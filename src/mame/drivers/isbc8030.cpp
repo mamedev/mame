@@ -57,7 +57,7 @@ private:
 	void isbc8030_io(address_map &map);
 	void isbc8030_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
 	required_device<i8255_device> m_ppi;
 	required_device<pic8259_device> m_pic;
@@ -90,6 +90,7 @@ void isbc8030_state::isbc8030(machine_config &config)
 	I8085A(config, m_maincpu, XTAL(22'118'400) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &isbc8030_state::isbc8030_mem);
 	m_maincpu->set_addrmap(AS_IO, &isbc8030_state::isbc8030_io);
+	m_maincpu->in_inta_func().set(m_pic, FUNC(pic8259_device::acknowledge));
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);

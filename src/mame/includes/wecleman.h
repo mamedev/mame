@@ -43,7 +43,7 @@ public:
 	void init_wecleman();
 	void init_hotchase();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hotchase_sound_status_r);
+	DECLARE_READ_LINE_MEMBER(hotchase_sound_status_r);
 
 private:
 	enum
@@ -93,7 +93,7 @@ private:
 	DECLARE_WRITE16_MEMBER(wecleman_protection_w);
 	DECLARE_WRITE16_MEMBER(irqctrl_w);
 	DECLARE_WRITE16_MEMBER(selected_ip_w);
-	DECLARE_READ16_MEMBER(selected_ip_r);
+	uint8_t selected_ip_r();
 	DECLARE_WRITE16_MEMBER(blitter_w);
 	DECLARE_READ8_MEMBER(multiply_r);
 	DECLARE_WRITE8_MEMBER(multiply_w);
@@ -104,7 +104,7 @@ private:
 	DECLARE_WRITE16_MEMBER(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w);
 	DECLARE_WRITE16_MEMBER(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w);
 	DECLARE_WRITE8_MEMBER(wecleman_K00723216_bank_w);
-	DECLARE_WRITE8_MEMBER(wecleman_volume_callback);
+	void wecleman_volume_callback(uint8_t data);
 	template<int Chip> DECLARE_READ8_MEMBER(hotchase_k007232_r);
 	template<int Chip> DECLARE_WRITE8_MEMBER(hotchase_k007232_w);
 

@@ -132,7 +132,7 @@ TILE_GET_INFO_MEMBER(ampoker2_state::get_bg_tile_info)
 	code = code + (256 * (color & 0x03));   /* code = color.bit1 + color.bit0 + code */
 	color = color >> 1;                     /* color = color - bit0 (bit1..bit7) */
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(ampoker2_state::s2k_get_bg_tile_info)
@@ -144,18 +144,18 @@ TILE_GET_INFO_MEMBER(ampoker2_state::s2k_get_bg_tile_info)
 	code = code + (256 * (color & 0x0f));   /* the game uses 2 extra bits */
 	color = color >> 1;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void ampoker2_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ampoker2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ampoker2_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 32);
 }
 
 VIDEO_START_MEMBER(ampoker2_state,sigma2k)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ampoker2_state::s2k_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ampoker2_state::s2k_get_bg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 32);
 }
 

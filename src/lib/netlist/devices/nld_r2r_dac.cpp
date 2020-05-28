@@ -15,14 +15,14 @@ namespace netlist
 	{
 	NETLIB_OBJECT_DERIVED(r2r_dac, twoterm)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(r2r_dac, twoterm)
-		, m_VIN(*this, "VIN", 1.0)
-		, m_R(*this, "R", 1.0)
+		NETLIB_CONSTRUCTOR(r2r_dac)
+		, m_VIN(*this, "VIN", nlconst::one())
+		, m_R(*this, "R", nlconst::one())
 		, m_num(*this, "N", 1)
 		, m_val(*this, "VAL", 1)
 		{
-			register_subalias("VOUT", m_P);
-			register_subalias("VGND", m_N);
+			register_subalias("VOUT", P());
+			register_subalias("VGND", N());
 		}
 
 		NETLIB_UPDATE_PARAMI();
@@ -30,8 +30,8 @@ namespace netlist
 		//NETLIB_UPDATEI();
 
 	protected:
-		param_double_t m_VIN;
-		param_double_t m_R;
+		param_fp_t m_VIN;
+		param_fp_t m_R;
 		param_int_t m_num;
 		param_int_t m_val;
 	};
@@ -39,12 +39,13 @@ namespace netlist
 
 	NETLIB_UPDATE_PARAM(r2r_dac)
 	{
-		solve_now();
-
-		double V = m_VIN() / static_cast<double>(1 << m_num())
-				* static_cast<double>(m_val());
-
-		this->set_G_V_I(1.0 / m_R(), V, 0.0);
+		nl_fptype V = m_VIN() / static_cast<nl_fptype>(1 << m_num())
+				* static_cast<nl_fptype>(m_val());
+		change_state([this, &V]()
+			{
+				this->set_G_V_I(plib::reciprocal(m_R()), V, nlconst::zero());
+			}
+		);
 	}
 	} //namespace analog
 

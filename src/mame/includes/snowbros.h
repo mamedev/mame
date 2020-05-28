@@ -74,9 +74,9 @@ private:
 	DECLARE_WRITE16_MEMBER(snowbros_irq4_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq3_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq2_ack_w);
-	DECLARE_WRITE8_MEMBER(prot_p0_w);
-	DECLARE_WRITE8_MEMBER(prot_p1_w);
-	DECLARE_WRITE8_MEMBER(prot_p2_w);
+	void prot_p0_w(uint8_t data);
+	void prot_p1_w(uint8_t data);
+	void prot_p2_w(uint8_t data);
 	DECLARE_READ16_MEMBER(sb3_sound_r);
 	DECLARE_READ16_MEMBER(_4in1_02_read);
 	DECLARE_READ16_MEMBER(_3in1_read);

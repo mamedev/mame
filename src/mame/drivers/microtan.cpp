@@ -238,7 +238,7 @@ static INPUT_PORTS_START( spinveti )
 	PORT_CONFSETTING(0x60, "Hardest")
 
 	PORT_START("KEYPAD")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Play") PORT_CODE(KEYCODE_P)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Play") PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Fire") PORT_CODE(KEYCODE_LCONTROL)
@@ -305,9 +305,9 @@ void microtan_state::mt65(machine_config &config)
 
 	/* snapshot/quickload */
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "dmp,m65"));
-	snapshot.set_load_callback(FUNC(microtan_state::snapshot_cb), this);
+	snapshot.set_load_callback(FUNC(microtan_state::snapshot_cb));
 	snapshot.set_interface("mt65_snap");
-	QUICKLOAD(config, "quickload", "hex").set_load_callback(FUNC(microtan_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "hex").set_load_callback(FUNC(microtan_state::quickload_cb));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "rom_list").set_original("mt65_rom");

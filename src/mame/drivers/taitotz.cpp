@@ -172,10 +172,10 @@ Notes:
 */
 
 #include "emu.h"
+#include "bus/ata/ataintf.h"
+#include "bus/ata/idehd.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/tlcs900/tlcs900.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
 #include "machine/nvram.h"
 #include "video/poly.h"
 
@@ -2187,7 +2187,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 
 READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 {
-	uint16_t d = m_ata->read_cs0(offset, mem_mask);
+	uint16_t d = m_ata->cs0_r(offset, mem_mask);
 	if (offset == 7)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2196,7 +2196,7 @@ READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 
 READ16_MEMBER(taitotz_state::tlcs_ide1_r)
 {
-	uint16_t d = m_ata->read_cs1(offset, mem_mask);
+	uint16_t d = m_ata->cs1_r(offset, mem_mask);
 	if (offset == 6)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2596,7 +2596,7 @@ void taitotz_state::taitotz(machine_config &config)
 
 	/* MN1020819DA sound CPU */
 
-	config.m_minimum_quantum = attotime::from_hz(120);
+	config.set_maximum_quantum(attotime::from_hz(120));
 
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, true));
 	ata.irq_handler().set(FUNC(taitotz_state::ide_interrupt));
@@ -2759,7 +2759,7 @@ ROM_START( taitotz )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", ROMREGION_ERASE00 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", ROMREGION_ERASE00 )
 	ROM_REGION( 0x10000, "sound_cpu", ROMREGION_ERASE00 ) /* Internal ROM :( */
 	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
 	DISK_REGION( "ata:0:hdd:image" )
@@ -2787,7 +2787,7 @@ ROM_START( landhigh )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e82-03.ic14", 0x000000, 0x020000, CRC(0de65b4d) SHA1(932316f7435259b723a29843d58b2e3dca92e7b7) )
 	ROM_LOAD16_BYTE( "e82-04.ic15", 0x000001, 0x020000, CRC(b3cb0f3d) SHA1(80414f50a1593c6b849d9f37e94a32168699a5c1) )
 
@@ -2807,7 +2807,7 @@ ROM_START( landhigha )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e82-03.ic14", 0x000000, 0x020000, CRC(0de65b4d) SHA1(932316f7435259b723a29843d58b2e3dca92e7b7) )
 	ROM_LOAD16_BYTE( "e82-04.ic15", 0x000001, 0x020000, CRC(b3cb0f3d) SHA1(80414f50a1593c6b849d9f37e94a32168699a5c1) )
 
@@ -2827,7 +2827,7 @@ ROM_START( batlgear )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V111A
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e68-07.ic14",  0x000000, 0x020000, CRC(554c6fd7) SHA1(9f203dead81c7ccf73d7fd462cab147cd17f890f) )
 	ROM_LOAD16_BYTE( "e68-08.ic15",  0x000001, 0x020000, CRC(f1932380) SHA1(64d12e858af15a9ba8254917da13863ac7c9c050) )
 
@@ -2842,7 +2842,7 @@ ROM_START( batlgr2 )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e87-03.ic14",  0x000000, 0x020000, CRC(49ae7cd0) SHA1(15f07a6bb2044a85a2139481f1dc95a44520c929) )
 	ROM_LOAD16_BYTE( "e87-04.ic15",  0x000001, 0x020000, CRC(59f8f75f) SHA1(f5595751b10c0033f460114c43f5e2c192fe61f1) )
 
@@ -2857,7 +2857,7 @@ ROM_START( batlgr2a )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e87-03.ic14",  0x000000, 0x020000, CRC(49ae7cd0) SHA1(15f07a6bb2044a85a2139481f1dc95a44520c929) )
 	ROM_LOAD16_BYTE( "e87-04.ic15",  0x000001, 0x020000, CRC(59f8f75f) SHA1(f5595751b10c0033f460114c43f5e2c192fe61f1) )
 
@@ -2872,14 +2872,14 @@ ROM_START( pwrshovl )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V111A
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e74-04++.ic14", 0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) ) // actually labeled E74-04**
 	ROM_LOAD16_BYTE( "e74-05++.ic15", 0x000001, 0x020000, CRC(2466217d) SHA1(dc814da3a1679cff001f179d3c1641af985a6490) ) // actually labeled E74-05**
 
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
+	ROM_REGION16_LE( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
 	ROM_LOAD( "e74-06.ic2", 0x000000, 0x020000, CRC(cd4a99d3) SHA1(ea280e05a68308c1c5f1fc0ee8a25b33923df635) ) // located on the I/O PCB
 
 	ROM_REGION( 0x20000, "oki1", 0 )
@@ -2896,14 +2896,14 @@ ROM_START( pwrshovla )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V111A
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e74-04++.ic14", 0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) ) // actually labeled E74-04**
 	ROM_LOAD16_BYTE( "e74-05++.ic15", 0x000001, 0x020000, CRC(2466217d) SHA1(dc814da3a1679cff001f179d3c1641af985a6490) ) // actually labeled E74-05**
 
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
+	ROM_REGION16_LE( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
 	ROM_LOAD( "e74-06.ic2", 0x000000, 0x020000, CRC(cd4a99d3) SHA1(ea280e05a68308c1c5f1fc0ee8a25b33923df635) ) // located on the I/O PCB
 
 	ROM_REGION( 0x20000, "oki1", 0 )
@@ -2920,7 +2920,7 @@ ROM_START( raizpin )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "f14-01.ic14",  0x000000, 0x020000, CRC(f86a184d) SHA1(46abd11430c08d4f384fb79a5a3a39e54f83b8d8) )
 	ROM_LOAD16_BYTE( "f14-02.ic15",  0x000001, 0x020000, CRC(bd2d0dee) SHA1(652f810702598184551de9fd69436862d48c1608) )
 
@@ -2935,7 +2935,7 @@ ROM_START( raizpinj )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "f14-01.ic14",  0x000000, 0x020000, CRC(f86a184d) SHA1(46abd11430c08d4f384fb79a5a3a39e54f83b8d8) )
 	ROM_LOAD16_BYTE( "f14-02.ic15",  0x000001, 0x020000, CRC(bd2d0dee) SHA1(652f810702598184551de9fd69436862d48c1608) )
 
@@ -2950,7 +2950,7 @@ ROM_START( styphp )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e98-01.ic14", 0x000000, 0x020000, CRC(479b37ad) SHA1(a0e59d990665244a7919a104dc4b6869ccf90be1) )
 	ROM_LOAD16_BYTE( "e98-02.ic15", 0x000001, 0x020000, CRC(d8da590f) SHA1(b33a67d81e388d7863adaf03041911c7f84d193b) )
 

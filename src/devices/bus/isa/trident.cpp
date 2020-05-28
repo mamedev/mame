@@ -169,7 +169,7 @@ void trident_vga_device::device_start()
 
 
 	// copy over interfaces
-	vga.read_dipswitch = read8_delegate(); //read_dipswitch;
+	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.vram_size = 0x200000;
 
 	vga.memory.resize(vga.svga_intf.vram_size);

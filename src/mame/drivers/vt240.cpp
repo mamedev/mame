@@ -74,7 +74,7 @@ private:
 	DECLARE_WRITE8_MEMBER(t11_comm_w);
 	DECLARE_READ8_MEMBER(duart_r);
 	DECLARE_WRITE8_MEMBER(duart_w);
-	DECLARE_WRITE8_MEMBER(duartout_w);
+	void duartout_w(uint8_t data);
 	DECLARE_READ8_MEMBER(mem_map_cs_r);
 	DECLARE_WRITE8_MEMBER(mem_map_cs_w);
 	DECLARE_READ8_MEMBER(ctrl_r);
@@ -84,7 +84,7 @@ private:
 	DECLARE_WRITE8_MEMBER(patmult_w);
 	DECLARE_WRITE8_MEMBER(vpat_w);
 	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	void vram_w(offs_t offset, uint16_t data);
 	DECLARE_READ8_MEMBER(vom_r);
 	DECLARE_WRITE8_MEMBER(vom_w);
 	DECLARE_READ8_MEMBER(nvr_store_r);
@@ -137,10 +137,10 @@ void vt240_state::irq_encoder(int irq, int state)
 		if(m_irqs & (1 << i))
 			break;
 	}
-	m_maincpu->set_input_line(3, (i & 8) ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(2, (i & 4) ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(1, (i & 2) ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(0, (i & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(t11_device::CP3_LINE, (i & 8) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(t11_device::CP2_LINE, (i & 4) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(t11_device::CP1_LINE, (i & 2) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(t11_device::CP0_LINE, (i & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(vt240_state::irq7_w)
@@ -208,8 +208,8 @@ UPD7220_DISPLAY_PIXELS_MEMBER( vt240_state::hgdc_draw )
 
 	if(!BIT(m_reg0, 7))
 	{
-		vram_w(generic_space(), address >> 1, 0);
-		vram_w(generic_space(), (0x20000 + address) >> 1, 0);
+		vram_w(address >> 1, 0);
+		vram_w((0x20000 + address) >> 1, 0);
 	}
 
 	gfx1 = m_video_ram[(address & 0x7fff) >> 1];
@@ -280,7 +280,7 @@ WRITE8_MEMBER(vt240_state::duart_w)
 		m_duart->write(offset >> 1, data);
 }
 
-WRITE8_MEMBER(vt240_state::duartout_w)
+void vt240_state::duartout_w(uint8_t data)
 {
 	m_host->write_rts(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 	m_host->write_dtr(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
@@ -386,7 +386,7 @@ READ16_MEMBER(vt240_state::vram_r)
 	return 0;
 }
 
-WRITE16_MEMBER(vt240_state::vram_w)
+void vt240_state::vram_w(offs_t offset, uint16_t data)
 {
 	uint8_t *video_ram = (uint8_t *)(&m_video_ram[0]);
 	offset <<= 1;

@@ -39,8 +39,8 @@
 class slotcarn_state : public driver_device
 {
 public:
-	slotcarn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	slotcarn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_backup_ram(*this, "backup_ram"),
 		m_ram_attr(*this, "raattr"),
 		m_ram_video(*this, "ravideo"),
@@ -571,8 +571,8 @@ void slotcarn_state::slotcarn(machine_config &config)
 	crtc.set_screen(m_screen);
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_begin_update_callback(FUNC(slotcarn_state::crtc_begin_update), this);
-	crtc.set_update_row_callback(FUNC(slotcarn_state::crtc_update_row), this);
+	crtc.set_begin_update_callback(FUNC(slotcarn_state::crtc_begin_update));
+	crtc.set_update_row_callback(FUNC(slotcarn_state::crtc_update_row));
 	crtc.out_hsync_callback().set(FUNC(slotcarn_state::hsync_changed));
 	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 

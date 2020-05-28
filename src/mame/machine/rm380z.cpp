@@ -305,7 +305,7 @@ void rm380z_state::config_memory_map()
 	else
 	{
 		program.install_rom( 0x0000, 0x0FFF, rom );
-		program.install_readwrite_handler(0x1BFC, 0x1BFF,read8_delegate(FUNC(rm380z_state::port_read_1b00), this),write8_delegate(FUNC(rm380z_state::port_write_1b00), this)    );
+		program.install_readwrite_handler(0x1BFC, 0x1BFF, read8_delegate(*this, FUNC(rm380z_state::port_read_1b00)), write8_delegate(*this, FUNC(rm380z_state::port_write_1b00)));
 		program.install_rom( 0x1C00, 0x1DFF, rom + 0x1400 );
 		program.install_ram( 0x4000, 0xDFFF, m_ram_p );
 	}

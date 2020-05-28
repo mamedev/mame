@@ -102,7 +102,7 @@ void isa8_pc1640_iga_device::device_start()
 	m_plane[3] = m_videoram + 0x30000;
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "ega", "iga");
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_w), this));
-	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_w), this));
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_w), this));
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_r)), write8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_w)));
+	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_r)), write8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_r)), write8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_w)));
 }

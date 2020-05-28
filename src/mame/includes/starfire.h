@@ -5,6 +5,10 @@
     Star Fire/Fire One system
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_STARFIRE_H
+#define MAME_INCLUDES_STARFIRE_H
+
+#pragma once
 
 #include "sound/samples.h"
 #include "screen.h"
@@ -25,14 +29,17 @@
 class starfire_state : public driver_device
 {
 public:
-	starfire_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	starfire_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_starfire_colorram(*this, "colorram"),
 		m_starfire_videoram(*this, "videoram"),
 		m_samples(*this, "samples"),
 		m_nmi(*this, "NMI"),
+		m_input_read(*this),
+		m_io2_write(*this),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{ }
 
 	void fireone(machine_config &config);
 	void starfire(machine_config &config);
@@ -59,6 +66,10 @@ private:
 
 	emu_timer* m_scanline_timer;
 	bitmap_rgb32 m_starfire_screen;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+
 	DECLARE_WRITE8_MEMBER(starfire_scratch_w);
 	DECLARE_READ8_MEMBER(starfire_scratch_r);
 	DECLARE_READ8_MEMBER(starfire_input_r);
@@ -74,8 +85,8 @@ private:
 	TIMER_CALLBACK_MEMBER(starfire_scanline_callback);
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	void get_pens(pen_t *pens);
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
 
 	void main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_STARFIRE_H

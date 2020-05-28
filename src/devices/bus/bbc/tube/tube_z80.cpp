@@ -67,7 +67,7 @@ void bbc_tube_z80_device::device_add_mconfig(machine_config &config)
 	m_z80->set_addrmap(AS_PROGRAM, &bbc_tube_z80_device::tube_z80_mem);
 	m_z80->set_addrmap(AS_OPCODES, &bbc_tube_z80_device::tube_z80_fetch);
 	m_z80->set_addrmap(AS_IO, &bbc_tube_z80_device::tube_z80_io);
-	m_z80->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(bbc_tube_z80_device::irq_callback), this));
+	m_z80->set_irq_acknowledge_callback(FUNC(bbc_tube_z80_device::irq_callback));
 
 	TUBE(config, m_ula);
 	m_ula->hirq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_tube_slot_device::irq_w));

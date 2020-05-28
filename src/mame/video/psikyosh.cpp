@@ -65,8 +65,10 @@ The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and 
 */
 
 #include "emu.h"
-#include "drawgfxm.h"
+#include "drawgfxt.ipp"
 #include "includes/psikyosh.h"
+
+#include <algorithm>
 
 static constexpr u32 BG_TRANSPEN = 0x00ff00ff; // used for representing transparency in temporary bitmaps
 
@@ -74,43 +76,102 @@ static constexpr u32 BG_TRANSPEN = 0x00ff00ff; // used for representing transpar
 //#define DEBUG_MESSAGE
 
 // take ARGB pixel with stored alpha and blend in to RGB32 bitmap
-#define PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(DEST, PRIORITY, SOURCE)                             \
+#define PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(DEST, SOURCE)                                           \
 do                                                                                                  \
 {                                                                                                   \
-	rgb_t srcdata = (SOURCE);                                                                      \
+	const rgb_t srcdata = (SOURCE);                                                                 \
 	if (srcdata != transpen)                                                                        \
-		(DEST) = alpha_blend_r32((DEST), srcdata, srcdata.a());                              \
+		(DEST) = alpha_blend_r32((DEST), srcdata, srcdata.a());                                     \
 }                                                                                                   \
 while (0)
 // take RGB pixel with separate alpha and blend in to RGB32 bitmap
-#define PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(DEST, PRIORITY, SOURCE)                                \
+#define PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(DEST, SOURCE)                                          \
 do                                                                                                  \
 {                                                                                                   \
-	u32 srcdata = (SOURCE);                                                                      \
+	const u32 srcdata = (SOURCE);                                                                   \
 	if (srcdata != transpen)                                                                        \
-		(DEST) = alpha_blend_r32((DEST), srcdata, alpha);                               \
+		(DEST) = alpha_blend_r32((DEST), srcdata, alpha);                                           \
 }                                                                                                   \
 while (0)
 // take ARGB pixel with stored alpha and copy in to RGB32 bitmap, scipping BG_TRANSPEN
-#define PIXEL_OP_COPY_TRANSPEN_RENDER32(DEST, PRIORITY, SOURCE)                             \
+#define PIXEL_OP_COPY_TRANSPEN_RENDER32(DEST, SOURCE)                                               \
 do                                                                                                  \
 {                                                                                                   \
-	u32 srcdata = (SOURCE);                                                                      \
+	const u32 srcdata = (SOURCE);                                                                   \
 	if (srcdata != transpen)                                                                        \
 		(DEST) = srcdata;                                                                           \
 }                                                                                                   \
 while (0)
 
+static inline void pixop_transparent_priority(u8 source, u32 *dest, u16 *pri, const pen_t *pal, u16 z)
+{
+	if (z >= *pri)
+	{
+		if (source != 0)
+		{
+			*dest = pal[source];
+			*pri = z;
+		}
+	}
+}
+
+static inline void pixop_transparent(u8 source, u32 *dest, const pen_t *pal)
+{
+	if (source != 0)
+		*dest = pal[source];
+}
+
+static inline void pixop_transparent_alpha_priority(u8 source, u32 *dest, u16 *pri, const pen_t *pal, u16 z, s16 alpha)
+{
+	if (z >= *pri)
+	{
+		if (source != 0)
+		{
+			*dest = alpha_blend_r32(*dest, pal[source], alpha);
+			*pri = z;
+		}
+	}
+}
+
+static inline void pixop_transparent_alpha(u8 source, u32 *dest, const pen_t *pal, s16 alpha)
+{
+	if (source != 0)
+		*dest = alpha_blend_r32(*dest, pal[source], alpha);
+}
+
+static inline void pixop_transparent_alphatable_priority(u8 source, u32 *dest, u16 *pri, const pen_t *pal, u16 z, u8 *alphatable)
+{
+	if (z >= *pri)
+	{
+		if (source != 0)
+		{
+			if (alphatable[source] == 0xff)
+				*dest = pal[source];
+			else
+				*dest = alpha_blend_r32(*dest, pal[source], alphatable[source]);
+
+			*pri = z;
+		}
+	}
+}
+
+static inline void pixop_transparent_alphatable(u8 source, u32 *dest, const pen_t *pal, u8 *alphatable)
+{
+	if (source != 0)
+	{
+		if (alphatable[source] == 0xff)
+			*dest = pal[source];
+		else
+			*dest = alpha_blend_r32(*dest, pal[source], alphatable[source]);
+	}
+}
 /*-------------------------------------------------
     draw_scanline32_alpha - take an RGB-encoded u32
     scanline and alpha-blend it into the destination bitmap
 -------------------------------------------------*/
 void psikyosh_state::draw_scanline32_alpha(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, int alpha)
 {
-	DECLARE_NO_PRIORITY;
-	u32 transpen = BG_TRANSPEN;
-
-	DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32, NO_PRIORITY);
+	drawscanline_core(bitmap, destx, desty, length, srcptr, [alpha, transpen = BG_TRANSPEN](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(destp, srcp); });
 }
 
 /*-------------------------------------------------
@@ -119,10 +180,7 @@ void psikyosh_state::draw_scanline32_alpha(bitmap_rgb32 &bitmap, s32 destx, s32 
 -------------------------------------------------*/
 void psikyosh_state::draw_scanline32_argb(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr)
 {
-	DECLARE_NO_PRIORITY;
-	u32 transpen = BG_TRANSPEN;
-
-	DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32, NO_PRIORITY);
+	drawscanline_core(bitmap, destx, desty, length, srcptr, [transpen = BG_TRANSPEN](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(destp, srcp); });
 }
 
 /*-------------------------------------------------
@@ -131,10 +189,7 @@ void psikyosh_state::draw_scanline32_argb(bitmap_rgb32 &bitmap, s32 destx, s32 d
 -------------------------------------------------*/
 void psikyosh_state::draw_scanline32_transpen(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr)
 {
-	DECLARE_NO_PRIORITY;
-	u32 transpen = BG_TRANSPEN;
-
-	DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_TRANSPEN_RENDER32, NO_PRIORITY);
+	drawscanline_core(bitmap, destx, desty, length, srcptr, [transpen = BG_TRANSPEN](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN_RENDER32(destp, srcp); });
 }
 
 
@@ -243,13 +298,13 @@ void psikyosh_state::draw_bglayerscroll(u8 const layer, bitmap_rgb32 &bitmap, co
 	u8 const size = BG_LARGE(layer) ? 32 : 16;
 	u16 const height = size * 16;
 
-	u8 linebank = BG_TYPE(layer);
+	u8 const linebank = BG_TYPE(layer);
 
 	/* cache rendered bitmap */
 	u8 last_bank[32]; // corresponds to bank of bitmap in m_bg_bitmap. bg_bitmap is split into 16/32-rows of one-tile high each
 	for (auto & elem : last_bank) elem = -1;
 
-	int scr_width = cliprect.width();
+	int const scr_width = cliprect.width();
 	u32 *scroll_reg = &m_spriteram[(linebank * 0x800) / 4 + cliprect.top()];
 	u32 *pzab_reg   = &m_spriteram[(linebank * 0x800) / 4 + cliprect.top() + 0x400 / 4]; // pri, zoom, alpha, bank
 
@@ -259,7 +314,7 @@ void psikyosh_state::draw_bglayerscroll(u8 const layer, bitmap_rgb32 &bitmap, co
 // write it with alpha
 	for (int scanline = cliprect.top(); scanline <= cliprect.bottom(); scanline++)
 	{
-		u8 pri = (*pzab_reg & 0xff000000) >> 24;
+		u8 const pri = (*pzab_reg & 0xff000000) >> 24;
 
 		if (pri == req_pri)
 		{
@@ -278,7 +333,7 @@ void psikyosh_state::draw_bglayerscroll(u8 const layer, bitmap_rgb32 &bitmap, co
 
 			if ((tilebank >= 0x0a) && (tilebank <= 0x1f)) /* 20 banks of 0x800 bytes. filter garbage. */
 			{
-				s16 const tilemap_scanline = (scanline - scrolly + 0x400) & (height - 1);
+				u16 const tilemap_scanline = (scanline - scrolly + 0x400) & (height - 1);
 
 				// render reelvant tiles to temp bitmap, assume bank changes infrequently/never. render alpha as per-pen
 				cache_bitmap(tilemap_scanline, gfx, size, tilebank, alpha, last_bank);
@@ -287,7 +342,7 @@ void psikyosh_state::draw_bglayerscroll(u8 const layer, bitmap_rgb32 &bitmap, co
 				g_profiler.start(PROFILER_USER2);
 				u32 tilemap_line[32 * 16];
 				u32 scr_line[64 * 8];
-				extract_scanline32(m_bg_bitmap, 0, tilemap_scanline, 0x200, tilemap_line);
+				std::copy_n(&m_bg_bitmap.pix32(tilemap_scanline, 0), 0x200, tilemap_line);
 				g_profiler.stop();
 
 				/* slow bit, needs optimising. apply scrollx and zoomx by assembling scanline from row */
@@ -428,25 +483,25 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 
 					if (sx < myclip.left())
 					{ /* clip left */
-						int pixels = myclip.left() - sx;
+						const int pixels = myclip.left() - sx;
 						sx += pixels;
 						x_index_base += xinc * pixels;
 					}
 					if (sy < myclip.top())
 					{ /* clip top */
-						int pixels = myclip.top() - sy;
+						const int pixels = myclip.top() - sy;
 						sy += pixels;
 						y_index += yinc * pixels;
 					}
 					/* NS 980211 - fixed incorrect clipping */
 					if (ex > myclip.right() + 1)
 					{ /* clip right */
-						int pixels = ex - myclip.right() - 1;
+						const int pixels = ex - myclip.right() - 1;
 						ex -= pixels;
 					}
 					if (ey > myclip.bottom() + 1)
 					{ /* clip bottom */
-						int pixels = ey - myclip.bottom() - 1;
+						const int pixels = ey - myclip.bottom() - 1;
 						ey -= pixels;
 					}
 
@@ -461,22 +516,14 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 								const u8 *source = code_base + (y_index) * gfx->rowbytes() + x_index_base;
 								u32 *dest = &dest_bmp.pix32(sy, sx);
 								u16 *pri = &m_z_bitmap.pix16(sy, sx);
-								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
-								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
+								const int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
+								const int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (int y = sy; y < ey; y++)
 								{
 									for (int x = sx; x < ex; x++)
 									{
-										if (z >= *pri)
-										{
-											const u8 c = *source;
-											if (c != 0)
-											{
-												*dest = pal[c];
-												*pri = z;
-											}
-										}
+										pixop_transparent_priority(*source, dest, pri, pal, z);
 										dest++;
 										pri++;
 										source += xinc;
@@ -490,17 +537,14 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 							{
 								const u8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								u32 *dest = &dest_bmp.pix32(sy, sx);
-								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
-								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
+								const int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
+								const int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (int y = sy; y < ey; y++)
 								{
 									for (int x = sx; x < ex; x++)
 									{
-										const u8 c = *source;
-										if (c != 0)
-											*dest = pal[c];
-
+										pixop_transparent(*source, dest, pal);
 										dest++;
 										source += xinc;
 									}
@@ -518,22 +562,14 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 								const u8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								u32 *dest = &dest_bmp.pix32(sy, sx);
 								u16 *pri = &m_z_bitmap.pix16(sy, sx);
-								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
-								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
+								const int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
+								const int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (int y = sy; y < ey; y++)
 								{
 									for (int x = sx; x < ex; x++)
 									{
-										if (z >= *pri)
-										{
-											const u8 c = *source;
-											if (c != 0)
-											{
-												*dest = alpha_blend_r32(*dest, pal[c], alpha);
-												*pri = z;
-											}
-										}
+										pixop_transparent_alpha_priority(*source, dest, pri, pal, z, alpha);
 										dest++;
 										pri++;
 										source += xinc;
@@ -547,17 +583,14 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 							{
 								const u8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								u32 *dest = &dest_bmp.pix32(sy, sx);
-								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
-								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
+								const int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
+								const int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (int y = sy; y < ey; y++)
 								{
 									for (int x = sx; x < ex; x++)
 									{
-										const u8 c = *source;
-										if (c != 0)
-											*dest = alpha_blend_r32(*dest, pal[c], alpha);
-
+										pixop_transparent_alpha(*source, dest, pal, alpha);
 										dest++;
 										source += xinc;
 									}
@@ -576,26 +609,14 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 								const u8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								u32 *dest = &dest_bmp.pix32(sy, sx);
 								u16 *pri = &m_z_bitmap.pix16(sy, sx);
-								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
-								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
+								const int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
+								const int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (int y = sy; y < ey; y++)
 								{
 									for (int x = sx; x < ex; x++)
 									{
-										if (z >= *pri)
-										{
-											const u8 c = *source;
-											if (c != 0)
-											{
-												if (m_alphatable[c] == 0xff)
-													*dest = pal[c];
-												else
-													*dest = alpha_blend_r32(*dest, pal[c], m_alphatable[c]);
-
-												*pri = z;
-											}
-										}
+										pixop_transparent_alphatable_priority(*source, dest, pri, pal, z, m_alphatable.get());
 										dest++;
 										pri++;
 										source += xinc;
@@ -609,21 +630,14 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 							{
 								const u8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								u32 *dest = &dest_bmp.pix32(sy, sx);
-								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
-								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
+								const int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
+								const int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (int y = sy; y < ey; y++)
 								{
 									for (int x = sx; x < ex; x++)
 									{
-										const u8 c = *source;
-										if (c != 0)
-										{
-											if (m_alphatable[c] == 0xff)
-												*dest = pal[c];
-											else
-												*dest = alpha_blend_r32(*dest, pal[c], m_alphatable[c]);
-										}
+										pixop_transparent_alphatable(*source, dest, pal, m_alphatable.get());
 										dest++;
 										source += xinc;
 									}
@@ -665,8 +679,8 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 		{
 			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 
-			int sprite_screen_height = ((high * gfx->height() * (0x400 * 0x400)) / zoomy + 0x200) >> 10; /* Round up to nearest pixel */
-			int sprite_screen_width = ((wide * gfx->width() * (0x400 * 0x400)) / zoomx + 0x200) >> 10;
+			const int sprite_screen_height = ((high * gfx->height() * (0x400 * 0x400)) / zoomy + 0x200) >> 10; /* Round up to nearest pixel */
+			const int sprite_screen_width = ((wide * gfx->width() * (0x400 * 0x400)) / zoomx + 0x200) >> 10;
 
 			if (sprite_screen_width && sprite_screen_height)
 			{
@@ -691,25 +705,25 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 
 				if (sx < myclip.left())
 				{ /* clip left */
-					int pixels = myclip.left() - sx;
+					const int pixels = myclip.left() - sx;
 					sx += pixels;
 					x_index_base += pixels * dx;
 				}
 				if (sy < myclip.top())
 				{ /* clip top */
-					int pixels = myclip.top() - sy;
+					const int pixels = myclip.top() - sy;
 					sy += pixels;
 					y_index += pixels * dy;
 				}
 				/* NS 980211 - fixed incorrect clipping */
 				if (ex > myclip.right() + 1)
 				{ /* clip right */
-					int pixels = ex-myclip.right() - 1;
+					const int pixels = ex-myclip.right() - 1;
 					ex -= pixels;
 				}
 				if (ey > myclip.bottom() + 1)
 				{ /* clip bottom */
-					int pixels = ey-myclip.bottom() - 1;
+					const int pixels = ey-myclip.bottom() - 1;
 					ey -= pixels;
 				}
 
@@ -724,22 +738,14 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 						{
 							for (int y = sy; y < ey; y++)
 							{
-								u8 *source = &m_zoom_bitmap.pix8(y_index >> 10);
+								const u8 *source = &m_zoom_bitmap.pix8(y_index >> 10);
 								u32 *dest = &dest_bmp.pix32(y);
 								u16 *pri = &m_z_bitmap.pix16(y);
 
 								int x_index = x_index_base;
 								for (int x = sx; x < ex; x++)
 								{
-									if (z >= pri[x])
-									{
-										const u8 c = source[x_index >> 10];
-										if (c != 0)
-										{
-											dest[x] = pal[c];
-											pri[x] = z;
-										}
-									}
+									pixop_transparent_priority(source[x_index >> 10], &dest[x], &pri[x], pal, z);
 									x_index += dx;
 								}
 
@@ -750,15 +756,13 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 						{
 							for (int y = sy; y < ey; y++)
 							{
-								u8 *source = &m_zoom_bitmap.pix8(y_index >> 10);
+								const u8 *source = &m_zoom_bitmap.pix8(y_index >> 10);
 								u32 *dest = &dest_bmp.pix32(y);
 
 								int x_index = x_index_base;
 								for (int x = sx; x < ex; x++)
 								{
-									const u8 c = source[x_index >> 10];
-									if (c != 0)
-										dest[x] = pal[c];
+									pixop_transparent(source[x_index >> 10], &dest[x], pal);
 									x_index += dx;
 								}
 
@@ -774,22 +778,14 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 						{
 							for (int y = sy; y < ey; y++)
 							{
-								u8 *source = &m_zoom_bitmap.pix8(y_index >> 10);
+								const u8 *source = &m_zoom_bitmap.pix8(y_index >> 10);
 								u32 *dest = &dest_bmp.pix32(y);
 								u16 *pri = &m_z_bitmap.pix16(y);
 
 								int x_index = x_index_base;
 								for (int x = sx; x < ex; x++)
 								{
-									if (z >= pri[x])
-									{
-										const u8 c = source[x_index >> 10];
-										if (c != 0)
-										{
-											dest[x] = alpha_blend_r32(dest[x], pal[c], alpha);
-											pri[x] = z;
-										}
-									}
+									pixop_transparent_alpha_priority(source[x_index >> 10], &dest[x], &pri[x], pal, z, alpha);
 									x_index += dx;
 								}
 
@@ -800,14 +796,13 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 						{
 							for (int y = sy; y < ey; y++)
 							{
-								u8 *source = &m_zoom_bitmap.pix8(y_index >> 10);
+								const u8 *source = &m_zoom_bitmap.pix8(y_index >> 10);
 								u32 *dest = &dest_bmp.pix32(y);
 
 								int x_index = x_index_base;
 								for (int x = sx; x < ex; x++)
 								{
-									const u8 c = source[x_index >> 10];
-									if (c != 0) dest[x] = alpha_blend_r32(dest[x], pal[c], alpha);
+									pixop_transparent_alpha(source[x_index >> 10], &dest[x], pal, alpha);
 									x_index += dx;
 								}
 
@@ -823,26 +818,14 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 						{
 							for (int y = sy; y < ey; y++)
 							{
-								u8 *source = &m_zoom_bitmap.pix8(y_index >> 10);
+								const u8 *source = &m_zoom_bitmap.pix8(y_index >> 10);
 								u32 *dest = &dest_bmp.pix32(y);
 								u16 *pri = &m_z_bitmap.pix16(y);
 
 								int x_index = x_index_base;
 								for (int x = sx; x < ex; x++)
 								{
-									if (z >= pri[x])
-									{
-										const u8 c = source[x_index >> 10];
-										if (c != 0)
-										{
-											if (m_alphatable[c] == 0xff)
-												dest[x] = pal[c];
-											else
-												dest[x] = alpha_blend_r32(dest[x], pal[c], m_alphatable[c]);
-
-											pri[x] = z;
-										}
-									}
+									pixop_transparent_alphatable_priority(source[x_index >> 10], &dest[x], &pri[x], pal, z, m_alphatable.get());
 									x_index += dx;
 								}
 
@@ -853,20 +836,13 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 						{
 							for (int y = sy; y < ey; y++)
 							{
-								u8 *source = &m_zoom_bitmap.pix8(y_index >> 10);
+								const u8 *source = &m_zoom_bitmap.pix8(y_index >> 10);
 								u32 *dest = &dest_bmp.pix32(y);
 
 								int x_index = x_index_base;
 								for (int x = sx; x < ex; x++)
 								{
-									const u8 c = source[x_index >> 10];
-									if (c != 0)
-									{
-										if (m_alphatable[c] == 0xff)
-											dest[x] = pal[c];
-										else
-											dest[x] = alpha_blend_r32(dest[x], pal[c], m_alphatable[c]);
-									}
+									pixop_transparent_alphatable(source[x_index >> 10], &dest[x], pal, m_alphatable.get());
 									x_index += dx;
 								}
 
@@ -981,7 +957,7 @@ void psikyosh_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 	while (sprite_ptr != m_sprite_end)
 	{
-		u8 bg_pri = SPRITE_PRI(sprite_ptr->bg_pri);
+		u8 const bg_pri = SPRITE_PRI(sprite_ptr->bg_pri);
 		// sprite vs backgrounds pri
 		if (bg_pri == req_pri)
 		{
@@ -1025,7 +1001,7 @@ void psikyosh_state::prelineblend(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	   gnbarich sets the 0x000000ff to 0x7f in test mode whilst the others use 0x80.
 	   tgm2 sets it to 0x00 on warning screen. Likely has no effect. */
 	u8 const bank = (m_vidregs[7] & 0xff000000) >> 24; /* bank is always 8 (0x4000) except for daraku/soldivid */
-	u32 *linefill = &m_spriteram[(bank * 0x800) / 4]; /* Per row */
+	u32 const *linefill = &m_spriteram[(bank * 0x800) / 4]; /* Per row */
 
 	assert(bitmap.bpp() == 32);
 
@@ -1046,7 +1022,7 @@ void psikyosh_state::postlineblend(bitmap_rgb32 &bitmap, const rectangle &clipre
 {
 	/* There are 224 values for post-lineblending. Using one for every row currently */
 	u8 const bank  = (m_vidregs[7] & 0xff000000) >> 24; /* bank is always 8 (i.e. 0x4000) except for daraku/soldivid */
-	u32 *lineblend = &m_spriteram[(bank * 0x800) / 4 + 0x400 / 4]; /* Per row */
+	u32 const *lineblend = &m_spriteram[(bank * 0x800) / 4 + 0x400 / 4]; /* Per row */
 
 	assert(bitmap.bpp() == 32);
 
@@ -1094,7 +1070,7 @@ void psikyosh_state::video_start()
 	}
 	for (i = 0; i < 0x40; i++)
 	{
-		int alpha = pal6bit(0x3f - i);
+		int const alpha = pal6bit(0x3f - i);
 		m_alphatable[i + 0xc0] = alpha;
 	}
 

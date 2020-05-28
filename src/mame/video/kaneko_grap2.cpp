@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(KANEKO_GRAP2, kaneko_grap2_device, "kaneko_grap2", "Kaneko GR
 
 kaneko_grap2_device::kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KANEKO_GRAP2, tag, owner, clock)
-	, device_rom_interface(mconfig, *this, 32) // TODO : Unknown Address Bits
+	, device_rom_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
 {
 }

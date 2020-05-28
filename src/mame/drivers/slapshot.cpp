@@ -128,9 +128,7 @@ ADC0809CNN - 8-bit Microprocessor Compatible A/D Converter
 Region byte at offset 0x031:
     d74_21.1  0x02  World Version
     d74_20.1  0x01  US Version
-    d74_??.1  0x00  Will Produce a Japanese Version, but it's unknown if the
-                    actual sound CPU code is the same as the World version,
-                    US versions or different then both.
+    d74_15.1  0x00  Japanese Version
 ***************************************************************************/
 
 #include "emu.h"
@@ -157,7 +155,7 @@ void slapshot_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(6, HOLD_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in slapshot_state::device_timer");
+		throw emu_fatalerror("Unknown id in slapshot_state::device_timer");
 	}
 }
 
@@ -407,14 +405,14 @@ void slapshot_state::machine_start()
 void slapshot_state::slapshot(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 14346000);   /* 28.6860 MHz / 2 ??? */
+	M68000(config, m_maincpu, 32_MHz_XTAL/2); /* overclocked MC68000P12F, 32MHz/2 or 26.6860MHz/2 ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &slapshot_state::slapshot_map);
 	m_maincpu->set_vblank_int("screen", FUNC(slapshot_state::interrupt));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 32000000/8));    /* 4 MHz */
+	z80_device &audiocpu(Z80(config, "audiocpu", 32_MHz_XTAL/8)); /* 4 MHz */
 	audiocpu.set_addrmap(AS_PROGRAM, &slapshot_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0640FIO(config, m_tc0640fio, 0);
 	m_tc0640fio->read_1_callback().set_ioport("COINS");
@@ -449,7 +447,7 @@ void slapshot_state::slapshot(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16000000/2));
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 32_MHz_XTAL/4)); /* 8 MHz */
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -466,14 +464,14 @@ void slapshot_state::slapshot(machine_config &config)
 void slapshot_state::opwolf3(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 14346000);   /* 28.6860 MHz / 2 ??? */
+	M68000(config, m_maincpu, 32_MHz_XTAL/2); /* overclocked MC68000P12F, 32MHz/2 or 26.6860MHz/2 ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &slapshot_state::opwolf3_map);
 	m_maincpu->set_vblank_int("screen", FUNC(slapshot_state::interrupt));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 32000000/8));    /* 4 MHz */
+	z80_device &audiocpu(Z80(config, "audiocpu", 32_MHz_XTAL/8)); /* 4 MHz */
 	audiocpu.set_addrmap(AS_PROGRAM, &slapshot_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
 	adc.eoc_ff_callback().set_inputline("maincpu", 3);
@@ -515,7 +513,7 @@ void slapshot_state::opwolf3(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16000000/2));
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 32_MHz_XTAL/4)); /* 8 MHz */
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -575,21 +573,21 @@ ROM_START( opwolf3 )
 	ROM_LOAD16_BYTE( "d74_17.17", 0x100001, 0x80000, CRC(ac35a672) SHA1(8136bd076443bfaeb3d339971d88951e8b2b59b4) ) // data ???
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD    ( "d74_22.77",    0x00000, 0x10000, CRC(118374a6) SHA1(cc1d0d28efdf1df3e648e7d932405811854ba4ee) )
+	ROM_LOAD( "d74_22.77", 0x00000, 0x10000, CRC(118374a6) SHA1(cc1d0d28efdf1df3e648e7d932405811854ba4ee) )
 
 	ROM_REGION( 0x400000, "tc0480scp", 0 )
-	ROM_LOAD32_WORD( "d74_05.80", 0x000000, 0x200000, CRC(85ea64cc) SHA1(1960a934191c451df1554323d47f6fc64939b0ce) )    /* SCR */
+	ROM_LOAD32_WORD( "d74_05.80", 0x000000, 0x200000, CRC(85ea64cc) SHA1(1960a934191c451df1554323d47f6fc64939b0ce) ) /* SCR */
 	ROM_LOAD32_WORD( "d74_06.81", 0x000002, 0x200000, CRC(2fa1e08d) SHA1(f1f34b308202fe08e73535424b5b4e3d91295224) )
 
 	ROM_REGION( 0x400000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "d74_02.23", 0x000000, 0x200000, CRC(aab86332) SHA1(b9133407504e9ef4fd5ae7d284cdb0c7f78f9a99) )    /* OBJ 4bpp */
+	ROM_LOAD16_BYTE( "d74_02.23", 0x000000, 0x200000, CRC(aab86332) SHA1(b9133407504e9ef4fd5ae7d284cdb0c7f78f9a99) ) /* OBJ 4bpp */
 	ROM_LOAD16_BYTE( "d74_03.24", 0x000001, 0x200000, CRC(3f398916) SHA1(4b6a3ee0baf5f32e24e5040f233300f1ca347fe7) )
 
 	ROM_REGION( 0x200000, "sprites_hi", 0 )
-	ROM_LOAD       ( "d74_04.25", 0x000000, 0x200000, CRC(2f385638) SHA1(1ba2ec7d9b1c491e1cc6d7e646e09ef2bc063f25) )    /* OBJ 2bpp */
+	ROM_LOAD( "d74_04.25", 0x000000, 0x200000, CRC(2f385638) SHA1(1ba2ec7d9b1c491e1cc6d7e646e09ef2bc063f25) ) /* OBJ 2bpp */
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )  /* ADPCM samples */
-	ROM_LOAD( "d74_01.37",  0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
+	ROM_LOAD( "d74_01.37", 0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
 
 	/* no Delta-T samples */
 ROM_END
@@ -602,21 +600,48 @@ ROM_START( opwolf3u )
 	ROM_LOAD16_BYTE( "d74_17.17", 0x100001, 0x80000, CRC(ac35a672) SHA1(8136bd076443bfaeb3d339971d88951e8b2b59b4) ) // data ???
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD    ( "d74_19.77",    0x00000, 0x10000, CRC(05d53f06) SHA1(48b0cd68ad3758f424552a4e3833c5a1c2f1825b) )
+	ROM_LOAD( "d74_19.77", 0x00000, 0x10000, CRC(05d53f06) SHA1(48b0cd68ad3758f424552a4e3833c5a1c2f1825b) )
 
 	ROM_REGION( 0x400000, "tc0480scp", 0 )
-	ROM_LOAD32_WORD( "d74_05.80", 0x000000, 0x200000, CRC(85ea64cc) SHA1(1960a934191c451df1554323d47f6fc64939b0ce) )    /* SCR */
+	ROM_LOAD32_WORD( "d74_05.80", 0x000000, 0x200000, CRC(85ea64cc) SHA1(1960a934191c451df1554323d47f6fc64939b0ce) ) /* SCR */
 	ROM_LOAD32_WORD( "d74_06.81", 0x000002, 0x200000, CRC(2fa1e08d) SHA1(f1f34b308202fe08e73535424b5b4e3d91295224) )
 
 	ROM_REGION( 0x400000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "d74_02.23", 0x000000, 0x200000, CRC(aab86332) SHA1(b9133407504e9ef4fd5ae7d284cdb0c7f78f9a99) )    /* OBJ 6bpp */
+	ROM_LOAD16_BYTE( "d74_02.23", 0x000000, 0x200000, CRC(aab86332) SHA1(b9133407504e9ef4fd5ae7d284cdb0c7f78f9a99) ) /* OBJ 6bpp */
 	ROM_LOAD16_BYTE( "d74_03.24", 0x000001, 0x200000, CRC(3f398916) SHA1(4b6a3ee0baf5f32e24e5040f233300f1ca347fe7) )
 
 	ROM_REGION( 0x200000, "sprites_hi", 0 )
-	ROM_LOAD       ( "d74_04.25", 0x000000, 0x200000, CRC(2f385638) SHA1(1ba2ec7d9b1c491e1cc6d7e646e09ef2bc063f25) )
+	ROM_LOAD( "d74_04.25", 0x000000, 0x200000, CRC(2f385638) SHA1(1ba2ec7d9b1c491e1cc6d7e646e09ef2bc063f25) )
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )  /* ADPCM samples */
-	ROM_LOAD( "d74_01.37",  0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
+	ROM_LOAD( "d74_01.37", 0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
+
+	/* no Delta-T samples */
+ROM_END
+
+ROM_START( opwolf3j )
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 1024K for 68000 code */
+	ROM_LOAD16_BYTE( "d74_16.3",  0x000000, 0x80000, CRC(198ff1f6) SHA1(f5b51e39cd73ea56cbf53731d3c885bfcecbd696) )
+	ROM_LOAD16_BYTE( "d74_15.1",  0x000001, 0x80000, CRC(a6015c65) SHA1(4659c04fed64d3efc2df662770cb4bee285c2ec5) )
+	ROM_LOAD16_BYTE( "d74_18.18", 0x100000, 0x80000, CRC(bd5d7cdb) SHA1(29f1cd7b86bc05f873e93f088194113da87a3b86) ) // data ???
+	ROM_LOAD16_BYTE( "d74_17.17", 0x100001, 0x80000, CRC(ac35a672) SHA1(8136bd076443bfaeb3d339971d88951e8b2b59b4) ) // data ???
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "d74_19.77", 0x00000, 0x10000, CRC(05d53f06) SHA1(48b0cd68ad3758f424552a4e3833c5a1c2f1825b) ) /* verified correct for the Japanese set */
+
+	ROM_REGION( 0x400000, "tc0480scp", 0 )
+	ROM_LOAD32_WORD( "d74_05.80", 0x000000, 0x200000, CRC(85ea64cc) SHA1(1960a934191c451df1554323d47f6fc64939b0ce) ) /* SCR */
+	ROM_LOAD32_WORD( "d74_06.81", 0x000002, 0x200000, CRC(2fa1e08d) SHA1(f1f34b308202fe08e73535424b5b4e3d91295224) )
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "d74_02.23", 0x000000, 0x200000, CRC(aab86332) SHA1(b9133407504e9ef4fd5ae7d284cdb0c7f78f9a99) ) /* OBJ 6bpp */
+	ROM_LOAD16_BYTE( "d74_03.24", 0x000001, 0x200000, CRC(3f398916) SHA1(4b6a3ee0baf5f32e24e5040f233300f1ca347fe7) )
+
+	ROM_REGION( 0x200000, "sprites_hi", 0 )
+	ROM_LOAD( "d74_04.25", 0x000000, 0x200000, CRC(2f385638) SHA1(1ba2ec7d9b1c491e1cc6d7e646e09ef2bc063f25) )
+
+	ROM_REGION( 0x200000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_LOAD( "d74_01.37", 0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
 
 	/* no Delta-T samples */
 ROM_END
@@ -663,3 +688,4 @@ void slapshot_state::driver_init()
 GAME( 1994, slapshot, 0,       slapshot, slapshot, slapshot_state, driver_init, ROT0, "Taito Corporation",         "Slap Shot (Japan)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1994, opwolf3,  0,       opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, opwolf3u, opwolf3, opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3j, opwolf3, opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito Corporation",         "Operation Wolf 3 (Japan)", MACHINE_SUPPORTS_SAVE )

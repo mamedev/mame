@@ -147,7 +147,7 @@ Clock mode:
 #include "emu.h"
 #include "tms9901.h"
 
-#include <math.h>
+#include <cmath>
 
 #define LOG_GENERAL  (1U << 0)
 #define LOG_PINS     (1U << 1)
@@ -172,7 +172,7 @@ tms9901_device::tms9901_device(const machine_config &mconfig, const char *tag, d
 	m_clockdiv(0),
 	m_timer_int_pending(false),
 	m_read_port(*this),
-	m_write_p{{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this}},
+	m_write_p(*this),
 	m_interrupt(*this)
 {
 }
@@ -314,12 +314,17 @@ void tms9901_device::set_int_line(int n, int state)
      (in this order). When configured as outputs, reading returns the latched
      values.
 */
-READ8_MEMBER( tms9901_device::read )
+uint8_t tms9901_device::read(offs_t offset)
 {
-	int crubit = offset & 0x01f;
+	return read_bit(offset)? 0x01 : 0x00;
+}
+
+bool tms9901_device::read_bit(int bit)
+{
+	int crubit = bit & 0x01f;
 
 	if (crubit == 0)
-		return m_clock_mode? 1 : 0;
+		return m_clock_mode;
 
 	if (crubit > 15)
 	{
@@ -329,8 +334,8 @@ READ8_MEMBER( tms9901_device::read )
 		else
 		{
 			// Positive logic; should be 0 if there is no connection.
-			if (m_read_port.isnull()) return 0;
-			return m_read_port((crubit<=P6)? crubit : P6+P0-crubit);
+			if (m_read_port.isnull()) return false;
+			return m_read_port((crubit<=P6)? crubit : P6+P0-crubit)!=0;
 		}
 	}
 
@@ -338,9 +343,9 @@ READ8_MEMBER( tms9901_device::read )
 	if (m_clock_mode)
 	{
 		if (crubit == 15)    // bit 15 in clock mode = /INTREQ
-			return (m_int_pending)? 0 : 1;
+			return !m_int_pending;
 
-		return BIT(m_clock_read_register, crubit-1);
+		return BIT(m_clock_read_register, crubit-1)!=0;
 	}
 	else
 	{
@@ -352,7 +357,7 @@ READ8_MEMBER( tms9901_device::read )
 		if (crubit>INT6 && is_output(22-crubit))
 			return output_value(22-crubit);
 		else
-			return m_read_port.isnull()? 1 : m_read_port(crubit);
+			return m_read_port.isnull()? true : (m_read_port(crubit)!=0);
 	}
 }
 
@@ -367,9 +372,13 @@ READ8_MEMBER( tms9901_device::read )
      15      Clock mode: /RST2; Interrupt mode: Set Mask 15
      16..31  Set P(n-16) as output, latch value, and output it
 */
-WRITE8_MEMBER( tms9901_device::write )
+void tms9901_device::write(offs_t offset, uint8_t data)
 {
-	data &= 1;  // clear extra bits
+	write_bit(offset, data!=0);
+}
+
+void tms9901_device::write_bit(int offset, bool data)
+{
 	int crubit = offset & 0x001f;
 
 	if (crubit >= 16)
@@ -477,7 +486,7 @@ void tms9901_device::timer_clock_in(line_state clk)
     a CLK line controlled by the CPU, like the TMS99xx systems.
     In that case, clock is set to 0.
 */
-WRITE_LINE_MEMBER( tms9901_device::phi_line )
+void tms9901_device::phi_line(int state)
 {
 	if (state==ASSERT_LINE)
 	{
@@ -564,7 +573,7 @@ void tms9901_device::device_reset()
 /*
     RST1 input line (active low; using ASSERT/CLEAR).
 */
-WRITE_LINE_MEMBER( tms9901_device::rst1_line )
+void tms9901_device::rst1_line(int state)
 {
 	if (state==ASSERT_LINE) do_reset();
 }
@@ -599,8 +608,7 @@ void tms9901_device::device_start()
 	}
 
 	m_read_port.resolve();
-	for (auto &cb : m_write_p)
-		cb.resolve_safe();
+	m_write_p.resolve_all_safe();
 	m_interrupt.resolve();
 
 	m_clock_register = 0;

@@ -48,7 +48,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void master(machine_config &config);
 
 	void init_master();
@@ -215,7 +215,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void master_state::master(machine_config &config)

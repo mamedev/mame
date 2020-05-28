@@ -61,19 +61,19 @@ public:
 	void dim68k(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER( dim68k_duart_r );
-	DECLARE_READ16_MEMBER( dim68k_fdc_r );
-	DECLARE_READ16_MEMBER( dim68k_game_switches_r );
-	DECLARE_READ16_MEMBER( dim68k_speaker_r );
-	DECLARE_WRITE16_MEMBER( dim68k_banksw_w );
-	DECLARE_WRITE16_MEMBER( dim68k_duart_w );
-	DECLARE_WRITE16_MEMBER( dim68k_fdc_w );
-	DECLARE_WRITE16_MEMBER( dim68k_printer_strobe_w );
-	DECLARE_WRITE16_MEMBER( dim68k_reset_timers_w );
-	DECLARE_WRITE16_MEMBER( dim68k_speaker_w );
-	DECLARE_WRITE16_MEMBER( dim68k_video_control_w );
-	DECLARE_WRITE16_MEMBER( dim68k_video_high_w );
-	DECLARE_WRITE16_MEMBER( dim68k_video_reset_w );
+	u16 dim68k_duart_r(offs_t offset);
+	u16 dim68k_fdc_r();
+	u16 dim68k_game_switches_r();
+	u16 dim68k_speaker_r();
+	void dim68k_banksw_w(u16 data);
+	void dim68k_duart_w(u16 data);
+	void dim68k_fdc_w(u16 data);
+	void dim68k_printer_strobe_w(u16 data);
+	void dim68k_reset_timers_w(u16 data);
+	void dim68k_speaker_w(u16 data);
+	void dim68k_video_control_w(u16 data);
+	void dim68k_video_high_w(u16 data);
+	void dim68k_video_reset_w(u16 data);
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -91,7 +91,7 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-READ16_MEMBER( dim68k_state::dim68k_duart_r )
+u16 dim68k_state::dim68k_duart_r(offs_t offset)
 // Port A is for the keyboard : 300 baud, no parity, 8 bits, 1 stop bit. Port B is for RS232.
 // The device also controls the parallel printer (except the strobe) and the RTC.
 // Device = SCN2681, not emulated. The keyboard is standard ASCII, so we can use the terminal
@@ -103,12 +103,12 @@ READ16_MEMBER( dim68k_state::dim68k_duart_r )
 	return 0;
 }
 
-READ16_MEMBER( dim68k_state::dim68k_fdc_r )
+u16 dim68k_state::dim68k_fdc_r()
 {
 	return 0;
 }
 
-READ16_MEMBER( dim68k_state::dim68k_game_switches_r )
+u16 dim68k_state::dim68k_game_switches_r()
 // Reading the game port switches
 // FFCC11 = switch 0; FFCC13 = switch 1, etc to switch 3
 // FFCC19 = paddle 0; FFCC1B = paddle 1, etc to paddle 3
@@ -116,7 +116,7 @@ READ16_MEMBER( dim68k_state::dim68k_game_switches_r )
 	return 0xffff;
 }
 
-READ16_MEMBER( dim68k_state::dim68k_speaker_r )
+u16 dim68k_state::dim68k_speaker_r()
 // Any read or write of this address will toggle the position of the speaker cone
 {
 	m_speaker_bit ^= 1;
@@ -124,22 +124,22 @@ READ16_MEMBER( dim68k_state::dim68k_speaker_r )
 	return 0;
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_speaker_w )
+void dim68k_state::dim68k_speaker_w(u16 data)
 {
 	m_speaker_bit ^= 1;
 	m_speaker->level_w(m_speaker_bit);
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_fdc_w )
+void dim68k_state::dim68k_fdc_w(u16 data)
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_video_high_w )
+void dim68k_state::dim68k_video_high_w(u16 data)
 // "write high byte of address in memory of start of display buffer"
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_video_control_w )
+void dim68k_state::dim68k_video_control_w(u16 data)
 {
 /* D7 0 = Hires/Graphics; 1= Lores/Text [not emulated yet]
    D6 0 = 8 dots per character; 1 = 7 dots [emulated]
@@ -166,25 +166,25 @@ WRITE16_MEMBER( dim68k_state::dim68k_video_control_w )
 	}
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_video_reset_w )
+void dim68k_state::dim68k_video_reset_w(u16 data)
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_duart_w )
+void dim68k_state::dim68k_duart_w(u16 data)
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_reset_timers_w )
+void dim68k_state::dim68k_reset_timers_w(u16 data)
 // reset game port timer before reading paddles
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_printer_strobe_w )
+void dim68k_state::dim68k_printer_strobe_w(u16 data)
 // anything sent here will trigger a one-shot for a strobe pulse
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_banksw_w )
+void dim68k_state::dim68k_banksw_w(u16 data)
 // At boot time, the rom and IO occupy 0-FFFF, this moves it to the proper place
 {
 }
@@ -213,7 +213,7 @@ void dim68k_state::dim68k_mem(address_map &map)
 	map(0x00ffcc00, 0x00ffcc1f).rw(FUNC(dim68k_state::dim68k_game_switches_r), FUNC(dim68k_state::dim68k_reset_timers_w));
 	map(0x00ffd000, 0x00ffd003).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff); // NEC uPD765A
 	map(0x00ffd004, 0x00ffd005).rw(FUNC(dim68k_state::dim68k_fdc_r), FUNC(dim68k_state::dim68k_fdc_w));
-	//AM_RANGE(0x00ffd400, 0x00ffd403) emulation trap control
+	//map(0x00ffd400, 0x00ffd403) emulation trap control
 	map(0x00ffd800, 0x00ffd801).w(FUNC(dim68k_state::dim68k_printer_strobe_w));
 	map(0x00ffdc00, 0x00ffdc01).w(FUNC(dim68k_state::dim68k_banksw_w));
 }
@@ -225,9 +225,9 @@ INPUT_PORTS_END
 
 void dim68k_state::machine_reset()
 {
-	u8* ROM = memregion("bootrom")->base();
+	u16* ROM = &memregion("bootrom")->as_u16();
 
-	memcpy((u8*)m_ram.target(), ROM, 0x2000);
+	memcpy((u16*)m_ram.target(), ROM, 0x2000);
 }
 
 // Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.
@@ -339,7 +339,7 @@ void dim68k_state::dim68k(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row));
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(dim68k_state::kbd_put));
@@ -376,26 +376,26 @@ MC113   82S153  U16
 */
 /* ROM definition */
 ROM_START( dim68k )
-	ROM_REGION( 0x2000, "bootrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "mc103e.bin", 0x0000, 0x1000, CRC(4730c902) SHA1(5c4bb79ad22def721a22eb63dd05e0391c8082be))
-	ROM_LOAD16_BYTE( "mc104.bin",  0x0001, 0x1000, CRC(14b04575) SHA1(43e15d9ebe1c9c1bf1bcfc1be3899a49e6748200))
+	ROM_REGION16_BE( 0x2000, "bootrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "mc103e.bin", 0x0001, 0x1000, CRC(4730c902) SHA1(5c4bb79ad22def721a22eb63dd05e0391c8082be))
+	ROM_LOAD16_BYTE( "mc104.bin",  0x0000, 0x1000, CRC(14b04575) SHA1(43e15d9ebe1c9c1bf1bcfc1be3899a49e6748200))
 
 	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASEFF )
 	ROM_LOAD( "mc105e.bin", 0x0000, 0x1000, CRC(7a09daa8) SHA1(844bfa579293d7c3442fcbfa21bda75fff930394))
 
 	// The remaining roms may not be in the correct positions or being loaded correctly
-	ROM_REGION( 0x1000, "cop6512", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "mc106.bin", 0x0000, 0x0100, CRC(11530d8a) SHA1(e3eae266535383bcaee2d84d7bed6052d40e4e4a))
-	ROM_LOAD16_WORD_SWAP( "mc107.bin", 0x0100, 0x0100, CRC(966db11b) SHA1(3c3105ac842602d8e01b0f924152fd672a85f00c))
-	ROM_LOAD16_WORD_SWAP( "mc108.bin", 0x0200, 0x0400, CRC(687f9b0a) SHA1(ed9f1265b25f89f6d3cf8cd0a7b0fb73cb129f9f))
-	ROM_LOAD16_WORD_SWAP( "mc109.bin", 0x0600, 0x0200, CRC(4a857f98) SHA1(9f2bbc2171fc49f65aa798c9cd7799a26afd2ddf))
-	ROM_LOAD16_WORD_SWAP( "mc110.bin", 0x0800, 0x0100, CRC(e207b457) SHA1(a8987ba3d1bbdb3d8b3b11cec90c532ff09e762e))
+	ROM_REGION16_BE( 0x1000, "cop6512", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD( "mc106.bin", 0x0000, 0x0100, CRC(11530d8a) SHA1(e3eae266535383bcaee2d84d7bed6052d40e4e4a))
+	ROM_LOAD16_WORD( "mc107.bin", 0x0100, 0x0100, CRC(966db11b) SHA1(3c3105ac842602d8e01b0f924152fd672a85f00c))
+	ROM_LOAD16_WORD( "mc108.bin", 0x0200, 0x0400, CRC(687f9b0a) SHA1(ed9f1265b25f89f6d3cf8cd0a7b0fb73cb129f9f))
+	ROM_LOAD16_WORD( "mc109.bin", 0x0600, 0x0200, CRC(4a857f98) SHA1(9f2bbc2171fc49f65aa798c9cd7799a26afd2ddf))
+	ROM_LOAD16_WORD( "mc110.bin", 0x0800, 0x0100, CRC(e207b457) SHA1(a8987ba3d1bbdb3d8b3b11cec90c532ff09e762e))
 
-	ROM_REGION( 0x1000, "copz80", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "mc111.bin", 0x0000, 0x0020, CRC(6a380057) SHA1(6522a7b3e0af9db14a6ed04d4eec3ee6e44c2dab))
+	ROM_REGION16_BE( 0x1000, "copz80", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD( "mc111.bin", 0x0000, 0x0020, CRC(6a380057) SHA1(6522a7b3e0af9db14a6ed04d4eec3ee6e44c2dab))
 
-	ROM_REGION( 0x1000, "cop8086", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "mc112.bin", 0x0000, 0x0100, CRC(dfd4cdbb) SHA1(a7831d415943fa86c417066807038bccbabb2573))
+	ROM_REGION16_BE( 0x1000, "cop8086", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD( "mc112.bin", 0x0000, 0x0100, CRC(dfd4cdbb) SHA1(a7831d415943fa86c417066807038bccbabb2573))
 	ROM_LOAD( "mc113.bin", 0x0100, 0x00ef, CRC(594bdf05) SHA1(36db911a27d930e023fa12683e86e9eecfffdba6))
 
 	ROM_REGION( 0x1000, "mb", ROMREGION_ERASEFF )   // mainboard unknown

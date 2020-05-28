@@ -162,31 +162,20 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 chars */
-	4096,
+	RGN_FRAC(1,2),
 	4,      /* 4 bits per pixel  */
-	{ 0x00000*8, 0x10000*8, 0x8000*8, 0x18000*8 },
+	{ 8, 0, RGN_FRAC(1,2)+8, RGN_FRAC(1,2) },
 	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8 /* every char takes 8 consecutive bytes */
+	{ STEP8(0,8*2) },
+	8*8*2 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout seallayout =
 {
 	16,16,
-	4096,
+	RGN_FRAC(1,2),
 	4,
-	{ 8, 0,  0x40000*8+8, 0x40000*8 },
-	{ STEP8(16*8*2,1), STEP8(0,1) },
-	{ STEP16(0,8*2) },
-	64*8
-};
-
-static const gfx_layout seallayout2 =
-{
-	16,16,
-	4096*2,
-	4,
-	{ 8, 0, 0x80000*8+8, 0x80000*8 },
+	{ 8, 0, RGN_FRAC(1,2)+8, RGN_FRAC(1,2) },
 	{ STEP8(16*8*2,1), STEP8(0,1) },
 	{ STEP16(0,8*2) },
 	64*8
@@ -196,7 +185,7 @@ static GFXDECODE_START( gfx_darkseal )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 16 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, seallayout,  768, 16 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, seallayout, 1024, 16 )  /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, seallayout2, 256, 32 )  /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, seallayout,  256, 32 )  /* Sprites 16x16 */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -211,6 +200,7 @@ void darkseal_state::darkseal(machine_config &config)
 	H6280(config, m_audiocpu, XTAL(32'220'000)/4); /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &darkseal_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+	m_audiocpu->set_timer_scale(2);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -229,8 +219,6 @@ void darkseal_state::darkseal(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x64);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x64);     // both these tilemaps need to be twice the y size of usual!
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -242,8 +230,6 @@ void darkseal_state::darkseal(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x00);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
@@ -287,8 +273,8 @@ ROM_START( darkseal )
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
-	ROM_LOAD( "fz_03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
+	ROM_LOAD16_BYTE( "fz_02.j1", 0x000001, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
+	ROM_LOAD16_BYTE( "fz_03.j2", 0x000000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
 	ROM_LOAD( "mac-03.h3", 0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
@@ -318,8 +304,8 @@ ROM_START( darkseal1 )
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz_02-1.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
-	ROM_LOAD( "fz_03-1.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
+	ROM_LOAD16_BYTE( "fz_02-1.j1", 0x000001, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
+	ROM_LOAD16_BYTE( "fz_03-1.j2", 0x000000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
 	ROM_LOAD( "mac-03.h3", 0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
@@ -349,8 +335,8 @@ ROM_START( darksealj )
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
-	ROM_LOAD( "fz_03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
+	ROM_LOAD16_BYTE( "fz_02.j1", 0x000001, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
+	ROM_LOAD16_BYTE( "fz_03.j2", 0x000000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
 	ROM_LOAD( "mac-03.h3", 0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
@@ -380,8 +366,8 @@ ROM_START( gatedoom )
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
-	ROM_LOAD( "fz_03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
+	ROM_LOAD16_BYTE( "fz_02.j1", 0x000001, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
+	ROM_LOAD16_BYTE( "fz_03.j2", 0x000000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
 	ROM_LOAD( "mac-03.h3", 0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
@@ -411,8 +397,8 @@ ROM_START( gatedoom1 )
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
-	ROM_LOAD( "fz_03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
+	ROM_LOAD16_BYTE( "fz_02.j1", 0x000001, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
+	ROM_LOAD16_BYTE( "fz_03.j2", 0x000000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
 	ROM_LOAD( "mac-03.h3", 0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */

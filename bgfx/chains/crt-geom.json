@@ -108,6 +108,7 @@
 	"passes": [
 		{
 			"effect": "crt-geom/crt-geom",
+			"applytint": true,
 			"name": "CRT",
 			"uniforms": [
 			    { "uniform": "curvature",   "slider": "curvature" },

@@ -14,6 +14,9 @@ Hardware notes:
 
 I/O is similar to supercon
 
+TODO:
+- add power-off NMI? does nothing, it will just go into an infinite loop
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -47,7 +50,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void cforte(machine_config &config);
 
 protected:
@@ -72,7 +75,7 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE64_MEMBER(lcd_output_w);
+	void lcd_output_w(u64 data);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(input1_r);
@@ -101,7 +104,7 @@ void cforte_state::machine_start()
 
 // HLCD0538
 
-WRITE64_MEMBER(cforte_state::lcd_output_w)
+void cforte_state::lcd_output_w(u64 data)
 {
 	// 4 rows used
 	u32 rowdata[4];
@@ -147,7 +150,7 @@ WRITE8_MEMBER(cforte_state::control_w)
 	m_lcd->clk_w(data >> 1 & 1);
 	m_lcd->lcd_w(data >> 2 & 1);
 
-	// d3: unused?
+	// d3: ? (goes high at power-off NMI)
 
 	// d4-d6: select led row
 	m_led_select = data >> 4 & 7;
@@ -241,7 +244,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void cforte_state::cforte(machine_config &config)

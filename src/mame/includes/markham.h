@@ -66,7 +66,7 @@ private:
 	void strnskil_slave_map(address_map &map);
 
 	DECLARE_WRITE8_MEMBER(coin_output_w);
-	template<int Bit> DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 
 	// markham specific
@@ -74,6 +74,7 @@ private:
 
 	// strnskil specific
 	DECLARE_READ8_MEMBER(strnskil_d800_r);
+	DECLARE_WRITE8_MEMBER(strnskil_master_output_w);
 
 	// protection comms for banbam/pettanp
 	DECLARE_READ8_MEMBER(banbam_protection_r);
@@ -124,6 +125,8 @@ private:
 	uint8_t m_packet_buffer[2];
 	uint8_t m_packet_write_pos;
 	bool m_packet_reset;
+
+	u8 m_strnskil_slave_irq;
 };
 
 #endif // MAME_INCLUDES_MARKHAM_H

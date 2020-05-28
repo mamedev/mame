@@ -27,6 +27,7 @@
 
 #include "debugger.h"
 #include "debug/debugcpu.h"
+#include "debug/express.h"
 
 /* seems to be defined on mingw-gcc */
 #undef i386
@@ -481,7 +482,7 @@ uint64_t i386_device::READ64PL(uint32_t ea, uint8_t privilege)
 	case 0:
 	default:
 		value = READ32PL(ea, privilege);
-		value |= uint64_t(READ32PL(ea + 2, privilege)) << 32;
+		value |= uint64_t(READ32PL(ea + 4, privilege)) << 32;
 		break;
 
 	case 1:
@@ -676,7 +677,7 @@ void i386_device::WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value)
 	{
 	case 0:
 		WRITE32PL(ea, privilege, value & 0xffffffff);
-		WRITE32PL(ea + 2, privilege, (value >> 32) & 0xffffffff);
+		WRITE32PL(ea + 4, privilege, (value >> 32) & 0xffffffff);
 		break;
 
 	case 1:
@@ -1777,7 +1778,7 @@ uint32_t i386_device::i386_get_debug_desc(I386_SREG *seg)
 	return seg->valid;
 }
 
-uint64_t i386_device::debug_segbase(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_segbase(int params, const uint64_t *param)
 {
 	uint32_t result;
 	I386_SREG seg;
@@ -1800,7 +1801,7 @@ uint64_t i386_device::debug_segbase(symbol_table &table, int params, const uint6
 	return result;
 }
 
-uint64_t i386_device::debug_seglimit(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_seglimit(int params, const uint64_t *param)
 {
 	uint32_t result = 0;
 	I386_SREG seg;
@@ -1816,7 +1817,7 @@ uint64_t i386_device::debug_seglimit(symbol_table &table, int params, const uint
 	return result;
 }
 
-uint64_t i386_device::debug_segofftovirt(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_segofftovirt(int params, const uint64_t *param)
 {
 	uint32_t result;
 	I386_SREG seg;
@@ -1854,7 +1855,7 @@ uint64_t i386_device::debug_segofftovirt(symbol_table &table, int params, const 
 	return result;
 }
 
-uint64_t i386_device::debug_virttophys(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_virttophys(int params, const uint64_t *param)
 {
 	uint32_t result = param[0];
 
@@ -1863,7 +1864,7 @@ uint64_t i386_device::debug_virttophys(symbol_table &table, int params, const ui
 	return result;
 }
 
-uint64_t i386_device::debug_cacheflush(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_cacheflush(int params, const uint64_t *param)
 {
 	uint32_t option;
 	bool invalidate;
@@ -1886,11 +1887,11 @@ uint64_t i386_device::debug_cacheflush(symbol_table &table, int params, const ui
 void i386_device::device_debug_setup()
 {
 	using namespace std::placeholders;
-	debug()->symtable().add("segbase", 1, 1, std::bind(&i386_device::debug_segbase, this, _1, _2, _3));
-	debug()->symtable().add("seglimit", 1, 1, std::bind(&i386_device::debug_seglimit, this, _1, _2, _3));
-	debug()->symtable().add("segofftovirt", 2, 2, std::bind(&i386_device::debug_segofftovirt, this, _1, _2, _3));
-	debug()->symtable().add("virttophys", 1, 1, std::bind(&i386_device::debug_virttophys, this, _1, _2, _3));
-	debug()->symtable().add("cacheflush", 0, 1, std::bind(&i386_device::debug_cacheflush, this, _1, _2, _3));
+	debug()->symtable().add("segbase", 1, 1, std::bind(&i386_device::debug_segbase, this, _1, _2));
+	debug()->symtable().add("seglimit", 1, 1, std::bind(&i386_device::debug_seglimit, this, _1, _2));
+	debug()->symtable().add("segofftovirt", 2, 2, std::bind(&i386_device::debug_segofftovirt, this, _1, _2));
+	debug()->symtable().add("virttophys", 1, 1, std::bind(&i386_device::debug_virttophys, this, _1, _2));
+	debug()->symtable().add("cacheflush", 0, 1, std::bind(&i386_device::debug_cacheflush, this, _1, _2));
 }
 
 /*************************************************************************/
@@ -1936,9 +1937,9 @@ void i386_device::i386_common_init()
 	m_program = &space(AS_PROGRAM);
 	if(m_program->data_width() == 16) {
 		// for the 386sx
-		macache16 = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_program->cache(macache16);
 	} else {
-		macache32 = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_program->cache(macache32);
 	}
 
 	m_io = &space(AS_IO);
@@ -1949,36 +1950,11 @@ void i386_device::i386_common_init()
 	zero_state();
 
 	save_item(NAME(m_reg.d));
-	save_item(NAME(m_sreg[ES].selector));
-	save_item(NAME(m_sreg[ES].base));
-	save_item(NAME(m_sreg[ES].limit));
-	save_item(NAME(m_sreg[ES].flags));
-	save_item(NAME(m_sreg[ES].d));
-	save_item(NAME(m_sreg[CS].selector));
-	save_item(NAME(m_sreg[CS].base));
-	save_item(NAME(m_sreg[CS].limit));
-	save_item(NAME(m_sreg[CS].flags));
-	save_item(NAME(m_sreg[CS].d));
-	save_item(NAME(m_sreg[SS].selector));
-	save_item(NAME(m_sreg[SS].base));
-	save_item(NAME(m_sreg[SS].limit));
-	save_item(NAME(m_sreg[SS].flags));
-	save_item(NAME(m_sreg[SS].d));
-	save_item(NAME(m_sreg[DS].selector));
-	save_item(NAME(m_sreg[DS].base));
-	save_item(NAME(m_sreg[DS].limit));
-	save_item(NAME(m_sreg[DS].flags));
-	save_item(NAME(m_sreg[DS].d));
-	save_item(NAME(m_sreg[FS].selector));
-	save_item(NAME(m_sreg[FS].base));
-	save_item(NAME(m_sreg[FS].limit));
-	save_item(NAME(m_sreg[FS].flags));
-	save_item(NAME(m_sreg[FS].d));
-	save_item(NAME(m_sreg[GS].selector));
-	save_item(NAME(m_sreg[GS].base));
-	save_item(NAME(m_sreg[GS].limit));
-	save_item(NAME(m_sreg[GS].flags));
-	save_item(NAME(m_sreg[GS].d));
+	save_item(STRUCT_MEMBER(m_sreg, selector));
+	save_item(STRUCT_MEMBER(m_sreg, base));
+	save_item(STRUCT_MEMBER(m_sreg, limit));
+	save_item(STRUCT_MEMBER(m_sreg, flags));
+	save_item(STRUCT_MEMBER(m_sreg, d));
 	save_item(NAME(m_eip));
 	save_item(NAME(m_prev_eip));
 
@@ -2146,7 +2122,7 @@ void i386_device::register_state_i386()
 
 	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%8s").noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%32s").noshow();
 	state_add( STATE_GENSP, "GENSP", REG32(ESP)).noshow();
 }
 
@@ -2229,7 +2205,20 @@ void i386_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			str = string_format("%08X", get_flags());
+			str = string_format("%08X %s%s%d%s%s%s%s%s%s%s%s%s",
+				get_flags(),
+				m_RF ? "R" : "r",
+				m_NT ? " N " : " n ",
+				m_IOP2 << 1 | m_IOP1,
+				m_OF ? " O" : " o",
+				m_DF ? " D" : " d",
+				m_IF ? " I" : " i",
+				m_TF ? " T" : " t",
+				m_SF ? " S" : " s",
+				m_ZF ? " Z" : " z",
+				m_AF ? " A" : " a",
+				m_PF ? " P" : " p",
+				m_CF ? " C" : " c");
 			break;
 		case X87_ST0:
 			str = string_format("%f", fx80_to_double(ST(0)));

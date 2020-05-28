@@ -8,7 +8,6 @@
  TODO:
  - colors (missing proms)
  - dips
- - controls (is there START button ?)
  - when a car sprite goes outside of the screen it gets stuck for a split frame on top of screen
 
 HW info :
@@ -92,12 +91,16 @@ static INPUT_PORTS_START( ssrj )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_REVERSE
 
 	PORT_START("IN2")
-	PORT_BIT( 0xf, IP_ACTIVE_LOW, IPT_BUTTON2  )  /* code @ $eef  , tested when controls = type4 */
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) ) /* ??? code @ $62c */
-	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Very_Difficult ) )
+	PORT_BIT( 0xf, IP_ACTIVE_LOW, IPT_UNUSED  ) PORT_CONDITION("IN3", 0x30, EQUALS, 0x00) /* code @ $eef, tested when controls != type1 */
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_START1 ) PORT_CONDITION("IN3", 0x30, NOTEQUALS, 0x00) PORT_NAME("Start (Easy)")
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_START2 ) PORT_CONDITION("IN3", 0x30, NOTEQUALS, 0x00) PORT_NAME("Start (Normal)")
+	PORT_BIT( 0x4, IP_ACTIVE_LOW, IPT_START3 ) PORT_CONDITION("IN3", 0x30, NOTEQUALS, 0x00) PORT_NAME("Start (Difficult)")
+	PORT_BIT( 0x8, IP_ACTIVE_LOW, IPT_START4 ) PORT_CONDITION("IN3", 0x30, NOTEQUALS, 0x00) PORT_NAME("Start (Very difficult)")
+	PORT_DIPNAME( 0x30, 0x20, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING( 0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING( 0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING( 0x10, DEF_STR( Difficult ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -117,7 +120,7 @@ static INPUT_PORTS_START( ssrj )
 	PORT_DIPNAME( 0x08, 0x08, "Freeze" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Controls ) ) /* 'press button to start' message, and wait for button2 */
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Controls ) ) /* Type 1 has no start button and uses difficulty DSW, type 2-4 have 4 start buttons that determine difficulty. MT07492 for more.  */
 	PORT_DIPSETTING(    0x00, "Type 1" )
 	PORT_DIPSETTING(    0x10, "Type 2" )
 	PORT_DIPSETTING(    0x20, "Type 3" )

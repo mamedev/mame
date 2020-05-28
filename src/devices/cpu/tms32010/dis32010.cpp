@@ -11,8 +11,8 @@
 	*                                                                          *
 	\**************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 #include "32010dsm.c"
 

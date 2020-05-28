@@ -61,7 +61,7 @@ void zaccaria_state::machine_reset()
 	m_dsw_sel = 0;
 }
 
-WRITE8_MEMBER(zaccaria_state::dsw_sel_w)
+void zaccaria_state::dsw_sel_w(uint8_t data)
 {
 	switch (data & 0xf0)
 	{
@@ -83,7 +83,7 @@ WRITE8_MEMBER(zaccaria_state::dsw_sel_w)
 	}
 }
 
-READ8_MEMBER(zaccaria_state::dsw_r)
+uint8_t zaccaria_state::dsw_r()
 {
 	return m_dsw_port[m_dsw_sel]->read();
 }
@@ -91,7 +91,7 @@ READ8_MEMBER(zaccaria_state::dsw_r)
 
 GAME_EXTERN(monymony);
 
-READ8_MEMBER(zaccaria_state::prot1_r)
+uint8_t zaccaria_state::prot1_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -111,7 +111,7 @@ READ8_MEMBER(zaccaria_state::prot1_r)
 	}
 }
 
-READ8_MEMBER(zaccaria_state::prot2_r)
+uint8_t zaccaria_state::prot2_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -336,7 +336,7 @@ void zaccaria_state::zaccaria(machine_config &config)
 	Z80(config, m_maincpu, XTAL(18'432'000)/6);   /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &zaccaria_state::main_map);
 
-//  config.m_minimum_quantum = attotime::from_hz(1000000);
+//  config.set_maximum_quantum(attotime::from_hz(1000000));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

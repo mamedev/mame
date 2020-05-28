@@ -104,7 +104,8 @@ int nscsi_cdrom_device::to_msf(int frame)
 
 void nscsi_cdrom_device::set_block_size(u32 block_size)
 {
-	assert_always(bytes_per_sector % block_size == 0, "block size must be a factor of sector size");
+	if (bytes_per_sector % block_size)
+		throw emu_fatalerror("nscsi_cdrom_device(%s): block size must be a factor of sector size", tag());
 
 	bytes_per_block = block_size;
 };
@@ -603,13 +604,23 @@ enum sgi_scsi_command_e : uint8_t {
 	 * in the kernel runs, if there are SCSI problems.
 	 */
 	SGI_HD2CDROM = 0xc9,
+	/*
+	 * IRIX 5.3 sends this command when it wants to eject the drive
+	 */
+	SGI_EJECT = 0xc4,
 };
 
 void nscsi_cdrom_sgi_device::scsi_command()
 {
 	switch (scsi_cmdbuf[0]) {
 	case SGI_HD2CDROM:
-		LOG("command SGI_HD2CDROM");
+		LOG("command SGI_HD2CDROM\n");
+		// No need to do anything (yet). Just acknowledge the command.
+		scsi_status_complete(SS_GOOD);
+		break;
+
+	case SGI_EJECT:
+		LOG("command SGI_EJECT\n");
 		// No need to do anything (yet). Just acknowledge the command.
 		scsi_status_complete(SS_GOOD);
 		break;
@@ -624,6 +635,9 @@ bool nscsi_cdrom_sgi_device::scsi_command_done(uint8_t command, uint8_t length)
 {
 	switch (command) {
 	case SGI_HD2CDROM:
+		return length == 10;
+
+	case SGI_EJECT:
 		return length == 10;
 
 	default:

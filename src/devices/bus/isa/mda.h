@@ -9,6 +9,7 @@
 #include "machine/pc_lpt.h"
 #include "video/mc6845.h"
 #include "emupal.h"
+#include "screen.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

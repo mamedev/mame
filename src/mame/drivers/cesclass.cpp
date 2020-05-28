@@ -41,10 +41,10 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	DECLARE_WRITE16_MEMBER(irq2_ack_w);
-	DECLARE_WRITE16_MEMBER(irq3_ack_w);
-	DECLARE_WRITE16_MEMBER(lamps_w);
-	DECLARE_WRITE16_MEMBER(outputs_w);
+	void irq2_ack_w(uint16_t data);
+	void irq3_ack_w(uint16_t data);
+	void lamps_w(uint16_t data);
+	void outputs_w(uint16_t data);
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -97,22 +97,22 @@ uint32_t cesclassic_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-WRITE16_MEMBER( cesclassic_state::irq2_ack_w )
+void cesclassic_state::irq2_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-WRITE16_MEMBER( cesclassic_state::irq3_ack_w )
+void cesclassic_state::irq3_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(3, CLEAR_LINE);
 }
 
-WRITE16_MEMBER( cesclassic_state::lamps_w )
+void cesclassic_state::lamps_w(uint16_t data)
 {
 	//popmessage("%04x",data);
 }
 
-WRITE16_MEMBER( cesclassic_state::outputs_w )
+void cesclassic_state::outputs_w(uint16_t data)
 {
 	/*
 	-x-- ---- OKI bankswitch
@@ -136,13 +136,13 @@ void cesclassic_state::cesclassic_map(address_map &map)
 	map(0x480000, 0x481fff).ram().share("nvram"); //8k according to schematics (games doesn't use that much tho)
 	map(0x600000, 0x600001).portr("SYSTEM");
 	map(0x610000, 0x610001).w(FUNC(cesclassic_state::outputs_w));
-//  AM_RANGE(0x640000, 0x640001) AM_WRITENOP
+//  map(0x640000, 0x640001).nopw();
 	map(0x640040, 0x640041).w(FUNC(cesclassic_state::lamps_w));
 	map(0x670000, 0x670001).portr("DSW");
 	map(0x70ff00, 0x70ff01).nopw(); // writes 0xffff at irq 3 end of service, watchdog?
 	map(0x900001, 0x900001).r(m_oki, FUNC(okim6295_device::read)); // unsure about this ...
 	map(0x900101, 0x900101).w(m_oki, FUNC(okim6295_device::write));
-//  AM_RANGE(0x904000, 0x904001) AM_WRITENOP //some kind of serial
+//  map(0x904000, 0x904001).nopw(); //some kind of serial
 }
 
 static INPUT_PORTS_START( cesclassic )

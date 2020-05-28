@@ -11,8 +11,11 @@
 #include "emu.h"
 #include "ui/mainmenu.h"
 
+#include "ui/about.h"
+#include "ui/analogipt.h"
 #include "ui/barcode.h"
 #include "ui/cheatopt.h"
+#include "ui/confswitch.h"
 #include "ui/datmenu.h"
 #include "ui/filemngr.h"
 #include "ui/info.h"
@@ -64,7 +67,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 	if (ui().machine_info().has_analog())
 		item_append(_("Analog Controls"), "", 0, (void *)ANALOG);
 	if (ui().machine_info().has_dips())
-		item_append(_("Dip Switches"), "", 0, (void *)SETTINGS_DIP_SWITCHES);
+		item_append(_("DIP Switches"), "", 0, (void *)SETTINGS_DIP_SWITCHES);
 	if (ui().machine_info().has_configs())
 		item_append(_("Machine Configuration"), "", 0, (void *)SETTINGS_DRIVER_CONFIG);
 
@@ -130,6 +133,10 @@ void menu_main::populate(float &customtop, float &custombottom)
 
 	item_append(menu_item_type::SEPARATOR);
 
+	item_append(string_format(_("About %s"), emulator_info::get_appname()), "", 0, (void *)ABOUT);
+
+	item_append(menu_item_type::SEPARATOR);
+
 //  item_append(_("Quit from Machine"), nullptr, 0, (void *)QUIT_GAME);
 
 	item_append(_("Select New Machine"), "", 0, (void *)SELECT_GAME);
@@ -162,7 +169,7 @@ void menu_main::handle()
 			break;
 
 		case SETTINGS_DRIVER_CONFIG:
-			menu::stack_push<menu_settings_driver_config>(ui(), container());
+			menu::stack_push<menu_settings_machine_config>(ui(), container());
 			break;
 
 		case ANALOG:
@@ -234,6 +241,10 @@ void menu_main::handle()
 				menu::stack_push<simple_menu_select_game>(ui(), container(), nullptr);
 			else
 				menu::stack_push<menu_select_game>(ui(), container(), nullptr);
+			break;
+
+		case ABOUT:
+			menu::stack_push<menu_about>(ui(), container());
 			break;
 
 		case BIOS_SELECTION:

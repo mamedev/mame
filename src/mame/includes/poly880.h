@@ -51,9 +51,9 @@ private:
 	DECLARE_WRITE8_MEMBER( cldig_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
-	DECLARE_WRITE8_MEMBER( pio1_pa_w );
-	DECLARE_READ8_MEMBER( pio1_pb_r );
-	DECLARE_WRITE8_MEMBER( pio1_pb_w );
+	void pio1_pa_w(uint8_t data);
+	uint8_t pio1_pb_r();
+	void pio1_pb_w(uint8_t data);
 
 	void update_display();
 

@@ -138,12 +138,13 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 
 #include "emu.h"
 
+#include "bus/ata/ataintf.h"
+#include "bus/ata/atapicdr.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/ataintf.h"
-#include "machine/atapicdr.h"
 #include "machine/ins8250.h"
 #include "machine/intelfsh.h"
+#include "machine/mb8421.h"
 #include "machine/midikbd.h"
 #include "machine/rtc65271.h"
 #include "machine/timer.h"
@@ -172,7 +173,7 @@ struct IBUTTON
 };
 
 
-#define PRINT_SPU_MEM 0
+//#define PRINT_SPU_MEM 0
 
 class firebeat_state : public driver_device
 {
@@ -187,6 +188,7 @@ public:
 		m_kbd(*this, "kbd%u", 0),
 		m_ata(*this, "ata"),
 		m_gcu(*this, "gcu%u", 0),
+		m_dpram(*this, "spuram"),
 		m_spuata(*this, "spu_ata")
 	{ }
 
@@ -207,6 +209,7 @@ private:
 	optional_device_array<midi_keyboard_device, 2> m_kbd;
 	required_device<ata_interface_device> m_ata;
 	optional_device_array<k057714_device, 2> m_gcu;
+	optional_device<cy7c131_device> m_dpram;
 	optional_device<ata_interface_device> m_spuata;
 
 	uint8_t m_extend_board_irq_enable;
@@ -216,7 +219,6 @@ private:
 	int m_cab_data_ptr;
 	const int * m_cur_cab_data;
 //  int m_keyboard_state[2];
-	uint8_t m_spu_shared_ram[0x400];
 	IBUTTON m_ibutton;
 	int m_ibutton_state;
 	int m_ibutton_read_subkey_ptr;
@@ -228,43 +230,39 @@ private:
 	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(firebeat_interrupt);
-	DECLARE_READ32_MEMBER(input_r);
-	DECLARE_READ32_MEMBER(sensor_r );
+	uint32_t input_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t sensor_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(ata_interrupt);
-	DECLARE_READ32_MEMBER(ata_command_r);
-	DECLARE_WRITE32_MEMBER(ata_command_w);
-	DECLARE_READ32_MEMBER(ata_control_r);
-	DECLARE_WRITE32_MEMBER(ata_control_w);
-//  DECLARE_READ32_MEMBER(comm_uart_r);
-//  DECLARE_WRITE32_MEMBER(comm_uart_w);
-	DECLARE_READ32_MEMBER(cabinet_r);
-	DECLARE_READ32_MEMBER(keyboard_wheel_r);
-	DECLARE_READ8_MEMBER(midi_uart_r);
-	DECLARE_WRITE8_MEMBER(midi_uart_w);
-	DECLARE_READ32_MEMBER(extend_board_irq_r);
-	DECLARE_WRITE32_MEMBER(extend_board_irq_w);
-	DECLARE_WRITE32_MEMBER(lamp_output_w);
-	DECLARE_WRITE32_MEMBER(lamp_output_kbm_w);
-	DECLARE_WRITE32_MEMBER(lamp_output_ppp_w);
-	DECLARE_WRITE32_MEMBER(lamp_output2_w);
-	DECLARE_WRITE32_MEMBER(lamp_output2_ppp_w);
-	DECLARE_WRITE32_MEMBER(lamp_output3_w);
-	DECLARE_WRITE32_MEMBER(lamp_output3_ppp_w);
-	DECLARE_READ32_MEMBER(ppc_spu_share_r);
-	DECLARE_WRITE32_MEMBER(ppc_spu_share_w);
-	DECLARE_READ16_MEMBER(spu_unk_r);
-	DECLARE_WRITE16_MEMBER(spu_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(spu_220000_w);
-	DECLARE_WRITE16_MEMBER(spu_sdram_bank_w);
-	DECLARE_READ16_MEMBER(m68k_spu_share_r);
-	DECLARE_WRITE16_MEMBER(m68k_spu_share_w);
+	uint32_t ata_command_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ata_command_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ata_control_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ata_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+//  uint32_t comm_uart_r(offs_t offset, uint32_t mem_mask = ~ 0);
+//  void comm_uart_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cabinet_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t keyboard_wheel_r(offs_t offset);
+	uint8_t midi_uart_r(offs_t offset);
+	void midi_uart_w(offs_t offset, uint8_t data);
+	uint32_t extend_board_irq_r(offs_t offset, uint32_t mem_mask = ~0);
+	void extend_board_irq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output_kbm_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output2_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output3_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t spu_unk_r();
+	void spu_irq_ack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void spu_220000_w(uint16_t data);
+	void spu_sdram_bank_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_interrupt);
 //  TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(spu_timer_callback);
 	void set_ibutton(uint8_t *data);
 	int ibutton_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(security_w);
-	void init_lights(write32_delegate out1, write32_delegate out2, write32_delegate out3);
+	void init_lights(write32s_delegate out1, write32s_delegate out2, write32s_delegate out3);
 	void init_firebeat();
 	void init_keyboard();
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_callback);
@@ -274,6 +272,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(gcu1_interrupt);
 	static void cdrom_config(device_t *device);
 	void firebeat_map(address_map &map);
+	void firebeat_spu_map(address_map &map);
 	void firebeat2_map(address_map &map);
 	void spu_map(address_map &map);
 	void ymz280b_map(address_map &map);
@@ -293,7 +292,7 @@ uint32_t firebeat_state::screen_update_firebeat_1(screen_device &screen, bitmap_
 
 /*****************************************************************************/
 
-READ32_MEMBER(firebeat_state::input_r)
+uint32_t firebeat_state::input_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -313,7 +312,7 @@ READ32_MEMBER(firebeat_state::input_r)
 	return r;
 }
 
-READ32_MEMBER(firebeat_state::sensor_r )
+uint32_t firebeat_state::sensor_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -330,110 +329,110 @@ READ32_MEMBER(firebeat_state::sensor_r )
 
 #define BYTESWAP16(x)   ((((x) >> 8) & 0xff) | (((x) << 8) & 0xff00))
 
-READ32_MEMBER(firebeat_state::ata_command_r )
+uint32_t firebeat_state::ata_command_r(offs_t offset, uint32_t mem_mask)
 {
 	uint16_t r;
 //  printf("ata_command_r: %08X, %08X\n", offset, mem_mask);
 	if (ACCESSING_BITS_16_31)
 	{
-		r = m_ata->read_cs0(offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		r = m_ata->cs0_r(offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
 		return BYTESWAP16(r) << 16;
 	}
 	else
 	{
-		r = m_ata->read_cs0((offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		r = m_ata->cs0_r((offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
 		return BYTESWAP16(r) << 0;
 	}
 }
 
-WRITE32_MEMBER(firebeat_state::ata_command_w )
+void firebeat_state::ata_command_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("ata_command_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 
 	if (ACCESSING_BITS_16_31)
 	{
-		m_ata->write_cs0(offset*2, BYTESWAP16((data >> 16) & 0xffff), BYTESWAP16((mem_mask >> 16) & 0xffff));
+		m_ata->cs0_w(offset*2, BYTESWAP16((data >> 16) & 0xffff), BYTESWAP16((mem_mask >> 16) & 0xffff));
 	}
 	else
 	{
-		m_ata->write_cs0((offset*2) + 1, BYTESWAP16((data >> 0) & 0xffff), BYTESWAP16((mem_mask >> 0) & 0xffff));
+		m_ata->cs0_w((offset*2) + 1, BYTESWAP16((data >> 0) & 0xffff), BYTESWAP16((mem_mask >> 0) & 0xffff));
 	}
 }
 
 
-READ32_MEMBER(firebeat_state::ata_control_r )
+uint32_t firebeat_state::ata_control_r(offs_t offset, uint32_t mem_mask)
 {
 	uint16_t r;
 //  printf("ata_control_r: %08X, %08X\n", offset, mem_mask);
 
 	if (ACCESSING_BITS_16_31)
 	{
-		r = m_ata->read_cs1(offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		r = m_ata->cs1_r(offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
 		return BYTESWAP16(r) << 16;
 	}
 	else
 	{
-		r = m_ata->read_cs1((offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		r = m_ata->cs1_r((offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
 		return BYTESWAP16(r) << 0;
 	}
 }
 
-WRITE32_MEMBER(firebeat_state::ata_control_w )
+void firebeat_state::ata_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		m_ata->write_cs1(offset*2, BYTESWAP16(data >> 16) & 0xffff, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		m_ata->cs1_w(offset*2, BYTESWAP16(data >> 16) & 0xffff, BYTESWAP16((mem_mask >> 16) & 0xffff));
 	}
 	else
 	{
-		m_ata->write_cs1((offset*2) + 1, BYTESWAP16(data >> 0) & 0xffff, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		m_ata->cs1_w((offset*2) + 1, BYTESWAP16(data >> 0) & 0xffff, BYTESWAP16((mem_mask >> 0) & 0xffff));
 	}
 }
 
 
 /*****************************************************************************/
 /*
-READ32_MEMBER(firebeat_state::comm_uart_r )
+uint32_t firebeat_state::comm_uart_r(offs_t offset, uint32_t mem_mask)
 {
     uint32_t r = 0;
 
     if (ACCESSING_BITS_24_31)
     {
-        r |= pc16552d_0_r(space, (offset*4)+0) << 24;
+        r |= pc16552d_0_r((offset*4)+0) << 24;
     }
     if (ACCESSING_BITS_16_23)
     {
-        r |= pc16552d_0_r(space, (offset*4)+1) << 16;
+        r |= pc16552d_0_r((offset*4)+1) << 16;
     }
     if (ACCESSING_BITS_8_15)
     {
-        r |= pc16552d_0_r(space, (offset*4)+2) << 8;
+        r |= pc16552d_0_r((offset*4)+2) << 8;
     }
     if (ACCESSING_BITS_0_7)
     {
-        r |= pc16552d_0_r(space, (offset*4)+3) << 0;
+        r |= pc16552d_0_r((offset*4)+3) << 0;
     }
 
     return r;
 }
 
-WRITE32_MEMBER(firebeat_state::comm_uart_w )
+void firebeat_state::comm_uart_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
     if (ACCESSING_BITS_24_31)
     {
-        pc16552d_0_w(space, (offset*4)+0, (data >> 24) & 0xff);
+        pc16552d_0_w((offset*4)+0, (data >> 24) & 0xff);
     }
     if (ACCESSING_BITS_16_23)
     {
-        pc16552d_0_w(space, (offset*4)+1, (data >> 16) & 0xff);
+        pc16552d_0_w((offset*4)+1, (data >> 16) & 0xff);
     }
     if (ACCESSING_BITS_8_15)
     {
-        pc16552d_0_w(space, (offset*4)+2, (data >> 8) & 0xff);
+        pc16552d_0_w((offset*4)+2, (data >> 8) & 0xff);
     }
     if (ACCESSING_BITS_0_7)
     {
-        pc16552d_0_w(space, (offset*4)+3, (data >> 0) & 0xff);
+        pc16552d_0_w((offset*4)+3, (data >> 0) & 0xff);
     }
 }
 
@@ -450,7 +449,7 @@ static const int cab_data[2] = { 0x0, 0x8 };
 static const int kbm_cab_data[2] = { 0x2, 0x8 };
 static const int ppd_cab_data[2] = { 0x1, 0x9 };
 
-READ32_MEMBER(firebeat_state::cabinet_r )
+uint32_t firebeat_state::cabinet_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -473,7 +472,7 @@ READ32_MEMBER(firebeat_state::cabinet_r )
 
 /*****************************************************************************/
 
-READ32_MEMBER(firebeat_state::keyboard_wheel_r )
+uint32_t firebeat_state::keyboard_wheel_r(offs_t offset)
 {
 	if (offset == 0)        // Keyboard Wheel (P1)
 	{
@@ -487,12 +486,12 @@ READ32_MEMBER(firebeat_state::keyboard_wheel_r )
 	return 0;
 }
 
-READ8_MEMBER(firebeat_state::midi_uart_r )
+uint8_t firebeat_state::midi_uart_r(offs_t offset)
 {
 	return m_duart_midi->read(offset >> 6);
 }
 
-WRITE8_MEMBER(firebeat_state::midi_uart_w )
+void firebeat_state::midi_uart_w(offs_t offset, uint8_t data)
 {
 	m_duart_midi->write(offset >> 6, data);
 }
@@ -600,7 +599,7 @@ TIMER_CALLBACK_MEMBER(firebeat_state::keyboard_timer_callback)
 // 0x10: ?
 // 0x20: ?
 
-READ32_MEMBER(firebeat_state::extend_board_irq_r)
+uint32_t firebeat_state::extend_board_irq_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -612,7 +611,7 @@ READ32_MEMBER(firebeat_state::extend_board_irq_r)
 	return r;
 }
 
-WRITE32_MEMBER(firebeat_state::extend_board_irq_w )
+void firebeat_state::extend_board_irq_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("extend_board_irq_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 
@@ -626,7 +625,7 @@ WRITE32_MEMBER(firebeat_state::extend_board_irq_w )
 
 /*****************************************************************************/
 
-WRITE32_MEMBER(firebeat_state::lamp_output_w )
+void firebeat_state::lamp_output_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// -------- -------- -------- xxxxxxxx   Status LEDs (active low)
 	if (ACCESSING_BITS_0_7)
@@ -644,9 +643,9 @@ WRITE32_MEMBER(firebeat_state::lamp_output_w )
 //  printf("lamp_output_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 }
 
-WRITE32_MEMBER(firebeat_state::lamp_output_kbm_w )
+void firebeat_state::lamp_output_kbm_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	lamp_output_w(space, offset, data, mem_mask);
+	lamp_output_w(offset, data, mem_mask);
 
 	if (ACCESSING_BITS_24_31)
 	{
@@ -663,9 +662,9 @@ WRITE32_MEMBER(firebeat_state::lamp_output_kbm_w )
 	}
 }
 
-WRITE32_MEMBER(firebeat_state::lamp_output_ppp_w )
+void firebeat_state::lamp_output_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	lamp_output_w(space, offset, data, mem_mask);
+	lamp_output_w(offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00000100 Left
@@ -705,14 +704,14 @@ WRITE32_MEMBER(firebeat_state::lamp_output_ppp_w )
 	}
 }
 
-WRITE32_MEMBER(firebeat_state::lamp_output2_w )
+void firebeat_state::lamp_output2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("lamp_output2_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 }
 
-WRITE32_MEMBER(firebeat_state::lamp_output2_ppp_w )
+void firebeat_state::lamp_output2_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	lamp_output2_w(space, offset, data, mem_mask);
+	lamp_output2_w(offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00010000 Top LED 0
@@ -739,14 +738,14 @@ WRITE32_MEMBER(firebeat_state::lamp_output2_ppp_w )
 	}
 }
 
-WRITE32_MEMBER(firebeat_state::lamp_output3_w )
+void firebeat_state::lamp_output3_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("lamp_output3_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 }
 
-WRITE32_MEMBER(firebeat_state::lamp_output3_ppp_w )
+void firebeat_state::lamp_output3_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	lamp_output3_w(space, offset, data, mem_mask);
+	lamp_output3_w(offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00010000 Lamp 0
@@ -765,76 +764,6 @@ WRITE32_MEMBER(firebeat_state::lamp_output3_ppp_w )
 /*****************************************************************************/
 
 
-READ32_MEMBER(firebeat_state::ppc_spu_share_r)
-{
-	uint32_t r = 0;
-
-#if PRINT_SPU_MEM
-	printf("ppc_spu_share_r: %08X, %08X at %08X\n", offset, mem_mask, m_maincpu->pc());
-#endif
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= m_spu_shared_ram[(offset * 4) + 0] << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= m_spu_shared_ram[(offset * 4) + 1] << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= m_spu_shared_ram[(offset * 4) + 2] <<  8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= m_spu_shared_ram[(offset * 4) + 3] <<  0;
-
-		if (offset == 0xff)     // address 0x3ff clears PPC interrupt
-		{
-			m_maincpu->set_input_line(INPUT_LINE_IRQ3, CLEAR_LINE);
-		}
-	}
-
-	return r;
-}
-
-WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
-{
-#if PRINT_SPU_MEM
-	printf("ppc_spu_share_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
-#endif
-
-	if (ACCESSING_BITS_24_31)
-	{
-		m_spu_shared_ram[(offset * 4) + 0] = (data >> 24) & 0xff;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		m_spu_shared_ram[(offset * 4) + 1] = (data >> 16) & 0xff;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		m_spu_shared_ram[(offset * 4) + 2] = (data >>  8) & 0xff;
-
-		if (offset == 0xff)     // address 0x3fe triggers M68K interrupt
-		{
-			m_audiocpu->set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE);
-
-			printf("SPU command %02X%02X\n", m_spu_shared_ram[0], m_spu_shared_ram[1]);
-
-			uint16_t cmd = ((uint16_t)(m_spu_shared_ram[0]) << 8) | m_spu_shared_ram[1];
-			if (cmd == 0x1110)
-			{
-				printf("   [%02X %02X %02X %02X %02X]\n", m_spu_shared_ram[0x10], m_spu_shared_ram[0x11], m_spu_shared_ram[0x12], m_spu_shared_ram[0x13], m_spu_shared_ram[0x14]);
-			}
-		}
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		m_spu_shared_ram[(offset * 4) + 3] = (data >>  0) & 0xff;
-	}
-}
-
 /*  SPU board M68K IRQs
 
     IRQ1: ?
@@ -847,42 +776,7 @@ WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
     IRQ6: ATA
 */
 
-READ16_MEMBER(firebeat_state::m68k_spu_share_r)
-{
-#if PRINT_SPU_MEM
-	printf("m68k_spu_share_r: %08X, %08X\n", offset, mem_mask);
-#endif
-	uint16_t r = 0;
-
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= m_spu_shared_ram[offset];
-
-		if (offset == 0x3fe)            // address 0x3fe clears M68K interrupt
-		{
-			m_audiocpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
-		}
-	}
-	return r;
-}
-
-WRITE16_MEMBER(firebeat_state::m68k_spu_share_w)
-{
-#if PRINT_SPU_MEM
-	printf("m68k_spu_share_w: %04X, %08X, %08X\n", data, offset, mem_mask);
-#endif
-	if (ACCESSING_BITS_0_7)
-	{
-		m_spu_shared_ram[offset] = data & 0xff;
-
-		if (offset == 0x3ff)            // address 0x3ff triggers PPC interrupt
-		{
-			m_maincpu->set_input_line(INPUT_LINE_IRQ3, ASSERT_LINE);
-		}
-	}
-}
-
-READ16_MEMBER(firebeat_state::spu_unk_r)
+uint16_t firebeat_state::spu_unk_r()
 {
 	// dipswitches?
 
@@ -893,7 +787,7 @@ READ16_MEMBER(firebeat_state::spu_unk_r)
 	return r;
 }
 
-WRITE16_MEMBER(firebeat_state::spu_irq_ack_w)
+void firebeat_state::spu_irq_ack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -906,12 +800,12 @@ WRITE16_MEMBER(firebeat_state::spu_irq_ack_w)
 	}
 }
 
-WRITE16_MEMBER(firebeat_state::spu_220000_w)
+void firebeat_state::spu_220000_w(uint16_t data)
 {
 	// IRQ2 handler 5 sets all bits
 }
 
-WRITE16_MEMBER(firebeat_state::spu_sdram_bank_w)
+void firebeat_state::spu_sdram_bank_w(uint16_t data)
 {
 }
 
@@ -943,7 +837,7 @@ void firebeat_state::firebeat_map(address_map &map)
 	map(0x70006000, 0x70006003).w(FUNC(firebeat_state::extend_board_irq_w));
 	map(0x70008000, 0x7000800f).r(FUNC(firebeat_state::keyboard_wheel_r));
 	map(0x7000a000, 0x7000a003).r(FUNC(firebeat_state::extend_board_irq_r));
-	map(0x74000000, 0x740003ff).rw(FUNC(firebeat_state::ppc_spu_share_r), FUNC(firebeat_state::ppc_spu_share_w)); // SPU shared RAM
+	map(0x74000000, 0x740003ff).noprw(); // SPU shared RAM
 	map(0x7d000200, 0x7d00021f).r(FUNC(firebeat_state::cabinet_r));
 	map(0x7d000340, 0x7d000347).r(FUNC(firebeat_state::sensor_r));
 	map(0x7d000400, 0x7d000401).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
@@ -960,6 +854,12 @@ void firebeat_state::firebeat_map(address_map &map)
 	map(0x7ff80000, 0x7fffffff).rom().region("user1", 0);       /* System BIOS */
 }
 
+void firebeat_state::firebeat_spu_map(address_map &map)
+{
+	firebeat_map(map);
+	map(0x74000000, 0x740003ff).rw(m_dpram, FUNC(cy7c131_device::right_r), FUNC(cy7c131_device::right_w)); // SPU shared RAM
+}
+
 void firebeat_state::firebeat2_map(address_map &map)
 {
 	firebeat_map(map);
@@ -974,7 +874,7 @@ void firebeat_state::spu_map(address_map &map)
 	map(0x220000, 0x220001).w(FUNC(firebeat_state::spu_220000_w));
 	map(0x230000, 0x230001).w(FUNC(firebeat_state::spu_irq_ack_w));
 	map(0x260000, 0x260001).w(FUNC(firebeat_state::spu_sdram_bank_w));
-	map(0x280000, 0x2807ff).rw(FUNC(firebeat_state::m68k_spu_share_r), FUNC(firebeat_state::m68k_spu_share_w));
+	map(0x280000, 0x2807ff).rw(m_dpram, FUNC(cy7c131_device::left_r), FUNC(cy7c131_device::left_w)).umask16(0x00ff);
 	map(0x300000, 0x30000f).rw(m_spuata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
 	map(0x340000, 0x34000f).rw(m_spuata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
 	map(0x400000, 0x400fff).rw("rf5c400", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));
@@ -1306,8 +1206,14 @@ void firebeat_state::firebeat_spu(machine_config &config)
 	firebeat(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_state::firebeat_spu_map);
+
 	M68000(config, m_audiocpu, 16000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &firebeat_state::spu_map);
+
+	CY7C131(config, m_dpram);
+	m_dpram->intl_callback().set_inputline(m_audiocpu, INPUT_LINE_IRQ4); // address 0x3fe triggers M68K interrupt
+	m_dpram->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3); // address 0x3ff triggers PPC interrupt
 
 	TIMER(config, "sputimer").configure_periodic(FUNC(firebeat_state::spu_timer_callback), attotime::from_hz(1000));
 
@@ -1466,11 +1372,11 @@ WRITE8_MEMBER(firebeat_state::security_w)
 
 /*****************************************************************************/
 
-void firebeat_state::init_lights(write32_delegate out1, write32_delegate out2, write32_delegate out3)
+void firebeat_state::init_lights(write32s_delegate out1, write32s_delegate out2, write32s_delegate out3)
 {
-	if(out1.isnull()) out1 = write32_delegate(FUNC(firebeat_state::lamp_output_w),this);
-	if(out2.isnull()) out2 = write32_delegate(FUNC(firebeat_state::lamp_output2_w),this);
-	if(out3.isnull()) out3 = write32_delegate(FUNC(firebeat_state::lamp_output3_w),this);
+	if(out1.isnull()) out1 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output_w));
+	if(out2.isnull()) out2 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output2_w));
+	if(out3.isnull()) out3 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output3_w));
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000804, 0x7d000807, out1);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000320, 0x7d000323, out2);
@@ -1489,23 +1395,23 @@ void firebeat_state::init_firebeat()
 
 	m_cur_cab_data = cab_data;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(firebeat_state::security_w), this));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(firebeat_state::security_w)));
 
 	set_ibutton(rom);
 
-	init_lights(write32_delegate(), write32_delegate(), write32_delegate());
+	init_lights(write32s_delegate(*this), write32s_delegate(*this), write32s_delegate(*this));
 }
 
 void firebeat_state::init_ppp()
 {
 	init_firebeat();
-	init_lights(write32_delegate(FUNC(firebeat_state::lamp_output_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output2_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output3_ppp_w),this));
+	init_lights(write32s_delegate(*this, FUNC(firebeat_state::lamp_output_ppp_w)), write32s_delegate(*this, FUNC(firebeat_state::lamp_output2_ppp_w)), write32s_delegate(*this, FUNC(firebeat_state::lamp_output3_ppp_w)));
 }
 
 void firebeat_state::init_ppd()
 {
 	init_firebeat();
-	init_lights(write32_delegate(FUNC(firebeat_state::lamp_output_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output2_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output3_ppp_w),this));
+	init_lights(write32s_delegate(*this, FUNC(firebeat_state::lamp_output_ppp_w)), write32s_delegate(*this, FUNC(firebeat_state::lamp_output2_ppp_w)), write32s_delegate(*this, FUNC(firebeat_state::lamp_output3_ppp_w)));
 
 	m_cur_cab_data = ppd_cab_data;
 }
@@ -1520,7 +1426,7 @@ void firebeat_state::init_keyboard()
 void firebeat_state::init_kbm()
 {
 	init_firebeat();
-	init_lights(write32_delegate(FUNC(firebeat_state::lamp_output_kbm_w),this), write32_delegate(), write32_delegate());
+	init_lights(write32s_delegate(*this, FUNC(firebeat_state::lamp_output_kbm_w)), write32s_delegate(*this), write32s_delegate(*this));
 
 	init_keyboard();
 

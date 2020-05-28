@@ -77,11 +77,10 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void sc12(machine_config &config);
 	void sc12b(machine_config &config);
 
@@ -94,7 +93,6 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
-	required_device<generic_slot_device> m_cart;
 	required_ioport m_inputs;
 
 	// address maps
@@ -104,11 +102,9 @@ private:
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	u8 input_r(offs_t offset);
 
 	u8 m_inp_mux;
 };
@@ -128,21 +124,7 @@ void sc12_state::machine_start()
     I/O
 ******************************************************************************/
 
-// cartridge
-
-DEVICE_IMAGE_LOAD_MEMBER(sc12_state::cart_load)
-{
-	u32 size = m_cart->common_get_size("rom");
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
-
-
-// TTL/generic
-
-WRITE8_MEMBER(sc12_state::control_w)
+void sc12_state::control_w(u8 data)
 {
 	// d0-d3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
@@ -159,7 +141,7 @@ WRITE8_MEMBER(sc12_state::control_w)
 	//..
 }
 
-READ8_MEMBER(sc12_state::input_r)
+u8 sc12_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 
@@ -224,7 +206,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void sc12_state::sc12(machine_config &config)
@@ -234,7 +216,7 @@ void sc12_state::sc12(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc12_state::div_trampoline);
 	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&sc12_state::main_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
-	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
+	const attotime irq_period = attotime::from_hz(600); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(sc12_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
 	TIMER(config, "irq_off").configure_periodic(FUNC(sc12_state::irq_off<M6502_IRQ_LINE>), irq_period);
@@ -253,9 +235,7 @@ void sc12_state::sc12(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_scc", "bin,dat");
-	m_cart->set_device_load(FUNC(sc12_state::cart_load), this);
-
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc");
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
 
@@ -265,12 +245,6 @@ void sc12_state::sc12b(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(4_MHz_XTAL); // R65C02P4
-
-	// change irq timer frequency
-	const attotime irq_period = attotime::from_hz(596); // from 556 timer (22nF, 82K+26K, 1K)
-	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(sc12_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(sc12_state::irq_off<M6502_IRQ_LINE>), irq_period);
 }
 
 
@@ -302,5 +276,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  CMP MACHINE  INPUT  STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1984, fscc12,  0,       0, sc12,    sc12,  sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 12", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, fscc12b, fscc12,  0, sc12b,   sc12b, sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, fscc12,  0,       0, sc12,    sc12,  sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, fscc12b, fscc12,  0, sc12b,   sc12b, sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12 B\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )

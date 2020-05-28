@@ -217,9 +217,9 @@ protected:
 	void interface_post_reset() override;
 
 	//! device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -235,8 +235,6 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
-	void fatal(int level, const char *format, ...);
-
 	devcb_read16 m_kb_read_callback;
 	devcb_write16 m_utilout_callback;
 
@@ -868,14 +866,14 @@ private:
 	void hard_reset();                              //!< reset the various registers
 	void soft_reset();                              //!< soft reset
 
-	void bs_early_bad();                            //! bs dummy early function
-	void bs_late_bad();                             //! bs dummy late function
+	[[noreturn]] void bs_early_bad();               //! bs dummy early function
+	[[noreturn]] void bs_late_bad();                //! bs dummy late function
 
-	void f1_early_bad();                            //! f1 dummy early function
-	void f1_late_bad();                             //! f1 dummy late function
+	[[noreturn]] void f1_early_bad();               //! f1 dummy early function
+	[[noreturn]] void f1_late_bad();                //! f1 dummy late function
 
-	void f2_early_bad();                            //! f2 dummy early function
-	void f2_late_bad();                             //! f2 dummy late function
+	[[noreturn]] void f2_early_bad();               //! f2 dummy early function
+	[[noreturn]] void f2_late_bad();                //! f2 dummy late function
 
 	DECLARE_READ16_MEMBER( noop_r );                //!< read open bus (0177777)
 	DECLARE_WRITE16_MEMBER( noop_w );               //!< write open bus

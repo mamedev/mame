@@ -81,7 +81,8 @@ void y8950_device::device_start()
 
 	/* stream system initialize */
 	m_chip = y8950_init(this,clock(),rate);
-	assert_always(m_chip != nullptr, "Error creating Y8950 chip");
+	if (!m_chip)
+		throw emu_fatalerror("y8950_device(%s): Error creating Y8950 chip", tag());
 
 	/* ADPCM ROM data */
 	y8950_set_delta_t_memory(m_chip, &y8950_device::static_read_byte, &y8950_device::static_write_byte);
@@ -159,7 +160,7 @@ DEFINE_DEVICE_TYPE(Y8950, y8950_device, "y8950", "Y8950 MSX-Audio")
 y8950_device::y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Y8950, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 21)
+	, device_rom_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_timer{ nullptr, nullptr }
 	, m_chip(nullptr)

@@ -28,8 +28,8 @@ public:
 
 	void dms5000(machine_config &config);
 private:
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(brightness_w);
+	uint8_t status_r(offs_t offset);
+	void brightness_w(uint8_t data);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_dms5000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -41,7 +41,7 @@ private:
 };
 
 
-READ8_MEMBER(dms5000_state::status_r)
+uint8_t dms5000_state::status_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -56,7 +56,7 @@ READ8_MEMBER(dms5000_state::status_r)
 	}
 }
 
-WRITE8_MEMBER(dms5000_state::brightness_w)
+void dms5000_state::brightness_w(uint8_t data)
 {
 }
 
@@ -117,7 +117,7 @@ void dms5000_state::dms5000(machine_config &config)
 
 /* ROM definition */
 ROM_START( dms5000 )
-	ROM_REGION( 0x4000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x4000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "dms-5000_54-8673o.bin", 0x0001, 0x2000, CRC(dce9823e) SHA1(d36ab87d2e6f5e9f02d59a6a7724ad3ce2428a2f))
 	ROM_LOAD16_BYTE( "dms-5000_54-8672e.bin", 0x0000, 0x2000, CRC(94d64c06) SHA1(be5a53da7bb29a5fa9ac31efe550d5d6ff8b77cd))
 ROM_END

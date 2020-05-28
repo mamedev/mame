@@ -13,10 +13,10 @@
 #undef G65816_CALL_DEBUGGER
 #define G65816_CALL_DEBUGGER(x) debugger_instruction_hook(x)
 
-#define g65816_read_8(addr)             m_data_space->read_byte(addr)
-#define g65816_write_8(addr,data)       m_data_space->write_byte(addr,data)
-#define g65816_read_8_immediate(A)      m_program_cache->read_byte(A)
-#define g65816_read_8_opcode(A)         m_opcode_cache->read_byte(A)
+#define g65816_read_8(addr)             m_data.read_byte(addr)
+#define g65816_write_8(addr,data)       m_data.write_byte(addr,data)
+#define g65816_read_8_immediate(A)      m_program.read_byte(A)
+#define g65816_read_8_opcode(A)         m_opcode.read_byte(A)
 #define g65816_jumping(A)
 #define g65816_branching(A)
 
@@ -25,7 +25,7 @@
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */
 
-#include <limits.h>
+#include <climits>
 
 
 /* ======================================================================== */
@@ -117,16 +117,16 @@
 /* ======================================================================== */
 
 #define CLK_OP          1
-#define CLK_R8          m_rw8_cycles
-#define CLK_R16         m_rw16_cycles
-#define CLK_R24         m_rw24_cycles
-#define CLK_W8          m_rw8_cycles
-#define CLK_W16         m_rw16_cycles
-#define CLK_W24         m_rw24_cycles
-#define CLK_RMW8        m_rw8_cycles+m_rw8_cycles + 1
-#define CLK_RMW16       m_rw16_cycles+m_rw16_cycles + 1
+#define CLK_R8          1
+#define CLK_R16         2
+#define CLK_R24         3
+#define CLK_W8          1
+#define CLK_W16         2
+#define CLK_W24         3
+#define CLK_RMW8        3
+#define CLK_RMW16       5
 
-#define CLK_IMPLIED     1
+
 #define CLK_IMPLIED     1
 #define CLK_RELATIVE_8  1
 #define CLK_RELATIVE_16 2
@@ -169,7 +169,7 @@
 #define CLK_W_S         2
 #define CLK_W_SIY       5
 
-#define CLK(A)          CLOCKS -= A
+#define CLK(A)          CLOCKS -= ((A)*(m_divider))
 #define CLK_BUS(A)      CLOCKS -= A
 #define USE_ALL_CLKS()  CLOCKS = 0
 

@@ -20,7 +20,7 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_dsp(*this,"dsp"),
 		m_tc0640fio(*this, "tc0640fio"),
-		m_gfx2(*this, "gfx2"),
+		m_dspgfx(*this, "dspgfx"),
 		m_vram(*this, "vram"),
 		m_objlist(*this, "objlist"),
 		m_main_ram(*this, "main_ram"),
@@ -50,7 +50,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 	required_device<tc0640fio_device> m_tc0640fio;
-	required_memory_region m_gfx2;
+	required_region_ptr<uint16_t> m_dspgfx;
 
 	required_shared_ptr<uint32_t> m_vram;
 	required_shared_ptr<uint32_t> m_objlist;
@@ -91,7 +91,7 @@ private:
 	int m_speed_meter;
 	int m_brake_meter;
 
-	DECLARE_WRITE8_MEMBER(coin_control_w);
+	void coin_control_w(uint8_t data);
 
 	DECLARE_READ8_MEMBER(mcu_comm_r);
 	DECLARE_WRITE8_MEMBER(mcu_comm_w);
@@ -102,11 +102,11 @@ private:
 	DECLARE_WRITE8_MEMBER(dendego_speedmeter_w);
 	DECLARE_WRITE8_MEMBER(dendego_brakemeter_w);
 
-	DECLARE_READ8_MEMBER(hc11_comm_r);
-	DECLARE_WRITE8_MEMBER(hc11_comm_w);
-	DECLARE_WRITE8_MEMBER(hc11_output_w);
-	DECLARE_READ8_MEMBER(hc11_data_r);
-	DECLARE_WRITE8_MEMBER(hc11_data_w);
+	uint8_t hc11_comm_r();
+	void hc11_comm_w(uint8_t data);
+	void hc11_output_w(uint8_t data);
+	uint8_t hc11_data_r();
+	void hc11_data_w(uint8_t data);
 	template <int Ch> uint8_t hc11_analog_r();
 
 	DECLARE_READ16_MEMBER(dsp_shared_r);

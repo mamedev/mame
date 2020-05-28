@@ -13,7 +13,7 @@
     68EC020 @ 16 MHz
     Motorola XC56156-40 DSP @ 40 MHz
     Z80 + K054539 for sound
-    Network to connect up to 4 PCBs.
+    K056230 for network (up to four players)
 
     Video hardware:
     TTL text plane similar to Run and Gun.
@@ -25,15 +25,14 @@
     - 68020 memory map
     - Z80 + sound system
     - EEPROM
-    - service switch
     - TTL text plane
+    - Controls
+    - Palettes
 
     Driver needs:
-    - Handle network at 580800 so game starts
+    - Network at 580800 (K056230)
     - Polygon rasterization (K054009 + K054010)
     - Hook up PSAC2 (gfx decode for it is already present and correct)
-    - Palettes
-    - Controls
     - Priorities.  From the original board it appears they're fixed, in front to back order:
       (all the way in front) TTL text layer -> polygons -> PSAC2 (all the way in back)
 
@@ -68,6 +67,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+//#include "machine/k056230.h"
 #include "machine/watchdog.h"
 #include "sound/k054539.h"
 #include "screen.h"
@@ -104,7 +104,7 @@ WRITE8_MEMBER(polygonet_state::polygonet_sys_w)
 		    D23 = BRMAS        - 68k bus error mask
 		    D22 = L7MAS        - L7 interrupt mask (unused - should always be '1')
 		    D21 = /L5MAS       - L5 interrupt mask/acknowledge (vblank)
-		    D20 = L3MAS        - L3 interrupt mask (network)
+		    D20 = L3MAS        - L3 interrupt mask (056230)
 		    D19 = VFLIP        - Flip video vertically
 		    D18 = HFLIP        - Flip video horizontally
 		    D17 = COIN2        - Coin counter 2
@@ -125,10 +125,10 @@ WRITE8_MEMBER(polygonet_state::polygonet_sys_w)
 }
 
 
-/* irqs 3, 5, and 7 have valid vectors                */
-/* irq 3 is network.  don't generate if you don't emulate the network h/w! */
-/* irq 5 is vblank */
-/* irq 7 does nothing (it jsrs to a rts and then rte) */
+/* irqs 3, 5, and 7 have valid vectors                
+   irq 3 is network. currently disabled for reasons above
+   irq 5 is vblank 
+   irq 7 does nothing (it jsrs to a rts and then rte) */
 INTERRUPT_GEN_MEMBER(polygonet_state::polygonet_interrupt)
 {
 	if (m_sys1 & 0x20)
@@ -565,7 +565,7 @@ void polygonet_state::plygonet(machine_config &config)
 	Z80(config, m_audiocpu, 8000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &polygonet_state::sound_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu"); /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
+	config.set_perfect_quantum(m_maincpu); /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 
 	EEPROM_ER5911_8BIT(config, m_eeprom);
 
@@ -606,7 +606,7 @@ static INPUT_PORTS_START( polygonet )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // Start 1, unused
-	PORT_DIPNAME( 0x30, 0x00, "Player Color" ) /* 0x10(SW1), 0x20(SW2).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
+	PORT_DIPNAME( 0x30, 0x00, "Player Color/Network ID" ) // 0x10(SW1), 0x20(SW2). It's mapped on the JAMMA connector and plugs into an external switch mech.
 	PORT_DIPSETTING(    0x00, "Red" )
 	PORT_DIPSETTING(    0x10, "Yellow" )
 	PORT_DIPSETTING(    0x20, "Green" )
@@ -687,11 +687,11 @@ ROM_START( plygonet )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 sound program */
 	ROM_LOAD("305b05.7b", 0x000000, 0x20000, CRC(2d3d9654) SHA1(784a409df47cee877e507b8bbd3610d161d63753) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) /* TTL text plane tiles */
-	ROM_LOAD( "305b06.18g", 0x000000, 0x20000, CRC(decd6e42) SHA1(4c23dcb1d68132d3381007096e014ee4b6007086) )
+	ROM_REGION32_BE( 0x20000, "gfx1", 0 ) /* TTL text plane tiles */
+	ROMX_LOAD( "305b06.18g", 0x000000, 0x20000, CRC(decd6e42) SHA1(4c23dcb1d68132d3381007096e014ee4b6007086), ROM_GROUPDWORD | ROM_REVERSE )
 
-	ROM_REGION( 0x40000, "gfx2", 0 ) /* '936 tiles */
-	ROM_LOAD( "305b07.20d", 0x000000, 0x40000, CRC(e4320bc3) SHA1(b0bb2dac40d42f97da94516d4ebe29b1c3d77c37) )
+	ROM_REGION32_BE( 0x40000, "gfx2", 0 ) /* '936 tiles */
+	ROMX_LOAD( "305b07.20d", 0x000000, 0x40000, CRC(e4320bc3) SHA1(b0bb2dac40d42f97da94516d4ebe29b1c3d77c37), ROM_GROUPDWORD | ROM_REVERSE )
 
 	ROM_REGION( 0x200000, "k054539", 0 ) /* sound data */
 	ROM_LOAD( "305b08.2e", 0x000000, 0x200000, CRC(874607df) SHA1(763b44a80abfbc355bcb9be8bf44373254976019) )
@@ -710,11 +710,11 @@ ROM_START( polynetw )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 sound program */
 	ROM_LOAD( "305jaa05.7b", 0x000000, 0x020000, CRC(06053db6) SHA1(c7d43c2650d949ee552a49db93dece842c17e68d) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) /* TTL text plane tiles */
-	ROM_LOAD( "305a06.18g", 0x000000, 0x020000, CRC(4b9b7e9c) SHA1(8c3c0f1ec7e26fd9552f6da1e6bdd7ff4453ba57) )
+	ROM_REGION32_BE( 0x20000, "gfx1", 0 ) /* TTL text plane tiles */
+	ROMX_LOAD( "305a06.18g", 0x000000, 0x020000, CRC(4b9b7e9c) SHA1(8c3c0f1ec7e26fd9552f6da1e6bdd7ff4453ba57), ROM_GROUPDWORD | ROM_REVERSE )
 
-	ROM_REGION( 0x40000, "gfx2", 0 ) /* '936 tiles */
-	ROM_LOAD( "305a07.20d", 0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203) )
+	ROM_REGION32_BE( 0x40000, "gfx2", 0 ) /* '936 tiles */
+	ROMX_LOAD( "305a07.20d", 0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203), ROM_GROUPDWORD | ROM_REVERSE )
 
 	ROM_REGION( 0x400000, "k054539", 0 ) /* sound data */
 	ROM_LOAD( "305a08.2e", 0x000000, 0x200000, CRC(7ddb8a52) SHA1(3199b347fc433ffe0de8521001df77672d40771e) )

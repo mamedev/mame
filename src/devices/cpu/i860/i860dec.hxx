@@ -36,7 +36,7 @@
  *
  */
 #include "i860.h"
-#include <math.h>
+#include <cmath>
 
 
 #undef HOST_MSB

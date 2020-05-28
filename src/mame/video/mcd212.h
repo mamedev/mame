@@ -126,16 +126,7 @@ public:
 
 	auto int_callback() { return m_int_callback.bind(); }
 
-	template <typename Object> void set_scanline_callback(Object &&cb) { m_scanline_callback = std::forward<Object>(cb); }
-	void set_scanline_callback(scanline_callback_delegate callback) { m_scanline_callback = callback; }
-	template <class FunctionClass> void set_scanline_callback(const char *devname, void (FunctionClass::*callback)(int), const char *name)
-	{
-		set_scanline_callback(scanline_callback_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_scanline_callback(void (FunctionClass::*callback)(int), const char *name)
-	{
-		set_scanline_callback(scanline_callback_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_scanline_callback(T &&... args) { m_scanline_callback.set(std::forward<T>(args)...); }
 
 	// device members
 	DECLARE_READ16_MEMBER( regs_r );

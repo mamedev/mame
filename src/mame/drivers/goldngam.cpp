@@ -265,7 +265,7 @@ private:
 	static constexpr int MOVIECRD_DUART1_IRQ = M68K_IRQ_2;
 	static constexpr int MOVIECRD_DUART2_IRQ = M68K_IRQ_4;
 
-	DECLARE_READ8_MEMBER(unk_r);
+	uint8_t unk_r();
 	virtual void video_start() override;
 	void palette_init(palette_device &palette);
 	uint32_t screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -320,7 +320,7 @@ void goldngam_state::palette_init(palette_device &palette)
 * Memory Map Information *
 *************************/
 
-READ8_MEMBER(goldngam_state::unk_r)
+uint8_t goldngam_state::unk_r()
 {
 	// hopper status read ?
 	return 1;
@@ -388,8 +388,8 @@ void goldngam_state::swisspkr_map(address_map &map)
 void goldngam_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff4, 0xfffff5).lr16("duart0 int", [this]() -> u16 { return m_duart[0]->get_irq_vector(); });
-	map(0xfffff8, 0xfffff9).lr16("duart0 int", [this]() -> u16 { return m_duart[1]->get_irq_vector(); });
+	map(0xfffff4, 0xfffff5).lr16(NAME([this] () -> u16 { return m_duart[0]->get_irq_vector(); }));
+	map(0xfffff8, 0xfffff9).lr16(NAME([this] () -> u16 { return m_duart[1]->get_irq_vector(); }));
 }
 
 void goldngam_state::moviecrd_map(address_map &map)

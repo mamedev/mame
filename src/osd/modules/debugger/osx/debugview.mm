@@ -10,13 +10,14 @@
 
 #include "emu.h"
 #include "debugger.h"
+#include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
 #include "modules/lib/osdobj_common.h"
 
 #include "util/xmlfile.h"
 
-#include <string.h>
+#include <cstring>
 
 
 static NSColor *DefaultForeground;
@@ -255,7 +256,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 	[self setFont:[[self class] defaultFontForMachine:m]];
 
-	NSMenu *contextMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Context"];
+	NSMenu *contextMenu = [[NSMenu alloc] initWithTitle:@"Context"];
 	[self addContextMenuItemsToMenu:contextMenu];
 	[self setMenu:contextMenu];
 	[contextMenu release];
@@ -871,7 +872,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)insertNewline:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+	machine->debugger().console().get_visible_cpu()->debug()->single_step();
 }
 
 

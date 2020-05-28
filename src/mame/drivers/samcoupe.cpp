@@ -65,7 +65,7 @@ void samcoupe_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		sam_video_update_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in samcoupe_state::device_timer");
+		throw emu_fatalerror("Unknown id in samcoupe_state::device_timer");
 	}
 }
 
@@ -236,6 +236,10 @@ READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 	/* bit 7, external memory */
 	data |= 1 << 7;
 
+	/* joysticks */
+	if (!BIT(offset, 12)) data &= m_joy1->read() | (0xff ^ 0x1f);
+	if (!BIT(offset, 11)) data &= m_joy2->read() | (0xff ^ 0x1f);
+
 	return data;
 }
 
@@ -291,19 +295,19 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_lpt2_strobe_w)
 
 void samcoupe_state::samcoupe_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().rw(FUNC(samcoupe_state::sam_bank1_r), FUNC(samcoupe_state::sam_bank1_w)); // AM_RAMBANK("bank1")
-	map(0x4000, 0x7fff).ram().rw(FUNC(samcoupe_state::sam_bank2_r), FUNC(samcoupe_state::sam_bank2_w)); // AM_RAMBANK("bank2")
-	map(0x8000, 0xbfff).ram().rw(FUNC(samcoupe_state::sam_bank3_r), FUNC(samcoupe_state::sam_bank3_w)); // AM_RAMBANK("bank3")
-	map(0xc000, 0xffff).ram().rw(FUNC(samcoupe_state::sam_bank4_r), FUNC(samcoupe_state::sam_bank4_w)); // AM_RAMBANK("bank4")
+	map(0x0000, 0x3fff).ram().rw(FUNC(samcoupe_state::sam_bank1_r), FUNC(samcoupe_state::sam_bank1_w)); // .bankrw("bank1");
+	map(0x4000, 0x7fff).ram().rw(FUNC(samcoupe_state::sam_bank2_r), FUNC(samcoupe_state::sam_bank2_w)); // .bankrw("bank2");
+	map(0x8000, 0xbfff).ram().rw(FUNC(samcoupe_state::sam_bank3_r), FUNC(samcoupe_state::sam_bank3_w)); // .bankrw("bank3");
+	map(0xc000, 0xffff).ram().rw(FUNC(samcoupe_state::sam_bank4_r), FUNC(samcoupe_state::sam_bank4_w)); // .bankrw("bank4");
 }
 
 void samcoupe_state::samcoupe_io(address_map &map)
 {
 	map(0x0080, 0x0081).select(0xff00).w(FUNC(samcoupe_state::samcoupe_ext_mem_w));
 	map(0x00e0, 0x00e7).select(0xff10).rw(FUNC(samcoupe_state::samcoupe_disk_r), FUNC(samcoupe_state::samcoupe_disk_w));
-	map(0x00e8, 0x00e8).select(0xff00).w("lpt1_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00e8, 0x00e8).select(0xff00).w("lpt1_data_out", FUNC(output_latch_device::write));
 	map(0x00e9, 0x00e9).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_lpt1_busy_r), FUNC(samcoupe_state::samcoupe_lpt1_strobe_w));
-	map(0x00ea, 0x00ea).select(0xff00).w("lpt2_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00ea, 0x00ea).select(0xff00).w("lpt2_data_out", FUNC(output_latch_device::write));
 	map(0x00eb, 0x00eb).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_lpt2_busy_r), FUNC(samcoupe_state::samcoupe_lpt2_strobe_w));
 	map(0x00f8, 0x00f8).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_pen_r), FUNC(samcoupe_state::samcoupe_clut_w));
 	map(0x00f9, 0x00f9).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_status_r), FUNC(samcoupe_state::samcoupe_line_int_w));
@@ -458,6 +462,24 @@ static INPUT_PORTS_START( samcoupe )
 	PORT_CONFNAME(0x01, 0x00, "Real Time Clock")
 	PORT_CONFSETTING(   0x00, DEF_STR(None))
 	PORT_CONFSETTING(   0x01, "SAMBUS")
+
+	/* Sam Coupe has single 9-pin ATARI-compatible connector but supports 2 joysticks via a splitter,
+	   this works by using a different ground for each stick (pin 8: stick 1 gnd, pin 9: stick 2 gnd.)
+	   Joysticks overlay number keys 6-0 for the stick 1 and 1-5 for stick 2 (same scheme as ZX Spectrum) */
+
+	PORT_START("joy_1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(1)
+
+	PORT_START("joy_2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2)
 INPUT_PORTS_END
 
 

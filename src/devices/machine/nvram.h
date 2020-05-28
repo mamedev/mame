@@ -40,18 +40,10 @@ public:
 
 	// inline configuration helpers
 	void set_default_value(default_value value) { m_default_value = value; }
-	template <typename Object> void set_custom_handler(Object &&cb)
+	template <typename... T> void set_custom_handler(T &&... args)
 	{
 		m_default_value = DEFAULT_CUSTOM;
-		m_custom_handler = std::forward<Object>(cb);
-	}
-	template <class FunctionClass> void set_custom_handler(const char *devname, void (FunctionClass::*callback)(nvram_device &, void *, size_t), const char *name)
-	{
-		set_custom_handler(init_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_custom_handler(void (FunctionClass::*callback)(nvram_device &, void *, size_t), const char *name)
-	{
-		set_custom_handler(init_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+		m_custom_handler.set(std::forward<T>(args)...);
 	}
 
 	// controls

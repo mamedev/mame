@@ -80,14 +80,14 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER (ram0000_r);
-	DECLARE_WRITE8_MEMBER(ram0000_w);
-	DECLARE_READ8_MEMBER (ram6000_r);
-	DECLARE_WRITE8_MEMBER(ram6000_w);
-	DECLARE_READ8_MEMBER (rama000_r);
-	DECLARE_WRITE8_MEMBER(rama000_w);
-	DECLARE_READ8_MEMBER (rame000_r);
-	DECLARE_WRITE8_MEMBER(rame000_w);
+	uint8_t ram0000_r(offs_t offset);
+	void ram0000_w(offs_t offset, uint8_t data);
+	uint8_t ram6000_r(offs_t offset);
+	void ram6000_w(offs_t offset, uint8_t data);
+	uint8_t rama000_r(offs_t offset);
+	void rama000_w(offs_t offset, uint8_t data);
+	uint8_t rame000_r(offs_t offset);
+	void rame000_w(offs_t offset, uint8_t data);
 	uint8_t port10_r();
 	void port10_w(uint8_t data);
 	void port20_w(uint8_t data);
@@ -190,7 +190,7 @@ void alphatro_state::update_banking()
 	}
 }
 
-READ8_MEMBER (alphatro_state::ram0000_r)
+uint8_t alphatro_state::ram0000_r(offs_t offset)
 {
 	if (offset < 0xf000)
 	{
@@ -200,7 +200,7 @@ READ8_MEMBER (alphatro_state::ram0000_r)
 	return m_p_videoram[offset & 0xfff];
 }
 
-WRITE8_MEMBER(alphatro_state::ram0000_w)
+void alphatro_state::ram0000_w(offs_t offset, uint8_t data)
 {
 
 	if (offset < 0xf000)
@@ -213,12 +213,12 @@ WRITE8_MEMBER(alphatro_state::ram0000_w)
 	}
 }
 
-READ8_MEMBER (alphatro_state::ram6000_r) { return m_ram_ptr[offset+0x6000]; }
-WRITE8_MEMBER(alphatro_state::ram6000_w) { m_ram_ptr[offset+0x6000] = data; }
-READ8_MEMBER (alphatro_state::rama000_r) { return m_ram_ptr[offset+0xa000]; }
-WRITE8_MEMBER(alphatro_state::rama000_w) { m_ram_ptr[offset+0xa000] = data; }
-READ8_MEMBER (alphatro_state::rame000_r) { return m_ram_ptr[offset+0xe000]; }
-WRITE8_MEMBER(alphatro_state::rame000_w) { m_ram_ptr[offset+0xe000] = data; }
+uint8_t alphatro_state::ram6000_r(offs_t offset) { return m_ram_ptr[offset+0x6000]; }
+void alphatro_state::ram6000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x6000] = data; }
+uint8_t alphatro_state::rama000_r(offs_t offset) { return m_ram_ptr[offset+0xa000]; }
+void alphatro_state::rama000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0xa000] = data; }
+uint8_t alphatro_state::rame000_r(offs_t offset) { return m_ram_ptr[offset+0xe000]; }
+void alphatro_state::rame000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0xe000] = data; }
 
 uint8_t alphatro_state::port10_r()
 {
@@ -448,7 +448,7 @@ void alphatro_state::alphatro_io(address_map &map)
 	// 8257 DMAC
 	map(0x60, 0x68).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	// 8259 PIT
-	//AM_RANGE(0x70, 0x72) AM_DEVREADWRITE("
+	//map(0x70, 0x72).r(FUNC(alphatro_state::)).w(FUNC(alphatro_state::));
 	map(0xf0, 0xf0).r(FUNC(alphatro_state::portf0_r)).w(FUNC(alphatro_state::portf0_w));
 	map(0xf8, 0xf8).rw(m_fdc, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
 	map(0xf9, 0xf9).r(m_fdc, FUNC(upd765a_device::msr_r));
@@ -769,7 +769,7 @@ void alphatro_state::alphatro(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(alphatro_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(alphatro_state::crtc_update_row));
 
 	I8251(config, m_usart, 16_MHz_XTAL / 4);
 	m_usart->txd_handler().set([this] (bool state) { m_cassbit = state; });
@@ -787,7 +787,7 @@ void alphatro_state::alphatro(machine_config &config)
 	RAM(config, "ram").set_default_size("64K");
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "alphatro_cart", "bin").set_device_load(FUNC(alphatro_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "alphatro_cart", "bin").set_device_load(FUNC(alphatro_state::cart_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("alphatro_cart");
 
 	/* 0000 banking */

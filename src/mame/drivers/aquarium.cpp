@@ -248,7 +248,7 @@ void aquarium_state::aquarium(machine_config &config)
 	EXCELLENT_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_palette(m_palette);
 	m_sprgen->set_color_base(0x300);
-	m_sprgen->set_colpri_callback(FUNC(aquarium_state::aquarium_colpri_cb), this);
+	m_sprgen->set_colpri_callback(FUNC(aquarium_state::aquarium_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

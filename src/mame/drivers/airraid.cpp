@@ -187,10 +187,9 @@ private:
 
 	required_device<airraid_video_device> m_airraid_video;
 
-	DECLARE_READ8_MEMBER(cshooter_coin_r);
-	DECLARE_WRITE8_MEMBER(cshooter_c500_w);
-	DECLARE_WRITE8_MEMBER(cshooter_c700_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
+	void cshooter_c500_w(uint8_t data);
+	void cshooter_c700_w(uint8_t data);
+	void bank_w(uint8_t data);
 	DECLARE_MACHINE_RESET(cshooter);
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
 
@@ -220,15 +219,15 @@ MACHINE_RESET_MEMBER(airraid_state,cshooter)
 {
 }
 
-WRITE8_MEMBER(airraid_state::cshooter_c500_w)
+void airraid_state::cshooter_c500_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(airraid_state::cshooter_c700_w)
+void airraid_state::cshooter_c700_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(airraid_state::bank_w)
+void airraid_state::bank_w(uint8_t data)
 {
 	// format of this address is TTBB tbfs
 
@@ -258,19 +257,18 @@ void airraid_state::airraid_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW2");
 	map(0xc004, 0xc004).portr("DSW1");
 	map(0xc500, 0xc500).w(FUNC(airraid_state::cshooter_c500_w));
-//  AM_RANGE(0xc600, 0xc600) AM_WRITE(cshooter_c600_w)            // see notes
+//  map(0xc600, 0xc600).w(FUNC(airraid_state::cshooter_c600_w));            // see notes
 	map(0xc700, 0xc700).w(FUNC(airraid_state::cshooter_c700_w));
-//  AM_RANGE(0xc801, 0xc801) AM_WRITE(cshooter_c801_w)            // see notes
+//  map(0xc801, 0xc801).w(FUNC(airraid_state::cshooter_c801_w));            // see notes
 	map(0xd000, 0xd7ff).ram().w(m_airraid_video, FUNC(airraid_video_device::txram_w)).share("txram");
 	map(0xd800, 0xd8ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xda00, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xdc00, 0xdc0f).ram().w(m_airraid_video, FUNC(airraid_video_device::vregs_w)).share("vregs");
-//  AM_RANGE(0xdc10, 0xdc10) AM_RAM
+//  map(0xdc10, 0xdc10).ram();
 	map(0xdc11, 0xdc11).w(FUNC(airraid_state::bank_w));
-//  AM_RANGE(0xdc19, 0xdc19) AM_RAM
-//  AM_RANGE(0xdc1e, 0xdc1e) AM_RAM
-//  AM_RANGE(0xdc1f, 0xdc1f) AM_RAM
-
+//  map(0xdc19, 0xdc19).ram();
+//  map(0xdc1e, 0xdc1e).ram();
+//  map(0xdc1f, 0xdc1f).ram();
 	map(0xde00, 0xde0f).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w));
 	map(0xe000, 0xfdff).ram().share("mainram");
 	map(0xfe00, 0xffff).ram().share("sprite_ram");
@@ -401,7 +399,7 @@ void airraid_state::airraid(machine_config &config)
 	audiocpu.set_addrmap(AS_OPCODES, &airraid_state::airraid_sound_decrypted_opcodes_map);
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 

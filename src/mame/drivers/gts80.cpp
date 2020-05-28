@@ -49,13 +49,13 @@ public:
 	void init_gts80();
 
 private:
-	DECLARE_READ8_MEMBER(port1a_r);
-	DECLARE_READ8_MEMBER(port2a_r);
-	DECLARE_WRITE8_MEMBER(port1b_w);
-	DECLARE_WRITE8_MEMBER(port2a_w);
-	DECLARE_WRITE8_MEMBER(port2b_w);
-	DECLARE_WRITE8_MEMBER(port3a_w);
-	DECLARE_WRITE8_MEMBER(port3b_w);
+	uint8_t port1a_r();
+	uint8_t port2a_r();
+	void port1b_w(uint8_t data);
+	void port2a_w(uint8_t data);
+	void port2b_w(uint8_t data);
+	void port3a_w(uint8_t data);
+	void port3b_w(offs_t offset, uint8_t data);
 	void gts80_map(address_map &map);
 
 	uint8_t m_port2;
@@ -272,7 +272,7 @@ static INPUT_PORTS_START( gts80 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
 INPUT_PORTS_END
 
-READ8_MEMBER( gts80_state::port1a_r )
+uint8_t gts80_state::port1a_r()
 {
 	char kbdrow[8];
 	uint8_t data = 0;
@@ -290,19 +290,19 @@ READ8_MEMBER( gts80_state::port1a_r )
 	return data;
 }
 
-READ8_MEMBER( gts80_state::port2a_r )
+uint8_t gts80_state::port2a_r()
 {
 	return m_port2 | 0x80; // slam tilt off
 }
 
 // sw strobes
-WRITE8_MEMBER( gts80_state::port1b_w )
+void gts80_state::port1b_w(uint8_t data)
 {
 	m_swrow = data;
 }
 
 // schematic and pinmame say '1' is indicated by m_segment !bits 4,5,6, but it is !bit 7
-WRITE8_MEMBER( gts80_state::port2a_w )
+void gts80_state::port2a_w(uint8_t data)
 {
 	m_port2 = data;
 	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
@@ -326,23 +326,23 @@ WRITE8_MEMBER( gts80_state::port2a_w )
 }
 
 //d0-3 bcd data; d4-6 = centre segment; d7 = dipsw enable
-WRITE8_MEMBER( gts80_state::port2b_w )
+void gts80_state::port2b_w(uint8_t data)
 {
 	m_segment = data;//printf("%s:%X ",machine().describe_context().c_str(),data);
 }
 
 // solenoids
-WRITE8_MEMBER( gts80_state::port3a_w )
+void gts80_state::port3a_w(uint8_t data)
 {
 }
 
 //pb0-3 = sound; pb4-7 = lamprow
-WRITE8_MEMBER( gts80_state::port3b_w )
+void gts80_state::port3b_w(offs_t offset, uint8_t data)
 {
 	uint8_t sndcmd = data & 15;
 	m_lamprow = data >> 4;
 	if (m_r0_sound)
-		m_r0_sound->write(space, offset, sndcmd);
+		m_r0_sound->write(offset, sndcmd);
 	if (m_r1_sound)
 		m_r1_sound->write(sndcmd);
 }

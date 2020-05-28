@@ -64,6 +64,7 @@
 #include "coco_pak.h"
 #include "coco_rs232.h"
 #include "coco_ssc.h"
+#include "coco_ram.h"
 
 #define SLOT1_TAG           "slot1"
 #define SLOT2_TAG           "slot2"
@@ -164,6 +165,7 @@ static void coco_cart_slot1_3(device_slot_interface &device)
 	device.option_add("dcmodem", COCO_DCMODEM);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("ssc", COCO_SSC);
+	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("games_master", COCO_PAK_GMC);
 	device.option_add("banked_16k", COCO_PAK_BANKED);
 	device.option_add("pak", COCO_PAK);
@@ -177,6 +179,7 @@ static void coco_cart_slot4(device_slot_interface &device)
 	device.option_add("dcmodem", COCO_DCMODEM);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("ssc", COCO_SSC);
+	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("games_master", COCO_PAK_GMC);
 	device.option_add("banked_16k", COCO_PAK_BANKED);
 	device.option_add("pak", COCO_PAK);
@@ -252,7 +255,7 @@ coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const 
 void coco_multipak_device::device_start()
 {
 	// install $FF7F handler
-	install_readwrite_handler(0xFF7F, 0xFF7F, read8_delegate(FUNC(coco_multipak_device::ff7f_read), this),write8_delegate(FUNC(coco_multipak_device::ff7f_write), this));
+	install_readwrite_handler(0xFF7F, 0xFF7F, read8_delegate(*this, FUNC(coco_multipak_device::ff7f_read)), write8_delegate(*this, FUNC(coco_multipak_device::ff7f_write)));
 
 	// initial state
 	m_select = 0xFF;

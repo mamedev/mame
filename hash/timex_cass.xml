@@ -1,0 +1,1391 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+    To load software, you must use the following sequence at the prompt:
+     "J" "shift+P" "shift+P" "enter" (this will enter the command LOAD "" and execute it)
+     You must then play the tape from the menu in MAME (you'll need to turn SCRLOCK off and hit TAB to get the MAME menu)
+
+
+    Notes on cassette dumps:
+        It's preferable to have a proper representation of each cassette side, rather than having both in a single TZX.
+        While the contents in both sides of each cassette are usually identical, it's preferable to have dumps of both to be completely sure.
+        Certain alternate editions might share the same data but have very different pauses between blocks, which makes them separate clones.
+        Beware of any "fake" TZX files with 1000ms pauses! Those are better added as TAP while the real TZXs are created.
+
+
+    Known software without a TZX or TAP dump:
+        Geovideo 4  (198x)(Paulo Sergio Coelho)     ->  https://www.worldofspectrum.org/infoseekid.cgi?id=4000104
+
+    Current bad dumps:
+        Cozinheiro (198x)(TMX Portugal Ltda)
+        Fórmula 1 (198x)(TMX Portugal Ltda)
+        Frogger (1983)(Games to Learn By Inc)
+        Mscript (rerelease) (1983)(Zebra Systems Inc)
+
+    Currently in need of a proper TZX dump (unless never released as physical media):
+        Androids (1983)(Timex Computer Corporation)
+        Artworx (1985)(NovelSoft)
+        Auto Analyzer (1983)(Timex Computer Corporation)
+        Basic 64 Demo - TC 2068 (1985)(TMX Portugal Ltda)
+        Crazy Bugs! (1983)(Timex Computer Corporation)
+        Desktop Publisher (1987)(Charles Stelding)
+        Disassembler (19XX)(unknown)
+        Horace & the Spiders (1983)(Timex Computer Corporation)
+        Hot Z Disassembler v1.43 (1984)(Ray Kingsley)
+        Hot Z Disassembler v1.84 (1984)(Ray Kingsley)
+        Hot Z Disassembler v1.95 (1984)(Ray Kingsley)
+        Keyword v1 (1984)(Glyn Kendall, Jack Dohany)
+        Keyword v5.0 (198X)(Jack Dohany)
+        Mscript (1983)(21st Century Electronics)
+        Personal Portfolio Manager (1983)(Timex Computer Corporation)
+        Pro Pinball (1983)(Timex Computer Corporation)
+        Pro-File 2068 (19XX)(P.O. Box 64)
+        Smart Terminal 1 (1983)(Timex Computer Corporation)
+        Super Hot Z Disassembler v2.51 (19XX)(Ray Kingsley)
+        Tasword Two (1983)(Tasman Software)
+        The Worx! (1986)(NovelSoft)
+        Timachine (1986)(NovelSoft)
+        Toolkit (1986)(TMX Portugal Ltda)
+        Upload-2000 (1983)(EZ-Key)
+        VU-3D (1983)(Timex Computer Corporation)
+        VU-Calc (1983)(Timex Computer Corporation)
+        VU-File (1983)(Timex Computer Corporation)
+        Window Print 32 (1987)(John M. Bell)
+        Window Print 64 (1987)(John M. Bell)
+
+-->
+<softwarelist name="timex_cass" description="Timex Sinclair 2068 cassettes">
+	<software name="4kracere">
+		<description>4K Race Refueled+</description>
+		<year>2005</year>
+		<publisher>Paolo Ferraris</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="5444">
+				<rom name="4k race refueled plus (2005)(paolo ferraris).tap" size="5444" crc="ad98748e" sha1="f436b5e3264de6c7594f921e486c887f571c8f4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aczgener">
+		<description>ACZ General Ledger 2000</description>
+		<year>1984</year>
+		<publisher>ACZ Software</publisher>
+		<part name="cass1" interface="spectrum_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="25716">
+				<rom name="acz general ledger 2000 - side 1 (1984)(acz software).tzx" size="25716" crc="5707e393" sha1="952ef3dd99b252d0f8939727b94940dec59dcc00"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="spectrum_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="30586">
+				<rom name="acz general ledger 2000 - side 2 (1984)(acz software).tzx" size="30586" crc="35d42ae1" sha1="17220d9a53778552d9a7cc6876cf535fe5d45d52"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aercopd12">
+		<description>AERCO 2068 Printer Driver V12</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="10630">
+				<rom name="aerco 2068 printer driver v12 (198x)(unknown).tzx" size="10630" crc="b21ca946" sha1="d89e3d0fc326712a05621b42c2a5394e18d04bb6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aercocp68">
+		<description>AERCO CP68 Printer Driver</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="spectrum_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="11503">
+				<rom name="aerco cp68 printer driver - side a (198x)(unknown).tzx" size="11503" crc="08dacd5b" sha1="a531da635393c38c00b90353b3c3bde797559edd"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="spectrum_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="10644">
+				<rom name="aerco cp68 printer driver - side b (198x)(unknown).tzx" size="10644" crc="41c50ed4" sha1="8d2eebda0f7866d65f0980eeb539d001188a890d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="androids">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Androids</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="15813">
+				<rom name="androids (1983)(timex computer corporation).tap" size="15813" crc="a785829c" sha1="f3fb98bcd41512c6ba708dde30fb4273fd4c2800"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aritmeti">
+		<description>Aritmetica</description>
+		<year>198?</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="33073">
+				<rom name="aritmetica (198x)(tmx portugal ltda).tzx" size="33073" crc="e31dfd3a" sha1="e68c0b3bd6a874a65a5e5e0ed37a772eb588bd9c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artworx">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Artworx</description>
+		<year>1985</year>
+		<publisher>NovelSoft</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="38106">
+				<rom name="artworx (1985)(novelsoft).tap" size="38106" crc="3d452716" sha1="0384c73646de660636015de5d396d55d93656376"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="assaltoa">
+		<description>Assalto A Embaixada</description>
+		<year>1982</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="18866">
+				<rom name="assalto a embaixada (1982)(tmx portugal ltda).tzx" size="18866" crc="adb7e4a1" sha1="89b661813b6fcb19aecabd93f5921e2f884ad55c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrobla">
+	<!--    Thought to be a bootleg of Quicksilva's Spectrum release.   -->
+		<description>Astro Blaster (bootleg?)</description>
+		<year>1984</year>
+		<publisher>Metal Soft</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="15743">
+				<rom name="astro blaster (1984)(metal soft).tzx" size="15743" crc="75e2b669" sha1="288eefb90d41cc81a93ae7b659505346db64dca6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="autoanaly">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Auto Analyzer</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="42926">
+				<rom name="auto analyzer (1983)(timex computer corporation).tap" size="42926" crc="2880b8a4" sha1="175f8feac7a61d4d814d9d02f45ebc233ed27e0c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="b64demo2048" cloneof="b64demo2068">
+		<description>Basic 64 Demo - TC 2048</description>
+		<year>1985</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="19834">
+				<rom name="basic 64 demo - tc 2048 (1985)(tmx portugal ltda).tzx" size="19834" crc="be6843fc" sha1="8a58544e984a00b7d4aabe799cfe3bd13cd981b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="b64demo2068">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Basic 64 Demo - TC 2068</description>
+		<year>1985</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="50280">
+				<rom name="basic 64 demo - tc 2068 (1985)(tmx portugal ltda).tap" size="50280" crc="d8d03582" sha1="b0cc1224cdbba95a7583b8791d5f6d3134b77507"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blam">
+		<description>Blam</description>
+		<year>1984</year>
+		<publisher>Riverside Software</publisher>
+		<part name="cass1" interface="spectrum_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="37033">
+				<rom name="blam - side 1 (1984)(riverside software).tzx" size="37033" crc="00017c28" sha1="f243839501be129bfd1aa7d44023d822c8ce8b22"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="spectrum_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="37894">
+				<rom name="blam - side 2 (1984)(riverside software).tzx" size="37894" crc="036c6cd5" sha1="d67def47c58a2dedb8b703095aa1c4c130ffe55f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blindall">
+		<description>Blind Alley</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="12806">
+				<rom name="blind alley (1983)(timex computer corporation).tzx" size="12806" crc="7764c1d9" sha1="25ee5e540cb7936023a4e927d4af9658db066612"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="britinva">
+		<description>Britain Invaded</description>
+		<year>1985</year>
+		<publisher>Sharps Inc</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="37830">
+				<rom name="britain invaded (1985)(sharps inc).tzx" size="37830" crc="00aa261d" sha1="5bb5ae076f84c272a068dfdc21950b7753370d59"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="budgeter">
+		<description>Budgeter</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="30820">
+				<rom name="budgeter (1983)(timex computer corporation).tzx" size="30820" crc="fb81420b" sha1="14ff12d8363237d0754690963848339a08b93a3b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capitali">
+		<description>Capitalization Master</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="39836">
+				<rom name="capitalization master (1983)(timex computer corporation).tzx" size="39836" crc="189691a1" sha1="b563d1433da152c23ddaf566e8977747101dcc3d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="checkboo">
+		<description>Checkbook Manager</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="12033">
+				<rom name="checkbook manager (1983)(timex computer corporation).tzx" size="12033" crc="c18bc225" sha1="3bce0ac65b3be7e0fa91b72db59388bf42f4ec1b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess">
+	<!--    Needs verification. This dump was previously thought to come from an alternate Spectrum release.    -->
+		<description>Chess</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="17323">
+				<rom name="chess (1983)(timex computer corporation).tzx" size="17323" crc="278bca15" sha1="b8908f2aae96a0402d5234901a4a67a99093216a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="circuitb">
+		<description>Circuit Board Scramble</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="34996">
+				<rom name="circuit board scramble (1983)(timex computer corporation).tzx" size="34996" crc="a4ea9bac" sha1="11e36ab95a95d1b6a990fb9d240295bd1ee1eee8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colorpri">
+		<description>ColorPRINT</description>
+		<year>2008</year>
+		<publisher>Andrew Owen</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="4896">
+				<rom name="colorprint (2008)(andrew owen).tap" size="4896" crc="50ea39cb" sha1="a9fb4bd6cf027122695d608d5ae9b3c28661d155"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colortil">
+		<description>ColorTILE</description>
+		<year>2008</year>
+		<publisher>Andrew Owen</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="26899">
+				<rom name="colortile (2008)(andrew owen).tap" size="26899" crc="c2b852c7" sha1="0920b084f28375c13bf12129f95b38fadf84b599"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy">
+		<description>Copy</description>
+		<year>198?</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass1" interface="spectrum_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="28339">
+				<rom name="copy - side a (198x)(tmx portugal ltda).tzx" size="28339" crc="ad9c4b42" sha1="25aa7a98278fc835e8e269276a50555d426b3b55"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="spectrum_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="30154">
+				<rom name="copy - side b (198x)(tmx portugal ltda).tzx" size="30154" crc="b537f68b" sha1="12e34608b18167cc687c182a62f0580de6649785"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cozinhei">
+	<!--    Bad dump    -->
+	<!--    Portuguese adaptation of Mr. Wimpy  -->
+		<description>Cozinheiro</description>
+		<year>198?</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="29328">
+				<rom name="cozinheiro (198x)(tmx portugal ltda).tzx" status="baddump" size="29328" crc="76887baf" sha1="caa7ee66802c903ee73ad83387706675bd16b27e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crazybug">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Crazy Bugs</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="8419">
+				<rom name="crazy bugs (1983)(timex computer corporation).tap" size="8419" crc="a7f28400" sha1="0df7fa93099603986774da2f9643e78ef587a5d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crossfir">
+		<description>Crossfire</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="5196">
+				<rom name="crossfire (1983)(timex computer corporation).tzx" size="5196" crc="2f5e8947" sha1="e2317f08998e643e4247dc8414e2aee46d15ef7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cyberzon">
+		<description>Cyber Zone</description>
+		<year>1983</year>
+		<publisher>Softsync Inc</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="16143">
+				<rom name="cyber zone (1983)(softsync inc).tzx" size="16143" crc="8166b09a" sha1="f9abbca5d987ec8fd30c2320d6e1f5b4a81ef4db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demokeyb">
+		<description>Demo (Keyboard Tutorial, Turtle Graphics, Home Accounting)</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="49208">
+				<rom name="demo - keyboard tutorial, turtle graphics, home accounting (1983)(timex computer corporation).tzx" size="49208" crc="44cb9043" sha1="bd8b722a27302b45d596c05ed5a3e79d5713f4a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demonstc">
+		<description>Demonstração TC 2048</description>
+		<year>198?</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass1" interface="spectrum_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="95250">
+				<rom name="demonstracao tc 2048 - side a (198x)(tmx portugal ltda).tzx" size="95250" crc="7eb56a5a" sha1="46db89e9951b0e8d0359f94228cb9fb07edeba82"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="spectrum_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="86582">
+				<rom name="demonstracao tc 2048 - side b (198x)(tmx portugal ltda).tzx" size="86582" crc="e9daede5" sha1="f20b44323ee9e73a71065b8fb6272b57136d8cc3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desktopp">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Desktop Publisher</description>
+		<year>1987</year>
+		<publisher>Charles Stelding</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="16380">
+				<rom name="desktop publisher (1987)(charles stelding).tap" size="16380" crc="49b5fb23" sha1="1b24d162154bd5198fc87ea5495b7466b2f3aaae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disassem">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Disassembler</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="13206">
+				<rom name="disassembler (19xx)(unknown).tap" size="13206" crc="655f4132" sha1="6bde3c9632dce4cc047f259836b49a7721341563"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragmast">
+		<description>Dragmaster</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="36200">
+				<rom name="dragmaster (1983)(timex computer corporation).tzx" size="36200" crc="89073acf" sha1="ea6db4d25d22d9bd19fb9355c4f6293ca1503472"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="financia">
+		<description>Financial Record Keeper</description>
+		<year>1983</year>
+		<publisher>Mark L. Fendrick</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="15432">
+				<rom name="financial record keeper (1983)(mark l. fendrick).tzx" size="15432" crc="017e2c44" sha1="e3d2d40753b2ccc18578cf633fef3718fa5add70"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flightsi">
+		<description>Flight Simulation</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="34978">
+				<rom name="flight simulation (1983)(timex computer corporation).tzx" size="34978" crc="8a0f3ffc" sha1="e72bc13878e3a96ea038c97b366518edc9589096"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="formula">
+	<!--    Bad dump    -->
+		<description>Fórmula 1</description>
+		<year>198?</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="6382">
+				<rom name="formula 1 (198x)(tmx portugal ltda).tzx" status="baddump" size="6382" crc="92908e9d" sha1="8dc0c80e86b763b76138ae2f2e7fc536fc943334"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger">
+	<!--    Bad dump    -->
+		<description>Frogger</description>
+		<year>1983</year>
+		<publisher>Games to Learn By Inc</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="38953">
+				<rom name="frogger (1983)(games to learn by inc).tzx" status="baddump" size="38953" crc="573c64eb" sha1="a45646004b374fa088849f1839bea3513e5c2ca2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fungolf">
+		<description>Fun Golf</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="7975">
+				<rom name="fun golf (1983)(timex computer corporation).tzx" size="7975" crc="6728bf4c" sha1="080919c0ee07925476fae3f5ab334344aea13f66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guardian">
+		<description>Guardian</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="41579">
+				<rom name="guardian (1983)(timex computer corporation).tzx" size="41579" crc="775e7ca4" sha1="456c128570a63bd7ff3a498a425ae787e0e93622"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guerraes">
+		<description>Guerra estelar</description>
+		<year>198?</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="32924">
+				<rom name="guerra estelar (198x)(tmx portugal ltda).tzx" size="32924" crc="fdeb4578" sha1="a2eed0a0467852702024899b7b72032c1c489a72"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gulpman">
+		<description>Gulpman</description>
+		<year>1983</year>
+		<publisher>Softsync Inc</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="6211">
+				<rom name="gulpman (1983)(softsync inc).tzx" size="6211" crc="07a75449" sha1="b20164564e5e3f2ea80648f3b02c0743a6a72098"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heroi">
+	<!--    Portuguese adaptation of H.E.R.O.   -->
+		<description>Herói</description>
+		<year>198?</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="32897">
+				<rom name="heroi (198x)(tmx portugal ltda).tzx" size="32897" crc="3a616c4a" sha1="764c232faf927161a9a5bf292e1c43f3c67be79c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homeimpr">
+		<description>Home Improvement Planner</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="34713">
+				<rom name="home improvement planner (1983)(timex computer corporation).tzx" size="34713" crc="3b025d7c" sha1="cab4e5750c9bb4bcff0b7bc51b00ceca54002ded"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="horaspid">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Horace &amp; the Spiders</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="16072">
+				<rom name="horace and the spiders (1983)(timex computer corporation).tap" size="16072" crc="658cfd25" sha1="235b3f1d87383a3e312add99fcc4aa6eba7a56da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="horaspidp" cloneof="horaspid">
+		<description>Horácio e as Aranhas</description>
+		<year>198?</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="9031">
+				<rom name="horacio e as aranhas (198x)(tmx portugal ltda).tzx" size="9031" crc="ce7b76b1" sha1="bdd2f2a5034bb39ea4a6fc83301350f947d0db52"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="horacski">
+		<description>Horace Goes Skiing</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="16639">
+				<rom name="horace goes skiing (1983)(timex computer corporation).tzx" size="16639" crc="95547439" sha1="181014d41b7b64024f30d83b3489c8d7ce61129d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hotzd143" cloneof="hotzd195">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Hot Z Disassembler v1.43</description>
+		<year>1984</year>
+		<publisher>Ray Kingsley</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="15347">
+				<rom name="hot z disassembler v1.43 (1984)(ray kingsley).tap" size="15347" crc="61ecc6ca" sha1="c68a087dd3de8b615f1ce7099d4908c74e2c5a98"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hotzd184" cloneof="hotzd195">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Hot Z Disassembler v1.84</description>
+		<year>1984</year>
+		<publisher>Ray Kingsley</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="21587">
+				<rom name="hot z disassembler v1.84 (1984)(ray kingsley).tap" size="21587" crc="3fa26cc4" sha1="91ba442d1651d529d8ee794ccc1f047603ad7f41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hotzd195">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Hot Z Disassembler v1.95</description>
+		<year>1984</year>
+		<publisher>Ray Kingsley</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="20709">
+				<rom name="hot z disassembler v1.95 (1984)(ray kingsley).tap" size="20709" crc="93f2806b" sha1="f64e4a29f20eb8045991a86adab050ebe0da6413"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hungrhrc">
+		<description>Hungry Horace</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="13933">
+				<rom name="hungry horace (1983)(timex computer corporation).tzx" size="13933" crc="f1d2f64d" sha1="95cda00b25bd7d826368ec81dc8ecd84fd05f1d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intrs232">
+		<description>Interface RS232</description>
+		<year>198?</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="418">
+				<rom name="interface rs232 (198x)(timex computer corporation).tzx" size="418" crc="81e729fd" sha1="88c2e38ca230f2cb535f7ea404f807f2cfed9f6c"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+    <software name="intrs232p" cloneof="intrs232">
+        <description>Interface RS232 (Portugal)</description>
+        <year>198?</year>
+        <publisher>TMX Portugal Ltda</publisher>
+        <part name="cass" interface="spectrum_cass">
+            <dataarea name="cass" size="">
+                <rom name="interface rs232 (198x)(tmx portugal ltda).tzx" size="" crc="" sha1=""/>
+            </dataarea>
+        </part>
+    </software>
+-->
+
+	<software name="invasore">
+		<description>Invasores Lunares</description>
+		<year>198?</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="16491">
+				<rom name="invasores lunares (198x)(tmx portugal ltda).tzx" size="16491" crc="73bd2fbd" sha1="2b4a7d9bfed87754de599de7f0f58158228f304a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jazzofir">
+		<description>JazzoFire</description>
+		<year>19??</year>
+		<publisher>P. Bingham</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="38466">
+				<rom name="jazzofire (19xx)(p. bingham).tzx" size="38466" crc="dbff7ade" sha1="28f821e6ead5fa7f30f057b8991e1f9ab01ebecc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jrccata3">
+		<description>JRC Catalog 3</description>
+		<year>1986</year>
+		<publisher>JRC Software</publisher>
+		<part name="cass1" interface="spectrum_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="36426">
+				<rom name="jrc catalog 3 - side 1 (1986)(jrc software).tzx" size="36426" crc="8dfb77cf" sha1="7ab55d26e1ef0984ab453b7afced6ff15b3f5407"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="spectrum_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="35043">
+				<rom name="jrc catalog 3 - side 2 (1986)(jrc software).tzx" size="35043" crc="9e40caf3" sha1="6e9e42c499de58a2a358bd67f2d8cd44c7dca756"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keyword1" cloneof="keyword5">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Keyword v1</description>
+		<year>1984</year>
+		<publisher>Glyn Kendall, Jack Dohany</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="4266">
+				<rom name="keyword v1 (1984)(glyn kendall, jack dohany).tap" size="4266" crc="d8bc72b9" sha1="7d1e4fa50cb294a6aa6eab8a3d4a63bcf14f5951"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keyword5">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Keyword v5.0</description>
+		<year>198?</year>
+		<publisher>Jack Dohany</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="3460">
+				<rom name="keyword v5.0 (198x)(jack dohany).tap" size="3460" crc="5888583b" sha1="16fdd0f5d1c31dfa9ed494be4053a29042cb44f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="language">
+		<description>Language Usage</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="47856">
+				<rom name="language usage (1983)(timex computer corporation).tzx" size="47856" crc="58feac32" sha1="32486f44341e45354b982ffaa7c0b644e4779974"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathwiz1">
+		<description>Math Wizardry I</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="16048">
+				<rom name="math wizardry i (1983)(timex computer corporation).tzx" size="16048" crc="ee2c160e" sha1="a7f76bb100fb7469ff31465ba934d38065edaff0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathwiz2">
+		<description>Math Wizardry II</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="15691">
+				<rom name="math wizardry ii (1983)(timex computer corporation).tzx" size="15691" crc="492d1b37" sha1="08655cc8aa1fc54200298d443a8d8b08a4550d12"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mineswee">
+		<description>Minesweeper</description>
+		<year>2003</year>
+		<publisher>Alvin Albrecht</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="17925">
+				<rom name="minesweeper (2003)(alvin albrecht).tap" size="17925" crc="9d86c3be" sha1="1980eaa46f5ffa0a62f6beb95b9548fdcc3e17c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="motocicl">
+		<description>Motociclismo</description>
+		<year>198?</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="32677">
+				<rom name="motociclismo (198x)(tmx portugal ltda).tzx" size="32677" crc="a341fc19" sha1="a58058b4a41af88915031006594c7694254a294e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mscript">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Mscript</description>
+		<year>1983</year>
+		<publisher>21st Century Electronics</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="9010">
+				<rom name="mscript (1983)(21st century electronics).tap" size="9010" crc="3913bbc3" sha1="1eb09498144b18700a1f5e7688106c98951e3b9d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mscriptr" cloneof="mscript">
+	<!--    Bad dump    -->
+		<description>Mscript (rerelease)</description>
+		<year>1983</year>
+		<publisher>Zebra Systems Inc</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="20491">
+				<rom name="mscript rerelease (1983)(zebra systems inc).tzx" status="baddump" size="20491" crc="3721abe9" sha1="1f248a6700a911056129eb3dc18e8cdb98d0f541"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multidra">
+		<description>Multi-Draw 2068</description>
+		<year>1984</year>
+		<publisher>Gary E. Ward</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="17201">
+				<rom name="multi-draw 2068 (1984)(gary e. ward).tap" size="17201" crc="09cd87b1" sha1="a14138e01682a5d923d32da93eb8155f15a4b244"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicola">
+		<description>Musicola</description>
+		<year>1983</year>
+		<publisher>Canaan Software</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="38531">
+				<rom name="musicola (1983)(canaan software).tzx" size="38531" crc="49a36f7b" sha1="b78ab5286b942bbc8ad64067eaa9d83e0ffedf2d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="omnical2">
+		<description>Omnicalc 2</description>
+		<year>1984</year>
+		<publisher>Microsphere</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="16824">
+				<rom name="omnicalc 2 (1984)(microsphere).tzx" size="16824" crc="4dc67599" sha1="9f08dfb40e767393beae375f55f7c8d79355f8c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="orcament">
+		<description>Orçamento Doméstico</description>
+		<year>198?</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="10137">
+				<rom name="orcamento domestico (198x)(tmx portugal ltda).tzx" size="10137" crc="99b3d99a" sha1="8a3cc2e76779e4dd4dc674e3df7c80d3c8453008"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penetrat">
+		<description>Penetrator</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="40092">
+				<rom name="penetrator (1983)(timex computer corporation).tzx" size="40092" crc="69754364" sha1="d7eb0578ed71a5ec77df2f5462930a3e99865216"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="perigosns">
+	<!--    Portuguese adaptation of Jungle Trouble -->
+		<description>Perigos Na Selva</description>
+		<year>1983</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="23070">
+				<rom name="perigos na selva (1983)(tmx portugal ltda).tzx" size="23070" crc="61c78a5f" sha1="c5b5c0a590164db3f7f4f6d35c8d5327a804580e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pershofi">
+		<description>Personal Home Finance</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="37233">
+				<rom name="personal home finance (1983)(timex computer corporation).tzx" size="37233" crc="05b5917b" sha1="1f0969c0539f5fed9f0b54e32c5d6d9e87bd2cdf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="perspoma">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Personal Portfolio Manager</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="35954">
+				<rom name="personal portfolio manager (1983)(timex computer corporation).tap" size="35954" crc="040f0e60" sha1="7908e1f375a19247e305d6df549ad32d1480e52d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="propinba">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Pro Pinball</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="24442">
+				<rom name="pro pinball (1983)(timex computer corporation).tap" size="24442" crc="e3046e2c" sha1="5a776a89d12d67b436d6f98b089dd4b8f585c00d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prof2068">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Pro-File 2068</description>
+		<year>19??</year>
+		<publisher>P.O. Box 64</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="15660">
+				<rom name="pro-file 2068 (19xx)(p.o. box 64).tap" size="15660" crc="48ad211e" sha1="bc27d8301c1857a8169dfe5f5f483e1be583e17a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prpresen">
+		<description>Programa de a presentaçao</description>
+		<year>1983</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass1" interface="spectrum_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="64513">
+				<rom name="programa de a presentacao - side a (1983)(tmx portugal ltda).tzx" size="64513" crc="473f0089" sha1="3cfcc1e405f6dfcdd9f99be11651f5a680904fcc"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="spectrum_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="87645">
+				<rom name="programa de a presentacao - side b (1983)(tmx portugal ltda).tzx" size="87645" crc="988ad0de" sha1="c4322b5a4f7560377c118746413c798f37aa6cc9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quadrach">
+		<description>Quadra-Chart</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="41100">
+				<rom name="quadra-chart (1983)(timex computer corporation).tzx" size="41100" crc="6f029f4e" sha1="f89df7f365b3b648c7a814684dd668a562e95075"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="relocata">
+		<description>Relocatable AERCO Centronics Print Driver</description>
+		<year>1985</year>
+		<publisher>Jack Dohany</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="10641">
+				<rom name="relocatable aerco centronics print driver (1985)(jack dohany).tzx" size="10641" crc="6663ea78" sha1="530f6fe7921f2ecde4d83a35a0f784314fc5ce48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sroulett">
+		<description>Simple Roulette</description>
+		<year>????</year>
+		<publisher>Jay Simpson</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="18208">
+				<rom name="simple roulette (xxxx)(jay simpson).tap" size="18208" crc="32afaab9" sha1="3358c044af17feb6d41e9551376b72bb78fdd28f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smarttr1">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Smart Terminal 1</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="8543">
+				<rom name="smart terminal 1 (1983)(timex computer corporation).tap" size="8543" crc="ac4ff16c" sha1="729956100e526e0fe89c1a82fc6930383259c697"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacerai">
+		<description>Space Raiders</description>
+		<year>1983</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="22651">
+				<rom name="space raiders (1983)(tmx portugal ltda).tzx" size="22651" crc="03aaf3e4" sha1="05fb367e864377853ed63b9a3e79be00fde37eae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speechsy">
+		<description>Speech Synthesizer</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="spectrum_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="87770">
+				<rom name="speech synthesizer - side a (1984)(unknown).tzx" size="87770" crc="34a53807" sha1="6a66cb3fc4802d754bccf4fe803d6e813633cc9e"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="spectrum_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="96418">
+				<rom name="speech synthesizer - side b (1984)(unknown).tzx" size="96418" crc="86453199" sha1="8e93d9d3c95e32fddeb7d81c2b726f5fcc7a134e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellin1">
+		<description>Spelling I</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="20866">
+				<rom name="spelling i (1983)(timex computer corporation).tzx" size="20866" crc="fdbbaf75" sha1="545fe4c1bd4376dc251a3606416c8f45d5c1149f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellin2">
+		<description>Spelling II</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="21472">
+				<rom name="spelling ii (1983)(timex computer corporation).tzx" size="21472" crc="e33dc403" sha1="02302622e7528c737f6125b2878e97a243306d31"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="statcapi">
+		<description>States &amp; Capitals</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="14891">
+				<rom name="states and capitals (1983)(timex computer corporation).tzx" size="14891" crc="ba095325" sha1="928e4239695a47f8dbddf0f73e59cc8119e0e24d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stockmar">
+		<description>Stock Market Simulation</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="29225">
+				<rom name="stock market simulation (1983)(timex computer corporation).tzx" size="29225" crc="7c506f83" sha1="45ba4ad58a162c9dc595d4643bc22e87c8559faf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprhzd251">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Super Hot Z Disassembler v2.51</description>
+		<year>19??</year>
+		<publisher>Ray Kingsley</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="25851">
+				<rom name="super hot z disassembler v2.51 (19xx)(ray kingsley).tap" size="25851" crc="812f75f4" sha1="a41bf0872b62686be79cdb76cbca9e57b6335e06"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tapecorr">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Tape Corrector</description>
+		<year>1988</year>
+		<publisher>Byte Power</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="1804">
+				<rom name="tape corrector (1988)(byte power).tap" size="1804" crc="4dbc5caf" sha1="562150be30f47c96c9428e652d123b42529349f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tasword2">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Tasword Two</description>
+		<year>1983</year>
+		<publisher>Tasman Software</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="16552">
+				<rom name="tasword two (1983)(tasman software).tap" size="16552" crc="14e618be" sha1="a8661af11f9e6c3adb7aa59eaf0452477863e6a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tc2048dm">
+		<description>TC 2048 Demonstraçao</description>
+		<year>1984</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass1" interface="spectrum_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass1" size="59350">
+				<rom name="tc 2048 demonstracao - side a (1984)(tmx portugal ltda).tzx" size="59350" crc="0c11b3b0" sha1="7775039bc3c5522fb60a4e929953064f436b14b7"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="spectrum_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass2" size="50119">
+				<rom name="tc 2048 demonstracao - side b (1984)(tmx portugal ltda).tzx" size="50119" crc="3a3cc13c" sha1="e3134203f65c16964a79b57896f342f5e70235e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tc2048hrc">
+		<description>TC2048 Hi-Res Colour Demo</description>
+		<year>20??</year>
+		<publisher>Andrew Owen</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="47267">
+				<rom name="tc2048 hi-res colour demo (20xx)(andrew owen).tap" size="47267" crc="6a1a578f" sha1="15fc1f43ffa241d2de052667d8bbd3100eb3ce09"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="techdraw">
+		<description>TechDraw Jr.</description>
+		<year>1985</year>
+		<publisher>Zebra Systems Inc</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="38467">
+				<rom name="techdraw jr. (1985)(zebra systems inc).tzx" size="38467" crc="bb7c5f60" sha1="744b3e60ec057917f0036ce838479a6776a69cc2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tradertr">
+		<description>The Trader Trilogy</description>
+		<year>1984</year>
+		<publisher>Knighted Computers</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="85137">
+				<rom name="the trader trilogy (1984)(knighted computers).tzx" size="85137" crc="4b0eb440" sha1="b5159278e348459a7375c9ae7dc4851bf122533c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="theworx">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>The Worx</description>
+		<year>1986</year>
+		<publisher>NovelSoft</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="35747">
+				<rom name="the worx (1986)(novelsoft).tap" size="35747" crc="c6bcc1c9" sha1="bb2ca922066307b58d853199b797ca52ec2e1454"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timachin">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Timachine</description>
+		<year>1986</year>
+		<publisher>NovelSoft</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="21780">
+				<rom name="timachine (1986)(novelsoft).tap" size="21780" crc="7478f519" sha1="9880fba4c49d69b58306d300ed184e657ed5f38f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timetch1">
+		<description>Time Teacher I</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="16604">
+				<rom name="time teacher i (1983)(timex computer corporation).tzx" size="16604" crc="41dbae8b" sha1="489756b9fcc94407c5b1e34ebc466e3809aa59be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timegate">
+		<description>Time-Gate</description>
+		<year>1983</year>
+		<publisher>Quicksilva Ltd</publisher>
+		<part name="cass1" interface="spectrum_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="23590">
+				<rom name="time-gate side a (1983)(quicksilva ltd).tzx" size="23590" crc="3b377f97" sha1="bfb1b01b5036eab33657ffd7c019c38e733c03c6"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="spectrum_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="35553">
+				<rom name="time-gate side b (1983)(quicksilva ltd).tzx" size="35553" crc="80074c4f" sha1="77c17c4f04d49a47309f8600d85a5a83816527f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tc2048hc">
+		<description>Timex TC2048 Hi-Colour Demo</description>
+		<year>2002</year>
+		<publisher>Grok Developments Ltd</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="9344">
+				<rom name="timex tc2048 hi-colour demo (2002)(grok developments ltd).tap" size="9344" crc="038a60d7" sha1="1a969eb8398b7297d99a9681f22ef826035c6306"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toolkit">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Toolkit</description>
+		<year>1986</year>
+		<publisher>TMX Portugal Ltda</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="5852">
+				<rom name="toolkit (1986)(tmx portugal ltda).tap" size="5852" crc="01d687d5" sha1="8a408cdf0d9f785c95c1351900831f1b253b5557"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="travtrsh">
+		<description>Travel with Trashman</description>
+		<year>1984</year>
+		<publisher>New Generation Software</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="45888">
+				<rom name="travel with trashman (1984)(new generation software).tzx" size="45888" crc="0492fd47" sha1="ce115402a18706ff6742b0df4e59dc26a2a2e916"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ts2068dm">
+		<description>TS-2068 DEMO</description>
+		<year>2010</year>
+		<publisher>Mister Beep</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="145552">
+				<rom name="ts-2068 demo (2010)(mister beep).tap" size="145552" crc="343d5f71" sha1="93e0627896889bc85edd2f9d64b34405157bc9c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="upload2k">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Upload-2000</description>
+		<year>1983</year>
+		<publisher>EZ-Key</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="3532">
+				<rom name="upload-2000 (1983)(ez-key).tap" size="3532" crc="df2dde88" sha1="5fcdf4468d10567c4a5e81a1561ac0ce0cc4e356"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vu3d">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>VU-3D</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="84212">
+				<rom name="vu-3d (1983)(timex computer corporation).tap" size="84212" crc="ea50204a" sha1="0cd220d258de94a4d1ea1f45e04dda3bc41a5cb3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vucalc">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>VU-Calc</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="13145">
+				<rom name="vu-calc (1983)(timex computer corporation).tap" size="13145" crc="72b16734" sha1="2096eeacb10001ffd4e4137234e0f4654c7d0059"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vufile">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>VU-File</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="32628">
+				<rom name="vu-file (1983)(timex computer corporation).tap" size="32628" crc="498a5a2e" sha1="a8ea174f8f8feb7eca7e16333b3ff244e8f282b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wareast">
+		<description>War in the East</description>
+		<year>1985</year>
+		<publisher>Sharps Inc</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="39107">
+				<rom name="war in the east (1985)(sharps inc).tzx" size="39107" crc="ec140430" sha1="772399be2fc413c9c93981d227583fa174dfb117"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="windowp32">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Window Print 32</description>
+		<year>1987</year>
+		<publisher>John M. Bell</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="10967">
+				<rom name="window print 32 (1987)(john m. bell).tap" size="10967" crc="4a8304e1" sha1="73eb06414dee0761e8b85f849ff4820c46b1517f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="windowp64">
+	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+		<description>Window Print 64</description>
+		<year>1987</year>
+		<publisher>John M. Bell</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="8598">
+				<rom name="window print 64 (1987)(john m. bell).tap" size="8598" crc="fd497fd7" sha1="1402e37244f20860b49a4a4e4d7c837a644c21d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordply1">
+		<description>Word Play I</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="17364">
+				<rom name="word play i (1983)(timex computer corporation).tzx" size="17364" crc="10991b27" sha1="f10c15bc42191d55873f45a4153a15fee4accfa3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordply2">
+		<description>Word Play II</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="15507">
+				<rom name="word play ii (1983)(timex computer corporation).tzx" size="15507" crc="c789498c" sha1="17b7f9020c7ac653774e652a164adf947fa6b5cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordcros">
+		<description>Wordcross</description>
+		<year>1983</year>
+		<publisher>Timex Computer Corporation</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="15003">
+				<rom name="wordcross (1983)(timex computer corporation).tzx" size="15003" crc="47b79d3c" sha1="22a3b6e83de7b4ed7fdac0e891b8482e557035f5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zealdisa">
+		<description>Zeal Disassembler</description>
+		<year>1983</year>
+		<publisher>J.C. Kilday Associates</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="7317">
+				<rom name="zeal disassembler (1983)(j.c. kilday associates).tzx" size="7317" crc="ebedcc0d" sha1="c26edc20a8b028fc522fc18ea780d6b9e31ade2c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeusasse">
+		<description>Zeus Assembler</description>
+		<year>1983</year>
+		<publisher>Softsync Inc</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="8835">
+				<rom name="zeus assembler (1983)(softsync inc).tzx" size="8835" crc="e4fbcf39" sha1="2dcb2ce7acfc9d91b70f851b6302bca64453029f"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

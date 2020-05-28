@@ -245,9 +245,9 @@ private:
 	DECLARE_WRITE8_MEMBER( beep_w );
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
-	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
-	DECLARE_READ8_MEMBER(kbd_port2_r);
-	DECLARE_WRITE8_MEMBER(kbd_port2_w);
+	void kbd_matrix_w(uint8_t data);
+	uint8_t kbd_port2_r();
+	void kbd_port2_w(uint8_t data);
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_READ8_MEMBER(fdc_stat_r);
@@ -329,7 +329,7 @@ READ_LINE_MEMBER(itt3030_state::kbd_matrix_r)
 	return m_kbdread;
 }
 
-WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
+void itt3030_state::kbd_matrix_w(uint8_t data)
 {
 //  printf("matrix_w: %02x (col %d row %d clk %d)\n", data, m_kbdcol, m_kbdrow, (data & 0x80) ? 1 : 0);
 
@@ -343,12 +343,12 @@ WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
 }
 
 // bit 2 is UPI-41 host IRQ to Z80
-WRITE8_MEMBER(itt3030_state::kbd_port2_w)
+void itt3030_state::kbd_port2_w(uint8_t data)
 {
 	m_kbdport2 = data;
 }
 
-READ8_MEMBER(itt3030_state::kbd_port2_r)
+uint8_t itt3030_state::kbd_port2_r()
 {
 	return m_kbdport2;
 }
@@ -745,6 +745,8 @@ void itt3030_state::itt3030(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("itt3030");
 }
 
 

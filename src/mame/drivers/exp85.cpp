@@ -54,7 +54,7 @@ void exp85_state::exp85_io(address_map &map)
 	map.global_mask(0xff);
 	map(0xf0, 0xf3).rw(I8355_TAG, FUNC(i8355_device::io_r), FUNC(i8355_device::io_w));
 	map(0xf8, 0xfd).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-//  AM_RANGE(0xfe, 0xff) AM_DEVREADWRITE(I8279_TAG, i8279_r, i8279_w)
+//  map(0xfe, 0xff).rw(I8279_TAG, FUNC(i8279_device::read), FUNC(i8279_device::write));
 }
 
 /* Input Ports */
@@ -78,7 +78,7 @@ INPUT_PORTS_END
 
 /* 8355 Interface */
 
-READ8_MEMBER( exp85_state::i8355_a_r )
+uint8_t exp85_state::i8355_a_r()
 {
 	/*
 
@@ -98,7 +98,7 @@ READ8_MEMBER( exp85_state::i8355_a_r )
 	return 0x02;
 }
 
-WRITE8_MEMBER( exp85_state::i8355_a_w )
+void exp85_state::i8355_a_w(uint8_t data)
 {
 	/*
 

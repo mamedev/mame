@@ -19,13 +19,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define TIKI100_BUS_TAG      "tiki100bus"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -37,7 +30,7 @@ class tiki100_bus_slot_device;
 
 // ======================> device_tiki100bus_card_interface
 
-class device_tiki100bus_card_interface : public device_slot_card_interface
+class device_tiki100bus_card_interface : public device_interface
 {
 	friend class tiki100_bus_device;
 	template <class ElementType> friend class simple_list;
@@ -64,7 +57,9 @@ protected:
 	// construction/destruction
 	device_tiki100bus_card_interface(const machine_config &mconfig, device_t &device);
 
-	tiki100_bus_device  *m_bus;
+	virtual void interface_pre_start() override;
+
+	tiki100_bus_device *m_bus;
 	tiki100_bus_slot_device *m_slot;
 	int m_busak;
 
@@ -76,27 +71,30 @@ private:
 // ======================> tiki100_bus_slot_device
 
 class tiki100_bus_slot_device : public device_t,
-							public device_slot_interface,
+							public device_single_card_slot_interface<device_tiki100bus_card_interface>,
 							public device_z80daisy_interface
 {
 public:
 	// construction/destruction
-	template <typename T>
-	tiki100_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+	template <typename T, typename U>
+	tiki100_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&bus, U &&opts, const char *dflt)
 		: tiki100_bus_slot_device(mconfig, tag, owner, 0)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
+		set_bus(std::forward<T>(bus));
 	}
 
 	tiki100_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	template <typename T> void set_bus(T &&tag) { m_bus.set_tag(std::forward<T>(tag)); }
+
+protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-protected:
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override { return get_card_device() ? m_card->z80daisy_irq_state() : 0; }
 	virtual int z80daisy_irq_ack() override { return get_card_device() ? m_card->z80daisy_irq_ack() : 0; }
@@ -104,7 +102,7 @@ protected:
 
 private:
 	// configuration
-	tiki100_bus_device  *m_bus;
+	required_device<tiki100_bus_device> m_bus;
 	device_tiki100bus_card_interface *m_card;
 };
 
@@ -128,7 +126,7 @@ public:
 	auto mrq_rd_callback() { return m_in_mrq_cb.bind(); }
 	auto mrq_wr_callback() { return m_out_mrq_cb.bind(); }
 
-	void add_card(device_tiki100bus_card_interface *card);
+	void add_card(device_tiki100bus_card_interface &card);
 
 	// computer interface
 	uint8_t mrq_r(offs_t offset, uint8_t data, bool &mdis);

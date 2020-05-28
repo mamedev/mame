@@ -50,10 +50,10 @@ public:
 	void shine(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(via0_pa_r);
-	DECLARE_WRITE8_MEMBER(via0_pb_w);
+	uint8_t via0_pa_r();
+	void via0_pb_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(floppy_w);
-	DECLARE_READ8_MEMBER(vdg_videoram_r);
+	uint8_t vdg_videoram_r(offs_t offset);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
@@ -174,7 +174,7 @@ INPUT_PORTS_END
     DEVICE CONFIGURATION
 ***************************************************************************/
 
-READ8_MEMBER(shine_state::via0_pa_r)
+uint8_t shine_state::via0_pa_r()
 {
 	uint8_t data;
 
@@ -183,7 +183,7 @@ READ8_MEMBER(shine_state::via0_pa_r)
 	return data;
 }
 
-WRITE8_MEMBER(shine_state::via0_pb_w)
+void shine_state::via0_pb_w(uint8_t data)
 {
 	/* keyboard column */
 	m_keylatch = data & 0x07;
@@ -210,7 +210,7 @@ WRITE8_MEMBER(shine_state::floppy_w)
 }
 
 
-READ8_MEMBER(shine_state::vdg_videoram_r)
+uint8_t shine_state::vdg_videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -32,7 +32,7 @@ struct PosNormalColorVertex
 
 	static void init()
 	{
-		ms_decl
+		ms_layout
 			.begin()
 			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
 			.add(bgfx::Attrib::Normal,   3, bgfx::AttribType::Float)
@@ -40,10 +40,10 @@ struct PosNormalColorVertex
 			.end();
 	};
 
-	static bgfx::VertexDecl ms_decl;
+	static bgfx::VertexLayout ms_layout;
 };
 
-bgfx::VertexDecl PosNormalColorVertex::ms_decl;
+bgfx::VertexLayout PosNormalColorVertex::ms_layout;
 
 struct Grid
 {
@@ -59,8 +59,9 @@ struct Grid
 	float m_normal[3];
 };
 
-// Triangulation tables taken from:
-// http://paulbourke.net/geometry/polygonise/
+// Reference(s):
+// - Polygonising a scalar field
+//   https://web.archive.org/web/20181127124338/http://paulbourke.net/geometry/polygonise/
 
 static const uint16_t s_edges[256] =
 {
@@ -370,10 +371,10 @@ static const float s_cube[8][3] =
 	{ 0.0f, 0.0f, 0.0f }, // 7
 };
 
-float vertLerp(float* __restrict _result, float _iso, uint32_t _idx0, float _v0, uint32_t _idx1, float _v1)
+float vertLerp(float* _result, float _iso, uint32_t _idx0, float _v0, uint32_t _idx1, float _v1)
 {
-	const float* __restrict edge0 = s_cube[_idx0];
-	const float* __restrict edge1 = s_cube[_idx1];
+	const float* edge0 = s_cube[_idx0];
+	const float* edge1 = s_cube[_idx1];
 
 	if (bx::abs(_iso-_v1) < 0.00001f)
 	{
@@ -400,7 +401,14 @@ float vertLerp(float* __restrict _result, float _iso, uint32_t _idx0, float _v0,
 	return lerp;
 }
 
-uint32_t triangulate(uint8_t* _result, uint32_t _stride, const float* __restrict _rgb, const float* __restrict _xyz, const Grid* _val[8], float _iso)
+uint32_t triangulate(
+	  uint8_t* _result
+	, uint32_t _stride
+	, const float* _rgb
+	, const float* _xyz
+	, const Grid* _val[8]
+	, float _iso
+	)
 {
 	uint8_t cubeindex = 0;
 	cubeindex |= (_val[0]->m_val < _iso) ? 0x01 : 0;
@@ -479,8 +487,8 @@ uint32_t triangulate(uint8_t* _result, uint32_t _stride, const float* __restrict
 class ExampleMetaballs : public entry::AppI
 {
 public:
-	ExampleMetaballs(const char* _name, const char* _description)
-		: entry::AppI(_name, _description)
+	ExampleMetaballs(const char* _name, const char* _description, const char* _url)
+		: entry::AppI(_name, _description, _url)
 	{
 	}
 
@@ -604,7 +612,7 @@ public:
 			// Allocate 32K vertices in transient vertex buffer.
 			uint32_t maxVertices = (32<<10);
 			bgfx::TransientVertexBuffer tvb;
-			bgfx::allocTransientVertexBuffer(&tvb, maxVertices, PosNormalColorVertex::ms_decl);
+			bgfx::allocTransientVertexBuffer(&tvb, maxVertices, PosNormalColorVertex::ms_layout);
 
 			const uint32_t numSpheres = 16;
 			float sphere[numSpheres][4];
@@ -665,14 +673,14 @@ public:
 						uint32_t xoffset = offset + xx;
 
 						Grid* grid = m_grid;
-						float normal[3] =
+						const bx::Vec3 normal =
 						{
 							grid[xoffset-1     ].m_val - grid[xoffset+1     ].m_val,
 							grid[xoffset-ypitch].m_val - grid[xoffset+ypitch].m_val,
 							grid[xoffset-zpitch].m_val - grid[xoffset+zpitch].m_val,
 						};
 
-						bx::vec3Norm(grid[xoffset].m_normal, normal);
+						bx::store(grid[xoffset].m_normal, bx::normalize(normal) );
 					}
 				}
 			}
@@ -722,7 +730,7 @@ public:
 							&grid[xoffset                ],
 						};
 
-						uint32_t num = triangulate( (uint8_t*)vertex, PosNormalColorVertex::ms_decl.getStride(), rgb, pos, val, 0.5f);
+						uint32_t num = triangulate( (uint8_t*)vertex, PosNormalColorVertex::ms_layout.getStride(), rgb, pos, val, 0.5f);
 						vertex += num;
 						numVertices += num;
 					}
@@ -794,4 +802,9 @@ public:
 
 } // namespace
 
-ENTRY_IMPLEMENT_MAIN(ExampleMetaballs, "02-metaball", "Rendering with transient buffers and embedding shaders.");
+ENTRY_IMPLEMENT_MAIN(
+	  ExampleMetaballs
+	, "02-metaball"
+	, "Rendering with transient buffers and embedding shaders."
+	, "https://bkaradzic.github.io/bgfx/examples.html#metaballs"
+	);

@@ -45,7 +45,7 @@ void runaway_state::machine_reset()
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(16), 16);
 	if (m_earom.found())
-		earom_control_w(machine().dummy_space(), 0, 0);
+		earom_control_w(0);
 }
 
 
@@ -66,7 +66,7 @@ READ8_MEMBER(runaway_state::runaway_input_r)
 }
 
 
-READ8_MEMBER(runaway_state::runaway_pot_r)
+uint8_t runaway_state::runaway_pot_r(offs_t offset)
 {
 	return (ioport("7000")->read() << (7 - offset)) & 0x80;
 }
@@ -89,7 +89,7 @@ WRITE8_MEMBER(runaway_state::earom_write)
 	m_earom->set_data(data);
 }
 
-WRITE8_MEMBER(runaway_state::earom_control_w)
+void runaway_state::earom_control_w(uint8_t data)
 {
 	// CK = DB0, C1 = /DB2, C2 = DB1, CS1 = DB3, /CS2 = GND
 	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));

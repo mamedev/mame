@@ -607,22 +607,25 @@ void qix_state::qix_base(machine_config &config)
 	MC6809E(config, m_maincpu, MAIN_CLOCK_OSC/4/4);  /* 1.25 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &qix_state::main_map);
 
-	/* high interleave needed to ensure correct text in service mode */
-	/* Zookeeper settings and high score table seem especially sensitive to this */
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	// high interleave needed to ensure correct text in service mode
+	// Zookeeper settings and high score table seem especially sensitive to this
+	config.set_perfect_quantum(m_maincpu);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	PIA6821(config, m_pia0, 0);
 	m_pia0->readpa_handler().set_ioport("P1");
+	m_pia0->set_port_a_input_overrides_output_mask(0xff);
 	m_pia0->readpb_handler().set_ioport("COIN");
 
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpa_handler().set_ioport("SPARE");
+	m_pia1->set_port_a_input_overrides_output_mask(0xff);
 	m_pia1->readpb_handler().set_ioport("IN0");
 
 	PIA6821(config, m_pia2, 0);
 	m_pia2->readpa_handler().set_ioport("P2");
+	m_pia2->set_port_a_input_overrides_output_mask(0xff);
 	m_pia2->writepb_handler().set(FUNC(qix_state::qix_coinctl_w));
 
 	/* video hardware */

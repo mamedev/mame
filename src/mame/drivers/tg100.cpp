@@ -28,7 +28,7 @@
 
 #include "emu.h"
 
-#include "cpu/h8/h83002.h"
+#include "cpu/h8500/h8520.h"
 #include "sound/multipcm.h"
 
 #include "screen.h"
@@ -46,9 +46,8 @@ public:
 	void tg100(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<h8520_device> m_maincpu;
 	required_device<multipcm_device> m_ymw258;
-	void tg100_io_map(address_map &map);
 	void tg100_map(address_map &map);
 	void ymw258_map(address_map &map);
 };
@@ -58,11 +57,6 @@ void tg100_state::tg100_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).ram(); /* gate array stuff */
 	map(0x00080000, 0x0009ffff).rom().region("prgrom", 0x00000);
-}
-
-void tg100_state::tg100_io_map(address_map &map)
-{
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
 }
 
 static INPUT_PORTS_START( tg100 )
@@ -76,9 +70,8 @@ void tg100_state::ymw258_map(address_map &map)
 void tg100_state::tg100(machine_config &config)
 {
 	/* basic machine hardware */
-	H83002(config, m_maincpu, XTAL(20'000'000)); /* TODO: correct CPU type (H8/520) */
+	HD6435208(config, m_maincpu, XTAL(20'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tg100_state::tg100_map);
-	m_maincpu->set_addrmap(AS_IO, &tg100_state::tg100_io_map);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -90,9 +83,12 @@ void tg100_state::tg100(machine_config &config)
 }
 
 ROM_START( tg100 )
+	ROM_REGION(0x20000, "prgrom", 0)
+	ROM_LOAD( "xk731c0.ic4", 0x00000, 0x20000, CRC(8fb6139c) SHA1(483103a2ffc63a90a2086c597baa2b2745c3a1c2) )
 
-	ROM_REGION(0x20000, "prgrom", 0) // H8/520 memory bus is 8 bit actually
-	ROM_LOAD16_WORD_SWAP( "xk731c0.ic4", 0x00000, 0x20000, CRC(8fb6139c) SHA1(483103a2ffc63a90a2086c597baa2b2745c3a1c2) )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "hd6435208a00p.bin", 0x0000, 0x4000, NO_DUMP )
+	ROM_COPY( "prgrom", 0x0000, 0x0000, 0x4000 )
 
 	ROM_REGION(0x200000, "ymw258", 0)
 	ROM_LOAD( "xk992a0.ic6", 0x000000, 0x200000, CRC(01dc6954) SHA1(32ec77a46f4d005538c735f56ad48fa7243c63be) )

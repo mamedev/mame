@@ -48,10 +48,10 @@ protected:
 private:
 	DECLARE_READ8_MEMBER(magic_string);
 
-	DECLARE_READ8_MEMBER(i80c31_p1_r);
-	DECLARE_READ8_MEMBER(i80c31_p3_r);
-	DECLARE_WRITE8_MEMBER(i80c31_p1_w);
-	DECLARE_WRITE8_MEMBER(i80c31_p3_w);
+	uint8_t i80c31_p1_r();
+	uint8_t i80c31_p3_r();
+	void i80c31_p1_w(uint8_t data);
+	void i80c31_p3_w(uint8_t data);
 
 	DECLARE_READ8_MEMBER(cn8_extension_r);
 	DECLARE_WRITE8_MEMBER(cn8_extension_w);
@@ -99,7 +99,7 @@ void icatel_state::i80c31_io(address_map &map)
 
 void icatel_state::i80c31_data(address_map &map)
 {
-//  AM_RANGE(0x0056,0x005A) AM_READ(magic_string) /* This is a hack! */
+//  map(0x0056,0x005A).r(FUNC(icatel_state::magic_string)); /* This is a hack! */
 }
 
 void icatel_state::init_icatel()
@@ -121,21 +121,21 @@ READ8_MEMBER(icatel_state::magic_string)
 	return mstr[offset%5];
 }
 
-READ8_MEMBER(icatel_state::i80c31_p1_r)
+uint8_t icatel_state::i80c31_p1_r()
 {
 	return 0x7f;
 }
 
-READ8_MEMBER(icatel_state::i80c31_p3_r)
+uint8_t icatel_state::i80c31_p3_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(icatel_state::i80c31_p1_w)
+void icatel_state::i80c31_p1_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(icatel_state::i80c31_p3_w)
+void icatel_state::i80c31_p3_w(uint8_t data)
 {
 }
 
@@ -279,7 +279,7 @@ void icatel_state::icatel(machine_config &config)
 
 	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 16);
-	m_lcdc->set_pixel_update_cb(FUNC(icatel_state::icatel_pixel_update), this);
+	m_lcdc->set_pixel_update_cb(FUNC(icatel_state::icatel_pixel_update));
 }
 
 ROM_START( icatel )

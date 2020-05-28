@@ -54,7 +54,7 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void chesster(machine_config &config);
 	void kishon(machine_config &config);
 
@@ -80,12 +80,12 @@ private:
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(offs_t offset, u8 data);
+	u8 input_r(offs_t offset);
 
-	int m_numbanks;
-	u8 m_speech_bank;
-	u8 m_select;
+	int m_numbanks = 0;
+	u8 m_speech_bank = 0;
+	u8 m_select = 0;
 };
 
 void chesster_state::init_chesster()
@@ -96,10 +96,6 @@ void chesster_state::init_chesster()
 
 void chesster_state::machine_start()
 {
-	// zerofill
-	m_speech_bank = 0;
-	m_select = 0;
-
 	// register for savestates
 	save_item(NAME(m_speech_bank));
 	save_item(NAME(m_select));
@@ -113,7 +109,7 @@ void chesster_state::machine_start()
 
 // TTL/generic
 
-WRITE8_MEMBER(chesster_state::control_w)
+void chesster_state::control_w(offs_t offset, u8 data)
 {
 	// a0-a2,d7: 74259(1)
 	u8 mask = 1 << offset;
@@ -133,7 +129,7 @@ WRITE8_MEMBER(chesster_state::control_w)
 	m_rombank->set_entry(bank & (m_numbanks - 1));
 }
 
-READ8_MEMBER(chesster_state::input_r)
+u8 chesster_state::input_r(offs_t offset)
 {
 	u8 sel = m_select >> 4 & 0xf;
 	u8 data = 0;
@@ -186,7 +182,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void chesster_state::chesster(machine_config &config)

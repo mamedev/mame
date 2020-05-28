@@ -27,7 +27,7 @@ public:
 	virtual void exit() override;
 
 	virtual osd_midi_device *create_midi_device() override;
-	virtual void list_midi_devices(void) override;
+	virtual void list_midi_devices() override;
 };
 
 
@@ -58,7 +58,7 @@ void none_module::exit()
 {
 }
 
-void none_module::list_midi_devices(void)
+void none_module::list_midi_devices()
 {
 	osd_printf_warning("\nMIDI is not supported in this build\n");
 }

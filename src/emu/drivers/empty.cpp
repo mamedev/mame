@@ -24,6 +24,8 @@ public:
 
 	void ___empty(machine_config &config);
 
+	virtual std::vector<std::string> searchpath() const override { return std::vector<std::string>(); }
+
 protected:
 	virtual void machine_start() override
 	{
@@ -60,7 +62,6 @@ void empty_state::___empty(machine_config &config)
 //**************************************************************************
 
 ROM_START( ___empty )
-	ROM_REGION( 0x10, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 

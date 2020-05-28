@@ -290,7 +290,7 @@ void apricot_keyboard_hle_device::received_byte(uint8_t byte)
 		if (m_rtc_index >= 0)
 		{
 			m_rtc->address_w(m_rtc_index--);
-			m_rtc->data_w(machine().dummy_space(), 0, byte);
+			m_rtc->data_w(byte);
 			m_rtc->write_w(1);
 			m_rtc->write_w(0);
 		}
@@ -316,7 +316,7 @@ void apricot_keyboard_hle_device::received_byte(uint8_t byte)
 			for (int i = 12; i >= 0; i--)
 			{
 				m_rtc->address_w(i);
-				transmit_byte(0xf0 | m_rtc->data_r(machine().dummy_space(), 0));
+				transmit_byte(0xf0 | m_rtc->data_r());
 			}
 
 			break;

@@ -282,7 +282,7 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_A_tile_info)
 	if(m_tilemapA_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
 	if(m_tilemapA_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0+depth,
+	tileinfo.set(0+depth,
 			code,
 			0x40+colr,
 			flags);
@@ -308,7 +308,7 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_B_tile_info)
 	if(m_tilemapB_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
 	if(m_tilemapB_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(1+depth,
+	tileinfo.set(1+depth,
 			code,
 			0x40+colr,
 			flags);
@@ -345,10 +345,10 @@ WRITE32_MEMBER(skns_state::v3_regs_w)
 
 void skns_state::video_start()
 {
-	m_tilemap_A = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skns_state::get_tilemap_A_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64, 64);
+	m_tilemap_A = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skns_state::get_tilemap_A_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,64);
 	m_tilemap_A->set_transparent_pen(0);
 
-	m_tilemap_B = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skns_state::get_tilemap_B_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64, 64);
+	m_tilemap_B = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skns_state::get_tilemap_B_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,64);
 	m_tilemap_B->set_transparent_pen(0);
 
 	m_sprite_bitmap.allocate(1024,1024);
@@ -507,7 +507,7 @@ uint32_t skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 					uint16_t pendata  = src[x]&0x7fff;
 					uint16_t pendata2 = src2[x]&0x7fff;
 					uint16_t bgpendata;
-					uint16_t pendata3 = src3[x]&0x3fff;
+					uint16_t pendata3 = m_alt_enable_sprites ? src3[x]&0x3fff : 0;
 
 					uint32_t coldat;
 
@@ -621,8 +621,13 @@ uint32_t skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		}
 	}
 
-	if (m_alt_enable_sprites)
-		m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), m_spc_regs ); // TODO : not all 0x4000 of the sprite RAM area can be displayed on real hardware
-
 	return 0;
+}
+
+WRITE_LINE_MEMBER(skns_state::screen_vblank)
+{
+	if (state)
+	{
+		m_spritegen->skns_draw_sprites(m_sprite_bitmap, m_screen->visible_area(), m_spriteram, m_spriteram.bytes(), m_spc_regs); // TODO: not all 0x4000 of the sprite RAM area can be displayed on real hardware
+	}
 }

@@ -403,7 +403,7 @@ P1KEY11  29|30  P2KEY11
 			KEY11 = 0x0800  // JAMMA P1 Button 1
 		}; // Mahjong->JAMMA mapping specific to this game pcb
 
-		u16 key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading
+		static const u16 key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading
 //          ROW (distinct pins for P1 or P2) | COLUMN (shared for P1+P2)
 			KEY4 | KEY3,  // A
 			KEY4 | KEY2,  // B
@@ -437,7 +437,7 @@ P1KEY11  29|30  P2KEY11
 		value |= 0xFFFF0000; // set top word
 		do {
 			// since we can't handle multiple keys, just return the first one depressed
-			if((keys & which_key) && (count < ARRAY_LENGTH(key_codes)))
+			if ((keys & which_key) && (count < ARRAY_LENGTH(key_codes)))
 			{
 				value &= ~((u32)(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
 				break;
@@ -1240,7 +1240,7 @@ GAME( 1999, s1945iii,  0,        psikyo5,         s1945iii, psikyosh_state, init
 
 /* ps5v2 */
 GAME( 2000, dragnblz,  0,        psikyo5,         dragnblz, psikyosh_state, init_ps5, ROT270, "Psikyo", "Dragon Blaze", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, tgm2,      0,        psikyo5_240,     tgm2,     psikyosh_state, init_ps5, ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, tgm2p,     tgm2,     psikyo5_240,     tgm2,     psikyosh_state, init_ps5, ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2 Plus", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tgm2,      0,        psikyo5_240,     tgm2,     psikyosh_state, init_ps5, ROT0,   "Arika",  "Tetris: The Absolute - The Grand Master 2", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tgm2p,     tgm2,     psikyo5_240,     tgm2,     psikyosh_state, init_ps5, ROT0,   "Arika",  "Tetris: The Absolute - The Grand Master 2 Plus", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, gnbarich,  0,        psikyo5,         gnbarich, psikyosh_state, init_ps5, ROT270, "Psikyo", "Gunbarich", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, mjgtaste,  0,        psikyo5_mahjong, mjgtaste, psikyosh_state, init_ps5, ROT0,   "Psikyo", "Mahjong G-Taste", MACHINE_SUPPORTS_SAVE )

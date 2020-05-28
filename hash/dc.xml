@@ -1,7 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
 TODO:
 
 Sort list by name
@@ -11,16 +12,12 @@ Create easy-to-browse missing dumps list
 Check romanization of Japanese titles
 Required hardware
 Make revisions have parent-style names
--->
 
-<!--
 This is a software list of the disc-based media released for the Sega Dreamcast.
 
 Much of the information in this softlist has been gathered from Sega Retro:
 http://segaretro.org/
--->
 
-<!--
 Dreamcast serial labels
 
     WORLD
@@ -828,7 +825,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="aerodijsmm" cloneof="aerodi" >
+	<software name="aerodijsmm" cloneof="aerodi">
 		<!-- http://redump.org/disc/41915/
 		<rom name="Aero Dancing i - Jikai-saku made Matemasen (Japan).gdi" size="433" crc="15e602fe" md5="a4db3a809f8edab42873cf760c16e953" sha1="83ad51211aac9dbbee67bb15a18707a88b2d6cd1"/>
 		<rom name="Aero Dancing i - Jikai-saku made Matemasen (Japan) (Track 1).bin" size="719712" crc="7bfc9cd3" md5="d808b8e61ed195281e795b6f24cdcf8d" sha1="22df00b2b6c1c0dcfbcd1c44586cb01b6a2c2296"/>
@@ -1905,7 +1902,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 988658 041148"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="angel wish kimi no egao ni chu! (jpn)" sha1="65c1da4807da03a1600219f5d90d8b725d190e98"/>
+				<disk name="angel wish kimi no egao ni chu (jpn)" sha1="65c1da4807da03a1600219f5d90d8b725d190e98"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1927,7 +1924,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <part interface="cdrom" name="cdrom2">
 	        <feature name="part_id" value="Original Voice Drama"/>
 	        <diskarea name="cdrom">
-	            <disk name="angel wish kimi no egao ni chu! - special pack-ban (jpn) (original voice drama)" status="nodump"/>
+	            <disk name="angel wish kimi no egao ni chu - special pack-ban (jpn) (original voice drama)" status="nodump"/>
 	        </diskarea>
 	    </part>
 	</software>
@@ -3066,7 +3063,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!-- The Limited Edition (T-23204M) comes in a cardboard slipcase and includes an audio CD. -->
-	<software name="bsbsg" > <!-- cloneof="bsb" --> <!-- Sega Rating: Suitable for All Ages -->
+	<software name="bsbsg"> <!-- cloneof="bsb" --> <!-- Sega Rating: Suitable for All Ages -->
 		<!-- http://redump.org/disc/43713/ http://redump.org/disc/43714/
 		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan).gdi" size="243" crc="3494ccc6" md5="aede4489a8f62e9146a5d489110993da" sha1="ecacde76f17665539d69629c14d52218cb42766a"/>
 		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 1).bin" size="2241456" crc="e607e01e" md5="93ae63a963ad44c86a023dafde9a63f1" sha1="b47a76464907cbd06ddf85345950f145782d00ba"/>
@@ -13748,7 +13745,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="alt_title" value="ガイアマスター　決戦!世紀王伝説"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="gaiamaster kessen! seiki-ou densetsu (jpn)" sha1="4b63aee3574b51f3b2a32ffcec52544361ff0641"/>
+				<disk name="gaiamaster kessen seiki-ou densetsu (jpn)" sha1="4b63aee3574b51f3b2a32ffcec52544361ff0641"/>
 			</diskarea>
 		</part>
 	</software>

@@ -2,7 +2,7 @@
 // copyright-holders:Felipe Sanches, Sandro Ronco
 /***************************************************************************
 
-        NT7534 LCD controller
+        Novatek NT7534 LCD controller
 
         TODO:
         - determine video timings and busy flag duration
@@ -34,6 +34,7 @@ nt7534_device::nt7534_device(const machine_config &mconfig, const char *tag, dev
 
 nt7534_device::nt7534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_pixel_update_cb(*this)
 {
 }
 
@@ -44,6 +45,8 @@ nt7534_device::nt7534_device(const machine_config &mconfig, device_type type, co
 void nt7534_device::device_start()
 {
 	m_busy_timer = timer_alloc(TIMER_BUSY);
+
+	m_pixel_update_cb.resolve();
 
 	// state saving
 	save_item(NAME(m_busy_flag));
@@ -152,27 +155,27 @@ uint32_t nt7534_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-READ8_MEMBER(nt7534_device::read)
+uint8_t nt7534_device::read(offs_t offset)
 {
 	switch (offset & 0x01)
 	{
-		case 0: return control_read(space, 0);
-		case 1: return data_read(space, 0);
+		case 0: return control_read();
+		case 1: return data_read();
 	}
 
 	return 0;
 }
 
-WRITE8_MEMBER(nt7534_device::write)
+void nt7534_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x01)
 	{
-		case 0: control_write(space, 0, data);  break;
-		case 1: data_write(space, 0, data);     break;
+		case 0: control_write(data);  break;
+		case 1: data_write(data);     break;
 	}
 }
 
-WRITE8_MEMBER(nt7534_device::control_write)
+void nt7534_device::control_write(uint8_t data)
 {
 	if (m_data_len == 4)
 	{
@@ -281,7 +284,7 @@ WRITE8_MEMBER(nt7534_device::control_write)
 	}
 }
 
-READ8_MEMBER(nt7534_device::control_read)
+uint8_t nt7534_device::control_read()
 {
 	if (m_data_len == 4)
 	{
@@ -299,7 +302,7 @@ READ8_MEMBER(nt7534_device::control_read)
 	}
 }
 
-WRITE8_MEMBER(nt7534_device::data_write)
+void nt7534_device::data_write(uint8_t data)
 {
 //  if (m_busy_flag)
 //  {
@@ -337,7 +340,7 @@ WRITE8_MEMBER(nt7534_device::data_write)
 	set_busy_flag(41);
 }
 
-READ8_MEMBER(nt7534_device::data_read)
+uint8_t nt7534_device::data_read()
 {
 	if (m_page*132 + m_column >= ARRAY_LENGTH(m_ddram))
 		return 0;

@@ -18,38 +18,35 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define WANGPC_BUS_TAG      "wangpcbus"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> wangpcbus_slot_device
-
+class device_wangpcbus_card_interface;
 class wangpcbus_device;
 
-class wangpcbus_slot_device : public device_t, public device_slot_interface
+
+// ======================> wangpcbus_slot_device
+
+class wangpcbus_slot_device : public device_t, public device_single_card_slot_interface<device_wangpcbus_card_interface>
 {
 public:
 	// construction/destruction
-	template <typename T>
-	wangpcbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, int sid)
+	template <typename T, typename U>
+	wangpcbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus, U &&opts, char const *dflt, int sid)
 		: wangpcbus_slot_device(mconfig, tag, owner, 0)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
-		set_wangpcbus_slot(sid);
+		set_bus(std::forward<T>(bus));
+		set_bus_slot(sid);
 	}
 	wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
-	void set_wangpcbus_slot(int sid) { m_sid = sid; }
+	template <typename T> void set_bus(T &&tag) { m_bus.set_tag(std::forward<T>(tag)); }
+	void set_bus_slot(int sid) { m_sid = sid; }
 
 protected:
 	// device-level overrides
@@ -57,16 +54,13 @@ protected:
 
 private:
 	// configuration
-	wangpcbus_device  *m_bus;
+	required_device<wangpcbus_device> m_bus;
 	int m_sid;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(WANGPC_BUS_SLOT, wangpcbus_slot_device)
-
-
-class device_wangpcbus_card_interface;
 
 
 // ======================> wangpcbus_device
@@ -89,7 +83,7 @@ public:
 	auto drq3_wr_callback() { return m_write_drq3.bind(); }
 	auto ioerror_wr_callback() { return m_write_ioerror.bind(); }
 
-	void add_card(device_wangpcbus_card_interface *card, int sid);
+	void add_card(device_wangpcbus_card_interface &card, int sid);
 
 	// computer interface
 	uint16_t mrdc_r(offs_t offset, uint16_t mem_mask = 0xffff);
@@ -151,7 +145,7 @@ DECLARE_DEVICE_TYPE(WANGPC_BUS, wangpcbus_device)
 // ======================> device_wangpcbus_card_interface
 
 // class representing interface-specific live wangpcbus card
-class device_wangpcbus_card_interface : public device_slot_card_interface
+class device_wangpcbus_card_interface : public device_interface
 {
 	friend class wangpcbus_device;
 	template <class ElementType> friend class simple_list;
@@ -177,6 +171,8 @@ public:
 protected:
 	// construction/destruction
 	device_wangpcbus_card_interface(const machine_config &mconfig, device_t &device);
+
+	virtual void interface_pre_start() override;
 
 	wangpcbus_device *m_bus;
 	wangpcbus_slot_device *m_slot;

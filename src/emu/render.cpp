@@ -460,7 +460,8 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 			for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
 				if ((lowest == -1 || m_scaled[scalenum].seqid < m_scaled[lowest].seqid) && !primlist.has_reference(m_scaled[scalenum].bitmap))
 					lowest = scalenum;
-			assert_always(lowest != -1, "Too many live texture instances!");
+			if (-1 == lowest)
+				throw emu_fatalerror("render_texture::get_scaled: Too many live texture instances!");
 
 			// throw out any existing entries
 			scaled = &m_scaled[lowest];
@@ -495,7 +496,7 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 //  palette for a texture
 //-------------------------------------------------
 
-const rgb_t *render_texture::get_adjusted_palette(render_container &container)
+const rgb_t *render_texture::get_adjusted_palette(render_container &container, u32 &out_length)
 {
 	// override the palette with our adjusted palette
 	switch (m_format)
@@ -505,7 +506,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 			assert(m_bitmap->palette() != nullptr);
 
 			// return our adjusted palette
-			return container.bcg_lookup_table(m_format, m_bitmap->palette());
+			return container.bcg_lookup_table(m_format, out_length, m_bitmap->palette());
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
@@ -514,7 +515,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 			// if no adjustment necessary, return nullptr
 			if (!container.has_brightness_contrast_gamma_changes())
 				return nullptr;
-			return container.bcg_lookup_table(m_format);
+			return container.bcg_lookup_table(m_format, out_length);
 
 		default:
 			assert(false);
@@ -678,7 +679,7 @@ float render_container::apply_brightness_contrast_gamma_fp(float value)
 //  given texture mode
 //-------------------------------------------------
 
-const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palette)
+const rgb_t *render_container::bcg_lookup_table(int texformat, u32 &out_length, palette_t *palette)
 {
 	switch (texformat)
 	{
@@ -690,14 +691,17 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 				recompute_lookups();
 			}
 			assert (palette == &m_palclient->palette());
+			out_length = palette->max_index();
 			return &m_bcglookup[0];
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
+			out_length = ARRAY_LENGTH(m_bcglookup256);
 			return m_bcglookup256;
 
 		default:
+			out_length = 0;
 			return nullptr;
 	}
 }
@@ -1058,17 +1062,18 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 		{
 			int ourindex = index() % scrcount;
 			screen_device *screen = iter.byindex(ourindex);
+			assert(screen != nullptr);
 
 			// find the first view with this screen and this screen only
 			for (view = view_by_index(viewindex = 0); view != nullptr; view = view_by_index(++viewindex))
 			{
-				const render_screen_list &viewscreens = view->screens();
-				if (viewscreens.count() == 0)
+				auto const &viewscreens = view->screens();
+				if (viewscreens.empty())
 				{
 					view = nullptr;
 					break;
 				}
-				else if (viewscreens.count() == viewscreens.contains(*screen))
+				else if (std::find_if(viewscreens.begin(), viewscreens.end(), [&screen](auto const &scr) { return &scr.get() != screen; }) == viewscreens.end())
 					break;
 			}
 		}
@@ -1078,13 +1083,12 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 		{
 			for (view = view_by_index(viewindex = 0); view != nullptr; view = view_by_index(++viewindex))
 			{
-				render_screen_list const &viewscreens(view->screens());
-				if (viewscreens.count() >= scrcount)
+				if (view->screen_count() >= scrcount)
 				{
 					bool screen_missing(false);
 					for (screen_device &screen : iter)
 					{
-						if (!viewscreens.contains(screen))
+						if (!view->has_screen(screen))
 						{
 							screen_missing = true;
 							break;
@@ -1110,19 +1114,6 @@ const char *render_target::view_name(int viewindex)
 {
 	layout_view const *const view = view_by_index(viewindex);
 	return view ? view->name().c_str() : nullptr;
-}
-
-
-//-------------------------------------------------
-//  render_target_get_view_screens - return a
-//  bitmask of which screens are visible on a
-//  given view
-//-------------------------------------------------
-
-const render_screen_list &render_target::view_screens(int viewindex)
-{
-	layout_view *view = view_by_index(viewindex);
-	return (view != nullptr) ? view->screens() : s_empty_screen_list;
 }
 
 
@@ -1369,7 +1360,7 @@ render_primitive_list &render_target::get_primitives()
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
 		set_render_bounds_xy(prim->bounds, 0.0f, 0.0f, (float)m_width, (float)m_height);
 		prim->full_bounds = prim->bounds;
-		set_render_color(&prim->color, 1.0f, 1.0f, 1.0f, 1.0f);
+		set_render_color(&prim->color, 1.0f, 0.1f, 0.1f, 0.1f);
 		prim->texture.base = nullptr;
 		prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 		list.append(*prim);
@@ -1542,13 +1533,13 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 	bool have_artwork  = false;
 
 	// if there's an explicit file, load that first
-	const char *basename = m_manager.machine().basename();
+	const std::string &basename = m_manager.machine().basename();
 	if (layoutfile)
-		have_artwork |= load_layout_file(basename, *layoutfile);
+		have_artwork |= load_layout_file(basename.c_str(), *layoutfile);
 
 	// if we're only loading this file, we know our final result
 	if (!singlefile)
-		load_additional_layout_files(basename, have_artwork);
+		load_additional_layout_files(basename.c_str(), have_artwork);
 }
 
 void render_target::load_layout_files(util::xml::data_node const &rootnode, bool singlefile)
@@ -1556,12 +1547,12 @@ void render_target::load_layout_files(util::xml::data_node const &rootnode, bool
 	bool have_artwork  = false;
 
 	// if there's an explicit file, load that first
-	const char *basename = m_manager.machine().basename();
-	have_artwork |= load_layout_file(m_manager.machine().root_device(), basename, rootnode);
+	const std::string &basename = m_manager.machine().basename();
+	have_artwork |= load_layout_file(m_manager.machine().root_device(), basename.c_str(), rootnode);
 
 	// if we're only loading this file, we know our final result
 	if (!singlefile)
-		load_additional_layout_files(basename, have_artwork);
+		load_additional_layout_files(basename.c_str(), have_artwork);
 }
 
 void render_target::load_additional_layout_files(const char *basename, bool have_artwork)
@@ -1570,11 +1561,12 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 	bool have_override = false;
 
 	// if override_artwork defined, load that and skip artwork other than default
-	if (m_manager.machine().options().override_artwork())
+	const char *const override_art = m_manager.machine().options().override_artwork();
+	if (override_art && *override_art)
 	{
-		if (load_layout_file(m_manager.machine().options().override_artwork(), m_manager.machine().options().override_artwork()))
+		if (load_layout_file(override_art, override_art))
 			have_override = true;
-		else if (load_layout_file(m_manager.machine().options().override_artwork(), "default"))
+		else if (load_layout_file(override_art, "default"))
 			have_override = true;
 	}
 
@@ -1591,7 +1583,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			have_artwork = true;
 
 		// if a default view has been specified, use that as a fallback
-		if (system.default_layout != nullptr)
+		if (system.default_layout)
 			have_default |= load_layout_file(nullptr, *system.default_layout);
 		m_manager.machine().config().apply_default_layouts(
 				[this, &have_default] (device_t &dev, internal_layout const &layout)
@@ -1599,36 +1591,30 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 
 		// try to load another file based on the parent driver name
 		int cloneof = driver_list::clone(system);
-		if (cloneof != -1)
+		while (0 <= cloneof)
 		{
 			if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
 				have_artwork |= load_layout_file(driver_list::driver(cloneof).name, "default");
 			else
 				have_artwork = true;
+
+			// Check the parent of the parent to cover bios based artwork
+			const game_driver &parent(driver_list::driver(cloneof));
+			cloneof = driver_list::clone(parent);
 		}
 
-		// Check the parent of the parent to cover bios based artwork
-		if (cloneof != -1) {
-			const game_driver &clone(driver_list::driver(cloneof));
-			int cloneofclone = driver_list::clone(clone);
-			if (cloneofclone != -1 && cloneofclone != cloneof)
+		// Use fallback artwork if defined and no artwork has been found yet
+		if (!have_artwork)
+		{
+			const char *const fallback_art = m_manager.machine().options().fallback_artwork();
+			if (fallback_art && *fallback_art)
 			{
-				if (!load_layout_file(driver_list::driver(cloneofclone).name, driver_list::driver(cloneofclone).name))
-					have_artwork |= load_layout_file(driver_list::driver(cloneofclone).name, "default");
+				if (!load_layout_file(fallback_art, fallback_art))
+					have_artwork |= load_layout_file(fallback_art, "default");
 				else
 					have_artwork = true;
 			}
 		}
-
-		// Use fallback artwork if defined and no artwork has been found yet
-		if (!have_artwork && m_manager.machine().options().fallback_artwork())
-		{
-			if (!load_layout_file(m_manager.machine().options().fallback_artwork(), m_manager.machine().options().fallback_artwork()))
-				have_artwork |= load_layout_file(m_manager.machine().options().fallback_artwork(), "default");
-			else
-				have_artwork = true;
-		}
-
 	}
 
 	// local screen info to avoid repeated code
@@ -1793,13 +1779,12 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			int viewindex(0);
 			for (layout_view *view = view_by_index(viewindex); need_tiles && view; view = view_by_index(++viewindex))
 			{
-				render_screen_list const &viewscreens(view->screens());
-				if (viewscreens.count() >= screens.size())
+				if (view->screen_count() >= screens.size())
 				{
 					bool screen_missing(false);
 					for (screen_device &screen : iter)
 					{
-						if (!viewscreens.contains(screen))
+						if (!view->has_screen(screen))
 						{
 							screen_missing = true;
 							break;
@@ -1991,11 +1976,10 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 	z_stream stream;
 	int zerr;
 
-	/* initialize the stream */
+	// initialize the stream
 	memset(&stream, 0, sizeof(stream));
 	stream.next_out = tempout.get();
 	stream.avail_out = layout_data.decompressed_size;
-
 
 	zerr = inflateInit(&stream);
 	if (zerr != Z_OK)
@@ -2004,12 +1988,12 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 		return false;
 	}
 
-	/* decompress this chunk */
+	// decompress this chunk
 	stream.next_in = (unsigned char *)layout_data.data;
 	stream.avail_in = layout_data.compressed_size;
 	zerr = inflate(&stream, Z_NO_FLUSH);
 
-	/* stop at the end of the stream */
+	// stop at the end of the stream
 	if (zerr == Z_STREAM_END)
 	{
 		// OK
@@ -2020,7 +2004,7 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 		return false;
 	}
 
-	/* clean up */
+	// clean up
 	zerr = inflateEnd(&stream);
 	if (zerr != Z_OK)
 	{
@@ -2052,12 +2036,33 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 
 	// attempt to open the file; bail if we can't
 	emu_file layoutfile(m_manager.machine().options().art_path(), OPEN_FLAG_READ);
-	osd_file::error const filerr(layoutfile.open(fname.c_str()));
+	layoutfile.set_restrict_to_mediapath(1);
+	osd_file::error const filerr(layoutfile.open(fname));
 	if (filerr != osd_file::error::NONE)
 		return false;
 
 	// read the file
-	util::xml::file::ptr rootnode(util::xml::file::read(layoutfile, nullptr));
+	util::xml::parse_options parseopt;
+	util::xml::parse_error parseerr;
+	parseopt.error = &parseerr;
+	util::xml::file::ptr rootnode(util::xml::file::read(layoutfile, &parseopt));
+	if (!rootnode)
+	{
+		if (parseerr.error_message)
+		{
+			osd_printf_warning(
+					"Error parsing XML file '%s' at line %d column %d: %s, ignoring\n",
+					filename,
+					parseerr.error_line,
+					parseerr.error_column,
+					parseerr.error_message);
+		}
+		else
+		{
+			osd_printf_warning("Error parsing XML file '%s', ignorning\n", filename);
+		}
+		return false;
+	}
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
 	if (!load_layout_file(m_manager.machine().root_device(), dirname, *rootnode))
@@ -2246,7 +2251,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					curitem.texture()->get_scaled(width, height, prim->texture, list, curitem.flags());
 
 					// set the palette
-					prim->texture.palette = curitem.texture()->get_adjusted_palette(container);
+					prim->texture.palette = curitem.texture()->get_adjusted_palette(container, prim->texture.palette_length);
 
 					// determine UV coordinates
 					prim->texcoords = oriented_texcoords[finalorient];
@@ -2691,7 +2696,8 @@ bool render_target::remove_clear_extent(const render_bounds &bounds)
 				// make a copy of this extent
 				memmove(&ext[ext[1] + 2], &ext[0], (last - ext) * sizeof(*ext));
 				last += ext[1] + 2;
-				assert_always(last < max, "Ran out of clear extents!\n");
+				if (last >= max)
+					throw emu_fatalerror("render_target::remove_clear_extent: Ran out of clear extents!");
 
 				// split the extent between pieces
 				ext[ext[1] + 2] = -(-ext[0] - diff);
@@ -2711,7 +2717,8 @@ bool render_target::remove_clear_extent(const render_bounds &bounds)
 				// make a copy of this extent
 				memmove(&ext[ext[1] + 2], &ext[0], (last - ext) * sizeof(*ext));
 				last += ext[1] + 2;
-				assert_always(last < max, "Ran out of clear extents!\n");
+				if (last >= max)
+					throw emu_fatalerror("render_target::remove_clear_extent: Ran out of clear extents!");
 
 				// split the extent between pieces
 				ext[ext[1] + 2] = -diff;
@@ -2736,7 +2743,8 @@ bool render_target::remove_clear_extent(const render_bounds &bounds)
 					memmove(&xext[2], &xext[0], (last - xext) * sizeof(*xext));
 					last += 2;
 					linelast += 2;
-					assert_always(last < max, "Ran out of clear extents!\n");
+					if (last >= max)
+						throw emu_fatalerror("render_target::remove_clear_extent: Ran out of clear extents!");
 
 					// split this extent into three parts
 					xext[0] = boundsx0 - x0;
@@ -2951,9 +2959,15 @@ render_manager::~render_manager()
 bool render_manager::is_live(screen_device &screen) const
 {
 	// iterate over all live targets and or together their screen masks
-	for (render_target &target : m_targetlist)
-		if (!target.hidden() && target.view_screens(target.view()).contains(screen))
-			return true;
+	for (render_target const &target : m_targetlist)
+	{
+		if (!target.hidden())
+		{
+			layout_view const *view = target.current_view();
+			if (view != nullptr && view->has_screen(screen))
+				return true;
+		}
+	}
 	return false;
 }
 

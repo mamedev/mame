@@ -33,11 +33,12 @@ public:
 	void data_w(uint8_t val);
 	void set_sector_base(uint32_t base);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER(intrq_r);
-	DECLARE_READ_LINE_MEMBER(drq_r);
+	// declared but not defined?
+	int intrq_r();
+	int drq_r();
 
 
 protected:
@@ -107,11 +108,8 @@ private:
 
 	devcb_write_line m_intrq_cb, m_drq_cb;
 
-	struct
-	{
-		harddisk_image_device *drive;
-		uint16_t cylinder;
-	} m_drives[4];
+	optional_device_array<harddisk_image_device, 4> m_drives;
+	uint16_t m_drive_cylinder[4];
 
 	uint16_t m_sector_base;
 

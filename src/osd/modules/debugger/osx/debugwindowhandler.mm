@@ -14,6 +14,7 @@
 #import "debugview.h"
 
 #include "debugger.h"
+#include "debug/debugcon.h"
 
 #include "util/xmlfile.h"
 
@@ -42,7 +43,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	NSMenuItem *runParentItem = [menu addItemWithTitle:@"Run"
 												action:@selector(debugRun:)
 										 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF5FunctionKey]];
-	NSMenu *runMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Run"];
+	NSMenu *runMenu = [[NSMenu alloc] initWithTitle:@"Run"];
 	[runParentItem setSubmenu:runMenu];
 	[runMenu release];
 	[runParentItem setKeyEquivalentModifierMask:0];
@@ -64,7 +65,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	 setKeyEquivalentModifierMask:0];
 
 	NSMenuItem *stepParentItem = [menu addItemWithTitle:@"Step" action:NULL keyEquivalent:@""];
-	NSMenu *stepMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Step"];
+	NSMenu *stepMenu = [[NSMenu alloc] initWithTitle:@"Step"];
 	[stepParentItem setSubmenu:stepMenu];
 	[stepMenu release];
 	[[stepMenu addItemWithTitle:@"Into"
@@ -81,7 +82,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	 setKeyEquivalentModifierMask:NSShiftKeyMask];
 
 	NSMenuItem *resetParentItem = [menu addItemWithTitle:@"Reset" action:NULL keyEquivalent:@""];
-	NSMenu *resetMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Reset"];
+	NSMenu *resetMenu = [[NSMenu alloc] initWithTitle:@"Reset"];
 	[resetParentItem setSubmenu:resetMenu];
 	[resetMenu release];
 	[[resetMenu addItemWithTitle:@"Soft"
@@ -96,7 +97,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	[menu addItem:[NSMenuItem separatorItem]];
 
 	NSMenuItem *newParentItem = [menu addItemWithTitle:@"New" action:NULL keyEquivalent:@""];
-	NSMenu *newMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"New"];
+	NSMenu *newMenu = [[NSMenu alloc] initWithTitle:@"New"];
 	[newParentItem setSubmenu:newMenu];
 	[newMenu release];
 	[newMenu addItemWithTitle:@"Memory Window"
@@ -131,14 +132,6 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	[[actionButton cell] setArrowPosition:NSPopUpArrowAtCenter];
 	[[self class] addCommonActionItems:[actionButton menu]];
 	return actionButton;
-}
-
-
-+ (device_debug::breakpoint *)findBreakpointAtAddress:(offs_t)address forDevice:(device_t &)device {
-	device_debug *const cpuinfo = device.debug();
-	device_debug::breakpoint *bp = cpuinfo->breakpoint_first();
-	while ((bp != nullptr) && (address != bp->address())) bp = bp->next();
-	return bp;
 }
 
 
@@ -197,12 +190,12 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 
 - (IBAction)debugBreak:(id)sender {
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
-		machine->debugger().cpu().get_visible_cpu()->debug()->halt_on_next_instruction("User-initiated break\n");
+		machine->debugger().console().get_visible_cpu()->debug()->halt_on_next_instruction("User-initiated break\n");
 }
 
 
 - (IBAction)debugRun:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->go();
+	machine->debugger().console().get_visible_cpu()->debug()->go();
 }
 
 
@@ -211,43 +204,43 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 														object:self
 													  userInfo:[NSDictionary dictionaryWithObject:[NSValue valueWithPointer:machine]
 																						   forKey:@"MAMEDebugMachine"]];
-	machine->debugger().cpu().get_visible_cpu()->debug()->go();
+	machine->debugger().console().get_visible_cpu()->debug()->go();
 }
 
 
 - (IBAction)debugRunToNextCPU:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->go_next_device();
+	machine->debugger().console().get_visible_cpu()->debug()->go_next_device();
 }
 
 
 - (IBAction)debugRunToNextInterrupt:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
+	machine->debugger().console().get_visible_cpu()->debug()->go_interrupt();
 }
 
 
 - (IBAction)debugRunToNextVBLANK:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->go_vblank();
+	machine->debugger().console().get_visible_cpu()->debug()->go_vblank();
 }
 
 
 - (IBAction)debugStepInto:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+	machine->debugger().console().get_visible_cpu()->debug()->single_step();
 }
 
 
 - (IBAction)debugStepOver:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->single_step_over();
+	machine->debugger().console().get_visible_cpu()->debug()->single_step_over();
 }
 
 
 - (IBAction)debugStepOut:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->single_step_out();
+	machine->debugger().console().get_visible_cpu()->debug()->single_step_out();
 }
 
 
 - (IBAction)debugSoftReset:(id)sender {
 	machine->schedule_soft_reset();
-	machine->debugger().cpu().get_visible_cpu()->debug()->go();
+	machine->debugger().console().get_visible_cpu()->debug()->go();
 }
 
 

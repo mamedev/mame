@@ -323,13 +323,13 @@ WRITE_LINE_MEMBER(bfm_sc5_state::bfm_sc5_duart_txa)
 	logerror("bfm_sc5_duart_tx\n");
 }
 
-READ8_MEMBER(bfm_sc5_state::bfm_sc5_duart_input_r)
+uint8_t bfm_sc5_state::bfm_sc5_duart_input_r()
 {
 	logerror("bfm_sc5_duart_input_r\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
+void bfm_sc5_state::bfm_sc5_duart_output_w(uint8_t data)
 {
 	logerror("bfm_sc5_duart_output_w\n");
 }
@@ -357,5 +357,3 @@ void bfm_sc5_state::bfm_sc5(machine_config &config)
 	YMZ280B(config, m_ymz, 16000000); // ?? Mhz
 	m_ymz->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
-
-#include "bfm_sc5sw.hxx"

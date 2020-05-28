@@ -118,10 +118,10 @@ isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type
 void isa8_com_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x03f8, 0x03ff, read8sm_delegate(FUNC(ins8250_device::ins8250_r), subdevice<ins8250_uart_device>("uart_0")), write8sm_delegate(FUNC(ins8250_device::ins8250_w), subdevice<ins8250_uart_device>("uart_0")) );
-	m_isa->install_device(0x02f8, 0x02ff, read8sm_delegate(FUNC(ins8250_device::ins8250_r), subdevice<ins8250_uart_device>("uart_1")), write8sm_delegate(FUNC(ins8250_device::ins8250_w), subdevice<ins8250_uart_device>("uart_1")) );
-//  m_isa->install_device(0x03e8, 0x03ef, read8sm_delegate(FUNC(ins8250_device::ins8250_r), subdevice<ins8250_uart_device>("uart_2")), write8sm_delegate(FUNC(ins8250_device::ins8250_w), subdevice<ins8250_uart_device>("uart_2")) );
-//  m_isa->install_device(0x02e8, 0x02ef, read8sm_delegate(FUNC(ins8250_device::ins8250_r), subdevice<ins8250_uart_device>("uart_3")), write8sm_delegate(FUNC(ins8250_device::ins8250_w), subdevice<ins8250_uart_device>("uart_3")) );
+	m_isa->install_device(0x03f8, 0x03ff, read8sm_delegate(*subdevice<ins8250_uart_device>("uart_0"), FUNC(ins8250_device::ins8250_r)), write8sm_delegate(*subdevice<ins8250_uart_device>("uart_0"), FUNC(ins8250_device::ins8250_w)));
+	m_isa->install_device(0x02f8, 0x02ff, read8sm_delegate(*subdevice<ins8250_uart_device>("uart_1"), FUNC(ins8250_device::ins8250_r)), write8sm_delegate(*subdevice<ins8250_uart_device>("uart_1"), FUNC(ins8250_device::ins8250_w)));
+//  m_isa->install_device(0x03e8, 0x03ef, read8sm_delegate(*subdevice<ins8250_uart_device>("uart_2"), FUNC(ins8250_device::ins8250_r)), write8sm_delegate(*subdevice<ins8250_uart_device>("uart_2"), FUNC(ins8250_device::ins8250_w)));
+//  m_isa->install_device(0x02e8, 0x02ef, read8sm_delegate(*subdevice<ins8250_uart_device>("uart_3"), FUNC(ins8250_device::ins8250_r)), write8sm_delegate(*subdevice<ins8250_uart_device>("uart_3"), FUNC(ins8250_device::ins8250_w)));
 }
 
 //-------------------------------------------------

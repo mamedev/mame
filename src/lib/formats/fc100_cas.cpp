@@ -10,7 +10,7 @@ it's all a guess.
 
 ********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "fc100_cas.h"
 

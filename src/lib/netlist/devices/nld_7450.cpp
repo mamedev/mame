@@ -7,12 +7,14 @@
 
 #include "nld_7450.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {
 	namespace devices
 	{
+
+	static constexpr const std::array<netlist_time, 2> times = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
+
 	NETLIB_OBJECT(7450)
 	{
 		NETLIB_CONSTRUCTOR(7450)
@@ -77,8 +79,6 @@ namespace netlist
 		m_D.activate();
 		auto t1 = m_A() & m_B();
 		auto t2 = m_C() & m_D();
-
-		const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
 
 		uint_fast8_t res = 0;
 		if (t1 ^ 1)

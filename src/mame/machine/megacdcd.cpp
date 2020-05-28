@@ -135,15 +135,14 @@ DEFINE_DEVICE_TYPE(LC89510_TEMP, lc89510_temp_device, "lc89510_temp", "lc89510_t
 
 lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LC89510_TEMP, tag, owner, clock)
+	, m_segacd_dma_callback(*this, FUNC(lc89510_temp_device::Fake_CDC_Do_DMA))
+	, m_type1_interrupt_callback(*this, FUNC(lc89510_temp_device::dummy_interrupt_callback))
+	, m_type2_interrupt_callback(*this, FUNC(lc89510_temp_device::dummy_interrupt_callback))
+	, m_type3_interrupt_callback(*this, FUNC(lc89510_temp_device::dummy_interrupt_callback))
 	, m_cdrom(*this, finder_base::DUMMY_TAG)
 	, m_cdda(*this, "cdda")
 	, m_68k(*this, finder_base::DUMMY_TAG)
 {
-	segacd_dma_callback =  segacd_dma_delegate(FUNC(lc89510_temp_device::Fake_CDC_Do_DMA), this);
-	type1_interrupt_callback =  interrupt_delegate(FUNC(lc89510_temp_device::dummy_interrupt_callback), this);
-	type2_interrupt_callback =  interrupt_delegate(FUNC(lc89510_temp_device::dummy_interrupt_callback), this);
-	type3_interrupt_callback =  interrupt_delegate(FUNC(lc89510_temp_device::dummy_interrupt_callback), this);
-
 	is_neoCD = false;
 
 	nff0002 = 0;
@@ -160,7 +159,7 @@ lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const ch
 	segacd_irq_mask = 0;
 }
 
-void lc89510_temp_device::dummy_interrupt_callback(void)
+void lc89510_temp_device::dummy_interrupt_callback()
 {
 }
 
@@ -172,10 +171,10 @@ void lc89510_temp_device::Fake_CDC_Do_DMA(int &dmacount, uint8_t *CDC_BUFFER, ui
 
 void lc89510_temp_device::device_start()
 {
-	segacd_dma_callback.bind_relative_to(*owner());
-	type1_interrupt_callback.bind_relative_to(*owner());
-	type2_interrupt_callback.bind_relative_to(*owner());
-	type3_interrupt_callback.bind_relative_to(*owner());
+	m_segacd_dma_callback.resolve();
+	m_type1_interrupt_callback.resolve();
+	m_type2_interrupt_callback.resolve();
+	m_type3_interrupt_callback.resolve();
 }
 
 void lc89510_temp_device::device_reset()
@@ -645,7 +644,7 @@ void lc89510_temp_device::CDC_Do_DMA(running_machine& machine, int rate)
 	uint16_t dma_addrc = LC8951RegistersW[REG_W_DACL] | (LC8951RegistersW[REG_W_DACH]<<8);
 
 	// HACK
-	segacd_dma_callback(dmacount, CDC_BUFFER, dma_addrc, destination );
+	m_segacd_dma_callback(dmacount, CDC_BUFFER, dma_addrc, destination );
 
 
 	dma_addrc += length*2;
@@ -1138,7 +1137,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( lc89510_temp_device::segacd_access_timer_callback 
 	{
 		if (nff0002 & 0x0050)
 		{
-			type2_interrupt_callback();
+			m_type2_interrupt_callback();
 		}
 	}
 
@@ -1295,7 +1294,7 @@ void lc89510_temp_device::scd_ctrl_checks(running_machine& machine)
 	{
 		if (is_neoCD)
 		{
-			type1_interrupt_callback();
+			m_type1_interrupt_callback();
 		}
 		else
 		{

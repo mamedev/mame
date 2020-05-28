@@ -11,7 +11,9 @@
 #include "machine/timer.h"
 #include "sound/cdda.h"
 
-class stvcd_device : public device_t, public device_mixer_interface
+class stvcd_device : public device_t,
+					 public device_mixer_interface,
+					 public device_memory_interface
 {
 	static constexpr unsigned MAX_FILTERS = 24;
 	static constexpr unsigned MAX_BLOCKS = 200;
@@ -31,8 +33,13 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_stop() override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
+	const address_space_config      m_space_config;
+
+	void io_regs(address_map &map);
+
 	TIMER_DEVICE_CALLBACK_MEMBER( stv_sector_cb );
 	TIMER_DEVICE_CALLBACK_MEMBER( stv_sh1_sim );
 
@@ -119,11 +126,6 @@ private:
 	void cd_defragblocks(partitionT *part);
 	void cd_getsectoroffsetnum(uint32_t bufnum, uint32_t *sectoffs, uint32_t *sectnum);
 
-	uint16_t cd_readWord(uint32_t addr);
-	void cd_writeWord(uint32_t addr, uint16_t data);
-	uint32_t cd_readLong(uint32_t addr);
-	void cd_writeLong(uint32_t addr, uint32_t data);
-
 	void cd_readTOC();
 	void cd_readblock(uint32_t fad, uint8_t *dat);
 	void cd_playdata();
@@ -192,6 +194,86 @@ private:
 	required_device<timer_device> m_sector_timer;
 	required_device<timer_device> m_sh1_timer;
 	required_device<cdda_device> m_cdda;
+
+	// CDC commands
+	// 0x00
+	void cmd_get_status();
+	void cmd_get_hw_info();
+	void cmd_get_toc();
+	void cmd_get_session_info();
+	void cmd_init_cdsystem();
+	void cmd_end_data_transfer();
+	// 0x10
+	void cmd_play_disc();
+	void cmd_seek_disc();
+	void cmd_ffwd_rew_disc();
+	// 0x20
+	void cmd_get_subcode_q_rw_channel();
+	// 0x30
+	void cmd_set_cddevice_connection();
+	void cmd_get_cddevice_connection();
+	void cmd_last_buffer_destination();
+	// 0x40
+	void cmd_set_filter_range();
+	void cmd_get_filter_range();
+	void cmd_set_filter_subheader_conditions();
+	void cmd_get_filter_subheader_conditions();
+	void cmd_set_filter_mode();
+	void cmd_get_filter_mode();
+	void cmd_set_filter_connection();
+	void cmd_reset_selector();
+	// 0x50
+	void cmd_get_buffer_size();
+	void cmd_get_buffer_partition_sector_number();
+	void cmd_calculate_actual_data_size();
+	void cmd_get_actual_data_size();
+	void cmd_get_sector_information();
+	// 0x60
+	void cmd_set_sector_length();
+	void cmd_get_sector_data();
+	void cmd_delete_sector_data();
+	void cmd_get_and_delete_sector_data();
+	void cmd_put_sector_data();
+	void cmd_move_sector_data();
+	void cmd_copy_sector_data();
+	void cmd_get_sector_data_copy_or_move_error();
+	// 0x70
+	void cmd_change_directory();
+	void cmd_read_directory();
+	void cmd_get_file_scope();
+	void cmd_get_target_file_info();
+	void cmd_read_file();
+	void cmd_abort_file();
+	// 0x90
+	void cmd_mpeg_get_status();
+	void cmd_mpeg_get_irq();
+	void cmd_mpeg_set_irq_mask();
+	void cmd_mpeg_init();
+	void cmd_mpeg_set_mode();
+	// 0xe0
+	void cmd_check_copy_protection();
+	void cmd_get_disc_region();
+	void cmd_get_mpeg_card_boot_rom();
+
+	// comms
+	DECLARE_READ32_MEMBER(datatrns_r);
+	DECLARE_WRITE32_MEMBER(datatrns_w);
+	inline u32 dataxfer_long_r();
+	inline u16 dataxfer_word_r();
+	inline void dataxfer_long_w(u32 data);
+	DECLARE_READ16_MEMBER(cr1_r);
+	DECLARE_READ16_MEMBER(cr2_r);
+	DECLARE_READ16_MEMBER(cr3_r);
+	DECLARE_READ16_MEMBER(cr4_r);
+	DECLARE_WRITE16_MEMBER(cr1_w);
+	DECLARE_WRITE16_MEMBER(cr2_w);
+	DECLARE_WRITE16_MEMBER(cr3_w);
+	DECLARE_WRITE16_MEMBER(cr4_w);
+
+	DECLARE_READ16_MEMBER(hirq_r);
+	DECLARE_WRITE16_MEMBER(hirq_w);
+	DECLARE_READ16_MEMBER(hirqmask_r);
+	DECLARE_WRITE16_MEMBER(hirqmask_w);
 };
 
 // device type definition

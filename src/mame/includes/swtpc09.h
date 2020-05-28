@@ -44,14 +44,14 @@ public:
 		, m_via_cb2(*this, "via_cb2")
 		, m_dat(*this, "dat")
 		, m_bankdev(*this, "bankdev")
-		, m_maincpu_clock(*this, "maincpu_clock")
-		, m_fdc_clock(*this, "fdc_clock")
-		, m_baud_rate_high(*this, "baud_rate_high")
-		, m_floppy_expected_density(*this, "floppy_expected_density")
-		, m_floppy_expected_sectors(*this, "floppy_expected_sectors")
-		, m_floppy_track_zero_expected_sectors(*this, "floppy_track_zero_expected_sectors")
-		, m_sbug_double_density(*this, "sbug_double_density")
-		, m_piaide_flex_boot_cd00(*this, "piaide_flex_boot_cd00")
+		, m_maincpu_clock(*this, "MAINCPU_CLOCK")
+		, m_fdc_clock(*this, "FDC_CLOCK")
+		, m_baud_rate_high(*this, "BAUD_RATE_HIGH")
+		, m_floppy_expected_density(*this, "FLOPPY_EXPECTED_DENSITY")
+		, m_floppy_expected_sectors(*this, "FLOPPY_EXPECTED_SECTORS")
+		, m_floppy_track_zero_expected_sectors(*this, "FLOPPY_TRACK_ZERO_EXPECTED_SECTORS")
+		, m_sbug_double_density(*this, "SBUG_DOUBLE_DENSITY")
+		, m_piaide_flex_boot_cd00(*this, "PIAIDE_FLEX_BOOT_CD00")
 	{ }
 
 	void swtpc09_base(machine_config &config);
@@ -59,18 +59,24 @@ public:
 	void swtpc09d3(machine_config &config);
 	void swtpc09u(machine_config &config);
 	void swtpc09(machine_config &config);
+	void swtpc09o(machine_config &config);
 
 	void init_swtpc09();
 	void init_swtpc09i();
 	void init_swtpc09u();
 	void init_swtpc09d3();
+	void init_swtpc09o();
+
+	DECLARE_INPUT_CHANGED_MEMBER(maincpu_clock_change);
+	DECLARE_INPUT_CHANGED_MEMBER(fdc_clock_change);
+	DECLARE_INPUT_CHANGED_MEMBER(baud_rate_high_change);
 
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_flex_formats);
 	DECLARE_FLOPPY_FORMATS(floppy_uniflex_formats);
 
-	DECLARE_READ8_MEMBER(pia0_a_r);
-	DECLARE_READ8_MEMBER(pia0_ca1_r);
+	uint8_t pia0_a_r();
+	uint8_t pia0_ca1_r();
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
 
 	DECLARE_WRITE_LINE_MEMBER(io_irq_w);
@@ -83,10 +89,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_sso_w );
 
-	DECLARE_READ8_MEMBER( dmaf3_via_read_porta );
-	DECLARE_READ8_MEMBER( dmaf3_via_read_portb );
-	DECLARE_WRITE8_MEMBER( dmaf3_via_write_porta );
-	DECLARE_WRITE8_MEMBER( dmaf3_via_write_portb );
+	uint8_t dmaf3_via_read_porta();
+	uint8_t dmaf3_via_read_portb();
+	void dmaf3_via_write_porta(uint8_t data);
+	void dmaf3_via_write_portb(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( dmaf3_via_irq );
 
 	TIMER_CALLBACK_MEMBER(floppy_motor_callback);
@@ -131,6 +137,7 @@ private:
 	void mp09_mem(address_map &map);
 	void uniflex_dmaf2_mem(address_map &map);
 	void uniflex_dmaf3_mem(address_map &map);
+	void os9_mem(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -182,6 +189,7 @@ private:
 	emu_timer *m_floppy_motor_timer;
 	floppy_image_device *m_fdc_floppy; // Current selected floppy.
 	uint8_t m_fdc_side;                // Current floppy side.
+	uint8_t m_fdc_dden;                // Current dden state.
 	uint8_t m_dmaf3_via_porta;
 	uint8_t m_dmaf3_via_portb;
 	uint8_t m_active_interrupt;

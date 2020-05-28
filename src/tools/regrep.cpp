@@ -6,12 +6,12 @@
 
 ****************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cctype>
 #include <new>
-#include <assert.h>
+#include <cassert>
 #include "osdcore.h"
 #include "png.h"
 

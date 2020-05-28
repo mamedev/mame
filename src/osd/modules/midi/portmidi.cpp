@@ -30,7 +30,7 @@ public:
 	virtual void exit()override;
 
 	virtual osd_midi_device *create_midi_device() override;
-	virtual void list_midi_devices(void) override;
+	virtual void list_midi_devices() override;
 };
 
 
@@ -77,7 +77,7 @@ void pm_module::exit()
 	Pm_Terminate();
 }
 
-void pm_module::list_midi_devices(void)
+void pm_module::list_midi_devices()
 {
 	int num_devs = Pm_CountDevices();
 	const PmDeviceInfo *pmInfo;

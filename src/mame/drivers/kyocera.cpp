@@ -65,7 +65,7 @@
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( pc8201_state::bank_r )
+uint8_t pc8201_state::bank_r()
 {
 	/*
 
@@ -144,7 +144,7 @@ void pc8201_state::bankswitch(uint8_t data)
 	membank("bank2")->set_entry(ram_bank);
 }
 
-WRITE8_MEMBER( pc8201_state::bank_w )
+void pc8201_state::bank_w(uint8_t data)
 {
 	/*
 
@@ -164,7 +164,7 @@ printf("bank %02x\n",data);
 	bankswitch(data);
 }
 
-WRITE8_MEMBER( pc8201_state::scp_w )
+void pc8201_state::scp_w(uint8_t data)
 {
 	/*
 
@@ -194,7 +194,18 @@ WRITE8_MEMBER( pc8201_state::scp_w )
 	m_iosel = data >> 5;
 }
 
-WRITE8_MEMBER( kc85_state::uart_ctrl_w )
+uint8_t kc85_state::uart_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_uart->drr_w(0);
+		m_uart->drr_w(1);
+	}
+
+	return m_uart->read();
+}
+
+void kc85_state::uart_ctrl_w(uint8_t data)
 {
 	/*
 
@@ -220,7 +231,7 @@ WRITE8_MEMBER( kc85_state::uart_ctrl_w )
 	m_uart->crl_w(1);
 }
 
-READ8_MEMBER( kc85_state::uart_status_r )
+uint8_t kc85_state::uart_status_r()
 {
 	/*
 
@@ -263,7 +274,7 @@ READ8_MEMBER( kc85_state::uart_status_r )
 	return data;
 }
 
-READ8_MEMBER( pc8201_state::uart_status_r )
+uint8_t pc8201_state::uart_status_r()
 {
 	/*
 
@@ -306,7 +317,7 @@ READ8_MEMBER( pc8201_state::uart_status_r )
 	return data;
 }
 
-WRITE8_MEMBER( pc8201_state::romah_w )
+void pc8201_state::romah_w(uint8_t data)
 {
 	/*
 
@@ -330,7 +341,7 @@ WRITE8_MEMBER( pc8201_state::romah_w )
 	m_rom_sel = BIT(data, 1);
 }
 
-WRITE8_MEMBER( pc8201_state::romal_w )
+void pc8201_state::romal_w(uint8_t data)
 {
 	/*
 
@@ -350,7 +361,7 @@ WRITE8_MEMBER( pc8201_state::romal_w )
 	m_rom_addr = (m_rom_addr & 0x1ff00) | data;
 }
 
-WRITE8_MEMBER( pc8201_state::romam_w )
+void pc8201_state::romam_w(uint8_t data)
 {
 	/*
 
@@ -370,7 +381,7 @@ WRITE8_MEMBER( pc8201_state::romam_w )
 	m_rom_addr = (m_rom_addr & 0x100ff) | (data << 8);
 }
 
-READ8_MEMBER( pc8201_state::romrd_r )
+uint8_t pc8201_state::romrd_r()
 {
 	uint8_t data = 0xff;
 
@@ -380,7 +391,7 @@ READ8_MEMBER( pc8201_state::romrd_r )
 	return data;
 }
 
-WRITE8_MEMBER( kc85_state::modem_w )
+void kc85_state::modem_w(uint8_t data)
 {
 	/*
 
@@ -400,7 +411,7 @@ WRITE8_MEMBER( kc85_state::modem_w )
 	//m_modem->en_w(BIT(data, 1));
 }
 
-WRITE8_MEMBER( kc85_state::ctrl_w )
+void kc85_state::ctrl_w(uint8_t data)
 {
 	/*
 
@@ -430,7 +441,7 @@ WRITE8_MEMBER( kc85_state::ctrl_w )
 	m_cassette->change_state(BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-READ8_MEMBER( kc85_state::keyboard_r )
+uint8_t kc85_state::keyboard_r()
 {
 	uint8_t data = 0xff;
 
@@ -475,17 +486,17 @@ void tandy200_state::bankswitch(uint8_t data)
 	}
 }
 
-READ8_MEMBER( tandy200_state::bank_r )
+uint8_t tandy200_state::bank_r()
 {
 	return m_bank;
 }
 
-WRITE8_MEMBER( tandy200_state::bank_w )
+void tandy200_state::bank_w(uint8_t data)
 {
 	bankswitch(data);
 }
 
-READ8_MEMBER( tandy200_state::stbk_r )
+uint8_t tandy200_state::stbk_r()
 {
 	uint8_t data = 0xff;
 
@@ -497,7 +508,7 @@ READ8_MEMBER( tandy200_state::stbk_r )
 	return data;
 }
 
-WRITE8_MEMBER( tandy200_state::stbk_w )
+void tandy200_state::stbk_w(uint8_t data)
 {
 	/*
 
@@ -521,20 +532,20 @@ WRITE8_MEMBER( tandy200_state::stbk_w )
 	m_cassette->change_state(BIT(data,1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-READ8_MEMBER( kc85_state::lcd_r )
+uint8_t kc85_state::lcd_r(offs_t offset)
 {
 	uint8_t data = 0;
 
 	for (uint8_t i = 0; i < 10; i++)
-		data |= m_lcdc[i]->read(space, offset);
+		data |= m_lcdc[i]->read(offset);
 
 	return data;
 }
 
-WRITE8_MEMBER( kc85_state::lcd_w )
+void kc85_state::lcd_w(offs_t offset, uint8_t data)
 {
 	for (uint8_t i = 0; i < 10; i++)
-		m_lcdc[i]->write(space, offset, data);
+		m_lcdc[i]->write(offset, data);
 }
 
 /* Memory Maps */
@@ -564,12 +575,12 @@ void tandy200_state::tandy200_mem(address_map &map)
 void kc85_state::kc85_io(address_map &map)
 {
 	map.unmap_value_high();
-//  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
-//  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
-//  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) optional answering telephone unit
-//  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) optional modem
+//  map(0x70, 0x70).mirror(0x0f); optional RAM unit
+//  map(0x80, 0x80).mirror(0x0f); optional I/O controller unit
+//  map(0x90, 0x90).mirror(0x0f); optional answering telephone unit
+//  map(0xa0, 0xa0).mirror(0x0f); optional modem
 	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0xc0, 0xc0).mirror(0x0f).rw(m_uart, FUNC(im6402_device::read), FUNC(im6402_device::write));
+	map(0xc0, 0xc0).mirror(0x0f).r(FUNC(kc85_state::uart_r)).w(m_uart, FUNC(im6402_device::write));
 	map(0xd0, 0xd0).mirror(0x0f).rw(FUNC(kc85_state::uart_status_r), FUNC(kc85_state::uart_ctrl_w));
 	map(0xe0, 0xe0).mirror(0x0f).rw(FUNC(kc85_state::keyboard_r), FUNC(kc85_state::ctrl_w));
 	map(0xf0, 0xf1).mirror(0x0e).rw(FUNC(kc85_state::lcd_r), FUNC(kc85_state::lcd_w));
@@ -584,7 +595,7 @@ void kc85_state::trsm100_io(address_map &map)
 void pc8201_state::pc8201_io(address_map &map)
 {
 	map.unmap_value_high();
-//  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional video interface 8255
+//  map(0x70, 0x70).mirror(0x0f); optional video interface 8255
 	map(0x80, 0x80).mirror(0x03).w(FUNC(pc8201_state::romah_w));
 	map(0x84, 0x84).mirror(0x03).w(FUNC(pc8201_state::romal_w));
 	map(0x88, 0x88).mirror(0x03).w(FUNC(pc8201_state::romam_w));
@@ -592,7 +603,7 @@ void pc8201_state::pc8201_io(address_map &map)
 	map(0x90, 0x90).mirror(0x0f).w(FUNC(pc8201_state::scp_w));
 	map(0xa0, 0xa0).mirror(0x0f).rw(FUNC(pc8201_state::bank_r), FUNC(pc8201_state::bank_w));
 	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0xc0, 0xc0).mirror(0x0f).rw(m_uart, FUNC(im6402_device::read), FUNC(im6402_device::write));
+	map(0xc0, 0xc0).mirror(0x0f).r(FUNC(pc8201_state::uart_r)).w(m_uart, FUNC(im6402_device::write));
 	map(0xd0, 0xd0).mirror(0x0f).r(FUNC(pc8201_state::uart_status_r)).w(FUNC(pc8201_state::uart_ctrl_w));
 	map(0xe0, 0xe0).mirror(0x0f).r(FUNC(pc8201_state::keyboard_r));
 	map(0xf0, 0xf1).mirror(0x0e).rw(FUNC(pc8201_state::lcd_r), FUNC(pc8201_state::lcd_w));
@@ -602,7 +613,7 @@ void tandy200_state::tandy200_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x90, 0x9f).rw(m_rtc, FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
-//  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, write)
+//  map(0xa0, 0xa0).mirror(0x0f).w(TCM5089_TAG, FUNC(tcm5089_device::write));
 	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0xc0, 0xc1).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xd0, 0xd0).mirror(0x0f).rw(FUNC(tandy200_state::bank_r), FUNC(tandy200_state::bank_w));
@@ -918,7 +929,7 @@ INPUT_PORTS_END
 
 /* 8155 Interface */
 
-WRITE8_MEMBER( kc85_state::i8155_pa_w )
+void kc85_state::i8155_pa_w(uint8_t data)
 {
 	/*
 
@@ -950,7 +961,7 @@ WRITE8_MEMBER( kc85_state::i8155_pa_w )
 	m_rtc->data_in_w(BIT(data, 4));
 }
 
-WRITE8_MEMBER( kc85_state::i8155_pb_w )
+void kc85_state::i8155_pb_w(uint8_t data)
 {
 	/*
 
@@ -995,7 +1006,7 @@ WRITE_LINE_MEMBER( kc85_state::write_centronics_select )
 	m_centronics_select = state;
 }
 
-READ8_MEMBER( kc85_state::i8155_pc_r )
+uint8_t kc85_state::i8155_pc_r()
 {
 	/*
 
@@ -1037,7 +1048,7 @@ WRITE_LINE_MEMBER( kc85_state::i8155_to_w )
 	m_uart->rrc_w(state);
 }
 
-WRITE8_MEMBER( tandy200_state::i8155_pa_w )
+void tandy200_state::i8155_pa_w(uint8_t data)
 {
 	/*
 
@@ -1059,7 +1070,7 @@ WRITE8_MEMBER( tandy200_state::i8155_pa_w )
 	m_keylatch = (m_keylatch & 0x100) | data;
 }
 
-WRITE8_MEMBER( tandy200_state::i8155_pb_w )
+void tandy200_state::i8155_pb_w(uint8_t data)
 {
 	/*
 
@@ -1096,7 +1107,7 @@ WRITE_LINE_MEMBER( tandy200_state::write_centronics_select )
 	m_centronics_select = state;
 }
 
-READ8_MEMBER( tandy200_state::i8155_pc_r )
+uint8_t tandy200_state::i8155_pc_r()
 {
 	/*
 
@@ -1343,6 +1354,7 @@ void kc85_state::kc85(machine_config &config)
 
 	IM6402(config, m_uart, 0, 0);
 	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->dr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
@@ -1392,6 +1404,7 @@ void pc8201_state::pc8201(machine_config &config)
 
 	IM6402(config, m_uart, 0, 0);
 	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->dr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
@@ -1450,6 +1463,7 @@ void trsm100_state::trsm100(machine_config &config)
 
 	IM6402(config, m_uart, 0, 0);
 	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->dr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
@@ -1497,7 +1511,7 @@ void tandy200_state::tandy200(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-//  MCFG_TCM5089_ADD(TCM5089_TAG, XTAL(3'579'545))
+//  TCM5089(config, TCM5089_TAG, XTAL(3'579'545));
 
 	/* devices */
 	i8155_device &i8155(I8155(config, I8155_TAG, XTAL(4'915'200)/2));
@@ -1508,10 +1522,11 @@ void tandy200_state::tandy200(machine_config &config)
 
 	RP5C01(config, m_rtc, XTAL(32'768));
 
-	i8251_device &i8251(I8251(config, I8251_TAG, 0)); /*XTAL(4'915'200)/2,*/
+	i8251_device &i8251(I8251(config, I8251_TAG, XTAL(4'915'200)/2));
 	i8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	i8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	i8251.rxrdy_handler().set_inputline(m_maincpu, I8085_RST65_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(I8251_TAG, FUNC(i8251_device::write_rxd));
@@ -1574,7 +1589,7 @@ ROM_END
 
 ROM_START( m10 )
 	// 3256C02-4B3/I        Italian
-	ROM_REGION( 0x8010, I8085_TAG, 0 )
+	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "m10rom.m12", 0x0000, 0x8000, CRC(f0e8447a) SHA1(d58867276213116a79f7074109b7d7ce02e8a3af) )
 ROM_END
 

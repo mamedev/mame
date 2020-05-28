@@ -73,8 +73,6 @@ public:
 	void sm7238(machine_config &config);
 
 private:
-	void sm7238_palette(palette_device &palette) const;
-
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_printer_clock);
 
@@ -100,7 +98,7 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
 	required_device<address_map_bank_device> m_videobank;
 	required_shared_ptr<u8> m_p_videoram;
@@ -141,7 +139,7 @@ void sm7238_state::videobank_map(address_map &map)
 void sm7238_state::sm7238_io(address_map &map)
 {
 	map.unmap_value_high();
-//	map(0x40, 0x4f).ram() // LUT
+//  map(0x40, 0x4f).ram() // LUT
 	map(0xa0, 0xa1).rw(m_i8251line, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xa4, 0xa5).rw(m_i8251kbd, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xa8, 0xab).rw(m_t_color, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
@@ -354,31 +352,24 @@ static GFXDECODE_START( gfx_sm7238 )
 	GFXDECODE_ENTRY("chargen", 0x0000, sm7238_charlayout, 0, 1)
 GFXDECODE_END
 
-void sm7238_state::sm7238_palette(palette_device &palette) const
-{
-	palette.set_pen_color(0, rgb_t::black());
-	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
-	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
-}
-
 void sm7238_state::sm7238(machine_config &config)
 {
 	I8080(config, m_maincpu, 16.5888_MHz_XTAL/9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sm7238_state::sm7238_mem);
 	m_maincpu->set_addrmap(AS_IO, &sm7238_state::sm7238_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->in_inta_func().set("pic8259", FUNC(pic8259_device::acknowledge));
 
 	ADDRESS_MAP_BANK(config, "videobank").set_map(&sm7238_state::videobank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
 	m_screen->set_raw(20.625_MHz_XTAL, KSM_TOTAL_HORZ, 0, KSM_DISP_HORZ, KSM_TOTAL_VERT, 0, KSM_DISP_VERT);
 	m_screen->set_screen_update(FUNC(sm7238_state::screen_update));
 	m_screen->screen_vblank().set(m_pic8259, FUNC(pic8259_device::ir2_w));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(sm7238_state::sm7238_palette), 3);
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_sm7238);
 
 	PIC8259(config, m_pic8259, 0);

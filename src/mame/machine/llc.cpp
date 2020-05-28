@@ -14,7 +14,7 @@
 
 
 // LLC1 BASIC keyboard
-READ8_MEMBER(llc_state::llc1_port2_b_r)
+uint8_t llc_state::llc1_port2_b_r()
 {
 	uint8_t retVal = 0;
 
@@ -29,13 +29,13 @@ READ8_MEMBER(llc_state::llc1_port2_b_r)
 	return retVal;
 }
 
-READ8_MEMBER(llc_state::llc1_port2_a_r)
+uint8_t llc_state::llc1_port2_a_r()
 {
 	return 0;
 }
 
 // LLC1 Monitor keyboard
-READ8_MEMBER(llc_state::llc1_port1_a_r)
+uint8_t llc_state::llc1_port1_a_r()
 {
 	uint8_t data = 0;
 	if (!BIT(m_porta, 4))
@@ -64,12 +64,12 @@ READ8_MEMBER(llc_state::llc1_port1_a_r)
 	return data;
 }
 
-WRITE8_MEMBER(llc_state::llc1_port1_a_w)
+void llc_state::llc1_port1_a_w(uint8_t data)
 {
 	m_porta = data;
 }
 
-WRITE8_MEMBER(llc_state::llc1_port1_b_w)
+void llc_state::llc1_port1_b_w(uint8_t data)
 {
 	static uint8_t count = 0, digit = 0;
 
@@ -168,18 +168,18 @@ WRITE8_MEMBER(llc_state::llc2_basic_enable_w)
 
 }
 
-READ8_MEMBER(llc_state::llc2_port1_b_r)
+uint8_t llc_state::llc2_port1_b_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(llc_state::llc2_port1_b_w)
+void llc_state::llc2_port1_b_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 6));
 	m_rv = BIT(data, 5);
 }
 
-READ8_MEMBER(llc_state::llc2_port2_a_r)
+uint8_t llc_state::llc2_port2_a_r()
 {
 	return 0; // bit 2 low or hangs on ^Z^X^C sequence
 }

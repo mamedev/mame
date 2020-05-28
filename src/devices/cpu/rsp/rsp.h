@@ -127,9 +127,9 @@ protected:
 	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override { }
 
@@ -218,9 +218,9 @@ private:
 	uint32_t m_ppc;
 	uint32_t m_nextpc;
 
-	address_space *m_program;
 protected:
-	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_pcache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_pcache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_program;
 
 private:
 	std::unique_ptr<cop2>    m_cop2;

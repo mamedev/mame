@@ -2765,7 +2765,7 @@ void tms99xx_device::alu_int()
 /*
     The minimum number of cycles applies to a command like STWP R0.
 */
-uint32_t tms99xx_device::execute_min_cycles() const
+uint32_t tms99xx_device::execute_min_cycles() const noexcept
 {
 	return 8;
 }
@@ -2774,12 +2774,12 @@ uint32_t tms99xx_device::execute_min_cycles() const
     The maximum number of cycles applies to a DIV command, depending on the
     data to be divided, and the mode of adressing.
 */
-uint32_t tms99xx_device::execute_max_cycles() const
+uint32_t tms99xx_device::execute_max_cycles() const noexcept
 {
 	return 124;
 }
 
-uint32_t tms99xx_device::execute_input_lines() const
+uint32_t tms99xx_device::execute_input_lines() const noexcept
 {
 	return 2;
 }

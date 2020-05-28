@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #ifndef MAME_CPU_BCP_BCPDASM_H
-#define MAME_CPU_BCP_BCPDASM_H 1
+#define MAME_CPU_BCP_BCPDASM_H
 
 #pragma once
 

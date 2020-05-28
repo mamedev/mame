@@ -118,21 +118,21 @@ const uint8_t i80186_cpu_device::m_i80186_timing[] =
 	33,             /* (80186) BOUND */
 };
 
-DEFINE_DEVICE_TYPE(I80186, i80186_cpu_device, "i80186", "Intel I80186")
-DEFINE_DEVICE_TYPE(I80188, i80188_cpu_device, "i80188", "Intel I80188")
+DEFINE_DEVICE_TYPE(I80186, i80186_cpu_device, "i80186", "Intel 80186")
+DEFINE_DEVICE_TYPE(I80188, i80188_cpu_device, "i80188", "Intel 80188")
 
 i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80186_cpu_device(mconfig, I80188, tag, owner, clock, 8)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
+	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::inta_callback));
 }
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80186_cpu_device(mconfig, I80186, tag, owner, clock, 16)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
+	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::inta_callback));
 }
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size)
@@ -144,6 +144,8 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type 
 	, m_out_chip_select_func(*this)
 	, m_out_tmrout0_func(*this)
 	, m_out_tmrout1_func(*this)
+	, m_irmx_irq_cb(*this)
+	, m_irmx_irq_ack(*this)
 {
 }
 
@@ -584,7 +586,7 @@ void i80186_cpu_device::device_start()
 	state_add( I8086_VECTOR, "V", m_int_vector).formatstr("%02X");
 
 	state_add( I8086_PC, "PC", m_pc ).callimport().formatstr("%05X");
-	state_add( STATE_GENPCBASE, "CURPC", m_pc ).callimport().formatstr("%05X").noshow();
+	state_add<uint32_t>( STATE_GENPCBASE, "CURPC", [this] { return (m_sregs[CS] << 4) + m_prev_ip; }).mask(0xfffff).noshow();
 	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 
 	// Most of these mnemonics are borrowed from the Intel 80C186EA/80C188EA User's Manual.
@@ -618,7 +620,7 @@ void i80186_cpu_device::device_start()
 	state_add( I80186_REQST, "REQST", m_intr.request ).formatstr("%04X");
 	state_add( I80186_PRIMSK, "PRIMSK", m_intr.priority_mask ).formatstr("%04X");
 	state_add( I80186_INTSTS, "INTSTS", m_intr.status ).formatstr("%04X");
-	state_add( I80186_TCUCON, "TCUCON", m_intr.timer ).formatstr("%04X");
+	state_add( I80186_TCUCON, "TCUCON", m_intr.timer[0] ).formatstr("%04X");
 	state_add( I80186_DMA0CON, "DMA0CON", m_intr.dma[0] ).formatstr("%04X");
 	state_add( I80186_DMA1CON, "DMA1CON", m_intr.dma[1] ).formatstr("%04X");
 	state_add( I80186_I0CON, "I0CON", m_intr.ext[0] ).formatstr("%04X");
@@ -649,6 +651,7 @@ void i80186_cpu_device::device_start()
 	save_item(NAME(m_dma[1].dest));
 	save_item(NAME(m_dma[1].count));
 	save_item(NAME(m_dma[1].control));
+	save_item(NAME(m_intr.vector));
 	save_item(NAME(m_intr.pending));
 	save_item(NAME(m_intr.ack_mask));
 	save_item(NAME(m_intr.priority_mask));
@@ -674,6 +677,7 @@ void i80186_cpu_device::device_start()
 	memset(&m_intr, 0, sizeof(intr_state));
 	memset(&m_mem, 0, sizeof(mem_state));
 	m_reloc = 0;
+	m_last_dma = 0;
 
 	m_timer[0].int_timer = timer_alloc(TIMER_INT0);
 	m_timer[1].int_timer = timer_alloc(TIMER_INT1);
@@ -683,6 +687,8 @@ void i80186_cpu_device::device_start()
 	m_out_tmrout1_func.resolve_safe();
 	m_read_slave_ack_func.resolve_safe(0);
 	m_out_chip_select_func.resolve_safe();
+	m_irmx_irq_cb.resolve_safe();
+	m_irmx_irq_ack.resolve();
 }
 
 void i80186_cpu_device::device_reset()
@@ -690,7 +696,9 @@ void i80186_cpu_device::device_reset()
 	i8086_common_cpu_device::device_reset();
 	/* reset the interrupt state */
 	m_intr.priority_mask    = 0x0007;
-	m_intr.timer            = 0x000f;
+	m_intr.timer[0]         = 0x000f;
+	m_intr.timer[1]         = 0x000f;
+	m_intr.timer[2]         = 0x000f;
 	m_intr.dma[0]           = 0x000f;
 	m_intr.dma[1]           = 0x000f;
 	m_intr.ext[0]           = 0x000f;
@@ -841,6 +849,17 @@ void i80186_cpu_device::write_word(uint32_t addr, uint16_t data)
  *  80186 interrupt controller
  *
  *************************************/
+IRQ_CALLBACK_MEMBER(i80186_cpu_device::inta_callback)
+{
+	if (BIT(m_reloc, 14))
+	{
+		if (!m_irmx_irq_ack.isnull())
+			return m_irmx_irq_ack(device, irqline);
+		return 0;
+	}
+	return int_callback(device, irqline);
+}
+
 IRQ_CALLBACK_MEMBER(i80186_cpu_device::int_callback)
 {
 	uint8_t   vector;
@@ -879,28 +898,44 @@ IRQ_CALLBACK_MEMBER(i80186_cpu_device::int_callback)
 	if((LOG_INTERRUPTS) && (m_intr.in_service!=old))
 		logerror("intr.in_service changed from %02X to %02X\n",old,m_intr.in_service);
 
-	if (m_intr.ack_mask == 0x0001)
+	if (!BIT(m_reloc, 14))
 	{
-		switch (m_intr.poll_status & 0x1f)
+		if (m_intr.ack_mask == 0x0001)
 		{
-			case 0x08:  m_intr.status &= ~0x01; break;
-			case 0x12:  m_intr.status &= ~0x02; break;
-			case 0x13:  m_intr.status &= ~0x04; break;
+			switch (m_intr.poll_status & 0x1f)
+			{
+				case 0x08:  m_intr.status &= ~0x01; break;
+				case 0x12:  m_intr.status &= ~0x02; break;
+				case 0x13:  m_intr.status &= ~0x04; break;
+			}
 		}
+
+		/* return the vector */
+		switch(m_intr.poll_status & 0x1F)
+		{
+			case 0x0C: vector = (m_intr.ext[0] & EXTINT_CTRL_CASCADE) ? m_read_slave_ack_func(0) : (m_intr.poll_status & 0x1f); break;
+			case 0x0D: vector = (m_intr.ext[1] & EXTINT_CTRL_CASCADE) ? m_read_slave_ack_func(1) : (m_intr.poll_status & 0x1f); break;
+			default:
+				vector = m_intr.poll_status & 0x1f; break;
+		}
+	}
+	else
+	{
+		if (m_intr.ack_mask & 0x31)
+		{
+			if (m_intr.ack_mask & 1)
+				m_intr.status &= ~0x01;
+			else if(m_intr.ack_mask & 0x10)
+				m_intr.status &= ~0x02;
+			else if(m_intr.ack_mask & 0x20)
+				m_intr.status &= ~0x04;
+		}
+		vector = m_intr.poll_status & 0xff;
 	}
 	m_intr.ack_mask = 0;
 
 	/* a request no longer pending */
 	m_intr.poll_status &= ~0x8000;
-
-	/* return the vector */
-	switch(m_intr.poll_status & 0x1F)
-	{
-		case 0x0C: vector = (m_intr.ext[0] & EXTINT_CTRL_CASCADE) ? m_read_slave_ack_func(0) : (m_intr.poll_status & 0x1f); break;
-		case 0x0D: vector = (m_intr.ext[1] & EXTINT_CTRL_CASCADE) ? m_read_slave_ack_func(1) : (m_intr.poll_status & 0x1f); break;
-		default:
-			vector = m_intr.poll_status & 0x1f; break;
-	}
 
 	if (LOG_INTERRUPTS)
 	{
@@ -925,27 +960,52 @@ void i80186_cpu_device::update_interrupt_state()
 	for (Priority = 0; Priority <= m_intr.priority_mask; Priority++)
 	{
 		/* note: by checking 4 bits, we also verify that the mask is off */
-		if ((m_intr.timer & 0x0F) == Priority)
+		if (BIT(m_reloc, 14))
 		{
-			/* if we're already servicing something at this level, don't generate anything new */
-			if (m_intr.in_service & 0x01)
-				return;
-
-			/* if there's something pending, generate an interrupt */
-			if (m_intr.status & 0x07)
+			for (IntNo = 0; IntNo < 3; IntNo++)
 			{
-				if (m_intr.status & 1)
-					new_vector = 0x08;
-				else if (m_intr.status & 2)
-					new_vector = 0x12;
-				else if (m_intr.status & 4)
-					new_vector = 0x13;
-				else
-					logerror("Invalid timer interrupt!\n");
+				if ((m_intr.timer[IntNo] & 0x0F) == Priority)
+				{
+					int irq = (1 << IntNo);
+					/* if we're already servicing something at this level, don't generate anything new */
+					if (m_intr.in_service & 0x01)
+						return;
 
-				/* set the clear mask and generate the int */
-				m_intr.ack_mask = 0x0001;
-				goto generate_int;
+					/* if there's something pending, generate an interrupt */
+					if (m_intr.status & irq)
+					{
+						new_vector = m_intr.vector | Priority;
+						/* set the clear mask and generate the int */
+						m_intr.ack_mask = IntNo ? (8 << IntNo) : 1;
+						goto generate_int;
+					}
+				}
+			}
+		}
+		else
+		{
+			if ((m_intr.timer[0] & 0x0F) == Priority)
+			{
+				/* if we're already servicing something at this level, don't generate anything new */
+				if (m_intr.in_service & 0x01)
+					return;
+
+				/* if there's something pending, generate an interrupt */
+				if (m_intr.status & 0x07)
+				{
+					if (m_intr.status & 1)
+						new_vector = 0x08;
+					else if (m_intr.status & 2)
+						new_vector = 0x12;
+					else if (m_intr.status & 4)
+						new_vector = 0x13;
+					else
+						logerror("Invalid timer interrupt!\n");
+
+					/* set the clear mask and generate the int */
+					m_intr.ack_mask = 0x0001;
+					goto generate_int;
+				}
 			}
 		}
 
@@ -960,13 +1020,19 @@ void i80186_cpu_device::update_interrupt_state()
 				/* if there's something pending, generate an interrupt */
 				if (m_intr.request & (0x04 << IntNo))
 				{
-					new_vector = 0x0a + IntNo;
+					if (BIT(m_reloc, 14))
+						new_vector = m_intr.vector | Priority;
+					else
+						new_vector = 0x0a + IntNo;
 
 					/* set the clear mask and generate the int */
 					m_intr.ack_mask = 0x0004 << IntNo;
 					goto generate_int;
 				}
 			}
+
+		if (BIT(m_reloc, 14))
+			continue;
 
 		/* check external interrupts */
 		for (IntNo = 0; IntNo < 4; IntNo++)
@@ -1002,14 +1068,22 @@ void i80186_cpu_device::update_interrupt_state()
 		}
 	}
 	m_intr.pending = 0;
-	set_input_line(0, CLEAR_LINE);
+	if (!BIT(m_reloc, 14))
+		set_input_line(0, CLEAR_LINE);
+	else
+		m_irmx_irq_cb(CLEAR_LINE);
 	return;
 
 generate_int:
 	/* generate the appropriate interrupt */
 	m_intr.poll_status = 0x8000 | new_vector;
 	if (!m_intr.pending)
-		set_input_line(0, ASSERT_LINE);
+	{
+		if (!BIT(m_reloc, 14))
+			set_input_line(0, ASSERT_LINE);
+		else
+			m_irmx_irq_cb(ASSERT_LINE);
+	}
 	m_intr.pending = 1;
 	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", machine().time().as_double(), new_vector);
 }
@@ -1048,11 +1122,27 @@ void i80186_cpu_device::handle_eoi(int data)
 		for (Priority = 0; ((Priority <= 7) && !handled); Priority++)
 		{
 			/* check for in-service timers */
-			if ((m_intr.timer & 0x07) == Priority && (m_intr.in_service & 0x01))
+			if (BIT(m_reloc, 14))
 			{
-				m_intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", machine().time().as_double());
-				handled=1;
+				for (IntNo = 0; ((IntNo < 2) && !handled) ; IntNo++)
+				{
+					int mask = IntNo ? (8 << IntNo) : 1;
+					if ((m_intr.timer[IntNo] & 0x07) == Priority && (m_intr.in_service & mask))
+					{
+						m_intr.in_service &= ~mask;
+						if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer%d\n", machine().time().as_double(), IntNo);
+						handled=1;
+					}
+				}
+			}
+			else
+			{
+				if ((m_intr.timer[0] & 0x07) == Priority && (m_intr.in_service & 0x01))
+				{
+					m_intr.in_service &= ~0x01;
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", machine().time().as_double());
+					handled=1;
+				}
 			}
 
 			/* check for in-service DMA interrupts */
@@ -1063,6 +1153,9 @@ void i80186_cpu_device::handle_eoi(int data)
 					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", machine().time().as_double(), IntNo);
 					handled=1;
 				}
+
+			if (BIT(m_reloc, 14))
+				continue;
 
 			/* check external interrupts */
 			for (IntNo = 0; ((IntNo < 4) && !handled) ; IntNo++)
@@ -1080,6 +1173,17 @@ void i80186_cpu_device::handle_eoi(int data)
 /* Trigger an external interrupt, optionally supplying the vector to take */
 void i80186_cpu_device::external_int(uint16_t intno, int state)
 {
+	if (BIT(m_reloc, 14))
+	{
+		if (!intno)
+		{
+			set_input_line(0, state);
+			return;
+		}
+		logerror("irq to line %d in irmx mode\n",intno);
+		return;
+	}
+
 	if (!(m_intr.ext_state & (1 << intno)) == !state)
 		return;
 
@@ -1453,6 +1557,10 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 
 	switch (offset)
 	{
+		case 0x10:
+			if (LOG_PORTS) logerror("%05X:read interrupt vector\n", m_pc);
+			return m_intr.vector;
+
 		case 0x11:
 			if (LOG_PORTS) logerror("%05X:ERROR - read from 80186 EOI\n", m_pc);
 			break;
@@ -1460,7 +1568,7 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 		case 0x12:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt poll\n", m_pc);
 			if (m_intr.poll_status & 0x8000)
-				int_callback(*this, 0);
+				inta_callback(*this, 0);
 			return m_intr.poll_status;
 
 		case 0x13:
@@ -1469,13 +1577,21 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 
 		case 0x14:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt mask\n", m_pc);
-			temp  = (m_intr.timer  >> 3) & 0x01;
+			temp  = (m_intr.timer[0]  >> 3) & 0x01;
 			temp |= (m_intr.dma[0] >> 1) & 0x04;
 			temp |= (m_intr.dma[1] >> 0) & 0x08;
-			temp |= (m_intr.ext[0] << 1) & 0x10;
-			temp |= (m_intr.ext[1] << 2) & 0x20;
-			temp |= (m_intr.ext[2] << 3) & 0x40;
-			temp |= (m_intr.ext[3] << 4) & 0x80;
+			if (BIT(m_reloc, 14))
+			{
+				temp |= (m_intr.timer[1] << 1) & 0x10;
+				temp |= (m_intr.timer[2] << 2) & 0x20;
+			}
+			else
+			{
+				temp |= (m_intr.ext[0] << 1) & 0x10;
+				temp |= (m_intr.ext[1] << 2) & 0x20;
+				temp |= (m_intr.ext[2] << 3) & 0x40;
+				temp |= (m_intr.ext[3] << 4) & 0x80;
+			}
 			return temp;
 
 		case 0x15:
@@ -1499,7 +1615,7 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 
 		case 0x19:
 			if (LOG_PORTS) logerror("%05X:read 80186 timer interrupt control\n", m_pc);
-			return m_intr.timer;
+			return m_intr.timer[0];
 
 		case 0x1a:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA 0 interrupt control\n", m_pc);
@@ -1511,19 +1627,31 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 
 		case 0x1c:
 			if (LOG_PORTS) logerror("%05X:read 80186 INT 0 interrupt control\n", m_pc);
-			return m_intr.ext[0];
+			if (BIT(m_reloc, 14))
+				return m_intr.timer[1];
+			else
+				return m_intr.ext[0];
 
 		case 0x1d:
 			if (LOG_PORTS) logerror("%05X:read 80186 INT 1 interrupt control\n", m_pc);
-			return m_intr.ext[1];
+			if (BIT(m_reloc, 14))
+				return m_intr.timer[2];
+			else
+				return m_intr.ext[1];
 
 		case 0x1e:
 			if (LOG_PORTS) logerror("%05X:read 80186 INT 2 interrupt control\n", m_pc);
-			return m_intr.ext[2];
+			if (BIT(m_reloc, 14))
+				return 0;
+			else
+				return m_intr.ext[2];
 
 		case 0x1f:
 			if (LOG_PORTS) logerror("%05X:read 80186 INT 3 interrupt control\n", m_pc);
-			return m_intr.ext[3];
+			if (BIT(m_reloc, 14))
+				return 0;
+			else
+				return m_intr.ext[3];
 
 		case 0x28:
 		case 0x2c:
@@ -1633,6 +1761,11 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 
 	switch (offset)
 	{
+		case 0x10:
+			if (LOG_PORTS) logerror("%05X:write interrupt vector = %04X\n", m_pc, data);
+			m_intr.vector = data & 0xf8;
+			break;
+
 		case 0x11:
 			if (LOG_PORTS) logerror("%05X:80186 EOI = %04X\n", m_pc, data);
 			handle_eoi(data);
@@ -1649,13 +1782,21 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 
 		case 0x14:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt mask = %04X\n", m_pc, data);
-			m_intr.timer  = (m_intr.timer  & ~0x08) | ((data << 3) & 0x08);
+			m_intr.timer[0]  = (m_intr.timer[0]  & ~0x08) | ((data << 3) & 0x08);
 			m_intr.dma[0] = (m_intr.dma[0] & ~0x08) | ((data << 1) & 0x08);
 			m_intr.dma[1] = (m_intr.dma[1] & ~0x08) | ((data << 0) & 0x08);
-			m_intr.ext[0] = (m_intr.ext[0] & ~0x08) | ((data >> 1) & 0x08);
-			m_intr.ext[1] = (m_intr.ext[1] & ~0x08) | ((data >> 2) & 0x08);
-			m_intr.ext[2] = (m_intr.ext[2] & ~0x08) | ((data >> 3) & 0x08);
-			m_intr.ext[3] = (m_intr.ext[3] & ~0x08) | ((data >> 4) & 0x08);
+			if (BIT(m_reloc, 14))
+			{
+				m_intr.timer[1] = (m_intr.timer[1] & ~0x08) | ((data >> 1) & 0x08);
+				m_intr.timer[2] = (m_intr.timer[2] & ~0x08) | ((data >> 2) & 0x08);
+			}
+			else
+			{
+				m_intr.ext[0] = (m_intr.ext[0] & ~0x08) | ((data >> 1) & 0x08);
+				m_intr.ext[1] = (m_intr.ext[1] & ~0x08) | ((data >> 2) & 0x08);
+				m_intr.ext[2] = (m_intr.ext[2] & ~0x08) | ((data >> 3) & 0x08);
+				m_intr.ext[3] = (m_intr.ext[3] & ~0x08) | ((data >> 4) & 0x08);
+			}
 			update_interrupt_state();
 			break;
 
@@ -1685,7 +1826,7 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 
 		case 0x19:
 			if (LOG_PORTS) logerror("%05X:80186 timer interrupt contol = %04X\n", m_pc, data);
-			m_intr.timer = data & 0x000f;
+			m_intr.timer[0] = data & 0x000f;
 			update_interrupt_state();
 			break;
 
@@ -1703,25 +1844,33 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 
 		case 0x1c:
 			if (LOG_PORTS) logerror("%05X:80186 INT 0 interrupt control = %04X\n", m_pc, data);
-			m_intr.ext[0] = data & 0x007f;
+			if (BIT(m_reloc, 14))
+				m_intr.timer[1] = data & 0x000f;
+			else
+				m_intr.ext[0] = data & 0x007f;
 			update_interrupt_state();
 			break;
 
 		case 0x1d:
 			if (LOG_PORTS) logerror("%05X:80186 INT 1 interrupt control = %04X\n", m_pc, data);
-			m_intr.ext[1] = data & 0x007f;
+			if (BIT(m_reloc, 14))
+				m_intr.timer[2] = data & 0x000f;
+			else
+				m_intr.ext[1] = data & 0x007f;
 			update_interrupt_state();
 			break;
 
 		case 0x1e:
 			if (LOG_PORTS) logerror("%05X:80186 INT 2 interrupt control = %04X\n", m_pc, data);
-			m_intr.ext[2] = data & 0x001f;
+			if (!BIT(m_reloc, 14))
+				m_intr.ext[2] = data & 0x001f;
 			update_interrupt_state();
 			break;
 
 		case 0x1f:
 			if (LOG_PORTS) logerror("%05X:80186 INT 3 interrupt control = %04X\n", m_pc, data);
-			m_intr.ext[3] = data & 0x001f;
+			if (!BIT(m_reloc, 14))
+				m_intr.ext[3] = data & 0x001f;
 			update_interrupt_state();
 			break;
 

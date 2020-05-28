@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(C64_EXPANSION_SLOT, c64_expansion_slot_device, "c64_expansion
 //-------------------------------------------------
 
 device_c64_expansion_card_interface::device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "c64exp"),
 	m_roml(*this, "roml"),
 	m_romh(*this, "romh"),
 	m_romx(*this, "romx"),
@@ -60,7 +60,7 @@ device_c64_expansion_card_interface::~device_c64_expansion_card_interface()
 
 c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_c64_expansion_card_interface>(mconfig, *this),
 	device_image_interface(mconfig, *this),
 	m_read_dma_cd(*this),
 	m_write_dma_cd(*this),
@@ -73,27 +73,12 @@ c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconf
 
 
 //-------------------------------------------------
-//  device_validity_check -
-//-------------------------------------------------
-
-void c64_expansion_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const carddev = get_card_device();
-	if (carddev && !dynamic_cast<device_c64_expansion_card_interface *>(carddev))
-		osd_printf_error("Card device %s (%s) does not implement device_c64_expansion_card_interface\n", carddev->tag(), carddev->name());
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void c64_expansion_slot_device::device_start()
 {
-	device_t *const carddev = get_card_device();
-	m_card = dynamic_cast<device_c64_expansion_card_interface *>(carddev);
-	if (carddev && !m_card)
-		fatalerror("Card device %s (%s) does not implement device_c64_expansion_card_interface\n", carddev->tag(), carddev->name());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_read_dma_cd.resolve_safe(0);

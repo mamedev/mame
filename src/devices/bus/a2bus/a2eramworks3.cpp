@@ -6,6 +6,7 @@
 
     Applied Engineering RamWorks III
 
+    The AE RamWorks patent is US 4601018.
 
 *********************************************************************/
 
@@ -89,8 +90,8 @@ uint8_t *a2eaux_ramworks3_device::get_auxbank_ptr()
 */
 void a2eaux_ramworks3_device::write_c07x(uint8_t offset, uint8_t data)
 {
-	// write to C073?
-	if (offset == 3)
+	// write to C071/3/5/7?
+	if ((offset & 0x9) == 1)
 	{
 		m_bank = 0x10000 * (data & 0x7f);
 	}

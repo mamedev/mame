@@ -92,15 +92,15 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( pc_dma_hrq_changed );
 	DECLARE_WRITE_LINE_MEMBER( pc_dma8237_out_eop );
-	DECLARE_READ8_MEMBER( pc_dma_read_byte );
-	DECLARE_WRITE8_MEMBER( pc_dma_write_byte );
-	DECLARE_READ8_MEMBER( pc_dma8237_1_dack_r );
-	DECLARE_READ8_MEMBER( pc_dma8237_2_dack_r );
-	DECLARE_READ8_MEMBER( pc_dma8237_3_dack_r );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_1_dack_w );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_2_dack_w );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_3_dack_w );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_0_dack_w );
+	uint8_t pc_dma_read_byte(offs_t offset);
+	void pc_dma_write_byte(offs_t offset, uint8_t data);
+	uint8_t pc_dma8237_1_dack_r();
+	uint8_t pc_dma8237_2_dack_r();
+	uint8_t pc_dma8237_3_dack_r();
+	void pc_dma8237_1_dack_w(uint8_t data);
+	void pc_dma8237_2_dack_w(uint8_t data);
+	void pc_dma8237_3_dack_w(uint8_t data);
+	void pc_dma8237_0_dack_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pc_dack0_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );

@@ -52,24 +52,24 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
 	switch (index)
 	{
 		case 7:
-			mapper.map_as_handler(0x00000, 0x04000, 0xffc000, read16_delegate(FUNC(segas18_state::misc_io_r), this), write16_delegate(FUNC(segas18_state::misc_io_w), this));
+			mapper.map_as_handler(0x00000, 0x04000, 0xffc000, read16_delegate(*this, FUNC(segas18_state::misc_io_r)), write16_delegate(*this, FUNC(segas18_state::misc_io_w)));
 			break;
 
 		case 6:
-			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "paletteram", write16_delegate(FUNC(segas18_state::paletteram_w), this));
+			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "paletteram", write16_delegate(*this, FUNC(segas18_state::paletteram_w)));
 			break;
 
 		case 5:
-			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segas18_state::tileram_w), this));
-			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segas18_state::textram_w), this));
+			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(*this, FUNC(segas18_state::tileram_w)));
+			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(*this, FUNC(segas18_state::textram_w)));
 			break;
 
 		case 4:
-			mapper.map_as_ram(0x00000, 0x00800, 0xfff800, "sprites", write16_delegate());
+			mapper.map_as_ram(0x00000, 0x00800, 0xfff800, "sprites", write16_delegate(*this));
 			break;
 
 		case 3:
-			mapper.map_as_ram(0x00000, 0x04000, 0xffc000, "workram", write16_delegate());
+			mapper.map_as_ram(0x00000, 0x04000, 0xffc000, "workram", write16_delegate(*this));
 			break;
 
 		case 2:
@@ -78,7 +78,7 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
 				case ROM_BOARD_171_SHADOW:  break;  // ???
 				case ROM_BOARD_837_7525:
 				case ROM_BOARD_171_5874:
-				case ROM_BOARD_171_5987:    mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::genesis_vdp_r), this), write16_delegate(FUNC(segas18_state::genesis_vdp_w), this)); break;
+				case ROM_BOARD_171_5987:    mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(*this, FUNC(segas18_state::genesis_vdp_r)), write16_delegate(*this, FUNC(segas18_state::genesis_vdp_w))); break;
 				default:                    assert(false);
 			}
 			break;
@@ -86,14 +86,14 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
 		case 1:
 			switch (m_romboard)
 			{
-				case ROM_BOARD_171_SHADOW:  mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::genesis_vdp_r), this), write16_delegate(FUNC(segas18_state::genesis_vdp_w), this)); break;
-				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate()); break;
+				case ROM_BOARD_171_SHADOW:  mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(*this, FUNC(segas18_state::genesis_vdp_r)), write16_delegate(*this, FUNC(segas18_state::genesis_vdp_w))); break;
+				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(*this)); break;
 				case ROM_BOARD_171_5987:    if (romsize <= 0x100000)
-												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(FUNC(segas18_state::rom_5987_bank_w), this));
+												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(*this, FUNC(segas18_state::rom_5987_bank_w)));
 											else
-												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom1base", "decrypted_rom1base",0x100000, write16_delegate(FUNC(segas18_state::rom_5987_bank_w), this));
+												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom1base", "decrypted_rom1base",0x100000, write16_delegate(*this, FUNC(segas18_state::rom_5987_bank_w)));
 											break;
-				case ROM_BOARD_837_7525:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(FUNC(segas18_state::rom_837_7525_bank_w), this));
+				case ROM_BOARD_837_7525:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(*this, FUNC(segas18_state::rom_837_7525_bank_w)));
 				break;
 
 				default:                    assert(false);
@@ -104,12 +104,12 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
 			switch (m_romboard)
 			{
 				case ROM_BOARD_171_SHADOW:
-				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate()); break;
+				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate(*this)); break;
 				case ROM_BOARD_837_7525:
 				case ROM_BOARD_171_5987:    if (romsize <= 0x100000)
-												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate());
+												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate(*this));
 											else
-												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate());
+												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate(*this));
 											break;
 				default:                    assert(false);
 			}
@@ -188,7 +188,7 @@ void segas18_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER( segas18_state::misc_outputs_w )
+void segas18_state::misc_outputs_w(uint8_t data)
 {
 	// miscellaneous output
 	set_grayscale(~data & 0x40);
@@ -211,7 +211,7 @@ READ16_MEMBER( segas18_state::misc_io_r )
 		// I/O chip
 		case 0x0000/2:
 		case 0x1000/2:
-			return m_io->read(space, offset) | (open_bus_r(space) & 0xff00);
+			return m_io->read(offset) | (m_mapper->open_bus_r() & 0xff00);
 
 		// video control latch
 		case 0x2000/2:
@@ -224,7 +224,7 @@ READ16_MEMBER( segas18_state::misc_io_r )
 	if (!m_custom_io_r.isnull())
 		return m_custom_io_r(space, offset, mem_mask);
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 WRITE16_MEMBER( segas18_state::misc_io_w )
@@ -237,7 +237,7 @@ WRITE16_MEMBER( segas18_state::misc_io_w )
 		case 0x1000/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_io->write(space, offset, data);
+				m_io->write(offset, data);
 				return;
 			}
 			break;
@@ -268,7 +268,7 @@ WRITE16_MEMBER( segas18_state::misc_io_w )
  *
  *************************************/
 
-WRITE8_MEMBER( segas18_state::rom_5874_bank_w )
+void segas18_state::rom_5874_bank_w(uint8_t data)
 {
 	if (m_romboard == ROM_BOARD_171_5874 || m_romboard == ROM_BOARD_171_SHADOW)
 	{
@@ -356,7 +356,7 @@ READ16_MEMBER( segas18_state::ddcrew_custom_io_r )
 		case 0x3024/2:
 			return ioport("EXSERVICE")->read();
 	}
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 
@@ -380,7 +380,7 @@ READ16_MEMBER( segas18_state::lghost_custom_io_r )
 			m_lghost_value <<= 1;
 			return result;
 	}
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
@@ -563,7 +563,7 @@ WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 }
 
 
-WRITE8_MEMBER( segas18_state::lghost_gun_recoil_w )
+void segas18_state::lghost_gun_recoil_w(uint8_t data)
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -582,16 +582,16 @@ WRITE8_MEMBER( segas18_state::lghost_gun_recoil_w )
 READ16_MEMBER( segas18_state::wwally_custom_io_r )
 {
 	if (offset >= 0x3000/2 && offset < 0x3018/2)
-		return m_upd4701[(offset & 0x0018/2) >> 2]->read_xy(space, offset & 0x0006/2);
+		return m_upd4701[(offset & 0x0018/2) >> 2]->read_xy(offset & 0x0006/2);
 
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 
 WRITE16_MEMBER( segas18_state::wwally_custom_io_w )
 {
 	if (offset >= 0x3000/2 && offset < 0x3018/2)
-		m_upd4701[(offset & 0x0018/2) >> 2]->reset_xy_r(space, 0);
+		m_upd4701[(offset & 0x0018/2) >> 2]->reset_xy_r();
 }
 
 
@@ -602,7 +602,7 @@ WRITE16_MEMBER( segas18_state::wwally_custom_io_w )
  *
  *************************************/
 
-WRITE8_MEMBER( segas18_state::soundbank_w )
+void segas18_state::soundbank_w(uint8_t data)
 {
 	m_soundbank->set_entry(data);
 }
@@ -1140,14 +1140,17 @@ static INPUT_PORTS_START( mwalk )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 ) // individual mode
+	// individual coin chute setting changes around the default behaviour
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x20)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) // individual mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x00)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "2 Credits to Start" ) PORT_DIPLOCATION("SW2:1")
@@ -1156,19 +1159,19 @@ static INPUT_PORTS_START( mwalk )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x08, 0x00, "Player Vitality" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Player Vitality" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x10, 0x00, "Play Mode" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, "Play Mode" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "2 Players" )
 	PORT_DIPSETTING(    0x00, "3 Players" )
-	PORT_DIPNAME( 0x20, 0x00, "Coin Chute" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Coin Chute" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "Common" )
 	PORT_DIPSETTING(    0x00, "Individual" )
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
@@ -1178,19 +1181,20 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mwalka )
 	PORT_INCLUDE( mwalk )
 
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x20)
+
 	PORT_MODIFY("DSW")
-	//"SW2:1" not divert from "mwalk"
-	//"SW2:2" not divert from "mwalk"
-	//"SW2:3" not divert from "mwalk"
-	//"SW2:4" not divert from "mwalk"
+	// inverts the meaning of these two dips, to follow suit with the US 3P cabinet
 	PORT_DIPNAME( 0x10, 0x10, "Play Mode" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, "2 Players" )
 	PORT_DIPSETTING(    0x10, "3 Players" )
 	PORT_DIPNAME( 0x20, 0x20, "Coin Chute" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, "Common" )
 	PORT_DIPSETTING(    0x20, "Individual" )
-	//"SW2:7" not divert from "mwalk"
-	//"SW2:8" not divert from "mwalk"
 INPUT_PORTS_END
 
 
@@ -1321,7 +1325,7 @@ void segas18_state::system18(machine_config &config)
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
 	SEGA_315_5195_MEM_MAPPER(config, m_mapper, 10000000, m_maincpu);
-	m_mapper->set_mapper(FUNC(segas18_state::memory_mapper), this);
+	m_mapper->set_mapper(FUNC(segas18_state::memory_mapper));
 	m_mapper->pbf().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	SEGA_315_5296(config, m_io, 16000000);
@@ -1343,7 +1347,7 @@ void segas18_state::system18(machine_config &config)
 	m_vdp->lv4_irq().set(FUNC(segas18_state::vdp_lv4irqline_callback_s18));
 	m_vdp->set_alt_timing(1);
 	m_vdp->set_pal_write_base(0x1000);
-	m_vdp->set_palette(m_palette);
+	m_vdp->set_ext_palette(m_palette);
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.0);
 
 	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "screen", 0, 1);
@@ -1441,7 +1445,7 @@ void segas18_state::system18_i8751(machine_config &config)
 	system18(config);
 
 	// basic machine hardware
-	m_maincpu->set_vblank_int(device_interrupt_delegate(), nullptr);
+	m_maincpu->remove_vblank_int();
 
 	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
@@ -1455,7 +1459,7 @@ void segas18_state::system18_fd1094_i8751(machine_config &config)
 	system18_fd1094(config);
 
 	// basic machine hardware
-	m_maincpu->set_vblank_int(device_interrupt_delegate(), nullptr);
+	m_maincpu->remove_vblank_int();
 
 	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
@@ -2683,6 +2687,9 @@ ROM_END
     Moonwalker, Sega System 18
     CPU: FD1094 (317-0159)
     ROM Board: 171-5873B
+   Main board: 837-7530-02
+      Game BD: 833-7528-02 MOONWALKER
+    ROM Board: 834-7529-02
 */
 ROM_START( mwalk )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom cpu 317-0159
@@ -3181,21 +3188,21 @@ void segas18_state::init_hamaway()
 void segas18_state::init_ddcrew()
 {
 	init_generic_5987();
-	m_custom_io_r = read16_delegate(FUNC(segas18_state::ddcrew_custom_io_r), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segas18_state::ddcrew_custom_io_r));
 }
 
 void segas18_state::init_lghost()
 {
 	init_generic_5987();
-	m_custom_io_r = read16_delegate(FUNC(segas18_state::lghost_custom_io_r), this);
-	m_custom_io_w = write16_delegate(FUNC(segas18_state::lghost_custom_io_w), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segas18_state::lghost_custom_io_r));
+	m_custom_io_w = write16_delegate(*this, FUNC(segas18_state::lghost_custom_io_w));
 }
 
 void segas18_state::init_wwally()
 {
 	init_generic_5987();
-	m_custom_io_r = read16_delegate(FUNC(segas18_state::wwally_custom_io_r), this);
-	m_custom_io_w = write16_delegate(FUNC(segas18_state::wwally_custom_io_w), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segas18_state::wwally_custom_io_r));
+	m_custom_io_w = write16_delegate(*this, FUNC(segas18_state::wwally_custom_io_w));
 }
 
 

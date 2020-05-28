@@ -8,11 +8,11 @@
 
 ****************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cctype>
 #include <new>
-#include <assert.h>
+#include <cassert>
 #include "coretmpl.h"
 #include "aviio.h"
 #include "avhuff.h"

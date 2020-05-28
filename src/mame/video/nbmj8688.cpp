@@ -269,7 +269,7 @@ void nbmj8688_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_nb1413m3->busyflag_w(1);
 		break;
 	default:
-		assert_always(false, "Unknown id in nbmj8688_state::device_timer");
+		throw emu_fatalerror("Unknown id in nbmj8688_state::device_timer");
 	}
 }
 
@@ -613,14 +613,14 @@ VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_pure_16bit_LCD)
 
 WRITE8_MEMBER(nbmj8688_state::HD61830B_both_instr_w)
 {
-	m_lcdc0->control_w(space, offset, data);
-	m_lcdc1->control_w(space, offset, data);
+	m_lcdc0->control_w(data);
+	m_lcdc1->control_w(data);
 }
 
 WRITE8_MEMBER(nbmj8688_state::HD61830B_both_data_w)
 {
-	m_lcdc0->data_w(space, offset, data);
-	m_lcdc1->data_w(space, offset, data);
+	m_lcdc0->data_w(data);
+	m_lcdc1->data_w(data);
 }
 
 

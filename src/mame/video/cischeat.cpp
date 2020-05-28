@@ -94,7 +94,8 @@ void wildplt_state::video_start()
 {
 	cischeat_state::video_start();
 	m_buffer_spriteram = &m_ram[0x8000/2];
-	m_spriteram = auto_alloc_array(machine(),uint16_t, 0x1000/2);
+	m_allocated_spriteram = std::make_unique<uint16_t[]>(0x1000/2);
+	m_spriteram = m_allocated_spriteram.get();
 }
 
 WRITE16_MEMBER(wildplt_state::sprite_dma_w)
@@ -139,19 +140,6 @@ READ16_MEMBER(cischeat_state::bigrun_ip_select_r)
 		case 2 : return 0xffff;                 // Cockpit: Left / Right Position?
 		case 3 : return ioport("PEDAL")->read();    // Accelerator (Pedal)
 		default: return 0xffff;
-	}
-}
-
-
-WRITE16_MEMBER(cischeat_state::leds_out_w)
-{
-	// leds
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-		m_leds[0] = BIT(data, 4);   // start button
-		m_leds[1] = BIT(data, 5);   // ?
 	}
 }
 
@@ -1009,11 +997,11 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 
-		popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%04X",
+		popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%02X",
 							m_scudhamm_motor_command,
 							scudhamm_motor_pos_r(space,0,0xffff),
 							scudhamm_motor_status_r(space,0,0xffff),
-							scudhamm_analog_r(space,0,0xffff) );
+							scudhamm_analog_r() );
 
 #if 0
 	// captflag

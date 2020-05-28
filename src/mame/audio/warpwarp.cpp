@@ -75,18 +75,18 @@ void warpwarp_sound_device::device_timer(emu_timer &timer, device_timer_id id, i
 {
 	switch (id)
 	{
-		case TIMER_SOUND_VOLUME_DECAY:
-			if (--m_sound_volume < 0)
-				m_sound_volume = 0;
-			break;
+	case TIMER_SOUND_VOLUME_DECAY:
+		if (--m_sound_volume < 0)
+			m_sound_volume = 0;
+		break;
 
-		case TIMER_MUSIC_VOLUME_DECAY:
-			if (--m_music_volume < 0)
-				m_music_volume = 0;
-			break;
+	case TIMER_MUSIC_VOLUME_DECAY:
+		if (--m_music_volume < 0)
+			m_music_volume = 0;
+		break;
 
-		default:
-			assert_always(false, "Unknown id in warpwarp_sound_device::device_timer");
+	default:
+		throw emu_fatalerror("Unknown id in warpwarp_sound_device::device_timer");
 	}
 }
 

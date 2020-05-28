@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(glass_state::get_tile_info)
 	int data2 = m_videoram[(Layer * 0x1000 / 2) + (tile_index << 1) + 1];
 	int code = ((data & 0x03) << 14) | ((data & 0x0fffc) >> 2);
 
-	SET_TILE_INFO_MEMBER(0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6));
+	tileinfo.set(0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6));
 }
 
 /***************************************************************************
@@ -112,8 +112,8 @@ WRITE16_MEMBER(glass_state::vram_w)
 
 void glass_state::video_start()
 {
-	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(glass_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(glass_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(glass_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(glass_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_screen_bitmap = std::make_unique<bitmap_ind16>(320, 200);
 
 	save_item(NAME(*m_screen_bitmap));

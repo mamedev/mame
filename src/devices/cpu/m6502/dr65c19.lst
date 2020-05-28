@@ -1,0 +1,20 @@
+# license:BSD-3-Clause
+# copyright-holders:AJR
+# r65c19 - many new instructions, others replaced or subtly altered in behavior
+brk_r_imp   ora_zpi     mpy_imp     tip_imp     nop_zpg     ora_zpg     asl_c_zpg   rmb_bzp     php_imp     ora_imm     asl_acc     jsb_vec     jpi_ind     ora_aba     asl_c_aba   bbr_zpb
+bpl_rel     ora_ipx     mpa_imp     lab_acc     nop_zpx     ora_zpx     asl_c_zpx   rmb_bzp     clc_imp     ora_aby     neg_acc     jsb_vec     nop_c_abx   ora_abx     asl_c_abx   bbr_zpb
+jsr_r_adr   and_zpi     psh_imp     phw_imp     bit_zpg     and_zpg     rol_c_zpg   rmb_bzp     plp_imp     and_imm     rol_acc     jsb_vec     bit_aba     and_aba     rol_c_aba   bbr_zpb
+bmi_rel     and_ipx     pul_imp     plw_imp     nop_zpx     and_zpx     rol_c_zpx   rmb_bzp     sec_imp     and_aby     asr_acc     jsb_vec     nop_c_abx   and_abx     rol_c_abx   bbr_zpb
+rti_imp     eor_zpi     rnd_imp     nop_c_imp   nop_zpg     eor_zpg     lsr_c_zpg   rmb_bzp     pha_imp     eor_imm     lsr_acc     jsb_vec     jmp_adr     eor_aba     lsr_c_aba   bbr_zpb
+bvc_rel     eor_ipx     clw_imp     nop_c_imp   nop_zpx     eor_zpx     lsr_c_zpx   rmb_bzp     cli_imp     eor_aby     phy_imp     jsb_vec     nop_c_abx   eor_abx     lsr_c_abx   bbr_zpb
+rts_r_imp   adc_c_zpi   taw_imp     nop_c_imp   add_zpg     adc_c_zpg   ror_c_zpg   rmb_bzp     pla_imp     adc_c_imm   ror_acc     jsb_vec     jmp_r_ind   adc_c_aba   ror_c_aba   bbr_zpb
+bvs_rel     adc_ipx     twa_imp     nop_c_imp   add_zpx     adc_c_zpx   ror_c_zpx   rmb_bzp     sei_imp     adc_c_aby   ply_imp     jsb_vec     jmp_iax     adc_c_abx   ror_c_abx   bbr_zpb
+bra_rel     sta_zpi     nop_imm     nop_c_imp   sty_zpg     sta_zpg     stx_zpg     smb_bzp     dey_imp     add_imm     txa_imp     nxt_imp     sty_aba     sta_aba     stx_aba     bbs_zpb
+bcc_rel     sta_ipx     nop_imm     nop_c_imp   sty_zpx     sta_zpx     stx_zpy     smb_bzp     tya_imp     sta_aby     txs_imp     lii_imp     nop_c_abx   sta_abx     nop_c_abx   bbs_zpb
+ldy_imm     lda_zpi     ldx_imm     nop_c_imp   ldy_zpg     lda_zpg     ldx_zpg     smb_bzp     tay_imp     lda_imm     tax_imp     lan_imp     ldy_aba     lda_aba     ldx_aba     bbs_zpb
+bcs_rel     lda_ipx     sti_imz     nop_c_imp   ldy_zpx     lda_zpx     ldx_zpy     smb_bzp     clv_imp     lda_aby     tsx_imp     ini_imp     ldy_abx     lda_abx     ldx_aby     bbs_zpb
+cpy_imm     cmp_zpi     rba_ima     nop_c_imp   cpy_zpg     cmp_zpg     dec_c_zpg   smb_bzp     iny_imp     cmp_imm     dex_imp     phi_imp     cpy_aba     cmp_aba     dec_c_aba   bbs_zpb
+bne_rel     cmp_ipx     sba_ima     nop_c_imp   exc_zpx     cmp_zpx     dec_c_zpx   smb_bzp     cld_imp     cmp_aby     phx_imp     pli_imp     nop_c_abx   cmp_abx     dec_c_abx   bbs_zpb
+cpx_imm     sbc_c_zpi   bar_amr     nop_c_imp   cpx_zpg     sbc_c_zpg   inc_c_zpg   smb_bzp     inx_imp     sbc_c_imm   nop_imp     lai_imp     cpx_aba     sbc_c_aba   inc_c_aba   bbs_zpb
+beq_rel     sbc_ipx     bas_amr     nop_c_imp   nop_zpx     sbc_c_zpx   inc_c_zpx   smb_bzp     sed_imp     sbc_c_aby   plx_imp     pia_imp     nop_c_abx   sbc_c_abx   inc_c_abx   bbs_zpb
+reset_r

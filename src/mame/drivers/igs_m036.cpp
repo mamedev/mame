@@ -117,7 +117,7 @@ ROM_START( cjdh2 )
 
 	// there is also a square socketed chip like the one on Haunted House (igs_m027) probably in need of dumping
 
-	ROM_REGION( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "cjdh2_s311cn.u33",  0x000000, 0x200000, CRC(a6fb72f0) SHA1(1d9583eafaea21d5ec078b7f2e3dc426571a9550) )
 
 	ROM_REGION( 0x200000, "oki", 0 ) // samples
@@ -135,7 +135,7 @@ ROM_START( cjdh2a )
 
 	// there is also a square socketed chip like the one on Haunted House (igs_m027) probably in need of dumping
 
-	ROM_REGION( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "cjdh2_s311cna.u33", 0x000000, 0x200000, CRC(0bc6bc1b) SHA1(c891a7051cda1fd250d9380d7f33b47c375db74d) )
 
 	ROM_REGION( 0x200000, "oki", 0 ) // samples
@@ -153,7 +153,7 @@ ROM_START( cjdh2b )
 
 	// there is also a square socketed chip like the one on Haunted House (igs_m027) probably in need of dumping
 
-	ROM_REGION( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "cjdh2_s311cnb.u33", 0x000000, 0x200000, CRC(ddcf50bd) SHA1(39a3ed728be5894a2fec5cf0858f6f40be5ccae1) )
 
 	ROM_REGION( 0x200000, "oki", 0 ) // samples
@@ -171,7 +171,7 @@ ROM_START( cjdh2c )
 
 	// there is also a square socketed chip like the one on Haunted House (igs_m027) probably in need of dumping
 
-	ROM_REGION( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "cjdh2_s215cn.u33",  0x000000, 0x200000, CRC(ebe35131) SHA1(1f167e70a80b39e0658fd97c249982a0aa622683) )
 
 	ROM_REGION( 0x200000, "oki", 0 ) // samples
@@ -188,7 +188,7 @@ ROM_START( cjddzsp )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "cjddzsp_igs036", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "cjddzsp_s122cn.u18",  0x000000, 0x200000, CRC(4a42aad6) SHA1(96805e5bfbd50686177fe50020229ea8787ade17) )
 
 	ROM_REGION( 0x800100, "oki", 0 ) // TT5665 samples
@@ -204,7 +204,7 @@ ROM_START( igsm312 )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "igsunk_igs036", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "m312cn.rom", 0x000000, 0x200000, CRC(5069c310) SHA1(d53a2e8acddfbb7afc27c68c0b3167419a3ec3e6) )
 
 	ROM_REGION( 0x800100, "oki", ROMREGION_ERASE00 ) // TT5665 samples

@@ -323,12 +323,12 @@ WRITE_LINE_MEMBER(hng64_state::dma_hreq_cb)
 	m_audiocpu->hack_w(1);
 }
 
-READ8_MEMBER(hng64_state::dma_memr_cb)
+uint8_t hng64_state::dma_memr_cb(offs_t offset)
 {
-	return m_audiocpu->space(AS_PROGRAM).read_byte(offset);;
+	return m_audiocpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(hng64_state::dma_iow3_cb)
+void hng64_state::dma_iow3_cb(uint8_t data)
 {
 	// currently it reads a block of 0x20 '0x00' values from a very specific block of RAM where there is a 0x20 space in the data and transfers them repeatedly, I assume
 	// this is some kind of buffer for the audio or DSP and eventually will be populated with other values...

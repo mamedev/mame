@@ -11,7 +11,7 @@
 
 #include "machine/3dom2.h"
 
-#include <math.h>
+#include <cmath>
 
 /*
     TODO:
@@ -555,22 +555,16 @@ static void write_te_reg(uint32_t &reg, uint32_t data, m2_te_device::te_reg_wmod
 	switch (mode)
 	{
 		case m2_te_device::REG_WRITE:
-		{
 			reg = data;
 			break;
-		}
 		case m2_te_device::REG_SET:
-		{
 			reg |= data;
 			break;
-		}
 		case m2_te_device::REG_CLEAR:
-		{
 			reg &= ~data;
 			break;
-		}
 		default:
-			assert_always(false, "Bad register write mode");
+			throw emu_fatalerror("write_te_reg: Bad register write mode");
 	}
 }
 
@@ -726,10 +720,10 @@ void m2_te_device::device_start()
 	m_winclip_int_handler.resolve_safe();
 
 	// Allocate texture RAM
-	m_tram = auto_alloc_array(machine(), uint32_t, TEXTURE_RAM_WORDS);
+	m_tram = std::make_unique<uint32_t[]>(TEXTURE_RAM_WORDS);
 
 	// Allocate PIP RAM
-	m_pipram = auto_alloc_array(machine(), uint32_t, PIP_RAM_WORDS);
+	m_pipram = std::make_unique<uint32_t[]>(PIP_RAM_WORDS);
 
 	// TODO
 	memset(&m_gc, 0, sizeof(m_gc));
@@ -763,22 +757,11 @@ void m2_te_device::device_reset()
 }
 
 
-//-------------------------------------------------
-//  device_post_load - device-specific post-load
-//-------------------------------------------------
-
-void m2_te_device::device_post_load()
-{
-
-}
-
-
-
 /***************************************************************************
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-READ32_MEMBER( m2_te_device::read )
+uint32_t m2_te_device::read(offs_t offset)
 {
 	uint32_t unit = (offset >> 11) & 7;
 	uint32_t reg = offset & 0x1ff;
@@ -834,7 +817,7 @@ READ32_MEMBER( m2_te_device::read )
 	return 0;
 }
 
-WRITE32_MEMBER( m2_te_device::write )
+void m2_te_device::write(offs_t offset, uint32_t data)
 {
 	uint32_t unit = (offset >> 11) & 7;
 	uint32_t reg = offset & 0x1ff;
@@ -1230,9 +1213,9 @@ void m2_te_device::setup_triangle(uint32_t flags)
 	if ((vb.y - vc.y) < 0.0f) a |= 2;
 	if ((vc.y - va.y) < 0.0f) a |= 1;
 
-	const se_vtx *v1 = NULL;
-	const se_vtx *v2 = NULL;
-	const se_vtx *v3 = NULL;
+	const se_vtx *v1 = nullptr;
+	const se_vtx *v2 = nullptr;
+	const se_vtx *v3 = nullptr;
 
 	switch (a)
 	{
@@ -1569,7 +1552,7 @@ void m2_te_device::walk_edges(uint32_t wrange)
 		if (scan_lr ^ (m_es.x1 < m_es.x2))
 		{
 			 // TODO: Is this possible?
-			assert_always(false, "SPECIAL CASE: WHAT DO?");
+			throw emu_fatalerror("m2_te_device::walk_edges: SPECIAL CASE: WHAT DO?");
 			r = m_es.r1; // Where do the colors come from?
 			g = m_es.g1;
 			b = m_es.b1;
@@ -3340,8 +3323,6 @@ void m2_te_device::illegal_inst()
 
 void m2_te_device::execute()
 {
-	address_space &space = machine().driver_data()->generic_space();
-
 #if TEST_TIMING
 	memset(g_statistics, 0, sizeof(g_statistics));
 #endif
@@ -3359,7 +3340,7 @@ void m2_te_device::execute()
 
 				while (cnt-- >= 0)
 				{
-					write(space, offs >> 2, irp_fetch(), 0xffffffff);
+					write(offs >> 2, irp_fetch());
 					offs += 4;
 
 					if (m_state != TE_RUNNING)

@@ -61,11 +61,8 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void savant(machine_config &config);
-
-	// user-controlled light switch (9 light bulbs behind LCD panel)
-	DECLARE_INPUT_CHANGED_MEMBER(light_switch) { output().set_value("backlight", newval); }
 
 protected:
 	virtual void machine_start() override;
@@ -96,15 +93,15 @@ private:
 	DECLARE_WRITE8_MEMBER(stall_w);
 	DECLARE_READ8_MEMBER(mcustatus_r);
 
-	DECLARE_WRITE64_MEMBER(lcd1_output_w);
-	DECLARE_WRITE64_MEMBER(lcd2_output_w);
+	void lcd1_output_w(u64 data);
+	void lcd2_output_w(u64 data);
 
 	DECLARE_READ8_MEMBER(databus_r);
 	DECLARE_WRITE8_MEMBER(databus_w);
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(lcd_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void lcd_w(u8 data);
+	u8 input_r();
 
 	bool m_wait_in;
 	u8 m_inp_mux;
@@ -176,14 +173,14 @@ READ8_MEMBER(savant_state::mcustatus_r)
 
 // 3870 side
 
-WRITE64_MEMBER(savant_state::lcd1_output_w)
+void savant_state::lcd1_output_w(u64 data)
 {
 	// uses C1-C24
 	m_lcd_data = m_lcd_data << 24 | (data >> 8 & 0xffffff);
 	m_display->matrix(data & 0xff, m_lcd_data);
 }
 
-WRITE64_MEMBER(savant_state::lcd2_output_w)
+void savant_state::lcd2_output_w(u64 data)
 {
 	// uses C6-C32
 	m_lcd_data = data >> 5 & 0x7ffffff;
@@ -238,7 +235,7 @@ WRITE8_MEMBER(savant_state::control_w)
 	m_control = data;
 }
 
-WRITE8_MEMBER(savant_state::lcd_w)
+void savant_state::lcd_w(u8 data)
 {
 	// d0: HLCD0538 data
 	// d4: HLCD0539 data
@@ -253,7 +250,7 @@ WRITE8_MEMBER(savant_state::lcd_w)
 	m_inp_mux = bitswap<8>(data,7,3,6,2,5,1,4,0);
 }
 
-READ8_MEMBER(savant_state::input_r)
+u8 savant_state::input_r()
 {
 	u8 data = 0;
 
@@ -343,8 +340,8 @@ static INPUT_PORTS_START( savant )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Promote")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Set Up")
 
-	PORT_START("LIGHT")
-	PORT_CONFNAME( 0x01, 0x01, "LCD Light" ) PORT_CHANGED_MEMBER(DEVICE_SELF, savant_state, light_switch, 0)
+	PORT_START("LIGHT") // user-controlled light switch (9 light bulbs behind LCD panel)
+	PORT_CONFNAME( 0x01, 0x01, "LCD Light" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -352,7 +349,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void savant_state::savant(machine_config &config)
@@ -368,12 +365,12 @@ void savant_state::savant(machine_config &config)
 	m_mcu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
 
 	F38T56(config, m_psu, 4_MHz_XTAL/2);
-	m_psu->set_int_vector(0x20);
+	m_psu->set_int_vector(0x0020);
 	m_psu->int_req_callback().set_inputline(m_mcu, F8_INPUT_LINE_INT_REQ);
 	m_psu->write_a().set(FUNC(savant_state::lcd_w));
 	m_psu->read_b().set(FUNC(savant_state::input_r));
 
-	config.m_perfect_cpu_quantum = subtag("mcu");
+	config.set_perfect_quantum(m_mcu);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->set_ui_enable(false); // no chesspieces
@@ -414,8 +411,8 @@ ROM_START( savant )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD("sl90547.u29", 0x0000, 0x0800, CRC(6fbf2aa0) SHA1(18e673ba5b806b397dd3d350525b5467c25a0d94) )
 
-	ROM_REGION( 763850, "screen", 0)
-	ROM_LOAD("savant.svg", 0, 763850, CRC(f29a5ca4) SHA1(9fabfb86e6235057b60232e987872a645ee4112e) )
+	ROM_REGION( 763958, "screen", 0)
+	ROM_LOAD("savant.svg", 0, 763958, CRC(44e6fa08) SHA1(26779470f83982ab150cd3d343c04a9ce5b93365) )
 ROM_END
 
 ROM_START( savant2 )
@@ -428,8 +425,8 @@ ROM_START( savant2 )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD("sl90547.u29", 0x0000, 0x0800, CRC(6fbf2aa0) SHA1(18e673ba5b806b397dd3d350525b5467c25a0d94) )
 
-	ROM_REGION( 763850, "screen", 0)
-	ROM_LOAD("savant.svg", 0, 763850, CRC(f29a5ca4) SHA1(9fabfb86e6235057b60232e987872a645ee4112e) )
+	ROM_REGION( 763958, "screen", 0)
+	ROM_LOAD("savant.svg", 0, 763958, CRC(44e6fa08) SHA1(26779470f83982ab150cd3d343c04a9ce5b93365) )
 ROM_END
 
 } // anonymous namespace

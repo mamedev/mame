@@ -27,7 +27,7 @@ void cchasm_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_maincpu->set_input_line(2, ASSERT_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in cchasm_state::device_timer");
+		throw emu_fatalerror("Unknown id in cchasm_state::device_timer");
 	}
 }
 

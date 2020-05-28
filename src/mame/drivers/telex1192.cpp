@@ -48,6 +48,8 @@ void telex1192_state::inst_map(address_map &map)
 
 void telex1192_state::data_map(address_map &map)
 {
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).ram();
 	map(0xa000, 0xa7ff).ram().share("nvram");
 }
 
@@ -58,7 +60,7 @@ INPUT_PORTS_END
 
 void telex1192_state::telex1192(machine_config &config)
 {
-	DP8344(config, m_bcp, 18.8696_MHz_XTAL);
+	DP8344A(config, m_bcp, 18.8696_MHz_XTAL);
 	m_bcp->set_addrmap(AS_PROGRAM, &telex1192_state::inst_map);
 	m_bcp->set_addrmap(AS_DATA, &telex1192_state::data_map);
 

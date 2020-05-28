@@ -152,7 +152,7 @@ TILE_GET_INFO_MEMBER(dday_state::get_bg_tile_info)
 	int code;
 
 	code = m_bgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, code >> 5, 0);
+	tileinfo.set(0, code, code >> 5, 0);
 }
 
 TILE_GET_INFO_MEMBER(dday_state::get_fg_tile_info)
@@ -161,7 +161,7 @@ TILE_GET_INFO_MEMBER(dday_state::get_fg_tile_info)
 
 	flipx = m_colorram[tile_index & 0x03e0] & 0x01;
 	code = m_fgvideoram[flipx ? tile_index ^ 0x1f : tile_index];
-	SET_TILE_INFO_MEMBER(2, code, code >> 5, flipx ? TILE_FLIPX : 0);
+	tileinfo.set(2, code, code >> 5, flipx ? TILE_FLIPX : 0);
 }
 
 TILE_GET_INFO_MEMBER(dday_state::get_text_tile_info)
@@ -169,7 +169,7 @@ TILE_GET_INFO_MEMBER(dday_state::get_text_tile_info)
 	int code;
 
 	code = m_textvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code, code >> 5, 0);
+	tileinfo.set(1, code, code >> 5, 0);
 }
 
 TILE_GET_INFO_MEMBER(dday_state::get_sl_tile_info)
@@ -191,7 +191,7 @@ TILE_GET_INFO_MEMBER(dday_state::get_sl_tile_info)
 		/* no mirroring, draw dark spot */
 		code = 1;
 
-	SET_TILE_INFO_MEMBER(3, code & 0x3f, 0, flipx ? TILE_FLIPX : 0);
+	tileinfo.set(3, code & 0x3f, 0, flipx ? TILE_FLIPX : 0);
 }
 
 
@@ -203,10 +203,10 @@ TILE_GET_INFO_MEMBER(dday_state::get_sl_tile_info)
 
 void dday_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dday_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dday_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dday_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_sl_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dday_state::get_sl_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dday_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dday_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dday_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_sl_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dday_state::get_sl_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_screen->register_screen_bitmap(m_main_bitmap);
 

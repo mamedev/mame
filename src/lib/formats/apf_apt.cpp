@@ -34,7 +34,7 @@ e. A checksum byte (8-bit addition)
 
 ********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/apf_apt.h"
 

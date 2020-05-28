@@ -11,11 +11,17 @@ Cassette is "best guess", as I was unable to locate any recordings, and
 also do not know the commands to save and load. SAVE and LOAD appear when
 F2 or shift-F2 pressed (in Korvet), but only produce errors.
 
-Status as at 2019-07-19:
-Korvet - can boot CP/M, but the keyboard then doesn't work.
-Neiva - keyboard not working
-BK8T - keyboard not working, stuck at a "config" screen.
-Kontur - needs to boot from a floppy and we don't have any that work
+Status as at 2019-09-18:
+Korvet, Neiva - largely working. Error after running something from B drive.
+              - floppy operation is very slow.
+Kontur - needs to boot from a floppy, not working.
+BK8T - Keys to navigate initial config screen are mostly unknown
+       (space - change value; Esc - go to next screen).
+     - Next screen: wants the date and time. You can press enter here.
+     - Wait a while, ignore the big message. You get a menu.
+     - Press 1 for a typewriter thing, or 6 for another menu.
+     - Not sure about the choices; needs someone who can read Russian.
+
 
 ****************************************************************************/
 
@@ -231,11 +237,11 @@ static void pk8020_floppies(device_slot_interface &device)
 void pk8020_state::pk8020(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 20_MHz_XTAL / 8); // КР580ВМ80А
-	m_maincpu->set_addrmap(AS_PROGRAM, &pk8020_state::pk8020_mem);
-	m_maincpu->set_addrmap(AS_IO, &pk8020_state::pk8020_io);
-	m_maincpu->set_vblank_int("screen", FUNC(pk8020_state::pk8020_interrupt));
-	m_maincpu->set_irq_acknowledge_callback("inr", FUNC(pic8259_device::inta_cb));
+	i8080a_cpu_device &maincpu(I8080A(config, m_maincpu, 20_MHz_XTAL / 8)); // КР580ВМ80А
+	maincpu.set_addrmap(AS_PROGRAM, &pk8020_state::pk8020_mem);
+	maincpu.set_addrmap(AS_IO, &pk8020_state::pk8020_io);
+	maincpu.set_vblank_int("screen", FUNC(pk8020_state::pk8020_interrupt));
+	maincpu.in_inta_func().set("inr", FUNC(pic8259_device::acknowledge));
 
 	PLS100(config, m_decplm); // КР556РТ2 (82S100 equivalent; D31)
 

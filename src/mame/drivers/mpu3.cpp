@@ -112,6 +112,7 @@ TODO: - Distinguish door switches using manual
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"
+#include "machine/rescap.h"
 
 #include "mpu3.lh"
 
@@ -202,30 +203,30 @@ public:
 private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
-	DECLARE_WRITE8_MEMBER(characteriser_w);
-	DECLARE_READ8_MEMBER(characteriser_r);
-	DECLARE_WRITE8_MEMBER(mpu3ptm_w);
-	DECLARE_READ8_MEMBER(mpu3ptm_r);
+	void characteriser_w(offs_t offset, uint8_t data);
+	uint8_t characteriser_r(offs_t offset);
+	void mpu3ptm_w(offs_t offset, uint8_t data);
+	uint8_t mpu3ptm_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o2_callback);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o3_callback);
-	DECLARE_READ8_MEMBER(pia_ic3_porta_r);
-	DECLARE_WRITE8_MEMBER(pia_ic3_portb_w);
+	uint8_t pia_ic3_porta_r();
+	void pia_ic3_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_ic3_ca2_w);
-	DECLARE_READ8_MEMBER(pia_ic4_porta_r);
-	DECLARE_WRITE8_MEMBER(pia_ic4_porta_w);
-	DECLARE_WRITE8_MEMBER(pia_ic4_portb_w);
+	uint8_t pia_ic4_porta_r();
+	void pia_ic4_porta_w(uint8_t data);
+	void pia_ic4_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_ic4_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_ic4_cb2_w);
-	DECLARE_WRITE8_MEMBER(pia_ic5_porta_w);
-	DECLARE_READ8_MEMBER(pia_ic5_portb_r);
-	DECLARE_WRITE8_MEMBER(pia_ic5_portb_w);
+	void pia_ic5_porta_w(uint8_t data);
+	uint8_t pia_ic5_portb_r();
+	void pia_ic5_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_ic5_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_ic5_cb2_w);
-	DECLARE_READ8_MEMBER(pia_ic6_porta_r);
-	DECLARE_READ8_MEMBER(pia_ic6_portb_r);
-	DECLARE_WRITE8_MEMBER(pia_ic6_porta_w);
-	DECLARE_WRITE8_MEMBER(pia_ic6_portb_w);
+	uint8_t pia_ic6_porta_r();
+	uint8_t pia_ic6_portb_r();
+	void pia_ic6_porta_w(uint8_t data);
+	void pia_ic6_portb_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(ic21_timeout);
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
 	TIMER_DEVICE_CALLBACK_MEMBER(ic10_callback);
@@ -405,7 +406,7 @@ TIMER_CALLBACK_MEMBER(mpu3_state::ic21_timeout)
 	ic21_output(0);
 }
 
-READ8_MEMBER(mpu3_state::pia_ic3_porta_r)
+uint8_t mpu3_state::pia_ic3_porta_r()
 {
 	static const char *const portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "DIL1", "DIL1", "DIL2", "DIL2" };
 	int data=0,swizzle;
@@ -448,7 +449,7 @@ READ8_MEMBER(mpu3_state::pia_ic3_porta_r)
 	return data;
 }
 
-WRITE8_MEMBER(mpu3_state::pia_ic3_portb_w)
+void mpu3_state::pia_ic3_portb_w(uint8_t data)
 {
 	LOG(("%s: IC3 PIA Port B Set to %2x (Triac)\n", machine().describe_context(),data));
 	m_triac_ic3 =data;
@@ -463,7 +464,7 @@ WRITE_LINE_MEMBER(mpu3_state::pia_ic3_ca2_w)
 	ic11_update();
 }
 
-READ8_MEMBER(mpu3_state::pia_ic4_porta_r)
+uint8_t mpu3_state::pia_ic4_porta_r()
 {
 	if (m_ic11_active)
 	{
@@ -477,7 +478,7 @@ READ8_MEMBER(mpu3_state::pia_ic4_porta_r)
 }
 
 /*  IC4, 7 seg leds */
-WRITE8_MEMBER(mpu3_state::pia_ic4_porta_w)
+void mpu3_state::pia_ic4_porta_w(uint8_t data)
 {
 	LOG(("%s: IC4 PIA Port A Set to %2x (DISPLAY PORT)\n", machine().describe_context(),data));
 	m_ic4_input_a=data;
@@ -510,7 +511,7 @@ WRITE8_MEMBER(mpu3_state::pia_ic4_porta_w)
 	}
 }
 
-WRITE8_MEMBER(mpu3_state::pia_ic4_portb_w)
+void mpu3_state::pia_ic4_portb_w(uint8_t data)
 {
 	LOG(("%s: IC4 PIA Port B Set to %2x (Lamp)\n", machine().describe_context(),data));
 	if (m_ic11_active)
@@ -543,7 +544,7 @@ WRITE_LINE_MEMBER(mpu3_state::pia_ic4_cb2_w)
 }
 
 /* IC5, AUX ports, coin lockouts and AY sound chip select (MODs below 4 only) */
-WRITE8_MEMBER(mpu3_state::pia_ic5_porta_w)
+void mpu3_state::pia_ic5_porta_w(uint8_t data)
 {
 	LOG(("%s: IC5 PIA Port A Set to %2x (Reel)\n", machine().describe_context(),data));
 	m_reels[0]->update( data     & 0x03);
@@ -556,7 +557,7 @@ WRITE8_MEMBER(mpu3_state::pia_ic5_porta_w)
 	awp_draw_reel(machine(),"reel4", *m_reels[3]);
 }
 
-READ8_MEMBER(mpu3_state::pia_ic5_portb_r)
+uint8_t mpu3_state::pia_ic5_portb_r()
 {
 	if (m_ic3_data & 0x80 )
 	{
@@ -570,7 +571,7 @@ READ8_MEMBER(mpu3_state::pia_ic5_portb_r)
 
 
 
-WRITE8_MEMBER(mpu3_state::pia_ic5_portb_w)
+void mpu3_state::pia_ic5_portb_w(uint8_t data)
 {
 	m_ic3_data = data;
 }
@@ -590,18 +591,18 @@ WRITE_LINE_MEMBER(mpu3_state::pia_ic5_cb2_w)
 
 
 /* IC6, AUX ports*/
-READ8_MEMBER(mpu3_state::pia_ic6_porta_r)
+uint8_t mpu3_state::pia_ic6_porta_r()
 {
 	return (ioport("AUX1")->read())|m_aux1_input;
 }
 
 
-READ8_MEMBER(mpu3_state::pia_ic6_portb_r)
+uint8_t mpu3_state::pia_ic6_portb_r()
 {
 	return (ioport("AUX2")->read())|m_aux2_input;
 }
 
-WRITE8_MEMBER(mpu3_state::pia_ic6_porta_w)
+void mpu3_state::pia_ic6_porta_w(uint8_t data)
 {
 	LOG(("%s: IC6 PIA Port A Set to %2x (Alpha)\n", machine().describe_context(),data));
 	m_vfd->por((data & 0x08));
@@ -609,7 +610,7 @@ WRITE8_MEMBER(mpu3_state::pia_ic6_porta_w)
 	m_vfd->sclk((data & 0x10) >>4);
 }
 
-WRITE8_MEMBER(mpu3_state::pia_ic6_portb_w)
+void mpu3_state::pia_ic6_portb_w(uint8_t data)
 {
 	LOG(("%s: IC6 PIA Port B Set to %2x (AUX2)\n", machine().describe_context(),data));
 	m_aux2_input = data;
@@ -738,7 +739,7 @@ The MPU3 characteriser is surprisingly simple to simulate, as it operates a call
 address of the PAL in memory varies between games. Once found, the memory location of the data table is easily found from the X register of the CPU.
 */
 
-WRITE8_MEMBER(mpu3_state::characteriser_w)
+void mpu3_state::characteriser_w(offs_t offset, uint8_t data)
 {
 	int x;
 	int call=data;
@@ -768,7 +769,7 @@ WRITE8_MEMBER(mpu3_state::characteriser_w)
 }
 
 
-READ8_MEMBER(mpu3_state::characteriser_r)
+uint8_t mpu3_state::characteriser_r(offs_t offset)
 {
 	if (!m_current_chr_table)
 		fatalerror("No Characteriser Table @ %04x\n", m_maincpu->pcbase());
@@ -801,12 +802,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpu3_state::ic10_callback)
 	m_pia4->ca1_w(m_ic10_output);
 
 }
-WRITE8_MEMBER(mpu3_state::mpu3ptm_w)
+void mpu3_state::mpu3ptm_w(offs_t offset, uint8_t data)
 {
 	m_ptm2->write(offset >>2,data);//((offset & 0x1f) >>2),data);
 }
 
-READ8_MEMBER(mpu3_state::mpu3ptm_r)
+uint8_t mpu3_state::mpu3ptm_r(offs_t offset)
 {
 	return m_ptm2->read(offset >>2);
 }
@@ -904,10 +905,9 @@ void mpu3_state::init_m3hprvpr()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_disp_func=METER_PORT;
+	m_disp_func = METER_PORT;
 	m_current_chr_table = hprvpr_data;
-	space.install_readwrite_handler(0xc000, 0xc000 , read8_delegate(FUNC(mpu3_state::characteriser_r), this),write8_delegate(FUNC(mpu3_state::characteriser_w), this));
-
+	space.install_readwrite_handler(0xc000, 0xc000, read8sm_delegate(*this, FUNC(mpu3_state::characteriser_r)), write8sm_delegate(*this, FUNC(mpu3_state::characteriser_w)));
 }
 
 ROM_START( m3tst )
@@ -1303,6 +1303,13 @@ ROM_START( m3rockpl )
 ROM_END
 
 
+ROM_START( m3rolla ) // R-5LS V.30
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "ic1", 0x6000, 0x2000, CRC(16e320ae) SHA1(3489e81f52db025ca2239c4072fa01f77f4d8d31) )
+	// ic2,ic3 and ic4 empty, ic5 is a 74ls138n
+	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )
+ROM_END
+
 ROM_START( m3rollem )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "roll-em.p1", 0x6000, 0x2000, CRC(2ec2cfa9) SHA1(461240315725f29f53fdcf89e767d17a4d2301eb) )
@@ -1629,6 +1636,7 @@ GAME(  198?, m3optunl,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, 
 GAMEL( 198?, m3razdaz,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Razzle Dazzle (Barcrest) (MPU3, set 1)", GAME_FLAGS, layout_m3razdaza )
 GAMEL( 198?, m3razdaza,  m3razdaz,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Razzle Dazzle (Barcrest) (MPU3, set 2)", GAME_FLAGS, layout_m3razdaza )
 GAMEL( 198?, m3razdazd,  m3razdaz,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Razzle Dazzle (Barcrest) [Dutch] (MPU3)", GAME_FLAGS, layout_m3razdaza )
+GAME(  198?, m3rolla,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Rollamatic 5-Line Special (Barcrest) (MPU3)", GAME_FLAGS ) // or 5-Line Special Rollamatic on the glass, using the title from the ROM
 GAMEL( 198?, m3rxchng,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU3)", GAME_FLAGS, layout_m3rxchng )
 GAMEL( 198?, m3circle,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Special Circle Club (Barcrest) (MPU3, set 1)", GAME_FLAGS, layout_m3circle )
 GAMEL( 198?, m3circlea,  m3circle,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Special Circle Club (Barcrest) (MPU3, set 2)", GAME_FLAGS, layout_m3circle )

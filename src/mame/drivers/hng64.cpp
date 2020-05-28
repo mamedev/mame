@@ -496,9 +496,9 @@ READ32_MEMBER(hng64_state::hng64_rtc_r)
 
 		// bit 4 disables "system log reader" (the device is 4-bit? so this bit is not from the device?)
 		if ((rtc_addr & 0xf) == 0xd)
-			return m_rtc->read(space, (rtc_addr) & 0xf) | 0x10;
+			return m_rtc->read((rtc_addr) & 0xf) | 0x10;
 
-		return m_rtc->read(space, (rtc_addr) & 0xf);
+		return m_rtc->read((rtc_addr) & 0xf);
 	}
 	else
 	{
@@ -566,7 +566,7 @@ WRITE32_MEMBER(hng64_state::hng64_rtc_w)
 	if (offset & 1)
 	{
 		// RTC is mapped to 1 byte (4-bits used) in every 8 bytes so we can't even install this with a umask
-		m_rtc->write(space, (offset >> 1) & 0xf, data);
+		m_rtc->write((offset >> 1) & 0xf, data);
 	}
 	else
 	{
@@ -1819,7 +1819,7 @@ void hng64_state::machine_reset()
 
 ***********************************************/
 
-WRITE8_MEMBER(hng64_state::ioport1_w)
+void hng64_state::ioport1_w(uint8_t data)
 {
 	//LOG("%s: ioport1_w %02x\n", machine().describe_context(), data);
 
@@ -1840,18 +1840,18 @@ WRITE8_MEMBER(hng64_state::ioport1_w)
 }
 
 // it does write 0xff here before each set of reading, but before setting a new output address?
-WRITE8_MEMBER(hng64_state::ioport3_w)
+void hng64_state::ioport3_w(uint8_t data)
 {
 
 	if (m_port1 & 0x08) // 0x08 in port1 enables write? otherwise it writes 0xff to port 7 all the time, when port 7 is also lamps
 	{
 		int addr = (m_port1 & 0xe0) >> 5;
-		m_lamps->lamps_w(space, addr, data);
+		m_lamps->lamps_w(addr, data);
 	}
 }
 
 
-READ8_MEMBER(hng64_state::ioport3_r)
+uint8_t hng64_state::ioport3_r()
 {
 	int addr = (m_port1&0xe0)>>5;
 
@@ -1863,17 +1863,16 @@ DEFINE_DEVICE_TYPE(HNG64_LAMPS, hng64_lamps_device, "hng64_lamps", "HNG64 Lamps"
 
 hng64_lamps_device::hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HNG64_LAMPS, tag, owner, clock)
-	, m_lamps_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_lamps_out_cb(*this)
 {
 }
 
 void hng64_lamps_device::device_start()
 {
-	for (auto &cb : m_lamps_out_cb)
-		cb.resolve_safe();
+	m_lamps_out_cb.resolve_all_safe();
 }
 
-WRITE8_MEMBER(hng64_state::hng64_drive_lamps7_w)
+void hng64_state::hng64_drive_lamps7_w(uint8_t data)
 {
 	/*
 	   0x80 - BGM Select #2 (Active High)
@@ -1887,7 +1886,7 @@ WRITE8_MEMBER(hng64_state::hng64_drive_lamps7_w)
 	*/
 }
 
-WRITE8_MEMBER(hng64_state::hng64_drive_lamps6_w)
+void hng64_state::hng64_drive_lamps6_w(uint8_t data)
 {
 	/*
 	   0x80 - BGM Select #4 (Active High)
@@ -1902,12 +1901,12 @@ WRITE8_MEMBER(hng64_state::hng64_drive_lamps6_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
-WRITE8_MEMBER(hng64_state::hng64_drive_lamps5_w)
+void hng64_state::hng64_drive_lamps5_w(uint8_t data)
 {
 	// force feedback steering position
 }
 
-WRITE8_MEMBER(hng64_state::hng64_shoot_lamps7_w)
+void hng64_state::hng64_shoot_lamps7_w(uint8_t data)
 {
 	/*
 	   0x80
@@ -1931,7 +1930,7 @@ WRITE8_MEMBER(hng64_state::hng64_shoot_lamps7_w)
     0x00004000 gun #3
 */
 
-WRITE8_MEMBER(hng64_state::hng64_shoot_lamps6_w)
+void hng64_state::hng64_shoot_lamps6_w(uint8_t data)
 {
 	// Start Lamp #1 / #2 don't get written to the output port, is this a TLCS870 bug or are they not connected to the 'lamp' outputs, they do get written to the DP ram, see above notes
 	/*
@@ -1946,7 +1945,7 @@ WRITE8_MEMBER(hng64_state::hng64_shoot_lamps6_w)
 	*/
 }
 
-WRITE8_MEMBER(hng64_state::hng64_fight_lamps6_w)
+void hng64_state::hng64_fight_lamps6_w(uint8_t data)
 {
 	/*
 	   0x80
@@ -1969,7 +1968,7 @@ WRITE8_MEMBER(hng64_state::hng64_fight_lamps6_w)
 
 ***********************************************/
 
-WRITE8_MEMBER(hng64_state::ioport7_w)
+void hng64_state::ioport7_w(uint8_t data)
 {
 	/* Port bits
 
@@ -2013,7 +2012,7 @@ WRITE8_MEMBER(hng64_state::ioport7_w)
 	m_port7 = data;
 }
 
-READ8_MEMBER(hng64_state::ioport0_r)
+uint8_t hng64_state::ioport0_r()
 {
 	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
 	uint8_t ret = m_dt71321_dpram->left_r(addr);
@@ -2022,7 +2021,7 @@ READ8_MEMBER(hng64_state::ioport0_r)
 	return ret;
 }
 
-WRITE8_MEMBER(hng64_state::ioport0_w)
+void hng64_state::ioport0_w(uint8_t data)
 {
 	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
 	m_dt71321_dpram->left_w(addr, data);
@@ -2040,7 +2039,7 @@ WRITE8_MEMBER(hng64_state::ioport0_w)
 /* This port is dual purpose, with the upper pins being used as a serial input / output / clock etc. and the output latch (written data) being configured appropriately however the lower 2 bits also seem to be used
    maybe these lower 2 bits were intended for serial comms LEDs, although none are documented in the PCB layouts.
 */
-WRITE8_MEMBER(hng64_state::ioport4_w)
+void hng64_state::ioport4_w(uint8_t data)
 {
 	LOG("%s: ioport4_w %02x\n", machine().describe_context(), data);
 }
@@ -2051,14 +2050,14 @@ WRITE8_MEMBER(hng64_state::ioport4_w)
 
 ***********************************************/
 
-READ8_MEMBER(hng64_state::anport0_r) { return m_an_in[0]->read(); }
-READ8_MEMBER(hng64_state::anport1_r) { return m_an_in[1]->read(); }
-READ8_MEMBER(hng64_state::anport2_r) { return m_an_in[2]->read(); }
-READ8_MEMBER(hng64_state::anport3_r) { return m_an_in[3]->read(); }
-READ8_MEMBER(hng64_state::anport4_r) { return m_an_in[4]->read(); }
-READ8_MEMBER(hng64_state::anport5_r) { return m_an_in[5]->read(); }
-READ8_MEMBER(hng64_state::anport6_r) { return m_an_in[6]->read(); }
-READ8_MEMBER(hng64_state::anport7_r) { return m_an_in[7]->read(); }
+uint8_t hng64_state::anport0_r() { return m_an_in[0]->read(); }
+uint8_t hng64_state::anport1_r() { return m_an_in[1]->read(); }
+uint8_t hng64_state::anport2_r() { return m_an_in[2]->read(); }
+uint8_t hng64_state::anport3_r() { return m_an_in[3]->read(); }
+uint8_t hng64_state::anport4_r() { return m_an_in[4]->read(); }
+uint8_t hng64_state::anport5_r() { return m_an_in[5]->read(); }
+uint8_t hng64_state::anport6_r() { return m_an_in[6]->read(); }
+uint8_t hng64_state::anport7_r() { return m_an_in[7]->read(); }
 
 /***********************************************
 

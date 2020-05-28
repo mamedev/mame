@@ -24,13 +24,14 @@ taito_sj_security_mcu_device::taito_sj_security_mcu_device(
 	, m_read_data(0U)
 	, m_zaccept(false)
 	, m_zready(false)
+	, m_pa_val(0U)
 	, m_pb_val(0U)
 	, m_busak(false)
 	, m_reset(false)
 {
 }
 
-READ8_MEMBER(taito_sj_security_mcu_device::data_r)
+u8 taito_sj_security_mcu_device::data_r(address_space &space, offs_t offset)
 {
 	if (BIT(offset, 0))
 	{
@@ -50,7 +51,7 @@ READ8_MEMBER(taito_sj_security_mcu_device::data_r)
 	}
 }
 
-WRITE8_MEMBER(taito_sj_security_mcu_device::data_w)
+void taito_sj_security_mcu_device::data_w(offs_t offset, u8 data)
 {
 	if (BIT(offset, 0))
 	{
@@ -131,12 +132,12 @@ void taito_sj_security_mcu_device::device_add_mconfig(machine_config &config)
 	m_mcu->portb_w().set(FUNC(taito_sj_security_mcu_device::mcu_pb_w));
 }
 
-READ8_MEMBER(taito_sj_security_mcu_device::mcu_pa_r)
+u8 taito_sj_security_mcu_device::mcu_pa_r()
 {
 	return get_bus_val();
 }
 
-READ8_MEMBER(taito_sj_security_mcu_device::mcu_pc_r)
+u8 taito_sj_security_mcu_device::mcu_pc_r()
 {
 	// FIXME 68INTAK is on PC3 but we're ignoring it
 	return
@@ -145,14 +146,14 @@ READ8_MEMBER(taito_sj_security_mcu_device::mcu_pc_r)
 			(m_busak ? 0x00U : 0x04U);
 }
 
-WRITE8_MEMBER(taito_sj_security_mcu_device::mcu_pa_w)
+void taito_sj_security_mcu_device::mcu_pa_w(u8 data)
 {
 	m_pa_val = data;
 	if (BIT(~m_pb_val, 6))
 		m_addr = (m_addr & 0xff00U) | u16(get_bus_val());
 }
 
-WRITE8_MEMBER(taito_sj_security_mcu_device::mcu_pb_w)
+void taito_sj_security_mcu_device::mcu_pb_w(u8 data)
 {
 	bool inc_addr(false);
 	u8 const diff(m_pb_val ^ data);
@@ -182,7 +183,7 @@ WRITE8_MEMBER(taito_sj_security_mcu_device::mcu_pb_w)
 	if (BIT(diff, 4))
 	{
 		if (BIT(~data, 4))
-			m_68write_cb(space, m_addr, bus_val);
+			m_68write_cb(m_addr, bus_val);
 		else if (BIT(data, 5))
 			inc_addr = true;
 	}
@@ -191,7 +192,7 @@ WRITE8_MEMBER(taito_sj_security_mcu_device::mcu_pb_w)
 	if (BIT(diff, 5))
 	{
 		if (BIT(~data, 5))
-			m_read_data = m_68read_cb(space, m_addr);
+			m_read_data = m_68read_cb(m_addr);
 		else if (BIT(data, 4))
 			inc_addr = true;
 	}

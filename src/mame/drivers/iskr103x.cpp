@@ -77,6 +77,8 @@ void iskr103x_state::iskr1030m(machine_config &config)
 
 	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
 	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(iskr1030m));
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", iskr103x_isa8_cards, "cga_iskr1030m", false); // FIXME: determine IS bus clock

@@ -21,12 +21,13 @@ DEFINE_DEVICE_TYPE(I82439TX_LEGACY, i82439tx_device, "i82439tx_legacy", "Intel 8
 i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	northbridge_device(mconfig, I82439TX_LEGACY, tag, owner, clock),
 	pci_device_interface(mconfig, *this),
-	m_cpu_tag(nullptr),
 	m_region_tag(nullptr),
 	m_space(nullptr),
 	m_rom(nullptr)
 {
 	m_smram.smiact_n = 1;
+	m_smram.tseg_size = 0;
+	m_smram.mapping = 0;
 }
 
 void i82439tx_device::i82439tx_configure_memory(uint8_t val, offs_t begin, offs_t end)
@@ -442,10 +443,7 @@ void i82439tx_device::device_start()
 {
 	northbridge_device::device_start();
 	// get address space we are working on
-	device_t *cpu = machine().device(m_cpu_tag);
-	assert(cpu != nullptr);
-
-	m_space = &cpu->memory().space(AS_PROGRAM);
+	m_space = &m_cpu->space(AS_PROGRAM);
 
 	// get rom region
 	m_rom = machine().root_device().memregion(m_region_tag)->base();

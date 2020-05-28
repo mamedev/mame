@@ -24,6 +24,8 @@
 #include "bus/rs232/rs232.h"
 
 
+namespace bus { namespace amiga { namespace zorro {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -51,8 +53,8 @@ public:
 	void iocpu_map(address_map &map);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 
 	// device_zorro2_card_interface overrides
@@ -71,9 +73,9 @@ private:
 	template<int N> DECLARE_WRITE8_MEMBER( acia_w );
 
 	// cia
-	DECLARE_READ8_MEMBER( cia_port_a_r );
-	DECLARE_READ8_MEMBER( cia_port_b_r );
-	DECLARE_WRITE8_MEMBER( cia_port_b_w );
+	uint8_t cia_port_a_r();
+	uint8_t cia_port_b_r();
+	void cia_port_b_w(uint8_t data);
 	DECLARE_READ8_MEMBER( cia_r );
 	DECLARE_WRITE8_MEMBER( cia_w );
 
@@ -104,7 +106,9 @@ private:
 	uint8_t m_cia_port_b;
 };
 
+} } } // namespace bus::amiga::zorro
+
 // device type definition
-DECLARE_DEVICE_TYPE(A2232, a2232_device)
+DECLARE_DEVICE_TYPE_NS(ZORRO_A2232, bus::amiga::zorro, a2232_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_A2232_H

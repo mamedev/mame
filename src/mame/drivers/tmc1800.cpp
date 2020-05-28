@@ -286,7 +286,7 @@ WRITE8_MEMBER( tmc2000_state::bankswitch_w )
 	m_rac = BIT(data, 0);
 	bankswitch();
 
-	m_cti->tone_latch_w(space, 0, data);
+	m_cti->tone_latch_w(data);
 }
 
 WRITE8_MEMBER( nano_state::bankswitch_w )
@@ -297,7 +297,7 @@ WRITE8_MEMBER( nano_state::bankswitch_w )
 	program.install_ram(0x0000, 0x0fff, 0x7000, ram);
 
 	/* write to CDP1864 tone latch */
-	m_cti->tone_latch_w(space, 0, data);
+	m_cti->tone_latch_w(data);
 }
 
 READ8_MEMBER( tmc1800_state::dispon_r )
@@ -624,12 +624,12 @@ WRITE_LINE_MEMBER( tmc2000_state::q_w )
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
-WRITE8_MEMBER( tmc2000_state::dma_w )
+void tmc2000_state::dma_w(offs_t offset, uint8_t data)
 {
 	m_color = ~(m_colorram[offset & 0x1ff]) & 0x07;
 
 	m_cti->con_w(0); // HACK
-	m_cti->dma_w(space, offset, data);
+	m_cti->dma_w(data);
 }
 
 // OSCOM Nano
@@ -800,7 +800,7 @@ void tmc1800_state::tmc1800(machine_config &config)
 	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb));
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
@@ -829,7 +829,7 @@ void osc1000b_state::osc1000b(machine_config &config)
 	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb));
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
@@ -855,7 +855,7 @@ void tmc2000_state::tmc2000(machine_config &config)
 	tmc2000_video(config);
 
 	// devices
-	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb));
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
@@ -881,7 +881,7 @@ void nano_state::nano(machine_config &config)
 	nano_video(config);
 
 	// devices
-	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb));
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
@@ -932,7 +932,7 @@ void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_beeper->set_clock(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in tmc1800_state::device_timer");
+		throw emu_fatalerror("Unknown id in tmc1800_state::device_timer");
 	}
 }
 

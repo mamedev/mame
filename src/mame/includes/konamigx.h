@@ -49,7 +49,6 @@ public:
 		, m_k053936_0_linectrl(*this, "k053936_0_line", 32)
 		, m_k053936_0_ctrl_16(*this, "k053936_0_ct16", 16)
 		, m_k053936_0_linectrl_16(*this, "k053936_0_li16", 16)
-		, m_konamigx_type3_psac2_bank(*this, "psac2_bank")
 		, m_generic_paletteram_32(*this, "paletteram")
 		, m_an0(*this, "AN0")
 		, m_an1(*this, "AN1")
@@ -78,7 +77,7 @@ public:
 	DECLARE_WRITE16_MEMBER(K055550_word_w);
 	DECLARE_WRITE16_MEMBER(K053990_martchmp_word_w);
 	DECLARE_WRITE32_MEMBER(fantjour_dma_w);
-	DECLARE_WRITE32_MEMBER(konamigx_type3_psac2_bank_w);
+	DECLARE_WRITE8_MEMBER(type3_bank_w);
 	DECLARE_WRITE32_MEMBER(konamigx_tilebank_w);
 	DECLARE_WRITE32_MEMBER(konamigx_t1_psacmap_w);
 	DECLARE_WRITE32_MEMBER(konamigx_t4_psacmap_w);
@@ -184,6 +183,7 @@ public:
 	void gokuparo(machine_config &config);
 	void sexyparo(machine_config &config);
 	void gx_base_memmap(address_map &map);
+	void racinfrc_map(address_map &map);
 	void gx_type1_map(address_map &map);
 	void gx_type2_map(address_map &map);
 	void gx_type3_map(address_map &map);
@@ -216,7 +216,6 @@ protected:
 	optional_shared_ptr<uint16_t> m_k053936_0_linectrl;
 	optional_shared_ptr<uint16_t> m_k053936_0_ctrl_16;
 	optional_shared_ptr<uint16_t> m_k053936_0_linectrl_16;
-	optional_shared_ptr<uint32_t> m_konamigx_type3_psac2_bank;
 	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
 
 	optional_ioport m_an0, m_an1, m_light0_x, m_light0_y, m_light1_x, m_light1_y, m_eepromout;
@@ -232,6 +231,7 @@ protected:
 	int m_gx_cfgport;
 	int m_suspension_active, m_resume_trigger;
 	int m_last_prot_op, m_last_prot_clk;
+	u16 m_last_prot_param;
 	uint8_t m_prev_pixel_clock;
 
 	uint8_t m_esc_program[4096];
@@ -291,7 +291,8 @@ protected:
 	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap2;
 	rectangle m_gxtype1_roz_dstbitmapclip;
 
-	int m_konamigx_type3_psac2_actual_bank;
+	u8 m_type3_psac2_bank;
+	u8 m_type3_spriteram_bank;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
 	int m_use_68020_post_clock_hack;
 	output_finder<> m_lamp;

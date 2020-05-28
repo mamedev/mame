@@ -93,7 +93,7 @@ uint32_t p112_state::screen_update_p112(screen_device &screen, bitmap_ind16 &bit
 void p112_state::p112(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(16'000'000));
+	Z80182(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &p112_state::p112_mem);
 	m_maincpu->set_addrmap(AS_IO, &p112_state::p112_io);
 

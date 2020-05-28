@@ -145,7 +145,7 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_gai_936_tile_info)
 
 	colour |= m_sub1_colorbase << 4;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
+	tileinfo.set(0, tileno, colour, 0);
 }
 
 VIDEO_START_MEMBER(mystwarr_state, gaiapols)
@@ -164,7 +164,7 @@ VIDEO_START_MEMBER(mystwarr_state, gaiapols)
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -10,  0); // floor tiles in demo loop2 (Elaine vs. boss)
 
-	m_ult_936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mystwarr_state::get_gai_936_tile_info),this), TILEMAP_SCAN_ROWS,  16, 16, 512, 512);
+	m_ult_936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mystwarr_state::get_gai_936_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	m_ult_936_tilemap->set_transparent_pen(0);
 }
 
@@ -178,7 +178,7 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_ult_936_tile_info)
 
 	colour = m_sub1_colorbase;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, (dat1[tile_index]&0x40) ? TILE_FLIPX : 0);
+	tileinfo.set(0, tileno, colour, (dat1[tile_index]&0x40) ? TILE_FLIPX : 0);
 }
 
 VIDEO_START_MEMBER(mystwarr_state, dadandrn)
@@ -199,7 +199,7 @@ VIDEO_START_MEMBER(mystwarr_state, dadandrn)
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -8, 0); // Brainy's laser
 
-	m_ult_936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mystwarr_state::get_ult_936_tile_info),this), TILEMAP_SCAN_ROWS,  16, 16, 512, 512);
+	m_ult_936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mystwarr_state::get_ult_936_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	m_ult_936_tilemap->set_transparent_pen(0);
 }
 

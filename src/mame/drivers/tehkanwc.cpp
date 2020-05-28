@@ -169,7 +169,7 @@ void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		break;
 	default:
-		assert_always(false, "Unknown id in tehkanwc_state::device_timer");
+		throw emu_fatalerror("Unknown id in tehkanwc_state::device_timer");
 	}
 }
 
@@ -186,27 +186,27 @@ WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 /* Emulate MSM sound samples with counters */
 
 
-READ8_MEMBER(tehkanwc_state::portA_r)
+uint8_t tehkanwc_state::portA_r()
 {
 	return m_msm_data_offs & 0xff;
 }
 
-READ8_MEMBER(tehkanwc_state::portB_r)
+uint8_t tehkanwc_state::portB_r()
 {
 	return (m_msm_data_offs >> 8) & 0xff;
 }
 
-WRITE8_MEMBER(tehkanwc_state::portA_w)
+void tehkanwc_state::portA_w(uint8_t data)
 {
 	m_msm_data_offs = (m_msm_data_offs & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tehkanwc_state::portB_w)
+void tehkanwc_state::portB_w(uint8_t data)
 {
 	m_msm_data_offs = (m_msm_data_offs & 0x00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(tehkanwc_state::msm_reset_w)
+void tehkanwc_state::msm_reset_w(uint8_t data)
 {
 	m_msm->reset_w(data ? 0 : 1);
 }
@@ -217,10 +217,10 @@ WRITE_LINE_MEMBER(tehkanwc_state::adpcm_int)
 	int msm_data = SAMPLES[m_msm_data_offs & 0x7fff];
 
 	if (m_toggle == 0)
-		m_msm->write_data((msm_data >> 4) & 0x0f);
+		m_msm->data_w((msm_data >> 4) & 0x0f);
 	else
 	{
-		m_msm->write_data(msm_data & 0x0f);
+		m_msm->data_w(msm_data & 0x0f);
 		m_msm_data_offs++;
 	}
 
@@ -681,7 +681,7 @@ void tehkanwc_state::tehkanwc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &tehkanwc_state::sound_port);
 	m_audiocpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);  /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
+	config.set_maximum_quantum(attotime::from_hz(600));  /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

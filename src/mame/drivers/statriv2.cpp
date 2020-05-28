@@ -107,7 +107,7 @@ public:
 	void init_addr_xhl();
 	void init_laserdisc();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
+	DECLARE_READ_LINE_MEMBER(latched_coin_r);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -123,9 +123,9 @@ private:
 	uint8_t m_latched_coin;
 	uint8_t m_last_coin;
 
-	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
-	DECLARE_READ8_MEMBER(question_data_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
+	void statriv2_videoram_w(offs_t offset, uint8_t data);
+	uint8_t question_data_r();
+	void ppi_portc_hi_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
@@ -157,7 +157,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
 	int code = m_videoram[0x400 + tile_index];
 	int attr = m_videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, code, attr, 0);
+	tileinfo.set(0, code, attr, 0);
 }
 
 TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
@@ -165,7 +165,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
 	int code = m_videoram[0x400 + tile_index];
 	int attr = m_videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
+	tileinfo.set(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
 }
 
 
@@ -187,12 +187,12 @@ void statriv2_state::statriv2_palette(palette_device &palette) const
 
 void statriv2_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info), this), TILEMAP_SCAN_ROWS, 8, 15, 64, 16);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(statriv2_state::horizontal_tile_info)), TILEMAP_SCAN_ROWS, 8, 15, 64, 16);
 }
 
 VIDEO_START_MEMBER(statriv2_state,vertical)
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(statriv2_state::vertical_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -203,7 +203,7 @@ VIDEO_START_MEMBER(statriv2_state,vertical)
  *
  *************************************/
 
-WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
+void statriv2_state::statriv2_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
@@ -266,7 +266,7 @@ INTERRUPT_GEN_MEMBER(statriv2_state::tripdraw_interrupt)
  *
  *************************************/
 
-READ8_MEMBER(statriv2_state::question_data_r)
+uint8_t statriv2_state::question_data_r()
 {
 	const uint8_t *qrom = memregion("questions")->base();
 	uint32_t qromsize = memregion("questions")->bytes();
@@ -291,13 +291,13 @@ READ8_MEMBER(statriv2_state::question_data_r)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(statriv2_state::latched_coin_r)
+READ_LINE_MEMBER(statriv2_state::latched_coin_r)
 {
 	return m_latched_coin;
 }
 
 
-WRITE8_MEMBER(statriv2_state::ppi_portc_hi_w)
+void statriv2_state::ppi_portc_hi_w(uint8_t data)
 {
 	data >>= 4;
 	if (data != 0x0f)
@@ -354,7 +354,7 @@ static INPUT_PORTS_START( statusbj )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(statriv2_state, latched_coin_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -387,7 +387,7 @@ static INPUT_PORTS_START( funcsino )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stand")         PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Game")   PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(statriv2_state, latched_coin_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -423,7 +423,7 @@ static INPUT_PORTS_START( tripdraw )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stand")         PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(statriv2_state, latched_coin_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -459,7 +459,7 @@ static INPUT_PORTS_START( bigcsino ) // flyer shows 8 buttons on the cabinet
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(statriv2_state, latched_coin_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -534,7 +534,7 @@ static INPUT_PORTS_START( statriv2 )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Play 1000")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(statriv2_state, latched_coin_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x20, 0x20, "Show Correct Answer" )
@@ -1698,18 +1698,18 @@ void statriv2_state::init_laserdisc()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_readwrite_handler(0x28, 0x2b,
-		read8_delegate([this](address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t
+		read8_delegate(*this, NAME([this] (address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t
 		{
 			uint8_t result = 0x00;
 			if (offset == 1)
 				result = 0x18;
 			logerror("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
 			return result;
-		},"write_lambda"),
-		write8_delegate([this](address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
+		})),
+		write8_delegate(*this, NAME([this] (address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 		{
 			logerror("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
-		},"read_lambda")
+		}))
 	);
 }
 

@@ -105,8 +105,8 @@ enum
 
 #define TMS340X0_SCANLINE_IND16_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms340x0_device::display_params *params)
 #define TMS340X0_SCANLINE_RGB32_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms340x0_device::display_params *params)
-#define TMS340X0_TO_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
-#define TMS340X0_FROM_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
+#define TMS340X0_TO_SHIFTREG_CB_MEMBER(_name) void _name(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t address, uint16_t *shiftreg)
+#define TMS340X0_FROM_SHIFTREG_CB_MEMBER(_name) void _name(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t address, uint16_t *shiftreg)
 
 
 class tms340x0_device : public cpu_device,
@@ -126,8 +126,8 @@ public:
 
 	typedef device_delegate<void (screen_device &screen, bitmap_ind16 &bitmap, int scanline, const display_params *params)> scanline_ind16_cb_delegate;
 	typedef device_delegate<void (screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const display_params *params)> scanline_rgb32_cb_delegate;
-	typedef device_delegate<void (address_space &space, offs_t address, uint16_t *shiftreg)> shiftreg_in_cb_delegate;
-	typedef device_delegate<void (address_space &space, offs_t address, uint16_t *shiftreg)> shiftreg_out_cb_delegate;
+	typedef device_delegate<void (memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t address, uint16_t *shiftreg)> shiftreg_in_cb_delegate;
+	typedef device_delegate<void (memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t address, uint16_t *shiftreg)> shiftreg_out_cb_delegate;
 
 	void set_halt_on_reset(bool halt_on_reset) { m_halt_on_reset = halt_on_reset; }
 	void set_pixel_clock(uint32_t pixclock) { m_pixclock = pixclock; }
@@ -137,72 +137,32 @@ public:
 	auto output_int() { return m_output_int_cb.bind(); }
 	auto ioreg_pre_write() { return m_ioreg_pre_write_cb.bind(); }
 
-	// Setters for ind16 scanline callback
-	template <class FunctionClass>
-	void set_scanline_ind16_callback(void (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, int, const display_params *),
-		const char *name)
+	// Setter for ind16 scanline callback
+	template <typename... T>
+	void set_scanline_ind16_callback(T &&... args)
 	{
-		set_scanline_ind16_callback(scanline_ind16_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_scanline_ind16_callback(const char *devname, void (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, int, const display_params *),
-		const char *name)
-	{
-		set_scanline_ind16_callback(scanline_ind16_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_scanline_ind16_callback(scanline_ind16_cb_delegate callback)
-	{
-		m_scanline_ind16_cb = callback;
+		m_scanline_ind16_cb.set(std::forward<T>(args)...);
 	}
 
-	// Setters for rgb32 scanline callback
-	template <class FunctionClass>
-	void set_scanline_rgb32_callback(void (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, int, const display_params *),
-		const char *name)
+	// Setter for rgb32 scanline callback
+	template <typename... T>
+	void set_scanline_rgb32_callback(T &&... args)
 	{
-		set_scanline_rgb32_callback(scanline_rgb32_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_scanline_rgb32_callback(const char *devname, void (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, int, const display_params *),
-		const char *name)
-	{
-		set_scanline_rgb32_callback(scanline_rgb32_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_scanline_rgb32_callback(scanline_rgb32_cb_delegate callback)
-	{
-		m_scanline_rgb32_cb = callback;
+		m_scanline_rgb32_cb.set(std::forward<T>(args)...);
 	}
 
-	// Setters for shift register input callback
-	template <class FunctionClass>
-	void set_shiftreg_in_callback(void (FunctionClass::*callback)(address_space &, offs_t, uint16_t *), const char *name)
+	// Setter for shift register input callback
+	template <typename... T>
+	void set_shiftreg_in_callback(T &&... args)
 	{
-		set_shiftreg_in_callback(shiftreg_in_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_shiftreg_in_callback(const char *devname, void (FunctionClass::*callback)(address_space &, offs_t, uint16_t *), const char *name)
-	{
-		set_shiftreg_in_callback(shiftreg_in_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_shiftreg_in_callback(shiftreg_in_cb_delegate callback)
-	{
-		m_to_shiftreg_cb = callback;
+		m_to_shiftreg_cb.set(std::forward<T>(args)...);
 	}
 
 	// Setters for shift register output callback
-	template <class FunctionClass>
-	void set_shiftreg_out_callback(void (FunctionClass::*callback)(address_space &, offs_t, uint16_t *), const char *name)
+	template <typename... T>
+	void set_shiftreg_out_callback(T &&... args)
 	{
-		set_shiftreg_out_callback(shiftreg_out_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_shiftreg_out_callback(const char *devname, void (FunctionClass::*callback)(address_space &, offs_t, uint16_t *), const char *name)
-	{
-		set_shiftreg_out_callback(shiftreg_out_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_shiftreg_out_callback(shiftreg_out_cb_delegate callback)
-	{
-		m_from_shiftreg_cb = callback;
+		m_from_shiftreg_cb.set(std::forward<T>(args)...);
 	}
 
 	void get_display_params(display_params *params);
@@ -300,9 +260,9 @@ protected:
 	virtual void device_post_load() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 10000; }
-	virtual uint32_t execute_input_lines() const override { return 2; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 10000; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -321,8 +281,8 @@ protected:
 	typedef uint32_t (tms340x0_device::*pixel_op_func)(uint32_t, uint32_t, uint32_t);
 	typedef void (tms340x0_device::*pixblt_op_func)(int, int);
 	typedef void (tms340x0_device::*pixblt_b_op_func)(int);
-	typedef void (tms340x0_device::*word_write_func)(address_space &space, offs_t offset,uint16_t data);
-	typedef uint16_t (tms340x0_device::*word_read_func)(address_space &space, offs_t offset);
+	typedef void (tms340x0_device::*word_write_func)(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset,uint16_t data);
+	typedef uint16_t (tms340x0_device::*word_read_func)(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset);
 
 	static const wfield_func s_wfield_functions[32];
 	static const rfield_func s_rfield_functions[64];
@@ -358,8 +318,8 @@ protected:
 	uint8_t            m_hblank_stable;
 	uint8_t            m_external_host_access;
 	uint8_t            m_executing;
-	address_space *m_program;
-	memory_access_cache<1, 3, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<32, 1, 3, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific m_program;
 	uint32_t  m_pixclock;                           /* the pixel clock (0 means don't adjust screen size) */
 	int     m_pixperclock;                        /* pixels per clock */
 	emu_timer *m_scantimer;
@@ -932,11 +892,11 @@ protected:
 	int compute_fill_cycles(int left_partials, int right_partials, int full_words, int op_timing);
 	int compute_pixblt_cycles(int left_partials, int right_partials, int full_words, int op_timing);
 	int compute_pixblt_b_cycles(int left_partials, int right_partials, int full_words, int rows, int op_timing, int bpp);
-	void memory_w(address_space &space, offs_t offset,uint16_t data);
-	uint16_t memory_r(address_space &space, offs_t offset);
-	void shiftreg_w(address_space &space, offs_t offset, uint16_t data);
-	uint16_t shiftreg_r(address_space &space, offs_t offset);
-	uint16_t dummy_shiftreg_r(address_space &space, offs_t offset);
+	void memory_w(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset,uint16_t data);
+	uint16_t memory_r(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset);
+	void shiftreg_w(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset, uint16_t data);
+	uint16_t shiftreg_r(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset);
+	uint16_t dummy_shiftreg_r(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset);
 	uint32_t pixel_op00(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
 	uint32_t pixel_op01(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
 	uint32_t pixel_op02(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
@@ -1056,8 +1016,8 @@ public:
 	virtual u16 io_register_r(offs_t offset) override;
 
 protected:
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 8 - 1) / 8; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 8); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 8 - 1) / 8; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 8); }
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	void internal_regs_map(address_map &map);
 };
@@ -1074,8 +1034,8 @@ public:
 	virtual u16 io_register_r(offs_t offset) override;
 
 protected:
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	void internal_regs_map(address_map &map);
 };

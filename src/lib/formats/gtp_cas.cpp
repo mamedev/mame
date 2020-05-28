@@ -6,7 +6,7 @@
 
     Miodrag Milanovic
 */
-#include <assert.h>
+#include <cassert>
 
 #include "gtp_cas.h"
 

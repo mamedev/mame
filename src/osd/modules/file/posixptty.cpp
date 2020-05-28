@@ -15,9 +15,9 @@
 #include <cstring>
 
 #include <fcntl.h>
-#include <limits.h>
+#include <climits>
 #include <unistd.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #if defined(__FreeBSD_kernel__) || defined(__DragonFly__)
 #include <termios.h>
@@ -109,6 +109,9 @@ bool posix_check_ptty_path(std::string const &path)
 
 osd_file::error posix_open_ptty(std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize, std::string &name)
 {
+#if defined(__ANDROID__)
+	return osd_file::error::FAILURE;
+#else // defined(__ANDROID__)
 #if (defined(sun) || defined(__sun)) && (defined(__SVR4) || defined(__svr4__))
 	int access = O_NOCTTY;
 	if (openflags & OPEN_FLAG_WRITE)
@@ -145,9 +148,6 @@ osd_file::error posix_open_ptty(std::uint32_t openflags, osd_file::ptr &file, st
 		::close(masterfd);
 		return errno_to_file_error(err);
 	}
-#elif defined(__ANDROID__)
-	int masterfd = -1, slavefd = -1;
-	char slavepath[PATH_MAX];
 #else
 	struct termios tios;
 	std::memset(&tios, 0, sizeof(tios));
@@ -188,4 +188,5 @@ osd_file::error posix_open_ptty(std::uint32_t openflags, osd_file::ptr &file, st
 		::close(masterfd);
 		return osd_file::error::OUT_OF_MEMORY;
 	}
+#endif // defined(__ANDROID__)
 }

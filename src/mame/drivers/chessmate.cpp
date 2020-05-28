@@ -90,9 +90,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	void digit_w(u8 data);
+	u8 input_r();
 
 	u8 m_inp_mux;
 	u8 m_7seg_data;
@@ -134,7 +134,7 @@ void chmate_state::update_display()
 	m_display->matrix_partial(0, 4, 1 << m_inp_mux, m_7seg_data);
 }
 
-WRITE8_MEMBER(chmate_state::control_w)
+void chmate_state::control_w(u8 data)
 {
 	// d0-d2: 74145 to input mux/digit select
 	m_inp_mux = data & 7;
@@ -151,13 +151,13 @@ WRITE8_MEMBER(chmate_state::control_w)
 	m_maincpu->set_input_line(M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(chmate_state::digit_w)
+void chmate_state::digit_w(u8 data)
 {
 	m_7seg_data = data;
 	update_display();
 }
 
-READ8_MEMBER(chmate_state::input_r)
+u8 chmate_state::input_r()
 {
 	u8 data = 0;
 

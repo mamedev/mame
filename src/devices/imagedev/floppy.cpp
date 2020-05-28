@@ -176,7 +176,6 @@ floppy_image_device *floppy_connector::get_device()
 floppy_image_device::floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_image_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this),
 		input_format(nullptr),
 		output_format(nullptr),
 		image(nullptr),

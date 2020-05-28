@@ -104,6 +104,7 @@
 // pcw/pcw16 beeper
 #include "sound/beep.h"
 #include "machine/ram.h"
+#include "machine/rescap.h"
 #include "render.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -223,7 +224,7 @@ void pcw_state::pcw_map(address_map &map)
 
 
 /* Keyboard is read by the MCU and sent as serial data to the gate array ASIC */
-READ8_MEMBER(pcw_state::pcw_keyboard_r)
+uint8_t pcw_state::pcw_keyboard_r(offs_t offset)
 {
 	return m_iptlines[offset]->read();
 }
@@ -245,7 +246,7 @@ void pcw_state::pcw_update_read_memory_block(int block, int bank)
 	if (bank == 3)
 	{
 		/* when upper 16 bytes are accessed use keyboard read handler */
-		space.install_read_handler( block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(FUNC(pcw_state::pcw_keyboard_data_r),this));
+		space.install_read_handler( block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(*this, FUNC(pcw_state::pcw_keyboard_data_r)));
 		LOGMEM("MEM: read block %i -> bank %i\n", block, bank);
 	}
 	else
@@ -752,20 +753,20 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_pins_callback)
 	m_printer_p2 |= 0x40;
 }
 
-READ8_MEMBER(pcw_state::mcu_printer_p1_r)
+uint8_t pcw_state::mcu_printer_p1_r()
 {
 	LOGPRN("PRN: MCU reading data from P1\n");
 	return m_printer_pins & 0x00ff;
 }
 
-WRITE8_MEMBER(pcw_state::mcu_printer_p1_w)
+void pcw_state::mcu_printer_p1_w(uint8_t data)
 {
 	m_printer_pins = (m_printer_pins & 0x0100) | data;
 	LOGPRN("PRN: Print head position = %i", m_printer_headpos);
 	LOGPRN("PRN: MCU writing %02x to P1 [%03x/%03x]\n", data,m_printer_pins, ~m_printer_pins & 0x1ff);
 }
 
-READ8_MEMBER(pcw_state::mcu_printer_p2_r)
+uint8_t pcw_state::mcu_printer_p2_r()
 {
 	uint8_t ret = 0x00;
 	LOGPRN("PRN: MCU reading data from P2\n");
@@ -776,7 +777,7 @@ READ8_MEMBER(pcw_state::mcu_printer_p2_r)
 	return ret;
 }
 
-WRITE8_MEMBER(pcw_state::mcu_printer_p2_w)
+void pcw_state::mcu_printer_p2_w(uint8_t data)
 {
 	LOGPRN("PRN: MCU writing %02x to P2\n", data);
 	m_printer_p2 = data & 0x70;
@@ -861,22 +862,22 @@ void pcw_state::mcu_transmit_serial(uint8_t bit)
 	}
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_scan_r)
+uint8_t pcw_state::mcu_kb_scan_r()
 {
 	return m_kb_scan_row & 0xff;
 }
 
-WRITE8_MEMBER(pcw_state::mcu_kb_scan_w)
+void pcw_state::mcu_kb_scan_w(uint8_t data)
 {
 	m_kb_scan_row = (m_kb_scan_row & 0xff00) | data;
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_scan_high_r)
+uint8_t pcw_state::mcu_kb_scan_high_r()
 {
 	return (m_kb_scan_row & 0xff00) >> 8;
 }
 
-WRITE8_MEMBER(pcw_state::mcu_kb_scan_high_w)
+void pcw_state::mcu_kb_scan_high_w(uint8_t data)
 {
 	if((m_mcu_prev & 0x02) && !(data & 0x02))  // bit is transmitted on high-to-low clock transition
 	{
@@ -895,7 +896,7 @@ WRITE8_MEMBER(pcw_state::mcu_kb_scan_high_w)
 	m_mcu_prev = data;
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_data_r)
+uint8_t pcw_state::mcu_kb_data_r()
 {
 	uint16_t scan_bits = ((m_kb_scan_row & 0xf000) >> 4) | (m_kb_scan_row & 0xff);
 	int x;
@@ -903,7 +904,7 @@ READ8_MEMBER(pcw_state::mcu_kb_data_r)
 	for(x=0;x<12;x++)
 	{
 		if(!(scan_bits & 1))
-			return pcw_keyboard_r(space,x);
+			return pcw_keyboard_r(x);
 		else
 			scan_bits >>= 1;
 	}
@@ -1266,8 +1267,8 @@ void pcw_state::pcw(machine_config &config)
 	m_keyboard_mcu->t0_in_cb().set(FUNC(pcw_state::mcu_kb_t0_r));
 	m_keyboard_mcu->bus_in_cb().set(FUNC(pcw_state::mcu_kb_data_r));
 
-//  config.m_minimum_quantum = attotime::from_hz(50);
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+//  config.set_maximum_quantum(attotime::from_hz(50));
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1291,7 +1292,7 @@ void pcw_state::pcw(machine_config &config)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("256K");
 
-	TIMER(config, "pcw_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(pcw_state::pcw_timer_interrupt), this), attotime::from_hz(300));
+	TIMER(config, "pcw_timer", 0).configure_periodic(FUNC(pcw_state::pcw_timer_interrupt), attotime::from_hz(300));
 }
 
 void pcw_state::pcw8256(machine_config &config)

@@ -74,13 +74,13 @@ TILE_GET_INFO_MEMBER(airbustr_state::get_tile_info)
 	int code = m_videoram[Layer][tile_index] + ((attr & 0x0f) << 8);
 	int color = (attr >> 4) + ((Layer ^ 1) << 4);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void airbustr_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(airbustr_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(airbustr_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(airbustr_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(airbustr_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_tilemap[1]->set_transparent_pen(0);
 

@@ -427,7 +427,7 @@ void crshrace_state::crshrace(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 2048);
 
 	VSYSTEM_SPR(config, m_spr, 0);
-	m_spr->set_tile_indirect_cb(FUNC(crshrace_state::crshrace_tile_callback), this);
+	m_spr->set_tile_indirect_cb(FUNC(crshrace_state::crshrace_tile_callback));
 	m_spr->set_gfx_region(2);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 

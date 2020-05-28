@@ -27,11 +27,11 @@ WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)
 
 void nes_state::nes_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().mirror(0x1800);                   /* RAM */
-	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));        /* PPU registers */
-	map(0x4014, 0x4014).w(FUNC(nes_state::nes_vh_sprite_dma_w));              /* stupid address space hole */
-	map(0x4016, 0x4016).rw(FUNC(nes_state::nes_in0_r), FUNC(nes_state::nes_in0_w));         /* IN0 - input port 1 */
-	map(0x4017, 0x4017).r(FUNC(nes_state::nes_in1_r));                         /* IN1 - input port 2 */
+	map(0x0000, 0x07ff).ram().mirror(0x1800);                                               // RAM
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write)); // PPU registers
+	map(0x4014, 0x4014).w(FUNC(nes_state::nes_vh_sprite_dma_w));                            // stupid address space hole
+	map(0x4016, 0x4016).rw(FUNC(nes_state::nes_in0_r), FUNC(nes_state::nes_in0_w));         // IN0 - input port 1
+	map(0x4017, 0x4017).r(FUNC(nes_state::nes_in1_r));                                      // IN1 - input port 2
 	// 0x4100-0x5fff -> LOW HANDLER defined on a pcb base
 	// 0x6000-0x7fff -> MID HANDLER defined on a pcb base
 	// 0x8000-0xffff -> HIGH HANDLER defined on a pcb base
@@ -91,6 +91,7 @@ void nes_state::nes(machine_config &config)
 void nes_state::nespal(machine_config &config)
 {
 	nes(config);
+
 	/* basic machine hardware */
 	m_maincpu->set_clock(PAL_APU_CLOCK);
 
@@ -111,6 +112,7 @@ void nes_state::nespal(machine_config &config)
 void nes_state::famicom(machine_config &config)
 {
 	nes(config);
+
 	NES_CONTROL_PORT(config.replace(), m_ctrl1, fc_control_port1_devices, "joypad");
 	NES_CONTROL_PORT(config.replace(), m_ctrl2, fc_control_port2_devices, "joypad");
 	NES_CONTROL_PORT(config, m_exp, fc_expansion_devices, nullptr);
@@ -125,6 +127,7 @@ void nes_state::famicom(machine_config &config)
 void nes_state::nespalc(machine_config &config)
 {
 	nespal(config);
+
 	m_maincpu->set_clock(PALC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
@@ -144,6 +147,7 @@ void nes_state::nespalc(machine_config &config)
 void nes_state::famipalc(machine_config &config)
 {
 	nespalc(config);
+
 	NES_CONTROL_PORT(config.replace(), m_ctrl1, fc_control_port1_devices, "joypad");
 	NES_CONTROL_PORT(config.replace(), m_ctrl2, fc_control_port2_devices, "joypad");
 	NES_CONTROL_PORT(config, m_exp, fc_expansion_devices, nullptr);
@@ -157,6 +161,7 @@ void nes_state::famipalc(machine_config &config)
 void nes_state::suborkbd(machine_config &config)
 {
 	famipalc(config);
+
 	/* TODO: emulate the parallel port bus! */
 	m_exp->set_default_option("subor_keyboard");
 	m_exp->set_fixed(true);
@@ -169,24 +174,24 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		// Set up memory handlers
-		space.install_read_handler(0x4020, 0x40ff, read8sm_delegate(FUNC(nes_disksys_device::read_ex), (nes_disksys_device *)slot));
-		space.install_write_handler(0x4020, 0x40ff, write8sm_delegate(FUNC(nes_disksys_device::write_ex), (nes_disksys_device *)slot));
-		space.install_read_handler(0x4100, 0x5fff, read8sm_delegate(FUNC(device_nes_cart_interface::read_l), (device_nes_cart_interface *)slot));
-		space.install_write_handler(0x4100, 0x5fff, write8sm_delegate(FUNC(device_nes_cart_interface::write_l), (device_nes_cart_interface *)slot));
-		space.install_read_handler(0x6000, 0x7fff, read8sm_delegate(FUNC(nes_disksys_device::read_m), (nes_disksys_device *)slot));
-		space.install_write_handler(0x6000, 0x7fff, write8sm_delegate(FUNC(nes_disksys_device::write_m), (nes_disksys_device *)slot));
-		space.install_read_handler(0x8000, 0xffff, read8sm_delegate(FUNC(nes_disksys_device::read_h), (nes_disksys_device *)slot));
-		space.install_write_handler(0x8000, 0xffff, write8sm_delegate(FUNC(nes_disksys_device::write_h), (nes_disksys_device *)slot));
+		space.install_read_handler(0x4020, 0x40ff, read8sm_delegate(*slot, FUNC(nes_disksys_device::read_ex)));
+		space.install_write_handler(0x4020, 0x40ff, write8sm_delegate(*slot, FUNC(nes_disksys_device::write_ex)));
+		space.install_read_handler(0x4100, 0x5fff, read8sm_delegate(*slot, FUNC(device_nes_cart_interface::read_l)));
+		space.install_write_handler(0x4100, 0x5fff, write8sm_delegate(*slot, FUNC(device_nes_cart_interface::write_l)));
+		space.install_read_handler(0x6000, 0x7fff, read8sm_delegate(*slot, FUNC(nes_disksys_device::read_m)));
+		space.install_write_handler(0x6000, 0x7fff, write8sm_delegate(*slot, FUNC(nes_disksys_device::write_m)));
+		space.install_read_handler(0x8000, 0xffff, read8sm_delegate(*slot, FUNC(nes_disksys_device::read_h)));
+		space.install_write_handler(0x8000, 0xffff, write8sm_delegate(*slot, FUNC(nes_disksys_device::write_h)));
 
 		slot->vram_alloc(0x2000);
 		slot->prgram_alloc(0x8000);
 
 		slot->pcb_start(machine(), m_ciram.get(), false);
-		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(FUNC(device_nes_cart_interface::chr_r),(device_nes_cart_interface *)slot), write8sm_delegate(FUNC(device_nes_cart_interface::chr_w),(device_nes_cart_interface *)slot));
-		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(FUNC(device_nes_cart_interface::nt_r),(device_nes_cart_interface *)slot), write8sm_delegate(FUNC(device_nes_cart_interface::nt_w),(device_nes_cart_interface *)slot));
-		m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),(device_nes_cart_interface *)slot));
-		m_ppu->set_hblank_callback(ppu2c0x_device::hblank_delegate(FUNC(nes_disksys_device::hblank_irq),(nes_disksys_device *)slot));
-		m_ppu->set_latch(ppu2c0x_device::latch_delegate(FUNC(device_nes_cart_interface::ppu_latch),(device_nes_cart_interface *)slot));
+		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*slot, FUNC(device_nes_cart_interface::chr_r)), write8sm_delegate(*slot, FUNC(device_nes_cart_interface::chr_w)));
+		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*slot, FUNC(device_nes_cart_interface::nt_r)), write8sm_delegate(*slot, FUNC(device_nes_cart_interface::nt_w)));
+		m_ppu->set_scanline_callback(*slot, FUNC(device_nes_cart_interface::scanline_irq));
+		m_ppu->set_hblank_callback(*slot, FUNC(nes_disksys_device::hblank_irq));
+		m_ppu->set_latch(*slot, FUNC(device_nes_cart_interface::ppu_latch));
 	}
 }
 

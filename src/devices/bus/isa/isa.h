@@ -125,6 +125,7 @@ public:
 	// inline configuration
 	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
 	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
+	auto iochrdy_callback() { return m_write_iochrdy.bind(); }
 	auto iochck_callback() { return m_write_iochck.bind(); }
 	auto irq2_callback() { return m_out_irq2_cb.bind(); }
 	auto irq3_callback() { return m_out_irq3_cb.bind(); }
@@ -154,6 +155,7 @@ public:
 	void unmap_device(offs_t start, offs_t end) const { m_iospace->unmap_readwrite(start, end); }
 	void unmap_bank(offs_t start, offs_t end);
 	void unmap_rom(offs_t start, offs_t end);
+	void unmap_readwrite(offs_t start, offs_t end);
 	bool is_option_rom_space_available(offs_t start, int size);
 
 	// FIXME: shouldn't need to expose this
@@ -181,6 +183,7 @@ public:
 	void dack_line_w(int line, int state);
 	void eop_w(int channels, int state);
 
+	void set_ready(int state);
 	void nmi();
 
 	virtual void set_dma_channel(uint8_t channel, device_isa8_card_interface *dev, bool do_eop);
@@ -222,6 +225,7 @@ protected:
 	std::forward_list<device_slot_interface *> m_slot_list;
 
 private:
+	devcb_write_line m_write_iochrdy;
 	devcb_write_line m_write_iochck;
 };
 
@@ -232,7 +236,7 @@ DECLARE_DEVICE_TYPE(ISA8, isa8_device)
 // ======================> device_isa8_card_interface
 
 // class representing interface-specific live isa8 card
-class device_isa8_card_interface : public device_slot_card_interface
+class device_isa8_card_interface : public device_interface
 {
 	friend class isa8_device;
 	template <class ElementType> friend class simple_list;

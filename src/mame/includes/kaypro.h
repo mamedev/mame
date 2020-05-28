@@ -50,9 +50,9 @@ public:
 	DECLARE_WRITE8_MEMBER(kaypro484_index_w);
 	DECLARE_WRITE8_MEMBER(kaypro484_register_w);
 	DECLARE_WRITE8_MEMBER(kaypro484_videoram_w);
-	DECLARE_READ8_MEMBER(pio_system_r);
-	DECLARE_WRITE8_MEMBER(kayproii_pio_system_w);
-	DECLARE_WRITE8_MEMBER(kayproiv_pio_system_w);
+	uint8_t pio_system_r();
+	void kayproii_pio_system_w(uint8_t data);
+	void kayproiv_pio_system_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_READ8_MEMBER(kaypro_videoram_r);

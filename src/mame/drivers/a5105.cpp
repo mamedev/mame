@@ -67,16 +67,16 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(a5105_memsel_r);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_READ8_MEMBER(key_mux_r);
-	DECLARE_READ8_MEMBER(pio_pb_r);
-	DECLARE_WRITE8_MEMBER(key_mux_w);
-	DECLARE_WRITE8_MEMBER(a5105_ab_w);
-	DECLARE_WRITE8_MEMBER(a5105_memsel_w);
-	DECLARE_WRITE8_MEMBER( a5105_upd765_w );
-	DECLARE_WRITE8_MEMBER(pcg_addr_w);
-	DECLARE_WRITE8_MEMBER(pcg_val_w);
+	uint8_t a5105_memsel_r();
+	uint8_t key_r();
+	uint8_t key_mux_r();
+	uint8_t pio_pb_r();
+	void key_mux_w(uint8_t data);
+	void a5105_ab_w(uint8_t data);
+	void a5105_memsel_w(uint8_t data);
+	void a5105_upd765_w(uint8_t data);
+	void pcg_addr_w(uint8_t data);
+	void pcg_val_w(uint8_t data);
 	void a5105_palette(palette_device &palette) const;
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
@@ -166,7 +166,7 @@ void a5105_state::a5105_mem(address_map &map)
 	map(0xc000, 0xffff).bankrw("bank4");
 }
 
-READ8_MEMBER( a5105_state::pio_pb_r )
+uint8_t a5105_state::pio_pb_r()
 {
 	/*
 
@@ -191,13 +191,13 @@ READ8_MEMBER( a5105_state::pio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( a5105_state::pcg_addr_w )
+void  a5105_state::pcg_addr_w(uint8_t data)
 {
 	m_pcg_addr = data << 3;
 	m_pcg_internal_addr = 0;
 }
 
-WRITE8_MEMBER( a5105_state::pcg_val_w )
+void a5105_state::pcg_val_w(uint8_t data)
 {
 	m_char_ram[m_pcg_addr | m_pcg_internal_addr] = data;
 
@@ -207,7 +207,7 @@ WRITE8_MEMBER( a5105_state::pcg_val_w )
 	m_pcg_internal_addr&=7;
 }
 
-READ8_MEMBER( a5105_state::key_r )
+uint8_t a5105_state::key_r()
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 											"KEY4", "KEY5", "KEY6", "KEY7",
@@ -217,12 +217,12 @@ READ8_MEMBER( a5105_state::key_r )
 	return ioport(keynames[m_key_mux & 0x0f])->read();
 }
 
-READ8_MEMBER( a5105_state::key_mux_r )
+uint8_t a5105_state::key_mux_r()
 {
 	return m_key_mux;
 }
 
-WRITE8_MEMBER( a5105_state::key_mux_w )
+void a5105_state::key_mux_w(uint8_t data)
 {
 	/*
 	    xxxx ---- unknown
@@ -232,7 +232,7 @@ WRITE8_MEMBER( a5105_state::key_mux_w )
 	m_key_mux = data;
 }
 
-WRITE8_MEMBER( a5105_state::a5105_ab_w )
+void a5105_state::a5105_ab_w(uint8_t data)
 {
 /*port $ab
         ---- 100x tape motor, active low
@@ -263,7 +263,7 @@ WRITE8_MEMBER( a5105_state::a5105_ab_w )
 	}
 }
 
-READ8_MEMBER( a5105_state::a5105_memsel_r )
+uint8_t a5105_state::a5105_memsel_r()
 {
 	uint8_t res;
 
@@ -275,7 +275,7 @@ READ8_MEMBER( a5105_state::a5105_memsel_r )
 	return res;
 }
 
-WRITE8_MEMBER( a5105_state::a5105_memsel_w )
+void a5105_state::a5105_memsel_w(uint8_t data)
 {
 	address_space &prog = m_maincpu->space( AS_PROGRAM );
 
@@ -366,7 +366,7 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 	//printf("Memsel change to %02x %02x %02x %02x\n",m_memsel[0],m_memsel[1],m_memsel[2],m_memsel[3]);
 }
 
-WRITE8_MEMBER( a5105_state::a5105_upd765_w )
+void a5105_state::a5105_upd765_w(uint8_t data)
 {
 	m_floppy0->get_device()->mon_w(!BIT(data,0));
 	m_floppy1->get_device()->mon_w(!BIT(data,1));
@@ -388,10 +388,10 @@ void a5105_state::a5105_io(address_map &map)
 	map(0x98, 0x99).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 
 	map(0x9c, 0x9c).w(FUNC(a5105_state::pcg_val_w));
-//  AM_RANGE(0x9d, 0x9d) crtc area (ff-based), palette routes here
+//  map(0x9d, 0x9d) crtc area (ff-based), palette routes here
 	map(0x9e, 0x9e).w(FUNC(a5105_state::pcg_addr_w));
 
-//  AM_RANGE(0xa0, 0xa1) ay8910?
+//  map(0xa0, 0xa1) ay8910?
 	map(0xa8, 0xa8).rw(FUNC(a5105_state::a5105_memsel_r), FUNC(a5105_state::a5105_memsel_w));
 	map(0xa9, 0xa9).r(FUNC(a5105_state::key_r));
 	map(0xaa, 0xaa).rw(FUNC(a5105_state::key_mux_r), FUNC(a5105_state::key_mux_w));
@@ -517,8 +517,7 @@ INPUT_PORTS_END
 
 void a5105_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	a5105_ab_w(space, 0, 9); // turn motor off
+	a5105_ab_w(9); // turn motor off
 
 	m_ram_base = (uint8_t*)m_ram->pointer();
 	m_rom_base = (uint8_t*)memregion("maincpu")->base();

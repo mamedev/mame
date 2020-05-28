@@ -42,8 +42,8 @@ DEFINE_DEVICE_TYPE(M50741, m50741_device, "m50741", "Mitsubishi M50741")
 m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
 	m740_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 13, 0, internal_map),
-	m_read_p{{*this}, {*this}, {*this}, {*this}},
-	m_write_p{{*this}, {*this}, {*this}, {*this}},
+	m_read_p(*this),
+	m_write_p(*this),
 	m_intctrl(0),
 	m_tmrctrl(0),
 	m_tmr12pre(0),
@@ -64,11 +64,8 @@ m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, co
 
 void m5074x_device::device_start()
 {
-	for (int i = 0; i < 4; i++)
-	{
-		m_read_p[i].resolve_safe(0);
-		m_write_p[i].resolve_safe();
-	}
+	m_read_p.resolve_all_safe(0);
+	m_write_p.resolve_all_safe();
 
 	for (int i = 0; i < NUM_TIMERS; i++)
 	{

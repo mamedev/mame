@@ -9,12 +9,43 @@ driver by David Haywood
 
 
 todo:
-
-PIC from Action Hollywood still needs deprotecting + dumping
-
-Both games have problems with the Eeprom (settings are not saved)
+  PIC from Action Hollywood still needs deprotecting + dumping
+  Both games have problems with the Eeprom (settings are not saved)
 
 
+Main board: PRO-3/B
++-------------------------------------------+
+|       IC13   PIC16C57                16MHz|
+|VOL    M6295                   +----+ 65764|
+|                               |1020|      |
+|                               +----+ 65764|
+|J    65764 65764                           |
+|A    65764 65764               +----+ IC36 |
+|M                              |1020| IC35 |
+|M                              +----+ IC34 |
+|A    62256 62256               +----+ IC33 |
+|  SW   IC5 IC6                 |1020| IC32 |
+|12MHz MC68000P12               +----+ IC31 |
+|MACH1111                62256         IC30 |
+|     93C46N             62256         IC29 |
++-------------------------------------------+
+
+   CPU: MC68000P12
+        PIC16C57-XT/P
+ Sound: OKI M6295 (rebadged as U6295)
+   OSC: 16.000MHz, 12.000MHz
+   RAM: UM62256D-70LL - 32Kx8 SRAM (x4)
+        HM3-65764E-5 - 8Kx8 SRAM (x6)
+EEPROM: 93C46N
+ Other: TI TPC1020BFN-084C (x3)
+        AMD MACH111-15CJ
+        VOL - volume pot
+        SW - push button service switch
+
+Measured clocks:
+    68000 - 12MHz
+ PIC16C57 - 4MHz
+    M6295 - 1MHz
 */
 
 /* Notes
@@ -166,10 +197,10 @@ void kickgoal_state::program_map(address_map &map)
 	map(0x880000, 0x89ffff).nopw(); // during startup
 
 	map(0x900000, 0x90ffff).nopw(); // during startup
-	map(0x900001, 0x900001).lw8("eeprom_cs_w", [this](u8 data){ m_eeprom->cs_write(BIT(data, 0)); });
-	map(0x900003, 0x900003).lw8("eeprom_clk_w", [this](u8 data){ m_eeprom->clk_write(BIT(data, 0)); });
-	map(0x900005, 0x900005).lw8("eeprom_di_w", [this](u8 data){ m_eeprom->di_write(BIT(data, 0)); });
-	map(0x900007, 0x900007).lr8("eeprom_r", [this](){ return m_eeprom->do_read(); });
+	map(0x900001, 0x900001).lw8(NAME([this] (u8 data) { m_eeprom->cs_write(BIT(data, 0)); }));
+	map(0x900003, 0x900003).lw8(NAME([this] (u8 data) { m_eeprom->clk_write(BIT(data, 0)); }));
+	map(0x900005, 0x900005).lw8(NAME([this] (u8 data) { m_eeprom->di_write(BIT(data, 0)); }));
+	map(0x900007, 0x900007).lr8(NAME([this] () { return m_eeprom->do_read(); }));
 
 	map(0xa00000, 0xa03fff).ram().w(FUNC(kickgoal_state::fgram_w)).share("fgram"); /* FG Layer */
 	map(0xa04000, 0xa07fff).ram().w(FUNC(kickgoal_state::bgram_w)).share("bgram"); /* Higher BG Layer */
@@ -320,7 +351,7 @@ void kickgoal_state::oki_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(kickgoal_state::soundio_port_a_w)
+void kickgoal_state::soundio_port_a_w(uint8_t data)
 {
 	// only time this ever gets a different value is the high score name entry, these banks are correct based on sample positions
 	switch (data)
@@ -331,23 +362,23 @@ WRITE8_MEMBER(kickgoal_state::soundio_port_a_w)
 	}
 }
 
-READ8_MEMBER(kickgoal_state::soundio_port_b_r)
+uint8_t kickgoal_state::soundio_port_b_r()
 {
 	return m_pic_portb;
 }
 
-WRITE8_MEMBER(kickgoal_state::soundio_port_b_w)
+void kickgoal_state::soundio_port_b_w(uint8_t data)
 {
 	m_pic_portb = data;
 }
 
-READ8_MEMBER(kickgoal_state::soundio_port_c_r)
+uint8_t kickgoal_state::soundio_port_c_r()
 {
 	// 0x20 = sound command ready?
 	return (m_pic_portc & ~0x20) | m_sound_command_sent;
 }
 
-WRITE8_MEMBER(kickgoal_state::soundio_port_c_w)
+void kickgoal_state::soundio_port_c_w(uint8_t data)
 {
 	if ((data & 0x10) != (m_pic_portc & 0x10))
 	{
@@ -392,14 +423,14 @@ void kickgoal_state::kickgoal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kickgoal_state::program_map);
 	m_maincpu->set_vblank_int("screen", FUNC(kickgoal_state::irq6_line_hold));
 
-	PIC16C57(config, m_audiocpu, XTAL(12'000'000)/3);  /* 4MHz ? */
+	PIC16C57(config, m_audiocpu, XTAL(12'000'000)/3);  /* 4MHz */
 	m_audiocpu->write_a().set(FUNC(kickgoal_state::soundio_port_a_w));
 	m_audiocpu->read_b().set(FUNC(kickgoal_state::soundio_port_b_r));
 	m_audiocpu->write_b().set(FUNC(kickgoal_state::soundio_port_b_w));
 	m_audiocpu->read_c().set(FUNC(kickgoal_state::soundio_port_c_r));
 	m_audiocpu->write_c().set(FUNC(kickgoal_state::soundio_port_c_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
@@ -422,7 +453,7 @@ void kickgoal_state::kickgoal(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	OKIM6295(config, m_oki, XTAL(12'000'000)/12, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki, XTAL(12'000'000)/12, okim6295_device::PIN7_LOW);  /* 1MHz */
 	m_oki->set_addrmap(0, &kickgoal_state::oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
@@ -547,7 +578,7 @@ void kickgoal_state::init_kickgoal()
 
 void kickgoal_state::init_actionhw()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800004, 0x800005, write16_delegate(FUNC(kickgoal_state::actionhw_snd_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800004, 0x800005, write16_delegate(*this, FUNC(kickgoal_state::actionhw_snd_w)));
 }
 
 GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_SUPPORTS_SAVE )

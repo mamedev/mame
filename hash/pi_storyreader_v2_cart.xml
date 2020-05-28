@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="pi_storyreader_v2_cart" description="Publications International Ltd Story Reader 2.0 cartridges">
+
+	<software name="ts2" supported="no">
+		<description>Toy Story 2</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_v2_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="storyreaderv2_toystory2.bin" size="0x100000" crc="b3b4b613" sha1="0e0bd3a9865ac35a0c8c0dae9cfaac15f5b30a89" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

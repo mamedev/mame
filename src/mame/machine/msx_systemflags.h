@@ -16,7 +16,7 @@ class msx_systemflags_device : public device_t
 public:
 	template <typename T>
 	msx_systemflags_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&maincpu_tag, uint8_t initial_value)
-		:msx_systemflags_device(mconfig, tag, owner, 0)
+		: msx_systemflags_device(mconfig, tag, owner, 0)
 	{
 		set_maincpu_tag(std::forward<T>(maincpu_tag));
 		set_initial_value(initial_value);
@@ -28,8 +28,8 @@ public:
 	template <typename T> void set_maincpu_tag(T &&maincpu_tag) { m_maincpu.set_tag(std::forward<T>(maincpu_tag)); }
 	void set_initial_value(uint8_t initial_value) { m_initial_value = initial_value; }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read();
+	void write(uint8_t data);
 
 protected:
 	virtual void device_start() override;

@@ -15,7 +15,7 @@
 #include "hpcdasm.h"
 
 #include "util/strformat.h"
-#include <ctype.h>
+#include <cctype>
 
 using osd::u32;
 using util::BIT;

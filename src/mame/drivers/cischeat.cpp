@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-/***************************************************************************
+/******************************************************************************
 
                             -= Jaleco Driving Games =-
 
@@ -159,6 +159,9 @@ To Do:
   in stage 6 etc.);
 - Force feedback :)
 - Major cleanups needed, especially in video file;
+- scudhamm: during attract mode every other how to play screen shows up with
+  wrong background layer colors;
+- armchmp2: arm input device not completely understood;
 - Split the non-road games into own driver, merge them with Alien Command,
   device-ify the sprite chip;
 
@@ -176,16 +179,17 @@ Dip locations verified for Big Run with the manual. Also added missing dips
 and locations from Service mode to: Scud Hammer, F1 GP Star 1 & 2 and
 Cisco Heat.
 
-***************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 #include "includes/cischeat.h"
 
 #include "cpu/m68000/m68000.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
+#include "machine/adc0804.h"
 #include "machine/jalcrpt.h"
 #include "machine/nvram.h"
+#include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
 
 #include "cischeat.lh"
@@ -205,6 +209,17 @@ Cisco Heat.
                                 Big Run
 **************************************************************************/
 
+WRITE16_MEMBER(cischeat_state::leds_out_w)
+{
+	// leds
+	if (ACCESSING_BITS_0_7)
+	{
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		m_leds[0] = BIT(data, 4);   // start button
+		m_leds[1] = BIT(data, 5);   // ?
+	}
+}
 
 void cischeat_state::bigrun_map(address_map &map)
 {
@@ -524,7 +539,7 @@ WRITE16_MEMBER(cischeat_state::scudhamm_motor_command_w)
 }
 
 
-READ16_MEMBER(cischeat_state::scudhamm_analog_r)
+uint8_t cischeat_state::scudhamm_analog_r()
 {
 	int i=ioport("IN1")->read(),j;
 
@@ -561,6 +576,7 @@ WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
+		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 		m_leds[3] = BIT(data, 4);
 		m_leds[4] = BIT(data, 5);
 	}
@@ -601,7 +617,7 @@ void cischeat_state::scudhamm_map(address_map &map)
 	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));             // Sound
 	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));             //
 	map(0x10001c, 0x10001d).w(FUNC(cischeat_state::scudhamm_enable_w));                                            // ?
-	map(0x100040, 0x100041).r(FUNC(cischeat_state::scudhamm_analog_r)).nopw();                         // A / D
+	map(0x100041, 0x100041).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));                    // A / D
 	map(0x100044, 0x100045).r(FUNC(cischeat_state::scudhamm_motor_pos_r));                                  // Motor Position
 	map(0x100050, 0x100051).r(FUNC(cischeat_state::scudhamm_motor_status_r)).w(FUNC(cischeat_state::scudhamm_motor_command_w));        // Motor Limit Switches
 	map(0x10005c, 0x10005d).portr("IN2");                                                    // 2 x DSW
@@ -612,37 +628,27 @@ void cischeat_state::scudhamm_map(address_map &map)
                             Arm Champs II
 **************************************************************************/
 
-READ16_MEMBER(cischeat_state::armchmp2_motor_status_r)
+READ16_MEMBER(armchamp2_state::motor_status_r)
 {
 	return 0x11;
 }
 
-WRITE16_MEMBER(cischeat_state::armchmp2_motor_command_w)
+WRITE16_MEMBER(armchamp2_state::motor_command_w)
 {
-	COMBINE_DATA( &m_scudhamm_motor_command );
+	// 0x00xx -> disable motor (test mode)
+	// 0x10ff -> automated test (test limits?)
+	// 0x10xx -> apply a left-to-right force
+	COMBINE_DATA( &m_arm_motor_command );
 }
 
-READ16_MEMBER(cischeat_state::armchmp2_analog_r)
+uint8_t armchamp2_state::analog_r()
 {
 	int armdelta;
 
-	armdelta = ioport("IN1")->read() - m_armold;
-	m_armold = ioport("IN1")->read();
+	armdelta = ioport("ARM")->read() - m_armold;
+	m_armold = ioport("ARM")->read();
 
-	return ~( m_scudhamm_motor_command + armdelta );    // + x : x<=0 and player loses, x>0 and player wins
-}
-
-READ16_MEMBER(cischeat_state::armchmp2_buttons_r)
-{
-	int arm_x = ioport("IN1")->read();
-
-	uint16_t ret = ioport("IN0")->read();
-
-	if (arm_x < 0x40)       ret &= ~1;
-	else if (arm_x > 0xc0)  ret &= ~2;
-	else if ((arm_x > 0x60) && (arm_x < 0xa0))  ret &= ~4;
-
-	return ret;
+	return (~( m_arm_motor_command + armdelta )) & 0xff;    // + x : x<=0 and player loses, x>0 and player wins
 }
 
 /*
@@ -653,7 +659,7 @@ READ16_MEMBER(cischeat_state::armchmp2_buttons_r)
     ---- ---- 76-- ----     Coin counters
     ---- ---- --54 3210
 */
-WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
+WRITE16_MEMBER(armchamp2_state::output_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -670,24 +676,25 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 	}
 }
 
-void cischeat_state::armchmp2_map(address_map &map)
+void armchamp2_state::armchmp2_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                                                 // ROM
+	map(0x000000, 0x07ffff).rom();
 	map(0x082000, 0x082005).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x082008, 0x08200d).nopw(); //      UNUSED LAYER
+	map(0x082008, 0x08200d).nopw();
 	map(0x082100, 0x082105).w("scroll2", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082208, 0x082209).rw(m_watchdog, FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
-	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");     // Scroll ram 0
-	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
-	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");              // Palette
-	map(0x0f0000, 0x0fffff).ram().share("ram");                                         // Work RAM + Spriteram
-	map(0x100000, 0x100001).portr("IN2").w(FUNC(cischeat_state::scudhamm_oki_bank_w));                      // DSW + Sound
-	map(0x100004, 0x100005).portr("IN3");                                                    // DSW
-	map(0x100008, 0x100009).rw(FUNC(cischeat_state::armchmp2_buttons_r), FUNC(cischeat_state::armchmp2_leds_w));                      // Leds + Coin Counters + Buttons + Sensors
-	map(0x10000c, 0x10000d).r(FUNC(cischeat_state::armchmp2_analog_r)).nopw();                         // A / D
-	map(0x100010, 0x100011).rw(FUNC(cischeat_state::armchmp2_motor_status_r), FUNC(cischeat_state::armchmp2_motor_command_w));        // Motor Limit Switches?
-	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           // Sound
-	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           //
+	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
+	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
+	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0f0000, 0x0fffff).ram().share("ram"); // Work RAM + Spriteram
+	map(0x100000, 0x100001).portr("IN2").w(FUNC(armchamp2_state::scudhamm_oki_bank_w));
+	map(0x100004, 0x100005).portr("DSW"); // DSW
+	map(0x100008, 0x100009).portr("IN0").w(FUNC(armchamp2_state::output_w));
+	map(0x10000d, 0x10000d).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write)); 
+	map(0x100010, 0x100011).rw(FUNC(armchamp2_state::motor_status_r), FUNC(armchamp2_state::motor_command_w));
+	// same hookup as acommand, most notably the "Arm Champs II" voice sample on title screen playbacks on oki1 mirror
+	map(0x100014, 0x100017).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x100018, 0x10001b).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 }
 
 
@@ -698,7 +705,7 @@ void cischeat_state::armchmp2_map(address_map &map)
 #define RIGHT 0
 #define LEFT  1
 
-WRITE16_MEMBER(cischeat_state::captflag_leds_w)
+WRITE16_MEMBER(captflag_state::leds_w)
 {
 	COMBINE_DATA( &m_captflag_leds );
 	if (ACCESSING_BITS_8_15)
@@ -709,13 +716,13 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 		m_leds[1] = BIT(data, 13);    // select
 
 		int power = (data & 0x1000);
-		m_captflag_hopper->motor_w(power ? 1 : 0);    // prize motor
+		m_hopper->motor_w(power ? 1 : 0);    // prize motor
 		if (!power)
-			m_captflag_hopper->reset();
+			m_hopper->reset();
 	}
 }
 
-WRITE16_MEMBER(cischeat_state::captflag_oki_bank_w)
+WRITE16_MEMBER(captflag_state::oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -726,32 +733,32 @@ WRITE16_MEMBER(cischeat_state::captflag_oki_bank_w)
 
 // Motors
 
-WRITE16_MEMBER(cischeat_state::captflag_motor_command_right_w)
+WRITE16_MEMBER(captflag_state::motor_command_right_w)
 {
 	// Output check:
 	// e09a up
 	// 80b9 - (when not busy)
 	// 0088 - (when busy)
 	// e0ba down
-	data = COMBINE_DATA( &m_captflag_motor_command[RIGHT] );
-	captflag_motor_move(RIGHT, data);
+	data = COMBINE_DATA( &m_motor_command[RIGHT] );
+	motor_move(RIGHT, data);
 }
-WRITE16_MEMBER(cischeat_state::captflag_motor_command_left_w)
+WRITE16_MEMBER(captflag_state::motor_command_left_w)
 {
 	// Output check:
 	// e0ba up
 	// 8099 - (when not busy)
 	// 0088 - (when busy)
 	// e09a down
-	data = COMBINE_DATA( &m_captflag_motor_command[LEFT] );
-	captflag_motor_move(LEFT, data);
+	data = COMBINE_DATA( &m_motor_command[LEFT] );
+	motor_move(LEFT, data);
 }
 
-void cischeat_state::captflag_motor_move(int side, uint16_t data)
+void captflag_state::motor_move(int side, uint16_t data)
 {
-	uint16_t & pos  = m_captflag_motor_pos[side];
+	uint16_t & pos  = m_motor_pos[side];
 
-	timer_device &dev((side == RIGHT) ? *m_captflag_motor_right : *m_captflag_motor_left);
+	timer_device &dev((side == RIGHT) ? *m_motor_right : *m_motor_left);
 
 //  bool busy = !(dev.time_left() == attotime::never);
 	bool busy = false;
@@ -802,20 +809,22 @@ void cischeat_state::captflag_motor_move(int side, uint16_t data)
 	output().set_value((side == RIGHT) ? "right" : "left", pos);
 }
 
-CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_pos_r)
+template <int N>
+CUSTOM_INPUT_MEMBER(captflag_state::motor_pos_r)
 {
 	const uint8_t pos[4] = {1,0,2,3}; // -> 2,3,1,0 offsets -> 0123
-	return ~pos[m_captflag_motor_pos[(uintptr_t)param]];
+	return ~pos[m_motor_pos[N]];
 }
 
-CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_busy_r)
+template <int N>
+READ_LINE_MEMBER(captflag_state::motor_busy_r)
 {
-//  timer_device & dev = ((side == RIGHT) ? m_captflag_motor_right : m_captflag_motor_left);
+//  timer_device & dev = ((side == RIGHT) ? m_motor_right : m_motor_left);
 //  return (dev.time_left() == attotime::never) ? 0 : 1;
 	return 0;
 }
 
-void cischeat_state::captflag_map(address_map &map)
+void captflag_state::captflag_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                                 // ROM
 	map(0x082000, 0x082005).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
@@ -827,24 +836,24 @@ void cischeat_state::captflag_map(address_map &map)
 	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2"); // Scroll RAM 2
 	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
 	map(0x0f0000, 0x0fffff).ram().share("ram");                                                 // Work RAM + Spriteram
-	map(0x100000, 0x100001).portr("SW1_2").w(FUNC(cischeat_state::captflag_oki_bank_w));                    // 2 x DSW + Sound
-	map(0x100008, 0x100009).portr("Buttons").w(FUNC(cischeat_state::captflag_leds_w));                      // Buttons + Leds
+	map(0x100000, 0x100001).portr("SW1_2").w(FUNC(captflag_state::oki_bank_w));                    // 2 x DSW + Sound
+	map(0x100008, 0x100009).portr("Buttons").w(FUNC(captflag_state::leds_w));                      // Buttons + Leds
 	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));         // Sound
 	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));         //
-	map(0x10001c, 0x10001d).w(FUNC(cischeat_state::scudhamm_enable_w));                                            // ?
+	map(0x10001c, 0x10001d).w(FUNC(captflag_state::scudhamm_enable_w));                                            // ?
 	map(0x100040, 0x100041).portr("SW01");                                                   // DSW + Motor
-	map(0x100044, 0x100045).w(FUNC(cischeat_state::captflag_motor_command_left_w));                                // Motor Command (Left)
-	map(0x100048, 0x100049).w(FUNC(cischeat_state::captflag_motor_command_right_w));                               // Motor Command (Right)
+	map(0x100044, 0x100045).w(FUNC(captflag_state::motor_command_left_w));                                 // Motor Command (Left)
+	map(0x100048, 0x100049).w(FUNC(captflag_state::motor_command_right_w));                                // Motor Command (Right)
 	map(0x100060, 0x10007f).ram().share("nvram");      // NVRAM (even bytes only)
 }
 
-void cischeat_state::captflag_oki1_map(address_map &map)
+void captflag_state::oki1_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0x20000, 0x3ffff).bankr("oki1_bank");
 }
 
-void cischeat_state::captflag_oki2_map(address_map &map)
+void captflag_state::oki2_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0x20000, 0x3ffff).bankr("oki2_bank");
@@ -1078,14 +1087,14 @@ static INPUT_PORTS_START( bigrun )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")   //Controls - $80002.w
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Brake")  // Brake
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Brake")  // Brake
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Gear Shift") PORT_TOGGLE // Shift
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Horn")   // Horn
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Horn")   // Horn
 
 	PORT_START("IN3")   // Motor Control? - $80004.w
 	PORT_DIPNAME( 0x01, 0x01, "Up Limit SW" )   // Limit the Cockpit movements?
@@ -1397,7 +1406,7 @@ static INPUT_PORTS_START( f1gpstar )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW) // -> f0100 (called "Test")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Gear Shift") PORT_TOGGLE // Shift
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Brake")// Brake -> !f9010
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Brake")// Brake -> !f9010
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 ) // "Race Together"
 
 	PORT_START("IN3")   // ? Read at boot only - $80006.w
@@ -1563,7 +1572,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( scudhamm )
 	PORT_START("IN0")   // Buttons
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // PORT_IMPULSE(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // GAME OVER if pressed on the selection screen
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )     // called "Test"
@@ -1625,11 +1634,30 @@ INPUT_PORTS_END
                             Arm Champs II
 **************************************************************************/
 
+CUSTOM_INPUT_MEMBER(armchamp2_state::left_sensor_r)
+{
+	int arm_x = ioport("ARM")->read();
+	return (arm_x < 0x40);
+}
+
+CUSTOM_INPUT_MEMBER(armchamp2_state::right_sensor_r)
+{
+	int arm_x = ioport("ARM")->read();
+	return (arm_x > 0xc0);
+}
+
+CUSTOM_INPUT_MEMBER(armchamp2_state::center_sensor_r)
+{
+	int arm_x = ioport("ARM")->read();
+	return ((arm_x > 0x60) && (arm_x < 0xa0));
+}
+
+
 static INPUT_PORTS_START( armchmp2 )
 	PORT_START("IN0")   // Buttons + Sensors
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) // left   sensor
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) // right  sensor
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) // center sensor
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(armchamp2_state, left_sensor_r)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(armchamp2_state, right_sensor_r)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(armchamp2_state, center_sensor_r)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1640,8 +1668,8 @@ static INPUT_PORTS_START( armchmp2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) // easy
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 ) // elbow (it always complains though)
 
-	PORT_START("IN1")   // A/D
-	PORT_BIT( 0x00ff, 0x0000, IPT_DIAL ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	PORT_START("ARM")   // A/D
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
 	PORT_START("IN2")   // DSW
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
@@ -1665,7 +1693,7 @@ static INPUT_PORTS_START( armchmp2 )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Europe ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( World ) )
 
-	PORT_START("IN3")   // DSW
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -1752,11 +1780,11 @@ static INPUT_PORTS_START( captflag )
 	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW2:8" )
 
 	PORT_START("SW01")
-	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)LEFT)
-	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)RIGHT)
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(captflag_state, motor_pos_r<LEFT>)
+	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(captflag_state, motor_pos_r<RIGHT>)
 
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)LEFT)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)RIGHT)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(captflag_state, motor_busy_r<LEFT>)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(captflag_state, motor_busy_r<RIGHT>)
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW01:1,2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
@@ -1792,44 +1820,6 @@ INPUT_PORTS_END
 
 **************************************************************************/
 
-#ifdef UNUSED_VARIABLE
-/* 8x8x4, straightforward layout */
-static const gfx_layout tiles_8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-#endif
-
-/* 16x16x4, straightforward layout */
-static const gfx_layout tiles_16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP16(0,4) },
-	{ STEP16(0,4*16) },
-	16*16*4
-};
-
-/* 16x16x4, made of four 8x8 tiles */
-static const gfx_layout tiles_16x16_quad =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(8*8*4*0,4), STEP8(8*8*4*2,4) },
-	{ STEP16(0,4*8) },
-	16*16*4
-};
-
 static const uint32_t road_layout_xoffset[64] =
 {
 	STEP16(16*4*0,4),STEP16(16*4*1,4),
@@ -1855,10 +1845,10 @@ static const gfx_layout road_layout =
 **************************************************************************/
 
 static GFXDECODE_START( gfx_bigrun )
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x0e00/2 , 16 ) // Scroll 0
-	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x1600/2 , 16 ) // Scroll 1
-	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x3600/2 , 16 ) // Scroll 2
-	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16,0x2800/2 , 64 ) // [0] Sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,   0x0e00/2 , 16 ) // Scroll 0
+	//GFXDECODE_ENTRY( "scroll1", 0, gfx_8x8x4_packed_msb,   0x1600/2 , 16 ) // Scroll 1
+	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,   0x3600/2 , 16 ) // Scroll 2
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 0x2800/2 , 64 ) // [0] Sprites
 	GFXDECODE_ENTRY( "road0", 0, road_layout,0x2000/2 , 64 ) // [1] Road 0
 	GFXDECODE_ENTRY( "road1", 0, road_layout,0x1800/2 , 64 ) // [2] Road 1
 GFXDECODE_END
@@ -1868,10 +1858,10 @@ GFXDECODE_END
 **************************************************************************/
 
 static GFXDECODE_START( gfx_cischeat )
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1c00/2, 32  ) // Scroll 0
-	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2c00/2, 32  ) // Scroll 1
-	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6c00/2, 32  ) // Scroll 2
-	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16,0x5000/2, 128 ) // [0] Sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,   0x1c00/2, 32  ) // Scroll 0
+	//GFXDECODE_ENTRY( "scroll1", 0, gfx_8x8x4_packed_msb,   0x2c00/2, 32  ) // Scroll 1
+	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,   0x6c00/2, 32  ) // Scroll 2
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 0x5000/2, 128 ) // [0] Sprites
 	GFXDECODE_ENTRY( "road0", 0, road_layout,0x3800/2, 64  ) // [1] Road 0
 	GFXDECODE_ENTRY( "road1", 0, road_layout,0x4800/2, 64  ) // [2] Road 1
 GFXDECODE_END
@@ -1881,10 +1871,10 @@ GFXDECODE_END
 **************************************************************************/
 
 static GFXDECODE_START( gfx_f1gpstar )
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1e00/2, 16  ) // Scroll 0
-	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2e00/2, 16  ) // Scroll 1
-	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6e00/2, 16  ) // Scroll 2
-	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16,0x5000/2, 128 ) // [0] Sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,   0x1e00/2, 16  ) // Scroll 0
+	//GFXDECODE_ENTRY( "scroll1", 0, gfx_8x8x4_packed_msb,   0x2e00/2, 16  ) // Scroll 1
+	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,   0x6e00/2, 16  ) // Scroll 2
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 0x5000/2, 128 ) // [0] Sprites
 	GFXDECODE_ENTRY( "road0", 0, road_layout,0x3800/2, 64  ) // [1] Road 0
 	GFXDECODE_ENTRY( "road1", 0, road_layout,0x4800/2, 64  ) // [2] Road 1
 GFXDECODE_END
@@ -1894,10 +1884,10 @@ GFXDECODE_END
 **************************************************************************/
 
 static GFXDECODE_START( gfx_scudhamm )
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x1e00/2, 16  )   // Scroll 0
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x0000/2, 16  )   // UNUSED
-	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,          0x4e00/2, 16  )   // Scroll 2
-	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16_quad,   0x3000/2, 128 )   // [0] sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,               0x1e00/2, 16  )   // Scroll 0
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,               0x0000/2, 16  )   // UNUSED
+	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,               0x4e00/2, 16  )   // Scroll 2
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x3000/2, 128 )   // [0] sprites
 	// No Road Layers
 GFXDECODE_END
 
@@ -1969,7 +1959,7 @@ void cischeat_state::bigrun(machine_config &config)
 	// timing set by the YM irqhandler
 //  m_soundcpu->set_periodic_int(FUNC(cischeat_state::irq4_line_hold), attotime::from_hz(16*30));
 
-	config.m_minimum_quantum = attotime::from_hz(1200);
+	config.set_maximum_quantum(attotime::from_hz(1200));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2086,7 +2076,7 @@ void cischeat_state::f1gpstr2(machine_config &config)
 	M68000(config, m_cpu5, 10000000);
 	m_cpu5->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstr2_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 }
 
 
@@ -2112,10 +2102,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line(3, HOLD_LINE);
+	if(m_screen->frame_number() & 1)
+		return;
 
-	if(scanline == 120) // timer irq (clears a flag, presumably sprite DMA end)
+	if(scanline == 240) // vblank-out irq
+		m_maincpu->set_input_line(4, HOLD_LINE);
+
+	if(scanline == 16) // clears a flag, sprite end DMA? 
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
@@ -2126,15 +2119,20 @@ void cischeat_state::scudhamm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cischeat_state::scudhamm_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::scudhamm_scanline), "screen", 0, 1);
 
+	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown clock
+	adc.vin_callback().set(FUNC(cischeat_state::scudhamm_analog_r));
+
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	m_screen->set_refresh_hz(30); //TODO: wrong!
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
+	// measured values for Arm Champs II: VSync: 59.1784Hz, HSync: 15082.0 kHz
+	m_screen->set_raw(XTAL(12'000'000)/2,396,0,256,256,16,240);
+//	m_screen->set_refresh_hz(30); //TODO: wrong!
+//	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
+//	m_screen->set_size(256, 256);
+//	m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
 	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_scudhamm));
 	m_screen->set_palette(m_palette);
 
@@ -2163,24 +2161,31 @@ void cischeat_state::scudhamm(machine_config &config)
                             Arm Champs II
 **************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::armchamp2_scanline)
+// TODO: intentionally duplicate scudhamm_scanline fn
+// armchamp2_state shouldn't derive from scudhamm_state but share this as a common device,
+// also assuming it really is using the same irq config as well ...
+TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_state::armchamp2_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line(2, HOLD_LINE);
+	if(m_screen->frame_number() & 1)
+		return;
 
-	if(scanline == 120) // timer irq (TODO: timing)
+	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line(4, HOLD_LINE);
+
+	if(scanline == 16) // does a bit more than scudhammer
+		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-void cischeat_state::armchmp2(machine_config &config)
+void armchamp2_state::armchmp2(machine_config &config)
 {
 	scudhamm(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &cischeat_state::armchmp2_map);
-	subdevice<timer_device>("scantimer")->set_callback(FUNC(cischeat_state::armchamp2_scanline));
+	m_maincpu->set_addrmap(AS_PROGRAM, &armchamp2_state::armchmp2_map);
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(armchamp2_state::armchamp2_scanline));
+	subdevice<adc0804_device>("adc")->vin_callback().set(FUNC(armchamp2_state::analog_r));
 }
 
 
@@ -2195,7 +2200,7 @@ void cischeat_state::armchmp2(machine_config &config)
     4-7]        rte
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(captflag_state::captflag_scanline)
 {
 	int scanline = param;
 
@@ -2206,14 +2211,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-void cischeat_state::captflag(machine_config &config)
+void captflag_state::captflag(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(24'000'000) / 2);  // TMP68000P-12
-	m_maincpu->set_addrmap(AS_PROGRAM, &cischeat_state::captflag_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::captflag_scanline), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &captflag_state::captflag_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(captflag_state::captflag_scanline), "screen", 0, 1);
 
-	TICKET_DISPENSER(config, m_captflag_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
 
 	WATCHDOG_TIMER(config, m_watchdog);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -2225,7 +2230,7 @@ void cischeat_state::captflag(machine_config &config)
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
-	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_scudhamm));
+	m_screen->set_screen_update(FUNC(captflag_state::screen_update_scudhamm));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scudhamm);
@@ -2236,8 +2241,8 @@ void cischeat_state::captflag(machine_config &config)
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x4e00/2);
 
 	// Motors
-	TIMER(config, m_captflag_motor_left).configure_generic(timer_device::expired_delegate());
-	TIMER(config, m_captflag_motor_right).configure_generic(timer_device::expired_delegate());
+	TIMER(config, m_motor_left).configure_generic(nullptr);
+	TIMER(config, m_motor_right).configure_generic(nullptr);
 
 	// Layout
 	config.set_default_layout(layout_captflag);
@@ -2247,12 +2252,12 @@ void cischeat_state::captflag(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	OKIM6295(config, m_oki1, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
-	m_oki1->set_addrmap(0, &cischeat_state::captflag_oki1_map);
+	m_oki1->set_addrmap(0, &captflag_state::oki1_map);
 	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 	OKIM6295(config, m_oki2, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
-	m_oki2->set_addrmap(0, &cischeat_state::captflag_oki2_map);
+	m_oki2->set_addrmap(0, &captflag_state::oki2_map);
 	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 }
@@ -2419,6 +2424,73 @@ ROM_START( bigrun )
 	ROM_CONTINUE(             0x060000, 0x020000             )
 
 	ROM_REGION( 0x80000, "oki2", 0 )    /* samples */
+	ROM_LOAD( "mb88004m.t51", 0x000000, 0x020000, CRC(ee52f04d) SHA1(fc45bd1d3a7552433e40846c358573c6988127c3) )
+	ROM_CONTINUE(             0x040000, 0x020000             )
+	ROM_CONTINUE(             0x020000, 0x020000             )
+	ROM_CONTINUE(             0x060000, 0x020000             )
+
+	ROM_REGION( 0x20000, "user2", 0 )       /* ? Unused ROMs ? */
+	ROM_LOAD( "br8951b.21",  0x000000, 0x020000, CRC(59b9c26b) SHA1(09fea3b77b045d9c1ed62bf53efa8b5242a33a10) ) // x00xxxxxxxxxxxxx, mask=0001e0
+	ROM_LOAD( "br8951b.22",  0x000000, 0x020000, CRC(c112a803) SHA1(224a2ed690b78caef266958a93524211ff4a8e70) ) // x00xxxxxxxxxxxxx
+	ROM_LOAD( "br8951b.23",  0x000000, 0x010000, CRC(b9474fec) SHA1(f1f0eab014e8f52572484b83f56189e0ff6f2b0d) ) // 000xxxxxxxxxxxxx
+ROM_END
+
+ROM_START( bigrunu )
+	ROM_REGION( 0x80000, "cpu1", 0 )
+	ROM_LOAD16_BYTE( "br8950b.1",  0x000000, 0x040000, CRC(748d1525) SHA1(1e7d8d8bae07d4b81ca46640ffcbd501b5504008) )
+	ROM_LOAD16_BYTE( "br8950b.2",  0x000001, 0x040000, CRC(4164a542) SHA1(d889388784a9ecc502071ab7ccf05e8574d25cf1) )
+
+	ROM_REGION( 0x40000, "cpu2", 0 )
+	ROM_LOAD16_BYTE( "br8952a.19", 0x000000, 0x020000, CRC(fcf6b70c) SHA1(34f7ca29241925251a043c63062596d1c220b730) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "br8952a.20", 0x000001, 0x020000, CRC(c43d367b) SHA1(86242ba03cd172e95bf42eac369fb3acf42c7c45) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x40000, "cpu3", 0 )
+	ROM_LOAD16_BYTE( "br8952a.9",  0x000000, 0x020000, CRC(f803f0d9) SHA1(6d2e90e74bb15cd443d901ad0fc827117432daa6) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "br8952a.10", 0x000001, 0x020000, CRC(8c0df287) SHA1(3a2e689e2d841e2089b18267a8462f1acc40ae99) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE( "br8953c.2", 0x000000, 0x020000, CRC(b690d8d9) SHA1(317c0b4e9bef30c84daf16765af66f5a6f9d1c54) )
+	ROM_LOAD16_BYTE( "br8953c.1", 0x000001, 0x020000, CRC(79fc7bc0) SHA1(edb6cf626f93417cdc9525627d85a0ca9bcd1b1c) )
+
+	ROM_REGION16_BE( 0x40000, "user1", 0 )  // second halves of program ROMs
+	ROM_LOAD16_BYTE( "br8950b.3",   0x000000, 0x020000, CRC(864cebf7) SHA1(4e63106cd5832901688dfce2e450f536a6927c81) )
+	ROM_LOAD16_BYTE( "br8950b.4",   0x000001, 0x020000, CRC(702c2a6e) SHA1(cf3327919e24b7206d404b008cb00117e4308f94) )
+
+	ROM_REGION( 0x040000, "scroll0", 0 )
+	ROM_LOAD( "br8950b.5",  0x000000, 0x020000, CRC(0530764e) SHA1(0a89eab2ce9bd5df574a46bb6ea884c33407f122) )
+	ROM_LOAD( "br8950b.6",  0x020000, 0x020000, CRC(cf40ecfa) SHA1(96e1bfb7a33603a1eaaeb31386bba947fc005060) )
+
+	ROM_REGION( 0x040000, "scroll1", 0 )
+	ROM_LOAD( "br8950b.7",  0x000000, 0x020000, CRC(bd5fd061) SHA1(e5e0afb0a3a1d5f7a27bd04b724c48ea65872233) )
+	ROM_LOAD( "br8950b.8",  0x020000, 0x020000, CRC(7d66f418) SHA1(f6564ac9d65d40af17f5dd422c435aeb6a385256) )
+
+	ROM_REGION( 0x020000, "scroll2", 0 )
+	ROM_LOAD( "br8950b.9",  0x000000, 0x020000, CRC(be0864c4) SHA1(e0f1c0f09b30a731f0e062b1acb1b3a3a772a5cc) )
+
+	ROM_REGION( 0x280000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "mr88004a.t41",  0x000000, 0x080000, CRC(c781d8c5) SHA1(52b23842a20443b51490d701dca72fb0a3118033) )
+	ROM_LOAD16_BYTE( "mr88004d.t43",  0x000001, 0x080000, CRC(e4041208) SHA1(f5bd21b42f627b01bca2324082aecee7852a37e6) )
+	ROM_LOAD16_BYTE( "mr88004b.t42",  0x100000, 0x080000, CRC(2df2e7b9) SHA1(5772e0dc2f842077ea70a558b55ec5ceea693f00) )
+	ROM_LOAD16_BYTE( "mr88004e.t44",  0x100001, 0x080000, CRC(7af7fbf6) SHA1(5b8e2d3bb0c9f29f2c96f68c6d4c7fbf63e640c9) )
+	ROM_LOAD16_BYTE( "mb88004c.t48",  0x200000, 0x040000, CRC(02e2931d) SHA1(754b38929a2dd10d39634fb9cf737e3175a8b1ec) )
+	ROM_LOAD16_BYTE( "mb88004f.t49",  0x200001, 0x040000, CRC(4f012dab) SHA1(35f756b1c7b41f2e81ccbefb2075608a5d663152) )
+
+	ROM_REGION( 0x100000, "road0", 0 )
+	ROM_LOAD( "mr88004g.t45",  0x000000, 0x080000, CRC(bb397bae) SHA1(c67d33bde6e8de2ea7581faadb96acd977adc13c) )
+	ROM_LOAD( "mb88004h.t46",  0x080000, 0x080000, CRC(6b31a1ba) SHA1(71a956f0f51a63bddedfef0febdc95108ed42226) )
+
+	ROM_REGION( 0x100000, "road1", 0 )
+	ROM_LOAD( "mr88004g.t45",  0x000000, 0x080000, CRC(bb397bae) SHA1(c67d33bde6e8de2ea7581faadb96acd977adc13c) )
+	ROM_LOAD( "mb88004h.t46",  0x080000, 0x080000, CRC(6b31a1ba) SHA1(71a956f0f51a63bddedfef0febdc95108ed42226) )
+
+	// t50 & t51: 40000-5ffff = 60000-7ffff
+	ROM_REGION( 0x80000, "oki1", 0 )
+	ROM_LOAD( "mb88004l.t50", 0x000000, 0x020000, CRC(6b11fb10) SHA1(eb6e9614bb50b8fc332ada61882da484d34d727f) )
+	ROM_CONTINUE(             0x040000, 0x020000             )
+	ROM_CONTINUE(             0x020000, 0x020000             )
+	ROM_CONTINUE(             0x060000, 0x020000             )
+
+	ROM_REGION( 0x80000, "oki2", 0 )
 	ROM_LOAD( "mb88004m.t51", 0x000000, 0x020000, CRC(ee52f04d) SHA1(fc45bd1d3a7552433e40846c358573c6988127c3) )
 	ROM_CONTINUE(             0x040000, 0x020000             )
 	ROM_CONTINUE(             0x020000, 0x020000             )
@@ -3749,7 +3821,7 @@ ROM_START( captflag )
 	ROM_LOAD( "mr92027-09_w26.ic18", 0x000000, 0x100000, CRC(3aaa332a) SHA1(6c19364069e0b077a07ac4f9c4b0cf0c0985a42a) ) // 1 on the PCB
 ROM_END
 
-void cischeat_state::init_captflag()
+void captflag_state::init_captflag()
 {
 	m_oki1_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki1")->base(), 0x20000);
 	m_oki2_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki2")->base(), 0x20000);
@@ -3764,15 +3836,23 @@ void cischeat_state::init_captflag()
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_NODEVICE_LAN, layout_cischeat ) // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
-GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state, init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
-GAMEL( 1992, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 4.0)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAMEL( 1991, f1gpstar3, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 3.0)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAMEL( 1991, f1gpstar2, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 2.0)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.7)",       MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1992, armchmp2o2,armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.6)",       MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 1.7)",       MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1992, wildplt,   0,        wildplt,  wildplt,  wildplt_state,  init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
-GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAME(  1993, captflag,  0,        captflag, captflag, cischeat_state, init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state, empty_init,    ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )
+GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, Europe?)", MACHINE_NODEVICE_LAN, layout_cischeat ) // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
+GAMEL( 1989, bigrunu,   bigrun,   bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, US?)",     MACHINE_NODEVICE_LAN, layout_cischeat )
+
+GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state, init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
+
+GAMEL( 1992, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 4.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1991, f1gpstar3, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 3.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1991, f1gpstar2, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 2.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+
+GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, armchamp2_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.7)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME(  1992, armchmp2o2,armchmp2, armchmp2, armchmp2, armchamp2_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.6)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, armchamp2_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 1.7)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+
+GAME(  1992, wildplt,   0,        wildplt,  wildplt,  wildplt_state,  init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
+
+GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+
+GAME(  1993, captflag,  0,        captflag, captflag, captflag_state, init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",                   MACHINE_IMPERFECT_GRAPHICS )
+
+GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state, empty_init,    ROT270, "Jaleco", "Scud Hammer",                            MACHINE_IMPERFECT_GRAPHICS )

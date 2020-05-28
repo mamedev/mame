@@ -474,7 +474,7 @@ void HC11OP(addd_indx)()
 {
 	uint8_t offset = FETCH();
 	uint16_t adr = m_ix + offset;
-	uint8_t i = READ8(adr);
+	uint16_t i = READ16(adr);
 	uint32_t r = REG_D + i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -490,7 +490,7 @@ void HC11OP(addd_indy)()
 {
 	uint8_t offset = FETCH();
 	uint16_t adr = m_iy + offset;
-	uint8_t i = READ8(adr);
+	uint16_t i = READ16(adr);
 	uint32_t r = REG_D + i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -1191,7 +1191,7 @@ void HC11OP(brclr_indx)()
 	CYCLES(7);
 }
 
-/* BRCLR INDX       0x18, 0x1F */
+/* BRCLR INDY       0x18, 0x1F */
 void HC11OP(brclr_indy)()
 {
 	uint8_t offset = FETCH();
@@ -1202,7 +1202,7 @@ void HC11OP(brclr_indy)()
 
 	if ((i & mask) == 0)
 	{
-		SET_PC(m_ppc + rel + 4);
+		SET_PC(m_ppc + rel + 5);
 	}
 
 	CYCLES(8);
@@ -1216,7 +1216,7 @@ void HC11OP(brset_dir)()
 	int8_t rel = FETCH();
 	uint8_t i = READ8(d);
 
-	if(i & mask)
+	if ((~i & mask) == 0)
 	{
 		SET_PC(m_ppc + rel + 4);
 	}
@@ -1253,7 +1253,7 @@ void HC11OP(brset_indy)()
 
 	if ((~i & mask) == 0)
 	{
-		SET_PC(m_ppc + rel + 4);
+		SET_PC(m_ppc + rel + 5);
 	}
 
 	CYCLES(8);
@@ -2097,6 +2097,42 @@ void HC11OP(eorb_indy)()
 	SET_N8(REG_B);
 	SET_Z8(REG_B);
 	CYCLES(5);
+}
+
+/* FDIV             0x03 */
+void HC11OP(fdiv)()
+{
+	uint16_t numerator = REG_D;
+	uint16_t denominator = m_ix;
+	uint16_t remainder;
+	uint16_t result;
+
+	CLEAR_ZVC();
+	if(denominator == 0) // divide by zero behaviour
+	{
+		remainder = 0xffff; // TODO: undefined behaviour according to the docs
+		result = 0xffff;
+		logerror("HC11: divide by zero at PC=%04x\n",m_pc-1);
+		m_ccr |= CC_C | CC_V;
+	}
+	else if(denominator <= numerator)
+	{
+		remainder = 0xffff; // TODO: undefined behaviour according to the docs
+		result = 0xffff;
+		logerror("HC11: FDIV overflow at PC=%04x\n",m_pc-1);
+		m_ccr |= CC_V;
+	}
+	else
+	{
+		uint32_t scaled_numerator = numerator * 65536;
+		remainder = scaled_numerator % denominator;
+		result = scaled_numerator / denominator;
+	}
+	m_ix = result;
+	REG_D = remainder;
+	SET_Z16(result);
+
+	CYCLES(41);
 }
 
 /* IDIV             0x02 */

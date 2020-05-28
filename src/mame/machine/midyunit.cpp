@@ -286,7 +286,7 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 	switch (sound)
 	{
 		case SOUND_CVSD_SMALL:
-			m_cvsd_sound->get_cpu()->space(AS_PROGRAM).install_write_handler(prot_start, prot_end, write8_delegate(FUNC(midyunit_state::cvsd_protection_w), this));
+			m_cvsd_sound->get_cpu()->space(AS_PROGRAM).install_write_handler(prot_start, prot_end, write8_delegate(*this, FUNC(midyunit_state::cvsd_protection_w)));
 			m_cvsd_protection_base = memregion("cvsd:cpu")->base() + 0x10000 + (prot_start - 0x8000);
 			break;
 
@@ -467,7 +467,7 @@ READ16_MEMBER(midyunit_state::mkturbo_prot_r)
 void midyunit_state::init_mkyturbo()
 {
 	/* protection */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midyunit_state::mkturbo_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(*this, FUNC(midyunit_state::mkturbo_prot_r)));
 
 	init_mkyunit();
 }
@@ -476,31 +476,31 @@ void midyunit_state::init_mkyturbo()
 
 void midyunit_state::term2_init_common(write16_delegate hack_w)
 {
-	/* protection */
-	static const struct protection_data term2_protection_data =
+	// protection
+	static constexpr struct protection_data term2_protection_data =
 	{
 		{ 0x0f00, 0x0f00, 0x0f00 },
 		{ 0x4000, 0xf000, 0xa000 }
 	};
 	m_prot_data = &term2_protection_data;
 
-	/* common init */
+	// common init
 	init_generic(6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
 
-	/* special inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01c00000, 0x01c0005f, read16_delegate(FUNC(midyunit_state::term2_input_r), this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01e00000, 0x01e0001f, write16_delegate(FUNC(midyunit_state::term2_sound_w), this));
+	// special inputs */
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01c00000, 0x01c0005f, read16_delegate(*this, FUNC(midyunit_state::term2_input_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01e00000, 0x01e0001f, write16_delegate(*this, FUNC(midyunit_state::term2_sound_w)));
 
-	/* HACK: this prevents the freeze on the movies */
-	/* until we figure what's causing it, this is better than nothing */
+	// HACK: this prevents the freeze on the movies
+	// until we figure what's causing it, this is better than nothing
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x010aa0e0, 0x010aa0ff, hack_w);
 	m_t2_hack_mem = m_mainram + (0xaa0e0>>4);
 }
 
-void midyunit_state::init_term2()    { term2_init_common(write16_delegate(FUNC(midyunit_state::term2_hack_w),this)); }
-void midyunit_state::init_term2la3() { term2_init_common(write16_delegate(FUNC(midyunit_state::term2la3_hack_w),this)); }
-void midyunit_state::init_term2la2() { term2_init_common(write16_delegate(FUNC(midyunit_state::term2la2_hack_w),this)); }
-void midyunit_state::init_term2la1() { term2_init_common(write16_delegate(FUNC(midyunit_state::term2la1_hack_w),this)); }
+void midyunit_state::init_term2()    { term2_init_common(write16_delegate(*this, FUNC(midyunit_state::term2_hack_w))); }
+void midyunit_state::init_term2la3() { term2_init_common(write16_delegate(*this, FUNC(midyunit_state::term2la3_hack_w))); }
+void midyunit_state::init_term2la2() { term2_init_common(write16_delegate(*this, FUNC(midyunit_state::term2la2_hack_w))); }
+void midyunit_state::init_term2la1() { term2_init_common(write16_delegate(*this, FUNC(midyunit_state::term2la1_hack_w))); }
 
 
 

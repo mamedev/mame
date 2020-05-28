@@ -16,8 +16,8 @@ public:
 	// construction/destruction
 	a800_rom_oss8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
+	virtual uint8_t read_80xx(offs_t offset) override;
+	virtual void write_d5xx(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -36,8 +36,8 @@ public:
 	// construction/destruction
 	a800_rom_oss34_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
+	virtual uint8_t read_80xx(offs_t offset) override;
+	virtual void write_d5xx(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -56,8 +56,8 @@ public:
 	// construction/destruction
 	a800_rom_oss43_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
+	virtual uint8_t read_80xx(offs_t offset) override;
+	virtual void write_d5xx(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -76,8 +76,8 @@ public:
 	// construction/destruction
 	a800_rom_oss91_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
+	virtual uint8_t read_80xx(offs_t offset) override;
+	virtual void write_d5xx(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides

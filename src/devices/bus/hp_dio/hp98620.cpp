@@ -34,34 +34,19 @@ void dio16_98620_device::device_start()
 {
 	m_installed_io = false;
 
-	save_item(NAME(m_regs[0].address));
-	save_item(NAME(m_regs[0].tc));
-	save_item(NAME(m_regs[0].control));
-	save_item(NAME(m_regs[0].irq_level));
-	save_item(NAME(m_regs[0].tsz));
-	save_item(NAME(m_regs[0].subcount));
-	save_item(NAME(m_regs[0].irq));
-	save_item(NAME(m_regs[0].ie));
-	save_item(NAME(m_regs[0].armed));
-	save_item(NAME(m_regs[0].dma_out));
-	save_item(NAME(m_regs[0].dma_pri));
-	save_item(NAME(m_regs[0].lword));
-	save_item(NAME(m_regs[0].word));
-
-
-	save_item(NAME(m_regs[1].address));
-	save_item(NAME(m_regs[1].tc));
-	save_item(NAME(m_regs[1].control));
-	save_item(NAME(m_regs[1].irq_level));
-	save_item(NAME(m_regs[1].tsz));
-	save_item(NAME(m_regs[1].subcount));
-	save_item(NAME(m_regs[1].irq));
-	save_item(NAME(m_regs[1].ie));
-	save_item(NAME(m_regs[1].armed));
-	save_item(NAME(m_regs[1].dma_out));
-	save_item(NAME(m_regs[1].dma_pri));
-	save_item(NAME(m_regs[1].lword));
-	save_item(NAME(m_regs[1].word));
+	save_item(STRUCT_MEMBER(m_regs, address));
+	save_item(STRUCT_MEMBER(m_regs, tc));
+	save_item(STRUCT_MEMBER(m_regs, control));
+	save_item(STRUCT_MEMBER(m_regs, irq_level));
+	save_item(STRUCT_MEMBER(m_regs, tsz));
+	save_item(STRUCT_MEMBER(m_regs, subcount));
+	save_item(STRUCT_MEMBER(m_regs, irq));
+	save_item(STRUCT_MEMBER(m_regs, ie));
+	save_item(STRUCT_MEMBER(m_regs, armed));
+	save_item(STRUCT_MEMBER(m_regs, dma_out));
+	save_item(STRUCT_MEMBER(m_regs, dma_pri));
+	save_item(STRUCT_MEMBER(m_regs, lword));
+	save_item(STRUCT_MEMBER(m_regs, word));
 
 	save_item(NAME(m_installed_io));
 	save_item(NAME(m_control));
@@ -75,8 +60,8 @@ void dio16_98620_device::device_reset()
 	if (!m_installed_io)
 	{
 		program_space().install_readwrite_handler(0x500000, 0x50020f,
-				read16_delegate(FUNC(dio16_98620_device::dma_r), this),
-				write16_delegate(FUNC(dio16_98620_device::dma_w), this));
+				read16_delegate(*this, FUNC(dio16_98620_device::dma_r)),
+				write16_delegate(*this, FUNC(dio16_98620_device::dma_w)));
 		m_installed_io = true;
 	}
 	m_control = 0;

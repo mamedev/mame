@@ -146,9 +146,9 @@ device_memory_interface::space_config_vector v30mz_cpu_device::memory_space_conf
 
 void v30mz_cpu_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_IO).specific(m_io);
 
 	save_item(NAME(m_regs.w));
 	save_item(NAME(m_sregs));
@@ -282,44 +282,44 @@ inline uint32_t v30mz_cpu_device::pc()
 
 inline uint8_t v30mz_cpu_device::read_byte(uint32_t addr)
 {
-	return m_program->read_byte(addr);
+	return m_program.read_byte(addr);
 }
 
 
 inline uint16_t v30mz_cpu_device::read_word(uint32_t addr)
 {
-	return m_program->read_byte(addr) | ( m_program->read_byte(addr+1) << 8 );
+	return m_program.read_byte(addr) | ( m_program.read_byte(addr+1) << 8 );
 }
 
 
 inline void v30mz_cpu_device::write_byte(uint32_t addr, uint8_t data)
 {
-	m_program->write_byte(addr, data);
+	m_program.write_byte(addr, data);
 }
 
 
 inline void v30mz_cpu_device::write_word(uint32_t addr, uint16_t data)
 {
-	m_program->write_byte( addr, data & 0xff );
-	m_program->write_byte( addr + 1, data >> 8 );
+	m_program.write_byte( addr, data & 0xff );
+	m_program.write_byte( addr + 1, data >> 8 );
 }
 
 
 inline uint8_t v30mz_cpu_device::read_port(uint16_t port)
 {
-	return m_io->read_byte(port);
+	return m_io.read_byte(port);
 }
 
 
 inline void v30mz_cpu_device::write_port(uint16_t port, uint8_t data)
 {
-	m_io->write_byte(port, data);
+	m_io.write_byte(port, data);
 }
 
 
 inline uint8_t v30mz_cpu_device::fetch_op()
 {
-	uint8_t data = m_cache->read_byte( pc() );
+	uint8_t data = m_cache.read_byte( pc() );
 	m_ip++;
 	return data;
 }
@@ -327,7 +327,7 @@ inline uint8_t v30mz_cpu_device::fetch_op()
 
 inline uint8_t v30mz_cpu_device::fetch()
 {
-	uint8_t data = m_cache->read_byte( pc() );
+	uint8_t data = m_cache.read_byte( pc() );
 	m_ip++;
 	return data;
 }
@@ -1307,7 +1307,7 @@ void v30mz_cpu_device::execute_set_input( int inptnum, int state )
 
 std::unique_ptr<util::disasm_interface> v30mz_cpu_device::create_disassembler()
 {
-	return std::make_unique<nec_disassembler>();
+	return std::make_unique<nec_disassembler>(this);
 }
 
 

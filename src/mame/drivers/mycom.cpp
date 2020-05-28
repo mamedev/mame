@@ -37,14 +37,25 @@
       toggles between English and Kana.
 
     TODO/info:
-    - Sound not working. The info makes its way to the audio chip but for
-      some unknown reason, nothing is heard.
     - FDC, little info, guessing (143kb, single sided, 525sd)
     - Cassette doesn't load
     - Printer
     - Keyboard lookup table for Kana and Shifted Kana
     - Keyboard autorepeat
     - Need software
+
+    Basic:
+    - To enter Basic, type BASIC. To quit, type EXIT.
+
+    Cassette:
+    - Bios 0: you can SAVE and LOAD from the monitor, but not from Basic. (see ToDo)
+    - Bios 1: Doesn't seem to be supported.
+
+    Sound:
+    - Bios 0: Sound is initialised with the volume turned off. In Basic, you
+              can POKE 4382,144 to enable sound.
+    - Bios 1: Doesn't appear to support sound. The included Basic has a SOUND
+              command (e.g SOUND 127,80), but no sound is heard.
 
 *******************************************************************************/
 
@@ -69,6 +80,8 @@ public:
 	mycom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_ppi0(*this, "ppi8255_0")
 		, m_ppi1(*this, "ppi8255_1")
 		, m_ppi2(*this, "ppi8255_2")
@@ -80,43 +93,40 @@ public:
 		, m_audio(*this, "sn1")
 		, m_rtc(*this, "rtc")
 		, m_palette(*this, "palette")
-		, m_p_videoram(*this, "vram")
 		, m_p_chargen(*this, "chargen")
 	{ }
 
 	void mycom(machine_config &config);
 
-	void init_mycom();
-
 private:
-	DECLARE_READ8_MEMBER(mycom_upper_r);
-	DECLARE_WRITE8_MEMBER(mycom_upper_w);
 	DECLARE_READ8_MEMBER(vram_data_r);
 	DECLARE_WRITE8_MEMBER(vram_data_w);
-	DECLARE_WRITE8_MEMBER(mycom_00_w);
-	DECLARE_WRITE8_MEMBER(mycom_04_w);
-	DECLARE_WRITE8_MEMBER(mycom_06_w);
-	DECLARE_WRITE8_MEMBER(mycom_0a_w);
-	DECLARE_READ8_MEMBER(mycom_05_r);
-	DECLARE_READ8_MEMBER(mycom_06_r);
-	DECLARE_READ8_MEMBER(mycom_08_r);
+	void port00_w(u8 data);
+	void port04_w(u8 data);
+	void port06_w(u8 data);
+	void port0a_w(u8 data);
+	u8 port05_r();
+	u8 port06_r();
+	u8 port08_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
-	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
+	void mycom_rtc_w(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void mycom_io(address_map &map);
 	void mycom_map(address_map &map);
 
-	uint8_t m_0a;
-	uint16_t m_i_videoram;
-	uint8_t m_keyb_press;
-	uint8_t m_keyb_press_flag;
-	uint8_t m_sn_we;
-	uint32_t m_upper_sw;
-	uint8_t *m_p_ram;
+	std::unique_ptr<u8[]> m_vram;
+	u8 m_port0a;
+	u8 m_keyb_press;
+	u8 m_sn_we;
+	u16 m_i_videoram;
+	bool m_keyb_press_flag;
+	bool m_upper_sw, m_lower_sw;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
@@ -128,7 +138,6 @@ private:
 	required_device<sn76489_device> m_audio;
 	required_device<msm5832_device> m_rtc;
 	required_device<palette_device> m_palette;
-	required_region_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 };
 
@@ -137,18 +146,18 @@ private:
 MC6845_UPDATE_ROW( mycom_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx=0,z;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	u8 chr,gfx=0,z;
+	u16 mem,x;
+	u32 *p = &bitmap.pix32(y);
 
-	if (m_0a & 0x40)
+	if (m_port0a & 0x40)
 	{
 		for (x = 0; x < x_count; x++)                   // lores pixels
 		{
-			uint8_t dbit=1;
+			u8 dbit=1;
 			if (x == cursor_x) dbit=0;
 			mem = (ma + x) & 0x7ff;
-			chr = m_p_videoram[mem];
+			chr = m_vram[mem];
 			z = ra / 3;
 			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
 			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
@@ -165,14 +174,14 @@ MC6845_UPDATE_ROW( mycom_state::crtc_update_row )
 	{
 		for (x = 0; x < x_count; x++)                   // text
 		{
-			uint8_t inv=0;
+			u8 inv=0;
 			if (x == cursor_x) inv=0xff;
 			mem = (ma + x) & 0x7ff;
 			if (ra > 7)
 				gfx = inv;  // some blank spacing lines
 			else
 			{
-				chr = m_p_videoram[mem];
+				chr = m_vram[mem];
 				gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
 			}
 
@@ -189,49 +198,39 @@ MC6845_UPDATE_ROW( mycom_state::crtc_update_row )
 	}
 }
 
-WRITE8_MEMBER( mycom_state::mycom_00_w )
+void mycom_state::port00_w(u8 data)
 {
 	switch(data)
 	{
-		case 0x00: membank("boot")->set_entry(1); break;
-		case 0x01: membank("boot")->set_entry(0); break;
-		case 0x02: m_upper_sw = 0x10000; break;
-		case 0x03: m_upper_sw = 0x0c000; break;
+		case 0x00: m_lower_sw = 1; break;   // rom
+		case 0x01: m_lower_sw = 0; break;   // ram
+		case 0x02: m_upper_sw = 1; break;   // rom
+		case 0x03: m_upper_sw = 0; break;   // ram
 	}
-}
-
-READ8_MEMBER( mycom_state::mycom_upper_r )
-{
-	return m_p_ram[offset | m_upper_sw];
-}
-
-WRITE8_MEMBER( mycom_state::mycom_upper_w )
-{
-	m_p_ram[offset | 0xc000] = data;
 }
 
 READ8_MEMBER( mycom_state::vram_data_r )
 {
-	return m_p_videoram[m_i_videoram];
+	return m_vram[m_i_videoram];
 }
 
 WRITE8_MEMBER( mycom_state::vram_data_w )
 {
-	m_p_videoram[m_i_videoram] = data;
+	m_vram[m_i_videoram] = data;
 }
 
 void mycom_state::mycom_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).bankrw("boot");
-	map(0x1000, 0xbfff).ram();
-	map(0xc000, 0xffff).rw(FUNC(mycom_state::mycom_upper_r), FUNC(mycom_state::mycom_upper_w));
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0x0000, 0x0fff).lr8(NAME([this] (offs_t offset) { if(m_lower_sw) return m_rom[offset]; else return m_ram[offset]; }));
+	map(0xc000, 0xffff).lr8(NAME([this] (offs_t offset) { if(m_upper_sw) return m_rom[offset]; else return m_ram[offset | 0xc000]; }));
 }
 
 void mycom_state::mycom_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(mycom_state::mycom_00_w));
+	map(0x00, 0x00).w(FUNC(mycom_state::port00_w));
 	map(0x01, 0x01).rw(FUNC(mycom_state::vram_data_r), FUNC(mycom_state::vram_data_w));
 	map(0x02, 0x02).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x03, 0x03).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -344,28 +343,28 @@ static GFXDECODE_START( gfx_mycom )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mycom_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE8_MEMBER( mycom_state::mycom_04_w )
+void mycom_state::port04_w(u8 data)
 {
 	m_i_videoram = (m_i_videoram & 0x700) | data;
 
 	m_sn_we = data;
 }
 
-WRITE8_MEMBER( mycom_state::mycom_06_w )
+void mycom_state::port06_w(u8 data)
 {
 	m_i_videoram = (m_i_videoram & 0x0ff) | ((data & 0x007) << 8);
 }
 
-READ8_MEMBER( mycom_state::mycom_08_r )
+u8 mycom_state::port08_r()
 {
 	/*
 	x--- ---- display flag
 	---- --x- keyboard shift
 	---- ---x keyboard strobe
 	*/
-	uint8_t data = 0;
+	u8 data = 0;
 
-	data = m_keyb_press_flag; //~m_keyb_press_flag & 1;
+	data = m_keyb_press_flag; //~m_keyb_press_flag;
 
 	if ((m_cass)->input() > 0.03) // not working
 		data+=4;
@@ -373,7 +372,7 @@ READ8_MEMBER( mycom_state::mycom_08_r )
 	return data;
 }
 
-READ8_MEMBER( mycom_state::mycom_06_r )
+u8 mycom_state::port06_r()
 {
 	/*
 	x--- ---- keyboard s5
@@ -384,12 +383,12 @@ READ8_MEMBER( mycom_state::mycom_06_r )
 	return 0xff;
 }
 
-READ8_MEMBER( mycom_state::mycom_05_r )
+u8 mycom_state::port05_r()
 {
 	return m_keyb_press;
 }
 
-WRITE8_MEMBER( mycom_state::mycom_0a_w )
+void mycom_state::port0a_w(u8 data)
 {
 	/*
 	x--- ---- width 80/40 (0 = 80, 1 = 40)
@@ -402,24 +401,24 @@ WRITE8_MEMBER( mycom_state::mycom_0a_w )
 	---- ---x printer strobe
 	*/
 
-	if ( (BIT(m_0a, 3)) != (BIT(data, 3)) )
+	if ( (BIT(m_port0a, 3)) != (BIT(data, 3)) )
 		m_cass->change_state(
 		BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	if (BIT(data, 3)) // motor on
 		m_cass->output( BIT(data, 2) ? -1.0 : +1.0);
 
-	if ( (BIT(data, 7)) != (BIT(m_0a, 7)) )
+	if ( (BIT(data, 7)) != (BIT(m_port0a, 7)) )
 		m_crtc->set_unscaled_clock(BIT(data, 7) ? 1008000 : 2016000);
 
-	m_0a = data;
+	m_port0a = data;
 
 	// if WE & CE are low, pass sound command to audio chip
 	if ((data & 0x30)==0)
 		m_audio->write(m_sn_we);
 }
 
-WRITE8_MEMBER(mycom_state::mycom_rtc_w)
+void mycom_state::mycom_rtc_w(u8 data)
 {
 	m_rtc->address_w(data & 0x0f);
 
@@ -429,7 +428,7 @@ WRITE8_MEMBER(mycom_state::mycom_rtc_w)
 	m_rtc->cs_w(BIT(data, 7));
 }
 
-static const uint8_t mycom_keyval[] = { 0,
+static const u8 mycom_keyval[] = { 0,
 0x1b,0x1b,0x7c,0x7c,0x18,0x18,0x0f,0x0f,0x09,0x09,0x1c,0x1c,0x30,0x00,0x50,0x70,0x3b,0x2b,
 0x00,0x00,0x31,0x21,0x51,0x71,0x41,0x61,0x5a,0x7a,0x17,0x17,0x2d,0x3d,0x40,0x60,0x3a,0x2a,
 0x0b,0x0b,0x32,0x22,0x57,0x77,0x53,0x73,0x58,0x78,0x03,0x03,0x5e,0x7e,0x5b,0x7b,0x5d,0x7d,
@@ -443,11 +442,11 @@ static const uint8_t mycom_keyval[] = { 0,
 
 TIMER_DEVICE_CALLBACK_MEMBER(mycom_state::mycom_kbd)
 {
-	uint8_t x, y, scancode = 0;
-	uint16_t pressed[9];
+	u8 x, y, scancode = 0;
+	u16 pressed[9];
 	char kbdrow[3];
-	uint8_t modifiers = ioport("XX")->read();
-	uint8_t shift_pressed = (modifiers & 2) >> 1;
+	u8 modifiers = ioport("XX")->read();
+	u8 shift_pressed = (modifiers & 2) >> 1;
 	m_keyb_press_flag = 0;
 
 	/* see what is pressed */
@@ -491,20 +490,22 @@ static void mycom_floppies(device_slot_interface &device)
 
 void mycom_state::machine_start()
 {
-	m_p_ram = memregion("maincpu")->base();
+	m_vram = make_unique_clear<u8[]>(0x0800);
+	save_pointer(NAME(m_vram), 0x0800);
+	save_item(NAME(m_port0a));
+	save_item(NAME(m_i_videoram));
+	save_item(NAME(m_keyb_press));
+	save_item(NAME(m_keyb_press_flag));
+	save_item(NAME(m_sn_we));
+	save_item(NAME(m_upper_sw));
+	save_item(NAME(m_lower_sw));
 }
 
 void mycom_state::machine_reset()
 {
-	membank("boot")->set_entry(1);
-	m_upper_sw = 0x10000;
-	m_0a = 0;
-}
-
-void mycom_state::init_mycom()
-{
-	uint8_t *RAM = memregion("maincpu")->base();
-	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
+	m_lower_sw = 1;
+	m_upper_sw = 1;
+	m_port0a = 0;
 }
 
 void mycom_state::mycom(machine_config &config)
@@ -515,14 +516,14 @@ void mycom_state::mycom(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mycom_state::mycom_io);
 
 	I8255(config, m_ppi0);
-	m_ppi0->out_pa_callback().set(FUNC(mycom_state::mycom_04_w));
-	m_ppi0->in_pb_callback().set(FUNC(mycom_state::mycom_05_r));
-	m_ppi0->in_pc_callback().set(FUNC(mycom_state::mycom_06_r));
-	m_ppi0->out_pc_callback().set(FUNC(mycom_state::mycom_06_w));
+	m_ppi0->out_pa_callback().set(FUNC(mycom_state::port04_w));
+	m_ppi0->in_pb_callback().set(FUNC(mycom_state::port05_r));
+	m_ppi0->in_pc_callback().set(FUNC(mycom_state::port06_r));
+	m_ppi0->out_pc_callback().set(FUNC(mycom_state::port06_w));
 
 	I8255(config, m_ppi1);
-	m_ppi1->in_pa_callback().set(FUNC(mycom_state::mycom_08_r));
-	m_ppi1->out_pc_callback().set(FUNC(mycom_state::mycom_0a_w));
+	m_ppi1->in_pa_callback().set(FUNC(mycom_state::port08_r));
+	m_ppi1->out_pc_callback().set(FUNC(mycom_state::port0a_w));
 
 	I8255(config, m_ppi2);
 	m_ppi2->in_pb_callback().set(m_rtc, FUNC(msm5832_device::data_r));
@@ -540,12 +541,12 @@ void mycom_state::mycom(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mycom);
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
-	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
-	MC6845(config, m_crtc, 1008000);
+	The manual states the CRTC is a HD46505S (apparently same as HD6845S). The start registers need to be readable. */
+	HD6845S(config, m_crtc, 1008000);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(mycom_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(mycom_state::crtc_update_row));
 
 	SPEAKER(config, "mono").front_center();
 	SN76489(config, m_audio, 10_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.50);
@@ -565,19 +566,17 @@ void mycom_state::mycom(machine_config &config)
 
 /* ROM definition */
 ROM_START( mycom )
-	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("mycom")
 	ROM_SYSTEM_BIOS(0, "mycom", "40 column")
-	ROMX_LOAD("bios0.rom", 0x10000, 0x3000, CRC(e6f50355) SHA1(5d3acea360c0a8ab547db03a43e1bae5125f9c2a), ROM_BIOS(0))
-	ROMX_LOAD("basic0.rom",0x13000, 0x1000, CRC(3b077465) SHA1(777427182627f371542c5e0521ed3ca1466a90e1), ROM_BIOS(0))
+	ROMX_LOAD("bios0.rom", 0x0000, 0x3000, CRC(e6f50355) SHA1(5d3acea360c0a8ab547db03a43e1bae5125f9c2a), ROM_BIOS(0))
+	ROMX_LOAD("basic0.rom",0x3000, 0x1000, CRC(3b077465) SHA1(777427182627f371542c5e0521ed3ca1466a90e1), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "takeda", "80 column")
-	ROMX_LOAD("bios1.rom", 0x10000, 0x3000, CRC(c51d7fcb) SHA1(31d39db43b77cca4d49ff9814d531e056924e716), ROM_BIOS(1))
-	ROMX_LOAD("basic1.rom",0x13000, 0x1000, CRC(30a573f1) SHA1(e3fe2e73644e831b52e2789dc7c181989cc30b82), ROM_BIOS(1))
+	ROMX_LOAD("bios1.rom", 0x0000, 0x3000, CRC(c51d7fcb) SHA1(31d39db43b77cca4d49ff9814d531e056924e716), ROM_BIOS(1))
+	ROMX_LOAD("basic1.rom",0x3000, 0x1000, CRC(30a573f1) SHA1(e3fe2e73644e831b52e2789dc7c181989cc30b82), ROM_BIOS(1))
 	/* Takeda bios has no cursor. Use the next lines to turn on cursor, but you must comment out when done. */
-	//ROM_FILL( 0x11eb6, 1, 0x47 )
-	//ROM_FILL( 0x11eb7, 1, 0x07 )
-
-	ROM_REGION( 0x0800, "vram", ROMREGION_ERASE00 )
+	//ROM_FILL( 0x1eb6, 1, 0x47 )
+	//ROM_FILL( 0x1eb7, 1, 0x07 )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(4039bb6f) SHA1(086ad303bf4bcf983fd6472577acbf744875fea8) )
@@ -586,4 +585,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                      FULLNAME      FLAGS
-COMP( 1981, mycom, 0,      0,      mycom,   mycom, mycom_state, init_mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, mycom, 0,      0,      mycom,   mycom, mycom_state, empty_init, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

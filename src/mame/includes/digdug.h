@@ -41,13 +41,13 @@ private:
 	uint32_t screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(digdug_videoram_w);
-	DECLARE_WRITE8_MEMBER(bg_select_w);
+	void bg_select_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tx_color_mode_w);
 	DECLARE_WRITE_LINE_MEMBER(bg_disable_w);
 
 	DECLARE_READ8_MEMBER(earom_read);
 	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
+	void earom_control_w(uint8_t data);
 	virtual void machine_start() override;
 
 	void digdug_map(address_map &map);

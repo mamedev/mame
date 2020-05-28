@@ -48,7 +48,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
+	uint8_t memory_read_byte(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
 	void maincpu_io_map(address_map &map);
@@ -125,7 +125,7 @@ void sagitta180_state::maincpu_map(address_map &map)
 {
 	map.global_mask(0xffff);
 	map(0x0000, 0x07ff).rom();
-//  AM_RANGE(0x0800, 0x17ff) AM_ROM
+//  map(0x0800, 0x17ff).rom();
 	map(0x1800, 0xffff).ram();
 }
 
@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER(sagitta180_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
-READ8_MEMBER(sagitta180_state::memory_read_byte)
+uint8_t sagitta180_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
@@ -216,7 +216,7 @@ void sagitta180_state::sagitta180(machine_config &config)
 
 	I8275(config, m_crtc, 12480000 / 8); /* guessed xtal */
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(sagitta180_state::crtc_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(sagitta180_state::crtc_display_pixels));
 	m_crtc->drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 	m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
 	m_crtc->set_screen("screen");

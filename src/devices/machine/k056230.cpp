@@ -2,7 +2,17 @@
 // copyright-holders:Fabio Priuli
 /***************************************************************************
 
-    Konami IC 056230 (LANC)
+Konami IC 056230 (LANC)
+
+Device Notes:
+-The custom IC itself
+-64k shared ram
+-LS161 4-bit binary counter
+-PAL(056787) for racinfrc's sub board and plygonet.cpp
+-PAL(056787A) for zr107.cpp, gticlub.cpp and thunderh's I/O board
+-HYC2485S RS485 transceiver
+
+TODO: nearly everything
 
 ***************************************************************************/
 
@@ -39,7 +49,7 @@ void k056230_device::device_start()
 }
 
 
-READ8_MEMBER(k056230_device::read)
+uint8_t k056230_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -61,7 +71,7 @@ TIMER_CALLBACK_MEMBER(k056230_device::network_irq_clear)
 }
 
 
-WRITE8_MEMBER(k056230_device::write)
+void k056230_device::write(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -94,13 +104,13 @@ WRITE8_MEMBER(k056230_device::write)
 //  logerror("k056230_w: %d, %02X at %08X\n", offset, data, machine().describe_context());
 }
 
-READ32_MEMBER(k056230_device::lanc_ram_r)
+uint32_t k056230_device::lanc_ram_r(offs_t offset, uint32_t mem_mask)
 {
 	//logerror("LANC_RAM_r: %08X, %08X %s\n", offset, mem_mask, machine().describe_context());
 	return m_ram[offset & 0x7ff];
 }
 
-WRITE32_MEMBER(k056230_device::lanc_ram_w)
+void k056230_device::lanc_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//logerror("LANC_RAM_w: %08X, %08X, %08X %s\n", data, offset, mem_mask, machine().describe_context());
 	COMBINE_DATA(m_ram + (offset & 0x7ff));

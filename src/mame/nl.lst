@@ -20,6 +20,224 @@
 1942p                           // prototype
 1942h                           // hack (Two Bit Score?)
 
+/* FIXME: games commented out complain about being a clone of a game not in the driver */
+
+@source:galaxian.cpp
+600                             // GX353 (c) 1981 Konami
+amidar                          // GX337 (c) 1982 Konami
+amidar1                         // GX337 (c) 1981 Konami
+amidarb                         // bootleg
+amidaro                         // GX337 (c) 1982 Konami + Olympia license
+amidars                         // GX337 (c) 1982 Konami
+amidaru                         // GX337 (c) 1982 Konami + Stern license
+amigo                           // bootleg
+amigo2                          // bootleg
+anteater                        // (c) 1982 Tago
+anteaterg                       // (c) 1983 TV-Tuning (F.E.G. license)
+anteatergg                      // bootleg
+anteateruk                      // (c) 1983 Free Enterprise Games
+aracnis                         // bootleg
+armorcar                        // (c) 1981 Stern
+armorcar2                       // (c) 1981 Stern
+asideral                        // bootleg
+astrians                        //
+atlantis                        // (c) 1981 Comsoft
+atlantis2                       // (c) 1981 Comsoft
+atlantisb                       // bootleg
+azurian                         // (c) 1982 Rait Electronics Ltd
+//batman2                         // bootleg
+blkhole                         // TDS (Tokyo Denshi Sekkei) & MINTS
+bomber                          //
+calipso                         // (c) 1982 Tago
+catacomb                        // 1982 MTM Games
+checkman                        // (c) 1982 Zilec-Zenitone
+checkmanj                       // (c) 1982 Jaleco (Zenitone/Zilec in ROM CM4, and the programmer names)
+chewing                         // ?? unknown
+//devilfsg                        // (c) 1984 Vision / Artic (bootleg?)
+dingo                           // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
+dingoe                          // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
+eagle                           // [1980] Centuri
+eagle2                          // [1980] Centuri
+eagle3                          // [1980] Centuri
+exodus                          // Subelectro - bootleg?
+explorer                        // bootleg
+fantastc                        // (c) Taito (Brazil) - rewrite of Galaga
+fantazia                        // bootleg
+frogf                           // bootleg
+frogg                           // bootleg
+frogger                         // GX392 (c) 1981 Konami
+froggeram                       // bootleg
+froggermc                       // 800-3110 (c) 1981 Sega
+froggers                        // bootleg
+froggers1                       // (c) 1981 Sega
+froggers2                       // 834-0068 (c) 1981 Sega
+froggers3                       //
+froggrs                         //
+froggervd                       // Video Dens
+fourplay                        // multigame
+galap1                          // hack
+galap4                          // hack
+galapx                          // hack
+galaxbsf                        // hack
+galaxbsf2                       // bootleg
+galaxian                        // (c) Namco
+galaxiana                       // (c) Namco
+galaxianbl                      // bootleg
+galaxianbl2                     // bootleg
+galaxiani                       // (c) Irem
+galaxianm                       // (c) Midway
+galaxianmo                      // (c) Midway
+galaxiant                       // (c) Taito
+galaxrcgg                       // bootleg (Recreativos Covadonga)
+galaxrf                         // bootleg (Recreativos Franco)
+galaxrfgg                       // bootleg (Recreativos Franco)
+galemp                          // (c) Taito do Brasil
+galturbo                        // hack
+//ghostmun                        //
+gmgalax                         // bootleg
+gteikoku                        // (c) Irem
+gteikokub                       // bootleg
+gteikokub2                      // bootleg
+gteikokub3                      // bootleg (Honly Enterprises)
+jumpbug                         // (c) 1981 Rock-ola
+jumpbugb                        // (c) 1981 Sega
+//jungsub                         // bootleg
+kamakazi3                       // Video Games (UK) Ltd., hack or bootleg?
+kamikazp                        // bootleg (Potomac Games)
+kingball                        // (c) 1980 Namco
+kingballj                       // (c) 1980 Namco
+kong                            // (c) Taito (Brazil) - rewrite of Donkey Kong
+//ladybugg                        // bootleg
+levers                          // (c) 1983 Rock-ola
+losttomb                        // (c) 1982 Stern
+losttombh                       // (c) 1982 Stern
+luctoday                        // 1980 Sigma
+mandinga                        // bootleg (Artemi)
+mandingaeg                      // bootleg (Electrogame)
+mandingarf                      // bootleg (Recreativos Franco S.A.)
+mandingac                       // bootleg (Centromatic)
+mltiwars                        // bootleg (Gayton Games)
+monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
+moonal2                         // [1980] Nichibutsu
+moonal2b                        // [1980] Nichibutsu
+moonaln                         // [Nichibutsu] (Karateco license) or hack
+mooncmw                         // bootleg
+mooncptc                        // bootleg (Petaco S.A.)
+mooncreg                        // bootleg
+mooncrgx                        // bootleg
+mooncrs2                        // bootleg
+mooncrs3                        // bootleg
+mooncrs4                        // bootleg
+mooncrs5                        // bootleg
+mooncrsb                        // bootleg
+mooncrsl                        // bootleg (Laguna S.A.)
+mooncrst                        // (c) 1980 Nichibutsu
+mooncrstg                       // (c) 1980 Gremlin
+mooncrstso                      // (c) 1980 SegaSA / Sonic
+mooncrsto                       // (c) 1980 Nichibutsu
+mooncrstu                       // (c) 1980 Nichibutsu USA
+mooncrstuk                      // (c) 1980 Nichibutsu UK
+mooncrstuku                     // (c) 1980 Nichibutsu UK
+moonqsr                         // (c) 1980 Nichibutsu
+moonwar                         // (c) 1981 Stern
+moonwara                        // (c) 1981 Stern
+mshuttle                        // (c) 1981 Nichibutsu
+mshuttle2                       // (c) 1981 Nichibutsu
+mshuttlea                       // (c) 1981 Nichibutsu
+mshuttlej                       // (c) 1981 Nichibutsu
+mshuttlej2                      // (c) 1981 Nichibutsu
+ncentury                        // bootleg (Petaco S.A.)
+offensiv                        // bootleg (Video Dens)
+omegab                          // bootleg
+omni                            // bootleg
+orbitron                        // (c) 1982 Signatron USA (Arcade Tv Game List - P.160, Left, 22 from top)
+//pacmanbl                        // bootleg
+//pacmanbla                       // bootleg
+//pacmanblb                       // bootleg
+//pacmanblv                       // bootleg (Video Dens)
+pajaroes                        // bootleg
+//phoenxp2                        // bootleg
+pisces                          // Subelectro
+piscesb                         // bootleg
+quaak                           // bootleg
+redufo                          // (c) Artic
+redufob                         // bootleg
+redufob2                        // bootleg
+scobra                          // GX316 (c) 1981 Konami
+scobrab                         // GX316 (c) 1981 Karateco (bootleg?)
+scobrae                         // GX316 (c) 1981 Stern
+scobrae2                        //
+scobrag                         // AVG by Zaccaria (bootleg?)
+scobraggi                       // bootleg (Cocamatic)
+scobras                         // GX316 (c) 1981 Stern
+scobrase                        // GX316 (c) 1981 Sega
+scorpion                        // (c) 1982 Zaccaria
+scorpiona                       // (c) 1982 Zaccaria
+scorpionb                       // (c) 1982 Zaccaria
+scorpionmc                      // bootleg
+scramble                        // GX387 (c) 1981 Konami
+scramblebb                      // bootleg?
+kamikazesp                      // bootleg (Euromatic S.A.)
+scramblebf                      // bootleg
+scrambles                       // GX387 (c) 1981 Stern
+scrambles2                      // GX387 (c) 1981 Stern
+scrambp                         // bootleg (Billport S.A.)
+scramce                         // bootleg (Centromatic S.A.)
+scrammr                         // bootleg (Model Racing)
+scrampt                         // bootleg (Petaco S.A.)
+scramrf                         // bootleg (Recreativos Franco)
+sfx                             // (c) 1983 Nichibutsu
+skelagon                        // (c) 1983 Nichibutsu USA
+skybase                         // (c) 1982 Omori Electric Co., Ltd.
+skyraidr                        // bootleg
+smooncrs                        // Gremlin
+spacbat2                        // bootleg
+spacbatt                        // bootleg
+spacempr                        // bootleg
+spactrai                        //
+spcdrag                         // bootleg
+spcdraga                        // bootleg
+spctbird                        // (c) Fortrek
+spdcoin                         // (c) 1984 Stern
+sstarcrs                        // Taito (Brazil)
+starfght                        // hack
+starfgmc                        // bootleg
+stera                           // bootleg
+streakng                        // [1980] Shoei
+streaknga                       // [1980] Shoei
+strfbomb                        // bootleg
+superbon                        // bootleg
+superg                          // hack
+supergs                         // Silver Systems hack
+supergx                         // [1980] Nichibutsu
+suprheli                        // bootleg
+swarm                           // hack
+tazmania                        // (c) 1982 Stern
+tdpgal                          // 1983 Design Labs / Thomas Automatics
+tenspot                         // (c) 1982 Thomas Automatics
+theend                          // (c) 1980 Konami
+takeoff                         // (c) 1980 Sidam (bootleg)
+theends                         // (c) 1980 Stern
+//thepitm                         // bootleg
+timefgtr                        // (c) Taito (Brazil) - rewrite of Time Pilot
+tst_galx                        // Galaxian Test ROM
+turpin                          // (c) 1981 Sega
+turpins                         // (c) 1981 bootleg
+turtles                         // (c) 1981 Stern
+uniwars                         // (c) Irem
+uniwarsa                        // (c) Karateco
+victoryc                        // (c) Comsoft
+victorycb                       // (c) Comsoft (bootleg)
+videight                        // multigame
+warofbug                        // (c) 1981 Armenia
+warofbugg                       // German Version
+warofbugu                       // (c) 1981 Armenia
+zerotime                        // hack (Petaco S.A.)
+zerotimed                       // hack (Datamat)
+zerotimemc                      // hack (Marti Colls)
+zigzagb                         // (c) 1982 LAX (bootleg)
+zigzagb2                        // (c) 1982 LAX (bootleg)
+
 @source:gamemachine.cpp
 2001tgm                         //
 
@@ -57,17 +275,168 @@ marioe                          // (c) 1983 Nintendo of America
 marioj                          // (c) 1983 Nintendo
 masao                           // bootleg
 
+@source:mw8080bw.cpp
+gunfight                        // 597 [1975] Dave Nutting Associates / Midway
+gunfighto                       // 597 [1975] Dave Nutting Associates / Midway
+
 @source:palestra.cpp
 palestra
 
 @source:popeye.cpp
+skyskipr
 popeye                          // (c) 1982
 popeyeu                         // (c) 1982
 popeyef                         // (c) 1982
 popeyebl                        // bootleg
+popeyeb2                        // bootleg
+popeyeb3                        // bootleg
+popeyej
+popeyejo
+popeyehs
 
-@source:prodigy.cpp
-prodigy                        // ACI Destiny Prodigy, 1981
+@source:segas16b.cpp
+aceattac                        // (c) 1988 (FD1094)
+//afightere
+//afighterf
+//afighterg
+//afighterh
+aliensyn                        // (c) 1987 (Unprotected)
+aliensyn3                       // (c) 1987 (FD1089A)
+aliensyn7                       // (c) 1987 (MC-8123B)
+aliensynj                       // (c) 1987 (FD1089A)
+altbeast                        // (c) 1988 (8751)
+altbeast2                       // (c) 1988 (MC-8123B)
+altbeast4                       // (c) 1988 (MC-8123B)
+altbeast5                       // (c) 1988 (FD1094)
+altbeast5d                      //
+altbeast6                       // (c) 1988 (8751)
+altbeastj                       // (c) 1988 (8751)
+altbeastj1                      // (c) 1988 (protected)
+altbeastj3                      // (c) 1988 (FD1094)
+altbeastj3d                     //
+atomicp                         // (c) 1990 Philko - korean clone board
+aurail                          // (c) 1990 Sega / Westone
+aurail1                         // (c) 1990 Sega / Westone (FD1089B)
+aurail1d                        //
+aurailj                         // (C) 1990 Sega / Westone (FD1089A)
+aurailjd                        //
+bayroute                        // (c) 1989 Sunsoft / Sega (FD1094)
+bayroute1                       // (c) 1989 Sunsoft / Sega (Unprotected)
+bayrouted                       //
+bayroutej                       // (c) 1989 Sunsoft / Sega (FD1094)
+bayroutejd                      //
+bullet                          // (c) 1987 (FD1094)
+bulletd                         //
+cencourt                        // (c) 1988 (MC-8123B)
+cotton                          // (c) 1990 (FD1094)
+cottond                         //
+cottonj                         // (c) 1990 (FD1094)
+cottonja                        // (c) 1990 (FD1094)
+cottonjad                       //
+cottonjd                        //
+cottonu                         // (c) 1990 (FD1094)
+cottonud                        //
+ddux                            // (c) 1989 (FD1094)
+ddux1                           // (c) 1989 (8751)
+dduxd                           //
+dduxj                           // (c) 1989 (FD1094)
+dduxjd                          //
+//defense                         // (c) 1987 (FD1094)
+dfjail                          //
+dunkshot                        // (c) 1986 (FD1089A)
+dunkshota                       // (c) 1986 (FD1089A)
+dunkshoto                       // (c) 1986 (FD1089A)
+eswat                           // (c) 1989 (FD1094)
+eswatd                          //
+eswatj                          // (c) 1989 (FD1094)
+eswatj1                         // (c) 1989 (FD1094)
+eswatj1d                        //
+eswatjd                         //
+eswatu                          // (c) 1989 (FD1094)
+eswatud                         //
+exctleag                        // (c) 1988 (FD1094)
+exctleagd                       //
+fantzn2x                        // (c) 2008 Sega / M2
+fantzn2xp                       // (c) 2008 Sega / M2
+//fantzoneta                      // (c) 2008 Sega / M2 (bootleg conversion)
+fpoint                          // (c) 1989 (Japan, FD1094)
+fpoint1                         // (c) 1989 (Japan, FD1094)
+fpoint1d                        //
+fpointbj                        // (c) 1989 (Datsu bootleg, Japan)
+fpointbl                        // (c) 1989 (Datsu bootleg)
+fpointbla                       //
+fpointd                         //
+goldnaxe                        // (c) 1989 (8751)
+goldnaxe1                       // (c) 1989 (FD1094)
+goldnaxe1d                      //
+goldnaxe2                       // (c) 1989 (8751)
+goldnaxe3                       // (c) 1989 (FD1094)
+goldnaxe3d                      //
+goldnaxej                       // (c) 1989 (FD1094)
+goldnaxejd                      //
+goldnaxeu                       // (c) 1989 (FD1094)
+goldnaxeud                      //
+hwchamp                         // (c) 1987 (Unprotected)
+hwchampj                        // (c) 1987 (FD1094)
+hwchampjd                       //
+isgsm                           //
+lockonph                        //
+mvp                             // (c) 1989 (FD1094)
+mvpd                            //
+mvpj                            // (c) 1989 (FD1094)
+mvpjd                           //
+passsht                         // (c) 1988 (FD1094)
+passshta                        // (c) 1988 (FD1094)
+passshtad                       //
+passshtd                        //
+passshtj                        // (c) 1988 (FD1094)
+passshtjd                       //
+riotcity                        // (c) 1991 Sega / Westone (Unprotected)
+ryukyu                          // (c) 1990 (FD1094)
+ryukyua                         // (c) 1990 (FD1094)
+ryukyud                         //
+//sdib                            // (c) 1987 (FD1089A)
+//sdibl                           // (c) 1987 bootleg
+//sdibl2                          // bootleg
+//sdibl3                          // bootleg
+//sdibl4                          // bootleg
+//sdibl5                          // bootleg
+//sdibl6                          // bootleg
+shinfz                          //
+//shinobi2                        // (c) 1987 (FD1094)
+//shinobi2d                       //
+//shinobi3                        // (c) 1987 (MC-8123B)
+//shinobi4                        // (c) 1987 (MC-8123B)
+//shinobi5                        // (c) 1987 (Unprotected)
+//shinobi6                        // (c) 1987 (Unprotected)
+sjryuko                         // (c) 1988 White Board (FD1094)
+snapper                         // (c) 1990 Philko - korean clone board
+sonicbom                        // (c) 1987 (FD1094)
+sonicbomd                       //
+suprleag                        // (c) 1987 (FD1094)
+tetrbx                          //
+//tetris1                         // (c) 1988 (FD1094) S16B
+//tetris1d                        //
+//tetris2                         // (c) 1988 (FD1094) S16B
+//tetris2d                        //
+timescan                        // (c) 1987 (Unprotected)
+toryumon                        // (c) 1995 (Unprotected)
+tturf                           // (c) 1989 Sega / Sunsoft (8751)
+tturfu                          // (c) 1989 Sega / Sunsoft (8751)
+ultracin                        // (c) 1996 Sega (Unprotected)
+wb3                             // (c) 1988 Sega / Westone (8751)
+wb32                            // (c) 1988 Sega / Westone (FD1094)
+wb32d                           //
+wb33                            // (c) 1988 Sega / Westone (FD1094)
+wb33d                           //
+wb34                            // (c) 1988 Sega / Westone (FD1094)
+wb34d                           //
+wrestwar                        // (c) 1989 (8751)
+wrestwar1                       // (c) 1989 (FD1094)
+wrestwar1d                      //
+wrestwar2                       // (c) 1989 (FD1094)
+wrestwar2d                      //
+
 
 @source:testpat.cpp
 tp1983
@@ -136,6 +505,9 @@ fun4a                           // (c) 1976 Bailey
 @source:chicago.cpp
 dmodrbcc                        // (c) 1976 Chicago Coin
 
+@source:crazybal.cpp
+crazybal                        // (c) 1978 EGS
+
 @source:electra.cpp
 avenger                         // (c) 1975 Electra
 
@@ -188,8 +560,3 @@ zzblock                         // (c) 1979 Taito
 
 @source:usbilliards.cpp
 sharkusb                        // (c) 1975 US Billiards
-
-
-
-
-

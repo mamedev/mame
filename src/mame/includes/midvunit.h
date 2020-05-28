@@ -7,8 +7,8 @@
 **************************************************************************/
 
 #include "audio/dcs.h"
+#include "bus/ata/ataintf.h"
 #include "machine/adc0844.h"
-#include "machine/ataintf.h"
 #include "machine/midwayic.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
@@ -164,7 +164,7 @@ private:
 	DECLARE_WRITE32_MEMBER(offroadc_serial_data_w);
 	DECLARE_READ32_MEMBER(midvplus_misc_r);
 	DECLARE_WRITE32_MEMBER(midvplus_misc_w);
-	DECLARE_WRITE8_MEMBER(midvplus_xf1_w);
+	void midvplus_xf1_w(uint8_t data);
 	DECLARE_READ32_MEMBER(generic_speedup_r);
 	DECLARE_READ32_MEMBER(midvunit_wheel_board_r);
 	DECLARE_WRITE32_MEMBER(midvunit_wheel_board_w);

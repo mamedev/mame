@@ -147,7 +147,7 @@ TILE_GET_INFO_MEMBER(polepos_state::bg_get_tile_info)
 	uint16_t word = m_view16_memory[tile_index];
 	int code = (word & 0xff) | ((word & 0x4000) >> 6);
 	int color = (word & 0x3f00) >> 8;
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			color,
 			0);
@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(polepos_state::tx_get_tile_info)
 	/* 128V input to the palette PROM */
 	if (tile_index >= 32*16) color |= 0x40;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			color,
 			0);
@@ -188,8 +188,8 @@ TILE_GET_INFO_MEMBER(polepos_state::tx_get_tile_info)
 
 void polepos_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(polepos_state::bg_get_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,16);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(polepos_state::tx_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(polepos_state::bg_get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 16);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(polepos_state::tx_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_tx_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x2f);
 

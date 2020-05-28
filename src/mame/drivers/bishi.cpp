@@ -466,7 +466,7 @@ void bishi_state::bishi(machine_config &config)
 	m_palette->enable_hilights();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(bishi_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(bishi_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_8, 1, 0);
 	m_k056832->set_palette(m_palette);
 
@@ -489,7 +489,7 @@ void bishi_state::dobouchn(machine_config &config)
 {
 	bishi(config);
 //  TODO: change accordingly (ASCII charset definitely not 8bpp, 5bpp perhaps?)
-//  m_k056832->set_tile_callback(FUNC(bishi_state::dobouchn_tile_callback), this);
+//  m_k056832->set_tile_callback(FUNC(bishi_state::dobouchn_tile_callback));
 	m_k056832->set_config(K056832_BPP_8, 1, 0);
 }
 

@@ -54,14 +54,14 @@ public:
 private:
 	DECLARE_READ8_MEMBER(pia51_r);
 	DECLARE_WRITE8_MEMBER(pia51_w);
-	DECLARE_READ8_MEMBER(p51b_r);
+	uint8_t p51b_r();
 	DECLARE_WRITE8_MEMBER(sol_w);
 	DECLARE_WRITE_LINE_MEMBER(p50ca2_w);
 	DECLARE_WRITE8_MEMBER(sw_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
-	DECLARE_WRITE8_MEMBER(p50a_w);
-	DECLARE_WRITE8_MEMBER(p50b_w);
-	DECLARE_WRITE8_MEMBER(p51a_w);
+	void p50a_w(uint8_t data);
+	void p50b_w(uint8_t data);
+	void p51a_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 	void micropin_map(address_map &map);
 	void pentacup2_io(address_map &map);
@@ -203,7 +203,7 @@ WRITE8_MEMBER( micropin_state::sw_w )
 {
 }
 
-WRITE8_MEMBER( micropin_state::p50a_w )
+void micropin_state::p50a_w(uint8_t data)
 {
 	m_counter++;
 	if (m_counter == 1)
@@ -214,7 +214,7 @@ WRITE8_MEMBER( micropin_state::p50a_w )
 	}
 }
 
-WRITE8_MEMBER( micropin_state::p50b_w )
+void micropin_state::p50b_w(uint8_t data)
 {
 	m_counter++;
 	if (m_counter == 2)
@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER( micropin_state::p50ca2_w )
 // The sound never gets muted, but is turned down with an electronic volume control,
 //   which must be the most complex circuit in this machine. We use a beeper to
 //   make the tones, and turn it off if no new commands arrive within .1 second.
-WRITE8_MEMBER( micropin_state::p51a_w )
+void micropin_state::p51a_w(uint8_t data)
 {
 	static uint16_t frequency[16] = { 387, 435, 488, 517, 581, 652, 691, 775, 870, 977, 1035, 1161, 1304, 1381, 1550, 1740 };
 	m_beep->set_clock(frequency[data & 15]);
@@ -250,7 +250,7 @@ WRITE8_MEMBER( micropin_state::p51a_w )
 	m_beep->set_state(1);
 }
 
-READ8_MEMBER( micropin_state::p51b_r )
+uint8_t micropin_state::p51b_r()
 {
 	return ioport("X0")->read();
 }

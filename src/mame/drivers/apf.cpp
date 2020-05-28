@@ -114,16 +114,16 @@ public:
 	void apfimag(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(videoram_r);
-	DECLARE_READ8_MEMBER(pia0_porta_r);
-	DECLARE_WRITE8_MEMBER(pia0_portb_w);
+	uint8_t videoram_r(offs_t offset);
+	uint8_t pia0_porta_r();
+	void pia0_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
-	DECLARE_READ8_MEMBER(pia1_porta_r);
-	DECLARE_READ8_MEMBER(pia1_portb_r);
-	DECLARE_WRITE8_MEMBER(pia1_portb_w);
-	DECLARE_WRITE8_MEMBER(apf_dischw_w);
-	DECLARE_READ8_MEMBER(serial_r);
-	DECLARE_WRITE8_MEMBER(serial_w);
+	uint8_t pia1_porta_r();
+	uint8_t pia1_portb_r();
+	void pia1_portb_w(uint8_t data);
+	void apf_dischw_w(offs_t offset, uint8_t data);
+	uint8_t serial_r(offs_t offset);
+	void serial_w(offs_t offset, uint8_t data);
 
 	void apfimag_map(address_map &map);
 	void apfm1000_map(address_map &map);
@@ -153,7 +153,7 @@ private:
 };
 
 
-READ8_MEMBER( apf_state::videoram_r )
+uint8_t apf_state::videoram_r(offs_t offset)
 {
 	if (BIT(m_pad_data, 7)) // AG line
 	{
@@ -184,7 +184,7 @@ READ8_MEMBER( apf_state::videoram_r )
 	}
 }
 
-READ8_MEMBER( apf_state::pia0_porta_r )
+uint8_t apf_state::pia0_porta_r()
 {
 	uint8_t data = 0xff;
 
@@ -195,7 +195,7 @@ READ8_MEMBER( apf_state::pia0_porta_r )
 	return data;
 }
 
-WRITE8_MEMBER( apf_state::pia0_portb_w )
+void apf_state::pia0_portb_w(uint8_t data)
 {
 	/* bit 7..6 video control */
 	m_crtc->ag_w(BIT(data, 7));
@@ -210,12 +210,12 @@ WRITE_LINE_MEMBER( apf_state::pia0_ca2_w )
 	m_ca2 = state;
 }
 
-READ8_MEMBER( apf_state::pia1_porta_r )
+uint8_t apf_state::pia1_porta_r()
 {
 	return m_key[m_keyboard_data]->read();
 }
 
-READ8_MEMBER( apf_state::pia1_portb_r )
+uint8_t apf_state::pia1_portb_r()
 {
 	uint8_t data = m_portb;
 
@@ -226,7 +226,7 @@ READ8_MEMBER( apf_state::pia1_portb_r )
 }
 
 
-WRITE8_MEMBER( apf_state::pia1_portb_w )
+void apf_state::pia1_portb_w(uint8_t data)
 {
 	/* bits 2..0 = keyboard line */
 	/* bit 3 = cass audio enable */
@@ -252,11 +252,11 @@ void apf_state::machine_start()
 		switch (m_cart->get_type())
 		{
 			case APF_BASIC:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x6800, 0x7fff, read8_delegate(FUNC(apf_cart_slot_device::extra_rom),(apf_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x6800, 0x7fff, read8sm_delegate(*m_cart, FUNC(apf_cart_slot_device::extra_rom)));
 				break;
 			case APF_SPACEDST:
 				m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x9800, 0x9fff);
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9800, 0x9bff, read8_delegate(FUNC(apf_cart_slot_device::read_ram),(apf_cart_slot_device*)m_cart), write8_delegate(FUNC(apf_cart_slot_device::write_ram),(apf_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9800, 0x9bff, read8sm_delegate(*m_cart, FUNC(apf_cart_slot_device::read_ram)), write8sm_delegate(*m_cart, FUNC(apf_cart_slot_device::write_ram)));
 				m_has_cart_ram = true;
 				break;
 		}
@@ -284,7 +284,7 @@ void apf_state::machine_reset()
 	}
 }
 
-WRITE8_MEMBER( apf_state::apf_dischw_w)
+void apf_state::apf_dischw_w(offs_t offset, uint8_t data)
 {
 	/* bit 3 is index of drive to select */
 	uint8_t drive = BIT(data, 3);
@@ -305,13 +305,13 @@ WRITE8_MEMBER( apf_state::apf_dischw_w)
 	logerror("disc w %04x %04x\n",offset,data);
 }
 
-READ8_MEMBER( apf_state::serial_r)
+uint8_t apf_state::serial_r(offs_t offset)
 {
 	logerror("serial r %04x\n",offset);
 	return 0;
 }
 
-WRITE8_MEMBER( apf_state::serial_w)
+void apf_state::serial_w(offs_t offset, uint8_t data)
 {
 	logerror("serial w %04x %04x\n",offset,data);
 }

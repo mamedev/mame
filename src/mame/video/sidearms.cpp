@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_sidearms_bg_tile_info)
 	color = attr>>3 & 0x1f;
 	flags = attr>>1 & 0x03;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(sidearms_state::get_philko_bg_tile_info)
@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_philko_bg_tile_info)
 	color = attr>>3 & 0x0f;
 	flags = attr>>1 & 0x03;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(sidearms_state::get_fg_tile_info)
@@ -124,7 +124,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_fg_tile_info)
 	int code = m_videoram[tile_index] + (attr<<2 & 0x300);
 	int color = attr & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(sidearms_state::tilemap_scan)
@@ -142,17 +142,17 @@ void sidearms_state::video_start()
 
 	if (!m_gameid)
 	{
-		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sidearms_state::get_sidearms_bg_tile_info),this), tilemap_mapper_delegate(FUNC(sidearms_state::tilemap_scan),this),
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sidearms_state::get_sidearms_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(sidearms_state::tilemap_scan)),
 				32, 32, 128, 128);
 
 		m_bg_tilemap->set_transparent_pen(15);
 	}
 	else
 	{
-		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sidearms_state::get_philko_bg_tile_info),this), tilemap_mapper_delegate(FUNC(sidearms_state::tilemap_scan),this), 32, 32, 128, 128);
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sidearms_state::get_philko_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(sidearms_state::tilemap_scan)), 32, 32, 128, 128);
 	}
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sidearms_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sidearms_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 64);
 
 	m_fg_tilemap->set_transparent_pen(3);

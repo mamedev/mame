@@ -326,6 +326,11 @@ public:
 
 	void swyft(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<m68008_device> m_maincpu;
 	optional_device<centronics_device> m_ctx;
@@ -344,10 +349,6 @@ private:
 	optional_ioport m_y6;
 	optional_ioport m_y7;*/
 
-	DECLARE_MACHINE_START(swyft);
-	DECLARE_MACHINE_RESET(swyft);
-	DECLARE_VIDEO_START(swyft);
-
 	uint32_t screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(bitlatch_r);
@@ -355,21 +356,21 @@ private:
 
 	DECLARE_READ8_MEMBER(swyft_via0_r);
 	DECLARE_WRITE8_MEMBER(swyft_via0_w);
-	DECLARE_READ8_MEMBER(via0_pa_r);
-	DECLARE_WRITE8_MEMBER(via0_pa_w);
+	uint8_t via0_pa_r();
+	void via0_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via0_ca2_w);
-	DECLARE_READ8_MEMBER(via0_pb_r);
-	DECLARE_WRITE8_MEMBER(via0_pb_w);
+	uint8_t via0_pb_r();
+	void via0_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via0_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via0_cb2_w);
 
 	DECLARE_READ8_MEMBER(swyft_via1_r);
 	DECLARE_WRITE8_MEMBER(swyft_via1_w);
-	DECLARE_READ8_MEMBER(via1_pa_r);
-	DECLARE_WRITE8_MEMBER(via1_pa_w);
+	uint8_t via1_pa_r();
+	void via1_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via1_ca2_w);
-	DECLARE_READ8_MEMBER(via1_pb_r);
-	DECLARE_WRITE8_MEMBER(via1_pb_w);
+	uint8_t via1_pb_r();
+	void via1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via1_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_cb2_w);
 
@@ -577,7 +578,7 @@ void swyft_state::swyft_mem(address_map &map)
 	map(0x0e4000, 0x0e4fff).rw(FUNC(swyft_state::swyft_via1_r), FUNC(swyft_state::swyft_via1_w));
 }
 
-MACHINE_START_MEMBER(swyft_state,swyft)
+void swyft_state::machine_start()
 {
 	for (auto &via : m_via)
 	{
@@ -588,11 +589,11 @@ MACHINE_START_MEMBER(swyft_state,swyft)
 	}
 }
 
-MACHINE_RESET_MEMBER(swyft_state,swyft)
+void swyft_state::machine_reset()
 {
 }
 
-VIDEO_START_MEMBER(swyft_state,swyft)
+void swyft_state::video_start()
 {
 }
 
@@ -670,13 +671,13 @@ WRITE8_MEMBER( swyft_state::swyft_via1_w )
 }
 
 // first via
-READ8_MEMBER( swyft_state::via0_pa_r )
+uint8_t swyft_state::via0_pa_r()
 {
 	LOGMASKED(LOG_VIA0, "VIA0: Port A read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER( swyft_state::via0_pa_w )
+void swyft_state::via0_pa_w(uint8_t data)
 {
 	LOGMASKED(LOG_VIA0, "VIA0: Port A written with data of 0x%02x!\n", data);
 }
@@ -686,13 +687,13 @@ WRITE_LINE_MEMBER ( swyft_state::via0_ca2_w )
 	LOGMASKED(LOG_VIA0, "VIA0: CA2 written with %d!\n", state);
 }
 
-READ8_MEMBER( swyft_state::via0_pb_r )
+uint8_t swyft_state::via0_pb_r()
 {
 	LOGMASKED(LOG_VIA0, "VIA0: Port B read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER( swyft_state::via0_pb_w )
+void swyft_state::via0_pb_w(uint8_t data)
 {
 	LOGMASKED(LOG_VIA0, "VIA0: Port B written with data of 0x%02x!\n", data);
 }
@@ -708,13 +709,13 @@ WRITE_LINE_MEMBER ( swyft_state::via0_cb2_w )
 }
 
 // second via
-READ8_MEMBER( swyft_state::via1_pa_r )
+uint8_t swyft_state::via1_pa_r()
 {
 	LOGMASKED(LOG_VIA1, "VIA1: Port A read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER( swyft_state::via1_pa_w )
+void swyft_state::via1_pa_w(uint8_t data)
 {
 	LOGMASKED(LOG_VIA1, "VIA1: Port A written with data of 0x%02x!\n", data);
 }
@@ -724,13 +725,13 @@ WRITE_LINE_MEMBER ( swyft_state::via1_ca2_w )
 	LOGMASKED(LOG_VIA1, "VIA1: CA2 written with %d!\n", state);
 }
 
-READ8_MEMBER( swyft_state::via1_pb_r )
+uint8_t swyft_state::via1_pb_r()
 {
 	LOGMASKED(LOG_VIA1, "VIA1: Port B read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER( swyft_state::via1_pb_w )
+void swyft_state::via1_pb_w(uint8_t data)
 {
 	LOGMASKED(LOG_VIA1, "VIA1: Port B written with data of 0x%02x!\n", data);
 }
@@ -756,10 +757,6 @@ void swyft_state::swyft(machine_config &config)
 	/* basic machine hardware */
 	M68008(config, m_maincpu, XTAL(15'897'600)/2); //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
 	m_maincpu->set_addrmap(AS_PROGRAM, &swyft_state::swyft_mem);
-
-	MCFG_MACHINE_START_OVERRIDE(swyft_state,swyft)
-	MCFG_MACHINE_RESET_OVERRIDE(swyft_state,swyft)
-	MCFG_VIDEO_START_OVERRIDE(swyft_state,swyft)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

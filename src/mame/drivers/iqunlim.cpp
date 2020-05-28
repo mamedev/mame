@@ -3,7 +3,6 @@
 
 /*
 
-
 IQ Unlimited - GERMAN:
       +------------------------------------------------------------------------------+
       |                                                                              |
@@ -55,19 +54,25 @@ A4 = MAX232
 #include "emu.h"
 #include "screen.h"
 #include "cpu/m68000/m68000.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 class iqunlim_state : public driver_device
 {
 public:
-	iqunlim_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
-	{ }
+	iqunlim_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_cart(*this, "cartslot")
+		{ }
 
 	void iqunlim(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void iqunlim_mem(address_map &map);
@@ -87,6 +92,17 @@ void iqunlim_state::iqunlim_mem(address_map &map)
 static INPUT_PORTS_START( iqunlim )
 INPUT_PORTS_END
 
+DEVICE_IMAGE_LOAD_MEMBER(iqunlim_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+
 void iqunlim_state::iqunlim(machine_config &config)
 {
 	/* basic machine hardware */
@@ -100,11 +116,23 @@ void iqunlim_state::iqunlim(machine_config &config)
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
 	screen.set_screen_update(FUNC(iqunlim_state::screen_update));
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "iqunlim_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(iqunlim_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("iqunlim_cart");
 }
 
 ROM_START( iqunlim )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD16_WORD_SWAP( "27-06126-007.bin", 0x000000, 0x200000, CRC(af38c743) SHA1(5b91748536905812e6de7145638699acb375865a) )
+	ROM_REGION(0x400000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "27-06122-006.bin", 0x000000, 0x400000, CRC(811b1b19) SHA1(bac99ce408ed0a3b6449db88b363293b46ce69b9) )
 ROM_END
 
-COMP( 19??, iqunlim, 0, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "Video Technology", "VTech IQ Unlimited (Germany)", MACHINE_IS_SKELETON)
+ROM_START( iqunlimgr )
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "27-06126-007.bin", 0x000000, 0x200000, BAD_DUMP CRC(af38c743) SHA1(5b91748536905812e6de7145638699acb375865a) ) // Seems underdumped
+ROM_END
+
+COMP( 1995, iqunlim,         0, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited",           MACHINE_IS_SKELETON) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.
+COMP( 1995, iqunlimgr, iqunlim, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited (Germany)", MACHINE_IS_SKELETON) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.

@@ -31,6 +31,9 @@ NETLIST_START(gtrak10)
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)
 
+	NET_C(VCC, high.VCC, low.VCC)
+	NET_C(GND, high.GND, low.GND)
+
 	MAINCLOCK(CLOCK, 14318181)
 
 	ALIAS(P, high)

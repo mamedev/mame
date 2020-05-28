@@ -42,8 +42,7 @@
 
 class device_comx_expansion_card_interface;
 
-class comx_expansion_slot_device : public device_t,
-									public device_slot_interface
+class comx_expansion_slot_device : public device_t, public device_single_card_slot_interface<device_comx_expansion_card_interface>
 {
 public:
 	// construction/destruction
@@ -74,7 +73,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(irq_w) { m_write_irq(state); }
 
-	DECLARE_WRITE8_MEMBER(sc_w);
+	void sc_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tpb_w);
 
 protected:
@@ -90,7 +89,7 @@ protected:
 // ======================> device_comx_expansion_card_interface
 
 // class representing interface-specific live comx_expansion card
-class device_comx_expansion_card_interface : public device_slot_card_interface
+class device_comx_expansion_card_interface : public device_interface
 {
 	friend class comx_expansion_slot_device;
 

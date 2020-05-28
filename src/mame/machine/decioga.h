@@ -30,8 +30,8 @@ public:
 
 	// DMA interface
 	void set_dma_space(address_space *space);
-	DECLARE_READ16_MEMBER(lance_dma_r);
-	DECLARE_WRITE16_MEMBER(lance_dma_w);
+	u16 lance_dma_r(offs_t offset);
+	void lance_dma_w(offs_t offset, u16 data);
 
 protected:
 	virtual void device_start() override;

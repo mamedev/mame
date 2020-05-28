@@ -44,9 +44,9 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(chsuper_vram_w);
-	DECLARE_WRITE8_MEMBER(chsuper_outporta_w);
-	DECLARE_WRITE8_MEMBER(chsuper_outportb_w);
+	void chsuper_vram_w(offs_t offset, uint8_t data);
+	void chsuper_outporta_w(uint8_t data);
+	void chsuper_outportb_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -108,7 +108,7 @@ uint32_t chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
+void chsuper_state::chsuper_vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 }
@@ -155,7 +155,7 @@ WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
 
 */
 
-WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
+void chsuper_state::chsuper_outporta_w(uint8_t data)  // Port EEh
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // Coin counter
 	m_lamps[0] = BIT(data, 1);  // Hold 1 / Black (Nero) lamp.
@@ -181,7 +181,7 @@ WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 	}
 }
 
-WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
+void chsuper_state::chsuper_outportb_w(uint8_t data)  // Port EFh
 {
 	// D0: unknown...
 	// D1: unused...
@@ -220,7 +220,7 @@ void chsuper_state::chsuper_prg_map(address_map &map)
 	map(0xfb000, 0xfbfff).ram().share("nvram");
 }
 
-//  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
+//  map(0xaff8, 0xaff8).w("oki", FUNC(okim6295_device::write));
 
 void chsuper_state::chsuper_portmap(address_map &map)
 {
@@ -367,7 +367,7 @@ void chsuper_state::ramdac_map(address_map &map)
 void chsuper_state::chsuper(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 4);   /* HD64180RP8, 8 MHz? */
+	Z80180(config, m_maincpu, 16_MHz_XTAL); // Z8018006VSC (but can actually take 8 MHz?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &chsuper_state::chsuper_prg_map);
 	m_maincpu->set_addrmap(AS_IO, &chsuper_state::chsuper_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(chsuper_state::irq0_line_hold));
@@ -386,13 +386,13 @@ void chsuper_state::chsuper(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chsuper);
 	PALETTE(config, m_palette).set_entries(0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // ADV476KP50
 	ramdac.set_addrmap(0, &chsuper_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 74HC273 latch + R2R network (unknown values)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);

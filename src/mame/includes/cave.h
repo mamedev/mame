@@ -15,6 +15,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
+#include "video/tmap038.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -25,8 +26,6 @@ public:
 	cave_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_videoregs(*this, "videoregs.%u", 0)
-		, m_vram(*this, "vram.%u", 0)
-		, m_vctrl(*this, "vctrl.%u", 0)
 		, m_spriteram(*this, "spriteram.%u", 0)
 		, m_io_in0(*this, "IN0")
 		, m_touch_x(*this, "TOUCH%u_X", 1U)
@@ -48,13 +47,14 @@ public:
 		, m_gfxdecode(*this, "gfxdecode.%u", 0U)
 		, m_screen(*this, "screen.%u", 0U)
 		, m_palette(*this, "palette.%u", 0U)
+		, m_tilemap(*this, "tilemap.%u", 0U)
 		, m_soundlatch(*this, "soundlatch")
 		, m_startup(*this, "startup")
 		, m_led_outputs(*this, "led%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(korokoro_hopper_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tjumpman_hopper_r);
+	DECLARE_READ_LINE_MEMBER(korokoro_hopper_r);
+	DECLARE_READ_LINE_MEMBER(tjumpman_hopper_r);
 
 	void init_uopoko();
 	void init_donpachi();
@@ -100,10 +100,18 @@ protected:
 	virtual void device_post_load() override;
 
 private:
+
+	enum
+	{
+		TYPE_ZOOM = 0,
+		TYPE_NOZOOM = 1,
+		TYPE_ISPWRINST2 = 2
+	};
+
 	void (cave_state::*m_get_sprite_info)(int chip);
 	void (cave_state::*m_sprite_draw)(int chip, int priority);
 
-	void add_base_config(machine_config &config);
+	void add_base_config(machine_config &config, int layer);
 	void add_ymz(machine_config &config);
 
 	u16 irq_cause_r(offs_t offset);
@@ -116,6 +124,7 @@ private:
 	void soundlatch_ack_w(u8 data);
 	void gaia_coin_w(u8 data);
 	u16 donpachi_videoregs_r(offs_t offset);
+	template<int Chip> void videoregs_w(offs_t offset, u16 data, u16 mem_mask);
 	void korokoro_leds_w(offs_t offset, u16 data, u16 mem_mask);
 	template<int Chip> void pwrinst2_vctrl_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 sailormn_input0_r();
@@ -124,8 +133,6 @@ private:
 	template<int Mask> void z80_rombank_w(u8 data);
 	template<int Mask> void oki1_bank_w(u8 data);
 	template<int Mask> void oki2_bank_w(u8 data);
-	template<int Chip> void vram_w(offs_t offset, u16 data, u16 mem_mask);
-	template<int Chip> void vram_8x8_w(offs_t offset, u16 data, u16 mem_mask);
 	void eeprom_w(u8 data);
 	void sailormn_eeprom_w(u8 data);
 	void hotdogst_eeprom_w(u8 data);
@@ -138,17 +145,12 @@ private:
 	void ppsatan_io_mux_w(offs_t offset, u16 data, u16 mem_mask);
 	template<int Player> u16 ppsatan_touch_r();
 	void ppsatan_out_w(offs_t offset, u16 data, u16 mem_mask);
-	TILE_GET_INFO_MEMBER(sailormn_get_tile_info_2);
-	template<int Chip, int Gfx> TILE_GET_INFO_MEMBER(get_tile_info);
+	void sailormn_get_banked_code(bool tiledim, u32 &color, u32 &pri, u32 &code);
 	DECLARE_MACHINE_RESET(sailormn);
-	DECLARE_VIDEO_START(ddonpach);
-	DECLARE_VIDEO_START(dfeveron);
-	DECLARE_VIDEO_START(donpachi);
+	DECLARE_VIDEO_START(spr_4bpp);
+	DECLARE_VIDEO_START(spr_8bpp);
 	DECLARE_VIDEO_START(korokoro);
 	DECLARE_VIDEO_START(ppsatan);
-	DECLARE_VIDEO_START(pwrinst2);
-	DECLARE_VIDEO_START(sailormn);
-	DECLARE_VIDEO_START(uopoko);
 	void cave_palette(palette_device &palette);
 	void dfeveron_palette(palette_device &palette);
 	void korokoro_palette(palette_device &palette);
@@ -183,8 +185,6 @@ private:
 
 	/* memory pointers */
 	optional_shared_ptr_array<u16, 4> m_videoregs;
-	optional_shared_ptr_array<u16, 4> m_vram;
-	optional_shared_ptr_array<u16, 4> m_vctrl;
 	optional_shared_ptr_array<u16, 4> m_spriteram;
 
 	optional_ioport m_io_in0;
@@ -235,10 +235,6 @@ private:
 	std::unique_ptr<sprite_cave []> m_sprite[4];
 	sprite_cave *m_sprite_table[4][MAX_PRIORITY][MAX_SPRITE_NUM + 1];
 
-	tilemap_t *m_tilemap[4];
-	bool      m_tiledim[4];
-	bool      m_old_tiledim[4];
-
 	bitmap_ind16 m_sprite_zbuf[4];
 	u16       m_sprite_zbuf_baseval;
 
@@ -259,6 +255,7 @@ private:
 
 	u16       m_sprite_base_pal;
 	u16       m_sprite_granularity;
+	u32       m_max_sprite_clk[4]; // max usable clock for sprites
 
 	/* misc */
 	int       m_time_vblank_irq;
@@ -295,6 +292,7 @@ private:
 	optional_device_array<gfxdecode_device, 4> m_gfxdecode;
 	optional_device_array<screen_device, 4> m_screen;
 	optional_device_array<palette_device, 4> m_palette;
+	optional_device_array<tilemap038_device, 4> m_tilemap;
 	optional_device<generic_latch_16_device> m_soundlatch;
 	optional_device<timer_device> m_startup;
 	output_finder<9> m_led_outputs;
@@ -304,7 +302,7 @@ private:
 
 	inline void tilemap_draw(int chip, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u32 priority, u32 priority2, int GFX);
 	void set_pens(int chip);
-	void vh_start(int num, u16 sprcol_base, u16 sprcol_granularity);
+	void vh_start(u16 sprcol_base, u16 sprcol_granularity);
 	void get_sprite_info_cave(int chip);
 	void get_sprite_info_donpachi(int chip);
 	void sprite_init();

@@ -131,6 +131,8 @@
 	function sln2005.projectdependencies(prj)
 		local deps = premake.getdependencies(prj)
 		if #deps > 0 then
+			local function compareuuid(a, b) return a.uuid < b.uuid end
+			table.sort(deps, compareuuid)
 			_p('\tProjectSection(ProjectDependencies) = postProject')
 			for _, dep in ipairs(deps) do
 				_p('\t\t{%s} = {%s}', dep.uuid, dep.uuid)

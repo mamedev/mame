@@ -20,9 +20,9 @@ public:
 	stfight_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
-	DECLARE_WRITE8_MEMBER(stfight_text_char_w);
-	DECLARE_WRITE8_MEMBER(stfight_sprite_bank_w);
-	DECLARE_WRITE8_MEMBER(stfight_vh_latch_w);
+	void stfight_text_char_w(offs_t offset, uint8_t data);
+	void stfight_sprite_bank_w(uint8_t data);
+	void stfight_vh_latch_w(offs_t offset, uint8_t data);
 
 protected:
 	uint32_t screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

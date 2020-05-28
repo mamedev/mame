@@ -52,7 +52,7 @@ PAGE SEL bit in PORT0 set to 1:
 #include "machine/z80daisy.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80sti.h"
 #include "video/mc6845.h"
@@ -442,8 +442,8 @@ void ts803_state::ts803(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(ts803_state::crtc_update_row), this);
-	crtc.set_on_update_addr_change_callback(FUNC(ts803_state::crtc_update_addr), this);
+	crtc.set_update_row_callback(FUNC(ts803_state::crtc_update_row));
+	crtc.set_on_update_addr_change_callback(FUNC(ts803_state::crtc_update_addr));
 
 	clock_device &sti_clock(CLOCK(config, "sti_clock", 16_MHz_XTAL / 13));
 	sti_clock.signal_handler().set("sti", FUNC(z80sti_device::tc_w));

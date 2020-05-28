@@ -107,6 +107,10 @@ public:
 		vprintf_wrap(wrapcol, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
 
+	device_t *get_visible_cpu() { return m_visiblecpu; }
+	void set_visible_cpu(device_t *visiblecpu) { m_visiblecpu = visiblecpu; }
+	symbol_table &visible_symtable();
+
 	static std::string cmderr_to_string(CMDERR error);
 
 private:
@@ -120,7 +124,8 @@ private:
 
 	struct debug_command
 	{
-		debug_command * next;
+		debug_command(const char *_command, u32 _flags, int _ref, int _minparams, int _maxparams, std::function<void(int, const std::vector<std::string> &)> _handler);
+
 		char            command[32];
 		const char *    params;
 		const char *    help;
@@ -133,10 +138,13 @@ private:
 
 	running_machine &m_machine;
 
+	// visible CPU device (the one that commands should apply to)
+	device_t        *m_visiblecpu;
+
 	text_buffer     *m_console_textbuf;
 	text_buffer     *m_errorlog_textbuf;
 
-	debug_command   *m_commandlist;
+	std::forward_list<debug_command> m_commandlist;
 
 	std::unique_ptr<std::istream> m_source_file;        // script source file
 };

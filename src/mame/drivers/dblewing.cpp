@@ -118,15 +118,15 @@ private:
 	required_device<deco104_device> m_deco104;
 	required_device<decospr_device> m_sprgen;
 
-	DECLARE_READ8_MEMBER(irq_latch_r);
+	uint8_t irq_latch_r();
 	DECLARE_WRITE_LINE_MEMBER(soundlatch_irq_w);
 	uint32_t screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
-	READ16_MEMBER( wf_protection_region_0_104_r );
-	WRITE16_MEMBER( wf_protection_region_0_104_w );
+	uint16_t wf_protection_region_0_104_r(offs_t offset);
+	void wf_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void dblewing_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
@@ -153,7 +153,7 @@ uint32_t dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ16_MEMBER( dblewing_state::wf_protection_region_0_104_r )
+uint16_t dblewing_state::wf_protection_region_0_104_r(offs_t offset)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -162,7 +162,7 @@ READ16_MEMBER( dblewing_state::wf_protection_region_0_104_r )
 	return data;
 }
 
-WRITE16_MEMBER( dblewing_state::wf_protection_region_0_104_w )
+void dblewing_state::wf_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -184,7 +184,7 @@ void dblewing_state::dblewing_map(address_map &map)
 	map(0x104000, 0x104fff).ram().share("pf1_rowscroll");
 	map(0x106000, 0x106fff).ram().share("pf2_rowscroll");
 
-//  AM_RANGE(0x280000, 0x2807ff) AM_DEVREADWRITE("ioprot104", deco104_device, dblewing_prot_r, dblewing_prot_w) AM_SHARE("prot16ram")
+//  map(0x280000, 0x2807ff).rw("ioprot104", FUNC(deco104_device::dblewing_prot_r), FUNC(deco104_device::dblewing_prot_w)).share("prot16ram");
 	map(0x280000, 0x283fff).rw(FUNC(dblewing_state::wf_protection_region_0_104_r), FUNC(dblewing_state::wf_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 
 
@@ -201,7 +201,7 @@ void dblewing_state::decrypted_opcodes_map(address_map &map)
 	map(0x000000, 0x07ffff).rom().share("decrypted_opcodes");
 }
 
-READ8_MEMBER(dblewing_state::irq_latch_r)
+uint8_t dblewing_state::irq_latch_r()
 {
 	// bit 0: irq type (0 = latch, 1 = ym)
 	return m_soundlatch_pending ? 0 : 1;
@@ -352,7 +352,7 @@ void dblewing_state::dblewing(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 
 	/* video hardware */
@@ -370,21 +370,19 @@ void dblewing_state::dblewing(machine_config &config)
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(dblewing_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(dblewing_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(dblewing_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(dblewing_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_pri_callback(FUNC(dblewing_state::pri_callback), this);
+	m_sprgen->set_pri_callback(FUNC(dblewing_state::pri_callback));
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	DECO104PROT(config, m_deco104, 0);
@@ -427,6 +425,30 @@ ROM_START( dblewing )
 	ROM_RELOAD(               0x020000, 0x020000 )
 ROM_END
 
+/*
+The most noticeable difference with the set below is that it doesn't use checkpoints, but respawns you when you die.
+Checkpoints were more common in Japan, so this is likely to be an export version.
+*/
+ROM_START( dblewinga )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
+	ROM_LOAD16_BYTE( "17.3d",    0x000001, 0x040000, CRC(3a7ba822) SHA1(726db048ae3ab45cca45f631ad1f04b5cbc7f741) )
+	ROM_LOAD16_BYTE( "18.5d",    0x000000, 0x040000, CRC(e5f5f004) SHA1(4bd40ef88027554a0328df1cf6f1c9c975a7a73f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound cpu
+	ROM_LOAD( "kp_02-.10h",   0x000000, 0x010000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "mbe-02.8h",    0x000000, 0x100000, CRC(5a6d3ac5) SHA1(738bb833e2c5d929ac75fe4e69ee0af88197d8a6) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "mbe-00.14a",   0x000000, 0x100000, CRC(e33f5c93) SHA1(720904b54d02dace2310ac6bd07d5ed4bc4fd69c) )
+	ROM_LOAD( "mbe-01.16a",   0x100000, 0x100000, CRC(ef452ad7) SHA1(7fe49123b5c2778e46104eaa3a2104ce09e05705) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki samples */
+	ROM_LOAD( "kp_03-.16h",   0x000000, 0x020000, CRC(5d7f930d) SHA1(ad23aa804ea3ccbd7630ade9b53fc3ea2718a6ec) )
+	ROM_RELOAD(               0x020000, 0x020000 )
+ROM_END
+
 void dblewing_state::init_dblewing()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
@@ -436,4 +458,5 @@ void dblewing_state::init_dblewing()
 }
 
 
-GAME( 1993, dblewing, 0, dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, dblewing,  0,        dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dblewinga, dblewing, dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings (Asia)", MACHINE_SUPPORTS_SAVE )

@@ -77,29 +77,29 @@ void pc_lpt_device::device_add_mconfig(machine_config &config)
 }
 
 
-READ8_MEMBER( pc_lpt_device::data_r )
+uint8_t pc_lpt_device::data_r()
 {
 	// pull up mechanism for input lines, zeros are provided by peripheral
 	return m_data & m_cent_data_in->read();
 }
 
-WRITE8_MEMBER( pc_lpt_device::data_w )
+void pc_lpt_device::data_w(uint8_t data)
 {
 	m_data = data;
 	m_cent_data_out->write(m_data);
 }
 
-READ8_MEMBER( pc_lpt_device::status_r )
+uint8_t pc_lpt_device::status_r()
 {
 	return m_cent_status_in->read() ^ STATUS_BUSY;
 }
 
-READ8_MEMBER( pc_lpt_device::control_r )
+uint8_t pc_lpt_device::control_r()
 {
 	return ~((m_control & m_cent_ctrl_in->read() & 0x3f) ^ CONTROL_INIT);
 }
 
-WRITE8_MEMBER( pc_lpt_device::control_w )
+void pc_lpt_device::control_w(uint8_t data)
 {
 	//  logerror("pc_lpt_control_w: 0x%02x\n", data);
 
@@ -107,13 +107,13 @@ WRITE8_MEMBER( pc_lpt_device::control_w )
 	m_cent_ctrl_out->write(m_control);
 }
 
-READ8_MEMBER( pc_lpt_device::read )
+uint8_t pc_lpt_device::read(offs_t offset)
 {
 	switch (offset)
 	{
-	case 0: return data_r(space, 0);
-	case 1: return status_r(space, 0);
-	case 2: return control_r(space, 0);
+	case 0: return data_r();
+	case 1: return status_r();
+	case 2: return control_r();
 	}
 
 	/* if we reach this its an error */
@@ -122,13 +122,13 @@ READ8_MEMBER( pc_lpt_device::read )
 	return 0xff;
 }
 
-WRITE8_MEMBER( pc_lpt_device::write )
+void pc_lpt_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-	case 0: data_w(space, 0, data); break;
+	case 0: data_w(data); break;
 	case 1: break;
-	case 2: control_w(space, 0, data); break;
+	case 2: control_w(data); break;
 	}
 }
 
@@ -147,13 +147,13 @@ void pc_lpt_device::update_irq()
 	}
 }
 
-WRITE_LINE_MEMBER( pc_lpt_device::write_irq_enabled )
+void pc_lpt_device::write_irq_enabled(int state)
 {
 	m_irq_enabled = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( pc_lpt_device::write_centronics_ack )
+void pc_lpt_device::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 	m_cent_status_in->write_bit6(state);

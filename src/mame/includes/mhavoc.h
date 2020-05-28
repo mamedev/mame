@@ -32,7 +32,9 @@ public:
 		m_gamma(*this, "gamma"),
 		m_pokey(*this, "pokey%u", 1U),
 		m_tms(*this, "tms"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U),
+		m_coin(*this, "COIN"),
+		m_service(*this, "SERVICE")
 	{ }
 
 	void alphaone(machine_config &config);
@@ -41,13 +43,12 @@ public:
 
 	void init_mhavocrv();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(tms5220_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mhavoc_bit67_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gamma_rcvd_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gamma_xmtd_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(alpha_rcvd_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(alpha_xmtd_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_service_r);
+	DECLARE_READ_LINE_MEMBER(gamma_rcvd_r);
+	DECLARE_READ_LINE_MEMBER(gamma_xmtd_r);
+	DECLARE_READ_LINE_MEMBER(alpha_rcvd_r);
+	DECLARE_READ_LINE_MEMBER(alpha_xmtd_r);
+	DECLARE_READ_LINE_MEMBER(clock_r);
 
 private:
 	DECLARE_READ8_MEMBER(dual_pokey_r);
@@ -84,6 +85,9 @@ private:
 	optional_device_array<pokey_device, 4> m_pokey;
 	optional_device<tms5220_device> m_tms;
 	output_finder<2> m_lamps;
+	optional_ioport m_coin;
+	optional_ioport m_service;
+
 	uint8_t m_alpha_data;
 	uint8_t m_alpha_rcvd;
 	uint8_t m_alpha_xmtd;

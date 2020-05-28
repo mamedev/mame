@@ -22,8 +22,8 @@
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
 #include "machine/z80dma.h"
+#include "machine/z80sio.h"
 #include "sound/ay8910.h"
 #include "sound/ym2151.h"
 #include "video/mc6845.h"
@@ -127,16 +127,16 @@ public:
 	DECLARE_READ8_MEMBER(x1turboz_blackclip_r);
 	DECLARE_READ8_MEMBER(x1turbo_bank_r);
 	DECLARE_WRITE8_MEMBER(x1turbo_bank_w);
-	DECLARE_READ8_MEMBER(x1_porta_r);
-	DECLARE_READ8_MEMBER(x1_portb_r);
-	DECLARE_READ8_MEMBER(x1_portc_r);
-	DECLARE_WRITE8_MEMBER(x1_porta_w);
-	DECLARE_WRITE8_MEMBER(x1_portb_w);
-	DECLARE_WRITE8_MEMBER(x1_portc_w);
+	uint8_t x1_porta_r();
+	uint8_t x1_portb_r();
+	uint8_t x1_portc_r();
+	void x1_porta_w(uint8_t data);
+	void x1_portb_w(uint8_t data);
+	void x1_portc_w(uint8_t data);
 	void init_x1_kanji();
-	DECLARE_MACHINE_START(x1);
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(x1);
-	DECLARE_VIDEO_START(x1);
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(x1turbo);
 	uint32_t screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
@@ -147,10 +147,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(hdl_w);
 
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<z80dma_device> m_dma;

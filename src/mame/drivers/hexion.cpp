@@ -115,7 +115,7 @@ WRITE_LINE_MEMBER(hexion_state::nmi_ack_w)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(hexion_state::ccu_int_time_w)
+void hexion_state::ccu_int_time_w(uint8_t data)
 {
 	logerror("ccu_int_time rewritten with value of %02x\n", data);
 	m_ccu_int_time = data;

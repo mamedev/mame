@@ -44,7 +44,7 @@ void midvunit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		scanline_timer_cb(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in midvunit_state::device_timer");
+		throw emu_fatalerror("Unknown id in midvunit_state::device_timer");
 	}
 }
 

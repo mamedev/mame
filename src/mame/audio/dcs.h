@@ -26,7 +26,7 @@ public:
 
 	void set_auto_ack(int state);
 
-	void set_fifo_callbacks(read16_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w);
+	void set_fifo_callbacks(read16smo_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w);
 	void set_io_callbacks(write_line_delegate output_full_cb, write_line_delegate input_empty_cb);
 
 	uint16_t data_r();
@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE32_MEMBER( dsio_idma_data_w );
 	DECLARE_READ32_MEMBER( dsio_idma_data_r );
 	void dmovlay_remap_memory();
-	WRITE32_MEMBER(dmovlay_callback);
+	void dmovlay_callback(uint32_t data);
 	void denver_postload(void);
 	void install_speedup(void);
 
@@ -75,7 +75,7 @@ public:
 	DECLARE_READ16_MEMBER( input_latch_r );
 	DECLARE_READ32_MEMBER( input_latch32_r );
 	TIMER_CALLBACK_MEMBER( latch_delayed_w );
-	DECLARE_WRITE16_MEMBER( output_latch_w );
+	void output_latch_w(uint16_t data);
 	DECLARE_WRITE32_MEMBER( output_latch32_w );
 	void delayed_ack_w();
 	TIMER_CALLBACK_MEMBER( delayed_ack_w_callback );
@@ -91,7 +91,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( dcs_irq );
 	TIMER_DEVICE_CALLBACK_MEMBER( sport0_irq );
 	void recompute_sample_rate();
-	WRITE32_MEMBER(sound_tx_callback);
+	void sound_tx_callback(offs_t offset, uint32_t data);
 	DECLARE_READ16_MEMBER( dcs_polling_r );
 	DECLARE_WRITE16_MEMBER( dcs_polling_w );
 	DECLARE_READ32_MEMBER(dcs_polling32_r);
@@ -192,6 +192,7 @@ protected:
 	uint16_t *    m_bootrom;
 	uint32_t      m_bootrom_words;
 	uint16_t *    m_sounddata;
+	std::unique_ptr<uint16_t[]> m_sounddata_ptr;
 	uint32_t      m_sounddata_words;
 	uint32_t      m_sounddata_banks;
 	uint16_t      m_sounddata_bank;
@@ -216,7 +217,7 @@ protected:
 	write_line_delegate m_output_full_cb;
 	write_line_delegate m_input_empty_cb;
 
-	read16_delegate m_fifo_data_r;
+	read16smo_delegate m_fifo_data_r;
 	read16_delegate m_fifo_status_r;
 	write_line_delegate m_fifo_reset_w;
 
@@ -229,7 +230,7 @@ protected:
 	uint32_t      m_timer_period;
 	uint32_t      m_timers_fired;
 
-	uint16_t *m_sram;
+	std::unique_ptr<uint16_t[]> m_sram;
 	uint16_t m_polling_value;
 	uint32_t m_polling32_value;
 	uint32_t *m_internal_program_ram;

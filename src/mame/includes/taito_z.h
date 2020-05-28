@@ -19,6 +19,7 @@
 #include "video/tc0110pcr.h"
 #include "video/tc0150rod.h"
 #include "video/tc0480scp.h"
+#include "screen.h"
 
 
 class taitoz_state : public driver_device
@@ -41,14 +42,21 @@ public:
 		m_tc0220ioc(*this, "tc0220ioc"),
 		m_tc0510nio(*this, "tc0510nio"),
 		m_tc0140syt(*this, "tc0140syt"),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_filter(*this, {"2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l"}),
+		m_gas(*this, "GAS"),
+		m_brake(*this, "BRAKE"),
 		m_steer(*this, "STEER"),
+		m_stickx(*this, "STICKX"),
+		m_sticky(*this, "STICKY"),
 		m_io_eepromout(*this, "EEPROMOUT"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gas_pedal_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(brake_pedal_r);
+	template <int axis> DECLARE_CUSTOM_INPUT_MEMBER(adstick_r);
 
 	void bshark_base(machine_config &config);
 	void sci(machine_config &config);
@@ -70,6 +78,7 @@ protected:
 	virtual void device_post_load() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void screen_config(machine_config &config, int vdisp_start, int vdisp_end);
 
 private:
 	enum
@@ -106,9 +115,14 @@ private:
 	optional_device<tc0220ioc_device> m_tc0220ioc;
 	optional_device<tc0510nio_device> m_tc0510nio;
 	optional_device<tc0140syt_device> m_tc0140syt;  // bshark & spacegun miss the CPUs which shall use TC0140
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device_array<filter_volume_device, 4> m_filter;
+	optional_ioport m_gas;
+	optional_ioport m_brake;
 	optional_ioport m_steer;
+	optional_ioport m_stickx;
+	optional_ioport m_sticky;
 	optional_ioport m_io_eepromout;
 	output_finder<2> m_lamps;
 

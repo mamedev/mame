@@ -118,8 +118,8 @@ public:
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
 
-	DECLARE_READ32_MEMBER(bfm_swp_mem_r);
-	DECLARE_WRITE32_MEMBER(bfm_swp_mem_w);
+	uint32_t bfm_swp_mem_r(offs_t offset, uint32_t mem_mask = ~0);
+	void bfm_swp_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -137,7 +137,7 @@ protected:
 	virtual void machine_start() override;
 };
 
-READ32_MEMBER(bfm_swp_state::bfm_swp_mem_r)
+uint32_t bfm_swp_state::bfm_swp_mem_r(offs_t offset, uint32_t mem_mask)
 {
 	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 4);
@@ -159,7 +159,7 @@ READ32_MEMBER(bfm_swp_state::bfm_swp_mem_r)
 	return 0x0000;
 }
 
-WRITE32_MEMBER(bfm_swp_state::bfm_swp_mem_w)
+void bfm_swp_state::bfm_swp_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 4);

@@ -47,7 +47,7 @@ void pgm_asic3_state::asic3_compute_hold(int y, int z)
 		break;
 	}
 }
-READ16_MEMBER(pgm_asic3_state::pgm_asic3_r)
+u16 pgm_asic3_state::pgm_asic3_r()
 {
 	switch (m_asic3_reg)
 	{
@@ -93,7 +93,7 @@ READ16_MEMBER(pgm_asic3_state::pgm_asic3_r)
 	return 0;
 }
 
-WRITE16_MEMBER(pgm_asic3_state::pgm_asic3_w)
+void pgm_asic3_state::pgm_asic3_w(offs_t offset, u16 data)
 {
 	if (offset == 0)
 	{
@@ -166,7 +166,8 @@ void pgm_asic3_state::init_orlegend()
 {
 	pgm_basic_init();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xC04000, 0xC0400f, read16_delegate(FUNC(pgm_asic3_state::pgm_asic3_r),this), write16_delegate(FUNC(pgm_asic3_state::pgm_asic3_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc04000, 0xc0400f, read16smo_delegate(*this, FUNC(pgm_asic3_state::pgm_asic3_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc04000, 0xc0400f, write16sm_delegate(*this, FUNC(pgm_asic3_state::pgm_asic3_w)));
 
 	m_asic3_reg = 0;
 	m_asic3_latch[0] = 0;

@@ -857,12 +857,12 @@ static INPUT_PORTS_START( wondstck )
 INPUT_PORTS_END
 
 template<int Layer>
-TILE_GET_INFO_MEMBER(nmg5_state::get_tile_info){ SET_TILE_INFO_MEMBER(0, m_vram[Layer][tile_index] | (m_gfx_bank << 16), Layer ^ 1, 0);}
+TILE_GET_INFO_MEMBER(nmg5_state::get_tile_info){ tileinfo.set(0, m_vram[Layer][tile_index] | (m_gfx_bank << 16), Layer ^ 1, 0);}
 
 void nmg5_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmg5_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmg5_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[1]->set_transparent_pen(0);
 
 	m_pixmap = std::make_unique<bitmap_ind16>(512, 256);

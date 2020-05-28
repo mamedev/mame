@@ -180,15 +180,15 @@ void wswan_state::common_start()
 	if (m_cart->exists())
 	{
 		// ROM
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000, 0x2ffff, read8sm_delegate(FUNC(ws_cart_slot_device::read_rom20),(ws_cart_slot_device*)m_cart));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x30000, 0x3ffff, read8sm_delegate(FUNC(ws_cart_slot_device::read_rom30),(ws_cart_slot_device*)m_cart));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000, 0xeffff, read8sm_delegate(FUNC(ws_cart_slot_device::read_rom40),(ws_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000, 0x2ffff, read8sm_delegate(*m_cart, FUNC(ws_cart_slot_device::read_rom20)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x30000, 0x3ffff, read8sm_delegate(*m_cart, FUNC(ws_cart_slot_device::read_rom30)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000, 0xeffff, read8sm_delegate(*m_cart, FUNC(ws_cart_slot_device::read_rom40)));
 
 		// SRAM
 		if (m_cart->get_type() == WS_SRAM)
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x10000, 0x1ffff, read8sm_delegate(FUNC(ws_cart_slot_device::read_ram),(ws_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x10000, 0x1ffff, write8sm_delegate(FUNC(ws_cart_slot_device::write_ram),(ws_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x10000, 0x1ffff, read8sm_delegate(*m_cart, FUNC(ws_cart_slot_device::read_ram)));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x10000, 0x1ffff, write8sm_delegate(*m_cart, FUNC(ws_cart_slot_device::write_ram)));
 		}
 	}
 }

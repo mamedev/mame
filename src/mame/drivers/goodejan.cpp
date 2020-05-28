@@ -66,7 +66,7 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
     Keys: Z
 
     PC=ECC72; 'HMODE' screen
-
+    TODO: find an actual way to access above, at worst find a suitable entry point -AS;
 
 *******************************************************************************************/
 
@@ -87,20 +87,24 @@ class goodejan_state : public driver_device, public seibu_sound_common
 {
 public:
 	goodejan_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_crtc(*this, "crtc"),
-		m_sc0_vram(*this, "sc0_vram"),
-		m_sc1_vram(*this, "sc1_vram"),
-		m_sc2_vram(*this, "sc2_vram"),
-		m_sc3_vram(*this, "sc3_vram"),
-		m_spriteram16(*this, "sprite_ram")
+		driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_crtc(*this, "crtc")
+		, m_sc0_vram(*this, "sc0_vram")
+		, m_sc1_vram(*this, "sc1_vram")
+		, m_sc2_vram(*this, "sc2_vram")
+		, m_sc3_vram(*this, "sc3_vram")
+		, m_spriteram16(*this, "sprite_ram")
+		, m_key(*this, "KEY%u", 0)
 	{ }
 
 	void totmejan(machine_config &config);
 	void goodejan(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -114,6 +118,8 @@ private:
 	required_shared_ptr<uint16_t> m_sc3_vram;
 	required_shared_ptr<uint16_t> m_spriteram16;
 
+	required_ioport_array<5> m_key;
+
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
@@ -124,15 +130,15 @@ private:
 	uint16_t m_layer_en;
 	uint16_t m_scrollram[6];
 
-	DECLARE_WRITE16_MEMBER(gfxbank_w);
-	DECLARE_READ16_MEMBER(mahjong_panel_r);
-	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc0vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc1vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc2vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc3vram_w);
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
+	void gfxbank_w(uint16_t data);
+	uint16_t mahjong_panel_r();
+	void mahjong_panel_w(uint16_t data);
+	void seibucrtc_sc0vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void seibucrtc_sc1vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void seibucrtc_sc2vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void seibucrtc_sc3vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void layer_en_w(uint16_t data);
+	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(seibucrtc_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc1_tile_info);
@@ -143,8 +149,8 @@ private:
 
 	void seibucrtc_sc0bank_w(uint16_t data);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void common_io_map(address_map &map);
 	void goodejan_io_map(address_map &map);
 	void goodejan_map(address_map &map);
@@ -193,90 +199,31 @@ private:
 ************************************/
 #define SEIBU_CRTC_SC2_SY   (m_scrollram[3])
 
-#if 0
-/*******************************
-* 0x1a - Layer Dynamic Paging?
-*******************************/
-#define SEIBU_CRTC_DYN_PAGING   (m_seibucrtc_vregs[0x001a/2])
-#define SEIBU_CRTC_SC3_PAGE_SEL (SEIBU_CRTC_DYN_PAGING & 0x0002)
-
-/*******************************
-* 0x1c - Layer Enable
-*******************************/
-#define SEIBU_CRTC_LAYER_EN     (m_seibucrtc_vregs[0x001c/2])
-#define SEIBU_CRTC_ENABLE_SC0   (!(SEIBU_CRTC_LAYER_EN & 0x0001))
-#define SEIBU_CRTC_ENABLE_SC2   (!(SEIBU_CRTC_LAYER_EN & 0x0002))
-#define SEIBU_CRTC_ENABLE_SC1   (!(SEIBU_CRTC_LAYER_EN & 0x0004))
-#define SEIBU_CRTC_ENABLE_SC3   (!(SEIBU_CRTC_LAYER_EN & 0x0008))
-#define SEIBU_CRTC_ENABLE_SPR   (!(SEIBU_CRTC_LAYER_EN & 0x0010))
-
-/************************************
-* 0x20 - Screen 0 (BG) scroll x
-************************************/
-#define SEIBU_CRTC_SC0_SX   (m_seibucrtc_vregs[0x0020/2])
-
-/************************************
-* 0x22 - Screen 0 (BG) scroll y
-************************************/
-#define SEIBU_CRTC_SC0_SY   (m_seibucrtc_vregs[0x0022/2])
-
-/************************************
-* 0x24 - Screen 1 (FG) scroll x
-************************************/
-#define SEIBU_CRTC_SC1_SX   (m_seibucrtc_vregs[0x0028/2])
-
-/************************************
-* 0x26 - Screen 1 (FG) scroll y
-************************************/
-#define SEIBU_CRTC_SC1_SY   (m_seibucrtc_vregs[0x002a/2])
-
-/************************************
-* 0x28 - Screen 2 (MD) scroll x
-************************************/
-#define SEIBU_CRTC_SC2_SX   (m_seibucrtc_vregs[0x0024/2])
-
-/************************************
-* 0x2a - Screen 2 (MD) scroll y
-************************************/
-#define SEIBU_CRTC_SC2_SY   (m_seibucrtc_vregs[0x0026/2])
-
-/************************************
-* 0x2c - Fix screen scroll x (global)
-************************************/
-#define SEIBU_CRTC_FIX_SX   (m_seibucrtc_vregs[0x002c/2])
-
-/************************************
-* 0x2e - Fix screen scroll y (global)
-************************************/
-#define SEIBU_CRTC_FIX_SY   (m_seibucrtc_vregs[0x002e/2])
-
-#endif
-
 /*******************************
 *
 * Write RAM accesses
 *
 *******************************/
 
-WRITE16_MEMBER( goodejan_state::seibucrtc_sc0vram_w )
+void goodejan_state::seibucrtc_sc0vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc0_vram[offset]);
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( goodejan_state::seibucrtc_sc2vram_w )
+void goodejan_state::seibucrtc_sc2vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc2_vram[offset]);
 	m_sc2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( goodejan_state::seibucrtc_sc1vram_w )
+void goodejan_state::seibucrtc_sc1vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc1_vram[offset]);
 	m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( goodejan_state::seibucrtc_sc3vram_w )
+void goodejan_state::seibucrtc_sc3vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc3_vram[offset]);
 	m_sc3_tilemap->mark_tile_dirty(offset);
@@ -300,28 +247,28 @@ TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc0_tile_info )
 	int tile = m_sc0_vram[tile_index] & 0xfff;
 	int color = (m_sc0_vram[tile_index] >> 12) & 0x0f;
 	tile+=(m_seibucrtc_sc0bank<<12);
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	tileinfo.set(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc2_tile_info )
 {
 	int tile = m_sc2_vram[tile_index] & 0xfff;
 	int color = (m_sc2_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(2, tile, color, 0);
+	tileinfo.set(2, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc1_tile_info )
 {
 	int tile = m_sc1_vram[tile_index] & 0xfff;
 	int color = (m_sc1_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(3, tile, color, 0);
+	tileinfo.set(3, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc3_tile_info )
 {
 	int tile = m_sc3_vram[tile_index] & 0xfff;
 	int color = (m_sc3_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(4, tile, color, 0);
+	tileinfo.set(4, tile, color, 0);
 }
 
 void goodejan_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
@@ -366,10 +313,10 @@ void goodejan_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 void goodejan_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc2_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc3_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goodejan_state::seibucrtc_sc0_tile_info)), TILEMAP_SCAN_ROWS, 16,16,32,32);
+	m_sc2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goodejan_state::seibucrtc_sc2_tile_info)), TILEMAP_SCAN_ROWS, 16,16,32,32);
+	m_sc1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goodejan_state::seibucrtc_sc1_tile_info)), TILEMAP_SCAN_ROWS, 16,16,32,32);
+	m_sc3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goodejan_state::seibucrtc_sc3_tile_info)), TILEMAP_SCAN_ROWS, 8,8,32,32);
 
 	m_sc2_tilemap->set_transparent_pen(15);
 	m_sc1_tilemap->set_transparent_pen(15);
@@ -414,30 +361,27 @@ uint32_t goodejan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 #define GOODEJAN_MHZ3 12000000
 
 
-WRITE16_MEMBER(goodejan_state::gfxbank_w)
+void goodejan_state::gfxbank_w(uint16_t data)
 {
 	seibucrtc_sc0bank_w((data & 0x100)>>8);
 }
 
 /* Multiplexer device for the mahjong panel */
-READ16_MEMBER(goodejan_state::mahjong_panel_r)
+uint16_t goodejan_state::mahjong_panel_r()
 {
-	uint16_t ret;
+	u16 ret;
 	ret = 0xffff;
 
-	switch(m_mux_data)
+	for (int i=0; i<5; i++)
 	{
-		case 1:    ret = ioport("KEY0")->read(); break;
-		case 2:    ret = ioport("KEY1")->read(); break;
-		case 4:    ret = ioport("KEY2")->read(); break;
-		case 8:    ret = ioport("KEY3")->read(); break;
-		case 0x10: ret = ioport("KEY4")->read(); break;
+		if (m_mux_data & (1 << i))
+			ret &= m_key[i]->read();
 	}
 
 	return ret;
 }
 
-WRITE16_MEMBER(goodejan_state::mahjong_panel_w)
+void goodejan_state::mahjong_panel_w(uint16_t data)
 {
 	m_mux_data = data;
 }
@@ -477,13 +421,13 @@ void goodejan_state::totmejan_io_map(address_map &map)
 void goodejan_state::goodejan_io_map(address_map &map)
 {
 	common_io_map(map);
-	map(0x8000, 0x807f).lrw16("crtc_rw",
-							  [this](address_space &space, offs_t offset, u16 mem_mask) {
+	map(0x8000, 0x807f).lrw16(
+							  NAME([this](address_space &space, offs_t offset, u16 mem_mask) {
 								  return m_crtc->read(space, offset ^ 0x20, mem_mask);
-							  },
-							  [this](address_space &space, offs_t offset, u16 data, u16 mem_mask) {
+							  }),
+							  NAME([this](address_space &space, offs_t offset, u16 data, u16 mem_mask) {
 								  m_crtc->write(space, offset ^ 0x20, data, mem_mask);
-							  });
+							  }));
 }
 
 static INPUT_PORTS_START( goodejan )
@@ -569,19 +513,22 @@ static INPUT_PORTS_START( goodejan )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "DSWA:8" )
-
-		PORT_DIPNAME( 0x0300, 0x0100, "Starting Points" )             PORT_DIPLOCATION("DSWB:1,2")
+	PORT_DIPNAME( 0x0300, 0x0300, "Starting Points" )             PORT_DIPLOCATION("DSWB:1,2")
 	PORT_DIPSETTING(      0x0300, "1500" )
 	PORT_DIPSETTING(      0x0200, "2000" )
 	PORT_DIPSETTING(      0x0100, "1000" )
 	PORT_DIPSETTING(      0x0000, "3000" )
-
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "DSWB:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "DSWB:4" )
-/*  [totmejan] Game definitely uses these, reads these 2 bits and stores at address 01A28h as 0-1st bit;
-    Sub-routine at E7C19h does some arithmetic operations depending on these.
-    I cound't understand whats going on. Call performs just before dealing tiles. */
-
+/*
+ *  [totmejan]
+ *  Before every hand game calls a subroutine at 0xe7c19, and reads these 2 bits from 0x01A28 work RAM buffer.
+ *  This affects the tile distribution RNG via a complex algo for the end goal of giving the player a more or less
+ *  favorable hand depending on the setting.
+ */
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) )         PORT_DIPLOCATION("DSWB:3,4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Demo_Sounds ) )        PORT_DIPLOCATION("DSWB:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -592,8 +539,9 @@ static INPUT_PORTS_START( goodejan )
 	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "DSWB:8" )
 
 	PORT_START("DSW2")
-		PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
-		PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN ) // 0x0002 must be kept low to work as service coin
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNKNOWN ) // 0x0002 must be kept low to work as service coin
 INPUT_PORTS_END
 
 
@@ -642,12 +590,12 @@ WRITE_LINE_MEMBER(goodejan_state::vblank_irq)
 /* vector 0x00c is just a reti */
 }
 
-WRITE16_MEMBER( goodejan_state::layer_en_w )
+void goodejan_state::layer_en_w(uint16_t data)
 {
 	m_layer_en = data;
 }
 
-WRITE16_MEMBER( goodejan_state::layer_scroll_w )
+void goodejan_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }
@@ -665,10 +613,9 @@ void goodejan_state::goodejan(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1); //TODO: dynamic resolution
+	// guess: assume ~59.61 Hz like toki, assume clock coming from the otherwise unused 12 MHz XTal
+	// (audio one don't give valid ranges for the provided HSync)
+	screen.set_raw(GOODEJAN_MHZ3/2, 390, 0, 256, 258, 16, 240);
 	screen.set_screen_update(FUNC(goodejan_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(goodejan_state::vblank_irq));
@@ -678,7 +625,7 @@ void goodejan_state::goodejan(machine_config &config)
 	m_crtc->layer_scroll_callback().set(FUNC(goodejan_state::layer_scroll_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goodejan);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x1000);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -687,7 +634,7 @@ void goodejan_state::goodejan(machine_config &config)
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", GOODEJAN_MHZ2/16, okim6295_device::PIN7_LOW));
+	okim6295_device &oki(OKIM6295(config, "oki", GOODEJAN_MHZ2/16, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));

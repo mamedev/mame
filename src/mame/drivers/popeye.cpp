@@ -22,94 +22,7 @@ Notes:
 #include "netlist/devices/net_lib.h"
 #include "screen.h"
 #include "speaker.h"
-
-/* This is the output stage of the audio circuit.
- * It is solely an impedance changer and could be left away
- */
-
-static NETLIST_START(nl_popeye_imp_changer)
-	RES(R62, 510000)
-	RES(R63, 100)
-	RES(R64, 510000)
-	RES(R65, 2100)
-	RES(R66, 330)
-	RES(R67, 51)
-
-	QBJT_EB(Q8, "2SC1815")
-	QBJT_EB(Q9, "2SA1015")
-
-	NET_C(V5, R62.1, Q8.C, R66.1)
-	NET_C(R62.2, R64.1, R63.1, C7.2)
-	NET_C(R63.2, Q8.B)
-	NET_C(Q8.E, R65.1, Q9.B)
-	NET_C(R66.2, Q9.E, R67.1)
-
-	NET_C(GND, Q9.C, R65.2, R64.2)
-NETLIST_END()
-
-static NETLIST_START(nl_popeye)
-
-	/* register hard coded netlists */
-
-	LOCAL_SOURCE(nl_popeye_imp_changer)
-
-	/* Standard stuff */
-
-	SOLVER(Solver, 48000)
-	PARAM(Solver.ACCURACY, 1e-5)
-	ANALOG_INPUT(V5, 5)
-
-	/* AY 8910 internal resistors */
-
-	RES(R_AY1_1, 1000);
-	RES(R_AY1_2, 1000);
-	RES(R_AY1_3, 1000);
-
-	RES(R52, 2000)
-	RES(R55, 2000)
-	RES(R58, 2000)
-	RES(R53, 2000)
-	RES(R56, 2000)
-	RES(R59, 2000)
-	RES(R51, 20000)
-	RES(R57, 30000)
-	RES(R60, 30000)
-
-	RES(R61, 120000)
-
-	RES(ROUT, 5000)
-
-	CAP(C4, 0.047e-6)
-	CAP(C5, 330e-12)
-	CAP(C6, 330e-12)
-	CAP(C7, 3.3e-6)
-	CAP(C40, 680e-12)
-
-	NET_C(V5, R_AY1_1.1, R_AY1_2.1, R_AY1_3.1)
-
-	NET_C(R_AY1_1.2, R52.1, R53.1)
-	NET_C(R_AY1_2.2, R55.1, R56.1)
-	NET_C(R_AY1_3.2, R58.1, R59.1)
-
-	NET_C(R53.2, R51.1, C4.1)
-	NET_C(R56.2, R57.1, C5.1)
-	NET_C(R59.2, R60.1, C6.1)
-
-	NET_C(R51.2, R57.2, R60.2, R61.1, C40.1, C7.1)
-
-	NET_C(GND, R52.2, R55.2, R58.2, C4.2, C5.2, C6.2, R61.2, C40.2)
-
-	INCLUDE(nl_popeye_imp_changer)
-
-	/* output resistor (actually located in TV */
-
-	NET_C(R67.2, ROUT.1)
-
-	NET_C(GND, ROUT.2)
-
-NETLIST_END()
-
-
+#include "audio/nl_popeye.h"
 
 void tnx1_state::driver_start()
 {
@@ -171,7 +84,7 @@ void tpp2_state::decrypt_rom()
 	std::copy_n(buffer.begin(), len, rom);
 }
 
-WRITE8_MEMBER(tnx1_state::refresh_w)
+void tnx1_state::refresh_w(offs_t offset, uint8_t data)
 {
 	const bool nmi_enabled = ((offset >> 8) & 1) != 0;
 	if (m_nmi_enabled != nmi_enabled)
@@ -183,9 +96,9 @@ WRITE8_MEMBER(tnx1_state::refresh_w)
 	}
 }
 
-WRITE8_MEMBER(tpp2_state::refresh_w)
+void tpp2_state::refresh_w(offs_t offset, uint8_t data)
 {
-	tnx1_state::refresh_w(space, offset, data, mem_mask);
+	tnx1_state::refresh_w(offset, data);
 
 	m_watchdog_enabled = ((offset >> 9) & 1) != 0;
 }
@@ -318,6 +231,7 @@ public:
 	{
 	}
 
+	virtual ~brazehs() override = default;
 	virtual void config(machine_config &config) override
 	{
 		T::config(config);
@@ -362,9 +276,9 @@ protected:
 };
 
 
-CUSTOM_INPUT_MEMBER(tnx1_state::dsw1_read)
+READ_LINE_MEMBER(tnx1_state::dsw1_read)
 {
-	return ioport("DSW1")->read() >> m_dswbit;
+	return m_io_dsw1->read() >> m_dswbit;
 }
 
 
@@ -418,7 +332,7 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_DIPSETTING(    0x08, "A 1/6 B 1/1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tnx1_state, dsw1_read, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tnx1_state, dsw1_read)
 
 	PORT_START("DSW1")  /* DSW1 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
@@ -442,9 +356,15 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START("MCONF")
+	PORT_CONFNAME( 0x03, 0x00, "Interlace mode" )
+	PORT_CONFSETTING(    0x00, "False Progressive" )
+	PORT_CONFSETTING(    0x01, "Interlaced (scanline skip)" )
+	PORT_CONFSETTING(    0x02, "Interlaced (bitmap)" )
 INPUT_PORTS_END
 
-CUSTOM_INPUT_MEMBER( tnx1_state::pop_field_r )
+READ_LINE_MEMBER( tnx1_state::pop_field_r )
 {
 	return m_field ^ 1;
 }
@@ -475,7 +395,7 @@ static INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tnx1_state,pop_field_r, nullptr) /* inverted init e/o signal (even odd) */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tnx1_state, pop_field_r) // inverted init e/o signal (even odd)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -497,7 +417,7 @@ static INPUT_PORTS_START( popeye )
 	PORT_CONFSETTING(    0x20, "Nintendo Co.,Ltd" )
 	PORT_CONFSETTING(    0x60, "Nintendo of America" )
 //  PORT_CONFSETTING(    0x00, "Nintendo of America" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tnx1_state, dsw1_read, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tnx1_state, dsw1_read)
 
 	PORT_START("DSW1")  /* DSW1 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )       PORT_DIPLOCATION("SW2:1,2")
@@ -521,6 +441,13 @@ static INPUT_PORTS_START( popeye )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )     PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START("MCONF")
+	PORT_CONFNAME( 0x03, 0x00, "Interlace mode" )
+	PORT_CONFSETTING(    0x00, "False Progressive" )
+	PORT_CONFSETTING(    0x01, "Interlaced (scanline skip)" )
+	PORT_CONFSETTING(    0x02, "Interlaced (bitmap)" )
+
 INPUT_PORTS_END
 
 
@@ -588,7 +515,7 @@ GFXDECODE_END
 
 
 
-WRITE8_MEMBER(tnx1_state::popeye_portB_w)
+void tnx1_state::popeye_portB_w(uint8_t data)
 {
 	/* bit 0 flips screen */
 	flip_screen_set(data & 1);
@@ -606,13 +533,14 @@ void tnx1_state::config(machine_config &config)
 	m_maincpu->refresh_cb().set(FUNC(tnx1_state::refresh_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*16, 32*16);
-	screen.set_visarea(0*16, 32*16-1, 2*16, 30*16-1);
-	screen.set_screen_update(FUNC(tnx1_state::screen_update));
-	screen.set_palette(m_palette);
+	// FIXME: 59.94 screen refresch is the NTSC standard
+	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.94)
+		.set_vblank_time(ATTOSECONDS_IN_USEC(0))
+		.set_size(32*16, 32*16)
+		.set_visarea(0*16, 32*16-1, 2*16, 30*16-1)
+		.set_palette(m_palette)
+		.set_screen_update(FUNC(tnx1_state::screen_update));
 	screen.screen_vblank().set(FUNC(tnx1_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popeye);
@@ -641,7 +569,7 @@ void tpp2_state::config(machine_config &config)
 	/* NETLIST configuration using internal AY8910 resistor values */
 
 	NETLIST_SOUND(config, "snd_nl", 48000)
-		.set_source(netlist_nl_popeye)
+		.set_source(NETLIST_NAME(popeye))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin0", 0, "R_AY1_1.R");

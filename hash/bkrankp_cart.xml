@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Official site: https://girls.channel.or.jp/karaoke/
+
+Known carts:
+
++======+=======+=========================+
+|Dumped| Serial|Title                    |
++======+=======+=========================+
+|  NO  |2315998|J-Pop - Blue             |
+|  NO  |2315999|Aikatsu Ver. Best        |
+|  NO  |2316073|J-Pop - Strawberry       |
+|  NO  |2316095|J-Pop - Green            |
+|  NO  |2316096|J-Pop - Pink             |
+|  NO  |2316097|J-Pop - Lemmon Yellow    |
+|  NO  |2323098|Yo-Kai Watch Selection   |
+|  NO  |2333250|J-Pop - Purple           |
+|  NO  |2333251|J-Pop - White            |
+| YES  |2333252|J-Pop - Rose             |
+|  NO  |2333253|J-Pop - Red              |
+| YES  |2333254|Vocaloid                 |
+|  NO  |2336074|J-Pop - Apple Green      |
+|  NO  |2336075|J-Pop - Grapefruit       |
+|  NO  |2336076|Disney Dream Hit Song    |
+|  NO  |2350534|J-Pop - Mint             |
+|  NO  |2350535|Best Hit Song            |
++======+=======+=========================+
+
+-->
+
+<softwarelist name="bkrankp_cart" description="Bandai Karaoke Ranking Party cartridges">
+
+	<software name="jpoprose" supported="no">
+		<description>J-Pop Rose</description>
+		<year>20??</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2333252" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="jpoprose_mx25l3206e_c22016.bin" size="0x400000" crc="6f8f1764" sha1="2802e1fe51a3fca9e0a8d0b577a9751adeb98db0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vocaloid" supported="no">
+		<description>Vocaloid</description>
+		<year>20??</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2333254" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="vocaloid_mx25l3206e_c22016.BIN" size="0x400000" crc="17569b76" sha1="9205fb80ac03092be274b9fd78eaffad52ef8d15" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+
+

@@ -28,7 +28,7 @@ public:
 	void inufuku(machine_config &config);
 	void _3on3dunk(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
+	DECLARE_READ_LINE_MEMBER(soundflag_r);
 
 private:
 	/* memory pointers */

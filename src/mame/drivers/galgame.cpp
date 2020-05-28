@@ -49,17 +49,17 @@ private:
 	int m_point_work_list_index;
 	int m_point_display_list_index;
 	int m_interrupt;
-	DECLARE_READ16_MEMBER(ke_r);
-	DECLARE_WRITE16_MEMBER(ke_w);
-	DECLARE_READ16_MEMBER(x_r);
-	DECLARE_WRITE16_MEMBER(x_w);
-	DECLARE_READ16_MEMBER(y_r);
-	DECLARE_WRITE16_MEMBER(y_w);
-	DECLARE_WRITE16_MEMBER(clk_w);
+	uint16_t ke_r(offs_t offset);
+	void ke_w(offs_t offset, uint16_t data);
+	uint16_t x_r();
+	void x_w(uint16_t data);
+	uint16_t y_r();
+	void y_w(uint16_t data);
+	void clk_w(uint16_t data);
 	virtual void machine_reset() override;
 	uint32_t screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxygame_irq);
-	IRQ_CALLBACK_MEMBER(galaxygame_irq_callback);
+	uint8_t galaxygame_irq_callback(offs_t offset);
 	required_device<t11_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	void galaxygame_map(address_map &map);
@@ -67,11 +67,11 @@ private:
 
 /*************************************
  *
- *  KE11 Extended Artithmetic Element
+ *  KE11 Extended Arithmetic Element
  *
  *************************************/
 
-READ16_MEMBER(galaxygame_state::ke_r)
+uint16_t galaxygame_state::ke_r(offs_t offset)
 {
 	uint16_t ret;
 
@@ -97,7 +97,7 @@ READ16_MEMBER(galaxygame_state::ke_r)
 	return ret;
 }
 
-WRITE16_MEMBER(galaxygame_state::ke_w)
+void galaxygame_state::ke_w(offs_t offset, uint16_t data)
 {
 	switch( offset )
 	{
@@ -192,22 +192,22 @@ uint32_t galaxygame_state::screen_update_galaxygame(screen_device &screen, bitma
 	return 0;
 }
 
-READ16_MEMBER(galaxygame_state::x_r)
+uint16_t galaxygame_state::x_r()
 {
 	return m_x;
 }
 
-WRITE16_MEMBER(galaxygame_state::x_w)
+void galaxygame_state::x_w(uint16_t data)
 {
 	m_x = data;
 }
 
-READ16_MEMBER(galaxygame_state::y_r)
+uint16_t galaxygame_state::y_r()
 {
 	return m_y;
 }
 
-WRITE16_MEMBER(galaxygame_state::y_w)
+void galaxygame_state::y_w(uint16_t data)
 {
 	m_y = data;
 	if ( data == 0x0101 )
@@ -286,7 +286,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE16_MEMBER(galaxygame_state::clk_w)
+void galaxygame_state::clk_w(uint16_t data)
 {
 	m_clk = data;
 }
@@ -303,9 +303,9 @@ void galaxygame_state::galaxygame_map(address_map &map)
 }
 
 
-IRQ_CALLBACK_MEMBER(galaxygame_state::galaxygame_irq_callback)
+uint8_t galaxygame_state::galaxygame_irq_callback(offs_t offset)
 {
-	device.execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0x40;
 }
 
@@ -320,6 +320,8 @@ INTERRUPT_GEN_MEMBER(galaxygame_state::galaxygame_irq)
 
 void galaxygame_state::machine_reset()
 {
+	m_maincpu->set_input_line(t11_device::VEC_LINE, ASSERT_LINE);
+
 	m_clk = 0x00;
 	m_point_work_list_index = 0;
 	m_point_display_list_index = 0;
@@ -331,7 +333,7 @@ void galaxygame_state::galaxygame(machine_config &config)
 	T11(config, m_maincpu, 3000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxygame_state::galaxygame_map);
 	m_maincpu->set_initial_mode(5 << 13);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxygame_state::galaxygame_irq_callback));
+	m_maincpu->in_iack().set(FUNC(galaxygame_state::galaxygame_irq_callback));
 	m_maincpu->set_periodic_int(FUNC(galaxygame_state::galaxygame_irq), attotime::from_hz(60));
 
 	/* video hardware */

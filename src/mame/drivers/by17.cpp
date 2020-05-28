@@ -60,9 +60,9 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	DECLARE_CUSTOM_INPUT_MEMBER(outhole_x0);
-	DECLARE_CUSTOM_INPUT_MEMBER(saucer_x3);
-	DECLARE_CUSTOM_INPUT_MEMBER(drop_target_x2);
+	template <int Param> DECLARE_READ_LINE_MEMBER(outhole_x0);
+	template <int Param> DECLARE_READ_LINE_MEMBER(saucer_x3);
+	template <int Param> DECLARE_READ_LINE_MEMBER(drop_target_x2);
 
 	void by17(machine_config &config);
 
@@ -104,15 +104,15 @@ private:
 	output_finder<5, 8> m_digits;
 	output_finder<20> m_solenoids;
 
-	DECLARE_READ8_MEMBER(u10_a_r);
-	DECLARE_WRITE8_MEMBER(u10_a_w);
-	DECLARE_READ8_MEMBER(u10_b_r);
-	DECLARE_WRITE8_MEMBER(u10_b_w);
-	DECLARE_READ8_MEMBER(u11_a_r);
-	DECLARE_WRITE8_MEMBER(u11_a_w);
-	DECLARE_WRITE8_MEMBER(u11_b_w);
-	DECLARE_READ8_MEMBER(nibble_nvram_r);
-	DECLARE_WRITE8_MEMBER(nibble_nvram_w);
+	uint8_t u10_a_r();
+	void u10_a_w(uint8_t data);
+	uint8_t u10_b_r();
+	void u10_b_w(uint8_t data);
+	uint8_t u11_a_r();
+	void u11_a_w(uint8_t data);
+	void u11_b_w(uint8_t data);
+	uint8_t nibble_nvram_r(offs_t offset);
+	void nibble_nvram_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
 	DECLARE_READ_LINE_MEMBER(u10_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
@@ -302,7 +302,7 @@ static INPUT_PORTS_START( by17 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 //  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, outhole_x0, (void *)0x07)  //  PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, outhole_x0<0x07>)  //  PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -386,17 +386,17 @@ static INPUT_PORTS_START( matahari )
 	PORT_DIPSETTING(    0x80, "Replay")
 
 	PORT_MODIFY("X2")   /* Drop Target switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x20)  // PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x21)  // PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x22)  // PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x23)  // PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x24)  // PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x25)  // PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x26)  // PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x27)  // PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x20>)  // PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x21>)  // PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x22>)  // PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x23>)  // PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x24>)  // PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x25>)  // PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x26>)  // PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x27>)  // PORT_CODE(KEYCODE_A)
 
 	PORT_MODIFY("X3")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, saucer_x3, (void *)0x37)   // PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, saucer_x3<0x37>)   // PORT_CODE(KEYCODE_Q)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pwerplay )
@@ -438,24 +438,25 @@ static INPUT_PORTS_START( pwerplay )
 	PORT_DIPSETTING(    0xc0, "Extra Ball / Replay")
 
 	PORT_MODIFY("X2")   /* Drop Target switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x20)  // PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x21)  // PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x22)  // PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x23)  // PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x24)  // PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x25)  // PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x26)  // PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, drop_target_x2, (void *)0x27)  // PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x20>)  // PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x21>)  // PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x22>)  // PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x23>)  // PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x24>)  // PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x25>)  // PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x26>)  // PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x27>)  // PORT_CODE(KEYCODE_A)
 
 	PORT_MODIFY("X3")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by17_state, saucer_x3, (void *)0x37)   // PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, saucer_x3<0x37>)   // PORT_CODE(KEYCODE_Q)
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER( by17_state::outhole_x0 )
+template <int Param>
+READ_LINE_MEMBER( by17_state::outhole_x0 )
 {
-	int bit_shift = ((uintptr_t)param & 0x07);
-	int port = (((uintptr_t)param >> 4) & 0x07);
+	int bit_shift = (Param & 0x07);
+	int port = ((Param >> 4) & 0x07);
 
 	/* Here we simulate the ball sitting in the Outhole so the Outhole Solenoid can release it */
 
@@ -465,10 +466,11 @@ CUSTOM_INPUT_MEMBER( by17_state::outhole_x0 )
 	return ((m_io_hold_x[port] >> bit_shift) & 1);
 }
 
-CUSTOM_INPUT_MEMBER( by17_state::saucer_x3 )
+template <int Param>
+READ_LINE_MEMBER( by17_state::saucer_x3 )
 {
-	int bit_shift = ((uintptr_t)param & 0x07);
-	int port = (((uintptr_t)param >> 4) & 0x07);
+	int bit_shift = (Param & 0x07);
+	int port = ((Param >> 4) & 0x07);
 
 	/* Here we simulate the ball sitting in a Saucer so the Saucer Solenoid can release it */
 
@@ -478,13 +480,13 @@ CUSTOM_INPUT_MEMBER( by17_state::saucer_x3 )
 	return ((m_io_hold_x[port] >> bit_shift) & 1);
 }
 
-
-CUSTOM_INPUT_MEMBER( by17_state::drop_target_x2 )
+template <int Param>
+READ_LINE_MEMBER( by17_state::drop_target_x2 )
 {
 	/* Here we simulate fallen Drop Targets so the Drop Target Reset Solenoids can release the switches */
 
-	int bit_shift = ((uintptr_t)param & 0x07);
-	int port = (((uintptr_t)param >> 4) & 0x07);
+	int bit_shift = (Param & 0x07);
+	int port = ((Param >> 4) & 0x07);
 
 	switch (bit_shift)
 	{
@@ -517,12 +519,12 @@ CUSTOM_INPUT_MEMBER( by17_state::drop_target_x2 )
 }
 
 
-READ8_MEMBER(by17_state::nibble_nvram_r)
+uint8_t by17_state::nibble_nvram_r(offs_t offset)
 {
 	return (m_nvram[offset] | 0x0f);
 }
 
-WRITE8_MEMBER(by17_state::nibble_nvram_w)
+void by17_state::nibble_nvram_w(offs_t offset, uint8_t data)
 {
 	m_nvram[offset] = (data | 0x0f);
 }
@@ -597,12 +599,12 @@ WRITE_LINE_MEMBER( by17_state::u11_cb2_w )
 	m_u11_cb2 = state;
 }
 
-READ8_MEMBER( by17_state::u10_a_r )
+uint8_t by17_state::u10_a_r()
 {
 	return m_u10a;
 }
 
-WRITE8_MEMBER( by17_state::u10_a_w )
+void by17_state::u10_a_w(uint8_t data)
 {
 //  logerror("Writing %02x to U10 PIA, CB2 state is %01x,  CA2 state is %01x, Lamp_Dec is %02x\n",data, m_u10_cb2, m_u10_ca2, (m_lamp_decode & 0x0f));
 
@@ -640,7 +642,7 @@ WRITE8_MEMBER( by17_state::u10_a_w )
 	m_u10a = data;
 }
 
-READ8_MEMBER( by17_state::u10_b_r )
+uint8_t by17_state::u10_b_r()
 {
 	uint8_t data = 0;
 
@@ -674,17 +676,17 @@ READ8_MEMBER( by17_state::u10_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( by17_state::u10_b_w )
+void by17_state::u10_b_w(uint8_t data)
 {
 	m_u10b = data;
 }
 
-READ8_MEMBER( by17_state::u11_a_r )
+uint8_t by17_state::u11_a_r()
 {
 	return m_u11a;
 }
 
-WRITE8_MEMBER( by17_state::u11_a_w )
+void by17_state::u11_a_w(uint8_t data)
 {
 	if (BIT(data, 0)==0)            // Display Credit/Ball
 	{
@@ -723,7 +725,7 @@ WRITE8_MEMBER( by17_state::u11_a_w )
 	m_u11a = data;
 }
 
-WRITE8_MEMBER( by17_state::u11_b_w )
+void by17_state::u11_b_w(uint8_t data)
 {
 	if (!m_u11_cb2)
 	{

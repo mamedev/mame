@@ -24,7 +24,6 @@ public:
 	// construction/destruction
 	i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_cpu(const char *tag) { m_cpu_tag = tag; }
 	void set_region(const char *tag) { m_region_tag = tag; }
 
 	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
@@ -41,7 +40,6 @@ protected:
 	void update_smram_mappings();
 
 private:
-	const char *m_cpu_tag;
 	const char *m_region_tag;
 
 	address_space *m_space;

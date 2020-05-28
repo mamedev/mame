@@ -97,7 +97,7 @@
  *      -  A32/D32 VMEbus master/slave interface with system controller function (VMEchip ASIC)
  *      -  Ethernet transceiver interface (AM79C90)
  *      -  SCSI bus interface with independent data bus on P2 connector (MB87033/34)
- *      -  Flopyy disk interface on P2 connector (FCD37C65C)
+ *      -  Floppy disk interface on P2 connector (FCD37C65C)
  *      -  Four serial ports (DUSCC SCN68562 x 2)
  *      -  20 bit digital i/o for user applications( 2 x 68230 PI/T )
  *      -  Real-Time Clock with interrupt (72423)
@@ -107,7 +107,7 @@
  *
  * Address Map
  * --------------------------------------------------------------------------
- *  Range                   Decscription
+ *  Range                   Desccription
  * --------------------------------------------------------------------------
  * 00000000-0xxFFFFF        Shared DRAM D8-D32 xx=0x1F-0x03 for 32Mb-4Mb
  * 0yy00000-FAFFFFFF        VME A32 D8-D32     yy=xx+1
@@ -271,13 +271,13 @@ cpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	void init_cpu33();
 
 private:
-	DECLARE_WRITE8_MEMBER (fdc_w);
-	DECLARE_READ8_MEMBER (fdc_r);
-	DECLARE_WRITE8_MEMBER (scsi_w);
-	DECLARE_READ8_MEMBER (scsi_r);
-	DECLARE_READ8_MEMBER (slot1_status_r);
-	DECLARE_READ32_MEMBER (bootvect_r);
-	DECLARE_WRITE32_MEMBER (bootvect_w);
+	void fdc_w(offs_t offset, uint8_t data);
+	uint8_t fdc_r(offs_t offset);
+	void scsi_w(offs_t offset, uint8_t data);
+	uint8_t scsi_r(offs_t offset);
+	uint8_t slot1_status_r();
+	uint32_t bootvect_r(offs_t offset);
+	void bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	/* Interrupt  support */
 	void cpu_space_map(address_map &map);
@@ -287,22 +287,22 @@ private:
 	int fga_irq_level;
 
 	/* Rotary switch PIT input */
-	DECLARE_READ8_MEMBER (rotary_rd);
-	DECLARE_READ8_MEMBER (flop_dmac_r);
-	DECLARE_WRITE8_MEMBER (flop_dmac_w);
-	DECLARE_READ8_MEMBER (pit1c_r);
-	DECLARE_WRITE8_MEMBER (pit1c_w);
-	DECLARE_READ8_MEMBER (pit2a_r);
-	DECLARE_WRITE8_MEMBER (pit2a_w);
-	DECLARE_READ8_MEMBER (board_mem_id_rd);
-	DECLARE_READ8_MEMBER (pit2c_r);
-	DECLARE_WRITE8_MEMBER (pit2c_w);
+	uint8_t rotary_rd();
+	uint8_t flop_dmac_r();
+	void flop_dmac_w(uint8_t data);
+	uint8_t pit1c_r();
+	void pit1c_w(uint8_t data);
+	uint8_t pit2a_r();
+	void pit2a_w(uint8_t data);
+	uint8_t board_mem_id_rd();
+	uint8_t pit2c_r();
+	void pit2c_w(uint8_t data);
 
 	/* VME bus accesses */
-	//DECLARE_READ16_MEMBER (vme_a24_r);
-	//DECLARE_WRITE16_MEMBER (vme_a24_w);
-	//DECLARE_READ16_MEMBER (vme_a16_r);
-	//DECLARE_WRITE16_MEMBER (vme_a16_w);
+	//uint16_t vme_a24_r();
+	//void vme_a24_w(uint16_t data);
+	//uint16_t vme_a16_r();
+	//void vme_a16_w(uint16_t data);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 
@@ -335,24 +335,24 @@ void cpu30_state::cpu30_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x00000007).ram().w(FUNC(cpu30_state::bootvect_w));   /* After first write we act as RAM */
 	map(0x00000000, 0x00000007).rom().r(FUNC(cpu30_state::bootvect_r));   /* ROM mirror just during reset */
-//  AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* RAM  installed in machine start */
+//  map(0x00000008, 0x003fffff).ram(); /* RAM  installed in machine start */
 	map(0xff000000, 0xff7fffff).rom().region("roms", 0x000000);
 	map(0xff800c00, 0xff800dff).rw(m_pit1, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
 	map(0xff800e00, 0xff800fff).rw(m_pit2, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
 	map(0xff802000, 0xff8021ff).rw(m_dusccterm, FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)); /* Port 1&2 - Dual serial port DUSCC   */
 	map(0xff802200, 0xff8023ff).rw("duscc2", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)); /* Port 3&4 - Dual serial port DUSCC   */
 	map(0xff803000, 0xff8031ff).rw(m_rtc, FUNC(rtc72423_device::read), FUNC(rtc72423_device::write));
-//  AM_RANGE (0xff803400, 0xff8035ff) AM_DEVREADWRITE8("scsi", mb87033_device, read, write, 0xffffffff) /* TODO: implement MB87344 SCSI device */
+//  map(0xff803400, 0xff8035ff).rw("scsi", FUNC(mb87033_device::read), FUNC(mb87033_device::write)); /* TODO: implement MB87344 SCSI device */
 	map(0xff803400, 0xff8035ff).rw(FUNC(cpu30_state::scsi_r), FUNC(cpu30_state::scsi_w)).umask32(0x000000ff); /* mock driver to log calls to device */
-//  AM_RANGE (0xff803800, 0xff80397f) AM_DEVREADWRITE8("fdc", wd37c65c_device, read, write, 0xffffffff) /* TODO: implement WD3/C65C fdc controller */
+//  map(0xff803800, 0xff80397f).rw("fdc", FUNC(wd37c65c_device::read), FUNC(wd37c65c_device::write)); /* TODO: implement WD3/C65C fdc controller */
 	map(0xff803800, 0xff80397f).rw(FUNC(cpu30_state::fdc_r), FUNC(cpu30_state::fdc_w)).umask32(0x000000ff); /* mock driver to log calls to device */
 	map(0xff803980, 0xff8039ff).r(FUNC(cpu30_state::slot1_status_r)).umask32(0x000000ff);
 	map(0xffc00000, 0xffcfffff).ram().share("nvram"); /* On-board SRAM with battery backup (nvram) */
 	map(0xffd00000, 0xffdfffff).rw(m_fga002, FUNC(fga002_device::read), FUNC(fga002_device::write));  /* FGA-002 Force Gate Array */
 	map(0xffe00000, 0xffefffff).rom().region("roms", 0x800000);
 
-	//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-	//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+	//map(0x100000, 0xfeffff).rw(FUNC(cpu30_state::vme_a24_r), FUNC(cpu30_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) - not verified */
+	//map(0xff0000, 0xffffff).rw(FUNC(cpu30_state::vme_a16_r), FUNC(cpu30_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) - not verified */
 }
 
 /* Input ports */
@@ -395,38 +395,38 @@ void cpu30_state::init_cpu30lite8()  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0
 void cpu30_state::init_cpu33()       { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x68; } // 0x60 skips FGA prompt
 
 /* Mock FDC driver */
-READ8_MEMBER (cpu30_state::fdc_r){
+uint8_t cpu30_state::fdc_r(offs_t offset){
 	LOG("%s\n * FDC read Offset: %04x\n", FUNCNAME, offset);
 	return 1;
 }
 
-WRITE8_MEMBER (cpu30_state::fdc_w){
+void cpu30_state::fdc_w(offs_t offset, uint8_t data){
 	LOG("%s\n * FDC write Offset: %04x Data: %02x\n", FUNCNAME, offset, data);
 }
 
 /* Mock SCSI driver */
-READ8_MEMBER (cpu30_state::scsi_r){
+uint8_t cpu30_state::scsi_r(offs_t offset){
 	LOG("%s\n * SCSI read Offset: %04x\n", FUNCNAME, offset);
 	return 1;
 }
 
-WRITE8_MEMBER (cpu30_state::scsi_w){
+void cpu30_state::scsi_w(offs_t offset, uint8_t data){
 	LOG("%s\n * SCSI write Offset: %04x Data: %02x\n", FUNCNAME, offset, data);
 }
 
 /* 1 = board is in slot 1, 0 = board is NOT in slot 1 */
-READ8_MEMBER (cpu30_state::slot1_status_r){
+uint8_t cpu30_state::slot1_status_r(){
 	LOG("%s\n", FUNCNAME);
 	return 1;
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
-READ32_MEMBER (cpu30_state::bootvect_r){
+uint32_t cpu30_state::bootvect_r(offs_t offset){
 	LOG("%s\n", FUNCNAME);
 	return m_sysrom[offset];
 }
 
-WRITE32_MEMBER (cpu30_state::bootvect_w){
+void cpu30_state::bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask){
 	LOG("%s\n", FUNCNAME);
 	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
@@ -487,42 +487,42 @@ WRITE32_MEMBER (cpu30_state::bootvect_w){
  *
  * "To start VMEPROM, the rotary switches must both be set to 'F':" Hmm...
  */
-READ8_MEMBER (cpu30_state::rotary_rd){
+uint8_t cpu30_state::rotary_rd(){
 	LOG("%s\n", FUNCNAME);
 	return 0xff; // TODO: make this configurable from commandline or artwork
 }
 
 // PIT#1 Port B TODO: implement floppy and dma control
-READ8_MEMBER (cpu30_state::flop_dmac_r){
+uint8_t cpu30_state::flop_dmac_r(){
 	LOG("%s\n", FUNCNAME);
 	return 0xff;
 }
 
-WRITE8_MEMBER (cpu30_state::flop_dmac_w){
+void cpu30_state::flop_dmac_w(uint8_t data){
 	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 #define FPCP_SENSE 0x40 /* Port C bit 6 is low if a Floating Point Co Processor is installed */
 // PIT#1 Port C TODO: implement timer+port interrupts
 // TODO: Connect PC0, PC1, PC4 and PC7 to B5 and/or P2 connector
-READ8_MEMBER (cpu30_state::pit1c_r){
+uint8_t cpu30_state::pit1c_r(){
 	LOG("%s\n", FUNCNAME);
 	m_maincpu->set_fpu_enable(1);    // Lets assume the FPCP is always installed ( which is default for 68030 atm )
 	return 0xff & ~FPCP_SENSE; // Should really be command line for the edge cases...
 }
 
-WRITE8_MEMBER (cpu30_state::pit1c_w){
+void cpu30_state::pit1c_w(uint8_t data){
 	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 // PIT#2 Port A TODO: Connect to B5 and /or P2 connector
-READ8_MEMBER (cpu30_state::pit2a_r){
+uint8_t cpu30_state::pit2a_r(){
 	LOG("%s\n", FUNCNAME);
 	logerror("Unsupported user i/o on PIT2 port A detected\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER (cpu30_state::pit2a_w){
+void cpu30_state::pit2a_w(uint8_t data){
 	LOG("%s(%02x)\n", FUNCNAME, data);
 	logerror("Unsupported user i/o on PIT2 port A detected\n");
 }
@@ -541,11 +541,11 @@ WRITE8_MEMBER (cpu30_state::pit2a_w){
  *                      contain the same identification number. In the case of the CPU-30 R4, the
  *                      number is 0x0a
  *
- * The speed of the board is meassured by looping some instructions and meassure the time it takes with a timer
+ * The speed of the board is measured by looping some instructions and measure the time it takes with a timer
  * Currently this doesn't work so the wrong speed is displayed on the screen. To fix this timing needs to be more exact.
- * Speed meassure subroutine is at address 0xffe033c4 in the FGA-002 firmware with CRC (faa38972) (for example)
+ * Speed measure subroutine is at address 0xffe033c4 in the FGA-002 firmware with CRC (faa38972) (for example)
  */
-READ8_MEMBER (cpu30_state::board_mem_id_rd)
+uint8_t cpu30_state::board_mem_id_rd()
 {
 	int sz;
 	LOG("%s\n", FUNCNAME);
@@ -591,32 +591,32 @@ READ8_MEMBER (cpu30_state::board_mem_id_rd)
 }
 
 // PIT#2 Port C TODO: implement timer interrupt, DMA i/o, memory control and Hardware ID
-READ8_MEMBER (cpu30_state::pit2c_r){
+uint8_t cpu30_state::pit2c_r(){
 	LOG("%s\n", FUNCNAME);
 	return 0xfe;
 }
 
-WRITE8_MEMBER (cpu30_state::pit2c_w){
+void cpu30_state::pit2c_w(uint8_t data){
 	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 #if 0
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (cpu30_state::vme_a24_r){
+uint16_t cpu30_state::vme_a24_r(){
 	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (cpu30_state::vme_a24_w){
+void cpu30_state::vme_a24_w(uint16_t data){
 	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
-READ16_MEMBER (cpu30_state::vme_a16_r){
+uint16_t cpu30_state::vme_a16_r(){
 	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (cpu30_state::vme_a16_w){
+void cpu30_state::vme_a16_w(uint16_t data){
 	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 #endif
@@ -661,7 +661,7 @@ static void fccpu30_vme_cards(device_slot_interface &device)
 
 void cpu30_state::cpu_space_map(address_map &map)
 {
-	map(0xfffffff2, 0xffffffff).lr16("fga002 irq", [this](offs_t offset) -> u16 { return m_fga002->iack(); });
+	map(0xfffffff2, 0xffffffff).lr16(NAME([this] (offs_t offset) -> u16 { return m_fga002->iack(); }));
 }
 
 void cpu30_state::cpu30(machine_config &config)

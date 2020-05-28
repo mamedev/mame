@@ -143,13 +143,13 @@ TIMER_CALLBACK_MEMBER(mb9061x_device::timer1_tick)
 	}
 }
 
-READ8_MEMBER(mb9061x_device::timer_r)
+u8 mb9061x_device::timer_r(offs_t offset)
 {
 	//printf("timer_r: offset %d = %02x\n", offset, m_timer_regs[offset]);
 	return m_timer_regs[offset];
 }
 
-WRITE8_MEMBER(mb9061x_device::timer_w)
+void mb9061x_device::timer_w(offs_t offset, u8 data)
 {
 	int timer = offset / 4;
 	int reg = offset % 4;
@@ -317,14 +317,14 @@ enum
 	TBTC_TBC0 = 0x01    // rate select bit 0
 };
 
-READ8_MEMBER(mb9061x_device::tbtc_r)
+u8 mb9061x_device::tbtc_r()
 {
 	return m_tbtc;
 }
 
-WRITE8_MEMBER(mb9061x_device::tbtc_w)
+void mb9061x_device::tbtc_w(u8 data)
 {
-	static const float periods[4] = { 1.024, 4.096, 16.384, 131.072 };
+	static const float periods[4] = { 1.024f, 4.096f, 16.384f, 131.072f };
 
 	//printf("%02x to TBTC\n", data);
 //  if ((!(data & TBTC_TBR)) || ((data & (TBTC_TBC1|TBTC_TBC0)) != (m_tbtc & (TBTC_TBC1|TBTC_TBC0))))
@@ -357,12 +357,12 @@ TIMER_CALLBACK_MEMBER(mb9061x_device::tbtc_tick)
 	}
 }
 
-READ8_MEMBER(mb9061x_device::intc_r)
+u8 mb9061x_device::intc_r(offs_t offset)
 {
 	return m_intc[offset];
 }
 
-WRITE8_MEMBER(mb9061x_device::intc_w)
+void mb9061x_device::intc_w(offs_t offset, u8 data)
 {
 	//printf("INTC ICR %d to %02x\n", offset, data);
 	m_intc[offset] = data;

@@ -861,7 +861,16 @@ static INPUT_PORTS_START( cptennis )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	/* other dips not verified */
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )                   PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, "10000" )
+	PORT_DIPSETTING(    0x04, "20000" )
+	PORT_DIPSETTING(    0x02, "30000" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )                   PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "Amateur" )
+	PORT_DIPSETTING(    0x00, "Professional" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5")
+	// DIPs verified from DIPSW sheet
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cprobowl )
@@ -966,7 +975,7 @@ void decocass_state::decocass(machine_config &config)
 	m_mcu->p2_in_cb().set(FUNC(decocass_state::i8041_p2_r));
 	m_mcu->p2_out_cb().set(FUNC(decocass_state::i8041_p2_w));
 
-	config.m_minimum_quantum = attotime::from_hz(4200);              /* interleave CPUs */
+	config.set_maximum_quantum(attotime::from_hz(4200));              /* interleave CPUs */
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -2065,14 +2074,14 @@ void decocass_state::init_decocrom()
 
 	/* convert charram to a banked ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x6000, 0xafff, "bank1");
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0xafff, write8_delegate(FUNC(decocass_state::decocass_de0091_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0xafff, write8_delegate(*this, FUNC(decocass_state::decocass_de0091_w)));
 	membank("bank1")->configure_entry(0, m_charram);
 	membank("bank1")->configure_entry(1, memregion("user3")->base());
 	membank("bank1")->configure_entry(2, memregion("user3")->base()+0x5000);
 	membank("bank1")->set_entry(0);
 
 	/* install the bank selector */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe900, 0xe900, write8_delegate(FUNC(decocass_state::decocass_e900_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe900, 0xe900, write8_delegate(*this, FUNC(decocass_state::decocass_e900_w)));
 }
 
 READ8_MEMBER(decocass_state::cdsteljn_input_r )
@@ -2105,8 +2114,8 @@ void decocass_state::init_cdsteljn()
 	init_decocass();
 
 	/* install custom mahjong panel */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe413, 0xe413, write8_delegate(FUNC(decocass_state::cdsteljn_mux_w), this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe600, 0xe6ff, read8_delegate(FUNC(decocass_state::cdsteljn_input_r), this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe413, 0xe413, write8_delegate(*this, FUNC(decocass_state::cdsteljn_mux_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe600, 0xe6ff, read8_delegate(*this, FUNC(decocass_state::cdsteljn_input_r)));
 }
 
 /* -- */ GAME( 1981, decocass,  0,        decocass, decocass, decocass_state,        init_decocass, ROT270, "Data East Corporation", "DECO Cassette System", MACHINE_IS_BIOS_ROOT )
@@ -2180,4 +2189,3 @@ void decocass_state::init_cdsteljn()
 /* UX9 */ // 1985.05 Geinoujin Shikaku Shiken
 
 /* xx */ GAME( 2008, decomult,  decocass, decocass, decocass, decocass_widel_state,  init_decocass, ROT270, "bootleg (David Widel)", "Deco Cassette System Multigame (ROM based)", 0 )
-

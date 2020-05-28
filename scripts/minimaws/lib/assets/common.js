@@ -8,7 +8,7 @@ function sort_table(tbl, col, dir, numeric)
 			function (x, y)
 			{
 				if (numeric)
-					return dir * (parseInt(x.cells[col].textContent) - parseInt(y.cells[col].textContent));
+					return dir * (parseFloat(x.cells[col].textContent) - parseFloat(y.cells[col].textContent));
 				else
 					return dir * x.cells[col].textContent.localeCompare(y.cells[col].textContent);
 			})

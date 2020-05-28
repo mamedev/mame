@@ -362,10 +362,10 @@ private:
 	required_device<palette_device> m_palette;
 	output_finder<8> m_lamps;
 
-	DECLARE_WRITE8_MEMBER(ppi0_portc_w);
-	DECLARE_READ8_MEMBER(ppi0_portc_r);
-	DECLARE_WRITE8_MEMBER(ayporta_w);
-	DECLARE_WRITE8_MEMBER(ayportb_w);
+	void ppi0_portc_w(uint8_t data);
+	uint8_t ppi0_portc_r();
+	void ayporta_w(uint8_t data);
+	void ayportb_w(uint8_t data);
 
 	void fortecar_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -463,7 +463,7 @@ R = 82 Ohms Pull Down.
 *        Misc R/W Handlers         *
 ***********************************/
 
-WRITE8_MEMBER(fortecar_state::ppi0_portc_w)
+void fortecar_state::ppi0_portc_w(uint8_t data)
 {
 /*
 NM93CS56N Serial EEPROM
@@ -478,13 +478,13 @@ DOUT PPI_PC4
 	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(fortecar_state::ppi0_portc_r)
+uint8_t fortecar_state::ppi0_portc_r()
 {
 //  popmessage("%s",machine().describe_context());
 	return ((m_eeprom->do_read() << 4) & 0x10);
 }
 
-WRITE8_MEMBER(fortecar_state::ayporta_w)
+void fortecar_state::ayporta_w(uint8_t data)
 {
 /*  System Lamps...
 
@@ -514,7 +514,7 @@ WRITE8_MEMBER(fortecar_state::ayporta_w)
 }
 
 
-WRITE8_MEMBER(fortecar_state::ayportb_w)
+void fortecar_state::ayportb_w(uint8_t data)
 {
 /*
 
@@ -558,7 +558,7 @@ void fortecar_state::fortecar_ports(address_map &map)
 	map(0x40, 0x40).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x60, 0x63).rw("fcppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));//M5L8255AP
-//  AM_RANGE(0x80, 0x81) //8251A UART
+//  map(0x80, 0x81) //8251A UART
 	map(0xa0, 0xa0).rw("rtc", FUNC(v3021_device::read), FUNC(v3021_device::write));
 	map(0xa1, 0xa1).portr("DSW");
 }

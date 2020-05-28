@@ -55,7 +55,7 @@ public:
 	void init_taito_b();
 
 protected:
-	DECLARE_WRITE8_MEMBER(player_12_coin_ctrl_w);
+	void player_12_coin_ctrl_w(uint8_t data);
 
 	void sound_map(address_map &map);
 
@@ -69,7 +69,7 @@ protected:
 	DECLARE_READ16_MEMBER(player_34_coin_ctrl_r);
 	DECLARE_WRITE16_MEMBER(player_34_coin_ctrl_w);
 	DECLARE_WRITE16_MEMBER(spacedxo_tc0220ioc_w);
-	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
+	void mb87078_gain_changed(offs_t offset, uint8_t data);
 	virtual void video_start() override;
 	uint32_t screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

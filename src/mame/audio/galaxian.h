@@ -7,37 +7,44 @@
 
 #include "sound/discrete.h"
 
-#define GAL_AUDIO   "discrete"
-
-class galaxian_sound_device : public device_t, public device_sound_interface
+class galaxian_sound_device : public device_t
 {
 public:
 	galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( sound_w );
-	DECLARE_WRITE8_MEMBER( pitch_w );
-	DECLARE_WRITE8_MEMBER( vol_w );
-	DECLARE_WRITE8_MEMBER( noise_enable_w );
-	DECLARE_WRITE8_MEMBER( background_enable_w );
-	DECLARE_WRITE8_MEMBER( fire_enable_w );
-	DECLARE_WRITE8_MEMBER( lfo_freq_w );
+	void pitch_w(uint8_t data);
+	void vol_w(offs_t offset, uint8_t data);
+	void noise_enable_w(uint8_t data);
+	void background_enable_w(offs_t offset, uint8_t data);
+	void fire_enable_w(uint8_t data);
+	void lfo_freq_w(offs_t offset, uint8_t data);
+	void sound_w(offs_t offset, uint8_t data);
 
 protected:
+	galaxian_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	required_device<discrete_device> m_discrete;
 
 private:
 	// internal state
 	uint8_t m_lfo_val;
-	required_device<discrete_device> m_discrete;
 };
 
-DECLARE_DEVICE_TYPE(GALAXIAN, galaxian_sound_device)
+class mooncrst_sound_device : public galaxian_sound_device
+{
+public:
+	mooncrst_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-DISCRETE_SOUND_EXTERN(galaxian_discrete);
-DISCRETE_SOUND_EXTERN(mooncrst_discrete);
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+DECLARE_DEVICE_TYPE(GALAXIAN_SOUND, galaxian_sound_device)
+DECLARE_DEVICE_TYPE(MOONCRST_SOUND, mooncrst_sound_device)
 
 #endif // MAME_AUDIO_GALAXIAN_H

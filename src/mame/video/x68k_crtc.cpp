@@ -136,7 +136,7 @@ void x68k_crtc_device::text_copy(unsigned src, unsigned dest, u8 planes)
 	// update RAM in each plane
 	for (int words = 256; words > 0; words--, src_ram++, dest_ram++)
 	{
-		for (u8 plane = 0; plane < 3; plane++)
+		for (u8 plane = 0; plane <= 3; plane++)
 			if (BIT(planes, plane))
 				m_tvram_write_callback(dest_ram + 0x10000 * plane, m_tvram_read_callback(src_ram + 0x10000 * plane, 0xffff), 0xffff);
 	}

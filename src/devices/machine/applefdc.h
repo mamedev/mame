@@ -30,8 +30,8 @@
 #define APPLEFDC_PH2    0x04
 #define APPLEFDC_PH3    0x08
 
-DECLARE_DEVICE_TYPE(APPLEFDC, applefdc_device)
-DECLARE_DEVICE_TYPE(IWM, iwm_device)
+DECLARE_DEVICE_TYPE(LEGACY_APPLEFDC, applefdc_device)
+DECLARE_DEVICE_TYPE(LEGACY_IWM, legacy_iwm_device)
 
 
 
@@ -62,12 +62,8 @@ public:
 	void set_config(const applefdc_interface *intrf) { m_interface = intrf; }
 
 	// read/write handlers
-	virtual uint8_t read(uint8_t offset);
-	virtual void write(uint8_t offset, uint8_t data);
-
-	// read/write handlers overloads
-	DECLARE_READ8_MEMBER( bus_r ) { return read(uint8_t(offset)); }
-	DECLARE_WRITE8_MEMBER( bus_w ) { write(uint8_t(offset), data); }
+	virtual uint8_t read(offs_t offset);
+	virtual void write(offs_t offset, uint8_t data);
 
 	// accessor
 	uint8_t get_lines();
@@ -139,16 +135,16 @@ public:
     IWM - Used on early Macs
 ***************************************************************************/
 
-class iwm_device : public applefdc_base_device
+class legacy_iwm_device : public applefdc_base_device
 {
 public:
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, const applefdc_interface *intrf)
-		: iwm_device(mconfig, tag, owner, (uint32_t)0)
+	legacy_iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, const applefdc_interface *intrf)
+		: legacy_iwm_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		set_config(intrf);
 	}
 
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	legacy_iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static constexpr feature_type imperfect_features() { return feature::DISK; }
 };

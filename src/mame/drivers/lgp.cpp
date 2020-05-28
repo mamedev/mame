@@ -173,7 +173,7 @@ void lgp_state::main_program_map(address_map &map)
 	map(0xe000, 0xe3ff).ram().share("tile_ram");
 	map(0xe400, 0xe7ff).ram().share("tile_ctrl_ram");
 
-//  AM_RANGE(0xef00,0xef00) AM_READ_PORT("IN_TEST")
+//  map(0xef00, 0xef00).portr("IN_TEST");
 	map(0xef80, 0xef80).rw(FUNC(lgp_state::ldp_read), FUNC(lgp_state::ldp_write));
 	map(0xefb8, 0xefb8).nopr(); // watchdog
 	map(0xefc0, 0xefc0).portr("DSWA");    /* Not tested */
@@ -197,8 +197,8 @@ void lgp_state::sound_program_map(address_map &map)
 void lgp_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0xfd,0xfd) AM_READ_PORT("IN_TEST")
-//  AM_RANGE(0xfe,0xfe) AM_READ_PORT("IN_TEST")
+//  map(0xfd,0xfd).portr("IN_TEST");
+//  map(0xfe,0xfe).portr("IN_TEST");
 }
 
 void lgp_state::sound_io_map(address_map &map)

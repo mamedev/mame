@@ -16,9 +16,9 @@ class tiamc1_sound_device : public device_t, public device_sound_interface
 public:
 	tiamc1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( tiamc1_timer0_w );
-	DECLARE_WRITE8_MEMBER( tiamc1_timer1_w );
-	DECLARE_WRITE8_MEMBER( tiamc1_timer1_gate_w );
+	void tiamc1_timer0_w(offs_t offset, uint8_t data);
+	void tiamc1_timer1_w(offs_t offset, uint8_t data);
+	void tiamc1_timer1_gate_w(uint8_t data);
 
 protected:
 	// device-level overrides

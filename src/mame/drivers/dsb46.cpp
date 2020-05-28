@@ -43,14 +43,11 @@ public:
 	{ }
 
 	void dsb46(machine_config &config);
-
 	void init_dsb46();
 
-protected:
-	virtual void machine_reset() override;
-
 private:
-	DECLARE_WRITE8_MEMBER(port1a_w);
+	virtual void machine_reset() override;
+	void port1a_w(u8 data);
 	void dsb46_io(address_map &map);
 	void dsb46_mem(address_map &map);
 	required_device<z80_device> m_maincpu;
@@ -69,11 +66,11 @@ void dsb46_state::dsb46_io(address_map &map)
 	map(0x00, 0x03).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x08, 0x0b).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x1a, 0x1a).w(FUNC(dsb46_state::port1a_w));
-	//AM_RANGE(0x10, 0x10) disk related
-	//AM_RANGE(0x14, 0x14) ?? (read after CTC1 TRG3)
-	//AM_RANGE(0x18, 0x18) ??
-	//AM_RANGE(0x1c, 0x1c) disk data
-	//AM_RANGE(0x1d, 0x1d) disk status (FF = no fdc)
+	//map(0x10, 0x10) disk related
+	//map(0x14, 0x14) ?? (read after CTC1 TRG3)
+	//map(0x18, 0x18) ??
+	//map(0x1c, 0x1c) disk data
+	//map(0x1d, 0x1d) disk status (FF = no fdc)
 }
 
 static INPUT_PORTS_START( dsb46 )
@@ -81,7 +78,7 @@ INPUT_PORTS_END
 
 void dsb46_state::init_dsb46()
 {
-	uint8_t *RAM = memregion("maincpu")->base();
+	u8 *RAM = memregion("maincpu")->base();
 	membank("read")->configure_entry(0, &RAM[0x10000]);
 	membank("read")->configure_entry(1, &RAM[0x00000]);
 	membank("write")->configure_entry(0, &RAM[0x00000]);
@@ -94,7 +91,7 @@ void dsb46_state::machine_reset()
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( dsb46_state::port1a_w )
+void dsb46_state::port1a_w(u8 data)
 {
 	membank("read")->set_entry(data & 1);
 }

@@ -68,12 +68,13 @@ public:
 	auto write_port5_callback() { return m_write_port[4].bind(); }
 	auto write_port6_callback() { return m_write_port[5].bind(); }
 	auto write_port7_callback() { return m_write_port[6].bind(); }
+	tms1024_device &set_ms(u8 i) { m_ms = i & 1; return *this; } // if hardwired, can just set MS pin state here
 
-	DECLARE_WRITE8_MEMBER(write_h);
-	DECLARE_READ8_MEMBER(read_h);
-	DECLARE_WRITE8_MEMBER(write_s);
-	DECLARE_WRITE_LINE_MEMBER(write_std);
-	DECLARE_WRITE_LINE_MEMBER(write_ms);
+	void write_h(u8 data);
+	u8 read_h();
+	void write_s(u8 data);
+	void write_std(int state);
+	void write_ms(int state);
 
 protected:
 	tms1024_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -87,8 +88,8 @@ protected:
 	u8 m_ms;     // mode select pin, default to read mode
 
 	// callbacks
-	devcb_read8 m_read_port[7];
-	devcb_write8 m_write_port[7];
+	devcb_read8::array<7> m_read_port;
+	devcb_write8::array<7> m_write_port;
 };
 
 

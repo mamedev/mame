@@ -24,6 +24,9 @@ public:
 	// construction/destruction
 	i82371sb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <typename T>
+	void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+
 	auto smi() { return m_smi_callback.bind(); }
 	auto boot_state_hook() { return m_boot_state_hook.bind(); }
 
@@ -61,6 +64,7 @@ private:
 	int m_apmc;
 	int m_apms;
 	uint32_t m_base;
+	required_device<cpu_device> m_cpu;
 };
 
 // device type definition

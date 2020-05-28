@@ -377,7 +377,7 @@ void bwing_state::bwing(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &bwing_state::bwp3_io_map);
 	m_audiocpu->set_periodic_int(FUNC(bwing_state::bwp3_interrupt), attotime::from_hz(1000));
 
-	config.m_minimum_quantum = attotime::from_hz(18000);     // high enough?
+	config.set_maximum_quantum(attotime::from_hz(18000));     // high enough?
 
 	ADDRESS_MAP_BANK(config, "vrambank").set_map(&bwing_state::bank_map).set_options(ENDIANNESS_BIG, 8, 15, 0x2000);
 

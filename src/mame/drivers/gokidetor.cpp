@@ -28,13 +28,13 @@ public:
 	void gokidetor(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(out4_w);
-	DECLARE_WRITE8_MEMBER(out5_w);
-	DECLARE_WRITE8_MEMBER(out6_w);
-	DECLARE_WRITE8_MEMBER(out7_w);
-	DECLARE_WRITE8_MEMBER(out8_w);
-	DECLARE_WRITE8_MEMBER(out9_w);
-	DECLARE_WRITE8_MEMBER(ym_porta_w);
+	void out4_w(uint8_t data);
+	void out5_w(uint8_t data);
+	void out6_w(uint8_t data);
+	void out7_w(uint8_t data);
+	void out8_w(uint8_t data);
+	void out9_w(uint8_t data);
+	void ym_porta_w(uint8_t data);
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
@@ -50,37 +50,37 @@ void gokidetor_state::machine_start()
 }
 
 
-WRITE8_MEMBER(gokidetor_state::out4_w)
+void gokidetor_state::out4_w(uint8_t data)
 {
 	logerror("Writing %02X to TE7750 port 4\n", data);
 }
 
-WRITE8_MEMBER(gokidetor_state::out5_w)
+void gokidetor_state::out5_w(uint8_t data)
 {
 	logerror("Writing %02X to TE7750 port 5\n", data);
 }
 
-WRITE8_MEMBER(gokidetor_state::out6_w)
+void gokidetor_state::out6_w(uint8_t data)
 {
 	logerror("Writing %02X to TE7750 port 6\n", data);
 }
 
-WRITE8_MEMBER(gokidetor_state::out7_w)
+void gokidetor_state::out7_w(uint8_t data)
 {
 	logerror("Writing %02X to TE7750 port 7\n", data);
 }
 
-WRITE8_MEMBER(gokidetor_state::out8_w)
+void gokidetor_state::out8_w(uint8_t data)
 {
 	logerror("Writing %02X to TE7750 port 8\n", data & 0x3f);
 }
 
-WRITE8_MEMBER(gokidetor_state::out9_w)
+void gokidetor_state::out9_w(uint8_t data)
 {
 	logerror("Writing %02X to TE7750 port 9\n", data);
 }
 
-WRITE8_MEMBER(gokidetor_state::ym_porta_w)
+void gokidetor_state::ym_porta_w(uint8_t data)
 {
 	if (data != 0x40)
 		logerror("Writing %02X to YM2203 port A\n", data);
@@ -99,7 +99,7 @@ void gokidetor_state::main_map(address_map &map)
 	// d101 = ?output
 	// d1c0 = ?output
 	map(0xd800, 0xd80f).rw("te7750", FUNC(te7750_device::read), FUNC(te7750_device::write));
-	//AM_RANGE(0xda00, 0xda01) AM_DEVWRITE("pwm", m66240_device, write)
+	//map(0xda00, 0xda01).w("pwm", FUNC(m66240_device::write));
 	// de00 ?input
 	// df00 ?input
 	map(0xe000, 0xe003).nopr(); // ?input

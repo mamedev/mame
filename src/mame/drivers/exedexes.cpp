@@ -210,11 +210,11 @@ void exedexes_state::machine_reset()
 void exedexes_state::exedexes(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);   /* 4 MHz (?) */
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // 3 MHz, verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &exedexes_state::exedexes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(exedexes_state::scanline), "screen", 0, 1);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 3000000));  /* 3 MHz ??? */
+	z80_device &audiocpu(Z80(config, "audiocpu", 12_MHz_XTAL / 4)); // 3 MHz, verified on PCB
 	audiocpu.set_addrmap(AS_PROGRAM, &exedexes_state::sound_map);
 	audiocpu.set_periodic_int(FUNC(exedexes_state::irq0_line_hold), attotime::from_hz(4*60));
 
@@ -222,7 +222,7 @@ void exedexes_state::exedexes(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(59.60); // verified on PCB
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
@@ -239,11 +239,11 @@ void exedexes_state::exedexes(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	AY8910(config, "aysnd", 1500000).add_route(ALL_OUTPUTS, "mono", 0.10);
+	AY8910(config, "aysnd", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.10); // 1.5 MHz, verified on PCB
 
-	SN76489(config, "sn1", 3000000).add_route(ALL_OUTPUTS, "mono", 0.36);
+	SN76489(config, "sn1", 12_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.36); // 3 MHz, verified on PCB
 
-	SN76489(config, "sn2", 3000000).add_route(ALL_OUTPUTS, "mono", 0.36);
+	SN76489(config, "sn2", 12_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.36); // 3 MHz, verified on PCB
 }
 
 

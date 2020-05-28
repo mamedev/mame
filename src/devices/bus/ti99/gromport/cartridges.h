@@ -95,14 +95,14 @@ protected:
 	void prepare_cartridge();
 
 	// device_image_interface
-	iodevice_t image_type() const override { return IO_CARTSLOT; }
-	bool is_readable()  const override           { return true; }
-	bool is_writeable() const override           { return false; }
-	bool is_creatable() const override           { return false; }
-	bool must_be_loaded() const override         { return false; }
-	bool is_reset_on_load() const override       { return false; }
-	const char *image_interface() const override { return "ti99_cart"; }
-	const char *file_extensions() const override { return "rpk"; }
+	iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	bool is_readable()  const noexcept override           { return true; }
+	bool is_writeable() const noexcept override           { return false; }
+	bool is_creatable() const noexcept override           { return false; }
+	bool must_be_loaded() const noexcept override         { return false; }
+	bool is_reset_on_load() const noexcept override       { return false; }
+	const char *image_interface() const noexcept override { return "ti99_cart"; }
+	const char *file_extensions() const noexcept override { return "rpk"; }
 
 private:
 

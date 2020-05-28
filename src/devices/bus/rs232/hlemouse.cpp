@@ -42,7 +42,7 @@
     report can be identified by a fixed pattern in the five most
     significant bits.
 
-    Reports are five bytes long.  The first byte contains the the button
+    Reports are five bytes long.  The first byte contains the button
     state; the second and fourth bytes contain X delta; the third and
     fifth bytes contain Y delta.  The two delta values for each axis
     should be summed.  Delta values range from -120 to 127 to prevent

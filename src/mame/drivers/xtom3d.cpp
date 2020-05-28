@@ -71,15 +71,15 @@ private:
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];
 
-	DECLARE_WRITE32_MEMBER( isa_ram1_w );
-	DECLARE_WRITE32_MEMBER( isa_ram2_w );
+	void isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( bios_ext1_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext2_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext3_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext4_ram_w );
+	void bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( bios_ram_w );
+	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
@@ -251,7 +251,7 @@ uint8_t xtom3d_state::piix4_config_r(int function, int reg)
 
 void xtom3d_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -298,7 +298,7 @@ void xtom3d_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint
 }
 
 
-WRITE32_MEMBER(xtom3d_state::isa_ram1_w)
+void xtom3d_state::isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -306,7 +306,7 @@ WRITE32_MEMBER(xtom3d_state::isa_ram1_w)
 	}
 }
 
-WRITE32_MEMBER(xtom3d_state::isa_ram2_w)
+void xtom3d_state::isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -314,7 +314,7 @@ WRITE32_MEMBER(xtom3d_state::isa_ram2_w)
 	}
 }
 
-WRITE32_MEMBER(xtom3d_state::bios_ext1_ram_w)
+void xtom3d_state::bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5e] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -323,7 +323,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext1_ram_w)
 }
 
 
-WRITE32_MEMBER(xtom3d_state::bios_ext2_ram_w)
+void xtom3d_state::bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -332,7 +332,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext2_ram_w)
 }
 
 
-WRITE32_MEMBER(xtom3d_state::bios_ext3_ram_w)
+void xtom3d_state::bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5f] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -341,7 +341,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext3_ram_w)
 }
 
 
-WRITE32_MEMBER(xtom3d_state::bios_ext4_ram_w)
+void xtom3d_state::bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -350,7 +350,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext4_ram_w)
 }
 
 
-WRITE32_MEMBER(xtom3d_state::bios_ram_w)
+void xtom3d_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -422,10 +422,8 @@ void xtom3d_state::xtom3d(machine_config &config)
 	pcat_common(config);
 
 	PCI_BUS_LEGACY(config, m_pcibus, 0, 0);
-	m_pcibus->set_device_read (0, FUNC(xtom3d_state::intel82439tx_pci_r), this);
-	m_pcibus->set_device_write(0, FUNC(xtom3d_state::intel82439tx_pci_w), this);
-	m_pcibus->set_device_read (7, FUNC(xtom3d_state::intel82371ab_pci_r), this);
-	m_pcibus->set_device_write(7, FUNC(xtom3d_state::intel82371ab_pci_w), this);
+	m_pcibus->set_device(0, FUNC(xtom3d_state::intel82439tx_pci_r), FUNC(xtom3d_state::intel82439tx_pci_w));
+	m_pcibus->set_device(7, FUNC(xtom3d_state::intel82371ab_pci_r), FUNC(xtom3d_state::intel82371ab_pci_w));
 
 	/* video hardware */
 	pcvideo_vga(config);

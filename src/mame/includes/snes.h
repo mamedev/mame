@@ -4,9 +4,9 @@
 #ifndef MAME_INCLUDES_SNES_H
 #define MAME_INCLUDES_SNES_H
 
-#include "cpu/spc700/spc700.h"
 #include "cpu/g65816/g65816.h"
-#include "audio/snes_snd.h"
+#include "machine/s_smp.h"
+#include "sound/s_dsp.h"
 #include "video/snes_ppu.h"
 #include "screen.h"
 
@@ -303,9 +303,10 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_spc700(*this, "spc700"),
+		m_s_dsp(*this, "s_dsp"),
 		m_ppu(*this, "ppu"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_wram(*this, "wram")
 	{ }
 
 	void init_snes();
@@ -316,6 +317,11 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 	enum
 	{
 		TIMER_NMI_TICK,
@@ -385,10 +391,12 @@ protected:
 
 	/* devices */
 	required_device<_5a22_device> m_maincpu;
-	required_device<spc700_device> m_soundcpu;
-	required_device<snes_sound_device> m_spc700;
+	required_device<s_smp_device> m_soundcpu;
+	required_device<s_dsp_device> m_s_dsp;
 	required_device<snes_ppu_device> m_ppu;
 	required_device<screen_device> m_screen;
+
+	required_shared_ptr<u8> m_wram;
 
 	inline int dma_abus_valid(uint32_t address);
 	inline uint8_t abus_read(address_space &space, uint32_t abus);
@@ -408,7 +416,7 @@ protected:
 	void snes_init_ram();
 
 	// input related
-	virtual DECLARE_WRITE8_MEMBER(io_read);
+	virtual void io_read();
 	virtual uint8_t oldjoy1_read(int latched);
 	virtual uint8_t oldjoy2_read(int latched);
 
@@ -432,10 +440,6 @@ protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_snes_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_sufami_cart);
 	void snes_init_timers();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /* Special chips, checked at init and used in memory handlers */

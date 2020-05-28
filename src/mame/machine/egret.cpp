@@ -99,7 +99,7 @@ const tiny_rom_entry *egret_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-void egret_device::send_port(address_space &space, uint8_t offset, uint8_t data)
+void egret_device::send_port(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -184,21 +184,21 @@ void egret_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 	}
 }
 
-READ8_MEMBER( egret_device::ddr_r )
+uint8_t egret_device::ddr_r(offs_t offset)
 {
 	return ddrs[offset];
 }
 
-WRITE8_MEMBER( egret_device::ddr_w )
+void egret_device::ddr_w(offs_t offset, uint8_t data)
 {
 /*  printf("%02x to DDR %c\n", data, 'A' + offset);*/
 
-	send_port(space, offset, ports[offset] & data);
+	send_port(offset, ports[offset] & data);
 
 	ddrs[offset] = data;
 }
 
-READ8_MEMBER( egret_device::ports_r )
+uint8_t egret_device::ports_r(offs_t offset)
 {
 	uint8_t incoming = 0;
 
@@ -241,19 +241,19 @@ READ8_MEMBER( egret_device::ports_r )
 	return incoming;
 }
 
-WRITE8_MEMBER( egret_device::ports_w )
+void egret_device::ports_w(offs_t offset, uint8_t data)
 {
-	send_port(space, offset, data);
+	send_port(offset, data);
 
 	ports[offset] = data;
 }
 
-READ8_MEMBER( egret_device::pll_r )
+uint8_t egret_device::pll_r()
 {
 	return pll_ctrl;
 }
 
-WRITE8_MEMBER( egret_device::pll_w )
+void egret_device::pll_w(uint8_t data)
 {
 	#ifdef EGRET_SUPER_VERBOSE
 	if (pll_ctrl != data)
@@ -270,34 +270,34 @@ WRITE8_MEMBER( egret_device::pll_w )
 	pll_ctrl = data;
 }
 
-READ8_MEMBER( egret_device::timer_ctrl_r )
+uint8_t egret_device::timer_ctrl_r()
 {
 	return timer_ctrl;
 }
 
-WRITE8_MEMBER( egret_device::timer_ctrl_w )
+void egret_device::timer_ctrl_w(uint8_t data)
 {
 //  printf("%02x to timer control\n", data);
 	timer_ctrl = data;
 }
 
-READ8_MEMBER( egret_device::timer_counter_r )
+uint8_t egret_device::timer_counter_r()
 {
 	return timer_counter;
 }
 
-WRITE8_MEMBER( egret_device::timer_counter_w )
+void egret_device::timer_counter_w(uint8_t data)
 {
 //  printf("%02x to timer/counter\n", data);
 	timer_counter = data;
 }
 
-READ8_MEMBER( egret_device::onesec_r )
+uint8_t egret_device::onesec_r()
 {
 	return onesec;
 }
 
-WRITE8_MEMBER( egret_device::onesec_w )
+void egret_device::onesec_w(uint8_t data)
 {
 //  printf("%02x to one-second control\n", data);
 
@@ -311,12 +311,12 @@ WRITE8_MEMBER( egret_device::onesec_w )
 	onesec = data;
 }
 
-READ8_MEMBER( egret_device::pram_r )
+uint8_t egret_device::pram_r(offs_t offset)
 {
 	return pram[offset];
 }
 
-WRITE8_MEMBER( egret_device::pram_w )
+void egret_device::pram_w(offs_t offset, uint8_t data)
 {
 	pram[offset] = data;
 }
@@ -370,7 +370,7 @@ void egret_device::device_start()
 	save_item(NAME(pram));
 	save_item(NAME(disk_pram));
 
-	uint8_t *rom = device().machine().root_device().memregion(device().subtag(EGRET_CPU_TAG).c_str())->base();
+	uint8_t *rom = device().machine().root_device().memregion(device().subtag(EGRET_CPU_TAG))->base();
 
 	if (rom)
 	{

@@ -107,6 +107,12 @@ template<typename T> void generic_fifo_device_base<T>::device_timer(emu_timer &t
 
 template<typename T> T generic_fifo_device_base<T>::pop()
 {
+	if(machine().side_effects_disabled()) {
+		if(is_empty())
+			return T();
+		return m_values.front();
+	}
+
 	// Are we empty?
 	if(is_empty()) {
 		// First, trigger the sync

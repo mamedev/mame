@@ -6,13 +6,13 @@
 
     How to create HDD image:
     ------------------------
-    chdman createhd -chs 615,4,17 -ss 512 -o necd5126a.chd
+    ./chdman createhd -chs 615,4,17 -ss 512 -o necd5126a.chd
+    ./chdman createhd -chs 1024,8,17 -ss 512 -o micr1325a.chd
 
     How to format HDD:
     ------------------
     mf(2,0)
     mf(2,0)
-    abcenix
     sas/format/format
     sa(40,0)
     y
@@ -34,8 +34,6 @@
 
     TODO:
 
-    - starting from MAME 0.151, the Z80 DMA reads 0x08 as the 257th byte to transfer from disk t0s14 thus failing a comparison @ 37cfa, leading to a watchdog reset
-      changing z80dma.cpp:480 to "done = (m_count == 0);" fixes this but isn't the real reason
     - segment/page RAM addresses are not correctly decoded, "sas/format/format" after abcenix is booted can't find the SASI interface because of this
         [:mac] ':3f' (08A98) MAC 7e4a2:0004a2 (SEGA 02f SEGD 09 PGA 09c PGD 8000 NONX 1 WP 0)
             should be
@@ -70,8 +68,9 @@
         - port C, open drain output bit PC1 (RTC/NVRAM data)
     - hard disk
         - 4105 SASI interface card
-        - SASI interface (scsibus.cpp)
-    - connect RS-232 port A
+    - connect RS-232 printer port
+    - Z80 SCC/DART interrupt chain
+    - Z80 SCC DMA request
 
 */
 
@@ -378,7 +377,7 @@ WRITE8_MEMBER( abc1600_state::fw0_w )
 
 	*/
 
-	if (LOG) logerror("FW0 %02x\n", data);
+	if (LOG) logerror("%s FW0 %02x\n", machine().describe_context(), data);
 
 	// drive select
 	floppy_image_device *floppy = nullptr;
@@ -415,7 +414,7 @@ WRITE8_MEMBER( abc1600_state::fw1_w )
 
 	*/
 
-	if (LOG) logerror("FW1 %02x\n", data);
+	if (LOG) logerror("%s FW1 %02x\n", machine().describe_context(), data);
 
 	// FDC master reset
 	if (!BIT(data, 0)) m_fdc->reset();
@@ -512,9 +511,9 @@ void abc1600_state::mac_mem(address_map &map)
 	map(0x1ff006, 0x1ff006).mirror(0xf9).rw(m_fdc, FUNC(fd1797_device::data_r), FUNC(fd1797_device::data_w));
 	map(0x1ff100, 0x1ff101).mirror(0xfe).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::crtc_map));
 	map(0x1ff200, 0x1ff207).mirror(0xf8).rw(FUNC(abc1600_state::dart_r), FUNC(abc1600_state::dart_w));
-	map(0x1ff300, 0x1ff300).mirror(0xff).rw(m_dma0, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
-	map(0x1ff400, 0x1ff400).mirror(0xff).rw(m_dma1, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
-	map(0x1ff500, 0x1ff500).mirror(0xff).rw(m_dma2, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x1ff300, 0x1ff300).mirror(0xff).rw(m_dma0, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x1ff400, 0x1ff400).mirror(0xff).rw(m_dma1, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x1ff500, 0x1ff500).mirror(0xff).rw(m_dma2, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x1ff600, 0x1ff607).mirror(0xf8).rw(FUNC(abc1600_state::scc_r), FUNC(abc1600_state::scc_w));
 	map(0x1ff700, 0x1ff707).mirror(0xf8).rw(FUNC(abc1600_state::cio_r), FUNC(abc1600_state::cio_w));
 	map(0x1ff800, 0x1ff8ff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr0_map));
@@ -619,12 +618,12 @@ WRITE8_MEMBER( abc1600_state::dart_w )
 
 READ8_MEMBER( abc1600_state::scc_r )
 {
-	return m_scc->reg_r(space, A1_A2);
+	return m_scc->ab_dc_r(A2_A1);
 }
 
 WRITE8_MEMBER( abc1600_state::scc_w )
 {
-	m_scc->reg_w(space, A1_A2, data);
+	m_scc->ab_dc_w(A2_A1, data);
 }
 
 
@@ -634,15 +633,15 @@ WRITE8_MEMBER( abc1600_state::scc_w )
 
 READ8_MEMBER( abc1600_state::cio_r )
 {
-	return m_cio->read(space, A2_A1);
+	return m_cio->read(A2_A1);
 }
 
 WRITE8_MEMBER( abc1600_state::cio_w )
 {
-	m_cio->write(space, A2_A1, data);
+	m_cio->write(A2_A1, data);
 }
 
-READ8_MEMBER( abc1600_state::cio_pa_r )
+uint8_t abc1600_state::cio_pa_r()
 {
 	/*
 
@@ -673,7 +672,7 @@ READ8_MEMBER( abc1600_state::cio_pa_r )
 	return data;
 }
 
-READ8_MEMBER( abc1600_state::cio_pb_r )
+uint8_t abc1600_state::cio_pb_r()
 {
 	/*
 
@@ -701,7 +700,7 @@ READ8_MEMBER( abc1600_state::cio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( abc1600_state::cio_pb_w )
+void abc1600_state::cio_pb_w(uint8_t data)
 {
 	/*
 
@@ -725,7 +724,7 @@ WRITE8_MEMBER( abc1600_state::cio_pb_w )
 	m_dart->rxca_w(prbr);
 }
 
-READ8_MEMBER( abc1600_state::cio_pc_r )
+uint8_t abc1600_state::cio_pc_r()
 {
 	/*
 
@@ -746,7 +745,7 @@ READ8_MEMBER( abc1600_state::cio_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( abc1600_state::cio_pc_w )
+void abc1600_state::cio_pc_w(uint8_t data)
 {
 	/*
 
@@ -807,9 +806,9 @@ WRITE_LINE_MEMBER( abc1600_state::nmi_w )
 void abc1600_state::cpu_space_map(address_map &map)
 {
 	map(0xffff0, 0xfffff).m(m_maincpu, FUNC(m68008_device::autovectors_map));
-	map(0xffff5, 0xffff5).lr8("cio int", [this]() -> u8 { return m_cio->intack_r(); });
-	map(0xffffb, 0xffffb).lr8("dart int", [this]() -> u8 { return m_dart->m1_r(); });
-	map(0xfffff, 0xfffff).lr8("nmi int", [this]() -> u8 { m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE); return m68008_device::autovector(7); });
+	map(0xffff5, 0xffff5).lr8(NAME([this]() -> u8 { return m_cio->intack_r(); }));
+	map(0xffffb, 0xffffb).lr8(NAME([this]() -> u8 { return m_dart->m1_r(); }));
+	map(0xfffff, 0xfffff).lr8(NAME([this]() -> u8 { m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE); return m68008_device::autovector(7); }));
 }
 
 void abc1600_state::machine_start()
@@ -894,14 +893,43 @@ void abc1600_state::abc1600(machine_config &config)
 	m_dma2->out_iorq_callback().set(ABC1600_MAC_TAG, FUNC(abc1600_mac_device::dma2_iorq_w));
 
 	Z80DART(config, m_dart, 64_MHz_XTAL / 16);
-	m_dart->out_txda_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
-	m_dart->out_dtra_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
-	m_dart->out_rtsa_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
-	m_dart->out_txdb_callback().set(ABC_KEYBOARD_PORT_TAG, FUNC(abc_keyboard_port_device::txd_w));
 	m_dart->out_int_callback().set_inputline(m_maincpu, M68K_IRQ_5);    // shared with SCC
+	m_dart->out_txda_callback().set(RS232_PR_TAG, FUNC(rs232_port_device::write_txd));
+	//m_dart->out_dtra_callback().set(RS232_PR_TAG, FUNC(rs232_port_device::write_dcd));
+	//m_dart->out_rtsa_callback().set(RS232_PR_TAG, FUNC(rs232_port_device::write_cts));
+	m_dart->out_txdb_callback().set(ABC_KEYBOARD_PORT_TAG, FUNC(abc_keyboard_port_device::txd_w));
 
-	SCC8530(config, m_scc, 64_MHz_XTAL / 16);
-	m_scc->intrq_callback().set_inputline(MC68008P8_TAG, M68K_IRQ_5);
+	abc_keyboard_port_device &kb(ABC_KEYBOARD_PORT(config, ABC_KEYBOARD_PORT_TAG, abc_keyboard_devices, "abc99"));
+	kb.out_rx_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
+	kb.out_trxc_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+	kb.out_keydown_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
+
+	rs232_port_device &rs232pr(RS232_PORT(config, RS232_PR_TAG, default_rs232_devices, nullptr));
+	rs232pr.rxd_handler().set(Z8470AB1_TAG, FUNC(z80dart_device::rxa_w));
+	//rs232pr.rts_handler().set(Z8470AB1_TAG, FUNC(z80dart_device::ctsa_w));
+	//rs232pr.dtr_handler().set(Z8470AB1_TAG, FUNC(z80dart_device::dcda_w));
+
+	SCC8530N(config, m_scc, 64_MHz_XTAL / 16);
+	m_scc->out_int_callback().set_inputline(MC68008P8_TAG, M68K_IRQ_5);
+	//m_scc->out_wreqa_callback().set(FUNC(abc1600_state::sccrq_w));
+	//m_scc->out_wreqb_callback().set(FUNC(abc1600_state::sccrq_w));
+	m_scc->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_scc->out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtrb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
+
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(Z8530B1_TAG, FUNC(scc8530_device::rxa_w));
+	rs232a.cts_handler().set(Z8530B1_TAG, FUNC(scc8530_device::ctsa_w));
+	rs232a.dcd_handler().set(Z8530B1_TAG, FUNC(scc8530_device::dcda_w));
+	rs232a.ri_handler().set(Z8530B1_TAG, FUNC(scc8530_device::synca_w));
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(Z8530B1_TAG, FUNC(scc8530_device::rxb_w));
+	rs232b.cts_handler().set(Z8530B1_TAG, FUNC(scc8530_device::ctsb_w));
+	rs232b.dcd_handler().set(Z8530B1_TAG, FUNC(scc8530_device::dcdb_w));
+	rs232b.ri_handler().set(Z8530B1_TAG, FUNC(scc8530_device::syncb_w));
 
 	Z8536(config, m_cio, 64_MHz_XTAL / 16);
 	m_cio->irq_wr_cb().set_inputline(MC68008P8_TAG, M68K_IRQ_2);
@@ -922,16 +950,6 @@ void abc1600_state::abc1600(machine_config &config)
 	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":0", abc1600_floppies, nullptr, floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":1", abc1600_floppies, nullptr, floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_floppy_formats);
-
-	RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr);
-
-	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
-
-	abc_keyboard_port_device &kb(ABC_KEYBOARD_PORT(config, ABC_KEYBOARD_PORT_TAG, abc_keyboard_devices, "abc99"));
-	kb.out_rx_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
-	kb.out_trxc_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
-	kb.out_keydown_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
 
 	abcbus_slot_device &bus0i(ABCBUS_SLOT(config, "bus0i", 64_MHz_XTAL / 16, abc1600bus_cards, nullptr));
 	bus0i.irq_callback().set(m_cio, FUNC(z8536_device::pa7_w));

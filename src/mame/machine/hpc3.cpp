@@ -40,20 +40,13 @@ hpc3_device::hpc3_device(const machine_config &mconfig, const char *tag, device_
 		{"PIO channel 9", ENDIANNESS_LITTLE, 16, 8, -1}}
 	, m_gio64_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_hal2(*this, finder_base::DUMMY_TAG)
-	, m_enet_rd_cb(*this)
-	, m_enet_wr_cb(*this)
-	, m_enet_rxrd_cb(*this)
-	, m_enet_txwr_cb(*this)
-	, m_enet_d8_rd_cb(*this)
-	, m_enet_d8_wr_cb(*this)
-	, m_enet_reset_cb(*this)
-	, m_enet_loopback_cb(*this)
+	, m_enet(*this, finder_base::DUMMY_TAG)
 	, m_enet_intr_out_cb(*this)
-	, m_hd_rd_cb{{*this}, {*this}}
-	, m_hd_wr_cb{{*this}, {*this}}
-	, m_hd_dma_rd_cb{{*this}, {*this}}
-	, m_hd_dma_wr_cb{{*this}, {*this}}
-	, m_hd_reset_cb{{*this}, {*this}}
+	, m_hd_rd_cb(*this)
+	, m_hd_wr_cb(*this)
+	, m_hd_dma_rd_cb(*this)
+	, m_hd_dma_wr_cb(*this)
+	, m_hd_reset_cb(*this)
 	, m_bbram_rd_cb(*this)
 	, m_bbram_wr_cb(*this)
 	, m_eeprom_dati_cb(*this)
@@ -83,23 +76,12 @@ device_memory_interface::space_config_vector hpc3_device::memory_space_config() 
 
 void hpc3_device::device_resolve_objects()
 {
-	m_enet_rd_cb.resolve();
-	m_enet_wr_cb.resolve_safe();
-	m_enet_rxrd_cb.resolve_safe(0);
-	m_enet_txwr_cb.resolve_safe();
-	m_enet_d8_rd_cb.resolve_safe(0);
-	m_enet_d8_wr_cb.resolve_safe();
-	m_enet_reset_cb.resolve_safe();
-	m_enet_loopback_cb.resolve_safe();
 	m_enet_intr_out_cb.resolve_safe();
-	for (int index = 0; index < 2; index++)
-	{
-		m_hd_rd_cb[index].resolve();
-		m_hd_wr_cb[index].resolve();
-		m_hd_dma_rd_cb[index].resolve_safe(0);
-		m_hd_dma_wr_cb[index].resolve_safe();
-		m_hd_reset_cb[index].resolve_safe();
-	}
+	m_hd_rd_cb.resolve_all();
+	m_hd_wr_cb.resolve_all();
+	m_hd_dma_rd_cb.resolve_all_safe(0);
+	m_hd_dma_wr_cb.resolve_all_safe();
+	m_hd_reset_cb.resolve_all_safe();
 	m_bbram_rd_cb.resolve_safe(0);
 	m_bbram_wr_cb.resolve_safe();
 	m_eeprom_dati_cb.resolve_safe(0);
@@ -135,18 +117,27 @@ void hpc3_device::device_start()
 		save_item(NAME(m_scsi_dma[i].m_active), i);
 	}
 
-	for (uint32_t i = 0; i < 2; i++)
-	{
-		save_item(NAME(m_enet_dma[i].m_cbp), i);
-		save_item(NAME(m_enet_dma[i].m_nbdp), i);
-		save_item(NAME(m_enet_dma[i].m_bc), i);
-		save_item(NAME(m_enet_dma[i].m_ctrl), i);
-		save_item(NAME(m_enet_dma[i].m_gio_fifo_ptr), i);
-		save_item(NAME(m_enet_dma[i].m_dev_fifo_ptr), i);
-	}
-	save_item(NAME(m_enet_reset));
+	save_item(NAME(m_enet_rx_cbp));
+	save_item(NAME(m_enet_rx_nbdp));
+	save_item(NAME(m_enet_rx_bc));
+	save_item(NAME(m_enet_rx_ctrl));
+	save_item(NAME(m_enet_rx_gio));
+	save_item(NAME(m_enet_rx_dev));
+
+	save_item(NAME(m_enet_misc));
 	save_item(NAME(m_enet_dmacfg));
 	save_item(NAME(m_enet_piocfg));
+
+	save_item(NAME(m_enet_tx_cbp));
+	save_item(NAME(m_enet_tx_nbdp));
+	save_item(NAME(m_enet_tx_bc));
+	save_item(NAME(m_enet_tx_ctrl));
+	save_item(NAME(m_enet_tx_gio));
+	save_item(NAME(m_enet_tx_dev));
+
+	save_item(NAME(m_enet_rx_cbdp));
+	save_item(NAME(m_enet_tx_cpfbdp));
+	save_item(NAME(m_enet_tx_ppfbdp));
 
 	for (uint32_t i = 0; i < 8; i++)
 	{
@@ -174,6 +165,8 @@ void hpc3_device::device_start()
 	save_pointer(NAME(m_scsi_fifo[1]), 96);
 	save_pointer(NAME(m_enet_fifo[ENET_RECV]), 32);
 	save_pointer(NAME(m_enet_fifo[ENET_XMIT]), 40);
+
+	m_enet_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hpc3_device::enet_transmit), this));
 }
 
 void hpc3_device::device_reset()
@@ -181,14 +174,6 @@ void hpc3_device::device_reset()
 	m_cpu_aux_ctrl = 0;
 
 	memset(m_scsi_dma, 0, sizeof(scsi_dma_t) * 2);
-	memset(m_enet_dma, 0, sizeof(enet_dma_t) * 2);
-	m_enet_dmacfg = 0;
-	m_enet_piocfg = 0;
-
-	m_enet_dma[ENET_RECV].m_cbp = 0x80000000;
-	m_enet_dma[ENET_XMIT].m_cbp = 0x80000000;
-	m_enet_dma[ENET_RECV].m_nbdp = 0x80000000;
-	m_enet_dma[ENET_XMIT].m_nbdp = 0x80000000;
 
 	for (uint32_t i = 0; i < 8; i++)
 	{
@@ -207,6 +192,8 @@ void hpc3_device::device_reset()
 
 	m_intstat = 0;
 	m_dma_complete_int_cb(0);
+
+	m_enet_misc = MISC_RESET;
 }
 
 void hpc3_device::map(address_map &map)
@@ -224,7 +211,7 @@ void hpc3_device::map(address_map &map)
 	map(0x0003000c, 0x0003000f).r(FUNC(hpc3_device::intstat_r));
 	map(0x00040000, 0x00047fff).rw(FUNC(hpc3_device::hd_r<0>), FUNC(hpc3_device::hd_w<0>));
 	map(0x00048000, 0x0004ffff).rw(FUNC(hpc3_device::hd_r<1>), FUNC(hpc3_device::hd_w<1>));
-	map(0x00054000, 0x000544ff).rw(FUNC(hpc3_device::enet_r), FUNC(hpc3_device::enet_w));
+	map(0x00054000, 0x000544ff).m(m_enet, FUNC(seeq80c03_device::map)).umask64(0x000000ff000000ff);
 	map(0x00058000, 0x0005bfff).rw(FUNC(hpc3_device::pio_data_r), FUNC(hpc3_device::pio_data_w));
 	map(0x0005c000, 0x0005cfff).rw(FUNC(hpc3_device::dma_config_r), FUNC(hpc3_device::dma_config_w));
 	map(0x0005d000, 0x0005dfff).rw(FUNC(hpc3_device::pio_config_r), FUNC(hpc3_device::pio_config_w));
@@ -248,7 +235,7 @@ void hpc3_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		LOGMASKED(LOG_UNKNOWN, "HPC3: Ignoring active PBUS DMA on channel %d\n", id - TIMER_PBUS_DMA);
 		break;
 	default:
-		assert_always(false, "Unknown id in hpc3_device::device_timer");
+		throw emu_fatalerror("Unknown id in hpc3_device::device_timer");
 	}
 }
 
@@ -298,29 +285,6 @@ void hpc3_device::do_pbus_dma(uint32_t channel)
 	else
 	{
 		dma.m_timer->adjust(attotime::never);
-	}
-}
-
-READ32_MEMBER(hpc3_device::enet_r)
-{
-	switch (offset)
-	{
-		case 0x000/4:
-			LOGMASKED(LOG_ETHERNET, "%s: HPC3: enet_r: Read MAC Address bytes 0-3, 0x80675309 & %08x\n", machine().describe_context(), mem_mask);
-			return 0x80675309;
-		default:
-			LOGMASKED(LOG_ETHERNET, "%s: HPC3: enet_r: Read Unknown Register %08x & %08x\n", machine().describe_context(), 0x1fbd4000 + (offset << 2), mem_mask);
-			return 0;
-	}
-}
-
-WRITE32_MEMBER(hpc3_device::enet_w)
-{
-	switch (offset)
-	{
-		default:
-			LOGMASKED(LOG_ETHERNET, "%s: HPC3: enet_w: Write Unknown Register %08x = %08x & %08x\n", machine().describe_context(), 0x1fbd4000 + (offset << 2), data, mem_mask);
-			break;
 	}
 }
 
@@ -398,26 +362,26 @@ READ32_MEMBER(hpc3_device::hd_enet_r)
 		return m_scsi_dma[channel].m_piocfg;
 	}
 	case 0x4000/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver Current Buffer Pointer Read: %08x\n", machine().describe_context(), m_enet_dma[ENET_RECV].m_cbp);
-		return m_enet_dma[ENET_RECV].m_cbp;
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver Current Buffer Pointer Read: %08x\n", machine().describe_context(), m_enet_rx_cbp);
+		return m_enet_rx_cbp;
 	case 0x4004/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver Next Buffer Desc Pointer Read: %08x\n", machine().describe_context(), m_enet_dma[ENET_RECV].m_nbdp);
-		return m_enet_dma[ENET_RECV].m_nbdp;
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver Next Buffer Desc Pointer Read: %08x\n", machine().describe_context(), m_enet_rx_nbdp);
+		return m_enet_rx_nbdp;
 	case 0x5000/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver Buffer Count Read: %08x\n", machine().describe_context(), m_enet_dma[ENET_RECV].m_bc);
-		return m_enet_dma[ENET_RECV].m_bc;
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver Buffer Count Read: %08x\n", machine().describe_context(), m_enet_rx_bc);
+		return m_enet_rx_bc;
 	case 0x5004/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver DMA Control Read: %08x\n", machine().describe_context(), m_enet_dma[ENET_RECV].m_ctrl);
-		return m_enet_dma[ENET_RECV].m_ctrl;
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver DMA Control Read: %08x\n", machine().describe_context(), m_enet_rx_ctrl);
+		return m_enet_rx_ctrl;
 	case 0x5008/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver GIO FIFO Pointer Read: %08x\n", machine().describe_context(), m_enet_dma[ENET_RECV].m_gio_fifo_ptr);
-		return m_enet_dma[ENET_RECV].m_gio_fifo_ptr;
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver GIO FIFO Pointer Read: %08x\n", machine().describe_context(), m_enet_rx_gio);
+		return m_enet_rx_gio;
 	case 0x500c/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver Device FIFO Pointer Read: %08x\n", machine().describe_context(), m_enet_dma[ENET_RECV].m_dev_fifo_ptr);
-		return m_enet_dma[ENET_RECV].m_dev_fifo_ptr;
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver Device FIFO Pointer Read: %08x\n", machine().describe_context(), m_enet_rx_dev);
+		return m_enet_rx_dev;
 	case 0x5014/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Reset Register Read: %08x\n", machine().describe_context(), m_enet_reset);
-		return m_enet_reset;
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Reset Register Read: %08x\n", machine().describe_context(), m_enet_misc);
+		return m_enet_misc;
 	case 0x5018/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet DMA Config Read: %08x\n", machine().describe_context(), m_enet_dmacfg);
 		return m_enet_dmacfg;
@@ -425,23 +389,32 @@ READ32_MEMBER(hpc3_device::hd_enet_r)
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet PIO Config Read: %08x\n", machine().describe_context(), m_enet_piocfg);
 		return m_enet_piocfg;
 	case 0x6000/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Current Buffer Pointer Read: %08x\n", machine().describe_context(), m_enet_dma[ENET_XMIT].m_cbp);
-		return m_enet_dma[ENET_XMIT].m_cbp;
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Current Buffer Pointer Read: %08x\n", machine().describe_context(), m_enet_tx_cbp);
+		return m_enet_tx_cbp;
 	case 0x6004/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Next Buffer Desc Pointer Read: %08x\n", machine().describe_context(), m_enet_dma[ENET_XMIT].m_nbdp);
-		return m_enet_dma[ENET_XMIT].m_nbdp;
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Next Buffer Desc Pointer Read: %08x\n", machine().describe_context(), m_enet_tx_nbdp);
+		return m_enet_tx_nbdp;
 	case 0x7000/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Buffer Count Read: %08x\n", machine().describe_context(), m_enet_dma[ENET_XMIT].m_bc);
-		return m_enet_dma[ENET_XMIT].m_bc;
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Buffer Count Read: %08x\n", machine().describe_context(), m_enet_tx_bc);
+		return m_enet_tx_bc;
 	case 0x7004/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter DMA Control Read: %08x\n", machine().describe_context(), m_enet_dma[ENET_XMIT].m_ctrl);
-		return m_enet_dma[ENET_XMIT].m_ctrl;
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter DMA Control Read: %08x\n", machine().describe_context(), m_enet_tx_ctrl);
+		return m_enet_tx_ctrl;
 	case 0x7008/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter GIO FIFO Pointer Read: %08x\n", machine().describe_context(), m_enet_dma[ENET_XMIT].m_gio_fifo_ptr);
-		return m_enet_dma[ENET_XMIT].m_gio_fifo_ptr;
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter GIO FIFO Pointer Read: %08x\n", machine().describe_context(), m_enet_tx_gio);
+		return m_enet_tx_gio;
 	case 0x700c/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Device FIFO Pointer Read: %08x\n", machine().describe_context(), m_enet_dma[ENET_XMIT].m_dev_fifo_ptr);
-		return m_enet_dma[ENET_XMIT].m_dev_fifo_ptr;
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Device FIFO Pointer Read: %08x\n", machine().describe_context(), m_enet_tx_dev);
+		return m_enet_tx_dev;
+	case 0x8000/4:
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver Current Buffer Descriptor Pointer Read: %08x\n", machine().describe_context(), m_enet_rx_cbdp);
+		return m_enet_rx_cbdp;
+	case 0xa000/4:
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Current/Previous First Buffer Descriptor Pointer Read: %08x\n", machine().describe_context(), m_enet_tx_cpfbdp);
+		return m_enet_tx_cpfbdp;
+	case 0xa004/4:
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Previous/Previous First Buffer Descriptor Pointer Read: %08x\n", machine().describe_context(), m_enet_tx_ppfbdp);
+		return m_enet_tx_ppfbdp;
 	default:
 		LOGMASKED(LOG_UNKNOWN, "%s: Unknown HPC3 ENET/HDx Read: %08x & %08x\n", machine().describe_context(), 0x1fb90000 + (offset << 2), mem_mask);
 		return 0;
@@ -466,6 +439,7 @@ WRITE32_MEMBER(hpc3_device::hd_enet_w)
 		const uint32_t channel = (offset & 0x2000/4) ? 1 : 0;
 		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI%d Buffer Count Write: %08x\n", machine().describe_context(), channel, data);
 		m_scsi_dma[channel].m_bc = data;
+		break;
 	}
 	case 0x1004/4:
 	case 0x3004/4:
@@ -519,18 +493,21 @@ WRITE32_MEMBER(hpc3_device::hd_enet_w)
 	}
 	case 0x4000/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver Current Buffer Pointer Write: %08x\n", machine().describe_context(), data);
-		m_enet_dma[ENET_RECV].m_cbp = data;
+		m_enet_rx_cbp = data;
 		break;
 	case 0x4004/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver Next Buffer Desc Pointer Write: %08x\n", machine().describe_context(), data);
-		m_enet_dma[ENET_RECV].m_nbdp = data;
+		m_enet_rx_nbdp = data;
 		break;
 	case 0x5000/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver Buffer Count Write (ignored): %08x\n", machine().describe_context(), data);
 		break;
 	case 0x5004/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver DMA Control Write: %08x\n", machine().describe_context(), data);
-		m_enet_dma[ENET_RECV].m_ctrl = data;
+		if (m_enet_rx_ctrl & RXC_CAM)
+			m_enet_rx_ctrl = (m_enet_rx_ctrl & (RXC_LC | RXC_ST)) | (data & ~(RXC_CA | RXC_LC | RXC_ST));
+		else
+			m_enet_rx_ctrl = (m_enet_rx_ctrl & (RXC_LC | RXC_ST)) | (data & ~((RXC_LC | RXC_ST)));
 		break;
 	case 0x5008/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver GIO FIFO Pointer Write (ignored): %08x\n", machine().describe_context(), data);
@@ -540,7 +517,7 @@ WRITE32_MEMBER(hpc3_device::hd_enet_w)
 		break;
 	case 0x5014/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Reset Register Write: %08x\n", machine().describe_context(), data);
-		m_enet_reset = data;
+		enet_misc_w(data);
 		break;
 	case 0x5018/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet DMA Config Write: %08x\n", machine().describe_context(), data);
@@ -555,14 +532,20 @@ WRITE32_MEMBER(hpc3_device::hd_enet_w)
 		break;
 	case 0x6004/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Next Buffer Desc Pointer Write: %08x\n", machine().describe_context(), data);
-		m_enet_dma[ENET_XMIT].m_nbdp = data;
+		m_enet_tx_nbdp = data;
 		break;
 	case 0x7000/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Buffer Count Write (ignored): %08x\n", machine().describe_context(), data);
 		break;
 	case 0x7004/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter DMA Control Write: %08x\n", machine().describe_context(), data);
-		m_enet_dma[ENET_XMIT].m_ctrl = data;
+		if (m_enet_tx_ctrl & RXC_CAM)
+			m_enet_tx_ctrl = (m_enet_tx_ctrl & (TXC_LC | TXC_ST)) | (data & ~(TXC_CA | TXC_LC | TXC_ST));
+		else
+			m_enet_tx_ctrl = (m_enet_tx_ctrl & (TXC_LC | TXC_ST)) | (data & ~((TXC_LC | TXC_ST)));
+
+		if ((m_enet_tx_ctrl & TXC_CA) && !m_enet_tx_timer->enabled())
+			m_enet_tx_timer->adjust(attotime::zero);
 		break;
 	case 0x7008/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter GIO FIFO Pointer Write (ignored): %08x\n", machine().describe_context(), data);
@@ -570,35 +553,115 @@ WRITE32_MEMBER(hpc3_device::hd_enet_w)
 	case 0x700c/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Device FIFO Pointer Write (ignored): %08x\n", machine().describe_context(), data);
 		break;
+	case 0x8000/4:
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Receiver Current Buffer Descriptor Pointer Write: %08x\n", machine().describe_context(), data);
+		m_enet_rx_cbdp = data;
+		break;
+	case 0xa000/4:
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Current/Previous Buffer Descriptor Pointer Write: %08x\n", machine().describe_context(), data);
+		m_enet_tx_cpfbdp = data;
+		break;
+	case 0xa004/4:
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet Transmitter Previous/Previous Buffer Descriptor Pointer Write: %08x\n", machine().describe_context(), data);
+		m_enet_tx_ppfbdp = data;
+		break;
+
 	default:
 		LOGMASKED(LOG_UNKNOWN, "%s: Unknown HPC3 ENET/HDx write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fb90000 + (offset << 2), data, mem_mask);
 		break;
 	}
 }
 
-WRITE_LINE_MEMBER(hpc3_device::enet_txrdy_w)
+void hpc3_device::enet_rxrdy_w(int state)
 {
-	// TODO
+	// check receive dma enabled
+	if (state && (m_enet_rx_ctrl & RXC_CA))
+	{
+		// next descriptor becomes current
+		m_enet_rx_cbdp = m_enet_rx_nbdp;
+
+		// fetch the current descriptor
+		m_enet_rx_cbp = m_gio64_space->read_dword(m_enet_rx_cbdp + 0);
+		m_enet_rx_bc = m_gio64_space->read_dword(m_enet_rx_cbdp + 4);
+		m_enet_rx_nbdp = m_gio64_space->read_dword(m_enet_rx_cbdp + 8);
+
+		LOGMASKED(LOG_ETHERNET, "enet rx dma chain 0x%08x cbp 0x%08x bc 0x%08x nbdp 0x%08x\n",
+			m_enet_rx_cbdp, m_enet_rx_cbp, m_enet_rx_bc, m_enet_rx_nbdp);
+
+		// skip buffer alignment bytes
+		if (enet_rx_bc_dec(2))
+			m_enet_rx_cbp += 2;
+
+		// transfer data from edlc fifo to memory
+		while (!m_enet->rxeof_r())
+			if (enet_rx_bc_dec())
+				m_gio64_space->write_byte(m_enet_rx_cbp++, m_enet->fifo_r());
+	}
 }
 
-WRITE_LINE_MEMBER(hpc3_device::enet_rxrdy_w)
+void hpc3_device::enet_intr_in_w(int state)
 {
-	// TODO
-}
+	if (state)
+	{
+		bool interrupt = false;
 
-WRITE_LINE_MEMBER(hpc3_device::enet_rxdc_w)
-{
-	// TODO
-}
+		// copy edlc status registers
+		m_enet_rx_ctrl &= ~RXC_ST;
+		m_enet_rx_ctrl |= m_enet->read(6) & RXC_ST;
+		m_enet_tx_ctrl &= ~TXC_ST;
+		m_enet_tx_ctrl |= m_enet->read(7) & TXC_ST;
 
-WRITE_LINE_MEMBER(hpc3_device::enet_txret_w)
-{
-	// TODO
-}
+		LOGMASKED(LOG_ETHERNET, "rx status 0x%02x tx status 0x%02x\n",
+			u8(m_enet_rx_ctrl), u8(m_enet_tx_ctrl));
 
-WRITE_LINE_MEMBER(hpc3_device::enet_intr_in_w)
-{
-	// TODO
+		// tx interrupt
+		if (!(m_enet_tx_ctrl & TXC_ST_O))
+		{
+			// write txd and clear byte count
+			if (m_enet_tx_ctrl & TXC_ST_S)
+				m_gio64_space->write_word(m_enet_tx_cpfbdp + 6, BC_TXD);
+
+			// interrupt host if xie or error
+			if ((m_enet_tx_bc & BC_XIE) || (m_enet_tx_ctrl & (TXC_ST_U | TXC_ST_C | TXC_ST_R)))
+			{
+				// stop dma
+				// FIXME: do we always stop dma, or only on errors?
+				m_enet_tx_ctrl &= ~TXC_CA;
+
+				interrupt = true;
+			}
+
+			// transmit next packet
+			if (m_enet_tx_ctrl & TXC_CA)
+				m_enet_tx_timer->adjust(attotime::zero);
+		}
+
+		// rx interrupt
+		if (!(m_enet_rx_ctrl & RXC_ST_O))
+		{
+			// transfer the status byte
+			if (enet_rx_bc_dec())
+				m_gio64_space->write_byte(m_enet_rx_cbp++, u8(m_enet_rx_ctrl));
+
+			// store the remaining buffer length
+			m_gio64_space->write_word(m_enet_rx_cbdp + 6, u16(m_enet_rx_bc & BC_BC));
+
+			// check for edlc overflow, receive buffer overflow or end of descriptor chain
+			if ((m_enet_rx_ctrl & (RXC_ST_V | RXC_RBO)) || (m_enet_rx_bc & BC_EOX))
+			{
+				m_enet_rx_ctrl &= ~RXC_CA;
+				interrupt = true;
+			}
+			else if (m_enet_rx_bc & BC_XIE)
+				interrupt = true;
+		}
+
+		if (interrupt && !BIT(m_enet_misc, 1))
+		{
+			m_enet_misc |= MISC_INT;
+			m_enet_intr_out_cb(interrupt);
+		}
+	}
 }
 
 template<hpc3_device::fifo_type_t Type>
@@ -1044,4 +1107,76 @@ void hpc3_device::eeprom_w(uint32_t data)
 	m_eeprom_dato_cb(BIT(data, 3));
 	m_eeprom_cs_cb(BIT(data, 1));
 	m_eeprom_clk_cb(BIT(data, 2));
+}
+
+void hpc3_device::enet_transmit(void *ptr, int param)
+{
+	// save the first transmit buffer descriptor pointer
+	// TODO: not sure how cpfbdp and ppfbdp work, perhaps round-robin?
+	m_enet_tx_cpfbdp = m_enet_tx_nbdp;
+
+	bool done = false;
+	while (!done)
+	{
+		// fetch the current descriptor
+		m_enet_tx_cbp = m_gio64_space->read_dword(m_enet_tx_nbdp + 0);
+		m_enet_tx_bc = m_gio64_space->read_dword(m_enet_tx_nbdp + 4);
+		m_enet_tx_nbdp = m_gio64_space->read_dword(m_enet_tx_nbdp + 8);
+
+		LOGMASKED(LOG_ETHERNET, "enet tx dma chain 0x%08x cbp 0x%08x bc 0x%08x nbdp 0x%08x\n",
+			m_enet_tx_cpfbdp, m_enet_tx_cbp, m_enet_tx_bc, m_enet_tx_nbdp);
+
+		// TODO: write inter-packet gap from first descriptor to seeq
+		//if (BIT(m_enet_dmacfg, 12))
+		//  m_enet->write(2, u8(m_enet_tx_bc >> 16));
+
+		// transfer data from memory to edlc fifo
+		unsigned const count = m_enet_tx_bc & BC_BC;
+		for (unsigned i = 0; i < count; i++)
+			m_enet->fifo_w(m_gio64_space->read_byte(m_enet_tx_cbp + i));
+
+		// check for end of packet
+		if (m_enet_tx_bc & BC_EOXP)
+		{
+			m_enet->txeof_w(1);
+			done = true;
+		}
+
+		// check for end of chain
+		if (m_enet_tx_bc & BC_EOX)
+		{
+			// stop dma
+			m_enet_tx_ctrl &= ~TXC_CA;
+			done = true;
+		}
+	}
+}
+
+void hpc3_device::enet_misc_w(u32 data)
+{
+	// channel reset
+	m_enet->reset_w(!(data & MISC_RESET));
+	// TODO: reset ethernet dma state
+
+	// clear channel interrupt
+	if (data & MISC_INT)
+		m_enet_intr_out_cb(0);
+
+	// TODO: loopback
+
+	m_enet_misc = data & ~MISC_INT;
+}
+
+bool hpc3_device::enet_rx_bc_dec(unsigned const count)
+{
+	if ((m_enet_rx_bc & BC_BC) >= count)
+	{
+		m_enet_rx_bc = (m_enet_rx_bc & ~BC_BC) | (((m_enet_rx_bc & BC_BC) - count) & BC_BC);
+
+		return true;
+	}
+
+	// receive buffer overflow
+	m_enet_rx_ctrl |= RXC_RBO;
+	return false;
 }

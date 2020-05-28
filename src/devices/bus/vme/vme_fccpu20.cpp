@@ -254,7 +254,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void vme_fccpu20_device::cpu_space_map(address_map &map)
 {
-	map(0xfffffff2, 0xffffffff).lr16("bim irq", [this](offs_t offset) -> u16 { return m_bim->iack(offset+1); });
+	map(0xfffffff2, 0xffffffff).lr16(NAME([this](offs_t offset) -> u16 { return m_bim->iack(offset+1); }));
 }
 
 void vme_fccpu20_device::device_add_mconfig(machine_config &config)
@@ -459,9 +459,9 @@ void vme_fccpu20_device::device_start()
 #if 0 // TODO: Setup VME access handlers for shared memory area
 	uint32_t base = 0xFFFF5000;
 	m_vme->install_device(base + 0, base + 1, // Channel B - Data
-							 read8_delegate(FUNC(z80sio_device::db_r),  subdevice<z80sio_device>("pit")), write8_delegate(FUNC(z80sio_device::db_w), subdevice<z80sio_device>("pit")), 0x00ff);
+			read8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::db_r)), write8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::db_w)), 0x00ff);
 	m_vme->install_device(base + 2, base + 3, // Channel B - Control
-							 read8_delegate(FUNC(z80sio_device::cb_r),  subdevice<z80sio_device>("pit")), write8_delegate(FUNC(z80sio_device::cb_w), subdevice<z80sio_device>("pit")), 0x00ff);
+			read8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::cb_r)), write8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::cb_w)), 0x00ff);
 #endif
 }
 
@@ -558,14 +558,14 @@ void vme_fccpu20_device::update_irq_to_maincpu()
 #define BR8N38400  0x08
 #define FORCEBUG   0x30
 
-READ8_MEMBER (vme_fccpu20_device::pita_r)
+uint8_t vme_fccpu20_device::pita_r()
 {
 	LOG("%s\n", FUNCNAME);
 	return FORCEBUG | BR7N9600;
 }
 
 /* Enabling/Disabling of VME IRQ 1-7 */
-READ8_MEMBER (vme_fccpu20_device::pitb_r)
+uint8_t vme_fccpu20_device::pitb_r()
 {
 	LOG("%s\n", FUNCNAME);
 	return 0xff;
@@ -573,7 +573,7 @@ READ8_MEMBER (vme_fccpu20_device::pitb_r)
 
 /* VME board ID bit and bus release software settings (output) (ROR, RAT, RATAR, RATBCLR, RORAT, RORRAT */
 /* Bit 4 is bus available */
-READ8_MEMBER (vme_fccpu20_device::pitc_r)
+uint8_t vme_fccpu20_device::pitc_r()
 {
 	uint8_t board_id = 0;
 

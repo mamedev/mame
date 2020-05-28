@@ -5,7 +5,7 @@
     Tape support for RK format
 
 */
-#include <assert.h>
+#include <cassert>
 
 #include "rk_cas.h"
 

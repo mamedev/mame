@@ -112,7 +112,7 @@ void zaccaria_state::zaccaria_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(zaccaria_state::get_tile_info)
 {
 	uint8_t attr = m_videoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index] + ((attr & 0x03) << 8),
 			((attr & 0x0c) >> 2) + ((m_attributesram[2 * (tile_index % 32) + 1] & 0x07) << 2),
 			0);
@@ -128,7 +128,7 @@ TILE_GET_INFO_MEMBER(zaccaria_state::get_tile_info)
 
 void zaccaria_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(zaccaria_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zaccaria_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_cols(32);
 }
@@ -141,13 +141,13 @@ void zaccaria_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(zaccaria_state::videoram_w)
+void zaccaria_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(zaccaria_state::attributes_w)
+void zaccaria_state::attributes_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{

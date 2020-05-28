@@ -102,7 +102,7 @@ void jpms80_state::jpms80_map(address_map &map)
 void jpms80_state::jpms80_io_map(address_map &map)
 {
 	map.global_mask(0x3ff);
-//  AM_RANGE(0x0000, 0x001f) // I/O & Optic (in)
+//  map(0x0000, 0x001f) // I/O & Optic (in)
 	map(0x0000, 0x000f).w("outlatch0", FUNC(ls259_device::write_d0));
 	map(0x0010, 0x001f).w("outlatch1", FUNC(ls259_device::write_d0));
 	map(0x0020, 0x002f).w("outlatch2", FUNC(ls259_device::write_d0));
@@ -114,7 +114,7 @@ void jpms80_state::jpms80_io_map(address_map &map)
 	map(0x0080, 0x008f).w("outlatch8", FUNC(ls259_device::write_d0));
 	map(0x0090, 0x009f).w("outlatch9", FUNC(ls259_device::write_d0));
 	map(0x00a0, 0x00af).w("outlatch10", FUNC(ls259_device::write_d0));
-//  AM_RANGE(0x0380, 0x03bf) // AY
+//  map(0x0380, 0x03bf) // AY
 	map(0x03c0, 0x03ff).rw(m_acc, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
 //  Lamps, Meters etc. can move around
 }

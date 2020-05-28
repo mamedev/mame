@@ -28,6 +28,8 @@
 #include "emu.h"
 #include "733_asr.h"
 
+#include <algorithm>
+
 enum
 {
 	/*ASROutQueueSize = 32,*/
@@ -201,9 +203,11 @@ void asr733_device::linefeed()
 {
 	uint8_t buf[asr_window_width];
 
+	assert(asr_window_offset_x + asr_window_width <= m_bitmap->width());
+	assert(asr_window_offset_y + asr_window_height <= m_bitmap->height());
 	for (int y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
 	{
-		extract_scanline8(*m_bitmap, asr_window_offset_x, y+asr_scroll_step, asr_window_width, buf);
+		std::copy_n(&m_bitmap->pix16(y+asr_scroll_step, asr_window_offset_x), asr_window_width, buf);
 		draw_scanline8(*m_bitmap, asr_window_offset_x, y, asr_window_width, buf, palette().pens());
 	}
 
@@ -311,7 +315,7 @@ void asr733_device::receive_callback(int dummy)
     14: DSR data set ready, 1 if online
     15: INT interrupt, 1 if interrupt
 */
-READ8_MEMBER( asr733_device::cru_r )
+uint8_t asr733_device::cru_r(offs_t offset)
 {
 	int reply = 0;
 
@@ -342,7 +346,7 @@ READ8_MEMBER( asr733_device::cru_r )
     14: enable interrupts, 1 to enable interrupts
     15: diagnostic mode, 0 for normal mode
 */
-WRITE8_MEMBER( asr733_device::cru_w )
+void asr733_device::cru_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

@@ -188,7 +188,7 @@ static GFXDECODE_START( gfx_flkatck )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 32 )
 GFXDECODE_END
 
-WRITE8_MEMBER(flkatck_state::volume_callback)
+void flkatck_state::volume_callback(uint8_t data)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
@@ -225,7 +225,7 @@ void flkatck_state::flkatck(machine_config &config)
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);   /* NEC D780C-1, 3.579545MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &flkatck_state::flkatck_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

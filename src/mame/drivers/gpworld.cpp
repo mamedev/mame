@@ -81,12 +81,12 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_shared_ptr<uint8_t> m_palette_ram;
 	required_shared_ptr<uint8_t> m_tile_ram;
-	DECLARE_READ8_MEMBER(ldp_read);
-	DECLARE_READ8_MEMBER(pedal_in);
-	DECLARE_WRITE8_MEMBER(ldp_write);
-	DECLARE_WRITE8_MEMBER(misc_io_write);
-	DECLARE_WRITE8_MEMBER(brake_gas_write);
-	DECLARE_WRITE8_MEMBER(palette_write);
+	uint8_t ldp_read();
+	uint8_t pedal_in();
+	void ldp_write(uint8_t data);
+	void misc_io_write(uint8_t data);
+	void brake_gas_write(uint8_t data);
+	void palette_write(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback);
@@ -270,12 +270,12 @@ void gpworld_state::machine_start()
 
 /* MEMORY HANDLERS */
 /* READS */
-READ8_MEMBER(gpworld_state::ldp_read)
+uint8_t gpworld_state::ldp_read()
 {
 	return m_ldp_read_latch;
 }
 
-READ8_MEMBER(gpworld_state::pedal_in)
+uint8_t gpworld_state::pedal_in()
 {
 	if (m_brake_gas)
 		return  ioport("INACCEL")->read();
@@ -285,12 +285,12 @@ READ8_MEMBER(gpworld_state::pedal_in)
 }
 
 /* WRITES */
-WRITE8_MEMBER(gpworld_state::ldp_write)
+void gpworld_state::ldp_write(uint8_t data)
 {
 	m_ldp_write_latch = data;
 }
 
-WRITE8_MEMBER(gpworld_state::misc_io_write)
+void gpworld_state::misc_io_write(uint8_t data)
 {
 	m_start_lamp = (data & 0x04) >> 1;
 	m_nmi_enable = (data & 0x40) >> 6;
@@ -299,12 +299,12 @@ WRITE8_MEMBER(gpworld_state::misc_io_write)
 	logerror("NMI : %x (0x%x)\n", m_nmi_enable, data);
 }
 
-WRITE8_MEMBER(gpworld_state::brake_gas_write)
+void gpworld_state::brake_gas_write(uint8_t data)
 {
 	m_brake_gas = data & 0x01;
 }
 
-WRITE8_MEMBER(gpworld_state::palette_write)
+void gpworld_state::palette_write(offs_t offset, uint8_t data)
 {
 	/* This is all just a (bad) guess */
 	int pal_index, r, g, b, a;
@@ -332,9 +332,9 @@ void gpworld_state::mainmem(address_map &map)
 	map(0xc800, 0xcfff).ram().w(FUNC(gpworld_state::palette_write)).share("palette_ram"); /* The memory test reads at 0xc800 */
 	map(0xd000, 0xd7ff).ram().share("tile_ram");
 	map(0xd800, 0xd800).rw(FUNC(gpworld_state::ldp_read), FUNC(gpworld_state::ldp_write));
-/*  AM_RANGE(0xd801,0xd801) AM_READ(???) */
+/*  map(0xd801, 0xd801).r(FUNC(gpworld_state::???)); */
 	map(0xda00, 0xda00).portr("INWHEEL"); //8255 here....
-/*  AM_RANGE(0xda01,0xda01) AM_WRITE(???) */                 /* These inputs are interesting - there are writes and reads all over these addr's */
+/*  map(0xda01, 0xda01).w(FUNC(gpworld_state::???)); */                 /* These inputs are interesting - there are writes and reads all over these addr's */
 	map(0xda02, 0xda02).w(FUNC(gpworld_state::brake_gas_write));               /*bit 0 select gas/brake input */
 	map(0xda20, 0xda20).r(FUNC(gpworld_state::pedal_in));
 
@@ -462,7 +462,7 @@ void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in gpworld_state::device_timer");
+		throw emu_fatalerror("Unknown id in gpworld_state::device_timer");
 	}
 }
 

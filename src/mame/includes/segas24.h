@@ -152,13 +152,13 @@ private:
 	DECLARE_READ16_MEMBER(  iod_r );
 	DECLARE_WRITE16_MEMBER( iod_w );
 
-	READ8_MEMBER(dcclub_p1_r);
-	READ8_MEMBER(dcclub_p3_r);
-	READ8_MEMBER(mahmajn_input_line_r);
-	READ8_MEMBER(mahmajn_inputs_r);
+	uint8_t dcclub_p1_r();
+	uint8_t dcclub_p3_r();
+	uint8_t mahmajn_input_line_r();
+	uint8_t mahmajn_inputs_r();
 
-	WRITE8_MEMBER(mahmajn_mux_w);
-	WRITE8_MEMBER(hotrod_lamps_w);
+	void mahmajn_mux_w(uint8_t data);
+	void hotrod_lamps_w(uint8_t data);
 
 	void fdc_init();
 	void reset_reset();

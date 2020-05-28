@@ -18,10 +18,10 @@ DEFINE_DEVICE_TYPE(JAKKS_GAMEKEY_SLOT, jakks_gamekey_slot_device, "jakks_gamekey
 //  device_jakks_gamekey_interface - constructor
 //-------------------------------------------------
 
-device_jakks_gamekey_interface::device_jakks_gamekey_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0)
+device_jakks_gamekey_interface::device_jakks_gamekey_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "jakksgamekey"),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
 
@@ -57,7 +57,7 @@ void device_jakks_gamekey_interface::rom_alloc(uint32_t size, const char *tag)
 jakks_gamekey_slot_device::jakks_gamekey_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, JAKKS_GAMEKEY_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_jakks_gamekey_interface>(mconfig, *this),
 	m_type(JAKKS_GAMEKEY_PLAIN),
 	m_cart(nullptr)
 {
@@ -77,7 +77,7 @@ jakks_gamekey_slot_device::~jakks_gamekey_slot_device()
 
 void jakks_gamekey_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_jakks_gamekey_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 //-------------------------------------------------
@@ -204,18 +204,18 @@ std::string jakks_gamekey_slot_device::get_default_card_software(get_default_car
  read
  -------------------------------------------------*/
 
-READ16_MEMBER(jakks_gamekey_slot_device::read_cart)
+uint16_t jakks_gamekey_slot_device::read_cart(offs_t offset)
 {
-	return m_cart->read_cart(space, offset);
+	return m_cart->read_cart(offset);
 }
 
 /*-------------------------------------------------
  write
  -------------------------------------------------*/
 
-WRITE16_MEMBER(jakks_gamekey_slot_device::write_cart)
+void jakks_gamekey_slot_device::write_cart(offs_t offset, uint16_t data)
 {
-	m_cart->write_cart(space, offset, data);
+	m_cart->write_cart(offset, data);
 }
 
 /*-------------------------------------------------
@@ -231,7 +231,7 @@ uint8_t jakks_gamekey_slot_device::read_cart_seeprom(void)
  write seeprom
  -------------------------------------------------*/
 
-WRITE16_MEMBER(jakks_gamekey_slot_device::write_cart_seeprom)
+void jakks_gamekey_slot_device::write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_cart->write_cart_seeprom(space, offset, data);
+	m_cart->write_cart_seeprom(offset, data);
 }

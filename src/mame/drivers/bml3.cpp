@@ -30,6 +30,7 @@
 #include "bus/bml3/bml3mp1802.h"
 #include "bus/bml3/bml3mp1805.h"
 #include "bus/bml3/bml3kanji.h"
+#include "bus/bml3/bml3rtc.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -87,33 +88,42 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(mc6845_r);
-	DECLARE_WRITE8_MEMBER(mc6845_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_WRITE8_MEMBER(hres_reg_w);
-	DECLARE_WRITE8_MEMBER(vres_reg_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(psg_latch_r);
-	DECLARE_WRITE8_MEMBER(psg_latch_w);
-	DECLARE_READ8_MEMBER(vram_attr_r);
-	DECLARE_WRITE8_MEMBER(vram_attr_w);
-	DECLARE_READ8_MEMBER(beep_r);
-	DECLARE_WRITE8_MEMBER(beep_w);
-	DECLARE_WRITE8_MEMBER(piaA_w);
-	DECLARE_READ8_MEMBER(keyb_nmi_r);
-	DECLARE_WRITE8_MEMBER(firq_mask_w);
-	DECLARE_READ8_MEMBER(firq_status_r);
-	DECLARE_WRITE8_MEMBER(relay_w);
+	void bml3mk2(machine_config &config);
+	void bml3mk5(machine_config &config);
+	void bml3(machine_config &config);
+	void bml3_common(machine_config &config);
+	void bml3_mem(address_map &map);
+	void bml3mk2_mem(address_map &map);
+	void bml3mk5_mem(address_map &map);
+
+private:
+	uint8_t mc6845_r(offs_t offset);
+	void mc6845_w(offs_t offset, u8 data);
+	uint8_t keyboard_r();
+	void keyboard_w(u8 data);
+	void hres_reg_w(u8 data);
+	void vres_reg_w(u8 data);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, u8 data);
+	uint8_t psg_latch_r();
+	void psg_latch_w(u8 data);
+	uint8_t vram_attr_r();
+	void vram_attr_w(u8 data);
+	uint8_t beep_r();
+	void beep_w(u8 data);
+	void piaA_w(uint8_t data);
+	uint8_t keyb_nmi_r();
+	void firq_mask_w(u8 data);
+	uint8_t firq_status_r();
+	void relay_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(acia_rts_w);
 	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
 
-	DECLARE_READ8_MEMBER(a000_r); DECLARE_WRITE8_MEMBER(a000_w);
-	DECLARE_READ8_MEMBER(c000_r); DECLARE_WRITE8_MEMBER(c000_w);
-	DECLARE_READ8_MEMBER(e000_r); DECLARE_WRITE8_MEMBER(e000_w);
-	DECLARE_READ8_MEMBER(f000_r); DECLARE_WRITE8_MEMBER(f000_w);
-	DECLARE_READ8_MEMBER(fff0_r); DECLARE_WRITE8_MEMBER(fff0_w);
+	uint8_t a000_r(offs_t offset); void a000_w(offs_t offset, u8 data);
+	uint8_t c000_r(offs_t offset); void c000_w(offs_t offset, u8 data);
+	uint8_t e000_r(offs_t offset); void e000_w(offs_t offset, u8 data);
+	uint8_t f000_r(offs_t offset); void f000_w(offs_t offset, u8 data);
+	uint8_t fff0_r(offs_t offset); void fff0_w(offs_t offset, u8 data);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -122,17 +132,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	DECLARE_READ8_MEMBER(ym2203_r);
-	DECLARE_WRITE8_MEMBER(ym2203_w);
+	uint8_t ym2203_r();
+	void ym2203_w(u8 data);
 
-	void bml3mk2(machine_config &config);
-	void bml3mk5(machine_config &config);
-	void bml3(machine_config &config);
-	void bml3_common(machine_config &config);
-	void bml3_mem(address_map &map);
-	void bml3mk2_mem(address_map &map);
-	void bml3mk5_mem(address_map &map);
-private:
 	u8 m_hres_reg;
 	u8 m_crtc_vreg[0x100];
 	u8 m_psg_latch;
@@ -168,7 +170,7 @@ private:
 	required_device<palette_device> m_palette;
 };
 
-READ8_MEMBER( bml3_state::mc6845_r )
+u8 bml3_state::mc6845_r(offs_t offset)
 {
 	if (offset)
 		return m_crtc->register_r();
@@ -176,7 +178,7 @@ READ8_MEMBER( bml3_state::mc6845_r )
 		return m_crtc->status_r();
 }
 
-WRITE8_MEMBER( bml3_state::mc6845_w )
+void bml3_state::mc6845_w(offs_t offset, u8 data)
 {
 	if(offset == 0)
 	{
@@ -190,7 +192,7 @@ WRITE8_MEMBER( bml3_state::mc6845_w )
 	}
 }
 
-READ8_MEMBER( bml3_state::keyboard_r )
+u8 bml3_state::keyboard_r()
 {
 	u8 ret = m_keyb_scancode;
 	if (!machine().side_effects_disabled())
@@ -198,7 +200,7 @@ READ8_MEMBER( bml3_state::keyboard_r )
 	return ret;
 }
 
-WRITE8_MEMBER( bml3_state::keyboard_w )
+void bml3_state::keyboard_w(u8 data)
 {
 	m_keyb_katakana_led_on = BIT(data, 0);
 	m_keyb_hiragana_led_on = BIT(data, 1);
@@ -223,7 +225,7 @@ void bml3_state::m6845_change_clock(u8 setting)
 	m_crtc->set_unscaled_clock(m6845_clock);
 }
 
-WRITE8_MEMBER( bml3_state::hres_reg_w )
+void bml3_state::hres_reg_w(u8 data)
 {
 	// MODE SEL register (see service manual p.43).
 	/*
@@ -238,7 +240,7 @@ WRITE8_MEMBER( bml3_state::hres_reg_w )
 	m6845_change_clock((m_hres_reg & 0x80) | (m_vres_reg & 0x08));
 }
 
-WRITE8_MEMBER( bml3_state::vres_reg_w )
+void bml3_state::vres_reg_w(u8 data)
 {
 	// The MB-6890 had an interlaced video mode which was used for displaying Japanese (Hiragana and Katakana) text (8x16 character glyph bitmaps).
 	/*
@@ -250,7 +252,7 @@ WRITE8_MEMBER( bml3_state::vres_reg_w )
 }
 
 
-READ8_MEMBER( bml3_state::vram_r )
+u8 bml3_state::vram_r(offs_t offset)
 {
 	// Bit 7 masks reading back to the latch
 	if (!BIT(m_attr_latch, 7))
@@ -261,38 +263,38 @@ READ8_MEMBER( bml3_state::vram_r )
 	return m_p_videoram[offset];
 }
 
-WRITE8_MEMBER( bml3_state::vram_w )
+void bml3_state::vram_w(offs_t offset, u8 data)
 {
 	m_p_videoram[offset] = data;
 	// color ram is 5-bit
 	m_p_videoram[offset+0x4000] = m_attr_latch & 0x1F;
 }
 
-READ8_MEMBER( bml3_state::psg_latch_r)
+u8 bml3_state::psg_latch_r()
 {
 	return 0x7f;
 }
 
-WRITE8_MEMBER( bml3_state::psg_latch_w)
+void bml3_state::psg_latch_w(u8 data)
 {
 	m_psg_latch = data;
 }
 
-READ8_MEMBER(bml3_state::ym2203_r)
+u8 bml3_state::ym2203_r()
 {
 	u8 dev_offs = ((m_psg_latch & 3) != 3);
 
 	return m_ym2203->read(dev_offs);
 }
 
-WRITE8_MEMBER(bml3_state::ym2203_w)
+void bml3_state::ym2203_w(u8 data)
 {
 	u8 dev_offs = ((m_psg_latch & 3) != 3);
 
 	m_ym2203->write(dev_offs, data);
 }
 
-READ8_MEMBER( bml3_state::vram_attr_r)
+u8 bml3_state::vram_attr_r()
 {
 	// C-REG-SELECT register
 	// Reads from a VRAM address copy the corresponding 'colour RAM' address to the low-order 5 bits of this register as a side-effect
@@ -300,7 +302,7 @@ READ8_MEMBER( bml3_state::vram_attr_r)
 	return m_attr_latch;
 }
 
-WRITE8_MEMBER( bml3_state::vram_attr_w)
+void bml3_state::vram_attr_w(u8 data)
 {
 	// C-REG-SELECT register
 	// Writes to a VRAM address copy the low-order 5 bits of this register to the corresponding 'colour RAM' address as a side-effect
@@ -313,39 +315,39 @@ WRITE8_MEMBER( bml3_state::vram_attr_w)
 	m_attr_latch = data;
 }
 
-READ8_MEMBER( bml3_state::beep_r)
+u8 bml3_state::beep_r()
 {
 	return -1; // BEEP status read?
 }
 
-WRITE8_MEMBER( bml3_state::beep_w)
+void bml3_state::beep_w(u8 data)
 {
 	m_speaker->level_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER( bml3_state::relay_w )
+void bml3_state::relay_w(u8 data)
 {
 	m_cass->change_state(
 		BIT(data,7) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-READ8_MEMBER( bml3_state::a000_r) { return m_extram[offset + 0xa000]; }
-WRITE8_MEMBER( bml3_state::a000_w) { m_extram[offset + 0xa000] = data; }
-READ8_MEMBER( bml3_state::c000_r) { return m_extram[offset + 0xc000]; }
-WRITE8_MEMBER( bml3_state::c000_w) { m_extram[offset + 0xc000] = data; }
-READ8_MEMBER( bml3_state::e000_r) { return m_extram[offset + 0xe000]; }
-WRITE8_MEMBER( bml3_state::e000_w) { m_extram[offset + 0xe000] = data; }
-READ8_MEMBER( bml3_state::f000_r) { return m_extram[offset + 0xf000]; }
-WRITE8_MEMBER( bml3_state::f000_w) { m_extram[offset + 0xf000] = data; }
-READ8_MEMBER( bml3_state::fff0_r) { return m_extram[offset + 0xfff0]; }
-WRITE8_MEMBER( bml3_state::fff0_w) { m_extram[offset + 0xfff0] = data; }
+u8 bml3_state::a000_r(offs_t offset) { return m_extram[offset + 0xa000]; }
+void bml3_state::a000_w(offs_t offset, u8 data) { m_extram[offset + 0xa000] = data; }
+u8 bml3_state::c000_r(offs_t offset) { return m_extram[offset + 0xc000]; }
+void bml3_state::c000_w(offs_t offset, u8 data) { m_extram[offset + 0xc000] = data; }
+u8 bml3_state::e000_r(offs_t offset) { return m_extram[offset + 0xe000]; }
+void bml3_state::e000_w(offs_t offset, u8 data) { m_extram[offset + 0xe000] = data; }
+u8 bml3_state::f000_r(offs_t offset) { return m_extram[offset + 0xf000]; }
+void bml3_state::f000_w(offs_t offset, u8 data) { m_extram[offset + 0xf000] = data; }
+u8 bml3_state::fff0_r(offs_t offset) { return m_extram[offset + 0xfff0]; }
+void bml3_state::fff0_w(offs_t offset, u8 data) { m_extram[offset + 0xfff0] = data; }
 
-READ8_MEMBER( bml3_state::keyb_nmi_r)
+u8 bml3_state::keyb_nmi_r()
 {
 	return 0; // bit 7 used to signal a BREAK key pressure
 }
 
-WRITE8_MEMBER( bml3_state::firq_mask_w)
+void bml3_state::firq_mask_w(u8 data)
 {
 	m_firq_mask = data & 0x80;
 	if(m_firq_mask)
@@ -355,7 +357,7 @@ WRITE8_MEMBER( bml3_state::firq_mask_w)
 	}
 }
 
-READ8_MEMBER( bml3_state::firq_status_r )
+u8 bml3_state::firq_status_r()
 {
 	u8 res = m_firq_status << 7;
 	m_firq_status = 0;
@@ -381,11 +383,11 @@ void bml3_state::bml3_mem(address_map &map)
 	// TIMER - System timer enable
 	map(0xffca, 0xffca).r(FUNC(bml3_state::firq_status_r)); // timer irq
 	// LPFLG - Light pen interrupt
-//  AM_RANGE(0xffcb, 0xffcb)
+//  map(0xffcb, 0xffcb)
 	// MODE_SEL - Graphics mode select
 	map(0xffd0, 0xffd0).w(FUNC(bml3_state::hres_reg_w));
 	// TRACE - Trace counter
-//  AM_RANGE(0xffd1, 0xffd1)
+//  map(0xffd1, 0xffd1)
 	// REMOTE - Remote relay control for cassette - bit 7
 	map(0xffd2, 0xffd2).w(FUNC(bml3_state::relay_w));
 	// MUSIC_SEL - Music select: toggle audio output level when rising
@@ -396,14 +398,14 @@ void bml3_state::bml3_mem(address_map &map)
 	map(0xffd5, 0xffd5).noprw();
 	// INTERLACE_SEL - Interlaced video mode (manual has "INTERACE SEL"!)
 	map(0xffd6, 0xffd6).w(FUNC(bml3_state::vres_reg_w));
-//  AM_RANGE(0xffd7, 0xffd7) baud select
+//  map(0xffd7, 0xffd7) baud select
 	// C_REG_SEL - Attribute register (character/video mode and colours)
 	map(0xffd8, 0xffd8).rw(FUNC(bml3_state::vram_attr_r), FUNC(bml3_state::vram_attr_w));
 	// KB - Keyboard mode register, interrupt control, keyboard LEDs
 	map(0xffe0, 0xffe0).rw(FUNC(bml3_state::keyboard_r), FUNC(bml3_state::keyboard_w));
-//  AM_RANGE(0xffe8, 0xffe8) bank register
-//  AM_RANGE(0xffe9, 0xffe9) IG mode register
-//  AM_RANGE(0xffea, 0xffea) IG enable register
+//  map(0xffe8, 0xffe8) bank register
+//  map(0xffe9, 0xffe9) IG mode register
+//  map(0xffea, 0xffea) IG enable register
 	map(0xa000, 0xfeff).rom().region("maincpu", 0xa000);
 	map(0xfff0, 0xffff).rom().region("maincpu", 0xfff0);
 	map(0xa000, 0xbfff).w(FUNC(bml3_state::a000_w));
@@ -766,16 +768,16 @@ void bml3_state::machine_reset()
 	/* defaults */
 	mem.install_rom(0xa000, 0xfeff,memregion("maincpu")->base() + 0xa000);
 	mem.install_rom(0xfff0, 0xffff,memregion("maincpu")->base() + 0xfff0);
-	mem.install_write_handler(0xa000, 0xbfff, write8_delegate(FUNC(bml3_state::a000_w), this),0);
-	mem.install_write_handler(0xc000, 0xdfff, write8_delegate(FUNC(bml3_state::c000_w), this),0);
-	mem.install_write_handler(0xe000, 0xefff, write8_delegate(FUNC(bml3_state::e000_w), this),0);
-	mem.install_write_handler(0xf000, 0xfeff, write8_delegate(FUNC(bml3_state::f000_w), this),0);
-	mem.install_write_handler(0xfff0, 0xffff, write8_delegate(FUNC(bml3_state::fff0_w), this),0);
+	mem.install_write_handler(0xa000, 0xbfff, write8sm_delegate(*this, FUNC(bml3_state::a000_w)), 0);
+	mem.install_write_handler(0xc000, 0xdfff, write8sm_delegate(*this, FUNC(bml3_state::c000_w)), 0);
+	mem.install_write_handler(0xe000, 0xefff, write8sm_delegate(*this, FUNC(bml3_state::e000_w)), 0);
+	mem.install_write_handler(0xf000, 0xfeff, write8sm_delegate(*this, FUNC(bml3_state::f000_w)), 0);
+	mem.install_write_handler(0xfff0, 0xffff, write8sm_delegate(*this, FUNC(bml3_state::fff0_w)), 0);
 
 	m_firq_mask = -1; // disable firq
 }
 
-WRITE8_MEMBER(bml3_state::piaA_w)
+void bml3_state::piaA_w(uint8_t data)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	/* ROM banking:
@@ -798,16 +800,17 @@ WRITE8_MEMBER(bml3_state::piaA_w)
 		if(data & 0x40)
 		{
 			mem.install_readwrite_handler(0xa000, 0xbfff,
-				read8_delegate(FUNC(bml3_state::a000_r), this),
-				write8_delegate(FUNC(bml3_state::a000_w), this), 0);
+					read8sm_delegate(*this, FUNC(bml3_state::a000_r)),
+					write8sm_delegate(*this, FUNC(bml3_state::a000_w)),
+					0);
 		}
 		else
 		{
 			mem.install_rom(0xa000, 0xbfff,
-				memregion("maincpu")->base() + 0xa000);
+					memregion("maincpu")->base() + 0xa000);
 			mem.install_write_handler(0xa000, 0xbfff,
-				write8_delegate(FUNC(bml3_state::a000_w), this),
-				0);
+					write8sm_delegate(*this, FUNC(bml3_state::a000_w)),
+					0);
 		}
 	}
 
@@ -816,16 +819,17 @@ WRITE8_MEMBER(bml3_state::piaA_w)
 		if(data & 0x40)
 		{
 			mem.install_readwrite_handler(0xc000, 0xdfff,
-				read8_delegate(FUNC(bml3_state::c000_r), this),
-				write8_delegate(FUNC(bml3_state::c000_w), this), 0);
+					read8sm_delegate(*this, FUNC(bml3_state::c000_r)),
+					write8sm_delegate(*this, FUNC(bml3_state::c000_w)),
+					0);
 		}
 		else
 		{
 			mem.install_rom(0xc000, 0xdfff,
-				memregion("maincpu")->base() + 0xc000);
+					memregion("maincpu")->base() + 0xc000);
 			mem.install_write_handler(0xc000, 0xdfff,
-				write8_delegate(FUNC(bml3_state::c000_w), this),
-				0);
+					write8sm_delegate(*this, FUNC(bml3_state::c000_w)),
+					0);
 		}
 	}
 
@@ -834,47 +838,50 @@ WRITE8_MEMBER(bml3_state::piaA_w)
 		if(data & 0x80)
 		{
 			mem.install_readwrite_handler(0xe000, 0xefff,
-				read8_delegate(FUNC(bml3_state::e000_r), this),
-				write8_delegate(FUNC(bml3_state::e000_w), this), 0);
+					read8sm_delegate(*this, FUNC(bml3_state::e000_r)),
+					write8sm_delegate(*this, FUNC(bml3_state::e000_w)),
+					0);
 		}
 		else
 		{
 			mem.install_rom(0xe000, 0xefff,
-				memregion("maincpu")->base() + 0xe000);
+					memregion("maincpu")->base() + 0xe000);
 			mem.install_write_handler(0xe000, 0xefff,
-				write8_delegate(FUNC(bml3_state::e000_w), this),
-				0);
+					write8sm_delegate(*this, FUNC(bml3_state::e000_w)),
+					0);
 		}
 	}
 
 	if(data & 1)
 	{
 		mem.install_readwrite_handler(0xf000, 0xfeff,
-			read8_delegate(FUNC(bml3_state::f000_r), this),
-			write8_delegate(FUNC(bml3_state::f000_w), this), 0);
+				read8sm_delegate(*this, FUNC(bml3_state::f000_r)),
+				write8sm_delegate(*this, FUNC(bml3_state::f000_w)),
+				0);
 	}
 	else
 	{
 		mem.install_rom(0xf000, 0xfeff,
-			memregion("maincpu")->base() + 0xf000);
+				memregion("maincpu")->base() + 0xf000);
 		mem.install_write_handler(0xf000, 0xfeff,
-			write8_delegate(FUNC(bml3_state::f000_w), this),
-			0);
+				write8sm_delegate(*this, FUNC(bml3_state::f000_w)),
+				0);
 	}
 
 	if(data & 2)
 	{
 		mem.install_readwrite_handler(0xfff0, 0xffff,
-			read8_delegate(FUNC(bml3_state::fff0_r), this),
-			write8_delegate(FUNC(bml3_state::fff0_w), this), 0);
+				read8sm_delegate(*this, FUNC(bml3_state::fff0_r)),
+				write8sm_delegate(*this, FUNC(bml3_state::fff0_w)),
+				0);
 	}
 	else
 	{
 		mem.install_rom(0xfff0, 0xffff,
-			memregion("maincpu")->base() + 0xfff0);
+				memregion("maincpu")->base() + 0xfff0);
 		mem.install_write_handler(0xfff0, 0xffff,
-			write8_delegate(FUNC(bml3_state::fff0_w), this),
-			0);
+				write8sm_delegate(*this, FUNC(bml3_state::fff0_w)),
+				0);
 	}
 }
 
@@ -909,6 +916,7 @@ static void bml3_cards(device_slot_interface &device)
 	device.option_add("bml3mp1802", BML3BUS_MP1802); // MP-1802 Floppy Controller Card
 	device.option_add("bml3mp1805", BML3BUS_MP1805); // MP-1805 Floppy Controller Card
 	device.option_add("bml3kanji",  BML3BUS_KANJI);
+	device.option_add("bml3rtc",    BML3BUS_RTC);
 }
 
 
@@ -936,7 +944,7 @@ void bml3_state::bml3_common(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(bml3_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(bml3_state::crtc_update_row));
 
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.
@@ -965,22 +973,21 @@ void bml3_state::bml3_common(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* slot devices */
-	bml3bus_device &bus(BML3BUS(config, "bml3bus", 0));
-	bus.set_space(m_maincpu, AS_PROGRAM);
-	bus.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	bus.irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
-	bus.firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
-	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes
-	   the MP-1805 ROM.
+	BML3BUS(config, m_bml3bus, 0);
+	m_bml3bus->set_space(m_maincpu, AS_PROGRAM);
+	m_bml3bus->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_bml3bus->irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	m_bml3bus->firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes the MP-1805 ROM.
 	   User may want to switch this to MP-1802 (5.25" DS/DD).
 	   Note it isn't feasible to use both, as they each place boot ROM at F800.
 	 */
-	BML3BUS_SLOT(config, "sl1", "bml3bus", bml3_cards, "bml3mp1805");
-	BML3BUS_SLOT(config, "sl2", "bml3bus", bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl3", "bml3bus", bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl4", "bml3bus", bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl5", "bml3bus", bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl6", "bml3bus", bml3_cards, "bml3kanji");
+	BML3BUS_SLOT(config, "sl1", m_bml3bus, bml3_cards, "bml3mp1805");
+	BML3BUS_SLOT(config, "sl2", m_bml3bus, bml3_cards, "bml3rtc");
+	BML3BUS_SLOT(config, "sl3", m_bml3bus, bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl4", m_bml3bus, bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl5", m_bml3bus, bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl6", m_bml3bus, bml3_cards, "bml3kanji");
 }
 
 void bml3_state::bml3(machine_config &config)

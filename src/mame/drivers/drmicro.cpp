@@ -55,7 +55,7 @@ WRITE_LINE_MEMBER(drmicro_state::pcm_w)
 		if (~m_pcm_adr & 1)
 			data >>= 4;
 
-		m_msm->write_data(data & 0x0f);
+		m_msm->data_w(data & 0x0f);
 		m_msm->reset_w(0);
 
 		m_pcm_adr = (m_pcm_adr + 1) & 0x7fff;
@@ -248,7 +248,7 @@ void drmicro_state::drmicro(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &drmicro_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(drmicro_state::drmicro_interrupt));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

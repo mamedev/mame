@@ -36,26 +36,28 @@ public:
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
-	virtual iodevice_t image_type() const override { return IO_SNAPSHOT; }
+	virtual iodevice_t image_type() const noexcept override { return IO_SNAPSHOT; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return m_interface; }
-	virtual const char *file_extensions() const override { return m_file_extensions; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *image_interface() const noexcept override { return m_interface; }
+	virtual const char *file_extensions() const noexcept override { return m_file_extensions; }
 
 	void set_extensions(const char *ext) { m_file_extensions = ext; }
 	void set_delay(attotime delay) { m_delay = delay; }
-	template <typename... T> void set_load_callback(T &&... args) { m_load = load_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_load_callback(T &&... args) { m_load.set(std::forward<T>(args)...); }
 
 protected:
 	snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 	TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload);
 
@@ -83,7 +85,7 @@ public:
 	}
 	quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
-	virtual iodevice_t image_type() const override { return IO_QUICKLOAD; }
+	virtual iodevice_t image_type() const noexcept override { return IO_QUICKLOAD; }
 };
 
 // device type definition

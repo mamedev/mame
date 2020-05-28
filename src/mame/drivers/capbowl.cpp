@@ -90,6 +90,7 @@
 #include "emu.h"
 #include "includes/capbowl.h"
 
+#include "machine/rescap.h"
 #include "machine/ticket.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
@@ -130,7 +131,7 @@ void capbowl_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		update(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in capbowl_state::device_timer");
+		throw emu_fatalerror("Unknown id in capbowl_state::device_timer");
 	}
 }
 

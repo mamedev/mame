@@ -7,15 +7,15 @@
 
 #include "screen.h"
 
-typedef device_delegate<void (u32 &colour, u32 &pri_mask)> decmxc06_colpri_cb_delegate;
-
 class deco_mxc06_device : public device_t, public device_video_interface
 {
 public:
+	typedef device_delegate<void (u32 &colour, u32 &pri_mask)> colpri_cb_delegate;
+
 	deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb = decmxc06_colpri_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb.set(std::forward<T>(args)...); }
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, u16* spriteram, int size);
 	void draw_sprites_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, u16* spriteram, int size);
@@ -34,7 +34,7 @@ private:
 		bool flipx, flipy;
 		u32 pri_mask;
 	};
-	decmxc06_colpri_cb_delegate m_colpri_cb;
+	colpri_cb_delegate m_colpri_cb;
 	bool m_flip_screen;
 	std::unique_ptr<struct sprite_t[]> m_spritelist;
 };

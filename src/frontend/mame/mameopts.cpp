@@ -18,7 +18,7 @@
 #include "hashfile.h"
 #include "clifront.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <stack>
 
 
@@ -130,7 +130,7 @@ void mame_options::parse_one_ini(emu_options &options, const char *basename, int
 	// open the file; if we fail, that's ok
 	emu_file file(options.ini_path(), OPEN_FLAG_READ);
 	osd_printf_verbose("Attempting load of %s.ini\n", basename);
-	osd_file::error filerr = file.open(basename, ".ini");
+	osd_file::error filerr = file.open(std::string(basename) + ".ini");
 	if (filerr != osd_file::error::NONE)
 		return;
 
@@ -143,7 +143,7 @@ void mame_options::parse_one_ini(emu_options &options, const char *basename, int
 	catch (options_exception &ex)
 	{
 		if (error_stream)
-			util::stream_format(*error_stream, "While parsing %s:\n%s\n", ex.message(), file.fullpath(), ex.message());
+			util::stream_format(*error_stream, "While parsing %s:\n%s\n", file.fullpath(), ex.message());
 		return;
 	}
 

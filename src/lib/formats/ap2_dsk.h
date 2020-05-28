@@ -23,7 +23,7 @@
 
 #define APPLE2_NIBBLE_SIZE              416
 #define APPLE2_SMALL_NIBBLE_SIZE        374
-//#define APPLE2_TRACK_COUNT              35
+#define APPLE2_STD_TRACK_COUNT          35
 #define APPLE2_TRACK_COUNT              40
 #define APPLE2_SECTOR_COUNT             16
 #define APPLE2_SECTOR_SIZE              256

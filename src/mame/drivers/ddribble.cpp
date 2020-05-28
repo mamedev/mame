@@ -68,7 +68,7 @@ WRITE8_MEMBER(ddribble_state::ddribble_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(1,(data >> 1) & 0x01);
 }
 
-READ8_MEMBER(ddribble_state::ddribble_vlm5030_busy_r)
+uint8_t ddribble_state::ddribble_vlm5030_busy_r()
 {
 	return machine().rand(); /* patch */
 	/* FIXME: remove ? */
@@ -78,7 +78,7 @@ READ8_MEMBER(ddribble_state::ddribble_vlm5030_busy_r)
 #endif
 }
 
-WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
+void ddribble_state::ddribble_vlm5030_ctrl_w(uint8_t data)
 {
 	/* b7 : vlm data bus OE   */
 
@@ -269,7 +269,7 @@ void ddribble_state::ddribble(machine_config &config)
 	mc6809e_device &cpu2(MC6809E(config, "cpu2", XTAL(18'432'000)/12));  /* verified on pcb */
 	cpu2.set_addrmap(AS_PROGRAM, &ddribble_state::cpu2_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* we need heavy synch */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* we need heavy synch */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

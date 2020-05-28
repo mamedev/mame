@@ -397,7 +397,7 @@ void sr_state::starrider(machine_config &config)
 	m_main_pia1->readpa_handler().set_ioport("IN2");
 	// CA1 is the /END SCREEN signal
 	// CA2 is the 4MS signal
-	m_main_pia1->writepb_handler().set(m_sound_pia1, FUNC(pia6821_device::write_portb));
+	m_main_pia1->writepb_handler().set(m_sound_pia1, FUNC(pia6821_device::portb_w));
 	m_main_pia1->cb2_handler().set(m_sound_pia1, FUNC(pia6821_device::ca1_w));
 	m_main_pia1->irqa_handler().set("main.irq", FUNC(input_merger_device::in_w<0>));
 	m_main_pia1->irqb_handler().set("main.irq", FUNC(input_merger_device::in_w<1>));
@@ -567,7 +567,9 @@ void sr_state::cpu_wd_w(u8 data)
 {
 	// U22 (74LS161) parallel load zero
 	if ((data & 0x3e) == 0x14)
-		/* TODO: watchdog reset */;
+	{
+		/* TODO: watchdog reset */
+	}
 }
 
 u8 sr_state::cpu_nvram_r(address_space &space, offs_t offset)
@@ -753,7 +755,7 @@ void sr_state::sound_pia2_pa(u8 data)
 	m_sound_pia2_pa_out = data;
 	if (diff & ~m_sound_pia2_pb_in & 0x77U)
 	{
-		m_sound_pia2->write_portb(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
+		m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
 		m_sound_pia2->ca1_w((0x07U == ((m_sound_pia2_pb_in | m_sound_pia2_pa_out) & 0x07U)) ? 1 : 0);
 		m_sound_pia2->ca2_w((0x70U == ((m_sound_pia2_pb_in | m_sound_pia2_pa_out) & 0x70U)) ? 1 : 0);
 	}
@@ -765,7 +767,7 @@ DECLARE_WRITE_LINE_MEMBER(sr_state::sound_fifo0_ir)
 		m_sound_pia2_pb_in |= 0x08U;
 	else
 		m_sound_pia2_pb_in &= 0xf7U;
-	m_sound_pia2->write_portb(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
+	m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
 }
 
 DECLARE_WRITE_LINE_MEMBER(sr_state::sound_fifo1_ir)
@@ -774,7 +776,7 @@ DECLARE_WRITE_LINE_MEMBER(sr_state::sound_fifo1_ir)
 		m_sound_pia2_pb_in |= 0x80U;
 	else
 		m_sound_pia2_pb_in &= 0x7fU;
-	m_sound_pia2->write_portb(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
+	m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
 }
 
 template <unsigned N> WRITE_LINE_MEMBER(sr_state::sound_fifo_or)
@@ -785,7 +787,7 @@ template <unsigned N> WRITE_LINE_MEMBER(sr_state::sound_fifo_or)
 		m_sound_pia2_pb_in &= ~(u8(1) << (N + 4));
 	if (!BIT(m_sound_pia2_pa_out, N + 4))
 	{
-		m_sound_pia2->write_portb(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
+		m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
 		m_sound_pia2->ca2_w((0x70U == ((m_sound_pia2_pb_in | m_sound_pia2_pa_out) & 0x70U)) ? 1 : 0);
 	}
 }
@@ -798,7 +800,7 @@ template <unsigned N> WRITE_LINE_MEMBER(sr_state::sound_fifo_flag)
 		m_sound_pia2_pb_in &= ~(u8(1) << N);
 	if (!BIT(m_sound_pia2_pa_out, N))
 	{
-		m_sound_pia2->write_portb(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
+		m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
 		m_sound_pia2->ca1_w((0x07U == ((m_sound_pia2_pb_in | m_sound_pia2_pa_out) & 0x07U)) ? 1 : 0);
 	}
 }

@@ -64,7 +64,7 @@ DEFINE_DEVICE_TYPE(COPERA_CART_SLOT, copera_cart_slot_device, "copera_cart_slot"
 //-------------------------------------------------
 
 device_md_cart_interface::device_md_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device), m_nvram_start(0), m_nvram_end(0), m_nvram_active(0), m_nvram_readonly(0), m_nvram_handlers_installed(0),
+	: device_interface(device, "mdcart"), m_nvram_start(0), m_nvram_end(0), m_nvram_active(0), m_nvram_readonly(0), m_nvram_handlers_installed(0),
 		m_rom(nullptr),
 		m_rom_size(0)
 {
@@ -163,7 +163,7 @@ uint32_t device_md_cart_interface::get_padded_size(uint32_t size)
 base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_md_cart_interface>(mconfig, *this),
 	m_type(SEGA_STD), m_cart(nullptr),
 	m_must_be_loaded(1)
 {
@@ -198,7 +198,7 @@ base_md_cart_slot_device::~base_md_cart_slot_device()
 
 void base_md_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_md_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 

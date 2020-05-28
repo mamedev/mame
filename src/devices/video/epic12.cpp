@@ -933,22 +933,22 @@ void epic12_device::install_handlers(int addr1, int addr2)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	read32_delegate read;
-	write32_delegate write;
+	read32_delegate read(*this);
+	write32_delegate write(*this);
 
 	if (m_is_unsafe)
 	{
 		printf("using unsafe blit code!\n");
-		read = read32_delegate(FUNC(epic12_device::blitter_r_unsafe), this);
-		write = write32_delegate(FUNC(epic12_device::blitter_w_unsafe), this);
+		read = read32_delegate(*this, FUNC(epic12_device::blitter_r_unsafe));
+		write = write32_delegate(*this, FUNC(epic12_device::blitter_w_unsafe));
 	}
 	else
 	{
-		read = read32_delegate(FUNC(epic12_device::blitter_r), this);
-		write = write32_delegate(FUNC(epic12_device::blitter_w), this);
+		read = read32_delegate(*this, FUNC(epic12_device::blitter_r));
+		write = write32_delegate(*this, FUNC(epic12_device::blitter_w));
 	}
 
-	space.install_readwrite_handler(addr1, addr2, read , write, 0xffffffffffffffffU);
+	space.install_readwrite_handler(addr1, addr2, std::move(read), std::move(write), 0xffffffffffffffffU);
 }
 
 u64 epic12_device::fpga_r()

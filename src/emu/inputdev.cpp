@@ -277,7 +277,8 @@ input_device::~input_device()
 
 input_item_id input_device::add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal)
 {
-	assert_always(machine().phase() == machine_phase::INIT, "Can only call input_device::add_item at init time!");
+	if (machine().phase() != machine_phase::INIT)
+		throw emu_fatalerror("Can only call input_device::add_item at init time!");
 	assert(name != nullptr);
 	assert(itemid > ITEM_ID_INVALID && itemid < ITEM_ID_MAXIMUM);
 	assert(getstate != nullptr);
@@ -422,7 +423,7 @@ input_device_joystick::input_device_joystick(input_manager &manager, const char 
 		m_joymap.parse(input_class_joystick::map_8way);
 	}
 	else if (mapstring != input_class_joystick::map_8way)
-		osd_printf_verbose("Input: Default joystick map = %s\n", m_joymap.to_string().c_str());
+		osd_printf_verbose("Input: Default joystick map = %s\n", m_joymap.to_string());
 }
 
 
@@ -494,7 +495,8 @@ input_class::~input_class()
 
 input_device *input_class::add_device(const char *name, const char *id, void *internal)
 {
-	assert_always(machine().phase() == machine_phase::INIT, "Can only call input_class::add_device at init time!");
+	if (machine().phase() != machine_phase::INIT)
+		throw emu_fatalerror("Can only call input_class::add_device at init time!");
 	assert(name != nullptr);
 	assert(id != nullptr);
 
@@ -646,7 +648,7 @@ bool input_class_joystick::set_global_joystick_map(const char *mapstring)
 	if (!map.parse(mapstring))
 		return false;
 
-	osd_printf_verbose("Input: Changing default joystick map = %s\n", map.to_string().c_str());
+	osd_printf_verbose("Input: Changing default joystick map = %s\n", map.to_string());
 
 	// iterate over joysticks and set the map
 	for (int joynum = 0; joynum <= maxindex(); joynum++)

@@ -8,7 +8,7 @@
 
 *********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 #include "pc98fdi_dsk.h"
 
 pc98fdi_format::pc98fdi_format()

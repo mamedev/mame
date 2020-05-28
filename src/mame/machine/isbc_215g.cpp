@@ -373,7 +373,7 @@ void isbc_215g_device::device_add_mconfig(machine_config &config)
 
 
 ROM_START( isbc_215g )
-	ROM_REGION( 0x4000, "i8089", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x4000, "i8089", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "174581.001.bin", 0x0000, 0x2000, CRC(ccdbc7ab) SHA1(5c2ebdde1b0252124177221ba9cacdb6d925a24d))
 	ROM_LOAD16_BYTE( "174581.002.bin", 0x0001, 0x2000, CRC(6190fa67) SHA1(295dd4e75f699aaf93227cc4876cee8accae383a))
 ROM_END

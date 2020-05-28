@@ -155,7 +155,7 @@ void lb186_state::lb186(machine_config &config)
 }
 
 ROM_START( lb186 )
-	ROM_REGION(0x4000, "bios", 0)
+	ROM_REGION16_LE(0x4000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v335", "BIOS Version 3.35") // 28 January 1987
 	ROMX_LOAD("a75515_v3.35.rom", 0x0000, 0x2000, CRC(245824fb) SHA1(b39ed91d421513f5912fdbc290aaa3f1b7d4f1e0), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("a75516_v3.35.rom", 0x0001, 0x2000, CRC(9d9a5e22) SHA1(070be31c622f50508e8cbdb797c79978b6a4b8f6), ROM_SKIP(1) | ROM_BIOS(0))

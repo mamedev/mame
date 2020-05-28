@@ -137,9 +137,9 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(hardhea2_interrupt);
 
 	// samples
-	DECLARE_WRITE8_MEMBER(suna8_play_samples_w);
-	DECLARE_WRITE8_MEMBER(rranger_play_samples_w);
-	DECLARE_WRITE8_MEMBER(suna8_samples_number_w);
+	void suna8_play_samples_w(uint8_t data);
+	void rranger_play_samples_w(uint8_t data);
+	void suna8_samples_number_w(uint8_t data);
 	void play_sample(int index);
 	SAMPLES_START_CB_MEMBER(sh_start);
 
@@ -155,6 +155,8 @@ private:
 	void brickzn_sound_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void hardhea2_map(address_map &map);
+	void hardhea2b_map(address_map &map);
+	void hardhea2b_decrypted_opcodes_map(address_map &map);
 	void hardhead_io_map(address_map &map);
 	void hardhead_map(address_map &map);
 	void hardhead_sound_io_map(address_map &map);

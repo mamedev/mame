@@ -35,7 +35,7 @@
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( trs80m2_state::read )
+uint8_t trs80m2_state::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -74,7 +74,7 @@ READ8_MEMBER( trs80m2_state::read )
 	return data;
 }
 
-WRITE8_MEMBER( trs80m2_state::write )
+void trs80m2_state::write(offs_t offset, uint8_t data)
 {
 	if (offset < 0x8000)
 	{
@@ -336,8 +336,8 @@ void trs80m2_state::z80_io(address_map &map)
 	map(0xe4, 0xe7).rw(FUNC(trs80m2_state::fdc_r), FUNC(trs80m2_state::fdc_w));
 	map(0xef, 0xef).w(FUNC(trs80m2_state::drvslt_w));
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0xf4, 0xf7).rw(Z80SIO_TAG, FUNC(z80sio0_device::cd_ba_r), FUNC(z80sio0_device::cd_ba_w));
-	map(0xf8, 0xf8).rw(m_dmac, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0xf4, 0xf7).rw(Z80SIO_TAG, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0xf8, 0xf8).rw(m_dmac, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0xf9, 0xf9).w(FUNC(trs80m2_state::rom_enable_w));
 	map(0xfc, 0xfc).r(FUNC(trs80m2_state::keyboard_r)).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0xfd, 0xfd).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -364,10 +364,10 @@ void trs80m16_state::m16_z80_io(address_map &map)
 
 void trs80m2_state::m68000_mem(address_map &map)
 {
-//  AM_RANGE(0x7800d0, 0x7800d1) 9519A (C/D = UDS)
-//  AM_RANGE(0x7800d2, 0x7800d3) limit/offset 2
-//  AM_RANGE(0x7800d4, 0x7800d5) limit/offset 1
-//  AM_RANGE(0x7800d6, 0x7800d7) Z80 IRQ
+//  map(0x7800d0, 0x7800d1) 9519A (C/D = UDS)
+//  map(0x7800d2, 0x7800d3) limit/offset 2
+//  map(0x7800d4, 0x7800d5) limit/offset 1
+//  map(0x7800d6, 0x7800d7) Z80 IRQ
 }
 
 
@@ -508,13 +508,13 @@ void trs80m2_state::kbd_w(u8 data)
 //  Z80DMA
 //-------------------------------------------------
 
-READ8_MEMBER(trs80m2_state::io_read_byte)
+uint8_t trs80m2_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(trs80m2_state::io_write_byte)
+void trs80m2_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.write_byte(offset, data);
@@ -539,7 +539,7 @@ WRITE_LINE_MEMBER( trs80m2_state::write_centronics_perror )
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER( trs80m2_state::pio_pa_r )
+uint8_t trs80m2_state::pio_pa_r()
 {
 	/*
 
@@ -579,7 +579,7 @@ READ8_MEMBER( trs80m2_state::pio_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( trs80m2_state::pio_pa_w )
+void trs80m2_state::pio_pa_w(uint8_t data)
 {
 	/*
 
@@ -608,18 +608,6 @@ WRITE_LINE_MEMBER( trs80m2_state::strobe_w )
 //-------------------------------------------------
 //  Z80CTC
 //-------------------------------------------------
-
-TIMER_DEVICE_CALLBACK_MEMBER(trs80m2_state::ctc_tick)
-{
-	m_ctc->trg0(1);
-	m_ctc->trg0(0);
-
-	m_ctc->trg1(1);
-	m_ctc->trg1(0);
-
-	m_ctc->trg2(1);
-	m_ctc->trg2(0);
-}
 
 static void trs80m2_floppies(device_slot_interface &device)
 {
@@ -729,7 +717,7 @@ void trs80m2_state::trs80m2(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(trs80m2_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(trs80m2_state::crtc_update_row));
 	m_crtc->out_de_callback().set(FUNC(trs80m2_state::de_w));
 	m_crtc->out_vsync_callback().set(FUNC(trs80m2_state::vsync_w));
 
@@ -744,11 +732,12 @@ void trs80m2_state::trs80m2(machine_config &config)
 
 	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80dart_device::rxca_w));
-	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80dart_device::txca_w));
-	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
-
-	TIMER(config, "ctc").configure_periodic(FUNC(trs80m2_state::ctc_tick), attotime::from_hz(8_MHz_XTAL / 2 / 2));
+	m_ctc->set_clk<0>(8_MHz_XTAL / 2 / 2);
+	m_ctc->set_clk<1>(8_MHz_XTAL / 2 / 2);
+	m_ctc->set_clk<2>(8_MHz_XTAL / 2 / 2);
+	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80sio_device::rxca_w));
+	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80sio_device::txca_w));
+	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));
 
 	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
 	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
@@ -762,10 +751,10 @@ void trs80m2_state::trs80m2(machine_config &config)
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio->in_pa_callback().set(FUNC(trs80m2_state::pio_pa_r));
 	m_pio->out_pa_callback().set(FUNC(trs80m2_state::pio_pa_w));
-	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pio->out_brdy_callback().set(FUNC(trs80m2_state::strobe_w));
 
-	z80sio0_device& sio(Z80SIO0(config, Z80SIO_TAG, 8_MHz_XTAL / 2));
+	z80sio_device& sio(Z80SIO(config, Z80SIO_TAG, 8_MHz_XTAL / 2)); // SIO/0
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -821,7 +810,7 @@ void trs80m16_state::trs80m16(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(trs80m2_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(trs80m2_state::crtc_update_row));
 	m_crtc->out_de_callback().set(FUNC(trs80m2_state::de_w));
 	m_crtc->out_vsync_callback().set(FUNC(trs80m2_state::vsync_w));
 
@@ -836,11 +825,12 @@ void trs80m16_state::trs80m16(machine_config &config)
 
 	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80dart_device::rxca_w));
-	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80dart_device::txca_w));
-	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
-
-	TIMER(config, "ctc").configure_periodic(FUNC(trs80m2_state::ctc_tick), attotime::from_hz(8_MHz_XTAL / 2 / 2));
+	m_ctc->set_clk<0>(8_MHz_XTAL / 2 / 2);
+	m_ctc->set_clk<1>(8_MHz_XTAL / 2 / 2);
+	m_ctc->set_clk<2>(8_MHz_XTAL / 2 / 2);
+	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80sio_device::rxca_w));
+	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80sio_device::txca_w));
+	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));
 
 	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
 	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
@@ -854,10 +844,10 @@ void trs80m16_state::trs80m16(machine_config &config)
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio->in_pa_callback().set(FUNC(trs80m2_state::pio_pa_r));
 	m_pio->out_pa_callback().set(FUNC(trs80m2_state::pio_pa_w));
-	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pio->out_brdy_callback().set(FUNC(trs80m2_state::strobe_w));
 
-	z80sio0_device& sio(Z80SIO0(config, Z80SIO_TAG, 8_MHz_XTAL / 2));
+	z80sio_device& sio(Z80SIO(config, Z80SIO_TAG, 8_MHz_XTAL / 2));
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	AM9519(config, m_uic, 0);

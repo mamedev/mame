@@ -231,7 +231,7 @@ TILE_GET_INFO_MEMBER(witch_state::get_gfx0_tile_info)
 
 	code=code | ((color & 0xe0) << 3);
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,   //tiles beyond 0x7ff only for sprites?
 			color & 0x0f,
 			0);
@@ -244,7 +244,7 @@ TILE_GET_INFO_MEMBER(witch_state::get_gfx1_tile_info)
 	int code  = m_gfx1_vram[tile_index];
 	int color = m_gfx1_cram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | ((color & 0xf0) << 4),
 			(color>>0) & 0x0f,
 			0);
@@ -255,7 +255,7 @@ TILE_GET_INFO_MEMBER(keirinou_state::get_keirinou_gfx1_tile_info)
 	int code  = m_gfx1_vram[tile_index];
 	int color = m_gfx1_cram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | ((color & 0xc0) << 2) | (m_bg_bank << 10),
 			(color>>0) & 0xf,
 			0);
@@ -263,7 +263,7 @@ TILE_GET_INFO_MEMBER(keirinou_state::get_keirinou_gfx1_tile_info)
 
 void witch_state::video_common_init()
 {
-	m_gfx0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(witch_state::get_gfx0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_gfx0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(witch_state::get_gfx0_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_gfx0_tilemap->set_transparent_pen(0);
 
@@ -276,7 +276,7 @@ void witch_state::video_common_init()
 void witch_state::video_start()
 {
 	video_common_init();
-	m_gfx1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(witch_state::get_gfx1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_gfx1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(witch_state::get_gfx1_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_gfx0_tilemap->set_palette_offset(0x100);
 	m_gfx1_tilemap->set_palette_offset(0x200);
@@ -288,7 +288,7 @@ void keirinou_state::video_start()
 {
 	//witch_state::video_start();
 	video_common_init();
-	m_gfx1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(keirinou_state::get_keirinou_gfx1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_gfx1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(keirinou_state::get_keirinou_gfx1_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_gfx0_tilemap->set_palette_offset(0x000);
 	m_gfx1_tilemap->set_palette_offset(0x100);
@@ -397,7 +397,7 @@ READ8_MEMBER(witch_state::gfx1_cram_r)
 	return m_gfx1_cram[offset];
 }
 
-READ8_MEMBER(witch_state::read_a000)
+uint8_t witch_state::read_a000()
 {
 	switch (m_reg_a002 & 0x3f)
 	{
@@ -413,7 +413,7 @@ READ8_MEMBER(witch_state::read_a000)
 	}
 }
 
-WRITE8_MEMBER(witch_state::write_a002)
+void witch_state::write_a002(uint8_t data)
 {
 	//A002 bit 7&6 = m_bank ????
 	m_reg_a002 = data;
@@ -421,7 +421,7 @@ WRITE8_MEMBER(witch_state::write_a002)
 	m_mainbank->set_entry((data >> 6) & 3);
 }
 
-WRITE8_MEMBER(keirinou_state::write_keirinou_a002)
+void keirinou_state::write_keirinou_a002(uint8_t data)
 {
 	uint8_t new_bg_bank;
 	m_reg_a002 = data;
@@ -437,7 +437,7 @@ WRITE8_MEMBER(keirinou_state::write_keirinou_a002)
 //  m_mainbank->set_entry((data >> 6) & 3);
 }
 
-WRITE8_MEMBER(witch_state::write_a006)
+void witch_state::write_a006(uint8_t data)
 {
 	// don't write when zeroed on reset
 	if (data == 0)
@@ -486,7 +486,7 @@ READ8_MEMBER(witch_state::prot_read_700x)
 	return memregion("sub")->base()[0x7000+offset];
 }
 
-WRITE8_MEMBER(witch_state::xscroll_w)
+void witch_state::xscroll_w(uint8_t data)
 {
 	m_scrollx = data;
 	// need to mark tiles dirty here, as the tilemap writes are affected by scrollx, see FIX_OFFSET macro.
@@ -495,7 +495,7 @@ WRITE8_MEMBER(witch_state::xscroll_w)
 	m_gfx1_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(witch_state::yscroll_w)
+void witch_state::yscroll_w(uint8_t data)
 {
 	m_scrolly = data;
 }
@@ -939,7 +939,7 @@ void witch_state::witch(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &witch_state::witch_sub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(witch_state::irq0_line_assert));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1136,7 +1136,7 @@ void witch_state::init_witch()
 	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + UNBANKED_SIZE, 0x8000);
 	m_mainbank->set_entry(0);
 
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(*this, FUNC(witch_state::prot_read_700x)));
 }
 
 GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System", "Keirin Ou", MACHINE_SUPPORTS_SAVE )

@@ -138,6 +138,7 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 #include "machine/idectrl.h"
 #include "machine/pcshare.h"
 #include "machine/ds128x.h"
+#include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/pc_vga.h"
@@ -153,28 +154,34 @@ public:
 	{
 	}
 
+	void calchase(machine_config &config);
+	void hostinv(machine_config &config);
+	void init_calchase();
+	void init_hostinv();
+
+private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
+	std::unique_ptr<uint8_t[]> m_nvram_data;
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];
 
 	uint32_t m_idle_skip_ram;
-	DECLARE_WRITE32_MEMBER(bios_ext_ram_w);
-	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_READ16_MEMBER(calchase_iocard1_r);
-	DECLARE_READ16_MEMBER(calchase_iocard2_r);
-	DECLARE_READ16_MEMBER(calchase_iocard3_r);
-	DECLARE_READ16_MEMBER(calchase_iocard4_r);
-	DECLARE_READ16_MEMBER(calchase_iocard5_r);
-	DECLARE_READ32_MEMBER(calchase_idle_skip_r);
-	DECLARE_WRITE32_MEMBER(calchase_idle_skip_w);
-	void init_calchase();
-	void init_hostinv();
+	void bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, uint8_t data);
+	uint16_t calchase_iocard1_r();
+	uint16_t calchase_iocard2_r();
+	uint16_t calchase_iocard3_r();
+	uint16_t calchase_iocard4_r();
+	uint16_t calchase_iocard5_r();
+	uint32_t calchase_idle_skip_r();
+	void calchase_idle_skip_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
-	void calchase(machine_config &config);
-	void hostinv(machine_config &config);
 	void calchase_io(address_map &map);
 	void calchase_map(address_map &map);
 
@@ -200,7 +207,7 @@ uint8_t calchase_state::mtxc_config_r(int function, int reg)
 
 void calchase_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 
 	/*
 	memory banking with North Bridge:
@@ -294,7 +301,7 @@ uint8_t calchase_state::piix4_config_r(int function, int reg)
 
 void calchase_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -344,7 +351,7 @@ void calchase_state::intel82371ab_pci_w(int function, int reg, uint32_t data, ui
 	}
 }
 
-WRITE32_MEMBER(calchase_state::bios_ram_w)
+void calchase_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x63] & 0x10)       // write to RAM if this region is write-enabled
 	{
@@ -352,7 +359,7 @@ WRITE32_MEMBER(calchase_state::bios_ram_w)
 	}
 }
 
-WRITE32_MEMBER(calchase_state::bios_ext_ram_w)
+void calchase_state::bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x63] & 0x40)       // write to RAM if this region is write-enabled
 	{
@@ -360,28 +367,38 @@ WRITE32_MEMBER(calchase_state::bios_ext_ram_w)
 	}
 }
 
-READ16_MEMBER(calchase_state::calchase_iocard1_r)
+uint8_t calchase_state::nvram_r(offs_t offset)
+{
+	return m_nvram_data[offset];
+}
+
+void calchase_state::nvram_w(offs_t offset, uint8_t data)
+{
+	m_nvram_data[offset] = data;
+}
+
+uint16_t calchase_state::calchase_iocard1_r()
 {
 	return ioport("IOCARD1")->read();
 }
 
-READ16_MEMBER(calchase_state::calchase_iocard2_r)
+uint16_t calchase_state::calchase_iocard2_r()
 {
 	return ioport("IOCARD2")->read();
 }
 
-READ16_MEMBER(calchase_state::calchase_iocard3_r)
+uint16_t calchase_state::calchase_iocard3_r()
 {
 	return ioport("IOCARD3")->read();
 }
 
 /* These two controls wheel pot or whatever this game uses ... */
-READ16_MEMBER(calchase_state::calchase_iocard4_r)
+uint16_t calchase_state::calchase_iocard4_r()
 {
 	return ioport("IOCARD4")->read();
 }
 
-READ16_MEMBER(calchase_state::calchase_iocard5_r)
+uint16_t calchase_state::calchase_iocard5_r()
 {
 	return ioport("IOCARD5")->read();
 }
@@ -402,8 +419,7 @@ void calchase_state::calchase_map(address_map &map)
 	map(0x000d0008, 0x000d000b).nopw(); // ???
 	map(0x000d0024, 0x000d0025).w("ldac", FUNC(dac_word_interface::data_w));
 	map(0x000d0028, 0x000d0029).w("rdac", FUNC(dac_word_interface::data_w));
-	map(0x000d0800, 0x000d0fff).rom().region("nvram", 0); //
-//  map(0x000d0800, 0x000d0fff).ram();  // GAME_CMOS
+	map(0x000d0800, 0x000d0fff).rw(FUNC(calchase_state::nvram_r), FUNC(calchase_state::nvram_w)); // GAME_CMOS
 
 	map(0x000e0000, 0x000effff).bankr("bios_ext").w(FUNC(calchase_state::bios_ext_ram_w));
 	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(calchase_state::bios_ram_w));
@@ -429,7 +445,7 @@ void calchase_state::calchase_io(address_map &map)
 	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
 	map(0x0200, 0x021f).noprw(); //To debug
 	map(0x0260, 0x026f).noprw(); //To debug
-	map(0x0278, 0x027b).nopw();//AM_WRITE(pnp_config_w)
+	map(0x0278, 0x027b).nopw();//.w(FUNC(calchase_state::pnp_config_w));
 	map(0x0280, 0x0287).noprw(); //To debug
 	map(0x02a0, 0x02a7).noprw(); //To debug
 	map(0x02c0, 0x02c7).noprw(); //To debug
@@ -446,7 +462,7 @@ void calchase_state::calchase_io(address_map &map)
 	// map(0x03b0, 0x03df).noprw();
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 	map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
-	map(0x0a78, 0x0a7b).nopw();//AM_WRITE(pnp_data_w)
+	map(0x0a78, 0x0a7b).nopw();//.w(FUNC(calchase_state::pnp_data_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 	map(0x42e8, 0x43ef).noprw(); //To debug
 	map(0x43c4, 0x43cb).rw("vga", FUNC(trident_vga_device::port_43c6_r), FUNC(trident_vga_device::port_43c6_w));  // Trident Memory and Video Clock register
@@ -668,6 +684,9 @@ void calchase_state::machine_start()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
 	m_bios_ext_ram = std::make_unique<uint32_t[]>(0x10000/4);
+
+	m_nvram_data = std::make_unique<uint8_t[]>(0x800);
+	subdevice<nvram_device>("nvram")->set_base(m_nvram_data.get(), 0x800);
 }
 
 void calchase_state::machine_reset()
@@ -690,10 +709,10 @@ void calchase_state::calchase(machine_config &config)
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (0, FUNC(calchase_state::intel82439tx_pci_r), this);
-	pcibus.set_device_write(0, FUNC(calchase_state::intel82439tx_pci_w), this);
-	pcibus.set_device_read (7, FUNC(calchase_state::intel82371ab_pci_r), this);
-	pcibus.set_device_write(7, FUNC(calchase_state::intel82371ab_pci_w), this);
+	pcibus.set_device(0, FUNC(calchase_state::intel82439tx_pci_r), FUNC(calchase_state::intel82439tx_pci_w));
+	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220Y
 
 	/* video hardware */
 	pcvideo_trident_vga(config);
@@ -725,10 +744,10 @@ void calchase_state::hostinv(machine_config &config)
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (0, FUNC(calchase_state::intel82439tx_pci_r), this);
-	pcibus.set_device_write(0, FUNC(calchase_state::intel82439tx_pci_w), this);
-	pcibus.set_device_read (7, FUNC(calchase_state::intel82371ab_pci_r), this);
-	pcibus.set_device_write(7, FUNC(calchase_state::intel82371ab_pci_w), this);
+	pcibus.set_device(0, FUNC(calchase_state::intel82439tx_pci_r), FUNC(calchase_state::intel82439tx_pci_w));
+	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220Y
 
 	/* video hardware */
 	pcvideo_trident_vga(config);
@@ -744,7 +763,7 @@ void calchase_state::hostinv(machine_config &config)
 }
 
 
-READ32_MEMBER(calchase_state::calchase_idle_skip_r)
+uint32_t calchase_state::calchase_idle_skip_r()
 {
 	if(m_maincpu->pc()==0x1406f48)
 		m_maincpu->spin_until_interrupt();
@@ -752,7 +771,7 @@ READ32_MEMBER(calchase_state::calchase_idle_skip_r)
 	return m_idle_skip_ram;
 }
 
-WRITE32_MEMBER(calchase_state::calchase_idle_skip_w)
+void calchase_state::calchase_idle_skip_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_idle_skip_ram);
 }
@@ -763,7 +782,8 @@ void calchase_state::init_calchase()
 
 	intel82439tx_init();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3f0b160, 0x3f0b163, read32_delegate(FUNC(calchase_state::calchase_idle_skip_r),this), write32_delegate(FUNC(calchase_state::calchase_idle_skip_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3f0b160, 0x3f0b163, read32smo_delegate(*this, FUNC(calchase_state::calchase_idle_skip_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3f0b160, 0x3f0b163, write32s_delegate(*this, FUNC(calchase_state::calchase_idle_skip_w)));
 }
 
 void calchase_state::init_hostinv()
@@ -774,10 +794,10 @@ void calchase_state::init_hostinv()
 }
 
 ROM_START( calchase )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "mb_bios.bin", 0x00000, 0x20000, CRC(dea7a51b) SHA1(e2028c00bfa6d12959fc88866baca8b06a1eab68) )
 
-	ROM_REGION( 0x8000, "video_bios", 0 )
+	ROM_REGION32_LE( 0x8000, "video_bios", 0 )
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
@@ -789,10 +809,10 @@ ROM_START( calchase )
 ROM_END
 
 ROM_START( hostinv )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) )
 
-	ROM_REGION( 0x8000, "video_bios", 0 )
+	ROM_REGION32_LE( 0x8000, "video_bios", 0 )
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
@@ -804,10 +824,10 @@ ROM_START( hostinv )
 ROM_END
 
 ROM_START( eggsplc )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) )
 
-	ROM_REGION( 0x8000, "video_bios", 0 )
+	ROM_REGION32_LE( 0x8000, "video_bios", 0 )
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 

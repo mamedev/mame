@@ -22,26 +22,18 @@ public:
 	virtual void do_exec_partial() override;
 
 protected:
-	class mi_6509_normal : public memory_interface {
+	class mi_6509 : public memory_interface {
 	public:
 		m6509_device *base;
 
-		mi_6509_normal(m6509_device *base);
-		virtual ~mi_6509_normal() {}
+		mi_6509(m6509_device *base);
+		virtual ~mi_6509() {}
 		virtual uint8_t read(uint16_t adr) override;
 		virtual uint8_t read_9(uint16_t adr) override;
 		virtual uint8_t read_sync(uint16_t adr) override;
 		virtual uint8_t read_arg(uint16_t adr) override;
 		virtual void write(uint16_t adr, uint8_t val) override;
 		virtual void write_9(uint16_t adr, uint8_t val) override;
-	};
-
-	class mi_6509_nd : public mi_6509_normal {
-	public:
-		mi_6509_nd(m6509_device *base);
-		virtual ~mi_6509_nd() {}
-		virtual uint8_t read_sync(uint16_t adr) override;
-		virtual uint8_t read_arg(uint16_t adr) override;
 	};
 
 	virtual void device_start() override;

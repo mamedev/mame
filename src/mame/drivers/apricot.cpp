@@ -76,16 +76,16 @@ private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	DECLARE_WRITE_LINE_MEMBER(i8086_lock_w);
-	DECLARE_WRITE8_MEMBER(i8089_ca1_w);
-	DECLARE_WRITE8_MEMBER(i8089_ca2_w);
-	DECLARE_WRITE8_MEMBER(i8255_portb_w);
-	DECLARE_READ8_MEMBER(i8255_portc_r);
-	DECLARE_WRITE8_MEMBER(i8255_portc_w);
+	void i8089_ca1_w(uint8_t data);
+	void i8089_ca2_w(uint8_t data);
+	void i8255_portb_w(uint8_t data);
+	uint8_t i8255_portc_r();
+	void i8255_portc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_READ8_MEMBER(sio_da_r);
-	DECLARE_READ8_MEMBER(sio_ca_r);
-	DECLARE_READ8_MEMBER(sio_db_r);
-	DECLARE_READ8_MEMBER(sio_cb_r);
+	uint8_t sio_da_r();
+	uint8_t sio_ca_r();
+	uint8_t sio_db_r();
+	uint8_t sio_cb_r();
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
@@ -133,14 +133,14 @@ private:
 //  I/O
 //**************************************************************************
 
-WRITE8_MEMBER( apricot_state::i8089_ca1_w )
+void apricot_state::i8089_ca1_w(uint8_t data)
 {
 	m_iop->sel_w(0);
 	m_iop->ca_w(1);
 	m_iop->ca_w(0);
 }
 
-WRITE8_MEMBER( apricot_state::i8089_ca2_w )
+void apricot_state::i8089_ca2_w(uint8_t data)
 {
 	m_iop->sel_w(1);
 	m_iop->ca_w(1);
@@ -159,7 +159,7 @@ WRITE_LINE_MEMBER( apricot_state::write_centronics_perror )
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER( apricot_state::i8255_portc_r )
+uint8_t apricot_state::i8255_portc_r()
 {
 	uint8_t data = 0;
 
@@ -171,7 +171,7 @@ READ8_MEMBER( apricot_state::i8255_portc_r )
 	return data;
 }
 
-WRITE8_MEMBER( apricot_state::i8255_portb_w )
+void apricot_state::i8255_portb_w(uint8_t data)
 {
 	// bit 0, crt reset
 	// bit 1, not connected
@@ -200,14 +200,14 @@ WRITE8_MEMBER( apricot_state::i8255_portb_w )
 	// PB7 Centronics transceiver direction. 0 = output, 1 = input
 }
 
-WRITE8_MEMBER( apricot_state::i8255_portc_w )
+void apricot_state::i8255_portc_w(uint8_t data)
 {
 //  schematic page 294 says pc4 outputs to centronics pin 13, which is the "select" output from the printer.
 	m_centronics->write_strobe(BIT(data, 5));
 //  schematic page 294 says pc6 outputs to centronics pin 15, which is unused
 }
 
-READ8_MEMBER( apricot_state::sio_da_r )
+uint8_t apricot_state::sio_da_r()
 {
 	if (m_bus_locked)
 		return m_sio->m1_r();
@@ -215,7 +215,7 @@ READ8_MEMBER( apricot_state::sio_da_r )
 	return m_sio->da_r();
 }
 
-READ8_MEMBER( apricot_state::sio_ca_r )
+uint8_t apricot_state::sio_ca_r()
 {
 	if (m_bus_locked)
 		return m_sio->m1_r();
@@ -223,7 +223,7 @@ READ8_MEMBER( apricot_state::sio_ca_r )
 	return m_sio->ca_r();
 }
 
-READ8_MEMBER( apricot_state::sio_cb_r )
+uint8_t apricot_state::sio_cb_r()
 {
 	if (m_bus_locked)
 		return m_sio->m1_r();
@@ -231,7 +231,7 @@ READ8_MEMBER( apricot_state::sio_cb_r )
 	return m_sio->cb_r();
 }
 
-READ8_MEMBER( apricot_state::sio_db_r )
+uint8_t apricot_state::sio_db_r()
 {
 	if (m_bus_locked)
 		return m_sio->m1_r();
@@ -393,7 +393,7 @@ void apricot_state::apricot(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(10);
-	m_crtc->set_update_row_callback(FUNC(apricot_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(apricot_state::crtc_update_row));
 	m_crtc->out_de_callback().set(FUNC(apricot_state::apricot_hd6845_de));
 
 	// sound hardware
@@ -402,8 +402,8 @@ void apricot_state::apricot(machine_config &config)
 
 	// devices
 	I8255A(config, m_ppi, 0);
-	m_ppi->in_pa_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
-	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi->in_pa_callback().set("cent_data_in", FUNC(input_buffer_device::read));
+	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_ppi->out_pb_callback().set(FUNC(apricot_state::i8255_portb_w));
 	m_ppi->in_pc_callback().set(FUNC(apricot_state::i8255_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(apricot_state::i8255_portc_w));
@@ -495,13 +495,13 @@ void apricot_state::apricotxi(machine_config &config)
 //**************************************************************************
 
 ROM_START( apricot )
-	ROM_REGION(0x4000, "bootstrap", 0)
+	ROM_REGION16_LE(0x4000, "bootstrap", 0)
 	ROM_LOAD16_BYTE("pc_bios_lo_001.bin", 0x0000, 0x2000, CRC(0c217cc2) SHA1(0d7a2b61e17966462b555115f962a175fadcf72a))
 	ROM_LOAD16_BYTE("pc_bios_hi_001.bin", 0x0001, 0x2000, CRC(7c27f36c) SHA1(c801bbf904815f76ec6463e948f57e0118a26292))
 ROM_END
 
 ROM_START( apricotxi )
-	ROM_REGION(0x4000, "bootstrap", 0)
+	ROM_REGION16_LE(0x4000, "bootstrap", 0)
 	ROM_LOAD16_BYTE("lo_ve007.u11", 0x0000, 0x2000, CRC(e74e14d1) SHA1(569133b0266ce3563b21ae36fa5727308797deee)) // LO Ve007 03.04.84
 	ROM_LOAD16_BYTE("hi_ve007.u9",  0x0001, 0x2000, CRC(b04fb83e) SHA1(cc2b2392f1b4c04bb6ec8ee26f8122242c02e572)) // HI Ve007 03.04.84
 ROM_END

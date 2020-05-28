@@ -8,16 +8,18 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_MACHINE_3DOM2_H
 #define MAME_MACHINE_3DOM2_H
 
-#include "emu.h"
+#pragma once
+
+#include "video/3dom2_te.h"
+
 #include "cpu/dspp/dspp.h"
 #include "cpu/powerpc/ppc.h"
-#include "video/3dom2_te.h"
+
 #include "screen.h"
+
 
 #define M2_BAD_TIMING       0       // HACK
 
@@ -117,12 +119,13 @@ public:
 		RAM_16MB    = 16
 	};
 
-	template <typename T, typename U>
-	m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag, U &&cpu2_tag)
+	template <typename T, typename U, typename V>
+	m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag, U &&cpu2_tag, V &&cde_tag)
 		: m2_bda_device(mconfig, tag, owner, clock)
 	{
 		m_cpu1.set_tag(std::forward<T>(cpu1_tag));
 		m_cpu2.set_tag(std::forward<U>(cpu2_tag));
+		m_cde.set_tag(std::forward<V>(cde_tag));
 	}
 	m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -138,16 +141,6 @@ public:
 	// Interface
 	DECLARE_READ32_MEMBER( cpu_id_r );
 	DECLARE_WRITE32_MEMBER( cpu_id_w );
-
-	READ8_MEMBER( read_bus )
-	{
-		return read_bus8(offset);
-	}
-
-	WRITE8_MEMBER( write_bus )
-	{
-		write_bus8(offset, data);
-	}
 
 	uint8_t read_bus8(offs_t offset);
 	uint16_t read_bus16(offs_t offset);
@@ -209,6 +202,7 @@ private:
 public: // TODO: THIS SHOULD NOT BE PUBLIC
 	required_device<ppc_device> m_cpu1;
 	required_device<ppc_device> m_cpu2;
+	required_device<m2_cde_device> m_cde;
 	devcb_read_line m_videores_in;
 
 	// Sub-devices
@@ -372,8 +366,8 @@ private:
 
 
 	// GPIO
-	devcb_read_line m_gpio_in[4];
-	devcb_write_line m_gpio_out[4];
+	devcb_read_line::array<4> m_gpio_in;
+	devcb_write_line::array<4> m_gpio_out;
 
 	// Registers
 	uint32_t    m_mcfg;
@@ -503,11 +497,12 @@ private:
 class m2_cde_device : public device_t
 {
 public:
-	template <typename T>
-	m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag)
+	template <typename T, typename U>
+	m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag, U &&bda_tag)
 		: m2_cde_device(mconfig, tag, owner, clock)
 	{
 		m_cpu1.set_tag(std::forward<T>(cpu1_tag));
+		m_bda.set_tag(std::forward<U>(bda_tag));
 	}
 	m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -691,14 +686,15 @@ private:
 	void start_dma(uint32_t ch);
 	void next_dma(uint32_t ch);
 
-	uint32_t address_to_biobus_slot(uint32_t addr) const
+	static uint32_t address_to_biobus_slot(uint32_t addr)
 	{
-		assert_always(addr >= 0x20000000 && addr <= 0x3fffffff, "Address not within BioBus address range");
+		if ((addr < 0x20000000) || (addr > 0x3fffffff))
+			throw emu_fatalerror("m2_cde_device::address_to_biobus_slot: Address not within BioBus address range");
 		return ((addr >> 24) >> 2) & 7;
 	}
 
 	required_device<ppc_device> m_cpu1;
-	m2_bda_device       *m_bda; // todo
+	required_device<m2_bda_device> m_bda;
 
 	devcb_write_line    m_int_handler;
 	devcb_write32       m_sdbg_out_handler;

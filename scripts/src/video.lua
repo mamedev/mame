@@ -353,6 +353,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/hd61603.h,VIDEOS["HD61603"] = true
+--------------------------------------------------
+
+if (VIDEOS["HD61603"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/hd61603.cpp",
+		MAME_DIR .. "src/devices/video/hd61603.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/hd61830.h,VIDEOS["HD61830"] = true
 --------------------------------------------------
 
@@ -384,6 +396,18 @@ if (VIDEOS["HD66421"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/hd66421.cpp",
 		MAME_DIR .. "src/devices/video/hd66421.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/hlcd0488.h,VIDEOS["HLCD0488"] = true
+--------------------------------------------------
+
+if (VIDEOS["HLCD0488"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/hlcd0488.cpp",
+		MAME_DIR .. "src/devices/video/hlcd0488.h",
 	}
 end
 
@@ -540,6 +564,18 @@ if (VIDEOS["IMS_CVC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/ims_cvc.cpp",
 		MAME_DIR .. "src/devices/video/ims_cvc.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/lc7582.h,VIDEOS["LC7582"] = true
+--------------------------------------------------
+
+if (VIDEOS["LC7582"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/lc7582.cpp",
+		MAME_DIR .. "src/devices/video/lc7582.h",
 	}
 end
 
@@ -723,6 +759,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pcf2100.h,VIDEOS["PCF2100"] = true
+--------------------------------------------------
+
+if (VIDEOS["PCF2100"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pcf2100.cpp",
+		MAME_DIR .. "src/devices/video/pcf2100.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/polylgcy.h,VIDEOS["POLY"] = true
 --------------------------------------------------
 
@@ -799,6 +847,17 @@ if (VIDEOS["SED1330"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/sed1330.cpp",
 		MAME_DIR .. "src/devices/video/sed1330.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/sed1500.h,VIDEOS["SED1500"] = true
+--------------------------------------------------
+if (VIDEOS["SED1500"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/sed1500.cpp",
+		MAME_DIR .. "src/devices/video/sed1500.h",
 	}
 end
 
@@ -1038,7 +1097,8 @@ if (VIDEOS["VOODOO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/voodoo.cpp",
 		MAME_DIR .. "src/devices/video/voodoo.h",
-		MAME_DIR .. "src/devices/video/vooddefs.h",
+		MAME_DIR .. "src/devices/video/vooddefs.ipp",
+		MAME_DIR .. "src/devices/video/voodoo_rast.ipp",
 	}
 end
 
@@ -1125,6 +1185,8 @@ if (VIDEOS["PPU2C0X"]~=null) then
 		MAME_DIR .. "src/devices/video/ppu2c0x.h",
 		MAME_DIR .. "src/devices/video/ppu2c0x_vt.cpp",
 		MAME_DIR .. "src/devices/video/ppu2c0x_vt.h",
+		MAME_DIR .. "src/devices/video/ppu2c0x_sh6578.cpp",
+		MAME_DIR .. "src/devices/video/ppu2c0x_sh6578.h",
 	}
 end
 

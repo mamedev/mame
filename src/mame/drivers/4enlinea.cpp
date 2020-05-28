@@ -232,11 +232,11 @@ public:
 private:
 	required_device<ay8910_device> m_ay;
 
-	DECLARE_READ8_MEMBER(serial_r);
-	DECLARE_READ8_MEMBER(serial_status_r);
-	DECLARE_WRITE8_MEMBER(serial_w);
-	DECLARE_WRITE8_MEMBER(serial_status_w);
-	DECLARE_READ8_MEMBER(hack_r);
+	uint8_t serial_r(offs_t offset);
+	uint8_t serial_status_r();
+	void serial_w(offs_t offset, uint8_t data);
+	void serial_status_w(uint8_t data);
+	uint8_t hack_r();
 	INTERRUPT_GEN_MEMBER(_4enlinea_irq);
 	INTERRUPT_GEN_MEMBER(_4enlinea_audio_irq);
 
@@ -278,8 +278,10 @@ public:
 	// construction/destruction
 	isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( _4enlinea_io_read );
-	DECLARE_WRITE8_MEMBER( _4enlinea_mode_control_w );
+	uint8_t _4enlinea_io_read (offs_t offset);
+	void _4enlinea_mode_control_w(uint8_t data);
+
+protected:
 	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -297,25 +299,25 @@ isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig
 }
 
 
-READ8_MEMBER( isa8_cga_4enlinea_device::_4enlinea_io_read )
+uint8_t isa8_cga_4enlinea_device::_4enlinea_io_read(offs_t offset)
 {
 	uint8_t data;
 
 	switch (offset)
 	{
 	case 0xa:
-		data = isa8_cga_device::io_read(space, offset);
+		data = isa8_cga_device::io_read(offset);
 		data|= (data & 8) << 4;
 		break;
 
 	default:
-		data = isa8_cga_device::io_read(space, offset);
+		data = isa8_cga_device::io_read(offset);
 		break;
 	}
 	return data;
 }
 
-WRITE8_MEMBER( isa8_cga_4enlinea_device::_4enlinea_mode_control_w )
+void isa8_cga_4enlinea_device::_4enlinea_mode_control_w(uint8_t data)
 {
 	// TODO
 }
@@ -329,14 +331,14 @@ void isa8_cga_4enlinea_device::device_start()
 	m_vram_size = 0x4000;
 	m_vram.resize(m_vram_size);
 
-	//m_isa->install_device(0x3bf, 0x3bf, 0, 0, nullptr, write8_delegate( FUNC(isa8_cga_4enlinea_device::_4enlinea_mode_control_w), this ) );
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_cga_4enlinea_device::_4enlinea_io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
+	//m_isa->install_device(0x3bf, 0x3bf, 0, 0, nullptr, write8_delegate(*this, FUNC(isa8_cga_4enlinea_device::_4enlinea_mode_control_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_cga_4enlinea_device::_4enlinea_io_read)), write8sm_delegate(*this, FUNC(isa8_cga_device::io_write)));
 	m_isa->install_bank(0x8000, 0xbfff, "bank1", &m_vram[0]);
 
 	/* Initialise the cga palette */
 	int i;
 
-	for ( i = 0; i < CGA_PALETTE_SETS * 16; i++ )
+	for (int i = 0; i < CGA_PALETTE_SETS * 16; i++ )
 	{
 		m_palette->set_pen_color( i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
 	}
@@ -359,7 +361,7 @@ void isa8_cga_4enlinea_device::device_start()
 }
 
 
-READ8_MEMBER(_4enlinea_state::serial_r)
+uint8_t _4enlinea_state::serial_r(offs_t offset)
 {
 	if(offset == 0)
 	{
@@ -379,7 +381,7 @@ READ8_MEMBER(_4enlinea_state::serial_r)
 void _4enlinea_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-//  AM_RANGE(0x8000, 0xbfff) AM_RAM // CGA VRAM
+//  map(0x8000, 0xbfff).ram(); // CGA VRAM
 	map(0xc000, 0xdfff).ram();
 
 	map(0xe000, 0xe001).r(FUNC(_4enlinea_state::serial_r));
@@ -389,22 +391,22 @@ void _4enlinea_state::main_portmap(address_map &map)
 {
 	map.global_mask(0x3ff);
 
-//  AM_RANGE(0x3d4, 0x3df) CGA regs
+//  map(0x3d4, 0x3df) CGA regs
 	map(0x3bf, 0x3bf).nopw(); // CGA mode control, TODO
 }
 
-READ8_MEMBER(_4enlinea_state::serial_status_r)
+uint8_t _4enlinea_state::serial_status_r()
 {
 	return m_serial_flags;
 }
 
-WRITE8_MEMBER(_4enlinea_state::serial_status_w)
+void _4enlinea_state::serial_status_w(uint8_t data)
 {
 	m_serial_flags = data; // probably just clears
 }
 
 /* TODO: do this really routes to 0xe000-0xe001 of Main CPU? */
-WRITE8_MEMBER(_4enlinea_state::serial_w)
+void _4enlinea_state::serial_w(offs_t offset, uint8_t data)
 {
 	m_serial_data[offset] = data;
 	if(offset == 0)
@@ -432,7 +434,7 @@ void _4enlinea_state::eeprom_clock_w(uint8_t data)
 	m_eeprom->write_scl(BIT(data, 6));
 }
 
-READ8_MEMBER(_4enlinea_state::hack_r)
+uint8_t _4enlinea_state::hack_r()
 {
 	return machine().rand();
 }
@@ -614,7 +616,7 @@ void _4enlinea_state::_4enlinea(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &_4enlinea_state::audio_map);
 	audiocpu.set_periodic_int(FUNC(_4enlinea_state::_4enlinea_audio_irq), attotime::from_hz(60)); //TODO
 
-	I2CMEM(config, m_eeprom).set_page_size(16).set_data_size(0x800); // X24C16P
+	I2C_24C16(config, m_eeprom); // X24C16P
 
 	// FIXME: determine ISA bus clock
 	isa8_device &isa(ISA8(config, "isa", 0));
@@ -650,7 +652,7 @@ void _4enlinea_state::k7_olym(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // D4464C-15L (6264) + battery
 
-	I2CMEM(config, m_eeprom).set_page_size(16).set_data_size(0x800); // X24C16P
+	I2C_24C16(config, m_eeprom); // X24C16P
 
 	isa8_device &isa(ISA8(config, "isa", 0));
 	isa.set_memspace("maincpu", AS_PROGRAM);

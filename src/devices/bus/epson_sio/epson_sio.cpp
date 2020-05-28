@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(EPSON_SIO, epson_sio_device, "epson_sio", "EPSON SIO port")
 //-------------------------------------------------
 
 device_epson_sio_interface::device_epson_sio_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "epsonsio")
 {
 	m_slot = dynamic_cast<epson_sio_device *>(device.owner());
 }
@@ -55,7 +55,7 @@ device_epson_sio_interface::~device_epson_sio_interface()
 
 epson_sio_device::epson_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EPSON_SIO, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_epson_sio_interface>(mconfig, *this),
 	m_cart(nullptr),
 	m_write_rx(*this),
 	m_write_pin(*this)
@@ -78,19 +78,10 @@ epson_sio_device::~epson_sio_device()
 
 void epson_sio_device::device_start()
 {
-	m_cart = dynamic_cast<device_epson_sio_interface *>(get_card_device());
+	m_cart = get_card_device();
 
 	m_write_rx.resolve_safe();
 	m_write_pin.resolve_safe();
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void epson_sio_device::device_reset()
-{
 }
 
 

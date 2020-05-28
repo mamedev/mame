@@ -41,23 +41,26 @@
 
 #include <algorithm>
 
-#define OP(name)        (&m6805_base_device::name)
-#define OP_T(name)      (&m6805_base_device::name<true>)
-#define OP_F(name)      (&m6805_base_device::name<false>)
-#define OP_IM(name)     (&m6805_base_device::name<addr_mode::IM>)
-#define OP_DI(name)     (&m6805_base_device::name<addr_mode::DI>)
-#define OP_EX(name)     (&m6805_base_device::name<addr_mode::EX>)
-#define OP_IX(name)     (&m6805_base_device::name<addr_mode::IX>)
-#define OP_IX1(name)    (&m6805_base_device::name<addr_mode::IX1>)
-#define OP_IX2(name)    (&m6805_base_device::name<addr_mode::IX2>)
+#define OP(name)        (&m6805_base_device::name<big>)
+#define OPN(name,n)     (&m6805_base_device::name<big, n>)
+#define OP_T(name)      (&m6805_base_device::name<big, true>)
+#define OP_F(name)      (&m6805_base_device::name<big, false>)
+#define OP_IM(name)     (&m6805_base_device::name<big, addr_mode::IM>)
+#define OP_DI(name)     (&m6805_base_device::name<big, addr_mode::DI>)
+#define OP_EX(name)     (&m6805_base_device::name<big, addr_mode::EX>)
+#define OP_IX(name)     (&m6805_base_device::name<big, addr_mode::IX>)
+#define OP_IX1(name)    (&m6805_base_device::name<big, addr_mode::IX1>)
+#define OP_IX2(name)    (&m6805_base_device::name<big, addr_mode::IX2>)
 
-const m6805_base_device::op_handler_table m6805_base_device::s_hmos_ops =
+#define big false
+
+const m6805_base_device::op_handler_table m6805_base_device::s_hmos_s_ops =
 {
 	/*      0/8          1/9          2/A          3/B          4/C          5/D          6/E          7/F */
-	/* 0 */ OP(brset<0>),OP(brclr<0>),OP(brset<1>),OP(brclr<1>),OP(brset<2>),OP(brclr<2>),OP(brset<3>),OP(brclr<3>),
-			OP(brset<4>),OP(brclr<4>),OP(brset<5>),OP(brclr<5>),OP(brset<6>),OP(brclr<6>),OP(brset<7>),OP(brclr<7>),
-	/* 1 */ OP(bset<0>), OP(bclr<0>), OP(bset<1>), OP(bclr<1>), OP(bset<2>), OP(bclr<2>), OP(bset<3>), OP(bclr<3>),
-			OP(bset<4>), OP(bclr<4>), OP(bset<5>), OP(bclr<5>), OP(bset<6>), OP(bclr<6>), OP(bset<7>), OP(bclr<7>),
+	/* 0 */ OPN(brset,0),OPN(brclr,0),OPN(brset,1),OPN(brclr,1),OPN(brset,2),OPN(brclr,2),OPN(brset,3),OPN(brclr,3),
+			OPN(brset,4),OPN(brclr,4),OPN(brset,5),OPN(brclr,5),OPN(brset,6),OPN(brclr,6),OPN(brset,7),OPN(brclr,7),
+	/* 1 */ OPN(bset,0), OPN(bclr,0), OPN(bset,1), OPN(bclr,1), OPN(bset,2), OPN(bclr,2), OPN(bset,3), OPN(bclr,3),
+			OPN(bset,4), OPN(bclr,4), OPN(bset,5), OPN(bclr,5), OPN(bset,6), OPN(bclr,6), OPN(bset,7), OPN(bclr,7),
 	/* 2 */ OP_T(bra),   OP_F(bra),   OP_T(bhi),   OP_F(bhi),   OP_T(bcc),   OP_F(bcc),   OP_T(bne),   OP_F(bne),
 			OP_T(bhcc),  OP_F(bhcc),  OP_T(bpl),   OP_F(bpl),   OP_T(bmc),   OP_F(bmc),   OP_T(bil),   OP_F(bil),
 	/* 3 */ OP_DI(neg),  OP(illegal), OP(illegal), OP_DI(com),  OP_DI(lsr),  OP(illegal), OP_DI(ror),  OP_DI(asr),
@@ -88,50 +91,13 @@ const m6805_base_device::op_handler_table m6805_base_device::s_hmos_ops =
 			OP_IX(eora), OP_IX(adca), OP_IX(ora),  OP_IX(adda), OP_IX(jmp),  OP_IX(jsr),  OP_IX(ldx),  OP_IX(stx)
 };
 
-const m6805_base_device::op_handler_table m6805_base_device::s_cmos_ops =
+const m6805_base_device::op_handler_table m6805_base_device::s_hc_s_ops =
 {
 	/*      0/8          1/9          2/A          3/B          4/C          5/D          6/E          7/F */
-	/* 0 */ OP(brset<0>),OP(brclr<0>),OP(brset<1>),OP(brclr<1>),OP(brset<2>),OP(brclr<2>),OP(brset<3>),OP(brclr<3>),
-			OP(brset<4>),OP(brclr<4>),OP(brset<5>),OP(brclr<5>),OP(brset<6>),OP(brclr<6>),OP(brset<7>),OP(brclr<7>),
-	/* 1 */ OP(bset<0>), OP(bclr<0>), OP(bset<1>), OP(bclr<1>), OP(bset<2>), OP(bclr<2>), OP(bset<3>), OP(bclr<3>),
-			OP(bset<4>), OP(bclr<4>), OP(bset<5>), OP(bclr<5>), OP(bset<6>), OP(bclr<6>), OP(bset<7>), OP(bclr<7>),
-	/* 2 */ OP_T(bra),   OP_F(bra),   OP_T(bhi),   OP_F(bhi),   OP_T(bcc),   OP_F(bcc),   OP_T(bne),   OP_F(bne),
-			OP_T(bhcc),  OP_F(bhcc),  OP_T(bpl),   OP_F(bpl),   OP_T(bmc),   OP_F(bmc),   OP_T(bil),   OP_F(bil),
-	/* 3 */ OP_DI(neg),  OP(illegal), OP(illegal), OP_DI(com),  OP_DI(lsr),  OP(illegal), OP_DI(ror),  OP_DI(asr),
-			OP_DI(lsl),  OP_DI(rol),  OP_DI(dec),  OP(illegal), OP_DI(inc),  OP_DI(tst),  OP(illegal), OP_DI(clr),
-	/* 4 */ OP(nega),    OP(illegal), OP(illegal), OP(coma),    OP(lsra),    OP(illegal), OP(rora),    OP(asra),
-			OP(lsla),    OP(rola),    OP(deca),    OP(illegal), OP(inca),    OP(tsta),    OP(illegal), OP(clra),
-	/* 5 */ OP(negx),    OP(illegal), OP(illegal), OP(comx),    OP(lsrx),    OP(illegal), OP(rorx),    OP(asrx),
-			OP(lslx),    OP(rolx),    OP(decx),    OP(illegal), OP(incx),    OP(tstx),    OP(illegal), OP(clrx),
-	/* 6 */ OP_IX1(neg), OP(illegal), OP(illegal), OP_IX1(com), OP_IX1(lsr), OP(illegal), OP_IX1(ror), OP_IX1(asr),
-			OP_IX1(lsl), OP_IX1(rol), OP_IX1(dec), OP(illegal), OP_IX1(inc), OP_IX1(tst), OP(illegal), OP_IX1(clr),
-	/* 7 */ OP_IX(neg),  OP(illegal), OP(illegal), OP_IX(com),  OP_IX(lsr),  OP(illegal), OP_IX(ror),  OP_IX(asr),
-			OP_IX(lsl),  OP_IX(rol),  OP_IX(dec),  OP(illegal), OP_IX(inc),  OP_IX(tst),  OP(illegal), OP_IX(clr),
-	/* 8 */ OP(rti),     OP(rts),     OP(illegal), OP(swi),     OP(illegal), OP(illegal), OP(illegal), OP(illegal),
-			OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(stop),    OP(wait),
-	/* 9 */ OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(tax),
-			OP(clc),     OP(sec),     OP(cli),     OP(sei),     OP(rsp),     OP(nop),     OP(illegal), OP(txa),
-	/* A */ OP_IM(suba), OP_IM(cmpa), OP_IM(sbca), OP_IM(cpx),  OP_IM(anda), OP_IM(bita), OP_IM(lda),  OP(illegal),
-			OP_IM(eora), OP_IM(adca), OP_IM(ora),  OP_IM(adda), OP(illegal), OP(bsr),     OP_IM(ldx),  OP(illegal),
-	/* B */ OP_DI(suba), OP_DI(cmpa), OP_DI(sbca), OP_DI(cpx),  OP_DI(anda), OP_DI(bita), OP_DI(lda),  OP_DI(sta),
-			OP_DI(eora), OP_DI(adca), OP_DI(ora),  OP_DI(adda), OP_DI(jmp),  OP_DI(jsr),  OP_DI(ldx),  OP_DI(stx),
-	/* C */ OP_EX(suba), OP_EX(cmpa), OP_EX(sbca), OP_EX(cpx),  OP_EX(anda), OP_EX(bita), OP_EX(lda),  OP_EX(sta),
-			OP_EX(eora), OP_EX(adca), OP_EX(ora),  OP_EX(adda), OP_EX(jmp),  OP_EX(jsr),  OP_EX(ldx),  OP_EX(stx),
-	/* D */ OP_IX2(suba),OP_IX2(cmpa),OP_IX2(sbca),OP_IX2(cpx), OP_IX2(anda),OP_IX2(bita),OP_IX2(lda), OP_IX2(sta),
-			OP_IX2(eora),OP_IX2(adca),OP_IX2(ora), OP_IX2(adda),OP_IX2(jmp), OP_IX2(jsr), OP_IX2(ldx), OP_IX2(stx),
-	/* E */ OP_IX1(suba),OP_IX1(cmpa),OP_IX1(sbca),OP_IX1(cpx), OP_IX1(anda),OP_IX1(bita),OP_IX1(lda), OP_IX1(sta),
-			OP_IX1(eora),OP_IX1(adca),OP_IX1(ora), OP_IX1(adda),OP_IX1(jmp), OP_IX1(jsr), OP_IX1(ldx), OP_IX1(stx),
-	/* F */ OP_IX(suba), OP_IX(cmpa), OP_IX(sbca), OP_IX(cpx),  OP_IX(anda), OP_IX(bita), OP_IX(lda),  OP_IX(sta),
-			OP_IX(eora), OP_IX(adca), OP_IX(ora),  OP_IX(adda), OP_IX(jmp),  OP_IX(jsr),  OP_IX(ldx),  OP_IX(stx)
-};
-
-const m6805_base_device::op_handler_table m6805_base_device::s_hc_ops =
-{
-	/*      0/8          1/9          2/A          3/B          4/C          5/D          6/E          7/F */
-	/* 0 */ OP(brset<0>),OP(brclr<0>),OP(brset<1>),OP(brclr<1>),OP(brset<2>),OP(brclr<2>),OP(brset<3>),OP(brclr<3>),
-			OP(brset<4>),OP(brclr<4>),OP(brset<5>),OP(brclr<5>),OP(brset<6>),OP(brclr<6>),OP(brset<7>),OP(brclr<7>),
-	/* 1 */ OP(bset<0>), OP(bclr<0>), OP(bset<1>), OP(bclr<1>), OP(bset<2>), OP(bclr<2>), OP(bset<3>), OP(bclr<3>),
-			OP(bset<4>), OP(bclr<4>), OP(bset<5>), OP(bclr<5>), OP(bset<6>), OP(bclr<6>), OP(bset<7>), OP(bclr<7>),
+	/* 0 */ OPN(brset,0),OPN(brclr,0),OPN(brset,1),OPN(brclr,1),OPN(brset,2),OPN(brclr,2),OPN(brset,3),OPN(brclr,3),
+			OPN(brset,4),OPN(brclr,4),OPN(brset,5),OPN(brclr,5),OPN(brset,6),OPN(brclr,6),OPN(brset,7),OPN(brclr,7),
+	/* 1 */ OPN(bset,0), OPN(bclr,0), OPN(bset,1), OPN(bclr,1), OPN(bset,2), OPN(bclr,2), OPN(bset,3), OPN(bclr,3),
+			OPN(bset,4), OPN(bclr,4), OPN(bset,5), OPN(bclr,5), OPN(bset,6), OPN(bclr,6), OPN(bset,7), OPN(bclr,7),
 	/* 2 */ OP_T(bra),   OP_F(bra),   OP_T(bhi),   OP_F(bhi),   OP_T(bcc),   OP_F(bcc),   OP_T(bne),   OP_F(bne),
 			OP_T(bhcc),  OP_F(bhcc),  OP_T(bpl),   OP_F(bpl),   OP_T(bmc),   OP_F(bmc),   OP_T(bil),   OP_F(bil),
 	/* 3 */ OP_DI(neg),  OP(illegal), OP(illegal), OP_DI(com),  OP_DI(lsr),  OP(illegal), OP_DI(ror),  OP_DI(asr),
@@ -162,6 +128,121 @@ const m6805_base_device::op_handler_table m6805_base_device::s_hc_ops =
 			OP_IX(eora), OP_IX(adca), OP_IX(ora),  OP_IX(adda), OP_IX(jmp),  OP_IX(jsr),  OP_IX(ldx),  OP_IX(stx)
 };
 
+#undef big
+#define big true
+
+const m6805_base_device::op_handler_table m6805_base_device::s_hmos_b_ops =
+{
+	/*      0/8          1/9          2/A          3/B          4/C          5/D          6/E          7/F */
+	/* 0 */ OPN(brset,0),OPN(brclr,0),OPN(brset,1),OPN(brclr,1),OPN(brset,2),OPN(brclr,2),OPN(brset,3),OPN(brclr,3),
+			OPN(brset,4),OPN(brclr,4),OPN(brset,5),OPN(brclr,5),OPN(brset,6),OPN(brclr,6),OPN(brset,7),OPN(brclr,7),
+	/* 1 */ OPN(bset,0), OPN(bclr,0), OPN(bset,1), OPN(bclr,1), OPN(bset,2), OPN(bclr,2), OPN(bset,3), OPN(bclr,3),
+			OPN(bset,4), OPN(bclr,4), OPN(bset,5), OPN(bclr,5), OPN(bset,6), OPN(bclr,6), OPN(bset,7), OPN(bclr,7),
+	/* 2 */ OP_T(bra),   OP_F(bra),   OP_T(bhi),   OP_F(bhi),   OP_T(bcc),   OP_F(bcc),   OP_T(bne),   OP_F(bne),
+			OP_T(bhcc),  OP_F(bhcc),  OP_T(bpl),   OP_F(bpl),   OP_T(bmc),   OP_F(bmc),   OP_T(bil),   OP_F(bil),
+	/* 3 */ OP_DI(neg),  OP(illegal), OP(illegal), OP_DI(com),  OP_DI(lsr),  OP(illegal), OP_DI(ror),  OP_DI(asr),
+			OP_DI(lsl),  OP_DI(rol),  OP_DI(dec),  OP(illegal), OP_DI(inc),  OP_DI(tst),  OP(illegal), OP_DI(clr),
+	/* 4 */ OP(nega),    OP(illegal), OP(illegal), OP(coma),    OP(lsra),    OP(illegal), OP(rora),    OP(asra),
+			OP(lsla),    OP(rola),    OP(deca),    OP(illegal), OP(inca),    OP(tsta),    OP(illegal), OP(clra),
+	/* 5 */ OP(negx),    OP(illegal), OP(illegal), OP(comx),    OP(lsrx),    OP(illegal), OP(rorx),    OP(asrx),
+			OP(lslx),    OP(rolx),    OP(decx),    OP(illegal), OP(incx),    OP(tstx),    OP(illegal), OP(clrx),
+	/* 6 */ OP_IX1(neg), OP(illegal), OP(illegal), OP_IX1(com), OP_IX1(lsr), OP(illegal), OP_IX1(ror), OP_IX1(asr),
+			OP_IX1(lsl), OP_IX1(rol), OP_IX1(dec), OP(illegal), OP_IX1(inc), OP_IX1(tst), OP(illegal), OP_IX1(clr),
+	/* 7 */ OP_IX(neg),  OP(illegal), OP(illegal), OP_IX(com),  OP_IX(lsr),  OP(illegal), OP_IX(ror),  OP_IX(asr),
+			OP_IX(lsl),  OP_IX(rol),  OP_IX(dec),  OP(illegal), OP_IX(inc),  OP_IX(tst),  OP(illegal), OP_IX(clr),
+	/* 8 */ OP(rti),     OP(rts),     OP(illegal), OP(swi),     OP(illegal), OP(illegal), OP(illegal), OP(illegal),
+			OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal),
+	/* 9 */ OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(tax),
+			OP(clc),     OP(sec),     OP(cli),     OP(sei),     OP(rsp),     OP(nop),     OP(illegal), OP(txa),
+	/* A */ OP_IM(suba), OP_IM(cmpa), OP_IM(sbca), OP_IM(cpx),  OP_IM(anda), OP_IM(bita), OP_IM(lda),  OP(illegal),
+			OP_IM(eora), OP_IM(adca), OP_IM(ora),  OP_IM(adda), OP(illegal), OP(bsr),     OP_IM(ldx),  OP(illegal),
+	/* B */ OP_DI(suba), OP_DI(cmpa), OP_DI(sbca), OP_DI(cpx),  OP_DI(anda), OP_DI(bita), OP_DI(lda),  OP_DI(sta),
+			OP_DI(eora), OP_DI(adca), OP_DI(ora),  OP_DI(adda), OP_DI(jmp),  OP_DI(jsr),  OP_DI(ldx),  OP_DI(stx),
+	/* C */ OP_EX(suba), OP_EX(cmpa), OP_EX(sbca), OP_EX(cpx),  OP_EX(anda), OP_EX(bita), OP_EX(lda),  OP_EX(sta),
+			OP_EX(eora), OP_EX(adca), OP_EX(ora),  OP_EX(adda), OP_EX(jmp),  OP_EX(jsr),  OP_EX(ldx),  OP_EX(stx),
+	/* D */ OP_IX2(suba),OP_IX2(cmpa),OP_IX2(sbca),OP_IX2(cpx), OP_IX2(anda),OP_IX2(bita),OP_IX2(lda), OP_IX2(sta),
+			OP_IX2(eora),OP_IX2(adca),OP_IX2(ora), OP_IX2(adda),OP_IX2(jmp), OP_IX2(jsr), OP_IX2(ldx), OP_IX2(stx),
+	/* E */ OP_IX1(suba),OP_IX1(cmpa),OP_IX1(sbca),OP_IX1(cpx), OP_IX1(anda),OP_IX1(bita),OP_IX1(lda), OP_IX1(sta),
+			OP_IX1(eora),OP_IX1(adca),OP_IX1(ora), OP_IX1(adda),OP_IX1(jmp), OP_IX1(jsr), OP_IX1(ldx), OP_IX1(stx),
+	/* F */ OP_IX(suba), OP_IX(cmpa), OP_IX(sbca), OP_IX(cpx),  OP_IX(anda), OP_IX(bita), OP_IX(lda),  OP_IX(sta),
+			OP_IX(eora), OP_IX(adca), OP_IX(ora),  OP_IX(adda), OP_IX(jmp),  OP_IX(jsr),  OP_IX(ldx),  OP_IX(stx)
+};
+
+const m6805_base_device::op_handler_table m6805_base_device::s_cmos_b_ops =
+{
+	/*      0/8          1/9          2/A          3/B          4/C          5/D          6/E          7/F */
+	/* 0 */ OPN(brset,0),OPN(brclr,0),OPN(brset,1),OPN(brclr,1),OPN(brset,2),OPN(brclr,2),OPN(brset,3),OPN(brclr,3),
+			OPN(brset,4),OPN(brclr,4),OPN(brset,5),OPN(brclr,5),OPN(brset,6),OPN(brclr,6),OPN(brset,7),OPN(brclr,7),
+	/* 1 */ OPN(bset,0), OPN(bclr,0), OPN(bset,1), OPN(bclr,1), OPN(bset,2), OPN(bclr,2), OPN(bset,3), OPN(bclr,3),
+			OPN(bset,4), OPN(bclr,4), OPN(bset,5), OPN(bclr,5), OPN(bset,6), OPN(bclr,6), OPN(bset,7), OPN(bclr,7),
+	/* 2 */ OP_T(bra),   OP_F(bra),   OP_T(bhi),   OP_F(bhi),   OP_T(bcc),   OP_F(bcc),   OP_T(bne),   OP_F(bne),
+			OP_T(bhcc),  OP_F(bhcc),  OP_T(bpl),   OP_F(bpl),   OP_T(bmc),   OP_F(bmc),   OP_T(bil),   OP_F(bil),
+	/* 3 */ OP_DI(neg),  OP(illegal), OP(illegal), OP_DI(com),  OP_DI(lsr),  OP(illegal), OP_DI(ror),  OP_DI(asr),
+			OP_DI(lsl),  OP_DI(rol),  OP_DI(dec),  OP(illegal), OP_DI(inc),  OP_DI(tst),  OP(illegal), OP_DI(clr),
+	/* 4 */ OP(nega),    OP(illegal), OP(illegal), OP(coma),    OP(lsra),    OP(illegal), OP(rora),    OP(asra),
+			OP(lsla),    OP(rola),    OP(deca),    OP(illegal), OP(inca),    OP(tsta),    OP(illegal), OP(clra),
+	/* 5 */ OP(negx),    OP(illegal), OP(illegal), OP(comx),    OP(lsrx),    OP(illegal), OP(rorx),    OP(asrx),
+			OP(lslx),    OP(rolx),    OP(decx),    OP(illegal), OP(incx),    OP(tstx),    OP(illegal), OP(clrx),
+	/* 6 */ OP_IX1(neg), OP(illegal), OP(illegal), OP_IX1(com), OP_IX1(lsr), OP(illegal), OP_IX1(ror), OP_IX1(asr),
+			OP_IX1(lsl), OP_IX1(rol), OP_IX1(dec), OP(illegal), OP_IX1(inc), OP_IX1(tst), OP(illegal), OP_IX1(clr),
+	/* 7 */ OP_IX(neg),  OP(illegal), OP(illegal), OP_IX(com),  OP_IX(lsr),  OP(illegal), OP_IX(ror),  OP_IX(asr),
+			OP_IX(lsl),  OP_IX(rol),  OP_IX(dec),  OP(illegal), OP_IX(inc),  OP_IX(tst),  OP(illegal), OP_IX(clr),
+	/* 8 */ OP(rti),     OP(rts),     OP(illegal), OP(swi),     OP(illegal), OP(illegal), OP(illegal), OP(illegal),
+			OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(stop),    OP(wait),
+	/* 9 */ OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(tax),
+			OP(clc),     OP(sec),     OP(cli),     OP(sei),     OP(rsp),     OP(nop),     OP(illegal), OP(txa),
+	/* A */ OP_IM(suba), OP_IM(cmpa), OP_IM(sbca), OP_IM(cpx),  OP_IM(anda), OP_IM(bita), OP_IM(lda),  OP(illegal),
+			OP_IM(eora), OP_IM(adca), OP_IM(ora),  OP_IM(adda), OP(illegal), OP(bsr),     OP_IM(ldx),  OP(illegal),
+	/* B */ OP_DI(suba), OP_DI(cmpa), OP_DI(sbca), OP_DI(cpx),  OP_DI(anda), OP_DI(bita), OP_DI(lda),  OP_DI(sta),
+			OP_DI(eora), OP_DI(adca), OP_DI(ora),  OP_DI(adda), OP_DI(jmp),  OP_DI(jsr),  OP_DI(ldx),  OP_DI(stx),
+	/* C */ OP_EX(suba), OP_EX(cmpa), OP_EX(sbca), OP_EX(cpx),  OP_EX(anda), OP_EX(bita), OP_EX(lda),  OP_EX(sta),
+			OP_EX(eora), OP_EX(adca), OP_EX(ora),  OP_EX(adda), OP_EX(jmp),  OP_EX(jsr),  OP_EX(ldx),  OP_EX(stx),
+	/* D */ OP_IX2(suba),OP_IX2(cmpa),OP_IX2(sbca),OP_IX2(cpx), OP_IX2(anda),OP_IX2(bita),OP_IX2(lda), OP_IX2(sta),
+			OP_IX2(eora),OP_IX2(adca),OP_IX2(ora), OP_IX2(adda),OP_IX2(jmp), OP_IX2(jsr), OP_IX2(ldx), OP_IX2(stx),
+	/* E */ OP_IX1(suba),OP_IX1(cmpa),OP_IX1(sbca),OP_IX1(cpx), OP_IX1(anda),OP_IX1(bita),OP_IX1(lda), OP_IX1(sta),
+			OP_IX1(eora),OP_IX1(adca),OP_IX1(ora), OP_IX1(adda),OP_IX1(jmp), OP_IX1(jsr), OP_IX1(ldx), OP_IX1(stx),
+	/* F */ OP_IX(suba), OP_IX(cmpa), OP_IX(sbca), OP_IX(cpx),  OP_IX(anda), OP_IX(bita), OP_IX(lda),  OP_IX(sta),
+			OP_IX(eora), OP_IX(adca), OP_IX(ora),  OP_IX(adda), OP_IX(jmp),  OP_IX(jsr),  OP_IX(ldx),  OP_IX(stx)
+};
+
+const m6805_base_device::op_handler_table m6805_base_device::s_hc_b_ops =
+{
+	/*      0/8          1/9          2/A          3/B          4/C          5/D          6/E          7/F */
+	/* 0 */ OPN(brset,0),OPN(brclr,0),OPN(brset,1),OPN(brclr,1),OPN(brset,2),OPN(brclr,2),OPN(brset,3),OPN(brclr,3),
+			OPN(brset,4),OPN(brclr,4),OPN(brset,5),OPN(brclr,5),OPN(brset,6),OPN(brclr,6),OPN(brset,7),OPN(brclr,7),
+	/* 1 */ OPN(bset,0), OPN(bclr,0), OPN(bset,1), OPN(bclr,1), OPN(bset,2), OPN(bclr,2), OPN(bset,3), OPN(bclr,3),
+			OPN(bset,4), OPN(bclr,4), OPN(bset,5), OPN(bclr,5), OPN(bset,6), OPN(bclr,6), OPN(bset,7), OPN(bclr,7),
+	/* 2 */ OP_T(bra),   OP_F(bra),   OP_T(bhi),   OP_F(bhi),   OP_T(bcc),   OP_F(bcc),   OP_T(bne),   OP_F(bne),
+			OP_T(bhcc),  OP_F(bhcc),  OP_T(bpl),   OP_F(bpl),   OP_T(bmc),   OP_F(bmc),   OP_T(bil),   OP_F(bil),
+	/* 3 */ OP_DI(neg),  OP(illegal), OP(illegal), OP_DI(com),  OP_DI(lsr),  OP(illegal), OP_DI(ror),  OP_DI(asr),
+			OP_DI(lsl),  OP_DI(rol),  OP_DI(dec),  OP(illegal), OP_DI(inc),  OP_DI(tst),  OP(illegal), OP_DI(clr),
+	/* 4 */ OP(nega),    OP(illegal), OP(mul),     OP(coma),    OP(lsra),    OP(illegal), OP(rora),    OP(asra),
+			OP(lsla),    OP(rola),    OP(deca),    OP(illegal), OP(inca),    OP(tsta),    OP(illegal), OP(clra),
+	/* 5 */ OP(negx),    OP(illegal), OP(illegal), OP(comx),    OP(lsrx),    OP(illegal), OP(rorx),    OP(asrx),
+			OP(lslx),    OP(rolx),    OP(decx),    OP(illegal), OP(incx),    OP(tstx),    OP(illegal), OP(clrx),
+	/* 6 */ OP_IX1(neg), OP(illegal), OP(illegal), OP_IX1(com), OP_IX1(lsr), OP(illegal), OP_IX1(ror), OP_IX1(asr),
+			OP_IX1(lsl), OP_IX1(rol), OP_IX1(dec), OP(illegal), OP_IX1(inc), OP_IX1(tst), OP(illegal), OP_IX1(clr),
+	/* 7 */ OP_IX(neg),  OP(illegal), OP(illegal), OP_IX(com),  OP_IX(lsr),  OP(illegal), OP_IX(ror),  OP_IX(asr),
+			OP_IX(lsl),  OP_IX(rol),  OP_IX(dec),  OP(illegal), OP_IX(inc),  OP_IX(tst),  OP(illegal), OP_IX(clr),
+	/* 8 */ OP(rti),     OP(rts),     OP(illegal), OP(swi),     OP(illegal), OP(illegal), OP(illegal), OP(illegal),
+			OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(stop),    OP(wait),
+	/* 9 */ OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(illegal), OP(tax),
+			OP(clc),     OP(sec),     OP(cli),     OP(sei),     OP(rsp),     OP(nop),     OP(illegal), OP(txa),
+	/* A */ OP_IM(suba), OP_IM(cmpa), OP_IM(sbca), OP_IM(cpx),  OP_IM(anda), OP_IM(bita), OP_IM(lda),  OP(illegal),
+			OP_IM(eora), OP_IM(adca), OP_IM(ora),  OP_IM(adda), OP(illegal), OP(bsr),     OP_IM(ldx),  OP(illegal),
+	/* B */ OP_DI(suba), OP_DI(cmpa), OP_DI(sbca), OP_DI(cpx),  OP_DI(anda), OP_DI(bita), OP_DI(lda),  OP_DI(sta),
+			OP_DI(eora), OP_DI(adca), OP_DI(ora),  OP_DI(adda), OP_DI(jmp),  OP_DI(jsr),  OP_DI(ldx),  OP_DI(stx),
+	/* C */ OP_EX(suba), OP_EX(cmpa), OP_EX(sbca), OP_EX(cpx),  OP_EX(anda), OP_EX(bita), OP_EX(lda),  OP_EX(sta),
+			OP_EX(eora), OP_EX(adca), OP_EX(ora),  OP_EX(adda), OP_EX(jmp),  OP_EX(jsr),  OP_EX(ldx),  OP_EX(stx),
+	/* D */ OP_IX2(suba),OP_IX2(cmpa),OP_IX2(sbca),OP_IX2(cpx), OP_IX2(anda),OP_IX2(bita),OP_IX2(lda), OP_IX2(sta),
+			OP_IX2(eora),OP_IX2(adca),OP_IX2(ora), OP_IX2(adda),OP_IX2(jmp), OP_IX2(jsr), OP_IX2(ldx), OP_IX2(stx),
+	/* E */ OP_IX1(suba),OP_IX1(cmpa),OP_IX1(sbca),OP_IX1(cpx), OP_IX1(anda),OP_IX1(bita),OP_IX1(lda), OP_IX1(sta),
+			OP_IX1(eora),OP_IX1(adca),OP_IX1(ora), OP_IX1(adda),OP_IX1(jmp), OP_IX1(jsr), OP_IX1(ldx), OP_IX1(stx),
+	/* F */ OP_IX(suba), OP_IX(cmpa), OP_IX(sbca), OP_IX(cpx),  OP_IX(anda), OP_IX(bita), OP_IX(lda),  OP_IX(sta),
+			OP_IX(eora), OP_IX(adca), OP_IX(ora),  OP_IX(adda), OP_IX(jmp),  OP_IX(jsr),  OP_IX(ldx),  OP_IX(stx)
+};
+
+#undef big
 
 const m6805_base_device::cycle_count_table m6805_base_device::s_hmos_cycles =
 {
@@ -262,8 +343,20 @@ m6805_base_device::m6805_base_device(
 
 void m6805_base_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
+	if (m_params.m_addr_width > 13) {
+		space(AS_PROGRAM).cache(m_cprogram16);
+		space(AS_PROGRAM).specific(m_program16);
+	} else {
+		space(AS_PROGRAM).cache(m_cprogram13);
+		space(AS_PROGRAM).specific(m_program13);
+	}
+
+	// get the minimum not including the zero placeholders for illegal instructions
+	m_min_cycles = *std::min_element(
+			std::begin(m_params.m_cycles),
+			std::end(m_params.m_cycles),
+			[] (u8 x, u8 y) { return u8(x - 1) < u8(y - 1); });
+	m_max_cycles = *std::max_element(std::begin(m_params.m_cycles), std::end(m_params.m_cycles));
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -307,7 +400,10 @@ void m6805_base_device::device_reset()
 	/* IRQ disabled */
 	SEI;
 
-	rm16(0xfffe & m_params.m_vector_mask, m_pc);
+	if (m_params.m_addr_width > 13)
+		rm16<true>(0xfffe & m_params.m_vector_mask, m_pc);
+	else
+		rm16<false>(0xfffe & m_params.m_vector_mask, m_pc);
 }
 
 
@@ -356,7 +452,10 @@ bool m6805_base_device::test_il()
 
 void m6805_base_device::interrupt_vector()
 {
-	rm16(0xfffa & m_params.m_vector_mask, m_pc);
+	if (m_params.m_addr_width > 13)
+		rm16<true>(0xfffa & m_params.m_vector_mask, m_pc);
+	else
+		rm16<false>(0xfffa & m_params.m_vector_mask, m_pc);
 }
 
 /* Generate interrupts */
@@ -368,15 +467,27 @@ void m6805_base_device::interrupt()
 
 	if (BIT(m_pending_interrupts, HD63705_INT_NMI))
 	{
-		pushword(m_pc);
-		pushbyte(m_x);
-		pushbyte(m_a);
-		pushbyte(m_cc);
+		if (m_params.m_addr_width > 13) {
+			pushword<true>(m_pc);
+			pushbyte<true>(m_x);
+			pushbyte<true>(m_a);
+			pushbyte<true>(m_cc);
+		}
+		else
+		{
+			pushword<false>(m_pc);
+			pushbyte<false>(m_x);
+			pushbyte<false>(m_a);
+			pushbyte<false>(m_cc);
+		}
 		SEI;
 		/* no vectors supported, just do the callback to clear irq_state if needed */
 		standard_irq_callback(0);
 
-		rm16(0x1ffc, m_pc);
+		if (m_params.m_addr_width > 13)
+			rm16<true>(0x1ffc, m_pc);
+		else
+			rm16<false>(0x1ffc, m_pc);
 		m_pending_interrupts &= ~(1 << HD63705_INT_NMI);
 
 		m_icount -= 11;
@@ -387,10 +498,19 @@ void m6805_base_device::interrupt()
 		if ((CC & IFLAG) == 0)
 		{
 			/* standard IRQ */
-			pushword(m_pc);
-			pushbyte(m_x);
-			pushbyte(m_a);
-			pushbyte(m_cc);
+			if (m_params.m_addr_width > 13) {
+				pushword<true>(m_pc);
+				pushbyte<true>(m_x);
+				pushbyte<true>(m_a);
+				pushbyte<true>(m_cc);
+			}
+			else
+			{
+				pushword<false>(m_pc);
+				pushbyte<false>(m_x);
+				pushbyte<false>(m_a);
+				pushbyte<false>(m_cc);
+			}
 			SEI;
 			/* no vectors supported, just do the callback to clear irq_state if needed */
 			standard_irq_callback(0);
@@ -424,7 +544,7 @@ std::unique_ptr<util::disasm_interface> m6805_base_device::create_disassembler()
 //  clock into cycles per second
 //-------------------------------------------------
 
-uint64_t m6805_base_device::execute_clocks_to_cycles(uint64_t clocks) const
+uint64_t m6805_base_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept
 {
 	return (clocks + 3) / 4;
 }
@@ -435,7 +555,7 @@ uint64_t m6805_base_device::execute_clocks_to_cycles(uint64_t clocks) const
 //  count back to raw clocks
 //-------------------------------------------------
 
-uint64_t m6805_base_device::execute_cycles_to_clocks(uint64_t cycles) const
+uint64_t m6805_base_device::execute_cycles_to_clocks(uint64_t cycles) const noexcept
 {
 	return cycles * 4;
 }
@@ -446,14 +566,9 @@ uint64_t m6805_base_device::execute_cycles_to_clocks(uint64_t cycles) const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t m6805_base_device::execute_min_cycles() const
+uint32_t m6805_base_device::execute_min_cycles() const noexcept
 {
-	// get the minimum not including the zero placeholders for illegal instructions
-	u32 const result(*std::min_element(
-			std::begin(m_params.m_cycles),
-			std::end(m_params.m_cycles),
-			[] (u8 x, u8 y) { return u8(x - 1) < u8(y - 1); }));
-	return result;
+	return m_min_cycles;
 }
 
 
@@ -462,10 +577,9 @@ uint32_t m6805_base_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t m6805_base_device::execute_max_cycles() const
+uint32_t m6805_base_device::execute_max_cycles() const noexcept
 {
-	u32 const result(*std::max_element(std::begin(m_params.m_cycles), std::end(m_params.m_cycles)));
-	return result;
+	return m_max_cycles;
 }
 
 
@@ -474,7 +588,7 @@ uint32_t m6805_base_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t m6805_base_device::execute_input_lines() const
+uint32_t m6805_base_device::execute_input_lines() const noexcept
 {
 	return 9;
 }
@@ -494,7 +608,7 @@ void m6805_base_device::execute_run()
 
 		debugger_instruction_hook(PC);
 
-		u8 const ireg = rdop(PC++);
+		u8 const ireg = m_params.m_addr_width > 13 ? rdop<true>(PC++) : rdop<false>(PC++);
 
 		(this->*m_params.m_ops[ireg])();
 		m_icount -= m_params.m_cycles[ireg];
@@ -527,7 +641,7 @@ m68hc05eg_device::m68hc05eg_device(const machine_config &mconfig, const char *ta
 			owner,
 			clock,
 			M68HC05EG,
-			{ s_hmos_ops, s_hmos_cycles, 13, 0x00ff, 0x00c0, 0xfffc }) // completely wrong, but it preserves existing behaviour
+			{ s_hmos_s_ops, s_hmos_cycles, 13, 0x00ff, 0x00c0, 0xfffc }) // completely wrong, but it preserves existing behaviour
 {
 }
 
@@ -535,7 +649,7 @@ void m68hc05eg_device::device_reset()
 {
 	m6805_base_device::device_reset();
 
-	rm16(0x1ffe, m_pc);
+	rm16<false>(0x1ffe, m_pc);
 }
 
 void m68hc05eg_device::interrupt_vector()
@@ -543,17 +657,17 @@ void m68hc05eg_device::interrupt_vector()
 	if (BIT(m_pending_interrupts, M68HC05EG_INT_IRQ))
 	{
 		m_pending_interrupts &= ~(1 << M68HC05EG_INT_IRQ);
-		rm16(0x1ffa, m_pc);
+		rm16<false>(0x1ffa, m_pc);
 	}
 	else if (BIT(m_pending_interrupts, M68HC05EG_INT_TIMER))
 	{
 		m_pending_interrupts &= ~(1 << M68HC05EG_INT_TIMER);
-		rm16(0x1ff8, m_pc);
+		rm16<false>(0x1ff8, m_pc);
 	}
 	else if (BIT(m_pending_interrupts, M68HC05EG_INT_CPI))
 	{
 		m_pending_interrupts &= ~(1 << M68HC05EG_INT_CPI);
-		rm16(0x1ff6, m_pc);
+		rm16<false>(0x1ff6, m_pc);
 	}
 }
 
@@ -567,7 +681,7 @@ hd63705_device::hd63705_device(const machine_config &mconfig, const char *tag, d
 			owner,
 			clock,
 			HD63705,
-			{ s_hmos_ops, s_hmos_cycles, 16, 0x017f, 0x0100, 0x1ffa })
+			{ s_hmos_b_ops, s_hmos_cycles, 16, 0x017f, 0x0100, 0x1ffa })
 {
 }
 
@@ -577,7 +691,7 @@ void hd63705_device::device_reset()
 
 	m_s.w.l = SP_MASK;
 
-	rm16(0x1ffe, m_pc);
+	rm16<true>(0x1ffe, m_pc);
 }
 
 void hd63705_device::execute_set_input(int inputnum, int state)
@@ -616,42 +730,42 @@ void hd63705_device::interrupt_vector()
 	if ((m_pending_interrupts & (1 << HD63705_INT_IRQ1)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_IRQ1);
-		rm16(0x1ff8, m_pc);
+		rm16<true>(0x1ff8, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_IRQ2)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_IRQ2);
-		rm16(0x1fec, m_pc);
+		rm16<true>(0x1fec, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_ADCONV)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_ADCONV);
-		rm16(0x1fea, m_pc);
+		rm16<true>(0x1fea, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_TIMER1)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_TIMER1);
-		rm16(0x1ff6, m_pc);
+		rm16<true>(0x1ff6, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_TIMER2)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_TIMER2);
-		rm16(0x1ff4, m_pc);
+		rm16<true>(0x1ff4, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_TIMER3)) != 0)
 	{
 		m_pending_interrupts &= ~(1<<HD63705_INT_TIMER3);
-		rm16(0x1ff2, m_pc);
+		rm16<true>(0x1ff2, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_PCI)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_PCI);
-		rm16(0x1ff0, m_pc);
+		rm16<true>(0x1ff0, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_SCI)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_SCI);
-		rm16(0x1fee, m_pc);
+		rm16<true>(0x1fee, m_pc);
 	}
 }
 

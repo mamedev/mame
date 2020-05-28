@@ -112,7 +112,7 @@ void vic20_video_pak_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_screen(MC6845_SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(vic20_video_pak_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(vic20_video_pak_device::crtc_update_row));
 }
 
 

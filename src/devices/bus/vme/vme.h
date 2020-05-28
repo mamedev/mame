@@ -213,7 +213,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(VME_SLOT, vme_slot_device)
 
-class device_vme_card_interface : public device_slot_card_interface
+class device_vme_card_interface : public device_interface
 {
 	template <class ElementType> friend class simple_list;
 public:

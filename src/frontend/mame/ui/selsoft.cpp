@@ -203,10 +203,6 @@ void menu_select_software::handle()
 				m_filter_highlight = software_filter::LAST;
 			break;
 
-		case IPT_UI_CONFIGURE:
-			inkey_navigation();
-			break;
-
 		case IPT_UI_DATS:
 			inkey_dats();
 			break;
@@ -225,12 +221,12 @@ void menu_select_software::handle()
 						if (!mfav.is_favorite_system_software(*swinfo))
 						{
 							mfav.add_favorite_software(*swinfo);
-							machine().popmessage(_("%s\n added to favorites list."), swinfo->longname.c_str());
+							machine().popmessage(_("%s\n added to favorites list."), swinfo->longname);
 						}
 
 						else
 						{
-							machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
+							machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname);
 							mfav.remove_favorite_software(*swinfo);
 						}
 					}
@@ -487,10 +483,10 @@ void menu_select_software::inkey_select(const event *menu_event)
 		driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
 		media_auditor auditor(drivlist);
 		drivlist.next();
-		software_list_device *swlist = software_list_device::find_by_name(*drivlist.config(), ui_swinfo->listname.c_str());
-		const software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+		software_list_device *swlist = software_list_device::find_by_name(*drivlist.config(), ui_swinfo->listname);
+		const software_info *swinfo = swlist->find(ui_swinfo->shortname);
 
-		media_auditor::summary const summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
+		media_auditor::summary const summary = auditor.audit_software(*swlist, *swinfo, AUDIT_VALIDATE_FAST);
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
@@ -525,7 +521,7 @@ void menu_select_software::load_sw_custom_filters()
 {
 	// attempt to open the output file
 	emu_file file(ui().options().ui_path(), OPEN_FLAG_READ);
-	if (file.open("custom_", m_driver.name, "_filter.ini") == osd_file::error::NONE)
+	if (file.open(util::string_format("custom_%s_filter.ini", m_driver.name)) == osd_file::error::NONE)
 	{
 		software_filter::ptr flt(software_filter::create(file, m_filter_data));
 		if (flt)
@@ -601,12 +597,12 @@ render_texture *menu_select_software::get_icon_texture(int linenum, void *select
 
 		bitmap_argb32 tmp;
 		emu_file snapfile(std::string(paths->second), OPEN_FLAG_READ);
-		if (snapfile.open(std::string(swinfo->shortname), ".ico") == osd_file::error::NONE)
+		if (snapfile.open(std::string(swinfo->shortname) + ".ico") == osd_file::error::NONE)
 		{
 			render_load_ico_highest_detail(snapfile, tmp);
 			snapfile.close();
 		}
-		if (!tmp.valid() && !swinfo->parentname.empty() && (snapfile.open(std::string(swinfo->parentname), ".ico") == osd_file::error::NONE))
+		if (!tmp.valid() && !swinfo->parentname.empty() && (snapfile.open(std::string(swinfo->parentname) + ".ico") == osd_file::error::NONE))
 		{
 			render_load_ico_highest_detail(snapfile, tmp);
 			snapfile.close();
@@ -633,7 +629,7 @@ void menu_select_software::get_selection(ui_software_info const *&software, game
 void menu_select_software::make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const
 {
 	// determine the text for the header
-	int vis_item = !m_search.empty() ? visible_items : (m_has_empty_start ? visible_items - 1 : visible_items);
+	int vis_item = !m_search.empty() ? m_available_items : (m_has_empty_start ? m_available_items - 1 : m_available_items);
 	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d software packages )"), emulator_info::get_appname(), bare_build_version, vis_item, m_swinfo.size() - 1);
 	line1 = string_format(_("Driver: \"%1$s\" software list "), m_driver.type.fullname());
 
@@ -676,7 +672,7 @@ void menu_select_software::filter_selected()
 					if (software_filter::CUSTOM == new_type)
 					{
 						emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-						if (file.open("custom_", m_driver.name, "_filter.ini") == osd_file::error::NONE)
+						if (file.open(util::string_format("custom_%s_filter.ini", m_driver.name)) == osd_file::error::NONE)
 						{
 							filter.save_ini(file, 0);
 							file.close();

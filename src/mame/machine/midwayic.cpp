@@ -246,36 +246,36 @@ void midway_serial_pic_emu_device::device_start()
 }
 
 
-READ8_MEMBER(midway_serial_pic_emu_device::read_a)
+uint8_t midway_serial_pic_emu_device::read_a()
 {
 //  printf("%s: read_a\n", machine().describe_context().c_str());
 	return 0x00;
 }
 
-READ8_MEMBER(midway_serial_pic_emu_device::read_b)
+uint8_t midway_serial_pic_emu_device::read_b()
 {
 //  printf("%s: read_b\n", machine().describe_context().c_str());
 	return 0x00;
 }
 
-READ8_MEMBER(midway_serial_pic_emu_device::read_c)
+uint8_t midway_serial_pic_emu_device::read_c()
 {
 //  used
 //  printf("%s: read_c\n", machine().describe_context().c_str());
 	return 0x00;
 }
 
-WRITE8_MEMBER(midway_serial_pic_emu_device::write_a)
+void midway_serial_pic_emu_device::write_a(uint8_t data)
 {
 //  printf("%s: write_a %02x\n", machine().describe_context().c_str(), data);
 }
 
-WRITE8_MEMBER(midway_serial_pic_emu_device::write_b)
+void midway_serial_pic_emu_device::write_b(uint8_t data)
 {
 //  printf("%s: write_b %02x\n", machine().describe_context().c_str(), data);
 }
 
-WRITE8_MEMBER(midway_serial_pic_emu_device::write_c)
+void midway_serial_pic_emu_device::write_c(uint8_t data)
 {
 //  used
 //  printf("%s: write_c %02x\n", machine().describe_context().c_str(), data);
@@ -756,11 +756,13 @@ void midway_ioasic_device::device_start()
 	/* configure the fifo */
 	if (m_has_dcs)
 	{
-		m_dcs->set_fifo_callbacks(read16_delegate(FUNC(midway_ioasic_device::fifo_r),this),
-			read16_delegate(FUNC(midway_ioasic_device::fifo_status_r),this),
-			write_line_delegate(FUNC(midway_ioasic_device::fifo_reset_w),this));
-		m_dcs->set_io_callbacks(write_line_delegate(FUNC(midway_ioasic_device::ioasic_output_full),this),
-			write_line_delegate(FUNC(midway_ioasic_device::ioasic_input_empty),this));
+		m_dcs->set_fifo_callbacks(
+				read16smo_delegate(*this, FUNC(midway_ioasic_device::fifo_r)),
+				read16_delegate(*this, FUNC(midway_ioasic_device::fifo_status_r)),
+				write_line_delegate(*this, FUNC(midway_ioasic_device::fifo_reset_w)));
+		m_dcs->set_io_callbacks(
+				write_line_delegate(*this, FUNC(midway_ioasic_device::ioasic_output_full)),
+				write_line_delegate(*this, FUNC(midway_ioasic_device::ioasic_input_empty)));
 	}
 
 	fifo_reset_w(1);
@@ -811,7 +813,7 @@ void midway_ioasic_device::update_ioasic_irq()
 }
 
 
-WRITE8_MEMBER(midway_ioasic_device::cage_irq_handler)
+void midway_ioasic_device::cage_irq_handler(uint8_t data)
 {
 	logerror("CAGE irq handler: %d\n", data);
 	m_sound_irq_state = 0;
@@ -852,7 +854,7 @@ WRITE_LINE_MEMBER(midway_ioasic_device::ioasic_output_full)
  *
  *************************************/
 
-READ16_MEMBER(midway_ioasic_device::fifo_r)
+uint16_t midway_ioasic_device::fifo_r()
 {
 	uint16_t result = 0;
 
@@ -1163,7 +1165,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 			/* sound reset? */
 			if (m_has_dcs)
 			{
-				m_dcs->reset_w(~newreg & 1);
+				m_dcs->reset_w(newreg & 1);
 			}
 			else if (m_has_cage)
 			{

@@ -42,8 +42,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	ati_vga_device *m_vga;
-	mach8_device *m_8514;
+	required_device<ati_vga_device> m_vga;
+	required_device<mach8_device> m_8514;
 };
 
 class isa16_vga_gfxultrapro_device :
@@ -65,8 +65,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	private:
-	mach32_device *m_vga;
+private:
+	required_device<mach32_device> m_vga;
 };
 
 class isa16_vga_mach64_device :
@@ -89,7 +89,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	mach64_device *m_vga;
+	required_device<mach64_device> m_vga;
 };
 
 

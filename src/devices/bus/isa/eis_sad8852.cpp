@@ -205,7 +205,7 @@ void isa16_sad8852_device::device_add_mconfig(machine_config &config)
 	cpu.set_addrmap(AS_PROGRAM, &isa16_sad8852_device::sad8852_mem);
 	cpu.set_addrmap(AS_IO, &isa16_sad8852_device::sad8852_io);
 
-	I8274_NEW(config, "terminal", XTAL(12'000'000) / 3); // Needs verification
+	I8274(config, "terminal", XTAL(12'000'000) / 3); // Needs verification
 }
 
 isa16_sad8852_device::isa16_sad8852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -236,8 +236,8 @@ void isa16_sad8852_device::device_reset()
 	{
 		m_isa->install_device(
 				0x378, 0x378, // Wrong, need to find real i/o addresses
-				read8_delegate(FUNC( isa16_sad8852_device::sad8852_r ), this),
-				write8_delegate(FUNC( isa16_sad8852_device::sad8852_w ), this));
+				read8_delegate(*this, FUNC(isa16_sad8852_device::sad8852_r)),
+				write8_delegate(*this, FUNC(isa16_sad8852_device::sad8852_w)));
 		m_irq = m_isairq->read();
 		m_installed = true;
 	}

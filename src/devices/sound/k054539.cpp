@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(K054539, k054539_device, "k054539", "K054539 ADPCM")
 k054539_device::k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K054539, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 24)
+	, device_rom_interface(mconfig, *this)
 	, flags(0)
 	, ram(nullptr)
 	, reverb_pos(0)
@@ -32,6 +32,7 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 	, m_timer(nullptr)
 	, m_timer_state(0)
 	, m_timer_handler(*this)
+	, m_apan_cb(*this)
 {
 }
 
@@ -503,7 +504,7 @@ void k054539_device::device_start()
 
 	// resolve / bind callbacks
 	m_timer_handler.resolve_safe();
-	m_apan_cb.bind_relative_to(*owner());
+	m_apan_cb.resolve();
 
 	for (auto & elem : gain)
 		elem = 1.0;

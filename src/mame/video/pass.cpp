@@ -13,7 +13,7 @@ TILE_GET_INFO_MEMBER(pass_state::get_pass_bg_tile_info)
 
 	tileno = m_bg_videoram[tile_index] & 0x1fff;
 	fx = (m_bg_videoram[tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(1, tileno, 0, TILE_FLIPYX(fx));
+	tileinfo.set(1, tileno, 0, TILE_FLIPYX(fx));
 
 }
 
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(pass_state::get_pass_fg_tile_info)
 	tileno = m_fg_videoram[tile_index] & 0x3fff;
 	flip = (m_fg_videoram[tile_index] & 0xc000) >>14;
 
-	SET_TILE_INFO_MEMBER(0, tileno, 0, TILE_FLIPYX(flip));
+	tileinfo.set(0, tileno, 0, TILE_FLIPYX(flip));
 
 }
 
@@ -46,8 +46,8 @@ WRITE16_MEMBER(pass_state::pass_fg_videoram_w)
 
 void pass_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pass_state::get_pass_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,  64, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pass_state::get_pass_fg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pass_state::get_pass_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,  64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pass_state::get_pass_fg_tile_info)), TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
 
 	m_fg_tilemap->set_transparent_pen(255);
 }

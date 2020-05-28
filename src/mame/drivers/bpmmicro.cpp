@@ -176,13 +176,13 @@ public:
 	}
 
 	void init_bp1200();
-	DECLARE_WRITE16_MEMBER(unknown_82200_w);
-	DECLARE_READ16_MEMBER(latch_84000_r);
-	DECLARE_WRITE16_MEMBER(latch_84002_w);
-	DECLARE_WRITE16_MEMBER(unknown_8400e_w);
-	DECLARE_WRITE16_MEMBER(unknown_84018_w);
-	DECLARE_WRITE16_MEMBER(unknown_8401a_w);
-	DECLARE_WRITE16_MEMBER(eeprom_8401c_w);
+	void unknown_82200_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t latch_84000_r(offs_t offset, uint16_t mem_mask = ~0);
+	void latch_84002_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void unknown_8400e_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void unknown_84018_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void unknown_8401a_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void eeprom_8401c_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	virtual void machine_start() override;
 	void bpmmicro(machine_config &config);
 	void i286_io(address_map &map);
@@ -218,30 +218,30 @@ void bpmmicro_state::machine_start()
  Read/Write handlers
 ******************************************************************************/
 
-WRITE16_MEMBER(bpmmicro_state::unknown_82200_w)
+void bpmmicro_state::unknown_82200_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: unknown write to 0x82200 offset %08x mask (%08x) data %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
 }
 
-READ16_MEMBER(bpmmicro_state::latch_84000_r)
+uint16_t bpmmicro_state::latch_84000_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t returnval = m_latch; // not sure this is correct, it could be that the 93c48 DO pin is connected directly to bit 7 here...
 	logerror("%08x:Read 0x84000 octal latch %08x (%08x), got %08x\n", machine().describe_context(), offset << 1, mem_mask, returnval);
 	return returnval;
 }
 
-WRITE16_MEMBER(bpmmicro_state::latch_84002_w)
+void bpmmicro_state::latch_84002_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: write to 0x84002 octal latch clock? %08x mask (%08x) data %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
 	if (data) m_latch = m_shifter;
 }
 
-WRITE16_MEMBER(bpmmicro_state::unknown_8400e_w)
+void bpmmicro_state::unknown_8400e_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: unknown write to 0x8400e offset %08x mask (%08x) data %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
 }
 
-WRITE16_MEMBER(bpmmicro_state::unknown_84018_w)
+void bpmmicro_state::unknown_84018_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: unknown write to 0x84018 offset %08x mask (%08x) data %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
 	if (data&1) // HACK
@@ -251,12 +251,12 @@ WRITE16_MEMBER(bpmmicro_state::unknown_84018_w)
 	}
 }
 
-WRITE16_MEMBER(bpmmicro_state::unknown_8401a_w)
+void bpmmicro_state::unknown_8401a_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: unknown write to 0x8401a offset %08x mask (%08x) data %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
 }
 
-WRITE16_MEMBER(bpmmicro_state::eeprom_8401c_w)
+void bpmmicro_state::eeprom_8401c_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s:write eeprom %08x (%08x) %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
 	if (ACCESSING_BITS_0_7)
@@ -342,7 +342,7 @@ void bpmmicro_state::i286_mem(address_map &map)
 	map(0x08401a, 0x8401b).w(FUNC(bpmmicro_state::unknown_8401a_w));
 	map(0x08401c, 0x8401d).w(FUNC(bpmmicro_state::eeprom_8401c_w));
 	map(0x0f0000, 0x0fffff).rom().region("bios", 0x10000);
-	//AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0) //?
+	//map(0xfe0000, 0xffffff).rom().region("bios", 0); //?
 	map(0xfffff0, 0xffffff).rom().region("bios", 0x1fff0); //?
 }
 
@@ -379,7 +379,7 @@ void bpmmicro_state::bpmmicro(machine_config &config)
 ******************************************************************************/
 
 ROM_START(bp1200)
-	ROM_REGION(0x20000, "bios", 0)
+	ROM_REGION16_LE(0x20000, "bios", 0)
 	// note about roms: the BP-1200 has two jumpers controlling what type of rom is installed;
 	// it needs 120ns or faster roms
 	// the "W1" and "W2" labels are next to pins A on the pcb

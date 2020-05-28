@@ -1,23 +1,33 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #include "bx_p.h"
 #include <bx/file.h>
 
+#ifndef BX_CONFIG_CRT_FILE_READER_WRITER
+#	define BX_CONFIG_CRT_FILE_READER_WRITER !BX_CRT_NONE
+#endif // BX_CONFIG_CRT_FILE_READER_WRITER
+
+#ifndef BX_CONFIG_CRT_DIRECTORY_READER
+#	define BX_CONFIG_CRT_DIRECTORY_READER (BX_PLATFORM_OS_DESKTOP && !BX_CRT_NONE)
+#endif // BX_CONFIG_CRT_DIRECTORY_READER
+
 #if BX_CRT_NONE
 #	include "crt0.h"
 #else
-#	include <stdio.h>
-#	include <sys/stat.h>
+#	if BX_CONFIG_CRT_DIRECTORY_READER
+#		include <dirent.h>
+#	endif // BX_CONFIG_CRT_DIRECTORY_READER
+#	include <stdio.h>      // remove
+#	include <sys/stat.h>   // stat, mkdir
+#	if BX_CRT_MSVC
+#		include <direct.h> // _getcwd
+#	else
+#		include <unistd.h> // getcwd
+#	endif // BX_CRT_MSVC
 #endif // !BX_CRT_NONE
-
-#ifndef BX_CONFIG_CRT_FILE_READER_WRITER
-#	define BX_CONFIG_CRT_FILE_READER_WRITER !(0 \
-			|| BX_CRT_NONE                      \
-			)
-#endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
 namespace bx
 {
@@ -64,6 +74,7 @@ namespace bx
 #	elif 0                   \
 	  || BX_PLATFORM_ANDROID \
 	  || BX_PLATFORM_BSD     \
+	  || BX_PLATFORM_HAIKU   \
 	  || BX_PLATFORM_IOS     \
 	  || BX_PLATFORM_OSX
 #		define fseeko64 fseeko
@@ -97,7 +108,7 @@ namespace bx
 				return false;
 			}
 
-			m_file = fopen(_filePath.get(), "rb");
+			m_file = fopen(_filePath.getCPtr(), "rb");
 			if (NULL == m_file)
 			{
 				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "FileReader: Failed to open file.");
@@ -177,7 +188,7 @@ namespace bx
 				return false;
 			}
 
-			m_file = fopen(_filePath.get(), _append ? "ab" : "wb");
+			m_file = fopen(_filePath.getCPtr(), _append ? "ab" : "wb");
 
 			if (NULL == m_file)
 			{
@@ -553,18 +564,193 @@ namespace bx
 		return impl->write(_data, _size, _err);
 	}
 
-	bool stat(const FilePath& _filePath, FileInfo& _outFileInfo)
+#if BX_CONFIG_CRT_DIRECTORY_READER
+
+	class DirectoryReaderImpl : public ReaderOpenI, public CloserI, public ReaderI
+	{
+	public:
+		DirectoryReaderImpl()
+			: m_dir(NULL)
+			, m_pos(0)
+		{
+		}
+
+		virtual ~DirectoryReaderImpl()
+		{
+			close();
+		}
+
+		virtual bool open(const FilePath& _filePath, Error* _err) override
+		{
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+			m_dir = opendir(_filePath.getCPtr() );
+
+			if (NULL == m_dir)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "DirectoryReader: Failed to open directory.");
+				return false;
+			}
+
+			m_pos = 0;
+
+			return true;
+		}
+
+		virtual void close() override
+		{
+			if (NULL != m_dir)
+			{
+				closedir(m_dir);
+				m_dir = NULL;
+			}
+		}
+
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) override
+		{
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+			int32_t total = 0;
+
+			uint8_t* out = (uint8_t*)_data;
+
+			while (0 < _size)
+			{
+				if (0 == m_pos)
+				{
+					if (!fetch(m_cache, m_dir) )
+					{
+						BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "DirectoryReader: EOF.");
+						return total;
+					}
+				}
+
+				const uint8_t* src = (const uint8_t*)&m_cache;
+				int32_t size = min<int32_t>(_size, sizeof(m_cache)-m_pos);
+				memCopy(&out[total], &src[m_pos], size);
+				total += size;
+				_size -= size;
+
+				m_pos += size;
+				m_pos %= sizeof(m_cache);
+			}
+
+			return total;
+		}
+
+		static bool fetch(FileInfo& _out, DIR* _dir)
+		{
+			for (;;)
+			{
+				const dirent* item = readdir(_dir);
+
+				if (NULL == item)
+				{
+					break;
+				}
+
+				if (0 != (item->d_type & DT_DIR) )
+				{
+					_out.type = FileType::Dir;
+					_out.size = UINT64_MAX;
+					_out.filePath.set(item->d_name);
+					return true;
+				}
+
+				if (0 != (item->d_type & DT_REG) )
+				{
+					_out.type = FileType::File;
+					_out.size = UINT64_MAX;
+					_out.filePath.set(item->d_name);
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		FileInfo m_cache;
+		DIR*     m_dir;
+		int32_t  m_pos;
+	};
+
+#else
+
+	class DirectoryReaderImpl : public ReaderOpenI, public CloserI, public ReaderI
+	{
+	public:
+		DirectoryReaderImpl()
+		{
+		}
+
+		virtual ~DirectoryReaderImpl()
+		{
+		}
+
+		virtual bool open(const FilePath& _filePath, Error* _err) override
+		{
+			BX_UNUSED(_filePath);
+			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "DirectoryReader: Failed to open directory.");
+			return false;
+		}
+
+		virtual void close() override
+		{
+		}
+
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) override
+		{
+			BX_UNUSED(_data, _size);
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "DirectoryReader: EOF.");
+			return 0;
+		}
+	};
+
+#endif // BX_CONFIG_CRT_DIRECTORY_READER
+
+	DirectoryReader::DirectoryReader()
+	{
+		BX_STATIC_ASSERT(sizeof(DirectoryReaderImpl) <= sizeof(m_internal) );
+		BX_PLACEMENT_NEW(m_internal, DirectoryReaderImpl);
+	}
+
+	DirectoryReader::~DirectoryReader()
+	{
+		DirectoryReaderImpl* impl = reinterpret_cast<DirectoryReaderImpl*>(m_internal);
+		impl->~DirectoryReaderImpl();
+	}
+
+	bool DirectoryReader::open(const FilePath& _filePath, Error* _err)
+	{
+		DirectoryReaderImpl* impl = reinterpret_cast<DirectoryReaderImpl*>(m_internal);
+		return impl->open(_filePath, _err);
+	}
+
+	void DirectoryReader::close()
+	{
+		DirectoryReaderImpl* impl = reinterpret_cast<DirectoryReaderImpl*>(m_internal);
+		impl->close();
+	}
+
+	int32_t DirectoryReader::read(void* _data, int32_t _size, Error* _err)
+	{
+		DirectoryReaderImpl* impl = reinterpret_cast<DirectoryReaderImpl*>(m_internal);
+		return impl->read(_data, _size, _err);
+	}
+
+	bool stat(FileInfo& _outFileInfo, const FilePath& _filePath)
 	{
 #if BX_CRT_NONE
 		BX_UNUSED(_filePath, _outFileInfo);
 		return false;
 #else
-		_outFileInfo.m_size = 0;
-		_outFileInfo.m_type = FileInfo::Count;
+		_outFileInfo.size = 0;
+		_outFileInfo.type = FileType::Count;
 
 #	if BX_COMPILER_MSVC
 		struct ::_stat64 st;
-		int32_t result = ::_stat64(_filePath.get(), &st);
+		int32_t result = ::_stat64(_filePath.getCPtr(), &st);
 
 		if (0 != result)
 		{
@@ -573,15 +759,15 @@ namespace bx
 
 		if (0 != (st.st_mode & _S_IFREG) )
 		{
-			_outFileInfo.m_type = FileInfo::Regular;
+			_outFileInfo.type = FileType::File;
 		}
 		else if (0 != (st.st_mode & _S_IFDIR) )
 		{
-			_outFileInfo.m_type = FileInfo::Directory;
+			_outFileInfo.type = FileType::Dir;
 		}
 #	else
 		struct ::stat st;
-		int32_t result = ::stat(_filePath.get(), &st);
+		int32_t result = ::stat(_filePath.getCPtr(), &st);
 		if (0 != result)
 		{
 			return false;
@@ -589,18 +775,185 @@ namespace bx
 
 		if (0 != (st.st_mode & S_IFREG) )
 		{
-			_outFileInfo.m_type = FileInfo::Regular;
+			_outFileInfo.type = FileType::File;
 		}
 		else if (0 != (st.st_mode & S_IFDIR) )
 		{
-			_outFileInfo.m_type = FileInfo::Directory;
+			_outFileInfo.type = FileType::Dir;
 		}
 #	endif // BX_COMPILER_MSVC
 
-		_outFileInfo.m_size = st.st_size;
+		_outFileInfo.size = st.st_size;
 
 		return true;
 #endif // BX_CRT_NONE
+	}
+
+	bool make(const FilePath& _filePath, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		if (!_err->isOk() )
+		{
+			return false;
+		}
+
+#if BX_CRT_MSVC
+		int32_t result = ::_mkdir(_filePath.getCPtr() );
+#elif BX_CRT_MINGW
+		int32_t result = ::mkdir(_filePath.getCPtr());
+#elif BX_CRT_NONE
+		BX_UNUSED(_filePath);
+		int32_t result = -1;
+#else
+		int32_t result = ::mkdir(_filePath.getCPtr(), 0700);
+#endif // BX_CRT_MSVC
+
+		if (0 != result)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool makeAll(const FilePath& _filePath, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		if (!_err->isOk() )
+		{
+			return false;
+		}
+
+		FileInfo fi;
+
+		if (stat(fi, _filePath) )
+		{
+			if (FileType::Dir == fi.type)
+			{
+				return true;
+			}
+
+			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
+			return false;
+		}
+
+		const StringView dir   = strRTrim(_filePath, "/");
+		const StringView slash = strRFind(dir, '/');
+
+		if (!slash.isEmpty()
+		&&  slash.getPtr() - dir.getPtr() > 1)
+		{
+			if (!makeAll(StringView(dir.getPtr(), slash.getPtr() ), _err) )
+			{
+				return false;
+			}
+		}
+
+		FilePath path(dir);
+		return make(path, _err);
+	}
+
+	bool remove(const FilePath& _filePath, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		if (!_err->isOk() )
+		{
+			return false;
+		}
+
+#if BX_CRT_MSVC
+		int32_t result = -1;
+		FileInfo fi;
+		if (stat(fi, _filePath) )
+		{
+			if (FileType::Dir == fi.type)
+			{
+				result = ::_rmdir(_filePath.getCPtr() );
+			}
+			else
+			{
+				result = ::remove(_filePath.getCPtr() );
+			}
+		}
+#elif BX_CRT_NONE
+		BX_UNUSED(_filePath);
+		int32_t result = -1;
+#else
+		int32_t result = ::remove(_filePath.getCPtr() );
+#endif // BX_CRT_MSVC
+
+		if (0 != result)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool removeAll(const FilePath& _filePath, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		if (remove(_filePath, _err) )
+		{
+			return true;
+		}
+
+		_err->reset();
+
+		FileInfo fi;
+
+		if (!stat(fi, _filePath) )
+		{
+			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
+			return false;
+		}
+
+		if (FileType::Dir != fi.type)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
+			return false;
+		}
+
+		Error err;
+		DirectoryReader dr;
+
+		if (!bx::open(&dr, _filePath) )
+		{
+			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
+			return false;
+		}
+
+		while (err.isOk() )
+		{
+			bx::read(&dr, fi, &err);
+
+			if (err.isOk() )
+			{
+				if (0 == strCmp(fi.filePath, ".")
+				||  0 == strCmp(fi.filePath, "..") )
+				{
+					continue;
+				}
+
+				FilePath path(_filePath);
+				path.join(fi.filePath);
+				if (!removeAll(path, _err) )
+				{
+					_err->reset();
+					break;
+				}
+			}
+		}
+
+		bx::close(&dr);
+
+		return remove(_filePath, _err);
 	}
 
 } // namespace bx

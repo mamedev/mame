@@ -16,7 +16,7 @@
 #include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/mc2661.h"
+#include "machine/scn_pci.h"
 
 class tricep_state : public driver_device
 {
@@ -40,7 +40,7 @@ private:
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device_array<mc2661_device, 4> m_usart;
+	required_device_array<scn2651_device, 4> m_usart;
 	required_shared_ptr<uint16_t> m_p_ram;
 
 	uint8_t m_mux;
@@ -67,7 +67,7 @@ void tricep_state::tricep_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x0007ffff).ram().share("p_ram");
-	map(0x00fd0000, 0x00fd1fff).rom().region("user1", 0);
+	map(0x00fd0000, 0x00fd1fff).rom().region("bios", 0);
 	map(0x00ff0028, 0x00ff002b).rw(FUNC(tricep_state::usart_r), FUNC(tricep_state::usart_w));
 	map(0x00ff002e, 0x00ff002f).nopr();
 	map(0x00ff002f, 0x00ff002f).w(FUNC(tricep_state::usart_select_w));
@@ -80,9 +80,9 @@ INPUT_PORTS_END
 
 void tricep_state::machine_reset()
 {
-	uint8_t* user1 = memregion("user1")->base();
+	uint8_t* bios = memregion("bios")->base();
 
-	memcpy((uint8_t*)m_p_ram.target(),user1,0x2000);
+	memcpy((uint8_t*)m_p_ram.target(),bios,0x2000);
 
 	m_maincpu->reset();
 
@@ -106,28 +106,28 @@ void tricep_state::tricep(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tricep_state::tricep_mem);
 	// TODO: MC68451 MMU
 
-	MC2661(config, m_usart[0], 5.0688_MHz_XTAL);
+	SCN2651(config, m_usart[0], 5.0688_MHz_XTAL);
 	m_usart[0]->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_usart[0]->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_usart[0]->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	MC2661(config, m_usart[1], 5.0688_MHz_XTAL);
-	MC2661(config, m_usart[2], 5.0688_MHz_XTAL);
-	MC2661(config, m_usart[3], 5.0688_MHz_XTAL);
+	SCN2651(config, m_usart[1], 5.0688_MHz_XTAL);
+	SCN2651(config, m_usart[2], 5.0688_MHz_XTAL);
+	SCN2651(config, m_usart[3], 5.0688_MHz_XTAL);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set(m_usart[0], FUNC(mc2661_device::rx_w));
-	rs232.dsr_handler().set(m_usart[0], FUNC(mc2661_device::dsr_w));
-	rs232.dcd_handler().set(m_usart[0], FUNC(mc2661_device::dcd_w));
-	rs232.cts_handler().set(m_usart[0], FUNC(mc2661_device::cts_w));
+	rs232.rxd_handler().set(m_usart[0], FUNC(scn2651_device::rxd_w));
+	rs232.dsr_handler().set(m_usart[0], FUNC(scn2651_device::dsr_w));
+	rs232.dcd_handler().set(m_usart[0], FUNC(scn2651_device::dcd_w));
+	rs232.cts_handler().set(m_usart[0], FUNC(scn2651_device::cts_w));
 	rs232.set_option_device_input_defaults("terminal", terminal_defaults);
 }
 
 /* ROM definition */
 ROM_START( tricep )
-	ROM_REGION( 0x2000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "tri2.4_odd.u37",  0x0000, 0x1000, CRC(31eb2dcf) SHA1(2d9df9262ee1096d0398505e10d209201ac49a5d))
-	ROM_LOAD16_BYTE( "tri2.4_even.u36", 0x0001, 0x1000, CRC(4414dcdc) SHA1(00a3d293617dc691748ae85b6ccdd6723daefc0a))
+	ROM_REGION16_BE( 0x2000, "bios", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "tri2.4_odd.u37",  0x0001, 0x1000, CRC(31eb2dcf) SHA1(2d9df9262ee1096d0398505e10d209201ac49a5d))
+	ROM_LOAD16_BYTE( "tri2.4_even.u36", 0x0000, 0x1000, CRC(4414dcdc) SHA1(00a3d293617dc691748ae85b6ccdd6723daefc0a))
 ROM_END
 
 /* Driver */

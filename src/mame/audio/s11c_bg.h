@@ -23,9 +23,9 @@ public:
 	// construction/destruction
 	s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
-	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
-	DECLARE_WRITE8_MEMBER(bgbank_w);
+	void bg_speech_clock_w(uint8_t data);
+	void bg_speech_digit_w(uint8_t data);
+	void bgbank_w(uint8_t data);
 	void ctrl_w(uint8_t data);
 	void data_w(uint8_t data);
 
@@ -47,7 +47,7 @@ private:
 	required_region_ptr<uint8_t> m_rom;
 
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE8_MEMBER(pia40_pb_w);
+	void pia40_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
 };
 

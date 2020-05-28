@@ -23,6 +23,16 @@ enum
 	I286_BP,
 	I286_SI,
 	I286_DI,
+
+	I286_AL,
+	I286_AH,
+	I286_CL,
+	I286_CH,
+	I286_DL,
+	I286_DH,
+	I286_BL,
+	I286_BH,
+
 	I286_FLAGS,
 
 	I286_ES,
@@ -85,7 +95,7 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_set_input(int inputnum, int state) override;
 	bool memory_translate(int spacenum, int intention, offs_t &address) override;
 

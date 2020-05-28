@@ -78,10 +78,10 @@ private:
 	bool m_comms_ack;
 
 	virtual void machine_start() override;
-	DECLARE_READ16_MEMBER(comms_r);
-	DECLARE_WRITE16_MEMBER(comms_w);
-	DECLARE_WRITE16_MEMBER(data_bank_w);
-	DECLARE_WRITE16_MEMBER(upd_w);
+	uint16_t comms_r(offs_t offset, uint16_t mem_mask = ~0);
+	void comms_w(offs_t offset, uint16_t data);
+	void data_bank_w(uint16_t data);
+	void upd_w(uint16_t data);
 	void gambl186_io(address_map &map);
 	void gambl186_map(address_map &map);
 };
@@ -93,7 +93,7 @@ void gambl186_state::machine_start()
 
 static const uint8_t password[] = {5, 2, 0, 3, 0, 0, 2, 4, 5, 6, 0x16};
 
-READ16_MEMBER(gambl186_state::comms_r)
+uint16_t gambl186_state::comms_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t retval = 0;
 
@@ -279,7 +279,7 @@ READ16_MEMBER(gambl186_state::comms_r)
 	return retval;
 }
 
-WRITE16_MEMBER(gambl186_state::comms_w)
+void gambl186_state::comms_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 	{
@@ -324,7 +324,7 @@ WRITE16_MEMBER(gambl186_state::comms_w)
 	}
 }
 
-WRITE16_MEMBER( gambl186_state::data_bank_w)
+void gambl186_state::data_bank_w(uint16_t data)
 {
 	membank("data_bank")->set_entry(data & 3);
 	if(data & 0xfffc)
@@ -347,14 +347,14 @@ WRITE16_MEMBER( gambl186_state::data_bank_w)
    504h: e000
    504h: 2000
 */
-WRITE16_MEMBER(gambl186_state::upd_w)
+void gambl186_state::upd_w(uint16_t data)
 {
 //// FIXME
 //  m_upd7759->reset_w(0);
 //  m_upd7759->reset_w(1);
 
-//  if (ACCESSING_BITS_0_7) m_upd7759->port_w(space, 0, data & 0xff);
-//  if (ACCESSING_BITS_8_15) m_upd7759->port_w(space, 0, (data >> 8) & 0xff);
+//  if (ACCESSING_BITS_0_7) m_upd7759->port_w(data & 0xff);
+//  if (ACCESSING_BITS_8_15) m_upd7759->port_w((data >> 8) & 0xff);
 	data = (data >> 8);
 	popmessage("sample index: %02x", data);
 
@@ -380,11 +380,11 @@ void gambl186_state::gambl186_io(address_map &map)
 	map(0x0502, 0x0503).portr("IN1");
 	map(0x0504, 0x0505).portr("IN2");  // Seems to writes more upd7759 params in MSB...
 
-	//AM_RANGE(0x0500, 0x050f) AM_READ(unk_r)
+	//map(0x0500, 0x050f).r(FUNC(gambl186_state::unk_r));
 	map(0x0580, 0x0581).portr("DSW1");
 	map(0x0582, 0x0583).portr("JOY");
 	map(0x0584, 0x0585).portr("DSW0").nopw(); // Watchdog: bit 8
-//  AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
+//  map(0x0600, 0x0603).nopw(); // lamps
 	map(0x0680, 0x0683).rw(FUNC(gambl186_state::comms_r), FUNC(gambl186_state::comms_w));
 	map(0x0700, 0x0701).w(FUNC(gambl186_state::data_bank_w));
 }
@@ -499,7 +499,7 @@ ROM_START( gambl186 )
 	ROM_LOAD16_BYTE( "ie398.u11", 0x00000, 0x80000, CRC(86ad7cab) SHA1(b701c3701db630d218a9b1700f216f795a1b1272) )
 	ROM_LOAD16_BYTE( "io398.u12", 0x00001, 0x80000, CRC(0a036f34) SHA1(63d0b87c7d4c902413f28c0b55d78e5fda511f4f) )
 
-	ROM_REGION( 0x40000, "ipl", 0 )
+	ROM_REGION16_LE( 0x40000, "ipl", 0 )
 	ROM_LOAD16_BYTE( "se403p.u9",  0x00000, 0x20000, CRC(1021cc20) SHA1(d9bb67676b05458ff813d608431ff06946ab7721) )
 	ROM_LOAD16_BYTE( "so403p.u10", 0x00001, 0x20000, CRC(af9746c9) SHA1(3f1ab8110cc5eadec661181779799693ad695e21) )
 
@@ -512,7 +512,7 @@ ROM_START( gambl186a )
 	ROM_LOAD16_BYTE( "ie399.u11", 0x00000, 0x80000, CRC(2a7bce20) SHA1(fbabaaa0d72b5dfccd33f5194d13009bdc44b5a7) )
 	ROM_LOAD16_BYTE( "io399.u12", 0x00001, 0x80000, CRC(9212f52b) SHA1(d970c59c1e0f5f7e94c1b632398bcfae278c143d) )
 
-	ROM_REGION( 0x40000, "ipl", 0 )
+	ROM_REGION16_LE( 0x40000, "ipl", 0 )
 	ROM_LOAD16_BYTE( "se403p.u9",  0x00000, 0x20000, CRC(1021cc20) SHA1(d9bb67676b05458ff813d608431ff06946ab7721) )
 	ROM_LOAD16_BYTE( "so403p.u10", 0x00001, 0x20000, CRC(af9746c9) SHA1(3f1ab8110cc5eadec661181779799693ad695e21) )
 
@@ -526,7 +526,7 @@ ROM_START( gambl186b )
 	ROM_LOAD16_BYTE( "ie3.7.8.bin", 0x00000, 0x80000, CRC(cc27886c) SHA1(cb27af74dffe86c564ba8a0ad711f4232330cf1b) )
 	ROM_LOAD16_BYTE( "io3.7.8.bin", 0x00001, 0x80000, CRC(c69bf3ad) SHA1(eb612e903a9b184c2dd363e081ee8f650a4f2f90) )
 
-	ROM_REGION( 0x40000, "ipl", 0 )
+	ROM_REGION16_LE( 0x40000, "ipl", 0 )
 	ROM_LOAD16_BYTE( "se3.8.6t.bin", 0x00000, 0x20000,CRC(158bd3a3) SHA1(846f382f145f8c4c36bd75fef12717b41e91c70b))
 	ROM_LOAD16_BYTE( "so3.8.6t.bin", 0x00001, 0x20000, CRC(4bd275d3) SHA1(6b84f54e723408b06b71e89f7de6a8014fd9ecfd) )
 

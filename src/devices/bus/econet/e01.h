@@ -65,22 +65,22 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_bsy_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_req_w );
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( ram_select_r );
-	DECLARE_WRITE8_MEMBER( floppy_w );
-	DECLARE_READ8_MEMBER( network_irq_disable_r );
-	DECLARE_WRITE8_MEMBER( network_irq_disable_w );
-	DECLARE_READ8_MEMBER( network_irq_enable_r );
-	DECLARE_WRITE8_MEMBER( network_irq_enable_w );
-	DECLARE_READ8_MEMBER( hdc_data_r );
-	DECLARE_WRITE8_MEMBER( hdc_data_w );
-	DECLARE_WRITE8_MEMBER( hdc_select_w );
-	DECLARE_WRITE8_MEMBER( hdc_irq_enable_w );
-	DECLARE_READ8_MEMBER( rtc_address_r );
-	DECLARE_WRITE8_MEMBER( rtc_address_w );
-	DECLARE_READ8_MEMBER( rtc_data_r );
-	DECLARE_WRITE8_MEMBER( rtc_data_w );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t ram_select_r();
+	void floppy_w(uint8_t data);
+	uint8_t network_irq_disable_r();
+	void network_irq_disable_w(uint8_t data);
+	uint8_t network_irq_enable_r();
+	void network_irq_enable_w(uint8_t data);
+	uint8_t hdc_data_r();
+	void hdc_data_w(uint8_t data);
+	void hdc_select_w(uint8_t data);
+	void hdc_irq_enable_w(uint8_t data);
+	uint8_t rtc_address_r();
+	void rtc_address_w(uint8_t data);
+	uint8_t rtc_data_r();
+	void rtc_data_w(uint8_t data);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats_afs);
 
@@ -96,6 +96,8 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_memory_region m_rom;
 	required_device<centronics_device> m_centronics;
+
+	output_finder<> m_led;
 
 	inline void update_interrupts();
 	inline void network_irq_enable(int enabled);

@@ -133,7 +133,7 @@ void pc9801_26_device::device_reset()
 	uint16_t port_base = (ioport("OPN_DSW")->read() & 1) << 8;
 
 	m_bus->io_space().unmap_readwrite(0x0088, 0x008b, 0x100);
-	m_bus->install_io(port_base + 0x0088, port_base + 0x008b, read8_delegate(FUNC(pc9801_26_device::opn_r), this), write8_delegate(FUNC(pc9801_26_device::opn_w), this) );
+	m_bus->install_io(port_base + 0x0088, port_base + 0x008b, read8_delegate(*this, FUNC(pc9801_26_device::opn_r)), write8_delegate(*this, FUNC(pc9801_26_device::opn_w)));
 }
 
 
@@ -150,7 +150,7 @@ READ8_MEMBER(pc9801_26_device::opn_r)
 	}
 	else // odd
 	{
-		printf("Read to undefined port [%02x]\n",offset+0x188);
+		logerror("Read to undefined port [%02x]\n", offset+0x188);
 		return 0xff;
 	}
 }
@@ -161,5 +161,5 @@ WRITE8_MEMBER(pc9801_26_device::opn_w)
 	if((offset & 5) == 0)
 		m_opn->write(offset >> 1, data);
 	else // odd
-		printf("PC9801-26: Write to undefined port [%02x] %02x\n",offset+0x188,data);
+		logerror("PC9801-26: Write to undefined port [%02x] %02x\n", offset+0x188, data);
 }

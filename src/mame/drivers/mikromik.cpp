@@ -83,7 +83,7 @@
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mm1_state::read )
+uint8_t mm1_state::read(offs_t offset)
 {
 	uint8_t data = 0;
 	uint8_t mmu = m_mmu_rom->base()[(m_a8 << 8) | (offset >> 8)];
@@ -117,7 +117,7 @@ READ8_MEMBER( mm1_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mm1_state::write )
+void mm1_state::write(offs_t offset, uint8_t data)
 {
 	uint8_t mmu = m_mmu_rom->base()[(m_a8 << 8) | (offset >> 8)];
 
@@ -295,7 +295,7 @@ WRITE_LINE_MEMBER( mm1_state::dma_hrq_w )
 	m_dmac->hack_w(state);
 }
 
-READ8_MEMBER( mm1_state::mpsc_dack_r )
+uint8_t mm1_state::mpsc_dack_r()
 {
 	// clear data request
 	m_dmac->dreq2_w(CLEAR_LINE);
@@ -303,7 +303,7 @@ READ8_MEMBER( mm1_state::mpsc_dack_r )
 	return 1;//m_mpsc->dtra_r();
 }
 
-WRITE8_MEMBER( mm1_state::mpsc_dack_w )
+void mm1_state::mpsc_dack_w(uint8_t data)
 {
 	//m_mpsc->hai_w(data);
 
@@ -435,7 +435,7 @@ void mm1_state::mm1(machine_config &config)
 	m_maincpu->in_sid_func().set(FUNC(mm1_state::dsra_r));
 	m_maincpu->out_sod_func().set(KB_TAG, FUNC(mm1_keyboard_device::bell_w));
 
-	config.m_perfect_cpu_quantum = subtag(I8085A_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	// peripheral hardware
 	ADDRESS_MAP_BANK(config, m_io);
@@ -491,10 +491,10 @@ void mm1_state::mm1(machine_config &config)
 	m_mpsc->out_txdrqa_callback().set(FUNC(mm1_state::drq1_w));
 
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
-	m_rs232a->cts_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
+	m_rs232a->cts_handler().set(m_mpsc, FUNC(upd7201_device::rxa_w));
 	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
 	RS232_PORT(config, m_rs232c, default_rs232_devices, nullptr);
-	m_rs232c->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
+	m_rs232c->cts_handler().set(m_mpsc, FUNC(upd7201_device::ctsb_w));
 
 	mm1_keyboard_device &kb(MM1_KEYBOARD(config, KB_TAG, 2500)); // actual KBCLK is 6.144_MHz_XTAL/2/16
 	kb.kbst_wr_callback().set(m_iop, FUNC(i8212_device::stb_w));

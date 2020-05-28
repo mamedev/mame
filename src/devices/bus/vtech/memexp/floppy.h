@@ -39,10 +39,10 @@ protected:
 private:
 	void map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_READ8_MEMBER(shifter_r);
-	DECLARE_READ8_MEMBER(rd_r);
-	DECLARE_READ8_MEMBER(wpt_r);
+	void latch_w(uint8_t data);
+	uint8_t shifter_r();
+	uint8_t rd_r();
+	uint8_t wpt_r();
 
 	void index_callback(floppy_image_device *floppy, int state);
 	void update_latching_inverter();

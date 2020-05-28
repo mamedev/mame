@@ -367,22 +367,22 @@ void gt64xxx_device::map_cpu_space()
 	// PCI IO Window
 	winStart = m_reg[GREG_PCI_IO_LO]<<21;
 	winEnd =   (m_reg[GREG_PCI_IO_LO]<<21) | (m_reg[GREG_PCI_IO_HI]<<21) | 0x1fffff;
-	m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::master_io_r), this));
-	m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::master_io_w), this));
+	m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(gt64xxx_device::master_io_r)));
+	m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(gt64xxx_device::master_io_w)));
 	logerror("map_cpu_space pci_io start: %08X end: %08X\n", winStart, winEnd);
 
 	// PCI MEM0 Window
 	winStart = m_reg[GREG_PCI_MEM0_LO]<<21;
 	winEnd =   (m_reg[GREG_PCI_MEM0_LO]<<21) | (m_reg[GREG_PCI_MEM0_HI]<<21) | 0x1fffff;
-	m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::master_mem0_r), this));
-	m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::master_mem0_w), this));
+	m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(gt64xxx_device::master_mem0_r)));
+	m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(gt64xxx_device::master_mem0_w)));
 	logerror("map_cpu_space pci_mem0 start: %08X end: %08X\n", winStart, winEnd);
 
 	// PCI MEM1 Window
 	winStart = m_reg[GREG_PCI_MEM1_LO]<<21;
 	winEnd =   (m_reg[GREG_PCI_MEM1_LO]<<21) | (m_reg[GREG_PCI_MEM1_HI]<<21) | 0x1fffff;
-	m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::master_mem1_r), this));
-	m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::master_mem1_w), this));
+	m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(gt64xxx_device::master_mem1_r)));
+	m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(gt64xxx_device::master_mem1_w)));
 	logerror("map_cpu_space pci_mem1 start: %08X end: %08X\n", winStart, winEnd);
 
 	// Setup the address mapping table for DMA lookups
@@ -424,8 +424,8 @@ void gt64xxx_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
 	winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
 	winSize = winEnd - winStart + 1;
-	memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::ras_0_r), this));
-	memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::ras_0_w), this));
+	memory_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(gt64xxx_device::ras_0_r)));
+	memory_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(gt64xxx_device::ras_0_w)));
 	LOGGALILEO("map_extra RAS0 start=%08X end=%08X size=%08X\n", winStart, winEnd, winSize);
 
 	// RAS1
@@ -433,8 +433,8 @@ void gt64xxx_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
 	winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
 	winSize = winEnd - winStart + 1;
-	memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::ras_1_r), this));
-	memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::ras_1_w), this));
+	memory_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(gt64xxx_device::ras_1_r)));
+	memory_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(gt64xxx_device::ras_1_w)));
 	LOGGALILEO("map_extra RAS1 start=%08X end=%08X size=%08X\n", winStart, winEnd, winSize);
 
 	// RAS2
@@ -442,8 +442,8 @@ void gt64xxx_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
 	winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
 	winSize = winEnd - winStart + 1;
-	memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::ras_2_r), this));
-	memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::ras_2_w), this));
+	memory_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(gt64xxx_device::ras_2_r)));
+	memory_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(gt64xxx_device::ras_2_w)));
 	LOGGALILEO("map_extra RAS2 start=%08X end=%08X size=%08X\n", winStart, winEnd, winSize);
 
 	// RAS3
@@ -451,8 +451,8 @@ void gt64xxx_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
 	winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
 	winSize = winEnd - winStart + 1;
-	memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::ras_3_r), this));
-	memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::ras_3_w), this));
+	memory_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(gt64xxx_device::ras_3_r)));
+	memory_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(gt64xxx_device::ras_3_w)));
 	LOGGALILEO("map_extra RAS3 start=%08X end=%08X size=%08X\n", winStart, winEnd, winSize);
 }
 

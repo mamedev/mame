@@ -252,7 +252,7 @@ namespace sol {
 				using yes = char;
 				using no = struct { char s[2]; };
 
-				struct F { void operator()(); };
+				struct F { void operator()() {}; };
 				struct Derived : T, F {};
 				template<typename U, U> struct Check;
 

@@ -496,6 +496,7 @@ a2000_kbd_g80_device::a2000_kbd_g80_device(machine_config const &mconfig, device
 	, device_amiga_keyboard_interface(mconfig, *this)
 	, m_rows(*this, "ROW%u", 0U)
 	, m_mcu(*this, "u1")
+	, m_led_kbd_caps(*this, "led_kbd_caps")
 	, m_row_drive(0U)
 	, m_host_kdat(true)
 	, m_mcu_kdat(true)
@@ -514,7 +515,7 @@ WRITE_LINE_MEMBER(a2000_kbd_g80_device::kdat_w)
 	}
 }
 
-READ8_MEMBER(a2000_kbd_g80_device::mcu_bus_r)
+u8 a2000_kbd_g80_device::mcu_bus_r(offs_t offset)
 {
 	// when jumpered for external ROM, offset latched by U2 is 0x60 + (row << 1)
 	uint8_t result(0U);
@@ -527,16 +528,16 @@ READ8_MEMBER(a2000_kbd_g80_device::mcu_bus_r)
 	return result;
 }
 
-WRITE8_MEMBER(a2000_kbd_g80_device::mcu_p1_w)
+void a2000_kbd_g80_device::mcu_p1_w(u8 data)
 {
 	m_row_drive = (m_row_drive & 0x1f00U) | uint16_t(data);
 }
 
-WRITE8_MEMBER(a2000_kbd_g80_device::mcu_p2_w)
+void a2000_kbd_g80_device::mcu_p2_w(u8 data)
 {
 	m_row_drive = (m_row_drive & 0x00ffU) | (uint16_t(data & 0x1fU) << 8);
 
-	machine().output().set_value("led_kbd_caps", BIT(~data, 5));
+	m_led_kbd_caps = BIT(~data, 5);
 
 	if (bool(BIT(data, 6) != m_mcu_kdat))
 	{
@@ -574,6 +575,8 @@ void a2000_kbd_g80_device::device_add_mconfig(machine_config &config)
 
 void a2000_kbd_g80_device::device_start()
 {
+	m_led_kbd_caps.resolve();
+
 	save_item(NAME(m_row_drive));
 	save_item(NAME(m_host_kdat));
 	save_item(NAME(m_mcu_kdat));

@@ -76,7 +76,7 @@ public:
 
 	void r2dtank(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(get_ttl74123_output);
+	DECLARE_READ_LINE_MEMBER(ttl74123_output_r);
 
 protected:
 	virtual void machine_start() override;
@@ -103,9 +103,9 @@ private:
 	DECLARE_READ8_MEMBER(audio_answer_r);
 	DECLARE_WRITE8_MEMBER(audio_answer_w);
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
-	DECLARE_WRITE8_MEMBER(AY8910_select_w);
-	DECLARE_READ8_MEMBER(AY8910_port_r);
-	DECLARE_WRITE8_MEMBER(AY8910_port_w);
+	void AY8910_select_w(uint8_t data);
+	uint8_t AY8910_port_r();
+	void AY8910_port_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(pia_comp_w);
 
@@ -170,7 +170,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", m_maincpu->
 
 WRITE8_MEMBER(r2dtank_state::audio_answer_w)
 {
-	/* HACK - prevents lock-up, but causes game to end some in-between sreens prematurely */
+	/* HACK - prevents lock-up, but causes game to end some in-between screens prematurely */
 	if (m_audiocpu->pc() == 0xfb12)
 		data = 0x00;
 
@@ -181,10 +181,10 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", m_audiocpu
 }
 
 
-WRITE8_MEMBER(r2dtank_state::AY8910_select_w)
+void r2dtank_state::AY8910_select_w(uint8_t data)
 {
 	/* not sure what all the bits mean:
-	   D0 - ????? definetely used
+	   D0 - ????? definitely used
 	   D1 - not used?
 	   D2 - selects ay8910 control or port
 	   D3 - selects ay8910 #0
@@ -196,7 +196,7 @@ if (LOG_AUDIO_COMM) logerror("%s:  CPU#1  AY8910_select_w: %x\n", machine().desc
 }
 
 
-READ8_MEMBER(r2dtank_state::AY8910_port_r)
+uint8_t r2dtank_state::AY8910_port_r()
 {
 	uint8_t ret = 0;
 
@@ -210,7 +210,7 @@ READ8_MEMBER(r2dtank_state::AY8910_port_r)
 }
 
 
-WRITE8_MEMBER(r2dtank_state::AY8910_port_w)
+void r2dtank_state::AY8910_port_w(uint8_t data)
 {
 	if (m_AY8910_selected & 0x08)
 		m_ay1->data_address_w(m_AY8910_selected >> 2, data);
@@ -239,7 +239,7 @@ WRITE_LINE_MEMBER(r2dtank_state::ttl74123_output_changed)
 }
 
 
-CUSTOM_INPUT_MEMBER(r2dtank_state::get_ttl74123_output)
+READ_LINE_MEMBER(r2dtank_state::ttl74123_output_r)
 {
 	return m_ttl74123_output;
 }
@@ -348,7 +348,6 @@ void r2dtank_state::r2dtank_main_map(address_map &map)
 
 void r2dtank_state::r2dtank_audio_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();     /* internal RAM */
 	map(0xd000, 0xd003).rw("pia_audio", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xf000, 0xf000).rw(FUNC(r2dtank_state::audio_command_r), FUNC(r2dtank_state::audio_answer_w));
 	map(0xf800, 0xffff).rom();
@@ -372,7 +371,7 @@ static INPUT_PORTS_START( r2dtank )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, r2dtank_state,get_ttl74123_output, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(r2dtank_state, ttl74123_output_r)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
@@ -466,7 +465,7 @@ void r2dtank_state::r2dtank(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(r2dtank_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(r2dtank_state::crtc_update_row));
 	crtc.out_de_callback().set("74123", FUNC(ttl74123_device::a_w));
 
 	/* 74LS123 */

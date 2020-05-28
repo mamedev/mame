@@ -101,6 +101,7 @@ Optional (on expansion card) (Viper)
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "machine/bfm_comn.h"
+#include "machine/rescap.h"
 #include "speaker.h"
 
 #include "sc1_vfd.lh"
@@ -144,35 +145,35 @@ public:
 
 protected:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(irqlatch_r);
-	DECLARE_WRITE8_MEMBER(reel12_w);
-	DECLARE_WRITE8_MEMBER(reel34_w);
-	DECLARE_WRITE8_MEMBER(reel56_w);
-	DECLARE_WRITE8_MEMBER(mmtr_w);
-	DECLARE_READ8_MEMBER(mmtr_r);
-	DECLARE_READ8_MEMBER(dipcoin_r);
-	DECLARE_WRITE8_MEMBER(vfd_w);
-	DECLARE_READ8_MEMBER(mux1latch_r);
-	DECLARE_READ8_MEMBER(mux1datlo_r);
-	DECLARE_READ8_MEMBER(mux1dathi_r);
-	DECLARE_WRITE8_MEMBER(mux1latch_w);
-	DECLARE_WRITE8_MEMBER(mux1datlo_w);
-	DECLARE_WRITE8_MEMBER(mux1dathi_w);
-	DECLARE_READ8_MEMBER(mux2latch_r);
-	DECLARE_READ8_MEMBER(mux2datlo_r);
-	DECLARE_READ8_MEMBER(mux2dathi_r);
-	DECLARE_WRITE8_MEMBER(mux2latch_w);
-	DECLARE_WRITE8_MEMBER(mux2datlo_w);
-	DECLARE_WRITE8_MEMBER(mux2dathi_w);
-	DECLARE_WRITE8_MEMBER(aciactrl_w);
-	DECLARE_WRITE8_MEMBER(aciadata_w);
-	DECLARE_READ8_MEMBER(aciastat_r);
-	DECLARE_READ8_MEMBER(aciadata_r);
-	DECLARE_WRITE8_MEMBER(triac_w);
-	DECLARE_READ8_MEMBER(triac_r);
-	DECLARE_READ8_MEMBER(nec_r);
-	DECLARE_WRITE8_MEMBER(nec_latch_w);
+	void bankswitch_w(uint8_t data);
+	uint8_t irqlatch_r();
+	void reel12_w(uint8_t data);
+	void reel34_w(uint8_t data);
+	void reel56_w(uint8_t data);
+	void mmtr_w(uint8_t data);
+	uint8_t mmtr_r();
+	uint8_t dipcoin_r();
+	void vfd_w(uint8_t data);
+	uint8_t mux1latch_r();
+	uint8_t mux1datlo_r();
+	uint8_t mux1dathi_r();
+	void mux1latch_w(uint8_t data);
+	void mux1datlo_w(uint8_t data);
+	void mux1dathi_w(uint8_t data);
+	uint8_t mux2latch_r();
+	uint8_t mux2datlo_r();
+	uint8_t mux2dathi_r();
+	void mux2latch_w(uint8_t data);
+	void mux2datlo_w(uint8_t data);
+	void mux2dathi_w(uint8_t data);
+	void aciactrl_w(uint8_t data);
+	void aciadata_w(uint8_t data);
+	uint8_t aciastat_r();
+	uint8_t aciadata_r();
+	void triac_w(uint8_t data);
+	uint8_t triac_r();
+	uint8_t nec_r();
+	void nec_latch_w(uint8_t data);
 
 	void save_state();
 
@@ -270,7 +271,7 @@ int bfm_sc1_state::Scorpion1_GetSwitchState(int strobe, int data)
 #endif
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::bankswitch_w)
+void bfm_sc1_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }
@@ -291,7 +292,7 @@ INTERRUPT_GEN_MEMBER(bfm_sc1_state::timer_irq)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::irqlatch_r)
+uint8_t bfm_sc1_state::irqlatch_r()
 {
 	int result = m_irq_status | 0x02;
 
@@ -302,7 +303,7 @@ READ8_MEMBER(bfm_sc1_state::irqlatch_r)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::reel12_w)
+void bfm_sc1_state::reel12_w(uint8_t data)
 {
 	if ( m_locked & 0x01 )
 	{   // hardware is still locked,
@@ -319,7 +320,7 @@ WRITE8_MEMBER(bfm_sc1_state::reel12_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::reel34_w)
+void bfm_sc1_state::reel34_w(uint8_t data)
 {
 	if ( m_locked & 0x02 )
 	{   // hardware is still locked,
@@ -336,7 +337,7 @@ WRITE8_MEMBER(bfm_sc1_state::reel34_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::reel56_w)
+void bfm_sc1_state::reel56_w(uint8_t data)
 {
 	m_reels[4]->update((data>>4)&0x0f);
 	m_reels[5]->update( data    &0x0f);
@@ -349,9 +350,8 @@ WRITE8_MEMBER(bfm_sc1_state::reel56_w)
 // mechanical meters //////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mmtr_w)
+void bfm_sc1_state::mmtr_w(uint8_t data)
 {
-	int i;
 	if ( m_locked & 0x04 )
 	{   // hardware is still locked,
 		m_locked &= ~0x04;
@@ -362,7 +362,7 @@ WRITE8_MEMBER(bfm_sc1_state::mmtr_w)
 
 		m_mmtr_latch = data;
 
-		for (i=0; i<8; i++)
+		for (int i=0; i<8; i++)
 		{
 			if ( changed & (1 << i) )
 			{
@@ -375,28 +375,28 @@ WRITE8_MEMBER(bfm_sc1_state::mmtr_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mmtr_r)
+uint8_t bfm_sc1_state::mmtr_r()
 {
 	return m_mmtr_latch;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::dipcoin_r)
+uint8_t bfm_sc1_state::dipcoin_r()
 {
 	return ioport("STROBE0")->read() & 0x1F;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::nec_r)
+uint8_t bfm_sc1_state::nec_r()
 {
 	return 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::vfd_w)
+void bfm_sc1_state::vfd_w(uint8_t data)
 {
 	m_vfd0->por(data & VFD_RESET);
 	m_vfd0->data(data & VFD_DATA);
@@ -434,28 +434,28 @@ static const uint8_t BFM_strcnv[] =
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mux1latch_r)
+uint8_t bfm_sc1_state::mux1latch_r()
 {
 	return m_mux1_input;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mux1datlo_r)
+uint8_t bfm_sc1_state::mux1datlo_r()
 {
 	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mux1dathi_r)
+uint8_t bfm_sc1_state::mux1dathi_r()
 {
 	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mux1latch_w)
+void bfm_sc1_state::mux1latch_w(uint8_t data)
 {
 	int changed = m_mux1_outputlatch ^ data;
 	static const char *const portnames[] = { "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7" };
@@ -490,42 +490,42 @@ WRITE8_MEMBER(bfm_sc1_state::mux1latch_w)
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mux1datlo_w)
+void bfm_sc1_state::mux1datlo_w(uint8_t data)
 {
 	m_mux1_datalo = data;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mux1dathi_w)
+void bfm_sc1_state::mux1dathi_w(uint8_t data)
 {
 	m_mux1_datahi = data;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mux2latch_r)
+uint8_t bfm_sc1_state::mux2latch_r()
 {
 	return m_mux2_input;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mux2datlo_r)
+uint8_t bfm_sc1_state::mux2datlo_r()
 {
 	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mux2dathi_r)
+uint8_t bfm_sc1_state::mux2dathi_r()
 {
 	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mux2latch_w)
+void bfm_sc1_state::mux2latch_w(uint8_t data)
 {
 	int changed = m_mux2_outputlatch ^ data;
 
@@ -556,14 +556,14 @@ WRITE8_MEMBER(bfm_sc1_state::mux2latch_w)
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mux2datlo_w)
+void bfm_sc1_state::mux2datlo_w(uint8_t data)
 {
 	m_mux2_datalo = data;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mux2dathi_w)
+void bfm_sc1_state::mux2dathi_w(uint8_t data)
 {
 	m_mux2_datahi = data;
 }
@@ -572,26 +572,26 @@ WRITE8_MEMBER(bfm_sc1_state::mux2dathi_w)
 // serial port //////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::aciactrl_w)
+void bfm_sc1_state::aciactrl_w(uint8_t data)
 {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::aciadata_w)
+void bfm_sc1_state::aciadata_w(uint8_t data)
 {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::aciastat_r)
+uint8_t bfm_sc1_state::aciastat_r()
 {
 	return m_acia_status;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::aciadata_r)
+uint8_t bfm_sc1_state::aciadata_r()
 {
 	return 0;
 }
@@ -600,28 +600,28 @@ READ8_MEMBER(bfm_sc1_state::aciadata_r)
 // payslide triacs //////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::triac_w)
+void bfm_sc1_state::triac_w(uint8_t data)
 {
 	m_triac_latch = data;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::triac_r)
+uint8_t bfm_sc1_state::triac_r()
 {
 	return m_triac_latch;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(bfm_sc1_state::nec_reset_w)
+void bfm_sc1_state::nec_reset_w(uint8_t data)
 {
 	m_upd7759->start_w(0);
 	m_upd7759->reset_w(data != 0);
 }
 #endif
 /////////////////////////////////////////////////////////////////////////////////////
-WRITE8_MEMBER(bfm_sc1_state::nec_latch_w)
+void bfm_sc1_state::nec_latch_w(uint8_t data)
 {
 	m_upd7759->port_w(data & 0x3f); // setup sample
 	m_upd7759->start_w(0);
@@ -1075,7 +1075,7 @@ INPUT_PORTS_END
 
 void bfm_sc1_state::scorpion1(machine_config &config)
 {
-	M6809(config, m_maincpu, MASTER_CLOCK/4);          // 6809 CPU at 1 Mhz
+	MC6809(config, m_maincpu, MASTER_CLOCK);          // 6809 CPU, 1 Mhz Q/E
 	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc1_state::sc1_base);                        // setup read and write memorymap
 	m_maincpu->set_periodic_int(FUNC(bfm_sc1_state::timer_irq), attotime::from_hz(1000));              // generate 1000 IRQ's per second
 

@@ -79,22 +79,22 @@ protected:
 
 private:
 	void excali64_palette(palette_device &palette);
-	DECLARE_WRITE8_MEMBER(ppib_w);
-	DECLARE_READ8_MEMBER(ppic_r);
-	DECLARE_WRITE8_MEMBER(ppic_w);
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port50_r);
-	DECLARE_WRITE8_MEMBER(port70_w);
-	DECLARE_WRITE8_MEMBER(porte4_w);
-	DECLARE_READ8_MEMBER(porte8_r);
-	DECLARE_WRITE8_MEMBER(portec_w);
+	void ppib_w(uint8_t data);
+	uint8_t ppic_r();
+	void ppic_w(uint8_t data);
+	uint8_t port00_r();
+	uint8_t port50_r();
+	void port70_w(uint8_t data);
+	void porte4_w(uint8_t data);
+	uint8_t porte8_r();
+	void portec_w(uint8_t data);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_WRITE_LINE_MEMBER(cent_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_WRITE_LINE_MEMBER(crtc_hs);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
@@ -145,7 +145,7 @@ void excali64_state::io_map(address_map &map)
 	map(0x50, 0x5f).r(FUNC(excali64_state::port50_r));
 	map(0x60, 0x63).mirror(0x0c).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x70, 0x7f).w(FUNC(excali64_state::port70_w));
-	map(0xe0, 0xe3).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0xe0, 0xe3).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0xe4, 0xe7).w(FUNC(excali64_state::porte4_w));
 	map(0xe8, 0xeb).r(FUNC(excali64_state::porte8_r));
 	map(0xec, 0xef).w(FUNC(excali64_state::portec_w));
@@ -257,12 +257,12 @@ WRITE_LINE_MEMBER( excali64_state::motor_w )
 	m_floppy0->get_device()->mon_w(!m_motor);
 }
 
-READ8_MEMBER( excali64_state::porte8_r )
+uint8_t excali64_state::porte8_r()
 {
 	return 0xfc | (uint8_t)m_motor;
 }
 
-WRITE8_MEMBER( excali64_state::porte4_w )
+void excali64_state::porte4_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 	if (BIT(data, 0))
@@ -283,7 +283,7 @@ d0 = precomp (selectable by jumper)
 d1 = size select
 d2 = density select (0 = double)
 */
-WRITE8_MEMBER( excali64_state::portec_w )
+void excali64_state::portec_w(uint8_t data)
 {
 	m_fdc->enmf_w(BIT(data, 1));
 	m_fdc->dden_w(BIT(data, 2));
@@ -296,36 +296,36 @@ WRITE_LINE_MEMBER( excali64_state::busreq_w )
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER( excali64_state::memory_read_byte )
+uint8_t excali64_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( excali64_state::memory_write_byte )
+void excali64_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER( excali64_state::io_read_byte )
+uint8_t excali64_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( excali64_state::io_write_byte )
+void excali64_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);
 }
 
-WRITE8_MEMBER( excali64_state::ppib_w )
+void excali64_state::ppib_w(uint8_t data)
 {
 	m_kbdrow = data;
 }
 
-READ8_MEMBER( excali64_state::ppic_r )
+uint8_t excali64_state::ppic_r()
 {
 	uint8_t data = 0xf4; // READY line must be low to print
 	data |= (uint8_t)m_centronics_busy;
@@ -333,13 +333,13 @@ READ8_MEMBER( excali64_state::ppic_r )
 	return data;
 }
 
-WRITE8_MEMBER( excali64_state::ppic_w )
+void excali64_state::ppic_w(uint8_t data)
 {
 	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
 	m_centronics->write_strobe(BIT(data, 4));
 }
 
-READ8_MEMBER( excali64_state::port00_r )
+uint8_t excali64_state::port00_r()
 {
 	uint8_t data = 0xff;
 
@@ -360,7 +360,7 @@ d3 : 2nd colour set (previously, dispen, which is a mistake in hardware and sche
 d4 : vsync
 d5 : rombank
 */
-READ8_MEMBER( excali64_state::port50_r )
+uint8_t excali64_state::port50_r()
 {
 	uint8_t data = m_sys_status & 0x2f;
 	bool csync = m_crtc_hs | m_crtc_vs;
@@ -372,7 +372,7 @@ READ8_MEMBER( excali64_state::port50_r )
 d0,1,2,3,5 : same as port50
 (schematic wrongly says d7 used for 2nd colour set)
 */
-WRITE8_MEMBER( excali64_state::port70_w )
+void excali64_state::port70_w(uint8_t data)
 {
 	m_sys_status = data;
 	m_crtc->set_unscaled_clock(BIT(data, 2) ? 2e6 : 1e6);
@@ -572,7 +572,7 @@ void excali64_state::excali64(machine_config &config)
 	//pit.set_clk<2>(16_MHz_XTAL / 16); /* Timer 2: not used */
 
 	i8255_device &ppi(I8255A(config, "ppi"));
-	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w)); // parallel port
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write)); // parallel port
 	ppi.out_pb_callback().set(FUNC(excali64_state::ppib_w));
 	ppi.in_pc_callback().set(FUNC(excali64_state::ppic_r));
 	ppi.out_pc_callback().set(FUNC(excali64_state::ppic_w));
@@ -596,7 +596,7 @@ void excali64_state::excali64(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(excali64_state::update_row), this);
+	m_crtc->set_update_row_callback(FUNC(excali64_state::update_row));
 	m_crtc->out_hsync_callback().set(FUNC(excali64_state::crtc_hs));
 	m_crtc->out_vsync_callback().set(FUNC(excali64_state::crtc_vs));
 

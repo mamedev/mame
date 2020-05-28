@@ -199,32 +199,32 @@ READ8_MEMBER( buggyboyjr_sound_device::bbjr_analog_r )
 		return (m_brake->read() & 0xf) << 4;
 }
 
-WRITE8_MEMBER( tx1_sound_device::tx1_coin_cnt_w )
+void tx1_sound_device::tx1_coin_cnt_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 //  machine().bookkeeping().coin_counter_w(2, data & 0x40);
 }
 
-WRITE8_MEMBER( buggyboy_sound_device::bb_coin_cnt_w )
+void buggyboy_sound_device::bb_coin_cnt_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 //  machine().bookkeeping().coin_counter_w(2, data & 0x04);
 }
 
-WRITE8_MEMBER( tx1_sound_device::tx1_ppi_latch_w )
+void tx1_sound_device::tx1_ppi_latch_w(uint8_t data)
 {
 	m_ppi_latch_a = ((m_brake->read() & 0xf) << 4) | (m_accelerator->read() & 0xf);
 	m_ppi_latch_b = m_steering->read();
 }
 
-READ8_MEMBER( tx1_sound_device::tx1_ppi_porta_r )
+uint8_t tx1_sound_device::tx1_ppi_porta_r()
 {
 	return m_ppi_latch_a;
 }
 
-READ8_MEMBER( tx1_sound_device::tx1_ppi_portb_r )
+uint8_t tx1_sound_device::tx1_ppi_portb_r()
 {
 	return m_ppi_portd->read() | m_ppi_latch_b;
 }
@@ -291,7 +291,7 @@ INTERRUPT_GEN_MEMBER(tx1_sound_device::z80_irq)
 
 ***************************************************************************/
 
-WRITE8_MEMBER( tx1_sound_device::ay8910_a_w )
+void tx1_sound_device::ay8910_a_w(uint8_t data)
 {
 	m_stream->update();
 
@@ -299,7 +299,7 @@ WRITE8_MEMBER( tx1_sound_device::ay8910_a_w )
 	m_ay_outputa = ~data;
 }
 
-WRITE8_MEMBER( tx1_sound_device::ay8910_b_w )
+void tx1_sound_device::ay8910_b_w(uint8_t data)
 {
 	m_stream->update();
 
@@ -481,7 +481,7 @@ INPUT_PORTS_START( tx1_inputs )
 	PORT_DIPSETTING(      0xe000, "No Bonus" )
 
 	PORT_START("AN_STEERING")
-	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(6)
 
 	PORT_START("AN_ACCELERATOR")
 	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
@@ -493,7 +493,7 @@ INPUT_PORTS_START( tx1_inputs )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Change") PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )
 
 	PORT_START("PPI_PORTD")
@@ -718,19 +718,19 @@ void buggyboy_sound_device::device_reset()
 
 ***************************************************************************/
 
-WRITE8_MEMBER( buggyboy_sound_device::ym1_a_w )
+void buggyboy_sound_device::ym1_a_w(uint8_t data)
 {
 	m_stream->update();
 	m_ym1_outputa = data ^ 0xff;
 }
 
-WRITE8_MEMBER( buggyboy_sound_device::ym2_a_w )
+void buggyboy_sound_device::ym2_a_w(uint8_t data)
 {
 	m_stream->update();
 	m_ym2_outputa = data ^ 0xff;
 }
 
-WRITE8_MEMBER( buggyboy_sound_device::ym2_b_w )
+void buggyboy_sound_device::ym2_b_w(uint8_t data)
 {
 	m_stream->update();
 
@@ -939,7 +939,7 @@ INPUT_PORTS_START( buggyboy_inputs )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Change") PORT_TOGGLE
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
 	PORT_START("PPI_PORTC")
@@ -1028,7 +1028,7 @@ INPUT_PORTS_START( buggyboyjr_inputs )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Change") PORT_TOGGLE
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
 	/* Wire jumper setting on sound PCB */

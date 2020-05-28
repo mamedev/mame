@@ -32,12 +32,12 @@ void vsmileb_state::machine_reset()
 	m_mode = 0x0400;
 }
 
-READ16_MEMBER(vsmileb_state::porta_r)
+uint16_t vsmileb_state::porta_r()
 {
 	return 0x0302 | (m_io_logo->read() ? 0x0080 : 0x0000);
 }
 
-READ16_MEMBER(vsmileb_state::portb_r)
+uint16_t vsmileb_state::portb_r()
 {
 	return 0x0080;
 }
@@ -70,9 +70,9 @@ template <uint16_t V> INPUT_CHANGED_MEMBER(vsmileb_state::sw_mode)
 
 void vsmileb_state::banked_map(address_map &map)
 {
-	map(0x0000000, 0x03fffff).rom().region("maincpu", 0);
-	map(0x0400000, 0x07fffff).rom().region("maincpu", 0);
-	map(0x0800000, 0x0bfffff).rom().region("maincpu", 0);
+	map(0x0000000, 0x03fffff).rom().region("sysrom", 0);
+	map(0x0400000, 0x07fffff).rom().region("sysrom", 0);
+	map(0x0800000, 0x0bfffff).rom().region("sysrom", 0);
 
 	map(0x1000000, 0x13fffff).rw(m_cart, FUNC(vsmile_cart_slot_device::bank0_r), FUNC(vsmile_cart_slot_device::bank0_w));
 
@@ -150,17 +150,23 @@ void vsmileb_state::vsmilebp(machine_config &config)
  *
  ************************************/
 
-// TODO: decide on a dump endian, these likely differ in endianess due to different dumping technqiues
 ROM_START( vsmileb )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "vbabybios.bin", 0x000000, 0x800000, CRC(ddc7f845) SHA1(2c17d0f54200070176d03d44a40c7923636e596a) )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabybios.bin", 0x000000, 0x800000, CRC(58d4caa0) SHA1(0b636ff80fd7fc429d753a8beab2957f1e59cbde) )
+ROM_END
+
+ROM_START( vsmilebs )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabybios_spain_pooh.bin", 0x000000, 0x800000, CRC(a1926654) SHA1(a8ccbe29235bb44faef77b1e7d73a20221b005c2) )
 ROM_END
 
 ROM_START( vsmilebsw )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "vsmileswedenbios.bin", 0x000000, 0x800000, CRC(8b464b19) SHA1(cea304ba886c39e86906aad3dce17d5fff7cfcbe) )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabyswedenbios.bin", 0x000000, 0x800000, CRC(8b464b19) SHA1(cea304ba886c39e86906aad3dce17d5fff7cfcbe) )
 ROM_END
 
 //    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,            flags
 CONS( 2005, vsmileb,   0,       0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2005, vsmilebsw ,vsmileb, 0,      vsmilebp,vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Sweden)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// has the Winnie the Pooh game in the BIOS ROM.  This was supplied as a 'Romless cart' with the device, so probably triggers a switch, currently always banked in.
+CONS( 2005, vsmilebs,  vsmileb, 0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Spain, with Aventuras en el Bosque de los Cien Acres)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

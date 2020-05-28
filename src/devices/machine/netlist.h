@@ -70,23 +70,36 @@ public:
 
 	virtual ~netlist_mame_device();
 
-	void set_setup_func(func_type &&func) { m_setup_func = std::move(func); }
+	void set_setup_func(func_type &&func) noexcept { m_setup_func = std::move(func); }
 
-	ATTR_HOT inline netlist::setup_t &setup();
-	ATTR_HOT inline netlist_mame_t &netlist() { return *m_netlist; }
+	netlist::setup_t &setup();
+	netlist_mame_t &netlist() noexcept { return *m_netlist; }
 
-	ATTR_HOT void update_icount(netlist::netlist_time time);
-	ATTR_HOT void check_mame_abort_slice();
+	void update_icount(netlist::netlist_time_ext time) noexcept;
+	void check_mame_abort_slice() noexcept;
 
-	static void register_memregion_source(netlist::nlparse_t &setup, device_t &dev, const char *name);
+	static void register_memregion_source(netlist::nlparse_t &parser, device_t &dev, const char *name);
 
 	int m_icount;
 
+	static constexpr const unsigned MDIV_SHIFT = 16;
+
+	netlist::netlist_time_ext nltime_ext_from_clocks(unsigned c) const noexcept
+	{
+		return (m_div * c).shr(MDIV_SHIFT);
+	}
+
+	netlist::netlist_time nltime_from_clocks(unsigned c) const noexcept
+	{
+		return static_cast<netlist::netlist_time>((m_div * c).shr(MDIV_SHIFT));
+	}
+
 protected:
+
 	netlist_mame_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// Custom to netlist ...
-	virtual void nl_register_devices(netlist::setup_t &lsetup) const { }
+	virtual void nl_register_devices(netlist::nlparse_t &parser) const { }
 
 	// device_t overrides
 	virtual void device_config_complete() override;
@@ -98,20 +111,20 @@ protected:
 	virtual void device_pre_save() override;
 	virtual void device_clock_changed() override;
 
-	netlist::netlist_time m_div;
+	plib::unique_ptr<netlist::netlist_state_t> base_validity_check(validity_checker &valid) const;
 
-	plib::unique_ptr<netlist::netlist_t> base_validity_check(validity_checker &valid) const;
-
+	attotime m_cur_time;
+	attotime m_attotime_per_clock;
 private:
 	void save_state();
 
-	void common_dev_start(netlist::netlist_t *lnetlist) const;
+	void common_dev_start(netlist::netlist_state_t *lnetlist) const;
 
-	/* timing support here - so sound can hijack it ... */
-	netlist::netlist_time        m_rem;
-	netlist::netlist_time        m_old;
+	netlist::netlist_time_ext    m_div;
+	netlist::netlist_time_ext    m_rem;
+	netlist::netlist_time_ext    m_old;
 
-	netlist::pool_owned_ptr<netlist_mame_t> m_netlist;
+	std::unique_ptr<netlist_mame_t> m_netlist;
 
 	func_type m_setup_func;
 };
@@ -167,14 +180,14 @@ public:
 
 protected:
 	// netlist_mame_device
-	virtual void nl_register_devices(netlist::setup_t &lsetup) const override;
+	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
 	virtual void device_start() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override;
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override;
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override;
 
 	ATTR_HOT virtual void execute_run() override;
 
@@ -219,6 +232,7 @@ public:
 
 
 	inline sound_stream *get_stream() { return m_stream; }
+	void update_to_current_time();
 
 
 	// device_sound_interface overrides
@@ -227,15 +241,18 @@ public:
 
 protected:
 	// netlist_mame_device
-	virtual void nl_register_devices(netlist::setup_t &lsetup) const override;
+	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 private:
 	std::map<int, nld_sound_out *> m_out;
 	nld_sound_in *m_in;
 	sound_stream *m_stream;
+	bool m_is_device_call;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -258,7 +275,7 @@ public:
 	}
 
 	virtual void custom_netlist_additions(netlist::netlist_state_t &nlstate) { }
-	virtual void pre_parse_action(netlist::netlist_state_t &nlstate) { }
+	virtual void pre_parse_action(netlist::nlparse_t &parser) { }
 	virtual void validity_helper(validity_checker &valid,
 		netlist::netlist_state_t &nlstate) const { }
 
@@ -267,11 +284,14 @@ public:
 	inline void update_to_current_time()
 	{
 		if (m_sound != nullptr)
-			m_sound->get_stream()->update();
+		{
+			m_sound->update_to_current_time();
+		}
 	}
 
 	void set_mult_offset(const double mult, const double offset);
 
+	netlist_mame_sound_device *sound() { return m_sound;}
 protected:
 	double m_offset;
 	double m_mult;
@@ -319,7 +339,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	netlist::param_num_t<double> *m_param;
+	netlist::param_num_t<netlist::nl_fptype> *m_param;
 	bool   m_auto_port;
 	const char *m_param_name;
 	double m_value_for_device_timer;
@@ -337,12 +357,10 @@ public:
 	// construction/destruction
 	netlist_mame_analog_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class FC>
-	void set_params(const char *in_name, void (FC::*callback)(const double, const attotime &),
-		const char *name, const char *tag)
+	template <typename... T> void set_params(const char *in_name, T &&... args)
 	{
 		m_in = in_name;
-		m_delegate = std::move(output_delegate(callback, name, tag, (FC *)nullptr));
+		m_delegate.set(std::forward<T>(args)...);
 	}
 
 
@@ -368,14 +386,10 @@ public:
 	// construction/destruction
 	netlist_mame_logic_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void set_params(const char *in_name, output_delegate &&adelegate);
-	template <class FunctionClass> void set_params(const char *in_name, void (FunctionClass::*callback)(const int, const attotime &), const char *name)
+	template <typename... T> void set_params(const char *in_name, T &&... args)
 	{
-		set_params(in_name, output_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_params(const char *in_name, const char *devname, void (FunctionClass::*callback)(const int, const attotime &), const char *name)
-	{
-		set_params(in_name, output_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+		m_in = in_name;
+		m_delegate.set(std::forward<T>(args)...);
 	}
 
 protected:

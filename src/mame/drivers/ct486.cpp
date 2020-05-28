@@ -47,10 +47,10 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ16_MEMBER( cs4031_ior );
-	DECLARE_WRITE16_MEMBER( cs4031_iow );
+	uint16_t cs4031_ior(offs_t offset);
+	void cs4031_iow(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER( cs4031_hold );
-	DECLARE_WRITE8_MEMBER( cs4031_tc ) { m_isabus->eop_w(offset, data); }
+	void cs4031_tc(offs_t offset, uint8_t data) { m_isabus->eop_w(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( cs4031_spkr ) { m_speaker->level_w(state); }
 	void ct486(machine_config &config);
 	void ct486_io(address_map &map);
@@ -66,7 +66,7 @@ void ct486_state::machine_start()
 {
 }
 
-READ16_MEMBER( ct486_state::cs4031_ior )
+uint16_t ct486_state::cs4031_ior(offs_t offset)
 {
 	if (offset < 4)
 		return m_isabus->dack_r(offset);
@@ -74,7 +74,7 @@ READ16_MEMBER( ct486_state::cs4031_ior )
 		return m_isabus->dack16_r(offset);
 }
 
-WRITE16_MEMBER( ct486_state::cs4031_iow )
+void ct486_state::cs4031_iow(offs_t offset, uint16_t data)
 {
 	if (offset < 4)
 		m_isabus->dack_w(offset, data);
@@ -188,6 +188,7 @@ void ct486_state::ct486(machine_config &config)
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
 	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 }
 
 

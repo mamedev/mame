@@ -9,8 +9,8 @@
 #include "emu.h"
 #include "ide.h"
 
+#include "bus/ata/atadev.h"
 #include "imagedev/harddriv.h"
-#include "machine/idectrl.h"
 #include "sound/cdda.h"
 #include "speaker.h"
 

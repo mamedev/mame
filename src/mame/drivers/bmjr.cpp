@@ -35,15 +35,15 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_READ8_MEMBER(ff_r);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_READ8_MEMBER(tape_r);
-	DECLARE_WRITE8_MEMBER(tape_w);
-	DECLARE_READ8_MEMBER(tape_stop_r);
-	DECLARE_READ8_MEMBER(tape_start_r);
-	DECLARE_WRITE8_MEMBER(xor_display_w);
+	u8 key_r();
+	void key_w(u8 data);
+	u8 ff_r();
+	u8 unk_r();
+	u8 tape_r();
+	void tape_w(u8 data);
+	u8 tape_stop_r();
+	u8 tape_start_r();
+	void xor_display_w(u8 data);
 	void init_bmjr();
 	u32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -98,14 +98,14 @@ u32 bmjr_state::screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-READ8_MEMBER( bmjr_state::key_r )
+u8 bmjr_state::key_r()
 {
 	char kbdrow[6];
 	sprintf(kbdrow,"KEY%X", m_key_mux);
 	return (ioport(kbdrow)->read() & 15) | (ioport("KEYMOD")->read() << 4);
 }
 
-WRITE8_MEMBER( bmjr_state::key_w )
+void bmjr_state::key_w(u8 data)
 {
 	m_key_mux = data & 0xf;
 
@@ -114,24 +114,24 @@ WRITE8_MEMBER( bmjr_state::key_w )
 }
 
 
-READ8_MEMBER( bmjr_state::ff_r )
+u8 bmjr_state::ff_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER( bmjr_state::unk_r )
+u8 bmjr_state::unk_r()
 {
 	return 0x30;
 }
 
-READ8_MEMBER( bmjr_state::tape_r )
+u8 bmjr_state::tape_r()
 {
 	//m_cass->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 
 	return ((m_cass->input()) > 0.03) ? 0xff : 0x00;
 }
 
-WRITE8_MEMBER( bmjr_state::tape_w )
+void bmjr_state::tape_w(u8 data)
 {
 	if(!m_tape_switch)
 	{
@@ -144,7 +144,7 @@ WRITE8_MEMBER( bmjr_state::tape_w )
 	}
 }
 
-READ8_MEMBER( bmjr_state::tape_stop_r )
+u8 bmjr_state::tape_stop_r()
 {
 	m_tape_switch = 0;
 	//m_cass->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
@@ -152,14 +152,14 @@ READ8_MEMBER( bmjr_state::tape_stop_r )
 	return 0x01;
 }
 
-READ8_MEMBER( bmjr_state::tape_start_r )
+u8 bmjr_state::tape_start_r()
 {
 	m_tape_switch = 1;
 	m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 	return 0x01;
 }
 
-WRITE8_MEMBER( bmjr_state::xor_display_w )
+void bmjr_state::xor_display_w(u8 data)
 {
 	m_xor_display = data;
 }
@@ -173,9 +173,9 @@ void bmjr_state::bmjr_mem(address_map &map)
 	map(0x0000, 0xafff).ram().share("wram");
 	map(0xb000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).rom();
-//  AM_RANGE(0xe890, 0xe890) W MP-1710 tile color
-//  AM_RANGE(0xe891, 0xe891) W MP-1710 background color
-//  AM_RANGE(0xe892, 0xe892) W MP-1710 monochrome / color setting
+//  map(0xe890, 0xe890) W MP-1710 tile color
+//  map(0xe891, 0xe891) W MP-1710 background color
+//  map(0xe892, 0xe892) W MP-1710 monochrome / color setting
 	map(0xee00, 0xee00).r(FUNC(bmjr_state::tape_stop_r)); //R stop tape
 	map(0xee20, 0xee20).r(FUNC(bmjr_state::tape_start_r)); //R start tape
 	map(0xee40, 0xee40).w(FUNC(bmjr_state::xor_display_w)); //W Picture reverse
@@ -184,7 +184,7 @@ void bmjr_state::bmjr_mem(address_map &map)
 	map(0xef00, 0xef00).r(FUNC(bmjr_state::ff_r)); //R timer
 	map(0xef40, 0xef40).r(FUNC(bmjr_state::ff_r)); //R unknown
 	map(0xef80, 0xef80).r(FUNC(bmjr_state::unk_r)); //R unknown
-//  AM_RANGE(0xefe0, 0xefe0) W screen mode
+//  map(0xefe0, 0xefe0) W screen mode
 	map(0xf000, 0xffff).rom();
 }
 

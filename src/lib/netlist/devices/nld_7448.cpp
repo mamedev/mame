@@ -5,9 +5,8 @@
  *
  */
 
-#include "nld_7448.h"
-#include "nlid_system.h"
-#include "nlid_truthtable.h"
+#include "nl_base.h"
+#include "nl_factory.h"
 
 #include <array>
 
@@ -15,7 +14,7 @@ namespace netlist
 {
 	namespace devices
 	{
-	#if !(USE_TRUTHTABLE_7448)
+	#if !(NL_USE_TRUTHTABLE_7448)
 	NETLIB_OBJECT(7448)
 	{
 		NETLIB_CONSTRUCTOR(7448)
@@ -27,16 +26,32 @@ namespace netlist
 		, m_BIQ(*this, "BIQ")
 		, m_RBIQ(*this, "RBIQ")
 		, m_state(*this, "m_state", 0)
-		, m_Q(*this, {{"a", "b", "c", "d", "e", "f", "g"}})
+		, m_Q(*this, {"a", "b", "c", "d", "e", "f", "g"})
 		, m_power_pins(*this)
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_state = 0;
+		}
 		NETLIB_UPDATEI();
 
-	public:
-		void update_outputs(unsigned v);
+		friend class NETLIB_NAME(7448_dip);
+	private:
+		void update_outputs(unsigned v) noexcept
+		{
+			nl_assert(v<16);
+			if (v != m_state)
+			{
+				// max transfer time is 100 NS */
+
+				uint8_t t = tab7448[v];
+				for (std::size_t i = 0; i < 7; i++)
+					m_Q[i].push((t >> (6-i)) & 1, NLTIME_FROM_NS(100));
+				m_state = v;
+			}
+		}
 
 		logic_input_t m_A;
 		logic_input_t m_B;
@@ -51,39 +66,43 @@ namespace netlist
 		object_array_t<logic_output_t, 7> m_Q;  /* a .. g */
 		nld_power_pins m_power_pins;
 
+		static const std::array<uint8_t, 16> tab7448;
 	};
 
-	NETLIB_OBJECT_DERIVED(7448_dip, 7448)
+	NETLIB_OBJECT(7448_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(7448_dip, 7448)
+		NETLIB_CONSTRUCTOR(7448_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1", m_B);
-			register_subalias("2", m_C);
-			register_subalias("3", m_LTQ);
-			register_subalias("4", m_BIQ);
-			register_subalias("5", m_RBIQ);
-			register_subalias("6", m_D);
-			register_subalias("7", m_A);
-			register_subalias("8", "GND");
+			register_subalias("1", A.m_B);
+			register_subalias("2", A.m_C);
+			register_subalias("3", A.m_LTQ);
+			register_subalias("4", A.m_BIQ);
+			register_subalias("5", A.m_RBIQ);
+			register_subalias("6", A.m_D);
+			register_subalias("7", A.m_A);
+			register_subalias("8", "A.GND");
 
-			register_subalias("9",  m_Q[4]); // e
-			register_subalias("10", m_Q[3]); // d
-			register_subalias("11", m_Q[2]); // c
-			register_subalias("12", m_Q[1]); // b
-			register_subalias("13", m_Q[0]); // a
-			register_subalias("14", m_Q[6]); // g
-			register_subalias("15", m_Q[5]); // f
-			register_subalias("16", "VCC");
+			register_subalias("9",  A.m_Q[4]); // e
+			register_subalias("10", A.m_Q[3]); // d
+			register_subalias("11", A.m_Q[2]); // c
+			register_subalias("12", A.m_Q[1]); // b
+			register_subalias("13", A.m_Q[0]); // a
+			register_subalias("14", A.m_Q[6]); // g
+			register_subalias("15", A.m_Q[5]); // f
+			register_subalias("16", "A.VCC");
 		}
+	private:
+		NETLIB_SUB(7448) A;
 	};
 	#endif
 
 
-	#if !(USE_TRUTHTABLE_7448)
+	#if !(NL_USE_TRUTHTABLE_7448)
 
 #define BITS7(b6,b5,b4,b3,b2,b1,b0) ((b6)<<6) | ((b5)<<5) | ((b4)<<4) | ((b3)<<3) | ((b2)<<2) | ((b1)<<1) | ((b0)<<0)
 
-	static constexpr const std::array<uint8_t, 16> tab7448 =
+	const std::array<uint8_t, 16> NETLIB_NAME(7448)::tab7448 =
 	{
 			BITS7(   1, 1, 1, 1, 1, 1, 0 ),  /* 00 - not blanked ! */
 			BITS7(   0, 1, 1, 0, 0, 0, 0 ),  /* 01 */
@@ -130,32 +149,6 @@ namespace netlist
 			if ((!m_RBIQ() && (v==0)))
 					v = 15;
 			update_outputs(v);
-		}
-	}
-
-	NETLIB_RESET(7448)
-	{
-		m_state = 0;
-#if 0
-		m_A.set_state(logic_t::STATE_INP_PASSIVE);
-		m_B.set_state(logic_t::STATE_INP_PASSIVE);
-		m_C.set_state(logic_t::STATE_INP_PASSIVE);
-		m_D.set_state(logic_t::STATE_INP_PASSIVE);
-		m_RBIQ.set_state(logic_t::STATE_INP_PASSIVE);
-#endif
-	}
-
-	NETLIB_FUNC_VOID(7448, update_outputs, (unsigned v))
-	{
-		nl_assert(v<16);
-		if (v != m_state)
-		{
-			// max transfer time is 100 NS */
-
-			uint8_t t = tab7448[v];
-			for (std::size_t i = 0; i < 7; i++)
-				m_Q[i].push((t >> (6-i)) & 1, NLTIME_FROM_NS(100));
-			m_state = v;
 		}
 	}
 

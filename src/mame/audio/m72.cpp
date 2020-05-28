@@ -51,7 +51,7 @@ DEFINE_DEVICE_TYPE(IREM_M72_AUDIO, m72_audio_device, "m72_audio", "Irem M72 Audi
 
 m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IREM_M72_AUDIO, tag, owner, clock)
-	, device_rom_interface(mconfig, *this, 32) // unknown address bits
+	, device_rom_interface(mconfig, *this)
 	, m_sample_addr(0)
 	, m_dac(*this, finder_base::DUMMY_TAG)
 {

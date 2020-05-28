@@ -38,7 +38,7 @@
 
 class device_vtech_ioexp_interface;
 
-class vtech_ioexp_slot_device : public device_t, public device_slot_interface
+class vtech_ioexp_slot_device : public device_t, public device_single_card_slot_interface<device_vtech_ioexp_interface>
 {
 	friend class device_vtech_ioexp_interface;
 public:
@@ -59,15 +59,12 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	required_address_space m_io;
-
-	device_vtech_ioexp_interface *m_cart;
 };
 
 // class representing interface-specific live ioexp device
-class device_vtech_ioexp_interface : public device_slot_card_interface
+class device_vtech_ioexp_interface : public device_interface
 {
 public:
 	// construction/destruction

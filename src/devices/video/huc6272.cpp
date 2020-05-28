@@ -10,6 +10,8 @@
 
     ADPCM related patents:
     - https://patents.google.com/patent/US5692099
+    - https://patents.google.com/patent/US6453286
+    - https://patents.google.com/patent/US5548655A
 
 ***************************************************************************/
 
@@ -188,7 +190,7 @@ void huc6272_device::write_microprg_data(offs_t address, uint16_t data)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ32_MEMBER( huc6272_device::read )
+uint32_t huc6272_device::read(offs_t offset)
 {
 	uint32_t res = 0;
 
@@ -262,7 +264,7 @@ READ32_MEMBER( huc6272_device::read )
 	return res;
 }
 
-WRITE32_MEMBER( huc6272_device::write )
+void huc6272_device::write(offs_t offset, uint32_t data)
 {
 	if((offset & 1) == 0)
 		m_register = data & 0x7f;
@@ -497,9 +499,9 @@ uint8_t huc6272_device::adpcm_update(int chan)
 	if (!m_adpcm.playing[chan])
 		return 0;
 
-	int rate = (1 << m_adpcm.rate);
+	const unsigned rate = (1 << m_adpcm.rate);
 	m_adpcm.pos[chan]++;
-	if (m_adpcm.pos[chan] > rate)
+	if (m_adpcm.pos[chan] >= rate)
 	{
 		if (m_adpcm.input[chan] == -1)
 		{
@@ -541,22 +543,23 @@ uint8_t huc6272_device::adpcm_update(int chan)
 			if (m_adpcm.nibble[chan] >= 28)
 				m_adpcm.input[chan] = -1;
 		}
+		m_adpcm.pos[chan] = 0;
 	}
 
 	return (m_adpcm.input[chan] >> m_adpcm.nibble[chan]) & 0xf;
 }
 
-READ8_MEMBER(huc6272_device::adpcm_update_0)
+uint8_t huc6272_device::adpcm_update_0()
 {
 	return adpcm_update(0);
 }
 
-READ8_MEMBER(huc6272_device::adpcm_update_1)
+uint8_t huc6272_device::adpcm_update_1()
 {
 	return adpcm_update(1);
 }
 
-WRITE8_MEMBER(huc6272_device::cdda_update)
+void huc6272_device::cdda_update(offs_t offset, uint8_t data)
 {
 	if (offset)
 		m_cdda_r->set_output_gain(ALL_OUTPUTS, float(data) / 63.0);

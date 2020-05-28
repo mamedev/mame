@@ -64,21 +64,21 @@ WRITE8_MEMBER(poly_state::select_map2_w)
 }
 
 
-WRITE8_MEMBER(poly_state::pia0_pa_w)
+void poly_state::pia0_pa_w(uint8_t data)
 {
 	logerror("PIA0: Port A out: %02X\n", data);
 	m_video_pa = data;
 	m_ptm->set_g3(BIT(data, 7));
 }
 
-WRITE8_MEMBER(poly_state::pia0_pb_w)
+void poly_state::pia0_pb_w(uint8_t data)
 {
 	logerror("PIA0: Port B out: %02X\n", data);
 	m_video_pb = data;
 }
 
 
-READ8_MEMBER(poly_state::pia1_b_in)
+uint8_t poly_state::pia1_b_in()
 {
 	// B1 - D0
 	// B2 - D1
@@ -108,12 +108,12 @@ READ8_MEMBER(poly_state::pia1_b_in)
 }
 
 
-READ8_MEMBER(poly_state::videoram_1_r)
+uint8_t poly_state::videoram_1_r(offs_t offset)
 {
 	return m_videoram[offset];
 }
 
-READ8_MEMBER(poly_state::videoram_2_r)
+uint8_t poly_state::videoram_2_r(offs_t offset)
 {
 	return m_videoram[offset + 0x400];
 }

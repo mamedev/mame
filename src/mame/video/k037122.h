@@ -17,12 +17,12 @@ public:
 	void set_gfx_index(int index) { m_gfx_index = index; }
 
 	void tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
-	DECLARE_READ32_MEMBER( sram_r );
-	DECLARE_WRITE32_MEMBER( sram_w );
-	DECLARE_READ32_MEMBER( char_r );
-	DECLARE_WRITE32_MEMBER( char_w );
-	DECLARE_READ32_MEMBER( reg_r );
-	DECLARE_WRITE32_MEMBER( reg_w );
+	uint32_t sram_r(offs_t offset);
+	void sram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t char_r(offs_t offset);
+	void char_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t reg_r(offs_t offset);
+	void reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	// device-level overrides

@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include <ctype.h>
+#include <cctype>
 #include "imageutl.h"
 
 int compute_log2(int val)

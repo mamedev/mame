@@ -1,0 +1,72 @@
+Name     GAL20V8 Registered Mode Test ;
+PartNo   00 ;
+Date     4/6/2020 ;
+Revision 01 ;
+Designer MAME ;
+Company  MAME ;
+Assembly None ;
+Location  ;
+Device   G20V8MS ;
+
+/* Registered Mode Test */
+
+/* Input Pins */
+PIN 2   = [I2] ; 
+PIN 3   = [I3] ; 
+PIN 4   = [I4] ; 
+PIN 5   = [I5] ; 
+PIN 6   = [I6] ; 
+PIN 7   = [I7] ; 
+PIN 8   = [I8] ; 
+PIN 9   = [I9] ; 
+PIN 10  = [I10] ; 
+PIN 11  = [I11] ;
+PIN 14  = [I14] ;
+PIN 15  = [I15] ;
+PIN 16  = [I16] ;
+PIN 17  = [I17] ;
+PIN 21  = [I21] ;
+PIN 23  = [I23] ; 
+
+/* Output Pins */
+PINNODE 18  = [O18] ; 
+PINNODE 19  = [RF19] ; 
+PINNODE 20  = [RF20] ; 
+PINNODE 22  = [O22] ; 
+
+/* Logic Equations */
+
+O18 = I3 & RF19 #
+      I5 #
+      I7 & RF20 #
+      I9 #
+      I11 #
+      I15 & !RF19 & !RF20 #
+      I17;
+O18.oe = !I17 & !I21 & I23;
+
+!RF19.D = !I10 & !I23 #
+          !I11 & O18 #
+          !I9 #
+          !I7 & I21 #
+          !I5 & RF20 #
+          !I3 #
+          !I2 #
+          I4 & O22;
+
+RF20.D = I6 #
+         I10 & RF19 #
+         !I7 & I17 #
+         O18 & !O22 #
+         I9 & !I10 #
+         I14 & !I17 #
+         !I16 #
+         !RF19 & I23;
+
+O22 = !I8 & I23 #
+      !RF19 & I23 #
+      !O18 & RF20 #
+      I17 #
+      I16 #
+      !I2 & I8 & I14 & !RF20 #
+      !I2 & !I4 & !I6 & !I8 & !I10 & !I14;

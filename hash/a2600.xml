@@ -1,7 +1,25 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
 Info from Atariage and Atarimania
+
+
+Dick Smith catalog numbers, taken from advertisements:
+
+X-1400 : Atari VCS console
+X-1404 : Video Chess
+X-1405 : Circus Atari
+X-1406 : Space Invaders
+X-1407 : Sky Diver
+X-1408 : Air Sea Battle
+X-1409 : Bowling
+X-1410 : Outlaw
+X-1411 : Breakout
+X-1413 : Night Driver
+X-1414 : Streetracer
+
 -->
 
 <softwarelist name="a2600" description="Atari 2600 cartridges">
@@ -1924,7 +1942,7 @@ Info from Atariage and Atarimania
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="bi! bi! (aka skindiver) (2600 screen search console) (jone yuan telephonic enterprise co) (pal).bin" size="4096" crc="1cc3c6a8" sha1="d370e020567e488e9a694dffcf36bef8e45448bc"/>
+				<rom name="bi bi (aka skindiver) (2600 screen search console) (jone yuan telephonic enterprise co) (pal).bin" size="4096" crc="1cc3c6a8" sha1="d370e020567e488e9a694dffcf36bef8e45448bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1977,7 +1995,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_fe" />
 			<dataarea name="rom" size="8192">
-				<rom name="activision decathlon, the - zehnkampf (1983) (activision, david crane - ariola) (eaz-030, eaz-030-04b, eaz-030-04i - 711 030-725) (pal).bin" size="8192" crc="2452adab" sha1="082fc914d6ebf415926fbb6cf781de209a4d052d"/>
+				<rom name="activision decathlon, the - zehnkampf (1983) (david crane - ariola) (eaz-030, eaz-030-04b, eaz-030-04i - 711 030-725) (pal).bin" size="8192" crc="2452adab" sha1="082fc914d6ebf415926fbb6cf781de209a4d052d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2110,10 +2128,11 @@ Info from Atariage and Atarimania
 		<description>Big Bird's Egg Catch (PAL)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<!-- christopher h. omarzu -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="big bird's egg catch (grover's egg catch) (kid's controller) (children's computer workshop) (1983) (atari, christopher h. omarzu) (cx26104) (pal).bin" size="8192" crc="b0555578" sha1="fd9822ec54add04569b629d631182d9deac7184d"/>
+				<rom name="big bird's egg catch (grover's egg catch) (kid's controller) (children's computer workshop) (cx26104) (pal).bin" size="8192" crc="b0555578" sha1="fd9822ec54add04569b629d631182d9deac7184d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2122,10 +2141,11 @@ Info from Atariage and Atarimania
 		<description>Big Bird's Egg Catch (Prototype 19830517)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<!-- christopher h. omarzu -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="big bird's egg catch (grover's egg catch) (kid's controller) (children's computer workshop) (05-17-1983) (atari, christopher h. omarzu) (cx26104) (prototype).bin" size="8192" crc="3a4038ac" sha1="e2b0304de695cea7c98344642254b7f181e928d2"/>
+				<rom name="big bird's egg catch (grover's egg catch) (kid's controller) (children's computer workshop) (cx26104) (prototype19830517).bin" size="8192" crc="3a4038ac" sha1="e2b0304de695cea7c98344642254b7f181e928d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2134,10 +2154,11 @@ Info from Atariage and Atarimania
 		<description>Big Bird's Egg Catch (Prototype 19830502)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<!-- christopher h. omarzu -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="big bird's egg catch (grover's egg catch) (kid's controller) (children's computer workshop) (05-02-1983) (atari, christopher h. omarzu) (cx26104) (prototype).bin" size="8192" crc="eeb65efa" sha1="aafb88ef8f95b1051cb8b6a153b165215c95c7bd"/>
+				<rom name="big bird's egg catch (grover's egg catch) (kid's controller) (children's computer workshop) (cx26104) (prototype 19830502).bin" size="8192" crc="eeb65efa" sha1="aafb88ef8f95b1051cb8b6a153b165215c95c7bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2146,10 +2167,11 @@ Info from Atariage and Atarimania
 		<description>Big Bird's Egg Catch (Prototype 19821208)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<!-- christopher h. omarzu -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="big bird's egg catch (grover's egg catch) (kid's controller) (children's computer workshop) (12-08-1982) (atari, christopher h. omarzu) (cx26104) (prototype).bin" size="8192" crc="9de03520" sha1="a3ab3699d945ac356aeff637046f197f9d6f7063"/>
+				<rom name="big bird's egg catch (grover's egg catch) (kid's controller) (children's computer workshop) (cx26104) (prototype 19821208).bin" size="8192" crc="9de03520" sha1="a3ab3699d945ac356aeff637046f197f9d6f7063"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2467,7 +2489,7 @@ Info from Atariage and Atarimania
 		<publisher>First Star Software</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="boing! (bubbles, soap suds, the emphysema game) (1983) (first star software, alex leavens, shirley ann russell) (pal).bin" size="4096" crc="d2f06299" sha1="d7a079a8874dcf059d10dc49831d6d9e2db68917"/>
+				<rom name="boing (bubbles, soap suds, the emphysema game) (1983) (first star software, alex leavens, shirley ann russell) (pal).bin" size="4096" crc="d2f06299" sha1="d7a079a8874dcf059d10dc49831d6d9e2db68917"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2478,7 +2500,7 @@ Info from Atariage and Atarimania
 		<publisher>First Star Software</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="boing! (bubbles, soap suds, the emphysema game) (1983) (first star software, alex leavens, shirley ann russell).bin" size="4096" crc="ad380487" sha1="d106bb41a38ed222dead608d839e8a3f0d0ecc18"/>
+				<rom name="boing (bubbles, soap suds, the emphysema game) (1983) (first star software, alex leavens, shirley ann russell).bin" size="4096" crc="ad380487" sha1="d106bb41a38ed222dead608d839e8a3f0d0ecc18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3807,10 +3829,11 @@ Info from Atariage and Atarimania
 		<description>Cookie Monster Munch</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<!-- children's computer workshop, gary stark -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="cookie monster munch (cokie monster's maze, cookie monster's garden) (kid's controller) (children's computer workshop) (1983) (atari, gary stark) (cx26102).bin" size="8192" crc="97ba488f" sha1="f4a62ba0ff59803c5f40d59eeed1e126fe37979b"/>
+				<rom name="cookie monster munch (cookie monster's maze, cookie monster's garden) (kid's controller) (cx26102).bin" size="8192" crc="97ba488f" sha1="f4a62ba0ff59803c5f40d59eeed1e126fe37979b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3819,10 +3842,11 @@ Info from Atariage and Atarimania
 		<description>Cookie Monster Munch (PAL)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<!-- children's computer workshop, gary stark -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="cookie monster munch (cokie monster's maze, cookie monster's garden) (kid's controller) (children's computer workshop) (1983) (atari, gary stark) (cx26102) (pal).bin" size="8192" crc="8ee4c319" sha1="fd47df700820295ead34a9d9cf5c73eccf1101bd"/>
+				<rom name="cookie monster munch (cookie monster's maze, cookie monster's garden) (kid's controller) (cx26102) (pal).bin" size="8192" crc="8ee4c319" sha1="fd47df700820295ead34a9d9cf5c73eccf1101bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3831,10 +3855,11 @@ Info from Atariage and Atarimania
 		<description>Cookie Monster Munch (PAL) (Alt)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<!-- children's computer workshop, gary stark -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="cookie monster munch (cokie monster's maze, cookie monster's garden) (kid's controller) (children's computer workshop) (1983) (atari, gary stark) (cx26102) (pal) [a].bin" size="8192" crc="cb377c19" sha1="3e03319ac9fdb095ace67ca1586be2cd1dbbbf64"/>
+				<rom name="cookie monster munch (cookie monster's maze, cookie monster's garden) (kid's controller) (cx26102) (pal) [a].bin" size="8192" crc="cb377c19" sha1="3e03319ac9fdb095ace67ca1586be2cd1dbbbf64"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4481,7 +4506,7 @@ Info from Atariage and Atarimania
 			<!-- SuperChip -->
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
-				<rom name="dark chambers (dungeon, dungeon masters) (1988) (atari, adam clayton, john howard palevich) (cx26151, cx26151p) (prototype) (pal).bin" size="16384" crc="19e38e50" sha1="72563f872ebfd285ef51b9f2fe7d3a8f55f1b0fa"/>
+				<rom name="dark chambers (dungeon, dungeon masters)(adam clayton, john howard palevich) (cx26151, cx26151p) (prototype) (pal).bin" size="16384" crc="19e38e50" sha1="72563f872ebfd285ef51b9f2fe7d3a8f55f1b0fa"/>
 			</dataarea>
 			<dataarea name="ram" size="128">
 			</dataarea>
@@ -4679,7 +4704,7 @@ Info from Atariage and Atarimania
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="demon attack (death from above) (1982) (imagic, rob fulop) (720000-200, 720101-1b, 720101-1c, ia3200, ia3200c, ix-006-04) [fixed].bin" size="4096" crc="31c9df5e" sha1="e5011b85a0e3c148087865bebd7e9b6608c32292"/>
+				<rom name="demon attack (death from above) (rob fulop) (720000-200, 720101-1b, 720101-1c, ia3200, ia3200c, ix-006-04) [fixed].bin" size="4096" crc="31c9df5e" sha1="e5011b85a0e3c148087865bebd7e9b6608c32292"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4745,7 +4770,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="demons to diamonds (hot rox) (paddle) (1982) (atari, alan j. murphy, nick 'sandy maiwald' turner - sears) (cx2615 - 49-75140).bin" size="4096" crc="9b97c3da" sha1="b45582de81c48b04c2bb758d69021e8088c70ce7"/>
+				<rom name="demons to diamonds (hot rox) (paddle) (1982) (alan j. murphy, nick 'sandy maiwald' turner - sears) (cx2615 - 49-75140).bin" size="4096" crc="9b97c3da" sha1="b45582de81c48b04c2bb758d69021e8088c70ce7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5341,7 +5366,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="dragster - dragster rennen (1980) (activision, david crane - ariola) (eag-001, pag-001, eag-001-04b, eag-001-04i - 711 001-715) (pal).bin" size="2048" crc="d26b820b" sha1="2fdad16a60cd3a49d3bdfb301b3590f2aaa71da3"/>
+				<rom name="dragster - dragster rennen (1980) (david crane) (eag-001, pag-001, eag-001-04b, eag-001-04i - 711 001-715) (pal).bin" size="2048" crc="d26b820b" sha1="2fdad16a60cd3a49d3bdfb301b3590f2aaa71da3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5706,7 +5731,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="enduro - transamerika-rennen (1983) (activision, larry miller - ariola) (eax-026, eax-026-04b, eax-026-04i - 711 026-725) (pal).bin" size="4096" crc="fc2d83ac" sha1="0a2fc2f048a9904799df26db1e17ffedad8ff302"/>
+				<rom name="enduro - transamerika-rennen (1983) (larry miller) (eax-026, eax-026-04b, eax-026-04i - 711 026-725) (pal).bin" size="4096" crc="fc2d83ac" sha1="0a2fc2f048a9904799df26db1e17ffedad8ff302"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6340,7 +6365,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="frogger ii - threeedeep! (1984) (parker brothers, mark lesser) (pb5590).bin" size="8192" crc="3ba0d9bf" sha1="6b9e591cc53844795725fc66c564f0364d1fbe40"/>
+				<rom name="frogger ii - threeedeep (1984) (parker brothers, mark lesser) (pb5590).bin" size="8192" crc="3ba0d9bf" sha1="6b9e591cc53844795725fc66c564f0364d1fbe40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6352,7 +6377,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="frogger ii - threeedeep! (1984) (parker brothers, mark lesser) (pb5590) (pal).bin" size="8192" crc="09cdd3ea" sha1="bce92de22fc8950f0eebb643d96fe9fa5dba2b72"/>
+				<rom name="frogger ii - threeedeep (1984) (parker brothers, mark lesser) (pb5590) (pal).bin" size="8192" crc="09cdd3ea" sha1="bce92de22fc8950f0eebb643d96fe9fa5dba2b72"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6474,7 +6499,7 @@ Info from Atariage and Atarimania
 		<publisher>Quelle</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="fuchs &amp; schweinchen schlau (aka oink!) (1983) (quelle) (806.174 9) (pal).bin" size="4096" crc="ff3f327b" sha1="4de5d915b58402f5018173120f42be7a7dfabb8e"/>
+				<rom name="fuchs &amp; schweinchen schlau (aka oink) (1983) (quelle) (806.174 9) (pal).bin" size="4096" crc="ff3f327b" sha1="4de5d915b58402f5018173120f42be7a7dfabb8e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7096,10 +7121,11 @@ Info from Atariage and Atarimania
 		<description>Grover's Music Maker (Prototype 19830118)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<!-- stephan r. keith, preston stuart -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="grover's music maker (monkey music) (kid's controller) (children's computer workshop) (01-18-1983) (atari, stephan r. keith, preston stuart) (cx26106) (prototype).bin" size="8192" crc="e1372b28" sha1="b9760ffba05139bca0fac3f7d3dc1e5d57600eda"/>
+				<rom name="grover's music maker (monkey music) (kid's controller) (children's computer workshop) (cx26106) (prototype19830118).bin" size="8192" crc="e1372b28" sha1="b9760ffba05139bca0fac3f7d3dc1e5d57600eda"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7108,10 +7134,11 @@ Info from Atariage and Atarimania
 		<description>Grover's Music Maker (Prototype 19821229)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<!-- stephan r. keith, preston stuart -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="grover's music maker (monkey music) (kid's controller) (children's computer workshop) (12-29-1982) (atari, stephan r. keith, preston stuart) (cx26106) (prototype).bin" size="8192" crc="f9e70731" sha1="c90acaee066f97efc6a520deb7fa3e5760a471fa"/>
+				<rom name="grover's music maker (monkey music) (kid's controller) (children's computer workshop) (cx26106) (prototype19821229).bin" size="8192" crc="f9e70731" sha1="c90acaee066f97efc6a520deb7fa3e5760a471fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7205,7 +7232,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="h.e.r.o. - helicopter-held (1984) (activision, john van ryzin - ariola) (eaz-036-04, eaz-036-04b, eaz-036-04i - 711 036-720) (pal).bin" size="8192" crc="4a5f82ba" sha1="5e4f98210ef5a6682581b60a9fc939fce6b22d97"/>
+				<rom name="h.e.r.o. - helicopter-held (1984) (john van ryzin) (eaz-036-04, eaz-036-04b, eaz-036-04i - 711 036-720) (pal).bin" size="8192" crc="4a5f82ba" sha1="5e4f98210ef5a6682581b60a9fc939fce6b22d97"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7308,7 +7335,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="haunted house (mystery mansion, graves' manor, nightmare manor) (09-28-81) (atari, james andreasen - sears) (cx2654 - 49-75141) (prototype).bin" size="4096" crc="2667b2ab" sha1="b841411b2c719a4a89498e8cac06c1c1986c794d"/>
+				<rom name="haunted house (mystery mansion, graves' manor, nightmare manor) (james andreasen) (cx2654 - 49-75141) (prototype 09-28-81).bin" size="4096" crc="2667b2ab" sha1="b841411b2c719a4a89498e8cac06c1c1986c794d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7319,7 +7346,7 @@ Info from Atariage and Atarimania
 		<publisher>Suntek</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="hey! stop! (aka keystone kapers) (rainbow vision - suntek) (ss-012) (pal).bin" size="4096" crc="6f3a278e" sha1="4b808c975f8a8345c72d0f6281ea5ba93963d7fb"/>
+				<rom name="hey stop (aka keystone kapers) (rainbow vision - suntek) (ss-012) (pal).bin" size="4096" crc="6f3a278e" sha1="4b808c975f8a8345c72d0f6281ea5ba93963d7fb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7601,7 +7628,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="indy 500 - race (race car) (driving controller) (1977) (atari, carla meninsky, ed riddle - sears) (cx2611 - 99821, 49-75149).bin" size="2048" crc="b43da2a3" sha1="620ab88d63cdd3f8ce67deac00a22257c7205c8b"/>
+				<rom name="indy 500 - race (race car) (driving controller) (1977) (carla meninsky, ed riddle) (cx2611 - 99821, 49-75149).bin" size="2048" crc="b43da2a3" sha1="620ab88d63cdd3f8ce67deac00a22257c7205c8b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7962,7 +7989,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="kaboom! (paddle) (1981) (activision, larry kaplan, david crane) (ag-010, ag-010-04).bin" size="2048" crc="813f00f6" sha1="40d4df4f8e4a69a299ae7678c17e72bedeb70105"/>
+				<rom name="kaboom (paddle) (1981) (activision, larry kaplan, david crane) (ag-010, ag-010-04).bin" size="2048" crc="813f00f6" sha1="40d4df4f8e4a69a299ae7678c17e72bedeb70105"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7973,7 +8000,7 @@ Info from Atariage and Atarimania
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="kaboom! (paddle) (cce).bin" size="2048" crc="b4901d54" sha1="ae5af59b3503858bd847c07fea8033139890ff34"/>
+				<rom name="kaboom (paddle) (cce).bin" size="2048" crc="b4901d54" sha1="ae5af59b3503858bd847c07fea8033139890ff34"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7984,7 +8011,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="kaboom! - schneller als der knall (paddle) (1981) (activision, larry kaplan, david crane - ariola) (eag-010, pag-010 - 711 010-720) (pal).bin" size="2048" crc="63f8f529" sha1="a257546271b33d7e3b9e7ea0ec4606ec47cfbc94"/>
+				<rom name="kaboom - schneller als der knall (paddle) (1981) (larry kaplan, david crane) (eag-010, pag-010 - 711 010-720) (pal).bin" size="2048" crc="63f8f529" sha1="a257546271b33d7e3b9e7ea0ec4606ec47cfbc94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8196,7 +8223,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="keystone kapers - raueber und gendarm (1983) (activision, garry kitchen - ariola) (eax-025, eax-025-04i - 711 025-725) (pal).bin" size="4096" crc="5d27f7fb" sha1="525e9054343916e2a7271278cf3610e0ed1efb71"/>
+				<rom name="keystone kapers - raueber und gendarm (1983) (garry kitchen) (eax-025, eax-025-04i - 711 025-725) (pal).bin" size="4096" crc="5d27f7fb" sha1="525e9054343916e2a7271278cf3610e0ed1efb71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8435,7 +8462,7 @@ Info from Atariage and Atarimania
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="kwibble (quick step! beta) (1983) (imagic, dave johnson) (720119-1a, 03211) (prototype).bin" size="4096" crc="45628bd3" sha1="696cc5c94de107940e0b22feb3089aaf62e96996"/>
+				<rom name="kwibble (quick step beta) (1983) (imagic, dave johnson) (720119-1a, 03211) (prototype).bin" size="4096" crc="45628bd3" sha1="696cc5c94de107940e0b22feb3089aaf62e96996"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8545,7 +8572,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="laser blast - duell im weltall (lazer) (1981) (activision, david crane - ariola) (eag-008, pag-008, eag-008-04i - 711 008-720) (pal).bin" size="2048" crc="de02eab3" sha1="f43046e44100f123e04432dfed61a487c10e36d9"/>
+				<rom name="laser blast - duell im weltall (lazer) (1981) (david crane) (eag-008, pag-008, eag-008-04i - 711 008-720) (pal).bin" size="2048" crc="de02eab3" sha1="f43046e44100f123e04432dfed61a487c10e36d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8702,7 +8729,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="lord of the rings, the - journey to rivendell (the lord of the rings i) (1983) (parker brothers, mark lesser) (pb5950) (prototype).bin" size="8192" crc="59b96db3" sha1="ef02fdb94ac092247bfcd5f556e01a68c06a4832"/>
+				<rom name="lord of the rings, the - journey to rivendell (the lord of the rings i) (1983) (mark lesser) (pb5950) (prototype).bin" size="8192" crc="59b96db3" sha1="ef02fdb94ac092247bfcd5f556e01a68c06a4832"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8714,7 +8741,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="lord of the rings, the - journey to rivendell (the lord of the rings i) (1983) (parker brothers, mark lesser) (pb5950) (prototype) [a].bin" size="8192" crc="e735bb54" sha1="9010530904f78ad10a6164174cb657d1f4717337"/>
+				<rom name="lord of the rings, the - journey to rivendell (the lord of the rings i) (1983) (mark lesser) (pb5950) (prototype) [a].bin" size="8192" crc="e735bb54" sha1="9010530904f78ad10a6164174cb657d1f4717337"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8989,10 +9016,11 @@ Info from Atariage and Atarimania
 		<description>Masters of the Universe - The Power of He-Man</description>
 		<year>1983</year>
 		<publisher>M Network</publisher>
+		<!-- connie goldman, joe king, patricia lewis du long, gerald moore, mike sanders, jossef wagner -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e7" />
 			<dataarea name="rom" size="16384">
-				<rom name="masters of the universe - the power of he-man (1983) (m network, connie goldman, joe king, patricia lewis du long, gerald moore, mike sanders, jossef wagner - intv) (mt4319).bin" size="16384" crc="0603e177" sha1="6db8fa65755db86438ada3d90f4c39cc288dcf84"/>
+				<rom name="masters of the universe - the power of he-man (1983) (mt4319).bin" size="16384" crc="0603e177" sha1="6db8fa65755db86438ada3d90f4c39cc288dcf84"/>
 			</dataarea>
 			<dataarea name="ram" size="2048">
 			</dataarea>
@@ -9028,7 +9056,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="maze craze - a game of cops 'n robbers - maze mania - a game of cops 'n robbers (1980) (atari, richard maurer - sears) (cx2635 - 49-75157).bin" size="4096" crc="0098e428" sha1="aba25089d87cd6fee8d206b880baa5d938aae255"/>
+				<rom name="maze craze - a game of cops 'n robbers - maze mania - a game of cops 'n robbers (richard maurer) (cx2635 - 49-75157).bin" size="4096" crc="0098e428" sha1="aba25089d87cd6fee8d206b880baa5d938aae255"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9178,7 +9206,7 @@ Info from Atariage and Atarimania
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="megamania - a space nightmare - ein alptraum im weltall (1982) (activision, steve cartwright - ariola) (eax-017, eax-017-04i - 711 017-720) (pal).bin" size="4096" crc="797e148e" sha1="756396b5d89831909d3d55cba143f5d1a101e366"/>
+				<rom name="megamania - a space nightmare - ein alptraum im weltall (steve cartwright) (eax-017, eax-017-04i - 711 017-720) (pal).bin" size="4096" crc="797e148e" sha1="756396b5d89831909d3d55cba143f5d1a101e366"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9999,7 +10027,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="mr. do! (1983) (coleco, ed english) (2656).bin" size="8192" crc="860a47a1" sha1="e4c912199779bba25f1b9950007f14dca3d19c84"/>
+				<rom name="mr. do (1983) (coleco, ed english) (2656).bin" size="8192" crc="860a47a1" sha1="e4c912199779bba25f1b9950007f14dca3d19c84"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10012,7 +10040,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="mr. do! (1983) (cbs electronics, ed english) (4l4478) (pal).bin" size="8192" crc="9fedc6ae" sha1="85c693ef75fb62f26f9977acf63790a00cc0cb5e"/>
+				<rom name="mr. do (1983) (cbs electronics, ed english) (4l4478) (pal).bin" size="8192" crc="9fedc6ae" sha1="85c693ef75fb62f26f9977acf63790a00cc0cb5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10024,7 +10052,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="mr. do!'s castle (1984) (parker brothers) (pb5820).bin" size="8192" crc="044735b9" sha1="330c2c67399e07c40f4101f9e18670fef070475e"/>
+				<rom name="mr. do's castle (1984) (parker brothers) (pb5820).bin" size="8192" crc="044735b9" sha1="330c2c67399e07c40f4101f9e18670fef070475e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10129,7 +10157,7 @@ Info from Atariage and Atarimania
 		<publisher>Sparrow</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="music machine, the (paddle) (1983) (sparrow - homecomputer software co., dan schafer, glenn stohel, jon tedesco) (gcg 1001t).bin" size="4096" crc="bd133d59" sha1="5a641caa2ab3c7c0cd5deb027acbc58efccf8d6a"/>
+				<rom name="music machine, the (paddle) (homecomputer software co., dan schafer, glenn stohel, jon tedesco) (gcg 1001t).bin" size="4096" crc="bd133d59" sha1="5a641caa2ab3c7c0cd5deb027acbc58efccf8d6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10220,10 +10248,11 @@ Info from Atariage and Atarimania
 	<software name="namethis">
 		<description>Name This Game</description>
 		<year>1982</year>
+		<!-- roger booth, sylvia day, ron dubren, todd marshall, wes trager, henry will iv -->
 		<publisher>U.S. Games Corporation</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="name this game (guardians of treasure, octopussy) (1982) (u.s. games corporation, roger booth, sylvia day, ron dubren, todd marshall, wes trager, henry will iv) (vc1007).bin" size="4096" crc="a86e1ad8" sha1="2b4a0535ca83b963906eb0a5d60ce0e21f07905d"/>
+				<rom name="name this game (guardians of treasure, octopussy) (1982) (vc1007).bin" size="4096" crc="a86e1ad8" sha1="2b4a0535ca83b963906eb0a5d60ce0e21f07905d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10326,7 +10355,7 @@ Info from Atariage and Atarimania
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="no escape! (escape from argos) (1982) (imagic, michael greene) (720055-1a, ia3312).bin" size="4096" crc="8941caea" sha1="e2e8750b8856dd44d914c43a7d277188cc148e5c"/>
+				<rom name="no escape (escape from argos) (1982) (imagic, michael greene) (720055-1a, ia3312).bin" size="4096" crc="8941caea" sha1="e2e8750b8856dd44d914c43a7d277188cc148e5c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10338,7 +10367,7 @@ Info from Atariage and Atarimania
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="no escape! (escape from argos) (1982) (imagic, michael greene) (720055-2a, ia3312p) (pal).bin" size="4096" crc="ae03d1b3" sha1="fb9fc3e2b2e391952bfb090ec6e189dcc40aa0fa"/>
+				<rom name="no escape (escape from argos) (1982) (imagic, michael greene) (720055-2a, ia3312p) (pal).bin" size="4096" crc="ae03d1b3" sha1="fb9fc3e2b2e391952bfb090ec6e189dcc40aa0fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10415,9 +10444,10 @@ Info from Atariage and Atarimania
 		<description>Octopus (PAL)</description>
 		<year>1983</year>
 		<publisher>Carrere Video</publisher>
+		<!-- roger booth, sylvia day, ron dubren, todd marshall, wes trager, henry will iv -->
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="octopus (aka name this game) (1983) (carrere video, roger booth, sylvia day, todd marshall, wes trager, henry will iv - teldec) (usc1007) (pal).bin" size="4096" crc="8df953c1" sha1="21e319d2856dbc207fd4029a626e1b60afb44691"/>
+				<rom name="octopus (aka name this game) (1983) (usc1007) (pal).bin" size="4096" crc="8df953c1" sha1="21e319d2856dbc207fd4029a626e1b60afb44691"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10469,7 +10499,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="oink! (1982) (activision, mike lorenzen) (ax-023).bin" size="4096" crc="86f99b5e" sha1="ea674cf2c90d407b8f8b96eac692690b602b73f9"/>
+				<rom name="oink (1982) (activision, mike lorenzen) (ax-023).bin" size="4096" crc="86f99b5e" sha1="ea674cf2c90d407b8f8b96eac692690b602b73f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10480,7 +10510,7 @@ Info from Atariage and Atarimania
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="oink! (cce).bin" size="4096" crc="d63bbf34" sha1="03eb4a3b3db04c1782e1a91d27ea515163d258fb"/>
+				<rom name="oink (cce).bin" size="4096" crc="d63bbf34" sha1="03eb4a3b3db04c1782e1a91d27ea515163d258fb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10491,7 +10521,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="oink! - das schweinchen und der wolf (1982) (activision, mike lorenzen - ariola) (eax-023 - 711 023-720) (pal).bin" size="4096" crc="7eb46148" sha1="96f71b08725ab78cac3d0ebb9dcffcf1d4895fba"/>
+				<rom name="oink - das schweinchen und der wolf (1982) (activision, mike lorenzen - ariola) (eax-023 - 711 023-720) (pal).bin" size="4096" crc="7eb46148" sha1="96f71b08725ab78cac3d0ebb9dcffcf1d4895fba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10502,7 +10532,7 @@ Info from Atariage and Atarimania
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="oink! (unknown) (pal).bin" size="4096" crc="95121f77" sha1="f8c9e7d65b9924da6fac0ce7dc9eec8c0040057d"/>
+				<rom name="oink (unknown) (pal).bin" size="4096" crc="95121f77" sha1="f8c9e7d65b9924da6fac0ce7dc9eec8c0040057d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10527,7 +10557,7 @@ Info from Atariage and Atarimania
 		<publisher>Bit Corporation</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="open, sesame! - sesam, oeffne dich (1982) (bit corporation) (pg204) (pal).bin" size="4096" crc="0d12fd9b" sha1="cd968c2a983f9adf4d8d8d56823923b31c33980f"/>
+				<rom name="open, sesame - sesam, oeffne dich (1982) (bit corporation) (pg204) (pal).bin" size="4096" crc="0d12fd9b" sha1="cd968c2a983f9adf4d8d8d56823923b31c33980f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10547,10 +10577,11 @@ Info from Atariage and Atarimania
 		<description>Oscar's Trash Race</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<!-- christopher h. omarzu, preston stuart, bruce williams -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="oscar's trash race (kid's controller) (children's computer workshop) (1983) (atari, christopher h. omarzu, preston stuart, bruce williams) (cx26101).bin" size="8192" crc="34721d7b" sha1="7905709fcc85cbcfc28ca2ed543ffa737a5483ae"/>
+				<rom name="oscar's trash race (kid's controller) (children's computer workshop) (1983) (cx26101).bin" size="8192" crc="34721d7b" sha1="7905709fcc85cbcfc28ca2ed543ffa737a5483ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10559,10 +10590,11 @@ Info from Atariage and Atarimania
 		<description>Oscar's Trash Race (PAL)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<!-- christopher h. omarzu, preston stuart, bruce williams -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="oscar's trash race (kid's controller) (children's computer workshop) (1983) (atari, christopher h. omarzu, preston stuart, bruce williams) (cx26101) (pal).bin" size="8192" crc="4cc88058" sha1="98007f26356b4032a2ae4e9fddea5a38a988eb13"/>
+				<rom name="oscar's trash race (kid's controller) (children's computer workshop) (1983) (cx26101) (pal).bin" size="8192" crc="4cc88058" sha1="98007f26356b4032a2ae4e9fddea5a38a988eb13"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10571,10 +10603,11 @@ Info from Atariage and Atarimania
 		<description>Oscar's Trash Race (Prototype 19830330)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<!-- christopher h. omarzu, preston stuart, bruce williams -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="oscar's trash race (kid's controller) (children's computer workshop) (03-30-1983) (atari, christopher h. omarzu, preston stuart, bruce williams) (cx26101) (prototype).bin" size="8192" crc="3b06e5b1" sha1="52028232f4f30800a2131d53fca49b05f6148868"/>
+				<rom name="oscar's trash race (kid's controller) (children's computer workshop) (03-30-1983) (cx26101) (prototype).bin" size="8192" crc="3b06e5b1" sha1="52028232f4f30800a2131d53fca49b05f6148868"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10583,10 +10616,11 @@ Info from Atariage and Atarimania
 		<description>Oscar's Trash Race (Prototype 19821203)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<!-- christopher h. omarzu, preston stuart, bruce williams -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="oscar's trash race (kid's controller) (children's computer workshop) (12-03-1982) (atari, christopher h. omarzu, preston stuart, bruce williams) (cx26101) (prototype).bin" size="8192" crc="06191c30" sha1="de79ef324d63b2bcadfc845f36b6535793a3b260"/>
+				<rom name="oscar's trash race (kid's controller) (children's computer workshop) (12-03-1982) (cx26101) (prototype).bin" size="8192" crc="06191c30" sha1="de79ef324d63b2bcadfc845f36b6535793a3b260"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11152,7 +11186,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="pigs in space - starring miss piggy (1983) (atari, bill aspromonte, john russell, michael sierchio, robert zdybel) (cx26114).bin" size="8192" crc="27673d7c" sha1="d08b30ca2e5e351cac3bd3fb760b87a1a30aa300"/>
+				<rom name="pigs in space - starring miss piggy (1983) (bill aspromonte, john russell, michael sierchio, robert zdybel) (cx26114).bin" size="8192" crc="27673d7c" sha1="d08b30ca2e5e351cac3bd3fb760b87a1a30aa300"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11164,7 +11198,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="pigs in space - starring miss piggy (1983) (atari, bill aspromonte, john russell, michael sierchio, robert zdybel) (cx26114) (pal).bin" size="8192" crc="2adb9a1f" sha1="aee08324bc209f39c14658980fee06343d0d8b63"/>
+				<rom name="pigs in space - starring miss piggy (1983) (bill aspromonte, john russell, michael sierchio, robert zdybel) (cx26114) (pal).bin" size="8192" crc="2adb9a1f" sha1="aee08324bc209f39c14658980fee06343d0d8b63"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11176,7 +11210,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="pigs in space - starring miss piggy (1983) (atari, bill aspromonte, john russell, michael sierchio, robert zdybel) (cx26114) (prototype).bin" size="8192" crc="86a5b934" sha1="21a614365d63ff101af2f9cc9cb5f819229ec8db"/>
+				<rom name="pigs in space - starring miss piggy (bill aspromonte, john russell, michael sierchio, robert zdybel) (cx26114) (prototype).bin" size="8192" crc="86a5b934" sha1="21a614365d63ff101af2f9cc9cb5f819229ec8db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11234,7 +11268,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall! - pitfall harry's jungle adventure (1982) (activision, david crane) (ax-018, ax-018-04).bin" size="4096" crc="42ad47bf" sha1="8d525480445d48cc48460dc666ebad78c8fb7b73"/>
+				<rom name="pitfall - pitfall harry's jungle adventure (1982) (activision, david crane) (ax-018, ax-018-04).bin" size="4096" crc="42ad47bf" sha1="8d525480445d48cc48460dc666ebad78c8fb7b73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11256,7 +11290,7 @@ Info from Atariage and Atarimania
 		<publisher>Supergame</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall (aka pitfall!) (1984) (supergame) (32).bin" size="4096" crc="ad2224e6" sha1="861196f2425b9374c1aba5703bc15b88241e066b"/>
+				<rom name="pitfall (aka pitfall) (1984) (supergame) (32).bin" size="4096" crc="ad2224e6" sha1="861196f2425b9374c1aba5703bc15b88241e066b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11267,7 +11301,7 @@ Info from Atariage and Atarimania
 		<publisher>Genus</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall (aka pitfall!) (genus).bin" size="4096" crc="1fc7038f" sha1="a0a548bc6cc9e6af1401c37d43783590b670ae1d"/>
+				<rom name="pitfall (aka pitfall) (genus).bin" size="4096" crc="1fc7038f" sha1="a0a548bc6cc9e6af1401c37d43783590b670ae1d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11278,7 +11312,7 @@ Info from Atariage and Atarimania
 		<publisher>Star Game</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall (aka pitfall!) (star game) (012).bin" size="4096" crc="4e11f28d" sha1="fd68866b59bc9ff2fdeba0cb92012bfcc044de32"/>
+				<rom name="pitfall (aka pitfall) (star game) (012).bin" size="4096" crc="4e11f28d" sha1="fd68866b59bc9ff2fdeba0cb92012bfcc044de32"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11289,7 +11323,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall! - abenteuer im urwald (1982) (activision, david crane - ariola) (eax-018, eax-018-04b, eax-018-04i - 711 018-725) (pal).bin" size="4096" crc="ff7841d2" sha1="d0ec08b88d032627701ad72337524d91b26c656b"/>
+				<rom name="pitfall - abenteuer im urwald (1982) (david crane) (eax-018, eax-018-04b, eax-018-04i - 711 018-725) (pal).bin" size="4096" crc="ff7841d2" sha1="d0ec08b88d032627701ad72337524d91b26c656b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11300,7 +11334,7 @@ Info from Atariage and Atarimania
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall! - pitfall harry's jungle adventure (unknown) (pal).bin" size="4096" crc="38630571" sha1="f1b5fd9eefd04eec2df9aca6d7ca514f9495ba4e"/>
+				<rom name="pitfall - pitfall harry's jungle adventure (unknown) (pal).bin" size="4096" crc="38630571" sha1="f1b5fd9eefd04eec2df9aca6d7ca514f9495ba4e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11311,7 +11345,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall! - pitfall harry's jungle adventure (1982) (activision, david crane) (ax-018, ax-018-04) (prototype).bin" size="4096" crc="61e6f17a" sha1="c084539ef888ef0ac8bde9e81cd497697ba2b42a"/>
+				<rom name="pitfall - pitfall harry's jungle adventure (1982) (activision, david crane) (ax-018, ax-018-04) (prototype).bin" size="4096" crc="61e6f17a" sha1="c084539ef888ef0ac8bde9e81cd497697ba2b42a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11322,7 +11356,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall! - pitfall harry's jungle adventure (1981) (activision, david crane) (ax-018, ax-018-04) (prototype).bin" size="4096" crc="79c93300" sha1="fd79516f3db60978dc2645625ee028f5af76b637"/>
+				<rom name="pitfall - pitfall harry's jungle adventure (1981) (activision, david crane) (ax-018, ax-018-04) (prototype).bin" size="4096" crc="79c93300" sha1="fd79516f3db60978dc2645625ee028f5af76b637"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11411,7 +11445,7 @@ Info from Atariage and Atarimania
 		<publisher>Spectravideo</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="planet patrol - planeten patrouilie (1982) (spectravision, spectravideo - quelle) (sa-202 - 412.851 8) (pal) [different spaceship].bin" size="4096" crc="92cf5728" sha1="9f2bdc53ef1b9242270059f990448a3b8ddd1826"/>
+				<rom name="planet patrol - planeten patrouilie (1982) sa-202 - 412.851 8) (pal) [different spaceship].bin" size="4096" crc="92cf5728" sha1="9f2bdc53ef1b9242270059f990448a3b8ddd1826"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11740,10 +11774,11 @@ Info from Atariage and Atarimania
 		<description>Porky's</description>
 		<year>1983</year>
 		<publisher>20th Century Fox Video Games</publisher>
+		<!-- 20th century fox video games - lazer micro systems - dunhill electronic media corp., b. winston hendrickson, randy hyde, mark v. rhoads, john simonds -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="porky's (1983) (20th century fox video games - lazer micro systems - dunhill electronic media corp., b. winston hendrickson, randy hyde, mark v. rhoads, john simonds) (11013).bin" size="8192" crc="add0b98a" sha1="70afc2cc870be546dc976fa0c6811f7e01ebc471"/>
+				<rom name="porky's (1983) (11013).bin" size="8192" crc="add0b98a" sha1="70afc2cc870be546dc976fa0c6811f7e01ebc471"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11974,7 +12009,7 @@ Info from Atariage and Atarimania
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="quick step! (hop to it, kwibble) (1983) (imagic, dave johnson) (720119-1a, 03211).bin" size="4096" crc="057440fe" sha1="33a47f79610c4525802c9881f67ad1f3f8c1b55d"/>
+				<rom name="quick step (hop to it, kwibble) (1983) (imagic, dave johnson) (720119-1a, 03211).bin" size="4096" crc="057440fe" sha1="33a47f79610c4525802c9881f67ad1f3f8c1b55d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11985,7 +12020,7 @@ Info from Atariage and Atarimania
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="quick step! (hop to it, kwibble) (1983) (imagic, dave johnson) (720119-2a, 13211, eix-004-04i) (pal).bin" size="4096" crc="a8ebe2dc" sha1="80875ea38c58c64e787fbf1c4b9948ad6625f2c9"/>
+				<rom name="quick step (hop to it, kwibble) (1983) (imagic, dave johnson) (720119-2a, 13211, eix-004-04i) (pal).bin" size="4096" crc="a8ebe2dc" sha1="80875ea38c58c64e787fbf1c4b9948ad6625f2c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12218,7 +12253,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
-				<rom name="rampage! (1989) (activision, robert c. polaro) (ak-049-04).bin" size="16384" crc="f0b446ac" sha1="7bb7df255829d5fbbee0d944915e50f89a5e7075"/>
+				<rom name="rampage (1989) (activision, robert c. polaro) (ak-049-04).bin" size="16384" crc="f0b446ac" sha1="7bb7df255829d5fbbee0d944915e50f89a5e7075"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12230,7 +12265,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
-				<rom name="rampage! (1989) (activision, robert c. polaro) (eak-049-04b) (pal).bin" size="16384" crc="5b2c2f22" sha1="c42f6da3aa0c8b5db68dd25ac5d6aa56d59baf48"/>
+				<rom name="rampage (1989) (activision, robert c. polaro) (eak-049-04b) (pal).bin" size="16384" crc="5b2c2f22" sha1="c42f6da3aa0c8b5db68dd25ac5d6aa56d59baf48"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12373,7 +12408,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="realsports soccer - football - realsports soccer (1983) (atari, jerome domurat, michael sierchio) (cx2667) [no opening tune].bin" size="8192" crc="0cbaa09c" sha1="9c88e0dbb287d27c0e2c32f6e85d829133bbe8a3"/>
+				<rom name="realsports soccer - football - realsports soccer (1983) (jerome domurat, michael sierchio) (cx2667) [no opening tune].bin" size="8192" crc="0cbaa09c" sha1="9c88e0dbb287d27c0e2c32f6e85d829133bbe8a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12500,7 +12535,7 @@ Info from Atariage and Atarimania
 		<publisher>20th Century Fox Video Games</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="revenge of the beefsteak tomatoes (revenge of the cherry tomatoes) (1982) (20th century fox video games, john russell) (11016).bin" size="4096" crc="243a36df" sha1="f8a9dd46f9bad232f74d1ee2671ccb26ea1b3029"/>
+				<rom name="revenge of the beefsteak tomatoes (revenge of the cherry tomatoes) (20th century fox video games, john russell) (11016).bin" size="4096" crc="243a36df" sha1="f8a9dd46f9bad232f74d1ee2671ccb26ea1b3029"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13102,7 +13137,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
-				<rom name="save mary! (saving mary) (04-03-1989) (atari - axlon, tod frye) (cx26178) (prototype).bin" size="16384" crc="ef858ab2" sha1="1ddedcf4ffe4fc96a2870e11d9cca5fc73e93f59"/>
+				<rom name="save mary (saving mary) (04-03-1989) (atari - axlon, tod frye) (cx26178) (prototype).bin" size="16384" crc="ef858ab2" sha1="1ddedcf4ffe4fc96a2870e11d9cca5fc73e93f59"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13115,7 +13150,7 @@ Info from Atariage and Atarimania
 			<!-- SuperChip -->
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
-				<rom name="save mary! (saving mary) (10-24-1991) (atari - axlon, tod frye) (cx26178) (prototype) (pal).bin" size="16384" crc="eb2e801d" sha1="44357b828b3214441d702d4912a1949951d80472"/>
+				<rom name="save mary (saving mary) (10-24-1991) (atari - axlon, tod frye) (cx26178) (prototype) (pal).bin" size="16384" crc="eb2e801d" sha1="44357b828b3214441d702d4912a1949951d80472"/>
 			</dataarea>
 			<dataarea name="ram" size="128">
 			</dataarea>
@@ -13130,7 +13165,7 @@ Info from Atariage and Atarimania
 			<!-- SuperChip -->
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
-				<rom name="save mary! (saving mary) (11-21-1989) (atari - axlon, tod frye) (cx26178) (prototype).bin" size="16384" crc="01e18f53" sha1="ecd8ef49ae23ddd3e10ec60839b95c8e7764ea27"/>
+				<rom name="save mary (saving mary) (11-21-1989) (atari - axlon, tod frye) (cx26178) (prototype).bin" size="16384" crc="01e18f53" sha1="ecd8ef49ae23ddd3e10ec60839b95c8e7764ea27"/>
 			</dataarea>
 			<dataarea name="ram" size="128">
 			</dataarea>
@@ -13407,7 +13442,7 @@ Info from Atariage and Atarimania
 		<publisher>Sears</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="seawolf 3 (submarine commander beta) (03-23-1981) (sears tele-games, marilyn churchill, matthew l. hubbard) (cx2647 - 49-75142) (prototype) (pal).bin" size="4096" crc="e4ddefca" sha1="b743d4d11a01d0253c14b1234a2205952a2a0ecf"/>
+				<rom name="seawolf 3 (submarine commander beta) (marilyn churchill, matthew l. hubbard) (cx2647 - 49-75142) (prototype19810323) (pal).bin" size="4096" crc="e4ddefca" sha1="b743d4d11a01d0253c14b1234a2205952a2a0ecf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14437,7 +14472,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_fe" />
 			<dataarea name="rom" size="8192">
-				<rom name="space shuttle - a journey into space - eine reise ins all (1983) (activision, steve 'jessica' kitchen - ariola) (eaz-033 - 711 033-725) (pal).bin" size="8192" crc="600e7c77" sha1="3e9cd06cba4d79a9bc04faf79977b01d4947f935"/>
+				<rom name="space shuttle - a journey into space - eine reise ins all (1983) (steve 'jessica' kitchen) (eaz-033 - 711 033-725) (pal).bin" size="8192" crc="600e7c77" sha1="3e9cd06cba4d79a9bc04faf79977b01d4947f935"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14913,7 +14948,7 @@ Info from Atariage and Atarimania
 		<publisher>Apollo</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="squoosh (vat's incredible!, the grape escape) (1983) (apollo) (ap-2012) (prototype).bin" size="4096" crc="b4212adb" sha1="7405d4b427cb278062fa44db918c0a702062e55c"/>
+				<rom name="squoosh (vat's incredible, the grape escape) (1983) (apollo) (ap-2012) (prototype).bin" size="4096" crc="b4212adb" sha1="7405d4b427cb278062fa44db918c0a702062e55c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14924,7 +14959,7 @@ Info from Atariage and Atarimania
 		<publisher>Apollo</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="squoosh (vat's incredible!, the grape escape) (1983) (apollo) (ap-2012) (prototype) [a].bin" size="4096" crc="fe44446e" sha1="11a9dd44787f011ec540159248377cb27fb8f7bb"/>
+				<rom name="squoosh (vat's incredible, the grape escape) (1983) (apollo) (ap-2012) (prototype) [a].bin" size="4096" crc="fe44446e" sha1="11a9dd44787f011ec540159248377cb27fb8f7bb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15171,7 +15206,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="star wars - return of the jedi - death star battle (revenge of the jedi - game ii) (1983) (parker brothers, ray miller, todd marshall) (pb5060).bin" size="8192" crc="0886a55d" sha1="2ad9db4b5aec2da36ecc3178599b02619c3c462e"/>
+				<rom name="star wars - return of the jedi - death star battle (revenge of the jedi - game ii) (ray miller, todd marshall) (pb5060).bin" size="8192" crc="0886a55d" sha1="2ad9db4b5aec2da36ecc3178599b02619c3c462e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15183,7 +15218,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="star wars - return of the jedi - death star battle (revenge of the jedi - game ii) (1983) (parker brothers, ray miller, todd marshall) (931513) (pal).bin" size="8192" crc="2a2bd248" sha1="19447d7eabdecd9984be1a2ad500ba34251c458a"/>
+				<rom name="star wars, return of the jedi, death star battle (revenge of the jedi - game ii) (ray miller, todd marshall) (931513) (pal).bin" size="8192" crc="2a2bd248" sha1="19447d7eabdecd9984be1a2ad500ba34251c458a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15192,10 +15227,11 @@ Info from Atariage and Atarimania
 		<description>Star Wars - Return of the Jedi - Ewok Adventure (PAL)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<!-- larry gelberg, gary goltz -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="star wars - return of the jedi - ewok adventure (revenge of the jedi - game i) (1983) (parker brothers, larry gelberg, gary goltz) (pb5065) (prototype) (pal).bin" size="8192" crc="d113f5fe" sha1="c9d201935bbe6373793241ba9c03cc02f1df31c9"/>
+				<rom name="star wars - return of the jedi - ewok adventure (revenge of the jedi - game i) (pb5065) (prototype) (pal).bin" size="8192" crc="d113f5fe" sha1="c9d201935bbe6373793241ba9c03cc02f1df31c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15204,10 +15240,11 @@ Info from Atariage and Atarimania
 		<description>Star Wars - Return of the Jedi - Ewok Adventure (Prototype)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<!-- larry gelberg, gary goltz -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="star wars - return of the jedi - ewok adventure (revenge of the jedi - game i) (1983) (parker brothers, larry gelberg, gary goltz) (pb5065) (prototype).bin" size="8192" crc="939550e7" sha1="b759eabf0dcb112c94b9fd66451a882130667860"/>
+				<rom name="star wars - return of the jedi - ewok adventure (revenge of the jedi - game i) (pb5065) (prototype).bin" size="8192" crc="939550e7" sha1="b759eabf0dcb112c94b9fd66451a882130667860"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15216,10 +15253,11 @@ Info from Atariage and Atarimania
 		<description>Star Wars - The Arcade Game</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
+		<!-- wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="star wars - the arcade game (1984) (parker brothers, wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart) (pb5540).bin" size="8192" crc="65c31ca4" sha1="8823fe3d8e3aeadc6b61ca51914e3b15aa13801c"/>
+				<rom name="star wars - the arcade game (1984) (pb5540).bin" size="8192" crc="65c31ca4" sha1="8823fe3d8e3aeadc6b61ca51914e3b15aa13801c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15228,10 +15266,11 @@ Info from Atariage and Atarimania
 		<description>Star Wars - The Arcade Game (PAL)</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
+		<!-- wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="star wars - the arcade game (1984) (parker brothers, wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart) (pb5540) (pal).bin" size="8192" crc="273bda48" sha1="914eb4529f5fa044516ba2cf5a606e847cbf0d15"/>
+				<rom name="star wars - the arcade game (1984) (pb5540) (pal).bin" size="8192" crc="273bda48" sha1="914eb4529f5fa044516ba2cf5a606e847cbf0d15"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15240,9 +15279,10 @@ Info from Atariage and Atarimania
 		<description>Star Wars - The Arcade Game (Prototype 19840103)</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
+		<!-- wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart -->
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="star wars - the arcade game (01-03-1984) (parker brothers, wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart) (pb5540) (prototype).bin" size="4096" crc="fa4a0e53" sha1="9657f1e445d6e406a48115846352f4f9bc815ec8"/>
+				<rom name="star wars - the arcade game (01-03-1984) (pb5540) (prototype).bin" size="4096" crc="fa4a0e53" sha1="9657f1e445d6e406a48115846352f4f9bc815ec8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15251,10 +15291,11 @@ Info from Atariage and Atarimania
 		<description>Star Wars - The Arcade Game (Prototype 19840405)</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
+		<!-- wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart -->
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="star wars - the arcade game (04-05-1984) (parker brothers, wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart) (pb5540) (prototype) (8k).bin" size="8192" crc="47efd61d" sha1="e3c6f3dd4390fb60d88a05ef084947574d313ba5"/>
+				<rom name="star wars - the arcade game (04-05-1984) (pb5540) (prototype) (8k).bin" size="8192" crc="47efd61d" sha1="e3c6f3dd4390fb60d88a05ef084947574d313ba5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15263,9 +15304,10 @@ Info from Atariage and Atarimania
 		<description>Star Wars - The Arcade Game (Prototype 19831205)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<!-- wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart -->
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="star wars - the arcade game (12-05-1983) (parker brothers, wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart) (pb5540) (prototype).bin" size="4096" crc="665077d0" sha1="e5122f75129085d803997244246d45eb007ede9a"/>
+				<rom name="star wars - the arcade game (12-05-1983) (pb5540) (prototype).bin" size="4096" crc="665077d0" sha1="e5122f75129085d803997244246d45eb007ede9a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15274,9 +15316,10 @@ Info from Atariage and Atarimania
 		<description>Star Wars - The Arcade Game (Prototype 19831215)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<!-- wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart -->
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="star wars - the arcade game (12-15-1983) (parker brothers, wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart) (pb5540) (prototype).bin" size="4096" crc="04b83443" sha1="dc0741b28cdf29558b0c5ee376b4dc90984b92d7"/>
+				<rom name="star wars - the arcade game (12-15-1983) (pb5540) (prototype).bin" size="4096" crc="04b83443" sha1="dc0741b28cdf29558b0c5ee376b4dc90984b92d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15285,9 +15328,10 @@ Info from Atariage and Atarimania
 		<description>Star Wars - The Arcade Game (Prototype 19831223)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<!-- wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart -->
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="star wars - the arcade game (12-23-1983) (parker brothers, wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart) (pb5540) (prototype).bin" size="4096" crc="39bc1d6c" sha1="58baf6739e6128048cb6d59971e93700a9de6f2f"/>
+				<rom name="star wars - the arcade game (12-23-1983) (pb5540) (prototype).bin" size="4096" crc="39bc1d6c" sha1="58baf6739e6128048cb6d59971e93700a9de6f2f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16064,7 +16108,7 @@ Info from Atariage and Atarimania
 		<publisher>Video Gems</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="surfer's paradise - but danger below! (1983) (video gems) (vg-02) (pal).bin" size="4096" crc="8c68f2ae" sha1="e754c8985ca7f5780c23a856656099b710e89919"/>
+				<rom name="surfer's paradise - but danger below (1983) (video gems) (vg-02) (pal).bin" size="4096" crc="8c68f2ae" sha1="e754c8985ca7f5780c23a856656099b710e89919"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16429,7 +16473,7 @@ Info from Atariage and Atarimania
 		<publisher>Quelle</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="teller-jonglieren! (aka dancing plate) (1983) (quelle) (685.996 1) (pal).bin" size="4096" crc="3e039461" sha1="d144243c0afc541df0400654ae37f38f0bdb5967"/>
+				<rom name="teller-jonglieren (aka dancing plate) (1983) (quelle) (685.996 1) (pal).bin" size="4096" crc="3e039461" sha1="d144243c0afc541df0400654ae37f38f0bdb5967"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16720,7 +16764,7 @@ Info from Atariage and Atarimania
 		<publisher>Suntek</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="tom boy (aka pitfall!) (rainbow vision - suntek) (ss-005) (pal).bin" size="4096" crc="aa168aaa" sha1="f536dea39f64d1fd72e4ee0a98394eda39ddc3da"/>
+				<rom name="tom boy (aka pitfall) (rainbow vision - suntek) (ss-005) (pal).bin" size="4096" crc="aa168aaa" sha1="f536dea39f64d1fd72e4ee0a98394eda39ddc3da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16731,7 +16775,7 @@ Info from Atariage and Atarimania
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="tom boy (aka pitfall!) (unknown).bin" size="4096" crc="5d6580fc" sha1="396a96c91c0992f8726933766099a3f2c0669b31"/>
+				<rom name="tom boy (aka pitfall) (unknown).bin" size="4096" crc="5d6580fc" sha1="396a96c91c0992f8726933766099a3f2c0669b31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16801,7 +16845,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
-				<rom name="track and field (los angeles 1984 games) (track &amp; field controller) (1984) (atari - gcc, jaques hugon, seth lipkin) (cx26125, cx26127).bin" size="16384" crc="21827056" sha1="005a6a53f5a856f0bdbca519af1ef236aaa1494d"/>
+				<rom name="track and field (los angeles 1984 games) (track &amp; field controller) (jaques hugon, seth lipkin) (cx26125, cx26127).bin" size="16384" crc="21827056" sha1="005a6a53f5a856f0bdbca519af1ef236aaa1494d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16823,7 +16867,7 @@ Info from Atariage and Atarimania
 		<publisher>Funvision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="treasure hunting (aka pitfall!) (funvision - fund. international co.).bin" size="4096" crc="b1600d79" sha1="461d91dee959958f9107f1d72e716a17af3c1c92"/>
+				<rom name="treasure hunting (aka pitfall) (funvision - fund. international co.).bin" size="4096" crc="b1600d79" sha1="461d91dee959958f9107f1d72e716a17af3c1c92"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16908,7 +16952,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_fa" />
 			<dataarea name="rom" size="12288">
-				<rom name="tunnel runner (black box) (1983) (cbs electronics, richard k. balaska jr., andy frank, stuart ross) (4l 2520 5000) (prototype).bin" size="12288" crc="bd2d975a" sha1="af202ee515b41113660bdf4500802108b12f85a3"/>
+				<rom name="tunnel runner (black box) (1983) (richard k. balaska jr., andy frank, stuart ross) (4l 2520 5000) (prototype).bin" size="12288" crc="bd2d975a" sha1="af202ee515b41113660bdf4500802108b12f85a3"/>
 			</dataarea>
 			<dataarea name="ram" size="256">
 			</dataarea>

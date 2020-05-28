@@ -409,3 +409,28 @@ uint32_t _8080bw_state::screen_update_spacecom(screen_device &screen, bitmap_rgb
 
 	return 0;
 }
+
+/*******************************************************/
+/*                                                     */
+/* Model Racing "Orbite"                               */
+/*                                                     */
+/*******************************************************/
+uint32_t orbite_state::screen_update_orbite(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (offs_t offs = 0; offs < m_main_ram.bytes(); offs++)
+	{
+		uint8_t back_color = 0;
+
+		uint8_t y = offs >> 5;
+		uint8_t x = offs << 3;
+
+		uint8_t data = m_main_ram[offs];
+		uint8_t fore_color = m_scattered_colorram[(offs & 0x1f) | ((offs & 0x1f80) >> 2)] & 0x07;
+
+		set_8_pixels(bitmap, y, x, data, fore_color, back_color);
+	}
+
+	clear_extra_columns(bitmap, 0);
+
+	return 0;
+}

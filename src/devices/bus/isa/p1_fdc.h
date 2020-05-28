@@ -27,6 +27,9 @@ public:
 	// construction/destruction
 	p1_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <typename T>
+	void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+
 	DECLARE_READ8_MEMBER(p1_fdc_r);
 	DECLARE_WRITE8_MEMBER(p1_fdc_w);
 
@@ -45,6 +48,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(p1_fdc_irq_drq);
 
 	required_device<fd1793_device> m_fdc;
+	required_device<cpu_device> m_cpu;
 
 public:
 	void p1_wd17xx_aux_w(int data);

@@ -196,7 +196,7 @@ WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 		uint8_t data = memregion("adpcm")->base()[m_sample_offset >> 1];
 
 		/* write the next nibble and advance */
-		m_msm->write_data((data >> (4 * (~m_sample_offset & 1))) & 0x0f);
+		m_msm->data_w((data >> (4 * (~m_sample_offset & 1))) & 0x0f);
 		m_sample_offset++;
 
 		/* every 256 clocks, we decrement the length */
@@ -334,7 +334,7 @@ void crgolf_state::mastrglf_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
-//  AM_RANGE(0x20, 0x20) AM_WRITE(rom_bank_select_w)
+//  map(0x20, 0x20).w(FUNC(crgolf_state::rom_bank_select_w));
 	map(0x40, 0x40).w("soundlatch1", FUNC(generic_latch_8_device::write));
 	map(0xa0, 0xa0).r("soundlatch2", FUNC(generic_latch_8_device::read));
 }
@@ -428,10 +428,10 @@ static INPUT_PORTS_START( crgolf )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x06, 0x04, "Half-Round Play" ) PORT_DIPLOCATION("SW:1,4")
-	PORT_DIPSETTING(    0x00, "4 Coins" )
-	PORT_DIPSETTING(    0x02, "5 Coins" )
-	PORT_DIPSETTING(    0x04, "6 Coins" )
-	PORT_DIPSETTING(    0x06, "10 Coins" )
+	PORT_DIPSETTING(    0x00, "4 Credits" )
+	PORT_DIPSETTING(    0x02, "5 Credits" )
+	PORT_DIPSETTING(    0x04, "6 Credits" )
+	PORT_DIPSETTING(    0x06, "10 Credits" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -458,6 +458,27 @@ static INPUT_PORTS_START( crgolf )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START(crgolfa)
+	PORT_INCLUDE(crgolf)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20, 0x20, "Price To Start" ) PORT_DIPLOCATION( "SW:5" )
+	PORT_DIPSETTING( 0x20, "2 Credits" )
+	PORT_DIPSETTING( 0x00, "1 Credit" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(crgolfb)
+	PORT_INCLUDE(crgolf)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW:5" )
+	PORT_DIPNAME( 0x06, 0x04, "Half-Round Play" ) PORT_DIPLOCATION( "SW:1,4" )
+	PORT_DIPSETTING( 0x00, "5 Credits" )
+	PORT_DIPSETTING( 0x02, "8 Credits" )
+	PORT_DIPSETTING( 0x04, "10 Credits" )
+	PORT_DIPSETTING( 0x06, "15 Credits" )
+INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -476,7 +497,7 @@ void crgolf_state::crgolf(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &crgolf_state::sound_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1H
 	mainlatch.q_out_cb<3>().set(FUNC(crgolf_state::color_select_w));
@@ -757,7 +778,7 @@ ROM_END
 
 void crgolf_state::init_crgolfhi()
 {
-	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8_delegate(FUNC(crgolf_state::crgolfhi_sample_w),this));
+	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8_delegate(*this, FUNC(crgolf_state::crgolfhi_sample_w)));
 }
 
 
@@ -768,11 +789,11 @@ void crgolf_state::init_crgolfhi()
  *
  *************************************/
 
-GAME( 1984, crgolf,   0,      crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfa,  crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfb,  crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (set 3)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Champion Golf",             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf, crgolf_state, init_crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolf,   0,      crgolf,   crgolf,  crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfa,  crgolf, crgolf,   crgolfa, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfb,  crgolf, crgolf,   crgolfb, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfc,  crgolf, crgolf,   crgolfb, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Champion Golf",             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfbt, crgolf, crgolf,   crgolfb, crgolf_state, empty_init,    ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crgolfhi, 0,      crgolfhi, crgolfa, crgolf_state, init_crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, mastrglf, 0,      mastrglf, crgolf, crgolf_state, empty_init,    ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, mastrglf, 0,      mastrglf, crgolf,  crgolf_state, empty_init,    ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

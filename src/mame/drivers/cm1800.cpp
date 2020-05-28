@@ -49,18 +49,18 @@ public:
 		, m_uart(*this, "uart")
 	{ }
 
-	DECLARE_READ8_MEMBER(uart_status_r);
-
 	void cm1800(machine_config &config);
+	
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
 	virtual void machine_reset() override;
+	u8 uart_status_r();
 	required_device<cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;
 };
 
-READ8_MEMBER(cm1800_state::uart_status_r)
+u8 cm1800_state::uart_status_r()
 {
 	return (m_uart->dav_r()) | (m_uart->tbmt_r() << 2);
 }

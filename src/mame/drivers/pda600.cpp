@@ -91,7 +91,7 @@ void pda600_state::pda600_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x1ffff).rom();
-	//AM_RANGE(0x20000, 0x9ffff) AM_RAM // PCMCIA Card
+	//map(0x20000, 0x9ffff).ram(); // PCMCIA Card
 	map(0xa0000, 0xa7fff).ram().region("videoram", 0);
 	map(0xe0000, 0xfffff).ram().region("mainram", 0).share("nvram");
 }
@@ -101,9 +101,9 @@ void pda600_state::pda600_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x3f).noprw(); /* Z180 internal registers */
-	//AM_RANGE(0x40, 0x7f) AM_NOP   /* Z180 internal registers */
+	//map(0x40, 0x7f).noprw();   /* Z180 internal registers */
 	map(0x80, 0x8f).rw("rtc", FUNC(hd64610_device::read), FUNC(hd64610_device::write));
-	//AM_RANGE(0xC0, 0xC1) AM_NOP   /* LCD */
+	//map(0xc0, 0xc1).noprw();  /* LCD */
 }
 
 /* Input ports */
@@ -207,7 +207,7 @@ GFXDECODE_END
 void pda600_state::pda600(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(14'318'181));
+	Z8S180(config, m_maincpu, XTAL(14'318'181));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pda600_state::pda600_mem);
 	m_maincpu->set_addrmap(AS_IO, &pda600_state::pda600_io);
 

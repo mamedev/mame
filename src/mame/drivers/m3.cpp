@@ -136,7 +136,7 @@ void m3_state::m3(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(7);
-	crtc.set_update_row_callback(FUNC(m3_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(m3_state::crtc_update_row));
 }
 
 ROM_START( m3 )

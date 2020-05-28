@@ -309,7 +309,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(microtan_state::kbd_scan)
 }
 
 
-WRITE8_MEMBER(microtan_state::pgm_chargen_w)
+void microtan_state::pgm_chargen_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x200)
 	{

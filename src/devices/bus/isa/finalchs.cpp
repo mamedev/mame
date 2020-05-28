@@ -58,7 +58,7 @@ void isa8_finalchs_device::device_reset()
 	{
 		// MAME doesn't allow reading ioport at device_start
 		u16 port = ioport("DSW")->read() * 0x10 + 0x100;
-		m_isa->install_device(port, port+1, read8_delegate(FUNC(isa8_finalchs_device::finalchs_r), this), write8_delegate(FUNC(isa8_finalchs_device::finalchs_w), this));
+		m_isa->install_device(port, port+1, read8_delegate(*this, FUNC(isa8_finalchs_device::finalchs_r)), write8_delegate(*this, FUNC(isa8_finalchs_device::finalchs_w)));
 
 		m_installed = true;
 	}

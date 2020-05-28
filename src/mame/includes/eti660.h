@@ -50,9 +50,9 @@ private:
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 	DECLARE_WRITE_LINE_MEMBER( ca2_w );
-	DECLARE_WRITE8_MEMBER( dma_w );
-	DECLARE_READ8_MEMBER( pia_pa_r );
-	DECLARE_WRITE8_MEMBER( pia_pa_w );
+	void dma_w(offs_t offset, uint8_t data);
+	uint8_t pia_pa_r();
+	void pia_pa_w(uint8_t data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	required_shared_ptr<uint8_t> m_p_videoram;
 

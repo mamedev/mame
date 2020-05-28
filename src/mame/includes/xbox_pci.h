@@ -75,6 +75,7 @@ DECLARE_DEVICE_TYPE(NV2A_RAM, nv2a_ram_device)
 class lpcbus_host_interface {
 public:
 	virtual void set_virtual_line(int line, int state) = 0;
+	virtual void remap() = 0;
 };
 
 class lpcbus_device_interface {
@@ -96,6 +97,7 @@ public:
 	void debug_generate_irq(int irq, int state);
 
 	virtual void set_virtual_line(int line, int state) override;
+	virtual void remap() override;
 
 	DECLARE_READ32_MEMBER(acpi_r);
 	DECLARE_WRITE32_MEMBER(acpi_w);
@@ -116,14 +118,19 @@ protected:
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	DECLARE_WRITE_LINE_MEMBER(interrupt_ouptut_changed);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out0_changed);
+	DECLARE_WRITE_LINE_MEMBER(pit8254_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
 
 private:
 	void internal_io_map(address_map &map);
 	void lpc_io(address_map &map);
 	void update_smi_line();
+	void speaker_set_spkrdata(uint8_t data);
+
+	DECLARE_READ8_MEMBER(portb_r);
+	DECLARE_WRITE8_MEMBER(portb_w);
 
 	devcb_write_line m_smi_callback;
 	devcb_write_line m_interrupt_output;
@@ -140,7 +147,13 @@ private:
 	uint16_t m_gpe0_enable;
 	uint16_t m_global_smi_control;
 	uint8_t m_smi_command_port;
+	uint8_t m_gpio_mode[26];
 	lpcbus_device_interface *lpcdevices[16];
+	uint8_t m_speaker;
+	bool m_refresh;
+	uint8_t m_pit_out2;
+	uint8_t m_spkrdata;
+	uint8_t m_channel_check;
 };
 
 DECLARE_DEVICE_TYPE(MCPX_ISALPC, mcpx_isalpc_device)
@@ -198,7 +211,7 @@ class mcpx_ohci_device : public pci_device {
 public:
 	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void set_hack_callback(std::function<void(void)> hack) { hack_callback = hack; }
-	void plug_usb_device(int port, ohci_function *function);
+	void plug_usb_device(int port, device_usb_ohci_function_interface *function);
 
 	auto interrupt_handler() { return m_interrupt_handler.bind(); }
 
@@ -219,7 +232,7 @@ private:
 	std::function<void(void)> hack_callback;
 	void ohci_mmio(address_map &map);
 	struct dev_t {
-		ohci_function *dev;
+		device_usb_ohci_function_interface *dev;
 		int port;
 	} connecteds[4];
 	int connecteds_count;

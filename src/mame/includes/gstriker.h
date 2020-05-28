@@ -83,7 +83,7 @@ private:
 	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
 
 	// vgoalsoc and twrldc
-	DECLARE_WRITE8_MEMBER(twcup94_prot_reg_w);
+	void twcup94_prot_reg_w(uint8_t data);
 
 	// vgoalsoc only
 	DECLARE_READ16_MEMBER(vbl_toggle_r);

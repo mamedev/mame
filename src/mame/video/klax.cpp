@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(klax_state::get_playfield_tile_info)
 	const u16 data2 = m_playfield_tilemap->extmem_read(tile_index) >> 8;
 	const u32 code = data1 & 0x1fff;
 	const u32 color = data2 & 0x0f;
-	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
+	tileinfo.set(0, code, color, (data1 >> 15) & 1);
 }
 
 
@@ -74,7 +74,7 @@ const atari_motion_objects_config klax_state::s_mob_config =
  *
  *************************************/
 
-void klax_state::klax_latch_w(u16 data)
+void klax_state::latch_w(u16 data)
 {
 }
 

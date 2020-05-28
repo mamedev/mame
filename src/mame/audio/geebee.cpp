@@ -58,13 +58,13 @@ void geebee_sound_device::device_timer(emu_timer &timer, device_timer_id id, int
 {
 	switch (id)
 	{
-		case TIMER_VOLUME_DECAY:
-			if (--m_volume < 0)
-				m_volume = 0;
-			break;
+	case TIMER_VOLUME_DECAY:
+		if (--m_volume < 0)
+			m_volume = 0;
+		break;
 
-		default:
-			assert_always(false, "Unknown id in geebee_device::device_timer");
+	default:
+		throw emu_fatalerror("Unknown id in geebee_device::device_timer");
 	}
 }
 

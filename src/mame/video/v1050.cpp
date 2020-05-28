@@ -115,7 +115,7 @@ void v1050_state::v1050_video(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(v1050_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(v1050_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(v1050_state::crtc_vs_w));
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));

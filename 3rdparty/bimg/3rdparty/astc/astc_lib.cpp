@@ -52,6 +52,8 @@ namespace
     {
         { 0, 1, 2, 3 }, // ASTC_RGBA
         { 2, 1, 0, 3 }, // ASTC_BGRA
+        { 0, 0, 0, 1 }, // ASTC_ENC_NORMAL_RA
+        { 0, 3, 6, 5 }, // ASTC_DEC_RA_NORMAL
     };
 
     void alloc_temp_buffers(compress_symbolic_block_buffers* temp_buffers)
@@ -272,197 +274,64 @@ namespace
 
     void setup_ewp(ASTC_COMPRESS_MODE mode, int ydim, int xdim, error_weighting_params& ewp)
     {
-        float oplimit_autoset    = 0.0;
-        float dblimit_autoset_2d = 0.0;
-        float bmc_autoset        = 0.0;
-        float mincorrel_autoset  = 0.0;
+        float oplimit    = 0.0;
+        float dblimit_2d = 0.0;
+        float bmc        = 0.0;
+        float mincorrel  = 0.0;
 
-        int plimit_autoset       = -1;
-        int maxiters_autoset     = 0;
-        int pcdiv                = 1;
+        int plimit       = -1;
+        int maxiters     = 0;
 
         float log10_texels_2d = log((float)(xdim * ydim)) / log(10.0f);
 
         if (mode == ASTC_COMPRESS_VERY_FAST)
         {
-            plimit_autoset = 2;
-            oplimit_autoset = 1.0;
-            dblimit_autoset_2d = MAX(70 - 35 * log10_texels_2d, 53 - 19 * log10_texels_2d);
-            bmc_autoset = 25;
-            mincorrel_autoset = 0.5;
-            maxiters_autoset = 1;
-
-            switch (ydim)
-            {
-            case 4:
-                pcdiv = 240;
-                break;
-            case 5:
-                pcdiv = 56;
-                break;
-            case 6:
-                pcdiv = 64;
-                break;
-            case 8:
-                pcdiv = 47;
-                break;
-            case 10:
-                pcdiv = 36;
-                break;
-            case 12:
-                pcdiv = 30;
-                break;
-            default:
-                pcdiv = 30;
-                break;
-            }
+            plimit = 2;
+            oplimit = 1.0;
+            dblimit_2d = MAX(70 - 35 * log10_texels_2d, 53 - 19 * log10_texels_2d);
+            bmc = 25;
+            mincorrel = 0.5;
+            maxiters = 1;
         }
         else if (mode == ASTC_COMPRESS_FAST)
         {
-            plimit_autoset = 4;
-            oplimit_autoset = 1.0;
-            mincorrel_autoset = 0.5;
-            dblimit_autoset_2d = MAX(85 - 35 * log10_texels_2d, 63 - 19 * log10_texels_2d);
-            bmc_autoset = 50;
-            maxiters_autoset = 1;
-
-            switch (ydim)
-            {
-            case 4:
-                pcdiv = 60;
-                break;
-            case 5:
-                pcdiv = 27;
-                break;
-            case 6:
-                pcdiv = 30;
-                break;
-            case 8:
-                pcdiv = 24;
-                break;
-            case 10:
-                pcdiv = 16;
-                break;
-            case 12:
-                pcdiv = 20;
-                break;
-            default:
-                pcdiv = 20;
-                break;
-            };
+            plimit = 4;
+            oplimit = 1.0;
+            mincorrel = 0.5;
+            dblimit_2d = MAX(85 - 35 * log10_texels_2d, 63 - 19 * log10_texels_2d);
+            bmc = 50;
+            maxiters = 1;
         }
         else if (mode == ASTC_COMPRESS_MEDIUM)
         {
-            plimit_autoset = 25;
-            oplimit_autoset = 1.2f;
-            mincorrel_autoset = 0.75f;
-            dblimit_autoset_2d = MAX(95 - 35 * log10_texels_2d, 70 - 19 * log10_texels_2d);
-            bmc_autoset = 75;
-            maxiters_autoset = 2;
-
-            switch (ydim)
-            {
-            case 4:
-                pcdiv = 25;
-                break;
-            case 5:
-                pcdiv = 15;
-                break;
-            case 6:
-                pcdiv = 15;
-                break;
-            case 8:
-                pcdiv = 10;
-                break;
-            case 10:
-                pcdiv = 8;
-                break;
-            case 12:
-                pcdiv = 6;
-                break;
-            default:
-                pcdiv = 6;
-                break;
-            };
+            plimit = 25;
+            oplimit = 1.2f;
+            mincorrel = 0.75f;
+            dblimit_2d = MAX(95 - 35 * log10_texels_2d, 70 - 19 * log10_texels_2d);
+            bmc = 75;
+            maxiters = 2;
         }
         else if (mode == ASTC_COMPRESS_THOROUGH)
         {
-            plimit_autoset = 100;
-            oplimit_autoset = 2.5f;
-            mincorrel_autoset = 0.95f;
-            dblimit_autoset_2d = MAX(105 - 35 * log10_texels_2d, 77 - 19 * log10_texels_2d);
-            bmc_autoset = 95;
-            maxiters_autoset = 4;
-
-            switch (ydim)
-            {
-            case 4:
-                pcdiv = 12;
-                break;
-            case 5:
-                pcdiv = 7;
-                break;
-            case 6:
-                pcdiv = 7;
-                break;
-            case 8:
-                pcdiv = 5;
-                break;
-            case 10:
-                pcdiv = 4;
-                break;
-            case 12:
-                pcdiv = 3;
-                break;
-            default:
-                pcdiv = 3;
-                break;
-            };
+            plimit = 100;
+            oplimit = 2.5f;
+            mincorrel = 0.95f;
+            dblimit_2d = MAX(105 - 35 * log10_texels_2d, 77 - 19 * log10_texels_2d);
+            bmc = 95;
+            maxiters = 4;
         }
         else if (mode == ASTC_COMPRESS_EXHAUSTIVE)
         {
-            plimit_autoset = PARTITION_COUNT;
-            oplimit_autoset = 1000.0f;
-            mincorrel_autoset = 0.99f;
-            dblimit_autoset_2d = 999.0f;
-            bmc_autoset = 100;
-            maxiters_autoset = 4;
-
-            switch (ydim)
-            {
-            case 4:
-                pcdiv = 3;
-                break;
-            case 5:
-                pcdiv = 1;
-                break;
-            case 6:
-                pcdiv = 1;
-                break;
-            case 8:
-                pcdiv = 1;
-                break;
-            case 10:
-                pcdiv = 1;
-                break;
-            case 12:
-                pcdiv = 1;
-                break;
-            default:
-                pcdiv = 1;
-                break;
-            }
+            plimit = PARTITION_COUNT;
+            oplimit = 1000.0f;
+            mincorrel = 0.99f;
+            dblimit_2d = 999.0f;
+            bmc = 100;
+            maxiters = 4;
         }
 
-        int partitions_to_test = plimit_autoset;
-        float dblimit_2d = dblimit_autoset_2d;
-        float oplimit = oplimit_autoset;
-        float mincorrel = mincorrel_autoset;
-
-        int maxiters = maxiters_autoset;
         ewp.max_refinement_iters = maxiters;
-
-        ewp.block_mode_cutoff = bmc_autoset / 100.0f;
+        ewp.block_mode_cutoff = bmc / 100.0f;
 
         float texel_avg_error_limit_2d;
 
@@ -477,6 +346,7 @@ namespace
         ewp.partition_1_to_2_limit = oplimit;
         ewp.lowest_correlation_cutoff = mincorrel;
 
+        int partitions_to_test = plimit;
         if (partitions_to_test < 1)
             partitions_to_test = 1;
         else if (partitions_to_test > PARTITION_COUNT)
@@ -486,6 +356,18 @@ namespace
         ewp.texel_avg_error_limit = texel_avg_error_limit_2d;
 
         expand_block_artifact_suppression(xdim, ydim, 1, &ewp);
+    }
+
+    void setup_ewp(ASTC_CHANNELS channels, error_weighting_params& ewp)
+    {
+        if (channels == ASTC_ENC_NORMAL_RA)
+        {
+            ewp.rgba_weights[0] = 1.0f;
+            ewp.rgba_weights[1] = 0.01f;
+            ewp.rgba_weights[2] = 0.01f;
+            ewp.rgba_weights[3] = 1.0f;
+            ewp.ra_normal_angular_scale = 1;
+        }
     }
 }
 
@@ -517,6 +399,7 @@ void astc_compress
     error_weighting_params ewp;
     init_ewp(ewp);
     setup_ewp(compress_mode, block_width, block_height, ewp);
+    setup_ewp(src_channels, ewp);   // For special-case encoding of some channel types such as normals
 
     if (src_stride == 0)
         src_stride = src_width * 4;

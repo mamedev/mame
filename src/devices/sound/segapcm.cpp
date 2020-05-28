@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(SEGAPCM, segapcm_device, "segapcm", "Sega PCM")
 segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGAPCM, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 21)
+	, device_rom_interface(mconfig, *this)
 	, m_ram(nullptr)
 	, m_bankshift(12)
 	, m_bankmask(0x70)
@@ -146,14 +146,14 @@ void segapcm_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 }
 
 
-WRITE8_MEMBER( segapcm_device::sega_pcm_w )
+void segapcm_device::write(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	m_ram[offset & 0x07ff] = data;
 }
 
 
-READ8_MEMBER( segapcm_device::sega_pcm_r )
+uint8_t segapcm_device::read(offs_t offset)
 {
 	m_stream->update();
 	return m_ram[offset & 0x07ff];

@@ -71,6 +71,7 @@ public:
 	void vmetal(machine_config &config);
 	void daitorid(machine_config &config);
 	void puzzli(machine_config &config);
+	void puzzlia(machine_config &config);
 	void pangpoms(machine_config &config);
 	void dokyusp(machine_config &config);
 	void dokyusei(machine_config &config);
@@ -96,7 +97,7 @@ public:
 	void init_metro();
 	void init_lastfortg();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(custom_soundstatus_r);
+	DECLARE_READ_LINE_MEMBER(custom_soundstatus_r);
 
 private:
 	enum
@@ -109,21 +110,22 @@ private:
 	void irq_cause_w(offs_t offset, u8 data);
 	uint8_t irq_vector_r(offs_t offset);
 	DECLARE_WRITE16_MEMBER(mouja_irq_timer_ctrl_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
+	DECLARE_WRITE8_MEMBER(sound_data_w);
+	TIMER_CALLBACK_MEMBER(sound_data_sync);
 	DECLARE_READ8_MEMBER(soundstatus_r);
 	DECLARE_WRITE8_MEMBER(soundstatus_w);
-	template<int Mask> DECLARE_WRITE8_MEMBER(upd7810_rombank_w);
-	DECLARE_READ8_MEMBER(upd7810_porta_r);
-	DECLARE_WRITE8_MEMBER(upd7810_porta_w);
-	DECLARE_WRITE8_MEMBER(upd7810_portb_w);
-	DECLARE_WRITE8_MEMBER(daitorid_portb_w);
+	template<int Mask> void upd7810_rombank_w(uint8_t data);
+	uint8_t upd7810_porta_r();
+	void upd7810_porta_w(uint8_t data);
+	void upd7810_portb_w(uint8_t data);
+	void daitorid_portb_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(coin_lockout_1word_w);
 	DECLARE_WRITE16_MEMBER(coin_lockout_4words_w);
 	DECLARE_READ16_MEMBER(balcube_dsw_r);
 	DECLARE_READ16_MEMBER(gakusai_input_r);
 	DECLARE_WRITE8_MEMBER(blzntrnd_sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(puzzlet_irq_enable_w);
-	DECLARE_WRITE16_MEMBER(puzzlet_portb_w);
+	void puzzlet_portb_w(uint16_t data);
 	DECLARE_WRITE16_MEMBER(k053936_w);
 	DECLARE_WRITE8_MEMBER(gakusai_oki_bank_hi_w);
 	DECLARE_WRITE8_MEMBER(gakusai_oki_bank_lo_w);
@@ -226,6 +228,7 @@ private:
 	emu_timer   *m_karatour_irq_timer;
 
 	/* sound related */
+	uint8_t     m_sound_data;
 	uint16_t      m_soundstatus;
 	int         m_porta;
 	int         m_portb;

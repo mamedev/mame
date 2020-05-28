@@ -179,16 +179,16 @@ private:
 	DECLARE_WRITE8_MEMBER(floppy_select_w);
 	DECLARE_WRITE8_MEMBER(floppy_side_w);
 
-	DECLARE_READ8_MEMBER(mz2500_porta_r);
-	DECLARE_READ8_MEMBER(mz2500_portb_r);
-	DECLARE_READ8_MEMBER(mz2500_portc_r);
-	DECLARE_WRITE8_MEMBER(mz2500_porta_w);
-	DECLARE_WRITE8_MEMBER(mz2500_portb_w);
-	DECLARE_WRITE8_MEMBER(mz2500_portc_w);
-	DECLARE_WRITE8_MEMBER(mz2500_pio1_porta_w);
-	DECLARE_READ8_MEMBER(mz2500_pio1_porta_r);
-	DECLARE_READ8_MEMBER(opn_porta_r);
-	DECLARE_WRITE8_MEMBER(opn_porta_w);
+	uint8_t mz2500_porta_r();
+	uint8_t mz2500_portb_r();
+	uint8_t mz2500_portc_r();
+	void mz2500_porta_w(uint8_t data);
+	void mz2500_portb_w(uint8_t data);
+	void mz2500_portc_w(uint8_t data);
+	void mz2500_pio1_porta_w(uint8_t data);
+	uint8_t mz2500_pio1_porta_r();
+	uint8_t opn_porta_r();
+	void opn_porta_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_clk0_irq);
 	DECLARE_WRITE_LINE_MEMBER(mz2500_rtc_alarm_irq);
 	IRQ_CALLBACK_MEMBER( mz2500_irq_ack );

@@ -42,11 +42,7 @@ public:
 	deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	void set_init(deco_rmc3_palette_init_delegate init) { m_init = init; }
-	template <class FunctionClass> void set_init(const char *devname, void (FunctionClass::*callback)(deco_rmc3_device &), const char *name)
-	{
-		set_init(deco_rmc3_palette_init_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_init(T &&... args) { m_init.set(std::forward<T>(args)...); }
 //  void set_membits(int membits);
 //  void set_endianness(endianness_t endianness);
 	void set_entries(u32 entries) { m_entries = entries; }
@@ -68,16 +64,16 @@ public:
 	}
 
 	// generic read/write handlers
-	DECLARE_READ8_MEMBER(read8);
-	DECLARE_WRITE8_MEMBER(write8);
-	DECLARE_WRITE8_MEMBER(write8_ext);
-	DECLARE_WRITE8_MEMBER(write_indirect);
-	DECLARE_WRITE8_MEMBER(write_indirect_ext);
-	DECLARE_READ16_MEMBER(read16);
-	DECLARE_WRITE16_MEMBER(write16);
-	DECLARE_WRITE16_MEMBER(write16_ext);
-	DECLARE_READ32_MEMBER(read32);
-	DECLARE_WRITE32_MEMBER(write32);
+	u8 read8(offs_t offset);
+	void write8(offs_t offset, u8 data);
+	void write8_ext(offs_t offset, u8 data);
+	void write_indirect(offs_t offset, u8 data);
+	void write_indirect_ext(offs_t offset, u8 data);
+	u16 read16(offs_t offset);
+	void write16(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void write16_ext(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u32 read32(offs_t offset);
+	void write32(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void palette_init_proms(deco_rmc3_device &palette);
 

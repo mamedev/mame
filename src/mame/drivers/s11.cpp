@@ -20,7 +20,6 @@ ToDo:
 #include "emu.h"
 #include "includes/s11.h"
 
-#include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -209,7 +208,7 @@ WRITE8_MEMBER( s11_state::sol3_w )
 {
 }
 
-WRITE8_MEMBER( s11_state::sound_w )
+void s11_state::sound_w(uint8_t data)
 {
 	m_sound_data = data;
 }
@@ -223,12 +222,12 @@ WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
 		m_pia40->cb2_w(state);
 }
 
-WRITE8_MEMBER( s11_state::lamp0_w )
+void s11_state::lamp0_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( s11_state::dig0_w )
+void s11_state::dig0_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
@@ -239,7 +238,7 @@ WRITE8_MEMBER( s11_state::dig0_w )
 	m_segment2 = 0;
 }
 
-WRITE8_MEMBER( s11_state::dig1_w )
+void s11_state::dig1_w(uint8_t data)
 {
 	m_segment2 |= data;
 	m_segment2 |= 0x20000;
@@ -250,7 +249,7 @@ WRITE8_MEMBER( s11_state::dig1_w )
 	}
 }
 
-READ8_MEMBER( s11_state::pia28_w7_r )
+uint8_t s11_state::pia28_w7_r()
 {
 	uint8_t ret = 0x80;
 
@@ -263,7 +262,7 @@ READ8_MEMBER( s11_state::pia28_w7_r )
 	return ret;
 }
 
-WRITE8_MEMBER( s11_state::pia2c_pa_w )
+void s11_state::pia2c_pa_w(uint8_t data)
 {
 	m_segment1 |= (data<<8);
 	m_segment1 |= 0x10000;
@@ -274,7 +273,7 @@ WRITE8_MEMBER( s11_state::pia2c_pa_w )
 	}
 }
 
-WRITE8_MEMBER( s11_state::pia2c_pb_w )
+void s11_state::pia2c_pb_w(uint8_t data)
 {
 	m_segment1 |= data;
 	m_segment1 |= 0x20000;
@@ -285,19 +284,19 @@ WRITE8_MEMBER( s11_state::pia2c_pb_w )
 	}
 }
 
-READ8_MEMBER( s11_state::switch_r )
+uint8_t s11_state::switch_r()
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"X%X",m_kbdrow);
 	return ~ioport(kbdrow)->read();
 }
 
-WRITE8_MEMBER( s11_state::switch_w )
+void s11_state::switch_w(uint8_t data)
 {
 	m_kbdrow = data;
 }
 
-WRITE8_MEMBER( s11_state::pia34_pa_w )
+void s11_state::pia34_pa_w(uint8_t data)
 {
 	m_segment2 |= (data<<8);
 	m_segment2 |= 0x10000;
@@ -308,10 +307,10 @@ WRITE8_MEMBER( s11_state::pia34_pa_w )
 	}
 }
 
-WRITE8_MEMBER( s11_state::pia34_pb_w )
+void s11_state::pia34_pb_w(uint8_t data)
 {
 	if(m_pia40)
-		m_pia40->write_portb(data);
+		m_pia40->portb_w(data);
 	else
 		m_bg->data_w(data);
 }
@@ -344,7 +343,7 @@ WRITE_LINE_MEMBER( s11_state::pias_cb2_w )
 		m_hc55516->digit_w(state);
 }
 
-READ8_MEMBER( s11_state::sound_r )
+uint8_t s11_state::sound_r()
 {
 	return m_sound_data;
 }
@@ -365,9 +364,9 @@ WRITE_LINE_MEMBER( s11_state::pia40_cb2_w )
 	m_pia34->cb1_w(state);  // To Widget MCB1 through CPU Data interface
 }
 
-WRITE8_MEMBER( s11_state::pia40_pb_w )
+void s11_state::pia40_pb_w(uint8_t data)
 {
-	m_pia34->write_portb(data);
+	m_pia34->portb_w(data);
 }
 
 void s11_state::init_s11()

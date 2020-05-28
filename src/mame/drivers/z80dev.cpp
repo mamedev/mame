@@ -37,8 +37,8 @@ public:
 	void z80dev(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER( display_w );
-	DECLARE_READ8_MEMBER( test_r );
+	void display_w(offs_t offset, uint8_t data);
+	uint8_t test_r();
 
 	virtual void machine_start() override;
 
@@ -49,7 +49,7 @@ private:
 	output_finder<6> m_digits;
 };
 
-WRITE8_MEMBER( z80dev_state::display_w )
+void z80dev_state::display_w(offs_t offset, uint8_t data)
 {
 	// ---- xxxx digit
 	// xxxx ---- ???
@@ -58,7 +58,7 @@ WRITE8_MEMBER( z80dev_state::display_w )
 	m_digits[offset] = hex_7seg[data & 0x0f];
 }
 
-READ8_MEMBER( z80dev_state::test_r )
+uint8_t z80dev_state::test_r()
 {
 	return machine().rand();
 }
@@ -136,7 +136,7 @@ void z80dev_state::z80dev(machine_config &config)
 
 /* ROM definition */
 ROM_START( z80dev )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "z80dev.bin", 0x0000, 0x0800, CRC(dd5b9cd9) SHA1(97c176fcb63674f0592851b7858cb706886b5857))
 ROM_END
 

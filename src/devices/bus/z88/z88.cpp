@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(Z88CART_SLOT, z88cart_slot_device, "z88cart_slot", "Z88 Cartr
 //-------------------------------------------------
 
 device_z88cart_interface::device_z88cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "z88cart")
 {
 }
 
@@ -58,7 +58,7 @@ device_z88cart_interface::~device_z88cart_interface()
 z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z88CART_SLOT, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_z88cart_interface>(mconfig, *this)
 	, m_out_flp_cb(*this)
 	, m_cart(nullptr)
 	, m_flp_timer(nullptr)
@@ -71,7 +71,7 @@ z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const ch
 
 void z88cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_z88cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 
 	// resolve callbacks
 	m_out_flp_cb.resolve_safe();
@@ -170,10 +170,10 @@ std::string z88cart_slot_device::get_default_card_software(get_default_card_soft
     read
 -------------------------------------------------*/
 
-READ8_MEMBER(z88cart_slot_device::read)
+uint8_t z88cart_slot_device::read(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read(space, offset);
+		return m_cart->read(offset);
 	else
 		return 0xff;
 }
@@ -183,10 +183,10 @@ READ8_MEMBER(z88cart_slot_device::read)
     write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(z88cart_slot_device::write)
+void z88cart_slot_device::write(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write(space, offset, data);
+		m_cart->write(offset, data);
 }
 
 

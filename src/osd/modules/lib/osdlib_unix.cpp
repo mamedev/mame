@@ -8,11 +8,11 @@
 //
 //============================================================
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/types.h>
-#include <signal.h>
+#include <csignal>
 #include <dlfcn.h>
 
 #include <cstdio>
@@ -90,34 +90,33 @@ void osd_free_executable(void *ptr, size_t size)
 
 void osd_break_into_debugger(const char *message)
 {
-	#ifdef MAME_DEBUG
+#ifdef MAME_DEBUG
 	printf("MAME exception: %s\n", message);
 	printf("Attempting to fall into debugger\n");
 	kill(getpid(), SIGTRAP);
-	#else
+#else
 	printf("Ignoring MAME exception: %s\n", message);
-	#endif
+#endif
 }
 
 #ifdef SDLMAME_ANDROID
-char *osd_get_clipboard_text(void)
+std::string osd_get_clipboard_text(void)
 {
-	return nullptr;
+	return std::string();
 }
 #else
 //============================================================
 //  osd_get_clipboard_text
 //============================================================
 
-char *osd_get_clipboard_text(void)
+std::string osd_get_clipboard_text(void)
 {
-	char *result = nullptr;
+	std::string result;
 
 	if (SDL_HasClipboardText())
 	{
 		char *temp = SDL_GetClipboardText();
-		result = (char *) malloc(strlen(temp) + 1);
-		strcpy(result, temp);
+		result.assign(temp);
 		SDL_free(temp);
 	}
 	return result;

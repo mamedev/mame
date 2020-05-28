@@ -8,7 +8,7 @@
 
 ****************************************************************************/
 
-#include <time.h>
+#include <ctime>
 
 #include "imgtool.h"
 #include "formats/imageutl.h"

@@ -8,13 +8,17 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <assert.h>
 #include "options.h"
+
 #include "corestr.h"
+
+#include <locale>
 #include <string>
+
+#include <cassert>
+#include <cctype>
+#include <cstdarg>
+#include <cstdlib>
 
 
 const int core_options::MAX_UNADORNED_OPTIONS;
@@ -134,7 +138,7 @@ core_options::entry::~entry()
 //  entry::value
 //-------------------------------------------------
 
-const char *core_options::entry::value() const
+const char *core_options::entry::value() const noexcept
 {
 	// returning 'nullptr' from here signifies a value entry that is essentially "write only"
 	// and cannot be meaningfully persisted (e.g. - a command or the software name)
@@ -181,43 +185,82 @@ void core_options::entry::set_default_value(std::string &&newvalue)
 
 void core_options::entry::validate(const std::string &data)
 {
-	float fval;
-	int ival;
+	std::istringstream str(data);
+	str.imbue(std::locale::classic());
 
 	switch (type())
 	{
 	case option_type::BOOLEAN:
-		// booleans must be 0 or 1
-		if (sscanf(data.c_str(), "%d", &ival) != 1 || ival < 0 || ival > 1)
-			throw options_warning_exception("Illegal boolean value for %s: \"%s\"; reverting to %s\n", name(), data, value());
+		{
+			// booleans must be 0 or 1
+			int ival;
+			if (!(str >> ival) || (0 > ival) || (1 < ival))
+				throw options_warning_exception("Illegal boolean value for %s: \"%s\"; reverting to %s\n", name(), data, value());
+		}
 		break;
 
 	case option_type::INTEGER:
-		// integers must be integral
-		if (sscanf(data.c_str(), "%d", &ival) != 1)
-			throw options_warning_exception("Illegal integer value for %s: \"%s\"; reverting to %s\n", name(), data, value());
-
-		// range checking
-		if (has_range())
 		{
-			int minimum_integer = atoi(minimum());
-			int maximum_integer = atoi(maximum());
-			if (ival < minimum_integer || ival > maximum_integer)
-				throw options_warning_exception("Out-of-range integer value for %s: \"%s\" (must be between %d and %d); reverting to %s\n", name(), data, minimum_integer, maximum_integer, value());
+			// integers must be integral
+			int ival;
+			if (!(str >> ival))
+				throw options_warning_exception("Illegal integer value for %s: \"%s\"; reverting to %s\n", name(), data, value());
+
+			// range checking
+			char const *const strmin(minimum());
+			char const *const strmax(maximum());
+			int imin(0), imax(0);
+			if (strmin)
+			{
+				str.str(strmin);
+				str >> imin;
+			}
+			if (strmax)
+			{
+				str.str(strmax);
+				str >> imax;
+			}
+			if ((strmin && (ival < imin)) || (strmax && (ival > imax)))
+			{
+				if (!strmax)
+					throw options_warning_exception("Out-of-range integer value for %s: \"%s\" (must be no less than %d); reverting to %s\n", name(), data, imin, value());
+				else if (!strmin)
+					throw options_warning_exception("Out-of-range integer value for %s: \"%s\" (must be no greater than %d); reverting to %s\n", name(), data, imax, value());
+				else
+					throw options_warning_exception("Out-of-range integer value for %s: \"%s\" (must be between %d and %d, inclusive); reverting to %s\n", name(), data, imin, imax, value());
+			}
 		}
 		break;
 
 	case option_type::FLOAT:
-		if (sscanf(data.c_str(), "%f", &fval) != 1)
-			throw options_warning_exception("Illegal float value for %s: \"%s\"; reverting to %s\n", name(), data, value());
-
-		// range checking
-		if (has_range())
 		{
-			float minimum_float = atof(minimum());
-			float maximum_float = atof(maximum());
-			if (fval < minimum_float || fval > maximum_float)
-				throw options_warning_exception("Out-of-range float value for %s: \"%s\" (must be between %f and %f); reverting to %s\n", name(), data, minimum_float, maximum_float, value());
+			float fval;
+			if (!(str >> fval))
+				throw options_warning_exception("Illegal float value for %s: \"%s\"; reverting to %s\n", name(), data, value());
+
+			// range checking
+			char const *const strmin(minimum());
+			char const *const strmax(maximum());
+			float fmin(0), fmax(0);
+			if (strmin)
+			{
+				str.str(strmin);
+				str >> fmin;
+			}
+			if (strmax)
+			{
+				str.str(strmax);
+				str >> fmax;
+			}
+			if ((strmin && (fval < fmin)) || (strmax && (fval > fmax)))
+			{
+				if (!strmax)
+					throw options_warning_exception("Out-of-range float value for %s: \"%s\" (must be no less than %f); reverting to %s\n", name(), data, fmin, value());
+				else if (!strmin)
+					throw options_warning_exception("Out-of-range float value for %s: \"%s\" (must be no greater than %f); reverting to %s\n", name(), data, fmax, value());
+				else
+					throw options_warning_exception("Out-of-range float value for %s: \"%s\" (must be between %f and %f, inclusive); reverting to %s\n", name(), data, fmin, fmax, value());
+			}
 		}
 		break;
 
@@ -238,7 +281,7 @@ void core_options::entry::validate(const std::string &data)
 //  entry::minimum
 //-------------------------------------------------
 
-const char *core_options::entry::minimum() const
+const char *core_options::entry::minimum() const noexcept
 {
 	return nullptr;
 }
@@ -248,7 +291,7 @@ const char *core_options::entry::minimum() const
 //  entry::maximum
 //-------------------------------------------------
 
-const char *core_options::entry::maximum() const
+const char *core_options::entry::maximum() const noexcept
 {
 	return nullptr;
 }
@@ -258,7 +301,7 @@ const char *core_options::entry::maximum() const
 //  entry::has_range
 //-------------------------------------------------
 
-bool core_options::entry::has_range() const
+bool core_options::entry::has_range() const noexcept
 {
 	return minimum() && maximum();
 }
@@ -268,11 +311,10 @@ bool core_options::entry::has_range() const
 //  entry::default_value
 //-------------------------------------------------
 
-const std::string &core_options::entry::default_value() const
+const std::string &core_options::entry::default_value() const noexcept
 {
-	// I don't really want this generally available, but MewUI seems to need it.  Please
-	// do not use
-	throw false;
+	// I don't really want this generally available, but MewUI seems to need it.  Please do not use.
+	abort();
 }
 
 
@@ -307,25 +349,21 @@ core_options::simple_entry::~simple_entry()
 //  simple_entry::value
 //-------------------------------------------------
 
-const char *core_options::simple_entry::value() const
+const char *core_options::simple_entry::value() const noexcept
 {
-	const char *result;
 	switch (type())
 	{
 	case core_options::option_type::BOOLEAN:
 	case core_options::option_type::INTEGER:
 	case core_options::option_type::FLOAT:
 	case core_options::option_type::STRING:
-		result = m_data.c_str();
-		break;
+		return m_data.c_str();
 
 	default:
 		// this is an option type for which returning a value is
 		// a meaningless operation (e.g. - core_options::option_type::COMMAND)
-		result = nullptr;
-		break;
+		return nullptr;
 	}
-	return result;
 }
 
 
@@ -333,7 +371,7 @@ const char *core_options::simple_entry::value() const
 //  simple_entry::default_value
 //-------------------------------------------------
 
-const std::string &core_options::simple_entry::default_value() const
+const std::string &core_options::simple_entry::default_value() const noexcept
 {
 	// only MewUI seems to need this; please don't use
 	return m_defdata;
@@ -364,7 +402,7 @@ void core_options::simple_entry::set_default_value(std::string &&newvalue)
 //  minimum
 //-------------------------------------------------
 
-const char *core_options::simple_entry::minimum() const
+const char *core_options::simple_entry::minimum() const noexcept
 {
 	return m_minimum.c_str();
 }
@@ -374,7 +412,7 @@ const char *core_options::simple_entry::minimum() const
 //  maximum
 //-------------------------------------------------
 
-const char *core_options::simple_entry::maximum() const
+const char *core_options::simple_entry::maximum() const noexcept
 {
 	return m_maximum.c_str();
 }
@@ -482,7 +520,7 @@ void core_options::add_entry(const options_entry &opt, bool override_existing)
 	{
 		for (const std::string &name : names)
 		{
-			existing_entry = get_entry(name.c_str());
+			existing_entry = get_entry(name);
 			if (existing_entry)
 				break;
 		}
@@ -619,7 +657,7 @@ void core_options::parse_command_line(const std::vector<std::string> &args, int 
 		// special case - collect unadorned arguments after commands into a special place
 		if (is_unadorned && !m_command.empty())
 		{
-			m_command_arguments.push_back(std::move(args[arg]));
+			m_command_arguments.push_back(args[arg]);
 			command_argument_processed();
 			continue;
 		}
@@ -777,7 +815,7 @@ void core_options::copy_from(const core_options &that)
 		if (dest_entry->names().size() > 0)
 		{
 			// identify the source entry
-			const entry::shared_ptr source_entry = that.get_entry(dest_entry->name());
+			const entry::shared_const_ptr source_entry = that.get_entry(dest_entry->name());
 			if (source_entry)
 			{
 				const char *value = source_entry->value();
@@ -799,6 +837,7 @@ std::string core_options::output_ini(const core_options *diff) const
 {
 	// INI files are complete, so always start with a blank buffer
 	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 
 	int num_valid_headers = 0;
 	int unadorned_index = 0;
@@ -885,9 +924,10 @@ std::string core_options::output_help() const
 //  value - return the raw option value
 //-------------------------------------------------
 
-const char *core_options::value(const char *option) const
+const char *core_options::value(const char *option) const noexcept
 {
-	return get_entry(option)->value();
+	auto const entry = get_entry(option);
+	return entry ? entry->value() : nullptr;
 }
 
 
@@ -895,9 +935,48 @@ const char *core_options::value(const char *option) const
 //  description - return description of option
 //-------------------------------------------------
 
-const char *core_options::description(const char *option) const
+const char *core_options::description(const char *option) const noexcept
 {
-	return get_entry(option)->description();
+	auto const entry = get_entry(option);
+	return entry ? entry->description() : nullptr;
+}
+
+
+//-------------------------------------------------
+//  value - return the option value as an integer
+//-------------------------------------------------
+
+int core_options::int_value(const char *option) const
+{
+	char const *const data = value(option);
+	if (!data)
+		return 0;
+	std::istringstream str(data);
+	str.imbue(std::locale::classic());
+	int ival;
+	if (str >> ival)
+		return ival;
+	else
+		return 0;
+}
+
+
+//-------------------------------------------------
+//  value - return the option value as a float
+//-------------------------------------------------
+
+float core_options::float_value(const char *option) const
+{
+	char const *const data = value(option);
+	if (!data)
+		return 0.0f;
+	std::istringstream str(data);
+	str.imbue(std::locale::classic());
+	float fval;
+	if (str >> fval)
+		return fval;
+	else
+		return 0.0f;
 }
 
 
@@ -984,13 +1063,13 @@ void core_options::do_set_value(entry &curentry, std::string &&data, int priorit
 //  get_entry
 //-------------------------------------------------
 
-const core_options::entry::shared_ptr core_options::get_entry(const std::string &name) const
+core_options::entry::shared_const_ptr core_options::get_entry(const std::string &name) const noexcept
 {
 	auto curentry = m_entrymap.find(name);
 	return (curentry != m_entrymap.end()) ? curentry->second.lock() : nullptr;
 }
 
-core_options::entry::shared_ptr core_options::get_entry(const std::string &name)
+core_options::entry::shared_ptr core_options::get_entry(const std::string &name) noexcept
 {
 	auto curentry = m_entrymap.find(name);
 	return (curentry != m_entrymap.end()) ? curentry->second.lock() : nullptr;
@@ -1011,17 +1090,17 @@ void core_options::set_value_changed_handler(const std::string &name, std::funct
 //  header_exists
 //-------------------------------------------------
 
-bool core_options::header_exists(const char *description) const
+bool core_options::header_exists(const char *description) const noexcept
 {
 	auto iter = std::find_if(
-		m_entries.begin(),
-		m_entries.end(),
-		[description](const auto &entry)
-		{
-			return entry->type() == option_type::HEADER
-					&& entry->description()
-					&& !strcmp(entry->description(), description);
-		});
+			m_entries.begin(),
+			m_entries.end(),
+			[description](const auto &entry)
+			{
+				return entry->type() == option_type::HEADER
+						&& entry->description()
+						&& !strcmp(entry->description(), description);
+			});
 
 	return iter != m_entries.end();
 }

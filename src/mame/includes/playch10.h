@@ -52,7 +52,7 @@ public:
 	void init_pckboard();
 	void init_pc_hrz();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
+	DECLARE_READ_LINE_MEMBER(int_detect_r);
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(up8w_w);
@@ -68,7 +68,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dog_di_w);
 	DECLARE_WRITE_LINE_MEMBER(ppu_reset_w);
 	DECLARE_READ8_MEMBER(pc10_detectclr_r);
-	DECLARE_WRITE8_MEMBER(cart_sel_w);
+	void cart_sel_w(uint8_t data);
 	DECLARE_READ8_MEMBER(pc10_prot_r);
 	DECLARE_WRITE8_MEMBER(pc10_prot_w);
 	DECLARE_WRITE8_MEMBER(pc10_in0_w);

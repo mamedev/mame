@@ -10,6 +10,9 @@
 #include "audio/cmi01a.h"
 #include "machine/input_merger.h"
 
+#define VERBOSE     (0)
+#include "logmacro.h"
+
 #define MASTER_OSCILLATOR       XTAL(34'291'712)
 
 
@@ -45,8 +48,7 @@ void cmi01a_device::device_add_mconfig(machine_config &config)
 	m_pia[1]->irqa_handler().set("cmi01a_irq", FUNC(input_merger_device::in_w<2>));
 	m_pia[1]->irqb_handler().set("cmi01a_irq", FUNC(input_merger_device::in_w<3>));
 
-	PTM6840(config, m_ptm, 2000000); // ptm_cmi01a_config
-	m_ptm->set_external_clocks(250000, 500000, 500000);
+	PTM6840(config, m_ptm, DERIVED_CLOCK(1, 1)); // ptm_cmi01a_config
 	m_ptm->o1_callback().set(FUNC(cmi01a_device::ptm_o1));
 	m_ptm->irq_callback().set("cmi01a_irq", FUNC(input_merger_device::in_w<4>));
 
@@ -90,6 +92,8 @@ void cmi01a_device::device_start()
 	m_zx_timer->adjust(attotime::never);
 
 	m_stream = stream_alloc(0, 1, 44100);
+
+	m_ptm->set_external_clocks(clock() / 8, clock() / 4, clock() / 4);
 }
 
 void cmi01a_device::device_reset()
@@ -115,7 +119,7 @@ void cmi01a_device::device_reset()
 
 WRITE_LINE_MEMBER( cmi01a_device::pia_0_ca2_w )
 {
-	// upate_stream()
+	// update_stream()
 	if (!state)
 	{
 		m_segment_cnt = 0x4000 | ((m_pia[0]->a_output() & 0x7f) << 7);
@@ -255,8 +259,6 @@ WRITE_LINE_MEMBER( cmi01a_device::pia_0_cb2_w )
 		m_ptm->set_g2(1);
 		m_ptm->set_g3(1);
 
-		//printf("Stop %d\n", m_channel);
-
 		m_zx_timer->adjust(attotime::never);
 		m_active = false;
 		m_zx_flag = 0;  // TEST
@@ -306,7 +308,7 @@ READ_LINE_MEMBER( cmi01a_device::zx_r )
 
 void cmi01a_device::write(offs_t offset, uint8_t data)
 {
-	//printf("C%d W: %02x = %02x\n", m_channel, offset, data);
+	LOG("%s: channel card %d write: %02x = %02x\n", machine().describe_context(), m_channel, offset, data);
 
 	switch (offset)
 	{
@@ -349,13 +351,13 @@ void cmi01a_device::write(offs_t offset, uint8_t data)
 			int a1 = (m_ptm_o1 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
 			int a2 = BIT(offset, 1);
 
-			//printf("CH%d PTM W: [%x] = %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
+			//osd_printf_debug("CH%d PTM W: [%x] = %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
 			m_ptm->write((a2 << 2) | (a1 << 1) | a0, data);
 			break;
 		}
 
 		default:
-			logerror("Unknown channel card write to E0%02X = %02X\n", offset, data);
+			LOG("%s: Unknown channel card write to E0%02X = %02X\n", machine().describe_context(), offset, data);
 			break;
 	}
 }
@@ -402,21 +404,21 @@ uint8_t cmi01a_device::read(offs_t offset)
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		{
 			int a0 = offset & 1;
-			int a1 = (m_ptm_o1 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
+			int a1 = ((m_ptm_o1 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2))) ? 1 : 0;
 			int a2 = BIT(offset, 1);
 
 			data = m_ptm->read((a2 << 2) | (a1 << 1) | a0);
 
-			//printf("CH%d PTM R: [%x] %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
+			//osd_printf_debug("CH%d PTM R: [%x] %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
 			break;
 		}
 
 		default:
-			logerror("Unknown channel card read from E0%02X\n", offset);
+			LOG("%s: Unknown channel card %d read from E0%02X\n", machine().describe_context(), m_channel, offset);
 			break;
 	}
 
-	//printf("C%d R: %02x = %02x\n", m_channel, offset, data);
+	LOG("%s: channel card %d read: %02x = %02x\n", machine().describe_context(), m_channel, offset, data);
 
 	return data;
 }

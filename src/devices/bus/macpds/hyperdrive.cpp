@@ -159,7 +159,7 @@ void macpds_hyperdrive_device::device_start()
 	install_rom(this, HYPERDRIVE_ROM_REGION, 0xf80000);
 
 	// WD200x registers
-	m_macpds->install_device(0xfc0000, 0xfc000f, read16_delegate(FUNC(macpds_hyperdrive_device::hyperdrive_r), this), write16_delegate(FUNC(macpds_hyperdrive_device::hyperdrive_w), this));
+	m_macpds->install_device(0xfc0000, 0xfc000f, read16_delegate(*this, FUNC(macpds_hyperdrive_device::hyperdrive_r)), write16_delegate(*this, FUNC(macpds_hyperdrive_device::hyperdrive_w)));
 }
 
 //-------------------------------------------------
@@ -180,12 +180,12 @@ READ16_MEMBER( macpds_hyperdrive_device::hyperdrive_r )
 	return m_hdc->read(offset);
 }
 
-WRITE8_MEMBER( macpds_hyperdrive_device::hdd_w )
+void macpds_hyperdrive_device::hdd_w(offs_t offset, uint8_t data)
 {
 //  printf("hdd_w: %02x @ %x\n", data, offset);
 }
 
-READ8_MEMBER( macpds_hyperdrive_device::hdd_r )
+uint8_t macpds_hyperdrive_device::hdd_r(offs_t offset)
 {
 //  printf("hdd_r: @ %x\n", offset);
 	return 0;

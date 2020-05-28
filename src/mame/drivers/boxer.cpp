@@ -47,14 +47,14 @@ public:
 	void boxer(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(misc_r);
-	DECLARE_WRITE8_MEMBER(bell_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(pot_w);
-	DECLARE_WRITE8_MEMBER(irq_reset_w);
-	DECLARE_WRITE8_MEMBER(crowd_w);
-	DECLARE_WRITE8_MEMBER(led_w);
+	uint8_t input_r(offs_t offset);
+	uint8_t misc_r(offs_t offset);
+	void bell_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void pot_w(uint8_t data);
+	void irq_reset_w(uint8_t data);
+	void crowd_w(uint8_t data);
+	void led_w(uint8_t data);
 	void boxer_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pot_interrupt);
@@ -103,7 +103,7 @@ void boxer_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		periodic_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in boxer_state::device_timer");
+		throw emu_fatalerror("Unknown id in boxer_state::device_timer");
 	}
 }
 
@@ -250,7 +250,7 @@ uint32_t boxer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
  *
  *************************************/
 
-READ8_MEMBER(boxer_state::input_r)
+uint8_t boxer_state::input_r(offs_t offset)
 {
 	uint8_t val = ioport("IN0")->read();
 
@@ -261,7 +261,7 @@ READ8_MEMBER(boxer_state::input_r)
 }
 
 
-READ8_MEMBER(boxer_state::misc_r)
+uint8_t boxer_state::misc_r(offs_t offset)
 {
 	uint8_t val = 0;
 
@@ -290,17 +290,17 @@ READ8_MEMBER(boxer_state::misc_r)
 
 
 
-WRITE8_MEMBER(boxer_state::bell_w)
+void boxer_state::bell_w(uint8_t data)
 {
 }
 
 
-WRITE8_MEMBER(boxer_state::sound_w)
+void boxer_state::sound_w(uint8_t data)
 {
 }
 
 
-WRITE8_MEMBER(boxer_state::pot_w)
+void boxer_state::pot_w(uint8_t data)
 {
 	/* BIT0 => HPOT1 */
 	/* BIT1 => VPOT1 */
@@ -315,13 +315,13 @@ WRITE8_MEMBER(boxer_state::pot_w)
 }
 
 
-WRITE8_MEMBER(boxer_state::irq_reset_w)
+void boxer_state::irq_reset_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(boxer_state::crowd_w)
+void boxer_state::crowd_w(uint8_t data)
 {
 	/* BIT0 => ATTRACT */
 	/* BIT1 => CROWD-1 */
@@ -332,7 +332,7 @@ WRITE8_MEMBER(boxer_state::crowd_w)
 }
 
 
-WRITE8_MEMBER(boxer_state::led_w)
+void boxer_state::led_w(uint8_t data)
 {
 	m_leds[1] = BIT(~data, 0);
 	m_leds[0] = BIT(~data, 1);

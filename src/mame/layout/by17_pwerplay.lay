@@ -1,9 +1,12 @@
 <?xml version="1.0"?>
-<!-- Pinball Machine, Bally ~ PowerPlay -->
-<!-- [Quench] September 2015 -->
+<!--
+license:CC0
+copyright-holders:Quench
 
+Pinball Machine, Bally ~ PowerPlay
 
-<!-- Any state="9" items are not displayed and are only used for object alignment -->
+Any state="9" items are not displayed and are only used for object alignment
+-->
 
 <mamelayout version="2">
 

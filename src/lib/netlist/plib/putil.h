@@ -1,31 +1,258 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * putil.h
- *
- */
 
 #ifndef PUTIL_H_
 #define PUTIL_H_
 
+///
+/// \file putil.h
+///
+
+#include "palloc.h"
 #include "pexception.h"
 #include "pstring.h"
+
 #include <algorithm>
 #include <initializer_list>
-#include <sstream>
 #include <vector>
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
 
+// Discussion and background of this MSVC bug: https://github.com/mamedev/mame/issues/6106
+///
+/// \brief Macro to work around a bug in MSVC treatment of __VA_ARGS__
+///
+#define PMSVC_VARARG_BUG(MACRO, ARGS) MACRO ARGS
+
+/// \brief Determine number of arguments in __VA_ARGS__
+///
+/// This macro works up to 16 arguments in __VA_ARGS__
+///
+/// \returns Number of arguments
+///
+#define PNARGS(...) PNARGS_1(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+
+#define PNARGS_2(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, N, ...) N
+#define PNARGS_1(...) PMSVC_VARARG_BUG(PNARGS_2, (__VA_ARGS__))
+
+/// \brief Concatenate two arguments after expansion
+///
+/// \returns Concatenated expanded arguments
+///
+#define PCONCAT(a, b) PCONCAT_(a, b)
+
+#define PCONCAT_(a, b) a ## b
+
+#define PSTRINGIFY_1(x)                             #x
+#define PSTRINGIFY_2(x, x2)                         #x, #x2
+#define PSTRINGIFY_3(x, x2, x3)                     #x, #x2, #x3
+#define PSTRINGIFY_4(x, x2, x3, x4)                 #x, #x2, #x3, #x4
+#define PSTRINGIFY_5(x, x2, x3, x4, x5)             #x, #x2, #x3, #x4, #x5
+#define PSTRINGIFY_6(x, x2, x3, x4, x5, x6)         #x, #x2, #x3, #x4, #x5, #x6
+#define PSTRINGIFY_7(x, x2, x3, x4, x5, x6, x7)     #x, #x2, #x3, #x4, #x5, #x6, #x7
+#define PSTRINGIFY_8(x, x2, x3, x4, x5, x6, x7, x8) #x, #x2, #x3, #x4, #x5, #x6, #x7, #x8
+#define PSTRINGIFY_9(x, x2, x3, x4, x5, x6, x7, x8, x9) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9
+#define PSTRINGIFY_10(x, x2, x3, x4, x5, x6, x7, x8, x9, xa) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa
+#define PSTRINGIFY_11(x, x2, x3, x4, x5, x6, x7, x8, x9, xa, xb) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa, #xb
+#define PSTRINGIFY_12(x, x2, x3, x4, x5, x6, x7, x8, x9, xa, xb, xc) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa, #xb, #xc
+#define PSTRINGIFY_13(x, x2, x3, x4, x5, x6, x7, x8, x9, xa, xb, xc, xd) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa, #xb, #xc, #xd
+#define PSTRINGIFY_14(x, x2, x3, x4, x5, x6, x7, x8, x9, xa, xb, xc, xd, xe) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa, #xb, #xc, #xd, #xe
+#define PSTRINGIFY_15(x, x2, x3, x4, x5, x6, x7, x8, x9, xa, xb, xc, xd, xe, xf) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa, #xb, #xc, #xd, #xe, #xf
+#define PSTRINGIFY_16(x, x2, x3, x4, x5, x6, x7, x8, x9, xa, xb, xc, xd, xe, xf, x10) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa, #xb, #xc, #xd, #xe, #xf, #x10
+
+/// \brief Individually stringify up to 16 arguments
+///
+/// PSTRINGIFY_VA(a, b, c) will be expanded to "a", "b", "c"
+///
+/// \returns List of stringified individual arguments
+///
+#define PSTRINGIFY_VA(...) PMSVC_VARARG_BUG(PCONCAT, (PSTRINGIFY_, PNARGS(__VA_ARGS__)))(__VA_ARGS__)
+
+/// \brief Dispatch VARARG macro to specialized macros
+///
+/// ```
+/// #define LOCAL_LIB_ENTRY(...) PCALLVARARG(LOCAL_LIB_ENTRY_, __VA_ARGS__)
+/// ```
+///
+/// Will pass varargs depending on number of arguments to
+///
+/// ```
+/// LOCAL_LIB_ENTRY_1(a1)
+/// LOCAL_LIB_ENTRY_2(a1 , a2)
+/// ```
+///
+/// \returns result of specialized macro
+///
+#define PCALLVARARG(MAC, ...) PMSVC_VARARG_BUG(PCONCAT, (MAC, PNARGS(__VA_ARGS__)))(__VA_ARGS__)
+
+// FIXME:: __FUNCTION__ may be not be supported by all compilers.
+
+#define PSOURCELOC() plib::source_location(__FILE__, __LINE__)
 
 namespace plib
 {
 
+	/// \brief Source code locations.
+	///
+	/// The c++20 draft for source locations is based on const char * strings.
+	/// It is thus only suitable for c++ source code and not for programmatic
+	/// parsing of files. This class is a replacement for dynamic use cases.
+	///
+	struct source_location
+	{
+		source_location() noexcept
+		: m_file("unknown"), m_func(m_file), m_line(0), m_col(0)
+		{ }
+
+		source_location(pstring file, unsigned line) noexcept
+		: m_file(std::move(file)), m_func("unknown"), m_line(line), m_col(0)
+		{ }
+
+		source_location(pstring file, pstring func, unsigned line) noexcept
+		: m_file(std::move(file)), m_func(std::move(func)), m_line(line), m_col(0)
+		{ }
+
+		PCOPYASSIGNMOVE(source_location, default)
+
+		unsigned line() const noexcept { return m_line; }
+		unsigned column() const noexcept { return m_col; }
+		pstring file_name() const noexcept { return m_file; }
+		pstring function_name() const noexcept { return m_func; }
+
+		source_location &operator ++() noexcept
+		{
+			++m_line;
+			return *this;
+		}
+
+	private:
+		pstring m_file;
+		pstring m_func;
+		unsigned m_line;
+		unsigned m_col;
+	};
+
+	/// \brief Base source class.
+	///
+	/// Pure virtual class all other source implementations are based on.
+	/// Sources provide an abstraction to read input from a variety of
+	/// sources, e.g. files, memory, remote locations.
+	///
+	class psource_t
+	{
+	public:
+
+		using stream_ptr = plib::unique_ptr<std::istream>;
+
+		psource_t() noexcept = default;
+
+		PCOPYASSIGNMOVE(psource_t, delete)
+
+		virtual ~psource_t() noexcept = default;
+
+		virtual stream_ptr stream(const pstring &name) = 0;
+	private:
+	};
+
+	/// \brief Generic string source.
+	///
+	/// Will return the given string when name matches.
+	/// Is used in preprocessor code to eliminate inclusion of certain files.
+	///
+	/// \tparam TS base stream class. Default is psource_t
+	///
+	template <typename TS = psource_t>
+	class psource_str_t : public TS
+	{
+	public:
+		psource_str_t(pstring name, pstring str)
+		: m_name(std::move(name)), m_str(std::move(str))
+		{}
+
+		PCOPYASSIGNMOVE(psource_str_t, delete)
+		~psource_str_t() noexcept override = default;
+
+		typename TS::stream_ptr stream(const pstring &name) override
+		{
+			return (name == m_name) ?
+				plib::make_unique<std::stringstream>(m_str) : typename TS::stream_ptr(nullptr);
+		}
+	private:
+		pstring m_name;
+		pstring m_str;
+	};
+
+	/// \brief Generic sources collection.
+	///
+	/// \tparam TS base stream class. Default is psource_t
+	///
+	template <typename TS = psource_t>
+	class psource_collection_t
+	{
+	public:
+		using source_type = plib::unique_ptr<TS>;
+		using list_t = std::vector<source_type>;
+
+		psource_collection_t() noexcept = default;
+
+		PCOPYASSIGNMOVE(psource_collection_t, delete)
+		virtual ~psource_collection_t() noexcept = default;
+
+		void add_source(source_type &&src)
+		{
+			m_collection.push_back(std::move(src));
+		}
+
+		template <typename S = TS>
+		typename S::stream_ptr get_stream(pstring name)
+		{
+			for (auto &s : m_collection)
+			{
+				auto *source(dynamic_cast<S *>(s.get()));
+				if (source)
+				{
+					auto strm = source->stream(name);
+					if (strm)
+						return strm;
+				}
+			}
+			return typename S::stream_ptr(nullptr);
+		}
+
+		template <typename S, typename F>
+		bool for_all(F lambda)
+		{
+			for (auto &s : m_collection)
+			{
+				auto *source(dynamic_cast<S *>(s.get()));
+				if (source)
+				{
+					if (lambda(source))
+						return true;
+				}
+			}
+			return false;
+		}
+
+	private:
+		list_t m_collection;
+	};
+
 	namespace util
 	{
-		const pstring buildpath(std::initializer_list<pstring> list );
-		const pstring environment(const pstring &var, const pstring &default_val);
+		pstring basename(const pstring &filename, const pstring &suffix = "");
+		pstring path(const pstring &filename);
+		pstring buildpath(std::initializer_list<pstring> list );
+		pstring environment(const pstring &var, const pstring &default_val);
 	} // namespace util
 
 	namespace container
@@ -59,52 +286,6 @@ namespace plib
 		}
 	} // namespace container
 
-	/* May be further specialized .... This is the generic version */
-	template <typename T>
-	struct constants
-	{
-		static constexpr T zero()   noexcept { return static_cast<T>(0); }
-		static constexpr T one()    noexcept { return static_cast<T>(1); }
-		static constexpr T two()    noexcept { return static_cast<T>(2); }
-		static constexpr T sqrt2()  noexcept { return static_cast<T>(1.414213562373095048801688724209); }
-		static constexpr T pi()     noexcept { return static_cast<T>(3.14159265358979323846264338327950); }
-
-		/*!
-		 * \brief Electric constant of vacuum
-		 */
-		static constexpr T eps_0() noexcept { return static_cast<T>(8.854187817e-12); }
-		/*!
-		 * \brief Relative permittivity of Silicon dioxide
-		 */
-		static constexpr T eps_SiO2() noexcept { return static_cast<T>(3.9); }
-		/*!
-		 * \brief Relative permittivity of Silicon
-		 */
-		static constexpr T eps_Si() noexcept { return static_cast<T>(11.7); }
-		/*!
-		 * \brief Boltzmann constant
-		 */
-		static constexpr T k_b() noexcept { return static_cast<T>(1.38064852e-23); }
-		/*!
-		 * \brief room temperature (gives VT = 0.02585 at T=300)
-		 */
-		static constexpr T T0() noexcept { return static_cast<T>(300); }
-		/*!
-		 * \brief Elementary charge
-		 */
-		static constexpr T Q_e() noexcept { return static_cast<T>(1.6021765314e-19); }
-		/*!
-		 * \brief Intrinsic carrier concentration in 1/m^3 of Silicon
-		 */
-		static constexpr T NiSi() noexcept { return static_cast<T>(1.45e16); }
-
-		template <typename V>
-		static constexpr const T cast(V &&v) noexcept { return static_cast<T>(v); }
-	};
-
-	static_assert(noexcept(constants<double>::one()) == true, "Not evaluated as constexpr");
-
-
 	template <class C>
 	struct indexed_compare
 	{
@@ -123,132 +304,21 @@ namespace plib
 	std::vector<pstring> psplit(const pstring &str, const std::vector<pstring> &onstrl);
 	std::vector<std::string> psplit_r(const std::string &stri,
 			const std::string &token,
-			const std::size_t maxsplit);
+			std::size_t maxsplit);
 
 	// ----------------------------------------------------------------------------------------
-	// number conversions
+	// simple hash
 	// ----------------------------------------------------------------------------------------
 
-	template <typename T, bool CLOCALE, typename E = void>
-	struct pstonum_helper;
-
-	template<typename T, bool CLOCALE>
-	struct pstonum_helper<T, CLOCALE, typename std::enable_if<std::is_integral<T>::value
-		&& std::is_signed<T>::value>::type>
+	template <typename T>
+	std::size_t hash(const T *buf, std::size_t size)
 	{
-		template <typename S>
-		long long operator()(const S &arg, std::size_t *idx)
-		{
-			return std::stoll(arg, idx);
-		}
-	};
-
-	template<typename T, bool CLOCALE>
-	struct pstonum_helper<T, CLOCALE, typename std::enable_if<std::is_integral<T>::value
-		&& !std::is_signed<T>::value>::type>
-	{
-		template <typename S>
-		unsigned long long operator()(const S &arg, std::size_t *idx)
-		{
-			return std::stoull(arg, idx);
-		}
-	};
-
-	template<typename T, bool CLOCALE>
-	struct pstonum_helper<T, CLOCALE, typename std::enable_if<std::is_floating_point<T>::value>::type>
-	{
-		template <typename S>
-		long double operator()(const S &arg, std::size_t *idx)
-		{
-			if (CLOCALE)
-			{
-				std::stringstream  ss;
-				ss.imbue(std::locale::classic());
-				ss << arg;
-				long int len(ss.tellp());
-				auto x(constants<long double>::zero());
-				long int pos(0);
-				if (ss >> x)
-				{
-					pos = static_cast<long int>(ss.tellg());
-					if (pos == -1)
-						pos = len;
-				}
-				*idx = static_cast<std::size_t>(pos);
-				//printf("%s, %f, %lu %ld\n", arg, (double)x, *idx, (long int) ss.tellg());
-				return x;
-			}
-			else
-				return std::stold(arg, idx);
-		}
-	};
-
-	template<typename T, bool CLOCALE, typename S>
-	T pstonum(const S &arg)
-	{
-		decltype(arg.c_str()) cstr = arg.c_str();
-		std::size_t idx(0);
-		auto ret = pstonum_helper<T, CLOCALE>()(cstr, &idx);
-		using ret_type = decltype(ret);
-		if (ret >= static_cast<ret_type>(std::numeric_limits<T>::lowest())
-			&& ret <= static_cast<ret_type>(std::numeric_limits<T>::max()))
-			//&& (ret == T(0) || std::abs(ret) >= std::numeric_limits<T>::min() ))
-		{
-			if (cstr[idx] != 0)
-				throw pexception(pstring("Continuation after numeric value ends: ") + cstr);
-		}
-		else
-		{
-			throw pexception(pstring("Out of range: ") + cstr);
-		}
-		return static_cast<T>(ret);
+		std::size_t result = 5381; // NOLINT
+		for (const T* p = buf; p != buf + size; p++)
+			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<std::size_t>(*p); // NOLINT
+		return result;
 	}
-
-	template<typename R, bool CLOCALE, typename T>
-	R pstonum_ne(const T &str, bool &err) noexcept
-	{
-		try
-		{
-			err = false;
-			return pstonum<R, CLOCALE>(str);
-		}
-		catch (...)
-		{
-			err = true;
-			return R(0);
-		}
-	}
-
-	//============================================================
-	//  penum - strongly typed enumeration
-	//============================================================
-
-	struct penum_base
-	{
-	protected:
-		static int from_string_int(const char *str, const char *x);
-		static std::string nthstr(int n, const char *str);
-	};
 
 } // namespace plib
 
-#define P_ENUM(ename, ...) \
-	struct ename : public plib::penum_base { \
-		enum E { __VA_ARGS__ }; \
-		ename (E v) : m_v(v) { } \
-		bool set_from_string (const std::string &s) { \
-			static char const *const strings = # __VA_ARGS__; \
-			int f = from_string_int(strings, s.c_str()); \
-			if (f>=0) { m_v = static_cast<E>(f); return true; } else { return false; } \
-		} \
-		operator E() const {return m_v;} \
-		bool operator==(const ename &rhs) const {return m_v == rhs.m_v;} \
-		bool operator==(const E &rhs) const {return m_v == rhs;} \
-		std::string name() const { \
-			static char const *const strings = # __VA_ARGS__; \
-			return nthstr(static_cast<int>(m_v), strings); \
-		} \
-		private: E m_v; };
-
-
-#endif /* PUTIL_H_ */
+#endif // PUTIL_H_

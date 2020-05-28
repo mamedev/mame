@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#include <assert.h>
+#include <cassert>
 
 #include "mfi_dsk.h"
 #include <zlib.h>

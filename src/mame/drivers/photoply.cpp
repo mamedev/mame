@@ -32,8 +32,8 @@ TODO:
 class photoply_state : public pcat_base_state
 {
 public:
-	photoply_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
+	photoply_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pcat_base_state(mconfig, type, tag),
 		m_eeprom(*this, "eeprom"),
 		m_main_bios(*this, "bios"),
 		m_video_bios(*this, "video_bios"),
@@ -196,11 +196,11 @@ void photoply_state::photoply_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(cirrus_gd5446_device::mem_r), FUNC(cirrus_gd5446_device::mem_w));
-//  AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
-//  AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("ex_bios", 0)
+//  map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
+//  map(0x000c8000, 0x000cffff).rom().region("ex_bios", 0);
 	map(0x000c0000, 0x000fffff).rw(FUNC(photoply_state::bios_r), FUNC(photoply_state::bios_w));
 	map(0x00100000, 0x07ffffff).ram(); // 64MB RAM, guess!
-	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
+	map(0xfffe0000, 0xffffffff).lr8([this] (offs_t offset) { return m_main_bios[offset]; }, "bios_upper_r");
 }
 
 
@@ -213,9 +213,9 @@ void photoply_state::photoply_io(address_map &map)
 	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
 	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
 	map(0x0202, 0x0202).w(FUNC(photoply_state::eeprom_w));
-//  AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
+//  map(0x0278, 0x027f).ram(); //parallel port 2
 	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
-//  AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
+//  map(0x0378, 0x037f).ram(); //parallel port
 	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5446_device::port_03b0_r), FUNC(cirrus_gd5446_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5446_device::port_03c0_r), FUNC(cirrus_gd5446_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5446_device::port_03d0_r), FUNC(cirrus_gd5446_device::port_03d0_w));
@@ -319,8 +319,7 @@ void photoply_state::photoply(machine_config &config)
 	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (5, FUNC(photoply_state::sis_pcm_r), this);
-	pcibus.set_device_write(5, FUNC(photoply_state::sis_pcm_w), this);
+	pcibus.set_device(5, FUNC(photoply_state::sis_pcm_r), FUNC(photoply_state::sis_pcm_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
@@ -373,3 +372,4 @@ ROM_END
 
 GAME( 199?, photoply,     0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (v2.01)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
 GAME( 2004, photoply2k4,  0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2004", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+

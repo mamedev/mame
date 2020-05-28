@@ -10,7 +10,7 @@
 
 ***************************************************************************/
 
-#include <math.h>
+#include <cmath>
 #define CX4_Tan(a) (CX4_CosTable[a] ? ((((int32_t)CX4_SinTable[a]) << 16) / CX4_CosTable[a]) : 0x80000000)
 #define CX4_sar(b, n) ((b) >> (n))
 #ifdef PI

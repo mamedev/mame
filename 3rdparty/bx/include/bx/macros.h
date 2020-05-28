@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -115,7 +115,11 @@
 
 /// The return value of the function is solely a function of the arguments.
 ///
-#define BX_CONSTEXPR_FUNC constexpr BX_CONST_FUNC
+#if __cplusplus < 201402
+#	define BX_CONSTEXPR_FUNC BX_CONST_FUNC
+#else
+#	define BX_CONSTEXPR_FUNC constexpr BX_CONST_FUNC
+#endif // __cplusplus < 201402
 
 ///
 #define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)

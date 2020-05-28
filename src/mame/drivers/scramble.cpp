@@ -165,7 +165,7 @@ void scramble_state::newsin7_map(address_map &map)
 	map(0x5080, 0x50ff).ram();
 	map(0x6800, 0x6800).w(FUNC(scramble_state::galaxold_coin_counter_1_w));
 	map(0x6801, 0x6801).w(FUNC(scramble_state::galaxold_stars_enable_w));
-	//AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_nmi_enable_w)
+	//map(0x6802, 0x6802).w(FUNC(scramble_state::galaxold_nmi_enable_w));
 	map(0x6808, 0x6808).w(FUNC(scramble_state::galaxold_coin_counter_0_w));
 	map(0x6809, 0x6809).w(FUNC(scramble_state::galaxold_flip_screen_x_w));
 	map(0x680b, 0x680b).w(FUNC(scramble_state::galaxold_flip_screen_y_w));
@@ -555,10 +555,10 @@ static INPUT_PORTS_START( knockoutb )
 INPUT_PORTS_END
 
 /* ckongs coinage DIPs are spread across two input ports */
-CUSTOM_INPUT_MEMBER(scramble_state::ckongs_coinage_r)
+template <int Mask>
+READ_LINE_MEMBER(scramble_state::ckongs_coinage_r)
 {
-	int bit_mask = (uintptr_t)param;
-	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
+	return (ioport("FAKE")->read() & Mask) ? 1 : 0;
 }
 
 static INPUT_PORTS_START( ckongs )
@@ -573,8 +573,8 @@ static INPUT_PORTS_START( ckongs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scramble_state,ckongs_coinage_r, (void *)0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scramble_state,ckongs_coinage_r, (void *)0x02)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(scramble_state, ckongs_coinage_r<0x01>)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(scramble_state, ckongs_coinage_r<0x02>)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -590,7 +590,7 @@ static INPUT_PORTS_START( ckongs )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scramble_state,ckongs_coinage_r, (void *)0x04)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(scramble_state, ckongs_coinage_r<0x04>)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -1464,12 +1464,10 @@ void scramble_state::hotshock(machine_config &config)
 	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,pisces)
 
-	subdevice<ay8910_device>("8910.1")->reset_routes();
-	subdevice<ay8910_device>("8910.1")->add_route(ALL_OUTPUTS, "mono", 0.33);
+	subdevice<ay8910_device>("8910.1")->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.33);
 
 	subdevice<ay8910_device>("8910.2")->port_a_read_callback().set(FUNC(scramble_state::hotshock_soundlatch_r));
-	subdevice<ay8910_device>("8910.2")->reset_routes();
-	subdevice<ay8910_device>("8910.2")->add_route(ALL_OUTPUTS, "mono", 0.33);
+	subdevice<ay8910_device>("8910.2")->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 
 void scramble_state::cavelon(machine_config &config)
@@ -1514,8 +1512,7 @@ void scramble_state::triplep(machine_config &config)
 
 	/* sound hardware */
 	subdevice<ay8910_device>("8910.1")->set_clock(18432000/12); // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
-	subdevice<ay8910_device>("8910.1")->reset_routes();
-	subdevice<ay8910_device>("8910.1")->add_route(ALL_OUTPUTS, "mono", 1.0);
+	subdevice<ay8910_device>("8910.1")->reset_routes().add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	config.device_remove("8910.2");
 }
@@ -1541,6 +1538,7 @@ void scramble_state::hunchbks(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &scramble_state::hunchbks_map);
 	maincpu.set_addrmap(AS_IO, &scramble_state::hunchbks_readport);
 	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank));
+	maincpu.intack_handler().set_constant(0x03);
 	maincpu.set_vblank_int("screen", FUNC(scramble_state::hunchbks_vh_interrupt));
 
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));

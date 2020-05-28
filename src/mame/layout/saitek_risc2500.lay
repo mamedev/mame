@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 <!-- define elements -->
 	<element name="digit" defstate="0">
@@ -111,6 +114,8 @@
 	<element name="lcd_bg"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
 	<element name="background"><rect><color red="0.63" green="0.63" blue="0.63" /></rect></element>
 	<element name="blackb"><rect><color red="0.1" green="0.1" blue="0.1" /></rect></element>
+	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
+	<element name="bmask"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
 
 	<element name="piece" defstate="0">
 		<image file="chess/wp.png" state="1"/>
@@ -146,7 +151,7 @@
 
 <!-- sb board -->
 
-	<element name="cwhite"><rect><color red="1.00" green="1.00" blue="1.00" /></rect></element>
+	<element name="cwhite"><rect><color red="0.93" green="0.93" blue="0.93" /></rect></element>
 	<element name="cblack"><rect><color red="0.40" green="0.40" blue="0.40" /></rect></element>
 
 	<element name="hlbb" defstate="0">
@@ -269,34 +274,34 @@
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib2">
-		<rect><color red="1.00" green="1.00" blue="1.00" /></rect>
+		<rect><color red="0.93" green="0.93" blue="0.93" /></rect>
 		<text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uib3">
-		<rect><color red="1.00" green="1.00" blue="1.00" /></rect>
+		<rect><color red="0.93" green="0.93" blue="0.93" /></rect>
 		<text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uis1"><text string="SPAWN:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih1"><text string="HAND:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih2">
-		<rect><color red="1.00" green="1.00" blue="1.00" /></rect>
+		<rect><color red="0.93" green="0.93" blue="0.93" /></rect>
 		<text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu1"><text string="UNDO:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uiu2a">
-		<rect><color red="1.00" green="1.00" blue="1.00" /></rect>
+		<rect><color red="0.93" green="0.93" blue="0.93" /></rect>
 		<text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu2b">
-		<rect><color red="1.00" green="1.00" blue="1.00" /></rect>
+		<rect><color red="0.93" green="0.93" blue="0.93" /></rect>
 		<text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu2c">
-		<rect><color red="1.00" green="1.00" blue="1.00" /></rect>
+		<rect><color red="0.93" green="0.93" blue="0.93" /></rect>
 		<text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu2d">
-		<rect><color red="1.00" green="1.00" blue="1.00" /></rect>
+		<rect><color red="0.93" green="0.93" blue="0.93" /></rect>
 		<text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu3a" defstate="0">
@@ -396,7 +401,7 @@
 	<group name="lcd">
 		<bounds x="0" y="0" width="30" height="11.2" />
 		<element ref="lcd_bg"><bounds x="0" y="0" width="30.0" height="11.2" /></element>
-		<screen index="0" blend="alpha"><bounds x="0" y="0.3" width="30" height="3.5" /></screen>
+		<screen index="0" blend="alpha"><bounds x="0" y="0.35" width="30" height="3.6986" /></screen>
 
 		<bezel name="sym12"  element="sym_colon" ><bounds x="12.0"   y="4.5" width="1.5" height="3" /></bezel>
 		<bezel name="sym13"  element="sym_colon" ><bounds x="24.2"   y="4.5" width="1.5" height="3" /></bezel>
@@ -426,11 +431,10 @@
 	</group>
 
 <!-- build screen -->
-	<view name="Internal Layout">
+	<view name="Internal Layout (Full)">
 		<bounds x="0" y="0" width="167" height="90" />
 
 		<element ref="background"><bounds x="13" y="0" width="154" height="90" /></element>
-		<element ref="blackb"><bounds x="107.8" y="4.3" width="30.4" height="11.6" /></element>
 
 		<bezel element="text_8"     ><bounds x="18" y="6"  width="2" height="2" /></bezel>
 		<bezel element="text_7"     ><bounds x="18" y="16" width="2" height="2" /></bezel>
@@ -481,12 +485,15 @@
 		<bezel element="text_down"  ><bounds x="145" y="51" width="7" height="3" /></bezel>
 		<bezel element="text_enter" ><bounds x="154" y="52" width="7" height="2" /></bezel>
 
-		<bezel element="text_p1" ><bounds x="110.5" y="65.5" width="4" height="4" /><color alpha="0.85" /></bezel>
-		<bezel element="text_p2" ><bounds x="119.5" y="65.5" width="4" height="4" /><color alpha="0.85" /></bezel>
-		<bezel element="text_p3" ><bounds x="128.5" y="65.5" width="4" height="4" /><color alpha="0.85" /></bezel>
-		<bezel element="text_p4" ><bounds x="137.5" y="65.5" width="4" height="4" /><color alpha="0.85" /></bezel>
-		<bezel element="text_p5" ><bounds x="146.5" y="65.5" width="4" height="4" /><color alpha="0.85" /></bezel>
-		<bezel element="text_p6" ><bounds x="155.5" y="65.5" width="4" height="4" /><color alpha="0.85" /></bezel>
+		<element ref="whitew"><bounds x="110.5" y="65.5" width="50" height="4" /></element>
+		<element ref="text_p1"><bounds x="110.5" y="65.5" width="4" height="4" /></element>
+		<element ref="text_p2"><bounds x="119.5" y="65.5" width="4" height="4" /></element>
+		<element ref="text_p3"><bounds x="128.5" y="65.5" width="4" height="4" /></element>
+		<element ref="text_p4"><bounds x="137.5" y="65.5" width="4" height="4" /></element>
+		<element ref="text_p5"><bounds x="146.5" y="65.5" width="4" height="4" /></element>
+		<element ref="text_p6"><bounds x="155.5" y="65.5" width="4" height="4" /></element>
+		<element ref="bmask" blend="add"><bounds x="110.5" y="65.5" width="50" height="4" /></element>
+		<element ref="background" blend="multiply"><bounds x="110.5" y="65.5" width="50" height="4" /></element>
 
 		<bezel element="hlb" inputtag="RESET" inputmask="0x00000001"><bounds x="109"  y="40" width="8" height="2" /></bezel>
 		<bezel element="hlb" inputtag="P7" inputmask="0x80000000"><bounds x="120" y="40" width="8" height="2" /></bezel>
@@ -508,12 +515,14 @@
 		<bezel element="hlb" inputtag="P1" inputmask="0x40000000"><bounds x="145" y="70" width="7" height="2" /></bezel>
 		<bezel element="hlb" inputtag="P0" inputmask="0x40000000"><bounds x="154" y="70" width="7" height="2" /></bezel>
 
-		<group ref="lcd"><bounds x="108" y="4.5" width="30" height="11.2" /></group>
+		<element ref="blackb"><bounds x="107.8" y="10.4" width="30.4" height="11.6" /></element>
+		<group ref="lcd"><bounds x="108" y="10.6" width="30" height="11.2" /></group>
+
 		<group ref="sb_board"><bounds x="21" y="2" width="80" height="80" /></group>
-		<group ref="sb_ui"><bounds x="1.5" y="5" width="10" height="80" /></group>
+		<group ref="sb_ui"><bounds x="1.5" y="2" width="10" height="80" /></group>
 	</view>
 
-	<view name="LCD">
+	<view name="Internal Layout (LCD)">
 		<group ref="lcd"><bounds x="0" y="0" width="30" height="11.2" /></group>
 	</view>
 </mamelayout>

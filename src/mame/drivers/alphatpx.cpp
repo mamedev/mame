@@ -36,7 +36,7 @@
 
     P2U
     ===
-    For paging via port 0x78A, a 16K RAM card with RAM at 0x0000 and 0x3fff and the banking logic (see above) is added to the the standard 48K memory card.
+    For paging via port 0x78A, a 16K RAM card with RAM at 0x0000 and 0x3fff and the banking logic (see above) is added to the standard 48K memory card.
     P2S, P2U: 2x 320K, double sided, 40 tracks, 16 sectors/track, 256 bytes/sector floppy disk drives
 
     P3, P4
@@ -112,23 +112,23 @@ protected:
 
 private:
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
-	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
-	DECLARE_READ8_MEMBER(kbd_port2_r);
-	DECLARE_WRITE8_MEMBER(kbd_port2_w);
+	void kbd_matrix_w(u8 data);
+	u8 kbd_port2_r();
+	void kbd_port2_w(u8 data);
 
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(fdc_stat_r);
-	DECLARE_WRITE8_MEMBER(fdc_cmd_w);
+	u8 fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, u8 data);
+	u8 fdc_stat_r();
+	void fdc_cmd_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
-	DECLARE_WRITE8_MEMBER(beep_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
+	void beep_w(u8 data);
+	void bank_w(u8 data);
 
 	void alphatp2_io(address_map &map);
 	void alphatp2_map(address_map &map);
@@ -142,7 +142,7 @@ private:
 	required_device<beep_device> m_beep;
 	required_ioport_array<16> m_keycols;
 
-	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
+	u8 m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_gfx;
@@ -184,33 +184,33 @@ protected:
 	virtual void machine_reset() override;
 private:
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
-	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
-	DECLARE_READ8_MEMBER(kbd_port2_r);
-	DECLARE_WRITE8_MEMBER(kbd_port2_w);
+	void kbd_matrix_w(u8 data);
+	u8 kbd_port2_r();
+	void kbd_port2_w(u8 data);
 
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(fdc_stat_r);
-	DECLARE_WRITE8_MEMBER(fdc_cmd_w);
+	u8 fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, u8 data);
+	u8 fdc_stat_r();
+	void fdc_cmd_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
-	DECLARE_WRITE8_MEMBER(beep_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(start88_r);
-	DECLARE_READ8_MEMBER(comm85_r);
-	DECLARE_WRITE8_MEMBER(comm85_w);
-	DECLARE_READ8_MEMBER(comm88_r);
-	DECLARE_WRITE8_MEMBER(comm88_w);
-	DECLARE_READ8_MEMBER(gfxext_r);
-	DECLARE_WRITE8_MEMBER(gfxext_w);
-	DECLARE_WRITE8_MEMBER(gfxext1_w);
-	DECLARE_WRITE8_MEMBER(gfxext2_w);
-	DECLARE_WRITE8_MEMBER(gfxext3_w);
+	void beep_w(u8 data);
+	void bank_w(u8 data);
+	u8 start88_r(offs_t offset);
+	u8 comm85_r(offs_t offset);
+	void comm85_w(u8 data);
+	u8 comm88_r(offs_t offset);
+	void comm88_w(u8 data);
+	u8 gfxext_r(offs_t offset);
+	void gfxext_w(offs_t offset, u8 data);
+	void gfxext1_w(u8 data);
+	void gfxext2_w(u8 data);
+	void gfxext3_w(offs_t offset, u8 data);
 
 	u8* vramext_addr_xlate(offs_t offset);
 
@@ -231,7 +231,7 @@ private:
 	required_ioport_array<16> m_keycols;
 	required_ioport m_scncfg;
 
-	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
+	u8 m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<u8> m_vram;
@@ -279,7 +279,7 @@ void alphatp_12_state::alphatp2_io(address_map &map)
 }
 
 
-WRITE8_MEMBER(alphatp_12_state::bank_w)
+void alphatp_12_state::bank_w(u8 data)
 {
 	m_bankdev->set_bank(BIT(data, 6));
 }
@@ -308,13 +308,13 @@ void alphatp_34_state::alphatp3_map(address_map &map)
 void alphatp_34_state::alphatp3_io(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x00, 0x00) AM_READ // unknown
+	//map(0x00, 0x00).r(FUNC(alphatp_34_state::)); // unknown
 	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x08, 0x09).rw(FUNC(alphatp_34_state::comm88_r), FUNC(alphatp_34_state::comm88_w));
 	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
 	map(0x12, 0x12).w(FUNC(alphatp_34_state::beep_w));
 	map(0x40, 0x41).r(FUNC(alphatp_34_state::start88_r));
-	//AM_RANGE(0x42, 0x42) AM_WRITE // unknown
+	//map(0x42, 0x42).w(FUNC(alphatp_34_state::)); // unknown
 	map(0x50, 0x53).rw(FUNC(alphatp_34_state::fdc_r), FUNC(alphatp_34_state::fdc_w));
 	map(0x54, 0x54).rw(FUNC(alphatp_34_state::fdc_stat_r), FUNC(alphatp_34_state::fdc_cmd_w));
 	map(0x78, 0x78).w(FUNC(alphatp_34_state::bank_w));
@@ -329,17 +329,17 @@ void alphatp_34_state::alphatp30_8088_map(address_map &map)
 
 void alphatp_34_state::alphatp30_8088_io(address_map &map)
 {
-	//AM_RANGE(0x008a, 0x008a) AM_READ // unknown
+	//map(0x008a, 0x008a).r(FUNC(alphatp_34_state::)); // unknown
 	map(0xf800, 0xf800).w(FUNC(alphatp_34_state::gfxext1_w));
 	map(0xf900, 0xf900).w(FUNC(alphatp_34_state::gfxext2_w));
 	map(0xfa00, 0xfa01).w(FUNC(alphatp_34_state::gfxext3_w));
-	//AM_RANGE(0xfb00, 0xfb0f) AM_WRITE // unknown possibly gfx ext
+	//map(0xfb00, 0xfb0f).w(FUNC(alphatp_34_state::)); // unknown possibly gfx ext
 	map(0xffe0, 0xffe1).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xffe4, 0xffe7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xffe9, 0xffea).rw(FUNC(alphatp_34_state::comm85_r), FUNC(alphatp_34_state::comm85_w));
 }
 
-READ8_MEMBER(alphatp_34_state::start88_r)
+u8 alphatp_34_state::start88_r(offs_t offset)
 {
 	if(!offset)
 	{
@@ -355,12 +355,12 @@ READ8_MEMBER(alphatp_34_state::start88_r)
 	return 0;
 }
 
-WRITE8_MEMBER(alphatp_34_state::bank_w)
+void alphatp_34_state::bank_w(u8 data)
 {
 	m_bankdev->set_bank(BIT(data, 6));
 }
 
-READ8_MEMBER(alphatp_34_state::comm88_r)
+u8 alphatp_34_state::comm88_r(offs_t offset)
 {
 	if(!offset)
 		return (m_85_da ? 0 : 1) | (m_88_da ? 0 : 0x80);
@@ -370,7 +370,7 @@ READ8_MEMBER(alphatp_34_state::comm88_r)
 	return m_85_data;
 }
 
-WRITE8_MEMBER(alphatp_34_state::comm88_w)
+void alphatp_34_state::comm88_w(u8 data)
 {
 	m_88_data = data;
 	if(m_pic)
@@ -378,7 +378,7 @@ WRITE8_MEMBER(alphatp_34_state::comm88_w)
 	m_88_da = true;
 }
 
-READ8_MEMBER(alphatp_34_state::comm85_r)
+u8 alphatp_34_state::comm85_r(offs_t offset)
 {
 	if(!offset)
 		return m_88_da ? 0 : 1;
@@ -387,24 +387,24 @@ READ8_MEMBER(alphatp_34_state::comm85_r)
 	return m_88_data;
 }
 
-WRITE8_MEMBER(alphatp_34_state::comm85_w)
+void alphatp_34_state::comm85_w(u8 data)
 {
 	m_85_data = data;
 	m_85_da = true;
 	m_i8088->set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(alphatp_34_state::gfxext1_w)
+void alphatp_34_state::gfxext1_w(u8 data)
 {
 	m_gfxext1 = data;
 }
 
-WRITE8_MEMBER(alphatp_34_state::gfxext2_w)
+void alphatp_34_state::gfxext2_w(u8 data)
 {
 	m_gfxext2 = data;
 }
 
-WRITE8_MEMBER(alphatp_34_state::gfxext3_w)
+void alphatp_34_state::gfxext3_w(offs_t offset, u8 data)
 {
 	u16 mask = 0xff << (offset ? 0 : 8);
 	m_gfxext3 = (m_gfxext3 & mask) | (data << (offset * 8));
@@ -421,7 +421,7 @@ u8* alphatp_34_state::vramext_addr_xlate(offs_t offset)
 		return &m_vramchr[(((((m_gfxext2 & 0x8) << 2) ^ bank) * 48) + (offs - 80)) % (256*12)];
 }
 
-READ8_MEMBER(alphatp_34_state::gfxext_r)
+u8 alphatp_34_state::gfxext_r(offs_t offset)
 {
 	switch(m_gfxext1)
 	{
@@ -433,7 +433,7 @@ READ8_MEMBER(alphatp_34_state::gfxext_r)
 	return 0;
 }
 
-WRITE8_MEMBER(alphatp_34_state::gfxext_w)
+void alphatp_34_state::gfxext_w(offs_t offset, u8 data)
 {
 	switch(m_gfxext1)
 	{
@@ -469,7 +469,7 @@ READ_LINE_MEMBER(alphatp_12_state::kbd_matrix_r)
 	return m_kbdread;
 }
 
-WRITE8_MEMBER(alphatp_12_state::kbd_matrix_w)
+void alphatp_12_state::kbd_matrix_w(u8 data)
 {
 	if ((data & 0x80) && (!m_kbdclk))
 	{
@@ -482,13 +482,13 @@ WRITE8_MEMBER(alphatp_12_state::kbd_matrix_w)
 }
 
 // bit 2 is UPI-41 host IRQ to Z80
-WRITE8_MEMBER(alphatp_12_state::kbd_port2_w)
+void alphatp_12_state::kbd_port2_w(u8 data)
 {
 	m_kbdport2 = data;
 
 }
 
-READ8_MEMBER(alphatp_12_state::kbd_port2_r)
+u8 alphatp_12_state::kbd_port2_r()
 {
 	return m_kbdport2;
 }
@@ -502,7 +502,7 @@ READ_LINE_MEMBER(alphatp_34_state::kbd_matrix_r)
 	return m_kbdread;
 }
 
-WRITE8_MEMBER(alphatp_34_state::kbd_matrix_w)
+void alphatp_34_state::kbd_matrix_w(u8 data)
 {
 	if (data & 0x80)
 	{
@@ -516,13 +516,13 @@ WRITE8_MEMBER(alphatp_34_state::kbd_matrix_w)
 }
 
 // bit 2 is UPI-41 host IRQ to Z80
-WRITE8_MEMBER(alphatp_34_state::kbd_port2_w)
+void alphatp_34_state::kbd_port2_w(u8 data)
 {
 	m_kbdport2 = data;
 
 }
 
-READ8_MEMBER(alphatp_34_state::kbd_port2_r)
+u8 alphatp_34_state::kbd_port2_r()
 {
 	return m_kbdport2;
 }
@@ -901,7 +901,7 @@ static const gfx_layout extcharlayout =
 //  VIDEO - Alphatronic P1, P2, P2S, P2U and Hell 2069
 //**************************************************************************
 
-uint32_t alphatp_12_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 alphatp_12_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
 	int start = m_crtc->upscroll_offset();
@@ -912,12 +912,12 @@ uint32_t alphatp_12_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		int vramy = (start + y) % 24;
 		for (int x = 0; x < 80; x++)
 		{
-			uint8_t code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
+			u8 code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
 			// draw 12 lines of the character
 			bool cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
-				uint8_t data = m_gfx[((code & 0x7f) * 16) + line];
+				u8 data = m_gfx[((code & 0x7f) * 16) + line];
 				if (cursoren)
 					data ^= 0xff;
 				bitmap.pix32(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
@@ -943,7 +943,7 @@ static GFXDECODE_START( gfx_alphatp3 )
 	GFXDECODE_ENTRY("gfx", 0, charlayout, 0, 1)
 GFXDECODE_END
 
-uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
 	int start = m_crtc->upscroll_offset();
@@ -955,7 +955,7 @@ uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		int vramy = (start + y) % 24;
 		for (int x = 0; x < 80; x++)
 		{
-			uint8_t code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
+			u8 code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
 			// draw 12 lines of the character
 			bool cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
@@ -993,7 +993,7 @@ uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 //  SOUND - Alphatronic P1, P2, P2S, P2U and Hell 2069
 //**************************************************************************
 
-WRITE8_MEMBER( alphatp_12_state::beep_w )
+void alphatp_12_state::beep_w(u8 data)
 {
 	m_beep->set_state(data&1);
 }
@@ -1002,7 +1002,7 @@ WRITE8_MEMBER( alphatp_12_state::beep_w )
 //  SOUND - Alphatronic P3, P4, P30 and P40
 //**************************************************************************
 
-WRITE8_MEMBER( alphatp_34_state::beep_w )
+void alphatp_34_state::beep_w(u8 data)
 {
 	m_beep->set_state(data&1);
 }
@@ -1026,9 +1026,9 @@ WRITE_LINE_MEMBER(alphatp_12_state::fdchld_w)
 	m_fdc_hld = state;
 }
 
-READ8_MEMBER(alphatp_12_state::fdc_stat_r)
+u8 alphatp_12_state::fdc_stat_r()
 {
-	uint8_t res = 0;
+	u8 res = 0;
 	floppy_image_device *floppy1,*floppy2;
 	floppy1 = floppy2 = nullptr;
 
@@ -1046,18 +1046,18 @@ READ8_MEMBER(alphatp_12_state::fdc_stat_r)
 	return res;
 }
 
-READ8_MEMBER(alphatp_12_state::fdc_r)
+u8 alphatp_12_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER(alphatp_12_state::fdc_w)
+void alphatp_12_state::fdc_w(offs_t offset, u8 data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
 
 
-WRITE8_MEMBER(alphatp_12_state::fdc_cmd_w)
+void alphatp_12_state::fdc_cmd_w(u8 data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -1109,9 +1109,9 @@ WRITE_LINE_MEMBER(alphatp_34_state::fdchld_w)
 	m_fdc_hld = state;
 }
 
-READ8_MEMBER(alphatp_34_state::fdc_stat_r)
+u8 alphatp_34_state::fdc_stat_r()
 {
-	uint8_t res = 0;
+	u8 res = 0;
 	floppy_image_device *floppy1 = m_floppy[0]->get_device();
 	floppy_image_device *floppy2 = m_floppy[1]->get_device();
 
@@ -1125,18 +1125,18 @@ READ8_MEMBER(alphatp_34_state::fdc_stat_r)
 	return res;
 }
 
-READ8_MEMBER(alphatp_34_state::fdc_r)
+u8 alphatp_34_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER(alphatp_34_state::fdc_w)
+void alphatp_34_state::fdc_w(offs_t offset, u8 data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
 
 
-WRITE8_MEMBER(alphatp_34_state::fdc_cmd_w)
+void alphatp_34_state::fdc_cmd_w(u8 data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -1210,7 +1210,7 @@ void alphatp_12_state::alphatp2(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &alphatp_12_state::alphatp2_mem);
 	maincpu.set_addrmap(AS_IO, &alphatp_12_state::alphatp2_io);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum("maincpu");
 
 	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_12_state::kbd_matrix_r));
@@ -1288,9 +1288,9 @@ void alphatp_34_state::alphatp3(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &alphatp_34_state::alphatp3_mem);
 	maincpu.set_addrmap(AS_IO, &alphatp_34_state::alphatp3_io);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum("maincpu");
 
-	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL /2);
+	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_34_state::kbd_matrix_r));
 	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_34_state::kbd_matrix_w));
 	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_34_state::kbd_port2_r));

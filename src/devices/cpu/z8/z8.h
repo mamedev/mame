@@ -46,12 +46,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 6; }
-	virtual uint32_t execute_max_cycles() const override { return 27; }
-	virtual uint32_t execute_input_lines() const override { return 4; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return true; }
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 6; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 27; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return true; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -74,14 +74,14 @@ private:
 	address_space_config m_data_config;
 	address_space_config m_register_config;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
-	address_space *m_data;
-	address_space *m_regs;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_data;
+	memory_access< 8, 0, 0, ENDIANNESS_BIG>::specific m_regs;
 
 	// callbacks
-	devcb_read8 m_input_cb[4];
-	devcb_write8 m_output_cb[4];
+	devcb_read8::array<4> m_input_cb;
+	devcb_write8::array<4> m_output_cb;
 
 	uint32_t m_rom_size;
 
@@ -191,9 +191,9 @@ private:
 	inline uint8_t fetch();
 	inline uint8_t fetch_opcode();
 	inline uint16_t fetch_word();
-	inline uint8_t register_read(uint8_t offset) { return m_regs->read_byte(offset); }
+	inline uint8_t register_read(uint8_t offset) { return m_regs.read_byte(offset); }
 	inline uint16_t register_pair_read(uint8_t offset);
-	inline void register_write(uint8_t offset, uint8_t data) { m_regs->write_byte(offset, data); }
+	inline void register_write(uint8_t offset, uint8_t data) { m_regs.write_byte(offset, data); }
 	inline void register_pair_write(uint8_t offset, uint16_t data);
 	inline uint8_t get_working_register(int offset) const;
 	inline uint8_t get_register(uint8_t offset) const;
@@ -205,10 +205,10 @@ private:
 	inline void set_flag(uint8_t flag, int state);
 	inline void clear(uint8_t dst);
 	inline void load(uint8_t dst, uint8_t src);
-	inline void load_from_memory(address_space &space);
-	inline void load_to_memory(address_space &space);
-	inline void load_from_memory_autoinc(address_space &space);
-	inline void load_to_memory_autoinc(address_space &space);
+	inline void load_from_memory(memory_access<16, 0, 0, ENDIANNESS_BIG>::specific &space);
+	inline void load_to_memory(memory_access<16, 0, 0, ENDIANNESS_BIG>::specific &space);
+	inline void load_from_memory_autoinc(memory_access<16, 0, 0, ENDIANNESS_BIG>::specific &space);
+	inline void load_to_memory_autoinc(memory_access<16, 0, 0, ENDIANNESS_BIG>::specific &space);
 	inline void pop(uint8_t dst);
 	inline void push(uint8_t src);
 	inline void add_carry(uint8_t dst, uint8_t src);

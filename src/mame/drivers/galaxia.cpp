@@ -87,7 +87,7 @@ WRITE_LINE_MEMBER(galaxia_state::vblank_irq)
 {
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03); // S2650
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 		cvs_scroll_stars();
 	}
 }
@@ -309,6 +309,7 @@ void galaxia_state::galaxia(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &galaxia_state::galaxia_data_map);
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->flag_handler().set(FUNC(galaxia_state::write_s2650_flag));
+	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -351,6 +352,7 @@ void galaxia_state::astrowar(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &galaxia_state::galaxia_data_map);
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->flag_handler().set(FUNC(galaxia_state::write_s2650_flag));
+	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

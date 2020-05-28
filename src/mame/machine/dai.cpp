@@ -31,7 +31,7 @@ void dai_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		timer_set(attotime::from_hz(100), TIMER_TMS5501);
 		break;
 	default:
-		assert_always(false, "Unknown id in dai_state::device_timer");
+		throw emu_fatalerror("Unknown id in dai_state::device_timer");
 	}
 }
 
@@ -53,7 +53,7 @@ void dai_state::dai_update_memory(int dai_rom_bank)
 }
 
 
-READ8_MEMBER(dai_state::dai_keyboard_r)
+uint8_t dai_state::dai_keyboard_r()
 {
 	uint8_t data = 0x00;
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
@@ -67,7 +67,7 @@ READ8_MEMBER(dai_state::dai_keyboard_r)
 	return data;
 }
 
-WRITE8_MEMBER(dai_state::dai_keyboard_w)
+void dai_state::dai_keyboard_w(uint8_t data)
 {
 	m_keyboard_scan_mask = data;
 }
@@ -147,13 +147,13 @@ WRITE8_MEMBER(dai_state::dai_io_discrete_devices_w)
 {
 	switch(offset & 0x000f) {
 	case 0x04:
-		m_sound->set_volume(space, offset, data);
+		m_sound->set_volume(offset, data);
 		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 0 volume");
 		LOG_DAI_PORT_W (offset, (data&0xf0)>>4, "discrete devices - osc. 1 volume");
 		break;
 
 	case 0x05:
-		m_sound->set_volume(space, offset, data);
+		m_sound->set_volume(offset, data);
 		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 2 volume");
 		LOG_DAI_PORT_W (offset, (data&0xf0)>>4, "discrete devices - noise volume");
 		break;

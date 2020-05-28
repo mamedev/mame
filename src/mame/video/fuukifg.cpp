@@ -13,6 +13,8 @@ fuukivid_device::fuukivid_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, FUUKI_VIDEO, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, device_video_interface(mconfig, *this)
+	, m_tile_cb(*this)
+	, m_colpri_cb(*this)
 	, m_gfx_region(*this, DEVICE_SELF)
 	, m_colbase(0)
 	, m_colnum(0x100)
@@ -34,8 +36,8 @@ void fuukivid_device::device_start()
 	};
 	layout_16x16x4.total = m_gfx_region->bytes() / ((16*16*4) / 8);
 
-	m_tile_cb.bind_relative_to(*owner());
-	m_colpri_cb.bind_relative_to(*owner());
+	m_tile_cb.resolve();
+	m_colpri_cb.resolve();
 
 	set_gfx(0, std::make_unique<gfx_element>(&palette(), layout_16x16x4, m_gfx_region->base(), 0, m_colnum, m_colbase));
 }

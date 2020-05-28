@@ -18,6 +18,7 @@ TODO:
   Is cpu cycle timing wrong? I suspect conditional branch timing due to cache miss
   (pipeline has to refill). The delay loop between writing to the speaker is simply:
   SUBS R2, R2, #$1, BNE $2000cd8
+- does it have an LCDC? if so, what chip?
 
 ******************************************************************************/
 
@@ -102,7 +103,7 @@ void risc2500_state::remove_boot_rom()
 void risc2500_state::lcd_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(131, 136, 139)); // lcd pixel off
-	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
+	palette.set_pen_color(1, rgb_t(51, 42, 43)); // lcd pixel on
 	palette.set_pen_color(2, rgb_t(138, 146, 148)); // background
 }
 
@@ -118,7 +119,7 @@ uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			uint8_t gfx = bitswap<8>(m_vram[c*5 + x], 6,5,0,1,2,3,4,7);
 
 			for(int y=0; y<7; y++)
-				bitmap.pix16(y, 71 - (c*6 + x)) = (gfx >> (y + 1)) & 1;
+				bitmap.pix16(y + 1, 71 - (c*6 + x)) = (gfx >> (y + 1)) & 1;
 		}
 
 		// LCD digits and symbols
@@ -287,8 +288,8 @@ void risc2500_state::risc2500(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(12*6+1, 7);
-	screen.set_visarea(0, 12*6, 0, 7-1);
+	screen.set_size(12*6+1, 7+2);
+	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(risc2500_state::screen_update));
 	screen.set_palette("palette");
 
@@ -317,20 +318,23 @@ void risc2500_state::risc2500(machine_config &config)
 /* ROM definitions */
 
 ROM_START( risc2500 )
-	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE )
-	ROM_SYSTEM_BIOS( 0, "v104", "v1.04" )
-	ROMX_LOAD("s2500_v104.bin", 0x000000, 0x020000, CRC(84a06178) SHA1(66f4d9f53de6da865a3ebb4af1d6a3e245c59a3c), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "v103", "v1.03" )
-	ROMX_LOAD("s2500_v103.bin", 0x000000, 0x020000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc), ROM_BIOS(1))
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("risc2500_v.1.04.u7", 0x000000, 0x020000, CRC(84a06178) SHA1(66f4d9f53de6da865a3ebb4af1d6a3e245c59a3c) ) // M27C1001
 ROM_END
 
-ROM_START( montreux )
-	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE )
-	ROM_SYSTEM_BIOS( 0, "v100", "v1.00" )
-	ROMX_LOAD("montreux.bin", 0x000000, 0x040000, CRC(db374cf3) SHA1(44dd60d56779084326c3dfb41d2137ebf0b4e0ac), ROM_BIOS(0))
+ROM_START( risc2500a )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("risc2500_v.1.03.u7", 0x000000, 0x020000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc) )
+ROM_END
+
+ROM_START( montreux ) // v1.00
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("rt17b_103_u_7.u7", 0x000000, 0x040000, CRC(db374cf3) SHA1(44dd60d56779084326c3dfb41d2137ebf0b4e0ac) ) // 27C020-15
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME              FLAGS */
-CONS( 1992, risc2500, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Kasparov RISC 2500", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
-CONS( 1995, montreux, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // after Saitek bought Hegener + Glaser
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS */
+CONS( 1992, risc2500,  0,        0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
+CONS( 1992, risc2500a, risc2500, 0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
+
+CONS( 1995, montreux,  0,        0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // after Saitek bought Hegener + Glaser

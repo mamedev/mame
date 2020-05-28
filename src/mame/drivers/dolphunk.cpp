@@ -86,6 +86,7 @@
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
+#include "video/pwm.h"
 
 #include "dolphunk.lh"
 
@@ -98,30 +99,29 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
-		, m_digits(*this, "digit%u", 0U)
+		, m_display(*this, "display")
 	{ }
 
 	void dauphin(machine_config &config);
 
 private:
 	DECLARE_READ_LINE_MEMBER(cass_r);
-	DECLARE_READ8_MEMBER(port07_r);
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_WRITE8_MEMBER(port06_w);
+	u8 port07_r();
+	void port00_w(offs_t offset, u8 data);
+	void port06_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	void dauphin_io(address_map &map);
 	void dauphin_mem(address_map &map);
 
-	uint8_t m_cass_data;
-	uint8_t m_last_key;
+	u8 m_cass_data;
+	u8 m_last_key;
 	bool m_cassbit;
 	bool m_cassold;
 	bool m_speaker_state;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<s2650_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
-	output_finder<4> m_digits;
+	required_device<pwm_display_device> m_display;
 };
 
 READ_LINE_MEMBER( dauphin_state::cass_r )
@@ -129,20 +129,20 @@ READ_LINE_MEMBER( dauphin_state::cass_r )
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
 
-WRITE8_MEMBER( dauphin_state::port00_w )
+void dauphin_state::port00_w(offs_t offset, u8 data)
 {
-	m_digits[offset] = data;
+	m_display->matrix(1<<offset, data);
 }
 
-WRITE8_MEMBER( dauphin_state::port06_w )
+void dauphin_state::port06_w(u8 data)
 {
 	m_speaker_state ^=1;
 	m_speaker->level_w(m_speaker_state);
 }
 
-READ8_MEMBER( dauphin_state::port07_r )
+u8 dauphin_state::port07_r()
 {
-	uint8_t keyin, i, data = 0x40;
+	u8 keyin, i, data = 0x40;
 
 	keyin = ioport("X0")->read();
 	if (keyin != 0xff)
@@ -237,6 +237,8 @@ void dauphin_state::dauphin(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_dolphunk);
+	PWM_DISPLAY(config, m_display).set_size(4, 8);
+	m_display->set_segmask(0x0f, 0xff);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -250,7 +252,7 @@ void dauphin_state::dauphin(machine_config &config)
 
 /* ROM definition */
 ROM_START( dauphin )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dolphin_mo.rom", 0x0000, 0x0100, CRC(a8811f48) SHA1(233c629dc20fac286c8c1559e461bb0b742a675e) )
 	// This one is used in winarcadia but it is a bad dump, we use the corrected one above
 	//ROM_LOAD( "dolphin_mo.rom", 0x0000, 0x0100, BAD_DUMP CRC(1ac4ac18) SHA1(62a63de6fcd6cd5fcee930d31c73fe603647f06c) )

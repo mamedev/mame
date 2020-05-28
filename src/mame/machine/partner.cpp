@@ -100,8 +100,8 @@ void partner_state::partner_iomap_bank(uint8_t *rom)
 	switch(m_win_mem_page) {
 		case 2 :
 				// FDD
-				space.install_write_handler(0xdc00, 0xddff, write8sm_delegate(FUNC(partner_state::partner_floppy_w),this));
-				space.install_read_handler (0xdc00, 0xddff, read8sm_delegate(FUNC(partner_state::partner_floppy_r),this));
+				space.install_write_handler(0xdc00, 0xddff, write8sm_delegate(*this, FUNC(partner_state::partner_floppy_w)));
+				space.install_read_handler (0xdc00, 0xddff, read8sm_delegate(*this, FUNC(partner_state::partner_floppy_r)));
 				break;
 		case 4 :
 				// Timer

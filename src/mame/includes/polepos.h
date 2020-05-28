@@ -11,6 +11,7 @@
 #pragma once
 
 #include "machine/74259.h"
+#include "machine/adc0804.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/namco.h"
@@ -31,6 +32,7 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_namco_sound(*this, "namco"),
 		m_latch(*this, "latch"),
+		m_adc(*this, "adc"),
 		m_sprite16_memory(*this, "sprite16_memory"),
 		m_road16_memory(*this, "road16_memory"),
 		m_alpha16_memory(*this, "alpha16_memory"),
@@ -40,7 +42,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(auto_start_r);
+	DECLARE_READ_LINE_MEMBER(auto_start_r);
 
 	void init_polepos2();
 
@@ -61,6 +63,7 @@ private:
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<namco_device> m_namco_sound;
 	required_device<ls259_device> m_latch;
+	required_device<adc0804_device> m_adc;
 	required_shared_ptr<uint16_t> m_sprite16_memory;
 	required_shared_ptr<uint16_t> m_road16_memory;
 	required_shared_ptr<uint16_t> m_alpha16_memory;
@@ -87,9 +90,8 @@ private:
 	uint8_t m_sub_irq_mask;
 
 	DECLARE_READ16_MEMBER(polepos2_ic25_r);
-	DECLARE_READ8_MEMBER(adc_r);
+	uint8_t analog_r();
 	DECLARE_READ8_MEMBER(ready_r);
-	DECLARE_WRITE_LINE_MEMBER(iosel_w);
 	DECLARE_WRITE_LINE_MEMBER(gasel_w);
 	DECLARE_WRITE_LINE_MEMBER(sb0_w);
 	DECLARE_WRITE_LINE_MEMBER(chacl_w);
@@ -106,13 +108,13 @@ private:
 	DECLARE_WRITE16_MEMBER(alpha16_w);
 	DECLARE_READ8_MEMBER(alpha_r);
 	DECLARE_WRITE8_MEMBER(alpha_w);
-	DECLARE_WRITE8_MEMBER(out_0);
-	DECLARE_WRITE8_MEMBER(out_1);
-	DECLARE_READ8_MEMBER(namco_52xx_rom_r);
-	DECLARE_READ8_MEMBER(namco_52xx_si_r);
-	DECLARE_READ8_MEMBER(namco_53xx_k_r);
-	DECLARE_READ8_MEMBER(steering_changed_r);
-	DECLARE_READ8_MEMBER(steering_delta_r);
+	void out(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(lockout);
+	uint8_t namco_52xx_rom_r(offs_t offset);
+	uint8_t namco_52xx_si_r();
+	uint8_t namco_53xx_k_r();
+	uint8_t steering_changed_r();
+	uint8_t steering_delta_r();
 	DECLARE_WRITE8_MEMBER(bootleg_soundlatch_w);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);

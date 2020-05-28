@@ -69,7 +69,7 @@ private:
 	void update();
 
 	// callbacks
-	devcb_write_line m_y_func[4];
+	devcb_write_line::array<4> m_y_func;
 
 	// inputs
 	uint8_t m_a;        // pins 1,4,9,12

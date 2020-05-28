@@ -27,6 +27,8 @@
 #include "cpu/i8085/i8085.h"
 #include "emupal.h"
 #include "screen.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
 
 
 class plan80_state : public driver_device
@@ -37,6 +39,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
+		, m_speaker(*this, "speaker")
 	{ }
 
 	void plan80(machine_config &config);
@@ -49,8 +52,9 @@ private:
 		TIMER_BOOT
 	};
 
-	DECLARE_READ8_MEMBER(plan80_04_r);
-	DECLARE_WRITE8_MEMBER(plan80_09_w);
+	DECLARE_READ8_MEMBER(port04_r);
+	DECLARE_WRITE8_MEMBER(port09_w);
+	DECLARE_WRITE8_MEMBER(port10_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void plan80_io(address_map &map);
@@ -58,13 +62,15 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_kbd_row;
+	bool m_spk_pol;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
+	required_device<speaker_sound_device> m_speaker;
 };
 
-READ8_MEMBER( plan80_state::plan80_04_r )
+READ8_MEMBER( plan80_state::port04_r )
 {
 	uint8_t data = 0xff;
 
@@ -86,9 +92,15 @@ READ8_MEMBER( plan80_state::plan80_04_r )
 	return data;
 }
 
-WRITE8_MEMBER( plan80_state::plan80_09_w )
+WRITE8_MEMBER( plan80_state::port09_w )
 {
 	m_kbd_row = data;
+}
+
+WRITE8_MEMBER( plan80_state::port10_w )
+{
+	m_spk_pol ^= 1;
+	m_speaker->level_w(m_spk_pol);
 }
 
 
@@ -105,8 +117,9 @@ void plan80_state::plan80_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x04, 0x04).r(FUNC(plan80_state::plan80_04_r));
-	map(0x09, 0x09).w(FUNC(plan80_state::plan80_09_w));
+	map(0x04, 0x04).r(FUNC(plan80_state::port04_r));
+	map(0x09, 0x09).w(FUNC(plan80_state::port09_w));
+	map(0x10, 0x10).w(FUNC(plan80_state::port10_w));
 }
 
 /* Input ports */
@@ -168,7 +181,7 @@ void plan80_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in plan80_state::device_timer");
+		throw emu_fatalerror("Unknown id in plan80_state::device_timer");
 	}
 }
 
@@ -251,6 +264,10 @@ void plan80_state::plan80(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_plan80);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 /* ROM definition */
@@ -268,4 +285,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY        FULLNAME   FLAGS
-COMP( 1988, plan80, 0,      0,      plan80,  plan80, plan80_state, init_plan80, "Tesla Eltos", "Plan-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1988, plan80, 0,      0,      plan80,  plan80, plan80_state, init_plan80, "Tesla Eltos", "Plan-80", MACHINE_NOT_WORKING )

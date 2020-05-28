@@ -27,8 +27,8 @@ DEFINE_DEVICE_TYPE(TMS1025, tms1025_device, "tms1025", "TMS1025 I/O Expander")
 tms1024_device::tms1024_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_h(0), m_s(0), m_std(0), m_ms(0)
-	, m_read_port{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_write_port{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_read_port(*this)
+	, m_write_port(*this)
 {
 }
 
@@ -51,10 +51,8 @@ tms1025_device::tms1025_device(const machine_config &mconfig, const char *tag, d
 void tms1024_device::device_start()
 {
 	// resolve callbacks (there is no port 0)
-	for (devcb_read8 &cb : m_read_port)
-		cb.resolve_safe(0);
-	for (devcb_write8 &cb : m_write_port)
-		cb.resolve_safe();
+	m_read_port.resolve_all_safe(0);
+	m_write_port.resolve_all_safe();
 
 	// register for savestates
 	save_item(NAME(m_h));
@@ -69,13 +67,13 @@ void tms1024_device::device_start()
 //  handlers
 //-------------------------------------------------
 
-WRITE8_MEMBER(tms1024_device::write_h)
+void tms1024_device::write_h(u8 data)
 {
 	// H1,2,3,4: data for outputs A,B,C,D
 	m_h = data & 0xf;
 }
 
-READ8_MEMBER(tms1024_device::read_h)
+u8 tms1024_device::read_h()
 {
 	if (!m_ms)
 	{
@@ -89,13 +87,13 @@ READ8_MEMBER(tms1024_device::read_h)
 	return m_h;
 }
 
-WRITE8_MEMBER(tms1024_device::write_s)
+void tms1024_device::write_s(uint8_t data)
 {
 	// S0,1,2: select port
 	m_s = data & 7;
 }
 
-WRITE_LINE_MEMBER(tms1024_device::write_std)
+void tms1024_device::write_std(int state)
 {
 	state = (state) ? 1 : 0;
 
@@ -116,7 +114,7 @@ WRITE_LINE_MEMBER(tms1024_device::write_std)
 	m_std = state;
 }
 
-WRITE_LINE_MEMBER(tms1024_device::write_ms)
+void tms1024_device::write_ms(int state)
 {
 	// 0: multiplexer(read) mode, 1: latch(write) mode
 	m_ms = (state) ? 1 : 0;

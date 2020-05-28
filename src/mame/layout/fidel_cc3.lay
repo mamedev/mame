@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
+
+<!-- NOTE: no chesspieces simulation here -->
 
 <!-- define elements -->
 

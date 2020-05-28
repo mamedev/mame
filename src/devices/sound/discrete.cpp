@@ -246,13 +246,15 @@ bool discrete_task::process(void)
 		int avail;
 
 		avail = sn->linked_outbuf->ptr - sn->ptr;
-		assert_always(avail >= 0, "task_callback: available samples are negative");
+		if (avail < 0)
+			throw emu_fatalerror("discrete_task::process: available samples are negative");
 		if (avail < samples)
 			samples = avail;
 	}
 
 	m_samples -= samples;
-	assert_always(m_samples >=0, "task_callback: task_samples got negative");
+	if (m_samples < 0)
+		throw emu_fatalerror("discrete_task::process: m_samples got negative");
 	while (samples > 0)
 	{
 		/* step */

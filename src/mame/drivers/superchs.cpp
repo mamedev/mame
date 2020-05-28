@@ -210,7 +210,7 @@ void superchs_state::superchs(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &superchs_state::superchs_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(superchs_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(480); /* Need to interleave CPU 1 & 3 */
+	config.set_maximum_quantum(attotime::from_hz(480)); /* Need to interleave CPU 1 & 3 */
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -551,8 +551,8 @@ READ16_MEMBER(superchs_state::sub_cycle_r)
 void superchs_state::init_superchs()
 {
 	/* Speedup handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x100003, read32_delegate(FUNC(superchs_state::main_cycle_r),this));
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x80000a, 0x80000b, read16_delegate(FUNC(superchs_state::sub_cycle_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x100003, read32_delegate(*this, FUNC(superchs_state::main_cycle_r)));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x80000a, 0x80000b, read16_delegate(*this, FUNC(superchs_state::sub_cycle_r)));
 }
 
 GAMEL( 1992, superchs,   0,        superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito Corporation Japan",   "Super Chase - Criminal Termination (World)", 0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2O

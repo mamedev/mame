@@ -24,8 +24,9 @@ public:
 	template <typename T> void set_ramtag(T &&tag) { m_ram.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_isatag(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -35,7 +36,7 @@ private:
 	required_device<cpu_device> m_cpu;
 	address_space* m_space;
 	required_device<ram_device> m_ram;
-	required_region_ptr<uint8_t> m_rom;
+	required_region_ptr<uint32_t> m_rom;
 
 	uint8_t m_reg[0x100];
 	uint8_t m_reg_select;

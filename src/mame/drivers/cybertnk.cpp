@@ -4,7 +4,7 @@
 
 Cyber Tank HW (c) 1987/1988 Coreland Technology
 
-preliminary driver by Angelo Salese & David Haywood
+driver by Angelo Salese & David Haywood
 
 Maybe it has some correlation with WEC Le Mans HW? (supposedly that was originally done by Coreland too)
 
@@ -229,15 +229,15 @@ private:
 
 	tilemap_t *m_tilemap[3];
 
-	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
+	template<int Layer> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint8_t m_mux_data;
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(io_rdy_r);
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_WRITE8_MEMBER(cnt_w);
+	void sound_cmd_w(offs_t offset, uint8_t data);
+	void mux_w(offs_t offset, uint8_t data);
+	uint8_t io_rdy_r();
+	uint8_t mux_r();
+	void irq_ack_w(offs_t offset, uint8_t data);
+	void cnt_w(offs_t offset, uint8_t data);
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
@@ -267,7 +267,7 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tile_info)
 	int pal = (code & 0xe000) >> 13;
 	pal     |=(code & 0x1c00) >> 7;
 
-	SET_TILE_INFO_MEMBER(Layer,
+	tileinfo.set(Layer,
 			code & 0x1fff,
 			pal,
 			0);
@@ -275,13 +275,13 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tile_info)
 
 void cybertnk_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cybertnk_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8,128,32);
 	m_tilemap[0]->set_transparent_pen(0);
 
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cybertnk_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8,128,32);
 	m_tilemap[1]->set_transparent_pen(0);
 
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<2>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cybertnk_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 8,8,128,32);
 	m_tilemap[2]->set_transparent_pen(0);
 }
 
@@ -499,14 +499,14 @@ uint32_t cybertnk_state::screen_update_cybertnk_left(screen_device &screen, bitm
 uint32_t cybertnk_state::screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, -256); }
 
 template<int Layer>
-WRITE16_MEMBER(cybertnk_state::vram_w)
+void cybertnk_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER( cybertnk_state::sound_cmd_w )
+void cybertnk_state::sound_cmd_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -519,7 +519,7 @@ WRITE8_MEMBER( cybertnk_state::sound_cmd_w )
 }
 
 
-WRITE8_MEMBER( cybertnk_state::mux_w )
+void cybertnk_state::mux_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -533,13 +533,13 @@ WRITE8_MEMBER( cybertnk_state::mux_w )
 	}
 }
 
-READ8_MEMBER( cybertnk_state::io_rdy_r )
+uint8_t cybertnk_state::io_rdy_r()
 {
 	// bit 0: i/o controller busy?
 	return 0;
 }
 
-READ8_MEMBER( cybertnk_state::mux_r )
+uint8_t cybertnk_state::mux_r()
 {
 	switch (m_mux_data & 0x60)
 	{
@@ -560,7 +560,7 @@ READ8_MEMBER( cybertnk_state::mux_r )
 }
 
 /* Amusingly the data written here is pretty weird, it seems suited for an unused protection device (attract = coin count, in-game = return status of some inputs) */
-WRITE8_MEMBER( cybertnk_state::irq_ack_w )
+void cybertnk_state::irq_ack_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -573,12 +573,12 @@ WRITE8_MEMBER( cybertnk_state::irq_ack_w )
 	}
 }
 
-WRITE8_MEMBER( cybertnk_state::cnt_w )
+void cybertnk_state::cnt_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
 		// count counters / lamps?
-		// writes 04 / 00 atlternating during attract mode
+		// writes 04 / 00 alternating during attract mode
 		// writes 01 or 02 when coins are inserted depending on slot
 	}
 	else if (offset == 1)
@@ -833,7 +833,7 @@ void cybertnk_state::cybertnk(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(3'579'545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cybertnk_state::sound_mem);
 
-	config.m_minimum_quantum = attotime::from_hz(60000); //arbitrary value, needed to get the communication to work
+	config.set_maximum_quantum(attotime::from_hz(60000)); //arbitrary value, needed to get the communication to work
 
 	/* video hardware */
 	config.set_default_layout(layout_dualhsxs);

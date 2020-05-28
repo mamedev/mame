@@ -67,7 +67,7 @@ public:
 
 	void scyclone(machine_config &config);
 
-	CUSTOM_INPUT_MEMBER(collision_r);
+	DECLARE_READ_LINE_MEMBER(collision_r);
 
 private:
 	DECLARE_WRITE8_MEMBER(vidctrl_w);
@@ -339,8 +339,8 @@ void scyclone_state::scyclone_sub_map(address_map &map)
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("dac", FUNC(dac_byte_interface::data_w)); // music
 	map(0x3001, 0x3001).w(FUNC(scyclone_state::snd_3001_w)); // written at the same time, with the same data as 0x3005
 	map(0x3002, 0x3002).w("dac2", FUNC(dac_byte_interface::data_w)); // speech
-//  AM_RANGE(0x3003, 0x3003) AM_WRITE(snd_3003_w) // writes 02 or 00
-//  AM_RANGE(0x3004, 0x3004) AM_WRITE(snd_3004_w) // always writes 00?
+//  map(0x3003, 0x3003).w(FUNC(scyclone_state::snd_3003_w)); // writes 02 or 00
+//  map(0x3004, 0x3004).w(FUNC(scyclone_state::snd_3004_w)); // always writes 00?
 	map(0x3005, 0x3005).w(FUNC(scyclone_state::snd_3005_w)); // written at the same time, with the same data as 0x3001
 }
 
@@ -353,7 +353,7 @@ void scyclone_state::scyclone_sub_iomap(address_map &map)
 // appears to be when a white bitmap pixel (col 0x7) collides with a large sprite?
 // if you simply set it to 1 and shoot in the left corner, the game gets stuck
 // but if you have it set to 0 there are no collisions with large objects
-CUSTOM_INPUT_MEMBER(scyclone_state::collision_r)
+READ_LINE_MEMBER(scyclone_state::collision_r)
 {
 	return m_hascollided;
 }
@@ -371,7 +371,7 @@ static INPUT_PORTS_START( scyclone )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scyclone_state, collision_r, nullptr) // hw collision?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(scyclone_state, collision_r) // hw collision?
 	// maybe these 4 are the 4xdsw bank?
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )

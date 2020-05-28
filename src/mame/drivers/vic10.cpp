@@ -23,7 +23,6 @@
 #include "sound/mos6581.h"
 #include "video/mos6566.h"
 
-#define M6510_TAG       "u3"
 #define MOS6566_TAG     "u2"
 #define MOS6581_TAG     "u6"
 #define MOS6526_TAG     "u9"
@@ -37,7 +36,7 @@ class vic10_state : public driver_device
 public:
 	vic10_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, M6510_TAG),
+		m_maincpu(*this, "u3"),
 		m_vic(*this, MOS6566_TAG),
 		m_sid(*this, MOS6581_TAG),
 		m_cia(*this, MOS6526_TAG),
@@ -645,17 +644,16 @@ void vic10_state::vic10(machine_config &config)
 	// basic hardware
 	M6510(config, m_maincpu, XTAL(8'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vic10_state::vic10_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(vic10_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(vic10_state::cpu_w));
 	m_maincpu->set_pulls(0x10, 0x20);
-	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
 
 	// video hardware
 	mos8566_device &mos8566(MOS8566(config, MOS6566_TAG, XTAL(8'000'000)/8));
-	mos8566.set_cpu(M6510_TAG);
+	mos8566.set_cpu(m_maincpu);
 	mos8566.irq_callback().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	mos8566.set_screen(SCREEN_TAG);
 	mos8566.set_addrmap(0, &vic10_state::vic_videoram_map);

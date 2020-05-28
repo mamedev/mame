@@ -95,14 +95,13 @@
 
 #pragma once
 
+#include <type_traits>
+#include <utility>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-class palette_device;
-typedef device_delegate<void (palette_device &)> palette_init_delegate;
-
 
 // ======================> raw_to_rgb_converter
 
@@ -271,31 +270,22 @@ public:
 
 	template <typename T>
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_444_prom_t, T &&region, u32 entries)
-		: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_444_proms), tag, this), entries)
+		: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_rgb_444_proms)), entries)
 	{
 		set_prom_region(std::forward<T>(region));
 	}
 
-	// FIXME: these should be aware of current device for resolving the tag
-	template <class FunctionClass>
-	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, void (FunctionClass::*init)(palette_device &), const char *name, u32 entries = 0U, u32 indirect = 0U)
-		: palette_device(mconfig, tag, owner, init_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr)), entries, indirect)
-	{ }
-	template <class FunctionClass>
-	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, void (FunctionClass::*init)(palette_device &) const, const char *name, u32 entries = 0U, u32 indirect = 0U)
-		: palette_device(mconfig, tag, owner, init_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr)), entries, indirect)
-	{ }
-	template <class FunctionClass>
-	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *devname, void (FunctionClass::*init)(palette_device &), const char *name, u32 entries = 0U, u32 indirect = 0U)
-		: palette_device(mconfig, tag, owner, init_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr)), entries, indirect)
-	{ }
-	template <class FunctionClass>
-	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *devname, void (FunctionClass::*init)(palette_device &) const, const char *name, u32 entries = 0U, u32 indirect = 0U)
-		: palette_device(mconfig, tag, owner, init_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr)), entries, indirect)
-	{ }
+	template <typename F>
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, F &&init, std::enable_if_t<init_delegate::supports_callback<F>::value, const char *> name, u32 entries = 0U, u32 indirect = 0U)
+		: palette_device(mconfig, tag, owner, 0U)
+	{ set_init(std::forward<F>(init), name).set_entries(entries, indirect); }
+	template <typename T, typename F>
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&devname, F &&init, std::enable_if_t<init_delegate::supports_callback<F>::value, const char *> name, u32 entries = 0U, u32 indirect = 0U)
+		: palette_device(mconfig, tag, owner, 0U)
+	{ set_init(std::forward<T>(devname), std::forward<F>(init), name).set_entries(entries, indirect); }
 
 	// configuration
-	template <typename Object> void set_init(Object &&init) { m_init = std::forward<Object>(init); }
+	template <typename... T> palette_device &set_init(T &&... args) { m_init.set(std::forward<T>(args)...); return *this; }
 	palette_device &set_format(raw_to_rgb_converter raw_to_rgb) { m_raw_to_rgb = raw_to_rgb; return *this; }
 	palette_device &set_format(int bytes_per_entry, raw_to_rgb_converter::raw_to_rgb_func func, u32 entries);
 	palette_device &set_format(rgb_332_t, u32 entries);
@@ -346,28 +336,6 @@ public:
 	palette_device &enable_shadows() { m_enable_shadows = true; return *this; }
 	palette_device &enable_hilights() { m_enable_hilights = true; return *this; }
 	template <typename T> palette_device &set_prom_region(T &&region) { m_prom_region.set_tag(std::forward<T>(region)); return *this; }
-
-	// FIXME: these should be aware of current device for resolving the tag
-	template <class FunctionClass>
-	void set_init(void (FunctionClass::*init)(palette_device &), const char *name)
-	{
-		m_init = init_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
-	}
-	template <class FunctionClass>
-	void set_init(void (FunctionClass::*init)(palette_device &) const, const char *name)
-	{
-		m_init = init_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
-	}
-	template <class FunctionClass>
-	void set_init(const char *devname, void (FunctionClass::*init)(palette_device &), const char *name)
-	{
-		m_init = init_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
-	}
-	template <class FunctionClass>
-	void set_init(const char *devname, void (FunctionClass::*init)(palette_device &) const, const char *name)
-	{
-		m_init = init_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
-	}
 
 	// palette RAM accessors
 	memory_array &basemem() { return m_paletteram; }

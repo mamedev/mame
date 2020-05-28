@@ -59,11 +59,11 @@ private:
 
 	tilemap_t *m_sc0_tilemap;
 
-	DECLARE_WRITE8_MEMBER(sc0_lovram);
-	DECLARE_WRITE8_MEMBER(sc0_hivram);
-	DECLARE_WRITE8_MEMBER(sc0_cram);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(prot_latch_r);
+	void sc0_lovram(offs_t offset, uint8_t data);
+	void sc0_hivram(offs_t offset, uint8_t data);
+	void sc0_cram(offs_t offset, uint8_t data);
+	void bank_w(uint8_t data);
+	uint8_t prot_latch_r();
 
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 
@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(d9final_state::get_sc0_tile_info)
 	int tile = ((m_hi_vram[tile_index] & 0x3f)<<8) | m_lo_vram[tile_index];
 	int color = m_cram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -90,7 +90,7 @@ TILE_GET_INFO_MEMBER(d9final_state::get_sc0_tile_info)
 
 void d9final_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(d9final_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(d9final_state::get_sc0_tile_info)), TILEMAP_SCAN_ROWS, 8,8,64,32);
 }
 
 uint32_t d9final_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -99,31 +99,31 @@ uint32_t d9final_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-WRITE8_MEMBER(d9final_state::sc0_lovram)
+void d9final_state::sc0_lovram(offs_t offset, uint8_t data)
 {
 	m_lo_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(d9final_state::sc0_hivram)
+void d9final_state::sc0_hivram(offs_t offset, uint8_t data)
 {
 	m_hi_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(d9final_state::sc0_cram)
+void d9final_state::sc0_cram(offs_t offset, uint8_t data)
 {
 	m_cram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(d9final_state::bank_w)
+void d9final_state::bank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x7);
 }
 
 /* game checks this after three attract cycles, otherwise coin inputs stop to work. */
-READ8_MEMBER(d9final_state::prot_latch_r)
+uint8_t d9final_state::prot_latch_r()
 {
 //  printf("PC=%06x\n",m_maincpu->pc());
 
@@ -141,14 +141,14 @@ void d9final_state::d9final_map(address_map &map)
 	map(0xd000, 0xd7ff).ram().w(FUNC(d9final_state::sc0_lovram)).share("lo_vram");
 	map(0xd800, 0xdfff).ram().w(FUNC(d9final_state::sc0_hivram)).share("hi_vram");
 	map(0xe000, 0xe7ff).ram().w(FUNC(d9final_state::sc0_cram)).share("cram");
-	map(0xf000, 0xf007).r(FUNC(d9final_state::prot_latch_r)); //AM_DEVREADWRITE("essnd", es8712_device, read, write)
+	map(0xf000, 0xf007).r(FUNC(d9final_state::prot_latch_r)); //.rw("essnd", FUNC(es8712_device::read), FUNC(es8712_device::write));
 	map(0xf800, 0xf80f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
 }
 
 void d9final_state::d9final_io(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0x00, 0x00) AM_WRITENOP //bit 0: irq enable? screen enable?
+//  map(0x00, 0x00).nopw(); //bit 0: irq enable? screen enable?
 	map(0x00, 0x00).portr("DSWA");
 	map(0x20, 0x20).portr("DSWB");
 	map(0x40, 0x40).portr("DSWC");

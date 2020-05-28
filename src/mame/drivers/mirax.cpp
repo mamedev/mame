@@ -335,7 +335,7 @@ void mirax_state::mirax_main_map(address_map &map)
 	map(0xf400, 0xf400).portr("DSW2");
 	map(0xf500, 0xf507).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xf800, 0xf800).w(FUNC(mirax_state::sound_cmd_w));
-//  AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
+//  map(0xf900, 0xf900) //sound cmd mirror? ack?
 }
 
 void mirax_state::mirax_sound_map(address_map &map)

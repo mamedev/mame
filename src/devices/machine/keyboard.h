@@ -79,18 +79,11 @@ public:
 			device_t *owner,
 			u32 clock);
 
-	template <class FunctionClass>
-	void set_keyboard_callback(void (FunctionClass::*callback)(u8 character), const char *name)
+	template <typename... T>
+	void set_keyboard_callback(T &&... args)
 	{
-		set_keyboard_callback(output_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+		m_keyboard_cb.set(std::forward<T>(args)...);
 	}
-	// FIXME: this should be aware of current device for resolving the tag
-	template <class FunctionClass>
-	void set_keyboard_callback(const char *devname, void (FunctionClass::*callback)(u8 character), const char *name)
-	{
-		set_keyboard_callback(output_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_keyboard_callback(output_delegate callback) { m_keyboard_cb = callback; }
 
 	virtual ioport_constructor device_input_ports() const override;
 

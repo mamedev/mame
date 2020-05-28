@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -277,22 +277,21 @@ namespace bgfx
 		return (_a + _b + _c) * 1.0f/3.0f;
 	}
 
-	const float* vertexPos(const void* _vertices, uint32_t _stride, uint32_t _index)
+	const bx::Vec3 vertexPos(const void* _vertices, uint32_t _stride, uint32_t _index)
 	{
 		const uint8_t* vertices = (const uint8_t*)_vertices;
-		return (const float*)&vertices[_index*_stride];
+		return bx::load<bx::Vec3>(&vertices[_index*_stride]);
 	}
 
-	inline float distanceDir(const float* __restrict _dir, const void* __restrict _vertices, uint32_t _stride, uint32_t _index)
+	inline float distanceDir(const float* _dir, const void* _vertices, uint32_t _stride, uint32_t _index)
 	{
-		return bx::vec3Dot(vertexPos(_vertices, _stride, _index), _dir);
+		return bx::dot(vertexPos(_vertices, _stride, _index), bx::load<bx::Vec3>(_dir) );
 	}
 
-	inline float distancePos(const float* __restrict _pos, const void* __restrict _vertices, uint32_t _stride, uint32_t _index)
+	inline float distancePos(const float* _pos, const void* _vertices, uint32_t _stride, uint32_t _index)
 	{
-		float tmp[3];
-		bx::vec3Sub(tmp, _pos, vertexPos(_vertices, _stride, _index) );
-		return bx::sqrt(bx::vec3Dot(tmp, tmp) );
+		const bx::Vec3 tmp = bx::sub(bx::load<bx::Vec3>(_pos), vertexPos(_vertices, _stride, _index) );
+		return bx::sqrt(bx::dot(tmp, tmp) );
 	}
 
 	typedef float (*KeyFn)(float, float, float);
@@ -300,10 +299,10 @@ namespace bgfx
 
 	template<typename IndexT, DistanceFn dfn, KeyFn kfn, uint32_t xorBits>
 	inline void calcSortKeys(
-		  uint32_t* __restrict _keys
-		, uint32_t* __restrict _values
+		  uint32_t* _keys
+		, uint32_t* _values
 		, const float _dirOrPos[3]
-		, const void* __restrict _vertices
+		, const void* _vertices
 		, uint32_t _stride
 		, const IndexT* _indices
 		, uint32_t _num

@@ -44,7 +44,5 @@ void bbc_rom_device::device_start()
 
 uint8_t bbc_rom_device::read(offs_t offset)
 {
-	uint32_t size = std::min((int32_t)get_rom_size(), 0x4000);
-
-	return get_rom_base()[offset & (size - 1)];
+	return get_rom_base()[offset & (get_rom_size() - 1)];
 }

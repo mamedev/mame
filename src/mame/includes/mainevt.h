@@ -49,10 +49,10 @@ private:
 	DECLARE_WRITE8_MEMBER(dv_sh_bankswitch_w);
 	uint32_t screen_update_mainevt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(dv_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(dv_vblank_w);
 	INTERRUPT_GEN_MEMBER(mainevt_sound_timer_irq);
 	INTERRUPT_GEN_MEMBER(devstors_sound_timer_irq);
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(uint8_t data);
 	K052109_CB_MEMBER(mainevt_tile_callback);
 	K052109_CB_MEMBER(dv_tile_callback);
 	K051960_CB_MEMBER(mainevt_sprite_callback);

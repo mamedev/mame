@@ -9,6 +9,7 @@
 
     Notes:
     - To enter test mode, hold down 1P Start and 2P Start, then reset
+      (only works for version 9.0)
     - One of the ROMs contains a message that this game was created
       by "Pacific Polytechnical Corporation, Santa Cruz"
 
@@ -73,25 +74,25 @@ public:
 	void dac_update_cb();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void palette_init(palette_device &palette);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_READ8_MEMBER(line_r);
+	void palette_w(offs_t offset, uint8_t data);
+	uint8_t line_r();
 
 	DECLARE_WRITE_LINE_MEMBER(noise_w);
-	DECLARE_WRITE8_MEMBER(dac_w);
-	DECLARE_READ8_MEMBER(via_audio_pa_r);
-	DECLARE_WRITE8_MEMBER(via_audio_pa_w);
-	DECLARE_WRITE8_MEMBER(via_audio_pb_w);
+	void dac_w(offs_t offset, uint8_t data);
+	uint8_t via_audio_pa_r();
+	void via_audio_pa_w(uint8_t data);
+	void via_audio_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ptm_o1_w);
 	DECLARE_WRITE_LINE_MEMBER(ptm_o2_w);
 	DECLARE_WRITE_LINE_MEMBER(ptm_o3_w);
 	DECLARE_WRITE_LINE_MEMBER(dmod_clr_w);
 	DECLARE_WRITE_LINE_MEMBER(dmod_data_w);
 
-	DECLARE_READ8_MEMBER(via_system_pa_r);
-	DECLARE_READ8_MEMBER(via_system_pb_r);
-	DECLARE_WRITE8_MEMBER(via_system_pa_w);
-	DECLARE_WRITE8_MEMBER(via_system_pb_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	uint8_t via_system_pa_r();
+	uint8_t via_system_pb_r();
+	void via_system_pa_w(uint8_t data);
+	void via_system_pb_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
 
 	void beezer(machine_config &config);
 	void banked_map(address_map &map);
@@ -175,8 +176,8 @@ void beezer_state::sound_map(address_map &map)
 	map(0x1000, 0x1007).mirror(0x07f8).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x1800, 0x180f).mirror(0x07f0).m(m_via_audio, FUNC(via6522_device::map));
 	map(0x8000, 0x8003).mirror(0x1ffc).w(FUNC(beezer_state::dac_w));
-//  AM_RANGE(0xa000, 0xbfff) AM_ROM // 2d (can be ram, unpopulated)
-//  AM_RANGE(0xc000, 0xdfff) AM_ROM // 4d (unpopulated)
+//  map(0xa000, 0xbfff).rom(); // 2d (can be ram, unpopulated)
+//  map(0xc000, 0xdfff).rom(); // 4d (unpopulated)
 	map(0xe000, 0xffff).rom().region("audiocpu", 0); // 6d
 }
 
@@ -276,7 +277,7 @@ void beezer_state::palette_init(palette_device &device)
 		2, resistances_b,  m_weights_b, 680, 150);
 }
 
-WRITE8_MEMBER( beezer_state::palette_w )
+void beezer_state::palette_w(offs_t offset, uint8_t data)
 {
 	int r = combine_weights(m_weights_r, BIT(data, 0), BIT(data, 1), BIT(data, 2));
 	int g = combine_weights(m_weights_g, BIT(data, 3), BIT(data, 4), BIT(data, 5));
@@ -285,7 +286,7 @@ WRITE8_MEMBER( beezer_state::palette_w )
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
-READ8_MEMBER( beezer_state::line_r )
+uint8_t beezer_state::line_r()
 {
 	// d2 to d7 connected to hex buffer u34
 	return m_screen->vpos() & 0xfc;
@@ -302,7 +303,7 @@ void beezer_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	{
 	case TIMER_DAC: dac_update_cb(); break;
 	case TIMER_SCANLINE: scanline_cb(); break;
-	default: assert_always(false, "Unknown id in beezer_state::device_timer");
+	default: throw emu_fatalerror("Unknown id in beezer_state::device_timer");
 	}
 }
 
@@ -330,22 +331,22 @@ WRITE_LINE_MEMBER( beezer_state::noise_w )
 	m_via_audio->write_pb6(m_noise);
 }
 
-WRITE8_MEMBER( beezer_state::dac_w )
+void beezer_state::dac_w(offs_t offset, uint8_t data)
 {
 	m_dac_data[offset] = data;
 }
 
-READ8_MEMBER( beezer_state::via_audio_pa_r )
+uint8_t beezer_state::via_audio_pa_r()
 {
 	return m_pbus;
 }
 
-WRITE8_MEMBER( beezer_state::via_audio_pa_w )
+void beezer_state::via_audio_pa_w(uint8_t data)
 {
 	m_pbus = data;
 }
 
-WRITE8_MEMBER( beezer_state::via_audio_pb_w )
+void beezer_state::via_audio_pb_w(uint8_t data)
 {
 	// bit 0 - dmod disable
 	// bit 1 - fm or am
@@ -395,7 +396,7 @@ WRITE_LINE_MEMBER( beezer_state::dmod_data_w )
 //  MACHINE EMULATION
 //**************************************************************************
 
-READ8_MEMBER( beezer_state::via_system_pa_r )
+uint8_t beezer_state::via_system_pa_r()
 {
 	uint8_t data = 0;
 
@@ -407,7 +408,7 @@ READ8_MEMBER( beezer_state::via_system_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER(beezer_state::via_system_pa_w)
+void beezer_state::via_system_pa_w(uint8_t data)
 {
 	// bit 3, audio cpu reset line
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
@@ -434,17 +435,17 @@ WRITE8_MEMBER(beezer_state::via_system_pa_w)
 	}
 }
 
-READ8_MEMBER( beezer_state::via_system_pb_r )
+uint8_t beezer_state::via_system_pb_r()
 {
 	return m_pbus;
 }
 
-WRITE8_MEMBER( beezer_state::via_system_pb_w )
+void beezer_state::via_system_pb_w(uint8_t data)
 {
 	m_pbus = data;
 }
 
-WRITE8_MEMBER( beezer_state::bankswitch_w )
+void beezer_state::bankswitch_w(uint8_t data)
 {
 	m_x = BIT(data, 3);
 	m_y = BIT(data, 4);
@@ -467,8 +468,8 @@ void beezer_state::machine_start()
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 
 	// register for state saving
-	save_pointer(NAME(m_ch_sign), 4);
-	save_pointer(NAME(m_dac_data), 4);
+	save_item(NAME(m_ch_sign));
+	save_item(NAME(m_dac_data));
 	save_item(NAME(m_count));
 	save_item(NAME(m_noise));
 	save_item(NAME(m_pbus));
@@ -482,7 +483,7 @@ void beezer_state::machine_reset()
 	m_pbus = 0xff;
 
 	// initialize memory banks
-	bankswitch_w(machine().dummy_space(), 0, 0);
+	bankswitch_w(0);
 
 	// start timer
 	m_dac_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL(4'000'000) / 4) / 16));
@@ -631,5 +632,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY            FULLNAME          FLAGS
-GAME( 1982, beezer,  0,      beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (set 1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, beezer1, beezer, beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (set 2)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, beezer,  0,      beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (version 9.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Has test mode, shows version
+GAME( 1982, beezer1, beezer, beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (unknown earlier version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // No test mode, possibly earlier?

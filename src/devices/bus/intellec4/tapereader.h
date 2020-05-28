@@ -29,13 +29,13 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t  image_type()       const override { return IO_PUNCHTAPE; }
-	virtual bool        is_readable()      const override { return true; }
-	virtual bool        is_writeable()     const override { return false; }
-	virtual bool        is_creatable()     const override { return false; }
-	virtual bool        must_be_loaded()   const override { return false; }
-	virtual bool        is_reset_on_load() const override { return false; }
-	virtual char const *file_extensions()  const override { return "bnpf,hex,lst,txt"; }
+	virtual iodevice_t  image_type()       const noexcept override { return IO_PUNCHTAPE; }
+	virtual bool        is_readable()      const noexcept override { return true; }
+	virtual bool        is_writeable()     const noexcept override { return false; }
+	virtual bool        is_creatable()     const noexcept override { return false; }
+	virtual bool        must_be_loaded()   const noexcept override { return false; }
+	virtual bool        is_reset_on_load() const noexcept override { return false; }
+	virtual char const *file_extensions()  const noexcept override { return "bnpf,hex,lst,txt"; }
 
 protected:
 	virtual void device_start() override;

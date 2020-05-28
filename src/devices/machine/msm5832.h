@@ -40,8 +40,8 @@ public:
 	// construction/destruction
 	msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t data_r();
+	void data_w(uint8_t data);
 
 	void address_w(uint8_t data);
 

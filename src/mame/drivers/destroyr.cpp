@@ -47,11 +47,11 @@ private:
 		TIMER_DESTROYR_FRAME
 	};
 
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(cursor_load_w);
-	DECLARE_WRITE8_MEMBER(interrupt_ack_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(scanline_r);
+	void misc_w(uint8_t data);
+	void cursor_load_w(uint8_t data);
+	void interrupt_ack_w(uint8_t data);
+	uint8_t input_r(offs_t offset);
+	uint8_t scanline_r();
 
 	void destroyr_palette(palette_device &palette) const;
 
@@ -170,7 +170,7 @@ void destroyr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		frame_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in destroyr_state::device_timer");
+		throw emu_fatalerror("Unknown id in destroyr_state::device_timer");
 	}
 }
 
@@ -222,7 +222,7 @@ void destroyr_state::machine_reset()
 }
 
 
-WRITE8_MEMBER(destroyr_state::misc_w)
+void destroyr_state::misc_w(uint8_t data)
 {
 	/* bits 0 to 2 connect to the sound circuits */
 	m_attract = data & 0x01;
@@ -237,20 +237,20 @@ WRITE8_MEMBER(destroyr_state::misc_w)
 }
 
 
-WRITE8_MEMBER(destroyr_state::cursor_load_w)
+void destroyr_state::cursor_load_w(uint8_t data)
 {
 	m_cursor = data;
 	m_watchdog->watchdog_reset();
 }
 
 
-WRITE8_MEMBER(destroyr_state::interrupt_ack_w)
+void destroyr_state::interrupt_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-READ8_MEMBER(destroyr_state::input_r)
+uint8_t destroyr_state::input_r(offs_t offset)
 {
 	if (offset & 1)
 	{
@@ -271,7 +271,7 @@ READ8_MEMBER(destroyr_state::input_r)
 }
 
 
-READ8_MEMBER(destroyr_state::scanline_r)
+uint8_t destroyr_state::scanline_r()
 {
 	return m_screen->vpos();
 }

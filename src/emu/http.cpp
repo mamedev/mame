@@ -7,12 +7,13 @@ http.cpp
 HTTP server handling
 
 ***************************************************************************/
+#include "emu.h"
+
 #ifdef __sun
 #define ASIO_DISABLE_DEV_POLL
 #define ASIO_HAS_EPOLL
 #endif
 
-#include "emu.h"
 #include "server_ws_impl.hpp"
 #include "server_http_impl.hpp"
 #include <fstream>
@@ -126,7 +127,7 @@ public:
 	std::size_t m_path_end;
 	std::size_t m_query_end;
 
-	http_request_impl(std::shared_ptr<webpp::Request> request) : m_request(request) {
+	http_request_impl(std::shared_ptr<webpp::Request> request) : m_request(std::move(request)) {
 		std::size_t len = m_request->path.length();
 
 		m_fragment = m_request->path.find('#');
@@ -194,7 +195,7 @@ struct http_response_impl : public http_manager::http_response {
 	std::stringstream m_headers;
 	std::stringstream m_body;
 
-	http_response_impl(std::shared_ptr<webpp::Response> response) : m_response(response) { }
+	http_response_impl(std::shared_ptr<webpp::Response> response) : m_response(std::move(response)) { }
 
 	virtual ~http_response_impl() = default;
 
@@ -237,10 +238,10 @@ struct websocket_endpoint_impl : public http_manager::websocket_endpoint {
 		http_manager::websocket_close_handler on_close,
 		http_manager::websocket_error_handler on_error)
 	: m_endpoint(endpoint) {
-		this->on_open = on_open;
-		this->on_message = on_message;
-		this->on_close = on_close;
-		this->on_error = on_error;
+		this->on_open = std::move(on_open);
+		this->on_message = std::move(on_message);
+		this->on_close = std::move(on_close);
+		this->on_error = std::move(on_error);
 	}
 };
 
@@ -294,8 +295,8 @@ http_manager::http_manager(bool active, short port, const char *root)
 		}
 
 		// Determine the file extension.
-		std::size_t last_slash_pos = path.find_last_of("/");
-		std::size_t last_dot_pos = path.find_last_of(".");
+		std::size_t last_slash_pos = path.find_last_of('/');
+		std::size_t last_dot_pos = path.find_last_of('.');
 		std::string extension;
 		if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos)
 		{
@@ -544,21 +545,21 @@ http_manager::websocket_endpoint_ptr http_manager::add_endpoint(const std::strin
 		auto endpoint_impl = std::make_shared<websocket_endpoint_impl>(endpoint_ptr, on_open, on_message, on_close, on_error);
 
 		endpoint.on_open = [&, this, endpoint_impl](std::shared_ptr<webpp::Connection> connection) {
-			this->on_open(endpoint_impl, connection);
+			this->on_open(endpoint_impl, std::move(connection));
 		};
 
 		endpoint.on_message = [&, this, endpoint_impl](std::shared_ptr<webpp::Connection> connection, std::shared_ptr<webpp::ws_server::Message> message) {
 			std::string payload = message->string();
 			int opcode = message->fin_rsv_opcode & 0x0f;
-			this->on_message(endpoint_impl, connection, payload, opcode);
+			this->on_message(endpoint_impl, std::move(connection), payload, opcode);
 		};
 
 		endpoint.on_close = [&, this, endpoint_impl](std::shared_ptr<webpp::Connection> connection, int status, const std::string& reason) {
-			this->on_close(endpoint_impl, connection, status, reason);
+			this->on_close(endpoint_impl, std::move(connection), status, reason);
 		};
 
 		endpoint.on_error = [&, this, endpoint_impl](std::shared_ptr<webpp::Connection> connection, const std::error_code& error_code) {
-			this->on_error(endpoint_impl, connection, error_code);
+			this->on_error(endpoint_impl, std::move(connection), error_code);
 		};
 
 		m_endpoints[path] = endpoint_impl;

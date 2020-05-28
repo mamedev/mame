@@ -1,261 +1,739 @@
 #!/usr/bin/python
 ##
 ## license:BSD-3-Clause
-## copyright-holders:Miodrag Milanovic
+## copyright-holders:Vas Crabb
 
-from __future__ import with_statement
-
+import argparse
+import io
+import os.path
 import sys
-## to ignore include of emu.h add it always to list
 
-files_included = ['src/emu/emu.h']
 
-include_dirs = ['src/emu/', 'src/devices/', 'src/mame/', 'src/lib/']
+class ParserBase(object):
+    def process_lines(self, f):
+        self.input_line = 1
+        for line in f:
+            pos = 0
+            start = 0
+            if line.endswith('\n'):
+                line = line[:-1]
+            used = 0
+            while used is not None:
+                start += used
+                used = self.processors[self.parse_state](line[start:])
+            self.input_line += 1
 
-mappings = dict()
 
-deps_files_included = [ ]
+class CppParser(ParserBase):
+    TOKEN_LEAD = frozenset(
+            [chr(x) for x in range(ord('A'), ord('Z') + 1)] +
+            [chr(x) for x in range(ord('a'), ord('z') + 1)] +
+            ['_'])
+    TOKEN_CONTINUATION = frozenset(
+            [chr(x) for x in range(ord('0'), ord('9') + 1)] +
+            [chr(x) for x in range(ord('A'), ord('Z') + 1)] +
+            [chr(x) for x in range(ord('a'), ord('z') + 1)] +
+            ['_'])
+    HEXADECIMAL_DIGIT = frozenset(
+            [chr(x) for x in range(ord('0'), ord('9') + 1)] +
+            [chr(x) for x in range(ord('A'), ord('F') + 1)] +
+            [chr(x) for x in range(ord('a'), ord('f') + 1)])
 
-deps_include_dirs = ['src/mame/']
-
-components = [ ]
-
-drivers = [ ]
-
-def file_exists(root, srcfile, folder, inc_dir):
-    includes = [ folder ]
-    includes.extend(inc_dir)
-    for line in includes:
-        try:
-            fp = open(root + line + srcfile, 'r')
-            fp.close()
-            return line + srcfile
-        except IOError:
+    class Handler(object):
+        def line(self, text):
             pass
-    return ''
 
-def add_c_if_exists(root, fullname):
-    try:
-        fp = open(root + fullname, 'r')
-        fp.close()
-        deps_files_included.append(fullname)
-    except IOError:
-        pass
+        def comment(self, text):
+            pass
 
-def add_rest_if_exists(root, srcfile,folder):
-    t = srcfile.rsplit('/', 2)
-    if t[1]=='includes':
-        t[2] = t[2].replace('.h','.cpp')
-        t[1] = 'drivers'     
-        add_c_if_exists(root,"/".join(t))
-        parse_file_for_deps(root, "/".join(t), folder)
-        t[1] = 'machine'     
-        add_c_if_exists(root,"/".join(t))
-        parse_file_for_deps(root, "/".join(t), folder)
-        t[1] = 'video'     
-        add_c_if_exists(root,"/".join(t))
-        parse_file_for_deps(root, "/".join(t), folder)
-        t[1] = 'audio'
-        add_c_if_exists(root,"/".join(t))
-        parse_file_for_deps(root, "/".join(t), folder)
+        def line_comment(self, text):
+            pass
 
-def parse_file_for_deps(root, srcfile, folder):
-    try:
-        fp = open(root + srcfile, 'r')
-    except IOError:
-        return 1
-    in_comment = 0
-    linenum = 0
-    for line in fp.readlines():
-        content = ''
-        linenum+=1
-        srcptr = 0
-        while srcptr < len(line):
-            c = line[srcptr]
-            srcptr+=1
-            if ord(c)==13 or ord(c)==10:
-                if ord(c)==13 and ord(line[srcptr])==10:
-                    srcptr+=1
-                continue
-            if c==' ' or ord(c)==9:
-                continue
-            if in_comment==1 and c=='*' and line[srcptr]=='/' :
-                srcptr+=1
-                in_comment = 0
-                continue
-            if in_comment:
-                continue
-            if c=='/' and line[srcptr]=='*' :
-                srcptr+=1
-                in_comment = 1
-                continue
-            if c=='/' and line[srcptr]=='/' :
-                break
-            content += c
-        content = content.strip()
-        if len(content)>0:
-            if content.startswith('#include'):
-               name = content[8:]
-               name = name.replace('"','')
-               fullname = file_exists(root, name, folder,deps_include_dirs)
-               if fullname in deps_files_included:
-                   continue
-               if fullname!='':
-                   deps_files_included.append(fullname)
-                   add_c_if_exists(root, fullname.replace('.h','.cpp'))
-                   add_rest_if_exists(root, fullname,folder)
-                   newfolder = fullname.rsplit('/', 1)[0] + '/'
-                   parse_file_for_deps(root, fullname, newfolder)
-               continue
-    fp.close()
-    return 0
+    class ParseState(object):
+        DEFAULT = 0
+        COMMENT = 1
+        LINE_COMMENT = 2
+        TOKEN = 3
+        STRING_CONSTANT = 4
+        CHARACTER_CONSTANT = 5
+        NUMERIC_CONSTANT = 6
 
-def parse_file(root, srcfile, folder):
-    try:
-        fp = open(root + srcfile, 'r')
-    except IOError:
-        return 1
-    in_comment = 0
-    linenum = 0
-    for line in fp.readlines():
-        content = ''
-        linenum+=1
-        srcptr = 0
-        while srcptr < len(line):
-            c = line[srcptr]
-            srcptr+=1
-            if ord(c)==13 or ord(c)==10:
-                if ord(c)==13 and ord(line[srcptr])==10:
-                    srcptr+=1
-                continue
-            if c==' ' or ord(c)==9:
-                continue
-            if in_comment==1 and c=='*' and line[srcptr]=='/' :
-                srcptr+=1
-                in_comment = 0
-                continue
-            if in_comment:
-                continue
-            if c=='/' and line[srcptr]=='*' :
-                srcptr+=1
-                in_comment = 1
-                continue
-            if c=='/' and line[srcptr]=='/' :
-                break
-            content += c
-        content = content.strip()
-        if len(content)>0:
-            if content.startswith('#include'):
-               name = content[8:]
-               name = name.replace('"','')
-               fullname = file_exists(root, name, folder,include_dirs)
-               if fullname in files_included:
-                   continue
-               if "src/lib/netlist/" in fullname:
-                   continue
-               if fullname!='':
-                   if fullname in mappings.keys():
-                        if not(mappings[fullname] in components):
-                            components.append(mappings[fullname])
-                   files_included.append(fullname)
-                   newfolder = fullname.rsplit('/', 1)[0] + '/'
-                   parse_file(root, fullname, newfolder)
-                   if (fullname.endswith('.h') and not("src/emu" in fullname) and not("src/devices" in fullname) and not("src/lib" in fullname) and not("src/osd" in fullname)):
-                       parse_file_for_deps(root, fullname.replace('.h','.cpp'), newfolder)
-                   elif fullname.endswith('.h'):
-                       parse_file(root, fullname.replace('.h','.cpp'), newfolder)
-               continue
-    fp.close()
-    return 0
+    def __init__(self, handler, **kwargs):
+        super(CppParser, self).__init__(**kwargs)
+        self.handler = handler
+        self.processors = {
+                self.ParseState.DEFAULT: self.process_default,
+                self.ParseState.COMMENT: self.process_comment,
+                self.ParseState.LINE_COMMENT: self.process_line_comment,
+                self.ParseState.TOKEN: self.process_token,
+                self.ParseState.STRING_CONSTANT: self.process_text,
+                self.ParseState.CHARACTER_CONSTANT: self.process_text,
+                self.ParseState.NUMERIC_CONSTANT: self.process_numeric }
 
-def parse_file_for_drivers(root, srcfile):
-    srcfile = srcfile.replace('\\','/')
-    if srcfile.startswith('src/mame/drivers'):
-       splitname = srcfile.split('/', 4)
-       drivers.append(splitname[3])
-    return 0
+    def parse(self, f):
+        self.parse_state = self.ParseState.DEFAULT
+        self.comment_line = None
+        self.lead_digit = None
+        self.radix = None
+        self.line_buffer = ''
+        self.comment_buffer = ''
+        self.process_lines(f)
+        if self.parse_state == self.ParseState.COMMENT:
+            raise Exception('unterminated multi-line comment beginning on line %d' % (self.comment_line, ))
+        elif self.parse_state == self.ParseState.CHARACTER_CONSTANT:
+            raise Exception('unterminated character literal on line %d' % (self.input_line, ))
+        elif self.parse_state == self.ParseState.STRING_CONSTANT:
+            raise Exception('unterminated string literal on line %d' % (self.input_line, ))
 
-def parse_lua_file(srcfile):
-    try:
-        fp = open(srcfile, 'r')
-    except IOError:
-        sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
-        return 1
-    for line in fp.readlines():
-        content = line.strip()
-        if len(content)>0:
-            if content.startswith('--@'):
-               name = content[3:]
-               mappings[name.rsplit(',', 1)[0]] = name.rsplit(',', 1)[1]
-    return 0
+    def process_default(self, line):
+        escape = False
+        pos = 0
+        length = len(line)
+        while pos < length:
+            ch = line[pos]
+            if (ch == '"') or (ch == "'"):
+                self.parse_state = self.ParseState.STRING_CONSTANT if ch == '"' else self.ParseState.CHARACTER_CONSTANT
+                self.line_buffer += line[:pos + 1]
+                return pos + 1
+            elif ch == '*':
+                if escape:
+                    self.parse_state = self.ParseState.COMMENT
+                    self.comment_line = self.input_line
+                    self.line_buffer += line[:pos - 1] + ' '
+                    return pos + 1
+            elif ch == '/':
+                if escape:
+                    self.parse_state = self.ParseState.LINE_COMMENT
+                    self.handler.line(self.line_buffer + line[:pos - 1] + ' ')
+                    self.line_buffer = ''
+                    return pos + 1
+            elif ch in self.TOKEN_LEAD:
+                self.parse_state = self.ParseState.TOKEN
+                self.line_buffer += line[:pos]
+                return pos
+            elif (ch >= '0') and (ch <= '9'):
+                self.parse_state = self.ParseState.NUMERIC_CONSTANT
+                self.line_buffer += line[:pos]
+                return pos
+            escape = ch == '/'
+            pos += 1
+        if line.endswith('\\'):
+            self.line_buffer += line[:-1]
+        else:
+            self.handler.line(self.line_buffer + line)
+            self.line_buffer = ''
 
-if len(sys.argv) < 5:
-    print('Usage:')
-    print('  makedep <root> <source.c> <type> <target>')
-    sys.exit(0)
+    def process_comment(self, line):
+        escape = False
+        pos = 0
+        length = len(line)
+        while pos < length:
+            ch = line[pos]
+            if escape and (ch == '/'):
+                self.parse_state = self.ParseState.DEFAULT
+                self.comment_line = None
+                self.handler.comment(self.comment_buffer + line[:pos - 1])
+                self.comment_buffer = ''
+                return pos + 1
+            escape = ch == '*'
+            pos += 1
+        if line.endswith('\\'):
+            self.comment_buffer += line[:-1]
+        else:
+            self.comment_buffer += line + '\n'
 
-root = sys.argv[1] + '/'
+    def process_line_comment(self, line):
+        self.parse_state = self.ParseState.DEFAULT
+        self.handler.line_comment(self.comment_buffer + line)
+        self.comment_buffer = ''
 
-parse_lua_file(root +'scripts/src/bus.lua')
-parse_lua_file(root +'scripts/src/cpu.lua')
-parse_lua_file(root +'scripts/src/machine.lua')
-parse_lua_file(root +'scripts/src/sound.lua')
-parse_lua_file(root +'scripts/src/video.lua')
-parse_lua_file(root +'scripts/src/formats.lua')
+    def process_token(self, line):
+        pos = 0
+        length = len(line)
+        while pos < length:
+            ch = line[pos]
+            if ch not in self.TOKEN_CONTINUATION:
+                self.parse_state = self.ParseState.DEFAULT
+                self.line_buffer += line[:pos]
+                return pos
+            pos += 1
+        self.parse_state = self.ParseState.DEFAULT
+        self.handler.line(self.line_buffer + line)
+        self.line_buffer = ''
 
-for filename in sys.argv[2].rsplit(',') :
-    deps_files_included.append(filename.replace('\\','/'))
-    parse_file_for_deps(root,filename,'')
+    def process_text(self, line):
+        quote = '"' if self.parse_state == self.ParseState.STRING_CONSTANT else "'"
+        escape = False
+        pos = 0
+        length = len(line)
+        while pos < length:
+            ch = line[pos]
+            if (ch == quote) and not escape:
+                self.parse_state = self.ParseState.DEFAULT
+                self.line_buffer += line[:pos + 1]
+                return pos + 1
+            escape = (ch == '\\') and not escape
+            pos += 1
+        if line.endswith('\\'):
+            self.line_buffer += line[:-1]
+        else:
+            t = 'string' if self.ParseState == self.ParseState.STRING_CONSTANT else 'character'
+            raise Exception('unterminated %s literal on line %d' % (t, self.input_line))
 
-for filename in deps_files_included:
-    parse_file(root,filename,'')
+    def process_numeric(self, line):
+        escape = False
+        pos = 0
+        length = len(line)
+        while pos < length:
+            ch = line[pos]
+            if self.lead_digit is None:
+                self.lead_digit = ch
+                if ch != '0':
+                    self.radix = 10
+            elif self.radix is None:
+                if ch == "'":
+                    if escape:
+                        raise Exception('adjacent digit separators on line %d' % (self.input_line, ))
+                    else:
+                        escape = True
+                elif (ch == 'B') or (ch == 'b'):
+                    self.radix = 2
+                elif (ch == 'X') or (ch == 'x'):
+                    self.radix = 16
+                elif (ch >= '0') and (ch <= '7'):
+                    self.radix = 8
+                else:
+                    self.parse_state = self.ParseState.DEFAULT # probably an argument to a token-pasting or stringifying macro
+            else:
+                if ch == "'":
+                    if escape:
+                        raise Exception('adjacent digit separators on line %d' % (self.input_line, ))
+                    else:
+                        escape = True
+                else:
+                    escape = False
+                    if self.radix == 2:
+                        if (ch < '0') or (ch > '1'):
+                            self.parse_state = self.ParseState.DEFAULT
+                    elif self.radix == 8:
+                        if (ch < '0') or (ch > '7'):
+                            self.parse_state = self.ParseState.DEFAULT
+                    elif self.radix == 10:
+                        if (ch < '0') or (ch > '9'):
+                            self.parse_state = self.ParseState.DEFAULT
+                    elif self.radix == 16:
+                        if ch not in self.HEXADECIMAL_DIGIT:
+                            self.parse_state = self.ParseState.DEFAULT
+            if self.parse_state == self.ParseState.DEFAULT:
+                self.lead_digit = None
+                self.radix = None
+                self.line_buffer += line[:pos]
+                return pos
+            pos += 1
+        self.parse_state = self.ParseState.DEFAULT
+        self.lead_digit = None
+        self.radix = None
+        self.handler.line(self.line_buffer + line)
+        self.line_buffer = ''
 
-for filename in sys.argv[2].rsplit(',') :
-    parse_file_for_drivers(root,filename)
 
-# display output
-if sys.argv[3]=='drivers':
-    #output the list of externs first
-    for drv in sorted(drivers):
-        print(drv)
-    print("")
+class LuaParser(ParserBase):
+    class Handler(object):
+        def short_comment(self, text):
+            pass
 
-if sys.argv[3]=='target':
-    for line in components:
-        sys.stdout.write("%s\n" % line)    
-    sys.stdout.write('\n')
-    sys.stdout.write('function createProjects_mame_%s(_target, _subtarget)\n' % sys.argv[4])
-    sys.stdout.write('    project ("mame_%s")\n' % sys.argv[4])
-    sys.stdout.write('    targetsubdir(_target .."_" .. _subtarget)\n')
-    sys.stdout.write('    kind (LIBTYPE)\n')
-    sys.stdout.write('    uuid (os.uuid("drv-mame-%s"))\n' % sys.argv[4])
-    sys.stdout.write('    addprojectflags()\n')
-    sys.stdout.write('    \n')
-    sys.stdout.write('    includedirs {\n')
-    sys.stdout.write('        MAME_DIR .. "src/osd",\n')
-    sys.stdout.write('        MAME_DIR .. "src/emu",\n')
-    sys.stdout.write('        MAME_DIR .. "src/devices",\n')
-    sys.stdout.write('        MAME_DIR .. "src/mame",\n')
-    sys.stdout.write('        MAME_DIR .. "src/lib",\n')
-    sys.stdout.write('        MAME_DIR .. "src/lib/util",\n')
-    sys.stdout.write('        MAME_DIR .. "src/lib/netlist",\n')
-    sys.stdout.write('        MAME_DIR .. "3rdparty",\n')
-    sys.stdout.write('        GEN_DIR  .. "mame/layout",\n')
-    sys.stdout.write('        ext_includedir("flac"),\n')
-    sys.stdout.write('        ext_includedir("glm"),\n')
-    sys.stdout.write('        ext_includedir("jpeg"),\n')
-    sys.stdout.write('        ext_includedir("rapidjson"),\n')
-    sys.stdout.write('        ext_includedir("zlib"),\n')
-    sys.stdout.write('    }\n')
-    sys.stdout.write('\n')
-    sys.stdout.write('    files{\n')
-    for line in deps_files_included:
-        sys.stdout.write('        MAME_DIR .. "%s",\n' % line)
-    sys.stdout.write('    }\n')
-    sys.stdout.write('end\n')
-    sys.stdout.write('\n')
-    sys.stdout.write('function linkProjects_mame_%s(_target, _subtarget)\n' % sys.argv[4])
-    sys.stdout.write('    links {\n')
-    sys.stdout.write('        "mame_%s",\n' % sys.argv[4])
-    sys.stdout.write('    }\n')
-    sys.stdout.write('end\n')
+        def long_comment_start(self, level):
+            pass
+
+        def long_comment_line(self, text):
+            pass
+
+        def long_comment_end(self):
+            pass
+
+    class ParseState(object):
+        DEFAULT = 0
+        SHORT_COMMENT = 1
+        LONG_COMMENT = 2
+        STRING_CONSTANT = 3
+        LONG_STRING_CONSTANT = 4
+
+    def __init__(self, handler, **kwargs):
+        super(LuaParser, self).__init__(**kwargs)
+        self.handler = handler
+        self.processors = {
+                self.ParseState.DEFAULT: self.process_default,
+                self.ParseState.SHORT_COMMENT: self.process_short_comment,
+                self.ParseState.LONG_COMMENT: self.process_long_comment,
+                self.ParseState.STRING_CONSTANT: self.process_string_constant,
+                self.ParseState.LONG_STRING_CONSTANT: self.process_long_string_constant }
+
+    def parse(self, f):
+        self.parse_state = self.ParseState.DEFAULT
+        self.long_bracket_level = None
+        self.escape = False
+        self.block_line = None
+        self.block_level = None
+        self.string_quote = None
+        self.process_lines(f)
+        if self.parse_state == self.ParseState.LONG_COMMENT:
+            raise Exception('unterminated long comment beginning on line %d' % (self.block_line, ));
+        elif self.parse_state == self.ParseState.STRING_CONSTANT:
+            raise Exception('unterminated string literal on line %d' % (self.input_line, ));
+        elif self.parse_state == self.ParseState.LONG_STRING_CONSTANT:
+            raise Exception('unterminated long string literal beginning on line %d' % (self.block_line, ));
+
+    def process_default(self, line):
+        pos = 0
+        length = len(line)
+        while pos < length:
+            ch = line[pos]
+            if (ch == '"') or (ch == "'"):
+                self.string_quote = ch
+                self.parse_state = self.ParseState.STRING_CONSTANT
+                self.long_bracket_level = None
+                self.escape = False
+                return pos + 1;
+            elif (ch == '-') and self.escape:
+                self.parse_state = self.ParseState.SHORT_COMMENT
+                self.long_bracket_level = None
+                self.escape = False
+                return pos + 1
+            elif self.long_bracket_level is not None:
+                if ch == '=':
+                    self.long_bracket_level += 1
+                elif ch == '[':
+                    self.block_line = self.input_line
+                    self.block_level = self.long_bracket_level
+                    self.parse_state = self.ParseState.LONG_STRING_CONSTANT
+                    self.long_bracket_level = None
+                    self.escape = False
+                    return pos + 1
+                else:
+                    self.long_bracket_level = None
+            elif ch == '[':
+                self.long_bracket_level = 0
+            self.escape = ch == '-'
+            pos += 1
+        self.escape = False
+
+    def process_short_comment(self, line):
+        pos = 0
+        length = len(line)
+        while pos < length:
+            ch = line[pos]
+            if self.long_bracket_level is not None:
+                if ch == '=':
+                    self.long_bracket_level += 1
+                elif ch == '[':
+                    self.block_line = self.input_line
+                    self.block_level = self.long_bracket_level
+                    self.parse_state = self.ParseState.LONG_COMMENT
+                    self.long_bracket_level = None
+                    self.handler.long_comment_start(self.block_level)
+                    return pos + 1
+                else:
+                    self.long_bracket_level = None
+            elif ch == '[':
+                self.long_bracket_level = 0
+            if self.long_bracket_level is None:
+                self.handler.short_comment(line[pos:])
+                self.parse_state = self.ParseState.DEFAULT
+                return None
+            pos += 1
+        self.handler.short_comment(line)
+        self.parse_state = self.ParseState.DEFAULT
+
+    def process_long_comment(self, line):
+        pos = 0
+        length = len(line)
+        while pos < length:
+            ch = line[pos]
+            if self.long_bracket_level is not None:
+                if ch == '=':
+                    self.long_bracket_level += 1
+                elif ch == ']':
+                    if self.long_bracket_level == self.block_level:
+                        if self.parse_state == self.ParseState.LONG_COMMENT:
+                            self.handler.long_comment_line(line[:endpos])
+                            self.handler.long_comment_end()
+                        self.parse_state = self.ParseState.DEFAULT
+                        return pos + 1
+                    else:
+                        self.long_bracket_level = 0
+                else:
+                    self.long_bracket_level = None
+            elif ch == ']':
+                endpos = pos
+                self.long_bracket_level = 0
+            pos += 1
+        self.long_bracket_level = None
+        self.handler.long_comment_line(line)
+
+    def process_string_constant(self, line):
+        pos = 0
+        length = len(line)
+        while pos < length:
+            ch = line[pos]
+            if (ch == self.string_quote) and not self.escape:
+                self.parse_state = self.ParseState.DEFAULT
+                return pos + 1
+            self.escape = (ch == '\\') and not self.escape
+            pos += 1
+        if not self.escape:
+            raise Exception('unterminated string literal on line %d' % (self.input_line, ));
+
+    def process_long_string_constant(self, line):
+        self.process_long_comment(line) # this works because they're both closed by a matching long bracket
+
+
+class DriverFilter(object):
+    DRIVER_CHARS = frozenset(
+            [chr(x) for x in range(ord('0'), ord('9') + 1)] +
+            [chr(x) for x in range(ord('a'), ord('z') + 1)] +
+            ['_'])
+
+    def __init__(self, options, **kwargs):
+        super(DriverFilter, self).__init__(**kwargs)
+        self.parse_filter(options.filter)
+        self.parse_list(options.list)
+
+    def write_source(self, f):
+        f.write(
+                '#include "emu.h"\n' \
+                '\n' \
+                '#include "drivenum.h"\n' \
+                '\n')
+        for driver in self.drivers:
+            f.write('GAME_EXTERN(%s);\n' % driver)
+        f.write(
+                '\n' \
+                'game_driver const *const driver_list::s_drivers_sorted[%d] =\n' \
+                '{\n' % (len(self.drivers), ))
+        for driver in self.drivers:
+            f.write('\t&GAME_NAME(%s),\n' % driver)
+        f.write(
+                '};\n' \
+                '\n' \
+                'std::size_t const driver_list::s_driver_count = %d;\n' % (len(self.drivers), ))
+
+    def parse_filter(self, path):
+        def do_parse(p):
+            def line_hook(text):
+                text = text.strip()
+                if text.startswith('#'):
+                    do_parse(os.path.join(os.path.dirname(n), text[1:].lstrip()))
+                elif text.startswith('+'):
+                    text = text[1:].lstrip()
+                    if not text:
+                        sys.stderr.write('%s:%s: Empty driver name\n' % (p, parser.input_line, text))
+                        sys.exit(1)
+                    elif not all(x in self.DRIVER_CHARS for x in text):
+                        sys.stderr.write('%s:%s: Invalid character in driver name "%s"\n' % (p, parser.input_line, text))
+                        sys.exit(1)
+                    includes.add(text)
+                    excludes.discard(text)
+                elif text.startswith('-'):
+                    text = text[1:].lstrip()
+                    if not text:
+                        sys.stderr.write('%s:%s: Empty driver name\n' % (p, parser.input_line, text))
+                        sys.exit(1)
+                    elif not all(x in self.DRIVER_CHARS for x in text):
+                        sys.stderr.write('%s:%s: Invalid character in driver name "%s"\n' % (p, parser.input_line, text))
+                        sys.exit(1)
+                    includes.discard(text)
+                    excludes.add(text)
+                elif text:
+                    sources.add(text)
+
+            n = os.path.normpath(p)
+            if n not in filters:
+                filters.add(n)
+                try:
+                    f = io.open(n, 'r', encoding='utf-8')
+                except IOError:
+                    sys.stderr.write('Unable to open filter file "%s"\n' % (p, ))
+                    sys.exit(1)
+                with f:
+                    handler = CppParser.Handler()
+                    handler.line = line_hook
+                    parser = CppParser(handler)
+                    try:
+                        parser.parse(f)
+                    except IOError:
+                        sys.stderr.write('Error reading filter file "%s"\n' % (p, ))
+                        sys.exit(1)
+                    except Exception as e:
+                        sys.stderr.write('Error parsing filter file "%s": %s\n' % (p, e))
+                        sys.exit(1)
+
+        sources = set()
+        includes = set()
+        excludes = set()
+        filters = set()
+        if path is not None:
+            do_parse(path)
+            sys.stderr.write('%d source file(s) found\n' % (len(sources), ))
+        self.sources = frozenset(sources)
+        self.includes = frozenset(includes)
+        self.excludes = frozenset(excludes)
+
+    def parse_list(self, path):
+        def do_parse(p):
+            def line_hook(text):
+                text = text.strip()
+                if text.startswith('#'):
+                    do_parse(os.path.join(os.path.dirname(n), text[1:].lstrip()))
+                elif text.startswith('@'):
+                    parts = text[1:].lstrip().split(':', 1)
+                    parts[0] = parts[0].strip()
+                    if (parts[0] == 'source') and (len(parts) == 2):
+                        parts[1] = parts[1].strip()
+                        if not parts[1]:
+                            sys.stderr.write('%s:%s: Empty source file name "%s"\n' % (p, parser.input_line, text))
+                            sys.exit(1)
+                        elif self.sources:
+                            state['includesrc'] = parts[1] in self.sources
+                    else:
+                        sys.stderr.write('%s:%s: Unsupported directive "%s"\n' % (p, parser.input_line, text))
+                        sys.exit(1)
+                elif text:
+                    if not all(x in self.DRIVER_CHARS for x in text):
+                        sys.stderr.write('%s:%s: Invalid character in driver name "%s"\n' % (p, parser.input_line, text))
+                        sys.exit(1)
+                    elif state['includesrc'] and (text not in self.excludes):
+                        drivers.add(text)
+
+            n = os.path.normpath(p)
+            if n not in lists:
+                lists.add(n)
+                try:
+                    f = io.open(n, 'r', encoding='utf-8')
+                except IOError:
+                    sys.stderr.write('Unable to open list file "%s"\n' % (p, ))
+                    sys.exit(1)
+                with f:
+                    handler = CppParser.Handler()
+                    handler.line = line_hook
+                    parser = CppParser(handler)
+                    try:
+                        parser.parse(f)
+                    except IOError:
+                        sys.stderr.write('Error reading list file "%s"\n' % (p, ))
+                        sys.exit(1)
+                    except Exception as e:
+                        sys.stderr.write('Error parsing list file "%s": %s\n' % (p, e))
+                        sys.exit(1)
+
+        lists = set()
+        drivers = set()
+        state = object()
+        state = { 'includesrc': True }
+        do_parse(path)
+        for driver in self.includes:
+            drivers.add(driver)
+        sys.stderr.write('%d driver(s) found\n' % (len(drivers), ))
+        drivers.add('___empty')
+        self.drivers = sorted(drivers)
+
+
+def split_path(path):
+    path = os.path.normpath(path)
+    result = [ ]
+    while True:
+        dirname, basename = os.path.split(path)
+        if dirname == path:
+            result.insert(0, dirname)
+            return result
+        elif basename == path:
+            result.insert(0, basename)
+            return result
+        else:
+            result.insert(0, basename)
+            path = dirname
+
+
+def parse_command_line():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(title='commands', dest='command', metavar='<command>')
+
+    subparser = subparsers.add_parser('sourcesproject', help='generate project directives for source files')
+    subparser.add_argument('-r', '--root', metavar='<srcroot>', default='.', help='path to emulator source root (defaults to working directory)')
+    subparser.add_argument('-t', '--target', metavar='<target>', required=True, help='generated emulator target name')
+    subparser.add_argument('sources', metavar='<srcfile>', nargs='+', help='source files to include')
+
+    subparser = subparsers.add_parser('sourcesfilter', help='generate driver filter for source files')
+    subparser.add_argument('sources', metavar='<srcfile>', nargs='+', help='source files to include')
+
+    subparser = subparsers.add_parser('driverlist', help='generate driver list source')
+    subparser.add_argument('-f', '--filter', metavar='<fltfile>', help='input filter file')
+    subparser.add_argument('list', metavar='<lstfile>', help='input list file')
+
+    return parser.parse_args()
+
+
+def collect_lua_directives(options):
+    def short_comment_hook(text):
+        if text.startswith('@'):
+            name, action = text[1:].rstrip().rsplit(',', 1)
+            if name not in result:
+                result[name] = [ ]
+            result[name].append(action)
+
+    base = os.path.join(options.root, 'scripts', 'src')
+    result = { }
+    handler = LuaParser.Handler()
+    handler.short_comment = short_comment_hook
+    parser = LuaParser(handler)
+    for name in ('bus', 'cpu', 'machine', 'sound', 'video', 'formats'):
+        path = os.path.join(base, name + '.lua')
+        try:
+            f = io.open(path, 'r', encoding='utf-8')
+        except IOError:
+            sys.stderr.write('Unable to open source file "%s"\n' % (path, ))
+            sys.exit(1)
+        try:
+            with f:
+                parser.parse(f)
+        except IOError:
+            sys.stderr.write('Error reading source file "%s"\n' % (path, ))
+            sys.exit(1)
+        except Exception as e:
+            sys.stderr.write('Error parsing source file "%s": %s\n' % (path, e))
+            sys.exit(1)
+    return result
+
+
+def scan_source_dependencies(options):
+    def locate_include(path):
+        relative = os.path.join(*path)
+        for incdir in roots:
+            if os.path.isfile(os.path.join(os.path.join(options.root, *incdir), relative)):
+                return tuple(incdir + path)
+
+    def test_siblings(relative, basename):
+        pathbase = '/'.join(relative) + '/'
+        dirname = os.path.join(options.root, *relative)
+        for ext in ('.cpp', '.ipp', '.hxx'):
+            path = pathbase + basename + ext
+            if (path not in seen) and os.path.isfile(os.path.join(dirname, basename + ext)):
+                remaining.append(path)
+                seen.add(path)
+
+    def line_hook(text):
+        text = text.lstrip()
+        if text.startswith('#'):
+            text = text[1:].lstrip()
+            if text.startswith('include'):
+                text = text[7:]
+                if text[:1].isspace():
+                    text = text.strip()
+                    if (len(text) > 2) and (text[0] == '"') and (text[-1] == '"'):
+                        components = locate_include(tuple(x for x in text[1:-1].split('/') if x))
+                        if components:
+                            path = '/'.join(components)
+                            if path not in seen:
+                                remaining.append(path)
+                                seen.add(path)
+                                base, ext = os.path.splitext(components[-1])
+                                if ext.lower().startswith('.h'):
+                                    components = components[:-1]
+                                    test_siblings(components, base)
+                                    if components == ('src', 'mame', 'includes'):
+                                        for aspect in ('audio', 'drivers', 'video', 'machine'):
+                                            test_siblings(('src', 'mame', aspect), base)
+
+    handler = CppParser.Handler()
+    handler.line = line_hook
+    parser = CppParser(handler)
+    seen = set('/'.join(x for x in split_path(source) if x) for source in options.sources)
+    remaining = list(seen)
+    while remaining:
+        source = remaining.pop()
+        components = tuple(source.split('/'))
+        roots = (components[:-1], ('src', 'devices'), ('src', 'mame'), ('src', 'lib'))
+        try:
+            f = io.open(os.path.join(options.root, *components), 'r', encoding='utf-8')
+        except IOError:
+            sys.stderr.write('Unable to open source file "%s"\n' % (source, ))
+            sys.exit(1)
+        try:
+            with f:
+                parser.parse(f)
+        except IOError:
+            sys.stderr.write('Error reading source file "%s"\n' % (source, ))
+            sys.exit(1)
+        except Exception as e:
+            sys.stderr.write('Error parsing source file "%s": %s\n' % (source, e))
+            sys.exit(1)
+    return seen
+
+
+def write_project(options, f, mappings, sources):
+    targetsrc = ''
+    for source in sorted(sources):
+        action = mappings.get(source)
+        if action:
+            for line in action:
+                f.write(line + '\n')
+        if source.startswith('src/mame/'):
+            targetsrc += '        MAME_DIR .. "%s",\n' % (source, )
+    f.write(
+            '\n' \
+            'function createProjects_mame_%s(_target, _subtarget)\n' \
+            '    project ("mame_%s")\n' \
+            '    targetsubdir(_target .."_" .. _subtarget)\n' \
+            '    kind (LIBTYPE)\n' \
+            '    uuid (os.uuid("drv-mame-%s"))\n' \
+            '    addprojectflags()\n' \
+            '    \n' \
+            '    includedirs {\n' \
+            '        MAME_DIR .. "src/osd",\n' \
+            '        MAME_DIR .. "src/emu",\n' \
+            '        MAME_DIR .. "src/devices",\n' \
+            '        MAME_DIR .. "src/mame",\n' \
+            '        MAME_DIR .. "src/lib",\n' \
+            '        MAME_DIR .. "src/lib/util",\n' \
+            '        MAME_DIR .. "src/lib/netlist",\n' \
+            '        MAME_DIR .. "3rdparty",\n' \
+            '        GEN_DIR  .. "mame/layout",\n' \
+            '        ext_includedir("flac"),\n' \
+            '        ext_includedir("glm"),\n' \
+            '        ext_includedir("jpeg"),\n' \
+            '        ext_includedir("rapidjson"),\n' \
+            '        ext_includedir("zlib"),\n' \
+            '    }\n' \
+            '\n' \
+            '    files{\n%s' \
+            '    }\n' \
+            'end\n' \
+            '\n' \
+            'function linkProjects_mame_%s(_target, _subtarget)\n' \
+            '    links {\n' \
+            '        "mame_%s",\n' \
+            '    }\n' \
+            'end\n' % (options.target, options.target, options.target, targetsrc, options.target, options.target))
+
+
+def write_filter(options, f):
+    drivers = set()
+    for source in options.sources:
+        components = tuple(x for x in split_path(source) if x)
+        if (len(components) > 3) and (components[:3] == ('src', 'mame', 'drivers')):
+            ext = os.path.splitext(components[-1])[1].lower()
+            if ext.startswith('.c'):
+                drivers.add('/'.join(components[3:]))
+    for driver in sorted(drivers):
+        f.write(driver + '\n')
+
+
+if __name__ == '__main__':
+    options = parse_command_line()
+    if options.command == 'sourcesproject':
+        header_to_optional = collect_lua_directives(options)
+        source_dependencies = scan_source_dependencies(options)
+        write_project(options, sys.stdout, header_to_optional, source_dependencies)
+    elif options.command == 'sourcesfilter':
+        write_filter(options, sys.stdout)
+    elif options.command == 'driverlist':
+        DriverFilter(options).write_source(sys.stdout)

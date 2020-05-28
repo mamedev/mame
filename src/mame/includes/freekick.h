@@ -22,6 +22,7 @@ public:
 	void base(machine_config &config);
 	void oigas(machine_config &config);
 	void pbillrd(machine_config &config);
+	void pbillrdbl(machine_config &config);
 	void gigas(machine_config &config);
 	void gigasm(machine_config &config);
 	void pbillrdm(machine_config &config);
@@ -30,6 +31,7 @@ public:
 
 	void init_gigas();
 	void init_gigasb();
+	void init_pbillrdbl();
 	void init_pbillrds();
 
 private:
@@ -64,9 +66,9 @@ private:
 	DECLARE_READ8_MEMBER(freekick_ff_r);
 	DECLARE_WRITE8_MEMBER(freekick_ff_w);
 	DECLARE_WRITE8_MEMBER(freek_videoram_w);
-	DECLARE_WRITE8_MEMBER(snd_rom_addr_l_w);
-	DECLARE_WRITE8_MEMBER(snd_rom_addr_h_w);
-	DECLARE_READ8_MEMBER(snd_rom_r);
+	void snd_rom_addr_l_w(uint8_t data);
+	void snd_rom_addr_h_w(uint8_t data);
+	uint8_t snd_rom_r();
 	TILE_GET_INFO_MEMBER(get_freek_tile_info);
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(pbillrd);
@@ -95,4 +97,5 @@ private:
 	void omega_io_map(address_map &map);
 	void omega_map(address_map &map);
 	void pbillrd_map(address_map &map);
+	void pbillrdbl_map(address_map &map);
 };

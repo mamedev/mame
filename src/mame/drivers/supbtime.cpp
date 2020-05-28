@@ -330,7 +330,7 @@ void supbtime_state::supbtime(machine_config &config)
 	M68000(config, m_maincpu, XTAL(21'477'272) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &supbtime_state::supbtime_map);
 
-	H6280(config, m_audiocpu, XTAL(32'220'000) / 8);
+	H6280(config, m_audiocpu, XTAL(32'220'000) / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &supbtime_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
@@ -347,8 +347,6 @@ void supbtime_state::supbtime(machine_config &config)
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);

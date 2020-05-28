@@ -111,7 +111,7 @@ void nb1413m3_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			timer_callback(ptr, param);
 			break;
 		default:
-			assert_always(false, "Unknown id in nb1413m3_device::device_timer");
+			throw emu_fatalerror("Unknown id in nb1413m3_device::device_timer");
 	}
 }
 
@@ -498,7 +498,7 @@ READ8_MEMBER( nb1413m3_device::inputport3_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::dipsw1_r )
+uint8_t nb1413m3_device::dipsw1_r()
 {
 	device_t &root = machine().root_device();
 	switch (m_nb1413m3_type)
@@ -542,7 +542,7 @@ READ8_MEMBER( nb1413m3_device::dipsw1_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::dipsw2_r )
+uint8_t nb1413m3_device::dipsw2_r()
 {
 	device_t &root = machine().root_device();
 	switch (m_nb1413m3_type)

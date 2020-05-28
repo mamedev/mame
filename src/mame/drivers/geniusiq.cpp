@@ -205,17 +205,17 @@ private:
 	void geniusiq_palette(palette_device &palette) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(input_r);
-	DECLARE_WRITE16_MEMBER(mouse_pos_w);
-	DECLARE_WRITE16_MEMBER(gfx_base_w);
-	DECLARE_WRITE16_MEMBER(gfx_dest_w);
-	DECLARE_WRITE16_MEMBER(gfx_color_w);
-	DECLARE_WRITE16_MEMBER(gfx_idx_w);
+	uint16_t input_r();
+	void mouse_pos_w(offs_t offset, uint16_t data);
+	void gfx_base_w(offs_t offset, uint16_t data);
+	void gfx_dest_w(offs_t offset, uint16_t data);
+	void gfx_color_w(offs_t offset, uint16_t data);
+	void gfx_idx_w(uint16_t data);
 	void queue_input(uint16_t data);
-	DECLARE_READ16_MEMBER(cart_state_r);
+	uint16_t cart_state_r();
 
-	DECLARE_READ16_MEMBER(unk0_r) { return 0; }
-	DECLARE_READ16_MEMBER(unk_r) { return machine().rand(); }
+	uint16_t unk0_r() { return 0; }
+	uint16_t unk_r() { return machine().rand(); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(cart_unload);
 
@@ -300,12 +300,12 @@ uint32_t geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ16_MEMBER( geniusiq_state::cart_state_r )
+uint16_t geniusiq_state::cart_state_r()
 {
 	return m_cart_state;
 }
 
-WRITE16_MEMBER( geniusiq_state::mouse_pos_w )
+void geniusiq_state::mouse_pos_w(offs_t offset, uint16_t data)
 {
 	if (offset)
 		m_mouse_gfx_posy = data;
@@ -313,12 +313,12 @@ WRITE16_MEMBER( geniusiq_state::mouse_pos_w )
 		m_mouse_gfx_posx = data;
 }
 
-WRITE16_MEMBER(geniusiq_state::gfx_color_w)
+void geniusiq_state::gfx_color_w(offs_t offset, uint16_t data)
 {
 	m_gfx_color[offset & 1] = data & 0x0f;
 }
 
-WRITE16_MEMBER(geniusiq_state::gfx_dest_w)
+void geniusiq_state::gfx_dest_w(offs_t offset, uint16_t data)
 {
 	if (offset)
 		m_gfx_y = data;
@@ -326,7 +326,7 @@ WRITE16_MEMBER(geniusiq_state::gfx_dest_w)
 		m_gfx_x = data;
 }
 
-WRITE16_MEMBER(geniusiq_state::gfx_base_w)
+void geniusiq_state::gfx_base_w(offs_t offset, uint16_t data)
 {
 	if (offset)
 		m_gfx_base = (m_gfx_base & 0xffff0000) | (data<<0);
@@ -334,7 +334,7 @@ WRITE16_MEMBER(geniusiq_state::gfx_base_w)
 		m_gfx_base = (m_gfx_base & 0x0000ffff) | (data<<16);
 }
 
-WRITE16_MEMBER(geniusiq_state::gfx_idx_w)
+void geniusiq_state::gfx_idx_w(uint16_t data)
 {
 	uint16_t *gfx = m_rom + ((m_gfx_base + (data & 0xff)*32)>>1);
 
@@ -354,7 +354,7 @@ WRITE16_MEMBER(geniusiq_state::gfx_idx_w)
 		}
 }
 
-READ16_MEMBER( geniusiq_state::input_r )
+uint16_t geniusiq_state::input_r()
 {
 	/*
 	    this is guesswork and may not be correct
@@ -429,8 +429,8 @@ void geniusiq_state::geniusiq_mem(address_map &map)
 	map(0x310000, 0x31FFFF).ram();
 	map(0x400000, 0x41ffff).mirror(0x0e0000).rw("flash", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
 	map(0x600300, 0x600301).r(FUNC(geniusiq_state::input_r));
-	//AM_RANGE(0x600500, 0x60050f)                      // read during IRQ 5
-	//AM_RANGE(0x600600, 0x600605)                      // sound ??
+	//map(0x600500, 0x60050f)                      // read during IRQ 5
+	//map(0x600600, 0x600605)                      // sound ??
 	map(0x600606, 0x600609).w(FUNC(geniusiq_state::gfx_base_w));
 	map(0x60060a, 0x60060b).w(FUNC(geniusiq_state::gfx_idx_w));
 	map(0x600802, 0x600803).r(FUNC(geniusiq_state::cart_state_r));  // cartridge state
@@ -721,8 +721,8 @@ void geniusiq_state::iq128(machine_config &config)
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "iq128_cart"));
-	cartslot.set_device_load(FUNC(geniusiq_state::cart_load), this);
-	cartslot.set_device_unload(FUNC(geniusiq_state::cart_unload), this);
+	cartslot.set_device_load(FUNC(geniusiq_state::cart_load));
+	cartslot.set_device_unload(FUNC(geniusiq_state::cart_unload));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("iq128");

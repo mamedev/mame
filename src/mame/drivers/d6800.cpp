@@ -83,10 +83,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 private:
-	DECLARE_READ8_MEMBER( d6800_cassette_r );
-	DECLARE_WRITE8_MEMBER( d6800_cassette_w );
-	DECLARE_READ8_MEMBER( d6800_keyboard_r );
-	DECLARE_WRITE8_MEMBER( d6800_keyboard_w );
+	uint8_t d6800_cassette_r();
+	void d6800_cassette_w(uint8_t data);
+	uint8_t d6800_keyboard_r();
+	void d6800_keyboard_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( d6800_screen_w );
 	uint32_t screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
@@ -289,7 +289,7 @@ WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
 	m_cb2 = state;
 }
 
-READ8_MEMBER( d6800_state::d6800_cassette_r )
+uint8_t d6800_state::d6800_cassette_r()
 {
 	/*
 	Cassette circuit consists of a 741 op-amp, a 74121 oneshot, and a 74LS74.
@@ -301,7 +301,7 @@ READ8_MEMBER( d6800_state::d6800_cassette_r )
 	return m_cass_data[2] | m_portb;
 }
 
-WRITE8_MEMBER( d6800_state::d6800_cassette_w )
+void d6800_state::d6800_cassette_w(uint8_t data)
 {
 	/*
 	    A NE556 runs at either 1200 or 2400 Hz, depending on the state of bit 0.
@@ -316,7 +316,7 @@ WRITE8_MEMBER( d6800_state::d6800_cassette_w )
 	m_portb = data & 0x7f;
 }
 
-READ8_MEMBER( d6800_state::d6800_keyboard_r )
+uint8_t d6800_state::d6800_keyboard_r()
 {
 	/*
 	This system reads the key matrix one way, then swaps the input and output
@@ -329,7 +329,7 @@ READ8_MEMBER( d6800_state::d6800_keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( d6800_state::d6800_keyboard_w )
+void d6800_state::d6800_keyboard_w(uint8_t data)
 {
 	/*
 
@@ -445,7 +445,7 @@ void d6800_state::d6800(machine_config &config)
 	TIMER(config, "kansas_r").configure_periodic(FUNC(d6800_state::kansas_r), attotime::from_hz(40000));
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "bin,c8,ch8", attotime::from_seconds(1)).set_load_callback(FUNC(d6800_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin,c8,ch8", attotime::from_seconds(1)).set_load_callback(FUNC(d6800_state::quickload_cb));
 }
 
 /* ROMs */

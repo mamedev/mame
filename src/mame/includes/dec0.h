@@ -65,8 +65,6 @@ public:
 	void init_midresb();
 	void init_ffantasybl();
 
-	DECLARE_VIDEO_START(dec0_nodma);
-
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -86,7 +84,11 @@ protected:
 	DECLARE_READ16_MEMBER(slyspy_controls_r);
 	DECLARE_WRITE16_MEMBER(priority_w);
 
+	DECLARE_VIDEO_START(dec0_nodma);
+	DECLARE_VIDEO_START(slyspy);
+
 	void robocop_colpri_cb(u32 &colour, u32 &pri_mask);
+	void baddudes_tile_cb(tile_data &tileinfo, u32 &tile, u32 &colour, u32 &flags);
 
 	void set_screen_raw_params_data_east(machine_config &config);
 
@@ -121,11 +123,11 @@ private:
 	DECLARE_READ16_MEMBER(midres_controls_r);
 	DECLARE_READ8_MEMBER(hippodrm_prot_r);
 	DECLARE_WRITE8_MEMBER(hippodrm_prot_w);
-	DECLARE_READ8_MEMBER(dec0_mcu_port0_r);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port0_w);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port1_w);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port2_w);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port3_w);
+	uint8_t dec0_mcu_port0_r();
+	void dec0_mcu_port0_w(uint8_t data);
+	void dec0_mcu_port1_w(uint8_t data);
+	void dec0_mcu_port2_w(uint8_t data);
+	void dec0_mcu_port3_w(uint8_t data);
 	DECLARE_READ16_MEMBER(hippodrm_68000_share_r);
 	DECLARE_WRITE16_MEMBER(hippodrm_68000_share_w);
 	DECLARE_WRITE16_MEMBER(sprite_mirror_w);
@@ -139,15 +141,13 @@ private:
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(slyspy);
 	DECLARE_VIDEO_START(dec0);
+	DECLARE_VIDEO_START(baddudes);
 
 	uint32_t screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_bandit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_birdtry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_robocop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_hippodrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_slyspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_midres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void hbarrel_colpri_cb(u32 &colour, u32 &pri_mask);
 	void bandit_colpri_cb(u32 &colour, u32 &pri_mask);

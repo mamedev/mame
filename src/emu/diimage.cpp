@@ -19,6 +19,7 @@
 #include "softlist_dev.h"
 #include "formats/ioprocs.h"
 
+#include <cstring>
 #include <regex>
 
 
@@ -27,26 +28,27 @@
 //**************************************************************************
 const image_device_type_info device_image_interface::m_device_info_array[] =
 	{
-		{ IO_UNKNOWN,   "unknown",      "unkn" },
-		{ IO_CARTSLOT,  "cartridge",    "cart" }, /*  0 */
-		{ IO_FLOPPY,    "floppydisk",   "flop" }, /*  1 */
-		{ IO_HARDDISK,  "harddisk",     "hard" }, /*  2 */
-		{ IO_CYLINDER,  "cylinder",     "cyln" }, /*  3 */
-		{ IO_CASSETTE,  "cassette",     "cass" }, /*  4 */
-		{ IO_PUNCHCARD, "punchcard",    "pcrd" }, /*  5 */
-		{ IO_PUNCHTAPE, "punchtape",    "ptap" }, /*  6 */
-		{ IO_PRINTER,   "printout",     "prin" }, /*  7 */
-		{ IO_SERIAL,    "serial",       "serl" }, /*  8 */
-		{ IO_PARALLEL,  "parallel",     "parl" }, /*  9 */
-		{ IO_SNAPSHOT,  "snapshot",     "dump" }, /* 10 */
-		{ IO_QUICKLOAD, "quickload",    "quik" }, /* 11 */
-		{ IO_MEMCARD,   "memcard",      "memc" }, /* 12 */
-		{ IO_CDROM,     "cdrom",        "cdrm" }, /* 13 */
-		{ IO_MAGTAPE,   "magtape",      "magt" }, /* 14 */
-		{ IO_ROM,       "romimage",     "rom"  }, /* 15 */
-		{ IO_MIDIIN,    "midiin",       "min"  }, /* 16 */
-		{ IO_MIDIOUT,   "midiout",      "mout" }, /* 17 */
-		{ IO_PICTURE,   "picture",      "pic"  }  /* 18 */
+		{ IO_UNKNOWN,   "unknown",      "unkn" }, /*  0 */
+		{ IO_CARTSLOT,  "cartridge",    "cart" }, /*  1 */
+		{ IO_FLOPPY,    "floppydisk",   "flop" }, /*  2 */
+		{ IO_HARDDISK,  "harddisk",     "hard" }, /*  3 */
+		{ IO_CYLINDER,  "cylinder",     "cyln" }, /*  4 */
+		{ IO_CASSETTE,  "cassette",     "cass" }, /*  5 */
+		{ IO_PUNCHCARD, "punchcard",    "pcrd" }, /*  6 */
+		{ IO_PUNCHTAPE, "punchtape",    "ptap" }, /*  7 */
+		{ IO_PRINTER,   "printout",     "prin" }, /*  8 */
+		{ IO_SERIAL,    "serial",       "serl" }, /*  9 */
+		{ IO_PARALLEL,  "parallel",     "parl" }, /* 10 */
+		{ IO_SNAPSHOT,  "snapshot",     "dump" }, /* 11 */
+		{ IO_QUICKLOAD, "quickload",    "quik" }, /* 12 */
+		{ IO_MEMCARD,   "memcard",      "memc" }, /* 13 */
+		{ IO_CDROM,     "cdrom",        "cdrm" }, /* 14 */
+		{ IO_MAGTAPE,   "magtape",      "magt" }, /* 15 */
+		{ IO_ROM,       "romimage",     "rom"  }, /* 16 */
+		{ IO_MIDIIN,    "midiin",       "min"  }, /* 17 */
+		{ IO_MIDIOUT,   "midiout",      "mout" }, /* 18 */
+		{ IO_PICTURE,   "picture",      "pic"  }, /* 19 */
+		{ IO_VIDEO,     "vidfile",      "vid"  }  /* 20 */
 	};
 
 
@@ -193,7 +195,7 @@ void device_image_interface::set_image_filename(const std::string &filename)
 	auto iter = std::find_if(
 		m_image_name.rbegin(),
 		m_image_name.rend(),
-		[](char c) { return (c == '\\') || (c == '/') || (c == ':'); });
+		[](char c) { return (c == '\\') || (c == '/'); });
 
 	if (iter != m_image_name.rend())
 		m_basename.assign(iter.base(), m_image_name.end());
@@ -217,7 +219,7 @@ void device_image_interface::set_image_filename(const std::string &filename)
 //  image creation by name
 //-------------------------------------------------
 
-const image_device_format *device_image_interface::device_get_named_creatable_format(const std::string &format_name)
+const image_device_format *device_image_interface::device_get_named_creatable_format(const std::string &format_name) noexcept
 {
 	for (auto &format : m_formatlist)
 		if (format->name() == format_name)
@@ -379,7 +381,7 @@ void device_image_interface::setup_working_directory()
 	// get user-specified directory and make sure it exists
 	m_working_directory = device().mconfig().options().sw_path();
 	// if multipath, get first
-	size_t i = m_working_directory.find_first_of(";");
+	size_t i = m_working_directory.find_first_of(';');
 	if (i != std::string::npos)
 		m_working_directory.resize(i);
 	// validate directory
@@ -430,7 +432,7 @@ const std::string &device_image_interface::working_directory()
 //  software_info structure from the softlist
 //-------------------------------------------------
 
-const software_info *device_image_interface::software_entry() const
+const software_info *device_image_interface::software_entry() const noexcept
 {
 	return !m_software_part_ptr ? nullptr : &m_software_part_ptr->info();
 }
@@ -446,7 +448,7 @@ u8 *device_image_interface::get_software_region(const char *tag)
 		return nullptr;
 
 	std::string full_tag = util::string_format("%s:%s", device().tag(), tag);
-	memory_region *region = device().machine().root_device().memregion(full_tag.c_str());
+	memory_region *region = device().machine().root_device().memregion(full_tag);
 	return region != nullptr ? region->base() : nullptr;
 }
 
@@ -458,7 +460,7 @@ u8 *device_image_interface::get_software_region(const char *tag)
 u32 device_image_interface::get_software_region_length(const char *tag)
 {
 	std::string full_tag = util::string_format("%s:%s", device().tag(), tag);
-	memory_region *region = device().machine().root_device().memregion(full_tag.c_str());
+	memory_region *region = device().machine().root_device().memregion(full_tag);
 	return region != nullptr ? region->bytes() : 0;
 }
 
@@ -587,7 +589,7 @@ u32 device_image_interface::crc()
 //  end command line?
 //-------------------------------------------------
 
-bool device_image_interface::support_command_line_image_creation() const
+bool device_image_interface::support_command_line_image_creation() const noexcept
 {
 	bool result;
 	switch (image_type())
@@ -625,11 +627,12 @@ bool device_image_interface::support_command_line_image_creation() const
 
 void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
-	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+	if (!buffer || (length <= 0))
+		throw emu_fatalerror("device_image_interface::battery_load: Must specify sensical buffer/length");
 
 	osd_file::error filerr;
 	int bytes_read = 0;
-	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
+	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext).append(".nv");
 
 	/* try to open the battery file and read it in, if possible */
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
@@ -641,13 +644,14 @@ void device_image_interface::battery_load(void *buffer, int length, int fill)
 	memset(((char *)buffer) + bytes_read, fill, length - bytes_read);
 }
 
-void device_image_interface::battery_load(void *buffer, int length, void *def_buffer)
+void device_image_interface::battery_load(void *buffer, int length, const void *def_buffer)
 {
-	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+	if (!buffer || (length <= 0))
+		throw emu_fatalerror("device_image_interface::battery_load: Must specify sensical buffer/length");
 
 	osd_file::error filerr;
 	int bytes_read = 0;
-	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
+	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext).append(".nv");
 
 	// try to open the battery file and read it in, if possible
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
@@ -655,9 +659,9 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 	if (filerr == osd_file::error::NONE)
 		bytes_read = file.read(buffer, length);
 
-	// if no file was present, copy the default battery
-	if (bytes_read == 0 && def_buffer)
-		memcpy((char *)buffer, (char *)def_buffer, length);
+	// if no file was present, copy the default contents
+	if (!bytes_read && def_buffer)
+		std::memcpy(buffer, def_buffer, length);
 }
 
 
@@ -670,12 +674,13 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 
 void device_image_interface::battery_save(const void *buffer, int length)
 {
-	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+	if (!buffer || (length <= 0))
+		throw emu_fatalerror("device_image_interface::battery_save: Must specify sensical buffer/length");
 
 	if (!device().machine().options().nvram_save())
 		return;
 
-	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
+	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext).append(".nv");
 
 	// try to open the battery file and write it out, if possible
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -831,56 +836,44 @@ std::vector<u32> device_image_interface::determine_open_plan(bool is_create)
 
 
 //-------------------------------------------------
-//  dump_wrong_and_correct_checksums - dump an
-//  error message containing the wrong and the
-//  correct checksums for a given software item
-//-------------------------------------------------
-
-static void dump_wrong_and_correct_checksums(const util::hash_collection &hashes, const util::hash_collection &acthashes)
-{
-	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string().c_str());
-	osd_printf_error("       FOUND: %s\n", acthashes.macro_string().c_str());
-}
-
-
-//-------------------------------------------------
 //  verify_length_and_hash - verify the length
 //  and hash signatures of a file
 //-------------------------------------------------
 
 static int verify_length_and_hash(emu_file *file, const char *name, u32 explength, const util::hash_collection &hashes)
 {
-	int retVal = 0;
-	if (file==nullptr) return 0;
+	int retval = 0;
+	if (!file)
+		return 0;
 
 	// verify length
 	u32 actlength = file->size();
 	if (explength != actlength)
 	{
 		osd_printf_error("%s WRONG LENGTH (expected: %d found: %d)\n", name, explength, actlength);
-		retVal++;
+		retval++;
 	}
 
-	// If there is no good dump known, write it
 	util::hash_collection &acthashes = file->hashes(hashes.hash_types().c_str());
 	if (hashes.flag(util::hash_collection::FLAG_NO_DUMP))
 	{
+		// If there is no good dump known, write it
 		osd_printf_error("%s NO GOOD DUMP KNOWN\n", name);
 	}
-	// verify checksums
 	else if (hashes != acthashes)
 	{
 		// otherwise, it's just bad
 		osd_printf_error("%s WRONG CHECKSUMS:\n", name);
-		dump_wrong_and_correct_checksums(hashes, acthashes);
-		retVal++;
+		osd_printf_error("    EXPECTED: %s\n", hashes.macro_string());
+		osd_printf_error("       FOUND: %s\n", acthashes.macro_string());
+		retval++;
 	}
-	// If it matches, but it is actually a bad dump, write it
 	else if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
 	{
+		// If it matches, but it is actually a bad dump, write it
 		osd_printf_error("%s NEEDS REDUMP\n",name);
 	}
-	return retVal;
+	return retval;
 }
 
 
@@ -890,102 +883,67 @@ static int verify_length_and_hash(emu_file *file, const char *name, u32 explengt
 
 bool device_image_interface::load_software(software_list_device &swlist, const char *swname, const rom_entry *start)
 {
-	std::string locationtag, breakstr("%");
-	const rom_entry *region;
-	bool retVal = false;
+	bool retval = false;
 	int warningcount = 0;
-	for (region = start; region != nullptr; region = rom_next_region(region))
+	for (const rom_entry *region = start; region; region = rom_next_region(region))
 	{
 		// loop until we hit the end of this region
-		const rom_entry *romp = region + 1;
-		while (!ROMENTRY_ISREGIONEND(romp))
+		for (const rom_entry *romp = region + 1; !ROMENTRY_ISREGIONEND(romp); romp++)
 		{
 			// handle files
 			if (ROMENTRY_ISFILE(romp))
 			{
-				osd_file::error filerr = osd_file::error::NOT_FOUND;
-
-				u32 crc = 0;
-				bool has_crc = util::hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
-
-				const software_info *swinfo = swlist.find(swname);
-				if (swinfo == nullptr)
+				const software_info *const swinfo = swlist.find(swname);
+				if (!swinfo)
 					return false;
 
-				u32 supported = swinfo->supported();
+				const u32 supported = swinfo->supported();
 				if (supported == SOFTWARE_SUPPORTED_PARTIAL)
-					osd_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name().c_str());
+					osd_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
 				if (supported == SOFTWARE_SUPPORTED_NO)
-					osd_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name().c_str());
+					osd_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
 
-				// attempt reading up the chain through the parents and create a locationtag std::string in the format
-				// " swlist % clonename % parentname "
-				// below, we have the code to split the elements and to create paths to load from
+				u32 crc = 0;
+				const bool has_crc = util::hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
+				std::vector<const software_info *> parents;
+				std::vector<std::string> searchpath = rom_load_manager::get_software_searchpath(swlist, *swinfo);
 
-				while (swinfo != nullptr)
+				// for historical reasons, add the search path for the software list device's owner
+				const device_t *const listowner = swlist.owner();
+				if (listowner)
 				{
-					locationtag.append(swinfo->shortname()).append(breakstr);
-					swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname().c_str()) : nullptr;
-				}
-				// strip the final '%'
-				locationtag.erase(locationtag.length() - 1, 1);
-
-
-				// check if locationtag actually contains two locations separated by '%'
-				// (i.e. check if we are dealing with a clone in softwarelist)
-				std::string tag2, tag3, tag4(locationtag), tag5;
-				int separator = tag4.find_first_of('%');
-				if (separator != -1)
-				{
-					// we are loading a clone through softlists, split the setname from the parentname
-					tag5.assign(tag4.substr(separator + 1, tag4.length() - separator + 1));
-					tag4.erase(separator, tag4.length() - separator);
+					std::vector<std::string> devsearch = listowner->searchpath();
+					for (std::string &path : devsearch)
+						searchpath.emplace_back(std::move(path));
 				}
 
-				// prepare locations where we have to load from: list/parentname & list/clonename
-				std::string tag1(swlist.list_name());
-				tag1.append(PATH_SEPARATOR);
-				tag2.assign(tag1.append(tag4));
-				tag1.assign(swlist.list_name());
-				tag1.append(PATH_SEPARATOR);
-				tag3.assign(tag1.append(tag5));
+				// try to load the file
+				m_mame_file.reset(new emu_file(device().machine().options().media_path(), searchpath, OPEN_FLAG_READ));
+				m_mame_file->set_restrict_to_mediapath(1);
+				osd_file::error filerr;
+				if (has_crc)
+					filerr = m_mame_file->open(ROM_GETNAME(romp), crc);
+				else
+					filerr = m_mame_file->open(ROM_GETNAME(romp));
+				if (filerr != osd_file::error::NONE)
+					m_mame_file.reset();
 
-				if (tag5.find_first_of('%') != -1)
-					fatalerror("We do not support clones of clones!\n");
-
-				// try to load from the available location(s):
-				// - if we are not using lists, we have regiontag only;
-				// - if we are using lists, we have: list/clonename, list/parentname, clonename, parentname
-				// try to load from list/setname
-				if ((m_mame_file == nullptr) && (tag2.c_str() != nullptr))
-					m_mame_file = common_process_file(device().machine().options(), tag2.c_str(), has_crc, crc, romp, filerr);
-				// try to load from list/parentname
-				if ((m_mame_file == nullptr) && (tag3.c_str() != nullptr))
-					m_mame_file = common_process_file(device().machine().options(), tag3.c_str(), has_crc, crc, romp, filerr);
-				// try to load from setname
-				if ((m_mame_file == nullptr) && (tag4.c_str() != nullptr))
-					m_mame_file = common_process_file(device().machine().options(), tag4.c_str(), has_crc, crc, romp, filerr);
-				// try to load from parentname
-				if ((m_mame_file == nullptr) && (tag5.c_str() != nullptr))
-					m_mame_file = common_process_file(device().machine().options(), tag5.c_str(), has_crc, crc, romp, filerr);
-
-				warningcount += verify_length_and_hash(m_mame_file.get(),ROM_GETNAME(romp),ROM_GETLENGTH(romp), util::hash_collection(ROM_GETHASHDATA(romp)));
+				warningcount += verify_length_and_hash(m_mame_file.get(), ROM_GETNAME(romp), ROM_GETLENGTH(romp), util::hash_collection(ROM_GETHASHDATA(romp)));
 
 				if (filerr == osd_file::error::NONE)
 					filerr = util::core_file::open_proxy(*m_mame_file, m_file);
 				if (filerr == osd_file::error::NONE)
-					retVal = true;
+					retval = true;
 
 				break; // load first item for start
 			}
-			romp++; /* something else; skip */
 		}
 	}
+
 	if (warningcount > 0)
-	{
 		osd_printf_error("WARNING: the software item might not run correctly.\n");
-	}
-	return retVal;
+
+	return retval;
 }
 
 
@@ -1047,7 +1005,7 @@ done:
 			if (device().machine().phase() == machine_phase::RUNNING)
 				device().popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
 			else
-				osd_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path.c_str(), error());
+				osd_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, error());
 		}
 		clear();
 	}

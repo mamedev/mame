@@ -137,15 +137,8 @@ public:
 	void program_11bit(address_map &map);
 	void program_12bit(address_map &map);
 
-	void set_t0_clk_cb(clock_update_delegate callback) { m_t0_clk_func = callback; }
-	template <class FunctionClass> void set_t0_clk_cb(const char *devname, void (FunctionClass::*callback)(uint32_t), const char *name)
-	{
-		set_t0_clk_cb(clock_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_t0_clk_cb(void (FunctionClass::*callback)(uint32_t), const char *name)
-	{
-		set_t0_clk_cb(clock_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_t0_clk_cb(T &&... args) { m_t0_clk_func.set(std::forward<T>(args)...); }
+
 protected:
 	typedef int (mcs48_cpu_device::*mcs48_ophandler)();
 
@@ -158,11 +151,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 15 - 1) / 15; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 15); }
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 3; }
-	virtual uint32_t execute_input_lines() const override { return 2; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 15 - 1) / 15; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 15); }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 3; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -182,12 +175,12 @@ protected:
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
-	devcb_read8   m_port_in_cb[2];
-	devcb_write8  m_port_out_cb[2];
-	devcb_read8   m_bus_in_cb;
-	devcb_write8  m_bus_out_cb;
+	devcb_read8::array<2> m_port_in_cb;
+	devcb_write8::array<2> m_port_out_cb;
+	devcb_read8 m_bus_in_cb;
+	devcb_write8 m_bus_out_cb;
 
-	devcb_read_line m_test_in_cb[2];
+	devcb_read_line::array<2> m_test_in_cb;
 	clock_update_delegate m_t0_clk_func;
 	devcb_write_line m_prog_out_cb;
 
@@ -223,10 +216,9 @@ protected:
 	int         m_icount;
 
 	/* Memory spaces */
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_data;
-	address_space *m_io;
+	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
+	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	required_shared_ptr<uint8_t> m_dataptr;
 
@@ -242,15 +234,15 @@ protected:
 	const mcs48_ophandler *const m_opcode_table;
 
 	/* ROM is mapped to AS_PROGRAM */
-	uint8_t program_r(offs_t a)         { return m_program->read_byte(a); }
+	uint8_t program_r(offs_t a)         { return m_program.read_byte(a); }
 
 	/* RAM is mapped to AS_DATA */
-	uint8_t ram_r(offs_t a)             { return m_data->read_byte(a); }
-	void    ram_w(offs_t a, uint8_t v)  { m_data->write_byte(a, v); }
+	uint8_t ram_r(offs_t a)             { return m_data.read_byte(a); }
+	void    ram_w(offs_t a, uint8_t v)  { m_data.write_byte(a, v); }
 
 	/* ports are mapped to AS_IO and callbacks */
-	uint8_t ext_r(offs_t a)             { return m_io->read_byte(a); }
-	void    ext_w(offs_t a, uint8_t v)  { m_io->write_byte(a, v); }
+	uint8_t ext_r(offs_t a)             { return m_io.read_byte(a); }
+	void    ext_w(offs_t a, uint8_t v)  { m_io.write_byte(a, v); }
 	uint8_t port_r(offs_t a)            { return m_port_in_cb[a - 1](); }
 	void    port_w(offs_t a, uint8_t v) { m_port_out_cb[a - 1](v); }
 	int     test_r(offs_t a)            { return m_test_in_cb[a](); }
@@ -524,8 +516,8 @@ public:
 
 protected:
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 30 - 1) / 30; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 30); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 30 - 1) / 30; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 30); }
 };
 
 class i8022_device : public mcs48_cpu_device
@@ -536,8 +528,8 @@ public:
 
 protected:
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 30 - 1) / 30; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 30); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 30 - 1) / 30; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 30); }
 };
 
 class i8035_device : public mcs48_cpu_device
@@ -629,8 +621,8 @@ class upi41_cpu_device : public mcs48_cpu_device
 {
 public:
 	/* functions for talking to the input/output buffers on the UPI41-class chips */
-	DECLARE_READ8_MEMBER(upi41_master_r);
-	DECLARE_WRITE8_MEMBER(upi41_master_w);
+	uint8_t upi41_master_r(offs_t offset);
+	void upi41_master_w(offs_t offset, uint8_t data);
 
 protected:
 	// construction/destruction

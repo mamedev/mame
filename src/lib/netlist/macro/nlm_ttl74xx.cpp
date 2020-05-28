@@ -1,10 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-#include "nlm_ttl74xx.h"
 
-#include "netlist/devices/nld_schmitt.h"
-#include "netlist/devices/nld_system.h"
-
+#include "netlist/devices/net_lib.h"
 
 /*
  *  DM7400: Quad 2-Input NAND Gates
@@ -117,6 +114,37 @@ static NETLIST_START(TTL_7404_DIP)
 		C.A,  /*    A3 |5           10| Y5   */ E.Q,
 		C.Q,  /*    Y3 |6            9| A4   */ D.A,
 		A.GND,/*   GND |7            8| Y4   */ D.Q
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+/*
+ *   DM7406: Hex Inverting Buffers with
+ *           High Voltage Open-Collector Outputs
+ *
+ *  Naming conventions follow Fairchild Semiconductor datasheet
+ *
+ */
+
+static NETLIST_START(TTL_7406_DIP)
+	TTL_7406_GATE(A)
+	TTL_7406_GATE(B)
+	TTL_7406_GATE(C)
+	TTL_7406_GATE(D)
+	TTL_7406_GATE(E)
+	TTL_7406_GATE(F)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
+
+	DIPPINS(  /*       +--------------+      */
+		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
+		A.Y,  /*    Y1 |2           13| A6   */ F.A,
+		B.A,  /*    A2 |3           12| Y6   */ F.Y,
+		B.Y,  /*    Y2 |4    7406   11| A5   */ E.A,
+		C.A,  /*    A3 |5           10| Y5   */ E.Y,
+		C.Y,  /*    Y3 |6            9| A4   */ D.A,
+		A.GND,/*   GND |7            8| Y4   */ D.Y
 			  /*       +--------------+      */
 	)
 NETLIST_END()
@@ -245,6 +273,7 @@ static NETLIST_START(TTL_7414_GATE)
 	ALIAS(A, X.A)
 	ALIAS(Q, X.Q)
 	ALIAS(GND, X.GND)
+	ALIAS(VCC, X.VCC)
 NETLIST_END()
 
 static NETLIST_START(TTL_74LS14_GATE)
@@ -252,6 +281,7 @@ static NETLIST_START(TTL_74LS14_GATE)
 	ALIAS(A, X.A)
 	ALIAS(Q, X.Q)
 	ALIAS(GND, X.GND)
+	ALIAS(VCC, X.VCC)
 NETLIST_END()
 
 static NETLIST_START(TTL_7414_DIP)
@@ -263,10 +293,10 @@ static NETLIST_START(TTL_7414_DIP)
 	SCHMITT_TRIGGER(F, "DM7414")
 
 	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
-	DUMMY_INPUT(VCC)
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
 
 	DIPPINS(   /*       +--------------+      */
-		A.A,   /*    A1 |1     ++    14| VCC  */ VCC.I,
+		A.A,   /*    A1 |1     ++    14| VCC  */ A.VCC,
 		A.Q,   /*    Y1 |2           13| A6   */ F.A,
 		B.A,   /*    A2 |3           12| Y6   */ F.Q,
 		B.Q,   /*    Y2 |4    7414   11| A5   */ E.A,
@@ -286,10 +316,10 @@ static NETLIST_START(TTL_74LS14_DIP)
 	SCHMITT_TRIGGER(F, "DM74LS14")
 
 	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
-	DUMMY_INPUT(VCC)
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
 
 	DIPPINS(   /*       +--------------+      */
-		A.A,   /*    A1 |1     ++    14| VCC  */ VCC.I,
+		A.A,   /*    A1 |1     ++    14| VCC  */ A.VCC,
 		A.Q,   /*    Y1 |2           13| A6   */ F.A,
 		B.A,   /*    A2 |3           12| Y6   */ F.Q,
 		B.Q,   /*    Y2 |4   74LS14  11| A5   */ E.A,
@@ -353,7 +383,45 @@ static NETLIST_START(TTL_7420_DIP)
 
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
-	DUMMY_INPUT(NC)
+	NC_PIN(NC)
+
+	DIPPINS(  /*       +--------------+      */
+		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
+		A.B,  /*    B1 |2           13| D2   */ B.D,
+		NC.I, /*    NC |3           12| C2   */ B.C,
+		A.C,  /*    C1 |4    7420   11| NC   */ NC.I,
+		A.D,  /*    D1 |5           10| B2   */ B.B,
+		A.Q,  /*    Y1 |6            9| A2   */ B.A,
+		A.GND,/*   GND |7            8| Y2   */ B.Q
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+/*
+ *  DM7421: Dual 4-Input AND Gates
+ *
+ *                  ___
+ *              Y = ABCD
+ *          +---+---+---+---++---+
+ *          | A | B | C | D || Y |
+ *          +===+===+===+===++===+
+ *          | X | X | X | 0 || 0 |
+ *          | X | X | 0 | X || 0 |
+ *          | X | 0 | X | X || 0 |
+ *          | 0 | X | X | X || 0 |
+ *          | 1 | 1 | 1 | 1 || 1 |
+ *          +---+---+---+---++---+
+ *
+ *  Naming conventions follow National Semiconductor datasheet *
+ */
+
+static NETLIST_START(TTL_7421_DIP)
+	TTL_7421_GATE(A)
+	TTL_7421_GATE(B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+	NC_PIN(NC)
 
 	DIPPINS(  /*       +--------------+      */
 		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
@@ -395,13 +463,14 @@ static NETLIST_START(TTL_7425_DIP)
 
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
-	DUMMY_INPUT(X)
+	NC_PIN(XA) // FIXME: Functionality needs to be implemented
+	NC_PIN(XB) // FIXME: Functionality needs to be implemented
 
 	DIPPINS(  /*       +--------------+      */
 		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
 		A.B,  /*    B1 |2           13| D2   */ B.D,
-		X.I,  /*    X1 |3           12| C2   */ B.C,
-		A.C,  /*    C1 |4    7425   11| X2   */ X.I,
+		XA.I, /*    X1 |3           12| C2   */ B.C,
+		A.C,  /*    C1 |4    7425   11| X2   */ XB.I,
 		A.D,  /*    D1 |5           10| B2   */ B.B,
 		A.Q,  /*    Y1 |6            9| A2   */ B.A,
 		A.GND,/*   GND |7            8| Y2   */ B.Q
@@ -471,15 +540,17 @@ NETLIST_END()
 static NETLIST_START(TTL_7430_DIP)
 	TTL_7430_GATE(A)
 
-	DUMMY_INPUT(NC)
+	NC_PIN(NC9)
+	NC_PIN(NC10)
+	NC_PIN(NC13)
 
 	DIPPINS(  /*       +--------------+      */
 		A.A,  /*     A |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*     B |2           13| NC   */ NC.I,
+		A.B,  /*     B |2           13| NC   */ NC13.I,
 		A.C,  /*     C |3           12| H    */ A.H,
 		A.D,  /*     D |4    7430   11| G    */ A.G,
-		A.E,  /*     E |5           10| NC   */ NC.I,
-		A.F,  /*     F |6            9| NC   */ NC.I,
+		A.E,  /*     E |5           10| NC   */ NC10.I,
+		A.F,  /*     F |6            9| NC   */ NC9.I,
 		A.GND,/*   GND |7            8| Y    */ A.Q
 			  /*       +--------------+      */
 	)
@@ -604,7 +675,7 @@ static NETLIST_START(TTL_7486_DIP)
 	)
 NETLIST_END()
 
-#if (USE_TRUTHTABLE_74107)
+#if (NL_USE_TRUTHTABLE_74107)
 #ifndef __PLIB_PREPROCESSOR__
 #define TTL_74107_TT(name)                                                         \
 		NET_REGISTER_DEV(TTL_74107, name)
@@ -660,6 +731,106 @@ NETLIST_END()
  * Naming conventions follow National Semiconductor datasheet
  *
  */
+
+//- Identifier:  TTL_74125_DIP
+//- Title: SN74125 QUADRUPLE BUS BUFFERS WITH 3-STATE OUTPUTS
+//- Description: These bus buffers feature three-state outputs
+//-    that, when enabled, have the low impedance characteristics of a
+//-    TTL output with additional drive capability at high logic levels
+//-    to permit driving heavily loaded bus lines without external
+//-    pullup resistors. When disabled, both output transistors are turned
+//-    off, presenting a high-impedance state to the bus so the output will
+//-    act neither as a significant load nor as a driver. The ’125 and
+//-    ’LS125A devices’ outputs are disabled when G is high.
+//-    The ’126 and ’LS126A devices’ outputs are disabled when G is low
+//-
+//- Pinalias: 1GQ,1A,1Y,2GQ,2A,2Y,GND,3Y,3A,3GQ,4Y,4A,4GQ,VCC
+//- Package: DIP
+//- Param: FORCE_TRISTATE_LOGIC
+//-    Set this parameter to 1 force tristate outputs into logic mode.
+//-    This should be done only if the device enable inputs are connected
+//-    in a way which always enables the device.
+//- NamingConvention: Naming conventions follow Texas instruments datasheet
+//- Limitations:
+//-    No limitations
+//-
+//- Example: 74125.cpp,74125_example
+//-
+//- FunctionTable:
+//-
+//-    | GQ  | A  | Y  |
+//-    |:---:|:--:|:--:|
+//-    |  L  |  L |  L |
+//-    |  L  |  H |  H |
+//-    |  H  |  X |  Z |
+//-
+
+static NETLIST_START(TTL_74125_DIP)
+
+	TTL_74125_GATE(A1)
+	TTL_74125_GATE(A2)
+	TTL_74125_GATE(A3)
+	TTL_74125_GATE(A4)
+
+	DEFPARAM(FORCE_TRISTATE_LOGIC, "$(@.A1.FORCE_TRISTATE_LOGIC")
+
+	PARAM(A1.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A2.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A3.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A4.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+
+	ALIAS(1, A1.GQ)
+	ALIAS(2, A1.A)
+	ALIAS(3, A1.Y)
+	ALIAS(4, A2.GQ)
+	ALIAS(5, A2.A)
+	ALIAS(6, A2.Y)
+	ALIAS(7, A1.GND)
+
+	ALIAS(8, A3.Y)
+	ALIAS(9, A3.A)
+	ALIAS(10, A3.GQ)
+	ALIAS(11, A4.Y)
+	ALIAS(12, A4.A)
+	ALIAS(13, A4.GQ)
+	ALIAS(14, A1.VCC)
+
+	NET_C(A1.VCC, A2.VCC, A3.VCC, A4.VCC)
+	NET_C(A1.GND, A2.GND, A3.GND, A4.GND)
+NETLIST_END()
+
+static NETLIST_START(TTL_74126_DIP)
+
+	TTL_74126_GATE(A1)
+	TTL_74126_GATE(A2)
+	TTL_74126_GATE(A3)
+	TTL_74126_GATE(A4)
+
+	DEFPARAM(FORCE_TRISTATE_LOGIC, 0)
+	PARAM(A1.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A2.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A3.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A4.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+
+	ALIAS(1, A1.G)
+	ALIAS(2, A1.A)
+	ALIAS(3, A1.Y)
+	ALIAS(4, A2.G)
+	ALIAS(5, A2.A)
+	ALIAS(6, A2.Y)
+	ALIAS(7, A1.GND)
+
+	ALIAS(8, A3.Y)
+	ALIAS(9, A3.A)
+	ALIAS(10, A3.G)
+	ALIAS(11, A4.Y)
+	ALIAS(12, A4.A)
+	ALIAS(13, A4.G)
+	ALIAS(14, A1.VCC)
+
+	NET_C(A1.VCC, A2.VCC, A3.VCC, A4.VCC)
+	NET_C(A1.GND, A2.GND, A3.GND, A4.GND)
+NETLIST_END()
 
 static NETLIST_START(TTL_74155_DIP)
 	NET_REGISTER_DEV(TTL_74155A_GATE, A)
@@ -764,11 +935,13 @@ NETLIST_END()
  *
  */
 
+#if !NL_AUTO_DEVICES
 #ifndef __PLIB_PREPROCESSOR__
 #define TTL_74279A(name)                                                         \
 		NET_REGISTER_DEV(TTL_74279A, name)
 #define TTL_74279B(name)                                                         \
 		NET_REGISTER_DEV(TTL_74279B, name)
+#endif
 #endif
 
 static NETLIST_START(TTL_74279_DIP)
@@ -790,6 +963,93 @@ static NETLIST_START(TTL_74279_DIP)
 		B.Q,   /*  2Q |7           10| 3R  */ C.R,
 		A.GND, /* GND |8            9| 3Q  */ C.Q
 			   /*     +--------------+     */
+	)
+NETLIST_END()
+
+/*
+ *  DM74377: Octal D Flip-Flop With Enable
+ *  DM74378: Hex D Flip-Flop With Enable
+ *  DM74379: 4-bit D Flip-Flop With Enable
+ *
+ */
+
+static NETLIST_START(TTL_74377_DIP)
+	TTL_74377_GATE(A)
+	TTL_74377_GATE(B)
+	TTL_74377_GATE(C)
+	TTL_74377_GATE(D)
+	TTL_74377_GATE(E)
+	TTL_74377_GATE(F)
+	TTL_74377_GATE(G)
+	TTL_74377_GATE(H)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC, G.VCC, H.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND, G.GND, H.GND)
+	NET_C(A.CP, B.CP, C.CP, D.CP, E.CP, F.CP, G.CP, H.CP)
+	NET_C(A.E, B.E, C.E, D.E, E.E, F.E, G.E, H.E)
+
+	DIPPINS(  /*       +--------------+      */
+		A.E,  /*    /E |1     ++    20| VCC  */ A.VCC,
+		A.Q,  /*    Q0 |2           19| Q7   */ H.Q,
+		A.D,  /*    D0 |3           18| D7   */ H.D,
+		B.D,  /*    D1 |4   74377   17| D6   */ G.D,
+		B.Q,  /*    Q1 |5           16| Q6   */ G.Q,
+		C.Q,  /*    Q2 |6           15| Q5   */ F.Q,
+		C.D,  /*    D2 |7           14| D5   */ F.D,
+		D.D,  /*    D3 |8           13| D4   */ E.D,
+		D.Q,  /*    Q3 |9           12| Q4   */ E.D,
+		A.GND,/*   GND |10          11| CP   */ A.CP
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+static NETLIST_START(TTL_74378_DIP)
+	TTL_74377_GATE(A)
+	TTL_74377_GATE(B)
+	TTL_74377_GATE(C)
+	TTL_74377_GATE(D)
+	TTL_74377_GATE(E)
+	TTL_74377_GATE(F)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
+	NET_C(A.CP, B.CP, C.CP, D.CP, E.CP, F.CP)
+	NET_C(A.E, B.E, C.E, D.E, E.E, F.E)
+
+	DIPPINS(  /*       +--------------+      */
+		A.E,  /*    /E |1     ++    16| VCC  */ A.VCC,
+		A.Q,  /*    Q0 |2           15| Q5   */ F.Q,
+		A.D,  /*    D0 |3           14| D5   */ F.D,
+		B.D,  /*    D1 |4   74378   13| D4   */ E.D,
+		B.Q,  /*    Q1 |5           12| Q4   */ E.Q,
+		C.D,  /*    D2 |6           11| D3   */ D.D,
+		C.Q,  /*    Q2 |7           10| Q3   */ D.Q,
+		A.GND,/*   GND |8            9| CP   */ A.CP
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+static NETLIST_START(TTL_74379_DIP)
+	TTL_74377_GATE(A)
+	TTL_74377_GATE(B)
+	TTL_74377_GATE(C)
+	TTL_74377_GATE(D)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND)
+	NET_C(A.CP, B.CP, C.CP, D.CP)
+	NET_C(A.E, B.E, C.E, D.E)
+
+	DIPPINS(  /*       +--------------+      */
+		A.E,  /*    /E |1     ++    16| VCC  */ A.VCC,
+		A.Q,  /*    Q0 |2           15| Q3   */ D.Q,
+		A.QQ, /*   /Q0 |3           14| /Q3  */ D.QQ,
+		A.D,  /*    D0 |4   74379   13| D3   */ D.D,
+		B.D,  /*    D1 |5           12| D2   */ C.D,
+		B.QQ, /*   /Q1 |6           11| /Q2  */ C.QQ,
+		B.Q,  /*    Q1 |7           10| Q2   */ C.Q,
+		A.GND,/*   GND |8            9| CP   */ A.CP
+			  /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -827,7 +1087,7 @@ NETLIST_END()
 
 #ifndef __PLIB_PREPROCESSOR__
 #define DM9312_TT(name)     \
-		NET_REGISTER_DEV(DM9312_TT, name)
+		NET_REGISTER_DEV(DM9312, name)
 #endif
 
 static NETLIST_START(DM9312_DIP)
@@ -846,7 +1106,7 @@ static NETLIST_START(DM9312_DIP)
 	)
 NETLIST_END()
 
-#if (USE_TRUTHTABLE_7448)
+#if (NL_USE_TRUTHTABLE_7448)
 
 /*
  *  DM7448: BCD to 7-Segment decoders/drivers
@@ -892,7 +1152,7 @@ NETLIST_START(TTL74XX_lib)
 	NET_MODEL("DM7414         SCHMITT_TRIGGER(VTP=1.7 VTM=0.9 VI=4.35 RI=6.15k VOH=3.5 ROH=120 VOL=0.1 ROL=37.5 TPLH=15 TPHL=15)")
 	NET_MODEL("TTL_7414_GATE  SCHMITT_TRIGGER(VTP=1.7 VTM=0.9 VI=4.35 RI=6.15k VOH=3.5 ROH=120 VOL=0.1 ROL=37.5 TPLH=15 TPHL=15)")
 	NET_MODEL("DM74LS14       SCHMITT_TRIGGER(VTP=1.6 VTM=0.8 VI=4.4 RI=19.3k VOH=3.45 ROH=130 VOL=0.1 ROL=31.2 TPLH=15 TPHL=15)")
-	//NET_MODEL("DM7414 FAMILY(FV=5 IVL=0.16 IVH=0.4 OVL=0.1 OVH=0.05 ORL=10.0 ORH=1.0e8)")
+	//NET_MODEL("DM7414 FAMILY(IVL=0.16 IVH=0.4 OVL=0.1 OVH=0.05 ORL=10.0 ORH=1.0e8)")
 
 
 	TRUTHTABLE_START(TTL_7400_GATE, 2, 1, "")
@@ -939,6 +1199,14 @@ NETLIST_START(TTL74XX_lib)
 		TT_LINE(" 0 | 1 |22")
 		TT_LINE(" 1 | 0 |15")
 		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
+	TRUTHTABLE_START(TTL_7406_GATE, 1, 1, "")
+		TT_HEAD("A|Y ")
+		TT_LINE("0|1|15")
+		TT_LINE("1|0|23")
+		/* Open Collector */
+		TT_FAMILY("74XXOC")
 	TRUTHTABLE_END()
 
 	TRUTHTABLE_START(TTL_7408_GATE, 2, 1, "")
@@ -1018,6 +1286,26 @@ NETLIST_START(TTL74XX_lib)
 		TT_LINE("X,X,0,X|1|22")
 		TT_LINE("X,X,X,0|1|22")
 		TT_LINE("1,1,1,1|0|15")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
+	TRUTHTABLE_START(TTL_7421_GATE, 4, 1, "")
+		TT_HEAD("A,B,C,D|Q ")
+		TT_LINE("0,X,X,X|0|22")
+		TT_LINE("X,0,X,X|0|22")
+		TT_LINE("X,X,0,X|0|22")
+		TT_LINE("X,X,X,0|0|22")
+		TT_LINE("1,1,1,1|1|15")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
+	TRUTHTABLE_START(TTL_7421_AND, 4, 1, "+A,+B,+C,+D,@VCC,@GND")
+		TT_HEAD("A,B,C,D|Q ")
+		TT_LINE("0,X,X,X|0|22")
+		TT_LINE("X,0,X,X|0|22")
+		TT_LINE("X,X,0,X|0|22")
+		TT_LINE("X,X,X,0|0|22")
+		TT_LINE("1,1,1,1|1|15")
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
@@ -1115,7 +1403,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-#if (USE_TRUTHTABLE_7448)
+#if (NL_USE_TRUTHTABLE_7448)
 	TRUTHTABLE_START(TTL_7448, 7, 7, "+A,+B,+C,+D,+LTQ,+BIQ,+RBIQ,@VCC,@GND")
 		TT_HEAD(" LTQ,BIQ,RBIQ, A , B , C , D | a, b, c, d, e, f, g")
 
@@ -1207,7 +1495,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-#if (USE_TRUTHTABLE_74107)
+#if (NL_USE_TRUTHTABLE_74107)
 	/*
 	 *          +-----+-----+-----+---++---+-----+
 	 *          | CLRQ| CLK |  J  | K || Q | QQ  |
@@ -1340,7 +1628,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(DM9312_TT, 12, 2, "+A,+B,+C,+G,+D0,+D1,+D2,+D3,+D4,+D5,+D6,+D7,@VCC,@GND")
+	TRUTHTABLE_START(DM9312, 12, 2, "+A,+B,+C,+G,+D0,+D1,+D2,+D3,+D4,+D5,+D6,+D7,@VCC,@GND")
 		TT_HEAD(" C, B, A, G,D0,D1,D2,D3,D4,D5,D6,D7| Y,YQ")
 		TT_LINE(" X, X, X, 1, X, X, X, X, X, X, X, X| 0, 1|33,19")
 		TT_LINE(" 0, 0, 0, 0, 0, X, X, X, X, X, X, X| 0, 1|33,28")
@@ -1365,6 +1653,7 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7400_DIP)
 	LOCAL_LIB_ENTRY(TTL_7402_DIP)
 	LOCAL_LIB_ENTRY(TTL_7404_DIP)
+	LOCAL_LIB_ENTRY(TTL_7406_DIP)
 	LOCAL_LIB_ENTRY(TTL_7408_DIP)
 	LOCAL_LIB_ENTRY(TTL_7410_DIP)
 	LOCAL_LIB_ENTRY(TTL_7411_DIP)
@@ -1374,21 +1663,27 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_74LS14_DIP)
 	LOCAL_LIB_ENTRY(TTL_7416_DIP)
 	LOCAL_LIB_ENTRY(TTL_7420_DIP)
+	LOCAL_LIB_ENTRY(TTL_7421_DIP)
 	LOCAL_LIB_ENTRY(TTL_7425_DIP)
 	LOCAL_LIB_ENTRY(TTL_7427_DIP)
 	LOCAL_LIB_ENTRY(TTL_7430_DIP)
 	LOCAL_LIB_ENTRY(TTL_7432_DIP)
 	LOCAL_LIB_ENTRY(TTL_7437_DIP)
-#if (USE_TRUTHTABLE_7448)
+#if (NL_USE_TRUTHTABLE_7448)
 	LOCAL_LIB_ENTRY(TTL_7448_DIP)
 #endif
 	LOCAL_LIB_ENTRY(TTL_7486_DIP)
-#if (USE_TRUTHTABLE_74107)
+	LOCAL_LIB_ENTRY(TTL_74125_DIP)
+	LOCAL_LIB_ENTRY(TTL_74126_DIP)
+#if (NL_USE_TRUTHTABLE_74107)
 	LOCAL_LIB_ENTRY(TTL_74107_DIP)
 #endif
 	LOCAL_LIB_ENTRY(TTL_74155_DIP)
 	LOCAL_LIB_ENTRY(TTL_74156_DIP)
 	LOCAL_LIB_ENTRY(TTL_74260_DIP)
 	LOCAL_LIB_ENTRY(TTL_74279_DIP)
+	LOCAL_LIB_ENTRY(TTL_74377_DIP)
+	LOCAL_LIB_ENTRY(TTL_74378_DIP)
+	LOCAL_LIB_ENTRY(TTL_74379_DIP)
 	LOCAL_LIB_ENTRY(DM9312_DIP)
 NETLIST_END()

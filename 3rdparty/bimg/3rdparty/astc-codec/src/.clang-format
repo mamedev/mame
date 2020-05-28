@@ -1,0 +1,4 @@
+BasedOnStyle: Google
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Inline
+SpaceAfterTemplateKeyword: false

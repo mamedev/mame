@@ -63,6 +63,8 @@ private:
 	uint8_t m_data;
 	uint8_t m_transmit;
 
+	uint8_t m_last_status;
+
 	void set_disable_inhibit(bool dis, bool inh);
 	void set_lines(bool bav, bool hsk);
 };

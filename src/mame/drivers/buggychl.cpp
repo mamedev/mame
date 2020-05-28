@@ -223,11 +223,11 @@ void buggychl_state::buggychl_map(address_map &map)
 	map(0xd603, 0xd603).mirror(0x00e4).portr("IN0");    /* player inputs */
 	map(0xd608, 0xd608).mirror(0x00e4).portr("WHEEL");
 	map(0xd609, 0xd609).mirror(0x00e4).portr("IN1");    /* coin + accelerator */
-//  AM_RANGE(0xd60a, 0xd60a) AM_MIRROR(0x00e4) // other inputs, not used?
-//  AM_RANGE(0xd60b, 0xd60b) AM_MIRROR(0x00e4) // other inputs, not used?
+//  map(0xd60a, 0xd60a).mirror(0x00e4); // other inputs, not used?
+//  map(0xd60b, 0xd60b).mirror(0x00e4); // other inputs, not used?
 	map(0xd610, 0xd610).mirror(0x00e4).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xd611, 0xd611).mirror(0x00e4).r(FUNC(buggychl_state::sound_status_main_r));
-//  AM_RANGE(0xd613, 0xd613) AM_MIRROR(0x00e4) AM_WRITE(sound_reset_w)
+//  map(0xd613, 0xd613).mirror(0x00e4).w(FUNC(buggychl_state::sound_reset_w));
 	map(0xd618, 0xd618).mirror(0x00e7).nopw();    /* accelerator clear; TODO: should we emulate the proper quadrature counter here? */
 	map(0xd700, 0xd7ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xd820, 0xd83f).ram(); // TODO
@@ -406,7 +406,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P1 Gear Shift")  /* shift */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_TOGGLE PORT_NAME("P1 Gear Shift")  /* shift */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -417,7 +417,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, buggychl_state, pedal_in_r, nullptr)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(buggychl_state, pedal_in_r)
 
 	PORT_START("PEDAL")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_NAME("P1 Pedal") PORT_SENSITIVITY(100) PORT_KEYDELTA(15)   /* accelerator */
@@ -463,24 +463,24 @@ WRITE8_MEMBER(buggychl_state::ta7630_volbal_msm_w)
 	m_ta7630->set_device_volume(m_msm, data >> 4);
 }
 
-WRITE8_MEMBER(buggychl_state::ta7630_volbal_ay1_w)
+void buggychl_state::ta7630_volbal_ay1_w(uint8_t data)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 	m_ta7630->set_device_volume(m_ay1, data >> 4);
 }
 
-WRITE8_MEMBER(buggychl_state::port_b_0_w)
+void buggychl_state::port_b_0_w(uint8_t data)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }
 
-WRITE8_MEMBER(buggychl_state::ta7630_volbal_ay2_w)
+void buggychl_state::ta7630_volbal_ay2_w(uint8_t data)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 	m_ta7630->set_device_volume(m_ay2, data >> 4);
 }
 
-WRITE8_MEMBER(buggychl_state::port_b_1_w)
+void buggychl_state::port_b_1_w(uint8_t data)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }

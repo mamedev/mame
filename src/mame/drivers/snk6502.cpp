@@ -293,14 +293,6 @@ Stephh's notes (based on the games M6502 code and some tests) :
 
 #define MASTER_CLOCK    XTAL(11'289'000)
 
-/* Change to 1 to allow fake debug buttons */
-#define NIBBLER_HACK    0
-
-
-#ifndef M_LN2
-#define M_LN2       0.69314718055994530942
-#endif
-
 
 void snk6502_state::machine_start()
 {
@@ -382,26 +374,46 @@ void snk6502_state::satansat_map(address_map &map)
 	map(0xf800, 0xffff).rom();
 }
 
-void snk6502_state::vanguard_map(address_map &map)
+uint8_t vanguard_state::highmem_r(offs_t offset)
+{
+	// RDY toggles on ϕ2 during each access to memory above $3FFF, generating one wait state
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-1);
+
+	return m_highmem->read8(offset + 0x4000);
+}
+
+void vanguard_state::highmem_w(offs_t offset, uint8_t data)
+{
+	// RDY toggles on ϕ2 during each access to memory above $3FFF, but 6502 does not apply wait states to writes
+	m_highmem->write8(offset + 0x4000, data);
+}
+
+void vanguard_state::vanguard_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07ff).ram().w(FUNC(snk6502_state::videoram2_w)).share("videoram2");
-	map(0x0800, 0x0bff).ram().w(FUNC(snk6502_state::videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(FUNC(snk6502_state::colorram_w)).share("colorram");
-	map(0x1000, 0x1fff).ram().w(FUNC(snk6502_state::charram_w)).share("charram");
+	map(0x0400, 0x07ff).ram().w(FUNC(vanguard_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(FUNC(vanguard_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(vanguard_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(FUNC(vanguard_state::charram_w)).share("charram");
 	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x3001, 0x3001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x3100, 0x3102).w("snk6502", FUNC(vanguard_sound_device::sound_w));
-	map(0x3103, 0x3103).w(FUNC(snk6502_state::flipscreen_w));
+	map(0x3103, 0x3103).w(FUNC(vanguard_state::flipscreen_w));
 	map(0x3104, 0x3104).portr("IN0");
 	map(0x3105, 0x3105).portr("IN1");
 	map(0x3106, 0x3106).portr("DSW");
 	map(0x3107, 0x3107).portr("IN2");
-	map(0x3200, 0x3200).w(FUNC(snk6502_state::scrollx_w));
-	map(0x3300, 0x3300).w(FUNC(snk6502_state::scrolly_w));
+	map(0x3200, 0x3200).w(FUNC(vanguard_state::scrollx_w));
+	map(0x3300, 0x3300).w(FUNC(vanguard_state::scrolly_w));
 	map(0x3400, 0x3400).w("snk6502", FUNC(vanguard_sound_device::speech_w)); // speech
-	map(0x4000, 0xbfff).rom();
-	map(0xf000, 0xffff).rom(); /* for the reset / interrupt vectors */
+	map(0x4000, 0xffff).rw(FUNC(vanguard_state::highmem_r), FUNC(vanguard_state::highmem_w));
+}
+
+void vanguard_state::vanguard_upper_map(address_map &map)
+{
+	map(0x4000, 0xbfff).rom().region("maincpu", 0x4000);
+	map(0xf000, 0xffff).rom().region("maincpu", 0xf000); /* for the reset / interrupt vectors */
 }
 
 void fantasy_state::fantasy_map(address_map &map)
@@ -422,8 +434,8 @@ void fantasy_state::fantasy_map(address_map &map)
 	map(0x2200, 0x2200).w(FUNC(fantasy_state::scrollx_w));
 	map(0x2300, 0x2300).w(FUNC(fantasy_state::scrolly_w));
 	map(0x2400, 0x2400).w("snk6502", FUNC(fantasy_sound_device::speech_w));  // speech
-	map(0x3000, 0xbfff).rom();
-	map(0xf000, 0xffff).rom();
+	map(0x3000, 0x3fff).rom().region("maincpu", 0x3000);
+	map(0x4000, 0xffff).rw(FUNC(fantasy_state::highmem_r), FUNC(fantasy_state::highmem_w));
 }
 
 void fantasy_state::pballoon_map(address_map &map)
@@ -433,7 +445,13 @@ void fantasy_state::pballoon_map(address_map &map)
 	map(0x0800, 0x0bff).ram().w(FUNC(fantasy_state::videoram_w)).share("videoram");
 	map(0x0c00, 0x0fff).ram().w(FUNC(fantasy_state::colorram_w)).share("colorram");
 	map(0x1000, 0x1fff).ram().w(FUNC(fantasy_state::charram_w)).share("charram");
-	map(0x3000, 0x9fff).rom();
+	map(0x3000, 0x3fff).rom().region("maincpu", 0x3000);
+	map(0x4000, 0xffff).rw(FUNC(fantasy_state::highmem_r), FUNC(fantasy_state::highmem_w));
+}
+
+void fantasy_state::pballoon_upper_map(address_map &map)
+{
+	map(0x4000, 0x9fff).rom().region("maincpu", 0x4000);
 	map(0xb000, 0xb000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xb001, 0xb001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xb100, 0xb102).w("snk6502", FUNC(fantasy_sound_device::sound_w));
@@ -444,7 +462,7 @@ void fantasy_state::pballoon_map(address_map &map)
 	map(0xb107, 0xb107).portr("IN2");
 	map(0xb200, 0xb200).w(FUNC(fantasy_state::scrollx_w));
 	map(0xb300, 0xb300).w(FUNC(fantasy_state::scrolly_w));
-	map(0xf000, 0xffff).rom();
+	map(0xf000, 0xffff).rom().region("maincpu", 0xf000);
 }
 
 
@@ -529,12 +547,12 @@ static INPUT_PORTS_START( satansat )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x7c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("snk6502:custom", snk6502_sound_device,music0_playing, nullptr)     /* music0 playing */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("snk6502:custom", snk6502_sound_device, music0_playing)     // music0 playing
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, snk6502_state,coin_inserted, 0)
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                         /* NC */
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,sasuke_count_r, nullptr)       /* connected to a binary counter */
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk6502_state, sasuke_count_r)       // connected to a binary counter
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:!1")
@@ -594,7 +612,7 @@ static INPUT_PORTS_START( vanguard )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL  /* fire left */
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("snk6502:custom", snk6502_sound_device,music0_playing, nullptr)     /* music0 playing */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("snk6502:custom", snk6502_sound_device, music0_playing)     // music0 playing
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fantasy )
@@ -626,32 +644,14 @@ static INPUT_PORTS_START( pballoon )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nibbler )
-	/* There are no buttons on a real "Nibbler" cabinet, but I guess that the game was tested
-	   with a "Vanguard" cabinet so they have been mapped with debug features.
-	   Rock-Ola documentation recommends a "4 Way Joystick - Heavy Duty" (RMC #G-6477-A). */
+	// Rock-Ola documentation recommends a "4 Way Joystick - Heavy Duty" (RMC #G-6477-A).
 	PORT_START("IN0")
-#if NIBBLER_HACK
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 0") PORT_CODE(KEYCODE_Z) // slow down
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 1") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 2") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 3") PORT_CODE(KEYCODE_V)
-#else
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-#endif
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_4WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
 
 	PORT_START("IN1")
-#if NIBBLER_HACK
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 4") PORT_CODE(KEYCODE_B) // pause
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 5") PORT_CODE(KEYCODE_N) // unpause
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 6") PORT_CODE(KEYCODE_M) // end game
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 7") PORT_CODE(KEYCODE_K)
-#else
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-#endif
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -687,6 +687,27 @@ static INPUT_PORTS_START( nibbler )
 	PORT_DIPSETTING(    0xc0, "2 Coins/1 Credit 4/3" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, "1 Coin/1 Credit 2/3" )
+
+	/* There are no buttons on a real "Nibbler" cabinet, but I guess that the game was tested
+	   with a "Vanguard" cabinet so they have been mapped with debug features. */
+	PORT_START("DEBUG")
+	PORT_CONFNAME( 0x01, 0x00, "Enable Debug Inputs" )
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 0") PORT_CODE(KEYCODE_Z) // slow down
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 1") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 2") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 3") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x00)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 4") PORT_CODE(KEYCODE_B) // pause
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 5") PORT_CODE(KEYCODE_N) // unpause
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 6") PORT_CODE(KEYCODE_M) // end game
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 7") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nibbler8 )
@@ -849,12 +870,17 @@ void snk6502_state::satansat(machine_config &config)
 	SATANSAT_SOUND(config.replace(), "snk6502", 0);
 }
 
-void snk6502_state::vanguard(machine_config &config)
+void vanguard_state::vanguard(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, MASTER_CLOCK / 16); // adjusted using common divisor
-	m_maincpu->set_addrmap(AS_PROGRAM, &snk6502_state::vanguard_map);
-	m_maincpu->set_vblank_int("screen", FUNC(snk6502_state::snk6502_interrupt));
+	M6502(config, m_maincpu, MASTER_CLOCK / 8); // runs twice as fast as CRTC
+	m_maincpu->set_addrmap(AS_PROGRAM, &vanguard_state::vanguard_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vanguard_state::snk6502_interrupt));
+
+	ADDRESS_MAP_BANK(config, m_highmem);
+	m_highmem->set_addrmap(0, &vanguard_state::vanguard_upper_map);
+	m_highmem->set_data_width(8);
+	m_highmem->set_addr_width(16);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -862,11 +888,11 @@ void snk6502_state::vanguard(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(snk6502_state::screen_update));
+	screen.set_screen_update(FUNC(vanguard_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vanguard);
-	PALETTE(config, m_palette, FUNC(snk6502_state::snk6502_palette), 64);
-	MCFG_VIDEO_START_OVERRIDE(snk6502_state,snk6502)
+	PALETTE(config, m_palette, FUNC(vanguard_state::snk6502_palette), 64);
+	MCFG_VIDEO_START_OVERRIDE(vanguard_state,snk6502)
 
 	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 16));
 	crtc.set_screen("screen");
@@ -902,6 +928,7 @@ void fantasy_state::pballoon(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &fantasy_state::pballoon_map);
+	m_highmem->set_addrmap(AS_PROGRAM, &fantasy_state::pballoon_upper_map);
 
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state, pballoon)
 
@@ -1140,6 +1167,39 @@ ROM_START( vanguardj )
 	ROM_LOAD( "sk4_ic52.bin", 0x0800, 0x0800, CRC(cc4a0b6f) SHA1(251b24d60083d516c4ba686d75b41e04d10f7198) )  /* sound ROM 2 */
 
 	ROM_REGION( 0x5800, "speech", 0 )   /* space for the speech ROMs (not supported) */
+	//ROM_LOAD( "hd38882.bin",  0x0000, 0x4000, NO_DUMP )   /* HD38882 internal ROM */
+	ROM_LOAD( "sk6_ic07.bin", 0x4000, 0x0800, CRC(2b7cbae9) SHA1(3d44a0232d7c94d8170cc06e90cc30bd57c99202) )
+	ROM_LOAD( "sk6_ic08.bin", 0x4800, 0x0800, CRC(3b7e9d7c) SHA1(d9033188068b2aaa1502c89cf09f955eded8fa7a) )
+	ROM_LOAD( "sk6_ic11.bin", 0x5000, 0x0800, CRC(c36df041) SHA1(8b51934229b961180d1edb99be3a4d337d37f66f) )
+ROM_END
+
+// Dumped from a Germany sourced Zaccaria Vanguard cabinet PCB. Continue text is in German. Only the program ROMs were dumped,
+// but the other ROMs labels match the original SNK version and are believed to be the same
+ROM_START( vanguardg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "vg1.bin",  0x4000, 0x1000, CRC(6a29e354) SHA1(ff953962ebc14a28cfc96f8e269cb1e1c188ed8a) )
+	ROM_LOAD( "vg2.bin",  0x5000, 0x1000, CRC(302bba54) SHA1(1944f229481328a0635fafda65054106f42a532a) )
+	ROM_LOAD( "vg3.bin",  0x6000, 0x1000, CRC(424755f6) SHA1(b4762b40c7ed70d4b90319a1a30983a41a096afb) )
+	ROM_LOAD( "vg4g.bin", 0x7000, 0x1000, CRC(4a82306a) SHA1(086d6c96d79681b482378c04b7340d3285d11ed8) )
+	ROM_LOAD( "vg5.bin",  0x8000, 0x1000, CRC(fde157d0) SHA1(3f705fb6a410004f4f86283694e3694e49701af6) )
+	ROM_RELOAD(           0xf000, 0x1000 )  // for the reset and interrupt vectors
+	ROM_LOAD( "vg6.bin",  0x9000, 0x1000, CRC(0d5b47d0) SHA1(922621c23f33fe756cb6baa12e5465c4e64f2dda) )
+	ROM_LOAD( "vg7.bin",  0xa000, 0x1000, CRC(8549b8f8) SHA1(375bc6f7e15564d5cf7e00c44e2651793c56d6ca) )
+	ROM_LOAD( "vg8s.bin", 0xb000, 0x1000, CRC(abe5fa3f) SHA1(cadb7c873ef025792c9ec38a6399ed19ade3b755) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "sk5_ic50.bin", 0x0000, 0x0800, CRC(e7d4315b) SHA1(b99e4ea07292a0eabaa6098037c92a5678627cec) )
+	ROM_LOAD( "sk5_ic51.bin", 0x0800, 0x0800, CRC(96e87858) SHA1(4e9ccb055919c8acf5837e062857647d5363af60) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "sk5_ic7.bin",  0x0000, 0x0020, CRC(ad782a73) SHA1(ddf44f74a20f10ed976c434a885857dade1f86d7) ) // foreground colors
+	ROM_LOAD( "sk5_ic6.bin",  0x0020, 0x0020, CRC(7dc9d450) SHA1(9b2d1dfb3270a562d14bd54bfb3405a9095becc0) ) // background colors
+
+	ROM_REGION( 0x1000, "snk6502", 0 )  // sound ROMs
+	ROM_LOAD( "sk4_ic51.bin", 0x0000, 0x0800, CRC(d2a64006) SHA1(3f20b59ce1954f65535cd5603ca9271586428e35) )
+	ROM_LOAD( "sk4_ic52.bin", 0x0800, 0x0800, CRC(cc4a0b6f) SHA1(251b24d60083d516c4ba686d75b41e04d10f7198) )
+
+	ROM_REGION( 0x5800, "speech", 0 )
 	//ROM_LOAD( "hd38882.bin",  0x0000, 0x4000, NO_DUMP )   /* HD38882 internal ROM */
 	ROM_LOAD( "sk6_ic07.bin", 0x4000, 0x0800, CRC(2b7cbae9) SHA1(3d44a0232d7c94d8170cc06e90cc30bd57c99202) )
 	ROM_LOAD( "sk6_ic08.bin", 0x4800, 0x0800, CRC(3b7e9d7c) SHA1(d9033188068b2aaa1502c89cf09f955eded8fa7a) )
@@ -1524,19 +1584,20 @@ GAME( 1981, satansat,    0,        satansat, satansat, snk6502_state, empty_init
 GAME( 1981, satansata,   satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK", "Satan of Saturn (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, zarzon,      satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK (Taito America license)", "Zarzon", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, satansatind, satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "bootleg (Inder S.A.)", "Satan of Saturn (Inder S.A., bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguard,    0,        vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguardc,   vanguard, vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguardj,   vanguard, vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguard,    0,        vanguard, vanguard, vanguard_state,empty_init, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguardc,   vanguard, vanguard, vanguard, vanguard_state,empty_init, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguardg,   vanguard, vanguard, vanguard, vanguard_state,empty_init, ROT90, "SNK", "Vanguard (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguardj,   vanguard, vanguard, vanguard, vanguard_state,empty_init, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, fantasyu,    0,        fantasy,  fantasyu, fantasy_state, empty_init, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, fantasyg,    fantasyu, fantasy,  fantasy,  fantasy_state, empty_init, ROT90, "SNK", "Fantasy (Germany, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
 GAME( 1981, fantasyg2,   fantasyu, fantasy,  fantasy,  fantasy_state, empty_init, ROT90, "SNK", "Fantasy (Germany, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
 GAME( 1981, fantasyj,    fantasyu, fantasy,  fantasyu, fantasy_state, empty_init, ROT90, "SNK", "Fantasy (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pballoon,    0,        pballoon, pballoon, fantasy_state, empty_init, ROT90, "SNK", "Pioneer Balloon", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pballoonr,   pballoon, pballoon, pballoon, fantasy_state, empty_init, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler,     0,        nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9, alternate set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler,     0,        nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler8,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nibblero,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola (Olympia license)", "Nibbler (rev 8, Olympia)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler7,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 7)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler6,    nibbler,  nibbler,  nibbler6, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (Pioneer Balloon conversion - rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nibblero,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia - rev 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 6, Pioneer Balloon conversion)", MACHINE_SUPPORTS_SAVE ) // music

@@ -201,8 +201,9 @@ static INPUT_PORTS_START( f1gp )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("JOY_TYPE", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_CONDITION("JOY_TYPE", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_CONDITION("JOY_TYPE", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Brake Button")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Accelerator Button")
+	// following two are logically arranged as per service mode
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Brake Button")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Accelerator Button")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -300,11 +301,11 @@ static INPUT_PORTS_START( f1gp )
 INPUT_PORTS_END
 
 
-/* the same as f1gp, but with an extra button */
 static INPUT_PORTS_START( f1gp2 )
 	PORT_INCLUDE( f1gp )
 
 	PORT_MODIFY("INPUTS")
+	// additional button, complies with 1992 F1 season
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Turbo Button")
 
 	PORT_MODIFY("DSW3")
@@ -374,7 +375,7 @@ void f1gp_state::f1gp(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &f1gp_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &f1gp_state::sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* 100 CPU slices per frame */
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
@@ -398,13 +399,13 @@ void f1gp_state::f1gp(machine_config &config)
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_pritype(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<1>), this);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<1>));
 	m_spr_old[1]->set_gfx_region(2);
 	m_spr_old[1]->set_pritype(2);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
@@ -441,7 +442,7 @@ void f1gp_state::f1gpb(machine_config &config)
 	sub.set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
 	/* NO sound CPU */
-	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* 100 CPU slices per frame */
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
@@ -487,8 +488,9 @@ void f1gp2_state::f1gp2(machine_config &config)
 	config.device_remove("gga");
 	config.device_remove("vsystem_spr_old1");
 	config.device_remove("vsystem_spr_old2");
+
 	VSYSTEM_SPR(config, m_spr, 0);
-	m_spr->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>), this);
+	m_spr->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>));
 	m_spr->set_gfx_region(1);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 

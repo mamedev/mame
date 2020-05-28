@@ -146,13 +146,13 @@ public:
 	auto lamps6_out_cb() { return m_lamps_out_cb[6].bind(); }
 	auto lamps7_out_cb() { return m_lamps_out_cb[7].bind(); }
 
-	DECLARE_WRITE8_MEMBER(lamps_w) { m_lamps_out_cb[offset](data); }
+	void lamps_w(offs_t offset, uint8_t data) { m_lamps_out_cb[offset](data); }
 
 protected:
 	virtual void device_start() override;
 
 private:
-	devcb_write8  m_lamps_out_cb[8];
+	devcb_write8::array<8> m_lamps_out_cb;
 };
 
 
@@ -256,23 +256,23 @@ private:
 	required_ioport_array<8> m_an_in;
 
 
-	DECLARE_WRITE8_MEMBER(hng64_default_lamps0_w) { logerror("lamps0 %02x\n", data); }
-	DECLARE_WRITE8_MEMBER(hng64_default_lamps1_w) { logerror("lamps1 %02x\n", data); }
-	DECLARE_WRITE8_MEMBER(hng64_default_lamps2_w) { logerror("lamps2 %02x\n", data); }
-	DECLARE_WRITE8_MEMBER(hng64_default_lamps3_w) { logerror("lamps3 %02x\n", data); }
-	DECLARE_WRITE8_MEMBER(hng64_default_lamps4_w) { logerror("lamps4 %02x\n", data); }
-	DECLARE_WRITE8_MEMBER(hng64_default_lamps5_w) { logerror("lamps5 %02x\n", data); }
-	DECLARE_WRITE8_MEMBER(hng64_default_lamps6_w) { logerror("lamps6 %02x\n", data); }
-	DECLARE_WRITE8_MEMBER(hng64_default_lamps7_w) { logerror("lamps7 %02x\n", data); }
+	void hng64_default_lamps0_w(uint8_t data) { logerror("lamps0 %02x\n", data); }
+	void hng64_default_lamps1_w(uint8_t data) { logerror("lamps1 %02x\n", data); }
+	void hng64_default_lamps2_w(uint8_t data) { logerror("lamps2 %02x\n", data); }
+	void hng64_default_lamps3_w(uint8_t data) { logerror("lamps3 %02x\n", data); }
+	void hng64_default_lamps4_w(uint8_t data) { logerror("lamps4 %02x\n", data); }
+	void hng64_default_lamps5_w(uint8_t data) { logerror("lamps5 %02x\n", data); }
+	void hng64_default_lamps6_w(uint8_t data) { logerror("lamps6 %02x\n", data); }
+	void hng64_default_lamps7_w(uint8_t data) { logerror("lamps7 %02x\n", data); }
 
-	DECLARE_WRITE8_MEMBER(hng64_drive_lamps7_w);
-	DECLARE_WRITE8_MEMBER(hng64_drive_lamps6_w);
-	DECLARE_WRITE8_MEMBER(hng64_drive_lamps5_w);
+	void hng64_drive_lamps7_w(uint8_t data);
+	void hng64_drive_lamps6_w(uint8_t data);
+	void hng64_drive_lamps5_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(hng64_shoot_lamps7_w);
-	DECLARE_WRITE8_MEMBER(hng64_shoot_lamps6_w);
+	void hng64_shoot_lamps7_w(uint8_t data);
+	void hng64_shoot_lamps6_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(hng64_fight_lamps6_w);
+	void hng64_fight_lamps6_w(uint8_t data);
 
 	int m_samsho64_3d_hack;
 	int m_roadedge_3d_hack;
@@ -391,27 +391,27 @@ private:
 	DECLARE_WRITE8_MEMBER(hng64_comm_mmu_w);
 
 	// shared ram access
-	DECLARE_READ8_MEMBER(ioport0_r);
-	DECLARE_WRITE8_MEMBER(ioport0_w);
-	DECLARE_WRITE8_MEMBER(ioport7_w);
+	uint8_t ioport0_r();
+	void ioport0_w(uint8_t data);
+	void ioport7_w(uint8_t data);
 
 	// input port access
-	DECLARE_READ8_MEMBER(ioport3_r);
-	DECLARE_WRITE8_MEMBER(ioport3_w);
-	DECLARE_WRITE8_MEMBER(ioport1_w);
+	uint8_t ioport3_r();
+	void ioport3_w(uint8_t data);
+	void ioport1_w(uint8_t data);
 
 	// unknown access
-	DECLARE_WRITE8_MEMBER(ioport4_w);
+	void ioport4_w(uint8_t data);
 
 	// analog input access
-	DECLARE_READ8_MEMBER(anport0_r);
-	DECLARE_READ8_MEMBER(anport1_r);
-	DECLARE_READ8_MEMBER(anport2_r);
-	DECLARE_READ8_MEMBER(anport3_r);
-	DECLARE_READ8_MEMBER(anport4_r);
-	DECLARE_READ8_MEMBER(anport5_r);
-	DECLARE_READ8_MEMBER(anport6_r);
-	DECLARE_READ8_MEMBER(anport7_r);
+	uint8_t anport0_r();
+	uint8_t anport1_r();
+	uint8_t anport2_r();
+	uint8_t anport3_r();
+	uint8_t anport4_r();
+	uint8_t anport5_r();
+	uint8_t anport6_r();
+	uint8_t anport7_r();
 
 	DECLARE_WRITE_LINE_MEMBER( sio0_w );
 
@@ -507,8 +507,8 @@ private:
 	void reset_net();
 
 	DECLARE_WRITE_LINE_MEMBER(dma_hreq_cb);
-	DECLARE_READ8_MEMBER(dma_memr_cb);
-	DECLARE_WRITE8_MEMBER(dma_iow3_cb);
+	uint8_t dma_memr_cb(offs_t offset);
+	void dma_iow3_cb(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tcu_tm0_cb);
 	DECLARE_WRITE_LINE_MEMBER(tcu_tm1_cb);
 	DECLARE_WRITE_LINE_MEMBER(tcu_tm2_cb);

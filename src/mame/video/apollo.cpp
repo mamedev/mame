@@ -1473,7 +1473,8 @@ WRITE8_MEMBER( apollo_graphics_15i::apollo_ccr_w )
 			{
 				MLOG1(("apollo_graphics_15i::apollo_ccr_w: writing LUT data register with RW = 1 in LUT Control register"));
 			}
-			else if ((m_lut_control & LUT_AD_CS) == 0)
+
+			if ((m_lut_control & LUT_AD_CS) == 0)
 			{
 				m_ad_result = c8p_read_adc(data);
 				m_ad_pending = 1;

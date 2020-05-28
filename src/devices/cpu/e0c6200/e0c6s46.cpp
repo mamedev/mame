@@ -51,10 +51,12 @@ void e0c6s46_device::e0c6s46_data(address_map &map)
 e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: e0c6200_cpu_device(mconfig, E0C6S46, tag, owner, clock, address_map_constructor(FUNC(e0c6s46_device::e0c6s46_program), this), address_map_constructor(FUNC(e0c6s46_device::e0c6s46_data), this))
 	, m_vram1(*this, "vram1")
-	, m_vram2(*this, "vram2"), m_osc(0), m_svd(0), m_lcd_control(0), m_lcd_contrast(0)
-	, m_write_r{{*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_read_p{{*this}, {*this}, {*this}, {*this}}
-	, m_write_p{{*this}, {*this}, {*this}, {*this}}
+	, m_vram2(*this, "vram2")
+	, m_osc(0), m_svd(0), m_lcd_control(0), m_lcd_contrast(0)
+	, m_pixel_update_cb(*this)
+	, m_write_r(*this)
+	, m_read_p(*this)
+	, m_write_p(*this)
 	, m_r_dir(0), m_p_dir(0), m_p_pullup(0), m_dfk0(0), m_256_src_pulse(0), m_core_256_handle(nullptr)
 	, m_watchdog_count(0), m_clktimer_count(0), m_stopwatch_on(0), m_swl_cur_pulse(0), m_swl_slice(0)
 	, m_swl_count(0), m_swh_count(0), m_prgtimer_select(0), m_prgtimer_on(0), m_prgtimer_src_pulse(0)
@@ -74,16 +76,11 @@ void e0c6s46_device::device_start()
 	e0c6200_cpu_device::device_start();
 
 	// find ports
-	for (int i = 0; i < 5; i++)
-		m_write_r[i].resolve_safe();
+	m_write_r.resolve_all_safe();
+	m_read_p.resolve_all_safe(0);
+	m_write_p.resolve_all_safe();
 
-	for (int i = 0; i < 4; i++)
-	{
-		m_read_p[i].resolve_safe(0);
-		m_write_p[i].resolve_safe();
-	}
-
-	m_pixel_update_cb.bind_relative_to(*owner());
+	m_pixel_update_cb.resolve();
 
 	// create timers
 	m_core_256_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::core_256_cb), this));
@@ -606,7 +603,7 @@ u32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 //  internal I/O
 //-------------------------------------------------
 
-READ8_MEMBER(e0c6s46_device::io_r)
+u8 e0c6s46_device::io_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -700,7 +697,7 @@ READ8_MEMBER(e0c6s46_device::io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(e0c6s46_device::io_w)
+void e0c6s46_device::io_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{

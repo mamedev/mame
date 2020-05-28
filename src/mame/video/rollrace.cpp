@@ -14,7 +14,7 @@ TILE_GET_INFO_MEMBER(rollrace_state::get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[(tile_index & 0x1f)*2+1] & 0x1f;
 
-	SET_TILE_INFO_MEMBER(RA_FGCHAR_BASE + m_chrbank,
+	tileinfo.set(RA_FGCHAR_BASE + m_chrbank,
 		code,
 		color,
 		TILE_FLIPY);
@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(rollrace_state::get_fg_tile_info)
 
 void rollrace_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rollrace_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rollrace_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scroll_cols(32);

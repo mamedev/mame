@@ -221,7 +221,7 @@ void gaplus_base_state::device_timer(emu_timer &timer, device_timer_id id, int p
 		namcoio1_run(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in gaplus_base_state::device_timer");
+		throw emu_fatalerror("Unknown id in gaplus_base_state::device_timer");
 	}
 }
 
@@ -298,7 +298,7 @@ void gaplus_base_state::cpu2_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().w(FUNC(gaplus_base_state::videoram_w)).share("videoram");   /* tilemap RAM (shared with CPU #1) */
 	map(0x0800, 0x1fff).ram().share("spriteram");                           /* shared RAM with CPU #1 */
-//  AM_RANGE(0x500f, 0x500f) AM_WRITENOP                                            /* ??? written 256 times on startup */
+//  map(0x500f, 0x500f).nopw();                                            /* ??? written 256 times on startup */
 	map(0x6000, 0x6fff).w(FUNC(gaplus_base_state::irq_2_ctrl_w));                          /* IRQ 2 control */
 	map(0xa000, 0xffff).rom();                                                 /* ROM */
 }
@@ -484,7 +484,7 @@ static const char *const gaplus_sample_names[] =
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gaplus_state::out_lamps0)
+void gaplus_state::out_lamps0(uint8_t data)
 {
 	m_lamps[0] = BIT(data, 0);
 	m_lamps[1] = BIT(data, 1);
@@ -492,7 +492,7 @@ WRITE8_MEMBER(gaplus_state::out_lamps0)
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
-WRITE8_MEMBER(gaplus_state::out_lamps1)
+void gaplus_state::out_lamps1(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(1, ~data & 1);
 }
@@ -526,7 +526,7 @@ void gaplus_base_state::gaplus_base(machine_config &config)
 	MC6809E(config, m_subcpu2, XTAL(24'576'000) / 16);   /* 1.536 MHz */
 	m_subcpu2->set_addrmap(AS_PROGRAM, &gaplus_base_state::cpu3_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* a high value to ensure proper synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* a high value to ensure proper synchronization of the CPUs */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

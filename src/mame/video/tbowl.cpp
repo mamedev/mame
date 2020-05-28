@@ -18,7 +18,7 @@ TILE_GET_INFO_MEMBER(tbowl_state::get_tx_tile_info)
 	tileno = m_txvideoram[tile_index] | ((m_txvideoram[tile_index+0x800] & 0x07) << 8);
 	col = (m_txvideoram[tile_index+0x800] & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(0,tileno,col,0);
+	tileinfo.set(0,tileno,col,0);
 }
 
 WRITE8_MEMBER(tbowl_state::txvideoram_w)
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(tbowl_state::get_bg_tile_info)
 	tileno = m_bgvideoram[tile_index] | ((m_bgvideoram[tile_index+0x1000] & 0x0f) << 8);
 	col = (m_bgvideoram[tile_index+0x1000] & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(1,tileno,col,0);
+	tileinfo.set(1,tileno,col,0);
 }
 
 WRITE8_MEMBER(tbowl_state::bg2videoram_w)
@@ -77,7 +77,7 @@ TILE_GET_INFO_MEMBER(tbowl_state::get_bg2_tile_info)
 	tileno ^= 0x400;
 	col = (m_bg2videoram[tile_index+0x1000] & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(2,tileno,col,0);
+	tileinfo.set(2,tileno,col,0);
 }
 
 WRITE8_MEMBER(tbowl_state::bgvideoram_w)
@@ -111,9 +111,9 @@ WRITE8_MEMBER(tbowl_state::bg2yscroll_hi)
 
 void tbowl_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tbowl_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tbowl_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,128,32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tbowl_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,128,32);
+	m_tx_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tbowl_state::get_tx_tile_info)),  TILEMAP_SCAN_ROWS,  8, 8,  64,32);
+	m_bg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tbowl_state::get_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16, 128,32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tbowl_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 128,32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_transparent_pen(0);

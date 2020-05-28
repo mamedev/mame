@@ -113,8 +113,8 @@ void amiga_dmac_device::autoconfig_base_address(offs_t address)
 
 		// internal dmac registers
 		m_space->install_readwrite_handler(address, address + 0xff,
-			read16_delegate(FUNC(amiga_dmac_device::register_read), this),
-			write16_delegate(FUNC(amiga_dmac_device::register_write), this), 0xffff);
+				read16_delegate(*this, FUNC(amiga_dmac_device::register_read)),
+				write16_delegate(*this, FUNC(amiga_dmac_device::register_write)), 0xffff);
 
 		// install access to the rom space
 		if (m_rom)
@@ -381,8 +381,8 @@ WRITE_LINE_MEMBER( amiga_dmac_device::configin_w )
 
 		// install autoconfig handler
 		m_space->install_readwrite_handler(0xe80000, 0xe8007f,
-			read16_delegate(FUNC(amiga_autoconfig::autoconfig_read), static_cast<amiga_autoconfig *>(this)),
-			write16_delegate(FUNC(amiga_autoconfig::autoconfig_write), static_cast<amiga_autoconfig *>(this)), 0xffff);
+				read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
+				write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
 }
 

@@ -19,7 +19,8 @@ public:
 	phi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// See ieee488.h
-	enum phi_488_signal_t {
+	enum phi_488_signal_t
+	{
 		PHI_488_EOI,
 		PHI_488_DAV,
 		PHI_488_NRFD,
@@ -35,7 +36,14 @@ public:
 	auto dio_read_cb() { return m_dio_read_func.bind(); }
 	auto dio_write_cb() { return m_dio_write_func.bind(); }
 	// Set write callbacks to access uniline signals on IEEE-488
-	template <phi_488_signal_t Signal> auto signal_write_cb() { return m_signal_wr_fns[ Signal ].bind(); }
+	auto eoi_write_cb() { return m_signal_wr_fns[ PHI_488_EOI ].bind(); }
+	auto dav_write_cb() { return m_signal_wr_fns[ PHI_488_DAV ].bind(); }
+	auto nrfd_write_cb() { return m_signal_wr_fns[ PHI_488_NRFD ].bind(); }
+	auto ndac_write_cb() { return m_signal_wr_fns[ PHI_488_NDAC ].bind(); }
+	auto ifc_write_cb() { return m_signal_wr_fns[ PHI_488_IFC ].bind(); }
+	auto srq_write_cb() { return m_signal_wr_fns[ PHI_488_SRQ ].bind(); }
+	auto atn_write_cb() { return m_signal_wr_fns[ PHI_488_ATN ].bind(); }
+	auto ren_write_cb() { return m_signal_wr_fns[ PHI_488_REN ].bind(); }
 	// Set write callback for INT signal
 	auto int_write_cb() { return m_int_write_func.bind(); }
 	// Set write callback for DMARQ signal
@@ -52,7 +60,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(atn_w);
 	DECLARE_WRITE_LINE_MEMBER(ren_w);
 
-	DECLARE_WRITE8_MEMBER(bus_dio_w);
+	void bus_dio_w(uint8_t data);
 
 	void set_ext_signal(phi_488_signal_t signal , int state);
 
@@ -76,10 +84,10 @@ public:
 	// 2        13
 	// 1        14
 	// 0        15
-	DECLARE_WRITE16_MEMBER(reg16_w);
-	DECLARE_READ16_MEMBER(reg16_r);
-	DECLARE_WRITE8_MEMBER(reg8_w);
-	DECLARE_READ8_MEMBER(reg8_r);
+	void reg16_w(offs_t offset, uint16_t data);
+	uint16_t reg16_r(offs_t offset);
+	void reg8_w(offs_t offset, uint8_t data);
+	uint8_t reg8_r(offs_t offset);
 
 protected:
 	phi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -95,7 +103,7 @@ private:
 
 	devcb_read8 m_dio_read_func;
 	devcb_write8 m_dio_write_func;
-	devcb_write_line m_signal_wr_fns[ PHI_488_SIGNAL_COUNT ];
+	devcb_write_line::array<PHI_488_SIGNAL_COUNT> m_signal_wr_fns;
 	devcb_write_line m_int_write_func;
 	devcb_write_line m_dmarq_write_func;
 	devcb_read_line m_sys_cntrl_read_func;

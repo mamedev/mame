@@ -20,9 +20,11 @@ set the data line and then set the clock line.
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class device_pc_kbd_interface;
+
 
 class pc_kbdc_slot_device : public device_t,
-							public device_slot_interface
+							public device_single_card_slot_interface<device_pc_kbd_interface>
 {
 public:
 	// construction/destruction
@@ -53,8 +55,6 @@ protected:
 DECLARE_DEVICE_TYPE(PC_KBDC_SLOT, pc_kbdc_slot_device)
 
 
-class device_pc_kbd_interface;
-
 class pc_kbdc_device : public device_t
 {
 public:
@@ -79,8 +79,8 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
-	void update_clock_state();
-	void update_data_state();
+	void update_clock_state(bool fromkb);
+	void update_data_state(bool fromkb);
 
 	devcb_write_line    m_out_clock_cb;
 	devcb_write_line    m_out_data_cb;
@@ -103,7 +103,7 @@ DECLARE_DEVICE_TYPE(PC_KBDC, pc_kbdc_device)
 
 // ======================> device_pc_pbd_interface
 
-class device_pc_kbd_interface : public device_slot_card_interface
+class device_pc_kbd_interface : public device_interface
 {
 	friend class pc_kbdc_device;
 public:
@@ -129,7 +129,6 @@ protected:
 	pc_kbdc_device          *m_pc_kbdc;
 	const char              *m_pc_kbdc_tag;
 };
-
 
 
 #endif // MAME_BUS_PC_KBD_PC_KBDC_H

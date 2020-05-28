@@ -29,7 +29,7 @@
 #include "emu.h"
 #include "16c62xdsm.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <stdexcept>
 
 

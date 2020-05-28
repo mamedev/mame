@@ -448,13 +448,13 @@ INPUT_PORTS_END
 
 
 
-WRITE8_MEMBER(spy_state::volume_callback0)
+void spy_state::volume_callback0(uint8_t data)
 {
 	m_k007232_1->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232_1->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-WRITE8_MEMBER(spy_state::volume_callback1)
+void spy_state::volume_callback1(uint8_t data)
 {
 	m_k007232_2->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232_2->set_volume(1, 0, (data & 0x0f) * 0x11);
@@ -514,13 +514,13 @@ void spy_state::spy(machine_config &config)
 	K052109(config, m_k052109, 0); // 051961 on schematics
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
-	m_k052109->set_tile_callback(FUNC(spy_state::tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(spy_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
-	m_k051960->set_sprite_callback(FUNC(spy_state::sprite_callback), this);
+	m_k051960->set_sprite_callback(FUNC(spy_state::sprite_callback));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

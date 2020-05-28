@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-  macpci.c: second-generation Old World PowerMacs based on PCI instead of NuBus
+  macpci.cpp: second-generation Old World PowerMacs based on PCI instead of NuBus
 
   Preliminary driver by R. Belmont (based on pippin.c skeleton by Angelo Salese)
 
@@ -118,7 +118,7 @@ void macpci_state::pippin(machine_config &config)
 
 	cdrom_image_device &cdrom(CDROM(config, "cdrom", 0));
 	cdrom.set_interface("pippin_cdrom");
-	SOFTWARE_LIST(config, "cd_list").set_type("pippin", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cd_list").set_original("pippin");
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("32M");
@@ -139,7 +139,7 @@ void macpci_state::pippin(machine_config &config)
 	m_cuda->linechange_callback().set(FUNC(macpci_state::cuda_adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 }
 
 /* ROM definition */

@@ -7,7 +7,6 @@
 
 #include "nld_74153.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {
@@ -22,7 +21,7 @@ namespace devices
 	NETLIB_OBJECT(74153)
 	{
 		NETLIB_CONSTRUCTOR(74153)
-		, m_C(*this, {{"C0", "C1", "C2", "C3"}}, NETLIB_DELEGATE(74153, sub))
+		, m_C(*this, {"C0", "C1", "C2", "C3"}, NETLIB_DELEGATE(74153, sub))
 		, m_G(*this, "G", NETLIB_DELEGATE(74153, sub))
 		, m_Y(*this, "AY") //FIXME: Change netlists
 		, m_chan(*this, "m_chan", 0)
@@ -45,7 +44,7 @@ namespace devices
 
 		NETLIB_HANDLERI(sub)
 		{
-			constexpr const netlist_time delay[2] = { NLTIME_FROM_NS(23), NLTIME_FROM_NS(18) };
+			constexpr const std::array<netlist_time, 2> delay = { NLTIME_FROM_NS(23), NLTIME_FROM_NS(18) };
 			if (!m_G())
 			{
 				auto t = m_C[m_chan]();

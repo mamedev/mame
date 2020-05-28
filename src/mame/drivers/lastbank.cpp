@@ -54,7 +54,6 @@ private:
 	required_device<es8712_device> m_essnd;
 
 	virtual void machine_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	uint8_t m_mux_data;
@@ -77,15 +76,6 @@ void lastbank_state::machine_start()
 {
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_sound_flags));
-}
-
-uint32_t lastbank_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-
-	m_vdp->screen_update(screen, bitmap, cliprect);
-
-	return 0;
 }
 
 WRITE_LINE_MEMBER(lastbank_state::screen_vblank)
@@ -223,7 +213,7 @@ static INPUT_PORTS_START( lastbank )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lastbank_state, sound_status_r, nullptr)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(lastbank_state, sound_status_r)
 
 	PORT_START("P1_KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("5-6") PORT_CODE(KEYCODE_B)
@@ -413,7 +403,7 @@ void lastbank_state::lastbank(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &lastbank_state::lastbank_audio_io);
 	// yes, we have no interrupts
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	//MCFG_MACHINE_START_OVERRIDE(lastbank_state,lastbank)
 	//MCFG_MACHINE_RESET_OVERRIDE(lastbank_state,lastbank)
@@ -424,11 +414,12 @@ void lastbank_state::lastbank(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(lastbank_state::screen_update));
+	screen.set_screen_update("tc0091lvc", FUNC(tc0091lvc_device::screen_update));
 	screen.screen_vblank().set(FUNC(lastbank_state::screen_vblank));
 	screen.set_palette("tc0091lvc:palette");
 
 	TC0091LVC(config, m_vdp, 0);
+	m_vdp->set_tilemap_xoffs(0,192); // TODO: correct?
 
 //  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 

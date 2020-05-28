@@ -8,19 +8,20 @@
 
 *********************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <limits.h>
-#include <assert.h>
+#include "flopimg.h"
+#include "imageutl.h"
 
-#include "emu.h" // emu_fatalerror
+#include "emucore.h" // emu_fatalerror
 #include "osdcore.h"
 #include "ioprocs.h"
-#include "flopimg.h"
 #include "pool.h"
-#include "imageutl.h"
+
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+#include <cctype>
+#include <climits>
+#include <cassert>
 
 #define TRACK_LOADED        0x01
 #define TRACK_DIRTY         0x02

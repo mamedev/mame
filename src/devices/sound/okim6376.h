@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include "dirom.h"
+
 /* an interface for the OKIM6376 and similar chips (CPU interface only) */
 
-class okim6376_device : public device_t, public device_sound_interface, public device_rom_interface
+class okim6376_device : public device_t, public device_sound_interface, public device_rom_interface<23, 0, 0, ENDIANNESS_BIG>
 {
 public:
 	okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

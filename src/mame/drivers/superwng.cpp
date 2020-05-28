@@ -94,7 +94,7 @@ private:
 	DECLARE_WRITE8_MEMBER(superwng_cointcnt1_w);
 	DECLARE_WRITE8_MEMBER(superwng_cointcnt2_w);
 	DECLARE_WRITE8_MEMBER(superwng_hopper_w);
-	DECLARE_READ8_MEMBER(superwng_sound_byte_r);
+	uint8_t superwng_sound_byte_r();
 	DECLARE_WRITE8_MEMBER(superwng_unk_a187_w);
 	DECLARE_WRITE8_MEMBER(superwng_unk_a185_w);
 
@@ -102,7 +102,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void superwng_palette(palette_device &palette) const;
 	uint32_t screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(main_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
 
 	void superwng_map(address_map &map);
@@ -130,7 +130,7 @@ TILE_GET_INFO_MEMBER(superwng_state::get_bg_tile_info)
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, flipx|flipy);
+	tileinfo.set(0, code, attr & 0xf, flipx|flipy);
 }
 
 TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
@@ -145,13 +145,13 @@ TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, flipx|flipy);
+	tileinfo.set(0, code, attr & 0xf, flipx|flipy);
 }
 
 void superwng_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superwng_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superwng_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(superwng_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(superwng_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scrollx(0, 64);
 }
@@ -242,10 +242,10 @@ WRITE8_MEMBER(superwng_state::superwng_nmi_enable_w)
 	m_nmi_enable = data;
 }
 
-INTERRUPT_GEN_MEMBER(superwng_state::superwng_nmi_interrupt)
+WRITE_LINE_MEMBER(superwng_state::main_nmi_interrupt)
 {
-	if (BIT(m_nmi_enable, 0))
-		nmi_line_pulse(device);
+	if (state && BIT(m_nmi_enable, 0))
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_sound_interrupt_w)
@@ -254,7 +254,7 @@ WRITE8_MEMBER(superwng_state::superwng_sound_interrupt_w)
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(superwng_state::superwng_sound_byte_r)
+uint8_t superwng_state::superwng_sound_byte_r()
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_sound_byte;
@@ -483,7 +483,6 @@ void superwng_state::superwng(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &superwng_state::superwng_map);
-	m_maincpu->set_vblank_int("screen", FUNC(superwng_state::superwng_nmi_interrupt));
 
 	Z80(config, m_audiocpu, MASTER_CLOCK/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &superwng_state::superwng_sound_map);
@@ -497,6 +496,7 @@ void superwng_state::superwng(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(superwng_state::screen_update_superwng));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(superwng_state::main_nmi_interrupt));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superwng);
 

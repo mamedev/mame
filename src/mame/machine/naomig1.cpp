@@ -29,6 +29,8 @@ void naomi_g1_device::amap(address_map &map)
 naomi_g1_device::naomi_g1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, irq_cb(*this)
+	, ext_irq_cb(*this)
+	, reset_out_cb(*this)
 {
 }
 
@@ -36,6 +38,8 @@ void naomi_g1_device::device_start()
 {
 	timer = timer_alloc(G1_TIMER_ID);
 	irq_cb.resolve_safe();
+	ext_irq_cb.resolve_safe();
+	reset_out_cb.resolve_safe();
 
 	save_item(NAME(gdstar));
 	save_item(NAME(gdlen));
@@ -51,6 +55,7 @@ void naomi_g1_device::device_reset()
 	gddir = 0;
 	gden = 0;
 	gdst = 0;
+	set_ext_irq(CLEAR_LINE);
 }
 
 void naomi_g1_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

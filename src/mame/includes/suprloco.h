@@ -41,7 +41,7 @@ private:
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(scrollram_w);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void control_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

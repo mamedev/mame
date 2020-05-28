@@ -40,7 +40,7 @@ x68k_midi_device::x68k_midi_device(const machine_config &mconfig, const char *ta
 void x68k_midi_device::device_start()
 {
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
-	m_slot->space().install_readwrite_handler(0xeafa00,0xeafa0f,read8_delegate(FUNC(x68k_midi_device::x68k_midi_reg_r),this),write8_delegate(FUNC(x68k_midi_device::x68k_midi_reg_w),this),0x00ff00ff);
+	m_slot->space().install_readwrite_handler(0xeafa00,0xeafa0f, read8_delegate(*this, FUNC(x68k_midi_device::x68k_midi_reg_r)), write8_delegate(*this, FUNC(x68k_midi_device::x68k_midi_reg_w)), 0x00ff00ff);
 }
 
 void x68k_midi_device::device_reset()
@@ -49,12 +49,12 @@ void x68k_midi_device::device_reset()
 
 READ8_MEMBER(x68k_midi_device::x68k_midi_reg_r)
 {
-	return m_midi->read(space, offset);
+	return m_midi->read(offset);
 }
 
 WRITE8_MEMBER(x68k_midi_device::x68k_midi_reg_w)
 {
-	m_midi->write(space, offset, data);
+	m_midi->write(offset, data);
 }
 
 void x68k_midi_device::irq_w(int state)

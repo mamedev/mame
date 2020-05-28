@@ -51,21 +51,21 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_READ8_MEMBER(portb0_r);
-	DECLARE_WRITE8_MEMBER(port80_w);
-	DECLARE_WRITE8_MEMBER(port90_w);
-	DECLARE_WRITE8_MEMBER(ppi_control_w);
-	DECLARE_WRITE8_MEMBER(ppi_data_w);
-	DECLARE_WRITE8_MEMBER(ppi1_a_w);
-	DECLARE_WRITE8_MEMBER(ppi1_b_w);
-	DECLARE_WRITE8_MEMBER(ppi1_c_w);
-	DECLARE_WRITE8_MEMBER(ppi2_a_w);
-	DECLARE_WRITE8_MEMBER(ppi2_b_w);
-	DECLARE_WRITE8_MEMBER(ppi2_c_w);
-	DECLARE_WRITE8_MEMBER(ay1_a_w);
-	DECLARE_WRITE8_MEMBER(ay1_b_w);
-	DECLARE_WRITE8_MEMBER(ay2_a_w);
-	DECLARE_WRITE8_MEMBER(ay2_b_w);
+	uint8_t portb0_r(offs_t offset);
+	void port80_w(uint8_t data);
+	void port90_w(uint8_t data);
+	void ppi_control_w(uint8_t data);
+	void ppi_data_w(uint8_t data);
+	void ppi1_a_w(uint8_t data);
+	void ppi1_b_w(uint8_t data);
+	void ppi1_c_w(uint8_t data);
+	void ppi2_a_w(uint8_t data);
+	void ppi2_b_w(uint8_t data);
+	void ppi2_c_w(uint8_t data);
+	void ay1_a_w(uint8_t data);
+	void ay1_b_w(uint8_t data);
+	void ay2_a_w(uint8_t data);
+	void ay2_b_w(uint8_t data);
 
 	void maincpu_io_map(address_map &map);
 	void maincpu_map(address_map &map);
@@ -231,23 +231,23 @@ static INPUT_PORTS_START( idsa )
 INPUT_PORTS_END
 
 // This came from pinmame, even though there's no spb640 chip
-READ8_MEMBER( idsa_state::portb0_r )
+uint8_t idsa_state::portb0_r(offs_t offset)
 {
 	uint16_t data = m_speech->spb640_r(offset / 2);
 	return offset % 2 ? (uint8_t)(data >> 8) : (uint8_t)(data & 0xff);
 }
 
 // ports 80 & 90 for the display
-WRITE8_MEMBER( idsa_state::port80_w )
+void idsa_state::port80_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( idsa_state::port90_w )
+void idsa_state::port90_w(uint8_t data)
 {
 }
 
 // AY ports are for lamps and solenoids
-WRITE8_MEMBER( idsa_state::ppi_control_w )
+void idsa_state::ppi_control_w(uint8_t data)
 {
 	//logerror("%s: AY1 port A = %02X\n", machine().describe_context(), data);
 	if (!BIT(data, 2))
@@ -256,57 +256,57 @@ WRITE8_MEMBER( idsa_state::ppi_control_w )
 		m_ppi[1]->write(data & 0x03, m_ppi_data);
 }
 
-WRITE8_MEMBER( idsa_state::ppi_data_w )
+void idsa_state::ppi_data_w(uint8_t data)
 {
 	m_ppi_data = data;
 }
 
-WRITE8_MEMBER( idsa_state::ppi1_a_w )
+void idsa_state::ppi1_a_w(uint8_t data)
 {
 	logerror("%s: PPI1 port A = %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER( idsa_state::ppi1_b_w )
+void idsa_state::ppi1_b_w(uint8_t data)
 {
 	logerror("%s: PPI1 port B = %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER( idsa_state::ppi1_c_w )
+void idsa_state::ppi1_c_w(uint8_t data)
 {
 	logerror("%s: PPI1 port C = %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER( idsa_state::ppi2_a_w )
+void idsa_state::ppi2_a_w(uint8_t data)
 {
 	logerror("%s: PPI2 port A = %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER( idsa_state::ppi2_b_w )
+void idsa_state::ppi2_b_w(uint8_t data)
 {
 	logerror("%s: PPI2 port B = %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER( idsa_state::ppi2_c_w )
+void idsa_state::ppi2_c_w(uint8_t data)
 {
 	logerror("%s: PPI2 port C = %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER( idsa_state::ay1_a_w )
+void idsa_state::ay1_a_w(uint8_t data)
 {
 	//logerror("%s: AY1 port A = %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER( idsa_state::ay1_b_w )
+void idsa_state::ay1_b_w(uint8_t data)
 {
 	//logerror("%s: AY1 port B = %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER( idsa_state::ay2_a_w )
+void idsa_state::ay2_a_w(uint8_t data)
 {
 	//logerror("%s: AY2 port A = %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER( idsa_state::ay2_b_w )
+void idsa_state::ay2_b_w(uint8_t data)
 {
 	//logerror("%s: AY2 port B = %02X\n", machine().describe_context(), data);
 }

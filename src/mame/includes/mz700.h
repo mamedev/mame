@@ -82,13 +82,13 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_other_callback);
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit_irq_2);
-	DECLARE_READ8_MEMBER(pio_port_b_r);
-	DECLARE_READ8_MEMBER(pio_port_c_r);
-	DECLARE_WRITE8_MEMBER(pio_port_a_w);
-	DECLARE_WRITE8_MEMBER(pio_port_c_w);
+	uint8_t pio_port_b_r();
+	uint8_t pio_port_c_r();
+	void pio_port_a_w(uint8_t data);
+	void pio_port_c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(mz800_z80pio_irq);
-	DECLARE_READ8_MEMBER(mz800_z80pio_port_a_r);
-	DECLARE_WRITE8_MEMBER(mz800_z80pio_port_a_w);
+	uint8_t mz800_z80pio_port_a_r();
+	void mz800_z80pio_port_a_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 

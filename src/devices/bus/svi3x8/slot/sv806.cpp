@@ -52,7 +52,7 @@ void sv806_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_screen("80col");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(sv806_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(sv806_device::crtc_update_row));
 }
 
 

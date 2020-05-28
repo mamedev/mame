@@ -76,7 +76,7 @@ WRITE_LINE_MEMBER(ojankohs_state::ojankohs_adpcm_int)
 	/* clock the data through */
 	if (m_vclk_left)
 	{
-		m_msm->write_data((m_adpcm_data >> 4));
+		m_msm->data_w(m_adpcm_data >> 4);
 		m_adpcm_data <<= 4;
 		m_vclk_left--;
 	}
@@ -607,13 +607,13 @@ READ8_MEMBER( ojankohs_state::ojankoc_keymatrix_p2_r )
 	return data;
 }
 
-READ8_MEMBER( ojankohs_state::ojankohs_dipsw1_r )
+uint8_t ojankohs_state::ojankohs_dipsw1_r()
 {
 	uint8_t data = m_dsw1->read();
 	return bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
-READ8_MEMBER( ojankohs_state::ojankohs_dipsw2_r )
+uint8_t ojankohs_state::ojankohs_dipsw2_r()
 {
 	uint8_t data = m_dsw2->read();
 	return bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);

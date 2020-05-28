@@ -118,8 +118,8 @@ private:
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pa_r();
+	void ppi_pc_w(uint8_t data);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	void sf7000_io_map(address_map &map);

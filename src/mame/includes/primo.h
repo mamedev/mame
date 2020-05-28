@@ -33,12 +33,13 @@ public:
 		m_cart2(*this, "cartslot2"),
 		m_screen(*this, "screen"),
 		m_mem_exp_port(*this, "MEMORY_EXPANSION"),
-		m_clock_port(*this, "CPU_CLOCK")
+		m_clock_port(*this, "CPU_CLOCK"),
+		m_keyboard_port(*this, "IN%u", 0U),
+		m_reset_port(*this, "RESET"),
+		m_video_ram(*this, "videoram")
 	{ }
 
-	void init_primo48();
-	void init_primo64();
-	void init_primo32();
+	void init_primo();
 
 	void primob32(machine_config &config);
 	void primob64(machine_config &config);
@@ -49,11 +50,11 @@ public:
 	void primoa48(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(primo_be_1_r);
-	DECLARE_READ8_MEMBER(primo_be_2_r);
-	DECLARE_WRITE8_MEMBER(primo_ki_1_w);
-	DECLARE_WRITE8_MEMBER(primo_ki_2_w);
-	DECLARE_WRITE8_MEMBER(primo_FD_w);
+	uint8_t primo_be_1_r(offs_t offset);
+	uint8_t primo_be_2_r();
+	void primo_ki_1_w(uint8_t data);
+	void primo_ki_2_w(uint8_t data);
+	void primo_FD_w(uint8_t data);
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(primob);
@@ -61,7 +62,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void primo_draw_scanline(bitmap_ind16 &bitmap, int primo_scanline);
 	void primo_update_memory();
-	void primo_common_driver_init (primo_state *state);
 	void primo_common_machine_init();
 	void primo_setup_pss(uint8_t* snapshot_data, uint32_t snapshot_size);
 	void primo_setup_pp(uint8_t* quickload_data, uint32_t quickload_size);
@@ -83,6 +83,9 @@ private:
 	required_device<screen_device> m_screen;
 	required_ioport m_mem_exp_port;
 	required_ioport m_clock_port;
+	required_ioport_array<4> m_keyboard_port;
+	required_ioport m_reset_port;
+	required_shared_ptr<uint8_t> m_video_ram;
 
 	memory_region *m_cart1_rom;
 	memory_region *m_cart2_rom;

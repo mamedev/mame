@@ -13,7 +13,6 @@
 
 #include "emu.h"
 #include "includes/vertigo.h"
-#include "includes/exidy440.h"
 #include "audio/exidy440.h"
 #include "speaker.h"
 

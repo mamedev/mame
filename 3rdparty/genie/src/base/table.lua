@@ -171,6 +171,24 @@
 
 
 --
+-- Return an iterator over key/value pairs in a table, sorted by key.
+--
+
+	function table.sortedpairs(t)
+		local keys = table.keys(t)
+		local i = 0
+		table.sort(keys)
+		return function()
+			i = i + 1
+			if keys[i] == nil then
+				return nil
+			end
+			return keys[i], t[keys[i]]
+		end
+	end
+
+
+--
 -- Adds the key-value associations from one table into another
 -- and returns the resulting merged table.
 --
@@ -212,12 +230,12 @@
 		end
 		return result
 	end
-	
-	
+
+
 	--
 	-- reverse table order
 	--
-	
+
 	function table.reverse(arr)
 		for i=1, math.floor(#arr / 2) do
 			arr[i], arr[#arr - i + 1] = arr[#arr - i + 1], arr[i]

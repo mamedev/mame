@@ -70,7 +70,7 @@ int sprint2_state::service_mode()
 }
 
 
-INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
+INTERRUPT_GEN_MEMBER(sprint2_state::sprint2_irq)
 {
 	/* handle steering wheels */
 
@@ -494,7 +494,7 @@ void sprint2_state::sprint2(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 12.096_MHz_XTAL / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sprint2_state::sprint2_map);
-	m_maincpu->set_vblank_int("screen", FUNC(sprint2_state::sprint2));
+	m_maincpu->set_vblank_int("screen", FUNC(sprint2_state::sprint2_irq));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 

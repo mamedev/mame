@@ -10,7 +10,7 @@ For more information see:
 
 ********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "ace_tap.h"
 

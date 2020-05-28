@@ -60,8 +60,8 @@ private:
 	DECLARE_WRITE8_MEMBER(txtram_w);
 	DECLARE_WRITE8_MEMBER(xscroll_w);
 	DECLARE_WRITE8_MEMBER(yscroll_w);
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_READ8_MEMBER(soundtimer_r);
+	uint8_t soundlatch_r();
+	uint8_t soundtimer_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_txt_tile_info);

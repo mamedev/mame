@@ -160,7 +160,7 @@ void lvpoker_state::ponttehk_map(address_map &map)
 	map(0x8400, 0x87ff).ram().w(FUNC(lvpoker_state::colorram_w)).share("colorram");
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1").nopw(); // lamps
-	map(0xa002, 0xa002).r(FUNC(lvpoker_state::payout_r)).w(FUNC(lvpoker_state::control_port_2a_w));//AM_WRITENOP // ???
+	map(0xa002, 0xa002).r(FUNC(lvpoker_state::payout_r)).w(FUNC(lvpoker_state::control_port_2a_w));//.nopw(); // ???
 }
 
 void lvcards_state::lvcards_map(address_map &map)
@@ -598,7 +598,7 @@ lc1.bin      [2/4]      1.l4         [4/4]      0.317383%
 lc1.bin      [4/4]      1.l4         [2/4]      0.317383%
 lc2.bin      [even 2/2] 2.k4         [odd 2/2]  0.146484%
 */
-ROM_START( lvcardsa )
+ROM_START( lvcardsa ) // Tehkan 5910A-1 PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.l4", 0x0000, 0x4000, CRC(81a25f70) SHA1(ce8917674b3374e5e138420f062d9b7aba3f6e11) )
 	ROM_LOAD( "2.k4", 0x4000, 0x2000, CRC(d1c72fc2) SHA1(496606e129046d253d716254ef4e58a93ca10aa0) )

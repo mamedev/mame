@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(fitfight_state::get_fof_bak_tile_info)
 	int xflip = (m_fof_bak_tileram[tile_index * 2] & 0x0020) >> 5;
 	xflip ^= 1;
 
-	SET_TILE_INFO_MEMBER(2, code, colr, TILE_FLIPYX(xflip));
+	tileinfo.set(2, code, colr, TILE_FLIPYX(xflip));
 }
 
 WRITE16_MEMBER(fitfight_state::fof_bak_tileram_w)
@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(fitfight_state::get_fof_mid_tile_info)
 	int xflip = (m_fof_mid_tileram[tile_index * 2] & 0x0020) >> 5;
 	xflip ^= 1;
 
-	SET_TILE_INFO_MEMBER(1, code, colr, TILE_FLIPYX(xflip));
+	tileinfo.set(1, code, colr, TILE_FLIPYX(xflip));
 }
 
 WRITE16_MEMBER(fitfight_state::fof_mid_tileram_w)
@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(fitfight_state::get_fof_txt_tile_info)
 	int xflip = (m_fof_txt_tileram[tile_index * 2] & 0x0020) >> 5;
 	xflip ^= 1;
 
-	SET_TILE_INFO_MEMBER(0, code, colr, TILE_FLIPYX(xflip));
+	tileinfo.set(0, code, colr, TILE_FLIPYX(xflip));
 }
 
 WRITE16_MEMBER(fitfight_state::fof_txt_tileram_w)
@@ -95,13 +95,13 @@ WRITE16_MEMBER(fitfight_state::fof_txt_tileram_w)
 
 void fitfight_state::video_start()
 {
-	m_fof_bak_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fitfight_state::get_fof_bak_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
+	m_fof_bak_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fitfight_state::get_fof_bak_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
 	/* opaque */
 
-	m_fof_mid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fitfight_state::get_fof_mid_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
+	m_fof_mid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fitfight_state::get_fof_mid_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
 	m_fof_mid_tilemap->set_transparent_pen(0);
 
-	m_fof_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fitfight_state::get_fof_txt_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
+	m_fof_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fitfight_state::get_fof_txt_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
 	m_fof_txt_tilemap->set_transparent_pen(0);
 }
 

@@ -64,7 +64,7 @@ this seems to be the only zoom feature actually used in the games.
 #include "tc0080vco.h"
 #include "video/taito_helper.h"
 
-#include "drawgfxm.h"
+#include "drawgfxt.ipp"
 #include "screen.h"
 
 
@@ -143,8 +143,8 @@ void tc0080vco_device::device_start()
 		16*8
 	};
 
-	m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0080vco_device::get_bg0_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0080vco_device::get_bg1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
@@ -158,7 +158,7 @@ void tc0080vco_device::device_start()
 	m_tilemap[0]->set_scroll_rows(512);
 
 	/* Perform extra initialisations for text layer */
-	m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0080vco_device::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_tilemap[2]->set_scrolldx(0, 0);
 	m_tilemap[2]->set_scrolldy(48, -448);
@@ -327,7 +327,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg0_tile_info)
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			TILE_FLIPYX((m_bg0_ram_1[tile_index] & 0x00c0) >> 6));
@@ -342,7 +342,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg1_tile_info)
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			TILE_FLIPYX((m_bg1_ram_1[tile_index] & 0x00c0) >> 6));
@@ -369,7 +369,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_tx_tile_info)
 		tileinfo.category = 0;
 	}
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile,
 			0,
 			0);
@@ -710,25 +710,7 @@ void tc0080vco_device::bg1_tilemap_draw(screen_device &screen, bitmap_ind16 &bit
 			sy =  (( 0x3fe - m_scroll_ram[layer + 3]) << 16) - (max_y + min_y) * (zy - 0x10000);
 		}
 
-		{
-			bitmap_ind16 &dest = bitmap;
-			bitmap_ind16 &src = srcbitmap;
-			s32 startx = sx;
-			s32 starty = sy;
-			s32 incxx = zx;
-			s32 incxy = 0;
-			s32 incyx = 0;
-			s32 incyy = zy;
-			int wraparound = 0;
-			u8 privalue = priority;
-			u8 primask = pmask;
-			bitmap_ind8 &priority = screen.priority();
-
-			if (dest.bpp() == 16)
-				COPYROZBITMAP_CORE(u16, PIXEL_OP_COPY_TRANS0_SET_PRIORITY, u8);
-			else
-				COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_TRANS0_SET_PRIORITY, u8);
-		}
+		copyrozbitmap_core(bitmap, cliprect, srcbitmap, sx, sy, zx, 0, 0, zy, false, screen.priority(), [privalue = priority, primask = pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_TRANS0_SET_PRIORITY(destp, pri, srcp); });
 	}
 }
 

@@ -55,6 +55,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_audiobank(*this, "audiobank"),
+		m_c140_region(*this, "c140"),
 		m_dpram(*this, "dpram"),
 		m_spriteram(*this, "spriteram"),
 		m_c45_road(*this, "c45_road"),
@@ -67,6 +68,12 @@ public:
 	void configure_c65_standard(machine_config &config);
 	void configure_c68_standard(machine_config &config);
 	void configure_c123tmap_standard(machine_config &config);
+	void configure_c169roz_standard(machine_config &config);
+	void configure_c355spr_standard(machine_config &config);
+	void configure_c45road_standard(machine_config &config);
+	void configure_common_standard(machine_config &config);
+	void configure_namcos2_sprite_standard(machine_config &config);
+	void configure_namcos2_roz_standard(machine_config &config);
 	void metlhawk(machine_config &config);
 	void gollygho(machine_config &config);
 	void assaultp(machine_config &config);
@@ -176,21 +183,23 @@ enum
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_audiobank;
+	required_region_ptr<u16> m_c140_region;
 
 	std::unique_ptr<uint8_t[]> m_eeprom;
 
 	DECLARE_READ16_MEMBER(dpram_word_r);
 	DECLARE_WRITE16_MEMBER(dpram_word_w);
-	DECLARE_READ8_MEMBER(dpram_byte_r);
-	DECLARE_WRITE8_MEMBER(dpram_byte_w);
+	uint8_t dpram_byte_r(offs_t offset);
+	void dpram_byte_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
 
+	DECLARE_READ16_MEMBER(c140_rom_r);
 	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
 
-	DECLARE_WRITE8_MEMBER(sound_reset_w);
-	DECLARE_WRITE8_MEMBER(system_reset_w);
+	void sound_reset_w(uint8_t data);
+	void system_reset_w(uint8_t data);
 	void reset_all_subcpus(int state);
 
 	virtual void video_start() override;
@@ -242,11 +251,15 @@ enum
 	void RozCB_luckywld(uint16_t code, int *tile, int *mask, int which);
 	void RozCB_metlhawk(uint16_t code, int *tile, int *mask, int which);
 
+	void c140_default_am(address_map &map);
 	void common_default_am(address_map &map);
 	void common_finallap_am(address_map &map);
 	void common_suzuka8h_am(address_map &map);
+	void common_suzuka8h_roz_am(address_map &map);
+	void common_luckywld_roz_am(address_map &map);
 	void common_metlhawk_am(address_map &map);
 	void common_sgunner_am(address_map &map);
+	void master_common_am(address_map &map);
 	void master_default_am(address_map &map);
 	void master_finallap_am(address_map &map);
 	void master_suzuka8h_am(address_map &map);
@@ -255,6 +268,7 @@ enum
 	void master_sgunner_am(address_map &map);
 
 	void namcos2_68k_default_cpu_board_am(address_map &map);
+	void slave_common_am(address_map &map);
 	void slave_default_am(address_map &map);
 	void slave_finallap_am(address_map &map);
 	void slave_suzuka8h_am(address_map &map);

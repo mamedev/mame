@@ -21,8 +21,8 @@
 #include <cmath>
 #include <new>
 
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdlib>
 
 
 
@@ -201,7 +201,7 @@ private:
 		stream.next_out = pnginfo.image.get();
 		stream.avail_out = expected;
 		stream.avail_in = 0;
-		std::list<image_data_chunk>::const_iterator it = idata.begin();
+		auto it = idata.begin();
 		while ((idata.end() != it) && ((Z_OK == zerr) || (Z_BUF_ERROR == zerr)) && !stream.avail_in)
 		{
 			stream.avail_in = it->length;
@@ -1042,7 +1042,7 @@ static png_error convert_bitmap_to_image_palette(png_info &pnginfo, const bitmap
 	/* copy in the pixels, specifying a nullptr filter */
 	for (y = 0; y < pnginfo.height; y++)
 	{
-		uint16_t *src = reinterpret_cast<uint16_t *>(bitmap.raw_pixptr(y));
+		auto *src = reinterpret_cast<uint16_t *>(bitmap.raw_pixptr(y));
 		uint8_t *dst = &pnginfo.image[y * (rowbytes + 1)];
 
 		/* store the filter byte, then copy the data */
@@ -1088,7 +1088,7 @@ static png_error convert_bitmap_to_image_rgb(png_info &pnginfo, const bitmap_t &
 		/* 16bpp palettized format */
 		if (bitmap.format() == BITMAP_FORMAT_IND16)
 		{
-			uint16_t *src16 = reinterpret_cast<uint16_t *>(bitmap.raw_pixptr(y));
+			auto *src16 = reinterpret_cast<uint16_t *>(bitmap.raw_pixptr(y));
 			for (x = 0; x < pnginfo.width; x++)
 			{
 				rgb_t color = palette[*src16++];
@@ -1101,7 +1101,7 @@ static png_error convert_bitmap_to_image_rgb(png_info &pnginfo, const bitmap_t &
 		/* 32-bit RGB direct */
 		else if (bitmap.format() == BITMAP_FORMAT_RGB32)
 		{
-			uint32_t *src32 = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y));
+			auto *src32 = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y));
 			for (x = 0; x < pnginfo.width; x++)
 			{
 				rgb_t raw = *src32++;
@@ -1114,7 +1114,7 @@ static png_error convert_bitmap_to_image_rgb(png_info &pnginfo, const bitmap_t &
 		/* 32-bit ARGB direct */
 		else if (bitmap.format() == BITMAP_FORMAT_ARGB32)
 		{
-			uint32_t *src32 = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y));
+			auto *src32 = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y));
 			for (x = 0; x < pnginfo.width; x++)
 			{
 				rgb_t raw = *src32++;

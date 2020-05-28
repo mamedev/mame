@@ -116,17 +116,17 @@ private:
 		TIMER_BEEP_OFF
 	};
 
-	DECLARE_READ8_MEMBER(port04_r);
-	DECLARE_WRITE8_MEMBER(port04_w);
-	DECLARE_READ8_MEMBER(port05_r);
-	DECLARE_READ8_MEMBER(port06_r);
-	DECLARE_WRITE8_MEMBER(port06_w);
-	DECLARE_READ8_MEMBER(port08_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_READ8_MEMBER(port09_r);
-	DECLARE_READ8_MEMBER(port0a_r);
-	DECLARE_WRITE8_MEMBER(port0a_w);
-	DECLARE_WRITE8_MEMBER(port0d_w);
+	u8 port04_r();
+	void port04_w(u8 data);
+	u8 port05_r();
+	u8 port06_r();
+	void port06_w(u8 data);
+	u8 port08_r();
+	void port08_w(u8 data);
+	u8 port09_r();
+	u8 port0a_r();
+	void port0a_w(u8 data);
+	void port0d_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(hsync_w);
 	DECLARE_WRITE_LINE_MEMBER(vsync_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
@@ -168,11 +168,11 @@ void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_beep->set_state(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in amust_state::device_timer");
+		throw emu_fatalerror("Unknown id in amust_state::device_timer");
 	}
 }
 
-//WRITE8_MEMBER( amust_state::port00_w )
+//void amust_state::port00_w(u8 data)
 //{
 //  membank("bankr0")->set_entry(BIT(data, 6));
 //  m_fdc->dden_w(BIT(data, 5));
@@ -270,39 +270,39 @@ WRITE_LINE_MEMBER( amust_state::vsync_w )
 	do_int();
 }
 
-READ8_MEMBER( amust_state::port04_r )
+u8 amust_state::port04_r()
 {
 	return m_port04;
 }
 
-WRITE8_MEMBER( amust_state::port04_w )
+void amust_state::port04_w(u8 data)
 {
 	m_port04 = data;
 }
 
-READ8_MEMBER( amust_state::port05_r )
+u8 amust_state::port05_r()
 {
 	return 0;
 }
 
-READ8_MEMBER( amust_state::port06_r )
+u8 amust_state::port06_r()
 {
 	return m_port06;
 }
 
 // BIT 5 low while writing to screen
-WRITE8_MEMBER( amust_state::port06_w )
+void amust_state::port06_w(u8 data)
 {
 	m_port06 = data;
 }
 
-READ8_MEMBER( amust_state::port08_r )
+u8 amust_state::port08_r()
 {
 	return m_port08;
 }
 
 // lower 8 bits of video address
-WRITE8_MEMBER( amust_state::port08_w )
+void amust_state::port08_w(u8 data)
 {
 	m_port08 = data;
 }
@@ -317,13 +317,13 @@ d5 - status of fdc intrq; loops till NZ
 d6 -
 d7 -
 */
-READ8_MEMBER( amust_state::port09_r )
+u8 amust_state::port09_r()
 {
 	logerror("%s\n",machine().describe_context());
 	return (ioport("P9")->read() & 0x1f) | m_port09;
 }
 
-READ8_MEMBER( amust_state::port0a_r )
+u8 amust_state::port0a_r()
 {
 	return m_port0a;
 }
@@ -335,7 +335,7 @@ with selecting which device causes interrupt?
 D0 ?
 Bit 4 low = beeper.
 Lower 3 bits = upper part of video address */
-WRITE8_MEMBER( amust_state::port0a_w )
+void amust_state::port0a_w(u8 data)
 {
 	m_port0a = data;
 
@@ -354,7 +354,7 @@ WRITE8_MEMBER( amust_state::port0a_w )
 	}
 }
 
-WRITE8_MEMBER( amust_state::port0d_w )
+void amust_state::port0d_w(u8 data)
 {
 	uint16_t video_address = m_port08 | ((m_port0a & 7) << 8);
 	m_p_videoram[video_address] = data;
@@ -459,7 +459,7 @@ void amust_state::amust(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(amust_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(amust_state::crtc_update_row));
 	crtc.out_hsync_callback().set(FUNC(amust_state::hsync_w));
 	crtc.out_vsync_callback().set(FUNC(amust_state::vsync_w));
 

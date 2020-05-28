@@ -82,7 +82,7 @@ void gamate_video_device::increment_vram_address()
 	m_vramaddress &= 0x1fff;
 }
 
-WRITE8_MEMBER(gamate_video_device::lcdcon_w)
+void gamate_video_device::lcdcon_w(uint8_t data)
 {
 	/*
 	NXWS ???E
@@ -103,7 +103,7 @@ WRITE8_MEMBER(gamate_video_device::lcdcon_w)
 	// setting data & 0x01 is bad
 }
 
-WRITE8_MEMBER(gamate_video_device::xscroll_w)
+void gamate_video_device::xscroll_w(uint8_t data)
 {
 	/*
 	XXXX XXXX
@@ -112,7 +112,7 @@ WRITE8_MEMBER(gamate_video_device::xscroll_w)
 	m_scrollx = data;
 }
 
-WRITE8_MEMBER(gamate_video_device::yscroll_w)
+void gamate_video_device::yscroll_w(uint8_t data)
 {
 	/*
 	YYYY YYYY
@@ -121,7 +121,7 @@ WRITE8_MEMBER(gamate_video_device::yscroll_w)
 	m_scrolly = data;
 }
 
-WRITE8_MEMBER(gamate_video_device::xpos_w)
+void gamate_video_device::xpos_w(uint8_t data)
 {
 	/*
 	BxxX XXXX
@@ -132,7 +132,7 @@ WRITE8_MEMBER(gamate_video_device::xpos_w)
 	set_vram_addr_lower_5bits(data & 0x1f);
 }
 
-WRITE8_MEMBER(gamate_video_device::ypos_w)
+void gamate_video_device::ypos_w(uint8_t data)
 {
 	/*
 	YYYY YYYY
@@ -141,7 +141,7 @@ WRITE8_MEMBER(gamate_video_device::ypos_w)
 	set_vram_addr_upper_8bits(data);
 }
 
-READ8_MEMBER(gamate_video_device::vram_r)
+uint8_t gamate_video_device::vram_r()
 {
 	uint16_t address = m_vramaddress << 1;
 
@@ -155,7 +155,7 @@ READ8_MEMBER(gamate_video_device::vram_r)
 	return ret;
 }
 
-WRITE8_MEMBER(gamate_video_device::vram_w)
+void gamate_video_device::vram_w(uint8_t data)
 {
 	uint16_t address = m_vramaddress << 1;
 

@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(mogura_state::get_mogura_tile_info)
 	int code = m_tileram[tile_index];
 	int attr = m_tileram[tile_index + 0x800];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(attr >> 1) & 7,
 			0);
@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(mogura_state::get_mogura_tile_info)
 void mogura_state::video_start()
 {
 	m_gfxdecode->gfx(0)->set_source(m_gfxram);
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mogura_state::get_mogura_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mogura_state::get_mogura_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 uint32_t mogura_state::screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

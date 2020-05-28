@@ -49,9 +49,9 @@ protected:
 	virtual bool is_readable(uint8_t offset) override;
 
 private:
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pa_r();
+	uint8_t ppi_pb_r();
+	void ppi_pc_w(uint8_t data);
 
 	required_device<cassette_image_device> m_cassette;
 	required_device<i8255_device> m_ppi;

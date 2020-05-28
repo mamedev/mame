@@ -53,7 +53,7 @@ Let's first run MAME in a terminal to reach the LUA console:
       _/  _/  _/  _/_/_/_/  _/  _/  _/  _/_/_/
      _/      _/  _/    _/  _/      _/  _/
     _/      _/  _/    _/  _/      _/  _/_/_/_/
-    mame v0.205
+    mame v0.217
     Copyright (C) Nicola Salmoria and the MAME team
 
     Lua 5.3
@@ -77,7 +77,7 @@ You can check at runtime which version of MAME you are running, with:
 ::
 
     [MAME]> print(emu.app_name() .. " " .. emu.app_version())
-    mame 0.205
+    mame 0.217
 
 We now start exploring screen related methods. First, let's enumerate available screens:
 

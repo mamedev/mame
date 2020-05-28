@@ -58,7 +58,8 @@ base_28fxxx_device::base_28fxxx_device(const machine_config &mconfig, device_typ
 	, m_program_power(CLEAR_LINE)
 	, m_state(STATE_READ_MEMORY)
 {
-	assert_always((m_size & (m_size - 1)) == 0, "memory size must be an exact power of two");
+	if (m_size & (m_size - 1))
+		throw emu_fatalerror("%s(%s): memory size must be an exact power of two", type.shortname(), tag);
 }
 
 intel_28f010_device::intel_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -117,7 +118,7 @@ void base_28fxxx_device::erase()
 	memset(m_data.get(), 0xff, m_size);
 }
 
-READ8_MEMBER(base_28fxxx_device::read)
+u8 base_28fxxx_device::read(address_space &space, offs_t offset, u8 mem_mask)
 {
 	switch (m_state)
 	{
@@ -145,7 +146,7 @@ READ8_MEMBER(base_28fxxx_device::read)
 	}
 }
 
-WRITE8_MEMBER(base_28fxxx_device::write)
+void base_28fxxx_device::write(offs_t offset, u8 data)
 {
 	// writes are ignored unless Vpp is asserted
 	if (!m_program_power)

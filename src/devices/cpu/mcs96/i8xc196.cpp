@@ -24,7 +24,7 @@ std::unique_ptr<util::disasm_interface> i8xc196_device::create_disassembler()
 
 void i8xc196_device::internal_regs(address_map &map)
 {
-	map(0x00, 0x01).lr16("r0", []() -> u16 { return 0; }).nopw();
+	map(0x00, 0x01).lr16([] () -> u16 { return 0; }, "r0").nopw();
 	map(0x08, 0x08).rw(FUNC(i8xc196_device::int_mask_r), FUNC(i8xc196_device::int_mask_w));
 	map(0x09, 0x09).rw(FUNC(i8xc196_device::int_pending_r), FUNC(i8xc196_device::int_pending_w));
 	map(0x18, 0xff).ram().share("register_file");

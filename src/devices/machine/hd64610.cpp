@@ -276,7 +276,7 @@ void hd64610_device::nvram_write(emu_file &file)
 //  hardware start/stop
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( hd64610_device::h_w )
+void hd64610_device::h_w(int state)
 {
 	m_hline_state = state;
 }
@@ -286,7 +286,7 @@ WRITE_LINE_MEMBER( hd64610_device::h_w )
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( hd64610_device::read )
+uint8_t hd64610_device::read(offs_t offset)
 {
 	uint8_t data =  m_regs[offset & 0x0f];
 
@@ -300,7 +300,7 @@ READ8_MEMBER( hd64610_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( hd64610_device::write )
+void hd64610_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x0f)
 	{

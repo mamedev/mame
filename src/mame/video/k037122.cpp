@@ -9,15 +9,16 @@ Konami 037122
 #include "konami_helper.h"
 #include "screen.h"
 
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 #define K037122_NUM_TILES       16384
 
 DEFINE_DEVICE_TYPE(K037122, k037122_device, "k037122", "K037122 2D Tilemap")
 
-k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K037122, tag, owner, clock),
+k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, K037122, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_gfx_interface(mconfig, *this, nullptr),
 	m_tile_ram(nullptr),
@@ -51,8 +52,8 @@ void k037122_device::device_start()
 	m_tile_ram = make_unique_clear<uint32_t[]>(0x20000 / 4);
 	m_reg = make_unique_clear<uint32_t[]>(0x400 / 4);
 
-	m_layer[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k037122_device::tile_info_layer0),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_layer[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k037122_device::tile_info_layer1),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_layer[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k037122_device::tile_info_layer0)), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_layer[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k037122_device::tile_info_layer1)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
 	m_layer[0]->set_transparent_pen(0);
 	m_layer[1]->set_transparent_pen(0);
@@ -92,7 +93,7 @@ TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer0)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, flags);
+	tileinfo.set(m_gfx_index, tile, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer1)
@@ -107,7 +108,7 @@ TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer1)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, flags);
+	tileinfo.set(m_gfx_index, tile, color, flags);
 }
 
 
@@ -136,12 +137,12 @@ void k037122_device::update_palette_color( uint32_t palette_base, int color )
 	palette().set_pen_color(color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
 }
 
-READ32_MEMBER( k037122_device::sram_r )
+uint32_t k037122_device::sram_r(offs_t offset)
 {
 	return m_tile_ram[offset];
 }
 
-WRITE32_MEMBER( k037122_device::sram_w )
+void k037122_device::sram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_tile_ram.get() + offset);
 
@@ -178,14 +179,14 @@ WRITE32_MEMBER( k037122_device::sram_w )
 }
 
 
-READ32_MEMBER( k037122_device::char_r )
+uint32_t k037122_device::char_r(offs_t offset)
 {
 	int bank = m_reg[0x30 / 4] & 0x7;
 
 	return m_char_ram[offset + (bank * (0x40000 / 4))];
 }
 
-WRITE32_MEMBER( k037122_device::char_w )
+void k037122_device::char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int bank = m_reg[0x30 / 4] & 0x7;
 	uint32_t addr = offset + (bank * (0x40000/4));
@@ -194,7 +195,7 @@ WRITE32_MEMBER( k037122_device::char_w )
 	gfx(m_gfx_index)->mark_dirty(addr / 32);
 }
 
-READ32_MEMBER( k037122_device::reg_r )
+uint32_t k037122_device::reg_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -206,7 +207,7 @@ READ32_MEMBER( k037122_device::reg_r )
 	return m_reg[offset];
 }
 
-WRITE32_MEMBER( k037122_device::reg_w )
+void k037122_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_reg.get() + offset);
 }

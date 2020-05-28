@@ -60,7 +60,7 @@ private:
 	std::unique_ptr<uint16_t[]> m_spriteram2_older;
 
 	DECLARE_READ16_MEMBER(pending_command_r);
-	DECLARE_WRITE8_MEMBER(unknown_output_w);
+	void unknown_output_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(spritebank_w);
 	DECLARE_WRITE16_MEMBER(tileregs_w);

@@ -182,17 +182,17 @@ static INPUT_PORTS_START( ksayakyu )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER(ksayakyu_state::dummy1_w)
+void ksayakyu_state::dummy1_w(uint8_t data)
 {
 //  printf("%02x 1\n", data);
 }
 
-WRITE8_MEMBER(ksayakyu_state::dummy2_w)
+void ksayakyu_state::dummy2_w(uint8_t data)
 {
 //  printf("%02x 2\n", data);
 }
 
-WRITE8_MEMBER(ksayakyu_state::dummy3_w)
+void ksayakyu_state::dummy3_w(uint8_t data)
 {
 //  printf("%02x 3\n", data);
 }
@@ -268,7 +268,7 @@ void ksayakyu_state::ksayakyu(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &ksayakyu_state::soundcpu_map);
 	audiocpu.set_periodic_int(FUNC(ksayakyu_state::irq0_line_hold), attotime::from_hz(60)); //guess, controls music tempo
 
-	config.m_minimum_quantum = attotime::from_hz(60000);
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 
 	/* video hardware */

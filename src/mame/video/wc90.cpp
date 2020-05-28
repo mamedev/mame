@@ -15,7 +15,7 @@ TILE_GET_INFO_MEMBER(wc90_state::get_bg_tile_info)
 	int attr = m_bgvideoram[tile_index];
 	int tile = m_bgvideoram[tile_index + 0x800] +
 					256 * ((attr & 3) + ((attr >> 1) & 4));
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			attr >> 4,
 			0);
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(wc90_state::get_fg_tile_info)
 	int attr = m_fgvideoram[tile_index];
 	int tile = m_fgvideoram[tile_index + 0x800] +
 					256 * ((attr & 3) + ((attr >> 1) & 4));
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile,
 			attr >> 4,
 			0);
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(wc90_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(wc90_state::get_tx_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_txvideoram[tile_index + 0x800] + ((m_txvideoram[tile_index] & 0x07) << 8),
 			m_txvideoram[tile_index] >> 4,
 			0);
@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(wc90_state::track_get_bg_tile_info)
 	int attr = m_bgvideoram[tile_index];
 	int tile = m_bgvideoram[tile_index + 0x800] +
 					256 * (attr & 7);
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			attr >> 4,
 			0);
@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(wc90_state::track_get_fg_tile_info)
 	int attr = m_fgvideoram[tile_index];
 	int tile = m_fgvideoram[tile_index + 0x800] +
 					256 * (attr & 7);
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile,
 			attr >> 4,
 			0);
@@ -71,9 +71,9 @@ TILE_GET_INFO_MEMBER(wc90_state::track_get_fg_tile_info)
 
 void wc90_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,     16,16,64,32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 64,32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);
@@ -81,9 +81,9 @@ void wc90_state::video_start()
 
 VIDEO_START_MEMBER(wc90_state,wc90t)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90_state::track_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,     16,16,64,32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90_state::track_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90_state::track_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90_state::track_get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90_state::get_tx_tile_info)),       TILEMAP_SCAN_ROWS,  8, 8, 64,32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);

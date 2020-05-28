@@ -103,7 +103,6 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 #include "emu.h"
 #include "includes/tubep.h"
 
-#include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/74259.h"
@@ -261,7 +260,7 @@ void tubep_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		rjammer_scanline_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in tubep_state::device_timer");
+		throw emu_fatalerror("Unknown id in tubep_state::device_timer");
 	}
 }
 
@@ -537,12 +536,12 @@ WRITE_LINE_MEMBER(tubep_state::rjammer_adpcm_vck)
 
 	if (m_ls74 == 1)
 	{
-		m_msm->write_data((m_ls377 >> 0) & 15);
+		m_msm->data_w((m_ls377 >> 0) & 15);
 		m_soundcpu->set_input_line(0, ASSERT_LINE);
 	}
 	else
 	{
-		m_msm->write_data((m_ls377 >> 4) & 15);
+		m_msm->data_w((m_ls377 >> 4) & 15);
 	}
 
 }
@@ -594,27 +593,27 @@ void tubep_state::rjammer_sound_portmap(address_map &map)
 }
 
 
-WRITE8_MEMBER(tubep_state::ay8910_portA_0_w)
+void tubep_state::ay8910_portA_0_w(uint8_t data)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portB_0_w)
+void tubep_state::ay8910_portB_0_w(uint8_t data)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portA_1_w)
+void tubep_state::ay8910_portA_1_w(uint8_t data)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portB_1_w)
+void tubep_state::ay8910_portB_1_w(uint8_t data)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portA_2_w)
+void tubep_state::ay8910_portA_2_w(uint8_t data)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portB_2_w)
+void tubep_state::ay8910_portB_2_w(uint8_t data)
 {
 		//analog sound control
 }
@@ -836,9 +835,10 @@ void tubep_state::tubep(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &tubep_state::tubep_sound_portmap);
 
 	NSC8105(config, m_mcu, 6000000);        /* 6 MHz Xtal - divided internally ??? */
+	m_mcu->set_ram_enable(false);
 	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(tubep_state::coin1_counter_w));
@@ -885,6 +885,7 @@ void tubep_state::tubepb(machine_config &config)
 	tubep(config);
 
 	M6802(config.replace(), m_mcu, 6000000); /* ? MHz Xtal */
+	m_mcu->set_ram_enable(false);
 	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
 
 	//m_screen->screen_vblank().set_inputline(m_mcu, INPUT_LINE_NMI);
@@ -908,6 +909,7 @@ void tubep_state::rjammer(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	NSC8105(config, m_mcu, 6000000);    /* 6 MHz Xtal - divided internally ??? */
+	m_mcu->set_ram_enable(false);
 	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3A

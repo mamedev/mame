@@ -137,7 +137,7 @@ void radio86_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_bank1->set_entry(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in radio86_state::device_timer");
+		throw emu_fatalerror("Unknown id in radio86_state::device_timer");
 	}
 }
 
@@ -173,7 +173,7 @@ void radio86_state::radio86_pagesel(uint8_t data)
 	m_disk_sel = data;
 }
 
-READ8_MEMBER(radio86_state::radio86rom_romdisk_porta_r)
+uint8_t radio86_state::radio86rom_romdisk_porta_r()
 {
 	uint16_t addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
 	if (m_cart->exists() && addr < m_cart->get_rom_size())
@@ -204,11 +204,6 @@ void radio86_state::radio86_romdisk_portb_w(uint8_t data)
 void radio86_state::radio86_romdisk_portc_w(uint8_t data)
 {
 	m_romdisk_msb = data;
-}
-
-void radio86_state::mikrosha_8255_font_page_w(uint8_t data)
-{
-	m_mikrosha_font_page = (data  > 7) & 1;
 }
 
 I8275_DRAW_CHARACTER_MEMBER(radio86_state::display_pixels)

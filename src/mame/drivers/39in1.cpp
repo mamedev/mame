@@ -20,6 +20,16 @@
  * TODO:
  *   PXA255 peripherals
  *
+ * 39in1 notes:
+ * The actual PCB just normally boots up to the game, whereas in MAME it
+ * defaults to test mode and checks the rom, then jumps out to the game
+ * after loading all 39 games. It is almost like it is defaulting to test
+ * mode on at bootup. On the real PCB, it just loads the 39 games then
+ * shows the game selection menu. Going into the test mode does the same
+ * code check but then shows  a test screen with color bars. Pressing
+ * next shows a high score clear screen (if the HS dip is on). Pressing
+ * next shows the game dips screens and allows you to set up soft dip
+ * switches for each of the 39 games.
  **************************************************************************/
 
 #include "emu.h"
@@ -52,13 +62,12 @@ private:
 	required_shared_ptr<uint32_t> m_ram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE32_MEMBER(eeprom_set_w);
-	DECLARE_WRITE32_MEMBER(eeprom_clear_w);
+	uint32_t eeprom_r();
+	void eeprom_w(uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(cpld_r);
-	DECLARE_WRITE32_MEMBER(cpld_w);
-	DECLARE_READ32_MEMBER(prot_cheater_r);
+	uint32_t cpld_r(offs_t offset);
+	void cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t prot_cheater_r();
 	DECLARE_MACHINE_START(60in1);
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -83,32 +92,22 @@ inline void ATTR_PRINTF(3,4) _39in1_state::verboselog(int n_level, const char *s
 	}
 }
 
-READ32_MEMBER(_39in1_state::eeprom_r)
+uint32_t _39in1_state::eeprom_r()
 {
 	return (m_eeprom->do_read() << 5) | (1 << 1); // Must be on.  Probably a DIP switch.
 }
 
-WRITE32_MEMBER(_39in1_state::eeprom_set_w)
+void _39in1_state::eeprom_w(uint32_t data, uint32_t mem_mask)
 {
-	if (BIT(data, 2))
+	if (BIT(mem_mask, 2))
 		m_eeprom->cs_write(ASSERT_LINE);
-	if (BIT(data, 3))
-		m_eeprom->clk_write(ASSERT_LINE);
-	if (BIT(data, 4))
-		m_eeprom->di_write(1);
+	if (BIT(mem_mask, 3))
+		m_eeprom->clk_write(BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
+	if (BIT(mem_mask, 4))
+		m_eeprom->di_write(BIT(data, 4));
 }
 
-WRITE32_MEMBER(_39in1_state::eeprom_clear_w)
-{
-	if (BIT(data, 2))
-		m_eeprom->cs_write(ASSERT_LINE);
-	if (BIT(data, 3))
-		m_eeprom->clk_write(CLEAR_LINE);
-	if (BIT(data, 4))
-		m_eeprom->di_write(0);
-}
-
-READ32_MEMBER(_39in1_state::cpld_r)
+uint32_t _39in1_state::cpld_r(offs_t offset)
 {
 	//if (m_maincpu->pc() != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, m_maincpu->pc(), state);
 
@@ -163,7 +162,7 @@ READ32_MEMBER(_39in1_state::cpld_r)
 	return 0;
 }
 
-WRITE32_MEMBER(_39in1_state::cpld_w)
+void _39in1_state::cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (mem_mask == 0xffff)
 	{
@@ -177,7 +176,7 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 	if (m_maincpu->pc() == 0x2874)
 	{
 		m_state = 2;
-		m_magic = space.read_byte(0xa02d4ff0);
+		m_magic = m_maincpu->space(AS_PROGRAM).read_byte(0xa02d4ff0);
 	}
 	else if (offset == 0xa)
 	{
@@ -190,7 +189,7 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 #endif
 }
 
-READ32_MEMBER(_39in1_state::prot_cheater_r)
+uint32_t _39in1_state::prot_cheater_r()
 {
 	return 0x37;
 }
@@ -198,7 +197,7 @@ READ32_MEMBER(_39in1_state::prot_cheater_r)
 void _39in1_state::driver_init()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler (0xa0151648, 0xa015164b, read32_delegate(FUNC(_39in1_state::prot_cheater_r), this));
+	space.install_read_handler (0xa0151648, 0xa015164b, read32smo_delegate(*this, FUNC(_39in1_state::prot_cheater_r)));
 }
 
 void _39in1_state::_39in1_map(address_map &map)
@@ -206,12 +205,12 @@ void _39in1_state::_39in1_map(address_map &map)
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00400000, 0x005fffff).rom().region("data", 0);
 	map(0x04000000, 0x047fffff).rw(FUNC(_39in1_state::cpld_r), FUNC(_39in1_state::cpld_w));
-	map(0x40000000, 0x400002ff).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_dma_r), FUNC(pxa255_periphs_device::pxa255_dma_w));
-	map(0x40400000, 0x40400083).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_i2s_r), FUNC(pxa255_periphs_device::pxa255_i2s_w));
-	map(0x40a00000, 0x40a0001f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_ostimer_r), FUNC(pxa255_periphs_device::pxa255_ostimer_w));
-	map(0x40d00000, 0x40d00017).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_intc_r), FUNC(pxa255_periphs_device::pxa255_intc_w));
-	map(0x40e00000, 0x40e0006b).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_gpio_r), FUNC(pxa255_periphs_device::pxa255_gpio_w));
-	map(0x44000000, 0x4400021f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_lcd_r), FUNC(pxa255_periphs_device::pxa255_lcd_w));
+	map(0x40000000, 0x400002ff).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::dma_r), FUNC(pxa255_periphs_device::dma_w));
+	map(0x40400000, 0x40400083).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::i2s_r), FUNC(pxa255_periphs_device::i2s_w));
+	map(0x40a00000, 0x40a0001f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::ostimer_r), FUNC(pxa255_periphs_device::ostimer_w));
+	map(0x40d00000, 0x40d00017).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::intc_r), FUNC(pxa255_periphs_device::intc_w));
+	map(0x40e00000, 0x40e0006b).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::gpio_r), FUNC(pxa255_periphs_device::gpio_w));
+	map(0x44000000, 0x4400021f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::lcd_r), FUNC(pxa255_periphs_device::lcd_w));
 	map(0xa0000000, 0xa07fffff).ram().share("ram");
 }
 
@@ -249,6 +248,23 @@ static INPUT_PORTS_START( 39in1 )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x80000000, IP_ACTIVE_LOW )
+
+/*  The following dips apply to 39in1 and 48in1. 60in1 is the same but the last unused dipsw#4 is test mode off/on.
+
+    PORT_START("DSW")      // 1x 4-position DIP switch labelled SW3
+    PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW3:1")
+    PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x02, 0x02, "Display Mode" )            PORT_DIPLOCATION("SW3:2")
+    PORT_DIPSETTING(    0x02, "CGA 15.75kHz" )
+    PORT_DIPSETTING(    0x00, "VGA 31.5kHz" )
+    PORT_DIPNAME( 0x04, 0x04, "High Score Saver" )        PORT_DIPLOCATION("SW3:3")
+    PORT_DIPSETTING(    0x04, "Disabled" )
+    PORT_DIPSETTING(    0x00, "Enabled" )
+    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW3:4")
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+*/
 INPUT_PORTS_END
 
 void _39in1_state::machine_start()
@@ -281,9 +297,8 @@ void _39in1_state::_39in1(machine_config &config)
 	EEPROM_93C66_16BIT(config, "eeprom");
 
 	PXA255_PERIPHERALS(config, m_pxa_periphs, 200000000, m_maincpu);
-	m_pxa_periphs->gpio0_set_cb().set(FUNC(_39in1_state::eeprom_set_w));
-	m_pxa_periphs->gpio0_clear_cb().set(FUNC(_39in1_state::eeprom_clear_w));
-	m_pxa_periphs->gpio0_in_cb().set(FUNC(_39in1_state::eeprom_r));
+	m_pxa_periphs->gpio0_write().set(FUNC(_39in1_state::eeprom_w));
+	m_pxa_periphs->gpio0_read().set(FUNC(_39in1_state::eeprom_r));
 }
 
 void _39in1_state::_60in1(machine_config &config)
@@ -409,6 +424,18 @@ ROM_START( 19in1 )
 	ROM_LOAD16_WORD_SWAP( "19in1_eeprom.bin", 0x000, 0x200, NO_DUMP )
 ROM_END
 
+// TODO: encryption is different from 39in1 and 60in1
+ROM_START( rodent )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "exterminator.u2", 0x00000, 0x80000, CRC(23c1d21f) SHA1(349565b0f0a015196827707cabb8d9ce6560d2cc) )
+
+	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_LOAD( "m29w160db.u19", 0x000000, 0x200000, CRC(665ee79c) SHA1(35896b97378e8cd78e99d4527b9dc7392e545e17) )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "93c66.u32", 0x000, 0x200, CRC(c311c7bc) SHA1(8328002b7f6a8b7a3ffca079b7960bc990211d7b) )
+ROM_END
+
 GAME(2004, 4in1a,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "4 in 1 MAME bootleg (set 1, ver 3.00)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
 GAME(2004, 4in1b,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "4 in 1 MAME bootleg (set 2)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
 GAME(2004, 19in1,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "19 in 1 MAME bootleg",                              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
@@ -417,3 +444,4 @@ GAME(2004, 48in1,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "boo
 GAME(2004, 48in1b, 39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "48 in 1 MAME bootleg (set 2, ver 3.09, alt flash)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
 GAME(2004, 48in1a, 39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "48 in 1 MAME bootleg (set 3, ver 3.02)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
 GAME(2004, 60in1,  39in1, _60in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "60 in 1 MAME bootleg (ver 3.00)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2005, rodent, 0,     _39in1, 39in1, _39in1_state, driver_init, ROT270, "The Game Room", "Rodent Exterminator",                         MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)

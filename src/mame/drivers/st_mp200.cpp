@@ -62,13 +62,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
 private:
-	DECLARE_READ8_MEMBER(u10_a_r);
-	DECLARE_WRITE8_MEMBER(u10_a_w);
-	DECLARE_READ8_MEMBER(u10_b_r);
-	DECLARE_WRITE8_MEMBER(u10_b_w);
-	DECLARE_READ8_MEMBER(u11_a_r);
-	DECLARE_WRITE8_MEMBER(u11_a_w);
-	DECLARE_WRITE8_MEMBER(u11_b_w);
+	uint8_t u10_a_r();
+	void u10_a_w(uint8_t data);
+	uint8_t u10_b_r();
+	void u10_b_w(uint8_t data);
+	uint8_t u11_a_r();
+	void u11_a_w(uint8_t data);
+	void u11_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
@@ -114,14 +114,14 @@ private:
 
 void st_mp200_state::st_mp200_map(address_map &map)
 {
-	//ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	//map.global_mask(0x7fff);
 	map(0x0000, 0x007f).ram(); // internal to the cpu
 	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x00a0, 0x00a7).nopw(); // to sound board
 	map(0x00c0, 0x00c7); // to sound board
 	map(0x0200, 0x02ff).ram().share("nvram");
-	map(0x1000, 0xffff).rom(); //AM_REGION("roms", 0 )
+	map(0x1000, 0xffff).rom(); //.region("roms", 0 );
 }
 
 static INPUT_PORTS_START( mp200 )
@@ -354,7 +354,7 @@ WRITE_LINE_MEMBER( st_mp200_state::u11_ca2_w )
 	{
 		if (BIT(m_u10a, 7))
 		{
-			m_s14001a->data_w(generic_space(), 0, m_u10a & 0x3f);
+			m_s14001a->data_w(m_u10a & 0x3f);
 			m_s14001a->start_w(1);
 			m_s14001a->start_w(0);
 		}
@@ -375,12 +375,12 @@ WRITE_LINE_MEMBER( st_mp200_state::u11_cb2_w )
 	m_u11_cb2 = state;
 }
 
-READ8_MEMBER( st_mp200_state::u10_a_r )
+uint8_t st_mp200_state::u10_a_r()
 {
 	return m_u10a;
 }
 
-WRITE8_MEMBER( st_mp200_state::u10_a_w )
+void st_mp200_state::u10_a_w(uint8_t data)
 {
 	m_u10a = data;
 
@@ -405,7 +405,7 @@ WRITE8_MEMBER( st_mp200_state::u10_a_w )
 	}
 }
 
-READ8_MEMBER( st_mp200_state::u10_b_r )
+uint8_t st_mp200_state::u10_b_r()
 {
 	uint8_t data = 0;
 
@@ -439,17 +439,17 @@ READ8_MEMBER( st_mp200_state::u10_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( st_mp200_state::u10_b_w )
+void st_mp200_state::u10_b_w(uint8_t data)
 {
 	m_u10b = data;
 }
 
-READ8_MEMBER( st_mp200_state::u11_a_r )
+uint8_t st_mp200_state::u11_a_r()
 {
 	return m_u11a;
 }
 
-WRITE8_MEMBER( st_mp200_state::u11_a_w )
+void st_mp200_state::u11_a_w(uint8_t data)
 {
 	m_u11a = data;
 
@@ -482,7 +482,7 @@ WRITE8_MEMBER( st_mp200_state::u11_a_w )
 	}
 }
 
-WRITE8_MEMBER( st_mp200_state::u11_b_w )
+void st_mp200_state::u11_b_w(uint8_t data)
 {
 	m_u11b = data;
 	if (!m_u11_cb2)

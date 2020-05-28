@@ -80,7 +80,7 @@ const uint32_t okim9810_device::s_sampling_freq_div_table[16] =
 okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OKIM9810, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 24),
+		device_rom_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_TMP_register(0x00),
 		m_global_volume(0x00),
@@ -242,7 +242,7 @@ uint8_t okim9810_device::read_status()
 //  read - memory interface for reading the active status
 //-------------------------------------------------
 
-READ8_MEMBER( okim9810_device::read )
+uint8_t okim9810_device::read()
 {
 	assert(!m_serial);
 	return read_status();
@@ -444,7 +444,7 @@ void okim9810_device::write_command(uint8_t data)
 	m_dadr = 0;
 }
 
-WRITE8_MEMBER( okim9810_device::write )
+void okim9810_device::write(uint8_t data)
 {
 	assert(!m_serial);
 	write_command(data);
@@ -493,7 +493,7 @@ void okim9810_device::write_tmp_register(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( okim9810_device::tmp_register_w )
+void okim9810_device::tmp_register_w(uint8_t data)
 {
 	assert(!m_serial);
 	write_tmp_register(data);
@@ -504,12 +504,12 @@ WRITE8_MEMBER( okim9810_device::tmp_register_w )
 //  Serial interface, NOT verified
 //-----------------------------------------------------------
 
-WRITE_LINE_MEMBER( okim9810_device::serial_w )
+void okim9810_device::serial_w(int state)
 {
 	m_serial = state;
 }
 
-WRITE_LINE_MEMBER( okim9810_device::si_w )
+void okim9810_device::si_w(int state)
 {
 	if (m_si != state)
 	{
@@ -534,43 +534,43 @@ WRITE_LINE_MEMBER( okim9810_device::si_w )
 	}
 }
 
-WRITE_LINE_MEMBER( okim9810_device::sd_w )
+void okim9810_device::sd_w(int state)
 {
 	m_sd = state;
 }
 
-WRITE_LINE_MEMBER( okim9810_device::ud_w )
+void okim9810_device::ud_w(int state)
 {
 	m_ud = state;
 }
 
-WRITE_LINE_MEMBER( okim9810_device::cmd_w )
+void okim9810_device::cmd_w(int state)
 {
 	m_cmd = state;
 }
 
-READ_LINE_MEMBER( okim9810_device::so_r )
+int okim9810_device::so_r()
 {
 	m_serial_read_latch = (m_serial_read_latch & ~(1<<m_serial_bits)) | (read_status() & (1<<m_serial_bits));
 	return (read_status() >> (7-m_serial_bits)) & 1;
 }
 
-READ_LINE_MEMBER( okim9810_device::sr0_r )
+int okim9810_device::sr0_r()
 {
 	return (m_serial_read_latch >> ((m_ud) ? 4 : 0)) & 1;
 }
 
-READ_LINE_MEMBER( okim9810_device::sr1_r )
+int okim9810_device::sr1_r()
 {
 	return (m_serial_read_latch >> ((m_ud) ? 5 : 1)) & 1;
 }
 
-READ_LINE_MEMBER( okim9810_device::sr2_r )
+int okim9810_device::sr2_r()
 {
 	return (m_serial_read_latch >> ((m_ud) ? 6 : 2)) & 1;
 }
 
-READ_LINE_MEMBER( okim9810_device::sr3_r )
+int okim9810_device::sr3_r()
 {
 	return (m_serial_read_latch >> ((m_ud) ? 7 : 3)) & 1;
 }

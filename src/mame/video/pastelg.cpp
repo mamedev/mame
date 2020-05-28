@@ -11,11 +11,51 @@
 #include "emu.h"
 #include "includes/pastelg.h"
 
-/******************************************************************************
 
+// pastelg specific methods
 
-******************************************************************************/
-void pastelg_state::pastelg_palette(palette_device &palette) const
+uint16_t pastelg_state::blitter_src_addr_r()
+{
+	return m_blitter_src_addr;
+}
+
+void pastelg_state::romsel_w(address_space &space, uint8_t data)
+{
+	m_gfxbank = ((data & 0xc0) >> 6);
+	m_palbank = ((data & 0x10) >> 4);
+	m_nb1413m3->sndrombank1_w(space, 0, data);
+
+	if ((m_gfxbank << 16) > m_blitter_rom.mask())
+	{
+#ifdef MAME_DEBUG
+		popmessage("GFXROM BANK OVER!!");
+#endif
+		m_gfxbank &= (m_blitter_rom.length() / 0x20000 - 1);
+	}
+}
+
+// threeds specific methods
+
+void threeds_state::romsel_w(uint8_t data)
+{
+	if (data & 0xfc) printf("%02x\n", data);
+	m_gfxbank = (data & 0x3);
+}
+
+void threeds_state::output_w(uint8_t data)
+{
+	m_palbank = ((data & 0x10) >> 4);
+
+}
+
+uint8_t threeds_state::rom_readback_r()
+{
+	return m_blitter_rom[(m_blitter_src_addr | (m_gfxbank << 16)) & 0x3ffff];
+}
+
+// common methods
+
+void pastelg_common_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -44,16 +84,7 @@ void pastelg_state::pastelg_palette(palette_device &palette) const
 	}
 }
 
-/******************************************************************************
-
-
-******************************************************************************/
-int pastelg_state::pastelg_blitter_src_addr_r()
-{
-	return m_blitter_src_addr;
-}
-
-WRITE8_MEMBER(pastelg_state::pastelg_blitter_w)
+void pastelg_common_state::blitter_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -63,74 +94,31 @@ WRITE8_MEMBER(pastelg_state::pastelg_blitter_w)
 		case 3: m_blitter_desty = data; break;
 		case 4: m_blitter_sizex = data; break;
 		case 5: m_blitter_sizey = data;
-				/* writing here also starts the blit */
-				pastelg_gfxdraw();
+				// writing here also starts the blit
+				gfxdraw();
 				break;
 		case 6: m_blitter_direction_x = (data & 0x01) ? 1 : 0;
 				m_blitter_direction_y = (data & 0x02) ? 1 : 0;
 				m_flipscreen = (data & 0x04) ? 0 : 1;
 				m_dispflag = (data & 0x08) ? 0 : 1;
-				pastelg_vramflip();
+				vramflip();
 				break;
 	}
 }
 
-
-WRITE8_MEMBER(pastelg_state::threeds_romsel_w)
+void pastelg_common_state::vramflip()
 {
-	if (data&0xfc) printf("%02x\n",data);
-	m_gfxrom = (data & 0x3);
-}
-
-WRITE8_MEMBER(pastelg_state::threeds_output_w)
-{
-	m_palbank = ((data & 0x10) >> 4);
-
-}
-
-READ8_MEMBER(pastelg_state::threeds_rom_readback_r)
-{
-	uint8_t *GFX = memregion("gfx1")->base();
-
-	return GFX[(m_blitter_src_addr | (m_gfxrom << 16)) & 0x3ffff];
-}
-
-
-WRITE8_MEMBER(pastelg_state::pastelg_romsel_w)
-{
-	int gfxlen = memregion("gfx1")->bytes();
-	m_gfxrom = ((data & 0xc0) >> 6);
-	m_palbank = ((data & 0x10) >> 4);
-	m_nb1413m3->sndrombank1_w(space, 0, data);
-
-	if ((m_gfxrom << 16) > (gfxlen - 1))
-	{
-#ifdef MAME_DEBUG
-		popmessage("GFXROM BANK OVER!!");
-#endif
-		m_gfxrom &= (gfxlen / 0x20000 - 1);
-	}
-}
-
-/******************************************************************************
-
-
-******************************************************************************/
-void pastelg_state::pastelg_vramflip()
-{
-	int x, y;
-	uint8_t color1, color2;
 	int width = m_screen->width();
 	int height = m_screen->height();
 
 	if (m_flipscreen == m_flipscreen_old) return;
 
-	for (y = 0; y < height; y++)
+	for (int y = 0; y < height; y++)
 	{
-		for (x = 0; x < width; x++)
+		for (int x = 0; x < width; x++)
 		{
-			color1 = m_videoram[(y * width) + x];
-			color2 = m_videoram[((y ^ 0xff) * width) + (x ^ 0xff)];
+			uint8_t color1 = m_videoram[(y * width) + x];
+			uint8_t color2 = m_videoram[((y ^ 0xff) * width) + (x ^ 0xff)];
 			m_videoram[(y * width) + x] = color2;
 			m_videoram[((y ^ 0xff) * width) + (x ^ 0xff)] = color1;
 		}
@@ -139,45 +127,29 @@ void pastelg_state::pastelg_vramflip()
 	m_flipscreen_old = m_flipscreen;
 }
 
-void pastelg_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pastelg_common_state::blitter_timer_callback(void *ptr, s32 param)
 {
-	switch (id)
-	{
-	case TIMER_BLITTER:
-		m_nb1413m3->busyflag_w(1);
-		break;
-	default:
-		assert_always(false, "Unknown id in pastelg_state::device_timer");
-	}
+	m_nb1413m3->busyflag_w(1);
 }
 
 
-void pastelg_state::pastelg_gfxdraw()
+void pastelg_common_state::gfxdraw()
 {
-	uint8_t *GFX = memregion("gfx1")->base();
 	int width = m_screen->width();
 
-	int x, y;
-	int dx, dy;
-	int startx, starty;
 	int sizex, sizey;
 	int incx, incy;
-	int ctrx, ctry;
-	int readflag;
-	int gfxaddr, gfxlen;
-	int count;
-	uint8_t color;
 
 	m_nb1413m3->m_busyctr = 0;
 
-	startx = m_blitter_destx + m_blitter_sizex;
-	starty = m_blitter_desty + m_blitter_sizey;
+	int startx = m_blitter_destx + m_blitter_sizex;
+	int starty = m_blitter_desty + m_blitter_sizey;
 
 
 	if (m_blitter_direction_x)
 	{
-		if (m_blitter_sizex&0x80) sizex = 0xff-m_blitter_sizex;
-		else sizex=m_blitter_sizex;
+		if (m_blitter_sizex & 0x80) sizex = 0xff - m_blitter_sizex;
+		else sizex = m_blitter_sizex;
 		incx = 1;
 	}
 	else
@@ -188,8 +160,8 @@ void pastelg_state::pastelg_gfxdraw()
 
 	if (m_blitter_direction_y)
 	{
-		if (m_blitter_sizey&0x80) sizey = 0xff-m_blitter_sizey;
-		else sizey=m_blitter_sizey;
+		if (m_blitter_sizey & 0x80) sizey = 0xff - m_blitter_sizey;
+		else sizey = m_blitter_sizey;
 		incy = 1;
 	}
 	else
@@ -198,23 +170,22 @@ void pastelg_state::pastelg_gfxdraw()
 		incy = -1;
 	}
 
-	gfxlen = memregion("gfx1")->bytes();
-	gfxaddr = (m_gfxrom << 16) + m_blitter_src_addr;
+	int gfxaddr = (m_gfxbank << 16) + m_blitter_src_addr;
 
-	readflag = 0;
+	int readflag = 0;
 
-	count = 0;
-	y = starty;
+	int count = 0;
+	int y = starty;
 
-	for (ctry = sizey; ctry >= 0; ctry--)
+	for (int ctry = sizey; ctry >= 0; ctry--)
 	{
-		x = startx;
+		int x = startx;
 
-		for (ctrx = sizex; ctrx >= 0; ctrx--)
+		for (int ctrx = sizex; ctrx >= 0; ctrx--)
 		{
-			gfxaddr = (m_gfxrom << 16) + ((m_blitter_src_addr + count));
+			gfxaddr = (m_gfxbank << 16) + ((m_blitter_src_addr + count));
 
-			if ((gfxaddr > (gfxlen - 1)))
+			if (gfxaddr > m_blitter_rom.mask())
 			{
 #ifdef MAME_DEBUG
 				popmessage("GFXROM ADDRESS OVER!!");
@@ -222,10 +193,10 @@ void pastelg_state::pastelg_gfxdraw()
 				gfxaddr = 0;
 			}
 
-			color = GFX[gfxaddr];
+			uint8_t color = m_blitter_rom[gfxaddr];
 
-			dx = x & 0xff;
-			dy = y & 0xff;
+			int dx = x & 0xff;
+			int dy = y & 0xff;
 
 			if (m_flipscreen)
 			{
@@ -279,20 +250,20 @@ void pastelg_state::pastelg_gfxdraw()
 
 
 ******************************************************************************/
-void pastelg_state::video_start()
+void pastelg_common_state::video_start()
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
 
 	m_videoram = make_unique_clear<uint8_t[]>(width * height);
 
-	m_blitter_timer = timer_alloc(TIMER_BLITTER);
+	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pastelg_state::blitter_timer_callback), this));
 
 	save_item(NAME(m_blitter_desty));
 	save_item(NAME(m_blitter_sizex));
 	save_item(NAME(m_blitter_sizey));
 	save_item(NAME(m_blitter_src_addr));
-	save_item(NAME(m_gfxrom));
+	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_dispflag));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_blitter_direction_x));
@@ -306,16 +277,15 @@ void pastelg_state::video_start()
 
 
 ******************************************************************************/
-uint32_t pastelg_state::screen_update_pastelg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pastelg_common_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_dispflag)
 	{
-		int x, y;
 		int width = screen.width();
 		int height = screen.height();
 
-		for (y = 0; y < height; y++)
-			for (x = 0; x < width; x++)
+		for (int y = 0; y < height; y++)
+			for (int x = 0; x < width; x++)
 				bitmap.pix16(y, x) = m_videoram[(y * width) + x];
 	}
 	else

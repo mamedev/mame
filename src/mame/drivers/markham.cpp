@@ -61,15 +61,11 @@ WRITE8_MEMBER(markham_state::coin_output_w)
 	}
 }
 
-template<int Bit>
 WRITE8_MEMBER(markham_state::flipscreen_w)
 {
-	// Strength & Skill hardware only
-	m_scroll_ctrl = data >> 5;
-
-	if (flip_screen() != (BIT(data, Bit)))
+	if (flip_screen() != (BIT(data, 0)))
 	{
-		flip_screen_set(BIT(data, Bit));
+		flip_screen_set(BIT(data, 0));
 		machine().tilemap().mark_all_dirty();
 	}
 }
@@ -82,10 +78,21 @@ READ8_MEMBER(markham_state::strnskil_d800_r)
 	return (m_irq_source);
 }
 
+WRITE8_MEMBER(markham_state::strnskil_master_output_w)
+{
+	m_scroll_ctrl = data >> 5;
+
+	flipscreen_w(space, 0, (data >> 3) & 1);
+
+	// bit 0: master CPU bus request?
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(markham_state::strnskil_scanline)
 {
 	int scanline = param;
 
+	// same as Ikki, whereas if non-vblank IRQ isn't in-sync with slave CPU irqs then stage 2/3 lacks any sprite whatsoever.
+	// TODO: maybe this is just a timer device that dispatches irqs to both CPUs and running at VSync*2. Verify on real HW or schematics.
 	if (scanline == m_irq_scanline_end || scanline == m_irq_scanline_start)
 	{
 		m_maincpu->set_input_line(0, HOLD_LINE);
@@ -205,7 +212,7 @@ void markham_state::markham_master_map(address_map &map)
 	map(0xe009, 0xe009).nopw(); /* to CPU2 busreq */
 
 	map(0xe00c, 0xe00d).writeonly().share("xscroll");
-	map(0xe00e, 0xe00e).w(FUNC(markham_state::flipscreen_w<0>));
+	map(0xe00e, 0xe00e).w(FUNC(markham_state::flipscreen_w));
 }
 
 void markham_state::strnskil_master_map(address_map &map)
@@ -223,8 +230,7 @@ void markham_state::strnskil_master_map(address_map &map)
 	map(0xd804, 0xd804).portr("P1");
 	map(0xd805, 0xd805).portr("P2");
 
-	/* same write used here is used for scrolling */
-	map(0xd808, 0xd808).w(FUNC(markham_state::flipscreen_w<3>));
+	map(0xd808, 0xd808).w(FUNC(markham_state::strnskil_master_output_w));
 	map(0xd809, 0xd809).w(FUNC(markham_state::coin_output_w));
 	map(0xd80a, 0xd80b).writeonly().share("xscroll");
 }
@@ -543,6 +549,26 @@ static GFXDECODE_START( gfx_markham )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0,   64 )
 GFXDECODE_END
 
+void markham_state::machine_start()
+{
+	save_item(NAME(m_coin2_lock_cnt));
+
+	/* banbam specific */
+	save_item(NAME(m_packet_buffer));
+	save_item(NAME(m_packet_reset));
+	save_item(NAME(m_packet_write_pos));
+}
+
+void markham_state::machine_reset()
+{
+	/* prevent phantom coins again */
+	m_coin2_lock_cnt = 3;
+
+	/* banbam specific */
+	m_packet_write_pos = 0;
+	m_packet_reset = true;
+}
+
 void markham_state::markham(machine_config &config)
 {
 	/* basic machine hardware */
@@ -554,7 +580,7 @@ void markham_state::markham(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &markham_state::markham_slave_map);
 	m_subcpu->set_vblank_int("screen", FUNC(markham_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(CPU_CLOCK/256));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -785,26 +811,6 @@ ROM_START( pettanp )
 	ROM_REGION(0x800, "mcu", 0) /* Fujitsu MB8841 4-Bit MCU internal ROM */
 	ROM_LOAD( "sun-8212.ic3", 0x000,  0x800,  NO_DUMP ) // very much likely to be same as banbam and arabian
 ROM_END
-
-void markham_state::machine_start()
-{
-	save_item(NAME(m_coin2_lock_cnt));
-
-	/* banbam specific */
-	save_item(NAME(m_packet_buffer));
-	save_item(NAME(m_packet_reset));
-	save_item(NAME(m_packet_write_pos));
-}
-
-void markham_state::machine_reset()
-{
-	/* prevent phantom coins again */
-	m_coin2_lock_cnt = 3;
-
-	/* banbam specific */
-	m_packet_write_pos = 0;
-	m_packet_reset = true;
-}
 
 /* Markham hardware */
 GAME( 1983, markham,  0,        markham,  markham,  markham_state, empty_init, ROT0, "Sun Electronics", "Markham", MACHINE_SUPPORTS_SAVE )

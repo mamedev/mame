@@ -2,15 +2,17 @@
 // copyright-holders:cam900
 /*
     Hudson HuC6230 SoundBox
-    HuC6280 PSG with ADPCM
+    PSG part of HuC6280 with ADPCM
 
     TODO:
     - Volume is linear?
     - Make it actually working
-    - Implement CDDA Volume
+    - Implement/Correct VCA (Voltage Controlled Amplifier) behavior
 
     Related patent:
     - https://patents.google.com/patent/US5692099
+    - https://patents.google.com/patent/US6453286
+    - https://patents.google.com/patent/US5548655A
 */
 
 #include "emu.h"
@@ -33,8 +35,8 @@ void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			if (!channel->m_playing)
 				continue;
 
-			outputs[0][i] = clamp(outputs[0][i] + ((channel->m_output * channel->m_lvol) >> 2), -32768, 32767);
-			outputs[1][i] = clamp(outputs[1][i] + ((channel->m_output * channel->m_rvol) >> 2), -32768, 32767);
+			outputs[0][i] = clamp(outputs[0][i] + ((channel->m_output * channel->m_lvol) >> 3), -32768, 32767);
+			outputs[1][i] = clamp(outputs[1][i] + ((channel->m_output * channel->m_rvol) >> 3), -32768, 32767);
 		}
 	}
 }
@@ -44,13 +46,13 @@ void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 /* MAME specific code                                                       */
 /*--------------------------------------------------------------------------*/
 
-WRITE8_MEMBER( huc6230_device::write )
+void huc6230_device::write(offs_t offset, uint8_t data)
 {
 	/* Update stream */
 	m_stream->update();
 	if (offset < 0x10)
 	{
-		m_psg->c6280_w(space, offset, data, mem_mask);
+		m_psg->c6280_w(offset, data);
 	}
 	else if (offset < 0x11)
 	{
@@ -83,19 +85,19 @@ WRITE8_MEMBER( huc6230_device::write )
 	}
 	else if (offset < 0x16)
 	{
-		m_cdda_lvol = data & 0x3f;
-		m_cdda_cb(0, m_cdda_lvol);
+		m_pcm_lvol = data & 0x3f;
+		m_vca_cb(0, m_pcm_lvol);
 	}
 	else if (offset < 0x17)
 	{
-		m_cdda_rvol = data & 0x3f;
-		m_cdda_cb(1, m_cdda_rvol);
+		m_pcm_rvol = data & 0x3f;
+		m_vca_cb(1, m_pcm_rvol);
 	}
 }
 
 TIMER_CALLBACK_MEMBER(huc6230_device::adpcm_timer)
 {
-	int frq = (1 << m_adpcm_freq);
+	const unsigned frq = (1 << m_adpcm_freq);
 	for (int adpcm = 0; adpcm < 2; adpcm++)
 	{
 		adpcm_channel *channel = &m_adpcm_channel[adpcm];
@@ -113,7 +115,7 @@ TIMER_CALLBACK_MEMBER(huc6230_device::adpcm_timer)
 		channel->m_pos++;
 		channel->m_input = m_adpcm_update_cb[adpcm]();
 
-		if (channel->m_pos > frq)
+		if (channel->m_pos >= frq)
 		{
 			channel->m_pos = 0;
 			channel->m_prev_sample = channel->m_curr_sample;
@@ -143,10 +145,10 @@ huc6230_device::huc6230_device(const machine_config &mconfig, const char *tag, d
 	, m_stream(nullptr)
 	, m_psg(*this, "psg")
 	, m_adpcm_freq(0)
-	, m_cdda_lvol(0)
-	, m_cdda_rvol(0)
-	, m_adpcm_update_cb{{*this}, {*this}}
-	, m_cdda_cb(*this)
+	, m_pcm_lvol(0)
+	, m_pcm_rvol(0)
+	, m_adpcm_update_cb(*this)
+	, m_vca_cb(*this)
 {
 }
 
@@ -166,12 +168,11 @@ void huc6230_device::device_add_mconfig(machine_config &config)
 
 void huc6230_device::device_start()
 {
-	for (auto &cb : m_adpcm_update_cb)
-		cb.resolve_safe(0);
+	m_adpcm_update_cb.resolve_all_safe(0);
 
-	m_cdda_cb.resolve_safe();
+	m_vca_cb.resolve_safe();
 
-	m_stream = machine().sound().stream_alloc(*this, 2, 2, clock() / 96);
+	m_stream = machine().sound().stream_alloc(*this, 2, 2, clock() / 6);
 	m_adpcm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(huc6230_device::adpcm_timer),this));
 
 	for (int i = 0; i < 2; i++)
@@ -196,13 +197,13 @@ void huc6230_device::device_start()
 		save_item(NAME(m_adpcm_channel[i].m_input), i);
 	}
 	save_item(NAME(m_adpcm_freq));
-	save_item(NAME(m_cdda_lvol));
-	save_item(NAME(m_cdda_rvol));
+	save_item(NAME(m_pcm_lvol));
+	save_item(NAME(m_pcm_rvol));
 }
 
 void huc6230_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / 96);
+	m_stream->set_sample_rate(clock() / 6);
 	attotime adpcm_period = clocks_to_attotime(682);
 	m_adpcm_timer->adjust(adpcm_period, 0, adpcm_period);
 }

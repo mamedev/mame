@@ -55,16 +55,16 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 private:
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w); // solenoids 0-7
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
+	uint8_t sound_r();
+	void dig0_w(uint8_t data);
+	void dig1_w(uint8_t data);
+	void lamp0_w(uint8_t data);
+	void lamp1_w(uint8_t data) { };
+	void sol2_w(uint8_t data) { }; // solenoids 8-15
+	void sol3_w(uint8_t data); // solenoids 0-7
+	void sound_w(uint8_t data);
+	uint8_t switch_r();
+	void switch_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
@@ -85,7 +85,7 @@ private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<m6802_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_pias;
 	required_device<pia6821_device> m_pia21;
@@ -177,13 +177,13 @@ INPUT_CHANGED_MEMBER( s8a_state::audio_nmi )
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER( s8a_state::sol3_w )
+void s8a_state::sol3_w(uint8_t data)
 {
 	if (data==0x0a)
 		m_samples->start(0, 7); // mechanical drum when you have 2 or more batches
 }
 
-WRITE8_MEMBER( s8a_state::sound_w )
+void s8a_state::sound_w(uint8_t data)
 {
 	m_sound_data = data;
 }
@@ -200,11 +200,11 @@ WRITE_LINE_MEMBER( s8a_state::pia21_ca2_w )
 	m_pias->ca1_w(state);
 }
 
-WRITE8_MEMBER( s8a_state::lamp0_w )
+void s8a_state::lamp0_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( s8a_state::dig0_w )
+void s8a_state::dig0_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
@@ -213,7 +213,7 @@ WRITE8_MEMBER( s8a_state::dig0_w )
 	m_digits[60] = patterns[data>>4]; // diag digit
 }
 
-WRITE8_MEMBER( s8a_state::dig1_w )
+void s8a_state::dig1_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 	if (m_data_ok)
@@ -224,19 +224,19 @@ WRITE8_MEMBER( s8a_state::dig1_w )
 	m_data_ok = false;
 }
 
-READ8_MEMBER( s8a_state::switch_r )
+uint8_t s8a_state::switch_r()
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"X%X",m_kbdrow);
 	return ioport(kbdrow)->read() ^ 0xff;
 }
 
-WRITE8_MEMBER( s8a_state::switch_w )
+void s8a_state::switch_w(uint8_t data)
 {
 	m_kbdrow = data;
 }
 
-READ8_MEMBER( s8a_state::sound_r )
+uint8_t s8a_state::sound_r()
 {
 	return m_sound_data;
 }
@@ -293,6 +293,7 @@ void s8a_state::s8a(machine_config &config)
 {
 	/* basic machine hardware */
 	M6802(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_ram_enable(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s8a_state::s8a_main_map);
 	MCFG_MACHINE_RESET_OVERRIDE(s8a_state, s8a)
 

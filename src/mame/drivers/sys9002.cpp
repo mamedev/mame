@@ -64,8 +64,8 @@ void sys9002_state::sys9002_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	//AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)  // left commented out as mame freezes after about 2 seconds
-	//AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	//map(0x04, 0x04).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));  // left commented out as mame freezes after about 2 seconds
+	//map(0x05, 0x05).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x08, 0x09).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x11, 0x11).nopr();  // continuous read
 	map(0x1c, 0x1d).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
@@ -143,7 +143,7 @@ void sys9002_state::sys9002(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(sys9002_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(sys9002_state::crtc_update_row));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 614400));
 	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));

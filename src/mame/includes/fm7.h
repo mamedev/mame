@@ -138,7 +138,6 @@ public:
 		m_kb_ports(*this, "key%u", 1),
 		m_keymod(*this, "key_modifiers"),
 		m_joy1(*this, "joy1"),
-		m_joy2(*this, "joy2"),
 		m_dsw(*this, "DSW"),
 		m_palette(*this, "palette"),
 		m_av_palette(*this, "av_palette"),
@@ -176,8 +175,6 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(fm7_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fm7_fdc_drq_w);
-	DECLARE_READ8_MEMBER(fm77av_joy_1_r);
-	DECLARE_READ8_MEMBER(fm77av_joy_2_r);
 	DECLARE_WRITE_LINE_MEMBER(fm77av_fmirq);
 
 	DECLARE_READ8_MEMBER(fm7_subintf_r);
@@ -393,7 +390,6 @@ private:
 	required_ioport_array<3> m_kb_ports;
 	required_ioport m_keymod;
 	required_ioport m_joy1;
-	required_ioport m_joy2;
 	required_ioport m_dsw;
 	required_device<palette_device> m_palette;
 	optional_device<palette_device> m_av_palette;

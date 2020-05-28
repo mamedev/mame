@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/arm7/arm7.h"
 
 class s3c24xx_peripheral_types // TODO: better name for this
 {

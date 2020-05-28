@@ -201,18 +201,18 @@ void rm380z_state::rm480z_mem(address_map &map)
 
 void rm380z_state::rm480z_io(address_map &map)
 {
-	//AM_RANGE(0x00, 0x17) AM_RAM // videoram
-	//AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) // control port 0
-	//AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) // control port 1
-	//AM_RANGE(0x1a, 0x1a) AM_MIRROR(0xff00) // control port 2
-	//AM_RANGE(0x1b, 0x1b) AM_MIRROR(0xff00) // control port 3 (DAC) // option
-	//AM_RANGE(0x1d, 0x1d) AM_MIRROR(0xff00) // control port 5 (USERIO) // option
-	//AM_RANGE(0x20, 0x23) AM_MIRROR(0xff00) // system CTC - 0=SIO4&cassin, 1=SIO2&cassio, 2=keybd int, 3=50hz int for repeat key
-	//AM_RANGE(0x24, 0x27) AM_MIRROR(0xff00) // system SIO - 0=chA network data, 1=chB SIO4 data, 2=ChA control, 3=ChB control
-	//AM_RANGE(0x28, 0x29) AM_MIRROR(0xff02) // am9511/am9512 maths chip // option
-	//AM_RANGE(0x2c, 0x2f) AM_MIRROR(0xff00) // z80ctc IEEE int, Maths int, RTC, RTC // option
-	//AM_RANGE(0x30, 0x37) AM_MIRROR(0xff00) // IEEE chip // option
-	//AM_RANGE(0x38, 0x3b) AM_MIRROR(0xff00) // Hi-res graphics option
+	//map(0x00, 0x17).ram(); // videoram
+	//map(0x18, 0x18).mirror(0xff00); // control port 0
+	//map(0x19, 0x19).mirror(0xff00); // control port 1
+	//map(0x1a, 0x1a).mirror(0xff00); // control port 2
+	//map(0x1b, 0x1b).mirror(0xff00); // control port 3 (DAC) // option
+	//map(0x1d, 0x1d).mirror(0xff00); // control port 5 (USERIO) // option
+	//map(0x20, 0x23).mirror(0xff00); // system CTC - 0=SIO4&cassin, 1=SIO2&cassio, 2=keybd int, 3=50hz int for repeat key
+	//map(0x24, 0x27).mirror(0xff00); // system SIO - 0=chA network data, 1=chB SIO4 data, 2=ChA control, 3=ChB control
+	//map(0x28, 0x29).mirror(0xff02); // am9511/am9512 maths chip // option
+	//map(0x2c, 0x2f).mirror(0xff00); // z80ctc IEEE int, Maths int, RTC, RTC // option
+	//map(0x30, 0x37).mirror(0xff00); // IEEE chip // option
+	//map(0x38, 0x3b).mirror(0xff00); // Hi-res graphics option
 }
 
 INPUT_PORTS_START( rm380z )

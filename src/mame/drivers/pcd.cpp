@@ -17,9 +17,9 @@
 #include "cpu/i86/i186.h"
 #include "imagedev/floppy.h"
 #include "machine/mc146818.h"
-#include "machine/mc2661.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
+#include "machine/scn_pci.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
@@ -56,7 +56,7 @@ public:
 	void pcd(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( irq_callback );
+	uint8_t irq_callback(offs_t offset);
 	TIMER_DEVICE_CALLBACK_MEMBER( timer0_tick );
 	DECLARE_WRITE_LINE_MEMBER( i186_timer1_w );
 
@@ -97,7 +97,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<wd2793_device> m_fdc;
 	required_device<mc146818_device> m_rtc;
-	required_device_array<mc2661_device, 3> m_usart;
+	required_device_array<scn2661b_device, 3> m_usart;
 	required_device<scsi_port_device> m_scsi;
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_data_in;
@@ -140,7 +140,7 @@ void pcd_state::machine_reset()
 		m_mmu.type = 0;
 }
 
-READ8_MEMBER( pcd_state::irq_callback )
+uint8_t pcd_state::irq_callback(offs_t offset)
 {
 	return (offset ? m_pic2 : m_pic1)->acknowledge();
 }
@@ -434,10 +434,10 @@ void pcd_state::pcd_io(address_map &map)
 	map(0xf904, 0xf905).rw(FUNC(pcd_state::dskctl_r), FUNC(pcd_state::dskctl_w));
 	map(0xf940, 0xf943).rw(FUNC(pcd_state::scsi_r), FUNC(pcd_state::scsi_w));
 	map(0xf980, 0xf9bf).m("video", FUNC(pcdx_video_device::map));
-	map(0xf9c0, 0xf9c3).rw(m_usart[0], FUNC(mc2661_device::read), FUNC(mc2661_device::write));  // UARTs
-	map(0xf9d0, 0xf9d3).rw(m_usart[1], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
-	map(0xf9e0, 0xf9e3).rw(m_usart[2], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
-//  AM_RANGE(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
+	map(0xf9c0, 0xf9c3).rw(m_usart[0], FUNC(scn2661b_device::read), FUNC(scn2661b_device::write));  // UARTs
+	map(0xf9d0, 0xf9d3).rw(m_usart[1], FUNC(scn2661b_device::read), FUNC(scn2661b_device::write));
+	map(0xf9e0, 0xf9e3).rw(m_usart[2], FUNC(scn2661b_device::read), FUNC(scn2661b_device::write));
+//  map(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
 	map(0xfb00, 0xfb00).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
 	map(0xfb02, 0xffff).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
 }
@@ -506,25 +506,25 @@ void pcd_state::pcd(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", pcd_floppies, "55f", pcd_state::floppy_formats);
 
 	// usart
-	MC2661(config, m_usart[0], 4.9152_MHz_XTAL);
+	SCN2661B(config, m_usart[0], 4.9152_MHz_XTAL);
 	m_usart[0]->rxrdy_handler().set(m_pic1, FUNC(pic8259_device::ir3_w));
 	m_usart[0]->txrdy_handler().set(m_pic1, FUNC(pic8259_device::ir3_w));
 	m_usart[0]->txd_handler().set("rs232_1", FUNC(rs232_port_device::write_txd));
 
-	MC2661(config, m_usart[1], 4.9152_MHz_XTAL);
+	SCN2661B(config, m_usart[1], 4.9152_MHz_XTAL);
 	m_usart[1]->rxrdy_handler().set(m_pic1, FUNC(pic8259_device::ir2_w));
 	//m_usart[1]->.txrdy_handler().set(m_pic1, FUNC(pic8259_device::ir2_w)); // this gets stuck high causing the keyboard to not work
 	m_usart[1]->txd_handler().set("keyboard", FUNC(pcd_keyboard_device::t0_w));
 
-	MC2661(config, m_usart[2], 4.9152_MHz_XTAL);
+	SCN2661B(config, m_usart[2], 4.9152_MHz_XTAL);
 	m_usart[2]->rxrdy_handler().set(m_pic1, FUNC(pic8259_device::ir4_w));
 	m_usart[2]->txrdy_handler().set(m_pic1, FUNC(pic8259_device::ir4_w));
 	m_usart[2]->txd_handler().set("rs232_2", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &rs232_1(RS232_PORT(config, "rs232_1", default_rs232_devices, nullptr));
-	rs232_1.rxd_handler().set(m_usart[0], FUNC(mc2661_device::rx_w));
+	rs232_1.rxd_handler().set(m_usart[0], FUNC(scn2661b_device::rxd_w));
 	rs232_port_device &rs232_2(RS232_PORT(config, "rs232_2", default_rs232_devices, nullptr));
-	rs232_2.rxd_handler().set(m_usart[2], FUNC(mc2661_device::rx_w));
+	rs232_2.rxd_handler().set(m_usart[2], FUNC(scn2661b_device::rxd_w));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -539,7 +539,7 @@ void pcd_state::pcd(machine_config &config)
 	m_rtc->set_24hrs(true);
 
 	pcd_keyboard_device &keyboard(PCD_KEYBOARD(config, "keyboard", 0));
-	keyboard.out_tx_handler().set(m_usart[1], FUNC(mc2661_device::rx_w));
+	keyboard.out_tx_handler().set(m_usart[1], FUNC(scn2661b_device::rxd_w));
 
 	SCSI_PORT(config, m_scsi, 0);
 	m_scsi->set_data_input_buffer("scsi_data_in");
@@ -554,6 +554,8 @@ void pcd_state::pcd(machine_config &config)
 
 	INPUT_BUFFER(config, "scsi_data_in", 0);
 	m_scsi->set_slot_device(1, "harddisk", OMTI5100, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
+
+	SOFTWARE_LIST(config, "flop_list").set_original("pcd_flop");
 }
 
 void pcd_state::pcx(machine_config &config)
@@ -568,6 +570,7 @@ void pcd_state::pcx(machine_config &config)
 
 	m_usart[1]->txd_handler().set_nop();
 
+	config.device_remove("flop_list");
 	SOFTWARE_LIST(config, "flop_ls").set_original("pcx_flop");
 }
 
@@ -576,7 +579,7 @@ void pcd_state::pcx(machine_config &config)
 //**************************************************************************
 
 ROM_START( pcd )
-	ROM_REGION(0x4000, "bios", 0)
+	ROM_REGION16_LE(0x4000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v2", "V2 GS")  // from mainboard SYBAC S26361-D359 V2 GS
 	ROMX_LOAD("s26361-d359.d42", 0x0001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("s26361-d359.d43", 0x0000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda), ROM_SKIP(1) | ROM_BIOS(0))
@@ -586,7 +589,7 @@ ROM_START( pcd )
 ROM_END
 
 ROM_START( pcx )
-	ROM_REGION(0x4000, "bios", 0)
+	ROM_REGION16_LE(0x4000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v2", "V2 GS")  // from mainboard SYBAC S26361-D359 V2 GS
 	ROMX_LOAD("s26361-d359.d42", 0x0001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("s26361-d359.d43", 0x0000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda), ROM_SKIP(1) | ROM_BIOS(0))

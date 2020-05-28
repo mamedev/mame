@@ -1175,6 +1175,23 @@ void hcd62121_cpu_device::execute_run()
 			}
 			break;
 
+		case 0x50:      /* xorb ir1,r2 */
+		case 0x51:      /* xorw ir1,r2 */
+		case 0x52:      /* xorq ir1,r2 */
+		case 0x53:      /* xort ir1,r2 */
+			{
+				int size = datasize(op);
+				u8 reg1 = read_op();
+				u8 reg2 = read_op();
+
+				read_iregreg(size, reg1, reg2, true);
+
+				op_xor(size);
+
+				write_iregreg(size, reg1, reg2);
+			}
+			break;
+
 		case 0x54:      /* cmpb ir1,r2 */
 		case 0x55:      /* cmpw ir1,r2 */
 		case 0x56:      /* cmpq ir1,r2 */

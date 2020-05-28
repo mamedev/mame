@@ -25,7 +25,7 @@ header and leader bytes.
 
 ********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "sorc_cas.h"
 

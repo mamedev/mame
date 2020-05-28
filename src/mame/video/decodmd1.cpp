@@ -13,23 +13,23 @@
 
 DEFINE_DEVICE_TYPE(DECODMD1, decodmd_type1_device, "decodmd1", "Data East Pinball Dot Matrix Display Type 1")
 
-READ8_MEMBER( decodmd_type1_device::latch_r )
+uint8_t decodmd_type1_device::latch_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( decodmd_type1_device::data_w )
+void decodmd_type1_device::data_w(uint8_t data)
 {
 	m_latch = data;
 }
 
-READ8_MEMBER( decodmd_type1_device::busy_r )
+uint8_t decodmd_type1_device::busy_r()
 {
 	return m_status;
 }
 
 
-WRITE8_MEMBER( decodmd_type1_device::ctrl_w )
+void decodmd_type1_device::ctrl_w(uint8_t data)
 {
 	if((data | m_ctrl) & 0x01)
 	{
@@ -49,19 +49,19 @@ WRITE8_MEMBER( decodmd_type1_device::ctrl_w )
 	m_ctrl = data;
 }
 
-READ8_MEMBER( decodmd_type1_device::ctrl_r )
+uint8_t decodmd_type1_device::ctrl_r()
 {
 	return m_ctrl;
 }
 
-READ8_MEMBER( decodmd_type1_device::status_r )
+uint8_t decodmd_type1_device::status_r()
 {
 	return (m_busy & 0x01) | (m_status << 1);
 }
 
 // Z80 I/O ports not fully decoded.
 // if bit 7 = 0, then when bit 2 is 0 selects COCLK, and when bit 2 is 1 selects CLATCH
-READ8_MEMBER( decodmd_type1_device::dmd_port_r )
+uint8_t decodmd_type1_device::dmd_port_r(offs_t offset)
 {
 	if((offset & 0x84) == 0x80)
 	{
@@ -74,7 +74,7 @@ READ8_MEMBER( decodmd_type1_device::dmd_port_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( decodmd_type1_device::dmd_port_w )
+void decodmd_type1_device::dmd_port_w(offs_t offset, uint8_t data)
 {
 	uint8_t bit;
 
@@ -202,7 +202,7 @@ void decodmd_type1_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &decodmd_type1_device::decodmd1_map);
 	m_cpu->set_addrmap(AS_IO, &decodmd_type1_device::decodmd1_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(decodmd_type1_device::dmd_nmi), attotime::from_hz(2000));  // seems a lot
 

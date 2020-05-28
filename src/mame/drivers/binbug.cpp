@@ -67,8 +67,8 @@ public:
 	void binbug(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(mem_r);
-	DECLARE_WRITE8_MEMBER(mem_w);
+	u8 mem_r(offs_t offset);
+	void mem_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
 	DECLARE_READ_LINE_MEMBER(binbug_serial_r);
 	DECLARE_WRITE_LINE_MEMBER(binbug_serial_w);
@@ -122,7 +122,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( binbug_state::kansas_r )
 		return;
 
 	/* cassette - turn 1200/2400Hz to a bit */
-	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -142,12 +142,12 @@ WRITE_LINE_MEMBER( binbug_state::binbug_serial_w )
 	m_cassoutbit = state;
 }
 
-READ8_MEMBER( binbug_state::mem_r )
+u8 binbug_state::mem_r(offs_t offset)
 {
 	return m_s100->smemr_r(offset + 0x7800);
 }
 
-WRITE8_MEMBER( binbug_state::mem_w )
+void binbug_state::mem_w(offs_t offset, u8 data)
 {
 	m_s100->mwrt_w(offset + 0x7800, data);
 }
@@ -173,7 +173,7 @@ QUICKLOAD_LOAD_MEMBER(binbug_state::quickload_cb)
 	int quick_addr = 0x440;
 	int exec_addr;
 	int quick_length;
-	std::vector<uint8_t> quick_data;
+	std::vector<u8> quick_data;
 	int read_;
 	image_init_result result = image_init_result::FAIL;
 
@@ -266,7 +266,7 @@ void binbug_state::binbug(machine_config &config)
 	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard").set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(binbug_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(binbug_state::quickload_cb));
 
 	S100_BUS(config, m_s100, 0);
 	S100_SLOT(config, "s100:1", binbug_s100_devices, "dg640");

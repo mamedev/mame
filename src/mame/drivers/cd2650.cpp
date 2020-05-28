@@ -78,7 +78,7 @@ private:
 	void cd2650_data(address_map &map);
 	void cd2650_io(address_map &map);
 	void cd2650_mem(address_map &map);
-	DECLARE_READ8_MEMBER(keyin_r);
+	u8 keyin_r();
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(tape_deck_on_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
@@ -86,13 +86,13 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint8_t m_term_data;
+	u8 m_term_data;
 	bool m_cassbit;
 	bool m_cassold;
-	uint8_t m_cass_data[4];
+	u8 m_cass_data[4];
 	virtual void machine_reset() override;
 	required_device<s2650_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<cassette_image_device> m_cass;
 };
@@ -118,7 +118,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cd2650_state::kansas_r)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -138,9 +138,9 @@ READ_LINE_MEMBER(cd2650_state::cass_r)
 	return m_cass_data[2];
 }
 
-READ8_MEMBER(cd2650_state::keyin_r)
+u8 cd2650_state::keyin_r()
 {
-	uint8_t ret = m_term_data;
+	u8 ret = m_term_data;
 	m_term_data = ret | 0x80;
 	return ret;
 }
@@ -155,7 +155,7 @@ void cd2650_state::cd2650_mem(address_map &map)
 void cd2650_state::cd2650_io(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x80, 0x84) disk i/o
+	//map(0x80, 0x84) disk i/o
 }
 
 void cd2650_state::cd2650_data(address_map &map)
@@ -181,7 +181,7 @@ uint32_t cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
     When the bottom of the screen is reached, it does not scroll, it just wraps around. */
 
 	uint16_t offset = 0;
-	uint8_t y,ra,chr,gfx;
+	u8 y,ra,chr,gfx;
 	uint16_t sy=0,x,mem;
 
 	for (y = 0; y < 16; y++)
@@ -263,7 +263,7 @@ QUICKLOAD_LOAD_MEMBER(cd2650_state::quickload_cb)
 	}
 	else
 	{
-		std::vector<uint8_t> quick_data(quick_length);
+		std::vector<u8> quick_data(quick_length);
 		int read_ = image.fread( &quick_data[0], quick_length);
 		if (read_ != quick_length)
 		{
@@ -341,7 +341,7 @@ void cd2650_state::cd2650(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(cd2650_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(cd2650_state::quickload_cb));
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();

@@ -356,46 +356,6 @@ configuration { }
 strip()
 
 --------------------------------------------------
--- src2html
---------------------------------------------------
-
-project("src2html")
-uuid ("b31e963a-09ef-4696-acbd-e663e35ce6f7")
-kind "ConsoleApp"
-
-flags {
-	"Symbols", -- always include minimum symbols for executables
-}
-
-if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
-end
-
-links {
-	"utils",
-	ext_lib("expat"),
-	"ocore_" .. _OPTIONS["osd"],
-	ext_lib("zlib"),
-	ext_lib("utf8proc"),
-}
-
-includedirs {
-	MAME_DIR .. "src/osd",
-	MAME_DIR .. "src/lib/util",
-}
-
-files {
-	MAME_DIR .. "src/tools/src2html.cpp",
-}
-
-configuration { "mingw*" or "vs*" }
-	targetextension ".exe"
-
-configuration { }
-
-strip()
-
---------------------------------------------------
 -- split
 --------------------------------------------------
 
@@ -499,7 +459,11 @@ links {
 
 includedirs {
 	MAME_DIR .. "src/lib",
-  MAME_DIR .. "src/lib/netlist",
+	MAME_DIR .. "src/lib/netlist",
+}
+
+defines {
+  "NL_DISABLE_DYNAMIC_LOAD=1",
 }
 
 files {
@@ -507,13 +471,13 @@ files {
 }
 
 configuration { "mingw*" }
-  linkoptions{
-	"-municode",
-  }
+	linkoptions{
+		"-municode",
+	}
 configuration { "vs*" }
-  flags {
-	"Unicode",
-  }
+	flags {
+		"Unicode",
+	}
 
 configuration { "mingw*" or "vs*" }
 	targetextension ".exe"
@@ -544,7 +508,7 @@ links {
 
 includedirs {
 	MAME_DIR .. "src/lib",
-  MAME_DIR .. "src/lib/netlist",
+	MAME_DIR .. "src/lib/netlist",
 }
 
 files {
@@ -552,13 +516,13 @@ files {
 }
 
 configuration { "mingw*" }
-  linkoptions{
-	"-municode",
-  }
+	linkoptions{
+		"-municode",
+	}
 configuration { "vs*" }
-  flags {
-	"Unicode",
-  }
+	flags {
+		"Unicode",
+	}
 
 configuration { "mingw*" or "vs*" }
 	targetextension ".exe"
@@ -722,6 +686,7 @@ files {
 	MAME_DIR .. "src/tools/imgtool/modules/amiga.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/macbin.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/rsdos.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/dgndos.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/os9.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/mac.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/ti99.cpp",
@@ -813,6 +778,7 @@ if (_OPTIONS["osd"] == "sdl") then
 	end
 
 	links {
+		"utils",
 		"ocore_" .. _OPTIONS["osd"],
 		ext_lib("utf8proc"),
 	}
@@ -876,6 +842,7 @@ if (_OPTIONS["osd"] == "sdl") then
 
 	includedirs {
 		MAME_DIR .. "src/osd",
+		MAME_DIR .. "src/lib/util",
 	}
 
 	files {

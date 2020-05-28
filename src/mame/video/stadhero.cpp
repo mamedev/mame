@@ -27,7 +27,7 @@ uint32_t stadhero_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_spritegen->set_flip_screen(flip);
 	m_pf1_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	m_tilegen->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 0);
+	m_tilegen->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0);
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), m_spriteram, 0x800/2);
 	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(stadhero_state::get_pf1_tile_info)
 	int color=tile >> 12;
 
 	tile=tile&0xfff;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(stadhero_state::get_pf1_tile_info)
 
 void stadhero_state::video_start()
 {
-	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stadhero_state::get_pf1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stadhero_state::get_pf1_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 	m_pf1_tilemap->set_transparent_pen(0);
 }
 

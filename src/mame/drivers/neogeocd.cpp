@@ -6,8 +6,7 @@
     Neo-Geo CD hardware
 
     Thanks to:
-        * The FBA team (Barry Harris) for much of the CDC / CDD code and system details.
-          ( http://www.barryharris.me.uk/ )
+        * Jan Klaassen (of the former FBA team) for much of the CDC / CDD code and system details.
         * Mirko Buffoni for a commented disassembly of the NeoCD bios rom.
 
     Current status:
@@ -542,7 +541,7 @@ int32_t ngcd_state::SekIdle(int32_t nCycles)
  *  DMA
 
     FF0061  Write 0x40 means start DMA transfer
-    FF0064  Source address (in copy mode), Target address (in filll mode)
+    FF0064  Source address (in copy mode), Target address (in fill mode)
     FF0068  Target address (in copy mode)
     FF006C  Fill word
     FF0070  Words count
@@ -586,7 +585,7 @@ void ngcd_state::do_dma(address_space& curr_space)
 {
 	// The LC8953 chip has a programmable DMA controller, which is not properly emulated.
 	// Since the software only uses it in a limited way, we can apply a simple heuristic
-	// to determnine the requested operation.
+	// to determine the requested operation.
 
 	// Additionally, we don't know how many cycles DMA operations take.
 	// Here, only bus access is used to get a rough approximation --
@@ -926,7 +925,7 @@ void ngcd_state::neocd_audio_io_map(address_map &map)
 	map(0x04, 0x07).mirror(0xff00).rw(m_ym, FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0x08, 0x08).mirror(0xff00).select(0x0010).w(FUNC(ngcd_state::audio_cpu_enable_nmi_w));
 	// banking reads are actually NOP on NeoCD? but some games still access them
-//  AM_RANGE(0x08, 0x0b) AM_MIRROR(0x00f0) AM_SELECT(0xff00) AM_READ(audio_cpu_bank_select_r)
+//  map(0x08, 0x0b).mirror(0x00f0).select(0xff00).r(FUNC(ngcd_state::audio_cpu_bank_select_r));
 	map(0x0c, 0x0c).mirror(0xff00).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
 
 	// ??
@@ -1056,9 +1055,9 @@ void ngcd_state::neocd(machine_config &config)
 	LC89510_TEMP(config, m_tempcdc, 0); // cd controller
 	m_tempcdc->set_cdrom_tag("cdrom");
 	m_tempcdc->set_is_neoCD(true);
-	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1), this);
-	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2), this);
-	m_tempcdc->set_type3_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type3), this);
+	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1));
+	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2));
+	m_tempcdc->set_type3_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type3));
 
 	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
 
@@ -1066,7 +1065,7 @@ void ngcd_state::neocd(machine_config &config)
 	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_controls, "joy", false);
 
 	CDROM(config, "cdrom").set_interface("neocd_cdrom");
-	SOFTWARE_LIST(config, "cd_list").set_type("neocd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cd_list").set_original("neocd");
 
 	m_ym->set_addrmap(0, &ngcd_state::neocd_ym_map);
 }
@@ -1086,7 +1085,9 @@ ROM_START( neocd )
 	ROM_SYSTEM_BIOS( 1, "front",   "Front loading Neo-Geo CD" )
 	ROMX_LOAD("front-sp1.bin",    0x00000, 0x80000, CRC(cac62307) SHA1(53bc1f283cdf00fa2efbb79f2e36d4c8038d743a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
-	ROMX_LOAD("uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
+	ROMX_LOAD("uni-bioscd32.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 3, "unibios33", "Universe Bios (Hack, Ver. 3.3)" )
+	ROMX_LOAD("uni-bioscd33.rom",    0x00000, 0x80000, CRC(ff3abc59) SHA1(5142f205912869b673a71480c5828b1eaed782a8), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3))
 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	/* 2MB of 68K RAM */
@@ -1100,7 +1101,9 @@ ROM_START( neocdz )
 	ROM_SYSTEM_BIOS( 0, "official",   "Official BIOS" )
 	ROMX_LOAD("neocd.bin",    0x00000, 0x80000, CRC(df9de490) SHA1(7bb26d1e5d1e930515219cb18bcde5b7b23e2eda), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
-	ROMX_LOAD("uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
+	ROMX_LOAD("uni-bioscd32.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 2, "unibios33", "Universe Bios (Hack, Ver. 3.3)" )
+	ROMX_LOAD("uni-bioscd33.rom",    0x00000, 0x80000, CRC(ff3abc59) SHA1(5142f205912869b673a71480c5828b1eaed782a8), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	/* 2MB of 68K RAM */

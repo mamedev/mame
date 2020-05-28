@@ -19,8 +19,8 @@
 #include <windows.h>
 #include <winioctl.h>
 #include <tchar.h>
-#include <stdlib.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cctype>
 
 
 namespace {

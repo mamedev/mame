@@ -38,8 +38,8 @@ public:
 	void init_landbrka();
 	void init_landbrkb();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(eolith_speedup_getvblank);
-	DECLARE_CUSTOM_INPUT_MEMBER(stealsee_speedup_getvblank);
+	DECLARE_READ_LINE_MEMBER(speedup_vblank_r);
+	DECLARE_READ_LINE_MEMBER(stealsee_speedup_vblank_r);
 
 	void speedup_read();
 	void init_speedup();
@@ -60,10 +60,10 @@ private:
 	template<int Player> DECLARE_READ32_MEMBER(hidctch3_pen_r);
 	DECLARE_WRITE16_MEMBER(eolith_vram_w);
 	DECLARE_READ16_MEMBER(eolith_vram_r);
-	DECLARE_WRITE8_MEMBER(sound_p1_w);
-	DECLARE_READ8_MEMBER(qs1000_p1_r);
-	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_to_qs1000);
+	void sound_p1_w(uint8_t data);
+	uint8_t qs1000_p1_r();
+	void qs1000_p1_w(uint8_t data);
+	void soundcpu_to_qs1000(uint8_t data);
 
 	DECLARE_MACHINE_RESET(eolith);
 	DECLARE_VIDEO_START(eolith);

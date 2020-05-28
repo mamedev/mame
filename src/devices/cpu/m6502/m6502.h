@@ -23,7 +23,6 @@ public:
 	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	bool get_sync() const { return sync; }
-	void disable_cache() { cache_disabled = true; }
 
 	auto sync_cb() { return sync_w.bind(); }
 
@@ -34,10 +33,11 @@ protected:
 
 	class memory_interface {
 	public:
-		address_space *program, *sprogram;
-		memory_access_cache<0, 0, ENDIANNESS_LITTLE> *cache, *scache;
+		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache cprogram, csprogram;
+		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific program;
+		memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific program14;
 
-		virtual ~memory_interface() {}
+		virtual ~memory_interface() = default;
 		virtual uint8_t read(uint16_t adr) = 0;
 		virtual uint8_t read_9(uint16_t adr);
 		virtual uint8_t read_sync(uint16_t adr) = 0;
@@ -46,20 +46,20 @@ protected:
 		virtual void write_9(uint16_t adr, uint8_t val);
 	};
 
-	class mi_default_normal : public memory_interface {
+	class mi_default : public memory_interface {
 	public:
-		virtual ~mi_default_normal() {}
+		virtual ~mi_default() = default;
 		virtual uint8_t read(uint16_t adr) override;
 		virtual uint8_t read_sync(uint16_t adr) override;
 		virtual uint8_t read_arg(uint16_t adr) override;
 		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 
-	class mi_default_nd : public mi_default_normal {
+	class mi_default14 : public mi_default {
 	public:
-		virtual ~mi_default_nd() {}
-		virtual uint8_t read_sync(uint16_t adr) override;
-		virtual uint8_t read_arg(uint16_t adr) override;
+		virtual ~mi_default14() = default;
+		virtual uint8_t read(uint16_t adr) override;
+		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 
 	enum {
@@ -85,12 +85,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual bool execute_input_edge_triggered(int inputnum) const override;
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -122,7 +122,7 @@ protected:
 	int inst_state, inst_substate;
 	int icount, bcount, count_before_instruction_step;
 	bool nmi_state, irq_state, apu_irq_state, v_state;
-	bool irq_taken, sync, cache_disabled, inhibit_interrupts;
+	bool irq_taken, sync, inhibit_interrupts;
 
 	uint8_t read(uint16_t adr) { return mintf->read(adr); }
 	uint8_t read_9(uint16_t adr) { return mintf->read_9(adr); }
@@ -277,6 +277,11 @@ protected:
 	virtual void execute_run() override;
 };
 
+class m6512_device : public m6502_device {
+public:
+	m6512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 enum {
 	M6502_PC = 1,
 	M6502_A,
@@ -294,5 +299,6 @@ enum {
 };
 
 DECLARE_DEVICE_TYPE(M6502, m6502_device)
+DECLARE_DEVICE_TYPE(M6512, m6512_device)
 
 #endif // MAME_CPU_M6502_M6502_H

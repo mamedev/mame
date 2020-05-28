@@ -68,7 +68,7 @@ TILE_GET_INFO_MEMBER(exprraid_state::get_bg_tile_info)
 
 	tileinfo.category = ((attr & 0x80) ? 1 : 0);
 
-	SET_TILE_INFO_MEMBER(bank, code, color, flags);
+	tileinfo.set(bank, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(exprraid_state::get_fg_tile_info)
@@ -77,13 +77,13 @@ TILE_GET_INFO_MEMBER(exprraid_state::get_fg_tile_info)
 	int code = m_videoram[tile_index] + ((attr & 0x07) << 8);
 	int color = (attr & 0x10) >> 4;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void exprraid_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(exprraid_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(exprraid_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(exprraid_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(exprraid_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_rows(2);
 	m_fg_tilemap->set_transparent_pen(0);

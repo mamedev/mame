@@ -14,9 +14,11 @@
 #include "cpu/sparc/sparc.h"
 #include "machine/bankdev.h"
 
+class device_sbus_card_interface;
 class sbus_device;
 
-class sbus_slot_device : public device_t, public device_slot_interface
+
+class sbus_slot_device : public device_t, public device_single_card_slot_interface<device_sbus_card_interface>
 {
 public:
 	// construction/destruction
@@ -51,8 +53,6 @@ protected:
 
 DECLARE_DEVICE_TYPE(SBUS_SLOT, sbus_slot_device)
 
-
-class device_sbus_card_interface;
 
 class sbus_device : public device_t,
 	public device_memory_interface
@@ -103,12 +103,12 @@ protected:
 	virtual void device_start() override;
 
 	// internal state
-	required_device<mb86901_device> m_maincpu;
+	required_device<sparc_base_device> m_maincpu;
 	required_device<address_map_bank_device> m_type1space;
 	address_space *m_space;
 
-	devcb_write_line    m_irq_cb[7];
-	devcb_write32       m_buserr;
+	devcb_write_line::array<7> m_irq_cb;
+	devcb_write32 m_buserr;
 
 	device_sbus_card_interface *m_device_list[3];
 
@@ -125,7 +125,7 @@ DECLARE_DEVICE_TYPE(SBUS, sbus_device)
 
 
 // class representing interface-specific live sbus card
-class device_sbus_card_interface : public device_slot_card_interface
+class device_sbus_card_interface : public device_interface
 {
 	friend class sbus_device;
 public:

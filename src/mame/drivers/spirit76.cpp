@@ -37,10 +37,10 @@ public:
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portb_r);
+	void porta_w(u8 data);
+	void portb_w(u8 data);
+	u8 porta_r();
+	u8 portb_r();
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_READ8_MEMBER(unk_r);
 	void maincpu_map(address_map &map);
@@ -53,7 +53,7 @@ private:
 void spirit76_state::maincpu_map(address_map &map)
 {
 	map.unmap_value_high();
-//  ADDRESS_MAP_GLOBAL_MASK(0xfff) // this could most likely go in once the memory map is sorted
+//  map.global_mask(0xfff); // this could most likely go in once the memory map is sorted
 	map(0x0000, 0x00ff).ram(); // 2x 2112
 	map(0x2200, 0x2203).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // 6820
 	map(0x2400, 0x2400).r(FUNC(spirit76_state::unk_r));
@@ -79,26 +79,26 @@ TIMER_DEVICE_CALLBACK_MEMBER( spirit76_state::irq )
 }
 
 // continual write in irq routine
-WRITE8_MEMBER( spirit76_state::porta_w )
+void spirit76_state::porta_w(u8 data)
 {
 	printf("PORT A=%X\n",data);
 }
 
 // continual write in irq routine
-WRITE8_MEMBER( spirit76_state::portb_w )
+void spirit76_state::portb_w(u8 data)
 {
 	printf("PORT B=%X\n",data);
 }
 
 // continual read in irq routine
-READ8_MEMBER( spirit76_state::porta_r )
+u8 spirit76_state::porta_r()
 {
 	printf("Read PORT A\n");
 	return 0xff;
 }
 
 // might not be used?
-READ8_MEMBER( spirit76_state::portb_r )
+u8 spirit76_state::portb_r()
 {
 	printf("Read PORT B\n");
 	return 0xff;

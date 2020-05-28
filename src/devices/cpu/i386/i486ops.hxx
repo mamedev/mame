@@ -533,3 +533,8 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 	}
 	m_cr[cr] = data;
 }
+
+void i386_device::i486_wait()
+{
+	x87_mf_fault();
+}

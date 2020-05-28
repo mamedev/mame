@@ -89,6 +89,11 @@ public:
 		, m_option(*this, "OPTION")
 		, m_dtr(*this, "DTR")
 		, m_baudgen_timer(nullptr)
+		, m_force_blank(false)
+		, m_4hz_flasher(false)
+		, m_2hz_flasher(false)
+		, m_lpt_select(false)
+		, m_keyboard_scan(false)
 	{ }
 
 	void tv912(machine_config &config);
@@ -96,9 +101,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(uart_settings_changed);
 
 private:
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	void p1_w(u8 data);
+	u8 p2_r();
+	void p2_w(u8 data);
 	DECLARE_READ8_MEMBER(crtc_r);
 	DECLARE_WRITE8_MEMBER(crtc_w);
 	DECLARE_READ8_MEMBER(uart_status_r);
@@ -143,17 +148,18 @@ private:
 
 	bool m_force_blank;
 	bool m_4hz_flasher;
+	bool m_2hz_flasher;
 	bool m_lpt_select;
 	u8 m_keyboard_scan;
 	std::unique_ptr<u8[]> m_dispram;
 };
 
-WRITE8_MEMBER(tv912_state::p1_w)
+void tv912_state::p1_w(u8 data)
 {
 	m_keyboard_scan = data;
 }
 
-READ8_MEMBER(tv912_state::p2_r)
+u8 tv912_state::p2_r()
 {
 	ioport_value dup = m_half_duplex->read();
 
@@ -171,23 +177,25 @@ READ8_MEMBER(tv912_state::p2_r)
 	return result | 0x5f;
 }
 
-WRITE8_MEMBER(tv912_state::p2_w)
+void tv912_state::p2_w(u8 data)
 {
 	// P20-P23: Address Signals (4MSBS)
 	m_bankdev->set_bank(data & 0x0f);
 
 	// P24: +4Hz Flasher
+	if (BIT(data, 4) && !m_4hz_flasher)
+		m_2hz_flasher = !m_2hz_flasher;
 	m_4hz_flasher = BIT(data, 4);
 }
 
 READ8_MEMBER(tv912_state::crtc_r)
 {
-	return m_crtc->read(space, bitswap<4>(offset, 5, 4, 1, 0));
+	return m_crtc->read(bitswap<4>(offset, 5, 4, 1, 0));
 }
 
 WRITE8_MEMBER(tv912_state::crtc_w)
 {
-	m_crtc->write(space, bitswap<4>(offset, 5, 4, 1, 0), data);
+	m_crtc->write(bitswap<4>(offset, 5, 4, 1, 0), data);
 }
 
 READ8_MEMBER(tv912_state::keyboard_r)
@@ -280,12 +288,19 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 	int scroll = m_crtc->upscroll_offset();
 
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	u8 charctrl = 0x8, charctrl_latch = 0x8;
+
+	for (int y = 0; y < 240; y++)
 	{
 		int row = ((y / 10) + scroll) % 24;
 		int ra = y % 10;
 		int x = 0;
 		u8 *charbase = &m_p_chargen[(ra & 7) | BIT(videoctrl, 1) << 10];
+
+		if (ra == 0)
+			charctrl_latch = charctrl;
+		else
+			charctrl = charctrl_latch;
 
 		for (int pos = 0; pos < 80; pos++)
 		{
@@ -296,25 +311,49 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 			if (CHARSET_TEST && pos >= 32 && pos < 64)
 				ch = (pos & 0x1f) | (row & 7) << 5;
 
-			u8 data = (ra > 0 && ra < 9) ? charbase[(ch & 0x7f) << 3] : 0;
-			u8 dots = (data & 0xfc) >> 1;
+			bool inhibit = ra == 0 || ra == 9;
+			bool underline = ra == 9 && BIT(charctrl, 0);
+			bool invert = BIT(charctrl, 1);
+			if ((ch & 0x60) == 0)
+			{
+				inhibit = true;
+				if (BIT(ch, 4))
+					charctrl = ch & 0xf;
+				else
+					charctrl = (charctrl & 0xc) | (ch & 0x3);
+				if (!BIT(ch, 0))
+					underline = false;
+				if (!BIT(ch, 1))
+					invert = false;
+			}
+			else if ((charctrl & 0xc) == 0xc && m_2hz_flasher)
+				inhibit = true;
+
+			u8 data = inhibit ? 0 : charbase[(ch & 0x7f) << 3];
+			u8 dots = underline ? 0xff : (data & 0xfc) >> 1;
 			bool adv = BIT(data, 1);
 
 			if (x == curs.left() && y >= curs.top() && y <= curs.bottom())
 			{
-				if (BIT(videoctrl, 0) || !m_4hz_flasher)
+				if (m_4hz_flasher && !BIT(videoctrl, 0))
+					dots = 0;
+				else
 					dots ^= 0xff;
 			}
+			if (invert)
+				dots ^= 0xff;
 
+			// Protected characters are displayed at half intensity
+			rgb_t fg = BIT(ch, 7) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
 			for (int d = 0; d < TV912_CH_WIDTH / 2; d++)
 			{
 				if (x >= cliprect.left() && x <= cliprect.right())
-					bitmap.pix(y, x) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(y, x) = BIT(dots, 7) ? fg : rgb_t::black();
 				x++;
 				if (adv)
 					dots <<= 1;
 				if (x >= cliprect.left() && x <= cliprect.right())
-					bitmap.pix(y, x) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(y, x) = BIT(dots, 7) ? fg : rgb_t::black();
 				x++;
 				if (!adv)
 					dots <<= 1;
@@ -339,6 +378,7 @@ void tv912_state::machine_start()
 	save_item(NAME(m_force_blank));
 	save_item(NAME(m_lpt_select));
 	save_item(NAME(m_4hz_flasher));
+	save_item(NAME(m_2hz_flasher));
 	save_item(NAME(m_keyboard_scan));
 	save_pointer(NAME(m_dispram), 0x1000);
 }
@@ -562,7 +602,7 @@ static INPUT_PORTS_START( tv912b )
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY13")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('h') PORT_CHAR('H') PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR(0x08) PORT_CODE(KEYCODE_H)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('s') PORT_CHAR('S') PORT_CHAR(0x13) PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -574,7 +614,7 @@ static INPUT_PORTS_START( tv912b )
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY15")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('k') PORT_CHAR('K') PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR(0x0b) PORT_CODE(KEYCODE_K)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('f') PORT_CHAR('F') PORT_CHAR(0x06) PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -592,7 +632,7 @@ static INPUT_PORTS_START( tv912b )
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY18")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rub Out") PORT_CHAR(0x08) PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rub Out") PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR(0x10) PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -605,7 +645,7 @@ static INPUT_PORTS_START( tv912b )
 
 	PORT_START("KEY20")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN) // control character 0x1f (PAGE)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('l') PORT_CHAR('L') PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR(0x0c) PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN) // control character 0xb5
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -770,7 +810,7 @@ static INPUT_PORTS_START( tv912c )
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY15")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('k') PORT_CHAR('K') PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR(0x0b) PORT_CODE(KEYCODE_K)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('f') PORT_CHAR('F') PORT_CHAR(0x06) PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -801,7 +841,7 @@ static INPUT_PORTS_START( tv912c )
 
 	PORT_START("KEY20")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN) // (BLOCK CONV)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('l') PORT_CHAR('L') PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR(0x0c) PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 

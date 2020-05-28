@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="electron_flop" description="Acorn Electron disks">
 
@@ -871,6 +874,19 @@
 		</part>
 	</software>
 
+	<software name="sp64">
+		<description>Stop Press 64</description>
+		<year>1992</year>
+		<publisher>Slogger</publisher>
+		<info name="usage" value="Requires SP64i" />
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="sp64_boot-adfs_e.adf" size="327680" crc="8e83fb1d" sha1="d5c4ed8182c0202fd664e5714527a1091a1495ca"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Magazines -->
 
 	<software name="euser401">
@@ -879,7 +895,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "163840">
+			<dataarea name="flop" size="163840">
 				<rom name="eup401-adfs_e.adf" size="163840" crc="877cb96a" sha1="ef8120efcecbd188be7f7c8d0f4ad7d37dd055bd"/>
 			</dataarea>
 		</part>
@@ -891,7 +907,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "163840">
+			<dataarea name="flop" size="163840">
 				<rom name="eup402-adfs_e.adf" size="163840" crc="b9be7a87" sha1="e5b388acdb543b704928bf0da3a25212c36ff3b8"/>
 			</dataarea>
 		</part>
@@ -903,7 +919,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "143360">
+			<dataarea name="flop" size="143360">
 				<rom name="eup408-adfs_e.adf" size="143360" crc="b53e5255" sha1="0a8075adaf1a4be5d8ada3f49d855a8b6caf30d5"/>
 			</dataarea>
 		</part>
@@ -915,7 +931,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eup411-adfs_e.adf" size="327680" crc="37fe65b8" sha1="d87df67bafa2f6680a53c9b74007df6ba056c52b"/>
 			</dataarea>
 		</part>
@@ -927,7 +943,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eup501-adfs_e.adf" size="327680" crc="e0236dec" sha1="b02577cadb34522267f5b57b215725cdb0cb695a"/>
 			</dataarea>
 		</part>
@@ -939,7 +955,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "163840">
+			<dataarea name="flop" size="163840">
 				<rom name="eup503-adfs_e.adf" size="163840" crc="120862d9" sha1="b4181c5416fe7b8805a719214f3f755798c54888"/>
 			</dataarea>
 		</part>
@@ -951,7 +967,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eup506-adfs_e.adf" size="327680" crc="ab8e73a2" sha1="94d39072552cd39b863d4bc8262d698811e608ae"/>
 			</dataarea>
 		</part>
@@ -963,7 +979,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "163840">
+			<dataarea name="flop" size="163840">
 				<rom name="eup512-adfs_e.adf" size="163840" crc="df8498ad" sha1="0b92f865b054e19395fd66a1448c4ab1998116bb"/>
 			</dataarea>
 		</part>
@@ -975,7 +991,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eup609-adfs_e.adf" size="327680" crc="87677d8b" sha1="411a85d374b00d56f90bacb436477dad62354ca0"/>
 			</dataarea>
 		</part>
@@ -987,7 +1003,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug00-adfs_e.adm" size="327680" crc="4740034e" sha1="f490213581c04d7dcf71ba67202060edeb3c8df5"/>
 			</dataarea>
 		</part>
@@ -1011,7 +1027,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug01-adfs_e.adm" size="327680" crc="c88aa2cc" sha1="e0241b8efb8db79aa1b2198dc8cb0da7ce1f1636"/>
 			</dataarea>
 		</part>
@@ -1035,7 +1051,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug02-adfs_e.adm" size="327680" crc="7183e0aa" sha1="a14ef8e51dd657aa68e91239f5ac1a28630001af"/>
 			</dataarea>
 		</part>
@@ -1059,7 +1075,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug03-adfs_e.adm" size="327680" crc="23dcd1ee" sha1="f56dd7eeea3d6cc909cf74ce4460de96474d2432"/>
 			</dataarea>
 		</part>
@@ -1083,7 +1099,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug04-adfs_e.adm" size="327680" crc="582e6244" sha1="7bda20012b374bad4c5616cc59ecc6308a8a47e8"/>
 			</dataarea>
 		</part>
@@ -1107,7 +1123,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug05-adfs_e.adm" size="327680" crc="75b230f4" sha1="7c576854b68e6ff9dd3342fc222b26cf869b4c98"/>
 			</dataarea>
 		</part>
@@ -1131,7 +1147,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug06-adfs_e.adm" size="327680" crc="0f93e2f4" sha1="53d97babb475dcd11ff418a998a21a49e6afb398"/>
 			</dataarea>
 		</part>
@@ -1155,7 +1171,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug07-adfs_e.adm" size="327680" crc="0893a33c" sha1="25410596e4d2c79b09e3ef0ff2b9cbec373b0c45"/>
 			</dataarea>
 		</part>
@@ -1179,7 +1195,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug08-adfs_e.adm" size="327680" crc="975081c0" sha1="5df40bbce6ad50df548ac2c18f304c1b64b0a5b2"/>
 			</dataarea>
 		</part>
@@ -1203,7 +1219,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug09-adfs_e.adm" size="327680" crc="c692fd87" sha1="ec3264586f02d779b9599b966724805fc66790fb"/>
 			</dataarea>
 		</part>
@@ -1227,7 +1243,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug10-adfs_e.adf" size="327680" crc="81aece86" sha1="af32dd473f9dddb1d4bbeeb14531ffe89dec7527"/>
 			</dataarea>
 		</part>
@@ -1251,7 +1267,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug11-adfs_e.adm" size="327680" crc="48bc3d92" sha1="07c7af3781474ee070b6de5df58b11b5328b3dba"/>
 			</dataarea>
 		</part>
@@ -1275,7 +1291,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug12-adfs_e.adm" size="327680" crc="23b0a6e2" sha1="398a4e27c5e56fdde5dcc516a8e99a84eff99afa"/>
 			</dataarea>
 		</part>
@@ -1299,7 +1315,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug13-adfs_e.adm" size="327680" crc="f563737e" sha1="a503691cd455ba0039b1bd7be5319823cf8af0f3"/>
 			</dataarea>
 		</part>
@@ -1323,7 +1339,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug14-adfs_e.adm" size="327680" crc="f779d137" sha1="c761cfc7af876c2a8d927a5167de822cf4948bda"/>
 			</dataarea>
 		</part>
@@ -1347,7 +1363,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug15-adfs_e.adm" size="327680" crc="c88bb350" sha1="9cfbd3da8717c0c420bad302da4f95e6e3b0fbbb"/>
 			</dataarea>
 		</part>
@@ -1371,7 +1387,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug16-adfs_e.adm" size="327680" crc="79f77d2a" sha1="4a6733504baf7eb7220b5bc5b8ce399474a801eb"/>
 			</dataarea>
 		</part>
@@ -1395,7 +1411,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug17-adfs_e.adm" size="327680" crc="b3d12948" sha1="bc6fd15c12569ece9c3ee8326e3ce852c958bccf"/>
 			</dataarea>
 		</part>
@@ -1419,7 +1435,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug18-adfs_e.adm" size="327680" crc="5836ed85" sha1="cb1724ede0b0a49c059f3090dfdb022e3534d46f"/>
 			</dataarea>
 		</part>
@@ -1443,7 +1459,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug19-adfs_e.adm" size="327680" crc="35e99e94" sha1="70d40fb376abf398b084aeab9e5f53707905cdbf"/>
 			</dataarea>
 		</part>
@@ -1467,7 +1483,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug20-adfs_e.adm" size="327680" crc="8e49a4e0" sha1="3e45590a628b7ba2dc663c900fe6d12f46d0276a"/>
 			</dataarea>
 		</part>
@@ -1492,19 +1508,19 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disc A"/>
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug21a-adfs_e.adm" size="327680" crc="976e8253" sha1="bfd50a79bab5b3027de2ace13a1fff847e5a5eca"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disc B"/>
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug21b-adfs_e.adm" size="327680" crc="c4c0d47a" sha1="2f382946ae07514aff952a3ca1915f56f7f3ffac"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disc C"/>
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug21c-adfs_e.adm" size="327680" crc="5b11bb25" sha1="faaa66492b1ec2bb18e367b82e0ebaf837ac51f5"/>
 			</dataarea>
 		</part>
@@ -1538,7 +1554,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug22-adfs_e.adm" size="327680" crc="489bc91c" sha1="ed35a3d364d7931cc9bec21dbf33a8cf5ef9f8d5"/>
 			</dataarea>
 		</part>
@@ -1562,7 +1578,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug23-adfs_e.adm" size="327680" crc="e0891b3d" sha1="029b2f6a796101f111bb8d9b0644345f0200d73d"/>
 			</dataarea>
 		</part>
@@ -1586,7 +1602,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug24-adfs_e.adm" size="327680" crc="8e598e9c" sha1="2dbf77c95a7013ec345eaf57ac698a45f4daa4aa"/>
 			</dataarea>
 		</part>
@@ -1610,7 +1626,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug25-adfs_e.adm" size="327680" crc="60eb9705" sha1="fd5c5f9a30456a12eb1518b01096ebf6ea41fc0d"/>
 			</dataarea>
 		</part>
@@ -1634,7 +1650,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug26-adfs_e.adm" size="327680" crc="b3e71512" sha1="9f2dcfa9ab34e3bc7355225a25938384e69e9f61"/>
 			</dataarea>
 		</part>
@@ -1658,7 +1674,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug27-adfs_e.adm" size="327680" crc="031f778e" sha1="c6cb8c8baa3fe6fdf452d1e248e8cc6103c5d184"/>
 			</dataarea>
 		</part>
@@ -1682,7 +1698,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug28-adfs_e.adm" size="327680" crc="262049db" sha1="68c40fa3e6729bd0106b939b46ebf717c97ae945"/>
 			</dataarea>
 		</part>
@@ -1706,7 +1722,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug29-adfs_e.adf" size="327680" crc="b79dfb85" sha1="5d78e0b086c17337fb71dc6bff965e078478d9d4"/>
 			</dataarea>
 		</part>
@@ -1730,7 +1746,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug30-adfs_e.adm" size="327680" crc="52dba14a" sha1="406c7623410a79455121d6b9bcb26e8b6bc66843"/>
 			</dataarea>
 		</part>
@@ -1754,7 +1770,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug31-adfs_e.adm" size="327680" crc="2bf82f9a" sha1="df9d4ec4838932c249870b6bb4357bfc926dc740"/>
 			</dataarea>
 		</part>
@@ -1778,7 +1794,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug32-adfs_e.adm" size="327680" crc="a94ab4a3" sha1="081103e7db38e37060c54dfc65a1f75daf833eff"/>
 			</dataarea>
 		</part>
@@ -1802,7 +1818,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug33-adfs_e.adf" size="327680" crc="f59e6869" sha1="621e303427d9af758148d25f9bc07c2204ea05d4"/>
 			</dataarea>
 		</part>
@@ -1826,7 +1842,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug34-adfs_e.adf" size="327680" crc="6f6e5dce" sha1="3083b46f4981baabe6226e6bfdb6316105abbed1"/>
 			</dataarea>
 		</part>
@@ -1850,7 +1866,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug35-adfs_e.adm" size="327680" crc="c3128438" sha1="a429eee99e4897335c3803f403ef83668abc7014"/>
 			</dataarea>
 		</part>
@@ -1874,7 +1890,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug36-adfs_e.adm" size="327680" crc="ee1d86c0" sha1="e752e9ef6941c70b60f755088fb20d287e9839ca"/>
 			</dataarea>
 		</part>
@@ -1898,7 +1914,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug37-adfs_e.adf" size="327680" crc="ea443e37" sha1="fd738688da3eb774db367f9f3f1291ccea447ba6"/>
 			</dataarea>
 		</part>
@@ -1922,7 +1938,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug38-adfs_e.adm" size="327680" crc="2834da9b" sha1="c2e63b880af59994563fe1deb873d59edc65d0fb"/>
 			</dataarea>
 		</part>
@@ -1946,7 +1962,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug39-adfs_e.adm" size="327680" crc="5610df83" sha1="635f9ac634d8f5ec7c44efeca6b876d9f9adc9f2"/>
 			</dataarea>
 		</part>
@@ -1970,7 +1986,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug40-adfs_e.adm" size="327680" crc="2d434783" sha1="6468062b255070c088faedc183da1441996a5d7d"/>
 			</dataarea>
 		</part>
@@ -1994,7 +2010,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug41-adfs_e.adf" size="327680" crc="67529ec8" sha1="390b5e990aa2a7620101fc86fcbcba4df61cacef"/>
 			</dataarea>
 		</part>
@@ -2018,7 +2034,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug42-adfs_e.adm" size="327680" crc="1e62f7f9" sha1="aa7be72517733346210a6426d0273aff206da65f"/>
 			</dataarea>
 		</part>
@@ -2042,7 +2058,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug43a44-adfs_e.adm" size="327680" crc="1ba16ac2" sha1="4bc42e457c72c821fda5ef9a63d48c39b0693fcb"/>
 			</dataarea>
 		</part>
@@ -2066,7 +2082,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug45-adfs_e.adf" size="327680" crc="da5d1965" sha1="d12be02c36dc83214431570c97c91da226783433"/>
 			</dataarea>
 		</part>
@@ -2090,7 +2106,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug46-adfs_e.adf" size="327680" crc="0b2b8091" sha1="91c478b242b6770f5e4a079200badceecdf39c66"/>
 			</dataarea>
 		</part>
@@ -2114,7 +2130,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug47-adfs_e.adf" size="327680" crc="c0d85427" sha1="6d83d56b71b5745328ba1b238f742a0107ee7849"/>
 			</dataarea>
 		</part>
@@ -2138,7 +2154,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug48-adfs_e.adf" size="327680" crc="305509f0" sha1="456397bc0a42d01d7ef32fefbb1e18a87d342253"/>
 			</dataarea>
 		</part>
@@ -2162,7 +2178,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug49-adfs_e.adf" size="327680" crc="e1ac5b94" sha1="abfe757fa476c76f23c2a5ecbfb85766ec431ab3"/>
 			</dataarea>
 		</part>
@@ -2186,7 +2202,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug50-adfs_e.adf" size="327680" crc="e0356521" sha1="a63a769abd8ccfc99292d53ea63a4664c780425d"/>
 			</dataarea>
 		</part>
@@ -2210,7 +2226,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug51-adfs_e.adf" size="327680" crc="fdca6ecc" sha1="a51eab375275cb8a83e839fb6ad81c9a272ed703"/>
 			</dataarea>
 		</part>
@@ -2234,7 +2250,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug52-adfs_e.adf" size="327680" crc="0f5edcc1" sha1="d791b0c10c5a7429b49aaa78f1f3d71a56cf174a"/>
 			</dataarea>
 		</part>
@@ -2258,7 +2274,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug53-adfs_e.adf" size="327680" crc="a475842f" sha1="40625793a26410de1e11e9a8fa7d109df555cbdd"/>
 			</dataarea>
 		</part>
@@ -2282,7 +2298,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug54-adfs_e.adf" size="327680" crc="edf5e56e" sha1="404cd6816031a64469389ede117f0b8c30e515d4"/>
 			</dataarea>
 		</part>
@@ -2306,7 +2322,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug55-adfs_e.adf" size="327680" crc="ce6f0c16" sha1="d1be66c7a50921a880a38dc92046fbf906b3b4d1"/>
 			</dataarea>
 		</part>
@@ -2330,7 +2346,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug56-adfs_e.adf" size="327680" crc="f2c49d81" sha1="c14e47e9586d262dbf5208fcf4d51742ba7ae17b"/>
 			</dataarea>
 		</part>
@@ -2354,7 +2370,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug57-adfs_e.adf" size="327680" crc="d1affeb3" sha1="27a55185d7d803013d5b5f19b1707ec2bc6d8ec0"/>
 			</dataarea>
 		</part>
@@ -2378,7 +2394,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug58-adfs_e.adf" size="327680" crc="7d9bfb12" sha1="e9166bc7f2dd6975e46284fe8ac64e03cf8649b8"/>
 			</dataarea>
 		</part>
@@ -2402,7 +2418,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug59-adfs_e.adf" size="327680" crc="4bde890a" sha1="0a16ddd6e7fb2f449a74cc6d6e6c4d69acf4e9bc"/>
 			</dataarea>
 		</part>
@@ -2426,7 +2442,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug60-adfs_e.adf" size="327680" crc="d284acb3" sha1="8436e13c9115538f8a0b76621599b8e999a55f97"/>
 			</dataarea>
 		</part>
@@ -2450,7 +2466,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug61-adfs_e.adf" size="327680" crc="5fd813c5" sha1="283f35e0f59afc936084cfe13033f759d2df38dc"/>
 			</dataarea>
 		</part>
@@ -2474,7 +2490,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug62-adfs_e.adf" size="327680" crc="7eb2d4c0" sha1="af149ecb6a1925e691310cfa45a7931076cc01b7"/>
 			</dataarea>
 		</part>
@@ -2498,7 +2514,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug63-adfs_e.adf" size="327680" crc="3af73966" sha1="dd705c947e5b8643626a93e458293036a6e95758"/>
 			</dataarea>
 		</part>
@@ -2522,7 +2538,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug64-adfs_e.adf" size="327680" crc="25e82d8c" sha1="02fc1710bcb6c7a4cd8996c9a29733d460b8a2c6"/>
 			</dataarea>
 		</part>
@@ -2546,7 +2562,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug65-adfs_e.adf" size="327680" crc="1bfe96a4" sha1="e3142d3d37044cca97911a25e93fbc6796d7318b"/>
 			</dataarea>
 		</part>
@@ -2570,7 +2586,7 @@
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size="327680">
 				<rom name="eug66-adfs_e.adf" size="327680" crc="c7ce4f99" sha1="35bedcbb14806525a4a37bb35c24ade254183f05"/>
 			</dataarea>
 		</part>
@@ -2695,6 +2711,210 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
 				<rom name="bbc_music_demo_world-dfs_e.dsd" size="409600" crc="32f86547" sha1="1eab8e9545d27b50a98bc083bb39cd80b68ca298"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd000">
+		<description>HeadFirst PD Disk E000/M000/B000</description>
+		<year>1992</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="81664">
+				<rom name="headfirst-pd-disk-000.ssd" size="81664" crc="2e060e6e" sha1="499c6f2283693ff11717082393a8056ece47de6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd001">
+		<description>HeadFirst PD Disk E001/M005/B001</description>
+		<year>1992</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="headfirst-pd-disk-001.ssd" size="204800" crc="3921402f" sha1="bc4b2a795c4726cd94f62b0c0a577ca22c56ab99"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd002">
+		<description>HeadFirst PD Disk E002/M006/B002</description>
+		<year>1992</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="58880">
+				<rom name="headfirst-pd-disk-002.ssd" size="58880" crc="3e52014a" sha1="d82362d5d1fb4d7d1f9b439b8f045958168e415b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd003">
+		<description>HeadFirst PD Disk E003</description>
+		<year>1992</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="20224">
+				<rom name="headfirst-pd-disk-003.ssd" size="20224" crc="89f761c4" sha1="d615fd893b3df04f509c91f5489dad329d1fdf8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd004">
+		<description>HeadFirst PD Disk E004</description>
+		<year>1992</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="37632">
+				<rom name="headfirst-pd-disk-e004.ssd" size="37632" crc="86d5906c" sha1="1d44a83aedbefb62e1137e1892bf696b58ba1f54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd005">
+		<description>HeadFirst PD Disk E005</description>
+		<year>1992</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="203264">
+				<rom name="headfirst-pd-disk-005.ssd" size="203264" crc="be21a88b" sha1="f9508fd4dc9ca35aa0b9557704e5b79c8f89fa9b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd006">
+		<description>HeadFirst PD Disk E006</description>
+		<year>1992</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143104">
+				<rom name="headfirst-pd-disk-006.ssd" size="143104" crc="f8940d6c" sha1="4981b2680c4f02ff8d3452e335792d39031c4bfb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd007">
+		<description>HeadFirst PD Disk E007</description>
+		<year>1992</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="138496">
+				<rom name="headfirst-pd-disk-007.ssd" size="138496" crc="55bc7b3f" sha1="69e695847190142c5c6ce9fb7c6d9fb27b8596f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd008">
+		<description>HeadFirst PD Disk E008</description>
+		<year>1993</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="58112">
+				<rom name="headfirst-pd-disk-008.ssd" size="58112" crc="cb2bcb60" sha1="7e761cc17fc81759102a2ca07c3eb085f5dfc295"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd009">
+		<description>HeadFirst PD Disk E009</description>
+		<year>1993</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="37120">
+				<rom name="headfirst-pd-disk-009.ssd" size="37120" crc="ab798b8d" sha1="a521a87c8bc93391cdb6aebeaa884752950a91a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd010">
+		<description>HeadFirst PD Disk E010/M009/B005</description>
+		<year>1993</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="headfirst-pd-disk-010.ssd" size="204800" crc="097e2fcd" sha1="854f4a49170eb15d3d6c7d7e6b680507e9bc11d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd011">
+		<description>HeadFirst PD Disk E011</description>
+		<year>1993</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="headfirst-pd-disk-011.ssd" size="204800" crc="8a16052b" sha1="5ba9281e66f89fa9b5b92e79c00ea953a7d2b02c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd012">
+		<description>HeadFirst PD Disk M013/B012</description>
+		<year>1993</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="170496">
+				<rom name="headfirst-pd-disk-012.ssd" size="170496" crc="e6d2b477" sha1="f24a77a807da86ab4542b8e9f9863371daae9d5a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd013">
+		<description>HeadFirst PD Disk E013</description>
+		<year>1993</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="167424">
+				<rom name="headfirst-pd-disk-013.ssd" size="167424" crc="1d443c20" sha1="0bb592b5f3b721401477530be2d9e1807b8ecd9f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd015">
+		<description>HeadFirst PD Disk E015/M015/B014</description>
+		<year>1993</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="157440">
+				<rom name="headfirst-pd-disk-015.ssd" size="157440" crc="d263683b" sha1="d91c3198f9d798e75d562a08a483ea79aefa153d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd016">
+		<description>HeadFirst PD Disk E016/M016/B015</description>
+		<year>1993</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="355840">
+				<rom name="headfirst-pd-disk-016.dsd" size="355840" crc="1cbd7c10" sha1="e9c114827efcceb397be669589bb7de6c4c5a93c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdpd017">
+		<description>HeadFirst PD Disk E017</description>
+		<year>1993</year>
+		<publisher>HeadFirst PD</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="200448">
+				<rom name="headfirst-pd-disk-017.ssd" size="200448" crc="5f3a0c33" sha1="52dd3d2ae027cc01c3c087905d35ce6be4a63578"/>
 			</dataarea>
 		</part>
 	</software>

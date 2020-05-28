@@ -18,7 +18,7 @@
 #include <mmsystem.h>
 #include <d3d9.h>
 #include <d3dx9.h>
-#include <math.h>
+#include <cmath>
 #undef interface
 
 #include "d3d/d3dcomm.h"

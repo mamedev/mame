@@ -68,7 +68,7 @@ void os214_state::os214_prg_map(address_map &map)
 
 void os214_state::os214_io_map(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 }
 
 void os214_state::os214(machine_config &config)

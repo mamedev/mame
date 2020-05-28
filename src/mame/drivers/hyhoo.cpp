@@ -43,7 +43,7 @@ void hyhoo_state::hyhoo_map(address_map &map)
 void hyhoo_state::hyhoo_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
+//  map(0x00, 0x00).w(m_nb1413m3, FUNC(nb1413m3_device::nmi_clock_w));
 	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r));
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
@@ -56,7 +56,7 @@ void hyhoo_state::hyhoo_io_map(address_map &map)
 	map(0xe0, 0xe0).w(FUNC(hyhoo_state::hyhoo_romsel_w));
 	map(0xe0, 0xe1).r(m_nb1413m3, FUNC(nb1413m3_device::gfxrom_r));
 	map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
-//  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
+//  map(0xf0, 0xf0).nopw();
 	map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 }
 

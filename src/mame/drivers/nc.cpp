@@ -848,7 +848,7 @@ void nc100_state::nc100_io(address_map &map)
 	map(0x10, 0x13).rw(FUNC(nc100_state::nc_memory_management_r), FUNC(nc100_state::nc_memory_management_w));
 	map(0x20, 0x20).w(FUNC(nc100_state::nc100_memory_card_wait_state_w));
 	map(0x30, 0x30).w(FUNC(nc100_state::nc100_uart_control_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x50, 0x53).w(FUNC(nc100_state::nc_sound_w));
 	map(0x60, 0x60).w(FUNC(nc100_state::nc_irq_mask_w));
 	map(0x70, 0x70).w(FUNC(nc100_state::nc100_poweroff_control_w));
@@ -1251,7 +1251,7 @@ void nc200_state::nc200_io(address_map &map)
 	map(0x10, 0x13).rw(FUNC(nc200_state::nc_memory_management_r), FUNC(nc200_state::nc_memory_management_w));
 	map(0x20, 0x20).w(FUNC(nc200_state::nc200_memory_card_wait_state_w));
 	map(0x30, 0x30).w(FUNC(nc200_state::nc200_uart_control_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x50, 0x53).w(FUNC(nc200_state::nc_sound_w));
 	map(0x60, 0x60).w(FUNC(nc200_state::nc_irq_mask_w));
 	map(0x70, 0x70).w(FUNC(nc200_state::nc200_poweroff_control_w));
@@ -1381,7 +1381,7 @@ void nc_state::nc_base(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, /*6000000*/ 4606000);        /* Russell Marks says this is more accurate */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nc_state::nc_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -1411,8 +1411,8 @@ void nc_state::nc_base(machine_config &config)
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cardslot", generic_plain_slot, nullptr));
-	cartslot.set_device_load(FUNC(nc_state::load_pcmcia_card), this);
-	cartslot.set_device_unload(FUNC(nc_state::unload_pcmcia_card), this);
+	cartslot.set_device_load(FUNC(nc_state::load_pcmcia_card));
+	cartslot.set_device_unload(FUNC(nc_state::unload_pcmcia_card));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");

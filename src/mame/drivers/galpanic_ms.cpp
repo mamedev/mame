@@ -2,9 +2,9 @@
 // copyright-holders:David Haywood, Nicola Salmoria
 
 /*
-    Gals Panic (Modular System bootleg)
+    New Quiz (Gals Panic bootleg on Modular System)
 
-    PCB stack was marked as 'New Quiz' (aka New Qix?)
+    PCB stack was marked as 'New Quiz'
 
     this is a clone of the expro02.cpp version of Gals Panic
 
@@ -154,7 +154,8 @@ uint32_t galspanic_ms_state::screen_update_backgrounds(screen_device &screen, bi
 uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_backgrounds(screen, bitmap, cliprect);
-//  m_kaneko_spr->render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
+//  m_kaneko_spr->render_sprites(cliprect, m_spriteram, m_spriteram.bytes());
+//  m_kaneko_spr->copybitmap(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
@@ -368,4 +369,4 @@ ROM_START( galpanicms )
 ROM_END
 
 
-GAME( 1990, galpanicms,  galsnew,  newquiz,  newquiz,  galspanic_ms_state, empty_init, ROT90, "bootleg", "Gals Panic (Modular System bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1991, galpanicms,  galsnew,  newquiz,  newquiz,  galspanic_ms_state, empty_init, ROT90, "bootleg (Kaenko)", "New Quiz (Modular System bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

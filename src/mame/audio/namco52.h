@@ -17,16 +17,8 @@ public:
 	auto romread_callback() { return m_romread.bind(); }
 	auto si_callback() { return m_si.bind(); }
 
-	DECLARE_WRITE8_MEMBER(write);
-
-	DECLARE_READ8_MEMBER( K_r );
-	DECLARE_READ_LINE_MEMBER( SI_r );
-	DECLARE_READ8_MEMBER( R0_r );
-	DECLARE_READ8_MEMBER( R1_r );
-	DECLARE_WRITE8_MEMBER( P_w );
-	DECLARE_WRITE8_MEMBER( R2_w );
-	DECLARE_WRITE8_MEMBER( R3_w );
-	DECLARE_WRITE8_MEMBER( O_w );
+	DECLARE_WRITE_LINE_MEMBER( reset );
+	void write(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -37,6 +29,7 @@ protected:
 	TIMER_CALLBACK_MEMBER( latch_callback );
 	TIMER_CALLBACK_MEMBER( irq_clear );
 	TIMER_CALLBACK_MEMBER( external_clock_pulse );
+
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
@@ -50,6 +43,15 @@ private:
 
 	uint8_t m_latched_cmd;
 	uint32_t m_address;
+
+	uint8_t K_r();
+	DECLARE_READ_LINE_MEMBER( SI_r );
+	uint8_t R0_r();
+	uint8_t R1_r();
+	void P_w(uint8_t data);
+	void R2_w(uint8_t data);
+	void R3_w(uint8_t data);
+	void O_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_52XX, namco_52xx_device)

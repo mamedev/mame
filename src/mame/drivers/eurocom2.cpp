@@ -83,13 +83,13 @@ public:
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(fdc_aux_r);
-	DECLARE_WRITE8_MEMBER(fdc_aux_w);
+	uint8_t fdc_aux_r(offs_t offset);
+	void fdc_aux_w(offs_t offset, uint8_t data);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_WRITE8_MEMBER(vico_w);
+	void vico_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(kbd_get);
+	uint8_t kbd_get();
 	void kbd_put(u8 data);
 
 	DECLARE_READ_LINE_MEMBER(pia1_ca1_r);
@@ -131,19 +131,17 @@ public:
 		, m_ptm(*this, "ptm")
 	{ }
 
-	DECLARE_READ8_MEMBER(waveterm_kb_r);
-	DECLARE_WRITE8_MEMBER(waveterm_kb_w);
+	uint8_t waveterm_kb_r();
+	void waveterm_kb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(waveterm_kbh_w);
 
-	DECLARE_READ8_MEMBER(pia3_pa_r);
-	DECLARE_WRITE8_MEMBER(pia3_pa_w);
-	DECLARE_WRITE8_MEMBER(pia3_pb_w);
+	void pia3_pb_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(pia3_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia3_ca2_r);
 	DECLARE_WRITE_LINE_MEMBER(pia3_cb2_w);
 
-	DECLARE_READ8_MEMBER(waveterm_adc);
-	DECLARE_WRITE8_MEMBER(waveterm_dac);
+	uint8_t waveterm_adc();
+	void waveterm_dac(uint8_t data); // declared but not defined, commented in memory map
 
 	void waveterm(machine_config &config);
 	void waveterm_map(address_map &map);
@@ -163,7 +161,7 @@ protected:
  * b6 -- irq
  * b7 -- drq
  */
-READ8_MEMBER(eurocom2_state::fdc_aux_r)
+uint8_t eurocom2_state::fdc_aux_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -185,7 +183,7 @@ READ8_MEMBER(eurocom2_state::fdc_aux_r)
  * b6 -- nc
  * b7 -- 1 = enable timer interrupt
  */
-WRITE8_MEMBER(eurocom2_state::fdc_aux_w)
+void eurocom2_state::fdc_aux_w(offs_t offset, uint8_t data)
 {
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
@@ -214,7 +212,7 @@ WRITE8_MEMBER(eurocom2_state::fdc_aux_w)
 	LOGDBG("Floppy %d <- %02x\n", offset, data);
 }
 
-WRITE8_MEMBER(eurocom2_state::vico_w)
+void eurocom2_state::vico_w(offs_t offset, uint8_t data)
 {
 	LOG("VICO %d <- %02x\n", offset, data);
 
@@ -255,7 +253,7 @@ READ_LINE_MEMBER(eurocom2_state::pia1_ca1_r)
 }
 
 /* bit 7 may be connected to something else -- see section 6.2 of Eurocom manual */
-READ8_MEMBER(eurocom2_state::kbd_get)
+uint8_t eurocom2_state::kbd_get()
 {
 	return m_kbd_data;
 }
@@ -269,7 +267,7 @@ void eurocom2_state::kbd_put(u8 data)
 }
 
 
-READ8_MEMBER(waveterm_state::waveterm_kb_r)
+uint8_t waveterm_state::waveterm_kb_r()
 {
 	uint8_t data = 0xff;
 
@@ -282,7 +280,7 @@ READ8_MEMBER(waveterm_state::waveterm_kb_r)
 	return data;
 }
 
-WRITE8_MEMBER(waveterm_state::waveterm_kb_w)
+void waveterm_state::waveterm_kb_w(uint8_t data)
 {
 	m_drive = (~data) >> 4;
 }
@@ -292,11 +290,11 @@ WRITE_LINE_MEMBER(waveterm_state::waveterm_kbh_w)
 	m_driveh = !state;
 }
 
-WRITE8_MEMBER(waveterm_state::pia3_pb_w)
+void waveterm_state::pia3_pb_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(waveterm_state::waveterm_adc)
+uint8_t waveterm_state::waveterm_adc()
 {
 	return m_screen->frame_number() % 255; // XXX
 }
@@ -350,7 +348,7 @@ void waveterm_state::waveterm_map(address_map &map)
 	map(0xfd08, 0xfd0f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0xfd10, 0xfd17).unmaprw();
 	map(0xfd18, 0xfd18).r(FUNC(waveterm_state::waveterm_adc));  //  AD558 ADC
-//  AM_RANGE(0xfd20, 0xfd20) AM_READ(waveterm_dac)  //  ZN432 DAC ??
+//  map(0xfd20, 0xfd20).r(FUNC(waveterm_state::waveterm_dac));  //  ZN432 DAC ??
 }
 
 static INPUT_PORTS_START(eurocom2)

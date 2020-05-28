@@ -42,16 +42,16 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER( motors_limit_r );
 
 private:
-	DECLARE_WRITE8_MEMBER( scanlines_w );
-	DECLARE_WRITE8_MEMBER( digit_w );
-	DECLARE_READ8_MEMBER( kbd_r );
-	DECLARE_WRITE8_MEMBER( snd_ctrl_w );
-	DECLARE_WRITE8_MEMBER( ay_w );
-	DECLARE_READ8_MEMBER( ay_r );
-	DECLARE_WRITE8_MEMBER( ay8910_0_b_w );
-	DECLARE_WRITE8_MEMBER( ay8910_1_a_w );
-	DECLARE_WRITE8_MEMBER( ay8910_1_b_w );
-	DECLARE_WRITE8_MEMBER( motors_w );
+	void scanlines_w(uint8_t data);
+	void digit_w(uint8_t data);
+	uint8_t kbd_r();
+	void snd_ctrl_w(uint8_t data);
+	void ay_w(uint8_t data);
+	uint8_t ay_r();
+	void ay8910_0_b_w(uint8_t data);
+	void ay8910_1_a_w(uint8_t data);
+	void ay8910_1_b_w(uint8_t data);
+	void motors_w(uint8_t data);
 
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -156,7 +156,7 @@ static INPUT_PORTS_START( icecold )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP)
-	PORT_BIT(0x55, IP_ACTIVE_LOW, IPT_CUSTOM)          PORT_CUSTOM_MEMBER(DEVICE_SELF, icecold_state, motors_limit_r, nullptr)
+	PORT_BIT(0x55, IP_ACTIVE_LOW, IPT_CUSTOM)          PORT_CUSTOM_MEMBER(icecold_state, motors_limit_r)
 
 	PORT_START("X0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1)
@@ -230,22 +230,22 @@ INPUT_CHANGED_MEMBER( icecold_state::test_switch_press )
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER( icecold_state::motors_w )
+void icecold_state::motors_w(uint8_t data)
 {
 	m_motors_ctrl = data;
 }
 
-WRITE8_MEMBER( icecold_state::scanlines_w )
+void icecold_state::scanlines_w(uint8_t data)
 {
 	m_digit = data & 7;
 }
 
-WRITE8_MEMBER( icecold_state::digit_w )
+void icecold_state::digit_w(uint8_t data)
 {
 	m_digit_outputs[m_digit] = data & 0x7f;
 }
 
-READ8_MEMBER( icecold_state::kbd_r )
+uint8_t icecold_state::kbd_r()
 {
 	switch(m_digit)
 	{
@@ -262,7 +262,7 @@ READ8_MEMBER( icecold_state::kbd_r )
 }
 
 
-WRITE8_MEMBER( icecold_state::snd_ctrl_w )
+void icecold_state::snd_ctrl_w(uint8_t data)
 {
 	if (m_ay_ctrl & ~data & 0x04)
 		m_ay8910[0]->data_address_w(m_ay_ctrl & 0x01, m_sound_latch);
@@ -272,12 +272,12 @@ WRITE8_MEMBER( icecold_state::snd_ctrl_w )
 	m_ay_ctrl = data;
 }
 
-WRITE8_MEMBER( icecold_state::ay_w )
+void icecold_state::ay_w(uint8_t data)
 {
 	m_sound_latch = data;
 }
 
-READ8_MEMBER( icecold_state::ay_r )
+uint8_t icecold_state::ay_r()
 {
 	if (m_ay_ctrl & 0x02)
 		return m_ay8910[0]->data_r();
@@ -287,7 +287,7 @@ READ8_MEMBER( icecold_state::ay_r )
 	return 0;
 }
 
-WRITE8_MEMBER( icecold_state::ay8910_0_b_w )
+void icecold_state::ay8910_0_b_w(uint8_t data)
 {
 	for (int n = 0; n < 5; n++)
 		m_lamp_outputs[n] = BIT(data, n);
@@ -296,7 +296,7 @@ WRITE8_MEMBER( icecold_state::ay8910_0_b_w )
 	m_motenbl = BIT(data, 7);
 }
 
-WRITE8_MEMBER( icecold_state::ay8910_1_a_w )
+void icecold_state::ay8910_1_a_w(uint8_t data)
 {
 	for (int n = 0; n < 5; n++)
 		m_lamp_outputs[n + 5] = BIT(data, n);
@@ -305,7 +305,7 @@ WRITE8_MEMBER( icecold_state::ay8910_1_a_w )
 	// BIT 7 watchdog reset
 }
 
-WRITE8_MEMBER( icecold_state::ay8910_1_b_w )
+void icecold_state::ay8910_1_b_w(uint8_t data)
 {
 	if (m_motenbl == 0)
 	{
@@ -392,10 +392,10 @@ void icecold_state::icecold(machine_config &config)
 	kbdc.in_rl_callback().set(FUNC(icecold_state::kbd_r));              // kbd RL lines
 
 	// 30Hz signal from CH-C of ay0
-	TIMER(config, "sint_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(icecold_state::icecold_sint_timer), this), attotime::from_hz(30));
+	TIMER(config, "sint_timer", 0).configure_periodic(FUNC(icecold_state::icecold_sint_timer), attotime::from_hz(30));
 
 	// for update motors position
-	TIMER(config, "motors_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(icecold_state::icecold_motors_timer), this), attotime::from_msec(50));
+	TIMER(config, "motors_timer", 0).configure_periodic(FUNC(icecold_state::icecold_motors_timer), attotime::from_msec(50));
 
 	// video hardware
 	config.set_default_layout(layout_icecold);

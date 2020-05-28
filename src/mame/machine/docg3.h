@@ -19,14 +19,7 @@
 class diskonchip_g3_device : public device_t, public device_nvram_interface
 {
 public:
-	// construction/destruction
-	diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, int size)
-		: diskonchip_g3_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		set_size(size);
-	}
-
-	diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
 	void set_size(int _size) { m_size = _size; }
 protected:

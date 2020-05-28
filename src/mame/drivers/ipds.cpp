@@ -153,7 +153,7 @@ void ipds_state::ipds(machine_config &config)
 
 	I8275(config, m_crtc, XTAL(19'660'800) / 4);
 	m_crtc->set_character_width(6);
-	m_crtc->set_display_callback(FUNC(ipds_state::crtc_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(ipds_state::crtc_display_pixels));
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(ipds_state::kbd_put));

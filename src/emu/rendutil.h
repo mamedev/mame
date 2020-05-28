@@ -15,7 +15,7 @@
 
 #include "render.h"
 
-#include <math.h>
+#include <cmath>
 
 
 /* ----- image formats ----- */

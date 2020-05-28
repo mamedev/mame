@@ -402,7 +402,7 @@ void ymf271_device::init_envelope(YMF271Slot *slot)
 
 	// init release state
 	rate = get_keyscaled_rate(slot->relrate * 4, keycode, slot->keyscale);
-	slot->env_release_step = (rate < 4) ? 0 : (int)(((double)(255-0) / m_lut_ar[rate]) * 65536.0);
+	slot->env_release_step = (rate < 4) ? 0 : (int)(((double)(255-0) / m_lut_dc[rate]) * 65536.0);
 
 	slot->volume = (255-160) << ENV_VOLUME_SHIFT; // -60db
 	slot->env_state = ENV_ATTACK;
@@ -1346,7 +1346,7 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			break;
 
 		default:
-			assert_always(false, "Unknown id in ymf271_device::device_timer");
+			throw emu_fatalerror("Unknown id in ymf271_device::device_timer");
 			break;
 	}
 }
@@ -1648,12 +1648,12 @@ void ymf271_device::calculate_clock_correction()
 
 	for (int i = 0; i < 64; i++)
 	{
-		// attack/release rate in number of samples
+		// attack rate in number of samples
 		m_lut_ar[i] = (ARTime[i] * clock_correction * 44100.0) / 1000.0;
 	}
 	for (int i = 0; i < 64; i++)
 	{
-		// decay rate in number of samples
+		// decay/release rate in number of samples
 		m_lut_dc[i] = (DCTime[i] * clock_correction * 44100.0) / 1000.0;
 	}
 }
@@ -1805,7 +1805,7 @@ DEFINE_DEVICE_TYPE(YMF271, ymf271_device, "ymf271", "Yamaha YMF271 OPX")
 ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMF271, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 23)
+	, device_rom_interface(mconfig, *this)
 	, m_timerA(0)
 	, m_timerB(0)
 	, m_irqstate(0)

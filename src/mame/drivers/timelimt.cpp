@@ -235,7 +235,7 @@ void timelimt_state::timelimt(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &timelimt_state::sound_io_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(timelimt_state::irq0_line_hold)); /* ? */
 
-	config.m_minimum_quantum = attotime::from_hz(3000);
+	config.set_maximum_quantum(attotime::from_hz(3000));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC15
 	mainlatch.q_out_cb<0>().set(FUNC(timelimt_state::nmi_enable_w));

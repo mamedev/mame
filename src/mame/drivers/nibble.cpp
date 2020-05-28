@@ -118,12 +118,12 @@ TILE_GET_INFO_MEMBER(nibble_state::get_bg_tile_info)
 */
 	uint8_t code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0 /* bank */, code, 0 /* color */, 0);
+	tileinfo.set(0 /* bank */, code, 0 /* color */, 0);
 }
 
 void nibble_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nibble_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nibble_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t nibble_state::screen_update_nibble(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -336,7 +336,7 @@ GFXDECODE_END
 
 void nibble_state::nibble(machine_config &config)
 {
-	UPD7811(config, m_maincpu, MASTER_CLOCK / 3); // type guessed; clock not verified
+	UPD78C11(config, m_maincpu, MASTER_CLOCK); // type guessed; clock not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &nibble_state::nibble_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(nibble_state::nibble_interrupt));
 

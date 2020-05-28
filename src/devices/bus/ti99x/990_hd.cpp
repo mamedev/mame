@@ -1007,18 +1007,18 @@ void ti990_hdc_device::device_start()
 void ti990_hdc_device::device_add_mconfig(machine_config &config)
 {
 	harddisk_image_device &harddisk1(HARDDISK(config, "harddisk1"));
-	harddisk1.set_device_load(FUNC(ti990_hdc_device::load_hd), this);
-	harddisk1.set_device_unload(FUNC(ti990_hdc_device::unload_hd), this);
+	harddisk1.set_device_load(FUNC(ti990_hdc_device::load_hd));
+	harddisk1.set_device_unload(FUNC(ti990_hdc_device::unload_hd));
 
 	harddisk_image_device &harddisk2(HARDDISK(config, "harddisk2"));
-	harddisk2.set_device_load(FUNC(ti990_hdc_device::load_hd), this);
-	harddisk2.set_device_unload(FUNC(ti990_hdc_device::unload_hd), this);
+	harddisk2.set_device_load(FUNC(ti990_hdc_device::load_hd));
+	harddisk2.set_device_unload(FUNC(ti990_hdc_device::unload_hd));
 
 	harddisk_image_device &harddisk3(HARDDISK(config, "harddisk3"));
-	harddisk3.set_device_load(FUNC(ti990_hdc_device::load_hd), this);
-	harddisk3.set_device_unload(FUNC(ti990_hdc_device::unload_hd), this);
+	harddisk3.set_device_load(FUNC(ti990_hdc_device::load_hd));
+	harddisk3.set_device_unload(FUNC(ti990_hdc_device::unload_hd));
 
 	harddisk_image_device &harddisk4(HARDDISK(config, "harddisk4"));
-	harddisk4.set_device_load(FUNC(ti990_hdc_device::load_hd), this);
-	harddisk4.set_device_unload(FUNC(ti990_hdc_device::unload_hd), this);
+	harddisk4.set_device_load(FUNC(ti990_hdc_device::load_hd));
+	harddisk4.set_device_unload(FUNC(ti990_hdc_device::unload_hd));
 }

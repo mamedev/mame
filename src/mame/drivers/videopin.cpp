@@ -57,7 +57,7 @@ void videopin_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in videopin_state::device_timer");
+		throw emu_fatalerror("Unknown id in videopin_state::device_timer");
 	}
 }
 
@@ -393,6 +393,8 @@ void videopin_state::videopin(machine_config &config)
  *
  *************************************/
 
+// This is PCB revision -01 (older version) with 16 PROMs (1024x4)
+// A later undumped revision (still marked -01) only had 8 PROMs (2048x4)
 ROM_START( videopin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD_NIB_LOW ( "34242-01.e0", 0x2000, 0x0400, CRC(c6a83795) SHA1(73a65cca7c1e337b336b7d515eafc2981e669be8) )
@@ -423,6 +425,26 @@ ROM_START( videopin )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "9402-01.h4",  0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) ) /* sync */
+ROM_END
+
+// This is an even later revision (marked -02) with 4 EPROMs (4096x8 according to manual, while 2048x8 in reality)
+ROM_START( videopina )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "034253-01.m0", 0x2000, 0x0800, CRC(981b5986) SHA1(78ca6dc1b968529e23796884aa461e71bf7f9a48) )
+	ROM_LOAD( "034254-01.h2", 0x2800, 0x0800, CRC(c3eebf23) SHA1(e9a0e2bf71a5131a8317ad40c1c56f84b5ae1643) )
+	ROM_LOAD( "034255-01.j2", 0x3000, 0x0800, CRC(5565ae42) SHA1(4a9f376650684217d523d3378a5852aaa9fdfedc) )
+	ROM_LOAD( "034256-01.k2", 0x3800, 0x0800, CRC(9f24428c) SHA1(df35225afebb4cc18a593ec665e94f677b3606ee) )
+	ROM_COPY( "maincpu" , 0x3c00, 0xfc00, 0x400 )
+
+	ROM_REGION( 0x0200, "gfx1", 0 ) // tiles
+	ROM_LOAD_NIB_LOW ( "34259-01.d5", 0x0000, 0x0200, CRC(6cd98c06) SHA1(48bf077b7abbd2f529a19bdf85700b93014f39f9) )
+	ROM_LOAD_NIB_HIGH( "34258-01.c5", 0x0000, 0x0200, CRC(91a5f117) SHA1(03ac6b0b3da0ed5faf1ba6695d16918d12ceeff5) )
+
+	ROM_REGION( 0x0020, "gfx2", 0 ) // ball
+	ROM_LOAD( "34257-01.m1", 0x0000, 0x0020, CRC(50245866) SHA1(b0692bc8d44f127f6e7182a1ce75a785e22ac5b9) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "9402-01.h4",  0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) ) // sync
 ROM_END
 
 ROM_START( solarwar )
@@ -464,5 +486,6 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1979, videopin, 0, videopin, videopin, videopin_state, empty_init, ROT270, "Atari", "Video Pinball", MACHINE_SUPPORTS_SAVE, layout_videopin )
-GAMEL( 1979, solarwar, 0, videopin, solarwar, videopin_state, empty_init, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, videopin,         0, videopin, videopin, videopin_state, empty_init, ROT270, "Atari", "Video Pinball (16 PROMs version)", MACHINE_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, videopina, videopin, videopin, videopin, videopin_state, empty_init, ROT270, "Atari", "Video Pinball (4 ROMs version)", MACHINE_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, solarwar,         0, videopin, solarwar, videopin_state, empty_init, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE, layout_videopin )

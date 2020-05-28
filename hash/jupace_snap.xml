@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Created by Robbbert on 2020-01-14.
+
+There are many more .ace files, but they duplicate the ones already in jupace_cass.xml
+
+NOTES:
+  * It is recommended to run with 32k of ram (-ram 32k)
+
+-->
+
+<softwarelist name="jupace_snap" description="Jupiter Cantab Jupiter Ace snapshots">
+	<software name="briques">
+		<description>Casse Briques</description>
+		<year>1983</year>
+		<publisher>ERE</publisher>
+		<info name="usage" value="Press Enter" /><!-- n jeu, where n = number of lives -->
+		<part name="snap" interface="jupace_snap">
+			<dataarea name="snap" size="2572">
+				<rom name="casse briques (1983)(ere)(fr)[3k].ace" size="2572" crc="d2bc5b51" sha1="bcbee732478b8be742996b7af42330c6666472e2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mines">
+		<description>Champs De Mines</description>
+		<year>1983</year>
+		<publisher>ERE</publisher>
+		<info name="usage" value="Press Enter" /><!-- n jeu, where n = number of mines times 10 -->
+		<part name="snap" interface="jupace_snap">
+			<dataarea name="snap" size="2768">
+				<rom name="champs de mines (1983)(ere)(fr)[3k].ace" size="2768" crc="f6249f68" sha1="b9fc39c03472d122cd8056fb1716185c4c2f433d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="milliped">
+		<description>Millipede</description>
+		<year>1983</year>
+		<publisher>Your Computer</publisher>
+		<info name="usage" value="Type milliped and press Enter" />
+		<part name="snap" interface="jupace_snap">
+			<dataarea name="snap" size="4166">
+				<rom name="millipede (1983-04)(your computer)[3k].ace" size="4166" crc="466ff760" sha1="620674685ecffeae221cc5dc7c4ceb9e7894d0d1"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="pacman">
+		<description>Pacman</description>
+		<year>1983</year>
+		<publisher>Your Computer</publisher>
+		<info name="usage" value="The playfield shows by itself, type run and press Enter" />
+		<part name="snap" interface="jupace_snap">
+			<dataarea name="snap" size="3197">
+				<rom name="pacman (1983-03)(your computer)[3k].ace" size="3197" crc="68d096a9" sha1="e0b654ebca9fe8c32143335daf23bf4075781e68"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="valkyr">
+		<description>Valkyr</description>
+		<year>1985</year>
+		<publisher>Colinsoft</publisher>
+		<part name="snap" interface="jupace_snap">
+			<dataarea name="snap" size="22763">
+				<rom name="valkyr.ace" size="22763" crc="3f1bee9e" sha1="85dec67ffdf542102eb89065b60f396825d5cd73"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

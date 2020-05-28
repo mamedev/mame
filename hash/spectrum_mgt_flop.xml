@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+    ZX Spectrum MGT Disciple / +D disk images
+
+    images for the "Disciple" and "+D" ZX Spectrum fdd interfaces produced by MGT (Miles Gordan Technology)
+
+    insert system disk,
+    'RUN'      boots the main DOS from disk
+    'CAT 1/2'  lists disk 1/2 catalogue
+    'LOAD Pn'  loads program #n
+
+    more commands listed in devices\bus\spectrum\plusd.cpp or disciple.cpp
+
+    for disciple, must use matching rom/system disk versions:
+    v2 rom -> system disk/system tape ver 2, 2b, 2c
+    v3 rom -> system disk/system tape ver 3a, 3b or 3d
+
+    for plusd, must use matching rom/system disk versions:
+    v1  rom -> system disk/system tape ver 1
+    v1a rom -> system disk/system tape ver 2a
+-->
+
+<softwarelist name="spectrum_mgt_flop" description="ZX Spectrum MGT DISCiPLE/+D disks">
+	<software name="plusdsys">
+		<description>Plus D System Disk v2a</description>
+		<year>1986</year>
+		<publisher>Miles Gordon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="plus d system disk v2a.mgt" size="819200" crc="abaeb064" sha1="d98dbf3bbdecd48e33a5c191ecaca29358984394"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="plusdsys_a">
+		<description>Plus D System Disk v1</description>
+		<year>1986</year>
+		<publisher>Miles Gordon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="plus d system disk v1.mgt" size="819200" crc="2bbb11c2" sha1="3693ff50a2b51b16fad2f69b6a032d22841bc423"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="disciplesys">
+		<description>DISCiPLE System Disk v3d</description>
+		<year>1986</year>
+		<publisher>Miles Gordon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="disciple system disk v3d.mgt" size="819200" crc="fd931fba" sha1="6446120e6993dcae13e2259bf9a6d83ca300e166"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="disciplesys_a">
+		<description>DISCiPLE System Disk v3b</description>
+		<year>1986</year>
+		<publisher>Miles Gordon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="disciple system disk v3b.mgt" size="819200" crc="4fef82ca" sha1="69ab399bfc8b47090ca1c4cdaec8d01e6d901d06"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="disciplesys_b">
+		<description>DISCiPLE System Disk v3a</description>
+		<year>1986</year>
+		<publisher>Miles Gordon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="disciple system disk v3a.mgt" size="819200" crc="57a42968" sha1="435ae58de3dfdd1bbc17f97af8acf80328c276e6"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="disciplesys_c">
+		<description>DISCiPLE System Disk v2c</description>
+		<year>1986</year>
+		<publisher>Miles Gordon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="disciple system disk v2c.mgt" size="819200" crc="87e6484f" sha1="56cbaac201fdb8a4736c64adaeeb719a64d872d6"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="disciplesys_d">
+		<description>DISCiPLE System Disk v2b</description>
+		<year>1986</year>
+		<publisher>Miles Gordon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="disciple system disk v2b.mgt" size="819200" crc="84221dc8" sha1="6530305e69a9b02275b82abe0e7bca9afcc5c49f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="disciplesys_e">
+		<description>DISCiPLE System Disk v2</description>
+		<year>1986</year>
+		<publisher>Miles Gordon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="disciple system disk v2.mgt" size="819200" crc="97de35a1" sha1="fa7bb3572910becbe9f9ed718ada43faf83e7f80"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="unidos">
+		<description>Uni-Dos</description>
+		<year>1990</year>
+		<publisher>S.D. Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="uni-dos v1.mgt" size="819200" crc="bfa654cd" sha1="1fafbdfdfe608bf20585fe46eace2eede3a95a6f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="pickpoke">
+		<description>Pick-Poke-It</description>
+		<year>1989</year>
+		<publisher>Miles Gordon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="pick-poke-it.mgt" size="819200" crc="9efa0d0c" sha1="489a48fc842e79531b1a06c4f0c269ca696acccc"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

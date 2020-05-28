@@ -65,7 +65,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(blueprnt_state::dipsw_w)
+void blueprnt_state::dipsw_w(uint8_t data)
 {
 	m_dipsw = data;
 }
@@ -359,7 +359,7 @@ void blueprnt_state::blueprnt(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(blueprnt_state::irq0_line_hold), attotime::from_hz(4*60)); // IRQs connected to 32V
 									// NMIs are caused by the main CPU
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

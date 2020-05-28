@@ -9,7 +9,7 @@
 #include "cpu/sharc/sharc.h"
 #include "video/k001006.h"
 
-#include <float.h>
+#include <cfloat>
 
 
 struct k001005_polydata

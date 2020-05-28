@@ -36,7 +36,7 @@ i82355_device::i82355_device(const machine_config &mconfig, const char *tag, dev
 	, m_lint_callback(*this)
 	, m_local_index(0x00)
 	, m_local_status(0x00)
-	, m_id{0}
+	, m_id{{0}}
 	, m_global_config(0x00) // TBD: revision code in upper 4 bits
 	, m_system_interrupt(0x00)
 	, m_semaphore_flag{false, false}
@@ -46,19 +46,19 @@ i82355_device::i82355_device(const machine_config &mconfig, const char *tag, dev
 	, m_local_doorbell_enable(0x00)
 	, m_eisa_doorbell_status(0x00)
 	, m_eisa_doorbell_enable(0x00)
-	, m_peek_poke_data{0}
-	, m_peek_poke_address{0}
+	, m_peek_poke_data{{0}}
+	, m_peek_poke_address{{0}}
 	, m_peek_poke_status(0x00)
 	, m_io_decode_base{0x00, 0x00}
 	, m_io_decode_control{0x00, 0x00}
 	, m_transfer_config{0x00, 0x00}
 	, m_transfer_status{0x00, 0x00}
-	, m_base_count{{0}, {0}}
-	, m_base_address{{0}, {0}}
-	, m_current_count{{0}, {0}}
-	, m_current_address{{0}, {0}}
-	, m_tbi_base{{0}, {0}}
-	, m_tbi_current{{0}, {0}}
+	, m_base_count{ {{0}}, {{0}} }
+	, m_base_address{ {{0}}, {{0}} }
+	, m_current_count{ {{0}}, {{0}} }
+	, m_current_address{ {{0}}, {{0}} }
+	, m_tbi_base{ {{0}}, {{0}} }
+	, m_tbi_current{ {{0}}, {{0}} }
 {
 	// TODO: 24-byte FIFO for each data transfer channel
 	std::fill(std::begin(m_mailbox), std::end(m_mailbox), 0x00);

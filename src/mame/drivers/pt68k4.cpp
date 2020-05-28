@@ -57,7 +57,6 @@ TODO: 68230 device
 
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
-#include "machine/pc_fdc.h"
 #include "machine/timekpr.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
@@ -115,7 +114,7 @@ private:
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 
 	DECLARE_READ8_MEMBER(pia_stub_r);
-	DECLARE_WRITE8_MEMBER(duart1_out);
+	void duart1_out(uint8_t data);
 
 	DECLARE_WRITE8_MEMBER(fdc_select_w);
 
@@ -202,7 +201,7 @@ WRITE_LINE_MEMBER(pt68k4_state::keyboard_data_w)
 	m_kdata = (state == ASSERT_LINE) ? 0x80 : 0x00;
 }
 
-WRITE8_MEMBER(pt68k4_state::duart1_out)
+void pt68k4_state::duart1_out(uint8_t data)
 {
 	m_speaker->level_w((data >> 3) & 1);
 }

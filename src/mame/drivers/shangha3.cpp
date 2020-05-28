@@ -114,6 +114,11 @@ WRITE16_MEMBER(shangha3_state::irq_ack_w)
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
+uint8_t shangha3_state::cgrom_r(offs_t offset)
+{
+	return m_cgrom[offset];
+}
+
 void shangha3_state::shangha3_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
@@ -147,7 +152,7 @@ void shangha3_state::heberpop_map(address_map &map)
 	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
 	map(0x340001, 0x340001).w(FUNC(shangha3_state::flipscreen_w));
 	map(0x360000, 0x360001).w(FUNC(shangha3_state::gfxlist_addr_w));
-	map(0x800000, 0xb7ffff).rom().region("gfx1", 0);
+	map(0x800000, 0xb7ffff).r(FUNC(shangha3_state::cgrom_r));
 }
 
 void shangha3_state::blocken_map(address_map &map)
@@ -164,7 +169,7 @@ void shangha3_state::blocken_map(address_map &map)
 	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
 	map(0x340001, 0x340001).w(FUNC(shangha3_state::flipscreen_w));
 	map(0x360000, 0x360001).w(FUNC(shangha3_state::gfxlist_addr_w));
-	map(0x800000, 0xb7ffff).rom().region("gfx1", 0);
+	map(0x800000, 0xb7ffff).r(FUNC(shangha3_state::cgrom_r));
 }
 
 

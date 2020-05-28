@@ -66,21 +66,21 @@ public:
 	required_device_array<dac_word_interface, 16> m_dacs;
 	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 	std::unique_ptr<rgb_t[]> m_colormap;
-	DECLARE_WRITE16_MEMBER(palette_w);
-	DECLARE_READ16_MEMBER(line_r);
-	DECLARE_WRITE16_MEMBER(laserdisc_w);
-	DECLARE_READ16_MEMBER(laserdisc_r);
-	DECLARE_WRITE16_MEMBER(ldaud_w);
-	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_WRITE16_MEMBER(reset_w);
-	DECLARE_WRITE16_MEMBER(io_w);
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_READ16_MEMBER(chop_r);
-	DECLARE_READ16_MEMBER(read_rotram);
-	DECLARE_WRITE16_MEMBER(write_rotram);
-	DECLARE_READ16_MEMBER(read_sndram);
-	DECLARE_WRITE16_MEMBER(write_sndram);
-	DECLARE_WRITE16_MEMBER(sound_dac_w);
+	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t line_r();
+	void laserdisc_w(uint16_t data);
+	uint16_t laserdisc_r();
+	void ldaud_w(uint16_t data);
+	void control_w(uint16_t data);
+	void reset_w(uint16_t data);
+	void io_w(uint16_t data);
+	uint16_t io_r();
+	uint16_t chop_r();
+	uint16_t read_rotram(offs_t offset);
+	void write_rotram(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t read_sndram(offs_t offset);
+	void write_sndram(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_dac_w(uint16_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -119,7 +119,7 @@ void cubeqst_state::video_start()
 	m_depth_buffer = std::make_unique<uint8_t[]>(512);
 }
 
-WRITE16_MEMBER(cubeqst_state::palette_w)
+void cubeqst_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -203,9 +203,9 @@ uint32_t cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-READ16_MEMBER(cubeqst_state::line_r)
+uint16_t cubeqst_state::line_r()
 {
-	/* I think this is unusued */
+	/* I think this is unused */
 	return m_screen->vpos();
 }
 
@@ -229,7 +229,7 @@ WRITE_LINE_MEMBER(cubeqst_state::vblank_irq)
  *
  *************************************/
 
-WRITE16_MEMBER(cubeqst_state::laserdisc_w)
+void cubeqst_state::laserdisc_w(uint16_t data)
 {
 	m_laserdisc->data_w(data & 0xff);
 }
@@ -238,7 +238,7 @@ WRITE16_MEMBER(cubeqst_state::laserdisc_w)
     D0: Command acknowledge
     D1: Seek status (0 = searching, 1 = ready)
 */
-READ16_MEMBER(cubeqst_state::laserdisc_r)
+uint16_t cubeqst_state::laserdisc_r()
 {
 	int ldp_command_flag = (m_laserdisc->ready_r() == ASSERT_LINE) ? 0 : 1;
 	int ldp_seek_status = (m_laserdisc->status_r() == ASSERT_LINE) ? 1 : 0;
@@ -248,7 +248,7 @@ READ16_MEMBER(cubeqst_state::laserdisc_r)
 
 
 /* LDP audio squelch control */
-WRITE16_MEMBER(cubeqst_state::ldaud_w)
+void cubeqst_state::ldaud_w(uint16_t data)
 {
 	m_laserdisc->set_external_audio_squelch(data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -263,7 +263,7 @@ WRITE16_MEMBER(cubeqst_state::ldaud_w)
 
     Note: Can only be written during VBLANK (as with palette RAM)
 */
-WRITE16_MEMBER(cubeqst_state::control_w)
+void cubeqst_state::control_w(uint16_t data)
 {
 	m_laserdisc->video_enable(data & 1);
 }
@@ -299,7 +299,7 @@ void cubeqst_state::swap_linecpu_banks()
     D1: /Sound
     D2: /Disk
 */
-WRITE16_MEMBER(cubeqst_state::reset_w)
+void cubeqst_state::reset_w(uint16_t data)
 {
 	m_rotatecpu->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
 	m_linecpu->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
@@ -322,7 +322,7 @@ WRITE16_MEMBER(cubeqst_state::reset_w)
  *
  *************************************/
 
-WRITE16_MEMBER(cubeqst_state::io_w)
+void cubeqst_state::io_w(uint16_t data)
 {
 	/*
 	   0: Spare lamp
@@ -348,7 +348,7 @@ WRITE16_MEMBER(cubeqst_state::io_w)
 	m_io_latch = data;
 }
 
-READ16_MEMBER(cubeqst_state::io_r)
+uint16_t cubeqst_state::io_r()
 {
 	uint16_t port_data = ioport("IO")->read();
 
@@ -369,7 +369,7 @@ READ16_MEMBER(cubeqst_state::io_r)
 }
 
 /* Trackball ('CHOP') */
-READ16_MEMBER(cubeqst_state::chop_r)
+uint16_t cubeqst_state::chop_r()
 {
 	return (ioport("TRACK_X")->read() << 8) | ioport("TRACK_Y")->read();
 }
@@ -410,22 +410,22 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ16_MEMBER(cubeqst_state::read_rotram)
+uint16_t cubeqst_state::read_rotram(offs_t offset)
 {
 	return m_rotatecpu->rotram_r(offset);
 }
 
-WRITE16_MEMBER(cubeqst_state::write_rotram)
+void cubeqst_state::write_rotram(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_rotatecpu->rotram_w(offset, data, mem_mask);
 }
 
-READ16_MEMBER(cubeqst_state::read_sndram)
+uint16_t cubeqst_state::read_sndram(offs_t offset)
 {
 	return m_soundcpu->sndram_r(offset);
 }
 
-WRITE16_MEMBER(cubeqst_state::write_sndram)
+void cubeqst_state::write_sndram(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundcpu->sndram_w(offset, data, mem_mask);
 }
@@ -509,7 +509,7 @@ void cubeqst_state::machine_reset()
  */
 
 /* Called by the sound CPU emulation */
-WRITE16_MEMBER( cubeqst_state::sound_dac_w )
+void cubeqst_state::sound_dac_w(uint16_t data)
 {
 	/// d0 selects between 4051.1d (right, d0=1) and 4051.3d (left, d0=0)
 	/// d1-d3 select the channel
@@ -542,7 +542,7 @@ void cubeqst_state::cubeqst(machine_config &config)
 	m_soundcpu->dac_w().set(FUNC(cubeqst_state::sound_dac_w));
 	m_soundcpu->set_sound_region("soundproms");
 
-	config.m_minimum_quantum = attotime::from_hz(48000);
+	config.set_maximum_quantum(attotime::from_hz(48000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -565,31 +565,19 @@ void cubeqst_state::cubeqst(machine_config &config)
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	for (int i = 0; i < 8; i++)
 	{
 		// ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c22 (34) + tl074cn.1b (53) + r10k.rn1 (30)
 		AD7521(config, m_dacs[i*2+0], 0).add_route(0, "rspeaker", 0.125);
+		vref.add_route(0, m_dacs[i*2+0], 1.0, DAC_VREF_POS_INPUT);
+		vref.add_route(0, m_dacs[i*2+0], -1.0, DAC_VREF_NEG_INPUT);
 
 		// ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c13 (34) + tl074cn.3b (53) + r10k.rn3 (30)
 		AD7521(config, m_dacs[i*2+1], 0).add_route(0, "lspeaker", 0.125);
+		vref.add_route(0, m_dacs[i*2+1], 1.0, DAC_VREF_POS_INPUT);
+		vref.add_route(0, m_dacs[i*2+1], -1.0, DAC_VREF_NEG_INPUT);
 	}
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "rdac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac0", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac0", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac3", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac3", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac4", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac4", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac5", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac5", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac6", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac6", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac7", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac7", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac7", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac7", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

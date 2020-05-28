@@ -72,12 +72,15 @@ public:
 	// All lines that are not in input are to be reported at "1"
 	auto read_dc() { return m_read_dc_func.bind(); }
 
+	// Callback to fetch interrupt vector
+	auto int_ack() { return m_int_ack_func.bind(); }
+
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 2; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
 	// 3 cycles is for int. acknowledge + 1 instruction
-	virtual uint32_t execute_max_cycles() const override { return 3; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 3; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -95,6 +98,8 @@ private:
 
 	devcb_write8 m_dc_changed_func;
 	devcb_read8 m_read_dc_func;
+	devcb_read8 m_int_ack_func;
+
 	int m_icount;
 
 	// State of processor
@@ -108,9 +113,9 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
-	address_space *m_io;
+	memory_access<11, 0, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<11, 0, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 4, 0, 0, ENDIANNESS_BIG>::specific m_io;
 
 	// device_t overrides
 	virtual void device_start() override;

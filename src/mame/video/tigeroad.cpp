@@ -80,7 +80,7 @@ TILE_GET_INFO_MEMBER(tigeroad_state::get_bg_tile_info)
 	int color = attr & 0x0f;
 	int flags = (attr & 0x20) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 	tileinfo.group = (attr & 0x10) ? 1 : 0;
 }
 
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(tigeroad_state::get_fg_tile_info)
 	int color = attr & 0x0f;
 	int flags = (attr & 0x10) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILEMAP_MAPPER_MEMBER(tigeroad_state::tigeroad_tilemap_scan)
@@ -105,11 +105,11 @@ TILEMAP_MAPPER_MEMBER(tigeroad_state::tigeroad_tilemap_scan)
 void tigeroad_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(tigeroad_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(tigeroad_state::tigeroad_tilemap_scan),this),
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tigeroad_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(tigeroad_state::tigeroad_tilemap_scan)),
 			32, 32, 128, 128);
 
 	m_fg_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(tigeroad_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tigeroad_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 
 	m_bg_tilemap->set_transmask(0, 0xffff, 0);

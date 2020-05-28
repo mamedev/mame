@@ -209,7 +209,7 @@ INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)
 */
 
 
-READ8_MEMBER(msx_state::msx_psg_port_a_r)
+uint8_t msx_state::msx_psg_port_a_r()
 {
 	uint8_t data = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 
@@ -255,16 +255,16 @@ READ8_MEMBER(msx_state::msx_psg_port_a_r)
 	return data;
 }
 
-READ8_MEMBER(msx_state::msx_psg_port_b_r)
+uint8_t msx_state::msx_psg_port_b_r()
 {
 	return m_psg_b;
 }
 
-WRITE8_MEMBER(msx_state::msx_psg_port_a_w)
+void msx_state::msx_psg_port_a_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(msx_state::msx_psg_port_b_w)
+void msx_state::msx_psg_port_b_w(uint8_t data)
 {
 	/* Arabic or kana mode led */
 	if ( (data ^ m_psg_b) & 0x80)
@@ -294,12 +294,12 @@ WRITE8_MEMBER( msx2_state::msx_rtc_latch_w )
 
 WRITE8_MEMBER( msx2_state::msx_rtc_reg_w )
 {
-	m_rtc->write(space, m_rtc_latch, data);
+	m_rtc->write(m_rtc_latch, data);
 }
 
 READ8_MEMBER( msx2_state::msx_rtc_reg_r )
 {
-	return m_rtc->read(space, m_rtc_latch);
+	return m_rtc->read(m_rtc_latch);
 }
 
 
@@ -307,7 +307,7 @@ READ8_MEMBER( msx2_state::msx_rtc_reg_r )
 ** The PPI functions
 */
 
-WRITE8_MEMBER( msx_state::msx_ppi_port_a_w )
+void msx_state::msx_ppi_port_a_w(uint8_t data)
 {
 	m_primary_slot = data;
 
@@ -316,7 +316,7 @@ WRITE8_MEMBER( msx_state::msx_ppi_port_a_w )
 	msx_memory_map_all ();
 }
 
-WRITE8_MEMBER( msx_state::msx_ppi_port_c_w )
+void msx_state::msx_ppi_port_c_w(uint8_t data)
 {
 	m_keylatch = data & 0x0f;
 
@@ -339,7 +339,7 @@ WRITE8_MEMBER( msx_state::msx_ppi_port_c_w )
 	m_port_c_old = data;
 }
 
-READ8_MEMBER( msx_state::msx_ppi_port_b_r )
+uint8_t msx_state::msx_ppi_port_b_r()
 {
 	uint8_t result = 0xff;
 	int row, data;
@@ -494,7 +494,7 @@ READ8_MEMBER( msx2_state::msx_switched_r )
 
 	for (int i = 0; i < m_switched.size(); i++)
 	{
-		data &= m_switched[i]->switched_read(space, offset);
+		data &= m_switched[i]->switched_read(offset);
 	}
 
 	return data;
@@ -504,6 +504,6 @@ WRITE8_MEMBER( msx2_state::msx_switched_w )
 {
 	for (int i = 0; i < m_switched.size(); i++)
 	{
-		m_switched[i]->switched_write(space, offset, data);
+		m_switched[i]->switched_write(offset, data);
 	}
 }

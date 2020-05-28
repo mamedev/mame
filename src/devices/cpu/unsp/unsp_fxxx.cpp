@@ -9,6 +9,14 @@
 
 #include "unspdasm.h"
 
+#include <climits>
+
+#define LOG_UNSP_MULS            (1U << 1)
+
+#define VERBOSE             (0)
+
+#include "logmacro.h"
+
 inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 {
 	//                          |   | |
@@ -16,49 +24,50 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 	// DS Reg   1 1 1 1   - - - 0   0 0 1 0   w r r r
 	// FR Reg   1 1 1 1   - - - 0   0 0 1 1   w r r r
 
+	// FR = 'inner flag register' on ISA1.2+
+	// does this mean 1.2+ do not store the registers in the upper bits of SR, or is this something else?
+	// smartfp IRQ4 reads this and puts in on the stack
+
 	if (((op & 0xffc0) == 0xfe00) && m_iso >= 12)
 	{
 		// ds = imm6
-		int imm = op & 0x003f;
-		set_ds(imm);
+		set_ds(op & 0x003f);
 		return;
 	}
 	else if (((op & 0xf1f8) == 0xf020) && m_iso >= 12)
 	{
 		// rx = ds
-		int r = op & 0x7;
-		m_core->m_r[r] = get_ds();
+		m_core->m_r[op & 0x7] = get_ds();
 		return;
 	}
 	else if (((op & 0xf1f8) == 0xf028) && m_iso >= 12)
 	{
 		// ds = rx
-		int r = op & 0x7;
-		set_ds(m_core->m_r[r]);
+		set_ds(m_core->m_r[op & 0x7]);
 		return;
 	}
 	else if (((op & 0xf1f8) == 0xf030) && m_iso >= 12)
 	{
-		int r = op & 0x7;
-		logerror("%s = fr\n", regs[r]);
-		unimplemented_opcode(op);
+		m_core->m_r[op & 0x7] = get_fr();
 		return;
 	}
 	else if (((op & 0xf1f8) == 0xf038) && m_iso >= 12)
 	{
-		int r = op & 0x7;
-		logerror("fr = %s\n", regs[r]);
-		unimplemented_opcode(op);
+		set_fr(m_core->m_r[op & 0x7]);
 		return;
 	}
 
 	// everything else falls through to the multiply
 
-	// signed * unsigned
+	// MUL us ( signed * unsigned )
 	// MUL      1 1 1 1*  r r r 0*  0 0 0 0   1 r r r     (** = sign bits, fixed here)
+
 	const uint16_t opa = (op >> 9) & 7;
 	const uint16_t opb = op & 7;
 	m_core->m_icount -= 12;
+
+	LOGMASKED(LOG_UNSP_MULS, "%s: MUL us with %04x (unsigned) * %04x (signed) (fra:%d) :\n", machine().describe_context(), m_core->m_r[opa], m_core->m_r[opb], m_core->m_fra);
+
 	uint32_t lres = m_core->m_r[opa] * m_core->m_r[opb];
 	if (m_core->m_r[opb] & 0x8000)
 	{
@@ -66,6 +75,8 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 	}
 	m_core->m_r[REG_R4] = lres >> 16;
 	m_core->m_r[REG_R3] = (uint16_t)lres;
+
+	LOGMASKED(LOG_UNSP_MULS, "result was : %08x\n", lres);
 
 	return;
 }
@@ -93,16 +104,60 @@ inline void unsp_device::execute_fxxx_001_group(uint16_t op)
 		uint8_t bitop =  (op & 0x0030) >> 4;
 		uint8_t offset = (op & 0x000f) >> 0;
 		uint8_t d =      (op & 0x0400) >> 10;
+		uint16_t imm16 = read16(UNSP_LPC);
+		add_lpc(1);
 
 		if (d)
 		{
-			logerror("%s ds:[$04x],%d\n", bitops[bitop], offset);
-			unimplemented_opcode(op);
+			switch (bitop)
+			{
+			case 0x0: // tstb
+				logerror("tstb ds:[%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+
+			case 0x1: // setb
+				logerror("setb ds:[%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+
+			case 0x2: // clrb
+				logerror("clrb ds:[%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+
+			case 0x3: // invb
+				logerror("invb ds:[%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+			}
 		}
 		else
 		{
-			logerror("%s [$04x],%d\n", bitops[bitop], offset);
-			unimplemented_opcode(op);
+			switch (bitop)
+			{
+			case 0x0: // tstb
+				logerror("tstb [%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+
+			case 0x1: // setb    (bkrankp uses this)
+			{
+				uint16_t temp = read16(imm16);
+				temp |= (1 << offset);
+				write16(imm16, temp);
+				break;
+			}
+			case 0x2: // clrb
+				logerror("clrb [%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+
+			case 0x3: // invb
+				logerror("invb [%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+			}
 		}
 
 		return;
@@ -142,8 +197,10 @@ inline void unsp_device::execute_fxxx_011_group(uint16_t op)
 	// JMPR    1 1 1 1   1 1 1 0   1 1 - -   - - - -
 	if (((op & 0xffc0) == 0xfec0) && m_iso >= 12)
 	{
-		logerror("goto mr\n");
-		unimplemented_opcode(op);
+		m_core->m_icount -= 5;
+		m_core->m_r[REG_PC] = m_core->m_r[REG_R3];
+		m_core->m_r[REG_SR] &= 0xffc0;
+		m_core->m_r[REG_SR] |= m_core->m_r[REG_R4] & 0x3f;
 		return;
 	}
 
@@ -165,13 +222,13 @@ inline void unsp_device::execute_fxxx_100_group(uint16_t op)
 
 	if ((op & 0xf1f8) == 0xf108)
 	{
-		uint32_t lres = 0;
-
 		const uint16_t opa = (op >> 9) & 7;
 		const uint16_t opb = op & 7;
 
+		LOGMASKED(LOG_UNSP_MULS, "%s: MUL ss with %04x (signed) * %04x (signed) (fra:%d) :\n", machine().describe_context(), m_core->m_r[opa], m_core->m_r[opb], m_core->m_fra);
+
 		m_core->m_icount -= 12;
-		lres = m_core->m_r[opa] * m_core->m_r[opb];
+		uint32_t lres = m_core->m_r[opa] * m_core->m_r[opb];
 		if (m_core->m_r[opb] & 0x8000)
 		{
 			lres -= m_core->m_r[opa] << 16;
@@ -182,6 +239,9 @@ inline void unsp_device::execute_fxxx_100_group(uint16_t op)
 		}
 		m_core->m_r[REG_R4] = lres >> 16;
 		m_core->m_r[REG_R3] = (uint16_t)lres;
+
+		LOGMASKED(LOG_UNSP_MULS, "result was : %08x\n", lres);
+
 		return;
 	}
 
@@ -190,6 +250,35 @@ inline void unsp_device::execute_fxxx_100_group(uint16_t op)
 	return;
 }
 
+void unsp_12_device::execute_divq(uint16_t op)
+{
+	if (m_core->m_divq_bit == UINT_MAX)
+	{
+		m_core->m_divq_bit = 15;
+		m_core->m_divq_dividend = (m_core->m_r[REG_R4] << 16) | m_core->m_r[REG_R3];
+		m_core->m_divq_divisor = m_core->m_r[REG_R2];
+		m_core->m_divq_a = 0;
+	}
+	m_core->m_aq = BIT(m_core->m_divq_a, 31);
+	if (m_core->m_aq)
+	{
+		m_core->m_divq_a += m_core->m_divq_a + BIT(m_core->m_divq_dividend, 15) + m_core->m_divq_divisor;
+	}
+	else
+	{
+		m_core->m_divq_a += m_core->m_divq_a + BIT(m_core->m_divq_dividend, 15) - m_core->m_divq_divisor;
+	}
+	m_core->m_divq_dividend <<= 1;
+	m_core->m_divq_dividend++;
+	m_core->m_divq_dividend ^= BIT(m_core->m_divq_a, 31);
+	m_core->m_r[REG_R3] = (uint16_t)m_core->m_divq_dividend;
+	m_core->m_divq_bit--;
+}
+
+bool unsp_12_device::op_is_divq(const uint16_t op)
+{
+	return (op & 0xf163) == 0xf163;
+}
 
 void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 {
@@ -202,46 +291,54 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	// DIVQ      1 1 1 1   - - - 1   0 1 1 -   - 0 1 1
 	// EXP       1 1 1 1   - - - 1   0 1 1 -   - 1 0 0
 
+	m_core->m_icount -= 1; // Unknown count
+
 	switch (op)
 	{
 	case 0xf146: case 0xf346: case 0xf546: case 0xf746: case 0xf946: case 0xfb46: case 0xfd46: case 0xff46:
-		logerror("fraction off\n");
-		unimplemented_opcode(op);
+		m_core->m_fra = 0;
 		return;
 
 	case 0xf147: case 0xf347: case 0xf547: case 0xf747: case 0xf947: case 0xfb47: case 0xfd47: case 0xff47:
-		logerror("fraction on\n");
-		unimplemented_opcode(op);
+		m_core->m_fra = 1;
 		return;
 
 	case 0xf14a: case 0xf34a: case 0xf54a: case 0xf74a: case 0xf94a: case 0xfb4a: case 0xfd4a: case 0xff4a:
-		logerror("secbank off\n");
-		unimplemented_opcode(op);
+		if (m_core->m_bnk)
+		{
+			std::swap<uint32_t>(m_core->m_r[REG_R1], m_core->m_secbank[REG_SR1]);
+			std::swap<uint32_t>(m_core->m_r[REG_R2], m_core->m_secbank[REG_SR2]);
+			std::swap<uint32_t>(m_core->m_r[REG_R3], m_core->m_secbank[REG_SR3]);
+			std::swap<uint32_t>(m_core->m_r[REG_R4], m_core->m_secbank[REG_SR4]);
+		}
+		m_core->m_bnk = 0;
 		return;
 
 	case 0xf14b: case 0xf34b: case 0xf54b: case 0xf74b: case 0xf94b: case 0xfb4b: case 0xfd4b: case 0xff4b:
-		logerror("secbank on\n");
-		unimplemented_opcode(op);
+		if (m_core->m_bnk == 0)
+		{
+			std::swap<uint32_t>(m_core->m_r[REG_R1], m_core->m_secbank[REG_SR1]);
+			std::swap<uint32_t>(m_core->m_r[REG_R2], m_core->m_secbank[REG_SR2]);
+			std::swap<uint32_t>(m_core->m_r[REG_R3], m_core->m_secbank[REG_SR3]);
+			std::swap<uint32_t>(m_core->m_r[REG_R4], m_core->m_secbank[REG_SR4]);
+		}
+		m_core->m_bnk = 1;
 		return;
 
 	case 0xf14d: case 0xf34d: case 0xf54d: case 0xf74d: case 0xf94d: case 0xfb4d: case 0xfd4d: case 0xff4d:
-		logerror("irqnest off\n");
-		unimplemented_opcode(op);
+		m_core->m_ine = 0;
 		return;
 
 	case 0xf14f: case 0xf34f: case 0xf54f: case 0xf74f: case 0xf94f: case 0xfb4f: case 0xfd4f: case 0xff4f:
-		logerror("irqnest on\n");
-		unimplemented_opcode(op);
+		m_core->m_ine = 1;
 		return;
 
 	case 0xf144: case 0xf344: case 0xf544: case 0xf744: case 0xf944: case 0xfb44: case 0xfd44: case 0xff44:
-		logerror("fir_mov on\n");
-		unimplemented_opcode(op);
+		m_core->m_fir_move = 1;
 		return;
 
 	case 0xf145: case 0xf345: case 0xf545: case 0xf745: case 0xf945: case 0xfb45: case 0xfd45: case 0xff45:
-		logerror("fir_mov off\n");
-		unimplemented_opcode(op);
+		m_core->m_fir_move = 0;
 		return;
 
 	case 0xf161: case 0xf361: case 0xf561: case 0xf761: case 0xf961: case 0xfb61: case 0xfd61: case 0xff61:
@@ -249,7 +346,6 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf171: case 0xf371: case 0xf571: case 0xf771: case 0xf971: case 0xfb71: case 0xfd71: case 0xff71:
 	case 0xf179: case 0xf379: case 0xf579: case 0xf779: case 0xf979: case 0xfb79: case 0xfd79: case 0xff79:
 	{
-		m_core->m_icount -= 1; // unknown count
 		uint32_t addr = m_core->m_r[REG_R3] | ((m_core->m_r[REG_R4] & 0x3f) << 16);
 		push(m_core->m_r[REG_PC], &m_core->m_r[REG_SP]);
 		push(m_core->m_r[REG_SR], &m_core->m_r[REG_SP]);
@@ -271,8 +367,7 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf16b: case 0xf36b: case 0xf56b: case 0xf76b: case 0xf96b: case 0xfb6b: case 0xfd6b: case 0xff6b:
 	case 0xf173: case 0xf373: case 0xf573: case 0xf773: case 0xf973: case 0xfb73: case 0xfd73: case 0xff73:
 	case 0xf17b: case 0xf37b: case 0xf57b: case 0xf77b: case 0xf97b: case 0xfb7b: case 0xfd7b: case 0xff7b:
-		logerror("divq mr, r2\n");
-		unimplemented_opcode(op);
+		execute_divq(op);
 		return;
 
 	case 0xf164: case 0xf364: case 0xf564: case 0xf764: case 0xf964: case 0xfb64: case 0xfd64: case 0xff64:
@@ -280,24 +375,17 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf174: case 0xf374: case 0xf574: case 0xf774: case 0xf974: case 0xfb74: case 0xfd74: case 0xff74:
 	case 0xf17c: case 0xf37c: case 0xf57c: case 0xf77c: case 0xf97c: case 0xfb7c: case 0xfd7c: case 0xff7c:
 	{
-		//unimplemented_opcode(op);
-		// what is this, sign extend / sign expand / zero expand? it doesn't seem to be exponent
-		// palette uploads in smartfp depend on this, however this logic only works for the first few, so isn't correct
-		uint16_t result = m_core->m_r[REG_R4];// rand();
-		uint16_t temp = m_core->m_r[REG_R4];
+		uint16_t r4 = m_core->m_r[REG_R4];
 
-		for (int i = 0; i < 16; i++)
+		if (r4 & 0x8000)
 		{
-			int bit = (temp << i) & 0x8000;
-
-			if (bit)
-				break;
-
-			result |= 1 << (15 - i);
+			m_core->m_r[REG_R2] = count_leading_ones(0xffff0000 | r4) - 17;
+		}
+		else
+		{
+			m_core->m_r[REG_R2] = count_leading_zeros(r4) - 17; // -17 because count_leading_zeros works with 32-bit values
 		}
 
-		logerror("pc:%06x: r2 = exp r4 (with r2 = %04x r4 = %04x) (returning %04x)\n", UNSP_LPC, m_core->m_r[REG_R2], m_core->m_r[REG_R4], result);
-		m_core->m_r[REG_R2] = result;
 		return;
 	}
 
@@ -339,6 +427,14 @@ void unsp_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf143: case 0xf343: case 0xf543: case 0xf743: case 0xf943: case 0xfb43: case 0xfd43: case 0xff43:
 		m_core->m_enable_irq = 1;
 		m_core->m_enable_fiq = 1;
+		return;
+
+	case 0xf144: case 0xf344: case 0xf544: case 0xf744: case 0xf944: case 0xfb44: case 0xfd44: case 0xff44:
+		m_core->m_fir_move = 1;
+		return;
+
+	case 0xf145: case 0xf345: case 0xf545: case 0xf745: case 0xf945: case 0xfb45: case 0xfd45: case 0xff45:
+		m_core->m_fir_move = 0;
 		return;
 
 	case 0xf160: case 0xf360: case 0xf560: case 0xf760: case 0xf960: case 0xfb60: case 0xfd60: case 0xff60:
@@ -398,8 +494,45 @@ inline void unsp_device::execute_fxxx_110_group(uint16_t op)
 	// MULS    1 1 1 1*  r r r 1*  1 0*s s   s r r r    (1* = sign bit, 1* = sign bit 0* = upper size bit)
 
 	// MULS ss with upper size bit not set
-	unimplemented_opcode(op);
-	//return;
+	const uint16_t size = ((op >> 3) & 7) ? ((op >> 3) & 7) : 16;
+	const uint16_t rd = (op >> 9) & 7;
+	const uint16_t rs = op & 7;
+	execute_muls_ss(rd, rs, size);
+}
+
+void unsp_device::execute_muls_ss(const uint16_t rd, const uint16_t rs, const uint16_t size)
+{
+	const uint32_t rdv = m_core->m_r[rd];
+	const uint32_t rsv = m_core->m_r[rs];
+	int64_t lres = 0;
+	uint16_t values[16];
+	for (uint16_t i = 0; i < size; i++)
+	{
+		values[i] = read16(rdv + i);
+		const uint16_t rhs = read16(rsv + i);
+		uint32_t tres = values[i] * rhs;
+		if (values[i] & 0x8000)
+		{
+			tres -= rhs << 16;
+		}
+		if (rhs & 0x8000)
+		{
+			tres -= values[i] << 16;
+		}
+		lres += (int64_t)(int32_t)tres;
+	}
+	m_core->m_sb = 0;
+	if (m_core->m_fir_move)
+	{
+		for (uint16_t i = size - 1; i > 0; i--)
+		{
+			write16(rdv + i, values[i - 1]);
+		}
+	}
+	m_core->m_r[rd] += size;
+	m_core->m_r[rs] += size;
+	m_core->m_r[REG_R4] = (uint16_t)(lres >> 16);
+	m_core->m_r[REG_R3] = (uint16_t)lres;
 }
 
 inline void unsp_device::execute_fxxx_111_group(uint16_t op)
@@ -412,8 +545,9 @@ inline void unsp_device::execute_fxxx_111_group(uint16_t op)
 	// MULS    1 1 1 1*  r r r 1*  1 1*s s   s r r r    (1* = sign bit, 1* = sign bit 1* = upper size bit)
 
 	// MULS ss with upper size bit set.
-	unimplemented_opcode(op);
-	//return;
+	const uint16_t rd = (op >> 9) & 7;
+	const uint16_t rs = op & 7;
+	execute_muls_ss(rd, rs, ((op >> 3) & 7) + 8);
 }
 
 void unsp_device::execute_fxxx_group(uint16_t op)

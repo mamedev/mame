@@ -73,11 +73,11 @@ public:
 	void montecar(machine_config &config);
 	void superbug(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(steer_dir_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(steer_flag_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(skid_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(crash_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gear_r);
+	template <int P> DECLARE_READ_LINE_MEMBER(steer_dir_r);
+	template <int P> DECLARE_READ_LINE_MEMBER(steer_flag_r);
+	template <int P> DECLARE_READ_LINE_MEMBER(skid_r);
+	template <int P> DECLARE_READ_LINE_MEMBER(crash_r);
+	template <int P> DECLARE_READ_LINE_MEMBER(gear_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_mode_switch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(firetrk_horn_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(gear_changed);

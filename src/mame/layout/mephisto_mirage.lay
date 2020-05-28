@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 
 <!-- define elements -->
@@ -217,7 +220,10 @@
 		<rect state="1"><color red="0" green="0" blue="0" /></rect>
 	</element>
 
-	<element name="text_uit1"><text string="S.BOARD"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_uit1" defstate="0">
+		<text string="SB.MOBIL" state="0"><color red="0.81" green="0.8" blue="0.79" /></text>
+		<text string="SB.MODULAR" state="1"><color red="0.81" green="0.8" blue="0.79" /></text>
+	</element>
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib2">
@@ -265,10 +271,14 @@
 
 	<group name="sb_ui">
 		<bounds x="0" y="0" width="10" height="80" />
+
+		<!-- can click here to change board type -->
+		<bezel element="hlub" inputtag="FAKE" inputmask="0x01" inputraw="1"><bounds x="0" y="1.5" width="10" height="5" /></bezel>
+
 		<bezel element="cblack"><bounds x="0" y="0" width="10" height="1" /></bezel>
 		<bezel element="cblack"><bounds x="0" y="7" width="10" height="1" /></bezel>
 		<bezel element="cblack"><bounds x="0" y="79" width="10" height="1" /></bezel>
-		<bezel element="text_uit1"><bounds x="0" y="2" width="10" height="2" /></bezel>
+		<bezel element="text_uit1" inputtag="FAKE" inputmask="0x01" inputraw="1"><bounds x="0" y="2" width="10" height="2" /></bezel>
 		<bezel element="text_uit2"><bounds x="0" y="4" width="10" height="2" /></bezel>
 
 		<!-- board -->

@@ -22,7 +22,7 @@
  * Still in the public domain.
  */
 
-#include <string.h>     /* for memcpy() */
+#include <cstring>     /* for memcpy() */
 
 #include "md5.h"
 

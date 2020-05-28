@@ -48,7 +48,7 @@ WRITE_LINE_MEMBER(mjkjidai_state::adpcm_int)
 	else
 	{
 		uint8_t const data = m_adpcmrom[m_adpcm_pos / 2];
-		m_msm->write_data(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
+		m_msm->data_w(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
 		m_adpcm_pos++;
 	}
 }
@@ -69,12 +69,12 @@ CUSTOM_INPUT_MEMBER(mjkjidai_state::keyboard_r)
 	return res;
 }
 
-WRITE8_MEMBER(mjkjidai_state::keyboard_select_lo_w)
+void mjkjidai_state::keyboard_select_lo_w(uint8_t data)
 {
 	m_keyb = (m_keyb & 0xff00) | (data);
 }
 
-WRITE8_MEMBER(mjkjidai_state::keyboard_select_hi_w)
+void mjkjidai_state::keyboard_select_hi_w(uint8_t data)
 {
 	m_keyb = (m_keyb & 0x00ff) | (data << 8);
 }
@@ -162,7 +162,7 @@ static INPUT_PORTS_START( mjkjidai )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEYBOARD")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, mjkjidai_state, keyboard_r, nullptr)
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(mjkjidai_state, keyboard_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // reinitialize NVRAM and reset the game
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 

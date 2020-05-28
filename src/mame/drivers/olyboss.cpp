@@ -87,31 +87,30 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_read);
+	uint8_t keyboard_read();
 
 	UPD3301_DRAW_CHARACTER_MEMBER( olyboss_display_pixels );
 
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	DECLARE_WRITE_LINE_MEMBER( romdis_w );
-	DECLARE_READ8_MEMBER( dma_mem_r );
-	DECLARE_WRITE8_MEMBER( dma_mem_w );
+	uint8_t dma_mem_r(offs_t offset);
+	void dma_mem_w(offs_t offset, uint8_t data);
 	DECLARE_READ8_MEMBER( fdcctrl_r );
 	DECLARE_WRITE8_MEMBER( fdcctrl_w );
 	DECLARE_WRITE8_MEMBER( fdcctrl85_w );
-	DECLARE_READ8_MEMBER( fdcdma_r );
-	DECLARE_WRITE8_MEMBER( fdcdma_w );
-	DECLARE_WRITE8_MEMBER( crtcdma_w );
+	uint8_t fdcdma_r();
+	void fdcdma_w(uint8_t data);
+	void crtcdma_w(uint8_t data);
 	DECLARE_READ8_MEMBER( rom_r );
 	DECLARE_WRITE8_MEMBER( rom_w );
 	DECLARE_WRITE8_MEMBER( vchrmap_w );
 	DECLARE_WRITE8_MEMBER( vchrram_w );
 	DECLARE_WRITE8_MEMBER( vchrram85_w );
-	DECLARE_WRITE8_MEMBER( ppic_w );
+	void ppic_w(uint8_t data);
 	void olyboss_io(address_map &map);
 	void olyboss_mem(address_map &map);
 	void olyboss85_io(address_map &map);
-	IRQ_CALLBACK_MEMBER(irq_cb);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dma;
@@ -175,11 +174,11 @@ void olyboss_state::olyboss_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0, 0x8).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x10, 0x11).m(m_fdc, FUNC(upd765a_device::map));
-	//AM_RANGE(0x20, 0x20) //beeper?
+	//map(0x20, 0x20) //beeper?
 	map(0x30, 0x30).rw(m_uic, FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
 	map(0x31, 0x31).rw(m_uic, FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
 	map(0x40, 0x43).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	//AM_RANGE(0x50, 0x53) COM2651
+	//map(0x50, 0x53) COM2651
 	map(0x60, 0x60).rw(FUNC(olyboss_state::fdcctrl_r), FUNC(olyboss_state::fdcctrl_w));
 	map(0x80, 0x81).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
 	map(0x82, 0x84).w(FUNC(olyboss_state::vchrmap_w));
@@ -252,13 +251,6 @@ WRITE_LINE_MEMBER( olyboss_state::romdis_w )
 	m_romen = state ? false : true;
 }
 
-IRQ_CALLBACK_MEMBER( olyboss_state::irq_cb )
-{
-	if(!irqline)
-		return m_pic->acknowledge();
-	return 0;
-}
-
 //**************************************************************************
 //  VIDEO
 //**************************************************************************
@@ -290,7 +282,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( olyboss_state::olyboss_display_pixels )
 //  KEYBOARD
 //**************************************************************************
 
-READ8_MEMBER( olyboss_state::keyboard_read )
+uint8_t olyboss_state::keyboard_read()
 {
 	//logerror ("keyboard_read offs [%d]\n",offset);
 	if (m_keybhit)
@@ -303,7 +295,7 @@ READ8_MEMBER( olyboss_state::keyboard_read )
 	return 0x00;
 }
 
-WRITE8_MEMBER( olyboss_state::ppic_w )
+void olyboss_state::ppic_w(uint8_t data)
 {
 	m_uic->ireq4_w(BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
 	m_fdcctrl = (m_fdcctrl & ~0x10) | (BIT(data, 5) ? 0x10 : 0);
@@ -359,34 +351,34 @@ WRITE_LINE_MEMBER( olyboss_state::tc_w )
 	}
 }
 
-READ8_MEMBER( olyboss_state::dma_mem_r )
+uint8_t olyboss_state::dma_mem_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	return program.read_byte(offset);
 }
 
-WRITE8_MEMBER( olyboss_state::dma_mem_w )
+void olyboss_state::dma_mem_w(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.write_byte(offset, data);
 }
 
-READ8_MEMBER( olyboss_state::fdcdma_r )
+uint8_t olyboss_state::fdcdma_r()
 {
 	m_channel = 0;
 	return m_fdc->dma_r();
 }
 
-WRITE8_MEMBER( olyboss_state::fdcdma_w )
+void olyboss_state::fdcdma_w(uint8_t data)
 {
 	m_channel = 0;
 	m_fdc->dma_w(data);
 }
 
-WRITE8_MEMBER( olyboss_state::crtcdma_w )
+void olyboss_state::crtcdma_w(uint8_t data)
 {
 	m_channel = 2;
-	m_crtc->dack_w(space, offset, data, mem_mask);
+	m_crtc->dack_w(data);
 }
 
 READ8_MEMBER( olyboss_state::fdcctrl_r )
@@ -468,7 +460,7 @@ void olyboss_state::olybossd(machine_config &config)
 
 	UPD3301(config, m_crtc, XTAL(14'318'181));
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->int_wr_callback().set(m_uic, FUNC(am9519_device::ireq0_w)).invert();
 	m_crtc->set_screen(SCREEN_TAG);
@@ -501,7 +493,7 @@ void olyboss_state::bossb85(machine_config &config)
 	i8085a_cpu_device &maincpu(I8085A(config, m_maincpu, 4_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &olyboss_state::olyboss_mem);
 	maincpu.set_addrmap(AS_IO, &olyboss_state::olyboss85_io);
-	maincpu.set_irq_acknowledge_callback(FUNC(olyboss_state::irq_cb));
+	maincpu.in_inta_func().set(m_pic, FUNC(pic8259_device::acknowledge));
 	maincpu.out_sod_func().set(FUNC(olyboss_state::romdis_w));
 
 	/* video hardware */

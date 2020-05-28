@@ -31,11 +31,11 @@ NETLIST_START(hazelvid)
 	MAINCLOCK(video_clk, 16632000.0)
 
 	/* Character line counter, divide-by-9 */
-	TTL_74161(u88, high, high, high, low, high, u87_6.Q, video_clk, high, high)
+	TTL_74161_FIXME(u88, high, high, high, low, high, u87_6.Q, video_clk, high, high)
 
-	TTL_7404_INVERT(u87_6, u88.RCO)
+	TTL_7404_INVERT(u87_6, u88.RC)
 
-	TTL_74175(u81, video_clk, u88.RCO, u81.Q1, low, u88.QC, high)
+	TTL_74175(u81, video_clk, u88.RC, u81.Q1, low, u88.QC, high)
 
 	TTL_7404_INVERT(u87_5, u81.Q1)
 	ALIAS(ndot, u87_5.Q)
@@ -45,15 +45,17 @@ NETLIST_START(hazelvid)
 	/* Character bucket counter */
 
 	/* least significant 4 bits */
-	TTL_74161(u70, low, low, low, low, high, u59_5.Q, u81.Q2Q, high, high)
+	TTL_74161_FIXME(u70, low, low, low, low, high, u59_5.Q, u81.Q2Q, high, high)
 
 	/* most significant 4 bits */
-	TTL_74161(u69, low, low, low, low, high, u59_5.Q, u81.Q2Q, u70.RCO, u70.RCO)
+	TTL_74161_FIXME(u69, low, low, low, low, high, u59_5.Q, u81.Q2Q, u70.RC, u70.RC)
 	/* Horizontal/Vertical timing signals */
 
 	/* signal lookup PROM */
 	PROM_82S126(u71, low, low, u70.QA, u70.QB, u70.QC, u70.QD, u69.QA, u69.QB, u69.QC, low)
 	PARAM(u71.ROM, "u90_702128_82s129.bin")
+	// The prom is always enabled and outputs are only connected to logic inputs
+	PARAM(u71.FORCE_TRISTATE_LOGIC, 1)
 
 	/* signal decoding */
 	TTL_9334(u72, high, u81.Q1Q, u71.O4, u71.O1, u71.O2, u71.O3)
@@ -69,7 +71,7 @@ NETLIST_START(hazelvid)
 	ALIAS(char_line_clk, u83_1.Q)
 
 	/* Character line counter */
-	TTL_74161(u84, low, low, low, low, high, u83_3.Q, char_line_clk, high, high)
+	TTL_74161_FIXME(u84, low, low, low, low, high, u83_3.Q, char_line_clk, high, high)
 	ALIAS(lc20, u84.QA)
 	ALIAS(lc21, u84.QB)
 	ALIAS(lc22, u84.QC)
@@ -80,7 +82,7 @@ NETLIST_START(hazelvid)
 	TTL_7410_NAND(u89_3, u90.QD, u90.QC, u90.QA)
 
 	/* Character row counter */
-	TTL_74161(u90, low, low, low, low, high, u89_3.Q, u92_3.Q, high, high)
+	TTL_74161_FIXME(u90, low, low, low, low, high, u89_3.Q, u92_3.Q, high, high)
 	TTL_7404_INVERT(u92_3, u84.QD)
 	TTL_7404_INVERT(u92_1, u90.QB)
 
@@ -222,7 +224,10 @@ NETLIST_START(hazelvid)
 	EPROM_2716(u78, low, low, lc20, lc21, lc22, lc23, u66.Q1, u66.Q2, u66.Q3, u66.Q4, u66.Q5, u66.Q6, u56.Q1)
 	PARAM(u78.ROM, "u83_chr.bin")
 
-	TTL_74166(u77, video_clk, low, ndot, low, u78.D0, u78.D1, u78.D2, u78.D3, u78.D4, u78.D5, u78.D6, low, clr_vid_sr)
+	// The eprom is always enabled and outputs are only connected to logic inputs
+	PARAM(u78.FORCE_TRISTATE_LOGIC, 1)
+
+	TTL_74166(u77, video_clk, low, ndot, low, u78.O0, u78.O1, u78.O2, u78.O3, u78.O4, u78.O5, u78.O6, low, clr_vid_sr)
 	ALIAS(raw_dot, u77.QH)
 
 	TTL_7400_NAND(u79_4, fgbit_q, fgbit_q)
@@ -243,5 +248,10 @@ NETLIST_START(hazelvid)
 
 	NET_C(R21_POT.3, GND)
 	NET_C(R21_POT.2, GND)
+
+	NET_C(VCC, high.VCC, low.VCC, cpu_ba4.VCC, cpu_iowq.VCC, ba13.VCC, memwq.VCC, rwq.VCC, mrq.VCC,
+		cpu_db0.VCC, cpu_db1.VCC, cpu_db2.VCC, cpu_db3.VCC, cpu_db4.VCC, cpu_db5.VCC, cpu_db6.VCC, cpu_db7.VCC)
+	NET_C(GND, high.GND, low.GND, cpu_ba4.GND, cpu_iowq.GND, ba13.GND, memwq.GND, rwq.GND, mrq.GND,
+		cpu_db0.GND, cpu_db1.GND, cpu_db2.GND, cpu_db3.GND, cpu_db4.GND, cpu_db5.GND, cpu_db6.GND, cpu_db7.GND)
 
 NETLIST_END()

@@ -11,7 +11,7 @@
 #include "uniform.h"
 
 const uniform_reader::string_to_enum uniform_reader::TYPE_NAMES[uniform_reader::TYPE_COUNT] = {
-	{ "int",    bgfx::UniformType::Int1 },
+	{ "int",    bgfx::UniformType::Sampler },
 	{ "vec4",   bgfx::UniformType::Vec4 },
 	{ "mat3",   bgfx::UniformType::Mat3 },
 	{ "mat4",   bgfx::UniformType::Mat4 }
@@ -32,7 +32,7 @@ bgfx_uniform* uniform_reader::read_from_value(const Value& value, std::string pr
 	const size_t array_size = value_array.Size() * sizeof(float);
 
 	const size_t alloc_size = (type_size > array_size) ? type_size : array_size;
-	float* data = reinterpret_cast<float*>(new char[alloc_size]);
+	auto* data = reinterpret_cast<float*>(new char[alloc_size]);
 
 	unsigned int index = 0;
 	for (; index < type_size / 4 && index < value_array.Size(); index++)
@@ -45,7 +45,7 @@ bgfx_uniform* uniform_reader::read_from_value(const Value& value, std::string pr
 		data[index] = 0.0f;
 	}
 
-	bgfx_uniform* uniform = new bgfx_uniform(name, type);
+	auto* uniform = new bgfx_uniform(name, type);
 	uniform->set((void*)data, type_size);
 	delete [] data;
 

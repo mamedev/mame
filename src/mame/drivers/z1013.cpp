@@ -74,10 +74,10 @@ public:
 	void z1013(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(z1013_keyboard_w);
-	DECLARE_READ8_MEMBER(port_b_r);
-	DECLARE_WRITE8_MEMBER(port_b_w);
-	DECLARE_READ8_MEMBER(k7659_port_b_r);
+	void z1013_keyboard_w(uint8_t data);
+	uint8_t port_b_r();
+	void port_b_w(uint8_t data);
+	uint8_t k7659_port_b_r();
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	uint32_t screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -273,12 +273,12 @@ void z1013_state::machine_reset()
 	m_keyboard_line = 0;
 }
 
-WRITE8_MEMBER( z1013_state::z1013_keyboard_w )
+void z1013_state::z1013_keyboard_w(uint8_t data)
 {
 	m_keyboard_line = data;
 }
 
-READ8_MEMBER( z1013_state::port_b_r )
+uint8_t z1013_state::port_b_r()
 {
 	char kbdrow[6];
 	sprintf(kbdrow,"X%d", m_keyboard_line & 7);
@@ -295,13 +295,13 @@ READ8_MEMBER( z1013_state::port_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( z1013_state::port_b_w )
+void z1013_state::port_b_w(uint8_t data)
 {
 	m_keyboard_part = BIT(data, 4); // for z1013a2 only
 	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( z1013_state::k7659_port_b_r )
+uint8_t z1013_state::k7659_port_b_r()
 {
 	return 0xff;
 }
@@ -401,7 +401,7 @@ void z1013_state::z1013(machine_config &config)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	SNAPSHOT(config, "snapshot", "z80").set_load_callback(FUNC(z1013_state::snapshot_cb), this);
+	SNAPSHOT(config, "snapshot", "z80").set_load_callback(FUNC(z1013_state::snapshot_cb));
 }
 
 void z1013_state::z1013k76(machine_config &config)

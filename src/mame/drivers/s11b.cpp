@@ -26,7 +26,6 @@
 #include "emu.h"
 #include "includes/s11b.h"
 
-#include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -174,7 +173,7 @@ WRITE8_MEMBER( s11b_state::bg_speech_digit_w )
 		m_bg_hc55516->digit_w(data);
 }
 
-WRITE8_MEMBER( s11b_state::dig1_w )
+void s11b_state::dig1_w(uint8_t data)
 {
 	uint32_t seg = get_segment2();
 	seg |= data;
@@ -190,7 +189,7 @@ WRITE8_MEMBER( s11b_state::dig1_w )
 	set_segment2(seg);
 }
 
-WRITE8_MEMBER( s11b_state::pia2c_pa_w )
+void s11b_state::pia2c_pa_w(uint8_t data)
 {
 	uint32_t seg = get_segment1();
 	seg |= (data<<8);
@@ -206,7 +205,7 @@ WRITE8_MEMBER( s11b_state::pia2c_pa_w )
 	set_segment1(seg);
 }
 
-WRITE8_MEMBER( s11b_state::pia2c_pb_w )
+void s11b_state::pia2c_pb_w(uint8_t data)
 {
 	uint32_t seg = get_segment1();
 	seg |= data;
@@ -222,7 +221,7 @@ WRITE8_MEMBER( s11b_state::pia2c_pb_w )
 	set_segment1(seg);
 }
 
-WRITE8_MEMBER( s11b_state::pia34_pa_w )
+void s11b_state::pia34_pa_w(uint8_t data)
 {
 	uint32_t seg = get_segment2();
 	seg |= (data<<8);
@@ -313,6 +312,7 @@ void s11b_state::s11b(machine_config &config)
 
 	/* Add the soundcard */
 	M6802(config, m_audiocpu, XTAL(4'000'000));
+	m_audiocpu->set_ram_enable(false);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &s11b_state::s11b_audio_map);
 
 	SPEAKER(config, "speaker").front_center();
@@ -336,7 +336,7 @@ void s11b_state::s11b(machine_config &config)
 	/* Add the background music card */
 	MC6809E(config, m_bgcpu, XTAL(8'000'000) / 4); // MC68B09E
 	m_bgcpu->set_addrmap(AS_PROGRAM, &s11b_state::s11b_bg_map);
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	SPEAKER(config, "bg").front_center();
 	YM2151(config, m_ym, 3580000);

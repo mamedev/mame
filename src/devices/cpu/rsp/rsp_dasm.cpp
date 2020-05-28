@@ -230,7 +230,7 @@ void rsp_disassembler::disasm_swc2(std::ostream &stream, uint32_t op)
 
 u32 rsp_disassembler::opcode_alignment() const
 {
-	return 1;
+	return 4;
 }
 
 offs_t rsp_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)

@@ -10,13 +10,13 @@
 #include "machine/74259.h"
 #include "machine/wd_fdc.h"
 
-DECLARE_DEVICE_TYPE(JASMIN, jasmin_device)
+DECLARE_DEVICE_TYPE(ORIC_JASMIN, oric_jasmin_device)
 
-class jasmin_device : public oricext_device
+class oric_jasmin_device : public device_t, public device_oricext_interface
 {
 public:
-	jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~jasmin_device();
+	oric_jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~oric_jasmin_device();
 
 	DECLARE_INPUT_CHANGED_MEMBER(boot_pressed);
 

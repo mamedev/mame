@@ -17,23 +17,25 @@
 
 enum cassette_state
 {
-	/* this part of the state is controlled by the UI */
+	// this part of the state is controlled by the UI
 	CASSETTE_STOPPED            = 0,
 	CASSETTE_PLAY               = 1,
 	CASSETTE_RECORD             = 2,
 
-	/* this part of the state is controlled by drivers */
+	// this part of the state is controlled by drivers
 	CASSETTE_MOTOR_ENABLED      = 0,
 	CASSETTE_MOTOR_DISABLED     = 4,
 	CASSETTE_SPEAKER_ENABLED    = 0,
 	CASSETTE_SPEAKER_MUTED      = 8,
 
-	/* masks */
+	// masks
 	CASSETTE_MASK_UISTATE       = 3,
 	CASSETTE_MASK_MOTOR         = 4,
 	CASSETTE_MASK_SPEAKER       = 8,
 	CASSETTE_MASK_DRVSTATE      = 12
 };
+
+DECLARE_ENUM_BITWISE_OPERATORS(cassette_state)
 
 
 /***************************************************************************
@@ -54,7 +56,6 @@ public:
 	void set_formats(const struct CassetteFormat*  const *formats) { m_formats = formats; }
 	void set_create_opts(const struct CassetteOptions  *create_opts) { m_create_opts = create_opts; }
 	void set_default_state(cassette_state default_state) { m_default_state = default_state; }
-	void set_default_state(int default_state) { m_default_state = (cassette_state)default_state; }
 	void set_interface(const char *interface) { m_interface = interface; }
 
 	// image-level overrides
@@ -62,21 +63,20 @@ public:
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual std::string call_display() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CASSETTE; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CASSETTE; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return m_interface; }
-	virtual const char *file_extensions() const override { return m_extension_list; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *image_interface() const noexcept override { return m_interface; }
+	virtual const char *file_extensions() const noexcept override { return m_extension_list; }
 
 	// specific implementation
 	cassette_state get_state() { return m_state; }
-	void set_state(cassette_state state) { change_state(state, (cassette_state)(~0)); }
+	void set_state(cassette_state state) { change_state(state, cassette_state(~0)); }
 	void change_state(cassette_state state, cassette_state mask);
 
 	double input();
@@ -103,6 +103,9 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual const bool use_software_list_file_extension_for_filetype() const override { return true; }
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 private:
 	cassette_image  *m_cassette;

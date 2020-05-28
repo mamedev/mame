@@ -296,14 +296,14 @@ void prof80_state::prof80_mmu(address_map &map)
 void prof80_state::prof80_io(address_map &map)
 {
 	map(0x00, 0xd7).mirror(0xff00).rw(m_ecb, FUNC(ecbbus_device::io_r), FUNC(ecbbus_device::io_w));
-//  AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80STI_TAG, z80sti_device, read, write)
-//  AM_RANGE(0x94, 0x95) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(UNIO_Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
-//  AM_RANGE(0x96, 0x97) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(UNIO_Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
-//  AM_RANGE(0x9e, 0x9e) AM_MIRROR(0xff00) AM_WRITE(unio_ctrl_w)
-//  AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_device, write)
-//  AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_device, write)
-//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_READ(gripc_r)
-//  AM_RANGE(0xc1, 0xc1) AM_MIRROR(0xff00) AM_READWRITE(gripd_r, gripd_w)
+//  map(0x80, 0x8f).mirror(0xff00).rw(UNIO_Z80STI_TAG, FUNC(z80sti_device::read), FUNC(z80sti_device::write));
+//  map(0x94, 0x95).mirror(0xff00).rw(UNIO_Z80SIO_TAG, FUNC(z80sio_device::z80sio_d_r), FUNC(z80sio_device::z80sio_d_w)); // TODO: these methods don't exist anymore
+//  map(0x96, 0x97).mirror(0xff00).rw(UNIO_Z80SIO_TAG, FUNC(z80sio_device::z80sio_c_r), FUNC(z80sio_device::z80sio_c_w)); // TODO: these methods don't exist anymore
+//  map(0x9e, 0x9e).mirror(0xff00).w(FUNC(prof80_state::unio_ctrl_w));
+//  map(0x9c, 0x9c).mirror(0xff00).w(UNIO_CENTRONICS1_TAG, FUNC(centronics_device::write));
+//  map(0x9d, 0x9d).mirror(0xff00).w(UNIO_CENTRONICS1_TAG, FUNC(centronics_device::write));
+//  map(0xc0, 0xc0).mirror(0xff00).r(FUNC(prof80_state::gripc_r));
+//  map(0xc1, 0xc1).mirror(0xff00).rw(FUNC(prof80_state::gripd_r), FUNC(prof80_state::gripd_w));
 	map(0xd8, 0xd8).mirror(0xff00).w(FUNC(prof80_state::flr_w));
 	map(0xda, 0xda).mirror(0xff00).r(FUNC(prof80_state::status_r));
 	map(0xdb, 0xdb).mirror(0xff00).r(FUNC(prof80_state::status2_r));
@@ -494,11 +494,11 @@ void prof80_state::prof80(machine_config &config)
 
 	// ECB bus
 	ECBBUS(config, m_ecb);
-	ECBBUS_SLOT(config, "ecb_1", 1, ecbbus_cards, "grip21");
-	ECBBUS_SLOT(config, "ecb_2", 2, ecbbus_cards, nullptr);
-	ECBBUS_SLOT(config, "ecb_3", 3, ecbbus_cards, nullptr);
-	ECBBUS_SLOT(config, "ecb_4", 4, ecbbus_cards, nullptr);
-	ECBBUS_SLOT(config, "ecb_5", 5, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_1", m_ecb, 1, ecbbus_cards, "grip21");
+	ECBBUS_SLOT(config, "ecb_2", m_ecb, 2, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_3", m_ecb, 3, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_4", m_ecb, 4, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_5", m_ecb, 5, ecbbus_cards, nullptr);
 
 	// V24
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);

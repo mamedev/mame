@@ -14,8 +14,8 @@
 #include "cpu/mcs51/mcs51.h"
 #include "sound/upd7759.h"
 #include "machine/adc0844.h"
-#include "machine/mc2661.h"
 #include "machine/mc68681.h"
+#include "machine/scn_pci.h"
 #include "emupal.h"
 
 
@@ -58,7 +58,7 @@ public:
 	void init_micro3d();
 	void init_botss();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
+	DECLARE_READ_LINE_MEMBER(botss_hwchk_r);
 
 protected:
 	enum
@@ -159,7 +159,7 @@ private:
 	DECLARE_WRITE32_MEMBER(micro3d_mac2_w);
 	DECLARE_READ16_MEMBER(micro3d_encoder_h_r);
 	DECLARE_READ16_MEMBER(micro3d_encoder_l_r);
-	DECLARE_READ8_MEMBER(adc_volume_r);
+	uint8_t adc_volume_r();
 	DECLARE_READ16_MEMBER(botss_140000_r);
 	DECLARE_READ16_MEMBER(botss_180000_r);
 	DECLARE_WRITE16_MEMBER(micro3d_reset_w);
@@ -175,18 +175,18 @@ private:
 	DECLARE_READ32_MEMBER(micro3d_pipe_r);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_a);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_b);
-	DECLARE_WRITE8_MEMBER(micro3d_sound_p1_w);
-	DECLARE_WRITE8_MEMBER(micro3d_sound_p3_w);
-	DECLARE_READ8_MEMBER(micro3d_sound_p1_r);
-	DECLARE_READ8_MEMBER(micro3d_sound_p3_r);
+	void micro3d_sound_p1_w(uint8_t data);
+	void micro3d_sound_p3_w(uint8_t data);
+	uint8_t micro3d_sound_p1_r();
+	uint8_t micro3d_sound_p3_r();
 	INTERRUPT_GEN_MEMBER(micro3d_vblank);
 	TIMER_CALLBACK_MEMBER(mac_done_callback);
 	DECLARE_WRITE8_MEMBER(micro3d_upd7759_w);
-	DECLARE_WRITE8_MEMBER(data_from_i8031);
-	DECLARE_READ8_MEMBER(data_to_i8031);
+	void data_from_i8031(uint8_t data);
+	uint8_t data_to_i8031();
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_READ8_MEMBER(duart_input_r);
-	DECLARE_WRITE8_MEMBER(duart_output_w);
+	uint8_t duart_input_r();
+	void duart_output_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(duart_txb);
 	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
@@ -208,7 +208,7 @@ private:
 	void soundmem_prg(address_map &map);
 	void vgbmem(address_map &map);
 
-	required_device<mc2661_device> m_vgb_uart;
+	required_device<scn2651_device> m_vgb_uart;
 };
 
 #endif // MAME_INCLUDES_MICRO3D_H

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-/* Super80.c written by Robbbert, 2005-2009. See driver source for documentation. */
+/* Super80.cpp written by Robbbert, 2005-2009. See driver source for documentation. */
 
 #include "emu.h"
 #include "includes/super80.h"
@@ -9,21 +9,19 @@
 /**************************** PIO ******************************************************************************/
 
 
-WRITE8_MEMBER( super80_state::pio_port_a_w )
+void super80_state::pio_port_a_w(u8 data)
 {
 	m_keylatch = data;
-	m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff)); // refresh kbd int
+	m_pio->port_b_write(pio_port_b_r()); // refresh kbd int
 }
 
-READ8_MEMBER( super80_state::pio_port_b_r )
+uint8_t super80_state::pio_port_b_r()
 {
 	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
-	{
 		if (!BIT(m_keylatch, i))
 			data &= m_io_keyboard[i]->read();
-	}
 
 	m_key_pressed = 3;
 
@@ -32,7 +30,7 @@ READ8_MEMBER( super80_state::pio_port_b_r )
 
 /**************************** CASSETTE ROUTINES *****************************************************************/
 
-void super80_state::super80_cassette_motor( bool motor_state )
+void super80_state::cassette_motor( bool motor_state )
 {
 	// relay sound
 	if (BIT(m_last_data, 1) != motor_state)
@@ -60,7 +58,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_k )
 		m_key_pressed--;
 	else
 	if (!m_key_pressed)
-		m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
+		m_pio->port_b_write(pio_port_b_r());
 }
 
 /* cassette load circuit
@@ -89,16 +87,11 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::kansas_r )
 	}
 }
 
-/* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER(super80_state::super80_reset)
-{
-	membank("boot")->set_entry(0);
-}
 
 TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_h )
 {
 	uint8_t go_fast = 0;
-	if ( (!BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 1)) )    /* bit 2 of port F0 is low, OR user turned on config switch */
+	if ( (!BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 1)) )    // bit 2 of port F0 is low, OR user turned on config switch
 		go_fast++; // must be 1 at boot so banking works correctly
 
 	/* code to slow down computer to 1 MHz by halting cpu on every second frame */
@@ -137,13 +130,13 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_h )
 
 /**************************** I/O PORTS *****************************************************************/
 
-READ8_MEMBER( super80_state::port3e_r )
+u8 super80v_state::port3e_r()
 {
 	return 0xF8 | (m_fdc->intrq_r() << 0) | (m_fdc->drq_r() << 1) | 4;
 }
 
 // UFDC board can support 4 drives; we support 2
-WRITE8_MEMBER( super80_state::port3f_w )
+void super80v_state::port3f_w(u8 data)
 {
 	// m_fdc->58(BIT(data, 0));   5/8 pin not emulated in wd_fdc
 	m_fdc->enmf_w(BIT(data,1));
@@ -151,8 +144,8 @@ WRITE8_MEMBER( super80_state::port3f_w )
 	floppy_image_device *floppy = nullptr;
 	if (BIT(data, 2)) floppy = m_floppy0->get_device();
 	if (BIT(data, 3)) floppy = m_floppy1->get_device();
-	//if (BIT(data, 4)) floppy = m_floppy2->get_device();
-	//if (BIT(data, 5)) floppy = m_floppy3->get_device();
+	if (BIT(data, 4)) floppy = m_floppy2->get_device();
+	if (BIT(data, 5)) floppy = m_floppy3->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -165,71 +158,103 @@ WRITE8_MEMBER( super80_state::port3f_w )
 	m_fdc->dden_w(BIT(data, 7));
 }
 
-READ8_MEMBER( super80_state::super80_f2_r )
+u8 super80_state::portf2_r()
 {
-	uint8_t data = m_io_dsw->read() & 0xf0;  // dip switches on pcb
+	u8 data = m_io_dsw->read() & 0xf0;  // dip switches on pcb
 	data |= m_cass_data[2];         // bit 0 = output of U1, bit 1 = MDS cass state, bit 2 = current wave_state
 	data |= 0x08;               // bit 3 - not used
 	return data;
 }
 
-WRITE8_MEMBER( super80_state::super80_dc_w )
+void super80_state::portdc_w(u8 data)
 {
-	/* hardware strobe driven from port select, bit 7..0 = data */
+	// hardware strobe driven from port select, bit 7..0 = data
 	m_cent_data_out->write(data);
 	m_centronics->write_strobe(0);
 	m_centronics->write_strobe(1);
 }
 
 
-WRITE8_MEMBER( super80_state::super80_f0_w )
+void super80_state::portf0_w(u8 data)
 {
-	uint8_t bits = data ^ m_last_data;
+	u8 bits = data ^ m_last_data;
 	m_portf0 = data;
-	m_speaker->level_w(BIT(data, 3));               /* bit 3 - speaker */
-	if (BIT(bits, 1)) super80_cassette_motor(BIT(data, 1));  /* bit 1 - cassette motor */
-	m_cassette->output( BIT(data, 0) ? -1.0 : +1.0);    /* bit 0 - cass out */
+	m_speaker->level_w(BIT(data, 3));               // bit 3 - speaker
+	if (BIT(bits, 1)) cassette_motor(BIT(data, 1));  // bit 1 - cassette motor
+	m_cassette->output( BIT(data, 0) ? -1.0 : +1.0);    // bit 0 - cass out
 
 	m_last_data = data;
 }
 
-WRITE8_MEMBER( super80_state::super80r_f0_w )
-{
-	uint8_t bits = data ^ m_last_data;
-	m_portf0 = data | 0x14;
-	m_speaker->level_w(BIT(data, 3));               /* bit 3 - speaker */
-	if (BIT(bits, 1)) super80_cassette_motor(BIT(data, 1));  /* bit 1 - cassette motor */
-	m_cassette->output( BIT(data, 0) ? -1.0 : +1.0);    /* bit 0 - cass out */
-
-	m_last_data = data;
-}
 
 /**************************** BASIC MACHINE CONSTRUCTION ***********************************************************/
 
-MACHINE_RESET_MEMBER( super80_state, super80 )
+void super80_state::machine_start_common()
 {
+	m_cass_led.resolve();
+
+	// register for savestates
+	save_item(NAME(m_portf0));
+	save_item(NAME(m_s_options));
+	save_item(NAME(m_palette_index));
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_key_pressed));
+	save_item(NAME(m_boot_in_progress));
+	save_item(NAME(m_last_data));
+}
+
+void super80_state::machine_start()
+{
+	machine_start_common();
+	save_item(NAME(m_int_sw));
+	save_item(NAME(m_vidpg));
+	save_item(NAME(m_current_charset));
+}
+
+void super80v_state::machine_start()
+{
+	// zerofill
+	m_vram = make_unique_clear<u8[]>(0x3000);
+	save_pointer(NAME(m_vram), 0x3000);
+	machine_start_common();
+}
+
+void super80_state::machine_reset_common()
+{
+	m_boot_in_progress = true;
 	m_portf0 = 0; // must be 0 like real machine, or banking breaks on 32-col systems
 	m_keylatch = 0xff;
 	m_key_pressed = 0;
 	m_palette_index = 0;
-	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(super80_state::super80_reset),this));
-	membank("boot")->set_entry(1);
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x0fff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xc000, 0xcfff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
 }
 
-MACHINE_RESET_MEMBER( super80_state, super80r )
+void super80_state::machine_reset()
 {
-	m_portf0 = 0x14;
-	m_keylatch = 0xff;
-	m_key_pressed = 0;
-	m_palette_index = 0;
-	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(super80_state::super80_reset),this));
-	membank("boot")->set_entry(1);
+	machine_reset_common();
+	m_vidpg = 0xfe00;
 }
 
-void super80_state::init_super80()
+void super80v_state::machine_reset()
 {
-	uint8_t *RAM = memregion("maincpu")->base();
-	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
+	machine_reset_common();
 }
 
 
@@ -241,13 +266,13 @@ QUICKLOAD_LOAD_MEMBER(super80_state::quickload_cb)
 {
 	uint16_t exec_addr, start_addr, end_addr;
 
-	/* load the binary into memory */
+	// load the binary into memory
 	if (z80bin_load_file(&image, m_maincpu->space(AS_PROGRAM), file_type, &exec_addr, &start_addr, &end_addr) != image_init_result::PASS)
 		return image_init_result::FAIL;
 
-	/* is this file executable? */
+	// is this file executable?
 	if (exec_addr != 0xffff)
-		/* check to see if autorun is on */
+		// check to see if autorun is on
 		if (BIT(m_io_config->read(), 0))
 			m_maincpu->set_pc(exec_addr);
 

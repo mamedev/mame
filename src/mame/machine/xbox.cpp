@@ -21,6 +21,18 @@ const xbox_base_state::debugger_constants xbox_base_state::debugp[] = {
 	{ 0x49d8055a, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} }
 };
 
+const struct {
+	const char *name;
+	const int value;
+} vertex_format_names[] = {
+	{"NONE", 0x02}, {"NORMSHORT1", 0x11}, {"FLOAT1", 0x12}, {"PBYTE1", 0x14},
+	{"SHORT1", 0x15}, {"NORMPACKED3", 0x16}, {"NORMSHORT2", 0x21},
+	{"FLOAT2", 0x22}, {"PBYTE2", 0x24}, {"SHORT2", 0x25}, {"NORMSHORT3", 0x31},
+	{"FLOAT3", 0x32}, {"PBYTE3", 0x34}, {"SHORT3", 0x35}, {"D3DCOLOR", 0x40},
+	{"FLOAT4", 0x42}, {"NORMSHORT4", 0x41}, {"PBYTE4", 0x44}, {"SHORT4", 0x45},
+	{"FLOAT2H", 0x72}, { nullptr, 0}
+};
+
 int xbox_base_state::find_bios_index()
 {
 	u8 sb = system_bios();
@@ -36,7 +48,7 @@ bool xbox_base_state::find_bios_hash(int bios, uint32_t &crc32)
 	{
 		if (ROMENTRY_ISFILE(re))
 		{
-			if (ROM_GETBIOSFLAGS(re) == (bios + 1))
+			if (ROM_GETBIOSFLAGS(re) == (uint32_t)(bios + 1))
 			{
 				const std::string &h = re.hashdata();
 				util::hash_collection hc(h.c_str());
@@ -71,7 +83,6 @@ void xbox_base_state::find_debug_params()
 
 void xbox_base_state::dump_string_command(int ref, const std::vector<std::string> &params)
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
 	uint64_t addr;
@@ -89,11 +100,10 @@ void xbox_base_state::dump_string_command(int ref, const std::vector<std::string
 		con.printf("Address is unmapped.\n");
 		return;
 	}
-	address = (offs_t)addr;
 
-	uint32_t length = cpu.read_word(space, address, true);
-	uint32_t maximumlength = cpu.read_word(space, address + 2, true);
-	offs_t buffer = cpu.read_dword(space, address + 4, true);
+	uint32_t length = space.read_word_unaligned(address);
+	uint32_t maximumlength = space.read_word_unaligned(address + 2);
+	offs_t buffer = space.read_dword_unaligned(address + 4);
 	con.printf("Length %d word\n", length);
 	con.printf("MaximumLength %d word\n", maximumlength);
 	con.printf("Buffer %08X byte* ", buffer);
@@ -102,17 +112,19 @@ void xbox_base_state::dump_string_command(int ref, const std::vector<std::string
 	if (length > 256)
 		length = 256;
 
-	for (int a = 0; a < length; a++)
+	if (m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, buffer))
 	{
-		uint8_t c = cpu.read_byte(space, buffer + a, true);
-		con.printf("%c", c);
+		for (int a = 0; a < length; a++)
+		{
+			uint8_t c = space.read_byte(buffer + a);
+			con.printf("%c", c);
+		}
 	}
 	con.printf("\n");
 }
 
 void xbox_base_state::dump_process_command(int ref, const std::vector<std::string> &params)
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
 	uint64_t addr;
@@ -130,21 +142,19 @@ void xbox_base_state::dump_process_command(int ref, const std::vector<std::strin
 		con.printf("Address is unmapped.\n");
 		return;
 	}
-	address = (offs_t)addr;
 
-	con.printf("ReadyListHead {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address, true), cpu.read_dword(space, address + 4, true));
-	con.printf("ThreadListHead {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address + 8, true), cpu.read_dword(space, address + 12, true));
-	con.printf("StackCount %d dword\n", cpu.read_dword(space, address + 16, true));
-	con.printf("ThreadQuantum %d dword\n", cpu.read_dword(space, address + 20, true));
-	con.printf("BasePriority %d byte\n", cpu.read_byte(space, address + 24, true));
-	con.printf("DisableBoost %d byte\n", cpu.read_byte(space, address + 25, true));
-	con.printf("DisableQuantum %d byte\n", cpu.read_byte(space, address + 26, true));
-	con.printf("_padding %d byte\n", cpu.read_byte(space, address + 27, true));
+	con.printf("ReadyListHead {%08X,%08X} _LIST_ENTRY\n", space.read_dword(address), space.read_dword_unaligned(address + 4));
+	con.printf("ThreadListHead {%08X,%08X} _LIST_ENTRY\n", space.read_dword(address + 8), space.read_dword_unaligned(address + 12));
+	con.printf("StackCount %d dword\n", space.read_dword_unaligned(address + 16));
+	con.printf("ThreadQuantum %d dword\n", space.read_dword_unaligned(address + 20));
+	con.printf("BasePriority %d byte\n", space.read_byte(address + 24));
+	con.printf("DisableBoost %d byte\n", space.read_byte(address + 25));
+	con.printf("DisableQuantum %d byte\n", space.read_byte(address + 26));
+	con.printf("_padding %d byte\n", space.read_byte(address + 27));
 }
 
 void xbox_base_state::dump_list_command(int ref, const std::vector<std::string> &params)
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
 	uint64_t addr;
@@ -172,7 +182,6 @@ void xbox_base_state::dump_list_command(int ref, const std::vector<std::string> 
 		con.printf("Address is unmapped.\n");
 		return;
 	}
-	address = (offs_t)addr;
 	if (params.size() >= 3)
 		con.printf("Entry    Object\n");
 	else
@@ -186,7 +195,7 @@ void xbox_base_state::dump_list_command(int ref, const std::vector<std::string> 
 		else
 			con.printf("%08X\n", (uint32_t)addr);
 		old = addr;
-		addr = cpu.read_dword(space, address, true);
+		addr = space.read_dword_unaligned(address);
 		if (addr == start)
 			break;
 		if (addr == old)
@@ -194,13 +203,11 @@ void xbox_base_state::dump_list_command(int ref, const std::vector<std::string> 
 		address = (offs_t)addr;
 		if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 			break;
-		address = (offs_t)addr;
 	}
 }
 
 void xbox_base_state::dump_dpc_command(int ref, const std::vector<std::string> &params)
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
 	uint64_t addr;
@@ -218,20 +225,18 @@ void xbox_base_state::dump_dpc_command(int ref, const std::vector<std::string> &
 		con.printf("Address is unmapped.\n");
 		return;
 	}
-	address = (offs_t)addr;
-	con.printf("Type %d word\n", cpu.read_word(space, address, true));
-	con.printf("Inserted %d byte\n", cpu.read_byte(space, address + 2, true));
-	con.printf("Padding %d byte\n", cpu.read_byte(space, address + 3, true));
-	con.printf("DpcListEntry {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address + 4, true), cpu.read_dword(space, address + 8, true));
-	con.printf("DeferredRoutine %08X dword\n", cpu.read_dword(space, address + 12, true));
-	con.printf("DeferredContext %08X dword\n", cpu.read_dword(space, address + 16, true));
-	con.printf("SystemArgument1 %08X dword\n", cpu.read_dword(space, address + 20, true));
-	con.printf("SystemArgument2 %08X dword\n", cpu.read_dword(space, address + 24, true));
+	con.printf("Type %d word\n", space.read_word_unaligned(address));
+	con.printf("Inserted %d byte\n", space.read_byte(address + 2));
+	con.printf("Padding %d byte\n", space.read_byte(address + 3));
+	con.printf("DpcListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 4), space.read_dword_unaligned(address + 8, true));
+	con.printf("DeferredRoutine %08X dword\n", space.read_dword_unaligned(address + 12));
+	con.printf("DeferredContext %08X dword\n", space.read_dword_unaligned(address + 16));
+	con.printf("SystemArgument1 %08X dword\n", space.read_dword_unaligned(address + 20));
+	con.printf("SystemArgument2 %08X dword\n", space.read_dword_unaligned(address + 24));
 }
 
 void xbox_base_state::dump_timer_command(int ref, const std::vector<std::string> &params)
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
 	uint64_t addr;
@@ -249,22 +254,20 @@ void xbox_base_state::dump_timer_command(int ref, const std::vector<std::string>
 		con.printf("Address is unmapped.\n");
 		return;
 	}
-	address = (offs_t)addr;
-	con.printf("Header.Type %d byte\n", cpu.read_byte(space, address, true));
-	con.printf("Header.Absolute %d byte\n", cpu.read_byte(space, address + 1, true));
-	con.printf("Header.Size %d byte\n", cpu.read_byte(space, address + 2, true));
-	con.printf("Header.Inserted %d byte\n", cpu.read_byte(space, address + 3, true));
-	con.printf("Header.SignalState %08X dword\n", cpu.read_dword(space, address + 4, true));
-	con.printf("Header.WaitListEntry {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address + 8, true), cpu.read_dword(space, address + 12, true));
-	con.printf("%s", string_format("DueTime %x qword\n", (int64_t)cpu.read_qword(space, address + 16, true)).c_str());
-	con.printf("TimerListEntry {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address + 24, true), cpu.read_dword(space, address + 28, true));
-	con.printf("Dpc %08X dword\n", cpu.read_dword(space, address + 32, true));
-	con.printf("Period %d dword\n", cpu.read_dword(space, address + 36, true));
+	con.printf("Header.Type %d byte\n", space.read_byte(address));
+	con.printf("Header.Absolute %d byte\n", space.read_byte(address + 1));
+	con.printf("Header.Size %d byte\n", space.read_byte(address + 2));
+	con.printf("Header.Inserted %d byte\n", space.read_byte(address + 3));
+	con.printf("Header.SignalState %08X dword\n", space.read_dword_unaligned(address + 4));
+	con.printf("Header.WaitListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 8), space.read_dword_unaligned(address + 12));
+	con.printf("%s", string_format("DueTime %x qword\n", (int64_t)space.read_qword_unaligned(address + 16)).c_str());
+	con.printf("TimerListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 24), space.read_dword_unaligned(address + 28));
+	con.printf("Dpc %08X dword\n", space.read_dword_unaligned(address + 32));
+	con.printf("Period %d dword\n", space.read_dword_unaligned(address + 36));
 }
 
 void xbox_base_state::curthread_command(int ref, const std::vector<std::string> &params)
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
 	offs_t address;
@@ -276,26 +279,29 @@ void xbox_base_state::curthread_command(int ref, const std::vector<std::string> 
 		con.printf("Address is unmapped.\n");
 		return;
 	}
-	address = (offs_t)fsbase + (offs_t)debugc_bios->parameter[7-1];
 
-	uint32_t kthrd = cpu.read_dword(space, address, true);
+	uint32_t kthrd = space.read_dword_unaligned(address);
 	con.printf("Current thread is %08X\n", kthrd);
 	address = (offs_t)(kthrd + debugc_bios->parameter[8-1]);
-	uint32_t topstack = cpu.read_dword(space, address, true);
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
+		return;
+	uint32_t topstack = space.read_dword_unaligned(address);
 	con.printf("Current thread stack top is %08X\n", topstack);
 	address = (offs_t)(kthrd + debugc_bios->parameter[4-1]);
-	uint32_t tlsdata = cpu.read_dword(space, address, true);
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
+		return;
+	uint32_t tlsdata = space.read_dword_unaligned(address);
 	if (tlsdata == 0)
 		address = (offs_t)(topstack - debugc_bios->parameter[5-1] - debugc_bios->parameter[6-1]);
 	else
 		address = (offs_t)(tlsdata - debugc_bios->parameter[6-1]);
-	con.printf("Current thread function is %08X\n", cpu.read_dword(space, address, true));
+	if (m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
+		con.printf("Current thread function is %08X\n", space.read_dword_unaligned(address));
 }
 
 void xbox_base_state::threadlist_command(int ref, const std::vector<std::string> &params)
 {
 	address_space &space = m_maincpu->space();
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 
 	con.printf("Pri. _KTHREAD   Stack  Function\n");
@@ -303,20 +309,31 @@ void xbox_base_state::threadlist_command(int ref, const std::vector<std::string>
 	for (int pri = 0; pri < 16; pri++)
 	{
 		uint32_t curr = debugc_bios->parameter[1 - 1] + pri * 8;
-		uint32_t next = cpu.read_dword(space, curr, true);
+		uint32_t addr = curr;
+		if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, addr))
+			continue;
+		uint32_t next = space.read_dword_unaligned(addr);
 
 		while ((next != curr) && (next != 0))
 		{
 			uint32_t kthrd = next - debugc_bios->parameter[2 - 1];
-			uint32_t topstack = cpu.read_dword(space, kthrd + debugc_bios->parameter[3 - 1], true);
-			uint32_t tlsdata = cpu.read_dword(space, kthrd + debugc_bios->parameter[4 - 1], true);
-			uint32_t function;
+			if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, kthrd))
+				break;
+			uint32_t topstack = space.read_dword_unaligned(kthrd + debugc_bios->parameter[3 - 1]);
+			uint32_t tlsdata = space.read_dword_unaligned(kthrd + debugc_bios->parameter[4 - 1]);
+			uint32_t function = 0;
 			if (tlsdata == 0)
-				function = cpu.read_dword(space, topstack - debugc_bios->parameter[5 - 1] - debugc_bios->parameter[6 - 1], true);
+				addr = topstack - debugc_bios->parameter[5 - 1] - debugc_bios->parameter[6 - 1];
 			else
-				function = cpu.read_dword(space, tlsdata - debugc_bios->parameter[6 - 1], true);
+				addr = tlsdata - debugc_bios->parameter[6 - 1];
+			if (m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, addr))
+				function = space.read_dword_unaligned(addr);
 			con.printf(" %02d  %08x %08x %08x\n", pri, kthrd, topstack, function);
-			next = cpu.read_dword(space, next, true);
+			addr = next;
+			if (m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, addr))
+				next = space.read_dword_unaligned(addr);
+			else
+				break;
 		}
 	}
 }
@@ -405,8 +422,8 @@ void xbox_base_state::vprogdis_command(int ref, const std::vector<std::string> &
 	if (params.size() < 3)
 		return;
 
-	uint64_t address;
-	if (!machine().debugger().commands().validate_number_parameter(params[1], address))
+	uint64_t addr;
+	if (!machine().debugger().commands().validate_number_parameter(params[1], addr))
 		return;
 
 	uint64_t length;
@@ -424,8 +441,8 @@ void xbox_base_state::vprogdis_command(int ref, const std::vector<std::string> &
 		uint32_t instruction[4];
 		if (type == 1)
 		{
-			offs_t addr = (offs_t)address;
-			if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, addr))
+			offs_t address = (offs_t)addr;
+			if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 				return;
 			instruction[0] = space.read_dword_unaligned(address);
 			instruction[1] = space.read_dword_unaligned(address + 4);
@@ -434,7 +451,7 @@ void xbox_base_state::vprogdis_command(int ref, const std::vector<std::string> &
 		}
 		else
 		{
-			nvidia_nv2a->debug_grab_vertex_program_slot((int)address, instruction);
+			nvidia_nv2a->debug_grab_vertex_program_slot((int)addr, instruction);
 		}
 
 		char line[64];
@@ -442,11 +459,92 @@ void xbox_base_state::vprogdis_command(int ref, const std::vector<std::string> &
 			machine().debugger().console().printf("%s\n", line);
 
 		if (type == 1)
-			address = address + 4 * 4;
+			addr = addr + 4 * 4;
 		else
-			address++;
+			addr++;
 
 		length--;
+	}
+}
+
+void xbox_base_state::vdeclaration_command(int ref, const std::vector<std::string> &params)
+{
+	address_space &space = m_maincpu->space();
+
+	if (params.size() < 1)
+		return;
+
+	uint64_t addr;
+	if (!machine().debugger().commands().validate_number_parameter(params[1], addr))
+		return;
+
+	debugger_console &con = machine().debugger().console();
+	for (int n = 128; n > 0; n--)
+	{
+		offs_t address = (offs_t)addr;
+		if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
+			return;
+		uint32_t w = space.read_dword_unaligned(address);
+
+		if (w == 0xffffffff)
+		{
+			con.printf("D3DVSD_END()\n");
+			break;
+		}
+		switch ((w >> 29) & 7)
+		{
+		case 0:
+			con.printf("D3DVSD_NOP()\n");
+			break;
+		case 1:
+			if (w & (1 << 28))
+				con.printf("D3DVSD_STREAM_TESS()\n");
+			else
+				con.printf("D3DVSD_STREAM(%d)\n", w & 0x1fffffff);
+			break;
+		case 2:
+			if (w & 0x18000000)
+				con.printf("D3DVSD_SKIPBYTES(%d)\n", (w >> 16) & 0xfff);
+			else if (w & 0x10000000)
+				con.printf("D3DVSD_SKIP(%d)\n", (w >> 16) & 0xfff);
+			else
+			{
+				const char *t = "???";
+
+				for (int s = 0; vertex_format_names[s].value != 0; s++)
+				{
+					if (vertex_format_names[s].value == ((w >> 16) & 0xfff))
+					{
+						t = vertex_format_names[s].name;
+						break;
+					}
+				}
+				con.printf("D3DVSD_REG(%d, D3DVSDT_%s)\n", w & 0xffff, t);
+			}
+			break;
+		case 3:
+			if (w & 0x10000000)
+				con.printf("D3DVSD_TESSUV(%d)\n", w & 0xf);
+			else
+				con.printf("D3DVSD_TESSNORMAL(%d, %d)\n", (w >> 20) & 0xf, w & 0xf);
+			break;
+		case 4:
+			con.printf("D3DVSD_CONST(%d, %d)\n", (w & 0xff) - 96, (w >> 25) & 0xf);
+			for (int n = 0; n < ((w >> 23) & 0x3c); n++)
+			{
+				addr += 4;
+				address = (offs_t)addr;
+				if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
+					return;
+				w = space.read_dword_unaligned(address);
+				con.printf("%08x\n", w);
+			}
+			break;
+		default:
+			con.printf("??? %08x\n", w);
+			n = 0;
+		}
+		addr += 4;
 	}
 }
 
@@ -469,6 +567,7 @@ void xbox_base_state::help_command(int ref, const std::vector<std::string> &para
 	con.printf("  xbox grab_texture,<type>,<filename> -- Save to <filename> the next used texture of type <type>\n");
 	con.printf("  xbox grab_vprog,<filename> -- save current vertex program instruction slots to <filename>\n");
 	con.printf("  xbox vprogdis,<address>,<length>[,<type>] -- disassemble <lenght> vertex program instructions at <address> of <type>\n");
+	con.printf("  xbox vdeclaration,<address> -- decode vertex program declaration at <address>\n");
 	con.printf("  xbox help -- this list\n");
 }
 
@@ -504,6 +603,8 @@ void xbox_base_state::xbox_debug_commands(int ref, const std::vector<std::string
 		grab_vprog_command(ref, params);
 	else if (params[0] == "vprogdis")
 		vprogdis_command(ref, params);
+	else if (params[0] == "vdeclaration")
+		vdeclaration_command(ref, params);
 	else
 		help_command(ref, params);
 }
@@ -856,7 +957,7 @@ void xbox_base_state::xbox_base(machine_config &config)
 	PENTIUM3(config, m_maincpu, 733333333); /* Wrong! family 6 model 8 stepping 10 */
 	m_maincpu->set_irq_acknowledge_callback(FUNC(xbox_base_state::irq_callback));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	PCI_ROOT(config,        ":pci", 0);
 	NV2A_HOST(config,       ":pci:00.0", 0, m_maincpu);

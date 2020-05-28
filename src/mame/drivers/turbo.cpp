@@ -211,49 +211,49 @@ MACHINE_RESET_MEMBER(turbo_state,buckrog)
         3 = IC6 - CPU Board, Sheet 5, D7
 */
 
-WRITE8_MEMBER(turbo_state::turbo_ppi0a_w)
+void turbo_state::turbo_ppi0a_w(uint8_t data)
 {
 	/* bit0-7 = 0PA0-7 */
 	m_turbo_opa = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_ppi0b_w)
+void turbo_state::turbo_ppi0b_w(uint8_t data)
 {
 	/* bit0-7 = 0PB0-7 */
 	m_turbo_opb = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_ppi0c_w)
+void turbo_state::turbo_ppi0c_w(uint8_t data)
 {
 	/* bit0-7 = 0PC0-7 */
 	m_turbo_opc = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_ppi1a_w)
+void turbo_state::turbo_ppi1a_w(uint8_t data)
 {
 	/* bit0-7 = 1PA0-7 */
 	m_turbo_ipa = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_ppi1b_w)
+void turbo_state::turbo_ppi1b_w(uint8_t data)
 {
 	/* bit0-7 = 1PB0-7 */
 	m_turbo_ipb = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_ppi1c_w)
+void turbo_state::turbo_ppi1c_w(uint8_t data)
 {
 	/* bit0-7 = 1PC0-7 */
 	m_turbo_ipc = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_ppi3c_w)
+void turbo_state::turbo_ppi3c_w(uint8_t data)
 {
 	/* bit 0-3 = PLA0-3 */
 	/* bit 4-6 = COL0-2 */
@@ -275,7 +275,7 @@ WRITE8_MEMBER(turbo_state::turbo_ppi3c_w)
         1 = IC119 - CPU Board, Sheet 3, A5
 */
 
-WRITE8_MEMBER(turbo_state::subroc3d_ppi0a_w)
+void turbo_state::subroc3d_ppi0a_w(uint8_t data)
 {
 	/* bit 0-3 = PLY0-3 */
 	/* bit 4-7 = n/c */
@@ -283,14 +283,14 @@ WRITE8_MEMBER(turbo_state::subroc3d_ppi0a_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::subroc3d_ppi0c_w)
+void turbo_state::subroc3d_ppi0c_w(uint8_t data)
 {
 	/* bit 0-3 = COL0-3 */
 	m_subroc3d_col = data & 0x0f;
 }
 
 
-WRITE8_MEMBER(turbo_state::subroc3d_ppi0b_w)
+void turbo_state::subroc3d_ppi0b_w(uint8_t data)
 {
 	/* bit 0 = COM1 (COIN METER 1) */
 	/* bit 1 = COM2 (COIN METER 2) */
@@ -309,14 +309,14 @@ WRITE8_MEMBER(turbo_state::subroc3d_ppi0b_w)
  *
  *************************************/
 
-WRITE8_MEMBER(turbo_state::buckrog_ppi0a_w)
+void turbo_state::buckrog_ppi0a_w(uint8_t data)
 {
 	/* bit 0-7 = data to be read on the /IOREQ */
 	m_buckrog_command = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::buckrog_ppi0b_w)
+void turbo_state::buckrog_ppi0b_w(uint8_t data)
 {
 	/* bit 0-5 = MOV0-5 */
 	/* bit 6-7 = n/c */
@@ -324,7 +324,7 @@ WRITE8_MEMBER(turbo_state::buckrog_ppi0b_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::buckrog_ppi0c_w)
+void turbo_state::buckrog_ppi0c_w(uint8_t data)
 {
 	/* bit 0-2 = FCHG0 */
 	/* bit 3-5 = n/c */
@@ -335,7 +335,7 @@ WRITE8_MEMBER(turbo_state::buckrog_ppi0c_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::buckrog_ppi1c_w)
+void turbo_state::buckrog_ppi1c_w(uint8_t data)
 {
 	/* bit 0-2 = OBCH0-2 */
 	/* bit   3 = n/c */
@@ -356,12 +356,12 @@ WRITE8_MEMBER(turbo_state::buckrog_ppi1c_w)
  *
  *************************************/
 
-WRITE8_MEMBER( turbo_state::scanlines_w )
+void turbo_state::scanlines_w(uint8_t data)
 {
 	m_i8279_scanlines = data;
 }
 
-WRITE8_MEMBER( turbo_state::digit_w )
+void turbo_state::digit_w(uint8_t data)
 {
 	static const uint8_t ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
@@ -376,27 +376,27 @@ WRITE8_MEMBER( turbo_state::digit_w )
  *
  *************************************/
 
-READ8_MEMBER(turbo_state::turbo_collision_r)
+uint8_t turbo_state::turbo_collision_r()
 {
 	m_screen->update_partial(m_screen->vpos());
 	return ioport("DSW3")->read() | (m_turbo_collision & 15);
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_collision_clear_w)
+void turbo_state::turbo_collision_clear_w(uint8_t data)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_turbo_collision = 0;
 }
 
 
-READ8_MEMBER(turbo_state::turbo_analog_r)
+uint8_t turbo_state::turbo_analog_r()
 {
 	return ioport("DIAL")->read() - m_turbo_last_analog;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_analog_reset_w)
+void turbo_state::turbo_analog_reset_w(uint8_t data)
 {
 	m_turbo_last_analog = ioport("DIAL")->read();
 }
@@ -427,7 +427,7 @@ WRITE_LINE_MEMBER(turbo_state::start_lamp_w)
  *
  *************************************/
 
-READ8_MEMBER(turbo_state::buckrog_cpu2_command_r)
+uint8_t turbo_state::buckrog_cpu2_command_r()
 {
 	/* assert ACK */
 	m_i8255_0->pc6_w(CLEAR_LINE);
@@ -435,7 +435,7 @@ READ8_MEMBER(turbo_state::buckrog_cpu2_command_r)
 }
 
 
-READ8_MEMBER(turbo_state::buckrog_port_2_r)
+uint8_t turbo_state::buckrog_port_2_r()
 {
 	int inp1 = ioport("DSW1")->read();
 	int inp2 = ioport("DSW2")->read();
@@ -451,7 +451,7 @@ READ8_MEMBER(turbo_state::buckrog_port_2_r)
 }
 
 
-READ8_MEMBER(turbo_state::buckrog_port_3_r)
+uint8_t turbo_state::buckrog_port_3_r()
 {
 	int inp1 = ioport("DSW1")->read();
 	int inp2 = ioport("DSW2")->read();
@@ -870,7 +870,7 @@ void turbo_state::turbo(machine_config &config)
 	m_i8255_3->in_pb_callback().set_ioport("DSW2");
 	m_i8255_3->out_pc_callback().set(FUNC(turbo_state::turbo_ppi3c_w));
 
-	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4)); // unknown clock
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16)); // clock = H1
 	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
 	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
@@ -914,7 +914,7 @@ void turbo_state::subroc3d(machine_config &config)
 	m_i8255_1->out_pb_callback().set(FUNC(turbo_state::subroc3d_sound_b_w));
 	m_i8255_1->out_pc_callback().set(FUNC(turbo_state::subroc3d_sound_c_w));
 
-	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4)); // unknown clock
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16)); // unknown clock
 	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
 	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
@@ -948,7 +948,7 @@ void turbo_state::buckrog(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &turbo_state::buckrog_cpu2_map);
 	m_subcpu->set_addrmap(AS_IO, &turbo_state::buckrog_cpu2_portmap);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 	MCFG_MACHINE_RESET_OVERRIDE(turbo_state,buckrog)
 
 	I8255(config, m_i8255_0);
@@ -961,7 +961,7 @@ void turbo_state::buckrog(machine_config &config)
 	m_i8255_1->out_pb_callback().set(FUNC(turbo_state::buckrog_sound_b_w));
 	m_i8255_1->out_pc_callback().set(FUNC(turbo_state::buckrog_ppi1c_w));
 
-	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4)); // unknown clock
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16)); // unknown clock
 	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
 	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
@@ -1119,6 +1119,61 @@ ROM_END
 
 ROM_START( turbob )
 	ROM_REGION( 0x6000, "maincpu", 0 )
+	// C revision label on all ROMs
+	ROM_LOAD( "epr-1363_t5c.ic76",  0x0000, 0x2000, CRC(a9c9571e) SHA1(724f8c1c13d3bf25bb675519e1388fd6882c4d0b) ) /* CPU module stamped as 834-0128 */
+	ROM_LOAD( "epr-1364_t5c.ic89",  0x2000, 0x2000, CRC(dc1f8352) SHA1(687a9a8e4f830809f712b590be343fe7b292b9fb) )
+	ROM_LOAD( "epr-1365_t5c.ic103", 0x4000, 0x2000, CRC(6edc455f) SHA1(e83439ace7a152c4e0e49793cf3cd2a3a2015845) )
+
+	ROM_REGION( 0x20000, "sprites", 0 ) /* sprite data */
+	ROM_LOAD( "epr-1246.prom-ic84", 0x00000, 0x2000, CRC(555bfe9a) SHA1(1e56385475eeff044dcd9b44a154991d3efe995e) ) /* level 0 */
+	ROM_RELOAD(                     0x02000, 0x2000 )
+	ROM_LOAD( "epr-1247.prom-ic86", 0x04000, 0x2000, CRC(c8c5e4d5) SHA1(da70297340ddea0cd7fe04f2d94ea65f8202d0e5) ) /* level 1 */
+	ROM_RELOAD(                     0x06000, 0x2000 )
+	ROM_LOAD( "epr-1248.prom-ic88", 0x08000, 0x2000, CRC(82fe5b94) SHA1(b96688ca0cfd90fdc4ee7c2e6c0b66726cc5713c) ) /* level 2 */
+	ROM_RELOAD(                     0x0a000, 0x2000 )
+	ROM_LOAD( "epr-1249.prom-ic90", 0x0c000, 0x2000, CRC(e258e009) SHA1(598d382db0f789ea2fde749b7467abed545de25a) ) /* level 3 */
+	ROM_LOAD( "epr-1250.prom-ic108",0x0e000, 0x2000, CRC(aee6e05e) SHA1(99b9b1ec996746ddf713ed38192f350f1f32a847) )
+	ROM_LOAD( "epr-1251.prom-ic92", 0x10000, 0x2000, CRC(292573de) SHA1(3ddc980d11478a6a6e4082c2f76c1ab82ffe2f36) ) /* level 4 */
+	ROM_LOAD( "epr-1252.prom-ic110",0x12000, 0x2000, CRC(aee6e05e) SHA1(99b9b1ec996746ddf713ed38192f350f1f32a847) )
+	ROM_LOAD( "epr-1253.prom-ic94", 0x14000, 0x2000, CRC(92783626) SHA1(13979eb964112436182d2a92f21803bcc28f4a4a) ) /* level 5 */
+	ROM_LOAD( "epr-1254.prom-ic112",0x16000, 0x2000, CRC(aee6e05e) SHA1(99b9b1ec996746ddf713ed38192f350f1f32a847) )
+	ROM_LOAD( "epr-1255.prom-ic32", 0x18000, 0x2000, CRC(485dcef9) SHA1(0f760ebb42cc2580a29758c72428a41d74477ce6) ) /* level 6 */
+	ROM_LOAD( "epr-1256.prom-ic47", 0x1a000, 0x2000, CRC(aee6e05e) SHA1(99b9b1ec996746ddf713ed38192f350f1f32a847) )
+	ROM_LOAD( "epr-1257.prom-ic34", 0x1c000, 0x2000, CRC(4ca984ce) SHA1(99f294fb203f23929b44baa2dd1825c67dde08a1) ) /* level 7 */
+	ROM_LOAD( "epr-1258.prom-ic49", 0x1e000, 0x2000, CRC(aee6e05e) SHA1(99b9b1ec996746ddf713ed38192f350f1f32a847) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 ) /* foreground data */
+	ROM_LOAD( "epr-1244.cpu-ic111", 0x0000, 0x0800, CRC(17f67424) SHA1(6126562510f1509f3487faaa3b9d7470ab600a2c) )
+	ROM_LOAD( "epr-1245.cpu-ic122", 0x0800, 0x0800, CRC(2ba0b46b) SHA1(5d4d4f19ad7a911c7b37db190a420faf665546b4) )
+
+	ROM_REGION( 0x4800, "road", 0 ) /* road data */
+	ROM_LOAD( "epr-1125.cpu-ic1",   0x0000, 0x0800, CRC(65b5d44b) SHA1(bbdd5db013c9d876e9666f17c48569c7531bfc08) )
+	ROM_LOAD( "epr-1126.cpu-ic2",   0x0800, 0x0800, CRC(685ace1b) SHA1(99c8d36ac910169b27676d18c894433c2ba44853) )
+	ROM_LOAD( "epr-1127.cpu-ic13",  0x1000, 0x0800, CRC(9233c9ca) SHA1(cbf9a0f564d8ace1ccd701c1769dbc001d465851) )
+	ROM_LOAD( "epr-1238.cpu-ic14",  0x1800, 0x0800, CRC(d94fd83f) SHA1(1e3a68259d2ede623d5a7306fdf693a4eab301f0) )
+	ROM_LOAD( "epr-1239.cpu-ic27",  0x2000, 0x0800, CRC(4c41124f) SHA1(d73a9441552c77fb3078553195794311a950d589) )
+	ROM_LOAD( "epr-1240.cpu-ic28",  0x2800, 0x0800, CRC(371d6282) SHA1(f5902b357d976822d46aa6404b7bd30855d435a9) )
+	ROM_LOAD( "epr-1241.cpu-ic41",  0x3000, 0x0800, CRC(1109358a) SHA1(27a5351a4e87309671e72115299420315a93dba6) )
+	ROM_LOAD( "epr-1242.cpu-ic42",  0x3800, 0x0800, CRC(04866769) SHA1(1f9c0d53766fdaf8de57d3df05f291c2ca3dc5fb) )
+	ROM_LOAD( "epr-1243.cpu-ic74",  0x4000, 0x0800, CRC(29854c48) SHA1(cab89bc30f83d9746931ddf6f95a6d0c8a517e5d) )
+
+	ROM_REGION( 0x1020, "proms", 0 )    /* various PROMs */
+	ROM_LOAD( "pr-1114.prom-ic13",  0x0000, 0x0020, CRC(78aded46) SHA1(c78afe804f8b8e837b0c502de5b8715a41fb92b9) )  /* road red/green color table */
+	ROM_LOAD( "pr-1115.prom-ic18",  0x0020, 0x0020, CRC(5394092c) SHA1(129ff61104979ff6a3c3af8bf81c04ae9b133c9e) )  /* road collision/enable */
+	ROM_LOAD( "pr-1116.prom-ic20",  0x0040, 0x0020, CRC(3956767d) SHA1(073aaf57175526660fcf7af2e16e7f1d1aaba9a9) )  /* collision detection */
+	ROM_LOAD( "pr-1117.prom-ic21",  0x0060, 0x0020, CRC(f06d9907) SHA1(f11db7800f41b03e79f5eef8d7ef3ae0a6277518) )  /* road green/blue color table */
+	ROM_LOAD( "pr-1118.cpu-ic99",   0x0100, 0x0100, CRC(07324cfd) SHA1(844abc2042d6810fa34d84ff1ed57744886c6ea6) )  /* background color table */
+	ROM_LOAD( "pr-1119.cpu-ic50",   0x0200, 0x0200, CRC(57ebd4bc) SHA1(932649da3537666f95833a8a8aff506217bd9aa1) )  /* sprite Y scaling */
+	ROM_LOAD( "pr-1120.cpu-ic62",   0x0400, 0x0200, CRC(8dd4c8a8) SHA1(e8d9cf08f115d57c44746fa0ff28f47b064b4193) )  /* video timing */
+	ROM_LOAD( "pr-1121.prom-ic29",  0x0600, 0x0200, CRC(7692f497) SHA1(42468c0705df9928e15ff8deb7e793a6c0c04353) )  /* palette */
+	ROM_LOAD( "pr-1122.prom-ic11",  0x0800, 0x0400, CRC(1a86ce70) SHA1(cab708b9a089b2e28f2298c1e4fae6e200923527) )  /* sprite priorities */
+	ROM_LOAD( "pr-1123.prom-ic12",  0x0c00, 0x0400, CRC(02d2cb52) SHA1(c34d6b60355747ce20fcb8d322df0e188d187f10) )  /* sprite/road/background priorities */
+	ROM_LOAD( "pr-1279.sound-ic40", 0x1000, 0x0020, CRC(b369a6ae) SHA1(dda7c6cf58ce5173f29a3084c85393c0c4587086) )  /* sound board PROM */
+ROM_END
+
+
+ROM_START( turboc )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	// B revision label on 1st rom, A revision for 2nd / 3rd, 2nd rom was faulty, 3rd rom matched existing set, existing 2nd rom passes rom check.
 	ROM_LOAD( "epr-1363_t5b.ic76",  0x0000, 0x2000, CRC(f7f28149) SHA1(08aec3edd6d756b14b2f10fe5abd22ac83c79fcc) ) /* CPU module stamped as 834-0128 */
 	ROM_LOAD( "epr-1364_t5a.ic89",  0x2000, 0x2000, CRC(6a341693) SHA1(428927c4a14bf82225875012c255d25dcffaf2ab) )
@@ -1171,7 +1226,7 @@ ROM_START( turbob )
 	ROM_LOAD( "pr-1279.sound-ic40", 0x1000, 0x0020, CRC(b369a6ae) SHA1(dda7c6cf58ce5173f29a3084c85393c0c4587086) )  /* sound board PROM */
 ROM_END
 
-ROM_START( turboc )
+ROM_START( turbod )
 	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "epr-1363_t5a.ic76",  0x0000, 0x2000, CRC(5c110fb6) SHA1(fdcdf488bd112db12aa22c4b7e9f34004185d4ce) )
 	ROM_LOAD( "epr-1364_t5a.ic89",  0x2000, 0x2000, CRC(6a341693) SHA1(428927c4a14bf82225875012c255d25dcffaf2ab) )
@@ -1225,7 +1280,7 @@ ROM_START( turboc )
 ROM_END
 
 
-ROM_START( turbod )
+ROM_START( turboe )
 	ROM_REGION( 0x6000, "maincpu", 0 )
 	// no letter on rom labels, numbered 1363-1365, possibly the original 1363-1365 revision? - service mode still shows the older EPR-1262 through EPR-1264 tho?
 	ROM_LOAD( "1363.ic76",  0x0000, 0x2000, CRC(b6329a00) SHA1(02ca3d7703607bc0390a14d838fafb01a3e3cdef) ) /* CPU module stamped as 834-0128 */
@@ -1802,9 +1857,10 @@ void turbo_state::init_turbo_noenc()
 
 GAMEL( 1981, turbo,     0,       turbo,    turbo,    turbo_state, init_turbo_noenc, ROT270,             "Sega",    "Turbo (program 1513-1515)", MACHINE_IMPERFECT_SOUND , layout_turbo )
 GAMEL( 1981, turboa,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1262-1264)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turbob,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev B)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turboc,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev A)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turbod,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // but still reports 1262-1264 in the test mode?
+GAMEL( 1981, turbob,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev C)", MACHINE_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turboc,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev B)", MACHINE_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turbod,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev A)", MACHINE_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turboe,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // but still reports 1262-1264 in the test mode?
 GAMEL( 1981, turbobl,   turbo,   turbo,    turbo,    turbo_state, init_turbo_noenc, ROT270,             "bootleg", "Indianapolis (bootleg of Turbo)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // decrypted bootleg of a 1262-1264 set
 
 GAMEL( 1982, subroc3d,  0,       subroc3d, subroc3d, turbo_state, empty_init,       ORIENTATION_FLIP_X, "Sega",    "Subroc-3D", MACHINE_IMPERFECT_SOUND , layout_subroc3d )

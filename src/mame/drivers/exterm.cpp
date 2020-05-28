@@ -277,7 +277,7 @@ void exterm_state::sound_master_map(address_map &map)
 	map(0x6000, 0x67ff).w(FUNC(exterm_state::sound_nmi_rate_w));
 	map(0x6800, 0x6fff).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	map(0x7000, 0x77ff).r(FUNC(exterm_state::sound_nmi_to_slave_r));
-/*  AM_RANGE(0x7800, 0x7fff) unknown - to S4-13 */
+//  map(0x7800, 0x7fff) unknown - to S4-13
 	map(0x8000, 0xffff).rom();
 	map(0xa000, 0xbfff).w(FUNC(exterm_state::sound_control_w));
 }
@@ -395,7 +395,7 @@ void exterm_state::exterm(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch[0]).data_pending_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 	GENERIC_LATCH_8(config, m_soundlatch[1]).data_pending_callback().set_inputline(m_audioslave, M6502_IRQ_LINE);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

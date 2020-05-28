@@ -117,7 +117,7 @@ void cbuster_state::main_map(address_map &map)
 	map(0x0bc002, 0x0bc003).portr("DSW");
 	map(0x0bc002, 0x0bc003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0bc004, 0x0bc005).rw(FUNC(cbuster_state::prot_r), FUNC(cbuster_state::prot_w));
-	map(0x0bc006, 0x0bc007).portr("COINS").lw16("irq_ack_w", [this](u16 data) { m_maincpu->set_input_line(4, CLEAR_LINE); });
+	map(0x0bc006, 0x0bc007).portr("COINS").lw16(NAME([this] (u16 data) { m_maincpu->set_input_line(4, CLEAR_LINE); }));
 }
 
 
@@ -269,6 +269,7 @@ void cbuster_state::twocrude(machine_config &config)
 	H6280(config, m_audiocpu, XTAL(24'000'000)/4); /* Custom chip 45, 6MHz Verified */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cbuster_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+	m_audiocpu->set_timer_scale(2);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(58);
@@ -285,14 +286,12 @@ void cbuster_state::twocrude(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x20);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(cbuster_state::bank_callback), this);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(cbuster_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(cbuster_state::bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(cbuster_state::bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
@@ -300,14 +299,12 @@ void cbuster_state::twocrude(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x40);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cbuster_state::bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cbuster_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cbuster_state::bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cbuster_state::bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");

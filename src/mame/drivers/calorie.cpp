@@ -112,11 +112,11 @@ public:
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
 	uint8_t    m_bg_bank;
-	DECLARE_WRITE8_MEMBER(fg_ram_w);
-	DECLARE_WRITE8_MEMBER(bg_bank_w);
-	DECLARE_WRITE8_MEMBER(calorie_flipscreen_w);
-	DECLARE_READ8_MEMBER(calorie_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(bogus_w);
+	void fg_ram_w(offs_t offset, uint8_t data);
+	void bg_bank_w(uint8_t data);
+	void calorie_flipscreen_w(uint8_t data);
+	uint8_t calorie_soundlatch_r();
+	void bogus_w(offs_t offset, uint8_t data);
 	void init_calorieb();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -152,7 +152,7 @@ TILE_GET_INFO_MEMBER(calorie_state::get_bg_tile_info)
 	int color = src[bg_base + tile_index + 0x100] & 0x0f;
 	int flag  = src[bg_base + tile_index + 0x100] & 0x40 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flag);
+	tileinfo.set(1, code, color, flag);
 }
 
 TILE_GET_INFO_MEMBER(calorie_state::get_fg_tile_info)
@@ -160,14 +160,14 @@ TILE_GET_INFO_MEMBER(calorie_state::get_fg_tile_info)
 	int code  = ((m_fg_ram[tile_index + 0x400] & 0x30) << 4) | m_fg_ram[tile_index];
 	int color = m_fg_ram[tile_index + 0x400] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((m_fg_ram[tile_index + 0x400] & 0xc0) >> 6));
+	tileinfo.set(0, code, color, TILE_FLIPYX((m_fg_ram[tile_index + 0x400] & 0xc0) >> 6));
 }
 
 
 void calorie_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(calorie_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(calorie_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(calorie_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(calorie_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -230,13 +230,13 @@ uint32_t calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-WRITE8_MEMBER(calorie_state::fg_ram_w)
+void calorie_state::fg_ram_w(offs_t offset, uint8_t data)
 {
 	m_fg_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(calorie_state::bg_bank_w)
+void calorie_state::bg_bank_w(uint8_t data)
 {
 	if((m_bg_bank & ~0x10) != (data & ~0x10))
 		m_bg_tilemap->mark_all_dirty();
@@ -244,19 +244,19 @@ WRITE8_MEMBER(calorie_state::bg_bank_w)
 	m_bg_bank = data;
 }
 
-WRITE8_MEMBER(calorie_state::calorie_flipscreen_w)
+void calorie_state::calorie_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
 }
 
-READ8_MEMBER(calorie_state::calorie_soundlatch_r)
+uint8_t calorie_state::calorie_soundlatch_r()
 {
 	uint8_t latch = m_soundlatch->read();
 	m_soundlatch->clear_w();
 	return latch;
 }
 
-WRITE8_MEMBER(calorie_state::bogus_w)
+void calorie_state::bogus_w(offs_t offset, uint8_t data)
 {
 	popmessage("written to 3rd sound chip: data = %02X port = %02X", data, offset);
 }

@@ -35,15 +35,15 @@ public:
 	ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~ps2_gs_device() override;
 
-	DECLARE_READ64_MEMBER(priv_regs0_r);
-	DECLARE_WRITE64_MEMBER(priv_regs0_w);
-	DECLARE_READ64_MEMBER(priv_regs1_r);
-	DECLARE_WRITE64_MEMBER(priv_regs1_w);
+	uint64_t priv_regs0_r(offs_t offset);
+	void priv_regs0_w(offs_t offset, uint64_t data);
+	uint64_t priv_regs1_r(offs_t offset);
+	void priv_regs1_w(offs_t offset, uint64_t data);
 
-	DECLARE_WRITE64_MEMBER(regs_w);
+	void regs_w(offs_t offset, uint64_t data);
 
-	DECLARE_READ32_MEMBER(gif_r);
-	DECLARE_WRITE32_MEMBER(gif_w);
+	uint32_t gif_r(offs_t offset);
+	void gif_w(offs_t offset, uint32_t data);
 
 	ps2_gif_device* interface();
 

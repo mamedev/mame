@@ -25,7 +25,7 @@ public:
 
 	void driver_init() override;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(bsmt_status_r);
+	DECLARE_READ_LINE_MEMBER(bsmt_status_r);
 
 protected:
 	policetr_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t speedup_pc, uint32_t speedup_addr) :

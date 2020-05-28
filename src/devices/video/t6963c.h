@@ -8,7 +8,7 @@
 **********************************************************************/
 
 #ifndef MAME_VIDEO_T6963C_H
-#define MAME_VIDEO_T6963C_H 1
+#define MAME_VIDEO_T6963C_H
 
 #pragma once
 

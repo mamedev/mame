@@ -83,7 +83,7 @@ private:
 	DECLARE_WRITE8_MEMBER(time_display_w);
 	DECLARE_WRITE8_MEMBER(score_display_w);
 	DECLARE_WRITE8_MEMBER(score2_display_w);
-	template <unsigned N> DECLARE_WRITE8_MEMBER( digit_w ) { m_7segs[N] = data; }
+	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
 	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
 
@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(seabattl_state::get_bg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1, code, (color & 0x7), 0);
+	tileinfo.set(1, code, (color & 0x7), 0);
 }
 
 WRITE8_MEMBER(seabattl_state::seabattl_videoram_w)
@@ -242,7 +242,7 @@ void seabattl_state::video_start()
 {
 	m_7segs.resolve();
 	m_screen->register_screen_bitmap(m_collision_bg);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(seabattl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seabattl_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(-12, 0);
 }
@@ -449,7 +449,7 @@ void seabattl_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(seabattl_state::seabattl_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03); // S2650
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 static const gfx_layout tiles32x16x3_layout =
@@ -489,7 +489,7 @@ void seabattl_state::seabattl(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &seabattl_state::seabattl_data_map);
 	m_maincpu->set_vblank_int("screen", FUNC(seabattl_state::seabattl_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
-
+	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 	S2636(config, m_s2636, 0);
 	m_s2636->set_offsets(-13, -29);
 	m_s2636->add_route(ALL_OUTPUTS, "mono", 0.10);

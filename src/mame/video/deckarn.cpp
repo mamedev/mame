@@ -10,13 +10,14 @@ DEFINE_DEVICE_TYPE(DECO_KARNOVSPRITES, deco_karnovsprites_device, "deco_karnovsp
 
 deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DECO_KARNOVSPRITES, tag, owner, clock)
+	, m_colpri_cb(*this)
 {
 }
 
 void deco_karnovsprites_device::device_start()
 {
 	m_flip_screen = false;
-	m_colpri_cb.bind_relative_to(*owner());
+	m_colpri_cb.resolve();
 
 	save_item(NAME(m_flip_screen));
 }

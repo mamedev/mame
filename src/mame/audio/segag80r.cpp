@@ -438,7 +438,7 @@ void segag80r_state::sega005_sound_board(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::sega005_sound_a_w)
+void segag80r_state::sega005_sound_a_w(uint8_t data)
 {
 	uint8_t diff = data ^ m_sound_state[0];
 	m_sound_state[0] = data;
@@ -494,7 +494,7 @@ inline void segag80r_state::sega005_update_sound_data()
 }
 
 
-WRITE8_MEMBER(segag80r_state::sega005_sound_b_w)
+void segag80r_state::sega005_sound_b_w(uint8_t data)
 {
 	/*
 	       D6: manual timer clock (0->1)
@@ -693,7 +693,7 @@ void monsterb_sound_device::device_start()
  *
  *************************************/
 
-WRITE8_MEMBER(monsterb_sound_device::sound_a_w)
+void monsterb_sound_device::sound_a_w(uint8_t data)
 {
 	/* Lower four data lines get decoded into 13 control lines */
 	m_music->tms36xx_note_w(0, data & 15);
@@ -711,7 +711,7 @@ WRITE8_MEMBER(monsterb_sound_device::sound_a_w)
  *
  *************************************/
 
-WRITE8_MEMBER(monsterb_sound_device::sound_b_w)
+void monsterb_sound_device::sound_b_w(uint8_t data)
 {
 	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
@@ -733,13 +733,13 @@ WRITE8_MEMBER(monsterb_sound_device::sound_b_w)
  *
  *************************************/
 
-READ8_MEMBER(monsterb_sound_device::n7751_status_r)
+uint8_t monsterb_sound_device::n7751_status_r()
 {
 	return m_n7751_busy << 4;
 }
 
 
-WRITE8_MEMBER(monsterb_sound_device::n7751_command_w)
+void monsterb_sound_device::n7751_command_w(uint8_t data)
 {
 	/*
 	    Z80 7751 control port
@@ -776,14 +776,14 @@ void monsterb_sound_device::n7751_rom_select_w(uint8_t data)
 }
 
 
-READ8_MEMBER(monsterb_sound_device::n7751_rom_r)
+uint8_t monsterb_sound_device::n7751_rom_r()
 {
 	/* read from BUS */
 	return m_audiocpu_region->base()[m_sound_addr];
 }
 
 
-READ8_MEMBER(monsterb_sound_device::n7751_command_r)
+uint8_t monsterb_sound_device::n7751_command_r()
 {
 	/* read from P2 - 8255's PC0-2 connects to 7751's S0-2 (P24-P26 on an 8048) */
 	/* bit 0x80 is an alternate way to control the sample on/off; doesn't appear to be used */
@@ -791,7 +791,7 @@ READ8_MEMBER(monsterb_sound_device::n7751_command_r)
 }
 
 
-WRITE8_MEMBER(monsterb_sound_device::n7751_p2_w)
+void monsterb_sound_device::n7751_p2_w(uint8_t data)
 {
 	/* write to P2; low 4 bits go to 8243 */
 	m_i8243->p2_w(data & 0x0f);

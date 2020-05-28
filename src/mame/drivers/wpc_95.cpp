@@ -2433,6 +2433,18 @@ ROM_START(cv_13)
 	ROM_LOAD16_BYTE("s6v0_4.rom", 0x800000, 0x100000, CRC(36ca43d3) SHA1(b599f88649c220143aa44cd5213e725e62afb0bc))
 ROM_END
 
+ROM_START(cv_d52)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD("cv_g11.d52", 0x00000, 0x100000, CRC(2b6b2822) SHA1(177ddd826b7dee060d090cd79f972836a23d6df9))
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF) // needs different audio ROMs, not dumped for now
+	ROM_LOAD("s2v1_0.rom", 0x000000, 0x080000, BAD_DUMP CRC(79dbb8ee) SHA1(f76c0db93b89beaf1e90c5f2199262e296fb1b78))
+	ROM_RELOAD(0x000000+0x100000, 0x080000)
+	ROM_LOAD16_BYTE("s3v0_4.rom", 0x200000, 0x100000, BAD_DUMP CRC(8c6c0c56) SHA1(792431cc5b06c3d5028168297614f5eb7e8af34f))
+	ROM_LOAD16_BYTE("s4v0_4.rom", 0x400000, 0x100000, BAD_DUMP CRC(a9014b78) SHA1(abffe32ab729fb39ab2360d850c8b5476094fd92))
+	ROM_LOAD16_BYTE("s5v0_4.rom", 0x600000, 0x100000, BAD_DUMP CRC(7e07a2fc) SHA1(f908363c968c15c0dc62e32695e5e2d0ca869391))
+	ROM_LOAD16_BYTE("s6v0_4.rom", 0x800000, 0x100000, BAD_DUMP CRC(36ca43d3) SHA1(b599f88649c220143aa44cd5213e725e62afb0bc))
+ROM_END
+
 /*-----------------
 /  Congo #50050
 /------------------*/
@@ -3063,6 +3075,7 @@ GAME(1997,  cv_20h,     cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,    
 GAME(1997,  cv_10,      cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,     ROT0, "Bally",                "Cirqus Voltaire (1.0)",                  MACHINE_MECHANICAL)
 GAME(1997,  cv_11,      cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,     ROT0, "Bally",                "Cirqus Voltaire (1.1)",                  MACHINE_MECHANICAL)
 GAME(1997,  cv_13,      cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,     ROT0, "Bally",                "Cirqus Voltaire (1.3)",                  MACHINE_MECHANICAL)
+GAME(1997,  cv_d52,     cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,     ROT0, "Bally",                "Cirqus Voltaire (D.52 prototype)",       MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL) // needs different audio ROMs
 GAME(1995,  congo_21,   0,          wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (2.1)",                            MACHINE_MECHANICAL)
 GAME(1995,  congo_20,   congo_21,   wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (2.0)",                            MACHINE_MECHANICAL)
 GAME(1995,  congo_13,   congo_21,   wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (1.3)",                            MACHINE_MECHANICAL)

@@ -88,11 +88,11 @@ public:
 	void dg680(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_READ8_MEMBER(port08_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
+	u8 porta_r();
+	u8 portb_r();
+	void portb_w(u8 data);
+	u8 port08_r();
+	void port08_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	void kbd_put(u8 data);
@@ -100,15 +100,15 @@ private:
 	void dg680_io(address_map &map);
 	void dg680_mem(address_map &map);
 
-	uint8_t m_pio_b;
-	uint8_t m_term_data;
-	uint8_t m_protection[0x100];
+	u8 m_pio_b;
+	u8 m_term_data;
+	u8 m_protection[0x100];
 	virtual void machine_reset() override;
 
 	u8 m_cass_data[4];
 	bool m_cassold, m_cassinbit, m_cassoutbit;
-	DECLARE_READ8_MEMBER(mem_r);
-	DECLARE_WRITE8_MEMBER(mem_w);
+	u8 mem_r(offs_t offset);
+	void mem_w(offs_t offset, u8 data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -153,7 +153,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dg680_state::kansas_r )
 		return;
 
 	/* cassette - turn 1200/2400Hz to a bit */
-	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -164,12 +164,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( dg680_state::kansas_r )
 	}
 }
 
-READ8_MEMBER( dg680_state::mem_r )
+u8 dg680_state::mem_r(offs_t offset)
 {
 	return m_s100->smemr_r(offset + 0xf000);
 }
 
-WRITE8_MEMBER( dg680_state::mem_w )
+void dg680_state::mem_w(offs_t offset, u8 data)
 {
 	m_s100->mwrt_w(offset + 0xf000, data);
 }
@@ -191,9 +191,9 @@ void dg680_state::dg680_io(address_map &map)
 	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x04, 0x07).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x08, 0x08).rw(FUNC(dg680_state::port08_r), FUNC(dg680_state::port08_w)); //SWP Control and Status
-	//AM_RANGE(0x09,0x09) parallel input port
+	//map(0x09,0x09) parallel input port
 	// Optional AM9519 Programmable Interrupt Controller (port c = data, port d = control)
-	//AM_RANGE(0x0c,0x0d) AM_DEVREADWRITE("am9519", am9519_device, read, write)
+	//map(0x0c,0x0d).rw("am9519", FUNC(am9519_device::read), FUNC(am9519_device::write));
 }
 
 void dg680_state::machine_reset()
@@ -225,20 +225,20 @@ void dg680_state::kbd_put(u8 data)
 	m_pio->strobe_a(1);
 }
 
-READ8_MEMBER( dg680_state::porta_r )
+u8 dg680_state::porta_r()
 {
-	uint8_t data = m_term_data;
+	u8 data = m_term_data;
 	m_term_data = 0;
 	return data;
 }
 
-READ8_MEMBER( dg680_state::portb_r )
+u8 dg680_state::portb_r()
 {
 	return m_pio_b | m_cassinbit;
 }
 
 // bit 1 = cassout; bit 2 = motor on
-WRITE8_MEMBER( dg680_state::portb_w )
+void dg680_state::portb_w(u8 data)
 {
 	if (BIT(m_pio_b ^ data, 2))
 		m_cass->change_state(BIT(data, 2) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -246,15 +246,15 @@ WRITE8_MEMBER( dg680_state::portb_w )
 	m_cassoutbit = BIT(data, 1);
 }
 
-READ8_MEMBER( dg680_state::port08_r )
+u8 dg680_state::port08_r()
 {
-	uint8_t breg = m_maincpu->state_int(Z80_B);
+	u8 breg = m_maincpu->state_int(Z80_B);
 	return m_protection[breg];
 }
 
-WRITE8_MEMBER( dg680_state::port08_w )
+void dg680_state::port08_w(u8 data)
 {
-	uint8_t breg = m_maincpu->state_int(Z80_B);
+	u8 breg = m_maincpu->state_int(Z80_B);
 	m_protection[breg] = data;
 }
 

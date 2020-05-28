@@ -40,14 +40,14 @@ private:
 
 	//fdc
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_READ8_MEMBER(fdc_read_byte);
-	DECLARE_WRITE8_MEMBER(fdc_write_byte);
+	uint8_t fdc_read_byte();
+	void fdc_write_byte(uint8_t data);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	DECLARE_READ16_MEMBER (bootvect_r);
 	DECLARE_READ8_MEMBER (tcr_r);
 	DECLARE_WRITE8_MEMBER (tcr_w);
-	DECLARE_WRITE8_MEMBER (led_w);
+	void led_w(uint8_t data);
 
 	/* Dummy driver routines */
 	DECLARE_READ8_MEMBER(not_implemented_r);

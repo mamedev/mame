@@ -29,10 +29,10 @@ DEFINE_DEVICE_TYPE(SH7604_WDT, sh7604_wdt_device, "sh7604wdt", "SH7604 Watchdog 
 
 void sh7604_wdt_device::wdt_regs(address_map &map)
 {
-//  AM_RANGE(0x00, 0x00) timer control/status
-//  AM_RANGE(0x01, 0x01) timer counter
-//  AM_RANGE(0x02, 0x02) write only, reset control register
-//  AM_RANGE(0x03, 0x03) read status register, write reset status register
+//  map(0x00, 0x00) timer control/status
+//  map(0x01, 0x01) timer counter
+//  map(0x02, 0x02) write only, reset control register
+//  map(0x03, 0x03) read status register, write reset status register
 }
 
 //-------------------------------------------------

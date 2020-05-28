@@ -88,7 +88,7 @@ Address          Dir Data             Name      Description
 ---------------- --- ---------------- --------- -----------------------
 00xxxxxxxxxxxxx- R   xxxxxxxxxxxxxxxx ROM 4L/3L program ROM
 01xxxxxxxxxxxxx- R   xxxxxxxxxxxxxxxx ROM 4K/3K program ROM
-011-------------   W ---------------x NMIACKB   Z8002 #2 NMI enable/acknowledge [1]
+011-------------   W ---------------x NMIACKB   Z8002 #2 NVI enable/acknowledge [1]
 the rest of the memory map is common to the other Z8002
 
 
@@ -98,11 +98,14 @@ Address          Dir Data             Name      Description
 ---------------- --- ---------------- --------- -----------------------
 00xxxxxxxxxxxxx- R   xxxxxxxxxxxxxxxx ROM 4E/3E program ROM
 01xxxxxxxxxxxxx- R   xxxxxxxxxxxxxxxx ROM 4D/3D program ROM
-011-------------   W ---------------x NMIACKA   Z8002 #1 NMI enable/acknowledge [1]
+011-------------   W ---------------x NMIACKA   Z8002 #1 NVI enable/acknowledge [1]
 the rest of the memory map is common to the other Z8002
 
 [1] One Z8002 writes at $6000 and the other at $6002, but they did it only for clarity
     because the low address bits are ignored and the location is not shared.
+
+    NMIACK is not used to handle the NMI or NVI acknowledge cycles (whose codes are
+    ignored).
 
 
 Z8002 (common):
@@ -272,7 +275,7 @@ READ16_MEMBER(polepos_state::polepos2_ic25_r)
 }
 
 
-READ8_MEMBER(polepos_state::adc_r)
+uint8_t polepos_state::analog_r()
 {
 	return ioport(m_adc_input ? "ACCEL" : "BRAKE")->read();
 }
@@ -284,15 +287,10 @@ READ8_MEMBER(polepos_state::ready_r)
 	if (m_screen->vpos() >= 128)
 		ret ^= 0x02;
 
-	ret ^= 0x08; /* ADC End Flag */
+	if (!m_adc->intr_r())
+		ret ^= 0x08; /* ADC End Flag */
 
 	return ret;
-}
-
-
-WRITE_LINE_MEMBER(polepos_state::iosel_w)
-{
-//          polepos_mcu_enable_w(offset,data);
 }
 
 WRITE_LINE_MEMBER(polepos_state::gasel_w)
@@ -314,12 +312,12 @@ template<bool sub1> WRITE16_MEMBER(polepos_state::z8002_nvi_enable_w)
 		(sub1 ? m_subcpu : m_subcpu2)->set_input_line(z8002_device::NVI_LINE, CLEAR_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(polepos_state::auto_start_r)
+READ_LINE_MEMBER(polepos_state::auto_start_r)
 {
 	return m_auto_start_mask;
 }
 
-WRITE8_MEMBER(polepos_state::out_0)
+void polepos_state::out(uint8_t data)
 {
 // no start lamps in pole position
 //  output().set_led_value(1,data & 1);
@@ -328,31 +326,31 @@ WRITE8_MEMBER(polepos_state::out_0)
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
 
-WRITE8_MEMBER(polepos_state::out_1)
+WRITE_LINE_MEMBER(polepos_state::lockout)
 {
-	machine().bookkeeping().coin_lockout_global_w(data & 1);
+	machine().bookkeeping().coin_lockout_global_w(state);
 }
 
-READ8_MEMBER(polepos_state::namco_52xx_rom_r)
+uint8_t polepos_state::namco_52xx_rom_r(offs_t offset)
 {
 	uint32_t length = memregion("52xx")->bytes();
 logerror("ROM @ %04X\n", offset);
 	return (offset < length) ? memregion("52xx")->base()[offset] : 0xff;
 }
 
-READ8_MEMBER(polepos_state::namco_52xx_si_r)
+uint8_t polepos_state::namco_52xx_si_r()
 {
 	/* pulled to +5V */
 	return 1;
 }
 
-READ8_MEMBER(polepos_state::namco_53xx_k_r)
+uint8_t polepos_state::namco_53xx_k_r()
 {
 	/* hardwired to 0 */
 	return 0;
 }
 
-READ8_MEMBER(polepos_state::steering_changed_r)
+uint8_t polepos_state::steering_changed_r()
 {
 	/* read the current steering value and update our delta */
 	uint8_t steer_new = ioport("STEER")->read();
@@ -374,7 +372,7 @@ READ8_MEMBER(polepos_state::steering_changed_r)
 	return m_steer_accum & 1;
 }
 
-READ8_MEMBER(polepos_state::steering_delta_r)
+uint8_t polepos_state::steering_delta_r()
 {
 	return m_steer_delta;
 }
@@ -418,7 +416,7 @@ void polepos_state::machine_reset()
 
 void polepos_state::z80_map(address_map &map)
 {
-	map(0x0000, 0x2fff).rom();
+	map(0x0000, 0x2fff).rom().region("maincpu", 0);
 	map(0x3000, 0x37ff).mirror(0x0800).ram().share("nvram");                 /* Battery Backup */
 	map(0x4000, 0x47ff).rw(FUNC(polepos_state::sprite_r), FUNC(polepos_state::sprite_w));           /* Motion Object */
 	map(0x4800, 0x4bff).rw(FUNC(polepos_state::road_r), FUNC(polepos_state::road_w));               /* Road Memory */
@@ -440,14 +438,13 @@ void polepos_state::z80_map(address_map &map)
 void polepos_state::z80_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(polepos_state::adc_r)).nopw();
+	map(0x00, 0x00).rw(m_adc, FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 }
 
 
 /* the same memory map is used by both Z8002 CPUs; all RAM areas are shared */
 void polepos_state::z8002_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram().share(m_sprite16_memory);   /* Motion Object */
 	map(0x9000, 0x97ff).ram().share(m_road16_memory);     /* Road Memory */
 	map(0x9800, 0x9fff).ram().w(FUNC(polepos_state::alpha16_w)).share(m_alpha16_memory);  /* Alphanumeric (char ram) */
@@ -459,13 +456,15 @@ void polepos_state::z8002_map(address_map &map)
 void polepos_state::z8002_map_1(address_map &map)
 {
 	z8002_map(map);
-	map(0x6000, 0x6001).mirror(0x0ffe).w(FUNC(polepos_state::z8002_nvi_enable_w<true>)); /* NVI enable - *NOT* shared by the two CPUs */
+	map(0x0000, 0x7fff).rom().region("sub", 0);
+	map(0x6000, 0x6001).mirror(0x1ffe).w(FUNC(polepos_state::z8002_nvi_enable_w<true>)); /* NVI enable - *NOT* shared by the two CPUs */
 }
 
 void polepos_state::z8002_map_2(address_map &map)
 {
 	z8002_map(map);
-	map(0x6000, 0x6001).mirror(0x0ffe).w(FUNC(polepos_state::z8002_nvi_enable_w<false>)); /* NVI enable - *NOT* shared by the two CPUs */
+	map(0x0000, 0x7fff).rom().region("sub2", 0);
+	map(0x6000, 0x6001).mirror(0x1ffe).w(FUNC(polepos_state::z8002_nvi_enable_w<false>)); /* NVI enable - *NOT* shared by the two CPUs */
 }
 
 
@@ -476,8 +475,8 @@ void polepos_state::z8002_map_2(address_map &map)
 static INPUT_PORTS_START( polepos )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,auto_start_r, nullptr)  // start 1, program controlled
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Gear Change") POLEPOS_TOGGLE /* Gear */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(polepos_state, auto_start_r)  // start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -606,7 +605,7 @@ static INPUT_PORTS_START( topracern )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Gear Change") POLEPOS_TOGGLE /* Gear */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
@@ -861,13 +860,13 @@ void polepos_state::polepos(machine_config &config)
 	m_subcpu2->set_addrmap(AS_PROGRAM, &polepos_state::z8002_map_2);
 
 	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
-	n51xx.set_screen_tag(m_screen);
-	n51xx.input_callback<0>().set_ioport("IN0").mask(0x0f);
-	n51xx.input_callback<1>().set_ioport("IN0").rshift(4);
-	n51xx.input_callback<2>().set_ioport("DSWB").mask(0x0f);
-	n51xx.input_callback<3>().set_ioport("DSWB").rshift(4);
-	n51xx.output_callback<0>().set(FUNC(polepos_state::out_0));
-	n51xx.output_callback<1>().set(FUNC(polepos_state::out_1));
+	//n51xx.set_screen_tag(m_screen);
+	n51xx.input_callback<0>().set_ioport("DSWB").mask(0x0f);
+	n51xx.input_callback<1>().set_ioport("DSWB").rshift(4);
+	n51xx.input_callback<2>().set_ioport("IN0").mask(0x0f);
+	n51xx.input_callback<3>().set_ioport("IN0").rshift(4);
+	n51xx.output_callback().set(FUNC(polepos_state::out));
+	n51xx.lockout_callback().set(FUNC(polepos_state::lockout));
 
 	namco_52xx_device &n52xx(NAMCO_52XX(config, "52xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
 	n52xx.set_discrete("discrete");
@@ -888,16 +887,16 @@ void polepos_state::polepos(machine_config &config)
 
 	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/8/64));
 	n06xx.set_maincpu(m_maincpu);
+	n06xx.chip_select_callback<0>().set("51xx", FUNC(namco_51xx_device::chip_select));
+	n06xx.rw_callback<0>().set("51xx", FUNC(namco_51xx_device::rw));
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 	n06xx.read_callback<1>().set("53xx", FUNC(namco_53xx_device::read));
-	n06xx.read_request_callback<1>().set("53xx", FUNC(namco_53xx_device::read_request));
+	n06xx.chip_select_callback<1>().set("53xx", FUNC(namco_53xx_device::chip_select));
 	n06xx.write_callback<2>().set("52xx", FUNC(namco_52xx_device::write));
 	n06xx.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
-
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* some interleaving */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -905,20 +904,27 @@ void polepos_state::polepos(machine_config &config)
 
 	LS259(config, m_latch); // at 8E on polepos
 	m_latch->q_out_cb<0>().set_inputline(m_maincpu, 0, CLEAR_LINE).invert();
-	m_latch->q_out_cb<1>().set(FUNC(polepos_state::iosel_w));
+	m_latch->q_out_cb<1>().set("51xx", FUNC(namco_51xx_device::reset));
+	m_latch->q_out_cb<1>().append("52xx", FUNC(namco_52xx_device::reset));
+	m_latch->q_out_cb<1>().append("53xx", FUNC(namco_53xx_device::reset));
+	m_latch->q_out_cb<1>().append("54xx", FUNC(namco_54xx_device::reset));
 	m_latch->q_out_cb<2>().set(m_namco_sound, FUNC(namco_device::sound_enable_w));
-	m_latch->q_out_cb<2>().set("polepos", FUNC(polepos_sound_device::clson_w));
+	m_latch->q_out_cb<2>().append("polepos", FUNC(polepos_sound_device::clson_w));
 	m_latch->q_out_cb<3>().set(FUNC(polepos_state::gasel_w));
 	m_latch->q_out_cb<4>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 	m_latch->q_out_cb<5>().set_inputline(m_subcpu2, INPUT_LINE_RESET).invert();
 	m_latch->q_out_cb<6>().set(FUNC(polepos_state::sb0_w));
 	m_latch->q_out_cb<7>().set(FUNC(polepos_state::chacl_w));
 
+	ADC0804(config, m_adc, MASTER_CLOCK/8/8);
+	m_adc->vin_callback().set(FUNC(polepos_state::analog_r));
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16);
 	m_screen->set_screen_update(FUNC(polepos_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set("51xx", FUNC(namco_51xx_device::vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_polepos);
 	PALETTE(config, m_palette, FUNC(polepos_state::polepos_palette), 0x0f00, 128);
@@ -965,7 +971,7 @@ void polepos_state::topracern_io(address_map &map)
 
 void polepos_state::sound_z80_bootleg_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rom();
+	map(0x0000, 0x1fff).rom().region("soundz80bl", 0);
 	map(0x2700, 0x27ff).ram();
 	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_r));
@@ -993,17 +999,16 @@ void polepos_state::topracern(machine_config &config)
 	// TODO, remove these devices too, this bootleg doesn't have them, but the emulation doesn't boot without them.
 	// doesn't exist on the bootleg, but required for now or the game only boots in test mode!  they probably simulate some of the logic
 	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
-	n51xx.set_screen_tag(m_screen);
-	n51xx.input_callback<1>().set_ioport("IN0").rshift(4);
+	n51xx.input_callback<3>().set_ioport("IN0").rshift(4);
 
 	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/8/64));
 	n06xx.set_maincpu(m_maincpu);
+	n06xx.chip_select_callback<0>().set("51xx", FUNC(namco_51xx_device::chip_select));
+	n06xx.rw_callback<0>().set("51xx", FUNC(namco_51xx_device::rw));
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
-
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* some interleaving */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1011,20 +1016,23 @@ void polepos_state::topracern(machine_config &config)
 
 	LS259(config, m_latch);
 	m_latch->q_out_cb<0>().set_inputline(m_maincpu, 0, CLEAR_LINE).invert();
-	m_latch->q_out_cb<1>().set(FUNC(polepos_state::iosel_w));
 	m_latch->q_out_cb<2>().set(m_namco_sound, FUNC(namco_device::sound_enable_w));
-	m_latch->q_out_cb<2>().set("polepos", FUNC(polepos_sound_device::clson_w));
+	m_latch->q_out_cb<2>().append("polepos", FUNC(polepos_sound_device::clson_w));
 	m_latch->q_out_cb<3>().set(FUNC(polepos_state::gasel_w));
 	m_latch->q_out_cb<4>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 	m_latch->q_out_cb<5>().set_inputline(m_subcpu2, INPUT_LINE_RESET).invert();
 	m_latch->q_out_cb<6>().set(FUNC(polepos_state::sb0_w));
 	m_latch->q_out_cb<7>().set(FUNC(polepos_state::chacl_w));
 
+	ADC0804(config, m_adc, MASTER_CLOCK/8/8);
+	m_adc->vin_callback().set(FUNC(polepos_state::analog_r));
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16);
 	m_screen->set_screen_update(FUNC(polepos_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set("51xx", FUNC(namco_51xx_device::vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_polepos);
 	PALETTE(config, m_palette, FUNC(polepos_state::polepos_palette), 0x0f00, 128);
@@ -2442,7 +2450,7 @@ ROM_END
 void polepos_state::init_polepos2()
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read16_delegate(FUNC(polepos_state::polepos2_ic25_r),this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read16_delegate(*this, FUNC(polepos_state::polepos2_ic25_r)));
 }
 
 

@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Telercas Telmac TMC-600 euro bus emulation
+    Telercas Telmac TMC-600 Eurobus emulation
 
 **********************************************************************/
 
@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(TMC600_EURO_BUS_SLOT, tmc600_euro_bus_slot_t, "tmc600_euro_bus_slot", "TMC-600 euro bus slot")
+DEFINE_DEVICE_TYPE(TMC600_EUROBUS_SLOT, tmc600_eurobus_slot_device, "tmc600_eurobus_slot", "Telmac Eurobus slot")
 
 
 
@@ -24,23 +24,23 @@ DEFINE_DEVICE_TYPE(TMC600_EURO_BUS_SLOT, tmc600_euro_bus_slot_t, "tmc600_euro_bu
 //**************************************************************************
 
 //-------------------------------------------------
-//  device_tmc600_euro_bus_card_interface - constructor
+//  device_tmc600_eurobus_card_interface - constructor
 //-------------------------------------------------
 
-device_tmc600_euro_bus_card_interface::device_tmc600_euro_bus_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_tmc600_eurobus_card_interface::device_tmc600_eurobus_card_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "telmaceurobus")
 {
-	m_slot = dynamic_cast<tmc600_euro_bus_slot_t *>(device.owner());
+	m_slot = dynamic_cast<tmc600_eurobus_slot_device *>(device.owner());
 }
 
 
 //-------------------------------------------------
-//  tmc600_euro_bus_slot_t - constructor
+//  tmc600_eurobus_slot_device - constructor
 //-------------------------------------------------
 
-tmc600_euro_bus_slot_t::tmc600_euro_bus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, TMC600_EURO_BUS_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this)
+tmc600_eurobus_slot_device::tmc600_eurobus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TMC600_EUROBUS_SLOT, tag, owner, clock),
+	device_single_card_slot_interface<device_tmc600_eurobus_card_interface>(mconfig, *this)
 {
 }
 
@@ -49,17 +49,17 @@ tmc600_euro_bus_slot_t::tmc600_euro_bus_slot_t(const machine_config &mconfig, co
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void tmc600_euro_bus_slot_t::device_start()
+void tmc600_eurobus_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_tmc600_euro_bus_card_interface *>(get_card_device());
+	m_card = get_card_device();
 }
 
 
 //-------------------------------------------------
-//  SLOT_INTERFACE( tmc600_euro_bus_cards )
+//  SLOT_INTERFACE( tmc600_eurobus_cards )
 //-------------------------------------------------
 
-void tmc600_euro_bus_cards(device_slot_interface &device)
+void tmc600_eurobus_cards(device_slot_interface &device)
 {
 	//device.option_add("tmc710", TMC710); // 5-way expander
 	//device.option_add("tmc720", TMC720); // 5-way expander (new model)

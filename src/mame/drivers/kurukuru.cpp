@@ -137,7 +137,7 @@
             Coin B (10Y) meter |08| Coin A (100Y) meter
                   hopper motor |09| unknown out (ULN2003, pin15)
                      speaker - |10| speaker +
- (ULN2003, pin13) unknown out |11| unknown out (ULN2003, pin12)
+  (ULN2003, pin13) unknown out |11| unknown out (ULN2003, pin12)
                          green |12| red
                           sync |13| blue
   (ULN2003, pin13) unknown out |14| video gnd
@@ -427,8 +427,8 @@ private:
 	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_reset_w);
 	DECLARE_READ8_MEMBER(kurukuru_adpcm_timer_irqack_r);
 	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(ym2149_aout_w);
-	DECLARE_WRITE8_MEMBER(ym2149_bout_w);
+	void ym2149_aout_w(uint8_t data);
+	void ym2149_bout_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -460,7 +460,7 @@ private:
 WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
 {
 	m_soundirq->rst30_w(1);
-	m_adpcm->write_data(m_adpcm_data);
+	m_adpcm->data_w(m_adpcm_data);
 }
 
 
@@ -646,12 +646,12 @@ void kurukuru_state::ppj_audio_io(address_map &map)
 */
 
 /* YM2149 ports */
-WRITE8_MEMBER(kurukuru_state::ym2149_aout_w)
+void kurukuru_state::ym2149_aout_w(uint8_t data)
 {
 	logerror("YM2149: Port A out: %02X\n", data);
 }
 
-WRITE8_MEMBER(kurukuru_state::ym2149_bout_w)
+void kurukuru_state::ym2149_bout_w(uint8_t data)
 {
 	logerror("YM2149: Port B out: %02X\n", data);
 }

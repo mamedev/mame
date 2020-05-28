@@ -50,7 +50,7 @@
 
 /****************************************************************************************/
 
-WRITE8_MEMBER(tunhunt_state::videoram_w)
+void tunhunt_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(tunhunt_state::get_fg_tile_info)
 	int color = attr >> 6;
 	int flags = color ? TILE_FORCE_LAYER0 : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void tunhunt_state::video_start()
@@ -76,7 +76,7 @@ void tunhunt_state::video_start()
 
 	m_tmpbitmap.allocate(256, 64, m_screen->format());
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tunhunt_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tunhunt_state::get_fg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrollx(0, 64);
@@ -209,58 +209,52 @@ void tunhunt_state::draw_motion_object(bitmap_ind16 &bitmap, const rectangle &cl
 
 	bitmap_ind16 &tmpbitmap = m_tmpbitmap;
 	//int skip = m_workram[MOBST];
-	int x0 = 255-m_workram[MOBJV];
-	int y0 = 255-m_workram[MOBJH];
-	int scalex,scaley;
-	int line,span;
-	int x,span_data;
-	int color;
-	int count;
-	const uint8_t *source;
+	const int x0 = 255 - m_workram[MOBJV];
+	const int y0 = 255 - m_workram[MOBJH];
 
-	for( line=0; line<64; line++ )
+	for (int line = 0; line < 64; line++)
 	{
-		x = 0;
-		source = &m_spriteram[line*0x10];
-		for( span=0; span<0x10; span++ )
+		int x = 0;
+		const uint8_t *const source = &m_spriteram[line * 0x10];
+		for (int span = 0; span < 0x10; span++)
 		{
-			span_data = source[span];
-			if( span_data == 0xff ) break;
-			color = ((span_data>>6)&0x3)^0x3;
-			count = (span_data&0x1f)+1;
-			while( count-- && x < 256 )
+			const int span_data = source[span];
+			if (span_data == 0xff) break;
+			const int color = ((span_data >> 6) & 0x3) ^ 0x3;
+			int count = (span_data & 0x1f) + 1;
+			while (count-- && x < 256)
 				tmpbitmap.pix16(line, x++) = color;
 		}
-		while( x<256 )
+		while (x < 256)
 			tmpbitmap.pix16(line, x++) = 0;
-	} /* next line */
+	}
 
-	switch( m_workram[VSTRLO] )
+	int scaley;
+	switch (m_workram[VSTRLO])
 	{
 	case 0x01:
-		scaley = (1<<16)*0.33; /* seems correct */
+		scaley = (1 << 16) * 0.33; // seems correct
 		break;
 
 	case 0x02:
-		scaley = (1<<16)*0.50; /* seems correct */
+		scaley = (1 << 16) * 0.50; // seems correct
 		break;
 
 	default:
-		scaley = (1<<16)*m_workram[VSTRLO]/4; /* ??? */
+		scaley = (1 << 16) * m_workram[VSTRLO] / 4; // ???
 		break;
 	}
-	scalex = (1<<16);
+	const int scalex = 1 << 16;
 
 	copyrozbitmap_trans(
-		bitmap,cliprect,tmpbitmap,
-		-x0*scalex,/* startx */
-		-y0*scaley,/* starty */
-		scalex,/* incxx */
-		0,0,/* incxy,incyx */
-		scaley,/* incyy */
-		0, /* no wraparound */
-		0
-	);
+			bitmap, cliprect, tmpbitmap,
+			-x0 * scalex, // startx
+			-y0 * scaley, // starty
+			scalex, // incxx
+			0, 0, // incxy, incyx
+			scaley, // incyy
+			false, // no wraparound
+			0);
 }
 
 void tunhunt_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect)

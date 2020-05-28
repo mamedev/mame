@@ -35,10 +35,10 @@ public:
 	void clayshoo(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(analog_reset_w);
-	DECLARE_READ8_MEMBER(analog_r);
-	DECLARE_WRITE8_MEMBER(input_port_select_w);
-	DECLARE_READ8_MEMBER(input_port_r);
+	void analog_reset_w(uint8_t data);
+	uint8_t analog_r();
+	void input_port_select_w(uint8_t data);
+	uint8_t input_port_r();
 	uint32_t screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(reset_analog_bit);
 	uint8_t difficulty_input_port_r(int bit);
@@ -68,7 +68,7 @@ private:
  *
  *************************************/
 
-WRITE8_MEMBER(clayshoo_state::input_port_select_w)
+void clayshoo_state::input_port_select_w(uint8_t data)
 {
 	m_input_port_select = data;
 }
@@ -92,7 +92,7 @@ uint8_t clayshoo_state::difficulty_input_port_r( int bit )
 }
 
 
-READ8_MEMBER(clayshoo_state::input_port_r)
+uint8_t clayshoo_state::input_port_r()
 {
 	uint8_t ret = 0;
 
@@ -132,7 +132,7 @@ static attotime compute_duration( device_t *device, int analog_pos )
 }
 
 
-WRITE8_MEMBER(clayshoo_state::analog_reset_w)
+void clayshoo_state::analog_reset_w(uint8_t data)
 {
 	/* reset the analog value, and start the two times that will fire
 	   off in a short period proportional to the position of the
@@ -145,7 +145,7 @@ WRITE8_MEMBER(clayshoo_state::analog_reset_w)
 }
 
 
-READ8_MEMBER(clayshoo_state::analog_r)
+uint8_t clayshoo_state::analog_r()
 {
 	return m_analog_port_val;
 }
@@ -238,9 +238,9 @@ void clayshoo_state::main_io_map(address_map &map)
 	map(0x00, 0x00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x20, 0x23).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x30, 0x33).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-//  AM_RANGE(0x40, 0x43) AM_NOP // 8253 for sound?
-//  AM_RANGE(0x50, 0x50) AM_NOP // ?
-//  AM_RANGE(0x60, 0x60) AM_NOP // ?
+//  map(0x40, 0x43).noprw(); // 8253 for sound?
+//  map(0x50, 0x50).noprw(); // ?
+//  map(0x60, 0x60).noprw(); // ?
 }
 
 

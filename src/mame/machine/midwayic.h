@@ -74,12 +74,12 @@ protected:
 	virtual void device_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(read_a);
-	DECLARE_READ8_MEMBER(read_b);
-	DECLARE_READ8_MEMBER(read_c);
-	DECLARE_WRITE8_MEMBER(write_a);
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
+	uint8_t read_a();
+	uint8_t read_b();
+	uint8_t read_c();
+	void write_a(uint8_t data);
+	void write_b(uint8_t data);
+	void write_c(uint8_t data);
 };
 
 
@@ -164,7 +164,7 @@ public:
 	void fifo_full_w(uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(fifo_reset_w);
-	DECLARE_READ16_MEMBER(fifo_r);
+	uint16_t fifo_r();
 	DECLARE_READ16_MEMBER(fifo_status_r);
 
 	DECLARE_WRITE_LINE_MEMBER(ioasic_input_empty);
@@ -175,7 +175,7 @@ public:
 	DECLARE_READ32_MEMBER( packed_r );
 	DECLARE_WRITE32_MEMBER( packed_w );
 
-	DECLARE_WRITE8_MEMBER(cage_irq_handler);
+	void cage_irq_handler(uint8_t data);
 
 	void serial_rx_w(u8 data);
 

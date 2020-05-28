@@ -434,7 +434,7 @@ void fuuki16_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_raster_interrupt_timer->adjust(m_screen->frame_period());
 		break;
 	default:
-		assert_always(false, "Unknown id in fuuki16_state::device_timer");
+		throw emu_fatalerror("Unknown id in fuuki16_state::device_timer");
 	}
 }
 
@@ -486,7 +486,7 @@ void fuuki16_state::fuuki16(machine_config &config)
 	m_fuukivid->set_palette(m_palette);
 	m_fuukivid->set_color_base(0x400*2);
 	m_fuukivid->set_color_num(0x40);
-	m_fuukivid->set_colpri_callback(FUNC(fuuki16_state::fuuki16_colpri_cb), this);
+	m_fuukivid->set_colpri_callback(FUNC(fuuki16_state::fuuki16_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

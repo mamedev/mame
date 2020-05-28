@@ -11,8 +11,8 @@
 #ifndef FILTER_H
 #define FILTER_H
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 
 #include "library.h"
 

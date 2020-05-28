@@ -55,13 +55,8 @@ int osd_setenv(const char *name, const char *value, int overwrite);
 
 /*-----------------------------------------------------------------------------
     osd_get_clipboard_text: retrieves text from the clipboard
-
-    Return value:
-
-        the returned string needs to be free-ed!
 -----------------------------------------------------------------------------*/
-
-char *osd_get_clipboard_text(void);
+std::string osd_get_clipboard_text(void);
 
 /*-----------------------------------------------------------------------------
     dynamic_module: load functions from optional shared libraries

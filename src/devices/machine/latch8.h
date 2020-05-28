@@ -25,12 +25,12 @@ public:
 
 	/* write & read full byte */
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	/* reset the latch */
 
-	DECLARE_WRITE8_MEMBER( reset_w );
+	void reset_w(offs_t offset, uint8_t data);
 
 	/* read bit x                 */
 	/* return (latch >> x) & 0x01 */
@@ -59,14 +59,14 @@ public:
 	/* write bit x from data into bit determined by offset */
 	/* latch = (latch & ~(1<<offset)) | (((data >> x) & 0x01) << offset) */
 
-	DECLARE_WRITE8_MEMBER( bit0_w );
-	DECLARE_WRITE8_MEMBER( bit1_w );
-	DECLARE_WRITE8_MEMBER( bit2_w );
-	DECLARE_WRITE8_MEMBER( bit3_w );
-	DECLARE_WRITE8_MEMBER( bit4_w );
-	DECLARE_WRITE8_MEMBER( bit5_w );
-	DECLARE_WRITE8_MEMBER( bit6_w );
-	DECLARE_WRITE8_MEMBER( bit7_w );
+	void bit0_w(offs_t offset, uint8_t data);
+	void bit1_w(offs_t offset, uint8_t data);
+	void bit2_w(offs_t offset, uint8_t data);
+	void bit3_w(offs_t offset, uint8_t data);
+	void bit4_w(offs_t offset, uint8_t data);
+	void bit5_w(offs_t offset, uint8_t data);
+	void bit6_w(offs_t offset, uint8_t data);
+	void bit7_w(offs_t offset, uint8_t data);
 
 	/* Bit mask specifying bits to be masked *out* */
 	void set_maskout(uint32_t maskout) { m_maskout = maskout; }
@@ -104,8 +104,8 @@ private:
 	uint32_t           m_xorvalue;  /* after mask */
 	uint32_t           m_nosync;
 
-	devcb_write_line   m_write_cb[8];
-	devcb_read_line    m_read_cb[8];
+	devcb_write_line::array<8> m_write_cb;
+	devcb_read_line::array<8> m_read_cb;
 };
 
 DECLARE_DEVICE_TYPE(LATCH8, latch8_device)

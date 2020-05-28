@@ -102,7 +102,7 @@ void nubus_bootbug_device::device_start()
 
 	slotspace = get_slotspace();
 
-	nubus().install_device(slotspace, slotspace+0xff, read32_delegate(FUNC(nubus_bootbug_device::dev_r), this), write32_delegate(FUNC(nubus_bootbug_device::dev_w), this));
+	nubus().install_device(slotspace, slotspace+0xff, read32_delegate(*this, FUNC(nubus_bootbug_device::dev_r)), write32_delegate(*this, FUNC(nubus_bootbug_device::dev_w)));
 }
 
 //-------------------------------------------------

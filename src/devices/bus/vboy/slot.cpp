@@ -1,15 +1,23 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
-/***********************************************************************************************************
+// copyright-holders:Vas Crabb
+/***************************************************************************
+ Virtual Boy cartridge slot
 
-    Nintendo Virtual Boy cart emulation
-    (through slot devices)
-
- ***********************************************************************************************************/
-
+ TODO:
+ - Sound capabilities
+ ***************************************************************************/
 
 #include "emu.h"
 #include "slot.h"
+
+#include "emuopts.h"
+#include "romload.h"
+
+#include <cstring>
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -17,234 +25,151 @@
 
 DEFINE_DEVICE_TYPE(VBOY_CART_SLOT, vboy_cart_slot_device, "vboy_cart_slot", "Nintendo Virtual Boy Cartridge Slot")
 
-//**************************************************************************
-//    vboy cartridges Interface
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_vboy_cart_interface - constructor
-//-------------------------------------------------
-
-device_vboy_cart_interface::device_vboy_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0),
-		m_rom_mask(0)
-{
-}
-
-
-//-------------------------------------------------
-//  ~device_vboy_cart_interface - destructor
-//-------------------------------------------------
-
-device_vboy_cart_interface::~device_vboy_cart_interface()
-{
-}
-
-//-------------------------------------------------
-//  rom_alloc - alloc the space for the cart
-//-------------------------------------------------
-
-void device_vboy_cart_interface::rom_alloc(uint32_t size, const char *tag)
-{
-	if (m_rom == nullptr)
-	{
-		m_rom = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(VBOYSLOT_ROM_REGION_TAG).c_str(), size, 4, ENDIANNESS_LITTLE)->base();
-		m_rom_size = size/4;
-		m_rom_mask = m_rom_size - 1;
-	}
-}
-
-
-//-------------------------------------------------
-//  ram_alloc - alloc the space for the ram
-//-------------------------------------------------
-
-void device_vboy_cart_interface::eeprom_alloc(uint32_t size)
-{
-	m_eeprom.resize(size/sizeof(uint32_t));
-}
-
 
 //**************************************************************************
-//  LIVE DEVICE
+//  vboy_cart_slot_device
 //**************************************************************************
 
-//-------------------------------------------------
-//  vboy_cart_slot_device - constructor
-//-------------------------------------------------
-vboy_cart_slot_device::vboy_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vboy_cart_slot_device::vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, VBOY_CART_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
-	m_type(VBOY_STD),
+	device_single_card_slot_interface<device_vboy_cart_interface>(mconfig, *this),
+	m_intcro(*this),
+	m_exp_space(*this, finder_base::DUMMY_TAG, -1, 32),
+	m_chip_space(*this, finder_base::DUMMY_TAG, -1, 32),
+	m_rom_space(*this, finder_base::DUMMY_TAG, -1, 32),
+	m_exp_base(0U),
+	m_chip_base(0U),
+	m_rom_base(0U),
 	m_cart(nullptr)
 {
 }
 
 
-//-------------------------------------------------
-//  vboy_cart_slot_device - destructor
-//-------------------------------------------------
-
-vboy_cart_slot_device::~vboy_cart_slot_device()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void vboy_cart_slot_device::device_start()
-{
-	m_cart = dynamic_cast<device_vboy_cart_interface *>(get_card_device());
-}
-
-
-//-------------------------------------------------
-//  vboy PCB
-//-------------------------------------------------
-
-struct vboy_slot
-{
-	int                     pcb_id;
-	const char              *slot_option;
-};
-
-// Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
-static const vboy_slot slot_list[] =
-{
-	{ VBOY_STD,       "vb_rom" },
-	{ VBOY_EEPROM,    "vb_eeprom" }
-};
-
-static int vboy_get_pcb_id(const char *slot)
-{
-	for (auto & elem : slot_list)
-	{
-		if (!core_stricmp(elem.slot_option, slot))
-			return elem.pcb_id;
-	}
-
-	return 0;
-}
-
-#if 0
-static const char *vboy_get_slot(int type)
-{
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
-	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
-	}
-
-	return "vb_rom";
-}
-#endif
-
-/*-------------------------------------------------
- call load
- -------------------------------------------------*/
-
 image_init_result vboy_cart_slot_device::call_load()
 {
-	if (m_cart)
-	{
-		uint8_t *ROM;
-		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
-		bool has_eeprom = loaded_through_softlist() && get_software_region("eeprom");
-
-		if (len > 0x200000)
-		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return image_init_result::FAIL;
-		}
-
-		// always alloc 0x200000 so to be able to directly map the region
-		// to the address map (speeding up emulation a bit)
-		m_cart->rom_alloc(0x200000, tag());
-		if (has_eeprom)
-			m_cart->eeprom_alloc(get_software_region_length("eeprom"));
-
-		ROM = (uint8_t *)m_cart->get_rom_base();
-
-		if (!loaded_through_softlist())
-			fread(ROM, len);
-		else
-			memcpy(ROM, get_software_region("rom"), len);
-
-		if (len < 0x080000) { memcpy(ROM + 0x040000, ROM, 0x040000); }
-		if (len < 0x100000) { memcpy(ROM + 0x080000, ROM, 0x080000); }
-		if (len < 0x200000) { memcpy(ROM + 0x100000, ROM, 0x100000); }
-
-		if (!loaded_through_softlist())
-			m_type = vboy_get_pcb_id("vb_rom");
-		else
-		{
-			const char *pcb_name = get_feature("slot");
-			if (pcb_name)
-				m_type = vboy_get_pcb_id(pcb_name);
-		}
-
-		//printf("Type: %s\n", vboy_get_slot(m_type));
-
+	if (!m_cart)
 		return image_init_result::PASS;
+
+	memory_region *romregion(loaded_through_softlist() ? memregion("rom") : nullptr);
+	if (loaded_through_softlist() && !romregion)
+	{
+		seterror(IMAGE_ERROR_INVALIDIMAGE, "Software list item has no 'rom' data area");
+		return image_init_result::FAIL;
 	}
 
-	return image_init_result::PASS;
+	u32 const len(loaded_through_softlist() ? romregion->bytes() : length());
+	if ((0x0000'0003 & len) || (0x0100'0000 < len))
+	{
+		seterror(IMAGE_ERROR_UNSUPPORTED, "Unsupported cartridge size (must be a multiple of 4 bytes no larger than 16 MiB)");
+		return image_init_result::FAIL;
+	}
+
+	if (!loaded_through_softlist())
+	{
+		LOG("Allocating %u byte cartridge ROM region\n", len);
+		romregion = machine().memory().region_alloc(subtag("rom").c_str(), len, 4, ENDIANNESS_LITTLE);
+		u32 const cnt(fread(romregion->base(), len));
+		if (cnt != len)
+		{
+			seterror(IMAGE_ERROR_UNSPECIFIED, "Error reading cartridge file");
+			return image_init_result::FAIL;
+		}
+	}
+
+	return m_cart->load();
 }
 
-
-/*-------------------------------------------------
- call_unload
- -------------------------------------------------*/
 
 void vboy_cart_slot_device::call_unload()
 {
-	if (m_cart && m_cart->get_eeprom_base() && m_cart->get_eeprom_size())
-		battery_save(m_cart->get_eeprom_base(), m_cart->get_eeprom_size() * 4);
+	if (m_cart)
+		m_cart->unload();
 }
 
-/*-------------------------------------------------
- get default card software
- -------------------------------------------------*/
+
+void vboy_cart_slot_device::device_validity_check(validity_checker &valid) const
+{
+	if (m_exp_base & 0x00ff'ffff)
+		osd_printf_error("EXP base address 0x%X is not on a 24-bit boundary\n", m_exp_base);
+
+	if (m_chip_base & 0x00ff'ffff)
+		osd_printf_error("CHIP base address 0x%X is not on a 24-bit boundary\n", m_chip_base);
+
+	if (m_rom_base & 0x00ff'ffff)
+		osd_printf_error("ROM base address 0x%X is not on a 24-bit boundary\n", m_rom_base);
+}
+
+
+void vboy_cart_slot_device::device_resolve_objects()
+{
+	m_intcro.resolve_safe();
+}
+
+
+void vboy_cart_slot_device::device_start()
+{
+	if (!m_exp_space && ((m_exp_space.finder_tag() != finder_base::DUMMY_TAG) || (m_exp_space.spacenum() >= 0)))
+		throw emu_fatalerror("%s: Address space %d of device %s not found (EXP)\n", tag(), m_exp_space.spacenum(), m_exp_space.finder_tag());
+
+	if (!m_chip_space && ((m_chip_space.finder_tag() != finder_base::DUMMY_TAG) || (m_chip_space.spacenum() >= 0)))
+		throw emu_fatalerror("%s: Address space %d of device %s not found (CHIP)\n", tag(), m_chip_space.spacenum(), m_chip_space.finder_tag());
+
+	if (!m_rom_space && ((m_rom_space.finder_tag() != finder_base::DUMMY_TAG) || (m_rom_space.spacenum() >= 0)))
+		throw emu_fatalerror("%s: Address space %d of device %s not found (ROM)\n", tag(), m_rom_space.spacenum(), m_rom_space.finder_tag());
+
+	m_cart = get_card_device();
+}
+
 
 std::string vboy_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	return software_get_default_slot("vb_rom");
-}
-
-/*-------------------------------------------------
- read
- -------------------------------------------------*/
-
-READ32_MEMBER(vboy_cart_slot_device::read_cart)
-{
-	if (m_cart)
-		return m_cart->read_cart(space, offset, mem_mask);
+	std::string const image_name(mconfig().options().image_option(instance_name()).value());
+	software_part const *const part(!image_name.empty() ? find_software_item(image_name, true) : nullptr);
+	if (part)
+	{
+		//printf("[%s] Found software part for image name '%s'\n", tag(), image_name.c_str());
+		for (rom_entry const &entry : part->romdata())
+		{
+			if (ROMENTRY_ISREGION(entry) && (entry.name() == "sram"))
+			{
+				//printf("[%s] Found 'sram' data area, enabling cartridge backup RAM\n", tag());
+				return "flatrom_sram";
+			}
+		}
+	}
 	else
-		return 0xffffffff;
+	{
+		//printf("[%s] No software part found for image name '%s'\n", tag(), image_name.c_str());
+	}
+
+	//printf("[%s] Assuming plain ROM cartridge\n", tag());
+	return "flatrom";
 }
 
-/*-------------------------------------------------
- read
- -------------------------------------------------*/
 
-READ32_MEMBER(vboy_cart_slot_device::read_eeprom)
+
+//**************************************************************************
+//  device_vboy_cart_interface
+//**************************************************************************
+
+void device_vboy_cart_interface::unload()
 {
-	if (m_cart)
-		return m_cart->read_eeprom(space, offset, mem_mask);
-	else
-		return 0xffffffff;
 }
 
-/*-------------------------------------------------
- write
- -------------------------------------------------*/
 
-WRITE32_MEMBER(vboy_cart_slot_device::write_eeprom)
+device_vboy_cart_interface::device_vboy_cart_interface(machine_config const &mconfig, device_t &device) :
+	device_interface(device, "vboycart"),
+	m_slot(dynamic_cast<vboy_cart_slot_device *>(device.owner()))
 {
-	if (m_cart)
-		m_cart->write_eeprom(space, offset, data, mem_mask);
+}
+
+
+
+#include "rom.h"
+
+void vboy_carts(device_slot_interface &device)
+{
+	device.option_add_internal("flatrom", VBOY_FLAT_ROM);
+	device.option_add_internal("flatrom_sram", VBOY_FLAT_ROM_SRAM);
 }

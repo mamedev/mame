@@ -28,8 +28,8 @@ DEFINE_DEVICE_TYPE(ADAMNET_SLOT, adamnet_slot_device, "adamnet_slot", "ADAMnet s
 //  device_adamnet_card_interface - constructor
 //-------------------------------------------------
 
-device_adamnet_card_interface::device_adamnet_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
+device_adamnet_card_interface::device_adamnet_card_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "adamnet"),
 	m_bus(nullptr)
 {
 }
@@ -54,7 +54,8 @@ device_adamnet_card_interface::~device_adamnet_card_interface()
 //-------------------------------------------------
 adamnet_slot_device::adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ADAMNET_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this), m_bus(nullptr)
+	device_single_card_slot_interface<device_adamnet_card_interface>(mconfig, *this),
+	m_bus(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -65,9 +66,8 @@ adamnet_slot_device::adamnet_slot_device(const machine_config &mconfig, const ch
 
 void adamnet_slot_device::device_start()
 {
-	m_bus = machine().device<adamnet_device>(ADAMNET_TAG);
-	device_adamnet_card_interface *dev = dynamic_cast<device_adamnet_card_interface *>(get_card_device());
-	if (dev) m_bus->add_device(get_card_device());
+	device_adamnet_card_interface *dev = get_card_device();
+	if (dev) m_bus->add_device(&dev->device());
 }
 
 

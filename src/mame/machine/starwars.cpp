@@ -78,7 +78,7 @@ WRITE_LINE_MEMBER(starwars_state::coin2_counter_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(starwars_state::matrix_flag_r)
+READ_LINE_MEMBER(starwars_state::matrix_flag_r)
 {
 	/* set the matrix processor flag */
 	return m_math_run ? 1 : 0;

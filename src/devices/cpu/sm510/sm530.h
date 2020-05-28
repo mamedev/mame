@@ -29,8 +29,8 @@ protected:
 	virtual void device_reset() override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 3 - 1) / 3; } // 3 cycles per machine cycle
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * 3); } // "
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 3 - 1) / 3; } // 3 cycles per machine cycle
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 3); } // "
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 

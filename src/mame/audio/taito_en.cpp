@@ -65,10 +65,6 @@ void taito_en_device::device_reset()
 
 	uint16_t *ROM = (uint16_t *)m_osrom->base();
 	std::copy(&ROM[0x80000], &ROM[0x80004], &m_osram[0]); /* Stack and Reset vectors */
-
-	/* reset CPU to catch any banking of startup vectors */
-	m_audiocpu->reset();
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -78,14 +74,14 @@ void taito_en_device::device_reset()
  *
  *************************************/
 
-WRITE16_MEMBER( taito_en_device::en_es5505_bank_w )
+void taito_en_device::en_es5505_bank_w(offs_t offset, uint16_t data)
 {
 	/* mask out unused bits */
 	data &= m_bankmask;
 	m_ensoniq->voice_bank_w(offset,data<<20);
 }
 
-WRITE8_MEMBER( taito_en_device::en_volume_w )
+void taito_en_device::en_volume_w(offs_t offset, uint8_t data)
 {
 	m_mb87078->data_w(offset ^ 1, data);
 }
@@ -124,7 +120,7 @@ void taito_en_device::fc7_map(address_map &map)
  *
  *************************************/
 
-WRITE8_MEMBER(taito_en_device::mb87078_gain_changed)
+void taito_en_device::mb87078_gain_changed(offs_t offset, uint8_t data)
 {
 	if (offset > 1)
 	{
@@ -168,7 +164,7 @@ void taito_en_device::es5505_clock_changed(u32 data)
     IP5: 1MHz
 */
 
-WRITE8_MEMBER(taito_en_device::duart_output)
+void taito_en_device::duart_output(uint8_t data)
 {
 	if (data & 0x40)
 	{
@@ -195,7 +191,7 @@ WRITE8_MEMBER(taito_en_device::duart_output)
 void taito_en_device::device_add_mconfig(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_audiocpu, XTAL(30'476'100) / 2);
+	M68000(config, m_audiocpu, XTAL(30'476'180) / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taito_en_device::en_sound_map);
 	m_audiocpu->set_addrmap(m68000_device::AS_CPU_SPACE, &taito_en_device::fc7_map);
 
@@ -216,12 +212,12 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ESQ_5505_5510_PUMP(config, m_pump, XTAL(30'476'100) / (2 * 16 * 32));
+	ESQ_5505_5510_PUMP(config, m_pump, XTAL(30'476'180) / (2 * 16 * 32));
 	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, "lspeaker", 1.0);
 	m_pump->add_route(1, "rspeaker", 1.0);
 
-	ES5505(config, m_ensoniq, XTAL(30'476'100) / 2);
+	ES5505(config, m_ensoniq, XTAL(30'476'180) / 2);
 	m_ensoniq->sample_rate_changed().set(FUNC(taito_en_device::es5505_clock_changed));
 	m_ensoniq->set_region0("ensoniq.0");
 	m_ensoniq->set_region1("ensoniq.0");

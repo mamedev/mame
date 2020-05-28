@@ -34,6 +34,8 @@ public:
 		m_an(*this, { { "AN_C", "AN_D", "AN_E", "AN_F" } }),
 		m_fakex(*this, "FAKEX"),
 		m_fakey(*this, "FAKEY"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2"),
 		m_visarea(0, 0, 0, 0),
 		m_bankxor(0)
 	{}
@@ -58,7 +60,7 @@ public:
 	void init_arligntn();
 	void init_hstennis();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
+	DECLARE_READ_LINE_MEMBER(special_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
 
 protected:
@@ -89,6 +91,8 @@ protected:
 	optional_ioport_array<4> m_an;
 	optional_ioport m_fakex;
 	optional_ioport m_fakey;
+	optional_ioport m_p1;
+	optional_ioport m_p2;
 
 	rectangle m_visarea;
 
@@ -132,7 +136,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(blitter_bank_w);
 	DECLARE_WRITE8_MEMBER(rimrockn_bank_w);
-	DECLARE_WRITE8_MEMBER(pia_portb_out);
+	void pia_portb_out(uint8_t data);
 	DECLARE_WRITE8_MEMBER(gtg2_sound_data_w);
 	DECLARE_WRITE8_MEMBER(grom_bank_w);
 	DECLARE_WRITE8_MEMBER(palette_w);
@@ -141,8 +145,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE8_MEMBER(tms34061_w);
 	DECLARE_READ8_MEMBER(tms34061_r);
-	DECLARE_WRITE8_MEMBER(pia_porta_out);
-	DECLARE_WRITE8_MEMBER(ym2203_portb_out);
+	void pia_porta_out(uint8_t data);
+	void ym2203_portb_out(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

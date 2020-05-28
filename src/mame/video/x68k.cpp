@@ -93,22 +93,22 @@ bitmap_rgb32* ::x68k_get_gfx_page(int pri,int type)
 }
 */
 
-READ16_MEMBER(x68k_state::tvram_read)
+uint16_t x68k_state::tvram_read(offs_t offset)
 {
 	return m_tvram[offset];
 }
 
-WRITE16_MEMBER(x68k_state::tvram_write)
+void x68k_state::tvram_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tvram[offset]);
 }
 
-READ16_MEMBER(x68k_state::gvram_read)
+uint16_t x68k_state::gvram_read(offs_t offset)
 {
 	return m_gvram[offset];
 }
 
-WRITE16_MEMBER(x68k_state::gvram_write)
+void x68k_state::gvram_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_gvram[offset]);
 }
@@ -277,7 +277,10 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 						if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
 							m_special.pix16(scanline, pixel) = colour;
 						else
+						{
 							bitmap.pix16(scanline, pixel) = colour;
+							m_special.pix16(scanline, pixel) = 0;
+						}
 					}
 					loc++;
 					loc &= 0x3ff;
@@ -322,7 +325,15 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 							else if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
 								m_special.pix16(scanline, pixel) = colour;
 							else
+							{
+								m_special.pix16(scanline, pixel) = 0;
 								bitmap.pix16(scanline, pixel) = colour;
+							}
+						}
+						else if(((m_video.reg[2] & 0x1800) == 0x1000) && m_special.pix16(scanline, pixel))
+						{
+							bitmap.pix16(scanline, pixel) = m_special.pix16(scanline, pixel);
+							m_special.pix16(scanline, pixel) = 0;
 						}
 						loc++;
 						loc &= 0x1ff;
@@ -360,7 +371,15 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 								else if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
 									m_special.pix16(scanline, pixel) = colour;
 								else
+								{
 									bitmap.pix16(scanline, pixel) = colour;
+									m_special.pix16(scanline, pixel) = 0;
+								}
+							}
+							else if(((m_video.reg[2] & 0x1800) == 0x1000) && m_special.pix16(scanline, pixel))
+							{
+								bitmap.pix16(scanline, pixel) = m_special.pix16(scanline, pixel);
+								m_special.pix16(scanline, pixel) = 0;
 							}
 							loc++;
 							loc &= 0x1ff;
@@ -548,7 +567,7 @@ TILE_GET_INFO_MEMBER(x68k_state::get_bg0_tile)
 	int code = m_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(0,code,colour,flags);
+	tileinfo.set(0,code,colour,flags);
 }
 
 TILE_GET_INFO_MEMBER(x68k_state::get_bg1_tile)
@@ -556,7 +575,7 @@ TILE_GET_INFO_MEMBER(x68k_state::get_bg1_tile)
 	int code = m_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(0,code,colour,flags);
+	tileinfo.set(0,code,colour,flags);
 }
 
 TILE_GET_INFO_MEMBER(x68k_state::get_bg0_tile_16)
@@ -564,7 +583,7 @@ TILE_GET_INFO_MEMBER(x68k_state::get_bg0_tile_16)
 	int code = m_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(1,code,colour,flags);
+	tileinfo.set(1,code,colour,flags);
 }
 
 TILE_GET_INFO_MEMBER(x68k_state::get_bg1_tile_16)
@@ -572,7 +591,7 @@ TILE_GET_INFO_MEMBER(x68k_state::get_bg1_tile_16)
 	int code = m_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(1,code,colour,flags);
+	tileinfo.set(1,code,colour,flags);
 }
 
 void x68k_state::video_start()
@@ -592,10 +611,10 @@ void x68k_state::video_start()
 	m_gfxdecode->gfx(gfx_index)->set_colors(32);
 
 	/* Tilemaps */
-	m_bg0_8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(x68k_state::get_bg0_tile),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg1_8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(x68k_state::get_bg1_tile),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg0_16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(x68k_state::get_bg0_tile_16),this),TILEMAP_SCAN_ROWS,16,16,64,64);
-	m_bg1_16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(x68k_state::get_bg1_tile_16),this),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_bg0_8 =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(x68k_state::get_bg0_tile)),    TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_bg1_8 =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(x68k_state::get_bg1_tile)),    TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_bg0_16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(x68k_state::get_bg0_tile_16)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_bg1_16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(x68k_state::get_bg1_tile_16)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_bg0_8->set_transparent_pen(0);
 	m_bg1_8->set_transparent_pen(0);

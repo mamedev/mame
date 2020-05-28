@@ -9,6 +9,7 @@
 DECLARE_DEVICE_TYPE(R4000, r4000_device)
 DECLARE_DEVICE_TYPE(R4400, r4400_device)
 DECLARE_DEVICE_TYPE(R4600, r4600_device)
+DECLARE_DEVICE_TYPE(R5000, r5000_device)
 
 class r4000_base_device : public cpu_device
 {
@@ -45,7 +46,7 @@ public:
 	void bus_error() { m_bus_error = true; }
 
 protected:
-	enum cache_size_t
+	enum cache_size
 	{
 		CACHE_4K   = 0,
 		CACHE_8K   = 1,
@@ -56,7 +57,7 @@ protected:
 		CACHE_256K = 6,
 		CACHE_512K = 7,
 	};
-	r4000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 prid, cache_size_t icache_size, cache_size_t dcache_size);
+	r4000_base_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size icache_size, cache_size dcache_size);
 
 	enum cp0_reg : int
 	{
@@ -319,13 +320,14 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_execute_interface overrides
-	virtual u32 execute_min_cycles() const override { return 1; }
-	virtual u32 execute_max_cycles() const override { return 40; }
-	virtual u32 execute_input_lines() const override { return 6; }
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 40; }
+	virtual u32 execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// cpu implementation
+	virtual void handle_reserved_instruction(u32 const op);
 	void cpu_execute(u32 const op);
 	void cpu_exception(u32 exception, u16 const vector = 0x180);
 	void cpu_lwl(u32 const op);
@@ -354,20 +356,23 @@ protected:
 	// cp1 implementation
 	void cp1_unimplemented();
 	template <typename T> bool cp1_op(T op);
-	void cp1_execute(u32 const op);
+	virtual void cp1_execute(u32 const op);
+	virtual void cp1x_execute(u32 const op);
 	template <typename T> void cp1_set(unsigned const reg, T const data);
+	void cp1_mov_s(u32 const op);
+	void cp1_mov_d(u32 const op);
 
 	// cp2 implementation
 	void cp2_execute(u32 const op);
 
 	// address and memory handling
-	enum translate_t { ERROR, MISS, UNCACHED, CACHED };
-	translate_t translate(int intention, u64 &address);
+	enum translate_result { ERROR, MISS, UNCACHED, CACHED };
+	translate_result translate(int intention, u64 &address);
 	void address_error(int intention, u64 const address);
 
-	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, bool> load(u64 program_address, U &&apply);
+	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, bool> load(u64 program_address, U &&apply);
 	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(u64, T)>>::value, bool> load_linked(u64 program_address, U &&apply);
-	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::value, bool> store(u64 program_address, U data, T mem_mask = ~T(0));
+	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, T>::value, bool> store(u64 program_address, U data, T mem_mask = ~T(0));
 	bool fetch(u64 address, std::function<void(u32)> &&apply);
 
 	// debugging helpers
@@ -387,7 +392,7 @@ protected:
 	u64 m_r[32];
 	u64 m_hi;
 	u64 m_lo;
-	enum branch_state_t : unsigned
+	enum branch_state : unsigned
 	{
 		NONE      = 0,
 		DELAY     = 1, // delay slot instruction active
@@ -402,9 +407,10 @@ protected:
 	u64 m_cp0[32];
 	u64 m_cp0_timer_zero;
 	emu_timer *m_cp0_timer;
+	bool m_hard_reset;
 	bool m_ll_active;
 	bool m_bus_error;
-	struct tlb_entry_t
+	struct tlb_entry
 	{
 		u64 mask;
 		u64 vpn;
@@ -441,7 +447,7 @@ class r4000_device : public r4000_base_device
 public:
 	// NOTE: R4000 chips prior to 3.0 have an xtlb bug
 	r4000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4000, tag, owner, clock, 0x0430, CACHE_8K, CACHE_8K)
+		: r4000_base_device(mconfig, R4000, tag, owner, clock, 0x0430, 0x0500, CACHE_8K, CACHE_8K)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
@@ -452,7 +458,7 @@ class r4400_device : public r4000_base_device
 {
 public:
 	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, CACHE_16K, CACHE_16K)
+		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, 0x0500, CACHE_16K, CACHE_16K)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
@@ -463,10 +469,29 @@ class r4600_device : public r4000_base_device
 {
 public:
 	r4600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4600, tag, owner, clock, 0x2000, CACHE_16K, CACHE_16K)
+		: r4000_base_device(mconfig, R4600, tag, owner, clock, 0x2020, 0x2020, CACHE_16K, CACHE_16K)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
 	}
+};
+
+class r5000_device : public r4000_base_device
+{
+public:
+	r5000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: r4000_base_device(mconfig, R5000, tag, owner, clock, 0x2320, 0x2320, CACHE_32K, CACHE_32K)
+	{
+		// no secondary cache
+		m_cp0[CP0_Config] |= CONFIG_SC;
+	}
+
+private:
+	virtual void handle_reserved_instruction(u32 const op) override;
+	virtual void cp1_execute(u32 const op) override;
+	virtual void cp1x_execute(u32 const op) override;
+
+	static u32 const s_fcc_masks[8];
+	static u32 const s_fcc_shifts[8];
 };
 #endif // MAME_CPU_MIPS_R4000_H

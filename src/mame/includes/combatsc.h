@@ -99,7 +99,7 @@ public:
 	DECLARE_READ8_MEMBER(combatsc_busy_r);
 	DECLARE_WRITE8_MEMBER(combatsc_play_w);
 	DECLARE_WRITE8_MEMBER(combatsc_voice_reset_w);
-	DECLARE_WRITE8_MEMBER(combatsc_portA_w);
+	void combatsc_portA_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(combatscb_msm_w);
 	DECLARE_WRITE8_MEMBER(combatscb_sound_irq_ack);
 	void init_combatsc();

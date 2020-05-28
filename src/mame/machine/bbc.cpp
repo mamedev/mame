@@ -10,7 +10,7 @@
 
 ******************************************************************************/
 
-#include <ctype.h>
+#include <cctype>
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/tms5220.h"
@@ -31,56 +31,138 @@ TIMER_CALLBACK_MEMBER(bbc_state::reset_timer_cb)
   BBC Model B memory handling functions
 ****************************************/
 
-WRITE8_MEMBER(bbc_state::bbc_romsel_w)
+uint8_t bbc_state::bbc_ram_r(offs_t offset)
 {
-	if (m_swramtype == 0)
-	{
-		/* no sideways expansion board fitted so address only the 4 on board ROM sockets */
-		m_swrbank = (data & 0x03) | 0x0c;
-	}
+	if (m_internal && m_internal->overrides_ram())
+		return m_internal->ram_r(offset);
 	else
-	{
-		/* expansion board fitted so address all 16 ROM sockets */
-		m_swrbank = data & 0x0f;
-	}
+		return m_ram->pointer()[offset & m_ram->mask()];
 }
 
-READ8_MEMBER(bbc_state::bbc_paged_r)
+void bbc_state::bbc_ram_w(offs_t offset, uint8_t data)
+{
+	if (m_internal && m_internal->overrides_ram())
+		m_internal->ram_w(offset, data);
+	else
+		m_ram->pointer()[offset & m_ram->mask()] = data;
+}
+
+uint8_t bbc_state::bbc_romsel_r(offs_t offset)
+{
+	if (m_internal && m_internal->overrides_rom())
+		return m_internal->romsel_r(offset);
+	else
+		return 0xfe;
+}
+
+void bbc_state::bbc_romsel_w(offs_t offset, uint8_t data)
+{
+	/* no sideways expansion board fitted so address only the 4 on board ROM sockets */
+	m_romsel = data & 0x03;
+
+	/* pass romsel to internal expansion board */
+	if (m_internal && m_internal->overrides_rom())
+		m_internal->romsel_w(offset, data);
+}
+
+uint8_t bbc_state::bbc_paged_r(offs_t offset)
 {
 	uint8_t data;
-	std::string region_tag;
 
-	if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
+	if (m_internal && m_internal->overrides_rom())
 	{
-		data = m_rom[m_swrbank]->read(offset);
+		data = m_internal->paged_r(offset);
 	}
 	else
 	{
-		data = m_region_swr->base()[offset + (m_swrbank << 14)];
+		if (m_rom[m_romsel] && m_rom[m_romsel]->present())
+		{
+			data = m_rom[m_romsel]->read(offset);
+		}
+		else
+		{
+			data = m_region_swr->base()[offset + (m_romsel << 14)];
+		}
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbc_paged_w)
+void bbc_state::bbc_paged_w(offs_t offset, uint8_t data)
 {
-	static const unsigned short swramtype[4][16] = {
-		// TODO: move sideways ROM/RAM boards to slot devices
-		{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // 0: none
-		{ 0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1 }, // 1: 128K (bank 8 to 15) Solidisk sideways ram userport bank latch (not implemented)
-		{ 0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0 }, // 2: 64K (banks 4 to 7) for Acorn sideways ram FE30 bank latch
-		{ 0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1 }, // 3: 128K (banks 8 to 15) for Acorn sideways ram FE30 bank latch
-	};
-	std::string region_tag;
+	if (m_internal && m_internal->overrides_rom())
+	{
+		m_internal->paged_w(offset, data);
+	}
+	else
+	{
+		if (m_rom[m_romsel])
+		{
+			m_rom[m_romsel]->write(offset, data);
+		}
+	}
+}
 
-	if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
-	{
-		m_rom[m_swrbank]->write(offset, data);
-	}
-	else if (swramtype[m_swramtype][m_swrbank])
-	{
-		m_region_swr->base()[offset + (m_swrbank << 14)] = data;
-	}
+uint8_t bbc_state::bbc_mos_r(offs_t offset)
+{
+	if (m_internal && m_internal->overrides_mos())
+		return m_internal->mos_r(offset);
+	else
+		return m_region_mos->base()[offset];
+}
+
+void bbc_state::bbc_mos_w(offs_t offset, uint8_t data)
+{
+	if (m_internal && m_internal->overrides_mos())
+		m_internal->mos_w(offset, data);
+}
+
+uint8_t bbc_state::bbc_fred_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	data &= m_1mhzbus->fred_r(offset);
+
+	if (m_cart[0])
+		data &= m_cart[0]->read(offset, 1, 0, m_romsel & 0x01, 0, 0);
+	if (m_cart[1])
+		data &= m_cart[1]->read(offset, 1, 0, m_romsel & 0x01, 0, 0);
+
+	return data;
+}
+
+void bbc_state::bbc_fred_w(offs_t offset, uint8_t data)
+{
+	m_1mhzbus->fred_w(offset, data);
+
+	if (m_cart[0])
+		m_cart[0]->write(offset, data, 1, 0, m_romsel & 0x01, 0, 0);
+	if (m_cart[1])
+		m_cart[1]->write(offset, data, 1, 0, m_romsel & 0x01, 0, 0);
+}
+
+uint8_t bbc_state::bbc_jim_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	data &= m_1mhzbus->jim_r(offset);
+
+	if(m_cart[0])
+		data &= m_cart[0]->read(offset, 0, 1, m_romsel & 0x01, 0, 0);
+	if (m_cart[1])
+		data &= m_cart[1]->read(offset, 0, 1, m_romsel & 0x01, 0, 0);
+
+	return data;
+}
+
+void bbc_state::bbc_jim_w(offs_t offset, uint8_t data)
+{
+	m_1mhzbus->jim_w(offset, data);
+
+	if (m_cart[0])
+		m_cart[0]->write(offset, data, 0, 1, m_romsel & 0x01, 0, 0);
+	if (m_cart[1])
+		m_cart[1]->write(offset, data, 0, 1, m_romsel & 0x01, 0, 0);
 }
 
 
@@ -88,7 +170,7 @@ WRITE8_MEMBER(bbc_state::bbc_paged_w)
   BBC Model B+ memory handling functions
 ****************************************/
 
-READ8_MEMBER(bbc_state::bbcbp_fetch_r)
+uint8_t bbc_state::bbcbp_fetch_r(offs_t offset)
 {
 	switch (offset & 0xf000)
 	{
@@ -124,7 +206,7 @@ READ8_MEMBER(bbc_state::bbcbp_fetch_r)
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(bbc_state::bbcbp_romsel_w)
+void bbc_state::bbcbp_romsel_w(offs_t offset, uint8_t data)
 {
 	/* the BBC Model B+ addresses all 16 ROM sockets and extra 12K of RAM at 0x8000 and 20K of shadow RAM at 0x3000 */
 	switch (offset & 0x07)
@@ -132,7 +214,7 @@ WRITE8_MEMBER(bbc_state::bbcbp_romsel_w)
 	case 0x00:
 		m_paged_ram = BIT(data, 7);
 
-		m_swrbank = data & 0x0f;
+		m_romsel = data & 0x0f;
 		break;
 
 	case 0x04:
@@ -141,9 +223,13 @@ WRITE8_MEMBER(bbc_state::bbcbp_romsel_w)
 		setvideoshadow(m_vdusel);
 		break;
 	}
+
+	/* pass romsel to internal expansion board */
+	if (m_internal && m_internal->overrides_rom())
+		m_internal->romsel_w(offset, data);
 }
 
-READ8_MEMBER(bbc_state::bbcbp_paged_r)
+uint8_t bbc_state::bbcbp_paged_r(offs_t offset)
 {
 	uint8_t data;
 	std::string region_tag;
@@ -154,38 +240,46 @@ READ8_MEMBER(bbc_state::bbcbp_paged_r)
 	}
 	else
 	{
-		if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
+		if (m_internal && m_internal->overrides_rom())
 		{
-			data = m_rom[m_swrbank]->read(offset);
+			data = m_internal->paged_r(offset);
 		}
 		else
 		{
-			data = m_region_swr->base()[offset + (m_swrbank << 14)];
+			/* 32K sockets */
+			if (m_rom[m_romsel & 0x0e] && m_rom[m_romsel & 0x0e]->present())
+			{
+				data = m_rom[m_romsel & 0x0e]->read(offset | (m_romsel & 0x01) << 14);
+			}
+			else
+			{
+				data = m_region_swr->base()[offset + (m_romsel << 14)];
+			}
 		}
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbcbp_paged_w)
+void bbc_state::bbcbp_paged_w(offs_t offset, uint8_t data)
 {
-	/* the BBC Model B+ 128K has extra RAM mapped in replacing the ROM banks 0,1,c and d. */
-	static const unsigned short swram_banks[16] = { 1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0 };
-	std::string region_tag;
-
 	if (m_paged_ram && offset < 0x3000)
 	{
 		m_ram->pointer()[offset + 0x8000] = data;
 	}
 	else
 	{
-		if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
+		if (m_internal && m_internal->overrides_rom())
 		{
-			m_rom[m_swrbank]->write(offset, data);
+			m_internal->paged_w(offset, data);
 		}
-		else if (m_ram->size() == 128 * 1024 && swram_banks[m_swrbank])
+		else
 		{
-			m_region_swr->base()[offset + (m_swrbank << 14)] = data;
+			/* 32K sockets */
+			if (m_rom[m_romsel & 0x0e])
+			{
+				m_rom[m_romsel & 0x0e]->write(offset | (m_romsel & 0x01) << 14, data);
+			}
 		}
 	}
 }
@@ -225,7 +319,7 @@ WRITE8_MEMBER(bbc_state::bbcbp_paged_w)
   ANDY is the name of the 4K of RAM used by the MOS at &8000-&8FFF
 */
 
-READ8_MEMBER(bbc_state::bbcm_fetch_r)
+uint8_t bbc_state::bbcm_fetch_r(offs_t offset)
 {
 	if (m_acccon_x || (m_acccon_e && offset >= 0xc000 && offset <= 0xdfff))
 	{
@@ -238,12 +332,12 @@ READ8_MEMBER(bbc_state::bbcm_fetch_r)
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-READ8_MEMBER(bbc_state::bbcm_acccon_r)
+uint8_t bbc_state::bbcm_acccon_r()
 {
 	return m_acccon;
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_acccon_w)
+void bbc_state::bbcm_acccon_w(uint8_t data)
 {
 	m_acccon = data;
 
@@ -278,16 +372,19 @@ WRITE8_MEMBER(bbc_state::bbcm_acccon_w)
 	m_bankdev->set_bank(m_acccon_tst);
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_romsel_w)
+void bbc_state::bbcm_romsel_w(offs_t offset, uint8_t data)
 {
-	m_paged_ram = (data & 0x80) >> 7;
-	m_swrbank = data & 0x0f;
+	m_paged_ram = BIT(data, 7);
+	m_romsel = data & 0x0f;
+
+	/* pass romsel to internal expansion board */
+	if (m_internal && m_internal->overrides_rom())
+		m_internal->romsel_w(offset, data);
 }
 
-READ8_MEMBER(bbc_state::bbcm_paged_r)
+uint8_t bbc_state::bbcm_paged_r(offs_t offset)
 {
-	uint8_t data;
-	std::string region_tag;
+	uint8_t data = 0xff;
 
 	if (m_paged_ram && offset < 0x1000)
 	{
@@ -295,41 +392,203 @@ READ8_MEMBER(bbc_state::bbcm_paged_r)
 	}
 	else
 	{
-		if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
+		switch (m_romsel)
 		{
-			data = m_rom[m_swrbank]->read(offset);
-		}
-		else
-		{
-			data = m_region_swr->base()[offset + (m_swrbank << 14)];
+		case 0: case 1:
+			if (m_cart[0] && m_cart[0]->present())
+			{
+				data = m_cart[0]->read(offset, 0, 0, m_romsel & 0x01, 1, 0);
+			}
+			else
+			{
+				data = bus_video_data();
+			}
+			break;
+		case 2: case 3:
+			if (m_cart[1] && m_cart[1]->present())
+			{
+				data = m_cart[1]->read(offset, 0, 0, m_romsel & 0x01, 1, 0);
+			}
+			else
+			{
+				data = bus_video_data();
+			}
+			break;
+		default:
+			if (m_internal && m_internal->overrides_rom())
+			{
+				data = m_internal->paged_r(offset);
+			}
+			else
+			{
+				switch (m_romsel)
+				{
+				case 4: case 5: case 6: case 7:
+					/* 32K sockets */
+					if (m_rom[m_romsel & 0x0e] && m_rom[m_romsel & 0x0e]->present())
+					{
+						data = m_rom[m_romsel & 0x0e]->read(offset | (m_romsel & 0x01) << 14);
+					}
+					else
+					{
+						data = m_region_swr->base()[offset + (m_romsel << 14)];
+					}
+					break;
+				default:
+					/* 16K sockets */
+					if (m_rom[m_romsel] && m_rom[m_romsel]->present())
+					{
+						data = m_rom[m_romsel]->read(offset);
+					}
+					else
+					{
+						data = m_region_swr->base()[offset + (m_romsel << 14)];
+					}
+					break;
+				}
+			}
+			break;
 		}
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_paged_w)
+void bbc_state::bbcm_paged_w(offs_t offset, uint8_t data)
 {
-	std::string region_tag;
-
 	if (m_paged_ram && offset < 0x1000)
 	{
 		m_ram->pointer()[offset + 0x8000] = data;
 	}
 	else
 	{
-		if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
+		switch (m_romsel)
 		{
-			m_rom[m_swrbank]->write(offset, data);
-		}
-		else if ((!m_lk19_ic37_paged_rom && (m_swrbank == 4 || m_swrbank == 5)) || (!m_lk18_ic41_paged_rom && (m_swrbank == 6 || m_swrbank == 7)))
-		{
-			m_region_swr->base()[offset + (m_swrbank << 14)] = data;
+		case 0: case 1:
+			if (m_cart[0])
+			{
+				m_cart[0]->write(offset, data, 0, 0, m_romsel & 0x01, 1, 0);
+			}
+			break;
+		case 2: case 3:
+			if (m_cart[1])
+			{
+				m_cart[1]->write(offset, data, 0, 0, m_romsel & 0x01, 1, 0);
+			}
+			break;
+		default:
+			if (m_internal && m_internal->overrides_rom())
+			{
+				m_internal->paged_w(offset, data);
+			}
+			else
+			{
+				switch (m_romsel)
+				{
+				case 4: case 5: case 6: case 7:
+					/* 32K sockets */
+					if (m_rom[m_romsel & 0x0e])
+					{
+						m_rom[m_romsel & 0x0e]->write(offset | (m_romsel & 0x01) << 14, data);
+					}
+					break;
+				default:
+					/* 16K sockets */
+					if (m_rom[m_romsel])
+					{
+						m_rom[m_romsel]->write(offset, data);
+					}
+					break;
+				}
+			}
+			break;
 		}
 	}
 }
 
-READ8_MEMBER(bbc_state::bbcm_hazel_r)
+uint8_t bbc_state::bbcmc_paged_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	if (m_paged_ram && offset < 0x1000)
+	{
+		data = m_ram->pointer()[offset + 0x8000];
+	}
+	else
+	{
+		if (m_internal && m_internal->overrides_rom())
+		{
+			data = m_internal->paged_r(offset);
+		}
+		else
+		{
+			switch (m_romsel)
+			{
+			case 0: case 1: case 4: case 5: case 6: case 7:
+				/* 32K sockets */
+				if (m_rom[m_romsel & 0x0e] && m_rom[m_romsel & 0x0e]->present())
+				{
+					data = m_rom[m_romsel & 0x0e]->read(offset | (m_romsel & 0x01) << 14);
+				}
+				else
+				{
+					data = m_region_swr->base()[offset + (m_romsel << 14)];
+				}
+				break;
+			default:
+				/* 16K sockets */
+				if (m_rom[m_romsel] && m_rom[m_romsel]->present())
+				{
+					data = m_rom[m_romsel]->read(offset);
+				}
+				else
+				{
+					data = m_region_swr->base()[offset + (m_romsel << 14)];
+				}
+				break;
+			}
+		}
+	}
+
+	return data;
+}
+
+void bbc_state::bbcmc_paged_w(offs_t offset, uint8_t data)
+{
+	if (m_paged_ram && offset < 0x1000)
+	{
+		m_ram->pointer()[offset + 0x8000] = data;
+	}
+	else
+	{
+		if (m_internal && m_internal->overrides_rom())
+		{
+			m_internal->paged_w(offset, data);
+		}
+		else
+		{
+			switch (m_romsel)
+			{
+			case 0: case 1: case 4: case 5: case 6: case 7:
+				/* 32K sockets */
+				if (m_rom[m_romsel & 0x0e])
+				{
+					m_rom[m_romsel & 0x0e]->write(offset | (m_romsel & 0x01) << 14, data);
+				}
+				break;
+			default:
+				/* 16K sockets */
+				if (m_rom[m_romsel])
+				{
+					m_rom[m_romsel]->write(offset, data);
+				}
+				break;
+			}
+		}
+	}
+}
+
+uint8_t bbc_state::bbcm_hazel_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -339,13 +598,16 @@ READ8_MEMBER(bbc_state::bbcm_hazel_r)
 	}
 	else
 	{
-		data = m_region_mos->base()[offset];
+		if (m_internal && m_internal->overrides_mos())
+			data = m_internal->mos_r(offset);
+		else
+			data = m_region_mos->base()[offset];
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_hazel_w)
+void bbc_state::bbcm_hazel_w(offs_t offset, uint8_t data)
 {
 	if (m_acccon_y)
 	{
@@ -353,7 +615,7 @@ WRITE8_MEMBER(bbc_state::bbcm_hazel_w)
 	}
 }
 
-READ8_MEMBER(bbc_state::bbcm_tube_r)
+uint8_t bbc_state::bbcm_tube_r(offs_t offset)
 {
 	uint8_t data = 0xfe;
 
@@ -371,7 +633,7 @@ READ8_MEMBER(bbc_state::bbcm_tube_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_tube_w)
+void bbc_state::bbcm_tube_w(offs_t offset, uint8_t data)
 {
 	if (m_acccon_itu)
 	{
@@ -500,19 +762,12 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 		/* keyboard not enabled so increment counter */
 		m_column = (m_column + 1) % 16;
 
-		if (m_column < 13)
+		/* KBD IC4 8 input NAND gate */
+		/* set the value of via_system ca2, by checking for any keys
+		     being pressed on the selected m_column */
+		if ((m_keyboard[m_column]->read() | 0x01) != 0xff)
 		{
-			/* KBD IC4 8 input NAND gate */
-			/* set the value of via_system ca2, by checking for any keys
-			     being pressed on the selected m_column */
-			if ((m_keyboard[m_column]->read() | 0x01) != 0xff)
-			{
-				m_via6522_0->write_ca2(1);
-			}
-			else
-			{
-				m_via6522_0->write_ca2(0);
-			}
+			m_via6522_0->write_ca2(1);
 		}
 		else
 		{
@@ -533,14 +788,7 @@ int bbc_state::bbc_keyboard(int data)
 
 	bit = 0;
 
-	if (m_column < 13)
-	{
-		res = m_keyboard[m_column]->read();
-	}
-	else
-	{
-		res = 0xff;
-	}
+	res = m_keyboard[m_column]->read();
 
 	/* Normal keyboard result */
 	if ((res & (1<<row)) == 0)
@@ -640,12 +888,12 @@ void bbc_state::mc146818_set()
 }
 
 
-READ8_MEMBER(bbc_state::via_system_porta_r)
+uint8_t bbc_state::via_system_porta_r()
 {
 	return m_via_system_porta;
 }
 
-WRITE8_MEMBER(bbc_state::via_system_porta_w)
+void bbc_state::via_system_porta_w(uint8_t data)
 {
 	m_via_system_porta = data;
 
@@ -667,7 +915,7 @@ WRITE8_MEMBER(bbc_state::via_system_porta_w)
 }
 
 
-READ8_MEMBER(bbc_state::via_system_portb_r)
+uint8_t bbc_state::via_system_portb_r()
 {
 	uint8_t data = 0xff;
 
@@ -697,7 +945,7 @@ READ8_MEMBER(bbc_state::via_system_portb_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::via_system_portb_w)
+void bbc_state::via_system_portb_w(uint8_t data)
 {
 	m_latch->write_nibble_d3(data);
 
@@ -985,7 +1233,7 @@ void bbc_state::cassette_motor(bool motor_state)
                110 - 16MHz / 13 / 256 -    75 baud
 */
 
-WRITE8_MEMBER(bbc_state::serial_ula_w)
+void bbc_state::serial_ula_w(uint8_t data)
 {
 	static const int serial_clocks[8] =
 	{
@@ -1027,32 +1275,6 @@ WRITE_LINE_MEMBER(bbc_state::bus_nmi_w)
 {
 	m_bus_nmi = state;
 	update_nmi();
-}
-
-
-/**************************************
-   i8271 disc control function
-***************************************/
-
-
-WRITE_LINE_MEMBER(bbc_state::motor_w)
-{
-	floppy_image_device *floppy0 = m_i8271->subdevice<floppy_connector>("0")->get_device();
-	floppy_image_device *floppy1 = m_i8271->subdevice<floppy_connector>("1")->get_device();
-
-	if (floppy0) floppy0->mon_w(!state);
-	if (floppy1) floppy1->mon_w(!state);
-
-	m_i8271->ready_w(!state);
-}
-
-WRITE_LINE_MEMBER(bbc_state::side_w)
-{
-	floppy_image_device *floppy0 = m_i8271->subdevice<floppy_connector>("0")->get_device();
-	floppy_image_device *floppy1 = m_i8271->subdevice<floppy_connector>("1")->get_device();
-
-	if (floppy0) floppy0->ss_w(state);
-	if (floppy1) floppy1->ss_w(state);
 }
 
 
@@ -1099,7 +1321,7 @@ WRITE_LINE_MEMBER(bbc_state::fdc_drq_w)
          0        Drive select 0.
 */
 
-WRITE8_MEMBER(bbc_state::bbcbp_drive_control_w)
+void bbc_state::bbcbp_drive_control_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -1135,7 +1357,7 @@ WRITE8_MEMBER(bbc_state::bbcbp_drive_control_w)
          0        Drive select 0.
 */
 
-WRITE8_MEMBER(bbc_state::bbcm_drive_control_w)
+void bbc_state::bbcm_drive_control_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -1155,7 +1377,7 @@ WRITE8_MEMBER(bbc_state::bbcm_drive_control_w)
 	m_wd1770->mr_w(BIT(data, 2));
 }
 
-WRITE8_MEMBER(bbc_state::bbcmc_drive_control_w)
+void bbc_state::bbcmc_drive_control_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -1173,45 +1395,6 @@ WRITE8_MEMBER(bbc_state::bbcmc_drive_control_w)
 
 	// bit 2: reset
 	m_wd1772->mr_w(BIT(data, 2));
-}
-
-/**************************************
-   BBC cartslot loading functions
-***************************************/
-
-image_init_result bbc_state::load_cart(device_image_interface &image, generic_slot_device *slot)
-{
-	if (!image.loaded_through_softlist())
-	{
-		uint32_t filesize = image.length();
-
-		if (filesize > 0x8000)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cartridge socket accepts 16K/32K only");
-			return image_init_result::FAIL;
-		}
-
-		slot->rom_alloc(filesize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-		image.fread(slot->get_rom_base(), filesize);
-		return image_init_result::PASS;
-	}
-	else
-	{
-		uint32_t size_lo = image.get_software_region_length("lorom");
-		uint32_t size_hi = image.get_software_region_length("uprom");
-
-		if (size_lo + size_hi > 0x8000)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return image_init_result::FAIL;
-		}
-
-		slot->rom_alloc(0x8000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-		memcpy(slot->get_rom_base() + 0x0000, image.get_software_region("lorom"), size_lo);
-		memcpy(slot->get_rom_base() + 0x4000, image.get_software_region("uprom"), size_hi);
-	}
-
-	return image_init_result::PASS;
 }
 
 
@@ -1234,8 +1417,7 @@ void bbc_state::init_bbc()
 	/* light pen strobe detect (not emulated) */
 	m_via6522_0->write_cb2(1);
 
-	m_monitortype = monitor_type_t::COLOUR;
-	m_swramtype = 0;
+	update_palette(monitor_type::COLOUR);
 }
 
 void bbc_state::init_ltmp()
@@ -1243,46 +1425,14 @@ void bbc_state::init_ltmp()
 	init_bbc();
 
 	/* LTM machines used a 9" Hantarex MT3000 green monitor */
-	m_monitortype = monitor_type_t::GREEN;
-}
-
-void bbc_state::init_bbcm()
-{
-	std::string region_tag;
-
-	init_bbc();
-
-	/* set links if ROM present, disabling RAM */
-	if (m_rom[4] && memregion(region_tag.assign(m_rom[4]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
-	{
-		/* link for ROM in slots 4 and 5 */
-		m_lk19_ic37_paged_rom = true;
-	}
-	else
-	{
-		m_lk18_ic41_paged_rom = false;
-	}
-	if (m_rom[6] && memregion(region_tag.assign(m_rom[6]->tag()).append(BBC_ROM_REGION_TAG).c_str()))
-	{
-		/* link for ROM in slots 6 and 7 */
-		m_lk18_ic41_paged_rom = true;
-	}
-	else
-	{
-		m_lk18_ic41_paged_rom = false;
-	}
+	update_palette(monitor_type::GREEN);
 }
 
 void bbc_state::init_cfa()
 {
 	init_bbc();
 
-	/* link for ROM in slots 4 and 5 */
-	m_lk19_ic37_paged_rom = true;
-	/* link for ROM in slots 6 and 7 */
-	m_lk18_ic41_paged_rom = true;
-
-	m_monitortype = monitor_type_t::GREEN;
+	update_palette(monitor_type::GREEN);
 }
 
 
@@ -1316,7 +1466,7 @@ void bbc_state::insert_device_rom(memory_region *rom)
 		/* compare first 1K of bank with what we want to insert */
 		if (!memcmp(rom->base(), m_region_swr->base() + (bank * 0x4000), 0x400))
 		{
-			osd_printf_verbose("Found '%s' in romslot%d\n", get_rom_name(rom->base()).c_str(), bank);
+			osd_printf_verbose("Found '%s' in romslot%d\n", get_rom_name(rom->base()), bank);
 			return;
 		}
 	}
@@ -1335,8 +1485,8 @@ void bbc_state::insert_device_rom(memory_region *rom)
 				if (swr[0x0006] == 0xff && swr[0x4006] == 0xff)
 				{
 					memcpy(m_region_swr->base() + (bank * 0x4000), rom->base(), rom->bytes());
-					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base() + 0x4000).c_str(), bank + 1);
-					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base()).c_str(), bank);
+					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base() + 0x4000), bank + 1);
+					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base()), bank);
 					return;
 				}
 				break;
@@ -1346,7 +1496,7 @@ void bbc_state::insert_device_rom(memory_region *rom)
 				if (swr[0x0006] == 0xff)
 				{
 					memcpy(m_region_swr->base() + (bank * 0x4000), rom->base(), rom->bytes());
-					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base()).c_str(), bank);
+					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base()), bank);
 					return;
 				}
 				break;
@@ -1365,12 +1515,18 @@ void bbc_state::setup_device_roms()
 	device_t* exp_device;
 	device_t* ext_device;
 
-	/* insert ROM for FDC devices (BBC Model B only), always place into romslot 12 */
-	if (m_fdc && (exp_device = dynamic_cast<device_t*>(m_fdc->get_card_device())))
+	/* insert ROM(s) for internal expansion boards */
+	if (m_internal && (exp_device = dynamic_cast<device_t*>(m_internal->get_card_device())))
+	{
+		insert_device_rom(exp_device->memregion("exp_rom"));
+	}
+
+	/* insert ROM for FDC devices (BBC Model B only), always place into romslot 0 */
+	if (m_fdc && m_fdc->insert_rom() && (exp_device = dynamic_cast<device_t*>(m_fdc->get_card_device())))
 	{
 		if (exp_device->memregion("dfs_rom"))
 		{
-			memcpy(m_region_swr->base() + 0x30000, exp_device->memregion("dfs_rom")->base(), exp_device->memregion("dfs_rom")->bytes());
+			memcpy(m_region_swr->base(), exp_device->memregion("dfs_rom")->base(), exp_device->memregion("dfs_rom")->bytes());
 		}
 	}
 
@@ -1389,7 +1545,7 @@ void bbc_state::setup_device_roms()
 	/* configure cartslots */
 	for (int i = 0; i < 2; i++)
 	{
-		if (m_cart[i] && (rom_region = memregion(region_tag.assign(m_cart[i]->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
+		if (m_cart[i] && (rom_region = memregion(region_tag.assign(m_cart[i]->tag()).append(ELECTRON_CART_ROM_REGION_TAG).c_str())))
 		{
 			memcpy(m_region_swr->base() + (i * 0x8000), rom_region->base(), rom_region->bytes());
 		}
@@ -1450,15 +1606,15 @@ void bbc_state::setup_device_roms()
 	}
 
 	/* insert ROM(s) for Tube devices */
-	if (m_tube && (exp_device = dynamic_cast<device_t*>(m_tube->get_card_device())))
+	if (m_tube && m_tube->insert_rom() && (exp_device = dynamic_cast<device_t*>(m_tube->get_card_device())))
 	{
 		insert_device_rom(exp_device->memregion("exp_rom"));
 	}
-	if (m_intube && (exp_device = dynamic_cast<device_t*>(m_intube->get_card_device())))
+	if (m_intube && m_intube->insert_rom() && (exp_device = dynamic_cast<device_t*>(m_intube->get_card_device())))
 	{
 		insert_device_rom(exp_device->memregion("exp_rom"));
 	}
-	if (m_extube && (exp_device = dynamic_cast<device_t*>(m_extube->get_card_device())))
+	if (m_extube && m_extube->insert_rom() && (exp_device = dynamic_cast<device_t*>(m_extube->get_card_device())))
 	{
 		insert_device_rom(exp_device->memregion("exp_rom"));
 	}
@@ -1478,7 +1634,7 @@ void bbc_state::setup_device_roms()
 	/* list all inserted ROMs */
 	for (int i = 15; i >= 0; i--)
 	{
-		osd_printf_info("ROM %X : %s\n", i, get_rom_name(m_region_swr->base() + (i * 0x4000)).c_str());
+		osd_printf_info("ROM %X : %s\n", i, get_rom_name(m_region_swr->base() + (i * 0x4000)));
 	}
 }
 
@@ -1490,30 +1646,27 @@ void bbc_state::setup_device_roms()
 void bbc_state::machine_start()
 {
 	setup_device_roms();
+
+	/* register save states */
+	save_item(NAME(m_vula_ctrl));
+	save_item(NAME(m_vula_palette));
+	save_item(NAME(m_vula_palette_lookup));
+	save_item(STRUCT_MEMBER(m_vnula, palette_mode));
+	save_item(STRUCT_MEMBER(m_vnula, horiz_offset));
+	save_item(STRUCT_MEMBER(m_vnula, left_blank));
+	save_item(STRUCT_MEMBER(m_vnula, disable));
+	save_item(STRUCT_MEMBER(m_vnula, flash));
+	save_item(STRUCT_MEMBER(m_vnula, palette_byte));
+	save_item(STRUCT_MEMBER(m_vnula, palette_write));
 }
 
 void bbc_state::machine_reset()
 {
-	m_swramtype = (m_bbcconfig.read_safe(0) & 0x38) >> 3;
-	/* bank 1 regular lower RAM from 0000 to 3fff */
-	m_bank1->set_base(m_ram->pointer());
-	/* bank 3 regular higher RAM from 4000 to 7fff */
-	if (m_ram->size() == 16 * 1024)
-	{
-		/* 16K just repeat the lower 16K*/
-		m_bank3->set_base(m_ram->pointer());
-	}
-	else
-	{
-		/* 32K */
-		m_bank3->set_base(m_ram->pointer() + 0x4000);
-	}
-
 	/* install econet hardware */
 	if (m_bbcconfig.read_safe(0) & 0x04)
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfea0, 0xfebf, read8sm_delegate(FUNC(mc6854_device::read), m_adlc.target()), write8sm_delegate(FUNC(mc6854_device::write), m_adlc.target()));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfea0, 0xfebf, read8sm_delegate(*m_adlc, FUNC(mc6854_device::read)), write8sm_delegate(*m_adlc, FUNC(mc6854_device::write)));
 	else
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfea0, 0xfebf, read8_delegate(FUNC(bbc_state::bbc_fe_r), this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfea0, 0xfebf, read8smo_delegate(*this, FUNC(bbc_state::bbc_fe_r)));
 
 	/* power-on reset timer, should produce "boo...beep" startup sound before sn76496 is initialised */
 	//m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

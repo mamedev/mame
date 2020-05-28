@@ -48,11 +48,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 2; }
-	virtual uint32_t execute_max_cycles() const override { return 16; }
-	virtual uint32_t execute_input_lines() const override { return 4; }
-	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 16; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -236,11 +236,11 @@ protected:
 	const address_space_config m_program_config;
 	const address_space_config m_opcodes_config;
 	const address_space_config m_io_config;
-	address_space *m_program;
-	address_space *m_opcodes;
-	address_space *m_io;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_opcodes_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_args;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_opcodes;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
+
 	devcb_write_line m_irqack_cb;
 	devcb_write8 m_refresh_cb;
 	devcb_write_line m_halt_cb;
@@ -298,7 +298,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_input_lines() const override { return 7; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 7; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

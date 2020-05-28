@@ -41,8 +41,8 @@ void msx_slot_ram_mm_device::device_start()
 	save_item(NAME(m_bank_selected));
 
 	// Install IO read/write handlers
-	io_space().install_read_handler(0xFC, 0xFF, read8sm_delegate(FUNC(msx_slot_ram_mm_device::read_mapper_bank), this));
-	io_space().install_write_handler(0xFC, 0xFF, write8sm_delegate(FUNC(msx_slot_ram_mm_device::write_mapper_bank), this));
+	io_space().install_read_handler(0xFC, 0xFF, read8sm_delegate(*this, FUNC(msx_slot_ram_mm_device::read_mapper_bank)));
+	io_space().install_write_handler(0xFC, 0xFF, write8sm_delegate(*this, FUNC(msx_slot_ram_mm_device::write_mapper_bank)));
 }
 
 void msx_slot_ram_mm_device::device_post_load()

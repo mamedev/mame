@@ -91,31 +91,31 @@ void megasys1_tilemap_device::device_start()
 
 	// create 16x16 tilemaps
 	m_tilemap[0][0] = &machine().tilemap().create(
-			*this, tilemap_get_info_delegate(FUNC(megasys1_tilemap_device::get_scroll_tile_info_16x16),this), tilemap_mapper_delegate(FUNC(megasys1_tilemap_device::scan_16x16),this),
-			8,8, TILES_PER_PAGE_X * 16, TILES_PER_PAGE_Y * 2);
+			*this, tilemap_get_info_delegate(*this, FUNC(megasys1_tilemap_device::get_scroll_tile_info_16x16)), tilemap_mapper_delegate(*this, FUNC(megasys1_tilemap_device::scan_16x16)),
+			8, 8, TILES_PER_PAGE_X * 16, TILES_PER_PAGE_Y * 2);
 	m_tilemap[0][1] = &machine().tilemap().create(
-			*this, tilemap_get_info_delegate(FUNC(megasys1_tilemap_device::get_scroll_tile_info_16x16),this), tilemap_mapper_delegate(FUNC(megasys1_tilemap_device::scan_16x16),this),
-			8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 4);
+			*this, tilemap_get_info_delegate(*this, FUNC(megasys1_tilemap_device::get_scroll_tile_info_16x16)), tilemap_mapper_delegate(*this, FUNC(megasys1_tilemap_device::scan_16x16)),
+			8, 8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 4);
 	m_tilemap[0][2] = &machine().tilemap().create(
-			*this, tilemap_get_info_delegate(FUNC(megasys1_tilemap_device::get_scroll_tile_info_16x16),this), tilemap_mapper_delegate(FUNC(megasys1_tilemap_device::scan_16x16),this),
-			8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 8);
+			*this, tilemap_get_info_delegate(*this, FUNC(megasys1_tilemap_device::get_scroll_tile_info_16x16)), tilemap_mapper_delegate(*this, FUNC(megasys1_tilemap_device::scan_16x16)),
+			8, 8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 8);
 	m_tilemap[0][3] = &machine().tilemap().create(
-			*this, tilemap_get_info_delegate(FUNC(megasys1_tilemap_device::get_scroll_tile_info_16x16),this), tilemap_mapper_delegate(FUNC(megasys1_tilemap_device::scan_16x16),this),
-			8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 16);
+			*this, tilemap_get_info_delegate(*this, FUNC(megasys1_tilemap_device::get_scroll_tile_info_16x16)), tilemap_mapper_delegate(*this, FUNC(megasys1_tilemap_device::scan_16x16)),
+			8, 8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 16);
 
 	// create 8x8 tilemaps
 	m_tilemap[1][0] = &machine().tilemap().create(
-			*this, tilemap_get_info_delegate(FUNC(megasys1_tilemap_device::get_scroll_tile_info_8x8),this), tilemap_mapper_delegate(FUNC(megasys1_tilemap_device::scan_8x8),this),
-			8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 1);
+			*this, tilemap_get_info_delegate(*this, FUNC(megasys1_tilemap_device::get_scroll_tile_info_8x8)), tilemap_mapper_delegate(*this, FUNC(megasys1_tilemap_device::scan_8x8)),
+			8, 8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 1);
 	m_tilemap[1][1] = &machine().tilemap().create(
-			*this, tilemap_get_info_delegate(FUNC(megasys1_tilemap_device::get_scroll_tile_info_8x8),this), tilemap_mapper_delegate(FUNC(megasys1_tilemap_device::scan_8x8),this),
-			8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
+			*this, tilemap_get_info_delegate(*this, FUNC(megasys1_tilemap_device::get_scroll_tile_info_8x8)), tilemap_mapper_delegate(*this, FUNC(megasys1_tilemap_device::scan_8x8)),
+			8, 8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
 	m_tilemap[1][2] = &machine().tilemap().create(
-			*this, tilemap_get_info_delegate(FUNC(megasys1_tilemap_device::get_scroll_tile_info_8x8),this), tilemap_mapper_delegate(FUNC(megasys1_tilemap_device::scan_8x8),this),
-			8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
+			*this, tilemap_get_info_delegate(*this, FUNC(megasys1_tilemap_device::get_scroll_tile_info_8x8)), tilemap_mapper_delegate(*this, FUNC(megasys1_tilemap_device::scan_8x8)),
+			8, 8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
 	m_tilemap[1][3] = &machine().tilemap().create(
-			*this, tilemap_get_info_delegate(FUNC(megasys1_tilemap_device::get_scroll_tile_info_8x8),this), tilemap_mapper_delegate(FUNC(megasys1_tilemap_device::scan_8x8),this),
-			8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 4);
+			*this, tilemap_get_info_delegate(*this, FUNC(megasys1_tilemap_device::get_scroll_tile_info_8x8)), tilemap_mapper_delegate(*this, FUNC(megasys1_tilemap_device::scan_8x8)),
+			8, 8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 4);
 
 	// set transparency
 	for (int i = 0; i < 8; i++)
@@ -228,7 +228,7 @@ TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_8x8)
 {
 	uint16_t code = m_scrollram[tile_index];
 	uint16_t tile = ((code & 0xfff) + m_tile_bank) * m_8x8_scroll_factor;
-	SET_TILE_INFO_MEMBER(0, tile, code >> (16 - m_bits_per_color_code), 0);
+	tileinfo.set(0, tile, code >> (16 - m_bits_per_color_code), 0);
 }
 
 TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_16x16)
@@ -237,7 +237,7 @@ TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_16x16)
 	uint16_t tile = ((code & 0xfff) + m_tile_bank) * m_16x16_scroll_factor;
 	tile+= tile_index & 3;
 
-	SET_TILE_INFO_MEMBER(0, tile, code >> (16 - m_bits_per_color_code), 0);
+	tileinfo.set(0, tile, code >> (16 - m_bits_per_color_code), 0);
 }
 
 READ16_MEMBER(megasys1_tilemap_device::scroll_r)

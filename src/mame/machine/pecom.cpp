@@ -46,22 +46,22 @@ void pecom_state::machine_reset()
 
 READ8_MEMBER(pecom_state::pecom_cdp1869_charram_r)
 {
-	return m_cdp1869->char_ram_r(space, offset);
+	return m_cdp1869->char_ram_r(offset);
 }
 
 WRITE8_MEMBER(pecom_state::pecom_cdp1869_charram_w)
 {
-	return m_cdp1869->char_ram_w(space, offset, data);
+	return m_cdp1869->char_ram_w(offset, data);
 }
 
 READ8_MEMBER(pecom_state::pecom_cdp1869_pageram_r)
 {
-	return m_cdp1869->page_ram_r(space, offset);
+	return m_cdp1869->page_ram_r(offset);
 }
 
 WRITE8_MEMBER(pecom_state::pecom_cdp1869_pageram_w)
 {
-	return m_cdp1869->page_ram_w(space, offset, data);
+	return m_cdp1869->page_ram_w(offset, data);
 }
 
 WRITE8_MEMBER(pecom_state::pecom_bank_w)
@@ -73,10 +73,10 @@ WRITE8_MEMBER(pecom_state::pecom_bank_w)
 
 	if (data==2)
 	{
-		space2.install_read_handler (0xf000, 0xf7ff, read8_delegate(FUNC(pecom_state::pecom_cdp1869_charram_r),this));
-		space2.install_write_handler(0xf000, 0xf7ff, write8_delegate(FUNC(pecom_state::pecom_cdp1869_charram_w),this));
-		space2.install_read_handler (0xf800, 0xffff, read8_delegate(FUNC(pecom_state::pecom_cdp1869_pageram_r),this));
-		space2.install_write_handler(0xf800, 0xffff, write8_delegate(FUNC(pecom_state::pecom_cdp1869_pageram_w),this));
+		space2.install_read_handler (0xf000, 0xf7ff, read8_delegate(*this, FUNC(pecom_state::pecom_cdp1869_charram_r)));
+		space2.install_write_handler(0xf000, 0xf7ff, write8_delegate(*this, FUNC(pecom_state::pecom_cdp1869_charram_w)));
+		space2.install_read_handler (0xf800, 0xffff, read8_delegate(*this, FUNC(pecom_state::pecom_cdp1869_pageram_r)));
+		space2.install_write_handler(0xf800, 0xffff, write8_delegate(*this, FUNC(pecom_state::pecom_cdp1869_pageram_w)));
 	}
 	else
 	{
@@ -145,7 +145,7 @@ WRITE_LINE_MEMBER(pecom_state::q_w)
 	m_cassette->output(state ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER(pecom_state::sc_w )
+void pecom_state::sc_w(uint8_t data)
 {
 	switch (data)
 	{

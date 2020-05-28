@@ -160,13 +160,13 @@ WRITE16_MEMBER(dio16_98643_device::novram_w)
 	COMBINE_DATA(&m_novram[offset & 0x3f]);
 }
 
-WRITE16_MEMBER(dio16_98643_device::lance_dma_out)
+void dio16_98643_device::lance_dma_out(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("%s: offset=%04x, data=%d\n", __func__, offset, data);
 	COMBINE_DATA(&m_ram[(offset >> 1) & 0x1fff]);
 }
 
-READ16_MEMBER(dio16_98643_device::lance_dma_in)
+uint16_t dio16_98643_device::lance_dma_in(offs_t offset)
 {
 	uint16_t ret = m_ram[(offset >> 1) & 0x1fff];
 
@@ -194,19 +194,19 @@ void dio16_98643_device::addrmap(address_map &map)
 {
 	map(0x0000, 0x0001).rw(FUNC(dio16_98643_device::id_r), FUNC(dio16_98643_device::id_w));
 	map(0x0002, 0x0003).rw(FUNC(dio16_98643_device::sc_r), FUNC(dio16_98643_device::sc_w));
-	map(0x4000, 0x4003).lrw16("lance",
-		[this](address_space &space, offs_t offset, u16 mem_mask) -> u16 {
-			m_sc |= REG_STATUS_ACK;
-			return m_lance->regs_r(space, offset, mem_mask);
-		},
-		[this](address_space &space, offs_t offset, u16 data, u16 mem_mask) {
-			m_sc |= REG_STATUS_ACK;
-			return m_lance->regs_w(space, offset, data, mem_mask);
-		});
+	map(0x4000, 0x4003).lrw16(
+			[this] (address_space &space, offs_t offset, u16 mem_mask) -> u16 {
+				m_sc |= REG_STATUS_ACK;
+				return m_lance->regs_r(space, offset, mem_mask);
+			}, "lance_r",
+			[this] (address_space &space, offs_t offset, u16 data, u16 mem_mask) {
+				m_sc |= REG_STATUS_ACK;
+				return m_lance->regs_w(space, offset, data, mem_mask);
+			}, "lance_w");
 
-	map(0x8000, 0xbfff).lrw16("lanceram",
-		[this](offs_t offset) -> u16 { return m_ram[offset]; },
-		[this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_ram[offset]); });
+	map(0x8000, 0xbfff).lrw16(
+			NAME([this] (offs_t offset) -> u16 { return m_ram[offset]; }),
+			NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_ram[offset]); }));
 
 	map(0xc000, 0xffff).rw(FUNC(dio16_98643_device::novram_r), FUNC(dio16_98643_device::novram_w));
 }

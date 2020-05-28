@@ -118,7 +118,7 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_0)
 	int tile = m_vram_0[tile_index*2+0];
 	int color = m_vram_0[tile_index*2+1] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -129,7 +129,7 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_1)
 	int tile = m_vram_1[tile_index*2+0];
 	int color = m_vram_1[tile_index*2+1] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -140,7 +140,7 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_2)
 	int tile = m_vram_2[tile_index*2+0];
 	int color = m_vram_2[tile_index*2+1] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -151,7 +151,7 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_3)
 	int tile = m_vram_3[tile_index*2+0];
 	int color = m_vram_3[tile_index*2+1] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -159,10 +159,10 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_3)
 
 void umipoker_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_1),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_2),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_tilemap_3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_3),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info_0)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info_1)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info_2)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_tilemap_3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info_3)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 
 	m_tilemap_0->set_transparent_pen(0);
 	m_tilemap_1->set_transparent_pen(0);
@@ -357,8 +357,8 @@ void umipoker_state::umipoker_map(address_map &map)
 	map(0xe00004, 0xe00005).portr("IN1"); // unused?
 	map(0xe00008, 0xe00009).portr("IN2");
 	map(0xe00010, 0xe00011).w(FUNC(umipoker_state::umi_counters_w));
-//  AM_RANGE(0xe0000c, 0xe0000d) AM_WRITE(lamps_w) -----> lamps only for saiyukip.
-//  AM_RANGE(0xe00010, 0xe00011) AM_WRITE(counters_w) --> coin counters for both games.
+//  map(0xe0000c, 0xe0000d).w(FUNC(umipoker_state::lamps_w)); -----> lamps only for saiyukip.
+//  map(0xe00010, 0xe00011).w(FUNC(umipoker_state::counters_w)); --> coin counters for both games.
 	map(0xe00014, 0xe00015).portr("DSW1-2");
 	map(0xe00018, 0xe00019).portr("DSW3-4");
 	map(0xe00020, 0xe00021).w(FUNC(umipoker_state::umipoker_scrolly_0_w));

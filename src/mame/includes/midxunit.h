@@ -10,7 +10,9 @@
 
 #pragma once
 
+#include "midtunit.h"
 #include "machine/midwayic.h"
+
 
 class midxunit_state : public midtunit_state
 {
@@ -19,6 +21,8 @@ public:
 		: midtunit_state(mconfig, type, tag)
 		, m_nvram(*this, "nvram")
 		, m_midway_serial_pic(*this, "serial_pic")
+		, m_gun_recoil(*this, "Player%u_Gun_Recoil", 1U)
+		, m_gun_led(*this, "Player%u_Gun_LED", 1U)
 	{ }
 
 	void midxunit(machine_config &config);
@@ -48,6 +52,8 @@ private:
 
 	required_shared_ptr<uint16_t> m_nvram;
 	required_device<midway_serial_pic_device> m_midway_serial_pic;
+	output_finder<3> m_gun_recoil;
+	output_finder<3> m_gun_led;
 
 	uint8_t m_cmos_write_enable;
 	uint16_t m_iodata[8];

@@ -56,8 +56,8 @@ public:
 	void gaelco3d2(machine_config &config);
 	void gaelco3d(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(analog_bit_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(fp_analog_bit_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(analog_bit_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(fp_analog_bit_r);
 
 private:
 	virtual void machine_start() override;
@@ -148,7 +148,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(analog_port_latch_w);
 	DECLARE_READ32_MEMBER(tms_m68k_ram_r);
 	DECLARE_WRITE32_MEMBER(tms_m68k_ram_w);
-	DECLARE_WRITE8_MEMBER(tms_iack_w);
+	void tms_iack_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tms_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(tms_control3_w);
@@ -169,7 +169,7 @@ private:
 	INTERRUPT_GEN_MEMBER(vblank_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
 	void gaelco3d_render(screen_device &screen);
-	DECLARE_WRITE32_MEMBER(adsp_tx_callback);
+	void adsp_tx_callback(offs_t offset, uint32_t data);
 	DECLARE_WRITE_LINE_MEMBER(fp_analog_clock_w);
 
 	void adsp_data_map(address_map &map);

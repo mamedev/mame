@@ -13,9 +13,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-northbridge_device::northbridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+northbridge_device::northbridge_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
-	m_maincpu(*this, ":maincpu"),
+	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_ram(*this, ":" RAM_TAG)
 {
 }
@@ -26,7 +26,7 @@ northbridge_device::northbridge_device(const machine_config &mconfig, device_typ
 
 void northbridge_device::device_start()
 {
-	address_space& space = machine().device(":maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_cpu->space(AS_PROGRAM);
 
 	machine().root_device().membank("bank10")->set_base(m_ram->pointer());
 

@@ -47,7 +47,8 @@ ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config 
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_vsp(*this, "vsp"),
 	m_reading(false),
-	m_sbe(false)
+	m_sbe(false),
+	m_dec_high(false)
 {
 }
 
@@ -95,7 +96,11 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 	m_reading = (state==ASSERT_LINE);
 
 	bool valid = (((offset & 0x0400)==0) == m_reading);
-	m_sbe = ((offset & m_select_mask)==m_select_value) && valid;
+
+	if (m_dec_high)
+		m_sbe = ((offset & 0x7f801)==0x79000) && valid;
+	else
+		m_sbe = ((offset & 0x0f801)==0x09000) && valid;
 
 	if (m_sbe)
 	{
@@ -136,19 +141,9 @@ void ti_speech_synthesizer_device::device_start()
 
 void ti_speech_synthesizer_device::device_reset()
 {
-	if (m_genmod)
-	{
-		m_select_mask = 0x1ff801;
-		m_select_value = 0x179000;
-	}
-	else
-	{
-		m_select_mask = 0x7f801;
-		m_select_value = 0x79000;
-	}
-
 	m_reading = false;
 	m_sbe = false;
+	m_dec_high = (ioport("AMADECODE")->read()!=0);
 }
 
 ROM_START( ti99_speech )
@@ -175,6 +170,18 @@ void ti_speech_synthesizer_device::device_add_mconfig(machine_config& config)
     m_vsp->data_cb().set("vsm", FUNC(tms6100_device::data_line_r));
     m_vsp->romclk_cb().set("vsm", FUNC(tms6100_device::clk_w));
 */
+}
+
+INPUT_PORTS_START( ti99_speech )
+	PORT_START( "AMADECODE" )
+	PORT_CONFNAME( 0x01, 0x01, "Decode AMA/AMB/AMC lines" )
+		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
+		PORT_CONFSETTING( 0x01, DEF_STR( On ))
+INPUT_PORTS_END
+
+ioport_constructor ti_speech_synthesizer_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(ti99_speech);
 }
 
 const tiny_rom_entry *ti_speech_synthesizer_device::device_rom_region() const

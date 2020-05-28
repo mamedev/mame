@@ -47,7 +47,7 @@ target_manager::~target_manager()
 
 bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t style, bool double_buffer, bool filter, uint16_t scale, uint32_t screen)
 {
-	bgfx_target* target = new bgfx_target(name, format, width, height, style, double_buffer, filter, scale, screen);
+	auto* target = new bgfx_target(name, format, width, height, style, double_buffer, filter, scale, screen);
 	std::string full_name = name + std::to_string(screen);
 
 	m_targets[full_name] = target;
@@ -70,7 +70,7 @@ void target_manager::destroy_target(std::string name, uint32_t screen)
 
 bgfx_target* target_manager::create_backbuffer(void *handle, uint16_t width, uint16_t height)
 {
-	bgfx_target* target = new bgfx_target(handle, width, height);
+	auto* target = new bgfx_target(handle, width, height);
 	m_targets["backbuffer"] = target;
 	return target;
 }
@@ -81,7 +81,7 @@ bgfx_target* target_manager::target(uint32_t screen, std::string name)
 	bgfx_target* target = m_targets[full_name];
 	if (target == nullptr)
 	{
-		osd_printf_verbose("Warning: Attempting to retrieve a nonexistent target '%s' for screen %d\n", name.c_str(), screen);
+		osd_printf_verbose("Warning: Attempting to retrieve a nonexistent target '%s' for screen %d\n", name, screen);
 	}
 	return target;
 }
@@ -95,7 +95,7 @@ bool target_manager::update_target_sizes(uint32_t screen, uint16_t width, uint16
 	// Ensure that there's an entry to fill
 	while (sizes.size() <= screen)
 	{
-		sizes.push_back(osd_dim(0, 0));
+		sizes.emplace_back(osd_dim(0, 0));
 	}
 
 	if (width != sizes[screen].width() || height != sizes[screen].height())
@@ -144,7 +144,7 @@ void target_manager::update_screen_count(uint32_t count)
 	// Ensure that there's an entry to fill
 	while (count > m_native_dims.size())
 	{
-		m_native_dims.push_back(osd_dim(0, 0));
+		m_native_dims.emplace_back(osd_dim(0, 0));
 	}
 
 	if (count != m_screen_count)

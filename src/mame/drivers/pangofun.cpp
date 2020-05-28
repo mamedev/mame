@@ -200,12 +200,12 @@ ROM_START(pangofun)
 	ROM_REGION32_LE(0x20000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("bios.bin", 0x000000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
 
-	ROM_REGION(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
+	ROM_REGION32_LE(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
 	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
 	ROM_CONTINUE(               0x00001, 0x04000 )
 
 	/* this is what was on the rom board, mapping unknown */
-	ROM_REGION(0xa00000, "game_prg", 0)    /* rom board */
+	ROM_REGION32_LE(0xa00000, "game_prg", 0)    /* rom board */
 	ROM_LOAD("bank8.u39", 0x000000, 0x20000, CRC(72422c66) SHA1(40b8cca3f99925cf019053921165f6a4a30d784d) )
 	ROM_LOAD16_BYTE("bank0.u11", 0x100001, 0x80000, CRC(6ce951d7) SHA1(1dd09491c651920a8a507bdc6584400367e5a292) )
 	ROM_LOAD16_BYTE("bank0.u31", 0x100000, 0x80000, CRC(b6c06baf) SHA1(79074b086d24737d629272d98f17de6e1e650485) )

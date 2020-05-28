@@ -11,9 +11,9 @@
 #ifndef IMGTOOL_H
 #define IMGTOOL_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cassert>
 #include <functional>
 
 #include "corestr.h"
@@ -264,6 +264,6 @@ void unknown_partition_get_info(const imgtool_class *imgclass, uint32_t state, u
 
 char *strncpyz(char *dest, const char *source, size_t len);
 void rtrim(char *buf);
-std::string extract_padded_filename(const char *source, size_t filename_length, size_t extension_length);
+std::string extract_padded_filename(const char *source, size_t filename_length, size_t extension_length, char pad = ' ');
 
 #endif /* IMGTOOL_H */

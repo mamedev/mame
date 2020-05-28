@@ -48,7 +48,7 @@
 
 #include "screen.h"
 
-#include <math.h>
+#include <cmath>
 #include <array>
 #include <map>
 #include <memory>
@@ -218,49 +218,7 @@ struct render_texinfo
 	u64                 unique_id;          // unique identifier to pass to osd
 	u64                 old_id;             // previously allocated id, if applicable
 	const rgb_t *       palette;            // palette for PALETTE16 textures, bcg lookup table for RGB32/YUY16
-};
-
-
-// ======================> render_screen_list
-
-// a render_screen_list is a list of screen_devices
-class render_screen_list
-{
-	// screen list item
-	class item
-	{
-		friend class simple_list<item>;
-		friend class render_screen_list;
-
-	public:
-		// construction/destruction
-		item(screen_device &screen) : m_screen(screen) { }
-
-		// state
-		item *              m_next = nullptr;   // next screen in list
-		screen_device &     m_screen;           // reference to screen device
-	};
-
-public:
-	// getters
-	int count() const { return m_list.count(); }
-
-	// operations
-	void add(screen_device &screen) { m_list.append(*global_alloc(item(screen))); }
-	void reset() { m_list.reset(); }
-
-	// query
-	int contains(screen_device &screen) const
-	{
-		int count = 0;
-		for (item *curitem = m_list.first(); curitem; curitem = curitem->m_next)
-			if (&curitem->m_screen == &screen) count++;
-		return count;
-	}
-
-private:
-	// internal state
-	simple_list<item> m_list;
+	u32                 palette_length;
 };
 
 
@@ -436,7 +394,7 @@ public:
 private:
 	// internal helpers
 	void get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, u32 flags = 0);
-	const rgb_t *get_adjusted_palette(render_container &container);
+	const rgb_t *get_adjusted_palette(render_container &container, u32 &out_length);
 
 	static const int MAX_TEXTURE_SCALES = 16;
 
@@ -527,7 +485,7 @@ public:
 	bool has_brightness_contrast_gamma_changes() const { return (m_user.m_brightness != 1.0f || m_user.m_contrast != 1.0f || m_user.m_gamma != 1.0f); }
 	u8 apply_brightness_contrast_gamma(u8 value);
 	float apply_brightness_contrast_gamma_fp(float value);
-	const rgb_t *bcg_lookup_table(int texformat, palette_t *palette = nullptr);
+	const rgb_t *bcg_lookup_table(int texformat, u32 &out_length, palette_t *palette = nullptr);
 
 private:
 	// an item describes a high level primitive that is added to a container
@@ -770,6 +728,7 @@ public:
 	using environment = emu::render::detail::layout_environment;
 	using element_map = std::unordered_map<std::string, layout_element>;
 	using group_map = std::unordered_map<std::string, layout_group>;
+	using render_screen_list = std::list<std::reference_wrapper<screen_device>>;
 
 	/// \brief A single backdrop/screen/overlay/bezel/cpanel/marquee item
 	///
@@ -854,10 +813,12 @@ public:
 	const render_bounds &bounds() const { return m_bounds; }
 	const render_bounds &screen_bounds() const { return m_scrbounds; }
 	const render_screen_list &screens() const { return m_screens; }
+	size_t screen_count() const { return m_screens.size(); }
+	bool has_screen(screen_device &screen) const;
 
 	//
 	bool has_art() const { return m_has_art; }
-	float effective_aspect(render_layer_config config) const { return (config.zoom_to_screen() && m_screens.count() != 0) ? m_scraspect : m_aspect; }
+	float effective_aspect(render_layer_config config) const { return (config.zoom_to_screen() && !m_screens.empty()) ? m_scraspect : m_aspect; }
 
 	// operations
 	void recompute(render_layer_config layerconfig);
@@ -988,7 +949,6 @@ public:
 
 	// view information
 	const char *view_name(int viewindex);
-	const render_screen_list &view_screens(int viewindex);
 
 	// bounds computations
 	void compute_visible_area(s32 target_width, s32 target_height, float target_pixel_aspect, int target_orientation, s32 &visible_width, s32 &visible_height);
@@ -1078,8 +1038,6 @@ private:
 	s32                     m_clear_extents[MAX_CLEAR_EXTENTS]; // array of clear extents
 	bool                    m_transform_container;      // determines whether the screen container is transformed by the core renderer,
 														// otherwise the respective render API will handle the transformation (scale, offset)
-
-	static render_screen_list s_empty_screen_list;
 };
 
 

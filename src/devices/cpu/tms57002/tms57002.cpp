@@ -1026,17 +1026,17 @@ void tms57002_device::device_start()
 	save_item(NAME(allow_update));
 }
 
-u32 tms57002_device::execute_min_cycles() const
+u32 tms57002_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
 
-u32 tms57002_device::execute_max_cycles() const
+u32 tms57002_device::execute_max_cycles() const noexcept
 {
 	return 3;
 }
 
-u32 tms57002_device::execute_input_lines() const
+u32 tms57002_device::execute_input_lines() const noexcept
 {
 	return 0;
 }

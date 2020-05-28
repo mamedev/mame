@@ -19,7 +19,7 @@ class snk6502_sound_device : public device_t, public device_sound_interface
 public:
 	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(music0_playing);
+	DECLARE_READ_LINE_MEMBER(music0_playing);
 
 	void set_music_freq(int freq);
 	void set_music_clock(double clock_time);
@@ -81,8 +81,8 @@ class vanguard_sound_device : public device_t
 public:
 	vanguard_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( sound_w );
-	DECLARE_WRITE8_MEMBER( speech_w );
+	void sound_w(offs_t offset, uint8_t data);
+	void speech_w(uint8_t data);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -103,8 +103,8 @@ class fantasy_sound_device : public device_t
 public:
 	fantasy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( sound_w );
-	DECLARE_WRITE8_MEMBER( speech_w );
+	void sound_w(offs_t offset, uint8_t data);
+	void speech_w(uint8_t data);
 
 protected:
 	fantasy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -148,7 +148,7 @@ class sasuke_sound_device : public device_t
 public:
 	sasuke_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void sound_w(offs_t offset, uint8_t data);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -168,7 +168,7 @@ class satansat_sound_device : public device_t
 public:
 	satansat_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void sound_w(offs_t offset, uint8_t data);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

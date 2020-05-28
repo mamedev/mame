@@ -109,6 +109,7 @@ protected:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_starfield_control[4];
 	int m_total_stars;
+	int m_starfield_framecount;
 	struct star m_stars[MAX_STARS];
 	uint8_t m_main_irq_mask;
 	uint8_t m_sub_irq_mask;
@@ -153,8 +154,8 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(out_lamps0);
-	DECLARE_WRITE8_MEMBER(out_lamps1);
+	void out_lamps0(uint8_t data);
+	void out_lamps1(uint8_t data);
 
 	output_finder<2> m_lamps;
 };

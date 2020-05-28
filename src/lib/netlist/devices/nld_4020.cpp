@@ -5,9 +5,9 @@
  *
  */
 
-//#include "nlid_cmos.h"
 #include "nld_4020.h"
-#include "nlid_system.h"
+#include "nl_base.h"
+#include "nl_factory.h"
 
 namespace netlist
 {
@@ -15,11 +15,10 @@ namespace netlist
 	{
 	NETLIB_OBJECT(CD4020_sub)
 	{
-		NETLIB_CONSTRUCTOR(CD4020_sub)
-		NETLIB_FAMILY("CD4XXX")
+		NETLIB_CONSTRUCTOR_MODEL(CD4020_sub, "CD4XXX")
 		, m_IP(*this, "IP")
-		, m_Q(*this, {{"Q1", "_Q2", "_Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9",
-				"Q10", "Q11", "Q12", "Q13", "Q14"}})
+		, m_Q(*this, {"Q1", "_Q2", "_Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9",
+				"Q10", "Q11", "Q12", "Q13", "Q14"})
 		, m_cnt(*this, "m_cnt", 0)
 		, m_supply(*this, "VDD", "VSS")
 		{
@@ -34,8 +33,22 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		void update_outputs(const unsigned cnt);
+		void update_outputs(const unsigned cnt) noexcept
+		{
+			static constexpr const std::array<netlist_time, 14> out_delayQn = {
+					NLTIME_FROM_NS(180), NLTIME_FROM_NS(280),
+					NLTIME_FROM_NS(380), NLTIME_FROM_NS(480),
+					NLTIME_FROM_NS(580), NLTIME_FROM_NS(680),
+					NLTIME_FROM_NS(780), NLTIME_FROM_NS(880),
+					NLTIME_FROM_NS(980), NLTIME_FROM_NS(1080),
+					NLTIME_FROM_NS(1180), NLTIME_FROM_NS(1280),
+					NLTIME_FROM_NS(1380), NLTIME_FROM_NS(1480),
+			};
 
+			m_Q[0].push(cnt & 1, out_delayQn[0]);
+			for (std::size_t i=3; i<14; i++)
+				m_Q[i].push((cnt >> i) & 1, out_delayQn[i]);
+		}
 		logic_input_t m_IP;
 		object_array_t<logic_output_t, 14> m_Q;
 
@@ -45,8 +58,7 @@ namespace netlist
 
 	NETLIB_OBJECT(CD4020)
 	{
-		NETLIB_CONSTRUCTOR(CD4020)
-		NETLIB_FAMILY("CD4XXX")
+		NETLIB_CONSTRUCTOR_MODEL(CD4020, "CD4XXX")
 		, m_sub(*this, "sub")
 		, m_RESET(*this, "RESET")
 		{
@@ -74,7 +86,6 @@ namespace netlist
 		logic_input_t m_RESET;
 	};
 
-
 	NETLIB_UPDATE(CD4020_sub)
 	{
 		++m_cnt;
@@ -95,23 +106,6 @@ namespace netlist
 		}
 		else
 			m_sub.m_IP.activate_hl();
-	}
-
-	NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const unsigned cnt))
-	{
-		static constexpr const std::array<netlist_time, 14> out_delayQn = {
-				NLTIME_FROM_NS(180), NLTIME_FROM_NS(280),
-				NLTIME_FROM_NS(380), NLTIME_FROM_NS(480),
-				NLTIME_FROM_NS(580), NLTIME_FROM_NS(680),
-				NLTIME_FROM_NS(780), NLTIME_FROM_NS(880),
-				NLTIME_FROM_NS(980), NLTIME_FROM_NS(1080),
-				NLTIME_FROM_NS(1180), NLTIME_FROM_NS(1280),
-				NLTIME_FROM_NS(1380), NLTIME_FROM_NS(1480),
-		};
-
-		m_Q[0].push(cnt & 1, out_delayQn[0]);
-		for (std::size_t i=3; i<14; i++)
-			m_Q[i].push((cnt >> i) & 1, out_delayQn[i]);
 	}
 
 	NETLIB_DEVICE_IMPL(CD4020,         "CD4020", "")

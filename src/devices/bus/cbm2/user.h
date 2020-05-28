@@ -39,7 +39,7 @@ class cbm2_user_port_device;
 // ======================> device_cbm2_user_port_interface
 
 // class representing interface-specific live cbm2_expansion card
-class device_cbm2_user_port_interface : public device_slot_card_interface
+class device_cbm2_user_port_interface : public device_interface
 {
 public:
 	virtual uint8_t cbm2_d1_r() { return 0xff; }
@@ -67,8 +67,7 @@ protected:
 
 // ======================> cbm2_user_port_device
 
-class cbm2_user_port_device : public device_t,
-								public device_slot_interface
+class cbm2_user_port_device : public device_t, public device_single_card_slot_interface<device_cbm2_user_port_interface>
 {
 public:
 	// construction/destruction

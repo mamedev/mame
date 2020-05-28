@@ -131,20 +131,20 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 
-	DECLARE_READ8_MEMBER(apc_port_28_r);
-	DECLARE_WRITE8_MEMBER(apc_port_28_w);
-	DECLARE_READ8_MEMBER(apc_gdc_r);
-	DECLARE_WRITE8_MEMBER(apc_gdc_w);
-	DECLARE_READ8_MEMBER(apc_kbd_r);
-	DECLARE_WRITE8_MEMBER(apc_kbd_w);
-	DECLARE_WRITE8_MEMBER(apc_dma_segments_w);
-	DECLARE_READ8_MEMBER(apc_dma_r);
-	DECLARE_WRITE8_MEMBER(apc_dma_w);
-	DECLARE_WRITE8_MEMBER(apc_irq_ack_w);
-	DECLARE_READ8_MEMBER(apc_rtc_r);
-	DECLARE_WRITE8_MEMBER(apc_rtc_w);
-//  DECLARE_READ8_MEMBER(aux_pcg_r);
-//  DECLARE_WRITE8_MEMBER(aux_pcg_w);
+	uint8_t apc_port_28_r(offs_t offset);
+	void apc_port_28_w(offs_t offset, uint8_t data);
+	uint8_t apc_gdc_r(offs_t offset);
+	void apc_gdc_w(offs_t offset, uint8_t data);
+	uint8_t apc_kbd_r(offs_t offset);
+	void apc_kbd_w(offs_t offset, uint8_t data);
+	void apc_dma_segments_w(offs_t offset, uint8_t data);
+	uint8_t apc_dma_r(offs_t offset);
+	void apc_dma_w(offs_t offset, uint8_t data);
+	void apc_irq_ack_w(uint8_t data);
+	uint8_t apc_rtc_r();
+	void apc_rtc_w(uint8_t data);
+//  uint8_t aux_pcg_r();
+//  void aux_pcg_w(uint8_t data);
 
 	struct {
 		uint8_t status; //status
@@ -153,17 +153,15 @@ private:
 		uint8_t sh; //shift switches
 	}m_keyb;
 
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(apc_dma_hrq_changed);
 	DECLARE_WRITE_LINE_MEMBER(apc_tc_w);
 	DECLARE_WRITE_LINE_MEMBER(apc_dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(apc_dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(apc_dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(apc_dack3_w);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(apc_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(apc_dma_write_byte);
+	uint8_t apc_dma_read_byte(offs_t offset);
+	void apc_dma_write_byte(offs_t offset, uint8_t data);
 
 	int m_dack;
 	uint8_t m_dma_offset[4];
@@ -305,7 +303,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( apc_state::hgdc_draw_text )
 	}
 }
 
-READ8_MEMBER(apc_state::apc_port_28_r)
+uint8_t apc_state::apc_port_28_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -325,7 +323,7 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 	return res;
 }
 
-WRITE8_MEMBER(apc_state::apc_port_28_w)
+void apc_state::apc_port_28_w(offs_t offset, uint8_t data)
 {
 	if(offset & 1)
 		m_pit->write((offset & 6) >> 1, data);
@@ -339,7 +337,7 @@ WRITE8_MEMBER(apc_state::apc_port_28_w)
 }
 
 
-READ8_MEMBER(apc_state::apc_gdc_r)
+uint8_t apc_state::apc_gdc_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -351,7 +349,7 @@ READ8_MEMBER(apc_state::apc_gdc_r)
 	return res;
 }
 
-WRITE8_MEMBER(apc_state::apc_gdc_w)
+void apc_state::apc_gdc_w(offs_t offset, uint8_t data)
 {
 	if(offset & 1)
 		m_hgdc2->write((offset & 2) >> 1,data); // upd7220 bitmap port
@@ -359,7 +357,7 @@ WRITE8_MEMBER(apc_state::apc_gdc_w)
 		m_hgdc1->write((offset & 2) >> 1,data); // upd7220 character port
 }
 
-READ8_MEMBER(apc_state::apc_kbd_r)
+uint8_t apc_state::apc_kbd_r(offs_t offset)
 {
 	uint8_t res = 0;
 
@@ -374,12 +372,12 @@ READ8_MEMBER(apc_state::apc_kbd_r)
 	return res;
 }
 
-WRITE8_MEMBER(apc_state::apc_kbd_w)
+void apc_state::apc_kbd_w(offs_t offset, uint8_t data)
 {
 	printf("KEYB %08x %02x\n",offset,data);
 }
 
-WRITE8_MEMBER(apc_state::apc_dma_segments_w)
+void apc_state::apc_dma_segments_w(offs_t offset, uint8_t data)
 {
 	m_dma_offset[offset & 3] = data & 0x0f;
 }
@@ -414,17 +412,17 @@ CH3_EXA ==      0X3E                      ; CH-3 extended address (W)
 ... apparently, they rotated right the offset, compared to normal hook-up.
 */
 
-READ8_MEMBER(apc_state::apc_dma_r)
+uint8_t apc_state::apc_dma_r(offs_t offset)
 {
 	return m_dmac->read(bitswap<4>(offset,2,1,0,3));
 }
 
-WRITE8_MEMBER(apc_state::apc_dma_w)
+void apc_state::apc_dma_w(offs_t offset, uint8_t data)
 {
 	m_dmac->write(bitswap<4>(offset,2,1,0,3), data);
 }
 
-WRITE8_MEMBER(apc_state::apc_irq_ack_w)
+void apc_state::apc_irq_ack_w(uint8_t data)
 {
 	/*
 	    x--- GDC
@@ -439,7 +437,7 @@ WRITE8_MEMBER(apc_state::apc_irq_ack_w)
 		logerror("IRQ ACK %02x\n",data);
 }
 
-READ8_MEMBER(apc_state::apc_rtc_r)
+uint8_t apc_state::apc_rtc_r()
 {
 	/*
 	bit 1 high: low battery.
@@ -448,7 +446,7 @@ READ8_MEMBER(apc_state::apc_rtc_r)
 	return m_rtc->data_out_r();
 }
 
-WRITE8_MEMBER(apc_state::apc_rtc_w)
+void apc_state::apc_rtc_w(uint8_t data)
 {
 /*
 RTC write: 0x01 0001
@@ -489,16 +487,16 @@ void apc_state::apc_map(address_map &map)
 {
 	map(0x00000, 0x9ffff).ram();
 	map(0xa0000, 0xa0fff).ram().share("cmos");
-//  AM_RANGE(0xa1000, 0xbffff) mirror CMOS
-//  AM_RANGE(0xc0000, 0xcffff) standard character ROM
+//  map(0xa1000, 0xbffff) mirror CMOS
+//  map(0xc0000, 0xcffff) standard character ROM
 	map(0xd8000, 0xd9fff).ram().region("aux_pcg", 0); // AUX character RAM
-//  AM_RANGE(0xe0000, 0xeffff) Special Character RAM
+//  map(0xe0000, 0xeffff) Special Character RAM
 	map(0xfe000, 0xfffff).rom().region("ipl", 0);
 }
 
 void apc_state::apc_io(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 	map(0x00, 0x1f).rw(FUNC(apc_state::apc_dma_r), FUNC(apc_state::apc_dma_w)).umask16(0xff00);
 	map(0x20, 0x23).rw(m_i8259_m, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // i8259
 	map(0x28, 0x2f).rw(FUNC(apc_state::apc_port_28_r), FUNC(apc_state::apc_port_28_w)); // i8259 (even) / pit8253 (odd)
@@ -514,8 +512,8 @@ void apc_state::apc_io(address_map &map)
 //  0x5b, Power Off
 //  0x5e  APU status/command
 	map(0x60, 0x60).rw(m_sound, FUNC(upd1771c_device::read), FUNC(upd1771c_device::write));
-//  AM_RANGE(0x68, 0x6f) i8255 , ODA printer port (A: status (R) B: data (W) C: command (W))
-//  0x70, 0x76 AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
+//  map(0x68, 0x6f) i8255 , ODA printer port (A: status (R) B: data (W) C: command (W))
+//  map(0x70, 0x76).rw("upd7220_btm", FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff);
 //  0x71, 0x77 IDA Controller
 //  0x80, 0x90 Communication Adapter
 //  0xf0, 0xf6 ASOP Controller
@@ -845,7 +843,7 @@ ir6 Option
 ir7 APU
 */
 
-READ8_MEMBER(apc_state::get_slave_ack)
+uint8_t apc_state::get_slave_ack(offs_t offset)
 {
 	if (offset==7) { // IRQ = 7
 		return m_i8259_s->acknowledge();
@@ -876,7 +874,7 @@ WRITE_LINE_MEMBER( apc_state::apc_tc_w )
 //  printf("TC %02x\n",state);
 }
 
-READ8_MEMBER(apc_state::apc_dma_read_byte)
+uint8_t apc_state::apc_dma_read_byte(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
@@ -887,7 +885,7 @@ READ8_MEMBER(apc_state::apc_dma_read_byte)
 }
 
 
-WRITE8_MEMBER(apc_state::apc_dma_write_byte)
+void apc_state::apc_dma_write_byte(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
@@ -906,16 +904,6 @@ WRITE_LINE_MEMBER(apc_state::apc_dack0_w){ /*printf("%02x 0\n",state);*/ set_dma
 WRITE_LINE_MEMBER(apc_state::apc_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma_channel(1, state); }
 WRITE_LINE_MEMBER(apc_state::apc_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(2, state); }
 WRITE_LINE_MEMBER(apc_state::apc_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(3, state); }
-
-READ8_MEMBER(apc_state::fdc_r)
-{
-	return m_fdc->dma_r();
-}
-
-WRITE8_MEMBER(apc_state::fdc_w)
-{
-	m_fdc->dma_w(data);
-}
 
 /*
 CH0: CRT
@@ -964,8 +952,8 @@ void apc_state::apc(machine_config &config)
 	m_dmac->out_eop_callback().set(FUNC(apc_state::apc_tc_w));
 	m_dmac->in_memr_callback().set(FUNC(apc_state::apc_dma_read_byte));
 	m_dmac->out_memw_callback().set(FUNC(apc_state::apc_dma_write_byte));
-	m_dmac->in_ior_callback<1>().set(FUNC(apc_state::fdc_r));
-	m_dmac->out_iow_callback<1>().set(FUNC(apc_state::fdc_w));
+	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dmac->out_dack_callback<0>().set(FUNC(apc_state::apc_dack0_w));
 	m_dmac->out_dack_callback<1>().set(FUNC(apc_state::apc_dack1_w));
 	m_dmac->out_dack_callback<2>().set(FUNC(apc_state::apc_dack2_w));
@@ -1014,7 +1002,7 @@ void apc_state::apc(machine_config &config)
 ***************************************************************************/
 
 ROM_START( apc )
-	ROM_REGION( 0x2000, "ipl", ROMREGION_ERASE00 )
+	ROM_REGION16_LE( 0x2000, "ipl", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "pfbu2j.bin",   0x00000, 0x001000, CRC(86970df5) SHA1(be59c5dad3bd8afc21e9f2f1404553d4371978be) )
 	ROM_LOAD16_BYTE( "pfbu2l.bin",   0x00001, 0x001000, CRC(38df2e70) SHA1(a37ccaea00c2b290610d354de08b489fa897ec48) )
 
@@ -1024,7 +1012,7 @@ ROM_START( apc )
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD("pfcu1r.bin",   0x000000, 0x002000, CRC(683efa94) SHA1(43157984a1746b2e448f3236f571011af9a3aa73) )
 
-	ROM_REGION( 0x2000, "aux_pcg", ROMREGION_ERASE00 )
+	ROM_REGION16_LE( 0x2000, "aux_pcg", ROMREGION_ERASE00 )
 ROM_END
 
 void apc_state::init_apc()

@@ -56,7 +56,7 @@ ROM_END
 
 void a2bus_thunderclock_device::device_add_mconfig(machine_config &config)
 {
-	UPD1990A(config, m_upd1990ac, 1021800);
+	UPD1990A(config, m_upd1990ac, 32.768_kHz_XTAL);
 	m_upd1990ac->data_callback().set(FUNC(a2bus_thunderclock_device::upd_dataout_w));
 }
 

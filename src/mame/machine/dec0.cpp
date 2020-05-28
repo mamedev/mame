@@ -151,7 +151,7 @@ WRITE16_MEMBER(dec0_state::hippodrm_68000_share_w)
 */
 
 
-READ8_MEMBER(dec0_state::dec0_mcu_port0_r)
+uint8_t dec0_state::dec0_mcu_port0_r()
 {
 	uint8_t result = 0xff;
 
@@ -164,18 +164,18 @@ READ8_MEMBER(dec0_state::dec0_mcu_port0_r)
 	return result;
 }
 
-WRITE8_MEMBER(dec0_state::dec0_mcu_port0_w)
+void dec0_state::dec0_mcu_port0_w(uint8_t data)
 {
 	m_i8751_ports[0] = data;
 }
 
-WRITE8_MEMBER(dec0_state::dec0_mcu_port1_w)
+void dec0_state::dec0_mcu_port1_w(uint8_t data)
 {
 	logerror("dec0_mcu_port1_w: %02x\n", data);
 	m_i8751_ports[1] = data;
 }
 
-WRITE8_MEMBER(dec0_state::dec0_mcu_port2_w)
+void dec0_state::dec0_mcu_port2_w(uint8_t data)
 {
 	if (!BIT(data, 2) && BIT(m_i8751_ports[2], 2))
 		m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
@@ -189,7 +189,7 @@ WRITE8_MEMBER(dec0_state::dec0_mcu_port2_w)
 	m_i8751_ports[2] = data;
 }
 
-WRITE8_MEMBER(dec0_state::dec0_mcu_port3_w)
+void dec0_state::dec0_mcu_port3_w(uint8_t data)
 {
 	logerror("dec0_mcu_port3_w: %02x\n", data);
 	m_i8751_ports[3] = data;

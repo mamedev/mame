@@ -59,7 +59,7 @@ public:
 	auto int_cb() { return m_int_w.bind(); }
 
 	DECLARE_READ16_MEMBER(reg_r);
-	DECLARE_WRITE16_MEMBER(reg_w);
+	void reg_w(offs_t offset, uint16_t data);
 
 	void update();
 

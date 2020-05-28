@@ -102,9 +102,9 @@ private:
 	DECLARE_WRITE16_MEMBER(pushman_mcu_comm_w);
 	DECLARE_WRITE16_MEMBER(bballs_mcu_comm_w);
 
-	DECLARE_WRITE8_MEMBER(mcu_pa_w);
-	DECLARE_WRITE8_MEMBER(mcu_pb_w);
-	DECLARE_WRITE8_MEMBER(mcu_pc_w);
+	void mcu_pa_w(uint8_t data);
+	void mcu_pb_w(uint8_t data);
+	void mcu_pc_w(uint8_t data);
 
 	void bballs_map(address_map &map);
 	void pushman_map(address_map &map);
@@ -135,8 +135,7 @@ private:
 	void f1dream_map(address_map &map);
 	void f1dream_mcu_io(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(out1_w);
-	DECLARE_WRITE8_MEMBER(out3_w);
+	void out3_w(uint8_t data);
 
 	DECLARE_READ8_MEMBER(mcu_shared_r);
 	DECLARE_WRITE8_MEMBER(mcu_shared_w);

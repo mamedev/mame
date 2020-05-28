@@ -17,7 +17,7 @@ public:
 	auto dskblk_callback() { return m_write_dskblk.bind(); }
 	auto dsksyn_callback() { return m_write_dsksyn.bind(); }
 
-	DECLARE_WRITE8_MEMBER(ciaaprb_w);
+	void ciaaprb_w(uint8_t data);
 
 	uint8_t ciaapra_r();
 	uint16_t dskbytr_r();
@@ -93,6 +93,7 @@ private:
 	devcb_write_line m_write_dskblk;
 	devcb_write_line m_write_dsksyn;
 	output_finder<2> m_leds;
+	output_finder<> m_fdc_led;
 
 	floppy_image_device *floppy;
 	floppy_image_device *floppy_devices[4];

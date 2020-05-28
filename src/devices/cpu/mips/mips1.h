@@ -17,7 +17,7 @@ public:
 	void berr_w(int state) { m_bus_error = bool(state); }
 
 protected:
-	mips1core_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size);
+	mips1core_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size);
 
 	enum registers : unsigned
 	{
@@ -156,9 +156,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual u32 execute_min_cycles() const override { return 1; }
-	virtual u32 execute_max_cycles() const override { return 40; }
-	virtual u32 execute_input_lines() const override { return 6; }
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 40; }
+	virtual u32 execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -172,8 +172,9 @@ protected:
 	void icache_map(address_map &map);
 	void dcache_map(address_map &map);
 
-	// interrupts
+	// exceptions
 	void generate_exception(u32 exception, bool refill = false);
+	void address_error(int intention, u32 const address);
 
 	// cop0
 	virtual void handle_cop0(u32 const op);
@@ -192,8 +193,8 @@ protected:
 	void swr(u32 const op);
 
 	// memory accessors
-	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> load(u32 address, U &&apply);
-	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::value, void> store(u32 address, U data, T mem_mask = ~T(0));
+	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> load(u32 address, U &&apply);
+	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, T>::value, void> store(u32 address, U data, T mem_mask = ~T(0));
 	bool fetch(u32 address, std::function<void(u32)> &&apply);
 
 	// debug helpers
@@ -201,15 +202,15 @@ protected:
 	std::string debug_string_array(u32 array_pointer);
 
 	// address spaces
-	const address_space_config m_program_config_be;
-	const address_space_config m_program_config_le;
-	const address_space_config m_icache_config;
-	const address_space_config m_dcache_config;
+	address_space_config const m_program_config_be;
+	address_space_config const m_program_config_le;
+	address_space_config const m_icache_config;
+	address_space_config const m_dcache_config;
 
 	int m_data_spacenum;
 
 	// configuration
-	u32 m_cpurev;
+	u32 const m_cpurev;
 	endianness_t m_endianness;
 
 	// core registers
@@ -223,7 +224,7 @@ protected:
 
 	// internal stuff
 	int m_icount;
-	enum branch_state_t : unsigned
+	enum branch_state : unsigned
 	{
 		NONE      = 0,
 		DELAY     = 1, // delay slot instruction active
@@ -238,7 +239,7 @@ protected:
 	size_t const m_dcache_size;
 
 	// I/O
-	devcb_read_line m_in_brcond[4];
+	devcb_read_line::array<4> m_in_brcond;
 	bool m_bus_error;
 };
 
@@ -246,7 +247,7 @@ class mips1_device_base : public mips1core_device_base
 {
 public:
 	// floating point coprocessor revision numbers recognised by RISC/os 4.52 and IRIX
-	enum fpu_rev_t : u32
+	enum fpu_rev : u32
 	{
 		MIPS_R2360    = 0x0100, // MIPS R2360 Floating Point Board
 		MIPS_R2010    = 0x0200, // MIPS R2010 VLSI Floating Point Chip
@@ -260,7 +261,7 @@ public:
 	void set_fpu(u32 revision, unsigned interrupt = 3) { m_fcr0 = revision; m_fpu_irq = interrupt; }
 
 protected:
-	mips1_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size);
+	mips1_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size);
 
 	enum cp1_fcr31_mask : u32
 	{
@@ -323,70 +324,71 @@ private:
 class r2000_device : public mips1_device_base
 {
 public:
-	r2000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size = 0, size_t dcache_size = 0);
+	r2000_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size = 0, size_t dcache_size = 0);
 };
 
 class r2000a_device : public mips1_device_base
 {
 public:
-	r2000a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size = 0, size_t dcache_size = 0);
+	r2000a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size = 0, size_t dcache_size = 0);
 };
 
 class r3000_device : public mips1_device_base
 {
 public:
-	r3000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size = 0, size_t dcache_size = 0);
+	r3000_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size = 0, size_t dcache_size = 0);
 };
 
 class r3000a_device : public mips1_device_base
 {
 public:
-	r3000a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size = 0, size_t dcache_size = 0);
+	r3000a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size = 0, size_t dcache_size = 0);
 };
 
 class r3041_device : public mips1core_device_base
 {
 public:
-	r3041_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	r3041_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class r3051_device : public mips1core_device_base
 {
 public:
-	r3051_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	r3051_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
 class r3052_device : public mips1core_device_base
 {
 public:
-	r3052_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	r3052_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
 class r3052e_device : public mips1_device_base
 {
 public:
-	r3052e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	r3052e_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
 class r3071_device : public mips1_device_base
 {
 public:
-	r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size = 16384, size_t dcache_size = 4096);
+	r3071_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size = 16384, size_t dcache_size = 4096);
 };
 
 class r3081_device : public mips1_device_base
 {
 public:
-	r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size = 16384, size_t dcache_size = 4096);
+	r3081_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size = 16384, size_t dcache_size = 4096);
 };
 
 class iop_device : public mips1core_device_base
 {
 public:
-	iop_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	iop_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
 DECLARE_DEVICE_TYPE(R2000,       r2000_device)

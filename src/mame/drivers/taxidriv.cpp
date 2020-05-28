@@ -33,33 +33,33 @@ void taxidriv_state::machine_start()
 	save_item(NAME(m_spritectrl));
 }
 
-WRITE8_MEMBER(taxidriv_state::p2a_w){ spritectrl_w(space,0,data); }
-WRITE8_MEMBER(taxidriv_state::p2b_w){ spritectrl_w(space,1,data); }
-WRITE8_MEMBER(taxidriv_state::p2c_w){ spritectrl_w(space,2,data); }
-WRITE8_MEMBER(taxidriv_state::p3a_w){ spritectrl_w(space,3,data); }
-WRITE8_MEMBER(taxidriv_state::p3b_w){ spritectrl_w(space,4,data); }
-WRITE8_MEMBER(taxidriv_state::p3c_w){ spritectrl_w(space,5,data); }
-WRITE8_MEMBER(taxidriv_state::p4a_w){ spritectrl_w(space,6,data); }
-WRITE8_MEMBER(taxidriv_state::p4b_w){ spritectrl_w(space,7,data); }
-WRITE8_MEMBER(taxidriv_state::p4c_w){ spritectrl_w(space,8,data); }
+void taxidriv_state::p2a_w(uint8_t data) { spritectrl_w(0,data); }
+void taxidriv_state::p2b_w(uint8_t data) { spritectrl_w(1,data); }
+void taxidriv_state::p2c_w(uint8_t data) { spritectrl_w(2,data); }
+void taxidriv_state::p3a_w(uint8_t data) { spritectrl_w(3,data); }
+void taxidriv_state::p3b_w(uint8_t data) { spritectrl_w(4,data); }
+void taxidriv_state::p3c_w(uint8_t data) { spritectrl_w(5,data); }
+void taxidriv_state::p4a_w(uint8_t data) { spritectrl_w(6,data); }
+void taxidriv_state::p4b_w(uint8_t data) { spritectrl_w(7,data); }
+void taxidriv_state::p4c_w(uint8_t data) { spritectrl_w(8,data); }
 
 
-READ8_MEMBER(taxidriv_state::p0a_r)
+uint8_t taxidriv_state::p0a_r()
 {
 	return m_latchA;
 }
 
-READ8_MEMBER(taxidriv_state::p0c_r)
+uint8_t taxidriv_state::p0c_r()
 {
 	return (m_s1 << 7);
 }
 
-WRITE8_MEMBER(taxidriv_state::p0b_w)
+void taxidriv_state::p0b_w(uint8_t data)
 {
 	m_latchB = data;
 }
 
-WRITE8_MEMBER(taxidriv_state::p0c_w)
+void taxidriv_state::p0c_w(uint8_t data)
 {
 	m_s2 = data & 1;
 
@@ -72,40 +72,40 @@ WRITE8_MEMBER(taxidriv_state::p0c_w)
 //  popmessage("%02x",data&0x0f);
 }
 
-READ8_MEMBER(taxidriv_state::p1b_r)
+uint8_t taxidriv_state::p1b_r()
 {
 	return m_latchB;
 }
 
-READ8_MEMBER(taxidriv_state::p1c_r)
+uint8_t taxidriv_state::p1c_r()
 {
 	return (m_s2 << 7) | (m_s4 << 6) | ((ioport("SERVCOIN")->read() & 1) << 4);
 }
 
-WRITE8_MEMBER(taxidriv_state::p1a_w)
+void taxidriv_state::p1a_w(uint8_t data)
 {
 	m_latchA = data;
 }
 
-WRITE8_MEMBER(taxidriv_state::p1c_w)
+void taxidriv_state::p1c_w(uint8_t data)
 {
 	m_s1 = data & 1;
 	m_s3 = (data & 2) >> 1;
 }
 
-READ8_MEMBER(taxidriv_state::p8910_0a_r)
+uint8_t taxidriv_state::p8910_0a_r()
 {
 	return m_latchA;
 }
 
-READ8_MEMBER(taxidriv_state::p8910_1a_r)
+uint8_t taxidriv_state::p8910_1a_r()
 {
 	return m_s3;
 }
 
 /* note that a lot of writes happen with port B set as input. I think this is a bug in the
    original, since it works anyway even if the communication is flawed. */
-WRITE8_MEMBER(taxidriv_state::p8910_0b_w)
+void taxidriv_state::p8910_0b_w(uint8_t data)
 {
 	m_s4 = data & 1;
 }
@@ -129,7 +129,7 @@ void taxidriv_state::main_map(address_map &map)
 	map(0xf480, 0xf483).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* "sprite1" placement */
 	map(0xf500, 0xf503).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* "sprite2" placement */
 	map(0xf580, 0xf583).rw("ppi8255_4", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* "sprite3" placement */
-	//AM_RANGE(0xf780, 0xf781) AM_WRITEONLY     /* more scroll registers? */
+	//map(0xf780, 0xf781).writeonly();    /* more scroll registers? */
 	map(0xf782, 0xf787).writeonly().share("scroll");    /* bg scroll (three copies always identical) */
 	map(0xf800, 0xffff).ram();
 }
@@ -347,7 +347,7 @@ void taxidriv_state::taxidriv(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &taxidriv_state::cpu3_port_map);
 	audiocpu.set_vblank_int("screen", FUNC(taxidriv_state::irq0_line_hold));   /* ??? */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));

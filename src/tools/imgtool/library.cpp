@@ -9,7 +9,7 @@
 
 ****************************************************************************/
 
-#include <string.h>
+#include <cstring>
 #include <algorithm>
 
 #include "imgtool.h"

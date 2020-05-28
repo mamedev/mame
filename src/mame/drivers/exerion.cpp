@@ -158,14 +158,14 @@ INPUT_CHANGED_MEMBER(exerion_state::coin_inserted)
 
 /* This is the first of many Exerion "features". No clue if it's */
 /* protection or some sort of timer. */
-READ8_MEMBER(exerion_state::exerion_porta_r)
+uint8_t exerion_state::exerion_porta_r()
 {
 	m_porta ^= 0x40;
 	return m_porta;
 }
 
 
-WRITE8_MEMBER(exerion_state::exerion_portb_w)
+void exerion_state::exerion_portb_w(uint8_t data)
 {
 	/* pull the expected value from the ROM */
 	m_porta = memregion("maincpu")->base()[0x5f76];
@@ -175,7 +175,7 @@ WRITE8_MEMBER(exerion_state::exerion_portb_w)
 }
 
 
-READ8_MEMBER(exerion_state::exerion_protection_r)
+uint8_t exerion_state::exerion_protection_r(offs_t offset)
 {
 	if (m_maincpu->pc() == 0x4143)
 		return memregion("maincpu")->base()[0x33c0 + (m_main_ram[0xd] << 2) + offset];
@@ -237,7 +237,7 @@ void exerion_state::sub_map(address_map &map)
 /* verified from Z80 code */
 static INPUT_PORTS_START( exerion )
 	PORT_START("IN0")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exerion_state, exerion_controls_r, nullptr)
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exerion_state, exerion_controls_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 

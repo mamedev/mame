@@ -5,9 +5,9 @@
 
 DEFINE_DEVICE_TYPE(MIDI_PORT, midi_port_device, "midi_port", "MIDI port")
 
-midi_port_device::midi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDI_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+midi_port_device::midi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MIDI_PORT, tag, owner, clock),
+	device_single_card_slot_interface<device_midi_port_interface>(mconfig, *this),
 	m_rxd(0),
 	m_rxd_handler(*this),
 	m_dev(nullptr)
@@ -20,7 +20,7 @@ midi_port_device::~midi_port_device()
 
 void midi_port_device::device_config_complete()
 {
-	m_dev = dynamic_cast<device_midi_port_interface *>(get_card_device());
+	m_dev = get_card_device();
 }
 
 void midi_port_device::device_start()
@@ -34,8 +34,8 @@ WRITE_LINE_MEMBER( midi_port_device::write_txd )
 		m_dev->input_txd(state);
 }
 
-device_midi_port_interface::device_midi_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_midi_port_interface::device_midi_port_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "midi")
 {
 	m_port = dynamic_cast<midi_port_device *>(device.owner());
 }

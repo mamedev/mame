@@ -18,14 +18,13 @@ The speech driver is by Forrest S. Mozer's company.
 
 The cartridge slots are for extra teams. There are around 8 cartridges, each one
 included 3 or 4 baseball teams, with exception to the "Hall of Fame" cartridge.
-Players enter 3-digit code to select the team.
+Players enter a 3-digit code to select the team.
 
 TODO:
 - add cartridge slots
 - Buttons are unresponsive at initial game setup, you need to hold the yes/no button
   until it responds. The keypad reading routine is at $1A5D, it gets skipped for several
   seconds at a time. Once in-game, everything is fine though. BTANB or different cause?
-- get rid of savestate workaround once outputs support savestates
 
 *******************************************************************************
 
@@ -147,11 +146,11 @@ private:
 	u8 m_inp_mux;
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(bank_w);
+	void bank_w(u8 data);
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(input_w);
 	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(switch_r);
+	u8 switch_r();
 };
 
 void talkingbb_state::machine_start()
@@ -171,7 +170,7 @@ void talkingbb_state::machine_start()
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(talkingbb_state::bank_w)
+void talkingbb_state::bank_w(u8 data)
 {
 	// d0-d1: upper rom bank
 	// d2-d4: upper rom enable (bus conflict possible)
@@ -217,7 +216,7 @@ READ8_MEMBER(talkingbb_state::input_r)
 	return ~data;
 }
 
-READ8_MEMBER(talkingbb_state::switch_r)
+u8 talkingbb_state::switch_r()
 {
 	// d5: mode switch
 	return ~m_inputs[4]->read();

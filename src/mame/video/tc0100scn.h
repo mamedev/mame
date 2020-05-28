@@ -17,16 +17,17 @@ enum {
 	TC0620SCC_LAYOUT_DEFAULT = 0 // default TC0620SCC layout is 6bpp
 };
 
-typedef device_delegate<void (u32 *code, u16 *color)> tc0100scn_cb_delegate;
 #define TC0100SCN_CB_MEMBER(_name)   void _name(u32 *code, u16 *color)
 
 class tc0100scn_base_device : public device_t, public device_gfx_interface
 {
 public:
+	typedef device_delegate<void (u32 *code, u16 *color)> tc0100scn_cb_delegate;
+
 	// configuration
 	void set_gfxlayout(int layout) { m_gfxlayout = layout; }
 	void set_color_base(u16 base) { m_col_base = base; }
-	template <typename... T> void set_tile_callback(T &&... args) { m_tc0100scn_cb = tc0100scn_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_tile_callback(T &&... args) { m_tc0100scn_cb.set(std::forward<T>(args)...); }
 	void set_multiscr_xoffs(int xoffs) { m_multiscrn_xoffs = xoffs; }
 	void set_multiscr_hack(int hack) { m_multiscrn_hack = hack; }
 	void set_offsets(int x_offset, int y_offset)

@@ -255,12 +255,12 @@ void hp9122c_device::update_intsel()
 	m_cpufirq = firq;
 }
 
-READ8_MEMBER(hp9122c_device::i8291a_dio_r)
+uint8_t hp9122c_device::i8291a_dio_r()
 {
-	return m_bus->read_dio();
+	return m_bus->dio_r();
 }
 
-WRITE8_MEMBER(hp9122c_device::i8291a_dio_w)
+void hp9122c_device::i8291a_dio_w(uint8_t data)
 {
 	m_bus->dio_w(this, data);
 }
@@ -381,9 +381,8 @@ void hp9122c_device::device_add_mconfig(machine_config &config)
 	MC6809(config, m_cpu, XTAL(8'000'000));
 	m_cpu->set_addrmap(AS_PROGRAM, &hp9122c_device::cpu_map);
 
-	// without this flag, 'DMA' transfer via SYNC instruction
-	// will not work
-	config.m_perfect_cpu_quantum = subtag("cpu");
+	// without this flag, 'DMA' transfer via SYNC instruction will not work
+	//config.set_perfect_quantum(m_cpu); FIXME: not safe in a slot device - add barriers
 
 	MB8876(config, m_fdc, 8_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(hp9122c_device::fdc_intrq_w));

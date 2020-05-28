@@ -50,13 +50,13 @@ public:
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 	IRQ_CALLBACK_MEMBER(audiocpu_irq_ack);
-	DECLARE_WRITE8_MEMBER(ym2151_ct_w);
+	void ym2151_ct_w(uint8_t data);
 	virtual void machine_start() override;
 	uint32_t screen_update_crimfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(uint8_t data);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(uint8_t data);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
 
 	void crimfght(machine_config &config);

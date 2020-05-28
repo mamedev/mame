@@ -4,14 +4,14 @@
 #include "jasmin.h"
 #include "formats/oric_dsk.h"
 
-DEFINE_DEVICE_TYPE(JASMIN, jasmin_device, "jasmin", "Jasmin floppy drive interface")
+DEFINE_DEVICE_TYPE(ORIC_JASMIN, oric_jasmin_device, "oric_jasmin", "Jasmin floppy drive interface")
 
 ROM_START( jasmin )
 	ROM_REGION( 0x800, "jasmin", 0 )
 	ROM_LOAD("jasmin.rom", 0, 0x800, CRC(37220e89) SHA1(70e59b8abd67092f050462abc6cb5271e4c15f01) )
 ROM_END
 
-FLOPPY_FORMATS_MEMBER( jasmin_device::floppy_formats )
+FLOPPY_FORMATS_MEMBER( oric_jasmin_device::floppy_formats )
 	FLOPPY_ORIC_DSK_FORMAT
 FLOPPY_FORMATS_END
 
@@ -22,17 +22,18 @@ static void jasmin_floppies(device_slot_interface &device)
 
 INPUT_PORTS_START( jasmin )
 	PORT_START("JASMIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, jasmin_device, boot_pressed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, oric_jasmin_device, boot_pressed, 0)
 INPUT_PORTS_END
 
-void jasmin_device::map(address_map &map)
+void oric_jasmin_device::map(address_map &map)
 {
 	map(0x3f4, 0x3f7).rw("fdc", FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x3f8, 0x3ff).w(m_fdlatch, FUNC(ls259_device::write_d0));
 }
 
-jasmin_device::jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	oricext_device(mconfig, JASMIN, tag, owner, clock),
+oric_jasmin_device::oric_jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ORIC_JASMIN, tag, owner, clock),
+	device_oricext_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),
 	m_fdlatch(*this, "fdlatch"),
 	m_floppies(*this, "fdc:%u", 0U),
@@ -41,48 +42,47 @@ jasmin_device::jasmin_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-jasmin_device::~jasmin_device()
+oric_jasmin_device::~oric_jasmin_device()
 {
 }
 
-void jasmin_device::device_start()
+void oric_jasmin_device::device_start()
 {
-	oricext_device::device_start();
-	cpu->space(AS_PROGRAM).install_device(0x0000, 0xffff, *this, &jasmin_device::map);
+	cpu->space(AS_PROGRAM).install_device(0x0000, 0xffff, *this, &oric_jasmin_device::map);
 }
 
-const tiny_rom_entry *jasmin_device::device_rom_region() const
+const tiny_rom_entry *oric_jasmin_device::device_rom_region() const
 {
 	return ROM_NAME( jasmin );
 }
 
-void jasmin_device::device_add_mconfig(machine_config &config)
+void oric_jasmin_device::device_add_mconfig(machine_config &config)
 {
 	WD1770(config, m_fdc, 8_MHz_XTAL);
-	m_fdc->drq_wr_callback().set(FUNC(oricext_device::irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(oric_jasmin_device::irq_w));
 
-	FLOPPY_CONNECTOR(config, "fdc:0", jasmin_floppies, "3dsdd", jasmin_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", jasmin_floppies, nullptr, jasmin_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:2", jasmin_floppies, nullptr, jasmin_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:3", jasmin_floppies, nullptr, jasmin_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", jasmin_floppies, "3dsdd", oric_jasmin_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", jasmin_floppies, nullptr, oric_jasmin_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", jasmin_floppies, nullptr, oric_jasmin_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", jasmin_floppies, nullptr, oric_jasmin_device::floppy_formats);
 
 	LS259(config, m_fdlatch); // U14
-	m_fdlatch->q_out_cb<0>().set(FUNC(jasmin_device::side_sel_w));
+	m_fdlatch->q_out_cb<0>().set(FUNC(oric_jasmin_device::side_sel_w));
 	m_fdlatch->q_out_cb<1>().set(m_fdc, FUNC(wd1770_device::mr_w));
-	m_fdlatch->q_out_cb<2>().set(FUNC(jasmin_device::ram_access_w));
-	m_fdlatch->q_out_cb<3>().set(FUNC(jasmin_device::rom_access_w));
-	m_fdlatch->q_out_cb<4>().set(FUNC(jasmin_device::select_w));
-	m_fdlatch->q_out_cb<5>().set(FUNC(jasmin_device::select_w));
-	m_fdlatch->q_out_cb<6>().set(FUNC(jasmin_device::select_w));
-	m_fdlatch->q_out_cb<7>().set(FUNC(jasmin_device::select_w));
+	m_fdlatch->q_out_cb<2>().set(FUNC(oric_jasmin_device::ram_access_w));
+	m_fdlatch->q_out_cb<3>().set(FUNC(oric_jasmin_device::rom_access_w));
+	m_fdlatch->q_out_cb<4>().set(FUNC(oric_jasmin_device::select_w));
+	m_fdlatch->q_out_cb<5>().set(FUNC(oric_jasmin_device::select_w));
+	m_fdlatch->q_out_cb<6>().set(FUNC(oric_jasmin_device::select_w));
+	m_fdlatch->q_out_cb<7>().set(FUNC(oric_jasmin_device::select_w));
 }
 
-ioport_constructor jasmin_device::device_input_ports() const
+ioport_constructor oric_jasmin_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( jasmin );
 }
 
-void jasmin_device::remap()
+void oric_jasmin_device::remap()
 {
 	if(m_fdlatch->q3_r()) {
 		if(m_fdlatch->q2_r()) {
@@ -119,7 +119,7 @@ void jasmin_device::remap()
 	}
 }
 
-INPUT_CHANGED_MEMBER(jasmin_device::boot_pressed)
+INPUT_CHANGED_MEMBER(oric_jasmin_device::boot_pressed)
 {
 	if(newval) {
 		m_fdlatch->write_bit(3, 1);
@@ -127,23 +127,23 @@ INPUT_CHANGED_MEMBER(jasmin_device::boot_pressed)
 	}
 }
 
-WRITE_LINE_MEMBER(jasmin_device::side_sel_w)
+WRITE_LINE_MEMBER(oric_jasmin_device::side_sel_w)
 {
 	if(m_cur_floppy)
 		m_cur_floppy->ss_w(state);
 }
 
-WRITE_LINE_MEMBER(jasmin_device::ram_access_w)
+WRITE_LINE_MEMBER(oric_jasmin_device::ram_access_w)
 {
 	remap();
 }
 
-WRITE_LINE_MEMBER(jasmin_device::rom_access_w)
+WRITE_LINE_MEMBER(oric_jasmin_device::rom_access_w)
 {
 	remap();
 }
 
-WRITE_LINE_MEMBER(jasmin_device::select_w)
+WRITE_LINE_MEMBER(oric_jasmin_device::select_w)
 {
 	m_cur_floppy = nullptr;
 	for(int i=0; i != 4; i++)

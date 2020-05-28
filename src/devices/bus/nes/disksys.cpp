@@ -53,7 +53,7 @@ static const floppy_interface nes_floppy_interface =
 
 void nes_disksys_device::device_add_mconfig(machine_config &config)
 {
-	LEGACY_FLOPPY(config, FLOPPY_0, 0, &nes_floppy_interface);
+	LEGACY_FLOPPY(config, m_disk, 0, &nes_floppy_interface);
 }
 
 
@@ -101,7 +101,7 @@ nes_disksys_device::nes_disksys_device(const machine_config &mconfig, const char
 	: nes_nrom_device(mconfig, NES_DISKSYS, tag, owner, clock)
 	, m_2c33_rom(*this, "drive")
 	, m_fds_data(nullptr)
-	, m_disk(*this, FLOPPY_0)
+	, m_disk(*this, "floppy0")
 	, irq_timer(nullptr)
 	, m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_transfer(0), m_fds_motor_on(0), m_fds_door_closed(0), m_fds_current_side(0), m_fds_head_position(0), m_fds_status0(0), m_read_mode(0), m_drive_ready(0)
 	, m_fds_sides(0), m_fds_last_side(0), m_fds_count(0)

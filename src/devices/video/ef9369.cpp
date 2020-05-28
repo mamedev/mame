@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /***************************************************************************
 
@@ -30,6 +30,7 @@ DEFINE_DEVICE_TYPE(EF9369, ef9369_device, "ef9369", "Thomson EF9369 Single Chip 
 
 ef9369_device::ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EF9369, tag, owner, clock)
+	, m_color_update_cb(*this)
 	, m_address(0)
 {
 	std::fill(m_ca, m_ca + NUMCOLORS, 0);
@@ -45,7 +46,7 @@ ef9369_device::ef9369_device(const machine_config &mconfig, const char *tag, dev
 void ef9369_device::device_start()
 {
 	// bind delegate
-	m_color_update_cb.bind_relative_to(*owner());
+	m_color_update_cb.resolve();
 
 	// register for save states
 	save_pointer(NAME(m_ca), NUMCOLORS);
@@ -69,7 +70,7 @@ void ef9369_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER( ef9369_device::data_r )
+uint8_t ef9369_device::data_r()
 {
 	if (m_address & 1)
 		return m_m[m_address >> 1] << 4 | m_cc[m_address >> 1];
@@ -77,7 +78,7 @@ READ8_MEMBER( ef9369_device::data_r )
 		return m_cb[m_address >> 1] << 4 | m_ca[m_address >> 1];
 }
 
-WRITE8_MEMBER( ef9369_device::data_w )
+void ef9369_device::data_w(uint8_t data)
 {
 	const int entry = m_address >> 1;
 
@@ -101,7 +102,7 @@ WRITE8_MEMBER( ef9369_device::data_w )
 	m_address &= 0x1f;
 }
 
-WRITE8_MEMBER( ef9369_device::address_w )
+void ef9369_device::address_w(uint8_t data)
 {
 	m_address = data & 0x1f;    // 5-bit
 }

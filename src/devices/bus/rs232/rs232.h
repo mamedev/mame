@@ -22,7 +22,6 @@
 #define RS232_BAUD_38400 (0x0b)
 #define RS232_BAUD_57600 (0x0c)
 #define RS232_BAUD_115200 (0x0d)
-#define RS232_BAUD_7200 (0x0e)
 
 #define PORT_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
 	PORT_START(_tag) \
@@ -34,7 +33,6 @@
 	PORT_CONFSETTING( RS232_BAUD_1200, "1200") \
 	PORT_CONFSETTING( RS232_BAUD_2400, "2400") \
 	PORT_CONFSETTING( RS232_BAUD_4800, "4800") \
-	PORT_CONFSETTING( RS232_BAUD_7200, "7200") \
 	PORT_CONFSETTING( RS232_BAUD_9600, "9600") \
 	PORT_CONFSETTING( RS232_BAUD_14400, "14400") \
 	PORT_CONFSETTING( RS232_BAUD_19200, "19200") \
@@ -95,7 +93,7 @@
 
 class device_rs232_port_interface;
 
-class rs232_port_device : public device_t, public device_slot_interface
+class rs232_port_device : public device_t, public device_single_card_slot_interface<device_rs232_port_interface>
 {
 	friend class device_rs232_port_interface;
 
@@ -141,6 +139,7 @@ protected:
 	rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_resolve_objects() override;
+	virtual void device_reset() override;
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
@@ -166,7 +165,7 @@ private:
 	device_rs232_port_interface *m_dev;
 };
 
-class device_rs232_port_interface : public device_slot_card_interface
+class device_rs232_port_interface : public device_interface
 {
 	friend class rs232_port_device;
 
@@ -210,8 +209,7 @@ protected:
 			28800,
 			38400,
 			57600,
-			115200,
-			7200
+			115200
 		};
 
 		return values[baud];

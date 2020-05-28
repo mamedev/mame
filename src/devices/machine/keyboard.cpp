@@ -158,7 +158,7 @@ INPUT_PORTS_START( generic_keyboard )
 	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8)          PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('8')   PORT_CHAR('(')
 	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)          PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('9')   PORT_CHAR('(')
 	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)          PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('9')   PORT_CHAR(')')
-	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)          PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('0')   PORT_CHAR('(')
+	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)          PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('0')   PORT_CHAR(')')
 	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)          PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('0')
 	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('-')   PORT_CHAR('_')
 	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('-')   PORT_CHAR('=')
@@ -253,7 +253,7 @@ generic_keyboard_device::generic_keyboard_device(
 	, m_config(*this, "GENKBD_CFG")
 	, m_modifiers(*this, "GENKBD_MOD")
 	, m_last_modifiers(0U)
-	, m_keyboard_cb()
+	, m_keyboard_cb(*this)
 {
 }
 
@@ -272,7 +272,7 @@ ioport_constructor generic_keyboard_device::device_input_ports() const
 
 void generic_keyboard_device::device_start()
 {
-	m_keyboard_cb.bind_relative_to(*owner());
+	m_keyboard_cb.resolve();
 
 	save_item(NAME(m_last_modifiers));
 }

@@ -101,7 +101,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_hi);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_lo);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi_lo);
-	DECLARE_WRITE8_MEMBER(ay_audio_nmi_enable_w);
+	void ay_audio_nmi_enable_w(uint8_t data);
 
 	void init_btime();
 	void init_tisland();
@@ -141,6 +141,7 @@ public:
 	void mmonkey(machine_config &config);
 	void bnj(machine_config &config);
 	void cookrace(machine_config &config);
+	void protenn(machine_config &config);
 	void wtennis(machine_config &config);
 	void sdtennis(machine_config &config);
 	void tisland(machine_config &config);
@@ -154,6 +155,7 @@ public:
 	void disco_map(address_map &map);
 	void lnc_map(address_map &map);
 	void mmonkey_map(address_map &map);
+	void protenn_map(address_map &map);
 	void tisland_map(address_map &map);
 	void zoar_map(address_map &map);
 };

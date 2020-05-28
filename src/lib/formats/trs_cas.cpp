@@ -6,7 +6,7 @@ Support for TRS80 .cas cassette images
 
 ********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/trs_cas.h"
 

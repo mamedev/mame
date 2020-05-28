@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
-#include <errno.h>
+#include <cerrno>
 #endif
 
 #include "emu.h"
@@ -337,7 +337,7 @@ int netdev_tap::recv_dev(uint8_t **buf)
 
 static CREATE_NETDEV(create_tap)
 {
-	class netdev_tap *dev = global_alloc(netdev_tap(ifname, ifdev, rate));
+	auto *dev = global_alloc(netdev_tap(ifname, ifdev, rate));
 	return dynamic_cast<osd_netdev *>(dev);
 }
 

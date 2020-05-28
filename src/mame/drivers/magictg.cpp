@@ -641,12 +641,12 @@ WRITE32_MEMBER( magictg_state::f0_w )
 		}
 		case 0xcf8:
 		{
-			m_pci->write(space, 0, data, mem_mask);
+			m_pci->write(0, data, mem_mask);
 			break;
 		}
 		case 0xcfc:
 		{
-			m_pci->write(space, 1, data, mem_mask);
+			m_pci->write(1, data, mem_mask);
 			break;
 		}
 //      default:
@@ -678,12 +678,12 @@ READ32_MEMBER( magictg_state::f0_r )
 
 		case 0xcf8:
 		{
-			val = m_pci->read(space, 0, swapendian_int32(mem_mask));
+			val = m_pci->read(0, swapendian_int32(mem_mask));
 			break;
 		}
 		case 0xcfc:
 		{
-			val = m_pci->read(space, 1, swapendian_int32(mem_mask));
+			val = m_pci->read(1, swapendian_int32(mem_mask));
 			break;
 		}
 //      default:
@@ -882,7 +882,7 @@ void magictg_state::adsp_program_map(address_map &map)
 void magictg_state::adsp_data_map(address_map &map)
 {
 	map.unmap_value_high();
-//  AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("databank")
+//  map(0x0000, 0x03ff).bankrw("databank");
 	map(0x0400, 0x3fdf).ram();
 	map(0x3fe0, 0x3fff).rw(FUNC(magictg_state::adsp_control_r), FUNC(magictg_state::adsp_control_w));
 }
@@ -929,17 +929,13 @@ void magictg_state::magictg(machine_config &config)
 	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (0, FUNC(magictg_state::pci_dev0_r), this);
-	pcibus.set_device_write(0, FUNC(magictg_state::pci_dev0_w), this);
-	pcibus.set_device_read (7, FUNC(magictg_state::voodoo_0_pci_r), this);
-	pcibus.set_device_write(7, FUNC(magictg_state::voodoo_0_pci_w), this);
+	pcibus.set_device(0, FUNC(magictg_state::pci_dev0_r), FUNC(magictg_state::pci_dev0_w));
+	pcibus.set_device(7, FUNC(magictg_state::voodoo_0_pci_r), FUNC(magictg_state::voodoo_0_pci_w));
 
 #if defined(USE_TWO_3DFX)
-	pcibus.set_device_read (8, FUNC(magictg_state::voodoo_1_pci_r), this);
-	pcibus.set_device_write(8, FUNC(magictg_state::voodoo_1_pci_w), this);
+	pcibus.set_device(8, FUNC(magictg_state::voodoo_1_pci_r), FUNC(magictg_state::voodoo_1_pci_w));
 #endif
-	pcibus.set_device_read (9, FUNC(magictg_state::zr36120_pci_r), this); // TODO: ZR36120 device
-	pcibus.set_device_write(9, FUNC(magictg_state::zr36120_pci_w), this); // TODO: ZR36120 device
+	pcibus.set_device(9, FUNC(magictg_state::zr36120_pci_r), FUNC(magictg_state::zr36120_pci_w)); // TODO: ZR36120 device
 
 	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
 	m_voodoo[0]->set_fbmem(2);

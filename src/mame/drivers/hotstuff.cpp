@@ -13,11 +13,12 @@
 class hotstuff_state : public driver_device
 {
 public:
-	hotstuff_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hotstuff_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bitmapram(*this, "bitmapram"),
 		m_maincpu(*this, "maincpu"),
-		m_rtc(*this, "rtc") { }
+		m_rtc(*this, "rtc")
+	{ }
 
 	void hotstuff(machine_config &config);
 
@@ -39,37 +40,35 @@ void hotstuff_state::video_start()
 
 uint32_t hotstuff_state::screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int count, y,yyy,x,xxx;
+	int yyy,xxx;
 	uint16_t row_palette_data[0x10];
 	rgb_t row_palette_data_as_rgb32_pen_data[0x10];
 
 	yyy=512;xxx=512*2;
 
-	count = 0;
-	for (y = 0; y < yyy; y++)
+	int count = 0;
+	for (int y = 0; y < yyy; y++)
 	{
 		// the current palette is stored in the first 0x20 bytes of each row!
-		int p;
-
-		for (p=0;p<0x10;p++)
+		for (int p = 0; p < 0x10; p++)
 		{
-			row_palette_data[p] = m_bitmapram[count+p];
-
-			row_palette_data_as_rgb32_pen_data[p] = rgb_t( (row_palette_data[p] & 0x0f00)>>4, (row_palette_data[p] & 0x00f0)>>0, (row_palette_data[p] & 0x000f)<<4  );
-
+			row_palette_data[p] = m_bitmapram[count + p];
+			row_palette_data_as_rgb32_pen_data[p] = rgb_t(
+					pal4bit(row_palette_data[p] >> 8),
+					pal4bit(row_palette_data[p] >> 4),
+					pal4bit(row_palette_data[p] >> 0));
 		}
 
-		for(x = 0; x < xxx; x++)
+		for (int x = 0; x < xxx; )
 		{
-			{
-				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0xf000)>>12];
-				x++;
-				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x0f00)>>8];
-				x++;
-				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x00f0)>>4];
-				x++;
-				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x000f)>>0];
-			}
+			bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0xf000)>>12];
+			x++;
+			bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x0f00)>>8];
+			x++;
+			bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x00f0)>>4];
+			x++;
+			bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(m_bitmapram[count] &0x000f)>>0];
+			x++;
 
 			count++;
 		}
@@ -81,19 +80,15 @@ uint32_t hotstuff_state::screen_update_hotstuff(screen_device &screen, bitmap_rg
 void hotstuff_state::hotstuff_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x0fffff).noprw(); //ROM AM_REGION("data", 0)
+	map(0x080000, 0x0fffff).noprw(); //.rom().region("data", 0);
 
 	map(0x400000, 0x40ffff).ram();
 
 	map(0x600000, 0x600003).rw("scc1", FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 	map(0x620000, 0x620003).rw("scc2", FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
-	map(0x680000, 0x680001).lrw8("rtc_rw",
-								 [this](offs_t offset) {
-									 return m_rtc->read(offset^1);
-								 },
-								 [this](offs_t offset, u8 data) {
-									 m_rtc->write(offset^1, data);
-								 });
+	map(0x680000, 0x680001).lrw8(
+			NAME([this] (offs_t offset) { return m_rtc->read(offset^1); }),
+			NAME([this] (offs_t offset, u8 data) { m_rtc->write(offset^1, data); }));
 
 	map(0x980000, 0x9bffff).ram().share("bitmapram");
 }

@@ -86,7 +86,7 @@ private:
 	void clear_outputs(u8 new_q);
 
 	// device callbacks
-	devcb_write_line    m_q_out_cb[8];      // output line callback array
+	devcb_write_line::array<8> m_q_out_cb;      // output line callback array
 	devcb_write8        m_parallel_out_cb;  // parallel output option
 
 	// miscellaneous configuration

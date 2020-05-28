@@ -134,17 +134,17 @@ READ8_MEMBER(chaknpop_state::mcu_status_r)
 			((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
 }
 
-WRITE8_MEMBER(chaknpop_state::unknown_port_1_w)
+void chaknpop_state::unknown_port_1_w(uint8_t data)
 {
 	//logerror("%s: write to unknown port 1: 0x%02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(chaknpop_state::unknown_port_2_w)
+void chaknpop_state::unknown_port_2_w(uint8_t data)
 {
 	//logerror("%s: write to unknown port 2: 0x%02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(chaknpop_state::unknown_port_3_w)
+void chaknpop_state::unknown_port_3_w(uint8_t data)
 {
 	//logerror("%s: write to unknown port 3: 0x%02x\n", machine().describe_context(), data);
 }
@@ -370,7 +370,7 @@ void chaknpop_state::chaknpop(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(chaknpop_state::irq0_line_hold));
 
 	TAITO68705_MCU(config, m_bmcu, XTAL(18'000'000) / 6);    // Verified on PCB
-	config.m_minimum_quantum = attotime::from_hz(6000);  // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.set_maximum_quantum(attotime::from_hz(6000));  // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

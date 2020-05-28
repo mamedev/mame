@@ -60,30 +60,19 @@ public:
 	upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_character_width(int value) { m_width = value; }
-	template <typename... T> void set_display_callback(T &&... args) { m_display_cb = draw_character_delegate(std::forward<T>(args)...); }
-	void set_display_callback(draw_character_delegate callback) { m_display_cb = callback; }
-	template <class FunctionClass> void set_display_callback(const char *devname,
-		void (FunctionClass::*callback)(bitmap_rgb32 &, int, int, uint8_t, uint8_t, int, int, int, int, int, int, int), const char *name)
-	{
-		set_display_callback(draw_character_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_display_callback(
-		void (FunctionClass::*callback)(bitmap_rgb32 &, int, int, uint8_t, uint8_t, int, int, int, int, int, int, int), const char *name)
-	{
-		set_display_callback(draw_character_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 
 	auto drq_wr_callback() { return m_write_drq.bind(); }
 	auto int_wr_callback() { return m_write_int.bind(); }
 	auto hrtc_wr_callback() { return m_write_hrtc.bind(); }
 	auto vrtc_wr_callback() { return m_write_vrtc.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( dack_w );
-	DECLARE_WRITE_LINE_MEMBER( lpen_w );
-	DECLARE_READ_LINE_MEMBER( hrtc_r );
-	DECLARE_READ_LINE_MEMBER( vrtc_r );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	void dack_w(uint8_t data);
+	void lpen_w(int state);
+	int hrtc_r();
+	int vrtc_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

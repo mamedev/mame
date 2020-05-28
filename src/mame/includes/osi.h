@@ -136,9 +136,9 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( osi470_pia_pa_r );
-	DECLARE_WRITE8_MEMBER( osi470_pia_pa_w );
-	DECLARE_WRITE8_MEMBER( osi470_pia_pb_w );
+	uint8_t osi470_pia_pa_r();
+	void osi470_pia_pa_w(uint8_t data);
+	void osi470_pia_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( osi470_pia_cb2_w );
 
 	void c1pmf_mem(address_map &map);

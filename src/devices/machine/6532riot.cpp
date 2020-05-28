@@ -146,7 +146,7 @@ void riot6532_device::timer_end()
     riot6532_w - master I/O write access
 -------------------------------------------------*/
 
-WRITE8_MEMBER( riot6532_device::write )
+void riot6532_device::write(offs_t offset, uint8_t data)
 {
 	reg_w(offset, data);
 }
@@ -231,7 +231,7 @@ void riot6532_device::reg_w(uint8_t offset, uint8_t data)
     riot6532_r - master I/O read access
 -------------------------------------------------*/
 
-READ8_MEMBER( riot6532_device::read )
+uint8_t riot6532_device::read(offs_t offset)
 {
 	return reg_r(offset, machine().side_effects_disabled());
 }
@@ -510,6 +510,6 @@ void riot6532_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			timer_end();
 			break;
 		default:
-			assert_always(false, "Unknown id in riot6532_device::device_timer");
+			throw emu_fatalerror("Unknown id in riot6532_device::device_timer");
 	}
 }

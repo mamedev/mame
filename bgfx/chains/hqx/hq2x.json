@@ -43,6 +43,7 @@
 	"passes": [
 		{
 			"effect": "hqx/hq2x",
+			"applytint": true,
 			"name": "HQ2x pass",
 			"input": [
 				{ "sampler": "decal", "texture": "screen" },

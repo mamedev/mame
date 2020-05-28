@@ -80,12 +80,12 @@ void seicross_state::machine_reset()
 
 
 
-READ8_MEMBER(seicross_state::portB_r)
+uint8_t seicross_state::portB_r()
 {
 	return (m_portb & 0x9f) | (m_debug_port.read_safe(0) & 0x60);
 }
 
-WRITE8_MEMBER(seicross_state::portB_w)
+void seicross_state::portB_w(uint8_t data)
 {
 	//logerror("PC %04x: 8910 port B = %02x\n", m_maincpu->pc(), data);
 	/* bit 0 is IRQ enable */
@@ -135,7 +135,6 @@ void seicross_state::main_portmap(address_map &map)
 
 void seicross_state::mcu_nvram_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x1000, 0x10ff).ram().share("nvram");
 	map(0x2000, 0x2000).w(FUNC(seicross_state::dac_w));
 	map(0x8000, 0xf7ff).rom().region("maincpu", 0);
@@ -144,7 +143,6 @@ void seicross_state::mcu_nvram_map(address_map &map)
 
 void seicross_state::mcu_no_nvram_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x1003, 0x1003).portr("DSW1");       /* DSW1 */
 	map(0x1005, 0x1005).portr("DSW2");       /* DSW2 */
 	map(0x1006, 0x1006).portr("DSW3");       /* DSW3 */
@@ -406,7 +404,7 @@ void seicross_state::no_nvram(machine_config &config)
 	NSC8105(config, m_mcu, XTAL(18'432'000) / 6);   /* ??? */
 	m_mcu->set_addrmap(AS_PROGRAM, &seicross_state::mcu_no_nvram_map);
 
-	config.m_minimum_quantum = attotime::from_hz(1200);  /* 20 CPU slices per frame - a high value to ensure proper */
+	config.set_maximum_quantum(attotime::from_hz(1200));  /* 20 CPU slices per frame - a high value to ensure proper */
 						/* synchronization of the CPUs */
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -604,6 +602,33 @@ ROM_START( seicross )
 	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) )
 ROM_END
 
+// this set is almost identical to sectrzon
+ROM_START( seicrossa )
+	ROM_REGION( 0x7800, "maincpu", 0 )
+	ROM_LOAD( "sr-1.3a",    0x0000, 0x1000, CRC(f0a45cb4) SHA1(ab3b8d78e25cdbb2fd6a6c0718ae13767364994d) )
+	ROM_LOAD( "sr-2.3b",    0x1000, 0x1000, CRC(fea68ddb) SHA1(b9ed0cad9a2ded04bcc7042d975b77be63313070) )
+	ROM_LOAD( "sr-3.3d",    0x2000, 0x1000, CRC(baad4294) SHA1(e7fc3ccc940de6df8d786c986b602127c9db9ebb) )
+	ROM_LOAD( "sr-4.3e",    0x3000, 0x1000, CRC(75f2ca75) SHA1(fbf990edcb7b5a58f8dcee160883fde5e222ca6b) )
+	ROM_LOAD( "sr-5.3f",    0x4000, 0x1000, CRC(dc14f2c8) SHA1(dcda8d6f7be458d0adcddc37bbe0eb636a5b0b06) )
+	ROM_LOAD( "sr-6.3g",    0x5000, 0x1000, CRC(397a38c5) SHA1(6189028376c1781aae107c5fe0aec181a1d885e1) )
+	ROM_LOAD( "sr-7.3i",    0x6000, 0x1000, CRC(220a0919) SHA1(86e4c5d60353db17991fc5d6788308ed28bdc795) ) // unique, 1st half identical to seicross, 2nd half identical to sectrzon
+	ROM_LOAD( "sr-8.3j",    0x7000, 0x0800, CRC(2a95ad44) SHA1(75f5e9ea90f23b4e253d9f5a781a32fa914dee8c) ) // 1ST AND 2ND HALF IDENTICAL, same as sz8.3j
+	ROM_IGNORE(                     0x0800)
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "sr-11.7l",   0x0000, 0x1000, CRC(fbd9b91d) SHA1(6b3581f4b518c058b970d569ced07dd7dc6a87e6) )
+	ROM_LOAD( "sr-12.7n",   0x1000, 0x1000, CRC(c3c953c4) SHA1(a96937a48b59b7e992e53d279c10a5f3ea7f9a6f) )
+	ROM_LOAD( "sr-9.7h",    0x2000, 0x1000, CRC(4819f0cd) SHA1(fa8d371efc3198daf76ff1264e22673c5521becf) )
+	ROM_LOAD( "sr-10.7j",   0x3000, 0x1000, CRC(4c268778) SHA1(a1444fb3eb397c8167d769aa1f935c5f19df4d6d) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "sr-3.9c",    0x0000, 0x0020, CRC(4d218a3c) SHA1(26364dfdb7e13080357328a06c3bcf504778defd) )
+	ROM_LOAD( "sr-4.9b",    0x0020, 0x0020, BAD_DUMP CRC(969beb4c) SHA1(69499d916871bb0529952c89fbd75694124ec0b2) ) // unique, gives bad colors. No references available. TODO: verify if it's really bad
+
+	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, BAD_DUMP CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) ) // not dumped for this set
+ROM_END
+
 ROM_START( sectrzon )
 	ROM_REGION( 0x7800, "maincpu", 0 )
 	ROM_LOAD( "sz1.3a",       0x0000, 0x1000, CRC(f0a45cb4) SHA1(ab3b8d78e25cdbb2fd6a6c0718ae13767364994d) )
@@ -640,10 +665,11 @@ void seicross_state::init_friskytb()
 }
 
 
-GAME( 1981, friskyt,  0,        nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskyta, friskyt,  nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskytb, friskyt,  friskytb, friskyt,  seicross_state, init_friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // protection mcu runs encrypted opcodes
-GAME( 1982, radrad,   0,        no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Nichibutsu USA", "Radical Radial (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, radradj,  radrad,   no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp.", "Radical Radial (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, seicross, 0,        no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzon, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyt,   0,        nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyta,  friskyt,  nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskytb,  friskyt,  friskytb, friskyt,  seicross_state, init_friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // protection mcu runs encrypted opcodes
+GAME( 1982, radrad,    0,        no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Nichibutsu USA", "Radical Radial (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, radradj,   radrad,   no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp.", "Radical Radial (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, seicross,  0,        no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, seicrossa, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzon,  seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -23,10 +23,7 @@
     The keyboard is a separate unit. It contains a beeper.
 
     TODO:
-    - irq sources and communications; subcpu never enables its interrupts.
     - unimplemented instruction PER triggered (can be ignored)
-    - Most of this code is guesswork, because although schematics exist,
-      they are too blurry to read.
     - Display can be interlaced or non-interlaced. Interlaced not emulated.
     - Cassette Load is quite complex, using 6 pins of the sub-cpu. Not done.
     - subcpu is supposed to be in WAIT except in horizontal blanking period.
@@ -40,6 +37,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/upd7810/upd7810.h"
+#include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "video/mc6845.h"
 #include "sound/beep.h"
@@ -52,7 +50,7 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-#define MAIN_CLOCK 15974400
+#define MAIN_CLOCK 15.9744_MHz_XTAL
 
 class fp1100_state : public driver_device
 {
@@ -63,7 +61,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
 		, m_crtc(*this, "crtc")
-		, m_p_videoram(*this, "videoram")
+		, m_ipl(*this, "ipl")
+		, m_wram(*this, "wram")
+		, m_videoram(*this, "videoram")
 		, m_keyboard(*this, "KEY.%u", 0)
 		, m_beep(*this, "beeper")
 		, m_centronics(*this, "centronics")
@@ -72,61 +72,62 @@ public:
 
 	void fp1100(machine_config &config);
 
-	void init_fp1100();
-
 protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(main_bank_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(main_to_sub_w);
-	DECLARE_READ8_MEMBER(sub_to_main_r);
-	DECLARE_WRITE8_MEMBER(slot_bank_w);
-	DECLARE_READ8_MEMBER(slot_id_r);
-	DECLARE_READ8_MEMBER(main_to_sub_r);
-	DECLARE_WRITE8_MEMBER(sub_to_main_w);
-	DECLARE_WRITE8_MEMBER(colour_control_w);
-	DECLARE_WRITE8_MEMBER(kbd_row_w);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
+	void main_bank_w(u8 data);
+	void irq_mask_w(u8 data);
+	void slot_bank_w(u8 data);
+	u8 slot_id_r();
+	u8 memory_r(offs_t offset);
+	void colour_control_w(u8 data);
+	void kbd_row_w(u8 data);
+	void porta_w(u8 data);
+	u8 portb_r();
+	u8 portc_r();
+	void portc_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
+
 	required_device<palette_device> m_palette;
+
 	void io_map(address_map &map);
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
+	void handle_int_to_main();
 
-	uint8_t m_irq_mask;
-	uint8_t m_main_latch;
-	uint8_t m_sub_latch;
-	uint8_t m_slot_num;
-	uint8_t m_kbd_row;
-	uint8_t m_col_border;
-	uint8_t m_col_cursor;
-	uint8_t m_col_display;
-	uint8_t m_centronics_busy;
-	uint8_t m_cass_data[4];
+	u8 m_irq_mask;
+	u8 m_slot_num;
+	u8 m_kbd_row;
+	u8 m_col_border;
+	u8 m_col_cursor;
+	u8 m_col_display;
+	u8 m_centronics_busy;
+	u8 m_cass_data[4];
+	bool m_bank_sel;
+	bool m_main_irq_status;
+	bool m_sub_irq_status;
 	bool m_cassbit;
 	bool m_cassold;
 
 	struct {
-		uint8_t id;
+		u8 id;
 	}m_slot[8];
 
 	struct {
-		uint8_t porta;
-		uint8_t portb;
-		uint8_t portc;
+		u8 porta;
+		u8 portb;
+		u8 portc;
 	}m_upd7801;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<mc6845_device> m_crtc;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_ipl;
+	required_shared_ptr<u8> m_wram;
+	required_shared_ptr<u8> m_videoram;
 	required_ioport_array<16> m_keyboard;
 	required_device<beep_device> m_beep;
 	required_device<centronics_device> m_centronics;
@@ -136,19 +137,17 @@ private:
 MC6845_UPDATE_ROW( fp1100_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t r,g,b,col,i;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	u32 *p = &bitmap.pix32(y);
 
 	if (BIT(m_upd7801.porta, 4))
 	{ // green screen
-		for (x = 0; x < x_count; x++)
+		for (u16 x = 0; x < x_count; x++)
 		{
-			mem = (((ma+x)<<3) + ra) & 0x3fff;
-			g = m_p_videoram[mem];
-			for (i = 0; i < 8; i++)
+			u16 mem = (((ma+x)<<3) + ra) & 0x3fff;
+			u8 g = m_videoram[mem];
+			for (u8 i = 0; i < 8; i++)
 			{
-				col = BIT(g, i);
+				u8 col = BIT(g, i);
 				if (x == cursor_x) col ^= 1;
 				*p++ = palette[col<<1];
 			}
@@ -156,15 +155,15 @@ MC6845_UPDATE_ROW( fp1100_state::crtc_update_row )
 	}
 	else
 	{ // RGB screen
-		for (x = 0; x < x_count; x++)
+		for (u16 x = 0; x < x_count; x++)
 		{
-			mem = (((ma+x)<<3) + ra) & 0x3fff;
-			b = m_p_videoram[mem];
-			r = m_p_videoram[mem+0x4000];
-			g = m_p_videoram[mem+0x8000];
-			for (i = 0; i < 8; i++)
+			u16 mem = (((ma+x)<<3) + ra) & 0x3fff;
+			u8 b = m_videoram[mem];
+			u8 r = m_videoram[mem+0x4000];
+			u8 g = m_videoram[mem+0x8000];
+			for (u8 i = 0; i < 8; i++)
 			{
-				col = BIT(r, i) + (BIT(g, i) << 1) + (BIT(b, i) << 2);
+				u8 col = BIT(r, i) + (BIT(g, i) << 1) + (BIT(b, i) << 2);
 				if (x == cursor_x) col = m_col_cursor;
 				*p++ = palette[col];
 			}
@@ -177,76 +176,70 @@ d0 - Package select
 d1 - Bank select (at boot time)
 other bits not used
 */
-WRITE8_MEMBER( fp1100_state::main_bank_w )
+void fp1100_state::main_bank_w(u8 data)
 {
-	membank("bankr0")->set_entry( BIT(data,1)); //(1) RAM (0) ROM
+	m_bank_sel = BIT(data, 1);
 	m_slot_num = (m_slot_num & 3) | ((data & 1) << 2); //??
 }
 
-WRITE8_MEMBER( fp1100_state::irq_mask_w )
+// tell sub that latch has a byte
+void fp1100_state::irq_mask_w(u8 data)
 {
-	machine().scheduler().synchronize(); // force resync
 	m_irq_mask = data;
-	if (BIT(data, 7))
+	handle_int_to_main();
+
+	if (BIT(data, 7) && !m_sub_irq_status)
+	{
 		m_subcpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
+		LOG("%s: Sub IRQ asserted\n",machine().describe_context());
+		m_sub_irq_status = true;
+	}
+	else
+	if (!BIT(data, 7) && m_sub_irq_status)
+	{
+		m_subcpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
+		LOG("%s: Sub IRQ cleared\n",machine().describe_context());
+		m_sub_irq_status = false;
+	}
+
 	LOG("%s: IRQmask=%X\n",machine().describe_context(),data);
 }
 
-WRITE8_MEMBER( fp1100_state::main_to_sub_w )
-{
-	m_sub_latch = data;
-	LOG("%s: From main:%X\n",machine().describe_context(),data);
-//  m_subcpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
-}
-
-READ8_MEMBER( fp1100_state::sub_to_main_r )
-{
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-	LOG("%s: To main:%X\n",machine().describe_context(),m_main_latch);
-	return m_main_latch;
-}
-
-WRITE8_MEMBER( fp1100_state::slot_bank_w )
+void fp1100_state::slot_bank_w(u8 data)
 {
 	m_slot_num = (data & 3) | (m_slot_num & 4);
 }
 
-READ8_MEMBER( fp1100_state::slot_id_r )
+u8 fp1100_state::slot_id_r()
 {
 	//return 0xff;
 	return m_slot[m_slot_num & 7].id;
 }
 
+u8 fp1100_state::memory_r(offs_t offset)
+{
+	if (offset < 0x9000 && !m_bank_sel)
+		return m_ipl[offset];
+	else
+		return m_wram[offset];
+}
+
 void fp1100_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x8fff).bankr("bankr0").bankw("bankw0");
-	map(0x9000, 0xffff).ram().region("wram", 0x9000);
+	map(0x0000, 0xffff).r(FUNC(fp1100_state::memory_r));
+	map(0x0000, 0xffff).writeonly().share("wram"); // always write to ram
 }
 
 void fp1100_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x0000, 0xfeff) slot memory area
-	map(0xff00, 0xff7f).rw(FUNC(fp1100_state::slot_id_r), FUNC(fp1100_state::slot_bank_w));
-	map(0xff80, 0xffff).r(FUNC(fp1100_state::sub_to_main_r));
-	map(0xff80, 0xff9f).w(FUNC(fp1100_state::irq_mask_w));
-	map(0xffa0, 0xffbf).w(FUNC(fp1100_state::main_bank_w));
-	map(0xffc0, 0xffff).w(FUNC(fp1100_state::main_to_sub_w));
-}
-
-READ8_MEMBER( fp1100_state::main_to_sub_r )
-{
-	m_subcpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
-	LOG("%s: To sub:%X\n",machine().describe_context(),m_sub_latch);
-	return m_sub_latch;
-}
-
-WRITE8_MEMBER( fp1100_state::sub_to_main_w )
-{
-	m_main_latch = data;
-	LOG("%s: From sub:%X\n",machine().describe_context(),data);
-	//m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0); // Z80
+	//map(0x0000, 0xfeff) slot memory area
+	map(0xff00, 0xff00).mirror(0x7f).rw(FUNC(fp1100_state::slot_id_r), FUNC(fp1100_state::slot_bank_w));
+	map(0xff80, 0xff80).mirror(0x7f).r("sub2main", FUNC(generic_latch_8_device::read));
+	map(0xff80, 0xff80).mirror(0x1f).w(FUNC(fp1100_state::irq_mask_w));
+	map(0xffa0, 0xffa0).mirror(0x1f).w(FUNC(fp1100_state::main_bank_w));
+	map(0xffc0, 0xffc0).mirror(0x3f).w("main2sub", FUNC(generic_latch_8_device::write));
 }
 
 /*
@@ -255,7 +248,7 @@ d3     - not used
 d4,5,6 - colour of cursor; or display area (B,R,G) (see d7)
 d7     - 1=display area; 0=cursor
 */
-WRITE8_MEMBER( fp1100_state::colour_control_w )
+void fp1100_state::colour_control_w(u8 data)
 {
 	data = bitswap<8>(data, 7, 4, 6, 5, 3, 0, 2, 1);  // change BRG to RGB
 
@@ -276,9 +269,9 @@ d4       - Beeper
 d5       - "3state buffer of key data line (1=open, 0=closed)"
 d6,7     - not used
 */
-WRITE8_MEMBER( fp1100_state::kbd_row_w )
+void fp1100_state::kbd_row_w(u8 data)
 {
-	m_kbd_row = data & 15;
+	m_kbd_row = data;
 	m_beep->set_state(BIT(data, 4));
 }
 
@@ -288,10 +281,11 @@ void fp1100_state::sub_map(address_map &map)
 	map(0x2000, 0xdfff).ram().share("videoram"); //vram B/R/G
 	map(0xe000, 0xe000).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0xe400, 0xe7ff).portr("DSW").w(FUNC(fp1100_state::kbd_row_w));
-	map(0xe800, 0xebff).rw(FUNC(fp1100_state::main_to_sub_r), FUNC(fp1100_state::sub_to_main_w));
-	//AM_RANGE(0xec00, 0xefff) "Acknowledge of INT0" is coded in but isn't currently executed
-	map(0xf000, 0xf3ff).w(FUNC(fp1100_state::colour_control_w));
+	map(0xe400, 0xe400).mirror(0x3ff).portr("DSW").w(FUNC(fp1100_state::kbd_row_w));
+	map(0xe800, 0xe800).mirror(0x3ff).r("main2sub", FUNC(generic_latch_8_device::read));
+	map(0xe800, 0xe800).mirror(0x3ff).w("sub2main", FUNC(generic_latch_8_device::write));
+	map(0xec00, 0xec00).mirror(0x3ff).lw8(NAME([this] (u8 data) { m_subcpu->set_input_line(UPD7810_INTF0, CLEAR_LINE); }));
+	map(0xf000, 0xf000).mirror(0x3ff).w(FUNC(fp1100_state::colour_control_w));
 	map(0xf400, 0xff7f).rom().region("sub_ipl", 0x2400);
 }
 
@@ -304,19 +298,23 @@ d6     - CMT baud rate (1=300; 0=1200)
 d7     - CMT load clock
 The SO pin is Serial Output to CMT (1=2400Hz; 0=1200Hz)
 */
-WRITE8_MEMBER( fp1100_state::porta_w )
+void fp1100_state::porta_w(u8 data)
 {
 	m_upd7801.porta = data;
 
 	if (BIT(data, 5))
-		memset(m_p_videoram, 0, 0xc000);
+		memset(m_videoram, 0, 0xc000);
 }
 
-READ8_MEMBER( fp1100_state::portb_r )
+u8 fp1100_state::portb_r()
 {
-	uint8_t data = m_keyboard[m_kbd_row]->read() ^ 0xff;
-	//m_subcpu->set_input_line(UPD7810_INTF0, BIT(data, 7) ? HOLD_LINE : CLEAR_LINE);
-	return data;
+	u8 data = m_keyboard[m_kbd_row & 15]->read() ^ 0xff;
+	LOG("%s: PortB:%X:%X\n",machine().describe_context(),m_kbd_row,data);
+	//m_subcpu->set_input_line(UPD7810_INTF0, BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
+	if (BIT(m_kbd_row, 5))
+		return data;
+	else
+		return 0;
 }
 
 /*
@@ -325,7 +323,7 @@ d1 - Centronics error
 d2 - CMT load input clock
 d7 - CMT load serial data
 */
-READ8_MEMBER( fp1100_state::portc_r )
+u8 fp1100_state::portc_r()
 {
 	return (m_upd7801.portc & 0x78) | m_centronics_busy;
 }
@@ -336,23 +334,45 @@ d4 - Centronics port is used for input or output
 d5 - CMT relay
 d6 - Centronics strobe
 */
-WRITE8_MEMBER( fp1100_state::portc_w )
+void fp1100_state::portc_w(u8 data)
 {
 	u8 bits = data ^ m_upd7801.portc;
+	m_upd7801.portc = data;
+
 	if (BIT(bits, 3))
-		if (BIT(m_irq_mask, 4))
-			if (!BIT(data, 3))
-			{
-				m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0); // Z80
-				LOG("%s: PortC:%X\n",machine().describe_context(),data);
-			}
+	{
+		LOG("%s: PortC:%X\n",machine().describe_context(),data);
+		handle_int_to_main();
+	}
 	if (BIT(bits, 5))
 		m_cass->change_state(BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	if (BIT(bits, 6))
 		m_centronics->write_strobe(BIT(data, 6));
-	m_upd7801.portc = data;
 }
 
+// HOLD_LINE used because the interrupt is set and cleared by successive instructions, too fast for the maincpu to notice
+void fp1100_state::handle_int_to_main()
+{
+	// IRQ is on if bit 4 of mask AND bit 3 portC
+	if (BIT(m_upd7801.portc, 3) && BIT(m_irq_mask, 4))
+	{
+		if (!m_main_irq_status)
+		{
+			m_maincpu->set_input_line(0, HOLD_LINE);
+			LOG("%s: Main IRQ asserted\n",machine().describe_context());
+//          m_main_irq_status = true;
+		}
+	}
+	else
+	{
+		if (m_main_irq_status)
+		{
+//          m_maincpu->set_input_line(0, CLEAR_LINE);
+//          LOG("%s: Main IRQ cleared\n",machine().describe_context());
+			m_main_irq_status = false;
+		}
+	}
+}
 
 /* Input ports */
 static INPUT_PORTS_START( fp1100 )
@@ -361,8 +381,9 @@ static INPUT_PORTS_START( fp1100 )
 
 	PORT_START("KEY.1")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break")
-	PORT_BIT(0x70, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_NAME("Caps")
+	PORT_BIT(0x60, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Kanji")  // guess, it's in Japanese
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_NAME("Caps")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT) PORT_NAME("Graph")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("Ctrl")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Shift") PORT_CHAR(UCHAR_SHIFT_1)
@@ -478,13 +499,13 @@ static INPUT_PORTS_START( fp1100 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_NAME(":") PORT_CHAR(':') PORT_CHAR('*')
 
 	PORT_START("KEY.13")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED) // Capslock LED on
 
 	PORT_START("KEY.14")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED) // Kanji LED on
 
 	PORT_START("KEY.15")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED) // LEDs off
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Text width" ) PORT_DIPLOCATION("SW1:1")
@@ -595,9 +616,11 @@ INTERRUPT_GEN_MEMBER( fp1100_state::vblank_irq )
 
 void fp1100_state::machine_reset()
 {
+	m_main_irq_status = false;
+	m_sub_irq_status = false;
 	int i;
-	uint8_t slot_type;
-	const uint8_t id_type[4] = { 0xff, 0x00, 0x01, 0x04};
+	u8 slot_type;
+	const u8 id_type[4] = { 0xff, 0x00, 0x01, 0x04};
 	for(i=0;i<8;i++)
 	{
 		slot_type = (ioport("SLOTS")->read() >> i*2) & 3;
@@ -606,12 +629,9 @@ void fp1100_state::machine_reset()
 
 	m_beep->set_state(0);
 
-	membank("bankr0")->set_entry(0); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
+	m_bank_sel = false; // point at rom
 
 	m_irq_mask = 0;
-	m_main_latch = 0;
-	m_sub_latch = 0;
 	m_slot_num = 0;
 	m_kbd_row = 0;
 	m_col_border = 0;
@@ -620,16 +640,7 @@ void fp1100_state::machine_reset()
 	m_upd7801.porta = 0;
 	m_upd7801.portb = 0;
 	m_upd7801.portc = 0;
-}
-
-void fp1100_state::init_fp1100()
-{
-	uint8_t *main = memregion("ipl")->base();
-	uint8_t *wram = memregion("wram")->base();
-
-	membank("bankr0")->configure_entry(1, &wram[0x0000]);
-	membank("bankr0")->configure_entry(0, &main[0x0000]);
-	membank("bankw0")->configure_entry(0, &wram[0x0000]);
+	m_maincpu->set_input_line_vector(0, 0xF0);
 }
 
 void fp1100_state::fp1100(machine_config &config)
@@ -644,10 +655,13 @@ void fp1100_state::fp1100(machine_config &config)
 	sub.set_addrmap(AS_PROGRAM, &fp1100_state::sub_map);
 	sub.pa_out_cb().set(FUNC(fp1100_state::porta_w));
 	sub.pb_in_cb().set(FUNC(fp1100_state::portb_r));
-	sub.pb_out_cb().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	sub.pb_out_cb().set("cent_data_out", FUNC(output_latch_device::write));
 	sub.pc_in_cb().set(FUNC(fp1100_state::portc_r));
 	sub.pc_out_cb().set(FUNC(fp1100_state::portc_w));
 	sub.txd_func().set([this] (bool state) { m_cassbit = state; });
+
+	GENERIC_LATCH_8(config, "main2sub");
+	GENERIC_LATCH_8(config, "sub2main");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -669,7 +683,7 @@ void fp1100_state::fp1100(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(fp1100_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(fp1100_state::crtc_update_row));
 
 	/* Printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -694,11 +708,9 @@ ROM_START( fp1100 )
 	ROM_LOAD( "sub1.rom", 0x0000, 0x1000, CRC(8feda489) SHA1(917d5b398b9e7b9a6bfa5e2f88c5b99923c3c2a3))
 	ROM_LOAD( "sub2.rom", 0x1000, 0x1000, CRC(359f007e) SHA1(0188d5a7b859075cb156ee55318611bd004128d7))
 	ROM_LOAD( "sub3.rom", 0x2000, 0xf80, BAD_DUMP CRC(fb2b577a) SHA1(a9ae6b03e06ea2f5db30dfd51ebf5aede01d9672))
-
-	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME   FLAGS */
-COMP( 1983, fp1100, 0,      0,      fp1100,  fp1100, fp1100_state, init_fp1100, "Casio", "FP-1100", MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS */
+COMP( 1983, fp1100, 0,      0,      fp1100,  fp1100, fp1100_state, empty_init, "Casio", "FP-1100", MACHINE_NOT_WORKING)

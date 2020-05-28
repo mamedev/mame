@@ -13,10 +13,10 @@ public:
 
 	lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	void count_down(int nr);
-	template <typename... T> void set_timer_delegate(T &&... args) { m_timer_delegate = timer_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_timer_delegate(T &&... args) { m_timer_delegate.set(std::forward<T>(args)...); }
 
 protected:
 	struct LYNX_AUDIO {

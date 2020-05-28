@@ -8,7 +8,7 @@
 
 *********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/hect_dsk.h"
 #include "formats/basicdsk.h"

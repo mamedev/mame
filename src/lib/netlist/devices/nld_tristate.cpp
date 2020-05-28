@@ -15,8 +15,8 @@ namespace netlist
 	NETLIB_OBJECT(tristate)
 	{
 		NETLIB_CONSTRUCTOR(tristate)
-		, m_CEQ(*this, {{ "CEQ1", "CEQ2" }})
-		, m_D(*this, {{ "D1", "D2" }})
+		, m_CEQ(*this, { "CEQ1", "CEQ2" })
+		, m_D(*this, { "D1", "D2" })
 		, m_Q(*this, "Q")
 		{
 		}
@@ -32,8 +32,8 @@ namespace netlist
 	NETLIB_OBJECT(tristate3)
 	{
 		NETLIB_CONSTRUCTOR(tristate3)
-		, m_CEQ(*this, {{ "CEQ1", "CEQ2", "CEQ3" }} )
-		, m_D(*this, {{ "D1", "D2", "D3" }} )
+		, m_CEQ(*this, { "CEQ1", "CEQ2", "CEQ3" } )
+		, m_D(*this, { "D1", "D2", "D3" } )
 		, m_Q(*this, "Q")
 		{
 		}

@@ -5,6 +5,7 @@
 
 from __future__ import with_statement
 
+import io
 import re
 import sys
 
@@ -63,7 +64,7 @@ def extract_version(input):
 build, outfmt, srcfile, dstfile = parse_args()
 
 try:
-    fp = open(srcfile, 'rU')
+    fp = io.open(srcfile, 'r')
 except IOError:
     sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
     sys.exit(1)
@@ -165,6 +166,8 @@ elif outfmt == 'plist':
     fp.write('\t<string>%s</string>\n' % product_name)
     fp.write('\t<key>CFBundleShortVersionString</key>\n')
     fp.write('\t<string>%s.%s.%s</string>\n' % (version_major, version_minor, version_build))
+    fp.write('\t<key>NSPrincipalClass</key>\n')
+    fp.write('\t<string>NSApplication</string>\n')
     fp.write('</dict>\n')
     fp.write('</plist>\n')
 fp.flush()

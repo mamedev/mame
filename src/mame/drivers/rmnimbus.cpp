@@ -59,7 +59,7 @@ void rmnimbus_state::nimbus_io(address_map &map)
 	map(0x00a4, 0x00a4).rw(FUNC(rmnimbus_state::nimbus_mouse_js_r), FUNC(rmnimbus_state::nimbus_mouse_js_w));
 	map(0x00c0, 0x00cf).rw(FUNC(rmnimbus_state::nimbus_pc8031_r), FUNC(rmnimbus_state::nimbus_pc8031_w)).umask16(0x00ff);
 	map(0x00e0, 0x00ef).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
-	map(0x00f0, 0x00f7).rw(m_z80sio, FUNC(z80sio2_device::cd_ba_r), FUNC(z80sio2_device::cd_ba_w)).umask16(0x00ff);
+	map(0x00f0, 0x00f7).rw(m_z80sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0400, 0x0400).w(FUNC(rmnimbus_state::fdc_ctl_w));
 	map(0x0408, 0x040f).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write)).umask16(0x00ff);
 	map(0x0410, 0x041f).rw(FUNC(rmnimbus_state::scsi_r), FUNC(rmnimbus_state::scsi_w)).umask16(0x00ff);
@@ -112,8 +112,8 @@ void rmnimbus_state::nimbus(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &rmnimbus_state::nimbus_mem);
 	m_maincpu->set_addrmap(AS_IO, &rmnimbus_state::nimbus_io);
 	m_maincpu->read_slave_ack_callback().set(FUNC(rmnimbus_state::cascade_callback));
-	m_maincpu->tmrout0_handler().set(Z80SIO_TAG, FUNC(z80dart_device::rxca_w));
-	m_maincpu->tmrout1_handler().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
+	m_maincpu->tmrout0_handler().set(m_z80sio, FUNC(z80sio_device::rxca_w));
+	m_maincpu->tmrout1_handler().set(m_z80sio, FUNC(z80sio_device::rxtxcb_w));
 
 	I8031(config, m_iocpu, 11059200);
 	m_iocpu->set_addrmap(AS_PROGRAM, &rmnimbus_state::nimbus_iocpu_mem);
@@ -168,25 +168,25 @@ void rmnimbus_state::nimbus(machine_config &config)
 	m_ram->set_extra_options("128K,256K,384K,512K,640K,1024K");
 
 	/* Peripheral chips */
-	Z80SIO2(config, m_z80sio, 4000000);
+	Z80SIO(config, m_z80sio, 4000000); // Z0844006PSC (SIO/0)
 	m_z80sio->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
 	m_z80sio->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	m_z80sio->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 	m_z80sio->out_int_callback().set(FUNC(rmnimbus_state::sio_interrupt));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", keyboard, "rmnkbd"));
-	rs232a.rxd_handler().set(Z80SIO_TAG, FUNC(z80dart_device::rxa_w));
+	rs232a.rxd_handler().set(m_z80sio, FUNC(z80sio_device::rxa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(Z80SIO_TAG, FUNC(z80dart_device::rxb_w));
-	rs232b.dcd_handler().set(Z80SIO_TAG, FUNC(z80dart_device::dcdb_w));
-	rs232b.ri_handler().set(Z80SIO_TAG, FUNC(z80dart_device::rib_w));
-	rs232b.cts_handler().set(Z80SIO_TAG, FUNC(z80dart_device::ctsb_w));
+	rs232b.rxd_handler().set(m_z80sio, FUNC(z80sio_device::rxb_w));
+	rs232b.dcd_handler().set(m_z80sio, FUNC(z80sio_device::dcdb_w));
+	rs232b.ri_handler().set(m_z80sio, FUNC(z80sio_device::syncb_w));
+	rs232b.cts_handler().set(m_z80sio, FUNC(z80sio_device::ctsb_w));
 
 	EEPROM_93C06_16BIT(config, m_eeprom);
 
 	VIA6522(config, m_via, 1000000);
-	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->writepb_handler().set(FUNC(rmnimbus_state::nimbus_via_write_portb));
 	m_via->ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
 	m_via->irq_handler().set(m_maincpu, FUNC(i80186_cpu_device::int3_w));
@@ -209,7 +209,7 @@ void rmnimbus_state::nimbus(machine_config &config)
 	msm5205.set_prescaler_selector(msm5205_device::S48_4B);      /* 8 kHz */
 	msm5205.add_route(ALL_OUTPUTS, MONO_TAG, 0.75);
 
-	SOFTWARE_LIST(config, "disk_list").set_type("nimbus", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "disk_list").set_original("nimbus");
 }
 
 

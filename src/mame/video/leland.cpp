@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(leland_state::leland_get_tile_info)
 	int char_bank = ((m_gfxbank >> 4) & 0x03) << 10;
 	int prom_bank = ((m_gfxbank >> 3) & 0x01) << 13;
 	int tile = m_bg_prom[prom_bank | tile_index] | ((tile_index >> 7) & 0x300) | char_bank;
-	SET_TILE_INFO_MEMBER(0, tile, m_bg_prom[prom_bank | tile_index] >> 5, 0);
+	tileinfo.set(0, tile, m_bg_prom[prom_bank | tile_index] >> 5, 0);
 }
 
 
@@ -83,7 +83,7 @@ TILEMAP_MAPPER_MEMBER(ataxx_state::ataxx_scan)
 TILE_GET_INFO_MEMBER(ataxx_state::ataxx_get_tile_info)
 {
 	u16 tile = m_ataxx_qram[tile_index] | ((m_ataxx_qram[0x4000 | tile_index] & 0x7f) << 8);
-	SET_TILE_INFO_MEMBER(0, tile, 0, 0);
+	tileinfo.set(0, tile, 0, 0);
 }
 
 
@@ -96,7 +96,7 @@ TILE_GET_INFO_MEMBER(ataxx_state::ataxx_get_tile_info)
 void leland_state::video_start()
 {
 	/* tilemap */
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(leland_state::leland_get_tile_info),this), tilemap_mapper_delegate(FUNC(leland_state::leland_scan),this), 8, 8, 256, 256);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(leland_state::leland_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(leland_state::leland_scan)), 8, 8, 256, 256);
 
 	/* allocate memory */
 	m_video_ram = make_unique_clear<u8[]>(VRAM_SIZE);
@@ -122,7 +122,7 @@ void ataxx_state::video_start()
 {
 	// TODO: further untangle driver so the base class doesn't have stuff that isn't common and this can call the base implementation
 	/* tilemap */
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ataxx_state::ataxx_get_tile_info),this), tilemap_mapper_delegate(FUNC(ataxx_state::ataxx_scan),this), 8, 8, 256, 128);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ataxx_state::ataxx_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(ataxx_state::ataxx_scan)), 8, 8, 256, 128);
 
 	/* first do the standard stuff */
 	m_video_ram = make_unique_clear<u8[]>(VRAM_SIZE);

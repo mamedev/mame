@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /***************************************************************************
 
@@ -49,20 +49,20 @@ private:
 	std::string offset();
 	std::string invalid();
 
-	std::string from_i(std::string instr8, std::string instr16, std::string target);
-	std::string inst_ri(std::string instr8, std::string instr16);
-	std::string inst_r(std::string instr);
-	std::string inst_jr(std::string instr8, std::string instr16);
-	std::string inst_mi(std::string instr8, std::string instr16);
-	std::string inst_rm(std::string instr8, std::string instr16);
-	std::string inst_jm(std::string jump8short, std::string jump8long);
-	std::string inst_jmb(std::string jump8short, std::string jump8long);
-	std::string inst_mr(std::string instr8, std::string instr16);
-	std::string inst_pm(std::string instr16);
-	std::string inst_mp(std::string instr16);
-	std::string inst_j16(std::string jump8short, std::string jump16short, std::string jump8long, std::string jump16long);
-	std::string inst_m(std::string instr8, std::string instr16);
-	std::string inst_b(std::string instr);
+	std::string from_i(const std::string &instr8, const std::string &instr16, const std::string &target);
+	std::string inst_ri(const std::string &instr8, const std::string &instr16);
+	std::string inst_r(const std::string &instr);
+	std::string inst_jr(const std::string &instr8, const std::string &instr16);
+	std::string inst_mi(const std::string &instr8, const std::string &instr16);
+	std::string inst_rm(const std::string &instr8, const std::string &instr16);
+	std::string inst_jm(const std::string &jump8short, const std::string &jump8long);
+	std::string inst_jmb(const std::string &jump8short, const std::string &jump8long);
+	std::string inst_mr(const std::string &instr8, const std::string &instr16);
+	std::string inst_pm(const std::string &instr16);
+	std::string inst_mp(const std::string &instr16);
+	std::string inst_j16(const std::string &jump8short, const std::string &jump16short, const std::string &jump8long, const std::string &jump16long);
+	std::string inst_m(const std::string &instr8, const std::string &instr16);
+	std::string inst_b(const std::string &instr);
 
 	std::string do_disassemble();
 	void load_instruction();

@@ -93,10 +93,10 @@ void vtech2_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x1f).rw(FUNC(vtech2_state::laser_fdc_r), FUNC(vtech2_state::laser_fdc_w));
-	map(0x40, 0x40).lw8("set_bankA", [this] (u8 data) { m_banka->set_bank(data & 15); });
-	map(0x41, 0x41).lw8("set_bankB", [this] (u8 data) { m_bankb->set_bank(data & 15); });
-	map(0x42, 0x42).lw8("set_bankC", [this] (u8 data) { m_bankc->set_bank(data & 15); });
-	map(0x43, 0x43).lw8("set_bankD", [this] (u8 data) { m_bankd->set_bank(data & 15); });
+	map(0x40, 0x40).lw8(NAME([this] (u8 data) { m_banka->set_bank(data & 15); }));
+	map(0x41, 0x41).lw8(NAME([this] (u8 data) { m_bankb->set_bank(data & 15); }));
+	map(0x42, 0x42).lw8(NAME([this] (u8 data) { m_bankc->set_bank(data & 15); }));
+	map(0x43, 0x43).lw8(NAME([this] (u8 data) { m_bankd->set_bank(data & 15); }));
 	map(0x44, 0x44).w(FUNC(vtech2_state::laser_bg_mode_w));
 	map(0x45, 0x45).w(FUNC(vtech2_state::laser_two_color_w));
 }
@@ -490,7 +490,7 @@ void vtech2_state::laser350(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vtech2_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &vtech2_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vtech2_state::vtech2_interrupt));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ADDRESS_MAP_BANK(config, "banka").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 	ADDRESS_MAP_BANK(config, "bankb").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
@@ -521,10 +521,10 @@ void vtech2_state::laser350(machine_config &config)
 	VTECH_IOEXP_SLOT(config, "io").set_io_space(m_maincpu, AS_IO);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "vtech_cart", "rom,bin").set_device_load(FUNC(vtech2_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "vtech_cart", "rom,bin").set_device_load(FUNC(vtech2_state::cart_load));
 
 	/* 5.25" Floppy drive */
-	LEGACY_FLOPPY(config, FLOPPY_0, 0, &vtech2_floppy_interface);
+	LEGACY_FLOPPY(config, m_laser_file[0], 0, &vtech2_floppy_interface);
 }
 
 
@@ -549,8 +549,8 @@ void vtech2_state::laser700(machine_config &config)
 	ADDRESS_MAP_BANK(config.replace(), "bankd").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	/* Second 5.25" floppy drive */
-	LEGACY_FLOPPY(config, FLOPPY_1, 0, &vtech2_floppy_interface);
-	}
+	LEGACY_FLOPPY(config, m_laser_file[1], 0, &vtech2_floppy_interface);
+}
 
 
 ROM_START(laser350)

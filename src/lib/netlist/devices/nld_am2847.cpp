@@ -7,7 +7,6 @@
 
 #include "nld_am2847.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {
@@ -27,12 +26,24 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		void shift();
+		void shift() noexcept
+		{
+			uint32_t out = m_buffer[0] & 1;
+			uint32_t in = (m_RC() ? out : m_IN());
+			for (std::size_t i=0; i < 5; i++)
+			{
+				uint32_t shift_in = (i == 4) ? in : m_buffer[i + 1];
+				m_buffer[i] >>= 1;
+				m_buffer[i] |= shift_in << 15;
+			}
+
+			m_OUT.push(out, NLTIME_FROM_NS(200));
+		}
 
 		logic_input_t m_RC;
 		logic_input_t m_IN;
 
-		state_array<uint16_t, 5> m_buffer;
+		state_container<std::array<uint16_t, 5>> m_buffer;
 
 		logic_output_t m_OUT;
 		nld_power_pins m_power_pins;
@@ -73,10 +84,15 @@ namespace netlist
 			register_subalias("VDD", "A.VDD");
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_last_CP = 0;
+		}
+
 		NETLIB_UPDATEI();
 
-	protected:
+		friend class NETLIB_NAME(AM2847_dip);
+	private:
 		NETLIB_SUB(Am2847_shifter) m_A;
 		NETLIB_SUB(Am2847_shifter) m_B;
 		NETLIB_SUB(Am2847_shifter) m_C;
@@ -86,33 +102,33 @@ namespace netlist
 		state_var<uint32_t> m_last_CP;
 	};
 
-	NETLIB_OBJECT_DERIVED(AM2847_dip, AM2847)
+	NETLIB_OBJECT(AM2847_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(AM2847_dip, AM2847)
+		NETLIB_CONSTRUCTOR(AM2847_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1", m_A.m_OUT);
-			register_subalias("2", m_A.m_RC);
-			register_subalias("3", m_A.m_IN);
-			register_subalias("4", m_B.m_OUT);
-			register_subalias("5", m_B.m_RC);
-			register_subalias("6", m_B.m_IN);
-			register_subalias("7", m_C.m_OUT);
-			register_subalias("8", "VDD");
+			register_subalias("1", A.m_A.m_OUT);
+			register_subalias("2", A.m_A.m_RC);
+			register_subalias("3", A.m_A.m_IN);
+			register_subalias("4", A.m_B.m_OUT);
+			register_subalias("5", A.m_B.m_RC);
+			register_subalias("6", A.m_B.m_IN);
+			register_subalias("7", A.m_C.m_OUT);
+			register_subalias("8", "A.VDD");
 
-			register_subalias("9",  m_C.m_RC);
-			register_subalias("10", m_C.m_IN);
-			register_subalias("11", m_CP);
-			register_subalias("13", m_D.m_OUT);
-			register_subalias("14", m_D.m_RC);
-			register_subalias("15", m_D.m_IN);
-			register_subalias("16", "VSS");
+			register_subalias("9",  A.m_C.m_RC);
+			register_subalias("10", A.m_C.m_IN);
+			register_subalias("11", A.m_CP);
+			register_subalias("13", A.m_D.m_OUT);
+			register_subalias("14", A.m_D.m_RC);
+			register_subalias("15", A.m_D.m_IN);
+			register_subalias("16", "A.VSS");
 		}
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(AM2847) A;
 	};
-
-	NETLIB_RESET(AM2847)
-	{
-		m_last_CP = 0;
-	}
 
 	NETLIB_UPDATE(AM2847)
 	{
@@ -129,20 +145,6 @@ namespace netlist
 	NETLIB_UPDATE(Am2847_shifter)
 	{
 		/* do nothing */
-	}
-
-	NETLIB_FUNC_VOID(Am2847_shifter, shift, ())
-	{
-		uint32_t out = m_buffer[0] & 1;
-		uint32_t in = (m_RC() ? out : m_IN());
-		for (std::size_t i=0; i < 5; i++)
-		{
-			uint32_t shift_in = (i == 4) ? in : m_buffer[i + 1];
-			m_buffer[i] >>= 1;
-			m_buffer[i] |= shift_in << 15;
-		}
-
-		m_OUT.push(out, NLTIME_FROM_NS(200));
 	}
 
 	NETLIB_DEVICE_IMPL(AM2847,     "TTL_AM2847",     "+CP,+INA,+INB,+INC,+IND,+RCA,+RCB,+RCC,+RCD,@VSS,@VDD")

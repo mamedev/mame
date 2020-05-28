@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER( eti660_state::q_w )
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
-WRITE8_MEMBER( eti660_state::dma_w )
+void eti660_state::dma_w(offs_t offset, uint8_t data)
 {
 	offset -= 0x480;
 
@@ -183,12 +183,12 @@ WRITE8_MEMBER( eti660_state::dma_w )
 	else
 		m_color = m_p_videoram[offset] ? 7 : 0;
 
-	m_cti->dma_w(space, offset, data);
+	m_cti->dma_w(data);
 }
 
 /* PIA6821 Interface */
 
-READ8_MEMBER( eti660_state::pia_pa_r )
+uint8_t eti660_state::pia_pa_r()
 {
 	/*
 
@@ -214,7 +214,7 @@ READ8_MEMBER( eti660_state::pia_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( eti660_state::pia_pa_w )
+void eti660_state::pia_pa_w(uint8_t data)
 {
 	/*
 
@@ -336,7 +336,7 @@ void eti660_state::eti660(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("3K");
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "bin,c8,ch8", attotime::from_seconds(2)).set_load_callback(FUNC(eti660_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin,c8,ch8", attotime::from_seconds(2)).set_load_callback(FUNC(eti660_state::quickload_cb));
 }
 
 /* ROMs */

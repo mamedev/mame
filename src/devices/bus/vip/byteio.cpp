@@ -27,8 +27,8 @@ DEFINE_DEVICE_TYPE(VIP_BYTEIO_PORT, vip_byteio_port_device, "vip_byteio_port", "
 //  device_vip_byteio_port_interface - constructor
 //-------------------------------------------------
 
-device_vip_byteio_port_interface::device_vip_byteio_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+device_vip_byteio_port_interface::device_vip_byteio_port_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "vipbyteio")
 {
 	m_slot = dynamic_cast<vip_byteio_port_device *>(device.owner());
 }
@@ -45,7 +45,7 @@ device_vip_byteio_port_interface::device_vip_byteio_port_interface(const machine
 
 vip_byteio_port_device::vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VIP_BYTEIO_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_vip_byteio_port_interface>(mconfig, *this),
 	m_write_inst(*this),
 	m_cart(nullptr)
 {
@@ -57,7 +57,7 @@ vip_byteio_port_device::vip_byteio_port_device(const machine_config &mconfig, co
 
 void vip_byteio_port_device::device_start()
 {
-	m_cart = dynamic_cast<device_vip_byteio_port_interface *>(get_card_device());
+	m_cart = get_card_device();
 
 	// resolve callbacks
 	m_write_inst.resolve_safe();

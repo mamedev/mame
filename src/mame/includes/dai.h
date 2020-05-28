@@ -62,8 +62,8 @@ private:
 	DECLARE_WRITE8_MEMBER(dai_amd9511_w);
 	DECLARE_READ8_MEMBER(dai_pit_r);
 	DECLARE_WRITE8_MEMBER(dai_pit_w);
-	DECLARE_READ8_MEMBER(dai_keyboard_r);
-	DECLARE_WRITE8_MEMBER(dai_keyboard_w);
+	uint8_t dai_keyboard_r();
+	void dai_keyboard_w(uint8_t data);
 	void dai_palette(palette_device &palette) const;
 	uint32_t screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void dai_update_memory(int dai_rom_bank);

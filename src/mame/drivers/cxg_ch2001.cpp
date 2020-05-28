@@ -6,6 +6,12 @@
 CXG Chess 2001, also sold by Hanimex as HCG 1900 and by CGL as Computachess Champion.
 CXG Chess 3000 is assumed to be on similar hardware as this.
 
+The chess engine is by Richard Lang, based on Cyrus.
+
+CXG Systems S.A. and Newcrest Technology Ltd. are related companies, with
+Eric White at the steering wheel. Newcrest(1984-1991) is probably a rename of
+"White & Allcock"(1981-1984).
+
 Hardware notes:
 - Zilog Z8400APS @ 4 MHz (8MHz XTAL)
 - 2KB RAM HM6116, 16KB ROM D27128D
@@ -41,7 +47,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void ch2001(machine_config &config);
 
 protected:
@@ -64,9 +70,9 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void speaker_w(u8 data);
+	void leds_w(u8 data);
+	u8 input_r();
 
 	u16 m_inp_mux;
 	int m_dac_data;
@@ -91,14 +97,14 @@ void ch2001_state::machine_start()
 
 // TTL
 
-WRITE8_MEMBER(ch2001_state::speaker_w)
+void ch2001_state::speaker_w(u8 data)
 {
 	// 74ls109 toggle to speaker
 	m_dac_data ^= 1;
 	m_dac->write(m_dac_data);
 }
 
-WRITE8_MEMBER(ch2001_state::leds_w)
+void ch2001_state::leds_w(u8 data)
 {
 	// d0-d7: 74ls273 (WR to CLK)
 	// 74ls273 Q1-Q4: 74ls145 A-D
@@ -112,7 +118,7 @@ WRITE8_MEMBER(ch2001_state::leds_w)
 	m_display->matrix(sel, led_data);
 }
 
-READ8_MEMBER(ch2001_state::input_r)
+u8 ch2001_state::input_r()
 {
 	u8 data = 0;
 
@@ -173,7 +179,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void ch2001_state::ch2001(machine_config &config)
@@ -220,5 +226,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME      FLAGS */
-CONS( 1984, ch2001, 0,      0,      ch2001,  ch2001, ch2001_state, empty_init, "CXG",   "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS */
+CONS( 1984, ch2001, 0,      0,      ch2001,  ch2001, ch2001_state, empty_init, "CXG Systems / Newcrest Technology", "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

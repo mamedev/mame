@@ -63,7 +63,8 @@ enum
 	SCORES_VIEW,
 	SELECT_VIEW,
 	MARQUEES_VIEW,
-	LAST_VIEW = MARQUEES_VIEW
+	COVERS_VIEW,
+	LAST_VIEW = COVERS_VIEW
 };
 
 std::pair<char const *, char const *> const arts_info[] =
@@ -345,8 +346,8 @@ void menu_select_launch::bios_selection::handle()
 					machine().options().set_value(OPTION_BIOS, elem.second, OPTION_PRIORITY_CMDLINE); // oh dear, relying on this persisting through the part selection menu
 					driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
 					drivlist.next();
-					software_list_device *swlist = software_list_device::find_by_name(*drivlist.config(), ui_swinfo->listname.c_str());
-					const software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+					software_list_device *swlist = software_list_device::find_by_name(*drivlist.config(), ui_swinfo->listname);
+					const software_info *swinfo = swlist->find(ui_swinfo->shortname);
 					if (!select_part(ui(), container(), *swinfo, *ui_swinfo))
 					{
 						reselect_last::reselect(true);
@@ -692,7 +693,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 	else
 	{
 		std::string copyright(emulator_info::get_copyright());
-		size_t found = copyright.find("\n");
+		size_t found = copyright.find('\n');
 
 		tempbuf[0].clear();
 		tempbuf[1] = string_format(_("%1$s %2$s"), emulator_info::get_appname(), build_version);
@@ -710,40 +711,43 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 
 	// is favorite? draw the star
 	if (isstar)
-		draw_star(origx1 + ui().box_lr_border(), origy2 + (2.0f * ui().box_tb_border()));
+		draw_star(origx1 + ui().box_lr_border() * machine().render().ui_aspect(&container()), origy2 + (2.0f * ui().box_tb_border()));
 }
 
 
-void menu_select_launch::inkey_navigation()
+void menu_select_launch::rotate_focus(int dir)
 {
 	switch (get_focus())
 	{
 	case focused_menu::MAIN:
-		if (selected_index() <= visible_items)
+		if (selected_index() <= m_available_items)
 		{
 			m_prev_selected = get_selection_ref();
-			set_selected_index(visible_items + 1);
+			if ((0 < dir) || (ui_globals::panels_status == HIDE_BOTH))
+				set_selected_index(m_available_items + 1);
+			else if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
+				set_focus(focused_menu::LEFT);
+			else
+				set_focus(focused_menu::RIGHTBOTTOM);
 		}
 		else
 		{
-			if (ui_globals::panels_status != HIDE_LEFT_PANEL)
-				set_focus(focused_menu::LEFT);
-
-			else if (ui_globals::panels_status == HIDE_BOTH)
-			{
-				for (int x = 0; x < item_count(); ++x)
-					if (item(x).ref == m_prev_selected)
-						set_selected_index(x);
-			}
-			else
-			{
+			if ((0 > dir) || (ui_globals::panels_status == HIDE_BOTH))
+				select_prev();
+			else if (ui_globals::panels_status == HIDE_LEFT_PANEL)
 				set_focus(focused_menu::RIGHTTOP);
-			}
+			else
+				set_focus(focused_menu::LEFT);
 		}
 		break;
 
 	case focused_menu::LEFT:
-		if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
+		if (0 > dir)
+		{
+			set_focus(focused_menu::MAIN);
+			set_selected_index(m_available_items + 1);
+		}
+		else if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
 		{
 			set_focus(focused_menu::RIGHTTOP);
 		}
@@ -755,12 +759,31 @@ void menu_select_launch::inkey_navigation()
 		break;
 
 	case focused_menu::RIGHTTOP:
-		set_focus(focused_menu::RIGHTBOTTOM);
+		if (0 < dir)
+		{
+			set_focus(focused_menu::RIGHTBOTTOM);
+		}
+		else if (ui_globals::panels_status != HIDE_LEFT_PANEL)
+		{
+			set_focus(focused_menu::LEFT);
+		}
+		else
+		{
+			set_focus(focused_menu::MAIN);
+			set_selected_index(m_available_items + 1);
+		}
 		break;
 
 	case focused_menu::RIGHTBOTTOM:
-		set_focus(focused_menu::MAIN);
-		select_prev();
+		if (0 > dir)
+		{
+			set_focus(focused_menu::RIGHTTOP);
+		}
+		else
+		{
+			set_focus(focused_menu::MAIN);
+			select_prev();
+		}
 		break;
 	}
 }
@@ -793,7 +816,7 @@ void menu_select_launch::inkey_dats()
 void menu_select_launch::draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title_size)
 {
 	auto line_height = ui().get_line_height();
-	auto lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
+	auto lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect(&container());
 	auto gutter_width = lr_arrow_width * 1.3f;
 
 	// set left-right arrows dimension
@@ -904,10 +927,12 @@ float menu_select_launch::draw_left_panel(
 	// outline the box and inset by the border width
 	float const origy1(y1);
 	float const origy2(y2);
-	x2 = x1 + left_width + 2.0f * ui().box_lr_border();;
+	float const aspect(machine().render().ui_aspect(&container()));
+	float const lr_border(ui().box_lr_border() * aspect);
+	x2 = x1 + left_width + 2.0f * lr_border;
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
-	x1 += ui().box_lr_border();
-	x2 -= ui().box_lr_border();
+	x1 += lr_border;
+	x2 -= lr_border;
 	y1 += ui().box_tb_border();
 	y2 -= ui().box_tb_border();
 
@@ -964,12 +989,12 @@ float menu_select_launch::draw_left_panel(
 		y1 += line_height_max;
 	}
 
-	x1 = x2 + ui().box_lr_border();
-	x2 = x1 + 2.0f * ui().box_lr_border();
+	x1 = x2 + lr_border;
+	x2 = x1 + 2.0f * lr_border;
 	y1 = origy1;
 	y2 = origy2;
 	float const space = x2 - x1;
-	float const lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
+	float const lr_arrow_width = 0.4f * space * aspect;
 
 	// set left-right arrows dimension
 	float const ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
@@ -987,7 +1012,7 @@ float menu_select_launch::draw_left_panel(
 	}
 
 	draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
-	return x2 + ui().box_lr_border();
+	return x2 + lr_border;
 }
 
 
@@ -1013,7 +1038,7 @@ void menu_select_launch::check_for_icons(char const *listname)
 				current.append(PATH_SEPARATOR);
 			current.append(listname);
 		}
-		osd_printf_verbose("Checking for icons in directory %s\n", current.c_str());
+		osd_printf_verbose("Checking for icons in directory %s\n", current);
 
 		// open and walk the directory
 		osd::directory::ptr const dir(osd::directory::open(current));
@@ -1095,7 +1120,7 @@ bool menu_select_launch::scale_icon(bitmap_argb32 &&src, texture_and_bitmap &dst
 	{
 		// calculate available space for the icon in pixels
 		float const height(ui().get_line_height());
-		float const width(height * container().manager().ui_aspect());
+		float const width(height * container().manager().ui_aspect(&container()));
 		render_target const &target(machine().render().ui_target());
 		uint32_t const dst_height(target.height());
 		uint32_t const dst_width(target.width());
@@ -1181,8 +1206,10 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
 	// take off the borders
-	x1 += ui().box_lr_border();
-	x2 -= ui().box_lr_border();
+	float const aspect(machine().render().ui_aspect(&container()));
+	float const lr_border(ui().box_lr_border() * aspect);
+	x1 += lr_border;
+	x2 -= lr_border;
 	y1 += ui().box_tb_border();
 	y2 -= ui().box_tb_border();
 
@@ -1191,7 +1218,7 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 
 	auto const num_valid(std::count_if(std::begin(t_bitmap), std::end(t_bitmap), [](bitmap_argb32 const &e) { return e.valid(); }));
 
-	float const space_x = (y2 - y1) * container().manager().ui_aspect(&container());
+	float const space_x = (y2 - y1) * aspect;
 	float const total = (float(num_valid) * space_x) + (float(num_valid - 1) * 0.001f);
 	x1 += (x2 - x1) * 0.5f - total * 0.5f;
 	x2 = x1 + space_x;
@@ -1224,7 +1251,7 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 void menu_select_launch::draw_star(float x0, float y0)
 {
 	float y1 = y0 + ui().get_line_height();
-	float x1 = x0 + ui().get_line_height() * container().manager().ui_aspect();
+	float x1 = x0 + ui().get_line_height() * container().manager().ui_aspect(&container());
 	container().add_quad(x0, y0, x1, y1, rgb_t::white(), m_cache->star_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
 }
 
@@ -1278,8 +1305,8 @@ void menu_select_launch::get_title_search(std::string &snaptext, std::string &se
 	}
 
 	std::string tmp(searchstr);
-	path_iterator path(tmp.c_str());
-	path_iterator path_iter(addpath.c_str());
+	path_iterator path(tmp);
+	path_iterator path_iter(addpath);
 	std::string c_path, curpath;
 
 	// iterate over path and add path for zipped formats
@@ -1382,7 +1409,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			m_topline_datsview--;
 			return;
 		}
-		else if (selected_index() == visible_items + 1 || is_first_selected() || m_ui_error)
+		else if (selected_index() == m_available_items + 1 || is_first_selected() || m_ui_error)
 		{
 			return;
 		}
@@ -1405,7 +1432,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			m_topline_datsview++;
 			return;
 		}
-		else if (is_last_selected() || selected_index() == visible_items - 1 || m_ui_error)
+		else if (is_last_selected() || selected_index() == m_available_items - 1 || m_ui_error)
 		{
 			return;
 		}
@@ -1425,11 +1452,11 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			return;
 		}
 
-		if (selected_index() < visible_items && !m_ui_error)
+		if (selected_index() < m_available_items && !m_ui_error)
 		{
 			set_selected_index(std::max(selected_index() - m_visible_items, 0));
 
-			top_line -= m_visible_items - (top_line + m_visible_lines == visible_items);
+			top_line -= m_visible_items - (top_line + m_visible_lines == m_available_items);
 		}
 	}
 
@@ -1443,9 +1470,9 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			return;
 		}
 
-		if (selected_index() < visible_items && !m_ui_error)
+		if (selected_index() < m_available_items && !m_ui_error)
 		{
-			set_selected_index(std::min(selected_index() + m_visible_lines - 2 + (selected_index() == 0), visible_items - 1));
+			set_selected_index(std::min(selected_index() + m_visible_lines - 2 + (selected_index() == 0), m_available_items - 1));
 
 			top_line += m_visible_lines - 2;
 		}
@@ -1464,7 +1491,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			return;
 		}
 
-		if (selected_index() < visible_items && !m_ui_error)
+		if (selected_index() < m_available_items && !m_ui_error)
 			select_first_item();
 	}
 
@@ -1481,8 +1508,22 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			return;
 		}
 
-		if (selected_index() < visible_items && !m_ui_error)
-			set_selected_index(top_line = visible_items - 1);
+		if (selected_index() < m_available_items && !m_ui_error)
+			set_selected_index(top_line = m_available_items - 1);
+	}
+
+	// focus next rotates throw targets forward
+	if (exclusive_input_pressed(iptkey, IPT_UI_FOCUS_NEXT, 12))
+	{
+		if (!m_ui_error)
+			rotate_focus(1);
+	}
+
+	// focus next rotates throw targets forward
+	if (exclusive_input_pressed(iptkey, IPT_UI_FOCUS_PREV, 12))
+	{
+		if (!m_ui_error)
+			rotate_focus(-1);
 	}
 
 	// pause enables/disables pause
@@ -1503,8 +1544,27 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	{
 		for (int code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
 		{
-			if (m_ui_error || code == IPT_UI_CONFIGURE || (code == IPT_UI_LEFT && ignoreleft) || (code == IPT_UI_RIGHT && ignoreright) || (code == IPT_UI_PAUSE && ignorepause))
+			if (m_ui_error)
 				continue;
+
+			switch (code)
+			{
+			case IPT_UI_FOCUS_NEXT:
+			case IPT_UI_FOCUS_PREV:
+				continue;
+			case IPT_UI_LEFT:
+				if (ignoreleft)
+					continue;
+				break;
+			case IPT_UI_RIGHT:
+				if (ignoreright)
+					continue;
+				break;
+			case IPT_UI_PAUSE:
+				if (ignorepause)
+					continue;
+				break;
+			}
 
 			if (exclusive_input_pressed(iptkey, code, 0))
 				break;
@@ -1554,7 +1614,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			{
 				if (hover() >= 0 && hover() < item_count())
 				{
-					if (hover() >= visible_items - 1 && selected_index() < visible_items)
+					if (hover() >= m_available_items - 1 && selected_index() < m_available_items)
 						m_prev_selected = get_selection_ref();
 					set_selected_index(hover());
 					m_focus = focused_menu::MAIN;
@@ -1562,12 +1622,12 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				else if (hover() == HOVER_ARROW_UP)
 				{
 					set_selected_index(std::max(selected_index() - m_visible_items, 0));
-					top_line -= m_visible_items - (top_line + m_visible_lines == visible_items);
+					top_line -= m_visible_items - (top_line + m_visible_lines == m_available_items);
 					set_pressed();
 				}
 				else if (hover() == HOVER_ARROW_DOWN)
 				{
-					set_selected_index(std::min(selected_index() + m_visible_lines - 2 + (selected_index() == 0), visible_items - 1));
+					set_selected_index(std::min(selected_index() + m_visible_lines - 2 + (selected_index() == 0), m_available_items - 1));
 					top_line += m_visible_lines - 2;
 					set_pressed();
 				}
@@ -1581,6 +1641,12 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 					m_topline_datsview -= m_right_visible_lines - 1;
 				else if (hover() == HOVER_LPANEL_ARROW)
 				{
+					if (get_focus() == focused_menu::LEFT)
+					{
+						set_focus(focused_menu::MAIN);
+						select_prev();
+					}
+
 					if (ui_globals::panels_status == HIDE_LEFT_PANEL)
 						ui_globals::panels_status = SHOW_PANELS;
 					else if (ui_globals::panels_status == HIDE_BOTH)
@@ -1592,6 +1658,12 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				}
 				else if (hover() == HOVER_RPANEL_ARROW)
 				{
+					if ((get_focus() == focused_menu::RIGHTTOP) || (get_focus() == focused_menu::RIGHTBOTTOM))
+					{
+						set_focus(focused_menu::MAIN);
+						select_prev();
+					}
+
 					if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
 						ui_globals::panels_status = SHOW_PANELS;
 					else if (ui_globals::panels_status == HIDE_BOTH)
@@ -1653,7 +1725,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			{
 				if (local_menu_event.zdelta > 0)
 				{
-					if (selected_index() >= visible_items || is_first_selected() || m_ui_error)
+					if (selected_index() >= m_available_items || is_first_selected() || m_ui_error)
 						break;
 					set_selected_index(selected_index() - local_menu_event.num_lines);
 					if (selected_index() < top_line + (top_line != 0))
@@ -1661,9 +1733,9 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				}
 				else
 				{
-					if (selected_index() >= visible_items - 1 || m_ui_error)
+					if (selected_index() >= m_available_items - 1 || m_ui_error)
 						break;
-					set_selected_index(std::min(selected_index() + local_menu_event.num_lines, visible_items - 1));
+					set_selected_index(std::min(selected_index() + local_menu_event.num_lines, m_available_items - 1));
 					if (selected_index() >= top_line + m_visible_items + (top_line != 0))
 						top_line += local_menu_event.num_lines;
 				}
@@ -1679,9 +1751,8 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 
 		// translate CHAR events into specials
 		case ui_event::IME_CHAR:
-			if (exclusive_input_pressed(ev.iptkey, IPT_UI_CONFIGURE, 0))
+			if (exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_NEXT, 0) || exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_PREV, 0))
 			{
-				ev.iptkey = IPT_UI_CONFIGURE;
 				stop = true;
 			}
 			else if (m_ui_error)
@@ -1747,19 +1818,21 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 void menu_select_launch::draw(uint32_t flags)
 {
 	bool noinput = (flags & PROCESS_NOINPUT);
+	float const aspect = machine().render().ui_aspect(&container());
+	float const lr_border = ui().box_lr_border() * aspect;
 	float line_height = ui().get_line_height();
-	float const ud_arrow_width = line_height * machine().render().ui_aspect();
+	float const ud_arrow_width = line_height * aspect;
 	float const gutter_width = 0.52f * ud_arrow_width;
 	float const icon_offset = m_has_icons ? (1.5f * ud_arrow_width) : 0.0f;
-	float right_panel_size = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL) ? 2.0f * ui().box_lr_border() : 0.3f;
-	float visible_width = 1.0f - 4.0f * ui().box_lr_border();
+	float right_panel_size = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL) ? 2.0f * lr_border : 0.3f;
+	float visible_width = 1.0f - 4.0f * lr_border;
 	float primary_left = (1.0f - visible_width) * 0.5f;
 	float primary_width = visible_width;
 
 	draw_background();
 
 	clear_hover();
-	visible_items = (m_is_swlist) ? item_count() - 2 : item_count() - 2 - skip_main_items;
+	m_available_items = (m_is_swlist) ? item_count() - 2 : item_count() - 2 - skip_main_items;
 	float extra_height = (m_is_swlist) ? 2.0f * line_height : (2.0f + skip_main_items) * line_height;
 	float visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
 
@@ -1787,36 +1860,36 @@ void menu_select_launch::draw(uint32_t flags)
 	visible_top += get_customtop();
 
 	// compute left box size
-	float x1 = visible_left - ui().box_lr_border();
+	float x1 = visible_left - lr_border;
 	float y1 = visible_top - ui().box_tb_border();
-	float x2 = x1 + 2.0f * ui().box_lr_border();
+	float x2 = x1 + 2.0f * lr_border;
 	float y2 = visible_top + visible_main_menu_height + ui().box_tb_border() + extra_height;
 
 	// add left box
 	visible_left = draw_left_panel(x1, y1, x2, y2);
-	visible_width -= right_panel_size + visible_left - 2.0f * ui().box_lr_border();
+	visible_width -= right_panel_size + visible_left - 2.0f * lr_border;
 
 	// compute and add main box
-	x1 = visible_left - ui().box_lr_border();
-	x2 = visible_left + visible_width + ui().box_lr_border();
+	x1 = visible_left - lr_border;
+	x2 = visible_left + visible_width + lr_border;
 	float line = visible_top + (float(m_visible_lines) * line_height);
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
-	if (visible_items < m_visible_lines)
-		m_visible_lines = visible_items;
+	if (m_available_items < m_visible_lines)
+		m_visible_lines = m_available_items;
 	if (top_line < 0 || is_first_selected())
 		top_line = 0;
-	if (selected_index() < visible_items && top_line + m_visible_lines >= visible_items)
-		top_line = visible_items - m_visible_lines;
+	if (selected_index() < m_available_items && top_line + m_visible_lines >= m_available_items)
+		top_line = m_available_items - m_visible_lines;
 
 	// determine effective positions taking into account the hilighting arrows
 	float effective_width = visible_width - 2.0f * gutter_width;
 	float effective_left = visible_left + gutter_width;
 
-	if ((m_focus == focused_menu::MAIN) && (selected_index() < visible_items))
+	if ((m_focus == focused_menu::MAIN) && (selected_index() < m_available_items))
 		m_prev_selected = nullptr;
 
-	int const n_loop = (std::min)(m_visible_lines, visible_items);
+	int const n_loop = (std::min)(m_visible_lines, m_available_items);
 	for (int linenum = 0; linenum < n_loop; linenum++)
 	{
 		float line_y = visible_top + (float)linenum * line_height;
@@ -1871,7 +1944,7 @@ void menu_select_launch::draw(uint32_t flags)
 			if (hover() == itemnum)
 				set_hover(HOVER_ARROW_UP);
 		}
-		else if (linenum == m_visible_lines - 1 && itemnum != visible_items - 1)
+		else if (linenum == m_visible_lines - 1 && itemnum != m_available_items - 1)
 		{
 			// if we're on the bottom line, display the down arrow
 			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
@@ -1938,7 +2011,7 @@ void menu_select_launch::draw(uint32_t flags)
 		}
 	}
 
-	for (size_t count = visible_items; count < item_count(); count++)
+	for (size_t count = m_available_items; count < item_count(); count++)
 	{
 		const menu_item &pitem = item(count);
 		const char *itemtext = pitem.text.c_str();
@@ -1986,14 +2059,14 @@ void menu_select_launch::draw(uint32_t flags)
 
 	draw_right_panel(x1, y1, x2, y2);
 
-	x1 = primary_left - ui().box_lr_border();
-	x2 = primary_left + primary_width + ui().box_lr_border();
+	x1 = primary_left - lr_border;
+	x2 = primary_left + primary_width + lr_border;
 
 	// if there is something special to add, do it by calling the virtual method
 	custom_render(get_selection_ref(), get_customtop(), get_custombottom(), x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	m_visible_items = m_visible_lines - (top_line != 0) - (top_line + m_visible_lines != visible_items);
+	m_visible_items = m_visible_lines - (top_line != 0) - (top_line + m_visible_lines != m_available_items);
 
 	// noinput
 	if (noinput)
@@ -2013,10 +2086,11 @@ void menu_select_launch::draw(uint32_t flags)
 
 void menu_select_launch::draw_right_panel(float origx1, float origy1, float origx2, float origy2)
 {
+	float const aspect(machine().render().ui_aspect(&container()));
 	bool const hide((ui_globals::panels_status == HIDE_RIGHT_PANEL) || (ui_globals::panels_status == HIDE_BOTH));
-	float const x2(hide ? origx2 : (origx1 + 2.0f * ui().box_lr_border()));
+	float const x2(hide ? origx2 : (origx1 + 2.0f * ui().box_lr_border() * aspect));
 	float const space(x2 - origx1);
-	float const lr_arrow_width(0.4f * space * machine().render().ui_aspect());
+	float const lr_arrow_width(0.4f * space * aspect);
 
 	// set left-right arrows dimension
 	float const ar_x0(0.5f * (x2 + origx1) - 0.5f * lr_arrow_width);
@@ -2208,8 +2282,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		// loads the image if necessary
 		if (!m_cache->snapx_driver_is(driver) || !snapx_valid() || m_switch_image)
 		{
-			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
-			snapfile.set_restrict_to_mediapath(true);
+			emu_file snapfile(searchstr, OPEN_FLAG_READ);
 			bitmap_argb32 tmp_bitmap;
 
 			// try to load snapshot first from saved "0000.png" file
@@ -2275,7 +2348,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 std::string menu_select_launch::arts_render_common(float origx1, float origy1, float origx2, float origy2)
 {
 	float const line_height = ui().get_line_height();
-	float const gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
+	float const gutter_width = 0.4f * line_height * machine().render().ui_aspect(&container()) * 1.3f;
 
 	std::string snaptext, searchstr;
 	get_title_search(snaptext, searchstr);
@@ -2488,8 +2561,9 @@ void menu_select_launch::exit(running_machine &machine)
 
 float menu_select_launch::draw_collapsed_left_panel(float x1, float y1, float x2, float y2)
 {
+	float const aspect = machine().render().ui_aspect(&container());
 	float const space = x2 - x1;
-	float const lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
+	float const lr_arrow_width = 0.4f * space * aspect;
 
 	// set left-right arrows dimension
 	float const ar_x0 = 0.5f * (x2 + x1) - (0.5f * lr_arrow_width);
@@ -2508,7 +2582,7 @@ float menu_select_launch::draw_collapsed_left_panel(float x1, float y1, float x2
 
 	draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
 
-	return x2 + ui().box_lr_border();
+	return x2 + ui().box_lr_border() * aspect;
 }
 
 
@@ -2602,8 +2676,9 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	}
 
 	origy1 += ui().box_tb_border();
-	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
-	float ud_arrow_width = line_height * machine().render().ui_aspect();
+	float const aspect(machine().render().ui_aspect(&container()));
+	float const gutter_width = 0.4f * line_height * aspect * 1.3f;
+	float const ud_arrow_width = line_height * aspect;
 	float oy1 = origy1 + line_height;
 
 	char const *const snaptext(m_info_view ? m_items_list[m_info_view - 1].c_str() : _(first));

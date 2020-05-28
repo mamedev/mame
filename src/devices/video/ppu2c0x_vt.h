@@ -25,18 +25,20 @@ enum vtxx_pal_mode {
 
 class ppu_vt03_device : public ppu2c0x_device {
 public:
-	ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	auto read_bg() { return m_read_bg.bind(); }
 	auto read_sp() { return m_read_sp.bind(); }
 
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
-	void set_201x_descramble(const uint8_t descramble[6]) { for (int i = 0; i < 6; i++) m_2012_2017_descramble[i] = descramble[i]; }
+	void set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5);
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
-	virtual DECLARE_READ8_MEMBER(palette_read) override;
-	virtual DECLARE_WRITE8_MEMBER(palette_write) override;
+	uint8_t read_extended(offs_t offset);
+	void write_extended(offs_t offset, uint8_t data);
+
+	virtual uint8_t palette_read(offs_t offset) override;
+	virtual void palette_write(offs_t offset, uint8_t data) override;
 
 	virtual uint32_t palette_entries() const override { return 256; }
 	virtual uint32_t palette_indirect_entries() const override { return 4*16*8; }
@@ -61,6 +63,13 @@ public:
 	uint8_t get_m_read_bg4_bg3();
 	uint8_t get_speva2_speva0();
 
+	bool get_is_pal() { return m_is_pal; }
+	bool get_is_50hz() { return m_is_50hz; }
+
+protected:
+	bool m_is_pal;
+	bool m_is_50hz;
+
 private:
 	devcb_read8 m_read_bg;
 	devcb_read8 m_read_sp;
@@ -84,6 +93,12 @@ private:
 	void set_new_pen(int i);
 };
 
+class ppu_vt03pal_device : public ppu_vt03_device {
+public:
+	ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+};
+
 DECLARE_DEVICE_TYPE(PPU_VT03,    ppu_vt03_device)
+DECLARE_DEVICE_TYPE(PPU_VT03PAL,    ppu_vt03pal_device)
 
 #endif // MAME_VIDEO_PPU_VT03_H

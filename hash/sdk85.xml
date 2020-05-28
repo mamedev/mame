@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="sdk85" description="SDK-85 expansion ROMs">
+
+	<software name="ap29" supported="no">
+		<!-- Program listed in "Using the Intel 8085 Serial I/O Lines" application note -->
+		<!-- CRT and cassette tape interfaces require custom SID/SOD hookups -->
+		<description>AP-29 Serial I/O Routines</description>
+		<year>1977</year>
+		<publisher>Intel</publisher>
+		<info name="author" value="John Wharton"/>
+		<part name="prom" interface="sdk85_rom">
+			<dataarea name="rom" size="2048">
+				<rom name="ap29.bin" size="2048" crc="c17c3020" sha1="d96dd85fd47ad4af41366a4df758a421b1c39d49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmind">
+		<description>Mastermind</description>
+		<year>2019</year>
+		<publisher>hack (Peter Naszvadi)</publisher>
+		<info name="author" value="Paolo Forlani and Stefano Bodrato"/>
+		<part name="prom" interface="sdk85_rom">
+			<dataarea name="rom" size="2048">
+				<rom name="mastermind.a15" size="2048" crc="0538e162" sha1="c351975e2cf515cee29fcaeb04ef47189afe5250"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

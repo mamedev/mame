@@ -145,15 +145,15 @@ private:
 
 	DECLARE_WRITE8_MEMBER(audio_1_command_w);
 	DECLARE_WRITE8_MEMBER(audio_1_answer_w);
-	DECLARE_WRITE8_MEMBER(audio_2_command_w);
+	void audio_2_command_w(uint8_t data);
 	DECLARE_READ8_MEMBER(nyny_pia_1_2_r);
 	DECLARE_WRITE8_MEMBER(nyny_pia_1_2_w);
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_firq);
-	DECLARE_WRITE8_MEMBER(pia_2_port_a_w);
-	DECLARE_WRITE8_MEMBER(pia_2_port_b_w);
+	void pia_2_port_a_w(uint8_t data);
+	void pia_2_port_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(nyny_ay8910_37_port_a_w);
+	void nyny_ay8910_37_port_a_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(update_pia_1);
@@ -218,13 +218,13 @@ INTERRUPT_GEN_MEMBER(nyny_state::update_pia_1)
  *
  *************************************/
 
-WRITE8_MEMBER(nyny_state::pia_2_port_a_w)
+void nyny_state::pia_2_port_a_w(uint8_t data)
 {
 	m_star_delay_counter = (m_star_delay_counter & 0x0f00) | data;
 }
 
 
-WRITE8_MEMBER(nyny_state::pia_2_port_b_w)
+void nyny_state::pia_2_port_b_w(uint8_t data)
 {
 	/* bits 0-3 go to bits 8-11 of the star delay counter */
 	m_star_delay_counter = (m_star_delay_counter & 0x00ff) | ((data & 0x0f) << 8);
@@ -233,7 +233,7 @@ WRITE8_MEMBER(nyny_state::pia_2_port_b_w)
 	m_star_enable = data & 0x10;
 
 	/* bits 5-7 go to the music board connector */
-	audio_2_command_w(m_maincpu->space(AS_PROGRAM), 0, data & 0xe0);
+	audio_2_command_w(data & 0xe0);
 }
 
 
@@ -383,7 +383,7 @@ WRITE8_MEMBER(nyny_state::audio_1_answer_w)
 }
 
 
-WRITE8_MEMBER(nyny_state::nyny_ay8910_37_port_a_w)
+void nyny_state::nyny_ay8910_37_port_a_w(uint8_t data)
 {
 	/* not sure what this does */
 
@@ -396,7 +396,7 @@ WRITE8_MEMBER(nyny_state::nyny_ay8910_37_port_a_w)
  *
  *************************************/
 
-WRITE8_MEMBER(nyny_state::audio_2_command_w)
+void nyny_state::audio_2_command_w(uint8_t data)
 {
 	m_soundlatch2->write((data & 0x60) >> 5);
 	m_audiocpu2->set_input_line(M6802_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
@@ -452,7 +452,6 @@ void nyny_state::nyny_main_map(address_map &map)
 void nyny_state::nyny_audio_1_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x007f).ram();     /* internal RAM */
 	map(0x0080, 0x0fff).noprw();
 	map(0x1000, 0x1000).mirror(0x0fff).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(nyny_state::audio_1_answer_w));
 	map(0x2000, 0x2000).mirror(0x0fff).portr("SW3");
@@ -470,7 +469,6 @@ void nyny_state::nyny_audio_1_map(address_map &map)
 void nyny_state::nyny_audio_2_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x007f).ram();     /* internal RAM */
 	map(0x0080, 0x0fff).noprw();
 	map(0x1000, 0x1000).mirror(0x0fff).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0x2000, 0x2000).mirror(0x0ffe).r("ay3", FUNC(ay8910_device::data_r));
@@ -622,8 +620,8 @@ void nyny_state::nyny(machine_config &config)
 	m_mc6845->set_screen("screen");
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);
-	m_mc6845->set_update_row_callback(FUNC(nyny_state::crtc_update_row), this);
-	m_mc6845->set_end_update_callback(FUNC(nyny_state::crtc_end_update), this);
+	m_mc6845->set_update_row_callback(FUNC(nyny_state::crtc_update_row));
+	m_mc6845->set_end_update_callback(FUNC(nyny_state::crtc_end_update));
 	m_mc6845->out_de_callback().set(m_ic48_1, FUNC(ttl74123_device::a_w));
 
 	/* 74LS123 */

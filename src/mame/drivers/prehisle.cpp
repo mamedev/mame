@@ -40,17 +40,17 @@ void prehisle_state::prehisle_map(address_map &map)
 	map(0x0d0000, 0x0d07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0e0010, 0x0e0011).portr("P2");                     // Player 2
 	map(0x0e0020, 0x0e0021).portr("COIN");                   // Coins, Tilt, Service
-	map(0x0e0041, 0x0e0041).lr8("P1_r", [this]() -> u8 { return m_io_p1->read() ^ m_invert_controls; }); // Player 1
+	map(0x0e0041, 0x0e0041).lr8(NAME([this] () -> u8 { return m_io_p1->read() ^ m_invert_controls; })); // Player 1
 	map(0x0e0042, 0x0e0043).portr("DSW0");                   // DIPs
 	map(0x0e0044, 0x0e0045).portr("DSW1");                   // DIPs + VBLANK
 	map(0x0f0000, 0x0f0001).w(FUNC(prehisle_state::fg_scrolly_w));
 	map(0x0f0010, 0x0f0011).w(FUNC(prehisle_state::fg_scrollx_w));
 	map(0x0f0020, 0x0f0021).w(FUNC(prehisle_state::bg_scrolly_w));
 	map(0x0f0030, 0x0f0031).w(FUNC(prehisle_state::bg_scrollx_w));
-	map(0x0f0046, 0x0f0047).lw16("invert_controls_w", [this](u16 data){ m_invert_controls = data ? 0xff : 0x00; });
-	map(0x0f0050, 0x0f0051).lw16("coin_counter_1_w", [this](u16 data){ machine().bookkeeping().coin_counter_w(0, data & 1); });
-	map(0x0f0052, 0x0f0053).lw16("coin_counter_2_w", [this](u16 data){ machine().bookkeeping().coin_counter_w(1, data & 1); });
-	map(0x0f0060, 0x0f0061).lw16("flip_screen_w", [this](u16 data){ flip_screen_set(data & 0x01); });
+	map(0x0f0046, 0x0f0047).lw16(NAME([this] (u16 data) { m_invert_controls = data ? 0xff : 0x00; }));
+	map(0x0f0050, 0x0f0051).lw16(NAME([this] (u16 data) { machine().bookkeeping().coin_counter_w(0, data & 1); }));
+	map(0x0f0052, 0x0f0053).lw16(NAME([this] (u16 data) { machine().bookkeeping().coin_counter_w(1, data & 1); }));
+	map(0x0f0060, 0x0f0061).lw16(NAME([this] (u16 data) { flip_screen_set(data & 0x01); }));
 	map(0x0f0070, 0x0f0071).w(FUNC(prehisle_state::soundcmd_w));
 }
 
@@ -77,7 +77,7 @@ void prehisle_state::prehisle_sound_io_map(address_map &map)
 	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
 	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
 	map(0x40, 0x40).w(FUNC(prehisle_state::upd_port_w));
-	map(0x80, 0x80).lw8("upd_reset", [this](u8 data){ m_upd7759->reset_w(BIT(data, 7)); } );
+	map(0x80, 0x80).lw8(NAME([this] (u8 data) { m_upd7759->reset_w(BIT(data, 7)); }));
 }
 
 /******************************************************************************/

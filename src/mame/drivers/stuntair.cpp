@@ -145,7 +145,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(spritebank1_w);
 	DECLARE_WRITE8_MEMBER(stuntair_coin_w);
 	DECLARE_WRITE8_MEMBER(stuntair_sound_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
+	void ay8910_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(stuntair_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -192,7 +192,7 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_fg_tile_info)
 
 	// where does the FG palette come from? it's a 1bpp layer..
 
-	SET_TILE_INFO_MEMBER(0, tileno & 0x7f, 0, opaque ? TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
+	tileinfo.set(0, tileno & 0x7f, 0, opaque ? TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
 }
 
 TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
@@ -201,16 +201,16 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
 	tileno |= (m_bgattrram[tile_index] & 0x08)<<5;
 	int colour = (m_bgattrram[tile_index] & 0x07);
 
-	SET_TILE_INFO_MEMBER(1, tileno, colour, 0);
+	tileinfo.set(1, tileno, colour, 0);
 }
 
 
 void stuntair_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stuntair_state::get_stuntair_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stuntair_state::get_stuntair_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -483,7 +483,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(stuntair_state::ay8910_portb_w)
+void stuntair_state::ay8910_portb_w(uint8_t data)
 {
 	// it writes $e8 and $f0 for music drums?
 	// possibly to discrete sound circuitry?

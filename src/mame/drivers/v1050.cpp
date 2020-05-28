@@ -160,6 +160,7 @@ Notes:
 
 void v1050_state::set_interrupt(int line, int state)
 {
+	line ^= 7;
 	if (state)
 	{
 		m_int_state |= (1 << line);
@@ -492,8 +493,8 @@ void v1050_state::v1050_io(address_map &map)
 	map(0xb0, 0xb0).rw(FUNC(v1050_state::dint_clr_r), FUNC(v1050_state::dint_clr_w));
 	map(0xc0, 0xc0).w(FUNC(v1050_state::v1050_i8214_w));
 	map(0xd0, 0xd0).w(FUNC(v1050_state::bank_w));
-	map(0xe0, 0xe0).w(FUNC(v1050_state::sasi_data_w)).r(m_sasi_data_in, FUNC(input_buffer_device::bus_r));
-	map(0xe1, 0xe1).r(m_sasi_ctrl_in, FUNC(input_buffer_device::bus_r)).w(FUNC(v1050_state::sasi_ctrl_w));
+	map(0xe0, 0xe0).w(FUNC(v1050_state::sasi_data_w)).r(m_sasi_data_in, FUNC(input_buffer_device::read));
+	map(0xe1, 0xe1).r(m_sasi_ctrl_in, FUNC(input_buffer_device::read)).w(FUNC(v1050_state::sasi_ctrl_w));
 }
 
 void v1050_state::v1050_crt_mem(address_map &map)
@@ -651,13 +652,13 @@ WRITE_LINE_MEMBER(v1050_state::pic_int_w)
 
 // Display 8255A Interface
 
-WRITE8_MEMBER(v1050_state::disp_ppi_pc_w)
+void v1050_state::disp_ppi_pc_w(uint8_t data)
 {
 	m_ppi_6502->pc2_w(BIT(data, 6));
 	m_ppi_6502->pc4_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER(v1050_state::m6502_ppi_pc_w)
+void v1050_state::m6502_ppi_pc_w(uint8_t data)
 {
 	m_ppi_disp->pc2_w(BIT(data, 7));
 	m_ppi_disp->pc4_w(BIT(data, 6));
@@ -665,7 +666,7 @@ WRITE8_MEMBER(v1050_state::m6502_ppi_pc_w)
 
 // Miscellanous 8255A Interface
 
-WRITE8_MEMBER( v1050_state::misc_ppi_pa_w )
+void v1050_state::misc_ppi_pa_w(uint8_t data)
 {
 	/*
 
@@ -712,7 +713,7 @@ WRITE_LINE_MEMBER(v1050_state::write_centronics_perror)
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER(v1050_state::misc_ppi_pc_r)
+uint8_t v1050_state::misc_ppi_pc_r()
 {
 	/*
 
@@ -768,7 +769,7 @@ void v1050_state::set_baud_sel(int baud_sel)
 	}
 }
 
-WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
+void v1050_state::misc_ppi_pc_w(uint8_t data)
 {
 	/*
 
@@ -798,7 +799,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 
 // Real Time Clock 8255A Interface
 
-WRITE8_MEMBER( v1050_state::rtc_ppi_pb_w )
+void v1050_state::rtc_ppi_pb_w(uint8_t data)
 {
 	/*
 
@@ -818,12 +819,12 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pb_w )
 	m_int_mask = data;
 }
 
-READ8_MEMBER( v1050_state::rtc_ppi_pa_r )
+uint8_t v1050_state::rtc_ppi_pa_r()
 {
 	return m_rtc_ppi_pa;
 }
 
-WRITE8_MEMBER( v1050_state::rtc_ppi_pa_w )
+void v1050_state::rtc_ppi_pa_w(uint8_t data)
 {
 	m_rtc->d0_w((data >> 0) & 1);
 	m_rtc->d1_w((data >> 1) & 1);
@@ -831,7 +832,7 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pa_w )
 	m_rtc->d3_w((data >> 3) & 1);
 }
 
-READ8_MEMBER( v1050_state::rtc_ppi_pc_r )
+uint8_t v1050_state::rtc_ppi_pc_r()
 {
 	/*
 
@@ -851,7 +852,7 @@ READ8_MEMBER( v1050_state::rtc_ppi_pc_r )
 	return m_rtc_ppi_pc;
 }
 
-WRITE8_MEMBER( v1050_state::rtc_ppi_pc_w )
+void v1050_state::rtc_ppi_pc_w(uint8_t data)
 {
 	/*
 
@@ -1030,11 +1031,9 @@ void v1050_state::v1050(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &v1050_state::v1050_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(v1050_state::v1050_int_ack));
 
-	config.m_perfect_cpu_quantum = subtag(Z80_TAG);
-
 	M6502(config, m_subcpu, 15.36_MHz_XTAL/16);
 	m_subcpu->set_addrmap(AS_PROGRAM, &v1050_state::v1050_crt_mem);
-	config.m_perfect_cpu_quantum = subtag(M6502_TAG);
+	config.set_perfect_quantum(m_subcpu);
 
 	// keyboard HACK
 	TIMER(config, "keyboard").configure_periodic(FUNC(v1050_state::v1050_keyboard_tick), attotime::from_hz(60));
@@ -1060,7 +1059,7 @@ void v1050_state::v1050(machine_config &config)
 	i8255_device &ppi_misc(I8255A(config, I8255A_MISC_TAG));
 	ppi_misc.in_pc_callback().set(FUNC(v1050_state::misc_ppi_pc_r));
 	ppi_misc.out_pa_callback().set(FUNC(v1050_state::misc_ppi_pa_w));
-	ppi_misc.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi_misc.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ppi_misc.out_pc_callback().set(FUNC(v1050_state::misc_ppi_pc_w));
 
 	i8255_device &ppi_rtc(I8255A(config, I8255A_RTC_TAG));

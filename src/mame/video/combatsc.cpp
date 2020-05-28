@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 
 	number = m_page[0][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			number,
 			color,
 			0);
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1)
 
 	number = m_page[1][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			number,
 			color,
 			0);
@@ -161,7 +161,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info)
 	int number = m_page[0][tile_index + 0xc00];
 	int color = 16 + (attributes & 0x0f);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			number,
 			color,
 			0);
@@ -193,7 +193,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0_bootleg)
 	color = pal*16;// + (attributes & 0x0f);
 	number = m_page[0][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			number,
 			color,
 			0);
@@ -224,7 +224,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1_bootleg)
 	color = pal * 16;// + (attributes & 0x0f);
 	number = m_page[1][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			number,
 			color,
 			0);
@@ -236,7 +236,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info_bootleg)
 	int number = m_page[0][tile_index + 0xc00];
 	int color = 16;// + (attributes & 0x0f);
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			number,
 			color,
 			0);
@@ -250,9 +250,9 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info_bootleg)
 
 VIDEO_START_MEMBER(combatsc_state,combatsc)
 {
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_textlayer =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_tile_info0)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_textlayer =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_text_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_spriteram[0] = make_unique_clear<uint8_t[]>(0x800);
 	m_spriteram[1] = make_unique_clear<uint8_t[]>(0x800);
@@ -269,9 +269,9 @@ VIDEO_START_MEMBER(combatsc_state,combatsc)
 
 VIDEO_START_MEMBER(combatsc_state,combatscb)
 {
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_textlayer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_tile_info0_bootleg)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_tile_info1_bootleg)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_textlayer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_text_info_bootleg)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_spriteram[0] = make_unique_clear<uint8_t[]>(0x800);
 	m_spriteram[1] = make_unique_clear<uint8_t[]>(0x800);
@@ -318,7 +318,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_video_w)
 WRITE8_MEMBER(combatsc_state::combatsc_pf_control_w)
 {
 	k007121_device *k007121 = m_video_circuit ? m_k007121_2 : m_k007121_1;
-	k007121->ctrl_w(space, offset, data);
+	k007121->ctrl_w(offset, data);
 
 	if (offset == 7)
 	{

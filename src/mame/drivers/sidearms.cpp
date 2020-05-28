@@ -42,6 +42,12 @@ Notes:
   encoding parameters have been identified, the other 28(!) are
   believed to be line-buffer controls.
 
+  A bootleg has been found that matches "sidearmsj" but with the
+  starfield data ROM being half the size of the original one and
+  containing its second half. Also, it seems that, as the original
+  game it's currently emulated, it uses just the first half of the
+  starfield ROM, so it's something worth checking.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -702,7 +708,7 @@ void sidearms_state::whizz(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::whizz_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &sidearms_state::whizz_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60000);
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

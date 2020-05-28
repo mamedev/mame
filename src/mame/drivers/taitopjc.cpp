@@ -213,7 +213,7 @@ TILE_GET_INFO_MEMBER(taitopjc_state::tile_get_info)
 	int tile = (val & 0xfff);
 	int flags = 0;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, flags);
+	tileinfo.set(0, tile, color, flags);
 }
 
 TILEMAP_MAPPER_MEMBER(taitopjc_state::tile_scan_layer0)
@@ -244,8 +244,8 @@ void taitopjc_state::video_start()
 	m_screen_ram = std::make_unique<uint32_t[]>(0x40000);
 	m_pal_ram = std::make_unique<uint32_t[]>(0x8000);
 
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitopjc_state::tile_get_info),this), tilemap_mapper_delegate(FUNC(taitopjc_state::tile_scan_layer0),this), 16, 16, 32, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitopjc_state::tile_get_info),this), tilemap_mapper_delegate(FUNC(taitopjc_state::tile_scan_layer1),this), 16, 16, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitopjc_state::tile_get_info)), tilemap_mapper_delegate(*this, FUNC(taitopjc_state::tile_scan_layer0)), 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitopjc_state::tile_get_info)), tilemap_mapper_delegate(*this, FUNC(taitopjc_state::tile_scan_layer1)), 16, 16, 32, 32);
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(1);
 
@@ -638,7 +638,7 @@ void taitopjc_state::tlcs900h_mem(address_map &map)
 	map(0x044000, 0x045fff).ram().share("nvram");
 	map(0x060000, 0x061fff).rw(FUNC(taitopjc_state::tlcs_common_r), FUNC(taitopjc_state::tlcs_common_w));
 	map(0x06c000, 0x06c00f).w(FUNC(taitopjc_state::tlcs_unk_w));
-	map(0xfc0000, 0xffffff).rom().region("io_cpu", 0);
+	map(0xfc0000, 0xffffff).rom().region("iocpu", 0);
 }
 
 void taitopjc_state::mn10200_map(address_map &map)
@@ -686,13 +686,13 @@ WRITE16_MEMBER(taitopjc_state::dsp_romh_w)
 
 void taitopjc_state::tms_program_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().region("user2", 0);
-	map(0x4c00, 0xefff).rom().region("user2", 0x9800);
+	map(0x0000, 0x3fff).rom().region("dspdata", 0);
+	map(0x4c00, 0xefff).rom().region("dspdata", 0x9800);
 }
 
 void taitopjc_state::tms_data_map(address_map &map)
 {
-	map(0x4000, 0x6fff).rom().region("user2", 0x8000);
+	map(0x4000, 0x6fff).rom().region("dspdata", 0x8000);
 	map(0x7000, 0xefff).ram();
 	map(0xf000, 0xffff).rw(FUNC(taitopjc_state::tms_dspshare_r), FUNC(taitopjc_state::tms_dspshare_w));
 }
@@ -797,7 +797,7 @@ void taitopjc_state::taitopjc(machine_config &config)
 	MN1020012A(config, m_soundcpu, 10000000); /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &taitopjc_state::mn10200_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -818,11 +818,11 @@ void taitopjc_state::taitopjc(machine_config &config)
 
 void taitopjc_state::init_optiger()
 {
-	uint8_t *rom = (uint8_t*)memregion("io_cpu")->base();
+	uint8_t *rom = (uint8_t*)memregion("iocpu")->base();
 
 	// skip sound check
-	rom[0x217] = 0x00;
-	rom[0x218] = 0x00;
+	rom[BYTE_XOR_LE(0x217)] = 0x00;
+	rom[BYTE_XOR_LE(0x218)] = 0x00;
 
 #if 0
 	uint32_t *mr = (uint32_t*)memregion("user1")->base();
@@ -839,11 +839,11 @@ ROM_START( optiger )
 	ROM_LOAD32_BYTE( "e63-31-1_p-lh.8",  0x000002, 0x080000, CRC(ad69e649) SHA1(9fc853d2cb6e7cac87dc06bad91048f191b799c5) )
 	ROM_LOAD32_BYTE( "e63-30-1_p-ll.7",  0x000003, 0x080000, CRC(a6183479) SHA1(e556c3edf100342079e680ec666f018fca7a82b0) )
 
-	ROM_REGION16_BE( 0x20000, "user2", 0 )
-	ROM_LOAD16_BYTE( "e63-04_l.29",  0x000001, 0x010000, CRC(eccae391) SHA1(e5293c16342cace54dc4b6dfb827558e18ac25a4) )
-	ROM_LOAD16_BYTE( "e63-03_h.28",  0x000000, 0x010000, CRC(58fce52f) SHA1(1e3d9ee034b25e658ca45a8b900de2aa54b00135) )
+	ROM_REGION16_LE( 0x20000, "dspdata", 0 )
+	ROM_LOAD16_BYTE( "e63-04_l.29",  0x000000, 0x010000, CRC(eccae391) SHA1(e5293c16342cace54dc4b6dfb827558e18ac25a4) )
+	ROM_LOAD16_BYTE( "e63-03_h.28",  0x000001, 0x010000, CRC(58fce52f) SHA1(1e3d9ee034b25e658ca45a8b900de2aa54b00135) )
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION( 0x40000, "iocpu", 0 )
 	ROM_LOAD16_BYTE( "e63-28-1_0.59", 0x000000, 0x020000, CRC(ef41ffaf) SHA1(419621f354f548180d37961b861304c469e43a65) )
 	ROM_LOAD16_BYTE( "e63-27-1_1.58", 0x000001, 0x020000, CRC(facc17a7) SHA1(40d69840cfcfe5a509d69824c2994de56a3c6ece) )
 
@@ -861,7 +861,7 @@ ROM_START( optiger )
 	ROM_LOAD16_WORD_SWAP( "e63-09_poly0.3", 0x000000, 0x400000, CRC(c3e2b1e0) SHA1(ee71f3f59b46e26dbe2ff724da2c509267c8bf2f) )
 	ROM_LOAD16_WORD_SWAP( "e63-10_poly1.4", 0x400000, 0x400000, CRC(f4a56390) SHA1(fc3c51a7f4639479e66ad50dcc94255d94803c97) )
 	ROM_LOAD16_WORD_SWAP( "e63-11_poly2.5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) )
-// Poly 3 is not populated
+	// Poly 3 is not populated
 
 	ROM_REGION( 0x800000, "sound_data", 0 )
 	ROM_LOAD( "e63-23_wd0.36", 0x000000, 0x200000, CRC(d69e196e) SHA1(f738bb9e1330f6dabb5e0f0378a1a8eb48a4fa40) )
@@ -869,8 +869,13 @@ ROM_START( optiger )
 	ROM_LOAD( "e63-25_wd2.38", 0x400000, 0x200000, CRC(bd35bdac) SHA1(5cde6c1a6b74659507b31fcb88257e65f230bfe2) )
 	ROM_LOAD( "e63-26_wd3.39", 0x600000, 0x200000, CRC(346bd413) SHA1(0f6081d22db88eef08180278e7ae97283b5e8452) )
 
-	ROM_REGION( 0x500, "plds", ROMREGION_ERASEFF )
-	// TODO: There are 6 PALs in total on the main PCB.
+	ROM_REGION( 0x850, "plds", 0 )
+	ROM_LOAD( "e63-01_palce16v8h-5-5.ic23",  0x000, 0x117, CRC(f114c13f) SHA1(ca9ec41d5c16347bdf107b340e6e1b9e6b7c74a9) )
+	ROM_LOAD( "e63-02_palce22v10h-5-5.ic25", 0x117, 0x2dd, CRC(8418da84) SHA1(b235761f78ecb16d764fbefb00d04092d3a22ca9) )
+	ROM_LOAD( "e63-05_palce16v8h-10-4.ic36", 0x3f4, 0x117, CRC(e27e9734) SHA1(77dadfbedb625b65617640bb73c59c9e5b0c927f) )
+	ROM_LOAD( "e63-06_palce16v8h-10-4.ic41", 0x50b, 0x117, CRC(75184422) SHA1(d35e98e0278d713139eb1c833f41f57ed0dd3c9f) )
+	ROM_LOAD( "e63-07_palce16v8h-10-4.ic43", 0x622, 0x117, CRC(eb77b03f) SHA1(567f92a4fd1fa919d5e9047ee15c058bf40855fb) )
+	ROM_LOAD( "e63-08_palce16v8h-15-4.ic49", 0x739, 0x117, CRC(c305c56d) SHA1(49592fa43c548ac6b08951d03677a3f23e9c8de8) )
 ROM_END
 
 GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, init_optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

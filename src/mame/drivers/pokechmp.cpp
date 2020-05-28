@@ -115,7 +115,7 @@ void pokechmp_state::pokechmp_sound_map(address_map &map)
 	map(0x2000, 0x2000).w(FUNC(pokechmp_state::pokechmp_sound_bank_w)); /* sound rom bank seems to be replaced with OKI bank */
 	map(0x2800, 0x2800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // extra
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-//  AM_RANGE(0x3400, 0x3400) AM_READ(pokechmp_adpcm_reset_r) /* not on here */
+//  map(0x3400, 0x3400).r(FUNC(pokechmp_state::pokechmp_adpcm_reset_r)); /* not on here */
 	map(0x4000, 0x7fff).bankr("bank3");
 	map(0x8000, 0xffff).rom();
 }

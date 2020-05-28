@@ -23,6 +23,7 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_ram(*this, "ram"),
+		m_cgrom(*this, "gfx1"),
 		m_okibank(*this, "okibank")
 	{ }
 
@@ -47,6 +48,7 @@ private:
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint16_t> m_ram;
+	required_region_ptr<uint8_t> m_cgrom;
 
 	optional_memory_bank m_okibank;
 
@@ -63,6 +65,7 @@ private:
 	DECLARE_WRITE16_MEMBER(gfxlist_addr_w);
 	DECLARE_WRITE16_MEMBER(blitter_go_w);
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
+	uint8_t cgrom_r(offs_t offset);
 
 	// shangha3 specific
 	DECLARE_READ16_MEMBER(shangha3_prot_r);

@@ -111,8 +111,8 @@ private:
 	DECLARE_WRITE8_MEMBER(jokrwild_videoram_w);
 	DECLARE_WRITE8_MEMBER(jokrwild_colorram_w);
 	DECLARE_READ8_MEMBER(rng_r);
-	DECLARE_WRITE8_MEMBER(testa_w);
-	DECLARE_WRITE8_MEMBER(testb_w);
+	void testa_w(uint8_t data);
+	void testb_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void jokrwild_palette(palette_device &palette) const;
 	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -147,12 +147,12 @@ TILE_GET_INFO_MEMBER(jokrwild_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] | ((attr & 0xc0) << 2);
 	int color = (attr & 0x0f);
 
-	SET_TILE_INFO_MEMBER(0, code , color , 0);
+	tileinfo.set(0, code , color , 0);
 }
 
 void jokrwild_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jokrwild_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 26);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jokrwild_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 24, 26);
 }
 
 uint32_t jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -195,7 +195,7 @@ void jokrwild_state::jokrwild_map(address_map &map)
 	map(0x2400, 0x27ff).ram(); //stack RAM
 	map(0x4004, 0x4007).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4008, 0x400b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //optical sensor is here
-//  AM_RANGE(0x4010, 0x4010) AM_READNOP /* R ???? */
+//  map(0x4010, 0x4010).nopr(); /* R ???? */
 	map(0x6000, 0x6000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x6001, 0x6001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x6100, 0x6100).portr("SW1");
@@ -399,12 +399,12 @@ GFXDECODE_END
 *    PIA Interfaces    *
 ***********************/
 
-WRITE8_MEMBER(jokrwild_state::testa_w)
+void jokrwild_state::testa_w(uint8_t data)
 {
 //  printf("%02x A\n",data);
 }
 
-WRITE8_MEMBER(jokrwild_state::testb_w)
+void jokrwild_state::testb_w(uint8_t data)
 {
 //  printf("%02x B\n",data);
 }

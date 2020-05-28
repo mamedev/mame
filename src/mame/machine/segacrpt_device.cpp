@@ -123,7 +123,7 @@
   315-5064      Water Match             used Mister Viking for k.p.a.
   315-5065      Bull Fight
   315-5069      Star Force              game by Tehkan; same key as Super Locomotive
-  ???-????      Spatter
+  ???-????      Spatter                 same encryption scheme is used by the Falcon 03155096 CPU (Z80)
   315-5084      Jongkyo                 TABLE INCOMPLETE game by Kiwako; also has a simple bitswap on top
   315-5093      Pitfall II
   315-5098      Ninja Princess          unencrypted version available; same key as Up'n Down

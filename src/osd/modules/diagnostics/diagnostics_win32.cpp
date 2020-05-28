@@ -610,7 +610,7 @@ uintptr_t symbol_manager::get_text_section_base()
 	ImageNtHeader_fn image_nt_header = m_dbghelp_dll->bind<ImageNtHeader_fn>("ImageNtHeader");
 
 	// start with the image base
-	PVOID base = reinterpret_cast<PVOID>(GetModuleHandleUni());
+	auto base = reinterpret_cast<PVOID>(GetModuleHandleUni());
 	assert(base != nullptr);
 
 	// make sure we have the functions we need
@@ -663,23 +663,27 @@ sampling_profiler::~sampling_profiler()
 }
 
 
-//-------------------------------------------------
+////-------------------------------------------------
 //  start - begin gathering profiling information
 //-------------------------------------------------
 
 void sampling_profiler::start()
 {
 	// do the dance to get a handle to ourself
-	BOOL result = DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &m_target_thread,
-		THREAD_GET_CONTEXT | THREAD_SUSPEND_RESUME | THREAD_QUERY_INFORMATION, FALSE, 0);
-	assert_always(result, "Failed to get thread handle for main thread");
+	BOOL const result = DuplicateHandle(
+			GetCurrentProcess(), GetCurrentThread(),
+			GetCurrentProcess(), &m_target_thread,
+			THREAD_GET_CONTEXT | THREAD_SUSPEND_RESUME | THREAD_QUERY_INFORMATION, FALSE, 0);
+	if (!result)
+		throw emu_fatalerror("sampling_profiler::start: Failed to get thread handle for main thread");
 
 	// reset the exit flag
 	m_thread_exit = false;
 
 	// start the thread
 	m_thread = CreateThread(nullptr, 0, thread_entry, (LPVOID)this, 0, &m_thread_id);
-	assert_always(m_thread != nullptr, "Failed to create profiler thread\n");
+	if (!m_thread)
+		throw emu_fatalerror("sampling_profiler::start: Failed to create profiler thread");
 
 	// max out the priority
 	SetThreadPriority(m_thread, THREAD_PRIORITY_TIME_CRITICAL);
@@ -708,8 +712,8 @@ void sampling_profiler::stop()
 
 int CLIB_DECL sampling_profiler::compare_address(const void *item1, const void *item2)
 {
-	const uintptr_t *entry1 = reinterpret_cast<const uintptr_t *>(item1);
-	const uintptr_t *entry2 = reinterpret_cast<const uintptr_t *>(item2);
+	const auto *entry1 = reinterpret_cast<const uintptr_t *>(item1);
+	const auto *entry2 = reinterpret_cast<const uintptr_t *>(item2);
 	int mincount = std::min(entry1[0], entry2[0]);
 
 	// sort in order of: bucket, caller, caller's caller, etc.
@@ -729,8 +733,8 @@ int CLIB_DECL sampling_profiler::compare_address(const void *item1, const void *
 
 int CLIB_DECL sampling_profiler::compare_frequency(const void *item1, const void *item2)
 {
-	const uintptr_t *entry1 = reinterpret_cast<const uintptr_t *>(item1);
-	const uintptr_t *entry2 = reinterpret_cast<const uintptr_t *>(item2);
+	const auto *entry1 = reinterpret_cast<const uintptr_t *>(item1);
+	const auto *entry2 = reinterpret_cast<const uintptr_t *>(item2);
 
 	// sort by frequency, then by address
 	if (entry1[0] != entry2[0])

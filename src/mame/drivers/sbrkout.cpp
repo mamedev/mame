@@ -333,13 +333,13 @@ READ8_MEMBER(sbrkout_state::sync2_r)
 TILE_GET_INFO_MEMBER(sbrkout_state::get_bg_tile_info)
 {
 	int code = (m_videoram[tile_index] & 0x80) ? m_videoram[tile_index] : 0;
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 
 void sbrkout_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sbrkout_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sbrkout_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

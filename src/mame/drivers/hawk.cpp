@@ -62,10 +62,11 @@ private:
 void hawk_state::hawk_io(address_map &map)
 {
 	map.unmap_value_high();
-	//map.global_mask(0xff);
-	//map(0x18, 0x18).nopw();
-	//map(0x40, 0x4f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	//map(0xcd, 0xcd).noprw(); // 0x00
+	map(0x0010, 0x0010).mirror(0xff00).nopw();
+	map(0x0018, 0x0018).nopw();
+	map(0x003f, 0x003f).nopw();
+	map(0x0080, 0x00bf).noprw(); // Z180 internal registers
+	map(0x00c0, 0x00cf).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
 void hawk_state::hawk_mem(address_map &map)
@@ -102,7 +103,7 @@ void hawk_state::hawk_palette(palette_device &palette) const
 void hawk_state::hawk(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, 12.288_MHz_XTAL / 2); /* HD64B180R0F */
+	Z80180(config, m_maincpu, 12.288_MHz_XTAL); /* HD64B180R0F */
 	m_maincpu->set_addrmap(AS_PROGRAM, &hawk_state::hawk_mem);
 	m_maincpu->set_addrmap(AS_IO, &hawk_state::hawk_io);
 
@@ -142,6 +143,10 @@ ROM_START(hawk)
 	ROMX_LOAD("v1.10_1.rom",      0x08000, 0x08000, CRC(121b5ce0) SHA1(baf06bc0d16501b50cbf97b686612b00098c73ab), ROM_BIOS(2))
 	ROMX_LOAD("v1.10_2.rom",      0x10000, 0x08000, CRC(cd5d94c7) SHA1(44c996b4bf00185ccb303cf9ef9bbd705018390c), ROM_BIOS(2))
 	ROMX_LOAD("56189.rom",        0x18000, 0x08000, CRC(1b2db82b) SHA1(2185d27816bde263c62db1a2441d8a6d2cb6d193), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "101", "DEMOS 2.21 V1.01")
+	ROMX_LOAD("hawk-v1.01-0.rom", 0x00000, 0x08000, CRC(96404435) SHA1(3b108d6906ecc7d7a36c36b993e79ec7480668fa), ROM_BIOS(3))
+	ROMX_LOAD("hawk-v1.01-1.rom", 0x08000, 0x08000, CRC(4f99c76c) SHA1(45ff638277cff7b1fb2e21c4c348dad2b2e779b7), ROM_BIOS(3))
+	ROMX_LOAD("hawk-v1.01-2.rom", 0x10000, 0x08000, CRC(982ed053) SHA1(ab0a860f1204f36f490fdfadfefe2ee4a82ed3be), ROM_BIOS(3))
 ROM_END
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY                FULLNAME      FLAGS

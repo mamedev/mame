@@ -113,7 +113,7 @@ void fd4000_device::fd4000_mem(address_map &map)
 }
 
 
-READ8_MEMBER( fd2000_device::via_pa_r )
+uint8_t fd2000_device::via_pa_r()
 {
 	/*
 
@@ -133,7 +133,7 @@ READ8_MEMBER( fd2000_device::via_pa_r )
 	return 0;
 }
 
-WRITE8_MEMBER( fd2000_device::via_pa_w )
+void fd2000_device::via_pa_w(uint8_t data)
 {
 	/*
 
@@ -151,7 +151,7 @@ WRITE8_MEMBER( fd2000_device::via_pa_w )
 	*/
 }
 
-READ8_MEMBER( fd2000_device::via_pb_r )
+uint8_t fd2000_device::via_pb_r()
 {
 	/*
 
@@ -176,7 +176,7 @@ READ8_MEMBER( fd2000_device::via_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( fd2000_device::via_pb_w )
+void fd2000_device::via_pb_w(uint8_t data)
 {
 	/*
 

@@ -88,7 +88,7 @@ const uint8_t okim6295_device::s_volume_table[16] =
 okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OKIM6295, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 18),
+		device_rom_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_command(-1),
 		m_stream(nullptr),

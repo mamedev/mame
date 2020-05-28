@@ -141,6 +141,12 @@ WRITE_LINE_MEMBER(ioport_device::clock_in)
 		m_connected->clock_in(state);
 }
 
+WRITE_LINE_MEMBER(ioport_device::reset_in)
+{
+	if (m_connected != nullptr)
+		m_connected->reset_in(state);
+}
+
 void ioport_device::device_start()
 {
 	m_console_extint.resolve();

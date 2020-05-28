@@ -67,8 +67,8 @@ WRITE8_MEMBER(xavix_io_device::xav_7a0x_dat_w)
 
 		switch (offset)
 		{
-		case 0x0: m_out0_cb(space, 0, outdata); break;
-		case 0x1: m_out1_cb(space, 0, outdata); break;
+		case 0x0: m_out0_cb(outdata); break;
+		case 0x1: m_out1_cb(outdata); break;
 		}
 	}
 }
@@ -92,8 +92,8 @@ READ8_MEMBER(xavix_io_device::xav_7a0x_dat_r)
 	{
 		switch (offset)
 		{
-		case 0x0: ret = m_in0_cb(space, 0); break;
-		case 0x1: ret = m_in1_cb(space, 0); break;
+		case 0x0: ret = m_in0_cb(); break;
+		case 0x1: ret = m_in1_cb(); break;
 		}
 
 		ret &= ~m_dir[offset];

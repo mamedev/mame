@@ -178,7 +178,10 @@ dp835x_a_device::dp835x_a_device(const machine_config &mconfig, const char *tag,
 
 void dp835x_device::device_config_complete()
 {
-	if (has_screen() && screen().refresh_attoseconds() == 0)
+	if (!has_screen())
+		return;
+
+	if (screen().refresh_attoseconds() == 0)
 	{
 		int lines_per_frame = m_video_scan_lines + m_vblank_interval[m_60hz_refresh ? 1 : 0];
 		if (m_half_shift)
@@ -227,6 +230,7 @@ void dp835x_device::device_start()
 	save_item(NAME(m_rsr));
 	save_item(NAME(m_cr));
 	save_item(NAME(m_row_start));
+	save_item(NAME(m_line));
 }
 
 
@@ -475,7 +479,7 @@ TIMER_CALLBACK_MEMBER(dp835x_device::hblank_start)
 	m_lrc_callback(0);
 
 	// increment line counter or reset it
-	if (m_lc < m_char_height - 1 && m_line != lines_per_frame - m_char_height)
+	if (m_lc < m_char_height - 1 && m_line != lines_per_frame - m_char_height - 1)
 		m_lc++;
 	else
 	{
@@ -491,17 +495,6 @@ TIMER_CALLBACK_MEMBER(dp835x_device::hblank_start)
 	// update line buffer recirculate enable output based on address mode
 	bool lbre = m_lc != (m_cgpi ? 0 : m_char_height - 1);
 	m_lbre_callback(lbre ? 1 : 0);
-
-	if (m_line >= lines_per_frame - m_char_height && m_line < lines_per_frame)
-	{
-		m_row_start = m_rsr = m_topr;
-	}
-	else if (!lbre || m_line >= m_video_scan_lines)
-	{
-		// calculate starting address of next row (address counter runs continuously during VBLANK)
-		m_row_start = m_rsr;
-		m_rsr = (m_row_start + m_chars_per_row) & 0xfff;
-	}
 
 	// update vertical blanking output
 	if (m_line == m_video_scan_lines)
@@ -531,6 +524,18 @@ TIMER_CALLBACK_MEMBER(dp835x_device::hblank_near_end)
 	m_lrc_callback(1);
 	if (m_lc == 0)
 		m_clc_callback(1);
+
+	int last_line = m_video_scan_lines + m_vblank_interval[m_60hz_refresh ? 1 : 0] - (m_cgpi ? 0 : 1);
+	if (m_line >= last_line - m_char_height && m_line < last_line)
+	{
+		m_row_start = m_rsr = m_topr;
+	}
+	else if (m_lc == (m_cgpi ? 0 : m_char_height - 1) || m_line >= m_video_scan_lines)
+	{
+		// calculate starting address of next row (address counter runs continuously during VBLANK)
+		m_row_start = m_rsr;
+		m_rsr = (m_row_start + m_chars_per_row) & 0xfff;
+	}
 }
 
 

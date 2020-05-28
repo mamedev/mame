@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
 
-// CPU die is an Elan EU3A12 (Elan "RISC II Series" quasi-PIC with 16-bit opcodes)
+// CPU die (epoxy blob) is an Elan EU3A12 (Elan "RISC II Series" quasi-PIC with 16-bit opcodes)
 
 #include "emu.h"
 #include "cpu/rii/riscii.h"
@@ -22,7 +22,7 @@ private:
 
 	void prog_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<riscii_series_device> m_maincpu;
 };
 
 uint32_t vreadere_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -32,7 +32,7 @@ uint32_t vreadere_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void vreadere_state::prog_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).rom().region("maincpu", 0);
+	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
 }
 
 static INPUT_PORTS_START( vreadere )
@@ -40,7 +40,7 @@ INPUT_PORTS_END
 
 void vreadere_state::vreadere(machine_config &config)
 {
-	RISCII(config, m_maincpu, 10'000'000); // CPU type is unknown, epoxy blob
+	EPG3231(config, m_maincpu, 10'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vreadere_state::prog_map);
 
 	/* video hardware */

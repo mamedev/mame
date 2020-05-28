@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Robbbert
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     2013-09-10 Skeleton driver for Televideo TV950
@@ -70,9 +70,9 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(via_a_w);
-	DECLARE_WRITE8_MEMBER(via_b_w);
-	DECLARE_READ8_MEMBER(via_b_r);
+	void via_a_w(uint8_t data);
+	void via_b_w(uint8_t data);
+	uint8_t via_b_r();
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
@@ -227,19 +227,19 @@ WRITE8_MEMBER(tv950_state::row_addr_w)
 	m_row_addr = data;
 }
 
-WRITE8_MEMBER(tv950_state::via_a_w)
+void tv950_state::via_a_w(uint8_t data)
 {
 	m_via_row = ~data & 15;
 	// PA4, 5, 7 to do
 }
 
-WRITE8_MEMBER(tv950_state::via_b_w)
+void tv950_state::via_b_w(uint8_t data)
 {
 	// bit 3 of m_via_row must be active as well?
 	m_keyboard->rx_w(!BIT(data, 7));
 }
 
-READ8_MEMBER(tv950_state::via_b_r)
+uint8_t tv950_state::via_b_r()
 {
 	uint8_t data = 0xff;
 	for (int n = 0; n < 4; n++)
@@ -298,8 +298,8 @@ void tv950_state::tv950(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(14);
-	m_crtc->set_update_row_callback(FUNC(tv950_state::crtc_update_row), this);
-	m_crtc->set_on_update_addr_change_callback(FUNC(tv950_state::crtc_update_addr), this);
+	m_crtc->set_update_row_callback(FUNC(tv950_state::crtc_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(tv950_state::crtc_update_addr));
 	m_crtc->out_hsync_callback().set(m_via, FUNC(via6522_device::write_pb6)).invert();
 	m_crtc->out_vsync_callback().set(FUNC(tv950_state::crtc_vs_w));
 	m_crtc->set_screen(nullptr);

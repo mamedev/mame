@@ -11,10 +11,13 @@
 // tech manual: http://manx.classiccmp.org/mirror/vt100.net/docs/la120-tm/la120tm1.pdf
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/74259.h"
+#include "machine/dc305.h"
 #include "machine/er1400.h"
 #include "machine/i8251.h"
+#include "machine/input_merger.h"
 #include "sound/beep.h"
 #include "render.h"
 #include "speaker.h"
@@ -38,7 +41,8 @@ public:
 		m_speaker(*this, "beeper"),
 		m_usart(*this, "usart"),
 		m_nvm(*this, "nvm"),
-		m_ledlatch(*this, "ledlatch")
+		m_ledlatch(*this, "ledlatch"),
+		m_prtlsi(*this, "prtlsi")
 	{
 	}
 
@@ -49,12 +53,15 @@ private:
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
-	DECLARE_READ8_MEMBER(la120_KBD_r);
-	DECLARE_WRITE8_MEMBER(la120_LED_w);
-	DECLARE_READ8_MEMBER(la120_NVR_r);
-	DECLARE_WRITE8_MEMBER(la120_NVR_w);
-	DECLARE_READ8_MEMBER(la120_DC305_r);
-	DECLARE_WRITE8_MEMBER(la120_DC305_w);
+
+	IRQ_CALLBACK_MEMBER(inta_cb);
+
+	uint8_t la120_KBD_r(offs_t offset);
+	void la120_LED_w(offs_t offset, uint8_t data);
+	uint8_t la120_NVR_r();
+	void la120_NVR_w(offs_t offset, uint8_t data);
+	uint8_t la120_DC305_r(offs_t offset);
+	void la120_DC305_w(offs_t offset, uint8_t data);
 
 	void la120_io(address_map &map);
 	void la120_mem(address_map &map);
@@ -67,13 +74,23 @@ private:
 	required_device<i8251_device> m_usart;
 	required_device<er1400_device> m_nvm;
 	required_device<ls259_device> m_ledlatch;
+	required_device<dc305_device> m_prtlsi;
 
 	ioport_port* m_col_array[16];
 	uint8_t m_led_7seg_counter;
 	uint8_t m_led_7seg[4];
 };
 
-READ8_MEMBER( decwriter_state::la120_KBD_r )
+IRQ_CALLBACK_MEMBER( decwriter_state::inta_cb )
+{
+	// one wait state inserted
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-1);
+
+	return m_prtlsi->inta();
+}
+
+uint8_t decwriter_state::la120_KBD_r(offs_t offset)
 {
 	/* for reading the keyboard array, addr bits 5-11 are ignored.
 	 * a15 a14 a13 a12 a11 a10  a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
@@ -94,7 +111,7 @@ READ8_MEMBER( decwriter_state::la120_KBD_r )
 	return code;
 }
 
-WRITE8_MEMBER( decwriter_state::la120_LED_w )
+void decwriter_state::la120_LED_w(offs_t offset, uint8_t data)
 {
 	/* for writing the keyboard array, addr bits 5-11 are ignored.
 	 * a15 a14 a13 a12 a11 a10  a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
@@ -144,7 +161,7 @@ WRITE8_MEMBER( decwriter_state::la120_LED_w )
    1 1 0 Accept address
    1 1 1 Accept data
    */
-READ8_MEMBER( decwriter_state::la120_NVR_r )
+uint8_t decwriter_state::la120_NVR_r()
 {
 	// one wait state inserted
 	if (!machine().side_effects_disabled())
@@ -153,7 +170,7 @@ READ8_MEMBER( decwriter_state::la120_NVR_r )
 	return (!m_nvm->data_r() << 7) | 0x7f;
 }
 
-WRITE8_MEMBER( decwriter_state::la120_NVR_w )
+void decwriter_state::la120_NVR_w(offs_t offset, uint8_t data)
 {
 	// one wait state inserted
 	if (!machine().side_effects_disabled())
@@ -186,13 +203,13 @@ WRITE8_MEMBER( decwriter_state::la120_NVR_w )
    |\------- ?
    \-------- ?
  */
-READ8_MEMBER( decwriter_state::la120_DC305_r )
+uint8_t decwriter_state::la120_DC305_r(offs_t offset)
 {
 	// one wait state inserted
 	if (!machine().side_effects_disabled())
 		m_maincpu->adjust_icount(-1);
 
-	uint8_t data = 0x00;
+	uint8_t data = m_prtlsi->read(offset);
 	if (DC305_VERBOSE)
 		logerror("DC305 Read from offset %01x, returning %02X\n", offset, data);
 	return data;
@@ -207,12 +224,13 @@ READ8_MEMBER( decwriter_state::la120_DC305_r )
    at least 3 bits control the speaker/buzzer which can be on or off, at least two volume levels, and at least two frequencies, 400hz or 2400hz
    two quadrature lines from the head servomotor connect here to allow the dc305 to determine motor position; one pulses when the motor turns clockwise and one when it turns counterclockwise. the head stop is found when the pulses stop, which firmware uses to find the zero position.
  */
-WRITE8_MEMBER( decwriter_state::la120_DC305_w )
+void decwriter_state::la120_DC305_w(offs_t offset, uint8_t data)
 {
 	// one wait state inserted
 	if (!machine().side_effects_disabled())
 		m_maincpu->adjust_icount(-1);
 
+	m_prtlsi->write(offset, data);
 	if (DC305_VERBOSE)
 		logerror("DC305 Write of %02X to offset %01X\n", data, offset);
 }
@@ -413,7 +431,7 @@ void decwriter_state::la120(machine_config &config)
 	I8080A(config, m_maincpu, XTAL(18'000'000) / 9); // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
 	m_maincpu->set_addrmap(AS_PROGRAM, &decwriter_state::la120_mem);
 	m_maincpu->set_addrmap(AS_IO, &decwriter_state::la120_io);
-	//m_maincpu->set_irq_acknowledge_callback("prtlsi", FUNC(dc305_device::inta_cb));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(decwriter_state::inta_cb));
 
 	/* video hardware */
 	//TODO: no actual screen! has 8 leds above the keyboard (similar to vt100/vk100) and has 4 7segment leds for showing an error code.
@@ -423,10 +441,10 @@ void decwriter_state::la120(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_refresh_hz(30);
 
-	//dc305_device &prtlsi(DC305(config, "prtlsi", XTAL(18'000'000) / 9));
-	//prtlsi.out_rxc_cb().set("usart", FUNC(i8251_device, write_rxc));
-	//prtlsi.out_txc_cb().set("usart", FUNC(i8251_device, write_txc));
-	//prtlsi.out_int_cb().set("mainint", FUNC(input_merger_device::in_w<0>));
+	DC305(config, m_prtlsi, XTAL(18'000'000) / 9);
+	m_prtlsi->rxc_callback().set("usart", FUNC(i8251_device::write_rxc));
+	m_prtlsi->txc_callback().set("usart", FUNC(i8251_device::write_txc));
+	m_prtlsi->int_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
 
 	LS259(config, m_ledlatch); // E2 on keyboard
 	m_ledlatch->q_out_cb<0>().set_output("led1").invert(); // ON LINE
@@ -445,19 +463,17 @@ void decwriter_state::la120(machine_config &config)
 	BEEP(config, m_speaker, 786).add_route(ALL_OUTPUTS, "mono", 0.50); // TODO: LA120 speaker is controlled by asic; VT100 has: 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 
 	/* i8251 */
-	I8251(config, "usart", XTAL(18'000'000) / 9);
-	/*
-	usart.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-	usart.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
-	usart.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	i8251_device &usart(I8251(config, "usart", XTAL(18'000'000) / 9));
+	usart.txd_handler().set("eia", FUNC(rs232_port_device::write_txd));
+	usart.dtr_handler().set("eia", FUNC(rs232_port_device::write_dtr));
+	usart.rts_handler().set("eia", FUNC(rs232_port_device::write_rts));
 	usart.rxrdy_handler().set("mainint", FUNC(input_merger_device::in_w<1>));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, 0);
 
-	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232_port_device &rs232(RS232_PORT(config, "eia", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set("usart", FUNC(i8251_device::write_rxd));
 	rs232.dsr_handler().set("usart", FUNC(i8251_device::write_dsr));
-	*/
 
 	ER1400(config, m_nvm);
 }

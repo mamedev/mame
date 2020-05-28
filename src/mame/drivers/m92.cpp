@@ -283,7 +283,7 @@ WRITE8_MEMBER(m92_state::bankswitch_w)
 		logerror("%05x: bankswitch %04x\n", m_maincpu->pc(), data);
 }
 
-CUSTOM_INPUT_MEMBER(m92_state::m92_sprite_busy_r)
+READ_LINE_MEMBER(m92_state::sprite_busy_r)
 {
 	return m_sprite_buffer_busy;
 }
@@ -399,7 +399,7 @@ void m92_state::sound_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0xa0000, 0xa3fff).ram();
-	map(0xa8000, 0xa803f).rw("irem", FUNC(iremga20_device::irem_ga20_r), FUNC(iremga20_device::irem_ga20_w)).umask16(0x00ff);
+	map(0xa8000, 0xa803f).rw("irem", FUNC(iremga20_device::read), FUNC(iremga20_device::write)).umask16(0x00ff);
 	map(0xa8040, 0xa8043).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0xa8044, 0xa8044).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0xa8046, 0xa8046).w("soundlatch2", FUNC(generic_latch_8_device::write));
@@ -420,7 +420,7 @@ static INPUT_PORTS_START( m92_2player )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, m92_state,m92_sprite_busy_r, nullptr)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(m92_state, sprite_busy_r)
 	/* DIP switch bank 3 */
 	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW3:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW3:2" )
@@ -1791,13 +1791,12 @@ ROM_START( mysticrib )
 	ROM_LOAD( "mr-da.bin", 0x000000, 0x040000, CRC(1a11fc59) SHA1(6d1f4ca688bf015ecbbe369fbc0eb5e2bcaefcfc) )
 ROM_END
 
-
 ROM_START( uccops )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "uc_h0.rom", 0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
-	ROM_LOAD16_BYTE( "uc_l0.rom", 0x000000, 0x040000, CRC(df9a4826) SHA1(298033d97b9587e3548cb3bffa16b7ba9a6ff20d) )
-	ROM_LOAD16_BYTE( "uc_h1.rom", 0x080001, 0x020000, CRC(8d29bcd6) SHA1(470b77d1b8f88824bac294bd12a205a23dad2287) )
-	ROM_LOAD16_BYTE( "uc_l1.rom", 0x080000, 0x020000, CRC(a8a402d8) SHA1(0b40fb69f0a3e24e6b60117d2d2fd4cc170bc621) )
+	ROM_LOAD16_BYTE( "uc_h0.ic28", 0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
+	ROM_LOAD16_BYTE( "uc_l0.ic39", 0x000000, 0x040000, CRC(df9a4826) SHA1(298033d97b9587e3548cb3bffa16b7ba9a6ff20d) )
+	ROM_LOAD16_BYTE( "uc_h1.ic27", 0x080001, 0x020000, CRC(8d29bcd6) SHA1(470b77d1b8f88824bac294bd12a205a23dad2287) )
+	ROM_LOAD16_BYTE( "uc_l1.ic38", 0x080000, 0x020000, CRC(a8a402d8) SHA1(0b40fb69f0a3e24e6b60117d2d2fd4cc170bc621) )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "uc_sh0.rom", 0x00001, 0x10000, CRC(df90b198) SHA1(6b334457f06f6b9cfb355ba3d399bebb37b5733e) )
@@ -1821,10 +1820,10 @@ ROM_END
 
 ROM_START( uccopsu )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "uc_h0.rom",   0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
-	ROM_LOAD16_BYTE( "uc_l0.rom",   0x000000, 0x040000, CRC(df9a4826) SHA1(298033d97b9587e3548cb3bffa16b7ba9a6ff20d) )
-	ROM_LOAD16_BYTE( "uc_h1-g.rom", 0x080001, 0x020000, CRC(6b8ca2de) SHA1(1096b93bbaa4c97d4900e8c083cde99195cad5ba) )
-	ROM_LOAD16_BYTE( "uc_l1-g.rom", 0x080000, 0x020000, CRC(2bdec7dd) SHA1(58817099e74fd5bc299b7bc14d83ee75ed200b53) )
+	ROM_LOAD16_BYTE( "uc_h0.ic28",   0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
+	ROM_LOAD16_BYTE( "uc_l0.ic39",   0x000000, 0x040000, CRC(df9a4826) SHA1(298033d97b9587e3548cb3bffa16b7ba9a6ff20d) )
+	ROM_LOAD16_BYTE( "uc_h1-g.ic27", 0x080001, 0x020000, CRC(6b8ca2de) SHA1(1096b93bbaa4c97d4900e8c083cde99195cad5ba) )
+	ROM_LOAD16_BYTE( "uc_l1-g.ic38", 0x080000, 0x020000, CRC(2bdec7dd) SHA1(58817099e74fd5bc299b7bc14d83ee75ed200b53) )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "uc_sh0.rom", 0x00001, 0x10000, CRC(df90b198) SHA1(6b334457f06f6b9cfb355ba3d399bebb37b5733e) )
@@ -1846,26 +1845,12 @@ ROM_START( uccopsu )
 	ROM_LOAD( "uc_w42.rom", 0x000000, 0x080000, CRC(d17d3fd6) SHA1(b02da0d01c41c7bf50cd35d6c75bacc3e3e0b85a) )
 ROM_END
 
-
-/*
-Undercover Cops Alpha Renewal Version
-Irem, 1992
-
-An alt. version, runs on standard
-M92 main board:  M92-A-B 05C04170B1
-
-ROM board:  M92-E-B 05C04238B1
-Chips used are...
-Nanao 08J27504A1
-Nanao 08J27291A5  @ 14.31818MHz
-*/
-
-ROM_START( uccopsar ) /* Alpha Renewal Version */
+ROM_START( uccopsj )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "uc_h0_a.ic28", 0x000001, 0x040000, CRC(9e17cada) SHA1(086bb9c1ab851cab3734c2f9188d8ff3c5f98913) )
 	ROM_LOAD16_BYTE( "uc_l0_a.ic39", 0x000000, 0x040000, CRC(4a4e3208) SHA1(d61c74d46584e2c15e70f7a17b598e51981da9e8) )
-	ROM_LOAD16_BYTE( "uc_h1.ic27",   0x080001, 0x020000, CRC(79d79742) SHA1(f9c03c4d42b5b3d0f0185462868b04f1bb679f90) )
-	ROM_LOAD16_BYTE( "uc_l1.ic38",   0x080000, 0x020000, CRC(37211581) SHA1(b8fdff96b2c7d5cf2975dcf81c00581ccb595c15) )
+	ROM_LOAD16_BYTE( "uc_h1_a.ic27", 0x080001, 0x020000, CRC(83f78dea) SHA1(6d197c3ea76beac31c3ea6e54a3ffea9d6c0c653) )
+	ROM_LOAD16_BYTE( "uc_l1_a.ic38", 0x080000, 0x020000, CRC(19628280) SHA1(e6c06cb7c37e46a7db3b4f318e836aa5a2390eda) )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "uc_sh0.ic30", 0x00001, 0x10000, CRC(f0ca1b03) SHA1(07154a2c747091f8be23587c109d91ed1672da6e) )
@@ -1887,12 +1872,58 @@ ROM_START( uccopsar ) /* Alpha Renewal Version */
 	ROM_LOAD( "uc_da.bin", 0x000000, 0x080000, CRC(0b2855e9) SHA1(70f9decd78eab679a2ccad69e01cb303b61e0d38) )
 ROM_END
 
-ROM_START( uccopsj )
+/*
+Undercover Cops Alpha Renewal Version
+Irem, 1992
+
+An alt. version, runs on standard
+M92 main board:  M92-A-B 05C04170B1
+
+ROM board:  M92-E-B 05C04238B1
+Chips used are...
+Nanao 08J27504A1
+Nanao 08J27291A5  @ 14.31818MHz
+
+The general consensus surrounding The Alpha Renewal version is: The US / World versions of Undercover Cops were originally released
+unfinished with lots of incomplete elements and different character names.  The Japanese version was much more complete. As a result
+the US / World versions were re-released with all the missing features from the Japanese version under the 'Alpha Renewal' title. So
+basically the subtitle might have been a "playful" reminder "this renews the alpha version to be the final version"  ;-)
+
+*/
+
+ROM_START( uccopsar ) /* Alpha Renewal Version */
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "uc_h0_a.ic28", 0x000001, 0x040000, CRC(9e17cada) SHA1(086bb9c1ab851cab3734c2f9188d8ff3c5f98913) )
-	ROM_LOAD16_BYTE( "uc_l0_a.ic39", 0x000000, 0x040000, CRC(4a4e3208) SHA1(d61c74d46584e2c15e70f7a17b598e51981da9e8) )
-	ROM_LOAD16_BYTE( "uc_h1_a.ic27", 0x080001, 0x020000, CRC(83f78dea) SHA1(6d197c3ea76beac31c3ea6e54a3ffea9d6c0c653) )
-	ROM_LOAD16_BYTE( "uc_l1_a.ic38", 0x080000, 0x020000, CRC(19628280) SHA1(e6c06cb7c37e46a7db3b4f318e836aa5a2390eda) )
+	ROM_LOAD16_BYTE( "uc_h0_a.ic28",  0x000001, 0x040000, CRC(9e17cada) SHA1(086bb9c1ab851cab3734c2f9188d8ff3c5f98913) )
+	ROM_LOAD16_BYTE( "uc_l0_a.ic39",  0x000000, 0x040000, CRC(4a4e3208) SHA1(d61c74d46584e2c15e70f7a17b598e51981da9e8) )
+	ROM_LOAD16_BYTE( "uc_ar_h1.ic27", 0x080001, 0x020000, CRC(79d79742) SHA1(f9c03c4d42b5b3d0f0185462868b04f1bb679f90) )
+	ROM_LOAD16_BYTE( "uc_ar_l1.ic38", 0x080000, 0x020000, CRC(37211581) SHA1(b8fdff96b2c7d5cf2975dcf81c00581ccb595c15) )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE( "uc_sh0.ic30", 0x00001, 0x10000, CRC(f0ca1b03) SHA1(07154a2c747091f8be23587c109d91ed1672da6e) )
+	ROM_LOAD16_BYTE( "uc_sl0.ic31", 0x00000, 0x10000, CRC(d1661723) SHA1(bdc00196aa2074e7b21e5949f73e9f2b93d76fd9) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* Tiles */
+	ROM_LOAD( "uc_c0.ic26", 0x000000, 0x080000, CRC(6a419a36) SHA1(1907d15fcc4a8bf875d19768667ee4de4702cc2a) )
+	ROM_LOAD( "uc_c1.ic25", 0x080000, 0x080000, CRC(d703ecc7) SHA1(9716a8fde668e63cf3060450eb32ea43edf143d8) )
+	ROM_LOAD( "uc_c2.ic24", 0x100000, 0x080000, CRC(96397ac6) SHA1(6dfe507bd9f41b5d46d85ef5f46a368745593b52) )
+	ROM_LOAD( "uc_c3.ic23", 0x180000, 0x080000, CRC(5d07d10d) SHA1(ee1a928b37043c476346f189f75d2bfcc44bffe6) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* Sprites */
+	ROM_LOAD( "uc_030.ic37", 0x000000, 0x100000, CRC(97f7775e) SHA1(5cd147fd940b1ab6eba8e6c6f803bdcc5da5a563) )
+	ROM_LOAD( "uc_020.ic36", 0x100000, 0x100000, CRC(5e0b1d65) SHA1(9e45753d10b2d7b580cd11cef74181209a424189) )
+	ROM_LOAD( "uc_010.ic35", 0x200000, 0x100000, CRC(bdc224b3) SHA1(09477ec39890d954fac6ff653b9f46c9adea56b6) )
+	ROM_LOAD( "uc_000.ic34", 0x300000, 0x100000, CRC(7526daec) SHA1(79431d711deb6ed09dc52be753b7b0f2c5588dc3) )
+
+	ROM_REGION( 0x80000, "irem", 0 )
+	ROM_LOAD( "uc_da.bin", 0x000000, 0x080000, CRC(0b2855e9) SHA1(70f9decd78eab679a2ccad69e01cb303b61e0d38) )
+ROM_END
+
+ROM_START( uccopsaru ) /* Alpha Renewal Version */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "uc_aru_h0.ic28", 0x000001, 0x040000, CRC(e9522dc7) SHA1(23efcd62f02b2d513726d72894774193dd023116) )
+	ROM_LOAD16_BYTE( "uc_aru_l0.ic39", 0x000000, 0x040000, CRC(619b6aee) SHA1(5bcc9fa339df22d760a029d56edb581bc23eb641) )
+	ROM_LOAD16_BYTE( "uc_aru_h1.ic27", 0x080001, 0x020000, CRC(2130d53b) SHA1(7f88dc2a8e7bf7bec53f8e727b0647981c4b2965) )
+	ROM_LOAD16_BYTE( "uc_aru_l1.ic38", 0x080000, 0x020000, CRC(d768b177) SHA1(6147beb65fc4edef3ec9ff4c4e2a481a4370693a) )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "uc_sh0.ic30", 0x00001, 0x10000, CRC(f0ca1b03) SHA1(07154a2c747091f8be23587c109d91ed1672da6e) )
@@ -2245,8 +2276,9 @@ GAME( 1991, thndblst, lethalth, lethalth,      thndblst,  m92_state, empty_init,
 
 GAME( 1992, uccops,   0,        uccops,        uccops,    m92_state, empty_init,    ROT0,   "Irem",         "Undercover Cops (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, uccopsu,  uccops,   uccops,        uccops,    m92_state, empty_init,    ROT0,   "Irem",         "Undercover Cops (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, uccopsar, uccops,   uccops,        uccops,    m92_state, empty_init,    ROT0,   "Irem",         "Undercover Cops - Alpha Renewal Version", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, uccopsj,  uccops,   uccops,        uccops,    m92_state, empty_init,    ROT0,   "Irem",         "Undercover Cops (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, uccopsar, uccops,   uccops,        uccops,    m92_state, empty_init,    ROT0,   "Irem",         "Undercover Cops - Alpha Renewal Version (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, uccopsaru,uccops,   uccops,        uccops,    m92_state, empty_init,    ROT0,   "Irem America", "Undercover Cops - Alpha Renewal Version (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 GAME( 1992, mysticri, 0,        mysticri,      mysticri,  m92_state, empty_init,    ROT0,   "Irem",         "Mystic Riders (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1992, gunhohki, mysticri, mysticri,      mysticri,  m92_state, empty_init,    ROT0,   "Irem",         "Mahou Keibitai Gun Hohki (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

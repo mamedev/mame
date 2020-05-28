@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -21,6 +21,7 @@ namespace bx
 	};
 
 	/// Non-zero-terminated string view.
+	///
 	class StringView
 	{
 	public:
@@ -77,9 +78,16 @@ namespace bx
 		///
 		void clear();
 
+		/// Returns pointer to non-terminated string.
+		///
+		/// @attention Use of this pointer in standard C/C++ functions is not safe. You must use it
+		///   in conjunction with `getTerm()` or getLength()`.
 		///
 		const char* getPtr() const;
 
+		/// Returns pointer past last character in string view.
+		///
+		/// @attention Dereferencing this pointer is not safe.
 		///
 		const char* getTerm() const;
 
@@ -261,7 +269,7 @@ namespace bx
 	StringView findIdentifierMatch(const StringView& _str, const StringView& _word);
 
 	/// Finds any identifier from NULL terminated array of identifiers.
-	StringView findIdentifierMatch(const StringView& _str, const char** _words);
+	StringView findIdentifierMatch(const StringView& _str, const char** _words, int32_t _num = INT32_MAX);
 
 	/// Cross platform implementation of vsnprintf that returns number of
 	/// characters which would have been written to the final string if
@@ -272,6 +280,12 @@ namespace bx
 	/// characters which would have been written to the final string if
 	/// enough space had been available.
 	int32_t snprintf(char* _out, int32_t _max, const char* _format, ...);
+
+	///
+	int32_t vprintf(const char* _format, va_list _argList);
+
+	///
+	int32_t printf(const char* _format, ...);
 
 	/// Templatized snprintf.
 	template <typename Ty>
@@ -320,6 +334,31 @@ namespace bx
 
 	/// Converts string to 32-bit unsigned integer value.
 	bool fromString(uint32_t* _out, const StringView& _str);
+
+	///
+	class LineReader
+	{
+	public:
+		///
+		LineReader(const bx::StringView& _str);
+
+		///
+		void reset();
+
+		///
+		StringView next();
+
+		///
+		bool isDone() const;
+
+		///
+		uint32_t getLine() const;
+
+	private:
+		const bx::StringView m_str;
+		bx::StringView m_curr;
+		uint32_t m_line;
+	};
 
 } // namespace bx
 

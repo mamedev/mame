@@ -45,17 +45,17 @@ enum DEV_STATUS
 
 struct prot_data
 {
-	uint8_t passwd_len;
-	const uint8_t* passwd;
-	const uint8_t* code;
-	uint8_t checksum_ranges[17];
-	uint8_t checksums[4];
+	u8 passwd_len;
+	const u8* passwd;
+	const u8* code;
+	u8 checksum_ranges[17];
+	u8 checksums[4];
 };
 
 
 // deroon prot data
-static const uint8_t deroon_passwd[] = {'L','U','N','A',0};
-static const uint8_t deroon_upload[] = {0x02, 0x4e, 0x75, 0x00 }; // code length, code, 0x00 trailer
+static const u8 deroon_passwd[] = {'L','U','N','A',0};
+static const u8 deroon_upload[] = {0x02, 0x4e, 0x75, 0x00 }; // code length, code, 0x00 trailer
 static const struct prot_data deroon_data =
 {
 	5,
@@ -72,8 +72,8 @@ static const struct prot_data deroon_data =
 };
 
 // tkdensho prot data
-static const uint8_t tkdensho_passwd[] = {'A','G','E','P','R','O','T','E','C','T',' ','S','T','A','R','T',0};
-static const uint8_t tkdensho_upload[] = {0x06, 0x4e, 0xf9, 0x00, 0x00, 0x22, 0xc4,0x00};
+static const u8 tkdensho_passwd[] = {'A','G','E','P','R','O','T','E','C','T',' ','S','T','A','R','T',0};
+static const u8 tkdensho_upload[] = {0x06, 0x4e, 0xf9, 0x00, 0x00, 0x22, 0xc4,0x00};
 static const struct prot_data tkdensho_data =
 {
 	0x11,
@@ -146,7 +146,7 @@ READ16_MEMBER(tecmosys_state::prot_data_r)
 {
 	// prot appears to be read-ready for two consecutive reads
 	// but returns 0xff for subsequent reads.
-	uint8_t ret = m_device_value;
+	u8 ret = m_device_value;
 	m_device_value = 0xff;
 	//logerror("- prot_r = 0x%02x\n", ret );
 	return ret << 8;

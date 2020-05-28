@@ -64,42 +64,42 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE16_MEMBER(fresh_bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(fresh_attr_videoram_w);
+	void fresh_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fresh_attr_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_fresh_bg_tile_info);
-	DECLARE_WRITE16_MEMBER(fresh_bg_2_videoram_w);
-	DECLARE_WRITE16_MEMBER(fresh_attr_2_videoram_w);
+	void fresh_bg_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fresh_attr_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_fresh_bg_2_tile_info);
 
 	uint16_t m_d30000_value;
 
-	DECLARE_WRITE16_MEMBER( d30000_write )
+	void d30000_write(uint16_t data)
 	{
 		m_d30000_value = data;
 	}
 
-	DECLARE_WRITE16_MEMBER( c71000_write )
+	void c71000_write(uint16_t data)
 	{
 		logerror("c74000_write (scroll 0) %04x (m_d30000_value = %04x)\n", data, m_d30000_value);
 	}
-	DECLARE_WRITE16_MEMBER( c74000_write )
+	void c74000_write(uint16_t data)
 	{
 		logerror("c74000_write (scroll 1) %04x (m_d30000_value = %04x)\n", data, m_d30000_value);
 	}
-	DECLARE_WRITE16_MEMBER( c75000_write )
+	void c75000_write(uint16_t data)
 	{
 		logerror("c75000_write (scroll 2) %04x (m_d30000_value = %04x)\n", data, m_d30000_value);
 	}
-	DECLARE_WRITE16_MEMBER( c76000_write )
+	void c76000_write(uint16_t data)
 	{
 		logerror("c76000_write (scroll 3) %04x (m_d30000_value = %04x)\n", data, m_d30000_value);
 	}
 
-	DECLARE_READ16_MEMBER( unk_r )
+	uint16_t unk_r()
 	{
 		return machine().rand();
 	}
-	DECLARE_READ16_MEMBER( unk2_r )
+	uint16_t unk2_r()
 	{
 		return 0x10;
 	}
@@ -116,17 +116,17 @@ TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_tile_info)
 	int tileno, pal;
 	tileno = m_bg_videoram[tile_index];
 	pal = m_attr_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(1, tileno, pal, 0);
+	tileinfo.set(1, tileno, pal, 0);
 }
 
 
-WRITE16_MEMBER(fresh_state::fresh_bg_videoram_w)
+void fresh_state::fresh_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(fresh_state::fresh_attr_videoram_w)
+void fresh_state::fresh_attr_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_attr_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -138,17 +138,17 @@ TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_2_tile_info)
 	int tileno, pal;
 	tileno = m_bg_2_videoram[tile_index];
 	pal = m_attr_2_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, tileno, pal, 0);
+	tileinfo.set(0, tileno, pal, 0);
 }
 
 
-WRITE16_MEMBER(fresh_state::fresh_bg_2_videoram_w)
+void fresh_state::fresh_bg_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_2_videoram[offset]);
 	m_bg_2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(fresh_state::fresh_attr_2_videoram_w)
+void fresh_state::fresh_attr_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_attr_2_videoram[offset]);
 	m_bg_2_tilemap->mark_tile_dirty(offset);
@@ -159,8 +159,8 @@ WRITE16_MEMBER(fresh_state::fresh_attr_2_videoram_w)
 
 void fresh_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fresh_state::get_fresh_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,  64, 512);
-	m_bg_2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fresh_state::get_fresh_bg_2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,  64, 512);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fresh_state::get_fresh_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,  64, 512);
+	m_bg_2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fresh_state::get_fresh_bg_2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,  64, 512);
 
 	m_bg_tilemap->set_transparent_pen(255);
 }
@@ -183,19 +183,18 @@ void fresh_state::fresh_map(address_map &map)
 	map(0xc20000, 0xc2ffff).ram().w(FUNC(fresh_state::fresh_bg_videoram_w)).share("bg_videoram");
 	map(0xc30000, 0xc3ffff).ram().w(FUNC(fresh_state::fresh_attr_videoram_w)).share("attr_videoram");
 
-//  AM_RANGE(0xc70000, 0xc70001) AM_RAM
-//  AM_RANGE(0xc70002, 0xc70003) AM_RAM
+//  map(0xc70000, 0xc70001).ram();
+//  map(0xc70002, 0xc70003).ram();
 	map(0xc71000, 0xc71001).w(FUNC(fresh_state::c71000_write));
-//  AM_RANGE(0xc72000, 0xc72001) AM_RAM
-//  AM_RANGE(0xc72002, 0xc72003) AM_RAM
-//  AM_RANGE(0xc73000, 0xc73001) AM_RAM
-//  AM_RANGE(0xc73002, 0xc73003) AM_RAM
+//  map(0xc72000, 0xc72001).ram();
+//  map(0xc72002, 0xc72003).ram();
+//  map(0xc73000, 0xc73001).ram();
+//  map(0xc73002, 0xc73003).ram();
 	map(0xc74000, 0xc74001).w(FUNC(fresh_state::c74000_write));
 	map(0xc75000, 0xc75001).w(FUNC(fresh_state::c75000_write));
 	map(0xc76000, 0xc76001).w(FUNC(fresh_state::c76000_write));
-//  AM_RANGE(0xc77000, 0xc77001) AM_RAM
-//  AM_RANGE(0xc77002, 0xc77003) AM_RAM
-
+//  map(0xc77000, 0xc77001).ram();
+//  map(0xc77002, 0xc77003).ram();
 
 	// written together
 	map(0xc40000, 0xc417ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -205,12 +204,12 @@ void fresh_state::fresh_map(address_map &map)
 	map(0xd10001, 0xd10001).w("ymsnd", FUNC(ym2413_device::data_port_w));
 
 	map(0xd30000, 0xd30001).w(FUNC(fresh_state::d30000_write));
-	map(0xd40000, 0xd40001).portr("IN0"); //AM_WRITENOP // checks for 0x10
-//  AM_RANGE(0xd40002, 0xd40003) AM_WRITENOP
+	map(0xd40000, 0xd40001).portr("IN0"); //.nopw(); // checks for 0x10
+//  map(0xd40002, 0xd40003).nopw();
 	map(0xd70000, 0xd70001).portr("IN1"); // checks for 0x10, dead loop if fail
 
-	map(0xe00000, 0xe00001).portr("DSW0"); //AM_WRITENOP
-	map(0xe20000, 0xe20001).portr("DSW1"); //AM_WRITENOP
+	map(0xe00000, 0xe00001).portr("DSW0"); //.nopw();
+	map(0xe20000, 0xe20001).portr("DSW1"); //.nopw();
 	map(0xe40000, 0xe40001).portr("DSW2");
 	map(0xe60000, 0xe60001).portr("DSW3");
 	map(0xe80000, 0xe80001).portr("IN6");

@@ -2,8 +2,8 @@
 // copyright-holders:Angelo Salese, Tomasz Slanina
 /******************************************************************
  NEC V810 (upd70732) core
-  Tomasz Slanina - analog[at]op.pl
-  Angelo Salese - lordkale[at]libero.it
+  Tomasz Slanina
+  Angelo Salese
 
  Change Log
  - 23/08/2012 - Implemented remaining BSU opcodes (Angelo Salese)
@@ -126,26 +126,26 @@ std::unique_ptr<util::disasm_interface> v810_device::create_disassembler()
 #define SET_EP(val)             (PSW = (PSW & ~0x00004000) | ((val) << 14))
 #define SET_NP(val)             (PSW = (PSW & ~0x00008000) | ((val) << 15))
 
-#define R_B(addr) (m_program->read_byte(addr))
-#define R_H(addr) (m_program->read_word(addr))
-#define R_W(addr) (m_program->read_dword(addr))
+#define R_B(addr) (m_program.read_byte(addr))
+#define R_H(addr) (m_program.read_word(addr))
+#define R_W(addr) (m_program.read_dword(addr))
 
 
-#define W_B(addr, val) (m_program->write_byte(addr,val))
-#define W_H(addr, val) (m_program->write_word(addr,val))
-#define W_W(addr, val) (m_program->write_dword(addr,val))
+#define W_B(addr, val) (m_program.write_byte(addr,val))
+#define W_H(addr, val) (m_program.write_word(addr,val))
+#define W_W(addr, val) (m_program.write_dword(addr,val))
 
 
-#define RIO_B(addr) (m_io->read_byte(addr))
-#define RIO_H(addr) (m_io->read_word(addr))
-#define RIO_W(addr) (m_io->read_dword(addr))
+#define RIO_B(addr) (m_io.read_byte(addr))
+#define RIO_H(addr) (m_io.read_word(addr))
+#define RIO_W(addr) (m_io.read_dword(addr))
 
 
-#define WIO_B(addr, val) (m_io->write_byte(addr,val))
-#define WIO_H(addr, val) (m_io->write_word(addr,val))
-#define WIO_W(addr, val) (m_io->write_dword(addr,val))
+#define WIO_B(addr, val) (m_io.write_byte(addr,val))
+#define WIO_H(addr, val) (m_io.write_word(addr,val))
+#define WIO_W(addr, val) (m_io.write_dword(addr,val))
 
-#define R_OP(addr)  (m_cache->read_word(addr))
+#define R_OP(addr)  (m_cache.read_word(addr))
 
 #define GET1 (op&0x1f)
 #define GET2 ((op>>5)&0x1f)
@@ -1255,9 +1255,9 @@ const v810_device::opcode_func v810_device::s_OpCodeTable[64] =
 
 void v810_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(has_space(AS_IO) ? AS_IO : AS_PROGRAM).specific(m_io);
 
 	m_irq_line = 0;
 	m_irq_state = CLEAR_LINE;

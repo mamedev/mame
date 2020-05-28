@@ -64,7 +64,7 @@ void ad1848_device::device_reset()
 	m_irq = false;
 }
 
-READ8_MEMBER(ad1848_device::read)
+uint8_t ad1848_device::read(offs_t offset)
 {
 	switch(offset)
 	{
@@ -80,7 +80,7 @@ READ8_MEMBER(ad1848_device::read)
 	return 0;
 }
 
-WRITE8_MEMBER(ad1848_device::write)
+void ad1848_device::write(offs_t offset, uint8_t data)
 {
 	static constexpr int div_factor[] = {3072, 1536, 896, 768, 448, 384, 512, 2560};
 	switch(offset)
@@ -127,13 +127,13 @@ WRITE8_MEMBER(ad1848_device::write)
 	}
 }
 
-READ8_MEMBER(ad1848_device::dack_r)
+uint8_t ad1848_device::dack_r()
 {
 	m_drq_cb(CLEAR_LINE);
 	return 0; // not implemented
 }
 
-WRITE8_MEMBER(ad1848_device::dack_w)
+void ad1848_device::dack_w(uint8_t data)
 {
 	if(!m_play)
 		return;

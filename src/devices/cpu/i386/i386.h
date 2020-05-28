@@ -12,7 +12,6 @@
 #include "softfloat/softfloat.h"
 #endif
 
-#include "debug/debugcpu.h"
 #include "divtlb.h"
 
 #include "i386dasm.h"
@@ -36,11 +35,11 @@ public:
 	auto smiact() { return m_smiact.bind(); }
 	auto ferr() { return m_ferr_handler.bind(); }
 
-	uint64_t debug_segbase(symbol_table &table, int params, const uint64_t *param);
-	uint64_t debug_seglimit(symbol_table &table, int params, const uint64_t *param);
-	uint64_t debug_segofftovirt(symbol_table &table, int params, const uint64_t *param);
-	uint64_t debug_virttophys(symbol_table &table, int params, const uint64_t *param);
-	uint64_t debug_cacheflush(symbol_table &table, int params, const uint64_t *param);
+	uint64_t debug_segbase(int params, const uint64_t *param);
+	uint64_t debug_seglimit(int params, const uint64_t *param);
+	uint64_t debug_segofftovirt(int params, const uint64_t *param);
+	uint64_t debug_virttophys(int params, const uint64_t *param);
+	uint64_t debug_cacheflush(int params, const uint64_t *param);
 
 protected:
 	i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width);
@@ -51,10 +50,10 @@ protected:
 	virtual void device_debug_setup() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 40; }
-	virtual uint32_t execute_input_lines() const override { return 32; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 32; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -90,9 +89,9 @@ protected:
 	virtual void cache_clean() {}
 
 	// routine to access memory
-	virtual u8 mem_pr8(offs_t address) { return macache32->read_byte(address); }
-	virtual u16 mem_pr16(offs_t address) { return macache32->read_word(address); }
-	virtual u32 mem_pr32(offs_t address) { return macache32->read_dword(address); }
+	virtual u8 mem_pr8(offs_t address) { return macache32.read_byte(address); }
+	virtual u16 mem_pr16(offs_t address) { return macache32.read_word(address); }
+	virtual u32 mem_pr32(offs_t address) { return macache32.read_dword(address); }
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -308,8 +307,8 @@ protected:
 	address_space *m_program;
 	address_space *m_io;
 	uint32_t m_a20_mask;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *macache16;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *macache32;
+	memory_access<32, 1, 0, ENDIANNESS_LITTLE>::cache macache16;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache macache32;
 
 	int m_cpuid_max_input_value_eax; // Highest CPUID standard function available
 	uint32_t m_cpuid_id0, m_cpuid_id1, m_cpuid_id2;
@@ -324,8 +323,10 @@ protected:
 	uint16_t m_x87_cw;
 	uint16_t m_x87_sw;
 	uint16_t m_x87_tw;
-	uint64_t m_x87_data_ptr;
-	uint64_t m_x87_inst_ptr;
+	uint16_t m_x87_ds;
+	uint32_t m_x87_data_ptr;
+	uint16_t m_x87_cs;
+	uint32_t m_x87_inst_ptr;
 	uint16_t m_x87_opcode;
 
 	i386_modrm_func m_opcode_table_x87_d8[256];
@@ -466,6 +467,7 @@ protected:
 	void modrm_to_EA(uint8_t mod_rm, uint32_t* out_ea, uint8_t* out_segment);
 	uint32_t GetNonTranslatedEA(uint8_t modrm,uint8_t *seg);
 	uint32_t GetEA(uint8_t modrm, int rwn);
+	uint32_t Getx87EA(uint8_t modrm, int rwn);
 	void i386_check_sreg_validity(int reg);
 	int i386_limit_check(int seg, uint32_t offset);
 	void i386_sreg_load(uint16_t selector, uint8_t reg, bool *fault);
@@ -638,6 +640,7 @@ protected:
 	void i386_aam();
 	void i386_clts();
 	void i386_wait();
+	void i486_wait();
 	void i386_lock();
 	void i386_mov_r32_tr();
 	void i386_mov_tr_r32();
@@ -1353,7 +1356,8 @@ protected:
 	inline void x87_set_stack_overflow();
 	int x87_inc_stack();
 	int x87_dec_stack();
-	int x87_check_exceptions();
+	int x87_check_exceptions(bool store = false);
+	int x87_mf_fault();
 	inline void x87_write_cw(uint16_t cw);
 	void x87_reset();
 	floatx80 x87_add(floatx80 a, floatx80 b);
@@ -1479,8 +1483,6 @@ protected:
 	void x87_fincstp(uint8_t modrm);
 	void x87_fclex(uint8_t modrm);
 	void x87_ffree(uint8_t modrm);
-	void x87_fdisi(uint8_t modrm);
-	void x87_feni(uint8_t modrm);
 	void x87_finit(uint8_t modrm);
 	void x87_fldcw(uint8_t modrm);
 	void x87_fstcw(uint8_t modrm);
@@ -1526,9 +1528,9 @@ public:
 	i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual u8 mem_pr8(offs_t address) override { return macache16->read_byte(address); };
-	virtual u16 mem_pr16(offs_t address) override { return macache16->read_word(address); };
-	virtual u32 mem_pr32(offs_t address) override { return macache16->read_dword(address); };
+	virtual u8 mem_pr8(offs_t address) override { return macache16.read_byte(address); };
+	virtual u16 mem_pr16(offs_t address) override { return macache16.read_word(address); };
+	virtual u32 mem_pr32(offs_t address) override { return macache16.read_dword(address); };
 
 	virtual uint16_t READ16PL(uint32_t ea, uint8_t privilege) override;
 	virtual uint32_t READ32PL(uint32_t ea, uint8_t privilege) override;
@@ -1575,7 +1577,7 @@ public:
 protected:
 	pentium_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI || inputnum == INPUT_LINE_SMI; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI || inputnum == INPUT_LINE_SMI; }
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
 	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;

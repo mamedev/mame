@@ -125,10 +125,10 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	DECLARE_READ16_MEMBER(input_r);
+	u16 input_r();
 	void cfrogger(machine_config &config);
 };
 
@@ -141,7 +141,7 @@ void cfrogger_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(cfrogger_state::plate_w)
+void cfrogger_state::plate_w(offs_t offset, u8 data)
 {
 	// F0,F1: input mux
 	if (offset == MELPS4_PORTF)
@@ -154,7 +154,7 @@ WRITE8_MEMBER(cfrogger_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(cfrogger_state::grid_w)
+void cfrogger_state::grid_w(u16 data)
 {
 	// D0-D11: vfd grid
 	m_grid = data;
@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER(cfrogger_state::speaker_w)
 	m_speaker->level_w(state);
 }
 
-READ16_MEMBER(cfrogger_state::input_r)
+u16 cfrogger_state::input_r()
 {
 	// K0,K1: multiplexed inputs
 	// K2: N/C
@@ -250,10 +250,10 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	DECLARE_READ16_MEMBER(input_r);
+	u16 input_r();
 	void gjungler(machine_config &config);
 };
 
@@ -266,7 +266,7 @@ void gjungler_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(gjungler_state::plate_w)
+void gjungler_state::plate_w(offs_t offset, u8 data)
 {
 	// G0,G1: input mux
 	if (offset == MELPS4_PORTG)
@@ -279,7 +279,7 @@ WRITE8_MEMBER(gjungler_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(gjungler_state::grid_w)
+void gjungler_state::grid_w(u16 data)
 {
 	// D0-D11: vfd grid
 	m_grid = data;
@@ -292,7 +292,7 @@ WRITE_LINE_MEMBER(gjungler_state::speaker_w)
 	m_speaker->level_w(state);
 }
 
-READ16_MEMBER(gjungler_state::input_r)
+u16 gjungler_state::input_r()
 {
 	// K0,K1: multiplexed inputs
 	// K2,K3: fixed inputs

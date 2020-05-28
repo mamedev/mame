@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(atarig1_state::get_alpha_tile_info)
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 	int opaque = data & 0x8000;
-	SET_TILE_INFO_MEMBER(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	tileinfo.set(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(atarig1_state::get_playfield_tile_info)
 	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = (m_playfield_tile_bank << 12) | (data & 0xfff);
 	int color = (data >> 12) & 7;
-	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
+	tileinfo.set(0, code, color, (data >> 15) & 1);
 }
 
 
@@ -67,9 +67,9 @@ VIDEO_START_MEMBER(atarig1_state,atarig1)
  *
  *************************************/
 
-void atarig1_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(atarig1_state::scanline_update)
 {
-	int i;
+	int scanline = param;
 
 	//if (scanline == 0) logerror("-------\n");
 
@@ -77,10 +77,10 @@ void atarig1_state::scanline_update(screen_device &screen, int scanline)
 	int offset = (scanline / 8) * 64 + 48;
 	if (offset >= 0x800)
 		return;
-	screen.update_partial(std::max(scanline - 1, 0));
+	m_screen->update_partial(std::max(scanline - 1, 0));
 
 	/* update the playfield scrolls */
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		uint16_t word;
 
@@ -91,7 +91,7 @@ void atarig1_state::scanline_update(screen_device &screen, int scanline)
 			int newscroll = ((word >> 6) + m_pfscroll_xoffset) & 0x1ff;
 			if (newscroll != m_playfield_xscroll)
 			{
-				screen.update_partial(std::max(scanline + i - 1, 0));
+				m_screen->update_partial(std::max(scanline + i - 1, 0));
 				m_playfield_tilemap->set_scrollx(0, newscroll);
 				m_playfield_xscroll = newscroll;
 			}
@@ -105,13 +105,13 @@ void atarig1_state::scanline_update(screen_device &screen, int scanline)
 			int newbank = word & 7;
 			if (newscroll != m_playfield_yscroll)
 			{
-				screen.update_partial(std::max(scanline + i - 1, 0));
+				m_screen->update_partial(std::max(scanline + i - 1, 0));
 				m_playfield_tilemap->set_scrolly(0, newscroll);
 				m_playfield_yscroll = newscroll;
 			}
 			if (newbank != m_playfield_tile_bank)
 			{
-				screen.update_partial(std::max(scanline + i - 1, 0));
+				m_screen->update_partial(std::max(scanline + i - 1, 0));
 				m_playfield_tilemap->mark_all_dirty();
 				m_playfield_tile_bank = newbank;
 			}

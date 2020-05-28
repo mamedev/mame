@@ -31,15 +31,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 
 private:
-	DECLARE_READ8_MEMBER(sensors1_r);
-	DECLARE_READ8_MEMBER(sensors2_r);
-	DECLARE_WRITE8_MEMBER(lamp_w);
-	DECLARE_WRITE8_MEMBER(coin_w);
+	uint8_t sensors1_r();
+	uint8_t sensors2_r();
+	void lamp_w(uint8_t data);
+	void coin_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(vram_fg_w);
 	DECLARE_WRITE8_MEMBER(vram_bg_w);
-	DECLARE_WRITE8_MEMBER(scroll_x_w);
-	DECLARE_WRITE8_MEMBER(scroll_y_w);
-	DECLARE_WRITE8_MEMBER(gfxbank_w);
+	void scroll_x_w(uint8_t data);
+	void scroll_y_w(uint8_t data);
+	void gfxbank_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 

@@ -53,6 +53,7 @@ private:
 
 	int m_video_control;
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	u16 mix_callback(u16 p, u16 p2);
 
 	DECLARE_READ16_MEMBER(sshangha_protection_region_8_146_r);
 	DECLARE_WRITE16_MEMBER(sshangha_protection_region_8_146_w);
@@ -60,9 +61,6 @@ private:
 	DECLARE_WRITE16_MEMBER(sshangha_protection_region_d_146_w);
 	DECLARE_READ16_MEMBER(deco_71_r);
 	DECLARE_READ16_MEMBER(sshanghab_protection16_r);
-
-	DECLARE_READ16_MEMBER(palette_r);
-	DECLARE_WRITE16_MEMBER(palette_w);
 
 	DECLARE_READ8_MEMBER(sound_shared_r);
 	DECLARE_WRITE8_MEMBER(sound_shared_w);

@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(pturn_state::get_tile_info)
 
 	tileno=tile_lookup[tileno>>4]|(tileno&0xf)|(m_fgbank<<8);
 
-	SET_TILE_INFO_MEMBER(0,tileno,m_fgpalette,0);
+	tileinfo.set(0,tileno,m_fgpalette,0);
 }
 
 
@@ -184,14 +184,14 @@ TILE_GET_INFO_MEMBER(pturn_state::get_bg_tile_info)
 	{
 		palno=25;
 	}
-	SET_TILE_INFO_MEMBER(1,tileno+m_bgbank*256,palno,0);
+	tileinfo.set(1,tileno+m_bgbank*256,palno,0);
 }
 
 void pturn_state::video_start()
 {
-	m_fgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pturn_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,32,32);
+	m_fgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pturn_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fgmap->set_transparent_pen(0);
-	m_bgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pturn_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,32,32*8);
+	m_bgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pturn_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32*8);
 	m_bgmap->set_transparent_pen(0);
 
 	save_item(NAME(m_bgbank));
@@ -451,23 +451,25 @@ static INPUT_PORTS_START( pturn )
 	PORT_BIT( 0xc8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )           PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x02, "7" )
 	PORT_DIPSETTING(    0x03, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Bonus_Life ) )      PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x0c, "100000" )
 	PORT_DIPSETTING(    0x08, "50000" )
 	PORT_DIPSETTING(    0x04, "20000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPUNUSED_DIPLOC(0x10, IP_ACTIVE_HIGH, "SW1:!5")   // marked as "NOT USED" in doc
+	PORT_DIPUNUSED_DIPLOC(0x20, IP_ACTIVE_HIGH, "SW1:!6")   // marked as "NOT USED" in doc
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )         PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0xb0, IP_ACTIVE_HIGH, IPT_UNUSED ) /* marked as "NOT USED" in doc */
+	PORT_DIPUNUSED_DIPLOC(0x80, IP_ACTIVE_HIGH, "SW1:!8")  // marked as "NOT USED" in doc
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )          PORT_DIPLOCATION("SW2:!1,!2,!3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
@@ -476,7 +478,7 @@ static INPUT_PORTS_START( pturn )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_B ) )          PORT_DIPLOCATION("SW2:!4,!5,!6")
 	PORT_DIPSETTING(    0x38, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
@@ -485,10 +487,10 @@ static INPUT_PORTS_START( pturn )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x40, 0x00, "Freeze" )
+	PORT_DIPNAME( 0x40, 0x00, "Freeze" )                   PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x00, "Normal Display" )
 	PORT_DIPSETTING(    0x40, "Stop Motion" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) ) /* marked as "NOT USED" in doc */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )        PORT_DIPLOCATION("SW2:!8")  // marked as "NOT USED" in doc
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 INPUT_PORTS_END

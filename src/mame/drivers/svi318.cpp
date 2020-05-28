@@ -545,7 +545,7 @@ void svi3x8_state::svi318(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("svi318_cass");
 
 	// cartridge slot
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "svi318_cart", "bin,rom").set_device_load(FUNC(svi3x8_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "svi318_cart", "bin,rom").set_device_load(FUNC(svi3x8_state::cart_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("svi318_cart");
 
 	// expander bus

@@ -21,14 +21,14 @@ DEFINE_DEVICE_TYPE(BBC_CV1797, bbc_cv1797_device,  "bbc_cv1797", "Computer Villa
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( cv1797 )
+//  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( bbc_cv1797_device::floppy_formats )
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_FSD_FORMAT
-FLOPPY_FORMATS_END0
+FLOPPY_FORMATS_END
 
 static void bbc_floppies_525(device_slot_interface &device)
 {
@@ -38,6 +38,10 @@ static void bbc_floppies_525(device_slot_interface &device)
 	device.option_add("525dd",   FLOPPY_525_DD);
 	device.option_add("525qd",   FLOPPY_525_QD);
 }
+
+//-------------------------------------------------
+//  ROM( cv1797 )
+//-------------------------------------------------
 
 ROM_START( cv1797 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
@@ -143,7 +147,7 @@ void bbc_cv1797_device::write(offs_t offset, uint8_t data)
 		m_fdc->dden_w(!BIT(data, 2));
 
 		// bit 6: reset
-		//if (BIT(data, 6)) m_fdc->soft_reset();
+		//m_fdc->mr_w(!BIT(data, 6));
 	}
 }
 

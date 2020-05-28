@@ -256,7 +256,7 @@ INPUT_PORTS_END
 void techno_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff2, 0xfffff3).lr16("timer irq", [this]() -> u16 { return m_vector; });
+	map(0xfffff2, 0xfffff3).lr16(NAME([this] () -> u16 { return m_vector; }));
 }
 
 void techno_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

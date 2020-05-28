@@ -21,7 +21,7 @@ class device_uts_keyboard_interface;
 
 // ======================> uts_keyboard_port_device
 
-class uts_keyboard_port_device : public device_t, public device_slot_interface
+class uts_keyboard_port_device : public device_t, public device_single_card_slot_interface<device_uts_keyboard_interface>
 {
 	friend class device_uts_keyboard_interface;
 
@@ -63,7 +63,7 @@ private:
 
 // ======================> device_uts_keyboard_interface
 
-class device_uts_keyboard_interface : public device_slot_card_interface
+class device_uts_keyboard_interface : public device_interface
 {
 	friend class uts_keyboard_port_device;
 

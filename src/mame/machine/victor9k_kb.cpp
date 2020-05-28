@@ -598,7 +598,7 @@ WRITE_LINE_MEMBER( victor_9000_keyboard_device::kback_w )
 //  kb_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( victor_9000_keyboard_device::kb_p1_r )
+uint8_t victor_9000_keyboard_device::kb_p1_r()
 {
 	uint8_t data = 0xff;
 
@@ -620,7 +620,7 @@ READ8_MEMBER( victor_9000_keyboard_device::kb_p1_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( victor_9000_keyboard_device::kb_p1_w )
+void victor_9000_keyboard_device::kb_p1_w(uint8_t data)
 {
 	m_p1 = data;
 }
@@ -630,7 +630,7 @@ WRITE8_MEMBER( victor_9000_keyboard_device::kb_p1_w )
 //  kb_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( victor_9000_keyboard_device::kb_p2_w )
+void victor_9000_keyboard_device::kb_p2_w(uint8_t data)
 {
 	/*
 

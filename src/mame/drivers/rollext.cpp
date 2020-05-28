@@ -554,7 +554,7 @@ void rollext_state::rollext(machine_config &config)
 	tms32082_pp_device &pp0(TMS32082_PP(config, "pp0", 60000000));
 	pp0.set_addrmap(AS_PROGRAM, &rollext_state::memmap);
 
-	config.m_minimum_quantum = attotime::from_hz(100);
+	config.set_maximum_quantum(attotime::from_hz(100));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -572,7 +572,7 @@ INTERRUPT_GEN_MEMBER(rollext_state::vblank_interrupt)
 
 void rollext_state::init_rollext()
 {
-	m_maincpu->set_command_callback(write32_delegate(FUNC(rollext_state::cmd_callback),this));
+	m_maincpu->set_command_callback(*this, FUNC(rollext_state::cmd_callback));
 }
 
 

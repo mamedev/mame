@@ -542,7 +542,7 @@ void jr200_state::machine_reset()
 void jr200_state::jr200(machine_config &config)
 {
 	/* basic machine hardware */
-	M6802(config, m_maincpu, XTAL(14'318'181) / 4); /* MN1800A, ? MHz assumption that it is same as JR-100*/
+	M6808(config, m_maincpu, XTAL(14'318'181) / 4); /* MN1800A, ? MHz assumption that it is same as JR-100*/
 	m_maincpu->set_addrmap(AS_PROGRAM, &jr200_state::jr200_mem);
 
 //  MN1544(config, "mn1544", ?);

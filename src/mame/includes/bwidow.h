@@ -31,7 +31,8 @@ public:
 	void bwidow_audio(machine_config &config);
 	void gravitar_audio(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	DECLARE_READ_LINE_MEMBER(clock_r);
+
 protected:
 	DECLARE_READ8_MEMBER(spacduel_IN3_r);
 	DECLARE_READ8_MEMBER(bwidowp_in_r);
@@ -40,7 +41,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_READ8_MEMBER(earom_read);
 	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
+	void earom_control_w(uint8_t data);
 
 	void bwidow_map(address_map &map);
 	void bwidowp_map(address_map &map);

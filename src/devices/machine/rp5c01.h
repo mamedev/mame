@@ -43,10 +43,10 @@ public:
 	auto out_alarm_callback() { return m_out_alarm_cb.bind(); }
 	void remove_battery() { m_battery_backed = false; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ_LINE_MEMBER( alarm_r ) { return m_alarm; }
-	DECLARE_WRITE_LINE_MEMBER( adj_w ) { if (state) adjust_seconds(); }
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	int alarm_r() { return m_alarm; }
+	void adj_w(int state) { if (state) adjust_seconds(); }
 
 protected:
 	// construction/destruction

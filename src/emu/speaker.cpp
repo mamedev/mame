@@ -79,8 +79,8 @@ void speaker_device::mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, 
 		samples_this_update = numsamples;
 
 		// reset the mixing streams
-		memset(leftmix, 0, samples_this_update * sizeof(*leftmix));
-		memset(rightmix, 0, samples_this_update * sizeof(*rightmix));
+		std::fill_n(leftmix, samples_this_update, 0);
+		std::fill_n(rightmix, samples_this_update, 0);
 	}
 	assert(samples_this_update == numsamples);
 

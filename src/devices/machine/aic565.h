@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #ifndef MAME_MACHINE_AIC565_H
-#define MAME_MACHINE_AIC565_H 1
+#define MAME_MACHINE_AIC565_H
 
 #pragma once
 

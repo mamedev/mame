@@ -5,7 +5,7 @@
 MMD-2 driver by Miodrag Milanovic
 
 2009-05-12 Initial version
-2011-01-12 MMD2 working {Robbbert]
+2011-01-12 MMD2 working [Robbbert]
 
 
 http://www.cs.unc.edu/~yakowenk/classiccmp/mmd2/
@@ -106,9 +106,15 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
+		, m_banks(*this, "bank%u", 1U)
 		, m_io_keyboard(*this, "X%u", 0)
+		, m_io_dsw(*this, "DSW")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+		, m_p(*this, "p%u_%u", 0U, 0U)
+		, m_led_halt(*this, "led_halt")
+		, m_led_hold(*this, "led_hold")
+		, m_led_inte(*this, "led_inte")
+	{ }
 
 	void mmd2(machine_config &config);
 
@@ -116,68 +122,76 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_WRITE8_MEMBER(port01_w);
-	DECLARE_WRITE8_MEMBER(port02_w);
-	DECLARE_WRITE8_MEMBER(port05_w);
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_READ8_MEMBER(port13_r);
+	void port00_w(uint8_t data);
+	void port01_w(uint8_t data);
+	void port02_w(uint8_t data);
+	void port05_w(uint8_t data);
+	uint8_t port01_r();
+	uint8_t port13_r();
 	DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(scanlines_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(status_callback);
+	uint8_t keyboard_r();
+	void scanlines_w(uint8_t data);
+	void digit_w(uint8_t data);
+	void status_callback(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(inte_callback);
-	DECLARE_READ_LINE_MEMBER(si);
-	DECLARE_WRITE_LINE_MEMBER(so);
+
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	virtual void machine_reset() override;
 	void reset_banks();
+
 	uint8_t m_digit;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
+	required_memory_bank_array<8> m_banks;
 	required_ioport_array<4> m_io_keyboard;
+	required_ioport m_io_dsw;
 	output_finder<9> m_digits;
+	output_finder<3, 8> m_p;
+	output_finder<> m_led_halt;
+	output_finder<> m_led_hold;
+	output_finder<> m_led_inte;
 };
 
 
-WRITE8_MEMBER( mmd2_state::port00_w )
+void mmd2_state::port00_w(uint8_t data)
 {
-	output().set_value("p0_7", BIT(data,7) ? 0 : 1);
-	output().set_value("p0_6", BIT(data,6) ? 0 : 1);
-	output().set_value("p0_5", BIT(data,5) ? 0 : 1);
-	output().set_value("p0_4", BIT(data,4) ? 0 : 1);
-	output().set_value("p0_3", BIT(data,3) ? 0 : 1);
-	output().set_value("p0_2", BIT(data,2) ? 0 : 1);
-	output().set_value("p0_1", BIT(data,1) ? 0 : 1);
-	output().set_value("p0_0", BIT(data,0) ? 0 : 1);
+	m_p[0][7] = BIT(data,7) ? 0 : 1;
+	m_p[0][6] = BIT(data,6) ? 0 : 1;
+	m_p[0][5] = BIT(data,5) ? 0 : 1;
+	m_p[0][4] = BIT(data,4) ? 0 : 1;
+	m_p[0][3] = BIT(data,3) ? 0 : 1;
+	m_p[0][2] = BIT(data,2) ? 0 : 1;
+	m_p[0][1] = BIT(data,1) ? 0 : 1;
+	m_p[0][0] = BIT(data,0) ? 0 : 1;
 }
 
-WRITE8_MEMBER( mmd2_state::port01_w )
+void mmd2_state::port01_w(uint8_t data)
 {
-	output().set_value("p1_7", BIT(data,7) ? 0 : 1);
-	output().set_value("p1_6", BIT(data,6) ? 0 : 1);
-	output().set_value("p1_5", BIT(data,5) ? 0 : 1);
-	output().set_value("p1_4", BIT(data,4) ? 0 : 1);
-	output().set_value("p1_3", BIT(data,3) ? 0 : 1);
-	output().set_value("p1_2", BIT(data,2) ? 0 : 1);
-	output().set_value("p1_1", BIT(data,1) ? 0 : 1);
-	output().set_value("p1_0", BIT(data,0) ? 0 : 1);
+	m_p[1][7] = BIT(data,7) ? 0 : 1;
+	m_p[1][6] = BIT(data,6) ? 0 : 1;
+	m_p[1][5] = BIT(data,5) ? 0 : 1;
+	m_p[1][4] = BIT(data,4) ? 0 : 1;
+	m_p[1][3] = BIT(data,3) ? 0 : 1;
+	m_p[1][2] = BIT(data,2) ? 0 : 1;
+	m_p[1][1] = BIT(data,1) ? 0 : 1;
+	m_p[1][0] = BIT(data,0) ? 0 : 1;
 }
 
-WRITE8_MEMBER( mmd2_state::port02_w )
+void mmd2_state::port02_w(uint8_t data)
 {
-	output().set_value("p2_7", BIT(data,7) ? 0 : 1);
-	output().set_value("p2_6", BIT(data,6) ? 0 : 1);
-	output().set_value("p2_5", BIT(data,5) ? 0 : 1);
-	output().set_value("p2_4", BIT(data,4) ? 0 : 1);
-	output().set_value("p2_3", BIT(data,3) ? 0 : 1);
-	output().set_value("p2_2", BIT(data,2) ? 0 : 1);
-	output().set_value("p2_1", BIT(data,1) ? 0 : 1);
-	output().set_value("p2_0", BIT(data,0) ? 0 : 1);
+	m_p[2][7] = BIT(data,7) ? 0 : 1;
+	m_p[2][6] = BIT(data,6) ? 0 : 1;
+	m_p[2][5] = BIT(data,5) ? 0 : 1;
+	m_p[2][4] = BIT(data,4) ? 0 : 1;
+	m_p[2][3] = BIT(data,3) ? 0 : 1;
+	m_p[2][2] = BIT(data,2) ? 0 : 1;
+	m_p[2][1] = BIT(data,1) ? 0 : 1;
+	m_p[2][0] = BIT(data,0) ? 0 : 1;
 }
 
 void mmd2_state::mem_map(address_map &map)
@@ -276,66 +290,69 @@ C  D  E  F      MEM  REGS  AUX  CANCEL
 
 READ8_MEMBER( mmd2_state::bank_r )
 {
-	membank("bank1")->set_entry(offset);
-	membank("bank2")->set_entry(offset);
-	membank("bank3")->set_entry(offset);
-	membank("bank4")->set_entry(offset);
-	membank("bank5")->set_entry(offset);
-	membank("bank6")->set_entry(offset);
-	membank("bank7")->set_entry(offset);
-	membank("bank8")->set_entry(offset);
-	return 0xff;
+	for (auto &bank : m_banks)
+		bank->set_entry(offset);
+	return space.unmap();
 }
 
-READ8_MEMBER( mmd2_state::port01_r )
+uint8_t mmd2_state::port01_r()
 {
 	// need to add ttyin bit 0
 	uint8_t data = 0x84;
-	data |= ioport("DSW")->read();
+	data |= m_io_dsw->read();
 	data |= (m_cass->input() < 0.02) ? 0 : 2;
 	return data;
 }
 
-WRITE8_MEMBER( mmd2_state::port05_w )
+void mmd2_state::port05_w(uint8_t data)
 {
 	// need to add ttyout bit 0
 	m_cass->output(BIT(data, 1) ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER( mmd2_state::scanlines_w )
+void mmd2_state::scanlines_w(uint8_t data)
 {
 	m_digit = data;
 }
 
-WRITE8_MEMBER( mmd2_state::digit_w )
+void mmd2_state::digit_w(uint8_t data)
 {
 	if (m_digit < 9)
 		m_digits[m_digit] = data;
 }
 
-READ8_MEMBER( mmd2_state::keyboard_r )
+uint8_t mmd2_state::keyboard_r()
 {
 	uint8_t data = 0xff;
 
-	if (m_digit < 4)
-		data = m_io_keyboard[m_digit]->read();
+	if ((m_digit & 7) < 4)
+		data = m_io_keyboard[m_digit & 7]->read();
 
 	return data;
 }
 
-WRITE8_MEMBER( mmd2_state::status_callback )
+void mmd2_state::status_callback(uint8_t data)
 {
 	// operate the HALT LED
-	output().set_value("led_halt", ~data & i8080_cpu_device::STATUS_HLTA);
+	m_led_halt = ~data & i8080_cpu_device::STATUS_HLTA;
 	// operate the HOLD LED - this should connect to the HLDA pin,
 	// but it isn't emulated, using WO instead (whatever that does).
-	output().set_value("led_hold", data & i8080_cpu_device::STATUS_WO);
+	m_led_hold = data & i8080_cpu_device::STATUS_WO;
 }
 
 WRITE_LINE_MEMBER( mmd2_state::inte_callback )
 {
 	// operate the INTE LED
-	output().set_value("led_inte", state);
+	m_led_inte = state;
+}
+
+void mmd2_state::machine_start()
+{
+	m_digits.resolve();
+	m_p.resolve();
+	m_led_halt.resolve();
+	m_led_hold.resolve();
+	m_led_inte.resolve();
 }
 
 void mmd2_state::machine_reset()
@@ -345,47 +362,39 @@ void mmd2_state::machine_reset()
 
 void mmd2_state::reset_banks()
 {
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
-	membank("bank3")->set_entry(0);
-	membank("bank4")->set_entry(0);
-	membank("bank5")->set_entry(0);
-	membank("bank6")->set_entry(0);
-	membank("bank7")->set_entry(0);
-	membank("bank8")->set_entry(0);
+	for (auto &bank : m_banks)
+		bank->set_entry(0);
 }
 
 void mmd2_state::init_mmd2()
 {
-/*
-We preset all banks here, so that bankswitching will incur no speed penalty.
-0000/0400 indicate ROMs, D800/DC00/E400 indicate RAM, 8000 is a dummy write area for ROM banks.
-*/
-	uint8_t *p_ram = memregion("maincpu")->base();
-	membank("bank1")->configure_entry(0, &p_ram[0x0000]);
-	membank("bank1")->configure_entry(1, &p_ram[0xd800]);
-	membank("bank1")->configure_entry(2, &p_ram[0x0c00]);
-	membank("bank2")->configure_entry(0, &p_ram[0x8000]);
-	membank("bank2")->configure_entry(1, &p_ram[0xd800]);
-	membank("bank2")->configure_entry(2, &p_ram[0x8000]);
-	membank("bank3")->configure_entry(0, &p_ram[0x0400]);
-	membank("bank3")->configure_entry(1, &p_ram[0xdc00]);
-	membank("bank3")->configure_entry(2, &p_ram[0xdc00]);
-	membank("bank4")->configure_entry(0, &p_ram[0x8000]);
-	membank("bank4")->configure_entry(1, &p_ram[0xdc00]);
-	membank("bank4")->configure_entry(2, &p_ram[0xdc00]);
-	membank("bank5")->configure_entry(0, &p_ram[0xd800]);
-	membank("bank5")->configure_entry(1, &p_ram[0x0000]);
-	membank("bank5")->configure_entry(2, &p_ram[0x0000]);
-	membank("bank6")->configure_entry(0, &p_ram[0xd800]);
-	membank("bank6")->configure_entry(1, &p_ram[0x8000]);
-	membank("bank6")->configure_entry(2, &p_ram[0x8000]);
-	membank("bank7")->configure_entry(0, &p_ram[0xe400]);
-	membank("bank7")->configure_entry(1, &p_ram[0x0c00]);
-	membank("bank7")->configure_entry(2, &p_ram[0xd800]);
-	membank("bank8")->configure_entry(0, &p_ram[0xe400]);
-	membank("bank8")->configure_entry(1, &p_ram[0x8000]);
-	membank("bank8")->configure_entry(2, &p_ram[0xd800]);
+	// We preset all banks here, so that bankswitching will incur no speed penalty.
+	// 0000/0400 indicate ROMs, D800/DC00/E400 indicate RAM, 8000 is a dummy write area for ROM banks.
+	uint8_t *const p_ram = memregion("maincpu")->base();
+	m_banks[0]->configure_entry(0, &p_ram[0x0000]);
+	m_banks[0]->configure_entry(1, &p_ram[0xd800]);
+	m_banks[0]->configure_entry(2, &p_ram[0x0c00]);
+	m_banks[1]->configure_entry(0, &p_ram[0x8000]);
+	m_banks[1]->configure_entry(1, &p_ram[0xd800]);
+	m_banks[1]->configure_entry(2, &p_ram[0x8000]);
+	m_banks[2]->configure_entry(0, &p_ram[0x0400]);
+	m_banks[2]->configure_entry(1, &p_ram[0xdc00]);
+	m_banks[2]->configure_entry(2, &p_ram[0xdc00]);
+	m_banks[3]->configure_entry(0, &p_ram[0x8000]);
+	m_banks[3]->configure_entry(1, &p_ram[0xdc00]);
+	m_banks[3]->configure_entry(2, &p_ram[0xdc00]);
+	m_banks[4]->configure_entry(0, &p_ram[0xd800]);
+	m_banks[4]->configure_entry(1, &p_ram[0x0000]);
+	m_banks[4]->configure_entry(2, &p_ram[0x0000]);
+	m_banks[5]->configure_entry(0, &p_ram[0xd800]);
+	m_banks[5]->configure_entry(1, &p_ram[0x8000]);
+	m_banks[5]->configure_entry(2, &p_ram[0x8000]);
+	m_banks[6]->configure_entry(0, &p_ram[0xe400]);
+	m_banks[6]->configure_entry(1, &p_ram[0x0c00]);
+	m_banks[6]->configure_entry(2, &p_ram[0xd800]);
+	m_banks[7]->configure_entry(0, &p_ram[0xe400]);
+	m_banks[7]->configure_entry(1, &p_ram[0x8000]);
+	m_banks[7]->configure_entry(2, &p_ram[0xd800]);
 }
 
 void mmd2_state::mmd2(machine_config &config)

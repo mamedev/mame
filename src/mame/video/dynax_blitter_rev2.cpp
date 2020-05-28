@@ -61,7 +61,7 @@ dynax_blitter_rev2_device::dynax_blitter_rev2_device(const machine_config &mconf
 
 dynax_blitter_rev2_device::dynax_blitter_rev2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_rom_interface(mconfig, *this, 20, ENDIANNESS_LITTLE, 8)
+	, device_rom_interface(mconfig, *this)
 	, m_vram_out_cb(*this)
 	, m_scrollx_cb(*this)
 	, m_scrolly_cb(*this)
@@ -272,7 +272,7 @@ void dynax_blitter_rev2_device::scroll_w(u8 data)
 //  pen_w - set the destination pen
 //-------------------------------------------------
 
-WRITE8_MEMBER(dynax_blitter_rev2_device::pen_w)
+void dynax_blitter_rev2_device::pen_w(uint8_t data)
 {
 	m_blit_pen = data;
 	LOG("%s: P=%02X\n", machine().describe_context(), data);
@@ -283,7 +283,7 @@ WRITE8_MEMBER(dynax_blitter_rev2_device::pen_w)
 //  regs_w - handle blitter register writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(dynax_blitter_rev2_device::regs_w)
+void dynax_blitter_rev2_device::regs_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -350,7 +350,7 @@ void cdracula_blitter_device::device_resolve_objects()
 //  bootleg blitter
 //-------------------------------------------------
 
-WRITE8_MEMBER(cdracula_blitter_device::flags_w)
+void cdracula_blitter_device::flags_w(uint8_t data)
 {
 	LOG("%s: FLG=%02X\n", machine().describe_context(), data);
 
@@ -367,7 +367,7 @@ WRITE8_MEMBER(cdracula_blitter_device::flags_w)
 //  (slightly different for bootleg)
 //-------------------------------------------------
 
-WRITE8_MEMBER(cdracula_blitter_device::regs_w)
+void cdracula_blitter_device::regs_w(offs_t offset, uint8_t data)
 {
 	// first register does not trigger a blit, it sets the destination
 	switch (offset)

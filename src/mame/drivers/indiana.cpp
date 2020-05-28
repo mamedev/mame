@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic, AJR
 /***************************************************************************
 
         Indiana University 68030 board
@@ -15,7 +15,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "bus/rs232/keyboard.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/m68000/m68000.h"
 #include "bus/isa/com.h"
 #include "bus/isa/fdc.h"
@@ -24,17 +25,19 @@
 #include "bus/isa/isa_cards.h"
 #include "bus/isa/vga.h"
 #include "machine/mc68901.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
 
-#define M68K_TAG "maincpu"
 #define ISABUS_TAG "isa"
-#define MFP_TAG "mfp"
 
 class indiana_state : public driver_device
 {
 public:
 	indiana_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, M68K_TAG) { }
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	void indiana(machine_config &config);
 
@@ -52,7 +55,7 @@ void indiana_state::indiana_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0000ffff).mirror(0x7f800000).rom().region("user1", 0); // 64Kb of EPROM
 	map(0x00100000, 0x00107fff).mirror(0x7f8f8000).ram(); // SRAM 32Kb of SRAM
-	map(0x00200000, 0x002fffff).rw(MFP_TAG, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x7f800000); // MFP
+	map(0x00200000, 0x002fffff).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x7f800000); // MFP
 	map(0x00400000, 0x004fffff).rw(ISABUS_TAG, FUNC(isa16_device::io16_swap_r), FUNC(isa16_device::io16_swap_w)).mirror(0x7f800000); // 16 bit PC IO
 	map(0x00500000, 0x005fffff).rw(ISABUS_TAG, FUNC(isa16_device::mem16_swap_r), FUNC(isa16_device::mem16_swap_w)).mirror(0x7f800000); // 16 bit PC MEM
 	map(0x00600000, 0x006fffff).rw(ISABUS_TAG, FUNC(isa16_device::io_r), FUNC(isa16_device::io_w)).mirror(0x7f800000); // 8 bit PC IO
@@ -86,38 +89,46 @@ void indiana_isa_cards(device_slot_interface &device)
 	device.option_add("ide", ISA16_IDE);
 }
 
-static DEVICE_INPUT_DEFAULTS_START( keyboard )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
-DEVICE_INPUT_DEFAULTS_END
-
 void indiana_state::indiana(machine_config &config)
 {
 	/* basic machine hardware */
-	M68030(config, m_maincpu, XTAL(16'000'000));
+	M68030(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &indiana_state::indiana_mem);
 
-	// FIXME: determine ISA bus clock
-	isa16_device &isa(ISA16(config, ISABUS_TAG, 0));
+	isa16_device &isa(ISA16(config, ISABUS_TAG, 16_MHz_XTAL / 2)); // OSC = CLK = CLK8
 	isa.set_custom_spaces();
+	isa.irq3_callback().set_inputline(m_maincpu, M68K_IRQ_5);
+	isa.irq4_callback().set_inputline(m_maincpu, M68K_IRQ_4);
+	isa.irq5_callback().set_inputline(m_maincpu, M68K_IRQ_3);
+	isa.irq6_callback().set_inputline(m_maincpu, M68K_IRQ_2);
+	isa.irq7_callback().set_inputline(m_maincpu, M68K_IRQ_1);
+	isa.irq2_callback().set("mfp", FUNC(mc68901_device::i7_w)); // IRQ9
+	isa.irq10_callback().set("mfp", FUNC(mc68901_device::i6_w));
+	isa.irq11_callback().set("mfp", FUNC(mc68901_device::i5_w));
+	isa.irq12_callback().set("mfp", FUNC(mc68901_device::i4_w));
+	isa.irq14_callback().set("mfp", FUNC(mc68901_device::i3_w));
+	isa.irq15_callback().set("mfp", FUNC(mc68901_device::i2_w));
 
 	ISA16_SLOT(config, "isa1", 0, ISABUS_TAG, indiana_isa_cards, "vga", false);
 	ISA16_SLOT(config, "isa2", 0, ISABUS_TAG, indiana_isa_cards, "fdc_at", false);
 	ISA16_SLOT(config, "isa3", 0, ISABUS_TAG, indiana_isa_cards, "comat", false);
 	ISA16_SLOT(config, "isa4", 0, ISABUS_TAG, indiana_isa_cards, "ide", false);
 
-	mc68901_device &mfp(MC68901(config, MFP_TAG, XTAL(16'000'000)/4));
-	mfp.set_timer_clock(XTAL(16'000'000)/4);
-	mfp.set_rx_clock(0);
-	mfp.set_tx_clock(0);
-	mfp.out_so_cb().set("keyboard", FUNC(rs232_port_device::write_txd));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "pc_kbdc", 0));
+	pc_kbdc.out_data_cb().set("mfp", FUNC(mc68901_device::i0_w));
+	pc_kbdc.out_data_cb().append("mfp", FUNC(mc68901_device::si_w));
+	pc_kbdc.out_clock_cb().set("mfp", FUNC(mc68901_device::i1_w));
+	pc_kbdc.out_clock_cb().append("mfp", FUNC(mc68901_device::rc_w));
 
-	rs232_port_device &keyboard(RS232_PORT(config, "keyboard", default_rs232_devices, "keyboard"));
-	keyboard.rxd_handler().set(MFP_TAG, FUNC(mc68901_device::write_rx));
-	keyboard.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
+	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84).set_pc_kbdc_slot(subdevice("pc_kbdc"));
+
+	mc68901_device &mfp(MC68901(config, "mfp", 16_MHz_XTAL / 4));
+	mfp.set_timer_clock(16_MHz_XTAL / 16);
+	mfp.out_irq_cb().set_inputline(m_maincpu, M68K_IRQ_6);
+	mfp.out_tdo_cb().set("speaker", FUNC(speaker_sound_device::level_w));
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 /* ROM definition */

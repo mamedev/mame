@@ -23,9 +23,8 @@ Each byte is 8 bits (MSB first) with no start or stop bits.
 
 ********************************************************************/
 
-#include "emu.h"   // for popmessage and <string>
-
 #include "camplynx_cas.h"
+
 
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
@@ -128,7 +127,7 @@ static int camplynx_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 
 			/* tell user how to load the tape */
 			if (buffer)
-				osd_printf_info("%s\n", pgmname.c_str());
+				osd_printf_info("%s\n", pgmname);
 
 			/* second SYNC + A5 */
 			for (i = 0; i < 555; i++)

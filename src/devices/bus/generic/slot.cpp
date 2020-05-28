@@ -24,6 +24,10 @@
 #include "emu.h"
 #include "slot.h"
 
+#define VERBOSE 1
+#include "logmacro.h"
+
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -32,98 +36,120 @@ DEFINE_DEVICE_TYPE(GENERIC_SOCKET, generic_socket_device, "generic_socket", "Gen
 DEFINE_DEVICE_TYPE(GENERIC_CARTSLOT, generic_cartslot_device, "generic_cartslot", "Generic Cartridge Slot")
 
 
-//-------------------------------------------------
-//  device_generic_cart_interface - constructor
-//-------------------------------------------------
+//**************************************************************************
+//  device_generic_cart_interface
+//**************************************************************************
 
-device_generic_cart_interface::device_generic_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0),
-		m_region(*this, DEVICE_SELF)
+device_generic_cart_interface::device_generic_cart_interface(machine_config const &mconfig, device_t &device) :
+	device_interface(device, "genslot"),
+	m_region(*this, DEVICE_SELF),
+	m_ram(),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
-
-
-//-------------------------------------------------
-//  ~device_generic_cart_interface - destructor
-//-------------------------------------------------
 
 device_generic_cart_interface::~device_generic_cart_interface()
 {
 }
 
-//-------------------------------------------------
-//  rom_alloc - alloc the space for the cart
-//-------------------------------------------------
-
-void device_generic_cart_interface::rom_alloc(size_t size, int width, endianness_t endian, const char *tag)
+u8 device_generic_cart_interface::read_rom(offs_t offset)
 {
-	if (m_rom == nullptr)
-	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(GENERIC_ROM_REGION_TAG).c_str(), size, width, endian)->base();
-		m_rom_size = size;
-	}
+	return 0xff;
 }
 
-
-//-------------------------------------------------
-//  ram_alloc - alloc the space for the ram
-//-------------------------------------------------
-
-void device_generic_cart_interface::ram_alloc(uint32_t size)
+u16 device_generic_cart_interface::read16_rom(offs_t offset, u16 mem_mask)
 {
+	return 0xffff;
+}
+
+u32 device_generic_cart_interface::read32_rom(offs_t offset, u32 mem_mask)
+{
+	return 0xffffffff;
+}
+
+u8 device_generic_cart_interface::read_ram(offs_t offset)
+{
+	return 0xff;
+}
+
+void device_generic_cart_interface::write_ram(offs_t offset, u8 data)
+{
+}
+
+void device_generic_cart_interface::rom_alloc(u32 size, int width, endianness_t endian, char const *tag)
+{
+	if (m_rom)
+	{
+		throw emu_fatalerror(
+				"%s: Request to allocate ROM when already allocated (allocated size %u, requested size %u)\n",
+				device().tag(),
+				m_rom_size,
+				size);
+	}
+
+	std::string fulltag(tag);
+	fulltag.append(GENERIC_ROM_REGION_TAG);
+	device().logerror("Allocating %u byte ROM region with tag '%s' (width %d)\n", size, fulltag, width);
+	m_rom = device().machine().memory().region_alloc(fulltag.c_str(), size, width, endian)->base();
+	m_rom_size = size;
+}
+
+void device_generic_cart_interface::ram_alloc(u32 size)
+{
+	if (!m_ram.empty())
+	{
+		throw emu_fatalerror(
+				"%s: Request to allocate RAM when already allocated (allocated size %u, requested size %u)\n",
+				device().tag(),
+				m_ram.size(),
+				size);
+	}
+
+	device().logerror("Allocating %u bytes of RAM\n", size);
 	m_ram.resize(size);
 }
 
 
-
 //**************************************************************************
-//  LIVE DEVICE
+//  generic_slot_device
 //**************************************************************************
 
-//-------------------------------------------------
-//  generic_slot_device - constructor
-//-------------------------------------------------
-generic_slot_device::generic_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+generic_slot_device::generic_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_generic_cart_interface>(mconfig, *this),
 	m_interface(nullptr),
 	m_default_card("rom"),
 	m_extensions("bin"),
 	m_must_be_loaded(false),
 	m_width(GENERIC_ROM8_WIDTH),
 	m_endianness(ENDIANNESS_LITTLE),
-	m_cart(nullptr)
+	m_cart(nullptr),
+	m_device_image_load(*this),
+	m_device_image_unload(*this)
 {
 }
 
-generic_socket_device::generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: generic_slot_device(mconfig, GENERIC_SOCKET, tag, owner, clock)
+generic_socket_device::generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	generic_slot_device(mconfig, GENERIC_SOCKET, tag, owner, clock)
 {
 }
 
-generic_cartslot_device::generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: generic_slot_device(mconfig, GENERIC_CARTSLOT, tag, owner, clock)
+generic_cartslot_device::generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	generic_slot_device(mconfig, GENERIC_CARTSLOT, tag, owner, clock)
 {
 }
-
-//-------------------------------------------------
-//  generic_slot_device - destructor
-//-------------------------------------------------
 
 generic_slot_device::~generic_slot_device()
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
 void generic_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_generic_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
+	m_device_image_load.resolve();
+	m_device_image_unload.resolve();
 }
 
 
@@ -139,7 +165,7 @@ image_init_result generic_slot_device::call_load()
 			return m_device_image_load(*this);
 		else
 		{
-			uint32_t len = common_get_size("rom");
+			u32 len = common_get_size("rom");
 
 			rom_alloc(len, m_width, m_endianness);
 			common_load_rom(get_rom_base(), len, "rom");
@@ -185,7 +211,7 @@ std::string generic_slot_device::get_default_card_software(get_default_card_soft
  for fullpath and for softlist
  -------------------------------------------------*/
 
-uint32_t generic_slot_device::common_get_size(const char *region)
+u32 generic_slot_device::common_get_size(char const *region)
 {
 	// if we are loading from softlist, you have to specify a region
 	assert(!loaded_through_softlist() || (region != nullptr));
@@ -198,7 +224,7 @@ uint32_t generic_slot_device::common_get_size(const char *region)
  for fullpath and for softlist
  -------------------------------------------------*/
 
-void generic_slot_device::common_load_rom(uint8_t *ROM, uint32_t len, const char *region)
+void generic_slot_device::common_load_rom(u8 *ROM, u32 len, char const *region)
 {
 	// basic sanity check
 	assert((ROM != nullptr) && (len > 0));
@@ -216,7 +242,7 @@ void generic_slot_device::common_load_rom(uint8_t *ROM, uint32_t len, const char
  read_rom
  -------------------------------------------------*/
 
-uint8_t generic_slot_device::read_rom(offs_t offset)
+u8 generic_slot_device::read_rom(offs_t offset)
 {
 	if (m_cart)
 		return m_cart->read_rom(offset);
@@ -228,7 +254,7 @@ uint8_t generic_slot_device::read_rom(offs_t offset)
  read16_rom
  -------------------------------------------------*/
 
-uint16_t generic_slot_device::read16_rom(offs_t offset, uint16_t mem_mask)
+u16 generic_slot_device::read16_rom(offs_t offset, u16 mem_mask)
 {
 	if (m_cart)
 		return m_cart->read16_rom(offset, mem_mask);
@@ -240,7 +266,7 @@ uint16_t generic_slot_device::read16_rom(offs_t offset, uint16_t mem_mask)
  read32_rom
  -------------------------------------------------*/
 
-uint32_t generic_slot_device::read32_rom(offs_t offset, uint32_t mem_mask)
+u32 generic_slot_device::read32_rom(offs_t offset, u32 mem_mask)
 {
 	if (m_cart)
 		return m_cart->read32_rom(offset, mem_mask);
@@ -252,7 +278,7 @@ uint32_t generic_slot_device::read32_rom(offs_t offset, uint32_t mem_mask)
  read_ram
  -------------------------------------------------*/
 
-uint8_t generic_slot_device::read_ram(offs_t offset)
+u8 generic_slot_device::read_ram(offs_t offset)
 {
 	if (m_cart)
 		return m_cart->read_ram(offset);
@@ -264,7 +290,7 @@ uint8_t generic_slot_device::read_ram(offs_t offset)
  write_ram
  -------------------------------------------------*/
 
-void generic_slot_device::write_ram(offs_t offset, uint8_t data)
+void generic_slot_device::write_ram(offs_t offset, u8 data)
 {
 	if (m_cart)
 		m_cart->write_ram(offset, data);

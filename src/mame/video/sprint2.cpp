@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(sprint2_state::get_tile_info)
 {
 	uint8_t code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code & 0x3f, code >> 7, 0);
+	tileinfo.set(0, code & 0x3f, code >> 7, 0);
 }
 
 
@@ -45,7 +45,7 @@ void sprint2_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_helper);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sprint2_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sprint2_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 }
 
 

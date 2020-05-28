@@ -32,9 +32,9 @@ public:
 	void dynashot(machine_config &config);
 	void homerun(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sprite0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(homerun_d7756_busy_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_d7756_busy_r);
+	DECLARE_READ_LINE_MEMBER(sprite0_r);
+	DECLARE_READ_LINE_MEMBER(homerun_d7756_busy_r);
+	DECLARE_READ_LINE_MEMBER(ganjaja_d7756_busy_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_hopper_status_r);
 
 protected:
@@ -64,10 +64,10 @@ private:
 
 	void control_w(u8 data);
 	void d7756_sample_w(u8 data);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(scrollhi_w);
-	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(scrollx_w);
+	void videoram_w(offs_t offset, u8 data);
+	void scrollhi_w(u8 data);
+	void scrolly_w(u8 data);
+	void scrollx_w(u8 data);
 
 	static rgb_t homerun_RGB332(u32 raw);
 	TILE_GET_INFO_MEMBER(get_tile_info);

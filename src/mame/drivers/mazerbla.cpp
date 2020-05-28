@@ -156,7 +156,7 @@ private:
 	DECLARE_WRITE8_MEMBER(cfb_led_w);
 	DECLARE_WRITE8_MEMBER(vsb_ls273_audio_control_w);
 	DECLARE_WRITE8_MEMBER(sound_int_clear_w);
-	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
+	void gg_led_ctrl_w(uint8_t data);
 	void mazerbla_palette(palette_device &palette);
 	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
@@ -429,7 +429,7 @@ WRITE8_MEMBER(mazerbla_state::cfb_led_w)
 	m_leds[2] = BIT(data, 7);
 }
 
-WRITE8_MEMBER(mazerbla_state::gg_led_ctrl_w)
+void mazerbla_state::gg_led_ctrl_w(uint8_t data)
 {
 	/* bit 0, bit 1 - led on */
 	m_leds[1] = BIT(data, 0);
@@ -474,7 +474,7 @@ void mazerbla_state::mazerbla_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x4c, 0x4f).rw(FUNC(mazerbla_state::ls670_1_r), FUNC(mazerbla_state::ls670_0_w));
-	map(0x60, 0x60).w(FUNC(mazerbla_state::zpu_bcd_decoder_w)); // AM_READ from protection pal, if populated
+	map(0x60, 0x60).w(FUNC(mazerbla_state::zpu_bcd_decoder_w)); // r(FUNC(mazerbla_state::) from protection pal, if populated
 	map(0x62, 0x62).r(FUNC(mazerbla_state::zpu_inputs_r));
 	// 64 is some sort of output latch, unpopulated?
 	// 66 is some sort of output latch, unpopulated?

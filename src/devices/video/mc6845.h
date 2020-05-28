@@ -72,11 +72,11 @@ public:
 	}
 	void set_char_width(int pixels) { m_hpixels_per_column = pixels; }
 
-	template <typename... T> void set_reconfigure_callback(T &&... args) { m_reconfigure_cb = reconfigure_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_begin_update_callback(T &&... args) { m_begin_update_cb = begin_update_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_update_row_callback(T &&... args) { m_update_row_cb = update_row_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_end_update_callback(T &&... args) { m_end_update_cb = end_update_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_on_update_addr_change_callback(T &&... args) { m_on_update_addr_changed_cb = on_update_addr_changed_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_reconfigure_callback(T &&... args) { m_reconfigure_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_begin_update_callback(T &&... args) { m_begin_update_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_update_row_callback(T &&... args) { m_update_row_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_end_update_callback(T &&... args) { m_end_update_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_on_update_addr_change_callback(T &&... args) { m_on_update_addr_changed_cb.set(std::forward<T>(args)...); }
 
 	auto out_de_callback() { return m_out_de_cb.bind(); }
 	auto out_cur_callback() { return m_out_cur_cb.bind(); }
@@ -219,6 +219,7 @@ protected:
 	uint16_t  m_vsync_on_pos;
 	uint16_t  m_vsync_off_pos;
 	bool    m_has_valid_parameters;
+	bool    m_display_disabled_msg_shown;
 
 	uint16_t   m_current_disp_addr;   /* the display address currently drawn (used only in mc6845_update) */
 
@@ -235,7 +236,7 @@ protected:
 	void set_vsync(int state);
 	void set_cur(int state);
 	bool match_line();
-	bool check_cursor_visible(uint16_t ra, uint16_t line_addr);
+	virtual bool check_cursor_visible(uint16_t ra, uint16_t line_addr);
 	void handle_line_timer();
 	virtual void update_cursor_state();
 	virtual uint8_t draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -329,8 +330,11 @@ public:
 	hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	hd6845s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual bool check_cursor_visible(uint16_t ra, uint16_t line_addr) override;
 };
 
 class sy6545_1_device : public mc6845_device
@@ -355,7 +359,7 @@ protected:
 
 // HD6345/HD6445 CRTC-II
 // http://bitsavers.informatik.uni-stuttgart.de/pdf/hitachi/_dataBooks/1987_Hitachi_8_16_Bit_Peripheral_LSI_Data_Book.pdf, pp. 99
-class hd6345_device : public mc6845_device
+class hd6345_device : public hd6845s_device
 {
 public:
 	hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -363,16 +367,6 @@ public:
 	void address_w(uint8_t data);
 	uint8_t register_r();
 	void register_w(uint8_t data);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-};
-
-class ams40041_device : public mc6845_device
-{
-public:
-	ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -477,7 +471,6 @@ DECLARE_DEVICE_TYPE(HD6845S,  hd6845s_device)
 DECLARE_DEVICE_TYPE(SY6545_1, sy6545_1_device)
 DECLARE_DEVICE_TYPE(SY6845E,  sy6845e_device)
 DECLARE_DEVICE_TYPE(HD6345,   hd6345_device)
-DECLARE_DEVICE_TYPE(AMS40041, ams40041_device)
 DECLARE_DEVICE_TYPE(AMS40489, ams40489_device)
 DECLARE_DEVICE_TYPE(MOS8563,  mos8563_device)
 DECLARE_DEVICE_TYPE(MOS8568,  mos8568_device)

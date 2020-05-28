@@ -154,7 +154,7 @@ namespace esqpanel {
 			m_to_send.put(c);
 			const std::string &s = m_to_send.str();
 
-			for (auto iter: m_panels)
+			for (const auto &iter: m_panels)
 			{
 				external_panel_ptr panel = iter.second;
 				if (panel->send_display_data())
@@ -215,7 +215,7 @@ namespace esqpanel {
 				}
 
 				// Echo the non-command message to any other connected panels that want it
-				for (auto iter: m_panels)
+				for (const auto &iter: m_panels)
 				{
 					external_panel_ptr other_panel = iter.second;
 					if (other_panel != panel && (t & other_panel->send_message_types()) != 0)
@@ -415,6 +415,7 @@ esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type
 	m_write_tx(*this),
 	m_write_analog(*this)
 {
+	std::fill(std::begin(m_xmitring), std::end(m_xmitring), 0);
 }
 
 

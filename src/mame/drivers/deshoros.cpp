@@ -55,14 +55,14 @@ private:
 
 	char m_led_array[21];
 
-	DECLARE_WRITE8_MEMBER(firq_ack_w);
-	DECLARE_WRITE8_MEMBER(nmi_ack_w);
-	DECLARE_READ8_MEMBER(printer_status_r);
-	DECLARE_READ8_MEMBER(display_ready_r);
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_WRITE8_MEMBER(out_w);
-	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void firq_ack_w(uint8_t data);
+	void nmi_ack_w(uint8_t data);
+	uint8_t printer_status_r();
+	uint8_t display_ready_r();
+	void display_w(uint8_t data);
+	void out_w(uint8_t data);
+	void bank_select_w(uint8_t data);
+	void sound_w(offs_t offset, uint8_t data);
 
 	void main_map(address_map &map);
 protected:
@@ -99,17 +99,17 @@ uint32_t destiny_state::screen_update_destiny(screen_device &screen, bitmap_ind1
 
 ***************************************************************************/
 
-WRITE8_MEMBER(destiny_state::firq_ack_w)
+void destiny_state::firq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(destiny_state::nmi_ack_w)
+void destiny_state::nmi_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-READ8_MEMBER(destiny_state::printer_status_r)
+uint8_t destiny_state::printer_status_r()
 {
 	// d2: mark sensor
 	// d3: motor stop
@@ -120,14 +120,14 @@ READ8_MEMBER(destiny_state::printer_status_r)
 	return 0xff;
 }
 
-READ8_MEMBER(destiny_state::display_ready_r)
+uint8_t destiny_state::display_ready_r()
 {
 	// d7: /display ready
 	// other bits: N/C
 	return 0;
 }
 
-WRITE8_MEMBER(destiny_state::display_w)
+void destiny_state::display_w(uint8_t data)
 {
 	/* this is preliminary, just fills a string and doesn't support control codes etc. */
 
@@ -139,7 +139,7 @@ WRITE8_MEMBER(destiny_state::display_w)
 	m_led_array[19] = data;
 }
 
-WRITE8_MEMBER(destiny_state::out_w)
+void destiny_state::out_w(uint8_t data)
 {
 	// d0: coin blocker
 	machine().bookkeeping().coin_lockout_w(0, ~data & 1);
@@ -149,7 +149,7 @@ WRITE8_MEMBER(destiny_state::out_w)
 	// other bits: N/C?
 }
 
-WRITE8_MEMBER(destiny_state::bank_select_w)
+void destiny_state::bank_select_w(uint8_t data)
 {
 	// d0-d2 and d4: bank (but only up to 4 banks supported)
 	membank("bank1")->set_base(memregion("answers")->base() + 0x6000 * (data & 3));
@@ -166,7 +166,7 @@ INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
 		machine().bookkeeping().coin_counter_w(0, newval);
 }
 
-WRITE8_MEMBER(destiny_state::sound_w)
+void destiny_state::sound_w(offs_t offset, uint8_t data)
 {
 	// a0: sound on/off
 	m_beeper->set_state(~offset & 1);
@@ -182,12 +182,12 @@ void destiny_state::main_map(address_map &map)
 	map(0x9003, 0x9003).portr("KEY1");
 	map(0x9004, 0x9004).portr("KEY2");
 	map(0x9005, 0x9005).portr("DIPSW").w(FUNC(destiny_state::out_w));
-//  AM_RANGE(0x9006, 0x9006) AM_NOP // printer motor on
-//  AM_RANGE(0x9007, 0x9007) AM_NOP // printer data
+//  map(0x9006, 0x9006).noprw(); // printer motor on
+//  map(0x9007, 0x9007).noprw(); // printer data
 	map(0x900a, 0x900b).w(FUNC(destiny_state::sound_w));
 	map(0x900c, 0x900c).w(FUNC(destiny_state::bank_select_w));
-//  AM_RANGE(0x900d, 0x900d) AM_NOP // printer motor off
-//  AM_RANGE(0x900e, 0x900e) AM_NOP // printer motor jam reset
+//  map(0x900d, 0x900d).noprw(); // printer motor off
+//  map(0x900e, 0x900e).noprw(); // printer motor jam reset
 	map(0xc000, 0xffff).rom();
 }
 
@@ -263,7 +263,7 @@ void destiny_state::machine_start()
 
 void destiny_state::machine_reset()
 {
-	bank_select_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+	bank_select_w(0);
 }
 
 void destiny_state::destiny(machine_config &config)

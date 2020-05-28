@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -149,14 +149,18 @@ namespace bx
 
 	/// Count number of bits set.
 	///
-	BX_CONSTEXPR_FUNC uint32_t uint32_cntbits(uint32_t _val);
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC uint32_t uint32_cntbits(Ty _val);
 
 	/// Count number of leading zeros.
 	///
-	BX_CONSTEXPR_FUNC uint32_t uint32_cntlz(uint32_t _val);
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC uint32_t uint32_cntlz(Ty _val);
 
+	/// Count number of trailing zeros.
 	///
-	BX_CONSTEXPR_FUNC uint32_t uint32_cnttz(uint32_t _val);
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC uint32_t uint32_cnttz(Ty _val);
 
 	///
 	BX_CONSTEXPR_FUNC uint32_t uint32_part1by1(uint32_t _a);
@@ -170,16 +174,41 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC uint32_t uint32_nextpow2(uint32_t _a);
 
-	/// Count number of bits set.
 	///
-	BX_CONSTEXPR_FUNC uint32_t uint64_cntbits(uint64_t _val);
-
-	/// Count number of leading zeros.
-	///
-	BX_CONSTEXPR_FUNC uint32_t uint64_cntlz(uint64_t _val);
+	BX_CONSTEXPR_FUNC uint64_t uint64_li(uint64_t _a);
 
 	///
-	BX_CONSTEXPR_FUNC uint32_t uint64_cnttz(uint64_t _val);
+	BX_CONSTEXPR_FUNC uint64_t uint64_dec(uint64_t _a);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_inc(uint64_t _a);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_not(uint64_t _a);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_neg(uint64_t _a);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_ext(uint64_t _a);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_and(uint64_t _a, uint64_t _b);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_andc(uint64_t _a, uint64_t _b);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_xor(uint64_t _a, uint64_t _b);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_xorl(uint64_t _a, uint64_t _b);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_or(uint64_t _a, uint64_t _b);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_orc(uint64_t _a, uint64_t _b);
 
 	///
 	BX_CONSTEXPR_FUNC uint64_t uint64_sll(uint64_t _a, int32_t _sa);
@@ -217,13 +246,10 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC uint32_t strideAlign(uint32_t _offset, uint32_t _stride);
 
-	/// Align to arbitrary stride and 16-bytes.
+	/// Align to arbitrary stride and Min bytes.
 	///
-	BX_CONSTEXPR_FUNC uint32_t strideAlign16(uint32_t _offset, uint32_t _stride);
-
-	/// Align to arbitrary stride and 256-bytes.
-	///
-	BX_CONSTEXPR_FUNC uint32_t strideAlign256(uint32_t _offset, uint32_t _stride);
+	template<uint32_t Min>
+	BX_CONSTEXPR_FUNC uint32_t strideAlign(uint32_t _offset, uint32_t _stride);
 
 	/// Convert float to half-float.
 	///

@@ -41,6 +41,9 @@ public:
 	auto port_in_cb() { return m_port_in_cb.bind(); } // K0-7 at Pinout
 	auto port_out_cb() { return m_port_out_cb.bind(); } // O0-7 at Pinout
 
+	// hack to fix music speed in some Data East games (core bug, external strapping, DE 45 customization or ???)
+	void set_timer_scale(int scale) { m_timer_scale = scale; }
+
 	/* functions for use by the PSG and joypad port only! */
 	uint8_t io_get_buffer();
 	void io_set_buffer(uint8_t);
@@ -61,14 +64,14 @@ protected:
 		H6280_IRQ1_STATE,
 		H6280_IRQ2_STATE,
 		H6280_IRQT_STATE,
-		H6280_M1,
-		H6280_M2,
-		H6280_M3,
-		H6280_M4,
-		H6280_M5,
-		H6280_M6,
-		H6280_M7,
-		H6280_M8
+		H6280_MPR0,
+		H6280_MPR1,
+		H6280_MPR2,
+		H6280_MPR3,
+		H6280_MPR4,
+		H6280_MPR5,
+		H6280_MPR6,
+		H6280_MPR7
 	};
 
 	// device-level overrides
@@ -78,10 +81,10 @@ protected:
 	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
-	virtual bool execute_input_edge_triggered(int inputnum) const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -354,17 +357,17 @@ protected:
 
 	// internal registers
 	void internal_map(address_map &map);
-	DECLARE_READ8_MEMBER( irq_status_r );
-	DECLARE_WRITE8_MEMBER( irq_status_w );
+	uint8_t irq_status_r(offs_t offset);
+	void irq_status_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( timer_r );
-	DECLARE_WRITE8_MEMBER( timer_w );
+	uint8_t timer_r();
+	void timer_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( port_r );
-	DECLARE_WRITE8_MEMBER( port_w );
+	uint8_t port_r();
+	void port_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( io_buffer_r );
-	DECLARE_WRITE8_MEMBER( psg_w );
+	uint8_t io_buffer_r();
+	void psg_w(offs_t offset, uint8_t data);
 
 	devcb_read8 m_port_in_cb;
 	devcb_write8 m_port_out_cb;
@@ -374,10 +377,12 @@ protected:
 	// other internal states
 	int m_icount;
 
+	uint8_t m_timer_scale;
+
 	// address spaces
-	address_space *m_program;
-	address_space *m_io;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<21, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<21, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access< 2, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	typedef void (h6280_device::*ophandler)();
 

@@ -17,8 +17,6 @@
     Copy the text and Paste into the emulator.
     =3E^=0F^=D3^=13^=3E^=07^=D3^=13^=3E^=00^=D3^=12^=76^-1000X
 
-    ToDo:
-    - Blank the display if digits aren't being refreshed
 
 ***************************************************************************/
 
@@ -28,6 +26,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80daisy.h"
+#include "video/pwm.h"
 #include "babbage.lh"
 
 #define MAIN_CLOCK 25e5
@@ -41,16 +40,16 @@ public:
 		, m_pio_1(*this, "z80pio_1")
 		, m_pio_2(*this, "z80pio_2")
 		, m_ctc(*this, "z80ctc")
-		, m_keyboard(*this, "X%u", 0)
-		, m_digits(*this, "digit%u", 0U)
+		, m_display(*this, "display")
+		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void babbage(machine_config &config);
 
-protected:
-	DECLARE_READ8_MEMBER(pio2_a_r);
-	DECLARE_WRITE8_MEMBER(pio1_b_w);
-	DECLARE_WRITE8_MEMBER(pio2_b_w);
+private:
+	uint8_t pio2_a_r();
+	void pio1_b_w(uint8_t data);
+	void pio2_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
@@ -59,18 +58,17 @@ protected:
 	void babbage_io(address_map &map);
 	void babbage_map(address_map &map);
 
-private:
-	uint8_t m_segment;
+	uint8_t m_seg;
 	uint8_t m_key;
 	uint8_t m_prev_key;
 	bool m_step;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio_1;
 	required_device<z80pio_device> m_pio_2;
 	required_device<z80ctc_device> m_ctc;
-	required_ioport_array<4> m_keyboard;
-	output_finder<33> m_digits;
+	required_device<pwm_display_device> m_display;
+	required_ioport_array<4> m_io_keyboard;
 };
 
 
@@ -153,7 +151,7 @@ WRITE_LINE_MEMBER( babbage_state::ctc_z2_w )
 
 // The 8 LEDs
 // bios never writes here - you need to set PIO for output yourself - see test program above
-WRITE8_MEMBER( babbage_state::pio1_b_w )
+void babbage_state::pio1_b_w(uint8_t data)
 {
 	char ledname[8];
 	for (int i = 0; i < 8; i++)
@@ -163,27 +161,24 @@ WRITE8_MEMBER( babbage_state::pio1_b_w )
 	}
 }
 
-READ8_MEMBER( babbage_state::pio2_a_r )
+uint8_t babbage_state::pio2_a_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE); // release interrupt
 	return m_key;
 }
 
-WRITE8_MEMBER( babbage_state::pio2_b_w )
+void babbage_state::pio2_b_w(uint8_t data)
 {
 	if (BIT(data, 7))
-	{
 		m_step = false;
-	}
-	else if (!m_step)
+	else
+	if (!m_step)
 	{
-		m_segment = data;
+		m_seg = data;
 		m_step = true;
 	}
 	else
-	{
-		m_digits[data] = m_segment;
-	}
+		m_display->matrix(data, m_seg);
 }
 
 static const z80_daisy_config babbage_daisy_chain[] =
@@ -200,7 +195,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 
 	for (u8 i = 0; i < 4; i++)
 	{
-		inp = m_keyboard[i]->read();
+		inp = m_io_keyboard[i]->read();
 
 		for (u8 j = 0; j < 5; j++)
 			if (BIT(inp, j))
@@ -223,6 +218,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 		m_pio_2->strobe(0, 1);
 }
 
+void babbage_state::machine_start()
+{
+	save_item(NAME(m_seg));
+	save_item(NAME(m_key));
+	save_item(NAME(m_prev_key));
+	save_item(NAME(m_step));
+}
 
 /***************************************************************************
 
@@ -240,6 +242,8 @@ void babbage_state::babbage(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_babbage);
+	PWM_DISPLAY(config, m_display).set_size(6, 8);
+	m_display->set_segmask(0x3f, 0xff);
 
 	/* Devices */
 	Z80CTC(config, m_ctc, MAIN_CLOCK);
@@ -257,7 +261,7 @@ void babbage_state::babbage(machine_config &config)
 	m_pio_2->in_pa_callback().set(FUNC(babbage_state::pio2_a_r));
 	m_pio_2->out_pb_callback().set(FUNC(babbage_state::pio2_b_w));
 
-	TIMER(config, "keyboard_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(babbage_state::keyboard_callback), this), attotime::from_hz(30));
+	TIMER(config, "keyboard_timer", 0).configure_periodic(FUNC(babbage_state::keyboard_callback), attotime::from_hz(30));
 }
 
 
@@ -268,10 +272,10 @@ void babbage_state::babbage(machine_config &config)
 ***************************************************************************/
 
 ROM_START(babbage)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x0800, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("mon.rom",    0x0000, 0x0200, CRC(469bd607) SHA1(8f3489a0f96de6a03b05c1ee01b89d9848f4b152) )
 ROM_END
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME       FLAGS
-COMP( 1986, babbage, 0,      0,      babbage, babbage, babbage_state, empty_init, "Mr Takafumi Aihara", "Babbage-2nd", MACHINE_NO_SOUND_HW )
+COMP( 1986, babbage, 0,      0,      babbage, babbage, babbage_state, empty_init, "Mr Takafumi Aihara", "Babbage-2nd", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

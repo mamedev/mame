@@ -57,8 +57,8 @@ public:
 
 protected:
 	DECLARE_READ_LINE_MEMBER(vsync_r);
-	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_WRITE8_MEMBER(video_w);
+	uint8_t video_r(offs_t offset);
+	void video_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

@@ -25,7 +25,7 @@ public:
 
 	void init_niyanpai();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
+	DECLARE_READ_LINE_MEMBER(musobana_outcoin_flag_r);
 
 private:
 	enum
@@ -84,7 +84,7 @@ private:
 	DECLARE_WRITE8_MEMBER(clutsel_0_w);
 	DECLARE_WRITE8_MEMBER(clutsel_1_w);
 	DECLARE_WRITE8_MEMBER(clutsel_2_w);
-	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
+	void tmp68301_parallel_port_w(uint16_t data);
 
 	// musobana and derived machine configs
 	DECLARE_READ16_MEMBER(musobana_inputport_0_r);

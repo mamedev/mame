@@ -99,12 +99,12 @@ DEFINE_DEVICE_TYPE(LYNX2_SND, lynx2_sound_device, "lynx2_sound", "Mikey (Lynx II
 lynx_sound_device::lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: lynx_sound_device(mconfig, LYNX_SND, tag, owner, clock)
 {
-	m_timer_delegate = timer_delegate();
 }
 
 lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_timer_delegate(*this)
 {
 }
 
@@ -174,7 +174,7 @@ void lynx_sound_device::device_start()
 {
 	m_mixer_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
 	m_usec_per_sample = 1000000 / machine().sample_rate();
-	m_timer_delegate.bind_relative_to(*owner());
+	m_timer_delegate.resolve();
 	init();
 	register_save();
 }
@@ -184,7 +184,7 @@ void lynx2_sound_device::device_start()
 {
 	m_mixer_channel = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
 	m_usec_per_sample = 1000000 / machine().sample_rate();
-	m_timer_delegate.bind_relative_to(*owner());
+	m_timer_delegate.resolve();
 	init();
 	register_save();
 }
@@ -228,7 +228,7 @@ void lynx_sound_device::count_down(int nr)
 	if (nr == 0)
 		m_mixer_channel->update();
 	//if ((channel->reg.control1 & 0x0f) == 0x0f) //count down if linking enabled and count enabled
-		channel->count--;
+	channel->count--;
 }
 
 void lynx_sound_device::shift(int chan_nr)
@@ -331,7 +331,7 @@ void lynx_sound_device::execute(int chan_nr)
 	}
 }
 
-READ8_MEMBER(lynx_sound_device::read)
+uint8_t lynx_sound_device::read(offs_t offset)
 {
 	uint8_t value = 0;
 	LYNX_AUDIO *channel = &m_audio[(offset >> 3) & 3];
@@ -394,7 +394,7 @@ READ8_MEMBER(lynx_sound_device::read)
 	return value;
 }
 
-WRITE8_MEMBER(lynx_sound_device::write)
+void lynx_sound_device::write(offs_t offset, uint8_t data)
 {
 	//logerror("audio write %.2x %.2x\n", offset, data);
 	LYNX_AUDIO *channel = &m_audio[(offset >> 3) & 3];

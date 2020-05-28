@@ -15,14 +15,14 @@ TILE_GET_INFO_MEMBER(playmark_state::bigtwin_get_tx_tile_info)
 {
 	uint16_t code = m_videoram1[2 * tile_index];
 	uint16_t color = m_videoram1[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::bigtwin_get_fg_tile_info)
 {
 	uint16_t code = m_videoram2[2 * tile_index];
 	uint16_t color = m_videoram2[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_tx_tile_info)
 	uint16_t code = m_videoram1[2 * tile_index];
 	uint16_t color = m_videoram1[2 * tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(2, code, (color >> 2), 0);
+	tileinfo.set(2, code, (color >> 2), 0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_fg_tile_info)
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_fg_tile_info)
 	uint16_t code = m_videoram2[2 * tile_index];
 	uint16_t color = m_videoram2[2 * tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(1, (code & 0x7fff), (color >> 2) + 8, (code & 0x8000) ? TILE_FLIPX : 0);
+	tileinfo.set(1, (code & 0x7fff), (color >> 2) + 8, (code & 0x8000) ? TILE_FLIPX : 0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_bg_tile_info)
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_bg_tile_info)
 	uint16_t code = m_videoram3[2 * tile_index];
 	uint16_t color = m_videoram3[2 * tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(1, (code & 0x7fff), (color >> 2), (code & 0x8000) ? TILE_FLIPX : 0);
+	tileinfo.set(1, (code & 0x7fff), (color >> 2), (code & 0x8000) ? TILE_FLIPX : 0);
 }
 
 
@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_tx_tile_info)
 	int code = m_videoram1[tile_index] & 0x0fff;
 	int colr = m_videoram1[tile_index] & 0xe000;
 
-	SET_TILE_INFO_MEMBER(3, code, (colr >> 13), 0);
+	tileinfo.set(3, code, (colr >> 13), 0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_fg_tile_info)
@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_fg_tile_info)
 	int code = m_videoram2[tile_index] & 0x1fff;
 	int colr = m_videoram2[tile_index] & 0xe000;
 
-	SET_TILE_INFO_MEMBER(2, code, (colr >> 13) + 8, 0);
+	tileinfo.set(2, code, (colr >> 13) + 8, 0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_bg_tile_info)
@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_bg_tile_info)
 	int code = m_videoram3[tile_index] & 0x1fff;
 	int colr = m_videoram3[tile_index] & 0xe000;
 
-	SET_TILE_INFO_MEMBER(1, code, (colr >> 13), 0);
+	tileinfo.set(1, code, (colr >> 13), 0);
 }
 
 
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(playmark_state::bigtwinb_get_tx_tile_info)
 	int code = m_videoram1[tile_index] & 0x0fff;
 	int colr = m_videoram1[tile_index] & 0xf000;
 
-	SET_TILE_INFO_MEMBER(3, code, (colr >> 12), 0);
+	tileinfo.set(3, code, (colr >> 12), 0);
 }
 
 /***************************************************************************
@@ -92,8 +92,8 @@ TILE_GET_INFO_MEMBER(playmark_state::bigtwinb_get_tx_tile_info)
 
 VIDEO_START_MEMBER(playmark_state,bigtwin)
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::bigtwin_get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::bigtwin_get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 
@@ -108,9 +108,9 @@ VIDEO_START_MEMBER(playmark_state,bigtwin)
 
 VIDEO_START_MEMBER(playmark_state,bigtwinb)
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::bigtwinb_get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::bigtwinb_get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::hrdtimes_get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::hrdtimes_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -128,9 +128,9 @@ VIDEO_START_MEMBER(playmark_state,bigtwinb)
 
 VIDEO_START_MEMBER(playmark_state,wbeachvl)
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::wbeachvl_get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::wbeachvl_get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::wbeachvl_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -145,8 +145,8 @@ VIDEO_START_MEMBER(playmark_state,wbeachvl)
 
 VIDEO_START_MEMBER(playmark_state,excelsr)
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::bigtwin_get_tx_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::bigtwin_get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 
@@ -160,9 +160,9 @@ VIDEO_START_MEMBER(playmark_state,excelsr)
 
 VIDEO_START_MEMBER(playmark_state,hotmind)
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::hrdtimes_get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::hrdtimes_get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::hrdtimes_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -181,9 +181,9 @@ VIDEO_START_MEMBER(playmark_state,hotmind)
 
 VIDEO_START_MEMBER(playmark_state,luckboomh)
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::hrdtimes_get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::hrdtimes_get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::hrdtimes_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -221,9 +221,9 @@ TILEMAP_MAPPER_MEMBER(playmark_state::playmark_tilemap_scan_pages)
 
 VIDEO_START_MEMBER(playmark_state,hrdtimes)
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(playmark_state::playmark_tilemap_scan_pages),this), 16, 16, 128, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::hrdtimes_get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::hrdtimes_get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(playmark_state::playmark_tilemap_scan_pages)), 16, 16, 128, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playmark_state::hrdtimes_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);

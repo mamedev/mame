@@ -37,7 +37,7 @@ public:
 
 	void rgum(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(rgum_heartbeat_r);
+	DECLARE_READ_LINE_MEMBER(heartbeat_r);
 
 private:
 	required_shared_ptr<uint8_t> m_vram;
@@ -100,7 +100,7 @@ void rgum_state::rgum_map(address_map &map)
 }
 
 
-CUSTOM_INPUT_MEMBER(rgum_state::rgum_heartbeat_r)
+READ_LINE_MEMBER(rgum_state::heartbeat_r)
 {
 	m_hbeat ^= 1;
 
@@ -125,7 +125,7 @@ static INPUT_PORTS_START( rgum )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rgum_state,rgum_heartbeat_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(rgum_state, heartbeat_r)
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

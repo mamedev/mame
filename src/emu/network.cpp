@@ -6,7 +6,7 @@
 
     Core network functions and definitions.
 ***************************************************************************/
-#include <ctype.h>
+#include <cctype>
 
 #include "emu.h"
 #include "network.h"

@@ -281,7 +281,7 @@ TILE_GET_INFO_MEMBER(urashima_state::get_tile_info_urashima)
 	uint16_t tile = code & 0xfff;
 	int region = (TileChip == 0) ? m_tile_bank : 3;
 
-	SET_TILE_INFO_MEMBER(region,
+	tileinfo.set(region,
 			tile,
 			code >> 12,
 			0);
@@ -302,10 +302,10 @@ void urashima_state::video_start()
 {
 	jalmah_state::video_start();
 
-	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<0>),this),tilemap_mapper_delegate(FUNC(urashima_state::range0_16x16),this),16,16,256,32);
+	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(urashima_state::get_tile_info_urashima<0>)), tilemap_mapper_delegate(*this, FUNC(urashima_state::range0_16x16)), 16,16,256,32);
 	// range confirmed with title screen transition in attract mode
 	// also it's confirmed to be 64 x 64 with 2nd tier girls stripping
-	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<1>),this),tilemap_mapper_delegate(FUNC(urashima_state::range3_8x8),this),8,8,64,64);
+	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(urashima_state::get_tile_info_urashima<1>)), tilemap_mapper_delegate(*this, FUNC(urashima_state::range3_8x8)), 8,8,64,64);
 
 	for(int i=0;i<2;i++)
 		m_layer[i]->set_transparent_pen(15);
@@ -1115,35 +1115,11 @@ void jalmah_state::jalmah(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			16*32+0*4, 16*32+1*4, 16*32+2*4, 16*32+3*4, 16*32+4*4, 16*32+5*4, 16*32+6*4, 16*32+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	32*32
-};
-
 static GFXDECODE_START( gfx_urashima )
-	GFXDECODE_ENTRY( "scroll0", 0, tilelayout, 0x100, 16 )
-	GFXDECODE_ENTRY( "scroll1", 0, tilelayout, 0x100, 16 )
-	GFXDECODE_ENTRY( "scroll2", 0, tilelayout, 0x100, 16 )
-	GFXDECODE_ENTRY( "scroll3", 0, charlayout, 0x000, 16 )
+	GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 )
+	GFXDECODE_ENTRY( "scroll1", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 )
+	GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 )
+	GFXDECODE_ENTRY( "scroll3", 0, gfx_8x8x4_packed_msb,               0x000, 16 )
 GFXDECODE_END
 
 void jalmah_state::jalmahv1(machine_config &config)
@@ -1175,8 +1151,8 @@ void urashima_state::urashima(machine_config &config)
 // the original MCU actually uploads these into shared work ram area
 // we actually compile it using EASy68k tool
 #define LOAD_FAKE_MCU_ROM \
-	ROM_REGION( 0x10000, "jmcu_rom", 0 ) \
-	ROM_LOAD16_WORD_SWAP( "mcu.bin", 0, 0x10000, BAD_DUMP CRC(35425d2f) SHA1(9a9914d4e50a665d4eb0efb80552f357fc719e7e)) \
+	ROM_REGION16_BE( 0x10000, "jmcu_rom", 0 ) \
+	ROM_LOAD16_WORD( "mcu.bin", 0, 0x10000, BAD_DUMP CRC(35425d2f) SHA1(9a9914d4e50a665d4eb0efb80552f357fc719e7e)) \
 
 
 /*
@@ -1725,53 +1701,53 @@ READ16_MEMBER(jalmah_state::suchiesp_mcu_r)
 
 void jalmah_state::init_urashima()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::urashima_mcu_r), this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::urashima_mcu_w), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::urashima_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(*this, FUNC(jalmah_state::urashima_mcu_w)));
 
 	m_mcu_prg = URASHIMA_MCU;
 }
 
 void jalmah_state::init_daireika()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::daireika_mcu_r), this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::daireika_mcu_w), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::daireika_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(*this, FUNC(jalmah_state::daireika_mcu_w)));
 
 	m_mcu_prg = DAIREIKA_MCU;
 }
 
 void jalmah_state::init_mjzoomin()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::mjzoomin_mcu_r), this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::mjzoomin_mcu_w), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::mjzoomin_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(*this, FUNC(jalmah_state::mjzoomin_mcu_w)));
 
 	m_mcu_prg = MJZOOMIN_MCU;
 }
 
 void jalmah_state::init_kakumei()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::kakumei_mcu_r)));
 
 	m_mcu_prg = KAKUMEI_MCU;
 }
 
 void jalmah_state::init_kakumei2()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::kakumei_mcu_r)));
 
 	m_mcu_prg = KAKUMEI2_MCU;
 }
 
 void jalmah_state::init_suchiesp()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::suchiesp_mcu_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::suchiesp_mcu_r)));
 
 	m_mcu_prg = SUCHIESP_MCU;
 }
 
 /*First version of the MCU*/
 GAME( 1989, urashima, 0, urashima,  urashima, urashima_state, init_urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1989, daireika, 0, jalmahv1,    daireika, jalmah_state,   init_daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1990, mjzoomin, 0, jalmahv1,    mjzoomin, jalmah_state,   init_mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1989, daireika, 0, jalmahv1,  daireika, jalmah_state,   init_daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1990, mjzoomin, 0, jalmahv1,  mjzoomin, jalmah_state,   init_mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 /*Second version of the MCU*/
 GAME( 1990, kakumei,  0, jalmah,    kakumei,  jalmah_state,   init_kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, kakumei2, 0, jalmah,    kakumei2, jalmah_state,   init_kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )

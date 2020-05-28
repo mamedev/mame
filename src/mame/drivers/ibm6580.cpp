@@ -152,8 +152,6 @@ public:
 	void ibm6580(machine_config &config);
 
 private:
-	void ibm6580_palette(palette_device &palette) const;
-
 	DECLARE_WRITE16_MEMBER(pic_latch_w);
 	DECLARE_WRITE16_MEMBER(unk_latch_w);
 
@@ -164,10 +162,10 @@ private:
 	DECLARE_READ8_MEMBER(video_r);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	DECLARE_READ8_MEMBER(ppi_a_r);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(ppi_c_w);
-	DECLARE_READ8_MEMBER(ppi_c_r);
+	uint8_t ppi_a_r();
+	void led_w(uint8_t data);
+	void ppi_c_w(uint8_t data);
+	uint8_t ppi_c_r();
 
 	DECLARE_WRITE_LINE_MEMBER(kb_data_w);
 	DECLARE_WRITE_LINE_MEMBER(kb_clock_w);
@@ -180,8 +178,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(floppy_hdl);
 	DECLARE_WRITE8_MEMBER(dmapg_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -357,7 +355,7 @@ WRITE16_MEMBER(ibm6580_state::unk_latch_w)
 	m_p40 |= 0x10;
 }
 
-WRITE8_MEMBER(ibm6580_state::led_w)
+void ibm6580_state::led_w(uint8_t data)
 {
 	output().set_value("led5", BIT(data, 7));
 	output().set_value("led6", BIT(data, 6));
@@ -419,7 +417,7 @@ WRITE8_MEMBER(ibm6580_state::led_w)
 	}
 }
 
-WRITE8_MEMBER(ibm6580_state::ppi_c_w)
+void ibm6580_state::ppi_c_w(uint8_t data)
 {
 	LOG("PPI Port C <- %02x\n", data);
 
@@ -435,7 +433,7 @@ WRITE8_MEMBER(ibm6580_state::ppi_c_w)
 	m_kbd->ack_w(BIT(data, 5));
 }
 
-READ8_MEMBER(ibm6580_state::ppi_c_r)
+uint8_t ibm6580_state::ppi_c_r()
 {
 	uint8_t data = 0;
 
@@ -446,7 +444,7 @@ READ8_MEMBER(ibm6580_state::ppi_c_r)
 	return data;
 }
 
-READ8_MEMBER(ibm6580_state::ppi_a_r)
+uint8_t ibm6580_state::ppi_a_r()
 {
 	uint8_t data = m_kb_fifo.dequeue();
 
@@ -488,13 +486,13 @@ WRITE_LINE_MEMBER(ibm6580_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
-READ8_MEMBER(ibm6580_state::memory_read_byte)
+uint8_t ibm6580_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset | (m_dma0pg << 16));
 }
 
-WRITE8_MEMBER(ibm6580_state::memory_write_byte)
+void ibm6580_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset | (m_dma0pg << 16), data);
@@ -823,13 +821,6 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-void ibm6580_state::ibm6580_palette(palette_device &palette) const
-{
-	palette.set_pen_color(0, 0, 0, 0 );     // Black
-	palette.set_pen_color(1, 0, 192, 0 );   // Normal
-	palette.set_pen_color(2, 0, 255, 0 );   // Bright
-}
-
 void ibm6580_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -879,7 +870,7 @@ void ibm6580_state::ibm6580(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("160K,192K,224K,256K,320K,384K");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
 	m_screen->set_raw(25_MHz_XTAL / 2, 833, 0, 640, 428, 0, 400);
 	m_screen->set_screen_update(FUNC(ibm6580_state::screen_update));
 	m_screen->set_palette("palette");
@@ -887,7 +878,7 @@ void ibm6580_state::ibm6580(machine_config &config)
 
 	config.set_default_layout(layout_ibm6580);
 
-	PALETTE(config, "palette", FUNC(ibm6580_state::ibm6580_palette), 3);
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	PIC8259(config, m_pic8259, 0);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);

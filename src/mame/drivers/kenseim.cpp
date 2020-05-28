@@ -138,7 +138,7 @@ GND | 20
 
 */
 
-// note: I've kept this code out of cps1.cpp as there is likely to be a substantial amount of game specific code here ones all the extra hardware is emulated
+// note: I've kept this code out of cps1.cpp as there is likely to be a substantial amount of game specific code here once all the extra hardware is emulated
 
 #include "emu.h"
 #include "cpu/z80/tmpz84c011.h"
@@ -172,11 +172,11 @@ public:
 
 	void init_kenseim();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_1234_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_5678_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_9_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_req_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_LVm_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(cmd_1234_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(cmd_5678_r);
+	DECLARE_READ_LINE_MEMBER(cmd_9_r);
+	DECLARE_READ_LINE_MEMBER(cmd_req_r);
+	DECLARE_READ_LINE_MEMBER(cmd_LVm_r);
 
 private:
 	void mole_up(int side, int mole)
@@ -217,21 +217,21 @@ private:
 
 	// certain
 
-	DECLARE_WRITE8_MEMBER(mb8936_portc_w); // 20x LEDs
+	void mb8936_portc_w(uint8_t data); // 20x LEDs
 
 
 
 	// uncertain
-	DECLARE_WRITE8_MEMBER(cpu_portc_w); // 4 bit out (lamps, coinlock etc.?)
+	void cpu_portc_w(uint8_t data); // 4 bit out (lamps, coinlock etc.?)
 
-	DECLARE_READ8_MEMBER(cpu_portd_r);  // 4 bit in (comms flags from 68k)
+	uint8_t cpu_portd_r();  // 4 bit in (comms flags from 68k)
 
-	DECLARE_WRITE8_MEMBER(cpu_portd_w); // 4 bit out (command flags to 68k?)
-	DECLARE_WRITE8_MEMBER(cpu_porte_w); // 8 bit out (command to 68k?)
+	void cpu_portd_w(uint8_t data); // 4 bit out (command flags to 68k?)
+	void cpu_porte_w(uint8_t data); // 8 bit out (command to 68k?)
 
-	WRITE8_MEMBER(mb8936_porta_w); // maybe molesa output? (6-bits?)
-	WRITE8_MEMBER(mb8936_portb_w); // maybe molesb output? (6-bits?)
-	WRITE8_MEMBER(mb8936_portf_w); // maybe strobe output?
+	void mb8936_porta_w(uint8_t data); // maybe molesa output? (6-bits?)
+	void mb8936_portb_w(uint8_t data); // maybe molesb output? (6-bits?)
+	void mb8936_portf_w(uint8_t data); // maybe strobe output?
 
 	void set_leds(uint32_t ledstates);
 
@@ -269,7 +269,7 @@ void kenseim_state::set_leds(uint32_t ledstates)
 }
 
 // could be wrong
-WRITE8_MEMBER(kenseim_state::mb8936_portc_w)
+void kenseim_state::mb8936_portc_w(uint8_t data)
 {
 	// I'm guessing these are the 20 'power meter' LEDs, 10 for each player? (it writes 42 times, with the last write being some terminator?)
 
@@ -306,7 +306,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_portc_w)
 }
 
 
-WRITE8_MEMBER(kenseim_state::mb8936_porta_w) // maybe molesa output? (6-bits?)
+void kenseim_state::mb8936_porta_w(uint8_t data) // maybe molesa output? (6-bits?)
 {
 	//if (data&0xc0) printf("%s mb8936 write %02x to port A (mole output 1?)\n", machine().describe_context().c_str(), data);
 
@@ -325,7 +325,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_porta_w) // maybe molesa output? (6-bits?)
 
 }
 
-WRITE8_MEMBER(kenseim_state::mb8936_portb_w) // maybe molesb output? (6-bits?)
+void kenseim_state::mb8936_portb_w(uint8_t data) // maybe molesb output? (6-bits?)
 {
 	//if (data&0xc0) printf("%s mb8936 write %02x to port B (mole output 2?)\n", machine().describe_context().c_str(), data);
 
@@ -343,14 +343,14 @@ WRITE8_MEMBER(kenseim_state::mb8936_portb_w) // maybe molesb output? (6-bits?)
 
 }
 
-WRITE8_MEMBER(kenseim_state::mb8936_portf_w)
+void kenseim_state::mb8936_portf_w(uint8_t data)
 {
 	// typically written when the 'moles' output is, maybe the 2 strobes?
 	//printf("%s mb8936 write %02x to port F (strobe?)\n", machine().describe_context().c_str(), data);
 }
 
 
-WRITE8_MEMBER(kenseim_state::cpu_portc_w)
+void kenseim_state::cpu_portc_w(uint8_t data)
 {
 	// port direction is set to 4-in 4-out
 	// d4: coin counter
@@ -373,27 +373,27 @@ WRITE8_MEMBER(kenseim_state::cpu_portc_w)
 
 /* 68k side COMMS reads */
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_1234_r)
+CUSTOM_INPUT_MEMBER(kenseim_state::cmd_1234_r)
 {
 	return (m_to_68k_cmd_low & 0x0f) >> 0;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_5678_r)
+CUSTOM_INPUT_MEMBER(kenseim_state::cmd_5678_r)
 {
 	return (m_to_68k_cmd_low & 0xf0) >> 4;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_9_r)
+READ_LINE_MEMBER(kenseim_state::cmd_9_r)
 {
 	return m_to_68k_cmd_d9;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_req_r)
+READ_LINE_MEMBER(kenseim_state::cmd_req_r)
 {
 	return m_to_68k_cmd_req;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_LVm_r)
+READ_LINE_MEMBER(kenseim_state::cmd_LVm_r)
 {
 	return m_to_68k_cmd_LVm;;
 }
@@ -422,7 +422,7 @@ WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
 
 /* Z80 side COMMS reads */
 
-READ8_MEMBER(kenseim_state::cpu_portd_r)
+uint8_t kenseim_state::cpu_portd_r()
 {
 	// port direction is set to 4-in 4-out
 	// d4: ACK
@@ -434,7 +434,7 @@ READ8_MEMBER(kenseim_state::cpu_portd_r)
 
 /* Z80 side COMMS writes */
 
-WRITE8_MEMBER(kenseim_state::cpu_portd_w)
+void kenseim_state::cpu_portd_w(uint8_t data)
 {
 	// port direction is set to 4-in 4-out
 	// d0: D9
@@ -446,7 +446,7 @@ WRITE8_MEMBER(kenseim_state::cpu_portd_w)
 	m_to_68k_cmd_LVm = data >> 2 & 1;
 }
 
-WRITE8_MEMBER(kenseim_state::cpu_porte_w)
+void kenseim_state::cpu_porte_w(uint8_t data)
 {
 	// DT1-DT8
 	m_to_68k_cmd_low = data;
@@ -504,7 +504,7 @@ void kenseim_state::kenseim(machine_config &config)
 	ppi_x2.in_pe().set_ioport("MOLEB");
 	ppi_x2.out_pf().set(FUNC(kenseim_state::mb8936_portf_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 }
 
 static INPUT_PORTS_START( kenseim )
@@ -512,10 +512,10 @@ static INPUT_PORTS_START( kenseim )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN1*/ ) // n/c
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN2*/ ) // n/c
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_9_r, nullptr) //   PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(kenseim_state, cmd_9_r) //   PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_req_r, nullptr) // PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_LVm_r, nullptr) // PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(kenseim_state, cmd_req_r) // PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(kenseim_state, cmd_LVm_r) // PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // PORT_SERVICE( 0x40, IP_ACTIVE_LOW ) n/c
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
 
@@ -524,7 +524,7 @@ static INPUT_PORTS_START( kenseim )
 //  PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) // D6
 //  PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) // D7
 //  PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) // D8
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_5678_r, nullptr)
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(kenseim_state, cmd_5678_r)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON1*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON2*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON3*/ ) /*PORT_PLAYER(1)*/ // n/c
@@ -534,7 +534,7 @@ static INPUT_PORTS_START( kenseim )
 //  PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) // D2
 //  PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) // D3
 //  PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) // D4
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_1234_r, nullptr)
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(kenseim_state, cmd_1234_r)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON1*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON2*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON3*/ ) /*PORT_PLAYER(2)*/ // n/c
@@ -652,18 +652,18 @@ ROM_START( kenseim )
 	ROM_LOAD16_WORD_SWAP( "knm_21.6f", 0x100000, 0x80000, CRC(a8025e91) SHA1(24cd3f34ae96947a1101e5f5cb6cf0d1c1d66dc0) )
 
 	ROM_REGION( 0x600000, "gfx", 0 )
-	ROMX_LOAD( "knm_01.3a",  0x000000, 0x80000, CRC(923f0c0c) SHA1(2569543ba33900d1e9c7c3981c8fe1cb40743546) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "knm_02.4a",  0x000002, 0x80000, CRC(fa694f67) SHA1(b1ffbeaba71619e9b52f1f50abc7dafe2f3332b1) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "knm_03.5a",  0x000004, 0x80000, CRC(af7af02c) SHA1(ce2e0c696b50e4806f25fc69bf4455048c9fa396) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "knm_04.6a",  0x000006, 0x80000, CRC(607a9af4) SHA1(78862e37c1fa727d9e36099e87ee17dfa9d2498f) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "knm_05.7a",  0x200000, 0x80000, CRC(d877eee9) SHA1(d63e123fa6c1f9927cec3cf93474f31729348fd5) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "knm_06.8a",  0x200002, 0x80000, CRC(8821a281) SHA1(216305421783baa20994eec33e26537f69f34fcb) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "knm_07.9a",  0x200004, 0x80000, CRC(00306d09) SHA1(581c4ba6f9eb3050d6bf989016532457314441e4) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "knm_08.10a", 0x200006, 0x80000, CRC(4a329d16) SHA1(60d66cec8c226ef49890d8b2cd82d798dfefa049) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "knm_10.3c",  0x400000, 0x80000, CRC(ca93a942) SHA1(1f293617e6f202054690035ebe6b6e45ffe68cc9) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "knm_11.4c",  0x400002, 0x80000, CRC(a91f3091) SHA1(7cddcd30aa6a561ce297b877611ffabfac10be28) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "knm_12.5c",  0x400004, 0x80000, CRC(5da8303a) SHA1(de30149e323f7892bb9967a98a0d3cd9c261dc69) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "knm_13.6c",  0x400006, 0x80000, CRC(889bb671) SHA1(c7952ed801343e79c06be8ed765a293e7322307b) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_LOAD64_WORD( "knm_01.3a",  0x000000, 0x80000, CRC(923f0c0c) SHA1(2569543ba33900d1e9c7c3981c8fe1cb40743546) )
+	ROM_LOAD64_WORD( "knm_02.4a",  0x000002, 0x80000, CRC(fa694f67) SHA1(b1ffbeaba71619e9b52f1f50abc7dafe2f3332b1) )
+	ROM_LOAD64_WORD( "knm_03.5a",  0x000004, 0x80000, CRC(af7af02c) SHA1(ce2e0c696b50e4806f25fc69bf4455048c9fa396) )
+	ROM_LOAD64_WORD( "knm_04.6a",  0x000006, 0x80000, CRC(607a9af4) SHA1(78862e37c1fa727d9e36099e87ee17dfa9d2498f) )
+	ROM_LOAD64_WORD( "knm_05.7a",  0x200000, 0x80000, CRC(d877eee9) SHA1(d63e123fa6c1f9927cec3cf93474f31729348fd5) )
+	ROM_LOAD64_WORD( "knm_06.8a",  0x200002, 0x80000, CRC(8821a281) SHA1(216305421783baa20994eec33e26537f69f34fcb) )
+	ROM_LOAD64_WORD( "knm_07.9a",  0x200004, 0x80000, CRC(00306d09) SHA1(581c4ba6f9eb3050d6bf989016532457314441e4) )
+	ROM_LOAD64_WORD( "knm_08.10a", 0x200006, 0x80000, CRC(4a329d16) SHA1(60d66cec8c226ef49890d8b2cd82d798dfefa049) )
+	ROM_LOAD64_WORD( "knm_10.3c",  0x400000, 0x80000, CRC(ca93a942) SHA1(1f293617e6f202054690035ebe6b6e45ffe68cc9) )
+	ROM_LOAD64_WORD( "knm_11.4c",  0x400002, 0x80000, CRC(a91f3091) SHA1(7cddcd30aa6a561ce297b877611ffabfac10be28) )
+	ROM_LOAD64_WORD( "knm_12.5c",  0x400004, 0x80000, CRC(5da8303a) SHA1(de30149e323f7892bb9967a98a0d3cd9c261dc69) )
+	ROM_LOAD64_WORD( "knm_13.6c",  0x400006, 0x80000, CRC(889bb671) SHA1(c7952ed801343e79c06be8ed765a293e7322307b) )
 
 	ROM_REGION( 0x28000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "knm_09.12a",  0x00000, 0x08000, CRC(15394dd7) SHA1(d96413cc8fa6cd3cfdafb2ab6305e41cfd2b8874) )
@@ -673,19 +673,19 @@ ROM_START( kenseim )
 	ROM_LOAD( "knm_18.11c",  0x00000, 0x20000, CRC(9e3e4773) SHA1(6e750a9610fabc4bf4964b5a754414d612d43dec) )
 	ROM_LOAD( "knm_19.12c",  0x20000, 0x20000, CRC(d6c4047f) SHA1(1259a3cbfc14c348ce4bd87b5de5e97ad252f7fb) )
 
-	ROM_REGION( 0x0200, "aboardplds", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0200, "aboardplds", 0 )
 	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
 	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
 	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
 	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
-	ROM_REGION( 0x0200, "bboardplds", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0200, "bboardplds", 0 )
 	ROM_LOAD( "knm10b.1a",    0x0000, 0x0117, CRC(e40131d4) SHA1(47e9f67ecacdf1d946838815dfe7396c9c698f04) )
 	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
 
-	ROM_REGION( 0x0200, "cboardplds", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
 	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 
@@ -695,7 +695,7 @@ ROM_END
 
 void kenseim_state::init_kenseim()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(FUNC(kenseim_state::cps1_kensei_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(*this, FUNC(kenseim_state::cps1_kensei_w)));
 
 	init_cps1();
 

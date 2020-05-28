@@ -21,20 +21,20 @@
     MEMORY I/O MACROS
 ***************************************************************************/
 
-#define TMS34010_RDMEM(A)         ((unsigned)m_program->read_byte (A))
-#define TMS34010_RDMEM_WORD(A)    ((unsigned)m_program->read_word (A))
+#define TMS34010_RDMEM(A)         ((unsigned)m_program.read_byte (A))
+#define TMS34010_RDMEM_WORD(A)    ((unsigned)m_program.read_word (A))
 inline uint32_t tms340x0_device::TMS34010_RDMEM_DWORD(offs_t A)
 {
-	uint32_t result = m_program->read_word(A);
-	return result | (m_program->read_word(A+16)<<16);
+	uint32_t result = m_program.read_word(A);
+	return result | (m_program.read_word(A+16)<<16);
 }
 
-#define TMS34010_WRMEM(A,V)       (m_program->write_byte(A,V))
-#define TMS34010_WRMEM_WORD(A,V)  (m_program->write_word(A,V))
+#define TMS34010_WRMEM(A,V)       (m_program.write_byte(A,V))
+#define TMS34010_WRMEM_WORD(A,V)  (m_program.write_word(A,V))
 inline void tms340x0_device::TMS34010_WRMEM_DWORD(offs_t A, uint32_t V)
 {
-	m_program->write_word(A,V);
-	m_program->write_word(A+16,V>>16);
+	m_program.write_word(A,V);
+	m_program.write_word(A+16,V>>16);
 }
 
 

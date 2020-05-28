@@ -120,17 +120,17 @@ void meg_base_device::device_reset()
 	m_pc = 0;
 }
 
-uint32_t meg_base_device::execute_min_cycles() const
+uint32_t meg_base_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
 
-uint32_t meg_base_device::execute_max_cycles() const
+uint32_t meg_base_device::execute_max_cycles() const noexcept
 {
 	return 1;
 }
 
-uint32_t meg_base_device::execute_input_lines() const
+uint32_t meg_base_device::execute_input_lines() const noexcept
 {
 	return 0;
 }

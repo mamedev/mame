@@ -64,12 +64,11 @@ class p8k_16_daisy_device : public device_t, public z80_daisy_chain_interface
 {
 public:
 	p8k_16_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	IRQ_CALLBACK_MEMBER(irq_callback) {
-		if(!irqline) return 0;
+	uint16_t viack_r() {
 		device_z80daisy_interface *intf = daisy_get_irq_device();
-		return intf ? intf->z80daisy_irq_ack() >> 1 : 0;
+		return intf ? intf->z80daisy_irq_ack() : 0;
 	}
-	DECLARE_WRITE8_MEMBER(reti_w) { if(data == 0x4d) daisy_call_reti_device(); }
+	void reti_w(uint8_t data) { if(data == 0x4d) daisy_call_reti_device(); }
 protected:
 	void device_start() override {}
 };
@@ -98,18 +97,18 @@ public:
 	void init_p8k();
 
 private:
-	DECLARE_READ8_MEMBER(p8k_port0_r);
-	DECLARE_WRITE8_MEMBER(p8k_port0_w);
+	uint8_t port0_r(offs_t offset);
+	void port0_w(offs_t offset, uint8_t data);
 	DECLARE_MACHINE_RESET(p8k);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(p8k_daisy_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(p8k_dma_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(p8k_16_daisy_interrupt );
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 
 	void p8k_16_datamap(address_map &map);
 	void p8k_16_iomap(address_map &map);
@@ -152,7 +151,7 @@ void p8k_state::p8k_memmap(address_map &map)
 void p8k_state::p8k_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x07).rw(FUNC(p8k_state::p8k_port0_r), FUNC(p8k_state::p8k_port0_w)); // MH7489
+	map(0x00, 0x07).rw(FUNC(p8k_state::port0_r), FUNC(p8k_state::port0_w)); // MH7489
 	map(0x08, 0x0b).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw("pio0", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x18, 0x1b).rw("pio1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
@@ -161,18 +160,18 @@ void p8k_state::p8k_iomap(address_map &map)
 	map(0x24, 0x27).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x28, 0x2b).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x2c, 0x2f).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x3c, 0x3c).rw("dma", FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x3c, 0x3c).rw("dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 }
 
 
 
-READ8_MEMBER( p8k_state::p8k_port0_r )
+uint8_t p8k_state::port0_r(offs_t offset)
 {
 	return 0;
 }
 
 // see memory explanation above
-WRITE8_MEMBER( p8k_state::p8k_port0_w )
+void p8k_state::port0_w(offs_t offset, uint8_t data)
 {
 	uint8_t breg = m_maincpu->state_int(Z80_B) >> 4;
 	if ((data==1) || (data==2) || (data==4))
@@ -216,25 +215,25 @@ WRITE_LINE_MEMBER( p8k_state::p8k_dma_irq_w )
 	p8k_daisy_interrupt(state);
 }
 
-READ8_MEMBER(p8k_state::memory_read_byte)
+uint8_t p8k_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(p8k_state::memory_write_byte)
+void p8k_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(p8k_state::io_read_byte)
+uint8_t p8k_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(p8k_state::io_write_byte)
+void p8k_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);
@@ -343,7 +342,7 @@ void p8k_state::p8k_16_datamap(address_map &map)
 
 void p8k_state::p8k_16_iomap(address_map &map)
 {
-//  AM_RANGE(0x0fef0, 0x0feff) // clock
+//  map(0x0fef0, 0x0feff) // clock
 	map(0x0ff80, 0x0ff87).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0ff88, 0x0ff8f).rw("sio1", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0ff90, 0x0ff97).rw("pio0", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)).umask16(0x00ff);
@@ -351,13 +350,13 @@ void p8k_state::p8k_16_iomap(address_map &map)
 	map(0x0ffa0, 0x0ffa7).rw(m_pio2, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)).umask16(0x00ff);
 	map(0x0ffa8, 0x0ffaf).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
 	map(0x0ffb0, 0x0ffb7).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
-//  AM_RANGE(0x0ffc0, 0x0ffc1) // SCR
-//  AM_RANGE(0x0ffc8, 0x0ffc9) // SBR
-//  AM_RANGE(0x0ffd0, 0x0ffd1) // NBR
-//  AM_RANGE(0x0ffd8, 0x0ffd9) // SNVR
+//  map(0x0ffc0, 0x0ffc1) // SCR
+//  map(0x0ffc8, 0x0ffc9) // SBR
+//  map(0x0ffd0, 0x0ffd1) // NBR
+//  map(0x0ffd8, 0x0ffd9) // SNVR
 	map(0x0ffe1, 0x0ffe1).w(m_daisy, FUNC(p8k_16_daisy_device::reti_w));
-//  AM_RANGE(0x0fff0, 0x0fff1) // TRPL
-//  AM_RANGE(0x0fff8, 0x0fff9) // IF1L
+//  map(0x0fff0, 0x0fff1) // TRPL
+//  map(0x0fff8, 0x0fff9) // IF1L
 }
 
 
@@ -488,11 +487,11 @@ void p8k_state::p8k(machine_config &config)
 void p8k_state::p8k_16(machine_config &config)
 {
 	/* basic machine hardware */
-	Z8001(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &p8k_state::p8k_16_memmap);
-	m_maincpu->set_addrmap(AS_DATA, &p8k_state::p8k_16_datamap);
-	m_maincpu->set_addrmap(AS_IO, &p8k_state::p8k_16_iomap);
-	m_maincpu->set_irq_acknowledge_callback("p8k_16_daisy", FUNC(p8k_16_daisy_device::irq_callback));
+	z8001_device &maincpu(Z8001(config, m_maincpu, XTAL(4'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &p8k_state::p8k_16_memmap);
+	maincpu.set_addrmap(AS_DATA, &p8k_state::p8k_16_datamap);
+	maincpu.set_addrmap(AS_IO, &p8k_state::p8k_16_iomap);
+	maincpu.viack().set("p8k_16_daisy", FUNC(p8k_16_daisy_device::viack_r));
 
 	P8K_16_DAISY(config, m_daisy, 0);
 	m_daisy->set_daisy_config(p8k_16_daisy_chain);

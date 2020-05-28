@@ -64,6 +64,7 @@ void potgold_state::machine_reset()
 
 void potgold_state::potgold_map(address_map &map)
 {
+	map(0x08000000, 0x080bffff).ram();
 	map(0xff000000, 0xffffffff).rom().region("user1", 0);
 }
 
@@ -120,11 +121,11 @@ ROM_END
 ROM_START( potgoldu580 ) // TMS34010FNL-40 + MC68H705 + YMF704C + ADV476KP35 RAMDAC + SC28L198A1A UART + EPM7192SQC160-10 CPLD
 	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* 34010 code */
 
-	ROM_LOAD16_BYTE( "pog_580f.u4", 0x180000, 0x80000, CRC(087704d2) SHA1(915c0c57d014d04d5016099915b754e7592cbb0d) )
-	ROM_LOAD16_BYTE( "pog_580f.u7", 0x180001, 0x80000, CRC(4b76499b) SHA1(3d377107a201607d63f802f54771ae562b60ae27) )
+	ROM_LOAD16_BYTE( "pog_580f.u4", 0x100000, 0x80000, CRC(087704d2) SHA1(915c0c57d014d04d5016099915b754e7592cbb0d) )
+	ROM_LOAD16_BYTE( "pog_580f.u7", 0x100001, 0x80000, CRC(4b76499b) SHA1(3d377107a201607d63f802f54771ae562b60ae27) )
 
-	ROM_LOAD16_BYTE( "pog_580f.u5", 0x280000, 0x80000, CRC(64c3b488) SHA1(30564feee544f7b4d1d48c68dbfcd6ae0ae1b220) )
-	ROM_LOAD16_BYTE( "pog_580f.u8", 0x280001, 0x80000, CRC(cca108a4) SHA1(edd46df79bd8835ca61b5d48277de4a70a83e2a0) )
+	ROM_LOAD16_BYTE( "pog_580f.u5", 0x000000, 0x80000, CRC(64c3b488) SHA1(30564feee544f7b4d1d48c68dbfcd6ae0ae1b220) )
+	ROM_LOAD16_BYTE( "pog_580f.u8", 0x000001, 0x80000, CRC(cca108a4) SHA1(edd46df79bd8835ca61b5d48277de4a70a83e2a0) )
 
 	// Dumper's note: "Security" chip needed to run the game. However from what I can tell the chip only collates the bins, dumps them to ram, and keeps settings.
 	ROM_REGION( 0x800, "mcu", 0 )
@@ -132,4 +133,4 @@ ROM_START( potgoldu580 ) // TMS34010FNL-40 + MC68H705 + YMF704C + ADV476KP35 RAM
 ROM_END
 
 GAME( 200?, potgoldu,    0,        potgold,    potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON )
-GAME( 200?, potgoldu580, potgoldu, potgold580, potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON )
+GAME( 2001, potgoldu580, potgoldu, potgold580, potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON )

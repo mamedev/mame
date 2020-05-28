@@ -3,6 +3,9 @@
 /***************************************************************************
 
     Z80-SIO Serial Input/Output
+    Z80-DART Dual Asynchronous Receiver/Transmitter
+    Intel 8274 Multi-Protocol Serial Controller
+    NEC µPD7201 Multiprotocol Serial Communications Controller
 
 ****************************************************************************
              _____   _____               _____               _____
@@ -49,6 +52,97 @@
           R S S D K S D S S R D                  R S S D K S D S S R C
           A A A A   E B B B B B                  A A A A   E B B B B
                     T                                      T
+                                 _____   _____
+                         D1   1 |*    \_/     | 40  D0
+                         D3   2 |             | 39  D2
+                         D5   3 |             | 38  D4
+                         D7   4 |             | 37  D6
+                       _INT   5 |             | 36  _IORQ
+                        IEI   6 |             | 35  _CE
+                        IEO   7 |             | 34  B/_A
+                        _M1   8 |             | 33  C/_D
+                        Vdd   9 |             | 32  _RD
+                    _W/RDYA  10 |   Z80-DART  | 31  GND
+                       _RIA  11 |    Z8470    | 30  _W/RDYB
+                       RxDA  12 |             | 29  _RIB
+                      _RxCA  13 |             | 28  RxDB
+                      _TxCA  14 |             | 27  _RxTxCB
+                       TxDA  15 |             | 26  TxDB
+                      _DTRA  16 |             | 25  _DTRB
+                      _RTSA  17 |             | 24  _RTSB
+                      _CTSA  18 |             | 23  _CTSB
+                      _DCDA  19 |             | 22  _DCDB
+                        CLK  20 |_____________| 21  _RESET
+
+                                 _____   _____
+                        CLK   1 |*    \_/     | 40  Vcc
+                     _RESET   2 |             | 39  _CTSA
+                       _CDA   3 |             | 38  _RTSA
+                      _RxCB   4 |             | 37  TxDA
+                       _CDB   5 |             | 36  _TxCA
+                      _CTSB   6 |             | 35  _RxCA
+                      _TxCB   7 |             | 34  RxDA
+                       TxDB   8 |             | 33  _SYNDETA
+                       RxDB   9 |    DIP40    | 32  RDYA/RxDRQA
+             _RTSB/_SYNDETB  10 |    I8274    | 31  _DTRA
+               RDYB/_TxDRQA  11 |             | 30  _IPO/TxDRQB
+                         D7  12 |             | 29  _IPI/RxDRQB
+                         D6  13 |             | 28  _INT
+                         D5  14 |             | 27  _INTA
+                         D4  15 |             | 26  _DTRB
+                         D3  16 |             | 25  A0
+                         D2  17 |             | 24  A1
+                         D1  18 |             | 23  _CS
+                         D0  19 |             | 22  _RD
+                        Vss  20 |_____________| 21  _WR
+
+                                 _____   _____
+                        CLK   1 |*    \_/     | 40  Vcc
+                     _RESET   2 |             | 39  _CTSA
+                      _DCDA   3 |             | 38  _RTSA
+                      _RxCB   4 |             | 37  TxDA
+                      _DCDB   5 |             | 36  _TxCA
+                      _CTSB   6 |             | 35  _RxCA
+                      _TxCB   7 |             | 34  RxDA
+                       TxDB   8 |             | 33  _SYNCA
+                       RxDB   9 |   DIP40     | 32  _WAITA/DRQRxA
+               _RTSB/_SYNCB  10 |   D7201     | 31  _DTRA/_HAO
+             _WAITB/_DRQTxA  11 |             | 30  _PRO/DRQTxB
+                         D7  12 |             | 29  _PRI/DRQRxB
+                         D6  13 |             | 28  _INT
+                         D5  14 |             | 27  _INTAK
+                         D4  15 |             | 26  _DTRB/_HAI
+                         D3  16 |             | 25  B/_A
+                         D2  17 |             | 24  C/_D
+                         D1  18 |             | 23  _CS
+                         D0  19 |             | 22  _RD
+                        Vss  20 |_____________| 21  _WR
+
+                                 _____   _____
+                           D1  1|*    \_/     |48 D0
+                           D3  2|             |47 D2
+                           D5  3|             |46 D4
+                           D7  4|             |45 D6
+                        _INTR  5|             |44 R/_W
+                          CLK  6|             |43 _IACK
+                        XTAL1  7|             |42 _DTACK
+                        XTAL2  8|             |41 _CS
+                       _RESET  9|             |40 _RxRDYB
+                      _RxRDYA 10|             |39 _TxRDYB
+                      _TxRDYA 11|  DIP48      |38 GND
+                          Vcc 12|  MK68564    |37 _IEI
+                         _IEO 13|  SIO        |36 _SYNCB
+                       _SYNCA 14|             |35 _TxCB
+                        _TxCA 15|             |34 _RxCB
+                        _RxCA 16|             |29 RxDB
+                         RxDA 17|             |28 TxDB
+                         TxDA 18|             |27 _DTRB
+                        _DTRA 19|             |26 _RTSB
+                        _RTSA 20|             |25 _CTSB
+                        _CTSA 21|             |24 _DCDB
+                        _DCDA 22|             |23 A1
+                           A2 23|             |22 A3
+                           A4 24|_____________|21 A5
 
 ***************************************************************************/
 
@@ -78,8 +172,10 @@ class z80sio_device;
 class z80sio_channel : public device_t
 {
 	friend class z80sio_device;
-	friend class i8274_new_device;
-	friend class upd7201_new_device;
+	friend class z80dart_device;
+	friend class i8274_device;
+	friend class upd7201_device;
+	friend class mk68564_device;
 
 public:
 	z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -199,8 +295,8 @@ protected:
 	void set_dtr(int state);
 	void set_rts(int state);
 
-	int get_clock_mode();
-	int get_rx_word_length();
+	int get_clock_mode() const;
+	int get_rx_word_length() const;
 	int get_tx_word_length() const;
 
 	// receiver state
@@ -222,7 +318,7 @@ protected:
 	bool m_rx_crc_en;   // rx CRC enabled
 	bool m_rx_parity;   // accumulated parity
 
-	int m_rx_first;     // first character received
+	bool m_rx_first;    // first character received
 
 	int m_rxd;
 
@@ -247,8 +343,8 @@ protected:
 	int m_rts;          // request to send
 
 	// external/status monitoring
-	int m_ext_latched;  // changed data lines
-	int m_brk_latched;  // break status latched
+	bool m_ext_latched; // changed data lines
+	bool m_brk_latched; // break status latched
 	int m_cts;          // clear to send line state
 	int m_dcd;          // data carrier detect line state
 	int m_sync;         // sync line state
@@ -258,19 +354,19 @@ protected:
 	int m_index;
 	z80sio_device *m_uart;
 
-private:
+protected:
 	// helpers
 	void out_txd_cb(int state);
 	void out_rts_cb(int state);
 	void out_dtr_cb(int state);
 	void set_ready(bool ready);
 	bool receive_allowed() const;
-	bool transmit_allowed() const;
+	virtual bool transmit_allowed() const;
 
 	void receive_enabled();
-	void enter_hunt_mode();
-	void sync_receive();
-	void sdlc_receive();
+	virtual void enter_hunt_mode();
+	virtual void sync_receive();
+	virtual void sdlc_receive();
 	void receive_data();
 	void queue_received(uint16_t data, uint32_t error);
 	void advance_rx_fifo();
@@ -280,18 +376,36 @@ private:
 	void transmit_enable();
 	void transmit_complete();
 	void async_tx_setup();
-	void sync_tx_sr_empty();
+	virtual void sync_tx_sr_empty();
 	void tx_setup(uint16_t data, int bits, bool framing, bool crc_tx, bool abort_tx);
-	void tx_setup_idle();
+	virtual void tx_setup_idle();
 	bool get_tx_empty() const;
 	void set_tx_empty(bool prev_state, bool new_state);
 	void update_crc(uint16_t& crc , bool bit);
 
+	virtual void sync_save_state();
 	void reset_ext_status();
 	void read_ext();
 	void trigger_ext_int();
 
 	uint8_t const m_rr1_auto_reset;
+};
+
+
+// ======================> z80dart_channel
+
+class z80dart_channel : public z80sio_channel
+{
+public:
+	z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void enter_hunt_mode() override;
+	virtual void sync_receive() override;
+	virtual void sdlc_receive() override;
+	virtual void sync_tx_sr_empty() override;
+	virtual void tx_setup_idle() override;
+	virtual void sync_save_state() override;
 };
 
 
@@ -301,6 +415,52 @@ class i8274_channel : public z80sio_channel
 {
 public:
 	i8274_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// ======================> mk68564_channel
+
+class mk68564_channel : public z80sio_channel
+{
+	friend class mk68564_device;
+
+public:
+	mk68564_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual bool transmit_allowed() const override;
+
+private:
+	uint8_t cmdreg_r();
+	void cmdreg_w(uint8_t data);
+	uint8_t modectl_r();
+	void modectl_w(uint8_t data);
+	uint8_t intctl_r();
+	void intctl_w(uint8_t data);
+	uint8_t sync1_r();
+	void sync1_w(uint8_t data);
+	uint8_t sync2_r();
+	void sync2_w(uint8_t data);
+	uint8_t rcvctl_r();
+	void rcvctl_w(uint8_t data);
+	uint8_t xmtctl_r();
+	void xmtctl_w(uint8_t data);
+	uint8_t tcreg_r();
+	void tcreg_w(uint8_t data);
+	uint8_t brgctl_r();
+	void brgctl_w(uint8_t data);
+
+	void brg_update();
+	TIMER_CALLBACK_MEMBER(brg_timeout);
+
+	bool m_tx_auto_enable;
+	uint8_t m_brg_tc;
+	uint8_t m_brg_control;
+	bool m_brg_state;
+	emu_timer *m_brg_timer;
 };
 
 
@@ -402,29 +562,42 @@ protected:
 	optional_device<cpu_device> m_hostcpu;
 
 	// internal state
-	devcb_write_line    m_out_txd_cb[2];
-	devcb_write_line    m_out_dtr_cb[2];
-	devcb_write_line    m_out_rts_cb[2];
-	devcb_write_line    m_out_wrdy_cb[2];
-	devcb_write_line    m_out_sync_cb[2];
+	devcb_write_line::array<2> m_out_txd_cb;
+	devcb_write_line::array<2> m_out_dtr_cb;
+	devcb_write_line::array<2> m_out_rts_cb;
+	devcb_write_line::array<2> m_out_wrdy_cb;
+	devcb_write_line::array<2> m_out_sync_cb;
 
-	devcb_write_line    m_out_int_cb;
-	devcb_write_line    m_out_rxdrq_cb[2];
-	devcb_write_line    m_out_txdrq_cb[2];
+	devcb_write_line m_out_int_cb;
+	devcb_write_line::array<2> m_out_rxdrq_cb;
+	devcb_write_line::array<2> m_out_txdrq_cb;
 
 	int m_int_state[8]; // interrupt state
 	int m_int_source[8]; // interrupt source
 };
 
-class i8274_new_device : public z80sio_device
+class z80dart_device : public z80sio_device
 {
 public:
-	i8274_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual int m1_r() override;
+	DECLARE_WRITE_LINE_MEMBER( ria_w ) { m_chanA->sync_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( rib_w ) { m_chanB->sync_w(state); }
 
 protected:
-	i8274_new_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	// device_t overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+class i8274_device : public z80sio_device
+{
+public:
+	i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint8_t inta_r() { return m1_r(); }
+
+protected:
+	i8274_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -437,15 +610,36 @@ protected:
 	virtual int const *interrupt_priorities() const override;
 };
 
-class upd7201_new_device : public i8274_new_device
+class upd7201_device : public i8274_device
 {
 public:
-	upd7201_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class mk68564_device : public i8274_device
+{
+public:
+	mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_xtal(uint32_t clock);
+	void set_xtal(const XTAL &clock) { set_xtal(clock.value()); }
+
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+
+protected:
+	// device_t overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void vectrg_w(uint8_t data);
 };
 
 // device type declaration
 DECLARE_DEVICE_TYPE(Z80SIO,         z80sio_device)
-DECLARE_DEVICE_TYPE(I8274_NEW,      i8274_new_device)
-DECLARE_DEVICE_TYPE(UPD7201_NEW,    upd7201_new_device)
+DECLARE_DEVICE_TYPE(Z80DART,        z80dart_device)
+DECLARE_DEVICE_TYPE(I8274,          i8274_device)
+DECLARE_DEVICE_TYPE(UPD7201,        upd7201_device)
+DECLARE_DEVICE_TYPE(MK68564,        mk68564_device)
 
 #endif // MAME_MACHINE_Z80SIO_H

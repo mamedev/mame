@@ -34,8 +34,8 @@ public:
 	void evmbug(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(rs232_r);
-	DECLARE_WRITE8_MEMBER(rs232_w);
+	uint8_t rs232_r(offs_t offset);
+	void rs232_w(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
 
 	void io_map(address_map &map);
@@ -67,7 +67,7 @@ void evmbug_state::io_map(address_map &map)
 static INPUT_PORTS_START( evmbug )
 INPUT_PORTS_END
 
-READ8_MEMBER( evmbug_state::rs232_r )
+uint8_t evmbug_state::rs232_r(offs_t offset)
 {
 	if (offset < 8)
 		return BIT(m_term_data, offset);
@@ -84,7 +84,7 @@ READ8_MEMBER( evmbug_state::rs232_r )
 		return 0;
 }
 
-WRITE8_MEMBER( evmbug_state::rs232_w )
+void evmbug_state::rs232_w(offs_t offset, uint8_t data)
 {
 	if (offset < 8)
 	{

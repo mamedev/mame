@@ -103,6 +103,48 @@ static int sony_enable2(void)
 	return (sony.lines & SONY_CA1) && (sony.lines & SONY_LSTRB);
 }
 
+static legacy_floppy_image_device *floppy_get_device(running_machine &machine,int drive)
+{
+	switch(drive) {
+		case 0 : return machine.device<legacy_floppy_image_device>(FLOPPY_0);
+		case 1 : return machine.device<legacy_floppy_image_device>(FLOPPY_1);
+		case 2 : return machine.device<legacy_floppy_image_device>(FLOPPY_2);
+		case 3 : return machine.device<legacy_floppy_image_device>(FLOPPY_3);
+	}
+	return nullptr;
+}
+
+static legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,int ftype,int drive)
+{
+	int i;
+	int cnt = 0;
+	for (i=0;i<4;i++) {
+		legacy_floppy_image_device *disk = floppy_get_device(machine,i);
+		if (disk && disk->floppy_get_drive_type()==ftype) {
+			if (cnt==drive) {
+				return disk;
+			}
+			cnt++;
+		}
+	}
+	return nullptr;
+}
+
+static int floppy_get_drive_by_type(legacy_floppy_image_device *image,int ftype)
+{
+	int i,drive =0;
+	for (i=0;i<4;i++) {
+		legacy_floppy_image_device *disk = floppy_get_device(image->machine(),i);
+		if (disk && disk->floppy_get_drive_type()==ftype) {
+			if (image==disk) {
+				return drive;
+			}
+			drive++;
+		}
+	}
+	return -1;
+}
+
 static void load_track_data(device_t *device,int floppy_select)
 {
 	int track_size;

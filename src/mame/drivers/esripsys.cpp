@@ -191,7 +191,7 @@ WRITE8_MEMBER(esripsys_state::fdt_w)
  *
  *************************************/
 
-READ16_MEMBER( esripsys_state::fdt_rip_r )
+uint16_t esripsys_state::fdt_rip_r(offs_t offset)
 {
 	offset = (offset & 0x7ff) << 1;
 
@@ -201,7 +201,7 @@ READ16_MEMBER( esripsys_state::fdt_rip_r )
 		return (m_fdt_b[offset] << 8) | m_fdt_b[offset + 1];
 }
 
-WRITE16_MEMBER( esripsys_state::fdt_rip_w )
+void esripsys_state::fdt_rip_w(offs_t offset, uint16_t data)
 {
 	offset = (offset & 0x7ff) << 1;
 
@@ -228,7 +228,7 @@ WRITE16_MEMBER( esripsys_state::fdt_rip_w )
    D7 = /FDONE
 */
 
-READ8_MEMBER(esripsys_state::rip_status_in)
+uint8_t esripsys_state::rip_status_in()
 {
 	int vpos =  m_screen->vpos();
 	uint8_t _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
@@ -284,9 +284,9 @@ READ8_MEMBER(esripsys_state::g_iobus_r)
 		case 0x10:
 			return ioport("IO_1")->read();
 		case 0x11:
-			return ioport("JOYSTICK_X")->read();
+			return ioport("STICKX")->read();
 		case 0x12:
-			return ioport("JOYSTICK_Y")->read();
+			return ioport("STICKY")->read();
 		case 0x16:
 			return m_io_firq_status;
 		case 0x18:
@@ -453,11 +453,11 @@ static INPUT_PORTS_START( turbosub )
 	PORT_START("IO_2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("JOYSTICK_X")
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200)
+	PORT_START("STICKX")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
 
-	PORT_START("JOYSTICK_Y")
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200)
+	PORT_START("STICKY")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
 
@@ -670,7 +670,7 @@ void esripsys_state::esripsys(machine_config &config)
 	m_gamecpu->set_addrmap(AS_PROGRAM, &esripsys_state::game_cpu_map);
 	m_gamecpu->set_vblank_int("screen", FUNC(esripsys_state::esripsys_vblank_irq));
 
-	config.m_perfect_cpu_quantum = subtag("game_cpu");
+	config.set_perfect_quantum(m_gamecpu);
 
 	MC6809E(config, m_framecpu, XTAL(8'000'000) / 4);
 	m_framecpu->set_addrmap(AS_PROGRAM, &esripsys_state::frame_cpu_map);

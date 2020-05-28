@@ -23,7 +23,7 @@
 
 class device_sk1100_printer_port_interface;
 
-class sk1100_printer_port_device : public device_t, public device_slot_interface
+class sk1100_printer_port_device : public device_t, public device_single_card_slot_interface<device_sk1100_printer_port_interface>
 {
 public:
 	// construction/destruction
@@ -59,7 +59,7 @@ private:
 // ======================> device_sk1100_printer_port_interface
 
 // class representing interface-specific live sk1100_printer_port peripheral
-class device_sk1100_printer_port_interface : public device_slot_card_interface
+class device_sk1100_printer_port_interface : public device_interface
 {
 	friend class sk1100_printer_port_device;
 public:

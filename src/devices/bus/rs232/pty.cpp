@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "pty.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 
 static constexpr int TIMER_POLL = 1;

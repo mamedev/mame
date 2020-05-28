@@ -8,12 +8,12 @@
 
 ****************************************************************************/
 
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstdio>
+#include <cctype>
+#include <cstdlib>
+#include <cmath>
 #include <new>
-#include <assert.h>
+#include <cassert>
 #include "bitmap.h"
 #include "chd.h"
 #include "avhuff.h"

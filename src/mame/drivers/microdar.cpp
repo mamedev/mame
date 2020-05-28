@@ -58,9 +58,19 @@ IC10 = Hitachi HD74HC244P
 
 **************************************************************************
 
-The "Sagitario" darts machine from CIC Play S.L. uses the same PCB with a different program ROM (from CIC Play).
-The chip at IC1 on the CIC Play PCB is silkscreened as "REF 0034 9115S", and the other at IC17 has
-its surface scratched out.
+Known machines using this hardware:
+___________________________________________________________________________________________________________
+|Dumped | Name       | Manufacturer | Notes                                                               |
+|-------|------------|--------------|---------------------------------------------------------------------|
+|  NO   | Sagitario  | CIC Play     | CPU silkscreened "REF 0034 9115S", without manufacturer logos       |
+|  YES  | Unknown    | Bifuca       | Added as "microdar". Standard Microdar SPD with Philips REF34VA     |
+|  NO   | Party Darts| Compumatic   | More info: http://www.recreativas.org/party-darts-4906-compumatic   |
+|  NO   | Diamant    | Unknown      | Newer PCB with Philips REF34VA and additional Compumatic custom ICs |
+|  NO   | Tiger Dart | Unknown      | Standard Microdar SPD with Philips REF34VA                          |
+|_______|____________|______________|_____________________________________________________________________|
+
+There's a later revision of the Compumatic Microdar PCB (V5), smaller, with a standard Atmel AT89S51
+instead of the REF34 CPU.
 
 */
 
@@ -110,7 +120,7 @@ void microdar_state::microdar(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // GM76C88ALK-15 + battery
 
-	I2CMEM(config, m_eeprom).set_page_size(16).set_data_size(0x800);
+	I2C_24C16(config, m_eeprom); // 24LC16B
 
 	// Code also references some sort of serial RTC?
 }

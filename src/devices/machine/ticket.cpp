@@ -51,7 +51,7 @@ ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, 
 	, m_status(0)
 	, m_power(0)
 	, m_timer(nullptr)
-	, m_output(*this, "led2") // TODO: probably shouldn't be hardcoded
+	, m_output(*this, tag) // TODO: change to "tag:status"
 {
 }
 

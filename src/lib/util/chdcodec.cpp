@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "chd.h"
 #include "hashing.h"
@@ -760,7 +760,7 @@ void chd_zlib_allocator::install(z_stream &stream)
 
 voidpf chd_zlib_allocator::fast_alloc(voidpf opaque, uInt items, uInt size)
 {
-	chd_zlib_allocator *codec = reinterpret_cast<chd_zlib_allocator *>(opaque);
+	auto *codec = reinterpret_cast<chd_zlib_allocator *>(opaque);
 
 	// compute the size, rounding to the nearest 1k
 	size = (size * items + 0x3ff) & ~0x3ff;
@@ -778,7 +778,7 @@ voidpf chd_zlib_allocator::fast_alloc(voidpf opaque, uInt items, uInt size)
 	}
 
 	// alloc a new one and put it into the list
-	uint32_t *ptr = reinterpret_cast<uint32_t *>(new uint8_t[size + sizeof(uint32_t)]);
+	auto *ptr = reinterpret_cast<uint32_t *>(new uint8_t[size + sizeof(uint32_t)]);
 	for (int scan = 0; scan < MAX_ZLIB_ALLOCS; scan++)
 		if (codec->m_allocptr[scan] == nullptr)
 		{
@@ -799,7 +799,7 @@ voidpf chd_zlib_allocator::fast_alloc(voidpf opaque, uInt items, uInt size)
 
 void chd_zlib_allocator::fast_free(voidpf opaque, voidpf address)
 {
-	chd_zlib_allocator *codec = reinterpret_cast<chd_zlib_allocator *>(opaque);
+	auto *codec = reinterpret_cast<chd_zlib_allocator *>(opaque);
 
 	// find the hunk
 	uint32_t *ptr = reinterpret_cast<uint32_t *>(address) - 1;
@@ -980,7 +980,7 @@ chd_lzma_allocator::~chd_lzma_allocator()
 
 void *chd_lzma_allocator::fast_alloc(void *p, size_t size)
 {
-	chd_lzma_allocator *codec = reinterpret_cast<chd_lzma_allocator *>(p);
+	auto *codec = reinterpret_cast<chd_lzma_allocator *>(p);
 
 	// compute the size, rounding to the nearest 1k
 	size = (size + 0x3ff) & ~0x3ff;
@@ -998,7 +998,7 @@ void *chd_lzma_allocator::fast_alloc(void *p, size_t size)
 	}
 
 	// alloc a new one and put it into the list
-	uint32_t *ptr = reinterpret_cast<uint32_t *>(new uint8_t[size + sizeof(uint32_t)]);
+	auto *ptr = reinterpret_cast<uint32_t *>(new uint8_t[size + sizeof(uint32_t)]);
 	for (int scan = 0; scan < MAX_LZMA_ALLOCS; scan++)
 		if (codec->m_allocptr[scan] == nullptr)
 		{
@@ -1022,7 +1022,7 @@ void chd_lzma_allocator::fast_free(void *p, void *address)
 	if (address == nullptr)
 		return;
 
-	chd_lzma_allocator *codec = reinterpret_cast<chd_lzma_allocator *>(p);
+	auto *codec = reinterpret_cast<chd_lzma_allocator *>(p);
 
 	// find the hunk
 	uint32_t *ptr = reinterpret_cast<uint32_t *>(address) - 1;

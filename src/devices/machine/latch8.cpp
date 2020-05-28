@@ -36,7 +36,7 @@ TIMER_CALLBACK_MEMBER( latch8_device::timerproc )
 
 /* ----------------------------------------------------------------------- */
 
-READ8_MEMBER( latch8_device::read )
+uint8_t latch8_device::read(offs_t offset)
 {
 	uint8_t res;
 
@@ -55,7 +55,7 @@ READ8_MEMBER( latch8_device::read )
 }
 
 
-WRITE8_MEMBER( latch8_device::write )
+void latch8_device::write(offs_t offset, uint8_t data)
 {
 	assert(offset == 0);
 
@@ -66,7 +66,7 @@ WRITE8_MEMBER( latch8_device::write )
 }
 
 
-WRITE8_MEMBER( latch8_device::reset_w )
+void latch8_device::reset_w(offs_t offset, uint8_t data)
 {
 	assert(offset == 0);
 
@@ -90,14 +90,14 @@ void latch8_device::bitx_w(int bit, offs_t offset, uint8_t data)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(latch8_device::timerproc),this), (mask << 8) | masked_data);
 }
 
-WRITE8_MEMBER( latch8_device::bit0_w ) { bitx_w(0, offset, data); }
-WRITE8_MEMBER( latch8_device::bit1_w ) { bitx_w(1, offset, data); }
-WRITE8_MEMBER( latch8_device::bit2_w ) { bitx_w(2, offset, data); }
-WRITE8_MEMBER( latch8_device::bit3_w ) { bitx_w(3, offset, data); }
-WRITE8_MEMBER( latch8_device::bit4_w ) { bitx_w(4, offset, data); }
-WRITE8_MEMBER( latch8_device::bit5_w ) { bitx_w(5, offset, data); }
-WRITE8_MEMBER( latch8_device::bit6_w ) { bitx_w(6, offset, data); }
-WRITE8_MEMBER( latch8_device::bit7_w ) { bitx_w(7, offset, data); }
+void latch8_device::bit0_w(offs_t offset, uint8_t data) { bitx_w(0, offset, data); }
+void latch8_device::bit1_w(offs_t offset, uint8_t data) { bitx_w(1, offset, data); }
+void latch8_device::bit2_w(offs_t offset, uint8_t data) { bitx_w(2, offset, data); }
+void latch8_device::bit3_w(offs_t offset, uint8_t data) { bitx_w(3, offset, data); }
+void latch8_device::bit4_w(offs_t offset, uint8_t data) { bitx_w(4, offset, data); }
+void latch8_device::bit5_w(offs_t offset, uint8_t data) { bitx_w(5, offset, data); }
+void latch8_device::bit6_w(offs_t offset, uint8_t data) { bitx_w(6, offset, data); }
+void latch8_device::bit7_w(offs_t offset, uint8_t data) { bitx_w(7, offset, data); }
 
 DEFINE_DEVICE_TYPE(LATCH8, latch8_device, "latch8", "8-bit latch")
 
@@ -109,8 +109,8 @@ latch8_device::latch8_device(const machine_config &mconfig, const char *tag, dev
 	, m_maskout(0)
 	, m_xorvalue(0)
 	, m_nosync(0)
-	, m_write_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_read_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_write_cb(*this)
+	, m_read_cb(*this)
 {
 }
 

@@ -64,11 +64,11 @@ private:
 	DECLARE_READ8_MEMBER(p2_mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_READ8_MEMBER(audio_cmd_r);
-	DECLARE_WRITE8_MEMBER(audio_p1_w);
-	DECLARE_WRITE8_MEMBER(audio_p2_w);
+	uint8_t audio_cmd_r();
+	void audio_p1_w(uint8_t data);
+	void audio_p2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(audio_t1_r);
-	DECLARE_WRITE8_MEMBER(ay_pa_w);
+	void ay_pa_w(uint8_t data);
 
 	void ron_audio_io(address_map &map);
 	void ron_audio_map(address_map &map);
@@ -438,12 +438,12 @@ WRITE_LINE_MEMBER(ron_state::vblank_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-READ8_MEMBER(ron_state::audio_cmd_r)
+uint8_t ron_state::audio_cmd_r()
 {
 	return m_sound_command << 3;
 }
 
-WRITE8_MEMBER(ron_state::audio_p1_w)
+void ron_state::audio_p1_w(uint8_t data)
 {
 	//address_space &space = m_audiocpu->space(AS_PROGRAM);
 
@@ -456,7 +456,7 @@ WRITE8_MEMBER(ron_state::audio_p1_w)
 		m_ay->data_w(data);
 }
 
-WRITE8_MEMBER(ron_state::audio_p2_w)
+void ron_state::audio_p2_w(uint8_t data)
 {
 	// TODO: guesswork, presumably f/f based
 	// p2 ff
@@ -482,7 +482,7 @@ READ_LINE_MEMBER(ron_state::audio_t1_r)
 	return !BIT(m_sound_command, 6);
 }
 
-WRITE8_MEMBER(ron_state::ay_pa_w)
+void ron_state::ay_pa_w(uint8_t data)
 {
 }
 
@@ -496,7 +496,7 @@ void ron_state::ron(machine_config &config)
 	I8035(config, m_audiocpu, SOUND_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ron_state::ron_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &ron_state::ron_audio_io);
-	m_audiocpu->set_t0_clk_cb("aysnd", FUNC(device_t::set_unscaled_clock));
+	m_audiocpu->set_t0_clk_cb("aysnd", FUNC(device_t::set_unscaled_clock_int));
 	m_audiocpu->p2_in_cb().set(FUNC(ron_state::audio_cmd_r));
 	m_audiocpu->p1_out_cb().set(FUNC(ron_state::audio_p1_w));
 	m_audiocpu->p2_out_cb().set(FUNC(ron_state::audio_p2_w));

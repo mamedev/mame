@@ -12,7 +12,7 @@
 
 ************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/agat840k_hle_dsk.h"
 

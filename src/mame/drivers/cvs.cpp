@@ -159,7 +159,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(0 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636[0]->read_data(space, offset);
+		return m_s2636[0]->read_data(offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
@@ -171,7 +171,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636[0]->write_data(space, offset, data);
+		m_s2636[0]->write_data(offset, data);
 }
 
 
@@ -180,7 +180,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(1 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636[1]->read_data(space, offset);
+		return m_s2636[1]->read_data(offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
@@ -192,7 +192,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636[1]->write_data(space, offset, data);
+		m_s2636[1]->write_data(offset, data);
 }
 
 
@@ -201,7 +201,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(2 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636[2]->read_data(space, offset);
+		return m_s2636[2]->read_data(offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
@@ -213,7 +213,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636[2]->write_data(space, offset, data);
+		m_s2636[2]->write_data(offset, data);
 }
 
 
@@ -226,7 +226,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 
 INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
 {
-	device.execute().pulse_input_line_and_vector(0, 0x03, device.execute().minimum_quantum_time());
+	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
 
 	cvs_scroll_stars();
 }
@@ -234,9 +234,7 @@ INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
 
 WRITE_LINE_MEMBER(cvs_state::cvs_slave_cpu_interrupt)
 {
-	m_audiocpu->set_input_line_vector(0, 0x03); // S2650
-	//m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-	m_audiocpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -376,7 +374,7 @@ READ8_MEMBER(cvs_state::cvs_speech_command_r)
 {
 	/* FIXME: this was by observation on board ???
 	 *          -bit 7 is TMS status (active LO) */
-	return ((m_tms5110->ctl_r(space, 0) ^ 1) << 7) | (m_soundlatch->read() & 0x7f);
+	return ((m_tms5110->ctl_r() ^ 1) << 7) | (m_soundlatch->read() & 0x7f);
 }
 
 
@@ -394,7 +392,7 @@ WRITE8_MEMBER(cvs_state::cvs_tms5110_ctl_w)
 			(m_tms5110_ctl_data[1] << 3);   /* CTL8 */
 
 	LOG(("CVS: Speech CTL = %04x %02x %02x\n",  ctl, offset, data));
-	m_tms5110->ctl_w(space, 0, ctl);
+	m_tms5110->ctl_w(ctl);
 }
 
 
@@ -973,16 +971,18 @@ void cvs_state::cvs(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(cvs_state::cvs_main_cpu_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->flag_handler().set(FUNC(cvs_state::write_s2650_flag));
+	m_maincpu->intack_handler().set_constant(0x03);
 
 	S2650(config, m_audiocpu, XTAL(14'318'181)/16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_dac_cpu_map);
+	m_audiocpu->intack_handler().set([this] { m_audiocpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 	/* doesn't look like it is used at all */
-	//MCFG_S2650_SENSE_INPUT(READLINE(*this, cvs_state, cvs_393hz_clock_r))
+	//m_audiocpu->sense_handler().set(FUNC(cvs_state::cvs_393hz_clock_r));
 
 	S2650(config, m_speechcpu, XTAL(14'318'181)/16);
 	m_speechcpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_speech_cpu_map);
 	/* romclk is much more probable, 393 Hz results in timing issues */
-	//MCFG_S2650_SENSE_INPUT(READLINE(*this, cvs_state, cvs_393hz_clock_r))
+	//m_speechcpu->sense_handler().set(FUNC(cvs_state::cvs_393hz_clock_r));
 	m_speechcpu->sense_handler().set("tms", FUNC(tms5110_device::romclk_hack_r));
 
 	/* video hardware */
@@ -1561,7 +1561,7 @@ READ8_MEMBER(cvs_state::huncholy_prot_r)
 
 void cvs_state::init_huncholy()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8_delegate(FUNC(cvs_state::huncholy_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8_delegate(*this, FUNC(cvs_state::huncholy_prot_r)));
 
 	save_item(NAME(m_protection_counter));
 }
@@ -1586,7 +1586,7 @@ READ8_MEMBER(cvs_state::superbik_prot_r)
 void cvs_state::init_superbik()
 {
 	m_protection_counter = 0;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f1, 0x73f2, read8_delegate(FUNC(cvs_state::superbik_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f1, 0x73f2, read8_delegate(*this, FUNC(cvs_state::superbik_prot_r)));
 
 	save_item(NAME(m_protection_counter));
 }
@@ -1619,7 +1619,7 @@ READ8_MEMBER(cvs_state::hero_prot_r)
 
 void cvs_state::init_hero()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f0, 0x73ff, read8_delegate(FUNC(cvs_state::hero_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f0, 0x73ff, read8_delegate(*this, FUNC(cvs_state::hero_prot_r)));
 }
 
 

@@ -61,17 +61,17 @@ public:
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_READ8_MEMBER(vector06_8255_portb_r);
-	DECLARE_READ8_MEMBER(vector06_8255_portc_r);
-	DECLARE_WRITE8_MEMBER(vector06_8255_porta_w);
-	DECLARE_WRITE8_MEMBER(vector06_8255_portb_w);
+	uint8_t vector06_8255_portb_r();
+	uint8_t vector06_8255_portc_r();
+	void vector06_8255_porta_w(uint8_t data);
+	void vector06_8255_portb_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(vector06_color_set);
-	DECLARE_READ8_MEMBER(vector06_romdisk_portb_r);
-	DECLARE_WRITE8_MEMBER(vector06_romdisk_portb_w);
-	DECLARE_WRITE8_MEMBER(vector06_romdisk_porta_w);
-	DECLARE_WRITE8_MEMBER(vector06_romdisk_portc_w);
+	uint8_t vector06_romdisk_portb_r();
+	void vector06_romdisk_portb_w(uint8_t data);
+	void vector06_romdisk_porta_w(uint8_t data);
+	void vector06_romdisk_portc_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(vector06_disc_w);
-	DECLARE_WRITE8_MEMBER(vector06_status_callback);
+	void vector06_status_callback(uint8_t data);
 	DECLARE_WRITE8_MEMBER(vector06_ramdisk_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	void vector06_set_video_mode(int width);

@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(welltris_state::get_tile_info)
 	uint16_t code = m_charvideoram[tile_index];
 	int bank = (code & 0x1000) >> 12;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code & 0x0fff) + (m_gfxbank[bank] << 12),
 			((code & 0xe000) >> 13) + (8 * m_charpalettebank),
 			0);
@@ -71,7 +71,7 @@ WRITE16_MEMBER(welltris_state::charvideoram_w)
 
 void welltris_state::video_start()
 {
-	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(welltris_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(welltris_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_char_tilemap->set_transparent_pen(15);
 

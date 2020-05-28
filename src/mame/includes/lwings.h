@@ -25,12 +25,18 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	void lwings(machine_config &config);
+	void sectionz(machine_config &config);
 	void trojan(machine_config &config);
 	void fball(machine_config &config);
 	void avengers(machine_config &config);
 	void avengersb(machine_config &config);
 
 	void init_avengersb();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	/* memory pointers */
@@ -78,9 +84,6 @@ private:
 	TILE_GET_INFO_MEMBER(lwings_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(trojan_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_VIDEO_START(trojan);
 	DECLARE_VIDEO_START(avengers);
 	DECLARE_VIDEO_START(avengersb);

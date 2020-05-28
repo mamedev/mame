@@ -25,7 +25,6 @@ able to deal with 256byte sectors so fails to load the irmx 512byte sector image
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
-//#include "machine/z80dart.h"
 #include "machine/z80sio.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/isbx/isbx.h"
@@ -45,7 +44,7 @@ public:
 		, m_centronics(*this, "centronics")
 		, m_cent_status_in(*this, "cent_status_in")
 		, m_statuslatch(*this, "statuslatch")
-		, m_bios(*this, "user1")
+		, m_bios(*this, "bios")
 		, m_biosram(*this, "biosram")
 		, m_sbx(*this, "sbx%u", 1U)
 	{ }
@@ -63,8 +62,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
 	DECLARE_WRITE_LINE_MEMBER(isbc286_tmr2_w);
 //  DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE8_MEMBER(ppi_c_w);
+	uint8_t get_slave_ack(offs_t offset);
+	void ppi_c_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(upperen_w);
 	DECLARE_READ16_MEMBER(bioslo_r);
 	DECLARE_WRITE16_MEMBER(bioslo_w);
@@ -89,7 +88,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8251_device> m_uart8251;
 //  optional_device<i8274_device> m_uart8274;
-	optional_device<i8274_new_device> m_uart8274;
+	optional_device<i8274_device> m_uart8274;
 	required_device<pic8259_device> m_pic_0;
 	optional_device<pic8259_device> m_pic_1;
 	optional_device<centronics_device> m_centronics;
@@ -123,7 +122,7 @@ void isbc_state::rpc86_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0xcffff).ram();
-	map(0xf8000, 0xfffff).rom().region("user1", 0);
+	map(0xf8000, 0xfffff).rom().region("bios", 0);
 }
 
 void isbc_state::rpc86_io(address_map &map)
@@ -159,7 +158,7 @@ void isbc_state::isbc86_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0xfbfff).ram();
-	map(0xfc000, 0xfffff).rom().region("user1", 0);
+	map(0xfc000, 0xfffff).rom().region("bios", 0);
 }
 
 void isbc_state::isbc_io(address_map &map)
@@ -189,7 +188,7 @@ void isbc_state::isbc286_io(address_map &map)
 	map(0x00c8, 0x00cf).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).w(FUNC(isbc_state::upperen_w)).umask16(0xff00);
 	map(0x00d0, 0x00d7).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
-	map(0x00d8, 0x00df).rw(m_uart8274, FUNC(i8274_new_device::cd_ba_r), FUNC(i8274_new_device::cd_ba_w)).umask16(0x00ff);
+	map(0x00d8, 0x00df).rw(m_uart8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0100, 0x0100).w("isbc_215g", FUNC(isbc_215g_device::write));
 }
 
@@ -197,8 +196,8 @@ void isbc_state::isbc286_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0xdffff).ram();
-	map(0xe0000, 0xfffff).rom().region("user1", 0);
-	map(0xfe0000, 0xffffff).rom().region("user1", 0);
+	map(0xe0000, 0xfffff).rom().region("bios", 0);
+	map(0xfe0000, 0xffffff).rom().region("bios", 0);
 }
 
 void isbc_state::isbc2861_mem(address_map &map)
@@ -206,8 +205,8 @@ void isbc_state::isbc2861_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0xdffff).ram();
 	map(0xe0000, 0xfffff).rw(FUNC(isbc_state::bioslo_r), FUNC(isbc_state::bioslo_w)).share("biosram");
-//  AM_RANGE(0x100000, 0x1fffff) AM_RAM // FIXME: XENIX doesn't like this, IRMX is okay with it
-	map(0xff0000, 0xffffff).rom().region("user1", 0);
+//  map(0x100000, 0x1fffff).ram(); // FIXME: XENIX doesn't like this, IRMX is okay with it
+	map(0xff0000, 0xffffff).rom().region("bios", 0);
 }
 
 /* Input ports */
@@ -238,7 +237,7 @@ WRITE_LINE_MEMBER( isbc_state::isbc86_tmr2_w )
 	m_uart8251->write_txc(state);
 }
 
-READ8_MEMBER( isbc_state::get_slave_ack )
+uint8_t isbc_state::get_slave_ack(offs_t offset)
 {
 	if (offset == 7)
 		return m_pic_1->acknowledge();
@@ -260,7 +259,7 @@ WRITE_LINE_MEMBER( isbc_state::write_centronics_ack )
 		m_pic_1->ir7_w(1);
 }
 
-WRITE8_MEMBER( isbc_state::ppi_c_w )
+void isbc_state::ppi_c_w(uint8_t data)
 {
 	m_centronics->write_strobe(data & 1);
 
@@ -449,14 +448,13 @@ void isbc_state::isbc286(machine_config &config)
 	pit.set_clk<0>(XTAL(22'118'400)/18);
 	pit.out_handler<0>().set(m_pic_0, FUNC(pic8259_device::ir0_w));
 	pit.set_clk<1>(XTAL(22'118'400)/18);
-//  pit.out_handler<1>().set(m_uart8274, FUNC(z80dart_device::rxtxcb_w));
-	pit.out_handler<1>().set(m_uart8274, FUNC(i8274_new_device::rxtxcb_w));
+	pit.out_handler<1>().set(m_uart8274, FUNC(i8274_device::rxtxcb_w));
 	pit.set_clk<2>(XTAL(22'118'400)/18);
 	pit.out_handler<2>().set(FUNC(isbc_state::isbc286_tmr2_w));
 
 	i8255_device &ppi(I8255A(config, "ppi"));
-	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
-	ppi.in_pb_callback().set(m_cent_status_in, FUNC(input_buffer_device::bus_r));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
+	ppi.in_pb_callback().set(m_cent_status_in, FUNC(input_buffer_device::read));
 	ppi.out_pc_callback().set(FUNC(isbc_state::ppi_c_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -479,7 +477,7 @@ void isbc_state::isbc286(machine_config &config)
 	m_uart8274->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 	m_uart8274->out_int_callback().set(FUNC(isbc_state::isbc_uart8274_irq));
 #else
-	I8274_NEW(config, m_uart8274, XTAL(16'000'000)/4);
+	I8274(config, m_uart8274, XTAL(16'000'000)/4);
 	m_uart8274->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_uart8274->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	m_uart8274->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -491,26 +489,14 @@ void isbc_state::isbc286(machine_config &config)
 #endif
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
-#if 0
-	rs232a.rxd_handler().set(m_uart8274, FUNC(z80dart_device::rxa_w));
-	rs232a.dcd_handler().set(m_uart8274, FUNC(z80dart_device::dcda_w));
-	rs232a.cts_handler().set(m_uart8274, FUNC(z80dart_device::ctsa_w));
-#else
-	rs232a.rxd_handler().set(m_uart8274, FUNC(i8274_new_device::rxa_w));
-	rs232a.dcd_handler().set(m_uart8274, FUNC(i8274_new_device::dcda_w));
-	rs232a.cts_handler().set(m_uart8274, FUNC(i8274_new_device::ctsa_w));
-#endif
+	rs232a.rxd_handler().set(m_uart8274, FUNC(i8274_device::rxa_w));
+	rs232a.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcda_w));
+	rs232a.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "terminal"));
-#if 0
-	rs232b.rxd_handler().set(m_uart8274, FUNC(z80dart_device::rxb_w));
-	rs232b.dcd_handler().set(m_uart8274, FUNC(z80dart_device::dcdb_w));
-	rs232b.cts_handler().set(m_uart8274, FUNC(z80dart_device::ctsb_w));
-#else
-	rs232b.rxd_handler().set(m_uart8274, FUNC(i8274_new_device::rxb_w));
-	rs232b.dcd_handler().set(m_uart8274, FUNC(i8274_new_device::dcdb_w));
-	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_new_device::ctsb_w));
-#endif
+	rs232b.rxd_handler().set(m_uart8274, FUNC(i8274_device::rxb_w));
+	rs232b.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcdb_w));
+	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsb_w));
 	rs232b.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(isbc286_terminal));
 
 	ISBX_SLOT(config, m_sbx[0], 0, isbx_cards, nullptr);
@@ -531,7 +517,7 @@ void isbc_state::isbc2861(machine_config &config)
 
 /* ROM definition */
 ROM_START( isbc86 )
-	ROM_REGION( 0x4000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x4000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "8612_2u.bin", 0x0001, 0x1000, CRC(84fa14cf) SHA1(783e1459ab121201fd49368d4bf769c1bab6447a))
 	ROM_LOAD16_BYTE( "8612_2l.bin", 0x0000, 0x1000, CRC(922bda5f) SHA1(15743e69f3aba56425fa004d19b82ec20532fd72))
 	ROM_LOAD16_BYTE( "8612_3u.bin", 0x2001, 0x1000, CRC(68d47c3e) SHA1(16c17f26b33daffa84d065ff7aefb581544176bd))
@@ -539,12 +525,12 @@ ROM_START( isbc86 )
 ROM_END
 
 ROM_START( isbc8605 )
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8605mon.bin", 0x4000, 0x4000, CRC(e16acb6e) SHA1(eb9a3fd21f7609d44f8052b6a0603ecbb52dc3f3))
 ROM_END
 
 ROM_START( isbc8630 )
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "14378", "14378" )
 	ROMX_LOAD( "143780-001_isdm_for_isbc_86-30_socket_u57_i2732a.bin", 0x4000, 0x1000, CRC(db0ef880) SHA1(8ef296066d16881217618e54b410d12157f318ea), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "143782-001_isdm_for_isbc_86-30_socket_u39_i2732a.bin", 0x4001, 0x1000, CRC(ea1ebe78) SHA1(f03b63659e8f5e96f481dbc6c2ddef1d22850ebb), ROM_SKIP(1) | ROM_BIOS(0))
@@ -558,7 +544,7 @@ ROM_START( isbc8630 )
 ROM_END
 
 ROM_START( isbc286 )
-	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x20000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "u79.bin", 0x00001, 0x10000, CRC(144182ea) SHA1(4620ca205a6ac98fe2636183eaead7c4bfaf7a72))
 	ROM_LOAD16_BYTE( "u36.bin", 0x00000, 0x10000, CRC(22db075f) SHA1(fd29ea77f5fc0697c8f8b66aca549aad5b9db3ea))
 ROM_END
@@ -636,7 +622,7 @@ ROM_END
  * :uart8274 B Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
 */
 ROM_START( isbc2861 )
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v11", "iSDM Monitor V1.1" )
 	ROMX_LOAD( "174894-001.bin", 0x0000, 0x4000, CRC(79e4f7af) SHA1(911a4595d35e6e82b1149e75bb027927cd1c1658), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "174894-002.bin", 0x0001, 0x4000, CRC(66747d21) SHA1(4094b1f10a8bc7db8d6dd48d7128e14e875776c7), ROM_SKIP(1) | ROM_BIOS(0))
@@ -650,13 +636,13 @@ ROM_START( isbc2861 )
 ROM_END
 
 ROM_START( isbc28612 )
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "176346-001.bin", 0x0000, 0x8000, CRC(f86c8be5) SHA1(e2bb16b0aeb718219e65d61edabd7838ef34c560))
 	ROM_LOAD16_BYTE( "176346-002.bin", 0x0001, 0x8000, CRC(b964c6c3) SHA1(c3de8541182e32b3568fde77da8c435eab397498))
 ROM_END
 
 ROM_START( rpc86 )
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "145068-001.bin", 0x4001, 0x1000, CRC(0fa9db83) SHA1(4a44f8683c263c9ef6850cbe05aaa73f4d4d4e06))
 	ROM_LOAD16_BYTE( "145069-001.bin", 0x6001, 0x1000, CRC(1692a076) SHA1(0ce3a4a867cb92340871bb8f9c3e91ce2984c77c))
 	ROM_LOAD16_BYTE( "145070-001.bin", 0x4000, 0x1000, CRC(8c8303ef) SHA1(60f94daa76ab9dea6e309ac580152eb212b847a0))

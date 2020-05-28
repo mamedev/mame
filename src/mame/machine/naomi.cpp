@@ -210,8 +210,8 @@ void naomi_state::set_drc_options()
 
 void naomi_state::init_naomi()
 {
-	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r), this)); // rev h bios
+	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(*this, FUNC(naomi_state::naomi_biose_idle_skip_r)); // rev e bios
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(*this, FUNC(naomi_state::naomi_biosh_idle_skip_r))); // rev h bios
 
 	set_drc_options();
 	create_pic_from_retdat();
@@ -219,7 +219,7 @@ void naomi_state::init_naomi()
 
 void naomi2_state::init_naomi2()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi2_biose_idle_skip_r),this)); // rev e bios
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(*this, FUNC(naomi_state::naomi2_biose_idle_skip_r))); // rev e bios
 
 	set_drc_options();
 	create_pic_from_retdat();
@@ -232,18 +232,34 @@ INPUT_CHANGED_MEMBER(naomi_state::naomi_mp_w)
 
 CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
 {
-	const char *tagptr = (const char *)param;
 	uint8_t retval = 0;
 
-	for (int i = 0x80; i >= 0x08; i >>= 1)
+	int port = 0;
+	for (int i = 0x80; i >= 0x08; i >>= 1, port++)
+	{
+		if (m_mp_mux & i)
+			retval |= m_mp[port].read_safe(0);
+	}
+	return retval;
+}
+
+CUSTOM_INPUT_MEMBER(naomi_state::suchie3_mp_r)
+{
+	uint8_t retval = 0;
+
+	int port = 0;
+	for (int i = 0x80; i >= 0x08; i >>= 1, port++)
 	{
 		if (m_mp_mux & i)
 		{
-			ioport_port *port = ioport(tagptr);
-			if (port != nullptr)
-				retval |= port->read();
+			// KEY1 and KEY5 are swapped
+			if (port == 0)
+				retval |= m_mp[4].read_safe(0);
+			else if (port == 4)
+				retval |= m_mp[0].read_safe(0);
+			else
+				retval |= m_mp[port].read_safe(0);
 		}
-		tagptr += strlen(tagptr) + 1;
 	}
 	return retval;
 }
@@ -251,7 +267,6 @@ CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
 CUSTOM_INPUT_MEMBER(naomi_state::naomi_kb_r)
 {
 	// TODO: player 2 input reading
-//  const int *tagptr = (const int *)param;
 	uint8_t retval = 0;
 	static const char *const keynames[] =
 	{
@@ -283,8 +298,8 @@ CUSTOM_INPUT_MEMBER(naomi_state::naomi_kb_r)
 
 void naomi_state::init_naomi_mp()
 {
-	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
+	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(*this, FUNC(naomi_state::naomi_biose_idle_skip_r)); // rev e bios
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(*this, FUNC(naomi_state::naomi_biosh_idle_skip_r))); // rev h bios
 	m_mp_mux = 0;
 
 	set_drc_options();
@@ -293,8 +308,8 @@ void naomi_state::init_naomi_mp()
 
 void naomi_state::init_naomigd()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this)); // rev e bios
-	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(*this, FUNC(naomi_state::naomi_biose_idle_skip_r))); // rev e bios
+	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(*this, FUNC(naomi_state::naomi_biosh_idle_skip_r))); // rev h bios
 
 	set_drc_options();
 	create_pic_from_retdat();
@@ -302,8 +317,8 @@ void naomi_state::init_naomigd()
 
 void naomi_state::init_naomigd_mp()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this)); // rev e bios
-	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(*this, FUNC(naomi_state::naomi_biose_idle_skip_r))); // rev e bios
+	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(*this, FUNC(naomi_state::naomi_biosh_idle_skip_r))); // rev h bios
 	m_mp_mux = 0;
 
 	set_drc_options();
@@ -321,7 +336,7 @@ READ64_MEMBER(naomi_state::naomigd_ggxxsla_idle_skip_r )
 
 void naomi_state::init_ggxxsla()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc1aae18, 0xc1aae1f, read64_delegate(FUNC(naomi_state::naomigd_ggxxsla_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc1aae18, 0xc1aae1f, read64_delegate(*this, FUNC(naomi_state::naomigd_ggxxsla_idle_skip_r)));
 	init_naomigd();
 }
 
@@ -336,7 +351,7 @@ READ64_MEMBER(naomi_state::naomigd_ggxx_idle_skip_r )
 
 void naomi_state::init_ggxx()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc1837b8, 0xc1837bf, read64_delegate(FUNC(naomi_state::naomigd_ggxx_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc1837b8, 0xc1837bf, read64_delegate(*this, FUNC(naomi_state::naomigd_ggxx_idle_skip_r)));
 	init_naomigd();
 }
 
@@ -352,7 +367,7 @@ READ64_MEMBER(naomi_state::naomigd_ggxxrl_idle_skip_r )
 
 void naomi_state::init_ggxxrl()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc18d6c8, 0xc18d6cf, read64_delegate(FUNC(naomi_state::naomigd_ggxxrl_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc18d6c8, 0xc18d6cf, read64_delegate(*this, FUNC(naomi_state::naomigd_ggxxrl_idle_skip_r)));
 	init_naomigd();
 }
 
@@ -367,7 +382,7 @@ READ64_MEMBER(naomi_state::naomigd_sfz3ugd_idle_skip_r )
 
 void naomi_state::init_sfz3ugd()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc5dc900, 0xc5dc907, read64_delegate(FUNC(naomi_state::naomigd_sfz3ugd_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc5dc900, 0xc5dc907, read64_delegate(*this, FUNC(naomi_state::naomigd_sfz3ugd_idle_skip_r)));
 	init_naomigd();
 }
 
@@ -385,7 +400,7 @@ READ64_MEMBER(naomi_state::hotd2_idle_skip_r )
 
 void naomi_state::init_hotd2()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xca25fb8, 0xca25fbf, read64_delegate(FUNC(naomi_state::hotd2_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xca25fb8, 0xca25fbf, read64_delegate(*this, FUNC(naomi_state::hotd2_idle_skip_r)));
 	set_drc_options();
 }
 

@@ -4,13 +4,14 @@
 
 from __future__ import print_function
 
+import io
+import logging
+import sys
+
 USAGE = """
 Usage:
 %s prefix {opc.lst|-} disp.lst device.inc deviced.inc
 """
-import sys
-import logging
-
 MAX_STATES = 0
 
 def load_opcodes(fname):
@@ -18,7 +19,7 @@ def load_opcodes(fname):
     opcodes = []
     logging.info("load_opcodes: %s", fname)
     try:
-        f = open(fname, "rU")
+        f = io.open(fname, "r")
     except Exception:
         err = sys.exc_info()[1]
         logging.error("cannot read opcodes file %s [%s]", fname, err)
@@ -41,7 +42,7 @@ def load_disp(fname):
     logging.info("load_disp: %s", fname)
     states = []
     try:
-        f = open(fname, "rU")
+        f = io.open(fname, "r")
     except Exception:
         err = sys.exc_info()[1]
         logging.error("cannot read display file %s [%s]", fname, err)
@@ -227,9 +228,9 @@ def save_dasm(f, device, states):
         opc = tokens[0]
         mode = tokens[-1]
         extra = "0"
-        if opc in ["jsr", "bsr", "callf"]:
+        if opc in ["jsr", "bsr", "callf", "jpi", "jsb"]:
             extra = "STEP_OVER"
-        elif opc in ["rts", "rti", "rtn", "retf"]:
+        elif opc in ["rts", "rti", "rtn", "retf", "tpi"]:
             extra = "STEP_OUT"
         emit(f, '\t{ "%s", DASM_%s, %s },' % (opc, mode, extra))
     emit(f, DISASM_EPILOG % d)

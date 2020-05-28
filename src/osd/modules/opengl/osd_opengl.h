@@ -32,6 +32,9 @@
 			#include "GL/wglext.h"
 			#endif
 		#endif
+	#elif defined(OSD_MAC)
+		#include <OpenGL/gl.h>
+		#include <OpenGL/glext.h>
 	#else
 	#include <SDL2/SDL_version.h>
 

@@ -489,7 +489,7 @@ WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dma_hrq_changed )
 }
 
 
-READ8_MEMBER( a2bus_pcxporter_device::pc_dma_read_byte )
+uint8_t a2bus_pcxporter_device::pc_dma_read_byte(offs_t offset)
 {
 	if(m_dma_channel == -1)
 		return 0xff;
@@ -499,7 +499,7 @@ READ8_MEMBER( a2bus_pcxporter_device::pc_dma_read_byte )
 }
 
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma_write_byte )
+void a2bus_pcxporter_device::pc_dma_write_byte(offs_t offset, uint8_t data)
 {
 	if(m_dma_channel == -1)
 		return;
@@ -510,41 +510,41 @@ WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma_write_byte )
 }
 
 
-READ8_MEMBER( a2bus_pcxporter_device::pc_dma8237_1_dack_r )
+uint8_t a2bus_pcxporter_device::pc_dma8237_1_dack_r()
 {
 	return m_isabus->dack_r(1);
 }
 
-READ8_MEMBER( a2bus_pcxporter_device::pc_dma8237_2_dack_r )
+uint8_t a2bus_pcxporter_device::pc_dma8237_2_dack_r()
 {
 	return m_isabus->dack_r(2);
 }
 
 
-READ8_MEMBER( a2bus_pcxporter_device::pc_dma8237_3_dack_r )
+uint8_t a2bus_pcxporter_device::pc_dma8237_3_dack_r()
 {
 	return m_isabus->dack_r(3);
 }
 
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma8237_1_dack_w )
+void a2bus_pcxporter_device::pc_dma8237_1_dack_w(uint8_t data)
 {
 	m_isabus->dack_w(1,data);
 }
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma8237_2_dack_w )
+void a2bus_pcxporter_device::pc_dma8237_2_dack_w(uint8_t data)
 {
 	m_isabus->dack_w(2,data);
 }
 
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma8237_3_dack_w )
+void a2bus_pcxporter_device::pc_dma8237_3_dack_w(uint8_t data)
 {
 	m_isabus->dack_w(3,data);
 }
 
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma8237_0_dack_w )
+void a2bus_pcxporter_device::pc_dma8237_0_dack_w(uint8_t data)
 {
 	m_u73_q2 = 0;
 	m_dma8237->dreq0_w( m_u73_q2 );

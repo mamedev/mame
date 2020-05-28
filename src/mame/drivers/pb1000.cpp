@@ -65,16 +65,13 @@ private:
 	memory_region *m_card2_reg;
 
 	virtual void machine_start() override;
-	DECLARE_WRITE16_MEMBER( gatearray_w );
-	DECLARE_WRITE8_MEMBER( lcd_control );
-	DECLARE_READ8_MEMBER( lcd_data_r );
-	DECLARE_WRITE8_MEMBER( lcd_data_w );
-	DECLARE_READ16_MEMBER( pb1000_kb_r );
-	DECLARE_READ16_MEMBER( pb2000c_kb_r );
-	DECLARE_WRITE8_MEMBER( kb_matrix_w );
-	DECLARE_READ8_MEMBER( pb1000_port_r );
-	DECLARE_READ8_MEMBER( pb2000c_port_r );
-	DECLARE_WRITE8_MEMBER( port_w );
+	void gatearray_w(offs_t offset, uint16_t data);
+	uint16_t pb1000_kb_r();
+	uint16_t pb2000c_kb_r();
+	void kb_matrix_w(uint8_t data);
+	uint8_t pb1000_port_r();
+	uint8_t pb2000c_port_r();
+	void port_w(uint8_t data);
 	uint16_t read_touchscreen(uint8_t line);
 	void pb1000_palette(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(keyboard_timer);
@@ -86,7 +83,7 @@ void pb1000_state::pb1000_mem(address_map &map)
 {
 	map.unmap_value_low();
 	map(0x00000, 0x00bff).rom();
-	//AM_RANGE( 0x00c00, 0x00c0f ) AM_NOP   //I/O
+	//map(0x00c00, 0x00c0f).noprw();   //I/O
 	map(0x06000, 0x07fff).ram().share("nvram1");
 	map(0x08000, 0x0ffff).bankr("bank1");
 	map(0x18000, 0x1ffff).ram().share("nvram2");
@@ -97,7 +94,7 @@ void pb1000_state::pb2000c_mem(address_map &map)
 	map.unmap_value_low();
 	map(0x00000, 0x0ffff).bankr("bank1");
 	map(0x00000, 0x00bff).rom();
-	//AM_RANGE( 0x00c00, 0x00c0f ) AM_NOP   //I/O
+	//map(0x00c00, 0x00c0f).noprw();   //I/O
 	map(0x00c10, 0x00c11).w(FUNC(pb1000_state::gatearray_w));
 	map(0x10000, 0x1ffff).ram().share("nvram1");
 	map(0x20000, 0x27fff).r(m_card1, FUNC(generic_slot_device::read16_rom));
@@ -330,7 +327,7 @@ static GFXDECODE_START( gfx_pb1000 )
 	GFXDECODE_ENTRY( "hd44352", 0x0000, pb1000_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE16_MEMBER( pb1000_state::gatearray_w )
+void pb1000_state::gatearray_w(offs_t offset, uint16_t data)
 {
 	m_gatearray[offset] = data&0xff;
 
@@ -341,24 +338,6 @@ WRITE16_MEMBER( pb1000_state::gatearray_w )
 	else
 		membank("bank1")->set_base(m_rom_reg->base());
 }
-
-WRITE8_MEMBER( pb1000_state::lcd_control )
-{
-	m_hd44352->control_write(data);
-}
-
-
-READ8_MEMBER( pb1000_state::lcd_data_r )
-{
-	return m_hd44352->data_read();
-}
-
-
-WRITE8_MEMBER( pb1000_state::lcd_data_w )
-{
-	m_hd44352->data_write(data);
-}
-
 
 uint16_t pb1000_state::read_touchscreen(uint8_t line)
 {
@@ -375,7 +354,7 @@ uint16_t pb1000_state::read_touchscreen(uint8_t line)
 }
 
 
-READ16_MEMBER( pb1000_state::pb1000_kb_r )
+uint16_t pb1000_state::pb1000_kb_r()
 {
 	static const char *const bitnames[] = {"NULL", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12", "NULL", "NULL", "NULL"};
 	uint16_t data = 0;
@@ -399,7 +378,7 @@ READ16_MEMBER( pb1000_state::pb1000_kb_r )
 	return data;
 }
 
-READ16_MEMBER( pb1000_state::pb2000c_kb_r )
+uint16_t pb1000_state::pb2000c_kb_r()
 {
 	static const char *const bitnames[] = {"NULL", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12", "NULL", "NULL", "NULL"};
 	uint16_t data = 0;
@@ -421,7 +400,7 @@ READ16_MEMBER( pb1000_state::pb2000c_kb_r )
 	return data;
 }
 
-WRITE8_MEMBER( pb1000_state::kb_matrix_w )
+void pb1000_state::kb_matrix_w(uint8_t data)
 {
 	if (data & 0x80)
 	{
@@ -442,19 +421,19 @@ WRITE8_MEMBER( pb1000_state::kb_matrix_w )
 	m_kb_matrix = data;
 }
 
-READ8_MEMBER( pb1000_state::pb1000_port_r )
+uint8_t pb1000_state::pb1000_port_r()
 {
 	//TODO
 	return 0x00;
 }
 
-READ8_MEMBER( pb1000_state::pb2000c_port_r )
+uint8_t pb1000_state::pb2000c_port_r()
 {
 	//TODO
 	return 0xfc;
 }
 
-WRITE8_MEMBER( pb1000_state::port_w )
+void pb1000_state::port_w(uint8_t data)
 {
 	m_beeper->set_state((BIT(data,7) ^ BIT(data,6)));
 	//printf("%x\n", data);
@@ -487,9 +466,9 @@ void pb1000_state::pb1000(machine_config &config)
 	/* basic machine hardware */
 	HD61700(config, m_maincpu, 910000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pb1000_state::pb1000_mem);
-	m_maincpu->lcd_ctrl().set(FUNC(pb1000_state::lcd_control));
-	m_maincpu->lcd_read().set(FUNC(pb1000_state::lcd_data_r));
-	m_maincpu->lcd_write().set(FUNC(pb1000_state::lcd_data_w));
+	m_maincpu->lcd_ctrl().set(m_hd44352, FUNC(hd44352_device::control_write));
+	m_maincpu->lcd_read().set(m_hd44352, FUNC(hd44352_device::data_read));
+	m_maincpu->lcd_write().set(m_hd44352, FUNC(hd44352_device::data_write));
 	m_maincpu->kb_read().set(FUNC(pb1000_state::pb1000_kb_r));
 	m_maincpu->kb_write().set(FUNC(pb1000_state::kb_matrix_w));
 	m_maincpu->port_read().set(FUNC(pb1000_state::pb1000_port_r));

@@ -25,6 +25,7 @@ Year + Game                     PCB        CPU    Sound         Custom          
 99  Tarzan (V107)               NO-0228?   Z180   M6295         IGS031 IGS025 IGS029  Battery
 99  Tarzan (V109C)              NO-0248-1  Z180   M6295         IGS031 IGS025         Battery
 00? Super Tarzan (V100I)        NO-0230-1  Z180   M6295         IGS031 IGS025         Battery
+01? Happy Skill (V611)          NO-0281    Z180   M6295 (K668)  IGS031 IGS025         Battery
 ??  Super Poker / Formosa       NO-0187    Z180   M6295 YM2413  IGS017 IGS025         Battery
 -------------------------------------------------------------------------------------------------------------
                                                                                     * not present in one set
@@ -98,7 +99,7 @@ public:
 	void data_w(u8 data);
 	u8 data_r();
 
-	void set_m3_bits(int m3, u8 b0, u8 b1, u8 b2, u8 b3);
+	template <unsigned N> void set_m3_bits(u8 b0, u8 b1, u8 b2, u8 b3);
 	void set_mf_bits(u8 b0, u8 b1, u8 b2, u8 b3);
 	void set_val_xor(u16 val_xor);
 
@@ -123,12 +124,12 @@ private:
 	u16 m_val_xor;
 };
 
-void igs_bitswap_device::set_m3_bits(int m3, u8 b0, u8 b1, u8 b2, u8 b3)
+template <unsigned N> void igs_bitswap_device::set_m3_bits(u8 b0, u8 b1, u8 b2, u8 b3)
 {
-	m_m3_bits[m3][0] = b0;
-	m_m3_bits[m3][1] = b1;
-	m_m3_bits[m3][2] = b2;
-	m_m3_bits[m3][3] = b3;
+	m_m3_bits[N][0] = b0;
+	m_m3_bits[N][1] = b1;
+	m_m3_bits[N][2] = b2;
+	m_m3_bits[N][3] = b3;
 
 #if 0
 	printf("igs_bitswap: INIT m3_bits[%x] =", m3);
@@ -501,6 +502,7 @@ public:
 	void init_tarzana();
 	void init_lhzb2a();
 	void init_mgdha();
+	void init_happyskl();
 
 protected:
 	virtual void video_start() override;
@@ -601,7 +603,7 @@ private:
 	void tarzan_decrypt_tiles();
 	void tarzan_decrypt_program_rom();
 	void tarzana_decrypt_program_rom();
-	void starzan_decrypt(u8 *ROM, int size, bool isOpcode);
+	void starzan_decrypt_program_rom();
 	void lhzb2_patch_rom();
 	void lhzb2_decrypt_tiles();
 	void lhzb2_decrypt_sprites();
@@ -889,46 +891,34 @@ void igs017_state::tarzan_decrypt_tiles()
 	}
 }
 
-// decryption is incomplete, the first part of code doesn't seem right.
+// decryption should be good
 void igs017_state::tarzan_decrypt_program_rom()
 {
-	u16 *ROM = (u16 *)memregion("maincpu")->base();
-	int size = 0x40000;
+	u8 *rom = memregion("maincpu")->base();
 
-	for(int i=0; i<size/2; i++)
+	for (int i = 0; i < 0x40000; i++)
 	{
-		u16 x = ROM[i];
+		u8 x = rom[i];
 
-		if ((i & 0x10c0) == 0x0000)
-			x ^= 0x0001;
-
-		if ((i & 0x0010) == 0x0010 || (i & 0x0130) == 0x0020)
-			x ^= 0x0404;
-
-		if ((i & 0x00d0) != 0x0010)
-			x ^= 0x1010;
-
-		if (((i & 0x0008) == 0x0008)^((i & 0x10c0) == 0x0000))
-			x ^= 0x0100;
-
-		ROM[i] = x;
-	}
-}
-// by iq_132
-void igs017_state::tarzana_decrypt_program_rom()
-{
-	u8 *ROM = memregion("maincpu")->base();
-	int size = 0x80000;
-
-	for (int i = 0; i < size; i++)
-	{
-		u8 x = 0;
 		if ((i & 0x00011) == 0x00011) x ^= 0x01;
 		if ((i & 0x02180) == 0x00000) x ^= 0x01;
-		if ((i & 0x001a0) != 0x00020) x ^= 0x20;
-		if ((i & 0x00260) != 0x00200) x ^= 0x40;
-		if ((i & 0x00060) != 0x00000 && (i & 0x00260) != 0x00240)   x ^= 0x80;
-		ROM[i] ^= x;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x04;
+		if ((i & 0x00080) != 0x00080) x ^= 0x10;
+		if ((i & 0x000e0) == 0x000c0) x ^= 0x10;
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x40000; i++)
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if (((i & 0x00020) == 0x00020) || ((i & 0x000260) == 0x00040)) x ^= 0x04;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x10;
+
+		rom[i] = x;
 	}
 }
 
@@ -938,52 +928,69 @@ void igs017_state::init_tarzan()
 	tarzan_decrypt_tiles();
 }
 
+void igs017_state::tarzana_decrypt_program_rom()
+{
+	u8 *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x40000; i++)
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x00080) != 0x00080) x ^= 0x20;
+		if ((i & 0x000e0) == 0x000c0) x ^= 0x20;
+		if ((i & 0x00280) != 0x00080) x ^= 0x40;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x80;
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x40000; i++) // by iq_132
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x20;
+		if ((i & 0x00260) != 0x00200) x ^= 0x40;
+		if ((i & 0x00060) != 0x00000 && (i & 0x00260) != 0x00240)   x ^= 0x80;
+
+		rom[i] = x;
+	}
+}
+
 void igs017_state::init_tarzana()
 {
 	tarzana_decrypt_program_rom();
-//  tarzana_decrypt_tiles();    // to do
+//  tarzana_decrypt_tiles();    // to do when dumped
 }
 
 
 // starzan
 
-// decryption is incomplete: data decryption is correct but opcodes are encrypted differently.
-
-void igs017_state::starzan_decrypt(u8 *ROM, int size, bool isOpcode)
+void igs017_state::starzan_decrypt_program_rom()
 {
-	for(int i=0; i<size; i++)
+	u8 *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x40000; i++)
 	{
-#if 1
-		u8 x = ROM[i];
+		u8 x = rom[i];
 
-		// this seems ok for opcodes too
-		if ((i & 0x10) && (i & 0x01))
-		{
-			if (!(!(i & 0x2000) && !(i & 0x100) && !(i & 0x80)))
-				x ^= 0x01;
-		}
-		else
-		{
-			if (!(i & 0x2000) && !(i & 0x100) && !(i & 0x80))
-				x ^= 0x01;
-		}
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x00020) != 0x00020) x ^= 0x20;
+		if ((i & 0x002a0) == 0x00220) x ^= 0x20;
+		if ((i & 0x00220) != 0x00200) x ^= 0x40;
+		if ((i & 0x001c0) != 0x00040) x ^= 0x80;
 
-		// 2x no xor (opcode)
-		// 3x no xor (opcode)
-		// 60-66 no xor (opcode)
-		if (!(i & 0x100) || (i & 0x80) || (i & 0x20))
-			x ^= 0x20;
+		m_decrypted_opcodes[i] = x;
+	}
 
-		// 2x needs xor (opcode)
-		// 3x needs xor (opcode)
-		if ((i & 0x200) || (i & 0x40) || !(i & 0x20))
-			x ^= 0x40;
+	for (int i = 0; i < 0x40000; i++) // by iq_132
+	{
+		u8 x = rom[i];
 
-		if ((!(i & 0x100) && (i & 0x80)) || (i & 0x20))
-			x ^= 0x80;
-
-#else
-		// by iq_132
 		if ((i & 0x00011) == 0x00011) x ^= 0x01;
 		if ((i & 0x02180) == 0x00000) x ^= 0x01;
 		if ((i & 0x000a0) != 0x00000) x ^= 0x20;
@@ -992,25 +999,55 @@ void igs017_state::starzan_decrypt(u8 *ROM, int size, bool isOpcode)
 		if ((i & 0x00260) == 0x00220) x ^= 0x40;
 		if ((i & 0x00020) == 0x00020) x ^= 0x80;
 		if ((i & 0x001a0) == 0x00080) x ^= 0x80;
-#endif
-		ROM[i] = x;
+
+		rom[i] = x;
 	}
 }
 
 void igs017_state::init_starzan()
 {
-	int size = 0x040000;
-
-	u8 *data = memregion("maincpu")->base();
-	u8 *code = m_decrypted_opcodes;
-	memcpy(code, data, size);
-
-	starzan_decrypt(data, size, false); // data
-	starzan_decrypt(code, size, true);  // opcodes
-
-	mgcs_flip_sprites();
+	starzan_decrypt_program_rom();
+	//  starzan_decrypt_tiles();    // to do when dumped
+	mgcs_flip_sprites(); // ?
 }
 
+
+void igs017_state::init_happyskl()
+{
+	u8 *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x40000; i++)
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x0280) != 0x00080) x ^= 0x20;
+		if ((i & 0x02a0) == 0x00280) x ^= 0x20;
+		if ((i & 0x0280) != 0x00080) x ^= 0x40;
+		if ((i & 0x01a0) != 0x00080) x ^= 0x80;
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x40000; i++) // adapted from starzan, seems ok
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x000a0) != 0x00000) x ^= 0x20;
+		if ((i & 0x001a0) == 0x00000) x ^= 0x20;
+		if ((i & 0x00060) != 0x00040) x ^= 0x40;
+		if ((i & 0x00260) == 0x00240) x ^= 0x40;
+		if ((i & 0x00020) == 0x00020) x ^= 0x80;
+		if ((i & 0x00260) == 0x00040) x ^= 0x80;
+
+		rom[i] = x;
+	}
+
+	tarzan_decrypt_tiles(); // seems ok
+}
 
 // sdmg2
 
@@ -1251,7 +1288,7 @@ void igs017_state::init_lhzb2()
 	lhzb2_patch_rom();
 
 	// install and configure protection device(s)
-//  m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+//  m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_r)), write16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_w)));
 //  m_igs025->m_kb_source_data = dw3_source_data;
 //  m_igs025->m_kb_source_data_offset = 0;
 //  m_igs025->m_kb_game_id = 0x00060000;
@@ -1424,7 +1461,7 @@ void igs017_state::init_slqz2()
 	slqz2_patch_rom();
 
 	// install and configure protection device(s)
-//  m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+//  m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_r)), write16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_w)));
 //  m_igs025->m_kb_source_data = dw3_source_data;
 //  m_igs025->m_kb_source_data_offset = 0;
 //  m_igs025->m_kb_game_id = 0x00060000;
@@ -1525,10 +1562,10 @@ void igs017_state::iqblocka_remap_addr_w(offs_t offset, u8 data)
 
 		// Add new memory ranges
 		address_space &prg_space = m_maincpu->space(AS_PROGRAM);
-		prg_space.install_write_handler(m_remap_addr + 0x0, m_remap_addr + 0x0, write8smo_delegate(FUNC(igs_incdec_device::reset_w), &(*m_igs_incdec)));
-		prg_space.install_write_handler(m_remap_addr + 0x1, m_remap_addr + 0x1, write8smo_delegate(FUNC(igs_incdec_device::dec_w),   &(*m_igs_incdec)));
-		prg_space.install_write_handler(m_remap_addr + 0x3, m_remap_addr + 0x3, write8smo_delegate(FUNC(igs_incdec_device::inc_w),   &(*m_igs_incdec)));
-		prg_space.install_read_handler (m_remap_addr + 0x5, m_remap_addr + 0x5, read8smo_delegate (FUNC(igs_incdec_device::val_r),   &(*m_igs_incdec)));
+		prg_space.install_write_handler(m_remap_addr + 0x0, m_remap_addr + 0x0, write8smo_delegate(*m_igs_incdec, FUNC(igs_incdec_device::reset_w)));
+		prg_space.install_write_handler(m_remap_addr + 0x1, m_remap_addr + 0x1, write8smo_delegate(*m_igs_incdec, FUNC(igs_incdec_device::dec_w)));
+		prg_space.install_write_handler(m_remap_addr + 0x3, m_remap_addr + 0x3, write8smo_delegate(*m_igs_incdec, FUNC(igs_incdec_device::inc_w)));
+		prg_space.install_read_handler (m_remap_addr + 0x5, m_remap_addr + 0x5, read8smo_delegate (*m_igs_incdec, FUNC(igs_incdec_device::val_r)));
 
 		logerror("%s: incdec protection remapped at %04x\n", machine().describe_context(), m_remap_addr);
 	}
@@ -2254,11 +2291,11 @@ void igs017_state::lhzb2a_remap_addr_w(address_space &space, u16 data)
 	m_remap_addr = data & 0xff;
 
 	// Add new memory ranges
-	space.install_write_handler    (m_remap_addr * 0x10000 + 0x4001, m_remap_addr * 0x10000 + 0x4001, write8smo_delegate(FUNC(igs_bitswap_device::address_w), &(*m_igs_bitswap)));
-	space.install_readwrite_handler(m_remap_addr * 0x10000 + 0x4003, m_remap_addr * 0x10000 + 0x4003, read8smo_delegate (FUNC(igs_bitswap_device::data_r),    &(*m_igs_bitswap)), write8smo_delegate(FUNC(igs_bitswap_device::data_w), &(*m_igs_bitswap)));
+	space.install_write_handler    (m_remap_addr * 0x10000 + 0x4001, m_remap_addr * 0x10000 + 0x4001, write8smo_delegate(*m_igs_bitswap, FUNC(igs_bitswap_device::address_w)));
+	space.install_readwrite_handler(m_remap_addr * 0x10000 + 0x4003, m_remap_addr * 0x10000 + 0x4003, read8smo_delegate (*m_igs_bitswap, FUNC(igs_bitswap_device::data_r)), write8smo_delegate(*m_igs_bitswap, FUNC(igs_bitswap_device::data_w)));
 
-	space.install_read_handler     (m_remap_addr * 0x10000 + 0x8000, m_remap_addr * 0x10000 + 0x8005, read16sm_delegate (FUNC(igs017_state::lhzb2a_input_r),      this));
-	space.install_write_handler    (m_remap_addr * 0x10000 + 0xc000, m_remap_addr * 0x10000 + 0xc001, write16mo_delegate(FUNC(igs017_state::lhzb2a_remap_addr_w), this));
+	space.install_read_handler     (m_remap_addr * 0x10000 + 0x8000, m_remap_addr * 0x10000 + 0x8005, read16sm_delegate (*this, FUNC(igs017_state::lhzb2a_input_r)));
+	space.install_write_handler    (m_remap_addr * 0x10000 + 0xc000, m_remap_addr * 0x10000 + 0xc001, write16mo_delegate(*this, FUNC(igs017_state::lhzb2a_remap_addr_w)));
 
 	logerror("%s: inputs and protection remapped at %02xxxxx\n", machine().describe_context(), m_remap_addr);
 }
@@ -2292,7 +2329,7 @@ void igs017_state::lhzb2a_map(address_map &map)
 	map(0x00320a, 0x00320b).r(m_igs_incdec, FUNC(igs_incdec_device::val_r));
 
 	map(0x500000, 0x503fff).ram();
-//  AM_RANGE(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
+//  map(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
 
 	map(0xb00000, 0xb0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -3497,7 +3534,7 @@ MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 
 void igs017_state::iqblocka(machine_config &config)
 {
-	Z180(config, m_maincpu, XTAL(16'000'000) / 2);
+	HD64180RP(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::iqblocka_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::iqblocka_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
@@ -3518,10 +3555,10 @@ void igs017_state::iqblocka(machine_config &config)
 	m_igs_bitswap->out_pa_callback().set(FUNC(igs017_state::iqblocka_keyin_w));
 	m_igs_bitswap->set_val_xor(0x15d6);
 	m_igs_bitswap->set_mf_bits(3, 5, 9, 11);
-	m_igs_bitswap->set_m3_bits(0, ~5,  8, ~10, ~15);
-	m_igs_bitswap->set_m3_bits(1,  3, ~8, ~12, ~15);
-	m_igs_bitswap->set_m3_bits(2,  2, ~6, ~11, ~15);
-	m_igs_bitswap->set_m3_bits(3,  0, ~1, ~3,  ~15);
+	m_igs_bitswap->set_m3_bits<0>(~5,  8, ~10, ~15);
+	m_igs_bitswap->set_m3_bits<1>( 3, ~8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits<2>( 2, ~6, ~11, ~15);
+	m_igs_bitswap->set_m3_bits<3>( 0, ~1, ~3,  ~15);
 
 	IGS_INCDEC(config, m_igs_incdec, 0);
 
@@ -3547,6 +3584,7 @@ void igs017_state::iqblocka(machine_config &config)
 void igs017_state::iqblockf(machine_config &config)
 {
 	iqblocka(config);
+
 	// tweaked protection bitswap
 	m_igs_bitswap->out_pb_callback().set(FUNC(igs017_state::iqblockf_keyout_w));
 	m_igs_bitswap->set_mf_bits(0, 5, 9, 13);
@@ -3555,12 +3593,13 @@ void igs017_state::iqblockf(machine_config &config)
 void igs017_state::genius6(machine_config &config)
 {
 	iqblockf(config);
+
 	// tweaked protection bitswap
 	m_igs_bitswap->set_mf_bits(2, 7, 9, 13);
-	m_igs_bitswap->set_m3_bits(0, ~5,  6,  ~7, ~15);
-	m_igs_bitswap->set_m3_bits(1,  1, ~6,  ~9, ~15);
-	m_igs_bitswap->set_m3_bits(2,  4, ~8, ~12, ~15);
-	m_igs_bitswap->set_m3_bits(3,  3, ~5,  ~6, ~15);
+	m_igs_bitswap->set_m3_bits<0>(~5,  6,  ~7, ~15);
+	m_igs_bitswap->set_m3_bits<1>( 1, ~6,  ~9, ~15);
+	m_igs_bitswap->set_m3_bits<2>( 4, ~8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits<3>( 3, ~5,  ~6, ~15);
 }
 
 void igs017_state::starzan(machine_config &config)
@@ -3616,7 +3655,7 @@ void igs017_state::mgcs(machine_config &config)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::mgcs_palette_bitswap), this);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::mgcs_palette_bitswap));
 	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound
@@ -3643,7 +3682,7 @@ void igs017_state::lhzb2(machine_config &config)
 
 	// protection
 	IGS025(config, m_igs025, 0);
-	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback), this);
+	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback));
 
 	IGS022(config, m_igs022, 0);
 
@@ -3657,7 +3696,7 @@ void igs017_state::lhzb2(machine_config &config)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap), this);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap));
 	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound
@@ -3689,10 +3728,10 @@ void igs017_state::lhzb2a(machine_config &config)
 	IGS_BITSWAP(config, m_igs_bitswap, 0);
 	m_igs_bitswap->set_val_xor(0x289a);
 	m_igs_bitswap->set_mf_bits(4, 7,  10, 13);
-	m_igs_bitswap->set_m3_bits(0, ~3,   8, ~12, ~15);
-	m_igs_bitswap->set_m3_bits(1, ~3,  ~6,  ~9, ~15);
-	m_igs_bitswap->set_m3_bits(2, ~3,   4,  ~5, ~15);
-	m_igs_bitswap->set_m3_bits(3, ~9, ~11,  12, ~15);
+	m_igs_bitswap->set_m3_bits<0>(~3,   8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits<1>(~3,  ~6,  ~9, ~15);
+	m_igs_bitswap->set_m3_bits<2>(~3,   4,  ~5, ~15);
+	m_igs_bitswap->set_m3_bits<3>(~9, ~11,  12, ~15);
 
 	IGS_INCDEC(config, m_igs_incdec, 0);
 
@@ -3706,7 +3745,7 @@ void igs017_state::lhzb2a(machine_config &config)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap), this);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap));
 //  m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound
@@ -3733,7 +3772,7 @@ void igs017_state::slqz2(machine_config &config)
 
 	// protection
 	IGS025(config, m_igs025, 0);
-	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback), this);
+	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback));
 
 	IGS022(config, m_igs022, 0);
 
@@ -3747,7 +3786,7 @@ void igs017_state::slqz2(machine_config &config)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::slqz2_palette_bitswap), this);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::slqz2_palette_bitswap));
 	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound
@@ -3836,7 +3875,7 @@ void igs017_state::mgdha(machine_config &config)
 
 void igs017_state::tjsb(machine_config &config)
 {
-	Z180(config, m_maincpu, XTAL(16'000'000) / 2);
+	HD64180RP(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::tjsb_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::tjsb_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
@@ -3859,7 +3898,7 @@ void igs017_state::tjsb(machine_config &config)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tjsb_palette_bitswap), this);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tjsb_palette_bitswap));
 	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound
@@ -3874,7 +3913,7 @@ void igs017_state::tjsb(machine_config &config)
 
 void igs017_state::spkrform(machine_config &config)
 {
-	Z180(config, m_maincpu, XTAL(16'000'000) / 2);
+	HD64180RP(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::spkrform_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::spkrform_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
@@ -4600,6 +4639,32 @@ ROM_START( starzan )
 	ROM_LOAD( "palce22v10h_tar97_u20.u20",   0x2dd, 0x2dd, NO_DUMP )
 ROM_END
 
+
+// IGS PCB NO-0281
+// Main CPU is a Zilog Z180 clocked @16MHz (XTAL and EXTAL pins directly tied to a 16MHz crystal)
+// OKI MSM6295 (actually a rebadged one marked 'K668 0003') clocked @1MHz, pin 7 is HIGH
+// A QFP208 custom ASIC marked 'IGS 031'
+// A PLCC68 custom IC marked 'IGS025 A9B2201 9931'
+// A Ni-MH 3.6V battery as seen in other IGS hardware
+ROM_START( happyskl )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "v611.u8", 0x00000, 0x40000, CRC(1fb3da98) SHA1(60674af9f5c53298b8ef856f1986c905b9bd7b96) )
+
+	ROM_REGION( 0x480000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "happyskill_cg.u2",     0x00000, 0x080000, CRC(297a1893) SHA1(9be9e2cdaba1615ea376f3fb7087bf990e68b3b4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	ROM_LOAD( "igs_a2701_cg_v100.u3", 0x80000, 0x400000, CRC(f3756a51) SHA1(8dd4677584f309cec4b068be9f9370a7a172a031) ) // FIXED BITS (xxxxxxx0xxxxxxxx) - 1xxxxxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "happyskill_text.u11", 0x00000, 0x80000, CRC(c6f51041) SHA1(81a9a03e92c1c67f299113dec9e05ba77395ea31) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE )
+	ROM_LOAD( "igs_s2702_sp_v100.u8", 0x00000, 0x80000, CRC(0ec9b1b5) SHA1(b8c7e068ddf6777a184339e6796be33e442a3df4) )
+
+	ROM_REGION( 0x2dd * 2, "plds", 0 )
+	ROM_LOAD( "atf22v10c.u10",   0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "peel22cv10a.u20", 0x2dd, 0x2dd, NO_DUMP )
+ROM_END
+
 /***************************************************************************
 
 Super Poker (v100xD03) / Formosa
@@ -4644,10 +4709,11 @@ GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, init_mgcs,   
 GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, init_lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (set 1)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, init_lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (VS221M)",          0 )
 GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS",                      "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1999,  tarzanc,  0,        iqblocka, iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING )
-GAME( 1999,  tarzan,   tarzanc,  iqblocka, iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING )
-GAME( 1999,  tarzana,  tarzanc,  iqblocka, iqblocka, igs017_state, init_tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING )
+GAME( 1999,  tarzanc,  0,        starzan,  iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet, sprites' decryption missing
+GAME( 1999,  tarzan,   tarzanc,  starzan,  iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet, sprites' decryption missing
+GAME( 1999,  tarzana,  tarzanc,  starzan,  iqblocka, igs017_state, init_tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // IGS029 needs to be emulated, sprites' decryption missing
 GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, init_starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                 MACHINE_NOT_WORKING )
+GAME( 2001?, happyskl, 0,        starzan,  iqblocka, igs017_state, init_happyskl, ROT0, "IGS",                      "Happy Skill (Italy, V611IT)",                 MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet, sprites' decryption missing
 
 // Parent spk306us in driver spoker.cpp. Move this set to that driver?
 GAME( ????,  spkrform, spk306us, spkrform, spkrform, igs017_state, init_spkrform, ROT0, "IGS",                      "Super Poker (v100xD03) / Formosa",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

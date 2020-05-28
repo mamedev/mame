@@ -120,26 +120,26 @@ public:
 	void atvtrack(machine_config &config);
 
 protected:
-	DECLARE_READ64_MEMBER(control_r);
-	DECLARE_WRITE64_MEMBER(control_w);
-	DECLARE_READ64_MEMBER(nand_data_r);
-	DECLARE_WRITE64_MEMBER(nand_data_w);
-	DECLARE_WRITE64_MEMBER(nand_cmd_w);
-	DECLARE_WRITE64_MEMBER(nand_addr_w);
-	DECLARE_READ64_MEMBER(ioport_r);
-	DECLARE_WRITE64_MEMBER(ioport_w);
-	DECLARE_READ32_MEMBER(gpu_r);
-	DECLARE_WRITE32_MEMBER(gpu_w);
+	u64 control_r(offs_t offset, u64 mem_mask = ~0);
+	void control_w(offs_t offset, u64 data, u64 mem_mask = ~0);
+	u64 nand_data_r();
+	void nand_data_w(u64 data);
+	void nand_cmd_w(u64 data);
+	void nand_addr_w(u64 data);
+	u64 ioport_r(offs_t offset);
+	void ioport_w(offs_t offset, u64 data);
+	u32 gpu_r(offs_t offset);
+	void gpu_w(offs_t offset, u32 data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	inline uint32_t decode64_32(offs_t offset64, uint64_t data, uint64_t mem_mask, offs_t &offset32);
-	void logbinary(uint32_t data,int high,int low);
+	u32 screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	inline u32 decode64_32(offs_t offset64, u64 data, u64 mem_mask, offs_t &offset32);
+	void logbinary(u32 data,int high,int low);
 
 	memory_region *m_nandregion;
 	int m_nandcommand[4], m_nandoffset[4], m_nandaddressstep, m_nandaddress[4];
-	uint32_t m_area1_data[4];
+	u32 m_area1_data[4];
 
 	required_device<sh4_device> m_maincpu;
 	required_device<sh4_device> m_subcpu;
@@ -174,9 +174,9 @@ private:
 	void smashdrv_main_port(address_map &map);
 };
 
-void atvtrack_state::logbinary(uint32_t data,int high=31,int low=0)
+void atvtrack_state::logbinary(u32 data,int high=31,int low=0)
 {
-	uint32_t s;
+	u32 s;
 	int z;
 
 	s=1 << high;
@@ -189,24 +189,24 @@ void atvtrack_state::logbinary(uint32_t data,int high=31,int low=0)
 	}
 }
 
-inline uint32_t atvtrack_state::decode64_32(offs_t offset64, uint64_t data, uint64_t mem_mask, offs_t &offset32)
+inline u32 atvtrack_state::decode64_32(offs_t offset64, u64 data, u64 mem_mask, offs_t &offset32)
 {
 	if (ACCESSING_BITS_0_31) {
 		offset32 = offset64 << 1;
-		return (uint32_t)data;
+		return (u32)data;
 	}
 	if (ACCESSING_BITS_32_63) {
 		offset32 = (offset64 << 1)+1;
-		return (uint32_t)(data >> 32);
+		return (u32)(data >> 32);
 	}
 	logerror("Wrong word size in external access\n");
 	//machine().debug_break();
 	return 0;
 }
 
-READ64_MEMBER(atvtrack_state::control_r)
+u64 atvtrack_state::control_r(offs_t offset, u64 mem_mask)
 {
-	uint32_t addr;
+	u32 addr;
 
 	addr = 0;
 	decode64_32(offset, 0, mem_mask, addr);
@@ -217,9 +217,9 @@ READ64_MEMBER(atvtrack_state::control_r)
 	return -1;
 }
 
-WRITE64_MEMBER(atvtrack_state::control_w)
+void atvtrack_state::control_w(offs_t offset, u64 data, u64 mem_mask)
 {
-	uint32_t addr, dat; //, old;
+	u32 addr, dat; //, old;
 
 	addr = 0;
 	dat = decode64_32(offset, data, mem_mask, addr);
@@ -236,7 +236,7 @@ WRITE64_MEMBER(atvtrack_state::control_w)
 //  logerror("\n");
 }
 
-READ64_MEMBER(atvtrack_state::nand_data_r)
+u64 atvtrack_state::nand_data_r()
 {
 	u32 dat = 0;
 	for (int c = 3; c >= 0; c--) {
@@ -251,7 +251,7 @@ READ64_MEMBER(atvtrack_state::nand_data_r)
 	return dat;
 }
 
-WRITE64_MEMBER(atvtrack_state::nand_data_w)
+void atvtrack_state::nand_data_w(u64 data)
 {
 	for (int c = 0; c < 4; c++) {
 		if (m_nandcommand[c] == 0x80) {
@@ -264,7 +264,7 @@ WRITE64_MEMBER(atvtrack_state::nand_data_w)
 	}
 }
 
-WRITE64_MEMBER(atvtrack_state::nand_cmd_w)
+void atvtrack_state::nand_cmd_w(u64 data)
 {
 	m_nandaddressstep = 0;
 	for (int c = 0;c < 4;c++) {
@@ -295,7 +295,7 @@ WRITE64_MEMBER(atvtrack_state::nand_cmd_w)
 	}
 }
 
-WRITE64_MEMBER(atvtrack_state::nand_addr_w)
+void atvtrack_state::nand_addr_w(u64 data)
 {
 	for (int c = 0;c < 4;c++) {
 		if (m_nandaddressstep == 0) {
@@ -324,7 +324,7 @@ void atvtrack_state::gpu_irq_set(int bit)
 	gpu_irq_test();
 }
 
-READ32_MEMBER(atvtrack_state::gpu_r)
+u32 atvtrack_state::gpu_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -338,7 +338,7 @@ READ32_MEMBER(atvtrack_state::gpu_r)
 	}
 }
 
-WRITE32_MEMBER(atvtrack_state::gpu_w)
+void atvtrack_state::gpu_w(offs_t offset, u32 data)
 {
 	switch (offset)
 	{
@@ -371,7 +371,7 @@ WRITE32_MEMBER(atvtrack_state::gpu_w)
 	}
 }
 
-READ64_MEMBER(atvtrack_state::ioport_r)
+u64 atvtrack_state::ioport_r(offs_t offset)
 {
 	if (offset == SH4_IOPORT_16/8) {
 #ifndef SPECIALMODE
@@ -383,7 +383,7 @@ READ64_MEMBER(atvtrack_state::ioport_r)
 	return 0;
 }
 
-WRITE64_MEMBER(atvtrack_state::ioport_w)
+void atvtrack_state::ioport_w(offs_t offset, u64 data)
 {
 	// SH4 GPIO port A used in this way:
 	// bits 15-11  O - port select: F002 (In)  E802 (In)  F800 (Out)        7800 (Out)
@@ -404,7 +404,7 @@ WRITE64_MEMBER(atvtrack_state::ioport_w)
 	// All above IO multiplexing, ADC and DAC implemented in FPGA
 
 #ifdef SPECIALMODE
-	uint64_t d;
+	u64 d;
 	static int cnt=0;
 	sh4_device_dma dm;
 #endif
@@ -415,7 +415,7 @@ WRITE64_MEMBER(atvtrack_state::ioport_w)
 				m_slaverun = true;
 		}
 //      logerror("SH4 16bit i/o port write ");
-//      logbinary((uint32_t)data,15,0);
+//      logbinary((u32)data,15,0);
 //      logerror("\n");
 	}
 #ifdef SPECIALMODE
@@ -441,7 +441,7 @@ void atvtrack_state::video_start()
 {
 }
 
-uint32_t atvtrack_state::screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 atvtrack_state::screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -518,7 +518,7 @@ void atvtrack_state::atvtrack_main_map(address_map &map)
 {
 	map(0x00000000, 0x000003ff).ram().share("sharedmem");
 	map(0x00020000, 0x00020007).rw(FUNC(atvtrack_state::control_r), FUNC(atvtrack_state::control_w)); // control registers
-//  AM_RANGE(0x00020040, 0x0002007f) // audio DAC buffer
+//  map(0x00020040, 0x0002007f) // audio DAC buffer
 	map(0x14000000, 0x14000007).rw(FUNC(atvtrack_state::nand_data_r), FUNC(atvtrack_state::nand_data_w));
 	map(0x14100000, 0x14100007).w(FUNC(atvtrack_state::nand_cmd_w));
 	map(0x14200000, 0x14200007).w(FUNC(atvtrack_state::nand_addr_w));

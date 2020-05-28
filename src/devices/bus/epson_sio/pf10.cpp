@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(EPSON_PF10, epson_pf10_device, "epson_pf10", "EPSON PF-10 Por
 
 void epson_pf10_device::cpu_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw("maincpu", FUNC(hd6303y_cpu_device::m6801_io_r), FUNC(hd6303y_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m("maincpu", FUNC(hd6303y_cpu_device::m6801_io));
 	map(0x0040, 0x00ff).ram(); /* 192 bytes internal ram */
 	map(0x0800, 0x0fff).ram(); /* external 2k ram */
 	map(0x1000, 0x17ff).rw(FUNC(epson_pf10_device::fdc_r), FUNC(epson_pf10_device::fdc_w));
@@ -140,24 +140,24 @@ void epson_pf10_device::device_timer(emu_timer &timer, device_timer_id id, int p
 //  CPU
 //**************************************************************************
 
-READ8_MEMBER( epson_pf10_device::port1_r )
+uint8_t epson_pf10_device::port1_r()
 {
 	logerror("%s: port1_r(%02x)\n", tag(), m_port1);
 	return m_port1;
 }
 
-WRITE8_MEMBER( epson_pf10_device::port1_w )
+void epson_pf10_device::port1_w(uint8_t data)
 {
 	logerror("%s: port1_w(%02x)\n", tag(), data);
 }
 
-READ8_MEMBER( epson_pf10_device::port2_r )
+uint8_t epson_pf10_device::port2_r()
 {
 	logerror("%s: port2_r(%02x)\n", tag(), m_port2);
 	return m_port2;
 }
 
-WRITE8_MEMBER( epson_pf10_device::port2_w )
+void epson_pf10_device::port2_w(uint8_t data)
 {
 	if (m_floppy->get_device() != nullptr)
 		m_floppy->get_device()->mon_w(data & PORT2_MON);

@@ -41,7 +41,7 @@ protected:
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
-	DECLARE_WRITE8_MEMBER(external_operation);
+	void external_operation(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
 	DECLARE_WRITE_LINE_MEMBER( board_ready );
 	DECLARE_WRITE_LINE_MEMBER( board_reset );
@@ -67,7 +67,7 @@ private:
 	DECLARE_WRITE8_MEMBER(fdc_write);
 	DECLARE_READ8_MEMBER(ibc_read);
 	DECLARE_WRITE8_MEMBER(ibc_write);
-	DECLARE_WRITE8_MEMBER(hexbus_out);
+	void hexbus_out(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(hsklatch_out);
 
 	DECLARE_READ8_MEMBER(cruread);

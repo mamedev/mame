@@ -51,7 +51,7 @@ TILEMAP_MAPPER_MEMBER(xain_state::back_scan)
 template <unsigned N> TILE_GET_INFO_MEMBER(xain_state::get_bg_tile_info)
 {
 	int const attr = m_bgram[N][tile_index | 0x400];
-	SET_TILE_INFO_MEMBER(2 - N,
+	tileinfo.set(2 - N,
 			m_bgram[N][tile_index] | ((attr & 7) << 8),
 			(attr & 0x70) >> 4,
 			(attr & 0x80) ? TILE_FLIPX : 0);
@@ -60,7 +60,7 @@ template <unsigned N> TILE_GET_INFO_MEMBER(xain_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(xain_state::get_char_tile_info)
 {
 	int attr = m_charram[tile_index | 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_charram[tile_index] | ((attr & 3) << 8),
 			(attr & 0xe0) >> 5,
 			0);
@@ -75,9 +75,9 @@ TILE_GET_INFO_MEMBER(xain_state::get_char_tile_info)
 
 void xain_state::video_start()
 {
-	m_bg_tilemaps[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xain_state::get_bg_tile_info<0>), this), tilemap_mapper_delegate(FUNC(xain_state::back_scan), this), 16,16,32,32);
-	m_bg_tilemaps[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xain_state::get_bg_tile_info<1>), this), tilemap_mapper_delegate(FUNC(xain_state::back_scan), this), 16,16,32,32);
-	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xain_state::get_char_tile_info), this), TILEMAP_SCAN_ROWS, 8,8,32,32);
+	m_bg_tilemaps[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xain_state::get_bg_tile_info<0>)), tilemap_mapper_delegate(*this, FUNC(xain_state::back_scan)), 16, 16, 32, 32);
+	m_bg_tilemaps[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xain_state::get_bg_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(xain_state::back_scan)), 16, 16, 32, 32);
+	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xain_state::get_char_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemaps[0]->set_transparent_pen(0);
 	m_bg_tilemaps[1]->set_transparent_pen(0);

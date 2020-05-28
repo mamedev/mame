@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /*********************************************************************
 
@@ -40,18 +40,18 @@
 
 ********************************************************************/
 
-#include <string.h>
-#include <time.h>
-#include <assert.h>
-#include <iomanip>
-
-#include "emu.h" // osd_printf_* (in osdcore.h)
-#include "imageutl.h"
 #include "ti99_dsk.h"
+#include "imageutl.h"
+
+#include "osdcore.h" // osd_printf_* (in osdcore.h)
+
+#include <cstring>
+#include <ctime>
+#include <cassert>
+#include <iomanip>
 
 #define SECTOR_SIZE 256
 
-#undef LOG_OUTPUT_FUNC
 #define LOG_OUTPUT_FUNC osd_printf_info
 
 #define LOG_WARN       (1U<<1)   // Warnings
@@ -64,7 +64,9 @@
 
 #define VERBOSE ( LOG_WARN )
 
+#define __EMU_H__ // logmacro wasn't really intended to be used outside stuff that uses libemu
 #include "logmacro.h"
+
 
 // ====================================================
 //  Common methods for both formats.

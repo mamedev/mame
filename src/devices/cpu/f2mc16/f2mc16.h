@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #ifndef MAME_CPU_F2MC16_F2MC16_H
-#define MAME_CPU_F2MC16_F2MC16_H 1
+#define MAME_CPU_F2MC16_F2MC16_H
 
 #pragma once
 

@@ -137,11 +137,11 @@ private:
 	void machine_start_ltcasino();
 	void machine_start_ltcasin2();
 
-	DECLARE_READ8_MEMBER(input_q_r);
-	DECLARE_READ8_MEMBER(input_s_r);
+	uint8_t input_q_r();
+	uint8_t input_s_r();
 
-	DECLARE_WRITE8_MEMBER(output_r_w);
-	DECLARE_WRITE8_MEMBER(output_t_w);
+	void output_r_w(uint8_t data);
+	void output_t_w(uint8_t data);
 };
 
 
@@ -375,7 +375,7 @@ TILE_GET_INFO_MEMBER(ltcasino_state::ltcasino_tile_info)
 
 	code |= BIT(attr, 7) << 8;
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(ltcasino_state::ltcasin2_tile_info)
@@ -386,7 +386,7 @@ TILE_GET_INFO_MEMBER(ltcasino_state::ltcasin2_tile_info)
 
 	code |= BIT(attr, 7) << 8;
 
-	SET_TILE_INFO_MEMBER(0, code, ((attr & 0x70) >> 1) | (attr & 7), 0);
+	tileinfo.set(0, code, ((attr & 0x70) >> 1) | (attr & 7), 0);
 }
 
 uint32_t ltcasino_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -430,17 +430,17 @@ void ltcasino_state::init_mv4in1()
 
 void ltcasino_state::machine_start_ltcasino()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ltcasino_state::ltcasino_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ltcasino_state::ltcasino_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_lamps.resolve();
 }
 
 void ltcasino_state::machine_start_ltcasin2()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ltcasino_state::ltcasin2_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ltcasino_state::ltcasin2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_lamps.resolve();
 }
 
-READ8_MEMBER(ltcasino_state::input_s_r)
+uint8_t ltcasino_state::input_s_r()
 {
 	uint8_t data = m_input_s->read() & 0xf1;
 
@@ -452,7 +452,7 @@ READ8_MEMBER(ltcasino_state::input_s_r)
 	return data;
 }
 
-READ8_MEMBER(ltcasino_state::input_q_r)
+uint8_t ltcasino_state::input_q_r()
 {
 	uint8_t data = m_input_q->read() & 0x1f;
 
@@ -464,7 +464,7 @@ READ8_MEMBER(ltcasino_state::input_q_r)
 	return data;
 }
 
-WRITE8_MEMBER(ltcasino_state::output_r_w)
+void ltcasino_state::output_r_w(uint8_t data)
 {
 	// 7------- unknown (toggles rapidly)
 	// -6------ unknown (toggles rapidly)
@@ -480,7 +480,7 @@ WRITE8_MEMBER(ltcasino_state::output_r_w)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 }
 
-WRITE8_MEMBER(ltcasino_state::output_t_w)
+void ltcasino_state::output_t_w(uint8_t data)
 {
 	// 76543210 unknown
 

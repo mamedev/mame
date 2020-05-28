@@ -76,10 +76,10 @@ public:
 	uint8_t m_bgcolor;
 	tilemap_t *m_tilemap;
 
-	DECLARE_WRITE8_MEMBER(bgcolor_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void bgcolor_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void nmi_enable_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
 	void carjmbre_palette(palette_device &palette) const;
@@ -145,7 +145,7 @@ void carjmbre_state::carjmbre_palette(palette_device &palette) const
 	palette.palette()->normalize_range(0, 63);
 }
 
-WRITE8_MEMBER(carjmbre_state::bgcolor_w)
+void carjmbre_state::bgcolor_w(uint8_t data)
 {
 	// guessed, seems to match with flyer
 	m_bgcolor = ~data & 0x3f;
@@ -154,7 +154,7 @@ WRITE8_MEMBER(carjmbre_state::bgcolor_w)
 
 // tilemap
 
-WRITE8_MEMBER(carjmbre_state::videoram_w)
+void carjmbre_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
@@ -164,12 +164,12 @@ TILE_GET_INFO_MEMBER(carjmbre_state::get_tile_info)
 {
 	int attr = m_videoram[tile_index | 0x400];
 	int code = (m_videoram[tile_index] & 0xff) | (attr << 1 & 0x100);
-	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, 0);
+	tileinfo.set(0, code, attr & 0xf, 0);
 }
 
 void carjmbre_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(carjmbre_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(carjmbre_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap->set_transparent_pen(0);
 }
 
@@ -230,14 +230,14 @@ INTERRUPT_GEN_MEMBER(carjmbre_state::vblank_nmi)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(carjmbre_state::nmi_enable_w)
+void carjmbre_state::nmi_enable_w(uint8_t data)
 {
 	// d0: enable/clear vblank nmi
 	m_nmi_enabled = bool(data & 1);
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(carjmbre_state::flipscreen_w)
+void carjmbre_state::flipscreen_w(uint8_t data)
 {
 	// d0: flip screen (cocktail mode)
 	flip_screen_set(data & 1);

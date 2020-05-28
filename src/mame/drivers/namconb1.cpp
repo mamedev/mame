@@ -307,7 +307,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::scantimer)
 	}
 
 	// Handle POSIRQ
-	uint32_t posirq_scanline = m_c116->get_reg(5) - 32;
+	u32 posirq_scanline = m_c116->get_reg(5) - 32;
 
 	if (scanline == posirq_scanline)
 	{
@@ -544,12 +544,12 @@ READ8_MEMBER(namconb1_state::namconb2_cpureg_r)
 
 READ32_MEMBER(namconb1_state::custom_key_r)
 {
-	uint16_t old_count = m_count;
+	u16 old_count = m_count;
 
 	do
 	{ /* pick a random number, but don't pick the same twice in a row */
 		m_count = machine().rand();
-	} while( m_count==old_count );
+	} while (m_count == old_count);
 
 	switch (m_gametype)
 	{
@@ -572,23 +572,23 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		switch (offset)
 		{
 			case 0: return 0x0189;
-			case 1: return  m_count<<16;
+			case 1: return  m_count << 16;
 		}
 		break;
 
 	case NAMCONB1_SWS96:
 		switch (offset)
 		{
-			case 0: return 0x01aa<<16;
-			case 4: return m_count<<16;
+			case 0: return 0x01aa << 16;
+			case 4: return m_count << 16;
 		}
 		break;
 
 	case NAMCONB1_SWS97:
 		switch (offset)
 		{
-			case 2: return 0x1b2<<16;
-			case 5: return m_count<<16;
+			case 2: return 0x1b2 << 16;
+			case 5: return m_count << 16;
 		}
 		break;
 
@@ -596,7 +596,7 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		switch (offset)
 		{
 			case 0: return 0x0167;
-			case 1: return m_count<<16;
+			case 1: return m_count << 16;
 		}
 		break;
 
@@ -604,7 +604,7 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		switch (offset)
 		{
 		case 1: return 0;
-		case 3: return (0x0171<<16) | m_count;
+		case 3: return (0x0171 << 16) | m_count;
 		}
 		break;
 
@@ -619,8 +619,8 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 	case NAMCONB1_VSHOOT:
 		switch (offset)
 		{
-			case 2: return m_count<<16;
-			case 3: return 0x0170<<16;
+			case 2: return m_count << 16;
+			case 3: return 0x0170 << 16;
 		}
 		break;
 
@@ -628,7 +628,7 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		switch (offset)
 		{
 			case 0: return 0x0186;
-			case 1: return m_count<<16;
+			case 1: return m_count << 16;
 		}
 		break;
 
@@ -649,10 +649,10 @@ READ32_MEMBER(namconb1_state::gunbulet_gun_r)
 
 	switch (offset)
 	{
-		case 0: case 1: result = (uint8_t)(0x0f + m_light1_y->read() * 224/255); break; /* Y (p2) */
-		case 2: case 3: result = (uint8_t)(0x26 + m_light1_x->read() * 288/314); break; /* X (p2) */
-		case 4: case 5: result = (uint8_t)(0x0f + m_light0_y->read() * 224/255); break; /* Y (p1) */
-		case 6: case 7: result = (uint8_t)(0x26 + m_light0_x->read() * 288/314); break; /* X (p1) */
+		case 0: case 1: result = (u8)(0x0f + m_light1_y->read() * 224/255); break; /* Y (p2) */
+		case 2: case 3: result = (u8)(0x26 + m_light1_x->read() * 288/314); break; /* X (p2) */
+		case 4: case 5: result = (u8)(0x0f + m_light0_y->read() * 224/255); break; /* Y (p1) */
+		case 6: case 7: result = (u8)(0x26 + m_light0_x->read() * 288/314); break; /* X (p1) */
 	}
 	return result<<24;
 } /* gunbulet_gun_r */
@@ -672,15 +672,15 @@ WRITE32_MEMBER(namconb1_state::srand_w)
 
 READ32_MEMBER(namconb1_state::share_r)
 {
-	return (m_namconb_shareram[offset*2] << 16) | m_namconb_shareram[offset*2+1];
+	return (m_namconb_shareram[offset * 2] << 16) | m_namconb_shareram[offset * 2 + 1];
 }
 
 WRITE32_MEMBER(namconb1_state::share_w)
 {
-	COMBINE_DATA(m_namconb_shareram+offset*2+1);
+	COMBINE_DATA(m_namconb_shareram + offset * 2 + 1);
 	data >>= 16;
 	mem_mask >>= 16;
-	COMBINE_DATA(m_namconb_shareram+offset*2);
+	COMBINE_DATA(m_namconb_shareram + offset  *2);
 }
 
 void namconb1_state::namconb1_am(address_map &map)
@@ -755,17 +755,17 @@ void namconb1_state::namcoc75_am(address_map &map)
 }
 
 
-READ8_MEMBER(namconb1_state::port6_r)
+uint8_t namconb1_state::port6_r()
 {
 	return m_port6;
 }
 
-WRITE8_MEMBER(namconb1_state::port6_w)
+void namconb1_state::port6_w(uint8_t data)
 {
 	m_port6 = data;
 }
 
-READ8_MEMBER(namconb1_state::port7_r)
+uint8_t namconb1_state::port7_r()
 {
 	switch (m_port6 & 0xf0)
 	{
@@ -792,9 +792,9 @@ READ8_MEMBER(namconb1_state::port7_r)
 // so the 8 bits of player 3 got routed to the 8 analog inputs.  +5V on the analog input will
 // register full scale, so it works...
 template <int Bit>
-uint16_t namconb1_state::dac_bit_r()
+u16 namconb1_state::dac_bit_r()
 {
-	return (m_p3.read_safe(0xff)<<(7-Bit))&0x80;
+	return (m_p3.read_safe(0xff) << (7 - Bit)) & 0x80;
 }
 
 
@@ -854,13 +854,13 @@ static INPUT_PORTS_START( namconb1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("P3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
 
 	PORT_START("P4")
@@ -955,10 +955,10 @@ void namconb1_state::machine_reset()
 
 void namconb1_state::namconb1(machine_config &config)
 {
-	M68EC020(config, m_maincpu, MASTER_CLOCK/2);
+	M68EC020(config, m_maincpu, MASTER_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namconb1_state::namconb1_am);
 
-	NAMCO_C75(config, m_mcu, MASTER_CLOCK/3);
+	NAMCO_C75(config, m_mcu, MASTER_CLOCK / 3);
 	m_mcu->set_addrmap(AS_PROGRAM, &namconb1_state::namcoc75_am);
 	m_mcu->p6_in_cb().set(FUNC(namconb1_state::port6_r));
 	m_mcu->p6_out_cb().set(FUNC(namconb1_state::port6_w));
@@ -981,9 +981,9 @@ void namconb1_state::namconb1(machine_config &config)
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namconb1_state::mcu_irq2_cb), attotime::from_hz(60));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK/8, 384, 0, 288, 264, 0, 224);
+	m_screen->set_raw(MASTER_CLOCK / 8, 384, 0, 288, 264, 0, 224);
 	m_screen->set_screen_update(FUNC(namconb1_state::screen_update_namconb1));
-	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));
+	m_screen->screen_vblank().set(FUNC(namconb1_state::screen_vblank));
 	m_screen->set_palette(m_c116);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
@@ -1002,8 +1002,6 @@ void namconb1_state::namconb1(machine_config &config)
 
 	NAMCO_C116(config, m_c116, 0);
 	m_c116->enable_shadows();
-
-	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb1)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1026,7 +1024,7 @@ void namconb1_state::namconb2(machine_config &config)
 	NAMCO_C169ROZ(config, m_c169roz, 0);
 	m_c169roz->set_palette(m_c116);
 	m_c169roz->set_is_namcofl(false);
-	m_c169roz->set_ram_words(0x20000/2);
+	m_c169roz->set_ram_words(0x20000 / 2);
 	m_c169roz->set_color_base(0x1800);
 }
 
@@ -1039,8 +1037,6 @@ void namconb1_state::machbrkr(machine_config &config)
 	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namconb1_state::NB2RozCB_machbrkr, this));
 
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_machbrkr, this));
-
-	MCFG_VIDEO_START_OVERRIDE(namconb1_state,machbrkr)
 }
 
 void namconb1_state::outfxies(machine_config &config)
@@ -1052,8 +1048,6 @@ void namconb1_state::outfxies(machine_config &config)
 	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namconb1_state::NB2RozCB_outfxies, this));
 
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_outfxies, this));
-
-	MCFG_VIDEO_START_OVERRIDE(namconb1_state,outfxies)
 }
 
 
@@ -1797,6 +1791,47 @@ ROM_START( outfxiesj )
 	ROM_LOAD16_WORD_SWAP( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
 ROM_END
 
+ROM_START( outfxiesa ) /* briefly shows "For use in Japan" notice, but Japanese text removed from game play. A Korean version? */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_WORD( "mprl.11c", 0x00002, 0x80000, CRC(22cd638d) SHA1(7b11ded9f2265678bb96b3fb706ed5fa37745511) ) // no label on ROM
+	ROM_LOAD32_WORD( "mpru.11d", 0x00000, 0x80000, CRC(a50f1cf9) SHA1(1c07c7e1ff2bb621c6fb249ae2e650097ce53aea) ) // no label on ROM
+
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
+	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_LOAD( "ou1voi0.6n", 0, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
+
+	ROM_REGION( 0x200000, "c123tmap:mask", 0 )
+	ROM_LOAD( "ou1shas.12s", 0, 0x200000,CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
+
+	ROM_REGION( 0x200000, "c169roz:mask", 0 )
+	ROM_LOAD( "ou1shar.18s", 0, 0x200000,   CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+
+	ROM_REGION( 0x2000000, "c355spr", 0 )
+	ROM_LOAD32_WORD( "ou1obj0l.4c", 0x0000000, 0x200000, CRC(1b4f7184) SHA1(a05d67842fce92f321d1fdd3bd30aa3427775a0c) )
+	ROM_LOAD32_WORD( "ou1obj0u.8c", 0x0000002, 0x200000, CRC(d0a69794) SHA1(07d449e54e9971abeb9cd5bb7b372270fafa8bac) )
+	ROM_LOAD32_WORD( "ou1obj1l.4b", 0x0400000, 0x200000, CRC(48a93e84) SHA1(6935ec161a12237d4cec732d42070f381c23b47c) )
+	ROM_LOAD32_WORD( "ou1obj1u.8b", 0x0400002, 0x200000, CRC(999de386) SHA1(d4780ab1929a3e2c2df464363d6451a2bcecb2a2) )
+	ROM_LOAD32_WORD( "ou1obj2l.4a", 0x0800000, 0x200000, CRC(30386cd0) SHA1(3563c5378288da58136f102381373bd6fcaeec21) )
+	ROM_LOAD32_WORD( "ou1obj2u.8a", 0x0800002, 0x200000, CRC(ccada5f8) SHA1(75ed95bb295780126879d67bba4d0ae1da63c928) )
+	ROM_LOAD32_WORD( "ou1obj3l.6c", 0x0c00000, 0x200000, CRC(5f41b44e) SHA1(3f5376fcd3e15af772df65b8eda4d5ee07ee5664) )
+	ROM_LOAD32_WORD( "ou1obj3u.9c", 0x0c00002, 0x200000, CRC(bc852c8e) SHA1(4863302c45ee16aaf2c36dac07aceaf287959c53) )
+	ROM_LOAD32_WORD( "ou1obj4l.6b", 0x1000000, 0x200000, CRC(99a5f9d7) SHA1(b0f46f4ac357918137031a19c36a56a47b7aefd6) )
+	ROM_LOAD32_WORD( "ou1obj4u.9b", 0x1000002, 0x200000, CRC(70ecaabb) SHA1(521c6849526fb271e6447f6c4f5bfa081f96b91e) )
+
+	ROM_REGION( 0x600000, "c169roz", 0 )
+	ROM_LOAD( "ou1-rot0.3d", 0x000000, 0x200000, CRC(a50c67c8) SHA1(432b8451eb9eaa3078134fce1e5e2d58a8b64be3) )
+	ROM_LOAD( "ou1-rot1.3c", 0x200000, 0x200000, CRC(14866780) SHA1(4a54151fada4dfba7232e53e40623e5697eeb7db) )
+	ROM_LOAD( "ou1-rot2.3b", 0x400000, 0x200000, CRC(55ccf3af) SHA1(d98489aaa840cbffb21c47609961c1163b0336f3) )
+
+	ROM_REGION( 0x200000, "c123tmap", 0 )
+	ROM_LOAD( "ou1-scr0.1d", 0x000000, 0x200000, CRC(b3b3f2e9) SHA1(541bd7e9ba12aff4ec4033bd9c6bb19476acb3c4) )
+
+	ROM_REGION32_BE( 0x100000, "data", 0 )
+	ROM_LOAD16_WORD_SWAP( "ou1dat0.20a", 0x00000, 0x80000, CRC(1a49aead) SHA1(df243aff1a6fb5bcf4d5d883c5af2374a4aff477) )
+	ROM_LOAD16_WORD_SWAP( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
+ROM_END
 
 ROM_START( machbrkr ) /* Defaults to Asia / 4 Player cabinet */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
@@ -1842,7 +1877,6 @@ ROM_START( machbrkr ) /* Defaults to Asia / 4 Player cabinet */
 	ROM_REGION32_BE( 0x100000, "data", 0 )
 	ROM_LOAD16_WORD_SWAP( "mb1_dat0.20a", 0x00000, 0x80000, CRC(fb2e3cd1) SHA1(019b1d645a07619036522f42e0b9a537f39b6b93) )
 ROM_END
-
 
 ROM_START( machbrkrj )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
@@ -1892,22 +1926,23 @@ ROM_END
 
 /***************************************************************/
 
-/*    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    CLASS,          INIT,          MONITOR,COMPANY,FULLNAME,   FLAGS */
-GAME( 1994, nebulray, 0,        namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nebulrayj,nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ptblank,  0,        namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ptblanka, ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbuletj,ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbuletw,ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gslugrsj, 0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gslgr94u, 0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gslgr94j, gslgr94u, namconb1, namconb1, namconb1_state, init_gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sws95,    0,        namconb1, namconb1, namconb1_state, init_sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, sws96,    0,        namconb1, namconb1, namconb1_state, init_sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, sws97,    0,        namconb1, namconb1, namconb1_state, init_sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, vshoot,   0,        namconb1, namconb1, namconb1_state, init_vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    CLASS,          INIT,          MONITOR,COMPANY,FULLNAME,   FLAGS */
+GAME( 1994, nebulray,  0,        namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nebulrayj, nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblank,   0,        namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblanka,  ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletj, ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletw, ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gslugrsj,  0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94u,  0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94j,  gslgr94u, namconb1, namconb1, namconb1_state, init_gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sws95,     0,        namconb1, namconb1, namconb1_state, init_sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sws96,     0,        namconb1, namconb1, namconb1_state, init_sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sws97,     0,        namconb1, namconb1, namconb1_state, init_sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, vshoot,    0,        namconb1, namconb1, namconb1_state, init_vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, outfxies, 0,        outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, outfxiesj,outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, machbrkr, 0,        machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
-GAME( 1995, machbrkrj,machbrkr, machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxies,  0,        outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesj, outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesa, outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Korea?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, machbrkr,  0,        machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
+GAME( 1995, machbrkrj, machbrkr, machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )

@@ -6,55 +6,107 @@
 #include "emu.h"
 #include "elan_eu3a05.h"
 
-DEFINE_DEVICE_TYPE(RADICA6502_SOUND, radica6502_sound_device, "radica6502sound", "Elan EU3A05 / EU3A14 Sound")
+DEFINE_DEVICE_TYPE(ELAN_EU3A05_SOUND, elan_eu3a05_sound_device, "elan_eu3a05sound", "Elan EU3A05 / EU3A14 Sound")
 
-#define LOG_AUDIO       (1U << 0)
+#define LOG_AUDIO       (1U << 1)
 
 #define LOG_ALL         (LOG_AUDIO)
 
-#define VERBOSE             (0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 
-radica6502_sound_device::radica6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RADICA6502_SOUND, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, m_stream(nullptr)
-	, m_space_read_cb(*this)
+elan_eu3a05_sound_device::elan_eu3a05_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ELAN_EU3A05_SOUND, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_memory_interface(mconfig, *this),
+	m_space_config("regs", ENDIANNESS_NATIVE, 8, 6, 0, address_map_constructor(FUNC(elan_eu3a05_sound_device::map), this)),
+	m_stream(nullptr),
+	m_space_read_cb(*this),
+	m_sound_end_cb(*this)
 {
 }
 
-void radica6502_sound_device::device_start()
+device_memory_interface::space_config_vector elan_eu3a05_sound_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+void elan_eu3a05_sound_device::map(address_map &map)
+{
+	map(0x00, 0x3f).rw(FUNC(elan_eu3a05_sound_device::read_unmapped), FUNC(elan_eu3a05_sound_device::write_unmapped));
+
+	map(0x00, 0x11).rw(FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_w)); // 6 * 24-bit (3 byte) channel addresses
+	map(0x12, 0x23).rw(FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_w)); // 6 * 24-bit (3 byte) channel lengths
+	map(0x24, 0x24).rw(FUNC(elan_eu3a05_sound_device::reg50a4_r), FUNC(elan_eu3a05_sound_device::reg50a4_w)); // unknown TODO
+	map(0x25, 0x25).rw(FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_w));
+	map(0x26, 0x27).rw(FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_volume_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_volume_w)); // 0x26 = volume channels 0,1,2,3  0x27 = volume channels 5,6  (lunar rescue sets 0x03 0x00 and just uses a single channel)
+	map(0x28, 0x28).r(FUNC(elan_eu3a05_sound_device::elan_eu3a05_50a8_r)); // stopped status? (read only?)
+	map(0x29, 0x29).rw(FUNC(elan_eu3a05_sound_device::reg50a9_r), FUNC(elan_eu3a05_sound_device::reg50a9_w)); // IRQ mask?
+
+	// no other reads/writes seen?
+}
+
+
+
+void elan_eu3a05_sound_device::device_start()
 {
 	m_space_read_cb.resolve_safe(0);
 	m_stream = stream_alloc(0, 1, 8000);
+
+	m_sound_end_cb.resolve_all_safe();
+
+	save_item(NAME(m_sound_byte_address));
+	save_item(NAME(m_sound_byte_len));
+	save_item(NAME(m_sound_current_nib_pos));
+	save_item(NAME(m_isstopped));
+	save_item(NAME(m_sound_trigger));
+	save_item(NAME(m_sound_unk));
+	save_item(NAME(m_volumes));
+	save_item(NAME(m_50a4));
+	save_item(NAME(m_50a9));
 }
 
-void radica6502_sound_device::device_reset()
+void elan_eu3a05_sound_device::device_reset()
 {
 	for (int i = 0; i < 6; i++)
 	{
 		m_sound_byte_address[i] = 0;
 		m_sound_byte_len[i] = 0;
 		m_sound_current_nib_pos[i] = 0;
+		m_adpcm[i].reset();
 	}
 
 	m_isstopped = 0x3f;
+
+	m_sound_trigger = 0x00;
+	m_sound_unk = 0x00;
+
+	m_volumes[0] = 0xff;
+	m_volumes[1] = 0x0f;
+
+	m_50a4 = 0x00;
+	m_50a9 = 0x00;
 }
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void radica6502_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+
+	int volume = m_volumes[0] | (m_volumes[1] << 8);
 
 	int outpos = 0;
 	// loop while we still have samples to generate
 	while (samples-- != 0)
 	{
+		int total = 0;
 		for (int channel = 0; channel < 6; channel++)
 		{
 			if (!((m_isstopped >> channel) & 1))
@@ -66,23 +118,23 @@ void radica6502_sound_device::sound_stream_update(sound_stream &stream, stream_s
 				int nibble = m_space_read_cb(readoffset);
 
 				nibble = nibble >> ((m_sound_current_nib_pos[channel] & 1) ? 0 : 4);
-				nibble &= 0x0f;
+				uint16_t decoded = (uint16_t)m_adpcm[channel].clock(nibble & 0xf);
+				decoded = (decoded * ((volume >> (channel * 2)) & 3)) / 3;
+				decoded <<= 4;
 
-				// it's actually some form of ADPCM? but apparently NOT the OKI ADPCM
-				if (nibble & 0x08)
-					nibble -= 0x10;
-
-				outputs[0][outpos] += nibble * 0x100;
+				total += (int32_t)(int16_t)decoded - 0x8000;
 
 				m_sound_current_nib_pos[channel]++;
 
 				if (m_sound_current_nib_pos[channel] >= m_sound_byte_len[channel] * 2)
 				{
 					m_sound_current_nib_pos[channel] = 0;
+					m_adpcm[channel].reset();
 					m_isstopped |= (1 << channel);
 
-					// maybe should generate an interrupt with vector
-					// ffb8, ffbc, ffc0, ffc4, ffc8, or ffcc depending on which channel finished??
+					// maybe, seems to match the system IRQ mask when the sound interrupts are enabled?
+					if (m_50a9 & (1 << channel))
+						m_sound_end_cb[channel](1); // generate interrupt based on which channel just stopped?
 				}
 			}
 			else
@@ -90,12 +142,15 @@ void radica6502_sound_device::sound_stream_update(sound_stream &stream, stream_s
 				//LOGMASKED( LOG_AUDIO, "m_isstopped %02x channel %d is NOT active %08x %06x\n", m_isstopped, channel, m_sound_byte_address[channel], m_sound_current_nib_pos[channel]);
 			}
 		}
+		outputs[0][outpos] = total / 6;
 		outpos++;
 	}
 }
 
 
-void radica6502_sound_device::handle_sound_addr_w(int which, int offset, uint8_t data)
+
+
+void elan_eu3a05_sound_device::handle_sound_addr_w(int which, int offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -116,7 +171,7 @@ void radica6502_sound_device::handle_sound_addr_w(int which, int offset, uint8_t
 	}
 }
 
-uint8_t radica6502_sound_device::handle_sound_addr_r(int which, int offset)
+uint8_t elan_eu3a05_sound_device::handle_sound_addr_r(int which, int offset)
 {
 	switch (offset)
 	{
@@ -136,19 +191,19 @@ uint8_t radica6502_sound_device::handle_sound_addr_r(int which, int offset)
 	return 0x00;
 }
 
-WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_addr_w)
+void elan_eu3a05_sound_device::elan_eu3a05_sound_addr_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	handle_sound_addr_w(offset / 3, offset % 3, data);
 }
 
-READ8_MEMBER(radica6502_sound_device::radicasi_sound_addr_r)
+uint8_t elan_eu3a05_sound_device::elan_eu3a05_sound_addr_r(offs_t offset)
 {
 	m_stream->update();
 	return handle_sound_addr_r(offset / 3, offset % 3);
 }
 
-void radica6502_sound_device::handle_sound_size_w(int which, int offset, uint8_t data)
+void elan_eu3a05_sound_device::handle_sound_size_w(int which, int offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -169,7 +224,7 @@ void radica6502_sound_device::handle_sound_size_w(int which, int offset, uint8_t
 	}
 }
 
-uint8_t radica6502_sound_device::handle_sound_size_r(int which, int offset)
+uint8_t elan_eu3a05_sound_device::handle_sound_size_r(int which, int offset)
 {
 	switch (offset)
 	{
@@ -189,19 +244,19 @@ uint8_t radica6502_sound_device::handle_sound_size_r(int which, int offset)
 	return 0x00;
 }
 
-WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_size_w)
+void elan_eu3a05_sound_device::elan_eu3a05_sound_size_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	handle_sound_size_w(offset / 3, offset % 3, data);
 }
 
-READ8_MEMBER(radica6502_sound_device::radicasi_sound_size_r)
+uint8_t elan_eu3a05_sound_device::elan_eu3a05_sound_size_r(offs_t offset)
 {
 	m_stream->update();
 	return handle_sound_size_r(offset / 3, offset % 3);
 }
 
-READ8_MEMBER(radica6502_sound_device::radicasi_sound_trigger_r)
+uint8_t elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_r()
 {
 	m_stream->update();
 
@@ -210,7 +265,7 @@ READ8_MEMBER(radica6502_sound_device::radicasi_sound_trigger_r)
 }
 
 
-WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_trigger_w)
+void elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_w(uint8_t data)
 {
 	m_stream->update();
 
@@ -231,16 +286,16 @@ WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_trigger_w)
 
 /* this is read/written with the same individual bits for each channel as the trigger
    maybe related to interrupts? */
-READ8_MEMBER(radica6502_sound_device::radicasi_sound_unk_r)
+uint8_t elan_eu3a05_sound_device::elan_eu3a05_sound_unk_r()
 {
-	LOGMASKED( LOG_AUDIO, "%s: radicasi_sound_unk_r\n", machine().describe_context());
+	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_sound_unk_r\n", machine().describe_context());
 	// don't think this reads back what was written probably a status of something instead?
 	return 0x00; //m_sound_unk;
 }
 
-WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_unk_w)
+void elan_eu3a05_sound_device::elan_eu3a05_sound_unk_w(uint8_t data)
 {
-	LOGMASKED( LOG_AUDIO, "%s: radicasi_sound_unk_w %02x\n", machine().describe_context(), data);
+	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_sound_unk_w %02x\n", machine().describe_context(), data);
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -256,19 +311,76 @@ WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_unk_w)
 		LOGMASKED( LOG_AUDIO, "  UNEXPECTED BITS SET");
 }
 
-void radica6502_sound_device::handle_sound_trigger(int which)
+void elan_eu3a05_sound_device::handle_sound_trigger(int which)
 {
 	LOGMASKED( LOG_AUDIO, "Triggering operation on channel (%d) with params %08x %08x\n", which, m_sound_byte_address[which], m_sound_byte_len[which]);
 
-	m_sound_current_nib_pos[which] = 0;
-	m_isstopped &= ~(1 << which);
+	if (m_isstopped & (1 << which)) // golden tee will repeatedly try to start the music on the title screen (although could depend on a status read first?)
+	{
+		if (m_sound_byte_len[which])
+		{
+			m_sound_current_nib_pos[which] = 0;
+			m_isstopped &= ~(1 << which);
+			m_adpcm[which].reset();
+		}
+	}
 }
 
 
-READ8_MEMBER(radica6502_sound_device::radicasi_50a8_r)
+uint8_t elan_eu3a05_sound_device::elan_eu3a05_50a8_r()
 {
 	m_stream->update();
 
-	LOGMASKED( LOG_AUDIO, "%s: radicasi_50a8_r\n", machine().describe_context());
+	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_50a8_r\n", machine().describe_context());
 	return m_isstopped;
 }
+
+uint8_t elan_eu3a05_sound_device::elan_eu3a05_sound_volume_r(offs_t offset)
+{
+	LOGMASKED( LOG_AUDIO, "%s: sound_volume_r (offset %d, data %02x)\n", machine().describe_context(), offset, m_volumes[offset]);
+	return m_volumes[offset];
+}
+
+void elan_eu3a05_sound_device::elan_eu3a05_sound_volume_w(offs_t offset, uint8_t data)
+{
+	m_stream->update();
+
+	LOGMASKED( LOG_AUDIO, "%s: sound_volume_w (offset %d, data %02x)\n", machine().describe_context(), offset, data);
+	m_volumes[offset] = data;
+}
+
+uint8_t elan_eu3a05_sound_device::read_unmapped(offs_t offset)
+{
+	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_sound_device::read_unmapped (offset %02x)\n", machine().describe_context(), offset);
+	return 0x00;
+}
+
+void elan_eu3a05_sound_device::write_unmapped(offs_t offset, uint8_t data)
+{
+	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_sound_device::write_unmapped (offset %02x) (data %02x)\n", machine().describe_context(), offset, data);
+}
+
+uint8_t elan_eu3a05_sound_device::reg50a4_r()
+{
+	LOGMASKED( LOG_AUDIO, "%s: reg50a4_r (unknown) (data %02x)\n", machine().describe_context(), m_50a4);
+	return m_50a4;
+}
+
+void elan_eu3a05_sound_device::reg50a4_w(uint8_t data)
+{
+	LOGMASKED( LOG_AUDIO, "%s: reg50a4_w (unknown) (data %02x)\n", machine().describe_context(), data);
+	m_50a4 = data;
+}
+
+uint8_t elan_eu3a05_sound_device::reg50a9_r()
+{
+	LOGMASKED( LOG_AUDIO, "%s: reg50a9_r (IRQ mask?) (data %02x)\n", machine().describe_context(), m_50a9);
+	return m_50a9;
+}
+
+void elan_eu3a05_sound_device::reg50a9_w(uint8_t data)
+{
+	LOGMASKED( LOG_AUDIO, "%s: reg50a4_w (IRQ mask?) (data %02x)\n", machine().describe_context(), data);
+	m_50a9 = data;
+}
+

@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pandoras_cpua_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(pandoras_cpub_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(pandoras_i8039_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
+	void i8039_irqen_and_status_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(pandoras_z80_irqtrigger_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
@@ -66,8 +66,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pandoras_cram_w);
 	DECLARE_WRITE8_MEMBER(pandoras_scrolly_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_READ8_MEMBER(pandoras_portA_r);
-	DECLARE_READ8_MEMBER(pandoras_portB_r);
+	uint8_t pandoras_portA_r();
+	uint8_t pandoras_portB_r();
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

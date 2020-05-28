@@ -248,12 +248,12 @@ private:
 	INTERRUPT_GEN_MEMBER(pc8801_vrtc_irq);
 	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc8801_rtc_irq);
-	DECLARE_READ8_MEMBER(cpu_8255_c_r);
-	DECLARE_WRITE8_MEMBER(cpu_8255_c_w);
-	DECLARE_READ8_MEMBER(fdc_8255_c_r);
-	DECLARE_WRITE8_MEMBER(fdc_8255_c_w);
-	DECLARE_READ8_MEMBER(opn_porta_r);
-	DECLARE_READ8_MEMBER(opn_portb_r);
+	uint8_t cpu_8255_c_r();
+	void cpu_8255_c_w(uint8_t data);
+	uint8_t fdc_8255_c_r();
+	void fdc_8255_c_w(uint8_t data);
+	uint8_t opn_porta_r();
+	uint8_t opn_portb_r();
 	IRQ_CALLBACK_MEMBER(pc8801_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(pc8801_sound_irq);
 };

@@ -101,7 +101,7 @@ private:
 	int m_sector;                           //!< current sector number in track
 	int m_page;                             //!< current page (derived from cylinder, head and sector)
 	std::unique_ptr<uint8_t[]> m_cache[2 * DIABLO_PAGES];                        //!< pages raw bytes
-	uint32_t** m_bits;                        //!< pages expanded to bits
+	std::unique_ptr<std::unique_ptr<uint32_t[]>[]> m_bits;                       //!< pages expanded to bits
 	int m_rdfirst;                          //!< set to first bit of a sector that is read from
 	int m_rdlast;                           //!< set to last bit of a sector that was read from
 	int m_wrfirst;                          //!< set to non-zero if a sector is written to

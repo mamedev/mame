@@ -229,12 +229,12 @@ WRITE_LINE_MEMBER( a2bus_ayboard_device::via2_irq_w )
 		lower_slot_irq();
 }
 
-WRITE8_MEMBER( a2bus_ayboard_device::via1_out_a )
+void a2bus_ayboard_device::via1_out_a(uint8_t data)
 {
 	m_porta1 = data;
 }
 
-WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
+void a2bus_ayboard_device::via1_out_b(uint8_t data)
 {
 	if (!BIT(data, 2))
 	{
@@ -262,7 +262,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 	}
 }
 
-WRITE8_MEMBER( a2bus_phasor_device::via1_out_b )
+void a2bus_phasor_device::via1_out_b(uint8_t data)
 {
 	if (!(data & 4))
 	{
@@ -311,12 +311,12 @@ WRITE8_MEMBER( a2bus_phasor_device::via1_out_b )
 	}
 }
 
-WRITE8_MEMBER( a2bus_ayboard_device::via2_out_a )
+void a2bus_ayboard_device::via2_out_a(uint8_t data)
 {
 	m_porta2 = data;
 }
 
-WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
+void a2bus_ayboard_device::via2_out_b(uint8_t data)
 {
 	if (!BIT(data, 2))
 	{
@@ -338,13 +338,13 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 				break;
 
 			case 3: // BDIR=1, BC1=1 (latch)
-				m_ay2->data_w(m_porta2);
+				m_ay2->address_w(m_porta2);
 				break;
 		}
 	}
 }
 
-WRITE8_MEMBER( a2bus_phasor_device::via2_out_b )
+void a2bus_phasor_device::via2_out_b(uint8_t data)
 {
 	if (!BIT(data, 2))
 	{

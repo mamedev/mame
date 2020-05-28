@@ -44,7 +44,7 @@ I/O ports: These ranges are what is guessed
 #include "machine/upd765.h"
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "machine/terminal.h"
 
@@ -62,40 +62,38 @@ public:
 	void czk80(machine_config &config);
 	void init_czk80();
 
-protected:
-	virtual void machine_reset() override;
-
 private:
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(czk80_reset);
-	DECLARE_READ8_MEMBER(port80_r);
-	DECLARE_READ8_MEMBER(port81_r);
-	DECLARE_WRITE8_MEMBER(port40_w);
+	u8 port80_r();
+	u8 port81_r();
+	void port40_w(u8 data);
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	void czk80_io(address_map &map);
 	void czk80_mem(address_map &map);
-	uint8_t m_term_data;
+	u8 m_term_data;
 	required_device<z80_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<upd765a_device> m_fdc;
 };
 
 
-WRITE8_MEMBER( czk80_state::port40_w )
+void czk80_state::port40_w(u8 data)
 {
 	membank("bankr1")->set_entry(BIT(data, 1));
 }
 
-READ8_MEMBER( czk80_state::port80_r )
+u8 czk80_state::port80_r()
 {
-	uint8_t ret = m_term_data;
+	u8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( czk80_state::port81_r )
+u8 czk80_state::port81_r()
 {
 	return (m_term_data) ? 3 : 1;
 }
@@ -166,7 +164,7 @@ void czk80_state::machine_reset()
 
 void czk80_state::init_czk80()
 {
-	uint8_t *main = memregion("maincpu")->base();
+	u8 *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);

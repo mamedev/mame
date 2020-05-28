@@ -101,10 +101,10 @@ private:
 	DECLARE_WRITE16_MEMBER(volume_w);
 	DECLARE_WRITE16_MEMBER(upd7759_w);
 	DECLARE_READ16_MEMBER(upd7759_r);
-	DECLARE_READ8_MEMBER(hopper_b_r);
-	DECLARE_READ8_MEMBER(hopper_c_r);
-	DECLARE_WRITE8_MEMBER(payen_a_w);
-	DECLARE_WRITE8_MEMBER(display_c_w);
+	uint8_t hopper_b_r();
+	uint8_t hopper_c_r();
+	void payen_a_w(uint8_t data);
+	void display_c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);

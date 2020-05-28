@@ -64,6 +64,15 @@ private:
 		offs_t dasm_flags;
 	};
 
+	enum class operand_class
+	{
+		SOURCE,
+		BITPOS,
+		DESTINATION,
+		ADDRESS,
+		SCALED_INDEX
+	};
+
 	static const NS32000_OPCODE format0_op[1];
 	static const NS32000_OPCODE format1_op[16];
 	static const NS32000_OPCODE format2_op[8];
@@ -101,15 +110,16 @@ private:
 	static char const *const M[];
 	static char const *const PR[];
 
-	std::string mnemonic_index(std::string form, std::string itype, std::string ftype);
+	std::string mnemonic_index(std::string form, const std::string &itype, const std::string &ftype);
 	uint8_t opcode_format(uint8_t byte);
 	int8_t short2int(uint8_t val);
 	static inline int32_t get_disp(offs_t &pc, const data_buffer &opcodes);
+	static inline std::string format_disp(int32_t disp);
 	static inline std::string get_option_list(uint8_t cfg);
 	static inline std::string get_options(uint8_t opts);
 	static inline std::string get_reg_list(offs_t &pc, const data_buffer &opcodes, bool reverse);
 
-	void stream_gen(std::ostream &stream, u8 gen_addr, u8 op_len, offs_t &pc, const data_buffer &opcodes);
+	void stream_gen(std::ostream &stream, u8 gen_addr, u8 op_len, operand_class op_class, offs_t &pc, const data_buffer &opcodes);
 
 	u32 m_base_pc;
 };

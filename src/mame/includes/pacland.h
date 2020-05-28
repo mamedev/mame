@@ -30,7 +30,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<hd63701_cpu_device> m_mcu;
+	required_device<hd63701v0_cpu_device> m_mcu;
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -57,8 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER(subreset_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(led_w);
+	void coin_w(uint8_t data);
+	void led_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(irq_1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(irq_2_ctrl_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);

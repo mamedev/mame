@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #ifndef MAME_BUS_S100_AM310_H
-#define MAME_BUS_S100_AM310_H 1
+#define MAME_BUS_S100_AM310_H
 
 #pragma once
 

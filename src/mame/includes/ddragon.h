@@ -55,7 +55,7 @@ public:
 	void init_ddragon();
 	void init_ddragon6809();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_bus_free);
+	DECLARE_READ_LINE_MEMBER(subcpu_bus_free_r);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -142,13 +142,12 @@ private:
 	DECLARE_WRITE8_MEMBER(ddragon_interrupt_w);
 	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_w);
-	DECLARE_READ8_MEMBER(ddragon_hd63701_internal_registers_r);
-	DECLARE_WRITE8_MEMBER(ddragon_hd63701_internal_registers_w);
+	void sub_port6_w(uint8_t data);
 	DECLARE_READ8_MEMBER(ddragon_comram_r);
 	DECLARE_WRITE8_MEMBER(ddragon_comram_w);
 	DECLARE_WRITE8_MEMBER(dd_adpcm_w);
 	DECLARE_READ8_MEMBER(dd_adpcm_status_r);
-	DECLARE_WRITE8_MEMBER(ddragonba_port_w);
+	void ddragonba_port_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_2);
 
@@ -159,6 +158,7 @@ private:
 	void ddragonba_sub_map(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
+	void sub_6309_map(address_map &map);
 };
 
 
@@ -181,7 +181,7 @@ private:
 	DECLARE_READ8_MEMBER(darktowr_mcu_bank_r);
 	DECLARE_WRITE8_MEMBER(darktowr_mcu_bank_w);
 	DECLARE_WRITE8_MEMBER(darktowr_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(mcu_port_a_w);
+	void mcu_port_a_w(offs_t offset, uint8_t data);
 
 	void darktowr_map(address_map &map);
 	void darktowr_banked_map(address_map &map);

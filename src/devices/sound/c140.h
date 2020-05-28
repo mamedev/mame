@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-/* C140.h */
+/* c140.h */
 
 #ifndef MAME_SOUND_C140_H
 #define MAME_SOUND_C140_H
 
 #pragma once
 
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -14,29 +15,28 @@
 
 
 // ======================> c140_device
+ // Verified from schematics (24 bit address, 12(16? for C219) bit data)
 
 class c140_device : public device_t,
-	public device_sound_interface,
-	public device_rom_interface
+					public device_sound_interface,
+					public device_rom_interface<25, 1, 0, ENDIANNESS_BIG>
 {
 public:
-	enum class C140_TYPE
-	{
-		SYSTEM2,
-		SYSTEM21,
-		ASIC219
-	};
-
 	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_bank_type(C140_TYPE bank) { m_banking_type = bank; }
 	auto int1_callback() { return m_int1_callback.bind(); }
 
 	u8 c140_r(offs_t offset);
 	void c140_w(offs_t offset, u8 data);
 
+	// little endian: Swap even and odd word
+	u8 c140_le_r(offs_t offset) { return c140_r(offset ^ 1); }
+	void c140_le_w(offs_t offset, u8 data) { c140_w(offset ^ 1, data);}
+
 protected:
+	c140_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
@@ -46,34 +46,38 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-private:
+	virtual int find_sample(int adrs, int bank, int voice);
+
 	static constexpr unsigned MAX_VOICE = 24;
 
 	struct C140_VOICE
 	{
 		C140_VOICE() { }
 
-		int32_t    ptoffset     = 0;
-		int32_t    pos          = 0;
-		int32_t    key          = 0;
+		s32    ptoffset     = 0;
+		s32    pos          = 0;
+		s32    key          = 0;
 		//--work
-		int32_t    lastdt       = 0;
-		int32_t    prevdt       = 0;
-		int32_t    dltdt        = 0;
+		s32    lastdt       = 0;
+		s32    prevdt       = 0;
+		s32    dltdt        = 0;
 		//--reg
-		int32_t    rvol         = 0;
-		int32_t    lvol         = 0;
-		int32_t    frequency    = 0;
-		int32_t    bank         = 0;
-		int32_t    mode         = 0;
+		s32    rvol         = 0;
+		s32    lvol         = 0;
+		s32    frequency    = 0;
+		s32    bank         = 0;
+		s32    mode         = 0;
 
-		int32_t    sample_start = 0;
-		int32_t    sample_end   = 0;
-		int32_t    sample_loop  = 0;
+		s32    sample_start = 0;
+		s32    sample_end   = 0;
+		s32    sample_loop  = 0;
 	};
 
-	void init_voice( C140_VOICE *v );
-	long find_sample(long adrs, long bank, int voice);
+	void init_voice(C140_VOICE *v);
+	const inline bool ch_looped(C140_VOICE *v) { return BIT(v->mode, 4); } // shared as c140 and c219
+
+	virtual const inline bool ch_mulaw(C140_VOICE *v) { return BIT(v->mode, 3); }
+	// bit 6 used, unknown
 
 	TIMER_CALLBACK_MEMBER(int1_on);
 
@@ -81,21 +85,51 @@ private:
 
 	int m_sample_rate;
 	sound_stream *m_stream;
-	C140_TYPE m_banking_type;
 	/* internal buffers */
-	std::unique_ptr<int16_t[]> m_mixer_buffer_left;
-	std::unique_ptr<int16_t[]> m_mixer_buffer_right;
+	std::unique_ptr<s16[]> m_mixer_buffer_left;
+	std::unique_ptr<s16[]> m_mixer_buffer_right;
 
 	int m_baserate;
-	uint8_t m_REG[0x200];
+	u8 m_REG[0x200];
 
-	int16_t m_pcmtbl[8];        //2000.06.26 CAB
+	s16 m_pcmtbl[256];        //2000.06.26 CAB
 
 	C140_VOICE m_voi[MAX_VOICE];
 
 	emu_timer *m_int1_timer;
 };
 
+class c219_device : public c140_device
+{
+public:
+	c219_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	u8 c219_r(offs_t offset);
+	void c219_w(offs_t offset, u8 data);
+
+	// little endian: Swap even and odd word
+	u8 c219_le_r(offs_t offset) { return c219_r(offset ^ 1); }
+	void c219_le_w(offs_t offset, u8 data) { c219_w(offset ^ 1, data);}
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	virtual int find_sample(int adrs, int bank, int voice) override;
+
+	virtual const inline bool ch_mulaw(C140_VOICE *v) override { return BIT(v->mode, 0); }
+private:
+	// bit 1 used, unknown
+	const inline bool ch_noise(C140_VOICE *v) { return BIT(v->mode, 2); }
+	const inline bool ch_inv_lout(C140_VOICE *v) { return BIT(v->mode, 3); }
+	const inline bool ch_inv_sign(C140_VOICE *v) { return BIT(v->mode, 6); }
+	u16 m_lfsr;
+};
+
 DECLARE_DEVICE_TYPE(C140, c140_device)
+DECLARE_DEVICE_TYPE(C219, c219_device)
 
 #endif // MAME_SOUND_C140_H

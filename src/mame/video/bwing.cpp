@@ -102,17 +102,17 @@ WRITE8_MEMBER(bwing_state::paletteram_w)
 
 TILE_GET_INFO_MEMBER(bwing_state::get_fgtileinfo)
 {
-	SET_TILE_INFO_MEMBER(2, m_fgscrollram[tile_index] & 0x7f, m_fgscrollram[tile_index] >> 7, 0);
+	tileinfo.set(2, m_fgscrollram[tile_index] & 0x7f, m_fgscrollram[tile_index] >> 7, 0);
 }
 
 TILE_GET_INFO_MEMBER(bwing_state::get_bgtileinfo)
 {
-	SET_TILE_INFO_MEMBER(3, m_bgscrollram[tile_index] & 0x7f, m_bgscrollram[tile_index] >> 7, 0);
+	tileinfo.set(3, m_bgscrollram[tile_index] & 0x7f, m_bgscrollram[tile_index] >> 7, 0);
 }
 
 TILE_GET_INFO_MEMBER(bwing_state::get_charinfo)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
+	tileinfo.set(0, m_videoram[tile_index], 0, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(bwing_state::scan_cols)
@@ -125,9 +125,9 @@ void bwing_state::video_start()
 {
 	int i;
 
-	m_charmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bwing_state::get_charinfo),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	m_fgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bwing_state::get_fgtileinfo),this), tilemap_mapper_delegate(FUNC(bwing_state::scan_cols),this), 16, 16, 64, 64);
-	m_bgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bwing_state::get_bgtileinfo),this), tilemap_mapper_delegate(FUNC(bwing_state::scan_cols),this), 16, 16, 64, 64);
+	m_charmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bwing_state::get_charinfo)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bwing_state::get_fgtileinfo)), tilemap_mapper_delegate(*this, FUNC(bwing_state::scan_cols)), 16, 16, 64, 64);
+	m_bgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bwing_state::get_bgtileinfo)), tilemap_mapper_delegate(*this, FUNC(bwing_state::scan_cols)), 16, 16, 64, 64);
 
 	m_charmap->set_transparent_pen(0);
 	m_fgmap->set_transparent_pen(0);

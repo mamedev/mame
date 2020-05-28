@@ -111,10 +111,10 @@ tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type optype
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_intram(*this, "intram")
 	, m_dbr(*this, "dbr")
-	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_port_analog_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_serial_out_cb{{*this}, {*this}}
+	, m_port_in_cb(*this)
+	, m_port_out_cb(*this)
+	, m_port_analog_in_cb(*this)
+	, m_serial_out_cb(*this)
 {
 }
 
@@ -138,7 +138,7 @@ bool tlcs870_device::stream_arg(std::ostream &stream, uint32_t pc, const char *p
 }
 
 // NOT using templates here because there are subtle differences in the port behavior (the ports are multi-purpose) that still need implementing
-READ8_MEMBER(tlcs870_device::port0_r)
+uint8_t tlcs870_device::port0_r()
 {
 	// need to use P0CR (0x000a) to control direction
 
@@ -148,7 +148,7 @@ READ8_MEMBER(tlcs870_device::port0_r)
 		return m_port_out_latch[0];
 }
 
-READ8_MEMBER(tlcs870_device::port1_r)
+uint8_t tlcs870_device::port1_r()
 {
 	// need to use P1CR (0x000b) to control direction
 
@@ -158,7 +158,7 @@ READ8_MEMBER(tlcs870_device::port1_r)
 		return m_port_out_latch[1];
 }
 
-READ8_MEMBER(tlcs870_device::port2_r) // 3-bit port
+uint8_t tlcs870_device::port2_r() // 3-bit port
 {
 	if (m_read_input_port)
 		return m_port_in_cb[2]() | 0xf8;
@@ -166,7 +166,7 @@ READ8_MEMBER(tlcs870_device::port2_r) // 3-bit port
 		return m_port_out_latch[2];
 }
 
-READ8_MEMBER(tlcs870_device::port3_r)
+uint8_t tlcs870_device::port3_r()
 {
 	if (m_read_input_port)
 		return m_port_in_cb[3]();
@@ -174,7 +174,7 @@ READ8_MEMBER(tlcs870_device::port3_r)
 		return m_port_out_latch[3];
 }
 
-READ8_MEMBER(tlcs870_device::port4_r)
+uint8_t tlcs870_device::port4_r()
 {
 	if (m_read_input_port)
 		return m_port_in_cb[4]();
@@ -182,7 +182,7 @@ READ8_MEMBER(tlcs870_device::port4_r)
 		return m_port_out_latch[4];
 }
 
-READ8_MEMBER(tlcs870_device::port5_r) // 5-bit port
+uint8_t tlcs870_device::port5_r() // 5-bit port
 {
 	if (m_read_input_port)
 		return m_port_in_cb[5]() | 0xe0;
@@ -190,7 +190,7 @@ READ8_MEMBER(tlcs870_device::port5_r) // 5-bit port
 		return m_port_out_latch[5];
 }
 
-READ8_MEMBER(tlcs870_device::port6_r) // doubles up as analog?
+uint8_t tlcs870_device::port6_r() // doubles up as analog?
 {
 	// need to use P6CR (0x000c) to control direction
 
@@ -200,7 +200,7 @@ READ8_MEMBER(tlcs870_device::port6_r) // doubles up as analog?
 		return m_port_out_latch[6];
 }
 
-READ8_MEMBER(tlcs870_device::port7_r)
+uint8_t tlcs870_device::port7_r()
 {
 	// need to use P7CR (0x000d) to control direction
 
@@ -210,70 +210,70 @@ READ8_MEMBER(tlcs870_device::port7_r)
 		return m_port_out_latch[7];
 }
 
-WRITE8_MEMBER(tlcs870_device::port0_w)
+void tlcs870_device::port0_w(uint8_t data)
 {
 	m_port_out_latch[0] = data;
 	m_port_out_cb[0](data);
 }
 
-WRITE8_MEMBER(tlcs870_device::port1_w)
+void tlcs870_device::port1_w(uint8_t data)
 {
 	m_port_out_latch[1] = data;
 	m_port_out_cb[1](data);
 }
 
-WRITE8_MEMBER(tlcs870_device::port2_w)
+void tlcs870_device::port2_w(uint8_t data)
 {
 	m_port_out_latch[2] = data;
 	m_port_out_cb[2](data);
 }
 
-WRITE8_MEMBER(tlcs870_device::port3_w)
+void tlcs870_device::port3_w(uint8_t data)
 {
 	m_port_out_latch[3] = data;
 	m_port_out_cb[3](data);
 }
 
-WRITE8_MEMBER(tlcs870_device::port4_w)
+void tlcs870_device::port4_w(uint8_t data)
 {
 	m_port_out_latch[4] = data;
 	m_port_out_cb[4](data);
 }
 
-WRITE8_MEMBER(tlcs870_device::port5_w)
+void tlcs870_device::port5_w(uint8_t data)
 {
 	m_port_out_latch[5] = data;
 	m_port_out_cb[5](data);
 }
 
-WRITE8_MEMBER(tlcs870_device::port6_w)
+void tlcs870_device::port6_w(uint8_t data)
 {
 	m_port_out_latch[6] = data;
 	m_port_out_cb[6](data);
 }
 
-WRITE8_MEMBER(tlcs870_device::port7_w)
+void tlcs870_device::port7_w(uint8_t data)
 {
 	m_port_out_latch[7] = data;
 	m_port_out_cb[7](data);
 }
 
-WRITE8_MEMBER(tlcs870_device::p0cr_w)
+void tlcs870_device::p0cr_w(uint8_t data)
 {
 	m_port0_cr = data;
 }
 
-WRITE8_MEMBER(tlcs870_device::p1cr_w)
+void tlcs870_device::p1cr_w(uint8_t data)
 {
 	m_port1_cr = data;
 }
 
-WRITE8_MEMBER(tlcs870_device::p6cr_w)
+void tlcs870_device::p6cr_w(uint8_t data)
 {
 	m_port6_cr = data;
 }
 
-WRITE8_MEMBER(tlcs870_device::p7cr_w)
+void tlcs870_device::p7cr_w(uint8_t data)
 {
 	m_port7_cr = data;
 }
@@ -287,7 +287,7 @@ TIMER_CALLBACK_MEMBER(tlcs870_device::tc1_cb)
 
 }
 
-WRITE8_MEMBER(tlcs870_device::tc1cr_w)
+void tlcs870_device::tc1cr_w(uint8_t data)
 {
 	m_TC1CR = data;
 
@@ -302,32 +302,32 @@ WRITE8_MEMBER(tlcs870_device::tc1cr_w)
 	LOG("%d: TC1M-0 (TC1 Mode Select)\n",                 (m_TC1CR & 0x01) ? 1 : 0);
 }
 
-WRITE8_MEMBER(tlcs870_device::treg1a_l_w)
+void tlcs870_device::treg1a_l_w(uint8_t data)
 {
 	m_TREG1A = (m_TREG1A & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tlcs870_device::treg1a_h_w)
+void tlcs870_device::treg1a_h_w(uint8_t data)
 {
 	m_TREG1A = (m_TREG1A & 0x00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(tlcs870_device::treg1b_l_w)
+void tlcs870_device::treg1b_l_w(uint8_t data)
 {
 	m_TREG1B = (m_TREG1B & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tlcs870_device::treg1b_h_w)
+void tlcs870_device::treg1b_h_w(uint8_t data)
 {
 	m_TREG1B = (m_TREG1B & 0x00ff) | (data << 8);
 }
 
-READ8_MEMBER(tlcs870_device::treg1b_l_r)
+uint8_t tlcs870_device::treg1b_l_r()
 {
 	return m_TREG1B & 0xff;
 }
 
-READ8_MEMBER(tlcs870_device::treg1b_h_r)
+uint8_t tlcs870_device::treg1b_h_r()
 {
 	return (m_TREG1B >>8) & 0xff;
 }
@@ -350,7 +350,7 @@ void tlcs870_device::tc2_cancel()
 	m_tcx_timer[1]->adjust(attotime::never);
 }
 
-WRITE8_MEMBER(tlcs870_device::tc2cr_w)
+void tlcs870_device::tc2cr_w(uint8_t data)
 {
 	if (data & 0x20)
 	{
@@ -377,12 +377,12 @@ WRITE8_MEMBER(tlcs870_device::tc2cr_w)
 	LOG("%d: TC2M (TC2 Mode Select)\n",            (m_TC2CR & 0x01) ? 1 : 0);
 }
 
-WRITE8_MEMBER(tlcs870_device::treg2_l_w)
+void tlcs870_device::treg2_l_w(uint8_t data)
 {
 	m_TREG2 = (m_TREG2 & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tlcs870_device::treg2_h_w)
+void tlcs870_device::treg2_h_w(uint8_t data)
 {
 	m_TREG2 = (m_TREG2 & 0x00ff) | (data << 8);
 }
@@ -394,7 +394,7 @@ TIMER_CALLBACK_MEMBER(tlcs870_device::tc3_cb)
 
 }
 
-WRITE8_MEMBER(tlcs870_device::tc3cr_w)
+void tlcs870_device::tc3cr_w(uint8_t data)
 {
 	m_TC3CR = data;
 
@@ -409,17 +409,17 @@ WRITE8_MEMBER(tlcs870_device::tc3cr_w)
 	LOG("%d: TC3M (TC3 Mode Select)\n",            (m_TC3CR & 0x01) ? 1 : 0);
 }
 
-WRITE8_MEMBER(tlcs870_device::treg3a_w)
+void tlcs870_device::treg3a_w(uint8_t data)
 {
 	m_TREG3A = data;
 }
 
-READ8_MEMBER(tlcs870_device::treg3a_r)
+uint8_t tlcs870_device::treg3a_r()
 {
 	return m_TREG3A;
 }
 
-READ8_MEMBER(tlcs870_device::treg3b_r)
+uint8_t tlcs870_device::treg3b_r()
 {
 	return m_TREG3B;
 }
@@ -431,7 +431,7 @@ TIMER_CALLBACK_MEMBER(tlcs870_device::tc4_cb)
 
 }
 
-WRITE8_MEMBER(tlcs870_device::tc4cr_w)
+void tlcs870_device::tc4cr_w(uint8_t data)
 {
 	m_TC4CR = data;
 
@@ -446,7 +446,7 @@ WRITE8_MEMBER(tlcs870_device::tc4cr_w)
 	LOG("%d: TC4M-0 (TC4 Mode Select)\n",          (m_TC4CR & 0x01) ? 1 : 0);
 }
 
-WRITE8_MEMBER(tlcs870_device::treg4_w)
+void tlcs870_device::treg4_w(uint8_t data)
 {
 	m_TREG4 = data;
 }
@@ -455,7 +455,7 @@ WRITE8_MEMBER(tlcs870_device::treg4_w)
 
 // this is used with TLCS870_IRQ_INTTBT (FFF2 INTTBT) (not used by hng64)
 // the divider output makes use of PORT1 bit 3, which must be properly configured
-WRITE8_MEMBER(tlcs870_device::tbtcr_w)
+void tlcs870_device::tbtcr_w(uint8_t data)
 {
 	m_TBTCR = data;
 
@@ -470,7 +470,7 @@ WRITE8_MEMBER(tlcs870_device::tbtcr_w)
 	LOG("%d: TBTCK-0 (Time Base Timer Interrupt Frequency)\n",  (m_TBTCR & 0x01) ? 1 : 0);
 }
 
-READ8_MEMBER(tlcs870_device::tbtcr_r)
+uint8_t tlcs870_device::tbtcr_r()
 {
 	return m_TBTCR;
 }
@@ -480,7 +480,7 @@ READ8_MEMBER(tlcs870_device::tbtcr_r)
 // TODO: use templates for SIO1/2 ports, as they're the same except for the DBR region they use?
 
 // Serial Port 1
-WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
+void tlcs870_device::sio1cr1_w(uint8_t data)
 {
 	m_SIOCR1[0] = data;
 
@@ -545,7 +545,7 @@ WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
 }
 
 
-WRITE8_MEMBER(tlcs870_device::sio1cr2_w)
+void tlcs870_device::sio1cr2_w(uint8_t data)
 {
 	m_SIOCR2[0] = data;
 
@@ -564,7 +564,7 @@ WRITE8_MEMBER(tlcs870_device::sio1cr2_w)
 
 }
 
-READ8_MEMBER(tlcs870_device::sio1sr_r)
+uint8_t tlcs870_device::sio1sr_r()
 {
 	/* TS-- ----
 
@@ -616,7 +616,7 @@ TIMER_CALLBACK_MEMBER(tlcs870_device::sio0_transmit_cb)
 }
 
 // Serial Port 2
-WRITE8_MEMBER(tlcs870_device::sio2cr1_w)
+void tlcs870_device::sio2cr1_w(uint8_t data)
 {
 	m_SIOCR1[1] = data;
 
@@ -631,7 +631,7 @@ WRITE8_MEMBER(tlcs870_device::sio2cr1_w)
 	LOG("%d: SCK2-0 (Serial Clock)\n",             (m_SIOCR1[1] & 0x01) ? 1 : 0);
 }
 
-WRITE8_MEMBER(tlcs870_device::sio2cr2_w)
+void tlcs870_device::sio2cr2_w(uint8_t data)
 {
 	m_SIOCR2[1] = data;
 
@@ -650,7 +650,7 @@ TIMER_CALLBACK_MEMBER(tlcs870_device::sio1_transmit_cb)
 {
 }
 
-READ8_MEMBER(tlcs870_device::sio2sr_r)
+uint8_t tlcs870_device::sio2sr_r()
 {
 	/* TS-- ----
 
@@ -663,7 +663,7 @@ READ8_MEMBER(tlcs870_device::sio2sr_r)
 
 // WDT emulation (Watchdog Timer)
 
-WRITE8_MEMBER(tlcs870_device::wdtcr1_w)
+void tlcs870_device::wdtcr1_w(uint8_t data)
 {
 	m_WDTCR1 = data;
 
@@ -680,7 +680,7 @@ WRITE8_MEMBER(tlcs870_device::wdtcr1_w)
 	// WDTOUT cannot be set to 1 by software
 }
 
-WRITE8_MEMBER(tlcs870_device::wdtcr2_w)
+void tlcs870_device::wdtcr2_w(uint8_t data)
 {
 	if (data == 0x4e)
 	{
@@ -699,7 +699,7 @@ WRITE8_MEMBER(tlcs870_device::wdtcr2_w)
 // Misc
 
 // not used by hng64
-WRITE8_MEMBER(tlcs870_device::syscr1_w)
+void tlcs870_device::syscr1_w(uint8_t data)
 {
 	m_SYSCR1 = data;
 
@@ -714,7 +714,7 @@ WRITE8_MEMBER(tlcs870_device::syscr1_w)
 	LOG("%d: (invalid)\n",                                       (m_SYSCR1 & 0x01) ? 1 : 0);
 }
 
-WRITE8_MEMBER(tlcs870_device::syscr2_w)
+void tlcs870_device::syscr2_w(uint8_t data)
 {
 	m_SYSCR2 = data;
 
@@ -729,25 +729,25 @@ WRITE8_MEMBER(tlcs870_device::syscr2_w)
 	LOG("%d: (invalid)\n",                                       (m_SYSCR2 & 0x01) ? 1 : 0);
 }
 
-READ8_MEMBER(tlcs870_device::syscr1_r)
+uint8_t tlcs870_device::syscr1_r()
 {
 	return m_SYSCR1; // low 2 bits are 'undefined'
 }
 
-READ8_MEMBER(tlcs870_device::syscr2_r)
+uint8_t tlcs870_device::syscr2_r()
 {
 	return m_SYSCR2 | 0x0f; // low bits always read as 1
 }
 
 // RBS / PSW direct access
 
-WRITE8_MEMBER(tlcs870_device::rbs_w)
+void tlcs870_device::rbs_w(uint8_t data)
 {
 	// upper bits of PSW (status flags) cannot be written, only the register bank
 	m_RBS = data & 0x0f;
 }
 
-READ8_MEMBER(tlcs870_device::psw_r)
+uint8_t tlcs870_device::psw_r()
 {
 	// outside of checking the results of opcodes that  use it directly (DAA / DAS) this is the only way to read / check the 'half' flag
 	return get_PSW();
@@ -755,7 +755,7 @@ READ8_MEMBER(tlcs870_device::psw_r)
 
 // ADC emulation
 
-READ8_MEMBER(tlcs870_device::adcdr_r)
+uint8_t tlcs870_device::adcdr_r()
 {
 	return m_ADCDR;
 }
@@ -780,12 +780,12 @@ READ8_MEMBER(tlcs870_device::adcdr_r)
 
  */
 
-READ8_MEMBER(tlcs870_device::adccr_r)
+uint8_t tlcs870_device::adccr_r()
 {
 	return m_ADCCR | 0x80; // return with 'finished' bit set
 }
 
-WRITE8_MEMBER(tlcs870_device::adccr_w)
+void tlcs870_device::adccr_w(uint8_t data)
 {
 	m_ADCCR = data;
 
@@ -796,12 +796,12 @@ WRITE8_MEMBER(tlcs870_device::adccr_w)
 }
 
 
-READ8_MEMBER(tlcs870_device::eintcr_r)
+uint8_t tlcs870_device::eintcr_r()
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(tlcs870_device::eintcr_w)
+void tlcs870_device::eintcr_w(uint8_t data)
 {
 	m_EINTCR = data;
 
@@ -822,17 +822,17 @@ WRITE8_MEMBER(tlcs870_device::eintcr_w)
 	*/
 }
 
-READ8_MEMBER(tlcs870_device::eir_l_r)
+uint8_t tlcs870_device::eir_l_r()
 {
 	return m_EIR & 0xff;
 }
 
-READ8_MEMBER(tlcs870_device::eir_h_r)
+uint8_t tlcs870_device::eir_h_r()
 {
 	return (m_EIR >> 8) & 0xff;
 }
 
-WRITE8_MEMBER(tlcs870_device::eir_l_w)
+void tlcs870_device::eir_l_w(uint8_t data)
 {
 	m_EIR = (m_EIR & 0xff00) | data;
 
@@ -847,7 +847,7 @@ WRITE8_MEMBER(tlcs870_device::eir_l_w)
 	LOG("%d: IMF\n",                             (m_EIR & 0x0001) ? 1 : 0); // can't be Reset interrupt (non-maskable)
 }
 
-WRITE8_MEMBER(tlcs870_device::eir_h_w)
+void tlcs870_device::eir_h_w(uint8_t data)
 {
 	m_EIR = (m_EIR & 0x00ff) | (data << 8);
 
@@ -869,23 +869,23 @@ WRITE8_MEMBER(tlcs870_device::eir_h_w)
     by writing 0 to it
 
 */
-READ8_MEMBER(tlcs870_device::il_l_r)
+uint8_t tlcs870_device::il_l_r()
 {
 	return m_IL & 0xff;
 }
 
-READ8_MEMBER(tlcs870_device::il_h_r)
+uint8_t tlcs870_device::il_h_r()
 {
 	return (m_IL >> 8) & 0xff;
 }
 
-WRITE8_MEMBER(tlcs870_device::il_l_w)
+void tlcs870_device::il_l_w(uint8_t data)
 {
 	// probably not this logic
 	m_IL = (m_IL & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tlcs870_device::il_h_w)
+void tlcs870_device::il_h_w(uint8_t data)
 {
 	// probably not this logic
 	m_IL = (m_EIR & 0x00ff) | (data << 8);
@@ -1240,14 +1240,10 @@ void tlcs870_device::device_start()
 
 	set_icountptr(m_icount);
 
-	for (auto &cb : m_port_in_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_out_cb)
-		cb.resolve_safe();
-	for (auto &cb : m_port_analog_in_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_serial_out_cb)
-		cb.resolve_safe();
+	m_port_in_cb.resolve_all_safe(0xff);
+	m_port_out_cb.resolve_all_safe();
+	m_port_analog_in_cb.resolve_all_safe(0xff);
+	m_serial_out_cb.resolve_all_safe();
 
 	m_serial_transmit_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::sio0_transmit_cb), this));
 	m_serial_transmit_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::sio1_transmit_cb), this));

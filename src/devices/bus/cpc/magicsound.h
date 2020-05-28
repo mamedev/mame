@@ -57,8 +57,8 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(da0_w);
-	DECLARE_READ8_MEMBER(dma_read_byte);
-	DECLARE_WRITE8_MEMBER(dma_write_byte);
+	uint8_t dma_read_byte(offs_t offset);
+	void dma_write_byte(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(dack2_w);

@@ -16,31 +16,16 @@ ToDo: Fix Sprites & Rowscroll/Select for Cocktail
 
 #include <algorithm>
 
-template<int Chip>
-TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info)
-{
-	int tileno = m_vram[Chip][tile_index * 2 + 1];
-	int colour = (m_vram[Chip][tile_index * 2] & 0x3f00) >> 8;
-	int pri = (m_vram[Chip][tile_index * 2] & 0xc000) >> 14;
-
-	pri |= 0x8;
-
-	SET_TILE_INFO_MEMBER(Chip,tileno,colour + m_palette_bank[Chip] * 0x40, 0);
-	tileinfo.category = pri;
-}
-
 
 void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint16_t *source = (m_spriteram_old.get() + (m_spriteram.bytes() / 2) /2);
+	u16 *source = (m_spriteram_old.get() + (m_spriteram.bytes() / 2) /2);
 	source -= 4;
-	uint16_t *finish = m_spriteram_old.get();
-	int global_x = m_vidregs[0] - 0x184;
-	int global_y = m_vidregs[1] - 0x1f1;
+	u16 *finish = m_spriteram_old.get();
+	int const global_x = m_vidregs[0] - 0x184;
+	int const global_y = m_vidregs[1] - 0x1f1;
 
-	uint16_t *destline;
-	uint8_t *priline;
-	int sprmask = m_sprdata.bytes()-1;
+	u32 const sprmask = m_sprdata.bytes()-1;
 
 	int xstart, xend, xinc;
 	int ystart, yend, yinc;
@@ -57,9 +42,9 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 	while (source >= finish)
 	{
-		int pen = (source[0] & 0x3f00) >> 8;
-		int tileno = source[1] & 0xffff;
-		int pri = (source[0] & 0xc000) >> 14;
+		u32 const pen = (source[0] & 0x3f00) >> 8;
+		u32 const tileno = source[1] & 0xffff;
+		u8 pri = (source[0] & 0xc000) >> 14;
 
 		pri |= 0x8;
 
@@ -68,13 +53,9 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 		int flipy = source[0] & 0x0040;
 		int flipx = source[0] & 0x0080;
 
-		int height = ((source[3] & 0xf000) >> 12) * 16;
-		int width = ((source[2] & 0xf000) >> 12) * 16;
-		int offset = tileno * 256;
-
-		int drawxpos, drawypos;
-		int xcnt, ycnt;
-		int pix;
+		int const height = ((source[3] & 0xf000) >> 12) * 16;
+		int const width = ((source[2] & 0xf000) >> 12) * 16;
+		u32 offset = tileno * 256;
 
 		if (x & 0x200) x-=0x400;
 		if (y & 0x200) y-=0x400;
@@ -97,26 +78,26 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 			if(!flipy) { ystart = 0;        yend = height; yinc = 1; }
 			else       { ystart = height-1; yend = -1;     yinc = -1; }
 
-			for (ycnt = ystart; ycnt != yend; ycnt += yinc)
+			for (int ycnt = ystart; ycnt != yend; ycnt += yinc)
 			{
-				drawypos = y + ycnt - global_y;
+				const int drawypos = y + ycnt - global_y;
 
 				if ((drawypos >= cliprect.min_y) && (drawypos <= cliprect.max_y))
 				{
-					destline = &bitmap.pix16(drawypos);
-					priline = &screen.priority().pix8(drawypos);
+					u16 *destline = &bitmap.pix16(drawypos);
+					u8 *priline = &screen.priority().pix8(drawypos);
 
-					for (xcnt = xstart; xcnt != xend; xcnt += xinc)
+					for (int xcnt = xstart; xcnt != xend; xcnt += xinc)
 					{
-						drawxpos = x + xcnt - global_x;
+						const int drawxpos = x + xcnt - global_x;
 
 						if ((drawxpos >= cliprect.min_x) && (drawxpos <= cliprect.max_x))
 						{
-							int pridata = priline[drawxpos];
+							const int pridata = priline[drawxpos];
 
 							if (!(pridata & 0x10)) // if we haven't already drawn a sprite pixel here (sprite masking)
 							{
-								pix = m_sprdata[(offset / 2)&sprmask];
+								u8 pix = m_sprdata[(offset / 2)&sprmask];
 
 								if (offset & 1)
 									pix = pix >> 4;
@@ -147,39 +128,38 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 void mcatadv_state::mcatadv_draw_tilemap_part( screen_device &screen, int layer, int i, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int flip;
-	uint32_t drawline;
+	if (!m_tilemap[layer]->enable())
+		return;
+
 	rectangle clip;
 
 	clip.min_x = cliprect.min_x;
 	clip.max_x = cliprect.max_x;
 
-	for (drawline = cliprect.min_y; drawline <= cliprect.max_y; drawline++)
+	for (u32 drawline = cliprect.min_y; drawline <= cliprect.max_y; drawline++)
 	{
-		int scrollx, scrolly;
-
 		clip.min_y = drawline;
 		clip.max_y = drawline;
 
-		scrollx = (m_scroll[layer][0] & 0x1ff) - 0x194;
-		scrolly = (m_scroll[layer][1] & 0x1ff) - 0x1df;
+		int scrollx = (m_tilemap[layer]->scrollx() & 0x1ff) - 0x194;
+		int scrolly = (m_tilemap[layer]->scrolly() & 0x1ff) - 0x1df;
 
-		if ((m_scroll[layer][1] & 0x4000) == 0x4000)
+		if (m_tilemap[layer]->rowselect_en())
 		{
-			int rowselect = m_vram[layer][0x1000 / 2 + (((drawline + scrolly) & 0x1ff) * 2) + 1];
+			const int rowselect = m_tilemap[layer]->rowselect(drawline + scrolly);
 			scrolly = rowselect - drawline;
 		}
 
-		if ((m_scroll[layer][0] & 0x4000) == 0x4000)
+		if (m_tilemap[layer]->rowscroll_en())
 		{
-			int rowscroll = m_vram[layer][0x1000 / 2 + (((drawline + scrolly) & 0x1ff) * 2) + 0];
+			const int rowscroll = m_tilemap[layer]->rowscroll(drawline + scrolly);
 			scrollx += rowscroll;
 		}
 
 		/* Global Flip */
-		if (!(m_scroll[layer][0] & 0x8000)) scrollx -= 0x19;
-		if (!(m_scroll[layer][1] & 0x8000)) scrolly -= 0x141;
-		flip = ((m_scroll[layer][0] & 0x8000) ? 0 : TILEMAP_FLIPX) | ((m_scroll[layer][1] & 0x8000) ? 0 : TILEMAP_FLIPY);
+		if (m_tilemap[layer]->flipx()) scrollx -= 0x19;
+		if (m_tilemap[layer]->flipy()) scrolly -= 0x141;
+		int flip = (m_tilemap[layer]->flipx() ? TILEMAP_FLIPX : 0) | (m_tilemap[layer]->flipy() ? TILEMAP_FLIPY : 0);
 
 		m_tilemap[layer]->set_scrollx(0, scrollx);
 		m_tilemap[layer]->set_scrolly(0, scrolly);
@@ -189,45 +169,39 @@ void mcatadv_state::mcatadv_draw_tilemap_part( screen_device &screen, int layer,
 	}
 }
 
-uint32_t mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
 	bitmap.fill(0x3f0, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	if (m_scroll[0][2] != m_palette_bank[0])
+	for (int i = 0; i < 2; i++)
 	{
-		m_palette_bank[0] = m_scroll[0][2]&0xf;
-		m_tilemap[0]->mark_all_dirty();
-	}
-
-	if (m_scroll[1][2] != m_palette_bank[1])
-	{
-		m_palette_bank[1] = m_scroll[1][2]&0xf;
-		m_tilemap[1]->mark_all_dirty();
+		m_tilemap[i]->prepare();
+		if (m_tilemap[i]->external() != m_palette_bank[i])
+		{
+			m_palette_bank[i] = m_tilemap[i]->external()&0xf;
+			m_tilemap[i]->mark_all_dirty();
+		}
 	}
 
 /*
     popmessage("%02x %02x %02x %02x",
-        (mcatadv_scroll1[0]  & 0x4000) >> 8,
-        (mcatadv_scroll1[1]  & 0x4000) >> 8,
-        (mcatadv_scroll2[0] & 0x4000) >> 8,
-        (mcatadv_scroll2[1] & 0x4000) >> 8);
+        m_tilemap[0]->rowscroll_en(),
+        m_tilemap[0]->rowselect_en(),
+        m_tilemap[1]->rowscroll_en(),
+        m_tilemap[1]->rowselect_en());
 */
 
-	for (i = 0; i <= 3; i++)
+	for (int i = 0; i <= 3; i++)
 	{
 	#ifdef MAME_DEBUG
 			if (!machine().input().code_pressed(KEYCODE_Q))
 	#endif
-			if (!(m_scroll[0][2]&0x10))
 				mcatadv_draw_tilemap_part(screen, 0, i|0x8, bitmap, cliprect);
 
 	#ifdef MAME_DEBUG
 			if (!machine().input().code_pressed(KEYCODE_W))
 	#endif
-			if (!(m_scroll[1][2]&0x10)) // tilemap flicker effect on large shadow, nost level 7
 				mcatadv_draw_tilemap_part(screen, 1, i|0x8, bitmap, cliprect);
 	}
 
@@ -242,14 +216,8 @@ uint32_t mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind1
 
 void mcatadv_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcatadv_state::get_mcatadv_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[0]->set_transparent_pen(0);
-
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcatadv_state::get_mcatadv_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[1]->set_transparent_pen(0);
-
-	m_spriteram_old = make_unique_clear<uint16_t[]>(m_spriteram.bytes() / 2);
-	m_vidregs_old = std::make_unique<uint16_t[]>(m_vidregs.bytes() / 2);
+	m_spriteram_old = make_unique_clear<u16[]>(m_spriteram.bytes() / 2);
+	m_vidregs_old = std::make_unique<u16[]>(m_vidregs.bytes() / 2);
 
 	m_palette_bank[0] = m_palette_bank[1] = 0;
 

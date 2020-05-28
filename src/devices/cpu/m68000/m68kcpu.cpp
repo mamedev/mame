@@ -729,18 +729,20 @@ void m68000_base_device::set_irq_line(int irqline, int state)
 
 	/* A transition from < 7 to 7 always interrupts (NMI) */
 	/* Note: Level 7 can also level trigger like a normal IRQ */
+	// FIXME: This may cause unintended level 7 interrupts if one or two IPL lines are asserted
+	// immediately before others are cleared. The actual 68000 imposes an input hold time.
 	if(old_level != 0x0700 && m_int_level == 0x0700)
 		m_nmi_pending = true;
 }
 
-void m68000_base_device::presave()
+void m68000_base_device::device_pre_save()
 {
 	m_save_sr = m68ki_get_sr();
 	m_save_stopped = (m_stopped & STOP_LEVEL_STOP) != 0;
 	m_save_halted  = (m_stopped & STOP_LEVEL_HALT) != 0;
 }
 
-void m68000_base_device::postload()
+void m68000_base_device::device_post_load()
 {
 	m68ki_set_sr_noint_nosp(m_save_sr);
 	//fprintf(stderr, "Reloaded, pc=%x\n", REG_PC(m68k));
@@ -761,7 +763,7 @@ void m68000_base_device::m68k_cause_bus_error()
 		return;
 	}
 
-	u32 sr = m68ki_init_exception();
+	u32 sr = m68ki_init_exception(EXCEPTION_BUS_ERROR);
 
 	m_run_mode = RUN_MODE_BERR_AERR_RESET_WSF;
 
@@ -949,7 +951,7 @@ void m68000_base_device::execute_run()
 						}
 					}
 
-					sr = m68ki_init_exception();
+					sr = m68ki_init_exception(EXCEPTION_BUS_ERROR);
 
 					m_run_mode = RUN_MODE_BERR_AERR_RESET;
 
@@ -1076,13 +1078,8 @@ void m68000_base_device::init_cpu_common(void)
 	save_item(NAME(m_mmu_last_page_entry));
 	save_item(NAME(m_mmu_last_page_entry_addr));
 
-	for (int i=0; i<MMU_ATC_ENTRIES;i++) {
-		save_item(NAME(m_mmu_atc_tag[i]), i);
-		save_item(NAME(m_mmu_atc_data[i]), i);
-	}
-
-	machine().save().register_presave(save_prepost_delegate(FUNC(m68000_base_device::presave), this));
-	machine().save().register_postload(save_prepost_delegate(FUNC(m68000_base_device::postload), this));
+	save_item(NAME(m_mmu_atc_tag));
+	save_item(NAME(m_mmu_atc_data));
 
 	set_icountptr(m_icount);
 	m_icount = 0;
@@ -1308,15 +1305,16 @@ void m68000_base_device::init8(address_space &space, address_space &ospace)
 {
 	m_space = &space;
 	m_ospace = &ospace;
-	auto ocache = ospace.cache<0, 0, ENDIANNESS_BIG>();
+	ospace.cache(m_oprogram8);
+	space.specific(m_program8);
 
-	m_readimm16 = [ocache](offs_t address) -> u16 { return ocache->read_word(address); };
-	m_read8   = [this](offs_t address) -> u8     { return m_space->read_byte(address); };
-	m_read16  = [this](offs_t address) -> u16    { return m_space->read_word(address); };
-	m_read32  = [this](offs_t address) -> u32    { return m_space->read_dword(address); };
-	m_write8  = [this](offs_t address, u8 data)  { m_space->write_byte(address, data); };
-	m_write16 = [this](offs_t address, u16 data)  { m_space->write_word(address, data); };
-	m_write32 = [this](offs_t address, u32 data)  { m_space->write_dword(address, data); };
+	m_readimm16 = [this](offs_t address) -> u16  { return m_oprogram8.read_word(address); };
+	m_read8   = [this](offs_t address) -> u8     { return m_program8.read_byte(address); };
+	m_read16  = [this](offs_t address) -> u16    { return m_program8.read_word(address); };
+	m_read32  = [this](offs_t address) -> u32    { return m_program8.read_dword(address); };
+	m_write8  = [this](offs_t address, u8 data)  { m_program8.write_byte(address, data); };
+	m_write16 = [this](offs_t address, u16 data) { m_program8.write_word(address, data); };
+	m_write32 = [this](offs_t address, u32 data) { m_program8.write_dword(address, data); };
 }
 
 /****************************************************************************
@@ -1327,15 +1325,16 @@ void m68000_base_device::init16(address_space &space, address_space &ospace)
 {
 	m_space = &space;
 	m_ospace = &ospace;
-	auto ocache = ospace.cache<1, 0, ENDIANNESS_BIG>();
+	ospace.cache(m_oprogram16);
+	space.specific(m_program16);
 
-	m_readimm16 = [ocache](offs_t address) -> u16 { return ocache->read_word(address); };
-	m_read8   = [this](offs_t address) -> u8     { return m_space->read_byte(address); };
-	m_read16  = [this](offs_t address) -> u16    { return m_space->read_word(address); };
-	m_read32  = [this](offs_t address) -> u32    { return m_space->read_dword(address); };
-	m_write8  = [this](offs_t address, u8 data)  { m_space->write_word(address & ~1, data | (data << 8), address & 1 ? 0x00ff : 0xff00); };
-	m_write16 = [this](offs_t address, u16 data)  { m_space->write_word(address, data); };
-	m_write32 = [this](offs_t address, u32 data)  { m_space->write_dword(address, data); };
+	m_readimm16 = [this](offs_t address) -> u16  { return m_oprogram16.read_word(address); };
+	m_read8   = [this](offs_t address) -> u8     { return m_program16.read_byte(address); };
+	m_read16  = [this](offs_t address) -> u16    { return m_program16.read_word(address); };
+	m_read32  = [this](offs_t address) -> u32    { return m_program16.read_dword(address); };
+	m_write8  = [this](offs_t address, u8 data)  { m_program16.write_word(address & ~1, data | (data << 8), address & 1 ? 0x00ff : 0xff00); };
+	m_write16 = [this](offs_t address, u16 data) { m_program16.write_word(address, data); };
+	m_write32 = [this](offs_t address, u32 data) { m_program16.write_dword(address, data); };
 }
 
 /****************************************************************************
@@ -1351,54 +1350,55 @@ void m68000_base_device::init32(address_space &space, address_space &ospace)
 {
 	m_space = &space;
 	m_ospace = &ospace;
-	auto ocache = ospace.cache<2, 0, ENDIANNESS_BIG>();
+	ospace.cache(m_oprogram32);
+	space.specific(m_program32);
 
-	m_readimm16 = [ocache](offs_t address) -> u16 { return ocache->read_word(address); };
-	m_read8   = [this](offs_t address) -> u8     { return m_space->read_byte(address); };
-	m_read16  = [this](offs_t address) -> u16    { return m_space->read_word_unaligned(address); };
-	m_read32  = [this](offs_t address) -> u32    { return m_space->read_dword_unaligned(address); };
+	m_readimm16 = [this](offs_t address) -> u16 { return m_oprogram32.read_word(address); };
+	m_read8   = [this](offs_t address) -> u8     { return m_program32.read_byte(address); };
+	m_read16  = [this](offs_t address) -> u16    { return m_program32.read_word_unaligned(address); };
+	m_read32  = [this](offs_t address) -> u32    { return m_program32.read_dword_unaligned(address); };
 	m_write8  = [this](offs_t address, u8 data)  {
-		m_space->write_dword(address & 0xfffffffcU, dword_from_byte(data), 0xff000000U >> 8 * (address & 3));
+		m_program32.write_dword(address & 0xfffffffcU, dword_from_byte(data), 0xff000000U >> 8 * (address & 3));
 	};
 	m_write16 = [this](offs_t address, u16 data)  {
 		switch (address & 3) {
 		case 0:
-			m_space->write_dword(address, dword_from_word(data), 0xffff0000U);
+			m_program32.write_dword(address, dword_from_word(data), 0xffff0000U);
 			break;
 
 		case 1:
-			m_space->write_dword(address - 1, dword_from_unaligned_word(data), 0x00ffff00);
+			m_program32.write_dword(address - 1, dword_from_unaligned_word(data), 0x00ffff00);
 			break;
 
 		case 2:
-			m_space->write_dword(address - 2, dword_from_word(data), 0x0000ffff);
+			m_program32.write_dword(address - 2, dword_from_word(data), 0x0000ffff);
 			break;
 
 		case 3:
-			m_space->write_dword(address - 3, dword_from_unaligned_word(data), 0x000000ff);
-			m_space->write_dword(address + 1, dword_from_byte(data & 0x00ff), 0xff000000U);
+			m_program32.write_dword(address - 3, dword_from_unaligned_word(data), 0x000000ff);
+			m_program32.write_dword(address + 1, dword_from_byte(data & 0x00ff), 0xff000000U);
 			break;
 		}
 	};
 	m_write32 = [this](offs_t address, u32 data)  {
 		switch (address & 3) {
 		case 0:
-			m_space->write_dword(address, data, 0xffffffffU);
+			m_program32.write_dword(address, data, 0xffffffffU);
 			break;
 
 		case 1:
-			m_space->write_dword(address - 1, (data & 0xff000000U) | (data & 0xffffff00U) >> 8, 0x00ffffff);
-			m_space->write_dword(address + 3, dword_from_byte(data & 0x000000ff), 0xff000000U);
+			m_program32.write_dword(address - 1, (data & 0xff000000U) | (data & 0xffffff00U) >> 8, 0x00ffffff);
+			m_program32.write_dword(address + 3, dword_from_byte(data & 0x000000ff), 0xff000000U);
 			break;
 
 		case 2:
-			m_space->write_dword(address - 2, dword_from_word((data & 0xffff0000U) >> 16), 0x0000ffff);
-			m_space->write_dword(address + 2, dword_from_word(data & 0x0000ffff), 0xffff0000U);
+			m_program32.write_dword(address - 2, dword_from_word((data & 0xffff0000U) >> 16), 0x0000ffff);
+			m_program32.write_dword(address + 2, dword_from_word(data & 0x0000ffff), 0xffff0000U);
 			break;
 
 		case 3:
-			m_space->write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_space->write_dword(address + 1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
+			m_program32.write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
+			m_program32.write_dword(address + 1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
 			break;
 		}
 	};
@@ -1409,16 +1409,17 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 {
 	m_space = &space;
 	m_ospace = &ospace;
-	auto ocache = ospace.cache<2, 0, ENDIANNESS_BIG>();
+	ospace.cache(m_oprogram32);
+	space.specific(m_program32);
 
-	m_readimm16 = [this, ocache](offs_t address) -> u16 {
+	m_readimm16 = [this](offs_t address) -> u16 {
 		if (m_pmmu_enabled) {
 			address = pmmu_translate_addr(address, 1);
 			if (m_mmu_tmp_buserror_occurred)
 			return ~0;
 		}
 
-		return ocache->read_word(address);
+		return m_oprogram32.read_word(address);
 	};
 
 	m_read8   = [this](offs_t address) -> u8     {
@@ -1427,7 +1428,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 				if (m_mmu_tmp_buserror_occurred)
 					return ~0;
 		}
-		return m_space->read_byte(address);
+		return m_program32.read_byte(address);
 	};
 
 	m_read16  = [this](offs_t address) -> u16    {
@@ -1436,14 +1437,14 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 			if (m_mmu_tmp_buserror_occurred)
 				return ~0;
 			if (WORD_ALIGNED(address))
-				return m_space->read_word(address0);
+				return m_program32.read_word(address0);
 			u32 address1 = pmmu_translate_addr(address + 1, 1);
 			if (m_mmu_tmp_buserror_occurred)
 				return ~0;
-			u16 result = m_space->read_byte(address0) << 8;
-			return result | m_space->read_byte(address1);
+			u16 result = m_program32.read_byte(address0) << 8;
+			return result | m_program32.read_byte(address1);
 		}
-		return m_space->read_word_unaligned(address);
+		return m_program32.read_word_unaligned(address);
 	};
 
 	m_read32  = [this](offs_t address) -> u32    {
@@ -1455,25 +1456,25 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 				// not at page boundary; use default code
 				address = address0;
 			else if (DWORD_ALIGNED(address)) // 0
-				return m_space->read_dword(address0);
+				return m_program32.read_dword(address0);
 			else {
 				u32 address2 = pmmu_translate_addr(address+2, 1);
 				if (m_mmu_tmp_buserror_occurred)
 					return ~0;
 				if (WORD_ALIGNED(address)) { // 2
-					u32 result = m_space->read_word(address0) << 16;
-					return result | m_space->read_word(address2);
+					u32 result = m_program32.read_word(address0) << 16;
+					return result | m_program32.read_word(address2);
 				}
 				u32 address1 = pmmu_translate_addr(address+1, 1);
 				u32 address3 = pmmu_translate_addr(address+3, 1);
 				if (m_mmu_tmp_buserror_occurred)
 					return ~0;
-				u32 result = m_space->read_byte(address0) << 24;
-				result |= m_space->read_word(address1) << 8;
-				return result | m_space->read_byte(address3);
+				u32 result = m_program32.read_byte(address0) << 24;
+				result |= m_program32.read_word(address1) << 8;
+				return result | m_program32.read_byte(address3);
 			}
 		}
-		return m_space->read_dword_unaligned(address);
+		return m_program32.read_dword_unaligned(address);
 	};
 
 	m_write8  = [this](offs_t address, u8  data) {
@@ -1482,7 +1483,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 			if (m_mmu_tmp_buserror_occurred)
 				return;
 		}
-		m_space->write_dword(address & 0xfffffffcU, dword_from_byte(data), 0xff000000U >> 8 * (address & 3));
+		m_program32.write_dword(address & 0xfffffffcU, dword_from_byte(data), 0xff000000U >> 8 * (address & 3));
 	};
 
 	m_write16 = [this](offs_t address, u16 data) {
@@ -1494,15 +1495,15 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 		}
 		switch (address & 3) {
 		case 0:
-			m_space->write_dword(address0, dword_from_word(data), 0xffff0000U);
+			m_program32.write_dword(address0, dword_from_word(data), 0xffff0000U);
 			break;
 
 		case 1:
-			m_space->write_dword(address0 - 1, dword_from_unaligned_word(data), 0x00ffff00);
+			m_program32.write_dword(address0 - 1, dword_from_unaligned_word(data), 0x00ffff00);
 			break;
 
 		case 2:
-			m_space->write_dword(address0 - 2, dword_from_word(data), 0x0000ffff);
+			m_program32.write_dword(address0 - 2, dword_from_word(data), 0x0000ffff);
 			break;
 
 		case 3:
@@ -1513,8 +1514,8 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 			}
-			m_space->write_dword(address0 - 3, dword_from_unaligned_word(data), 0x000000ff);
-			m_space->write_dword(address1, dword_from_byte(data & 0x00ff), 0xff000000U);
+			m_program32.write_dword(address0 - 3, dword_from_unaligned_word(data), 0x000000ff);
+			m_program32.write_dword(address1, dword_from_byte(data & 0x00ff), 0xff000000U);
 			break;
 		}
 		}
@@ -1529,7 +1530,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 		}
 		switch (address & 3) {
 		case 0:
-			m_space->write_dword(address0, data, 0xffffffffU);
+			m_program32.write_dword(address0, data, 0xffffffffU);
 			break;
 
 		case 1:
@@ -1540,8 +1541,8 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 			}
-			m_space->write_dword(address0 - 1, (data & 0xff000000U) | (data & 0xffffff00U) >> 8, 0x00ffffff);
-			m_space->write_dword(address3, dword_from_byte(data & 0x000000ff), 0xff000000U);
+			m_program32.write_dword(address0 - 1, (data & 0xff000000U) | (data & 0xffffff00U) >> 8, 0x00ffffff);
+			m_program32.write_dword(address3, dword_from_byte(data & 0x000000ff), 0xff000000U);
 			break;
 		}
 
@@ -1553,8 +1554,8 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 			}
-			m_space->write_dword(address0 - 2, dword_from_word((data & 0xffff0000U) >> 16), 0x0000ffff);
-			m_space->write_dword(address2, dword_from_word(data & 0x0000ffff), 0xffff0000U);
+			m_program32.write_dword(address0 - 2, dword_from_word((data & 0xffff0000U) >> 16), 0x0000ffff);
+			m_program32.write_dword(address2, dword_from_word(data & 0x0000ffff), 0xffff0000U);
 			break;
 		}
 
@@ -1566,8 +1567,8 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 			}
-			m_space->write_dword(address0 - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_space->write_dword(address1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
+			m_program32.write_dword(address0 - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
+			m_program32.write_dword(address1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
 			break;
 		}
 		}
@@ -1578,27 +1579,28 @@ void m68000_base_device::init32hmmu(address_space &space, address_space &ospace)
 {
 	m_space = &space;
 	m_ospace = &ospace;
-	auto ocache = ospace.cache<2, 0, ENDIANNESS_BIG>();
+	ospace.cache(m_oprogram32);
+	space.specific(m_program32);
 
-	m_readimm16 = [this, ocache](offs_t address) -> u16 {
+	m_readimm16 = [this](offs_t address) -> u16 {
 		if (m_hmmu_enabled)
 			address = hmmu_translate_addr(address);
-		return ocache->read_word(address);
+		return m_oprogram32.read_word(address);
 	};
 
 	m_read8   = [this](offs_t address) -> u8     {
 		if (m_hmmu_enabled)
 			address = hmmu_translate_addr(address);
-		return m_space->read_byte(address);
+		return m_program32.read_byte(address);
 	};
 
 	m_read16  = [this](offs_t address) -> u16    {
 		if (m_hmmu_enabled)
 			address = hmmu_translate_addr(address);
 		if (WORD_ALIGNED(address))
-			return m_space->read_word(address);
-		u16 result = m_space->read_byte(address) << 8;
-		return result | m_space->read_byte(address + 1);
+			return m_program32.read_word(address);
+		u16 result = m_program32.read_byte(address) << 8;
+		return result | m_program32.read_byte(address + 1);
 	};
 
 	m_read32  = [this](offs_t address) -> u32    {
@@ -1606,31 +1608,31 @@ void m68000_base_device::init32hmmu(address_space &space, address_space &ospace)
 			address = hmmu_translate_addr(address);
 
 		if (DWORD_ALIGNED(address))
-			return m_space->read_dword(address);
+			return m_program32.read_dword(address);
 		if (WORD_ALIGNED(address)) {
-			u32 result = m_space->read_word(address) << 16;
-			return result | m_space->read_word(address + 2);
+			u32 result = m_program32.read_word(address) << 16;
+			return result | m_program32.read_word(address + 2);
 		}
-		u32 result = m_space->read_byte(address) << 24;
-		result |= m_space->read_word(address + 1) << 8;
-		return result | m_space->read_byte(address + 3);
+		u32 result = m_program32.read_byte(address) << 24;
+		result |= m_program32.read_word(address + 1) << 8;
+		return result | m_program32.read_byte(address + 3);
 	};
 
 	m_write8  = [this](offs_t address, u8 data)  {
 		if (m_hmmu_enabled)
 			address = hmmu_translate_addr(address);
-		m_space->write_byte(address, data);
+		m_program32.write_byte(address, data);
 	};
 
 	m_write16 = [this](offs_t address, u16 data)  {
 		if (m_hmmu_enabled)
 			address = hmmu_translate_addr(address);
 		if (WORD_ALIGNED(address)) {
-			m_space->write_word(address, data);
+			m_program32.write_word(address, data);
 			return;
 		}
-		m_space->write_byte(address, data >> 8);
-		m_space->write_byte(address + 1, data);
+		m_program32.write_byte(address, data >> 8);
+		m_program32.write_byte(address + 1, data);
 	};
 
 	m_write32 = [this](offs_t address, u32 data)  {
@@ -1638,23 +1640,18 @@ void m68000_base_device::init32hmmu(address_space &space, address_space &ospace)
 			address = hmmu_translate_addr(address);
 
 		if (DWORD_ALIGNED(address)) {
-			m_space->write_dword(address, data);
+			m_program32.write_dword(address, data);
 			return;
 		}
 		if (WORD_ALIGNED(address)) {
-			m_space->write_word(address, data >> 16);
-			m_space->write_word(address + 2, data);
+			m_program32.write_word(address, data >> 16);
+			m_program32.write_word(address + 2, data);
 			return;
 		}
-		m_space->write_byte(address, data >> 24);
-		m_space->write_word(address + 1, data >> 8);
-		m_space->write_byte(address + 3, data);
+		m_program32.write_byte(address, data >> 24);
+		m_program32.write_word(address + 1, data >> 8);
+		m_program32.write_byte(address + 3, data);
 	};
-}
-
-void m68000_base_device::set_reset_callback(write_line_delegate callback)
-{
-	m_reset_instr_callback = callback;
 }
 
 // fault_addr = address to indicate fault at
@@ -1666,21 +1663,6 @@ void m68000_base_device::set_buserror_details(u32 fault_addr, u8 rw, u8 fc)
 	m_aerr_write_mode = (rw << 4);
 	m_aerr_fc = fc;
 	m_mmu_tmp_buserror_address = fault_addr; // Hack for x68030
-}
-
-void m68000_base_device::set_cmpild_callback(write32_delegate callback)
-{
-	m_cmpild_instr_callback = callback;
-}
-
-void m68000_base_device::set_rte_callback(write_line_delegate callback)
-{
-	m_rte_instr_callback = callback;
-}
-
-void m68000_base_device::set_tas_write_callback(write8_delegate callback)
-{
-	m_tas_write_callback = callback;
 }
 
 u16 m68000_base_device::get_fc()
@@ -1802,9 +1784,9 @@ void m68000_base_device::init_cpu_m68000(void)
 	m_cyc_dbcc_f_noexp = -2;
 	m_cyc_dbcc_f_exp   = 2;
 	m_cyc_scc_r_true   = 2;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 3;
-	m_cyc_shift        = 1;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 8;
+	m_cyc_shift        = 2;
 	m_cyc_reset        = 132;
 	m_has_pmmu         = 0;
 	m_has_hmmu         = 0;
@@ -1831,9 +1813,9 @@ void m68000_base_device::init_cpu_m68008(void)
 	m_cyc_dbcc_f_noexp = -2;
 	m_cyc_dbcc_f_exp   = 2;
 	m_cyc_scc_r_true   = 2;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 3;
-	m_cyc_shift        = 1;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 8;
+	m_cyc_shift        = 2;
 	m_cyc_reset        = 132;
 	m_has_pmmu         = 0;
 	m_has_fpu          = 0;
@@ -1858,9 +1840,9 @@ void m68000_base_device::init_cpu_m68010(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 6;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 3;
-	m_cyc_shift        = 1;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 8;
+	m_cyc_shift        = 2;
 	m_cyc_reset        = 130;
 	m_has_pmmu         = 0;
 	m_has_fpu          = 0;
@@ -1884,9 +1866,9 @@ void m68000_base_device::init_cpu_m68020(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 
 	define_state();
@@ -1940,9 +1922,9 @@ void m68000_base_device::init_cpu_m68ec020(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 0;
 	m_has_fpu          = 0;
@@ -1968,9 +1950,9 @@ void m68000_base_device::init_cpu_m68030(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 1;
 	m_has_fpu          = 1;
@@ -1997,9 +1979,9 @@ void m68000_base_device::init_cpu_m68ec030(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 0;     /* EC030 lacks the PMMU and is effectively a die-shrink 68020 */
 	m_has_fpu          = 1;
@@ -2026,9 +2008,9 @@ void m68000_base_device::init_cpu_m68040(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 1;
 	m_has_fpu          = 1;
@@ -2054,9 +2036,9 @@ void m68000_base_device::init_cpu_m68ec040(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 0;
 	m_has_fpu          = 0;
@@ -2082,9 +2064,9 @@ void m68000_base_device::init_cpu_m68lc040(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 1;
 	m_has_fpu          = 0;
@@ -2098,21 +2080,20 @@ void m68000_base_device::init_cpu_scc68070(void)
 	init_cpu_common();
 	m_cpu_type         = CPU_TYPE_SCC070;
 
-	// TODO: most of this is subtly different
 	init16(*m_program, *m_oprogram);
 	m_sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m_state_table      = m68ki_instruction_state_table[1];
 	m_cyc_instruction  = m68ki_cycles[1];
 	m_cyc_exception    = m68ki_exception_cycle_table[1];
-	m_cyc_bcc_notake_b = -4;
+	m_cyc_bcc_notake_b = 0;
 	m_cyc_bcc_notake_w = 0;
-	m_cyc_dbcc_f_noexp = 0;
-	m_cyc_dbcc_f_exp   = 6;
+	m_cyc_dbcc_f_noexp = 3;
+	m_cyc_dbcc_f_exp   = 3;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 3;
-	m_cyc_shift        = 1;
-	m_cyc_reset        = 130;
+	m_cyc_movem_w      = 7;
+	m_cyc_movem_l      = 11;
+	m_cyc_shift        = 3;
+	m_cyc_reset        = 154;
 	m_has_pmmu         = 0;
 	m_has_fpu          = 0;
 
@@ -2137,9 +2118,9 @@ void m68000_base_device::init_cpu_fscpu32(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 
 	define_state();
@@ -2164,9 +2145,9 @@ void m68000_base_device::init_cpu_coldfire(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 
 	define_state();
@@ -2302,7 +2283,7 @@ void m68000_base_device::m68ki_exception_interrupt(u32 int_level)
 		vector = m_cpu_space->read_word(0xfffffff0 | (int_level << 1)) & 0xff;
 
 	/* Start exception processing */
-	sr = m68ki_init_exception();
+	sr = m68ki_init_exception(vector);
 
 	/* Set the interrupt mask to the level of the one being serviced */
 	m_int_mask = int_level<<8;
@@ -2342,7 +2323,11 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
 		m_cpu_space_config("cpu space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_base_device::default_autovectors_map), this)),
 		m_interrupt_mixer(true),
-		m_cpu_space_id(AS_CPU_SPACE)
+		m_cpu_space_id(AS_CPU_SPACE),
+		m_reset_instr_callback(*this),
+		m_cmpild_instr_callback(*this),
+		m_rte_instr_callback(*this),
+		m_tas_write_callback(*this)
 {
 	clear_all();
 }
@@ -2355,7 +2340,11 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
 		m_cpu_space_config("cpu space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_base_device::default_autovectors_map), this)),
 		m_interrupt_mixer(true),
-		m_cpu_space_id(AS_CPU_SPACE)
+		m_cpu_space_id(AS_CPU_SPACE),
+		m_reset_instr_callback(*this),
+		m_cmpild_instr_callback(*this),
+		m_rte_instr_callback(*this),
+		m_tas_write_callback(*this)
 {
 	clear_all();
 }
@@ -2410,9 +2399,9 @@ void m68000_base_device::clear_all()
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp = 0;
 	m_cyc_scc_r_true = 0;
-	m_cyc_movem_w = 0;
-	m_cyc_movem_l = 0;
-	m_cyc_shift = 0;
+	m_cyc_movem_w = 1;
+	m_cyc_movem_l = 1;
+	m_cyc_shift = 1;
 	m_cyc_reset = 0;
 
 	m_initial_cycles = 0;
@@ -2480,13 +2469,13 @@ void m68000_base_device::autovectors_map(address_map &map)
 {
 	// Eventually add the sync to E due to vpa
 	// 8-bit handlers are used here to be compatible with all bus widths
-	map(0x3, 0x3).lr8("avec1", []() -> u8 { return autovector(1); });
-	map(0x5, 0x5).lr8("avec2", []() -> u8 { return autovector(2); });
-	map(0x7, 0x7).lr8("avec3", []() -> u8 { return autovector(3); });
-	map(0x9, 0x9).lr8("avec4", []() -> u8 { return autovector(4); });
-	map(0xb, 0xb).lr8("avec5", []() -> u8 { return autovector(5); });
-	map(0xd, 0xd).lr8("avec6", []() -> u8 { return autovector(6); });
-	map(0xf, 0xf).lr8("avec7", []() -> u8 { return autovector(7); });
+	map(0x3, 0x3).lr8(NAME([] () -> u8 { return autovector(1); }));
+	map(0x5, 0x5).lr8(NAME([] () -> u8 { return autovector(2); }));
+	map(0x7, 0x7).lr8(NAME([] () -> u8 { return autovector(3); }));
+	map(0x9, 0x9).lr8(NAME([] () -> u8 { return autovector(4); }));
+	map(0xb, 0xb).lr8(NAME([] () -> u8 { return autovector(5); }));
+	map(0xd, 0xd).lr8(NAME([] () -> u8 { return autovector(6); }));
+	map(0xf, 0xf).lr8(NAME([] () -> u8 { return autovector(7); }));
 }
 
 void m68000_base_device::default_autovectors_map(address_map &map)
@@ -2499,6 +2488,10 @@ void m68000_base_device::default_autovectors_map(address_map &map)
 
 void m68000_base_device::device_start()
 {
+	m_reset_instr_callback.resolve();
+	m_cmpild_instr_callback.resolve();
+	m_rte_instr_callback.resolve();
+	m_tas_write_callback.resolve();
 }
 
 void m68000_base_device::device_stop()
@@ -2592,6 +2585,7 @@ m68000_device::m68000_device(const machine_config &mconfig, const device_type ty
 
 void m68000_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68000();
 }
 
@@ -2615,6 +2609,7 @@ m68008_device::m68008_device(const machine_config &mconfig, const char *tag, dev
 
 void m68008_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68008();
 }
 
@@ -2626,6 +2621,7 @@ m68008fn_device::m68008fn_device(const machine_config &mconfig, const char *tag,
 
 void m68008fn_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68008();
 }
 
@@ -2638,6 +2634,7 @@ m68010_device::m68010_device(const machine_config &mconfig, const char *tag, dev
 
 void m68010_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68010();
 }
 
@@ -2650,6 +2647,7 @@ m68020_device::m68020_device(const machine_config &mconfig, const char *tag, dev
 
 void m68020_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68020();
 }
 
@@ -2661,6 +2659,7 @@ m68020fpu_device::m68020fpu_device(const machine_config &mconfig, const char *ta
 
 void m68020fpu_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68020fpu();
 }
 
@@ -2672,6 +2671,7 @@ m68020pmmu_device::m68020pmmu_device(const machine_config &mconfig, const char *
 
 void m68020pmmu_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68020pmmu();
 }
 
@@ -2697,6 +2697,7 @@ m68020hmmu_device::m68020hmmu_device(const machine_config &mconfig, const char *
 
 void m68020hmmu_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68020hmmu();
 }
 
@@ -2708,6 +2709,7 @@ m68ec020_device::m68ec020_device(const machine_config &mconfig, const char *tag,
 
 void m68ec020_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68ec020();
 }
 
@@ -2718,6 +2720,7 @@ m68030_device::m68030_device(const machine_config &mconfig, const char *tag, dev
 
 void m68030_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68030();
 }
 
@@ -2728,6 +2731,7 @@ m68ec030_device::m68ec030_device(const machine_config &mconfig, const char *tag,
 
 void m68ec030_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68ec030();
 }
 
@@ -2739,6 +2743,7 @@ m68040_device::m68040_device(const machine_config &mconfig, const char *tag, dev
 
 void m68040_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68040();
 }
 
@@ -2751,6 +2756,7 @@ m68ec040_device::m68ec040_device(const machine_config &mconfig, const char *tag,
 
 void m68ec040_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68ec040();
 }
 
@@ -2763,6 +2769,7 @@ m68lc040_device::m68lc040_device(const machine_config &mconfig, const char *tag,
 
 void m68lc040_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68lc040();
 }
 
@@ -2775,6 +2782,7 @@ scc68070_base_device::scc68070_base_device(const machine_config &mconfig, const 
 
 void scc68070_base_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_scc68070();
 }
 
@@ -2793,6 +2801,7 @@ fscpu32_device::fscpu32_device(const machine_config &mconfig, const char *tag, d
 
 void fscpu32_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_fscpu32();
 }
 
@@ -2805,6 +2814,7 @@ mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag,
 
 void mcf5206e_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_coldfire();
 }
 

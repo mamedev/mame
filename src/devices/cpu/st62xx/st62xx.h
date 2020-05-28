@@ -84,9 +84,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -108,8 +108,8 @@ protected:
 	void update_port_mode(uint8_t index, uint8_t changed);
 	void set_port_output_bit(uint8_t index, uint8_t bit, uint8_t state);
 
-	DECLARE_WRITE8_MEMBER(regs_w);
-	DECLARE_READ8_MEMBER(regs_r);
+	void regs_w(offs_t offset, uint8_t data);
+	uint8_t regs_r(offs_t offset);
 
 	enum
 	{
@@ -222,10 +222,10 @@ protected:
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;
 
-	devcb_write_line m_porta_out[6];
-	devcb_write_line m_portb_out[3];
-	devcb_write_line m_portc_out[4];
-	devcb_write_line m_portd_out[7];
+	devcb_write_line::array<6> m_porta_out;
+	devcb_write_line::array<3> m_portb_out;
+	devcb_write_line::array<4> m_portc_out;
+	devcb_write_line::array<7> m_portd_out;
 
 	uint8_t m_port_dir[4];
 	uint8_t m_port_option[4];

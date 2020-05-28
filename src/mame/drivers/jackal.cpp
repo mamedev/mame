@@ -366,7 +366,7 @@ void jackal_state::jackal(machine_config &config)
 	MC6809E(config, m_slavecpu, MASTER_CLOCK/12); // verified on pcb
 	m_slavecpu->set_addrmap(AS_PROGRAM, &jackal_state::slave_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

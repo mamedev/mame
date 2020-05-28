@@ -154,7 +154,7 @@ generic_terminal_device::generic_terminal_device(const machine_config &mconfig, 
 	, m_y_pos(0)
 	, m_bell_timer(nullptr)
 	, m_beeper(*this, "beeper")
-	, m_keyboard_cb()
+	, m_keyboard_cb(*this)
 {
 }
 
@@ -347,7 +347,7 @@ void generic_terminal_device::device_start()
 {
 	m_buffer = std::make_unique<uint8_t []>(m_width * m_height);
 	m_bell_timer = timer_alloc(BELL_TIMER_ID);
-	m_keyboard_cb.bind_relative_to(*owner());
+	m_keyboard_cb.resolve();
 	save_pointer(NAME(m_buffer), m_width * m_height);
 	save_item(NAME(m_x_pos));
 	save_item(NAME(m_framecnt));

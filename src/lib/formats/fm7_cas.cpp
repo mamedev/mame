@@ -4,7 +4,7 @@
  * Fujitsu FM-7 series cassette handling
  */
 
-#include <assert.h>
+#include <cassert>
 
 #include "fm7_cas.h"
 

@@ -67,9 +67,9 @@ protected:
 	tilemap_t *m_md_tilemap;
 
 	int m_sprites_x_offset;
-	DECLARE_READ8_MEMBER(playmark_snd_command_r);
-	DECLARE_WRITE8_MEMBER(playmark_oki_w);
-	DECLARE_WRITE8_MEMBER(playmark_snd_control_w);
+	uint8_t playmark_snd_command_r();
+	void playmark_oki_w(uint8_t data);
+	void playmark_snd_control_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER(sslam_tx_tileram_w);
 	DECLARE_WRITE16_MEMBER(sslam_md_tileram_w);
 	DECLARE_WRITE16_MEMBER(sslam_bg_tileram_w);

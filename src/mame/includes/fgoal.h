@@ -24,7 +24,7 @@ public:
 
 	void fgoal(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(_80_r);
+	DECLARE_READ_LINE_MEMBER(_80_r);
 
 protected:
 	enum

@@ -638,7 +638,7 @@ static INPUT_PORTS_START( teetert )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy_state,teetert_input_r, nullptr)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exidy_state, teetert_input_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -908,7 +908,7 @@ void exidy_state::venture(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::venture_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* audio hardware */
 	pia6821_device &pia(PIA6821(config, "pia", 0));
@@ -943,7 +943,7 @@ void exidy_state::mtrap(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::mtrap_map);
 
-	config.m_minimum_quantum = attotime::from_hz(1920);
+	config.set_maximum_quantum(attotime::from_hz(1920));
 
 	/* audio hardware */
 	pia6821_device &pia(PIA6821(config, "pia", 0));
@@ -1208,10 +1208,10 @@ ROM_START( mtrap )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "mtl11d.bin",  0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
 
-	ROM_REGION( 0x140, "proms", 0 ) // PROMs located at h14 and d6 were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. They also match the teetert ones.
+	ROM_REGION( 0x140, "proms", 0 ) // h14 taken from bootleg, very likely same and matches teetert, but marked bad dump until verification - same note applies to mtrap clone sets
 	ROM_LOAD( "74s288.h14", 0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
 	ROM_LOAD( "vel5c_1.c5", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
-	ROM_LOAD( "74s288.d6",  0x0120, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
+	ROM_LOAD( "74s288.d6",  0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
 ROM_END
 
 
@@ -1238,10 +1238,10 @@ ROM_START( mtrap2 )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "mtl11d.bin",  0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
 
-	ROM_REGION( 0x140, "proms", 0 ) // PROMs located at h14 and d6 were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. They also match the teetert ones.
+	ROM_REGION( 0x140, "proms", 0 )
 	ROM_LOAD( "74s288.h14", 0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
 	ROM_LOAD( "vel5c_1.c5", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
-	ROM_LOAD( "74s288.d6",  0x0120, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
+	ROM_LOAD( "74s288.d6",  0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
 ROM_END
 
 
@@ -1268,10 +1268,10 @@ ROM_START( mtrap3 )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "mtl11d.bin",  0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
 
-	ROM_REGION( 0x140, "proms", 0 ) // PROMs located at h14 and d6 were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. They also match the teetert ones.
+	ROM_REGION( 0x140, "proms", 0 )
 	ROM_LOAD( "74s288.h14", 0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
 	ROM_LOAD( "vel5c_1.c5", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
-	ROM_LOAD( "74s288.d6",  0x0120, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
+	ROM_LOAD( "74s288.d6",  0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
 ROM_END
 
 
@@ -1298,10 +1298,10 @@ ROM_START( mtrap4 )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "mtl11d.bin",   0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
 
-	ROM_REGION( 0x140, "proms", 0 ) // PROMs located at h14 and d6 were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. They also match the teetert ones.
+	ROM_REGION( 0x140, "proms", 0 )
 	ROM_LOAD( "74s288.h14", 0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
 	ROM_LOAD( "vel5c_1.c5", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
-	ROM_LOAD( "74s288.d6",  0x0120, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
+	ROM_LOAD( "74s288.d6",  0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
 ROM_END
 
 ROM_START( mtrapb )
@@ -1325,10 +1325,10 @@ ROM_START( mtrapb )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "2516.j6",   0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
 
-	ROM_REGION( 0x140, "proms", 0 ) // PROMs located at 6c and 3d were dumped from another bootleg, very probably they are the same, but marked as bad dump for precaution. They also match the teetert ones.
+	ROM_REGION( 0x140, "proms", 0 )
 	ROM_LOAD( "74s288.6c", 0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
 	ROM_LOAD( "24s10n.1c", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
-	ROM_LOAD( "74s288.3d", 0x0120, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
+	ROM_LOAD( "74s288.3d", 0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
 ROM_END
 
 /*
@@ -1446,6 +1446,30 @@ ROM_START( venture4 )
 	ROM_LOAD( "hrl14h 1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
 	ROM_LOAD( "vel5c 1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
 	ROM_LOAD( "hrl6d 1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
+ROM_END
+
+
+ROM_START( venture2b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "d2732.2s", 0x8000, 0x1000, CRC(87d69fe9) SHA1(d5ccf71af478873f32e23530a62515327f39f672) ) // only unique program ROM
+	ROM_LOAD( "d2732.2r", 0x9000, 0x1000, CRC(8163cefc) SHA1(7061819dd1105e8368c045dad2effae62d124539) )
+	ROM_LOAD( "d2732.2n", 0xa000, 0x1000, CRC(324a5054) SHA1(f845ff2f717ea627891e0dc9d6e66f690c0843d8) )
+	ROM_LOAD( "d2732.2m", 0xb000, 0x1000, CRC(24358203) SHA1(10c3ea83a892d6fd2751e590afe45bffa65bd6e0) )
+	ROM_LOAD( "d2732.2l", 0xc000, 0x1000, CRC(04428165) SHA1(6d8d860ce1f805ba2eb315f47c8660799256e921) )
+	ROM_LOAD( "d2732.2k", 0xd000, 0x1000, CRC(4c1a702a) SHA1(7f6a68d3cfdd885108eebb7ea76b3c2ce6070b18) )
+	ROM_LOAD( "d2732.2h", 0xe000, 0x1000, CRC(1aab27c2) SHA1(66c7274dbb8bda3c78cc61d96a6cb1a9b29939b5) )
+	ROM_LOAD( "d2732.2f", 0xf000, 0x1000, CRC(767bdd71) SHA1(334a903e05fc86186f90aa2d9ce3b0d367d7e516) )
+
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
+	ROM_LOAD( "tms2516.10f",  0x5800, 0x0800, CRC(4ea1c3d9) SHA1(d0c99c9d5b887d717c68e8745906ae4e65aec6ad) )
+	ROM_LOAD( "tms2564.10j",  0x6000, 0x2000, CRC(da9d8588) SHA1(b2e6509748059fc317af56d66396427c5ca78748) ) // bigger ROM, but contents identical to venture2
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "tms2516.6j",      0x0000, 0x0800, CRC(ea6fd981) SHA1(46b1658e1607423d5a073f14097c2a48d59057c0) ) // GFX ROM matches venture4, instead
+
+	ROM_REGION( 0x140, "proms", 0 ) // only 2 PROMs
+	ROM_LOAD( "sn74s288n.6c", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "sn74s288n.3d", 0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
 ROM_END
 
 
@@ -1771,6 +1795,7 @@ GAME( 1981, mtrapb2,   mtrap,   mtrap,    mtrap,     exidy_state, init_mtrap,   
 GAME( 1981, venture,   0,       venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 5 set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, venture2,  venture, venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 5 set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, venture4,  venture, venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, venture2b, venture, venture,  venture,   exidy_state, init_venture,  ROT0, "bootleg", "Venture (version 5 set 2, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, teetert,   0,       teetert,  teetert,   exidy_state, init_teetert,  ROT0, "Exidy",   "Teeter Torture (prototype)", MACHINE_SUPPORTS_SAVE )
 

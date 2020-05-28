@@ -17,6 +17,8 @@
 #include "emu.h"
 #include "dj2db.h"
 
+#include "machine/ay31015.h"
+
 
 
 //**************************************************************************
@@ -64,11 +66,6 @@ const tiny_rom_entry *s100_dj2db_device::device_rom_region() const
 //  COM8116_INTERFACE( brg_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( s100_dj2db_device::fr_w )
-{
-	// S1602 RRC/TRC
-}
-
 static void s100_dj2db_floppies(device_slot_interface &device)
 {
 	device.option_add("8dsdd", FLOPPY_8_DSDD);
@@ -104,10 +101,13 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 
 void s100_dj2db_device::device_add_mconfig(machine_config &config)
 {
-	COM8116(config, m_dbrg, 5.0688_MHz_XTAL);
-	m_dbrg->fr_handler().set(FUNC(s100_dj2db_device::fr_w));
+	COM8116(config, m_dbrg, 5.0688_MHz_XTAL); // BR2941
+	m_dbrg->fr_handler().set(m_uart, FUNC(ay51013_device::write_tcp));
+	m_dbrg->fr_handler().append(m_uart, FUNC(ay51013_device::write_rcp));
 
-	MB8866(config, m_fdc, 10_MHz_XTAL / 5);
+	AY51013(config, m_uart); // TR1602
+
+	MB8866(config, m_fdc, 10_MHz_XTAL / 10); // clocked by QC output of LS390
 	m_fdc->intrq_wr_callback().set(FUNC(s100_dj2db_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(s100_dj2db_device::fdc_drq_w));
 
@@ -247,6 +247,7 @@ s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *
 	device_s100_card_interface(mconfig, *this),
 	m_fdc(*this, MB8866_TAG),
 	m_dbrg(*this, BR1941_TAG),
+	m_uart(*this, S1602_TAG),
 	m_floppy0(*this, MB8866_TAG":0"),
 	m_floppy1(*this, MB8866_TAG":1"),
 	m_floppy2(*this, MB8866_TAG":2"),
@@ -294,6 +295,8 @@ void s100_dj2db_device::device_start()
 void s100_dj2db_device::device_reset()
 {
 	m_board_enbl = m_j4->read();
+
+	m_fdc->mr_w(0);
 }
 
 
@@ -432,7 +435,7 @@ void s100_dj2db_device::s100_mwrt_w(offs_t offset, uint8_t data)
 		m_access_enbl = BIT(data, 6);
 
 		// master reset
-		if (!BIT(data, 7)) m_fdc->soft_reset();
+		m_fdc->mr_w(BIT(data, 7));
 	}
 	else if (offset == 0xfbfa) // FUNCTION SEL
 	{

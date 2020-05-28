@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="msx1_flop" description="MSX1 disk images">
 
 <!--
@@ -361,7 +364,7 @@ The following floppies came with the machines.
 		<publisher>Eaglesoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="come on! picot (1986)(pony canyon)(jp).dsk" size="737280" crc="22bff100" sha1="823a33351442d2efeded9cbe6053b643b9981ae8" offset="0" />
+				<rom name="come on picot (1986)(pony canyon)(jp).dsk" size="737280" crc="22bff100" sha1="823a33351442d2efeded9cbe6053b643b9981ae8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -810,7 +813,7 @@ The following floppies came with the machines.
 		<info name="usage" value="Hold CTRL at boot until the beep." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="laserfight! (1989)(login soft)(jp).dsk" size="737280" crc="4811c8b6" sha1="b4cad1e07a2b0e54bae8d96e2f99cda7d3d01f29" offset="0" />
+				<rom name="laserfight (1989)(login soft)(jp).dsk" size="737280" crc="4811c8b6" sha1="b4cad1e07a2b0e54bae8d96e2f99cda7d3d01f29" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1870,7 +1873,7 @@ The following floppies came with the machines.
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="3d knockout! (1985)(alligata software)(gb).dsk" size="737280" crc="b9b4e2f5" sha1="5ecaf2f72eb4b7bde2bccd64b1442365cd3aeb79" offset="0" />
+				<rom name="3d knockout (1985)(alligata software)(gb).dsk" size="737280" crc="b9b4e2f5" sha1="5ecaf2f72eb4b7bde2bccd64b1442365cd3aeb79" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2194,7 +2197,7 @@ The following floppies came with the machines.
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="boom! (1986)(aackosoft)(nl).dsk" size="737280" crc="27e79483" sha1="c2367f4c1b5a5af8c6ca6c68008477bf1268644a" offset="0" />
+				<rom name="boom (1986)(aackosoft)(nl).dsk" size="737280" crc="27e79483" sha1="c2367f4c1b5a5af8c6ca6c68008477bf1268644a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3349,7 +3352,7 @@ The following floppies came with the machines.
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="oh no! (1986)(eaglesoft)(nl)[aka oh shit!].dsk" size="737280" crc="aee65f34" sha1="5c2cd6dd8192a8c29fc0e272181272cb26cc2af6" offset="0" />
+				<rom name="oh no (1986)(eaglesoft)(nl)[aka oh shit].dsk" size="737280" crc="aee65f34" sha1="5c2cd6dd8192a8c29fc0e272181272cb26cc2af6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4393,7 +4396,7 @@ The following floppies came with the machines.
 		<publisher>&lt;cart2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="adven'chuta! (1983)(mia)(jp).dsk" size="737280" crc="05c18396" sha1="2e7f5acbdb27fdf147feec4002627bc4d0e512e2" offset="0" />
+				<rom name="adven'chuta (1983)(mia)(jp).dsk" size="737280" crc="05c18396" sha1="2e7f5acbdb27fdf147feec4002627bc4d0e512e2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4514,7 +4517,7 @@ The following floppies came with the machines.
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="ale hop! (1988)(topo soft)(es).dsk" size="737280" crc="03955c76" sha1="9d2175fee15ed92e4d82bc94d04036f1f60208ca" offset="0" />
+				<rom name="ale hop (1988)(topo soft)(es).dsk" size="737280" crc="03955c76" sha1="9d2175fee15ed92e4d82bc94d04036f1f60208ca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4525,7 +4528,7 @@ The following floppies came with the machines.
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="ale hop! (1988)(topo soft)(es)[a].dsk" size="737280" crc="679384b6" sha1="2857616a03d58b4e55020644d54df7adc74fcf3e" offset="0" />
+				<rom name="ale hop (1988)(topo soft)(es)[a].dsk" size="737280" crc="679384b6" sha1="2857616a03d58b4e55020644d54df7adc74fcf3e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5460,7 +5463,7 @@ The following floppies came with the machines.
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="bop! (1986)(bug-byte software)(gb).dsk" size="737280" crc="05ab63a6" sha1="4f32214d3b744d31421466042fad4a45cbea6654" offset="0" />
+				<rom name="bop (1986)(bug-byte software)(gb).dsk" size="737280" crc="05ab63a6" sha1="4f32214d3b744d31421466042fad4a45cbea6654" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5692,7 +5695,7 @@ The following floppies came with the machines.
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="buzz off! (1984)(electric software)(gb).dsk" size="737280" crc="2b547aca" sha1="b557b30dae3ef1dc36e87b04f2a1cf2b26cb683a" offset="0" />
+				<rom name="buzz off (1984)(electric software)(gb).dsk" size="737280" crc="2b547aca" sha1="b557b30dae3ef1dc36e87b04f2a1cf2b26cb683a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5714,7 +5717,7 @@ The following floppies came with the machines.
 		<publisher>&lt;cart2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="c so! (1985)(pony canyon)(jp).dsk" size="737280" crc="5608cce4" sha1="480208cca4b8867d6a7466d27a0fa177efed7997" offset="0" />
+				<rom name="c so (1985)(pony canyon)(jp).dsk" size="737280" crc="5608cce4" sha1="480208cca4b8867d6a7466d27a0fa177efed7997" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6044,7 +6047,7 @@ The following floppies came with the machines.
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="checkmate! first moves in chess (1985)(toshiba-emi)(jp)[needs 64k in slot 2].dsk" size="737280" crc="7edc36c9" sha1="1eda39a2de8057b4bc82ebe58c7295860162ccba" offset="0" />
+				<rom name="checkmate first moves in chess (1985)(toshiba-emi)(jp)[needs 64k in slot 2].dsk" size="737280" crc="7edc36c9" sha1="1eda39a2de8057b4bc82ebe58c7295860162ccba" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11082,7 +11085,7 @@ The following floppies came with the machines.
 		<publisher>&lt;cart2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="mr. do! vs unicorns (1984)(sony)(jp).dsk" size="737280" crc="52be0090" sha1="e846fceaf36ffbb850aaad0e081c24631951010d" offset="0" />
+				<rom name="mr. do vs unicorns (1984)(sony)(jp).dsk" size="737280" crc="52be0090" sha1="e846fceaf36ffbb850aaad0e081c24631951010d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11456,7 +11459,7 @@ The following floppies came with the machines.
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="oh mummy!! (1984)(longman software)(gb).dsk" size="737280" crc="9cf775cc" sha1="cd7db0faf25ae33699b1708a19a874e3662e158a" offset="0" />
+				<rom name="oh mummy (1984)(longman software)(gb).dsk" size="737280" crc="9cf775cc" sha1="cd7db0faf25ae33699b1708a19a874e3662e158a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11467,7 +11470,7 @@ The following floppies came with the machines.
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="oh shit! (1986)(aackosoft)(nl).dsk" size="737280" crc="735ebc21" sha1="7de3f69a8a5136e0dd25214d36b1194a6506b377" offset="0" />
+				<rom name="oh shit (1986)(aackosoft)(nl).dsk" size="737280" crc="735ebc21" sha1="7de3f69a8a5136e0dd25214d36b1194a6506b377" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11489,7 +11492,7 @@ The following floppies came with the machines.
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="ole! (1986)(bug-byte software)(gb)(fr).dsk" size="737280" crc="4be9ec52" sha1="516d6c6403528c996b465564f147e4723fc78bce" offset="0" />
+				<rom name="ole (1986)(bug-byte software)(gb)(fr).dsk" size="737280" crc="4be9ec52" sha1="516d6c6403528c996b465564f147e4723fc78bce" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14151,7 +14154,7 @@ The following floppies came with the machines.
 		<publisher>&lt;tape2disk hack&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="trantor - the last stormtrooper (1987)(go!).dsk" size="737280" crc="846fff32" sha1="86412b8e43d07e35c533c31b5e21ef6a2adc4ff7" offset="0" />
+				<rom name="trantor - the last stormtrooper (1987)(go).dsk" size="737280" crc="846fff32" sha1="86412b8e43d07e35c533c31b5e21ef6a2adc4ff7" offset="0" />
 			</dataarea>
 		</part>
 	</software>

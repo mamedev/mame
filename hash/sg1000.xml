@@ -1,13 +1,15 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- Othello Multivision carts are marked with OMV.
+<!--
+license:CC0
+
+Othello Multivision carts are marked with OMV.
 
 Canceled titles (possibly exist in prototype form)
   C-62    Champion Ski (by Sega)
   OM-G009 Challenge Soccer (by Tsukuda)
   OM-G010 Great Escape 2 (by Tsukuda)
- -->
-<!--
+
 The following games were available both as Golden Carts and as MyCards.
 I'm not sure from what version the dumps below come (or it they have been
 verified to contain the same data)
@@ -18,8 +20,6 @@ C-26 - Star Force
 C-33 - Champion Boxing [dumped and verified to be diff from G-1033]
 C-43 - Zippy Race
 
- -->
-<!--
 Many SG-1000 games were also sold in Taiwan by Aaronix
 These are now mostly dumped (thanks to Bock and SMS Power)
 
@@ -844,7 +844,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="alt_title" value="シーソー"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c_so! (japan).bin" size="32768" crc="be7ed0eb" sha1="d45a230b3cbf2d2dcfe7b94691fc7f1a5d747625" offset="000000" />
+				<rom name="c_so (japan).bin" size="32768" crc="be7ed0eb" sha1="d45a230b3cbf2d2dcfe7b94691fc7f1a5d747625" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -857,7 +857,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="alt_title" value="頑皮鬼 ~ Wánpí guǐ"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c_so! (tw).bin" size="32768" crc="82c4e3e5" sha1="7101c42289815d7e0d04b523f8f0e833f2f089b3" offset="000000" />
+				<rom name="c_so (tw).bin" size="32768" crc="82c4e3e5" sha1="7101c42289815d7e0d04b523f8f0e833f2f089b3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

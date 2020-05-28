@@ -46,14 +46,14 @@ public:
 	DECLARE_WRITE8_MEMBER(aliens_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
-	DECLARE_WRITE8_MEMBER(aliens_snd_bankswitch_w);
+	void aliens_snd_bankswitch_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_aliens(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(uint8_t data);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(uint8_t data);
 	void aliens(machine_config &config);
 	void aliens_map(address_map &map);
 	void aliens_sound_map(address_map &map);

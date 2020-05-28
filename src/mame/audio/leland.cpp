@@ -145,33 +145,17 @@ void leland_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_audiocpu->tmrout0_handler().set(FUNC(leland_80186_sound_device::i80186_tmr0_w));
 
 	SPEAKER(config, "speaker").front_center();
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	for (int i = 0; i < 6; i++)
 	{
 		AD7524(config, m_dac[i], 0).add_route(ALL_OUTPUTS, "speaker", 0.2); // 74hc374.u31..6 + ad7524.u46..51
 		DAC_8BIT_BINARY_WEIGHTED(config, m_dacvol[i], 0); // 74hc374.u17..22 + rX2-rX9 (24k,12k,6.2k,3k,1.5k,750,360,160) where X is 0..5
+		m_dacvol[i]->add_route(0, m_dac[i], 1.0, DAC_VREF_POS_INPUT);
+		m_dacvol[i]->add_route(0, m_dac[i], -1.0, DAC_VREF_NEG_INPUT);
+		vref.add_route(0, m_dacvol[i], 1.0, DAC_VREF_POS_INPUT);
 	}
 	AD7533(config, "dac9", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // ad7533.u64
 
-	m_dacvol[0]->add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[0]->add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	m_dacvol[1]->add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[1]->add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-	m_dacvol[2]->add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[2]->add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT);
-	m_dacvol[3]->add_route(0, "dac4", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[3]->add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT);
-	m_dacvol[4]->add_route(0, "dac5", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[4]->add_route(0, "dac5", -1.0, DAC_VREF_NEG_INPUT);
-	m_dacvol[5]->add_route(0, "dac6", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[5]->add_route(0, "dac6", -1.0, DAC_VREF_NEG_INPUT);
-
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac4vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac5vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac6vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac9", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac9", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -202,38 +186,15 @@ void redline_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_audiocpu->chip_select_callback().set(FUNC(leland_80186_sound_device::peripheral_ctrl));
 
 	SPEAKER(config, "speaker").front_center();
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	for (int i = 0; i < 8; i++)
 	{
 		AD7524(config, m_dac[i], 0).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
 		DAC_8BIT_BINARY_WEIGHTED(config, m_dacvol[i], 0);
+		m_dacvol[i]->add_route(0, m_dac[i], 1.0, DAC_VREF_POS_INPUT);
+		m_dacvol[i]->add_route(0, m_dac[i], -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
+		vref.add_route(0, m_dacvol[i], 1.0, DAC_VREF_POS_INPUT);
 	}
-
-	m_dacvol[0]->add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[0]->add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	m_dacvol[1]->add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[1]->add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	m_dacvol[2]->add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[2]->add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	m_dacvol[3]->add_route(0, "dac4", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[3]->add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	m_dacvol[4]->add_route(0, "dac5", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[4]->add_route(0, "dac5", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	m_dacvol[5]->add_route(0, "dac6", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[5]->add_route(0, "dac6", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	m_dacvol[6]->add_route(0, "dac7", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[6]->add_route(0, "dac7", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	m_dacvol[7]->add_route(0, "dac8", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[7]->add_route(0, "dac8", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac4vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac5vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac6vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac7vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac8vol", 1.0, DAC_VREF_POS_INPUT);
 
 	PIT8254(config, m_pit[0], 0);
 	m_pit[0]->set_clk<0>(7000000);
@@ -268,27 +229,17 @@ void ataxx_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_audiocpu->tmrout0_handler().set(FUNC(leland_80186_sound_device::i80186_tmr0_w));
 
 	SPEAKER(config, "speaker").front_center();
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	for (int i = 0; i < 4; i++)
 	{
 		AD7524(config, m_dac[i], 0).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
 		DAC_8BIT_BINARY_WEIGHTED(config, m_dacvol[i], 0); // unknown DAC
+		m_dacvol[i]->add_route(0, m_dac[i], 1.0, DAC_VREF_POS_INPUT);
+		m_dacvol[i]->add_route(0, m_dac[i], -1.0, DAC_VREF_NEG_INPUT);
+		vref.add_route(0, m_dacvol[i], 1.0, DAC_VREF_POS_INPUT);
 	}
 	AD7533(config, "dac9", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 
-	m_dacvol[0]->add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[0]->add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	m_dacvol[1]->add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[1]->add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-	m_dacvol[2]->add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[2]->add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT);
-	m_dacvol[3]->add_route(0, "dac4", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[3]->add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT);
-
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac4vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac9", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac9", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -313,27 +264,16 @@ void wsf_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_audiocpu->tmrout1_handler().set(FUNC(leland_80186_sound_device::i80186_tmr1_w));
 
 	SPEAKER(config, "speaker").front_center();
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	for (int i = 0; i < 4; i++)
 	{
 		AD7524(config, m_dac[i], 0).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
 		DAC_8BIT_BINARY_WEIGHTED(config, m_dacvol[i], 0); // unknown DAC
+		m_dacvol[i]->add_route(0, m_dac[i], 1.0, DAC_VREF_POS_INPUT);
+		m_dacvol[i]->add_route(0, m_dac[i], -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
+		vref.add_route(0, m_dacvol[i], 1.0, DAC_VREF_POS_INPUT);
 	}
 	AD7533(config, "dac9", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-
-	m_dacvol[0]->add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[0]->add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	m_dacvol[1]->add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[1]->add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	m_dacvol[2]->add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[2]->add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	m_dacvol[3]->add_route(0, "dac4", 1.0, DAC_VREF_POS_INPUT);
-	m_dacvol[3]->add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac4vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac9", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac9", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -477,12 +417,12 @@ void leland_80186_sound_device::peripheral_ctrl(offs_t offset, u16 data)
 			u32 temp = (m_peripheral & 0xffc0) << 4;
 			if (data & 0x0040)
 			{
-				m_audiocpu->space(AS_PROGRAM).install_readwrite_handler(temp, temp + 0x2ff, read16s_delegate(FUNC(leland_80186_sound_device::peripheral_r), this), write16s_delegate(FUNC(leland_80186_sound_device::peripheral_w), this));
+				m_audiocpu->space(AS_PROGRAM).install_readwrite_handler(temp, temp + 0x2ff, read16s_delegate(*this, FUNC(leland_80186_sound_device::peripheral_r)), write16s_delegate(*this, FUNC(leland_80186_sound_device::peripheral_w)));
 			}
 			else
 			{
 				temp &= 0xffff;
-				m_audiocpu->space(AS_IO).install_readwrite_handler(temp, temp + 0x2ff, read16s_delegate(FUNC(leland_80186_sound_device::peripheral_r), this), write16s_delegate(FUNC(leland_80186_sound_device::peripheral_w), this));
+				m_audiocpu->space(AS_IO).install_readwrite_handler(temp, temp + 0x2ff, read16s_delegate(*this, FUNC(leland_80186_sound_device::peripheral_r)), write16s_delegate(*this, FUNC(leland_80186_sound_device::peripheral_w)));
 			}
 			break;
 		}

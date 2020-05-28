@@ -101,7 +101,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
 
-	// machine drivers
+	// machine configs
 	void cmpchess(machine_config &config);
 	void mk1(machine_config &config);
 	void cnc(machine_config &config);
@@ -129,15 +129,15 @@ private:
 	void update_reset(ioport_value state);
 
 	// I/O handlers
-	DECLARE_READ8_MEMBER(beeper_r);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(digit_select_w);
-	DECLARE_WRITE8_MEMBER(digit_data_w);
-	DECLARE_READ8_MEMBER(digit_data_r);
+	u8 beeper_r(offs_t offset);
+	void input_w(u8 data);
+	u8 input_r();
+	void digit_select_w(u8 data);
+	void digit_data_w(u8 data);
+	u8 digit_data_r();
 
-	DECLARE_WRITE8_MEMBER(input_digit_select_w) { input_w(space, offset, data); digit_select_w(space, offset, data); }
-	DECLARE_WRITE8_MEMBER(input_digit_data_w) { input_w(space, offset, data); digit_data_w(space, offset, data); }
+	void input_digit_select_w(u8 data) { input_w(data); digit_select_w(data); }
+	void input_digit_data_w(u8 data) { input_w(data); digit_data_w(data); }
 
 	u8 m_inp_mux;
 	u8 m_digit_select;
@@ -181,7 +181,7 @@ void cmpchess_state::update_reset(ioport_value state)
     I/O
 ******************************************************************************/
 
-READ8_MEMBER(cmpchess_state::beeper_r)
+u8 cmpchess_state::beeper_r(offs_t offset)
 {
 	// cncchess: trigger beeper
 	if (!machine().side_effects_disabled() && m_beeper != nullptr)
@@ -205,32 +205,32 @@ void cmpchess_state::update_display()
 	m_display->matrix(m_digit_select, bstate << 8 | digit_data);
 }
 
-WRITE8_MEMBER(cmpchess_state::digit_data_w)
+void cmpchess_state::digit_data_w(u8 data)
 {
 	// digit segment data
 	m_digit_data = data;
 	update_display();
 }
 
-READ8_MEMBER(cmpchess_state::digit_data_r)
+u8 cmpchess_state::digit_data_r()
 {
 	return m_digit_data;
 }
 
-WRITE8_MEMBER(cmpchess_state::digit_select_w)
+void cmpchess_state::digit_select_w(u8 data)
 {
 	// d0-d3: digit select (active low)
 	m_digit_select = ~data & 0xf;
 	update_display();
 }
 
-WRITE8_MEMBER(cmpchess_state::input_w)
+void cmpchess_state::input_w(u8 data)
 {
 	// input matrix is shared with either digit_data_w, or digit_select_w
 	m_inp_mux = data;
 }
 
-READ8_MEMBER(cmpchess_state::input_r)
+u8 cmpchess_state::input_r()
 {
 	u8 data = m_inp_mux;
 
@@ -368,18 +368,20 @@ void cmpchess_state::mk1(machine_config &config)
 	cmpchess(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(2000000); // JS&A version measured 2.18MHz on average
-	subdevice<f3853_device>("smi")->set_clock(2000000);
+	m_maincpu->set_clock(2250000); // JS&A version measured 2.18MHz on average
+	subdevice<f3853_device>("smi")->set_clock(2250000);
 
 	config.set_default_layout(layout_novag_mk1);
 }
 
 void cmpchess_state::cnc(machine_config &config)
 {
-	mk1(config);
+	cmpchess(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_IO, &cmpchess_state::cnc_io);
+	m_maincpu->set_clock(2000000); // LC circuit, measured 2MHz
+	subdevice<f3853_device>("smi")->set_clock(2000000);
 
 	config.set_default_layout(layout_cncchess);
 
@@ -424,4 +426,4 @@ ROM_END
 CONS( 1977, cmpchess, 0,        0, cmpchess, cmpchess, cmpchess_state, empty_init, "Data Cash Systems / Staid", "CompuChess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1978, ccmk1,    cmpchess, 0, mk1,      cmpchess, cmpchess_state, empty_init, "Novag", "Chess Champion: MK I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, cncchess, 0,        0, cnc,      cncchess, cmpchess_state, empty_init, "Conic", "Computer Chess (Conic)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, cncchess, 0,        0, cnc,      cncchess, cmpchess_state, empty_init, "Conic", "Computer Chess (Conic, model 7011)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

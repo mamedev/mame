@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ELECTRON_CLICK, electron_click_device, "electron_click", "Slogger Click cartridge")
+DEFINE_DEVICE_TYPE(ELECTRON_CLICK, electron_click_device, "electron_click", "Slogger Click (Electron) cartridge")
 
 
 //-------------------------------------------------

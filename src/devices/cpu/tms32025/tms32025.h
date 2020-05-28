@@ -99,9 +99,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 4; }
-	virtual uint32_t execute_max_cycles() const override { return 20; }
-	virtual uint32_t execute_input_lines() const override { return 6; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 4; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 20; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -127,10 +127,10 @@ protected:
 	required_shared_ptr<uint16_t> m_b2;
 	optional_shared_ptr<uint16_t> m_b3;
 
-	address_space *m_program;
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
-	address_space *m_data;
-	address_space *m_io;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_data;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_io;
 
 	typedef void ( tms32025_device::*opcode_func ) ();
 	struct tms32025_opcode

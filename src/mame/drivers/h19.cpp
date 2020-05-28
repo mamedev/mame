@@ -102,10 +102,10 @@ public:
 	void h19(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(h19_keyclick_w);
-	DECLARE_WRITE8_MEMBER(h19_bell_w);
-	DECLARE_READ8_MEMBER(kbd_key_r);
-	DECLARE_READ8_MEMBER(kbd_flags_r);
+	void h19_keyclick_w(uint8_t data);
+	void h19_bell_w(uint8_t data);
+	uint8_t kbd_key_r();
+	uint8_t kbd_flags_r();
 	DECLARE_READ_LINE_MEMBER(mm5740_shift_r);
 	DECLARE_READ_LINE_MEMBER(mm5740_control_r);
 	DECLARE_WRITE_LINE_MEMBER(mm5740_data_ready_w);
@@ -148,13 +148,11 @@ void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		m_bellactive = false;
 		break;
 	default:
-		assert_always(false, "Unknown id in h19_state::device_timer");
+		throw emu_fatalerror("Unknown id in h19_state::device_timer");
 	}
 
 	if (!m_keyclickactive && !m_bellactive)
-	{
 		m_beep->set_state(0);
-	}
 }
 
 
@@ -376,7 +374,7 @@ void h19_state::machine_reset()
 }
 
 
-WRITE8_MEMBER( h19_state::h19_keyclick_w )
+void h19_state::h19_keyclick_w(uint8_t data)
 {
 /* Keyclick - 6 mSec */
 
@@ -385,7 +383,7 @@ WRITE8_MEMBER( h19_state::h19_keyclick_w )
 	timer_set(attotime::from_msec(6), TIMER_KEY_CLICK_OFF);
 }
 
-WRITE8_MEMBER( h19_state::h19_bell_w )
+void h19_state::h19_bell_w(uint8_t data)
 {
 /* Bell (^G) - 200 mSec */
 
@@ -416,7 +414,7 @@ uint16_t h19_state::translate_mm5740_b(uint16_t b)
 	return ((b & 0x100) >> 2) | ((b & 0x0c0) << 1) | (b & 0x03f);
 }
 
-READ8_MEMBER(h19_state::kbd_key_r)
+uint8_t h19_state::kbd_key_r()
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	m_strobe = false;
@@ -425,7 +423,7 @@ READ8_MEMBER(h19_state::kbd_key_r)
 	return m_transchar;
 }
 
-READ8_MEMBER(h19_state::kbd_flags_r)
+uint8_t h19_state::kbd_flags_r()
 {
 	uint16_t modifiers = m_kbspecial->read();
 	uint8_t rv = modifiers & 0x7f;
@@ -471,6 +469,8 @@ WRITE_LINE_MEMBER(h19_state::mm5740_data_ready_w)
 
 MC6845_UPDATE_ROW( h19_state::crtc_update_row )
 {
+	if (!de)
+		return;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix32(y);
 
@@ -543,22 +543,22 @@ void h19_state::h19(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(h19_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(h19_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // frame pulse
 
 	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));
 	uart.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
 	MM5740(config, m_mm5740, MM5740_CLOCK);
-	m_mm5740->x_cb<0>().set_ioport("X1");
-	m_mm5740->x_cb<1>().set_ioport("X2");
-	m_mm5740->x_cb<2>().set_ioport("X3");
-	m_mm5740->x_cb<3>().set_ioport("X4");
-	m_mm5740->x_cb<4>().set_ioport("X5");
-	m_mm5740->x_cb<5>().set_ioport("X6");
-	m_mm5740->x_cb<6>().set_ioport("X7");
-	m_mm5740->x_cb<7>().set_ioport("X8");
-	m_mm5740->x_cb<8>().set_ioport("X9");
+	m_mm5740->x_cb<1>().set_ioport("X1");
+	m_mm5740->x_cb<2>().set_ioport("X2");
+	m_mm5740->x_cb<3>().set_ioport("X3");
+	m_mm5740->x_cb<4>().set_ioport("X4");
+	m_mm5740->x_cb<5>().set_ioport("X5");
+	m_mm5740->x_cb<6>().set_ioport("X6");
+	m_mm5740->x_cb<7>().set_ioport("X7");
+	m_mm5740->x_cb<8>().set_ioport("X8");
+	m_mm5740->x_cb<9>().set_ioport("X9");
 	m_mm5740->shift_cb().set(FUNC(h19_state::mm5740_shift_r));
 	m_mm5740->control_cb().set(FUNC(h19_state::mm5740_control_r));
 	m_mm5740->data_ready_cb().set(FUNC(h19_state::mm5740_data_ready_w));

@@ -36,9 +36,8 @@ void segas1x_bootleg_state::setup_system16_bootleg_spritebanking(  )
 {
 	if (m_spritebank_type == 0)
 	{
-		static const uint8_t alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
-		int i;
-		for (i = 0; i < 16; i++)
+		static constexpr uint8_t alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
+		for (int i = 0; i < 16; i++)
 			m_sprites->set_bank(i, alternate_banklist[i]);
 
 	}
@@ -233,7 +232,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg_tile_info)
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (((data & m_tilebank_switch) ? m_tile_bank[1] : m_tile_bank[0]) << 12);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -245,7 +244,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg_tile_info)
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (((data & m_tilebank_switch) ? m_tile_bank[1] : m_tile_bank[0]) << 12);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -257,7 +256,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg2_tile_info)
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (m_tile_bank[(data & 0x1000) >> 12] << 12);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -269,7 +268,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg2_tile_info)
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (m_tile_bank[(data & 0x1000) >> 12] << 12);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -321,14 +320,14 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_text_tile_info)
 
 	if (!m_shinobl_kludge)
 	{
-		SET_TILE_INFO_MEMBER(0,
+		tileinfo.set(0,
 				(tile_number & 0x1ff) | (m_tile_bank[0] << 12),
 				(tile_number >> 9) % 8,
 				0);
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(0,
+		tileinfo.set(0,
 				(tile_number & 0xff) | (m_tile_bank[0] << 12),
 				(tile_number >> 8) % 8,
 				0);
@@ -366,24 +365,24 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system16)
 
 	if (!m_bg1_trans)
 		m_background[0] = &machine().tilemap().create(
-				*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
+				*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(segas1x_bootleg_state::sys16_bg_map)),
 				8,8,
-				64*2,32*2 );
+				64*2,32*2);
 	else
 		m_background[0] = &machine().tilemap().create(
-				*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
+				*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(segas1x_bootleg_state::sys16_bg_map)),
 				8,8,
-				64*2,32*2 );
+				64*2,32*2);
 
 	m_foreground[0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(segas1x_bootleg_state::sys16_bg_map)),
 			8,8,
-			64*2,32*2 );
+			64*2,32*2);
 
 	m_text_layer = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_text_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_text_map),this),
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_text_tile_info)), tilemap_mapper_delegate(*this, FUNC(segas1x_bootleg_state::sys16_text_map)),
 			8,8,
-			40,28 );
+			40,28);
 
 	if (m_bg1_trans) m_background[0]->set_transparent_pen(0);
 	m_foreground[0]->set_transparent_pen(0);
@@ -422,14 +421,14 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system18old)
 	m_bg1_trans = 1;
 
 	m_background[1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(segas1x_bootleg_state::sys16_bg_map)),
 			8,8,
-			64*2,32*2 );
+			64*2,32*2);
 
 	m_foreground[1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_fg2_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_fg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(segas1x_bootleg_state::sys16_bg_map)),
 			8,8,
-			64*2,32*2 );
+			64*2,32*2);
 
 	m_foreground[1]->set_transparent_pen(0);
 
@@ -479,7 +478,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_infotxt)
 	data = m_textram[tile_index];
 	tile_number = data & 0x1ff;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			((data >> 9) & 0x7),
 			0);
@@ -493,7 +492,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_info0)
 	tile_number = data & 0x1fff;
 
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -506,7 +505,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_info1)
 	data = m_bg1_tileram[tile_index];
 	tile_number = data & 0x1fff;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -557,11 +556,11 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg)
 
 
 
-	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_infotxt),this), TILEMAP_SCAN_ROWS, 8,8, 64,32 );
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_infotxt)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 
 	// the system16a bootlegs have simple tilemaps instead of the paged system
-	m_bg_tilemaps[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_info0),this), TILEMAP_SCAN_ROWS, 8,8, 64,32 );
-	m_bg_tilemaps[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_info1),this), TILEMAP_SCAN_ROWS, 8,8, 64,32 );
+	m_bg_tilemaps[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_info0)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_bg_tilemaps[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_info1)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 
 	m_text_tilemap->set_transparent_pen(0);
 	m_bg_tilemaps[0]->set_transparent_pen(0);

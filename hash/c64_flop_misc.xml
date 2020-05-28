@@ -1,0 +1,867 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="c64_flop_misc" description="Commodore 64 miscellaneous disks">
+
+	<!-- Games -->
+
+	<software name="arttu">
+		<description>Little Knight Arthur</description>
+		<year>1986</year>
+		<publisher>Pasi Hytönen</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="arthurc64.d64" size="174848" crc="f741ada3" sha1="84eb7ce5152370fe53604209ee7fb54a284bfa6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbudge">
+		<description>Bill Budge: Pinball Construction Set</description>
+		<year>1983</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<!-- something special about the last sector -->
+				<rom name="bill_budge.d64" size="174848" crc="d42c40b4" sha1="75b0a166b29e9ed3834c95acc1f263a084062f5f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fcc"> <!-- optional -->
+		<description>The Final ChessCard</description>
+		<year>1990</year>
+		<publisher>Tasc</publisher>
+		<sharedfeat name="requirement" value="c64_cart:fcc"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/> <!-- book -->
+			<dataarea name="flop" size="174848">
+				<rom name="fcc_disk1.d64" size="174848" crc="c726ab83" sha1="9196fb222faf4b7c07e7814a25f65779ee35032d" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/> <!-- save disk -->
+			<dataarea name="flop" size="174848">
+				<rom name="fcc_disk2.d64" size="174848" crc="60042a32" sha1="c768a13201bdf78e1dd387ef9370dc10259d3f22" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Flippy disk. The other side is for Apple II. -->
+	<software name="jingldsk">
+		<description>JingleDisk - Holiday Musical Story with Computer Animation</description>
+		<year>1985</year>
+		<publisher>Thoughtware</publisher>
+		<info name="usage" value="Commodore: Load &quot;JINGLE&quot;,8,1 / Apple IIc and e: Self boots" />
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Operates on Commodore"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jingledisk (commodore).d64" size="174848" crc="2fc6663a" sha1="e81dab6d22df694f9f38ef6c03aa2305a62df140"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metaldst">
+		<description>Metal Dust</description>
+		<year>2012</year>
+		<publisher>Protovision</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="metal dust (final) disk1-5e0ec0.d81" size="819200" crc="c20c3cf1" sha1="471c7ae222522e3818f0b30591e9b3814965ba38"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="metal dust (final) disk2-389202.d81" size="819200" crc="877b8d19" sha1="2f04378b47a1190aba5241dfd7ac67c1928ca782"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="819200">
+				<rom name="metal dust (final) disk3-33ced1.d81" size="819200" crc="80fc1c80" sha1="b2b7739100a0ec1e3b27058086877e1880e7d5bb"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="819200">
+				<rom name="metal dust (final) disk4-69306e.d81" size="819200" crc="764f878f" sha1="9149f25990b7cbd8082ba60ea1b5074cacb0941a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Compilations -->
+
+	<!-- Applications -->
+
+	<software name="goliath">
+		<description>Goliath-Prommer (Ger)</description>
+		<year>19??</year>
+		<publisher>Rex-Datentechnik</publisher>
+		<info name="serial" value="REX 9655" />
+		<sharedfeat name="requirement" value="c64_user:goliath"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="goliath.d64" size="174848" crc="3c4f2931" sha1="5584a2406aab892884207f79065d3320ab0755af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speakez">
+		<description>SpeakEasy</description>
+		<year>1983</year>
+		<publisher>Personal Peripheral Products</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<sharedfeat name="requirement" value="c64_cart:speakez"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="speakeasy.d64" size="174848" crc="702cc20c" sha1="d9a19213809e2b51ee55fac9687b55bddaa86871"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Educational -->
+
+	<software name="kats1">
+		<description>KÄTS-opetuslevy 1 (Fin)</description>
+		<year>1989</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="kats-1.d64" size="174848" crc="076e961a" sha1="011922880a227d388a77b5c179d7540d6118469d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kats2">
+		<description>KÄTS-opetuslevy 2 (Fin)</description>
+		<year>1989</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="kats-2.d64" size="174848" crc="44a5f655" sha1="eecb240de09b8adfaac68190e490984ea7e62304"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kertolas">
+		<description>Kertolasku (Fin)</description>
+		<year>1986</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="kertolasku.d64" size="174848" crc="78f4ad0d" sha1="4ef1552535c26bf6c884f463d69f6e11fe152a9c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lrsharj">
+		<description>LRS-harjoitus (Fin)</description>
+		<year>1988</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="lrs-harjoitus.d64" size="174848" crc="ed5ce5ae" sha1="ca4eabc7d41db9f56e434ba8f38d7f24ad2fe5b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opinkirj">
+		<description>Opin kirjoittamaan (Fin)</description>
+		<year>1985</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="opin_kirjoittamaan.d64" size="174848" crc="6125f441" sha1="e1d908644529eb3c0e4fef4be7b394a697d6bb9a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opinluk1">
+		<description>Opin lukemaan 1 (Fin)</description>
+		<year>1985</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="opin_lukemaan_1.d64" size="174848" crc="70b4d79e" sha1="0f7ba68acfdca1b3fb8fc137b5b2c2292b6fc397"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opinluk2">
+		<description>Opin lukemaan 2 (Fin)</description>
+		<year>1985</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="opin_lukemaan_2.d64" size="174848" crc="58cb5f41" sha1="5cc321cb82f144b3faa88dbcb9b591657cdc66cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psenglsh">
+		<description>PS-English (Fin)</description>
+		<year>1986</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ps-english.d64" size="174848" crc="18d66daa" sha1="35d9871fb337ada74f0788d4910dfba08d1d4c15"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psmemory">
+		<description>PS-Memory (Fin)</description>
+		<year>1989</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ps-memory.d64" size="174848" crc="08a635cd" sha1="cd797378c35272ca65f35784fda7f4e42029d8ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puventti">
+		<description>Puhuva venttipeli (Fin)</description>
+		<year>1986</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="puhuva_venttipeli.d64" size="174848" crc="16661038" sha1="69c67d4e3c2f15285549df4cb19caae44ed2dc2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vahennys">
+		<description>Vähennyslasku (Fin)</description>
+		<year>1986</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="vahennyslasku.d64" size="174848" crc="e03d35ae" sha1="2fa26e548c577b647f3e23a93851c7cf4dc257ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valmhrj1">
+		<description>Valmiusharjoituksia 1 (Fin)</description>
+		<year>198?</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="valm-harj1.d64" size="174848" crc="190cf6d4" sha1="7ca9176a83c48f5b9aebbc3e38e9a847da9ffc3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yhteenla">
+		<description>Yhteenlasku (Fin)</description>
+		<year>198?</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="yhteenlasku.d64" size="174848" crc="c02a0821" sha1="17e03cd9d81ee2bf328e802354c149945a319450"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="getrdynu">
+		<description>Get Ready for Number with BJ Bear</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="requirement" value="c64_cart:magicvce"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="get_ready_for_number_with_bj_bear.d64" size="174848" crc="58c4760d" sha1="7c2165ae9e4322addef6666cdb996c8ad0914c15"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Test/Demo disks -->
+
+	<software name="1541demo">
+		<description>Commodore 1541 Floppy Disk Drive Test/Demo Disk</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="1540024-02" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1541-demo.1540024-02.d64" size="174848" crc="d97dcfc9" sha1="19412d8be0847b9204054fe8b6f052e1c1a45b81"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1541demoa" cloneof="1541demo">
+		<description>Commodore VIC-1541 Test/Demo</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1541-demo.d64" size="174848" crc="a706af44" sha1="7c88ba7858ea51e71414fd4c33c105b08790476a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1541demob" cloneof="1541demo">
+		<description>Commodore 1541 Floppy Disk Drive Test/Demo Disk (alt)</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1541-demo1.d64" size="174848" crc="75423f8c" sha1="e000908e81e2ead34ced9d863ef6758d70802a1e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1541democ" cloneof="1541demo">
+		<description>Commodore 1541 Floppy Disk Drive Test/Demo Disk (alt 2)</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1541-demo2.d64" size="174848" crc="fc981799" sha1="4443771ae67f892bb8c9cc9b59a240074c0bd9ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1541demod" cloneof="1541demo">
+		<description>Commodore Model 1541 Test/Demo-Diskette</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1541-demo3.d64" size="174848" crc="f2e1f736" sha1="2a19d35b332428696b18032511d8a272fceab400"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1764demo">
+		<description>Commodore 1764 RAM Expansion Utility Disk</description>
+		<year>1987</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="1764 RAM Expansion Utility Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="1764-utility.d64" size="174848" crc="41ab5c19" sha1="553f76035311d31b9959abebc9d5dec26fd30a56"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="1764 RAM Expansion GEOS Upgrade"/>
+			<dataarea name="flop" size="174848">
+				<rom name="1764-utility-geos.d64" size="174848" crc="e16571ec" sha1="36aaa8e59786171b8d20aaa608ca3e4feeee058f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1351demo">
+		<description>Commodore 1351 Mouse Utility Disk</description>
+		<year>1986</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Commodore 1351 Mouse Utility Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="1351-demo.d64" size="174848" crc="46e145cc" sha1="7eac697ab76d269b97734ef77a971d833fe6ffca"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="GEOS Upgrade v1.2 to v1.3"/>
+			<dataarea name="flop" size="174848">
+				<rom name="1351-geos.d64" size="174848" crc="e16571ec" sha1="36aaa8e59786171b8d20aaa608ca3e4feeee058f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfxse">
+		<description>SFX Sound Expander Test/Demo Disk</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="requirement" value="c64_cart:sfxse"/>
+
+		<!--
+		There's a message in track 18 sector 1 (the start of the BAM) telling you
+		to look at track 26 sector 2. There you find the beginning of a hidden
+		file. If you load this file into the correct start address ($C000) and
+		execute it from BASIC (SYS 49152) you get a rather cool surprise ;)
+
+		The copy protection (looking for 22,READ ERROR,18,18) has been removed by
+		changing the two bytes in block 26,1 at offsets $23 and $2A from $AC to $AE
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="sfx.d64" size="174848" crc="23238762" sha1="a7c6c027af8d9d18a0a4e9d751ffec28cc863bf6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfxsea" cloneof="sfxse">
+		<description>SFX Sound Expander (MIDI)</description>
+		<year>1987</year>
+		<publisher>Music Sales</publisher>
+		<sharedfeat name="requirement" value="c64_cart:sfxse"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="sfxse.d64" size="174848" crc="7eec5794" sha1="86c9413fc5f48735520b7714e9777a202843bc9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1660demo">
+		<description>Commodore Modem 300 Test/Demo Diskette</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1660-a.d64" size="174848" crc="4cd535b3" sha1="d9d1d6459db5efb9b6aa8fec2aed99e57c7f2761"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1660-b.d64" size="174848" crc="994d6efa" sha1="7d9ee76f5cc9ced1b486ed69d20f753a664b74db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1670demo">
+		<description>Commodore Modem 1200 Test/Demo Diskette</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1670-a.d64" size="174848" crc="4cd535b3" sha1="d9d1d6459db5efb9b6aa8fec2aed99e57c7f2761"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1670-b.d64" size="174848" crc="39693e8c" sha1="f89baac56a1ef72b85c9b84a0fd2c8120b4db4a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c64demo">
+		<description>C-64 Demodiskette</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="354011-08" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="c64-demodiskette.d64" size="174848" crc="4aeb0038" sha1="780bf7be5e66d2b930ebf55b7cd6c3c3b5941736"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c64bonus">
+		<description>Commodore C-64 Disk Bonus Pack</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="starter-kit.d64" size="174848" crc="616f4bfa" sha1="cbe9bb7ddda8b280672034cfbeb272e019d3a17e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sx64demo">
+		<description>Commodore SX-64 Test/Demo Disk</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="sx64-demo.d64" size="174848" crc="99b689fd" sha1="bb270585973317389c2a486f57e5e9646904acbc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mvdemo">
+		<description>Magic Voice Demo Disk</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="requirement" value="c64_cart:magicvce"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="magicvoicedemo.d64" size="174848" crc="e33213bf" sha1="e46300be955d64266d20c614aa1549f4c5640517"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1520tool">
+		<description>Tools for the Commodore 1520 Plotter</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="c1520_1.d64" size="174848" crc="346c6314" sha1="1b412ca97c7bb3aecbfcc2ce7a921d2f98d849e2"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="c1520_2.d64" size="174848" crc="4c009b05" sha1="b4af1966071a2e28005883eb8c9c3a9efff12792"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="c1520_3.d64" size="174848" crc="e1db28c8" sha1="259c7a7762955891009382c8423add7ad8830213"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swiftlnk">
+		<description>CMD SwiftLink</description>
+		<year>1990</year>
+		<publisher>CMD</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cmd_swiftlink_utils_d1s1.d64" size="174848" crc="f70f4ff8" sha1="d70d6b0c8c2f408286ce0ea9edcfe6c5cf1af60a"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cmd_swiftlink_utils_d1s2.d64" size="174848" crc="b9e18c85" sha1="b8b65c99ac1474b89729756adbdd969a3e9e9aa6"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cmd_swiftlink_utils_d2s1.d64" size="174848" crc="de2828a1" sha1="6516d4674dddc58a9d7787bcb9ea55d4b4fc9898"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="175531">
+				<rom name="cmd_swiftlink_utils_d2s2.d64" size="175531" crc="309d1b76" sha1="847b06a65238861c84dee715e48a635978647303"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cmd_swiftlink_utils_d3s1.d64" size="174848" crc="180ff985" sha1="0b0f4c610cc5a062287ae20e41d9df78b9dc6007"/>
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cmd_swiftlink_utils_d3s2.d64" size="174848" crc="d2ec8d3c" sha1="02413c30f631986c17984f54dac48b9aec0904af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbo232">
+		<description>CMD Turbo232</description>
+		<year>1997</year>
+		<publisher>CMD</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="turbo232.d64" size="174848" crc="48874d98" sha1="28b6d25bb0b62df81c4b17d9205c059c6736e817"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Operating Systems -->
+
+	<software name="contiki">
+		<description>Contiki Desktop OS 1.0</description>
+		<year>2003</year>
+		<publisher>Contiki Project</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="contiki-1.0.d64" size="174848" crc="259c97f7" sha1="7f4ada8f1cf9246b760364d31a9f3bc1493a8b1c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm">
+		<description>Commodore 64 CP/M Cartridge Boot Disk</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="requirement" value="c64_cart:cpm"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.d64" size="174848" crc="cc7473e0" sha1="82d8fd45bd4b6e93df7090b325ac6c9b6597fe36"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpma" cloneof="cpm">
+		<description>Commodore 64 CP/M Cartridge Boot Disk (alt)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="requirement" value="c64_cart:cpm"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cpm2.d64" size="174848" crc="b78211f0" sha1="37d65e4e7d04994c4e69918530aca444bda11f6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmb" cloneof="cpm">
+		<description>Commodore 64 CP/M Cartridge Boot Disk (alt 2)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="D CP2 622-04414" />
+		<sharedfeat name="requirement" value="c64_cart:cpm"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cpm3.d64" size="174848" crc="926d326d" sha1="8d5e6fac79c9f5e463a3514d8b37175e6879cc36"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geckos">
+		<description>GeckOS/A65 (v2.0)</description>
+		<year>1999</year>
+		<publisher>André Fachat</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="c64.d64" size="174848" crc="103a3ef6" sha1="54f484e7bd78ba65844cc1b3b2a2d43cacbebd0e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lunix">
+		<description>LUnix Next Generation (v0.21)</description>
+		<year>2004</year>
+		<publisher>LNG-Project</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="lunix-c64.d64" size="174848" crc="d45d5ffa" sha1="1c1d505670035e4a14f0c6446761e59285101767"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lunixreu" cloneof="lunix">
+		<description>LUnix Next Generation (v0.21, REU)</description>
+		<year>2004</year>
+		<publisher>LNG-Project</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="lunix-c64-reu.d64" size="174848" crc="47e6bb14" sha1="e4057ff831b19a6a10167e0b6ec0aeaa7be1c436"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- MIDI -->
+
+	<software name="midiutil">
+		<description>Midi Utilities 02</description>
+		<year>198?</year>
+		<publisher>The Music Software Exchange</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="midu.d64" size="174848" crc="4f4d3f29" sha1="e5c1bf26cca0e0dd65c8908f4554722d1d2d492c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patobmtx">
+		<description>Oberheim Matrix 6/6R Patches</description>
+		<year>198?</year>
+		<publisher>Oberheim</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="patobmtrx.d64" size="174848" crc="7243d5fc" sha1="4cdd27ef400e0b3f62299206e18ba0c8f0bd72be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="music64">
+		<description>Music 64</description>
+		<year>198?</year>
+		<publisher>Novel International</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<sharedfeat name="requirement" value="c64_cart:music64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="novel.d64" size="174848" crc="637da7dc" sha1="2ec0470f73244e7f4eff93d6ac9cd1b9b64f0f4a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmk49">
+		<description>CMK 49 Computer Musical Keyboard</description>
+		<year>198?</year>
+		<publisher>Siel</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<sharedfeat name="requirement" value="c64_cart:music64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cmk49.d64" size="174848" crc="5ef6645a" sha1="c9afd892731ebd68bc67bd8c6c84cbb1aa5e874d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Test -->
+
+	<software name="tsuit215">
+		<description>C64 Emulator Test Suite (v2.15)</description>
+		<year>1997</year>
+		<publisher>Wolfgang Lorenz</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="tsuit215-1.d64" size="174848" crc="cf1070b7" sha1="e7d31e4f55b771aa9595b27d294c72bc205e8770"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="tsuit215-2.d64" size="174848" crc="12430b99" sha1="a9522a3971d7e331412dfad52c297881ae4cea3c"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="174848">
+				<rom name="tsuit215-3.d64" size="174848" crc="c5898390" sha1="23e1ae5419983ed993d49b9d6d8fdd27b3632856"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vicetest">
+		<description>Versatile Commodore Emulator testprogs</description>
+		<year>2014</year>
+		<publisher>VICE Team</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="cputest"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cputest.d64" size="174848" crc="5a54f04e" sha1="e078223545030ae73ec034638589fffed5c8d8ef"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="cia"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cia.d64" size="174848" crc="51bcfc2c" sha1="a91beb1ca414a903d2e2f230bb3a781e4932159a"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="cianew"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cianew.d64" size="174848" crc="6892b708" sha1="82560a96a6de683733c037a3982a51210f63b135"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="testjoy"/>
+			<dataarea name="flop" size="174848">
+				<rom name="testjoy.d64" size="174848" crc="befdc13e" sha1="2635eb02aace327ded1e4ff9161a069706a2bf05"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Demos -->
+
+	<software name="2ndreal">
+		<description>Second Reality</description>
+		<year>1997</year>
+		<publisher>Smash Designs &amp; The Obsessed Maniacs</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="2nd1.d64" size="174848" crc="1dded14f" sha1="73d0d46fa4adf85a0bd7f55583f06d41b76c8e82"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="2nd2.d64" size="174848" crc="222c5b50" sha1="ea440448a32fe7a2e952e3265450b10c25233729"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

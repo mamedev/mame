@@ -50,10 +50,10 @@ public:
 private:
 	void machine_start() override;
 
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pb_w );
+	uint8_t ppi_pa_r();
+	void ppi_pa_w(uint8_t data);
+	uint8_t ppi_pb_r();
+	void ppi_pb_w(uint8_t data);
 
 	// timers
 	emu_timer *m_led_refresh_timer;
@@ -71,7 +71,7 @@ void amico2k_state::amico2k_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-//  AM_RANGE(0x0400, 0x07ff) AM_RAM // optional expansion RAM
+//  map(0x0400, 0x07ff).ram(); // optional expansion RAM
 	map(0xfb00, 0xfcff).rom();
 	map(0xfd00, 0xfd03).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfe00, 0xffff).rom();
@@ -118,7 +118,7 @@ TIMER_CALLBACK_MEMBER(amico2k_state::led_refresh)
 	}
 }
 
-READ8_MEMBER( amico2k_state::ppi_pa_r )
+uint8_t amico2k_state::ppi_pa_r()
 {
 	/*
 
@@ -144,7 +144,7 @@ READ8_MEMBER( amico2k_state::ppi_pa_r )
 	}
 }
 
-WRITE8_MEMBER( amico2k_state::ppi_pa_w )
+void amico2k_state::ppi_pa_w(uint8_t data)
 {
 	/*
 
@@ -165,7 +165,7 @@ WRITE8_MEMBER( amico2k_state::ppi_pa_w )
 	m_led_refresh_timer->adjust(attotime::from_usec(70));
 }
 
-READ8_MEMBER( amico2k_state::ppi_pb_r )
+uint8_t amico2k_state::ppi_pb_r()
 {
 	/*
 
@@ -185,7 +185,7 @@ READ8_MEMBER( amico2k_state::ppi_pb_r )
 	return 0;
 }
 
-WRITE8_MEMBER( amico2k_state::ppi_pb_w )
+void amico2k_state::ppi_pb_w(uint8_t data)
 {
 	/*
 

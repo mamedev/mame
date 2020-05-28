@@ -451,20 +451,20 @@ int model1_state::quad_t::compare(const model1_state::quad_t* other) const
 
 void model1_state::sort_quads() const
 {
-	const int count = m_quadpt - m_quaddb;
+	const int count = m_quadpt - &m_quaddb[0];
 	for (int i = 0; i < count; i++)
 	{
-		m_quadind[i] = m_quaddb + i;
+		m_quadind[i] = &m_quaddb[i];
 	}
-	qsort(m_quadind, count, sizeof(model1_state::quad_t*), comp_quads);
+	qsort(&m_quadind[0], count, sizeof(model1_state::quad_t*), comp_quads);
 }
 
 void model1_state::unsort_quads() const
 {
-	const int count = m_quadpt - m_quaddb;
+	const int count = m_quadpt - &m_quaddb[0];
 	for (int i = 0; i < count; i++)
 	{
-		m_quadind[i] = m_quaddb + i;
+		m_quadind[i] = &m_quaddb[i];
 	}
 }
 
@@ -472,7 +472,7 @@ void model1_state::unsort_quads() const
 void model1_state::draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	view_t *view = m_view.get();
-	int count = m_quadpt - m_quaddb;
+	int count = m_quadpt - &m_quaddb[0];
 
 	/* clip to the cliprect */
 	int save_x1 = view->x1;
@@ -755,7 +755,12 @@ float model1_state::compute_specular(glm::vec3& normal, glm::vec3& light, float 
 	return 0;
 }
 
-void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size) {
+void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size)
+{
+	// Protect against bad data when attacking a super destroyer
+	if(tex_adr == 0xffffffff || size >= 0x1000000)
+		return;
+
 #if 0
 	int dump;
 #endif
@@ -1176,15 +1181,15 @@ int model1_state::skip_direct(int list_offset) const
 
 void model1_state::draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_quadpt != m_quaddb)
+	if (m_quadpt != &m_quaddb[0])
 	{
 		LOG_TGP(("VIDEO: sort&draw\n"));
 		sort_quads();
 		draw_quads(bitmap, cliprect);
 	}
 
-	m_quadpt = m_quaddb;
-	m_pointpt = m_pointdb;
+	m_quadpt = &m_quaddb[0];
+	m_pointpt = &m_pointdb[0];
 }
 
 
@@ -1199,8 +1204,8 @@ int model1_state::draw_direct(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 	unsort_quads();
 	draw_quads(bitmap, cliprect);
 
-	m_quadpt = m_quaddb;
-	m_pointpt = m_pointdb;
+	m_quadpt = &m_quaddb[0];
+	m_pointpt = &m_pointdb[0];
 
 	return list_offset;
 }
@@ -1568,12 +1573,12 @@ void model1_state::video_start()
 
 	m_poly_ram = make_unique_clear<uint32_t[]>(0x400000);
 	m_tgp_ram = make_unique_clear<uint16_t[]>(0x100000-0x40000);
-	m_pointdb = auto_alloc_array_clear(machine(), model1_state::point_t, 1000000*2);
-	m_quaddb  = auto_alloc_array_clear(machine(), model1_state::quad_t, 1000000);
-	m_quadind = auto_alloc_array_clear(machine(), model1_state::quad_t *, 1000000);
+	m_pointdb = make_unique_clear<model1_state::point_t[]>(1000000*2);
+	m_quaddb  = make_unique_clear<model1_state::quad_t[]>(1000000);
+	m_quadind = make_unique_clear<model1_state::quad_t *[]>(1000000);
 
-	m_pointpt = m_pointdb;
-	m_quadpt = m_quaddb;
+	m_pointpt = &m_pointdb[0];
+	m_quadpt = &m_quaddb[0];
 	m_listctl[0] = m_listctl[1] = 0;
 
 	m_clipfn[0].m_isclipped = &model1_state::fclip_isc_bottom;
@@ -1649,7 +1654,7 @@ uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 
 	view->ayys = sin(view->ayy);
 
 	screen.priority().fill(0);
-	bitmap.fill(m_palette->pen(0), cliprect);
+	bitmap.fill(m_palette->pen(0x400), cliprect);
 
 	m_tiles->draw(screen, bitmap, cliprect, 6, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 4, 0, 0);

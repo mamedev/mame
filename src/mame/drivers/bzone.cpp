@@ -267,7 +267,7 @@ INTERRUPT_GEN_MEMBER(bzone_state::bzone_interrupt)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(bzone_state::clock_r)
+READ_LINE_MEMBER(bzone_state::clock_r)
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
@@ -394,9 +394,9 @@ void redbaron_state::redbaron_map(address_map &map)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step") \
 	/* bit 6 is the VG HALT bit. We set it to "low" */\
 	/* per default (busy vector processor). */\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_bzone_device, done_r, nullptr)\
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_bzone_device, done_r)\
 	/* bit 7 is tied to a 3kHz clock */\
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bzone_state,clock_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(bzone_state, clock_r)
 
 
 #define BZONEDSW0\
@@ -896,8 +896,8 @@ void bzone_state::init_bradley()
 	space.install_ram(0x400, 0x7ff);
 	space.install_read_port(0x1808, 0x1808, "1808");
 	space.install_read_port(0x1809, 0x1809, "1809");
-	space.install_read_handler(0x180a, 0x180a, read8smo_delegate(FUNC(bzone_state::analog_data_r),this));
-	space.install_write_handler(0x1848, 0x1850, write8sm_delegate(FUNC(bzone_state::analog_select_w),this));
+	space.install_read_handler(0x180a, 0x180a, read8smo_delegate(*this, FUNC(bzone_state::analog_data_r)));
+	space.install_write_handler(0x1848, 0x1850, write8sm_delegate(*this, FUNC(bzone_state::analog_select_w)));
 }
 
 

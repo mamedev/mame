@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_A)
 		bank = 0;   /*  this allows the game to print text
 		            in all banks selected by the k007121 */
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + 256*bank,
 			(attr & 0x0f) + 16,
 			(attr & 0x20) ? TILE_FLIPY : 0);
@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_B)
 	int attr = m_vram[tile_index + 0x800];
 	int code = m_vram[tile_index + 0xc00];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(attr & 0x0f) + 16,
 			0);
@@ -69,8 +69,8 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_B)
 
 void flkatck_state::video_start()
 {
-	m_k007121_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flkatck_state::get_tile_info_A),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_k007121_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flkatck_state::get_tile_info_B),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_k007121_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_A)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_k007121_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_B)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -105,7 +105,7 @@ WRITE8_MEMBER(flkatck_state::flkatck_k007121_regs_w)
 			break;
 	}
 
-	m_k007121->ctrl_w(space, offset, data);
+	m_k007121->ctrl_w(offset, data);
 }
 
 

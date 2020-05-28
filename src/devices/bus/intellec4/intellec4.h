@@ -121,7 +121,7 @@ class univ_bus_device;
 class device_univ_card_interface;
 
 
-class univ_slot_device : public device_t, public device_slot_interface
+class univ_slot_device : public device_t, public device_single_card_slot_interface<device_univ_card_interface>
 {
 public:
 	template <typename T, typename U>
@@ -138,9 +138,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_device<univ_bus_device>    m_bus;
@@ -183,7 +182,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// helpers for cards
@@ -211,7 +210,7 @@ private:
 };
 
 
-class device_univ_card_interface : public device_slot_card_interface
+class device_univ_card_interface : public device_interface
 {
 protected:
 	friend class univ_slot_device;
@@ -220,7 +219,7 @@ protected:
 	device_univ_card_interface(const machine_config &mconfig, device_t &device);
 
 	// device_interface implementation
-	void interface_pre_start() override;
+	void interface_pre_start() override ATTR_COLD;
 
 	address_space &rom_space()          { return *m_bus->m_rom_space; }
 	address_space &rom_ports_space()    { return *m_bus->m_rom_ports_space; }

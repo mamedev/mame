@@ -77,9 +77,9 @@ private:
 	DECLARE_WRITE8_MEMBER(floppy_reserve_w);
 	DECLARE_WRITE8_MEMBER(floppy_release_w);
 
-	DECLARE_READ8_MEMBER(ppi_porta_r);
-	DECLARE_READ8_MEMBER(ppi_portb_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+	uint8_t ppi_porta_r();
+	uint8_t ppi_portb_r();
+	void ppi_portc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(centronics_ack_w);
@@ -106,7 +106,7 @@ private:
 	DECLARE_WRITE8_MEMBER(nvram_w);
 	DECLARE_READ8_MEMBER(rtc_r);
 	DECLARE_WRITE8_MEMBER(rtc_w);
-	DECLARE_READ8_MEMBER(irq_callback);
+	uint8_t irq_callback();
 
 	void rc759_io(address_map &map);
 	void rc759_map(address_map &map);
@@ -176,7 +176,7 @@ READ8_MEMBER( rc759_state::keyboard_r )
 		return 0x00;
 }
 
-READ8_MEMBER( rc759_state::ppi_porta_r )
+uint8_t rc759_state::ppi_porta_r()
 {
 	uint8_t data = 0;
 
@@ -192,7 +192,7 @@ READ8_MEMBER( rc759_state::ppi_porta_r )
 	return data;
 }
 
-READ8_MEMBER( rc759_state::ppi_portb_r )
+uint8_t rc759_state::ppi_portb_r()
 {
 	uint8_t data = 0;
 
@@ -207,7 +207,7 @@ READ8_MEMBER( rc759_state::ppi_portb_r )
 	return data;
 }
 
-WRITE8_MEMBER( rc759_state::ppi_portc_w )
+void rc759_state::ppi_portc_w(uint8_t data)
 {
 	m_cas_enabled = BIT(data, 0);
 	m_cas->change_state(BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
@@ -449,7 +449,7 @@ WRITE8_MEMBER( rc759_state::nvram_w )
 		m_nvram_mem[addr >> 1] = (m_nvram_mem[addr >> 1] & 0xf0) | (data & 0x0f);
 }
 
-READ8_MEMBER( rc759_state::irq_callback )
+uint8_t rc759_state::irq_callback()
 {
 	return m_pic->acknowledge();
 }
@@ -484,10 +484,10 @@ void rc759_state::rc759_io(address_map &map)
 	map(0x056, 0x057).noprw(); // in reality, access to sound and rtc is a bit more involved
 	map(0x05a, 0x05a).w(m_snd, FUNC(sn76489a_device::write));
 	map(0x05c, 0x05c).rw(FUNC(rc759_state::rtc_r), FUNC(rc759_state::rtc_w));
-//  AM_RANGE(0x060, 0x06f) AM_WRITE8(crt_control_w, 0x00ff)
+//  map(0x060, 0x06f).w(FUNC(rc759_state::crt_control_w)).umask16(0x00ff);
 	map(0x070, 0x077).mirror(0x08).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x080, 0x0ff).rw(FUNC(rc759_state::nvram_r), FUNC(rc759_state::nvram_w)).umask16(0x00ff);
-//  AM_RANGE(0x100, 0x101) net
+//  map(0x100, 0x101) net
 	map(0x180, 0x1bf).rw(FUNC(rc759_state::palette_r), FUNC(rc759_state::palette_w)).umask16(0x00ff);
 	map(0x230, 0x231).w(FUNC(rc759_state::txt_irst_w));
 	map(0x240, 0x241).w(FUNC(rc759_state::txt_ca_w));
@@ -495,16 +495,16 @@ void rc759_state::rc759_io(address_map &map)
 	map(0x260, 0x260).rw(FUNC(rc759_state::centronics_control_r), FUNC(rc759_state::centronics_control_w));
 	map(0x280, 0x287).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 	map(0x288, 0x288).w(FUNC(rc759_state::floppy_control_w));
-//  AM_RANGE(0x28a, 0x28b) external printer data
-//  AM_RANGE(0x28d, 0x28d) external printer control
+//  map(0x28a, 0x28b) external printer data
+//  map(0x28d, 0x28d) external printer control
 	map(0x28e, 0x28e).rw(FUNC(rc759_state::floppy_ack_r), FUNC(rc759_state::floppy_reserve_w));
 	map(0x290, 0x290).w(FUNC(rc759_state::floppy_release_w));
-//  AM_RANGE(0x292, 0x293) AM_READWRITE8(printer_ack_r, printer_reserve_w, 0x00ff)
-//  AM_RANGE(0x294, 0x295) AM_WRITE8(printer_release_w, 0x00ff)
+//  map(0x292, 0x293).rw(FUNC(rc759_state::printer_ack_r), FUNC(rc759_state::printer_reserve_w)).umask16(0x00ff);
+//  map(0x294, 0x295).w(FUNC(rc759_state::printer_release_w)).umask16(0x00ff);
 	map(0x300, 0x30f).rw(m_isbx, FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
 	map(0x310, 0x31f).rw(m_isbx, FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0x00ff);
-//  AM_RANGE(0x320, 0x321) isbx dma ack
-//  AM_RANGE(0x330, 0x331) isbx tc
+//  map(0x320, 0x321) isbx dma ack
+//  map(0x330, 0x331) isbx tc
 }
 
 
@@ -611,7 +611,7 @@ void rc759_state::rc759(machine_config &config)
 //**************************************************************************
 
 ROM_START( rc759 )
-	ROM_REGION(0x8000, "bios", 0)
+	ROM_REGION16_LE(0x8000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "1-21", "1? Version 2.1")
 	ROMX_LOAD("rc759-1-2.1.rom", 0x0000, 0x8000, CRC(3a777d56) SHA1(a8592d61d5e1f92651a6f5e41c4ba14c9b6cc39b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "1-51", "1? Version 5.1")

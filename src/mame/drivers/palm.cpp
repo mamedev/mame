@@ -50,11 +50,11 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(palm_port_f_out);
-	DECLARE_READ8_MEMBER(palm_port_c_in);
-	DECLARE_READ8_MEMBER(palm_port_f_in);
-	DECLARE_WRITE16_MEMBER(palm_spim_out);
-	DECLARE_READ16_MEMBER(palm_spim_in);
+	void palm_port_f_out(uint8_t data);
+	uint8_t palm_port_c_in();
+	uint8_t palm_port_f_in();
+	void palm_spim_out(uint16_t data);
+	uint16_t palm_spim_in();
 	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
 	void palm_palette(palette_device &palette) const;
 
@@ -92,27 +92,27 @@ INPUT_CHANGED_MEMBER(palm_state::button_check)
 	m_maincpu->set_port_d_lines(button_state, (int)param);
 }
 
-WRITE8_MEMBER(palm_state::palm_port_f_out)
+void palm_state::palm_port_f_out(uint8_t data)
 {
 	m_port_f_latch = data;
 }
 
-READ8_MEMBER(palm_state::palm_port_c_in)
+uint8_t palm_state::palm_port_c_in()
 {
 	return 0x10;
 }
 
-READ8_MEMBER(palm_state::palm_port_f_in)
+uint8_t palm_state::palm_port_f_in()
 {
 	return m_port_f_latch;
 }
 
-WRITE16_MEMBER(palm_state::palm_spim_out)
+void palm_state::palm_spim_out(uint16_t data)
 {
 	m_spim_data = data;
 }
 
-READ16_MEMBER(palm_state::palm_spim_in)
+uint16_t palm_state::palm_spim_in()
 {
 	return m_spim_data;
 }
@@ -189,7 +189,7 @@ void palm_state::palm(machine_config &config)
 	m_maincpu->in_spim().set(FUNC(palm_state::palm_spim_in));
 	m_maincpu->spim_xch_trigger().set(FUNC(palm_state::palm_spim_exchange));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

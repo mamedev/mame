@@ -62,20 +62,7 @@ public:
 
 	void set_character_width(int value) { m_hpixels_per_column = value; }
 	void set_refresh_hack(bool hack) { m_refresh_hack = hack; }
-	template <typename... T> void set_display_callback(T &&... args) { m_display_cb = draw_character_delegate(std::forward<T>(args)...); }
-	void set_display_callback(draw_character_delegate callback) { m_display_cb = callback; }
-	template <class FunctionClass> void set_display_callback(const char *devname,
-		void (FunctionClass::*callback)(bitmap_rgb32 &, int, int, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t),
-		const char *name)
-	{
-		set_display_callback(draw_character_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_display_callback(
-		void (FunctionClass::*callback)(bitmap_rgb32 &, int, int, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t),
-		const char *name)
-	{
-		set_display_callback(draw_character_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 
 	auto drq_wr_callback() { return m_write_drq.bind(); }
 	auto irq_wr_callback() { return m_write_irq.bind(); }
@@ -83,10 +70,10 @@ public:
 	auto vrtc_wr_callback() { return m_write_vrtc.bind(); }
 	auto lc_wr_callback() { return m_write_lc.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( dack_w );
+	void dack_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( lpen_w );
 

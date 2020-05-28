@@ -14,7 +14,7 @@
 
 #include "cpu/i86/i186.h"
 #include "cpu/mcs51/mcs51.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "bus/scsi/scsi.h"
 #include "machine/6522via.h"
@@ -106,7 +106,7 @@ private:
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<output_latch_device> m_scsi_ctrl_out;
 	required_device<wd2793_device> m_fdc;
-	required_device<z80sio2_device> m_z80sio;
+	required_device<z80sio_device> m_z80sio;
 	required_device<screen_device> m_screen;
 	required_ioport m_io_config;
 	required_ioport m_io_joystick0;
@@ -132,18 +132,18 @@ private:
 	DECLARE_READ8_MEMBER(scsi_r);
 	DECLARE_WRITE8_MEMBER(scsi_w);
 	DECLARE_WRITE8_MEMBER(fdc_ctl_w);
-	DECLARE_READ8_MEMBER(nimbus_pc8031_r);
-	DECLARE_WRITE8_MEMBER(nimbus_pc8031_w);
+	uint8_t nimbus_pc8031_r(offs_t offset);
+	void nimbus_pc8031_w(offs_t offset, uint8_t data);
 	DECLARE_READ8_MEMBER(nimbus_pc8031_iou_r);
 	DECLARE_WRITE8_MEMBER(nimbus_pc8031_iou_w);
-	DECLARE_READ8_MEMBER(nimbus_pc8031_port1_r);
-	DECLARE_WRITE8_MEMBER(nimbus_pc8031_port1_w);
-	DECLARE_READ8_MEMBER(nimbus_pc8031_port3_r);
-	DECLARE_WRITE8_MEMBER(nimbus_pc8031_port3_w);
+	uint8_t nimbus_pc8031_port1_r();
+	void nimbus_pc8031_port1_w(uint8_t data);
+	uint8_t nimbus_pc8031_port3_r();
+	void nimbus_pc8031_port3_w(uint8_t data);
 	DECLARE_READ8_MEMBER(nimbus_iou_r);
 	DECLARE_WRITE8_MEMBER(nimbus_iou_w);
-	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_porta_w);
-	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_portb_w);
+	void nimbus_sound_ay8910_porta_w(uint8_t data);
+	void nimbus_sound_ay8910_portb_w(uint8_t data);
 	DECLARE_READ8_MEMBER(nimbus_mouse_js_r);
 	DECLARE_WRITE8_MEMBER(nimbus_mouse_js_w);
 	DECLARE_READ16_MEMBER(nimbus_video_io_r);
@@ -156,7 +156,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sio_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_drq_w);
-	DECLARE_WRITE8_MEMBER(nimbus_via_write_portb);
+	void nimbus_via_write_portb(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_cd);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_io);
@@ -175,7 +175,7 @@ private:
 	void write_pixel_data(uint16_t x, uint16_t y, uint16_t    data);
 	void change_palette(uint8_t bank, uint16_t colours);
 	void external_int(uint8_t vector, bool state);
-	DECLARE_READ8_MEMBER(cascade_callback);
+	uint8_t cascade_callback();
 	void nimbus_bank_memory();
 	void memory_reset();
 	void fdc_reset();

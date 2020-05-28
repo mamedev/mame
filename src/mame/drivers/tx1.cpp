@@ -8,7 +8,7 @@
 
     Games supported:
         * TX-1 (1983) [3 sets]
-        * Buggy Boy (1985)
+        * Buggy Boy (1985) [2 sets]
         * Buggy Boy Junior (1986)
 
     ROMs wanted:
@@ -538,6 +538,12 @@ ROM_START( tx1jc )
 ROM_END
 
 
+/*
+    The game is comprised of three boards:
+    - Sound Board (labeled TC033A, top small board)
+    - CPU Board (labeled TC031, middle board, uses 15.000 MHz xtal)
+    - Video Board (labeled TC032, bottom board, uses 18.000 MHz xtal)
+*/
 ROM_START( buggyboy )
 	ROM_REGION( 0x100000, "main_cpu", 0 )
 	ROM_LOAD16_BYTE( "bug1a.230", 0x20000, 0x8000, CRC(92797c25) SHA1(8f7434abbd7f557d3202abb01b1e4899c82c67a5) )
@@ -545,6 +551,104 @@ ROM_START( buggyboy )
 
 	ROM_LOAD16_BYTE( "bug2d.231", 0xf0000, 0x4000, CRC(f67bd593) SHA1(b6e3f9d5534b0addbba4aa4c813dda21a27cafa2) )
 	ROM_LOAD16_BYTE( "bug5d.174", 0xf0001, 0x4000, CRC(d0dd6ffc) SHA1(377581ace86ea0f713aa7dc8f96f27cbcda1b2ea) )
+
+	ROM_LOAD16_BYTE( "bug3b.232", 0xf8000, 0x4000, CRC(43cce3f0) SHA1(17de3728d809d386f6a7a330c8c8701975d4ebed) )
+	ROM_LOAD16_BYTE( "bug6b.175", 0xf8001, 0x4000, CRC(8f000dfa) SHA1(5fd78a03a00f547bbb431839f78a8d10a4ba8e3e) )
+
+	ROM_REGION( 0x100000, "math_cpu", 0 )
+	ROM_LOAD16_BYTE( "bug8a.061", 0x04000, 0x2000, CRC(512291cd) SHA1(60f87133c86b88b982ba4680f96d0ac55970cb8d) )
+	ROM_LOAD16_BYTE( "bug7a.060", 0x04001, 0x2000, CRC(d24dfdef) SHA1(37d05a8bf9567380523df01265afb9780e39ea2a) )
+
+	ROM_REGION( 0x10000, "soundbrd:audio_cpu", 0 )
+	ROM_LOAD( "bug35.11", 0x00000, 0x4000,  CRC(7aa16e9e) SHA1(ea54e56270f70351a62a78fa32027bb41ef9861e) )
+
+	ROM_REGION( 0x8000, "char_tiles", 0 )
+	ROM_LOAD( "bug34a",     0x00000, 0x4000, CRC(8c64eb3c) SHA1(e0846f9a4811a0b6561d7a9aa7d50c23ced8d1d3) )
+	ROM_LOAD( "bug33a.168", 0x04000, 0x4000, CRC(b500d683) SHA1(c9f92930c815a947fbd9a3846fd9580671da324f) )
+
+	ROM_REGION( 0x40000, "obj_tiles", 0 )
+	ROM_LOAD( "bug26.275", 0x00000, 0x4000, CRC(fc6fce64) SHA1(4cea5796c26980455bdc0f8fcdb8e719caa8041f) )
+	ROM_LOAD( "bug27.245", 0x04000, 0x4000, CRC(54b9a9dd) SHA1(4f4f29a459991501013cdfffd34b50eed1cde850) )
+	ROM_LOAD( "bug19.274", 0x08000, 0x4000, CRC(3392c2ef) SHA1(a4aa4f24517da16495be073aa590cda81d9fca49) )
+	ROM_LOAD( "bug20.244", 0x0c000, 0x4000, CRC(9ee4c236) SHA1(51155193e470a82deb5e3f1979ce112ada39b705) )
+
+	ROM_LOAD( "bug28.243", 0x10000, 0x4000, CRC(feef6c27) SHA1(61679d67a6ef85965078e3ddd11c178a1a55f223) )
+	ROM_LOAD( "bug29.212", 0x14000, 0x4000, CRC(f570e00b) SHA1(ced4b9a4a324a4c92c08e088fa116469b2878f55) )
+	ROM_LOAD( "bug21.242", 0x18000, 0x4000, CRC(088fef40) SHA1(a0c866c32857690915a33b0810219fb3cbf24f24) )
+	ROM_LOAD( "bug22.211", 0x1c000, 0x4000, CRC(5ec02630) SHA1(75233de03461016d1bc7c4ece0502e16e53c3351) )
+
+	ROM_LOAD( "bug30.186", 0x20000, 0x4000, CRC(5c2ecabf) SHA1(5be25ddc1e2aac4579a39e405f8eac919f4917bd) )
+	ROM_RELOAD(            0x34000, 0x4000 )
+	ROM_LOAD( "bug32.158", 0x24000, 0x4000, CRC(125461f2) SHA1(9dd94344cfc7a17670d6f512ecd5947f198154c0) )
+	ROM_RELOAD(            0x30000, 0x4000 )
+	ROM_LOAD( "bug23.185", 0x28000, 0x4000, CRC(cafb4d4a) SHA1(aa24becdf354abca507dbd77fa18d05bea685285) )
+	ROM_RELOAD(            0x3c000, 0x4000 )
+	ROM_LOAD( "bug25.157", 0x2c000, 0x4000, CRC(80c4e045) SHA1(be3b537d3ed3ee74fc51059aa744dca4d63431f6) )
+	ROM_RELOAD(            0x38000, 0x4000 )
+
+	ROM_REGION( 0x8000, "road", 0 )
+	ROM_LOAD( "bug12.58", 0x0000, 0x2000, CRC(bd34d55c) SHA1(05a719a6eff5af3aaaa1e0ee783b18597582ed64) )
+	ROM_LOAD( "bug11.57", 0x2000, 0x2000, CRC(a44d43eb) SHA1(c4d68c7e123506acaa6adc353579cac19ecb3a9d) )
+	ROM_LOAD( "bb3.137",  0x4000, 0x0200, CRC(ad76f3fb) SHA1(bf96f903b32e009a2592df0f28cc3e20b039f4d4) )
+	ROM_LOAD( "bb4.138",  0x4200, 0x0200, CRC(e4ca4ea0) SHA1(0c8dd6f87bddcc709de42e0c4a59be3c19c5aa8a) )
+	ROM_LOAD( "bb5.139",  0x4400, 0x0200, CRC(e2577a9a) SHA1(6408f815a1357712473c54a8603137a58431781b) )
+	ROM_LOAD( "bb6.94",   0x4600, 0x0200, CRC(ad43e02a) SHA1(c50a398020508f52ddf8d45881f211d17d096fa1) )
+
+	ROM_REGION16_LE( 0x10000, "au_data", 0 )
+	ROM_LOAD16_BYTE( "bug9.170",  0x0000, 0x4000, CRC(7d84135b) SHA1(3c669c4e796e83672aceeb6de1aeea28f9f2fef0) )
+	ROM_LOAD16_BYTE( "bug10.171", 0x0001, 0x4000, CRC(b518dd6f) SHA1(7cefa2f9438306c81dc83cd260928c835eb9b712) )
+	ROM_LOAD16_BYTE( "bb1.245",   0x8000, 0x0200, CRC(0ddbd36d) SHA1(7a08901a350c315d46ab8d0aa881db384b9f37d2) )
+	ROM_LOAD16_BYTE( "bb2.220",   0x8001, 0x0200, CRC(71d47de1) SHA1(2da9aeb3f2ebb1114631c8042a37c4f4c18e741b) )
+
+	ROM_REGION( 0x10000, "obj_map", 0 )
+	ROM_LOAD( "bug16.210", 0x0000, 0x4000, CRC(8b64409e) SHA1(1fb4c6923e6a9e1f2a63a2c335b63e2bdc44b61f) )
+	ROM_LOAD( "bug14.209", 0x4000, 0x4000, CRC(4e765282) SHA1(f7d69d39823a8b33bd0e5b1bd78a5d68a293e221) )
+	ROM_LOAD( "bug17.182", 0x8000, 0x4000, CRC(a5d84df6) SHA1(4e33ef0bee383e0d47b0c679cd2a54edb7ca0e3e) )
+	ROM_LOAD( "bug15.181", 0xc000, 0x4000, CRC(d519de10) SHA1(535d05e11af65be65f3d9924b0c48faf8dcfd1bf) )
+
+	ROM_REGION( 0x6000, "obj_luts", 0 )
+	ROM_LOAD( "bug13.124", 0x0000, 0x2000, CRC(53604d7a) SHA1(bfa304cd885162ece7a5f54988d9880fc541eb3a) )
+	ROM_LOAD( "bug18.156", 0x2000, 0x4000, CRC(e58321a6) SHA1(81be87d3c6046bb375c74362dc940f0269b39d1d) )
+
+	ROM_REGION( 0x10000, "proms", 0 )
+	ROM_LOAD( "bb10.191", 0x000,  0x100, CRC(f2368398) SHA1(53f28dba11bb494d033bb279abf138975c84b20d) )
+	ROM_LOAD( "bb11.192", 0x100,  0x100, CRC(bf77f624) SHA1(b042d293d2094dbabb32d628fd9addd832f084ef) )
+	ROM_LOAD( "bb12.193", 0x200,  0x100, CRC(10a2e8d1) SHA1(51a8c51ecbbb7bd04ae46fb5598d2c8de8097581) )
+	ROM_LOAD( "bb13.194", 0x300,  0x100, CRC(40d10dfa) SHA1(e40b4c424827937fec6df1a27b19b8dc09d3274a) )
+
+	ROM_LOAD( "bb10.104", 0x000,  0x100, CRC(f2368398) SHA1(53f28dba11bb494d033bb279abf138975c84b20d) )
+	ROM_LOAD( "bb11.105", 0x100,  0x100, CRC(bf77f624) SHA1(b042d293d2094dbabb32d628fd9addd832f084ef) )
+	ROM_LOAD( "bb12.106", 0x200,  0x100, CRC(10a2e8d1) SHA1(51a8c51ecbbb7bd04ae46fb5598d2c8de8097581) )
+	ROM_LOAD( "bb13.107", 0x300,  0x100, CRC(40d10dfa) SHA1(e40b4c424827937fec6df1a27b19b8dc09d3274a) )
+
+	ROM_LOAD( "bb10.49",  0x000,  0x100, CRC(f2368398) SHA1(53f28dba11bb494d033bb279abf138975c84b20d) )
+	ROM_LOAD( "bb11.50",  0x100,  0x100, CRC(bf77f624) SHA1(b042d293d2094dbabb32d628fd9addd832f084ef) )
+	ROM_LOAD( "bb12.51",  0x200,  0x100, CRC(10a2e8d1) SHA1(51a8c51ecbbb7bd04ae46fb5598d2c8de8097581) )
+	ROM_LOAD( "bb13.52",  0x300,  0x100, CRC(40d10dfa) SHA1(e40b4c424827937fec6df1a27b19b8dc09d3274a) )
+
+	ROM_LOAD( "bb14.199", 0x400,  0x100, CRC(0b821e0b) SHA1(b9401b9364fb99e15f562df91dcfdec1b989af2d) )
+	ROM_LOAD( "bb14.197", 0x400,  0x100, CRC(0b821e0b) SHA1(b9401b9364fb99e15f562df91dcfdec1b989af2d) )
+	ROM_LOAD( "bb14.137", 0x400,  0x100, CRC(0b821e0b) SHA1(b9401b9364fb99e15f562df91dcfdec1b989af2d) )
+
+	ROM_LOAD( "bb9.271",  0x500,  0x800, CRC(6fc807d1) SHA1(3442cbb21bbedf6291a3fe1747d479445f613d26) )
+	ROM_LOAD( "bb9.238",  0xd00,  0x800, CRC(6fc807d1) SHA1(3442cbb21bbedf6291a3fe1747d479445f613d26) )
+
+	ROM_LOAD( "bb7.16",   0x1500, 0x100, CRC(b57b609f) SHA1(2dea375437c62cb4c64b21d5e6ddc09397b6ab35) )
+	ROM_LOAD( "bb7.18",   0x1500, 0x100, CRC(b57b609f) SHA1(2dea375437c62cb4c64b21d5e6ddc09397b6ab35) )
+	ROM_LOAD( "bb7.20",   0x1500, 0x100, CRC(b57b609f) SHA1(2dea375437c62cb4c64b21d5e6ddc09397b6ab35) )
+
+	ROM_LOAD( "bb8.152",  0x1600, 0x100, CRC(2330ff4f) SHA1(e86eb63ce47572bcbbf325f9bb749d10d96bf2e7) )
+
+	/* TODO: PALs */
+ROM_END
+
+ROM_START( buggyboyb )
+	ROM_REGION( 0x100000, "main_cpu", 0 )
+	ROM_LOAD16_BYTE( "bug1a.230", 0x20000, 0x8000, CRC(92797c25) SHA1(8f7434abbd7f557d3202abb01b1e4899c82c67a5) )
+	ROM_LOAD16_BYTE( "bug4a.173", 0x20001, 0x8000, CRC(40ce3930) SHA1(4bf62ebeea1549a13a21a32cb860717f064b186a) )
+
+	ROM_LOAD16_BYTE( "bug2b.231", 0xf0000, 0x4000, CRC(44ebf66d) SHA1(507417754e3fc2b9e03a2c477da0ae3ee49a8e11) )
+	ROM_LOAD16_BYTE( "bug5b.174", 0xf0001, 0x4000, CRC(d02dd360) SHA1(00ee44ff31b5dc978248356593ca797bc291f636) )
 
 	ROM_LOAD16_BYTE( "bug3b.232", 0xf8000, 0x4000, CRC(43cce3f0) SHA1(17de3728d809d386f6a7a330c8c8701975d4ebed) )
 	ROM_LOAD16_BYTE( "bug6b.175", 0xf8001, 0x4000, CRC(8f000dfa) SHA1(5fd78a03a00f547bbb431839f78a8d10a4ba8e3e) )
@@ -742,5 +846,6 @@ ROM_END
 GAMEL( 1983, tx1,        0,        tx1,      0, tx1_state, empty_init, ROT0, "Tatsumi (Atari/Namco/Taito license)", "TX-1 (World)",        MACHINE_IMPERFECT_SOUND, layout_tx1 )
 GAMEL( 1983, tx1jb,      tx1,      tx1,      0, tx1_state, empty_init, ROT0, "Tatsumi",                             "TX-1 (Japan rev. B)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
 GAMEL( 1983, tx1jc,      tx1,      tx1,      0, tx1_state, empty_init, ROT0, "Tatsumi",                             "TX-1 (Japan rev. C)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1985, buggyboy,   0,        buggyboy, 0, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy/Speed Buggy (cockpit)",          0, layout_buggyboy )
+GAMEL( 1985, buggyboy,   0,        buggyboy, 0, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy/Speed Buggy (cockpit, rev. D)",  0, layout_buggyboy )
+GAMEL( 1986, buggyboyb,  buggyboy, buggyboy, 0, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy/Speed Buggy (cockpit, rev. B)",  0, layout_buggyboy )
 GAMEL( 1986, buggyboyjr, buggyboy, buggybjr, 0, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy Junior/Speed Buggy (upright)",   0, layout_buggybjr )

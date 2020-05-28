@@ -21,8 +21,8 @@ public:
 
 	es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(host_r);
-	DECLARE_WRITE8_MEMBER(host_w);
+	uint8_t host_r(address_space &space, offs_t offset);
+	void host_w(offs_t offset, uint8_t data);
 
 	int16_t ser_r(int offset);
 	void ser_w(int offset, int16_t data);
@@ -129,11 +129,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual space_config_vector memory_space_config() const override;
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override;
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override;
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int linenum, int state) override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

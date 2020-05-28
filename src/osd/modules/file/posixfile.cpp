@@ -50,9 +50,9 @@
 #include <vector>
 
 #include <fcntl.h>
-#include <limits.h>
+#include <climits>
 #include <sys/stat.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
 
 

@@ -78,13 +78,13 @@ constexpr u8 CR_CTRO    = 0x80U;
 } // anonymous namespace
 
 
-DEFINE_DEVICE_TYPE(M6500_1, m6500_1_device, "m6500_1", "MOS M6500/1");
+DEFINE_DEVICE_TYPE(M6500_1, m6500_1_device, "m6500_1", "MOS Technology 6500/1");
 
 
 m6500_1_device::m6500_1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: m6502_mcu_device(mconfig, M6500_1, tag, owner, clock)
-	, m_port_in_cb{ { *this }, { *this }, { *this }, { *this } }
-	, m_port_out_cb{ { *this }, { *this }, { *this }, { *this } }
+	, m_port_in_cb{ *this }
+	, m_port_out_cb{ *this }
 	, m_cntr_out_cb{ *this }
 	, m_cr{ 0x00U }
 	, m_port_in{ 0xffU, 0xffU, 0xffU, 0xffU }
@@ -103,7 +103,7 @@ m6500_1_device::m6500_1_device(machine_config const &mconfig, char const *tag, d
 }
 
 
-WRITE8_MEMBER(m6500_1_device::pa_w)
+void m6500_1_device::pa_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6500_1_device::set_port_in<0>), this), unsigned(data));
 }
@@ -134,12 +134,8 @@ void m6500_1_device::device_resolve_objects()
 {
 	m6502_mcu_device::device_resolve_objects();
 
-	for (devcb_read8 &cb : m_port_in_cb)
-		cb.resolve();
-
-	for (devcb_write8 &cb : m_port_out_cb)
-		cb.resolve_safe();
-
+	m_port_in_cb.resolve_all();
+	m_port_out_cb.resolve_all_safe();
 	m_cntr_out_cb.resolve_safe();
 }
 
@@ -189,12 +185,12 @@ void m6500_1_device::device_reset()
 }
 
 
-u64 m6500_1_device::execute_clocks_to_cycles(u64 clocks) const
+u64 m6500_1_device::execute_clocks_to_cycles(u64 clocks) const noexcept
 {
 	return (clocks + 1) / 2;
 }
 
-u64 m6500_1_device::execute_cycles_to_clocks(u64 cycles) const
+u64 m6500_1_device::execute_cycles_to_clocks(u64 cycles) const noexcept
 {
 	return cycles * 2;
 }
@@ -303,7 +299,7 @@ READ8_MEMBER(m6500_1_device::read_port)
 	if (!machine().side_effects_disabled() && m_port_in_cb[offset])
 	{
 		u8 const prev(m_port_in[offset]);
-		m_port_in[offset] = m_port_in_cb[offset](space);
+		m_port_in[offset] = m_port_in_cb[offset]();
 		if (!offset)
 		{
 			u8 const diff((prev ^ m_port_in[0]) & m_port_buf[0]);
@@ -322,12 +318,12 @@ WRITE8_MEMBER(m6500_1_device::write_port)
 {
 	u8 const prev(m_port_in[offset] & m_port_buf[offset]);
 	if (m_port_buf[offset] != data)
-		m_port_out_cb[offset](space, m_port_buf[offset] = data);
+		m_port_out_cb[offset](m_port_buf[offset] = data);
 
 	if (!offset)
 	{
 		if (!machine().side_effects_disabled() && m_port_in_cb[0])
-			m_port_in[0] = m_port_in_cb[0](space);
+			m_port_in[0] = m_port_in_cb[0]();
 		u8 const effective(m_port_in[0] & data);
 		u8 const diff(prev ^ effective);
 		if (BIT(diff, 0) && BIT(effective, 0))

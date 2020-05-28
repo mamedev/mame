@@ -95,9 +95,9 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	DECLARE_CUSTOM_INPUT_MEMBER(outhole_x0);
-	DECLARE_CUSTOM_INPUT_MEMBER(drop_target_x0);
-	DECLARE_CUSTOM_INPUT_MEMBER(kickback_x3);
+	template <int Param> DECLARE_READ_LINE_MEMBER(outhole_x0);
+	template <int Param> DECLARE_READ_LINE_MEMBER(drop_target_x0);
+	template <int Param> DECLARE_READ_LINE_MEMBER(kickback_x3);
 
 	void by35(machine_config &config);
 	void nuovo(machine_config &config);
@@ -143,15 +143,15 @@ protected:
 		, m_sound_int_handler(*this)
 	{ }
 
-	DECLARE_READ8_MEMBER(u10_a_r);
-	DECLARE_WRITE8_MEMBER(u10_a_w);
-	DECLARE_READ8_MEMBER(u10_b_r);
-	DECLARE_WRITE8_MEMBER(u10_b_w);
-	DECLARE_READ8_MEMBER(u11_a_r);
-	DECLARE_WRITE8_MEMBER(u11_a_w);
-	DECLARE_WRITE8_MEMBER(u11_b_w);
-	DECLARE_READ8_MEMBER(nibble_nvram_r);
-	DECLARE_WRITE8_MEMBER(nibble_nvram_w);
+	uint8_t u10_a_r();
+	void u10_a_w(uint8_t data);
+	uint8_t u10_b_r();
+	void u10_b_w(uint8_t data);
+	uint8_t u11_a_r();
+	void u11_a_w(uint8_t data);
+	void u11_b_w(uint8_t data);
+	uint8_t nibble_nvram_r(offs_t offset);
+	void nibble_nvram_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
 	DECLARE_READ_LINE_MEMBER(u10_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
@@ -236,13 +236,12 @@ void by35_state::by35_map(address_map &map)
 	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0200, 0x02ff).ram().rw(FUNC(by35_state::nibble_nvram_r), FUNC(by35_state::nibble_nvram_w)).share("nvram");
-	map(0x1000, 0x7fff).rom(); // AM_REGION("roms", 0 )
+	map(0x1000, 0x7fff).rom(); // .region("roms", 0 );
 }
 
 void by35_state::nuovo_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
-//  AM_RANGE(0x0000, 0x007f) AM_RAM     // Schematics infer that the M6802 internal RAM is disabled.
 	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0xffff).rom();
@@ -402,7 +401,7 @@ static INPUT_PORTS_START( by35 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 //  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, outhole_x0, (void *)0x07) // PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, outhole_x0<0x07>) // PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -843,14 +842,14 @@ static INPUT_PORTS_START( playboy )
 	PORT_DIPSETTING(    0x40, "Extra Ball or Special Held Until Collected")
 
 	PORT_MODIFY("X0")   /* Drop Target switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x00) // PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x01) // PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x02) // PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x03) // PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x04) // PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x00>) // PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x01>) // PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x02>) // PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x03>) // PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x04>) // PORT_CODE(KEYCODE_BACKSLASH)
 
 	PORT_MODIFY("X3")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, kickback_x3, (void *)0x37) // PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, kickback_x3<0x37>) // PORT_CODE(KEYCODE_Q)
 
 	PORT_START("RT2")
 	PORT_ADJUSTER( 50, "RT2 - Tone Sustain" )
@@ -952,10 +951,11 @@ static INPUT_PORTS_START( frontier )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER( by35_state::outhole_x0 )
+template <int Param>
+READ_LINE_MEMBER( by35_state::outhole_x0 )
 {
-	int bit_shift = ((uintptr_t)param & 0x07);
-	int port = (((uintptr_t)param >> 4) & 0x07);
+	int bit_shift = (Param & 0x07);
+	int port = ((Param >> 4) & 0x07);
 
 	/* Here we simulate the ball sitting in the Outhole so the Outhole Solenoid can release it */
 
@@ -965,10 +965,11 @@ CUSTOM_INPUT_MEMBER( by35_state::outhole_x0 )
 	return ((m_io_hold_x[port] >> bit_shift) & 1);
 }
 
-CUSTOM_INPUT_MEMBER( by35_state::kickback_x3 )
+template <int Param>
+READ_LINE_MEMBER( by35_state::kickback_x3 )
 {
-	int bit_shift = ((uintptr_t)param & 0x07);
-	int port = (((uintptr_t)param >> 4) & 0x07);
+	int bit_shift = (Param & 0x07);
+	int port = ((Param >> 4) & 0x07);
 
 	/* Here we simulate the ball sitting in a Saucer so the Saucer Solenoid can release it */
 
@@ -978,12 +979,13 @@ CUSTOM_INPUT_MEMBER( by35_state::kickback_x3 )
 	return ((m_io_hold_x[port] >> bit_shift) & 1);
 }
 
-CUSTOM_INPUT_MEMBER( by35_state::drop_target_x0 )
+template <int Param>
+READ_LINE_MEMBER( by35_state::drop_target_x0 )
 {
 	/* Here we simulate the Drop Target switch states so the Drop Target Reset Solenoid can also release the switches */
 
-	int bit_shift = ((uintptr_t)param & 0x07);
-	int port = (((uintptr_t)param >> 4) & 0x07);
+	int bit_shift = (Param & 0x07);
+	int port = ((Param >> 4) & 0x07);
 
 	switch (bit_shift)
 	{
@@ -1006,12 +1008,12 @@ CUSTOM_INPUT_MEMBER( by35_state::drop_target_x0 )
 	return ((m_io_hold_x[port] >> bit_shift) & 1);
 }
 
-READ8_MEMBER(by35_state::nibble_nvram_r)
+uint8_t by35_state::nibble_nvram_r(offs_t offset)
 {
 	return (m_nvram[offset] | 0x0f);
 }
 
-WRITE8_MEMBER(by35_state::nibble_nvram_w)
+void by35_state::nibble_nvram_w(offs_t offset, uint8_t data)
 {
 	m_nvram[offset] = (data | 0x0f);
 }
@@ -1092,12 +1094,12 @@ WRITE_LINE_MEMBER( by35_state::u11_cb2_w )
 	m_u11_cb2 = state;
 }
 
-READ8_MEMBER( by35_state::u10_a_r )
+uint8_t by35_state::u10_a_r()
 {
 	return m_u10a;
 }
 
-WRITE8_MEMBER( by35_state::u10_a_w )
+void by35_state::u10_a_w(uint8_t data)
 {
 	LOG("Writing %02x to U10 PIA, CB2 state is %01x,  CA2 state is %01x, Lamp_Dec is %02x\n",data, m_u10_cb2, m_u10_ca2, (m_lamp_decode & 0x0f));
 
@@ -1135,7 +1137,7 @@ WRITE8_MEMBER( by35_state::u10_a_w )
 	m_u10a = data;
 }
 
-READ8_MEMBER( by35_state::u10_b_r )
+uint8_t by35_state::u10_b_r()
 {
 	uint8_t data = 0;
 
@@ -1169,17 +1171,17 @@ READ8_MEMBER( by35_state::u10_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( by35_state::u10_b_w )
+void by35_state::u10_b_w(uint8_t data)
 {
 	m_u10b = data;
 }
 
-READ8_MEMBER( by35_state::u11_a_r )
+uint8_t by35_state::u11_a_r()
 {
 	return m_u11a;
 }
 
-WRITE8_MEMBER( by35_state::u11_a_w )
+void by35_state::u11_a_w(uint8_t data)
 {
 	if (BIT(data, 0)==0)            // Display Credit/Ball
 	{
@@ -1227,7 +1229,7 @@ WRITE8_MEMBER( by35_state::u11_a_w )
 	m_u11a = data;
 }
 
-WRITE8_MEMBER( by35_state::u11_b_w )
+void by35_state::u11_b_w(uint8_t data)
 {
 	if (!m_u11_cb2)
 	{
@@ -1499,8 +1501,9 @@ void by35_state::nuovo(machine_config &config)
 {
 	by35(config);
 
-	M6802(config.replace(), m_maincpu, 2000000); // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
-	m_maincpu->set_addrmap(AS_PROGRAM, &by35_state::nuovo_map);
+	m6802_cpu_device &maincpu(M6802(config.replace(), m_maincpu, 2000000)); // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
+	maincpu.set_addrmap(AS_PROGRAM, &by35_state::nuovo_map);
+	maincpu.set_ram_enable(false); // Schematics imply that the M6802 internal RAM is disabled.
 }
 
 void by35_state::as2888(machine_config &config)

@@ -25,9 +25,9 @@ void apexc_state::machine_start()
     Punch a tape character
 */
 
-WRITE8_MEMBER(apexc_state::tape_write)
+void apexc_state::tape_write(uint8_t data)
 {
-	m_tape_puncher->write(m_maincpu->space(AS_PROGRAM), 0, data);
+	m_tape_puncher->write(data);
 	teletyper_putchar(data & 0x1f); /* display on 'screen' */
 }
 

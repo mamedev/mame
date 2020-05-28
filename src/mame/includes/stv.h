@@ -33,6 +33,9 @@ public:
 	void stv_slot(machine_config &config);
 	void stv_cartslot(machine_config &config);
 	void stv(machine_config &config);
+	void critcrsh(machine_config &config);
+	void magzun(machine_config &config);
+	void stvmp(machine_config &config);
 	void hopper(machine_config &config);
 	void batmanfr(machine_config &config);
 	void shienryu(machine_config &config);
@@ -61,8 +64,6 @@ public:
 	void init_seabass();
 	void init_stv();
 	void init_thunt();
-	void init_critcrsh();
-	void init_stvmp();
 	void init_sasissu();
 	void init_dnmtdeka();
 	void init_ffreveng();
@@ -86,7 +87,6 @@ public:
 	void init_znpwfv();
 	void init_othellos();
 	void init_mausuke();
-	void init_hopper();
 
 private:
 	DECLARE_READ8_MEMBER(stv_ioga_r);
@@ -96,17 +96,9 @@ private:
 	DECLARE_WRITE8_MEMBER(magzun_ioga_w);
 	DECLARE_READ8_MEMBER(stvmp_ioga_r);
 	DECLARE_WRITE8_MEMBER(stvmp_ioga_w);
-	DECLARE_READ32_MEMBER(stv_ioga_r32);
-	DECLARE_WRITE32_MEMBER(stv_ioga_w32);
-	DECLARE_READ32_MEMBER(critcrsh_ioga_r32);
-	DECLARE_READ32_MEMBER(stvmp_ioga_r32);
-	DECLARE_WRITE32_MEMBER(stvmp_ioga_w32);
-	DECLARE_READ32_MEMBER(magzun_ioga_r32);
-	DECLARE_WRITE32_MEMBER(magzun_ioga_w32);
 	DECLARE_READ32_MEMBER(magzun_hef_hack_r);
 	DECLARE_READ32_MEMBER(magzun_rx_hack_r);
 	DECLARE_WRITE8_MEMBER(hop_ioga_w);
-	DECLARE_WRITE32_MEMBER(hop_ioga_w32);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart1 ) { return load_cart(image, m_cart1); }
@@ -159,16 +151,20 @@ private:
 	required_device<sega_billboard_device> m_billboard;
 	uint16_t crypt_read_callback(uint32_t addr);
 
-	DECLARE_READ8_MEMBER(pdr1_input_r);
-	DECLARE_READ8_MEMBER(pdr2_input_r);
-	DECLARE_WRITE8_MEMBER(pdr1_output_w);
-	DECLARE_WRITE8_MEMBER(pdr2_output_w);
+	uint8_t pdr1_input_r();
+	uint8_t pdr2_input_r();
+	void pdr1_output_w(uint8_t data);
+	void pdr2_output_w(uint8_t data);
 	void stv_select_game(int gameno);
 	uint8_t     m_prev_gamebank_select;
 
 	void sound_mem(address_map &map);
 	void scsp_mem(address_map &map);
 	void stv_mem(address_map &map);
+	void critcrsh_mem(address_map &map);
+	void magzun_mem(address_map &map);
+	void stvmp_mem(address_map &map);
+	void hopper_mem(address_map &map);
 	void stvcd_mem(address_map &map);
 };
 

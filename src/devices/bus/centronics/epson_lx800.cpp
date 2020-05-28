@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /**********************************************************************
 
@@ -92,7 +92,7 @@ void epson_lx800_device::device_add_mconfig(machine_config &config)
 
 	/* gate array */
 	e05a03_device &ic3b(E05A03(config, "ic3b", 0));
-	ic3b.pe_lp_wr_callback().set(FUNC(epson_lx800_device::paperempty_led_w));
+	ic3b.pe_lp_wr_callback().set_output("paperout_led");
 	ic3b.reso_wr_callback().set(FUNC(epson_lx800_device::reset_w));
 	ic3b.pe_wr_callback().set(FUNC(epson_lx800_device::centronics_pe_w));
 	ic3b.data_rd_callback().set(FUNC(epson_lx800_device::centronics_data_r));
@@ -193,7 +193,8 @@ epson_lx800_device::epson_lx800_device(const machine_config &mconfig, device_typ
 	device_t(mconfig, type, tag, owner, clock),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
-	m_beep(*this, "beeper")
+	m_beep(*this, "beeper"),
+	m_online_led(*this, "online_led")
 {
 }
 
@@ -204,6 +205,7 @@ epson_lx800_device::epson_lx800_device(const machine_config &mconfig, device_typ
 
 void epson_lx800_device::device_start()
 {
+	m_online_led.resolve();
 }
 
 
@@ -230,7 +232,7 @@ void epson_lx800_device::device_reset()
  * PA6             not used
  * PA7  R   P/S    P/S signal from the optional interface
  */
-READ8_MEMBER( epson_lx800_device::porta_r )
+uint8_t epson_lx800_device::porta_r(offs_t offset)
 {
 	uint8_t result = 0;
 
@@ -245,7 +247,7 @@ READ8_MEMBER( epson_lx800_device::porta_r )
 	return result;
 }
 
-WRITE8_MEMBER( epson_lx800_device::porta_w )
+void epson_lx800_device::porta_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: lx800_porta_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> carriage: %d, paper feed: %d\n", BIT(data, 0), BIT(data, 2));
@@ -260,7 +262,7 @@ WRITE8_MEMBER( epson_lx800_device::porta_w )
  * PC6   W  FIRE       drive pulse width signal
  * PC7   W  BUZZER     buzzer signal
  */
-READ8_MEMBER( epson_lx800_device::portc_r )
+uint8_t epson_lx800_device::portc_r(offs_t offset)
 {
 	uint8_t result = 0;
 
@@ -271,12 +273,12 @@ READ8_MEMBER( epson_lx800_device::portc_r )
 	return result;
 }
 
-WRITE8_MEMBER( epson_lx800_device::portc_w )
+void epson_lx800_device::portc_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: lx800_portc_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
 
-	machine().output().set_value("online_led", !BIT(data, 2));
+	m_online_led = !BIT(data, 2);
 	m_beep->set_state(!BIT(data, 7));
 }
 
@@ -315,7 +317,7 @@ READ_LINE_MEMBER( epson_lx800_device::an5_r )
     GATE ARRAY
 ***************************************************************************/
 
-READ8_MEMBER( epson_lx800_device::centronics_data_r )
+uint8_t epson_lx800_device::centronics_data_r()
 {
 	logerror("centronics: data read\n");
 	return 0x55;
@@ -324,12 +326,6 @@ READ8_MEMBER( epson_lx800_device::centronics_data_r )
 WRITE_LINE_MEMBER( epson_lx800_device::centronics_pe_w )
 {
 	logerror("centronics: pe = %d\n", state);
-}
-
-WRITE_LINE_MEMBER( epson_lx800_device::paperempty_led_w )
-{
-	logerror("setting paperout led: %d\n", state);
-	machine().output().set_value("paperout_led", state);
 }
 
 WRITE_LINE_MEMBER( epson_lx800_device::reset_w )

@@ -27,19 +27,17 @@ public:
 	// construction/destruction
 	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename... T> void set_display_callback(T &&... args) { m_display_cb = display_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 	void set_auto_configure_screen(bool auto_configure_screen) { m_auto_configure_screen = auto_configure_screen; }
 	void set_external_skew(int skew) { m_external_skew = skew; }
 
-	DECLARE_WRITE16_MEMBER( address16_w );
-	DECLARE_WRITE16_MEMBER( data16_w );
-	DECLARE_READ16_MEMBER( status16_r );
-	DECLARE_READ16_MEMBER( data16_r );
+	// 16-bit bus interface
+	void write16(offs_t offset, uint16_t data);
+	uint16_t read16(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER( address8_w );
-	DECLARE_WRITE8_MEMBER( data8_w );
-	DECLARE_READ8_MEMBER( status8_r );
-	DECLARE_READ8_MEMBER( data8_r );
+	// 8-bit bus interface
+	void write8(offs_t offset, uint8_t data);
+	uint8_t read8(offs_t offset);
 
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual const tiny_rom_entry *device_rom_region() const override;

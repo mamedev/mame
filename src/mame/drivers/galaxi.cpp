@@ -70,8 +70,8 @@ public:
 	void lastfour(machine_config &config);
 	void magjoker(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_READ_LINE_MEMBER(ticket_r);
+	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 protected:
 	virtual void machine_start() override;
@@ -109,14 +109,14 @@ private:
 	int       m_ticket;
 	uint16_t    m_out;
 
-	DECLARE_WRITE16_MEMBER(bg1_w);
-	DECLARE_WRITE16_MEMBER(bg2_w);
-	DECLARE_WRITE16_MEMBER(bg3_w);
-	DECLARE_WRITE16_MEMBER(bg4_w);
-	DECLARE_WRITE16_MEMBER(fg_w);
-	DECLARE_WRITE16_MEMBER(_500000_w);
-	DECLARE_WRITE16_MEMBER(_500002_w);
-	DECLARE_WRITE16_MEMBER(_500004_w);
+	void bg1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg4_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void _500000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void _500002_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void _500004_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
@@ -139,58 +139,58 @@ private:
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg1_tile_info)
 {
 	uint16_t code = m_bg1_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
+	tileinfo.set(0, code, 0x10 + (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg2_tile_info)
 {
 	uint16_t code = m_bg2_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
+	tileinfo.set(0, code, 0x10 + (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg3_tile_info)
 {
 	uint16_t code = m_bg3_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
+	tileinfo.set(0, code, (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg4_tile_info)
 {
 	uint16_t code = m_bg4_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
+	tileinfo.set(0, code, (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_fg_tile_info)
 {
 	uint16_t code = m_fg_ram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code, 0x20 + (code >> 12), 0);
+	tileinfo.set(1, code, 0x20 + (code >> 12), 0);
 }
 
-WRITE16_MEMBER(galaxi_state::bg1_w)
+void galaxi_state::bg1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg1_ram[offset]);
 	m_bg1_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(galaxi_state::bg2_w)
+void galaxi_state::bg2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2_ram[offset]);
 	m_bg2_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(galaxi_state::bg3_w)
+void galaxi_state::bg3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg3_ram[offset]);
 	m_bg3_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(galaxi_state::bg4_w)
+void galaxi_state::bg4_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg4_ram[offset]);
 	m_bg4_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(galaxi_state::fg_w)
+void galaxi_state::fg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_ram[offset]);
 	m_fg_tmap->mark_tile_dirty(offset);
@@ -198,12 +198,12 @@ WRITE16_MEMBER(galaxi_state::fg_w)
 
 void galaxi_state::video_start()
 {
-	m_bg1_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	m_bg2_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	m_bg3_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	m_bg4_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg4_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg1_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxi_state::get_bg1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg2_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxi_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg3_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxi_state::get_bg3_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg4_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxi_state::get_bg4_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
 
-	m_fg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20);
+	m_fg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxi_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20);
 
 	m_bg1_tmap->set_transparent_pen(0);
 	m_bg2_tmap->set_transparent_pen(0);
@@ -254,19 +254,19 @@ void galaxi_state::show_out(  )
 //  popmessage("%04x", m_out);
 }
 
-WRITE16_MEMBER(galaxi_state::_500000_w)
+void galaxi_state::_500000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg3_yscroll);
 	show_out();
 }
 
-WRITE16_MEMBER(galaxi_state::_500002_w)
+void galaxi_state::_500002_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg3_xscroll);
 	show_out();
 }
 
-WRITE16_MEMBER(galaxi_state::_500004_w)
+void galaxi_state::_500004_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -297,12 +297,12 @@ WRITE16_MEMBER(galaxi_state::_500004_w)
 	show_out();
 }
 
-CUSTOM_INPUT_MEMBER(galaxi_state::ticket_r)
+READ_LINE_MEMBER(galaxi_state::ticket_r)
 {
 	return m_ticket && !(m_screen->frame_number() % 10);
 }
 
-CUSTOM_INPUT_MEMBER(galaxi_state::hopper_r)
+READ_LINE_MEMBER(galaxi_state::hopper_r)
 {
 	return m_hopper && !(m_screen->frame_number() % 10);
 }
@@ -376,11 +376,11 @@ static INPUT_PORTS_START( galaxi )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, hopper_r, nullptr)   // hopper sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(galaxi_state, hopper_r)   // hopper sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_COIN3 )   // pin 25LC
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, ticket_r, nullptr)  // ticket sensor
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxi_state, ticket_r)  // ticket sensor
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // hopper out (pin 14LS)
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // (pin 26LC)
@@ -396,11 +396,11 @@ static INPUT_PORTS_START( magjoker )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, hopper_r, nullptr)   // hopper sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxi_state, hopper_r)   // hopper sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Hopper Refill") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, ticket_r, nullptr)  // ticket sensor
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxi_state, ticket_r)  // ticket sensor
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // hopper out (pin 14LS)
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )   // (pin 26LC)

@@ -35,40 +35,40 @@ public:
 	void altos8600(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER(cpuram_r);
-	DECLARE_WRITE16_MEMBER(cpuram_w);
-	DECLARE_READ16_MEMBER(stkram_r);
-	DECLARE_WRITE16_MEMBER(stkram_w);
-	DECLARE_READ16_MEMBER(coderam_r);
-	DECLARE_WRITE16_MEMBER(coderam_w);
-	DECLARE_READ16_MEMBER(xtraram_r);
-	DECLARE_WRITE16_MEMBER(xtraram_w);
-	DECLARE_READ16_MEMBER(cpuio_r);
-	DECLARE_WRITE16_MEMBER(cpuio_w);
-	DECLARE_READ16_MEMBER(nmi_r);
-	DECLARE_WRITE16_MEMBER(nmi_w);
-	DECLARE_READ16_MEMBER(dmacram_r);
-	DECLARE_WRITE16_MEMBER(dmacram_w);
-	DECLARE_READ16_MEMBER(mmuaddr_r);
-	DECLARE_WRITE16_MEMBER(mmuaddr_w);
-	DECLARE_READ16_MEMBER(mmuflags_r);
-	DECLARE_WRITE16_MEMBER(mmuflags_w);
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_READ16_MEMBER(fault_r);
-	DECLARE_READ16_MEMBER(errlo_r);
-	DECLARE_READ16_MEMBER(errhi_r);
-	DECLARE_WRITE16_MEMBER(clear_w);
-	DECLARE_WRITE8_MEMBER(cattn_w);
-	DECLARE_READ8_MEMBER(hd_r);
-	DECLARE_WRITE8_MEMBER(hd_w);
-	DECLARE_READ8_MEMBER(romport_r);
-	DECLARE_WRITE8_MEMBER(romport_w);
-	DECLARE_WRITE8_MEMBER(clrsys_w);
-	DECLARE_WRITE16_MEMBER(mode_w);
+	uint16_t cpuram_r(offs_t offset, u16 mem_mask = ~0);
+	void cpuram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	uint16_t stkram_r(offs_t offset, u16 mem_mask = ~0);
+	void stkram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	uint16_t coderam_r(offs_t offset, u16 mem_mask = ~0);
+	void coderam_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	uint16_t xtraram_r(offs_t offset, u16 mem_mask = ~0);
+	void xtraram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	uint16_t cpuio_r(offs_t offset, u16 mem_mask = ~0);
+	void cpuio_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	uint16_t nmi_r(offs_t offset, u16 mem_mask = ~0);
+	void nmi_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	uint16_t dmacram_r(offs_t offset, u16 mem_mask = ~0);
+	void dmacram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 mmuaddr_r(offs_t offset);
+	void mmuaddr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 mmuflags_r(offs_t offset);
+	void mmuflags_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 get_slave_ack(offs_t offset);
+	u16 fault_r();
+	u16 errlo_r();
+	u16 errhi_r();
+	void clear_w(u16 data);
+	void cattn_w(offs_t offset, u8 data);
+	u8 hd_r(offs_t offset);
+	void hd_w(offs_t offset, u8 data);
+	u8 romport_r(offs_t offset);
+	void romport_w(offs_t offset, u8 data);
+	void clrsys_w(u8 data);
+	void mode_w(u16 data);
 	DECLARE_WRITE_LINE_MEMBER(cpuif_w);
 	DECLARE_WRITE_LINE_MEMBER(fddrq_w);
 	DECLARE_WRITE_LINE_MEMBER(sintr1_w);
-	DECLARE_WRITE8_MEMBER(ics_attn_w);
+	void ics_attn_w(offs_t offset, u8 data);
 	IRQ_CALLBACK_MEMBER(inta);
 
 	virtual void machine_start() override;
@@ -81,8 +81,8 @@ private:
 	void extra_mem(address_map &map);
 	void stack_mem(address_map &map);
 
-	u16 xlate_r(address_space &space, offs_t offset, u16 mem_mask, int permbit);
-	void xlate_w(address_space &space, offs_t offset, u16 data, u16 mem_mask, int permbit);
+	u16 xlate_r(offs_t offset, u16 mem_mask, int permbit);
+	void xlate_w(offs_t offset, u16 data, u16 mem_mask, int permbit);
 	void seterr(offs_t offset, u16 mem_mask, u16 err_mask);
 	bool find_sector();
 	bool write_sector(u8 data);
@@ -91,7 +91,7 @@ private:
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<i8089_device> m_dmac;
 	required_device_array<pic8259_device, 3> m_pic;
-	required_device<i8274_new_device> m_uart8274;
+	required_device<i8274_device> m_uart8274;
 	required_device<fd1797_device> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<acs8600_ics_device> m_ics;
@@ -228,7 +228,7 @@ bool altos8600_state::write_sector(u8 data)
 	return false;
 }
 
-READ8_MEMBER(altos8600_state::hd_r)
+u8 altos8600_state::hd_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -243,7 +243,7 @@ READ8_MEMBER(altos8600_state::hd_r)
 	return 0;
 }
 
-WRITE8_MEMBER(altos8600_state::hd_w)
+void altos8600_state::hd_w(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
@@ -366,45 +366,45 @@ WRITE_LINE_MEMBER(altos8600_state::sintr1_w)
 		m_pic[1]->ir3_w(CLEAR_LINE);
 }
 
-READ16_MEMBER(altos8600_state::fault_r)
+u16 altos8600_state::fault_r()
 {
 	return m_mmuerr;
 }
 
-READ16_MEMBER(altos8600_state::errlo_r)
+u16 altos8600_state::errlo_r()
 {
 	return m_mmueaddr[0];
 }
 
-READ16_MEMBER(altos8600_state::errhi_r)
+u16 altos8600_state::errhi_r()
 {
 	return m_mmueaddr[1];
 }
 
-WRITE16_MEMBER(altos8600_state::clear_w)
+void altos8600_state::clear_w(u16 data)
 {
 	m_mmuerr = 0xffff;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_nmistat = false;
 }
 
-READ16_MEMBER(altos8600_state::mmuaddr_r)
+u16 altos8600_state::mmuaddr_r(offs_t offset)
 {
 	return m_mmuaddr[offset & 0xff];
 }
 
-WRITE16_MEMBER(altos8600_state::mmuaddr_w)
+void altos8600_state::mmuaddr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if(mem_mask & 0xff)
 		m_mmuaddr[offset & 0xff] = data & 0xff;
 }
 
-READ16_MEMBER(altos8600_state::mmuflags_r)
+u16 altos8600_state::mmuflags_r(offs_t offset)
 {
 	return m_mmuflags[offset & 0xff] | (m_user ? 1 : 0) | (m_mode & 2);
 }
 
-WRITE16_MEMBER(altos8600_state::mmuflags_w)
+void altos8600_state::mmuflags_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	data &= ~0x17;
 	if(mem_mask == 0xff)
@@ -414,21 +414,21 @@ WRITE16_MEMBER(altos8600_state::mmuflags_w)
 	m_mmuflags[offset & 0xff] = data;
 }
 
-WRITE8_MEMBER(altos8600_state::cattn_w)
+void altos8600_state::cattn_w(offs_t offset, u8 data)
 {
 	m_dmac->sel_w(offset & 1 ? ASSERT_LINE : CLEAR_LINE);
 	m_dmac->ca_w(ASSERT_LINE);
 	m_dmac->ca_w(CLEAR_LINE);
 }
 
-READ8_MEMBER(altos8600_state::romport_r)
+uint8_t altos8600_state::romport_r(offs_t offset)
 {
 	if(offset & 1)
 		return m_romport[offset >> 1];
 	return 0;
 }
 
-WRITE8_MEMBER(altos8600_state::romport_w)
+void altos8600_state::romport_w(offs_t offset, u8 data)
 {
 	const char *fdc = nullptr;
 	switch(offset)
@@ -474,12 +474,12 @@ WRITE8_MEMBER(altos8600_state::romport_w)
 	}
 }
 
-WRITE8_MEMBER(altos8600_state::clrsys_w)
+void altos8600_state::clrsys_w(u8 data)
 {
 	m_pic[0]->ir0_w(CLEAR_LINE);
 }
 
-WRITE8_MEMBER(altos8600_state::ics_attn_w)
+void altos8600_state::ics_attn_w(offs_t offset, u8 data)
 {
 	if(!offset)
 	{
@@ -488,14 +488,14 @@ WRITE8_MEMBER(altos8600_state::ics_attn_w)
 	}
 }
 
-WRITE16_MEMBER(altos8600_state::mode_w)
+void altos8600_state::mode_w(u16 data)
 {
 	m_mode = data;
 	if(m_cpuif && BIT(m_mode, 0))
 		m_user = true;
 }
 
-READ8_MEMBER(altos8600_state::get_slave_ack)
+u8 altos8600_state::get_slave_ack(offs_t offset)
 {
 	if(offset == 2)
 		return m_pic[1]->acknowledge();
@@ -521,7 +521,7 @@ void altos8600_state::seterr(offs_t offset, u16 mem_mask, u16 err_mask)
 	m_mmueaddr[1] = (m_user ? 0x100 : 0) | (m_mode & 2 ? 0x200 : 0) | ((offset >> 3) & 0xf000);
 }
 
-u16 altos8600_state::xlate_r(address_space &space, offs_t offset, u16 mem_mask, int permbit)
+u16 altos8600_state::xlate_r(offs_t offset, u16 mem_mask, int permbit)
 {
 	u8 page = m_mmuaddr[offset >> 11];
 	u16 flags = m_mmuflags[offset >> 11];
@@ -535,7 +535,7 @@ u16 altos8600_state::xlate_r(address_space &space, offs_t offset, u16 mem_mask, 
 
 }
 
-void altos8600_state::xlate_w(address_space &space, offs_t offset, u16 data, u16 mem_mask, int permbit)
+void altos8600_state::xlate_w(offs_t offset, u16 data, u16 mem_mask, int permbit)
 {
 	u8 page = m_mmuaddr[offset >> 11];
 	u16 flags = m_mmuflags[offset >> 11];
@@ -557,47 +557,47 @@ void altos8600_state::xlate_w(address_space &space, offs_t offset, u16 data, u16
 	m_mmuflags[offset >> 11] |= 4;
 }
 
-READ16_MEMBER(altos8600_state::cpuram_r)
+u16 altos8600_state::cpuram_r(offs_t offset, u16 mem_mask)
 {
-	return xlate_r(space, offset, mem_mask, 14);
+	return xlate_r(offset, mem_mask, 14);
 }
 
-WRITE16_MEMBER(altos8600_state::cpuram_w)
+void altos8600_state::cpuram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	xlate_w(space, offset, data, mem_mask, 14);
+	xlate_w(offset, data, mem_mask, 14);
 }
 
-READ16_MEMBER(altos8600_state::stkram_r)
+u16 altos8600_state::stkram_r(offs_t offset, u16 mem_mask)
 {
-	return xlate_r(space, offset, mem_mask, 13);
+	return xlate_r(offset, mem_mask, 13);
 }
 
-WRITE16_MEMBER(altos8600_state::stkram_w)
+void altos8600_state::stkram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	xlate_w(space, offset, data, mem_mask, 13);
+	xlate_w(offset, data, mem_mask, 13);
 }
 
-READ16_MEMBER(altos8600_state::coderam_r)
+u16 altos8600_state::coderam_r(offs_t offset, u16 mem_mask)
 {
-	return xlate_r(space, offset, mem_mask, 15);
+	return xlate_r(offset, mem_mask, 15);
 }
 
-WRITE16_MEMBER(altos8600_state::coderam_w)
+void altos8600_state::coderam_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	xlate_w(space, offset, data, mem_mask, 15);
+	xlate_w(offset, data, mem_mask, 15);
 }
 
-READ16_MEMBER(altos8600_state::xtraram_r)
+u16 altos8600_state::xtraram_r(offs_t offset, u16 mem_mask)
 {
-	return xlate_r(space, offset, mem_mask, 12);
+	return xlate_r(offset, mem_mask, 12);
 }
 
-WRITE16_MEMBER(altos8600_state::xtraram_w)
+void altos8600_state::xtraram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	xlate_w(space, offset, data, mem_mask, 12);
+	xlate_w(offset, data, mem_mask, 12);
 }
 
-READ16_MEMBER(altos8600_state::cpuio_r)
+u16 altos8600_state::cpuio_r(offs_t offset, u16 mem_mask)
 {
 	if(m_user && !machine().side_effects_disabled())
 	{
@@ -607,7 +607,7 @@ READ16_MEMBER(altos8600_state::cpuio_r)
 	return m_dmac->space(AS_IO).read_word_unaligned(offset << 1, mem_mask);
 }
 
-WRITE16_MEMBER(altos8600_state::cpuio_w)
+void altos8600_state::cpuio_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if(m_user && !machine().side_effects_disabled())
 	{
@@ -617,7 +617,7 @@ WRITE16_MEMBER(altos8600_state::cpuio_w)
 	m_dmac->space(AS_IO).write_word_unaligned(offset << 1, data, mem_mask);
 }
 
-READ16_MEMBER(altos8600_state::dmacram_r)
+u16 altos8600_state::dmacram_r(offs_t offset, u16 mem_mask)
 {
 	u8 page = m_mmuaddr[offset >> 11];
 	u16 flags = m_mmuflags[offset >> 11];
@@ -629,7 +629,7 @@ READ16_MEMBER(altos8600_state::dmacram_r)
 
 }
 
-WRITE16_MEMBER(altos8600_state::dmacram_w)
+void altos8600_state::dmacram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	u8 page = m_mmuaddr[offset >> 11];
 	u16 flags = m_mmuflags[offset >> 11];
@@ -642,13 +642,13 @@ WRITE16_MEMBER(altos8600_state::dmacram_w)
 	m_mmuflags[offset >> 11] |= 4;
 }
 
-READ16_MEMBER(altos8600_state::nmi_r)
+u16 altos8600_state::nmi_r(offs_t offset, u16 mem_mask)
 {
 	seterr(offset, mem_mask, 0x100);
 	return 0;
 }
 
-WRITE16_MEMBER(altos8600_state::nmi_w)
+void altos8600_state::nmi_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	seterr(offset, mem_mask, 0x100);
 }
@@ -702,7 +702,7 @@ void altos8600_state::dmac_io(address_map &map)
 	map(0x0038, 0x003f).w(FUNC(altos8600_state::cattn_w));
 	map(0x0040, 0x0047).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write)).umask16(0xff00);
-	map(0x0048, 0x004f).rw(m_uart8274, FUNC(i8274_new_device::cd_ba_r), FUNC(i8274_new_device::cd_ba_w)).umask16(0x00ff);
+	map(0x0048, 0x004f).rw(m_uart8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0048, 0x004f).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 	map(0x0050, 0x0057).rw(FUNC(altos8600_state::romport_r), FUNC(altos8600_state::romport_w));
 	map(0x0058, 0x005f).rw(m_pic[0], FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
@@ -754,7 +754,7 @@ void altos8600_state::altos8600(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("1M");//.set_extra_options("512K");
 
-	I8274_NEW(config, m_uart8274, 16_MHz_XTAL/4);
+	I8274(config, m_uart8274, 16_MHz_XTAL/4);
 	m_uart8274->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_uart8274->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	m_uart8274->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -764,33 +764,33 @@ void altos8600_state::altos8600(machine_config &config)
 	m_uart8274->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir7_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
-	rs232a.rxd_handler().set(m_uart8274, FUNC(i8274_new_device::rxa_w));
-	rs232a.dcd_handler().set(m_uart8274, FUNC(i8274_new_device::dcda_w));
-	rs232a.cts_handler().set(m_uart8274, FUNC(i8274_new_device::ctsa_w));
+	rs232a.rxd_handler().set(m_uart8274, FUNC(i8274_device::rxa_w));
+	rs232a.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcda_w));
+	rs232a.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(m_uart8274, FUNC(i8274_new_device::rxb_w));
-	rs232b.dcd_handler().set(m_uart8274, FUNC(i8274_new_device::dcdb_w));
-	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_new_device::ctsb_w));
+	rs232b.rxd_handler().set(m_uart8274, FUNC(i8274_device::rxb_w));
+	rs232b.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcdb_w));
+	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsb_w));
 
 	I8255A(config, "ppi", 0);
 
 	pit8253_device &pit(PIT8253(config, "pit", 0));
 	pit.set_clk<0>(1228800);
-	pit.out_handler<0>().set(m_uart8274, FUNC(i8274_new_device::rxca_w));
-	pit.out_handler<0>().append(m_uart8274, FUNC(i8274_new_device::txca_w));
+	pit.out_handler<0>().set(m_uart8274, FUNC(i8274_device::rxca_w));
+	pit.out_handler<0>().append(m_uart8274, FUNC(i8274_device::txca_w));
 	pit.set_clk<1>(1228800);
-	pit.out_handler<1>().set(m_uart8274, FUNC(i8274_new_device::rxtxcb_w));
+	pit.out_handler<1>().set(m_uart8274, FUNC(i8274_device::rxtxcb_w));
 	pit.set_clk<2>(1228800);
 	pit.out_handler<1>().set(m_pic[0], FUNC(pic8259_device::ir1_w));
 
 	FD1797(config, m_fdc, 2000000);
 	m_fdc->intrq_wr_callback().set(m_pic[1], FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set(FUNC(altos8600_state::fddrq_w));
-	FLOPPY_CONNECTOR(config, "fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	ACS8600_ICS(config, m_ics, 0);
 	m_ics->set_host_space(m_dmac, AS_PROGRAM); // TODO: fixme
@@ -798,6 +798,8 @@ void altos8600_state::altos8600(machine_config &config)
 	m_ics->irq2_callback().set(m_pic[0], FUNC(pic8259_device::ir6_w));
 
 	HARDDISK(config, "hdd", 0);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("altos8600");
 }
 
 ROM_START(altos8600)

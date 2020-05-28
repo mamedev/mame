@@ -202,9 +202,6 @@ void timekeeper_device::device_start()
 {
 	system_time systime;
 
-	/* validate some basic stuff */
-	assert(this != nullptr);
-
 	machine().base_datetime(systime);
 
 	m_control = 0;
@@ -237,7 +234,6 @@ void timekeeper_device::device_start()
 	m_watchdog_timer->adjust(attotime::never);
 	m_reset_cb.resolve_safe();
 	m_irq_cb.resolve_safe();
-
 }
 
 //-------------------------------------------------

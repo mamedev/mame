@@ -125,9 +125,7 @@ Notes:
   (aka 7 colors), this is assumed to be a homebrew repair or hack.
   Update: Gee Bee definitely uses an overlay while kaitei actually outputs
   colors depending on the monitor type used (color or b&w).
-  sos is the odd one: it seems to be running in a b&w environment but a pic
-  on the net shows it with reversed black and white compared to current
-  implementation.
+  sos is the odd one: it seems to be running in a b&w environment.
   Also the flyer shows the girl to be colorized purple, while the points
   numbers are in cyan and text in red (and this arrangement doesn't
   make much sense, different version maybe?).
@@ -765,6 +763,12 @@ void warpwarp_state::navarone(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,navarone)
 }
 
+void warpwarp_state::sos(machine_config &config)
+{
+	navarone(config);
+	m_palette->set_init(FUNC(warpwarp_state::sos_palette));
+}
+
 void warpwarp_state::kaitei(machine_config &config)
 {
 	geebee(config);
@@ -1031,10 +1035,10 @@ GAMEL( 1978, geebeea,    geebee,   geebeeb,  geebeeb,   warpwarp_state, init_gee
 GAMEL( 1978, geebeeb,    geebee,   geebeeb,  geebeeb,   warpwarp_state, init_geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", MACHINE_SUPPORTS_SAVE, layout_geebee ) // Fratelli Bertolino
 GAMEL( 1978, geebeeg,    geebee,   geebee,   geebee,    warpwarp_state, init_geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", MACHINE_SUPPORTS_SAVE, layout_geebee )
 
+GAME(  1979, sos,        0,        sos,      sos,       warpwarp_state, init_sos,      ROT90, "K.K. Tokki (Namco license)", "SOS Game", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL( 1980, navarone,   0,        navarone, navarone,  warpwarp_state, init_navarone, ROT90, "Namco", "Navarone", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_navarone )
 GAME(  1980, kaitein,    kaitei,   kaitei,   kaitein,   warpwarp_state, init_kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", MACHINE_SUPPORTS_SAVE ) // pretty sure it didn't have a color overlay
-GAME(  1980, kaitei,     0,        kaitei,   kaitei,    warpwarp_state, init_kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", MACHINE_SUPPORTS_SAVE ) // "
-GAME(  1980, sos,        0,        navarone, sos,       warpwarp_state, init_sos,      ROT90, "Namco", "SOS", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // developed by Shoei? Flyer shows a Shoei logo.
+GAME(  1980, kaitei,     0,        kaitei,   kaitei,    warpwarp_state, init_kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", MACHINE_SUPPORTS_SAVE ) // " - aka "Atrantis"
 
 /* Color games */
 GAME(  1979, bombbee,    0,        bombbee,  bombbee,   warpwarp_state, init_bombbee,  ROT90, "Namco", "Bomb Bee", MACHINE_SUPPORTS_SAVE )

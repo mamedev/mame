@@ -167,8 +167,8 @@ z8_device::z8_device(const machine_config &mconfig, device_type type, const char
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, preprogrammed ? address_map_constructor(FUNC(z8_device::preprogrammed_map), this) : address_map_constructor(FUNC(z8_device::program_map), this))
 	, m_data_config("data", ENDIANNESS_BIG, 8, 16, 0)
 	, m_register_config("register", ENDIANNESS_BIG, 8, 8, 0, address_map_constructor(FUNC(z8_device::register_map), this))
-	, m_input_cb{{*this}, {*this}, {*this}, {*this}}
-	, m_output_cb{{*this}, {*this}, {*this}, {*this}}
+	, m_input_cb(*this)
+	, m_output_cb(*this)
 	, m_rom_size(rom_size)
 	, m_input{0xff, 0xff, 0xff, 0x0f}
 {
@@ -286,7 +286,7 @@ uint16_t z8_device::mask_external_address(uint16_t addr)
 uint8_t z8_device::fetch()
 {
 	uint16_t real_pc = (m_pc < m_rom_size) ? m_pc : mask_external_address(m_pc);
-	uint8_t data = m_cache->read_byte(real_pc);
+	uint8_t data = m_cache.read_byte(real_pc);
 
 	m_pc++;
 
@@ -299,7 +299,7 @@ uint8_t z8_device::fetch_opcode()
 	m_ppc = (m_pc < m_rom_size) ? m_pc : mask_external_address(m_pc);
 	debugger_instruction_hook(m_ppc);
 
-	uint8_t data = m_cache->read_byte(m_ppc);
+	uint8_t data = m_cache.read_byte(m_ppc);
 
 	m_pc++;
 
@@ -912,12 +912,12 @@ void z8_device::spl_write(uint8_t data)
 
 uint16_t z8_device::register_pair_read(uint8_t offset)
 {
-	return m_regs->read_word_unaligned(offset);
+	return m_regs.read_word_unaligned(offset);
 }
 
 void z8_device::register_pair_write(uint8_t offset, uint16_t data)
 {
-	m_regs->write_word_unaligned(offset, data);
+	m_regs.write_word_unaligned(offset, data);
 }
 
 uint8_t z8_device::get_working_register(int offset) const
@@ -956,7 +956,7 @@ void z8_device::stack_push_byte(uint8_t src)
 		m_sp.w = sp;
 
 		// @SP <- src
-		m_data->write_byte(mask_external_address(sp), src);
+		m_data.write_byte(mask_external_address(sp), src);
 	}
 }
 
@@ -978,7 +978,7 @@ void z8_device::stack_push_word(uint16_t src)
 		m_sp.w = sp;
 
 		// @SP <- src
-		m_data->write_word_unaligned(mask_external_address(sp), src);
+		m_data.write_word_unaligned(mask_external_address(sp), src);
 	}
 }
 
@@ -999,7 +999,7 @@ uint8_t z8_device::stack_pop_byte()
 	{
 		// @SP <- src
 		uint16_t sp = m_sp.w;
-		uint8_t byte = m_data->read_byte(mask_external_address(sp));
+		uint8_t byte = m_data.read_byte(mask_external_address(sp));
 
 		// SP <- SP + 1 (postincrement)
 		m_sp.w = sp + 1;
@@ -1025,7 +1025,7 @@ uint16_t z8_device::stack_pop_word()
 	{
 		// @SP <- src
 		uint16_t sp = m_sp.w;
-		uint16_t word = m_data->read_word_unaligned(mask_external_address(sp));
+		uint16_t word = m_data.read_word_unaligned(mask_external_address(sp));
 
 		// SP <- SP + 2 (postincrement)
 		m_sp.w = sp + 2;
@@ -1173,10 +1173,8 @@ TIMER_CALLBACK_MEMBER(z8_device::timeout)
 
 void z8_device::device_start()
 {
-	for (auto &cb : m_input_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_output_cb)
-		cb.resolve_safe();
+	m_input_cb.resolve_all_safe(0xff);
+	m_output_cb.resolve_all_safe();
 
 	/* set up the state table */
 	{
@@ -1221,10 +1219,10 @@ void z8_device::device_start()
 	}
 
 	/* find address spaces */
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
-	m_data = has_space(AS_DATA) ? &space(AS_DATA) : m_program;
-	m_regs = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(has_space(AS_DATA) ? AS_DATA : AS_PROGRAM).specific(m_data);
+	space(AS_IO).specific(m_regs);
 
 	/* allocate timers */
 	m_internal_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8_device::timeout<0>), this));
@@ -1326,8 +1324,8 @@ void z8_device::take_interrupt(int irq)
 	stack_push_byte(m_flags);
 
 	// branch to the vector
-	m_pc = m_cache->read_byte(vector) << 8;
-	m_pc |= m_cache->read_byte(vector + 1);
+	m_pc = m_cache.read_byte(vector) << 8;
+	m_pc |= m_cache.read_byte(vector + 1);
 }
 
 void z8_device::process_interrupts()

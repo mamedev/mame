@@ -220,7 +220,7 @@ WRITE8_MEMBER(seawolf2_state::sound_2_w)// Port 41
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::input_mux_r)
+uint8_t astrocde_state::input_mux_r(offs_t offset)
 {
 	return m_handle[offset & 3].read_safe(0xff);
 }
@@ -395,7 +395,7 @@ WRITE8_MEMBER(tenpindx_state::lights_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::votrax_speech_w)
+void astrocde_state::votrax_speech_w(uint8_t data)
 {
 	m_votrax->inflection_w(data >> 6);
 	m_votrax->write(data & 0x3f);
@@ -404,7 +404,7 @@ WRITE8_MEMBER(astrocde_state::votrax_speech_w)
 }
 
 
-CUSTOM_INPUT_MEMBER( astrocde_state::votrax_speech_status_r )
+READ_LINE_MEMBER( astrocde_state::votrax_speech_status_r )
 {
 	return m_votrax->request();
 }
@@ -537,8 +537,8 @@ void seawolf2_state::port_map_discrete(address_map &map)
 	map(0x19, 0x19).w(FUNC(astrocde_state::expand_register_w));
 	map(0x40, 0x40).mirror(0x18).w(FUNC(seawolf2_state::sound_1_w));
 	map(0x41, 0x41).mirror(0x18).w(FUNC(seawolf2_state::sound_2_w));
-	map(0x42, 0x42).mirror(0x18).w("lamplatch2", FUNC(output_latch_device::bus_w));
-	map(0x43, 0x43).mirror(0x18).w("lamplatch1", FUNC(output_latch_device::bus_w));
+	map(0x42, 0x42).mirror(0x18).w("lamplatch2", FUNC(output_latch_device::write));
+	map(0x43, 0x43).mirror(0x18).w("lamplatch1", FUNC(output_latch_device::write));
 }
 
 
@@ -723,7 +723,7 @@ static INPUT_PORTS_START( ebases )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "S1:8" )
 
 	PORT_START("P4HANDLE")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ebases_state, trackball_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ebases_state, trackball_r)
 
 	PORT_START("TRACKX1")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET
@@ -838,7 +838,7 @@ static INPUT_PORTS_START( wow )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state, votrax_speech_status_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(astrocde_state, votrax_speech_status_r)
 
 	PORT_START("P4HANDLE")
 	/* "If S1:1,2,3 are all ON or all OFF, only coin meter number 1 will count." */
@@ -908,7 +908,7 @@ static INPUT_PORTS_START( gorf )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state, votrax_speech_status_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(astrocde_state, votrax_speech_status_r)
 
 	PORT_START("P4HANDLE")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("S1:1")
@@ -1055,7 +1055,7 @@ static INPUT_PORTS_START( demndrgn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2HANDLE")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, demndrgn_state, joystick_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(demndrgn_state, joystick_r)
 
 	PORT_START("P3HANDLE")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1318,7 +1318,7 @@ void astrocde_state::spacezap(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &astrocde_state::port_map_mono_pattern);
 
 	m_astrocade_sound1->so_cb<0>().set("watchdog", FUNC(watchdog_timer_device::reset_w));
-	m_astrocade_sound1->so_cb<3>().set("outlatch", FUNC(output_latch_device::bus_w));
+	m_astrocade_sound1->so_cb<3>().set("outlatch", FUNC(output_latch_device::write));
 
 	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch", 0)); // MC14174B on game board at U16
 	outlatch.bit_handler<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
@@ -1457,8 +1457,8 @@ void astrocde_state::profpac(machine_config &config)
 	lamplatch.bit_handler<5>().set_output("lamp4");   // right lamp B
 	lamplatch.bit_handler<6>().set_output("lamp5");   // right lamp C
 
-	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::bus_w));
-	m_astrocade_sound1->so_cb<5>().set("lamplatch", FUNC(output_latch_device::bus_w));
+	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::write));
+	m_astrocade_sound1->so_cb<5>().set("lamplatch", FUNC(output_latch_device::write));
 }
 
 void demndrgn_state::demndrgn(machine_config &config)
@@ -1477,7 +1477,7 @@ void demndrgn_state::demndrgn(machine_config &config)
 	outlatch.bit_handler<3>().set_output("led1");
 	outlatch.bit_handler<4>().set(FUNC(demndrgn_state::input_select_w));
 
-	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::bus_w));
+	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::write));
 	m_astrocade_sound1->pot_cb<0>().set_ioport("FIREX");
 	m_astrocade_sound1->pot_cb<1>().set_ioport("FIREY");
 }

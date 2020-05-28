@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -46,7 +46,7 @@ namespace entry
 		virtual bool open(const bx::FilePath& _filePath, bx::Error* _err) override
 		{
 			String filePath(s_currentDir);
-			filePath.append(_filePath.get() );
+			filePath.append(_filePath);
 			return super::open(filePath.getPtr(), _err);
 		}
 	};
@@ -59,7 +59,7 @@ namespace entry
 		virtual bool open(const bx::FilePath& _filePath, bool _append, bx::Error* _err) override
 		{
 			String filePath(s_currentDir);
-			filePath.append(_filePath.get() );
+			filePath.append(_filePath);
 			return super::open(filePath.getPtr(), _append, _err);
 		}
 	};
@@ -352,9 +352,6 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		{ entry::Key::GamepadStart, entry::Modifier::None,      1, NULL, "graphics stats"                    },
 		{ entry::Key::F1,           entry::Modifier::LeftShift, 1, NULL, "graphics stats 0\ngraphics text 0" },
 		{ entry::Key::F3,           entry::Modifier::None,      1, NULL, "graphics wireframe"                },
-		{ entry::Key::F4,           entry::Modifier::None,      1, NULL, "graphics hmd"                      },
-		{ entry::Key::F4,           entry::Modifier::LeftShift, 1, NULL, "graphics hmdrecenter"              },
-		{ entry::Key::F4,           entry::Modifier::LeftCtrl,  1, NULL, "graphics hmddbg"                   },
 		{ entry::Key::F6,           entry::Modifier::None,      1, NULL, "graphics profiler"                 },
 		{ entry::Key::F7,           entry::Modifier::None,      1, NULL, "graphics vsync"                    },
 		{ entry::Key::F8,           entry::Modifier::None,      1, NULL, "graphics msaa"                     },
@@ -446,10 +443,11 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		return bx::kExitFailure;
 	}
 
-	AppI::AppI(const char* _name, const char* _description)
+	AppI::AppI(const char* _name, const char* _description, const char* _url)
 	{
 		m_name        = _name;
 		m_description = _description;
+		m_url         = _url;
 		m_next        = s_apps;
 
 		s_apps = this;
@@ -488,6 +486,11 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 	const char* AppI::getDescription() const
 	{
 		return m_description;
+	}
+
+	const char* AppI::getUrl() const
+	{
+		return m_url;
 	}
 
 	AppI* AppI::getNext()
@@ -752,7 +755,7 @@ restart:
 				case Event::DropFile:
 					{
 						const DropFileEvent* drop = static_cast<const DropFileEvent*>(ev);
-						DBG("%s", drop->m_filePath.get() );
+						DBG("%s", drop->m_filePath.getCPtr() );
 					}
 					break;
 

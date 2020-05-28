@@ -22,6 +22,7 @@
   1997: R-Zone DataZone: PDA with a built-in SuperScreen.
 
   TODO:
+  - softwarelist? it's impossible right now due to SVG initialization
   - support for SuperScreen. SVG colors will need to be inverted, or maybe
     with artwork or HLSL?
   - add DataZone, will get its own driver
@@ -67,13 +68,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sclock_w);
 	DECLARE_READ_LINE_MEMBER(sdata_r);
 
-	DECLARE_WRITE8_MEMBER(t1_write_r);
-	DECLARE_WRITE8_MEMBER(t1_write_s);
-	virtual DECLARE_READ8_MEMBER(input_r) override;
+	void t1_write_r(u8 data);
+	void t1_write_s(u8 data);
+	virtual u8 input_r() override;
 
 	void t2_update_audio();
-	DECLARE_WRITE8_MEMBER(t2_write_r);
-	DECLARE_WRITE8_MEMBER(t2_write_s);
+	void t2_write_r(u8 data);
+	void t2_write_s(u8 data);
 
 	virtual void machine_start() override;
 };
@@ -155,7 +156,7 @@ READ_LINE_MEMBER(rzone_state::sdata_r)
 
 // cartridge type 1: simple SM510
 
-WRITE8_MEMBER(rzone_state::t1_write_r)
+void rzone_state::t1_write_r(u8 data)
 {
 	// R1: Audio
 	audio_w(data & 1);
@@ -164,7 +165,7 @@ WRITE8_MEMBER(rzone_state::t1_write_r)
 	sctrl_w(data >> 1 & 1);
 }
 
-WRITE8_MEMBER(rzone_state::t1_write_s)
+void rzone_state::t1_write_s(u8 data)
 {
 	// S1: LED
 	led_w(data & 1);
@@ -173,7 +174,7 @@ WRITE8_MEMBER(rzone_state::t1_write_s)
 	sclock_w(data >> 1 & 1);
 }
 
-READ8_MEMBER(rzone_state::input_r)
+u8 rzone_state::input_r()
 {
 	// K1: SDATA
 	return sdata_r();
@@ -187,14 +188,14 @@ void rzone_state::t2_update_audio()
 	audio_w((m_s >> 2 & 1) | (m_r & 1));
 }
 
-WRITE8_MEMBER(rzone_state::t2_write_r)
+void rzone_state::t2_write_r(u8 data)
 {
 	// R: Audio
 	m_r = data;
 	t2_update_audio();
 }
 
-WRITE8_MEMBER(rzone_state::t2_write_s)
+void rzone_state::t2_write_s(u8 data)
 {
 	// S1: SCTRL
 	sctrl_w(data & 1);
@@ -248,7 +249,7 @@ void rzone_state::rzbatfor(machine_config &config)
 {
 	/* basic machine hardware */
 	SM512(config, m_maincpu); // no external XTAL
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->write_segs().set(FUNC(rzone_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(rzone_state::input_r));
 	m_maincpu->write_s().set(FUNC(rzone_state::t2_write_s));
 	m_maincpu->write_r().set(FUNC(rzone_state::t2_write_r));
@@ -272,7 +273,7 @@ void rzone_state::rztoshden(machine_config &config)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->write_segs().set(FUNC(rzone_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(rzone_state::input_r));
 	m_maincpu->write_s().set(FUNC(rzone_state::t1_write_s));
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
@@ -296,7 +297,7 @@ void rzone_state::rzindy500(machine_config &config)
 	/* basic machine hardware */
 	SM510(config, m_maincpu); // no external XTAL
 	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->write_segs().set(FUNC(rzone_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(rzone_state::input_r));
 	m_maincpu->write_s().set(FUNC(rzone_state::t1_write_s));
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));

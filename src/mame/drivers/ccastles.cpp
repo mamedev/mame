@@ -123,6 +123,7 @@
 #include "includes/ccastles.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "speaker.h"
@@ -170,7 +171,7 @@ TIMER_CALLBACK_MEMBER(ccastles_state::clock_irq)
 }
 
 
-CUSTOM_INPUT_MEMBER(ccastles_state::get_vblank)
+READ_LINE_MEMBER(ccastles_state::vblank_r)
 {
 	int scanline = m_screen->vpos();
 	return m_syncprom[scanline & 0xff] & 1;
@@ -282,14 +283,14 @@ WRITE_LINE_MEMBER(ccastles_state::nvram_store_w)
 
 READ8_MEMBER(ccastles_state::nvram_r)
 {
-	return (m_nvram_4b->read(space, offset) & 0x0f) | (m_nvram_4a->read(space, offset) << 4);
+	return (m_nvram_4b->read(space, offset) & 0x0f) | (m_nvram_4a->read(space,offset) << 4);
 }
 
 
 WRITE8_MEMBER(ccastles_state::nvram_w)
 {
-	m_nvram_4b->write(space, offset, data);
-	m_nvram_4a->write(space, offset, data >> 4);
+	m_nvram_4b->write(offset, data);
+	m_nvram_4a->write(offset, data >> 4);
 }
 
 
@@ -340,7 +341,7 @@ static INPUT_PORTS_START( ccastles )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ccastles_state,get_vblank, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ccastles_state, vblank_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Jump/1P Start Upright")    PORT_CONDITION("IN1",0x20,EQUALS,0x00)  /* left Jump, non-cocktail start1 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P Jump")           PORT_CONDITION("IN1",0x20,EQUALS,0x20)  /* 1p Jump, cocktail */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Jump/2P Start Upright")   PORT_CONDITION("IN1",0x20,EQUALS,0x00)  /* right Jump, non-cocktail start2 */

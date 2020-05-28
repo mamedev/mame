@@ -23,25 +23,25 @@ enum
 
 // ======================> device_ekara_cart_interface
 
-class device_ekara_cart_interface : public device_slot_card_interface
+class device_ekara_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
 	virtual ~device_ekara_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_cart) { }
+	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
+	virtual void write_cart(offs_t offset, uint8_t data) { }
 
-	virtual DECLARE_READ8_MEMBER(read_extra) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_extra) { }
+	virtual uint8_t read_extra(offs_t offset) { return 0xff; }
+	virtual void write_extra(offs_t offset, uint8_t data) { }
 
 	virtual DECLARE_WRITE_LINE_MEMBER(write_sda) { }
 	virtual DECLARE_WRITE_LINE_MEMBER(write_scl) { }
 	//virtual DECLARE_WRITE_LINE_MEMBER( write_wc )
 	virtual DECLARE_READ_LINE_MEMBER( read_sda ) { return 0; }
 
-	virtual DECLARE_WRITE8_MEMBER(write_bus_control) { }
+	virtual void write_bus_control(offs_t offset, uint8_t data) { }
 
 	virtual bool is_read_access_not_rom(void) { return false; }
 	virtual bool is_write_access_not_rom(void) { return false; }
@@ -62,7 +62,7 @@ protected:
 
 class ekara_cart_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_ekara_cart_interface>
 {
 public:
 	// construction/destruction
@@ -83,45 +83,47 @@ public:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override {}
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	int get_type() { return m_type; }
-	static int get_cart_type(const uint8_t *ROM, uint32_t len);
-
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "ekara_cart"; }
-	virtual const char *file_extensions() const override { return "bin,u1"; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "ekara_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,u1"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
+	int get_type() { return m_type; }
+	static int get_cart_type(const uint8_t *ROM, uint32_t len);
+
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	uint8_t read_cart(offs_t offset);
+	void write_cart(offs_t offset, uint8_t data);
 
-	virtual DECLARE_READ8_MEMBER(read_extra);
-	virtual DECLARE_WRITE8_MEMBER(write_extra);
+	uint8_t read_extra(offs_t offset);
+	void write_extra(offs_t offset, uint8_t data);
 
-	virtual DECLARE_WRITE_LINE_MEMBER(write_sda);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_scl);
-	//virtual DECLARE_WRITE_LINE_MEMBER( write_wc );
-	virtual DECLARE_READ_LINE_MEMBER( read_sda );
+	DECLARE_WRITE_LINE_MEMBER(write_sda);
+	DECLARE_WRITE_LINE_MEMBER(write_scl);
+	//DECLARE_WRITE_LINE_MEMBER( write_wc );
+	DECLARE_READ_LINE_MEMBER( read_sda );
 
-	virtual DECLARE_WRITE8_MEMBER(write_bus_control);
+	void write_bus_control(offs_t offset, uint8_t data);
 
-	virtual bool is_read_access_not_rom(void);
-	virtual bool is_write_access_not_rom(void);
+	bool is_read_access_not_rom(void);
+	bool is_write_access_not_rom(void);
 
 	bool has_cart() { return m_cart ? true : false; }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int m_type;
 	device_ekara_cart_interface*       m_cart;

@@ -38,7 +38,7 @@
 #include "emu.h"
 #include "includes/hp9845.h"
 
-#include "bus/hp_optroms/hp_optrom.h"
+#include "machine/hp9845_optrom.h"
 #include "bus/hp9845_io/hp9845_io.h"
 #include "machine/timer.h"
 
@@ -473,8 +473,8 @@ void hp9845_base_state::device_reset()
 
 	// Then, set r/w handlers of all installed I/O cards
 	int sc;
-	read16_delegate rhandler;
-	write16_delegate whandler;
+	read16_delegate rhandler(*this);
+	write16_delegate whandler(*this);
 	for (unsigned i = 0; 4 > i; ++i) {
 		if ((sc = m_io_slot[i]->get_rw_handlers(rhandler , whandler)) >= 0) {
 			logerror("Install R/W handlers for slot %u @ SC = %d\n", i, sc);
@@ -622,17 +622,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::kb_scan)
 		memcpy(&m_kb_state[ 0 ] , &input[ 0 ] , sizeof(m_kb_state));
 }
 
-READ16_MEMBER(hp9845_base_state::kb_scancode_r)
+uint16_t hp9845_base_state::kb_scancode_r()
 {
 		return ~m_kb_scancode & 0x7f;
 }
 
-READ16_MEMBER(hp9845_base_state::kb_status_r)
+uint16_t hp9845_base_state::kb_status_r()
 {
 		return m_kb_status;
 }
 
-WRITE16_MEMBER(hp9845_base_state::kb_irq_clear_w)
+void hp9845_base_state::kb_irq_clear_w(uint16_t data)
 {
 		BIT_CLR(m_kb_status, 0);
 		update_kb_prt_irq();
@@ -755,8 +755,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual DECLARE_READ16_MEMBER(graphic_r) override;
-	virtual DECLARE_WRITE16_MEMBER(graphic_w) override;
+	virtual uint16_t graphic_r(offs_t offset) override;
+	virtual void graphic_w(offs_t offset, uint16_t data) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
@@ -820,7 +820,7 @@ void hp9845b_state::machine_reset()
 	update_graphic_bits();
 }
 
-READ16_MEMBER(hp9845b_state::graphic_r)
+uint16_t hp9845b_state::graphic_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -859,7 +859,7 @@ READ16_MEMBER(hp9845b_state::graphic_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9845b_state::graphic_w)
+void hp9845b_state::graphic_w(offs_t offset, uint16_t data)
 {
 		//logerror("wr gv R%u = %04x\n", 4 + offset , data);
 
@@ -1983,8 +1983,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual DECLARE_READ16_MEMBER(graphic_r) override;
-	virtual DECLARE_WRITE16_MEMBER(graphic_w) override;
+	virtual uint16_t graphic_r(offs_t offset) override;
+	virtual void graphic_w(offs_t offset, uint16_t data) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
@@ -2081,7 +2081,7 @@ void hp9845c_state::machine_reset()
 	m_gv_sk_int_latched = false;
 }
 
-READ16_MEMBER(hp9845c_state::graphic_r)
+uint16_t hp9845c_state::graphic_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -2133,7 +2133,7 @@ READ16_MEMBER(hp9845c_state::graphic_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9845c_state::graphic_w)
+void hp9845c_state::graphic_w(offs_t offset, uint16_t data)
 {
 	LOG("wr gv R%u = %04x\n", 4 + offset , data);
 
@@ -2721,8 +2721,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual DECLARE_READ16_MEMBER(graphic_r) override;
-	virtual DECLARE_WRITE16_MEMBER(graphic_w) override;
+	virtual uint16_t graphic_r(offs_t offset) override;
+	virtual void graphic_w(offs_t offset, uint16_t data) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
@@ -2792,7 +2792,7 @@ void hp9845t_state::machine_reset()
 	set_video_mar(0);
 }
 
-READ16_MEMBER(hp9845t_state::graphic_r)
+uint16_t hp9845t_state::graphic_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -2848,7 +2848,7 @@ READ16_MEMBER(hp9845t_state::graphic_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9845t_state::graphic_w)
+void hp9845t_state::graphic_w(offs_t offset, uint16_t data)
 {
 	LOG("wr gv R%u = %04x\n", 4 + offset , data);
 
@@ -3663,7 +3663,7 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 	m_ppu->set_9845_boot_mode(true);
 	m_ppu->set_rw_cycles(6 , 6);
 	m_ppu->set_relative_mode(true);
-	m_ppu->set_irq_acknowledge_callback("io_sys" , FUNC(hp98x5_io_sys_device::irq_callback));
+	m_ppu->int_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::int_r));
 	m_ppu->pa_changed_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::pa_w));
 
 	HP98X5_IO_SYS(config , m_io_sys , 0);
@@ -3701,14 +3701,14 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 	// right-hand side and left-hand side drawers, respectively.
 	// Here we do away with the distinction between LPU & PPU ROMs: in the end they
 	// are visible to both CPUs at the same addresses.
-	HP_OPTROM_SLOT(config, "drawer1", 0);
-	HP_OPTROM_SLOT(config, "drawer2", 0);
-	HP_OPTROM_SLOT(config, "drawer3", 0);
-	HP_OPTROM_SLOT(config, "drawer4", 0);
-	HP_OPTROM_SLOT(config, "drawer5", 0);
-	HP_OPTROM_SLOT(config, "drawer6", 0);
-	HP_OPTROM_SLOT(config, "drawer7", 0);
-	HP_OPTROM_SLOT(config, "drawer8", 0);
+	HP9845_OPTROM(config, "drawer1", 0);
+	HP9845_OPTROM(config, "drawer2", 0);
+	HP9845_OPTROM(config, "drawer3", 0);
+	HP9845_OPTROM(config, "drawer4", 0);
+	HP9845_OPTROM(config, "drawer5", 0);
+	HP9845_OPTROM(config, "drawer6", 0);
+	HP9845_OPTROM(config, "drawer7", 0);
+	HP9845_OPTROM(config, "drawer8", 0);
 
 	// I/O slots
 	for (unsigned slot = 0; slot < 4; slot++) {

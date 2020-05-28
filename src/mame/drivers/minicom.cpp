@@ -58,12 +58,12 @@ public:
 	void init_minicom();
 
 private:
-	DECLARE_WRITE8_MEMBER(i87c52_p0_w);
-	DECLARE_WRITE8_MEMBER(i87c52_p1_w);
-	DECLARE_WRITE8_MEMBER(i87c52_p2_w);
-	DECLARE_WRITE8_MEMBER(i87c52_p3_w);
-	DECLARE_READ8_MEMBER(i87c52_p1_r);
-	DECLARE_READ8_MEMBER(i87c52_p2_r);
+	void i87c52_p0_w(uint8_t data);
+	void i87c52_p1_w(uint8_t data);
+	void i87c52_p2_w(uint8_t data);
+	void i87c52_p3_w(uint8_t data);
+	uint8_t i87c52_p1_r();
+	uint8_t i87c52_p2_r();
 
 	uint8_t m_p[4];
 	uint16_t m_display_data;
@@ -97,7 +97,7 @@ void minicom_state::machine_reset()
 		m_digits[i] = 0;
 }
 
-READ8_MEMBER(minicom_state::i87c52_p1_r)
+uint8_t minicom_state::i87c52_p1_r()
 {
 	//P1.3 seems to be an indicator of whether or not we have a printer device attached.
 	// at address 0xABF the code checks this flag in order to decide which string to display:
@@ -105,7 +105,7 @@ READ8_MEMBER(minicom_state::i87c52_p1_r)
 	return PRINTER_ATTACHED << 3;
 }
 
-READ8_MEMBER(minicom_state::i87c52_p2_r)
+uint8_t minicom_state::i87c52_p2_r()
 {
 //          return 0; //para a palestra no Garoa... :-)
 	return 1; //to skip the "NO POWER" warning. I'm not sure why.
@@ -124,7 +124,7 @@ static void printbits(uint8_t v) {
 #define P1_UNKNOWN_BITS (0xFF & ~(1 << 2))
 #define P2_UNKNOWN_BITS 0xFF
 #define P3_UNKNOWN_BITS (0xFF & ~((1 << 4)|(1 << 5)))
-WRITE8_MEMBER(minicom_state::i87c52_p0_w)
+void minicom_state::i87c52_p0_w(uint8_t data)
 {
 	if (data != m_p[0])
 	{
@@ -142,7 +142,7 @@ WRITE8_MEMBER(minicom_state::i87c52_p0_w)
 	}
 }
 
-WRITE8_MEMBER(minicom_state::i87c52_p1_w)
+void minicom_state::i87c52_p1_w(uint8_t data)
 {
 	if (data != m_p[1])
 	{
@@ -164,7 +164,7 @@ WRITE8_MEMBER(minicom_state::i87c52_p1_w)
 	}
 }
 
-WRITE8_MEMBER(minicom_state::i87c52_p2_w)
+void minicom_state::i87c52_p2_w(uint8_t data)
 {
 	if (data != m_p[2])
 	{
@@ -181,7 +181,7 @@ WRITE8_MEMBER(minicom_state::i87c52_p2_w)
 	}
 }
 
-WRITE8_MEMBER(minicom_state::i87c52_p3_w)
+void minicom_state::i87c52_p3_w(uint8_t data)
 {
 	if (data != m_p[3])
 	{

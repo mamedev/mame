@@ -2,15 +2,17 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles
 /***************************************************************************
 
-    config.c
+    config.cpp
 
     Configuration file I/O.
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "drivenum.h"
 #include "config.h"
+
+#include "drivenum.h"
+#include "emuopts.h"
+
 #include "xmlfile.h"
 
 #define DEBUG_CONFIG        0
@@ -40,8 +42,8 @@ void configuration_manager::config_register(const char* nodename, config_load_de
 {
 	config_element element;
 	element.name = nodename;
-	element.load = load;
-	element.save = save;
+	element.load = std::move(load);
+	element.save = std::move(save);
 
 	m_typelist.push_back(element);
 }
@@ -60,7 +62,7 @@ int configuration_manager::load_settings()
 	int loaded = 0;
 
 	/* loop over all registrants and call their init function */
-	for (auto type : m_typelist)
+	for (const auto &type : m_typelist)
 		type.load(config_type::INIT, nullptr);
 
 	/* now load the controller file */
@@ -69,7 +71,7 @@ int configuration_manager::load_settings()
 		/* open the config file */
 		emu_file file(machine().options().ctrlr_path(), OPEN_FLAG_READ);
 		osd_printf_verbose("Attempting to parse: %s.cfg\n",controller);
-		osd_file::error filerr = file.open(controller, ".cfg");
+		osd_file::error filerr = file.open(std::string(controller) + ".cfg");
 
 		if (filerr != osd_file::error::NONE)
 			throw emu_fatalerror("Could not load controller file %s.cfg", controller);
@@ -87,13 +89,13 @@ int configuration_manager::load_settings()
 		load_xml(file, config_type::DEFAULT);
 
 	/* finally, load the game-specific file */
-	filerr = file.open(machine().basename(), ".cfg");
+	filerr = file.open(machine().basename() + ".cfg");
 	osd_printf_verbose("Attempting to parse: %s.cfg\n",machine().basename());
 	if (filerr == osd_file::error::NONE)
 		loaded = load_xml(file, config_type::GAME);
 
 	/* loop over all registrants and call their final function */
-	for (auto type : m_typelist)
+	for (const auto &type : m_typelist)
 		type.load(config_type::FINAL, nullptr);
 
 	/* if we didn't find a saved config, return 0 so the main core knows that it */
@@ -105,7 +107,7 @@ int configuration_manager::load_settings()
 void configuration_manager::save_settings()
 {
 	/* loop over all registrants and call their init function */
-	for (auto type : m_typelist)
+	for (const auto &type : m_typelist)
 		type.save(config_type::INIT, nullptr);
 
 	/* save the defaults file */
@@ -115,12 +117,12 @@ void configuration_manager::save_settings()
 		save_xml(file, config_type::DEFAULT);
 
 	/* finally, save the game-specific file */
-	filerr = file.open(machine().basename(), ".cfg");
+	filerr = file.open(machine().basename() + ".cfg");
 	if (filerr == osd_file::error::NONE)
 		save_xml(file, config_type::GAME);
 
 	/* loop over all registrants and call their final function */
-	for (auto type : m_typelist)
+	for (const auto &type : m_typelist)
 		type.save(config_type::FINAL, nullptr);
 }
 
@@ -204,7 +206,7 @@ int configuration_manager::load_xml(emu_file &file, config_type which_type)
 			osd_printf_debug("Entry: %s -- processing\n", name);
 
 		/* loop over all registrants and call their load function */
-		for (auto type : m_typelist)
+		for (const auto &type : m_typelist)
 			type.load(which_type, systemnode->get_child(type.name.c_str()));
 		count++;
 	}
@@ -246,7 +248,7 @@ int configuration_manager::save_xml(emu_file &file, config_type which_type)
 
 	/* create the input node and write it out */
 	/* loop over all registrants and call their save function */
-	for (auto type : m_typelist)
+	for (const auto &type : m_typelist)
 	{
 		util::xml::data_node *const curnode = systemnode->add_child(type.name.c_str(), nullptr);
 		if (!curnode)

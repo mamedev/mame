@@ -11,7 +11,7 @@ TILE_GET_INFO_MEMBER(speedspn_state::get_tile_info)
 	int code = m_vidram[tile_index*2+1] | (m_vidram[tile_index*2] << 8);
 	int attr = m_attram[tile_index^0x400];
 
-	SET_TILE_INFO_MEMBER(0,code,attr & 0x3f,(attr & 0x80) ? TILE_FLIPX : 0);
+	tileinfo.set(0,code,attr & 0x3f,(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
 void speedspn_state::video_start()
@@ -20,7 +20,7 @@ void speedspn_state::video_start()
 	m_bank_vidram = 0;
 	m_vidram.resize(0x1000 * 2);
 	memset(&m_vidram[0], 0, 0x1000*2);
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(speedspn_state::get_tile_info),this),TILEMAP_SCAN_COLS, 8, 8,64,32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(speedspn_state::get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	save_item(NAME(m_display_disable));
 	save_item(NAME(m_bank_vidram));

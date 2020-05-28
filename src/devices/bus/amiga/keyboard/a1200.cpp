@@ -47,6 +47,8 @@
 #include "a1200.h"
 #include "matrix.h"
 
+#include "cpu/m6805/m68hc05.h"
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -105,6 +107,7 @@ a1200_kbd_device::a1200_kbd_device(machine_config const &mconfig, char const *ta
 	, device_amiga_keyboard_interface(mconfig, *this)
 	, m_rows(*this, "ROW%u", 0)
 	, m_mpu(*this, "mpu")
+	, m_led_kbd_caps(*this, "led_kbd_caps")
 	, m_row_drive(0xffff)
 	, m_host_kdat(true)
 	, m_mpu_kdat(true)
@@ -127,7 +130,7 @@ INPUT_CHANGED_MEMBER(a1200_kbd_device::layout_changed)
 	m_mpu->set_input_line(M68HC05_IRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ8_MEMBER(a1200_kbd_device::mpu_portb_r)
+u8 a1200_kbd_device::mpu_portb_r()
 {
 	u8 result(m_host_kdat ? 0xff : 0xfe);
 	for (unsigned row = 0; m_rows.size() > row; ++row)
@@ -138,12 +141,12 @@ READ8_MEMBER(a1200_kbd_device::mpu_portb_r)
 	return result;
 }
 
-WRITE8_MEMBER(a1200_kbd_device::mpu_porta_w)
+void a1200_kbd_device::mpu_porta_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	m_row_drive = (m_row_drive & 0xff00) | u16(u8(data | ~mem_mask));
 }
 
-WRITE8_MEMBER(a1200_kbd_device::mpu_portb_w)
+void a1200_kbd_device::mpu_portb_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	u8 const kdat(BIT(data, 0) | BIT(~mem_mask, 0));
 	m_host->kdat_w(kdat ? 1 : 0);
@@ -158,10 +161,10 @@ WRITE8_MEMBER(a1200_kbd_device::mpu_portb_w)
 	}
 }
 
-WRITE8_MEMBER(a1200_kbd_device::mpu_portc_w)
+void a1200_kbd_device::mpu_portc_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	m_row_drive = (m_row_drive & 0x80ff) | (u16(u8(data | ~mem_mask) & 0x7f) << 8);
-	machine().output().set_value("led_kbd_caps", BIT(~data, 7));
+	m_led_kbd_caps = BIT(~data, 7);
 }
 
 WRITE_LINE_MEMBER(a1200_kbd_device::mpu_tcmp)
@@ -171,13 +174,13 @@ WRITE_LINE_MEMBER(a1200_kbd_device::mpu_tcmp)
 
 void a1200_kbd_device::device_add_mconfig(machine_config &config)
 {
-	M68HC705C8A(config, m_mpu, XTAL(3'000'000));
-	m_mpu->port_r<1>().set(FUNC(a1200_kbd_device::mpu_portb_r));
-	m_mpu->port_r<3>().set_ioport("MOD");
-	m_mpu->port_w<0>().set(FUNC(a1200_kbd_device::mpu_porta_w));
-	m_mpu->port_w<1>().set(FUNC(a1200_kbd_device::mpu_portb_w));
-	m_mpu->port_w<2>().set(FUNC(a1200_kbd_device::mpu_portc_w));
-	m_mpu->tcmp().set(FUNC(a1200_kbd_device::mpu_tcmp));
+	m68hc705c8a_device &mpu(M68HC705C8A(config, m_mpu, XTAL(3'000'000)));
+	mpu.portb_r().set(FUNC(a1200_kbd_device::mpu_portb_r));
+	mpu.portd_r().set_ioport("MOD");
+	mpu.porta_w().set(FUNC(a1200_kbd_device::mpu_porta_w));
+	mpu.portb_w().set(FUNC(a1200_kbd_device::mpu_portb_w));
+	mpu.portc_w().set(FUNC(a1200_kbd_device::mpu_portc_w));
+	mpu.tcmp().set(FUNC(a1200_kbd_device::mpu_tcmp));
 }
 
 tiny_rom_entry const *a1200_kbd_device::device_rom_region() const
@@ -192,6 +195,8 @@ ioport_constructor a1200_kbd_device::device_input_ports() const
 
 void a1200_kbd_device::device_start()
 {
+	m_led_kbd_caps.resolve();
+
 	save_item(NAME(m_row_drive));
 	save_item(NAME(m_host_kdat));
 	save_item(NAME(m_mpu_kdat));

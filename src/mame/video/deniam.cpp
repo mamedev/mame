@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(deniam_state::get_bg_tile_info)
 {
 	const int page = tile_index >> 11;
 	u16 attr = m_videoram[m_bg_page[page] * 0x0800 + (tile_index & 0x7ff)];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			attr,
 			(attr & 0x1fc0) >> 6,
 			0);
@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(deniam_state::get_fg_tile_info)
 {
 	const int page = tile_index >> 11;
 	u16 attr = m_videoram[m_fg_page[page] * 0x0800 + (tile_index & 0x7ff)];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			attr,
 			(attr & 0x1fc0) >> 6,
 			0);
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(deniam_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(deniam_state::get_tx_tile_info)
 {
 	u16 attr = m_textram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			attr & 0xf1ff,
 			(attr & 0x0e00) >> 9,
 			0);
@@ -97,9 +97,9 @@ TILE_GET_INFO_MEMBER(deniam_state::get_tx_tile_info)
 
 void deniam_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deniam_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(deniam_state::scan_pages),this), 8, 8, 128, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deniam_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(deniam_state::scan_pages),this), 8, 8, 128, 64);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deniam_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deniam_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(deniam_state::scan_pages)), 8, 8, 128, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deniam_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(deniam_state::scan_pages)), 8, 8, 128, 64);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deniam_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);

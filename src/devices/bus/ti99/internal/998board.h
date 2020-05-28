@@ -160,17 +160,17 @@ private:
 
 	protected:
 		// Two flipflops
-		bool m_counting;
-		bool m_generate;
+		bool m_counting = false;
+		bool m_generate = false;
 		// Counter
-		int  m_counter;
+		int  m_counter = 0;
 
 		// Select value (indicates selected line)
-		int  m_selvalue;
+		int  m_selvalue = 0;
 
 		// Line state flags
-		bool m_addressed;
-		bool m_ready;
+		bool m_addressed = false;
+		bool m_ready = false;
 	};
 
 	class grom_waitstate_generator : public waitstate_generator
@@ -188,16 +188,16 @@ private:
 	};
 
 	// Memory cycle state
-	bool m_memen;
+	bool m_memen = false;
 
 	// Waiting for video
-	bool m_video_wait;
+	bool m_video_wait = false;
 
 	// State of the CRUS line
-	int m_crus;
+	int m_crus = ASSERT_LINE;
 
 	// Are the GROM libraries turned on?
-	bool m_crugl;
+	bool m_crugl = ASSERT_LINE;
 
 	// Do we have a logical address space match?
 	bool m_lasreq = false;
@@ -206,27 +206,27 @@ private:
 	bool m_grom_or_video = false;
 
 	// Select lines
-	bool m_spwt;
-	bool m_sccs;
-	bool m_sromcs;
-	bool m_sprd;
-	bool m_vdprd;
-	bool m_vdpwt;
+	bool m_spwt = false;
+	bool m_sccs = false;
+	bool m_sromcs = false;
+	bool m_sprd = false;
+	bool m_vdprd = CLEAR_LINE;
+	bool m_vdpwt = CLEAR_LINE;
 
 	// Collective GROM select state
-	int m_gromsel;
+	int m_gromsel = 0;
 
 	// Outgoing READY
-	int m_ggrdy;
+	int m_ggrdy = ASSERT_LINE;
 
 	// Outgoing READY latch (common flipflop driving SRY)
-	bool m_sry;
+	bool m_sry = false;
 
 	// Holds the A14 address line state. We need this for the clock_in method.
-	int m_a14;
+	int m_a14 = 0;
 
 	// Keeps the recent DBIN level
-	int m_dbin_level;
+	int m_dbin_level = 0;
 
 	// Wait state logic components
 	grom_waitstate_generator m_sgmws, m_tsgws, m_p8gws, m_p3gws;
@@ -273,51 +273,51 @@ public:
 
 private:
 	// Memory cycle state
-	bool m_pmemen;
+	bool m_pmemen = false;
 
 	// Logical access
-	bool m_lasreq;
+	bool m_lasreq = false;
 
 	// DRAM access
-	bool m_skdrcs;
+	bool m_skdrcs = false;
 
 	// Indicates the UP level of the GROMCLK
-	bool m_gromclk_up;
+	bool m_gromclk_up = false;
 
 	// Have we got the upper word of the address?
-	bool m_gotfirstword;
+	bool m_gotfirstword = false;
 
 	// Address latch
-	int m_address_latch;
+	int m_address_latch = 0;
 
 	// Most significant byte of the 24-bit address
-	int m_prefix;
+	int m_prefix = 0;
 
 	// CRU select of the 1700 device
-	bool m_alcpg;
+	bool m_alcpg = false;
 
 	// CRU select of the 2700 device
-	bool m_txspg;
+	bool m_txspg = false;
 
 	// ROM1 select lines
-	bool m_rom1cs;
-	bool m_rom1am;
-	bool m_rom1al;
+	bool m_rom1cs = false;
+	bool m_rom1am = false;
+	bool m_rom1al = false;
 
 	// OSO select
-	bool m_alccs;
+	bool m_alccs = false;
 
 	// Pascal ROM select line
-	bool m_prcs;
+	bool m_prcs = false;
 
 	// Cartridge port select line
-	bool m_cmas;
+	bool m_cmas = false;
 
 	// GROM clock count (as frequency divider)
-	int m_gromclock_count;
+	int m_gromclock_count = 0;
 
 	// Remember last msast state for edge detection
-	int m_msast;
+	int m_msast = 0;
 
 	// Pointer to mainboard
 	mainboard8_device* m_mainboard;
@@ -358,7 +358,7 @@ public:
 
 private:
 	// Memory cycle state
-	bool m_memen;
+	bool m_memen = false;
 
 	// DMA methods for loading/saving maps
 	void mapper_load();
@@ -369,52 +369,52 @@ private:
 	uint32_t  m_base_register[16];
 
 	// Indicates a logical space access
-	bool m_logical_space;
+	bool m_logical_space = true;
 
 	// Physical address
-	uint32_t  m_physical_address;
+	uint32_t  m_physical_address = 0;
 
 	// Pointer to SRAM where AMIGO needs to upload/download its map values
-	uint8_t* m_sram;
+	uint8_t* m_sram = nullptr;
 
 	// Pointer to mainboard
 	mainboard8_device* m_mainboard;
 
 	// Keep the system ready state
-	int m_srdy;
+	int m_srdy = 0;
 
 	// Outgoing READY level
-	int m_ready_out;
+	int m_ready_out = 0;
 
 	// Keep the CRUS setting
-	int m_crus;
+	int m_crus = 0;
 
 	// State of the address creation
-	int m_amstate;
+	int m_amstate = 0;
 
 	// Protection flags
-	int m_protflag;
+	int m_protflag = 0;
 
 	// Accessing SRAM
-	bool m_sram_accessed;
+	bool m_sram_accessed = false;
 
 	// Accessing DRAM
-	bool m_dram_accessed;
+	bool m_dram_accessed = false;
 
 	// Accessing the mapper
-	bool m_mapper_accessed;
+	bool m_mapper_accessed = false;
 
 	// HOLDA flag
-	bool m_hold_acknowledged;
+	bool m_hold_acknowledged = false;
 
 	// Address in SRAM during DMA
-	uint32_t  m_sram_address;
+	uint32_t  m_sram_address = 0;
 
 	// Number of the currently loaded/save base register
-	int m_basereg;
+	int m_basereg = 0;
 
 	// Latched value for mapper DMA transfer
-	uint32_t m_mapvalue;
+	uint32_t m_mapvalue = 0;
 };
 
 /*
@@ -471,54 +471,54 @@ private:
 	required_device<bus::hexbus::hexbus_device> m_hexbusout;
 
 	// Registers
-	uint8_t m_data;
-	uint8_t m_status;
-	uint8_t m_control;
-	uint8_t m_xmit;
+	uint8_t m_data = 0;
+	uint8_t m_status = 0;
+	uint8_t m_control = 0;
+	uint8_t m_xmit = 0;
 
-	bool m_bav;         // Bus available; when true, a communication is about to happen
-	bool m_sbav;        // Stable BAV; the BAV signal is true for two clock cycles
-	bool m_sbavold;     // Old SBAV state
-	bool m_bavold;
+	bool m_bav = false;         // Bus available; when true, a communication is about to happen
+	bool m_sbav = false;        // Stable BAV; the BAV signal is true for two clock cycles
+	bool m_sbavold = false;     // Old SBAV state
+	bool m_bavold = false;
 
-	bool m_hsk;         // Handshake line; when true, a bus member needs more time to process the message
-	bool m_hsklocal;    // Local level of HSK
-	bool m_shsk;        // Stable HSK
-	bool m_hskold;
+	bool m_hsk = false;         // Handshake line; when true, a bus member needs more time to process the message
+	bool m_hsklocal = false;    // Local level of HSK
+	bool m_shsk = false;        // Stable HSK
+	bool m_hskold = false;
 
 	// Page 3 in OSO schematics: Write timing
-	bool m_wq1;         // Flipflop 1
-	bool m_wq1old;      // Previous state
-	bool m_wq2;         // Flipflop 2
-	bool m_wq2old;      // Previous state
-	bool m_wnp;         // Write nibble selection; true means upper 4 bits
-	bool m_wbusy;       // When true, direct the transmit register towards the output
-	bool m_wbusyold;    // Old state of the WBUSY line
-	bool m_sendbyte;    // Byte has been loaded into the XMIT register
-	bool m_wrset;       // Start sending
-	bool m_counting;    // Counter running
-	int m_clkcount;     // Counter for 30 cycles
+	bool m_wq1 = false;         // Flipflop 1
+	bool m_wq1old = false;      // Previous state
+	bool m_wq2 = false;         // Flipflop 2
+	bool m_wq2old = false;      // Previous state
+	bool m_wnp = false;         // Write nibble selection; true means upper 4 bits
+	bool m_wbusy = false;       // When true, direct the transmit register towards the output
+	bool m_wbusyold = false;    // Old state of the WBUSY line
+	bool m_sendbyte = false;    // Byte has been loaded into the XMIT register
+	bool m_wrset = false;       // Start sending
+	bool m_counting = false;    // Counter running
+	int m_clkcount = 0;     // Counter for 30 cycles
 
 	// Page 4 in OSO schematics: Read timing
-	bool m_rq1;         // Flipflop 1
-	bool m_rq2;         // Flipflop 2
-	bool m_rq2old;      // Previous state
-	bool m_rnib;        // Read nibble, true means upper 4 bits
-	bool m_rnibcold;    // Needed to detect the raising edge
-	bool m_rdset;       // Start reading
-	bool m_rdsetold;    // Old state
-	bool m_msns;        // Upper 4 bits
-	bool m_lsns;        // Lower 4 bits
+	bool m_rq1 = false;         // Flipflop 1
+	bool m_rq2 = false;         // Flipflop 2
+	bool m_rq2old = false;      // Previous state
+	bool m_rnib = false;        // Read nibble, true means upper 4 bits
+	bool m_rnibcold = false;    // Needed to detect the raising edge
+	bool m_rdset = false;       // Start reading
+	bool m_rdsetold = false;    // Old state
+	bool m_msns = false;        // Upper 4 bits
+	bool m_lsns = false;        // Lower 4 bits
 
 	// Page 6 (RHSUS*)
-	bool m_rhsus;       // Needed to assert the HSK line until the CPU has read the byte
+	bool m_rhsus = false;       // Needed to assert the HSK line until the CPU has read the byte
 
-	bool m_rbusy;
+	bool m_rbusy = false;
 
-	bool m_phi3;
+	bool m_phi3 = false;
 
 	// Debugging help
-	uint8_t m_oldvalue;
+	uint8_t m_oldvalue = 0;
 /*
     // This is a buffer to enqueue changes on the Hexbus
     // This is not part of the real implementation, but in the emulation
@@ -585,40 +585,40 @@ protected:
 
 private:
 	// Holds the state of the A14 line
-	bool    m_A14_set;
+	bool    m_A14_set = false;
 
 	// Propagates the end of the memory cycle
 	void cycle_end();
 
 	// Original logical address.
-	int     m_logical_address;
+	int     m_logical_address = 0;
 
 	// Mapped physical address.
-	int     m_physical_address;
+	int     m_physical_address = 0;
 
 	// Indicates that a byte is waiting on the data bus (see m_latched_data)
-	bool    m_pending_write;
+	bool    m_pending_write = false;
 
 	// Hold the value of the data bus. In a real machine, the data bus continues
 	// to show that value, but in this emulation we have a push mechanism.
-	uint8_t   m_latched_data;
+	uint8_t   m_latched_data = 0;
 
 	// Hold the level of the GROMCLK line
-	int m_gromclk;
+	int m_gromclk = 0;
 
 	// Selecting GROM libraries
 	void select_groms();
 
 	// Previous select state
-	int m_prev_grom;
+	int m_prev_grom = 0;
 
 	// Ready states
-	bool m_speech_ready;
-	bool m_sound_ready;
-	bool m_pbox_ready;
+	bool m_speech_ready = true;
+	bool m_sound_ready = true;
+	bool m_pbox_ready = true;
 
 	// Keeps the recent DBIN level
-	int m_dbin_level;
+	int m_dbin_level = 0;
 
 	// Ready line to the CPU
 	devcb_write_line m_ready;
@@ -649,7 +649,7 @@ private:
 	required_device<ram_device>             m_dram;
 
 	// Debugging
-	int m_last_ready;
+	int m_last_ready = CLEAR_LINE;
 	line_state m_crus_debug;
 
 	// System GROM library
@@ -683,15 +683,15 @@ private:
 	required_device<tmc0430_device> m_p3grom2;
 
 	// Idle flags for GROMs
-	bool m_sgrom_idle;
-	bool m_tsgrom_idle;
-	bool m_p8grom_idle;
-	bool m_p3grom_idle;
+	bool m_sgrom_idle = true;
+	bool m_tsgrom_idle = true;
+	bool m_p8grom_idle = true;
+	bool m_p3grom_idle = true;
 
 	// ROM area of the system.
-	uint8_t*   m_rom0;
-	uint8_t*   m_rom1;
-	uint8_t*   m_pascalrom;
+	uint8_t*   m_rom0 = nullptr;
+	uint8_t*   m_rom1 = nullptr;
+	uint8_t*   m_pascalrom = nullptr;
 };
 
 } } } // end namespace bus::ti99::internal

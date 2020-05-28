@@ -257,12 +257,12 @@ void battlnts_state::battlnts(machine_config &config)
 
 	K007342(config, m_k007342, 0);
 	m_k007342->set_gfxnum(0);
-	m_k007342->set_tile_callback(FUNC(battlnts_state::battlnts_tile_callback), this);
+	m_k007342->set_tile_callback(FUNC(battlnts_state::battlnts_tile_callback));
 	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
 	K007420(config, m_k007420, 0);
 	m_k007420->set_bank_limit(0x3ff);
-	m_k007420->set_sprite_callback(FUNC(battlnts_state::battlnts_sprite_callback), this);
+	m_k007420->set_sprite_callback(FUNC(battlnts_state::battlnts_sprite_callback));
 	m_k007420->set_palette_tag("palette");
 
 	/* sound hardware */

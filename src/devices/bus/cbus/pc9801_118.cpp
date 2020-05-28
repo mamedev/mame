@@ -114,7 +114,7 @@ void pc9801_118_device::device_validity_check(validity_checker &valid) const
 
 void pc9801_118_device::device_start()
 {
-	m_bus->install_io(0xa460, 0xa463, read8_delegate(FUNC(pc9801_118_device::id_r), this), write8_delegate(FUNC(pc9801_118_device::ext_w), this) );
+	m_bus->install_io(0xa460, 0xa463, read8_delegate(*this, FUNC(pc9801_118_device::id_r)), write8_delegate(*this, FUNC(pc9801_118_device::ext_w)));
 
 	save_item(NAME(m_ext_reg));
 }
@@ -128,7 +128,7 @@ void pc9801_118_device::device_reset()
 {
 	uint16_t port_base = (ioport("OPN3_DSW")->read() & 1) << 8;
 	m_bus->io_space().unmap_readwrite(0x0088, 0x008b, 0x100);
-	m_bus->install_io(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_118_device::opn3_r), this), write8_delegate(FUNC(pc9801_118_device::opn3_w), this) );
+	m_bus->install_io(port_base + 0x0088, port_base + 0x008f, read8_delegate(*this, FUNC(pc9801_118_device::opn3_r)), write8_delegate(*this, FUNC(pc9801_118_device::opn3_w)));
 	m_ext_reg = 1; // TODO: enabled or disabled?
 }
 

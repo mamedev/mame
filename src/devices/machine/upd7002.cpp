@@ -19,7 +19,14 @@
 DEFINE_DEVICE_TYPE(UPD7002, upd7002_device, "upd7002", "uPD7002 ADC")
 
 upd7002_device::upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, UPD7002, tag, owner, clock), m_status(0), m_data1(0), m_data0(0), m_digitalvalue(0), m_conversion_counter(0)
+	: device_t(mconfig, UPD7002, tag, owner, clock)
+	, m_status(0)
+	, m_data1(0)
+	, m_data0(0)
+	, m_digitalvalue(0)
+	, m_conversion_counter(0)
+	, m_get_analogue_cb(*this)
+	, m_eoc_cb(*this)
 {
 }
 
@@ -29,8 +36,8 @@ upd7002_device::upd7002_device(const machine_config &mconfig, const char *tag, d
 
 void upd7002_device::device_start()
 {
-	m_get_analogue_cb.bind_relative_to(*owner());
-	m_eoc_cb.bind_relative_to(*owner());
+	m_get_analogue_cb.resolve();
+	m_eoc_cb.resolve();
 
 	// register for state saving
 	save_item(NAME(m_status));
@@ -61,7 +68,7 @@ void upd7002_device::device_reset()
 
 READ_LINE_MEMBER( upd7002_device::eoc_r )
 {
-	return (m_status>>7)&0x01;
+	return BIT(m_status, 7);
 }
 
 
@@ -71,41 +78,42 @@ void upd7002_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 	case TIMER_CONVERSION_COMPLETE:
 		{
-		int counter_value = param;
-		if (counter_value==m_conversion_counter)
-		{
-			// this really always does a 12 bit conversion
-			m_data1 = m_digitalvalue>>8;
-			m_data0 = m_digitalvalue&0xf0;
+			int counter_value = param;
+			if (counter_value == m_conversion_counter)
+			{
+				// this really always does a 12 bit conversion
+				m_data1 = m_digitalvalue >> 8;
+				m_data0 = m_digitalvalue & 0xf0;
 
-			// set the status register with top 2 MSB, not busy and conversion complete
-			m_status = (m_status & 0x0f)|((m_data1 & 0xc0)>>2)|0x40;
+				// set the status register with top 2 MSB, not busy and conversion complete
+				m_status = (m_status & 0x0f) | ((m_data1 & 0xc0) >> 2) | 0x40;
 
-			// call the EOC function with EOC from status
-			// eoc_r(0) this has just been set to 0
-			if (!m_eoc_cb.isnull()) m_eoc_cb(0);
-			m_conversion_counter=0;
+				// call the EOC function with EOC from status
+				// eoc_r(0) this has just been set to 0
+				if (!m_eoc_cb.isnull()) m_eoc_cb(0);
+				m_conversion_counter=0;
+			}
 		}
 		break;
-		}
 	default:
-		assert_always(false, "Unknown id in upd7002_device::device_timer");
+		throw emu_fatalerror("Unknown id in upd7002_device::device_timer");
 	}
 }
 
 
 uint8_t upd7002_device::read(offs_t offset)
 {
-	switch(offset&0x03)
+	switch (offset & 0x03)
 	{
-		case 0:
-			return m_status;
+	case 0:
+		return m_status;
 
-		case 1:
-			return m_data1;
+	case 1:
+		return m_data1;
 
-		case 2: case 3:
-			return m_data0;
+	case 2:
+	case 3:
+		return m_data0;
 	}
 	return 0;
 }
@@ -116,9 +124,9 @@ void upd7002_device::write(offs_t offset, uint8_t data)
 {
 	/* logerror("write to uPD7002 $%02X = $%02X\n",offset,data); */
 
-	switch(offset&0x03)
+	switch (offset & 0x03)
 	{
-		case 0:
+	case 0:
 		/*
 		Data Latch/AD start
 		    D0 and D1 together define which one of the four input channels is selected
@@ -152,17 +160,20 @@ void upd7002_device::write(offs_t offset, uint8_t data)
 		{
 			// 12 bit conversion takes 10ms
 			timer_set(attotime::from_msec(10), TIMER_CONVERSION_COMPLETE, m_conversion_counter);
-		} else {
+		}
+		else
+		{
 			// 8 bit conversion takes 4ms
 			timer_set(attotime::from_msec(4), TIMER_CONVERSION_COMPLETE, m_conversion_counter);
 		}
 		break;
 
-		case 1: case 2:
+	case 1:
+	case 2:
 		/* Nothing */
 		break;
 
-		case 3:
+	case 3:
 		/* Test Mode: Used for inspecting the device, The data input-output terminals assume an input
 		      state and are connected to the A/D counter. Therefore, the A/D conversion data
 		      read out after this is meaningless.

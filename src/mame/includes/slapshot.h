@@ -81,7 +81,7 @@ private:
 	optional_ioport m_io_service;
 
 	/* video-related */
-	slapshot_tempsprite *m_spritelist;
+	std::unique_ptr<slapshot_tempsprite[]> m_spritelist;
 	bool      m_sprites_disabled;
 	s32       m_sprites_active_area;
 	s32       m_sprites_master_scrollx;

@@ -36,8 +36,6 @@ local function init()
 		romset VARCHAR NOT NULL,
 		data CLOB NOT NULL)]])
 		db.check("creating marp table")
-		db.exec("CREATE INDEX \"romset_" .. file .. "\" ON \"" .. file .. "_idx\"(romset)")
-		db.check("creating marp index")
 	end
 
 	for line in fh:lines() do
@@ -61,8 +59,6 @@ local function init()
 	if dbver then
 		db.exec("DELETE FROM \"" .. file .. "\"")
 		db.check("deleting marp")
-		db.exec("DELETE FROM \"" .. file .. "_idx\"")
-		db.check("deleting marp index")
 		stmt = db.prepare("UPDATE version SET version = ? WHERE datfile = ?")
 		db.check("updating marp version")
 	else

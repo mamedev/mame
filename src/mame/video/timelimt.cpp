@@ -69,20 +69,20 @@ void timelimt_state::timelimt_palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(timelimt_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1, m_bg_videoram[tile_index], 0, 0);
+	tileinfo.set(1, m_bg_videoram[tile_index], 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(timelimt_state::get_fg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
+	tileinfo.set(0, m_videoram[tile_index], 0, 0);
 }
 
 void timelimt_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(timelimt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(timelimt_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 32);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(timelimt_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(timelimt_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);

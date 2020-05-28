@@ -135,7 +135,7 @@ void r10788_device::device_timer(emu_timer &timer, device_timer_id id, int param
  *
  *************************************/
 
-WRITE8_MEMBER( r10788_device::io_w )
+void r10788_device::io_w(offs_t offset, uint8_t data)
 {
 	assert(offset < 16);
 	switch (offset)
@@ -180,7 +180,7 @@ WRITE8_MEMBER( r10788_device::io_w )
 }
 
 
-READ8_MEMBER( r10788_device::io_r )
+uint8_t r10788_device::io_r(offs_t offset)
 {
 	assert(offset < 16);
 	uint8_t data = 0xf;

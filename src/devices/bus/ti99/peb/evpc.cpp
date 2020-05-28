@@ -27,6 +27,9 @@
     Thus we assume that in the TI console (option 1) the sound chip has
     also been removed.
 
+    The EVPC has one configuration option:
+       VRAM may be set to 128K or 192K.
+
     Important note: The DSR (firmware) of the EVPC expects a memory expansion
     to be present; otherwise, the configuration (using CALL EVPC) will crash.
     There is no warning if the 32K expansion is not present.
@@ -86,10 +89,10 @@ SETADDRESS_DBIN_MEMBER( snug_enhanced_video_device::setaddress_dbin )
 
 	m_address = offset;
 	bool reading = (state==ASSERT_LINE);
-	int offbase = (m_address & 0xfc01);
+	int offbase = (m_address & 0x7fc01); // The 7 represents the AMA/B/C lines
 
 	// Sound
-	m_sound_accessed = ((m_address & 0xff01)==0x8400) && !reading;
+	m_sound_accessed = ((m_address & 0x7ff01)==0x78400) && !reading;
 
 	// Video space
 	// 8800 / 8802 / 8804 / 8806
@@ -97,15 +100,15 @@ SETADDRESS_DBIN_MEMBER( snug_enhanced_video_device::setaddress_dbin )
 	//
 	// Bits 1000 1w00 0000 0xx0
 	// Mask 1111 1000 0000 0001
-	m_video_accessed = ((offbase==0x8800) && reading) || ((offbase==0x8c00) && !reading);
+	m_video_accessed = ((offbase==0x78800) && reading) || ((offbase==0x78c00) && !reading);
 
 	// Read a byte in evpc DSR space
 	// 0x4000 - 0x5eff   DSR (paged)
 	// 0x5f00 - 0x5fef   NOVRAM
 	// 0x5ff0 - 0x5fff   Palette
-	m_inDsrArea = ((m_address & 0xe000)==0x4000);
-	m_novram_accessed = ((m_address & 0xff00)==0x5f00);
-	m_palette_accessed = ((m_address & 0xfff0)==0x5ff0);
+	m_inDsrArea = in_dsr_space(m_address, true);
+	m_novram_accessed = ((m_address & 0x7ff00)==0x75f00);
+	m_palette_accessed = ((m_address & 0x7fff0)==0x75ff0);
 
 	// Note that we check the selection in reverse order so that the overlap is avoided
 }
@@ -413,11 +416,10 @@ void snug_enhanced_video_device::device_start()
 
 void snug_enhanced_video_device::device_reset()
 {
-	m_select_mask = 0x7e000;
-	m_select_value = 0x74000;
 	m_dsr_page = 0;
 	m_RAMEN = false;
 	m_selected = false;
+	m_video->set_vram_size((ioport("EVPC-MEM")->read()==0)? 0x20000 : 0x30000);
 }
 
 void snug_enhanced_video_device::device_stop()
@@ -471,6 +473,11 @@ INPUT_PORTS_START( ti99_evpc )
 	PORT_DIPNAME( 0x01, 0x00, "EVPC Configuration" )
 		PORT_DIPSETTING(    0x00, "DIP" )
 		PORT_DIPSETTING(    0x01, "NOVRAM" )
+
+	PORT_START( "EVPC-MEM" )
+	PORT_CONFNAME( 0x01, 0x00, "EVPC video memory" )
+		PORT_DIPSETTING(    0x00, "128K" )
+		PORT_DIPSETTING(    0x01, "192K" )
 INPUT_PORTS_END
 
 const tiny_rom_entry *snug_enhanced_video_device::device_rom_region() const
@@ -487,7 +494,7 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 {
 	// video hardware
 	V9938(config, m_video, XTAL(21'477'272)); // typical 9938 clock, not verified
-	m_video->set_vram_size(0x20000);
+
 	m_video->int_cb().set(FUNC(snug_enhanced_video_device::video_interrupt_in));
 	m_video->set_screen(TI_SCREEN_TAG);
 	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));

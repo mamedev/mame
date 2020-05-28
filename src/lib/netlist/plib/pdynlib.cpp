@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * dynlib.c
- *
- */
 
 #include "pdynlib.h"
 
@@ -59,7 +55,7 @@ WCHAR *wstring_from_utf8(const char *utf8string)
 
 namespace plib {
 dynlib::dynlib(const pstring &libname)
-: m_isLoaded(false), m_lib(nullptr)
+: m_lib(nullptr)
 {
 #ifdef _WIN32
 	//fprintf(stderr, "win: loading <%s>\n", libname.c_str());
@@ -69,7 +65,7 @@ dynlib::dynlib(const pstring &libname)
 	else
 		m_lib = GetModuleHandle(nullptr);
 	if (m_lib != nullptr)
-		m_isLoaded = true;
+		set_loaded(true);
 	//else
 	//  fprintf(stderr, "win: library <%s> not found!\n", libname.c_str());
 	delete [] buffer;
@@ -82,14 +78,14 @@ dynlib::dynlib(const pstring &libname)
 	else
 		m_lib = dlopen(nullptr, RTLD_LAZY);
 	if (m_lib != nullptr)
-		m_isLoaded = true;
+		set_loaded(true);
 	//else
 	//  printf("library <%s> not found: %s\n", libname.c_str(), dlerror());
 #endif
 	}
 
 dynlib::dynlib(const pstring &path, const pstring &libname)
-: m_isLoaded(false), m_lib(nullptr)
+: m_lib(nullptr)
 {
 	// FIXME: implement path search
 	plib::unused_var(path);
@@ -101,7 +97,7 @@ dynlib::dynlib(const pstring &path, const pstring &libname)
 	else
 		m_lib = GetModuleHandle(nullptr);
 	if (m_lib != nullptr)
-		m_isLoaded = true;
+		set_loaded(true);
 	else
 	{
 		//printf("win: library <%s> not found!\n", libname.c_str());
@@ -116,7 +112,7 @@ dynlib::dynlib(const pstring &path, const pstring &libname)
 	else
 		m_lib = dlopen(nullptr, RTLD_LAZY);
 	if (m_lib != nullptr)
-		m_isLoaded = true;
+		set_loaded(true);
 	else
 	{
 		//printf("library <%s> not found!\n", libname.c_str());
@@ -136,12 +132,7 @@ dynlib::~dynlib()
 	}
 }
 
-bool dynlib::isLoaded() const
-{
-	return m_isLoaded;
-}
-
-void *dynlib::getsym_p(const pstring &name)
+void *dynlib::getsym_p(const pstring &name) const noexcept
 {
 #ifdef _WIN32
 	return (void *) GetProcAddress((HMODULE) m_lib, name.c_str());

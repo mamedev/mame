@@ -73,7 +73,7 @@ void windows_osd_interface::poll_input(running_machine &machine) const
 //  customize_input_type_list
 //============================================================
 
-void windows_osd_interface::customize_input_type_list(simple_list<input_type_entry> &typelist)
+void windows_osd_interface::customize_input_type_list(std::vector<input_type_entry> &typelist)
 {
 	const char* uimode;
 

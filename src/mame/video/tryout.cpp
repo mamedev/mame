@@ -46,12 +46,12 @@ TILE_GET_INFO_MEMBER(tryout_state::get_fg_tile_info)
 	code |= ((attr & 0x03) << 8);
 	int color = ((attr & 0x4) >> 2) + 6;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(tryout_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(2, m_vram[tile_index] & 0x7f, 2, 0);
+	tileinfo.set(2, m_vram[tile_index] & 0x7f, 2, 0);
 }
 
 READ8_MEMBER(tryout_state::vram_r)
@@ -162,8 +162,8 @@ TILEMAP_MAPPER_MEMBER(tryout_state::get_bg_memory_offset)
 
 void tryout_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tryout_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(tryout_state::get_fg_memory_offset),this),8,8,32,32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tryout_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(tryout_state::get_bg_memory_offset),this),16,16,64,16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tryout_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(tryout_state::get_fg_memory_offset)),  8, 8, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tryout_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(tryout_state::get_bg_memory_offset)), 16,16, 64,16);
 
 	m_vram=std::make_unique<uint8_t[]>(8 * 0x800);
 	m_vram_gfx=std::make_unique<uint8_t[]>(0x6000);

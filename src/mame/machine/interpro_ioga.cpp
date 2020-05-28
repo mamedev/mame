@@ -134,7 +134,6 @@ DEFINE_DEVICE_TYPE(SAPPHIRE_IOGA, sapphire_ioga_device, "ioga_s", "I/O Gate Arra
 interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_memory_space(*this, finder_base::DUMMY_TAG, -1, 32)
-	, m_memory(nullptr)
 	, m_out_nmi_func(*this)
 	, m_out_irq_func(*this)
 	, m_out_irq_vector_func(*this)
@@ -168,7 +167,7 @@ sapphire_ioga_device::sapphire_ioga_device(const machine_config &mconfig, const 
 
 void interpro_ioga_device::device_start()
 {
-	m_memory = m_memory_space->cache<2, 0, ENDIANNESS_LITTLE>();
+	m_memory_space->cache(m_memory);
 
 	// resolve callbacks
 	m_out_nmi_func.resolve();
@@ -176,6 +175,8 @@ void interpro_ioga_device::device_start()
 	m_out_irq_vector_func.resolve();
 	m_fdc_tc_func.resolve();
 	m_eth_ca_func.resolve();
+
+	m_hwicr = std::make_unique<u16[]>(get_int_count());
 
 	for (dma_channel_t &dma_channel : m_dma_channel)
 	{
@@ -219,7 +220,7 @@ void interpro_ioga_device::device_reset()
 	m_irq_vector = 0;
 	m_line_state = 0;
 
-	m_hwicr = std::make_unique<u16[]>(get_int_count());
+	std::fill_n(m_hwicr.get(), get_int_count(), u16(0));
 
 	// initialise dma state
 	for (dma_channel_t &dma_channel : m_dma_channel)
@@ -261,7 +262,7 @@ void sapphire_ioga_device::device_reset()
 /*
  * Interrupts
  */
-WRITE32_MEMBER(interpro_ioga_device::bus_error)
+void interpro_ioga_device::bus_error(offs_t offset, u32 data)
 {
 	LOG("bus_error address 0x%08x businfo 0x%08x\n", data, offset);
 
@@ -692,9 +693,9 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::dma)
 		{
 			// transfer from the memory to device or device to memory
 			if (dma_channel.control & DMA_CTRL_WRITE)
-				dma_channel.device_w(m_memory->read_byte(dma_channel.real_address));
+				dma_channel.device_w(m_memory.read_byte(dma_channel.real_address));
 			else
-				m_memory->write_byte(dma_channel.real_address, dma_channel.device_r());
+				m_memory.write_byte(dma_channel.real_address, dma_channel.device_r());
 
 			// increment address and decrement count
 			dma_channel.real_address++;
@@ -708,7 +709,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::dma)
 				// translate virtual address
 				if (dma_channel.control & DMA_CTRL_VIRTUAL)
 				{
-					const u32 ptde = m_memory->read_dword(dma_channel.virtual_address);
+					const u32 ptde = m_memory.read_dword(dma_channel.virtual_address);
 
 					// FIXME: ignore the page fault flag?
 					dma_channel.real_address = ptde & ~0xfff;
@@ -886,7 +887,7 @@ void interpro_ioga_device::dma_w(address_space &space, offs_t offset, u32 data, 
 		// translate virtual address
 		if (data & DMA_CTRL_VIRTUAL)
 		{
-			const u32 ptde = m_memory->read_dword(dma_channel.virtual_address);
+			const u32 ptde = m_memory.read_dword(dma_channel.virtual_address);
 
 			// FIXME: ignore the page fault flag?
 			dma_channel.real_address = (ptde & ~0xfff) | (dma_channel.real_address & 0xfff);
@@ -928,7 +929,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::serial_dma)
 		{
 			if (dma_channel.control & SDMA_WRITE)
 			{
-				u8 data = m_memory->read_byte(dma_channel.address++);
+				u8 data = m_memory.read_byte(dma_channel.address++);
 
 				LOGMASKED(LOG_SERIALDMA, "dma: writing byte 0x%02x to serial channel %d\n",
 					data, dma_channel.channel);
@@ -942,7 +943,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::serial_dma)
 				LOGMASKED(LOG_SERIALDMA, "dma: reading byte 0x%02x from serial channel %d\n",
 					data, dma_channel.channel);
 
-				m_memory->write_byte(dma_channel.address++, data);
+				m_memory.write_byte(dma_channel.address++, data);
 			}
 
 			// decrement transfer count
@@ -1255,7 +1256,7 @@ READ32_MEMBER(interpro_ioga_device::mouse_status_r)
 	return result;
 }
 
-WRITE32_MEMBER(interpro_ioga_device::mouse_status_w)
+void interpro_ioga_device::mouse_status_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_MOUSE, "mouse_status_w status 0x%08x mask 0x%08x\n",
 		data, mem_mask);
@@ -1307,14 +1308,14 @@ WRITE16_MEMBER(emerald_ioga_device::eth_w)
 
 	LOGMASKED(LOG_NETWORK, "eth_w address 0x%08x mask 0x%04x data 0x%04x\n",
 		address, mem_mask, data);
-	m_memory->write_word(address, data, mem_mask);
+	m_memory.write_word(address, data, mem_mask);
 }
 
 READ16_MEMBER(emerald_ioga_device::eth_r)
 {
 	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
 
-	const u16 data = m_memory->read_word(address, mem_mask);
+	const u16 data = m_memory.read_word(address, mem_mask);
 	LOGMASKED(LOG_NETWORK, "eth_r 0x%08x mask 0x%04x data 0x%04x\n",
 		address, mem_mask, data);
 
@@ -1368,14 +1369,14 @@ WRITE16_MEMBER(turquoise_ioga_device::eth_w)
 
 	LOGMASKED(LOG_NETWORK, "eth_w address 0x%08x mask 0x%04x data 0x%04x\n",
 		address, mem_mask, data);
-	m_memory->write_word(address, data, mem_mask);
+	m_memory.write_word(address, data, mem_mask);
 }
 
 READ16_MEMBER(turquoise_ioga_device::eth_r)
 {
 	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
 
-	const u16 data = m_memory->read_word(address, mem_mask);
+	const u16 data = m_memory.read_word(address, mem_mask);
 	LOGMASKED(LOG_NETWORK, "eth_r 0x%08x mask 0x%04x data 0x%04x\n",
 		address, mem_mask, data);
 
@@ -1456,7 +1457,7 @@ WRITE16_MEMBER(sapphire_ioga_device::eth_w)
 
 	LOGMASKED(LOG_NETWORK, "eth_w channel %c address 0x%08x mask 0x%08x data 0x%04x\n",
 		channel + 'A', address, mem_mask, data);
-	m_memory->write_word(address, data, mem_mask);
+	m_memory.write_word(address, data, mem_mask);
 }
 
 READ16_MEMBER(sapphire_ioga_device::eth_r)
@@ -1475,7 +1476,7 @@ READ16_MEMBER(sapphire_ioga_device::eth_r)
 			offset << 1, address);
 	}
 
-	u16 data = m_memory->read_word(address, mem_mask);
+	u16 data = m_memory.read_word(address, mem_mask);
 	LOGMASKED(LOG_NETWORK, "eth_r channel %c address 0x%08x mask 0x%08x data 0x%04x\n",
 		channel + 'A', address, mem_mask, data);
 	return data;

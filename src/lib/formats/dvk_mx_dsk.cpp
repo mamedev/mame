@@ -18,7 +18,7 @@
 
 ************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "flopimg.h"
 #include "formats/dvk_mx_dsk.h"

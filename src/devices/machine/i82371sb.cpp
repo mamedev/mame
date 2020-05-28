@@ -492,7 +492,7 @@ void i82371sb_isa_device::map_extra(uint64_t memory_window_start, uint64_t memor
 
 
 // Southbridge
-READ8_MEMBER( i82371sb_isa_device::get_slave_ack )
+uint8_t i82371sb_isa_device::get_slave_ack(offs_t offset)
 {
 	if (offset==2) // IRQ = 2
 		return m_pic8259_slave->acknowledge();
@@ -582,7 +582,7 @@ WRITE_LINE_MEMBER( i82371sb_isa_device::pc_dma_hrq_changed )
 	m_dma8237_2->hack_w( state );
 }
 
-READ8_MEMBER(i82371sb_isa_device::pc_dma_read_byte)
+uint8_t i82371sb_isa_device::pc_dma_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
@@ -595,7 +595,7 @@ READ8_MEMBER(i82371sb_isa_device::pc_dma_read_byte)
 }
 
 
-WRITE8_MEMBER(i82371sb_isa_device::pc_dma_write_byte)
+void i82371sb_isa_device::pc_dma_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
@@ -606,7 +606,7 @@ WRITE8_MEMBER(i82371sb_isa_device::pc_dma_write_byte)
 }
 
 
-READ8_MEMBER(i82371sb_isa_device::pc_dma_read_word)
+uint8_t i82371sb_isa_device::pc_dma_read_word(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
@@ -621,7 +621,7 @@ READ8_MEMBER(i82371sb_isa_device::pc_dma_read_word)
 }
 
 
-WRITE8_MEMBER(i82371sb_isa_device::pc_dma_write_word)
+void i82371sb_isa_device::pc_dma_write_word(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
@@ -632,22 +632,22 @@ WRITE8_MEMBER(i82371sb_isa_device::pc_dma_write_word)
 }
 
 
-READ8_MEMBER( i82371sb_isa_device::pc_dma8237_0_dack_r ) { return m_isabus->dack_r(0); }
-READ8_MEMBER( i82371sb_isa_device::pc_dma8237_1_dack_r ) { return m_isabus->dack_r(1); }
-READ8_MEMBER( i82371sb_isa_device::pc_dma8237_2_dack_r ) { return m_isabus->dack_r(2); }
-READ8_MEMBER( i82371sb_isa_device::pc_dma8237_3_dack_r ) { return m_isabus->dack_r(3); }
-READ8_MEMBER( i82371sb_isa_device::pc_dma8237_5_dack_r ) { return m_isabus->dack_r(5); }
-READ8_MEMBER( i82371sb_isa_device::pc_dma8237_6_dack_r ) { return m_isabus->dack_r(6); }
-READ8_MEMBER( i82371sb_isa_device::pc_dma8237_7_dack_r ) { return m_isabus->dack_r(7); }
+uint8_t i82371sb_isa_device::pc_dma8237_0_dack_r() { return m_isabus->dack_r(0); }
+uint8_t i82371sb_isa_device::pc_dma8237_1_dack_r() { return m_isabus->dack_r(1); }
+uint8_t i82371sb_isa_device::pc_dma8237_2_dack_r() { return m_isabus->dack_r(2); }
+uint8_t i82371sb_isa_device::pc_dma8237_3_dack_r() { return m_isabus->dack_r(3); }
+uint8_t i82371sb_isa_device::pc_dma8237_5_dack_r() { return m_isabus->dack_r(5); }
+uint8_t i82371sb_isa_device::pc_dma8237_6_dack_r() { return m_isabus->dack_r(6); }
+uint8_t i82371sb_isa_device::pc_dma8237_7_dack_r() { return m_isabus->dack_r(7); }
 
 
-WRITE8_MEMBER( i82371sb_isa_device::pc_dma8237_0_dack_w ) { m_isabus->dack_w(0, data); }
-WRITE8_MEMBER( i82371sb_isa_device::pc_dma8237_1_dack_w ) { m_isabus->dack_w(1, data); }
-WRITE8_MEMBER( i82371sb_isa_device::pc_dma8237_2_dack_w ) { m_isabus->dack_w(2, data); }
-WRITE8_MEMBER( i82371sb_isa_device::pc_dma8237_3_dack_w ) { m_isabus->dack_w(3, data); }
-WRITE8_MEMBER( i82371sb_isa_device::pc_dma8237_5_dack_w ) { m_isabus->dack_w(5, data); }
-WRITE8_MEMBER( i82371sb_isa_device::pc_dma8237_6_dack_w ) { m_isabus->dack_w(6, data); }
-WRITE8_MEMBER( i82371sb_isa_device::pc_dma8237_7_dack_w ) { m_isabus->dack_w(7, data); }
+void i82371sb_isa_device::pc_dma8237_0_dack_w(uint8_t data) { m_isabus->dack_w(0, data); }
+void i82371sb_isa_device::pc_dma8237_1_dack_w(uint8_t data) { m_isabus->dack_w(1, data); }
+void i82371sb_isa_device::pc_dma8237_2_dack_w(uint8_t data) { m_isabus->dack_w(2, data); }
+void i82371sb_isa_device::pc_dma8237_3_dack_w(uint8_t data) { m_isabus->dack_w(3, data); }
+void i82371sb_isa_device::pc_dma8237_5_dack_w(uint8_t data) { m_isabus->dack_w(5, data); }
+void i82371sb_isa_device::pc_dma8237_6_dack_w(uint8_t data) { m_isabus->dack_w(6, data); }
+void i82371sb_isa_device::pc_dma8237_7_dack_w(uint8_t data) { m_isabus->dack_w(7, data); }
 
 WRITE_LINE_MEMBER( i82371sb_isa_device::at_dma8237_out_eop )
 {
@@ -961,8 +961,8 @@ void i82371sb_ide_device::map_extra(uint64_t memory_window_start, uint64_t memor
 	{
 		offs_t m_base = bmiba & 0xfff0;
 
-		io_space->install_readwrite_handler(m_base, m_base + 0x7, read32_delegate(FUNC(bus_master_ide_controller_device::bmdma_r), &(*m_ide1)), write32_delegate(FUNC(bus_master_ide_controller_device::bmdma_w), &(*m_ide1)), 0xffffffff);
-		io_space->install_readwrite_handler(m_base + 0x8, m_base + 0xf, read32_delegate(FUNC(bus_master_ide_controller_device::bmdma_r), &(*m_ide2)), write32_delegate(FUNC(bus_master_ide_controller_device::bmdma_w), &(*m_ide2)), 0xffffffff);
+		io_space->install_readwrite_handler(m_base, m_base + 0x7, read32_delegate(*m_ide1, FUNC(bus_master_ide_controller_device::bmdma_r)), write32_delegate(*m_ide1, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
+		io_space->install_readwrite_handler(m_base + 0x8, m_base + 0xf, read32_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_r)), write32_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
 	}
 }
 

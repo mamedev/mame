@@ -48,12 +48,12 @@ public:
 private:
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(hex_display_w);
+	u8 keyboard_r();
+	void hex_display_w(offs_t offset, u8 data);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
-	uint8_t convert_key(uint8_t data);
+	u8 convert_key(u8 data);
 	bool m_cassinbit, m_cassoutbit, m_cassold;
 	u8 m_cass_data[4];
 
@@ -71,12 +71,12 @@ void elekscmp_state::machine_start()
 	m_digit.resolve();
 }
 
-WRITE8_MEMBER(elekscmp_state::hex_display_w)
+void elekscmp_state::hex_display_w(offs_t offset, u8 data)
 {
 	m_digit[offset & 0x7] = data;
 }
 
-uint8_t elekscmp_state::convert_key(uint8_t data)
+u8 elekscmp_state::convert_key(u8 data)
 {
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
@@ -85,7 +85,7 @@ uint8_t elekscmp_state::convert_key(uint8_t data)
 	return 0xff;
 }
 
-READ8_MEMBER(elekscmp_state::keyboard_r)
+u8 elekscmp_state::keyboard_r()
 {
 	u8 data = m_io_keyboard[0]->read();
 	if (data)

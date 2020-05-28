@@ -16,48 +16,49 @@
 
 
 namespace ui {
+
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
-menu_control_floppy_image::menu_control_floppy_image(mame_ui_manager &mui, render_container &container, device_image_interface &image) : menu_control_device_image(mui, container, image)
+menu_control_floppy_image::menu_control_floppy_image(mame_ui_manager &mui, render_container &container, device_image_interface &image) :
+	menu_control_device_image(mui, container, image),
+	fd(dynamic_cast<floppy_image_device &>(image)),
+	input_format(nullptr),
+	output_format(nullptr),
+	input_filename(),
+	output_filename()
 {
-	floppy_image_device *fd = static_cast<floppy_image_device *>(&m_image);
-	const floppy_image_format_t *fif_list = fd->get_formats();
 	int fcnt = 0;
-	for(const floppy_image_format_t *i = fif_list; i; i = i->next)
+	for(const floppy_image_format_t *i = fd.get_formats(); i; i = i->next)
 		fcnt++;
 
-	format_array = global_alloc_array(floppy_image_format_t *, fcnt);
-	input_format = output_format = nullptr;
-	input_filename = output_filename = "";
+	format_array = std::make_unique<floppy_image_format_t * []>(fcnt);
 }
 
 menu_control_floppy_image::~menu_control_floppy_image()
 {
-	global_free_array(format_array);
 }
 
 void menu_control_floppy_image::do_load_create()
 {
-	floppy_image_device *fd = static_cast<floppy_image_device *>(&m_image);
 	if(input_filename.compare("")==0) {
-		image_init_result err = fd->create(output_filename, nullptr, nullptr);
+		image_init_result err = fd.create(output_filename, nullptr, nullptr);
 		if (err != image_init_result::PASS) {
-			machine().popmessage("Error: %s", fd->error());
+			machine().popmessage("Error: %s", fd.error());
 			return;
 		}
 	} else {
-		image_init_result err = fd->load(input_filename);
+		image_init_result err = fd.load(input_filename);
 		if ((err == image_init_result::PASS) && (output_filename.compare("") != 0))
-			err = fd->reopen_for_write(output_filename) ? image_init_result::FAIL : image_init_result::PASS;
+			err = fd.reopen_for_write(output_filename) ? image_init_result::FAIL : image_init_result::PASS;
 		if (err != image_init_result::PASS) {
-			machine().popmessage("Error: %s", fd->error());
+			machine().popmessage("Error: %s", fd.error());
 			return;
 		}
 	}
 	if(output_format)
-		fd->setup_write(output_format);
+		fd.setup_write(output_format);
 }
 
 void menu_control_floppy_image::hook_load(const std::string &filename)
@@ -91,10 +92,9 @@ void menu_control_floppy_image::hook_load(const std::string &filename)
 
 void menu_control_floppy_image::handle()
 {
-	floppy_image_device *fd = static_cast<floppy_image_device *>(&m_image);
 	switch (m_state) {
 	case DO_CREATE: {
-		floppy_image_format_t *fif_list = fd->get_formats();
+		floppy_image_format_t *fif_list = fd.get_formats();
 			int ext_match;
 			int total_usable = 0;
 			for(floppy_image_format_t *i = fif_list; i; i = i->next) {
@@ -111,7 +111,7 @@ void menu_control_floppy_image::handle()
 				format_array[total_usable++] = i;
 		}
 		m_submenu_result.i = -1;
-		menu::stack_push<menu_select_format>(ui(), container(), format_array, ext_match, total_usable, &m_submenu_result.i);
+		menu::stack_push<menu_select_format>(ui(), container(), format_array.get(), ext_match, total_usable, &m_submenu_result.i);
 
 		m_state = SELECT_FORMAT;
 		break;
@@ -133,7 +133,7 @@ void menu_control_floppy_image::handle()
 		switch(m_submenu_result.rw) {
 		case menu_select_rw::result::READONLY:
 			do_load_create();
-			fd->setup_write(nullptr);
+			fd.setup_write(nullptr);
 			stack_pop();
 			break;
 

@@ -38,8 +38,6 @@ i8008_device::i8008_device(const machine_config &mconfig, const char *tag, devic
 	: cpu_device(mconfig, I8008, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 14)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 5)
-	, m_program(nullptr)
-	, m_cache(nullptr)
 {
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -52,9 +50,9 @@ i8008_device::i8008_device(const machine_config &mconfig, const char *tag, devic
 void i8008_device::device_start()
 {
 	// find address spaces
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_IO).specific(m_io);
 
 	// save state
 	save_item(NAME(m_PC));
@@ -222,7 +220,7 @@ std::unique_ptr<util::disasm_interface> i8008_device::create_disassembler()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t i8008_device::execute_min_cycles() const
+uint32_t i8008_device::execute_min_cycles() const noexcept
 {
 	return 8;
 }
@@ -232,7 +230,7 @@ uint32_t i8008_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t i8008_device::execute_max_cycles() const
+uint32_t i8008_device::execute_max_cycles() const noexcept
 {
 	return 16;
 }
@@ -511,11 +509,11 @@ inline void i8008_device::execute_one(int opcode)
 							if (((opcode>>4)&3)==0) {
 								// INP
 								m_icount -= 8;
-								m_A = m_io->read_byte((opcode >> 1) & 0x1f);
+								m_A = m_io.read_byte((opcode >> 1) & 0x1f);
 							} else {
 								// OUT
 								m_icount -= 6;
-								m_io->write_byte((opcode >> 1) & 0x1f, m_A);
+								m_io.write_byte((opcode >> 1) & 0x1f, m_A);
 							}
 							break;
 					}
@@ -601,7 +599,7 @@ inline void i8008_device::pop_stack()
 
 inline uint8_t i8008_device::rop()
 {
-	uint8_t retVal = m_cache->read_byte(GET_PC.w.l);
+	uint8_t retVal = m_cache.read_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x3fff;
 	m_PC = GET_PC;
 	return retVal;
@@ -618,7 +616,7 @@ inline uint8_t i8008_device::get_reg(uint8_t reg)
 		case 4 : retVal = m_E; break;
 		case 5 : retVal = m_H; break;
 		case 6 : retVal = m_L; break;
-		default: retVal = m_program->read_byte((m_H << 8) + m_L); break;
+		default: retVal = m_program.read_byte((m_H << 8) + m_L); break;
 	}
 	return retVal;
 }
@@ -633,13 +631,13 @@ inline void i8008_device::set_reg(uint8_t reg, uint8_t val)
 		case 4 : m_E = val; break;
 		case 5 : m_H = val; break;
 		case 6 : m_L = val; break;
-		default: m_program->write_byte((m_H << 8) + m_L, val); break;
+		default: m_program.write_byte((m_H << 8) + m_L, val); break;
 	}
 }
 
 inline uint8_t i8008_device::arg()
 {
-	uint8_t retVal = m_cache->read_byte(GET_PC.w.l);
+	uint8_t retVal = m_cache.read_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x3fff;
 	m_PC = GET_PC;
 	return retVal;

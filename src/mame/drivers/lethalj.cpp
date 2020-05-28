@@ -137,6 +137,44 @@ Pin #11(+) | | R               |
            |                GND|]--------------
            +-------------------+               Ground
 
+
+
+                      Frantic Fred JAMMA Pinout
+
+                          Main Jamma Connector
+            Solder Side          |             Parts Side
+------------------------------------------------------------------
+             GND             | A | 1 |             GND
+             GND             | B | 2 |             GND
+             +5              | C | 3 |             +5
+             +5              | D | 4 |             +5
+                             | E | 5 |
+             +12             | F | 6 |             +12
+------------ KEY ------------| H | 7 |------------ KEY -----------
+        Ticket Counter       | J | 8 |      Coin Counter # 1
+           Marquee*          | K | 9 |       Ticket Motor
+                             | L | 10|
+        R Speaker (-)        | M | 11|        R Speaker (+)
+        Video Green          | N | 12|        Video Red
+        Video Sync           | P | 13|        Video Blue
+       Service Switch        | R | 14|        Video GND
+                             | S | 15|       Ticket Sense
+        Coin Switch 2        | T | 16|       Coin Switch 1
+                             | U | 17|
+                             | V | 18|
+                             | W | 19|
+          Dummy Pin          | X | 20|       Bonus Button
+                             | Y | 21|
+          Dummy Pin          | Z | 22|          Wheel
+          Dummy Pin          | a | 23|          Wheel
+                             | b | 24|
+                             | c | 25|
+                             | d | 26|
+             GND             | e | 27|          GND
+             GND             | f | 28|          GND
+
+* There is a resistor connected between +12v & Marquee - so it's to power the light
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -150,7 +188,7 @@ Pin #11(+) | | R               |
 #define MASTER_CLOCK            XTAL(40'000'000)
 #define SOUND_CLOCK             XTAL(2'000'000)
 
-#define VIDEO_CLOCK             XTAL(11'289'000)
+#define VIDEO_CLOCK             XTAL(11'289'600)
 #define VIDEO_CLOCK_LETHALJ     XTAL(11'059'200)
 
 
@@ -216,7 +254,7 @@ void lethalj_state::lethalj_map(address_map &map)
 	map(0x04000000, 0x0400000f).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x04000010, 0x0400001f).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x04100000, 0x0410000f).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-//  AM_RANGE(0x04100010, 0x0410001f) AM_READNOP     /* read but never examined */
+//  map(0x04100010, 0x0410001f).nopr();     /* read but never examined */
 	map(0x04200000, 0x0420001f).nopw();    /* clocks bits through here */
 	map(0x04300000, 0x0430007f).r(FUNC(lethalj_state::lethalj_gun_r));
 	map(0x04400000, 0x0440000f).nopw();    /* clocks bits through here */
@@ -514,7 +552,7 @@ static INPUT_PORTS_START( cclownz )
 	PORT_DIPSETTING(      0x0000, "3000" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lethalj_state,cclownz_paddle, nullptr)
+	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(lethalj_state, cclownz_paddle)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0060, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
@@ -583,6 +621,70 @@ static INPUT_PORTS_START( franticf ) // how do the directional inputs work?
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_DIPNAME( 0x0030, 0x0000, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:4,3")
+	PORT_DIPSETTING(      0x0020, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Bonus Mode" )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0040, "0 Missed Apples" )
+	PORT_DIPSETTING(      0x0000, "1 Missed Apple" )
+	PORT_DIPNAME( 0x0080, 0x0000, "Bonus Ticket" )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0080, "Every 3rd Game" )
+	PORT_DIPSETTING(      0x0000, "Every Game" )
+	PORT_DIPNAME( 0x0100, 0x0100, "Double Ticket Values" )      PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "Bonus Round" )               PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )               /* Enables "Cyclone" bonus option at the end of the game */
+	PORT_DIPNAME( 0x0400, 0x0400, "Ticket Payout" )             PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(      0x0400, "Preset" )                    /* AKA "Just for Playing" */
+	PORT_DIPSETTING(      0x0000, "Based on Play" )
+	PORT_DIPNAME( 0x1800, 0x1800, "Apples Per Game" )           PORT_DIPLOCATION("SW3:5,4")
+	PORT_DIPSETTING(      0x0000, "5" )
+	PORT_DIPSETTING(      0x0800, "7" )
+	PORT_DIPSETTING(      0x1000, "8" )
+	PORT_DIPSETTING(      0x1800, "9" )
+	PORT_DIPNAME( 0xe000, 0x8000, "Ticket Preset" )             PORT_DIPLOCATION("SW3:8,7,6")
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x2000, "2" )
+	PORT_DIPSETTING(      0x4000, "3" )
+	PORT_DIPSETTING(      0x6000, "4" )
+	PORT_DIPSETTING(      0x8000, "5" )
+	PORT_DIPSETTING(      0xa000, "6" )
+	PORT_DIPSETTING(      0xc000, "7" )
+	PORT_DIPSETTING(      0xe000, "8" )
+/*
+                    "Play Based" Tickets despenced based on setting of DSW6-8
+                    --------------------------------------------------------------
+Apples Per Game     0x7000  0x6000  0x5000  0x4000  0x3000  0x2000  0x1000  0x0000
+----------------------------------------------------------------------------------
+       5              3       9       3       9       7       6       5       5
+       7              4      10       4      13       8       7       9       7
+       8              4      10       6      15       9       9       9       8
+       9              5      11       6      18      10       9      10       9
+
+*/
+
+//  PORT_START("PADDLE")
+//  PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE ) PORT_PLAYER(1) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_CENTERDELTA(0) PORT_REVERSE
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( franticfa ) // how do the directional inputs work?
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -601,21 +703,82 @@ static INPUT_PORTS_START( franticf ) // how do the directional inputs work?
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1c00, 0x0400, "Number of Fruit" )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "x" )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_DIPNAME( 0x0030, 0x0000, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:4,3")
+	PORT_DIPSETTING(      0x0020, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Bonus Mode" )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0040, "0 Missed Apples" )
+	PORT_DIPSETTING(      0x0000, "1 Missed Apple" )
+	PORT_DIPNAME( 0x0080, 0x0000, "Bonus Ticket" )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0080, "Every 3rd Game" )
+	PORT_DIPSETTING(      0x0000, "Every Game" )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1") /* This one likey Enables/Disables the Bonus round */
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2") /* Preset & play based? */
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+/*
+    PORT_DIPNAME( 0x1c00, 0x0400, "Number of Fruit" )
+    PORT_DIPSETTING(      0x0000, "3" )
+    PORT_DIPSETTING(      0x0400, "5" )
+    PORT_DIPSETTING(      0x0800, "7" )
+    PORT_DIPSETTING(      0x0c00, "9" )
+    PORT_DIPSETTING(      0x1000, "9 (duplicate 1)" ) // appear to be duplicates but could affect something else too
+    PORT_DIPSETTING(      0x1400, "9 (duplicate 2)" )
+    PORT_DIPSETTING(      0x1800, "9 (duplicate 3)" )
+    PORT_DIPSETTING(      0x1c00, "9 (duplicate 4)" )
+    PORT_DIPNAME( 0x6000, 0x2000, "Initial Fruit Values" )
+    PORT_DIPSETTING(      0x0000, "Lowest" )
+    PORT_DIPSETTING(      0x2000, "Low" )
+    PORT_DIPSETTING(      0x4000, "Medium" )
+    PORT_DIPSETTING(      0x6000, "High" )
+*/
+
+	PORT_DIPNAME( 0x0c00, 0x0400, "Apples Per Game" )       PORT_DIPLOCATION("SW3:4,3")
 	PORT_DIPSETTING(      0x0000, "3" )
 	PORT_DIPSETTING(      0x0400, "5" )
 	PORT_DIPSETTING(      0x0800, "7" )
 	PORT_DIPSETTING(      0x0c00, "9" )
-	PORT_DIPSETTING(      0x1000, "9 (duplicate 1)" ) // appear to be duplicates but could affect something else too
-	PORT_DIPSETTING(      0x1400, "9 (duplicate 2)" )
-	PORT_DIPSETTING(      0x1800, "9 (duplicate 3)" )
-	PORT_DIPSETTING(      0x1c00, "9 (duplicate 4)" )
-	PORT_DIPNAME( 0x6000, 0x2000, "Initial Fruit Values" )
-	PORT_DIPSETTING(      0x0000, "Lowest" )
-	PORT_DIPSETTING(      0x2000, "Low" )
-	PORT_DIPSETTING(      0x4000, "Medium" )
-	PORT_DIPSETTING(      0x6000, "High" )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x7000, 0x7000, "Ticket Preset" )         PORT_DIPLOCATION("SW3:7,6,5")
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x1000, "2" )
+	PORT_DIPSETTING(      0x2000, "3" )
+	PORT_DIPSETTING(      0x3000, "4" )
+	PORT_DIPSETTING(      0x4000, "5" )
+	PORT_DIPSETTING(      0x5000, "6" )
+	PORT_DIPSETTING(      0x6000, "7" )
+	PORT_DIPSETTING(      0x7000, "8" )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
@@ -856,6 +1019,32 @@ ROM_END
 
 ROM_START( franticf )
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
+	ROM_LOAD16_BYTE( "cfvc_8.02.vc8", 0x000000, 0x020000, CRC(9c8ff952) SHA1(f5c5b001d12aa7564d106f90ca0c49da4224c84d) ) /* AMD 27C010 EPROM */
+	ROM_LOAD16_BYTE( "cfvc_9.02.vc9", 0x000001, 0x020000, CRC(8da38843) SHA1(dd3d1013bea69d2939d11bcbfe6269e89cb3ba77) ) /* AMD 27C010 EPROM */
+	ROM_COPY( "maincpu", 0x00000, 0x040000, 0x040000 )
+	ROM_COPY( "maincpu", 0x00000, 0x080000, 0x080000 )
+
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
+	ROM_LOAD16_BYTE( "cfgr_1.0.gr1", 0x000000, 0x080000, CRC(5a60aca0) SHA1(33ad0a03ab70e29c0dbf2b034498e9fd395eb353) ) /* Also known to be labeled "FFCGR 1.0" */
+	ROM_LOAD16_BYTE( "cfgr_2.gr2",   0x000001, 0x080000, CRC(fc44a126) SHA1(54d27c3f5bdea33c72ea5595410178f1e70ac43b) )
+	ROM_LOAD16_BYTE( "cfgr_4.gr4",   0x200000, 0x080000, CRC(b3997f9d) SHA1(25d67ee122eb342f3c617fef345a32abe965739e) ) /* Also known to be labeled "CF GR 4.00" */
+	ROM_LOAD16_BYTE( "cfgr_3.gr3",   0x200001, 0x080000, CRC(0834b6fe) SHA1(779fb60ce6b1dcdb432c6e3b48864ddb05b73038) )
+	ROM_LOAD16_BYTE( "ffgr6.gr6",    0x400000, 0x080000, CRC(41bd31a2) SHA1(9e7b5479b2ae8001ea624a7d53e49cd85fb2984d) ) /* Also known to be labeled "FF GR 6.00" */
+	ROM_LOAD16_BYTE( "ffgr5.gr5",    0x400001, 0x080000, CRC(ca8a5e67) SHA1(ec9d74f13c21897a3d36626a2fc0320979aa6a3a) ) /* Also known to be labeled "FF GR 5.00" */
+
+	ROM_REGION( 0x80000, "oki1", 0 )                /* sound data */
+	ROM_LOAD( "ffu18.u20", 0x00000, 0x80000, CRC(2fb2e5a6) SHA1(8599ec10500016c3486f9078b72cb3bda3381208) ) /* known to be labeled either "FFU18" or "FF U18/U20" */
+
+	ROM_REGION( 0x80000, "oki2", 0 )                /* sound data */
+	ROM_LOAD( "ffu21.u21", 0x00000, 0x80000, CRC(7d9c85c8) SHA1(6090645d981d56eb8d072d042c0f02114c874137) ) /* Also known to be labeled "CFU 21" */
+
+	ROM_REGION( 0x80000, "oki3", 0 )                /* sound data */
+	ROM_LOAD( "ffu18.u18", 0x00000, 0x80000, CRC(2fb2e5a6) SHA1(8599ec10500016c3486f9078b72cb3bda3381208) ) /* known to be labeled either "FFU18" or "FF U18/U20" */
+ROM_END
+
+
+ROM_START( franticfa )
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "fred_vc-8.vc8", 0x000000, 0x080000, CRC(f7eb92a2) SHA1(c56a0432b8c4fe8522f6dd1e0b60eded3dfc25d2) )
 	ROM_LOAD16_BYTE( "fred_vc-9.vc9", 0x000001, 0x080000, CRC(b657b800) SHA1(12649becab0019ea7150b5d797b72b07121c6a3e) )
 
@@ -1015,19 +1204,19 @@ ROM_END
 
 void lethalj_state::init_ripribit()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::ripribit_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::ripribit_control_w)));
 }
 
 
 void lethalj_state::init_cfarm()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cfarm_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::cfarm_control_w)));
 }
 
 
 void lethalj_state::init_cclownz()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cclownz_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::cclownz_control_w)));
 }
 
 
@@ -1039,7 +1228,8 @@ void lethalj_state::init_cclownz()
  *************************************/
 
 GAME( 1996, lethalj,   0,        lethalj,  lethalj,   lethalj_state, empty_init,    ROT0,  "The Game Room", "Lethal Justice (Version 2.3)", 0 )
-GAME( 1996, franticf,  0,        gameroom, franticf,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Frantic Fred", MACHINE_NOT_WORKING )
+GAME( 1998, franticf,  0,        gameroom, franticf,  lethalj_state, empty_init,    ROT0,  "ICE",           "Frantic Fred (Release 2)", MACHINE_NOT_WORKING ) /* manual states (C) 1998 Innovative Concepts in Entertainment, Inc. */
+GAME( 1996, franticfa, franticf, gameroom, franticfa, lethalj_state, empty_init,    ROT0,  "The Game Room", "Frantic Fred", MACHINE_NOT_WORKING )
 GAME( 1997, eggventr,  0,        gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
 GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
 GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )

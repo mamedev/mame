@@ -75,13 +75,13 @@ protected:
 	virtual void update_audio_squelch() { set_audio_squelch((m_i8049_port1 & 0x40) || !(m_pia.portb & 0x01), (m_i8049_port1 & 0x40) || !(m_pia.portb & 0x02)); }
 
 	// internal read/write handlers
-	DECLARE_READ8_MEMBER( i8049_pia_r );
-	DECLARE_WRITE8_MEMBER( i8049_pia_w );
-	DECLARE_READ8_MEMBER( i8049_bus_r );
-	DECLARE_WRITE8_MEMBER( i8049_port1_w );
-	DECLARE_WRITE8_MEMBER( i8049_port2_w );
-	DECLARE_READ_LINE_MEMBER( i8049_t0_r );
-	DECLARE_READ_LINE_MEMBER( i8049_t1_r );
+	uint8_t i8049_pia_r(offs_t offset);
+	void i8049_pia_w(offs_t offset, uint8_t data);
+	uint8_t i8049_bus_r();
+	void i8049_port1_w(uint8_t data);
+	void i8049_port2_w(uint8_t data);
+	int i8049_t0_r();
+	int i8049_t1_r();
 
 	// pioneer PIA subclass
 	class pioneer_pia
@@ -103,10 +103,22 @@ protected:
 	void overlay_erase(bitmap_yuy16 &bitmap, float xstart, float xend);
 	void overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, float xstart);
 
+	// LED outputs
+	output_finder<>     m_audio1;
+	output_finder<>     m_audio2;
+	output_finder<>     m_clv;
+	output_finder<>     m_cav;
+	output_finder<>     m_srev;
+	output_finder<>     m_sfwd;
+	output_finder<>     m_play;
+	output_finder<>     m_step;
+	output_finder<>     m_pause;
+	output_finder<>     m_standby;
+
 	// internal state
-	uint8_t               m_control;              // control line state
-	uint8_t               m_lastcommand;          // last command seen
-	uint16_t              m_accumulator;          // bit accumulator
+	uint8_t             m_control;              // control line state
+	uint8_t             m_lastcommand;          // last command seen
+	uint16_t            m_accumulator;          // bit accumulator
 	attotime            m_lastcommandtime;      // time of the last command
 	attotime            m_lastbittime;          // time of last bit received
 	attotime            m_firstbittime;         // time of first bit in command
@@ -116,8 +128,8 @@ protected:
 	attotime            m_slowtrg;              // time of the last SLOW TRG
 	pioneer_pia         m_pia;                  // PIA state
 	bool                m_vsync;                // live VSYNC state
-	uint8_t               m_i8049_port1;          // 8049 port 1 state
-	uint8_t               m_i8049_port2;          // 8049 port 2 state
+	uint8_t             m_i8049_port1;          // 8049 port 1 state
+	uint8_t             m_i8049_port2;          // 8049 port 2 state
 
 private:
 	void pr8210_portmap(address_map &map);
@@ -164,10 +176,10 @@ protected:
 
 private:
 	// internal read/write handlers
-	DECLARE_READ8_MEMBER( i8748_data_r );
-	DECLARE_READ8_MEMBER( i8748_port2_r );
-	DECLARE_WRITE8_MEMBER( i8748_port2_w );
-	DECLARE_READ_LINE_MEMBER( i8748_t0_r );
+	uint8_t i8748_data_r();
+	uint8_t i8748_port2_r();
+	void i8748_port2_w(uint8_t data);
+	int i8748_t0_r();
 
 	void simutrek_portmap(address_map &map);
 

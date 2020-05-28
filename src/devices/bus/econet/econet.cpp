@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(ECONET_SLOT, econet_slot_device, "econet_slot", "Econet stati
 //-------------------------------------------------
 
 device_econet_interface::device_econet_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device), m_econet(nullptr), m_address(0), m_next(nullptr)
+	device_interface(device, "econet"), m_econet(nullptr), m_address(0), m_next(nullptr)
 {
 }
 

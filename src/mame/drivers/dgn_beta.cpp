@@ -383,7 +383,7 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 	m_mc6845->set_screen("screen");
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(16); /*?*/
-	m_mc6845->set_update_row_callback(FUNC(dgn_beta_state::crtc_update_row), this);
+	m_mc6845->set_update_row_callback(FUNC(dgn_beta_state::crtc_update_row));
 	m_mc6845->out_vsync_callback().set(FUNC(dgn_beta_state::dgnbeta_vsync_changed));
 
 	/* internal ram */

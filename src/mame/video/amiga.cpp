@@ -217,7 +217,7 @@ int amiga_state::copper_execute_next(int xpos)
 	{
 		if (LOG_COPPER)
 			logerror("%02X.%02X: Write to %s = %04x\n", m_last_scanline, xpos / 2, s_custom_reg_names[m_copper_pending_offset & 0xff], m_copper_pending_data);
-		write_custom_chip(m_copper_pending_offset, m_copper_pending_data);
+		custom_chip_w(m_copper_pending_offset, m_copper_pending_data);
 		m_copper_pending_offset = 0;
 	}
 
@@ -273,7 +273,7 @@ int amiga_state::copper_execute_next(int xpos)
 			{
 				if (LOG_COPPER)
 					logerror("%02X.%02X: Write to %s = %04x\n", m_last_scanline, xpos / 2, s_custom_reg_names[word0 & 0xff], word1);
-				write_custom_chip(word0, word1);
+				custom_chip_w(word0, word1);
 			}
 			else    // additional 2 cycles needed for non-Agnus registers
 			{

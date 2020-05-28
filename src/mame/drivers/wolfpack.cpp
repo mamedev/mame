@@ -22,7 +22,7 @@ void wolfpack_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		periodic_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in wolfpack_state::device_timer");
+		throw emu_fatalerror("Unknown id in wolfpack_state::device_timer");
 	}
 }
 
@@ -53,10 +53,10 @@ void wolfpack_state::machine_reset()
 }
 
 
-CUSTOM_INPUT_MEMBER(wolfpack_state::dial_r)
+template <int Bit>
+READ_LINE_MEMBER(wolfpack_state::dial_r)
 {
-	int bit = (uintptr_t)param;
-	return ((ioport("DIAL")->read() + bit) / 2) & 0x01;
+	return ((ioport("DIAL")->read() + Bit) / 2) & 0x01;
 }
 
 
@@ -101,7 +101,7 @@ WRITE8_MEMBER(wolfpack_state::word_w)
 {
 	/* latch word from bus into temp register, and place on s14001a input bus */
 	/* there is no real need for a temp register at all, since the bus 'register' acts as one */
-	m_s14001a->data_w(space, 0, data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
+	m_s14001a->data_w(data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
 }
 
 WRITE8_MEMBER(wolfpack_state::start_speech_w)
@@ -171,8 +171,8 @@ void wolfpack_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( wolfpack )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state, dial_r, (void *)0)    /* dial connects here */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state, dial_r, (void *)1)    /* dial connects here */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(wolfpack_state, dial_r<0>)    // dial connects here
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(wolfpack_state, dial_r<1>)    // dial connects here
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )

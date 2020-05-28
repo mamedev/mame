@@ -67,14 +67,14 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(yumefuda_vram_w);
-	DECLARE_WRITE8_MEMBER(yumefuda_cram_w);
-	DECLARE_READ8_MEMBER(custom_ram_r);
-	DECLARE_WRITE8_MEMBER(custom_ram_w);
-	DECLARE_WRITE8_MEMBER(prot_lock_w);
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(yumefuda_output_w);
+	void yumefuda_vram_w(offs_t offset, uint8_t data);
+	void yumefuda_cram_w(offs_t offset, uint8_t data);
+	uint8_t custom_ram_r(offs_t offset);
+	void custom_ram_w(offs_t offset, uint8_t data);
+	void prot_lock_w(uint8_t data);
+	uint8_t mux_r();
+	void mux_w(uint8_t data);
+	void yumefuda_output_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(y_get_bg_tile_info);
 	uint32_t screen_update_yumefuda(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(albazg_state::y_get_bg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + ((color & 0xf8) << 3),
 			color & 0x7,
 			0);
@@ -112,7 +112,7 @@ TILE_GET_INFO_MEMBER(albazg_state::y_get_bg_tile_info)
 
 void albazg_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(albazg_state::y_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(albazg_state::y_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t albazg_state::screen_update_yumefuda(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -139,26 +139,26 @@ static GFXDECODE_START( gfx_yumefuda )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(albazg_state::yumefuda_vram_w)
+void albazg_state::yumefuda_vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(albazg_state::yumefuda_cram_w)
+void albazg_state::yumefuda_cram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /*Custom RAM (Thrash Protection)*/
-READ8_MEMBER(albazg_state::custom_ram_r)
+uint8_t albazg_state::custom_ram_r(offs_t offset)
 {
 //  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, m_maincpu->space(AS_PROGRAM).pc());
 	return m_cus_ram[offset];// ^ 0x55;
 }
 
-WRITE8_MEMBER(albazg_state::custom_ram_w)
+void albazg_state::custom_ram_w(offs_t offset, uint8_t data)
 {
 //  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, m_maincpu->space(AS_PROGRAM).pc());
 	if(m_prot_lock)
@@ -166,13 +166,13 @@ WRITE8_MEMBER(albazg_state::custom_ram_w)
 }
 
 /*this might be used as NVRAM commands btw*/
-WRITE8_MEMBER(albazg_state::prot_lock_w)
+void albazg_state::prot_lock_w(uint8_t data)
 {
 //  logerror("PC %04x Prot lock value written %02x\n", m_maincpu->space(AS_PROGRAM).pc(), data);
 	m_prot_lock = data;
 }
 
-READ8_MEMBER(albazg_state::mux_r)
+uint8_t albazg_state::mux_r()
 {
 	switch(m_mux_data)
 	{
@@ -188,7 +188,7 @@ READ8_MEMBER(albazg_state::mux_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(albazg_state::mux_w)
+void albazg_state::mux_w(uint8_t data)
 {
 	int new_bank = (data & 0xc0) >> 6;
 
@@ -205,7 +205,7 @@ WRITE8_MEMBER(albazg_state::mux_w)
 	m_mux_data = data & ~0xc0;
 }
 
-WRITE8_MEMBER(albazg_state::yumefuda_output_w)
+void albazg_state::yumefuda_output_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, ~data & 4);
 	machine().bookkeeping().coin_counter_w(1, ~data & 2);

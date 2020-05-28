@@ -167,10 +167,10 @@ public:
 	DECLARE_READ8_MEMBER(apollo_dma_page_register_r);
 	DECLARE_WRITE16_MEMBER(apollo_address_translation_map_w);
 	DECLARE_READ16_MEMBER(apollo_address_translation_map_r);
-	DECLARE_READ8_MEMBER(apollo_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(apollo_dma_write_byte);
-	DECLARE_READ8_MEMBER(apollo_dma_read_word);
-	DECLARE_WRITE8_MEMBER(apollo_dma_write_word);
+	uint8_t apollo_dma_read_byte(offs_t offset);
+	void apollo_dma_write_byte(offs_t offset, uint8_t data);
+	uint8_t apollo_dma_read_word(offs_t offset);
+	void apollo_dma_write_word(offs_t offset, uint8_t data);
 	DECLARE_WRITE8_MEMBER(apollo_rtc_w);
 	DECLARE_READ8_MEMBER(apollo_rtc_r);
 	DECLARE_WRITE8_MEMBER(cache_control_register_w);
@@ -226,27 +226,27 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_master_set_int_line );
 	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_slave_set_int_line );
 	DECLARE_WRITE_LINE_MEMBER( sio_irq_handler );
-	DECLARE_WRITE8_MEMBER( sio_output );
+	void sio_output(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( sio2_irq_handler );
 	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_irq_function );
 	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_timer_tick );
-	DECLARE_READ8_MEMBER( apollo_pic8259_get_slave_ack );
+	uint8_t apollo_pic8259_get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( apollo_rtc_irq_function );
 
-	DECLARE_READ8_MEMBER(pc_dma8237_0_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_1_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_2_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_3_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_5_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_6_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_7_dack_r);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_0_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_1_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_2_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_3_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_5_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_6_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_7_dack_w);
+	uint8_t pc_dma8237_0_dack_r();
+	uint8_t pc_dma8237_1_dack_r();
+	uint8_t pc_dma8237_2_dack_r();
+	uint8_t pc_dma8237_3_dack_r();
+	uint8_t pc_dma8237_5_dack_r();
+	uint8_t pc_dma8237_6_dack_r();
+	uint8_t pc_dma8237_7_dack_r();
+	void pc_dma8237_0_dack_w(uint8_t data);
+	void pc_dma8237_1_dack_w(uint8_t data);
+	void pc_dma8237_2_dack_w(uint8_t data);
+	void pc_dma8237_3_dack_w(uint8_t data);
+	void pc_dma8237_5_dack_w(uint8_t data);
+	void pc_dma8237_6_dack_w(uint8_t data);
+	void pc_dma8237_7_dack_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
@@ -367,25 +367,25 @@ public:
 	apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~apollo_ni();
 
-	virtual iodevice_t image_type() const override { return IO_ROM; }
-
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual bool support_command_line_image_creation() const override { return 1; }
-	virtual const char *file_extensions() const override { return "ani,bin"; }
-
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_READ16_MEMBER(read);
-
 	// image-level overrides
+	virtual iodevice_t image_type() const noexcept override { return IO_ROM; }
+
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual bool support_command_line_image_creation() const noexcept override { return true; }
+	virtual const char *file_extensions() const noexcept override { return "ani,bin"; }
+
 	virtual image_init_result call_load() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
-	virtual const char *custom_instance_name() const override { return "node_id"; }
-	virtual const char *custom_brief_instance_name() const override { return "ni"; }
+	virtual const char *custom_instance_name() const noexcept override { return "node_id"; }
+	virtual const char *custom_brief_instance_name() const noexcept override { return "ni"; }
+
+	DECLARE_WRITE16_MEMBER(write);
+	DECLARE_READ16_MEMBER(read);
 
 	void set_node_id_from_disk();
 

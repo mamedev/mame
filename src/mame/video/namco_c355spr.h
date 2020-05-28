@@ -19,6 +19,7 @@ public:
 	//void set_ram_words(u32 size) { m_ramsize = size; }
 	void set_palxor(int palxor) { m_palxor = palxor; }
 	void set_buffer(int buffer) { m_buffer = buffer; }
+	void set_external_prifill(bool external) { m_external_prifill = external; }
 
 	u16 spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -37,7 +38,12 @@ public:
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
+	void get_sprites(const rectangle cliprect);
+	void copy_sprites(const rectangle cliprect);
 
+	void clear_screen_bitmap() { m_screenbitmap.fill(0xffff); }
+	void clear_screen_bitmap(const rectangle cliprect) { m_screenbitmap.fill(0xffff, cliprect); }
+	bitmap_ind16 &screen_bitmap() { return m_screenbitmap; }
 
 protected:
 	// device-level overrides
@@ -61,8 +67,10 @@ private:
 	};
 
 	// general
-	void zdrawgfxzoom(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, int scalex, int scaley, int zpos);
-	void zdrawgfxzoom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, int scalex, int scaley, int zpos);
+	void zdrawgfxzoom(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, int scalex, int scaley, u8 prival);
+
+	void copybitmap(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 pri);
+	void copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &clip, u8 pri);
 
 	// C355 Motion Object Emulation
 	// for pal_xor, supply either 0x0 (normal) or 0xf (palette mapping reversed)
@@ -71,7 +79,6 @@ private:
 	// C355 Motion Object internals
 	void get_single_sprite(const u16 *pSource, c355_sprite *sprite_ptr);
 	void get_list(int no, const u16 *pSpriteList16, const u16 *pSpriteTable);
-	void get_sprites();
 	template<class BitmapClass> void draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri);
 
 	std::unique_ptr<c355_sprite []> m_spritelist[2];
@@ -80,10 +87,13 @@ private:
 	int m_palxor;
 	u16 m_position[4];
 	std::unique_ptr<u16 []> m_spriteram[2];
+	bitmap_ind16 m_tempbitmap;
+	bitmap_ind16 m_screenbitmap;
 
 	int m_scrolloffs[2];
 	//u32 m_ramsize;
 	int m_buffer;
+	bool m_external_prifill;
 
 	required_memory_region m_gfx_region;
 	u16 m_colbase;

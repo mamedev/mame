@@ -21,11 +21,11 @@ public:
 	s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// single bit registers (74LS74)
-	DECLARE_READ8_MEMBER(zfg_r);
-	DECLARE_WRITE8_MEMBER(zfg_w);
+	uint8_t zfg_r(offs_t offset);
+	void zfg_w(uint8_t data);
 	// shared memory 2k
-	DECLARE_READ8_MEMBER(share_r);
-	DECLARE_WRITE8_MEMBER(share_w);
+	uint8_t share_r(offs_t offset);
+	void share_w(offs_t offset, uint8_t data);
 
 	// public API - stuff that gets called from host
 	// shared memory 2k
@@ -34,11 +34,11 @@ public:
 	// - share_w
 	// single bit registers (74LS74)
 	// reads/writes at I/O 0x801000
-	DECLARE_READ8_MEMBER(cn_r);
-	DECLARE_WRITE8_MEMBER(cn_w);
+	uint8_t cn_r();
+	void cn_w(uint8_t data);
 	// reads/writes at I/O 0x801002
-	DECLARE_READ8_MEMBER(fg_r);
-	DECLARE_WRITE8_MEMBER(fg_w);
+	uint8_t fg_r();
+	void fg_w(uint8_t data);
 
 	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();

@@ -60,13 +60,16 @@ public:
 
 	void set_int_line(int pin_number, int state);
 
-	DECLARE_WRITE_LINE_MEMBER( rst1_line );
+	void rst1_line(int state);
 
 	// Synchronous clock input
-	DECLARE_WRITE_LINE_MEMBER( phi_line );
+	void phi_line(int state);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+
+	bool read_bit(int bit);
+	void write_bit(int bit, bool set);
 
 	auto p_out_cb(int n) { return m_write_p[n].bind(); }
 	auto read_cb() { return m_read_port.bind(); }
@@ -163,7 +166,7 @@ private:
 	devcb_read8        m_read_port;
 
 	// I/O lines, used for output. When used as inputs, the levels are delivered via the m_read_block
-	devcb_write_line   m_write_p[16];
+	devcb_write_line::array<16> m_write_p;
 
 	// INTREQ pin
 	devcb_write_line   m_interrupt;

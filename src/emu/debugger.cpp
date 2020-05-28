@@ -14,7 +14,7 @@
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"
 #include "debug/debugvw.h"
-#include <ctype.h>
+#include <cctype>
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -31,7 +31,7 @@ static bool g_atexit_registered = false;
 
 void debugger_manager::debug_break()
 {
-	m_cpu->get_visible_cpu()->debug()->halt_on_next_instruction("Internal breakpoint\n");
+	m_console->get_visible_cpu()->debug()->halt_on_next_instruction("Internal breakpoint\n");
 }
 
 

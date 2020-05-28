@@ -709,8 +709,8 @@ ROM_END
 
 void jchan_state::init_jchan()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),this));
-	m_subcpu->space(AS_PROGRAM).install_write_handler(0x400000, 0x400001, write16_delegate(FUNC(jchan_state::sub2main_cmd_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16_delegate(*this, FUNC(jchan_state::main2sub_cmd_w)));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x400000, 0x400001, write16_delegate(*this, FUNC(jchan_state::sub2main_cmd_w)));
 }
 
 

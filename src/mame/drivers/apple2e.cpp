@@ -157,7 +157,8 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/a2vulcan.h"
 #include "bus/a2bus/4play.h"
 #include "bus/a2bus/computereyes2.h"
-
+#include "bus/a2bus/byte8251.h"
+#include "bus/a2bus/a2iwm.h"
 #include "bus/a2gameio/gameio.h"
 
 #include "bus/rs232/rs232.h"
@@ -284,7 +285,7 @@ public:
 	required_device<address_map_bank_device> m_lcbank;
 	optional_device<mos6551_device> m_acia1, m_acia2;
 	optional_device<applefdc_base_device> m_laserudc;
-	optional_device<iwm_device> m_iicpiwm;
+	optional_device<legacy_iwm_device> m_iicpiwm;
 	required_device<ds1315_device> m_ds1315;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
@@ -295,70 +296,70 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram0000_r);
-	DECLARE_WRITE8_MEMBER(ram0000_w);
-	DECLARE_READ8_MEMBER(ram0200_r);
-	DECLARE_WRITE8_MEMBER(ram0200_w);
-	DECLARE_READ8_MEMBER(ram0400_r);
-	DECLARE_WRITE8_MEMBER(ram0400_w);
-	DECLARE_READ8_MEMBER(ram0800_r);
-	DECLARE_WRITE8_MEMBER(ram0800_w);
-	DECLARE_READ8_MEMBER(ram2000_r);
-	DECLARE_WRITE8_MEMBER(ram2000_w);
-	DECLARE_READ8_MEMBER(ram4000_r);
-	DECLARE_WRITE8_MEMBER(ram4000_w);
-	DECLARE_READ8_MEMBER(cec4000_r);
-	DECLARE_READ8_MEMBER(cec8000_r);
-	DECLARE_WRITE8_MEMBER(ram8000_w);
-	DECLARE_READ8_MEMBER(auxram0000_r);
-	DECLARE_WRITE8_MEMBER(auxram0000_w);
-	DECLARE_READ8_MEMBER(auxram0200_r);
-	DECLARE_WRITE8_MEMBER(auxram0200_w);
-	DECLARE_READ8_MEMBER(auxram0400_r);
-	DECLARE_WRITE8_MEMBER(auxram0400_w);
-	DECLARE_READ8_MEMBER(auxram0800_r);
-	DECLARE_WRITE8_MEMBER(auxram0800_w);
-	DECLARE_READ8_MEMBER(auxram2000_r);
-	DECLARE_WRITE8_MEMBER(auxram2000_w);
-	DECLARE_READ8_MEMBER(auxram4000_r);
-	DECLARE_WRITE8_MEMBER(auxram4000_w);
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_WRITE8_MEMBER(c000_w);
-	DECLARE_READ8_MEMBER(c000_iic_r);
-	DECLARE_WRITE8_MEMBER(c000_iic_w);
-	DECLARE_READ8_MEMBER(c080_r);
-	DECLARE_WRITE8_MEMBER(c080_w);
-	DECLARE_READ8_MEMBER(c100_r);
-	DECLARE_READ8_MEMBER(c100_int_r);
-	DECLARE_READ8_MEMBER(c100_int_bank_r);
-	DECLARE_READ8_MEMBER(c100_cec_r);
-	DECLARE_READ8_MEMBER(c100_cec_bank_r);
-	DECLARE_WRITE8_MEMBER(c100_w);
-	DECLARE_READ8_MEMBER(c300_r);
-	DECLARE_READ8_MEMBER(c300_int_r);
-	DECLARE_READ8_MEMBER(c300_int_bank_r);
-	DECLARE_READ8_MEMBER(c300_cec_r);
-	DECLARE_READ8_MEMBER(c300_cec_bank_r);
-	DECLARE_WRITE8_MEMBER(c300_w);
-	DECLARE_READ8_MEMBER(c400_r);
-	DECLARE_READ8_MEMBER(c400_int_r);
-	DECLARE_READ8_MEMBER(c400_int_bank_r);
-	DECLARE_READ8_MEMBER(c400_cec_r);
-	DECLARE_READ8_MEMBER(c400_cec_bank_r);
-	DECLARE_WRITE8_MEMBER(c400_w);
-	DECLARE_WRITE8_MEMBER(c400_cec_w);
-	DECLARE_READ8_MEMBER(c800_r);
-	DECLARE_READ8_MEMBER(c800_int_r);
-	DECLARE_READ8_MEMBER(c800_cec_r);
-	DECLARE_READ8_MEMBER(c800_cec_bank_r);
-	DECLARE_READ8_MEMBER(c800_b2_int_r);
-	DECLARE_WRITE8_MEMBER(c800_w);
-	DECLARE_READ8_MEMBER(inh_r);
-	DECLARE_WRITE8_MEMBER(inh_w);
-	DECLARE_READ8_MEMBER(lc_r);
-	DECLARE_WRITE8_MEMBER(lc_w);
-	DECLARE_READ8_MEMBER(lc_romswitch_r);
-	DECLARE_WRITE8_MEMBER(lc_romswitch_w);
+	uint8_t ram0000_r(offs_t offset);
+	void ram0000_w(offs_t offset, uint8_t data);
+	uint8_t ram0200_r(offs_t offset);
+	void ram0200_w(offs_t offset, uint8_t data);
+	uint8_t ram0400_r(offs_t offset);
+	void ram0400_w(offs_t offset, uint8_t data);
+	uint8_t ram0800_r(offs_t offset);
+	void ram0800_w(offs_t offset, uint8_t data);
+	uint8_t ram2000_r(offs_t offset);
+	void ram2000_w(offs_t offset, uint8_t data);
+	uint8_t ram4000_r(offs_t offset);
+	void ram4000_w(offs_t offset, uint8_t data);
+	uint8_t cec4000_r(offs_t offset);
+	uint8_t cec8000_r(offs_t offset);
+	void ram8000_w(offs_t offset, uint8_t data);
+	uint8_t auxram0000_r(offs_t offset);
+	void auxram0000_w(offs_t offset, uint8_t data);
+	uint8_t auxram0200_r(offs_t offset);
+	void auxram0200_w(offs_t offset, uint8_t data);
+	uint8_t auxram0400_r(offs_t offset);
+	void auxram0400_w(offs_t offset, uint8_t data);
+	uint8_t auxram0800_r(offs_t offset);
+	void auxram0800_w(offs_t offset, uint8_t data);
+	uint8_t auxram2000_r(offs_t offset);
+	void auxram2000_w(offs_t offset, uint8_t data);
+	uint8_t auxram4000_r(offs_t offset);
+	void auxram4000_w(offs_t offset, uint8_t data);
+	uint8_t c000_r(offs_t offset);
+	void c000_w(offs_t offset, uint8_t data);
+	uint8_t c000_iic_r(offs_t offset);
+	void c000_iic_w(offs_t offset, uint8_t data);
+	uint8_t c080_r(offs_t offset);
+	void c080_w(offs_t offset, uint8_t data);
+	uint8_t c100_r(offs_t offset);
+	uint8_t c100_int_r(offs_t offset);
+	uint8_t c100_int_bank_r(offs_t offset);
+	uint8_t c100_cec_r(offs_t offset);
+	uint8_t c100_cec_bank_r(offs_t offset);
+	void c100_w(offs_t offset, uint8_t data);
+	uint8_t c300_r(offs_t offset);
+	uint8_t c300_int_r(offs_t offset);
+	uint8_t c300_int_bank_r(offs_t offset);
+	uint8_t c300_cec_r(offs_t offset);
+	uint8_t c300_cec_bank_r(offs_t offset);
+	void c300_w(offs_t offset, uint8_t data);
+	uint8_t c400_r(offs_t offset);
+	uint8_t c400_int_r(offs_t offset);
+	uint8_t c400_int_bank_r(offs_t offset);
+	uint8_t c400_cec_r(offs_t offset);
+	uint8_t c400_cec_bank_r(offs_t offset);
+	void c400_w(offs_t offset, uint8_t data);
+	void c400_cec_w(offs_t offset, uint8_t data);
+	uint8_t c800_r(offs_t offset);
+	uint8_t c800_int_r(offs_t offset);
+	uint8_t c800_cec_r(offs_t offset);
+	uint8_t c800_cec_bank_r(offs_t offset);
+	uint8_t c800_b2_int_r(offs_t offset);
+	void c800_w(offs_t offset, uint8_t data);
+	uint8_t inh_r(offs_t offset);
+	void inh_w(offs_t offset, uint8_t data);
+	uint8_t lc_r(offs_t offset);
+	void lc_w(offs_t offset, uint8_t data);
+	uint8_t lc_romswitch_r(offs_t offset);
+	void lc_romswitch_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
@@ -366,9 +367,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
-	DECLARE_READ8_MEMBER(memexp_r);
-	DECLARE_WRITE8_MEMBER(memexp_w);
-	DECLARE_READ8_MEMBER(nsc_backing_r);
+	uint8_t memexp_r(offs_t offset);
+	void memexp_w(offs_t offset, uint8_t data);
+	uint8_t nsc_backing_r(offs_t offset);
 
 	void apple2cp(machine_config &config);
 	void laser128ex2(machine_config &config);
@@ -661,7 +662,7 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 	}
 }
 
-READ8_MEMBER(apple2e_state::memexp_r)
+uint8_t apple2e_state::memexp_r(offs_t offset)
 {
 	uint8_t retval = m_exp_regs[offset];
 
@@ -689,7 +690,7 @@ READ8_MEMBER(apple2e_state::memexp_r)
 	return retval;
 }
 
-WRITE8_MEMBER(apple2e_state::memexp_w)
+void apple2e_state::memexp_w(offs_t offset, uint8_t data)
 {
 	if (!m_exp_ram)
 	{
@@ -1639,7 +1640,7 @@ void apple2e_state::do_io(int offset, bool is_iic)
 	}
 }
 
-READ8_MEMBER(apple2e_state::c000_r)
+uint8_t apple2e_state::c000_r(offs_t offset)
 {
 	if(machine().side_effects_disabled()) return read_floatingbus();
 	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
@@ -1658,8 +1659,8 @@ READ8_MEMBER(apple2e_state::c000_r)
 				return rv;
 			}
 
-		case 0x11:  // read LCRAM2 (LC Dxxx bank), also reads like $C010 without strobe reset
-			return (m_lcram2 ? 0x80 : 0x00) | m_strobe | m_transchar;
+		case 0x11:  // read LCRAM2 (LC Dxxx bank)
+			return (m_lcram2 ? 0x80 : 0x00) | m_transchar;
 
 		case 0x12:  // read LCRAM (is LC readable?)
 			return (m_lcram ? 0x80 : 0x00) | m_transchar;
@@ -1753,7 +1754,7 @@ READ8_MEMBER(apple2e_state::c000_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(apple2e_state::c000_w)
+void apple2e_state::c000_w(offs_t offset, uint8_t data)
 {
 	if(machine().side_effects_disabled()) return;
 
@@ -1881,7 +1882,7 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 	}
 }
 
-READ8_MEMBER(apple2e_state::c000_iic_r)
+uint8_t apple2e_state::c000_iic_r(offs_t offset)
 {
 	if(machine().side_effects_disabled()) return read_floatingbus();
 	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
@@ -2006,7 +2007,7 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(apple2e_state::c000_iic_w)
+void apple2e_state::c000_iic_w(offs_t offset, uint8_t data)
 {
 	if(machine().side_effects_disabled()) return;
 
@@ -2234,7 +2235,7 @@ void apple2e_state::update_iic_mouse()
 	}
 }
 
-READ8_MEMBER(apple2e_state::c080_r)
+uint8_t apple2e_state::c080_r(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -2271,7 +2272,7 @@ READ8_MEMBER(apple2e_state::c080_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(apple2e_state::c080_w)
+void apple2e_state::c080_w(offs_t offset, uint8_t data)
 {
 	int slot;
 
@@ -2379,17 +2380,17 @@ uint8_t apple2e_state::read_int_rom(int slotbias, int offset)
 	return m_ds1315->read(slotbias + offset);
 }
 
-READ8_MEMBER(apple2e_state::nsc_backing_r) { return m_rom_ptr[offset]; }
+uint8_t apple2e_state::nsc_backing_r(offs_t offset) { return m_rom_ptr[offset]; }
 
-READ8_MEMBER(apple2e_state::c100_r)  { return read_slot_rom(1, offset); }
-READ8_MEMBER(apple2e_state::c100_int_r)  { return read_int_rom(0x100, offset); }
-READ8_MEMBER(apple2e_state::c100_int_bank_r)  { return read_int_rom(0x4100, offset); }
-READ8_MEMBER(apple2e_state::c100_cec_r)  { return m_rom_ptr[0xc100 + offset]; }
-READ8_MEMBER(apple2e_state::c100_cec_bank_r)  { return m_rom_ptr[0x4100 + offset]; }
-WRITE8_MEMBER(apple2e_state::c100_w) { write_slot_rom(1, offset, data); }
-READ8_MEMBER(apple2e_state::c300_r)  { return read_slot_rom(3, offset); }
+uint8_t apple2e_state::c100_r(offs_t offset)  { return read_slot_rom(1, offset); }
+uint8_t apple2e_state::c100_int_r(offs_t offset)  { return read_int_rom(0x100, offset); }
+uint8_t apple2e_state::c100_int_bank_r(offs_t offset)  { return read_int_rom(0x4100, offset); }
+uint8_t apple2e_state::c100_cec_r(offs_t offset)  { return m_rom_ptr[0xc100 + offset]; }
+uint8_t apple2e_state::c100_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4100 + offset]; }
+void apple2e_state::c100_w(offs_t offset, uint8_t data) { write_slot_rom(1, offset, data); }
+uint8_t apple2e_state::c300_r(offs_t offset)  { return read_slot_rom(3, offset); }
 
-READ8_MEMBER(apple2e_state::c300_int_r)
+uint8_t apple2e_state::c300_int_r(offs_t offset)
 {
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
@@ -2399,7 +2400,7 @@ READ8_MEMBER(apple2e_state::c300_int_r)
 	return read_int_rom(0x300, offset);
 }
 
-READ8_MEMBER(apple2e_state::c300_int_bank_r)
+uint8_t apple2e_state::c300_int_bank_r(offs_t offset)
 {
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
@@ -2409,7 +2410,7 @@ READ8_MEMBER(apple2e_state::c300_int_bank_r)
 	return read_int_rom(0x4300, offset);
 }
 
-WRITE8_MEMBER(apple2e_state::c300_w)
+void apple2e_state::c300_w(offs_t offset, uint8_t data)
 {
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
@@ -2420,11 +2421,11 @@ WRITE8_MEMBER(apple2e_state::c300_w)
 	write_slot_rom(3, offset, data);
 }
 
-READ8_MEMBER(apple2e_state::c300_cec_r)  { return m_rom_ptr[0xc300 + offset]; }
-READ8_MEMBER(apple2e_state::c300_cec_bank_r)  { return m_rom_ptr[0x4300 + offset]; }
+uint8_t apple2e_state::c300_cec_r(offs_t offset)  { return m_rom_ptr[0xc300 + offset]; }
+uint8_t apple2e_state::c300_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4300 + offset]; }
 
-READ8_MEMBER(apple2e_state::c400_r)  { return read_slot_rom(4, offset); }
-READ8_MEMBER(apple2e_state::c400_int_r)
+uint8_t apple2e_state::c400_r(offs_t offset)  { return read_slot_rom(4, offset); }
+uint8_t apple2e_state::c400_int_r(offs_t offset)
 {
 	if ((offset < 0x100) && (m_mockingboard4c))
 	{
@@ -2434,7 +2435,7 @@ READ8_MEMBER(apple2e_state::c400_int_r)
 	return read_int_rom(0x400, offset);
 }
 
-READ8_MEMBER(apple2e_state::c400_int_bank_r)
+uint8_t apple2e_state::c400_int_bank_r(offs_t offset)
 {
 	if ((offset < 0x100) && (m_mockingboard4c))
 	{
@@ -2444,7 +2445,7 @@ READ8_MEMBER(apple2e_state::c400_int_bank_r)
 	return read_int_rom(0x4400, offset);
 }
 
-WRITE8_MEMBER(apple2e_state::c400_w)
+void apple2e_state::c400_w(offs_t offset, uint8_t data)
 {
 	if ((m_isiic) && (offset < 0x100))
 	{
@@ -2454,10 +2455,10 @@ WRITE8_MEMBER(apple2e_state::c400_w)
 	write_slot_rom(4, offset, data);
 }
 
-READ8_MEMBER(apple2e_state::c400_cec_r)  { return m_rom_ptr[0xc400 + offset]; }
-READ8_MEMBER(apple2e_state::c400_cec_bank_r)  { return m_rom_ptr[0x4400 + offset]; }
+uint8_t apple2e_state::c400_cec_r(offs_t offset)  { return m_rom_ptr[0xc400 + offset]; }
+uint8_t apple2e_state::c400_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4400 + offset]; }
 
-WRITE8_MEMBER(apple2e_state::c400_cec_w)
+void apple2e_state::c400_cec_w(offs_t offset, uint8_t data)
 {
 	if ((m_iscecm))
 	{
@@ -2465,14 +2466,20 @@ WRITE8_MEMBER(apple2e_state::c400_cec_w)
 	}
 }
 
-READ8_MEMBER(apple2e_state::c800_r)
+uint8_t apple2e_state::c800_r(offs_t offset)
 {
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
+		uint8_t rv = 0xff;
+
+		if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
+		{
+			rv = m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
+		}
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
 		update_slotrom_banks();
-		return 0xff;
+		return rv;
 	}
 
 	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
@@ -2483,7 +2490,7 @@ READ8_MEMBER(apple2e_state::c800_r)
 	return read_floatingbus();
 }
 
-READ8_MEMBER(apple2e_state::c800_int_r)
+uint8_t apple2e_state::c800_int_r(offs_t offset)
 {
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
@@ -2500,7 +2507,7 @@ READ8_MEMBER(apple2e_state::c800_int_r)
 	return m_rom_ptr[0x800 + offset];
 }
 
-READ8_MEMBER(apple2e_state::c800_b2_int_r)
+uint8_t apple2e_state::c800_b2_int_r(offs_t offset)
 {
 	if ((m_isiicplus) && (m_romswitch) && (((offset >= 0x400) && (offset < 0x500)) || ((offset >= 0x600) && (offset < 0x700))))
 	{
@@ -2517,12 +2524,17 @@ READ8_MEMBER(apple2e_state::c800_b2_int_r)
 	return m_rom_ptr[0x4800 + offset];
 }
 
-WRITE8_MEMBER(apple2e_state::c800_w)
+void apple2e_state::c800_w(offs_t offset, uint8_t data)
 {
 	if ((m_isiicplus) && (m_romswitch) && (((offset >= 0x400) && (offset < 0x500)) || ((offset >= 0x600) && (offset < 0x700))))
 	{
 		mig_w(offset-0x400, data);
 		return;
+	}
+
+	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	{
+		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 
 	if (offset == 0x7ff)
@@ -2533,20 +2545,13 @@ WRITE8_MEMBER(apple2e_state::c800_w)
 			m_intc8rom = false;
 			update_slotrom_banks();
 		}
-
-		return;
-	}
-
-	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
-	{
-		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 }
 
-READ8_MEMBER(apple2e_state::c800_cec_r)  { return m_rom_ptr[0xc800 + offset]; }
-READ8_MEMBER(apple2e_state::c800_cec_bank_r)  { return m_rom_ptr[0x4800 + offset]; }
+uint8_t apple2e_state::c800_cec_r(offs_t offset)  { return m_rom_ptr[0xc800 + offset]; }
+uint8_t apple2e_state::c800_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4800 + offset]; }
 
-READ8_MEMBER(apple2e_state::inh_r)
+uint8_t apple2e_state::inh_r(offs_t offset)
 {
 	if (m_inh_slot != -1)
 	{
@@ -2557,7 +2562,7 @@ READ8_MEMBER(apple2e_state::inh_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(apple2e_state::inh_w)
+void apple2e_state::inh_w(offs_t offset, uint8_t data)
 {
 	if (m_inh_slot != -1)
 	{
@@ -2565,17 +2570,17 @@ WRITE8_MEMBER(apple2e_state::inh_w)
 	}
 }
 
-READ8_MEMBER(apple2e_state::lc_romswitch_r)
+uint8_t apple2e_state::lc_romswitch_r(offs_t offset)
 {
 	return m_rom_ptr[0x5000 + offset];
 }
 
-WRITE8_MEMBER(apple2e_state::lc_romswitch_w)
+void apple2e_state::lc_romswitch_w(offs_t offset, uint8_t data)
 {
-	lc_w(space, offset, data);
+	lc_w(offset, data);
 }
 
-READ8_MEMBER(apple2e_state::lc_r)
+uint8_t apple2e_state::lc_r(offs_t offset)
 {
 	if ((m_altzp) && (!m_iscec))
 	{
@@ -2618,7 +2623,7 @@ READ8_MEMBER(apple2e_state::lc_r)
 	}
 }
 
-WRITE8_MEMBER(apple2e_state::lc_w)
+void apple2e_state::lc_w(offs_t offset, uint8_t data)
 {
 	if (!m_lcwriteenable)
 	{
@@ -2798,26 +2803,26 @@ uint8_t apple2e_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-READ8_MEMBER(apple2e_state::ram0000_r)  { return m_ram_ptr[offset]; }
-WRITE8_MEMBER(apple2e_state::ram0000_w) { m_ram_ptr[offset] = data; }
-READ8_MEMBER(apple2e_state::ram0200_r)  { return m_ram_ptr[offset+0x200]; }
-WRITE8_MEMBER(apple2e_state::ram0200_w) { m_ram_ptr[offset+0x200] = data; }
-READ8_MEMBER(apple2e_state::ram0400_r)  { return m_ram_ptr[offset+0x400]; }
-WRITE8_MEMBER(apple2e_state::ram0400_w) { m_ram_ptr[offset+0x400] = data; }
-READ8_MEMBER(apple2e_state::ram0800_r)  { return m_ram_ptr[offset+0x800]; }
-WRITE8_MEMBER(apple2e_state::ram0800_w) { m_ram_ptr[offset+0x800] = data; }
-READ8_MEMBER(apple2e_state::ram2000_r)  { return m_ram_ptr[offset+0x2000]; }
-WRITE8_MEMBER(apple2e_state::ram2000_w) { m_ram_ptr[offset+0x2000] = data; }
-READ8_MEMBER(apple2e_state::ram4000_r)  { return m_ram_ptr[offset+0x4000]; }
-WRITE8_MEMBER(apple2e_state::ram4000_w) { m_ram_ptr[offset+0x4000] = data; }
-WRITE8_MEMBER(apple2e_state::ram8000_w) { m_ram_ptr[offset+0x8000] = data; }
-READ8_MEMBER(apple2e_state::cec4000_r)
+uint8_t apple2e_state::ram0000_r(offs_t offset)  { return m_ram_ptr[offset]; }
+void apple2e_state::ram0000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset] = data; }
+uint8_t apple2e_state::ram0200_r(offs_t offset)  { return m_ram_ptr[offset+0x200]; }
+void apple2e_state::ram0200_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x200] = data; }
+uint8_t apple2e_state::ram0400_r(offs_t offset)  { return m_ram_ptr[offset+0x400]; }
+void apple2e_state::ram0400_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x400] = data; }
+uint8_t apple2e_state::ram0800_r(offs_t offset)  { return m_ram_ptr[offset+0x800]; }
+void apple2e_state::ram0800_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x800] = data; }
+uint8_t apple2e_state::ram2000_r(offs_t offset)  { return m_ram_ptr[offset+0x2000]; }
+void apple2e_state::ram2000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x2000] = data; }
+uint8_t apple2e_state::ram4000_r(offs_t offset)  { return m_ram_ptr[offset+0x4000]; }
+void apple2e_state::ram4000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x4000] = data; }
+void apple2e_state::ram8000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x8000] = data; }
+uint8_t apple2e_state::cec4000_r(offs_t offset)
 {
 	//printf("cec4000_r: ofs %x\n", offset);
 	return m_cec_remap[((m_cec_bank & 0xf) << 14) + offset];
 }
 
-READ8_MEMBER(apple2e_state::cec8000_r)
+uint8_t apple2e_state::cec8000_r(offs_t offset)
 {
 	//printf("cec8000_r: ofs %x\n", offset);
 	if (m_cec_bank & 0x20)
@@ -2830,18 +2835,18 @@ READ8_MEMBER(apple2e_state::cec8000_r)
 	}
 }
 
-READ8_MEMBER(apple2e_state::auxram0000_r)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset]; } else { return read_floatingbus(); } }
-WRITE8_MEMBER(apple2e_state::auxram0000_w) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset] = data; } }
-READ8_MEMBER(apple2e_state::auxram0200_r)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x200]; } else { return read_floatingbus(); } }
-WRITE8_MEMBER(apple2e_state::auxram0200_w) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x200] = data; } }
-READ8_MEMBER(apple2e_state::auxram0400_r)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x400]; } else { return read_floatingbus(); } }
-WRITE8_MEMBER(apple2e_state::auxram0400_w) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x400] = data; } }
-READ8_MEMBER(apple2e_state::auxram0800_r)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x800]; } else { return read_floatingbus(); } }
-WRITE8_MEMBER(apple2e_state::auxram0800_w) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x800] = data; } }
-READ8_MEMBER(apple2e_state::auxram2000_r)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x2000]; } else { return read_floatingbus(); } }
-WRITE8_MEMBER(apple2e_state::auxram2000_w) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x2000] = data; } }
-READ8_MEMBER(apple2e_state::auxram4000_r)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x4000]; } else { return read_floatingbus(); } }
-WRITE8_MEMBER(apple2e_state::auxram4000_w) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x4000] = data; } }
+uint8_t apple2e_state::auxram0000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0000_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset] = data; } }
+uint8_t apple2e_state::auxram0200_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x200]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0200_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x200] = data; } }
+uint8_t apple2e_state::auxram0400_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x400]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0400_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x400] = data; } }
+uint8_t apple2e_state::auxram0800_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x800]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0800_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x800] = data; } }
+uint8_t apple2e_state::auxram2000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x2000]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram2000_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x2000] = data; } }
+uint8_t apple2e_state::auxram4000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x4000]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram4000_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x4000] = data; } }
 
 void apple2e_state::apple2e_map(address_map &map)
 {
@@ -2909,10 +2914,10 @@ void apple2e_state::laser128_map(address_map &map)
 	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
 	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_w));
 	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
-//  AM_RANGE(0xc098, 0xc09b) AM_DEVREADWRITE(IIC_ACIA1_TAG, mos6551_device, read, write)
-//  AM_RANGE(0xc0a8, 0xc0ab) AM_DEVREADWRITE(IIC_ACIA2_TAG, mos6551_device, read, write)
+//  map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+//  map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0d0, 0xc0d3).rw(FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
-	map(0xc0e0, 0xc0ef).rw(m_laserudc, FUNC(applefdc_base_device::bus_r), FUNC(applefdc_base_device::bus_w));
+	map(0xc0e0, 0xc0ef).rw(m_laserudc, FUNC(applefdc_base_device::read), FUNC(applefdc_base_device::write));
 	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
 	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
 	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
@@ -3426,232 +3431,6 @@ static INPUT_PORTS_START( ceci )
 	PORT_INCLUDE( apple2_sysconfig )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( cece )
-	PORT_START("X0")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR('\'') PORT_CHAR('\"')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('C') PORT_CHAR('c')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K') PORT_CHAR('k')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('S') PORT_CHAR('s')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) PORT_NAME("F4")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
-	PORT_BIT(0x240, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X1")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)      PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('`') PORT_CHAR('~')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D') PORT_CHAR('d')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('T') PORT_CHAR('t')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_NAME("F5")
-	PORT_BIT(0x340, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X2")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)  PORT_CHAR('E') PORT_CHAR('e')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M') PORT_CHAR('m')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('U') PORT_CHAR('u')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7) PORT_NAME("CN")
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
-	PORT_BIT(0x300, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X3")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)  PORT_CHAR('F') PORT_CHAR('f')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('n')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('V') PORT_CHAR('v')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab")      PORT_CODE(KEYCODE_TAB)      PORT_CHAR(9)
-	PORT_BIT(0x340, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X4")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)  PORT_CHAR('G') PORT_CHAR('g')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O') PORT_CHAR('o')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)  PORT_CHAR('W') PORT_CHAR('w')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_NAME("EN")
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9) PORT_NAME("STOP")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X5")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F11) PORT_NAME("TEST")
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('H') PORT_CHAR('h')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)  PORT_CHAR('X') PORT_CHAR('x')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_NAME("F1")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x280, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X6")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('A') PORT_CHAR('a')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('I') PORT_CHAR('i')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q') PORT_CHAR('q')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)  PORT_CHAR('Y') PORT_CHAR('y')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) PORT_NAME("F2")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)      PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(10)
-	PORT_BIT(0x280, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X7")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B') PORT_CHAR('b')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('J') PORT_CHAR('j')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)  PORT_CHAR('R') PORT_CHAR('r')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z') PORT_CHAR('z')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_NAME("F3")
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X8")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("keyb_special")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-
-	PORT_INCLUDE( apple2_sysconfig )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( cecg )
-	PORT_START("X0")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR('\'') PORT_CHAR('\"')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('C') PORT_CHAR('c')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K') PORT_CHAR('k')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('S') PORT_CHAR('s')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) PORT_NAME("F4")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
-	PORT_BIT(0x240, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X1")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)      PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('`') PORT_CHAR('~')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D') PORT_CHAR('d')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('T') PORT_CHAR('t')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_NAME("F5")
-	PORT_BIT(0x340, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X2")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)  PORT_CHAR('E') PORT_CHAR('e')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M') PORT_CHAR('m')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('U') PORT_CHAR('u')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7) PORT_NAME("CN")
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
-	PORT_BIT(0x300, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X3")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)  PORT_CHAR('F') PORT_CHAR('f')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('n')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('V') PORT_CHAR('v')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab")      PORT_CODE(KEYCODE_TAB)      PORT_CHAR(9)
-	PORT_BIT(0x340, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X4")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)  PORT_CHAR('G') PORT_CHAR('g')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O') PORT_CHAR('o')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)  PORT_CHAR('W') PORT_CHAR('w')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_NAME("EN")
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9) PORT_NAME("STOP")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X5")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F11) PORT_NAME("TEST")
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('H') PORT_CHAR('h')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)  PORT_CHAR('X') PORT_CHAR('x')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_NAME("F1")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x280, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X6")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('A') PORT_CHAR('a')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('I') PORT_CHAR('i')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q') PORT_CHAR('q')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)  PORT_CHAR('Y') PORT_CHAR('y')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) PORT_NAME("F2")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)      PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(10)
-	PORT_BIT(0x280, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X7")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B') PORT_CHAR('b')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('J') PORT_CHAR('j')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)  PORT_CHAR('R') PORT_CHAR('r')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z') PORT_CHAR('z')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_NAME("F3")
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X8")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("keyb_special")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-
-	PORT_INCLUDE( apple2_sysconfig )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( cecm )
 	PORT_START("X0")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR(')')
@@ -3765,7 +3544,7 @@ static INPUT_PORTS_START( cecm )
 	PORT_INCLUDE( apple2_sysconfig )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( cec2000 )
+static INPUT_PORTS_START( zijini )
 	PORT_START("X0")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
@@ -3784,7 +3563,7 @@ static INPUT_PORTS_START( cec2000 )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D') PORT_CHAR('d')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('T') PORT_CHAR('t')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_NAME("F5")
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_NAME("EN")
 	PORT_BIT(0x340, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X2")
@@ -3815,7 +3594,7 @@ static INPUT_PORTS_START( cec2000 )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)  PORT_CHAR('G') PORT_CHAR('g')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O') PORT_CHAR('o')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)  PORT_CHAR('W') PORT_CHAR('w')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_NAME("EN")
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9) PORT_NAME("STOP")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -4386,6 +4165,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("diskii", A2BUS_DISKII);  /* Disk II Controller Card */
 	device.option_add("diskiing", A2BUS_DISKIING);  /* Disk II Controller Card, cycle-accurate version */
 	device.option_add("diskiing13", A2BUS_DISKIING13);  /* Disk II Controller Card, cycle-accurate version */
+	device.option_add("diskiiiwm", A2BUS_IWM_CARD);  /* IWM Disk II Controller Card */
 	device.option_add("mockingboard", A2BUS_MOCKINGBOARD);  /* Sweet Micro Systems Mockingboard */
 	device.option_add("phasor", A2BUS_PHASOR);  /* Applied Engineering Phasor */
 	device.option_add("cffa2", A2BUS_CFFA2);  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */
@@ -4434,13 +4214,15 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("vulcan", A2BUS_VULCANIIE); /* Applied Engineering Vulcan IDE drive */
 	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
 	device.option_add("ceyes2", A2BUS_COMPUTEREYES2); /* ComputerEyes/2 Video Digitizer */
+	device.option_add("applesurance", A2BUS_APPLESURANCE);  /* Applesurance Diagnostic Controller */
+	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)
 {
-	device.option_add("std80", A2EAUX_STD80COL); /* Apple IIe Standard 80 Column Card */
-	device.option_add("ext80", A2EAUX_EXT80COL); /* Apple IIe Extended 80 Column Card */
-	device.option_add("rw3", A2EAUX_RAMWORKS3);  /* Applied Engineering RamWorks III */
+	device.option_add("std80", A2EAUX_STD80COL); // Apple IIe Standard 80 Column Card
+	device.option_add("ext80", A2EAUX_EXT80COL); // Apple IIe Extended 80 Column Card
+	device.option_add("rw3", A2EAUX_RAMWORKS3);  // Applied Engineering RamWorks III
 }
 
 void apple2e_state::apple2e(machine_config &config)
@@ -4452,7 +4234,7 @@ void apple2e_state::apple2e(machine_config &config)
 
 	TIMER(config, m_scantimer, 0);
 	m_scantimer->configure_scanline(FUNC(apple2e_state::apple2_interrupt), "screen", 0, 1);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
@@ -4526,7 +4308,7 @@ void apple2e_state::apple2e(machine_config &config)
 
 	/* repeat timer.  15 Hz from page 7-15 of "Understanding the Apple IIe" */
 	timer_device &timer(TIMER(config, "repttmr", 0));
-	timer.configure_periodic(timer_device::expired_delegate(FUNC(apple2e_state::ay3600_repeat), this), attotime::from_hz(15));
+	timer.configure_periodic(FUNC(apple2e_state::ay3600_repeat), attotime::from_hz(15));
 
 	/* slot devices */
 	A2BUS(config, m_a2bus, 0);
@@ -4547,7 +4329,7 @@ void apple2e_state::apple2e(machine_config &config)
 	m_a2eauxslot->set_space(m_maincpu, AS_PROGRAM);
 	m_a2eauxslot->out_irq_callback().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2eauxslot->out_nmi_callback().set(FUNC(apple2e_state::a2bus_nmi_w));
-	A2EAUXSLOT_SLOT(config, "aux", m_a2eauxslot, apple2eaux_cards, "ext80");
+	A2EAUXSLOT_SLOT(config, "aux", m_a2eauxslot, apple2eaux_cards, "ext80");   // default to an extended 80-column card
 
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);
 
@@ -4765,7 +4547,7 @@ void apple2e_state::apple2cp(machine_config &config)
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
-	IWM(config, m_iicpiwm, &a2cp_interface);
+	LEGACY_IWM(config, m_iicpiwm, &a2cp_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
 	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 	FLOPPY_SONY(config, FLOPPY_2, &apple2cp_floppy35_floppy_interface);
@@ -4779,7 +4561,7 @@ void apple2e_state::apple2c_iwm(machine_config &config)
 	apple2c(config);
 
 	config.device_remove("sl6");
-	A2BUS_IWM_FDC(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_IWM(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 }
 
 void apple2e_state::apple2c_mem(machine_config &config)
@@ -4790,7 +4572,7 @@ void apple2e_state::apple2c_mem(machine_config &config)
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
 	config.device_remove("sl6");
-	A2BUS_IWM_FDC(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_IWM(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 }
@@ -4811,7 +4593,7 @@ void apple2e_state::laser128(machine_config &config)
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
-	APPLEFDC(config, m_laserudc, &fdc_interface);
+	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
 	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 
@@ -4835,7 +4617,7 @@ void apple2e_state::laser128ex2(machine_config &config)
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
-	APPLEFDC(config, m_laserudc, &fdc_interface);
+	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
 	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 
@@ -4856,13 +4638,9 @@ void apple2e_state::laser128ex2(machine_config &config)
 void apple2e_state::cec(machine_config &config)
 {
 	apple2e(config);
-	config.device_remove("sl1");
-	config.device_remove("sl2");
+
 	config.device_remove("sl3");
-	config.device_remove("sl4");
-	config.device_remove("sl5");
 	config.device_remove("sl6");
-	config.device_remove("sl7");
 
 	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
@@ -5242,6 +5020,29 @@ ROM_START(cec2000)
 	ROM_LOAD( "u40.m2822.bin", 0x000000, 0x000100, CRC(b72a2c70) SHA1(bc39fbd5b9a8d2287ac5d0a42e639fc4d3c2f9d4) )
 ROM_END
 
+ROM_START(zijini)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD( "u13.9433c-0202.rcl-zh-32.bin", 0x000000, 0x001000, CRC(816a86f1) SHA1(58ad0008df72896a18601e090ee0d58155ffa5be) )
+	ROM_LOAD( "u13.9433c-0202.rcl-zh-32.bin", 0x001000, 0x001000, CRC(816a86f1) SHA1(58ad0008df72896a18601e090ee0d58155ffa5be) )
+
+	ROM_REGION(0x10000,"maincpu",0)
+	//ROM_SYSTEM_BIOS(0, "default", "ver 1.0")
+	//ROMX_LOAD( "u20.rom10.27256.bin", 0x000000, 0x008000, CRC(51b92e5d) SHA1(654588f15910a04934d3579b12c14cc44f8ffd47), ROM_BIOS(0) )
+	//ROMX_LOAD( "u14.rom20.27256.bin", 0x008000, 0x008000, CRC(1bbc7f3a) SHA1(32d8ac440a59dc0d2096eadfca057c27c7ad9cc1), ROM_BIOS(0) )
+	ROM_LOAD( "u20-m27256-3c91.bin", 0x000000, 0x008000, CRC(dc95ebba) SHA1(360d8f4be3ea94eb4cc37f8c489f22c1436f4a51) )
+	ROM_LOAD( "u21-m27256-4e04.bin", 0x008000, 0x008000, CRC(0d7011bd) SHA1(322ed9805a76c0066170edc420419c7ef65ead8e) )
+
+	ROM_REGION(0x40000,"cecexp",0)
+	ROM_LOAD16_BYTE( "u4.c3001.531000.bin", 0x000000, 0x020000, CRC(d255ea01) SHA1(6ee445c0e7938e2f5de796daac369eb297915129) )
+	ROM_LOAD16_BYTE( "u7.c3002.531000.bin", 0x000001, 0x020000, CRC(31963b3b) SHA1(a255f7d0756ae67510f0bf325dc88371906df59d) )
+
+	ROM_REGION(0x800,"keyboard",0)
+	ROM_LOAD( "u26.9433c-0201.rcl-zh-16.bin", 0x000000, 0x000800, CRC(f3190603) SHA1(7efdf6f4ee0ed01ff06341c601496a43d06afd6b) )
+
+	ROM_REGION(0x100,"slot6",0)
+	ROM_LOAD( "u40.m2822.bin", 0x000000, 0x000100, CRC(b72a2c70) SHA1(bc39fbd5b9a8d2287ac5d0a42e639fc4d3c2f9d4) )
+ROM_END
+
 /*    YEAR  NAME        PARENT   COMPAT  MACHINE      INPUT      CLASS          INIT        COMPANY             FULLNAME */
 COMP( 1983, apple2e,    0,       apple2, apple2e,     apple2e,   apple2e_state, empty_init, "Apple Computer",   "Apple //e", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, apple2euk,  apple2e, 0,      apple2e,     apple2euk, apple2e_state, empty_init, "Apple Computer",   "Apple //e (UK)", MACHINE_SUPPORTS_SAVE )
@@ -5262,8 +5063,9 @@ COMP( 1985, apple2c0,   apple2c, 0,      apple2c_iwm, apple2c,   apple2e_state, 
 COMP( 1986, apple2c3,   apple2c, 0,      apple2c_mem, apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c (Original Memory Expansion)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2c4,   apple2c, 0,      apple2c_mem, apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c (rev 4)", MACHINE_SUPPORTS_SAVE )
 COMP( 1987, ceci,       0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer I", MACHINE_SUPPORTS_SAVE )
-COMP( 1989, cece,       0,       apple2, cec,         cece,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer E", MACHINE_SUPPORTS_SAVE )
-COMP( 1989, cecg,       0,       apple2, cec,         cecg,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer G", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, cece,       0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer E", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, cecg,       0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer G", MACHINE_SUPPORTS_SAVE )
 COMP( 1989, cecm,       0,       apple2, cec,         cecm,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer M", MACHINE_SUPPORTS_SAVE )
-COMP( 1991, cec2000,    0,       apple2, cec,         cec2000,   apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer 2000", MACHINE_SUPPORTS_SAVE )
+COMP( 1991, cec2000,    0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer 2000", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, zijini,     0,       apple2, cec,         zijini,    apple2e_state, empty_init, "Nanjing Computer Factory", "Zi Jin I", MACHINE_SUPPORTS_SAVE )
 COMP( 1988, apple2cp,   apple2c, 0,      apple2cp,    apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c Plus", MACHINE_SUPPORTS_SAVE )

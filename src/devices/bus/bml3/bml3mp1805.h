@@ -30,8 +30,8 @@ public:
 	// construction/destruction
 	bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(bml3_mp1805_r);
-	DECLARE_WRITE8_MEMBER(bml3_mp1805_w);
+	uint8_t bml3_mp1805_r();
+	void bml3_mp1805_w(uint8_t data);
 
 protected:
 	virtual void device_start() override;
@@ -41,6 +41,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	required_device_array<legacy_floppy_image_device, 4> m_floppy;
 	required_device<mc6843_device> m_mc6843;
 
 private:

@@ -28,25 +28,6 @@ typedef enum {
 	HP49_G
 } hp48_models;
 
-/* memory module configuration */
-typedef struct
-{
-	/* static part */
-	uint32_t off_mask;             /* offset bit-mask, indicates the real size */
-	read8_delegate read;
-	const char *read_name;
-	write8_delegate write;
-	void* data;                  /* non-NULL for banks */
-	int isnop;
-
-	/* configurable part */
-	uint8_t  state;                /* one of HP48_MODULE_ */
-	uint32_t base;                 /* base address */
-	uint32_t mask;                 /* often improperly called size, it is an address select mask */
-
-} hp48_module;
-
-
 /* screen image averaging */
 #define HP48_NB_SCREENS 3
 
@@ -55,6 +36,7 @@ class hp48_state : public driver_device
 public:
 	hp48_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_modules{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this } }
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
 		, m_palette(*this, "palette")
@@ -72,13 +54,33 @@ public:
 
 	void init_hp48();
 
-	/* from highest to lowest priority: HDW, NCE2, CE1, CE2, NCE3, NCE1 */
-	hp48_module m_modules[6];
-
 	void decode_nibble(uint8_t* dst, uint8_t* src, int size);
 	void encode_nibble(uint8_t* dst, uint8_t* src, int size);
 
 	void apply_modules();
+
+	/* memory module configuration */
+	struct hp48_module
+	{
+		hp48_module(device_t &owner) : read(owner), write(owner) { }
+
+		/* static part */
+		uint32_t off_mask;          // offset bit-mask, indicates the real size
+		read8_delegate read;
+		const char *read_name;
+		write8_delegate write;
+		void* data;                 // non-NULL for banks
+		int isnop;
+
+		/* configurable part */
+		uint8_t  state;             // one of HP48_MODULE_
+		uint32_t base;              // base address
+		uint32_t mask;              // often improperly called size, it is an address select mask
+
+	};
+
+	/* from highest to lowest priority: HDW, NCE2, CE1, CE2, NCE3, NCE1 */
+	hp48_module m_modules[6];
 
 private:
 	virtual void machine_reset() override;
@@ -111,16 +113,16 @@ private:
 
 	/* memory controller */
 	DECLARE_WRITE_LINE_MEMBER(mem_reset);
-	DECLARE_WRITE32_MEMBER(mem_config);
-	DECLARE_WRITE32_MEMBER(mem_unconfig);
-	DECLARE_READ32_MEMBER(mem_id);
+	void mem_config(uint32_t data);
+	void mem_unconfig(uint32_t data);
+	uint32_t mem_id();
 
 	/* CRC computation */
-	DECLARE_WRITE32_MEMBER(mem_crc);
+	void mem_crc(offs_t offset, uint32_t data);
 
 	/* IN/OUT registers */
-	DECLARE_READ32_MEMBER(reg_in);
-	DECLARE_WRITE32_MEMBER(reg_out);
+	uint32_t reg_in();
+	void reg_out(uint32_t data);
 
 	/* keyboard interrupt system */
 	DECLARE_WRITE_LINE_MEMBER(rsi);

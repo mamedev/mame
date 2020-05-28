@@ -42,6 +42,7 @@
 	"passes": [
 		{
 			"effect": "xbr/super-xbr/super-2xbr-3d-pass0",
+			"applytint": true,
 			"name": "Pass 0",
 			"input": [
 				{ "sampler": "s0", "texture": "screen" }

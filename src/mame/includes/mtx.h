@@ -17,7 +17,7 @@
 #include "bus/mtx/exp.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
 #include "machine/ram.h"
@@ -96,7 +96,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_trg1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_trg2_w);
-	DECLARE_WRITE_LINE_MEMBER(mtx_tms9929a_interrupt);
 	DECLARE_READ8_MEMBER(mtx_strobe_r);
 	DECLARE_READ8_MEMBER(mtx_sound_strobe_r);
 	DECLARE_WRITE8_MEMBER(mtx_cst_w);

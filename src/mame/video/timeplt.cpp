@@ -99,7 +99,7 @@ TILE_GET_INFO_MEMBER(timeplt_state::get_tile_info)
 	int flags = TILE_FLIPYX(attr >> 6);
 
 	tileinfo.category = (attr & 0x10) >> 4;
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(timeplt_state::get_chkun_tile_info)
@@ -110,7 +110,7 @@ TILE_GET_INFO_MEMBER(timeplt_state::get_chkun_tile_info)
 	int flags = 0;//TILE_FLIPYX(attr >> 6);
 
 	tileinfo.category = (attr & 0x80) >> 7;
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 
@@ -123,7 +123,7 @@ TILE_GET_INFO_MEMBER(timeplt_state::get_chkun_tile_info)
 
 void timeplt_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(timeplt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(timeplt_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_video_enable = 0;
 
 	save_item(NAME(m_video_enable));
@@ -137,7 +137,7 @@ VIDEO_START_MEMBER(timeplt_state,psurge)
 
 VIDEO_START_MEMBER(timeplt_state,chkun)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(timeplt_state::get_chkun_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(timeplt_state::get_chkun_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_video_enable = 0;
 
 	save_item(NAME(m_video_enable));

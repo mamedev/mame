@@ -98,11 +98,11 @@ public:
 
 protected:
 	DECLARE_READ8_MEMBER(hack_r);
-	DECLARE_WRITE8_MEMBER(nmi_set_w);
+	void nmi_set_w(u8 data);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_READ8_MEMBER(mcu2_p1_r);
-	DECLARE_WRITE8_MEMBER(mcu3_p2_w);
+	u8 mcu2_p1_r();
+	void mcu3_p2_w(u8 data);
 
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 
@@ -143,17 +143,17 @@ public:
 	void josvolly(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(mcu1_p1_r);
-	DECLARE_READ8_MEMBER(mcu1_p2_r);
-	DECLARE_READ8_MEMBER(mcu2_p1_r);
-	DECLARE_READ8_MEMBER(mcu2_p2_r);
+	u8 mcu1_p1_r();
+	u8 mcu1_p2_r();
+	u8 mcu2_p1_r();
+	u8 mcu2_p2_r();
 
 	DECLARE_WRITE8_MEMBER(cpu2_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(cpu2_irq_clear_w);
-	DECLARE_WRITE8_MEMBER(mcu1_p1_w);
-	DECLARE_WRITE8_MEMBER(mcu1_p2_w);
-	DECLARE_WRITE8_MEMBER(mcu2_p1_w);
-	DECLARE_WRITE8_MEMBER(mcu2_p2_w);
+	void mcu1_p1_w(u8 data);
+	void mcu1_p2_w(u8 data);
+	void mcu2_p1_w(u8 data);
+	void mcu2_p2_w(u8 data);
 
 	void josvolly_palette(palette_device &palette) const;
 

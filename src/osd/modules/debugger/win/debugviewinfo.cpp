@@ -12,6 +12,7 @@
 #include "debugwininfo.h"
 #include "uimetrics.h"
 #include "debugger.h"
+#include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
 #include "strconv.h"
@@ -111,9 +112,9 @@ uint32_t debugview_info::maxwidth()
 {
 	uint32_t max = m_view->total_size().x;
 	debug_view_source const *const cursource = m_view->source();
-	for (const debug_view_source &source : m_view->source_list())
+	for (auto &source : m_view->source_list())
 	{
-		m_view->set_source(source);
+		m_view->set_source(*source);
 		uint32_t const chars = m_view->total_size().x;
 		if (max < chars)
 			max = chars;
@@ -207,7 +208,7 @@ bool debugview_info::source_is_visible_cpu() const
 	if (m_view != nullptr)
 	{
 		const debug_view_source *const source = m_view->source();
-		return (source != nullptr) && (machine().debugger().cpu().get_visible_cpu() == source->device());
+		return (source != nullptr) && (machine().debugger().console().get_visible_cpu() == source->device());
 	}
 	return false;
 }
@@ -217,7 +218,7 @@ bool debugview_info::set_source_index(int index)
 {
 	if (m_view != nullptr)
 	{
-		const debug_view_source *const source = m_view->source_list().find(index);
+		const debug_view_source *const source = m_view->source(index);
 		if (source != nullptr)
 		{
 			m_view->set_source(*source);
@@ -245,7 +246,7 @@ bool debugview_info::set_source_for_device(device_t &device)
 
 bool debugview_info::set_source_for_visible_cpu()
 {
-	device_t *const curcpu = machine().debugger().cpu().get_visible_cpu();
+	device_t *const curcpu = machine().debugger().console().get_visible_cpu();
 	if (curcpu != nullptr)
 		return set_source_for_device(*curcpu);
 	else
@@ -264,7 +265,7 @@ HWND debugview_info::create_source_combobox(HWND parent, LONG_PTR userdata)
 	// populate the combobox
 	debug_view_source const *const cursource = m_view->source();
 	int maxlength = 0;
-	for (debug_view_source const *source = m_view->first_source(); source != nullptr; source = source->next())
+	for (auto &source : m_view->source_list())
 	{
 		int const length = strlen(source->name());
 		if (length > maxlength)
@@ -274,7 +275,7 @@ HWND debugview_info::create_source_combobox(HWND parent, LONG_PTR userdata)
 	}
 	if (cursource != nullptr)
 	{
-		SendMessage(result, CB_SETCURSEL, m_view->source_list().indexof(*cursource), 0);
+		SendMessage(result, CB_SETCURSEL, m_view->source_index(*cursource), 0);
 		SendMessage(result, CB_SETDROPPEDWIDTH, ((maxlength + 2) * metrics().debug_font_width()) + metrics().vscroll_width(), 0);
 		m_view->set_source(*cursource);
 	}
@@ -758,7 +759,7 @@ LRESULT debugview_info::view_proc(UINT message, WPARAM wparam, LPARAM lparam)
 
 void debugview_info::static_update(debug_view &view, void *osdprivate)
 {
-	debugview_info *const info = (debugview_info *)osdprivate;
+	auto *const info = (debugview_info *)osdprivate;
 	assert(info->m_view == &view);
 	info->update();
 }
@@ -774,7 +775,7 @@ LRESULT CALLBACK debugview_info::static_view_proc(HWND wnd, UINT message, WPARAM
 		return 0;
 	}
 
-	debugview_info *const info = (debugview_info *)(uintptr_t)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	auto *const info = (debugview_info *)(uintptr_t)GetWindowLongPtr(wnd, GWLP_USERDATA);
 	if (info == nullptr)
 		return DefWindowProc(wnd, message, wparam, lparam);
 

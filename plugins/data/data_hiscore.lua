@@ -86,11 +86,25 @@ end
 
 function env.byte_trim(bytes, val)
 	val = tonumber(val)
-	for i = 1, #bytes do
-		if bytes[i] ~= val then
+	len = #bytes
+	for i = 1, len do
+		if bytes[1] ~= val then
 			return bytes
 		end
 		table.remove(bytes, 1)
+	end
+	return bytes
+end
+
+function env.byte_trunc(bytes, val)
+	val = tonumber(val)
+	for i = 1, #bytes do
+		if bytes[i] == val then
+			break
+		end
+	end
+	while #bytes >= i do
+		table.remove(bytes)
 	end
 	return bytes
 end

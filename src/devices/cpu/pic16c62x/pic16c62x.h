@@ -53,6 +53,9 @@ DECLARE_DEVICE_TYPE(PIC16C622A,  pic16c622a_device)
 
 class pic16c62x_device : public cpu_device
 {
+public:
+	void set_config(int data);
+
 protected:
 	// construction/destruction
 	pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int picmodel);
@@ -62,11 +65,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 2; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 2; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -111,10 +114,10 @@ private:
 	uint8_t   m_picRAMmask;
 	int     m_inst_cycles;
 
-	address_space *m_program;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_data;
-	address_space *m_io;
+	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access< 8, 0,  0, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access< 5, 0,  0, ENDIANNESS_LITTLE>::specific m_io;
 
 	// For debugger
 	int m_debugger_temp;
@@ -189,7 +192,6 @@ private:
 	void build_opcode_table(void);
 	void pic16c62x_reset_regs();
 	void pic16c62x_soft_reset();
-	void pic16c62x_set_config(int data);
 	void pic16c62x_update_watchdog(int counts);
 	void pic16c62x_update_timer(int counts);
 

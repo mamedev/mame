@@ -40,9 +40,13 @@ function discord.startplugin()
 		if data:find("code", 1, true) then
 			error("discord: bad RPC reply, " .. data:sub(8) .. "\n")
 		end
+		if #data == 0 then
+			error("discord: timed out waiting for response\n");
+		end
 	end
 
 	local function update(status)
+		if not pipe then return end
 		local running = emu.romname() ~= "___empty"
 		local state = not running and "In menu" or status
 		local details = running and manager:machine():system().description or nil
@@ -78,13 +82,18 @@ function discord.startplugin()
 			local res = pipe:read(100)
 			data = data .. res
 		until #res == 0 and #data > 0 or time + 1 < os.time()
+		if #data == 0 then
+			emu.print_verbose("discord: timed out waiting for response, closing connection\n");
+			pipe = nil
+		end
 		--print(data)
 	end
 
 	do
 		local stat, err = pcall(init)
 		if not stat then
-			emu.print_error(err)
+			emu.print_verbose(err)
+			pipe = nil
 			return
 		end
 	end

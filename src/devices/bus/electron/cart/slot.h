@@ -116,7 +116,7 @@ class device_electron_cart_interface;
 
 class electron_cartslot_device : public device_t,
 									public device_image_interface,
-									public device_slot_interface
+									public device_single_card_slot_interface<device_electron_cart_interface>
 {
 public:
 	// construction/destruction
@@ -136,23 +136,18 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return true; }
-	virtual bool is_writeable() const override { return true; }
-	virtual bool is_creatable() const override { return false; }
-	virtual bool must_be_loaded() const override { return false; }
-	virtual bool is_reset_on_load() const override { return true; }
-	virtual const char *image_interface() const override { return "electron_cart"; }
-	virtual const char *file_extensions() const override { return "rom,bin"; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "electron_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "rom,bin"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
@@ -161,10 +156,20 @@ public:
 	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2);
 	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2);
 
+	virtual bool present() { return is_loaded() || loaded_through_softlist(); }
+
 	DECLARE_WRITE_LINE_MEMBER(irq_w) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(nmi_w) { m_nmi_handler(state); }
 
 protected:
+	electron_cartslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+
 	device_electron_cart_interface *m_cart;
 
 private:
@@ -175,7 +180,7 @@ private:
 
 // ======================> device_electron_cart_interface
 
-class device_electron_cart_interface : public device_slot_card_interface
+class device_electron_cart_interface : public device_interface
 {
 public:
 	// construction/destruction

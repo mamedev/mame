@@ -27,6 +27,8 @@ public:
 	// construction/destruction
 	mc1502_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <typename T>
+	void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 
 	TIMER_CALLBACK_MEMBER(motor_callback);
 
@@ -49,8 +51,10 @@ private:
 
 	required_device<fd1793_device> m_fdc;
 	int motor_on;
+	u8 m_control;
 	emu_timer *motor_timer;
-
+	required_device<cpu_device> m_cpu;
+	void motors_onoff();
 public:
 	void mc1502_wd17xx_aux_w(uint8_t data);
 	uint8_t mc1502_wd17xx_aux_r();

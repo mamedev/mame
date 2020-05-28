@@ -21,7 +21,7 @@
 
 #include "emu.h"
 #include "i8087.h"
-#include <math.h>
+#include <cmath>
 
 /*************************************
  *
@@ -259,12 +259,13 @@ void i8087_device::execute()
 		m_timer->adjust(attotime::from_hz((m_icount ? m_icount : 1) * clock()));
 }
 
-WRITE32_MEMBER(i8087_device::insn_w)
+void i8087_device::insn_w(uint32_t data)
 {
-	m_ppc = m_pc = data;
+	m_ppc = m_pc;
+	m_pc = data;
 }
 
-WRITE32_MEMBER(i8087_device::addr_w)
+void i8087_device::addr_w(uint32_t data)
 {
 	m_ea = data;
 	execute();
@@ -433,7 +434,7 @@ int i8087_device::dec_stack()
  *
  *************************************/
 
-int i8087_device::check_exceptions()
+int i8087_device::check_exceptions(bool store)
 {
 	/* Update the exceptions from SoftFloat */
 	if (float_exception_flags & float_flag_invalid)
@@ -456,13 +457,21 @@ int i8087_device::check_exceptions()
 		m_sw |= X87_SW_PE;
 		float_exception_flags &= ~float_flag_inexact;
 	}
+	if (float_exception_flags & float_flag_divbyzero)
+	{
+		m_sw |= X87_SW_ZE;
+		float_exception_flags &= ~float_flag_divbyzero;
+	}
+
+	u16 unmasked = (m_sw & ~m_cw) & 0x3f;
 
 	if ((m_sw & ~m_cw) & 0x3f)
 	{
 		// interrupt handler
 		if (!(m_cw & X87_CW_IEM)) { m_sw |= X87_SW_ES; m_int_handler(1); }
 		logerror("Unmasked x87 exception (CW:%.4x, SW:%.4x)\n", m_cw, m_sw);
-		return 0;
+		if (store || !(unmasked & (X87_SW_OE | X87_SW_UE)))
+			return 0;
 	}
 
 	return 1;
@@ -2760,11 +2769,9 @@ void i8087_device::fst_m32real(u8 modrm)
 		value = ST(0);
 	}
 
-	if (check_exceptions())
-	{
-		u32 m32real = floatx80_to_float32(value);
+	u32 m32real = floatx80_to_float32(value);
+	if (check_exceptions(true))
 		WRITE32(ea, m32real);
-	}
 
 	CYCLES(7);
 }
@@ -2785,11 +2792,9 @@ void i8087_device::fst_m64real(u8 modrm)
 		value = ST(0);
 	}
 
-	if (check_exceptions())
-	{
-		uint64_t m64real = floatx80_to_float64(value);
+	u64 m64real = floatx80_to_float64(value);
+	if (check_exceptions(true))
 		WRITE64(ea, m64real);
-	}
 
 	CYCLES(8);
 }
@@ -2832,9 +2837,9 @@ void i8087_device::fstp_m32real(u8 modrm)
 		value = ST(0);
 	}
 
-	if (check_exceptions())
+	u32 m32real = floatx80_to_float32(value);
+	if (check_exceptions(true))
 	{
-		u32 m32real = floatx80_to_float32(value);
 		WRITE32(ea, m32real);
 		inc_stack();
 	}
@@ -2859,9 +2864,9 @@ void i8087_device::fstp_m64real(u8 modrm)
 
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	u64 m64real = floatx80_to_float64(value);
+	if (check_exceptions(true))
 	{
-		uint64_t m64real = floatx80_to_float64(value);
 		WRITE64(ea, m64real);
 		inc_stack();
 	}
@@ -2885,7 +2890,7 @@ void i8087_device::fstp_m80real(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE80(ea, value);
 		inc_stack();
@@ -2944,7 +2949,7 @@ void i8087_device::fist_m16int(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE16(ea, m16int);
 	}
@@ -2977,7 +2982,7 @@ void i8087_device::fist_m32int(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE32(ea, m32int);
 	}
@@ -3010,7 +3015,7 @@ void i8087_device::fistp_m16int(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE16(ea, m16int);
 		inc_stack();
@@ -3044,7 +3049,7 @@ void i8087_device::fistp_m32int(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE32(ea, m32int);
 		inc_stack();
@@ -3078,7 +3083,7 @@ void i8087_device::fistp_m64int(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE64(ea, m64int);
 		inc_stack();
@@ -3113,7 +3118,7 @@ void i8087_device::fbstp(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE80(ea, result);
 		inc_stack();
@@ -4185,12 +4190,17 @@ void i8087_device::fstcw(u8 modrm)
 
 void i8087_device::fldenv(u8 modrm)
 {
-	// TODO: Pointers and selectors
 	u32 ea = m_ea;
+	u16 temp;
 
 	write_cw(READ16(ea));
 	m_sw = READ16(ea + 2);
 	m_tw = READ16(ea + 4);
+	m_ppc = READ16(ea + 6);
+	temp = READ16(ea + 8);
+	m_opcode = temp & 0x7ff;
+	m_ppc |= ((temp & 0xf000) << 4);
+	m_ea = READ16(ea + 10) | ((READ16(ea + 12) & 0xf000) << 4);
 
 	check_exceptions();
 
@@ -4205,6 +4215,10 @@ void i8087_device::fstenv(u8 modrm)
 	WRITE16(ea + 0, m_cw);
 	WRITE16(ea + 2, m_sw);
 	WRITE16(ea + 4, m_tw);
+	WRITE16(ea + 6, m_ppc & 0xffff);
+	WRITE16(ea + 8, (m_opcode & 0x07ff) | ((m_ppc & 0x0f0000) >> 4));
+	WRITE16(ea + 10, m_ea & 0xffff);
+	WRITE16(ea + 12, (m_ea & 0x0f0000) >> 4);
 	CYCLES(67);
 }
 
@@ -4215,6 +4229,10 @@ void i8087_device::fsave(u8 modrm)
 	WRITE16(ea + 0, m_cw);
 	WRITE16(ea + 2, m_sw);
 	WRITE16(ea + 4, m_tw);
+	WRITE16(ea + 6, m_ppc & 0xffff);
+	WRITE16(ea + 8, (m_opcode & 0x07ff) | ((m_ppc & 0x0f0000) >> 4));
+	WRITE16(ea + 10, m_ea & 0xffff);
+	WRITE16(ea + 12, (m_ea & 0x0f0000) >> 4);
 
 	for (int i = 0; i < 8; ++i)
 		WRITE80(ea + i*10, ST(i));
@@ -4225,10 +4243,16 @@ void i8087_device::fsave(u8 modrm)
 void i8087_device::frstor(u8 modrm)
 {
 	u32 ea = m_ea;
+	u16 temp;
 
 	write_cw(READ16(ea));
 	m_sw = READ16(ea + 2);
 	m_tw = READ16(ea + 4);
+	m_ppc = READ16(ea + 6);
+	temp = READ16(ea + 8);
+	m_opcode = temp & 0x7ff;
+	m_ppc |= ((temp & 0xf000) << 4);
+	m_ea = READ16(ea + 10) | ((READ16(ea + 12) & 0xf000) << 4);
 
 	for (int i = 0; i < 8; ++i)
 		write_stack(i, READ80(ea + i*10), false);
@@ -4450,6 +4474,7 @@ void i8087_device::build_opcode_table_d9()
 				case 0xcf: ptr = &i8087_device::fxch_sti;  break;
 
 				case 0xd0: ptr = &i8087_device::fnop;      break;
+				case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf: ptr = &i8087_device::fstp_sti;     break;
 				case 0xe0: ptr = &i8087_device::fchs;      break;
 				case 0xe1: ptr = &i8087_device::fabs;      break;
 				case 0xe4: ptr = &i8087_device::ftst;      break;

@@ -12,10 +12,10 @@
 
 #include "machine/6532riot.h"
 #include "machine/gen_latch.h"
+#include "machine/slapstic.h"
 #include "machine/x2212.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
-#include "includes/slapstic.h"
 
 
 class starwars_state : public driver_device
@@ -41,7 +41,7 @@ public:
 	void init_esb();
 	void init_starwars();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(matrix_flag_r);
+	DECLARE_READ_LINE_MEMBER(matrix_flag_r);
 
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -92,8 +92,8 @@ private:
 	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
-	DECLARE_READ8_MEMBER(r6532_porta_r);
-	DECLARE_WRITE8_MEMBER(r6532_porta_w);
+	uint8_t r6532_porta_r();
+	void r6532_porta_w(uint8_t data);
 
 	void starwars_mproc_init();
 	void starwars_mproc_reset();

@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/points.h"
 #include "debug/textbuf.h"
 #include "debug_module.h"
 #include "debugger.h"
@@ -346,9 +347,9 @@ public:
 	bool is_thread_id_ok(const char *buf);
 
 	void handle_character(char ch);
-	void send_nack(void);
-	void send_ack(void);
-	void handle_packet(void);
+	void send_nack();
+	void send_ack();
+	void handle_packet();
 
 	enum cmd_reply
 	{
@@ -387,12 +388,12 @@ public:
 
 	readbuf_state m_readbuf_state;
 
-	void generate_target_xml(void);
+	void generate_target_xml();
 
-	int readchar(void);
+	int readchar();
 
 	void send_reply(const char *str);
-	void send_stop_packet(void);
+	void send_stop_packet();
 
 private:
 	running_machine *m_machine;
@@ -426,8 +427,8 @@ private:
 
 	std::map<offs_t, uint64_t> m_address_map;
 
-	device_debug::breakpoint *m_triggered_breakpoint;
-	device_debug::watchpoint *m_triggered_watchpoint;
+	debug_breakpoint *m_triggered_breakpoint;
+	debug_watchpoint *m_triggered_watchpoint;
 
 	std::string m_target_xml;
 
@@ -449,7 +450,7 @@ int debug_gdbstub::init(const osd_options &options)
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::exit(void)
+void debug_gdbstub::exit()
 {
 }
 
@@ -460,7 +461,7 @@ void debug_gdbstub::init_debugger(running_machine &machine)
 }
 
 //-------------------------------------------------------------------------
-int debug_gdbstub::readchar(void)
+int debug_gdbstub::readchar()
 {
 	// NOTE: we don't use m_socket.getc() because it does not work with
 	//       sockets (it assumes seeking is possible).
@@ -497,7 +498,7 @@ static std::string escape_packet(const std::string src)
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::generate_target_xml(void)
+void debug_gdbstub::generate_target_xml()
 {
 	// Note: we do not attempt to replicate the regnum values from old
 	//       GDB clients that did not support target.xml.
@@ -544,7 +545,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 			uint64_t datamask = entry->datamask();
 			int index = entry->index();
 			const std::string &format_string = entry->format_string();
-			osd_printf_info("[%3d] datasize %d mask %016" PRIx64 " [%s] [%s]\n", index, datasize, datamask, symbol, format_string.c_str());
+			osd_printf_info("[%3d] datasize %d mask %016" PRIx64 " [%s] [%s]\n", index, datasize, datamask, symbol, format_string);
 		}
 #endif
 
@@ -583,11 +584,11 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 
 #if 0
 		for ( const auto &reg: m_gdb_registers )
-			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name.c_str());
+			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name);
 #endif
 
 		std::string socket_name = string_format("socket.localhost:%d", m_debugger_port);
-		osd_file::error filerr = m_socket.open(socket_name.c_str());
+		osd_file::error filerr = m_socket.open(socket_name);
 		if ( filerr != osd_file::error::NONE )
 			fatalerror("gdbstub: failed to start listening on port %d\n", m_debugger_port);
 		osd_printf_info("gdbstub: listening on port %d\n", m_debugger_port);
@@ -596,7 +597,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 	}
 	else
 	{
-		device_debug *debug = m_debugger_cpu->get_visible_cpu()->debug();
+		device_debug *debug = m_debugger_console->get_visible_cpu()->debug();
 		m_triggered_watchpoint = debug->triggered_watchpoint();
 		m_triggered_breakpoint = debug->triggered_breakpoint();
 		if ( m_send_stop_packet )
@@ -622,7 +623,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::debugger_update(void)
+void debug_gdbstub::debugger_update()
 {
 	while ( true )
 	{
@@ -634,13 +635,13 @@ void debug_gdbstub::debugger_update(void)
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::send_nack(void)
+void debug_gdbstub::send_nack()
 {
 	m_socket.puts("-");
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::send_ack(void)
+void debug_gdbstub::send_ack()
 {
 	m_socket.puts("+");
 }
@@ -683,7 +684,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_c(const char *buf)
 	if ( *buf != '\0' )
 		return REPLY_UNSUPPORTED;
 
-	m_debugger_cpu->get_visible_cpu()->debug()->go();
+	m_debugger_console->get_visible_cpu()->debug()->go();
 	m_send_stop_packet = true;
 	return REPLY_NONE;
 }
@@ -696,7 +697,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_D(const char *buf)
 	if ( *buf != '\0' )
 		return REPLY_UNSUPPORTED;
 
-	m_debugger_cpu->get_visible_cpu()->debug()->go();
+	m_debugger_console->get_visible_cpu()->debug()->go();
 	m_dettached = true;
 
 	return REPLY_OK;
@@ -752,7 +753,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_H(const char *buf)
 debug_gdbstub::cmd_reply debug_gdbstub::handle_k(const char *buf)
 {
 	m_machine->schedule_exit();
-	m_debugger_cpu->get_visible_cpu()->debug()->go();
+	m_debugger_console->get_visible_cpu()->debug()->go();
 	m_dettached = true;
 	m_socket.close();
 	return REPLY_NONE;
@@ -969,7 +970,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_s(const char *buf)
 	if ( *buf != '\0' )
 		return REPLY_UNSUPPORTED;
 
-	m_debugger_cpu->get_visible_cpu()->debug()->single_step();
+	m_debugger_console->get_visible_cpu()->debug()->single_step();
 	m_send_stop_packet = true;
 	return REPLY_NONE;
 }
@@ -977,13 +978,9 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_s(const char *buf)
 //-------------------------------------------------------------------------
 static bool remove_breakpoint(device_debug *debug, uint64_t address, int /*kind*/)
 {
-	device_debug::breakpoint *bp = debug->breakpoint_first();
-	while ( bp != nullptr )
-	{
-		if ( bp->address() == address )
-			return debug->breakpoint_clear(bp->index());
-		bp = bp->next();
-	}
+	const debug_breakpoint *bp = debug->breakpoint_find(address);
+	if (bp != nullptr)
+		return debug->breakpoint_clear(bp->index());
 	return false;
 }
 
@@ -1025,7 +1022,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_z(const char *buf)
 		m_address_map.erase(offset);
 	}
 
-	device_debug *debug = m_debugger_cpu->get_visible_cpu()->debug();
+	device_debug *debug = m_debugger_console->get_visible_cpu()->debug();
 	switch ( type )
 	{
 		// Note: software and hardware breakpoints are treated both the
@@ -1066,7 +1063,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_Z(const char *buf)
 		m_address_map[offset] = address;
 	}
 
-	device_debug *debug = m_debugger_cpu->get_visible_cpu()->debug();
+	device_debug *debug = m_debugger_console->get_visible_cpu()->debug();
 	switch ( type )
 	{
 		// Note: software and hardware breakpoints are treated both the
@@ -1094,7 +1091,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_Z(const char *buf)
 
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::send_stop_packet(void)
+void debug_gdbstub::send_stop_packet()
 {
 	int signal = 5; // GDB_SIGNAL_TRAP
 	std::string reply = string_format("T%02x", signal);
@@ -1123,7 +1120,7 @@ void debug_gdbstub::send_stop_packet(void)
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::handle_packet(void)
+void debug_gdbstub::handle_packet()
 {
 	// For any command not supported by the stub, an empty response
 	// (‘$#00’) should be returned. That way it is possible to extend

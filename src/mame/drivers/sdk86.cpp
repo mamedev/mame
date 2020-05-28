@@ -45,15 +45,16 @@ public:
 	sdk86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_kbdrow(*this, "X%X", 0U)
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void sdk86(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(scanlines_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(kbd_r);
+	void scanlines_w(uint8_t data);
+	void digit_w(uint8_t data);
+	uint8_t kbd_r();
 
 	void sdk86_io(address_map &map);
 	void sdk86_mem(address_map &map);
@@ -61,6 +62,7 @@ private:
 	uint8_t m_digit;
 	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
+	required_ioport_array<3> m_kbdrow;
 	output_finder<8> m_digits;
 };
 
@@ -112,27 +114,24 @@ static INPUT_PORTS_START( sdk86 )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( sdk86_state::scanlines_w )
+void sdk86_state::scanlines_w(uint8_t data)
 {
 	m_digit = data;
 }
 
-WRITE8_MEMBER( sdk86_state::digit_w )
+void sdk86_state::digit_w(uint8_t data)
 {
 	if (m_digit < 8)
 		m_digits[m_digit] = data;
 }
 
-READ8_MEMBER( sdk86_state::kbd_r )
+uint8_t sdk86_state::kbd_r()
 {
 	uint8_t data = 0xff;
 
-	if (m_digit < 3)
-	{
-		char kbdrow[6];
-		sprintf(kbdrow,"X%X",m_digit);
-		data = ioport(kbdrow)->read();
-	}
+	if ((m_digit & 7) < 3)
+		data = m_kbdrow[m_digit & 7]->read();
+
 	return data;
 }
 

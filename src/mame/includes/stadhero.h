@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
+#include "screen.h"
 #include "tilemap.h"
 
 class stadhero_state : public driver_device
@@ -17,6 +18,7 @@ public:
 		m_spritegen(*this, "spritegen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch"),
+		m_screen(*this, "screen"),
 		m_spriteram(*this, "spriteram"),
 		m_pf1_data(*this, "pf1_data"),
 		m_coin(*this, "COIN")
@@ -32,6 +34,7 @@ private:
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<screen_device> m_screen;
 
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_pf1_data;
@@ -42,6 +45,7 @@ private:
 
 	DECLARE_WRITE16_MEMBER(int_ack_w);
 	DECLARE_WRITE16_MEMBER(pf1_data_w);
+	uint8_t mystery_r();
 
 	virtual void video_start() override;
 

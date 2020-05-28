@@ -4,7 +4,7 @@
  * NEC PC-6001 cassette format handling
  */
 
-#include <assert.h>
+#include <cassert>
 
 #include "p6001_cas.h"
 

@@ -78,7 +78,7 @@ void hideseek_state::mem_map(address_map &map)
 	map(0x01000000, 0x01ffffff).ram(); // DRAM
 	map(0xffff8000, 0xffff87ff).ram(); // HD64F7045F28 i/os
 	map(0xfffff000, 0xffffffff).ram(); // on-chip RAM
-//  AM_RANGE(0x06000000, 0x07ffffff) AM_ROM AM_REGION("blit_data", 0)
+//  map(0x06000000, 0x07ffffff).rom().region("blit_data", 0);
 }
 
 

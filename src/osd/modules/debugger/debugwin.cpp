@@ -161,7 +161,7 @@ void debugger_windows::debugger_update()
 		{
 			HWND const focuswnd = GetFocus();
 
-			m_machine->debugger().cpu().get_visible_cpu()->debug()->halt_on_next_instruction("User-initiated break\n");
+			m_machine->debugger().debug_break();
 
 			// if we were focused on some window's edit box, reset it to default
 			for (auto &info : m_window_list)

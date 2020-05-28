@@ -281,12 +281,12 @@ TILE_GET_INFO_MEMBER(tmspoker_state::get_bg_tile_info)
 */
 	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0 /* bank */, code, 0 /* color */, 0);
+	tileinfo.set(0 /* bank */, code, 0 /* color */, 0);
 }
 
 void tmspoker_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tmspoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tmspoker_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t tmspoker_state::screen_update_tmspoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -654,4 +654,4 @@ void tmspoker_state::init_bus()
 *************************/
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY      FULLNAME                      FLAGS
-GAME( 198?, tmspoker, 0,      tmspoker, tmspoker, tmspoker_state, init_bus, ROT0, "<unknown>", "unknown TMS9980 Poker Game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 198?, tmspoker, 0,      tmspoker, tmspoker, tmspoker_state, init_bus, ROT0, "<unknown>", "unknown TMS9980 poker game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

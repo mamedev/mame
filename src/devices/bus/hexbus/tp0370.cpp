@@ -177,7 +177,11 @@ READ8_MEMBER( ibc_device::read )
 		if (m_bav) status |= 0x20;
 		if (m_hsk) status |= 0x10;
 
-		LOGMASKED(LOG_STATUS, "Status -> %02x\n", status);
+		if (status != m_last_status)
+		{
+			LOGMASKED(LOG_STATUS, "Status -> %02x\n", status);
+			m_last_status = status;
+		}
 
 		// Reset flag
 		m_message_started = false;
@@ -246,7 +250,7 @@ void ibc_device::set_lines(bool bav, bool hsk)
 	uint8_t val = (m_transmit & 0xc0)|((m_transmit & 0x30)>>4);
 	if (!bav) val |= 0x04;
 	if (!hsk) val |= 0x10;
-	if (m_transmit != 0xff) LOGMASKED(LOG_LINES, "Data = %01x\n", m_transmit>>4);
+	if (hsk) LOGMASKED(LOG_LINES, "Data = %01x\n", m_transmit>>4);
 
 	m_hexout(val);
 }

@@ -1281,9 +1281,9 @@ TIMER_CALLBACK_MEMBER(avgdvg_device::run_state_machine)
  *
  ************************************/
 
-CUSTOM_INPUT_MEMBER(avgdvg_device::done_r)
+READ_LINE_MEMBER(avgdvg_device::done_r)
 {
-	return m_sync_halt ? 0x01 : 0x00;
+	return m_sync_halt ? 1 : 0;
 }
 
 void avgdvg_device::go_w(u8 data)

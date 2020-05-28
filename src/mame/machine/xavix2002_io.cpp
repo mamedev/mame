@@ -84,9 +84,9 @@ WRITE8_MEMBER(xavix2002_io_device::pio_out_w)
 
 		switch (offset)
 		{
-			case 0: m_out0_cb(space,0,outdata); break;
-			case 1: m_out1_cb(space,0,outdata); break;
-			case 2: m_out2_cb(space,0,outdata); break;
+			case 0: m_out0_cb(outdata); break;
+			case 1: m_out1_cb(outdata); break;
+			case 2: m_out2_cb(outdata); break;
 			default: break;
 		}
 	}

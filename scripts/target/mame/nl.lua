@@ -23,10 +23,11 @@ CPUS["M6803"] = true
 CPUS["M6809"] = true
 CPUS["MCS48"] = true
 CPUS["I8085"] = true
---CPUS["MCS51"] = true
+CPUS["MCS51"] = true
 --CPUS["M6800"] = true
 --CPUS["M6809"] = true
 --CPUS["M680X0"] = true
+CPUS["M680X0"] = true
 --CPUS["TMS9900"] = true
 --CPUS["COP400"] = true
 CPUS["F8"] = true
@@ -43,20 +44,26 @@ SOUNDS["AY8910"] = true
 SOUNDS["MSM5205"] = true
 --SOUNDS["ASTROCADE"] = true
 SOUNDS["TMS5220"] = true
---SOUNDS["OKIM6295"] = true
+SOUNDS["OKIM6295"] = true
+SOUNDS["UPD7759"] = true
 --SOUNDS["HC55516"] = true
 --SOUNDS["YM3812"] = true
 --SOUNDS["CEM3394"] = true
 --SOUNDS["VOTRAX"] = true
+SOUNDS["YM2151"] = true
+SOUNDS["YM2413"] = true
 SOUNDS["BEEP"] = true
 SOUNDS["VOLT_REG"] = true
 SOUNDS["SPEAKER"] = true
+SOUNDS["DIGITALKER"] = true
+SOUNDS["SN76477"] = true
 
 --------------------------------------------------
 -- specify available video cores
 --------------------------------------------------
 
 VIDEOS["FIXFREQ"] = true
+VIDEOS["PWM_DISPLAY"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -79,6 +86,8 @@ MACHINES["6821PIA"] = true
 MACHINES["I8255"] = true
 MACHINES["WATCHDOG"] = true
 MACHINES["EEPROMDEV"] = true
+MACHINES["UPD4701"] = true
+MACHINES["CXD1095"] = true
 --MACHINES["TTL74148"] = true
 --MACHINES["TTL74153"] = true
 --MACHINES["TTL7474"] = true
@@ -88,6 +97,7 @@ MACHINES["EEPROMDEV"] = true
 --MACHINES["68681"] = true
 --MACHINES["BANKDEV"] = true
 MACHINES["F3853"] = true
+MACHINES["MB14241"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -125,10 +135,10 @@ function createProjects_mame_nl(_target, _subtarget)
 
 files{
 	MAME_DIR .. "src/mame/drivers/pong.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pong.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pong.h",
-	MAME_DIR .. "src/mame/machine/nl_pongd.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pongd.h",
+	MAME_DIR .. "src/mame/machine/nl_pongf.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pongf.h",
+	MAME_DIR .. "src/mame/machine/nl_pongdoubles.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pongdoubles.h",
 	MAME_DIR .. "src/mame/machine/nl_breakout.cpp",
 	MAME_DIR .. "src/mame/machine/nl_breakout.h",
 	MAME_DIR .. "src/mame/machine/nl_rebound.cpp",
@@ -147,12 +157,18 @@ files{
 	MAME_DIR .. "src/mame/drivers/1942.cpp",
 	MAME_DIR .. "src/mame/includes/1942.h",
 	MAME_DIR .. "src/mame/video/1942.cpp",
+	MAME_DIR .. "src/mame/audio/nl_1942.cpp",
+	MAME_DIR .. "src/mame/audio/nl_1942.h",
 
 	MAME_DIR .. "src/mame/drivers/gamemachine.cpp",
+	MAME_DIR .. "src/mame/audio/nl_gamemachine.h",
+	MAME_DIR .. "src/mame/audio/nl_gamemachine.cpp",
 
 	MAME_DIR .. "src/mame/drivers/popeye.cpp",
 	MAME_DIR .. "src/mame/includes/popeye.h",
 	MAME_DIR .. "src/mame/video/popeye.cpp",
+	MAME_DIR .. "src/mame/audio/nl_popeye.cpp",
+	MAME_DIR .. "src/mame/audio/nl_popeye.h",
 
 	MAME_DIR .. "src/mame/drivers/mario.cpp",
 	MAME_DIR .. "src/mame/includes/mario.h",
@@ -169,6 +185,15 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
 	MAME_DIR .. "src/mame/audio/nl_kidniki.h",
 
+  MAME_DIR .. "src/mame/machine/mw8080bw.cpp",
+  MAME_DIR .. "src/mame/drivers/mw8080bw.cpp",
+  MAME_DIR .. "src/mame/includes/mw8080bw.h",
+  MAME_DIR .. "src/mame/audio/mw8080bw.h",
+  MAME_DIR .. "src/mame/audio/mw8080bw.cpp",
+  MAME_DIR .. "src/mame/video/mw8080bw.cpp",
+	MAME_DIR .. "src/mame/audio/nl_gunfight.cpp",
+	MAME_DIR .. "src/mame/audio/nl_gunfight.h",
+
 	MAME_DIR .. "src/mame/audio/cheekyms.cpp",
 	MAME_DIR .. "src/mame/audio/cheekyms.h",
 	MAME_DIR .. "src/mame/audio/nl_cheekyms.cpp",
@@ -176,6 +201,17 @@ files{
 	MAME_DIR .. "src/mame/drivers/cheekyms.cpp",
 	MAME_DIR .. "src/mame/includes/cheekyms.h",
 	MAME_DIR .. "src/mame/video/cheekyms.cpp",
+
+	MAME_DIR .. "src/mame/drivers/galaxian.cpp",
+	MAME_DIR .. "src/mame/includes/galaxian.h",
+	MAME_DIR .. "src/mame/audio/galaxian.cpp",
+	MAME_DIR .. "src/mame/audio/galaxian.h",
+	MAME_DIR .. "src/mame/video/galaxian.cpp",
+	MAME_DIR .. "src/mame/audio/nl_konami.h",
+	MAME_DIR .. "src/mame/audio/nl_konami.cpp",
+
+	MAME_DIR .. "src/mame/audio/cclimber.cpp",
+	MAME_DIR .. "src/mame/audio/cclimber.h",
 
 	MAME_DIR .. "src/mame/audio/nl_zac1b11142.cpp",
 	MAME_DIR .. "src/mame/audio/nl_zacc1b11142.h",
@@ -186,10 +222,34 @@ files{
 	MAME_DIR .. "src/mame/video/zaccaria.cpp",
 
 	MAME_DIR .. "src/mame/drivers/cocoloco.cpp",
+	MAME_DIR .. "src/mame/audio/nl_cocoloco.h",
+	MAME_DIR .. "src/mame/audio/nl_cocoloco.cpp",
 
 	MAME_DIR .. "src/mame/drivers/palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.h",
+
+	MAME_DIR .. "src/mame/drivers/segas16b.cpp",
+	MAME_DIR .. "src/mame/includes/segas16b.h",
+	MAME_DIR .. "src/mame/video/segas16b.cpp",
+	MAME_DIR .. "src/mame/audio/nl_segas16b.cpp",
+	MAME_DIR .. "src/mame/audio/nl_segas16b.h",
+	MAME_DIR .. "src/mame/machine/315_5195.cpp",
+	MAME_DIR .. "src/mame/machine/315_5195.h",
+	MAME_DIR .. "src/mame/machine/fd1089.cpp",
+	MAME_DIR .. "src/mame/machine/fd1089.h",
+	MAME_DIR .. "src/mame/machine/fd1094.cpp",
+	MAME_DIR .. "src/mame/machine/fd1094.h",
+	MAME_DIR .. "src/mame/machine/segaic16.cpp",
+	MAME_DIR .. "src/mame/machine/segaic16.h",
+	MAME_DIR .. "src/mame/video/sega16sp.cpp",
+	MAME_DIR .. "src/mame/video/sega16sp.h",
+	MAME_DIR .. "src/mame/machine/mc8123.cpp",
+	MAME_DIR .. "src/mame/machine/mc8123.h",
+	MAME_DIR .. "src/mame/video/segaic16.cpp",
+	MAME_DIR .. "src/mame/video/segaic16.h",
+	MAME_DIR .. "src/mame/video/segaic16_road.cpp",
+	MAME_DIR .. "src/mame/video/segaic16_road.h",
 
 	MAME_DIR .. "src/mame/drivers/testpat.cpp",
 	MAME_DIR .. "src/mame/machine/nl_tp1983.cpp",
@@ -202,6 +262,7 @@ files{
 	MAME_DIR .. "src/mame/drivers/aleisttl.cpp",
 	MAME_DIR .. "src/mame/drivers/bailey.cpp",
 	MAME_DIR .. "src/mame/drivers/chicago.cpp",
+	MAME_DIR .. "src/mame/drivers/crazybal.cpp",
 	MAME_DIR .. "src/mame/drivers/electra.cpp",
 	MAME_DIR .. "src/mame/drivers/exidyttl.cpp",
 	MAME_DIR .. "src/mame/drivers/fungames.cpp",

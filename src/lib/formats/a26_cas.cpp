@@ -6,7 +6,7 @@ Atari 2600 SuperCharger support
 
 */
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/a26_cas.h"
 

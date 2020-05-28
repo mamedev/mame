@@ -558,16 +558,17 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 DEFINE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state, "segas32_pcb", "Sega System 32 PCB")
 
 segas32_state::segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_PCB, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_PCB, tag, owner, clock, false)
 {
 }
 
-segas32_state::segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+segas32_state::segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_multi32)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_z80_shared_ram(*this,"z80_shared_ram")
 	, m_system32_workram(*this,"workram")
 	, m_videoram(*this,"videoram", 0)
 	, m_spriteram(*this,"spriteram", 0)
+	, m_soundram(*this, "soundram")
 	, m_paletteram(*this,"paletteram.%u", 0, uint8_t(0))
 	, m_maincpu(*this, "maincpu")
 	, m_soundcpu(*this, "soundcpu")
@@ -583,7 +584,26 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 	, m_soundrom_bank(*this, "soundbank")
 	, m_multipcm_bank_hi(*this, "multipcmbankhi")
 	, m_multipcm_bank_lo(*this, "multipcmbanklo")
+	, m_is_multi32(is_multi32)
+	, m_sound_irq_input(0)
+	, m_sound_dummy_value(0)
+	, m_sound_bank(0)
+	, m_system32_tilebank_external(0)
+	, m_sprite_render_count(0)
+	, m_print_count(0)
+	, m_vblank_end_int_timer(nullptr)
+	, m_update_sprites_timer(nullptr)
 {
+	std::fill(std::begin(m_v60_irq_control), std::end(m_v60_irq_control), 0);
+	std::fill(std::begin(m_v60_irq_timer), std::end(m_v60_irq_timer), nullptr);
+	std::fill(std::begin(m_sound_irq_control), std::end(m_sound_irq_control), 0);
+	std::fill(std::begin(m_system32_displayenable), std::end(m_system32_displayenable), 0);
+	std::fill(std::begin(m_arescue_dsp_io), std::end(m_arescue_dsp_io), 0);
+	std::fill(std::begin(m_sprite_control_latched), std::end(m_sprite_control_latched), 0);
+	std::fill(std::begin(m_sprite_control), std::end(m_sprite_control), 0);
+
+	for (int i = 0; i < 2; i++)
+		std::fill(std::begin(m_mixer_control[i]), std::end(m_mixer_control[i]), 0);
 }
 
 
@@ -618,47 +638,22 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
  *
  *************************************/
 
-void segas32_state::device_start()
-{
-	common_start(0);
-}
-
-void segas32_trackball_state::device_start()
-{
-	common_start(0);
-}
-
 void segas32_v25_state::device_start()
 {
-	common_start(0);
+	segas32_4player_state::device_start();
 	decrypt_protrom();
-}
-
-void segas32_upd7725_state::device_start()
-{
-	common_start(0);
 }
 
 void segas32_cd_state::device_start()
 {
-	common_start(0);
+	segas32_state::device_start();
 	m_lamps.resolve();
-}
-
-void sega_multi32_state::device_start()
-{
-	common_start(1);
 }
 
 void sega_multi32_analog_state::device_start()
 {
-	common_start(1);
+	sega_multi32_state::device_start();
 	m_analog_bank = 0;
-}
-
-void sega_multi32_6player_state::device_start()
-{
-	common_start(1);
 }
 
 void segas32_state::device_reset()
@@ -825,7 +820,7 @@ INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
  *************************************/
 
 
-WRITE8_MEMBER(segas32_state::misc_output_0_w)
+void segas32_state::misc_output_0_w(uint8_t data)
 {
 	if (m_sw1_output)
 		(this->*m_sw1_output)(0, data);
@@ -837,7 +832,7 @@ WRITE8_MEMBER(segas32_state::misc_output_0_w)
 }
 
 
-WRITE8_MEMBER(segas32_state::misc_output_1_w)
+void segas32_state::misc_output_1_w(uint8_t data)
 {
 	if (m_sw1_output)
 		(this->*m_sw1_output)(1, data);
@@ -849,21 +844,21 @@ WRITE8_MEMBER(segas32_state::misc_output_1_w)
 }
 
 
-WRITE8_MEMBER(segas32_state::sw2_output_0_w)
+void segas32_state::sw2_output_0_w(uint8_t data)
 {
 	if (m_sw2_output)
 		(this->*m_sw2_output)(0, data);
 }
 
 
-WRITE8_MEMBER(segas32_state::sw2_output_1_w)
+void segas32_state::sw2_output_1_w(uint8_t data)
 {
 	if (m_sw2_output)
 		(this->*m_sw2_output)(1, data);
 }
 
 
-WRITE8_MEMBER(segas32_state::tilebank_external_w)
+void segas32_state::tilebank_external_w(uint8_t data)
 {
 	m_system32_tilebank_external = data;
 }
@@ -1193,9 +1188,9 @@ void segas32_state::multi32_map(address_map &map)
 	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
 	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
 	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
-	map(0x610000, 0x61007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<0>));
+	map(0x610000, 0x61007f).mirror(0x06ff80).rw(FUNC(segas32_state::mixer_r<0>), FUNC(segas32_state::mixer_w<0>));
 	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<1>), FUNC(segas32_state::paletteram_w<1>)).share("paletteram.1");
-	map(0x690000, 0x69007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<1>));
+	map(0x690000, 0x69007f).mirror(0x06ff80).rw(FUNC(segas32_state::mixer_r<1>), FUNC(segas32_state::mixer_w<1>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
 	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
@@ -1242,7 +1237,7 @@ void segas32_state::system32_sound_portmap(address_map &map)
 void segas32_state::rf5c68_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("soundram");
 }
 
 
@@ -1347,7 +1342,18 @@ static INPUT_PORTS_START( system32_generic )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("mainpcb:SERVICE34_A")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Push SW1 (Service)") // on PCB
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Push SW2 (Test)") // on PCB
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1390,7 +1396,18 @@ static INPUT_PORTS_START( system32_generic_slave )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("slavepcb:SERVICE34_A")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("slavepcb_SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("slavepcb_SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("slavepcb_SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("slavepcb_SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("slavepcb:Push SW1 (Service)") PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("slavepcb:Push SW2 (Test)") PORT_CODE(KEYCODE_CLOSEBRACE)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1649,20 +1666,6 @@ static INPUT_PORTS_START( f1en )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("mainpcb:SERVICE34_A")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 	PORT_START("mainpcb:ANALOG1")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("mainpcb:Steering Wheel")
 
@@ -1686,20 +1689,6 @@ static INPUT_PORTS_START( f1en )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("slavepcb:SERVICE34_A")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("slavepcb:ANALOG1")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("slavepcb:Steering Wheel")  PORT_PLAYER(2)
@@ -1727,20 +1716,6 @@ static INPUT_PORTS_START( f1lap )
 
 	PORT_MODIFY("mainpcb:SERVICE12_A")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("mainpcb:SERVICE34_A")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("mainpcb:ANALOG1")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_NAME("mainpcb:Steering Wheel")
@@ -1941,7 +1916,7 @@ static INPUT_PORTS_START( kokoroj2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
 
 	PORT_MODIFY("mainpcb:SERVICE34_A")
-	PORT_DIPNAME( 0x08, 0x00, "CD & Printer" )
+	PORT_DIPNAME( 0x08, 0x00, "CD & Printer" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2008,20 +1983,6 @@ static INPUT_PORTS_START( radm )
 	PORT_MODIFY("mainpcb:SERVICE12_A")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("mainpcb:SERVICE34_A")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 	PORT_START("mainpcb:ANALOG1")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
@@ -2047,16 +2008,7 @@ static INPUT_PORTS_START( radr )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("mainpcb:SERVICE34_A")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Transmission" )
+	PORT_DIPNAME( 0x08, 0x08, "Transmission" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "Manual" )
 	PORT_DIPSETTING(    0x00, "Automatic" )
 
@@ -2117,20 +2069,6 @@ static INPUT_PORTS_START( slipstrm )
 
 	PORT_MODIFY("mainpcb:SERVICE12_A")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("mainpcb:SERVICE34_A")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("mainpcb:ANALOG1")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
@@ -2371,7 +2309,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(SEGA_S32_REGULAR_DEVICE, segas32_regular_state, "segas32_pcb_regular", "Sega System 32 regular PCB")
 
 segas32_regular_state::segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_REGULAR_DEVICE, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_REGULAR_DEVICE, tag, owner, clock, false)
 {
 }
 
@@ -2407,7 +2345,7 @@ segas32_analog_state::segas32_analog_state(const machine_config &mconfig, const 
 }
 
 segas32_analog_state::segas32_analog_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, type, tag, owner, clock)
+	: segas32_state(mconfig, type, tag, owner, clock, false)
 {
 }
 
@@ -2419,7 +2357,7 @@ void segas32_trackball_state::system32_trackball_map(address_map &map)
 {
 	map.unmap_value_high();
 	system32_map(map);
-	//AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
+	//map(0xc00040, 0xc0005f).mirror(0x0fff80).rw(FUNC(segas32_trackball_state::sonic_custom_io_r), FUNC(segas32_trackball_state::sonic_custom_io_w)).umask16(0x00ff);
 	map(0xc00040, 0xc00047).mirror(0x0fff80).rw("upd1", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
 	map(0xc00048, 0xc0004f).mirror(0x0fff80).rw("upd2", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
 	map(0xc00050, 0xc00057).mirror(0x0fff80).rw("upd3", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
@@ -2449,7 +2387,7 @@ void segas32_trackball_state::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(SEGA_S32_TRACKBALL_DEVICE, segas32_trackball_state, "segas32_pcb_trackball", "Sega System 32 trackball PCB")
 
 segas32_trackball_state::segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_TRACKBALL_DEVICE, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_TRACKBALL_DEVICE, tag, owner, clock, false)
 {
 }
 
@@ -2484,7 +2422,7 @@ segas32_4player_state::segas32_4player_state(const machine_config &mconfig, cons
 }
 
 segas32_4player_state::segas32_4player_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, type, tag, owner, clock)
+	: segas32_state(mconfig, type, tag, owner, clock, false)
 {
 }
 
@@ -2548,13 +2486,13 @@ segas32_upd7725_state::segas32_upd7725_state(const machine_config &mconfig, cons
 
 
 
-WRITE8_MEMBER(segas32_cd_state::lamps1_w)
+void segas32_cd_state::lamps1_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(segas32_cd_state::lamps2_w)
+void segas32_cd_state::lamps2_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[8 + i] = BIT(data, i);
@@ -2605,7 +2543,7 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 	scsi.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	scsi.slot(1).set_option_machine_config("cdrom", cdrom_config);
 
-	cxd1095_device &cxdio(CXD1095(config, "cxdio", 0));
+	cxd1095_device &cxdio(CXD1095(config, "cxdio"));
 	cxdio.out_porta_cb().set(FUNC(segas32_cd_state::lamps1_w));
 	cxdio.out_portb_cb().set(FUNC(segas32_cd_state::lamps2_w));
 	cxdio.in_portd_cb().set_constant(0xff); // Ports C-E used for IEEE-488 printer interface
@@ -2614,7 +2552,7 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(SEGA_S32_CD_DEVICE, segas32_cd_state, "segas32_pcb_cd", "Sega System 32 CD PCB")
 
 segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, tag, owner, clock, false)
 	, m_lamps(*this, "lamp%u", 0U)
 {
 }
@@ -2705,7 +2643,7 @@ sega_multi32_state::sega_multi32_state(const machine_config &mconfig, const char
 }
 
 sega_multi32_state::sega_multi32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, type, tag, owner, clock)
+	: segas32_state(mconfig, type, tag, owner, clock, true)
 {
 }
 
@@ -2752,6 +2690,7 @@ DEFINE_DEVICE_TYPE(SEGA_MULTI32_ANALOG_DEVICE, sega_multi32_analog_state, "segas
 sega_multi32_analog_state::sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega_multi32_state(mconfig, SEGA_MULTI32_ANALOG_DEVICE, tag, owner, clock)
 	, m_analog_ports(*this, "ANALOG%u", 1)
+	, m_analog_bank(0)
 {
 }
 
@@ -2989,7 +2928,7 @@ void segas32_new_state::sega_multi32_6p(machine_config &config)
     ROM PCB No: 834-8526-01 (US)
                 834-8526-02 (Export)
                 834-8526-03 (Japan)
-                834-8526-05 (Export)
+                834-8526-05 (Export, had the DSP 837-8341 board attached)
    Link PCB No: 837-8223-01
      A/D BD No: 837-7536 (one for each mainboard)
      DSP BD No: 837-8341
@@ -3039,19 +2978,21 @@ ROM_START( arescue )
 	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) )
+	ROM_LOAD64_BYTE( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) )
+	ROM_LOAD64_BYTE( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) )
+	ROM_LOAD64_BYTE( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) )
+	ROM_LOAD64_BYTE( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) )
+	ROM_LOAD64_BYTE( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) )
+	ROM_LOAD64_BYTE( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) )
+	ROM_LOAD64_BYTE( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14542.ic13",     0x000000, 0x020000, CRC(6d39fc18) SHA1(7fbddfb2605a020331e1e81a7bc4466196df17bd) ) /* 834-8526-05 (Export) */
@@ -3072,14 +3013,14 @@ ROM_START( arescue )
 	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
 
 	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) )
+	ROM_LOAD64_BYTE( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) )
+	ROM_LOAD64_BYTE( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) )
+	ROM_LOAD64_BYTE( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) )
+	ROM_LOAD64_BYTE( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) )
+	ROM_LOAD64_BYTE( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) )
+	ROM_LOAD64_BYTE( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) )
+	ROM_LOAD64_BYTE( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -3115,19 +3056,21 @@ ROM_START( arescueu )
 	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) )
+	ROM_LOAD64_BYTE( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) )
+	ROM_LOAD64_BYTE( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) )
+	ROM_LOAD64_BYTE( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) )
+	ROM_LOAD64_BYTE( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) )
+	ROM_LOAD64_BYTE( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) )
+	ROM_LOAD64_BYTE( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) )
+	ROM_LOAD64_BYTE( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14540.ic13",     0x000000, 0x020000, CRC(c2b4e5d0) SHA1(69f8ddded5095df9012663d0ded61b78f1692a8d) )
@@ -3148,14 +3091,14 @@ ROM_START( arescueu )
 	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
 
 	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) )
+	ROM_LOAD64_BYTE( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) )
+	ROM_LOAD64_BYTE( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) )
+	ROM_LOAD64_BYTE( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) )
+	ROM_LOAD64_BYTE( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) )
+	ROM_LOAD64_BYTE( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) )
+	ROM_LOAD64_BYTE( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) )
+	ROM_LOAD64_BYTE( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -3191,19 +3134,21 @@ ROM_START( arescuej )
 	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) )
+	ROM_LOAD64_BYTE( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) )
+	ROM_LOAD64_BYTE( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) )
+	ROM_LOAD64_BYTE( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) )
+	ROM_LOAD64_BYTE( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) )
+	ROM_LOAD64_BYTE( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) )
+	ROM_LOAD64_BYTE( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) )
+	ROM_LOAD64_BYTE( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14515.ic13",     0x000000, 0x020000, CRC(fb5eefbd) SHA1(f2739ad2e168843fe992d7fb546ffd859fa6c17a) )
@@ -3224,14 +3169,14 @@ ROM_START( arescuej )
 	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
 
 	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) )
+	ROM_LOAD64_BYTE( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) )
+	ROM_LOAD64_BYTE( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) )
+	ROM_LOAD64_BYTE( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) )
+	ROM_LOAD64_BYTE( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) )
+	ROM_LOAD64_BYTE( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) )
+	ROM_LOAD64_BYTE( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) )
+	ROM_LOAD64_BYTE( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) )
 ROM_END
 
 
@@ -3265,14 +3210,14 @@ ROM_START( alien3 )
 	ROM_LOAD16_BYTE( "mpr-15862.ic5",  0x000001, 0x200000, CRC(9e277d25) SHA1(9f191484a42391268306a8d2d95c340ce8b2d6cd) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15864.ic32", 0x000000, 0x200000, CRC(58207157) SHA1(d1b0c7edac8b89b1322398d4cd3a976a88bc0b56) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15866.ic30", 0x000002, 0x200000, CRC(9c53732c) SHA1(9aa5103cc10b4927c16e0cf102b64a15dd038756) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15868.ic28", 0x000004, 0x200000, CRC(62d556e8) SHA1(d70cab0881784a3d4dd06d0c99587ca6054c2dc4) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15870.ic26", 0x000006, 0x200000, CRC(d31c0400) SHA1(44c1b2e5236d894d31ff72552a7ad50270dd2fad) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15865.ic31", 0x800000, 0x200000, CRC(dd64f87b) SHA1(cfa96c5f2b1221706552f5cef4aa7c61ebe21e39) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15867.ic29", 0x800002, 0x200000, CRC(8cf9cb11) SHA1(a77399fccee3f258a5716721edd69a33f94f8daf) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15869.ic27", 0x800004, 0x200000, CRC(dd4b137f) SHA1(7316dce32d35bf468defae5e6ed86910a37a2457) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15871.ic25", 0x800006, 0x200000, CRC(58eb10ae) SHA1(23f2a72dc7b2d7b5c8a979952f81608296805745) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15864.ic32", 0x000000, 0x200000, CRC(58207157) SHA1(d1b0c7edac8b89b1322398d4cd3a976a88bc0b56) )
+	ROM_LOAD64_WORD( "mpr-15866.ic30", 0x000002, 0x200000, CRC(9c53732c) SHA1(9aa5103cc10b4927c16e0cf102b64a15dd038756) )
+	ROM_LOAD64_WORD( "mpr-15868.ic28", 0x000004, 0x200000, CRC(62d556e8) SHA1(d70cab0881784a3d4dd06d0c99587ca6054c2dc4) )
+	ROM_LOAD64_WORD( "mpr-15870.ic26", 0x000006, 0x200000, CRC(d31c0400) SHA1(44c1b2e5236d894d31ff72552a7ad50270dd2fad) )
+	ROM_LOAD64_WORD( "mpr-15865.ic31", 0x800000, 0x200000, CRC(dd64f87b) SHA1(cfa96c5f2b1221706552f5cef4aa7c61ebe21e39) )
+	ROM_LOAD64_WORD( "mpr-15867.ic29", 0x800002, 0x200000, CRC(8cf9cb11) SHA1(a77399fccee3f258a5716721edd69a33f94f8daf) )
+	ROM_LOAD64_WORD( "mpr-15869.ic27", 0x800004, 0x200000, CRC(dd4b137f) SHA1(7316dce32d35bf468defae5e6ed86910a37a2457) )
+	ROM_LOAD64_WORD( "mpr-15871.ic25", 0x800006, 0x200000, CRC(58eb10ae) SHA1(23f2a72dc7b2d7b5c8a979952f81608296805745) )
 
 	ROM_REGION16_BE( 0x80, "mainpcb:eeprom", 0 )
 	ROM_LOAD16_WORD( "93c45_eeprom.ic76", 0x0000, 0x0080, CRC(6e1d9df3) SHA1(2fd818bc393fb96e945fa37a63c8a3c4aff2f79f) )
@@ -3306,14 +3251,14 @@ ROM_START( alien3u )
 	ROM_LOAD16_BYTE( "mpr-15862.ic5",  0x000001, 0x200000, CRC(9e277d25) SHA1(9f191484a42391268306a8d2d95c340ce8b2d6cd) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15864.ic32", 0x000000, 0x200000, CRC(58207157) SHA1(d1b0c7edac8b89b1322398d4cd3a976a88bc0b56) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15866.ic30", 0x000002, 0x200000, CRC(9c53732c) SHA1(9aa5103cc10b4927c16e0cf102b64a15dd038756) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15868.ic28", 0x000004, 0x200000, CRC(62d556e8) SHA1(d70cab0881784a3d4dd06d0c99587ca6054c2dc4) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15870.ic26", 0x000006, 0x200000, CRC(d31c0400) SHA1(44c1b2e5236d894d31ff72552a7ad50270dd2fad) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15865.ic31", 0x800000, 0x200000, CRC(dd64f87b) SHA1(cfa96c5f2b1221706552f5cef4aa7c61ebe21e39) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15867.ic29", 0x800002, 0x200000, CRC(8cf9cb11) SHA1(a77399fccee3f258a5716721edd69a33f94f8daf) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15869.ic27", 0x800004, 0x200000, CRC(dd4b137f) SHA1(7316dce32d35bf468defae5e6ed86910a37a2457) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15871.ic25", 0x800006, 0x200000, CRC(58eb10ae) SHA1(23f2a72dc7b2d7b5c8a979952f81608296805745) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15864.ic32", 0x000000, 0x200000, CRC(58207157) SHA1(d1b0c7edac8b89b1322398d4cd3a976a88bc0b56) )
+	ROM_LOAD64_WORD( "mpr-15866.ic30", 0x000002, 0x200000, CRC(9c53732c) SHA1(9aa5103cc10b4927c16e0cf102b64a15dd038756) )
+	ROM_LOAD64_WORD( "mpr-15868.ic28", 0x000004, 0x200000, CRC(62d556e8) SHA1(d70cab0881784a3d4dd06d0c99587ca6054c2dc4) )
+	ROM_LOAD64_WORD( "mpr-15870.ic26", 0x000006, 0x200000, CRC(d31c0400) SHA1(44c1b2e5236d894d31ff72552a7ad50270dd2fad) )
+	ROM_LOAD64_WORD( "mpr-15865.ic31", 0x800000, 0x200000, CRC(dd64f87b) SHA1(cfa96c5f2b1221706552f5cef4aa7c61ebe21e39) )
+	ROM_LOAD64_WORD( "mpr-15867.ic29", 0x800002, 0x200000, CRC(8cf9cb11) SHA1(a77399fccee3f258a5716721edd69a33f94f8daf) )
+	ROM_LOAD64_WORD( "mpr-15869.ic27", 0x800004, 0x200000, CRC(dd4b137f) SHA1(7316dce32d35bf468defae5e6ed86910a37a2457) )
+	ROM_LOAD64_WORD( "mpr-15871.ic25", 0x800006, 0x200000, CRC(58eb10ae) SHA1(23f2a72dc7b2d7b5c8a979952f81608296805745) )
 
 	ROM_REGION16_BE( 0x80, "mainpcb:eeprom", 0 )
 	ROM_LOAD16_WORD( "93c45_eeprom.ic76", 0x0000, 0x0080, CRC(6e1d9df3) SHA1(2fd818bc393fb96e945fa37a63c8a3c4aff2f79f) )
@@ -3347,14 +3292,14 @@ ROM_START( alien3j )
 	ROM_LOAD16_BYTE( "mpr-15862.ic5",  0x000001, 0x200000, CRC(9e277d25) SHA1(9f191484a42391268306a8d2d95c340ce8b2d6cd) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15864.ic32", 0x000000, 0x200000, CRC(58207157) SHA1(d1b0c7edac8b89b1322398d4cd3a976a88bc0b56) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15866.ic30", 0x000002, 0x200000, CRC(9c53732c) SHA1(9aa5103cc10b4927c16e0cf102b64a15dd038756) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15868.ic28", 0x000004, 0x200000, CRC(62d556e8) SHA1(d70cab0881784a3d4dd06d0c99587ca6054c2dc4) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15870.ic26", 0x000006, 0x200000, CRC(d31c0400) SHA1(44c1b2e5236d894d31ff72552a7ad50270dd2fad) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15865.ic31", 0x800000, 0x200000, CRC(dd64f87b) SHA1(cfa96c5f2b1221706552f5cef4aa7c61ebe21e39) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15867.ic29", 0x800002, 0x200000, CRC(8cf9cb11) SHA1(a77399fccee3f258a5716721edd69a33f94f8daf) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15869.ic27", 0x800004, 0x200000, CRC(dd4b137f) SHA1(7316dce32d35bf468defae5e6ed86910a37a2457) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15871.ic25", 0x800006, 0x200000, CRC(58eb10ae) SHA1(23f2a72dc7b2d7b5c8a979952f81608296805745) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15864.ic32", 0x000000, 0x200000, CRC(58207157) SHA1(d1b0c7edac8b89b1322398d4cd3a976a88bc0b56) )
+	ROM_LOAD64_WORD( "mpr-15866.ic30", 0x000002, 0x200000, CRC(9c53732c) SHA1(9aa5103cc10b4927c16e0cf102b64a15dd038756) )
+	ROM_LOAD64_WORD( "mpr-15868.ic28", 0x000004, 0x200000, CRC(62d556e8) SHA1(d70cab0881784a3d4dd06d0c99587ca6054c2dc4) )
+	ROM_LOAD64_WORD( "mpr-15870.ic26", 0x000006, 0x200000, CRC(d31c0400) SHA1(44c1b2e5236d894d31ff72552a7ad50270dd2fad) )
+	ROM_LOAD64_WORD( "mpr-15865.ic31", 0x800000, 0x200000, CRC(dd64f87b) SHA1(cfa96c5f2b1221706552f5cef4aa7c61ebe21e39) )
+	ROM_LOAD64_WORD( "mpr-15867.ic29", 0x800002, 0x200000, CRC(8cf9cb11) SHA1(a77399fccee3f258a5716721edd69a33f94f8daf) )
+	ROM_LOAD64_WORD( "mpr-15869.ic27", 0x800004, 0x200000, CRC(dd4b137f) SHA1(7316dce32d35bf468defae5e6ed86910a37a2457) )
+	ROM_LOAD64_WORD( "mpr-15871.ic25", 0x800006, 0x200000, CRC(58eb10ae) SHA1(23f2a72dc7b2d7b5c8a979952f81608296805745) )
 
 	ROM_REGION16_BE( 0x80, "mainpcb:eeprom", 0 )
 	ROM_LOAD16_WORD( "93c45_eeprom.ic76", 0x0000, 0x0080, CRC(6e1d9df3) SHA1(2fd818bc393fb96e945fa37a63c8a3c4aff2f79f) )
@@ -3392,14 +3337,14 @@ ROM_START( arabfgt )
 	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(010656f3) SHA1(31619c022cba4f250ce174f186d3e34444f60faf) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14600f.ic32", 0x000000, 0x200000, CRC(e860988a) SHA1(328581877c0890519c854f75f0976b0e9c4560f8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14602.ic30",  0x000002, 0x200000, CRC(64524e4d) SHA1(86246185ab5ab638a73991c9e3aeb07c6d51be4f) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14604.ic28",  0x000004, 0x200000, CRC(5f8d5167) SHA1(1b08495e5a4cc2530c2895e47abd0e0b75496c68) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14606.ic26",  0x000006, 0x200000, CRC(7047f437) SHA1(e806a1cd73c96b33e8edc64e41d99bf7798103e0) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14601f.ic31", 0x800000, 0x200000, CRC(a2f3bb32) SHA1(1a60975dead5faf08ad4e9a96a00f98664d5e5ec) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14603.ic29",  0x800002, 0x200000, CRC(f6ce494b) SHA1(b3117e34913e855c035ebe37fbfbe0f7466f94f0) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14605.ic27",  0x800004, 0x200000, CRC(aaf52697) SHA1(b502a37ae68fc08b60cdf0e2b744898b3474d3b9) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14607.ic25",  0x800006, 0x200000, CRC(b70b0735) SHA1(9ef2da6f710bc5c2c7ee30dc144409a61dbe6646) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-14600f.ic32", 0x000000, 0x200000, CRC(e860988a) SHA1(328581877c0890519c854f75f0976b0e9c4560f8) )
+	ROM_LOAD64_WORD( "mpr-14602.ic30",  0x000002, 0x200000, CRC(64524e4d) SHA1(86246185ab5ab638a73991c9e3aeb07c6d51be4f) )
+	ROM_LOAD64_WORD( "mpr-14604.ic28",  0x000004, 0x200000, CRC(5f8d5167) SHA1(1b08495e5a4cc2530c2895e47abd0e0b75496c68) )
+	ROM_LOAD64_WORD( "mpr-14606.ic26",  0x000006, 0x200000, CRC(7047f437) SHA1(e806a1cd73c96b33e8edc64e41d99bf7798103e0) )
+	ROM_LOAD64_WORD( "mpr-14601f.ic31", 0x800000, 0x200000, CRC(a2f3bb32) SHA1(1a60975dead5faf08ad4e9a96a00f98664d5e5ec) )
+	ROM_LOAD64_WORD( "mpr-14603.ic29",  0x800002, 0x200000, CRC(f6ce494b) SHA1(b3117e34913e855c035ebe37fbfbe0f7466f94f0) )
+	ROM_LOAD64_WORD( "mpr-14605.ic27",  0x800004, 0x200000, CRC(aaf52697) SHA1(b502a37ae68fc08b60cdf0e2b744898b3474d3b9) )
+	ROM_LOAD64_WORD( "mpr-14607.ic25",  0x800006, 0x200000, CRC(b70b0735) SHA1(9ef2da6f710bc5c2c7ee30dc144409a61dbe6646) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -3426,14 +3371,14 @@ ROM_START( arabfgtu )
 	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(010656f3) SHA1(31619c022cba4f250ce174f186d3e34444f60faf) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14600f.ic32", 0x000000, 0x200000, CRC(e860988a) SHA1(328581877c0890519c854f75f0976b0e9c4560f8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14602.ic30",  0x000002, 0x200000, CRC(64524e4d) SHA1(86246185ab5ab638a73991c9e3aeb07c6d51be4f) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14604.ic28",  0x000004, 0x200000, CRC(5f8d5167) SHA1(1b08495e5a4cc2530c2895e47abd0e0b75496c68) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14606.ic26",  0x000006, 0x200000, CRC(7047f437) SHA1(e806a1cd73c96b33e8edc64e41d99bf7798103e0) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14601f.ic31", 0x800000, 0x200000, CRC(a2f3bb32) SHA1(1a60975dead5faf08ad4e9a96a00f98664d5e5ec) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14603.ic29",  0x800002, 0x200000, CRC(f6ce494b) SHA1(b3117e34913e855c035ebe37fbfbe0f7466f94f0) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14605.ic27",  0x800004, 0x200000, CRC(aaf52697) SHA1(b502a37ae68fc08b60cdf0e2b744898b3474d3b9) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14607.ic25",  0x800006, 0x200000, CRC(b70b0735) SHA1(9ef2da6f710bc5c2c7ee30dc144409a61dbe6646) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-14600f.ic32", 0x000000, 0x200000, CRC(e860988a) SHA1(328581877c0890519c854f75f0976b0e9c4560f8) )
+	ROM_LOAD64_WORD( "mpr-14602.ic30",  0x000002, 0x200000, CRC(64524e4d) SHA1(86246185ab5ab638a73991c9e3aeb07c6d51be4f) )
+	ROM_LOAD64_WORD( "mpr-14604.ic28",  0x000004, 0x200000, CRC(5f8d5167) SHA1(1b08495e5a4cc2530c2895e47abd0e0b75496c68) )
+	ROM_LOAD64_WORD( "mpr-14606.ic26",  0x000006, 0x200000, CRC(7047f437) SHA1(e806a1cd73c96b33e8edc64e41d99bf7798103e0) )
+	ROM_LOAD64_WORD( "mpr-14601f.ic31", 0x800000, 0x200000, CRC(a2f3bb32) SHA1(1a60975dead5faf08ad4e9a96a00f98664d5e5ec) )
+	ROM_LOAD64_WORD( "mpr-14603.ic29",  0x800002, 0x200000, CRC(f6ce494b) SHA1(b3117e34913e855c035ebe37fbfbe0f7466f94f0) )
+	ROM_LOAD64_WORD( "mpr-14605.ic27",  0x800004, 0x200000, CRC(aaf52697) SHA1(b502a37ae68fc08b60cdf0e2b744898b3474d3b9) )
+	ROM_LOAD64_WORD( "mpr-14607.ic25",  0x800006, 0x200000, CRC(b70b0735) SHA1(9ef2da6f710bc5c2c7ee30dc144409a61dbe6646) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -3460,14 +3405,14 @@ ROM_START( arabfgtj )
 	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(010656f3) SHA1(31619c022cba4f250ce174f186d3e34444f60faf) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14600f.ic32", 0x000000, 0x200000, CRC(e860988a) SHA1(328581877c0890519c854f75f0976b0e9c4560f8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14602.ic30",  0x000002, 0x200000, CRC(64524e4d) SHA1(86246185ab5ab638a73991c9e3aeb07c6d51be4f) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14604.ic28",  0x000004, 0x200000, CRC(5f8d5167) SHA1(1b08495e5a4cc2530c2895e47abd0e0b75496c68) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14606.ic26",  0x000006, 0x200000, CRC(7047f437) SHA1(e806a1cd73c96b33e8edc64e41d99bf7798103e0) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14601f.ic31", 0x800000, 0x200000, CRC(a2f3bb32) SHA1(1a60975dead5faf08ad4e9a96a00f98664d5e5ec) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14603.ic29",  0x800002, 0x200000, CRC(f6ce494b) SHA1(b3117e34913e855c035ebe37fbfbe0f7466f94f0) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14605.ic27",  0x800004, 0x200000, CRC(aaf52697) SHA1(b502a37ae68fc08b60cdf0e2b744898b3474d3b9) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14607.ic25",  0x800006, 0x200000, CRC(b70b0735) SHA1(9ef2da6f710bc5c2c7ee30dc144409a61dbe6646) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-14600f.ic32", 0x000000, 0x200000, CRC(e860988a) SHA1(328581877c0890519c854f75f0976b0e9c4560f8) )
+	ROM_LOAD64_WORD( "mpr-14602.ic30",  0x000002, 0x200000, CRC(64524e4d) SHA1(86246185ab5ab638a73991c9e3aeb07c6d51be4f) )
+	ROM_LOAD64_WORD( "mpr-14604.ic28",  0x000004, 0x200000, CRC(5f8d5167) SHA1(1b08495e5a4cc2530c2895e47abd0e0b75496c68) )
+	ROM_LOAD64_WORD( "mpr-14606.ic26",  0x000006, 0x200000, CRC(7047f437) SHA1(e806a1cd73c96b33e8edc64e41d99bf7798103e0) )
+	ROM_LOAD64_WORD( "mpr-14601f.ic31", 0x800000, 0x200000, CRC(a2f3bb32) SHA1(1a60975dead5faf08ad4e9a96a00f98664d5e5ec) )
+	ROM_LOAD64_WORD( "mpr-14603.ic29",  0x800002, 0x200000, CRC(f6ce494b) SHA1(b3117e34913e855c035ebe37fbfbe0f7466f94f0) )
+	ROM_LOAD64_WORD( "mpr-14605.ic27",  0x800004, 0x200000, CRC(aaf52697) SHA1(b502a37ae68fc08b60cdf0e2b744898b3474d3b9) )
+	ROM_LOAD64_WORD( "mpr-14607.ic25",  0x800006, 0x200000, CRC(b70b0735) SHA1(9ef2da6f710bc5c2c7ee30dc144409a61dbe6646) )
 ROM_END
 
 
@@ -3494,14 +3439,14 @@ ROM_START( brival )
 	ROM_LOAD16_BYTE( "mpr-15628.ic5",  0x000001, 0x200000, CRC(58d4ca40) SHA1(b1633acc803bba7e8283a9663b49abeda662a74d) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15637.ic32", 0x000000, 0x200000, CRC(b6cf2f05) SHA1(a308d40ce5165e03fccf7fcd615ee111f7840fdc) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15635.ic30", 0x000002, 0x200000, CRC(70f2eb2b) SHA1(9868c8b0dd8ce810a0e32f51e702eee7e1c9a967) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15633.ic28", 0x000004, 0x200000, CRC(005dfed5) SHA1(f555620d75d3886a890307be9df9c0879bcda695) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15631.ic26", 0x000006, 0x200000, CRC(c35e2f21) SHA1(37935aa2eaa1769e57fb58f47f9797ae153d7496) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15636.ic31", 0x800000, 0x200000, CRC(d81ca97b) SHA1(a8e64e6cbe822f18ce20f50c8ddb8f1d5ed8b783) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15634.ic29", 0x800002, 0x200000, CRC(b0c6c52a) SHA1(04dd7344ca82e38f9d796a764c9e5a631a89aaac) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15632.ic27", 0x800004, 0x200000, CRC(8476e52b) SHA1(e89748d34febcaf362580cdae30a5c570e56899a) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15630.ic25", 0x800006, 0x200000, CRC(bf7dd2f6) SHA1(ab3fbe9e2b9b57424fb2a147f32b0f573c0b11b8) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15637.ic32", 0x000000, 0x200000, CRC(b6cf2f05) SHA1(a308d40ce5165e03fccf7fcd615ee111f7840fdc) )
+	ROM_LOAD64_WORD( "mpr-15635.ic30", 0x000002, 0x200000, CRC(70f2eb2b) SHA1(9868c8b0dd8ce810a0e32f51e702eee7e1c9a967) )
+	ROM_LOAD64_WORD( "mpr-15633.ic28", 0x000004, 0x200000, CRC(005dfed5) SHA1(f555620d75d3886a890307be9df9c0879bcda695) )
+	ROM_LOAD64_WORD( "mpr-15631.ic26", 0x000006, 0x200000, CRC(c35e2f21) SHA1(37935aa2eaa1769e57fb58f47f9797ae153d7496) )
+	ROM_LOAD64_WORD( "mpr-15636.ic31", 0x800000, 0x200000, CRC(d81ca97b) SHA1(a8e64e6cbe822f18ce20f50c8ddb8f1d5ed8b783) )
+	ROM_LOAD64_WORD( "mpr-15634.ic29", 0x800002, 0x200000, CRC(b0c6c52a) SHA1(04dd7344ca82e38f9d796a764c9e5a631a89aaac) )
+	ROM_LOAD64_WORD( "mpr-15632.ic27", 0x800004, 0x200000, CRC(8476e52b) SHA1(e89748d34febcaf362580cdae30a5c570e56899a) )
+	ROM_LOAD64_WORD( "mpr-15630.ic25", 0x800006, 0x200000, CRC(bf7dd2f6) SHA1(ab3fbe9e2b9b57424fb2a147f32b0f573c0b11b8) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -3529,14 +3474,14 @@ ROM_START( brivalj )
 	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(cafb0de9) SHA1(94c6bfc7a4081dee373e9466a7b6f80889696087) ) /* ROM # matches tile ROM # from Arabian Fight ??? */
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "brivalj_mp15637.32", 0x000000, 0x200000, CRC(f39844c0) SHA1(c48dc8cccdd9d3756cf99a983c6a89ed43fcda22) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "brivalj_mp15635.30", 0x000002, 0x200000, CRC(263cf6d1) SHA1(7accd214502fd050edc0901c9929d6069dae4d00) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "brivalj_mp15633.28", 0x000004, 0x200000, CRC(44e9a88b) SHA1(57a930b9c3b83c889df54de60c90f847c2dcb614) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "brivalj_mp15631.26", 0x000006, 0x200000, CRC(e93cf9c9) SHA1(17786cd3ccaef613216db724e923861841c52b45) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "brivalj_mp15636.31", 0x800000, 0x200000, CRC(079ff77f) SHA1(bdd41acef58c39ba58cf85d307229622877dbdf9) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "brivalj_mp15634.29", 0x800002, 0x200000, CRC(1edc14cd) SHA1(80a281c904560b364fe9f2b8987b7a254220a29f) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "brivalj_mp15632.27", 0x800004, 0x200000, CRC(796215f2) SHA1(d7b393781dbba59c9b1cd600d27e6d91e36ea771) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "brivalj_mp15630.25", 0x800006, 0x200000, CRC(8dabb501) SHA1(c5af2187d00e0b9732a82441f9758b303fecbb2c) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "brivalj_mp15637.32", 0x000000, 0x200000, CRC(f39844c0) SHA1(c48dc8cccdd9d3756cf99a983c6a89ed43fcda22) )
+	ROM_LOAD64_WORD( "brivalj_mp15635.30", 0x000002, 0x200000, CRC(263cf6d1) SHA1(7accd214502fd050edc0901c9929d6069dae4d00) )
+	ROM_LOAD64_WORD( "brivalj_mp15633.28", 0x000004, 0x200000, CRC(44e9a88b) SHA1(57a930b9c3b83c889df54de60c90f847c2dcb614) )
+	ROM_LOAD64_WORD( "brivalj_mp15631.26", 0x000006, 0x200000, CRC(e93cf9c9) SHA1(17786cd3ccaef613216db724e923861841c52b45) )
+	ROM_LOAD64_WORD( "brivalj_mp15636.31", 0x800000, 0x200000, CRC(079ff77f) SHA1(bdd41acef58c39ba58cf85d307229622877dbdf9) )
+	ROM_LOAD64_WORD( "brivalj_mp15634.29", 0x800002, 0x200000, CRC(1edc14cd) SHA1(80a281c904560b364fe9f2b8987b7a254220a29f) )
+	ROM_LOAD64_WORD( "brivalj_mp15632.27", 0x800004, 0x200000, CRC(796215f2) SHA1(d7b393781dbba59c9b1cd600d27e6d91e36ea771) )
+	ROM_LOAD64_WORD( "brivalj_mp15630.25", 0x800006, 0x200000, CRC(8dabb501) SHA1(c5af2187d00e0b9732a82441f9758b303fecbb2c) )
 ROM_END
 
 
@@ -3561,19 +3506,24 @@ ROM_START( darkedge )
 	ROM_LOAD16_BYTE( "mpr-15247.ic5",  0x000001, 0x080000, CRC(be21548c) SHA1(2e315aadc2a0b781c3ee3fe71c75eb1f43514eff) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15249.ic32", 0x000000, 0x200000, CRC(2b4371a8) SHA1(47f448bfbc068f2d0cdedd81bcd280823d5758a3) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15251.ic30", 0x000002, 0x200000, CRC(efe2d689) SHA1(af22153ea3afdde3732f881087c642170f91d745) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15253.ic28", 0x000004, 0x200000, CRC(8356ed01) SHA1(a28747813807361c7d0c722a94e194caea8bfab6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15255.ic26", 0x000006, 0x200000, CRC(ff04a5b0) SHA1(d4548f9da014ba5249c2f75d654a2a88c095aaf8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15250.ic31", 0x800000, 0x200000, CRC(c5cab71a) SHA1(111c69c40a39c3fceef38f5876e1dcf7ac2fbee2) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15252.ic29", 0x800002, 0x200000, CRC(f8885fea) SHA1(ef944df5f6fd64813734056ad2a150f518c75459) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15254.ic27", 0x800004, 0x200000, CRC(7765424b) SHA1(7cd4c275f6333beeea62dd65a769e11650c68923) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15256.ic25", 0x800006, 0x200000, CRC(44c36b62) SHA1(4c7f2cc4347ef2126dcbf43e8dce8500e52b5f8e) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15249.ic32", 0x000000, 0x200000, CRC(2b4371a8) SHA1(47f448bfbc068f2d0cdedd81bcd280823d5758a3) )
+	ROM_LOAD64_WORD( "mpr-15251.ic30", 0x000002, 0x200000, CRC(efe2d689) SHA1(af22153ea3afdde3732f881087c642170f91d745) )
+	ROM_LOAD64_WORD( "mpr-15253.ic28", 0x000004, 0x200000, CRC(8356ed01) SHA1(a28747813807361c7d0c722a94e194caea8bfab6) )
+	ROM_LOAD64_WORD( "mpr-15255.ic26", 0x000006, 0x200000, CRC(ff04a5b0) SHA1(d4548f9da014ba5249c2f75d654a2a88c095aaf8) )
+	ROM_LOAD64_WORD( "mpr-15250.ic31", 0x800000, 0x200000, CRC(c5cab71a) SHA1(111c69c40a39c3fceef38f5876e1dcf7ac2fbee2) )
+	ROM_LOAD64_WORD( "mpr-15252.ic29", 0x800002, 0x200000, CRC(f8885fea) SHA1(ef944df5f6fd64813734056ad2a150f518c75459) )
+	ROM_LOAD64_WORD( "mpr-15254.ic27", 0x800004, 0x200000, CRC(7765424b) SHA1(7cd4c275f6333beeea62dd65a769e11650c68923) )
+	ROM_LOAD64_WORD( "mpr-15256.ic25", 0x800006, 0x200000, CRC(44c36b62) SHA1(4c7f2cc4347ef2126dcbf43e8dce8500e52b5f8e) )
 ROM_END
 
 /**************************************************************************************************************************
     Dark Edge (Japan)
     protected via FD1149 317-0204
+
+    Sega Game ID codes:
+       Game BD: 833-9230 DARK EDGE
+    ROM PCB No: 834-9231
+     A/D BD NO. 837-7968
 */
 ROM_START( darkedgej )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -3590,14 +3540,14 @@ ROM_START( darkedgej )
 	ROM_LOAD16_BYTE( "mpr-15247.ic5",  0x000001, 0x080000, CRC(be21548c) SHA1(2e315aadc2a0b781c3ee3fe71c75eb1f43514eff) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15249.ic32", 0x000000, 0x200000, CRC(2b4371a8) SHA1(47f448bfbc068f2d0cdedd81bcd280823d5758a3) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15251.ic30", 0x000002, 0x200000, CRC(efe2d689) SHA1(af22153ea3afdde3732f881087c642170f91d745) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15253.ic28", 0x000004, 0x200000, CRC(8356ed01) SHA1(a28747813807361c7d0c722a94e194caea8bfab6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15255.ic26", 0x000006, 0x200000, CRC(ff04a5b0) SHA1(d4548f9da014ba5249c2f75d654a2a88c095aaf8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15250.ic31", 0x800000, 0x200000, CRC(c5cab71a) SHA1(111c69c40a39c3fceef38f5876e1dcf7ac2fbee2) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15252.ic29", 0x800002, 0x200000, CRC(f8885fea) SHA1(ef944df5f6fd64813734056ad2a150f518c75459) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15254.ic27", 0x800004, 0x200000, CRC(7765424b) SHA1(7cd4c275f6333beeea62dd65a769e11650c68923) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15256.ic25", 0x800006, 0x200000, CRC(44c36b62) SHA1(4c7f2cc4347ef2126dcbf43e8dce8500e52b5f8e) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15249.ic32", 0x000000, 0x200000, CRC(2b4371a8) SHA1(47f448bfbc068f2d0cdedd81bcd280823d5758a3) )
+	ROM_LOAD64_WORD( "mpr-15251.ic30", 0x000002, 0x200000, CRC(efe2d689) SHA1(af22153ea3afdde3732f881087c642170f91d745) )
+	ROM_LOAD64_WORD( "mpr-15253.ic28", 0x000004, 0x200000, CRC(8356ed01) SHA1(a28747813807361c7d0c722a94e194caea8bfab6) )
+	ROM_LOAD64_WORD( "mpr-15255.ic26", 0x000006, 0x200000, CRC(ff04a5b0) SHA1(d4548f9da014ba5249c2f75d654a2a88c095aaf8) )
+	ROM_LOAD64_WORD( "mpr-15250.ic31", 0x800000, 0x200000, CRC(c5cab71a) SHA1(111c69c40a39c3fceef38f5876e1dcf7ac2fbee2) )
+	ROM_LOAD64_WORD( "mpr-15252.ic29", 0x800002, 0x200000, CRC(f8885fea) SHA1(ef944df5f6fd64813734056ad2a150f518c75459) )
+	ROM_LOAD64_WORD( "mpr-15254.ic27", 0x800004, 0x200000, CRC(7765424b) SHA1(7cd4c275f6333beeea62dd65a769e11650c68923) )
+	ROM_LOAD64_WORD( "mpr-15256.ic25", 0x800006, 0x200000, CRC(44c36b62) SHA1(4c7f2cc4347ef2126dcbf43e8dce8500e52b5f8e) )
 ROM_END
 
 
@@ -3626,14 +3576,14 @@ ROM_START( dbzvrvs )
 	ROM_LOAD16_BYTE( "mpr-16544", 0x000001, 0x100000, CRC(f6c93dfc) SHA1(a006cedb7d0151ccc8d22e6588b1c39e099da182) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-16546", 0x000000, 0x200000, CRC(96f4be31) SHA1(ce3281630180d91de7850e9b1062382817fe0b1d) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16548", 0x000002, 0x200000, CRC(00377f59) SHA1(cf0f808d7730f334c5ac80d3171fa457be9ac88e) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16550", 0x000004, 0x200000, CRC(168e8966) SHA1(a18ec30f1358b09bcde6d8d2dbe0a82bea3bdae9) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16552", 0x000006, 0x200000, CRC(a31dae31) SHA1(2da2c391f29b5fdb87e3f95d9dabd50370fafa5a) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16547", 0x800000, 0x200000, CRC(50d328ed) SHA1(c4795299f5d7c9f3a847d684d8cde7012d4486f0) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16549", 0x800002, 0x200000, CRC(a5802e9f) SHA1(4cec3ed85a21aaf99b73013795721f212019e619) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16551", 0x800004, 0x200000, CRC(dede05fc) SHA1(51e092579e2b81fb68a9cc54165f80026fe71796) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16553", 0x800006, 0x200000, CRC(c0a43009) SHA1(e4f73768de512046b3e25c4238da811dcc2dde0b) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-16546", 0x000000, 0x200000, CRC(96f4be31) SHA1(ce3281630180d91de7850e9b1062382817fe0b1d) )
+	ROM_LOAD64_WORD( "mpr-16548", 0x000002, 0x200000, CRC(00377f59) SHA1(cf0f808d7730f334c5ac80d3171fa457be9ac88e) )
+	ROM_LOAD64_WORD( "mpr-16550", 0x000004, 0x200000, CRC(168e8966) SHA1(a18ec30f1358b09bcde6d8d2dbe0a82bea3bdae9) )
+	ROM_LOAD64_WORD( "mpr-16552", 0x000006, 0x200000, CRC(a31dae31) SHA1(2da2c391f29b5fdb87e3f95d9dabd50370fafa5a) )
+	ROM_LOAD64_WORD( "mpr-16547", 0x800000, 0x200000, CRC(50d328ed) SHA1(c4795299f5d7c9f3a847d684d8cde7012d4486f0) )
+	ROM_LOAD64_WORD( "mpr-16549", 0x800002, 0x200000, CRC(a5802e9f) SHA1(4cec3ed85a21aaf99b73013795721f212019e619) )
+	ROM_LOAD64_WORD( "mpr-16551", 0x800004, 0x200000, CRC(dede05fc) SHA1(51e092579e2b81fb68a9cc54165f80026fe71796) )
+	ROM_LOAD64_WORD( "mpr-16553", 0x800006, 0x200000, CRC(c0a43009) SHA1(e4f73768de512046b3e25c4238da811dcc2dde0b) )
 ROM_END
 
 
@@ -3645,7 +3595,7 @@ ROM_END
 
     Sega Game ID codes:
      GAME BD NO. 833-8389-02 EXHAUST NOTE
-         ROM BD. 834-8439-02
+         ROM BD. 834-8439-02 or 834-8439-05 for stand alone version
         MAIN BD. 837-7428 (SYSTEM 32 COM)
     Link PCB NO. 837-8223-01
       A/D BD NO. 837-7536
@@ -3663,20 +3613,20 @@ ROM_START( f1en )
 	ROM_LOAD_x2( "epr-14446.ic22", 0x300000, 0x080000, CRC(646ec2cb) SHA1(67e453f128ae227e22c68f55d0d3f5831fbeb2f9) )
 
 	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD32_BYTE( "mpr-14362", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
-	ROM_LOAD32_BYTE( "mpr-14361", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
-	ROM_LOAD32_BYTE( "mpr-14360", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
-	ROM_LOAD32_BYTE( "mpr-14359", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
+	ROM_LOAD32_BYTE( "mpr-14362.ic38", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
+	ROM_LOAD32_BYTE( "mpr-14361.ic34", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
+	ROM_LOAD32_BYTE( "mpr-14360.ic29", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
+	ROM_LOAD32_BYTE( "mpr-14359.ic25", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14370", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14369", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14368", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14367", 0x000003, 0x080000, CRC(77bb9003) SHA1(6370fdeab4967976840d752577cd860b9ce8efca) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14366", 0x000004, 0x080000, CRC(21078e83) SHA1(f35f643c28aad3bf18cb9906b114c4f49b7b4cd1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14365", 0x000005, 0x080000, CRC(36913790) SHA1(4a447cffb44b023fe1441277db1e411d4cd119eb) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14364", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14363", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14370.ic36", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) )
+	ROM_LOAD64_BYTE( "mpr-14369.ic32", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) )
+	ROM_LOAD64_BYTE( "mpr-14368.ic27", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) )
+	ROM_LOAD64_BYTE( "mpr-14367.ic23", 0x000003, 0x080000, CRC(77bb9003) SHA1(6370fdeab4967976840d752577cd860b9ce8efca) )
+	ROM_LOAD64_BYTE( "mpr-14366.ic37", 0x000004, 0x080000, CRC(21078e83) SHA1(f35f643c28aad3bf18cb9906b114c4f49b7b4cd1) )
+	ROM_LOAD64_BYTE( "mpr-14365.ic33", 0x000005, 0x080000, CRC(36913790) SHA1(4a447cffb44b023fe1441277db1e411d4cd119eb) )
+	ROM_LOAD64_BYTE( "mpr-14364.ic28", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) )
+	ROM_LOAD64_BYTE( "mpr-14363.ic24", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x8( "epr-14452a.ic6",        0x000000, 0x020000, CRC(b5b4a9d9) SHA1(6699c15dc1155c3cee33a06d320acbff0ab5ad11) )
@@ -3690,20 +3640,20 @@ ROM_START( f1en )
 	ROM_LOAD_x2( "epr-14446.ic22", 0x300000, 0x080000, CRC(646ec2cb) SHA1(67e453f128ae227e22c68f55d0d3f5831fbeb2f9) )
 
 	ROM_REGION( 0x100000, "slavepcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD32_BYTE( "mpr-14362", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
-	ROM_LOAD32_BYTE( "mpr-14361", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
-	ROM_LOAD32_BYTE( "mpr-14360", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
-	ROM_LOAD32_BYTE( "mpr-14359", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
+	ROM_LOAD32_BYTE( "mpr-14362.ic38", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
+	ROM_LOAD32_BYTE( "mpr-14361.ic34", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
+	ROM_LOAD32_BYTE( "mpr-14360.ic29", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
+	ROM_LOAD32_BYTE( "mpr-14359.ic25", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
 	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14370", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14369", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14368", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14367", 0x000003, 0x080000, CRC(77bb9003) SHA1(6370fdeab4967976840d752577cd860b9ce8efca) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14366", 0x000004, 0x080000, CRC(21078e83) SHA1(f35f643c28aad3bf18cb9906b114c4f49b7b4cd1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14365", 0x000005, 0x080000, CRC(36913790) SHA1(4a447cffb44b023fe1441277db1e411d4cd119eb) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14364", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14363", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14370.ic36", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) )
+	ROM_LOAD64_BYTE( "mpr-14369.ic32", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) )
+	ROM_LOAD64_BYTE( "mpr-14368.ic27", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) )
+	ROM_LOAD64_BYTE( "mpr-14367.ic23", 0x000003, 0x080000, CRC(77bb9003) SHA1(6370fdeab4967976840d752577cd860b9ce8efca) )
+	ROM_LOAD64_BYTE( "mpr-14366.ic37", 0x000004, 0x080000, CRC(21078e83) SHA1(f35f643c28aad3bf18cb9906b114c4f49b7b4cd1) )
+	ROM_LOAD64_BYTE( "mpr-14365.ic33", 0x000005, 0x080000, CRC(36913790) SHA1(4a447cffb44b023fe1441277db1e411d4cd119eb) )
+	ROM_LOAD64_BYTE( "mpr-14364.ic28", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) )
+	ROM_LOAD64_BYTE( "mpr-14363.ic24", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) )
 
 ROM_END
 
@@ -3713,7 +3663,7 @@ ROM_END
 
     Sega Game ID codes:
      GAME BD NO. 833-8389-01 EXHAUST NOTE
-         ROM BD. 834-8439-01 or 834-8439-04
+         ROM BD. 834-8439-01 or 834-8439-04 for stand alone version
         MAIN BD. 837-7428 (SYSTEM 32 COM)
     Link PCB NO. 837-8223-01
       A/D BD NO. 837-7536
@@ -3731,20 +3681,20 @@ ROM_START( f1enu ) // ROM PCB number is 834-8439-04
 	ROM_LOAD_x2( "epr-14446.ic22", 0x300000, 0x080000, CRC(646ec2cb) SHA1(67e453f128ae227e22c68f55d0d3f5831fbeb2f9) )
 
 	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD32_BYTE( "mpr-14362", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
-	ROM_LOAD32_BYTE( "mpr-14361", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
-	ROM_LOAD32_BYTE( "mpr-14360", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
-	ROM_LOAD32_BYTE( "mpr-14359", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
+	ROM_LOAD32_BYTE( "mpr-14362.ic38", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
+	ROM_LOAD32_BYTE( "mpr-14361.ic34", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
+	ROM_LOAD32_BYTE( "mpr-14360.ic29", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
+	ROM_LOAD32_BYTE( "mpr-14359.ic25", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14370", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14369", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14368", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14367", 0x000003, 0x080000, CRC(77bb9003) SHA1(6370fdeab4967976840d752577cd860b9ce8efca) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14366", 0x000004, 0x080000, CRC(21078e83) SHA1(f35f643c28aad3bf18cb9906b114c4f49b7b4cd1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14365", 0x000005, 0x080000, CRC(36913790) SHA1(4a447cffb44b023fe1441277db1e411d4cd119eb) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14364", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14363", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14370.ic36", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) )
+	ROM_LOAD64_BYTE( "mpr-14369.ic32", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) )
+	ROM_LOAD64_BYTE( "mpr-14368.ic27", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) )
+	ROM_LOAD64_BYTE( "mpr-14367.ic23", 0x000003, 0x080000, CRC(77bb9003) SHA1(6370fdeab4967976840d752577cd860b9ce8efca) )
+	ROM_LOAD64_BYTE( "mpr-14366.ic37", 0x000004, 0x080000, CRC(21078e83) SHA1(f35f643c28aad3bf18cb9906b114c4f49b7b4cd1) )
+	ROM_LOAD64_BYTE( "mpr-14365.ic33", 0x000005, 0x080000, CRC(36913790) SHA1(4a447cffb44b023fe1441277db1e411d4cd119eb) )
+	ROM_LOAD64_BYTE( "mpr-14364.ic28", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) )
+	ROM_LOAD64_BYTE( "mpr-14363.ic24", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x8( "epr-14451a.ic6",        0x000000, 0x020000, CRC(e17259c9) SHA1(be789b7630b7265e19ea2c80f603caff9cec37f8) )
@@ -3758,20 +3708,20 @@ ROM_START( f1enu ) // ROM PCB number is 834-8439-04
 	ROM_LOAD_x2( "epr-14446.ic22", 0x300000, 0x080000, CRC(646ec2cb) SHA1(67e453f128ae227e22c68f55d0d3f5831fbeb2f9) )
 
 	ROM_REGION( 0x100000, "slavepcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD32_BYTE( "mpr-14362", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
-	ROM_LOAD32_BYTE( "mpr-14361", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
-	ROM_LOAD32_BYTE( "mpr-14360", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
-	ROM_LOAD32_BYTE( "mpr-14359", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
+	ROM_LOAD32_BYTE( "mpr-14362.ic38", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
+	ROM_LOAD32_BYTE( "mpr-14361.ic34", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
+	ROM_LOAD32_BYTE( "mpr-14360.ic29", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
+	ROM_LOAD32_BYTE( "mpr-14359.ic25", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
 	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14370", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14369", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14368", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14367", 0x000003, 0x080000, CRC(77bb9003) SHA1(6370fdeab4967976840d752577cd860b9ce8efca) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14366", 0x000004, 0x080000, CRC(21078e83) SHA1(f35f643c28aad3bf18cb9906b114c4f49b7b4cd1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14365", 0x000005, 0x080000, CRC(36913790) SHA1(4a447cffb44b023fe1441277db1e411d4cd119eb) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14364", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14363", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14370.ic36", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) )
+	ROM_LOAD64_BYTE( "mpr-14369.ic32", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) )
+	ROM_LOAD64_BYTE( "mpr-14368.ic27", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) )
+	ROM_LOAD64_BYTE( "mpr-14367.ic23", 0x000003, 0x080000, CRC(77bb9003) SHA1(6370fdeab4967976840d752577cd860b9ce8efca) )
+	ROM_LOAD64_BYTE( "mpr-14366.ic37", 0x000004, 0x080000, CRC(21078e83) SHA1(f35f643c28aad3bf18cb9906b114c4f49b7b4cd1) )
+	ROM_LOAD64_BYTE( "mpr-14365.ic33", 0x000005, 0x080000, CRC(36913790) SHA1(4a447cffb44b023fe1441277db1e411d4cd119eb) )
+	ROM_LOAD64_BYTE( "mpr-14364.ic28", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) )
+	ROM_LOAD64_BYTE( "mpr-14363.ic24", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -3798,20 +3748,20 @@ ROM_START( f1enj ) // ROM PCB number is 834-8439-04
 	ROM_LOAD_x2( "epr-14446.ic22", 0x300000, 0x080000, CRC(646ec2cb) SHA1(67e453f128ae227e22c68f55d0d3f5831fbeb2f9) )
 
 	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD32_BYTE( "mpr-14362", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
-	ROM_LOAD32_BYTE( "mpr-14361", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
-	ROM_LOAD32_BYTE( "mpr-14360", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
-	ROM_LOAD32_BYTE( "mpr-14359", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
+	ROM_LOAD32_BYTE( "mpr-14362.ic38", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
+	ROM_LOAD32_BYTE( "mpr-14361.ic34", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
+	ROM_LOAD32_BYTE( "mpr-14360.ic29", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
+	ROM_LOAD32_BYTE( "mpr-14359.ic25", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14370", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14369", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14368", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14367", 0x000003, 0x080000, CRC(77bb9003) SHA1(6370fdeab4967976840d752577cd860b9ce8efca) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14366", 0x000004, 0x080000, CRC(21078e83) SHA1(f35f643c28aad3bf18cb9906b114c4f49b7b4cd1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14365", 0x000005, 0x080000, CRC(36913790) SHA1(4a447cffb44b023fe1441277db1e411d4cd119eb) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14364", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14363", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14370.ic36", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) )
+	ROM_LOAD64_BYTE( "mpr-14369.ic32", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) )
+	ROM_LOAD64_BYTE( "mpr-14368.ic27", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) )
+	ROM_LOAD64_BYTE( "mpr-14367.ic23", 0x000003, 0x080000, CRC(77bb9003) SHA1(6370fdeab4967976840d752577cd860b9ce8efca) )
+	ROM_LOAD64_BYTE( "mpr-14366.ic37", 0x000004, 0x080000, CRC(21078e83) SHA1(f35f643c28aad3bf18cb9906b114c4f49b7b4cd1) )
+	ROM_LOAD64_BYTE( "mpr-14365.ic33", 0x000005, 0x080000, CRC(36913790) SHA1(4a447cffb44b023fe1441277db1e411d4cd119eb) )
+	ROM_LOAD64_BYTE( "mpr-14364.ic28", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) )
+	ROM_LOAD64_BYTE( "mpr-14363.ic24", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x8( "epr-14450a.ic6",        0x000000, 0x020000, CRC(10f62723) SHA1(68fcd6655798f348678e3cc8857c6d1cb46e0987) )
@@ -3825,20 +3775,20 @@ ROM_START( f1enj ) // ROM PCB number is 834-8439-04
 	ROM_LOAD_x2( "epr-14446.ic22", 0x300000, 0x080000, CRC(646ec2cb) SHA1(67e453f128ae227e22c68f55d0d3f5831fbeb2f9) )
 
 	ROM_REGION( 0x100000, "slavepcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD32_BYTE( "mpr-14362", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
-	ROM_LOAD32_BYTE( "mpr-14361", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
-	ROM_LOAD32_BYTE( "mpr-14360", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
-	ROM_LOAD32_BYTE( "mpr-14359", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
+	ROM_LOAD32_BYTE( "mpr-14362.ic38", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
+	ROM_LOAD32_BYTE( "mpr-14361.ic34", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
+	ROM_LOAD32_BYTE( "mpr-14360.ic29", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
+	ROM_LOAD32_BYTE( "mpr-14359.ic25", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
 	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14370", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14369", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14368", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14367", 0x000003, 0x080000, CRC(77bb9003) SHA1(6370fdeab4967976840d752577cd860b9ce8efca) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14366", 0x000004, 0x080000, CRC(21078e83) SHA1(f35f643c28aad3bf18cb9906b114c4f49b7b4cd1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14365", 0x000005, 0x080000, CRC(36913790) SHA1(4a447cffb44b023fe1441277db1e411d4cd119eb) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14364", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14363", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14370.ic36", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) )
+	ROM_LOAD64_BYTE( "mpr-14369.ic32", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) )
+	ROM_LOAD64_BYTE( "mpr-14368.ic27", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) )
+	ROM_LOAD64_BYTE( "mpr-14367.ic23", 0x000003, 0x080000, CRC(77bb9003) SHA1(6370fdeab4967976840d752577cd860b9ce8efca) )
+	ROM_LOAD64_BYTE( "mpr-14366.ic37", 0x000004, 0x080000, CRC(21078e83) SHA1(f35f643c28aad3bf18cb9906b114c4f49b7b4cd1) )
+	ROM_LOAD64_BYTE( "mpr-14365.ic33", 0x000005, 0x080000, CRC(36913790) SHA1(4a447cffb44b023fe1441277db1e411d4cd119eb) )
+	ROM_LOAD64_BYTE( "mpr-14364.ic28", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) )
+	ROM_LOAD64_BYTE( "mpr-14363.ic24", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) )
 ROM_END
 
 
@@ -3869,14 +3819,14 @@ ROM_START( f1lap )
 	ROM_LOAD16_BYTE( "mpr-15609.ic5",  0x000001, 0x200000, CRC(d586e455) SHA1(aea190d31c590216eb19766ba749b1e9b710bdce) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15600.ic32", 0x000000, 0x200000, CRC(d2698d23) SHA1(996fbcc1d0814e6f14fa7e4870ece077ecda54e6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15602.ic30", 0x000002, 0x200000, CRC(1674764d) SHA1(bc39757a5d25df1a088f874ca2442854eb551e48) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15604.ic28", 0x000004, 0x200000, CRC(1552bbb9) SHA1(77edd3f9d8dec87fa0445d264309e6164eba9313) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15606.ic26", 0x000006, 0x200000, CRC(2b4f5265) SHA1(48b4ccdedb52fbf80661ff380e5a273201fc0a12) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15601.ic31", 0x800000, 0x200000, CRC(31a8f40a) SHA1(62798346750dea87e43c8a8b01c33bf886bb50f4) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15603.ic29", 0x800002, 0x200000, CRC(3805ecbc) SHA1(54d29250441160f282c70adfd515adb21d2cda33) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15605.ic27", 0x800004, 0x200000, CRC(cbdbf35e) SHA1(a1c0900ac3210e72f5848561a6c4a77c804782c6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15607.ic25", 0x800006, 0x200000, CRC(6c8817c9) SHA1(f5d493ed4237caf5042e95373bf9abd1fd16f873) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15600.ic32", 0x000000, 0x200000, CRC(d2698d23) SHA1(996fbcc1d0814e6f14fa7e4870ece077ecda54e6) )
+	ROM_LOAD64_WORD( "mpr-15602.ic30", 0x000002, 0x200000, CRC(1674764d) SHA1(bc39757a5d25df1a088f874ca2442854eb551e48) )
+	ROM_LOAD64_WORD( "mpr-15604.ic28", 0x000004, 0x200000, CRC(1552bbb9) SHA1(77edd3f9d8dec87fa0445d264309e6164eba9313) )
+	ROM_LOAD64_WORD( "mpr-15606.ic26", 0x000006, 0x200000, CRC(2b4f5265) SHA1(48b4ccdedb52fbf80661ff380e5a273201fc0a12) )
+	ROM_LOAD64_WORD( "mpr-15601.ic31", 0x800000, 0x200000, CRC(31a8f40a) SHA1(62798346750dea87e43c8a8b01c33bf886bb50f4) )
+	ROM_LOAD64_WORD( "mpr-15603.ic29", 0x800002, 0x200000, CRC(3805ecbc) SHA1(54d29250441160f282c70adfd515adb21d2cda33) )
+	ROM_LOAD64_WORD( "mpr-15605.ic27", 0x800004, 0x200000, CRC(cbdbf35e) SHA1(a1c0900ac3210e72f5848561a6c4a77c804782c6) )
+	ROM_LOAD64_WORD( "mpr-15607.ic25", 0x800006, 0x200000, CRC(6c8817c9) SHA1(f5d493ed4237caf5042e95373bf9abd1fd16f873) )
 
 	ROM_REGION( 0x20000, "user2", 0 ) /*  comms board  */
 	ROM_LOAD( "15612", 0x00000, 0x20000, CRC(9d204617) SHA1(8db57121065f5d1ac52fcfb88459bdbdc30e645b) )
@@ -3903,14 +3853,14 @@ ROM_START( f1lapt )
 	ROM_LOAD16_BYTE( "mpr-15609.ic5",  0x000001, 0x200000, CRC(d586e455) SHA1(aea190d31c590216eb19766ba749b1e9b710bdce) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15600.ic32", 0x000000, 0x200000, CRC(d2698d23) SHA1(996fbcc1d0814e6f14fa7e4870ece077ecda54e6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15602.ic30", 0x000002, 0x200000, CRC(1674764d) SHA1(bc39757a5d25df1a088f874ca2442854eb551e48) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15604.ic28", 0x000004, 0x200000, CRC(1552bbb9) SHA1(77edd3f9d8dec87fa0445d264309e6164eba9313) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15606.ic26", 0x000006, 0x200000, CRC(2b4f5265) SHA1(48b4ccdedb52fbf80661ff380e5a273201fc0a12) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15601.ic31", 0x800000, 0x200000, CRC(31a8f40a) SHA1(62798346750dea87e43c8a8b01c33bf886bb50f4) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15603.ic29", 0x800002, 0x200000, CRC(3805ecbc) SHA1(54d29250441160f282c70adfd515adb21d2cda33) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15605.ic27", 0x800004, 0x200000, CRC(cbdbf35e) SHA1(a1c0900ac3210e72f5848561a6c4a77c804782c6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15607.ic25", 0x800006, 0x200000, CRC(6c8817c9) SHA1(f5d493ed4237caf5042e95373bf9abd1fd16f873) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15600.ic32", 0x000000, 0x200000, CRC(d2698d23) SHA1(996fbcc1d0814e6f14fa7e4870ece077ecda54e6) )
+	ROM_LOAD64_WORD( "mpr-15602.ic30", 0x000002, 0x200000, CRC(1674764d) SHA1(bc39757a5d25df1a088f874ca2442854eb551e48) )
+	ROM_LOAD64_WORD( "mpr-15604.ic28", 0x000004, 0x200000, CRC(1552bbb9) SHA1(77edd3f9d8dec87fa0445d264309e6164eba9313) )
+	ROM_LOAD64_WORD( "mpr-15606.ic26", 0x000006, 0x200000, CRC(2b4f5265) SHA1(48b4ccdedb52fbf80661ff380e5a273201fc0a12) )
+	ROM_LOAD64_WORD( "mpr-15601.ic31", 0x800000, 0x200000, CRC(31a8f40a) SHA1(62798346750dea87e43c8a8b01c33bf886bb50f4) )
+	ROM_LOAD64_WORD( "mpr-15603.ic29", 0x800002, 0x200000, CRC(3805ecbc) SHA1(54d29250441160f282c70adfd515adb21d2cda33) )
+	ROM_LOAD64_WORD( "mpr-15605.ic27", 0x800004, 0x200000, CRC(cbdbf35e) SHA1(a1c0900ac3210e72f5848561a6c4a77c804782c6) )
+	ROM_LOAD64_WORD( "mpr-15607.ic25", 0x800006, 0x200000, CRC(6c8817c9) SHA1(f5d493ed4237caf5042e95373bf9abd1fd16f873) )
 
 	ROM_REGION( 0x20000, "user2", 0 ) /*  comms board  */
 	ROM_LOAD( "15612", 0x00000, 0x20000, CRC(9d204617) SHA1(8db57121065f5d1ac52fcfb88459bdbdc30e645b) )
@@ -3942,14 +3892,14 @@ ROM_START( f1lapj )
 	ROM_LOAD16_BYTE( "mpr-15609.ic5",  0x000001, 0x200000, CRC(d586e455) SHA1(aea190d31c590216eb19766ba749b1e9b710bdce) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15600.ic32", 0x000000, 0x200000, CRC(d2698d23) SHA1(996fbcc1d0814e6f14fa7e4870ece077ecda54e6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15602.ic30", 0x000002, 0x200000, CRC(1674764d) SHA1(bc39757a5d25df1a088f874ca2442854eb551e48) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15604.ic28", 0x000004, 0x200000, CRC(1552bbb9) SHA1(77edd3f9d8dec87fa0445d264309e6164eba9313) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15606.ic26", 0x000006, 0x200000, CRC(2b4f5265) SHA1(48b4ccdedb52fbf80661ff380e5a273201fc0a12) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15601.ic31", 0x800000, 0x200000, CRC(31a8f40a) SHA1(62798346750dea87e43c8a8b01c33bf886bb50f4) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15603.ic29", 0x800002, 0x200000, CRC(3805ecbc) SHA1(54d29250441160f282c70adfd515adb21d2cda33) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15605.ic27", 0x800004, 0x200000, CRC(cbdbf35e) SHA1(a1c0900ac3210e72f5848561a6c4a77c804782c6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15607.ic25", 0x800006, 0x200000, CRC(6c8817c9) SHA1(f5d493ed4237caf5042e95373bf9abd1fd16f873) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15600.ic32", 0x000000, 0x200000, CRC(d2698d23) SHA1(996fbcc1d0814e6f14fa7e4870ece077ecda54e6) )
+	ROM_LOAD64_WORD( "mpr-15602.ic30", 0x000002, 0x200000, CRC(1674764d) SHA1(bc39757a5d25df1a088f874ca2442854eb551e48) )
+	ROM_LOAD64_WORD( "mpr-15604.ic28", 0x000004, 0x200000, CRC(1552bbb9) SHA1(77edd3f9d8dec87fa0445d264309e6164eba9313) )
+	ROM_LOAD64_WORD( "mpr-15606.ic26", 0x000006, 0x200000, CRC(2b4f5265) SHA1(48b4ccdedb52fbf80661ff380e5a273201fc0a12) )
+	ROM_LOAD64_WORD( "mpr-15601.ic31", 0x800000, 0x200000, CRC(31a8f40a) SHA1(62798346750dea87e43c8a8b01c33bf886bb50f4) )
+	ROM_LOAD64_WORD( "mpr-15603.ic29", 0x800002, 0x200000, CRC(3805ecbc) SHA1(54d29250441160f282c70adfd515adb21d2cda33) )
+	ROM_LOAD64_WORD( "mpr-15605.ic27", 0x800004, 0x200000, CRC(cbdbf35e) SHA1(a1c0900ac3210e72f5848561a6c4a77c804782c6) )
+	ROM_LOAD64_WORD( "mpr-15607.ic25", 0x800006, 0x200000, CRC(6c8817c9) SHA1(f5d493ed4237caf5042e95373bf9abd1fd16f873) )
 
 	ROM_REGION( 0x20000, "user2", 0 ) /*  comms board  */
 	ROM_LOAD( "15612", 0x00000, 0x20000, CRC(9d204617) SHA1(8db57121065f5d1ac52fcfb88459bdbdc30e645b) )
@@ -3988,14 +3938,14 @@ ROM_START( ga2 )
 	ROM_LOAD16_BYTE( "mpr-14947.ic5",  0x000001, 0x200000, CRC(b53e62f4) SHA1(5aa0f198e6eb070b77b0d180d30c0228a9bc691e) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14949.ic32", 0x000000, 0x200000, CRC(152c716c) SHA1(448d16ea036b66e886119c00af543dfa5e53fd84) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14951.ic30", 0x000002, 0x200000, CRC(fdb1a534) SHA1(3126b595bf69bf9952fedf8f9c6743eb10489dc6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14953.ic28", 0x000004, 0x200000, CRC(33bd1c15) SHA1(4e16562e3357d4db54b20543073e8f1fd6f74b1f) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14955.ic26", 0x000006, 0x200000, CRC(e42684aa) SHA1(12e0f18a11edb46f09e2e8c5c4ba14170d0cf00d) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14950.ic31", 0x800000, 0x200000, CRC(15fd0026) SHA1(e918984bd60ad63172fe273b31cc9019100228c8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14952.ic29", 0x800002, 0x200000, CRC(96f96613) SHA1(4c9808866032dab0401de322c28242e8a8775457) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14954.ic27", 0x800004, 0x200000, CRC(39b2ac9e) SHA1(74f4c81d85ab9b4c5e8ae4b4d2c6dff766c482ca) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14956.ic25", 0x800006, 0x200000, CRC(298fca50) SHA1(16e09b19cc7be3dfc8e82b45348e6d1cf2ed5621) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-14949.ic32", 0x000000, 0x200000, CRC(152c716c) SHA1(448d16ea036b66e886119c00af543dfa5e53fd84) )
+	ROM_LOAD64_WORD( "mpr-14951.ic30", 0x000002, 0x200000, CRC(fdb1a534) SHA1(3126b595bf69bf9952fedf8f9c6743eb10489dc6) )
+	ROM_LOAD64_WORD( "mpr-14953.ic28", 0x000004, 0x200000, CRC(33bd1c15) SHA1(4e16562e3357d4db54b20543073e8f1fd6f74b1f) )
+	ROM_LOAD64_WORD( "mpr-14955.ic26", 0x000006, 0x200000, CRC(e42684aa) SHA1(12e0f18a11edb46f09e2e8c5c4ba14170d0cf00d) )
+	ROM_LOAD64_WORD( "mpr-14950.ic31", 0x800000, 0x200000, CRC(15fd0026) SHA1(e918984bd60ad63172fe273b31cc9019100228c8) )
+	ROM_LOAD64_WORD( "mpr-14952.ic29", 0x800002, 0x200000, CRC(96f96613) SHA1(4c9808866032dab0401de322c28242e8a8775457) )
+	ROM_LOAD64_WORD( "mpr-14954.ic27", 0x800004, 0x200000, CRC(39b2ac9e) SHA1(74f4c81d85ab9b4c5e8ae4b4d2c6dff766c482ca) )
+	ROM_LOAD64_WORD( "mpr-14956.ic25", 0x800006, 0x200000, CRC(298fca50) SHA1(16e09b19cc7be3dfc8e82b45348e6d1cf2ed5621) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -4028,14 +3978,14 @@ ROM_START( ga2u )
 	ROM_LOAD16_BYTE( "mpr-14947.ic5",  0x000001, 0x200000, CRC(b53e62f4) SHA1(5aa0f198e6eb070b77b0d180d30c0228a9bc691e) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14949.ic32", 0x000000, 0x200000, CRC(152c716c) SHA1(448d16ea036b66e886119c00af543dfa5e53fd84) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14951.ic30", 0x000002, 0x200000, CRC(fdb1a534) SHA1(3126b595bf69bf9952fedf8f9c6743eb10489dc6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14953.ic28", 0x000004, 0x200000, CRC(33bd1c15) SHA1(4e16562e3357d4db54b20543073e8f1fd6f74b1f) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14955.ic26", 0x000006, 0x200000, CRC(e42684aa) SHA1(12e0f18a11edb46f09e2e8c5c4ba14170d0cf00d) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14950.ic31", 0x800000, 0x200000, CRC(15fd0026) SHA1(e918984bd60ad63172fe273b31cc9019100228c8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14952.ic29", 0x800002, 0x200000, CRC(96f96613) SHA1(4c9808866032dab0401de322c28242e8a8775457) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14954.ic27", 0x800004, 0x200000, CRC(39b2ac9e) SHA1(74f4c81d85ab9b4c5e8ae4b4d2c6dff766c482ca) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14956.ic25", 0x800006, 0x200000, CRC(298fca50) SHA1(16e09b19cc7be3dfc8e82b45348e6d1cf2ed5621) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-14949.ic32", 0x000000, 0x200000, CRC(152c716c) SHA1(448d16ea036b66e886119c00af543dfa5e53fd84) )
+	ROM_LOAD64_WORD( "mpr-14951.ic30", 0x000002, 0x200000, CRC(fdb1a534) SHA1(3126b595bf69bf9952fedf8f9c6743eb10489dc6) )
+	ROM_LOAD64_WORD( "mpr-14953.ic28", 0x000004, 0x200000, CRC(33bd1c15) SHA1(4e16562e3357d4db54b20543073e8f1fd6f74b1f) )
+	ROM_LOAD64_WORD( "mpr-14955.ic26", 0x000006, 0x200000, CRC(e42684aa) SHA1(12e0f18a11edb46f09e2e8c5c4ba14170d0cf00d) )
+	ROM_LOAD64_WORD( "mpr-14950.ic31", 0x800000, 0x200000, CRC(15fd0026) SHA1(e918984bd60ad63172fe273b31cc9019100228c8) )
+	ROM_LOAD64_WORD( "mpr-14952.ic29", 0x800002, 0x200000, CRC(96f96613) SHA1(4c9808866032dab0401de322c28242e8a8775457) )
+	ROM_LOAD64_WORD( "mpr-14954.ic27", 0x800004, 0x200000, CRC(39b2ac9e) SHA1(74f4c81d85ab9b4c5e8ae4b4d2c6dff766c482ca) )
+	ROM_LOAD64_WORD( "mpr-14956.ic25", 0x800006, 0x200000, CRC(298fca50) SHA1(16e09b19cc7be3dfc8e82b45348e6d1cf2ed5621) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -4066,14 +4016,14 @@ ROM_START( ga2j )
 	ROM_LOAD16_BYTE( "mpr-14947.ic5",  0x000001, 0x200000, CRC(b53e62f4) SHA1(5aa0f198e6eb070b77b0d180d30c0228a9bc691e) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14949.ic32", 0x000000, 0x200000, CRC(152c716c) SHA1(448d16ea036b66e886119c00af543dfa5e53fd84) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14951.ic30", 0x000002, 0x200000, CRC(fdb1a534) SHA1(3126b595bf69bf9952fedf8f9c6743eb10489dc6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14953.ic28", 0x000004, 0x200000, CRC(33bd1c15) SHA1(4e16562e3357d4db54b20543073e8f1fd6f74b1f) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14955.ic26", 0x000006, 0x200000, CRC(e42684aa) SHA1(12e0f18a11edb46f09e2e8c5c4ba14170d0cf00d) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14950.ic31", 0x800000, 0x200000, CRC(15fd0026) SHA1(e918984bd60ad63172fe273b31cc9019100228c8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14952.ic29", 0x800002, 0x200000, CRC(96f96613) SHA1(4c9808866032dab0401de322c28242e8a8775457) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14954.ic27", 0x800004, 0x200000, CRC(39b2ac9e) SHA1(74f4c81d85ab9b4c5e8ae4b4d2c6dff766c482ca) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-14956.ic25", 0x800006, 0x200000, CRC(298fca50) SHA1(16e09b19cc7be3dfc8e82b45348e6d1cf2ed5621) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-14949.ic32", 0x000000, 0x200000, CRC(152c716c) SHA1(448d16ea036b66e886119c00af543dfa5e53fd84) )
+	ROM_LOAD64_WORD( "mpr-14951.ic30", 0x000002, 0x200000, CRC(fdb1a534) SHA1(3126b595bf69bf9952fedf8f9c6743eb10489dc6) )
+	ROM_LOAD64_WORD( "mpr-14953.ic28", 0x000004, 0x200000, CRC(33bd1c15) SHA1(4e16562e3357d4db54b20543073e8f1fd6f74b1f) )
+	ROM_LOAD64_WORD( "mpr-14955.ic26", 0x000006, 0x200000, CRC(e42684aa) SHA1(12e0f18a11edb46f09e2e8c5c4ba14170d0cf00d) )
+	ROM_LOAD64_WORD( "mpr-14950.ic31", 0x800000, 0x200000, CRC(15fd0026) SHA1(e918984bd60ad63172fe273b31cc9019100228c8) )
+	ROM_LOAD64_WORD( "mpr-14952.ic29", 0x800002, 0x200000, CRC(96f96613) SHA1(4c9808866032dab0401de322c28242e8a8775457) )
+	ROM_LOAD64_WORD( "mpr-14954.ic27", 0x800004, 0x200000, CRC(39b2ac9e) SHA1(74f4c81d85ab9b4c5e8ae4b4d2c6dff766c482ca) )
+	ROM_LOAD64_WORD( "mpr-14956.ic25", 0x800006, 0x200000, CRC(298fca50) SHA1(16e09b19cc7be3dfc8e82b45348e6d1cf2ed5621) )
 ROM_END
 
 
@@ -4097,14 +4047,14 @@ ROM_START( harddunk )
 	ROM_LOAD16_BYTE( "mpr-16504.ic11", 0x000001, 0x080000, CRC(7c61fcd8) SHA1(ca4354f90fada752bf11ee22a7798a8aa22b1c61) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-16495.ic14", 0x000000, 0x200000, CRC(6e5f26be) SHA1(146761072bbed08f4a9df8a474b34fab61afaa4f) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16497.ic15", 0x000002, 0x200000, CRC(42ab5859) SHA1(f50c51eb81186aec5f747ecab4c5c928f8701afc) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16499.ic10", 0x000004, 0x200000, CRC(a290ea36) SHA1(2503b44174f23a9d323caab86553977d1d6d9c94) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16501.ic38", 0x000006, 0x200000, CRC(f1566620) SHA1(bcf31d11ee669d5afc7dc22c42fa59f4e48c1f50) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16496.ic22", 0x800000, 0x200000, CRC(d9d27247) SHA1(d211623478516ed1b89ab16a7fc7969954c5e353) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16498.ic23", 0x800002, 0x200000, CRC(c022a991) SHA1(a660a20692f4d9ba7be73577328f69f109be5e47) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16500.ic18", 0x800004, 0x200000, CRC(452c0be3) SHA1(af87ce4618bae2d791c1baed34ba7f853af664ff) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16502.ic41", 0x800006, 0x200000, CRC(ffc3147e) SHA1(12d882dec3098674d27058a8009e8778555f477a) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-16495.ic14", 0x000000, 0x200000, CRC(6e5f26be) SHA1(146761072bbed08f4a9df8a474b34fab61afaa4f) )
+	ROM_LOAD64_WORD( "mpr-16497.ic15", 0x000002, 0x200000, CRC(42ab5859) SHA1(f50c51eb81186aec5f747ecab4c5c928f8701afc) )
+	ROM_LOAD64_WORD( "mpr-16499.ic10", 0x000004, 0x200000, CRC(a290ea36) SHA1(2503b44174f23a9d323caab86553977d1d6d9c94) )
+	ROM_LOAD64_WORD( "mpr-16501.ic38", 0x000006, 0x200000, CRC(f1566620) SHA1(bcf31d11ee669d5afc7dc22c42fa59f4e48c1f50) )
+	ROM_LOAD64_WORD( "mpr-16496.ic22", 0x800000, 0x200000, CRC(d9d27247) SHA1(d211623478516ed1b89ab16a7fc7969954c5e353) )
+	ROM_LOAD64_WORD( "mpr-16498.ic23", 0x800002, 0x200000, CRC(c022a991) SHA1(a660a20692f4d9ba7be73577328f69f109be5e47) )
+	ROM_LOAD64_WORD( "mpr-16500.ic18", 0x800004, 0x200000, CRC(452c0be3) SHA1(af87ce4618bae2d791c1baed34ba7f853af664ff) )
+	ROM_LOAD64_WORD( "mpr-16502.ic41", 0x800006, 0x200000, CRC(ffc3147e) SHA1(12d882dec3098674d27058a8009e8778555f477a) )
 
 	ROM_REGION( 0x400000, "mainpcb:sega", 0 ) /* Sega PCM sound data */
 	ROM_LOAD( "mpr-16506.1", 0x000000, 0x200000, CRC(e779f5ed) SHA1(462d1bbe8bb12a0c5a6d6c613c720b26ec21cb25) )
@@ -4128,14 +4078,14 @@ ROM_START( harddunkj )
 	ROM_LOAD16_BYTE( "mpr-16504.ic11", 0x000001, 0x080000, CRC(7c61fcd8) SHA1(ca4354f90fada752bf11ee22a7798a8aa22b1c61) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-16495.ic14", 0x000000, 0x200000, CRC(6e5f26be) SHA1(146761072bbed08f4a9df8a474b34fab61afaa4f) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16497.ic15", 0x000002, 0x200000, CRC(42ab5859) SHA1(f50c51eb81186aec5f747ecab4c5c928f8701afc) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16499.ic10", 0x000004, 0x200000, CRC(a290ea36) SHA1(2503b44174f23a9d323caab86553977d1d6d9c94) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16501.ic38", 0x000006, 0x200000, CRC(f1566620) SHA1(bcf31d11ee669d5afc7dc22c42fa59f4e48c1f50) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16496.ic22", 0x800000, 0x200000, CRC(d9d27247) SHA1(d211623478516ed1b89ab16a7fc7969954c5e353) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16498.ic23", 0x800002, 0x200000, CRC(c022a991) SHA1(a660a20692f4d9ba7be73577328f69f109be5e47) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16500.ic18", 0x800004, 0x200000, CRC(452c0be3) SHA1(af87ce4618bae2d791c1baed34ba7f853af664ff) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16502.ic41", 0x800006, 0x200000, CRC(ffc3147e) SHA1(12d882dec3098674d27058a8009e8778555f477a) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-16495.ic14", 0x000000, 0x200000, CRC(6e5f26be) SHA1(146761072bbed08f4a9df8a474b34fab61afaa4f) )
+	ROM_LOAD64_WORD( "mpr-16497.ic15", 0x000002, 0x200000, CRC(42ab5859) SHA1(f50c51eb81186aec5f747ecab4c5c928f8701afc) )
+	ROM_LOAD64_WORD( "mpr-16499.ic10", 0x000004, 0x200000, CRC(a290ea36) SHA1(2503b44174f23a9d323caab86553977d1d6d9c94) )
+	ROM_LOAD64_WORD( "mpr-16501.ic38", 0x000006, 0x200000, CRC(f1566620) SHA1(bcf31d11ee669d5afc7dc22c42fa59f4e48c1f50) )
+	ROM_LOAD64_WORD( "mpr-16496.ic22", 0x800000, 0x200000, CRC(d9d27247) SHA1(d211623478516ed1b89ab16a7fc7969954c5e353) )
+	ROM_LOAD64_WORD( "mpr-16498.ic23", 0x800002, 0x200000, CRC(c022a991) SHA1(a660a20692f4d9ba7be73577328f69f109be5e47) )
+	ROM_LOAD64_WORD( "mpr-16500.ic18", 0x800004, 0x200000, CRC(452c0be3) SHA1(af87ce4618bae2d791c1baed34ba7f853af664ff) )
+	ROM_LOAD64_WORD( "mpr-16502.ic41", 0x800006, 0x200000, CRC(ffc3147e) SHA1(12d882dec3098674d27058a8009e8778555f477a) )
 
 	ROM_REGION( 0x400000, "mainpcb:sega", 0 ) /* Sega PCM sound data */
 	ROM_LOAD( "mpr-16506.ic1", 0x000000, 0x200000, CRC(e779f5ed) SHA1(462d1bbe8bb12a0c5a6d6c613c720b26ec21cb25) )
@@ -4169,14 +4119,14 @@ ROM_START( holo )
 	/* game doesn't use bg tilemaps */
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14973", 0x000000, 0x100000, CRC(b3c3ff6b) SHA1(94e8dbfae37a5b122ee3d471aad1f758e4a39b9e) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14972", 0x000001, 0x100000, CRC(0c161374) SHA1(413ab45deb687ecdbdc06ae98aa32ad8a0d80e0c) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14971", 0x000002, 0x100000, CRC(dfcf6fdf) SHA1(417291b54010be20dd6738a70d372b580615a8bb) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14970", 0x000003, 0x100000, CRC(cae3a745) SHA1(b6cc1f4abb460cda4714967e880928dc727ecf0a) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14969", 0x000004, 0x100000, CRC(c06b7c15) SHA1(8b97a899e6eacf798b9f55af8df95e12ccacadec) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14968", 0x000005, 0x100000, CRC(f413894a) SHA1(d65f57b1e55199e901c7c2f701589c46eeab739a) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14967", 0x000006, 0x100000, CRC(5377fce0) SHA1(baf8f82ab851b24202938fc7213d72324b9b92c0) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14966", 0x000007, 0x100000, CRC(dffba2e9) SHA1(b97e47e78abb8302bc2c87681643382203bd76eb) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14973", 0x000000, 0x100000, CRC(b3c3ff6b) SHA1(94e8dbfae37a5b122ee3d471aad1f758e4a39b9e) )
+	ROM_LOAD64_BYTE( "mpr-14972", 0x000001, 0x100000, CRC(0c161374) SHA1(413ab45deb687ecdbdc06ae98aa32ad8a0d80e0c) )
+	ROM_LOAD64_BYTE( "mpr-14971", 0x000002, 0x100000, CRC(dfcf6fdf) SHA1(417291b54010be20dd6738a70d372b580615a8bb) )
+	ROM_LOAD64_BYTE( "mpr-14970", 0x000003, 0x100000, CRC(cae3a745) SHA1(b6cc1f4abb460cda4714967e880928dc727ecf0a) )
+	ROM_LOAD64_BYTE( "mpr-14969", 0x000004, 0x100000, CRC(c06b7c15) SHA1(8b97a899e6eacf798b9f55af8df95e12ccacadec) )
+	ROM_LOAD64_BYTE( "mpr-14968", 0x000005, 0x100000, CRC(f413894a) SHA1(d65f57b1e55199e901c7c2f701589c46eeab739a) )
+	ROM_LOAD64_BYTE( "mpr-14967", 0x000006, 0x100000, CRC(5377fce0) SHA1(baf8f82ab851b24202938fc7213d72324b9b92c0) )
+	ROM_LOAD64_BYTE( "mpr-14966", 0x000007, 0x100000, CRC(dffba2e9) SHA1(b97e47e78abb8302bc2c87681643382203bd76eb) )
 ROM_END
 
 
@@ -4206,14 +4156,14 @@ ROM_START( jpark )
 	ROM_LOAD16_BYTE( "mpr-16403.ic5",  0x000001, 0x200000, CRC(02530a9b) SHA1(b43e1b47f74c801bfc599cbe893fb8dc13453dd0) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-16405.ic32", 0x000000, 0x200000, CRC(b425f182) SHA1(66c6bd29dd3450db816b895c4c9c5208a66aae67) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16407.ic30", 0x000002, 0x200000, CRC(bc49ffd9) SHA1(a50ba7ddccfdfd7638c4041978b39c1559afbbb4) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16409.ic28", 0x000004, 0x200000, CRC(fe73660d) SHA1(ec1a3ea5303d2ccb9e327da18476969953626e1c) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16411.ic26", 0x000006, 0x200000, CRC(71cabbc5) SHA1(9760f57ef43eb251488dadd37711d5682d902434) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16406.ic31", 0x800000, 0x200000, CRC(b9ed73d6) SHA1(0dd22e7a21e95d84fc91acd742c737f96529f515) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16408.ic29", 0x800002, 0x200000, CRC(7b2f476b) SHA1(da99a9911982ba8aaef8c9aecc2977c9fd6da094) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16410.ic27", 0x800004, 0x200000, CRC(49c8f952) SHA1(f26b818711910b10bf520e5f849a1478a6b1d6e6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16412.ic25", 0x800006, 0x200000, CRC(105dc26e) SHA1(fd2ef8c9fe1a78b4f9cc891a6fbd060184e58a1f) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-16405.ic32", 0x000000, 0x200000, CRC(b425f182) SHA1(66c6bd29dd3450db816b895c4c9c5208a66aae67) )
+	ROM_LOAD64_WORD( "mpr-16407.ic30", 0x000002, 0x200000, CRC(bc49ffd9) SHA1(a50ba7ddccfdfd7638c4041978b39c1559afbbb4) )
+	ROM_LOAD64_WORD( "mpr-16409.ic28", 0x000004, 0x200000, CRC(fe73660d) SHA1(ec1a3ea5303d2ccb9e327da18476969953626e1c) )
+	ROM_LOAD64_WORD( "mpr-16411.ic26", 0x000006, 0x200000, CRC(71cabbc5) SHA1(9760f57ef43eb251488dadd37711d5682d902434) )
+	ROM_LOAD64_WORD( "mpr-16406.ic31", 0x800000, 0x200000, CRC(b9ed73d6) SHA1(0dd22e7a21e95d84fc91acd742c737f96529f515) )
+	ROM_LOAD64_WORD( "mpr-16408.ic29", 0x800002, 0x200000, CRC(7b2f476b) SHA1(da99a9911982ba8aaef8c9aecc2977c9fd6da094) )
+	ROM_LOAD64_WORD( "mpr-16410.ic27", 0x800004, 0x200000, CRC(49c8f952) SHA1(f26b818711910b10bf520e5f849a1478a6b1d6e6) )
+	ROM_LOAD64_WORD( "mpr-16412.ic25", 0x800006, 0x200000, CRC(105dc26e) SHA1(fd2ef8c9fe1a78b4f9cc891a6fbd060184e58a1f) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* unused */
 	ROM_LOAD( "epr-13908.xx", 0x00000, 0x8000, CRC(6228c1d2) SHA1(bd37fe775534fb94c9af80546948ce5f9c47bbf5) ) /* cabinet movement */
@@ -4242,14 +4192,14 @@ ROM_START( jparkj )
 	ROM_LOAD16_BYTE( "mpr-16403.ic5",  0x000001, 0x200000, CRC(02530a9b) SHA1(b43e1b47f74c801bfc599cbe893fb8dc13453dd0) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-16405.ic32", 0x000000, 0x200000, CRC(b425f182) SHA1(66c6bd29dd3450db816b895c4c9c5208a66aae67) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16407.ic30", 0x000002, 0x200000, CRC(bc49ffd9) SHA1(a50ba7ddccfdfd7638c4041978b39c1559afbbb4) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16409.ic28", 0x000004, 0x200000, CRC(fe73660d) SHA1(ec1a3ea5303d2ccb9e327da18476969953626e1c) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16411.ic26", 0x000006, 0x200000, CRC(71cabbc5) SHA1(9760f57ef43eb251488dadd37711d5682d902434) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16406.ic31", 0x800000, 0x200000, CRC(b9ed73d6) SHA1(0dd22e7a21e95d84fc91acd742c737f96529f515) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16408.ic29", 0x800002, 0x200000, CRC(7b2f476b) SHA1(da99a9911982ba8aaef8c9aecc2977c9fd6da094) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16410.ic27", 0x800004, 0x200000, CRC(49c8f952) SHA1(f26b818711910b10bf520e5f849a1478a6b1d6e6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16412.ic25", 0x800006, 0x200000, CRC(105dc26e) SHA1(fd2ef8c9fe1a78b4f9cc891a6fbd060184e58a1f) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-16405.ic32", 0x000000, 0x200000, CRC(b425f182) SHA1(66c6bd29dd3450db816b895c4c9c5208a66aae67) )
+	ROM_LOAD64_WORD( "mpr-16407.ic30", 0x000002, 0x200000, CRC(bc49ffd9) SHA1(a50ba7ddccfdfd7638c4041978b39c1559afbbb4) )
+	ROM_LOAD64_WORD( "mpr-16409.ic28", 0x000004, 0x200000, CRC(fe73660d) SHA1(ec1a3ea5303d2ccb9e327da18476969953626e1c) )
+	ROM_LOAD64_WORD( "mpr-16411.ic26", 0x000006, 0x200000, CRC(71cabbc5) SHA1(9760f57ef43eb251488dadd37711d5682d902434) )
+	ROM_LOAD64_WORD( "mpr-16406.ic31", 0x800000, 0x200000, CRC(b9ed73d6) SHA1(0dd22e7a21e95d84fc91acd742c737f96529f515) )
+	ROM_LOAD64_WORD( "mpr-16408.ic29", 0x800002, 0x200000, CRC(7b2f476b) SHA1(da99a9911982ba8aaef8c9aecc2977c9fd6da094) )
+	ROM_LOAD64_WORD( "mpr-16410.ic27", 0x800004, 0x200000, CRC(49c8f952) SHA1(f26b818711910b10bf520e5f849a1478a6b1d6e6) )
+	ROM_LOAD64_WORD( "mpr-16412.ic25", 0x800006, 0x200000, CRC(105dc26e) SHA1(fd2ef8c9fe1a78b4f9cc891a6fbd060184e58a1f) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* unused */
 	ROM_LOAD( "epr-13908.xx", 0x00000, 0x8000, CRC(6228c1d2) SHA1(bd37fe775534fb94c9af80546948ce5f9c47bbf5) ) /* cabinet movement */
@@ -4278,14 +4228,14 @@ ROM_START( jparkja )
 	ROM_LOAD16_BYTE( "mpr-16403.ic5",  0x000001, 0x200000, CRC(02530a9b) SHA1(b43e1b47f74c801bfc599cbe893fb8dc13453dd0) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-16405.ic32", 0x000000, 0x200000, CRC(b425f182) SHA1(66c6bd29dd3450db816b895c4c9c5208a66aae67) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16407.ic30", 0x000002, 0x200000, CRC(bc49ffd9) SHA1(a50ba7ddccfdfd7638c4041978b39c1559afbbb4) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16409.ic28", 0x000004, 0x200000, CRC(fe73660d) SHA1(ec1a3ea5303d2ccb9e327da18476969953626e1c) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16411.ic26", 0x000006, 0x200000, CRC(71cabbc5) SHA1(9760f57ef43eb251488dadd37711d5682d902434) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16406.ic31", 0x800000, 0x200000, CRC(b9ed73d6) SHA1(0dd22e7a21e95d84fc91acd742c737f96529f515) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16408.ic29", 0x800002, 0x200000, CRC(7b2f476b) SHA1(da99a9911982ba8aaef8c9aecc2977c9fd6da094) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16410.ic27", 0x800004, 0x200000, CRC(49c8f952) SHA1(f26b818711910b10bf520e5f849a1478a6b1d6e6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16412.ic25", 0x800006, 0x200000, CRC(105dc26e) SHA1(fd2ef8c9fe1a78b4f9cc891a6fbd060184e58a1f) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-16405.ic32", 0x000000, 0x200000, CRC(b425f182) SHA1(66c6bd29dd3450db816b895c4c9c5208a66aae67) )
+	ROM_LOAD64_WORD( "mpr-16407.ic30", 0x000002, 0x200000, CRC(bc49ffd9) SHA1(a50ba7ddccfdfd7638c4041978b39c1559afbbb4) )
+	ROM_LOAD64_WORD( "mpr-16409.ic28", 0x000004, 0x200000, CRC(fe73660d) SHA1(ec1a3ea5303d2ccb9e327da18476969953626e1c) )
+	ROM_LOAD64_WORD( "mpr-16411.ic26", 0x000006, 0x200000, CRC(71cabbc5) SHA1(9760f57ef43eb251488dadd37711d5682d902434) )
+	ROM_LOAD64_WORD( "mpr-16406.ic31", 0x800000, 0x200000, CRC(b9ed73d6) SHA1(0dd22e7a21e95d84fc91acd742c737f96529f515) )
+	ROM_LOAD64_WORD( "mpr-16408.ic29", 0x800002, 0x200000, CRC(7b2f476b) SHA1(da99a9911982ba8aaef8c9aecc2977c9fd6da094) )
+	ROM_LOAD64_WORD( "mpr-16410.ic27", 0x800004, 0x200000, CRC(49c8f952) SHA1(f26b818711910b10bf520e5f849a1478a6b1d6e6) )
+	ROM_LOAD64_WORD( "mpr-16412.ic25", 0x800006, 0x200000, CRC(105dc26e) SHA1(fd2ef8c9fe1a78b4f9cc891a6fbd060184e58a1f) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* unused */
 	ROM_LOAD( "epr-13908.xx", 0x00000, 0x8000, CRC(6228c1d2) SHA1(bd37fe775534fb94c9af80546948ce5f9c47bbf5) ) /* cabinet movement */
@@ -4314,14 +4264,60 @@ ROM_START( jparkjc )
 	ROM_LOAD16_BYTE( "mpr-16403.ic5",  0x000001, 0x200000, CRC(02530a9b) SHA1(b43e1b47f74c801bfc599cbe893fb8dc13453dd0) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-16405.ic32", 0x000000, 0x200000, CRC(b425f182) SHA1(66c6bd29dd3450db816b895c4c9c5208a66aae67) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16407.ic30", 0x000002, 0x200000, CRC(bc49ffd9) SHA1(a50ba7ddccfdfd7638c4041978b39c1559afbbb4) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16409.ic28", 0x000004, 0x200000, CRC(fe73660d) SHA1(ec1a3ea5303d2ccb9e327da18476969953626e1c) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16411.ic26", 0x000006, 0x200000, CRC(71cabbc5) SHA1(9760f57ef43eb251488dadd37711d5682d902434) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16406.ic31", 0x800000, 0x200000, CRC(b9ed73d6) SHA1(0dd22e7a21e95d84fc91acd742c737f96529f515) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16408.ic29", 0x800002, 0x200000, CRC(7b2f476b) SHA1(da99a9911982ba8aaef8c9aecc2977c9fd6da094) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16410.ic27", 0x800004, 0x200000, CRC(49c8f952) SHA1(f26b818711910b10bf520e5f849a1478a6b1d6e6) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16412.ic25", 0x800006, 0x200000, CRC(105dc26e) SHA1(fd2ef8c9fe1a78b4f9cc891a6fbd060184e58a1f) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-16405.ic32", 0x000000, 0x200000, CRC(b425f182) SHA1(66c6bd29dd3450db816b895c4c9c5208a66aae67) )
+	ROM_LOAD64_WORD( "mpr-16407.ic30", 0x000002, 0x200000, CRC(bc49ffd9) SHA1(a50ba7ddccfdfd7638c4041978b39c1559afbbb4) )
+	ROM_LOAD64_WORD( "mpr-16409.ic28", 0x000004, 0x200000, CRC(fe73660d) SHA1(ec1a3ea5303d2ccb9e327da18476969953626e1c) )
+	ROM_LOAD64_WORD( "mpr-16411.ic26", 0x000006, 0x200000, CRC(71cabbc5) SHA1(9760f57ef43eb251488dadd37711d5682d902434) )
+	ROM_LOAD64_WORD( "mpr-16406.ic31", 0x800000, 0x200000, CRC(b9ed73d6) SHA1(0dd22e7a21e95d84fc91acd742c737f96529f515) )
+	ROM_LOAD64_WORD( "mpr-16408.ic29", 0x800002, 0x200000, CRC(7b2f476b) SHA1(da99a9911982ba8aaef8c9aecc2977c9fd6da094) )
+	ROM_LOAD64_WORD( "mpr-16410.ic27", 0x800004, 0x200000, CRC(49c8f952) SHA1(f26b818711910b10bf520e5f849a1478a6b1d6e6) )
+	ROM_LOAD64_WORD( "mpr-16412.ic25", 0x800006, 0x200000, CRC(105dc26e) SHA1(fd2ef8c9fe1a78b4f9cc891a6fbd060184e58a1f) )
+ROM_END
+
+
+/**************************************************************************************************************************
+ **************************************************************************************************************************
+ **************************************************************************************************************************
+    Soreike Kokology Sega System 32 ROM Board '837-8393 16Mb ROM BD' with
+    sticker 834-9494 and sticker 'REV. A'
+    No security board.
+    GAL16V8 at IC23: 315-5552
+    Jumpers settings:
+    JP1: 2-3, JP2: 2-3, JP3: 1-2, JP4: 1-2, JP5: 1-2, JP6: 1-2,
+    JP7: 1-2, JP8: 1-2, JP9: 2-3, JP10: 2-3, JP11: 2-3, JP12: 1-2,
+    JP13: 2-3, JP14: 1-2, JP15: 2-3, JP16: 1-2, JP17: 1-2,
+    JP18: 2-3, JP19: 1-2, JP20: 2-3, JP21: 1-2, JP22: 1-2,
+    JP23: 2-3, JP24: 2-3
+*/
+
+ROM_START( kokoroj )
+	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
+	ROM_LOAD_x8( "epr-15524a.ic8",     0x000000,  0x20000, CRC(3b4cc0cf) SHA1(2536c67ac4255cdb6988d37f48f91ad272aebb4f) )
+	ROM_LOAD16_BYTE( "epr-15521a.ic18", 0x100000, 0x80000, CRC(24c02cf9) SHA1(d2ab8a47ff6541d2a6be7ce50784b8c9a3a215be) )
+	ROM_LOAD16_BYTE( "epr-15520a.ic9",  0x100001, 0x80000, CRC(bfbae875) SHA1(340c1e07eeb8e15448f82b87cc749d66086130ab) )
+
+	ROM_REGION( 0x400000, "mainpcb:soundcpu", 0 )
+	ROM_LOAD_x8( "epr-15523.ic36", 0x000000, 0x020000, CRC(b3b9d29c) SHA1(22acd747540e8c4558ec5eaeda1aaab68f84a6e2) )
+	ROM_LOAD_x2( "mpr-15522.ic35", 0x100000, 0x080000, CRC(fb68a351) SHA1(f307c0e4f33786630e8baddbb8c0a5e0f956de76) )
+	// IC24 & IC34 are not populated
+
+	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "mpr-15526.ic14", 0x000000, 0x100000, CRC(f6907c13) SHA1(d3f65dd02d7cee0fd2f422ba6a54164b2a2b8303) )
+	ROM_LOAD16_BYTE( "mpr-15525.ic5",  0x000001, 0x100000, CRC(8c0c876f) SHA1(e5335fa7a3e4a0e1d79fc7612bf4aaa50224f4ca) )
+
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 )
+	ROM_LOAD64_WORD( "mpr-15527.ic32", 0x000000, 0x200000, CRC(132f91c6) SHA1(0f854b173bdebfb642dba3b58a307d0e3a157c85) )
+	ROM_LOAD64_WORD( "mpr-15529.ic30", 0x000002, 0x200000, CRC(c1b826f7) SHA1(00051762074cdcf62b07cea6c744244b11ebf1b1) )
+	ROM_LOAD64_WORD( "mpr-15531.ic28", 0x000004, 0x200000, CRC(d624e05f) SHA1(f19f173aaeb04a59ab7fe89a3490d1d7c13c77a0) )
+	ROM_LOAD64_WORD( "mpr-15533.ic26", 0x000006, 0x200000, CRC(aff0e9a8) SHA1(5ced176cfef65426e2b4a3b990a319fdceaa9162) )
+	ROM_LOAD64_WORD( "mpr-15528.ic31", 0x800000, 0x200000, CRC(2e4bc090) SHA1(67d464ea078a19ae303b2b60f4ab0abd71aea85c) )
+	ROM_LOAD64_WORD( "mpr-15530.ic29", 0x800002, 0x200000, CRC(307877a8) SHA1(0104a51349f745a9fb7cc238a832ef6abeec2025) )
+	ROM_LOAD64_WORD( "mpr-15532.ic27", 0x800004, 0x200000, CRC(923ba3e5) SHA1(d26c55e7021c81b5fdaa9fadee20db30f6677981) )
+	ROM_LOAD64_WORD( "mpr-15534.ic25", 0x800006, 0x200000, CRC(4fa5c56d) SHA1(52926bef0f21ef17dc9d49e3137712bf6d8c29af) )
+
+	// Audio CD
+	DISK_REGION( "mainpcb:scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_IMAGE_READONLY( "kokoroj", 0, NO_DUMP )
 ROM_END
 
 
@@ -4351,14 +4347,14 @@ ROM_START( kokoroj2 )
 	ROM_LOAD16_BYTE( "mpr-16187.ic5",  0x000001, 0x200000, CRC(98b62f8b) SHA1(eaf98efd9eac7b7c385138a8a4dbc94b0ca38df5) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-16189.ic32", 0x000000, 0x200000, CRC(0937f713) SHA1(4b2b09ec8ed97794ad3824d1c57eae7f7e01379c) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16191.ic30", 0x000002, 0x200000, CRC(cfef4aaa) SHA1(bc8a252dcbdb8facdd91eda7aed0f56fe7529d15) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16193.ic28", 0x000004, 0x200000, CRC(a0706e4e) SHA1(1f36d952971c05db4190b229aa4957db3e5224f1) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16195.ic26", 0x000006, 0x200000, CRC(a4ddcd61) SHA1(90ef40f1fc84d1e4d4f78c33b8f0d1f56e04bf90) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16190.ic31", 0x800000, 0x200000, CRC(528d408e) SHA1(89f8a2cfc8b59377d6a65555c3172e457b131502) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16192.ic29", 0x800002, 0x200000, CRC(efaa93d1) SHA1(2947eaf7fc358ced1c04e7abe7a3f3066c73f2d0) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16194.ic27", 0x800004, 0x200000, CRC(39b5efe7) SHA1(2039909a2dd46951d442f1b6377f365525f9f2f1) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16196.ic25", 0x800006, 0x200000, CRC(b8e22e05) SHA1(dd667e2c5d421cba356421825e6aca9b5ca0af45) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-16189.ic32", 0x000000, 0x200000, CRC(0937f713) SHA1(4b2b09ec8ed97794ad3824d1c57eae7f7e01379c) )
+	ROM_LOAD64_WORD( "mpr-16191.ic30", 0x000002, 0x200000, CRC(cfef4aaa) SHA1(bc8a252dcbdb8facdd91eda7aed0f56fe7529d15) )
+	ROM_LOAD64_WORD( "mpr-16193.ic28", 0x000004, 0x200000, CRC(a0706e4e) SHA1(1f36d952971c05db4190b229aa4957db3e5224f1) )
+	ROM_LOAD64_WORD( "mpr-16195.ic26", 0x000006, 0x200000, CRC(a4ddcd61) SHA1(90ef40f1fc84d1e4d4f78c33b8f0d1f56e04bf90) )
+	ROM_LOAD64_WORD( "mpr-16190.ic31", 0x800000, 0x200000, CRC(528d408e) SHA1(89f8a2cfc8b59377d6a65555c3172e457b131502) )
+	ROM_LOAD64_WORD( "mpr-16192.ic29", 0x800002, 0x200000, CRC(efaa93d1) SHA1(2947eaf7fc358ced1c04e7abe7a3f3066c73f2d0) )
+	ROM_LOAD64_WORD( "mpr-16194.ic27", 0x800004, 0x200000, CRC(39b5efe7) SHA1(2039909a2dd46951d442f1b6377f365525f9f2f1) )
+	ROM_LOAD64_WORD( "mpr-16196.ic25", 0x800006, 0x200000, CRC(b8e22e05) SHA1(dd667e2c5d421cba356421825e6aca9b5ca0af45) )
 
 	/* AUDIO CD */
 	DISK_REGION( "mainpcb:scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -4381,31 +4377,31 @@ ROM_END
 */
 ROM_START( orunners )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code */
-	ROM_LOAD32_WORD_x4( "epr15620.ic37", 0x000000, 0x020000, CRC(84f5ad92) SHA1(1f9cb04b42b2d450be93400d9979a7910eaf05d1) )
-	ROM_LOAD32_WORD_x4( "epr15621.ic40", 0x000002, 0x020000, CRC(d98b765a) SHA1(b58567e976228267a86af53de2135bc0b247a44a) )
-	ROM_LOAD32_WORD( "mpr15538.ic36",   0x100000, 0x080000, CRC(93958820) SHA1(e19b6f18a5707dbb64ae009d63c05eac5bac4a81) )
-	ROM_LOAD32_WORD( "mpr15539.ic39",   0x100002, 0x080000, CRC(219760fa) SHA1(bd62a83de9c9542f6da454a87dc4947492f65c52) )
+	ROM_LOAD32_WORD_x4( "epr-15620.ic37", 0x000000, 0x020000, CRC(84f5ad92) SHA1(1f9cb04b42b2d450be93400d9979a7910eaf05d1) )
+	ROM_LOAD32_WORD_x4( "epr-15621.ic40", 0x000002, 0x020000, CRC(d98b765a) SHA1(b58567e976228267a86af53de2135bc0b247a44a) )
+	ROM_LOAD32_WORD( "mpr-15538.ic36",    0x100000, 0x080000, CRC(93958820) SHA1(e19b6f18a5707dbb64ae009d63c05eac5bac4a81) )
+	ROM_LOAD32_WORD( "mpr-15539.ic39",    0x100002, 0x080000, CRC(219760fa) SHA1(bd62a83de9c9542f6da454a87dc4947492f65c52) )
 
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "epr15550.ic31", 0x00000, 0x80000, CRC(0205d2ed) SHA1(3475479e1a45fe96eefbe53842758898db7accbf) )
+	ROM_LOAD( "epr-15550.ic31", 0x00000, 0x80000, CRC(0205d2ed) SHA1(3475479e1a45fe96eefbe53842758898db7accbf) )
 
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD16_BYTE( "mpr15548.ic3", 0x000000, 0x200000, CRC(b6470a66) SHA1(e1544590c02d41f62f82a4d771b893fb0f2734c7) )
-	ROM_LOAD16_BYTE( "mpr15549.ic11", 0x000001, 0x200000, CRC(81d12520) SHA1(1555893941e832f00ad3d0b3ad0c34a0d3a1c58a) )
+	ROM_LOAD16_BYTE( "mpr-15548.ic3", 0x000000, 0x200000, CRC(b6470a66) SHA1(e1544590c02d41f62f82a4d771b893fb0f2734c7) )
+	ROM_LOAD16_BYTE( "mpr-15549.ic11", 0x000001, 0x200000, CRC(81d12520) SHA1(1555893941e832f00ad3d0b3ad0c34a0d3a1c58a) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr15540.ic14", 0x000000, 0x200000, CRC(a10d72b4) SHA1(6d9d5e20be6721b53ce49df4d5a1bbd91f5b3aed) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15542.ic15", 0x000002, 0x200000, CRC(40952374) SHA1(c669ef52508bc2f49cf812dc86ac98fb535471fa) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15544.ic10", 0x000004, 0x200000, CRC(39e3df45) SHA1(38a7b21617b45613b05509dda388f8f7770b186c) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15546.ic38", 0x000006, 0x200000, CRC(e3fcc12c) SHA1(1cf7e05c7873f68789a27a91cddf471df40d7907) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15541.ic22", 0x800000, 0x200000, CRC(a2003c2d) SHA1(200a2c7d78d3f5f28909267fdcdbddd58c5f5fa2) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15543.ic23", 0x800002, 0x200000, CRC(933e8e7b) SHA1(0d53286f524f47851a483569dc37e9f6d34cc5f4) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15545.ic18", 0x800004, 0x200000, CRC(53dd0235) SHA1(4aee5ae1820ff933b6bd8a54bdbf989c0bc95c1a) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15547.ic41", 0x800006, 0x200000, CRC(edcb2a43) SHA1(f0bcfcc749ca0267f85bf9838164869912944d00) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15540.ic14", 0x000000, 0x200000, CRC(a10d72b4) SHA1(6d9d5e20be6721b53ce49df4d5a1bbd91f5b3aed) )
+	ROM_LOAD64_WORD( "mpr-15542.ic15", 0x000002, 0x200000, CRC(40952374) SHA1(c669ef52508bc2f49cf812dc86ac98fb535471fa) )
+	ROM_LOAD64_WORD( "mpr-15544.ic10", 0x000004, 0x200000, CRC(39e3df45) SHA1(38a7b21617b45613b05509dda388f8f7770b186c) )
+	ROM_LOAD64_WORD( "mpr-15546.ic38", 0x000006, 0x200000, CRC(e3fcc12c) SHA1(1cf7e05c7873f68789a27a91cddf471df40d7907) )
+	ROM_LOAD64_WORD( "mpr-15541.ic22", 0x800000, 0x200000, CRC(a2003c2d) SHA1(200a2c7d78d3f5f28909267fdcdbddd58c5f5fa2) )
+	ROM_LOAD64_WORD( "mpr-15543.ic23", 0x800002, 0x200000, CRC(933e8e7b) SHA1(0d53286f524f47851a483569dc37e9f6d34cc5f4) )
+	ROM_LOAD64_WORD( "mpr-15545.ic18", 0x800004, 0x200000, CRC(53dd0235) SHA1(4aee5ae1820ff933b6bd8a54bdbf989c0bc95c1a) )
+	ROM_LOAD64_WORD( "mpr-15547.ic41", 0x800006, 0x200000, CRC(edcb2a43) SHA1(f0bcfcc749ca0267f85bf9838164869912944d00) )
 
 	ROM_REGION( 0x400000, "mainpcb:sega", 0 ) /* Sega PCM sound data */
-	ROM_LOAD( "mpr15551.ic1", 0x000000, 0x200000, CRC(4894bc73) SHA1(351f5c03fb430fd87df915dfe3a377b5ada622c4) )
-	ROM_LOAD( "mpr15552.ic2", 0x200000, 0x200000, CRC(1c4b5e73) SHA1(50a8e9a200575a3522a51bf094aa0e87b90bb0a3) )
+	ROM_LOAD( "mpr-15551.ic1", 0x000000, 0x200000, CRC(4894bc73) SHA1(351f5c03fb430fd87df915dfe3a377b5ada622c4) )
+	ROM_LOAD( "mpr-15552.ic2", 0x200000, 0x200000, CRC(1c4b5e73) SHA1(50a8e9a200575a3522a51bf094aa0e87b90bb0a3) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -4419,31 +4415,31 @@ ROM_END
 */
 ROM_START( orunnersu )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code */
-	ROM_LOAD32_WORD_x4( "epr15618.ic37", 0x000000, 0x020000, CRC(25647f76) SHA1(9f882921ebb2f078350295c322b263f75812c053) )
-	ROM_LOAD32_WORD_x4( "epr15619.ic40", 0x000002, 0x020000, CRC(2a558f95) SHA1(616ec0a7b251da61a49b933c58895b1a4d39417a) )
-	ROM_LOAD32_WORD( "mpr15538.ic36",   0x100000, 0x080000, CRC(93958820) SHA1(e19b6f18a5707dbb64ae009d63c05eac5bac4a81) )
-	ROM_LOAD32_WORD( "mpr15539.ic39",   0x100002, 0x080000, CRC(219760fa) SHA1(bd62a83de9c9542f6da454a87dc4947492f65c52) )
+	ROM_LOAD32_WORD_x4( "epr-15618.ic37", 0x000000, 0x020000, CRC(25647f76) SHA1(9f882921ebb2f078350295c322b263f75812c053) )
+	ROM_LOAD32_WORD_x4( "epr-15619.ic40", 0x000002, 0x020000, CRC(2a558f95) SHA1(616ec0a7b251da61a49b933c58895b1a4d39417a) )
+	ROM_LOAD32_WORD( "mpr-15538.ic36",    0x100000, 0x080000, CRC(93958820) SHA1(e19b6f18a5707dbb64ae009d63c05eac5bac4a81) )
+	ROM_LOAD32_WORD( "mpr-15539.ic39",    0x100002, 0x080000, CRC(219760fa) SHA1(bd62a83de9c9542f6da454a87dc4947492f65c52) )
 
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "epr15550.ic31", 0x00000, 0x80000, CRC(0205d2ed) SHA1(3475479e1a45fe96eefbe53842758898db7accbf) )
+	ROM_LOAD( "epr-15550.ic31", 0x00000, 0x80000, CRC(0205d2ed) SHA1(3475479e1a45fe96eefbe53842758898db7accbf) )
 
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD16_BYTE( "mpr15548.ic3", 0x000000, 0x200000, CRC(b6470a66) SHA1(e1544590c02d41f62f82a4d771b893fb0f2734c7) )
-	ROM_LOAD16_BYTE( "mpr15549.ic11", 0x000001, 0x200000, CRC(81d12520) SHA1(1555893941e832f00ad3d0b3ad0c34a0d3a1c58a) )
+	ROM_LOAD16_BYTE( "mpr-15548.ic3", 0x000000, 0x200000, CRC(b6470a66) SHA1(e1544590c02d41f62f82a4d771b893fb0f2734c7) )
+	ROM_LOAD16_BYTE( "mpr-15549.ic11", 0x000001, 0x200000, CRC(81d12520) SHA1(1555893941e832f00ad3d0b3ad0c34a0d3a1c58a) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr15540.ic14", 0x000000, 0x200000, CRC(a10d72b4) SHA1(6d9d5e20be6721b53ce49df4d5a1bbd91f5b3aed) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15542.ic15", 0x000002, 0x200000, CRC(40952374) SHA1(c669ef52508bc2f49cf812dc86ac98fb535471fa) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15544.ic10", 0x000004, 0x200000, CRC(39e3df45) SHA1(38a7b21617b45613b05509dda388f8f7770b186c) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15546.ic38", 0x000006, 0x200000, CRC(e3fcc12c) SHA1(1cf7e05c7873f68789a27a91cddf471df40d7907) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15541.ic22", 0x800000, 0x200000, CRC(a2003c2d) SHA1(200a2c7d78d3f5f28909267fdcdbddd58c5f5fa2) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15543.ic23", 0x800002, 0x200000, CRC(933e8e7b) SHA1(0d53286f524f47851a483569dc37e9f6d34cc5f4) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15545.ic18", 0x800004, 0x200000, CRC(53dd0235) SHA1(4aee5ae1820ff933b6bd8a54bdbf989c0bc95c1a) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15547.ic41", 0x800006, 0x200000, CRC(edcb2a43) SHA1(f0bcfcc749ca0267f85bf9838164869912944d00) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15540.ic14", 0x000000, 0x200000, CRC(a10d72b4) SHA1(6d9d5e20be6721b53ce49df4d5a1bbd91f5b3aed) )
+	ROM_LOAD64_WORD( "mpr-15542.ic15", 0x000002, 0x200000, CRC(40952374) SHA1(c669ef52508bc2f49cf812dc86ac98fb535471fa) )
+	ROM_LOAD64_WORD( "mpr-15544.ic10", 0x000004, 0x200000, CRC(39e3df45) SHA1(38a7b21617b45613b05509dda388f8f7770b186c) )
+	ROM_LOAD64_WORD( "mpr-15546.ic38", 0x000006, 0x200000, CRC(e3fcc12c) SHA1(1cf7e05c7873f68789a27a91cddf471df40d7907) )
+	ROM_LOAD64_WORD( "mpr-15541.ic22", 0x800000, 0x200000, CRC(a2003c2d) SHA1(200a2c7d78d3f5f28909267fdcdbddd58c5f5fa2) )
+	ROM_LOAD64_WORD( "mpr-15543.ic23", 0x800002, 0x200000, CRC(933e8e7b) SHA1(0d53286f524f47851a483569dc37e9f6d34cc5f4) )
+	ROM_LOAD64_WORD( "mpr-15545.ic18", 0x800004, 0x200000, CRC(53dd0235) SHA1(4aee5ae1820ff933b6bd8a54bdbf989c0bc95c1a) )
+	ROM_LOAD64_WORD( "mpr-15547.ic41", 0x800006, 0x200000, CRC(edcb2a43) SHA1(f0bcfcc749ca0267f85bf9838164869912944d00) )
 
 	ROM_REGION( 0x400000, "mainpcb:sega", 0 ) /* Sega PCM sound data */
-	ROM_LOAD( "mpr15551.ic1", 0x000000, 0x200000, CRC(4894bc73) SHA1(351f5c03fb430fd87df915dfe3a377b5ada622c4) )
-	ROM_LOAD( "mpr15552.ic2", 0x200000, 0x200000, CRC(1c4b5e73) SHA1(50a8e9a200575a3522a51bf094aa0e87b90bb0a3) )
+	ROM_LOAD( "mpr-15551.ic1", 0x000000, 0x200000, CRC(4894bc73) SHA1(351f5c03fb430fd87df915dfe3a377b5ada622c4) )
+	ROM_LOAD( "mpr-15552.ic2", 0x200000, 0x200000, CRC(1c4b5e73) SHA1(50a8e9a200575a3522a51bf094aa0e87b90bb0a3) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -4457,31 +4453,31 @@ ROM_END
 */
 ROM_START( orunnersj )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code */
-	ROM_LOAD32_WORD_x4( "epr15616.ic37", 0x000000, 0x020000, CRC(fb550545) SHA1(2f2c36843b115f5417e1f2ccd4a34ebf91265190) ) /* Need to verify the EPR numbers */
-	ROM_LOAD32_WORD_x4( "epr15617.ic40", 0x000002, 0x020000, CRC(6bb741e0) SHA1(d92087a2c0b6de4287e569eecf9758615a85d1eb) ) /* Need to verify the EPR numbers */
-	ROM_LOAD32_WORD( "mpr15538.ic36",   0x100000, 0x080000, CRC(93958820) SHA1(e19b6f18a5707dbb64ae009d63c05eac5bac4a81) )
-	ROM_LOAD32_WORD( "mpr15539.ic39",   0x100002, 0x080000, CRC(219760fa) SHA1(bd62a83de9c9542f6da454a87dc4947492f65c52) )
+	ROM_LOAD32_WORD_x4( "epr-15616.ic37", 0x000000, 0x020000, CRC(fb550545) SHA1(2f2c36843b115f5417e1f2ccd4a34ebf91265190) ) /* Need to verify the EPR numbers */
+	ROM_LOAD32_WORD_x4( "epr-15617.ic40", 0x000002, 0x020000, CRC(6bb741e0) SHA1(d92087a2c0b6de4287e569eecf9758615a85d1eb) ) /* Need to verify the EPR numbers */
+	ROM_LOAD32_WORD( "mpr-15538.ic36",    0x100000, 0x080000, CRC(93958820) SHA1(e19b6f18a5707dbb64ae009d63c05eac5bac4a81) )
+	ROM_LOAD32_WORD( "mpr-15539.ic39",    0x100002, 0x080000, CRC(219760fa) SHA1(bd62a83de9c9542f6da454a87dc4947492f65c52) )
 
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "epr15550.ic31", 0x00000, 0x80000, CRC(0205d2ed) SHA1(3475479e1a45fe96eefbe53842758898db7accbf) )
+	ROM_LOAD( "epr-15550.ic31", 0x00000, 0x80000, CRC(0205d2ed) SHA1(3475479e1a45fe96eefbe53842758898db7accbf) )
 
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD16_BYTE( "mpr15548.ic3", 0x000000, 0x200000, CRC(b6470a66) SHA1(e1544590c02d41f62f82a4d771b893fb0f2734c7) )
-	ROM_LOAD16_BYTE( "mpr15549.ic11", 0x000001, 0x200000, CRC(81d12520) SHA1(1555893941e832f00ad3d0b3ad0c34a0d3a1c58a) )
+	ROM_LOAD16_BYTE( "mpr-15548.ic3", 0x000000, 0x200000, CRC(b6470a66) SHA1(e1544590c02d41f62f82a4d771b893fb0f2734c7) )
+	ROM_LOAD16_BYTE( "mpr-15549.ic11", 0x000001, 0x200000, CRC(81d12520) SHA1(1555893941e832f00ad3d0b3ad0c34a0d3a1c58a) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr15540.ic14", 0x000000, 0x200000, CRC(a10d72b4) SHA1(6d9d5e20be6721b53ce49df4d5a1bbd91f5b3aed) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15542.ic15", 0x000002, 0x200000, CRC(40952374) SHA1(c669ef52508bc2f49cf812dc86ac98fb535471fa) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15544.ic10", 0x000004, 0x200000, CRC(39e3df45) SHA1(38a7b21617b45613b05509dda388f8f7770b186c) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15546.ic38", 0x000006, 0x200000, CRC(e3fcc12c) SHA1(1cf7e05c7873f68789a27a91cddf471df40d7907) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15541.ic22", 0x800000, 0x200000, CRC(a2003c2d) SHA1(200a2c7d78d3f5f28909267fdcdbddd58c5f5fa2) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15543.ic23", 0x800002, 0x200000, CRC(933e8e7b) SHA1(0d53286f524f47851a483569dc37e9f6d34cc5f4) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15545.ic18", 0x800004, 0x200000, CRC(53dd0235) SHA1(4aee5ae1820ff933b6bd8a54bdbf989c0bc95c1a) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr15547.ic41", 0x800006, 0x200000, CRC(edcb2a43) SHA1(f0bcfcc749ca0267f85bf9838164869912944d00) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15540.ic14", 0x000000, 0x200000, CRC(a10d72b4) SHA1(6d9d5e20be6721b53ce49df4d5a1bbd91f5b3aed) )
+	ROM_LOAD64_WORD( "mpr-15542.ic15", 0x000002, 0x200000, CRC(40952374) SHA1(c669ef52508bc2f49cf812dc86ac98fb535471fa) )
+	ROM_LOAD64_WORD( "mpr-15544.ic10", 0x000004, 0x200000, CRC(39e3df45) SHA1(38a7b21617b45613b05509dda388f8f7770b186c) )
+	ROM_LOAD64_WORD( "mpr-15546.ic38", 0x000006, 0x200000, CRC(e3fcc12c) SHA1(1cf7e05c7873f68789a27a91cddf471df40d7907) )
+	ROM_LOAD64_WORD( "mpr-15541.ic22", 0x800000, 0x200000, CRC(a2003c2d) SHA1(200a2c7d78d3f5f28909267fdcdbddd58c5f5fa2) )
+	ROM_LOAD64_WORD( "mpr-15543.ic23", 0x800002, 0x200000, CRC(933e8e7b) SHA1(0d53286f524f47851a483569dc37e9f6d34cc5f4) )
+	ROM_LOAD64_WORD( "mpr-15545.ic18", 0x800004, 0x200000, CRC(53dd0235) SHA1(4aee5ae1820ff933b6bd8a54bdbf989c0bc95c1a) )
+	ROM_LOAD64_WORD( "mpr-15547.ic41", 0x800006, 0x200000, CRC(edcb2a43) SHA1(f0bcfcc749ca0267f85bf9838164869912944d00) )
 
 	ROM_REGION( 0x400000, "mainpcb:sega", 0 ) /* Sega PCM sound data */
-	ROM_LOAD( "mpr15551.ic1", 0x000000, 0x200000, CRC(4894bc73) SHA1(351f5c03fb430fd87df915dfe3a377b5ada622c4) )
-	ROM_LOAD( "mpr15552.ic2", 0x200000, 0x200000, CRC(1c4b5e73) SHA1(50a8e9a200575a3522a51bf094aa0e87b90bb0a3) )
+	ROM_LOAD( "mpr-15551.ic1", 0x000000, 0x200000, CRC(4894bc73) SHA1(351f5c03fb430fd87df915dfe3a377b5ada622c4) )
+	ROM_LOAD( "mpr-15552.ic2", 0x200000, 0x200000, CRC(1c4b5e73) SHA1(50a8e9a200575a3522a51bf094aa0e87b90bb0a3) )
 ROM_END
 
 
@@ -4531,14 +4527,14 @@ ROM_START( radm )
 	ROM_LOAD32_BYTE( "mpr-13522.ic18", 0x000003, 0x080000, CRC(25e04648) SHA1(617e794e8f7aa2a435bac917b8968699fe88dafb) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13514.ic16", 0x000003, 0x100000, CRC(d0f9ebd1) SHA1(510ebd3d7a52bcab2debea61591770d1dff172a1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13515.ic2",  0x000004, 0x100000, CRC(77bf2387) SHA1(7215dde5618e238edbe16b3007ede790785fe25f) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13516.ic6",  0x000005, 0x100000, CRC(8c4bc62d) SHA1(3206f623ec0b7558413d063404103b183f26b488) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13517.ic11", 0x000006, 0x100000, CRC(1d7d84a7) SHA1(954cfccfc7250a5bead2eeba42e655d5ac82955f) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13518.ic17", 0x000007, 0x100000, CRC(9ea4b15d) SHA1(7dcfd6d42bb945beca8344cf92e7bd53903a824b) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) )
+	ROM_LOAD64_BYTE( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) )
+	ROM_LOAD64_BYTE( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) )
+	ROM_LOAD64_BYTE( "mpr-13514.ic16", 0x000003, 0x100000, CRC(d0f9ebd1) SHA1(510ebd3d7a52bcab2debea61591770d1dff172a1) )
+	ROM_LOAD64_BYTE( "mpr-13515.ic2",  0x000004, 0x100000, CRC(77bf2387) SHA1(7215dde5618e238edbe16b3007ede790785fe25f) )
+	ROM_LOAD64_BYTE( "mpr-13516.ic6",  0x000005, 0x100000, CRC(8c4bc62d) SHA1(3206f623ec0b7558413d063404103b183f26b488) )
+	ROM_LOAD64_BYTE( "mpr-13517.ic11", 0x000006, 0x100000, CRC(1d7d84a7) SHA1(954cfccfc7250a5bead2eeba42e655d5ac82955f) )
+	ROM_LOAD64_BYTE( "mpr-13518.ic17", 0x000007, 0x100000, CRC(9ea4b15d) SHA1(7dcfd6d42bb945beca8344cf92e7bd53903a824b) )
 
 	ROM_REGION( 0x8000, "user2", 0 ) /* unused (cabinet motor?) */
 	ROM_LOAD( "epr-13686.bin", 0x00000, 0x8000, CRC(317a2857) SHA1(e0788dc7a7d214d9c4d26b24e44c1a0dc9ae477c) ) /* cabinet movement */
@@ -4570,14 +4566,14 @@ ROM_START( radmu )
 	ROM_LOAD32_BYTE( "mpr-13522.ic18", 0x000003, 0x080000, CRC(25e04648) SHA1(617e794e8f7aa2a435bac917b8968699fe88dafb) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13514.ic16", 0x000003, 0x100000, CRC(d0f9ebd1) SHA1(510ebd3d7a52bcab2debea61591770d1dff172a1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13515.ic2",  0x000004, 0x100000, CRC(77bf2387) SHA1(7215dde5618e238edbe16b3007ede790785fe25f) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13516.ic6",  0x000005, 0x100000, CRC(8c4bc62d) SHA1(3206f623ec0b7558413d063404103b183f26b488) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13517.ic11", 0x000006, 0x100000, CRC(1d7d84a7) SHA1(954cfccfc7250a5bead2eeba42e655d5ac82955f) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13518.ic17", 0x000007, 0x100000, CRC(9ea4b15d) SHA1(7dcfd6d42bb945beca8344cf92e7bd53903a824b) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) )
+	ROM_LOAD64_BYTE( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) )
+	ROM_LOAD64_BYTE( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) )
+	ROM_LOAD64_BYTE( "mpr-13514.ic16", 0x000003, 0x100000, CRC(d0f9ebd1) SHA1(510ebd3d7a52bcab2debea61591770d1dff172a1) )
+	ROM_LOAD64_BYTE( "mpr-13515.ic2",  0x000004, 0x100000, CRC(77bf2387) SHA1(7215dde5618e238edbe16b3007ede790785fe25f) )
+	ROM_LOAD64_BYTE( "mpr-13516.ic6",  0x000005, 0x100000, CRC(8c4bc62d) SHA1(3206f623ec0b7558413d063404103b183f26b488) )
+	ROM_LOAD64_BYTE( "mpr-13517.ic11", 0x000006, 0x100000, CRC(1d7d84a7) SHA1(954cfccfc7250a5bead2eeba42e655d5ac82955f) )
+	ROM_LOAD64_BYTE( "mpr-13518.ic17", 0x000007, 0x100000, CRC(9ea4b15d) SHA1(7dcfd6d42bb945beca8344cf92e7bd53903a824b) )
 
 	ROM_REGION( 0x8000, "user2", 0 ) /* unused (cabinet motor?) */
 	ROM_LOAD( "epr-13686.bin", 0x00000, 0x8000, CRC(317a2857) SHA1(e0788dc7a7d214d9c4d26b24e44c1a0dc9ae477c) ) /* cabinet movement */
@@ -4607,9 +4603,9 @@ ROM_START( radr )
 
 	ROM_REGION( 0x400000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x8( "epr-14108.ic9",  0x000000, 0x020000, CRC(38a99b4d) SHA1(b6455e6b29bfef41c5e0ebe3a8064889b7e5f5fd) )
-	ROM_LOAD_x2( "epr-14109.ic14", 0x100000, 0x080000, CRC(b42e5833) SHA1(da94ce7c1d7a581a1aa6b79b323c67a919918808) )
-	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(b495e7dc) SHA1(b4143fcee10e0649378fdb1e3f5a0a2c585414ec) )
-	ROM_LOAD_x2( "epr-14237.ic22", 0x300000, 0x080000, CRC(0a4b4b29) SHA1(98447a587f903ba03e17d6a145b7c8bfddf25c4d) )
+	ROM_LOAD_x2( "epr-14109.ic14", 0x100000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) // same as radm, but different epr code
+	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) ) // same as radm, but different epr code
+	ROM_LOAD_x2( "epr-14237.ic22", 0x300000, 0x080000, CRC(0a4b4b29) SHA1(98447a587f903ba03e17d6a145b7c8bfddf25c4d) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "epr-14102.ic3",  0x000000, 0x040000, CRC(5626e80f) SHA1(9844817295a8cd8a9b09da6681b0c1fbfe82618e) )
@@ -4618,14 +4614,14 @@ ROM_START( radr )
 	ROM_LOAD32_BYTE( "epr-14105.ic18", 0x000003, 0x040000, CRC(614843b6) SHA1(d4f2cd3b024f7152d6e89237f0da06adea2efe57) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13514.ic16", 0x000003, 0x100000, CRC(d0f9ebd1) SHA1(510ebd3d7a52bcab2debea61591770d1dff172a1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13515.ic2",  0x000004, 0x100000, CRC(77bf2387) SHA1(7215dde5618e238edbe16b3007ede790785fe25f) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13516.ic6",  0x000005, 0x100000, CRC(8c4bc62d) SHA1(3206f623ec0b7558413d063404103b183f26b488) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13517.ic11", 0x000006, 0x100000, CRC(1d7d84a7) SHA1(954cfccfc7250a5bead2eeba42e655d5ac82955f) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13518.ic17", 0x000007, 0x100000, CRC(9ea4b15d) SHA1(7dcfd6d42bb945beca8344cf92e7bd53903a824b) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) )
+	ROM_LOAD64_BYTE( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) )
+	ROM_LOAD64_BYTE( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) )
+	ROM_LOAD64_BYTE( "mpr-13514.ic16", 0x000003, 0x100000, CRC(d0f9ebd1) SHA1(510ebd3d7a52bcab2debea61591770d1dff172a1) )
+	ROM_LOAD64_BYTE( "mpr-13515.ic2",  0x000004, 0x100000, CRC(77bf2387) SHA1(7215dde5618e238edbe16b3007ede790785fe25f) )
+	ROM_LOAD64_BYTE( "mpr-13516.ic6",  0x000005, 0x100000, CRC(8c4bc62d) SHA1(3206f623ec0b7558413d063404103b183f26b488) )
+	ROM_LOAD64_BYTE( "mpr-13517.ic11", 0x000006, 0x100000, CRC(1d7d84a7) SHA1(954cfccfc7250a5bead2eeba42e655d5ac82955f) )
+	ROM_LOAD64_BYTE( "mpr-13518.ic17", 0x000007, 0x100000, CRC(9ea4b15d) SHA1(7dcfd6d42bb945beca8344cf92e7bd53903a824b) )
 
 	ROM_REGION( 0x8000, "user2", 0 ) /* unused */
 	ROM_LOAD( "epr-14084.17", 0x00000, 0x8000, CRC(f14ed074) SHA1(e1bb23eac85e3236046527c5c7688f6f23d43aef) ) /* cabinet link */
@@ -4652,8 +4648,8 @@ ROM_START( radru )
 
 	ROM_REGION( 0x400000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x8( "epr-14108.ic9",  0x000000, 0x020000, CRC(38a99b4d) SHA1(b6455e6b29bfef41c5e0ebe3a8064889b7e5f5fd) )
-	ROM_LOAD_x2( "epr-14109.ic14", 0x100000, 0x080000, CRC(b42e5833) SHA1(da94ce7c1d7a581a1aa6b79b323c67a919918808) )
-	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(b495e7dc) SHA1(b4143fcee10e0649378fdb1e3f5a0a2c585414ec) )
+	ROM_LOAD_x2( "epr-14109.ic14", 0x100000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) // same as radm, but different epr code
+	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) ) // same as radm, but different epr code
 	ROM_LOAD_x2( "epr-14237.ic22", 0x300000, 0x080000, CRC(0a4b4b29) SHA1(98447a587f903ba03e17d6a145b7c8bfddf25c4d) )
 
 	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
@@ -4663,14 +4659,14 @@ ROM_START( radru )
 	ROM_LOAD32_BYTE( "epr-14105.ic16", 0x000003, 0x040000, CRC(614843b6) SHA1(d4f2cd3b024f7152d6e89237f0da06adea2efe57) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13514.ic16", 0x000003, 0x100000, CRC(d0f9ebd1) SHA1(510ebd3d7a52bcab2debea61591770d1dff172a1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13515.ic2",  0x000004, 0x100000, CRC(77bf2387) SHA1(7215dde5618e238edbe16b3007ede790785fe25f) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13516.ic6",  0x000005, 0x100000, CRC(8c4bc62d) SHA1(3206f623ec0b7558413d063404103b183f26b488) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13517.ic11", 0x000006, 0x100000, CRC(1d7d84a7) SHA1(954cfccfc7250a5bead2eeba42e655d5ac82955f) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13518.ic17", 0x000007, 0x100000, CRC(9ea4b15d) SHA1(7dcfd6d42bb945beca8344cf92e7bd53903a824b) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) )
+	ROM_LOAD64_BYTE( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) )
+	ROM_LOAD64_BYTE( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) )
+	ROM_LOAD64_BYTE( "mpr-13514.ic16", 0x000003, 0x100000, CRC(d0f9ebd1) SHA1(510ebd3d7a52bcab2debea61591770d1dff172a1) )
+	ROM_LOAD64_BYTE( "mpr-13515.ic2",  0x000004, 0x100000, CRC(77bf2387) SHA1(7215dde5618e238edbe16b3007ede790785fe25f) )
+	ROM_LOAD64_BYTE( "mpr-13516.ic6",  0x000005, 0x100000, CRC(8c4bc62d) SHA1(3206f623ec0b7558413d063404103b183f26b488) )
+	ROM_LOAD64_BYTE( "mpr-13517.ic11", 0x000006, 0x100000, CRC(1d7d84a7) SHA1(954cfccfc7250a5bead2eeba42e655d5ac82955f) )
+	ROM_LOAD64_BYTE( "mpr-13518.ic17", 0x000007, 0x100000, CRC(9ea4b15d) SHA1(7dcfd6d42bb945beca8344cf92e7bd53903a824b) )
 
 	ROM_REGION( 0x8000, "user2", 0 ) /* unused */
 	ROM_LOAD( "epr-14084.17", 0x00000, 0x8000, CRC(f14ed074) SHA1(e1bb23eac85e3236046527c5c7688f6f23d43aef) ) /* cabinet link */
@@ -4697,8 +4693,8 @@ ROM_START( radrj )
 
 	ROM_REGION( 0x400000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x8( "epr-14108.ic9",  0x000000, 0x020000, CRC(38a99b4d) SHA1(b6455e6b29bfef41c5e0ebe3a8064889b7e5f5fd) )
-	ROM_LOAD_x2( "epr-14109.ic14", 0x100000, 0x080000, CRC(b42e5833) SHA1(da94ce7c1d7a581a1aa6b79b323c67a919918808) )
-	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(b495e7dc) SHA1(b4143fcee10e0649378fdb1e3f5a0a2c585414ec) )
+	ROM_LOAD_x2( "epr-14109.ic14", 0x100000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) // same as radm, but different epr code
+	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) ) // same as radm, but different epr code
 	ROM_LOAD_x2( "epr-14237.ic22", 0x300000, 0x080000, CRC(0a4b4b29) SHA1(98447a587f903ba03e17d6a145b7c8bfddf25c4d) )
 
 	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
@@ -4708,14 +4704,14 @@ ROM_START( radrj )
 	ROM_LOAD32_BYTE( "epr-14105.ic16", 0x000003, 0x040000, CRC(614843b6) SHA1(d4f2cd3b024f7152d6e89237f0da06adea2efe57) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13514.ic16", 0x000003, 0x100000, CRC(d0f9ebd1) SHA1(510ebd3d7a52bcab2debea61591770d1dff172a1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13515.ic2",  0x000004, 0x100000, CRC(77bf2387) SHA1(7215dde5618e238edbe16b3007ede790785fe25f) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13516.ic6",  0x000005, 0x100000, CRC(8c4bc62d) SHA1(3206f623ec0b7558413d063404103b183f26b488) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13517.ic11", 0x000006, 0x100000, CRC(1d7d84a7) SHA1(954cfccfc7250a5bead2eeba42e655d5ac82955f) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-13518.ic17", 0x000007, 0x100000, CRC(9ea4b15d) SHA1(7dcfd6d42bb945beca8344cf92e7bd53903a824b) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) )
+	ROM_LOAD64_BYTE( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) )
+	ROM_LOAD64_BYTE( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) )
+	ROM_LOAD64_BYTE( "mpr-13514.ic16", 0x000003, 0x100000, CRC(d0f9ebd1) SHA1(510ebd3d7a52bcab2debea61591770d1dff172a1) )
+	ROM_LOAD64_BYTE( "mpr-13515.ic2",  0x000004, 0x100000, CRC(77bf2387) SHA1(7215dde5618e238edbe16b3007ede790785fe25f) )
+	ROM_LOAD64_BYTE( "mpr-13516.ic6",  0x000005, 0x100000, CRC(8c4bc62d) SHA1(3206f623ec0b7558413d063404103b183f26b488) )
+	ROM_LOAD64_BYTE( "mpr-13517.ic11", 0x000006, 0x100000, CRC(1d7d84a7) SHA1(954cfccfc7250a5bead2eeba42e655d5ac82955f) )
+	ROM_LOAD64_BYTE( "mpr-13518.ic17", 0x000007, 0x100000, CRC(9ea4b15d) SHA1(7dcfd6d42bb945beca8344cf92e7bd53903a824b) )
 
 	ROM_REGION( 0x8000, "user2", 0 ) /* unused */
 	ROM_LOAD( "epr-14084.17", 0x00000, 0x8000, CRC(f14ed074) SHA1(e1bb23eac85e3236046527c5c7688f6f23d43aef) ) /* cabinet link */
@@ -4752,14 +4748,14 @@ ROM_START( slipstrm )
 	ROM_LOAD32_BYTE( "s32_scr03.ic25", 0x000003, 0x080000, CRC(4948604a) SHA1(d5a1b9781fef7976a59a0af9b755a04fcacf9381) )
 
 	ROM_REGION32_BE( 0x400000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "s32_obj00.ic36", 0x000000, 0x80000, CRC(cffe9e0d) SHA1(5272d54ff142de927a9abd61f3646e963c7d22c4) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj01.ic32", 0x000001, 0x80000, CRC(4ebd1383) SHA1(ce35f4d15e7904bfde55e58cdde925cba8002763) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj02.ic27", 0x000002, 0x80000, CRC(b3cf4fe2) SHA1(e13199522e1e3e8b9cfe72cc29b33f25dad542ef) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj03.ic23", 0x000003, 0x80000, CRC(c6345391) SHA1(155758097911ffca0c5c0b2a24a8033339dcfcbb) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj04.ic37", 0x000004, 0x80000, CRC(2de4288e) SHA1(8e794f79f506293edb7609187a7908516ce76849) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj05.ic33", 0x000005, 0x80000, CRC(6cfb74fb) SHA1(b74c886959910cd069427418525b23300a9b7b18) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj06.ic28", 0x000006, 0x80000, CRC(53234bf4) SHA1(1eca538dcb86e44c31310ab1ab42a2b66b69c8fe) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj07.ic24", 0x000007, 0x80000, CRC(22c129cf) SHA1(0f64680511a357038f6a556253c13fbb5417dd1a) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "s32_obj00.ic36", 0x000000, 0x80000, CRC(cffe9e0d) SHA1(5272d54ff142de927a9abd61f3646e963c7d22c4) )
+	ROM_LOAD64_BYTE( "s32_obj01.ic32", 0x000001, 0x80000, CRC(4ebd1383) SHA1(ce35f4d15e7904bfde55e58cdde925cba8002763) )
+	ROM_LOAD64_BYTE( "s32_obj02.ic27", 0x000002, 0x80000, CRC(b3cf4fe2) SHA1(e13199522e1e3e8b9cfe72cc29b33f25dad542ef) )
+	ROM_LOAD64_BYTE( "s32_obj03.ic23", 0x000003, 0x80000, CRC(c6345391) SHA1(155758097911ffca0c5c0b2a24a8033339dcfcbb) )
+	ROM_LOAD64_BYTE( "s32_obj04.ic37", 0x000004, 0x80000, CRC(2de4288e) SHA1(8e794f79f506293edb7609187a7908516ce76849) )
+	ROM_LOAD64_BYTE( "s32_obj05.ic33", 0x000005, 0x80000, CRC(6cfb74fb) SHA1(b74c886959910cd069427418525b23300a9b7b18) )
+	ROM_LOAD64_BYTE( "s32_obj06.ic28", 0x000006, 0x80000, CRC(53234bf4) SHA1(1eca538dcb86e44c31310ab1ab42a2b66b69c8fe) )
+	ROM_LOAD64_BYTE( "s32_obj07.ic24", 0x000007, 0x80000, CRC(22c129cf) SHA1(0f64680511a357038f6a556253c13fbb5417dd1a) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -4787,14 +4783,14 @@ ROM_START( slipstrmh )
 	ROM_LOAD32_BYTE( "s32_scr03.ic25", 0x000003, 0x080000, CRC(4948604a) SHA1(d5a1b9781fef7976a59a0af9b755a04fcacf9381) )
 
 	ROM_REGION32_BE( 0x400000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "s32_obj00.ic36", 0x000000, 0x80000, CRC(cffe9e0d) SHA1(5272d54ff142de927a9abd61f3646e963c7d22c4) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj01.ic32", 0x000001, 0x80000, CRC(4ebd1383) SHA1(ce35f4d15e7904bfde55e58cdde925cba8002763) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj02.ic27", 0x000002, 0x80000, CRC(b3cf4fe2) SHA1(e13199522e1e3e8b9cfe72cc29b33f25dad542ef) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj03.ic23", 0x000003, 0x80000, CRC(c6345391) SHA1(155758097911ffca0c5c0b2a24a8033339dcfcbb) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj04.ic37", 0x000004, 0x80000, CRC(2de4288e) SHA1(8e794f79f506293edb7609187a7908516ce76849) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj05.ic33", 0x000005, 0x80000, CRC(6cfb74fb) SHA1(b74c886959910cd069427418525b23300a9b7b18) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj06.ic28", 0x000006, 0x80000, CRC(53234bf4) SHA1(1eca538dcb86e44c31310ab1ab42a2b66b69c8fe) , ROM_SKIP(7) )
-	ROMX_LOAD( "s32_obj07.ic24", 0x000007, 0x80000, CRC(22c129cf) SHA1(0f64680511a357038f6a556253c13fbb5417dd1a) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "s32_obj00.ic36", 0x000000, 0x80000, CRC(cffe9e0d) SHA1(5272d54ff142de927a9abd61f3646e963c7d22c4) )
+	ROM_LOAD64_BYTE( "s32_obj01.ic32", 0x000001, 0x80000, CRC(4ebd1383) SHA1(ce35f4d15e7904bfde55e58cdde925cba8002763) )
+	ROM_LOAD64_BYTE( "s32_obj02.ic27", 0x000002, 0x80000, CRC(b3cf4fe2) SHA1(e13199522e1e3e8b9cfe72cc29b33f25dad542ef) )
+	ROM_LOAD64_BYTE( "s32_obj03.ic23", 0x000003, 0x80000, CRC(c6345391) SHA1(155758097911ffca0c5c0b2a24a8033339dcfcbb) )
+	ROM_LOAD64_BYTE( "s32_obj04.ic37", 0x000004, 0x80000, CRC(2de4288e) SHA1(8e794f79f506293edb7609187a7908516ce76849) )
+	ROM_LOAD64_BYTE( "s32_obj05.ic33", 0x000005, 0x80000, CRC(6cfb74fb) SHA1(b74c886959910cd069427418525b23300a9b7b18) )
+	ROM_LOAD64_BYTE( "s32_obj06.ic28", 0x000006, 0x80000, CRC(53234bf4) SHA1(1eca538dcb86e44c31310ab1ab42a2b66b69c8fe) )
+	ROM_LOAD64_BYTE( "s32_obj07.ic24", 0x000007, 0x80000, CRC(22c129cf) SHA1(0f64680511a357038f6a556253c13fbb5417dd1a) )
 ROM_END
 
 
@@ -4826,18 +4822,18 @@ ROM_START( sonic )
 	ROM_LOAD16_BYTE( "mpr-15788.ic5",  0x000001, 0x100000, CRC(a6ed5d7a) SHA1(d30f26b452d380e7657e044e144f7dbbc4dc13e5) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15790.ic32", 0x000000, 0x200000, CRC(c69d51b1) SHA1(7644fb64457855f9ed87ca25ddc28c21bcb61fd9) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15792.ic30", 0x000002, 0x200000, CRC(1006bb67) SHA1(38c752e634aa94b1a23c09c4dba6388b7d0358af) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15794.ic28", 0x000004, 0x200000, CRC(8672b480) SHA1(61659e3856cdff0b2bca190a7e60c81b86ea2089) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15796.ic26", 0x000006, 0x200000, CRC(95b8011c) SHA1(ebc56ae49a76d04de60b0f81506769219a9885a7) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15790.ic32", 0x000000, 0x200000, CRC(c69d51b1) SHA1(7644fb64457855f9ed87ca25ddc28c21bcb61fd9) )
+	ROM_LOAD64_WORD( "mpr-15792.ic30", 0x000002, 0x200000, CRC(1006bb67) SHA1(38c752e634aa94b1a23c09c4dba6388b7d0358af) )
+	ROM_LOAD64_WORD( "mpr-15794.ic28", 0x000004, 0x200000, CRC(8672b480) SHA1(61659e3856cdff0b2bca190a7e60c81b86ea2089) )
+	ROM_LOAD64_WORD( "mpr-15796.ic26", 0x000006, 0x200000, CRC(95b8011c) SHA1(ebc56ae49a76d04de60b0f81506769219a9885a7) )
 
 	// NOTE: these last 4 are in fact 16 megabit ROMs,
 	// but they were dumped as 8 because the top half
 	// is "FF" in all of them.
-	ROMX_LOAD( "mpr-15791.ic31", 0x800000, 0x100000, CRC(42217066) SHA1(46d14c632da1bed02bc0a637e34ab9cbf356c5de) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15793.ic29", 0x800002, 0x100000, CRC(75bafe55) SHA1(ad33dae062c4bdf8d17d3f6f7c333aa2e7da260e) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15795.ic27", 0x800004, 0x100000, CRC(7f3dad30) SHA1(84be1c31df35e1c7fef77e83d6d135378789a1ef) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15797.ic25", 0x800006, 0x100000, CRC(013c6cab) SHA1(eb9b77d28815d2e225b0882706084a52b11c48ea) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15791.ic31", 0x800000, 0x100000, CRC(42217066) SHA1(46d14c632da1bed02bc0a637e34ab9cbf356c5de) )
+	ROM_LOAD64_WORD( "mpr-15793.ic29", 0x800002, 0x100000, CRC(75bafe55) SHA1(ad33dae062c4bdf8d17d3f6f7c333aa2e7da260e) )
+	ROM_LOAD64_WORD( "mpr-15795.ic27", 0x800004, 0x100000, CRC(7f3dad30) SHA1(84be1c31df35e1c7fef77e83d6d135378789a1ef) )
+	ROM_LOAD64_WORD( "mpr-15797.ic25", 0x800006, 0x100000, CRC(013c6cab) SHA1(eb9b77d28815d2e225b0882706084a52b11c48ea) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -4864,14 +4860,14 @@ ROM_START( sonicp )
 	ROM_LOAD32_BYTE( "sonscl3.bin", 0x000003, 0x080000, CRC(7ce7554b) SHA1(8def3acae6baafbe9e350f18e245a9a833df5cc4) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "sonobj0.bin", 0x000000, 0x100000, CRC(ceea18e3) SHA1(f902a7e2f8e126fd7a7862c55de32ce6352a7716) , ROM_SKIP(7) )
-	ROMX_LOAD( "sonobj1.bin", 0x000001, 0x100000, CRC(6bbc226b) SHA1(5ef4256b6a93891daf1349def6db3bc428e5f4f3) , ROM_SKIP(7) )
-	ROMX_LOAD( "sonobj2.bin", 0x000002, 0x100000, CRC(fcd5ef0e) SHA1(e3e50d4838ac3cce41d69ee6cd31981fbe422a4b) , ROM_SKIP(7) )
-	ROMX_LOAD( "sonobj3.bin", 0x000003, 0x100000, CRC(b99b42ab) SHA1(60d91dc4e8e0adc62809cd2e71833c658124fbfc) , ROM_SKIP(7) )
-	ROMX_LOAD( "sonobj4.bin", 0x000004, 0x100000, CRC(c7ec1456) SHA1(d866b9dff546bd6feb43e317328ac0a2324303b9) , ROM_SKIP(7) )
-	ROMX_LOAD( "sonobj5.bin", 0x000005, 0x100000, CRC(bd5da27f) SHA1(ab3043190a32b555513a29a70e01547daf698cf8) , ROM_SKIP(7) )
-	ROMX_LOAD( "sonobj6.bin", 0x000006, 0x100000, CRC(313c92d1) SHA1(a5134750667502811fd755cc0974a744cdb785e1) , ROM_SKIP(7) )
-	ROMX_LOAD( "sonobj7.bin", 0x000007, 0x100000, CRC(3784c507) SHA1(8ea58c52b09b84643218e26f1ec1fa0ea864346e) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "sonobj0.bin", 0x000000, 0x100000, CRC(ceea18e3) SHA1(f902a7e2f8e126fd7a7862c55de32ce6352a7716) )
+	ROM_LOAD64_BYTE( "sonobj1.bin", 0x000001, 0x100000, CRC(6bbc226b) SHA1(5ef4256b6a93891daf1349def6db3bc428e5f4f3) )
+	ROM_LOAD64_BYTE( "sonobj2.bin", 0x000002, 0x100000, CRC(fcd5ef0e) SHA1(e3e50d4838ac3cce41d69ee6cd31981fbe422a4b) )
+	ROM_LOAD64_BYTE( "sonobj3.bin", 0x000003, 0x100000, CRC(b99b42ab) SHA1(60d91dc4e8e0adc62809cd2e71833c658124fbfc) )
+	ROM_LOAD64_BYTE( "sonobj4.bin", 0x000004, 0x100000, CRC(c7ec1456) SHA1(d866b9dff546bd6feb43e317328ac0a2324303b9) )
+	ROM_LOAD64_BYTE( "sonobj5.bin", 0x000005, 0x100000, CRC(bd5da27f) SHA1(ab3043190a32b555513a29a70e01547daf698cf8) )
+	ROM_LOAD64_BYTE( "sonobj6.bin", 0x000006, 0x100000, CRC(313c92d1) SHA1(a5134750667502811fd755cc0974a744cdb785e1) )
+	ROM_LOAD64_BYTE( "sonobj7.bin", 0x000007, 0x100000, CRC(3784c507) SHA1(8ea58c52b09b84643218e26f1ec1fa0ea864346e) )
 ROM_END
 
 
@@ -4908,14 +4904,14 @@ ROM_START( spidman )
 	ROM_LOAD32_BYTE( "mpr-14288-s.ic25", 0x000003, 0x100000, CRC(3188b636) SHA1(bc0adeeca5040caa563ee1e0eded9c323ca23446) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14299-h.ic36", 0x000000, 0x100000, CRC(ce59231b) SHA1(bcb1f11b74935694d0617ec8df66db2cc57b6219) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14298-h.ic32", 0x000001, 0x100000, CRC(2745c84c) SHA1(5a0528c921cba7a1047d3a2ece79925103d719a1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14297-h.ic27", 0x000002, 0x100000, CRC(29cb9450) SHA1(7dc38d23a2f0cee2f4edde05c1a6f0dc83f331db) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14296-h.ic23", 0x000003, 0x100000, CRC(9d8cbd31) SHA1(55a9f9ec9029157da033e69664b58e694a28db47) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14295-h.ic37", 0x000004, 0x100000, CRC(29591f50) SHA1(1ac4ceaf74892e30f210ad77024eb441c5e4a959) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14294-h.ic33", 0x000005, 0x100000, CRC(fa86b794) SHA1(7b6907e5734fbf2fba7bcc213a8551fec5e9f3d5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14293-s.ic28", 0x000006, 0x100000, CRC(52899269) SHA1(ff809ff88701109e0ca79e785a61402d97335cec) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14292-s.ic24", 0x000007, 0x100000, CRC(41f71443) SHA1(351d40d6159cb5b792519bce5d16490965800cfb) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14299-h.ic36", 0x000000, 0x100000, CRC(ce59231b) SHA1(bcb1f11b74935694d0617ec8df66db2cc57b6219) )
+	ROM_LOAD64_BYTE( "mpr-14298-h.ic32", 0x000001, 0x100000, CRC(2745c84c) SHA1(5a0528c921cba7a1047d3a2ece79925103d719a1) )
+	ROM_LOAD64_BYTE( "mpr-14297-h.ic27", 0x000002, 0x100000, CRC(29cb9450) SHA1(7dc38d23a2f0cee2f4edde05c1a6f0dc83f331db) )
+	ROM_LOAD64_BYTE( "mpr-14296-h.ic23", 0x000003, 0x100000, CRC(9d8cbd31) SHA1(55a9f9ec9029157da033e69664b58e694a28db47) )
+	ROM_LOAD64_BYTE( "mpr-14295-h.ic37", 0x000004, 0x100000, CRC(29591f50) SHA1(1ac4ceaf74892e30f210ad77024eb441c5e4a959) )
+	ROM_LOAD64_BYTE( "mpr-14294-h.ic33", 0x000005, 0x100000, CRC(fa86b794) SHA1(7b6907e5734fbf2fba7bcc213a8551fec5e9f3d5) )
+	ROM_LOAD64_BYTE( "mpr-14293-s.ic28", 0x000006, 0x100000, CRC(52899269) SHA1(ff809ff88701109e0ca79e785a61402d97335cec) )
+	ROM_LOAD64_BYTE( "mpr-14292-s.ic24", 0x000007, 0x100000, CRC(41f71443) SHA1(351d40d6159cb5b792519bce5d16490965800cfb) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -4950,14 +4946,14 @@ ROM_START( spidmanu )
 	ROM_LOAD32_BYTE( "mpr-14288-s.ic25", 0x000003, 0x100000, CRC(3188b636) SHA1(bc0adeeca5040caa563ee1e0eded9c323ca23446) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14299-h.ic36", 0x000000, 0x100000, CRC(ce59231b) SHA1(bcb1f11b74935694d0617ec8df66db2cc57b6219) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14298-h.ic32", 0x000001, 0x100000, CRC(2745c84c) SHA1(5a0528c921cba7a1047d3a2ece79925103d719a1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14297-h.ic27", 0x000002, 0x100000, CRC(29cb9450) SHA1(7dc38d23a2f0cee2f4edde05c1a6f0dc83f331db) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14296-h.ic23", 0x000003, 0x100000, CRC(9d8cbd31) SHA1(55a9f9ec9029157da033e69664b58e694a28db47) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14295-h.ic37", 0x000004, 0x100000, CRC(29591f50) SHA1(1ac4ceaf74892e30f210ad77024eb441c5e4a959) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14294-h.ic33", 0x000005, 0x100000, CRC(fa86b794) SHA1(7b6907e5734fbf2fba7bcc213a8551fec5e9f3d5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14293-s.ic28", 0x000006, 0x100000, CRC(52899269) SHA1(ff809ff88701109e0ca79e785a61402d97335cec) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14292-s.ic24", 0x000007, 0x100000, CRC(41f71443) SHA1(351d40d6159cb5b792519bce5d16490965800cfb) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14299-h.ic36", 0x000000, 0x100000, CRC(ce59231b) SHA1(bcb1f11b74935694d0617ec8df66db2cc57b6219) )
+	ROM_LOAD64_BYTE( "mpr-14298-h.ic32", 0x000001, 0x100000, CRC(2745c84c) SHA1(5a0528c921cba7a1047d3a2ece79925103d719a1) )
+	ROM_LOAD64_BYTE( "mpr-14297-h.ic27", 0x000002, 0x100000, CRC(29cb9450) SHA1(7dc38d23a2f0cee2f4edde05c1a6f0dc83f331db) )
+	ROM_LOAD64_BYTE( "mpr-14296-h.ic23", 0x000003, 0x100000, CRC(9d8cbd31) SHA1(55a9f9ec9029157da033e69664b58e694a28db47) )
+	ROM_LOAD64_BYTE( "mpr-14295-h.ic37", 0x000004, 0x100000, CRC(29591f50) SHA1(1ac4ceaf74892e30f210ad77024eb441c5e4a959) )
+	ROM_LOAD64_BYTE( "mpr-14294-h.ic33", 0x000005, 0x100000, CRC(fa86b794) SHA1(7b6907e5734fbf2fba7bcc213a8551fec5e9f3d5) )
+	ROM_LOAD64_BYTE( "mpr-14293-s.ic28", 0x000006, 0x100000, CRC(52899269) SHA1(ff809ff88701109e0ca79e785a61402d97335cec) )
+	ROM_LOAD64_BYTE( "mpr-14292-s.ic24", 0x000007, 0x100000, CRC(41f71443) SHA1(351d40d6159cb5b792519bce5d16490965800cfb) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -4973,8 +4969,8 @@ Input sub board: 837-7968
 */
 ROM_START( spidmanj )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
-	ROM_LOAD_x4( "epr-14287.ic13",       0x000000, 0x020000, CRC(403ccdc9) SHA1(4e240c749e362dfa5c579ccbdff18ae3fab58dff) )
-	ROM_LOAD_x4( "epr-14286.ic7",        0x080000, 0x020000, CRC(5c2b4e2c) SHA1(79229594710416510f85e6e53ea578789afd4091) )
+	ROM_LOAD_x4( "epr-14287.ic13",        0x000000, 0x020000, CRC(403ccdc9) SHA1(4e240c749e362dfa5c579ccbdff18ae3fab58dff) )
+	ROM_LOAD_x4( "epr-14286.ic7",         0x080000, 0x020000, CRC(5c2b4e2c) SHA1(79229594710416510f85e6e53ea578789afd4091) )
 	ROM_LOAD16_BYTE_x4( "epr-14281.ic14", 0x100000, 0x020000, CRC(8a746c42) SHA1(fa3729ec3aa4b3c59322408146ce2cfbf5a11b98) )
 	ROM_LOAD16_BYTE_x4( "epr-14280.ic6",  0x100001, 0x020000, CRC(3c8148f7) SHA1(072b7982bb95e7a9ab77844b59020146c262488d) )
 
@@ -4991,14 +4987,14 @@ ROM_START( spidmanj )
 	ROM_LOAD32_BYTE( "mpr-14288-s.ic25", 0x000003, 0x100000, CRC(3188b636) SHA1(bc0adeeca5040caa563ee1e0eded9c323ca23446) )
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-14299-h.ic36", 0x000000, 0x100000, CRC(ce59231b) SHA1(bcb1f11b74935694d0617ec8df66db2cc57b6219) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14298-h.ic32", 0x000001, 0x100000, CRC(2745c84c) SHA1(5a0528c921cba7a1047d3a2ece79925103d719a1) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14297-h.ic27", 0x000002, 0x100000, CRC(29cb9450) SHA1(7dc38d23a2f0cee2f4edde05c1a6f0dc83f331db) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14296-h.ic23", 0x000003, 0x100000, CRC(9d8cbd31) SHA1(55a9f9ec9029157da033e69664b58e694a28db47) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14295-h.ic37", 0x000004, 0x100000, CRC(29591f50) SHA1(1ac4ceaf74892e30f210ad77024eb441c5e4a959) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14294-h.ic33", 0x000005, 0x100000, CRC(fa86b794) SHA1(7b6907e5734fbf2fba7bcc213a8551fec5e9f3d5) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14293-s.ic28", 0x000006, 0x100000, CRC(52899269) SHA1(ff809ff88701109e0ca79e785a61402d97335cec) , ROM_SKIP(7) )
-	ROMX_LOAD( "mpr-14292-s.ic24", 0x000007, 0x100000, CRC(41f71443) SHA1(351d40d6159cb5b792519bce5d16490965800cfb) , ROM_SKIP(7) )
+	ROM_LOAD64_BYTE( "mpr-14299-h.ic36", 0x000000, 0x100000, CRC(ce59231b) SHA1(bcb1f11b74935694d0617ec8df66db2cc57b6219) )
+	ROM_LOAD64_BYTE( "mpr-14298-h.ic32", 0x000001, 0x100000, CRC(2745c84c) SHA1(5a0528c921cba7a1047d3a2ece79925103d719a1) )
+	ROM_LOAD64_BYTE( "mpr-14297-h.ic27", 0x000002, 0x100000, CRC(29cb9450) SHA1(7dc38d23a2f0cee2f4edde05c1a6f0dc83f331db) )
+	ROM_LOAD64_BYTE( "mpr-14296-h.ic23", 0x000003, 0x100000, CRC(9d8cbd31) SHA1(55a9f9ec9029157da033e69664b58e694a28db47) )
+	ROM_LOAD64_BYTE( "mpr-14295-h.ic37", 0x000004, 0x100000, CRC(29591f50) SHA1(1ac4ceaf74892e30f210ad77024eb441c5e4a959) )
+	ROM_LOAD64_BYTE( "mpr-14294-h.ic33", 0x000005, 0x100000, CRC(fa86b794) SHA1(7b6907e5734fbf2fba7bcc213a8551fec5e9f3d5) )
+	ROM_LOAD64_BYTE( "mpr-14293-s.ic28", 0x000006, 0x100000, CRC(52899269) SHA1(ff809ff88701109e0ca79e785a61402d97335cec) )
+	ROM_LOAD64_BYTE( "mpr-14292-s.ic24", 0x000007, 0x100000, CRC(41f71443) SHA1(351d40d6159cb5b792519bce5d16490965800cfb) )
 ROM_END
 /**************************************************************************************************************************
  **************************************************************************************************************************
@@ -5010,8 +5006,8 @@ ROM_START( scross )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code */
 	ROM_LOAD32_WORD_x2( "epr-15093.ic37", 0x000000, 0x040000, CRC(2adc7a4b) SHA1(dca71f00d94898c0758394704d819e13482bf120) )
 	ROM_LOAD32_WORD_x2( "epr-15094.ic40", 0x000002, 0x040000, CRC(bbb0ae73) SHA1(0d8837706405f301adf8fa85c8d4813d7600af98) )
-	ROM_LOAD32_WORD( "mpr-15018.ic36", 0x100000, 0x080000, CRC(3a98385e) SHA1(8088d337655030c28e290da4bbf44cb647dab66c) )
-	ROM_LOAD32_WORD( "mpr-15019.ic39", 0x100002, 0x080000, CRC(8bf4ac83) SHA1(e594d9d9b42d0765ed8a20a40b7dd92b75124d34) )
+	ROM_LOAD32_WORD( "mpr-15018.ic36",    0x100000, 0x080000, CRC(3a98385e) SHA1(8088d337655030c28e290da4bbf44cb647dab66c) )
+	ROM_LOAD32_WORD( "mpr-15019.ic39",    0x100002, 0x080000, CRC(8bf4ac83) SHA1(e594d9d9b42d0765ed8a20a40b7dd92b75124d34) )
 
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-15192.ic31", 0x00000, 0x20000, CRC(7524290b) SHA1(ee58be2c0c4293ee19622b96ca493f4ce4da0038) )
@@ -5021,14 +5017,14 @@ ROM_START( scross )
 	ROM_LOAD16_BYTE( "mpr-15021.ic11", 0x000001, 0x100000, CRC(3677db02) SHA1(7aeeb85f1632253fcdc8f7881512066e97837e5e) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15022.ic14", 0x000000, 0x100000, CRC(baee6fd5) SHA1(ddf022c61f0805af45a84c65eb5d01006c153c07) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15024.ic15", 0x000002, 0x100000, CRC(b9f339e2) SHA1(4b9a392459132a19d62928ef3939e1f2356e3994) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15026.ic10", 0x000004, 0x100000, CRC(b72e8df6) SHA1(a7a87f79814b022985121e163c7f88244c50e427) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15028.ic38", 0x000006, 0x100000, CRC(183f6eb0) SHA1(5a2172d5afd696af361ff9f8a92f5911e05c578d) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15023.ic22", 0x800000, 0x100000, CRC(230735ed) SHA1(36075504e27b8a32d63fa3b8abd7037d17440ebf) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15025.ic23", 0x800002, 0x100000, CRC(da4315cb) SHA1(3910c5654e34b17851d6d93615e3404b3b397fea) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15027.ic18", 0x800004, 0x100000, CRC(b765efb8) SHA1(61f3865f92b36ca4b3cd20c0716a7121755eea73) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15029.ic41", 0x800006, 0x100000, CRC(cf8e3b2b) SHA1(c158810d9d82b10a753bc739d1f56572042dac0b) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15022.ic14", 0x000000, 0x100000, CRC(baee6fd5) SHA1(ddf022c61f0805af45a84c65eb5d01006c153c07) )
+	ROM_LOAD64_WORD( "mpr-15024.ic15", 0x000002, 0x100000, CRC(b9f339e2) SHA1(4b9a392459132a19d62928ef3939e1f2356e3994) )
+	ROM_LOAD64_WORD( "mpr-15026.ic10", 0x000004, 0x100000, CRC(b72e8df6) SHA1(a7a87f79814b022985121e163c7f88244c50e427) )
+	ROM_LOAD64_WORD( "mpr-15028.ic38", 0x000006, 0x100000, CRC(183f6eb0) SHA1(5a2172d5afd696af361ff9f8a92f5911e05c578d) )
+	ROM_LOAD64_WORD( "mpr-15023.ic22", 0x800000, 0x100000, CRC(230735ed) SHA1(36075504e27b8a32d63fa3b8abd7037d17440ebf) )
+	ROM_LOAD64_WORD( "mpr-15025.ic23", 0x800002, 0x100000, CRC(da4315cb) SHA1(3910c5654e34b17851d6d93615e3404b3b397fea) )
+	ROM_LOAD64_WORD( "mpr-15027.ic18", 0x800004, 0x100000, CRC(b765efb8) SHA1(61f3865f92b36ca4b3cd20c0716a7121755eea73) )
+	ROM_LOAD64_WORD( "mpr-15029.ic41", 0x800006, 0x100000, CRC(cf8e3b2b) SHA1(c158810d9d82b10a753bc739d1f56572042dac0b) )
 
 	ROM_REGION( 0x400000, "mainpcb:sega", 0 ) /* Sega PCM sound data */
 	ROM_LOAD( "mpr-15031.ic1", 0x000000, 0x100000, CRC(6af139dc) SHA1(2378c2ad0c52c114eb93206a6fbee723c038d030) )
@@ -5041,8 +5037,8 @@ ROM_END
 ROM_START( scrossa )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code */
 	// 37/40 were missing labels
-	ROM_LOAD32_WORD_x2( "ic37",         0x000000, 0x040000, CRC(240a7655) SHA1(7cfdce002fb4783e8c1debf206922d88647c106e) )
-	ROM_LOAD32_WORD_x2( "ic40",         0x000002, 0x040000, CRC(3a073060) SHA1(c92c8d8921d94d85c8484c103cbf9cd6ad651333) )
+	ROM_LOAD32_WORD_x2( "ic37",        0x000000, 0x040000, CRC(240a7655) SHA1(7cfdce002fb4783e8c1debf206922d88647c106e) )
+	ROM_LOAD32_WORD_x2( "ic40",        0x000002, 0x040000, CRC(3a073060) SHA1(c92c8d8921d94d85c8484c103cbf9cd6ad651333) )
 	ROM_LOAD32_WORD( "mpr-15018.ic36", 0x100000, 0x080000, CRC(3a98385e) SHA1(8088d337655030c28e290da4bbf44cb647dab66c) )
 	ROM_LOAD32_WORD( "mpr-15019.ic39", 0x100002, 0x080000, CRC(8bf4ac83) SHA1(e594d9d9b42d0765ed8a20a40b7dd92b75124d34) )
 
@@ -5054,14 +5050,14 @@ ROM_START( scrossa )
 	ROM_LOAD16_BYTE( "mpr-15021.ic11", 0x000001, 0x100000, CRC(3677db02) SHA1(7aeeb85f1632253fcdc8f7881512066e97837e5e) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15022.ic14", 0x000000, 0x100000, CRC(baee6fd5) SHA1(ddf022c61f0805af45a84c65eb5d01006c153c07) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15024.ic15", 0x000002, 0x100000, CRC(b9f339e2) SHA1(4b9a392459132a19d62928ef3939e1f2356e3994) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15026.ic10", 0x000004, 0x100000, CRC(b72e8df6) SHA1(a7a87f79814b022985121e163c7f88244c50e427) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15028.ic38", 0x000006, 0x100000, CRC(183f6eb0) SHA1(5a2172d5afd696af361ff9f8a92f5911e05c578d) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15023.ic22", 0x800000, 0x100000, CRC(230735ed) SHA1(36075504e27b8a32d63fa3b8abd7037d17440ebf) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15025.ic23", 0x800002, 0x100000, CRC(da4315cb) SHA1(3910c5654e34b17851d6d93615e3404b3b397fea) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15027.ic18", 0x800004, 0x100000, CRC(b765efb8) SHA1(61f3865f92b36ca4b3cd20c0716a7121755eea73) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15029.ic41", 0x800006, 0x100000, CRC(cf8e3b2b) SHA1(c158810d9d82b10a753bc739d1f56572042dac0b) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15022.ic14", 0x000000, 0x100000, CRC(baee6fd5) SHA1(ddf022c61f0805af45a84c65eb5d01006c153c07) )
+	ROM_LOAD64_WORD( "mpr-15024.ic15", 0x000002, 0x100000, CRC(b9f339e2) SHA1(4b9a392459132a19d62928ef3939e1f2356e3994) )
+	ROM_LOAD64_WORD( "mpr-15026.ic10", 0x000004, 0x100000, CRC(b72e8df6) SHA1(a7a87f79814b022985121e163c7f88244c50e427) )
+	ROM_LOAD64_WORD( "mpr-15028.ic38", 0x000006, 0x100000, CRC(183f6eb0) SHA1(5a2172d5afd696af361ff9f8a92f5911e05c578d) )
+	ROM_LOAD64_WORD( "mpr-15023.ic22", 0x800000, 0x100000, CRC(230735ed) SHA1(36075504e27b8a32d63fa3b8abd7037d17440ebf) )
+	ROM_LOAD64_WORD( "mpr-15025.ic23", 0x800002, 0x100000, CRC(da4315cb) SHA1(3910c5654e34b17851d6d93615e3404b3b397fea) )
+	ROM_LOAD64_WORD( "mpr-15027.ic18", 0x800004, 0x100000, CRC(b765efb8) SHA1(61f3865f92b36ca4b3cd20c0716a7121755eea73) )
+	ROM_LOAD64_WORD( "mpr-15029.ic41", 0x800006, 0x100000, CRC(cf8e3b2b) SHA1(c158810d9d82b10a753bc739d1f56572042dac0b) )
 
 	ROM_REGION( 0x400000, "mainpcb:sega", 0 ) /* Sega PCM sound data */
 	ROM_LOAD( "mpr-15031.ic1", 0x000000, 0x100000, CRC(6af139dc) SHA1(2378c2ad0c52c114eb93206a6fbee723c038d030) )
@@ -5091,14 +5087,14 @@ ROM_START( scrossu )
 	ROM_LOAD16_BYTE( "mpr-15021.ic11", 0x000001, 0x100000, CRC(3677db02) SHA1(7aeeb85f1632253fcdc8f7881512066e97837e5e) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15022.ic14", 0x000000, 0x100000, CRC(baee6fd5) SHA1(ddf022c61f0805af45a84c65eb5d01006c153c07) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15024.ic15", 0x000002, 0x100000, CRC(b9f339e2) SHA1(4b9a392459132a19d62928ef3939e1f2356e3994) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15026.ic10", 0x000004, 0x100000, CRC(b72e8df6) SHA1(a7a87f79814b022985121e163c7f88244c50e427) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15028.ic38", 0x000006, 0x100000, CRC(183f6eb0) SHA1(5a2172d5afd696af361ff9f8a92f5911e05c578d) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15023.ic22", 0x800000, 0x100000, CRC(230735ed) SHA1(36075504e27b8a32d63fa3b8abd7037d17440ebf) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15025.ic23", 0x800002, 0x100000, CRC(da4315cb) SHA1(3910c5654e34b17851d6d93615e3404b3b397fea) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15027.ic18", 0x800004, 0x100000, CRC(b765efb8) SHA1(61f3865f92b36ca4b3cd20c0716a7121755eea73) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15029.ic41", 0x800006, 0x100000, CRC(cf8e3b2b) SHA1(c158810d9d82b10a753bc739d1f56572042dac0b) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15022.ic14", 0x000000, 0x100000, CRC(baee6fd5) SHA1(ddf022c61f0805af45a84c65eb5d01006c153c07) )
+	ROM_LOAD64_WORD( "mpr-15024.ic15", 0x000002, 0x100000, CRC(b9f339e2) SHA1(4b9a392459132a19d62928ef3939e1f2356e3994) )
+	ROM_LOAD64_WORD( "mpr-15026.ic10", 0x000004, 0x100000, CRC(b72e8df6) SHA1(a7a87f79814b022985121e163c7f88244c50e427) )
+	ROM_LOAD64_WORD( "mpr-15028.ic38", 0x000006, 0x100000, CRC(183f6eb0) SHA1(5a2172d5afd696af361ff9f8a92f5911e05c578d) )
+	ROM_LOAD64_WORD( "mpr-15023.ic22", 0x800000, 0x100000, CRC(230735ed) SHA1(36075504e27b8a32d63fa3b8abd7037d17440ebf) )
+	ROM_LOAD64_WORD( "mpr-15025.ic23", 0x800002, 0x100000, CRC(da4315cb) SHA1(3910c5654e34b17851d6d93615e3404b3b397fea) )
+	ROM_LOAD64_WORD( "mpr-15027.ic18", 0x800004, 0x100000, CRC(b765efb8) SHA1(61f3865f92b36ca4b3cd20c0716a7121755eea73) )
+	ROM_LOAD64_WORD( "mpr-15029.ic41", 0x800006, 0x100000, CRC(cf8e3b2b) SHA1(c158810d9d82b10a753bc739d1f56572042dac0b) )
 
 	ROM_REGION( 0x400000, "mainpcb:sega", 0 ) /* Sega PCM sound data */
 	ROM_LOAD( "mpr-15031.ic1", 0x000000, 0x100000, CRC(6af139dc) SHA1(2378c2ad0c52c114eb93206a6fbee723c038d030) )
@@ -5134,14 +5130,14 @@ ROM_START( svf )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16791.ic26", 0x000006, 0x200000, CRC(4f7236da) SHA1(d1c29f6aa82d60a626217f1430bc8a76ef012007) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16860.ic31", 0x800000, 0x200000, CRC(578a7325) SHA1(75a066841fa24952d8ed5ac2d988609295f437a8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16861.ic29", 0x800002, 0x200000, CRC(d79c3f73) SHA1(e4360efb0964a92cfad8c458a5568709fcc81339) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16862.ic27", 0x800004, 0x200000, CRC(00793354) SHA1(3b37a89c5100d5f92a3567fc8d2003bc9d6fe0cd) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16863.ic25", 0x800006, 0x200000, CRC(42338226) SHA1(106636408d5648fb95fbaee06074c57f6a535a82) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) )
+	ROM_LOAD64_WORD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) )
+	ROM_LOAD64_WORD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) )
+	ROM_LOAD64_WORD( "mpr-16791.ic26", 0x000006, 0x200000, CRC(4f7236da) SHA1(d1c29f6aa82d60a626217f1430bc8a76ef012007) )
+	ROM_LOAD64_WORD( "mpr-16860.ic31", 0x800000, 0x200000, CRC(578a7325) SHA1(75a066841fa24952d8ed5ac2d988609295f437a8) )
+	ROM_LOAD64_WORD( "mpr-16861.ic29", 0x800002, 0x200000, CRC(d79c3f73) SHA1(e4360efb0964a92cfad8c458a5568709fcc81339) )
+	ROM_LOAD64_WORD( "mpr-16862.ic27", 0x800004, 0x200000, CRC(00793354) SHA1(3b37a89c5100d5f92a3567fc8d2003bc9d6fe0cd) )
+	ROM_LOAD64_WORD( "mpr-16863.ic25", 0x800006, 0x200000, CRC(42338226) SHA1(106636408d5648fb95fbaee06074c57f6a535a82) )
 ROM_END
 
 ROM_START( svfo )
@@ -5162,14 +5158,14 @@ ROM_START( svfo )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16791.ic26", 0x000006, 0x200000, CRC(4f7236da) SHA1(d1c29f6aa82d60a626217f1430bc8a76ef012007) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16860.ic31", 0x800000, 0x200000, CRC(578a7325) SHA1(75a066841fa24952d8ed5ac2d988609295f437a8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16861.ic29", 0x800002, 0x200000, CRC(d79c3f73) SHA1(e4360efb0964a92cfad8c458a5568709fcc81339) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16862.ic27", 0x800004, 0x200000, CRC(00793354) SHA1(3b37a89c5100d5f92a3567fc8d2003bc9d6fe0cd) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16863.ic25", 0x800006, 0x200000, CRC(42338226) SHA1(106636408d5648fb95fbaee06074c57f6a535a82) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) )
+	ROM_LOAD64_WORD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) )
+	ROM_LOAD64_WORD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) )
+	ROM_LOAD64_WORD( "mpr-16791.ic26", 0x000006, 0x200000, CRC(4f7236da) SHA1(d1c29f6aa82d60a626217f1430bc8a76ef012007) )
+	ROM_LOAD64_WORD( "mpr-16860.ic31", 0x800000, 0x200000, CRC(578a7325) SHA1(75a066841fa24952d8ed5ac2d988609295f437a8) )
+	ROM_LOAD64_WORD( "mpr-16861.ic29", 0x800002, 0x200000, CRC(d79c3f73) SHA1(e4360efb0964a92cfad8c458a5568709fcc81339) )
+	ROM_LOAD64_WORD( "mpr-16862.ic27", 0x800004, 0x200000, CRC(00793354) SHA1(3b37a89c5100d5f92a3567fc8d2003bc9d6fe0cd) )
+	ROM_LOAD64_WORD( "mpr-16863.ic25", 0x800006, 0x200000, CRC(42338226) SHA1(106636408d5648fb95fbaee06074c57f6a535a82) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -5194,14 +5190,14 @@ ROM_START( svs )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16791.ic26", 0x000006, 0x200000, CRC(4f7236da) SHA1(d1c29f6aa82d60a626217f1430bc8a76ef012007) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16860.ic31", 0x800000, 0x200000, CRC(578a7325) SHA1(75a066841fa24952d8ed5ac2d988609295f437a8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16861.ic29", 0x800002, 0x200000, CRC(d79c3f73) SHA1(e4360efb0964a92cfad8c458a5568709fcc81339) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16862.ic27", 0x800004, 0x200000, CRC(00793354) SHA1(3b37a89c5100d5f92a3567fc8d2003bc9d6fe0cd) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16863.ic25", 0x800006, 0x200000, CRC(42338226) SHA1(106636408d5648fb95fbaee06074c57f6a535a82) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) )
+	ROM_LOAD64_WORD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) )
+	ROM_LOAD64_WORD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) )
+	ROM_LOAD64_WORD( "mpr-16791.ic26", 0x000006, 0x200000, CRC(4f7236da) SHA1(d1c29f6aa82d60a626217f1430bc8a76ef012007) )
+	ROM_LOAD64_WORD( "mpr-16860.ic31", 0x800000, 0x200000, CRC(578a7325) SHA1(75a066841fa24952d8ed5ac2d988609295f437a8) )
+	ROM_LOAD64_WORD( "mpr-16861.ic29", 0x800002, 0x200000, CRC(d79c3f73) SHA1(e4360efb0964a92cfad8c458a5568709fcc81339) )
+	ROM_LOAD64_WORD( "mpr-16862.ic27", 0x800004, 0x200000, CRC(00793354) SHA1(3b37a89c5100d5f92a3567fc8d2003bc9d6fe0cd) )
+	ROM_LOAD64_WORD( "mpr-16863.ic25", 0x800006, 0x200000, CRC(42338226) SHA1(106636408d5648fb95fbaee06074c57f6a535a82) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -5230,14 +5226,14 @@ ROM_START( jleague )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16791.ic26", 0x000006, 0x200000, CRC(4f7236da) SHA1(d1c29f6aa82d60a626217f1430bc8a76ef012007) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16786.ic31", 0x800000, 0x200000, CRC(d08a2d32) SHA1(baac63cbacbe38e057684174040384a7152eb523) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16788.ic29", 0x800002, 0x200000, CRC(cd9d3605) SHA1(7c4402be1a1ddde6766cfdd5fe7e2a088c4a59e8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16790.ic27", 0x800004, 0x200000, CRC(2ea75746) SHA1(c91e5d678917886cc23fbef7a577c5a70665c7b2) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16792.ic25", 0x800006, 0x200000, CRC(9f416072) SHA1(18107cf64f918888aa5a54432f8e9137910101b8) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) )
+	ROM_LOAD64_WORD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) )
+	ROM_LOAD64_WORD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) )
+	ROM_LOAD64_WORD( "mpr-16791.ic26", 0x000006, 0x200000, CRC(4f7236da) SHA1(d1c29f6aa82d60a626217f1430bc8a76ef012007) )
+	ROM_LOAD64_WORD( "mpr-16786.ic31", 0x800000, 0x200000, CRC(d08a2d32) SHA1(baac63cbacbe38e057684174040384a7152eb523) )
+	ROM_LOAD64_WORD( "mpr-16788.ic29", 0x800002, 0x200000, CRC(cd9d3605) SHA1(7c4402be1a1ddde6766cfdd5fe7e2a088c4a59e8) )
+	ROM_LOAD64_WORD( "mpr-16790.ic27", 0x800004, 0x200000, CRC(2ea75746) SHA1(c91e5d678917886cc23fbef7a577c5a70665c7b2) )
+	ROM_LOAD64_WORD( "mpr-16792.ic25", 0x800006, 0x200000, CRC(9f416072) SHA1(18107cf64f918888aa5a54432f8e9137910101b8) )
 ROM_END
 
 ROM_START( jleagueo )
@@ -5258,14 +5254,14 @@ ROM_START( jleagueo )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16791.ic26", 0x000006, 0x200000, CRC(4f7236da) SHA1(d1c29f6aa82d60a626217f1430bc8a76ef012007) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16786.ic31", 0x800000, 0x200000, CRC(d08a2d32) SHA1(baac63cbacbe38e057684174040384a7152eb523) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16788.ic29", 0x800002, 0x200000, CRC(cd9d3605) SHA1(7c4402be1a1ddde6766cfdd5fe7e2a088c4a59e8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16790.ic27", 0x800004, 0x200000, CRC(2ea75746) SHA1(c91e5d678917886cc23fbef7a577c5a70665c7b2) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-16792.ic25", 0x800006, 0x200000, CRC(9f416072) SHA1(18107cf64f918888aa5a54432f8e9137910101b8) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) )
+	ROM_LOAD64_WORD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) )
+	ROM_LOAD64_WORD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) )
+	ROM_LOAD64_WORD( "mpr-16791.ic26", 0x000006, 0x200000, CRC(4f7236da) SHA1(d1c29f6aa82d60a626217f1430bc8a76ef012007) )
+	ROM_LOAD64_WORD( "mpr-16786.ic31", 0x800000, 0x200000, CRC(d08a2d32) SHA1(baac63cbacbe38e057684174040384a7152eb523) )
+	ROM_LOAD64_WORD( "mpr-16788.ic29", 0x800002, 0x200000, CRC(cd9d3605) SHA1(7c4402be1a1ddde6766cfdd5fe7e2a088c4a59e8) )
+	ROM_LOAD64_WORD( "mpr-16790.ic27", 0x800004, 0x200000, CRC(2ea75746) SHA1(c91e5d678917886cc23fbef7a577c5a70665c7b2) )
+	ROM_LOAD64_WORD( "mpr-16792.ic25", 0x800006, 0x200000, CRC(9f416072) SHA1(18107cf64f918888aa5a54432f8e9137910101b8) )
 ROM_END
 
 
@@ -5294,14 +5290,14 @@ ROM_START( titlef )
 	ROM_LOAD16_BYTE( "mpr-15382.ic11", 0x000001, 0x200000, CRC(fd03a130) SHA1(040c36383ef5d8298af714958cd5b0a4c7556ae7) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15379.ic14", 0x000000, 0x200000, CRC(e5c74b11) SHA1(67e4460efe5dcd88ffc12024b255efc843e6a8b5) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15375.ic15", 0x000002, 0x200000, CRC(046a9b50) SHA1(2b4c53f2a0264835cb7197daa9b3461c212541e8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15371.ic10", 0x000004, 0x200000, CRC(999046c6) SHA1(37ce4e8aaf537b5366eacabaf36e4477b5624121) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15373.ic38", 0x000006, 0x200000, CRC(9b3294d9) SHA1(19542f14ce09753385a44098dfd1aaf331e7af0e) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15380.ic22", 0x800000, 0x200000, CRC(6ea0e58d) SHA1(1c4b761522157b0b9d086181ba6f6994879d8fdf) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15376.ic23", 0x800002, 0x200000, CRC(de3e05c5) SHA1(cac0d04ecd37e5836d246c0809bcfc11430df591) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15372.ic18", 0x800004, 0x200000, CRC(c187c36a) SHA1(bb55c2a768a43ef19a7847a4aa113523fee26c20) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15374.ic41", 0x800006, 0x200000, CRC(e026aab0) SHA1(75dfaef6d50c3d1d7f27aa5e44fcbc0ff2173c6f) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15379.ic14", 0x000000, 0x200000, CRC(e5c74b11) SHA1(67e4460efe5dcd88ffc12024b255efc843e6a8b5) )
+	ROM_LOAD64_WORD( "mpr-15375.ic15", 0x000002, 0x200000, CRC(046a9b50) SHA1(2b4c53f2a0264835cb7197daa9b3461c212541e8) )
+	ROM_LOAD64_WORD( "mpr-15371.ic10", 0x000004, 0x200000, CRC(999046c6) SHA1(37ce4e8aaf537b5366eacabaf36e4477b5624121) )
+	ROM_LOAD64_WORD( "mpr-15373.ic38", 0x000006, 0x200000, CRC(9b3294d9) SHA1(19542f14ce09753385a44098dfd1aaf331e7af0e) )
+	ROM_LOAD64_WORD( "mpr-15380.ic22", 0x800000, 0x200000, CRC(6ea0e58d) SHA1(1c4b761522157b0b9d086181ba6f6994879d8fdf) )
+	ROM_LOAD64_WORD( "mpr-15376.ic23", 0x800002, 0x200000, CRC(de3e05c5) SHA1(cac0d04ecd37e5836d246c0809bcfc11430df591) )
+	ROM_LOAD64_WORD( "mpr-15372.ic18", 0x800004, 0x200000, CRC(c187c36a) SHA1(bb55c2a768a43ef19a7847a4aa113523fee26c20) )
+	ROM_LOAD64_WORD( "mpr-15374.ic41", 0x800006, 0x200000, CRC(e026aab0) SHA1(75dfaef6d50c3d1d7f27aa5e44fcbc0ff2173c6f) )
 
 	ROM_REGION( 0x400000, "mainpcb:sega", 0 ) /* Sega PCM sound data */
 	ROM_LOAD( "mpr-15385.ic1", 0x000000, 0x200000, CRC(5a9b0aa0) SHA1(d208aa165f9eea05e3b8c3f406ff44374e4f6887) )
@@ -5330,14 +5326,14 @@ ROM_START( titlefu )
 	ROM_LOAD16_BYTE( "mpr-15382.ic11", 0x000001, 0x200000, CRC(fd03a130) SHA1(040c36383ef5d8298af714958cd5b0a4c7556ae7) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15379.ic14", 0x000000, 0x200000, CRC(e5c74b11) SHA1(67e4460efe5dcd88ffc12024b255efc843e6a8b5) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15375.ic15", 0x000002, 0x200000, CRC(046a9b50) SHA1(2b4c53f2a0264835cb7197daa9b3461c212541e8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15371.ic10", 0x000004, 0x200000, CRC(999046c6) SHA1(37ce4e8aaf537b5366eacabaf36e4477b5624121) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15373.ic38", 0x000006, 0x200000, CRC(9b3294d9) SHA1(19542f14ce09753385a44098dfd1aaf331e7af0e) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15380.ic22", 0x800000, 0x200000, CRC(6ea0e58d) SHA1(1c4b761522157b0b9d086181ba6f6994879d8fdf) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15376.ic23", 0x800002, 0x200000, CRC(de3e05c5) SHA1(cac0d04ecd37e5836d246c0809bcfc11430df591) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15372.ic18", 0x800004, 0x200000, CRC(c187c36a) SHA1(bb55c2a768a43ef19a7847a4aa113523fee26c20) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15374.ic41", 0x800006, 0x200000, CRC(e026aab0) SHA1(75dfaef6d50c3d1d7f27aa5e44fcbc0ff2173c6f) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15379.ic14", 0x000000, 0x200000, CRC(e5c74b11) SHA1(67e4460efe5dcd88ffc12024b255efc843e6a8b5) )
+	ROM_LOAD64_WORD( "mpr-15375.ic15", 0x000002, 0x200000, CRC(046a9b50) SHA1(2b4c53f2a0264835cb7197daa9b3461c212541e8) )
+	ROM_LOAD64_WORD( "mpr-15371.ic10", 0x000004, 0x200000, CRC(999046c6) SHA1(37ce4e8aaf537b5366eacabaf36e4477b5624121) )
+	ROM_LOAD64_WORD( "mpr-15373.ic38", 0x000006, 0x200000, CRC(9b3294d9) SHA1(19542f14ce09753385a44098dfd1aaf331e7af0e) )
+	ROM_LOAD64_WORD( "mpr-15380.ic22", 0x800000, 0x200000, CRC(6ea0e58d) SHA1(1c4b761522157b0b9d086181ba6f6994879d8fdf) )
+	ROM_LOAD64_WORD( "mpr-15376.ic23", 0x800002, 0x200000, CRC(de3e05c5) SHA1(cac0d04ecd37e5836d246c0809bcfc11430df591) )
+	ROM_LOAD64_WORD( "mpr-15372.ic18", 0x800004, 0x200000, CRC(c187c36a) SHA1(bb55c2a768a43ef19a7847a4aa113523fee26c20) )
+	ROM_LOAD64_WORD( "mpr-15374.ic41", 0x800006, 0x200000, CRC(e026aab0) SHA1(75dfaef6d50c3d1d7f27aa5e44fcbc0ff2173c6f) )
 
 	ROM_REGION( 0x400000, "mainpcb:sega", 0 ) /* Sega PCM sound data */
 	ROM_LOAD( "mpr-15385.ic1", 0x000000, 0x200000, CRC(5a9b0aa0) SHA1(d208aa165f9eea05e3b8c3f406ff44374e4f6887) )
@@ -5366,14 +5362,14 @@ ROM_START( titlefj )
 	ROM_LOAD16_BYTE( "mpr-15382.ic11", 0x000001, 0x200000, CRC(fd03a130) SHA1(040c36383ef5d8298af714958cd5b0a4c7556ae7) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROMX_LOAD( "mpr-15379.ic14", 0x000000, 0x200000, CRC(e5c74b11) SHA1(67e4460efe5dcd88ffc12024b255efc843e6a8b5) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15375.ic15", 0x000002, 0x200000, CRC(046a9b50) SHA1(2b4c53f2a0264835cb7197daa9b3461c212541e8) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15371.ic10", 0x000004, 0x200000, CRC(999046c6) SHA1(37ce4e8aaf537b5366eacabaf36e4477b5624121) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15373.ic38", 0x000006, 0x200000, CRC(9b3294d9) SHA1(19542f14ce09753385a44098dfd1aaf331e7af0e) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15380.ic22", 0x800000, 0x200000, CRC(6ea0e58d) SHA1(1c4b761522157b0b9d086181ba6f6994879d8fdf) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15376.ic23", 0x800002, 0x200000, CRC(de3e05c5) SHA1(cac0d04ecd37e5836d246c0809bcfc11430df591) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15372.ic18", 0x800004, 0x200000, CRC(c187c36a) SHA1(bb55c2a768a43ef19a7847a4aa113523fee26c20) , ROM_SKIP(6)|ROM_GROUPWORD )
-	ROMX_LOAD( "mpr-15374.ic41", 0x800006, 0x200000, CRC(e026aab0) SHA1(75dfaef6d50c3d1d7f27aa5e44fcbc0ff2173c6f) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROM_LOAD64_WORD( "mpr-15379.ic14", 0x000000, 0x200000, CRC(e5c74b11) SHA1(67e4460efe5dcd88ffc12024b255efc843e6a8b5) )
+	ROM_LOAD64_WORD( "mpr-15375.ic15", 0x000002, 0x200000, CRC(046a9b50) SHA1(2b4c53f2a0264835cb7197daa9b3461c212541e8) )
+	ROM_LOAD64_WORD( "mpr-15371.ic10", 0x000004, 0x200000, CRC(999046c6) SHA1(37ce4e8aaf537b5366eacabaf36e4477b5624121) )
+	ROM_LOAD64_WORD( "mpr-15373.ic38", 0x000006, 0x200000, CRC(9b3294d9) SHA1(19542f14ce09753385a44098dfd1aaf331e7af0e) )
+	ROM_LOAD64_WORD( "mpr-15380.ic22", 0x800000, 0x200000, CRC(6ea0e58d) SHA1(1c4b761522157b0b9d086181ba6f6994879d8fdf) )
+	ROM_LOAD64_WORD( "mpr-15376.ic23", 0x800002, 0x200000, CRC(de3e05c5) SHA1(cac0d04ecd37e5836d246c0809bcfc11430df591) )
+	ROM_LOAD64_WORD( "mpr-15372.ic18", 0x800004, 0x200000, CRC(c187c36a) SHA1(bb55c2a768a43ef19a7847a4aa113523fee26c20) )
+	ROM_LOAD64_WORD( "mpr-15374.ic41", 0x800006, 0x200000, CRC(e026aab0) SHA1(75dfaef6d50c3d1d7f27aa5e44fcbc0ff2173c6f) )
 
 	ROM_REGION( 0x400000, "mainpcb:sega", 0 ) /* Sega PCM sound data */
 	ROM_LOAD( "mpr-15385.ic1", 0x000000, 0x200000, CRC(5a9b0aa0) SHA1(d208aa165f9eea05e3b8c3f406ff44374e4f6887) )
@@ -5387,8 +5383,8 @@ ROM_END
 */
 ROM_START( as1 )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code */
-	ROM_LOAD32_WORD_x2( "epr15420.ic37", 0x000000, 0x20000, CRC(1f9747b0) SHA1(51d1fbccf6960967d4458ba26fad42ac51978c67) )
-	ROM_LOAD32_WORD_x2( "epr15421.ic40", 0x000002, 0x20000, CRC(aa96422a) SHA1(21cf327d102f5c7c4a4e41d889d9b4d10c44de35) )
+	ROM_LOAD32_WORD_x4( "epr15420.ic37", 0x000000, 0x20000, CRC(1f9747b0) SHA1(51d1fbccf6960967d4458ba26fad42ac51978c67) )
+	ROM_LOAD32_WORD_x4( "epr15421.ic40", 0x000002, 0x20000, CRC(aa96422a) SHA1(21cf327d102f5c7c4a4e41d889d9b4d10c44de35) )
 
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr15367.ic31", 0x00000, 0x20000, CRC(0220f078) SHA1(9fab79fc91764ecf678bfa4d38d1b4054e258b76) )
@@ -5422,6 +5418,7 @@ void segas32_state::segas32_common_init()
 	uint8_t *Z80 = memregion("soundcpu")->base();
 	uint32_t size = memregion("soundcpu")->bytes();
 	m_soundrom_bank->configure_entries(0, size / 0x2000, &Z80[0], 0x2000);
+
 	/* reset the custom handlers and other pointers */
 	m_system32_prot_vblank = nullptr;
 	m_sw1_output = nullptr;
@@ -5667,11 +5664,11 @@ void segas32_new_state::init_arescue()
 	m_slavepcb->init_arescue(0);
 
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_masterslave)));
 
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_slave)));
 }
 
 void segas32_new_state::init_f1en() {
@@ -5681,11 +5678,11 @@ void segas32_new_state::init_f1en() {
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
 	memset(m_dual_pcb_comms.get(), 0xff, 0x1000 / 2);
 
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_masterslave)));
 
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_slave)));
 }
 
 void segas32_new_state::init_f1lap()
@@ -5698,7 +5695,7 @@ void segas32_new_state::init_f1lapt()
 	m_mainpcb->init_f1lapt();
 }
 
-void segas32_state::init_alien3(void)
+void segas32_state::init_alien3()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::alien3_sw1_output;
@@ -5707,73 +5704,53 @@ void segas32_state::init_alien3(void)
 void segas32_state::init_arescue(int m_hasdsp)
 {
 	segas32_common_init();
-	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00007, read16_delegate(FUNC(segas32_state::arescue_dsp_r),this), write16_delegate(FUNC(segas32_state::arescue_dsp_w),this));
+	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00007, read16_delegate(*this, FUNC(segas32_state::arescue_dsp_r)), write16_delegate(*this, FUNC(segas32_state::arescue_dsp_w)));
 
 	for (auto & elem : m_arescue_dsp_io)
 		elem = 0x00;
 
-	if (m_hasdsp)
-	{
-		// massages the data from the BPMicro-compatible dump to runnable form
-		uint8_t *dspsrc = (uint8_t *)memregion("dsp")->base();
-		uint32_t *dspprg = (uint32_t *)memregion("dspprg")->base();
-		uint16_t *dspdata = (uint16_t *)memregion("dspdata")->base();
-
-		// copy DSP program
-		for (int i = 0; i < 0x2000; i+= 4)
-		{
-			*dspprg = dspsrc[0+i]<<24 | dspsrc[1+i]<<16 | dspsrc[2+i]<<8;
-			dspprg++;
-		}
-
-		// copy DSP data
-		for (int i = 0; i < 0x800; i+= 2)
-		{
-			*dspdata++ = dspsrc[0x2000+i]<<8 | dspsrc[0x2001+i];
-		}
-	}
 	m_sw1_output = &segas32_state::arescue_sw1_output;
 }
 
 
-void segas32_state::init_arabfgt(void)
+void segas32_state::init_arabfgt()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_brival(void)
+void segas32_state::init_brival()
 {
 	segas32_common_init();
 
 	/* install protection handlers */
 	m_system32_protram = std::make_unique<uint16_t[]>(0x1000/2);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16_delegate(FUNC(segas32_state::brival_protection_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16_delegate(FUNC(segas32_state::brival_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16_delegate(*this, FUNC(segas32_state::brival_protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16_delegate(*this, FUNC(segas32_state::brival_protection_w)));
 }
 
 
-void segas32_state::init_darkedge(void)
+void segas32_state::init_darkedge()
 {
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::darkedge_protection_r),this), write16_delegate(FUNC(segas32_state::darkedge_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(*this, FUNC(segas32_state::darkedge_protection_r)), write16_delegate(*this, FUNC(segas32_state::darkedge_protection_w)));
 	m_system32_prot_vblank = &segas32_state::darkedge_fd1149_vblank;
 }
 
 
-void segas32_state::init_dbzvrvs(void)
+void segas32_state::init_dbzvrvs()
 {
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::dbzvrvs_protection_r),this), write16_delegate(FUNC(segas32_state::dbzvrvs_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_r)), write16_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_w)));
 	// 0x810000 to 0x8107ff = link RAM? probably not a dual cabinet, though...
 }
 
 
-void segas32_state::init_f1en(void)
+void segas32_state::init_f1en()
 {
 	segas32_common_init();
 
@@ -5782,7 +5759,7 @@ void segas32_state::init_f1en(void)
 }
 
 
-void segas32_state::init_f1lap(void)
+void segas32_state::init_f1lap()
 {
 	segas32_common_init();
 	m_system32_prot_vblank = &segas32_state::f1lap_fd1149_vblank;
@@ -5793,7 +5770,7 @@ void segas32_state::init_f1lap(void)
 }
 
 
-void segas32_state::init_f1lapt(void)
+void segas32_state::init_f1lapt()
 {
 	segas32_common_init();
 
@@ -5803,13 +5780,13 @@ void segas32_state::init_f1lapt(void)
 }
 
 
-void segas32_state::init_ga2(void)
+void segas32_state::init_ga2()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_harddunk(void)
+void segas32_state::init_harddunk()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::harddunk_sw1_output;
@@ -5818,13 +5795,13 @@ void segas32_state::init_harddunk(void)
 }
 
 
-void segas32_state::init_holo(void)
+void segas32_state::init_holo()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_jpark(void)
+void segas32_state::init_jpark()
 {
 	/* Temp. Patch until we emulate the 'Drive Board', thanks to Malice */
 	uint16_t *pROM = (uint16_t *)m_maincpu_region->base();
@@ -5838,7 +5815,7 @@ void segas32_state::init_jpark(void)
 }
 
 
-void segas32_state::init_orunners(void)
+void segas32_state::init_orunners()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::orunners_sw1_output;
@@ -5848,7 +5825,7 @@ void segas32_state::init_orunners(void)
 }
 
 
-void segas32_state::init_radm(void)
+void segas32_state::init_radm()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::radm_sw1_output;
@@ -5856,7 +5833,7 @@ void segas32_state::init_radm(void)
 }
 
 
-void segas32_state::init_radr(void)
+void segas32_state::init_radr()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::radm_sw1_output;
@@ -5866,10 +5843,10 @@ void segas32_state::init_radr(void)
 }
 
 
-void segas32_state::init_scross(void)
+void segas32_state::init_scross()
 {
 	segas32_common_init();
-	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8_delegate(FUNC(segas32_state::scross_bank_w),this));
+	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8_delegate(*this, FUNC(segas32_state::scross_bank_w)));
 
 	m_sw1_output = &segas32_state::scross_sw1_output;
 	m_sw2_output = &segas32_state::scross_sw2_output;
@@ -5878,47 +5855,47 @@ void segas32_state::init_scross(void)
 }
 
 
-void segas32_state::init_slipstrm(void)
+void segas32_state::init_slipstrm()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_sonic(void)
+void segas32_state::init_sonic()
 {
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16_delegate(FUNC(segas32_state::sonic_level_load_protection),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16_delegate(*this, FUNC(segas32_state::sonic_level_load_protection)));
 }
 
 
-void segas32_state::init_sonicp(void)
+void segas32_state::init_sonicp()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_spidman(void)
+void segas32_state::init_spidman()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_svf(void)
+void segas32_state::init_svf()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_jleague(void)
+void segas32_state::init_jleague()
 {
 	segas32_common_init();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20F700, 0x20F705, write16_delegate(FUNC(segas32_state::jleague_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20F700, 0x20F705, write16_delegate(*this, FUNC(segas32_state::jleague_protection_w)));
 }
 
 
-void segas32_state::init_titlef(void)
+void segas32_state::init_titlef()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::titlef_sw1_output;
@@ -5937,7 +5914,7 @@ GAME( 1992, arescueu,  arescue,  sega_system32_dual_direct_upd7725, arescue, seg
 GAME( 1992, arescuej,  arescue,  sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1993, alien3,    0,        sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, alien3u,   alien3,   sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, alien3u,   alien3,   sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, alien3j,   alien3,   sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1991, arabfgt,   0,        sega_system32_arf,         arabfgt,  segas32_new_state, init_arabfgt,  ROT0, "Sega",   "Arabian Fight (World)", MACHINE_IMPERFECT_GRAPHICS ) /* Released in 03.1992 */
@@ -5950,27 +5927,28 @@ GAME( 1992, brivalj,   brival,   sega_system32_4p,          brival,   segas32_ne
 GAME( 1992, darkedge,  0,        sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, darkedgej, darkedge, sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, dbzvrvs,   0,        sega_system32_analog,      dbzvrvs,  segas32_new_state, init_dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z V.R.V.S. (Japan)", MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1994, dbzvrvs,   0,        sega_system32_analog,      dbzvrvs,  segas32_new_state, init_dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z V.R.V.S. (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS)
 
-GAME( 1991, f1en,      0,        sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, f1enu,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, f1enj,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, f1en,      0,        sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (World, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, f1enu,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, f1enj,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1993, f1lap,     0,        sega_system32_analog,      f1lap,    segas32_new_state, init_f1lap,    ROT0, "Sega",   "F1 Super Lap (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, f1lapt,    f1lap,    sega_system32_analog,      f1lap,    segas32_new_state, init_f1lapt,   ROT0, "Sega",   "F1 Super Lap (World, Unprotected)", MACHINE_IMPERFECT_GRAPHICS ) /* Factory unprotected */
 GAME( 1993, f1lapj,    f1lap,    sega_system32_analog,      f1lap,    segas32_new_state, init_f1lap,    ROT0, "Sega",   "F1 Super Lap (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, ga2,       0,        sega_system32_ga2,         ga2,      segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, ga2u,      ga2,      sega_system32_ga2,         ga2u,     segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2,       0,        sega_system32_ga2,         ga2,      segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World, Rev B)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2u,      ga2,      sega_system32_ga2,         ga2u,     segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, ga2j,      ga2,      sega_system32_ga2,         ga2,      segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, holo,      0,        sega_system32,             holo,     segas32_new_state, init_holo,     ORIENTATION_FLIP_Y, "Sega",   "Holosseum (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, holo,      0,        sega_system32,             holo,     segas32_new_state, init_holo,     ORIENTATION_FLIP_Y, "Sega",   "Holosseum (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, jpark,     0,        sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1994 */
+GAME( 1993, jpark,     0,        sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (World, Rev A)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1994 */
 GAME( 1993, jparkj,    jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, jparkja,   jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, jparkjc,   jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Conversion)", MACHINE_IMPERFECT_GRAPHICS )
 
+GAME( 1992, kokoroj,   0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology (Rev A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
 GAME( 1993, kokoroj2,  0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology Vol. 2 - Kokoro no Tanteikyoku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
 
 GAME( 1990, radm,      0,        sega_system32_analog,      radm,     segas32_new_state, init_radm,     ROT0, "Sega",   "Rad Mobile (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1991 */
@@ -5987,12 +5965,12 @@ GAME( 1992, sonic,     0,        sega_system32_track,       sonic,    segas32_ne
 GAME( 1992, sonicp,    sonic,    sega_system32_track,       sonic,    segas32_new_state, init_sonicp,   ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, prototype)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1991, spidman,   0,        sega_system32_4p,          spidman,  segas32_new_state, init_spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, spidmanu,  spidman,  sega_system32_4p,          spidmanu, segas32_new_state, init_spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, spidmanu,  spidman,  sega_system32_4p,          spidmanu, segas32_new_state, init_spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, spidmanj,  spidman,  sega_system32_4p,          spidman,  segas32_new_state, init_spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1994, svf,       0,        sega_system32,             svf,      segas32_new_state, init_svf,      ROT0, "Sega",   "Super Visual Football: European Sega Cup (Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, svfo,      svf,      sega_system32,             svf,      segas32_new_state, init_svf,      ROT0, "Sega",   "Super Visual Football: European Sega Cup", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, svs,       svf,      sega_system32,             svf,      segas32_new_state, init_svf,      ROT0, "Sega",   "Super Visual Soccer: Sega Cup (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, svs,       svf,      sega_system32,             svf,      segas32_new_state, init_svf,      ROT0, "Sega",   "Super Visual Soccer: Sega Cup (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, jleague,   svf,      sega_system32,             svf,      segas32_new_state, init_jleague,  ROT0, "Sega",   "The J.League 1994 (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, jleagueo,  svf,      sega_system32,             svf,      segas32_new_state, init_jleague,  ROT0, "Sega",   "The J.League 1994 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 

@@ -40,7 +40,7 @@ void bublbobl_state::common_sreset(int state)
 // 44 74 74 76 or 76 36 76 once or more per frame...
 */
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
+void bublbobl_state::bublbobl_bankswitch_w(uint8_t data)
 {
 	//logerror("bankswitch_w:  write of %02X\n", data);
 	/* bits 0-2 select ROM bank */
@@ -72,7 +72,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
    \-------- ? used (idle high, /SRESET?)
 // bublboblp: test and main: 00 C8 C9 C8 C9...; tokio: test 00 09 09 49 main 00 09 C8 CF
 */
-WRITE8_MEMBER(bublbobl_state::tokio_bankswitch_w)
+void bublbobl_state::tokio_bankswitch_w(uint8_t data)
 {
 	/* bits 0-2 select ROM bank */
 	membank("bank1")->set_entry(data & 7);
@@ -99,7 +99,7 @@ WRITE8_MEMBER(bublbobl_state::tokio_bankswitch_w)
    |\------- ? used (idle high, /SBRES? or /SBINT?)
    \-------- VHINV (flip screen)
 */
-WRITE8_MEMBER(bublbobl_state::tokio_videoctrl_w)
+void bublbobl_state::tokio_videoctrl_w(uint8_t data)
 {
 	//logerror("tokio_videoctrl_w:  write of %02X\n", data);
 	/* bits 0-3 not used? */
@@ -135,7 +135,7 @@ void bublbobl_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_mcu->set_input_line(0, CLEAR_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in bublbobl_state::device_timer");
+		throw emu_fatalerror("Unknown id in bublbobl_state::device_timer");
 	}
 }
 
@@ -392,7 +392,7 @@ INTERRUPT_GEN_MEMBER(bub68705_state::bublbobl_m68705_interrupt)
 }
 
 
-WRITE8_MEMBER(bub68705_state::port_a_w)
+void bub68705_state::port_a_w(uint8_t data)
 {
 	//logerror("%04x: 68705 port A write %02x\n", m_mcu->pc(), data);
 	m_port_a_out = data;
@@ -419,12 +419,12 @@ WRITE8_MEMBER(bub68705_state::port_a_w)
  *  7   W  not used?
  */
 
-WRITE8_MEMBER(bub68705_state::port_b_w)
+void bub68705_state::port_b_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port B write %02x\n", m_mcu->pc(), data);
 
 	if (BIT(mem_mask, 0) && !BIT(data, 0) && BIT(m_port_b_out, 0))
-		m_mcu->pa_w(space, 0, m_latch);
+		m_mcu->pa_w(m_latch);
 
 	if (BIT(mem_mask, 1) && BIT(data, 1) && !BIT(m_port_b_out, 1)) /* positive edge trigger */
 	{

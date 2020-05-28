@@ -486,7 +486,7 @@ READ8_MEMBER(arkanoid_state::arkanoid_bootleg_d008_r)
 {
 	uint8_t arkanoid_bootleg_d008_bit[8];
 	uint8_t arkanoid_bootleg_d008_val;
-	uint8_t arkanoid_paddle_value = ioport("MUX")->read();
+	uint8_t arkanoid_paddle_value = input_mux_r();
 	int b;
 
 	arkanoid_bootleg_d008_bit[4] = arkanoid_bootleg_d008_bit[6] = arkanoid_bootleg_d008_bit[7] = 0;  /* untested bits */

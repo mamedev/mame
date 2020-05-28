@@ -28,7 +28,7 @@
 #include "machine/terminal.h"
 #include "machine/z80dma.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 
 class ts802_state : public driver_device
@@ -56,10 +56,10 @@ private:
 	DECLARE_WRITE8_MEMBER(port04_w);
 	DECLARE_WRITE8_MEMBER(port18_w);
 	DECLARE_WRITE8_MEMBER(port80_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
 	void ts802_io(address_map &map);
 	void ts802_mem(address_map &map);
@@ -80,7 +80,7 @@ void ts802_state::ts802_mem(address_map &map)
 
 void ts802_state::ts802_io(address_map &map)
 {
-	//ADDRESS_MAP_UNMAP_HIGH
+	//map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x03).r(FUNC(ts802_state::port00_r));  // DIP switches
 	// 04 - written once after OS boot to bank in RAM from 0000-3FFF instead of ROM.  4000-FFFF is always RAM.
@@ -88,13 +88,13 @@ void ts802_state::ts802_io(address_map &map)
 	// 08-0B: Z80 CTC
 	map(0x08, 0x0b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	// 0C-0F: Z80 SIO #1
-	//AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("dart1", z80dart_device, ba_cd_r, ba_cd_w)
+	//map(0x0c, 0x0f).rw("dart1", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x0c, 0x0c).r(FUNC(ts802_state::port0c_r));
 	map(0x0d, 0x0d).r(FUNC(ts802_state::port0d_r)).w(m_terminal, FUNC(generic_terminal_device::write));
 	map(0x0e, 0x0e).r(FUNC(ts802_state::port0e_r));
 	map(0x0f, 0x0f).r(FUNC(ts802_state::port0f_r));
 	// 10: Z80 DMA
-	map(0x10, 0x13).rw("dma", FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x10, 0x13).rw("dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	// 14-17: WD 1793
 	map(0x14, 0x17).rw("fdc", FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	// 18: floppy misc.
@@ -124,22 +124,22 @@ WRITE8_MEMBER( ts802_state::port80_w )
 {
 }
 
-READ8_MEMBER( ts802_state::memory_read_byte )
+uint8_t ts802_state::memory_read_byte(offs_t offset)
 {
 	return m_mem->read_byte(offset);
 }
 
-WRITE8_MEMBER( ts802_state::memory_write_byte )
+void ts802_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	m_mem->write_byte(offset, data);
 }
 
-READ8_MEMBER( ts802_state::io_read_byte )
+uint8_t ts802_state::io_read_byte(offs_t offset)
 {
 	return m_io->read_byte(offset);
 }
 
-WRITE8_MEMBER( ts802_state::io_write_byte )
+void ts802_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	m_io->write_byte(offset, data);
 }

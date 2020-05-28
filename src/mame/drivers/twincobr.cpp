@@ -665,7 +665,7 @@ void twincobr_state::twincobr(machine_config &config)
 	m_dsp->set_addrmap(AS_IO, &twincobr_state::dsp_io_map);
 	m_dsp->bio().set(FUNC(twincobr_state::twincobr_bio_r));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<2>().set(FUNC(twincobr_state::int_enable_w));

@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="ekara_japan_ac" description="Takara e-kara (Japan) ACxxxx series cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
 
@@ -7,8 +10,9 @@
 	Japanese cart listing (by AC code)  * = dumped
 	 * = dumped
 
-	this numbering is a little unusual, maybe there are other AC cartridges that were
-	bundled with other units?
+	this numbering is a little unusual, maybe the 'A' series Pichi Pichi Pitch
+	are actually 1-8 here, just lacking the actual AC markings.
+	see ekara_japan_a.xml
 
 	*AC0009-KIR / KR-1  Kirarin Cartridge Vol.1 (bundled with Kirarin microphone)
 

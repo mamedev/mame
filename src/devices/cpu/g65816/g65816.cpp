@@ -860,10 +860,9 @@ void g65816_device::device_start()
 	m_execute = nullptr;
 	m_debugger_temp = 0;
 
-	address_space &program_space = space(AS_PROGRAM);
-	m_data_space = has_space(AS_DATA) ? &space(AS_DATA) : &program_space;
-	m_program_cache = program_space.cache<0, 0, ENDIANNESS_LITTLE>();
-	m_opcode_cache = (has_space(AS_OPCODES) ? space(AS_OPCODES) : program_space).cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_program);
+	(has_space(AS_OPCODES) ? space(AS_OPCODES) : space(AS_PROGRAM)).cache(m_opcode);
+	(has_space(AS_DATA) ? space(AS_DATA) : space(AS_PROGRAM)).specific(m_data);
 
 	m_wdm_w.resolve_safe();
 
@@ -895,9 +894,7 @@ void g65816_device::device_start()
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(g65816_device::g65816_restore_state), this));
 
-	m_rw8_cycles = 1;
-	m_rw16_cycles = 2;
-	m_rw24_cycles = 3;
+	m_divider = 1;
 
 	state_add( G65816_PC,        "PC", m_debugger_temp).callimport().callexport().formatstr("%06X");
 	state_add( G65816_S,         "S", m_s).callimport().formatstr("%04X");
@@ -1031,14 +1028,14 @@ int g65816_device::bus_5A22_cycle_burst(unsigned addr)
 
 	if(addr & 0x408000) {
 		if(addr & 0x800000)
-			return (m_fastROM & 1) ? 6 : 8;
+			return (m_fastROM & 1) ? 0 : 2;
 
-		return 8;
+		return 2;
 	}
-	if((addr + 0x6000) & 0x4000) return 8;
-	if((addr - 0x4000) & 0x7e00) return 6;
+	if((addr + 0x6000) & 0x4000) return 2;
+	if((addr - 0x4000) & 0x7e00) return 0;
 
-	return 12;
+	return 6;
 }
 
 
@@ -1048,9 +1045,7 @@ void _5a22_device::device_start()
 
 	state_add( _5A22_FASTROM, "fastROM", m_debugger_temp).mask(0x01).callimport().callexport().formatstr("%01X");
 
-	m_rw8_cycles = 0;
-	m_rw16_cycles = 0;
-	m_rw24_cycles = 0;
+	m_divider = 6;
 }
 
 void _5a22_device::state_import(const device_state_entry &entry)
@@ -1096,29 +1091,29 @@ translation of Breath of Fire 2 to work. More weirdness: we might need to leave
 8 CPU cycles for division at first, since using 16 produces bugs (see e.g.
 Triforce pieces in Zelda 3 intro) */
 
-WRITE8_MEMBER( _5a22_device::wrmpya_w )
+void _5a22_device::wrmpya_w(uint8_t data)
 {
 	m_wrmpya = data;
 }
 
-WRITE8_MEMBER( _5a22_device::wrmpyb_w )
+void _5a22_device::wrmpyb_w(uint8_t data)
 {
 	m_wrmpyb = data;
 	m_rdmpy = m_wrmpya * m_wrmpyb;
 	/* TODO: m_rddiv == 0? */
 }
 
-WRITE8_MEMBER( _5a22_device::wrdivl_w )
+void _5a22_device::wrdivl_w(uint8_t data)
 {
 	m_wrdiv = (data) | (m_wrdiv & 0xff00);
 }
 
-WRITE8_MEMBER( _5a22_device::wrdivh_w )
+void _5a22_device::wrdivh_w(uint8_t data)
 {
 	m_wrdiv = (data << 8) | (m_wrdiv & 0xff);
 }
 
-WRITE8_MEMBER( _5a22_device::wrdvdd_w )
+void _5a22_device::wrdvdd_w(uint8_t data)
 {
 	uint16_t quotient, remainder;
 
@@ -1131,27 +1126,27 @@ WRITE8_MEMBER( _5a22_device::wrdvdd_w )
 	m_rdmpy = remainder;
 }
 
-WRITE8_MEMBER( _5a22_device::memsel_w )
+void _5a22_device::memsel_w(uint8_t data)
 {
 	m_fastROM = data & 1;
 }
 
-READ8_MEMBER( _5a22_device::rddivl_r )
+uint8_t _5a22_device::rddivl_r()
 {
 	return m_rddiv & 0xff;
 }
 
-READ8_MEMBER( _5a22_device::rddivh_r )
+uint8_t _5a22_device::rddivh_r()
 {
 	return m_rddiv >> 8;
 }
 
-READ8_MEMBER( _5a22_device::rdmpyl_r )
+uint8_t _5a22_device::rdmpyl_r()
 {
 	return m_rdmpy & 0xff;
 }
 
-READ8_MEMBER( _5a22_device::rdmpyh_r )
+uint8_t _5a22_device::rdmpyh_r()
 {
 	return m_rdmpy >> 8;
 }
@@ -1159,21 +1154,16 @@ READ8_MEMBER( _5a22_device::rdmpyh_r )
 
 void _5a22_device::set_5a22_map()
 {
-	space(AS_PROGRAM).install_write_handler(0x4202, 0x4202, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrmpya_w),this));
-	space(AS_PROGRAM).install_write_handler(0x4203, 0x4203, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrmpyb_w),this));
-	space(AS_PROGRAM).install_write_handler(0x4204, 0x4204, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrdivl_w),this));
-	space(AS_PROGRAM).install_write_handler(0x4205, 0x4205, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrdivh_w),this));
-	space(AS_PROGRAM).install_write_handler(0x4206, 0x4206, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrdvdd_w),this));
+	space(AS_PROGRAM).install_write_handler(0x4202, 0x4202, 0, 0xbf0000, 0, write8smo_delegate(*this, FUNC(_5a22_device::wrmpya_w)));
+	space(AS_PROGRAM).install_write_handler(0x4203, 0x4203, 0, 0xbf0000, 0, write8smo_delegate(*this, FUNC(_5a22_device::wrmpyb_w)));
+	space(AS_PROGRAM).install_write_handler(0x4204, 0x4204, 0, 0xbf0000, 0, write8smo_delegate(*this, FUNC(_5a22_device::wrdivl_w)));
+	space(AS_PROGRAM).install_write_handler(0x4205, 0x4205, 0, 0xbf0000, 0, write8smo_delegate(*this, FUNC(_5a22_device::wrdivh_w)));
+	space(AS_PROGRAM).install_write_handler(0x4206, 0x4206, 0, 0xbf0000, 0, write8smo_delegate(*this, FUNC(_5a22_device::wrdvdd_w)));
 
-	space(AS_PROGRAM).install_write_handler(0x420d, 0x420d, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::memsel_w),this));
+	space(AS_PROGRAM).install_write_handler(0x420d, 0x420d, 0, 0xbf0000, 0, write8smo_delegate(*this, FUNC(_5a22_device::memsel_w)));
 
-	space(AS_PROGRAM).install_read_handler(0x4214, 0x4214, 0, 0xbf0000, 0, read8_delegate(FUNC(_5a22_device::rddivl_r),this));
-	space(AS_PROGRAM).install_read_handler(0x4215, 0x4215, 0, 0xbf0000, 0, read8_delegate(FUNC(_5a22_device::rddivh_r),this));
-	space(AS_PROGRAM).install_read_handler(0x4216, 0x4216, 0, 0xbf0000, 0, read8_delegate(FUNC(_5a22_device::rdmpyl_r),this));
-	space(AS_PROGRAM).install_read_handler(0x4217, 0x4217, 0, 0xbf0000, 0, read8_delegate(FUNC(_5a22_device::rdmpyh_r),this));
+	space(AS_PROGRAM).install_read_handler(0x4214, 0x4214, 0, 0xbf0000, 0, read8smo_delegate(*this, FUNC(_5a22_device::rddivl_r)));
+	space(AS_PROGRAM).install_read_handler(0x4215, 0x4215, 0, 0xbf0000, 0, read8smo_delegate(*this, FUNC(_5a22_device::rddivh_r)));
+	space(AS_PROGRAM).install_read_handler(0x4216, 0x4216, 0, 0xbf0000, 0, read8smo_delegate(*this, FUNC(_5a22_device::rdmpyl_r)));
+	space(AS_PROGRAM).install_read_handler(0x4217, 0x4217, 0, 0xbf0000, 0, read8smo_delegate(*this, FUNC(_5a22_device::rdmpyh_r)));
 }
-
-
-/* ======================================================================== */
-/* ============================== END OF FILE ============================= */
-/* ======================================================================== */

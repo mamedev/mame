@@ -25,8 +25,8 @@ void hp48_port_image_device::fill_port()
 	LOG("hp48_port_image_device::fill_port: %s module=%i size=%i rw=%i\n", tag(), m_module, size, m_port_write);
 	m_port_data = make_unique_clear<uint8_t[]>(2 * size);
 	m_hp48->m_modules[m_module].off_mask = 2 * (( size > 128 * 1024 ) ? 128 * 1024 : size) - 1;
-	m_hp48->m_modules[m_module].read     = read8_delegate();
-	m_hp48->m_modules[m_module].write    = write8_delegate();
+	m_hp48->m_modules[m_module].read     = read8_delegate(*m_hp48);
+	m_hp48->m_modules[m_module].write    = write8_delegate(*m_hp48);
 	m_hp48->m_modules[m_module].isnop    = m_port_write ? 0 : 1;
 	m_hp48->m_modules[m_module].data     = (void*)m_port_data.get();
 	m_hp48->apply_modules();
@@ -37,8 +37,8 @@ void hp48_port_image_device::unfill_port()
 {
 	LOG("hp48_port_image_device::unfill_port\n");
 	m_hp48->m_modules[m_module].off_mask = 0x00fff;  /* 2 KB */
-	m_hp48->m_modules[m_module].read     = read8_delegate();
-	m_hp48->m_modules[m_module].write    = write8_delegate();
+	m_hp48->m_modules[m_module].read     = read8_delegate(*m_hp48);
+	m_hp48->m_modules[m_module].write    = write8_delegate(*m_hp48);
 	m_hp48->m_modules[m_module].data     = nullptr;
 	m_hp48->m_modules[m_module].isnop    = 1;
 	m_port_size                          = 0;

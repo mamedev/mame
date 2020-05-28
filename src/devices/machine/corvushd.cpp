@@ -814,7 +814,7 @@ uint8_t corvus_hdc_device::corvus_get_drive_parameters(uint8_t drv) {
 	//
 	if ( ! corvus_hdc_file( drv ) )
 	{
-		logerror("corvus_get_drive_parameters: Attempt to retrieve parameters from non-existant drive: %d\n", drv);
+		logerror("corvus_get_drive_parameters: Attempt to retrieve parameters from non-existent drive: %d\n", drv);
 		m_xmit_bytes = 1;
 		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
 	}
@@ -1502,7 +1502,7 @@ void corvus_hdc_device::device_start() {
 // Returns:
 //      Value in the controller status register
 //
-READ8_MEMBER ( corvus_hdc_device::status_r ) {
+uint8_t corvus_hdc_device::status_r() {
 	return m_status;
 }
 
@@ -1521,7 +1521,7 @@ READ8_MEMBER ( corvus_hdc_device::status_r ) {
 // Returns:
 //      Value in the controller data register
 //
-READ8_MEMBER ( corvus_hdc_device::read ) {
+uint8_t corvus_hdc_device::read() {
 	uint8_t result;
 
 	if((m_status & CONTROLLER_DIRECTION) == 0) {   // Check to see if we're in Controller-to-Host mode
@@ -1569,7 +1569,7 @@ READ8_MEMBER ( corvus_hdc_device::read ) {
 // Returns:
 //      Nothing
 //
-WRITE8_MEMBER ( corvus_hdc_device::write ) {
+void corvus_hdc_device::write(uint8_t data) {
 	//
 	// Received a byte -- check to see if we should really respond
 	//

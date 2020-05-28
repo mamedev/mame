@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C64_DELA_EP256, c64_dela_ep256_cartridge_device, "delep256", "C64 Dela 256KB EPROM cartridge")
+DEFINE_DEVICE_TYPE(C64_DELA_EP256, c64_dela_ep256_cartridge_device, "c64_dela_ep256", "C64 Dela 256KB EPROM cartridge")
 
 
 //-------------------------------------------------

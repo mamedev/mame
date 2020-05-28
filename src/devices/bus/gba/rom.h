@@ -137,8 +137,13 @@ public:
 	// construction/destruction
 	gba_rom_drilldoz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
+	virtual void device_start() override;
 	virtual void gpio_dev_write(uint16_t data, int gpio_dirs) override;
+
+private:
+	output_finder<> m_rumble;
 };
 
 
@@ -161,6 +166,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	output_finder<> m_rumble;
+
 	uint8_t m_last_val;
 	int m_counter;
 	required_ioport m_gyro_z;

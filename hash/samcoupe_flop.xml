@@ -1,8 +1,26 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- to boot disks type 'BOOT' and press return
+  to boot disks type 'BOOT' and press return
   alternatively press numpad 9 which seems to do the same thing
+
+  disk image formats:
+  .mgt  .dsk  .sad
+  confusingly there seems to be two types of .dsk image, one is just the same as .mgt in all but the extension,
+  the other is "extended DSK disk image" (sometimes with .edsk extension) which is often used for Amstrad CPC and Spectrum +3 images.
+  .sad seems to be a more advanced format that allows copy-protected images etc.
+
+  currently only .mgt/.dsk is supported in coupedsk.cpp
+  should be trivial to add "extended DSK disk image" support as it's already in Mame.
+
+  most game images have trainers/pokes.
+  all Sam Coupe games will probably need re-dumping at some point as there seems to be very few clean images available.
+  TOSEC and GoodSamC don't have much, mostly hacked, demos, unlicensed/homebrew etc.
+  www.worldofsam.org is a good source of infomation but most commercial games are not available for download.
+
+  SAMDOS disks include the official MGT ZX Spectrum emulator.
 -->
 
 <softwarelist name="samcoupe_flop" description="Sam Coupe Floppy Disks">
@@ -13,12 +31,68 @@
 		<publisher>Revelation Software / Software Projects</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="manic miner (1992) (revelation software) (demo).dsk" size="819200" crc="02708a54" sha1="a2d5634f5e64960db21eed38c1cef79bd2e13e7a" offset="0"/>
+				<rom name="manic miner (1992) (revelation software) (demo).dsk" size="819200" crc="02708a54" sha1="a2d5634f5e64960db21eed38c1cef79bd2e13e7a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="samdos1">
+		<description>Sam Coupe System Disk (SAMDOS v1.1)</description>
+		<year>1990</year>
+		<publisher>Miles Gordon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="sam coupe system disk (SAMDOS v1.1).dsk" size="819200" crc="2d871850" sha1="6982d32a0a4b45e9bcb7239b2207e62a7de343dd"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="samdos2">
+		<description>Sam Coupe System Disk (SAMDOS v2.0)</description>
+		<year>1990</year>
+		<publisher>Miles Gordon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="sam coupe system disk (SAMDOS v2.0).dsk" size="819200" crc="6634f061" sha1="a0b6696ea81356bff052daeb7fc49cc4a9f7ff17"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="boing">
+		<description>Boing!</description>
+		<year>1992</year>
+		<publisher>Noesis Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="boing.dsk" size="819200" crc="c7f81167" sha1="7305db3c9db95980d5e167e4b71aa680edef6055"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="defenders">
+		<description>Defenders Of The Earth</description>
+		<year>1990</year>
+		<publisher>Enigma Variations</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="defenders of the earth.dsk" size="819200" crc="ba7dc965" sha1="13a7ac6b437433604ad6044238380c322b87fc43"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="samstrikes">
+		<description>Sam Strikes Out!</description>
+		<year>1990</year>
+		<publisher>Enigma Variations</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="sam strikes out.dsk" size="819200" crc="c11bbd22" sha1="6f6bdd9add07e6ce319fa93c83177d0ab9221829"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sphera">
+		<description>Sphera</description>
+		<year>1990</year>
+		<publisher>Enigma Variations</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="sphera.dsk" size="819200" crc="6e8cc190" sha1="5502ae252d570129a82aecc8e17b1a4d197ab4ff"/>
 			</dataarea>
 		</part>
 	</software>
 </softwarelist>
-
-
-
-

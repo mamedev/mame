@@ -49,10 +49,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 2; }
-	virtual uint32_t execute_max_cycles() const override { return 26; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 26; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -165,97 +165,97 @@ private:
 	address_space *m_io;
 	int     m_icount;
 
-	devcb_read8   m_port_in_cb[8];
-	devcb_write8  m_port_out_cb[8];
-	devcb_read8   m_port_analog_in_cb[8];
-	devcb_write_line m_serial_out_cb[2];
+	devcb_read8::array<8>   m_port_in_cb;
+	devcb_write8::array<8>  m_port_out_cb;
+	devcb_read8::array<8>   m_port_analog_in_cb;
+	devcb_write_line::array<2> m_serial_out_cb;
 
 
 	uint8_t m_port_out_latch[8];
 	int m_read_input_port;
 	uint8_t m_port0_cr, m_port1_cr, m_port6_cr, m_port7_cr;
 
-	DECLARE_READ8_MEMBER(port0_r);
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_READ8_MEMBER(port3_r);
-	DECLARE_READ8_MEMBER(port4_r);
-	DECLARE_READ8_MEMBER(port5_r);
-	DECLARE_READ8_MEMBER(port6_r);
-	DECLARE_READ8_MEMBER(port7_r);
+	uint8_t port0_r();
+	uint8_t port1_r();
+	uint8_t port2_r();
+	uint8_t port3_r();
+	uint8_t port4_r();
+	uint8_t port5_r();
+	uint8_t port6_r();
+	uint8_t port7_r();
 
-	DECLARE_WRITE8_MEMBER(port0_w);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_WRITE8_MEMBER(port3_w);
-	DECLARE_WRITE8_MEMBER(port4_w);
-	DECLARE_WRITE8_MEMBER(port5_w);
-	DECLARE_WRITE8_MEMBER(port6_w);
-	DECLARE_WRITE8_MEMBER(port7_w);
+	void port0_w(uint8_t data);
+	void port1_w(uint8_t data);
+	void port2_w(uint8_t data);
+	void port3_w(uint8_t data);
+	void port4_w(uint8_t data);
+	void port5_w(uint8_t data);
+	void port6_w(uint8_t data);
+	void port7_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(p0cr_w);
-	DECLARE_WRITE8_MEMBER(p1cr_w);
-	DECLARE_WRITE8_MEMBER(p6cr_w);
-	DECLARE_WRITE8_MEMBER(p7cr_w);
+	void p0cr_w(uint8_t data);
+	void p1cr_w(uint8_t data);
+	void p6cr_w(uint8_t data);
+	void p7cr_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(eir_l_r);
-	DECLARE_READ8_MEMBER(eir_h_r);
-	DECLARE_READ8_MEMBER(il_l_r);
-	DECLARE_READ8_MEMBER(il_h_r);
+	uint8_t eir_l_r();
+	uint8_t eir_h_r();
+	uint8_t il_l_r();
+	uint8_t il_h_r();
 
-	DECLARE_WRITE8_MEMBER(eir_l_w);
-	DECLARE_WRITE8_MEMBER(eir_h_w);
-	DECLARE_WRITE8_MEMBER(il_l_w);
-	DECLARE_WRITE8_MEMBER(il_h_w);
+	void eir_l_w(uint8_t data);
+	void eir_h_w(uint8_t data);
+	void il_l_w(uint8_t data);
+	void il_h_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(eintcr_r);
+	uint8_t eintcr_r();
 
-	DECLARE_WRITE8_MEMBER(eintcr_w);
+	void eintcr_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(treg1a_l_w);
-	DECLARE_WRITE8_MEMBER(treg1a_h_w);
-	DECLARE_WRITE8_MEMBER(treg1b_l_w);
-	DECLARE_WRITE8_MEMBER(treg1b_h_w);
-	DECLARE_WRITE8_MEMBER(tc1cr_w);
-	DECLARE_WRITE8_MEMBER(tc2cr_w);
-	DECLARE_WRITE8_MEMBER(treg2_l_w);
-	DECLARE_WRITE8_MEMBER(treg2_h_w);
-	DECLARE_WRITE8_MEMBER(treg3a_w);
-	DECLARE_WRITE8_MEMBER(tc3cr_w);
-	DECLARE_WRITE8_MEMBER(tc4cr_w);
+	void treg1a_l_w(uint8_t data);
+	void treg1a_h_w(uint8_t data);
+	void treg1b_l_w(uint8_t data);
+	void treg1b_h_w(uint8_t data);
+	void tc1cr_w(uint8_t data);
+	void tc2cr_w(uint8_t data);
+	void treg2_l_w(uint8_t data);
+	void treg2_h_w(uint8_t data);
+	void treg3a_w(uint8_t data);
+	void tc3cr_w(uint8_t data);
+	void tc4cr_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(treg1b_l_r);
-	DECLARE_READ8_MEMBER(treg1b_h_r);
-	DECLARE_READ8_MEMBER(treg3a_r);
-	DECLARE_READ8_MEMBER(treg3b_r);
-	DECLARE_WRITE8_MEMBER(treg4_w);
+	uint8_t treg1b_l_r();
+	uint8_t treg1b_h_r();
+	uint8_t treg3a_r();
+	uint8_t treg3b_r();
+	void treg4_w(uint8_t data);
 
 
-	DECLARE_WRITE8_MEMBER(sio1cr1_w);
-	DECLARE_WRITE8_MEMBER(sio1cr2_w);
-	DECLARE_WRITE8_MEMBER(sio2cr1_w);
-	DECLARE_WRITE8_MEMBER(sio2cr2_w);
-	DECLARE_READ8_MEMBER(sio2sr_r);
-	DECLARE_READ8_MEMBER(sio1sr_r);
+	void sio1cr1_w(uint8_t data);
+	void sio1cr2_w(uint8_t data);
+	void sio2cr1_w(uint8_t data);
+	void sio2cr2_w(uint8_t data);
+	uint8_t sio2sr_r();
+	uint8_t sio1sr_r();
 
-	DECLARE_WRITE8_MEMBER(wdtcr1_w);
-	DECLARE_WRITE8_MEMBER(wdtcr2_w);
+	void wdtcr1_w(uint8_t data);
+	void wdtcr2_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(tbtcr_w);
+	void tbtcr_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(tbtcr_r);
+	uint8_t tbtcr_r();
 
-	DECLARE_WRITE8_MEMBER(syscr1_w);
-	DECLARE_WRITE8_MEMBER(syscr2_w);
-	DECLARE_READ8_MEMBER(syscr1_r);
-	DECLARE_READ8_MEMBER(syscr2_r);
-	DECLARE_WRITE8_MEMBER(rbs_w);
-	DECLARE_READ8_MEMBER(psw_r);
+	void syscr1_w(uint8_t data);
+	void syscr2_w(uint8_t data);
+	uint8_t syscr1_r();
+	uint8_t syscr2_r();
+	void rbs_w(uint8_t data);
+	uint8_t psw_r();
 
-	DECLARE_READ8_MEMBER(adccr_r);
-	DECLARE_READ8_MEMBER(adcdr_r);
+	uint8_t adccr_r();
+	uint8_t adcdr_r();
 
-	DECLARE_WRITE8_MEMBER(adccr_w);
+	void adccr_w(uint8_t data);
 
 	// Work registers
 	uint8_t m_cycles;

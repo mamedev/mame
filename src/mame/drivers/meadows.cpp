@@ -201,7 +201,7 @@ WRITE8_MEMBER(meadows_state::meadows_audio_w)
 
 INPUT_CHANGED_MEMBER(meadows_state::coin_inserted)
 {
-	m_maincpu->set_input_line_and_vector(0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82); // S2650
+	m_maincpu->set_input_line(0, (newval ? ASSERT_LINE : CLEAR_LINE));
 }
 
 
@@ -626,12 +626,13 @@ void meadows_state::meadows(machine_config &config)
 	/* basic machine hardware */
 	S2650(config, m_maincpu, MASTER_CLOCK/8);  /* 5MHz / 8 = 625 kHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &meadows_state::meadows_main_map);
+	m_maincpu->intack_handler().set([]() { return 0x82; });
 
 	S2650(config, m_audiocpu, MASTER_CLOCK/8); /* 5MHz / 8 = 625 kHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &meadows_state::audio_map);
 	m_audiocpu->set_periodic_int(FUNC(meadows_state::audio_interrupt), attotime::from_hz((double)5000000/131072));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -691,7 +692,7 @@ void meadows_state::bowl3d(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &meadows_state::audio_map);
 	m_audiocpu->set_periodic_int(FUNC(meadows_state::audio_interrupt), attotime::from_hz((double)5000000/131072));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(xevious_state::get_fg_tile_info)
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
 	uint8_t color = ((attr & 0x03) << 4) | ((attr & 0x3c) >> 2);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_xevious_fg_videoram[tile_index] | (flip_screen() ? 0x100 : 0),
 			color,
 			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (flip_screen() ? TILE_FLIPX : 0));
@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(xevious_state::get_bg_tile_info)
 	uint8_t code = m_xevious_bg_videoram[tile_index];
 	uint8_t attr = m_xevious_bg_colorram[tile_index];
 	uint8_t color = ((attr & 0x3c) >> 2) | ((code & 0x80) >> 3) | ((attr & 0x03) << 5);
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code + ((attr & 0x01) << 8),
 			color,
 			TILE_FLIPYX((attr & 0xc0) >> 6));
@@ -142,8 +142,8 @@ TILE_GET_INFO_MEMBER(xevious_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(xevious_state,xevious)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xevious_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xevious_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xevious_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xevious_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_bg_tilemap->set_scrolldx(-20,288+27);
 	m_bg_tilemap->set_scrolldy(-16,-16);

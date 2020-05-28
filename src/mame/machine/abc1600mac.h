@@ -47,18 +47,18 @@ public:
 	DECLARE_WRITE8_MEMBER( page_w );
 	DECLARE_WRITE8_MEMBER( dmamap_w );
 
-	DECLARE_READ8_MEMBER( dma0_mreq_r ) { return dma_mreq_r(DMAMAP_R0_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma0_mreq_w ) { dma_mreq_w(DMAMAP_R0_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma0_iorq_r ) { return dma_iorq_r(DMAMAP_R0_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma0_iorq_w ) { dma_iorq_w(DMAMAP_R0_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma1_mreq_r ) { return dma_mreq_r(DMAMAP_R1_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma1_mreq_w ) { dma_mreq_w(DMAMAP_R1_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma1_iorq_r ) { return dma_iorq_r(DMAMAP_R1_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma1_iorq_w ) { dma_iorq_w(DMAMAP_R1_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma2_mreq_r ) { return dma_mreq_r(DMAMAP_R2_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma2_mreq_w ) { dma_mreq_w(DMAMAP_R2_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma2_iorq_r ) { return dma_iorq_r(DMAMAP_R2_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma2_iorq_w ) { dma_iorq_w(DMAMAP_R2_LO, offset, data); }
+	uint8_t dma0_mreq_r(offs_t offset) { return dma_mreq_r(DMAMAP_R0_LO, offset); }
+	void dma0_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R0_LO, offset, data); }
+	uint8_t dma0_iorq_r(offs_t offset) { return dma_iorq_r(DMAMAP_R0_LO, offset); }
+	void dma0_iorq_w(offs_t offset, uint8_t data) { dma_iorq_w(DMAMAP_R0_LO, offset, data); }
+	uint8_t dma1_mreq_r(offs_t offset) { return dma_mreq_r(DMAMAP_R1_LO, offset); }
+	void dma1_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R1_LO, offset, data); }
+	uint8_t dma1_iorq_r(offs_t offset) { return dma_iorq_r(DMAMAP_R1_LO, offset); }
+	void dma1_iorq_w(offs_t offset, uint8_t data) { dma_iorq_w(DMAMAP_R1_LO, offset, data); }
+	uint8_t dma2_mreq_r(offs_t offset) { return dma_mreq_r(DMAMAP_R2_LO, offset); }
+	void dma2_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R2_LO, offset, data); }
+	uint8_t dma2_iorq_r(offs_t offset) { return dma_iorq_r(DMAMAP_R2_LO, offset); }
+	void dma2_iorq_w(offs_t offset, uint8_t data) { dma_iorq_w(DMAMAP_R2_LO, offset, data); }
 
 	void program_map(address_map &map);
 protected:

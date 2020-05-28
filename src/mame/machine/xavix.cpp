@@ -379,27 +379,17 @@ WRITE8_MEMBER(xavix_state::dispctrl_posirq_y_w)
 /* Per Game IO port callbacks */
 
 
-CUSTOM_INPUT_MEMBER(xavix_i2c_state::i2c_r)
-{
-	return m_i2cmem->read_sda();
-}
-
-CUSTOM_INPUT_MEMBER(xavix_i2c_cart_state::i2c_r)
-{
-	return m_i2cmem->read_sda();
-}
-
-CUSTOM_INPUT_MEMBER(xavix_i2c_lotr_state::camera_r) // seems to be some kind of camera status bits
+READ_LINE_MEMBER(xavix_i2c_lotr_state::camera_r) // seems to be some kind of camera status bits
 {
 	return machine().rand();
 }
 
-CUSTOM_INPUT_MEMBER(xavix_i2c_bowl_state::camera_r) // seems to be some kind of camera status bits
+READ_LINE_MEMBER(xavix_i2c_bowl_state::camera_r) // seems to be some kind of camera status bits
 {
 	return machine().rand();
 }
 
-CUSTOM_INPUT_MEMBER(xavix_ekara_state::ekara_multi0_r)
+READ_LINE_MEMBER(xavix_ekara_state::ekara_multi0_r)
 {
 	switch (m_extraioselect & 0x7f)
 	{
@@ -417,7 +407,7 @@ CUSTOM_INPUT_MEMBER(xavix_ekara_state::ekara_multi0_r)
 	return 0x00;
 }
 
-CUSTOM_INPUT_MEMBER(xavix_ekara_state::ekara_multi1_r)
+READ_LINE_MEMBER(xavix_ekara_state::ekara_multi1_r)
 {
 	switch (m_extraioselect & 0x7f)
 	{
@@ -524,13 +514,13 @@ void xavix_ekara_state::write_io1(uint8_t data, uint8_t direction)
 
 /* SuperXavix IO port handliner (per game) */
 
-READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io0)
+uint8_t xavix_i2c_jmat_state::read_extended_io0()
 {
 	LOG("%s: read_extended_io0\n", machine().describe_context());
 	return 0x00;
 }
 
-READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io1)
+uint8_t xavix_i2c_jmat_state::read_extended_io1()
 {
 	LOG("%s: read_extended_io1\n", machine().describe_context());
 
@@ -539,18 +529,18 @@ READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io1)
 	//return 0x00;
 }
 
-READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io2)
+uint8_t xavix_i2c_jmat_state::read_extended_io2()
 {
 	LOG("%s: read_extended_io2\n", machine().describe_context());
 	return 0x00;
 }
 
-WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io0)
+void xavix_i2c_jmat_state::write_extended_io0(uint8_t data)
 {
 	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io1)
+void xavix_i2c_jmat_state::write_extended_io1(uint8_t data)
 {
 	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
 
@@ -559,14 +549,14 @@ WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io1)
 
 }
 
-WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io2)
+void xavix_i2c_jmat_state::write_extended_io2(uint8_t data)
 {
 	LOG("%s: io2_data_w %02x\n", machine().describe_context(), data);
 }
 
 // the cart pins Popira 2 uses for IO with cart gc0010 are not controllable by the CPU on other ekara systems
 
-CUSTOM_INPUT_MEMBER(xavix_popira2_cart_state::i2c_r)
+READ_LINE_MEMBER(xavix_popira2_cart_state::i2c_r)
 {
 	if (m_cartslot->has_cart())
 		return m_cartslot->read_sda();

@@ -29,12 +29,12 @@
 Audio handlers
 ***************************************************************************/
 
-WRITE8_MEMBER(qix_state::qix_dac_w)
+void qix_state::qix_dac_w(uint8_t data)
 {
 	m_discrete->write(QIX_DAC_DATA, data);
 }
 
-WRITE8_MEMBER(qix_state::qix_vol_w)
+void qix_state::qix_vol_w(uint8_t data)
 {
 	m_discrete->write(QIX_VOL_DATA, data);
 }
@@ -96,7 +96,7 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-WRITE8_MEMBER(qix_state::sndpia_2_warning_w)
+void qix_state::sndpia_2_warning_w(uint8_t data)
 {
 	popmessage("PIA 5 write!!");
 }
@@ -104,18 +104,18 @@ WRITE8_MEMBER(qix_state::sndpia_2_warning_w)
 
 TIMER_CALLBACK_MEMBER(qix_state::deferred_sndpia1_porta_w)
 {
-	m_sndpia1->write_porta(param);
+	m_sndpia1->porta_w(param);
 }
 
 
-WRITE8_MEMBER(qix_state::sync_sndpia1_porta_w)
+void qix_state::sync_sndpia1_porta_w(uint8_t data)
 {
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(qix_state::deferred_sndpia1_porta_w), this), data);
 }
 
 
-WRITE8_MEMBER(qix_state::slither_coinctl_w)
+void qix_state::slither_coinctl_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, (~data >> 6) & 1);
 	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 1);
@@ -156,7 +156,6 @@ WRITE_LINE_MEMBER(qix_state::qix_pia_sint)
 
 void qix_state::audio_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x2000, 0x2003).mirror(0x5ffc).rw(m_sndpia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4000, 0x4003).mirror(0x3ffc).rw(m_sndpia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xd000, 0xffff).rom();

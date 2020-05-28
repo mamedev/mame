@@ -176,7 +176,7 @@ void * ym2612_init(device_t *device, int baseclock, int rate,
 void ym2612_clock_changed(void *chip, int clock, int rate);
 void ym2612_shutdown(void *chip);
 void ym2612_reset_chip(void *chip);
-void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length);
+void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length, u8 output_bits);
 
 int ym2612_write(void *chip, int a,unsigned char v);
 unsigned char ym2612_read(void *chip,int a);

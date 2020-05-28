@@ -147,7 +147,7 @@ static const int exception_codes[] =
 static const int sh3_intevt2_exception_codes[] =
 
 { 0x000, /* Power-on Reset */
-	-1, /* Manual Reset */
+	0x020, /* Manual Reset */
 	-1, /* H-UDI Reset */
 	-1, /* Inst TLB Multiple Hit */
 	-1, /* Data TLB Multiple Hit */
@@ -169,26 +169,26 @@ static const int sh3_intevt2_exception_codes[] =
 	-1, /* FPU Exception */
 	-1, /* Initial Page Write exception */
 
-	-1, /* Unconditional TRAP */
+	0x160, /* Unconditional TRAP */
 	-1, /* User break After Instruction */
 
-	-1, /* NMI */     /* SH4_INTC_NMI=23 represents this location in this list.. */
+	0x1C0, /* NMI */     /* SH4_INTC_NMI=23 represents this location in this list.. */
 
-	-1, /* EX Irq 0 */
-	-1, /*        1 */
-	-1, /*        2 */
-	-1, /*        3 */
-	-1, /*        4 */
-	-1, /*        5 */
-	-1, /*        6 */
-	-1, /*        7 */
-	-1, /*        8 */
-	-1, /*        9 */
-	-1, /*        A */
-	-1, /*        B */
-	-1, /*        C */
-	-1, /*        D */
-	-1, /*        E */
+	0x200, /* EX Irq 0 */
+	0x220, /*        1 */
+	0x240, /*        2 */
+	0x260, /*        3 */
+	0x280, /*        4 */
+	0x2A0, /*        5 */
+	0x2C0, /*        6 */
+	0x2E0, /*        7 */
+	0x300, /*        8 */
+	0x320, /*        9 */
+	0x340, /*        A */
+	0x360, /*        B */
+	0x380, /*        C */
+	0x3A0, /*        D */
+	0x3C0, /*        E */
 
 	0x600, /* SH4_INTC_IRL0 */
 	0x620, /* SH4_INTC_IRL1 */
@@ -198,10 +198,10 @@ static const int sh3_intevt2_exception_codes[] =
 
 	-1, /* HUDI */
 	-1, /* SH4_INTC_GPOI */
-	-1, /* SH4_INTC_DMTE0 */
-	-1, /* SH4_INTC_DMTE1 */
-	-1, /* SH4_INTC_DMTE2 */
-	-1, /* SH4_INTC_DMTE3 */
+	0x800, /* SH4_INTC_DMTE0 */
+	0x820, /* SH4_INTC_DMTE1 */
+	0x840, /* SH4_INTC_DMTE2 */
+	0x860, /* SH4_INTC_DMTE3 */
 
 	-1, /* SH4_INTC_DMTE4 */
 	-1, /* SH4_INTC_DMTE5 */
@@ -458,6 +458,10 @@ void sh34_base_device::sh4_exception(const char *message, int exception) // hand
 
 			m_sh3internal_lower[INTEVT2] = sh3_intevt2_exception_codes[exception];
 			m_sh3internal_upper[SH3_EXPEVT_ADDR] = exception_codes[exception];
+			if (sh3_intevt2_exception_codes[exception] >= 0x600)
+				m_sh3internal_upper[SH3_INTEVT_ADDR] = 0x3E0 - ((m_exception_priority[exception] >> 8) & 255) * 0x20;
+			else
+				m_sh3internal_upper[SH3_INTEVT_ADDR] = sh3_intevt2_exception_codes[exception];
 
 
 			LOG(("SH-3 '%s' interrupt exception #%d after [%s]\n", tag(), exception, message));

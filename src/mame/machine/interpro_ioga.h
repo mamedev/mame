@@ -205,7 +205,7 @@ public:
 	DECLARE_READ32_MEMBER(bus_timeout_r) { return m_bus_timeout; }
 	DECLARE_WRITE32_MEMBER(bus_timeout_w) { m_bus_timeout = data; }
 
-	DECLARE_WRITE32_MEMBER(bus_error);
+	void bus_error(offs_t offset, u32 data);
 
 	// timers
 	DECLARE_READ32_MEMBER(timer0_r);
@@ -235,7 +235,7 @@ public:
 		MOUSE_BUTTONS = 0x00070000
 	};
 	DECLARE_READ32_MEMBER(mouse_status_r);
-	DECLARE_WRITE32_MEMBER(mouse_status_w);
+	void mouse_status_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 protected:
 	// device-level overrides
@@ -243,7 +243,7 @@ protected:
 	virtual void device_reset() override;
 
 	required_address_space m_memory_space;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_memory;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_memory;
 
 	// callbacks
 	devcb_write_line m_out_nmi_func;

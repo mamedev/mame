@@ -193,13 +193,13 @@ public:
 	void init_sfkick();
 
 private:
-	DECLARE_WRITE8_MEMBER(page0_w);
-	DECLARE_WRITE8_MEMBER(page1_w);
-	DECLARE_WRITE8_MEMBER(page2_w);
-	DECLARE_WRITE8_MEMBER(page3_w);
-	DECLARE_READ8_MEMBER(ppi_port_b_r);
-	DECLARE_WRITE8_MEMBER(ppi_port_a_w);
-	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
+	void page0_w(offs_t offset, uint8_t data);
+	void page1_w(offs_t offset, uint8_t data);
+	void page2_w(offs_t offset, uint8_t data);
+	void page3_w(offs_t offset, uint8_t data);
+	uint8_t ppi_port_b_r();
+	void ppi_port_a_w(uint8_t data);
+	void ppi_port_c_w(uint8_t data);
 	virtual void machine_reset() override;
 	void sfkick_remap_banks();
 	void sfkick_bank_set(int num, int data);
@@ -239,7 +239,7 @@ private:
 #define MASTER_CLOCK    XTAL(21'477'272)
 
 
-READ8_MEMBER(sfkick_state::ppi_port_b_r)
+uint8_t sfkick_state::ppi_port_b_r()
 {
 	switch(m_input_mux&0x0f)
 	{
@@ -377,7 +377,7 @@ void sfkick_state::sfkick_remap_banks()
 	}
 }
 
-WRITE8_MEMBER(sfkick_state::ppi_port_a_w)
+void sfkick_state::ppi_port_a_w(uint8_t data)
 {
 	m_bank_cfg=data;
 	sfkick_remap_banks();
@@ -394,7 +394,7 @@ void sfkick_state::sfkick_bank_set(int num, int data)
 	sfkick_remap_banks();
 }
 
-WRITE8_MEMBER(sfkick_state::page0_w)
+void sfkick_state::page0_w(offs_t offset, uint8_t data)
 {
 	if((m_bank_cfg&3)==2)
 	{
@@ -409,7 +409,7 @@ WRITE8_MEMBER(sfkick_state::page0_w)
 	}
 }
 
-WRITE8_MEMBER(sfkick_state::page1_w)
+void sfkick_state::page1_w(offs_t offset, uint8_t data)
 {
 	if(((m_bank_cfg>>2)&3)==2)
 	{
@@ -424,7 +424,7 @@ WRITE8_MEMBER(sfkick_state::page1_w)
 	}
 }
 
-WRITE8_MEMBER(sfkick_state::page2_w)
+void sfkick_state::page2_w(offs_t offset, uint8_t data)
 {
 	if(((m_bank_cfg>>4)&3)==2)
 	{
@@ -439,7 +439,7 @@ WRITE8_MEMBER(sfkick_state::page2_w)
 	}
 }
 
-WRITE8_MEMBER(sfkick_state::page3_w)
+void sfkick_state::page3_w(offs_t offset, uint8_t data)
 {
 	if(((m_bank_cfg>>6)&3)==2)
 	{
@@ -502,7 +502,7 @@ void sfkick_state::sfkick_sound_io_map(address_map &map)
 	map(0x04, 0x05).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
 
-WRITE8_MEMBER(sfkick_state::ppi_port_c_w)
+void sfkick_state::ppi_port_c_w(uint8_t data)
 {
 	m_input_mux=data;
 }
@@ -597,7 +597,7 @@ void sfkick_state::sfkick(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sfkick_state::sfkick_map);
 	m_maincpu->set_addrmap(AS_IO, &sfkick_state::sfkick_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60000);
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 	Z80(config, m_soundcpu, MASTER_CLOCK/6);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &sfkick_state::sfkick_sound_map);

@@ -83,8 +83,8 @@ enum
 /* Registers - used by m37710_set_reg() and m37710_get_reg() */
 enum
 {
-	M37710_PC=1, M37710_S, M37710_P, M37710_A, M37710_B, M37710_X, M37710_Y,
-	M37710_PB, M37710_DB, M37710_D, M37710_E,
+	M37710_PC=1, M37710_S, M37710_PS, M37710_A, M37710_B, M37710_X, M37710_Y,
+	M37710_PG, M37710_DT, M37710_DPR, M37710_E,
 	M37710_NMI_STATE, M37710_IRQ_STATE
 };
 
@@ -128,9 +128,20 @@ public:
 	auto an7_cb() { return m_analog_cb[7].bind(); }
 
 protected:
+	void ad_register_map(address_map &map);
+	void uart0_register_map(address_map &map);
+	void uart1_register_map(address_map &map);
+	void timer_register_map(address_map &map);
+	void timer_6channel_register_map(address_map &map);
+	void irq_register_map(address_map &map);
+
 	// internal registers
-	uint8_t port_r(offs_t offset);
-	void port_w(offs_t offset, uint8_t data);
+	template <int Base> uint8_t port_r(offs_t offset);
+	template <int Base> void port_w(offs_t offset, uint8_t data);
+	uint8_t get_port_reg(int p);
+	uint8_t get_port_dir(int p);
+	void set_port_reg(int p, uint8_t data);
+	void set_port_dir(int p, uint8_t data);
 	void da_reg_w(offs_t offset, uint8_t data);
 	void pulse_output_w(offs_t offset, uint8_t data);
 	uint8_t ad_control_r();
@@ -180,8 +191,10 @@ protected:
 	void refresh_timer_w(uint8_t data);
 	uint16_t dmac_control_r(offs_t offset, uint16_t mem_mask);
 	void dmac_control_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint8_t int_control_r(offs_t offset);
-	void int_control_w(offs_t offset, uint8_t data);
+	template <int Level> uint8_t int_control_r();
+	template <int Level> void int_control_w(uint8_t data);
+	uint8_t get_int_control(int level);
+	void set_int_control(int level, uint8_t data);
 
 	// construction/destruction
 	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
@@ -191,11 +204,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); }
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 20; /* rough guess */ }
-	virtual uint32_t execute_input_lines() const override { return M37710_LINE_MAX; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 20; /* rough guess */ }
+	virtual uint32_t execute_input_lines() const noexcept override { return M37710_LINE_MAX; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -217,11 +230,11 @@ private:
 	address_space_config m_io_config;
 
 	// I/O port callbacks
-	devcb_read8 m_port_in_cb[11];
-	devcb_write8 m_port_out_cb[11];
+	devcb_read8::array<11> m_port_in_cb;
+	devcb_write8::array<11> m_port_out_cb;
 
 	// A-D callbacks
-	devcb_read16 m_analog_cb[8];
+	devcb_read16::array<8> m_analog_cb;
 
 	uint32_t m_a;         /* Accumulator */
 	uint32_t m_b;         /* holds high byte of accumulator */
@@ -234,9 +247,9 @@ private:
 	uint32_t m_s;         /* Stack Pointer */
 	uint32_t m_pc;        /* Program Counter */
 	uint32_t m_ppc;       /* Previous Program Counter */
-	uint32_t m_pb;        /* Program Bank (shifted left 16) */
-	uint32_t m_db;        /* Data Bank (shifted left 16) */
-	uint32_t m_d;         /* Direct Register */
+	uint32_t m_pg;        /* Program Bank (shifted left 16) */
+	uint32_t m_dt;        /* Data Bank (shifted left 16) */
+	uint32_t m_dpr;       /* Direct Page Register */
 	uint32_t m_flag_e;        /* Emulation Mode Flag */
 	uint32_t m_flag_m;        /* Memory/Accumulator Select Flag */
 	uint32_t m_flag_x;        /* Index Select Flag */
@@ -257,8 +270,8 @@ private:
 	int m_ICount;     /* cycle count */
 	uint32_t m_source;        /* temp register */
 	uint32_t m_destination;   /* temp register */
-	address_space *m_program;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::specific m_program;
 	uint32_t m_stopped;       /* Sets how the CPU is stopped */
 
 	// ports
@@ -295,19 +308,16 @@ private:
 	uint16_t m_dmac_control;
 
 	// DMA
-	uint32_t m_dma0_src, m_dma0_dst, m_dma0_cnt, m_dma0_mode;
-	uint32_t m_dma1_src, m_dma1_dst, m_dma1_cnt, m_dma1_mode;
-	uint32_t m_dma2_src, m_dma2_dst, m_dma2_cnt, m_dma2_mode;
-	uint32_t m_dma3_src, m_dma3_dst, m_dma3_cnt, m_dma3_mode;
+	uint32_t m_dma_src[4], m_dma_dst[4], m_dma_cnt[4], m_dma_mode[4];
 
 	// interrupt controller
 	uint8_t m_int_control[M37710_MASKABLE_INTERRUPTS];
 
 	// for debugger
 	uint32_t m_debugger_pc;
-	uint32_t m_debugger_pb;
-	uint32_t m_debugger_db;
-	uint32_t m_debugger_p;
+	uint32_t m_debugger_pg;
+	uint32_t m_debugger_dt;
+	uint32_t m_debugger_ps;
 	uint32_t m_debugger_a;
 	uint32_t m_debugger_b;
 
@@ -317,7 +327,6 @@ private:
 	typedef void (m37710_cpu_device::*set_reg_func)(int regnum, uint32_t val);
 	typedef int  (m37710_cpu_device::*execute_func)(int cycles);
 
-	static const int m37710_int_reg_map[M37710_MASKABLE_INTERRUPTS];
 	static const int m37710_irq_vectors[M37710_INTERRUPT_MAX];
 	static const char *const m37710_tnames[8];
 	static const char *const m37710_intnames[M37710_INTERRUPT_MAX];
@@ -395,17 +404,17 @@ private:
 	void m37710i_jump_24(uint32_t address);
 	void m37710i_branch_8(uint32_t offset);
 	void m37710i_branch_16(uint32_t offset);
-	uint32_t m37710i_get_reg_p();
+	uint32_t m37710i_get_reg_ps();
 	void m37710i_set_reg_ipl(uint32_t value);
 	void m37710i_interrupt_software(uint32_t vector);
 	void m37710i_set_flag_m0x0(uint32_t value);
 	void m37710i_set_flag_m0x1(uint32_t value);
 	void m37710i_set_flag_m1x0(uint32_t value);
 	void m37710i_set_flag_m1x1(uint32_t value);
-	void m37710i_set_reg_p_m0x0(uint32_t value);
-	void m37710i_set_reg_p_m0x1(uint32_t value);
-	void m37710i_set_reg_p_m1x0(uint32_t value);
-	void m37710i_set_reg_p_m1x1(uint32_t value);
+	void m37710i_set_reg_ps_m0x0(uint32_t value);
+	void m37710i_set_reg_ps_m0x1(uint32_t value);
+	void m37710i_set_reg_ps_m1x0(uint32_t value);
+	void m37710i_set_reg_ps_m1x1(uint32_t value);
 	uint32_t EA_IMM8();
 	uint32_t EA_IMM16();
 	uint32_t EA_IMM24();
@@ -2168,10 +2177,20 @@ protected:
 	void map(address_map &map);
 };
 
+class m37730s2_device : public m37710_cpu_device
+{
+public:
+	// construction/destruction
+	m37730s2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	void map(address_map &map);
+};
+
 DECLARE_DEVICE_TYPE(M37702M2, m37702m2_device)
 DECLARE_DEVICE_TYPE(M37702S1, m37702s1_device)
 DECLARE_DEVICE_TYPE(M37710S4, m37710s4_device)
 DECLARE_DEVICE_TYPE(M37720S1, m37720s1_device)
+DECLARE_DEVICE_TYPE(M37730S2, m37730s2_device)
 
 
 /* ======================================================================== */

@@ -18,7 +18,7 @@
 #include "vecstream.h"
 #include "xmlfile.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
@@ -205,7 +205,6 @@ private:
 					{
 						std::istringstream stream(m_text);
 						stream.imbue(f_portable_locale);
-						(void)m_text.c_str();
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -242,7 +241,6 @@ private:
 					{
 						std::istringstream stream(m_text);
 						stream.imbue(f_portable_locale);
-						(void)m_text.c_str();
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -302,7 +300,6 @@ private:
 					{
 						std::istringstream stream(m_text);
 						stream.imbue(f_portable_locale);
-						(void)m_text.c_str();
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -844,14 +841,6 @@ public:
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-render_screen_list render_target::s_empty_screen_list;
-
-
-
-//**************************************************************************
 //  LAYOUT ELEMENT
 //**************************************************************************
 
@@ -1301,9 +1290,9 @@ private:
 
 			// log an error
 			if (m_alphafile.empty())
-				osd_printf_warning("Unable to load component bitmap '%s'\n", m_imagefile.c_str());
+				osd_printf_warning("Unable to load component bitmap '%s'\n", m_imagefile);
 			else
-				osd_printf_warning("Unable to load component bitmap '%s'/'%s'\n", m_imagefile.c_str(), m_alphafile.c_str());
+				osd_printf_warning("Unable to load component bitmap '%s'/'%s'\n", m_imagefile, m_alphafile);
 		}
 	}
 
@@ -2160,14 +2149,14 @@ public:
 		// split out position names from string and figure out our number of symbols
 		int location;
 		m_numstops = 0;
-		location=symbollist.find(",");
+		location=symbollist.find(',');
 		while (location!=-1)
 		{
 			m_stopnames[m_numstops] = symbollist;
 			m_stopnames[m_numstops] = m_stopnames[m_numstops].substr(0, location);
 			symbollist = symbollist.substr(location+1, symbollist.length()-(location-1));
 			m_numstops++;
-			location=symbollist.find(",");
+			location=symbollist.find(',');
 		}
 		m_stopnames[m_numstops++] = symbollist;
 
@@ -2177,7 +2166,7 @@ public:
 
 		for (int i=0;i<m_numstops;i++)
 		{
-			location=m_stopnames[i].find(":");
+			location=m_stopnames[i].find(':');
 			if (location!=-1)
 			{
 				m_imagefile[i] = m_stopnames[i];
@@ -2470,8 +2459,7 @@ private:
 					// allocate a temporary bitmap
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
-
-					const char *origs =m_stopnames[fruit].c_str();
+					const char *origs = m_stopnames[fruit].c_str();
 					const char *ends = origs + strlen(origs);
 					const char *s = origs;
 					char32_t schar;
@@ -3030,6 +3018,17 @@ layout_view::~layout_view()
 
 
 //-------------------------------------------------
+//  has_screen - return true if this view contains
+//  the given screen
+//-------------------------------------------------
+
+bool layout_view::has_screen(screen_device &screen) const
+{
+	return std::find_if(m_screens.begin(), m_screens.end(), [&screen](auto const &scr) { return &scr.get() == &screen; }) != m_screens.end();
+}
+
+
+//-------------------------------------------------
 //  recompute - recompute the bounds and aspect
 //  ratio of a view and all of its contained items
 //-------------------------------------------------
@@ -3039,7 +3038,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 	// reset the bounds
 	m_bounds.x0 = m_bounds.y0 = m_bounds.x1 = m_bounds.y1 = 0.0f;
 	m_scrbounds.x0 = m_scrbounds.y0 = m_scrbounds.x1 = m_scrbounds.y1 = 0.0f;
-	m_screens.reset();
+	m_screens.clear();
 
 	// loop over all layers
 	bool first = true;
@@ -3063,7 +3062,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 			scrfirst = false;
 
 			// accumulate the screens in use while we're scanning
-			m_screens.add(*curitem.m_screen);
+			m_screens.emplace_back(*curitem.m_screen);
 		}
 	}
 
@@ -3073,7 +3072,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 
 	// if we're handling things normally, the target bounds are (0,0)-(1,1)
 	render_bounds target_bounds;
-	if (!layerconfig.zoom_to_screen() || m_screens.count() == 0)
+	if (!layerconfig.zoom_to_screen() || m_screens.empty())
 	{
 		// compute the aspect ratio of the view
 		m_aspect = (m_bounds.x1 - m_bounds.x0) / (m_bounds.y1 - m_bounds.y0);
@@ -3316,18 +3315,12 @@ layout_view::item::item(
 	, m_color(render_color_multiply(env.parse_color(itemnode.get_child("color")), color))
 	, m_blend_mode(get_blend_mode(env, itemnode))
 {
-	// outputs need resolving
-	if (m_have_output)
-		m_output.resolve();
-
 	// fetch common data
 	int index = env.get_attribute_int(itemnode, "index", -1);
 	if (index != -1)
 		m_screen = screen_device_iterator(env.machine().root_device()).byindex(index);
 	for (u32 mask = m_input_mask; (mask != 0) && (~mask & 1); mask >>= 1)
 		m_input_shift++;
-	if (m_have_output && m_element)
-		m_output = m_element->default_state();
 
 	// sanity checks
 	if (strcmp(itemnode.get_name(), "screen") == 0)
@@ -3412,9 +3405,16 @@ int layout_view::item::state() const
 
 void layout_view::item::resolve_tags()
 {
+	if (m_have_output)
+	{
+		m_output.resolve();
+		if (m_element)
+			m_output = m_element->default_state();
+	}
+
 	if (!m_input_tag.empty())
 	{
-		m_input_port = m_element->machine().root_device().ioport(m_input_tag.c_str());
+		m_input_port = m_element->machine().root_device().ioport(m_input_tag);
 		if (m_input_port)
 		{
 			for (ioport_field &field : m_input_port->fields())

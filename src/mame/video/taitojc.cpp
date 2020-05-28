@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(taitojc_state::taitojc_tile_info)
 	uint32_t val = m_tile_ram[tile_index];
 	int color = (val >> 22) & 0xff;
 	int tile = (val >> 2) & 0x7f;
-	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, 0);
+	tileinfo.set(m_gfx_index, tile, color, 0);
 }
 
 READ32_MEMBER(taitojc_state::taitojc_palette_r)
@@ -309,7 +309,7 @@ void taitojc_state::video_start()
 
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitojc_state::taitojc_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitojc_state::taitojc_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_tilemap->set_transparent_pen(0);
 

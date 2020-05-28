@@ -62,17 +62,17 @@ public:
 
 	void init_brailab4();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(cass3_r);
+	DECLARE_READ_LINE_MEMBER(cass3_r);
 
 private:
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(cass_w);
-	DECLARE_READ8_MEMBER(cass2_r);
-	DECLARE_READ8_MEMBER(exxx_r);
-	DECLARE_WRITE8_MEMBER(port7f_w);
-	DECLARE_WRITE8_MEMBER(portff_w);
-	DECLARE_WRITE8_MEMBER(brailab4_port7f_w);
-	DECLARE_WRITE8_MEMBER(brailab4_portff_w);
+	uint8_t key_r(offs_t offset);
+	void cass_w(offs_t offset, uint8_t data);
+	uint8_t cass2_r();
+	uint8_t exxx_r(offs_t offset);
+	void port7f_w(uint8_t data);
+	void portff_w(uint8_t data);
+	void brailab4_port7f_w(uint8_t data);
+	void brailab4_portff_w(uint8_t data);
 	DECLARE_VIDEO_START(homelab2);
 	DECLARE_MACHINE_RESET(homelab3);
 	DECLARE_VIDEO_START(homelab3);
@@ -103,7 +103,7 @@ INTERRUPT_GEN_MEMBER(homelab_state::homelab_frame)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
+uint8_t homelab_state::key_r(offs_t offset) // offset 27F-2FE
 {
 	if (offset == 0x38) // 0x3838
 	{
@@ -126,12 +126,12 @@ READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
 	return data;
 }
 
-READ8_MEMBER( homelab_state::cass2_r )
+uint8_t homelab_state::cass2_r()
 {
 	return (m_cass->input() > 0.03) ? 0xff : 0;
 }
 
-WRITE8_MEMBER( homelab_state::cass_w )
+void homelab_state::cass_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0x73f) // 0x3f3f
 		m_nmi = true;
@@ -152,31 +152,31 @@ MACHINE_RESET_MEMBER(homelab_state,brailab4)
 	membank("bank1")->set_entry(0);
 }
 
-WRITE8_MEMBER( homelab_state::port7f_w )
+void homelab_state::port7f_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( homelab_state::portff_w )
+void homelab_state::portff_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( homelab_state::brailab4_port7f_w )
+void homelab_state::brailab4_port7f_w(uint8_t data)
 {
 	membank("bank1")->set_entry(0);
 }
 
-WRITE8_MEMBER( homelab_state::brailab4_portff_w )
+void homelab_state::brailab4_portff_w(uint8_t data)
 {
 	membank("bank1")->set_entry(1);
 }
 
-CUSTOM_INPUT_MEMBER( homelab_state::cass3_r )
+READ_LINE_MEMBER( homelab_state::cass3_r )
 {
 	return (m_cass->input() > 0.03);
 }
 
 
-READ8_MEMBER( homelab_state::exxx_r )
+uint8_t homelab_state::exxx_r(offs_t offset)
 {
 // keys E800-E813 but E810-E813 are not connected
 // cassin E883
@@ -362,7 +362,7 @@ static INPUT_PORTS_START( homelab3 ) // F4 to F8 are foreign characters
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homelab_state, cass3_r, " ")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(homelab_state, cass3_r)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -475,7 +475,7 @@ static INPUT_PORTS_START( brailab4 ) // F4 to F8 are foreign characters
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homelab_state, cass3_r, " ")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(homelab_state, cass3_r)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -779,7 +779,7 @@ void homelab_state::homelab(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
 
-	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb));
 }
 
 void homelab_state::homelab3(machine_config &config)
@@ -812,7 +812,7 @@ void homelab_state::homelab3(machine_config &config)
 
 	CASSETTE(config, m_cass);
 	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
-	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb));
 }
 
 void homelab_state::brailab4(machine_config &config)
@@ -847,7 +847,7 @@ void homelab_state::brailab4(machine_config &config)
 
 	CASSETTE(config, m_cass);
 	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
-	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(18)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(18)).set_load_callback(FUNC(homelab_state::quickload_cb));
 }
 
 void homelab_state::init_brailab4()

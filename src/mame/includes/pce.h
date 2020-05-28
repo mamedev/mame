@@ -64,8 +64,8 @@ public:
 	int m_joystick_port_select;
 	int m_joystick_data_select;
 	uint8_t m_joy_6b_packet[5];
-	DECLARE_WRITE8_MEMBER(mess_pce_joystick_w);
-	DECLARE_READ8_MEMBER(mess_pce_joystick_r);
+	void mess_pce_joystick_w(uint8_t data);
+	uint8_t mess_pce_joystick_r();
 	DECLARE_WRITE8_MEMBER(pce_cd_intf_w);
 	DECLARE_READ8_MEMBER(pce_cd_intf_r);
 	DECLARE_READ8_MEMBER(pce_cd_acard_wram_r);

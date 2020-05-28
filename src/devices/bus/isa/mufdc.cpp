@@ -161,7 +161,7 @@ void mufdc_device::device_start()
 void mufdc_device::device_reset()
 {
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, shortname(), "option");
-	m_isa->install_device(0x3f0, 0x3f7, *m_fdc, &pc_fdc_interface::map);
+	m_isa->install_device(0x3f0, 0x3f7, *m_fdc, &mcs3201_device::map);
 	m_isa->set_dma_channel(2, this, true);
 }
 
@@ -170,7 +170,7 @@ void mufdc_device::device_reset()
 //  FDC INTERFACE
 //**************************************************************************
 
-READ8_MEMBER( mufdc_device::fdc_input_r )
+uint8_t mufdc_device::fdc_input_r()
 {
 	return ~m_config->read();
 }

@@ -439,7 +439,7 @@ void vastar_common_state::common(machine_config &config)
 	m_subcpu->set_addrmap(AS_IO, &vastar_common_state::cpu2_port_map);
 	m_subcpu->set_periodic_int(FUNC(vastar_common_state::irq0_line_hold), attotime::from_hz(242)); /* 4 * vsync_freq(60.58) measured, it is not known yet how long it is asserted so we'll use HOLD_LINE for now */
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(vastar_common_state::nmi_mask_w));

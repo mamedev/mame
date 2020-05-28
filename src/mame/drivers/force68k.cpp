@@ -166,11 +166,11 @@ public:
 	void fccpu1(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER (bootvect_r);
-	DECLARE_READ16_MEMBER (vme_a24_r);
-	DECLARE_WRITE16_MEMBER (vme_a24_w);
-	DECLARE_READ16_MEMBER (vme_a16_r);
-	DECLARE_WRITE16_MEMBER (vme_a16_w);
+	uint16_t bootvect_r(offs_t offset);
+	uint16_t vme_a24_r();
+	void vme_a24_w(uint16_t data);
+	uint16_t vme_a16_r();
+	void vme_a16_w(uint16_t data);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 
@@ -195,7 +195,7 @@ private:
 	// User EPROM/SRAM slot(s)
 	image_init_result force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
-	DECLARE_READ16_MEMBER (read16_rom);
+	uint16_t read16_rom(offs_t offset);
 
 	void force68k_mem(address_map &map);
 
@@ -231,16 +231,16 @@ void force68k_state::force68k_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x000007).rom().r(FUNC(force68k_state::bootvect_r));       /* Vectors mapped from System EPROM */
 	map(0x000008, 0x01ffff).ram(); /* DRAM CPU-1B */
-//AM_RANGE (0x020000, 0x07ffff) AM_RAM /* Additional DRAM CPU-1D */
+//  map(0x020000, 0x07ffff).ram(); /* Additional DRAM CPU-1D */
 	map(0x080000, 0x083fff).rom(); /* System EPROM Area 16Kb DEBUGGER supplied as default on CPU-1B/D     */
 	map(0x084000, 0x09ffff).rom(); /* System EPROM Area 112Kb additional space for System ROM     */
-//AM_RANGE (0x0a0000, 0x0bffff) AM_ROM /* User EPROM/SRAM Area, max 128Kb mapped by a cartslot  */
+//  map(0x0a0000, 0x0bffff).rom(); /* User EPROM/SRAM Area, max 128Kb mapped by a cartslot  */
 	map(0x0c0040, 0x0c0043).rw(m_aciahost, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0x0c0080, 0x0c0083).rw(m_aciaterm, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0x0c0100, 0x0c0103).rw(m_aciaremt, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0x0c0400, 0x0c042f).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0e0035).rw(m_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
-//AM_RANGE(0x0e0200, 0x0e0380) AM_READWRITE(fpu_r, fpu_w) /* optional FPCP 68881 FPU interface */
+//  map(0x0e0200, 0x0e0380).rw(FUNC(force68k_state::fpu_r), FUNC(force68k_state::fpu_w)); /* optional FPCP 68881 FPU interface */
 	map(0x100000, 0xfeffff).rw(FUNC(force68k_state::vme_a24_r), FUNC(force68k_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) */
 	map(0xff0000, 0xffffff).rw(FUNC(force68k_state::vme_a16_r), FUNC(force68k_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) */
 }
@@ -381,9 +381,9 @@ void force68k_state::machine_start ()
 	{
 		m_usrrom = (uint16_t*)m_cart->get_rom_base();
 #if 0 // This should be the correct way but produces odd and even bytes swapped
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(FUNC(generic_slot_device::read16_rom), (generic_slot_device*)m_cart));
-#else // So we installs a custom very ineffecient handler for now until we understand hwp to solve the problem better
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(FUNC(force68k_state::read16_rom), this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16sm_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
+#else // So we installs a custom very inefficient handler for now until we understand hop to solve the problem better
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16sm_delegate(*this, FUNC(force68k_state::read16_rom)));
 #endif
 	}
 }
@@ -404,14 +404,14 @@ void force68k_state::machine_reset ()
 	m_brg->timer_enable((mc14411_device::timer_id) m_serial_p5->read(), true);
 }
 
-/* A very ineffecient User cart emulation of two 8 bit sockets (odd and even) */
-READ16_MEMBER (force68k_state::read16_rom){
+/* A very inefficient User cart emulation of two 8 bit sockets (odd and even) */
+uint16_t force68k_state::read16_rom(offs_t offset){
 	offset = offset % m_cart->common_get_size("rom"); // Don't read outside buffer...
 	return ((m_usrrom [offset] << 8) & 0xff00) | ((m_usrrom [offset] >> 8) & 0x00ff);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
-READ16_MEMBER (force68k_state::bootvect_r){
+uint16_t force68k_state::bootvect_r(offs_t offset){
 	return m_sysrom [offset];
 }
 
@@ -434,24 +434,24 @@ READ16_MEMBER (force68k_state::bootvect_r){
  */
 
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (force68k_state::vme_a24_r)
+uint16_t force68k_state::vme_a24_r()
 {
 	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a24_w)
+void force68k_state::vme_a24_w(uint16_t data)
 {
 	LOG("%s\n", FUNCNAME);
 }
 
-READ16_MEMBER (force68k_state::vme_a16_r)
+uint16_t force68k_state::vme_a16_r()
 {
 	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a16_w)
+void force68k_state::vme_a16_w(uint16_t data)
 {
 	LOG("%s\n", FUNCNAME);
 }
@@ -500,7 +500,7 @@ void force68k_state::fccpu1_eprom_sockets(machine_config &config)
 	generic_cartslot_device &exp_rom1(GENERIC_CARTSLOT(config, "exp_rom1", generic_plain_slot, "fccpu1_cart", "bin,rom"));
 	exp_rom1.set_width(GENERIC_ROM16_WIDTH);
 	exp_rom1.set_endian(ENDIANNESS_BIG);
-	exp_rom1.set_device_load(FUNC(force68k_state::exp1_load), this);
+	exp_rom1.set_device_load(FUNC(force68k_state::exp1_load));
 //  SOFTWARE_LIST(config, "cart_list").set_original("fccpu1_cart");
 }
 
@@ -584,7 +584,7 @@ void force68k_state::fccpu1(machine_config &config)
 
 	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
 	PIT68230(config, m_pit, XTAL(16'000'000) / 2);
-	m_pit->pa_out_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pit->pa_out_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pit->h2_out_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
 
 	// Centronics

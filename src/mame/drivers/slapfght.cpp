@@ -10,7 +10,7 @@
     Alcon / Slap Fight
     Guardian / Get Star
     Performan
-    Tiger Heli
+    Tiger-Heli
 
   TODO:
   - proper MCU emulation (mame/machine/slapfght.cpp)
@@ -36,7 +36,7 @@ $f000-$f7ff    READ:SF_S16       WRITE:Character RAM
 $f800-$ffff    READ:Unknown H/W  WRITE:Attribute RAM
 
 $c800-$cfff    Appears to be RAM BUT 1st 0x10 bytes are swapped with
-               the sound CPU and visversa for READ OPERATIONS
+               the sound CPU and vice versa for READ OPERATIONS
 
 
 Write I/O MAP
@@ -63,7 +63,7 @@ $0f
 Read I/O Map
 ------------
 
-$00     Status regsiter - cycle 0xc7, 0x55, 0x00  (Thanks to Dave Spicer for the info)
+$00     Status register - cycle 0xc7, 0x55, 0x00  (Thanks to Dave Spicer for the info)
 
 
 Known Info
@@ -210,7 +210,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - US version, licensed to Kitkorp - name "Guardian".
   - MCU dumped and emulated.
   - Difficulty determines the number of energy bars you get.
-  - Each hit removes 1 enegy bar.
+  - Each hit removes 1 energy bar.
   - According to the manual, default difficulty shall be set to "Hard".
   - You can only get ONE extra life.
   - I don't know if it's an ingame bug, but you always have to enter
@@ -236,7 +236,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Bootleg based on 'getstarj'
   - MCU reads/writes are patched, but this hasn't been done in the "test mode".
   - The game seems to have its own protection (check code at 0x0569 and 0x0ac6).
-  - Patches are coded diffrently than in 'getstarb1' and code isn't always perfect
+  - Patches are coded differently than in 'getstarb1' and code isn't always perfect
     (lazy coding ?) which causes LOTS of ingames bugs or strange behaviours :
       * patched command 0x20 : NO continue play
       * patched command 0x21 : as soon as a player loses all his lives,
@@ -250,7 +250,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
         (thus the need of a specific INPUT_PORTS definition for this game)
       * patched command 0x2a : player flag (which determines if player 1 or
         player 2 is playing) is NOT updated, causing the following things :
-          . current player score will ALWAYS be dusplayed under player 1
+          . current player score will ALWAYS be displayed under player 1
           . when cabinet is set to "Cocktail", player 2 uses player 1 inputs
       * patched command 0x38 : laser position does NOT change according to
         player position (it ALWATS starts from the middle of the screen)
@@ -789,7 +789,7 @@ void slapfght_state::init_getstarb1()
 	init_banks();
 
 	/* requires this or it gets stuck with 'rom test' on screen */
-	/* it is possible the program roms are slighly corrupt like the gfx roms, or
+	/* it is possible the program roms are slightly corrupt like the gfx roms, or
 	   that the bootleg simply shouldn't execute the code due to the modified roms */
 	/* TODO: find & fix the cause of the following happening. */
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -906,7 +906,7 @@ void slapfght_state::perfrman(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &slapfght_state::perfrman_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(slapfght_state::sound_nmi), attotime::from_hz(240)); // music speed, verified
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -958,7 +958,7 @@ void slapfght_state::tigerh(machine_config &config)
 
 	TAITO68705_MCU_TIGER(config, m_bmcu, 36_MHz_XTAL/12); // 3MHz
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -1044,7 +1044,7 @@ void slapfght_state::slapfigh(machine_config &config)
 	TAITO68705_MCU(config, m_bmcu, 36_MHz_XTAL/12); // 3MHz
 	m_bmcu->aux_strobe_cb().set(FUNC(slapfght_state::scroll_from_mcu_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -1181,19 +1181,19 @@ ROM_END
 
 
 /*
-Tiger Heli
+Tiger-Heli
 1985 Taito Corporation
 
-The Tiger Heli PCB is almost exactly the same PCB as Slap Fight/Alcon but a few chips
+The Tiger-Heli PCB is almost exactly the same PCB as Slap Fight/Alcon but a few chips
 have different placings and there's more EPROM locations on one of the boards
 (although they're not populated).
-Also, Tiger Heli has a 22-way edge connector, while Alcon/Slap Fight is JAMMA.
+Also, Tiger-Heli has a 22-way edge connector, while Alcon/Slap Fight is JAMMA.
 
 
 PCB Layouts - Top Board
 -----------------------
 
-Tiger Heli -   M6100111A
+Tiger-Heli -   M6100111A
                850011401
 
 GX-511-A MADE IN JAPAN
@@ -1636,7 +1636,7 @@ ROM_END
 
 This set comes from a different type of board with unique Taito ID code of "A76"
 PCBs are labeled GX-006-A & GX-006-B  It has a 22pin edge connector and closely
-resembles the Tigher Heli PCB (shown above) with rom placement and components.
+resembles the Tiger-Heli PCB (shown above) with rom placement and components.
 
 */
 
@@ -1813,7 +1813,7 @@ ROM_END
 Guardian
 1986 Taito Corporation
 
-The Guardian PCB is exactly the same PCB as Tiger Heli, including the
+The Guardian PCB is exactly the same PCB as Tiger-Heli, including the
 edge connector pinout.
 
 PCB Layout
@@ -2049,12 +2049,12 @@ ROM_END
 GAME( 1985, perfrman,   0,        perfrman,   perfrman,  slapfght_state, empty_init,     ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman,  slapfght_state, empty_init,     ROT270, "Toaplan / Data East USA",         "Performan (US)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, tigerh,     0,        tigerh,     tigerh,    slapfght_state, empty_init,     ROT270, "Toaplan / Taito America Corp.",   "Tiger Heli (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,    slapfght_state, empty_init,     ROT270, "Toaplan / Taito",                 "Tiger Heli (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb1,   tigerh,   tigerhb1,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger Heli (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb2,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger Heli (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb3,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger Heli (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb4,   tigerh,   tigerhb4,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger Heli (bootleg set 4)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // MCU not hooked up
+GAME( 1985, tigerh,     0,        tigerh,     tigerh,    slapfght_state, empty_init,     ROT270, "Toaplan / Taito America Corp.",   "Tiger-Heli (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,    slapfght_state, empty_init,     ROT270, "Toaplan / Taito",                 "Tiger-Heli (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb1,   tigerh,   tigerhb1,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger-Heli (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb2,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger-Heli (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb3,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger-Heli (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb4,   tigerh,   tigerhb4,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger-Heli (bootleg set 4)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // MCU not hooked up
 
 GAME( 1986, alcon,      0,        slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito America Corp.",   "Alcon (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito",                 "Slap Fight (A77 set, 8606M PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

@@ -74,7 +74,7 @@ WRITE8_MEMBER(pc1350_state::lcd_write)
 	m_reg[offset & 0xfff] = data;
 }
 
-READ8_MEMBER(pc1350_state::keyboard_line_r)
+uint8_t pc1350_state::keyboard_line_r()
 {
 	return m_reg[0xe00];
 }

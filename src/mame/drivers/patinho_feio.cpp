@@ -83,7 +83,7 @@ void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_d
 	m_prev_FLAGS = FLAGS;
 }
 
-WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
+void patinho_feio_state::decwriter_data_w(uint8_t data)
 {
 	m_decwriter->write(data);
 
@@ -111,7 +111,7 @@ void patinho_feio_state::decwriter_kbd_input(u8 data)
 	m_maincpu->transfer_byte_from_external_device(0xA, ~data);
 }
 
-WRITE8_MEMBER(patinho_feio_state::teletype_data_w)
+void patinho_feio_state::teletype_data_w(uint8_t data)
 {
 	m_tty->write(data);
 
@@ -282,7 +282,7 @@ void patinho_feio_state::patinho_feio(machine_config &config)
 	m_tty->set_keyboard_callback(FUNC(patinho_feio_state::teletype_kbd_input));
 
 	/* punched tape */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "patinho_tape", "bin").set_device_load(FUNC(patinho_feio_state::tape_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "patinho_tape", "bin").set_device_load(FUNC(patinho_feio_state::tape_load));
 
 	config.set_default_layout(layout_patinho);
 

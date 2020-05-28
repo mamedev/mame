@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #ifndef MAME_CPU_BCP_DP8344_H
-#define MAME_CPU_BCP_DP8344_H 1
+#define MAME_CPU_BCP_DP8344_H
 
 #pragma once
 
@@ -41,12 +41,9 @@ public:
 		BCP_IW, BCP_IX, BCP_IY, BCP_IZ,
 		BCP_IWLO, BCP_IXLO, BCP_IYLO, BCP_IZLO,
 		BCP_IWHI, BCP_IXHI, BCP_IYHI, BCP_IZHI,
-		BCP_TR,
+		BCP_TR, BCP_COUNT,
 		BCP_ASP, BCP_DSP
 	};
-
-	// construction/destruction
-	dp8344_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// callback configuration
 	auto birq_out_cb() { return m_birq_out_cb.bind(); }
@@ -64,15 +61,18 @@ public:
 	void remote_write(offs_t offset, u8 data);
 
 protected:
+	// construction/destruction
+	dp8344_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-specific overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual u32 execute_min_cycles() const override { return 2; }
-	virtual u32 execute_max_cycles() const override { return 4; }
-	virtual u32 execute_input_lines() const override { return 3; }
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 4; }
+	virtual u32 execute_input_lines() const noexcept override { return 3; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int irqline, int state) override;
 
@@ -82,9 +82,18 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
+	// device_state_interface overrides
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
 private:
+	enum inst_state : u8 {
+		T1_DECODE, T1_START, T1_SKIP, T1_LJMP, T1_LCALL,
+		TX_READ, TX_WRITE,
+		TX1_JRMK, TX1_JMP, TX2_JMP, TX_CALL, TX_RETF,
+		T2_NEXT, T2_STORE, T2_READ, T2_WRITE, T2_ABSOLUTE
+	};
+
 	// internal functions
-	bool get_flag(unsigned f) const;
 	void set_receiver_interrupt(bool state);
 	void set_transmitter_interrupt(bool state);
 	void set_line_turn_around_interrupt(bool state);
@@ -94,9 +103,18 @@ private:
 	void set_condition_code(u8 data);
 	void set_interrupt_control(u8 data);
 	void set_auxiliary_control(u8 data);
-	u16 get_timer_count();
+	void set_device_control(u8 data);
+	bool interrupt_active() const;
+	u8 get_interrupt_vector() const;
+	bool get_flag(unsigned f) const;
+	void set_nz(u8 result);
+	void set_carry(bool state);
+	static u8 rotate_right(u8 data, u8 b);
+	u8 add_nzcv(u8 s1, u8 s2, bool carry_in);
+	u8 sub_nzcv(u8 s1, u8 s2, bool carry_in);
+	void timer_count();
 	void address_stack_push();
-	void address_stack_pop(u8 grf);
+	void address_stack_pop(u8 g, bool rf);
 	void set_stack_pointer(u8 data);
 	void data_stack_push(u8 data);
 	u8 data_stack_pop();
@@ -106,21 +124,29 @@ private:
 	void transmitter_idle();
 	void receiver_active();
 	void receive_fifo_push(u8 data);
-	u8 receive_fifo_pop();
+	u8 receive_fifo_pop(bool test);
 	void set_receiver_error(u8 code);
-	u8 get_error_code();
+	u8 get_error_code(bool test);
+	void set_transceiver_command(u8 data);
 	void set_transceiver_mode(u8 data);
 	void clear_network_command_flag(u8 data);
-	u8 read_register(unsigned reg);
+	u8 read_register(unsigned reg, bool test);
 	u8 read_accumulator() const;
 	void write_register(unsigned reg, u8 data);
+	void prefetch_instruction();
+	void latch_address(bool rw);
+	void instruction_wait();
+	inst_state decode_instruction();
+	void store_result();
+	void data_write();
+	void data_read();
 
 	// address spaces
 	const address_space_config m_inst_config;
 	const address_space_config m_data_config;
-	address_space *m_inst_space;
-	address_space *m_data_space;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_inst_cache;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::cache m_inst_cache;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific m_inst_space;
+	memory_access<16, 0,  0, ENDIANNESS_LITTLE>::specific m_data_space;
 
 	// output callbacks
 	devcb_write_line m_birq_out_cb;
@@ -130,8 +156,13 @@ private:
 
 	// execution state
 	u16 m_pc;
+	u16 m_ppc;
 	s32 m_icount;
 	bool m_nmi_pending;
+	inst_state m_inst_state;
+	u8 m_wait_states;
+	u8 m_source_data;
+	u16 m_data_address;
 
 	// control registers
 	u8 m_ccr;
@@ -152,10 +183,12 @@ private:
 	u8 m_gp_alt[4];
 
 	// index registers
-	PAIR16 m_ir[4];
+	u16 m_ir[4];
 
 	// timer registers
 	u16 m_tr;
+	u8 m_tclk;
+	u16 m_tcount;
 
 	// internal stacks
 	u32 m_as[12];
@@ -183,7 +216,26 @@ private:
 	u8 m_tfifo_head;
 };
 
-// device type declaration
-DECLARE_DEVICE_TYPE(DP8344, dp8344_device)
+// ======================> dp8344a_device
+
+class dp8344a_device : public dp8344_device
+{
+public:
+	// device type constructor
+	dp8344a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+// ======================> dp8344b_device
+
+class dp8344b_device : public dp8344_device
+{
+public:
+	// device type constructor
+	dp8344b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+// device type declarations
+DECLARE_DEVICE_TYPE(DP8344A, dp8344a_device)
+DECLARE_DEVICE_TYPE(DP8344B, dp8344b_device)
 
 #endif // MAME_CPU_BCP_DP8344_H

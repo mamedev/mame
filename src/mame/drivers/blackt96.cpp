@@ -39,6 +39,7 @@ D.G.R.M. NO 1947
 Notes:
       68000 clock 9.000MHz [18/2]
       M6295 clocks 1.000MHz [8/8] pin 7 high
+      PIC16C57 clock 4.000MHz [8/2]
 
 
 2008-07
@@ -103,17 +104,17 @@ public:
 	{ }
 
 	// read/write handlers
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE16_MEMBER(tx_vram_w);
+	void output_w(uint8_t data);
+	void sound_cmd_w(uint8_t data);
+	void tx_vram_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE8_MEMBER(blackt96_soundio_port_a_w);
-	DECLARE_READ8_MEMBER(blackt96_soundio_port_b_r);
-	DECLARE_WRITE8_MEMBER(blackt96_soundio_port_b_w);
-	DECLARE_READ8_MEMBER(blackt96_soundio_port_c_r);
-	DECLARE_WRITE8_MEMBER(blackt96_soundio_port_c_w);
+	void blackt96_soundio_port_a_w(uint8_t data);
+	uint8_t blackt96_soundio_port_b_r();
+	void blackt96_soundio_port_b_w(uint8_t data);
+	uint8_t blackt96_soundio_port_c_r();
+	void blackt96_soundio_port_c_w(uint8_t data);
 
-	DECLARE_READ16_MEMBER( random_r ) // todo, get rid of this once we work out where reads are from
+	uint16_t random_r() // todo, get rid of this once we work out where reads are from
 	{
 		return machine().rand();
 	}
@@ -161,7 +162,7 @@ TILE_GET_INFO_MEMBER(blackt96_state::get_tx_tile_info)
 	uint8_t color = m_tilemapram[tile_index*2+1] & 0x0f;
 	tile += m_txt_bank * 0x100;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color,
 			0);
@@ -170,7 +171,7 @@ TILE_GET_INFO_MEMBER(blackt96_state::get_tx_tile_info)
 
 void blackt96_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blackt96_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blackt96_state::get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 }
@@ -187,7 +188,7 @@ uint32_t blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_in
 }
 
 
-WRITE8_MEMBER(blackt96_state::sound_cmd_w)
+void blackt96_state::sound_cmd_w(uint8_t data)
 {
 	//logerror("sound_cmd_w %02x\n", data);
 	m_soundcmd = data;
@@ -219,7 +220,7 @@ void blackt96_state::machine_reset()
 	m_txt_bank = 0;
 }
 
-WRITE8_MEMBER(blackt96_state::output_w)
+void blackt96_state::output_w(uint8_t data)
 {
 	// -bbb 8-21
 	// 1 - coin counter 1
@@ -236,7 +237,7 @@ WRITE8_MEMBER(blackt96_state::output_w)
 //  printf("blackt96_c0000_w %04x %04x\n",data & 0xfc,mem_mask);
 }
 
-WRITE16_MEMBER(blackt96_state::tx_vram_w)
+void blackt96_state::tx_vram_w(offs_t offset, uint16_t data)
 {
 	m_tilemapram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset/2);
@@ -392,33 +393,33 @@ static GFXDECODE_START( gfx_blackt96 )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(blackt96_state::blackt96_soundio_port_a_w)
+void blackt96_state::blackt96_soundio_port_a_w(uint8_t data)
 {
 	// soundbank
 	logerror("%s: blackt96_soundio_port_a_w (set soundbank %02x)\n", machine().describe_context().c_str(), data);
 	m_oki1bank->set_entry(data & 0x07);
 }
 
-READ8_MEMBER(blackt96_state::blackt96_soundio_port_b_r)
+uint8_t blackt96_state::blackt96_soundio_port_b_r()
 {
 	//logerror("%s: blackt96_soundio_port_b_r (data read is %02x)\n", machine().describe_context().c_str(), m_port_b_latch);
 	return m_port_b_latch;
 }
 
-WRITE8_MEMBER(blackt96_state::blackt96_soundio_port_b_w)
+void blackt96_state::blackt96_soundio_port_b_w(uint8_t data)
 {
 	m_port_b_latch = data;
 	//logerror("%s: blackt96_soundio_port_b_w (set latch to %02x)\n", machine().describe_context().c_str(), m_port_b_latch);
 }
 
-READ8_MEMBER(blackt96_state::blackt96_soundio_port_c_r)
+uint8_t blackt96_state::blackt96_soundio_port_c_r()
 {
 	// bit 0x40 = sound command ready?
 	if (m_soundcmd_ready) return 0x40;
 	return 0x00;
 }
 
-WRITE8_MEMBER(blackt96_state::blackt96_soundio_port_c_w)
+void blackt96_state::blackt96_soundio_port_c_w(uint8_t data)
 {
 //  logerror("%s: blackt96_soundio_port_c_w (PREV DATA %02x CURR DATA %02x)\n", machine().describe_context().c_str(), m_port_c_data, data);
 	// data & 0x80 unuused?
@@ -480,11 +481,11 @@ void blackt96_state::tile_callback(int &tile, int& fx, int& fy, int& region)
 
 void blackt96_state::blackt96(machine_config &config)
 {
-	M68000(config, m_maincpu, 18000000 /2);
+	M68000(config, m_maincpu, 18_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackt96_state::blackt96_map);
 	m_maincpu->set_vblank_int("screen", FUNC(blackt96_state::irq1_line_hold));
 
-	pic16c57_device &audiocpu(PIC16C57(config, "audiocpu", 8000000)); /* ? */
+	pic16c57_device &audiocpu(PIC16C57(config, "audiocpu", 8_MHz_XTAL / 2));
 	audiocpu.write_a().set(FUNC(blackt96_state::blackt96_soundio_port_a_w));
 	audiocpu.read_b().set(FUNC(blackt96_state::blackt96_soundio_port_b_r));
 	audiocpu.write_b().set(FUNC(blackt96_state::blackt96_soundio_port_b_w));
@@ -506,18 +507,20 @@ void blackt96_state::blackt96(machine_config &config)
 
 	SNK68_SPR(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);
-	m_sprites->set_tile_indirect_cb(FUNC(blackt96_state::tile_callback), this);
+	m_sprites->set_tile_indirect_cb(FUNC(blackt96_state::tile_callback));
 	m_sprites->set_no_partial();
+	m_sprites->set_xpos_shift(12);
+	m_sprites->set_color_entry_mask(0x7f);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	OKIM6295(config, m_oki[0], 8000000/8, okim6295_device::PIN7_HIGH); // music
+	OKIM6295(config, m_oki[0], 8_MHz_XTAL / 8, okim6295_device::PIN7_HIGH); // music
 	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
 	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
 	m_oki[0]->set_addrmap(0, &blackt96_state::oki1_map);
 
-	OKIM6295(config, m_oki[1], 8000000/8, okim6295_device::PIN7_HIGH); // sfx
+	OKIM6295(config, m_oki[1], 8_MHz_XTAL / 8, okim6295_device::PIN7_HIGH); // sfx
 	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
 	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
 }

@@ -52,8 +52,8 @@ public:
 
 	void thayers(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
+	DECLARE_READ_LINE_MEMBER(laserdisc_enter_r);
+	DECLARE_READ_LINE_MEMBER(laserdisc_ready_r);
 
 private:
 	enum
@@ -84,14 +84,14 @@ private:
 	DECLARE_READ8_MEMBER(irqstate_r);
 	DECLARE_WRITE8_MEMBER(timer_int_ack_w);
 	DECLARE_WRITE8_MEMBER(data_rdy_int_ack_w);
-	DECLARE_WRITE8_MEMBER(cop_d_w);
+	void cop_d_w(uint8_t data);
 	DECLARE_READ8_MEMBER(cop_data_r);
 	DECLARE_WRITE8_MEMBER(cop_data_w);
-	DECLARE_READ8_MEMBER(cop_l_r);
-	DECLARE_WRITE8_MEMBER(cop_l_w);
-	DECLARE_READ8_MEMBER(cop_g_r);
+	uint8_t cop_l_r();
+	void cop_l_w(uint8_t data);
+	uint8_t cop_g_r();
 	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(cop_g_w);
+	void cop_g_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(kbdata_r);
 	DECLARE_WRITE_LINE_MEMBER(kbclk_w);
 	DECLARE_WRITE8_MEMBER(control2_w);
@@ -133,7 +133,7 @@ void thayers_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		check_interrupt();
 		break;
 	default:
-		assert_always(false, "Unknown id in thayers_state::device_timer");
+		throw emu_fatalerror("Unknown id in thayers_state::device_timer");
 	}
 }
 
@@ -196,7 +196,7 @@ WRITE8_MEMBER(thayers_state::data_rdy_int_ack_w)
 	check_interrupt();
 }
 
-WRITE8_MEMBER(thayers_state::cop_d_w)
+void thayers_state::cop_d_w(uint8_t data)
 {
 	/*
 
@@ -244,7 +244,7 @@ WRITE8_MEMBER(thayers_state::cop_data_w)
 	if (LOG) logerror("COP DATA %02x\n", m_cop_data_latch);
 }
 
-READ8_MEMBER(thayers_state::cop_l_r)
+uint8_t thayers_state::cop_l_r()
 {
 	if (!m_cop_data_latch_enable)
 	{
@@ -256,13 +256,13 @@ READ8_MEMBER(thayers_state::cop_l_r)
 	}
 }
 
-WRITE8_MEMBER(thayers_state::cop_l_w)
+void thayers_state::cop_l_w(uint8_t data)
 {
 	m_cop_l = data;
 	if (LOG) logerror("COP L %02x\n", m_cop_l);
 }
 
-READ8_MEMBER(thayers_state::cop_g_r)
+uint8_t thayers_state::cop_g_r()
 {
 	/*
 
@@ -299,7 +299,7 @@ WRITE8_MEMBER(thayers_state::control_w)
 	if (LOG) logerror("COP G0..2 %u\n", m_cop_cmd_latch);
 }
 
-WRITE8_MEMBER(thayers_state::cop_g_w)
+void thayers_state::cop_g_w(uint8_t data)
 {
 	/*
 
@@ -651,14 +651,14 @@ void thayers_state::thayers_io_map(address_map &map)
 
 /* Input Ports */
 
-CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_enter_r)
+READ_LINE_MEMBER(thayers_state::laserdisc_enter_r)
 {
 	if (m_pr7820 != nullptr) return m_pr7820_enter;
 	if (m_ldv1000 != nullptr) return (m_ldv1000->status_strobe_r() == ASSERT_LINE) ? 0 : 1;
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_ready_r)
+READ_LINE_MEMBER(thayers_state::laserdisc_ready_r)
 {
 	if (m_pr7820 != nullptr) return (m_pr7820->ready_r() == ASSERT_LINE) ? 0 : 1;
 	if (m_ldv1000 != nullptr) return (m_ldv1000->command_strobe_r() == ASSERT_LINE) ? 0 : 1;
@@ -702,8 +702,8 @@ static INPUT_PORTS_START( thayers )
 	PORT_START("COIN")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_enter_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_ready_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(thayers_state, laserdisc_enter_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(thayers_state, laserdisc_ready_r)
 
 	PORT_START("ROW.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1 YES") PORT_CODE(KEYCODE_1)

@@ -1,7 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-#ifndef NLD_TTL74XX_H_
-#define NLD_TTL74XX_H_
+
+#ifndef NLM_TTL74XX_H_
+#define NLM_TTL74XX_H_
+
+///
+/// \file nlm_ttl74xx.h
+///
 
 #include "netlist/nl_setup.h"
 
@@ -11,7 +16,7 @@
  *  Netlist Macros
  * ---------------------------------------------------------------------------*/
 
-#ifndef NL_AUTO_DEVICES
+#if !NL_AUTO_DEVICES
 
 #define TTL_7400_GATE(name)                                                    \
 		NET_REGISTER_DEV(TTL_7400_GATE, name)
@@ -51,6 +56,14 @@
 
 #define TTL_7404_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7404_DIP, name)
+
+
+#define TTL_7406_GATE(name)                                                    \
+		NET_REGISTER_DEV(TTL_7406_GATE, name)
+
+#define TTL_7406_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7406_DIP, name)
+
 
 #define TTL_7408_GATE(name)                                                    \
 		NET_REGISTER_DEV(TTL_7408_GATE, name)
@@ -131,6 +144,22 @@
 		NET_REGISTER_DEV(TTL_7420_DIP, name)
 
 
+#define TTL_7421_GATE(name)                                                    \
+		NET_REGISTER_DEV(TTL_7421_GATE, name)
+
+#define TTL_7421_AND(name, cI1, cI2, cI3, cI4)                                 \
+		NET_REGISTER_DEV(TTL_7421_AND, name)                                   \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, A, cI1)                                              \
+		NET_CONNECT(name, B, cI2)                                              \
+		NET_CONNECT(name, C, cI3)                                              \
+		NET_CONNECT(name, D, cI4)
+
+#define TTL_7421_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7421_DIP, name)
+
+
 #define TTL_7425_GATE(name)                                                    \
 		NET_REGISTER_DEV(TTL_7425_GATE, name)
 
@@ -209,7 +238,7 @@
 		NET_REGISTER_DEV(TTL_7437_DIP, name)
 
 
-#if (USE_TRUTHTABLE_7448)
+#if (NL_USE_TRUTHTABLE_7448)
 #define TTL_7448(name, cA0, cA1, cA2, cA3, cLTQ, cBIQ, cRBIQ)                  \
 		NET_REGISTER_DEV(TTL_7448, name)                                       \
 		NET_CONNECT(name, VCC, VCC)                                            \
@@ -240,7 +269,7 @@
 #define TTL_7486_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7486_DIP, name)
 
-#if (USE_TRUTHTABLE_74107)
+#if (NL_USE_TRUTHTABLE_74107)
 #define TTL_74107(name, cCLK, cJ, cK, cCLRQ)                                   \
 		NET_REGISTER_DEV(TTL_74107, name)                                      \
 		NET_CONNECT(name, GND, GND)                                            \
@@ -254,6 +283,9 @@
 		NET_REGISTER_DEV(TTL_74107_DIP, name)
 
 #endif
+
+#define TTL_74125_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74125_DIP, name)
 
 #define TTL_74155_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74155_DIP, name)
@@ -280,8 +312,17 @@
 #define TTL_74279_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74279_DIP, name)
 
+#define TTL_74377_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74377_DIP, name)
+
+#define TTL_74378_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74378_DIP, name)
+
+#define TTL_74379_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74379_DIP, name)
+
 #define DM9312(name, cA, cB, cC, cSTROBE, cD0, cD1, cD2, cD3, cD4, cD5, cD6, cD7)     \
-		NET_REGISTER_DEV(DM9312_TT, name)                                      \
+		NET_REGISTER_DEV(DM9312, name)                                         \
 		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A,  cA)                                              \
@@ -300,7 +341,7 @@
 #define DM9312_DIP(name)                                                       \
 		NET_REGISTER_DEV(DM9312_DIP, name)
 
-#endif
+#endif // NL_AUTO_DEVICES
 
 /* ----------------------------------------------------------------------------
  *  External declarations
@@ -308,6 +349,7 @@
 
 NETLIST_EXTERNAL(TTL74XX_lib)
 
-#endif
+#endif // __PLIB_PREPROCESSOR__
 
-#endif
+
+#endif // NLM_TTL74XX

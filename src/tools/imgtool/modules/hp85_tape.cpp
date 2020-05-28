@@ -43,8 +43,8 @@ static constexpr tape_pos_t FMT_IFG_SIZE = 2.5 * hti_format_t::ONE_INCH_POS;
 // Formatted size of IRGs: 1"
 static constexpr tape_pos_t FMT_IRG_SIZE = hti_format_t::ONE_INCH_POS;
 
-// Formatted size of records: 2.85"
-static constexpr tape_pos_t FMT_REC_SIZE = 2.85 * hti_format_t::ONE_INCH_POS;
+// Formatted size of records: 2.67"
+static constexpr tape_pos_t FMT_REC_SIZE = 2.67 * hti_format_t::ONE_INCH_POS;
 
 // Starting position on tracks: 74" from beginning of tape
 static constexpr tape_pos_t TRACK_START = 74 * hti_format_t::ONE_INCH_POS;
@@ -145,6 +145,7 @@ typedef struct {
 tape_image_85::tape_image_85(void)
 	: dirty(false)
 {
+	image.set_bits_per_word(16);
 }
 
 void tape_image_85::format_img(void)
@@ -263,22 +264,24 @@ bool tape_image_85::load_sif_file(file_no_t file_no , sif_file_t& out)
 		if (!image.next_data(track , pos , true , false , it)) {
 			break;
 		}
-		// 0    Sync word
-		// 1    File word
-		// 2    Record word
-		// 3    Length word
-		// 4    Checksum
-		tape_word_t hdr[ 5 ];
-		auto res = hti_format_t::ADV_CONT_DATA;
-		for (unsigned i = 0; i < 5; i++) {
+		unsigned bit_idx = 15;
+		if (!image.sync_with_record(track , it , bit_idx)) {
+			// Couldn't align
+			return false;
+		}
+
+		// 0    File word
+		// 1    Record word
+		// 2    Length word
+		// 3    Checksum
+		tape_word_t hdr[ 4 ];
+		for (unsigned i = 0; i < 4; i++) {
+			auto res = image.next_word(track , it , bit_idx , hdr[ i ]);
 			if (res != hti_format_t::ADV_CONT_DATA) {
 				return false;
 			}
-			hdr[ i ] = it->second;
-			res = image.adv_it(track , true , it);
 		}
-		if (hdr[ 0 ] != SYNC_WORD ||
-			checksum(&hdr[ 1 ] , 3) != hdr[ 4 ]) {
+		if (checksum(&hdr[ 0 ] , 3) != hdr[ 3 ]) {
 			return false;
 		}
 
@@ -287,7 +290,7 @@ bool tape_image_85::load_sif_file(file_no_t file_no , sif_file_t& out)
 		bool hdr_has_body;
 		unsigned hdr_body_len;
 
-		if (!dec_rec_header(&hdr[ 1 ] , hdr_file_no , hdr_rec_no , hdr_has_body , hdr_body_len)) {
+		if (!dec_rec_header(&hdr[ 0 ] , hdr_file_no , hdr_rec_no , hdr_has_body , hdr_body_len)) {
 			return false;
 		}
 
@@ -304,11 +307,10 @@ bool tape_image_85::load_sif_file(file_no_t file_no , sif_file_t& out)
 		tape_word_t body[ MAX_RECORD_SIZE / 2 + 1 ];
 		unsigned word_no = (hdr_body_len + 1) / 2 + 1;
 		for (unsigned i = 0; i < word_no; i++) {
+			auto res = image.next_word(track , it , bit_idx , body[ i ]);
 			if (res != hti_format_t::ADV_CONT_DATA) {
 				return false;
 			}
-			body[ i ] = it->second;
-			res = image.adv_it(track , true , it);
 		}
 		if (checksum(&body[ 0 ] , word_no - 1) != body[ word_no - 1 ]) {
 			return false;

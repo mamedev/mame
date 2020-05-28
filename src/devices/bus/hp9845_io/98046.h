@@ -18,7 +18,7 @@
 #include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
 
-class hp98046_io_card_device : public hp9845_io_card_device
+class hp98046_io_card_device : public device_t, public device_hp9845_io_interface
 {
 public:
 	// construction/destruction
@@ -77,8 +77,8 @@ private:
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_READ8_MEMBER(cpu_r);
 	DECLARE_WRITE8_MEMBER(cpu_w);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	uint8_t p1_r();
+	void p2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sio_int_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_txd_w);
 	DECLARE_WRITE_LINE_MEMBER(rs232_rxd_w);

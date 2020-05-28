@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -10,6 +10,7 @@
 #include "endian.h"
 #include "error.h"
 #include "filepath.h"
+#include "math.h"
 #include "string.h"
 #include "uint32_t.h"
 
@@ -21,94 +22,116 @@ BX_ERROR_RESULT(BX_ERROR_READERWRITER_ALREADY_OPEN, BX_MAKEFOURCC('R', 'W', 0, 5
 
 namespace bx
 {
-	///
+	/// The position from where offset is added.
 	struct Whence
 	{
+		/// Whence values:
 		enum Enum
 		{
-			Begin,
-			Current,
-			End,
+			Begin,   //!< From begining of file.
+			Current, //!< From current position of file.
+			End,     //!< From end of file.
 		};
 	};
 
-	///
+	/// Reader interface.
 	struct BX_NO_VTABLE ReaderI
 	{
+		///
 		virtual ~ReaderI() = 0;
+
+		///
 		virtual int32_t read(void* _data, int32_t _size, Error* _err) = 0;
 	};
 
-	///
+	/// Writer interface.
 	struct BX_NO_VTABLE WriterI
 	{
+		///
 		virtual ~WriterI() = 0;
+
+		///
 		virtual int32_t write(const void* _data, int32_t _size, Error* _err) = 0;
 	};
 
-	///
+	/// Seeker interface.
 	struct BX_NO_VTABLE SeekerI
 	{
+		///
 		virtual ~SeekerI() = 0;
+
+		///
 		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) = 0;
 	};
 
-	///
+	/// Reader seeker interface.
 	struct BX_NO_VTABLE ReaderSeekerI : public ReaderI, public SeekerI
 	{
 	};
 
-	///
+	/// Writer seeker interface.
 	struct BX_NO_VTABLE WriterSeekerI : public WriterI, public SeekerI
 	{
 	};
 
-	///
+	/// Open for reading interface.
 	struct BX_NO_VTABLE ReaderOpenI
 	{
+		///
 		virtual ~ReaderOpenI() = 0;
+
+		///
 		virtual bool open(const FilePath& _filePath, Error* _err) = 0;
 	};
 
-	///
+	/// Open for writing interface.
 	struct BX_NO_VTABLE WriterOpenI
 	{
+		///
 		virtual ~WriterOpenI() = 0;
+
+		///
 		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) = 0;
 	};
 
-	///
+	/// Open process interface.
 	struct BX_NO_VTABLE ProcessOpenI
 	{
+		///
 		virtual ~ProcessOpenI() = 0;
+
+		///
 		virtual bool open(const FilePath& _filePath, const StringView& _args, Error* _err) = 0;
 	};
 
-	///
+	/// Closer interface.
 	struct BX_NO_VTABLE CloserI
 	{
+		///
 		virtual ~CloserI() = 0;
+
+		///
 		virtual void close() = 0;
 	};
 
-	///
+	/// File reader interface.
 	struct BX_NO_VTABLE FileReaderI : public ReaderOpenI, public CloserI, public ReaderSeekerI
 	{
 	};
 
-	///
+	/// File writer interface.
 	struct BX_NO_VTABLE FileWriterI : public WriterOpenI, public CloserI, public WriterSeekerI
 	{
 	};
 
-	///
+	/// Memory block interface.
 	struct BX_NO_VTABLE MemoryBlockI
 	{
 		virtual void* more(uint32_t _size = 0) = 0;
 		virtual uint32_t getSize() = 0;
 	};
 
-	///
+	/// Static memory block interface.
 	class StaticMemoryBlock : public MemoryBlockI
 	{
 	public:
@@ -125,11 +148,11 @@ namespace bx
 		virtual uint32_t getSize() override;
 
 	private:
-		void* m_data;
+		void*    m_data;
 		uint32_t m_size;
 	};
 
-	///
+	/// Memory block.
 	class MemoryBlock : public MemoryBlockI
 	{
 	public:
@@ -147,8 +170,8 @@ namespace bx
 
 	private:
 		AllocatorI* m_allocator;
-		void* m_data;
-		uint32_t m_size;
+		void*       m_data;
+		uint32_t    m_size;
 	};
 
 	/// Sizer writer. Dummy writter that only counts number of bytes written into it.
@@ -172,7 +195,7 @@ namespace bx
 		int64_t m_top;
 	};
 
-	///
+	/// Memory reader.
 	class MemoryReader : public ReaderSeekerI
 	{
 	public:
@@ -203,7 +226,7 @@ namespace bx
 		int64_t m_top;
 	};
 
-	///
+	/// Memory writer.
 	class MemoryWriter : public WriterSeekerI
 	{
 	public:
@@ -222,9 +245,9 @@ namespace bx
 	private:
 		MemoryBlockI* m_memBlock;
 		uint8_t* m_data;
-		int64_t m_pos;
-		int64_t m_top;
-		int64_t m_size;
+		int64_t  m_pos;
+		int64_t  m_top;
+		int64_t  m_size;
 	};
 
 	/// Static (fixed size) memory block writer.

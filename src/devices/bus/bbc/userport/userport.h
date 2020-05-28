@@ -41,7 +41,7 @@
 
 class device_bbc_userport_interface;
 
-class bbc_userport_slot_device : public device_t, public device_slot_interface
+class bbc_userport_slot_device : public device_t, public device_single_card_slot_interface<device_bbc_userport_interface>
 {
 public:
 	// construction/destruction
@@ -70,7 +70,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	device_bbc_userport_interface *m_device;
 
@@ -82,7 +81,7 @@ private:
 
 // ======================> device_bbc_userport_interface
 
-class device_bbc_userport_interface : public device_slot_card_interface
+class device_bbc_userport_interface : public device_interface
 {
 public:
 	// construction/destruction

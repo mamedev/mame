@@ -22,8 +22,10 @@
 
 
 #include "emu.h"
-#include "hashfile.h"
 #include "a800_slot.h"
+
+#include "hashfile.h"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -38,11 +40,11 @@ DEFINE_DEVICE_TYPE(XEGS_CART_SLOT,  xegs_cart_slot_device,  "xegs_cart_slot",  "
 //  device_vcs_cart_interface - constructor
 //-------------------------------------------------
 
-device_a800_cart_interface::device_a800_cart_interface (const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0),
-		m_bank_mask(0)
+device_a800_cart_interface::device_a800_cart_interface (const machine_config &mconfig, device_t &device) :
+	device_interface(device, "a800cart"),
+	m_rom(nullptr),
+	m_rom_size(0),
+	m_bank_mask(0)
 {
 }
 
@@ -104,7 +106,8 @@ void device_a800_cart_interface::nvram_alloc(uint32_t size)
 a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)
+	device_single_card_slot_interface<device_a800_cart_interface>(mconfig, *this),
+	m_cart(nullptr), m_type(0)
 {
 }
 
@@ -148,7 +151,7 @@ xegs_cart_slot_device::~xegs_cart_slot_device()
 
 void a800_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_a800_cart_interface  *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 
@@ -491,18 +494,18 @@ std::string xegs_cart_slot_device::get_default_card_software(get_default_card_so
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(a800_cart_slot_device::read_80xx)
+uint8_t a800_cart_slot_device::read_80xx(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_80xx(space, offset, mem_mask);
+		return m_cart->read_80xx(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(a800_cart_slot_device::read_d5xx)
+uint8_t a800_cart_slot_device::read_d5xx(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_d5xx(space, offset, mem_mask);
+		return m_cart->read_d5xx(offset);
 	else
 		return 0xff;
 }
@@ -512,14 +515,14 @@ READ8_MEMBER(a800_cart_slot_device::read_d5xx)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(a800_cart_slot_device::write_80xx)
+void a800_cart_slot_device::write_80xx(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_80xx(space, offset, data, mem_mask);
+		m_cart->write_80xx(offset, data);
 }
 
-WRITE8_MEMBER(a800_cart_slot_device::write_d5xx)
+void a800_cart_slot_device::write_d5xx(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_d5xx(space, offset, data, mem_mask);
+		m_cart->write_d5xx(offset, data);
 }

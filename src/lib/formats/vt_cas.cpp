@@ -1,6 +1,6 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller
-#include <assert.h>
+#include <cassert>
 
 #include "formats/vt_cas.h"
 

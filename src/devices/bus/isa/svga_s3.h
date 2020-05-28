@@ -35,8 +35,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	s3_vga_device *m_vga;
-	ibm8514a_device *m_8514;
+	required_device<s3_vga_device> m_vga;
+	required_device<ibm8514a_device> m_8514;
 };
 
 class isa16_s3virge_device :
@@ -58,8 +58,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	DECLARE_WRITE_LINE_MEMBER(linear_config_changed_w);
+
 private:
-	s3virge_vga_device *m_vga;
+	required_device<s3virge_vga_device> m_vga;
 };
 
 class isa16_s3virgedx_device :
@@ -81,8 +83,13 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	DECLARE_WRITE_LINE_MEMBER(linear_config_changed_w);
+
 private:
-	s3virgedx_vga_device *m_vga;
+	required_device<s3virgedx_vga_device> m_vga;
+	bool m_lfb_enable;
+	uint32_t m_lfb_start;
+	uint32_t m_lfb_end;
 };
 
 class isa16_stealth3d2kpro_device :
@@ -104,8 +111,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	DECLARE_WRITE_LINE_MEMBER(linear_config_changed_w);
+
 private:
-	s3virgedx_vga_device *m_vga;
+	required_device<s3virgedx_vga_device> m_vga;
 };
 
 

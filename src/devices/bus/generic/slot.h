@@ -7,52 +7,86 @@
 
 #include "softlist_dev.h"
 
+#include <cassert>
+
 
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
 
-
-// ======================> device_generic_cart_interface
-
-class device_generic_cart_interface : public device_slot_card_interface
+class device_generic_cart_interface : public device_interface
 {
 public:
+	// TODO: find a better home for this helper
+	template <unsigned Shift, typename T>
+	static void install_non_power_of_two(
+			offs_t length,
+			offs_t decode_limit,
+			offs_t decode_mask,
+			offs_t decode_offset,
+			offs_t base,
+			T &&install)
+	{
+		assert(!(decode_limit & base));
+		for (offs_t remain = length, start = 0U; remain && (decode_limit >= start); )
+		{
+			unsigned const msb(31 - count_leading_zeros(u32(remain)));
+			offs_t const chunk(offs_t(1) << msb);
+			offs_t range((chunk - 1) & decode_limit);
+			offs_t mirror(decode_limit & ~decode_mask & ~range);
+
+			// TODO: deal with small offsets - probably requires breaking into smaller chunks with mirror set
+			if (decode_offset & range)
+				throw emu_fatalerror("Can't deal with offset/size combination\n");
+
+			range = (range << Shift) | ((offs_t(1) << Shift) - 1);
+			mirror <<= Shift;
+			offs_t const begin(start << Shift);
+			offs_t const end(begin | range);
+			offs_t const src(start | ((chunk - 1) & decode_offset));
+
+			install(base | begin, base | end, mirror, src);
+
+			remain ^= chunk;
+			start ^= chunk;
+		}
+	}
+
 	// construction/destruction
 	virtual ~device_generic_cart_interface();
 
 	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
-	virtual uint16_t read16_rom(offs_t offset, uint16_t mem_mask) { return 0xffff; }
-	virtual uint32_t read32_rom(offs_t offset, uint32_t mem_mask) { return 0xffffffff; }
+	virtual u8 read_rom(offs_t offset);
+	virtual u16 read16_rom(offs_t offset, u16 mem_mask);
+	virtual u32 read32_rom(offs_t offset, u32 mem_mask);
 
-	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
-	virtual void write_ram(offs_t offset, uint8_t data) {}
+	virtual u8 read_ram(offs_t offset);
+	virtual void write_ram(offs_t offset, u8 data);
 
-	virtual void rom_alloc(size_t size, int width, endianness_t end, const char *tag);
-	virtual void ram_alloc(uint32_t size);
+	virtual void rom_alloc(u32 size, int width, endianness_t end, char const *tag);
+	virtual void ram_alloc(u32 size);
 
-	uint8_t* get_rom_base()  { return m_rom; }
-	uint32_t get_rom_size() { return m_rom_size; }
+	u8 *get_rom_base()  { return m_rom; }
+	u32 get_rom_size() { return m_rom_size; }
 
-	uint8_t* get_region_base()  { if (m_region.found()) return m_region->base(); return nullptr; }
-	uint32_t get_region_size() { if (m_region.found()) return m_region->bytes(); return 0; }
+	u8 *get_region_base()  { return m_region.found() ? m_region->base() : nullptr; }
+	u32 get_region_size() { return m_region.found() ? m_region->bytes() : 0U; }
 
-	uint8_t* get_ram_base() { return &m_ram[0]; }
-	uint32_t get_ram_size() { return m_ram.size(); }
+	u8 *get_ram_base() { return &m_ram[0]; }
+	u32 get_ram_size() { return m_ram.size(); }
 
 	void save_ram() { device().save_item(NAME(m_ram)); }
 
 protected:
-	device_generic_cart_interface(const machine_config &mconfig, device_t &device);
-
-	// internal state
-	uint8_t  *m_rom;
-	uint32_t  m_rom_size;
-	std::vector<uint8_t> m_ram;
+	device_generic_cart_interface(machine_config const &mconfig, device_t &device);
 
 	// this replaces m_rom for non-user configurable carts!
 	optional_memory_region  m_region;
+
+	// internal state
+	std::vector<u8> m_ram;
+	u8 *m_rom;
+	u32 m_rom_size;
 };
 
 
@@ -67,96 +101,91 @@ enum
 
 
 
-// ======================> generic_slot_device
-
 class generic_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_generic_cart_interface>
 {
 public:
-	// construction/destruction
-	generic_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~generic_slot_device();
 
-	template <typename... T> void set_device_load(T &&... args) { m_device_image_load = load_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_device_unload(T &&... args) { m_device_image_unload = unload_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_device_load(T &&... args) { m_device_image_load.set(std::forward<T>(args)...); }
+	template <typename... T> void set_device_unload(T &&... args) { m_device_image_unload.set(std::forward<T>(args)...); }
 
-	void set_interface(const char * interface) { m_interface = interface; }
-	void set_default_card(const char * def) { m_default_card = def; }
-	void set_extensions(const char * exts) { m_extensions = exts; }
+	void set_interface(char const *interface) { m_interface = interface; }
+	void set_default_card(char const *def) { m_default_card = def; }
+	void set_extensions(char const *exts) { m_extensions = exts; }
 	void set_must_be_loaded(bool mandatory) { m_must_be_loaded = mandatory; }
 	void set_width(int width) { m_width = width; }
 	void set_endian(endianness_t end) { m_endianness = end; }
 
-	// device-level overrides
-	virtual void device_start() override;
-
-	// image-level overrides
+	// device_image_interface implementation
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
-
-	uint32_t common_get_size(const char *region);
-	void common_load_rom(uint8_t *ROM, uint32_t len, const char *region);
-
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return true; }
-	virtual bool is_writeable() const override { return false; }
-	virtual bool is_creatable() const override { return false; }
-	virtual bool must_be_loaded() const override { return m_must_be_loaded; }
-	virtual bool is_reset_on_load() const override { return true; }
-	virtual const char *image_interface() const override { return m_interface; }
-	virtual const char *file_extensions() const override { return m_extensions; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return m_must_be_loaded; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual char const *image_interface() const noexcept override { return m_interface; }
+	virtual char const *file_extensions() const noexcept override { return m_extensions; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
+	u32 common_get_size(char const *region);
+	void common_load_rom(u8 *ROM, u32 len, char const *region);
+
 	// reading and writing
-	virtual uint8_t read_rom(offs_t offset);
-	virtual uint16_t read16_rom(offs_t offset, uint16_t mem_mask = 0xffff);
-	virtual uint32_t read32_rom(offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual u8 read_rom(offs_t offset);
+	virtual u16 read16_rom(offs_t offset, u16 mem_mask = 0xffff);
+	virtual u32 read32_rom(offs_t offset, u32 mem_mask = 0xffffffff);
 
-	virtual uint8_t read_ram(offs_t offset);
-	virtual void write_ram(offs_t offset, uint8_t data);
+	virtual u8 read_ram(offs_t offset);
+	virtual void write_ram(offs_t offset, u8 data);
 
-	virtual void rom_alloc(size_t size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
-	virtual void ram_alloc(uint32_t size)  { if (m_cart) m_cart->ram_alloc(size); }
+	virtual void rom_alloc(u32 size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
+	virtual void ram_alloc(u32 size)  { if (m_cart) m_cart->ram_alloc(size); }
 
-	uint8_t* get_rom_base()
+	u8* get_rom_base()
 	{
-		if (m_cart)
-		{
-			if (!user_loadable())
-				return m_cart->get_region_base();
-			else
-				return m_cart->get_rom_base();
-		}
-		return nullptr;
+		if (!m_cart)
+			return nullptr;
+		else if (!user_loadable())
+			return m_cart->get_region_base();
+		else
+			return m_cart->get_rom_base();
 	}
-	uint32_t get_rom_size()
+	u32 get_rom_size()
 	{
-		if (m_cart)
-		{
-			if (!user_loadable())
-				return m_cart->get_region_size();
-			else
-				return m_cart->get_rom_size();
-		}
-		return 0;
+		if (!m_cart)
+			return 0U;
+		else if (!user_loadable())
+			return m_cart->get_region_size();
+		else
+			return m_cart->get_rom_size();
 	}
-	uint8_t* get_ram_base() { if (m_cart) return m_cart->get_ram_base(); return nullptr; }
+	u8 *get_ram_base() { return m_cart ? m_cart->get_ram_base() : nullptr; }
 
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
 protected:
-	const char *m_interface;
-	const char *m_default_card;
-	const char *m_extensions;
-	bool        m_must_be_loaded;
-	int         m_width;
+	generic_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// device_image_interface implementation
+	virtual software_list_loader const &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+
+	char const *m_interface;
+	char const *m_default_card;
+	char const *m_extensions;
+	bool m_must_be_loaded;
+	int m_width;
 	endianness_t m_endianness;
-	device_generic_cart_interface  *m_cart;
-	load_delegate   m_device_image_load;
+	device_generic_cart_interface *m_cart;
+	load_delegate m_device_image_load;
 	unload_delegate m_device_image_unload;
 };
 
@@ -164,8 +193,8 @@ class generic_socket_device : public generic_slot_device
 {
 public:
 	template <typename T>
-	generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *intf, const char *exts = nullptr)
-		: generic_socket_device(mconfig, tag, owner, (uint32_t)0)
+	generic_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *intf, char const *exts = nullptr)
+		: generic_socket_device(mconfig, tag, owner, u32(0))
 	{
 		opts(*this);
 		set_fixed(false);
@@ -174,17 +203,17 @@ public:
 			set_extensions(exts);
 	}
 
-	generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	generic_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
-	virtual iodevice_t image_type() const override { return IO_ROM; }
+	virtual iodevice_t image_type() const noexcept override { return IO_ROM; }
 };
 
 class generic_cartslot_device : public generic_slot_device
 {
 public:
 	template <typename T>
-	generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *intf, const char *exts = nullptr)
-		: generic_cartslot_device(mconfig, tag, owner, (uint32_t)0)
+	generic_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *intf, char const *exts = nullptr)
+		: generic_cartslot_device(mconfig, tag, owner, u32(0))
 	{
 		opts(*this);
 		set_fixed(false);
@@ -193,19 +222,14 @@ public:
 			set_extensions(exts);
 	}
 
-	generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	generic_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(GENERIC_SOCKET, generic_socket_device)
 DECLARE_DEVICE_TYPE(GENERIC_CARTSLOT, generic_cartslot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
 
 #endif // MAME_BUS_GENERIC_SLOT_H

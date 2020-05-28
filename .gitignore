@@ -43,6 +43,7 @@
 !/LICENSE
 /.idea
 docs/build
+docs/source/_build
 regtests/chdman/temp
 regtests/jedutil/output
 /CMakeLists.txt

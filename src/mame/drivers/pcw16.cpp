@@ -497,7 +497,7 @@ WRITE8_MEMBER(pcw16_state::pcw16_keyboard_control_w)
 				/* busy */
 				m_keyboard_state |= PCW16_KEYBOARD_BUSY_STATUS;
 				/* keyboard takes data */
-				m_keyboard->write(space, 0, m_keyboard_data_shift);
+				m_keyboard->write(m_keyboard_data_shift);
 				/* set clock low - no furthur transmissions */
 				pcw16_keyboard_set_clock_state(0);
 				/* set int */
@@ -532,7 +532,7 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_keyboard_callback)
 	{
 		int data;
 
-		data = m_keyboard->read(machine().dummy_space(), 0);
+		data = m_keyboard->read();
 
 		if (data)
 		{
@@ -1016,7 +1016,7 @@ void pcw16_state::pcw16(machine_config &config)
 	Z80(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcw16_state::pcw16_map);
 	m_maincpu->set_addrmap(AS_IO, &pcw16_state::pcw16_io);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ns16550_device &uart1(NS16550(config, "ns16550_1", XTAL(1'843'200)));     /* TODO: Verify uart model */
 	uart1.out_tx_callback().set("serport1", FUNC(rs232_port_device::write_txd));

@@ -350,7 +350,7 @@ void ravens_state::ravens(machine_config &config)
 	config.set_default_layout(layout_ravens);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(ravens_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(ravens_state::quickload_cb));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -375,7 +375,7 @@ void ravens_state::ravens2(machine_config &config)
 	m_terminal->set_keyboard_callback(FUNC(ravens_state::kbd_put));
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(ravens_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(ravens_state::quickload_cb));
 
 	SPEAKER(config, "mono").front_center();
 

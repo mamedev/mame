@@ -12,7 +12,6 @@
 
 #define NORMAL_PLANE_ORDER 4
 
-typedef device_delegate<void (int *code, int *color, int *priority_mask)> k053247_cb_delegate;
 #define K053246_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
 #define K055673_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
 
@@ -52,11 +51,12 @@ class k053247_device : public device_t,
 						public device_gfx_interface
 {
 public:
+	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority_mask)>;
+
 	k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	void set_k053247_callback(k053247_cb_delegate callback) { m_k053247_cb = callback; }
-	template <typename... T> void set_sprite_callback(T &&... args) { m_k053247_cb = k053247_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_sprite_callback(T &&... args) { m_k053247_cb.set(std::forward<T>(args)...); }
 	void set_config(int bpp, int dx, int dy)
 	{
 		m_bpp = bpp;
@@ -101,7 +101,7 @@ public:
 	u8    m_objcha_line;
 	int   m_z_rejection;
 
-	k053247_cb_delegate m_k053247_cb;
+	sprite_delegate m_k053247_cb;
 
 	required_region_ptr<u8> m_gfxrom;
 	int m_gfx_num;

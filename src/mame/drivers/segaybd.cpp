@@ -64,6 +64,7 @@ MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
 #include "machine/mb8421.h"
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
+#include "machine/segaic16.h"
 #include "machine/315_5296.h"
 #include "sound/segapcm.h"
 #include "sound/ym2151.h"
@@ -103,7 +104,7 @@ ioport_value segaybd_state::analog_mux()
 //  output1_w - handle writes to I/O port D
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaybd_state::output1_w)
+void segaybd_state::output1_w(uint8_t data)
 {
 	if (!m_output_cb1.isnull())
 		m_output_cb1(data);
@@ -114,7 +115,7 @@ WRITE8_MEMBER(segaybd_state::output1_w)
 //  misc_output_w - handle writes to I/O port E
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaybd_state::misc_output_w)
+void segaybd_state::misc_output_w(uint8_t data)
 {
 	//
 	//  D7 = /KILL
@@ -139,7 +140,7 @@ WRITE8_MEMBER(segaybd_state::misc_output_w)
 //  output2_w - handle writes to I/O port H
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaybd_state::output2_w)
+void segaybd_state::output2_w(uint8_t data)
 {
 	if (!m_output_cb2.isnull())
 		m_output_cb2(data);
@@ -591,7 +592,7 @@ void segaybd_state::main_map(address_map &map)
 	map(0x080000, 0x080007).mirror(0x001ff8).rw("multiplier_main", FUNC(sega_315_5248_multiplier_device::read), FUNC(sega_315_5248_multiplier_device::write));
 	map(0x082001, 0x082001).mirror(0x001ffe).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x084000, 0x08401f).mirror(0x001fe0).rw("divider_main", FUNC(sega_315_5249_divider_device::read), FUNC(sega_315_5249_divider_device::write));
-//  AM_RANGE(0x086000, 0x087fff) /DEA0
+//  map(0x086000, 0x087fff) /DEA0
 	map(0x0c0000, 0x0cffff).ram().share("shareram");
 	map(0x100000, 0x10001f).rw("io", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	map(0x100040, 0x100047).rw("adc", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::address_w)).umask16(0x00ff);
@@ -640,7 +641,7 @@ void segaybd_state::sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::read), FUNC(segapcm_device::write));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -704,7 +705,7 @@ void segaybd_state::link_map(address_map &map)
 }
 
 #if 0
-READ8_MEMBER(segaybd_state::link_portc0_r)
+uint8_t segaybd_state::link_portc0_r()
 {
 	return 0xf8;
 }
@@ -956,7 +957,7 @@ static INPUT_PORTS_START( pdrift )
 	PORT_INCLUDE( yboard_generic )
 
 	PORT_MODIFY("GENERAL")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Shift") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Shift") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
 
 	PORT_MODIFY("LIMITSW")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Safety Sensor Left")
@@ -1288,7 +1289,7 @@ void segaybd_state::yboard(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segaybd_state::sound_portmap);
 
 	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MB3773(config, "watchdog"); // IC95
 

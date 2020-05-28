@@ -18,10 +18,10 @@ DEFINE_DEVICE_TYPE(GAMATE_CART_SLOT, gamate_cart_slot_device, "gamate_cart_slot"
 //  device_gamate_cart_interface - constructor
 //-------------------------------------------------
 
-device_gamate_cart_interface::device_gamate_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0)
+device_gamate_cart_interface::device_gamate_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "gamatecart"),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
 
@@ -57,7 +57,7 @@ void device_gamate_cart_interface::rom_alloc(uint32_t size, const char *tag)
 gamate_cart_slot_device::gamate_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GAMATE_CART_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface(mconfig, *this),
 	m_type(GAMATE_PLAIN),
 	m_cart(nullptr)
 {
@@ -77,7 +77,7 @@ gamate_cart_slot_device::~gamate_cart_slot_device()
 
 void gamate_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_gamate_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 //-------------------------------------------------
@@ -225,11 +225,11 @@ std::string gamate_cart_slot_device::get_default_card_software(get_default_card_
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(gamate_cart_slot_device::read_cart)
+uint8_t gamate_cart_slot_device::read_cart(offs_t offset)
 {
 	if (m_cart)
 	{
-		return m_cart->read_cart(space, offset);
+		return m_cart->read_cart(offset);
 	}
 	else
 		return 0xff;
@@ -239,10 +239,10 @@ READ8_MEMBER(gamate_cart_slot_device::read_cart)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(gamate_cart_slot_device::write_cart)
+void gamate_cart_slot_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 	{
-		m_cart->write_cart(space, offset, data);
+		m_cart->write_cart(offset, data);
 	}
 }

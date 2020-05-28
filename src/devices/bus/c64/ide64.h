@@ -13,8 +13,8 @@
 
 
 #include "exp.h"
+#include "bus/ata/ataintf.h"
 #include "machine/ds1302.h"
-#include "machine/ataintf.h"
 #include "machine/intelfsh.h"
 #include "imagedev/harddriv.h"
 

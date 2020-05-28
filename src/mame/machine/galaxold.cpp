@@ -13,7 +13,7 @@
 #include "includes/galaxold.h"
 
 
-IRQ_CALLBACK_MEMBER(galaxold_state::hunchbkg_irq_callback)
+uint8_t galaxold_state::hunchbkg_intack()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0x03;
@@ -142,14 +142,6 @@ WRITE8_MEMBER(galaxold_state::_4in1_bank_w)
 	membank("bank1")->set_entry(m__4in1_bank);
 }
 
-CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
-{
-	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
-	int bit_mask = (uintptr_t)param;
-
-	return (ioport(portnames[m__4in1_bank])->read() & bit_mask) ? 0x01 : 0x00;
-}
-
 void galaxold_state::init_4in1()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -170,7 +162,7 @@ void galaxold_state::init_4in1()
 
 INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
 {
-	device.execute().pulse_input_line_and_vector(0, 0x03, device.execute().minimum_quantum_time());
+	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
 }
 
 void galaxold_state::init_bullsdrtg()

@@ -17,7 +17,7 @@
 #include "cpu/nanoprocessor/nanoprocessor.h"
 #include "dirtc.h"
 
-class hp98035_io_card_device : public hp9845_io_card_device, public device_rtc_interface
+class hp98035_io_card_device : public device_t, public device_hp9845_io_interface, public device_rtc_interface
 {
 public:
 	// construction/destruction
@@ -38,7 +38,7 @@ protected:
 	virtual DECLARE_WRITE16_MEMBER(reg_w) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(dc_w);
+	void dc_w(uint8_t data);
 
 	DECLARE_WRITE8_MEMBER(ram_addr_w);
 	DECLARE_READ8_MEMBER(ram_data_r);

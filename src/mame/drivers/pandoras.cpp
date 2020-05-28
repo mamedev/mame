@@ -86,7 +86,7 @@ WRITE8_MEMBER(pandoras_state::pandoras_i8039_irqtrigger_w)
 	m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(pandoras_state::i8039_irqen_and_status_w)
+void pandoras_state::i8039_irqen_and_status_w(uint8_t data)
 {
 	/* bit 7 enables IRQ */
 	if ((data & 0x80) == 0)
@@ -140,7 +140,7 @@ void pandoras_state::pandoras_slave_map(address_map &map)
 	map(0x1a02, 0x1a02).portr("P2");
 	map(0x1a03, 0x1a03).portr("DSW3");
 	map(0x1c00, 0x1c00).portr("DSW2");
-//  AM_RANGE(0x1e00, 0x1e00) AM_READNOP                                                     /* ??? seems to be important */
+//  map(0x1e00, 0x1e00).nopr();                                                     /* ??? seems to be important */
 	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));        /* watchdog reset */
 	map(0xa000, 0xa000).w(FUNC(pandoras_state::pandoras_cpua_irqtrigger_w));                           /* cause FIRQ on CPU A */
 	map(0xc000, 0xc7ff).ram().share("share4");                                      /* Shared RAM with the CPU A */
@@ -295,12 +295,12 @@ void pandoras_state::machine_reset()
 	m_i8039_status = 0;
 }
 
-READ8_MEMBER(pandoras_state::pandoras_portA_r)
+uint8_t pandoras_state::pandoras_portA_r()
 {
 	return m_i8039_status;
 }
 
-READ8_MEMBER(pandoras_state::pandoras_portB_r)
+uint8_t pandoras_state::pandoras_portB_r()
 {
 	return (m_audiocpu->total_cycles() / 512) & 0x0f;
 }
@@ -323,7 +323,7 @@ void pandoras_state::pandoras(machine_config &config)
 	m_mcu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 	m_mcu->p2_out_cb().set(FUNC(pandoras_state::i8039_irqen_and_status_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - needed for correct synchronization of the sound CPUs */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - needed for correct synchronization of the sound CPUs */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // C3
 	mainlatch.q_out_cb<0>().set(FUNC(pandoras_state::cpua_irq_enable_w)); // ENA

@@ -2,7 +2,7 @@
 // copyright-holders:Philip Bennett
 /***************************************************************************
 
-    esrip.c
+    esrip.cpp
 
     Implementation of the Entertainment Sciences
     AM29116-based Real Time Image Processor
@@ -187,13 +187,13 @@ void esrip_device::device_start()
 	m_fdt_w.resolve_safe();
 	m_lbrm = (uint8_t*)machine().root_device().memregion(m_lbrm_prom)->base();
 	m_status_in.resolve_safe(0);
-	m_draw.bind_relative_to(*owner());
+	m_draw.resolve();
 
 	/* Allocate image pointer table RAM */
 	m_ipt_ram.resize(IPT_RAM_SIZE/2);
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<3, -3, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_rip_pc).noshow();
@@ -1674,6 +1674,7 @@ esrip_device::esrip_device(const machine_config &mconfig, const char *tag, devic
 	, m_fdt_r(*this)
 	, m_fdt_w(*this)
 	, m_status_in(*this)
+	, m_draw(*this)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_lbrm_prom(nullptr)
 {
@@ -1724,7 +1725,7 @@ void esrip_device::am29116_execute(uint16_t inst, int _sre)
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t esrip_device::execute_min_cycles() const
+uint32_t esrip_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
@@ -1735,7 +1736,7 @@ uint32_t esrip_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t esrip_device::execute_max_cycles() const
+uint32_t esrip_device::execute_max_cycles() const noexcept
 {
 	return 1;
 }
@@ -1746,7 +1747,7 @@ uint32_t esrip_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t esrip_device::execute_input_lines() const
+uint32_t esrip_device::execute_input_lines() const noexcept
 {
 	return 0;
 }
@@ -1768,7 +1769,7 @@ void esrip_device::execute_run()
 	uint8_t status;
 
 	/* I think we can get away with placing this outside of the loop */
-	status = m_status_in(*m_program, 0);
+	status = m_status_in();
 
 	/* Core execution loop */
 	do
@@ -1801,7 +1802,7 @@ void esrip_device::execute_run()
 
 			/* FDT RAM: /Enable, Direction and /RAM OE */
 			else if (!bl44 && !_BIT(m_l2, 3) && bl46)
-				y_bus = m_fdt_r(*m_program, m_fdt_cnt, 0xffff);
+				y_bus = m_fdt_r(m_fdt_cnt);
 
 			/* IPT RAM: /Enable and /READ */
 			else if (!_BIT(m_l2, 6) && !_BIT(m_l4, 5))
@@ -1828,7 +1829,7 @@ void esrip_device::execute_run()
 
 		/* FDT RAM */
 		if (!bl44)
-			x_bus = m_fdt_r(*m_program, m_fdt_cnt, 0xffff);
+			x_bus = m_fdt_r(m_fdt_cnt);
 
 		/* Buffer is enabled - write direction */
 		else if (!BIT(m_l2, 3) && !bl46)
@@ -1853,7 +1854,7 @@ void esrip_device::execute_run()
 
 		/* Write FDT RAM: /Enable, Direction and WRITE */
 		if (!BIT(m_l2, 3) && !bl46 && !BIT(m_l4, 3))
-			m_fdt_w(*m_program, m_fdt_cnt, x_bus, 0xffff);
+			m_fdt_w(m_fdt_cnt, x_bus);
 
 		/* Write IPT RAM: /Enable and /WR */
 		if (!BIT(m_l2, 7) && !BIT(m_l4, 5))
@@ -1879,7 +1880,7 @@ void esrip_device::execute_run()
 		m_pl7 = m_l7;
 
 		/* Latch instruction */
-		inst = m_cache->read_qword(RIP_PC);
+		inst = m_cache.read_qword(RIP_PC);
 
 		in_h = inst >> 32;
 		in_l = inst & 0xffffffff;

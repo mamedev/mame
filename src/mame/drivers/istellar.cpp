@@ -163,16 +163,16 @@ void istellar_state::z80_0_io(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x02, 0x02).portr("DSW1");
 	map(0x03, 0x03).portr("DSW2");
-	/*AM_RANGE(0x04,0x04) AM_WRITE(volatile_palette_write)*/
+/*  map(0x04, 0x04).w(FUNC(istellar_state::volatile_palette_write));*/
 	map(0x05, 0x05).r("latch1", FUNC(generic_latch_8_device::read)).w("latch2", FUNC(generic_latch_8_device::write));
 }
 
 void istellar_state::z80_1_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).noprw(); /*AM_READWRITE(z80_1_slatch_read,z80_1_slatch_write)*/
-	map(0x01, 0x01).noprw(); /*AM_READWRITE(z80_1_nmienable,z80_1_soundwrite_front)*/
-	map(0x02, 0x02).noprw(); /*AM_WRITE(z80_1_soundwrite_rear)*/
+	map(0x00, 0x00).noprw(); /*.rw(FUNC(istellar_state::z80_1_slatch_read), FUNC(istellar_state::z80_1_slatch_write));*/
+	map(0x01, 0x01).noprw(); /*.rw(FUNC(istellar_state::z80_1_nmienable), FUNC(istellar_state::z80_1_soundwrite_front));*/
+	map(0x02, 0x02).noprw(); /*.w(FUNC(istellar_state::z80_1_soundwrite_rear));*/
 }
 
 void istellar_state::z80_2_io(address_map &map)
@@ -181,7 +181,7 @@ void istellar_state::z80_2_io(address_map &map)
 	map(0x00, 0x00).rw(FUNC(istellar_state::z80_2_ldp_read), FUNC(istellar_state::z80_2_ldp_write));
 	map(0x01, 0x01).r("latch2", FUNC(generic_latch_8_device::read)).w("latch1", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).r("latch2", FUNC(generic_latch_8_device::acknowledge_r));
-/*  AM_RANGE(0x03,0x03) AM_WRITE(z80_2_ldtrans_write)*/
+/*  map(0x03, 0x03).w(FUNC(istellar_state::z80_2_ldtrans_write));*/
 }
 
 

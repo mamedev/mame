@@ -467,7 +467,7 @@ void sprcros2_state::sprcros2(machine_config &config)
 	m_slave_cpu->set_addrmap(AS_IO, &sprcros2_state::slave_io);
 	m_slave_cpu->set_vblank_int("screen", FUNC(sprcros2_state::slave_vblank_irq));
 
-	config.m_perfect_cpu_quantum = subtag("master_cpu");
+	config.set_perfect_quantum(m_master_cpu);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

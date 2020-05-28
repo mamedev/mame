@@ -8,9 +8,12 @@
 
 *********************************************************************/
 
-#include <string.h>
-#include <assert.h>
-#include "flopimg.h"
+#include "imd_dsk.h"
+
+#include <cassert>
+#include <cstring>
+
+
 
 struct imddsk_tag
 {
@@ -372,9 +375,6 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
     IMD disk images
 
 *********************************************************************/
-
-#include "emu.h" // emu_fatalerror
-#include "imd_dsk.h"
 
 imd_format::imd_format()
 {

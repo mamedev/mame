@@ -74,7 +74,7 @@ WRITE8_MEMBER(hanaawas_state::hanaawas_colorram_w)
 	m_bg_tilemap->mark_tile_dirty((offset + (flip_screen() ? -1 : 1)) & 0x03ff);
 }
 
-WRITE8_MEMBER(hanaawas_state::hanaawas_portB_w)
+void hanaawas_state::hanaawas_portB_w(uint8_t data)
 {
 	/* bit 7 is flip screen */
 	if (flip_screen() != (~data & 0x80))
@@ -93,12 +93,12 @@ TILE_GET_INFO_MEMBER(hanaawas_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((attr & 0x20) << 3);
 	int color = m_colorram[tile_index] & 0x1f;
 
-	SET_TILE_INFO_MEMBER(gfxbank, code, color, 0);
+	tileinfo.set(gfxbank, code, color, 0);
 }
 
 void hanaawas_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hanaawas_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hanaawas_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t hanaawas_state::screen_update_hanaawas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

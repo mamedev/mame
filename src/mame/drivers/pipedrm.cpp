@@ -889,7 +889,7 @@ void pipedrm_state::init_pipedrm()
 
 void pipedrm_state::init_hatris()
 {
-	m_maincpu->space(AS_IO).install_write_handler(0x21, 0x21, write8_delegate(FUNC(pipedrm_state::fromance_gfxreg_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x21, 0x21, write8_delegate(*this, FUNC(pipedrm_state::fromance_gfxreg_w)));
 }
 
 

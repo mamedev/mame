@@ -75,7 +75,7 @@ WRITE16_MEMBER(midwunit_state::midwunit_io_w)
 			LOGMASKED(LOG_IO, "%s: Control W @ %05X = %04X\n", machine().describe_context(), offset, data);
 
 			/* bit 4 reset sound CPU */
-			m_dcs->reset_w(newword & 0x10);
+			m_dcs->reset_w(~newword & 0x10);
 
 			/* bit 5 (active low) reset security chip */
 			if (m_midway_serial_pic) m_midway_serial_pic->reset_w(newword & 0x20);
@@ -209,14 +209,14 @@ void midwunit_state::init_mk3r10()
 void midwunit_state::init_umk3()
 {
 	init_mk3_common();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(*this, FUNC(midwunit_state::umk3_palette_hack_w)));
 	m_umk3_palette = m_mainram + (0x6a060>>4);
 }
 
 void midwunit_state::init_umk3r11()
 {
 	init_mk3_common();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f,write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(*this, FUNC(midwunit_state::umk3_palette_hack_w)));
 	m_umk3_palette = m_mainram + (0x6a060>>4);
 }
 
@@ -291,7 +291,7 @@ WRITE16_MEMBER(midwunit_state::wwfmania_io_0_w)
 void midwunit_state::init_wwfmania()
 {
 	/* enable I/O shuffling */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01800000, 0x0180000f, write16_delegate(FUNC(midwunit_state::wwfmania_io_0_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01800000, 0x0180000f, write16_delegate(*this, FUNC(midwunit_state::wwfmania_io_0_w)));
 
 	/* serial prefixes 430, 528 */
 	//midway_serial_pic_init(machine(), 528);
@@ -316,8 +316,8 @@ void midwunit_state::init_rmpgwt()
 void midwunit_state::machine_reset()
 {
 	/* reset sound */
-	m_dcs->reset_w(1);
 	m_dcs->reset_w(0);
+	m_dcs->reset_w(1);
 
 	/* reset I/O shuffling */
 	for (int i = 0; i < 16; i++)

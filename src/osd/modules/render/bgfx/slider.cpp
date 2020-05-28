@@ -25,7 +25,7 @@ bgfx_slider::bgfx_slider(running_machine &machine, std::string name, float min, 
 	m_max = max;
 	m_value = def;
 
-	for (std::string string : strings)
+	for (const std::string &string : strings)
 	{
 		m_strings.push_back(string);
 	}
@@ -103,7 +103,7 @@ int32_t bgfx_slider::update(std::string *str, int32_t newval)
 
 		default:
 		{
-			float *val_ptr = reinterpret_cast<float *>(&m_value);
+			auto *val_ptr = reinterpret_cast<float *>(&m_value);
 			if (newval != SLIDER_NOCHANGE)
 			{
 				*val_ptr = float(newval) * m_step;

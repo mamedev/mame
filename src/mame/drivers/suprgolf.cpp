@@ -79,15 +79,15 @@ private:
 	DECLARE_WRITE8_MEMBER(pen_w);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
 	DECLARE_WRITE8_MEMBER(rom2_bank_select_w);
-	DECLARE_READ8_MEMBER(vregs_r);
-	DECLARE_WRITE8_MEMBER(vregs_w);
-	DECLARE_READ8_MEMBER(rom_bank_select_r);
-	DECLARE_WRITE8_MEMBER(rom_bank_select_w);
-	DECLARE_READ8_MEMBER(pedal_extra_bits_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_WRITE8_MEMBER(writeA);
-	DECLARE_WRITE8_MEMBER(writeB);
+	uint8_t vregs_r();
+	void vregs_w(uint8_t data);
+	uint8_t rom_bank_select_r();
+	void rom_bank_select_w(uint8_t data);
+	uint8_t pedal_extra_bits_r();
+	uint8_t p1_r();
+	uint8_t p2_r();
+	void writeA(uint8_t data);
+	void writeB(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 	int code = m_videoram[tile_index*2]+256*(m_videoram[tile_index*2+1]);
 	int color = m_videoram[tile_index*2+0x800] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code,
 		color,
 		0);
@@ -114,7 +114,7 @@ TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 
 void suprgolf_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(suprgolf_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprgolf_state::get_tile_info)), TILEMAP_SCAN_ROWS,8,8,32,32 );
 	m_paletteram = std::make_unique<uint8_t[]>(0x1000);
 	m_bg_vram = std::make_unique<uint8_t[]>(0x2000*0x20);
 	m_bg_fb = std::make_unique<uint16_t[]>(0x2000*0x20);
@@ -207,12 +207,12 @@ WRITE8_MEMBER(suprgolf_state::videoram_w)
 	}
 }
 
-READ8_MEMBER(suprgolf_state::vregs_r)
+uint8_t suprgolf_state::vregs_r()
 {
 	return m_vreg_bank;
 }
 
-WRITE8_MEMBER(suprgolf_state::vregs_w)
+void suprgolf_state::vregs_w(uint8_t data)
 {
 	//printf("%02x\n",data);
 
@@ -298,12 +298,12 @@ WRITE8_MEMBER(suprgolf_state::adpcm_data_w)
 	m_msm5205next = data;
 }
 
-READ8_MEMBER(suprgolf_state::rom_bank_select_r)
+uint8_t suprgolf_state::rom_bank_select_r()
 {
 	return m_rom_bank;
 }
 
-WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
+void suprgolf_state::rom_bank_select_w(uint8_t data)
 {
 	m_rom_bank = data;
 
@@ -324,7 +324,7 @@ WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
 		printf("Rom bank select 2 with data %02x activated\n",data);
 }
 
-READ8_MEMBER(suprgolf_state::pedal_extra_bits_r)
+uint8_t suprgolf_state::pedal_extra_bits_r()
 {
 	uint8_t p1_sht_sw,p2_sht_sw;
 
@@ -334,12 +334,12 @@ READ8_MEMBER(suprgolf_state::pedal_extra_bits_r)
 	return p1_sht_sw | p2_sht_sw;
 }
 
-READ8_MEMBER(suprgolf_state::p1_r)
+uint8_t suprgolf_state::p1_r()
 {
 	return (ioport("P1")->read() & 0xf0) | ((ioport("P1_ANALOG")->read() & 0xf));
 }
 
-READ8_MEMBER(suprgolf_state::p2_r)
+uint8_t suprgolf_state::p2_r()
 {
 	return (ioport("P2")->read() & 0xf0) | ((ioport("P2_ANALOG")->read() & 0xf));
 }
@@ -450,12 +450,12 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:8" )
 INPUT_PORTS_END
 
-WRITE8_MEMBER(suprgolf_state::writeA)
+void suprgolf_state::writeA(uint8_t data)
 {
 	osd_printf_debug("ymwA\n");
 }
 
-WRITE8_MEMBER(suprgolf_state::writeB)
+void suprgolf_state::writeB(uint8_t data)
 {
 	osd_printf_debug("ymwA\n");
 }
@@ -466,12 +466,12 @@ WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
 	m_toggle ^= 1;
 	if(m_toggle)
 	{
-		m_msm->write_data((m_msm5205next & 0xf0) >> 4);
+		m_msm->data_w((m_msm5205next & 0xf0) >> 4);
 		if(m_msm_nmi_mask) { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 	}
 	else
 	{
-		m_msm->write_data((m_msm5205next & 0x0f) >> 0);
+		m_msm->data_w((m_msm5205next & 0x0f) >> 0);
 	}
 }
 

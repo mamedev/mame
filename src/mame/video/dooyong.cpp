@@ -9,11 +9,11 @@
 /* These games all have ROM-based tilemaps for the backgrounds, title
    screens and sometimes "bosses" and special attacks. There are three
    schemes for tilemap encoding.  The scheme is chosen based on the
-   contents of the tilemap control variables declared above.
+   contents of the tilemap control variables.
    Note that although the tilemaps are arbitrarily wide (hundreds of
    thousands of pixels, depending on the size of the ROM), we only
    decode a 1024 pixel wide block at a time, and invalidate the tilemap
-   when the x scroll moves out of range (trying to decode the whole lot
+   when the X scroll moves out of range (trying to decode the whole lot
    at once uses hundreds of megabytes of RAM). */
 
 DEFINE_DEVICE_TYPE(DOOYONG_ROM_TILEMAP, dooyong_rom_tilemap_device, "dooyong_rom_tilemap", "Dooyong ROM Tilemap")
@@ -63,6 +63,7 @@ dooyong_rom_tilemap_device::dooyong_rom_tilemap_device(
 	: dooyong_tilemap_device_base(mconfig, type, tag, owner, clock)
 	, m_rows(8)
 	, m_tilerom(*this, finder_base::DUMMY_TAG)
+	, m_tmap_cb(*this)
 	, m_tilerom_offset(0)
 	, m_tilerom_length(~0U)
 	, m_transparent_pen(~0U)
@@ -79,14 +80,14 @@ void dooyong_rom_tilemap_device::ctrl_w(offs_t offset, u8 data)
 		m_registers[offset] = data;
 		switch (offset)
 		{
-		case 0: // Low byte of x scroll - scroll tilemap
+		case 0: // Low byte of X scroll - scroll tilemap
 			m_tilemap->set_scrollx(0, data);
 			break;
-		case 1: // High byte of x scroll - mark tilemap dirty so new tile gfx will be loaded
+		case 1: // High byte of X scroll - mark tilemap dirty so new tile gfx will be loaded
 			m_tilemap->mark_all_dirty();
 			break;
-		case 3: // Low byte of y scroll
-		case 4: // High byte of y scroll
+		case 3: // Low byte of Y scroll
+		case 4: // High byte of Y scroll
 			m_tilemap->set_scrolly(0, m_registers[3] | (unsigned(m_registers[4]) << 8));
 			break;
 		case 6: // Tilemap enable and mode control
@@ -108,11 +109,11 @@ void dooyong_rom_tilemap_device::device_start()
 	if (!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_tmap_cb.bind_relative_to(*owner());
+	m_tmap_cb.resolve();
 
 	m_tilemap = &machine().tilemap().create(
 			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(dooyong_rom_tilemap_device::tile_info), this),
+			tilemap_get_info_delegate(*this, FUNC(dooyong_rom_tilemap_device::tile_info)),
 			TILEMAP_SCAN_COLS,
 			gfx().width(),
 			gfx().height(),
@@ -149,8 +150,8 @@ TILE_GET_INFO_MEMBER(dooyong_rom_tilemap_device::tile_info)
 		// X = x flip
 		// Y = y flip
 		code = (BIT(attr, 15) << 9) | (attr & 0x01ff);
-		color = (attr >> 11) & 0x0fU;
-		flags = TILE_FLIPYX((attr >> 9) & 0x03U);
+		color = BIT(attr, 11, 4);
+		flags = TILE_FLIPYX(BIT(attr, 9, 2));
 	}
 	else
 	{   // bluehawk/primella/popbingo
@@ -170,10 +171,10 @@ TILE_GET_INFO_MEMBER(dooyong_rom_tilemap_device::tile_info)
 		else // just mimic old driver behavior (default configuration)
 		{
 			code = attr & 0x3ff;
-			color = (attr & 0x3c00) >> 10;
+			color = BIT(attr, 10, 4);
 		}
 
-		flags = TILE_FLIPYX((attr >> 14) & 0x03U);
+		flags = TILE_FLIPYX(BIT(attr, 14, 2));
 	}
 	color |= m_palette_bank;
 
@@ -236,7 +237,7 @@ void dooyong_ram_tilemap_device::device_start()
 
 	m_tilemap = &machine().tilemap().create(
 			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(dooyong_ram_tilemap_device::tile_info), this),
+			tilemap_get_info_delegate(*this, FUNC(dooyong_ram_tilemap_device::tile_info)),
 			TILEMAP_SCAN_COLS,
 			8,
 			8,
@@ -260,5 +261,5 @@ TILE_GET_INFO_MEMBER(dooyong_ram_tilemap_device::tile_info)
 	// c = gfx code
 	// C = color code
 	const u16 attr(m_tileram[tile_index]);
-	tileinfo.set(m_gfxnum, attr & 0x0fffU, m_palette_bank | ((attr >> 12) & 0x0fU), 0);
+	tileinfo.set(m_gfxnum, attr & 0x0fffU, m_palette_bank | BIT(attr, 12, 4), 0);
 }

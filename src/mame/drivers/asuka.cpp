@@ -243,7 +243,7 @@ void asuka_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_maincpu->set_input_line(5, HOLD_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in asuka_state::device_timer");
+		throw emu_fatalerror("Unknown id in asuka_state::device_timer");
 	}
 }
 
@@ -822,7 +822,7 @@ void asuka_state::bonzeadv(machine_config &config)
 
 	TIMER(config, "cchip_irq_clear").configure_generic(FUNC(asuka_state::cchip_irq_clear_cb));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -839,7 +839,7 @@ void asuka_state::bonzeadv(machine_config &config)
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette(m_tc0110pcr);
-	m_pc090oj->set_colpri_callback(FUNC(asuka_state::bonzeadv_colpri_cb), this);
+	m_pc090oj->set_colpri_callback(FUNC(asuka_state::bonzeadv_colpri_cb));
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_palette(m_tc0110pcr);
@@ -870,7 +870,7 @@ void asuka_state::asuka(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(16'000'000)/4); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::z80_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -894,7 +894,7 @@ void asuka_state::asuka(machine_config &config)
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(true);
 	m_pc090oj->set_palette(m_tc0110pcr);
-	m_pc090oj->set_colpri_callback(FUNC(asuka_state::asuka_colpri_cb), this);
+	m_pc090oj->set_colpri_callback(FUNC(asuka_state::asuka_colpri_cb));
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_palette(m_tc0110pcr);
@@ -933,11 +933,11 @@ void asuka_state::cadash(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000)/2);  /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::cadash_z80_map);
 
-	z180_device &subcpu(Z180(config, "subcpu", XTAL(8'000'000)));   /* 8MHz HD64180RP8 Z180 */
+	z180_device &subcpu(HD64180RP(config, "subcpu", XTAL(8'000'000)));   /* 8MHz HD64180RP8 Z180 */
 	subcpu.set_addrmap(AS_PROGRAM, &asuka_state::cadash_sub_map);
 	subcpu.set_addrmap(AS_IO, &asuka_state::cadash_sub_io);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -961,7 +961,7 @@ void asuka_state::cadash(machine_config &config)
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(true);
 	m_pc090oj->set_palette(m_tc0110pcr);
-	m_pc090oj->set_colpri_callback(FUNC(asuka_state::bonzeadv_colpri_cb), this);
+	m_pc090oj->set_colpri_callback(FUNC(asuka_state::bonzeadv_colpri_cb));
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_offsets(1, 0);
@@ -993,7 +993,7 @@ void asuka_state::mofflott(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);  /* 4 MHz ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::z80_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1016,7 +1016,7 @@ void asuka_state::mofflott(machine_config &config)
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette(m_tc0110pcr);
-	m_pc090oj->set_colpri_callback(FUNC(asuka_state::asuka_colpri_cb), this);
+	m_pc090oj->set_colpri_callback(FUNC(asuka_state::asuka_colpri_cb));
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_offsets(1, 0);
@@ -1056,7 +1056,7 @@ void asuka_state::eto(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);  /* 4 MHz ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::cadash_z80_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1079,7 +1079,7 @@ void asuka_state::eto(machine_config &config)
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette(m_tc0110pcr);
-	m_pc090oj->set_colpri_callback(FUNC(asuka_state::asuka_colpri_cb), this);
+	m_pc090oj->set_colpri_callback(FUNC(asuka_state::asuka_colpri_cb));
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_offsets(1, 0);

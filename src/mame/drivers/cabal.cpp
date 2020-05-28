@@ -249,7 +249,7 @@ WRITE8_MEMBER(cabal_state::cabalbl_1_adpcm_w)
 {
 	m_msm1->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm1->write_data(data);
+	m_msm1->data_w(data);
 	m_msm1->vclk_w(1);
 	m_msm1->vclk_w(0);
 }
@@ -257,7 +257,7 @@ WRITE8_MEMBER(cabal_state::cabalbl_2_adpcm_w)
 {
 	m_msm2->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm2->write_data(data);
+	m_msm2->data_w(data);
 	m_msm2->vclk_w(1);
 	m_msm2->vclk_w(0);
 }
@@ -590,7 +590,7 @@ void cabal_state::cabalbl(machine_config &config)
 	adpcm_2.set_addrmap(AS_IO, &cabal_state::cabalbl_talk2_portmap);
 	adpcm_2.set_periodic_int(FUNC(cabal_state::irq0_line_hold), attotime::from_hz(8000));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_START_OVERRIDE(cabal_state,cabalbl)
 	MCFG_MACHINE_RESET_OVERRIDE(cabal_state,cabalbl)

@@ -462,6 +462,10 @@ void rtc65271_device::field_interrupts()
 	}
 }
 
+READ_LINE_MEMBER(rtc65271_device::intrq_r)
+{
+	return (m_regs[reg_C] & reg_C_IRQF)? ASSERT_LINE : CLEAR_LINE;
+}
 
 /*
     Update SQW output state each half-period and assert periodic interrupt each

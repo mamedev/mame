@@ -265,8 +265,8 @@ public:
 	void spc1500(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(psga_r);
-	DECLARE_READ8_MEMBER(porta_r);
+	uint8_t psga_r();
+	uint8_t porta_r();
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
 	DECLARE_READ8_MEMBER(mc6845_videoram_r);
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -284,10 +284,10 @@ private:
 	DECLARE_READ8_MEMBER(crtc_r);
 	DECLARE_WRITE8_MEMBER(romsel);
 	DECLARE_WRITE8_MEMBER(ramsel);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(psgb_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_READ8_MEMBER(portb_r);
+	void portb_w(uint8_t data);
+	void psgb_w(uint8_t data);
+	void portc_w(uint8_t data);
+	uint8_t portb_r();
 	DECLARE_WRITE8_MEMBER(double_w);
 	DECLARE_READ8_MEMBER(io_r);
 	void spc_palette(palette_device &palette) const;
@@ -361,12 +361,12 @@ WRITE8_MEMBER( spc1500_state::ramsel)
 	membank("bank1")->set_entry(2);
 }
 
-WRITE8_MEMBER( spc1500_state::portb_w)
+void spc1500_state::portb_w(uint8_t data)
 {
 //  m_ipl = data & (1 << 1);
 }
 
-WRITE8_MEMBER( spc1500_state::psgb_w)
+void spc1500_state::psgb_w(uint8_t data)
 {
 	int elapsed_time = m_timer->elapsed().as_attoseconds()/ATTOSECONDS_PER_MICROSECOND;
 	if (m_ipl != ((data>>1)&1))
@@ -383,7 +383,7 @@ WRITE8_MEMBER( spc1500_state::psgb_w)
 	m_motor = BIT(data, 7);
 }
 
-WRITE8_MEMBER( spc1500_state::portc_w)
+void spc1500_state::portc_w(uint8_t data)
 {
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
 	m_centronics->write_strobe(BIT(data, 7));
@@ -392,7 +392,7 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 	m_vdg->set_unscaled_clock(VDP_CLOCK/(BIT(data, 2) ? 48 : 24));
 }
 
-READ8_MEMBER( spc1500_state::portb_r)
+uint8_t spc1500_state::portb_r()
 {
 	uint8_t data = 0;
 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED || ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED));
@@ -859,7 +859,7 @@ READ8_MEMBER(spc1500_state::mc6845_videoram_r)
 	return m_p_videoram[offset];
 }
 
-READ8_MEMBER( spc1500_state::psga_r )
+uint8_t spc1500_state::psga_r()
 {
 	uint8_t data = 0;
 	data |= (BIT(m_dipsw->read(),1)<<4) | (BIT(m_dipsw->read(),2)<<7);
@@ -867,7 +867,7 @@ READ8_MEMBER( spc1500_state::psga_r )
 	return data;
 }
 
-READ8_MEMBER( spc1500_state::porta_r )
+uint8_t spc1500_state::porta_r()
 {
 	uint8_t data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;
@@ -900,13 +900,13 @@ void spc1500_state::spc1500(machine_config &config)
 	m_vdg->set_screen("screen");
 	m_vdg->set_show_border_area(false);
 	m_vdg->set_char_width(8);
-	m_vdg->set_update_row_callback(FUNC(spc1500_state::crtc_update_row), this);
-	m_vdg->set_reconfigure_callback(FUNC(spc1500_state::crtc_reconfig), this);
+	m_vdg->set_update_row_callback(FUNC(spc1500_state::crtc_update_row));
+	m_vdg->set_reconfigure_callback(FUNC(spc1500_state::crtc_reconfig));
 
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
 
 	I8255(config, m_pio);
-	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pio->in_pb_callback().set(FUNC(spc1500_state::portb_r));
 	m_pio->out_pb_callback().set(FUNC(spc1500_state::portb_w));
 	m_pio->out_pc_callback().set(FUNC(spc1500_state::portc_w));
@@ -938,7 +938,7 @@ void spc1500_state::spc1500(machine_config &config)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-	}
+}
 
 /* ROM definition */
 ROM_START( spc1500 )
@@ -951,7 +951,6 @@ ROM_START( spc1500 )
 	ROM_LOAD( "ss151fnt.bin", 0x2000, 0x2000, CRC(83c2eb8d) SHA1(2adf7816206dc74b9f0d32cb3b56cbab31fa6044) )
 	ROM_LOAD( "ss152fnt.bin", 0x4000, 0x2000, CRC(f4a5a590) SHA1(c9a02756107083bf602ae7c90cfe29b8b964e0df) )
 	ROM_LOAD( "ss153fnt.bin", 0x6000, 0x2000, CRC(8677d5fa) SHA1(34bfacc855c3846744cd586c150c72e5cbe948b0) )
-
 ROM_END
 
 

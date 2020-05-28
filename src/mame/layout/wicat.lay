@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
-<!-- LED layout for Wicat WS-150 -->
+<!--
+license:CC0
+
+LED layout for Wicat WS-150
+-->
 
 <mamelayout version="2">
 

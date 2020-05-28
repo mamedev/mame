@@ -28,11 +28,11 @@ DEFINE_DEVICE_TYPE(VIC10_EXPANSION_SLOT, vic10_expansion_slot_device, "vic10_exp
 //  device_vic10_expansion_card_interface - constructor
 //-------------------------------------------------
 
-device_vic10_expansion_card_interface::device_vic10_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device),
-		m_lorom(*this, "lorom"),
-		m_exram(*this, "exram"),
-		m_uprom(*this, "uprom")
+device_vic10_expansion_card_interface::device_vic10_expansion_card_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "vic10exp"),
+	m_lorom(*this, "lorom"),
+	m_exram(*this, "exram"),
+	m_uprom(*this, "uprom")
 {
 	m_slot = dynamic_cast<vic10_expansion_slot_device *>(device.owner());
 }
@@ -58,7 +58,7 @@ device_vic10_expansion_card_interface::~device_vic10_expansion_card_interface()
 
 vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VIC10_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_vic10_expansion_card_interface>(mconfig, *this),
 	device_image_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_write_res(*this),
@@ -70,27 +70,12 @@ vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &m
 
 
 //-------------------------------------------------
-//  device_validity_check -
-//-------------------------------------------------
-
-void vic10_expansion_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const carddev = get_card_device();
-	if (carddev && !dynamic_cast<device_vic10_expansion_card_interface *>(carddev))
-		osd_printf_error("Card device %s (%s) does not implement device_vic10_expansion_card_interface\n", carddev->tag(), carddev->name());
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void vic10_expansion_slot_device::device_start()
 {
-	device_t *const carddev = get_card_device();
-	m_card = dynamic_cast<device_vic10_expansion_card_interface *>(carddev);
-	if (carddev && !m_card)
-		fatalerror("Card device %s (%s) does not implement device_vic10_expansion_card_interface\n", carddev->tag(), carddev->name());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();
@@ -99,21 +84,13 @@ void vic10_expansion_slot_device::device_start()
 	m_write_sp.resolve_safe();
 
 	// inherit bus clock
+	// FIXME: this should be unnecessary as slots pass DERIVED_CLOCK(1, 1) through by default
 	if (clock() == 0)
 	{
 		vic10_expansion_slot_device *root = machine().device<vic10_expansion_slot_device>(VIC10_EXPANSION_SLOT_TAG);
 		assert(root);
 		set_unscaled_clock(root->clock());
 	}
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void vic10_expansion_slot_device::device_reset()
-{
 }
 
 

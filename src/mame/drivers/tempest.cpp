@@ -278,6 +278,7 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/mathbox.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
@@ -319,14 +320,14 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	DECLARE_READ_LINE_MEMBER(clock_r);
 
 protected:
 	DECLARE_WRITE8_MEMBER(wdclr_w);
 	DECLARE_WRITE8_MEMBER(tempest_led_w);
 	DECLARE_WRITE8_MEMBER(tempest_coin_w);
-	DECLARE_READ8_MEMBER(input_port_1_bit_r);
-	DECLARE_READ8_MEMBER(input_port_2_bit_r);
+	uint8_t input_port_1_bit_r(offs_t offset);
+	uint8_t input_port_2_bit_r(offs_t offset);
 
 	DECLARE_READ8_MEMBER(earom_read);
 	DECLARE_WRITE8_MEMBER(earom_write);
@@ -391,20 +392,20 @@ CUSTOM_INPUT_MEMBER(tempest_state::tempest_buttons_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(tempest_state::clock_r)
+READ_LINE_MEMBER(tempest_state::clock_r)
 {
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
 
 
-READ8_MEMBER(tempest_state::input_port_1_bit_r)
+uint8_t tempest_state::input_port_1_bit_r(offs_t offset)
 {
 	return (m_in1->read() & (1 << offset)) ? 0 : 228;
 }
 
 
-READ8_MEMBER(tempest_state::input_port_2_bit_r)
+uint8_t tempest_state::input_port_2_bit_r(offs_t offset)
 {
 	return (m_in2->read() & (1 << offset)) ? 0 : 228;
 }
@@ -524,12 +525,12 @@ static INPUT_PORTS_START( tempest )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_tempest_device, done_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_tempest_device, done_r)
 	/* bit 7 is tied to a 3kHz (?) clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,clock_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tempest_state, clock_r)
 
 	PORT_START("IN1/DSW0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,tempest_knob_r, nullptr)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tempest_state, tempest_knob_r)
 	/* The next one is reponsible for cocktail mode.
 	 * According to the documentation, this is not a switch, although
 	 * it may have been planned to put it on the Math Box PCB, D/E2 )
@@ -550,7 +551,7 @@ static INPUT_PORTS_START( tempest )
 	PORT_DIPNAME(  0x04, 0x04, "Rating" ) PORT_DIPLOCATION("DE2:2")
 	PORT_DIPSETTING(     0x04, "1, 3, 5, 7, 9" )
 	PORT_DIPSETTING(     0x00, "tied to high score" )
-	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,tempest_buttons_r, nullptr)
+	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tempest_state, tempest_buttons_r)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )

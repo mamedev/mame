@@ -41,11 +41,11 @@ DEFINE_DEVICE_TYPE(A78_CART_SLOT, a78_cart_slot_device, "a78_cart_slot", "Atari 
 //-------------------------------------------------
 
 device_a78_cart_interface::device_a78_cart_interface (const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0),
-		m_base_rom(0x8000),
-		m_bank_mask(0)
+	: device_interface(device, "a78cart")
+	, m_rom(nullptr)
+	, m_rom_size(0)
+	, m_base_rom(0x8000)
+	, m_bank_mask(0)
 {
 }
 
@@ -573,34 +573,34 @@ std::string a78_cart_slot_device::get_default_card_software(get_default_card_sof
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_cart_slot_device::read_04xx)
+uint8_t a78_cart_slot_device::read_04xx(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_04xx(space, offset, mem_mask);
+		return m_cart->read_04xx(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(a78_cart_slot_device::read_10xx)
+uint8_t a78_cart_slot_device::read_10xx(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_10xx(space, offset, mem_mask);
+		return m_cart->read_10xx(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(a78_cart_slot_device::read_30xx)
+uint8_t a78_cart_slot_device::read_30xx(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_30xx(space, offset, mem_mask);
+		return m_cart->read_30xx(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(a78_cart_slot_device::read_40xx)
+uint8_t a78_cart_slot_device::read_40xx(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_40xx(space, offset, mem_mask);
+		return m_cart->read_40xx(offset);
 	else
 		return 0xff;
 }
@@ -610,28 +610,28 @@ READ8_MEMBER(a78_cart_slot_device::read_40xx)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(a78_cart_slot_device::write_04xx)
+void a78_cart_slot_device::write_04xx(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_04xx(space, offset, data, mem_mask);
+		m_cart->write_04xx(offset, data);
 }
 
-WRITE8_MEMBER(a78_cart_slot_device::write_10xx)
+void a78_cart_slot_device::write_10xx(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_10xx(space, offset, data, mem_mask);
+		m_cart->write_10xx(offset, data);
 }
 
-WRITE8_MEMBER(a78_cart_slot_device::write_30xx)
+void a78_cart_slot_device::write_30xx(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_30xx(space, offset, data, mem_mask);
+		m_cart->write_30xx(offset, data);
 }
 
-WRITE8_MEMBER(a78_cart_slot_device::write_40xx)
+void a78_cart_slot_device::write_40xx(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_40xx(space, offset, data, mem_mask);
+		m_cart->write_40xx(offset, data);
 }
 
 

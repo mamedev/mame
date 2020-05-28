@@ -130,8 +130,8 @@ C = MB3514 / 9325 M36
 class pico_base_state : public md_cons_state
 {
 public:
-	pico_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: md_cons_state(mconfig, type, tag),
+	pico_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_cons_state(mconfig, type, tag),
 		m_sega_315_5641_pcm(*this, "315_5641"),
 		m_io_page(*this, "PAGE"),
 		m_io_pad(*this, "PAD"),
@@ -164,9 +164,10 @@ protected:
 class pico_state : public pico_base_state
 {
 public:
-	pico_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pico_base_state(mconfig, type, tag),
-	m_picocart(*this, "picoslot") { }
+	pico_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pico_base_state(mconfig, type, tag),
+		m_picocart(*this, "picoslot")
+	{ }
 
 	void pico(machine_config &config);
 	void picopal(machine_config &config);
@@ -384,10 +385,10 @@ static void pico_cart(device_slot_interface &device)
 
 MACHINE_START_MEMBER(pico_state,pico)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_picocart));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_picocart));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_picocart));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a15)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a15)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
 
 	m_vdp->stop_timers();
 }
@@ -562,14 +563,17 @@ S-AUDIO <-| |                              +-----------+           +-------+    
 class copera_state : public pico_base_state
 {
 public:
-	copera_state(const machine_config &mconfig, device_type type, const char *tag)
-	: pico_base_state(mconfig, type, tag),
-	m_picocart(*this, "coperaslot") { }
+	copera_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pico_base_state(mconfig, type, tag),
+		m_picocart(*this, "coperaslot")
+	{ }
 
-	required_device<copera_cart_slot_device> m_picocart;
-	DECLARE_MACHINE_START(copera);
 	void copera(machine_config &config);
 	void copera_mem(address_map &map);
+
+private:
+	required_device<copera_cart_slot_device> m_picocart;
+	DECLARE_MACHINE_START(copera);
 };
 
 
@@ -596,10 +600,10 @@ static void copera_cart(device_slot_interface &device)
 
 MACHINE_START_MEMBER(copera_state,copera)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_picocart));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_picocart));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_picocart));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a15)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a15)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
 
 	m_sega_315_5641_pcm->reset_w(0);
 	m_sega_315_5641_pcm->start_w(0);
@@ -618,13 +622,13 @@ void copera_state::copera(machine_config &config)
 	config.device_remove("ymsnd");
 
 	MCFG_MACHINE_START_OVERRIDE( copera_state, copera )
-	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
+	MCFG_MACHINE_RESET_OVERRIDE( copera_state, ms_megadriv )
 
 	COPERA_CART_SLOT(config, m_picocart, copera_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("copera");
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK);
-	//m_sega_315_5641_pcm->drq().set(FUNC(pico_state::sound_cause_irq)); FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
+	//m_sega_315_5641_pcm->drq().set(FUNC(copera_state::sound_cause_irq)); FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
 	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
 	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
 }

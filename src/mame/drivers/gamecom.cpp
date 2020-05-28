@@ -264,7 +264,7 @@ void gamecom_state::gamecom(machine_config &config)
 	m_maincpu->timer_cb().set(FUNC(gamecom_state::gamecom_update_timers));
 	m_maincpu->set_vblank_int("screen", FUNC(gamecom_state::gamecom_interrupt));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -292,8 +292,8 @@ void gamecom_state::gamecom(machine_config &config)
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot1", generic_linear_slot, "gamecom_cart", "bin,tgc").set_device_load(FUNC(gamecom_state::cart1_load), this);
-	GENERIC_CARTSLOT(config, "cartslot2", generic_linear_slot, "gamecom_cart", "bin,tgc").set_device_load(FUNC(gamecom_state::cart2_load), this);
+	GENERIC_CARTSLOT(config, "cartslot1", generic_linear_slot, "gamecom_cart", "bin,tgc").set_device_load(FUNC(gamecom_state::cart1_load));
+	GENERIC_CARTSLOT(config, "cartslot2", generic_linear_slot, "gamecom_cart", "bin,tgc").set_device_load(FUNC(gamecom_state::cart2_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("gamecom");
 }
 

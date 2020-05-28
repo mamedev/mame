@@ -70,16 +70,34 @@
  *
  *************************************/
 
-void atarigt_state::update_interrupts()
+INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
 {
-	m_maincpu->set_input_line(4, m_video_int_state    ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(6, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_scanline_int_state = true;
+	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
 }
 
 
-INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
+WRITE_LINE_MEMBER(atarigt_state::video_int_write_line)
 {
-	scanline_int_write_line(1);
+	if (state)
+	{
+		m_video_int_state = true;
+		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+	}
+}
+
+
+void atarigt_state::scanline_int_ack_w(uint32_t data)
+{
+	m_scanline_int_state = false;
+	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
+}
+
+
+void atarigt_state::video_int_ack_w(uint32_t data)
+{
+	m_video_int_state = false;
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
@@ -89,10 +107,15 @@ INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(atarigt_state,atarigt)
+void atarigt_state::machine_start()
 {
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
+	atarigen_state::machine_start();
+
+	m_scanline_int_state = false;
+	m_video_int_state = false;
+
+	save_item(NAME(m_scanline_int_state));
+	save_item(NAME(m_video_int_state));
 }
 
 
@@ -103,7 +126,7 @@ MACHINE_RESET_MEMBER(atarigt_state,atarigt)
  *
  *************************************/
 
-WRITE8_MEMBER(atarigt_state::cage_irq_callback)
+void atarigt_state::cage_irq_callback(uint8_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, data != 0 ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -810,11 +833,11 @@ static const atari_rle_objects_config modesc =
 void atarigt_state::atarigt(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, ATARI_CLOCK_50MHz/2);
+	M68EC020(config, m_maincpu, 50_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarigt_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(atarigt_state::scanline_int_gen), attotime::from_hz(250));
 
-	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
+	TIMER(config, "scantimer").configure_scanline(FUNC(atarigt_state::scanline_update), m_screen, 0, 8);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
@@ -831,7 +854,7 @@ void atarigt_state::atarigt(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a pair of GALs to determine H and V parameters */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(atarigt_state::screen_update_atarigt));
 	m_screen->screen_vblank().set(FUNC(atarigt_state::video_int_write_line));
 
@@ -848,7 +871,7 @@ void atarigt_state::tmek(machine_config &config)
 {
 	atarigt(config);
 
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16); // should be 447 kHz according to schematics, but that fails the self-test
+	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16); // should be 447 kHz according to schematics, but that fails the self-test
 	m_adc->in_callback<2>().set_ioport("AN4");
 	m_adc->in_callback<3>().set_ioport("AN1");
 	m_adc->in_callback<6>().set_ioport("AN2");
@@ -1330,7 +1353,7 @@ void atarigt_state::init_tmek()
 	m_protection_w = &atarigt_state::tmek_protection_w;
 
 	/* temp hack */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd72000, 0xd75fff, write32_delegate(FUNC(atarigt_state::tmek_pf_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd72000, 0xd75fff, write32_delegate(*this, FUNC(atarigt_state::tmek_pf_w)));
 }
 
 

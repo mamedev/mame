@@ -265,9 +265,9 @@ void xor100_state::xor100_io(address_map &map)
 	map(0x0a, 0x0a).r(FUNC(xor100_state::prom_disable_r));
 	map(0x0b, 0x0b).portr("DSW0").w(COM5016_TAG, FUNC(com8116_device::stt_str_w));
 	map(0x0c, 0x0f).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0xf8, 0xfb).lrw8("fdc",
-					[this](offs_t offset) { return m_fdc->read(offset) ^ 0xff; },
-					[this](offs_t offset, u8 data) { m_fdc->write(offset, data ^ 0xff); });
+	map(0xf8, 0xfb).lrw8(
+					NAME([this](offs_t offset) { return m_fdc->read(offset) ^ 0xff; }),
+					NAME([this](offs_t offset, u8 data) { m_fdc->write(offset, data ^ 0xff); }));
 	map(0xfc, 0xfc).rw(FUNC(xor100_state::fdc_wait_r), FUNC(xor100_state::fdc_dcont_w));
 	map(0xfd, 0xfd).w(FUNC(xor100_state::fdc_dsel_w));
 }
@@ -365,7 +365,7 @@ WRITE_LINE_MEMBER( xor100_state::write_centronics_select )
 	m_centronics_select = state;
 }
 
-READ8_MEMBER(xor100_state::i8255_pc_r)
+uint8_t xor100_state::i8255_pc_r()
 {
 	/*
 
@@ -511,7 +511,7 @@ void xor100_state::xor100(machine_config &config)
 	brg.ft_handler().append(m_uart_b, FUNC(i8251_device::write_rxc));
 
 	i8255_device &ppi(I8255A(config, I8255A_TAG));
-	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ppi.out_pb_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
 	ppi.in_pc_callback().set(FUNC(xor100_state::i8255_pc_r));
 

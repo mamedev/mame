@@ -11,8 +11,8 @@
   Robocop 2         (c) 1991 Data East Corporation (Japanese version)
   Robocop 2         (c) 1991 Data East Corporation (World version)
   Stone Age         (Italian bootleg)
-  Mutant Fighter    (c) 1992 Data East Corporation (World version)
-  Death Brade       (c) 1992 Data East Corporation (Japanese version)
+  Mutant Fighter    (c) 1991 Data East Corporation (World version)
+  Death Brade       (c) 1991 Data East Corporation (Japanese version)
 
   Edward Randy runs on the same board as Caveman Ninja but the protection
   chip is different.  Robocop 2 also has a different protection chip but
@@ -665,30 +665,11 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static const gfx_layout tilelayout_8bpp =
-{
-	16,16,
-	4096,
-	8,
-	{ 0x100000*8+8, 0x100000*8, 0x40000*8+8, 0x40000*8, 0xc0000*8+8, 0xc0000*8, 8, 0 },
-	{ STEP8(16*8*2,1), STEP8(0,1) },
-	{ STEP16(0,8*2) },
-	64*8
-};
-
 static GFXDECODE_START( gfx_cninja )
 	GFXDECODE_ENTRY( "chars",    0, charlayout,   0, 32 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "tiles1",   0, tilelayout,   0, 32 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "tiles2",   0, tilelayout, 512, 64 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "sprites1", 0, tilelayout, 768, 32 )  /* Sprites 16x16 */
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_robocop2 )
-	GFXDECODE_ENTRY( "chars",    0, charlayout,        0, 32 )  /* Characters 8x8 */
-	GFXDECODE_ENTRY( "tiles1",   0, tilelayout,        0, 32 )  /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "tiles2",   0, tilelayout,      512, 64 )  /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "sprites1", 0, tilelayout,      768, 32 )  /* Sprites 16x16 */
-	GFXDECODE_ENTRY( "tiles2",   0, tilelayout_8bpp, 512,  1 )  /* Tiles 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_mutantf )
@@ -701,13 +682,13 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE8_MEMBER(cninja_state::sound_bankswitch_w)
+void cninja_state::sound_bankswitch_w(uint8_t data)
 {
 	/* the second OKIM6295 ROM is bank switched */
 	m_oki2->set_rom_bank(data & 1);
 }
 
-WRITE8_MEMBER(cninja_state::cninjabl2_oki_bank_w)
+void cninja_state::cninjabl2_oki_bank_w(uint8_t data)
 {
 	m_okibank->set_entry(data & 7);
 }
@@ -736,6 +717,11 @@ DECO16IC_BANK_CB_MEMBER(cninja_state::mutantf_2_bank_callback)
 	return ((bank >> 5) & 0x1) << 14;
 }
 
+// palette bits are not effected
+u16 cninja_state::robocop2_mix_callback(u16 p, u16 p2)
+{
+	return (p & 0x70f) | ((p2 & 0xf) << 4);
+}
 
 DECOSPR_PRIORITY_CB_MEMBER(cninja_state::pri_callback)
 {
@@ -777,6 +763,8 @@ void cninja_state::cninja(machine_config &config)
 	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
 	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
+	MCFG_VIDEO_START_OVERRIDE(cninja_state,cninja)
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248);
@@ -791,8 +779,6 @@ void cninja_state::cninja(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -804,21 +790,19 @@ void cninja_state::cninja(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
 	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback), this);
+	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO104PROT(config, m_ioprot, 0);
@@ -878,8 +862,6 @@ void cninja_state::stoneage(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -891,21 +873,19 @@ void cninja_state::stoneage(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
 	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback), this);
+	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO104PROT(config, m_ioprot, 0);
@@ -957,6 +937,8 @@ void cninja_state::cninjabl(machine_config &config)
 	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
 	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
+	MCFG_VIDEO_START_OVERRIDE(cninja_state,cninja)
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248);
@@ -971,8 +953,6 @@ void cninja_state::cninjabl(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -984,14 +964,12 @@ void cninja_state::cninjabl(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
@@ -1041,8 +1019,6 @@ void cninja_state::edrandy(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -1054,21 +1030,19 @@ void cninja_state::edrandy(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
 	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback), this);
+	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO146PROT(config, m_ioprot, 0);
@@ -1102,8 +1076,7 @@ void cninja_state::robocop2(machine_config &config)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
 	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
-	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
+	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
 	irq.set_screen_tag(m_screen);
@@ -1120,7 +1093,7 @@ void cninja_state::robocop2(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(cninja_state,robocop2)
 	MCFG_MACHINE_RESET_OVERRIDE(cninja_state,robocop2)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_robocop2);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cninja);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
@@ -1128,13 +1101,11 @@ void cninja_state::robocop2(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(cninja_state::robocop2_bank_callback), this);
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(cninja_state::robocop2_bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
@@ -1142,21 +1113,20 @@ void cninja_state::robocop2(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::robocop2_bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::robocop2_bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::robocop2_bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::robocop2_bank_callback));
+	m_deco_tilegen[1]->set_mix_callback(FUNC(cninja_state::robocop2_mix_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
 	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback), this);
+	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO146PROT(config, m_ioprot, 0);
@@ -1167,26 +1137,19 @@ void cninja_state::robocop2(machine_config &config)
 	m_ioprot->set_use_magic_read_address_xor(true);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(32'220'000) / 8));
-	ym1.add_route(ALL_OUTPUTS, "lspeaker", 0.60);
-	ym1.add_route(ALL_OUTPUTS, "rspeaker", 0.60);
+	YM2203(config, "ym1", XTAL(32'220'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.60);
 
 	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000) / 9));
 	ym2.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
 	ym2.port_write_handler().set(FUNC(cninja_state::sound_bankswitch_w));
-	ym2.add_route(0, "lspeaker", 0.45);
-	ym2.add_route(1, "rspeaker", 0.45);
+	ym2.add_route(0, "mono", 0.45);
+	ym2.add_route(1, "mono", 0.45);
 
-	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH));
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.75);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	OKIM6295(config, "oki1", XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	OKIM6295(config, m_oki2, XTAL(32'220'000) / 16, okim6295_device::PIN7_HIGH);
-	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.60);
-	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.60);
+	OKIM6295(config, m_oki2, XTAL(32'220'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
 
@@ -1199,8 +1162,7 @@ void cninja_state::mutantf(machine_config &config)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
 	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map_mutantf);
-	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
+	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1220,14 +1182,12 @@ void cninja_state::mutantf(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(cninja_state::mutantf_1_bank_callback), this);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(cninja_state::mutantf_2_bank_callback), this);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(cninja_state::mutantf_1_bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(cninja_state::mutantf_2_bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
@@ -1235,14 +1195,12 @@ void cninja_state::mutantf(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x40);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::mutantf_1_bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::mutantf_1_bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::mutantf_1_bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::mutantf_1_bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
@@ -1262,22 +1220,17 @@ void cninja_state::mutantf(machine_config &config)
 	m_ioprot->soundlatch_irq_cb().set_inputline(m_audiocpu, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000) / 9));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
 	ymsnd.port_write_handler().set(FUNC(cninja_state::sound_bankswitch_w));
-	ymsnd.add_route(0, "lspeaker", 0.45);
-	ymsnd.add_route(1, "rspeaker", 0.45);
+	ymsnd.add_route(0, "mono", 0.45);
+	ymsnd.add_route(1, "mono", 0.45);
 
-	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH));
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.75);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	OKIM6295(config, "oki1", XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	OKIM6295(config, m_oki2, XTAL(32'220'000) / 16, okim6295_device::PIN7_HIGH);
-	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.60);
-	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.60);
+	OKIM6295(config, m_oki2, XTAL(32'220'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
 /**********************************************************************************/
@@ -2217,7 +2170,7 @@ ROM_END
 void cninja_state::init_cninjabl2()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x180000, 0x18ffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b4000, 0x1b4001, read16_delegate(FUNC(cninja_state::cninjabl2_sprite_dma_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b4000, 0x1b4001, read16_delegate(*this, FUNC(cninja_state::cninjabl2_sprite_dma_r)));
 
 	m_okibank->configure_entries(0, 8, memregion("oki2")->base(), 0x10000);
 }
@@ -2256,8 +2209,8 @@ GAME( 1991, robocop2u,  robocop2, robocop2,  robocop2, cninja_state, empty_init,
 GAME( 1991, robocop2ua, robocop2, robocop2,  robocop2, cninja_state, empty_init,     ROT0, "Data East Corporation", "Robocop 2 (US v0.05)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1991, robocop2j,  robocop2, robocop2,  robocop2, cninja_state, empty_init,     ROT0, "Data East Corporation", "Robocop 2 (Japan v0.11)",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, mutantf,    0,        mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mutantf4,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mutantf3,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mutantf2,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, deathbrd,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Death Brade (Japan ver JM-3)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mutantf,    0,        mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mutantf4,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mutantf3,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mutantf2,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, deathbrd,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Death Brade (Japan ver JM-3)",    MACHINE_SUPPORTS_SAVE )

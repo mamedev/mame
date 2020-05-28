@@ -20,7 +20,7 @@
 #include <cstring>
 #include <iterator>
 
-#include <ctype.h>
+#include <cctype>
 
 
 namespace util {
@@ -395,7 +395,7 @@ int core_text_file::getc()
 
 		// fetch the next character
 		char16_t utf16_buffer[UTF16_CHAR_MAX];
-		char32_t uchar = char32_t(~0);
+		auto uchar = char32_t(~0);
 		switch (m_text_type)
 		{
 		default:
@@ -647,7 +647,7 @@ bool core_in_memory_file::eof() const
 {
 	// check for buffered chars
 	if (has_putback())
-		return 0;
+		return false;
 
 	// if the offset == length, we're at EOF
 	return (m_offset >= m_length);

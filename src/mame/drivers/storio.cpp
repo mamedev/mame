@@ -15,6 +15,10 @@
 
     TODO: everything!
 
+    NAND types
+
+    Storio Spanish old BIOS TC58NVG0S3ETA00 (2048+64) x 64 x 1024
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -105,7 +109,7 @@ void vtech_storio_state::vtech_storio(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vtech_storio_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(FUNC(vtech_storio_state::cart_load), this);
+	m_cart->set_device_load(FUNC(vtech_storio_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vtech_storio_cart");
 }
@@ -148,6 +152,13 @@ ROM_START( storioes )
 	ROM_LOAD( "esspa-pack_20111017.bin", 0x000000, 0x03c62bfc, CRC(fe9b78f9) SHA1(c114a8f82799861a0cca432ee145e436aca5f400) )
 ROM_END
 
+// ROM image dumped from a real Spanish VTech Storio console.
+// Seems to be the "2011.06.17" compilation, although there is a "Copyright (c) 2009 - 2012 Nuvoton" text on the ROM
+ROM_START( storioesa )
+	ROM_REGION( 0x08400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "storiospanisholdbios.bin", 0x000000, 0x08400000, CRC(c462cac4) SHA1(37e5497342a3a27366288b5c5dffd00d0826e183) )
+ROM_END
+
 // ROM image from VTech, not padded to the real ROM size
 ROM_START( storiofr )
 	ROM_REGION( 0x038c2a19, "maincpu", ROMREGION_ERASEFF )
@@ -167,5 +178,6 @@ CONS( 2011, vreadercafr,  vreader, 0,      vtech_storio, vtech_storio, vtech_sto
 CONS( 2011, storio,       vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (GB, English, 2011-10-17)",   MACHINE_IS_SKELETON )
 CONS( 2011, storiode,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (DE, German, 2011-10-17)",    MACHINE_IS_SKELETON )
 CONS( 2011, storioes,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (ES, Spanish, 2011-10-17)",   MACHINE_IS_SKELETON )
+CONS( 2011, storioesa,    vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (ES, Spanish, 2011-06-17?)",  MACHINE_IS_SKELETON )
 CONS( 2011, storiofr,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (FR, French, 2011-10-17)",    MACHINE_IS_SKELETON )
 CONS( 2011, storionl,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (NL, Dutch, 2011-10-17)",     MACHINE_IS_SKELETON )

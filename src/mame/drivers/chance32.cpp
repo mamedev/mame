@@ -50,21 +50,21 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(chance32_fgram_w)
+	void chance32_fgram_w(offs_t offset, uint8_t data)
 	{
 		m_fgram[offset] = data;
 		m_fg_tilemap->mark_tile_dirty(offset / 2);
 	}
 
-	DECLARE_WRITE8_MEMBER(chance32_bgram_w)
+	void chance32_bgram_w(offs_t offset, uint8_t data)
 	{
 		m_bgram[offset] = data;
 		m_bg_tilemap->mark_tile_dirty(offset / 2);
 	}
 
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(muxout_w);
-	DECLARE_READ8_MEMBER(mux_r);
+	void mux_w(uint8_t data);
+	void muxout_w(uint8_t data);
+	uint8_t mux_r();
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -89,7 +89,7 @@ TILE_GET_INFO_MEMBER(chance32_state::get_fg_tile_info)
 {
 	int code = (m_fgram[tile_index * 2 + 1] << 8) | m_fgram[tile_index * 2];
 	int flip = (~code >> 12)&1;
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code & 0x0fff,
 			code >> 13,
 			TILE_FLIPYX(flip<<1)|flip);
@@ -99,7 +99,7 @@ TILE_GET_INFO_MEMBER(chance32_state::get_bg_tile_info)
 {
 	int code = (m_bgram[tile_index * 2 +1] << 8) | m_bgram[tile_index * 2];
 	int flip = (~code >> 12)&1;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code & 0x0fff,
 			code >> 13,
 			TILE_FLIPYX(flip<<1|flip));
@@ -108,10 +108,10 @@ TILE_GET_INFO_MEMBER(chance32_state::get_bg_tile_info)
 
 void chance32_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chance32_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chance32_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chance32_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chance32_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
 
 	m_fg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
 	m_bg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
@@ -127,12 +127,12 @@ uint32_t chance32_state::screen_update_chance32(screen_device &screen, bitmap_rg
 }
 
 
-WRITE8_MEMBER(chance32_state::mux_w)
+void chance32_state::mux_w(uint8_t data)
 {
 	mux_data = data;
 }
 
-READ8_MEMBER(chance32_state::mux_r)
+uint8_t chance32_state::mux_r()
 {
 	uint8_t res,i;
 	const char *const muxnames[4] = { "IN0", "IN1", "IN2", "IN3" };
@@ -148,7 +148,7 @@ READ8_MEMBER(chance32_state::mux_r)
 }
 
 
-WRITE8_MEMBER(chance32_state::muxout_w)
+void chance32_state::muxout_w(uint8_t data)
 {
 /* Muxed Lamps
 

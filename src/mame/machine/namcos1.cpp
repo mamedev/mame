@@ -610,7 +610,7 @@ void namcos1_state::driver_init()
 	}
 
 	// kludge! see notes
-	m_mcu->space(AS_PROGRAM).install_write_handler(0xc000, 0xc000, write8smo_delegate(FUNC(namcos1_state::mcu_patch_w), this));
+	m_mcu->space(AS_PROGRAM).install_write_handler(0xc000, 0xc000, write8smo_delegate(*this, FUNC(namcos1_state::mcu_patch_w)));
 
 	// these are overridden as needed in the specific DRIVER_INIT_MEMBERs
 	m_key_id        = 0;
@@ -625,16 +625,16 @@ void namcos1_state::driver_init()
 void namcos1_state::key_type_1_init(int key_id)
 {
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
-		read8sm_delegate(FUNC(namcos1_state::key_type1_r),this),
-		write8sm_delegate(FUNC(namcos1_state::key_type1_w),this));
+			read8sm_delegate(*this, FUNC(namcos1_state::key_type1_r)),
+			write8sm_delegate(*this, FUNC(namcos1_state::key_type1_w)));
 	m_key_id = key_id;
 }
 
 void namcos1_state::key_type_2_init(int key_id)
 {
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
-		read8sm_delegate(FUNC(namcos1_state::key_type2_r),this),
-		write8sm_delegate(FUNC(namcos1_state::key_type2_w),this));
+			read8sm_delegate(*this, FUNC(namcos1_state::key_type2_r)),
+			write8sm_delegate(*this, FUNC(namcos1_state::key_type2_w)));
 	m_key_id = key_id;
 	save_item(NAME(m_key_quotient));
 	save_item(NAME(m_key_reminder));
@@ -644,8 +644,8 @@ void namcos1_state::key_type_2_init(int key_id)
 void namcos1_state::key_type_3_init(int key_id, int reg, int rng, int swap4_arg, int swap4, int bottom4, int top4)
 {
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
-		read8sm_delegate(FUNC(namcos1_state::key_type3_r),this),
-		write8sm_delegate(FUNC(namcos1_state::key_type3_w),this));
+			read8sm_delegate(*this, FUNC(namcos1_state::key_type3_r)),
+			write8sm_delegate(*this, FUNC(namcos1_state::key_type3_w)));
 	m_key_id        = key_id;
 	m_key_reg       = reg;
 	m_key_rng       = rng;
@@ -798,7 +798,7 @@ void namcos1_state::init_tankfrc4()
 	m_stored_input[0] = 0;
 	m_stored_input[1] = 0;
 
-	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(FUNC(namcos1_state::faceoff_inputs_r), this));
+	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(*this, FUNC(namcos1_state::faceoff_inputs_r)));
 	save_item(NAME(m_input_count));
 	save_item(NAME(m_stored_input));
 }
@@ -878,7 +878,7 @@ void namcos1_state::init_quester()
 {
 	m_strobe = 0;
 	driver_init();
-	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(FUNC(namcos1_state::quester_paddle_r), this));
+	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(*this, FUNC(namcos1_state::quester_paddle_r)));
 	save_item(NAME(m_strobe));
 }
 
@@ -964,7 +964,7 @@ void namcos1_state::init_berabohm()
 	m_strobe = 0;
 	m_strobe_count = 0;
 	driver_init();
-	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(FUNC(namcos1_state::berabohm_buttons_r), this));
+	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(*this, FUNC(namcos1_state::berabohm_buttons_r)));
 	save_item(NAME(m_input_count));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_strobe_count));
@@ -1043,7 +1043,7 @@ void namcos1_state::init_faceoff()
 	m_stored_input[1] = 0;
 
 	driver_init();
-	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(FUNC(namcos1_state::faceoff_inputs_r), this));
+	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(*this, FUNC(namcos1_state::faceoff_inputs_r)));
 	save_item(NAME(m_input_count));
 	save_item(NAME(m_stored_input));
 }

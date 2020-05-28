@@ -34,8 +34,8 @@
 class cgenie_state : public driver_device
 {
 public:
-	cgenie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cgenie_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
@@ -50,7 +50,7 @@ public:
 		m_control(0xff),
 		m_rs232_rx(1),
 		m_rs232_dcd(1)
-	{}
+	{ }
 
 	void init_cgenie_eu();
 	void init_cgenie_nz();
@@ -59,14 +59,14 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	// 4-bit color ram
-	DECLARE_READ8_MEMBER(colorram_r);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	uint8_t colorram_r(offs_t offset);
+	void colorram_w(offs_t offset, uint8_t data);
 
 	// control port
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(control_r);
+	void control_w(uint8_t data);
+	uint8_t control_r();
 
-	DECLARE_READ8_MEMBER(keyboard_r);
+	uint8_t keyboard_r(offs_t offset);
 	DECLARE_INPUT_CHANGED_MEMBER(rst_callback);
 
 	DECLARE_WRITE_LINE_MEMBER(rs232_rx_w);
@@ -225,7 +225,7 @@ INPUT_PORTS_END
 //  KEYBOARD
 //**************************************************************************
 
-READ8_MEMBER( cgenie_state::keyboard_r )
+uint8_t cgenie_state::keyboard_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -246,7 +246,7 @@ INPUT_CHANGED_MEMBER( cgenie_state::rst_callback )
 //  CONTROL PORT & RS232
 //**************************************************************************
 
-WRITE8_MEMBER( cgenie_state::control_w )
+void cgenie_state::control_w(uint8_t data)
 {
 	// cassette output
 	m_cassette->output(BIT(data, 0) ? -1.0 : 1.0);
@@ -266,7 +266,7 @@ WRITE8_MEMBER( cgenie_state::control_w )
 	m_control = data;
 }
 
-READ8_MEMBER( cgenie_state::control_r )
+uint8_t cgenie_state::control_r()
 {
 	uint8_t data = 0;
 
@@ -313,12 +313,12 @@ void cgenie_state::machine_start()
 //  VIDEO EMULATION
 //**************************************************************************
 
-READ8_MEMBER( cgenie_state::colorram_r )
+uint8_t cgenie_state::colorram_r(offs_t offset)
 {
 	return m_color_ram[offset] | 0xf0;
 }
 
-WRITE8_MEMBER( cgenie_state::colorram_w )
+void cgenie_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_color_ram[offset] = data & 0x0f;
 }
@@ -450,8 +450,8 @@ void cgenie_state::cgenie(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_begin_update_callback(FUNC(cgenie_state::crtc_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(cgenie_state::crtc_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(cgenie_state::crtc_begin_update));
+	m_crtc->set_update_row_callback(FUNC(cgenie_state::crtc_update_row));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -77,7 +77,7 @@ public:
 
 	void famibox(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
+	DECLARE_READ_LINE_MEMBER(coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
@@ -104,14 +104,14 @@ private:
 	emu_timer*  m_gameplay_timer;
 	uint8_t       m_money_reg;
 
-	DECLARE_WRITE8_MEMBER(famibox_nt_w);
-	DECLARE_READ8_MEMBER(famibox_nt_r);
-	DECLARE_WRITE8_MEMBER(sprite_dma_w);
-	DECLARE_READ8_MEMBER(famibox_IN0_r);
-	DECLARE_WRITE8_MEMBER(famibox_IN0_w);
-	DECLARE_READ8_MEMBER(famibox_IN1_r);
-	DECLARE_READ8_MEMBER(famibox_system_r);
-	DECLARE_WRITE8_MEMBER(famibox_system_w);
+	void famibox_nt_w(offs_t offset, uint8_t data);
+	uint8_t famibox_nt_r(offs_t offset);
+	void sprite_dma_w(address_space &space, uint8_t data);
+	uint8_t famibox_IN0_r();
+	void famibox_IN0_w(uint8_t data);
+	uint8_t famibox_IN1_r();
+	uint8_t famibox_system_r(offs_t offset);
+	void famibox_system_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -162,14 +162,14 @@ void famibox_state::set_mirroring(int mirroring)
 }
 #endif
 
-WRITE8_MEMBER(famibox_state::famibox_nt_w)
+void famibox_state::famibox_nt_w(offs_t offset, uint8_t data)
 {
 	int page = ((offset & 0xc00) >> 10);
 	m_nt_page[page][offset & 0x3ff] = data;
 }
 
 
-READ8_MEMBER(famibox_state::famibox_nt_r)
+uint8_t famibox_state::famibox_nt_r(offs_t offset)
 {
 	int page = ((offset & 0xc00) >> 10);
 	return m_nt_page[page][offset & 0x3ff];
@@ -181,7 +181,7 @@ READ8_MEMBER(famibox_state::famibox_nt_r)
 
 *******************************************************/
 
-WRITE8_MEMBER(famibox_state::sprite_dma_w)
+void famibox_state::sprite_dma_w(address_space &space, uint8_t data)
 {
 	int source = (data & 7);
 	m_ppu->spriteram_dma(space, source);
@@ -196,12 +196,12 @@ WRITE8_MEMBER(famibox_state::sprite_dma_w)
 *******************************************************/
 
 
-READ8_MEMBER(famibox_state::famibox_IN0_r)
+uint8_t famibox_state::famibox_IN0_r()
 {
 	return ((m_in_0 >> m_in_0_shift++) & 0x01) | 0x40;
 }
 
-WRITE8_MEMBER(famibox_state::famibox_IN0_w)
+void famibox_state::famibox_IN0_w(uint8_t data)
 {
 	if (data & 0x01)
 	{
@@ -215,7 +215,7 @@ WRITE8_MEMBER(famibox_state::famibox_IN0_w)
 	m_in_1 = ioport("P2")->read();
 }
 
-READ8_MEMBER(famibox_state::famibox_IN1_r)
+uint8_t famibox_state::famibox_IN1_r()
 {
 	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
 }
@@ -300,7 +300,7 @@ TIMER_CALLBACK_MEMBER(famibox_state::famicombox_gameplay_timer_callback)
 	}
 }
 
-READ8_MEMBER(famibox_state::famibox_system_r)
+uint8_t famibox_state::famibox_system_r(offs_t offset)
 {
 	switch( offset & 0x07 )
 	{
@@ -322,7 +322,7 @@ READ8_MEMBER(famibox_state::famibox_system_r)
 	}
 }
 
-WRITE8_MEMBER(famibox_state::famibox_system_w)
+void famibox_state::famibox_system_w(offs_t offset, uint8_t data)
 {
 	switch( offset & 0x07 )
 	{
@@ -421,7 +421,7 @@ INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(famibox_state::famibox_coin_r)
+READ_LINE_MEMBER(famibox_state::coin_r)
 {
 	return m_coins > 0;
 }
@@ -480,7 +480,7 @@ static INPUT_PORTS_START( famibox )
 	PORT_DIPSETTING(    0x08, "Key position 4" )
 	PORT_DIPSETTING(    0x10, "Key position 5" )
 	PORT_DIPSETTING(    0x20, "Key position 6" )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, famibox_state,famibox_coin_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(famibox_state, coin_r)
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, famibox_state,coin_inserted, 0)
@@ -510,7 +510,7 @@ void famibox_state::machine_start()
 	m_nt_page[2] = m_nt_ram.get() + 0x800;
 	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(famibox_state::famibox_nt_r), this), write8_delegate(FUNC(famibox_state::famibox_nt_w), this));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(famibox_state::famibox_nt_r)), write8sm_delegate(*this, FUNC(famibox_state::famibox_nt_w)));
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "ppubank1");
 
 	famicombox_bankswitch(0);

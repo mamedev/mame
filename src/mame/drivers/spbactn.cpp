@@ -418,16 +418,8 @@ void spbactn_state::spbactn(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-#if 0
-	// actual blanking frequencies unknown, but should be close to NTSC
+	// TODO: verify actual blanking frequencies (should be close to NTSC)
 	m_screen->set_raw(XTAL(22'656'000) / 2, 720, 0, 512, 262, 16, 240);
-#else
-	// set_raw breaks sprites; keeping this in for now
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-#endif
 	m_screen->set_screen_update(FUNC(spbactn_state::screen_update_spbactn));
 
 	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactn)

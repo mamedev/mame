@@ -95,10 +95,10 @@ void alto2_cpu_device::iomem_map(address_map &map)
 	map(0177205, 0177233).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
 	map(0177234, 0177237).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Experimental cursor control }
 	map(0177240, 0177257).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Alto-II debugger }
-//  AM_RANGE(0177244,                    0177247)                           AM_READWRITE( noop_r, noop_w )          // { Graphics keyboard }
+//  map(0177244, 0177247).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Graphics keyboard }
 	map(0177260, 0177377).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
 	// page 0377
-//  AM_RANGE(0177400,                    0177405)                           AM_READWRITE( noop_r, noop_w )          // { Maxc2 maintenance interface }
+//  map(0177400, 0177405).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Maxc2 maintenance interface }
 	map(0177400, 0177400).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Alto DLS input }
 	map(0177401, 0177417).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
 	map(0177420, 0177420).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { "" }
@@ -1093,14 +1093,6 @@ void alto2_cpu_device::execute_set_input(int inputnum, int state)
 {
 }
 
-void alto2_cpu_device::fatal(int exitcode, const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	emu_fatalerror error(exitcode, format, ap);
-	va_end(ap);
-}
-
 /** @brief task names */
 const char* alto2_cpu_device::task_name(int task)
 {
@@ -1268,42 +1260,42 @@ void alto2_cpu_device::watch_write(uint32_t addr, uint32_t data)
 /** @brief fatal exit on unitialized dynamic phase BUS source */
 void alto2_cpu_device::bs_early_bad()
 {
-	fatal(9,"fatal: bad early bus source pointer for task %s, mpc:%05o bs:%s\n",
-		task_name(m_task), m_mpc, bs_name(bs()));
+	throw emu_fatalerror(9,"fatal: bad early bus source pointer for task %s, mpc:%05o bs:%s\n",
+			task_name(m_task), m_mpc, bs_name(bs()));
 }
 
 /** @brief fatal exit on unitialized latching phase BUS source */
 void alto2_cpu_device::bs_late_bad()
 {
-	fatal(9,"fatal: bad late bus source pointer for task %s, mpc:%05o bs: %s\n",
-		task_name(m_task), m_mpc, bs_name(bs()));
+	throw emu_fatalerror(9,"fatal: bad late bus source pointer for task %s, mpc:%05o bs: %s\n",
+			task_name(m_task), m_mpc, bs_name(bs()));
 }
 
 /** @brief fatal exit on unitialized dynamic phase F1 function */
 void alto2_cpu_device::f1_early_bad()
 {
-	fatal(9,"fatal: bad early f1 function pointer for task %s, mpc:%05o f1: %s\n",
-		task_name(m_task), m_mpc, f1_name(f1()));
+	throw emu_fatalerror(9,"fatal: bad early f1 function pointer for task %s, mpc:%05o f1: %s\n",
+			task_name(m_task), m_mpc, f1_name(f1()));
 }
 
 /** @brief fatal exit on unitialized latching phase F1 function */
 void alto2_cpu_device::f1_late_bad()
 {
-	fatal(9,"fatal: bad late f1 function pointer for task %s, mpc:%05o f1: %s\n",
-		task_name(m_task), m_mpc, f1_name(f1()));
+	throw emu_fatalerror(9,"fatal: bad late f1 function pointer for task %s, mpc:%05o f1: %s\n",
+			task_name(m_task), m_mpc, f1_name(f1()));
 }
 
 /** @brief fatal exit on unitialized dynamic phase F2 function */
 void alto2_cpu_device::f2_early_bad()
 {
-	fatal(9,"fatal: bad early f2 function pointer for task %s, mpc:%05o f2: %s\n",
-		task_name(m_task), m_mpc, f2_name(f2()));
+	throw emu_fatalerror(9,"fatal: bad early f2 function pointer for task %s, mpc:%05o f2: %s\n",
+			task_name(m_task), m_mpc, f2_name(f2()));
 }
 
 /** @brief fatal exit on unitialized latching phase F2 function */
 void alto2_cpu_device::f2_late_bad()
 {
-	fatal(9,"fatal: bad late f2 function pointer for task %s, mpc:%05o f2: %s\n",
+	throw emu_fatalerror(9,"fatal: bad late f2 function pointer for task %s, mpc:%05o f2: %s\n",
 			task_name(m_task), m_mpc, f2_name(f2()));
 }
 
@@ -1768,7 +1760,7 @@ void alto2_cpu_device::f1_early_task()
 			return;
 		}
 	}
-	fatal(3, "no tasks requesting service\n");
+	throw emu_fatalerror(3, "no tasks requesting service\n");
 #endif  /* !USE_PRIO_F9318 */
 }
 

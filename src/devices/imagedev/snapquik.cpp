@@ -26,6 +26,7 @@ snapshot_image_device::snapshot_image_device(const machine_config &mconfig, cons
 snapshot_image_device::snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
+	, m_load(*this)
 	, m_file_extensions(nullptr)
 	, m_interface(nullptr)
 	, m_delay(attotime::zero)
@@ -56,6 +57,8 @@ TIMER_CALLBACK_MEMBER(snapshot_image_device::process_snapshot_or_quickload)
 
 void snapshot_image_device::device_start()
 {
+	m_load.resolve();
+
 	/* allocate a timer */
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snapshot_image_device::process_snapshot_or_quickload),this));
 }

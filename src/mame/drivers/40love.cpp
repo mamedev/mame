@@ -350,7 +350,7 @@ void fortyl_state::_40love_map(address_map &map)
 	map(0x9880, 0x98bf).rw(FUNC(fortyl_state::fortyl_bg_colorram_r), FUNC(fortyl_state::fortyl_bg_colorram_w)).share("colorram");      /* background attributes (2 bytes per line) */
 	map(0x98c0, 0x98ff).ram().share("spriteram2");/* sprites part 2 */
 	map(0xa000, 0xbfff).bankr("bank1");
-	//AM_RANGE(0xbf00, 0xbfff) writes here when zooms-in/out, left-over or pixel line clearance?
+	//map(0xbf00, 0xbfff) writes here when zooms-in/out, left-over or pixel line clearance?
 	map(0xc000, 0xffff).rw(FUNC(fortyl_state::fortyl_pixram_r), FUNC(fortyl_state::fortyl_pixram_w)); /* banked pixel layer */
 }
 
@@ -381,7 +381,7 @@ void fortyl_state::undoukai_map(address_map &map)
 	map(0xc000, 0xffff).rw(FUNC(fortyl_state::fortyl_pixram_r), FUNC(fortyl_state::fortyl_pixram_w));
 }
 
-WRITE8_MEMBER(fortyl_state::sound_control_0_w)
+void fortyl_state::sound_control_0_w(uint8_t data)
 {
 	m_snd_ctrl0 = data & 0xff;
 //  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -396,7 +396,7 @@ WRITE8_MEMBER(fortyl_state::sound_control_0_w)
 	//m_msm->set_output_gain(3, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
 
 }
-WRITE8_MEMBER(fortyl_state::sound_control_1_w)
+void fortyl_state::sound_control_1_w(uint8_t data)
 {
 	m_snd_ctrl1 = data & 0xff;
 //  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -409,7 +409,7 @@ WRITE8_MEMBER(fortyl_state::sound_control_1_w)
 	//m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 }
 
-WRITE8_MEMBER(fortyl_state::sound_control_2_w)
+void fortyl_state::sound_control_2_w(uint8_t data)
 {
 	m_snd_ctrl2 = data & 0xff;
 //  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -417,7 +417,7 @@ WRITE8_MEMBER(fortyl_state::sound_control_2_w)
 	m_ta7630->set_device_volume(m_ay,m_snd_ctrl2 >> 4);
 }
 
-WRITE8_MEMBER(fortyl_state::sound_control_3_w)/* unknown */
+void fortyl_state::sound_control_3_w(uint8_t data) /* unknown */
 {
 	m_snd_ctrl3 = data & 0xff;
 //  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -690,7 +690,7 @@ void fortyl_state::common(machine_config &config)
 
 	TAITO68705_MCU(config, m_bmcu, 18432000/6); /* OK */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* high interleave to ensure proper synchronization of CPUs */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* high interleave to ensure proper synchronization of CPUs */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

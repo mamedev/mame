@@ -33,25 +33,15 @@ public:
 	sed1520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// sconfiguration helpers
-	void set_screen_update_cb(screen_update_delegate callback) { m_screen_update_cb = callback; }
-	template <class FunctionClass> void set_screen_update_cb(const char *devname,
-		uint32_t (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, uint8_t *, int, int), const char *name)
-	{
-		set_screen_update_cb(screen_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_screen_update_cb(
-		uint32_t (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, uint8_t *, int, int), const char *name)
-	{
-		set_screen_update_cb(screen_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_screen_update_cb(T &&... args) { m_screen_update_cb.set(std::forward<T>(args)...); }
 
 	// device interface
-	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(control_write);
-	virtual DECLARE_READ8_MEMBER(status_read);
-	virtual DECLARE_WRITE8_MEMBER(data_write);
-	virtual DECLARE_READ8_MEMBER(data_read);
+	virtual void write(offs_t offset, uint8_t data);
+	virtual uint8_t read(offs_t offset);
+	virtual void control_write(uint8_t data);
+	virtual uint8_t status_read();
+	virtual void data_write(uint8_t data);
+	virtual uint8_t data_read();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:

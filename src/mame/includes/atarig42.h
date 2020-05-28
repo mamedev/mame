@@ -16,6 +16,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/adc0808.h"
 #include "machine/asic65.h"
+#include "machine/timer.h"
 #include "tilemap.h"
 
 class atarig42_state : public atarigen_state
@@ -34,9 +35,8 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
+	void video_int_ack_w(uint16_t data = 0);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	DECLARE_WRITE8_MEMBER(a2d_select_w);
 	DECLARE_READ8_MEMBER(a2d_data_r);
 	DECLARE_WRITE16_MEMBER(io_latch_w);

@@ -506,17 +506,17 @@ private:
 	uint8_t m_ay8910_addr;
 	int m_mux_data;
 
-	DECLARE_WRITE8_MEMBER(cpu_c048_w);
-	DECLARE_WRITE8_MEMBER(cpu_d800_w);
-	DECLARE_READ8_MEMBER(snd_e06_r);
-	DECLARE_WRITE8_MEMBER(snd_800_w);
-	DECLARE_WRITE8_MEMBER(snd_a02_w);
-	DECLARE_READ8_MEMBER(mux_port_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
-	DECLARE_WRITE8_MEMBER(trigsnd_w);
-	DECLARE_READ8_MEMBER(pia0_b_r);
-	DECLARE_READ8_MEMBER(pia1_b_r);
+	void cpu_c048_w(uint8_t data);
+	void cpu_d800_w(uint8_t data);
+	uint8_t snd_e06_r();
+	void snd_800_w(uint8_t data);
+	void snd_a02_w(uint8_t data);
+	uint8_t mux_port_r();
+	void mux_w(uint8_t data);
+	void counters_w(uint8_t data);
+	void trigsnd_w(uint8_t data);
+	uint8_t pia0_b_r();
+	uint8_t pia1_b_r();
 	void fclown_ay8910_w(offs_t offset, u8 data);
 	MC6845_UPDATE_ROW(update_row);
 	void _5clown_palette(palette_device &palette) const;
@@ -619,7 +619,7 @@ void _5clown_state::_5clown_palette(palette_device &palette) const
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
    The selector bits are located in PIA1, portB (bits 4-7).
 */
-READ8_MEMBER(_5clown_state::mux_port_r)
+uint8_t _5clown_state::mux_port_r()
 {
 	switch( m_mux_data & 0xf0 )     /* bits 4-7 */
 	{
@@ -633,13 +633,13 @@ READ8_MEMBER(_5clown_state::mux_port_r)
 }
 
 
-WRITE8_MEMBER(_5clown_state::mux_w)
+void _5clown_state::mux_w(uint8_t data)
 {
 	m_mux_data = data ^ 0xff;   /* Inverted */
 }
 
 
-WRITE8_MEMBER(_5clown_state::counters_w)
+void _5clown_state::counters_w(uint8_t data)
 {
 /*  Counters:
 
@@ -658,7 +658,7 @@ WRITE8_MEMBER(_5clown_state::counters_w)
 }
 
 
-WRITE8_MEMBER(_5clown_state::trigsnd_w)
+void _5clown_state::trigsnd_w(uint8_t data)
 {
 	/************ Interrupts trigger **************
 
@@ -676,13 +676,13 @@ WRITE8_MEMBER(_5clown_state::trigsnd_w)
 
 }
 
-READ8_MEMBER(_5clown_state::pia0_b_r)
+uint8_t _5clown_state::pia0_b_r()
 {
 	/* often read the port */
 	return 0x00;
 }
 
-READ8_MEMBER(_5clown_state::pia1_b_r)
+uint8_t _5clown_state::pia1_b_r()
 {
 	/* constantly read the port */
 	return 0x00;    /* bit 2 shouldn't be active to allow work the key out system */
@@ -692,12 +692,12 @@ READ8_MEMBER(_5clown_state::pia1_b_r)
 /**********************************/
 
 
-WRITE8_MEMBER(_5clown_state::cpu_c048_w)
+void _5clown_state::cpu_c048_w(uint8_t data)
 {
 	logerror("Main: Write to $C048: %02X\n", data);
 }
 
-WRITE8_MEMBER(_5clown_state::cpu_d800_w)
+void _5clown_state::cpu_d800_w(uint8_t data)
 {
 	logerror("Main: Write to $D800: %02x\n", data);
 	m_main_latch_d800 = data;
@@ -719,13 +719,13 @@ void _5clown_state::fclown_ay8910_w(offs_t offset, u8 data)
 *  SOUND  R/W Handlers        *
 ******************************/
 
-READ8_MEMBER(_5clown_state::snd_e06_r)
+uint8_t _5clown_state::snd_e06_r()
 {
 	logerror("Sound: Read from $0E06 \n");
 	return m_main_latch_d800;
 }
 
-WRITE8_MEMBER(_5clown_state::snd_800_w)
+void _5clown_state::snd_800_w(uint8_t data)
 {
 	m_snd_latch_0800 = data;
 
@@ -740,7 +740,7 @@ WRITE8_MEMBER(_5clown_state::snd_800_w)
 	}
 }
 
-WRITE8_MEMBER(_5clown_state::snd_a02_w)
+void _5clown_state::snd_a02_w(uint8_t data)
 {
 	m_snd_latch_0a02 = data & 0xff;
 	logerror("Sound: Write to $0A02: %02x\n", m_snd_latch_0a02);
@@ -1049,7 +1049,7 @@ void _5clown_state::fclown(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	crtc.set_update_row_callback(FUNC(_5clown_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(_5clown_state::update_row));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

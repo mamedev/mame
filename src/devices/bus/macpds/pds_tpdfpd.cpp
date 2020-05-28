@@ -112,8 +112,8 @@ void macpds_sedisplay_device::device_start()
 	static const char bankname[] = { "radpds_ram" };
 	m_macpds->install_bank(0xc40000, 0xc40000+VRAM_SIZE-1, bankname, m_vram.get());
 
-	m_macpds->install_device(0x770000, 0x77000f, read16_delegate(FUNC(macpds_sedisplay_device::ramdac_r), this), write16_delegate(FUNC(macpds_sedisplay_device::ramdac_w), this));
-	m_macpds->install_device(0xc10000, 0xc2ffff, read16_delegate(FUNC(macpds_sedisplay_device::sedisplay_r), this), write16_delegate(FUNC(macpds_sedisplay_device::sedisplay_w), this));
+	m_macpds->install_device(0x770000, 0x77000f, read16_delegate(*this, FUNC(macpds_sedisplay_device::ramdac_r)), write16_delegate(*this, FUNC(macpds_sedisplay_device::ramdac_w)));
+	m_macpds->install_device(0xc10000, 0xc2ffff, read16_delegate(*this, FUNC(macpds_sedisplay_device::sedisplay_r)), write16_delegate(*this, FUNC(macpds_sedisplay_device::sedisplay_w)));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(screen().time_until_pos(879, 0), 0);

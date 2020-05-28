@@ -319,9 +319,9 @@ void snk6502_sound_device::set_music_clock(double clock_time)
 	m_tone_clock = 0;
 }
 
-CUSTOM_INPUT_MEMBER(snk6502_sound_device::music0_playing)
+READ_LINE_MEMBER(snk6502_sound_device::music0_playing)
 {
-	return m_tone_channels[0].mute ? 0x01 : 0x00;
+	return m_tone_channels[0].mute ? 1 : 0;
 }
 
 void snk6502_sound_device::set_channel_base(int channel, int base, int mask)
@@ -338,6 +338,8 @@ void snk6502_sound_device::mute_channel(int channel)
 
 void snk6502_sound_device::unmute_channel(int channel)
 {
+	if (m_tone_channels[channel].mute)
+		m_tone_channels[channel].offset = 0;
 	m_tone_channels[channel].mute = 0;
 }
 
@@ -570,7 +572,7 @@ vanguard_sound_device::vanguard_sound_device(const machine_config &mconfig, cons
 {
 }
 
-WRITE8_MEMBER(vanguard_sound_device::sound_w)
+void vanguard_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -658,7 +660,7 @@ WRITE8_MEMBER(vanguard_sound_device::sound_w)
 	}
 }
 
-WRITE8_MEMBER(vanguard_sound_device::speech_w)
+void vanguard_sound_device::speech_w(uint8_t data)
 {
 	static const uint16_t vanguard_table[16] =
 	{
@@ -755,7 +757,7 @@ fantasy_sound_device::fantasy_sound_device(const machine_config &mconfig, device
 {
 }
 
-WRITE8_MEMBER(fantasy_sound_device::sound_w)
+void fantasy_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -855,7 +857,7 @@ WRITE8_MEMBER(fantasy_sound_device::sound_w)
 	}
 }
 
-WRITE8_MEMBER(fantasy_sound_device::speech_w)
+void fantasy_sound_device::speech_w(uint8_t data)
 {
 	static const uint16_t fantasy_table[16] =
 	{
@@ -967,7 +969,7 @@ sasuke_sound_device::sasuke_sound_device(const machine_config &mconfig, const ch
 {
 }
 
-WRITE8_MEMBER(sasuke_sound_device::sound_w)
+void sasuke_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1116,7 +1118,7 @@ satansat_sound_device::satansat_sound_device(const machine_config &mconfig, cons
 {
 }
 
-WRITE8_MEMBER(satansat_sound_device::sound_w)
+void satansat_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

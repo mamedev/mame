@@ -25,7 +25,7 @@
  */
 TILE_GET_INFO_MEMBER(mcr_state::mcr_90009_get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
+	tileinfo.set(0, m_videoram[tile_index], 0, 0);
 
 	/* sprite color base is constant 0x10 */
 	tileinfo.category = 1;
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_90010_get_tile_info)
 	int data = m_videoram[tile_index * 2] | (m_videoram[tile_index * 2 + 1] << 8);
 	int code = data & 0x1ff;
 	int color = (data >> 11) & 3;
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX(data >> 9));
+	tileinfo.set(0, code, color, TILE_FLIPYX(data >> 9));
 
 	/* sprite color base comes from the top 2 bits */
 	tileinfo.category = (data >> 14) & 3;
@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_91490_get_tile_info)
 	int data = m_videoram[tile_index * 2] | (m_videoram[tile_index * 2 + 1] << 8);
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 3;
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX(data >> 10));
+	tileinfo.set(0, code, color, TILE_FLIPYX(data >> 10));
 
 	/* sprite color base might come from the top 2 bits */
 	tileinfo.category = (data >> 14) & 3;
@@ -94,25 +94,25 @@ void mcr_state::video_start()
 	/* the tilemap callback is based on the CPU board */
 	switch (m_mcr_cpu_board)
 	{
-		case 90009:
-			m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_90009_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
-			break;
+	case 90009:
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mcr_state::mcr_90009_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,30);
+		break;
 
-		case 90010:
-			m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_90010_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
-			break;
+	case 90010:
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mcr_state::mcr_90010_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,30);
+		break;
 
-		case 91475:
-			m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_90010_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
-			break;
+	case 91475:
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mcr_state::mcr_90010_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,30);
+		break;
 
-		case 91490:
-			m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_91490_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
-			break;
+	case 91490:
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mcr_state::mcr_91490_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,30);
+		break;
 
-		default:
-			assert_always(0, "Unknown mcr board");
-			break;
+	default:
+		throw emu_fatalerror("mcr_state::video_start: Unknown mcr board");
+		break;
 	}
 }
 
@@ -159,7 +159,7 @@ void mcr_state::journey_set_color(int index, int data)
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_paletteram9_w)
+void mcr_state::mcr_paletteram9_w(offs_t offset, uint8_t data)
 {
 	// palette RAM is actually 9 bit (a 93419 SRAM)
 	// however, there is no way for the CPU to read back
@@ -177,14 +177,14 @@ WRITE8_MEMBER(mcr_state::mcr_paletteram9_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr_state::mcr_90009_videoram_w)
+void mcr_state::mcr_90009_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_90010_videoram_w)
+void mcr_state::mcr_90010_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -200,14 +200,14 @@ WRITE8_MEMBER(mcr_state::mcr_90010_videoram_w)
 }
 
 
-READ8_MEMBER(mcr_state::twotiger_videoram_r)
+uint8_t mcr_state::twotiger_videoram_r(offs_t offset)
 {
 	/* Two Tigers swizzles the address bits on videoram */
 	int effoffs = ((offset << 1) & 0x7fe) | ((offset >> 10) & 1);
 	return m_videoram[effoffs];
 }
 
-WRITE8_MEMBER(mcr_state::twotiger_videoram_w)
+void mcr_state::twotiger_videoram_w(offs_t offset, uint8_t data)
 {
 	/* Two Tigers swizzles the address bits on videoram */
 	int effoffs = ((offset << 1) & 0x7fe) | ((offset >> 10) & 1);
@@ -221,7 +221,7 @@ WRITE8_MEMBER(mcr_state::twotiger_videoram_w)
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_91490_videoram_w)
+void mcr_state::mcr_91490_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -392,20 +392,20 @@ uint32_t mcr_state::screen_update_mcr(screen_device &screen, bitmap_ind16 &bitma
 	/* update the sprites and render them */
 	switch (m_mcr_sprite_board)
 	{
-		case 91399:
-			render_sprites_91399(screen, bitmap, cliprect);
-			break;
+	case 91399:
+		render_sprites_91399(screen, bitmap, cliprect);
+		break;
 
-		case 91464:
-			if (m_mcr_cpu_board == 91442)
-				render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
-			else if (m_mcr_cpu_board == 91475)
-				render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x40);
-			else if (m_mcr_cpu_board == 91490)
-				render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
-			else if (m_mcr_cpu_board == 91721)
-				render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
-			break;
+	case 91464:
+		if (m_mcr_cpu_board == 91442)
+			render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
+		else if (m_mcr_cpu_board == 91475)
+			render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x40);
+		else if (m_mcr_cpu_board == 91490)
+			render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
+		else if (m_mcr_cpu_board == 91721)
+			render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
+		break;
 	}
 	return 0;
 }

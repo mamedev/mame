@@ -17,7 +17,7 @@
 #include "imagedev/floppy.h"
 #include "machine/fdc_pll.h"
 
-class hp9885_device : public hp98032_gpio_card_device
+class hp9885_device : public device_t, public device_hp98032_gpio_interface
 {
 public:
 	hp9885_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

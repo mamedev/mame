@@ -445,34 +445,34 @@ private:
 	uint16_t m_gn680_ret0;
 	uint16_t m_gn680_ret1;
 
-	DECLARE_READ32_MEMBER(hornet_k037122_sram_r);
-	DECLARE_WRITE32_MEMBER(hornet_k037122_sram_w);
-	DECLARE_READ32_MEMBER(hornet_k037122_char_r);
-	DECLARE_WRITE32_MEMBER(hornet_k037122_char_w);
-	DECLARE_READ32_MEMBER(hornet_k037122_reg_r);
-	DECLARE_WRITE32_MEMBER(hornet_k037122_reg_w);
-	DECLARE_READ8_MEMBER(sysreg_r);
-	DECLARE_WRITE8_MEMBER(sysreg_w);
-	DECLARE_WRITE32_MEMBER(comm1_w);
-	DECLARE_WRITE32_MEMBER(comm_rombank_w);
-	DECLARE_READ32_MEMBER(comm0_unk_r);
-	DECLARE_READ32_MEMBER(gun_r);
-	DECLARE_WRITE32_MEMBER(gun_w);
-	DECLARE_WRITE16_MEMBER(gn680_sysctrl);
-	DECLARE_READ16_MEMBER(gn680_latch_r);
-	DECLARE_WRITE16_MEMBER(gn680_latch_w);
-	DECLARE_READ32_MEMBER(dsp_dataram0_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
-	DECLARE_READ32_MEMBER(dsp_dataram1_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
+	uint32_t hornet_k037122_sram_r(offs_t offset);
+	void hornet_k037122_sram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t hornet_k037122_char_r(offs_t offset);
+	void hornet_k037122_char_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t hornet_k037122_reg_r(offs_t offset);
+	void hornet_k037122_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t sysreg_r(offs_t offset);
+	void sysreg_w(offs_t offset, uint8_t data);
+	void comm1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void comm_rombank_w(uint32_t data);
+	uint32_t comm0_unk_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t gun_r();
+	void gun_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void gn680_sysctrl(uint16_t data);
+	uint16_t gn680_latch_r();
+	void gn680_latch_w(offs_t offset, uint16_t data);
+	uint32_t dsp_dataram0_r(offs_t offset);
+	void dsp_dataram0_w(offs_t offset, uint32_t data);
+	uint32_t dsp_dataram1_r(offs_t offset);
+	void dsp_dataram1_w(offs_t offset, uint32_t data);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
-	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
-	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
+	void soundtimer_en_w(uint16_t data);
+	void soundtimer_count_w(uint16_t data);
 	double adc12138_input_callback(uint8_t input);
 	DECLARE_WRITE8_MEMBER(jamma_jvs_w);
-	DECLARE_READ8_MEMBER(comm_eeprom_r);
-	DECLARE_WRITE8_MEMBER(comm_eeprom_w);
+	uint8_t comm_eeprom_r();
+	void comm_eeprom_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -496,41 +496,41 @@ private:
 
 
 
-READ32_MEMBER(hornet_state::hornet_k037122_sram_r)
+uint32_t hornet_state::hornet_k037122_sram_r(offs_t offset)
 {
 	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122_2 : m_k037122_1;
-	return k037122->sram_r(space, offset, mem_mask);
+	return k037122->sram_r(offset);
 }
 
-WRITE32_MEMBER(hornet_state::hornet_k037122_sram_w)
+void hornet_state::hornet_k037122_sram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122_2 : m_k037122_1;
-	k037122->sram_w(space, offset, data, mem_mask);
+	k037122->sram_w(offset, data, mem_mask);
 }
 
 
-READ32_MEMBER(hornet_state::hornet_k037122_char_r)
+uint32_t hornet_state::hornet_k037122_char_r(offs_t offset)
 {
 	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122_2 : m_k037122_1;
-	return k037122->char_r(space, offset, mem_mask);
+	return k037122->char_r(offset);
 }
 
-WRITE32_MEMBER(hornet_state::hornet_k037122_char_w)
+void hornet_state::hornet_k037122_char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122_2 : m_k037122_1;
-	k037122->char_w(space, offset, data, mem_mask);
+	k037122->char_w(offset, data, mem_mask);
 }
 
-READ32_MEMBER(hornet_state::hornet_k037122_reg_r)
+uint32_t hornet_state::hornet_k037122_reg_r(offs_t offset)
 {
 	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122_2 : m_k037122_1;
-	return k037122->reg_r(space, offset, mem_mask);
+	return k037122->reg_r(offset);
 }
 
-WRITE32_MEMBER(hornet_state::hornet_k037122_reg_w)
+void hornet_state::hornet_k037122_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122_2 : m_k037122_1;
-	k037122->reg_w(space, offset, data, mem_mask);
+	k037122->reg_w(offset, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(hornet_state::voodoo_vblank_0)
@@ -567,7 +567,7 @@ uint32_t hornet_state::screen_update_rscreen(screen_device &screen, bitmap_rgb32
 
 /*****************************************************************************/
 
-READ8_MEMBER(hornet_state::sysreg_r)
+uint8_t hornet_state::sysreg_r(offs_t offset)
 {
 	uint8_t r = 0;
 
@@ -604,7 +604,7 @@ READ8_MEMBER(hornet_state::sysreg_r)
 	return r;
 }
 
-WRITE8_MEMBER(hornet_state::sysreg_w)
+void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -695,7 +695,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 
 /*****************************************************************************/
 
-READ8_MEMBER(hornet_state::comm_eeprom_r)
+uint8_t hornet_state::comm_eeprom_r()
 {
 	uint8_t r = 0;
 	r |= (m_lan_eeprom->do_read() & 1) << 1;
@@ -703,18 +703,18 @@ READ8_MEMBER(hornet_state::comm_eeprom_r)
 	return r;
 }
 
-WRITE8_MEMBER(hornet_state::comm_eeprom_w)
+void hornet_state::comm_eeprom_w(uint8_t data)
 {
 	m_eepromout->write(data, 0xff);
 	m_lan_ds2401->write((data >> 4) & 1);
 }
 
-WRITE32_MEMBER(hornet_state::comm1_w)
+void hornet_state::comm1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	printf("comm1_w: %08X, %08X, %08X\n", offset, data, mem_mask);
 }
 
-WRITE32_MEMBER(hornet_state::comm_rombank_w)
+void hornet_state::comm_rombank_w(uint32_t data)
 {
 	int bank = data >> 24;
 	uint8_t *usr3 = memregion("user3")->base();
@@ -722,19 +722,19 @@ WRITE32_MEMBER(hornet_state::comm_rombank_w)
 		membank("bank1")->set_entry(bank & 0x7f);
 }
 
-READ32_MEMBER(hornet_state::comm0_unk_r)
+uint32_t hornet_state::comm0_unk_r(offs_t offset, uint32_t mem_mask)
 {
 //  printf("comm0_unk_r: %08X, %08X\n", offset, mem_mask);
 	return 0xffffffff;
 }
 
 
-READ32_MEMBER(hornet_state::gun_r)
+uint32_t hornet_state::gun_r()
 {
 	return m_gn680_ret0<<16 | m_gn680_ret1;
 }
 
-WRITE32_MEMBER(hornet_state::gun_w)
+void hornet_state::gun_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (mem_mask == 0xffff0000)
 	{
@@ -751,7 +751,7 @@ TIMER_CALLBACK_MEMBER(hornet_state::sound_irq)
 }
 
 
-WRITE16_MEMBER(hornet_state::soundtimer_en_w)
+void hornet_state::soundtimer_en_w(uint16_t data)
 {
 	if (data & 1)
 	{
@@ -766,7 +766,7 @@ WRITE16_MEMBER(hornet_state::soundtimer_en_w)
 	}
 }
 
-WRITE16_MEMBER(hornet_state::soundtimer_count_w)
+void hornet_state::soundtimer_count_w(uint16_t data)
 {
 	// Reset the count
 	m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
@@ -830,20 +830,20 @@ void hornet_state::sound_memmap(address_map &map)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(hornet_state::gn680_sysctrl)
+void hornet_state::gn680_sysctrl(uint16_t data)
 {
 	// bit 15 = watchdog toggle
 	// lower 4 bits = LEDs?
 }
 
-READ16_MEMBER(hornet_state::gn680_latch_r)
+uint16_t hornet_state::gn680_latch_r()
 {
 	m_gn680->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 
 	return m_gn680_latch;
 }
 
-WRITE16_MEMBER(hornet_state::gn680_latch_w)
+void hornet_state::gn680_latch_w(offs_t offset, uint16_t data)
 {
 	if (offset)
 	{
@@ -870,22 +870,22 @@ void hornet_state::gn680_memmap(address_map &map)
 
 /*****************************************************************************/
 
-READ32_MEMBER(hornet_state::dsp_dataram0_r)
+uint32_t hornet_state::dsp_dataram0_r(offs_t offset)
 {
 	return m_sharc_dataram0[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(hornet_state::dsp_dataram0_w)
+void hornet_state::dsp_dataram0_w(offs_t offset, uint32_t data)
 {
 	m_sharc_dataram0[offset] = data;
 }
 
-READ32_MEMBER(hornet_state::dsp_dataram1_r)
+uint32_t hornet_state::dsp_dataram1_r(offs_t offset)
 {
 	return m_sharc_dataram1[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(hornet_state::dsp_dataram1_w)
+void hornet_state::dsp_dataram1_w(offs_t offset, uint32_t data)
 {
 	m_sharc_dataram1[offset] = data;
 }
@@ -1150,7 +1150,7 @@ void hornet_state::hornet(machine_config &config)
 	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp->set_addrmap(AS_DATA, &hornet_state::sharc0_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -1431,7 +1431,7 @@ void hornet_state::init_hornet()
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(hornet_state::jamma_jvs_w), this));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 }
 
 void hornet_state::init_gradius4()
@@ -1458,7 +1458,7 @@ void hornet_state::init_sscope()
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(hornet_state::jamma_jvs_w), this));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 }
 
 void hornet_state::init_sscope2() //fixme: eventually set sscope2 to load gfx roms from the comm board
@@ -1467,7 +1467,7 @@ void hornet_state::init_sscope2() //fixme: eventually set sscope2 to load gfx ro
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(hornet_state::jamma_jvs_w), this));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 }
 
 /*****************************************************************************/

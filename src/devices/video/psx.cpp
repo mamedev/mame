@@ -418,12 +418,12 @@ int psxgpu_device::DebugTextureDisplay( bitmap_rgb32 &bitmap )
 void psxgpu_device::updatevisiblearea()
 {
 	rectangle visarea;
-	float refresh;
+	double refresh;
 
 	if( ( n_gpustatus & ( 1 << 0x14 ) ) != 0 )
 	{
 		/* pal */
-		refresh = 50;
+		refresh = 50; // TODO: it's not exactly 50Hz
 		switch( ( n_gpustatus >> 0x13 ) & 1 )
 		{
 		case 0:
@@ -437,13 +437,16 @@ void psxgpu_device::updatevisiblearea()
 	else
 	{
 		/* ntsc */
-		refresh = 60;
+		// refresh rate derived from 53.693175MHz
+		// TODO: emulate display timings at lower level
 		switch( ( n_gpustatus >> 0x13 ) & 1 )
 		{
 		case 0:
+			refresh = 59.8260978565;
 			n_screenheight = 240;
 			break;
 		case 1:
+			refresh = 59.9400523286;
 			n_screenheight = 480;
 			break;
 		}
@@ -3261,7 +3264,7 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 	}
 }
 
-WRITE32_MEMBER( psxgpu_device::write )
+void psxgpu_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch( offset )
 	{
@@ -3456,7 +3459,7 @@ void psxgpu_device::gpu_read( uint32_t *p_ram, int32_t n_size )
 	}
 }
 
-READ32_MEMBER( psxgpu_device::read )
+uint32_t psxgpu_device::read(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 
@@ -3542,5 +3545,5 @@ void psxgpu_device::device_config_complete()
 	}
 
 	if (!screen().has_screen_update())
-		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(psxgpu_device::update_screen), this));
+		screen().set_screen_update(*this, FUNC(psxgpu_device::update_screen));
 }

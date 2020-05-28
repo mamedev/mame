@@ -9,8 +9,6 @@ the Deal 'Em board design, rather than the one they ultimately used, suggesting 
 
 
 //     - Deal 'Em lockouts vary on certain cabinets (normally connected to AUX2, but not there?)
-//     - Deal 'Em has bad tiles (apostrophe, logo, bottom corner), black should actually be transparent
-//                to give black on green. (Possibly colour 0 being used in place of colour 10?)
 
 
 #include "emu.h"
@@ -21,6 +19,7 @@ the Deal 'Em board design, rather than the one they ultimately used, suggesting 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class mpu4dealem_state : public mpu4_state
@@ -35,16 +34,41 @@ public:
 
 	void dealem(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	optional_shared_ptr<uint8_t> m_dealem_videoram;
 	DECLARE_MACHINE_RESET(dealem_vid);
 	void dealem_palette(palette_device &palette) const;
 	uint32_t screen_update_dealem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
 	required_device<gfxdecode_device> m_gfxdecode;
 	void dealem_memmap(address_map &map);
+	TILE_GET_INFO_MEMBER(tile_info);
+	tilemap_t *m_tilemap;
 };
 
+
+void mpu4dealem_state::video_start()
+{
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mpu4dealem_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 40, 32);
+}
+
+
+TILE_GET_INFO_MEMBER(mpu4dealem_state::tile_info)
+{
+	// 7654----  background color
+	// ----3---  unused
+	// -----210  tile bits 10-8
+
+	uint8_t data = m_dealem_videoram[0x1000 + tile_index];
+	uint8_t attr = m_dealem_videoram[0x0000 + tile_index];
+
+	uint16_t tile = ((attr & 0x07) << 8) | data;
+	uint8_t color = (attr >> 4) & 0x0f;
+
+	tileinfo.set(0, tile, color, 0);
+}
 
 
 static const gfx_layout dealemcharlayout =
@@ -60,7 +84,7 @@ static const gfx_layout dealemcharlayout =
 
 
 static GFXDECODE_START( gfx_dealem )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, dealemcharlayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, dealemcharlayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -98,52 +122,51 @@ void mpu4dealem_state::dealem_palette(palette_device &palette) const
 			2,  resistances_b,  weights_b,  1000,   0);
 
 	uint8_t const *color_prom = memregion("proms")->base();
-	unsigned const len = memregion("proms")->bytes();
-	for (int i = 0; i < len; i++)
+
+	for (int i = 0; i < 16; i++)
 	{
 		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = BIT(*color_prom, 0);
-		bit1 = BIT(*color_prom, 1);
-		bit2 = BIT(*color_prom, 2);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
 		int const r = combine_weights(weights_r, bit0, bit1, bit2);
-		/* green component */
-		bit0 = BIT(*color_prom, 3);
-		bit1 = BIT(*color_prom, 4);
-		bit2 = BIT(*color_prom, 5);
+
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
 		int const g = combine_weights(weights_g, bit0, bit1, bit2);
-		/* blue component */
-		bit0 = BIT(*color_prom, 6);
-		bit1 = BIT(*color_prom, 7);
+
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
 		int const b = combine_weights(weights_b, bit0, bit1);
 
-		palette.set_pen_color(i, rgb_t(r, g, b));
-		color_prom++;
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	for (int i = 0; i < 256; i++)
+	{
+		if ((i % 16) == 0)
+			// the background color is set to each of the 16 colors
+			palette.set_pen_indirect(i, i / 16);
+		else
+			// the rest of the palette is just a copy
+			palette.set_pen_indirect(i, i % 16);
 	}
 }
 
 
 uint32_t mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int count = 0;
-	for (int y = 0; y < 32; y++)
-	{
-		for (int x = 0; x < 40; x++)
-		{
-			int const tile = m_dealem_videoram[count + 0x1000] | (m_dealem_videoram[count] << 8);
-			count++;
-			m_gfxdecode->gfx(0)->opaque(bitmap, cliprect, tile, 0, 0, 0, x * 8, y * 8);
-		}
-	}
+	m_tilemap->mark_all_dirty();
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 
-
-WRITE_LINE_MEMBER(mpu4dealem_state::dealem_vsync_changed)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
-}
 
 
 /*************************************
@@ -159,7 +182,7 @@ void mpu4dealem_state::dealem_memmap(address_map &map)
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers
+/*  map(0x08e0, 0x08e7).rw(FUNC(mpu4dealem_state::68681_duart_r), FUNC(mpu4dealem_state::68681_duart_w)); */ //Runs hoppers
 
 	map(0x0900, 0x0907).rw(m_6840ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));/* PTM6840 IC2 */
 
@@ -216,20 +239,18 @@ void mpu4dealem_state::dealem(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_size((54+1)*8, (32+1)*8);                    /* Taken from 6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	screen.set_visarea(0*8, 40*8-1, 0*8, 31*8-1);      /* Taken from 6845 init, registers 01 & 06 */
-	screen.set_refresh_hz(56);                            /* Measured accurately from the flip-flop, but 6845 handles this */
+	screen.set_raw(MPU4_MASTER_CLOCK, 440, 0, 320, 279, 0, 248); // 6.88 MHz
 	screen.set_screen_update(FUNC(mpu4dealem_state::screen_update_dealem));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dealem);
 
-	PALETTE(config, m_palette, FUNC(mpu4dealem_state::dealem_palette), 32);
+	PALETTE(config, m_palette, FUNC(mpu4dealem_state::dealem_palette), 256, 16);
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", MPU4_MASTER_CLOCK / 4 / 8)); /* HD68B45 */
+	hd6845s_device &crtc(HD6845S(config, "crtc", MPU4_MASTER_CLOCK / 8)); // 0.86 MHz
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.out_vsync_callback().set(FUNC(mpu4dealem_state::dealem_vsync_changed));
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 }
 
 
@@ -371,7 +392,7 @@ ROM_START( v4dealem )
 	ROM_LOAD( "zenndlem.u24",   0x0000, 0x10000, CRC(3a1950c4) SHA1(7138346d4e8b3cffbd9751b4d7ebd367b9ad8da9) )    /* text layer */
 
 	ROM_REGION( 0x020, "proms", 0 )
-	ROM_LOAD( "zenndlem.u22",   0x000, 0x020, CRC(29988304) SHA1(42f61b8f9e1ee96b65db3b70833eb2f6e7a6ae0a) )
+	ROM_LOAD( "zenndlem.u22",   0x000, 0x020, CRC(29988304) SHA1(42f61b8f9e1ee96b65db3b70833eb2f6e7a6ae0a) ) // data duplicated twice
 
 	ROM_REGION( 0x200, "plds", 0 )
 	ROM_LOAD( "zenndlem.u10",   0x000, 0x104, CRC(e3103c05) SHA1(91b7be75c5fb37025039ab54b484e46a033969b5) )
@@ -382,4 +403,4 @@ and reel assembly with this kit and a supplied monitor. This explains why the ca
 The original Deal 'Em ran on Summit Coin hardware, and was made by someone else.
 Two further different releases were made, running on the Barcrest MPU4 Video, rather than this one. These are Deal 'Em Again and Deal 'Em 2000*/
 
-GAME( 1987, v4dealem, 0, dealem, dealem, mpu4dealem_state, empty_init, ROT0, "Zenitone","Deal 'Em (MPU4 Conversion Kit, v7.0)",MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, v4dealem, 0, dealem, dealem, mpu4dealem_state, empty_init, ROT0, "Zenitone","Deal 'Em (MPU4 Conversion Kit, v7.0)", 0 )

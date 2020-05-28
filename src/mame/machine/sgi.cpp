@@ -32,6 +32,7 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_eeprom(*this, finder_base::DUMMY_TAG)
 	, m_int_dma_done_cb(*this)
+	, m_eisa_present(*this)
 	, m_rpss_timer(nullptr)
 	, m_dma_timer(nullptr)
 	, m_watchdog(0)
@@ -73,6 +74,7 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 void sgi_mc_device::device_resolve_objects()
 {
 	m_int_dma_done_cb.resolve_safe();
+	m_eisa_present.resolve_safe(true);
 }
 
 //-------------------------------------------------
@@ -81,15 +83,8 @@ void sgi_mc_device::device_resolve_objects()
 
 void sgi_mc_device::device_start()
 {
-	// if Indigo2, ID appropriately
-	if (!strcmp(machine().system().name, "ip244415"))
-	{
-		m_sys_id = 0x13; // rev. C MC, EISA bus present
-	}
-	else
-	{
-		m_sys_id = 0x03; // rev. C MC, no EISA bus
-	}
+	m_sys_id = 0x03; // rev. C MC
+	m_sys_id |= m_eisa_present() << 4;
 
 	m_rpss_timer = timer_alloc(TIMER_RPSS);
 	m_rpss_timer->adjust(attotime::never);
@@ -186,14 +181,19 @@ void sgi_mc_device::device_reset()
 	m_space = &m_maincpu->space(AS_PROGRAM);
 }
 
-void sgi_mc_device::set_cpu_buserr(uint32_t address)
+void sgi_mc_device::set_cpu_buserr(uint32_t address, uint64_t mem_mask)
 {
 	m_cpu_error_addr = address;
 	m_cpu_error_status = 0x00000400;
-	if (address & 1)
-		m_cpu_error_status |= 0x000000f0;
-	else
-		m_cpu_error_status |= 0x0000000f;
+	uint64_t mask = 0x00000000000000ffULL;
+	for (uint32_t bit = 0; bit < 8; bit++)
+	{
+		if (mem_mask & mask)
+		{
+			m_cpu_error_status |= (1 << bit);
+		}
+		mask <<= 8;
+	}
 }
 
 uint32_t sgi_mc_device::dma_translate(uint32_t address)

@@ -13,8 +13,8 @@
 #include "osdcomm.h"
 #include "hash.h"
 
-#include <stdarg.h>
-#include <stdlib.h>
+#include <cstdarg>
+#include <cstdlib>
 
 
 #define MAX_FILES 1000

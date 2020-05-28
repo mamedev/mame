@@ -33,7 +33,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_soundnmi(*this, "soundnmi")
+		m_soundnmi(*this, "soundnmi"),
+		m_extraio1(*this, "EXTRA_P1")
 	{ }
 
 	void common(machine_config &config);
@@ -42,8 +43,6 @@ public:
 	void onna34ro(machine_config &config);
 	void victnine(machine_config &config);
 	void onna34ro_mcu(machine_config &config);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(victnine_mcu_status_bit01_r);
 
 protected:
 	virtual void machine_start() override;
@@ -85,12 +84,11 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 	required_device<input_merger_device> m_soundnmi;
+	optional_ioport m_extraio1;
 
 	DECLARE_READ8_MEMBER(snd_flag_r);
 	DECLARE_WRITE8_MEMBER(snd_reset_w);
 	DECLARE_READ8_MEMBER(flstory_mcu_status_r);
-	DECLARE_WRITE8_MEMBER(victnine_mcu_w);
-	DECLARE_READ8_MEMBER(victnine_mcu_r);
 	DECLARE_READ8_MEMBER(victnine_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(flstory_videoram_w);
 	DECLARE_WRITE8_MEMBER(flstory_palette_w);
@@ -99,10 +97,10 @@ private:
 	DECLARE_READ8_MEMBER(victnine_gfxctrl_r);
 	DECLARE_WRITE8_MEMBER(victnine_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(flstory_scrlram_w);
-	DECLARE_WRITE8_MEMBER(sound_control_0_w);
-	DECLARE_WRITE8_MEMBER(sound_control_1_w);
-	DECLARE_WRITE8_MEMBER(sound_control_2_w);
-	DECLARE_WRITE8_MEMBER(sound_control_3_w);
+	void sound_control_0_w(uint8_t data);
+	void sound_control_1_w(uint8_t data);
+	void sound_control_2_w(uint8_t data);
+	void sound_control_3_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(victnine_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rumba_tile_info);

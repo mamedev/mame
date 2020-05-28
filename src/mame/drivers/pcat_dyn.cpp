@@ -59,7 +59,7 @@ private:
 	DECLARE_WRITE8_MEMBER(bank1_w);
 	DECLARE_WRITE8_MEMBER(bank2_w);
 	DECLARE_READ8_MEMBER(audio_r);
-	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
+	void dma8237_1_dack_w(uint8_t data);
 	virtual void machine_start() override;
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
 	static void pcat_dyn_sb_conf(device_t *device);
@@ -126,7 +126,7 @@ void pcat_dyn_state::pcat_io(address_map &map)
 }
 
 //TODO: use atmb device
-WRITE8_MEMBER( pcat_dyn_state::dma8237_1_dack_w ){ m_isabus->dack_w(1, data); }
+void pcat_dyn_state::dma8237_1_dack_w(uint8_t data) { m_isabus->dack_w(1, data); }
 
 static INPUT_PORTS_START( pcat_dyn )
 	// M,N,Numpad 6 -- Hang
@@ -233,7 +233,7 @@ ROM_START(toursol)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* Motherboard BIOS */
 	ROM_LOAD("prom.mb", 0x000000, 0x10000, CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) )
 
-	ROM_REGION(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
+	ROM_REGION32_LE(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
 	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
 	ROM_CONTINUE(               0x00001, 0x04000 )
 
@@ -257,7 +257,7 @@ ROM_START(toursol1)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* Motherboard BIOS */
 	ROM_LOAD("prom.mb", 0x000000, 0x10000, CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) )
 
-	ROM_REGION(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
+	ROM_REGION32_LE(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
 	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
 	ROM_CONTINUE(               0x00001, 0x04000 )
 

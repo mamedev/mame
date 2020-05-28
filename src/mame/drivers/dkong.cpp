@@ -433,13 +433,13 @@ Donkey Kong Notes
  *
  *************************************/
 
-READ8_MEMBER(dkong_state::memory_read_byte)
+uint8_t dkong_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(dkong_state::memory_write_byte)
+void dkong_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
@@ -454,7 +454,7 @@ WRITE8_MEMBER(dkong_state::memory_write_byte)
 WRITE_LINE_MEMBER(dkong_state::s2650_interrupt)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03); // Z80
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 /*************************************
@@ -564,7 +564,7 @@ MACHINE_RESET_MEMBER(dkong_state,drakton)
  *
  *************************************/
 
-READ8_MEMBER(dkong_state::hb_dma_read_byte)
+uint8_t dkong_state::hb_dma_read_byte(offs_t offset)
 {
 	int   bucket = m_rev_map[(offset>>10) & 0x1ff];
 	int   addr;
@@ -577,7 +577,7 @@ READ8_MEMBER(dkong_state::hb_dma_read_byte)
 	return prog_space.read_byte(addr);
 }
 
-WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
+void dkong_state::hb_dma_write_byte(offs_t offset, uint8_t data)
 {
 	int   bucket = m_rev_map[(offset>>10) & 0x1ff];
 	int   addr;
@@ -590,12 +590,12 @@ WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
 	prog_space.write_byte(addr, data);
 }
 
-READ8_MEMBER(dkong_state::p8257_ctl_r)
+uint8_t dkong_state::p8257_ctl_r()
 {
 	return m_dma_latch;
 }
 
-WRITE8_MEMBER(dkong_state::p8257_ctl_w)
+void dkong_state::p8257_ctl_w(uint8_t data)
 {
 	m_dma_latch = data;
 }
@@ -876,7 +876,7 @@ void dkong_state::dkong3_map(address_map &map)
 void dkong_state::dkong3_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_z80dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));  /* dma controller */
+	map(0x00, 0x00).rw(m_z80dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));  /* dma controller */
 }
 
 /* Epos conversions */
@@ -1180,10 +1180,10 @@ static INPUT_PORTS_START( dkong3 )
 	PORT_DIPSETTING(    0x20, "50000" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:!7,!8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0xc0, "4" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dkong3b )
@@ -1869,6 +1869,7 @@ void dkong_state::s2650(machine_config &config)
 	s2650.set_addrmap(AS_DATA, &dkong_state::s2650_data_map);
 	s2650.sense_handler().set("screen", FUNC(screen_device::vblank));
 	s2650.flag_handler().set(FUNC(dkong_state::s2650_fo_w));
+	s2650.intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
 	m_screen->screen_vblank().set(FUNC(dkong_state::s2650_interrupt));
 
@@ -1939,7 +1940,7 @@ ROM_START( radarscp ) /* unclear which boardset this comes from; there existed a
 	ROM_LOAD( "trs2c5gc",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) )
 	ROM_LOAD( "trs2c5hc",     0x2000, 0x1000, CRC(51b8263d) SHA1(09687f2c40cf09ffc2aeddde4a4fa32800847f01) )
 	ROM_LOAD( "trs2c5kc",     0x3000, 0x1000, CRC(1f0101f7) SHA1(b9f988847fdefa64dfeae06c2244215cb0d64dbe) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
+	//empty socket on position 5L on pcb labeled "Test", 0x4000, 0x1000
 
 	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "trs2s3i",      0x0000, 0x0800, CRC(78034f14) SHA1(548b44ac69f39df6687da1c0f60968009b1e0767) )
@@ -1972,7 +1973,7 @@ ROM_START( radarscp1 ) /* TRS01 5-pcb stack with TRS01 "Voice" pcb on top contai
 	ROM_LOAD( "trs01_5g",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) )
 	ROM_LOAD( "trs01_5h",     0x2000, 0x1000, CRC(51b8263d) SHA1(09687f2c40cf09ffc2aeddde4a4fa32800847f01) )
 	ROM_LOAD( "trs01_5k",     0x3000, 0x1000, CRC(1f0101f7) SHA1(b9f988847fdefa64dfeae06c2244215cb0d64dbe) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
+	//empty socket on position 5L on pcb labeled "Test", 0x4000, 0x1000
 
 	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "trs-s__5a.5a", 0x0000, 0x0800, CRC(5166554c) SHA1(00bf501ca448929f6187598da6fdbc1ea488745a) ) // 5A on the 'voice' board on top of the 5-pcb stack; eprom label is "TRS-S ['S' overstrikes a '1'] // 5A [stamped '8' or 'a' in red ink]"
@@ -2015,7 +2016,6 @@ ROM_START( dkong ) /* Confirmed TKG-04 Upgrade as mentioned in Nintendo Service 
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
 	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(1c97d324) SHA1(c7966261f3a1d3296927e0b6ee1c58039fc53c1f) )
 	ROM_LOAD( "c_5at_g.bin",  0x3000, 0x1000, CRC(b9005ac0) SHA1(3fe3599f6fa7c496f782053ddf7bacb453d197c4) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
@@ -2044,7 +2044,6 @@ ROM_START( dkonghrd )
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
 	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(1c97d324) SHA1(c7966261f3a1d3296927e0b6ee1c58039fc53c1f) )
 	ROM_LOAD( "dk5ahard.bin", 0x3000, 0x1000, CRC(a990729b) SHA1(ebb050ce2504fe5f2bbf1fc56018f85a083fe4d0) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
@@ -2073,7 +2072,7 @@ ROM_START( dkongo )
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )    /* tkg3c.5g */
 	ROM_LOAD( "c_5h_b.bin",   0x2000, 0x1000, CRC(1d28895d) SHA1(63792cab215fc2a7b0e8ee61d8115045571e9d42) )    /* tkg3c.5h */
 	ROM_LOAD( "tkg3c.5k",     0x3000, 0x1000, CRC(553b89bb) SHA1(61611df9e2748fdcd31821038dcc0e16dc933873) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
+	//empty socket on position 5L on pcb labeled "Test", 0x4000, 0x1000
 
 	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
@@ -2102,7 +2101,7 @@ ROM_START( dkongj )
 	ROM_LOAD( "5g.cpu",       0x1000, 0x1000, CRC(d326599b) SHA1(94c7382604d0a123a442d53f9641f366dfbb7631) )
 	ROM_LOAD( "5h.cpu",       0x2000, 0x1000, CRC(ff31ac89) SHA1(9626a9e6df0d1b0ff273dbbe986f670200f91f75) )
 	ROM_LOAD( "c_5k_b.bin",   0x3000, 0x1000, CRC(394d6007) SHA1(57e5ae76ef5d4a2fa9cd860b6c6be03b6d5ed5ba) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
+	//empty socket on position 5L on pcb labeled "Test", 0x4000, 0x1000
 
 	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
@@ -2131,7 +2130,7 @@ ROM_START( dkongjo )
 	ROM_LOAD( "c_5g_b.bin",   0x1000, 0x1000, CRC(3b2a6635) SHA1(32c62e00863ab99c6f263587d9d5bb775a68f3de) )
 	ROM_LOAD( "c_5h_b.bin",   0x2000, 0x1000, CRC(1d28895d) SHA1(63792cab215fc2a7b0e8ee61d8115045571e9d42) )
 	ROM_LOAD( "c_5k_b.bin",   0x3000, 0x1000, CRC(394d6007) SHA1(57e5ae76ef5d4a2fa9cd860b6c6be03b6d5ed5ba) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
+	//empty socket on position 5L on pcb labeled "Test", 0x4000, 0x1000
 
 	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
@@ -2160,7 +2159,7 @@ ROM_START( dkongjo1 )
 	ROM_LOAD( "5g.cpu",       0x1000, 0x1000, CRC(d326599b) SHA1(94c7382604d0a123a442d53f9641f366dfbb7631) )
 	ROM_LOAD( "c_5h_b.bin",   0x2000, 0x1000, CRC(1d28895d) SHA1(63792cab215fc2a7b0e8ee61d8115045571e9d42) )
 	ROM_LOAD( "5k.bin",       0x3000, 0x1000, CRC(7961599c) SHA1(698a4c2b8d67840dca7526efb1ac0d3370a86925) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
+	//empty socket on position 5L on pcb labeled "Test", 0x4000, 0x1000
 
 	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
@@ -2189,7 +2188,6 @@ ROM_START( dkongpe )
 	ROM_LOAD( "c_5ct_gp.bin", 0x1000, 0x1000, CRC(45af403e) SHA1(6030a4af7df98bfdf5b35a9a42541566f7d12901) )
 	ROM_LOAD( "c_5bt_gp.bin", 0x2000, 0x1000, CRC(3a9783b7) SHA1(e98d757c048f2180ba22c774e0e425ddc661ba8c) )
 	ROM_LOAD( "c_5at_gp.bin", 0x3000, 0x1000, CRC(32bc20ff) SHA1(ef141f437912923625722b83a33ea182eaa31427) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x1800, "soundcpu", 0 )
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
@@ -2218,7 +2216,6 @@ ROM_START( dkongf ) /* Donkey Kong Foundry (hack) from Jeff's Romhack */
 	ROM_LOAD( "dk_f.5ct",  0x1000, 0x1000, CRC(88af9b69) SHA1(c5621dd8198c333b3fa32fdece60ee5a3d8b2276) )
 	ROM_LOAD( "dk_f.5bt",  0x2000, 0x1000, CRC(de74ad91) SHA1(c80227361bdbc565e9f5764e6364b52d40ca778a) )
 	ROM_LOAD( "dk_f.5at",  0x3000, 0x1000, CRC(6a6bd420) SHA1(f012e2d21d906a2993af9cf8b2912ea6c928e94b) )
-	ROM_LOAD( "diag.bin",  0x4000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
@@ -2247,7 +2244,6 @@ ROM_START( dkonghs )
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
 	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(1c97d324) SHA1(c7966261f3a1d3296927e0b6ee1c58039fc53c1f) )
 	ROM_LOAD( "c_5at_g.bin",  0x3000, 0x1000, CRC(b9005ac0) SHA1(3fe3599f6fa7c496f782053ddf7bacb453d197c4) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "braze", 0 )
 	ROM_LOAD( "dk_12.bin",    0x0000, 0x8000, CRC(2dd82c1d) SHA1(d5e28962a784b1f9169d248f0f416748ab7b5315) ) /* Version 1.2 */
@@ -2280,7 +2276,6 @@ ROM_START( dkongike )
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
 	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(1c97d324) SHA1(c7966261f3a1d3296927e0b6ee1c58039fc53c1f) )
 	ROM_LOAD( "c_5at_g.bin",  0x3000, 0x1000, CRC(b9005ac0) SHA1(3fe3599f6fa7c496f782053ddf7bacb453d197c4) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "braze", 0 )
 	ROM_LOAD( "kong_ike.bin", 0x0000, 0x10000, CRC(f924bd05) SHA1(3a52678018ddebaeff29e9c6c1cd7cee066a3390) ) /* Version 1.1 IKE */
@@ -2312,7 +2307,6 @@ ROM_START( dkongjrc )
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
 	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(1c97d324) SHA1(c7966261f3a1d3296927e0b6ee1c58039fc53c1f) )
 	ROM_LOAD( "c_5at_g.bin",  0x3000, 0x1000, CRC(b9005ac0) SHA1(3fe3599f6fa7c496f782053ddf7bacb453d197c4) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "braze", 0 )
 	ROM_LOAD( "kong_12.bin", 0x0000, 0x10000, CRC(4d82dc5b) SHA1(59479a0312155fc0d5fa7ae5e46c4f003e04d068) ) /* Version 1.2 */
@@ -2344,7 +2338,6 @@ ROM_START( dkongx )
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
 	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(1c97d324) SHA1(c7966261f3a1d3296927e0b6ee1c58039fc53c1f) )
 	ROM_LOAD( "c_5at_g.bin",  0x3000, 0x1000, CRC(b9005ac0) SHA1(3fe3599f6fa7c496f782053ddf7bacb453d197c4) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "braze", 0 )
 	ROM_LOAD( "d2k12.bin",  0x0000, 0x10000,  CRC(6e95ca0d) SHA1(c058add0f146d577e3df0ba60828fe1734e78d01) ) /* Version 1.2 */
@@ -2376,7 +2369,6 @@ ROM_START( dkongx11 )
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
 	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(1c97d324) SHA1(c7966261f3a1d3296927e0b6ee1c58039fc53c1f) )
 	ROM_LOAD( "c_5at_g.bin",  0x3000, 0x1000, CRC(b9005ac0) SHA1(3fe3599f6fa7c496f782053ddf7bacb453d197c4) )
-	ROM_LOAD( "diag.bin",     0x4000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "braze", 0 )
 	ROM_LOAD( "d2k11.bin",    0x00000, 0x10000, CRC(2048fc42) SHA1(e427a09ed8e792ee8ce01cd0b07c6a0d5a7c5536) ) /* Version 1.1 */
@@ -2414,7 +2406,7 @@ ROM_START( dkongjr )
 	ROM_CONTINUE(                 0x2800, 0x0800 )
 	ROM_CONTINUE(                 0x5000, 0x0800 )
 	ROM_CONTINUE(                 0x1800, 0x0800 )
-	ROM_LOAD( "diag.bin",         0x8000, 0x1000, NO_DUMP )
+	//empty socket on position 5A on pcb 0x8000, 0x1000
 
 	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "djr1-c_3h.3h",     0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
@@ -2436,11 +2428,11 @@ ROM_START( dkongjr )
 ROM_END
 
 ROM_START( dkongjr2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // same code as dkongjr, but arranged differently
 	ROM_LOAD( "0",            0x0000, 0x2000, CRC(dc1f1d12) SHA1(d0faac0310b0273429ccb3387b914792d1a312eb) )
 	ROM_LOAD( "1",            0x2000, 0x2000, CRC(f1f286d0) SHA1(cd87770c968d10623f312f651955ad9b1f85c6df) )
 	ROM_LOAD( "2",            0x4000, 0x2000, CRC(4cb856c4) SHA1(e5ac7155b13cac2c201fa733f5061fb4a0ceafa4) )
-	ROM_LOAD( "diag.bin",     0x8000, 0x1000, NO_DUMP )
+	//empty socket on position 5A on pcb 0x8000, 0x1000
 
 	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "8",            0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
@@ -2473,7 +2465,7 @@ ROM_START( dkongjrj )
 	ROM_CONTINUE(             0x2800, 0x0800 )
 	ROM_CONTINUE(             0x5000, 0x0800 )
 	ROM_CONTINUE(             0x1800, 0x0800 )
-	ROM_LOAD( "diag.bin",     0x8000, 0x1000, NO_DUMP )
+	//empty socket on position 5A on pcb 0x8000, 0x1000
 
 	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "c_3h.bin",     0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
@@ -2506,7 +2498,7 @@ ROM_START( dkongjnrj )
 	ROM_CONTINUE(             0x2800, 0x0800 )
 	ROM_CONTINUE(             0x5000, 0x0800 )
 	ROM_CONTINUE(             0x1800, 0x0800 )
-	ROM_LOAD( "diag.bin",     0x8000, 0x1000, NO_DUMP )
+	//empty socket on position 5A on pcb 0x8000, 0x1000
 
 	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "c_3h.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
@@ -2572,7 +2564,7 @@ ROM_START( dkongjrpb )
 	ROM_CONTINUE(             0x2800, 0x0800 )
 	ROM_CONTINUE(             0x5000, 0x0800 )
 	ROM_CONTINUE(             0x1800, 0x0800 )
-	ROM_LOAD( "diag.bin",     0x8000, 0x1000, NO_DUMP )
+	//empty socket on position 5A on pcb 0x8000, 0x1000
 
 	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "c_3h.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
@@ -2605,7 +2597,7 @@ ROM_START( dkongjrb )
 	ROM_CONTINUE(             0x2800, 0x0800 )
 	ROM_CONTINUE(             0x5000, 0x0800 )
 	ROM_CONTINUE(             0x1800, 0x0800 )
-	ROM_LOAD( "diag.bin",     0x8000, 0x1000, NO_DUMP )
+	//empty socket on position 5A on pcb 0x8000, 0x1000 )
 
 	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "c_3h.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
@@ -2638,7 +2630,7 @@ ROM_START( dkongjrhs )
 	ROM_CONTINUE(                 0x2800, 0x0800 )
 	ROM_CONTINUE(                 0x5000, 0x0800 )
 	ROM_CONTINUE(                 0x1800, 0x0800 )
-	ROM_LOAD( "diag.bin",         0x8000, 0x1000, NO_DUMP )
+	//empty socket on position 5A on pcb 0x8000, 0x1000 )
 
 	ROM_REGION( 0x10000, "braze", 0 )
 	ROM_LOAD( "dkj_12.bin",       0x0000, 0x8000, CRC(e341b337) SHA1(7cba8305d9618769ba3afb52a60984e16a0dd266) ) /* Version 1.2 */
@@ -2675,7 +2667,7 @@ ROM_START( dkongddk )
 	ROM_CONTINUE(                 0x2800, 0x0800 )
 	ROM_CONTINUE(                 0x5000, 0x0800 )
 	ROM_CONTINUE(                 0x1800, 0x0800 )
-	ROM_LOAD( "diag.bin",         0x8000, 0x1000, NO_DUMP )
+	//empty socket on position 5A on pcb 0x8000, 0x1000 )
 
 	ROM_REGION( 0x10000, "braze", 0 )
 	ROM_LOAD( "ddk_12.bin",  0x0000, 0x10000, CRC(26caaf8a) SHA1(8abd5855326a6653f12ae1bdc8f18ef45861c344) ) /* Version 1.2 */
@@ -2712,7 +2704,7 @@ ROM_START( jrking )
 	ROM_CONTINUE(          0x2800, 0x0800 )
 	ROM_CONTINUE(          0x5000, 0x0800 )
 	ROM_CONTINUE(          0x1800, 0x0800 )
-	ROM_LOAD( "diag.bin",  0x8000, 0x1000, NO_DUMP )
+	//empty socket on position 5A on pcb 0x8000, 0x1000 )
 
 	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "h3.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
@@ -2784,7 +2776,6 @@ ROM_START( dkingjr )
 	ROM_CONTINUE(           0x2800, 0x0800 )
 	ROM_CONTINUE(           0x5000, 0x0800 )
 	ROM_CONTINUE(           0x1800, 0x0800 )
-	ROM_LOAD( "diag.bin",   0x8000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x1000, "soundcpu", 0 )
 	ROM_LOAD( "4.7l",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
@@ -2829,7 +2820,6 @@ ROM_START( maguila )
 	ROM_CONTINUE(         0x2800, 0x0800 )
 	ROM_CONTINUE(         0x5000, 0x0800 )
 	ROM_CONTINUE(         0x1800, 0x0800 )
-	ROM_LOAD( "diag.bin", 0x8000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "4.7.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) ) // 2732
@@ -3633,8 +3623,8 @@ void dkong_state::init_strtheat()
 	drakton_decrypt_rom(0x88, 0x1c000, bs[3]);
 
 	/* custom handlers supporting Joystick or Steering Wheel */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8_delegate(FUNC(dkong_state::strtheat_inputport_0_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8_delegate(FUNC(dkong_state::strtheat_inputport_1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8_delegate(*this, FUNC(dkong_state::strtheat_inputport_0_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8_delegate(*this, FUNC(dkong_state::strtheat_inputport_1_r)));
 }
 
 void dkong_state::dk_braze_decrypt()
@@ -3657,8 +3647,8 @@ void dkong_state::init_dkonghs()
 	dk_braze_decrypt();
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(dkong_state::braze_eeprom_r), this));
-	space.install_write_handler(0xc000, 0xc000, write8_delegate(FUNC(dkong_state::braze_eeprom_w), this));
+	space.install_read_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc000, 0xc000, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkongx()
@@ -3666,10 +3656,10 @@ void dkong_state::init_dkongx()
 	dk_braze_decrypt();
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(dkong_state::dk_braze_a15_w),this));
+	space.install_write_handler(0xe000, 0xe000, write8_delegate(*this, FUNC(dkong_state::dk_braze_a15_w)));
 
-	space.install_read_handler(0xc800, 0xc800, read8_delegate(FUNC(dkong_state::braze_eeprom_r),this));
-	space.install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),this));
+	space.install_read_handler(0xc800, 0xc800, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc800, 0xc800, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkong3hs()
@@ -3682,8 +3672,8 @@ void dkong_state::init_dkong3hs()
 	m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0xffff, m_decrypted.get() + 0x8000);
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(dkong_state::braze_eeprom_r), this));
-	space.install_write_handler(0xc000, 0xc000, write8_delegate(FUNC(dkong_state::braze_eeprom_w), this));
+	space.install_read_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc000, 0xc000, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkingjr()

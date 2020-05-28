@@ -78,20 +78,20 @@ protected:
 
 private:
 	// internal read/write handlers
-	DECLARE_WRITE8_MEMBER( i8049_output0_w );
-	DECLARE_WRITE8_MEMBER( i8049_output1_w );
-	DECLARE_WRITE8_MEMBER( i8049_lcd_w );
-	DECLARE_READ8_MEMBER( i8049_unknown_r );
-	DECLARE_READ8_MEMBER( i8049_keypad_r );
-	DECLARE_READ8_MEMBER( i8049_datic_r );
-	DECLARE_READ8_MEMBER( i8049_from_controller_r );
-	DECLARE_WRITE8_MEMBER( i8049_to_controller_w );
-	DECLARE_READ8_MEMBER( i8049_port1_r );
-	DECLARE_WRITE8_MEMBER( i8049_port1_w );
-	DECLARE_READ8_MEMBER( i8049_port2_r );
-	DECLARE_WRITE8_MEMBER( i8049_port2_w );
-	DECLARE_READ_LINE_MEMBER( i8049_t0_r );
-	DECLARE_READ_LINE_MEMBER( i8049_t1_r );
+	void i8049_output0_w(uint8_t data);
+	void i8049_output1_w(uint8_t data);
+	void i8049_lcd_w(uint8_t data);
+	uint8_t i8049_unknown_r();
+	uint8_t i8049_keypad_r();
+	uint8_t i8049_datic_r();
+	uint8_t i8049_from_controller_r();
+	void i8049_to_controller_w(uint8_t data);
+	uint8_t i8049_port1_r();
+	void i8049_port1_w(uint8_t data);
+	uint8_t i8049_port2_r();
+	void i8049_port2_w(uint8_t data);
+	int i8049_t0_r();
+	int i8049_t1_r();
 
 	void vp931_portmap(address_map &map);
 

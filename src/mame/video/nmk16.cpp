@@ -40,26 +40,26 @@ template<unsigned Layer, unsigned Gfx>
 TILE_GET_INFO_MEMBER(nmk16_state::common_get_bg_tile_info)
 {
 	const u16 code = m_bgvideoram[Layer][(m_tilerambank << 13) | tile_index];
-	SET_TILE_INFO_MEMBER(Gfx, (code & 0xfff) | (m_bgbank << 12), code >> 12, 0);
+	tileinfo.set(Gfx, (code & 0xfff) | (m_bgbank << 12), code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(nmk16_state::common_get_tx_tile_info)
 {
 	const u16 code = m_txvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code & 0xfff, code >> 12, 0);
+	tileinfo.set(0, code & 0xfff, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(nmk16_state::bioship_get_bg_tile_info)
 {
 	const u16 code = m_tilemap_rom[(m_bioship_background_bank << 13) | tile_index]; // ROM Based
-	SET_TILE_INFO_MEMBER(3, code & 0xfff, code >> 12, 0);
+	tileinfo.set(3, code & 0xfff, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(nmk16_state::bjtwin_get_bg_tile_info)
 {
 	const u16 code = m_bgvideoram[0][tile_index];
 	const u8 bank = BIT(code, 11);
-	SET_TILE_INFO_MEMBER(bank,
+	tileinfo.set(bank,
 			(code & 0x7ff) + ((bank) ? (m_bgbank << 11) : 0),
 			code >> 12,
 			0);
@@ -77,10 +77,9 @@ void nmk16_state::video_init()
 	m_spriteram_old = make_unique_clear<u16[]>(0x1000/2);
 	m_spriteram_old2 = make_unique_clear<u16[]>(0x1000/2);
 
-	m_videoshift = 0;        /* 256x224 screen, no shift */
 	m_tilerambank = 0;
-	m_sprclk = 0;
 
+	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nmk16_state::dma_callback),this));
 	save_pointer(NAME(m_spriteram_old), 0x1000/2);
 	save_pointer(NAME(m_spriteram_old2), 0x1000/2);
 	save_item(NAME(m_bgbank));
@@ -89,17 +88,15 @@ void nmk16_state::video_init()
 	save_item(NAME(m_scroll[1]));
 	save_item(NAME(m_vscroll));
 	save_item(NAME(m_tilerambank));
-	save_item(NAME(m_sprclk));
 }
 
 
 VIDEO_START_MEMBER(nmk16_state, bioship)
 {
-	m_sprlimit = 384 * 263;
 	// ROM Based Tilemap
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::bioship_get_bg_tile_info), this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages), this), 16, 16, 256, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&nmk16_state::common_get_bg_tile_info<1, 1>, "bg1_gfx1", this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages), this), 16, 16, 256, 32);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_tx_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmk16_state::bioship_get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(nmk16_state::tilemap_scan_pages)), 16, 16, 256, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&nmk16_state::common_get_bg_tile_info<1, 1>))), tilemap_mapper_delegate(*this, FUNC(nmk16_state::tilemap_scan_pages)), 16, 16, 256, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmk16_state::common_get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_bg_tilemap[1]->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
@@ -111,9 +108,8 @@ VIDEO_START_MEMBER(nmk16_state, bioship)
 
 VIDEO_START_MEMBER(nmk16_state,macross)
 {
-	m_sprlimit = 384 * 263;
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&nmk16_state::common_get_bg_tile_info<0, 1>, "bg0_gfx1", this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages), this), 16, 16, 256, 32);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_tx_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&nmk16_state::common_get_bg_tile_info<0, 1>))), tilemap_mapper_delegate(*this, FUNC(nmk16_state::tilemap_scan_pages)), 16, 16, 256, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmk16_state::common_get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
 
@@ -123,7 +119,7 @@ VIDEO_START_MEMBER(nmk16_state,macross)
 VIDEO_START_MEMBER(nmk16_state,strahl)
 {
 	VIDEO_START_CALL_MEMBER(macross);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&nmk16_state::common_get_bg_tile_info<1, 3>, "bg1_gfx3", this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages), this), 16, 16, 256, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&nmk16_state::common_get_bg_tile_info<1, 3>))), tilemap_mapper_delegate(*this, FUNC(nmk16_state::tilemap_scan_pages)), 16, 16, 256, 32);
 	m_bg_tilemap[1]->set_transparent_pen(15);
 
 	m_sprdma_base = 0xf000;
@@ -131,15 +127,15 @@ VIDEO_START_MEMBER(nmk16_state,strahl)
 
 VIDEO_START_MEMBER(nmk16_state,macross2)
 {
-	m_sprlimit = 512 * 263; // not verified
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&nmk16_state::common_get_bg_tile_info<0, 1>, "bg0_gfx1", this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages), this), 16, 16, 256, 32);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_tx_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&nmk16_state::common_get_bg_tile_info<0, 1>))), tilemap_mapper_delegate(*this, FUNC(nmk16_state::tilemap_scan_pages)), 16, 16, 256, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmk16_state::common_get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
 
 	video_init();
-	m_videoshift = 64;  /* 384x224 screen, leftmost 64 pixels have to be retrieved */
-						/* from the other side of the tilemap (!) */
+	// 384x224 screen, leftmost 64 pixels have to be retrieved from the other side of the tilemap (!)
+	m_bg_tilemap[0]->set_scrolldx(64,64);
+	m_tx_tilemap->set_scrolldx(64,64);
 }
 
 VIDEO_START_MEMBER(nmk16_state,gunnail)
@@ -150,12 +146,11 @@ VIDEO_START_MEMBER(nmk16_state,gunnail)
 
 VIDEO_START_MEMBER(nmk16_state, bjtwin)
 {
-	m_sprlimit = 512 * 263; // not verified
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::bjtwin_get_bg_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmk16_state::bjtwin_get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	video_init();
-	m_videoshift = 64;  /* 384x224 screen, leftmost 64 pixels have to be retrieved */
-						/* from the other side of the tilemap (!) */
+	// 384x224 screen, leftmost 64 pixels have to be retrieved from the other side of the tilemap (!)
+	m_bg_tilemap[0]->set_scrolldx(64,64);
 }
 
 void nmk16_state::mustang_scroll_w(u16 data)
@@ -182,7 +177,12 @@ void nmk16_state::mustang_scroll_w(u16 data)
 			break;
 	}
 
-	m_bg_tilemap[0]->set_scrollx(0,m_mustang_bg_xscroll - m_videoshift);
+	m_bg_tilemap[0]->set_scrollx(0,m_mustang_bg_xscroll);
+}
+
+void nmk16_state::bjtwin_scroll_w(offs_t offset, u8 data)
+{
+	m_bg_tilemap[0]->set_scrolly(0,-data);
 }
 
 void nmk16_state::vandyke_scroll_w(offs_t offset, u16 data)
@@ -211,13 +211,14 @@ void nmk16_state::manybloc_scroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_gunnail_scrollram[offset]);
 
-	m_bg_tilemap[0]->set_scrollx(0,m_gunnail_scrollram[0x82/2]-m_videoshift);
+	m_bg_tilemap[0]->set_scrollx(0,m_gunnail_scrollram[0x82/2]);
 	m_bg_tilemap[0]->set_scrolly(0,m_gunnail_scrollram[0xc2/2]);
 }
 
 void nmk16_state::flipscreen_w(u8 data)
 {
 	flip_screen_set(data & 0x01);
+	m_spritegen->set_flip_screen(flip_screen());
 }
 
 void nmk16_state::tilebank_w(u8 data)
@@ -265,128 +266,29 @@ void nmk16_state::bioship_bank_w(u8 data)
 ***************************************************************************/
 
 
+void nmk16_state::get_colour_4bit(u32 &colour, u32 &pri_mask)
+{
+	colour &= 0xf;
+	pri_mask |= GFX_PMASK_2; // under foreground
+}
+
+void nmk16_state::get_colour_5bit(u32 &colour, u32 &pri_mask)
+{
+	colour &= 0x1f;
+	pri_mask |= GFX_PMASK_2; // under foreground
+}
+
 // manybloc uses extra flip bits on the sprites, but these break other games
 
-inline void nmk16_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *spr)
+void nmk16_state::get_sprite_flip(u16 attr, int &flipx, int &flipy, int &code)
 {
-	if (!(spr[0] & 0x0001))
-		return;
-
-	int sx          = (spr[4] & 0x1ff) + m_videoshift;
-	int sy          =  spr[6] & 0x1ff;
-	int code        =  spr[3];
-	const u16 color =  spr[7];
-	const int w     =  spr[1] & 0x00f;
-	const int h     = (spr[1] & 0x0f0) >> 4;
-	int delta = 16;
-
-	if (flip_screen())
-	{
-		sx = 368 - sx;
-		sy = 240 - sy;
-		delta = -16;
-	}
-
-	int yy = h;
-	do
-	{
-		int x = sx;
-		int xx = w;
-		do
-		{
-		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
-			code,
-			color,
-			flip_screen(), flip_screen(),
-			((x + 16) & 0x1ff) - 16,sy & 0x1ff, 15);
-		m_sprclk += 128; // 128 clock per each 16x16 tile
-		if (m_sprclk >= m_sprlimit)
-			return;
-
-		code++;
-		x += delta;
-		} while (--xx >= 0);
-
-		sy += delta;
-	} while (--yy >= 0);
+	flipy = (attr & 0x200) >> 9;
+	flipx = (attr & 0x100) >> 8;
 }
 
-inline void nmk16_state::draw_sprite_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *spr)
+void nmk16_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *src)
 {
-	if (!(spr[0] & 0x0001))
-		return;
-
-	int sx          = (spr[4] & 0x1ff) + m_videoshift;
-	int sy          =  spr[6] & 0x1ff;
-	int code        =  spr[3];
-	const u16 color =  spr[7];
-	const int w     =  spr[1] & 0x00f;
-	const int h     = (spr[1] & 0x0f0) >> 4;
-	int flipy       = (spr[1] & 0x200) >> 9;
-	int flipx       = (spr[1] & 0x100) >> 8;
-
-	int delta = 16;
-
-	flipx ^= flip_screen();
-	flipy ^= flip_screen();
-
-	if (flip_screen())
-	{
-		sx = 368 - sx;
-		sy = 240 - sy;
-		delta = -16;
-	}
-
-	int yy = h;
-	sy += flipy ? (delta * h) : 0;
-	do
-	{
-		int x = sx + (flipx ? (delta * w) : 0);
-		int xx = w;
-		do
-		{
-		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
-			code,
-			color,
-			flipx, flipy,
-			((x + 16) & 0x1ff) - 16,sy & 0x1ff, 15);
-		m_sprclk += 128; // 128 clock per each 16x16 tile
-		if (m_sprclk >= m_sprlimit)
-			return;
-
-		code++;
-		x += delta * (flipx ? -1 : 1);
-		} while (--xx >= 0);
-		sy += delta * (flipy ? -1 : 1);
-	} while (--yy >= 0);
-}
-
-void nmk16_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_sprclk = 0;
-
-	for (int offs = 0; offs < 0x1000/2; offs += 8)
-	{
-		m_sprclk += 16; // 16 clock per each reading
-		if (m_sprclk >= m_sprlimit)
-			return;
-
-		draw_sprite(bitmap, cliprect, m_spriteram_old2.get() + offs);
-	}
-}
-
-void nmk16_state::draw_sprites_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_sprclk = 0;
-
-	for (int offs = 0; offs < 0x1000/2; offs += 8)
-	{
-		m_sprclk += 16; // 16 clock per each reading
-		if (m_sprclk >= m_sprlimit)
-			return;
-
-		draw_sprite_flipsupported(bitmap, cliprect, m_spriteram_old2.get() + offs);
-	}
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), src, 0x1000 / 2);
 }
 
 /***************************************************************************
@@ -416,9 +318,9 @@ void nmk16_state::bg_update(screen_device &screen, bitmap_ind16 &bitmap, const r
 			m_bg_tilemap[layer]->set_scroll_rows(512);
 
 			m_bg_tilemap[layer]->set_scrolly(0, yscroll);
-			m_bg_tilemap[layer]->set_scrollx((i + yscroll) & 0x1ff, m_gunnail_scrollram[0] + m_gunnail_scrollram[i] - m_videoshift);
+			m_bg_tilemap[layer]->set_scrollx((i + yscroll) & 0x1ff, m_gunnail_scrollram[0] + m_gunnail_scrollram[i]);
 
-			m_bg_tilemap[layer]->draw(screen, bitmap, bgclip, 0, 0);
+			m_bg_tilemap[layer]->draw(screen, bitmap, bgclip, 0, 1);
 
 			y1++;
 			i++;
@@ -426,14 +328,13 @@ void nmk16_state::bg_update(screen_device &screen, bitmap_ind16 &bitmap, const r
 	}
 	else
 	{
-		m_bg_tilemap[layer]->draw(screen, bitmap, cliprect, 0, 0);
+		m_bg_tilemap[layer]->draw(screen, bitmap, cliprect, 0, 1);
 	}
 }
 
 void nmk16_state::tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tx_tilemap->set_scrollx(0,-m_videoshift);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 }
 
 /***************************************************************************
@@ -446,48 +347,42 @@ void nmk16_state::tx_update(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 u32 nmk16_state::screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	bg_update(screen, bitmap, cliprect, 0);
-	draw_sprites(bitmap, cliprect);
 	tx_update(screen, bitmap, cliprect);
-	return 0;
-}
-
-u32 nmk16_state::screen_update_manybloc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bg_update(screen, bitmap, cliprect, 0);
-	draw_sprites_flipsupported(bitmap, cliprect);
-	tx_update(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old2.get());
 	return 0;
 }
 
 u32 nmk16_state::screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	/* I think the protection device probably copies this to the regs... */
 	u16 tharrier_scroll = m_mainram[0x9f00/2];
 
 	m_bg_tilemap[0]->set_scrollx(0, tharrier_scroll);
 
 	bg_update(screen, bitmap, cliprect, 0);
-	draw_sprites_flipsupported(bitmap, cliprect);
 	tx_update(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old2.get());
 	return 0;
 }
 
 u32 nmk16_state::screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	bg_update(screen, bitmap, cliprect, 0);
 	bg_update(screen, bitmap, cliprect, 1);
-	draw_sprites(bitmap, cliprect);
 	tx_update(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old2.get());
 	return 0;
 }
 
 u32 nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap[0]->set_scrollx(0,-m_videoshift);
-
+	screen.priority().fill(0, cliprect);
 	bg_update(screen, bitmap, cliprect, 0);
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old.get()); // only a single buffer, verified
 	return 0;
 }
 
@@ -503,15 +398,14 @@ u32 nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitma
 TILE_GET_INFO_MEMBER(afega_state::get_bg_tile_info_8bit)
 {
 	const u16 code = m_bgvideoram[0][tile_index];
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	tileinfo.set(1, code, 0, 0);
 }
 
 VIDEO_START_MEMBER(afega_state,grdnstrm)
 {
-	m_sprlimit = 384 * 263;
 	// 8bpp Tilemap
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(afega_state::get_bg_tile_info_8bit), this), tilemap_mapper_delegate(FUNC(afega_state::tilemap_scan_pages), this), 16, 16, 256, 32);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(afega_state::common_get_tx_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(afega_state::get_bg_tile_info_8bit)), tilemap_mapper_delegate(*this, FUNC(afega_state::tilemap_scan_pages)), 16, 16, 256, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(afega_state::common_get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
 
@@ -533,6 +427,7 @@ void afega_state::video_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	int attr_mask               // "sprite active" mask
 	)
 {
+	screen.priority().fill(0, cliprect);
 	if (dsw_flipscreen)
 	{
 		flip_screen_x_set(~m_dsw_io[0]->read() & 0x0100);
@@ -545,21 +440,22 @@ void afega_state::video_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	m_tx_tilemap->set_scrollx(0, m_afega_scroll[1][1]);
 	m_tx_tilemap->set_scrolly(0, m_afega_scroll[1][0]);
 
-	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
 
-	draw_sprites_flipsupported(bitmap, cliprect);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old2.get());
 }
 
 void afega_state::redhawki_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	m_bg_tilemap[0]->set_scrollx(0, m_afega_scroll[1][0]&0xff);
 	m_bg_tilemap[0]->set_scrolly(0, m_afega_scroll[1][1]&0xff);
 
-	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
 
-	draw_sprites_flipsupported(bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old2.get());
 }
 
 u32 afega_state::screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)   { video_update(screen, bitmap, cliprect, 1, -0x100, +0x000, 0x0001);  return 0; }
@@ -569,13 +465,14 @@ u32 afega_state::screen_update_redhawki(screen_device &screen, bitmap_ind16 &bit
 
 u32 afega_state::screen_update_firehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	m_bg_tilemap[0]->set_scrolly(0, m_afega_scroll[1][1] + 0x100);
 	m_bg_tilemap[0]->set_scrollx(0, m_afega_scroll[0][1] - 0x100);
 
-	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
 
-	draw_sprites_flipsupported(bitmap, cliprect);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old2.get());
 	return 0;
 }

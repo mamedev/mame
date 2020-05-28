@@ -56,9 +56,9 @@ private:
 
 	uint8_t m_matrix;
 
-	DECLARE_WRITE8_MEMBER(matrix_w);
-	DECLARE_WRITE8_MEMBER(pio_port_a_w);
-	DECLARE_READ8_MEMBER(pio_port_b_r);
+	void matrix_w(uint8_t data);
+	void pio_port_a_w(uint8_t data);
+	uint8_t pio_port_b_r();
 };
 
 void slc1_state::machine_start()
@@ -75,7 +75,7 @@ void slc1_state::machine_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(slc1_state::pio_port_a_w)
+void slc1_state::pio_port_a_w(uint8_t data)
 {
 	// digit segment data
 	uint8_t digit = bitswap<8>(data,3,4,6,0,1,2,7,5);
@@ -97,7 +97,7 @@ WRITE8_MEMBER(slc1_state::pio_port_a_w)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(slc1_state::matrix_w)
+void slc1_state::matrix_w(uint8_t data)
 {
 	// d1: speaker out
 	//m_dac->write(BIT(data, 1));
@@ -106,7 +106,7 @@ WRITE8_MEMBER(slc1_state::matrix_w)
 	m_matrix = data;
 }
 
-READ8_MEMBER(slc1_state::pio_port_b_r)
+uint8_t slc1_state::pio_port_b_r()
 {
 	uint8_t data = 0;
 

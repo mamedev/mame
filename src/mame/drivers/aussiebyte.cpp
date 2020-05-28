@@ -60,7 +60,7 @@ void aussiebyte_state::aussiebyte_io(address_map &map)
 	map(0x08, 0x0b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).noprw(); // winchester interface
 	map(0x10, 0x13).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write));
-	map(0x14, 0x14).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x14, 0x14).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x15, 0x15).w(FUNC(aussiebyte_state::port15_w)); // boot rom disable
 	map(0x16, 0x16).w(FUNC(aussiebyte_state::port16_w)); // fdd select
 	map(0x17, 0x17).w(FUNC(aussiebyte_state::port17_w)); // DMA mux
@@ -217,7 +217,7 @@ WRITE8_MEMBER( aussiebyte_state::port1c_w )
 {
 }
 
-WRITE8_MEMBER( aussiebyte_state::port20_w )
+void aussiebyte_state::port20_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 7));
 	m_rtc->cs_w(BIT(data, 0));
@@ -238,7 +238,7 @@ READ8_MEMBER( aussiebyte_state::rtc_r )
 {
 	m_rtc->read_w(1);
 	m_rtc->address_w(offset);
-	uint8_t data = m_rtc->data_r(space,0);
+	uint8_t data = m_rtc->data_r();
 	m_rtc->read_w(0);
 	return data;
 }
@@ -246,7 +246,7 @@ READ8_MEMBER( aussiebyte_state::rtc_r )
 WRITE8_MEMBER( aussiebyte_state::rtc_w )
 {
 	m_rtc->address_w(offset);
-	m_rtc->data_w(space,0,data);
+	m_rtc->data_w(data);
 	m_rtc->write_w(1);
 	m_rtc->write_w(0);
 }
@@ -256,25 +256,25 @@ WRITE8_MEMBER( aussiebyte_state::rtc_w )
     DMA
 
 ************************************************************/
-READ8_MEMBER( aussiebyte_state::memory_read_byte )
+uint8_t aussiebyte_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( aussiebyte_state::memory_write_byte )
+void aussiebyte_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER( aussiebyte_state::io_read_byte )
+uint8_t aussiebyte_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( aussiebyte_state::io_write_byte )
+void aussiebyte_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);
@@ -550,8 +550,8 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 
 	Z80PIO(config, m_pio1, 16_MHz_XTAL / 4);
 	m_pio1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio1->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
-	m_pio1->in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
+	m_pio1->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
+	m_pio1->in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::read));
 	m_pio1->out_ardy_callback().set(m_centronics, FUNC(centronics_device::write_strobe)).invert();
 
 	Z80PIO(config, m_pio2, 16_MHz_XTAL / 4);
@@ -585,13 +585,15 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(aussiebyte_state::crtc_update_row), this);
-	m_crtc->set_on_update_addr_change_callback(FUNC(aussiebyte_state::crtc_update_addr), this);
+	m_crtc->set_update_row_callback(FUNC(aussiebyte_state::crtc_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(aussiebyte_state::crtc_update_addr));
 
 	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(aussiebyte_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(aussiebyte_state::quickload_cb));
+
+	SOFTWARE_LIST(config, "flop_list").set_original("aussiebyte");
 }
 
 

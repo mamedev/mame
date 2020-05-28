@@ -314,7 +314,7 @@ DEFINE_DEVICE_TYPE(SEI80BU, sei80bu_device, "sei80bu", "SEI80BU Encrypted Z80 In
 
 sei80bu_device::sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEI80BU, tag, owner, clock),
-		device_rom_interface(mconfig, *this, 16)
+		device_rom_interface(mconfig, *this)
 {
 }
 

@@ -11,20 +11,20 @@
 #include "emu.h"
 #include "a2232.h"
 
-
-//**************************************************************************
-//  CONSTANTS / MACROS
-//**************************************************************************
-
-#define VERBOSE 0
-#define VERBOSE_DATA 0
+#define LOG_GENERAL (1U << 0)
+#define LOG_DATA (1U << 1)
+//#define VERBOSE (LOG_GENERAL | LOG_DATA)
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2232, a2232_device, "a2232", "CBM A2232 Serial Card")
+DEFINE_DEVICE_TYPE_NS(ZORRO_A2232, bus::amiga::zorro, a2232_device, "zorro_a2232", "CBM A2232 Serial Card")
+
+
+namespace bus { namespace amiga { namespace zorro {
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -118,7 +118,7 @@ void a2232_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 a2232_device::a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2232, tag, owner, clock),
+	device_t(mconfig, ZORRO_A2232, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_iocpu(*this, "iocpu"),
 	m_ioirq(*this, "ioirq"),
@@ -136,7 +136,6 @@ a2232_device::a2232_device(const machine_config &mconfig, const char *tag, devic
 
 void a2232_device::device_start()
 {
-	set_zorro_device();
 }
 
 //-------------------------------------------------
@@ -160,16 +159,14 @@ void a2232_device::device_reset_after_children()
 
 WRITE8_MEMBER( a2232_device::int2_w )
 {
-	if (VERBOSE)
-		logerror("%s('%s'): int2_w %04x\n", shortname(), basetag(), data);
+	LOG("%s: int2_w %04x\n", shortname(), data);
 
 	m_slot->int2_w(1);
 }
 
 WRITE8_MEMBER( a2232_device::irq_ack8_w )
 {
-	if (VERBOSE)
-		logerror("%s('%s'): irq_ack_w %04x\n", shortname(), basetag(), data);
+	LOG("%s: irq_ack_w %04x\n", shortname(), data);
 
 	m_ioirq->in_w<8>(CLEAR_LINE);
 }
@@ -181,34 +178,31 @@ WRITE8_MEMBER( a2232_device::irq_ack8_w )
 
 void a2232_device::autoconfig_base_address(offs_t address)
 {
-	if (VERBOSE)
-		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname(), basetag(), address);
-
-	if (VERBOSE)
-		logerror("-> installing a2232\n");
+	LOG("%s: autoconfig_base_address received: 0x%06x\n", shortname(), address);
+	LOG("-> installing a2232\n");
 
 	// stop responding to default autoconfig
 	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	m_slot->space().install_readwrite_handler(address, address + 0x3fff,
-		read16_delegate(FUNC(a2232_device::shared_ram_r), this),
-		write16_delegate(FUNC(a2232_device::shared_ram_w), this), 0xffff);
+			read16_delegate(*this, FUNC(a2232_device::shared_ram_r)),
+			write16_delegate(*this, FUNC(a2232_device::shared_ram_w)), 0xffff);
 
 	m_slot->space().install_readwrite_handler(address + 0x4000, address + 0x4001,
-		read16_delegate(FUNC(a2232_device::irq_ack_r), this),
-		write16_delegate(FUNC(a2232_device::irq_ack_w), this), 0xffff);
+			read16_delegate(*this, FUNC(a2232_device::irq_ack_r)),
+			write16_delegate(*this, FUNC(a2232_device::irq_ack_w)), 0xffff);
 
 	m_slot->space().install_readwrite_handler(address + 0x8000, address + 0x8001,
-		read16_delegate(FUNC(a2232_device::reset_low_r), this),
-		write16_delegate(FUNC(a2232_device::reset_low_w), this), 0xffff);
+			read16_delegate(*this, FUNC(a2232_device::reset_low_r)),
+			write16_delegate(*this, FUNC(a2232_device::reset_low_w)), 0xffff);
 
 	m_slot->space().install_readwrite_handler(address + 0xa000, address + 0xa001,
-		read16_delegate(FUNC(a2232_device::irq_r), this),
-		write16_delegate(FUNC(a2232_device::irq_w), this), 0xffff);
+			read16_delegate(*this, FUNC(a2232_device::irq_r)),
+			write16_delegate(*this, FUNC(a2232_device::irq_w)), 0xffff);
 
 	m_slot->space().install_readwrite_handler(address + 0xc000, address + 0xc001,
-		read16_delegate(FUNC(a2232_device::reset_high_r), this),
-		write16_delegate(FUNC(a2232_device::reset_high_w), this), 0xffff);
+			read16_delegate(*this, FUNC(a2232_device::reset_high_r)),
+			write16_delegate(*this, FUNC(a2232_device::reset_high_w)), 0xffff);
 
 	// we're done
 	m_slot->cfgout_w(0);
@@ -216,8 +210,7 @@ void a2232_device::autoconfig_base_address(offs_t address)
 
 WRITE_LINE_MEMBER( a2232_device::cfgin_w )
 {
-	if (VERBOSE)
-		logerror("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
+	LOG("%s: configin_w (%d)\n", shortname(), state);
 
 	if (state == 0)
 	{
@@ -237,8 +230,8 @@ WRITE_LINE_MEMBER( a2232_device::cfgin_w )
 
 		// install autoconfig handler
 		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
-			read16_delegate(FUNC(amiga_autoconfig::autoconfig_read), static_cast<amiga_autoconfig *>(this)),
-			write16_delegate(FUNC(amiga_autoconfig::autoconfig_write), static_cast<amiga_autoconfig *>(this)), 0xffff);
+				read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
+				write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
 }
 
@@ -261,16 +254,14 @@ READ16_MEMBER( a2232_device::shared_ram_r )
 	else
 		data |= 0xff00;
 
-	if (VERBOSE_DATA)
-		logerror("%s('%s'): shared_ram_r(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset << 1, data, mem_mask);
+	LOGMASKED(LOG_DATA, "%s: shared_ram_r(%04x) %04x [mask = %04x]\n", shortname(), offset << 1, data, mem_mask);
 
 	return data;
 }
 
 WRITE16_MEMBER( a2232_device::shared_ram_w )
 {
-	if (VERBOSE_DATA)
-		logerror("%s('%s'): shared_ram_w(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset << 1, data, mem_mask);
+	LOGMASKED(LOG_DATA, "%s: shared_ram_w(%04x) %04x [mask = %04x]\n", shortname(), offset << 1, data, mem_mask);
 
 	if (ACCESSING_BITS_0_7)
 		m_shared_ram[(offset << 1) + 1] = data & 0xff;
@@ -320,8 +311,7 @@ READ16_MEMBER( a2232_device::reset_high_r )
 {
 	uint16_t data = 0xffff;
 
-	if (VERBOSE)
-		logerror("%s('%s'): reset_high_r %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
+	LOG("%s: reset_high_r %04x [mask = %04x]\n", shortname(), data, mem_mask);
 
 	m_iocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
@@ -330,8 +320,7 @@ READ16_MEMBER( a2232_device::reset_high_r )
 
 WRITE16_MEMBER( a2232_device::reset_high_w )
 {
-	if (VERBOSE)
-		logerror("%s('%s'): reset_high_w %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
+	LOG("%s: reset_high_w %04x [mask = %04x]\n", shortname(), data, mem_mask);
 
 	m_iocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
@@ -368,17 +357,17 @@ WRITE8_MEMBER( a2232_device::cia_w )
 	m_cia->write(offset >> 1, data);
 }
 
-READ8_MEMBER( a2232_device::cia_port_a_r )
+uint8_t a2232_device::cia_port_a_r()
 {
 	return m_cia_port_a;
 }
 
-READ8_MEMBER( a2232_device::cia_port_b_r )
+uint8_t a2232_device::cia_port_b_r()
 {
 	return m_cia_port_b;
 }
 
-WRITE8_MEMBER( a2232_device::cia_port_b_w )
+void a2232_device::cia_port_b_w(uint8_t data)
 {
 	// tod clock connected to pb7
 	m_cia->tod_w(BIT(data, 7));
@@ -498,3 +487,5 @@ void a2232_device::iocpu_map(address_map &map)
 	map(0x8000, 0x8000).w(FUNC(a2232_device::irq_ack8_w));
 	map(0xc000, 0xffff).ram().share("shared");
 }
+
+} } } // namespace bus::amiga::zorro

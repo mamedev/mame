@@ -70,12 +70,14 @@ void kaneko16_sprite_device::device_start()
 	m_first_sprite = std::make_unique<struct tempsprite_t[]>(0x400);
 	m_sprites_regs = make_unique_clear<u16[]>(0x20/2);
 	screen().register_screen_bitmap(m_sprites_bitmap);
+	screen().register_screen_bitmap(m_sprites_maskmap);
 
 	save_item(NAME(m_sprite_flipx));
 	save_item(NAME(m_sprite_flipy));
 	save_pointer(NAME(m_sprites_regs), 0x20/2);
 	save_item(NAME(m_keep_sprites));
 	save_item(NAME(m_sprites_bitmap));
+	save_item(NAME(m_sprites_maskmap));
 }
 
 
@@ -238,12 +240,11 @@ int kaneko16_sprite_device::parse_sprite_type012(int i, struct tempsprite_t *s, 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
 
 
-template<class _BitmapClass>
-void kaneko16_sprite_device::draw_sprites_custom(_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
+void kaneko16_sprite_device::draw_sprites_custom(const rectangle &clip,gfx_element *gfx,
 		u32 code,u32 color,bool flipx,bool flipy,int sx,int sy,
-		bitmap_ind8 &priority_bitmap, int priority)
+		int priority)
 {
-	const pen_t pen_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
+	const pen_t pen_base = gfx->granularity() * (color % gfx->colors());
 	const u8 *source_base = gfx->get_data(code % gfx->elements());
 	int dx, dy;
 
@@ -301,17 +302,11 @@ void kaneko16_sprite_device::draw_sprites_custom(_BitmapClass &dest_bmp,const re
 
 	if (ex > sx)
 	{ /* skip if inner loop doesn't draw anything */
-		typename _BitmapClass::pixel_t *dest;
-		int rgb;
-		if (sizeof(*dest) == 2) rgb = 0;
-		else rgb = 1;
-
-		const pen_t *pal = gfx->palette().pens();
 		for (int y = sy; y < ey; y++)
 		{
 			const u8 *source = source_base + y_index * gfx->rowbytes();
-			dest = &dest_bmp.pix(y);
-			u8 *pri = &priority_bitmap.pix8(y);
+			u16 *dest = &m_sprites_bitmap.pix16(y);
+			u8 *pri = &m_sprites_maskmap.pix8(y);
 
 			int x_index = x_index_base;
 			for (int x = sx; x < ex; x++)
@@ -319,11 +314,9 @@ void kaneko16_sprite_device::draw_sprites_custom(_BitmapClass &dest_bmp,const re
 				const u8 c = source[x_index];
 				if (c != 0)
 				{
-					if (pri[x] < priority)
-					{
-						if (!rgb) dest[x] = pen_base + c;
-						else dest[x] = pal[pen_base + c];
-					}
+					if (pri[x] == 0)
+						dest[x] = ((pen_base + c) & 0x3fff) + ((priority & 3) << 14);
+
 					pri[x] = 0xff; // mark it "already drawn"
 				}
 				x_index += dx;
@@ -335,8 +328,7 @@ void kaneko16_sprite_device::draw_sprites_custom(_BitmapClass &dest_bmp,const re
 
 
 /* Build a list of sprites to display & draw them */
-template<class _BitmapClass>
-void kaneko16_sprite_device::draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes)
+void kaneko16_sprite_device::draw_sprites(const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes)
 {
 	/* Sprites *must* be parsed from the first in RAM to the last,
 	   because of the multisprite feature. But they *must* be drawn
@@ -442,18 +434,13 @@ void kaneko16_sprite_device::draw_sprites(_BitmapClass &bitmap, const rectangle 
 
 	for (s--; s >= m_first_sprite.get(); s--)
 	{
-		const int curr_pri = s->priority;
-
-		const u32 primask = m_priority.sprite[curr_pri];
-
 		draw_sprites_custom(
-										bitmap,cliprect,gfx(0),
+										cliprect,gfx(0),
 										s->code,
 										s->color,
 										s->flipx, s->flipy,
 										s->x, s->y,
-										priority_bitmap,
-										primask);
+										s->priority);
 	}
 }
 
@@ -556,49 +543,53 @@ void kaneko16_sprite_device::regs_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-void kaneko16_sprite_device::copybitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	copybitmap_trans(bitmap,m_sprites_bitmap,0,0,0,0,cliprect,0);
-}
+void kaneko16_sprite_device::copybitmap(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap) { copybitmap_common(bitmap, cliprect, priority_bitmap); }
+void kaneko16_sprite_device::copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap) { copybitmap_common(bitmap, cliprect, priority_bitmap); }
 
-void kaneko16_sprite_device::copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+template<class _BitmapClass>
+void kaneko16_sprite_device::copybitmap_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
 	const pen_t *pal = gfx(0)->palette().pens();
 
+	typename _BitmapClass::pixel_t *dstbitmap;
+	int rgb;
+	if (sizeof(*dstbitmap) == 2) rgb = 0;
+	else rgb = 1;
+
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
+		dstbitmap = &bitmap.pix(y);
+		u8 *dstprimap = &priority_bitmap.pix8(y);
 		u16* srcbitmap = &m_sprites_bitmap.pix16(y);
-		u32* dstbitmap = &bitmap.pix32(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			const u16 pix = srcbitmap[x];
-			if (pix) dstbitmap[x] = pal[pix];
+			const u16 pri = (srcbitmap[x] & 0xc000) >> 14;
+			const u16 pix = srcbitmap[x] & 0x3fff;
+			if (m_priority.sprite[pri] > dstprimap[x])
+			{
+				if (pix & 0x3fff)
+				{
+					if (!rgb) dstbitmap[x] = m_colbase + pix;
+					else dstbitmap[x] = pal[m_colbase + pix];
+				}
+			}
 		}
 	}
 }
 
 
-void kaneko16_sprite_device::render_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes) { render_sprites_common(bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes); }
-void kaneko16_sprite_device::render_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes) { render_sprites_common(bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes); }
-
-template<class _BitmapClass>
-void kaneko16_sprite_device::render_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes)
+void kaneko16_sprite_device::render_sprites(const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes)
 {
 	/* Sprites last (rendered with pdrawgfx, so they can slip
 	   in between the layers) */
 
-	if (m_keep_sprites)
-	{
-		/* keep sprites on screen - used by mgcrystl when you get the first gem and it shows instructions */
-		draw_sprites(m_sprites_bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes);
-		copybitmap(bitmap,cliprect);
-	}
-	else
-	{
+	m_sprites_maskmap.fill(0, cliprect);
+	/* keep sprites on screen - used by mgcrystl when you get the first gem and it shows instructions */
+	if (!m_keep_sprites)
 		m_sprites_bitmap.fill(0, cliprect);
-		draw_sprites(bitmap,cliprect, priority_bitmap, spriteram16, spriteram16_bytes);
-	}
+
+	draw_sprites(cliprect, spriteram16, spriteram16_bytes);
 }
 
 kaneko_vu002_sprite_device::kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

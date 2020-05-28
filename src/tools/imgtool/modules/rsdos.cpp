@@ -8,9 +8,9 @@
 
 ****************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 #include "imgtool.h"
 #include "formats/coco_dsk.h"
 #include "iflopimg.h"
@@ -320,7 +320,7 @@ eof:
 	}
 	else
 	{
-		/* Not the end of file */
+		/* Note the end of file */
 		err = process_rsdos_file(&rsent, image, nullptr, filesize);
 		if (err)
 			return err;

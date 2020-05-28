@@ -78,8 +78,8 @@ void ibm3153_state::mem_map(address_map &map)
 void ibm3153_state::io_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram();
-	//ADDRESS_MAP_UNMAP_HIGH
-	//ADDRESS_MAP_GLOBAL_MASK(0xff)
+	//map.unmap_value_high();
+	//map.global_mask(0xff);
 }
 
 

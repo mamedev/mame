@@ -10,7 +10,6 @@
     are protected, which is the only transparent attribute supported.
 
     Known emulation bugs:
-    - Return key often gets corrupted when looped back
     - Frequent screen glitches when writing to the display
     - No dimming of protected characters
 
@@ -21,7 +20,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
-#include "machine/mc2661.h"
+#include "machine/scn_pci.h"
 #include "machine/wy50kb.h"
 #include "sound/spkrdev.h"
 #include "video/i8275.h"
@@ -64,7 +63,7 @@ private:
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_rambank;
 	required_device_array<i8276_device, 2> m_crtc;
-	required_device<mc2661_device> m_pci;
+	required_device<scn2651_device> m_pci;
 	required_device<rs232_port_device> m_modem;
 	required_device<rs232_port_device> m_printer;
 
@@ -147,14 +146,11 @@ u8 wy100_state::memory_r(offs_t offset)
 {
 	u8 p2 = m_maincpu->p2_r();
 	u8 data = BIT(p2, 5) ? m_pci->read(p2 & 3) : m_rambank->read8(offset);
-	if (BIT(p2, 5))
-		logerror("%s: Reading %02X from PCI register %d\n", machine().describe_context(), data, p2 & 3);
 	if (m_bs_enable && !machine().side_effects_disabled())
 	{
-		address_space &space = machine().dummy_space();
 		u8 chardata = (data & 0xe0) == 0x80 ? data : data & 0x7f;
-		m_crtc[0]->dack_w(space, 0, chardata);
-		m_crtc[1]->dack_w(space, 0, (chardata & 0xfe) | (BIT(data, 7) ? 0x00 : 0x01));
+		m_crtc[0]->dack_w(chardata);
+		m_crtc[1]->dack_w((chardata & 0xfe) | (BIT(data, 7) ? 0x00 : 0x01));
 	}
 	return data;
 }
@@ -166,19 +162,14 @@ void wy100_state::memory_w(offs_t offset, u8 data)
 	// CRTC access is write-only
 	if (!BIT(p2, 6))
 	{
-		address_space &space = machine().dummy_space();
-		m_crtc[0]->write(space, p2 & 1, data);
-		m_crtc[1]->write(space, p2 & 1, data);
+		m_crtc[0]->write(p2 & 1, data);
+		m_crtc[1]->write(p2 & 1, data);
 	}
 	else if (m_brdy)
 		m_bs_enable = true;
 
 	if (BIT(p2, 5))
-	{
-		logerror("%s: Writing %02X to PCI register %d\n", machine().describe_context(), data, p2 & 3);
-
 		m_pci->write(p2 & 3, data);
-	}
 
 	m_rambank->write8(offset, data);
 }
@@ -214,7 +205,7 @@ void wy100_state::wy100(machine_config &config)
 	m_maincpu->p1_out_cb().append("spkrgate", FUNC(input_merger_device::in_w<0>)).bit(7);
 	m_maincpu->p2_out_cb().set(FUNC(wy100_state::p2_w));
 	m_maincpu->t0_in_cb().set("keyboard", FUNC(wy100_keyboard_device::sense_r)).invert();
-	m_maincpu->t1_in_cb().set(m_pci, FUNC(mc2661_device::rxrdy_r)).invert();
+	m_maincpu->t1_in_cb().set(m_pci, FUNC(scn2651_device::rxrdy_r));
 
 	WY100_KEYBOARD(config, "keyboard");
 
@@ -224,7 +215,7 @@ void wy100_state::wy100(machine_config &config)
 	m_rambank->set_addr_width(13);
 	m_rambank->set_stride(0x100);
 
-	MC2661(config, m_pci, 10.1376_MHz_XTAL / 2); // INS2651N
+	SCN2651(config, m_pci, 10.1376_MHz_XTAL / 2); // INS2651N
 	m_pci->rts_handler().set(m_modem, FUNC(rs232_port_device::write_rts));
 	m_pci->dtr_handler().set(m_modem, FUNC(rs232_port_device::write_dtr));
 	m_pci->txd_handler().set(FUNC(wy100_state::txd_w));
@@ -241,7 +232,7 @@ void wy100_state::wy100(machine_config &config)
 		crtc->set_screen("screen");
 		crtc->set_character_width(10);
 	}
-	m_crtc[0]->set_display_callback(FUNC(wy100_state::draw_character), this);
+	m_crtc[0]->set_display_callback(FUNC(wy100_state::draw_character));
 	m_crtc[0]->drq_wr_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_crtc[0]->drq_wr_callback().append(FUNC(wy100_state::brdy_w));
 	m_crtc[0]->lc_wr_callback().set("spkrgate", FUNC(input_merger_device::in_w<1>)).bit(3);
@@ -252,12 +243,12 @@ void wy100_state::wy100(machine_config &config)
 	spkrgate.output_handler().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	RS232_PORT(config, m_modem, default_rs232_devices, "loopback");
-	m_modem->dcd_handler().set(m_pci, FUNC(mc2661_device::dcd_w));
-	m_modem->cts_handler().set(m_pci, FUNC(mc2661_device::cts_w));
-	m_modem->rxd_handler().set(m_pci, FUNC(mc2661_device::rx_w));
+	m_modem->dcd_handler().set(m_pci, FUNC(scn2651_device::dcd_w));
+	m_modem->cts_handler().set(m_pci, FUNC(scn2651_device::cts_w));
+	m_modem->rxd_handler().set(m_pci, FUNC(scn2651_device::rxd_w));
 
 	RS232_PORT(config, m_printer, default_rs232_devices, nullptr);
-	m_printer->dsr_handler().set(m_pci, FUNC(mc2661_device::dsr_w));
+	m_printer->dsr_handler().set(m_pci, FUNC(scn2651_device::dsr_w));
 }
 
 

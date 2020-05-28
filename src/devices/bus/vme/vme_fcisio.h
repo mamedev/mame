@@ -28,7 +28,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_READ8_MEMBER (config_rd);
+	uint8_t config_rd();
 
 	DECLARE_READ16_MEMBER (bootvect_r);
 

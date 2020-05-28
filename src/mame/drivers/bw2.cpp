@@ -59,7 +59,7 @@ enum
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( bw2_state::read )
+uint8_t bw2_state::read(offs_t offset)
 {
 	int rom = 1, vram = 1, ram1 = 1, ram2 = 1, ram3 = 1, ram4 = 1, ram5 = 1, ram6 = 1;
 
@@ -116,7 +116,7 @@ READ8_MEMBER( bw2_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bw2_state::write )
+void bw2_state::write(offs_t offset, uint8_t data)
 {
 	int vram = 1, ram1 = 1, ram2 = 1, ram3 = 1, ram4 = 1, ram5 = 1, ram6 = 1;
 
@@ -192,7 +192,7 @@ void bw2_state::bw2_io(address_map &map)
 	map(0x20, 0x21).m(m_lcdc, FUNC(msm6255_device::map));
 	map(0x30, 0x3f).rw(m_exp, FUNC(bw2_expansion_slot_device::slot_r), FUNC(bw2_expansion_slot_device::slot_w));
 	map(0x40, 0x41).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x60, 0x63).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write));
 	map(0x70, 0x7f).rw(m_exp, FUNC(bw2_expansion_slot_device::modsel_r), FUNC(bw2_expansion_slot_device::modsel_w));
 }
@@ -370,7 +370,7 @@ WRITE_LINE_MEMBER( bw2_state::write_centronics_busy )
 //  I8255A interface
 //-------------------------------------------------
 
-WRITE8_MEMBER( bw2_state::ppi_pa_w )
+void bw2_state::ppi_pa_w(uint8_t data)
 {
 	/*
 
@@ -400,7 +400,7 @@ WRITE8_MEMBER( bw2_state::ppi_pa_w )
 	m_centronics->write_strobe(BIT(data, 7));
 }
 
-READ8_MEMBER( bw2_state::ppi_pb_r )
+uint8_t bw2_state::ppi_pb_r()
 {
 	/*
 
@@ -425,7 +425,7 @@ READ8_MEMBER( bw2_state::ppi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( bw2_state::ppi_pc_w )
+void bw2_state::ppi_pc_w(uint8_t data)
 {
 	/*
 
@@ -439,7 +439,7 @@ WRITE8_MEMBER( bw2_state::ppi_pc_w )
 	m_bank = data & 0x07;
 }
 
-READ8_MEMBER( bw2_state::ppi_pc_r )
+uint8_t bw2_state::ppi_pc_r()
 {
 	/*
 

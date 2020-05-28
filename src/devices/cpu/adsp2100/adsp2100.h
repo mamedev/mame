@@ -215,8 +215,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -429,10 +429,10 @@ protected:
 	adsp_core           m_alt;
 
 	// address spaces
-	address_space *     m_program;
-	address_space *     m_data;
-	address_space *     m_io;
-	memory_access_cache<2, -2, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<14, 2, -2, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<14, 2, -2, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<14, 1, -1, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::specific m_io;
 
 	// tables
 	uint8_t               m_condition_table[0x1000];
@@ -471,7 +471,7 @@ public:
 
 protected:
 	// device_execute_interface overrides
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -494,7 +494,7 @@ protected:
 	adsp2101_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype);
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -515,7 +515,7 @@ public:
 
 protected:
 	// device_execute_interface overrides
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

@@ -81,9 +81,9 @@ private:
 	/* misc */
 	int      m_ay_data;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_WRITE8_MEMBER(sound_control_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void sound_data_w(uint8_t data);
+	void sound_control_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -96,19 +96,19 @@ private:
 };
 
 
-WRITE8_MEMBER(dynadice_state::videoram_w)
+void dynadice_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 	m_top_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(dynadice_state::sound_data_w)
+void dynadice_state::sound_data_w(uint8_t data)
 {
 	m_ay_data = data;
 }
 
-WRITE8_MEMBER(dynadice_state::sound_control_w)
+void dynadice_state::sound_control_w(uint8_t data)
 {
 /*
     AY 3-8910 :
@@ -231,14 +231,14 @@ GFXDECODE_END
 TILE_GET_INFO_MEMBER(dynadice_state::get_tile_info)
 {
 	int code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	tileinfo.set(1, code, 0, 0);
 }
 
 void dynadice_state::video_start()
 {
 	/* pacman - style videoram layout */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_top_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dynadice_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_top_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dynadice_state::get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
 	m_bg_tilemap->set_scrollx(0, -16);
 }
 

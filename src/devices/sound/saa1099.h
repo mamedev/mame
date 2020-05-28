@@ -19,7 +19,7 @@ class saa1099_device : public device_t,
 						public device_sound_interface
 {
 public:
-	saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void control_w(u8 data);
 	void data_w(u8 data);
@@ -39,46 +39,48 @@ private:
 	{
 		saa1099_channel() : amplitude{ 0, 0 }, envelope{ 0, 0 } { }
 
-		int frequency    = 0;   /* frequency (0x00..0xff) */
-		int freq_enable  = 0;   /* frequency enable */
-		int noise_enable = 0;   /* noise enable */
-		int octave       = 0;   /* octave (0x00..0x07) */
-		int amplitude[2];       /* amplitude (0x00..0x0f) */
-		int envelope[2];        /* envelope (0x00..0x0f or 0x10 == off) */
+		u8 frequency      = 0;      // frequency (0x00..0xff)
+		bool freq_enable  = false;  // frequency enable
+		bool noise_enable = false;  // noise enable
+		u8 octave         = 0;      // octave (0x00..0x07)
+		u16 amplitude[2];           // amplitude
+		u8 envelope[2];             // envelope (0x00..0x0f or 0x10 == off)
 
 		/* vars to simulate the square wave */
 		double counter = 0.0;
 		double freq = 0.0;
-		int level = 0;
+		u8 level = 0;
 	};
 
 	struct saa1099_noise
 	{
-		saa1099_noise() { }
+		saa1099_noise() { (void)pad; }
 
 		/* vars to simulate the noise generator output */
 		double counter = 0.0;
 		double freq = 0.0;
-		uint32_t level = 0xFFFFFFFF;         /* noise polynomial shifter */
+		u32 level = 0xffffffffU;    // noise polynomial shifter
+
+	private:
+		u32 pad; // pad out structure to multiple of sizeof(double)
 	};
 
 	void envelope_w(int ch);
 
-	sound_stream *m_stream;          /* our stream */
-	int m_noise_params[2];            /* noise generators parameters */
-	int m_env_enable[2];              /* envelope generators enable */
-	int m_env_reverse_right[2];       /* envelope reversed for right channel */
-	int m_env_mode[2];                /* envelope generators mode */
-	int m_env_bits[2];                /* non zero = 3 bits resolution */
-	int m_env_clock[2];               /* envelope clock mode (non-zero external) */
-	int m_env_step[2];                /* current envelope step */
-	int m_all_ch_enable;              /* all channels enable */
-	int m_sync_state;                 /* sync all channels */
-	int m_selected_reg;               /* selected register */
-	saa1099_channel m_channels[6];    /* channels */
-	saa1099_noise m_noise[2];         /* noise generators */
+	sound_stream *m_stream;         // our stream
+	u8 m_noise_params[2];           // noise generators parameters
+	bool m_env_enable[2];           // envelope generators enable
+	bool m_env_reverse_right[2];    // envelope reversed for right channel
+	u8 m_env_mode[2];               // envelope generators mode
+	bool m_env_bits[2];             // true = 3 bits resolution
+	bool m_env_clock[2];            // envelope clock mode (true external)
+	u8 m_env_step[2];               // current envelope step
+	bool m_all_ch_enable;           // all channels enable
+	bool m_sync_state;              // sync all channels
+	u8 m_selected_reg;              // selected register
+	saa1099_channel m_channels[6];  // channels
+	saa1099_noise m_noise[2];       // noise generators
 	double m_sample_rate;
-	int m_master_clock;
 };
 
 DECLARE_DEVICE_TYPE(SAA1099, saa1099_device)

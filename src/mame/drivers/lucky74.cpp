@@ -824,7 +824,7 @@ WRITE8_MEMBER(lucky74_state::custom_09R81P_port_w)
 	m_adpcm_reg[offset] = data;
 }
 
-WRITE8_MEMBER(lucky74_state::ym2149_portb_w)
+void lucky74_state::ym2149_portb_w(uint8_t data)
 {
 /*  when is in game mode writes 0x0a.
     when is in test mode writes 0x0e.
@@ -869,7 +869,7 @@ WRITE8_MEMBER(lucky74_state::copro_sm7831_w)
 *    Lamps    *
 **************/
 
-WRITE8_MEMBER(lucky74_state::lamps_a_w)
+void lucky74_state::lamps_a_w(uint8_t data)
 {
 /*  LAMPSA:
 
@@ -884,7 +884,7 @@ WRITE8_MEMBER(lucky74_state::lamps_a_w)
 	m_lamps[11] = BIT(data, 3);     /* SMALL */
 }
 
-WRITE8_MEMBER(lucky74_state::lamps_b_w)
+void lucky74_state::lamps_b_w(uint8_t data)
 {
 /*  LAMPSB:
 
@@ -1438,7 +1438,7 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 			/* transferring 1st nibble */
 			m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos];
 			m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
-			m_msm->write_data(m_adpcm_data >> 4);
+			m_msm->data_w(m_adpcm_data >> 4);
 
 			if (m_adpcm_pos == m_adpcm_end)
 			{
@@ -1451,7 +1451,7 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 		else
 		{
 			/* transferring 2nd nibble */
-			m_msm->write_data(m_adpcm_data & 0x0f);
+			m_msm->data_w(m_adpcm_data & 0x0f);
 			m_adpcm_data = -1;
 		}
 	}

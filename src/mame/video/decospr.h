@@ -5,13 +5,13 @@
 
 #pragma once
 
-typedef device_delegate<uint16_t (uint16_t pri)> decospr_pri_cb_delegate;
-typedef device_delegate<uint16_t (uint16_t col)> decospr_col_cb_delegate;
+typedef device_delegate<uint16_t (uint16_t pri, bool extpri)> decospr_pri_cb_delegate;
+typedef device_delegate<uint16_t (uint16_t col, bool extcol)> decospr_col_cb_delegate;
 
 
 // function definition for a callback
-#define DECOSPR_PRIORITY_CB_MEMBER(_name)   uint16_t _name(uint16_t pri)
-#define DECOSPR_COLOUR_CB_MEMBER(_name)     uint16_t _name(uint16_t col)
+#define DECOSPR_PRIORITY_CB_MEMBER(_name)   uint16_t _name(uint16_t pri, bool extpri)
+#define DECOSPR_COLOUR_CB_MEMBER(_name)     uint16_t _name(uint16_t col, bool extcol)
 
 
 class decospr_device : public device_t, public device_video_interface
@@ -22,8 +22,8 @@ public:
 	// configuration
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region(int gfxregion) { m_gfxregion = gfxregion; }
-	template <typename... T> void set_pri_callback(T &&... args) { m_pri_cb = decospr_pri_cb_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_col_callback(T &&... args) { m_col_cb = decospr_col_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_pri_callback(T &&... args) { m_pri_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_col_callback(T &&... args) { m_col_cb.set(std::forward<T>(args)...); }
 	void set_is_bootleg(bool is_bootleg) { m_is_bootleg = is_bootleg; }
 	void set_bootleg_type(int bootleg_type) { m_bootleg_type = bootleg_type; }
 	void set_flipallx(int flipallx) { m_flipallx = flipallx; }

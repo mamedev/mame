@@ -37,12 +37,12 @@ public:
 	// construction/destruction
 	a2bus_agat840k_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(d14_i_b);
-	DECLARE_READ8_MEMBER(d15_i_a);
-	DECLARE_READ8_MEMBER(d15_i_c);
-	DECLARE_WRITE8_MEMBER(d14_o_c);
-	DECLARE_WRITE8_MEMBER(d15_o_b);
-	DECLARE_WRITE8_MEMBER(d15_o_c);
+	uint8_t d14_i_b();
+	uint8_t d15_i_a();
+	uint8_t d15_i_c();
+	void d14_o_c(uint8_t data);
+	void d15_o_b(uint8_t data);
+	void d15_o_c(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(index_0_w);
 	DECLARE_WRITE_LINE_MEMBER(index_1_w);
@@ -70,11 +70,11 @@ protected:
 		TIMER_ID_SEEK
 	};
 
+	required_device_array<legacy_floppy_image_device, 2> m_floppy_image;
 	required_device<i8255_device> m_d14;
 	required_device<i8255_device> m_d15;
 
 private:
-	legacy_floppy_image_device *floppy_image(int drive);
 	legacy_floppy_image_device *m_floppy;
 	bool m_side;
 

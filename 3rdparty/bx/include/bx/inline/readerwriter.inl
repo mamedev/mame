@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -273,7 +273,7 @@ namespace bx
 	}
 
 	template<typename Ty>
-	int32_t read(ReaderI* _reader, Ty& _value, Error* _err)
+	inline int32_t read(ReaderI* _reader, Ty& _value, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
@@ -281,7 +281,7 @@ namespace bx
 	}
 
 	template<typename Ty>
-	int32_t readHE(ReaderI* _reader, Ty& _value, bool _fromLittleEndian, Error* _err)
+	inline int32_t readHE(ReaderI* _reader, Ty& _value, bool _fromLittleEndian, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
@@ -329,7 +329,7 @@ namespace bx
 	}
 
 	template<typename Ty>
-	int32_t write(WriterI* _writer, const Ty& _value, Error* _err)
+	inline int32_t write(WriterI* _writer, const Ty& _value, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
@@ -337,7 +337,7 @@ namespace bx
 	}
 
 	template<typename Ty>
-	int32_t writeLE(WriterI* _writer, const Ty& _value, Error* _err)
+	inline int32_t writeLE(WriterI* _writer, const Ty& _value, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
@@ -346,14 +346,26 @@ namespace bx
 		return result;
 	}
 
+	template<>
+	inline int32_t writeLE(WriterI* _writer, const float& _value, Error* _err)
+	{
+		return writeLE(_writer, floatToBits(_value), _err);
+	}
+
 	template<typename Ty>
-	int32_t writeBE(WriterI* _writer, const Ty& _value, Error* _err)
+	inline int32_t writeBE(WriterI* _writer, const Ty& _value, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
 		Ty value = toBigEndian(_value);
 		int32_t result = _writer->write(&value, sizeof(Ty), _err);
 		return result;
+	}
+
+	template<>
+	inline int32_t writeBE(WriterI* _writer, const float& _value, Error* _err)
+	{
+		return writeBE(_writer, floatToBits(_value), _err);
 	}
 
 	inline int64_t skip(SeekerI* _seeker, int64_t _offset)
@@ -392,7 +404,7 @@ namespace bx
 	}
 
 	template<typename Ty>
-	int32_t peek(ReaderSeekerI* _reader, Ty& _value, Error* _err)
+	inline int32_t peek(ReaderSeekerI* _reader, Ty& _value, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );

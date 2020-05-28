@@ -280,7 +280,7 @@ void unk_gambl_state::unkpacg_main_portmap(address_map &map)
 	map(0x00, 0x00).portr("DSW1");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2");
-//  AM_RANGE(0x03, 0x03) AM_WRITE("out_w")  // to investigate...
+//  map(0x03, 0x03).w(FUNC(unk_gambl_state::out_w));  // to investigate...
 	map(0x17, 0x17).w(m_ay, FUNC(ay8910_device::data_w));
 	map(0x27, 0x27).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x37, 0x37).w(m_ay, FUNC(ay8910_device::address_w));

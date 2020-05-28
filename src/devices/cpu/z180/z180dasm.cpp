@@ -450,7 +450,7 @@ offs_t z180_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 				break;
 			case 'O':   /* Offset relative to PC */
 				offset = (int8_t) params.r8(pos++);
-				util::stream_format(stream, "$%05X", pc + offset + 2);
+				util::stream_format(stream, "$%04X", (pc + offset + 2) & 0xffff);
 				break;
 			case 'P':   /* Port number */
 				ea = params.r8(pos++);
@@ -463,7 +463,7 @@ offs_t z180_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 			case 'W':   /* Memory address word */
 				ea = params.r16(pos);
 				pos += 2;
-				util::stream_format(stream, "$%05X", ea);
+				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'X':
 				offset = (int8_t) params.r8(pos++);

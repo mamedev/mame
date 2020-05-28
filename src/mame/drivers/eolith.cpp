@@ -3,7 +3,7 @@
 /********************************************************************
  Eolith 32 bits hardware: Gradation 2D system
 
- driver by Tomasz Slanina    analog [at] op.pl
+ driver by Tomasz Slanina
  and       Pierpaolo Prazzoli
 
  Main CPU:
@@ -164,7 +164,7 @@ READ32_MEMBER(eolith_state::hidctch3_pen_r)
  *
  *************************************/
 
-WRITE8_MEMBER( eolith_state::sound_p1_w )
+void eolith_state::sound_p1_w(uint8_t data)
 {
 	// .... xxxx - Data ROM bank (32kB)
 	// ...x .... - Unknown (Usually 1?)
@@ -191,13 +191,13 @@ WRITE8_MEMBER( eolith_state::sound_p1_w )
     P37 (O) RDB      (/RD)
 */
 
-READ8_MEMBER( eolith_state::qs1000_p1_r )
+uint8_t eolith_state::qs1000_p1_r()
 {
 	// Sound banking? (must be 1)
 	return 1;
 }
 
-WRITE8_MEMBER( eolith_state::qs1000_p1_w )
+void eolith_state::qs1000_p1_w(uint8_t data)
 {
 }
 
@@ -208,7 +208,7 @@ WRITE8_MEMBER( eolith_state::qs1000_p1_w )
  *
  *************************************/
 
-WRITE8_MEMBER(eolith_state::soundcpu_to_qs1000)
+void eolith_state::soundcpu_to_qs1000(uint8_t data)
 {
 	m_qs1000->serial_in(data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
@@ -277,7 +277,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, eolith_speedup_getvblank, nullptr)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(eolith_state, speedup_vblank_r)
 	PORT_BIT( 0x00003f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00008000, IP_ACTIVE_LOW )
@@ -515,7 +515,7 @@ static INPUT_PORTS_START( stealsee )
 	PORT_INCLUDE(common)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, stealsee_speedup_getvblank, nullptr)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(eolith_state, stealsee_speedup_vblank_r)
 INPUT_PORTS_END
 
 
@@ -558,7 +558,7 @@ void eolith_state::eolith45(machine_config &config)
 
 //  for testing sound sync
 //  config.m_perfect_cpu_quantum = subtag("maincpu");
-//  config.m_minimum_quantum = attotime::from_hz(6000);
+//  config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1726,7 +1726,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(eolith_state::eolith_speedup)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(eolith_state::eolith_speedup_getvblank)
+READ_LINE_MEMBER(eolith_state::speedup_vblank_r)
 {
 //  printf("%s:eolith speedup_read data %02x\n",machine().describe_context().c_str(), m_speedup_vblank);
 
@@ -1735,7 +1735,7 @@ CUSTOM_INPUT_MEMBER(eolith_state::eolith_speedup_getvblank)
 }
 
 // StealSee doesn't use interrupts, just the vblank
-CUSTOM_INPUT_MEMBER(eolith_state::stealsee_speedup_getvblank)
+READ_LINE_MEMBER(eolith_state::stealsee_speedup_vblank_r)
 {
 	int pc = m_maincpu->pc();
 

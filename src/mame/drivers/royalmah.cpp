@@ -20,6 +20,7 @@ Year + Game               Board(s)               CPU      Company            Not
 82  Royal Mahjong         ? + FRM-03             Z80      Falcon             bootleg
 83  Janyou Part II                               Z80      Cosmo Denshi
 84? Jan Oh                FRM-00?                Z80      Toaplan            Incomplete program roms
+84? Challenge Girl        FRM-03 + SK-1B         Z80      Paradise Denshi    The dumped set is a bootleg by Falcon
 86  Ippatsu Gyakuten                             Z80      Public/Paradais
 86  Don Den Mahjong       D039198L-0             Z80      Dyna Electronics
 86  Jong Shin             D8702158L1-0           Z80      Dyna Electronics
@@ -162,8 +163,8 @@ public:
 	void init_janptr96();
 
 private:
-	DECLARE_READ8_MEMBER(player_1_port_r);
-	DECLARE_READ8_MEMBER(player_2_port_r);
+	uint8_t player_1_port_r();
+	uint8_t player_2_port_r();
 	DECLARE_WRITE8_MEMBER(input_port_select_w);
 
 	DECLARE_WRITE8_MEMBER(royalmah_palbank_w);
@@ -205,8 +206,8 @@ private:
 	DECLARE_READ8_MEMBER(jansou_6405_r);
 	DECLARE_WRITE8_MEMBER(jansou_sound_w);
 
-	DECLARE_WRITE8_MEMBER(janptr96_dswsel_w);
-	DECLARE_READ8_MEMBER(janptr96_dsw_r);
+	void janptr96_dswsel_w(uint8_t data);
+	uint8_t janptr96_dsw_r();
 	DECLARE_WRITE8_MEMBER(janptr96_rombank_w);
 	DECLARE_WRITE8_MEMBER(janptr96_rambank_w);
 	DECLARE_READ8_MEMBER(janptr96_unknown_r);
@@ -216,31 +217,31 @@ private:
 	DECLARE_READ8_MEMBER(mjifb_rom_io_r);
 	DECLARE_WRITE8_MEMBER(mjifb_rom_io_w);
 	DECLARE_WRITE8_MEMBER(mjifb_videoram_w);
-	DECLARE_READ8_MEMBER(mjifb_p3_r);
-	DECLARE_READ8_MEMBER(mjifb_p5_r);
-	DECLARE_READ8_MEMBER(mjifb_p6_r);
-	DECLARE_READ8_MEMBER(mjifb_p7_r);
-	DECLARE_READ8_MEMBER(mjifb_p8_r);
-	DECLARE_WRITE8_MEMBER(mjifb_p3_w);
-	DECLARE_WRITE8_MEMBER(mjifb_p4_w);
-	DECLARE_WRITE8_MEMBER(mjifb_p8_w);
+	uint8_t mjifb_p3_r();
+	uint8_t mjifb_p5_r();
+	uint8_t mjifb_p6_r();
+	uint8_t mjifb_p7_r();
+	uint8_t mjifb_p8_r();
+	void mjifb_p3_w(uint8_t data);
+	void mjifb_p4_w(uint8_t data);
+	void mjifb_p8_w(uint8_t data);
 
 	DECLARE_READ8_MEMBER(mjdejavu_rom_io_r);
 	DECLARE_WRITE8_MEMBER(mjdejavu_rom_io_w);
 
-	DECLARE_READ8_MEMBER(mjtensin_p3_r);
-	DECLARE_WRITE8_MEMBER(mjtensin_p4_w);
+	uint8_t mjtensin_p3_r();
+	void mjtensin_p4_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(mjtensin_6ff3_w);
 
-	DECLARE_WRITE8_MEMBER(cafetime_p4_w);
-	DECLARE_WRITE8_MEMBER(cafetime_p3_w);
+	void cafetime_p4_w(uint8_t data);
+	void cafetime_p3_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(cafetime_dsw_w);
 	DECLARE_READ8_MEMBER(cafetime_dsw_r);
 	DECLARE_READ8_MEMBER(cafetime_7fe4_r);
 	DECLARE_WRITE8_MEMBER(cafetime_7fe3_w);
 
-	DECLARE_WRITE8_MEMBER(mjvegasa_p4_w);
-	DECLARE_WRITE8_MEMBER(mjvegasa_p3_w);
+	void mjvegasa_p4_w(uint8_t data);
+	void mjvegasa_p3_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(mjvegasa_rombank_w);
 	DECLARE_READ8_MEMBER(mjvegasa_rom_io_r);
 	DECLARE_WRITE8_MEMBER(mjvegasa_rom_io_w);
@@ -449,7 +450,7 @@ WRITE8_MEMBER(royalmah_state::input_port_select_w)
 	m_input_port_select = data;
 }
 
-READ8_MEMBER(royalmah_state::player_1_port_r)
+uint8_t royalmah_state::player_1_port_r()
 {
 	int ret = (ioport("KEY0")->read() & 0xc0) | 0x3f;
 
@@ -462,7 +463,7 @@ READ8_MEMBER(royalmah_state::player_1_port_r)
 	return ret;
 }
 
-READ8_MEMBER(royalmah_state::player_2_port_r)
+uint8_t royalmah_state::player_2_port_r()
 {
 	int ret = (ioport("KEY5")->read() & 0xc0) | 0x3f;
 
@@ -827,7 +828,7 @@ void royalmah_state::mjderngr_iomap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-//  AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1")
+//  map(0x10, 0x10).portr("DSW1");
 	map(0x10, 0x10).w(FUNC(royalmah_state::mjderngr_coin_w));   // palette bank is set separately
 	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
 	map(0x20, 0x20).w(FUNC(royalmah_state::dynax_bank_w));
@@ -999,14 +1000,14 @@ void royalmah_state::janptr96_map(address_map &map)
 	map(0x8000, 0xffff).writeonly().share("videoram");
 }
 
-WRITE8_MEMBER(royalmah_state::janptr96_dswsel_w)
+void royalmah_state::janptr96_dswsel_w(uint8_t data)
 {
 	// 0x20 = 0 -> hopper on
 	// 0x40 ?
 	m_dsw_select = data;
 }
 
-READ8_MEMBER(royalmah_state::janptr96_dsw_r)
+uint8_t royalmah_state::janptr96_dsw_r()
 {
 	if (~m_dsw_select & 0x01) return ioport("DSW4")->read();
 	if (~m_dsw_select & 0x02) return ioport("DSW3")->read();
@@ -1122,39 +1123,39 @@ void royalmah_state::mjifb_map(address_map &map)
 	map(0x7000, 0x7fff).ram().share("nvram");
 	map(0x8000, 0xbfff).rw(FUNC(royalmah_state::mjifb_rom_io_r), FUNC(royalmah_state::mjifb_rom_io_w)).share("videoram");
 	map(0xc000, 0xffff).rom().w(FUNC(royalmah_state::mjifb_videoram_w));
-//  AM_RANGE( 0xc000, 0xffff ) AM_ROM AM_WRITEONLY  This should, but doesn't work
+//  map(0xc000, 0xffff).rom().writeonly();  This should, but doesn't work
 }
 
-READ8_MEMBER(royalmah_state::mjifb_p3_r)
+uint8_t royalmah_state::mjifb_p3_r()
 {
 	return ioport("PORT3_5")->read() >> 6;
 }
-READ8_MEMBER(royalmah_state::mjifb_p5_r)
+uint8_t royalmah_state::mjifb_p5_r()
 {
 	return ioport("PORT3_5")->read();
 }
-READ8_MEMBER(royalmah_state::mjifb_p6_r)
+uint8_t royalmah_state::mjifb_p6_r()
 {
 	return ioport("PORT6_7")->read();
 }
-READ8_MEMBER(royalmah_state::mjifb_p7_r)
+uint8_t royalmah_state::mjifb_p7_r()
 {
 	return ioport("PORT6_7")->read() >> 4;
 }
-READ8_MEMBER(royalmah_state::mjifb_p8_r)
+uint8_t royalmah_state::mjifb_p8_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(royalmah_state::mjifb_p3_w)
+void royalmah_state::mjifb_p3_w(uint8_t data)
 {
 	m_rombank = (m_rombank & 0x0f) | ((data & 0x0c) << 2);
 }
-WRITE8_MEMBER(royalmah_state::mjifb_p4_w)
+void royalmah_state::mjifb_p4_w(uint8_t data)
 {
 	m_rombank = (m_rombank & 0xf0) | (data & 0x0f);
 }
-WRITE8_MEMBER(royalmah_state::mjifb_p8_w)
+void royalmah_state::mjifb_p8_w(uint8_t data)
 {
 	m_mjifb_rom_enable = (data & 0x08);
 }
@@ -1220,7 +1221,7 @@ void royalmah_state::mjdejavu_map(address_map &map)
                                 Mahjong Tensinhai
 ****************************************************************************/
 
-READ8_MEMBER(royalmah_state::mjtensin_p3_r)
+uint8_t royalmah_state::mjtensin_p3_r()
 {
 	return 0xff;
 }
@@ -1229,7 +1230,7 @@ void royalmah_state::mjtensin_update_rombank()
 {
 	m_mainbank->set_base(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x8000 );
 }
-WRITE8_MEMBER(royalmah_state::mjtensin_p4_w)
+void royalmah_state::mjtensin_p4_w(uint8_t data)
 {
 	m_rombank = (m_rombank & 0xf0) | (data & 0x0f);
 	mjtensin_update_rombank();
@@ -1266,12 +1267,12 @@ void royalmah_state::cafetime_update_rombank()
 {
 	m_mainbank->set_base(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x8000 );
 }
-WRITE8_MEMBER(royalmah_state::cafetime_p4_w)
+void royalmah_state::cafetime_p4_w(uint8_t data)
 {
 	m_rombank = (m_rombank & 0xf0) | (data & 0x0f);
 	cafetime_update_rombank();
 }
-WRITE8_MEMBER(royalmah_state::cafetime_p3_w)
+void royalmah_state::cafetime_p3_w(uint8_t data)
 {
 	m_rombank = (m_rombank & 0x0f) | ((data & 0x0c) << 2);
 	cafetime_update_rombank();
@@ -1328,11 +1329,11 @@ void royalmah_state::cafetime_map(address_map &map)
                                Mahjong Vegas
 ****************************************************************************/
 
-WRITE8_MEMBER(royalmah_state::mjvegasa_p4_w)
+void royalmah_state::mjvegasa_p4_w(uint8_t data)
 {
 	m_rombank = (m_rombank & 0xf8) | ((data & 0x0e) >> 1);
 }
-WRITE8_MEMBER(royalmah_state::mjvegasa_p3_w)
+void royalmah_state::mjvegasa_p3_w(uint8_t data)
 {
 	m_rombank = (m_rombank & 0xf7) | ((data & 0x04) << 1);
 }
@@ -1350,7 +1351,7 @@ READ8_MEMBER(royalmah_state::mjvegasa_rom_io_r)
 
 	if((offset & 0xfff0) == 0x8000)
 	{
-		return m_rtc->read(space, offset & 0xf);
+		return m_rtc->read(offset & 0xf);
 	}
 
 	logerror("%04X: unmapped IO read at %04X\n", m_maincpu->pc(), offset);
@@ -1369,7 +1370,7 @@ WRITE8_MEMBER(royalmah_state::mjvegasa_rom_io_w)
 
 	if((offset & 0xfff0) == 0x8000)
 	{
-		m_rtc->write(space, offset & 0xf,data);
+		m_rtc->write(offset & 0xf, data);
 		return;
 	}
 
@@ -5263,6 +5264,23 @@ ROM_START( rkjanoh2 )
 	ROM_LOAD( "82s123",       0x000, 0x020, CRC(74a53e94) SHA1(ca9114bd9b2b07f5abe82616b41ae9fdb9537a4f) )
 ROM_END
 
+ROM_START( chalgirl )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // the first 6 ROMs are on the FRM-03 board, the following on the SK-1B sub board
+	ROM_LOAD( "cg_11.o1",  0x0000, 0x1000, CRC(1c064d3e) SHA1(cfe7e536efb377f009d7c9bee5b5a814ad1404ad) ) // 2732
+	ROM_LOAD( "cg_22.o2",  0x1000, 0x1000, CRC(3244fe61) SHA1(3163f14b8977fe4b05aa11d332347c5f3cc2fbfa) ) // 2732
+	ROM_LOAD( "cg_33.o3",  0x2000, 0x1000, CRC(692ef940) SHA1(c5a54161bedf26695aedad66016b5a789dbe13e5) ) // 2732
+	ROM_LOAD( "cg_4.o3",   0x3000, 0x1000, CRC(562aa45f) SHA1(fc052b8f3b2f105c9282468d385a9ad554ec00f5) ) // 2732
+	ROM_LOAD( "cg_5.o4",   0x4000, 0x1000, CRC(c0849a41) SHA1(1d901d59248cf0d8beff03207c46e3c50d0011cf) ) // 2732
+	ROM_LOAD( "cg_6.o4",   0x5000, 0x1000, CRC(92687327) SHA1(4fafba5881dca2a147616d94dd055eba6aa3c653) ) // 2732
+	ROM_LOAD( "7.f1",      0x6000, 0x1000, CRC(465db6e1) SHA1(e08fe431ab8676372fc13c51a2684a0320e01031) ) // 2732
+	ROM_LOAD( "8.e1",      0x7000, 0x2000, CRC(42fafb6f) SHA1(32d06ee4fe28033ae04058d806917bf5b5690246) ) // 2764
+	ROM_LOAD( "9.c1",      0x9000, 0x2000, CRC(8291e28a) SHA1(9a05cae191babdf3f78a7131985d8c6583f7c973) ) // 2764
+	ROM_LOAD( "10.b1",     0xb000, 0x2000, CRC(04e76413) SHA1(e85db89084a8ae448fde4e202e8516b2e14a8265) ) // 2764
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "f-rom.bpr",  0x0000, 0x0020, BAD_DUMP CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) ) // not dumped for this set, using the one from royalmah for now
+ROM_END
+
 void royalmah_state::init_tahjong()
 {
 	m_mainbank->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -5327,6 +5345,7 @@ void royalmah_state::init_janptr96()
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
+GAME( 1984?, chalgirl, 0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "bootleg",                    "Challenge Girl (Falcon bootleg)", MACHINE_NOT_WORKING ) // correct rom loading / banking, girls aren't shown
 GAME( 1983,  seljan,   0,        seljan,   seljan,   royalmah_state, empty_init,    ROT0,   "Jem / Dyna Corp",            "Sel-Jan [BET] (Japan)", 0 )
 GAME( 1983,  janyoup2, royalmj,  janyoup2, janyoup2, royalmah_state, empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  royalmah_state, init_tahjong,  ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17

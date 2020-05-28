@@ -1277,11 +1277,11 @@ DIP switches are not verified
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/2610intf.h"
-#include "screen.h"
 #include "speaker.h"
 
 #include "contcirc.lh"
 #include "dblaxle.lh"
+#include "enforce.lh"
 
 
 void taitoz_state::parse_cpu_control()
@@ -1330,7 +1330,7 @@ void taitoz_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_maincpu->set_input_line(6, HOLD_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in taitoz_state::device_timer");
+		throw emu_fatalerror("Unknown id in taitoz_state::device_timer");
 	}
 }
 
@@ -1392,13 +1392,25 @@ void taitoz_state::spacegun_eeprom_w(u8 data)
                        GAME INPUTS
 **********************************************************/
 
-CUSTOM_INPUT_MEMBER(taitoz_state::taitoz_pedal_r)
+CUSTOM_INPUT_MEMBER(taitoz_state::gas_pedal_r)
 {
 	static const u8 retval[8] = { 0,1,3,2,6,7,5,4 };
-	ioport_port *port = ioport((const char *)param);
-	return retval[port != nullptr ? port->read() & 7 : 0];
+	return retval[m_gas.read_safe(0) & 7];
 }
 
+CUSTOM_INPUT_MEMBER(taitoz_state::brake_pedal_r)
+{
+	static const u8 retval[8] = { 0,1,3,2,6,7,5,4 };
+	return retval[m_brake.read_safe(0) & 7];
+}
+
+// enforceja only, 3 bits applied on both pots
+template <int axis> CUSTOM_INPUT_MEMBER(taitoz_state::adstick_r)
+{
+	static const u8 retval[8] = { 0,1,3,2,6,7,5,4 };
+	u8 raw_value = ((axis == 0 ? m_stickx : m_sticky).read_safe(0) >> 5) & 7;
+	return retval[raw_value];
+}
 
 u8 taitoz_state::contcirc_input_bypass_r()
 {
@@ -2210,7 +2222,7 @@ static INPUT_PORTS_START( contcirc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitoz_state, gas_pedal_r) PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x00)
 
 	PORT_START("IN1")
@@ -2219,7 +2231,7 @@ static INPUT_PORTS_START( contcirc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Shifter") PORT_TOGGLE
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitoz_state, brake_pedal_r) PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x00) // no function?
 
 	PORT_START("IN2")   /* unused */
@@ -2292,7 +2304,7 @@ static INPUT_PORTS_START( chasehq ) // IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitoz_state, brake_pedal_r) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
 
 	PORT_START("IN1")
@@ -2301,7 +2313,7 @@ static INPUT_PORTS_START( chasehq ) // IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Calibrate") // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitoz_state, gas_pedal_r) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
 
 	PORT_START("IN2")   /* unused */
@@ -2397,8 +2409,8 @@ static INPUT_PORTS_START( enforce )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)    /* Bomb */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)    /* Laser */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Gatling Gun") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Laser") PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2420,6 +2432,19 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( enforceja )
 	PORT_INCLUDE(enforce)
 
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitoz_state, adstick_r<0>);
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitoz_state, adstick_r<1>);
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Shifter") PORT_TOGGLE PORT_PLAYER(1)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_MODIFY("DSWA")
 	TAITO_COINAGE_JAPAN_OLD_LOC(SW A)
 
@@ -2427,8 +2452,14 @@ static INPUT_PORTS_START( enforceja )
 	PORT_DIPNAME( 0x30, 0x30, "3D Effects" )                 PORT_DIPLOCATION("SW B:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x10, "In Game Only" )
 	PORT_DIPSETTING(    0x00, "In Game Only" )
+	PORT_DIPSETTING(    0x10, "In Game Only (duplicate)" )
+
+	PORT_START("STICKX")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(4) PORT_PLAYER(1)
+
+	PORT_START("STICKY")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(4) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bshark )
@@ -2596,7 +2627,7 @@ static INPUT_PORTS_START( sci )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Turbo")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Turbo")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Center")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
@@ -3129,11 +3160,17 @@ void taitoz_state::machine_reset()
 	m_ioc220_port = 0;
 }
 
-/* Contcirc vis area seems narrower than the other games... */
+void taitoz_state::screen_config(machine_config &config, int vdisp_start, int vdisp_end)
+{
+//  26.860 MHz comes from the video board, assume /4 pixel clock
+//  contcirc and enforce uses a narrower visible area (checked via service mode),
+//  confirm if they outputs the same syncs.
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(26'686'000)/4, 424, 0, 320, 262, vdisp_start, vdisp_end);
+}
 
 void taitoz_state::contcirc(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);   /* 12 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitoz_state::contcirc_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitoz_state::irq6_line_hold));
@@ -3153,14 +3190,9 @@ void taitoz_state::contcirc(machine_config &config)
 	m_tc0040ioc->write_4_callback().set(FUNC(taitoz_state::coin_control_w));
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 3*8, 31*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 24, 248);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3176,7 +3208,7 @@ void taitoz_state::contcirc(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
 	SPEAKER(config, "rear").rear_center();
-	SPEAKER(config, "subwoofer").subwoofer();
+	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this speaker located?
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
@@ -3221,13 +3253,9 @@ void taitoz_state::chasehq(machine_config &config)
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
@@ -3243,7 +3271,7 @@ void taitoz_state::chasehq(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
 	SPEAKER(config, "rear").rear_center();
-	SPEAKER(config, "subwoofer").subwoofer();
+	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this speaker located?
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
@@ -3277,7 +3305,7 @@ void taitoz_state::enforce(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::enforce_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq6_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0040IOC(config, m_tc0040ioc, 0);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
@@ -3288,13 +3316,9 @@ void taitoz_state::enforce(machine_config &config)
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 31*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 24, 248);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3341,7 +3365,7 @@ void taitoz_state::bshark_base(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::bshark_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -3351,14 +3375,9 @@ void taitoz_state::bshark_base(machine_config &config)
 	m_tc0220ioc->write_4_callback().set(FUNC(taitoz_state::coin_control_w));
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_bshark));
-	screen.set_palette("palette");
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_bshark));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
@@ -3422,7 +3441,7 @@ void taitoz_state::sci(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::sci_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(3000);
+	config.set_maximum_quantum(attotime::from_hz(3000));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -3433,13 +3452,9 @@ void taitoz_state::sci(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_sci));
-	screen.set_palette("palette");
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_sci));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
@@ -3488,7 +3503,7 @@ void taitoz_state::nightstr(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::nightstr_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	adc0809_device &adc(ADC0809(config, "adc", 500000)); // clock unknown
 	adc.eoc_ff_callback().set_inputline("maincpu", 6);
@@ -3506,13 +3521,9 @@ void taitoz_state::nightstr(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
@@ -3528,7 +3539,7 @@ void taitoz_state::nightstr(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
 	SPEAKER(config, "rear").rear_center();
-	SPEAKER(config, "subwoofer").subwoofer();
+	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this located in the cabinet?
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
@@ -3562,7 +3573,7 @@ void taitoz_state::aquajack(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::aquajack_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(30000);
+	config.set_maximum_quantum(attotime::from_hz(30000));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -3573,13 +3584,9 @@ void taitoz_state::aquajack(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_aquajack));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_aquajack));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3645,13 +3652,9 @@ void taitoz_state::spacegun(machine_config &config)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_spacegun));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_spacegun));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3695,7 +3698,7 @@ void taitoz_state::dblaxle(machine_config &config)
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
 	// make quantum time to be a multiple of the xtal (fixes road layer stuck on continue)
-	config.m_minimum_quantum = attotime::from_hz(XTAL(32'000'000)/1024);
+	config.set_maximum_quantum(attotime::from_hz(XTAL(32'000'000)/1024));
 
 	TC0510NIO(config, m_tc0510nio, 0);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
@@ -3706,13 +3709,9 @@ void taitoz_state::dblaxle(machine_config &config)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_dblaxle));
-	screen.set_palette("palette");
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_dblaxle));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
@@ -3762,7 +3761,7 @@ void taitoz_state::racingb(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::racingb_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0510NIO(config, m_tc0510nio, 0);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
@@ -3773,13 +3772,9 @@ void taitoz_state::racingb(machine_config &config)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_racingb));
-	screen.set_palette("palette");
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_racingb));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
@@ -4647,13 +4642,16 @@ ROM_START( sci )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
 	ROM_LOAD( "c09-16.17", 0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )
+	ROM_LOAD( "c09-17.24", 0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) ) // same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-18.25", 0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) ) // same data also found on Racing Beat, Double Axle & Battle Shark
 	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // road/sprite priority and palette select
 	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
-//  ROM_LOAD( "c09-21.2",  0x00000, 0x00???, NO_DUMP ) /* pals (Guru dump) */
-//  ROM_LOAD( "c09-22.3",  0x00000, 0x00???, NO_DUMP )
-//  ROM_LOAD( "c09-24.22", 0x00000, 0x00???, NO_DUMP )
-//  ROM_LOAD( "c09-25.25", 0x00000, 0x00???, NO_DUMP )
-//  ROM_LOAD( "c09-26.26", 0x00000, 0x00???, NO_DUMP )
+	ROM_LOAD( "c09-19_pal16l8b.ic67", 0x00000, 0x00104, CRC(a0608442) SHA1(bcda5ef6582e82b2b369c24474bb14bd29e5d537) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-21_pal20l8b.ic2",  0x00000, 0x00144, CRC(583f9214) SHA1(1a5f3e9619bf6ba95f92ce9d12917014db8853a1) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-22_pal16l8b.ic3",  0x00000, 0x00104, CRC(b506d7a7) SHA1(603eb14d2703b94ae80894daa7f9f25890b7918c) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-24_pal20l8b.ic22", 0x00000, 0x00144, CRC(2ff83694) SHA1(c6594b1cfd3958d9b4ddb8d68d506929cfa0a759) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-25_pal20l8b.ic25", 0x00000, 0x00144, CRC(c69bf3fc) SHA1(83f1cc9f475aed47e969b77059f3332ef5068981) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-26_pal16l8b.ic26", 0x00000, 0x00104, CRC(36a8eb27) SHA1(8ec25c860e6568a3d1a7e7a8ed6a6397f135455c) ) // MMI PAL16L8B
 ROM_END
 
 ROM_START( scia )
@@ -4695,8 +4693,16 @@ ROM_START( scia )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
 	ROM_LOAD( "c09-16.17", 0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )
-	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // road/sprite priority and palette select
-	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
+	ROM_LOAD( "c09-17.24", 0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-18.25", 0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // AMD AM27S21 BPROM - road/sprite priority and palette select
+	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // AMD AM27S21 BPROM - road A/B internal priority
+	ROM_LOAD( "c09-19_pal16l8b.ic67", 0x00000, 0x00104, CRC(a0608442) SHA1(bcda5ef6582e82b2b369c24474bb14bd29e5d537) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-21_pal20l8b.ic2",  0x00000, 0x00144, CRC(583f9214) SHA1(1a5f3e9619bf6ba95f92ce9d12917014db8853a1) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-22_pal16l8b.ic3",  0x00000, 0x00104, CRC(b506d7a7) SHA1(603eb14d2703b94ae80894daa7f9f25890b7918c) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-24_pal20l8b.ic22", 0x00000, 0x00144, CRC(2ff83694) SHA1(c6594b1cfd3958d9b4ddb8d68d506929cfa0a759) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-25_pal20l8b.ic25", 0x00000, 0x00144, CRC(c69bf3fc) SHA1(83f1cc9f475aed47e969b77059f3332ef5068981) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-26_pal16l8b.ic26", 0x00000, 0x00104, CRC(36a8eb27) SHA1(8ec25c860e6568a3d1a7e7a8ed6a6397f135455c) ) // MMI PAL16L8B
 ROM_END
 
 ROM_START( scij )
@@ -4738,8 +4744,16 @@ ROM_START( scij )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
 	ROM_LOAD( "c09-16.17", 0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )
-	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // road/sprite priority and palette select
-	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
+	ROM_LOAD( "c09-17.24", 0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-18.25", 0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // AMD AM27S21 BPROM - road/sprite priority and palette select
+	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // AMD AM27S21 BPROM - road A/B internal priority
+	ROM_LOAD( "c09-19_pal16l8b.ic67", 0x00000, 0x00104, CRC(a0608442) SHA1(bcda5ef6582e82b2b369c24474bb14bd29e5d537) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-21_pal20l8b.ic2",  0x00000, 0x00144, CRC(583f9214) SHA1(1a5f3e9619bf6ba95f92ce9d12917014db8853a1) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-22_pal16l8b.ic3",  0x00000, 0x00104, CRC(b506d7a7) SHA1(603eb14d2703b94ae80894daa7f9f25890b7918c) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-24_pal20l8b.ic22", 0x00000, 0x00144, CRC(2ff83694) SHA1(c6594b1cfd3958d9b4ddb8d68d506929cfa0a759) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-25_pal20l8b.ic25", 0x00000, 0x00144, CRC(c69bf3fc) SHA1(83f1cc9f475aed47e969b77059f3332ef5068981) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-26_pal16l8b.ic26", 0x00000, 0x00104, CRC(36a8eb27) SHA1(8ec25c860e6568a3d1a7e7a8ed6a6397f135455c) ) // MMI PAL16L8B
 ROM_END
 
 ROM_START( sciu )
@@ -4781,8 +4795,16 @@ ROM_START( sciu )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
 	ROM_LOAD( "c09-16.17", 0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )
-	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // road/sprite priority and palette select
-	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
+	ROM_LOAD( "c09-17.24", 0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-18.25", 0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // AMD AM27S21 BPROM - road/sprite priority and palette select
+	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // AMD AM27S21 BPROM - road A/B internal priority
+	ROM_LOAD( "c09-19_pal16l8b.ic67", 0x00000, 0x00104, CRC(a0608442) SHA1(bcda5ef6582e82b2b369c24474bb14bd29e5d537) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-21_pal20l8b.ic2",  0x00000, 0x00144, CRC(583f9214) SHA1(1a5f3e9619bf6ba95f92ce9d12917014db8853a1) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-22_pal16l8b.ic3",  0x00000, 0x00104, CRC(b506d7a7) SHA1(603eb14d2703b94ae80894daa7f9f25890b7918c) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-24_pal20l8b.ic22", 0x00000, 0x00144, CRC(2ff83694) SHA1(c6594b1cfd3958d9b4ddb8d68d506929cfa0a759) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-25_pal20l8b.ic25", 0x00000, 0x00144, CRC(c69bf3fc) SHA1(83f1cc9f475aed47e969b77059f3332ef5068981) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-26_pal16l8b.ic26", 0x00000, 0x00104, CRC(36a8eb27) SHA1(8ec25c860e6568a3d1a7e7a8ed6a6397f135455c) ) // MMI PAL16L8B
 ROM_END
 
 ROM_START( scin )
@@ -4824,8 +4846,16 @@ ROM_START( scin )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
 	ROM_LOAD( "c09-16.17", 0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )
-	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // road/sprite priority and palette select
-	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
+	ROM_LOAD( "c09-17.24", 0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-18.25", 0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // AMD AM27S21 BPROM - road/sprite priority and palette select
+	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // AMD AM27S21 BPROM - road A/B internal priority
+	ROM_LOAD( "c09-19_pal16l8b.ic67", 0x00000, 0x00104, CRC(a0608442) SHA1(bcda5ef6582e82b2b369c24474bb14bd29e5d537) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-21_pal20l8b.ic2",  0x00000, 0x00144, CRC(583f9214) SHA1(1a5f3e9619bf6ba95f92ce9d12917014db8853a1) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-22_pal16l8b.ic3",  0x00000, 0x00104, CRC(b506d7a7) SHA1(603eb14d2703b94ae80894daa7f9f25890b7918c) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-24_pal20l8b.ic22", 0x00000, 0x00144, CRC(2ff83694) SHA1(c6594b1cfd3958d9b4ddb8d68d506929cfa0a759) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-25_pal20l8b.ic25", 0x00000, 0x00144, CRC(c69bf3fc) SHA1(83f1cc9f475aed47e969b77059f3332ef5068981) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-26_pal16l8b.ic26", 0x00000, 0x00104, CRC(36a8eb27) SHA1(8ec25c860e6568a3d1a7e7a8ed6a6397f135455c) ) // MMI PAL16L8B
 
 ROM_END
 
@@ -5519,7 +5549,7 @@ GAMEL(1988, chasehqu,   chasehq,  chasehq,   chasehq,   taitoz_state, empty_init
 
 GAME( 1988, enforce,    0,        enforce,   enforce,   taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Enforce (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, enforcej,   enforce,  enforce,   enforcej,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Enforce (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, enforceja,  enforce,  enforce,   enforceja, taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Enforce (Japan, Analog Controls)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1988, enforceja,  enforce,  enforce,  enforceja, taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Enforce (Japan, Analog Controls)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_enforce )
 
 GAME( 1989, bshark,     0,        bshark,    bshark,    taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Battle Shark (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bsharku,    bshark,   bshark,    bsharku,   taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

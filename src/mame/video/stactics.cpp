@@ -119,7 +119,7 @@ WRITE8_MEMBER(stactics_state::scroll_ram_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_frame_count_d3)
+READ_LINE_MEMBER(stactics_state::frame_count_d3_r)
 {
 	return (m_frame_count >> 3) & 0x01;
 }
@@ -169,13 +169,13 @@ WRITE8_MEMBER(stactics_state::shot_flag_clear_w)
 }
 
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_shot_standby)
+READ_LINE_MEMBER(stactics_state::shot_standby_r)
 {
 	return m_shot_standby;
 }
 
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_not_shot_arrive)
+READ_LINE_MEMBER(stactics_state::not_shot_arrive_r)
 {
 	return !m_shot_arrive;
 }

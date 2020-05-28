@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Cart pinout:
+
+Glob up, edge connector towards you. Odd pins 1-47 on top, right to left.
+Even pins 2-48 on bottom, pin 2 under pin 1, pin 48 under pin 47.
+
+1  GND           2  GND
+3  A1            4  A0
+5  A3            6  A2
+7  A5            8  A4
+9  A7            10 A6
+11 A18           12 A17
+13 A20           14 A21
+15 A8            16 A19
+17 A10           18 A9
+19 A12           20 A11
+21 A14           22 A13
+23 A16           24 A15
+25 /OE           26 GND
+27 VCC (3.3v)    28 GND
+29 N/C           30 N/C
+31 D7            32 D15
+33 D6            34 D14
+35 D5            36 D13
+37 D4            38 D12
+39 D3            40 D11
+41 D2            42 D10
+43 D1            44 D9
+45 D0            46 D8
+47 to pin 48     48 to pin 47
+
+
+Undumped carts:
+
+-Power Ranger Mystic Force - Whispering Voices / Code Busters (USA) (might match the dumped UK sourced cart)
+-Cenerentola - Cenerentola / Cenerentola Bellezze in Fiore (Italy)
+-Il Re Reone - Il Re Leone / Il Re Leone 2: Il Regno di Simba (Italy)
+-Winnie the Pooh - Salta Tigro, salta! / Winnie the Pooh l'orsetto goloso (Italy)
+
+- Portuguese carts?
+
+-->
+
+<softwarelist name="telestory_cart" description="JAKKS Pacific Telestory cartridges">
+
+	<software name="cinders" supported="no"> <!-- single story, but in both Spanish and English -->
+		<description>La Cenicienta - Bellezas en Flor / Cinderella - Beauties in Bloom (Spain)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / Handheld Games</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="telestorycinderellasp.bin" size="0x400000" crc="e1b2fd69" sha1="0f3109f30672dacbf52668d485eeed51829993a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohs" supported="no"> <!-- single story, but in both Spanish and English -->
+		<description>Winnie the Pooh - Salta, Tigger, Salta / Winnie the Pooh - Bounce, Tigger, Bounce (Spain)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / Handheld Games</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="telestorypoohsp.bin" size="0x400000" crc="f0ef00e8" sha1="bc407c127a64f6b5cfcf3239f1af3d7896d5a6c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkings" supported="no"> <!-- single story, but in both Spanish and English -->
+		<description>El Rey León II - El orgullo de Simba / The Lion King II - Simba's Pride (Spain)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / Handheld Games</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestorylionkingsp.bin" size="0x800000" crc="459ed493" sha1="8528d4fd5d4a7ff457935d618527621b8ec2a100"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doras" supported="no"> <!-- two stories, both in Spanish --> <!-- from a UK sourced cartridge, English and Spanish text on cart, but game appears to be entirely in Spanish -->
+		<description>Dora the Explorer - En la feria ambulante / Dora va a la escuela (Spanish)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / HotGen</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestory_dora.bin" size="0x400000" crc="79334d40" sha1="8e326e14f16fc93e494afdb2557ffdf751b7faf8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prmystic" supported="no"> <!-- from a UK sourced cartridge, check if it differs to US -->
+		<description>Power Rangers Mystic Force - Code Busters / Whispering Voices (UK / USA?)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / HotGen</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestory_powerrangers.bin" size="0x800000" crc="6da57a64" sha1="3f2d22188baefee07b11e7cd986188533a5faa4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooh" supported="no">
+		<description>Winnie the Pooh - Bounce Tigger Bounce / Pooh's Honey Tree (USA)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / Handheld Games</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="telestorypooh.bin" size="0x400000" crc="a05653ab" sha1="e9d13ba57e9d6bf1e1e2a1e0eef52be74db35637"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinder" supported="no">
+		<description>Cinderella - Cinderella / Beauties in Bloom (USA)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / Handheld Games</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestorycinderella.bin" size="0x800000" crc="c95f6cad" sha1="5f361480cbd4f12aacaaed55da113065fd4308d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking" supported="no">
+		<description>The Lion King - The Lion King / The Lion King II - Simba's Pride (USA)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / Handheld Games</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestorylionking.bin" size="0x800000" crc="f8ea0ee9" sha1="f63d9637c3ae715e89760d8a39c828f73d26d397"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dora" supported="no">
+		<description>Dora the Explorer - At the Carnival / Dora Goes to School (USA)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / HotGen</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="telestorydora.bin" size="0x400000" crc="8221c5ec" sha1="77ebe2d351cab78db82a0d88bcdfd25e0b1bf084"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongeb" supported="no">
+		<description>SpongeBob SquarePants - Ice-Cream Dreams / Stop the Presses! (USA)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / HotGen</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestoryspongebob.bin" size="0x800000" crc="fe969a30" sha1="05945f07ad45032328336b8d10475d06553507fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomas" supported="no">
+		<description>Thomas &amp; Friends - Thomas Visits the Toy Shop / Thomas' Milkshake Mix</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / HotGen</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestory_thomasvisitstoyshop_milkshakemix.bin" size="0x800000" crc="4b99c75d" sha1="a3885e435b0bf5a87f3952da2880c36d118af17e"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

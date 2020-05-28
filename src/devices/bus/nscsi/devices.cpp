@@ -9,6 +9,7 @@
 #include "bus/nscsi/cw7501.h"
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/s1410.h"
+#include "bus/nscsi/smoc501.h"
 
 void default_scsi_devices(device_slot_interface &device)
 {
@@ -19,4 +20,5 @@ void default_scsi_devices(device_slot_interface &device)
 	device.option_add("cdr4210", CDR4210);
 	device.option_add("cdrn820s", CDRN820S);
 	device.option_add("cdd2000", CDD2000);
+	device.option_add("smoc501", SMOC501);
 };

@@ -1,278 +1,283 @@
-// license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// license: BSD-3-Clause
+// copyright-holders: Angelo Salese, Dirk Best
 /***************************************************************************
 
     Casio FP-6000
 
-    preliminary driver by Angelo Salese
-
     TODO:
-    - keyboard;
-    - fdc / cmt;
+    - Fix cassette (SAVE is at 300 baud Kansas City format, loadable
+      on the super80, but LOAD throws RW error).
+    - Floppy/HDD
+    - Printer
     - gvram color pen is a rather crude guess (the layer is monochrome on
       BASIC?);
     - everything else
-
-    Debug trick for the keyboard:
-    - bp 0xfc93e, ip+=2 then define al = ASCII code
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "video/mc6845.h"
+#include "sound/spkrdev.h"
+#include "bus/centronics/ctronics.h"
+#include "machine/fp6000_kbd.h"
+#include "imagedev/cassette.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 class fp6000_state : public driver_device
 {
 public:
 	fp6000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_gvram(*this, "gvram"),
-		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
+		m_pic(*this, "pic"),
+		m_pit(*this, "pit"),
 		m_crtc(*this, "crtc"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_speaker(*this, "speaker"),
+		m_cassette(*this, "cassette"),
+		m_centronics(*this, "centronics"),
+		m_gvram(*this, "gvram"),
+		m_vram(*this, "vram"),
+		m_pcg(*this, "pcg")
 	{ }
 
 	void fp6000(machine_config &config);
 
-private:
-	uint8_t *m_char_rom;
-	required_shared_ptr<uint16_t> m_gvram;
-	required_shared_ptr<uint16_t> m_vram;
-	uint8_t m_crtc_vreg[0x100],m_crtc_index;
-
-	struct {
-		uint16_t cmd;
-	}m_key;
-	DECLARE_READ8_MEMBER(fp6000_pcg_r);
-	DECLARE_WRITE8_MEMBER(fp6000_pcg_w);
-	DECLARE_WRITE8_MEMBER(fp6000_6845_address_w);
-	DECLARE_WRITE8_MEMBER(fp6000_6845_data_w);
-	DECLARE_READ8_MEMBER(fp6000_key_r);
-	DECLARE_WRITE8_MEMBER(fp6000_key_w);
-	DECLARE_READ16_MEMBER(unk_r);
-	DECLARE_READ16_MEMBER(ex_board_r);
-	DECLARE_READ16_MEMBER(pit_r);
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_fp6000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	required_device<cpu_device> m_maincpu;
+	required_device<pic8259_device> m_pic;
+	required_device<pit8253_device> m_pit;
 	required_device<mc6845_device>m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cassette;
+	required_device<centronics_device> m_centronics;
+
+	required_shared_ptr<uint16_t> m_gvram;
+	required_shared_ptr<uint16_t> m_vram;
+	required_shared_ptr<uint16_t> m_pcg;
+
 	void fp6000_io(address_map &map);
 	void fp6000_map(address_map &map);
+
+	emu_timer *m_pit_timer;
+	void pit_timer0_w(int state);
+	TIMER_CALLBACK_MEMBER(pit_timer0_clear);
+	void pit_timer2_w(int state);
+
+	uint8_t port_08_r();
+	void port_08_w(uint8_t data);
+	uint8_t port_09_r();
+	void port_09_w(uint8_t data);
+	void port_0a_w(uint8_t data);
+	uint8_t port_0b_r();
+	void port_0b_w(uint8_t data);
+	uint8_t port_0c_r();
+	void port_0c_w(uint8_t data);
+	uint8_t port_0d_r();
+	void port_0d_w(uint8_t data);
+	uint8_t port_0e_r();
+	uint8_t port_0f_r();
+	void port_0f_w(uint8_t data);
+
+	MC6845_UPDATE_ROW(crtc_update_row);
+	uint16_t unk_r();
+
+	void centronics_busy_w(int state) { m_centronics_busy = state; };
+	void centronics_fault_w(int state) { m_centronics_fault = state; };
+	void centronics_perror_w(int state) { m_centronics_perror = state; };
+
+	uint8_t m_port_0a;
+
+	int m_centronics_busy;
+	int m_centronics_fault;
+	int m_centronics_perror;
 };
 
-void fp6000_state::video_start()
-{
-}
 
-#define mc6845_h_char_total     (m_crtc_vreg[0])
-#define mc6845_h_display        (m_crtc_vreg[1])
-#define mc6845_h_sync_pos       (m_crtc_vreg[2])
-#define mc6845_sync_width       (m_crtc_vreg[3])
-#define mc6845_v_char_total     (m_crtc_vreg[4])
-#define mc6845_v_total_adj      (m_crtc_vreg[5])
-#define mc6845_v_display        (m_crtc_vreg[6])
-#define mc6845_v_sync_pos       (m_crtc_vreg[7])
-#define mc6845_mode_ctrl        (m_crtc_vreg[8])
-#define mc6845_tile_height      (m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start   (m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end     (m_crtc_vreg[0x0b])
-#define mc6845_start_addr       (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr      (((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
-
-
-uint32_t fp6000_state::screen_update_fp6000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int x,y;
-	int xi,yi;
-	uint8_t *gfx_rom = memregion("pcg")->base();
-	uint32_t count;
-
-	count = 0;
-
-	for(y=0;y<400;y++)
-	{
-		for(x=0;x<640/4;x++)
-		{
-			for(xi=0;xi<4;xi++)
-			{
-				int dot = (m_gvram[count] >> (12-xi*4)) & 0xf;
-
-				if(y < 400 && x*4+xi < 640) /* TODO: safety check */
-					bitmap.pix16(y, x*4+xi) = m_palette->pen(dot);
-			}
-
-			count++;
-		}
-	}
-
-	for(y=0;y<mc6845_v_display;y++)
-	{
-		for(x=0;x<mc6845_h_display;x++)
-		{
-			int tile = m_vram[x+y*mc6845_h_display] & 0xff;
-			int color = (m_vram[x+y*mc6845_h_display] & 0x700) >> 8;
-			int pen;
-
-			for(yi=0;yi<mc6845_tile_height;yi++)
-			{
-				for(xi=0;xi<8;xi++)
-				{
-					pen = (gfx_rom[tile*16+yi] >> (7-xi) & 1) ? color : -1;
-
-					if(pen != -1)
-						if(y*mc6845_tile_height < 400 && x*8+xi < 640) /* TODO: safety check */
-							bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(pen);
-				}
-			}
-		}
-	}
-
-	/* quick and dirty way to do the cursor */
-	for(yi=0;yi<mc6845_tile_height;yi++)
-	{
-		for(xi=0;xi<8;xi++)
-		{
-			if(mc6845_h_display)
-			{
-				x = mc6845_cursor_addr % mc6845_h_display;
-				y = mc6845_cursor_addr / mc6845_h_display;
-				bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(7);
-			}
-		}
-	}
-
-	return 0;
-}
-
-READ8_MEMBER(fp6000_state::fp6000_pcg_r)
-{
-	return m_char_rom[offset];
-}
-
-WRITE8_MEMBER(fp6000_state::fp6000_pcg_w)
-{
-	m_char_rom[offset] = data;
-	m_gfxdecode->gfx(0)->mark_dirty(offset >> 4);
-}
-
-WRITE8_MEMBER(fp6000_state::fp6000_6845_address_w)
-{
-	m_crtc_index = data;
-	m_crtc->address_w(data);
-}
-
-WRITE8_MEMBER(fp6000_state::fp6000_6845_data_w)
-{
-	m_crtc_vreg[m_crtc_index] = data;
-	m_crtc->register_w(data);
-}
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
 
 void fp6000_state::fp6000_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0xbffff).ram();
-	map(0xc0000, 0xdffff).ram().share("gvram");//gvram
+	map(0xc0000, 0xdffff).ram().share("gvram");
 	map(0xe0000, 0xe0fff).ram().share("vram");
-	map(0xe7000, 0xe7fff).rw(FUNC(fp6000_state::fp6000_pcg_r), FUNC(fp6000_state::fp6000_pcg_w));
+	map(0xe7000, 0xe7fff).ram().share("pcg");
 	map(0xf0000, 0xfffff).rom().region("ipl", 0);
-}
-
-/* Hack until I understand what UART is this one ... */
-READ8_MEMBER(fp6000_state::fp6000_key_r)
-{
-	if(offset)
-	{
-		switch(m_key.cmd)
-		{
-			case 0x7e15: return 3;
-			case 0x1b15: return 1;
-			case 0x2415: return 0;
-			default: printf("%04x\n",m_key.cmd);
-		}
-		return 0;
-	}
-
-	return 0x40;
-}
-
-WRITE8_MEMBER(fp6000_state::fp6000_key_w)
-{
-	if(offset)
-		m_key.cmd = (data & 0xff) | (m_key.cmd << 8);
-	else
-		m_key.cmd = (data << 8) | (m_key.cmd & 0xff);
-}
-
-READ16_MEMBER(fp6000_state::unk_r)
-{
-	return 0x40;
-}
-
-READ16_MEMBER(fp6000_state::ex_board_r)
-{
-	return 0xffff;
-}
-
-READ16_MEMBER(fp6000_state::pit_r)
-{
-	return machine().rand();
 }
 
 void fp6000_state::fp6000_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x08, 0x09).r(FUNC(fp6000_state::ex_board_r)); // BIOS of some sort ...
-	map(0x0a, 0x0b).portr("DSW"); // installed RAM id?
-	map(0x10, 0x11).nopr();
-	map(0x20, 0x23).rw(FUNC(fp6000_state::fp6000_key_r), FUNC(fp6000_state::fp6000_key_w)).umask16(0x00ff);
-	map(0x38, 0x39).r(FUNC(fp6000_state::pit_r)); // pit?
-	map(0x70, 0x70).w(FUNC(fp6000_state::fp6000_6845_address_w));
-	map(0x72, 0x72).w(FUNC(fp6000_state::fp6000_6845_data_w));
+	map(0x08, 0x08).r(FUNC(fp6000_state::port_08_r));
+	map(0x08, 0x08).w(FUNC(fp6000_state::port_08_w));
+	map(0x09, 0x09).r(FUNC(fp6000_state::port_09_r));
+	map(0x09, 0x09).w(FUNC(fp6000_state::port_09_w));
+	map(0x0a, 0x0a).lr8(NAME([this] () { return ioport("cpudsw")->read(); }));
+	map(0x0a, 0x0a).w(FUNC(fp6000_state::port_0a_w));
+	map(0x0b, 0x0b).r(FUNC(fp6000_state::port_0b_r));
+	map(0x0b, 0x0b).w(FUNC(fp6000_state::port_0b_w));
+	map(0x0c, 0x0c).r(FUNC(fp6000_state::port_0c_r));
+	map(0x0c, 0x0c).w(FUNC(fp6000_state::port_0c_w));
+	map(0x0d, 0x0d).r(FUNC(fp6000_state::port_0d_r));
+	map(0x0d, 0x0d).w(FUNC(fp6000_state::port_0d_w));
+	map(0x0e, 0x0e).r(FUNC(fp6000_state::port_0e_r));
+	map(0x0e, 0x0e).w("centronics_data_out", FUNC(output_latch_device::write));
+	map(0x0f, 0x0f).r(FUNC(fp6000_state::port_0f_r));
+	map(0x0f, 0x0f).w(FUNC(fp6000_state::port_0f_w));
+	// 10-17 floppy?
+	map(0x14, 0x14).lr8(NAME([this] () { return ioport("floppydsw")->read(); }));
+	map(0x20, 0x23).rw("keyboard", FUNC(fp6000_kbd_device::read), FUNC(fp6000_kbd_device::write)).umask16(0x00ff);
+	map(0x30, 0x33).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x38, 0x3f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	// 50-5f dma?
+	map(0x70, 0x70).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x72, 0x72).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x74, 0x75).r(FUNC(fp6000_state::unk_r)); //bit 6 busy flag
 }
 
-/* Input ports */
+
+//**************************************************************************
+//  INPUT PORT DEFINITIONS
+//**************************************************************************
+
 static INPUT_PORTS_START( fp6000 )
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "DSW" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xe0, 0x40, "Installed RAM banks" )
-	PORT_DIPSETTING(    0xe0, "0" )
-	PORT_DIPSETTING(    0xc0, "1" )
-	PORT_DIPSETTING(    0xa0, "2" )
-	PORT_DIPSETTING(    0x80, "3" )
-	PORT_DIPSETTING(    0x60, "4" )
-	PORT_DIPSETTING(    0x40, "5" )
-	PORT_DIPSETTING(    0x20, "6 (INVALID)" ) //exceeds 768KB limit (writes to gvram et al)
-	PORT_DIPSETTING(    0x00, "7 (INVALID)" )
+	PORT_START("cpudsw")
+	PORT_DIPNAME(0x1f, 0x1e, "Printer type")
+	PORT_DIPSETTING(   0x1f, "0")
+	PORT_DIPSETTING(   0x1e, "1")
+	PORT_DIPSETTING(   0x1d, "2")
+	PORT_DIPSETTING(   0x1c, "3")
+	PORT_DIPSETTING(   0x1b, "4")
+	PORT_DIPSETTING(   0x1a, "5")
+	PORT_DIPSETTING(   0x19, "6")
+	PORT_DIPSETTING(   0x18, "7")
+	PORT_DIPSETTING(   0x17, "8")
+	PORT_DIPSETTING(   0x16, "9")
+	PORT_DIPSETTING(   0x15, "10")
+	PORT_DIPSETTING(   0x14, "11")
+	PORT_DIPSETTING(   0x13, "12")
+	PORT_DIPSETTING(   0x12, "13")
+	PORT_DIPSETTING(   0x11, "14")
+	PORT_DIPSETTING(   0x10, "15")
+	PORT_DIPSETTING(   0x0f, "16")
+	PORT_DIPSETTING(   0x0e, "17")
+	PORT_DIPSETTING(   0x0d, "18")
+	PORT_DIPSETTING(   0x0c, "19")
+	PORT_DIPSETTING(   0x0b, "20")
+	PORT_DIPSETTING(   0x0a, "21")
+	PORT_DIPSETTING(   0x09, "22")
+	PORT_DIPSETTING(   0x08, "23")
+	PORT_DIPSETTING(   0x07, "24")
+	PORT_DIPSETTING(   0x06, "25")
+	PORT_DIPSETTING(   0x05, "26")
+	PORT_DIPSETTING(   0x04, "27")
+	PORT_DIPSETTING(   0x03, "28")
+	PORT_DIPSETTING(   0x02, "29")
+	PORT_DIPSETTING(   0x01, "30")
+	PORT_DIPSETTING(   0x00, "31")
+	PORT_DIPNAME(0xe0, 0x40, "Installed RAM banks")
+	PORT_DIPSETTING(   0xe0, "0")
+	PORT_DIPSETTING(   0xc0, "1")
+	PORT_DIPSETTING(   0xa0, "2")
+	PORT_DIPSETTING(   0x80, "3")
+	PORT_DIPSETTING(   0x60, "4")
+	PORT_DIPSETTING(   0x40, "5")
+	PORT_DIPSETTING(   0x20, "6 (INVALID)") // exceeds 768KB limit (writes to gvram et al)
+	PORT_DIPSETTING(   0x00, "7 (INVALID)")
+
+	PORT_START("floppydsw")
+	PORT_DIPNAME(0x07, 0x07, "Floppy type?")
+	PORT_DIPSETTING(   0x07, DEF_STR( None ))
+	PORT_DIPSETTING(   0x06, "1")
+	PORT_DIPSETTING(   0x05, "2")
+	PORT_DIPSETTING(   0x04, "3")
+	PORT_DIPSETTING(   0x03, "4")
+	PORT_DIPSETTING(   0x02, "5")
+	PORT_DIPSETTING(   0x01, "6")
+	PORT_DIPSETTING(   0x00, "7")
+	PORT_DIPUNKNOWN(0x08, 0x08)
+	PORT_DIPUNKNOWN(0x10, 0x10)
+	PORT_DIPUNKNOWN(0x20, 0x20)
+	PORT_DIPUNKNOWN(0x40, 0x40)
+	PORT_DIPUNKNOWN(0x80, 0x80)
 INPUT_PORTS_END
 
-static const gfx_layout fp6000_charlayout =
+
+//**************************************************************************
+//  VIDEO EMULATION
+//**************************************************************************
+
+uint16_t fp6000_state::unk_r()
+{
+	// 7-------
+	// -6------  ?
+	// --5-----
+	// ---4----
+	// ----3---
+	// -----2--
+	// ------1-  screen lines: 0=200, 1=400
+	// -------0
+
+	return 0x40;
+}
+
+MC6845_UPDATE_ROW( fp6000_state::crtc_update_row )
+{
+	const pen_t *pen = m_palette->pens();
+	uint8_t *pcg = reinterpret_cast<uint8_t *>(m_pcg.target());
+	uint32_t *vram = reinterpret_cast<uint32_t *>(m_gvram.target());
+
+	for (int x = 0; x < x_count; x++)
+	{
+		// text mode
+		uint8_t code = (m_vram[ma + x] >> 0) & 0xff;
+		uint8_t color = (m_vram[ma + x] >> 8) & 0x0f;
+		uint8_t gfx = pcg[(code << 4) | ra];
+
+		// cursor?
+		if (x == cursor_x)
+			gfx = 0xff;
+
+		// draw 8 pixels of the character
+		for (int i = 0; i < 8; i++)
+			bitmap.pix32(y, x * 8 + i) = BIT(gfx, 7 - i) ? pen[color] : 0;
+
+		// graphics
+		uint32_t data = vram[(ma << 3) + (ra * x_count) + x];
+
+		// draw 8 gfx pixels
+		if ((data >> 12) & 0x0f) bitmap.pix32(y, x * 8 + 0) = pen[(data >> 12) & 0x0f];
+		if ((data >>  8) & 0x0f) bitmap.pix32(y, x * 8 + 1) = pen[(data >>  8) & 0x0f];
+		if ((data >>  4) & 0x0f) bitmap.pix32(y, x * 8 + 2) = pen[(data >>  4) & 0x0f];
+		if ((data >>  0) & 0x0f) bitmap.pix32(y, x * 8 + 3) = pen[(data >>  0) & 0x0f];
+		if ((data >> 28) & 0x0f) bitmap.pix32(y, x * 8 + 4) = pen[(data >> 28) & 0x0f];
+		if ((data >> 24) & 0x0f) bitmap.pix32(y, x * 8 + 5) = pen[(data >> 24) & 0x0f];
+		if ((data >> 20) & 0x0f) bitmap.pix32(y, x * 8 + 6) = pen[(data >> 20) & 0x0f];
+		if ((data >> 16) & 0x0f) bitmap.pix32(y, x * 8 + 7) = pen[(data >> 16) & 0x0f];
+	}
+}
+
+static const gfx_layout charlayout =
 {
 	8, 16,
 	RGN_FRAC(1,1),
@@ -283,58 +288,242 @@ static const gfx_layout fp6000_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( gfx_fp6000 )
-	GFXDECODE_ENTRY( "pcg", 0x0000, fp6000_charlayout, 0, 1 )
+static GFXDECODE_START( gfx )
+	GFXDECODE_RAM("pcg", 0, charlayout, 0, 1)
 GFXDECODE_END
 
 
+//**************************************************************************
+//  MACHINE EMULATION
+//**************************************************************************
+
+// 7-------  option rom available (1=no)
+// -654----  unknown
+// ----3---  cassette in
+// -----21-  unknown
+// -------0  cassette motor
+
+uint8_t fp6000_state::port_08_r()
+{
+	uint8_t data = 0;
+
+	data |= 0x80; // no option rom
+	data |= (m_cassette->input() > 0 ? 0x00 : 0x08);
+
+	return data;
+}
+
+void fp6000_state::port_08_w(uint8_t data)
+{
+	logerror("port_08 write %02x\n", data);
+
+	m_cassette->change_state(BIT(data, 0) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+}
+
+uint8_t fp6000_state::port_09_r()
+{
+	logerror("port_09 read\n");
+	return 0xff;
+}
+
+void fp6000_state::port_09_w(uint8_t data)
+{
+	logerror("port_09 write %02x\n", data);
+}
+
+void fp6000_state::port_0a_w(uint8_t data)
+{
+	// 7-------  speaker/cassette output select
+	// -6543210  unknown
+
+	logerror("port_0a write %02x\n", data);
+
+	m_port_0a = data;
+}
+
+uint8_t fp6000_state::port_0b_r()
+{
+	logerror("port_0b read\n");
+	return 0xff;
+}
+
+void fp6000_state::port_0b_w(uint8_t data)
+{
+	// printer control?
+	logerror("port_0b write %02x\n", data);
+	m_pic->ir7_w(1); // ?
+}
+
+uint8_t fp6000_state::port_0c_r()
+{
+	logerror("port_0c read\n");
+	return 0xff;
+}
+
+void fp6000_state::port_0c_w(uint8_t data)
+{
+	// 7-------  unknown
+	// -6------  pit timer2 gate?
+	// --543210  unknown
+
+	logerror("port_0c write %02x\n", data);
+}
+
+uint8_t fp6000_state::port_0d_r()
+{
+	logerror("port_0d read\n");
+	return 0xff;
+}
+
+void fp6000_state::port_0d_w(uint8_t data)
+{
+	// after writing printer data
+	logerror("port_0d write %02x\n", data);
+
+	// ?
+	m_centronics->write_strobe(1);
+	m_centronics->write_strobe(0);
+}
+
+uint8_t fp6000_state::port_0e_r()
+{
+	uint8_t data = 0;
+
+	// 765-----  unknown
+	// ---4321-  printer status lines
+	// -------0  printer busy
+
+	logerror("port_0e read\n");
+
+	data |= m_centronics_perror << 2; // guess
+	data |= m_centronics_fault << 1; // guess
+	data |= m_centronics_busy << 0;
+
+	return data;
+}
+
+uint8_t fp6000_state::port_0f_r()
+{
+	// read at end of timer interrupt routine, result discarded
+	return 0xff;
+}
+
+void fp6000_state::port_0f_w(uint8_t data)
+{
+	logerror("port_0f write %02x\n", data);
+	m_pic->ir7_w(0); // ?
+}
+
+void fp6000_state::pit_timer0_w(int state)
+{
+	// work around pit issue, it issues set and clear at the same time,
+	// leaving the pic no time to react
+	if (state)
+		m_pic->ir0_w(1);
+	else
+		m_pit_timer->adjust(attotime::from_hz(100000)); // timing?
+}
+
+TIMER_CALLBACK_MEMBER(fp6000_state::pit_timer0_clear)
+{
+	m_pic->ir0_w(0);
+}
+
+void fp6000_state::pit_timer2_w(int state)
+{
+	if (BIT(m_port_0a, 7))
+		m_speaker->level_w(state);
+	else
+		m_cassette->output(state ? -1.0 : +1.0);
+}
+
 void fp6000_state::machine_start()
 {
-	m_char_rom = memregion("pcg")->base();
+	m_pit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fp6000_state::pit_timer0_clear), this));
 }
 
 void fp6000_state::machine_reset()
 {
 }
 
+
+//**************************************************************************
+//  MACHINE DEFINTIONS
+//**************************************************************************
+
 void fp6000_state::fp6000(machine_config &config)
 {
-	/* basic machine hardware */
-	I8086(config, m_maincpu, 16000000/2);
+	I8086(config, m_maincpu, 16000000 / 2); // 8 Mhz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &fp6000_state::fp6000_map);
 	m_maincpu->set_addrmap(AS_IO, &fp6000_state::fp6000_io);
+	m_maincpu->set_irq_acknowledge_callback(m_pic, FUNC(pic8259_device::inta_cb));
 
-	/* video hardware */
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(16000000 / 16); // 1 MHz
+	m_pit->out_handler<0>().set(FUNC(fp6000_state::pit_timer0_w)).invert();
+	m_pit->set_clk<2>(16000000 / 8); // 2 MHz?
+	m_pit->out_handler<2>().set(FUNC(fp6000_state::pit_timer2_w));
+
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 480);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(fp6000_state::screen_update_fp6000));
-	screen.set_palette(m_palette);
+	screen.set_raw(16000000, 1024, 0, 640, 272, 0, 200); // 16 MHz?
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MC6845(config, m_crtc, 16000000/5);    /* unknown variant, unknown clock, hand tuned to get ~60 fps */
+	MC6845(config, m_crtc, 16000000 / 8); // unknown variant, 2 MHz?
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(fp6000_state::crtc_update_row));
 
-	PALETTE(config, m_palette).set_entries(8);
+	PALETTE(config, m_palette).set_entries(16);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fp6000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx);	
+
+	// audio hardware
+	SPEAKER(config, "mono").front_center();
+
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	// keyboard
+	fp6000_kbd_device &keyboard(FP6000_KBD(config, "keyboard"));
+	keyboard.int_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
+
+	// cassette
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	// centronics printer
+	output_latch_device &centronics_data_out(OUTPUT_LATCH(config, "centronics_data_out"));
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_output_latch(centronics_data_out);
+	m_centronics->ack_handler().set(m_pic, FUNC(pic8259_device::ir7_w)).invert();
+	m_centronics->busy_handler().set(FUNC(fp6000_state::centronics_busy_w));
+	m_centronics->fault_handler().set(FUNC(fp6000_state::centronics_fault_w));
+	m_centronics->perror_handler().set(FUNC(fp6000_state::centronics_perror_w));
 }
 
-/* ROM definition */
+
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
+
 ROM_START( fp6000 )
-	ROM_REGION( 0x10000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "ipl.rom", 0x0000, 0x10000, CRC(c72fe40a) SHA1(0e4c60dc27f6c7f461c4bc382b81602b3327a7a4))
+	ROM_REGION16_LE(0x10000, "ipl", 0)
+	ROM_LOAD("ipl.rom", 0x0000, 0x10000, CRC(c72fe40a) SHA1(0e4c60dc27f6c7f461c4bc382b81602b3327a7a4))
 
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
-	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP ) //unknown MCU type
-
-	ROM_REGION( 0x10000, "pcg", ROMREGION_ERASE00 )
+	ROM_REGION(0x1000, "mcu", 0)
+	ROM_LOAD("mcu", 0x0000, 0x1000, NO_DUMP) // unknown MCU type
 ROM_END
 
-/* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS */
-COMP( 1985, fp6000, 0,      0,      fp6000,  fp6000, fp6000_state, empty_init, "Casio", "FP-6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//**************************************************************************
+//  SYSTEM DRIVERS
+//**************************************************************************
+
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT         COMPANY  FULLNAME   FLAGS
+COMP( 1985, fp6000, 0,      0,      fp6000,  fp6000, fp6000_state, empty_init, "Casio", "FP-6000", MACHINE_NOT_WORKING )

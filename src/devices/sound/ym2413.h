@@ -32,58 +32,58 @@ protected:
 private:
 	struct OPLL_SLOT
 	{
-		uint32_t  ar;         /* attack rate: AR<<2           */
-		uint32_t  dr;         /* decay rate:  DR<<2           */
-		uint32_t  rr;         /* release rate:RR<<2           */
-		uint8_t   KSR;        /* key scale rate               */
-		uint8_t   ksl;        /* keyscale level               */
-		uint8_t   ksr;        /* key scale rate: kcode>>KSR   */
-		uint8_t   mul;        /* multiple: mul_tab[ML]        */
+		uint32_t  ar = 0;         /* attack rate: AR<<2           */
+		uint32_t  dr = 0;         /* decay rate:  DR<<2           */
+		uint32_t  rr = 0;         /* release rate:RR<<2           */
+		uint8_t   KSR = 0;        /* key scale rate               */
+		uint8_t   ksl = 0;        /* keyscale level               */
+		uint8_t   ksr = 0;        /* key scale rate: kcode>>KSR   */
+		uint8_t   mul = 0;        /* multiple: mul_tab[ML]        */
 
 		/* Phase Generator */
-		uint32_t  phase;      /* frequency counter            */
-		uint32_t  freq;       /* frequency counter step       */
-		uint8_t   fb_shift;   /* feedback shift value         */
-		int32_t   op1_out[2]; /* slot1 output for feedback    */
+		uint32_t  phase = 0;      /* frequency counter            */
+		uint32_t  freq = 0;       /* frequency counter step       */
+		uint8_t   fb_shift = 0;   /* feedback shift value         */
+		int32_t   op1_out[2] = { 0, 0 }; /* slot1 output for feedback    */
 
 		/* Envelope Generator */
-		uint8_t   eg_type;    /* percussive/nonpercussive mode*/
-		uint8_t   state;      /* phase type                   */
-		uint32_t  TL;         /* total level: TL << 2         */
-		int32_t   TLL;        /* adjusted now TL              */
-		int32_t   volume;     /* envelope counter             */
-		uint32_t  sl;         /* sustain level: sl_tab[SL]    */
+		uint8_t   eg_type = 0;    /* percussive/nonpercussive mode*/
+		uint8_t   state = 0;      /* phase type                   */
+		uint32_t  TL = 0;         /* total level: TL << 2         */
+		int32_t   TLL = 0;        /* adjusted now TL              */
+		int32_t   volume = 0;     /* envelope counter             */
+		uint32_t  sl = 0;         /* sustain level: sl_tab[SL]    */
 
-		uint8_t   eg_sh_dp;   /* (dump state)                 */
-		uint8_t   eg_sel_dp;  /* (dump state)                 */
-		uint8_t   eg_sh_ar;   /* (attack state)               */
-		uint8_t   eg_sel_ar;  /* (attack state)               */
-		uint8_t   eg_sh_dr;   /* (decay state)                */
-		uint8_t   eg_sel_dr;  /* (decay state)                */
-		uint8_t   eg_sh_rr;   /* (release state for non-perc.)*/
-		uint8_t   eg_sel_rr;  /* (release state for non-perc.)*/
-		uint8_t   eg_sh_rs;   /* (release state for perc.mode)*/
-		uint8_t   eg_sel_rs;  /* (release state for perc.mode)*/
+		uint8_t   eg_sh_dp = 0;   /* (dump state)                 */
+		uint8_t   eg_sel_dp = 0;  /* (dump state)                 */
+		uint8_t   eg_sh_ar = 0;   /* (attack state)               */
+		uint8_t   eg_sel_ar = 0;  /* (attack state)               */
+		uint8_t   eg_sh_dr = 0;   /* (decay state)                */
+		uint8_t   eg_sel_dr = 0;  /* (decay state)                */
+		uint8_t   eg_sh_rr = 0;   /* (release state for non-perc.)*/
+		uint8_t   eg_sel_rr = 0;  /* (release state for non-perc.)*/
+		uint8_t   eg_sh_rs = 0;   /* (release state for perc.mode)*/
+		uint8_t   eg_sel_rs = 0;  /* (release state for perc.mode)*/
 
-		uint32_t  key;        /* 0 = KEY OFF, >0 = KEY ON     */
+		uint32_t  key = 0;        /* 0 = KEY OFF, >0 = KEY ON     */
 
 		/* LFO */
-		uint32_t  AMmask;     /* LFO Amplitude Modulation enable mask */
-		uint8_t   vib;        /* LFO Phase Modulation enable flag (active high)*/
+		uint32_t  AMmask = 0;     /* LFO Amplitude Modulation enable mask */
+		uint8_t   vib = 0;        /* LFO Phase Modulation enable flag (active high)*/
 
 		/* waveform select */
-		unsigned int wavetable;
+		unsigned int wavetable = 0;
 	};
 
 	struct OPLL_CH
 	{
 		OPLL_SLOT SLOT[2];
 		/* phase generator state */
-		uint32_t  block_fnum; /* block+fnum                   */
-		uint32_t  fc;         /* Freq. freqement base         */
-		uint32_t  ksl_base;   /* KeyScaleLevel Base step      */
-		uint8_t   kcode;      /* key code (for key scaling)   */
-		uint8_t   sus;        /* sus on/off (release speed in percussive mode)*/
+		uint32_t  block_fnum = 0; /* block+fnum                   */
+		uint32_t  fc = 0;         /* Freq. freqement base         */
+		uint32_t  ksl_base = 0;   /* KeyScaleLevel Base step      */
+		uint8_t   kcode = 0;      /* key code (for key scaling)   */
+		uint8_t   sus = 0;        /* sus on/off (release speed in percussive mode)*/
 	};
 
 	enum {

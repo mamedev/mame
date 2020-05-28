@@ -276,7 +276,7 @@ void tomcat_state::sound_map(address_map &map)
 
 static INPUT_PORTS_START( tomcat )
 	PORT_START("IN0")   /* INPUTS */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_tomcat_device, done_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_tomcat_device, done_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNUSED ) // SPARE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON5 ) // DIAGNOSTIC
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
@@ -343,7 +343,7 @@ void tomcat_state::tomcat(machine_config &config)
 	// OUTB PB0 - PB7   OUTPUT  Speech Data
 	// IRQ CB connected to IRQ line of 6502
 
-	config.m_minimum_quantum = attotime::from_hz(4000);
+	config.set_maximum_quantum(attotime::from_hz(4000));
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set_output("led1").invert();

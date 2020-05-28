@@ -121,13 +121,13 @@ public:
 	void d6809(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( term_r );
-	DECLARE_WRITE8_MEMBER( term_w );
+	u8 term_r();
+	void term_w(u8 data);
 	void kbd_put(u8 data);
 
 	void mem_map(address_map &map);
 
-	uint8_t m_term_data;
+	u8 m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -135,14 +135,14 @@ private:
 	required_device<floppy_connector> m_floppy0;
 };
 
-READ8_MEMBER( d6809_state::term_r )
+u8 d6809_state::term_r()
 {
-	uint8_t ret = m_term_data;
+	u8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( d6809_state::term_w )
+void d6809_state::term_w(u8 data)
 {
 	if ((data > 0) && (data < 0x80))
 		m_terminal->write(data);
@@ -158,7 +158,7 @@ void d6809_state::mem_map(address_map &map)
 	//map(0x00f0, 0x00f0).r(m_fdc, FUNC(upd765a_device::msr_r));
 	map(0x00ff, 0x00ff).rw(FUNC(d6809_state::term_r), FUNC(d6809_state::term_w));
 	map(0x0200, 0x0201).mirror(0xfe).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x0300, 0x0300).mirror(0xff).lw8("tc", [this](u8 data){ m_fdc->tc_w(1); m_fdc->tc_w(0); } );
+	map(0x0300, 0x0300).mirror(0xff).lw8(NAME([this] (u8 data){ m_fdc->tc_w(1); m_fdc->tc_w(0); }));
 	map(0x1000, 0xdfff).ram();
 	map(0xe000, 0xffff).rom().region("roms", 0);
 }

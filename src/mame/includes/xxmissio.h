@@ -24,7 +24,7 @@ public:
 
 	void xxmissio(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(status_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(status_r);
 
 protected:
 	virtual void machine_start() override;
@@ -53,8 +53,8 @@ private:
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_READ8_MEMBER(bgram_r);
-	DECLARE_WRITE8_MEMBER(scroll_x_w);
-	DECLARE_WRITE8_MEMBER(scroll_y_w);
+	void scroll_x_w(uint8_t data);
+	void scroll_y_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(interrupt_m);
 	INTERRUPT_GEN_MEMBER(interrupt_s);

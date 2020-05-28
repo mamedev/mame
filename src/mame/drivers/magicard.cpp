@@ -755,7 +755,7 @@ WRITE16_MEMBER(magicard_state::philips_66470_w)
 
 void magicard_state::magicard_mem(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
+//  map.global_mask(0x1fffff);
 	map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
 	map(0x00600000, 0x007ffbff).ram().share("magicramb");
 	/* 001ffc00-001ffdff System I/O */
@@ -773,7 +773,7 @@ void magicard_state::magicard_mem(address_map &map)
 
 void magicard_state::hotslots_mem(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
+//  map.global_mask(0x1fffff);
 	map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
 	map(0x00600000, 0x007ffbff).ram().share("magicramb");
 	map(0x001fff80, 0x001fffbf).mirror(0x7fe00000).ram(); //DRAM I/O, not accessed by this game, CD buffer?

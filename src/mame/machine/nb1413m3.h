@@ -158,8 +158,8 @@ public:
 	DECLARE_READ8_MEMBER( inputport1_r );
 	DECLARE_READ8_MEMBER( inputport2_r );
 	DECLARE_READ8_MEMBER( inputport3_r );
-	DECLARE_READ8_MEMBER( dipsw1_r );
-	DECLARE_READ8_MEMBER( dipsw2_r );
+	uint8_t dipsw1_r();
+	uint8_t dipsw2_r();
 	DECLARE_READ8_MEMBER( dipsw3_l_r );
 	DECLARE_READ8_MEMBER( dipsw3_h_r );
 	DECLARE_WRITE8_MEMBER( outcoin_w );

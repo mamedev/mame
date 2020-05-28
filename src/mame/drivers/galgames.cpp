@@ -22,7 +22,7 @@ Notes:
 
 - 4 known game carts where produced, these are:
 
-    Star Pak 1: Seek the Peaks, 21 Thunder, Solar Solitaire, Prism Poker, Pharaoh's Tomb, Black Jack,
+    Star Pak 1: Seek the Peaks, 21 Thunder, Solar Solitaire, Prism Poker, Pharaoh's Tomb, Magic Black Jack,
                 Twenty One Thunder Plus, Power Pairs, Prism Poker Plus & Have A Cow
     Star Pak 2: Pac-Man, Ms.Pac-Man, Pharaoh's Tomb, Solar Solitaire, Power Pairs, Seek The peeks & Have A Cow
     Star Pak 3: Centipede, Great Wall, Ker-Chunk, Diamond Derby, Word Sleuth, Pull!, Astro Blast & Sweeper
@@ -30,6 +30,10 @@ Notes:
 
 - Allegedly there is a hard lock that SP1 and the PAC-MAN games (on SP2) cannot play together. Was a licensing issue with Namco.
   The system checks for cartridges on power up by querying the PIC parts. If the system sees SP1 & SP2 it disables SP2.
+
+- Early flyers show "Star Pak 1" titled as Cardmania!
+- Early flyers show "Star Pak 2" titled as Galaxy Games Volume 2
+- There is an early flyer showing a Cardmania! cartridge in front of a partialy blocked cartridge labeled Casino
 
 ***************************************************************************/
 
@@ -44,6 +48,7 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "dirom.h"
 
 /***************************************************************************
 
@@ -63,7 +68,7 @@ DECLARE_DEVICE_TYPE(GALGAMES_SLOT,          galgames_slot_device)
 
 // CART declaration
 
-class galgames_cart_device : public device_t, public device_rom_interface
+class galgames_cart_device : public device_t, public device_rom_interface<21, 1, 0, ENDIANNESS_BIG>
 {
 public:
 	// construction/destruction
@@ -309,7 +314,7 @@ galgames_cart_device::galgames_cart_device(
 		device_t *owner,
 		u32 clock):
 	device_t(mconfig, type, tag, owner, clock),
-	device_rom_interface(mconfig, *this, 21, ENDIANNESS_BIG, 16),
+	device_rom_interface(mconfig, *this),
 	m_cart(0),
 	m_slot(*this, "^slot"),
 	m_eeprom(*this, "eeprom"),

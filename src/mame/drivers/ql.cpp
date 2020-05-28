@@ -169,11 +169,11 @@ private:
 	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_WRITE8_MEMBER( ipc_w );
-	DECLARE_WRITE8_MEMBER( ipc_port1_w );
-	DECLARE_WRITE8_MEMBER( ipc_port2_w );
-	DECLARE_READ8_MEMBER( ipc_port2_r );
+	void ipc_port1_w(uint8_t data);
+	void ipc_port2_w(uint8_t data);
+	uint8_t ipc_port2_r();
 	DECLARE_READ_LINE_MEMBER( ipc_t1_r );
-	DECLARE_READ8_MEMBER( ipc_bus_r );
+	uint8_t ipc_bus_r();
 	DECLARE_WRITE_LINE_MEMBER( ql_baudx4_w );
 	DECLARE_WRITE_LINE_MEMBER( ql_comdata_w );
 	DECLARE_WRITE_LINE_MEMBER( zx8302_mdselck_w );
@@ -230,23 +230,23 @@ READ8_MEMBER( ql_state::read )
 	}
 	if (offset >= 0x18000 && offset <= 0x18003)
 	{
-		data = m_zx8302->rtc_r(space, offset & 0x03);
+		data = m_zx8302->rtc_r(offset & 0x03);
 	}
 	if (offset == 0x18020)
 	{
-		data = m_zx8302->status_r(space, 0);
+		data = m_zx8302->status_r();
 	}
 	if (offset == 0x18021)
 	{
-		data = m_zx8302->irq_status_r(space, 0);
+		data = m_zx8302->irq_status_r();
 	}
 	if (offset >= 0x18022 && offset <= 0x18023)
 	{
-		data = m_zx8302->mdv_track_r(space, offset & 0x01);
+		data = m_zx8302->mdv_track_r();
 	}
 	if (offset >= 0x20000 && offset < 0x40000)
 	{
-		data = m_zx8301->data_r(space, offset & 0x1ffff);
+		data = m_zx8301->data_r(offset & 0x1ffff);
 	}
 	if (offset >= 0xc0000)
 	{
@@ -277,35 +277,35 @@ WRITE8_MEMBER( ql_state::write )
 {
 	if (offset >= 0x18000 && offset <= 0x18001)
 	{
-		m_zx8302->rtc_w(space, offset & 0x01, data);
+		m_zx8302->rtc_w(data);
 	}
 	if (offset == 0x18002)
 	{
-		m_zx8302->control_w(space, 0, data);
+		m_zx8302->control_w(data);
 	}
 	if (offset == 0x18003)
 	{
-		m_zx8302->ipc_command_w(space, 0, data);
+		m_zx8302->ipc_command_w(data);
 	}
 	if (offset == 0x18020)
 	{
-		m_zx8302->mdv_control_w(space, 0, data);
+		m_zx8302->mdv_control_w(data);
 	}
 	if (offset == 0x18021)
 	{
-		m_zx8302->irq_acknowledge_w(space, 0, data);
+		m_zx8302->irq_acknowledge_w(data);
 	}
 	if (offset == 0x18022)
 	{
-		m_zx8302->data_w(space, 0, data);
+		m_zx8302->data_w(data);
 	}
 	if (offset == 0x18063)
 	{
-		m_zx8301->control_w(space, 0, data);
+		m_zx8301->control_w(data);
 	}
 	if (offset >= 0x20000 && offset < 0x40000)
 	{
-			m_zx8301->data_w(space, offset & 0x1ffff, data);
+			m_zx8301->data_w(offset & 0x1ffff, data);
 	}
 	if (m_qimi_enabled)
 	{
@@ -340,7 +340,7 @@ WRITE8_MEMBER( ql_state::ipc_w )
 //  ipc_port1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ql_state::ipc_port1_w )
+void ql_state::ipc_port1_w(uint8_t data)
 {
 	/*
 
@@ -365,7 +365,7 @@ WRITE8_MEMBER( ql_state::ipc_port1_w )
 //  ipc_port2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::ipc_port2_r )
+uint8_t ql_state::ipc_port2_r()
 {
 	/*
 
@@ -398,7 +398,7 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 //  ipc_port2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ql_state::ipc_port2_w )
+void ql_state::ipc_port2_w(uint8_t data)
 {
 	/*
 
@@ -458,7 +458,7 @@ READ_LINE_MEMBER( ql_state::ipc_t1_r )
 //  ipc_bus_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::ipc_bus_r )
+uint8_t ql_state::ipc_bus_r()
 {
 	/*
 

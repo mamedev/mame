@@ -103,7 +103,7 @@ namespace
 		virtual ioport_constructor device_input_ports() const override;
 
 		virtual uint8_t* get_cart_base() override;
-		DECLARE_WRITE8_MEMBER(pia_A_w);
+		void pia_A_w(uint8_t data);
 
 		// Clocks
 		void write_acia_clocks(int id, int state);
@@ -397,7 +397,7 @@ WRITE8_MEMBER(coco_t4426_device::scs_write)
 #define ROM6 (~0x40 & 0xff)
 #define ROM7 (~0x80 & 0xff)
 
-WRITE8_MEMBER( coco_t4426_device::pia_A_w )
+void coco_t4426_device::pia_A_w(uint8_t data)
 {
 	LOGPIA("%s(%02x)\n", FUNCNAME, data);
 	m_select = data;

@@ -39,7 +39,6 @@ and 16k of static RAM.
 
 To Do:
 - Cassette LED doesn't work.
-- Display should blank if PB0 not being pulsed.
 - Code up the expansion unit (rom is there but no schematic exists)
 - Need software.
 
@@ -52,6 +51,7 @@ To Do:
 #include "machine/6821pia.h"
 #include "imagedev/cassette.h"
 #include "speaker.h"
+#include "video/pwm.h"
 #include "emma2.lh"
 
 
@@ -64,29 +64,29 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_via(*this, "via")
 		, m_pia(*this, "pia")
-		, m_keyboard(*this, "X%u", 0)
-		, m_digits(*this, "digit%u", 0U)
+		, m_display(*this, "display")
+		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void emma2(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(segment_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	virtual void machine_reset() override;
+	void segment_w(uint8_t data);
+	void digit_w(uint8_t data);
+	uint8_t keyboard_r();
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void mem_map(address_map &map);
 
 	uint8_t m_digit;
-	bool m_dig_change;
+	uint8_t m_seg;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<via6522_device> m_via;
 	required_device<pia6821_device> m_pia;
-	required_ioport_array<8> m_keyboard;
-	output_finder<8> m_digits;
+	required_device<pwm_display_device> m_display;
+	required_ioport_array<8> m_io_keyboard;
 };
 
 void emma2_state::mem_map(address_map &map)
@@ -151,43 +151,37 @@ S   -   3   7   B   F
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( emma2_state::digit_w )
+void emma2_state::digit_w(uint8_t data)
 {
 	m_cassette->output( BIT(data, 6) ? +1.0 : -1.0);
 
-	data &= 7;
-	if (data != m_digit)
-	{
-		m_digit = data;
-		m_dig_change = true;
-	}
+	m_digit = data & 7;
+	m_display->matrix(1 << m_digit, m_seg);
 }
 
-WRITE8_MEMBER( emma2_state::segment_w )
+void emma2_state::segment_w(uint8_t data)
 {
-	if (m_dig_change)
-	{
-		m_dig_change = false;
-		m_digits[m_digit] = data;
-	}
+	m_seg = data;
+	m_display->matrix(1 << m_digit, m_seg);
 }
 
-READ8_MEMBER( emma2_state::keyboard_r )
+uint8_t emma2_state::keyboard_r()
 {
-	u8 data = m_keyboard[m_digit]->read();
+	u8 data = m_io_keyboard[m_digit]->read();
 	data |= ((m_cassette)->input() < 0.0) ? 0x80 : 0;
 	return data;
 }
 
-void emma2_state::machine_start()
-{
-	m_digits.resolve();
-}
-
 void emma2_state::machine_reset()
 {
+	m_seg = 0;
 	m_digit = 0;
-	m_dig_change = 0;
+}
+
+void emma2_state::machine_start()
+{
+	save_item(NAME(m_digit));
+	save_item(NAME(m_seg));
 }
 
 void emma2_state::emma2(machine_config &config)
@@ -198,6 +192,8 @@ void emma2_state::emma2(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_emma2);
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
 
 	/* Devices */
 	VIA6522(config, m_via, 1'000'000);  // #2 from cpu
@@ -232,4 +228,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME           FLAGS
-COMP( 1979, emma2,  0,      0,      emma2,   emma2,  emma2_state,  empty_init, "L.J.Technical Systems",   "Emma II trainer", 0 )
+COMP( 1979, emma2,  0,      0,      emma2,   emma2,  emma2_state,  empty_init, "L.J.Technical Systems",   "Emma II trainer", MACHINE_SUPPORTS_SAVE )

@@ -4,7 +4,7 @@
 
 About MegaTech:
 
-Megatech games are identical to their Genesis/SMS equivlents, however the Megatech cartridges contain
+Megatech games are identical to their Genesis/SMS equivalents, however the Megatech cartridges contain
 a BIOS rom with the game instructions.  The last part number of the bios ROM is the cart/game ID code.
 
 The instruction rom appears to map at 0x300000 in the cart space.
@@ -17,8 +17,8 @@ with their Playchoice 10 system.
 The BIOS screen is based around SMS hardware, with an additional Z80 and SMS VDP chip not present on
 a standard Genesis.
 
-SMS games run on Megatech in the Genesis's SMS compatability mode, where the Genesis Z80 becomes the
-main CPU and the Genesis VDP acts in a mode mimicing the behavior of the SMS VDP. A pin on the carts
+SMS games run on Megatech in the Genesis's SMS compatibility mode, where the Genesis Z80 becomes the
+main CPU and the Genesis VDP acts in a mode mimicking the behavior of the SMS VDP. A pin on the carts
 determines which mode the game runs in.
 
 Additions will only be made to this driver if proof that the dumped set are original roms with original
@@ -119,11 +119,11 @@ private:
 	void megatech(machine_config &config);
 
 	DECLARE_READ8_MEMBER(cart_select_r);
-	DECLARE_WRITE8_MEMBER(cart_select_w);
-	DECLARE_READ8_MEMBER(bios_portc_r);
-	DECLARE_READ8_MEMBER(bios_porte_r);
-	DECLARE_WRITE8_MEMBER(bios_portd_w);
-	DECLARE_WRITE8_MEMBER(bios_porte_w);
+	void cart_select_w(uint8_t data);
+	uint8_t bios_portc_r();
+	uint8_t bios_porte_r();
+	void bios_portd_w(uint8_t data);
+	void bios_porte_w(uint8_t data);
 	DECLARE_READ8_MEMBER(read_68k_banked_data);
 	DECLARE_WRITE8_MEMBER(write_68k_banked_data);
 	DECLARE_WRITE8_MEMBER(mt_z80_bank_w);
@@ -386,20 +386,20 @@ void mtech_state::set_genz80_as_sms()
 
 	memcpy(sms_rom.get(), m_region_maincpu->base(), 0xc000);
 
-	prg.install_write_handler(0xfffc, 0xffff, write8_delegate(FUNC(mtech_state::mt_sms_standard_rom_bank_w),this));
+	prg.install_write_handler(0xfffc, 0xffff, write8_delegate(*this, FUNC(mtech_state::mt_sms_standard_rom_bank_w)));
 
 	// ports
-	io.install_read_handler      (0x40, 0x41, 0, 0x3e, 0, read8sm_delegate(FUNC(mtech_state::sms_count_r),this));
-	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8smo_delegate(FUNC(sega315_5124_device::psg_w),(sega315_5124_device *)m_vdp));
-	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8smo_delegate(FUNC(sega315_5124_device::data_read),(sega315_5124_device *)m_vdp), write8smo_delegate(FUNC(sega315_5124_device::data_write),(sega315_5124_device *)m_vdp));
-	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8smo_delegate(FUNC(sega315_5124_device::control_read),(sega315_5124_device *)m_vdp), write8smo_delegate(FUNC(sega315_5124_device::control_write),(sega315_5124_device *)m_vdp));
+	io.install_read_handler      (0x40, 0x41, 0, 0x3e, 0, read8sm_delegate(*this, FUNC(mtech_state::sms_count_r)));
+	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8smo_delegate(*m_vdp, FUNC(sega315_5124_device::psg_w)));
+	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8smo_delegate(*m_vdp, FUNC(sega315_5124_device::data_read)), write8smo_delegate(*m_vdp, FUNC(sega315_5124_device::data_write)));
+	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8smo_delegate(*m_vdp, FUNC(sega315_5124_device::control_read)), write8smo_delegate(*m_vdp, FUNC(sega315_5124_device::control_write)));
 
-	io.install_read_handler      (0x10, 0x10, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this)); // super tetris
+	io.install_read_handler      (0x10, 0x10, read8_delegate(*this, FUNC(mtech_state::sms_ioport_dd_r))); // super tetris
 
-	io.install_read_handler      (0xdc, 0xdc, read8_delegate(FUNC(mtech_state::sms_ioport_dc_r),this));
-	io.install_read_handler      (0xdd, 0xdd, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this));
-	io.install_read_handler      (0xde, 0xde, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this));
-	io.install_read_handler      (0xdf, 0xdf, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this)); // adams family
+	io.install_read_handler      (0xdc, 0xdc, read8_delegate(*this, FUNC(mtech_state::sms_ioport_dc_r)));
+	io.install_read_handler      (0xdd, 0xdd, read8_delegate(*this, FUNC(mtech_state::sms_ioport_dd_r)));
+	io.install_read_handler      (0xde, 0xde, read8_delegate(*this, FUNC(mtech_state::sms_ioport_dd_r)));
+	io.install_read_handler      (0xdf, 0xdf, read8_delegate(*this, FUNC(mtech_state::sms_ioport_dd_r))); // adams family
 }
 
 
@@ -413,12 +413,12 @@ void mtech_state::set_genz80_as_md()
 
 	prg.install_ram(0x0000, 0x1fff, m_genz80.z80_prgram.get());
 
-	prg.install_readwrite_handler(0x4000, 0x4003, read8sm_delegate(FUNC(ym2612_device::read), (ym2612_device *)m_ymsnd), write8sm_delegate(FUNC(ym2612_device::write), (ym2612_device *)m_ymsnd));
-	prg.install_write_handler    (0x6000, 0x6000, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
-	prg.install_write_handler    (0x6001, 0x6001, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
-	prg.install_read_handler     (0x6100, 0x7eff, read8_delegate(FUNC(mtech_state::megadriv_z80_unmapped_read),this));
-	prg.install_readwrite_handler(0x7f00, 0x7fff, read8_delegate(FUNC(mtech_state::megadriv_z80_vdp_read),this), write8_delegate(FUNC(mtech_state::megadriv_z80_vdp_write),this));
-	prg.install_readwrite_handler(0x8000, 0xffff, read8_delegate(FUNC(mtech_state::z80_read_68k_banked_data),this), write8_delegate(FUNC(mtech_state::z80_write_68k_banked_data),this));
+	prg.install_readwrite_handler(0x4000, 0x4003, read8sm_delegate(*m_ymsnd, FUNC(ym2612_device::read)), write8sm_delegate(*m_ymsnd, FUNC(ym2612_device::write)));
+	prg.install_write_handler    (0x6000, 0x6000, write8_delegate(*this, FUNC(mtech_state::megadriv_z80_z80_bank_w)));
+	prg.install_write_handler    (0x6001, 0x6001, write8_delegate(*this, FUNC(mtech_state::megadriv_z80_z80_bank_w)));
+	prg.install_read_handler     (0x6100, 0x7eff, read8_delegate(*this, FUNC(mtech_state::megadriv_z80_unmapped_read)));
+	prg.install_readwrite_handler(0x7f00, 0x7fff, read8_delegate(*this, FUNC(mtech_state::megadriv_z80_vdp_read)), write8_delegate(*this, FUNC(mtech_state::megadriv_z80_vdp_write)));
+	prg.install_readwrite_handler(0x8000, 0xffff, read8_delegate(*this, FUNC(mtech_state::z80_read_68k_banked_data)), write8_delegate(*this, FUNC(mtech_state::z80_write_68k_banked_data)));
 }
 
 
@@ -464,7 +464,7 @@ void mtech_state::switch_cart(int gameno)
 	}
 }
 
-WRITE8_MEMBER(mtech_state::cart_select_w)
+void mtech_state::cart_select_w(uint8_t data)
 {
 	/* seems to write the slot number..
 	  but it stores something in (banked?) ram
@@ -475,23 +475,23 @@ WRITE8_MEMBER(mtech_state::cart_select_w)
 }
 
 
-READ8_MEMBER(mtech_state::bios_portc_r)
+uint8_t mtech_state::bios_portc_r()
 {
 	return 0;
 }
 
-READ8_MEMBER(mtech_state::bios_porte_r)
+uint8_t mtech_state::bios_porte_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(mtech_state::bios_portd_w)
+void mtech_state::bios_portd_w(uint8_t data)
 {
 	output().set_value("Alarm_sound", BIT(data, 7));
 	m_bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
 }
 
-WRITE8_MEMBER(mtech_state::bios_porte_w)
+void mtech_state::bios_porte_w(uint8_t data)
 {
 	output().set_value("Flash_screen", BIT(data, 1));
 }
@@ -538,7 +538,7 @@ void mtech_state::megatech_bios_map(address_map &map)
 	map(0x6400, 0x6407).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x6800, 0x6807).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x7000, 0x77ff).rom(); // from bios rom (0x7000-0x77ff populated in ROM)
-	//AM_RANGE(0x7800, 0x7fff) AM_RAM // ?
+	//map(0x7800, 0x7fff).ram(); // ?
 	map(0x8000, 0x9fff).rw(FUNC(mtech_state::read_68k_banked_data), FUNC(mtech_state::write_68k_banked_data)); // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
 }
 
@@ -653,23 +653,23 @@ MACHINE_RESET_MEMBER(mtech_state, megatech)
 
 	std::string region_tag;
 	if (m_cart1->get_rom_size() > 0)
-		m_cart_reg[0] = memregion(region_tag.assign(m_cart1->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_reg[0] = memregion(region_tag.assign(m_cart1->tag()).append(GENERIC_ROM_REGION_TAG));
 	else
 		m_cart_reg[0] = memregion(":mt_slot1:cart");
 	if (m_cart2)
-		m_cart_reg[1] = memregion(region_tag.assign(m_cart2->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_reg[1] = memregion(region_tag.assign(m_cart2->tag()).append(GENERIC_ROM_REGION_TAG));
 	if (m_cart3)
-		m_cart_reg[2] = memregion(region_tag.assign(m_cart3->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_reg[2] = memregion(region_tag.assign(m_cart3->tag()).append(GENERIC_ROM_REGION_TAG));
 	if (m_cart4)
-		m_cart_reg[3] = memregion(region_tag.assign(m_cart4->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_reg[3] = memregion(region_tag.assign(m_cart4->tag()).append(GENERIC_ROM_REGION_TAG));
 	if (m_cart5)
-		m_cart_reg[4] = memregion(region_tag.assign(m_cart5->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_reg[4] = memregion(region_tag.assign(m_cart5->tag()).append(GENERIC_ROM_REGION_TAG));
 	if (m_cart6)
-		m_cart_reg[5] = memregion(region_tag.assign(m_cart6->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_reg[5] = memregion(region_tag.assign(m_cart6->tag()).append(GENERIC_ROM_REGION_TAG));
 	if (m_cart7)
-		m_cart_reg[6] = memregion(region_tag.assign(m_cart7->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_reg[6] = memregion(region_tag.assign(m_cart7->tag()).append(GENERIC_ROM_REGION_TAG));
 	if (m_cart8)
-		m_cart_reg[7] = memregion(region_tag.assign(m_cart8->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_reg[7] = memregion(region_tag.assign(m_cart8->tag()).append(GENERIC_ROM_REGION_TAG));
 
 	switch_cart(0);
 }
@@ -691,12 +691,12 @@ void mtech_state::megatech(machine_config &config)
 	m_bioscpu->set_addrmap(AS_PROGRAM, &mtech_state::megatech_bios_map);
 	m_bioscpu->set_addrmap(AS_IO, &mtech_state::megatech_bios_portmap);
 
-	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	cxd1095_device &io1(CXD1095(config, "io1"));
 	io1.in_porta_cb().set_ioport("BIOS_DSW0");
 	io1.in_portb_cb().set_ioport("BIOS_DSW1");
 	io1.out_porte_cb().set(FUNC(mtech_state::cart_select_w));
 
-	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	cxd1095_device &io2(CXD1095(config, "io2"));
 	io2.in_porta_cb().set_ioport("BIOS_IN0");
 	io2.in_portb_cb().set_ioport("BIOS_IN1");
 	io2.in_portc_cb().set(FUNC(mtech_state::bios_portc_r));
@@ -709,8 +709,8 @@ void mtech_state::megatech(machine_config &config)
 	config.set_default_layout(layout_dualhovu);
 
 	screen_device &screen(*subdevice<screen_device>("megadriv"));
-	screen.set_raw(XTAL(10'738'635)/2, \
-			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
+	screen.set_raw(XTAL(10'738'635)/2,
+			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
 	screen.set_screen_update(FUNC(mtech_state::screen_update_main));
 	screen.screen_vblank().set(FUNC(mtech_state::screen_vblank_main));
@@ -719,8 +719,8 @@ void mtech_state::megatech(machine_config &config)
 
 	screen_device &menu(SCREEN(config, "menu", SCREEN_TYPE_RASTER));
 	// check frq
-	menu.set_raw(XTAL(10'738'635)/2, \
-			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
+	menu.set_raw(XTAL(10'738'635)/2,
+			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
 	menu.set_screen_update(FUNC(mtech_state::screen_update_menu));
 
@@ -768,7 +768,7 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 }
 
 #define MEGATECH_CARTSLOT(_tag, _load) \
-	GENERIC_CARTSLOT(config, _tag, generic_plain_slot, "megatech_cart").set_device_load(FUNC(mtech_state::_load), this)
+	GENERIC_CARTSLOT(config, _tag, generic_plain_slot, "megatech_cart").set_device_load(FUNC(mtech_state::_load))
 
 void mtech_state::megatech_multislot(machine_config &config)
 {
@@ -794,7 +794,7 @@ void mtech_state::megatech_fixedslot(machine_config &config)
 
 	// add cart slots
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "mt_slot1", generic_plain_slot, "megatech_cart"));
-	cartslot.set_device_load(FUNC(mtech_state::mt_cart1), this);
+	cartslot.set_device_load(FUNC(mtech_state::mt_cart1));
 	cartslot.set_user_loadable(false);
 }
 
@@ -1486,7 +1486,7 @@ ROM_END
 - Enduro Racer
 
 Games seen in auction (#122011114579) known not to be original but manufactured/bootlegged on actual megatech carts.
-The labels are noticably different than expected.  Be careful if thinking of obtaining!
+The labels are noticeably different than expected.  Be careful if thinking of obtaining!
 - After Burner II (GEN)
 - Castle of Illusion Starring Mickey Mouse (GEN)
 - Double Dragon (SMS)

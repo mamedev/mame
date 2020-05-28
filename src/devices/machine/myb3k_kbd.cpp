@@ -336,8 +336,10 @@ myb3k_keyboard_device::myb3k_keyboard_device(
 		device_t *owner,
 		u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_keyboard_cb()
+	, m_keyboard_cb(*this)
 	, m_io_kbd_t(*this, "MYB3K_T%X", 0U)
+	, m_x(0)
+	, m_y(0)
 {
 }
 
@@ -353,8 +355,7 @@ ioport_constructor myb3k_keyboard_device::device_input_ports() const
 
 void myb3k_keyboard_device::device_start()
 {
-	m_keyboard_cb.bind_relative_to(*owner());
-	device_reset();
+	m_keyboard_cb.resolve();
 }
 
 void myb3k_keyboard_device::device_reset()

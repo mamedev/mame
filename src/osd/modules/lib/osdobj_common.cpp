@@ -13,10 +13,13 @@
 #include "osdepend.h"
 #include "modules/lib/osdobj_common.h"
 
+#include <iostream>
+
+
 const options_entry osd_options::s_option_entries[] =
 {
 	{ nullptr,                               nullptr,           OPTION_HEADER,    "OSD KEYBOARD MAPPING OPTIONS" },
-#ifdef SDLMAME_MACOSX
+#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
 	{ OSDOPTION_UIMODEKEY,                   "DEL",             OPTION_STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
 #else
 	{ OSDOPTION_UIMODEKEY,                   "SCRLOCK",         OPTION_STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
@@ -92,7 +95,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD ACCELERATED VIDEO OPTIONS" },
 	{ OSDOPTION_FILTER ";glfilter;flt",       "1",              OPTION_BOOLEAN,   "use bilinear filtering when scaling emulated video" },
-	{ OSDOPTION_PRESCALE "(1-3)",             "1",              OPTION_INTEGER,   "scale emulated video by this factor before applying filters/shaders" },
+	{ OSDOPTION_PRESCALE "(1-8)",             "1",              OPTION_INTEGER,   "scale emulated video by this factor before applying filters/shaders" },
 
 #if USE_OPENGL
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OpenGL-SPECIFIC OPTIONS" },
@@ -228,6 +231,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, MONITOR_SDL);
 	REGISTER_MODULE(m_mod_man, MONITOR_WIN32);
 	REGISTER_MODULE(m_mod_man, MONITOR_DXGI);
+	REGISTER_MODULE(m_mod_man, MONITOR_MAC);
 
 #ifdef SDLMAME_MACOSX
 	REGISTER_MODULE(m_mod_man, DEBUG_OSX);
@@ -380,28 +384,28 @@ void osd_common_t::update_option(const std::string &key, std::vector<const char 
 //-------------------------------------------------
 //  output_callback  - callback for osd_printf_...
 //-------------------------------------------------
-void osd_common_t::output_callback(osd_output_channel channel, const char *msg, va_list args)
+void osd_common_t::output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args)
 {
 	switch (channel)
 	{
-		case OSD_OUTPUT_CHANNEL_ERROR:
-		case OSD_OUTPUT_CHANNEL_WARNING:
-			vfprintf(stderr, msg, args);
-			break;
-		case OSD_OUTPUT_CHANNEL_INFO:
-		case OSD_OUTPUT_CHANNEL_LOG:
-			vfprintf(stdout, msg, args);
-			break;
-		case OSD_OUTPUT_CHANNEL_VERBOSE:
-			if (verbose()) vfprintf(stdout, msg, args);
-			break;
-		case OSD_OUTPUT_CHANNEL_DEBUG:
+	case OSD_OUTPUT_CHANNEL_ERROR:
+	case OSD_OUTPUT_CHANNEL_WARNING:
+		util::stream_format(std::cerr, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_INFO:
+	case OSD_OUTPUT_CHANNEL_LOG:
+		util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_VERBOSE:
+		if (verbose()) util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_DEBUG:
 #ifdef MAME_DEBUG
-			vfprintf(stdout, msg, args);
+		util::stream_format(std::cout, args);
 #endif
-			break;
-		default:
-			break;
+		break;
+	default:
+		break;
 	}
 }
 
@@ -441,7 +445,7 @@ void osd_common_t::init(running_machine &machine)
 
 	m_machine = &machine;
 
-	osd_options &options = downcast<osd_options &>(machine.options());
+	auto &options = downcast<osd_options &>(machine.options());
 	// extract the verbose printing option
 	if (options.verbose())
 		set_verbose(true);
@@ -560,7 +564,7 @@ void osd_common_t::set_mastervolume(int attenuation)
 //  additions/modifications to the input list
 //-------------------------------------------------
 
-void osd_common_t::customize_input_type_list(simple_list<input_type_entry> &typelist)
+void osd_common_t::customize_input_type_list(std::vector<input_type_entry> &typelist)
 {
 	//
 	// inptport.c defines some general purpose defaults for key and joystick bindings.
@@ -620,7 +624,7 @@ bool osd_common_t::execute_command(const char *command)
 	else if (strcmp(command, OSDCOMMAND_LIST_MIDI_DEVICES) == 0)
 	{
 		osd_module *om = select_module_options(options(), OSD_MIDI_PROVIDER);
-		midi_module *pm = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
+		auto *pm = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
 
 		if (om->probe())
 		{

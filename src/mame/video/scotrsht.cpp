@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(scotrsht_state::get_bg_tile_info)
 
 	// data & 0x80 -> tile priority?
 
-	SET_TILE_INFO_MEMBER(0, code, color, flag);
+	tileinfo.set(0, code, color, flag);
 }
 
 /* Same as Jailbreak + palette bank */
@@ -115,7 +115,7 @@ void scotrsht_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void scotrsht_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(scotrsht_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(scotrsht_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_bg_tilemap->set_scroll_cols(64);
 

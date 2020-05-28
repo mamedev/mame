@@ -35,15 +35,15 @@ protected:
 private:
 
 	/* 8042 interface */
-	DECLARE_WRITE8_MEMBER(iocpu_port1_w);
-	DECLARE_WRITE8_MEMBER(iocpu_port2_w);
-	DECLARE_READ8_MEMBER(iocpu_port1_r);
-	DECLARE_READ8_MEMBER(iocpu_test0_r);
+	void iocpu_port1_w(uint8_t data);
+	void iocpu_port2_w(uint8_t data);
+	uint8_t iocpu_port1_r();
+	uint8_t iocpu_test0_r();
 
 	/* GPIB */
 	DECLARE_READ8_MEMBER(gpib_r);
 	DECLARE_WRITE8_MEMBER(gpib_w);
-	DECLARE_WRITE8_MEMBER(ieee488_dio_w);
+	void ieee488_dio_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(gpib_irq);
 	DECLARE_WRITE_LINE_MEMBER(gpib_dreq);

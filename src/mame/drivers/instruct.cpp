@@ -48,6 +48,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "speaker.h"
+#include "video/pwm.h"
 
 #include "instruct.lh"
 
@@ -62,7 +63,8 @@ public:
 		, m_p_smiram(*this, "smiram")
 		, m_p_extram(*this, "extram")
 		, m_cass(*this, "cassette")
-		, m_digits(*this, "digit%u", 0U)
+		, m_display(*this, "display")
+		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void instruct(machine_config &config);
@@ -86,10 +88,9 @@ private:
 	void mem_map(address_map &map);
 
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
 	uint16_t m_lar;
 	uint8_t m_digit;
-	bool m_valid_digit;
+	u8 m_seg;
 	bool m_cassin;
 	bool m_irqstate;
 	required_device<s2650_device> m_maincpu;
@@ -97,7 +98,8 @@ private:
 	required_shared_ptr<uint8_t> m_p_smiram;
 	required_shared_ptr<uint8_t> m_p_extram;
 	required_device<cassette_image_device> m_cass;
-	output_finder<129> m_digits;
+	required_device<pwm_display_device> m_display;
+	required_ioport_array<6> m_io_keyboard;
 };
 
 // flag led
@@ -131,16 +133,15 @@ WRITE8_MEMBER( instruct_state::portf8_w )
 // segment output
 WRITE8_MEMBER( instruct_state::portf9_w )
 {
-	if (m_valid_digit)
-		m_digits[m_digit] = data;
-	m_valid_digit = false;
+	m_seg = data;
+	m_display->matrix(m_digit, m_seg);
 }
 
 // digit & keyrow-scan select
 WRITE8_MEMBER( instruct_state::portfa_w )
 {
 	m_digit = data;
-	m_valid_digit = true;
+	m_display->matrix(m_digit, m_seg);
 }
 
 // user switches
@@ -164,17 +165,13 @@ READ8_MEMBER( instruct_state::portfd_r )
 // read keyboard
 READ8_MEMBER( instruct_state::portfe_r )
 {
-	for (uint8_t i = 0; i < 6; i++)
-	{
-		if (BIT(m_digit, i))
-		{
-			char kbdrow[6];
-			sprintf(kbdrow,"X%X",i);
-			return ioport(kbdrow)->read();
-		}
-	}
+	u8 data = 15;
 
-	return 0xf;
+	for (uint8_t i = 0; i < 6; i++)
+		if (BIT(m_digit, i))
+			data &= m_io_keyboard[i]->read();
+
+	return data;
 }
 
 
@@ -208,17 +205,14 @@ INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 	{
 		uint8_t switches = ioport("SW")->read();
 
-		// Set vector from INDIRECT sw
-		uint8_t vector = BIT(switches, 0) ? 0x87 : 0x07;
-
 		// Check INT sw & key
 		if (BIT(switches, 1))
-			device.execute().set_input_line_and_vector(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE, vector); // S2650
+			device.execute().set_input_line(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE);
 		else
 		// process ac input
 		{
 			m_irqstate ^= 1;
-			device.execute().set_input_line_and_vector(0, m_irqstate ? ASSERT_LINE : CLEAR_LINE, vector); // S2650
+			device.execute().set_input_line(0, m_irqstate ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
 }
@@ -430,12 +424,16 @@ void instruct_state::instruct(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(instruct_state::t2l_int), attotime::from_hz(120));
 	m_maincpu->sense_handler().set(FUNC(instruct_state::sense_r));
 	m_maincpu->flag_handler().set(FUNC(instruct_state::flag_w));
+	// Set vector from INDIRECT sw
+	m_maincpu->intack_handler().set([this]() { return BIT(ioport("SW")->read(), 0) ? 0x87 : 0x07; });
 
 	/* video hardware */
 	config.set_default_layout(layout_instruct);
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(instruct_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(instruct_state::quickload_cb));
 
 	SPEAKER(config, "mono").front_center();
 

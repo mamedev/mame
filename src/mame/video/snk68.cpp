@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(snk68_state::get_tile_info)
 	int tile = m_fg_tile_offset + (m_fg_videoram[2*tile_index] & 0xff);
 	int color = m_fg_videoram[2*tile_index+1] & 0x07;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(searchar_state::get_tile_info)
@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(searchar_state::get_tile_info)
 	// used in the ikari3 intro
 	int flags = (data & 0x8000) ? TILE_FORCE_LAYER0 : 0;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, flags);
+	tileinfo.set(0, tile, color, flags);
 }
 
 /***************************************************************************
@@ -58,7 +58,7 @@ void snk68_state::common_video_start()
 
 void snk68_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk68_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk68_state::get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	m_fg_tile_offset = 0;
 
 	common_video_start();
@@ -68,7 +68,7 @@ void snk68_state::video_start()
 
 void searchar_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(searchar_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(searchar_state::get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	snk68_state::common_video_start();
 }
@@ -129,7 +129,7 @@ WRITE8_MEMBER(searchar_state::flipscreen_w)
 
 uint32_t snk68_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0x7ff, cliprect);
+	bitmap.fill(m_palette->get_backdrop_pen(), cliprect);
 
 	m_sprites->draw_sprites_all(bitmap, cliprect);
 

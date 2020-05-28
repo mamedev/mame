@@ -17,7 +17,7 @@
 #ifndef MAME_EMU_VIDEO_H
 #define MAME_EMU_VIDEO_H
 
-#include "aviio.h"
+#include "recording.h"
 
 
 //**************************************************************************
@@ -40,13 +40,6 @@ class video_manager
 	friend class screen_device;
 
 public:
-	// movie format options
-	enum movie_format
-	{
-		MF_MNG,
-		MF_AVI
-	};
-
 	// construction/destruction
 	video_manager(running_machine &machine);
 
@@ -69,9 +62,7 @@ public:
 
 	// misc
 	void toggle_throttle();
-	void toggle_record_movie(movie_format format);
-	void toggle_record_mng() { toggle_record_movie(MF_MNG); }
-	void toggle_record_avi() { toggle_record_movie(MF_AVI); }
+	void toggle_record_movie(movie_recording::format format);
 	osd_file::error open_next(emu_file &file, const char *extension, uint32_t index = 0);
 	void compute_snapshot_size(s32 &width, s32 &height);
 	void pixels(u32 *buffer);
@@ -90,14 +81,9 @@ public:
 	void save_input_timecode();
 
 	// movies
-	void begin_recording(const char *name, movie_format format);
-	void begin_recording_mng(const char *name, uint32_t index, screen_device *screen);
-	void begin_recording_avi(const char *name, uint32_t index, screen_device *screen);
-	void end_recording(movie_format format);
-	void end_recording_mng(uint32_t index);
-	void end_recording_avi(uint32_t index);
+	void begin_recording(const char *name, movie_recording::format format);
+	void end_recording();
 	void add_sound_to_recording(const s16 *sound, int numsamples);
-	void add_sound_to_avi_recording(const s16 *sound, int numsamples, uint32_t index);
 
 	void set_timecode_enabled(bool value) { m_timecode_enabled = value; }
 	bool get_timecode_enabled() { return m_timecode_enabled; }
@@ -132,6 +118,9 @@ private:
 	void create_snapshot_bitmap(screen_device *screen);
 	void record_frame();
 
+	// movies
+	void begin_recording_screen(const std::string &filename, uint32_t index, screen_device *screen, movie_recording::format format);
+
 	// internal state
 	running_machine &   m_machine;                  // reference to our machine
 
@@ -163,6 +152,7 @@ private:
 	u32                 m_seconds_to_run;           // number of seconds to run before quitting
 	bool                m_auto_frameskip;           // flag: true if we're automatically frameskipping
 	u32                 m_speed;                    // overall speed (*1000)
+	bool                m_low_latency;              // flag: true if we are throttling after blitting
 
 	// frameskipping
 	u8                  m_empty_skip_count;         // number of empty frames we have skipped
@@ -179,38 +169,8 @@ private:
 	s32                 m_snap_width;               // width of snapshots (0 == auto)
 	s32                 m_snap_height;              // height of snapshots (0 == auto)
 
-	// movie recording - MNG
-	class mng_info_t
-	{
-	public:
-		mng_info_t()
-			: m_mng_frame_period(attotime::zero)
-			, m_mng_next_frame_time(attotime::zero)
-			, m_mng_frame(0) { }
-
-		std::unique_ptr<emu_file> m_mng_file;              // handle to the open movie file
-		attotime            m_mng_frame_period;         // period of a single movie frame
-		attotime            m_mng_next_frame_time;      // time of next frame
-		u32                 m_mng_frame;                // current movie frame number
-	};
-	std::vector<mng_info_t> m_mngs;
-
-	// movie recording - AVI
-	class avi_info_t
-	{
-	public:
-		avi_info_t()
-			: m_avi_file(nullptr)
-			, m_avi_frame_period(attotime::zero)
-			, m_avi_next_frame_time(attotime::zero)
-			, m_avi_frame(0) { }
-
-		avi_file::ptr       m_avi_file;                 // handle to the open movie file
-		attotime            m_avi_frame_period;         // period of a single movie frame
-		attotime            m_avi_next_frame_time;      // time of next frame
-		u32                 m_avi_frame;                // current movie frame number
-	};
-	std::vector<avi_info_t> m_avis;
+	// movie recordings
+	std::vector<movie_recording::ptr> m_movie_recordings;
 
 	static const bool   s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
 

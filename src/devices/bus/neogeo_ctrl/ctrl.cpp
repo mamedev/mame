@@ -43,8 +43,8 @@ DEFINE_DEVICE_TYPE(NEOGEO_CTRL_EDGE_CONNECTOR, neogeo_ctrl_edge_port_device, "ne
 //  device_neogeo_control_port_interface - constructor
 //-------------------------------------------------
 
-device_neogeo_control_port_interface::device_neogeo_control_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+device_neogeo_control_port_interface::device_neogeo_control_port_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "neogeoctrl")
 {
 	m_port = dynamic_cast<neogeo_control_port_device *>(device.owner());
 }
@@ -62,8 +62,8 @@ device_neogeo_control_port_interface::~device_neogeo_control_port_interface()
 //  device_neogeo_ctrl_edge_interface - constructor
 //-------------------------------------------------
 
-device_neogeo_ctrl_edge_interface::device_neogeo_ctrl_edge_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+device_neogeo_ctrl_edge_interface::device_neogeo_ctrl_edge_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "neogeoedge")
 {
 	m_port = dynamic_cast<neogeo_ctrl_edge_port_device *>(device.owner());
 }
@@ -88,7 +88,7 @@ device_neogeo_ctrl_edge_interface::~device_neogeo_ctrl_edge_interface()
 
 neogeo_control_port_device::neogeo_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NEOGEO_CONTROL_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_neogeo_control_port_interface>(mconfig, *this),
 	m_device(nullptr)
 {
 }
@@ -109,7 +109,7 @@ neogeo_control_port_device::~neogeo_control_port_device()
 
 void neogeo_control_port_device::device_start()
 {
-	m_device = dynamic_cast<device_neogeo_control_port_interface *>(get_card_device());
+	m_device = get_card_device();
 }
 
 
@@ -137,7 +137,7 @@ void neogeo_control_port_device::write_ctrlsel(uint8_t data)
 
 neogeo_ctrl_edge_port_device::neogeo_ctrl_edge_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NEOGEO_CTRL_EDGE_CONNECTOR, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_neogeo_ctrl_edge_interface>(mconfig, *this),
 	m_device(nullptr)
 {
 }
@@ -158,18 +158,18 @@ neogeo_ctrl_edge_port_device::~neogeo_ctrl_edge_port_device()
 
 void neogeo_ctrl_edge_port_device::device_start()
 {
-	m_device = dynamic_cast<device_neogeo_ctrl_edge_interface *>(get_card_device());
+	m_device = get_card_device();
 }
 
 
-READ8_MEMBER(neogeo_ctrl_edge_port_device::in0_r)
+uint8_t neogeo_ctrl_edge_port_device::in0_r()
 {
-	return m_device ? m_device->in0_r(space, offset, mem_mask) : 0xff;
+	return m_device ? m_device->in0_r() : 0xff;
 }
 
-READ8_MEMBER(neogeo_ctrl_edge_port_device::in1_r)
+uint8_t neogeo_ctrl_edge_port_device::in1_r()
 {
-	return m_device ? m_device->in1_r(space, offset, mem_mask) : 0xff;
+	return m_device ? m_device->in1_r() : 0xff;
 }
 
 uint8_t neogeo_ctrl_edge_port_device::read_start_sel()

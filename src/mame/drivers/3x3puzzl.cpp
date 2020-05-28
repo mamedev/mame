@@ -32,7 +32,7 @@ Notes:
      * On the intro, parts of the tilemaps are not being copied correctly
        causing bits of the charcter's hat to vanish
      * Background colors inexplicably change in certain places between frames
-     * Dipswitch descriptions on the DIP INFO page do not match atcual effects
+     * Dipswitch descriptions on the DIP INFO page do not match actual effects
        of said dipswitches
 
   These are not emulation bugs and have been verified on a real PCB
@@ -66,6 +66,11 @@ public:
 
 	void _3x3puzzle(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram1;
@@ -97,15 +102,11 @@ private:
 	int       m_oki_bank;
 	uint16_t  m_gfx_control;
 
-	DECLARE_WRITE16_MEMBER(gfx_ctrl_w);
-	DECLARE_WRITE16_MEMBER(tilemap1_scrollx_w);
-	DECLARE_WRITE16_MEMBER(tilemap1_scrolly_w);
+	void gfx_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tilemap1_scrollx_w(uint16_t data);
+	void tilemap1_scrolly_w(uint16_t data);
 
 	void _3x3puzzle_map(address_map &map);
-
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -113,7 +114,7 @@ private:
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
 {
 	uint16_t code = m_videoram1_buffer[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			0,
 			0);
@@ -122,7 +123,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 {
 	uint16_t code = m_videoram2_buffer[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			1,
 			0);
@@ -131,13 +132,13 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile3_info)
 {
 	uint16_t code = m_videoram3_buffer[tile_index];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			2,
 			0);
 }
 
-WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
+void _3x3puzzle_state::gfx_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// does this have registers to control when the actual tile/palette
 	// data is copied to a private buffer?
@@ -167,21 +168,21 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 	}
 }
 
-WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrollx_w)
+void _3x3puzzle_state::tilemap1_scrollx_w(uint16_t data)
 {
 	m_tilemap1->set_scrollx(data);
 }
 
-WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrolly_w)
+void _3x3puzzle_state::tilemap1_scrolly_w(uint16_t data)
 {
 	m_tilemap1->set_scrolly(data);
 }
 
 void _3x3puzzle_state::video_start()
 {
-	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile1_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile2_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tilemap3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile3_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_3x3puzzle_state::get_tile1_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_3x3puzzle_state::get_tile2_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_3x3puzzle_state::get_tile3_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap2->set_transparent_pen(0);
 	m_tilemap3->set_transparent_pen(0);
 }
@@ -263,50 +264,50 @@ static INPUT_PORTS_START( _3x3puzzle )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW01")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coinage ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) )    PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Difficulty ) )     PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(      0x1800, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easiest ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Free Play / Debug mode" )
+	PORT_DIPNAME( 0x4000, 0x4000, "Free Play / Debug mode" )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END

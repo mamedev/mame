@@ -636,7 +636,7 @@ void ymz280b_device::device_reset()
 	m_ext_mem_address = 0;
 
 	/* clear other voice parameters */
-	for (auto & elem : m_voice)
+	for (auto &elem : m_voice)
 	{
 		struct YMZ280BVoice *voice = &elem;
 
@@ -653,7 +653,7 @@ void ymz280b_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	if (id < 8)
 		update_irq_state_timer_common( id );
 	else
-		assert_always(false, "Unknown id in ymz280b_device::device_timer");
+		throw emu_fatalerror("Unknown id in ymz280b_device::device_timer");
 }
 
 
@@ -927,7 +927,7 @@ DEFINE_DEVICE_TYPE(YMZ280B, ymz280b_device, "ymz280b", "Yamaha YMZ280B PCMD8")
 ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMZ280B, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 24)
+	, device_rom_interface(mconfig, *this)
 	, m_current_register(0)
 	, m_status_register(0)
 	, m_irq_state(0)

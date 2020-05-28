@@ -130,7 +130,7 @@ uint8_t taitowlf_state::mtxc_config_r(int function, int reg)
 
 void taitowlf_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 
 	switch(reg)
 	{
@@ -204,7 +204,7 @@ uint8_t taitowlf_state::piix4_config_r(int function, int reg)
 
 void taitowlf_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -286,7 +286,7 @@ void taitowlf_state::taitowlf_map(address_map &map)
 	map(0x000f0000, 0x000fffff).bankr("bank1");
 	map(0x000f0000, 0x000fffff).w(FUNC(taitowlf_state::bios_ram_w));
 	map(0x00100000, 0x01ffffff).ram();
-//  AM_RANGE(0xf8000000, 0xf83fffff) AM_ROM AM_REGION("user3", 0)
+//  map(0xf8000000, 0xf83fffff).rom().region("user3", 0);
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);   /* System BIOS */
 }
 
@@ -379,10 +379,8 @@ void taitowlf_state::taitowlf(machine_config &config)
 
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (0, FUNC(taitowlf_state::intel82439tx_pci_r), this);
-	pcibus.set_device_write(0, FUNC(taitowlf_state::intel82439tx_pci_w), this);
-	pcibus.set_device_read (7, FUNC(taitowlf_state::intel82371ab_pci_r), this);
-	pcibus.set_device_write(7, FUNC(taitowlf_state::intel82371ab_pci_w), this);
+	pcibus.set_device(0, FUNC(taitowlf_state::intel82439tx_pci_r), FUNC(taitowlf_state::intel82439tx_pci_w));
+	pcibus.set_device(7, FUNC(taitowlf_state::intel82371ab_pci_r), FUNC(taitowlf_state::intel82371ab_pci_w));
 
 	pcat_common(config);
 

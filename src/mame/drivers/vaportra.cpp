@@ -217,6 +217,7 @@ void vaportra_state::vaportra(machine_config &config)
 	H6280(config, m_audiocpu, XTAL(24'000'000)/4); /* Custom chip 45; Audio section crystal is 32.220 MHz but CPU clock is confirmed as coming from the 24MHz crystal (6Mhz exactly on the CPU) */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &vaportra_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+	m_audiocpu->set_timer_scale(2);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -235,14 +236,12 @@ void vaportra_state::vaportra(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x20);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(vaportra_state::bank_callback), this);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(vaportra_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(vaportra_state::bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(vaportra_state::bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
@@ -250,20 +249,18 @@ void vaportra_state::vaportra(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x40);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(vaportra_state::bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(vaportra_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(vaportra_state::bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(vaportra_state::bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(2);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_colpri_callback(FUNC(vaportra_state::vaportra_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(vaportra_state::vaportra_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

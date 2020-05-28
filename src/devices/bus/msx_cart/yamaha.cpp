@@ -4,9 +4,6 @@
 
 Yamaha SFG01/SFG05 emulation
 
-TODO:
-- Use a real YM2164 implementation for SFG05
-
 **************************************************************************/
 
 #include "emu.h"
@@ -71,6 +68,16 @@ void msx_cart_sfg_device::device_add_mconfig(machine_config &config)
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("ym2148", FUNC(ym2148_device::write_rxd));
 }
 
+void msx_cart_sfg05_device::device_add_mconfig(machine_config &config)
+{
+	msx_cart_sfg_device::device_add_mconfig(config);
+
+	YM2164(config.replace(), m_ym2151, XTAL(3'579'545));
+	m_ym2151->irq_handler().set(FUNC(msx_cart_sfg05_device::ym2151_irq_w));
+	m_ym2151->add_route(0, "lspeaker", 0.80);
+	m_ym2151->add_route(1, "rspeaker", 0.80);
+}
+
 
 ROM_START( msx_sfg01 )
 	ROM_REGION(0x4000, "sfg", 0)
@@ -106,7 +113,7 @@ void msx_cart_sfg_device::device_start()
 
 	// This should probably moved up in the bus/slot hierarchy for the msx driver
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
-	maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(msx_cart_sfg_device::irq_callback),this));
+	maincpu->set_irq_acknowledge_callback(*this, FUNC(msx_cart_sfg_device::irq_callback));
 }
 
 

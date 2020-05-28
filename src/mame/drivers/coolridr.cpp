@@ -15,7 +15,6 @@
 
     TODO:
     - Understand what the 0x400000c reads on SH-2 really do.
-    - Remove SH-2 watchdog hack, if we ever bother about it ...
     - improve sound emulation
     - i8237 purpose is unknown (missing ROM for comms?).
     - verify zooming etc. our current algorithm is a bit ugly for text
@@ -379,24 +378,22 @@ public:
 	uint32_t get_20bit_data(uint32_t romoffset, int _20bitwordnum);
 	uint16_t get_10bit_data(uint32_t romoffset, int _10bitwordnum);
 
-	DECLARE_READ32_MEMBER(sound_dma_r);
-	DECLARE_WRITE32_MEMBER(sound_dma_w);
-	DECLARE_READ32_MEMBER(unk_blit_r);
-	DECLARE_WRITE32_MEMBER(unk_blit_w);
-	DECLARE_WRITE32_MEMBER(blit_mode_w);
-	DECLARE_WRITE32_MEMBER(blit_data_w);
-	DECLARE_WRITE32_MEMBER(fb_mode_w);
-	DECLARE_WRITE32_MEMBER(fb_data_w);
+	uint32_t sound_dma_r(offs_t offset);
+	void sound_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t unk_blit_r(offs_t offset);
+	void unk_blit_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void blit_mode_w(uint32_t data);
+	void blit_data_w(address_space &space, uint32_t data);
+	void fb_mode_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void fb_data_w(offs_t offset, uint32_t data);
 
-	DECLARE_WRITE32_MEMBER(dma_w);
-	DECLARE_READ32_MEMBER(coolridr_hack2_r);
-	DECLARE_READ32_MEMBER(aquastge_hack_r);
-	template<int Chip> DECLARE_READ16_MEMBER(soundram_r);
-	template<int Chip> DECLARE_WRITE16_MEMBER(soundram_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	void dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Chip> uint16_t soundram_r(offs_t offset);
+	template<int Chip> void soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void lamps_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
-	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
+	void sound_to_sh1_w(uint8_t data);
 	void init_coolridr();
 	void init_aquastge();
 	virtual void machine_start() override;
@@ -417,7 +414,7 @@ public:
 	void blit_current_sprite(address_space &space);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_main);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_sub);
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+	void scsp_irq(offs_t offset, uint8_t data);
 
 	void dma_transfer( address_space &space, uint16_t dma_index );
 
@@ -2303,7 +2300,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 }
 
 
-WRITE32_MEMBER(coolridr_state::blit_mode_w)
+void coolridr_state::blit_mode_w(uint32_t data)
 {
 	m_blitterMode = (data & 0x00ff0000) >> 16;
 
@@ -2369,7 +2366,7 @@ WRITE32_MEMBER(coolridr_state::blit_mode_w)
 	{
 		// Could be a full clear of VRAM?
 		for(uint32_t vramAddr = 0x3f40000; vramAddr < 0x3f4ffff; vramAddr+=4)
-			space.write_dword(vramAddr, 0x00000000);
+			m_maincpu->space(AS_PROGRAM).write_dword(vramAddr, 0x00000000);
 
 		m_blitterSerialCount = 0;
 	}
@@ -2389,7 +2386,7 @@ WRITE32_MEMBER(coolridr_state::blit_mode_w)
 	}
 }
 
-WRITE32_MEMBER(coolridr_state::blit_data_w)
+void coolridr_state::blit_data_w(address_space &space, uint32_t data)
 {
 	if (m_blitterMode == 0xf4)
 	{
@@ -2452,7 +2449,7 @@ WRITE32_MEMBER(coolridr_state::blit_data_w)
 	}
 }
 
-WRITE32_MEMBER(coolridr_state::fb_mode_w)
+void coolridr_state::fb_mode_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	This does the fb display/clear phases of blitter data processed in the previous frame.
@@ -2484,7 +2481,7 @@ WRITE32_MEMBER(coolridr_state::fb_mode_w)
 
 
 
-WRITE32_MEMBER(coolridr_state::fb_data_w)
+void coolridr_state::fb_data_w(offs_t offset, uint32_t data)
 {
 	if(m_blitterClearCount == 0)
 	{
@@ -2618,7 +2615,7 @@ WRITE32_MEMBER(coolridr_state::fb_data_w)
 	m_blitterClearCount++;
 }
 
-READ32_MEMBER(coolridr_state::unk_blit_r)
+uint32_t coolridr_state::unk_blit_r(offs_t offset)
 {
 //  if(offset == 0x0c/4) // TODO
 
@@ -2626,7 +2623,7 @@ READ32_MEMBER(coolridr_state::unk_blit_r)
 }
 
 
-WRITE32_MEMBER(coolridr_state::unk_blit_w)
+void coolridr_state::unk_blit_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_txt_blit[offset]);
 
@@ -2770,7 +2767,7 @@ void coolridr_state::dma_transfer( address_space &space, uint16_t dma_index )
 	}while(!end_dma_mark );
 }
 
-WRITE32_MEMBER(coolridr_state::dma_w)
+void coolridr_state::dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_framebuffer_vram[offset]);
 
@@ -2819,19 +2816,19 @@ void coolridr_state::aquastge_h1_map(address_map &map)
 }
 
 template<int Chip>
-READ16_MEMBER( coolridr_state::soundram_r)
+uint16_t coolridr_state::soundram_r(offs_t offset)
 {
 	return m_soundram[Chip][offset];
 }
 
 template<int Chip>
-WRITE16_MEMBER( coolridr_state::soundram_w)
+void coolridr_state::soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_soundram[Chip][offset]);
 }
 
 
-WRITE8_MEMBER( coolridr_state::lamps_w )
+void coolridr_state::lamps_w(uint8_t data)
 {
 	/*
 	x--- ---- P2 Music select Lamp
@@ -2845,7 +2842,7 @@ WRITE8_MEMBER( coolridr_state::lamps_w )
 }
 
 
-READ32_MEMBER(coolridr_state::sound_dma_r)
+uint32_t coolridr_state::sound_dma_r(offs_t offset)
 {
 	if(offset == 8)
 	{
@@ -2866,7 +2863,7 @@ READ32_MEMBER(coolridr_state::sound_dma_r)
 	return m_sound_dma[offset];
 }
 
-WRITE32_MEMBER(coolridr_state::sound_dma_w)
+void coolridr_state::sound_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	address_space &main_space = m_maincpu->space(AS_PROGRAM);
 	address_space &sound_space = m_soundcpu->space(AS_PROGRAM);
@@ -2962,7 +2959,7 @@ void coolridr_state::aquastge_submap(address_map &map)
 }
 
 /* TODO: what is this for, volume mixing? MIDI? */
-WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
+void coolridr_state::sound_to_sh1_w(uint8_t data)
 {
 	m_sound_fifo = data;
 }
@@ -3207,7 +3204,7 @@ void coolridr_state::machine_reset()
 	m_usethreads = m_io_config->read()&1;
 }
 
-WRITE8_MEMBER(coolridr_state::scsp_irq)
+void coolridr_state::scsp_irq(offs_t offset, uint8_t data)
 {
 	m_soundcpu->set_input_line(offset, data);
 }
@@ -3380,80 +3377,21 @@ ROM_START( aquastge )
 ROM_END
 
 
-/*
-TODO: both irq routines writes 1 to 0x60d8894, sets up the Watchdog timer then expect that this buffer goes low IN the irq routines.
-      The Watchdog Timer is setted up with these params:
-      0xee for wtcnt
-      0x39 for wtcsr (enable irq (bit 5), enable timer (bit 4), clock select divider / 64 (bits 2-0))
-      vector is 0x7f (so VBR+0x1fc)
-      level is 0xf
-... and indeed the Watchdog irq routine effectively clears this RAM buffer. What the manual doesn't say is that the Watchdog timer irq
-    presumably is treated as an NMI by the SH-2 CPU and not really a "normal" irq exception.
-    For the record, here's the ITI code snippet:
-    06002DE4: 2F36   MOV.L   R3,@-SP
-    06002DE6: E300   MOV     #$00,R3
-    06002DE8: 2F26   MOV.L   R2,@-SP
-    06002DEA: D20B   MOV.L   @($2C,PC),R2
-    06002DEC: 2230   MOV.B   R3,@R2 ;writes 0 to the RAM buffer 0x60d8896
-    06002DEE: 9305   MOV.W   @($000A,PC),R3
-    06002DF0: 9205   MOV.W   @($000A,PC),R2
-    06002DF2: 2231   MOV.W   R3,@R2 ;writes 0x19, disables the watchdog timer
-    06002DF4: 62F6   MOV.L   @SP+,R2
-    06002DF6: 63F6   MOV.L   @SP+,R3
-    06002DF8: 002B   RTE
-    06002DFA: 0009   NOP
-
-*/
-READ32_MEMBER(coolridr_state::coolridr_hack2_r)
-{
-	offs_t pc = m_maincpu->pc();
-
-	if(pc == 0x6002cba || pc == 0x6002d42)
-		return 0;
-
-	// with the non-recompiler pc returns +2
-	if(pc == 0x06002cbc || pc == 0x06002d44)
-		return 0;
-
-	return m_workram_h[0xd8894/4];
-}
-
-
-READ32_MEMBER(coolridr_state::aquastge_hack_r)
-{
-	offs_t pc = m_maincpu->pc();
-
-	if ((pc == 0x6009e76) || (pc == 0x6009e78))
-		return 0;
-	else
-	{
-//      printf("pc %08x\n", pc);
-	}
-
-	return m_workram_h[0xc3fd8/4];
-}
-
-
 void coolridr_state::init_coolridr()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
-
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 
 	m_colbase = 0x7b20;
 
 	// work around the hack when mapping the workram directly
-	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060d7fff, 0, &m_workram_h[0]);
-	m_maincpu->sh2drc_add_fastram(0x060d9000, 0x060fffff, 0, &m_workram_h[0xd9000/4]);
+	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_workram_h[0]);
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, 1, &m_rom[0]);
 	m_maincpu->sh2drc_add_fastram(0x20000000, 0x201fffff, 1, &m_rom[0]);
 }
 
 void coolridr_state::init_aquastge()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60c3fd8, 0x60c3fdb, read32_delegate(FUNC(coolridr_state::aquastge_hack_r), this));
-
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 

@@ -108,10 +108,10 @@ void spectrum_melodik_device::iorq_w(offs_t offset, uint8_t data)
 	switch (offset & 0xc002)
 	{
 	case 0x8000:
-		m_psg->address_w(data);
+		m_psg->data_w(data);
 		break;
 	case 0xc000:
-		m_psg->data_w(data);
+		m_psg->address_w(data);
 		break;
 	}
 	m_exp->iorq_w(offset, data);

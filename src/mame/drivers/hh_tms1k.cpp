@@ -8,6 +8,7 @@
   part of a series is (or will be) in its own driver, see:
   - eva: Chrysler EVA-11 (and EVA-24)
   - microvsn: Milton Bradley MicroVision
+  - sag: Entex Select-A-Game Machine
 
   (contd.) hh_tms1k child drivers:
   - tispellb: TI Spelling B series gen. 1
@@ -30,7 +31,7 @@
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
  @MP0170   TMS1000   1979, Conic Football
  *MP0230   TMS1000   1980, Entex Blast It (6015)
- @MP0271   TMS1000   1982, Tandy Radio Shack Monkey See
+ @MP0271   TMS1000   1982, Radio Shack Monkey See
  @MP0907   TMS1000   1979, Conic Basketball (101-006)
  @MP0908   TMS1000   1979, Conic Electronic I.Q.
  *MP0910   TMS1000   1979, Conic Basketball (101-003)
@@ -54,8 +55,9 @@
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
  @MP1219   TMS1100   1980, U.S. Games Super Sports-4
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
+ *MP1231   TMS1100   1983, Tandy 3-in-1 Sports Arena (model 60-2178)
  *MP1296   TMS1100?  1982, Entex Black Knight
- @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Tandy Radio Shack Science Fair Microcomputer Trainer
+ @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
@@ -66,11 +68,12 @@
  @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
- *MP3200   TMS1000   1978, Parker Brothers Electronic Mastermind
+ @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
+ @MP3260   TMS1000   1979, Electroplay Quickfire
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  @MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
@@ -85,7 +88,7 @@
  @MP3415   TMS1100   1978, Coleco Electronic Quarterback
  @MP3435   TMS1100   1979, Coleco Zodiac
  @MP3438A  TMS1100   1979, Kenner Star Wars Electronic Battle Command
-  MP3450A  TMS1100   1979, MicroVision cartridge: Blockbuster
+  MP3450A  TMS1100   1979, MicroVision cartridge: Block Buster
   MP3454   TMS1100   1979, MicroVision cartridge: Star Trek Phaser Strike
   MP3455   TMS1100   1980, MicroVision cartridge: Pinball
   MP3457   TMS1100   1979, MicroVision cartridge: Mindbuster
@@ -112,6 +115,7 @@
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
+ *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable)
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
@@ -122,13 +126,13 @@
  @MP7351   TMS1400   1982, Parker Brothers Master Merlin
  @MP7551   TMS1670   1980, Entex Color Football 4 (6009)
  @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (6008) (note: assume F to be a misprint)
- *MP7573   TMS1670?  1981, Entex Select-a-Game cartridge: Football 4 (? note: 40-pin, VFD-capable)
+  MP7573   TMS1670   1981, Entex Select-A-Game cartridge: Football 4 -> sag.cpp
  *M95041   ?         1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
 
   inconsistent:
 
  @TMS1007  TMS1000   1976, TSI Speech+ (S14002-A)
- @CD7282SL TMS1100   1981, Tandy Radio Shack Tandy-12 (serial is similar to TI Speak & Spell series?)
+ @CD7282SL TMS1100   1981, Tandy-12 (serial is similar to TI Speak & Spell series?)
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
@@ -220,7 +224,9 @@
 #include "merlin.lh" // clickable
 #include "mmerlin.lh" // clickable
 #include "monkeysee.lh"
+#include "pbmastm.lh"
 #include "phpball.lh"
+#include "qfire.lh" // clickable
 #include "quizwizc.lh"
 #include "raisedvl.lh"
 #include "simon.lh" // clickable
@@ -390,9 +396,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void matchnum(machine_config &config);
 };
 
@@ -403,7 +409,7 @@ void matchnum_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(matchnum_state::write_r)
+void matchnum_state::write_r(u16 data)
 {
 	// R3-R5,R8-R10: input mux
 	m_inp_mux = (data >> 3 & 7) | (data >> 5 & 0x38);
@@ -416,7 +422,7 @@ WRITE16_MEMBER(matchnum_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(matchnum_state::write_o)
+void matchnum_state::write_o(u16 data)
 {
 	// O0-O6: digit segments A-G
 	// O7: led data
@@ -424,7 +430,7 @@ WRITE16_MEMBER(matchnum_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(matchnum_state::read_k)
+u8 matchnum_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(6);
@@ -531,9 +537,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void arrball(machine_config &config);
 };
 
@@ -544,7 +550,7 @@ void arrball_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(arrball_state::write_r)
+void arrball_state::write_r(u16 data)
 {
 	// R8: input mux (always set)
 	m_inp_mux = data >> 8 & 1;
@@ -557,14 +563,14 @@ WRITE16_MEMBER(arrball_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(arrball_state::write_o)
+void arrball_state::write_o(u16 data)
 {
 	// O0-O6: digit segments/led data
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(arrball_state::read_k)
+u8 arrball_state::read_k()
 {
 	// K: multiplexed inputs (actually just 1)
 	return read_inputs(1);
@@ -651,9 +657,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void mathmagi(machine_config &config);
 };
 
@@ -664,7 +670,7 @@ void mathmagi_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(mathmagi_state::write_r)
+void mathmagi_state::write_r(u16 data)
 {
 	// R3,R5-R7,R9,R10: input mux
 	m_inp_mux = (data >> 3 & 1) | (data >> 4 & 0xe) | (data >> 5 & 0x30);
@@ -677,7 +683,7 @@ WRITE16_MEMBER(mathmagi_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(mathmagi_state::write_o)
+void mathmagi_state::write_o(u16 data)
 {
 	// O1-O7: led/digit segment data
 	// O0: N/C
@@ -685,7 +691,7 @@ WRITE16_MEMBER(mathmagi_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(mathmagi_state::read_k)
+u8 mathmagi_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(6);
@@ -774,7 +780,7 @@ ROM_START( mathmagi )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_mathmagi_output.pla", 0, 365, NO_DUMP )
 ROM_END
 
@@ -807,22 +813,22 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void bcheetah(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(bcheetah_state::write_r)
+void bcheetah_state::write_r(u16 data)
 {
 	// R0-R4: input mux
 	// R5,R6: tied to K4??
 	m_inp_mux = data & 0x1f;
 }
 
-WRITE16_MEMBER(bcheetah_state::write_o)
+void bcheetah_state::write_o(u16 data)
 {
 	// O1: back motor (drive)
 	// O0: front motor steer left
@@ -833,7 +839,7 @@ WRITE16_MEMBER(bcheetah_state::write_o)
 	output().set_value("motor2_right", data >> 2 & 1);
 }
 
-READ8_MEMBER(bcheetah_state::read_k)
+u8 bcheetah_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -919,9 +925,9 @@ public:
 
 private:
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_o(u16 data);
+	void write_r(u16 data);
+	u8 read_k();
 };
 
 // handlers
@@ -937,21 +943,21 @@ void cmulti8_state::update_display()
 	m_display->matrix((sel & mask) | m, m_o);
 }
 
-WRITE16_MEMBER(cmulti8_state::write_r)
+void cmulti8_state::write_r(u16 data)
 {
 	// R0-R10: input mux, select digit
 	m_r = m_inp_mux = data;
 	update_display();
 }
 
-WRITE16_MEMBER(cmulti8_state::write_o)
+void cmulti8_state::write_o(u16 data)
 {
 	// O0-O7: digit segments
 	m_o = bitswap<8>(data,0,4,5,6,7,1,2,3);
 	update_display();
 }
 
-READ8_MEMBER(cmulti8_state::read_k)
+u8 cmulti8_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(11);
@@ -1084,9 +1090,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void amaztron(machine_config &config);
 };
 
@@ -1097,7 +1103,7 @@ void amaztron_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(amaztron_state::write_r)
+void amaztron_state::write_r(u16 data)
 {
 	// R0-R5: input mux
 	m_inp_mux = data & 0x3f;
@@ -1111,7 +1117,7 @@ WRITE16_MEMBER(amaztron_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(amaztron_state::write_o)
+void amaztron_state::write_o(u16 data)
 {
 	// O0-O6: digit segments A-G
 	// O7: N/C
@@ -1119,7 +1125,7 @@ WRITE16_MEMBER(amaztron_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(amaztron_state::read_k)
+u8 amaztron_state::read_k()
 {
 	// K: multiplexed inputs
 	u8 k = read_inputs(6);
@@ -1227,9 +1233,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void zodiac(machine_config &config);
 };
 
@@ -1240,7 +1246,7 @@ void zodiac_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(zodiac_state::write_r)
+void zodiac_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -1254,14 +1260,14 @@ WRITE16_MEMBER(zodiac_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(zodiac_state::write_o)
+void zodiac_state::write_o(u16 data)
 {
 	// O0-O7: digit segment/led data
 	m_o = bitswap<8>(data,0,7,6,5,4,3,2,1);
 	update_display();
 }
 
-READ8_MEMBER(zodiac_state::read_k)
+u8 zodiac_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(6);
@@ -1326,18 +1332,10 @@ static INPUT_PORTS_START( zodiac )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// output PLA is not decapped, dumped electronically
-static const u16 zodiac_output_pla[0x20] =
-{
-	0x01, 0x08, 0xa0, 0xa8, 0x40, 0x48, 0xe0, 0xe8, 0x06, 0x10, 0xa6, 0xb0, 0x46, 0x50, 0xe6, 0xf0,
-	0x7e, 0x0c, 0xb6, 0x9e, 0xcc, 0xda, 0xfa, 0x0e, 0xfe, 0xce, 0xee, 0xbc, 0xf2, 0x3c, 0x70, 0x7c
-};
-
 void zodiac_state::zodiac(machine_config &config)
 {
 	/* basic machine hardware */
 	TMS1100(config, m_maincpu, 500000); // approximation - RC osc. R=18K, C=100pF
-	m_maincpu->set_output_pla(zodiac_output_pla);
 	m_maincpu->k().set(FUNC(zodiac_state::read_k));
 	m_maincpu->r().set(FUNC(zodiac_state::write_r));
 	m_maincpu->o().set(FUNC(zodiac_state::write_o));
@@ -1361,8 +1359,11 @@ ROM_START( zodiac )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, BAD_DUMP CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_zodiac_output.pla", 0, 365, NO_DUMP )
+
+	ROM_REGION16_LE( 0x40, "maincpu:opla_b", ROMREGION_ERASE00 ) // verified, electronic dump
+	ROM_LOAD16_BYTE( "tms1100_zodiac_output.bin", 0, 0x20, CRC(d35d64cb) SHA1(315e7ca9a18a06ff7dc0b95c6f119e093b15a41f) )
 ROM_END
 
 
@@ -1389,9 +1390,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void cqback(machine_config &config);
 };
 
@@ -1407,7 +1408,7 @@ void cqback_state::update_display()
 	m_display->matrix(m_r & 0x1ff, seg);
 }
 
-WRITE16_MEMBER(cqback_state::write_r)
+void cqback_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -1420,14 +1421,14 @@ WRITE16_MEMBER(cqback_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(cqback_state::write_o)
+void cqback_state::write_o(u16 data)
 {
 	// O0-O7: digit segments
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(cqback_state::read_k)
+u8 cqback_state::read_k()
 {
 	// K: multiplexed inputs, rotated matrix
 	return read_rotated_inputs(5);
@@ -1521,9 +1522,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void h2hfootb(machine_config &config);
 };
 
@@ -1534,7 +1535,7 @@ void h2hfootb_state::update_display()
 	m_display->matrix(m_r & 0x1ff, m_o | (m_r >> 1 & 0x100));
 }
 
-WRITE16_MEMBER(h2hfootb_state::write_r)
+void h2hfootb_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -1548,14 +1549,14 @@ WRITE16_MEMBER(h2hfootb_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(h2hfootb_state::write_o)
+void h2hfootb_state::write_o(u16 data)
 {
 	// O0-O7: digit segments A-G,A'
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(h2hfootb_state::read_k)
+u8 h2hfootb_state::read_k()
 {
 	// K: multiplexed inputs, rotated matrix
 	return read_rotated_inputs(9);
@@ -1659,9 +1660,9 @@ public:
 	attotime m_cap_charge;
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void h2hbaskb(machine_config &config);
 	void h2hhockey(machine_config &config);
 
@@ -1699,7 +1700,7 @@ void h2hbaskb_state::update_display()
 	m_display->matrix(sel, m_o);
 }
 
-WRITE16_MEMBER(h2hbaskb_state::write_r)
+void h2hbaskb_state::write_r(u16 data)
 {
 	// R0-R3: input mux
 	m_inp_mux = (data & 0xf);
@@ -1732,14 +1733,14 @@ WRITE16_MEMBER(h2hbaskb_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(h2hbaskb_state::write_o)
+void h2hbaskb_state::write_o(u16 data)
 {
 	// O1-O7: led data
 	m_o = data >> 1 & 0x7f;
 	update_display();
 }
 
-READ8_MEMBER(h2hbaskb_state::read_k)
+u8 h2hbaskb_state::read_k()
 {
 	// K1-K4: multiplexed inputs, K8: R9 and capacitor
 	return (read_inputs(4) & 7) | (m_cap_state ? 8 : 0);
@@ -1855,9 +1856,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
@@ -1887,7 +1888,7 @@ void h2hbaseb_state::update_display()
 	m_display->matrix((m_r & 0xff) | (m_r >> 1 & 0x100), (m_r & 0x100) | m_o);
 }
 
-WRITE16_MEMBER(h2hbaseb_state::write_r)
+void h2hbaseb_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -1901,7 +1902,7 @@ WRITE16_MEMBER(h2hbaseb_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(h2hbaseb_state::write_o)
+void h2hbaseb_state::write_o(u16 data)
 {
 	// O0-O6: digit segments A-G
 	// O7: N/C
@@ -1909,7 +1910,7 @@ WRITE16_MEMBER(h2hbaseb_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(h2hbaseb_state::read_k)
+u8 h2hbaseb_state::read_k()
 {
 	// K: multiplexed inputs (note: K8(Vss row) is always on)
 	return m_inputs[4]->read() | read_inputs(4);
@@ -1999,9 +2000,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void h2hboxing(machine_config &config);
 };
 
@@ -2012,7 +2013,7 @@ void h2hboxing_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(h2hboxing_state::write_r)
+void h2hboxing_state::write_r(u16 data)
 {
 	// R0-R4: input mux
 	m_inp_mux = data & 0x1f;
@@ -2026,14 +2027,14 @@ WRITE16_MEMBER(h2hboxing_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(h2hboxing_state::write_o)
+void h2hboxing_state::write_o(u16 data)
 {
 	// O0-O7: digit segments/led data
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(h2hboxing_state::read_k)
+u8 h2hboxing_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -2143,9 +2144,9 @@ public:
 	u16 m_pinout; // cartridge R pins
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void quizwizc(machine_config &config);
 
 protected:
@@ -2184,7 +2185,7 @@ void quizwizc_state::update_display()
 	m_display->matrix(m_r | 0x400, m_o);
 }
 
-WRITE16_MEMBER(quizwizc_state::write_r)
+void quizwizc_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -2199,14 +2200,14 @@ WRITE16_MEMBER(quizwizc_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(quizwizc_state::write_o)
+void quizwizc_state::write_o(u16 data)
 {
 	// O0-O7: led/digit segment data
 	m_o = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	update_display();
 }
 
-READ8_MEMBER(quizwizc_state::read_k)
+u8 quizwizc_state::read_k()
 {
 	// K: multiplexed inputs
 	// K1: cartridge pin 4 (pin 5 N/C)
@@ -2274,7 +2275,7 @@ void quizwizc_state::quizwizc(machine_config &config)
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "quizwiz_cart"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(quizwizc_state::cart_load), this);
+	cartslot.set_device_load(FUNC(quizwizc_state::cart_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("quizwiz");
 }
 
@@ -2285,7 +2286,7 @@ ROM_START( quizwizc )
 	ROM_LOAD( "m32001", 0x0000, 0x0400, CRC(053657eb) SHA1(38c84f7416f79aa679f434a3d35df54cd9aa528a) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
+	ROM_LOAD( "tms1000_common4_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_quizwizc_output.pla", 0, 365, CRC(475b7053) SHA1(8f61bf736eb41d7029a6b165cc0a184ba0a70a2a) )
 ROM_END
@@ -2331,9 +2332,9 @@ public:
 	u8 m_pinout; // cartridge K pins
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void tc4(machine_config &config);
 
 protected:
@@ -2371,7 +2372,7 @@ void tc4_state::update_display()
 	m_display->matrix(m_r, (m_o | (m_r << 2 & 0x100)));
 }
 
-WRITE16_MEMBER(tc4_state::write_r)
+void tc4_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -2387,14 +2388,14 @@ WRITE16_MEMBER(tc4_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(tc4_state::write_o)
+void tc4_state::write_o(u16 data)
 {
 	// O0-O7: led state
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(tc4_state::read_k)
+u8 tc4_state::read_k()
 {
 	// K: multiplexed inputs, cartridge pins from R9
 	return read_inputs(6) | ((m_r & 0x200) ? m_pinout : 0);
@@ -2462,7 +2463,7 @@ void tc4_state::tc4(machine_config &config)
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "tc4_cart"));
 	cartslot.set_must_be_loaded(true); // system won't power on without cartridge
-	cartslot.set_device_load(FUNC(tc4_state::cart_load), this);
+	cartslot.set_device_load(FUNC(tc4_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("tc4");
 }
@@ -2507,9 +2508,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void cnbaskb(machine_config &config);
 };
 
@@ -2520,7 +2521,7 @@ void cnbaskb_state::update_display()
 	m_display->matrix(m_r & 0x1fc, m_o);
 }
 
-WRITE16_MEMBER(cnbaskb_state::write_r)
+void cnbaskb_state::write_r(u16 data)
 {
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
@@ -2535,7 +2536,7 @@ WRITE16_MEMBER(cnbaskb_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(cnbaskb_state::write_o)
+void cnbaskb_state::write_o(u16 data)
 {
 	// O0-O6: led/digit segment data
 	// O7: N/C
@@ -2543,7 +2544,7 @@ WRITE16_MEMBER(cnbaskb_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(cnbaskb_state::read_k)
+u8 cnbaskb_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(3);
@@ -2632,9 +2633,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void cmsport(machine_config &config);
 };
 
@@ -2645,7 +2646,7 @@ void cmsport_state::update_display()
 	m_display->matrix(m_r & ~0x80, m_o);
 }
 
-WRITE16_MEMBER(cmsport_state::write_r)
+void cmsport_state::write_r(u16 data)
 {
 	// R7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
@@ -2659,14 +2660,14 @@ WRITE16_MEMBER(cmsport_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(cmsport_state::write_o)
+void cmsport_state::write_o(u16 data)
 {
 	// O0-O7: led/digit segment data
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(cmsport_state::read_k)
+u8 cmsport_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(3);
@@ -2761,9 +2762,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void cnfball(machine_config &config);
 };
 
@@ -2774,7 +2775,7 @@ void cnfball_state::update_display()
 	m_display->matrix(m_grid, m_o | (m_r << 6 & 0x700));
 }
 
-WRITE16_MEMBER(cnfball_state::write_r)
+void cnfball_state::write_r(u16 data)
 {
 	// R5,R8: N/C
 	// R6,R7: speaker out
@@ -2797,14 +2798,14 @@ WRITE16_MEMBER(cnfball_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(cnfball_state::write_o)
+void cnfball_state::write_o(u16 data)
 {
 	// O0-O7: digit segments
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(cnfball_state::read_k)
+u8 cnfball_state::read_k()
 {
 	// K: multiplexed inputs, K8 also tied to DS8874N CP(R0)
 	return read_inputs(2) | (m_r << 3 & 8);
@@ -2883,7 +2884,7 @@ ROM_END
 
   known releases:
   - Hong Kong: Electronic Football II, Conic
-  - USA: Electronic Football II, Tandy Radio Shack
+  - USA: Electronic Football II, Tandy
 
 ***************************************************************************/
 
@@ -2895,9 +2896,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void cnfball2(machine_config &config);
 };
 
@@ -2913,7 +2914,7 @@ void cnfball2_state::update_display()
 	m_display->matrix(m_r >> 2 & 0x1ff, seg);
 }
 
-WRITE16_MEMBER(cnfball2_state::write_r)
+void cnfball2_state::write_r(u16 data)
 {
 	// R0: speaker out
 	m_speaker->level_w(data & 1);
@@ -2926,14 +2927,14 @@ WRITE16_MEMBER(cnfball2_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(cnfball2_state::write_o)
+void cnfball2_state::write_o(u16 data)
 {
 	// O0-O7: digit segments
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(cnfball2_state::read_k)
+u8 cnfball2_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(3);
@@ -2965,22 +2966,10 @@ static INPUT_PORTS_START( cnfball2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// output PLA is not decapped
-static const u16 cnfball2_output_pla[0x20] =
-{
-	// first half was dumped electronically
-	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x40, 0x01, 0x08, 0x02, 0x04, 0x00,
-
-	// rest is unused, game only outputs with status bit clear
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0
-};
-
 void cnfball2_state::cnfball2(machine_config &config)
 {
 	/* basic machine hardware */
 	TMS1100(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->set_output_pla(cnfball2_output_pla);
 	m_maincpu->k().set(FUNC(cnfball2_state::read_k));
 	m_maincpu->r().set(FUNC(cnfball2_state::write_r));
 	m_maincpu->o().set(FUNC(cnfball2_state::write_o));
@@ -3004,8 +2993,11 @@ ROM_START( cnfball2 )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_cnfball2_output.pla", 0, 365, NO_DUMP )
+
+	ROM_REGION16_LE( 0x40, "maincpu:opla_b", ROMREGION_ERASE00 ) // verified, electronic dump, 2nd half unused
+	ROM_LOAD16_BYTE( "tms1100_cnfball2_output.bin", 0, 0x20, CRC(c51d7404) SHA1(3a00c69b52b7d0dd12ccd66428130592c7e06240) )
 ROM_END
 
 
@@ -3036,9 +3028,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void eleciq(machine_config &config);
 };
 
@@ -3049,7 +3041,7 @@ void eleciq_state::update_display()
 	m_display->matrix(m_r & ~1, m_o);
 }
 
-WRITE16_MEMBER(eleciq_state::write_r)
+void eleciq_state::write_r(u16 data)
 {
 	// R0: speaker out
 	m_speaker->level_w(data & 1);
@@ -3063,7 +3055,7 @@ WRITE16_MEMBER(eleciq_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(eleciq_state::write_o)
+void eleciq_state::write_o(u16 data)
 {
 	// O0-O6: led/digit segment data
 	// O7: N/C
@@ -3071,7 +3063,7 @@ WRITE16_MEMBER(eleciq_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(eleciq_state::read_k)
+u8 eleciq_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(7);
@@ -3160,6 +3152,122 @@ ROM_END
 
 /***************************************************************************
 
+  Electroplay Quickfire
+  * TMS1000NLL MP3260 (die label same)
+  * 2 7seg LEDs, 5 lamps, 3 lightsensors, lightgun
+
+  To play it in MAME, either use the clickable artwork with -mouse, or set
+  button 1 to "Z or X or C" and each lightsensor to one of those keys.
+  Although the game seems mostly playable without having to use the gun trigger
+
+***************************************************************************/
+
+class qfire_state : public hh_tms1k_state
+{
+public:
+	qfire_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+	void qfire(machine_config &config);
+};
+
+// handlers
+
+void qfire_state::write_r(u16 data)
+{
+	// R1,R2,R5: input mux
+	m_inp_mux = (data >> 1 & 3) | (data >> 3 & 4);
+
+	// R3,R4,R6-R8: leds (direct)
+	m_display->write_row(2, (data >> 3 & 3) | (data >> 4 & 0x1c));
+	m_display->update();
+
+	// R9: speaker out
+	m_speaker->level_w(data >> 9 & 1);
+}
+
+void qfire_state::write_o(u16 data)
+{
+	// O0: 1st digit "1"
+	// O1-O7: 2nd digit segments
+	m_display->write_row(0, (data & 1) ? 6 : 0);
+	m_display->write_row(1, data >> 1 & 0x7f);
+	m_display->update();
+}
+
+u8 qfire_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(3);
+}
+
+// config
+
+static INPUT_PORTS_START( qfire )
+	PORT_START("IN.0") // R1
+	PORT_CONFNAME( 0x0f, 0x00, "Game" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x08, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_CONFSETTING(    0x02, "4" )
+	PORT_CONFSETTING(    0x01, "5" )
+	PORT_CONFSETTING(    0x06, "6" )
+
+	PORT_START("IN.1") // R2
+	PORT_CONFNAME( 0x07, 0x04, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x04, "A" )
+	PORT_CONFSETTING(    0x02, "B" )
+	PORT_CONFSETTING(    0x01, "C" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Lightsensor 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Lightsensor 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Lightsensor 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // lightgun trigger, also turns on lightgun lamp
+INPUT_PORTS_END
+
+void qfire_state::qfire(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
+	m_maincpu->k().set(FUNC(qfire_state::read_k));
+	m_maincpu->r().set(FUNC(qfire_state::write_r));
+	m_maincpu->o().set(FUNC(qfire_state::write_o));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(3, 7);
+	m_display->set_segmask(3, 0x7f);
+	config.set_default_layout(layout_qfire);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( qfire )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3260", 0x0000, 0x0400, CRC(f6e28376) SHA1(6129584c55a1629b458694cdc97edccb77ab00ba) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_qfire_output.pla", 0, 365, CRC(8f7668a9) SHA1(c8faeff0f88bfea8f032ce5bc583f049e8930c11) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Entex (Electronic) Soccer
   * TMS1000NL MP0158 (die label same)
   * 2 7seg LEDs, 30 other LEDs, 1-bit sound
@@ -3178,9 +3286,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void esoccer(machine_config &config);
 };
 
@@ -3191,7 +3299,7 @@ void esoccer_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(esoccer_state::write_r)
+void esoccer_state::write_r(u16 data)
 {
 	// R0-R2: input mux
 	m_inp_mux = data & 7;
@@ -3205,14 +3313,14 @@ WRITE16_MEMBER(esoccer_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(esoccer_state::write_o)
+void esoccer_state::write_o(u16 data)
 {
 	// O0-O6: led state
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(esoccer_state::read_k)
+u8 esoccer_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(3);
@@ -3316,9 +3424,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void ebball(machine_config &config);
 };
 
@@ -3329,7 +3437,7 @@ void ebball_state::update_display()
 	m_display->matrix(m_r, ~m_o);
 }
 
-WRITE16_MEMBER(ebball_state::write_r)
+void ebball_state::write_r(u16 data)
 {
 	// R1-R5: input mux
 	m_inp_mux = data >> 1 & 0x1f;
@@ -3343,7 +3451,7 @@ WRITE16_MEMBER(ebball_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(ebball_state::write_o)
+void ebball_state::write_o(u16 data)
 {
 	// O0-O6: led state
 	// O7: N/C
@@ -3351,7 +3459,7 @@ WRITE16_MEMBER(ebball_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(ebball_state::read_k)
+u8 ebball_state::read_k()
 {
 	// K: multiplexed inputs (note: K8(Vss row) is always on)
 	return m_inputs[5]->read() | read_inputs(5);
@@ -3459,9 +3567,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void ebball2(machine_config &config);
 };
 
@@ -3472,7 +3580,7 @@ void ebball2_state::update_display()
 	m_display->matrix(m_r ^ 0x7f, ~m_o);
 }
 
-WRITE16_MEMBER(ebball2_state::write_r)
+void ebball2_state::write_r(u16 data)
 {
 	// R3-R6: input mux
 	m_inp_mux = data >> 3 & 0xf;
@@ -3486,14 +3594,14 @@ WRITE16_MEMBER(ebball2_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(ebball2_state::write_o)
+void ebball2_state::write_o(u16 data)
 {
 	// O0-O7: led state
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(ebball2_state::read_k)
+u8 ebball2_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(4);
@@ -3600,9 +3708,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
@@ -3639,7 +3747,7 @@ void ebball3_state::update_display()
 	m_display->update();
 }
 
-WRITE16_MEMBER(ebball3_state::write_r)
+void ebball3_state::write_r(u16 data)
 {
 	// R0-R2: input mux
 	m_inp_mux = data & 7;
@@ -3653,7 +3761,7 @@ WRITE16_MEMBER(ebball3_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(ebball3_state::write_o)
+void ebball3_state::write_o(u16 data)
 {
 	// O0-O6: led state
 	// O7: N/C
@@ -3661,7 +3769,7 @@ WRITE16_MEMBER(ebball3_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(ebball3_state::read_k)
+u8 ebball3_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(3);
@@ -3775,9 +3883,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void esbattle(machine_config &config);
 };
 
@@ -3788,7 +3896,7 @@ void esbattle_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(esbattle_state::write_r)
+void esbattle_state::write_r(u16 data)
 {
 	// R0,R1: input mux
 	m_inp_mux = data & 3;
@@ -3802,14 +3910,14 @@ WRITE16_MEMBER(esbattle_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(esbattle_state::write_o)
+void esbattle_state::write_o(u16 data)
 {
 	// O0-O7: led state
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(esbattle_state::read_k)
+u8 esbattle_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(2);
@@ -3888,8 +3996,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
+	void write_r(u16 data);
+	void write_o(u16 data);
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
@@ -3920,7 +4028,7 @@ void einvader_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(einvader_state::write_r)
+void einvader_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -3931,7 +4039,7 @@ WRITE16_MEMBER(einvader_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(einvader_state::write_o)
+void einvader_state::write_o(u16 data)
 {
 	// O0-O7: led state
 	m_o = data;
@@ -4012,9 +4120,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void efootb4(machine_config &config);
 };
 
@@ -4025,7 +4133,7 @@ void efootb4_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(efootb4_state::write_r)
+void efootb4_state::write_r(u16 data)
 {
 	// R0-R4: input mux
 	m_inp_mux = data & 0x1f;
@@ -4036,7 +4144,7 @@ WRITE16_MEMBER(efootb4_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(efootb4_state::write_o)
+void efootb4_state::write_o(u16 data)
 {
 	// O7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
@@ -4046,7 +4154,7 @@ WRITE16_MEMBER(efootb4_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(efootb4_state::read_k)
+u8 efootb4_state::read_k()
 {
 	return read_inputs(5);
 }
@@ -4160,9 +4268,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void ebaskb2(machine_config &config);
 };
 
@@ -4173,7 +4281,7 @@ void ebaskb2_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(ebaskb2_state::write_r)
+void ebaskb2_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -4187,7 +4295,7 @@ WRITE16_MEMBER(ebaskb2_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(ebaskb2_state::write_o)
+void ebaskb2_state::write_o(u16 data)
 {
 	// O0-O6: led state
 	// O7: N/C
@@ -4195,7 +4303,7 @@ WRITE16_MEMBER(ebaskb2_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(ebaskb2_state::read_k)
+u8 ebaskb2_state::read_k()
 {
 	return read_inputs(4);
 }
@@ -4298,9 +4406,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
@@ -4334,7 +4442,7 @@ void raisedvl_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(raisedvl_state::write_r)
+void raisedvl_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -4348,7 +4456,7 @@ WRITE16_MEMBER(raisedvl_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(raisedvl_state::write_o)
+void raisedvl_state::write_o(u16 data)
 {
 	// O0-O6: led state
 	// O7: N/C
@@ -4356,7 +4464,7 @@ WRITE16_MEMBER(raisedvl_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(raisedvl_state::read_k)
+u8 raisedvl_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(2) & 0xf;
@@ -4449,9 +4557,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void f2pbball(machine_config &config);
 };
 
@@ -4462,7 +4570,7 @@ void f2pbball_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(f2pbball_state::write_r)
+void f2pbball_state::write_r(u16 data)
 {
 	// R4,R9,R10: input mux
 	m_inp_mux = (data >> 4 & 1) | (data >> 8 & 6);
@@ -4476,14 +4584,14 @@ WRITE16_MEMBER(f2pbball_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(f2pbball_state::write_o)
+void f2pbball_state::write_o(u16 data)
 {
 	// O0-O7: led state
 	m_o = bitswap<8>(data,0,7,6,5,4,3,2,1);
 	update_display();
 }
 
-READ8_MEMBER(f2pbball_state::read_k)
+u8 f2pbball_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(3);
@@ -4571,9 +4679,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
@@ -4602,7 +4710,7 @@ void f3in1_state::update_display()
 	m_display->matrix(m_r & ~0x20, m_o);
 }
 
-WRITE16_MEMBER(f3in1_state::write_r)
+void f3in1_state::write_r(u16 data)
 {
 	// R0-R2,R4: input mux
 	m_inp_mux = (data & 7) | (data >> 1 & 8);
@@ -4616,14 +4724,14 @@ WRITE16_MEMBER(f3in1_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(f3in1_state::write_o)
+void f3in1_state::write_o(u16 data)
 {
 	// O0-O7: led state
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(f3in1_state::read_k)
+u8 f3in1_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(4);
@@ -4721,9 +4829,9 @@ public:
 	required_device<beep_device> m_beeper;
 
 	void update_display();
-	virtual DECLARE_WRITE16_MEMBER(write_r);
-	virtual DECLARE_WRITE16_MEMBER(write_o);
-	virtual DECLARE_READ8_MEMBER(read_k);
+	virtual void write_r(u16 data);
+	virtual void write_o(u16 data);
+	virtual u8 read_k();
 	void gpoker(machine_config &config);
 
 protected:
@@ -4744,7 +4852,7 @@ void gpoker_state::update_display()
 	m_display->matrix(m_r & 0x7ff, segs | (m_r >> 3 & 0xf00));
 }
 
-WRITE16_MEMBER(gpoker_state::write_r)
+void gpoker_state::write_r(u16 data)
 {
 	// R15: enable beeper
 	m_beeper->set_state(data >> 15 & 1);
@@ -4758,14 +4866,14 @@ WRITE16_MEMBER(gpoker_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(gpoker_state::write_o)
+void gpoker_state::write_o(u16 data)
 {
 	// O0-O7: digit segments A-G,H
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(gpoker_state::read_k)
+u8 gpoker_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(7);
@@ -4879,16 +4987,16 @@ public:
 		gpoker_state(mconfig, type, tag)
 	{ }
 
-	virtual DECLARE_WRITE16_MEMBER(write_r) override;
+	virtual void write_r(u16 data) override;
 	void gjackpot(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(gjackpot_state::write_r)
+void gjackpot_state::write_r(u16 data)
 {
 	// same as gpoker, only input mux msb is R10 instead of R6
-	gpoker_state::write_r(space, offset, data);
+	gpoker_state::write_r(data);
 	m_inp_mux = (data & 0x3f) | (data >> 4 & 0x40);
 }
 
@@ -5006,9 +5114,9 @@ public:
 	{ }
 
 	void update_display();
-	virtual DECLARE_WRITE16_MEMBER(write_r);
-	virtual DECLARE_WRITE16_MEMBER(write_o);
-	virtual DECLARE_READ8_MEMBER(read_k);
+	virtual void write_r(u16 data);
+	virtual void write_o(u16 data);
+	virtual u8 read_k();
 	void ginv(machine_config &config);
 };
 
@@ -5019,7 +5127,7 @@ void ginv_state::update_display()
 	m_display->matrix(m_grid, m_plate);
 }
 
-WRITE16_MEMBER(ginv_state::write_r)
+void ginv_state::write_r(u16 data)
 {
 	// R9,R10: input mux
 	m_inp_mux = data >> 9 & 3;
@@ -5034,14 +5142,14 @@ WRITE16_MEMBER(ginv_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(ginv_state::write_o)
+void ginv_state::write_o(u16 data)
 {
 	// O0-O7: VFD plate
 	m_plate = (m_plate & ~0xff) | data;
 	update_display();
 }
 
-READ8_MEMBER(ginv_state::read_k)
+u8 ginv_state::read_k()
 {
 	// K1-K4: multiplexed inputs (K8 is fire button)
 	return m_inputs[2]->read() | read_inputs(2);
@@ -5130,9 +5238,9 @@ public:
 	{ }
 
 	void update_display();
-	virtual DECLARE_WRITE16_MEMBER(write_r);
-	virtual DECLARE_WRITE16_MEMBER(write_o);
-	virtual DECLARE_READ8_MEMBER(read_k);
+	virtual void write_r(u16 data);
+	virtual void write_o(u16 data);
+	virtual u8 read_k();
 	void ginv1000(machine_config &config);
 };
 
@@ -5145,7 +5253,7 @@ void ginv1000_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(ginv1000_state::write_r)
+void ginv1000_state::write_r(u16 data)
 {
 	// R0: speaker out
 	m_speaker->level_w(data & 1);
@@ -5160,14 +5268,14 @@ WRITE16_MEMBER(ginv1000_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(ginv1000_state::write_o)
+void ginv1000_state::write_o(u16 data)
 {
 	// O0-O7: VFD plate
 	m_plate = (m_plate & ~0xff) | data;
 	update_display();
 }
 
-READ8_MEMBER(ginv1000_state::read_k)
+u8 ginv1000_state::read_k()
 {
 	// K1,K2: multiplexed inputs (K8 is fire button)
 	return m_inputs[2]->read() | read_inputs(2);
@@ -5225,8 +5333,8 @@ ROM_START( ginv1000 )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ginv1000_output.pla", 0, 365, CRC(b0a5dc41) SHA1(d94746ec48661998173e7f60ccc7c96e56b3484e) )
 
-	ROM_REGION( 226185, "screen", 0)
-	ROM_LOAD( "ginv1000.svg", 0, 226185, CRC(1e1bafd1) SHA1(15868ef0c9dadbf537fed0e2d846451ba99fab7b) )
+	ROM_REGION( 227224, "screen", 0)
+	ROM_LOAD( "ginv1000.svg", 0, 227224, CRC(f220711a) SHA1(729ad85fb9d9853a77c45b5ed072f10ede7649c4) )
 ROM_END
 
 
@@ -5256,23 +5364,14 @@ public:
 	{ }
 
 	required_device<tms1024_device> m_expander;
-	DECLARE_WRITE8_MEMBER(expander_w);
+	void expander_w(offs_t offset, u8 data);
 
 	void update_display();
-	virtual DECLARE_WRITE16_MEMBER(write_r);
-	virtual DECLARE_WRITE16_MEMBER(write_o);
-	virtual DECLARE_READ8_MEMBER(read_k);
+	virtual void write_r(u16 data);
+	virtual void write_o(u16 data);
+	virtual u8 read_k();
 	void ginv2000(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
 };
-
-void ginv2000_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	m_expander->write_ms(1); // Vss
-}
 
 // handlers
 
@@ -5281,7 +5380,7 @@ void ginv2000_state::update_display()
 	m_display->matrix(m_grid, m_plate);
 }
 
-WRITE8_MEMBER(ginv2000_state::expander_w)
+void ginv2000_state::expander_w(offs_t offset, u8 data)
 {
 	// TMS1024 port 4-7: VFD plate
 	int shift = (offset - tms1024_device::PORT4) * 4;
@@ -5289,7 +5388,7 @@ WRITE8_MEMBER(ginv2000_state::expander_w)
 	update_display();
 }
 
-WRITE16_MEMBER(ginv2000_state::write_r)
+void ginv2000_state::write_r(u16 data)
 {
 	// R0: speaker out
 	m_speaker->level_w(data & 1);
@@ -5299,7 +5398,7 @@ WRITE16_MEMBER(ginv2000_state::write_r)
 
 	// R11,R12: TMS1024 S1,S0 (S2 forced high)
 	// R13: TMS1024 STD
-	m_expander->write_s(space, 0, (data >> 12 & 1) | (data >> 10 & 2) | 4);
+	m_expander->write_s((data >> 12 & 1) | (data >> 10 & 2) | 4);
 	m_expander->write_std(data >> 13 & 1);
 
 	// R1-R10: VFD grid
@@ -5307,13 +5406,13 @@ WRITE16_MEMBER(ginv2000_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(ginv2000_state::write_o)
+void ginv2000_state::write_o(u16 data)
 {
 	// O4-O7: TMS1024 H1-H4
-	m_expander->write_h(space, 0, data >> 4 & 0xf);
+	m_expander->write_h(data >> 4 & 0xf);
 }
 
-READ8_MEMBER(ginv2000_state::read_k)
+u8 ginv2000_state::read_k()
 {
 	// K1,K2: multiplexed inputs (K8 is fire button)
 	return m_inputs[2]->read() | read_inputs(2);
@@ -5345,7 +5444,7 @@ void ginv2000_state::ginv2000(machine_config &config)
 	m_maincpu->r().set(FUNC(ginv2000_state::write_r));
 	m_maincpu->o().set(FUNC(ginv2000_state::write_o));
 
-	TMS1024(config, m_expander);
+	TMS1024(config, m_expander).set_ms(1); // MS tied high
 	m_expander->write_port4_callback().set(FUNC(ginv2000_state::expander_w));
 	m_expander->write_port5_callback().set(FUNC(ginv2000_state::expander_w));
 	m_expander->write_port6_callback().set(FUNC(ginv2000_state::expander_w));
@@ -5391,14 +5490,14 @@ ROM_END
   * 1 7seg led, 6 other leds, 1-bit sound
 
   This is a simple educational home computer. Refer to the extensive manual
-  for more information. It was published later in the USA by Tandy Radio Shack,
+  for more information. It was published later in the USA by Tandy(Radio Shack),
   under their Science Fair series. Another 25 years later, Gakken re-released
   the R-165 as GMC-4, obviously on modern hardware, but fully compatible.
 
   known releases:
   - Japan: FX-Micom R-165
-  - USA: Science Fair Microcomputer Trainer, published by Tandy Radio Shack.
-    Of note is the complete redesign of the case, adding more adjustable wiring
+  - USA: Science Fair Microcomputer Trainer, published by Tandy. Of note is
+    the complete redesign of the case, adding more adjustable wiring
 
 ***************************************************************************/
 
@@ -5410,9 +5509,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void fxmcr165(machine_config &config);
 };
 
@@ -5428,7 +5527,7 @@ void fxmcr165_state::update_display()
 	m_display->update();
 }
 
-WRITE16_MEMBER(fxmcr165_state::write_r)
+void fxmcr165_state::write_r(u16 data)
 {
 	// R0-R3: input mux low
 	m_inp_mux = (m_inp_mux & 0x10) | (data & 0xf);
@@ -5441,7 +5540,7 @@ WRITE16_MEMBER(fxmcr165_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(fxmcr165_state::write_o)
+void fxmcr165_state::write_o(u16 data)
 {
 	// O7: input mux high
 	m_inp_mux = (m_inp_mux & 0xf) | (data >> 3 & 0x10);
@@ -5451,7 +5550,7 @@ WRITE16_MEMBER(fxmcr165_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(fxmcr165_state::read_k)
+u8 fxmcr165_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -5556,15 +5655,15 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void elecdet(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(elecdet_state::write_r)
+void elecdet_state::write_r(u16 data)
 {
 	// R7,R8: speaker out
 	m_speaker->level_w((m_o & 0x80) ? (data >> 7 & 3) : 0);
@@ -5573,7 +5672,7 @@ WRITE16_MEMBER(elecdet_state::write_r)
 	m_display->matrix(data, bitswap<8>(m_o,7,5,2,1,4,0,6,3));
 }
 
-WRITE16_MEMBER(elecdet_state::write_o)
+void elecdet_state::write_o(u16 data)
 {
 	// O0,O1,O4,O6: input mux
 	m_inp_mux = (data & 3) | (data >> 2 & 4) | (data >> 3 & 8);
@@ -5583,7 +5682,7 @@ WRITE16_MEMBER(elecdet_state::write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(elecdet_state::read_k)
+u8 elecdet_state::read_k()
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inputs[4]->read() | read_inputs(4);
@@ -5700,9 +5799,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void starwbc(machine_config &config);
 };
 
@@ -5713,7 +5812,7 @@ void starwbc_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(starwbc_state::write_r)
+void starwbc_state::write_r(u16 data)
 {
 	// R0,R1,R3,R5,R7: input mux
 	m_inp_mux = (data & 3) | (data >> 1 & 4) | (data >> 2 & 8) | (data >> 3 & 0x10);
@@ -5727,14 +5826,14 @@ WRITE16_MEMBER(starwbc_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(starwbc_state::write_o)
+void starwbc_state::write_o(u16 data)
 {
 	// O0-O7: led state
 	m_o = (data << 4 & 0xf0) | (data >> 4 & 0x0f);
 	update_display();
 }
 
-READ8_MEMBER(starwbc_state::read_k)
+u8 starwbc_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -5848,9 +5947,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void astro(machine_config &config);
 };
 
@@ -5861,7 +5960,7 @@ void astro_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(astro_state::write_r)
+void astro_state::write_r(u16 data)
 {
 	// R0-R7: input mux
 	m_inp_mux = data & 0xff;
@@ -5871,14 +5970,14 @@ WRITE16_MEMBER(astro_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(astro_state::write_o)
+void astro_state::write_o(u16 data)
 {
 	// O0-O7: led state
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(astro_state::read_k)
+u8 astro_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(8);
@@ -6000,9 +6099,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void elecbowl(machine_config &config);
 };
 
@@ -6026,7 +6125,7 @@ void elecbowl_state::update_display()
 	m_display->update();
 }
 
-WRITE16_MEMBER(elecbowl_state::write_r)
+void elecbowl_state::write_r(u16 data)
 {
 	// R5-R7,R10: input mux
 	m_inp_mux = (data >> 5 & 7) | (data >> 7 & 8);
@@ -6042,7 +6141,7 @@ WRITE16_MEMBER(elecbowl_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(elecbowl_state::write_o)
+void elecbowl_state::write_o(u16 data)
 {
 	//if (data & 0x80) printf("%X ",data&0x7f);
 
@@ -6053,7 +6152,7 @@ WRITE16_MEMBER(elecbowl_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(elecbowl_state::read_k)
+u8 elecbowl_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(4);
@@ -6125,7 +6224,7 @@ ROM_START( elecbowl )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, BAD_DUMP CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_elecbowl_output.pla", 0, 365, NO_DUMP )
 ROM_END
 
@@ -6160,15 +6259,15 @@ public:
 
 	required_device<hlcd0569_device> m_lcd;
 
-	DECLARE_WRITE32_MEMBER(lcd_output_w);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void lcd_output_w(offs_t offset, u32 data);
+	void write_r(u16 data);
+	u8 read_k();
 	void horseran(machine_config &config);
 };
 
 // handlers
 
-WRITE32_MEMBER(horseran_state::lcd_output_w)
+void horseran_state::lcd_output_w(offs_t offset, u32 data)
 {
 	// only 3 rows used
 	if (offset > 2)
@@ -6184,7 +6283,7 @@ WRITE32_MEMBER(horseran_state::lcd_output_w)
 	m_display->update();
 }
 
-WRITE16_MEMBER(horseran_state::write_r)
+void horseran_state::write_r(u16 data)
 {
 	// R0: HLCD0569 clock
 	// R1: HLCD0569 data in
@@ -6197,7 +6296,7 @@ WRITE16_MEMBER(horseran_state::write_r)
 	m_inp_mux = data >> 3 & 0xff;
 }
 
-READ8_MEMBER(horseran_state::read_k)
+u8 horseran_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(8);
@@ -6318,15 +6417,15 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void mdndclab(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(mdndclab_state::write_r)
+void mdndclab_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -6335,13 +6434,13 @@ WRITE16_MEMBER(mdndclab_state::write_r)
 	m_inp_mux = (m_inp_mux & 0xff) | (data << 8 & 0x3ff00);
 }
 
-WRITE16_MEMBER(mdndclab_state::write_o)
+void mdndclab_state::write_o(u16 data)
 {
 	// O0-O7: input mux part
 	m_inp_mux = (m_inp_mux & ~0xff) | data;
 }
 
-READ8_MEMBER(mdndclab_state::read_k)
+u8 mdndclab_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(18);
@@ -6517,15 +6616,15 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void comp4(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(comp4_state::write_r)
+void comp4_state::write_r(u16 data)
 {
 	// leds:
 	// R4    R9
@@ -6536,7 +6635,7 @@ WRITE16_MEMBER(comp4_state::write_r)
 	m_display->matrix(m_o, data);
 }
 
-WRITE16_MEMBER(comp4_state::write_o)
+void comp4_state::write_o(u16 data)
 {
 	// O1-O3: input mux
 	m_inp_mux = data >> 1 & 7;
@@ -6546,7 +6645,7 @@ WRITE16_MEMBER(comp4_state::write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(comp4_state::read_k)
+u8 comp4_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(3);
@@ -6637,21 +6736,21 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void bship(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(bship_state::write_r)
+void bship_state::write_r(u16 data)
 {
 	// R0-R10: input mux
 	m_inp_mux = data;
 }
 
-WRITE16_MEMBER(bship_state::write_o)
+void bship_state::write_o(u16 data)
 {
 	// O4: explosion light bulb
 	m_display->matrix(1, data >> 4 & 1);
@@ -6659,7 +6758,7 @@ WRITE16_MEMBER(bship_state::write_o)
 	// other: sound
 }
 
-READ8_MEMBER(bship_state::read_k)
+u8 bship_state::read_k()
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inputs[11]->read() | read_inputs(11);
@@ -6795,15 +6894,15 @@ public:
 
 	required_device<sn76477_device> m_sn;
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void bshipb(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(bshipb_state::write_r)
+void bshipb_state::write_r(u16 data)
 {
 	// R0-R10: input mux
 	m_inp_mux = data;
@@ -6812,7 +6911,7 @@ WRITE16_MEMBER(bshipb_state::write_r)
 	m_sn->slf_res_w((data & 0x10) ? RES_INF : RES_K(33));
 }
 
-WRITE16_MEMBER(bshipb_state::write_o)
+void bshipb_state::write_o(u16 data)
 {
 	//printf("%X ", m_maincpu->debug_peek_o_index() & 0xf);
 
@@ -6847,7 +6946,7 @@ WRITE16_MEMBER(bshipb_state::write_o)
 	m_display->matrix(1, data >> 7 & 1);
 }
 
-READ8_MEMBER(bshipb_state::read_k)
+u8 bshipb_state::read_k()
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inputs[11]->read() | read_inputs(11);
@@ -6927,14 +7026,14 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	u8 read_k();
 	void simon(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(simon_state::write_r)
+void simon_state::write_r(u16 data)
 {
 	// R4-R8 go through an 75494 IC first:
 	// R4 -> 75494 IN6 -> green lamp
@@ -6952,7 +7051,7 @@ WRITE16_MEMBER(simon_state::write_r)
 	m_inp_mux = (data & 7) | (data >> 6 & 8);
 }
 
-READ8_MEMBER(simon_state::read_k)
+u8 simon_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(4);
@@ -7018,7 +7117,7 @@ ROM_START( simon )
 	ROM_LOAD( "tms1000.u1", 0x0000, 0x0400, CRC(9961719d) SHA1(35dddb018a8a2b31f377ab49c1f0cb76951b81c0) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_simon_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
+	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
 	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
 	ROM_LOAD( "tms1000_simon_output.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
 ROM_END
@@ -7028,7 +7127,7 @@ ROM_START( simonf )
 	ROM_LOAD( "mp3300", 0x0000, 0x0400, CRC(b9fcf93a) SHA1(45960e4242a08495f2a99fc5d44728eabd93cd9f) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_simon_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
+	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
 	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
 	ROM_LOAD( "tms1000_simon_output.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
 ROM_END
@@ -7055,8 +7154,8 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	u8 read_k();
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(speed_switch) { set_clock(); }
@@ -7084,7 +7183,7 @@ void ssimon_state::set_clock()
 	m_maincpu->set_unscaled_clock((inp & 2) ? 400000 : ((inp & 1) ? 275000 : 200000));
 }
 
-WRITE16_MEMBER(ssimon_state::write_r)
+void ssimon_state::write_r(u16 data)
 {
 	// R0-R3,R9,R10: input mux
 	m_inp_mux = (data & 0xf) | (data >> 5 & 0x30);
@@ -7099,7 +7198,7 @@ WRITE16_MEMBER(ssimon_state::write_r)
 	m_speaker->level_w(data >> 8 & 1);
 }
 
-READ8_MEMBER(ssimon_state::read_k)
+u8 ssimon_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(6);
@@ -7218,9 +7317,9 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 
 	int m_gearbox_pos;
 	bool sensor_state() { return m_gearbox_pos < 0 && m_display->element_on(0, 0); }
@@ -7254,7 +7353,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bigtrak_state::gearbox_sim_tick)
 		m_gearbox_pos++;
 }
 
-WRITE16_MEMBER(bigtrak_state::write_r)
+void bigtrak_state::write_r(u16 data)
 {
 	// R0-R5,R8: input mux (keypad, ext in enable)
 	m_inp_mux = (data & 0x3f) | (data >> 2 & 0x40);
@@ -7269,7 +7368,7 @@ WRITE16_MEMBER(bigtrak_state::write_r)
 	m_r = data;
 }
 
-WRITE16_MEMBER(bigtrak_state::write_o)
+void bigtrak_state::write_o(u16 data)
 {
 	// O1: left motor forward
 	// O2: left motor reverse
@@ -7288,7 +7387,7 @@ WRITE16_MEMBER(bigtrak_state::write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(bigtrak_state::read_k)
+u8 bigtrak_state::read_k()
 {
 	// K: multiplexed inputs
 	// K8: IR sensor
@@ -7381,7 +7480,7 @@ ROM_START( bigtrak )
 	ROM_LOAD( "mp3301a", 0x0000, 0x0400, CRC(1351bcdd) SHA1(68865389c25b541c09a742be61f8fb6488134d4e) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
+	ROM_LOAD( "tms1000_common4_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_bigtrak_output.pla", 0, 365, CRC(63be45f6) SHA1(918e38a223152db883c1a6f7acf56e87d7074734) )
 ROM_END
@@ -7427,9 +7526,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(motor_sim_tick);
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void mbdtower(machine_config &config);
 
 protected:
@@ -7518,7 +7617,7 @@ void mbdtower_state::update_display()
 	}
 }
 
-WRITE16_MEMBER(mbdtower_state::write_r)
+void mbdtower_state::write_r(u16 data)
 {
 	// R0-R2: input mux
 	m_inp_mux = data & 7;
@@ -7540,7 +7639,7 @@ WRITE16_MEMBER(mbdtower_state::write_r)
 	m_speaker->level_w(~data >> 4 & data >> 10 & 1);
 }
 
-WRITE16_MEMBER(mbdtower_state::write_o)
+void mbdtower_state::write_o(u16 data)
 {
 	// O0-O6: led segments A-G
 	// O7: digit select
@@ -7548,7 +7647,7 @@ WRITE16_MEMBER(mbdtower_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(mbdtower_state::read_k)
+u8 mbdtower_state::read_k()
 {
 	// K: multiplexed inputs
 	// K8: rotation sensor
@@ -7650,21 +7749,21 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void arcmania(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(arcmania_state::write_r)
+void arcmania_state::write_r(u16 data)
 {
 	// R1-R9: leds
 	m_display->matrix(1, data >> 1);
 }
 
-WRITE16_MEMBER(arcmania_state::write_o)
+void arcmania_state::write_o(u16 data)
 {
 	// O0-O2(tied together): speaker out
 	m_speaker->level_w(data & 7);
@@ -7677,7 +7776,7 @@ WRITE16_MEMBER(arcmania_state::write_o)
 		power_off();
 }
 
-READ8_MEMBER(arcmania_state::read_k)
+u8 arcmania_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(3);
@@ -7774,22 +7873,22 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void cnsector(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(cnsector_state::write_r)
+void cnsector_state::write_r(u16 data)
 {
 	// R0-R5: select digit
 	// R6-R9: direction leds
 	m_display->matrix(data, m_o);
 }
 
-WRITE16_MEMBER(cnsector_state::write_o)
+void cnsector_state::write_o(u16 data)
 {
 	// O0-O4: input mux
 	m_inp_mux = data & 0x1f;
@@ -7798,7 +7897,7 @@ WRITE16_MEMBER(cnsector_state::write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(cnsector_state::read_k)
+u8 cnsector_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -7916,15 +8015,15 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	virtual DECLARE_WRITE16_MEMBER(write_r);
-	virtual DECLARE_WRITE16_MEMBER(write_o);
-	virtual DECLARE_READ8_MEMBER(read_k);
+	virtual void write_r(u16 data);
+	virtual void write_o(u16 data);
+	virtual u8 read_k();
 	void merlin(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(merlin_state::write_r)
+void merlin_state::write_r(u16 data)
 {
 	/* leds:
 
@@ -7937,7 +8036,7 @@ WRITE16_MEMBER(merlin_state::write_r)
 	m_display->matrix(1, data);
 }
 
-WRITE16_MEMBER(merlin_state::write_o)
+void merlin_state::write_o(u16 data)
 {
 	// O4-O6(tied together): speaker out
 	m_speaker->level_w(data >> 4 & 7);
@@ -7947,7 +8046,7 @@ WRITE16_MEMBER(merlin_state::write_o)
 	m_inp_mux = data & 0xf;
 }
 
-READ8_MEMBER(merlin_state::read_k)
+u8 merlin_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(4);
@@ -8091,6 +8190,122 @@ ROM_END
 
 /***************************************************************************
 
+  Parker Brothers Electronic Master Mind
+  * TMS1000NLL MP3200 (die label 1000E, MP3200)
+  * 5 red leds, 5 green leds
+
+  This is a board game, it came with 4 plug boards and a lot of colored pegs.
+  It's not related to the equally named Electronic Master Mind by Invicta,
+  that one is on a Rockwell MM75.
+
+***************************************************************************/
+
+class pbmastm_state : public hh_tms1k_state
+{
+public:
+	pbmastm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+	void pbmastm(machine_config &config);
+};
+
+// handlers
+
+void pbmastm_state::write_r(u16 data)
+{
+	// R1-R10: leds (direct)
+	m_display->matrix(1, data >> 1);
+}
+
+void pbmastm_state::write_o(u16 data)
+{
+	// O0-O5: input mux
+	m_inp_mux = data & 0x3f;
+}
+
+u8 pbmastm_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(6);
+}
+
+// config
+
+static INPUT_PORTS_START( pbmastm )
+	PORT_START("IN.0") // O0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+
+	PORT_START("IN.1") // O1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("C")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("D")
+
+	PORT_START("IN.2") // O2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Red")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Blue")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("Brown")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("Black")
+
+	PORT_START("IN.3") // O3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Yellow")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("White")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Pink")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("Gray")
+
+	PORT_START("IN.4") // O4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Green")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("Orange")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("Blank")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Delete")
+
+	PORT_START("IN.5") // O5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Battery Test")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Code")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Check")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void pbmastm_state::pbmastm(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=56K, C=47pF
+	m_maincpu->k().set(FUNC(pbmastm_state::read_k));
+	m_maincpu->r().set(FUNC(pbmastm_state::write_r));
+	m_maincpu->o().set(FUNC(pbmastm_state::write_o));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 10);
+	config.set_default_layout(layout_pbmastm);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( pbmastm )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3200", 0x0000, 0x0400, CRC(059dbb88) SHA1(20e3f6aeecce167371bda914f263daf53c50c839) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_pbmastm_output.pla", 0, 365, CRC(b355c4d9) SHA1(43cc971a4feacfddfe810c8983c65d9eef3ed57b) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Parker Brothers Stop Thief, by Bob Doyle
   * TMS0980NLL MP6101B (die label 0980B-01A)
   * 3-digit 7seg LED display, 6-level sound
@@ -8109,15 +8324,15 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void stopthief(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(stopthief_state::write_r)
+void stopthief_state::write_r(u16 data)
 {
 	// R0-R2: select digit
 	m_display->matrix(data & 7, bitswap<8>(m_o,3,5,2,1,4,0,6,7) & 0x7f);
@@ -8129,7 +8344,7 @@ WRITE16_MEMBER(stopthief_state::write_r)
 	m_speaker->level_w(level);
 }
 
-WRITE16_MEMBER(stopthief_state::write_o)
+void stopthief_state::write_o(u16 data)
 {
 	// O0,O6: input mux
 	m_inp_mux = (data & 1) | (data >> 5 & 2);
@@ -8139,7 +8354,7 @@ WRITE16_MEMBER(stopthief_state::write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(stopthief_state::read_k)
+u8 stopthief_state::read_k()
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inputs[2]->read() | read_inputs(2);
@@ -8263,9 +8478,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void bankshot(machine_config &config);
 };
 
@@ -8276,7 +8491,7 @@ void bankshot_state::update_display()
 	m_display->matrix(m_r & ~3, m_o);
 }
 
-WRITE16_MEMBER(bankshot_state::write_r)
+void bankshot_state::write_r(u16 data)
 {
 	// R0: speaker out
 	m_speaker->level_w(data & 1);
@@ -8289,14 +8504,14 @@ WRITE16_MEMBER(bankshot_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(bankshot_state::write_o)
+void bankshot_state::write_o(u16 data)
 {
 	// O0-O7: led state
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(bankshot_state::read_k)
+u8 bankshot_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(2);
@@ -8405,9 +8620,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void splitsec(machine_config &config);
 };
 
@@ -8418,7 +8633,7 @@ void splitsec_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(splitsec_state::write_r)
+void splitsec_state::write_r(u16 data)
 {
 	// R8: speaker out
 	m_speaker->level_w(data >> 8 & 1);
@@ -8431,7 +8646,7 @@ WRITE16_MEMBER(splitsec_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(splitsec_state::write_o)
+void splitsec_state::write_o(u16 data)
 {
 	// O0-O6: led state
 	// O7: N/C
@@ -8439,7 +8654,7 @@ WRITE16_MEMBER(splitsec_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(splitsec_state::read_k)
+u8 splitsec_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(2);
@@ -8513,21 +8728,21 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void lostreas(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(lostreas_state::write_r)
+void lostreas_state::write_r(u16 data)
 {
 	// R0-R10: leds
 	m_display->matrix(1, data);
 }
 
-WRITE16_MEMBER(lostreas_state::write_o)
+void lostreas_state::write_o(u16 data)
 {
 	// O0-O3: input mux
 	m_inp_mux = data & 0xf;
@@ -8539,7 +8754,7 @@ WRITE16_MEMBER(lostreas_state::write_o)
 	m_speaker->level_w(data >> 4 & 0xf);
 }
 
-READ8_MEMBER(lostreas_state::read_k)
+u8 lostreas_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(4);
@@ -8652,15 +8867,15 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void alphie(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(alphie_state::write_r)
+void alphie_state::write_r(u16 data)
 {
 	// R1-R5, input mux (using d5 for Vss)
 	m_inp_mux = (data >> 1 & 0x1f) | 0x20;
@@ -8675,13 +8890,13 @@ WRITE16_MEMBER(alphie_state::write_r)
 	m_r = data;
 }
 
-WRITE16_MEMBER(alphie_state::write_o)
+void alphie_state::write_o(u16 data)
 {
 	// O?: speaker out
 	m_speaker->level_w(data & 1);
 }
 
-READ8_MEMBER(alphie_state::read_k)
+u8 alphie_state::read_k()
 {
 	// K: multiplexed inputs, rotated matrix
 	return read_rotated_inputs(6);
@@ -8759,7 +8974,7 @@ ROM_START( alphie )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, BAD_DUMP CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) ) // not in patent description
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1000_alphie_output.pla", 0, 365, NO_DUMP ) // "
 ROM_END
 
@@ -8769,7 +8984,7 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy Radio Shack Championship Football (model 60-2150)
+  Tandy Championship Football (model 60-2150)
   * PCB label CYG-316
   * TMS1100NLL MP1193 (die label 1100B, MP1193)
   * 7-digit 7seg LED display + LED grid, 1-bit sound
@@ -8787,9 +9002,9 @@ public:
 	{ }
 
 	void update_display();
-	virtual DECLARE_WRITE16_MEMBER(write_r);
-	virtual DECLARE_WRITE16_MEMBER(write_o);
-	virtual DECLARE_READ8_MEMBER(read_k);
+	virtual void write_r(u16 data);
+	virtual void write_o(u16 data);
+	virtual u8 read_k();
 	void tcfball(machine_config &config);
 };
 
@@ -8804,7 +9019,7 @@ void tcfball_state::update_display()
 	m_display->matrix(sel, m_o);
 }
 
-WRITE16_MEMBER(tcfball_state::write_r)
+void tcfball_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -8818,14 +9033,14 @@ WRITE16_MEMBER(tcfball_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(tcfball_state::write_o)
+void tcfball_state::write_o(u16 data)
 {
 	// O0-O7: digit segments/led data
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(tcfball_state::read_k)
+u8 tcfball_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(3);
@@ -8892,7 +9107,7 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy Radio Shack Championship Football (model 60-2151)
+  Tandy Championship Football (model 60-2151)
   * TMS1100NLL MP1183 (no decap)
   * 7-digit 7seg LED display + LED grid, 1-bit sound
 
@@ -8927,20 +9142,12 @@ static INPUT_PORTS_START( tcfballa )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Display")
 INPUT_PORTS_END
 
-// output PLA is not decapped, dumped electronically
-static const u16 tcfballa_output_pla[0x20] =
-{
-	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x00, 0x46, 0x70, 0x00, 0x00, 0x00,
-	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
-
 void tcfballa_state::tcfballa(machine_config &config)
 {
 	tcfball(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(375000); // approximation - RC osc. R=47K, C=50pF
-	m_maincpu->set_output_pla(tcfballa_output_pla);
 
 	config.set_default_layout(layout_tcfballa);
 }
@@ -8953,8 +9160,11 @@ ROM_START( tcfballa )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_tcfballa_output.pla", 0, 365, NO_DUMP )
+
+	ROM_REGION16_LE( 0x40, "maincpu:opla_b", ROMREGION_ERASE00 ) // verified, electronic dump
+	ROM_LOAD16_BYTE( "tms1100_tcfballa_output.bin", 0, 0x20, CRC(887ad9a5) SHA1(a2bac48f555df098c1f1f0fa663e5bcb989b8987) )
 ROM_END
 
 
@@ -8963,7 +9173,7 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy Radio Shack Computerized Arcade (1981, 1982, 1995)
+  Tandy Computerized Arcade (1981, 1982, 1995)
   * TMS1100 MCU, label CD7282SL
   * 12 lamps behind buttons, 1-bit sound
 
@@ -8996,9 +9206,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void tandy12(machine_config &config);
 };
 
@@ -9009,7 +9219,7 @@ void tandy12_state::update_display()
 	m_display->matrix(1, (m_o << 1 & 0x1fe) | (m_r << 9 & 0x1e00));
 }
 
-WRITE16_MEMBER(tandy12_state::write_r)
+void tandy12_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -9022,14 +9232,14 @@ WRITE16_MEMBER(tandy12_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(tandy12_state::write_o)
+void tandy12_state::write_o(u16 data)
 {
 	// O0-O7: button lamps 1-8
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(tandy12_state::read_k)
+u8 tandy12_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -9130,7 +9340,7 @@ ROM_START( tandy12 )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_tandy12_output.pla", 0, 365, NO_DUMP )
 ROM_END
 
@@ -9140,7 +9350,7 @@ ROM_END
 
 /***************************************************************************
 
-  (Tandy) Radio Shack Monkey See (1982 version)
+  Tandy(Radio Shack division) Monkey See (1982 version)
   * TMS1000 MP0271 (die label 1000E, MP0271), only half of ROM space used
   * 2 LEDs(one red, one green), 1-bit sound
 
@@ -9161,15 +9371,15 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void monkeysee(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(monkeysee_state::write_r)
+void monkeysee_state::write_r(u16 data)
 {
 	// R0-R4: input mux
 	m_inp_mux = data & 0x1f;
@@ -9178,14 +9388,14 @@ WRITE16_MEMBER(monkeysee_state::write_r)
 	m_speaker->level_w(data >> 5 & 1);
 }
 
-WRITE16_MEMBER(monkeysee_state::write_o)
+void monkeysee_state::write_o(u16 data)
 {
 	// O6,O7: leds
 	// other: N/C
 	m_display->matrix(1, data >> 6);
 }
 
-READ8_MEMBER(monkeysee_state::read_k)
+u8 monkeysee_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -9283,9 +9493,9 @@ public:
 	required_device<s14001a_device> m_speech;
 
 	void update_display();
-	virtual DECLARE_WRITE16_MEMBER(write_r);
-	virtual DECLARE_WRITE16_MEMBER(write_o);
-	virtual DECLARE_READ8_MEMBER(read_k);
+	virtual void write_r(u16 data);
+	virtual void write_o(u16 data);
+	virtual u8 read_k();
 	void speechp(machine_config &config);
 };
 
@@ -9296,10 +9506,10 @@ void speechp_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(speechp_state::write_r)
+void speechp_state::write_r(u16 data)
 {
 	// R5-R9: TSI C0-C5
-	m_speech->data_w(space, 0, data >> 5 & 0x3f);
+	m_speech->data_w(data >> 5 & 0x3f);
 
 	// R10: TSI START line
 	m_speech->start_w(data >> 10 & 1);
@@ -9312,14 +9522,14 @@ WRITE16_MEMBER(speechp_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(speechp_state::write_o)
+void speechp_state::write_o(u16 data)
 {
 	// O0-O7: digit segments
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(speechp_state::read_k)
+u8 speechp_state::read_k()
 {
 	// K: multiplexed inputs
 	return m_inputs[10]->read() | (read_inputs(10) & 7);
@@ -9444,9 +9654,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_o(u16 data);
+	void write_r(u16 data);
+	u8 read_k();
 	void tisr16(machine_config &config);
 };
 
@@ -9463,21 +9673,21 @@ void tisr16_state::update_display()
 	m_display->update();
 }
 
-WRITE16_MEMBER(tisr16_state::write_r)
+void tisr16_state::write_r(u16 data)
 {
 	// R0-R10: input mux, select digit
 	m_r = m_inp_mux = data;
 	update_display();
 }
 
-WRITE16_MEMBER(tisr16_state::write_o)
+void tisr16_state::write_o(u16 data)
 {
 	// O0-O7: digit segments
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(tisr16_state::read_k)
+u8 tisr16_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(11);
@@ -9699,20 +9909,20 @@ public:
 	void ti1250(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_o(u16 data);
+	void write_r(u16 data);
+	u8 read_k();
 };
 
 // handlers
 
-WRITE16_MEMBER(ti1250_state::write_r)
+void ti1250_state::write_r(u16 data)
 {
 	// R0-R8: select digit
 	m_display->matrix(data, m_o);
 }
 
-WRITE16_MEMBER(ti1250_state::write_o)
+void ti1250_state::write_o(u16 data)
 {
 	// O1-O5,O7: input mux
 	// O0-O7: digit segments
@@ -9720,7 +9930,7 @@ WRITE16_MEMBER(ti1250_state::write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(ti1250_state::read_k)
+u8 ti1250_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(6);
@@ -9879,9 +10089,9 @@ public:
 
 private:
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_o(u16 data);
+	void write_r(u16 data);
+	u8 read_k();
 };
 
 // handlers
@@ -9891,7 +10101,7 @@ void ti25503_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(ti25503_state::write_r)
+void ti25503_state::write_r(u16 data)
 {
 	// R0-R6: input mux
 	// R0-R8: select digit
@@ -9899,14 +10109,14 @@ WRITE16_MEMBER(ti25503_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(ti25503_state::write_o)
+void ti25503_state::write_o(u16 data)
 {
 	// O0-O7: digit segments
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(ti25503_state::read_k)
+u8 ti25503_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(7);
@@ -10021,20 +10231,20 @@ public:
 	void ti30(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_o(u16 data);
+	void write_r(u16 data);
+	u8 read_k();
 };
 
 // handlers
 
-WRITE16_MEMBER(ti30_state::write_r)
+void ti30_state::write_r(u16 data)
 {
 	// R0-R8: select digit
 	m_display->matrix(data, m_o);
 }
 
-WRITE16_MEMBER(ti30_state::write_o)
+void ti30_state::write_o(u16 data)
 {
 	// O0-O2,O4-O7: input mux
 	// O0-O7: digit segments
@@ -10042,7 +10252,7 @@ WRITE16_MEMBER(ti30_state::write_o)
 	m_o = bitswap<8>(data,7,5,2,1,4,0,6,3);
 }
 
-READ8_MEMBER(ti30_state::read_k)
+u8 ti30_state::read_k()
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inputs[7]->read() | read_inputs(7);
@@ -10315,20 +10525,20 @@ public:
 	void ti1000(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_o(u16 data);
+	void write_r(u16 data);
+	u8 read_k();
 };
 
 // handlers
 
-WRITE16_MEMBER(ti1000_state::write_r)
+void ti1000_state::write_r(u16 data)
 {
 	// R0-R7: select digit
 	m_display->matrix(data, m_o);
 }
 
-WRITE16_MEMBER(ti1000_state::write_o)
+void ti1000_state::write_o(u16 data)
 {
 	// O0-O3,O5(?): input mux
 	// O0-O7: digit segments
@@ -10336,7 +10546,7 @@ WRITE16_MEMBER(ti1000_state::write_o)
 	m_o = bitswap<8>(data,7,4,3,2,1,0,6,5);
 }
 
-READ8_MEMBER(ti1000_state::read_k)
+u8 ti1000_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -10430,14 +10640,14 @@ public:
 
 	void wizatron(machine_config &config);
 
-	virtual DECLARE_WRITE16_MEMBER(write_o);
-	virtual DECLARE_WRITE16_MEMBER(write_r);
-	virtual DECLARE_READ8_MEMBER(read_k);
+	virtual void write_o(u16 data);
+	virtual void write_r(u16 data);
+	virtual u8 read_k();
 };
 
 // handlers
 
-WRITE16_MEMBER(wizatron_state::write_r)
+void wizatron_state::write_r(u16 data)
 {
 	// R0-R8: select digit
 
@@ -10451,7 +10661,7 @@ WRITE16_MEMBER(wizatron_state::write_r)
 	m_display->matrix(data, m_o);
 }
 
-WRITE16_MEMBER(wizatron_state::write_o)
+void wizatron_state::write_o(u16 data)
 {
 	// O1-O4: input mux
 	// O0-O6: digit segments A-G
@@ -10460,7 +10670,7 @@ WRITE16_MEMBER(wizatron_state::write_o)
 	m_o = data & 0x7f;
 }
 
-READ8_MEMBER(wizatron_state::read_k)
+u8 wizatron_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(4);
@@ -10552,13 +10762,13 @@ public:
 	void lilprof(machine_config &config);
 
 private:
-	virtual DECLARE_WRITE16_MEMBER(write_o) override;
-	virtual DECLARE_READ8_MEMBER(read_k) override;
+	virtual void write_o(u16 data) override;
+	virtual u8 read_k() override;
 };
 
 // handlers
 
-WRITE16_MEMBER(lilprof_state::write_o)
+void lilprof_state::write_o(u16 data)
 {
 	// O1-O4,O7: input mux
 	// O0-O6: digit segments A-G
@@ -10566,7 +10776,7 @@ WRITE16_MEMBER(lilprof_state::write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(lilprof_state::read_k)
+u8 lilprof_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -10639,14 +10849,14 @@ public:
 	void lilprof78(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_o(u16 data);
+	void write_r(u16 data);
+	u8 read_k();
 };
 
 // handlers
 
-WRITE16_MEMBER(lilprof78_state::write_r)
+void lilprof78_state::write_r(u16 data)
 {
 	// update leds state
 	u8 seg = bitswap<8>(m_o,7,4,3,2,1,0,6,5) & 0x7f;
@@ -10661,7 +10871,7 @@ WRITE16_MEMBER(lilprof78_state::write_r)
 	m_display->update();
 }
 
-WRITE16_MEMBER(lilprof78_state::write_o)
+void lilprof78_state::write_o(u16 data)
 {
 	// O0-O3,O5(?): input mux
 	// O0-O6: digit segments A-G
@@ -10670,7 +10880,7 @@ WRITE16_MEMBER(lilprof78_state::write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(lilprof78_state::read_k)
+u8 lilprof78_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -10765,9 +10975,9 @@ public:
 	void dataman(machine_config &config);
 
 	virtual void update_display();
-	virtual DECLARE_WRITE16_MEMBER(write_o);
-	virtual DECLARE_WRITE16_MEMBER(write_r);
-	virtual DECLARE_READ8_MEMBER(read_k);
+	virtual void write_o(u16 data);
+	virtual void write_r(u16 data);
+	virtual u8 read_k();
 };
 
 // handlers
@@ -10778,7 +10988,7 @@ void dataman_state::update_display()
 	m_display->matrix(m_r & 0x1ff, m_o | (m_r >> 2 & 0x80));
 }
 
-WRITE16_MEMBER(dataman_state::write_r)
+void dataman_state::write_r(u16 data)
 {
 	// R0-R4: input mux
 	// R0-R8: select digit
@@ -10787,14 +10997,14 @@ WRITE16_MEMBER(dataman_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(dataman_state::write_o)
+void dataman_state::write_o(u16 data)
 {
 	// O0-O6: digit segments A-G
 	m_o = bitswap<8>(data,7,1,6,5,4,3,2,0) & 0x7f;
 	update_display();
 }
 
-READ8_MEMBER(dataman_state::read_k)
+u8 dataman_state::read_k()
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inputs[5]->read() | read_inputs(5);
@@ -10896,18 +11106,18 @@ public:
 	void mathmarv(machine_config &config);
 
 private:
-	virtual DECLARE_WRITE16_MEMBER(write_r) override;
+	virtual void write_r(u16 data) override;
 };
 
 // handlers
 
-WRITE16_MEMBER(mathmarv_state::write_r)
+void mathmarv_state::write_r(u16 data)
 {
 	// R8: speaker out
 	m_speaker->level_w(data >> 8 & 1);
 
 	// rest is same as dataman
-	dataman_state::write_r(space, offset, data);
+	dataman_state::write_r(data);
 }
 
 // config
@@ -10982,27 +11192,27 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void timaze(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(timaze_state::write_r)
+void timaze_state::write_r(u16 data)
 {
 	// R0: input mux
 	m_inp_mux = data & 1;
 }
 
-WRITE16_MEMBER(timaze_state::write_o)
+void timaze_state::write_o(u16 data)
 {
 	// O3210: 7seg EGCD?
 	m_display->matrix(1, bitswap<8>(data, 7,1,6,0,3,2,5,4));
 }
 
-READ8_MEMBER(timaze_state::read_k)
+u8 timaze_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(1);
@@ -11070,9 +11280,9 @@ public:
 		m_60hz(*this, "ac_line")
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void tithermos(machine_config &config);
 
 private:
@@ -11081,7 +11291,7 @@ private:
 
 // handlers
 
-WRITE16_MEMBER(tithermos_state::write_r)
+void tithermos_state::write_r(u16 data)
 {
 	// D1-D4: select digit
 	m_display->matrix(data, m_o);
@@ -11091,14 +11301,14 @@ WRITE16_MEMBER(tithermos_state::write_r)
 	m_r = data;
 }
 
-WRITE16_MEMBER(tithermos_state::write_o)
+void tithermos_state::write_o(u16 data)
 {
 	// SA-SP: input mux
 	// SA-SG: digit segments
 	m_o = m_inp_mux = data;
 }
 
-READ8_MEMBER(tithermos_state::read_k)
+u8 tithermos_state::read_k()
 {
 	// K: multiplexed inputs
 	u8 data = read_inputs(8);
@@ -11232,15 +11442,15 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void copycat(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(copycat_state::write_r)
+void copycat_state::write_r(u16 data)
 {
 	// R0-R3: leds
 	m_display->matrix(1, data & 0xf);
@@ -11250,14 +11460,14 @@ WRITE16_MEMBER(copycat_state::write_r)
 	m_inp_mux = data >> 4 & 0xf;
 }
 
-WRITE16_MEMBER(copycat_state::write_o)
+void copycat_state::write_o(u16 data)
 {
 	// O0,O1: speaker out
 	// O2,O7: N/C, O3-O6: tied together but unused
 	m_speaker->level_w(data & 3);
 }
 
-READ8_MEMBER(copycat_state::read_k)
+u8 copycat_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(4);
@@ -11354,20 +11564,20 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
+	void write_r(u16 data);
+	void write_o(u16 data);
 	void copycatm2(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(copycatm2_state::write_r)
+void copycatm2_state::write_r(u16 data)
 {
 	// R1-R4: leds
 	m_display->matrix(1, data >> 1 & 0xf);
 }
 
-WRITE16_MEMBER(copycatm2_state::write_o)
+void copycatm2_state::write_o(u16 data)
 {
 	// O0,O6: speaker out
 	m_speaker->level_w((data & 1) | (data >> 5 & 2));
@@ -11439,20 +11649,20 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
+	void write_r(u16 data);
+	void write_o(u16 data);
 	void ditto(machine_config &config);
 };
 
 // handlers
 
-WRITE16_MEMBER(ditto_state::write_r)
+void ditto_state::write_r(u16 data)
 {
 	// R0-R3: leds
 	m_display->matrix(1, data & 0xf);
 }
 
-WRITE16_MEMBER(ditto_state::write_o)
+void ditto_state::write_o(u16 data)
 {
 	// O5,O6: speaker out
 	m_speaker->level_w(data >> 5 & 3);
@@ -11471,7 +11681,7 @@ INPUT_PORTS_END
 void ditto_state::ditto(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1730(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
+	TMS1700(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->k().set_ioport("IN.0");
 	m_maincpu->r().set(FUNC(ditto_state::write_r));
 	m_maincpu->o().set(FUNC(ditto_state::write_o));
@@ -11528,9 +11738,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void ss7in1(machine_config &config);
 };
 
@@ -11541,7 +11751,7 @@ void ss7in1_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-WRITE16_MEMBER(ss7in1_state::write_r)
+void ss7in1_state::write_r(u16 data)
 {
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
@@ -11555,14 +11765,14 @@ WRITE16_MEMBER(ss7in1_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(ss7in1_state::write_o)
+void ss7in1_state::write_o(u16 data)
 {
 	// O0-O7: led data
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(ss7in1_state::read_k)
+u8 ss7in1_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(4);
@@ -11678,12 +11888,12 @@ public:
 
 	required_device<tms1025_device> m_expander;
 	u8 m_exp_port[7];
-	DECLARE_WRITE8_MEMBER(expander_w);
+	void expander_w(offs_t offset, u8 data);
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
@@ -11707,7 +11917,6 @@ void tbreakup_state::machine_reset()
 {
 	hh_tms1k_state::machine_reset();
 	set_clock();
-	m_expander->write_ms(1); // Vss
 }
 
 // handlers
@@ -11733,13 +11942,13 @@ void tbreakup_state::update_display()
 	m_display->update();
 }
 
-WRITE8_MEMBER(tbreakup_state::expander_w)
+void tbreakup_state::expander_w(offs_t offset, u8 data)
 {
 	// TMS1025 port 1-7 data
 	m_exp_port[offset] = data;
 }
 
-WRITE16_MEMBER(tbreakup_state::write_r)
+void tbreakup_state::write_r(u16 data)
 {
 	// R6: speaker out
 	m_speaker->level_w(data >> 6 & 1);
@@ -11749,7 +11958,7 @@ WRITE16_MEMBER(tbreakup_state::write_r)
 
 	// R3-R5: TMS1025 port S
 	// R2: TMS1025 STD pin
-	m_expander->write_s(space, 0, data >> 3 & 7);
+	m_expander->write_s(data >> 3 & 7);
 	m_expander->write_std(data >> 2 & 1);
 
 	// R0,R1: select digit
@@ -11757,17 +11966,17 @@ WRITE16_MEMBER(tbreakup_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(tbreakup_state::write_o)
+void tbreakup_state::write_o(u16 data)
 {
 	// O0-O3: TMS1025 port H
-	m_expander->write_h(space, 0, data & 0xf);
+	m_expander->write_h(data & 0xf);
 
 	// O0-O7: led state
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(tbreakup_state::read_k)
+u8 tbreakup_state::read_k()
 {
 	// K4: fixed input
 	// K8: multiplexed inputs
@@ -11802,7 +12011,7 @@ void tbreakup_state::tbreakup(machine_config &config)
 	m_maincpu->r().set(FUNC(tbreakup_state::write_r));
 	m_maincpu->o().set(FUNC(tbreakup_state::write_o));
 
-	TMS1025(config, m_expander);
+	TMS1025(config, m_expander).set_ms(1); // MS tied high
 	m_expander->write_port1_callback().set(FUNC(tbreakup_state::expander_w));
 	m_expander->write_port2_callback().set(FUNC(tbreakup_state::expander_w));
 	m_expander->write_port3_callback().set(FUNC(tbreakup_state::expander_w));
@@ -11875,9 +12084,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 
 	DECLARE_INPUT_CHANGED_MEMBER(flipper_button) { update_display(); }
 	void phpball(machine_config &config);
@@ -11893,7 +12102,7 @@ void phpball_state::update_display()
 	m_display->matrix((m_r & 0x1ff) | in1, m_o);
 }
 
-WRITE16_MEMBER(phpball_state::write_r)
+void phpball_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -11907,7 +12116,7 @@ WRITE16_MEMBER(phpball_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(phpball_state::write_o)
+void phpball_state::write_o(u16 data)
 {
 	// O0-O6: digit segment/led data
 	// O7: N/C
@@ -11915,7 +12124,7 @@ WRITE16_MEMBER(phpball_state::write_o)
 	update_display();
 }
 
-READ8_MEMBER(phpball_state::read_k)
+u8 phpball_state::read_k()
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inputs[1]->read() | read_inputs(1);
@@ -11990,9 +12199,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void ssports4(machine_config &config);
 };
 
@@ -12004,7 +12213,7 @@ void ssports4_state::update_display()
 	m_display->matrix(m_r, m_o | (m_r << 6 & 0x100));
 }
 
-WRITE16_MEMBER(ssports4_state::write_r)
+void ssports4_state::write_r(u16 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -12015,14 +12224,14 @@ WRITE16_MEMBER(ssports4_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(ssports4_state::write_o)
+void ssports4_state::write_o(u16 data)
 {
 	// O0-O7: led data
 	m_o = data;
 	update_display();
 }
 
-READ8_MEMBER(ssports4_state::read_k)
+u8 ssports4_state::read_k()
 {
 	// input mux is from R0,1,5,8,9 and O7
 	m_inp_mux = (m_r & 3) | (m_r >> 3 & 4) | (m_r >> 5 & 0x18) | (m_o >> 2 & 0x20);
@@ -12074,18 +12283,10 @@ static INPUT_PORTS_START( ssports4 )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// output PLA is not decapped, dumped electronically
-static const u16 ssports4_output_pla[0x20] =
-{
-	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x00, 0x40, 0x40, 0x40, 0x40, 0x40
-};
-
 void ssports4_state::ssports4(machine_config &config)
 {
 	/* basic machine hardware */
 	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->set_output_pla(ssports4_output_pla);
 	m_maincpu->k().set(FUNC(ssports4_state::read_k));
 	m_maincpu->r().set(FUNC(ssports4_state::write_r));
 	m_maincpu->o().set(FUNC(ssports4_state::write_o));
@@ -12110,8 +12311,11 @@ ROM_START( ssports4 )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_ssports4_output.pla", 0, 365, NO_DUMP )
+
+	ROM_REGION16_LE( 0x40, "maincpu:opla_b", ROMREGION_ERASE00 ) // verified, electronic dump
+	ROM_LOAD16_BYTE( "tms1100_ssports4_output.bin", 0, 0x20, CRC(cd6f162f) SHA1(3348edb697e996b5ab82be54076b9cd444e0f2b1) )
 ROM_END
 
 
@@ -12140,9 +12344,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(k4_button) { update_halt(); }
 
 	void update_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 	void xl25(machine_config &config);
 
 protected:
@@ -12160,7 +12364,7 @@ void xl25_state::machine_reset()
 void xl25_state::update_halt()
 {
 	// O5+K4 go to HALT pin (used when pressing store/recall button)
-	bool halt = !((m_o & 0x20) || (read_k(machine().dummy_space(), 0) & 4));
+	bool halt = !((m_o & 0x20) || (read_k() & 4));
 	m_maincpu->set_input_line(INPUT_LINE_HALT, halt ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -12169,7 +12373,7 @@ void xl25_state::update_display()
 	m_display->matrix(m_r, m_o >> 1);
 }
 
-WRITE16_MEMBER(xl25_state::write_r)
+void xl25_state::write_r(u16 data)
 {
 	// R0-R9: input mux, led select
 	m_inp_mux = data;
@@ -12177,7 +12381,7 @@ WRITE16_MEMBER(xl25_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(xl25_state::write_o)
+void xl25_state::write_o(u16 data)
 {
 	// O1-O3: led data
 	m_o = data;
@@ -12190,7 +12394,7 @@ WRITE16_MEMBER(xl25_state::write_o)
 	update_halt();
 }
 
-READ8_MEMBER(xl25_state::read_k)
+u8 xl25_state::read_k()
 {
 	// K: multiplexed inputs
 	// K4 also goes to MCU halt
@@ -12328,6 +12532,8 @@ CONS( 1979, cnfball,    0,         0, cnfball,   cnfball,   cnfball_state,   emp
 CONS( 1979, cnfball2,   0,         0, cnfball2,  cnfball2,  cnfball2_state,  empty_init, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, eleciq,     0,         0, eleciq,    eleciq,    eleciq_state,    empty_init, "Conic", "Electronic I.Q.", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
+CONS( 1979, qfire,      0,         0, qfire,     qfire,     qfire_state,     empty_init, "Electroplay", "Quickfire", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
 CONS( 1979, esoccer,    0,         0, esoccer,   esoccer,   esoccer_state,   empty_init, "Entex", "Electronic Soccer (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, ebball,     0,         0, ebball,    ebball,    ebball_state,    empty_init, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, ebball2,    0,         0, ebball2,   ebball2,   ebball2_state,   empty_init, "Entex", "Electronic Baseball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
@@ -12348,7 +12554,7 @@ CONS( 1981, ginv1000,   0,         0, ginv1000,  ginv1000,  ginv1000_state,  emp
 CONS( 1982, ginv2000,   0,         0, ginv2000,  ginv2000,  ginv2000_state,  empty_init, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, fxmcr165,   0,         0, fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, elecdet,    0,         0, elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
+CONS( 1979, elecdet,    0,         0, elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
 
 CONS( 1979, starwbc,    0,         0, starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars - Electronic Battle Command", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, starwbcp,   starwbc,   0, starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars - Electronic Battle Command (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -12372,6 +12578,7 @@ CONS( 1983, arcmania,   0,         0, arcmania,  arcmania,  arcmania_state,  emp
 
 CONS( 1977, cnsector,   0,         0, cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, pbmastm,    0,         0, pbmastm,   pbmastm,   pbmastm_state,   empty_init, "Parker Brothers", "Electronic Master Mind (Parker Brothers)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
 CONS( 1979, stopthief,  0,         0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 CONS( 1980, bankshot,   0,         0, bankshot,  bankshot,  bankshot_state,  empty_init, "Parker Brothers", "Bank Shot - Electronic Pool", MACHINE_SUPPORTS_SAVE )
@@ -12381,10 +12588,10 @@ CONS( 1982, lostreas,   0,         0, lostreas,  lostreas,  lostreas_state,  emp
 
 CONS( 1978, alphie,     0,         0, alphie,    alphie,    alphie_state,    empty_init, "Playskool", "Alphie - The Electronic Robot (patent)", MACHINE_SUPPORTS_SAVE ) // ***
 
-CONS( 1980, tcfball,    0,         0, tcfball,   tcfball,   tcfball_state,   empty_init, "Tandy Radio Shack", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, tcfballa,   tcfball,   0, tcfballa,  tcfballa,  tcfballa_state,  empty_init, "Tandy Radio Shack", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, tandy12,    0,         0, tandy12,   tandy12,   tandy12_state,   empty_init, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
-CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Radio Shack", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tcfball,    0,         0, tcfball,   tcfball,   tcfball_state,   empty_init, "Tandy Corporation", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tcfballa,   tcfball,   0, tcfballa,  tcfballa,  tcfballa_state,  empty_init, "Tandy Corporation", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, tandy12,    0,         0, tandy12,   tandy12,   tandy12_state,   empty_init, "Tandy Corporation", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Corporation", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1976, speechp,    0,         0, speechp,   speechp,   speechp_state,   empty_init, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
 

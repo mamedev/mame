@@ -718,7 +718,7 @@ void noki3310_state::noki3310(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	PCD8544(config, m_pcd8544, 0);
-	m_pcd8544->set_screen_update_cb(FUNC(noki3310_state::pcd8544_screen_update), this);
+	m_pcd8544->set_screen_update_cb(FUNC(noki3310_state::pcd8544_screen_update));
 
 	INTEL_TE28F160(config, "flash");
 }

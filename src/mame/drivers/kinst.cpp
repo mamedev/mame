@@ -180,10 +180,10 @@ Notes:
 #include "emu.h"
 #include "audio/dcs.h"
 
+#include "bus/ata/ataintf.h"
+#include "bus/ata/idehd.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -354,7 +354,7 @@ void kinst_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in kinst_state::device_timer");
+		throw emu_fatalerror("Unknown id in kinst_state::device_timer");
 	}
 }
 
@@ -374,25 +374,25 @@ INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
 
 READ32_MEMBER(kinst_state::ide_r)
 {
-	return m_ata->read_cs0(offset / 2, mem_mask);
+	return m_ata->cs0_r(offset / 2, mem_mask);
 }
 
 
 WRITE32_MEMBER(kinst_state::ide_w)
 {
-	m_ata->write_cs0(offset / 2, data, mem_mask);
+	m_ata->cs0_w(offset / 2, data, mem_mask);
 }
 
 
 READ32_MEMBER(kinst_state::ide_extra_r)
 {
-	return m_ata->read_cs1(6, 0xff);
+	return m_ata->cs1_r(6, 0xff);
 }
 
 
 WRITE32_MEMBER(kinst_state::ide_extra_w)
 {
-	m_ata->write_cs1(6, data, 0xff);
+	m_ata->cs1_w(6, data, 0xff);
 }
 
 
@@ -455,7 +455,7 @@ WRITE32_MEMBER(kinst_state::control_w)
 			break;
 
 		case 1:     /* $88 - sound reset */
-			m_dcs->reset_w(~data & 0x01);
+			m_dcs->reset_w(data & 0x01);
 			break;
 
 		case 2:     /* $90 - sound control */

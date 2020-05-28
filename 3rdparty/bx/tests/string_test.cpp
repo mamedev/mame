@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -91,6 +91,10 @@ TEST_CASE("strCat", "")
 
 TEST_CASE("strCmp", "")
 {
+	REQUIRE(0  < bx::strCmp("abvgd", "abv") );
+	REQUIRE(0  < bx::strCmp("abvgd", "") );
+	REQUIRE(0  > bx::strCmp("", "abvgd") );
+	REQUIRE(0 != bx::strCmp(".tar.gz", ".") );
 	REQUIRE(0 != bx::strCmp("meh", "meh/") );
 }
 
@@ -184,6 +188,7 @@ TEST_CASE("strRFind", "")
 	REQUIRE(bx::strRFind(bx::StringView(test, 0), 's').isEmpty() );
 	REQUIRE(bx::strRFind(bx::StringView(test, 1), 's').isEmpty() );
 	REQUIRE(&test[2] == bx::strRFind(test, 's').getPtr() );
+	REQUIRE(&test[3] == bx::strRFind(test, 't').getPtr() );
 }
 
 TEST_CASE("strFindI", "")

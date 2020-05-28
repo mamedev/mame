@@ -134,13 +134,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_output(u8 data);
 
 	u8 m_duart_io;
 	bool  m_bCalibSecondByte;
 
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
-	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	u16 esq5506_read_adc();
 	void es5506_clock_changed(u32 data);
 	void kt_map(address_map &map);
 	void ts_map(address_map &map);
@@ -190,7 +190,7 @@ WRITE_LINE_MEMBER(esqkt_state::esq5506_otto_irq)
 	#endif
 }
 
-READ16_MEMBER(esqkt_state::esq5506_read_adc)
+u16 esqkt_state::esq5506_read_adc()
 {
 	switch ((m_duart_io & 7) ^ 7)
 	{
@@ -224,7 +224,7 @@ WRITE_LINE_MEMBER(esqkt_state::duart_irq_handler)
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }
 
-WRITE8_MEMBER(esqkt_state::duart_output)
+void esqkt_state::duart_output(u8 data)
 {
 	m_duart_io = data;
 
@@ -360,9 +360,9 @@ static INPUT_PORTS_START( kt )
 INPUT_PORTS_END
 
 ROM_START( kt76 )
-	ROM_REGION(0x80000, "osrom", 0)
-	ROM_LOAD32_WORD( "kt76_162_lo.bin", 0x000000, 0x020000, CRC(1a1ab910) SHA1(dcc80db2297fd25993e090c2e5bb7f947319a8bf) )
-	ROM_LOAD32_WORD( "kt76_162_hi.bin", 0x000002, 0x040000, CRC(de16d236) SHA1(c55fca86453e90e8c34a048bed45817063237370) )
+	ROM_REGION32_BE(0x80000, "osrom", 0)
+	ROM_LOAD32_WORD_SWAP( "kt76_162_lo.bin", 0x000002, 0x020000, CRC(1a1ab910) SHA1(dcc80db2297fd25993e090c2e5bb7f947319a8bf) )
+	ROM_LOAD32_WORD_SWAP( "kt76_162_hi.bin", 0x000000, 0x040000, CRC(de16d236) SHA1(c55fca86453e90e8c34a048bed45817063237370) )
 
 	ROM_REGION(0x400000, "waverom", ROMREGION_ERASE00)
 	ROM_LOAD16_BYTE( "1351000401_rom0.u103", 0x000001, 0x200000, CRC(425047af) SHA1(9680d1fc222b29ba24f0fbf6136982bee87a60ef) )

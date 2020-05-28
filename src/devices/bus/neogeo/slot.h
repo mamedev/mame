@@ -68,6 +68,7 @@ enum
 	NEOGEO_SAMSHO5B,
 	NEOGEO_MSLUG3B6,
 	NEOGEO_MSLUG5P,
+	NEOGEO_MSLUG5B,
 	NEOGEO_KOG,
 	NEOGEO_SBP,
 	NEOGEO_KOF10TH,
@@ -85,7 +86,7 @@ enum
 #define DECRYPT_ALL_PARAMS \
 	uint8_t* cpuregion, uint32_t cpuregion_size,uint8_t* spr_region, uint32_t spr_region_size,uint8_t* fix_region, uint32_t fix_region_size,uint8_t* ym_region, uint32_t ym_region_size,uint8_t* ymdelta_region, uint32_t ymdelta_region_size,uint8_t* audiocpu_region, uint32_t audio_region_size, uint8_t* audiocrypt_region, uint32_t audiocrypt_region_size
 
-class device_neogeo_cart_interface : public device_slot_card_interface
+class device_neogeo_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -93,17 +94,17 @@ public:
 
 	// reading from ROM
 	virtual DECLARE_READ16_MEMBER(rom_r) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(banksel_w) { };
+	virtual DECLARE_WRITE16_MEMBER(banksel_w) { }
 	virtual DECLARE_READ16_MEMBER(ram_r) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(ram_w) { };
+	virtual DECLARE_WRITE16_MEMBER(ram_w) { }
 	virtual DECLARE_READ16_MEMBER(protection_r) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(protection_w) { };
+	virtual DECLARE_WRITE16_MEMBER(protection_w) { }
 	virtual DECLARE_READ16_MEMBER(addon_r) { return 0xffff; }
 	virtual uint32_t get_bank_base(uint16_t sel) { return 0; }
 	virtual uint32_t get_special_bank() { return 0; }
 	virtual uint16_t get_helper() { return 0; }
 
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS) { };
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) { }
 	virtual int get_fixed_bank_type() { return 0; }
 
 	void rom_alloc(uint32_t size) { m_rom.resize(size/sizeof(uint16_t)); }
@@ -186,7 +187,7 @@ protected:
 
 class neogeo_cart_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_neogeo_cart_interface>
 {
 public:
 	// construction/destruction
@@ -205,16 +206,15 @@ public:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "neo_cart"; }
-	virtual const char *file_extensions() const override { return "bin"; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "neo_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
@@ -337,6 +337,9 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 private:
 	int m_type;

@@ -204,10 +204,10 @@ public:
 	void tourvision(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
-	DECLARE_WRITE8_MEMBER(tourvision_i8155_a_w);
-	DECLARE_WRITE8_MEMBER(tourvision_i8155_b_w);
-	DECLARE_WRITE8_MEMBER(tourvision_i8155_c_w);
+	void tourvision_8085_d000_w(uint8_t data);
+	void tourvision_i8155_a_w(uint8_t data);
+	void tourvision_i8155_b_w(uint8_t data);
+	void tourvision_i8155_c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
@@ -349,7 +349,7 @@ void tourvision_state::pce_io(address_map &map)
 	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
 }
 
-WRITE8_MEMBER(tourvision_state::tourvision_8085_d000_w)
+void tourvision_state::tourvision_8085_d000_w(uint8_t data)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
 }
@@ -368,18 +368,18 @@ void tourvision_state::tourvision_8085_map(address_map &map)
 	map(0xf000, 0xf000).nopr(); // protection or internal counter ? there is sometimes some data in BIOS0 which is replaced by 0xff in BIOS1
 }
 
-WRITE8_MEMBER(tourvision_state::tourvision_i8155_a_w)
+void tourvision_state::tourvision_i8155_a_w(uint8_t data)
 {
 	//logerror("i8155 Port A: %02X\n", data);
 }
 
-WRITE8_MEMBER(tourvision_state::tourvision_i8155_b_w)
+void tourvision_state::tourvision_i8155_b_w(uint8_t data)
 {
 	// Selects game slot in bits 0 - 1
 	//logerror("i8155 Port B: %02X\n", data);
 }
 
-WRITE8_MEMBER(tourvision_state::tourvision_i8155_c_w)
+void tourvision_state::tourvision_i8155_c_w(uint8_t data)
 {
 	//logerror("i8155 Port C: %02X\n", data);
 }
@@ -402,7 +402,7 @@ void tourvision_state::tourvision(machine_config &config)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	I8085A(config, m_subcpu, 18000000/3 /*?*/);
 	m_subcpu->set_addrmap(AS_PROGRAM, &tourvision_state::tourvision_8085_map);
@@ -433,7 +433,7 @@ void tourvision_state::tourvision(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "tourvision_cart", "bin"));
-	cartslot.set_device_load(FUNC(tourvision_state::cart_load), this);
+	cartslot.set_device_load(FUNC(tourvision_state::cart_load));
 	cartslot.set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "tv_list").set_original("pce_tourvision");

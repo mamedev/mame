@@ -30,7 +30,7 @@
 #include "emu.h"
 #include "mea8000.h"
 
-#include <math.h>
+#include <cmath>
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -495,7 +495,7 @@ TIMER_CALLBACK_MEMBER( mea8000_device::timer_expire )
 /************************** CPU interface ****************************/
 
 
-READ8_MEMBER( mea8000_device::read )
+uint8_t mea8000_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -513,7 +513,7 @@ READ8_MEMBER( mea8000_device::read )
 	return 0;
 }
 
-WRITE8_MEMBER( mea8000_device::write )
+void mea8000_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

@@ -47,24 +47,24 @@ void namco_c123tmap_device::device_start()
 	m_tilemapinfo.videoram = std::make_unique<uint16_t[]>(size);
 
 	/* four scrolling tilemaps */
-	m_tilemapinfo.tmap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x0000>), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemapinfo.tmap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x1000>), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemapinfo.tmap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x2000>), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemapinfo.tmap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x0000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemapinfo.tmap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x1000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemapinfo.tmap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x2000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	if (m_tmap3_half_height)
 	{
-		m_tilemapinfo.tmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x3000>), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+		m_tilemapinfo.tmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x3000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 		/* two non-scrolling tilemaps */
-		m_tilemapinfo.tmap[4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x3808>), this), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
-		m_tilemapinfo.tmap[5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x3c08>), this), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
+		m_tilemapinfo.tmap[4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x3808>)), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
+		m_tilemapinfo.tmap[5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x3c08>)), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
 	}
 	else
 	{
-		m_tilemapinfo.tmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x3000>), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+		m_tilemapinfo.tmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x3000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 		/* two non-scrolling tilemaps */
-		m_tilemapinfo.tmap[4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x4008>), this), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
-		m_tilemapinfo.tmap[5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x4408>), this), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
+		m_tilemapinfo.tmap[4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x4008>)), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
+		m_tilemapinfo.tmap[5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x4408>)), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
 	}
 
 	/* define offsets for scrolling */
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(namco_c123tmap_device::get_tile_info)
 	int tile, mask;
 	m_tilemapinfo.cb(vram[tile_index], &tile, &mask);
 	tileinfo.mask_data = m_mask + mask * 8;
-	SET_TILE_INFO_MEMBER(0, tile, 0, 0);
+	tileinfo.set(0, tile, 0, 0);
 } /* get_tile_info */
 
 void namco_c123tmap_device::init_scroll(int flip) // 8 bit control with external flip screen value
@@ -153,19 +153,19 @@ void namco_c123tmap_device::set_tilemap_videoram(int offset, uint16_t newword)
 } /* set_tilemap_videoram */
 
 // 16 bit handlers
-WRITE16_MEMBER(namco_c123tmap_device::videoram16_w)
+void namco_c123tmap_device::videoram16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t newword = m_tilemapinfo.videoram[offset];
 	COMBINE_DATA(&newword);
 	set_tilemap_videoram(offset, newword);
 }
 
-READ16_MEMBER(namco_c123tmap_device::videoram16_r)
+uint16_t namco_c123tmap_device::videoram16_r(offs_t offset)
 {
 	return m_tilemapinfo.videoram[offset];
 }
 
-WRITE16_MEMBER(namco_c123tmap_device::control16_w)
+void namco_c123tmap_device::control16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_tilemapinfo.control[offset];
 	data = COMBINE_DATA(&m_tilemapinfo.control[offset]);
@@ -205,13 +205,13 @@ WRITE16_MEMBER(namco_c123tmap_device::control16_w)
 	}
 }
 
-READ16_MEMBER(namco_c123tmap_device::control16_r)
+uint16_t namco_c123tmap_device::control16_r(offs_t offset)
 {
 	return m_tilemapinfo.control[offset];
 }
 
 // 8 bit handlers
-WRITE8_MEMBER(namco_c123tmap_device::videoram8_w)
+void namco_c123tmap_device::videoram8_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t newword = m_tilemapinfo.videoram[offset >> 1];
 	if (offset & 1)
@@ -222,12 +222,12 @@ WRITE8_MEMBER(namco_c123tmap_device::videoram8_w)
 	set_tilemap_videoram(offset >> 1, newword);
 }
 
-READ8_MEMBER(namco_c123tmap_device::videoram8_r)
+uint8_t namco_c123tmap_device::videoram8_r(offs_t offset)
 {
 	return m_tilemapinfo.videoram[offset >> 1] >> ((~offset & 1) << 3);
 }
 
-WRITE8_MEMBER(namco_c123tmap_device::control8_w)
+void namco_c123tmap_device::control8_w(offs_t offset, uint8_t data)
 {
 	if ((m_tilemapinfo.control[offset] & 0xff) == data)
 		return;
@@ -243,7 +243,7 @@ WRITE8_MEMBER(namco_c123tmap_device::control8_w)
 	}
 }
 
-READ8_MEMBER(namco_c123tmap_device::control8_r)
+uint8_t namco_c123tmap_device::control8_r(offs_t offset)
 {
 	return m_tilemapinfo.control[offset] & 0xff;
 }

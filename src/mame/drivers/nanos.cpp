@@ -65,9 +65,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	DECLARE_WRITE_LINE_MEMBER(z80daisy_interrupt);
-	DECLARE_READ8_MEMBER(port_a_r);
-	DECLARE_READ8_MEMBER(port_b_r);
-	DECLARE_WRITE8_MEMBER(port_b_w);
+	uint8_t port_a_r();
+	uint8_t port_b_r();
+	void port_b_w(uint8_t data);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -170,10 +170,10 @@ void nanos_state::io_map(address_map &map)
 	map(0xA4, 0xA7).rw(m_ctc_1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
 	/* 256-k RAM card I  -  64k OS-Memory + 192k-RAM-Floppy */
-	//AM_RANGE(0xC0, 0xC7)
+	//map(0xC0, 0xC7)
 
 	/* 256-k RAM card II -  64k OS-Memory + 192k-RAM-Floppy */
-	//AM_RANGE(0xC8, 0xCF)
+	//map(0xC8, 0xCF)
 }
 
 /* Input ports */
@@ -302,7 +302,7 @@ uint32_t nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-READ8_MEMBER(nanos_state::port_a_r)
+uint8_t nanos_state::port_a_r()
 {
 	if (m_key_command==0)  {
 		return m_key_pressed;
@@ -313,13 +313,13 @@ READ8_MEMBER(nanos_state::port_a_r)
 	}
 }
 
-READ8_MEMBER(nanos_state::port_b_r)
+uint8_t nanos_state::port_b_r()
 {
 	return 0xff;
 }
 
 
-WRITE8_MEMBER(nanos_state::port_b_w)
+void nanos_state::port_b_w(uint8_t data)
 {
 	m_key_command = BIT(data,1);
 	if (BIT(data,7)) {

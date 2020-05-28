@@ -134,8 +134,8 @@
 
 ****************************************************************************/
 
-#include <time.h>
-#include <ctype.h>
+#include <ctime>
+#include <cctype>
 #include "imgtool.h"
 #include "formats/imageutl.h"
 #include "unicode.h"

@@ -106,7 +106,7 @@ private:
 	DECLARE_READ8_MEMBER(video_joy_r);
 	DECLARE_WRITE8_MEMBER(video_joy_w);
 
-	DECLARE_WRITE8_MEMBER( external_operation );
+	void external_operation(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led0_w);
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led1_w);
@@ -115,7 +115,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(usr9901_interrupt_callback);
 
 	DECLARE_WRITE_LINE_MEMBER(sys9901_interrupt_callback);
-	DECLARE_READ8_MEMBER(sys9901_r);
+	uint8_t sys9901_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel0_w);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel1_w);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel2_w);
@@ -135,7 +135,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sys9901_spkrdrive_w);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_tapewdata_w);
 
-	DECLARE_WRITE8_MEMBER( xmit_callback );
+	void xmit_callback(uint8_t data);
 	DECLARE_MACHINE_START(tm990_189);
 	DECLARE_MACHINE_RESET(tm990_189);
 	DECLARE_MACHINE_START(tm990_189_v);
@@ -326,7 +326,7 @@ WRITE_LINE_MEMBER( tm990189_state::sys9901_interrupt_callback )
 	m_tms9901_usr->set_int_line(5, state);
 }
 
-READ8_MEMBER( tm990189_state::sys9901_r )
+uint8_t tm990189_state::sys9901_r(offs_t offset)
 {
 	// |-|Cass|K|K|K|K|K|C|
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
@@ -476,16 +476,14 @@ public:
 	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_SERIAL; }
+	virtual iodevice_t image_type() const noexcept override { return IO_SERIAL; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return ""; }
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return ""; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -493,6 +491,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<tms9902_device> m_tms9902;
 };
@@ -546,7 +545,7 @@ void tm990_189_rs232_image_device::call_unload()
     tms9902->set_cts(RTS);
 } */
 
-WRITE8_MEMBER( tm990189_state::xmit_callback )
+void tm990189_state::xmit_callback(uint8_t data)
 {
 	uint8_t buf = data;
 	if (m_rs232_fp) m_rs232_fp->fwrite(&buf, 1);
@@ -555,7 +554,7 @@ WRITE8_MEMBER( tm990189_state::xmit_callback )
 /*
     External instruction decoding
 */
-WRITE8_MEMBER( tm990189_state::external_operation )
+void tm990189_state::external_operation(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

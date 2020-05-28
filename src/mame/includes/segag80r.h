@@ -151,7 +151,7 @@ private:
 	DECLARE_WRITE8_MEMBER(spaceod_sound_w);
 
 	DECLARE_WRITE8_MEMBER(usb_ram_w);
-	DECLARE_WRITE8_MEMBER(sindbadm_misc_w);
+	void sindbadm_misc_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(sindbadm_sn1_SN76496_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_sn2_SN76496_w);
 
@@ -164,8 +164,8 @@ private:
 	INTERRUPT_GEN_MEMBER(segag80r_vblank_start);
 	IRQ_CALLBACK_MEMBER(segag80r_irq_ack);
 	INTERRUPT_GEN_MEMBER(sindbadm_vblank_start);
-	DECLARE_WRITE8_MEMBER(sega005_sound_a_w);
-	DECLARE_WRITE8_MEMBER(sega005_sound_b_w);
+	void sega005_sound_a_w(uint8_t data);
+	void sega005_sound_b_w(uint8_t data);
 
 	void vblank_latch_set();
 	void g80_set_palette_entry(int entry, uint8_t data);
@@ -174,7 +174,7 @@ private:
 	void draw_background_spaceod(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background_page_scroll(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background_full_scroll(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	offs_t decrypt_offset(address_space &space, offs_t offset);
+	offs_t decrypt_offset(offs_t offset);
 	inline uint8_t demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0);
 	void monsterb_expand_gfx(const char *region);
 

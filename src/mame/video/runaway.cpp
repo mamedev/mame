@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(runaway_state::runaway_get_tile_info)
 {
 	uint8_t code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, ((code & 0x3f) << 1) | ((code & 0x40) >> 6) | (m_tile_bank << 7), 0, (code & 0x80) ? TILE_FLIPY : 0);
+	tileinfo.set(0, ((code & 0x3f) << 1) | ((code & 0x40) >> 6) | (m_tile_bank << 7), 0, (code & 0x80) ? TILE_FLIPY : 0);
 }
 
 
@@ -62,14 +62,14 @@ TILE_GET_INFO_MEMBER(runaway_state::qwak_get_tile_info)
 {
 	uint8_t code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), 0, 0);
+	tileinfo.set(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), 0, 0);
 }
 
 
 
 void runaway_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(runaway_state::runaway_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 30);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(runaway_state::runaway_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 30);
 
 	save_item(NAME(m_tile_bank));
 }
@@ -77,7 +77,7 @@ void runaway_state::video_start()
 
 VIDEO_START_MEMBER(runaway_state,qwak)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(runaway_state::qwak_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 30);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(runaway_state::qwak_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 30);
 
 	save_item(NAME(m_tile_bank));
 }

@@ -192,7 +192,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 {
 	if (machine().side_effects_disabled()) return;
 
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		if (m_tms9995_mode ? (!(offset & 1)) : (offset & 1))
 		{
@@ -243,7 +243,7 @@ void nouspikel_usb_smartmedia_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled()) return;
 
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		/* latch write */
 		if (offset & 1)
@@ -325,16 +325,6 @@ void nouspikel_usb_smartmedia_device::device_reset()
 	m_enable_sm = false;
 	m_write_flash = false;
 
-	if (m_genmod)
-	{
-		m_select_mask = 0x1fe000;
-		m_select_value = 0x174000;
-	}
-	else
-	{
-		m_select_mask = 0x7e000;
-		m_select_value = 0x74000;
-	}
 	m_selected = false;
 
 	m_cru_base = ioport("CRUUSBSM")->read();

@@ -53,8 +53,8 @@ void bbc_mertec_device::device_add_mconfig(machine_config &config)
 
 	/* adc */
 	UPD7002(config, m_upd7002, DERIVED_CLOCK(1, 8));
-	m_upd7002->set_get_analogue_callback(FUNC(bbc_mertec_device::get_analogue_input), this);
-	m_upd7002->set_eoc_callback(FUNC(bbc_mertec_device::upd7002_eoc), this);
+	m_upd7002->set_get_analogue_callback(FUNC(bbc_mertec_device::get_analogue_input));
+	m_upd7002->set_eoc_callback(FUNC(bbc_mertec_device::upd7002_eoc));
 
 	/* analogue port */
 	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);

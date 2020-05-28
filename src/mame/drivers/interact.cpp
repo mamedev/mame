@@ -89,10 +89,10 @@ void interact_state::interact_mem(address_map &map)
 	map.unmap_value_high();
 	/* Main ROM page*/
 	map(0x0000, 0x3fff).rom();  /*BANK(2)*/
-	/*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
+//  map(0x1000,0x3fff).ram();
 
 	/* Hardware address mapping*/
-/*  AM_RANGE(0x0800,0x0808) AM_WRITE(switch_bank_w)// Bank management not udsed in BR machine*/
+//  map(0x0800,0x0808).w(FUNC(interact_state::switch_bank_w)); // Bank management not udsed in BR machine*/
 	map(0x1000, 0x1000).w(FUNC(interact_state::color_a_w));  /* Color c0/c1*/
 	map(0x1800, 0x1800).w(FUNC(interact_state::color_b_w));  /* Color c2/c3*/
 	map(0x2000, 0x2003).w(FUNC(interact_state::sn_2000_w));  /* Sound*/

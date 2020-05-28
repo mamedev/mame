@@ -71,7 +71,7 @@ public:
 	std::unique_ptr<uint16_t[]> m_colorxlat;
 	std::unique_ptr<uint16_t[]> m_lumaram;
 	uint8_t m_gamma_table[256];
-	model2_renderer *m_poly;
+	std::unique_ptr<model2_renderer> m_poly;
 
 	/* Public for access by the ioports */
 	DECLARE_CUSTOM_INPUT_MEMBER(daytona_gearbox_r);
@@ -139,8 +139,8 @@ protected:
 
 	uint32_t m_geo_read_start_address;
 	uint32_t m_geo_write_start_address;
-	raster_state *m_raster;
-	geo_state *m_geo;
+	std::unique_ptr<raster_state> m_raster;
+	std::unique_ptr<geo_state> m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
 //  uint32_t m_soundack;
 	void model2_check_irq_state();
@@ -169,18 +169,18 @@ protected:
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(colorxlat_r);
 	DECLARE_WRITE16_MEMBER(colorxlat_w);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(in0_r);
+	void eeprom_w(uint8_t data);
+	uint8_t in0_r();
 	DECLARE_READ32_MEMBER(fifo_control_2a_r);
 	DECLARE_READ32_MEMBER(videoctl_r);
 	DECLARE_WRITE32_MEMBER(videoctl_w);
-	DECLARE_READ8_MEMBER(rchase2_drive_board_r);
-	DECLARE_WRITE8_MEMBER(rchase2_drive_board_w);
-	DECLARE_WRITE8_MEMBER(drive_board_w);
-	DECLARE_READ8_MEMBER(lightgun_data_r);
-	DECLARE_READ8_MEMBER(lightgun_mux_r);
-	DECLARE_WRITE8_MEMBER(lightgun_mux_w);
-	DECLARE_READ8_MEMBER(lightgun_offscreen_r);
+	uint8_t rchase2_drive_board_r();
+	void rchase2_drive_board_w(uint8_t data);
+	void drive_board_w(uint8_t data);
+	uint8_t lightgun_data_r(offs_t offset);
+	uint8_t lightgun_mux_r();
+	void lightgun_mux_w(uint8_t data);
+	uint8_t lightgun_offscreen_r(offs_t offset);
 	DECLARE_READ32_MEMBER(irq_request_r);
 	DECLARE_WRITE32_MEMBER(irq_ack_w);
 	DECLARE_READ32_MEMBER(irq_enable_r);
@@ -188,8 +188,8 @@ protected:
 	DECLARE_READ32_MEMBER(model2_serial_r);
 	DECLARE_WRITE32_MEMBER(model2o_serial_w);
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
-	DECLARE_WRITE16_MEMBER(horizontal_sync_w);
-	DECLARE_WRITE16_MEMBER(vertical_sync_w);
+	void horizontal_sync_w(uint16_t data);
+	void vertical_sync_w(uint16_t data);
 	DECLARE_READ32_MEMBER(doa_prot_r);
 	DECLARE_READ32_MEMBER(doa_unk_r);
 	void sega_0229_map(address_map &map);
@@ -210,9 +210,9 @@ protected:
 	DECLARE_READ8_MEMBER(tgpid_r);
 	DECLARE_READ32_MEMBER(polygon_count_r);
 
-	DECLARE_READ8_MEMBER(driveio_portg_r);
-	DECLARE_READ8_MEMBER(driveio_porth_r);
-	DECLARE_WRITE8_MEMBER(driveio_port_w);
+	uint8_t driveio_portg_r();
+	uint8_t driveio_porth_r();
+	void driveio_port_w(uint8_t data);
 	void push_geo_data(uint32_t data);
 	DECLARE_VIDEO_START(model2);
 	void reset_model2_scsp();
@@ -220,7 +220,7 @@ protected:
 //  DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
 //  DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+	void scsp_irq(offs_t offset, uint8_t data);
 
 	void model2_3d_frame_start( void );
 	void geo_parse( void );
@@ -399,9 +399,9 @@ public:
 
 protected:
 	DECLARE_READ32_MEMBER(fifo_control_2o_r);
-	DECLARE_WRITE8_MEMBER(daytona_output_w);
-	DECLARE_WRITE8_MEMBER(desert_output_w);
-	DECLARE_WRITE8_MEMBER(vcop_output_w);
+	void daytona_output_w(uint8_t data);
+	void desert_output_w(uint8_t data);
+	void vcop_output_w(uint8_t data);
 
 	void model2o_mem(address_map &map);
 };
@@ -502,6 +502,7 @@ public:
 	void model2b_0229(machine_config &config);
 	void model2b_5881(machine_config &config);
 	void indy500(machine_config &config);
+	void overrev2b(machine_config &config);
 	void powsled(machine_config &config);
 	void rchase2(machine_config &config);
 	void gunblade(machine_config &config);
@@ -758,6 +759,61 @@ struct quad_m2
 	uint16_t              z;
 	uint16_t              texheader[4];
 	uint8_t               luma;
+};
+
+/*******************************************
+ *
+ *  Hardware 3D Rasterizer Internal State
+ *
+ *******************************************/
+
+#define MAX_TRIANGLES       32768
+
+struct raster_state
+{
+//  uint32_t mode;                      /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
+	uint16_t *texture_rom;              /* Texture ROM pointer */
+	uint32_t texture_rom_mask;          /* Texture ROM mask */
+	int16_t viewport[4];                /* View port (startx,starty,endx,endy) */
+	int16_t center[4][2];               /* Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y]) */
+	uint16_t center_sel;                /* Selected center */
+	uint32_t reverse;                   /* Left/Right Reverse */
+	float z_adjust;                     /* ZSort Mode */
+	float triangle_z;                   /* Current Triangle z value */
+	uint8_t master_z_clip;              /* Master Z-Clip value */
+	uint32_t cur_command;               /* Current command */
+	uint32_t command_buffer[32];        /* Command buffer */
+	uint32_t command_index;             /* Command buffer index */
+	triangle tri_list[MAX_TRIANGLES];   /* Triangle list */
+	uint32_t tri_list_index;            /* Triangle list index */
+	triangle *tri_sorted_list[0x10000]; /* Sorted Triangle list */
+	uint16_t min_z;                     /* Minimum sortable Z value */
+	uint16_t max_z;                     /* Maximum sortable Z value */
+	uint16_t texture_ram[0x10000];      /* Texture RAM pointer */
+	uint8_t log_ram[0x40000];           /* Log RAM pointer */
+};
+
+/*******************************************
+ *
+ *  Geometry Engine Internal State
+ *
+ *******************************************/
+
+struct geo_state
+{
+	raster_state *          raster;
+	uint32_t              mode;                   /* bit 0 = Enable Specular, bit 1 = Calculate Normals */
+	uint32_t *          polygon_rom;            /* Polygon ROM pointer */
+	uint32_t            polygon_rom_mask;       /* Polygon ROM mask */
+	float               matrix[12];             /* Current Transformation Matrix */
+	poly_vertex         focus;                  /* Focus (x,y) */
+	poly_vertex         light;                  /* Light Vector */
+	float               lod;                    /* LOD */
+	float               coef_table[32];         /* Distane Coefficient table */
+	texture_parameter   texture_parameters[32]; /* Texture parameters */
+	uint32_t          polygon_ram0[0x8000];           /* Fast Polygon RAM pointer */
+	uint32_t          polygon_ram1[0x8000];           /* Slow Polygon RAM pointer */
+	model2_state    *state;
 };
 
 #endif // MAME_INCLUDES_MODEL2_H

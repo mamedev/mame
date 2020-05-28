@@ -241,10 +241,10 @@ ROM_START( rockroll ) // PCB serigraphed 'CB1 (CS4)' and '960606-5 CPU'. It was 
 	ROM_LOAD( "u15",  0x100000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
 
 	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "24lc16b.u10",  0x000, 0x800, NO_DUMP )
+	ROM_LOAD( "24lc16b.u10",  0x000, 0x800, CRC(fee6b8e4) SHA1(cb0ddd23e0decda540f22ebb455c91c2aabc60fd) )
 
 	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat_063_tibpal16l8-25cn.bin",  0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pat_063_tibpal16l8-25cn.bin",  0x000, 0x104, NO_DUMP ) // Protected
 ROM_END
 
 GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -3,3 +3,20 @@ build/obj/*
 buildVS/Release/*
 buildVS/x64/*
 buildVS/.vs/*
+nltool
+nlwav
+
+# Windows executables
+*.exe
+
+# Local doxygen binaries
+doxygen
+doxyindexer
+doxysearch.cgi
+
+# nltool/nlwav output files
+*.log
+*.wav
+
+# VS 2019
+*.user

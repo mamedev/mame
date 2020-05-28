@@ -92,7 +92,7 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_1)
 {
 	uint8_t *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6);
 
-	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
+	tileinfo.set(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
 
 
@@ -100,13 +100,13 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_2)
 {
 	uint8_t *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6) + 0x80;
 
-	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
+	tileinfo.set(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
 
 
 TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_FG)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
+	tileinfo.set(0, m_videoram[tile_index], 0, 0);
 }
 
 WRITE8_MEMBER(madalien_state::madalien_videoram_w)
@@ -118,27 +118,24 @@ WRITE8_MEMBER(madalien_state::madalien_videoram_w)
 
 void madalien_state::video_start()
 {
-	static const tilemap_mapper_delegate scan_functions[4] =
+	// can't make this static or it will keep stale pointers after a hard reset
+	const tilemap_mapper_delegate scan_functions[4] =
 	{
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode0),this),
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode1),this),
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode2),this),
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode3),this)
+		tilemap_mapper_delegate(*this, FUNC(madalien_state::scan_mode0)),
+		tilemap_mapper_delegate(*this, FUNC(madalien_state::scan_mode1)),
+		tilemap_mapper_delegate(*this, FUNC(madalien_state::scan_mode2)),
+		tilemap_mapper_delegate(*this, FUNC(madalien_state::scan_mode3))
 	};
 
-	static const int tilemap_cols[4] =
-	{
-		16, 16, 32, 32
-	};
+	static constexpr int tilemap_cols[4] = { 16, 16, 32, 32 };
 
-	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
+	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(madalien_state::get_tile_info_FG)), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_tilemap_fg->set_transparent_pen(0);
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_tilemap_edge1[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
-
-		m_tilemap_edge2[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge1[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(madalien_state::get_tile_info_BG_1)), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge2[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(madalien_state::get_tile_info_BG_2)), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 	}
 
 	m_headlight_bitmap = std::make_unique<bitmap_ind16>(128, 128);

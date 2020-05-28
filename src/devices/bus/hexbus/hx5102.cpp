@@ -148,7 +148,7 @@ hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-WRITE8_MEMBER( hx5102_device::external_operation )
+void hx5102_device::external_operation(offs_t offset, uint8_t data)
 {
 	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP) LOGMASKED(LOG_WARN, "External operation %s not implemented on HX5102 board\n", extop[offset]);
@@ -430,9 +430,9 @@ WRITE8_MEMBER(hx5102_device::ibc_write)
 		m_hexbus_ctrl->write(space, (offset>>1)&1, data);
 }
 
-WRITE8_MEMBER(hx5102_device::hexbus_out)
+void hx5102_device::hexbus_out(uint8_t data)
 {
-	LOGMASKED(LOG_HEXBUS, "hexbus out: %02x\n", data);
+	LOGMASKED(LOG_HEXBUS, "Write to hexbus: BAV*=%d, HSK*=%d, data=%x\n", bav_line(data)==ASSERT_LINE? 0:1, hsk_line(data)==ASSERT_LINE? 0:1, data_lines(data));
 
 	// Get the other levels and set our own states
 	uint8_t newlevel = hexbus_get_levels() & data;

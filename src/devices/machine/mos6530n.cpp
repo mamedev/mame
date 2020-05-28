@@ -75,38 +75,38 @@ void mos6532_new_device::io_map(address_map &map)
 	map(0x04, 0x07).mirror(0x8).w(FUNC(mos6532_new_device::edge_w));
 }
 
-READ8_MEMBER(mos6532_new_device::io_r)
+uint8_t mos6532_new_device::io_r(offs_t offset)
 {
 	offset &= 0x1f;
 	uint8_t ret = 0;
 
-	if (offset == 0x00 || offset == 0x08 || offset == 0x10 || offset == 0x18) ret = pa_data_r(space, 0);
-	if (offset == 0x01 || offset == 0x09 || offset == 0x11 || offset == 0x19) ret = pa_ddr_r(space, 0);
-	if (offset == 0x02 || offset == 0x0a || offset == 0x12 || offset == 0x1a) ret = pb_data_r(space, 0);
-	if (offset == 0x03 || offset == 0x0b || offset == 0x13 || offset == 0x1b) ret = pb_ddr_r(space, 0);
+	if (offset == 0x00 || offset == 0x08 || offset == 0x10 || offset == 0x18) ret = pa_data_r();
+	if (offset == 0x01 || offset == 0x09 || offset == 0x11 || offset == 0x19) ret = pa_ddr_r();
+	if (offset == 0x02 || offset == 0x0a || offset == 0x12 || offset == 0x1a) ret = pb_data_r();
+	if (offset == 0x03 || offset == 0x0b || offset == 0x13 || offset == 0x1b) ret = pb_ddr_r();
 
-	if (offset == 0x04 || offset == 0x06 || offset == 0x14 || offset == 0x16) ret = timer_off_r(space, 0);
-	if (offset == 0x0c || offset == 0x0e || offset == 0x1c || offset == 0x1e) ret = timer_on_r(space, 0);
+	if (offset == 0x04 || offset == 0x06 || offset == 0x14 || offset == 0x16) ret = timer_off_r();
+	if (offset == 0x0c || offset == 0x0e || offset == 0x1c || offset == 0x1e) ret = timer_on_r();
 
-	if (offset == 0x05 || offset == 0x07 || offset == 0x0d || offset == 0x0f) ret = irq_r(space, 0);
-	if (offset == 0x15 || offset == 0x17 || offset == 0x1d || offset == 0x1f) ret = irq_r(space, 0);
+	if (offset == 0x05 || offset == 0x07 || offset == 0x0d || offset == 0x0f) ret = irq_r();
+	if (offset == 0x15 || offset == 0x17 || offset == 0x1d || offset == 0x1f) ret = irq_r();
 
 	return ret;
 }
 
-WRITE8_MEMBER(mos6532_new_device::io_w)
+void mos6532_new_device::io_w(offs_t offset, uint8_t data)
 {
 	offset &= 0x1f;
 
-	if (offset == 0x00 || offset == 0x08 || offset == 0x10 || offset == 0x18) pa_data_w(space, 0, data);
-	if (offset == 0x01 || offset == 0x09 || offset == 0x11 || offset == 0x19) pa_ddr_w(space, 0, data);
-	if (offset == 0x02 || offset == 0x0a || offset == 0x12 || offset == 0x1a) pb_data_w(space, 0, data);
-	if (offset == 0x03 || offset == 0x0b || offset == 0x13 || offset == 0x1b) pb_ddr_w(space, 0, data);
-	if (offset == 0x14 || offset == 0x15 || offset == 0x16 || offset == 0x17) timer_off_w(space, offset&3, data);
-	if (offset == 0x1c || offset == 0x1d || offset == 0x1e || offset == 0x1f) timer_on_w(space, offset&3, data);
+	if (offset == 0x00 || offset == 0x08 || offset == 0x10 || offset == 0x18) pa_data_w(data);
+	if (offset == 0x01 || offset == 0x09 || offset == 0x11 || offset == 0x19) pa_ddr_w(data);
+	if (offset == 0x02 || offset == 0x0a || offset == 0x12 || offset == 0x1a) pb_data_w(data);
+	if (offset == 0x03 || offset == 0x0b || offset == 0x13 || offset == 0x1b) pb_ddr_w(data);
+	if (offset == 0x14 || offset == 0x15 || offset == 0x16 || offset == 0x17) timer_off_w(offset&3, data);
+	if (offset == 0x1c || offset == 0x1d || offset == 0x1e || offset == 0x1f) timer_on_w(offset&3, data);
 
-	if (offset == 0x04 || offset == 0x05 || offset == 0x06 || offset == 0x07) edge_w(space, offset&3, data);
-	if (offset == 0x0c || offset == 0x0d || offset == 0xea || offset == 0x0f) edge_w(space, offset&3, data);
+	if (offset == 0x04 || offset == 0x05 || offset == 0x06 || offset == 0x07) edge_w(data);
+	if (offset == 0x0c || offset == 0x0d || offset == 0xea || offset == 0x0f) edge_w(data);
 }
 
 
@@ -127,10 +127,10 @@ mos6530_device_base::mos6530_device_base(const machine_config &mconfig, device_t
 	m_out8_pa_cb(*this),
 	m_in8_pb_cb(*this),
 	m_out8_pb_cb(*this),
-	m_in_pa_cb{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
-	m_out_pa_cb{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
-	m_in_pb_cb{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
-	m_out_pb_cb{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
+	m_in_pa_cb(*this),
+	m_out_pa_cb(*this),
+	m_in_pb_cb(*this),
+	m_out_pb_cb(*this),
 	m_pa_in(0xff),
 	m_pa_out(0),
 	m_pa_ddr(0),
@@ -178,14 +178,10 @@ void mos6530_device_base::device_start()
 	m_out8_pa_cb.resolve();
 	m_in8_pb_cb.resolve();
 	m_out8_pb_cb.resolve();
-	for (auto &cb : m_in_pa_cb)
-		cb.resolve();
-	for (auto &cb : m_out_pa_cb)
-		cb.resolve_safe();
-	for (auto &cb : m_in_pb_cb)
-		cb.resolve();
-	for (auto &cb : m_out_pb_cb)
-		cb.resolve_safe();
+	m_in_pa_cb.resolve_all();
+	m_out_pa_cb.resolve_all_safe();
+	m_in_pb_cb.resolve_all();
+	m_out_pb_cb.resolve_all_safe();
 
 	// allocate timer
 	t_gen = timer_alloc(0);
@@ -456,7 +452,7 @@ void mos6530_device_base::pb_w(int bit, int state)
 //  pa_data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6530_device_base::pa_data_r )
+uint8_t mos6530_device_base::pa_data_r()
 {
 	uint8_t in = 0;
 
@@ -491,7 +487,7 @@ READ8_MEMBER( mos6530_device_base::pa_data_r )
 //  pa_data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6530_device_base::pa_data_w )
+void mos6530_device_base::pa_data_w(uint8_t data)
 {
 	m_pa_out = data;
 
@@ -506,7 +502,7 @@ WRITE8_MEMBER( mos6530_device_base::pa_data_w )
 //  pa_ddr_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6530_device_base::pa_ddr_w )
+void mos6530_device_base::pa_ddr_w(uint8_t data)
 {
 	m_pa_ddr = data;
 
@@ -521,7 +517,7 @@ WRITE8_MEMBER( mos6530_device_base::pa_ddr_w )
 //  pb_data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6530_device_base::pb_data_r )
+uint8_t mos6530_device_base::pb_data_r()
 {
 	uint8_t in = 0;
 
@@ -556,7 +552,7 @@ READ8_MEMBER( mos6530_device_base::pb_data_r )
 //  pb_data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6530_device_base::pb_data_w )
+void mos6530_device_base::pb_data_w(uint8_t data)
 {
 	m_pb_out = data;
 
@@ -570,7 +566,7 @@ WRITE8_MEMBER( mos6530_device_base::pb_data_w )
 //  pb_ddr_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6530_device_base::pb_ddr_w )
+void mos6530_device_base::pb_ddr_w(uint8_t data)
 {
 	m_pb_ddr = data;
 
@@ -584,7 +580,7 @@ WRITE8_MEMBER( mos6530_device_base::pb_ddr_w )
 //  timer_r -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6530_device_base::timer_off_r )
+uint8_t mos6530_device_base::timer_off_r()
 {
 	if (machine().side_effects_disabled())
 		return 0;
@@ -592,7 +588,7 @@ READ8_MEMBER( mos6530_device_base::timer_off_r )
 	return timer_r(false);
 }
 
-READ8_MEMBER( mos6530_device_base::timer_on_r )
+uint8_t mos6530_device_base::timer_on_r()
 {
 	if (machine().side_effects_disabled())
 		return 0;
@@ -627,7 +623,7 @@ uint8_t mos6530_device_base::timer_r(bool ie)
 //  irq_r -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6530_device_base::irq_r )
+uint8_t mos6530_device_base::irq_r()
 {
 	uint8_t data = get_irq_flags();
 
@@ -646,12 +642,12 @@ READ8_MEMBER( mos6530_device_base::irq_r )
 //  timer_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6530_device_base::timer_off_w )
+void mos6530_device_base::timer_off_w(offs_t offset, uint8_t data)
 {
 	timer_w(offset, data, false);
 }
 
-WRITE8_MEMBER( mos6530_device_base::timer_on_w )
+void mos6530_device_base::timer_on_w(offs_t offset, uint8_t data)
 {
 	timer_w(offset, data, true);
 }
@@ -692,7 +688,7 @@ void mos6530_device_base::timer_w(offs_t offset, uint8_t data, bool ie)
 //  edge_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6530_device_base::edge_w )
+void mos6530_device_base::edge_w(uint8_t data)
 {
 	m_pa7_dir = BIT(data, 0);
 	m_ie_edge = BIT(data, 1) ? false : true;

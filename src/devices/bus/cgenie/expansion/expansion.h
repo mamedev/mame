@@ -49,7 +49,7 @@
 
 class device_cg_exp_interface;
 
-class cg_exp_slot_device : public device_t, public device_slot_interface
+class cg_exp_slot_device : public device_t, public device_single_card_slot_interface<device_cg_exp_interface>
 {
 public:
 	// construction/destruction
@@ -83,7 +83,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	device_cg_exp_interface *m_cart;
 
@@ -94,7 +93,7 @@ private:
 };
 
 // class representing interface-specific live expansion device
-class device_cg_exp_interface : public device_slot_card_interface
+class device_cg_exp_interface : public device_interface
 {
 public:
 	// construction/destruction

@@ -24,7 +24,6 @@ GP1 HDD data contents:
 #include "includes/qdrmfgp.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/ataintf.h"
 #include "machine/nvram.h"
 #include "sound/k054539.h"
 #include "speaker.h"
@@ -382,7 +381,7 @@ static INPUT_PORTS_START( qdrmfgp )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
 
 	PORT_START("SENSOR")
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, qdrmfgp_state,battery_sensor_r, nullptr)   /* battery power sensor */
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(qdrmfgp_state, battery_sensor_r)   /* battery power sensor */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -462,7 +461,7 @@ static INPUT_PORTS_START( qdrmfgp2 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
 
 	PORT_START("SENSOR")
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, qdrmfgp_state,battery_sensor_r, nullptr)   /* battery power sensor */
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(qdrmfgp_state, battery_sensor_r)   /* battery power sensor */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -552,7 +551,7 @@ void qdrmfgp_state::qdrmfgp(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(qdrmfgp_state::qdrmfgp_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(qdrmfgp_state::qdrmfgp_tile_callback));
 	m_k056832->set_config(K056832_BPP_4dj, 1, 0);
 	m_k056832->set_palette(m_palette);
 
@@ -597,7 +596,7 @@ void qdrmfgp_state::qdrmfgp2(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(qdrmfgp_state::qdrmfgp2_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(qdrmfgp_state::qdrmfgp2_tile_callback));
 	m_k056832->set_config(K056832_BPP_4dj, 1, 0);
 	m_k056832->set_palette(m_palette);
 

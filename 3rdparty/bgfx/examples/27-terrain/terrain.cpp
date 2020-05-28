@@ -27,17 +27,17 @@ struct PosTexCoord0Vertex
 
 	static void init()
 	{
-		ms_decl
+		ms_layout
 			.begin()
 			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
 			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
 			.end();
 	}
 
-	static bgfx::VertexDecl ms_decl;
+	static bgfx::VertexLayout ms_layout;
 };
 
-bgfx::VertexDecl PosTexCoord0Vertex::ms_decl;
+bgfx::VertexLayout PosTexCoord0Vertex::ms_layout;
 
 struct TerrainData
 {
@@ -62,8 +62,8 @@ struct BrushData
 class ExampleTerrain : public entry::AppI
 {
 public:
-	ExampleTerrain(const char* _name, const char* _description)
-		: entry::AppI(_name, _description)
+ExampleTerrain(const char* _name, const char* _description, const char* _url)
+		: entry::AppI(_name, _description, _url)
 	{
 	}
 
@@ -112,7 +112,7 @@ public:
 		m_dvbh.idx = bgfx::kInvalidHandle;
 		m_dibh.idx = bgfx::kInvalidHandle;
 		m_heightTexture.idx = bgfx::kInvalidHandle;
-		s_heightTexture = bgfx::createUniform("s_heightTexture", bgfx::UniformType::Int1);
+		s_heightTexture = bgfx::createUniform("s_heightTexture", bgfx::UniformType::Sampler);
 
 		m_oldWidth  = 0;
 		m_oldHeight = 0;
@@ -135,9 +135,8 @@ public:
 
 		cameraCreate();
 
-		const float initialPos[3] = { s_terrainSize/2.0f, 100.0f, 0.0f };
-		cameraSetPosition(initialPos);
-		cameraSetVerticalAngle(-bx::kPi/4.0f);
+		cameraSetPosition({ s_terrainSize/2.0f, 100.0f, 0.0f });
+		cameraSetVerticalAngle(-bx::kPiQuarter);
 	}
 
 	virtual int shutdown() override
@@ -242,7 +241,7 @@ public:
 			}
 
 			mem = bgfx::makeRef(&m_terrain.m_vertices[0], sizeof(PosTexCoord0Vertex) * m_terrain.m_vertexCount);
-			m_vbh = bgfx::createVertexBuffer(mem, PosTexCoord0Vertex::ms_decl);
+			m_vbh = bgfx::createVertexBuffer(mem, PosTexCoord0Vertex::ms_layout);
 			if (bgfx::isValid(m_ibh) )
 			{
 				bgfx::destroy(m_ibh);
@@ -257,7 +256,7 @@ public:
 
 			if (!bgfx::isValid(m_dvbh) )
 			{
-				m_dvbh = bgfx::createDynamicVertexBuffer(m_terrain.m_vertexCount, PosTexCoord0Vertex::ms_decl);
+				m_dvbh = bgfx::createDynamicVertexBuffer(m_terrain.m_vertexCount, PosTexCoord0Vertex::ms_layout);
 			}
 
 			mem = bgfx::makeRef(&m_terrain.m_vertices[0], sizeof(PosTexCoord0Vertex) * m_terrain.m_vertexCount);
@@ -278,7 +277,7 @@ public:
 				updateTerrainMesh();
 
 				mem = bgfx::makeRef(&m_terrain.m_vertices[0], sizeof(PosTexCoord0Vertex) * m_terrain.m_vertexCount);
-				m_vbh = bgfx::createVertexBuffer(mem, PosTexCoord0Vertex::ms_decl);
+				m_vbh = bgfx::createVertexBuffer(mem, PosTexCoord0Vertex::ms_layout);
 
 				mem = bgfx::makeRef(&m_terrain.m_indices[0], sizeof(uint16_t) * m_terrain.m_indexCount);
 				m_ibh = bgfx::createIndexBuffer(mem);
@@ -357,30 +356,25 @@ public:
 		float ray_world[4];
 		bx::vec4MulMtx(ray_world, ray_eye, invViewMtx);
 
-		float ray_dir[3];
-		bx::vec3Norm(ray_dir, ray_world);
-		ray_dir[0] *= -1.0;
-		ray_dir[1] *= -1.0;
-		ray_dir[2] *= -1.0;
+		const bx::Vec3 rayDir = bx::mul(bx::normalize(bx::load<bx::Vec3>(ray_world) ), -1.0f);
 
-		float pos[3];
-		cameraGetPosition(pos);
+		bx::Vec3 pos = cameraGetPosition();
 		for (int i = 0; i < 1000; ++i)
 		{
-			bx::vec3Add(pos, pos, ray_dir);
+			pos = bx::add(pos, rayDir);
 
-			if (pos[0] < 0
-			||  pos[0] >= s_terrainSize
-			||  pos[2] < 0
-			||  pos[2] >= s_terrainSize)
+			if (pos.x < 0
+			||  pos.x >= s_terrainSize
+			||  pos.z < 0
+			||  pos.z >= s_terrainSize)
 			{
 				continue;
 			}
 
-			uint32_t heightMapPos = ( (uint32_t)pos[2] * s_terrainSize) + (uint32_t)pos[0];
-			if ( pos[1] < m_terrain.m_heightMap[heightMapPos] )
+			uint32_t heightMapPos = ( (uint32_t)pos.z * s_terrainSize) + (uint32_t)pos.x;
+			if (pos.y < m_terrain.m_heightMap[heightMapPos])
 			{
-				paintTerrainHeight( (uint32_t)pos[0], (uint32_t)pos[2]);
+				paintTerrainHeight( (uint32_t)pos.x, (uint32_t)pos.z);
 				return;
 			}
 		}
@@ -528,4 +522,9 @@ public:
 
 } // namespace
 
-ENTRY_IMPLEMENT_MAIN(ExampleTerrain, "27-terrain", "Terrain painting example.");
+ENTRY_IMPLEMENT_MAIN(
+	  ExampleTerrain
+	, "27-terrain"
+	, "Terrain painting example."
+	, "https://bkaradzic.github.io/bgfx/examples.html#terrain"
+	);

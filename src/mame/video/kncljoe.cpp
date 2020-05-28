@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(kncljoe_state::get_bg_tile_info)
 	int attr = m_videoram[2 * tile_index + 1];
 	int code = m_videoram[2 * tile_index] + ((attr & 0xc0) << 2) + (m_tile_bank << 10);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			attr & 0xf,
 			TILE_FLIPXY((attr & 0x30) >> 4));
@@ -99,7 +99,7 @@ TILE_GET_INFO_MEMBER(kncljoe_state::get_bg_tile_info)
 
 void kncljoe_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kncljoe_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kncljoe_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_bg_tilemap->set_scroll_rows(4);
 }

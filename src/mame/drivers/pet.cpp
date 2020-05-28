@@ -241,18 +241,18 @@ public:
 	void pet2001(machine_config &config);
 	void pet2001n32(machine_config &config);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( via_pa_w );
-	DECLARE_READ8_MEMBER( via_pb_r );
-	DECLARE_WRITE8_MEMBER( via_pb_w );
+	void via_pa_w(uint8_t data);
+	uint8_t via_pb_r();
+	void via_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
 
-	DECLARE_READ8_MEMBER( pia1_pa_r );
-	DECLARE_READ8_MEMBER( pia1_pb_r );
-	DECLARE_WRITE8_MEMBER( pia1_pa_w );
+	uint8_t pia1_pa_r();
+	uint8_t pia1_pb_r();
+	void pia1_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
 
 	DECLARE_WRITE_LINE_MEMBER( user_diag_w );
@@ -366,7 +366,7 @@ public:
 	void pet4016(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER( pia1_pb_r );
+	uint8_t pia1_pb_r();
 
 };
 
@@ -446,8 +446,8 @@ private:
 		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
 	void read_pla2_eprom(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint8_t m_cr;
 	void cbm8296_mem(address_map &map);
@@ -494,7 +494,7 @@ void pet_state::update_speaker()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( pet_state::read )
+uint8_t pet_state::read(offs_t offset)
 {
 	int sel = offset >> 12;
 	int norom = m_exp->norom_r(offset, sel);
@@ -592,7 +592,7 @@ READ8_MEMBER( pet_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pet_state::write )
+void pet_state::write(offs_t offset, uint8_t data)
 {
 	int sel = offset >> 12;
 
@@ -723,7 +723,7 @@ void cbm8296_state::read_pla2_eprom(offs_t offset, int phi2, int brw, int casena
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( cbm8296_state::read )
+uint8_t cbm8296_state::read(offs_t offset)
 {
 	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 1, noscreen = 1, noio = BIT(m_cr, 6);
@@ -804,7 +804,7 @@ READ8_MEMBER( cbm8296_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cbm8296_state::write )
+void cbm8296_state::write(offs_t offset, uint8_t data)
 {
 	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 0, noscreen = 1, noio = BIT(m_cr, 6);
@@ -1121,7 +1121,7 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-WRITE8_MEMBER( pet_state::via_pa_w )
+void pet_state::via_pa_w(uint8_t data)
 {
 	m_user->write_c((data>>0)&1);
 	m_user->write_d((data>>1)&1);
@@ -1135,7 +1135,7 @@ WRITE8_MEMBER( pet_state::via_pa_w )
 	m_via_pa = data;
 }
 
-READ8_MEMBER( pet_state::via_pb_r )
+uint8_t pet_state::via_pb_r()
 {
 	/*
 
@@ -1165,7 +1165,7 @@ READ8_MEMBER( pet_state::via_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( pet_state::via_pb_w )
+void pet_state::via_pb_w(uint8_t data)
 {
 	/*
 
@@ -1206,7 +1206,7 @@ WRITE_LINE_MEMBER( pet_state::via_cb2_w )
 }
 
 
-READ8_MEMBER( pet_state::pia1_pa_r )
+uint8_t pet_state::pia1_pa_r()
 {
 	/*
 
@@ -1241,7 +1241,7 @@ READ8_MEMBER( pet_state::pia1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( pet_state::pia1_pa_w )
+void pet_state::pia1_pa_w(uint8_t data)
 {
 	/*
 
@@ -1266,7 +1266,7 @@ WRITE8_MEMBER( pet_state::pia1_pa_w )
 	update_speaker();
 }
 
-READ8_MEMBER( pet_state::pia1_pb_r )
+uint8_t pet_state::pia1_pb_r()
 {
 	uint8_t data = 0xff;
 
@@ -1287,7 +1287,7 @@ READ8_MEMBER( pet_state::pia1_pb_r )
 	return data;
 }
 
-READ8_MEMBER( pet2001b_state::pia1_pb_r )
+uint8_t pet2001b_state::pia1_pb_r()
 {
 	uint8_t data = 0xff;
 
@@ -1714,7 +1714,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_user->pm_handler().set(m_via, FUNC(via6522_device::write_cb2));
 
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY));
-	quickload.set_load_callback(FUNC(pet_state::quickload_pet), this);
+	quickload.set_load_callback(FUNC(pet_state::quickload_pet));
 	quickload.set_interface("cbm_quik");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("pet_cass");
@@ -1733,7 +1733,6 @@ void pet_state::pet(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(8'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet2001_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1896,8 +1895,8 @@ void pet2001b_state::pet4032f(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
+	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -1952,8 +1951,8 @@ void pet_state::cbm4032f(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
+	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -2003,7 +2002,6 @@ void pet80_state::pet80(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(16'000'000)/16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet2001_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
@@ -2018,8 +2016,8 @@ void pet80_state::pet80(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(2*8);
-	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(pet80_state::pet80_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
+	m_crtc->set_update_row_callback(FUNC(pet80_state::pet80_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -2073,7 +2071,7 @@ void cbm8296_state::cbm8296(machine_config &config)
 	m_crtc->set_clock(XTAL(16'000'000)/16);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(2*8);
-	m_crtc->set_update_row_callback(FUNC(pet80_state::cbm8296_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(pet80_state::cbm8296_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	subdevice<ieee488_slot_device>("ieee8")->set_default_option("c8250");

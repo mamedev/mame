@@ -40,8 +40,8 @@ public:
 	void anes(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(vram_offset_w);
-	DECLARE_WRITE8_MEMBER(blit_trigger_w);
+	void vram_offset_w(offs_t offset, uint8_t data);
+	void blit_trigger_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -58,12 +58,12 @@ uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-WRITE8_MEMBER(anes_state::vram_offset_w)
+void anes_state::vram_offset_w(offs_t offset, uint8_t data)
 {
 	m_vram_offset[offset] = data;
 }
 
-WRITE8_MEMBER(anes_state::blit_trigger_w)
+void anes_state::blit_trigger_w(uint8_t data)
 {
 	/*
 	 operation is:
@@ -92,14 +92,14 @@ void anes_state::io_map(address_map &map)
 	map(0x07, 0x07).nopw(); // mux write
 	map(0x08, 0x09).w("ym", FUNC(ym2413_device::write));
 	map(0x0a, 0x0a).w(FUNC(anes_state::blit_trigger_w));
-//  AM_RANGE(0x0b, 0x0b) AM_WRITE(blit_mode_w)
+//  map(0x0b, 0x0b).w(FUNC(anes_state::blit_mode_w));
 	map(0x0c, 0x0e).w(FUNC(anes_state::vram_offset_w));
 	map(0x11, 0x11).portr("DSW1");
 	map(0x12, 0x12).portr("DSW2");
 	map(0x13, 0x13).portr("DSW3");
 	map(0x14, 0x15).nopr(); // mux read
 	map(0x16, 0x16).portr("IN0").nopw();
-//  AM_RANGE(0xfe, 0xfe) banking? unknown ROM range
+//  map(0xfe, 0xfe) banking? unknown ROM range
 }
 
 

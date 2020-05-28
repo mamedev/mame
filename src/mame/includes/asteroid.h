@@ -55,9 +55,9 @@ public:
 
 	DECLARE_READ8_MEMBER(earom_read);
 	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
+	void earom_control_w(uint8_t data);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	DECLARE_READ_LINE_MEMBER(clock_r);
 
 	INTERRUPT_GEN_MEMBER(asteroid_interrupt);
 	INTERRUPT_GEN_MEMBER(asterock_interrupt);

@@ -73,14 +73,14 @@
 #define LEFT    0x00
 #define RIGHT   0x01
 
-static constexpr int amplitude_lookup[16] = {
+static constexpr u16 amplitude_lookup[16] = {
 		0*32767/16,  1*32767/16,  2*32767/16,   3*32767/16,
 		4*32767/16,  5*32767/16,  6*32767/16,   7*32767/16,
 		8*32767/16,  9*32767/16, 10*32767/16, 11*32767/16,
 	12*32767/16, 13*32767/16, 14*32767/16, 15*32767/16
 };
 
-static constexpr uint8_t envelope[8][64] = {
+static constexpr u8 envelope[8][64] = {
 	/* zero amplitude */
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -135,19 +135,19 @@ DEFINE_DEVICE_TYPE(SAA1099, saa1099_device, "saa1099", "Philips SAA1099")
 //  saa1099_device - constructor
 //-------------------------------------------------
 
-saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SAA1099, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_noise_params{ 0, 0 }
-	, m_env_enable{ 0, 0 }
-	, m_env_reverse_right{ 0, 0 }
+	, m_env_enable{ false, false }
+	, m_env_reverse_right{ false, false }
 	, m_env_mode{ 0, 0 }
-	, m_env_bits{ 0, 0 }
-	, m_env_clock{ 0, 0 }
+	, m_env_bits{ false, false }
+	, m_env_clock{ false, false }
 	, m_env_step{ 0, 0 }
-	, m_all_ch_enable(0)
-	, m_sync_state(0)
+	, m_all_ch_enable(false)
+	, m_sync_state(false)
 	, m_selected_reg(0)
 	, m_sample_rate(0.0)
 {
@@ -161,7 +161,6 @@ saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, d
 void saa1099_device::device_start()
 {
 	/* copy global parameters */
-	m_master_clock = clock();
 	m_sample_rate = clock() / 256;
 
 	/* for each chip allocate one stream */
@@ -178,25 +177,19 @@ void saa1099_device::device_start()
 	save_item(NAME(m_sync_state));
 	save_item(NAME(m_selected_reg));
 
-	for (int i = 0; i < 6; i++)
-	{
-		save_item(NAME(m_channels[i].frequency), i);
-		save_item(NAME(m_channels[i].freq_enable), i);
-		save_item(NAME(m_channels[i].noise_enable), i);
-		save_item(NAME(m_channels[i].octave), i);
-		save_item(NAME(m_channels[i].amplitude), i);
-		save_item(NAME(m_channels[i].envelope), i);
-		save_item(NAME(m_channels[i].counter), i);
-		save_item(NAME(m_channels[i].freq), i);
-		save_item(NAME(m_channels[i].level), i);
-	}
+	save_item(STRUCT_MEMBER(m_channels, frequency));
+	save_item(STRUCT_MEMBER(m_channels, freq_enable));
+	save_item(STRUCT_MEMBER(m_channels, noise_enable));
+	save_item(STRUCT_MEMBER(m_channels, octave));
+	save_item(STRUCT_MEMBER(m_channels, amplitude));
+	save_item(STRUCT_MEMBER(m_channels, envelope));
+	save_item(STRUCT_MEMBER(m_channels, counter));
+	save_item(STRUCT_MEMBER(m_channels, freq));
+	save_item(STRUCT_MEMBER(m_channels, level));
 
-	for (int i = 0; i < 2; i++)
-	{
-		save_item(NAME(m_noise[i].counter), i);
-		save_item(NAME(m_noise[i].freq), i);
-		save_item(NAME(m_noise[i].level), i);
-	}
+	save_item(STRUCT_MEMBER(m_noise, counter));
+	save_item(STRUCT_MEMBER(m_noise, freq));
+	save_item(STRUCT_MEMBER(m_noise, level));
 }
 
 
@@ -206,7 +199,6 @@ void saa1099_device::device_start()
 
 void saa1099_device::device_clock_changed()
 {
-	m_master_clock = clock();
 	m_sample_rate = clock() / 256;
 
 	m_stream->set_sample_rate(m_sample_rate);
@@ -233,10 +225,10 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	{
 		switch (m_noise_params[ch])
 		{
-		case 0: m_noise[ch].freq = m_master_clock/256.0 * 2; break;
-		case 1: m_noise[ch].freq = m_master_clock/512.0 * 2; break;
-		case 2: m_noise[ch].freq = m_master_clock/1024.0 * 2; break;
-		case 3: m_noise[ch].freq = m_channels[ch * 3].freq;   break; // todo: this case will be m_master_clock/[ch*3's octave divisor, 0 is = 256*2, higher numbers are higher] * 2 if the tone generator phase reset bit (0x1c bit 1) is set.
+		case 0: m_noise[ch].freq = clock()/256.0 * 2; break;
+		case 1: m_noise[ch].freq = clock()/512.0 * 2; break;
+		case 2: m_noise[ch].freq = clock()/1024.0 * 2; break;
+		case 3: m_noise[ch].freq = m_channels[ch * 3].freq;   break; // todo: this case will be clock()/[ch*3's octave divisor, 0 is = 256*2, higher numbers are higher] * 2 if the tone generator phase reset bit (0x1c bit 1) is set.
 		}
 	}
 
@@ -249,7 +241,7 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		for (ch = 0; ch < 6; ch++)
 		{
 			if (m_channels[ch].freq == 0.0)
-				m_channels[ch].freq = (double)((2 * m_master_clock / 512) << m_channels[ch].octave) /
+				m_channels[ch].freq = (double)((2 * clock() / 512) << m_channels[ch].octave) /
 					(511.0 - (double)m_channels[ch].frequency);
 
 			/* check the actual position in the square wave */
@@ -257,7 +249,7 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			while (m_channels[ch].counter < 0)
 			{
 				/* calculate new frequency now after the half wave is updated */
-				m_channels[ch].freq = (double)((2 * m_master_clock / 512) << m_channels[ch].octave) /
+				m_channels[ch].freq = (double)((2 * clock() / 512) << m_channels[ch].octave) /
 					(511.0 - (double)m_channels[ch].frequency);
 
 				m_channels[ch].counter += m_sample_rate;
@@ -332,7 +324,7 @@ void saa1099_device::envelope_w(int ch)
 		m_channels[ch*3+0].envelope[ LEFT] =
 		m_channels[ch*3+1].envelope[ LEFT] =
 		m_channels[ch*3+2].envelope[ LEFT] = envelope[mode][step] & mask;
-		if (m_env_reverse_right[ch] & 0x01)
+		if (m_env_reverse_right[ch])
 		{
 			m_channels[ch*3+0].envelope[RIGHT] =
 			m_channels[ch*3+1].envelope[RIGHT] =
@@ -407,21 +399,13 @@ void saa1099_device::data_w(u8 data)
 		break;
 	/* channel i frequency enable */
 	case 0x14:
-		m_channels[0].freq_enable = data & 0x01;
-		m_channels[1].freq_enable = data & 0x02;
-		m_channels[2].freq_enable = data & 0x04;
-		m_channels[3].freq_enable = data & 0x08;
-		m_channels[4].freq_enable = data & 0x10;
-		m_channels[5].freq_enable = data & 0x20;
+		for (ch = 0; ch < 6; ch++)
+			m_channels[ch].freq_enable = BIT(data, ch);
 		break;
 	/* channel i noise enable */
 	case 0x15:
-		m_channels[0].noise_enable = data & 0x01;
-		m_channels[1].noise_enable = data & 0x02;
-		m_channels[2].noise_enable = data & 0x04;
-		m_channels[3].noise_enable = data & 0x08;
-		m_channels[4].noise_enable = data & 0x10;
-		m_channels[5].noise_enable = data & 0x20;
+		for (ch = 0; ch < 6; ch++)
+			m_channels[ch].noise_enable = BIT(data, ch);
 		break;
 	/* noise generators parameters */
 	case 0x16:
@@ -431,25 +415,23 @@ void saa1099_device::data_w(u8 data)
 	/* envelope generators parameters */
 	case 0x18:  case 0x19:
 		ch = reg - 0x18;
-		m_env_reverse_right[ch] = data & 0x01;
+		m_env_reverse_right[ch] = BIT(data, 0);
 		m_env_mode[ch] = (data >> 1) & 0x07;
-		m_env_bits[ch] = data & 0x10;
-		m_env_clock[ch] = data & 0x20;
-		m_env_enable[ch] = data & 0x80;
+		m_env_bits[ch] = BIT(data, 4);
+		m_env_clock[ch] = BIT(data, 5);
+		m_env_enable[ch] = BIT(data, 7);
 		/* reset the envelope */
 		m_env_step[ch] = 0;
 		break;
 	/* channels enable & reset generators */
 	case 0x1c:
-		m_all_ch_enable = data & 0x01;
-		m_sync_state = data & 0x02;
-		if (data & 0x02)
+		m_all_ch_enable = BIT(data, 0);
+		m_sync_state = BIT(data, 1);
+		if (BIT(data, 1))
 		{
-			int i;
-
 			/* Synch & Reset generators */
 			logerror("%s: -reg 0x1c- Chip reset\n", machine().describe_context());
-			for (i = 0; i < 6; i++)
+			for (int i = 0; i < 6; i++)
 			{
 				m_channels[i].level = 0;
 				m_channels[i].counter = 0.0;

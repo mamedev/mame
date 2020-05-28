@@ -11,7 +11,7 @@
 // class konami573_cassette_interface
 
 konami573_cassette_interface::konami573_cassette_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "k573cass")
 {
 	m_slot = dynamic_cast<konami573_cassette_slot_device *>(device.owner());
 }
@@ -78,7 +78,7 @@ konami573_cassette_x_device::konami573_cassette_x_device(const machine_config &m
 
 void konami573_cassette_x_device::device_add_mconfig(machine_config &config)
 {
-	X76F041( config, m_x76f041 );
+	X76F041(config, m_x76f041);
 }
 
 void konami573_cassette_x_device::device_start()
@@ -88,22 +88,22 @@ void konami573_cassette_x_device::device_start()
 
 WRITE_LINE_MEMBER(konami573_cassette_x_device::write_line_d0)
 {
-	m_x76f041->write_sda( state );
+	m_x76f041->write_sda(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_x_device::write_line_d1)
 {
-	m_x76f041->write_scl( state );
+	m_x76f041->write_scl(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_x_device::write_line_d2)
 {
-	m_x76f041->write_cs( state );
+	m_x76f041->write_cs(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_x_device::write_line_d3)
 {
-	m_x76f041->write_rst( state );
+	m_x76f041->write_rst(state);
 }
 
 READ_LINE_MEMBER(konami573_cassette_x_device::read_line_secflash_sda)
@@ -123,33 +123,33 @@ konami573_cassette_xi_device::konami573_cassette_xi_device(const machine_config 
 
 void konami573_cassette_xi_device::device_add_mconfig(machine_config &config)
 {
-	X76F041( config, m_x76f041 );
-	DS2401( config, m_ds2401 );
-	ADC0838( config, m_adc0838 );
+	X76F041(config, m_x76f041);
+	DS2401(config, m_ds2401);
+	ADC0838(config, m_adc0838);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_xi_device::write_line_d0)
 {
 	konami573_cassette_x_device::write_line_d0( state ); // shares line with x76f041 sda
 
-	m_adc0838->cs_write( state );
+	m_adc0838->cs_write(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_xi_device::write_line_d1)
 {
-	konami573_cassette_x_device::write_line_d1( state ); // shares line with x76f041 scl
+	konami573_cassette_x_device::write_line_d1(state); // shares line with x76f041 scl
 
-	m_adc0838->clk_write( state );
+	m_adc0838->clk_write(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_xi_device::write_line_d4)
 {
-	m_ds2401->write( !state );
+	m_ds2401->write(!state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_xi_device::write_line_d5)
 {
-	m_adc0838->di_write( state );
+	m_adc0838->di_write(state);
 }
 
 READ_LINE_MEMBER(konami573_cassette_xi_device::read_line_ds2401)
@@ -192,7 +192,7 @@ konami573_cassette_y_device::konami573_cassette_y_device(const machine_config &m
 
 void konami573_cassette_y_device::device_add_mconfig(machine_config &config)
 {
-	X76F100( config, m_x76f100 );
+	X76F100(config, m_x76f100);
 }
 
 void konami573_cassette_y_device::device_start()
@@ -216,46 +216,46 @@ READ_LINE_MEMBER(konami573_cassette_y_device::read_line_secflash_sda)
 
 WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d0)
 {
-	m_d0_handler( state );
-	m_x76f100->write_sda( state );
+	m_d0_handler(state);
+	m_x76f100->write_sda(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d1)
 {
-	m_d1_handler( state );
-	m_x76f100->write_scl( state );
+	m_d1_handler(state);
+	m_x76f100->write_scl(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d2)
 {
-	m_d2_handler( state );
-	m_x76f100->write_cs( state );
+	m_d2_handler(state);
+	m_x76f100->write_cs(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d3)
 {
-	m_d3_handler( state );
-	m_x76f100->write_rst( state );
+	m_d3_handler(state);
+	m_x76f100->write_rst(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d4)
 {
-	m_d4_handler( state );
+	m_d4_handler(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d5)
 {
-	m_d5_handler( state );
+	m_d5_handler(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d6)
 {
-	m_d6_handler( state );
+	m_d6_handler(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d7)
 {
-	m_d7_handler( state );
+	m_d7_handler(state);
 }
 
 
@@ -269,15 +269,15 @@ konami573_cassette_yi_device::konami573_cassette_yi_device(const machine_config 
 
 void konami573_cassette_yi_device::device_add_mconfig(machine_config &config)
 {
-	X76F100( config, m_x76f100 );
-	DS2401( config, m_ds2401 );
+	X76F100(config, m_x76f100);
+	DS2401(config, m_ds2401);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_yi_device::write_line_d4)
 {
-	konami573_cassette_y_device::write_line_d4( state );
+	konami573_cassette_y_device::write_line_d4(state);
 
-	m_ds2401->write( !state );
+	m_ds2401->write(!state);
 }
 
 READ_LINE_MEMBER(konami573_cassette_yi_device::read_line_ds2401)
@@ -298,8 +298,8 @@ konami573_cassette_zi_device::konami573_cassette_zi_device(const machine_config 
 
 void konami573_cassette_zi_device::device_add_mconfig(machine_config &config)
 {
-	DS2401( config, m_ds2401 );
-	ZS01( config, m_zs01 ).set_ds2401_tag( "id" );
+	DS2401(config, m_ds2401);
+	ZS01(config, m_zs01).set_ds2401_tag(m_ds2401);
 }
 
 void konami573_cassette_zi_device::device_start()
@@ -309,27 +309,27 @@ void konami573_cassette_zi_device::device_start()
 
 WRITE_LINE_MEMBER(konami573_cassette_zi_device::write_line_d1)
 {
-	m_zs01->write_scl( state );
+	m_zs01->write_scl(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_zi_device::write_line_d2)
 {
-	m_zs01->write_cs( state );
+	m_zs01->write_cs(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_zi_device::write_line_d3)
 {
-	m_zs01->write_rst( state );
+	m_zs01->write_rst(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_zi_device::write_line_d4)
 {
-	m_ds2401->write( !state );
+	m_ds2401->write(!state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_zi_device::write_line_zs01_sda)
 {
-	m_zs01->write_sda( state );
+	m_zs01->write_sda(state);
 }
 
 READ_LINE_MEMBER(konami573_cassette_zi_device::read_line_ds2401)
@@ -347,7 +347,7 @@ DEFINE_DEVICE_TYPE(KONAMI573_CASSETTE_SLOT, konami573_cassette_slot_device, "k57
 
 konami573_cassette_slot_device::konami573_cassette_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, KONAMI573_CASSETTE_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<konami573_cassette_interface>(mconfig, *this),
 	m_dsr_handler(*this)
 {
 }
@@ -356,117 +356,91 @@ void konami573_cassette_slot_device::device_start()
 {
 	m_dsr_handler.resolve_safe();
 
-	m_dev = dynamic_cast<konami573_cassette_interface *>(get_card_device());
+	m_dev = get_card_device();
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d0)
 {
-	if( m_dev )
-	{
-		m_dev->write_line_d0( state );
-	}
+	if (m_dev)
+		m_dev->write_line_d0(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d1)
 {
-	if( m_dev )
-	{
-		m_dev->write_line_d1( state );
-	}
+	if (m_dev)
+		m_dev->write_line_d1(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d2)
 {
-	if( m_dev )
-	{
-		m_dev->write_line_d2( state );
-	}
+	if (m_dev)
+		m_dev->write_line_d2(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d3)
 {
-	if( m_dev )
-	{
-		m_dev->write_line_d3( state );
-	}
+	if (m_dev)
+		m_dev->write_line_d3(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d4)
 {
-	if( m_dev )
-	{
-		m_dev->write_line_d4( state );
-	}
+	if (m_dev)
+		m_dev->write_line_d4(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d5)
 {
-	if( m_dev )
-	{
-		m_dev->write_line_d5( state );
-	}
+	if (m_dev)
+		m_dev->write_line_d5(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d6)
 {
-	if( m_dev )
-	{
-		m_dev->write_line_d6( state );
-	}
+	if (m_dev)
+		m_dev->write_line_d6(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d7)
 {
-	if( m_dev )
-	{
-		m_dev->write_line_d7( state );
-	}
+	if (m_dev)
+		m_dev->write_line_d7(state);
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_zs01_sda)
 {
-	if( m_dev )
-	{
-		m_dev->write_line_zs01_sda( state );
-	}
+	if (m_dev)
+		m_dev->write_line_zs01_sda(state);
 }
 
 READ_LINE_MEMBER(konami573_cassette_slot_device::read_line_ds2401)
 {
-	if( m_dev )
-	{
+	if (m_dev)
 		return m_dev->read_line_ds2401();
-	}
-
-	return 0;
+	else
+		return 0;
 }
 
 READ_LINE_MEMBER(konami573_cassette_slot_device::read_line_secflash_sda)
 {
-	if( m_dev )
-	{
+	if (m_dev)
 		return m_dev->read_line_secflash_sda();
-	}
-
-	return 0;
+	else
+		return 0;
 }
 
 READ_LINE_MEMBER(konami573_cassette_slot_device::read_line_adc083x_do)
 {
-	if( m_dev )
-	{
+	if (m_dev)
 		return m_dev->read_line_adc083x_do();
-	}
-
-	return 0;
+	else
+		return 0;
 }
 
 READ_LINE_MEMBER(konami573_cassette_slot_device::read_line_adc083x_sars)
 {
-	if( m_dev )
-	{
+	if (m_dev)
 		return m_dev->read_line_adc083x_sars();
-	}
-
-	return 0;
+	else
+		return 0;
 }

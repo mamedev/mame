@@ -32,27 +32,12 @@ DEFINE_DEVICE_TYPE(SEGA_315_5296, sega_315_5296_device, "315_5296", "Sega 315-52
 //  sega_315_5296_device - constructor
 //-------------------------------------------------
 
-sega_315_5296_device::sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEGA_315_5296, tag, owner, clock),
-	m_in_pa_cb(*this),
-	m_in_pb_cb(*this),
-	m_in_pc_cb(*this),
-	m_in_pd_cb(*this),
-	m_in_pe_cb(*this),
-	m_in_pf_cb(*this),
-	m_in_pg_cb(*this),
-	m_in_ph_cb(*this),
-	m_out_pa_cb(*this),
-	m_out_pb_cb(*this),
-	m_out_pc_cb(*this),
-	m_out_pd_cb(*this),
-	m_out_pe_cb(*this),
-	m_out_pf_cb(*this),
-	m_out_pg_cb(*this),
-	m_out_ph_cb(*this),
-	m_out_cnt0_cb(*this),
-	m_out_cnt1_cb(*this),
-	m_out_cnt2_cb(*this)
+sega_315_5296_device::sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SEGA_315_5296, tag, owner, clock),
+	m_in_port_cb(*this),
+	m_out_port_cb(*this),
+	m_out_cnt_cb(*this),
+	m_dir_override(0xff)
 {
 }
 
@@ -63,32 +48,15 @@ sega_315_5296_device::sega_315_5296_device(const machine_config &mconfig, const 
 void sega_315_5296_device::device_start()
 {
 	// resolve callbacks
-	m_in_pa_cb.resolve_safe(0xff); m_in_port_cb[0] = &m_in_pa_cb;
-	m_in_pb_cb.resolve_safe(0xff); m_in_port_cb[1] = &m_in_pb_cb;
-	m_in_pc_cb.resolve_safe(0xff); m_in_port_cb[2] = &m_in_pc_cb;
-	m_in_pd_cb.resolve_safe(0xff); m_in_port_cb[3] = &m_in_pd_cb;
-	m_in_pe_cb.resolve_safe(0xff); m_in_port_cb[4] = &m_in_pe_cb;
-	m_in_pf_cb.resolve_safe(0xff); m_in_port_cb[5] = &m_in_pf_cb;
-	m_in_pg_cb.resolve_safe(0xff); m_in_port_cb[6] = &m_in_pg_cb;
-	m_in_ph_cb.resolve_safe(0xff); m_in_port_cb[7] = &m_in_ph_cb;
-
-	m_out_pa_cb.resolve_safe(); m_out_port_cb[0] = &m_out_pa_cb;
-	m_out_pb_cb.resolve_safe(); m_out_port_cb[1] = &m_out_pb_cb;
-	m_out_pc_cb.resolve_safe(); m_out_port_cb[2] = &m_out_pc_cb;
-	m_out_pd_cb.resolve_safe(); m_out_port_cb[3] = &m_out_pd_cb;
-	m_out_pe_cb.resolve_safe(); m_out_port_cb[4] = &m_out_pe_cb;
-	m_out_pf_cb.resolve_safe(); m_out_port_cb[5] = &m_out_pf_cb;
-	m_out_pg_cb.resolve_safe(); m_out_port_cb[6] = &m_out_pg_cb;
-	m_out_ph_cb.resolve_safe(); m_out_port_cb[7] = &m_out_ph_cb;
-
-	m_out_cnt0_cb.resolve_safe(); m_out_cnt_cb[0] = &m_out_cnt0_cb;
-	m_out_cnt1_cb.resolve_safe(); m_out_cnt_cb[1] = &m_out_cnt1_cb;
-	m_out_cnt2_cb.resolve_safe(); m_out_cnt_cb[2] = &m_out_cnt2_cb;
+	m_in_port_cb.resolve_all_safe(0xff);
+	m_out_port_cb.resolve_all_safe();
+	m_out_cnt_cb.resolve_all_safe();
 
 	// register for savestates
 	save_item(NAME(m_output_latch));
 	save_item(NAME(m_cnt));
 	save_item(NAME(m_dir));
+	save_item(NAME(m_dir_override));
 }
 
 //-------------------------------------------------
@@ -105,15 +73,15 @@ void sega_315_5296_device::device_reset()
 	m_cnt = 0;
 
 	for (int i = 0; i < 8; i++)
-		(*m_out_port_cb[i])((offs_t)i, 0);
+		m_out_port_cb[i]((offs_t)i, 0);
 	for (auto & elem : m_out_cnt_cb)
-		(*elem)(0);
+		elem(0);
 }
 
 
 //-------------------------------------------------
 
-READ8_MEMBER( sega_315_5296_device::read )
+uint8_t sega_315_5296_device::read(offs_t offset)
 {
 	offset &= 0x3f;
 
@@ -122,11 +90,11 @@ READ8_MEMBER( sega_315_5296_device::read )
 		// port A to H
 		case 0x0: case 0x1: case 0x2: case 0x3: case 0x4: case 0x5: case 0x6: case 0x7:
 			// if the port is configured as an output, return the last thing written
-			if (m_dir & 1 << offset)
+			if (m_dir & m_dir_override & 1 << offset)
 				return m_output_latch[offset];
 
 			// otherwise, return an input port
-			return (*m_in_port_cb[offset])(offset);
+			return m_in_port_cb[offset](offset);
 
 		// 'SEGA' protection
 		case 0x8:
@@ -154,7 +122,7 @@ READ8_MEMBER( sega_315_5296_device::read )
 }
 
 
-WRITE8_MEMBER( sega_315_5296_device::write )
+void sega_315_5296_device::write(offs_t offset, uint8_t data)
 {
 	offset &= 0x3f;
 
@@ -164,7 +132,7 @@ WRITE8_MEMBER( sega_315_5296_device::write )
 		case 0x0: case 0x1: case 0x2: case 0x3: case 0x4: case 0x5: case 0x6: case 0x7:
 			// if the port is configured as an output, write it
 			if (m_dir & 1 << offset)
-				(*m_out_port_cb[offset])(offset, data);
+				m_out_port_cb[offset](offset, data);
 
 			m_output_latch[offset] = data;
 			break;
@@ -175,7 +143,7 @@ WRITE8_MEMBER( sega_315_5296_device::write )
 			// note: When CNT2 is configured as clock output, bit 2 of this register has
 			// no effect on the output level of CNT2.
 			for (int i = 0; i < 3; i++)
-				(*m_out_cnt_cb[i])(data >> i & 1);
+				m_out_cnt_cb[i](data >> i & 1);
 
 			// d3: CNT2 output mode (1= Clock output, 0= Programmable output)
 			// d4,5: CNT2 clock divider (0= CLK/4, 1= CLK/8, 2= CLK/16, 3= CLK/2)
@@ -192,7 +160,7 @@ WRITE8_MEMBER( sega_315_5296_device::write )
 				if ((m_dir ^ data) & (1 << i))
 				{
 					logerror("Port %c configured for output\n", 'A' + i);
-					(*m_out_port_cb[i])((offs_t)i, (data & 1 << i) ? m_output_latch[i] : 0);
+					m_out_port_cb[i]((offs_t)i, (data & 1 << i) ? m_output_latch[i] : 0);
 				}
 			}
 

@@ -38,7 +38,7 @@ void acorn_vdu40_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(12);
 	m_crtc->out_vsync_callback().set(FUNC(acorn_vdu40_device::vsync_changed));
-	m_crtc->set_update_row_callback(FUNC(acorn_vdu40_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(acorn_vdu40_device::crtc_update_row));
 
 	SAA5050(config, m_trom, 12_MHz_XTAL / 2);
 	m_trom->set_screen_size(40, 25, 40);
@@ -82,8 +82,8 @@ void acorn_vdu40_device::device_reset()
 	address_space &space = m_bus->memspace();
 
 	space.install_ram(0x0400, 0x07ff, m_videoram.get());
-	space.install_readwrite_handler(0x0800, 0x0800, read8smo_delegate(FUNC(mc6845_device::status_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
-	space.install_readwrite_handler(0x0801, 0x0801, read8smo_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
+	space.install_readwrite_handler(0x0800, 0x0800, read8smo_delegate(*m_crtc, FUNC(mc6845_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
+	space.install_readwrite_handler(0x0801, 0x0801, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
 }
 
 

@@ -31,7 +31,7 @@ void ne2000_device::device_start() {
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
 	set_isa_device();
-	m_isa->install16_device(0x0300, 0x031f, read16_delegate(FUNC(ne2000_device::ne2000_port_r), this), write16_delegate(FUNC(ne2000_device::ne2000_port_w), this));
+	m_isa->install16_device(0x0300, 0x031f, read16_delegate(*this, FUNC(ne2000_device::ne2000_port_r)), write16_delegate(*this, FUNC(ne2000_device::ne2000_port_w)));
 }
 
 void ne2000_device::device_reset() {
@@ -43,14 +43,14 @@ READ16_MEMBER(ne2000_device::ne2000_port_r) {
 	offset <<= 1;
 	if(offset < 16) {
 		m_dp8390->dp8390_cs(CLEAR_LINE);
-		return m_dp8390->dp8390_r(space, offset, 0xff) |
-				m_dp8390->dp8390_r(space, offset+1, 0xff) << 8;
+		return m_dp8390->dp8390_r(offset) |
+				m_dp8390->dp8390_r(offset+1) << 8;
 	}
 	if(mem_mask == 0xff00) offset++;
 	switch(offset) {
 	case 16:
 		m_dp8390->dp8390_cs(ASSERT_LINE);
-		return m_dp8390->dp8390_r(space, offset, mem_mask);
+		return m_dp8390->dp8390_r(offset);
 	case 31:
 		m_dp8390->dp8390_reset(CLEAR_LINE);
 		return 0;
@@ -68,15 +68,15 @@ WRITE16_MEMBER(ne2000_device::ne2000_port_w) {
 			data >>= 8;
 			offset++;
 		}
-		m_dp8390->dp8390_w(space, offset, data & 0xff, 0xff);
-		if(mem_mask == 0xffff) m_dp8390->dp8390_w(space, offset+1, data>>8, 0xff);
+		m_dp8390->dp8390_w(offset, data & 0xff);
+		if(mem_mask == 0xffff) m_dp8390->dp8390_w(offset+1, data>>8);
 		return;
 	}
 	if(mem_mask == 0xff00) offset++;
 	switch(offset) {
 	case 16:
 		m_dp8390->dp8390_cs(ASSERT_LINE);
-		m_dp8390->dp8390_w(space, offset, data, mem_mask);
+		m_dp8390->dp8390_w(offset, data);
 		return;
 	case 31:
 		m_dp8390->dp8390_reset(ASSERT_LINE);
@@ -104,7 +104,7 @@ WRITE_LINE_MEMBER(ne2000_device::ne2000_irq_w) {
 	}
 }
 
-READ8_MEMBER(ne2000_device::ne2000_mem_read) {
+uint8_t ne2000_device::ne2000_mem_read(offs_t offset) {
 	offset &= ~0x8000;
 	if(offset < 32) return m_prom[offset>>1];
 	if((offset < (16*1024)) || (offset >= (32*1024))) {
@@ -114,7 +114,7 @@ READ8_MEMBER(ne2000_device::ne2000_mem_read) {
 	return m_board_ram[offset - (16*1024)];
 }
 
-WRITE8_MEMBER(ne2000_device::ne2000_mem_write) {
+void ne2000_device::ne2000_mem_write(offs_t offset, uint8_t data) {
 	offset &= ~0x8000;
 	if((offset < (16*1024)) || (offset >= (32*1024))) {
 		logerror("ne2000: invalid memory write %04X\n", offset);

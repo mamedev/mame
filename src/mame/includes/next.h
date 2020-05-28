@@ -58,7 +58,7 @@ public:
 private:
 	required_device<cpu_device> maincpu;
 	required_device<mccs1850_device> rtc;
-	required_device<scc8530_t> scc;
+	required_device<scc8530_legacy_device> scc;
 	required_device<nextkbd_device> keyboard;
 	required_device<nscsi_bus_device> scsibus;
 	required_device<ncr5390_device> scsi;

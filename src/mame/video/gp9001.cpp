@@ -34,6 +34,7 @@
         in from the left)
     -  Teki Paki tests video RAM from address 0 past SpriteRAM to $37ff.
         This seems to be a bug in Teki Paki's vram test routine !
+    -  Measure cycle usage / max usable cycle for sprite drawing
 
 
 
@@ -153,9 +154,6 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 */
 static constexpr unsigned GP9001_PRIMASK = 0x000f;
 static constexpr unsigned GP9001_PRIMASK_TMAPS = 0x000e;
-// TODO : Wrong; It's possibly lower than 256 at real hardware
-// Most noticeable at some boss explosion scene in bgaregga
-static constexpr unsigned MAX_SPRITES = 256;
 
 template<int Layer>
 void gp9001vdp_device::tmap_w(offs_t offset, u16 data, u16 mem_mask)
@@ -213,6 +211,7 @@ gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *ta
 	, m_space_config("gp9001vdp", ENDIANNESS_BIG, 16, 14, 0, address_map_constructor(FUNC(gp9001vdp_device::map), this))
 	, m_vram(*this, "vram_%u", 0)
 	, m_spriteram(*this, "spriteram")
+	, m_gp9001_cb(*this)
 	, m_vint_out_cb(*this)
 {
 }
@@ -239,7 +238,7 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_tile_info)
 	}
 
 	const u32 color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			color,
 			0);
@@ -258,9 +257,9 @@ void gp9001vdp_device::device_add_mconfig(machine_config &config)
 
 void gp9001vdp_device::create_tilemaps()
 {
-	m_tm[2].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<2>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_tm[1].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_tm[0].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_tm[2].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(gp9001vdp_device::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 16,16,32,32);
+	m_tm[1].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(gp9001vdp_device::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16,16,32,32);
+	m_tm[0].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(gp9001vdp_device::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16,16,32,32);
 
 	m_tm[2].tmap->set_transparent_pen(0);
 	m_tm[1].tmap->set_transparent_pen(0);
@@ -272,7 +271,7 @@ void gp9001vdp_device::device_start()
 {
 	create_tilemaps();
 
-	m_gp9001_cb.bind_relative_to(*owner());
+	m_gp9001_cb.resolve();
 	m_vint_out_cb.resolve();
 
 	m_raise_irq_timer = timer_alloc(TIMER_RAISE_IRQ);
@@ -627,6 +626,8 @@ READ_LINE_MEMBER(gp9001vdp_device::fblank_r)
 
 void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const u8* primap )
 {
+	int clk = 0;
+	int clk_max = 432 * 262; // TODO : related to size of whole screen?
 	const u16 *source = (m_sp.use_sprite_buffer) ? m_spriteram->buffer() : m_spriteram->live();
 
 	const u32 total_elements = gfx(1)->elements();
@@ -635,8 +636,12 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 	int old_x = (-(m_sp.scrollx)) & 0x1ff;
 	int old_y = (-(m_sp.scrolly)) & 0x1ff;
 
-	for (int offs = 0; offs < (MAX_SPRITES * 4); offs += 4)
+	for (int offs = 0; offs < (m_spriteram->bytes() / 2); offs += 4)
 	{
+		clk += 8; // 8 cycle per each sprite
+		if (clk > clk_max)
+			return;
+
 		int sx, sy;
 		int sx_base, sy_base;
 
@@ -714,6 +719,10 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 				else       sy = sy_base + dim_y;
 				for (int dim_x = 0; dim_x < sprite_sizex; dim_x += 8)
 				{
+					clk += 32; // 32? cycle per each tile; TODO: verify from real hardware
+					if (clk > clk_max)
+						return;
+
 					if (flipx) sx = sx_base - dim_x;
 					else       sx = sx_base + dim_x;
 
@@ -883,6 +892,6 @@ void gp9001vdp_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		m_vint_out_cb(1);
 		break;
 	default:
-		assert_always(false, "Unknown id in gp9001vdp_device::device_timer");
+		throw emu_fatalerror("Unknown id in gp9001vdp_device::device_timer");
 	}
 }

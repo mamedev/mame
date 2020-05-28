@@ -19,6 +19,10 @@
 
  SoC has onboard keyboard scanning - matrix is 10 rows by 8 columns (KO0-KO9 and KI1-KI8)
  Piano keys have N-key rollover diodes, other buttons/switches don't
+
+ So-called program ROM actually mostly contains samples, which begin at offset 0x0b00;
+ a table at 0x085c has their starting addresses. The real microcode is likely internal,
+ since MSM6283s with different suffixes show up in other Casio keyboards.
  */
 
 #include "emu.h"
@@ -173,14 +177,14 @@ INPUT_PORTS_START(sk1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("G5#")
 
 	PORT_START("KO8")
-	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, sk1_state, mode_in, nullptr)
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(sk1_state, mode_in)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("A5")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("A5#")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("B5")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("C6")
 
 	PORT_START("KO9")
-	PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, sk1_state, function_in, nullptr)
+	PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(sk1_state, function_in)
 	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("TOGGLES")

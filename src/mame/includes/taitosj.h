@@ -58,7 +58,7 @@ public:
 	void init_spacecr();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(input_port_4_f0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kikstart_gear_r);
+	template <int Player> DECLARE_CUSTOM_INPUT_MEMBER(kikstart_gear_r);
 
 private:
 	required_shared_ptr<uint8_t> m_videoram_1;
@@ -122,8 +122,8 @@ private:
 	DECLARE_READ8_MEMBER(taitosj_fake_data_r);
 	DECLARE_WRITE8_MEMBER(taitosj_fake_data_w);
 	DECLARE_READ8_MEMBER(taitosj_fake_status_r);
-	DECLARE_READ8_MEMBER(mcu_mem_r);
-	DECLARE_WRITE8_MEMBER(mcu_mem_w);
+	uint8_t mcu_mem_r(offs_t offset);
+	void mcu_mem_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(mcu_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(mcu_busrq_w);
 	DECLARE_READ8_MEMBER(spacecr_prot_r);
@@ -135,9 +135,9 @@ private:
 	DECLARE_WRITE8_MEMBER(junglhbr_characterram_w);
 	DECLARE_WRITE8_MEMBER(taitosj_collision_reg_clear_w);
 
-	DECLARE_WRITE8_MEMBER(taitosj_sndnmi_msk_w);
-	DECLARE_WRITE8_MEMBER(input_port_4_f0_w);
-	DECLARE_WRITE8_MEMBER(taitosj_dacvol_w);
+	void taitosj_sndnmi_msk_w(uint8_t data);
+	void input_port_4_f0_w(uint8_t data);
+	void taitosj_dacvol_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

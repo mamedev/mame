@@ -701,7 +701,7 @@ WRITE8_MEMBER( adam_state::adamnet_w )
 //  m6801_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p1_w )
+void adam_state::m6801_p1_w(uint8_t data)
 {
 	/*
 
@@ -726,7 +726,7 @@ WRITE8_MEMBER( adam_state::m6801_p1_w )
 //  m6801_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::m6801_p2_r )
+uint8_t adam_state::m6801_p2_r()
 {
 	/*
 
@@ -753,7 +753,7 @@ READ8_MEMBER( adam_state::m6801_p2_r )
 //  m6801_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p2_w )
+void adam_state::m6801_p2_w(uint8_t data)
 {
 	/*
 
@@ -782,7 +782,7 @@ WRITE8_MEMBER( adam_state::m6801_p2_w )
 //  m6801_p3_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::m6801_p3_r )
+uint8_t adam_state::m6801_p3_r()
 {
 	/*
 
@@ -807,7 +807,7 @@ READ8_MEMBER( adam_state::m6801_p3_r )
 //  m6801_p3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p3_w )
+void adam_state::m6801_p3_w(uint8_t data)
 {
 	/*
 
@@ -832,7 +832,7 @@ WRITE8_MEMBER( adam_state::m6801_p3_w )
 //  m6801_p4_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p4_w )
+void adam_state::m6801_p4_w(uint8_t data)
 {
 	/*
 
@@ -884,7 +884,7 @@ void adam_state::adam_io(address_map &map)
 
 void adam_state::m6801_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(m_netcpu, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m(m_netcpu, FUNC(m6801_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
 	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
 }
@@ -1042,7 +1042,7 @@ void adam_state::adam(machine_config &config)
 	m_netcpu->out_p3_cb().set(FUNC(adam_state::m6801_p3_w));
 	m_netcpu->out_p4_cb().set(FUNC(adam_state::m6801_p4_w));
 	m_netcpu->out_sc2_cb().set(FUNC(adam_state::os3_w));
-	config.m_perfect_cpu_quantum = subtag(M6801_TAG);
+	config.set_perfect_quantum(m_netcpu);
 
 	// video hardware
 	TMS9928A(config, m_vdc, XTAL(10'738'635)).set_screen("screen");
@@ -1058,22 +1058,22 @@ void adam_state::adam(machine_config &config)
 	//m_psg->ready_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT).invert();
 
 	// devices
-	ADAMNET(config, ADAMNET_TAG, 0);
-	ADAMNET_SLOT(config, "net1", adamnet_devices, "kb");
-	ADAMNET_SLOT(config, "net2", adamnet_devices, "prn");
-	ADAMNET_SLOT(config, "net3", adamnet_devices, "ddp");
-	ADAMNET_SLOT(config, "net4", adamnet_devices, "fdc");
-	ADAMNET_SLOT(config, "net5", adamnet_devices, "fdc").set_option_device_input_defaults("fdc", device_iptdef_drive2);
-	ADAMNET_SLOT(config, "net6", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net7", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net8", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net9", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net10", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net11", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net12", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net13", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net14", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net15", adamnet_devices, nullptr);
+	ADAMNET(config, m_adamnet, 0);
+	ADAMNET_SLOT(config, "net1", m_adamnet, adamnet_devices, "kb");
+	ADAMNET_SLOT(config, "net2", m_adamnet, adamnet_devices, "prn");
+	ADAMNET_SLOT(config, "net3", m_adamnet, adamnet_devices, "ddp");
+	ADAMNET_SLOT(config, "net4", m_adamnet, adamnet_devices, "fdc");
+	ADAMNET_SLOT(config, "net5", m_adamnet, adamnet_devices, "fdc").set_option_device_input_defaults("fdc", device_iptdef_drive2);
+	ADAMNET_SLOT(config, "net6", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net7", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net8", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net9", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net10", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net11", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net12", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net13", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net14", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net15", m_adamnet, adamnet_devices, nullptr);
 
 	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
 	ADAM_EXPANSION_SLOT(config, m_slot1, XTAL(7'159'090)/2, adam_slot1_devices, "adamlink");

@@ -22,8 +22,8 @@
 //  debug_view_disasm_source - constructor
 //-------------------------------------------------
 
-debug_view_disasm_source::debug_view_disasm_source(const char *name, device_t &device)
-	: debug_view_source(name, &device),
+debug_view_disasm_source::debug_view_disasm_source(std::string &&name, device_t &device)
+	: debug_view_source(std::move(name), &device),
 		m_space(device.memory().space(AS_PROGRAM)),
 		m_decrypted_space(device.memory().has_space(AS_OPCODES) ? device.memory().space(AS_OPCODES) : device.memory().space(AS_PROGRAM))
 {
@@ -52,14 +52,14 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 {
 	// fail if no available sources
 	enumerate_sources();
-	if(m_source_list.count() == 0)
+	if(m_source_list.empty())
 		throw std::bad_alloc();
 
 	// count the number of comments
 	int total_comments = 0;
-	for(const debug_view_source &source : m_source_list)
+	for(auto &source : m_source_list)
 	{
-		const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(source);
+		const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(*source);
 		total_comments += dasmsource.device()->debug()->comment_count();
 	}
 
@@ -86,19 +86,23 @@ debug_view_disasm::~debug_view_disasm()
 void debug_view_disasm::enumerate_sources()
 {
 	// start with an empty list
-	m_source_list.reset();
+	m_source_list.clear();
 
 	// iterate over devices with disassembly interfaces
-	std::string name;
-	for(device_disasm_interface &dasm : disasm_interface_iterator(machine().root_device()))
+	for (device_disasm_interface &dasm : disasm_interface_iterator(machine().root_device()))
 	{
-		name = string_format("%s '%s'", dasm.device().name(), dasm.device().tag());
-		if(dasm.device().memory().space_config(AS_PROGRAM)!=nullptr)
-			m_source_list.append(*global_alloc(debug_view_disasm_source(name.c_str(), dasm.device())));
+		if (dasm.device().memory().space_config(AS_PROGRAM))
+		{
+			m_source_list.emplace_back(
+					std::make_unique<debug_view_disasm_source>(
+						util::string_format("%s '%s'", dasm.device().name(), dasm.device().tag()),
+						dasm.device()));
+		}
 	}
 
 	// reset the source to a known good entry
-	set_source(*m_source_list.first());
+	if (!m_source_list.empty())
+		set_source(*m_source_list[0]);
 }
 
 
@@ -113,7 +117,11 @@ void debug_view_disasm::view_notify(debug_view_notification type)
 		adjust_visible_y_for_cursor();
 
 	else if(type == VIEW_NOTIFY_SOURCE_CHANGED)
-		m_expression.set_context(&downcast<const debug_view_disasm_source *>(m_source)->device()->debug()->symtable());
+	{
+		const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
+		m_expression.set_context(&source.device()->debug()->symtable());
+		m_expression.set_default_base(source.space().is_octal() ? 8 : 16);
+	}
 }
 
 
@@ -352,13 +360,7 @@ void debug_view_disasm::complete_information(const debug_view_disasm_source &sou
 
 		dasm.m_is_pc = adr == pc;
 
-		dasm.m_is_bp = false;
-		for(device_debug::breakpoint *bp = source.device()->debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
-			if(adr ==(bp->address() & source.m_space.logaddrmask())) {
-				dasm.m_is_bp = true;
-				break;
-			}
-
+		dasm.m_is_bp = source.device()->debug()->breakpoint_find(adr) != nullptr;
 		dasm.m_is_visited = source.device()->debug()->track_pc_visited(adr);
 
 		const char *comment = source.device()->debug()->comment_text(adr);

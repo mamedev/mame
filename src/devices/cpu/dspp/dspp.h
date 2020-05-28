@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_DSPP_DSPP_H
+#define MAME_CPU_DSPP_DSPP_H
 
-#ifndef DEVICES_CPU_DSPP_DSPP_H
-#define DEVICES_CPU_DSPP_DSPP_H
+#pragma once
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
@@ -78,8 +78,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -199,11 +199,9 @@ private:
 	// Address spaces
 	const address_space_config  m_code_config;
 	const address_space_config  m_data_config;
-	address_space *     m_code;
-	address_space *     m_data;
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_code_cache;
-	std::function<uint16_t (offs_t)> m_code16;
-	std::function<const void * (offs_t)> m_codeptr;
+	memory_access<10, 1, -1, ENDIANNESS_BIG>::cache m_code_cache;
+	memory_access<10, 1, -1, ENDIANNESS_BIG>::specific m_code;
+	memory_access<10, 1, -1, ENDIANNESS_BIG>::specific m_data;
 
 	struct dspp_internal_state
 	{
@@ -392,4 +390,4 @@ public: // TODO
 DECLARE_DEVICE_TYPE(DSPP, dspp_device);
 
 
-#endif // DEVICES_CPU_DSPP_DSPP_H
+#endif // MAME_CPU_DSPP_DSPP_H

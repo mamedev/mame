@@ -177,7 +177,7 @@ void partner_state::partner(machine_config &config)
 
 	auto &i8275(I8275(config, "i8275", 16_MHz_XTAL / 12));
 	i8275.set_character_width(6);
-	i8275.set_display_callback(FUNC(partner_state::display_pixels), this);
+	i8275.set_display_callback(FUNC(partner_state::display_pixels));
 	i8275.drq_wr_callback().set("dma8257", FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */
@@ -207,14 +207,14 @@ void partner_state::partner(machine_config &config)
 	cassette.add_route(ALL_OUTPUTS, "mono", 0.05);
 	cassette.set_interface("partner_cass");
 
-	SOFTWARE_LIST(config, "cass_list").set_type("partner_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cass_list").set_original("partner_cass");
 
 	FD1793(config, "wd1793", 16_MHz_XTAL / 16);
 
 	FLOPPY_CONNECTOR(config, "fd0", "525qd", FLOPPY_525_QD, true, floppy_formats);
 	FLOPPY_CONNECTOR(config, "fd1", "525qd", FLOPPY_525_QD, true, floppy_formats);
 
-	SOFTWARE_LIST(config, "flop_list").set_type("partner_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list").set_original("partner_flop");
 
 	/* internal ram */
 	RAM(config, m_ram);

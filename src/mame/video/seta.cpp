@@ -306,7 +306,7 @@ TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info)
 	const u16 attr = vram[tile_index + 0x800];
 	if ((code & 0x3e00) == 0x3e00)
 		code = (code & 0xc07f) | ((m_twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);
-	SET_TILE_INFO_MEMBER(1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14));
+	tileinfo.set(1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14));
 }
 
 template<int Layer>
@@ -327,7 +327,7 @@ TILE_GET_INFO_MEMBER(seta_state::get_tile_info)
 		popmessage("Missing Color Mode = 1 for Layer = %d. Contact MAMETesters.", Layer);
 	}
 
-	SET_TILE_INFO_MEMBER(gfx, m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14));
+	tileinfo.set(gfx, m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14));
 }
 
 
@@ -351,12 +351,12 @@ VIDEO_START_MEMBER(seta_state,seta_2_layers)
 
 	/* layer 0 */
 	m_tilemap[0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info<0>), this), TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seta_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS,
 			16, 16, 64, 32);
 
 	/* layer 1 */
 	m_tilemap[1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info<1>), this), TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seta_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS,
 			16, 16, 64, 32);
 
 	m_tilemaps_flip = 0;
@@ -388,7 +388,7 @@ VIDEO_START_MEMBER(seta_state,seta_1_layer)
 
 	/* layer 0 */
 	m_tilemap[0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seta_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS,
 			16, 16, 64, 32);
 
 	m_color_mode_shift = 4;
@@ -422,7 +422,7 @@ VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
 
 	/* layer 0 */
 	m_tilemap[0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::twineagl_get_tile_info),this), TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seta_state::twineagl_get_tile_info)), TILEMAP_SCAN_ROWS,
 			16, 16, 64, 32);
 
 	m_tilemap[0]->set_transparent_pen(0);

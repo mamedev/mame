@@ -20,8 +20,7 @@
 
 class macpds_device;
 
-class macpds_slot_device : public device_t,
-							public device_slot_interface
+class macpds_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -100,7 +99,7 @@ DECLARE_DEVICE_TYPE(MACPDS, macpds_device)
 // ======================> device_macpds_card_interface
 
 // class representing interface-specific live macpds card
-class device_macpds_card_interface : public device_slot_card_interface
+class device_macpds_card_interface : public device_interface
 {
 	friend class macpds_device;
 	template <class ElememtType> friend class simple_list;

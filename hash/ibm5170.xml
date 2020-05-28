@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="ibm5170" description="IBM PC/AT disk images">
 
 	<software name="advdiags">
@@ -464,7 +467,7 @@
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="rom" size = "1474560">
+			<dataarea name="flop" size = "1474560">
 				<rom name="blueflops-2.0.14-bf-2.img" size="1474560" crc="622b1adc" sha1="c413aea75c4696da41dfc95b71503eb25e3e8a0f"/>
 			</dataarea>
 		</part>
@@ -550,7 +553,7 @@
 		</part>
 	</software>
 
-	<software name="drafix" supported="yes">
+	<software name="drafix">
 		<description>Drafix Windows CAD (Demo)</description>
 		<year>1990</year>
 		<publisher>Fox Data</publisher>
@@ -750,132 +753,138 @@
 		</part>
 	</software>
 
+	<!-- not original, has WinImage header -->
 	<software name="gem30">
 		<description>GEM Desktop 3.0</description>
 		<year>19??</year>
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="system master.img" size="368640" crc="2ebdb5fe" sha1="e2190f07fb6d4f36ca3c9fc5524ac5ab7440855c"/>
+				<rom name="system master.img" size="368640" crc="2ebdb5fe" sha1="e2190f07fb6d4f36ca3c9fc5524ac5ab7440855c" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="screen 1.img" size="368640" crc="f4d618b0" sha1="02fedd94df50f57c281b9a931ef72fc8dbeacc5c"/>
+				<rom name="screen 1.img" size="368640" crc="f4d618b0" sha1="02fedd94df50f57c281b9a931ef72fc8dbeacc5c" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="screen 2.img" size="368640" crc="031bd65f" sha1="87fcc18b8e99d727b71854a6f27cfcc7f4d6e569"/>
+				<rom name="screen 2.img" size="368640" crc="031bd65f" sha1="87fcc18b8e99d727b71854a6f27cfcc7f4d6e569" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printer 1.img" size="368640" crc="7f6a1247" sha1="200cd4002d6f2285a2762566bfd2f69a3ca70550"/>
+				<rom name="printer 1.img" size="368640" crc="7f6a1247" sha1="200cd4002d6f2285a2762566bfd2f69a3ca70550" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printer 2.img" size="368640" crc="1afc7a36" sha1="967103595523c7cdae923d5ff7bd1da802f6da9c"/>
+				<rom name="printer 2.img" size="368640" crc="1afc7a36" sha1="967103595523c7cdae923d5ff7bd1da802f6da9c" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printer 3.img" size="368640" crc="c704dcbd" sha1="f6a8fdd8cd2de0b30a0b96481daf4125a4ce0528"/>
+				<rom name="printer 3.img" size="368640" crc="c704dcbd" sha1="f6a8fdd8cd2de0b30a0b96481daf4125a4ce0528" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- not original, has WinImage header -->
 	<software name="gem301d">
 		<description>GEM Desktop 3.01d</description>
 		<year>19??</year>
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="system master.img" size="368640" crc="af28959d" sha1="b0a2319cba8f2423969926e6ac2053209c689396"/>
+				<rom name="system master.img" size="368640" crc="af28959d" sha1="b0a2319cba8f2423969926e6ac2053209c689396" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="screen 1.img" size="368640" crc="098a85ec" sha1="1ed066692563afb6be4d1cbc0902f7eacc1378f3"/>
+				<rom name="screen 1.img" size="368640" crc="098a85ec" sha1="1ed066692563afb6be4d1cbc0902f7eacc1378f3" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="screen 2.img" size="368640" crc="253b84e9" sha1="18ac60d22055438dffbbfa8f9d1801bd650e571a"/>
+				<rom name="screen 2.img" size="368640" crc="253b84e9" sha1="18ac60d22055438dffbbfa8f9d1801bd650e571a" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printer 1.img" size="368640" crc="934b3426" sha1="da3caa8122fc2a9e538b3c57c4d00c609f351cd1"/>
+				<rom name="printer 1.img" size="368640" crc="934b3426" sha1="da3caa8122fc2a9e538b3c57c4d00c609f351cd1" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printer 2.img" size="368640" crc="f1882987" sha1="3a92fa60408f8881fdcf582f8b4e981c12eaa5fe"/>
+				<rom name="printer 2.img" size="368640" crc="f1882987" sha1="3a92fa60408f8881fdcf582f8b4e981c12eaa5fe" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printer 3.img" size="368640" crc="19d6957a" sha1="9ad00be79187e767643952404e7e9502e1d109e7"/>
+				<rom name="printer 3.img" size="368640" crc="19d6957a" sha1="9ad00be79187e767643952404e7e9502e1d109e7" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- not original, has WinImage header -->
 	<software name="gempaint">
 		<description>GEM Paint</description>
 		<year>19??</year>
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk1.img" size="368640" crc="8d7af99e" sha1="1622b1bd5cfc777625d92129b5cb2c2176d4b624"/>
+				<rom name="disk1.img" size="368640" crc="8d7af99e" sha1="1622b1bd5cfc777625d92129b5cb2c2176d4b624"  status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
+
+	<!-- not original, has WinImage header -->
 	<software name="1stword">
 		<description>1st Word Plus 2.0</description>
 		<year>19??</year>
 		<publisher>GST Computer Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk1.img" size="368640" crc="705c06b4" sha1="1ec20a62ce21f48349e18026dd1f3de015c94cb4"/>
+				<rom name="disk1.img" size="368640" crc="705c06b4" sha1="1ec20a62ce21f48349e18026dd1f3de015c94cb4"  status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk2.img" size="368640" crc="a3a926a1" sha1="8c08c47394685abfffdd5af731256b96fb8dace7"/>
+				<rom name="disk2.img" size="368640" crc="a3a926a1" sha1="8c08c47394685abfffdd5af731256b96fb8dace7"  status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- not original, has WinImage header -->
 	<software name="geos20">
 		<description>GeoWorks Ensemble 2.0</description>
 		<year>1993</year>
 		<publisher>GeoWorks</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk1.img" size="1474560" crc="4935d991" sha1="752f39f19d5a26307eb9c07339763c95447f8616"/>
+				<rom name="disk1.img" size="1474560" crc="4935d991" sha1="752f39f19d5a26307eb9c07339763c95447f8616"  status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk2.img" size="1474560" crc="e72b697b" sha1="353b0e9979ef94181e3e1745a6a7e3f097092dfd"/>
+				<rom name="disk2.img" size="1474560" crc="e72b697b" sha1="353b0e9979ef94181e3e1745a6a7e3f097092dfd"  status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk3.img" size="1474560" crc="b15e719a" sha1="a5838a09c018875db116986e3074a9c403544c75"/>
+				<rom name="disk3.img" size="1474560" crc="b15e719a" sha1="a5838a09c018875db116986e3074a9c403544c75"  status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk4.img" size="1474560" crc="49856628" sha1="25b1b3477a7bd31423b6e3901a1d4c1c1069467b"/>
+				<rom name="disk4.img" size="1474560" crc="49856628" sha1="25b1b3477a7bd31423b6e3901a1d4c1c1069467b"  status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk5.img" size="1474560" crc="370f711c" sha1="b7ef83e7f99a563f39c04c0190a9d8ac1f5193d0"/>
+				<rom name="disk5.img" size="1474560" crc="370f711c" sha1="b7ef83e7f99a563f39c04c0190a9d8ac1f5193d0"  status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2113,7 +2122,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7fr" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (French)</description>
 		<year>1995</year>
@@ -2145,7 +2153,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7ja" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (Japanese)</description>
 		<year>1995</year>
@@ -2198,7 +2205,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7ko" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (Korean)</description>
 		<year>1995</year>
@@ -2246,7 +2252,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7ru" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (Russian)</description>
 		<year>1995</year>
@@ -2279,7 +2284,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7engb" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (UK English)</description>
 		<year>1995</year>
@@ -2570,7 +2574,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos2kzhs" cloneof="pcdos2k" supported="no">
 		<description>IBM PC DOS 2000 (Simplified Chinese)</description>
 		<year>1998</year>
@@ -4990,18 +4993,6 @@
 
 	<!-- Driver Disks -->
 
-	<software name="amouse7">
-		<!-- dumped via Kryoflux from original floppy, some modified sectors present -->
-		<description>AMouse Mouse Driver Disk</description>
-		<year>1991</year>
-		<publisher>ULTIMA Electronics Corp.</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="AMouse-driver-disk-7.0.img" size="737280" crc="e49af872" sha1="4ee28d6149cf6c4e3fc8562a8fe6f738c6b1b83d"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="scrlmous">
 		<description>Genius Scroll Mouse</description>
 		<year>2004</year>
@@ -5011,26 +5002,6 @@
 			<feature name="disk_serial" value="12060321100-B" />
 			<dataarea name="flop" size="1474560">
 				<rom name="scroll mouse.img" size="1474560" crc="5ed59ff2" sha1="da4405fda8f12616f0fe4ab71ca0aac92933b22e"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sicmouse">
-		<description>SICOS Mouse</description>
-		<year>1990</year>
-		<publisher>SICOS</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="SICOS\nMOUSE DRIVER\nMOUSE TESTER\nMENU MAKER"/>
-			<dataarea name="flop" size="368640">
-				<rom name="sicos_mouse.img" size="368640" crc="3f927fd3" sha1="f1372c69d5d497ca6f3ce85ec144b714dfb2ab94"/>
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="SICOS PAINT\nThe SICOS mouse - paint program"/>
-			<dataarea name="flop" size="368640">
-				<rom name="sicos_paint.img" size="368640" crc="b93dd558" sha1="3e78a30acf4adddbabb04babdc469b5c4ff4af4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5086,6 +5057,67 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="a4tech iwheelworks (version 7.0).img" size="1474560" crc="d514994a" sha1="1187b8595c5118d88b9bebf2bbdb74a057852dce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asuscd" supported="no">
+		<description>ASUS DVD / CD-ROM Drive Installation Disk Rev 1.5</description>
+		<year>1999</year>
+		<publisher>ASUSTek Computer</publisher>
+		<info name="version" value="1.5" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="ASUSCD150.img" size="1474560" crc="c020bf23" sha1="5bc80b05edec41a8523d59711498f8c64ddd0778"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdrom20" supported="no">
+		<description>CD-ROM Device Driver Version 2.00</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="version" value="2.00" />
+		<info name="serial" value="PART NO: 53.00037.001" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="CD-ROM Device Driver.img" size="737280" crc="c7651d24" sha1="729a7cf901ad58990201da39a7bbd0967b6d2b20"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdrom22">
+		<description>CD-ROM/DVD-ROM drive IDE/ATAPI interface V2.2</description>
+		<year>1999</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="version" value="2.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="CD-ROM_DVD-ROM_DRIVE_IDE_ATAPI_INTERFACE_v2.2.img" size="1474560" crc="a26cbdcb" sha1="e35eeb62c1b2c144defd3fbf0cd5ade5655e6505"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdrom32" supported="no">
+		<description>CD-ROM driver ATAPI (Version 3.2)</description>
+		<year>1999</year>
+		<publisher>CD Tech?</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="cdtech cd-rom driver atapi (version 3.2).img" size="1474560" crc="d41648aa" sha1="82728df751577e77591b544d4b77d781ad1457ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Contains drivers for various makes and models; the MAME ATAPI CD-ROM device is compatible with e.g. the "COMPAQ", "NEC", and "TATUNG" drivers -->
+	<software name="cdgod55">
+		<description>CD-ROM God Boot Disk Version 5.5 BETA2</description>
+		<year>1998</year>
+		<publisher>Kristopher Marciniak</publisher>
+		<info name="version" value="5.5 BETA2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="cdgod55.img" size="1474560" crc="f31ebbea" sha1="76af4556a48abe31eb6eaec83ab6131ea79f788a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5191,17 +5223,6 @@
 		</part>
 	</software>
 
-	<software name="cdrom32">
-		<description>CD-ROM driver ATAPI (Version 3.2)</description>
-		<year>1999</year>
-		<publisher>CD Tech?</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="cdtech cd-rom driver atapi (version 3.2).img" size="1474560" crc="d41648aa" sha1="82728df751577e77591b544d4b77d781ad1457ba"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="diagnost">
 		<description>Diagnostics - Test, Setup, and MDMI Utilities for Products with 640K of RAM Installed</description>
 		<year>1992</year>
@@ -5302,7 +5323,7 @@
 		</part>
 	</software>
 
-	<software name="hscd414">
+	<software name="hscd414" supported="no">
 		<description>High-Speed CD-ROM Driver (Version 4.14)</description>
 		<year>199?</year>
 		<publisher>Philips</publisher>
@@ -5491,16 +5512,16 @@
 		</part>
 	</software>
 
-	<software name="mousetb">
-		<description>Mouse/Trackball</description>
-		<year>1992</year>
-		<publisher>Compaq</publisher>
-		<info name="version" value="6.20 Rev. A" />
-		<info name="release" value="19921005"/>
-		<info name="serial" value="133446-002" />
+	<software name="lgcdrom">
+		<description>MS-DOS CD-ROM Extensions With Device Driver - Installation Disk Ver 1.25</description>
+		<year>1997</year>
+		<publisher>LG</publisher>
+		<info name="version" value="1.25" />
+		<info name="serial" value="P/N. 3171H-1011A / S0050802" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="133446-002.img" size="737280" crc="b8f7b556" sha1="548b551ed6e3242b8d361f803db2580a1a3995ee"/>
+			<!-- 1024-byte footer removed from 1475584-byte image -->
+			<dataarea name="flop" size = "1474560">
+				<rom name="cd-driver-1.25.img" size="1474560" crc="2ae76e35" sha1="ddf5f96010cb183188af2dbc1e7f6a4e5e2c3f4d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5533,7 +5554,7 @@
 		</part>
 	</software>
 
-	<software name="neccd110">
+	<software name="neccd110" supported="no">
 		<description>NEC Atapi-IDE CD-Rom Driver (Rev D011V110.ENG019)</description>
 		<year>1995</year>
 		<publisher>NEC</publisher>
@@ -6369,7 +6390,7 @@
 		</part>
 	</software>
 
-	<software name="5250emu" supported="yes">
+	<software name="5250emu">
 		<description>Enhanced 5250 Emulation Program</description>
 		<year>1986</year>
 		<publisher>IBM</publisher>
@@ -6745,8 +6766,8 @@
 		<year>1994</year>
 		<publisher>Accolade</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="4228062">
-				<rom name="jack nicklaus screen savers.mfm" size="4228062" crc="6fa0f8f9" sha1="5d1dd82b3e7993bc449b3583064b0aa3da391ef5"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="jack nicklaus screen savers.img" size="1474560" crc="175f8c1b" sha1="2da53c4d4b3de47d7f4eb31772caf39101790322"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6874,7 +6895,7 @@
 	</software>
 
 	<!-- Bundled with "Mastering Borland C++ 3.1" by Tom Swan. ISBN10: 0-672-30274-8 -->
-	<software name="brlndcpp" supported="yes">
+	<software name="brlndcpp">
 		<description>Mastering Borland C++ 3.1</description>
 		<year>1992</year>
 		<publisher>Sams Publishing</publisher>
@@ -7531,6 +7552,17 @@
 		</part>
 	</software>
 
+	<software name="quiklink2">
+		<description>QuickLink II Fax</description>
+		<year>1993</year>
+		<publisher>Smith Micro Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="quicklink ii fax.img" size="1474560" crc="184c21ee" sha1="011ec2c43527e7e153e013e36b8f16a0cac02ae5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="moneynet">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Reuters Money Network</description>
@@ -7576,8 +7608,19 @@
 		</part>
 	</software>
 
+	<software name="tagplus">
+		<description>Tågplusguiden - Vinter–Våren 1998</description>
+		<year>1998</year>
+		<publisher>Förlags AB Sveriges Kommunikationer</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="tagplus.img" size="1474560" crc="0791df49" sha1="9e6135848f43a84909d49bb147a300ef22c5611c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Bundled with "TMS320C5x DSK - Applications Guide" by Texas Instruments. TI ID: BPRA063 -->
-	<software name="tms320c5x" supported="yes">
+	<software name="tms320c5x">
 		<description>TMS320C5x DSK - Applications Guide - Application Software</description>
 		<year>1997</year>
 		<publisher>Texas Instruments</publisher>
@@ -7675,6 +7718,18 @@
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk3.img" size="737280" crc="86b13b21" sha1="4b4182380cdeaf8a327fa9c46263b0c911c814cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vinguide">
+		<description>Vinguiden 1.0 (Sweden)</description>
+		<year>1995</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="4229016">
+				<rom name="21-046-015472.mfm" size="4229016" crc="5387eea6" sha1="a25043518a0e30ca515324bc0a866945b9b9d383" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8719,7 +8774,7 @@
 	</software>
 
 	<software name="aitd">
-		<description>Alone in the Dark</description>
+		<description>Alone in the Dark (USA)</description>
 		<year>1992</year>
 		<publisher>I·Motion</publisher>
 		<info name="developer" value="Infogrames" />
@@ -8746,9 +8801,9 @@
 	</software>
 
 	<software name="aitdfr" cloneof="aitd">
-		<description>Alone in the Dark (French)</description>
+		<description>Alone in the Dark (France)</description>
 		<year>1992</year>
-		<publisher>I·Motion</publisher>
+		<publisher>Infogrames</publisher>
 		<info name="developer" value="Infogrames" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -8773,6 +8828,110 @@
 		</part>
 	</software>
 
+	<software name="aitd2">
+		<description>Alone in the Dark 2 (UK)</description>
+		<year>1993</year>
+		<publisher>Infogrames</publisher>
+		<info name="developer" value="Infogrames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="f1a73e14" sha1="4ca20f2461f843a3bf52e7870254493bf39e090d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 2 of 9].img" size="1474560" crc="769f58cf" sha1="45c5e1848c43c81b02b5989afde8d8019e374d30"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 3 of 9].img" size="1474560" crc="b1a99152" sha1="55ba003447e46e2b685077b8fdb585a5711406a3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 4 of 9].img" size="1474560" crc="a3a0dc74" sha1="b25f772eb044a3160b886812c29f097def5f2df0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 5 of 9].img" size="1474560" crc="1491f7f1" sha1="2905e81bb0a3fb2dc60fcf39c1daae3f938a23ca"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 6 of 9].img" size="1474560" crc="14b3105c" sha1="6f0d47336d7790708660e4f15c108a575b54698b"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 7 of 9].img" size="1474560" crc="60d7f101" sha1="091ea0d63720413455165326275bcd1bff11d3ef"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 8 of 9].img" size="1474560" crc="299d0b20" sha1="20bc9dc7a93f88b4f86d2ee54ced8453f7d6935f"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 9 of 9].img" size="1474560" crc="ee746f7e" sha1="4c7eebda892101aa51eda8dfa6f41de8eee52461"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aitd2fr" cloneof="aitd2">
+		<description>Alone in the Dark 2 (France)</description>
+		<year>1993</year>
+		<publisher>Infogrames</publisher>
+		<info name="developer" value="Infogrames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (France) [Infogrames] [1993] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="ed2958cb" sha1="788422cd961edd03782d3ae471886f35eb24b806"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (France) [Infogrames] [1993] [3.5HD] [Disk 2 of 9].img" size="1474560" crc="d6532aad" sha1="89a7e920c8915cc80f3927609b072ebcaf73ffdd"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (France) [Infogrames] [1993] [3.5HD] [Disk 3 of 9].img" size="1474560" crc="1ff64ce8" sha1="c76eb2dc6070ae596bc36b841015f45867781aec"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (France) [Infogrames] [1993] [3.5HD] [Disk 4 of 9].img" size="1474560" crc="5a6ae8f7" sha1="466821f5da1660db271308742e72cf5048b5e55c"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (France) [Infogrames] [1993] [3.5HD] [Disk 5 of 9].img" size="1474560" crc="af6fbb4f" sha1="216fff3881b71a1b4454c3bd39551843ef91b473"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (France) [Infogrames] [1993] [3.5HD] [Disk 6 of 9].img" size="1474560" crc="360c306d" sha1="bdf795dcaa06f4e7915b465c0480bd725532c618"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (France) [Infogrames] [1993] [3.5HD] [Disk 7 of 9].img" size="1474560" crc="0d17a92d" sha1="c6d3d57c0cc47f8a38f08468989bbe20c1483439"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (France) [Infogrames] [1993] [3.5HD] [Disk 8 of 9].img" size="1474560" crc="fdf8e568" sha1="98458a7e97607ee132c6f408d393b23189769284"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (France) [Infogrames] [1993] [3.5HD] [Disk 9 of 9].img" size="1474560" crc="1f8ab500" sha1="ee9bc17f48d80efabcf579d780fd34552852d351"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="amazon">
 		<description>Amazon - Guardians of Eden</description>
 		<year>1992</year>
@@ -8811,6 +8970,18 @@
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Amazon [Access Software] [1992] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="e0812686" sha1="6a1948de3a11be14589a4d290a3be8ec535d4ec3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anotherw">
+		<description>Another World</description>
+		<year>1991</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="developer" value="Delphine Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Another World [U.S. Gold] [1991] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="4eb64a42" sha1="b04f581b6c14c4b592b89f1875e645f7c03a90d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8946,6 +9117,43 @@
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Batman Returns [Konami] [1992] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="bbcb1008" sha1="20dcc177d7dbb74583a2302b1c24c452d57815a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="steelskyf">
+		<description>Beneath a Steel Sky (France)</description>
+		<year>1994</year>
+		<publisher>Virgin</publisher>
+		<info name="developer" value="Revolution Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="6b5e3247" sha1="b4cc255abfc5f72fc5c5dbea1aca595c92bbe70a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="49c4e105" sha1="25ab45d316be2cb2551d3d47efd60bddd0959cd9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="902136fd" sha1="5bc6e36e2facae5e7b5ace84a13787cac050941e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="0b2df06f" sha1="ff8ce38870c22e078ab288d7f165c20dcd0943dd"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="675693e5" sha1="efc84ebe51581650857e553cba1fd27cbd607d8a"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="c7ec313f" sha1="bf18daa98d1387f96ec97c91a18b7775ba67a87c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9102,6 +9310,23 @@
 		</part>
 	</software>
 
+	<software name="cfodder2">
+		<description>Cannon Fodder 2</description>
+		<year>1994</year>
+		<publisher>Virgin</publisher>
+		<info name="developer" value="Sensible Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Cannon Fodder 2 [Virgin Interactive Entertainment] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="d81d4719" sha1="c597e10cbf4573726ad60d8a3ecd0566f3ae34c4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Cannon Fodder 2 [Virgin Interactive Entertainment] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="d4e2aa4b" sha1="119e74068858e5a409fa79ef3302a2012d843ac2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cischeat">
 		<!-- Dumped via Kryoflux -->
 		<description>Cisco Heat - All American Police Car Race</description>
@@ -9151,7 +9376,7 @@
 		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (EGA) (3.5'').img" size="1474560" crc="c6d9eac0" sha1="ea1266074d4a9201ba66293b38d652480d4f0ab8"/>
+				<rom name="Commander Keen in Goodbye, Galaxy (USA) (v1.4) (EGA) (3.5'').img" size="1474560" crc="c6d9eac0" sha1="ea1266074d4a9201ba66293b38d652480d4f0ab8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9164,12 +9389,12 @@
 		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
-				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (EGA) (5.25'') (Disk 1).img" size="1228800" crc="c19a9f27" sha1="0c5bb1ae622384603ee5b9aafbe26c5429da3d96"/>
+				<rom name="Commander Keen in Goodbye, Galaxy (USA) (v1.4) (EGA) (5.25'') (Disk 1).img" size="1228800" crc="c19a9f27" sha1="0c5bb1ae622384603ee5b9aafbe26c5429da3d96"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
-				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (EGA) (5.25'') (Disk 2).img" size="1228800" crc="dc214a07" sha1="bc9eff392f349dadf379ef7c6296ad2aa01bac24"/>
+				<rom name="Commander Keen in Goodbye, Galaxy (USA) (v1.4) (EGA) (5.25'') (Disk 2).img" size="1228800" crc="dc214a07" sha1="bc9eff392f349dadf379ef7c6296ad2aa01bac24"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9182,7 +9407,7 @@
 		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (CGA) (3.5'').img" size="1474560" crc="ebb5fe47" sha1="4ba724bcc7ca7664c44192fb3a7719f9ec5e186c"/>
+				<rom name="Commander Keen in Goodbye, Galaxy (USA) (v1.4) (CGA) (3.5'').img" size="1474560" crc="ebb5fe47" sha1="4ba724bcc7ca7664c44192fb3a7719f9ec5e186c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9195,7 +9420,7 @@
 		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
-				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (CGA) (5.25'').img" size="1228800" crc="6e08fec4" sha1="ae808d3833b3a7ea27c26fa39d20c9694c0a0cd0"/>
+				<rom name="Commander Keen in Goodbye, Galaxy (USA) (v1.4) (CGA) (5.25'').img" size="1228800" crc="6e08fec4" sha1="ae808d3833b3a7ea27c26fa39d20c9694c0a0cd0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9209,17 +9434,17 @@
 		<info name="version" value="1.5" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.5) (3.5'') (Disk 1).img" size="737280" crc="495070a8" sha1="d63d0d20025b72f431ecb3b90df2eb54d5651726"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.5) (3.5'') (Disk 1).img" size="737280" crc="495070a8" sha1="d63d0d20025b72f431ecb3b90df2eb54d5651726"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.5) (3.5'') (Disk 2).img" size="737280" crc="5e1ad85b" sha1="eb96e4cc6200992ab6a65ac01c1daffb12684ade"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.5) (3.5'') (Disk 2).img" size="737280" crc="5e1ad85b" sha1="eb96e4cc6200992ab6a65ac01c1daffb12684ade"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.5) (3.5'') (Disk 3).img" size="737280" crc="2134a756" sha1="788d6b36c389f810384e4ae6969f39bad288cef6"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.5) (3.5'') (Disk 3).img" size="737280" crc="2134a756" sha1="788d6b36c389f810384e4ae6969f39bad288cef6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9257,12 +9482,12 @@
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.0) (3.5'') (Disk 1).img" size="737280" crc="91a56a22" sha1="adbe45f8c69a9a855a71edd601cabe29a2ebd332"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.0) (3.5'') (Disk 1).img" size="737280" crc="91a56a22" sha1="adbe45f8c69a9a855a71edd601cabe29a2ebd332"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.0) (3.5'') (Disk 2).img" size="737280" crc="9b481464" sha1="c0bb6de99c61b68d5aac8c14076d3129716cd30c"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.0) (3.5'') (Disk 2).img" size="737280" crc="9b481464" sha1="c0bb6de99c61b68d5aac8c14076d3129716cd30c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9275,17 +9500,17 @@
 		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.4) (5.25'') (Disk 1).img" size="368640" crc="7104af60" sha1="d1a90731b4636771b4116a54ff0be3c7f89af9e3"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.4) (5.25'') (Disk 1).img" size="368640" crc="7104af60" sha1="d1a90731b4636771b4116a54ff0be3c7f89af9e3"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.4) (5.25'') (Disk 2).img" size="368640" crc="ea21f0e3" sha1="213b9421f1d529e28ff7fa94f80a3c4f7822388d"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.4) (5.25'') (Disk 2).img" size="368640" crc="ea21f0e3" sha1="213b9421f1d529e28ff7fa94f80a3c4f7822388d"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.4) (5.25'') (Disk 3).img" size="368640" crc="a6a8c7b9" sha1="bd470395c6cd7dc8d467c48184f687c1452d4508"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.4) (5.25'') (Disk 3).img" size="368640" crc="a6a8c7b9" sha1="bd470395c6cd7dc8d467c48184f687c1452d4508"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9298,7 +9523,7 @@
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (Demo v1.0) (3.5'').img" size="737280" crc="f8bc360b" sha1="1f98b701c16d4459d012385b3bb766e55694709f"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (Demo v1.0) (3.5'').img" size="737280" crc="f8bc360b" sha1="1f98b701c16d4459d012385b3bb766e55694709f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9306,7 +9531,7 @@
 	<software name="colonize">
 		<description>Sid Meier's Colonization</description>
 		<year>1994</year>
-		<publisher>Microprose</publisher>
+		<publisher>MicroProse</publisher>
 		<info name="developer" value="Microprose" />
 		<info name="version" value="2.25 - 15 Sept 94" />
 		<part name="flop1" interface="floppy_3_5">
@@ -9333,6 +9558,23 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Corncob Deluxe (1992)(Personal Companion Software).dsk" size="737280" crc="1020897e" sha1="800e3adc74674d7433f1519b906dd35f3d996567"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corridr7">
+		<description>Corridor 7: Alien Invasion</description>
+		<year>1994</year>
+		<publisher>Capstone Software</publisher>
+		<info name="developer" value="Capstone Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Corridor 7 [Capstone Software] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="bd119818" sha1="e7fb3e97e70aaaa3b67d400172bf1d717581e03d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Corridor 7 [Capstone Software] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="6fb8e981" sha1="e7b1584b1e6597964d60eda42c1c0a275aad1333"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9381,8 +9623,30 @@
 		</part>
 	</software>
 
+	<software name="cruisecr">
+		<description>Cruise for a Corpse</description>
+		<year>1991</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="developer" value="Delphine Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Cruise For A Corpse [U.S. Gold] [1991] [3.5DD] [Disk 1 of 3].img" size="737280" crc="3783f600" sha1="874ed3004b6b867377107d019df780a4aa4dd556"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Cruise For A Corpse [U.S. Gold] [1991] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="8c2ff3c9" sha1="13bdf7b34d1321011c5be0c457455160c25f7dbe"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Cruise For A Corpse [U.S. Gold] [1991] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="f9ffe21a" sha1="5ccc25bda8b0a6cbadbaceb8f6c280f8c4bbec78"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="crystalc">
-		<description>Crystal Caves</description>
+		<description>Crystal Caves (1.0a)</description>
 		<year>1991</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="Apogee Software" />
@@ -9439,12 +9703,12 @@
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="D!Zone 1.0  #1.img" size="1474560" crc="ae5fd791" sha1="42d16ed62ce3781405ebc0304eafc7bc3f0c0ea0"/>
+				<rom name="DZone 1.0  #1.img" size="1474560" crc="ae5fd791" sha1="42d16ed62ce3781405ebc0304eafc7bc3f0c0ea0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="D!Zone 1.0  #2.img" size="737280" crc="7d146e94" sha1="b0fad9e41cc85e28fb5aa0fd8e06b452d1953cc0"/>
+				<rom name="DZone 1.0  #2.img" size="737280" crc="7d146e94" sha1="b0fad9e41cc85e28fb5aa0fd8e06b452d1953cc0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9456,17 +9720,17 @@
 		<info name="version" value="1.3a" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="D!Zone 1.3a  #1.img" size="1474560" crc="1d3944ae" sha1="6a3aa137bc3e5e5798e00fb79d8feaef56c834ee"/>
+				<rom name="DZone 1.3a  #1.img" size="1474560" crc="1d3944ae" sha1="6a3aa137bc3e5e5798e00fb79d8feaef56c834ee"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="D!Zone 1.3a  #2.img" size="1474560" crc="f8192965" sha1="97a128e1d03f91b0752fa7f9346d03cb5c1712d9"/>
+				<rom name="DZone 1.3a  #2.img" size="1474560" crc="f8192965" sha1="97a128e1d03f91b0752fa7f9346d03cb5c1712d9"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="D!Zone 1.3a  #3.img" size="1474560" crc="38719ef4" sha1="de87338c3a7d8af5b7aca8626a5d6d77db83ccbd"/>
+				<rom name="DZone 1.3a  #3.img" size="1474560" crc="38719ef4" sha1="de87338c3a7d8af5b7aca8626a5d6d77db83ccbd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9721,40 +9985,7 @@
 		<info name="version" value="1.7" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #1.img" size="1474560" crc="6bb31858" sha1="746653c590e2d528249bcafe74da6c7c805187fd"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #2.img" size="1474560" crc="e1a91aa2" sha1="eedce368b970077490df421f567dd22cc974c7be"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #3.img" size="1474560" crc="3fc281a4" sha1="def3e6746e9fa4815162c45f5c1e5f6a3b430db0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #4.img" size="1474560" crc="80d22e1a" sha1="32067ea046127630fbf0b3ec6a79d9d8d53e4a81"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #5.img" size="1474560" crc="15495bde" sha1="df4365f4969fc82c97269116e3da5fa81029f8b6"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="doom2a" cloneof="doom2">
-		<description>DOOM II: Hell on Earth (1.7, alt)</description>
-		<year>1994</year>
-		<publisher>GT Interactive</publisher>
-		<info name="developer" value="id Software" />
-		<info name="version" value="1.7" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<!-- 1024-byte footer removed from an image with size 1475584 crc c9c3bdc9, disks 2-5 match the doom2 set after removing this -->
+				<!-- 1024-byte footer removed from an image with size 1475584 crc c9c3bdc9, disks 2-5 match other dumps after removing this -->
 				<rom name="Doom II v1.7 (1994)(id Software) - Floppy Disk 1.img" size="1474560" crc="9ad5a439" sha1="1d2a3ee9e9578884f602ab69da12c5b2f962b456"/>
 			</dataarea>
 		</part>
@@ -10004,6 +10235,30 @@
 		</part>
 	</software>
 
+	<software name="epcrashb">
+		<description>Epic Pinball: Crash and Burn</description>
+		<year>1994</year>
+		<publisher>The B&amp;N Companies</publisher>
+		<info name="developer" value="Epic Megagames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Epic Pinball - Crash and Burn [The B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="f56c626d" sha1="a4c564a77d0da32d93a053d6bcfd33864b043e69"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epcyborg">
+		<description>Epic Pinball: Cyborgirl</description>
+		<year>1994</year>
+		<publisher>The B&amp;N Companies</publisher>
+		<info name="developer" value="Epic Megagames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Epic Pinball - Cyborgirl [The B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7370af3e" sha1="6ae169ff06c03da063ac72cb3318b76facbf0559"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="epdeepsea">
 		<description>Epic Pinball: Deep Sea</description>
 		<year>1994</year>
@@ -10013,6 +10268,31 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Pinball Deep Sea [B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="caae0723" sha1="625694111fc8cf946d2009caa3c6ca927e0c6779"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="epenigma">
+		<description>Epic Pinball: Enigma</description>
+		<year>1994</year>
+		<publisher>The B&amp;N Companies</publisher>
+		<info name="developer" value="Epic Megagames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Epic Pinball - Enigma [The B&amp;N Companies] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f603258e" sha1="4e8e9f8ea096979faeb5a0f5c316ee15227d3758"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epsharew">
+		<description>Epic Pinball (shareware version - Mr. Disk release)</description>
+		<year>1993</year>
+		<publisher>The B&amp;N Companies</publisher>
+		<info name="developer" value="Epic Megagames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Epic Pinball (shareware version - Mr. Disk release) [The B&amp;N Companies] [1993] [3.5DD] [Disk 1 of 1].img" size="737280" crc="16488379" sha1="1c94029d3ab7913e353d96e1d2aa4c2a20129bb4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10160,7 +10440,7 @@
 	</software>
 
 	<software name="kyrandiafr" cloneof="kyrandia">
-		<description>Fables &amp; Fiends - The Legend of Kyrandia Book One (French)</description>
+		<description>Fables &amp; Fiends - The Legend of Kyrandia Book One (France)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<info name="version" value="1.7" />
@@ -10188,7 +10468,7 @@
 	</software>
 
 	<software name="hofde">
-		<description>Fables &amp; Fiends - The Hand of Fate (German)</description>
+		<description>Fables &amp; Fiends - The Hand of Fate (Germany)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive Entertainment</publisher>
 		<info name="version" value="1.41" />
@@ -10259,6 +10539,72 @@
 		</part>
 	</software>
 
+	<software name="flashb">
+		<description>Flashback</description>
+		<year>1993</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="developer" value="Delphine Software International" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Flashback [U.S. Gold] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ace6d8a0" sha1="c728b35d3ebc08024b9685b78c3bcc570f049c25"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Flashback [U.S. Gold] [1993] [3.5DD] [Disk 2 of 2].img" size="737280" crc="e311edd2" sha1="e5369816adae87079ebae924f11c6b8bf204f576"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f1gp">
+		<description>Formula One Grand Prix (Euro)</description>
+		<year>1992</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="version" value="1.03" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Formula One Grand Prix [MicroProse] [1992] [3.5HD] [Disk A].img" size="1474560" crc="b6b492b4" sha1="72f8342d0f5c8088be1d26026834d2d08d3c430d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Formula One Grand Prix [MicroProse] [1992] [3.5HD] [Disk B].img" size="1474560" crc="730ac7ca" sha1="3f2e0bc149ec259fd7f8d5481005743975891b99"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Formula One Grand Prix [MicroProse] [1992] [3.5HD] [Disk C].img" size="1474560" crc="746eb33e" sha1="74cad4aed7f95cf4fb987844495f85b646801cde"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcgps" cloneof="f1gp">
+		<description>World Circuit - The Grand Prix Race Simulation (USA)</description>
+		<year>1992</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="version" value="1.03" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="Disc Code" value="4861A" />
+			<dataarea name="flop" size="1474560">
+				<rom name="World Circuit [MicroProse] [1992] [3.5HD] [Disk A].img" size="1474560" crc="02ced55a" sha1="0f96038f1552bff33747dea41c0ac6c0a1486ad3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="Disc Code" value="4861B" />
+			<dataarea name="flop" size="1474560">
+				<rom name="World Circuit [MicroProse] [1992] [3.5HD] [Disk B].img" size="1474560" crc="e7ff6515" sha1="6378a6d1d461015890f73d0dc5799acd412a3630"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="Disc Code" value="4861C" />
+			<dataarea name="flop" size="1474560">
+				<rom name="World Circuit [MicroProse] [1992] [3.5HD] [Disk C].img" size="1474560" crc="9ad130ca" sha1="a3414cb53382402b5cb8908983a0e10dc4542e3e"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="pharkas">
 		<description>Freddy Pharkas, Frontier Pharmacist</description>
 		<year>1993</year>
@@ -10310,14 +10656,14 @@
 		</part>
 		<!-- Dumped with a KryoFlux. Reads as "Good+Modified". -->
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "4227419">
-				<rom name="gilis presentask - diskett 2.mfm" size="4227419" crc="5d6167dd" sha1="3c13d298f68d0b5c98f3da64fa72df2c52658040"/>
+			<dataarea name="flop" size = "1477688">
+				<rom name="gilis presentask - diskett 2.imd" size="1477688" crc="6739361d" sha1="7bf0a4565ce4c342a498c914462fc53cf0b62353"/>
 			</dataarea>
 		</part>
 		<!-- Dumped with a KryoFlux. Reads as "Good+Modified". -->
 		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "4227928">
-				<rom name="gilis presentask - diskett 3.mfm" size="4227928" crc="87cb316c" sha1="561cf3024b3835e4893aa6a52a745f4ebe998392"/>
+			<dataarea name="flop" size = "1478710">
+				<rom name="gilis presentask - diskett 3.imd" size="1478710" crc="3ea9d9fe" sha1="8dabbfb2be7930eb0c269da5d882533fdf2ae54e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10349,10 +10695,21 @@
 		</part>
 	</software>
 
+	<software name="goal">
+		<description>Goal!</description>
+		<year>1993</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "4252733">
+				<rom name="Goal [Virgin Games] [1993] [3.5''HD] [Disk 1 of 1].mfm" size="4252733" crc="7b3476a9" sha1="6a47b37798f62580b2d68ced87e60944d4dd92ab"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="goblins">
 		<description>Gobliiins (US - VGA release)</description>
 		<year>1992</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.000 09/11/92" />
 		<info name="developer" value="Coktel Vision, M.D.O." />
 		<part name="flop1" interface="floppy_3_5">
@@ -10370,7 +10727,7 @@
 	<software name="goblins2">
 		<description>Gobliins 2: The Prince Buffoon</description>
 		<year>1993</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.000.000 02/10/93" />
 		<info name="developer" value="Coktel Vision, M.D.O." />
 		<part name="flop1" interface="floppy_3_5">
@@ -10388,7 +10745,7 @@
 	<software name="goblins3">
 		<description>Goblins Quest 3</description>
 		<year>1993</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.00" />
 		<info name="developer" value="Coktel Vision" />
 		<part name="flop1" interface="floppy_3_5">
@@ -10640,8 +10997,55 @@
 		</part>
 	</software>
 
+	<software name="humans" supported="no">
+		<description>The Humans (3.5" DD)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Humans [GameTek] [1992] [3.5DD] [Disk 1 of 4].img" size="737280" crc="c495a6cc" sha1="a052eecea85a433e32af3b95502ac5d4ff9e8dd6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Humans [GameTek] [1992] [3.5DD] [Disk 2 of 4].img" size="737280" crc="da7599e7" sha1="d18b191a07a820620d173deff0fd40c7f8d3a8f0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Humans [GameTek] [1992] [3.5DD] [Disk 3 of 4].img" size="737280" crc="5d567b00" sha1="964a7d5814a91a830e66376b1960575d3ed82935"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Humans [GameTek] [1992] [3.5DD] [Disk 4 of 4].img" size="737280" crc="07c709d5" sha1="49cbff728b2f7eabb08b6fd909c9e9bce14f241f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="humans_525" cloneof="humans">
+		<description>The Humans (5.25" HD)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1228800">
+				<rom name="The Humans [GameTek] [1992] [5.25HD] [Disk 1 of 3].img" size="1228800" crc="2dc56954" sha1="25877a02d07686f71e9bfc74a6e507a02a859c56"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1228800">
+				<rom name="The Humans [GameTek] [1992] [5.25HD] [Disk 2 of 3].img" size="1228800" crc="f376ef79" sha1="7a7f3b829edba812e88a81a958549eb4099bd9cd"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1228800">
+				<rom name="The Humans [GameTek] [1992] [5.25HD] [Disk 3 of 3].img" size="1228800" crc="1e0e73ed" sha1="e0fcd8422b91c8d3ea00e5706be871e9a4cf408c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="incait">
-		<description>Inca (Italian)</description>
+		<description>Inca (Italy)</description>
 		<year>1992</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Coktel Vision" />
@@ -10698,7 +11102,7 @@
 	</software>
 
 	<software name="inca2">
-		<description>Inca 2: Wiracocha (French/German/English)</description>
+		<description>Inca 2: Wiracocha (Europe)</description>
 		<year>1993</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Coktel Vision" />
@@ -10869,7 +11273,7 @@
 	</software>
 
 	<software name="indyfatede" cloneof="indyfate">
-		<description>Indiana Jones and the Fate of Atlantis (3.5", German)</description>
+		<description>Indiana Jones and the Fate of Atlantis (3.5", Germany)</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
 		<info name="developer" value="LucasArts" />
@@ -10971,6 +11375,43 @@
 		</part>
 	</software>
 
+	<software name="jp">
+		<description>Jurassic Park</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="4016975">
+				<rom name="jurassic park disk1.mfm" size="4016975" crc="23f5a6fa" sha1="00bd7b7ea646dd7df262537f40c4670af0ce6ff5" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="jurassic park disk2.img" size="1474560" crc="d4feae61" sha1="7de49b18bf2eb3f7b7315b7d0b7267d49ecfc702"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="jurassic park disk3.img" size="1474560" crc="50f4b8d2" sha1="e9c8f71eb40bf4b1792e513689083353fb5df026"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kickoff3">
+		<description>Kick Off 3: European Challenge</description>
+		<year>1994</year>
+		<publisher>Anco Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "4256441">
+				<rom name="Kick Off 3 - European Challenge [Anco] [1994] [3.5HD] [Disk 1 of 2].mfm" size="4256441" crc="547a62d3" sha1="b64cc65f47b7fadb67f7d53983d086cd74113583"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "4246196">
+				<rom name="Kick Off 3 - European Challenge [Anco] [1994] [3.5HD] [Disk 2 of 2].mfm" size="4246196" crc="97c90251" sha1="d23fa86200b7e3536f13d859158728e76c04a7d9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kilo1">
 		<description>Kiloblaster: Death of a Starship (Shareware, B&amp;N)</description>
 		<year>1994</year>
@@ -10986,54 +11427,54 @@
 	<software name="kingqst5">
 		<description>King's Quest V - Absence Makes the Heart Go Yonder!</description>
 		<year>1990</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "1474560">
 				<!-- has a saved configuration file -->
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 1 of 8).dsk" size="1474560" crc="f5ba7763" sha1="17308670441b68975e62e43fd5e62e450b63aa39" status="baddump"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 1 of 8).dsk" size="1474560" crc="f5ba7763" sha1="17308670441b68975e62e43fd5e62e450b63aa39" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 2 of 8).dsk" size="1474560" crc="64301d2a" sha1="42b88d1f42166159933ab6732842794592edb4a5"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 2 of 8).dsk" size="1474560" crc="64301d2a" sha1="42b88d1f42166159933ab6732842794592edb4a5"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 3 of 8).dsk" size="1474560" crc="a4a83cf3" sha1="b9e93420475e20333735bc45eed5035aebd304cd"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 3 of 8).dsk" size="1474560" crc="a4a83cf3" sha1="b9e93420475e20333735bc45eed5035aebd304cd"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 4 of 8).dsk" size="1474560" crc="9471702d" sha1="b7d86ed264c382a6dd5c273665950282f62a7fa1"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 4 of 8).dsk" size="1474560" crc="9471702d" sha1="b7d86ed264c382a6dd5c273665950282f62a7fa1"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 5 of 8).dsk" size="1474560" crc="a7db36ba" sha1="71e8917cb7b416cfc550328ef0b4f9dfc5585a39"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 5 of 8).dsk" size="1474560" crc="a7db36ba" sha1="71e8917cb7b416cfc550328ef0b4f9dfc5585a39"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 6 of 8).dsk" size="1474560" crc="3eb4d622" sha1="624c19c35a5614f81972d3ef461114462211a4b3"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 6 of 8).dsk" size="1474560" crc="3eb4d622" sha1="624c19c35a5614f81972d3ef461114462211a4b3"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 6" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 7 of 8).dsk" size="1474560" crc="c6d32a66" sha1="bf4ad8019fa543046c46cc06002f8b4185fe38b2"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 7 of 8).dsk" size="1474560" crc="c6d32a66" sha1="bf4ad8019fa543046c46cc06002f8b4185fe38b2"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 7" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 8 of 8).dsk" size="1474560" crc="474c2cc7" sha1="8847d6dc07c49dcc2022c46fb1086c77155c7f47"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 8 of 8).dsk" size="1474560" crc="474c2cc7" sha1="8847d6dc07c49dcc2022c46fb1086c77155c7f47"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11041,63 +11482,114 @@
 	<software name="kingqst5_525" cloneof="kingqst5">
 		<description>King's Quest V - Absence Makes the Heart Go Yonder! (Re-release)</description>
 		<year>1990</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 9).img" size="1228800" crc="6f17c558" sha1="1a357f90580470d2afd905657087b45eba4beba0"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 9).img" size="1228800" crc="6f17c558" sha1="1a357f90580470d2afd905657087b45eba4beba0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 1).img" size="1228800" crc="ce59191c" sha1="0f02214a7c4358075e49d553c3865be5d6847f8c"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 1).img" size="1228800" crc="ce59191c" sha1="0f02214a7c4358075e49d553c3865be5d6847f8c"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 2).img" size="1228800" crc="12977d48" sha1="09b3d3d33c854458249dc1568fe02174646f4ff6"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 2).img" size="1228800" crc="12977d48" sha1="09b3d3d33c854458249dc1568fe02174646f4ff6"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 3).img" size="1228800" crc="56ea7dd6" sha1="6a8910ba2a9c6e07accd09e7636dea43d16c7282"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 3).img" size="1228800" crc="56ea7dd6" sha1="6a8910ba2a9c6e07accd09e7636dea43d16c7282"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 4).img" size="1228800" crc="37d3bd46" sha1="0cec3d03ac78aaa063cde53a44f5a5b6b9afee6a"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 4).img" size="1228800" crc="37d3bd46" sha1="0cec3d03ac78aaa063cde53a44f5a5b6b9afee6a"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 5).img" size="1228800" crc="2427f41f" sha1="66bac67e2c5c4daa98cf95b6efbeb81d33ee218c"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 5).img" size="1228800" crc="2427f41f" sha1="66bac67e2c5c4daa98cf95b6efbeb81d33ee218c"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 6" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 6).img" size="1228800" crc="62792b08" sha1="ced1e2c11067f29c16fe5ca7e744cb984d68f77d"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 6).img" size="1228800" crc="62792b08" sha1="ced1e2c11067f29c16fe5ca7e744cb984d68f77d"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 7" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 7).img" size="1228800" crc="3769b33b" sha1="fa322e80edb7b17a4541d69ca6648a0d3c88dec1"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 7).img" size="1228800" crc="3769b33b" sha1="fa322e80edb7b17a4541d69ca6648a0d3c88dec1"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 8" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 8).img" size="1228800" crc="99a71113" sha1="3d68e348c5412b78174c54c558a4cca11de053ef"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 8).img" size="1228800" crc="99a71113" sha1="3d68e348c5412b78174c54c558a4cca11de053ef"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="lslvga">
+		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (VGA release)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="2.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 1 (VGA release) [Sierra] [1991] [3.5HD] [Disk 1 of 3] (Startup Disk).img" size="1474560" crc="c8caf78b" sha1="88eb7c5442fba643acc15daccebda62a6b5d6aa5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 1 (VGA release) [Sierra] [1991] [3.5HD] [Disk 2 of 3] (Disk 1).img" size="1474560" crc="42a6fbd1" sha1="60d8f9703a79b918555c3fcd2b22146ad53dceb6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 1 (VGA release) [Sierra] [1991] [3.5HD] [Disk 3 of 3] (Disk 2).img" size="1474560" crc="09610d5f" sha1="e40d9e8c40e7b6b2f2a0936840d6b09daff1e140"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lslega" cloneof="lslvga">
+		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (EGA release)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Leisure Suit Larry 1 (EGA release) [Sierra] [1991] [3.5DD] [Disk 1 of 4] (Startup Disk).img" size="737280" crc="58f85d3d" sha1="e893f0463faa25daaf6c3d6904ff8165254137c2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Leisure Suit Larry 1 (EGA release) [Sierra] [1991] [3.5DD] [Disk 2 of 4] (Disk 1).img" size="737280" crc="73ed045a" sha1="997ad190e171b60d0be8fff6fd2ae7343a843cca"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Leisure Suit Larry 1 (EGA release) [Sierra] [1991] [3.5DD] [Disk 3 of 4] (Disk 2).img" size="737280" crc="2af71f4a" sha1="0636341bbfd8891ff9c5b5554a11f1cdaa0b03fd"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Leisure Suit Larry 1 (EGA release) [Sierra] [1991] [3.5DD] [Disk 4 of 4] (Disk 3).img" size="737280" crc="5a6ef8f5" sha1="975ca78d507d0f47bfff1a5395882f9764a1e21b"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="lemmings">
 		<!-- Dumped via Kryoflux -->
 		<description>Lemmings</description>
@@ -11165,6 +11657,22 @@
 		</part>
 	</software>
 
+	<software name="links">
+		<description>Links - The Challenge of Golf (5.25" HD)</description>
+		<year>1990</year>
+		<publisher>Access Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Links - The Challenge of Golf [Access Software] [1990] [5.25HD] [Disk 1 of 2].img" size="1228800" crc="1c00c462" sha1="1ce067957287b805d5d4e84450c550f62eb9bcd2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Links - The Challenge of Golf [Access Software] [1990] [5.25HD] [Disk 2 of 2].img" size="1228800" crc="e43beb80" sha1="f5b658d86b4d5593119de5f46cb32460b38ca616"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="linksfcc">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Links - Championship Course - Firestone Country Club</description>
@@ -11227,6 +11735,30 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="tleodoomcd.img" size="1474560" crc="e2ad041a" sha1="e820373ae6bd18282bec8f3aa5b40c71a6105637"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lostvik">
+		<description>The Lost Vikings</description>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Lost Vikings [Interplay] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f4ca8940" sha1="ca83858d3b2d6eb10edef2dbeeedc842ba2ebb52"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lotus3">
+		<description>Lotus - The Ultimate Challenge</description>
+		<year>1993</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="developer" value="Magnetic Fields" />
+		<info name="version" value="Version 14/07/93" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Lotus - The Ultimate Challenge [Gremlin] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="0a34718f" sha1="16756f96d9fb444ddea58969b354fe205c1701c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11601,7 +12133,7 @@
 
 	<software name="monkey2k" cloneof="monkey2">
 		<description>Monkey Island 2: LeChuck's Revenge (3.5", Kixx re-release)</description>
-		<year>1991</year>
+		<year>1994</year>
 		<publisher>Kixx</publisher>
 		<info name="developer" value="LucasArts" />
 		<part name="flop1" interface="floppy_3_5">
@@ -11686,6 +12218,28 @@
 		</part>
 	</software>
 
+	<software name="mk">
+		<description>Mortal Kombat</description>
+		<year>1993</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="developer" value="Midway" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Mortal Kombat [Acclaim Entertainment] [1993] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="04a7ca95" sha1="194e24826fcd7e33f24ba1f5d6b0a26c421eb8f6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Mortal Kombat [Acclaim Entertainment] [1993] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="fce97e16" sha1="38f52943a43ad3efdad8b1428d24c069aaf7fe80"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Mortal Kombat [Acclaim Entertainment] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="b1958166" sha1="bb5c7de84cf51d44f09c149598257330e5768ebf"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mystict">
 		<description>Mystic Towers</description>
 		<year>1994</year>
@@ -11699,7 +12253,7 @@
 		</part>
 	</software>
 
-	<software name="nova9_525" supported="yes">
+	<software name="nova9_525">
 		<description>Nova 9 (International Version, 5.25")</description>
 		<year>1991</year>
 		<publisher>Dynamix</publisher>
@@ -11789,6 +12343,89 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Paganitzu (USA) (v1.02).img" size="1474560" crc="7efa4aa3" sha1="7520c44be7451ff07065471b905f93f60d507234"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pepperit">
+		<description>Pepper's Adventures in Time</description>
+		<year>1993</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pepper's adventures in time disk 1.img" size="1474560" crc="2f5d4ce0" sha1="28d6649eefe4f1c10f8bd4a9b66473337690aaa8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "4220474">
+				<rom name="pepper's adventures in time disk 2.mfm" size="4220474" crc="fd28b20e" sha1="b971bbc45a47d895c8e90778159a3eab07c82fe9" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pepper's adventures in time disk 3.img" size="1474560" crc="860af405" sha1="e1584bf8b5d9a38376af9ff1becd08bc93a13468"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pepper's adventures in time disk 4.img" size="1474560" crc="bfda5eb0" sha1="435c8c6f7ea681882a12518a6d035db216bb77f4"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pepper's adventures in time disk 5.img" size="1474560" crc="706df2ef" sha1="6ed1b94049579aaa9bb00ccf3c56071c4406a8dc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pbfant">
+		<description>Pinball Fantasies</description>
+		<year>1994</year>
+		<publisher>21st Century Entertainment</publisher>
+		<info name="developer" value="Digital Illusions" />
+		<info name="ported by" value="FrontLine Design" />
+		<info name="version" value="V1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pinball Fantasies [21st Century Entertainment] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="354ad00b" sha1="574e4fbf971355b57dd8ea652ae53bf67c036799"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pinball Fantasies [21st Century Entertainment] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="430f267d" sha1="56fb78a071ee464fa8d578a8f991da262b9e9ded"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="pquestvga">
+		<description>Police Quest in Pursuit of the Death Angel (VGA release)</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="2.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Police Quest in Pursuit of the Death Angel (VGA) [Sierra] [1992] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="9219bbe8" sha1="59fe0fed82c6f97150e559ab6ab7e3d46137bb95"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Police Quest in Pursuit of the Death Angel (VGA) [Sierra] [1992] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="23b75b13" sha1="0b24570f0ba52429de3ecce02b2a8cae8a54e4b4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Police Quest in Pursuit of the Death Angel (VGA) [Sierra] [1992] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="3ccabfdd" sha1="8aed555bf0cdb420e978e55ac40f458ad3dcfa38"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Police Quest in Pursuit of the Death Angel (VGA) [Sierra] [1992] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="bd0972a9" sha1="ceeaac5e05f1a29489789c67ec17680d7cda34f6"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Police Quest in Pursuit of the Death Angel (VGA) [Sierra] [1992] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="2d5eedea" sha1="effb9ca42378507ac7880882d927460b8ae61249"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11936,6 +12573,64 @@
 		</part>
 	</software>
 
+	<software name="rnebular">
+		<description>Rex Nebular and the Cosmic Gender-Bender</description>
+		<year>1992</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MPS Labs" />
+		<info name="version" value="8.44 14-Sept-92" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="b909632f" sha1="a96039324e7e700877ba73bc3cb67a483252f54d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 2 of 9].img" size="1474560" crc="bc664cf8" sha1="ae55574089bd55b624bc701091bb387986ddebde"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 3 of 9].img" size="1474560" crc="0ae60f2b" sha1="4a8763082dfa2cd43add0a7cbc03328de9e7ce36"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 4 of 9].img" size="1474560" crc="46b49f10" sha1="8d21b852cc030f4efba8947d9a16e0d5a812a9c5"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 5 of 9].img" size="1474560" crc="d3b40a21" sha1="04c5ae012260545ed35ae046bea1e54b5a0b3b24"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 6 of 9].img" size="1474560" crc="39df9cb8" sha1="48b19b6974e7b63bcf9f344db8445ce64b71c132"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 7 of 9].img" size="1474560" crc="952246d4" sha1="42d0d901e3bcfc16985368be2aed7bd0f314f03f"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 8 of 9].img" size="1474560" crc="afff088b" sha1="e87915eaf0f546c2034fd636248a1ae9592854b8"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 9 of 9].img" size="1474560" crc="6c2beb55" sha1="6ddd53a40a7cfb53672970ff69dadb7241eafa64"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Bonus Disk].img" size="1474560" crc="3476543e" sha1="8f6842b87f7abdf1b1e0ee31aa4354cbc2782733"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rotd">
 		<description>Rise of the Dragon</description>
 		<year>1990</year>
@@ -11975,44 +12670,78 @@
 		</part>
 	</software>
 
+	<software name="laurabw2">
+		<description>Roberta Williams' Laura Bow in "The Dagger of Amon Ra"</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra [Sierra] [1992] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="a62b1110" sha1="610eb437df91cc2e60b02c23530ed6255fffa9d6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra [Sierra] [1992] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="4f79b610" sha1="2c56eca8cdedb8493ca94a7189d170c62f3ea036"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra [Sierra] [1992] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="c324aeab" sha1="9082db6c91e394e87cb8d92edfa202e903c16b3e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra [Sierra] [1992] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="ccd2ff76" sha1="e67324610889ef7fa856a580b004bd42f75fa424"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra [Sierra] [1992] [3.5HD] [Disk 5 of 5] (Message - Audio).img" size="1474560" crc="4492d76b" sha1="f3c6aa180d1e6bc1c34faa3c96be58e83fadc3f9"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="samnmax">
-		<!-- Dumped via Kryoflux, track 0 shows as modified on all disks -->
 		<description>Sam &amp; Max Hit the Road</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<info name="version" value="Version 1.0, 10-18-93" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk1.img" size="1474560" crc="918a2aee" sha1="9293235f0efbbe19e9bb7c979911a2371e61f773" status="baddump" />
+				<rom name="Sam &amp; Max Hit the Road [LucasArts] [1993] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="fa0b1568" sha1="ea60fd005b491c167f3c46082cd75644690121e1"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk2.img" size="1474560" crc="59f7507a" sha1="e43bfd7cb3f120566845a9efe489f6c59d57d384" status="baddump" />
+				<rom name="Sam &amp; Max Hit the Road [LucasArts] [1993] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="7cdb72ed" sha1="87c474f1ee94a40227496be3004e29ead24b941a"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk3.img" size="1474560" crc="05541aff" sha1="03497aae8e443aada4c9234a6dd19563b8235450" status="baddump" />
+				<rom name="Sam &amp; Max Hit the Road [LucasArts] [1993] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="b54e36dd" sha1="f7022300a445773f3fa4f1d196b2b241e59cc1b3"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk4.img" size="1474560" crc="2174d87c" sha1="407eeb5293c9e02b38b1c8c314a8b23ae8a24fc9" status="baddump" />
+				<rom name="Sam &amp; Max Hit the Road [LucasArts] [1993] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="899b9b0b" sha1="a68f8942881d1b98772b0e33c95bf5eb1cbfe5b4"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk5.img" size="1474560" crc="cfd03ddc" sha1="c7ce4de481715bd03f1ecca31af4ce1ceaa2be66" status="baddump" />
+				<rom name="Sam &amp; Max Hit the Road [LucasArts] [1993] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="33f067ef" sha1="2775895f9898dc602d0bec93523c6ee98a30ce4f"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk6.img" size="1474560" crc="af792c0f" sha1="1df1e0b4ff74b5b4aa9b3c416da99880f58826cd" status="baddump" />
+				<rom name="Sam &amp; Max Hit the Road [LucasArts] [1993] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="5a28ca7c" sha1="f28c9d9bd7186f096fa99a2c77583ced0dead595"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk7.img" size="737280" crc="077b9c18" sha1="8d299cd5fe2ed0dd93253d383c12e3fa889a4b39" status="baddump" />
+				<rom name="Sam &amp; Max Hit the Road [LucasArts] [1993] [3.5DD] [Disk 7 of 7].img" size="737280" crc="4ad1f8fb" sha1="449d050f61df116c281021910f0e4671014bc95b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12041,7 +12770,7 @@
 	</software>
 
 	<software name="monkeyit" cloneof="monkeyk">
-		<description>The Secret of Monkey Island (Italian)</description>
+		<description>The Secret of Monkey Island (Italy)</description>
 		<year>1991</year>
 		<publisher>Lucasfilm Games</publisher>
 		<info name="developer" value="Lucasfilm Games" />
@@ -12049,22 +12778,38 @@
 		<info name="version" value="(VGA) Italian 1.0, 24 May 1991" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Secret of Monkey Island (Italian) [Lucasfilm Games] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="855256e3" sha1="045f3698543055e11ce6dd570f39e7233feca51a"/>
+				<rom name="The Secret of Monkey Island (Italy) [Lucasfilm Games] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="855256e3" sha1="045f3698543055e11ce6dd570f39e7233feca51a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Secret of Monkey Island (Italian) [Lucasfilm Games] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="56320b7b" sha1="e4c6ac3d5409b4b2d6a397d96a45c0c40b558c5f"/>
+				<rom name="The Secret of Monkey Island (Italy) [Lucasfilm Games] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="56320b7b" sha1="e4c6ac3d5409b4b2d6a397d96a45c0c40b558c5f"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Secret of Monkey Island (Italian) [Lucasfilm Games] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="456bfda5" sha1="14f1075199e39f9a033c073ba4dbed85c8937ebf"/>
+				<rom name="The Secret of Monkey Island (Italy) [Lucasfilm Games] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="456bfda5" sha1="14f1075199e39f9a033c073ba4dbed85c8937ebf"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Secret of Monkey Island (Italian) [Lucasfilm Games] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="2aab0101" sha1="689d2958ec39ab1dbdee508c66b4d8aedde71126"/>
+				<rom name="The Secret of Monkey Island (Italy) [Lucasfilm Games] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="2aab0101" sha1="689d2958ec39ab1dbdee508c66b4d8aedde71126"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="settlers">
+		<description>The Settlers</description>
+		<year>1994</year>
+		<publisher>Blue Byte</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Settlers [Blue Byte] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="73d2c2c0" sha1="a8e2ea92022792828b6364c80670d35e3d73536e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Settlers [Blue Byte] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="f18040c0" sha1="2bdf4dde6ff0b3e8b58099fb8597e17fb699d0e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12086,6 +12831,23 @@
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
 				<rom name="diskb.img" size="737280" crc="e3d92c3d" sha1="787b795422552c413bfe14465bc06b152943ce91"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="silverb2p">
+		<description>Silverball 2 Plus</description>
+		<year>1994</year>
+		<publisher>MicroLeague Multimedia</publisher>
+		<info name="developer" value="Digital Extremes - Epic MegaGames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Silverball Plus 2 [MicroLeague] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="d249822c" sha1="919d79a81b04e0f6d74c1fc9441b96430dc6d633"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Silverball Plus 2 [MicroLeague] [1994] [3.5DD] [Disk 2 of 2].img" size="737280" crc="05e3094e" sha1="1bb8b9bc0cbed8701a706f4a2f86102a20ccb29b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12167,9 +12929,27 @@
 	</software>
 
 	<software name="simlife">
-		<description>SimLife</description>
+		<description>SimLife (set 1)</description>
 		<year>1992</year>
 		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimLife (USA) [Maxis] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="2565bba0" sha1="121122ec26a856272259cecf37322118911fc9b6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimLife (USA) [Maxis] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="7f61828f" sha1="459a4b9d0dc9bdd100d056c45e49f648777668a8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simlifea" cloneof="simlife">
+		<description>SimLife (set 2, older)</description>
+		<year>1992</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="simlife.img" size="737280" crc="59898bed" sha1="346ae9fb47fe2a0324e2df8f1f77c09dd5c3d8ec"/>
@@ -12204,12 +12984,67 @@
 		</part>
 	</software>
 
+	<software name="sleepwalker">
+		<description>Sleepwalker</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<info name="developer" value="C.T.A. Developments" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "4215420">
+				<rom name="Sleepwalker [Ocean] [1993] [3.5HD] [Disk 1 of 3].mfm" size="4215420" crc="05da623d" sha1="b4ed81efbae60e0bf12fabe25cd60de30e8be821"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "4192605">
+				<rom name="Sleepwalker [Ocean] [1993] [3.5HD] [Disk 2 of 3].mfm" size="4192605" crc="0d5e83aa" sha1="8eefd8df3b23d88be5dfab933b4673a0685aa15b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "2159681">
+				<rom name="Sleepwalker [Ocean] [1993] [3.5HD] [Disk 3 of 3].mfm" size="2159681" crc="f08d4015" sha1="d7e3919a5d2a51e6e915ffe5d44dd8de07b3ec30"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sq1">
+		<description>Space Quest I: Roger Wilco in the Sarien Encounter (VGA release)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="2.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Startup Disk].img" size="1474560" crc="efed75ac" sha1="3eada329df25893cd6995d46daa0431081b3a88a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="7c42ebdc" sha1="74dcb59e3a228c984de17186fbcb895cc492d790"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="baed11fe" sha1="512ecab212d9a28a7684fd69cff42d0ded06fbb5"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="712d3413" sha1="e5a36f53f809c51177e243b132eea3ef9cc32954"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="94183b42" sha1="bd73a7787d8cc56490229af23637c741a19d3d56"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sq5">
 		<description>Space Quest V: The Next Mutation (3.5", v1.04)</description>
 		<year>1993</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.04" />
-		<info name="developer" value="Sierra" />
+		<info name="developer" value="Sierra On-Line" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Space Quest V - The Next Mutation (USA, Europe) (v1.04) (Disk 1).img" size="1474560" crc="482d85e8" sha1="b2ceda676dfef8f6351ec1f56cb02cdd994ae2d3"/>
@@ -12240,7 +13075,7 @@
 	<software name="sq5a" cloneof="sq5">
 		<description>Space Quest V: The Next Mutation (3.5", v1.03)</description>
 		<year>1993</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.03" />
 		<info name="developer" value="Sierra" />
 		<part name="flop1" interface="floppy_3_5">
@@ -12403,6 +13238,29 @@
 		</part>
 	</software>
 
+	<software name="srcrx">
+		<description>Speed Racer in the Challenge of Racer X</description>
+		<year>1993</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Accolade" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Speed Racer in the Challenge of Racer X [Accolade] [1993] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="0a9fdb73" sha1="4ad50c468cb5fbf1035b239915094d8ac8d86561"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Speed Racer in the Challenge of Racer X [Accolade] [1993] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="f81fdeb7" sha1="7d5d3b8660b2dc9215c0fd444bf1b430c4e4e7e4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Speed Racer in the Challenge of Racer X [Accolade] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="3492240a" sha1="d09314500a72cb24e314720c3e4e901aedd3e427"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="trek25th">
 		<description>Star Trek - 25th Anniversary</description>
 		<year>1992</year>
@@ -12519,6 +13377,28 @@
 		</part>
 	</software>
 
+	<software name="sf2">
+		<description>Street Fighter II</description>
+		<year>1993</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="developer" value="Capcom USA" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Street Fighter II [Capcom USA] [1992] [3.5''HD] [Disk 1 of 3].img" size="1474560" crc="8f19a1ba" sha1="4b8cb0adff1e7df836450738eeac74653de5654e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Street Fighter II [Capcom USA] [1992] [3.5''HD] [Disk 2 of 3].img" size="1474560" crc="696cccce" sha1="147845702699b98e08a22aa448f0a2d0e522a395"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Street Fighter II [Capcom USA] [1992] [3.5''HD] [Disk 3 of 3].img" size="1474560" crc="6cd1c68e" sha1="33dfd74a8a138d5605cae69f6c17e992612dff81"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="strkcomm" supported="no">
 		<description>Strike Commander</description>
 		<year>1992</year>
@@ -12611,6 +13491,70 @@
 		</part>
 	</software>
 
+	<software name="sw2050">
+		<description>Subwar 2050 - The Underwater Combat Simulation</description>
+		<year>1993</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Particle Systems" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Subwar 2050 - The Underwater Combat Simulation [MicroProse] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="0d95139a" sha1="3444dcff49f379efc4d1e62a89415816ea6c179a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Subwar 2050 - The Underwater Combat Simulation [MicroProse] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="80068c39" sha1="0479d164d1df91ac3f857877935d89bfd6bb89db"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Subwar 2050 - The Underwater Combat Simulation [MicroProse] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="97fd4b9e" sha1="6c0faa95f4e35b18747ee515522541f5e288c8ff"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Subwar 2050 - The Underwater Combat Simulation [MicroProse] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="f60023b4" sha1="cbff229bc8c2e2270981239c942f074909ee98a2"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Subwar 2050 - The Underwater Combat Simulation [MicroProse] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="4d9ace5d" sha1="a2fdceac39406c3c4a008bb6a8f9bfe454372a74"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="syndicate">
+		<description>Syndicate</description>
+		<year>1993</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Bullfrog Productions" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="1f88694e" sha1="ce392619acc8d00d611d7aee450bc6d34a24e9f4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="a3ba3bf9" sha1="9150bcdb953f5b324522da3ff3876aec061ce766"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="a724d555" sha1="e4b7fe3a523dc070b2111d15da75d60df1428676"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="576d07e1" sha1="2519e3039f667e5b3701dfe957267b527386740f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="4d3e6946" sha1="85e5cfdf3a5a5a71e3f21d356cc9683afdc7e8b0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thndrhwk">
 		<description>Thunderhawk AH-73M</description>
 		<year>1991</year>
@@ -12647,6 +13591,27 @@
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="UFO - Enemy Unknown (Europe) (Disk 3).img" size="1474560" crc="b809f0d2" sha1="c391ef6ddb9ff80764a5f86eaa6ade2582d3fa5f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufoeuita" cloneof="ufoeu">
+		<description>UFO - Enemy Unknown (Italy)</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ufo Enemy Unknown (Italy) [Microprose] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="e6cac594" sha1="ff9e23147c99fa8bf101c556a6727a6261542893"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ufo Enemy Unknown (Italy) [Microprose] [1994] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="eff641db" sha1="7a6f9b9b0efa9aa5268d4983c54206505f551495"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ufo Enemy Unknown (Italy) [Microprose] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="bb4c55f2" sha1="fea81ce17b795d33c004ae8fee26b66227a9f6ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12739,7 +13704,7 @@
 		</part>
 	</software>
 
-	<software name="veildark" supported="yes">
+	<software name="veildark">
 		<description>Veil of Darkness</description>
 		<year>1993</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
@@ -13036,35 +14001,10 @@
 		</part>
 	</software>
 
-	<software name="wcgps">
-		<description>World Circuit - Grand Prix Simulation</description>
-		<year>1992</year>
-		<publisher>MicroProse Ltd.</publisher>
-		<info name="version" value="1.2" />
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="Disc Code" value="4861A" />
-			<dataarea name="flop" size="1474560">
-				<rom name="diska.img" size="1474560" crc="02ced55a" sha1="0f96038f1552bff33747dea41c0ac6c0a1486ad3"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="Disc Code" value="4861B" />
-			<dataarea name="flop" size="1474560">
-				<rom name="diskb.img" size="1474560" crc="e7ff6515" sha1="6378a6d1d461015890f73d0dc5799acd412a3630"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="Disc Code" value="4861C" />
-			<dataarea name="flop" size="1474560">
-				<rom name="diskc.img" size="1474560" crc="9ad130ca" sha1="a3414cb53382402b5cb8908983a0e10dc4542e3e"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wcusa94">
 		<description>World Cup USA '94</description>
 		<year>1994</year>
-		<publisher>US Gold</publisher>
+		<publisher>U.S. Gold</publisher>
 		<info name="developer" value="Tiertex Design Studios" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -13080,7 +14020,7 @@
 
 	<software name="wolf3d">
 		<!-- Dumped via Kryoflux, track 0 shows as modified on both disks -->
-		<description>Wolfenstein 3-D (v1.4)</description>
+		<description>Wolfenstein 3-D (v1.4, 3.5" DD)</description>
 		<year>1992</year>
 		<publisher>GT Software</publisher>
 		<info name="developer" value="id Software" />
@@ -13158,12 +14098,12 @@
 		<publisher>Apogee Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Wolfenstein 3-D Super Upgrades! (USA) (Disk 1).img" size="737280" crc="37203373" sha1="594ac2225f0544739c53cdab1a8e3d3f36d7f373"/>
+				<rom name="Wolfenstein 3-D Super Upgrades (USA) (Disk 1).img" size="737280" crc="37203373" sha1="594ac2225f0544739c53cdab1a8e3d3f36d7f373"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Wolfenstein 3-D Super Upgrades! (USA) (Disk 2).img" size="1474560" crc="690f2c31" sha1="9a7341e1f8e9e51e37f9400b56290d5ea28b59d4"/>
+				<rom name="Wolfenstein 3-D Super Upgrades (USA) (Disk 2).img" size="1474560" crc="690f2c31" sha1="9a7341e1f8e9e51e37f9400b56290d5ea28b59d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13212,7 +14152,8 @@
 	<!-- Riki (Slovakia) -->
 
 	<!-- Riki 8 undumped
-	    <info name="Contents" value="The Mask" />-->
+	    <info name="Contents" value="The Mask" />
+	-->
 
 	<software name="riki10">
 		<description>Riki Coverdisk (June 1995) (Slovak)</description>
@@ -13384,7 +14325,8 @@
 
 	<!-- PC Gamer (Germany) -->
 	<!-- October 1992 undumped
-	    <info name="Contents" value="Soul Magican / Atom Demo" />-->
+	    <info name="Contents" value="Soul Magican / Atom Demo" />
+	-->
 
 	<software name="pcga9211">
 		<description>PC Games Coverdisk (November 1992) (German)</description>
@@ -13399,7 +14341,8 @@
 	</software>
 
 	<!-- December 1992 undumped
-	    <info name="Contents" value="Ween the Prophecy Demo" />-->
+	    <info name="Contents" value="Ween the Prophecy Demo" />
+	-->
 
 	<software name="pcga9301">
 		<description>PC Games Coverdisk (January 1993) (German)</description>
@@ -13426,13 +14369,16 @@
 	</software>
 
 	<!-- March 1993 undumped
-	    <info name="Contents" value="Ween the Prophecy Demo" />-->
+	    <info name="Contents" value="Ween the Prophecy Demo" />
+	-->
 
 	<!-- April 1993 undumped
-	    <info name="Contents" value="Zool Demo" />-->
+	    <info name="Contents" value="Zool Demo" />
+	-->
 
 	<!-- May 1993 undumped
-	    <info name="Contents" value="Tornado Demo" />-->
+	    <info name="Contents" value="Tornado Demo" />
+	-->
 
 	<software name="pcga9306">
 		<description>PC Games Coverdisk (June 1993) (German)</description>
@@ -13471,7 +14417,8 @@
 	</software>
 
 	<!-- September 1993 undumped
-	    <info name="Contents" value="Ambush at Sorinor Demo" />-->
+	    <info name="Contents" value="Ambush at Sorinor Demo" />
+	-->
 
 	<software name="pcga9310">
 		<description>PC Games Coverdisk (October 1993) (German)</description>
@@ -13486,13 +14433,16 @@
 	</software>
 
 	<!-- November 1993 undumped
-	    <info name="Contents" value="Energie Manager Demo" />-->
+	    <info name="Contents" value="Energie Manager Demo" />
+	-->
 
 	<!-- December 1993 undumped
-	    <info name="Contents" value="Micro Machines Demo" />-->
+	    <info name="Contents" value="Micro Machines Demo" />
+	-->
 
 	<!-- January 1994 undumped
-	    <info name="Contents" value="Android Demo" />-->
+	    <info name="Contents" value="Android Demo" />
+	-->
 
 	<software name="pcga9402">
 		<description>PC Games Coverdisk (February 1994) (German)</description>
@@ -13507,7 +14457,8 @@
 	</software>
 
 	<!-- March 1994 undumped
-	    <info name="Contents" value="Pinball Fantasies Demo" />-->
+	    <info name="Contents" value="Pinball Fantasies Demo" />
+	-->
 
 	<software name="pcga9404">
 		<description>PC Games Coverdisk (April 1994) (German)</description>
@@ -13546,22 +14497,28 @@
 	</software>
 
 	<!-- July 1994 undumped
-	    <info name="Contents" value="Tubular Worlds / Empire Soccer Demo" />-->
+	    <info name="Contents" value="Tubular Worlds / Empire Soccer Demo" />
+	-->
 
 	<!-- August 1994 undumped
-	    <info name="Contents" value="Der Clou Demo / 3 New Doom Level" />-->
+	    <info name="Contents" value="Der Clou Demo / 3 New Doom Level" />
+	-->
 
 	<!-- September 1994 undumped
-	    <info name="Contents" value="Tony and Friends in Kellogg's Land Demo" />-->
+	    <info name="Contents" value="Tony and Friends in Kellogg's Land Demo" />
+	-->
 
 	<!-- October 1994 undumped
-	    <info name="Contents" value="Cool Spot / Cheat It Demo" />-->
+	    <info name="Contents" value="Cool Spot / Cheat It Demo" />
+	-->
 
 	<!-- November 1994 undumped
-	    <info name="Contents" value="Bundesliga Manager Hattrick / 3 New Doom Level / Cheat it Demo" />-->
+	    <info name="Contents" value="Bundesliga Manager Hattrick / 3 New Doom Level / Cheat it Demo" />
+	-->
 
 	<!-- December 1994 undumped
-	    <info name="Contents" value="Desert Strike Demo / Bundesliga Manager Hattrick Update" />-->
+	    <info name="Contents" value="Desert Strike Demo / Bundesliga Manager Hattrick Update" />
+	-->
 
 	<software name="pcga9501">
 		<description>PC Games Coverdisk (January 1995) (German)</description>
@@ -13580,7 +14537,7 @@
 	<software name="airduel">
 		<description>Air Duel - 80 Years of Dogfighting</description>
 		<year>1993</year>
-		<publisher>MicroProse Ltd.</publisher>
+		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="diska.img" size="1474560" crc="d8e7a342" sha1="026af5576bf2b75ef609af0774958485c50c773b" status="baddump" />

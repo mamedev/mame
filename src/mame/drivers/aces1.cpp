@@ -78,25 +78,25 @@ private:
 	int m_reel_count[4];
 	int m_optic_pattern;
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
-	DECLARE_READ8_MEMBER( aces1_unk_r )
+	uint8_t aces1_unk_r()
 	{
 		return 0x00;
 	}
 
-	DECLARE_READ8_MEMBER( aces1_unk_port00_r )
+	uint8_t aces1_unk_port00_r()
 	{
 		return 0x00;
 	}
 
-	DECLARE_READ8_MEMBER( aces1_nmi_counter_reset_r )
+	uint8_t aces1_nmi_counter_reset_r()
 	{
 		aces1_reset_nmi_timer();
 		return 0x00;
 	}
 
-	DECLARE_WRITE8_MEMBER( aces1_nmi_counter_reset_w )
+	void aces1_nmi_counter_reset_w(uint8_t data)
 	{
 		aces1_reset_nmi_timer();
 	}
@@ -116,7 +116,7 @@ private:
 	emu_timer *m_aces1_nmi_timer;
 
 
-	DECLARE_WRITE8_MEMBER(ic24_write_a)
+	void ic24_write_a(uint8_t data)
 	{
 		if (m_led_strobe != m_input_strobe)
 		{
@@ -125,7 +125,7 @@ private:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER(ic24_write_b)
+	void ic24_write_b(uint8_t data)
 	{
 		//cheating a bit here, need persistence
 		if (m_lamp_strobe != m_input_strobe)
@@ -142,22 +142,22 @@ private:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER(ic24_write_c)
+	void ic24_write_c(uint8_t data)
 	{
 		m_input_strobe = (data & 0x0f);
 	}
 
-	DECLARE_WRITE8_MEMBER(ic25_write_a)
+	void ic25_write_a(uint8_t data)
 	{
 	//  printf("extender lamps %02x\n", data);
 	}
 
-	DECLARE_WRITE8_MEMBER(ic25_write_b)
+	void ic25_write_b(uint8_t data)
 	{
 	//  printf("meters, extender select %02x\n", data);
 	}
 
-	DECLARE_WRITE8_MEMBER(ic25_write_c)
+	void ic25_write_c(uint8_t data)
 	{
 		//There needs to be some way of connecting these values to stepper coils, or doing the MCU properly
 		// We should be able to see an enable clock, a sense and a full/half step selector, we don't have the half step visible it seems.
@@ -203,18 +203,18 @@ private:
 //    printf("reels, extender strobe %02x\n", data);
 	}
 
-	DECLARE_READ8_MEMBER( ic37_read_a )
+	uint8_t ic37_read_a()
 	{
 		//Should be coins and doors
 		return ioport("COINS")->read();
 	}
 
-	DECLARE_READ8_MEMBER( ic37_read_b )
+	uint8_t ic37_read_b()
 	{
 		return (m_io_ports[m_input_strobe & 7])->read();
 	}
 
-	DECLARE_READ8_MEMBER( ic37_read_c )
+	uint8_t ic37_read_c()
 	{
 		int action =0;
 		for (int reel = 0; reel < 4; reel++)

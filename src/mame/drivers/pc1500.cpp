@@ -52,12 +52,12 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( kb_matrix_w );
-	DECLARE_READ8_MEMBER( port_a_r );
-	DECLARE_READ8_MEMBER( port_b_r );
-	DECLARE_WRITE8_MEMBER( port_c_w );
+	void kb_matrix_w(uint8_t data);
+	uint8_t port_a_r();
+	uint8_t port_b_r();
+	void port_c_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( pc1500_kb_r );
+	uint8_t pc1500_kb_r();
 	void pc1500_palette(palette_device &palette) const;
 	void pc1500_mem(address_map &map);
 	void pc1500_mem_io(address_map &map);
@@ -81,7 +81,7 @@ void pc1500_state::pc1500_mem_io(address_map &map)
 	map(0xf000, 0xf00f).rw("lh5810", FUNC(lh5810_device::data_r), FUNC(lh5810_device::data_w));
 }
 
-READ8_MEMBER( pc1500_state::pc1500_kb_r )
+uint8_t pc1500_state::pc1500_kb_r()
 {
 	uint8_t data = 0xff;
 
@@ -224,12 +224,12 @@ static INPUT_PORTS_START( pc1500 )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( pc1500_state::kb_matrix_w )
+void pc1500_state::kb_matrix_w(uint8_t data)
 {
 	m_kb_matrix = data;
 }
 
-WRITE8_MEMBER( pc1500_state::port_c_w )
+void pc1500_state::port_c_w(uint8_t data)
 {
 	m_rtc->data_in_w(BIT(data, 0));
 	m_rtc->stb_w(BIT(data, 1));
@@ -240,7 +240,7 @@ WRITE8_MEMBER( pc1500_state::port_c_w )
 	m_rtc->c2_w(BIT(data, 5));
 }
 
-READ8_MEMBER( pc1500_state::port_b_r )
+uint8_t pc1500_state::port_b_r()
 {
 	/*
 	x--- ---- ON/Break key
@@ -261,7 +261,7 @@ READ8_MEMBER( pc1500_state::port_b_r )
 	return data;
 }
 
-READ8_MEMBER( pc1500_state::port_a_r )
+uint8_t pc1500_state::port_a_r()
 {
 	return 0xff;
 }
@@ -274,7 +274,7 @@ void pc1500_state::pc1500_palette(palette_device &palette) const
 
 void pc1500_state::pc1500(machine_config &config)
 {
-	LH5801(config, m_maincpu, 1300000); // 1.3 MHz
+	LH5801(config, m_maincpu, 2.6_MHz_XTAL); // 1.3 MHz internally
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc1500_state::pc1500_mem);
 	m_maincpu->set_addrmap(AS_IO, &pc1500_state::pc1500_mem_io);
 	m_maincpu->in_func().set(FUNC(pc1500_state::pc1500_kb_r));
@@ -297,7 +297,7 @@ void pc1500_state::pc1500(machine_config &config)
 	ioports.portc_w().set(FUNC(pc1500_state::port_c_w));
 	ioports.out_int().set_inputline("maincpu", LH5801_LINE_MI);
 
-	UPD1990A(config, m_rtc);
+	UPD1990A(config, m_rtc, 32.768_kHz_XTAL);
 }
 
 

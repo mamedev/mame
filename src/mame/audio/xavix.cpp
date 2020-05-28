@@ -216,7 +216,7 @@ void xavix_sound_device::disable_voice(int voice)
 
 // xavix_state support
 
-READ8_MEMBER(xavix_state::sound_regram_read_cb)
+uint8_t xavix_state::sound_regram_read_cb(offs_t offset)
 {
 	// 0x00 would be zero page memory, and problematic for many reasons, assume it just doesn't work like that
 	if ((m_sound_regbase & 0x3f) != 0x00)

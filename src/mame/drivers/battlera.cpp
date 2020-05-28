@@ -113,12 +113,12 @@ void battlera_state::machine_reset()
 
 /******************************************************************************/
 
-WRITE8_MEMBER(battlera_state::control_data_w)
+void battlera_state::control_data_w(uint8_t data)
 {
 	m_control_port_select=data;
 }
 
-READ8_MEMBER(battlera_state::control_data_r)
+uint8_t battlera_state::control_data_r()
 {
 	switch (m_control_port_select)
 	{
@@ -154,7 +154,7 @@ void battlera_state::battlera_portmap(address_map &map)
 
 WRITE_LINE_MEMBER(battlera_state::adpcm_int)
 {
-	m_msm->write_data(m_msm5205next >> 4);
+	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle = 1 - m_toggle;
@@ -162,12 +162,12 @@ WRITE_LINE_MEMBER(battlera_state::adpcm_int)
 		m_audiocpu->set_input_line(1, HOLD_LINE);
 }
 
-WRITE8_MEMBER(battlera_state::adpcm_data_w)
+void battlera_state::adpcm_data_w(uint8_t data)
 {
 	m_msm5205next = data;
 }
 
-WRITE8_MEMBER(battlera_state::adpcm_reset_w)
+void battlera_state::adpcm_reset_w(uint8_t data)
 {
 	m_msm->reset_w(0);
 }

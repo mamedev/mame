@@ -26,9 +26,9 @@ public:
 
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(data_w);
-	DECLARE_READ8_MEMBER(data_r);
+	uint8_t status_r();
+	void data_w(uint8_t data);
+	uint8_t data_r();
 	DECLARE_WRITE_LINE_MEMBER(rts_w);
 	/* Set to 1 during transmit, 0 for receive */
 	DECLARE_WRITE_LINE_MEMBER(tr_w);

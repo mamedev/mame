@@ -158,17 +158,17 @@ READ16_MEMBER(lordgun_state::aliencha_protection_r)
 	return 0;
 }
 
-WRITE8_MEMBER(lordgun_state::fake_w)
+void lordgun_state::fake_w(uint8_t data)
 {
 //  popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(lordgun_state::fake2_w)
+void lordgun_state::fake2_w(uint8_t data)
 {
 //  popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
+void lordgun_state::lordgun_eeprom_w(uint8_t data)
 {
 	int i;
 
@@ -199,7 +199,7 @@ WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
 	m_old = data;
 }
 
-WRITE8_MEMBER(lordgun_state::aliencha_eeprom_w)
+void lordgun_state::aliencha_eeprom_w(uint8_t data)
 {
 	if (~data & ~0xf8)
 	{
@@ -224,7 +224,7 @@ WRITE8_MEMBER(lordgun_state::aliencha_eeprom_w)
 }
 
 
-READ8_MEMBER(lordgun_state::aliencha_dip_r)
+uint8_t lordgun_state::aliencha_dip_r()
 {
 	switch (m_aliencha_dip_sel & 0x70)
 	{
@@ -238,7 +238,7 @@ READ8_MEMBER(lordgun_state::aliencha_dip_r)
 	}
 }
 
-WRITE8_MEMBER(lordgun_state::aliencha_dip_w)
+void lordgun_state::aliencha_dip_w(uint8_t data)
 {
 	m_aliencha_dip_sel = data;
 }
@@ -347,7 +347,7 @@ void lordgun_state::soundmem_map(address_map &map)
 	map(0xf000, 0xffff).ram();
 }
 
-WRITE8_MEMBER(lordgun_state::lordgun_okibank_w)
+void lordgun_state::lordgun_okibank_w(uint8_t data)
 {
 	m_oki->set_rom_bank((data >> 1) & 1);
 	if (data & ~3)  logerror("%s: unknown okibank bits %02x\n", machine().describe_context(), data);
@@ -951,6 +951,9 @@ ROM_START( lordgun )
 
 	ROM_REGION( 0x080000, "oki", 0 ) // Samples
 	ROM_LOAD( "lordgun.100", 0x00000, 0x80000, CRC(b4e0fa07) SHA1(f5f33fe3f3a124f4737751fda3ea409fceeec0be) )
+
+	ROM_REGION( 0x80, "eeprom", ROMREGION_LE|ROMREGION_16BIT )   // Default eeprom
+	ROM_LOAD( "eeprom", 0x00, 0x80, CRC(0dad0e43) SHA1(c216d1f19228e103b78e5acb30a66dab3804ac70) )
 ROM_END
 
 

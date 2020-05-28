@@ -50,15 +50,15 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
-	DECLARE_READ32_MEMBER(s3c2440_gpio_port_r);
-	DECLARE_WRITE32_MEMBER(s3c2440_gpio_port_w);
-	DECLARE_READ32_MEMBER(s3c2440_core_pin_r);
-	DECLARE_WRITE8_MEMBER(s3c2440_nand_command_w );
-	DECLARE_WRITE8_MEMBER(s3c2440_nand_address_w );
-	DECLARE_READ8_MEMBER(s3c2440_nand_data_r );
-	DECLARE_WRITE8_MEMBER(s3c2440_nand_data_w );
-	DECLARE_WRITE16_MEMBER(s3c2440_i2s_data_w );
-	DECLARE_READ32_MEMBER(s3c2440_adc_data_r );
+	uint32_t s3c2440_gpio_port_r(offs_t offset);
+	void s3c2440_gpio_port_w(offs_t offset, uint32_t data);
+	uint32_t s3c2440_core_pin_r(offs_t offset);
+	void s3c2440_nand_command_w(uint8_t data);
+	void s3c2440_nand_address_w(uint8_t data);
+	uint8_t s3c2440_nand_data_r();
+	void s3c2440_nand_data_w(uint8_t data);
+	void s3c2440_i2s_data_w(offs_t offset, uint16_t data);
+	uint32_t s3c2440_adc_data_r(offs_t offset);
 
 	void mini2440_map(address_map &map);
 };
@@ -82,7 +82,7 @@ inline void mini2440_state::verboselog(int n_level, const char *s_fmt, ...)
 
 // GPIO
 
-READ32_MEMBER(mini2440_state::s3c2440_gpio_port_r)
+uint32_t mini2440_state::s3c2440_gpio_port_r(offs_t offset)
 {
 	uint32_t data = m_port[offset];
 	switch (offset)
@@ -99,7 +99,7 @@ READ32_MEMBER(mini2440_state::s3c2440_gpio_port_r)
 	return data;
 }
 
-WRITE32_MEMBER(mini2440_state::s3c2440_gpio_port_w)
+void mini2440_state::s3c2440_gpio_port_w(offs_t offset, uint32_t data)
 {
 	// tout2/gb2 -> uda1341ts l3mode
 	// tout3/gb3 -> uda1341ts l3data
@@ -128,7 +128,7 @@ NCON: NAND flash memory selection (Normal / Advance)
 
 */
 
-READ32_MEMBER(mini2440_state::s3c2440_core_pin_r)
+uint32_t mini2440_state::s3c2440_core_pin_r(offs_t offset)
 {
 	int data = 0;
 	switch (offset)
@@ -142,29 +142,29 @@ READ32_MEMBER(mini2440_state::s3c2440_core_pin_r)
 
 // NAND
 
-WRITE8_MEMBER(mini2440_state::s3c2440_nand_command_w )
+void mini2440_state::s3c2440_nand_command_w(uint8_t data)
 {
 	m_nand->command_w(data);
 }
 
-WRITE8_MEMBER(mini2440_state::s3c2440_nand_address_w )
+void mini2440_state::s3c2440_nand_address_w(uint8_t data)
 {
 	m_nand->address_w(data);
 }
 
-READ8_MEMBER(mini2440_state::s3c2440_nand_data_r )
+uint8_t mini2440_state::s3c2440_nand_data_r()
 {
 	return m_nand->data_r();
 }
 
-WRITE8_MEMBER(mini2440_state::s3c2440_nand_data_w )
+void mini2440_state::s3c2440_nand_data_w(uint8_t data)
 {
 	m_nand->data_w(data);
 }
 
 // I2S
 
-WRITE16_MEMBER(mini2440_state::s3c2440_i2s_data_w )
+void mini2440_state::s3c2440_i2s_data_w(offs_t offset, uint16_t data)
 {
 	if ( offset )
 		m_ldac->write(data);
@@ -174,7 +174,7 @@ WRITE16_MEMBER(mini2440_state::s3c2440_i2s_data_w )
 
 // ADC
 
-READ32_MEMBER(mini2440_state::s3c2440_adc_data_r )
+uint32_t mini2440_state::s3c2440_adc_data_r(offs_t offset)
 {
 	uint32_t data = 0;
 	switch (offset)
@@ -212,7 +212,7 @@ void mini2440_state::machine_reset()
 
 void mini2440_state::mini2440_map(address_map &map)
 {
-//  AM_RANGE(0x00000000, 0x001fffff) AM_ROM
+//  map(0x00000000, 0x001fffff).rom();
 	map(0x30000000, 0x37ffffff).ram();
 }
 

@@ -8,9 +8,6 @@
 
 class riscii_disassembler : public util::disasm_interface
 {
-public:
-	riscii_disassembler() : riscii_disassembler(s_regs) { }
-
 protected:
 	// construction/destruction
 	riscii_disassembler(const char *const regs[]);
@@ -25,9 +22,19 @@ private:
 	// internal helpers
 	void format_register(std::ostream &stream, u8 reg) const;
 	void format_immediate(std::ostream &stream, u8 data) const;
+	void format_address(std::ostream &stream, u32 dst) const;
 
 	// register names
 	const char *const *m_regs;
+};
+
+class epg3231_disassembler : public riscii_disassembler
+{
+public:
+	epg3231_disassembler() : riscii_disassembler(s_regs) { }
+
+private:
+	static const char *const s_regs[0x60];
 };
 
 #endif // MAME_CPU_RII_RIIDASM_H

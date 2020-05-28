@@ -1014,6 +1014,8 @@ void ti99_4p_state::driver_reset()
 	m_cpu->set_ready(ASSERT_LINE);
 	m_cpu->set_hold(CLEAR_LINE);
 	m_int1 = m_int2 = CLEAR_LINE;
+	m_peribox->reset_in(ASSERT_LINE);
+	m_peribox->reset_in(CLEAR_LINE);
 }
 
 /*

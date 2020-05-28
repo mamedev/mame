@@ -6,7 +6,7 @@
  * Used to connect up to two 8-bit systems to the PC, allowing the download of assembled code directly to the
  * target 8-bit system (Spectrum, CPC, MSX, C64 and maybe the BBC?)
  *
- * The editor software require the ISA card to be present.
+ * The editor software requires the ISA card to be present.
  *
  * The PC end hardware consists of an 8-bit ISA card containing an 8255 PPI hooked up to the two connectors on the
  * back of the card.
@@ -45,7 +45,7 @@ WRITE8_MEMBER(isa8_pds_device::ppi_w)
 void isa8_pds_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0300, 0x0307, read8_delegate(FUNC(isa8_pds_device::ppi_r),this), write8_delegate(FUNC(isa8_pds_device::ppi_w),this) );
+	m_isa->install_device(0x0300, 0x0307, read8_delegate(*this, FUNC(isa8_pds_device::ppi_r)), write8_delegate(*this, FUNC(isa8_pds_device::ppi_w)));
 }
 
 void isa8_pds_device::device_reset()

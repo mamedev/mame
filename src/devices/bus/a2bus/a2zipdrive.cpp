@@ -68,7 +68,6 @@
 
 #include "emu.h"
 #include "a2zipdrive.h"
-#include "machine/ataintf.h"
 #include "imagedev/harddriv.h"
 
 //**************************************************************************
@@ -176,10 +175,10 @@ uint8_t a2bus_zipdrivebase_device::read_c0nx(uint8_t offset)
 		case 5:
 		case 6:
 		case 7:
-			return m_ata->read_cs0(offset, 0xff);
+			return m_ata->cs0_r(offset, 0xff);
 
 		case 8: // data port
-			m_lastdata = m_ata->read_cs0(0, 0xffff);
+			m_lastdata = m_ata->cs0_r(0, 0xffff);
 //          printf("%04x @ IDE data\n", m_lastdata);
 			return m_lastdata&0xff;
 
@@ -206,10 +205,10 @@ uint8_t a2bus_focusdrive_device::read_c0nx(uint8_t offset)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ata->read_cs0(offset&7, 0xff);
+			return m_ata->cs0_r(offset&7, 0xff);
 
 		case 0: // data port
-			m_lastdata = m_ata->read_cs0(0, 0xffff);
+			m_lastdata = m_ata->cs0_r(0, 0xffff);
 			//printf("%04x @ IDE data\n", m_lastdata);
 			return m_lastdata&0xff;
 
@@ -241,7 +240,7 @@ void a2bus_zipdrivebase_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 6:
 		case 7:
 //          printf("%02x to IDE controller @ %x\n", data, offset);
-			m_ata->write_cs0(offset, data, 0xff);
+			m_ata->cs0_w(offset, data, 0xff);
 			break;
 
 		case 8:
@@ -253,7 +252,7 @@ void a2bus_zipdrivebase_device::write_c0nx(uint8_t offset, uint8_t data)
 //          printf("%02x to IDE data hi\n", data);
 			m_lastdata &= 0x00ff;
 			m_lastdata |= (data << 8);
-			m_ata->write_cs0(0, m_lastdata, 0xffff);
+			m_ata->cs0_w(0, m_lastdata, 0xffff);
 			break;
 
 		default:
@@ -276,14 +275,14 @@ void a2bus_focusdrive_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 0xf:
 			// due to a bug in the 6502 firmware, eat data if DRQ is set
 			#if 0
-			while (m_ata->read_cs0(7, 0xff) & 0x08)
+			while (m_ata->cs0_r(7, 0xff) & 0x08)
 			{
-				m_ata->read_cs0(0, 0xffff);
+				m_ata->cs0_r(0, 0xffff);
 				printf("eating 2 bytes to clear DRQ\n");
 			}
 			#endif
 //          printf("%02x to IDE controller @ %x\n", data, offset);
-			m_ata->write_cs0(offset & 7, data, 0xff);
+			m_ata->cs0_w(offset & 7, data, 0xff);
 			break;
 
 		case 0:
@@ -295,7 +294,7 @@ void a2bus_focusdrive_device::write_c0nx(uint8_t offset, uint8_t data)
 //          printf("%02x to IDE data hi\n", data);
 			m_lastdata &= 0x00ff;
 			m_lastdata |= (data << 8);
-			m_ata->write_cs0(0, m_lastdata, 0xffff);
+			m_ata->cs0_w(0, m_lastdata, 0xffff);
 			break;
 
 		default:

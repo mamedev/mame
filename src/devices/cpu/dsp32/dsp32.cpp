@@ -174,8 +174,6 @@ dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, dev
 		m_icount(0),
 		m_lastpins(0),
 		m_ppc(0),
-		m_program(nullptr),
-		m_cache(nullptr),
 		m_output_pins_changed(*this)
 {
 	// set our instruction counter
@@ -191,8 +189,8 @@ void dsp32c_device::device_start()
 	m_output_pins_changed.resolve_safe();
 
 	// get our address spaces
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_r[15]).noshow();
@@ -415,17 +413,17 @@ std::unique_ptr<util::disasm_interface> dsp32c_device::create_disassembler()
 
 inline uint32_t dsp32c_device::ROPCODE(offs_t pc)
 {
-	return m_cache->read_dword(pc);
+	return m_cache.read_dword(pc);
 }
 
 inline uint8_t dsp32c_device::RBYTE(offs_t addr)
 {
-	return m_program->read_byte(addr);
+	return m_program.read_byte(addr);
 }
 
 inline void dsp32c_device::WBYTE(offs_t addr, uint8_t data)
 {
-	m_program->write_byte(addr, data);
+	m_program.write_byte(addr, data);
 }
 
 inline uint16_t dsp32c_device::RWORD(offs_t addr)
@@ -434,7 +432,7 @@ inline uint16_t dsp32c_device::RWORD(offs_t addr)
 	if (!WORD_ALIGNED(addr))
 		osd_printf_error("Unaligned word read @ %06X, PC=%06X\n", addr, PC);
 #endif
-	return m_program->read_word(addr);
+	return m_program.read_word(addr);
 }
 
 inline uint32_t dsp32c_device::RLONG(offs_t addr)
@@ -443,7 +441,7 @@ inline uint32_t dsp32c_device::RLONG(offs_t addr)
 	if (!DWORD_ALIGNED(addr))
 		osd_printf_error("Unaligned long read @ %06X, PC=%06X\n", addr, PC);
 #endif
-	return m_program->read_dword(addr);
+	return m_program.read_dword(addr);
 }
 
 inline void dsp32c_device::WWORD(offs_t addr, uint16_t data)
@@ -452,7 +450,7 @@ inline void dsp32c_device::WWORD(offs_t addr, uint16_t data)
 	if (!WORD_ALIGNED(addr))
 		osd_printf_error("Unaligned word write @ %06X, PC=%06X\n", addr, PC);
 #endif
-	m_program->write_word(addr, data);
+	m_program.write_word(addr, data);
 }
 
 inline void dsp32c_device::WLONG(offs_t addr, uint32_t data)
@@ -461,7 +459,7 @@ inline void dsp32c_device::WLONG(offs_t addr, uint32_t data)
 	if (!DWORD_ALIGNED(addr))
 		osd_printf_error("Unaligned long write @ %06X, PC=%06X\n", addr, PC);
 #endif
-	m_program->write_dword(addr, data);
+	m_program.write_dword(addr, data);
 }
 
 
@@ -542,7 +540,7 @@ void dsp32c_device::update_pins(void)
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t dsp32c_device::execute_min_cycles() const
+uint32_t dsp32c_device::execute_min_cycles() const noexcept
 {
 	return 4;
 }
@@ -553,7 +551,7 @@ uint32_t dsp32c_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t dsp32c_device::execute_max_cycles() const
+uint32_t dsp32c_device::execute_max_cycles() const noexcept
 {
 	return 4;
 }
@@ -564,7 +562,7 @@ uint32_t dsp32c_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t dsp32c_device::execute_input_lines() const
+uint32_t dsp32c_device::execute_input_lines() const noexcept
 {
 	return 2;
 }

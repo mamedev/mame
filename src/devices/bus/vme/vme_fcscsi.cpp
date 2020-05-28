@@ -193,7 +193,7 @@ void vme_fcscsi1_card_device::fcscsi1_mem(address_map &map)
 	map(0x002000, 0x01ffff).ram(); /* Dual Ported RAM */
 	map(0xe00000, 0xe7ffff).rom(); /* System EPROM Area 32Kb DEBUGGER supplied */
 	map(0xd00000, 0xd0003f).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
-//  AM_RANGE (0xc40000, 0xc4001f) AM_DEVREADWRITE8("scsi", ncr5386_device, read, write, 0x00ff) /* SCSI Controller interface - device support not yet available*/
+//  map(0xc40000, 0xc4001f).rw("scsi", FUNC(ncr5386_device::read), FUNC(ncr5386_device::write)).umask16(0x00ff); /* SCSI Controller interface - device support not yet available*/
 	map(0xc40000, 0xc4001f).rw(FUNC(vme_fcscsi1_card_device::scsi_r), FUNC(vme_fcscsi1_card_device::scsi_w)).umask16(0x00ff);
 	map(0xc80000, 0xc800ff).rw("mc68450", FUNC(hd63450_device::read), FUNC(hd63450_device::write));  /* DMA Controller interface */
 	map(0xcc0000, 0xcc0007).rw("fdc", FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);      /* Floppy Controller interface */
@@ -406,7 +406,7 @@ WRITE8_MEMBER (vme_fcscsi1_card_device::tcr_w){
 	return;
 }
 
-WRITE8_MEMBER (vme_fcscsi1_card_device::led_w){
+void vme_fcscsi1_card_device::led_w(uint8_t data) {
 	LOG("%s [%02x]\n", FUNCNAME, data);
 
 	m_fdc->dden_w(BIT(data, 7));
@@ -450,12 +450,12 @@ WRITE_LINE_MEMBER(vme_fcscsi1_card_device::fdc_irq)
 	update_irq_to_maincpu();
 }
 
-READ8_MEMBER(vme_fcscsi1_card_device::fdc_read_byte)
+uint8_t vme_fcscsi1_card_device::fdc_read_byte()
 {
 	return m_fdc->data_r();
 }
 
-WRITE8_MEMBER(vme_fcscsi1_card_device::fdc_write_byte)
+void vme_fcscsi1_card_device::fdc_write_byte(uint8_t data)
 {
 	m_fdc->data_w(data & 0xff);
 }

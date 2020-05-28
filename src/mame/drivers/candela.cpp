@@ -150,11 +150,11 @@ public:
 	{ }
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER (read);
-	DECLARE_WRITE8_MEMBER (write);
-	DECLARE_READ8_MEMBER( syspia_A_r );
-	DECLARE_READ8_MEMBER( syspia_B_r );
-	DECLARE_WRITE8_MEMBER( syspia_B_w );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t syspia_A_r();
+	uint8_t syspia_B_r();
+	void syspia_B_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( syspia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER( usrpia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER (write_acia_clock);
@@ -257,7 +257,7 @@ void can09t_state::machine_start()
 	memset(m_ram2, 0, sizeof(m_ram2));
 };
 
-READ8_MEMBER( can09t_state::read )
+uint8_t can09t_state::read(offs_t offset)
 {
 	LOG("%s %02x\n", FUNCNAME, offset);
 	uint8_t pla_offset = 0;
@@ -340,7 +340,7 @@ READ8_MEMBER( can09t_state::read )
 	return byte;
 }
 
-WRITE8_MEMBER( can09t_state::write )
+void can09t_state::write(offs_t offset, uint8_t data)
 {
 	LOG("%s() %04x : %02x\n", FUNCNAME, offset, data);
 	uint8_t pla_offset = 0;
@@ -420,20 +420,20 @@ WRITE8_MEMBER( can09t_state::write )
 	}
 }
 
-READ8_MEMBER( can09t_state::syspia_A_r )
+uint8_t can09t_state::syspia_A_r()
 {
 	LOG("%s()\n", FUNCNAME);
 	return 0;
 }
 
-READ8_MEMBER( can09t_state::syspia_B_r )
+uint8_t can09t_state::syspia_B_r()
 {
 	LOG("%s()\n", FUNCNAME);
 	u8 data = (m_cass->input() > 0.04) ? 0x80 : 0;
 	return data;
 }
 
-WRITE8_MEMBER( can09t_state::syspia_B_w )
+void can09t_state::syspia_B_w(uint8_t data)
 {
 	LOG("%s(%02x)\n", FUNCNAME, data);
 
@@ -517,10 +517,10 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER( pia1_A_r );
-	DECLARE_WRITE8_MEMBER( pia1_A_w );
-	DECLARE_READ8_MEMBER( pia1_B_r );
-	DECLARE_WRITE8_MEMBER( pia1_B_w );
+	uint8_t pia1_A_r();
+	void pia1_A_w(uint8_t data);
+	uint8_t pia1_B_r();
+	void pia1_B_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void can09_map(address_map &map);
@@ -582,24 +582,24 @@ uint32_t can09_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-READ8_MEMBER( can09_state::pia1_A_r )
+uint8_t can09_state::pia1_A_r()
 {
 	LOG("%s()\n", FUNCNAME);
 	return 0x40;
 }
 
-WRITE8_MEMBER( can09_state::pia1_A_w )
+void can09_state::pia1_A_w(uint8_t data)
 {
 	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
-READ8_MEMBER( can09_state::pia1_B_r )
+uint8_t can09_state::pia1_B_r()
 {
 	LOG("%s()\n", FUNCNAME);
 	return 0;
 }
 
-WRITE8_MEMBER( can09_state::pia1_B_w )
+void can09_state::pia1_B_w(uint8_t data)
 {
 	//  UINT8 *RAM = memregion("maincpu")->base();
 	LOG("%s(%02x)\n", FUNCNAME, data);
@@ -643,7 +643,7 @@ void can09_state::can09_map(address_map &map)
  * Port A=0x18 B=0x00
  * Port A=0x10 B=
 */
-//  AM_RANGE(0x0000, 0x7fff) AM_RAM
+//  map(0x0000, 0x7fff).ram();
 	map(0x0000, 0x7fff).ram().bankrw("bank1");
 	map(0xe000, 0xffff).rom().region("roms", 0);
 	map(0xe020, 0xe020).w(m_crtc, FUNC(hd6845s_device::address_w));

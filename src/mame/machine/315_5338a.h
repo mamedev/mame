@@ -55,8 +55,8 @@ public:
 	auto out_pf_callback() { return m_out_port_cb[5].bind(); }
 	auto out_pg_callback() { return m_out_port_cb[6].bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -66,8 +66,8 @@ private:
 	// callbacks
 	devcb_read8 m_read_cb;
 	devcb_write8 m_write_cb;
-	devcb_read8 m_in_port_cb[7];
-	devcb_write8 m_out_port_cb[7];
+	devcb_read8::array<7> m_in_port_cb;
+	devcb_write8::array<7> m_out_port_cb;
 
 	uint8_t m_port_value[7];
 	uint8_t m_port_config;

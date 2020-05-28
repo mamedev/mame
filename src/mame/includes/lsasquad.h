@@ -53,7 +53,7 @@ private:
 
 	DECLARE_READ8_MEMBER(lsasquad_mcu_status_r);
 	DECLARE_READ8_MEMBER(daikaiju_mcu_status_r);
-	DECLARE_WRITE8_MEMBER(unk);
+	void unk(uint8_t data);
 	DECLARE_MACHINE_START(lsasquad);
 	DECLARE_MACHINE_RESET(lsasquad);
 	uint32_t screen_update_lsasquad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

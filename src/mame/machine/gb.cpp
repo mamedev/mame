@@ -143,8 +143,8 @@ void gb_state::gb_init_regs()
 	SIODATA = 0x00;
 	SIOCONT = 0x7E;
 
-	gb_io_w(m_maincpu->space(AS_PROGRAM), 0x05, 0x00);       /* TIMECNT */
-	gb_io_w(m_maincpu->space(AS_PROGRAM), 0x06, 0x00);       /* TIMEMOD */
+	gb_io_w(0x05, 0x00);       /* TIMECNT */
+	gb_io_w(0x06, 0x00);       /* TIMEMOD */
 }
 
 
@@ -223,7 +223,7 @@ MACHINE_RESET_MEMBER(gb_state,sgb)
 }
 
 
-WRITE8_MEMBER(gb_state::gb_io_w)
+void gb_state::gb_io_w(offs_t offset, uint8_t data)
 {
 	static const uint8_t timer_shifts[4] = {10, 4, 6, 8};
 
@@ -312,7 +312,7 @@ WRITE8_MEMBER(gb_state::gb_io2_w)
 		m_bios_disable = true;
 	}
 	else
-		m_ppu->video_w(space, offset, data);
+		m_ppu->video_w(offset, data);
 }
 
 #ifdef MAME_DEBUG
@@ -462,7 +462,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 			return;
 		default:
 			/* we didn't handle the write, so pass it to the GB handler */
-			gb_io_w(space, offset, data);
+			gb_io_w(offset, data);
 			return;
 	}
 
@@ -565,7 +565,7 @@ void gb_state::gb_timer_increment()
 }
 
 // This gets called while the cpu is executing instructions to keep the timer state in sync
-WRITE8_MEMBER(gb_state::gb_timer_callback)
+void gb_state::gb_timer_callback(uint8_t data)
 {
 	uint16_t old_gb_divcount = m_divcount;
 	uint16_t old_internal_serial_clock = m_internal_serial_clock;
@@ -605,7 +605,7 @@ WRITE8_MEMBER(gb_state::gb_timer_callback)
 
 WRITE8_MEMBER(gb_state::gbc_io_w)
 {
-	gb_io_w(space, offset, data);
+	gb_io_w(offset, data);
 
 	// On CGB the internal serial transfer clock is selectable
 	if (offset == 0x02)
@@ -637,7 +637,7 @@ WRITE8_MEMBER(gb_state::gbc_io2_w)
 		default:
 			break;
 	}
-	m_ppu->video_w(space, offset, data);
+	m_ppu->video_w(offset, data);
 }
 
 READ8_MEMBER(gb_state::gbc_io2_r)
@@ -653,7 +653,7 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 	default:
 		break;
 	}
-	return m_ppu->video_r(space, offset);
+	return m_ppu->video_r(offset);
 }
 
 /****************************************************************************
@@ -719,7 +719,7 @@ READ8_MEMBER(megaduck_state::megaduck_video_r)
 	{
 		offset ^= 0x0C;
 	}
-	data = m_ppu->video_r(space, offset);
+	data = m_ppu->video_r(offset);
 	if (offset)
 		return data;
 	return bitswap<8>(data,7,0,5,4,6,3,2,1);
@@ -735,7 +735,7 @@ WRITE8_MEMBER(megaduck_state::megaduck_video_w)
 	{
 		offset ^= 0x0C;
 	}
-	m_ppu->video_w(space, offset, data);
+	m_ppu->video_w(offset, data);
 }
 
 /* Map megaduck audio offset to game boy audio offsets */

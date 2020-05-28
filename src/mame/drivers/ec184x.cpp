@@ -52,8 +52,8 @@ public:
 
 private:
 	DECLARE_MACHINE_RESET(ec1841);
-	DECLARE_READ8_MEMBER(memboard_r);
-	DECLARE_WRITE8_MEMBER(memboard_w);
+	uint8_t memboard_r(offs_t offset);
+	void memboard_w(offs_t offset, uint8_t data);
 
 	void ec1840_io(address_map &map);
 	void ec1840_map(address_map &map);
@@ -80,7 +80,7 @@ private:
  * Only one board should be enabled for read, and one for write.
  * Normally, this is the same board.
  *
- * Each board is divided into 4 banks, internally numbererd 0..3.
+ * Each board is divided into 4 banks, internally numbered 0..3.
  * POST tests each board on startup, and an error (indicated by
  * I/O CH CK bus signal) causes it to disable failing bank(s) by writing
  * 'reconfiguration code' (inverted number of failing memory bank) to
@@ -91,7 +91,7 @@ private:
  * bit 3    enable write access
  */
 
-READ8_MEMBER(ec184x_state::memboard_r)
+uint8_t ec184x_state::memboard_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -105,7 +105,7 @@ READ8_MEMBER(ec184x_state::memboard_r)
 	return data;
 }
 
-WRITE8_MEMBER(ec184x_state::memboard_w)
+void ec184x_state::memboard_w(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	uint8_t current = m_memory.enable[offset];
@@ -229,19 +229,22 @@ void ec184x_state::ec1847_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-//  AM_RANGE(0x0210, 0x021f) AM_RAM // internal (non-standard?) bus extender
+//  map(0x0210, 0x021f).ram(); // internal (non-standard?) bus extender
 }
 
 
 // XXX verify everything
 void ec184x_state::ec1840(machine_config &config)
 {
-	I8088(config, m_maincpu, 4096000);
+	I8086(config, m_maincpu, 4096000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ec184x_state::ec1840_map);
 	m_maincpu->set_addrmap(AS_IO, &ec184x_state::ec1840_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	EC1840_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	ec1840_mb_device &mb(EC1840_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0002", false);
@@ -267,7 +270,10 @@ void ec184x_state::ec1841(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ec184x_state, ec1841)
 
-	EC1841_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	ec1841_mb_device &mb(EC1841_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0002", false);   // cga
@@ -287,12 +293,15 @@ void ec184x_state::ec1841(machine_config &config)
 // XXX verify everything
 void ec184x_state::ec1847(machine_config &config)
 {
-	I8088(config, m_maincpu, 4772720);
+	I8086(config, m_maincpu, 4772720);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ec184x_state::ec1847_map);
 	m_maincpu->set_addrmap(AS_IO, &ec184x_state::ec1847_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "hercules", false);  // cga, ega and vga(?) are options too

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -10,8 +10,8 @@
 #define USE_D3D11_STAGING_BUFFER 0
 
 #if !USE_D3D11_DYNAMIC_LIB
-#   undef  BGFX_CONFIG_DEBUG_PIX
-#   define BGFX_CONFIG_DEBUG_PIX 0
+#   undef  BGFX_CONFIG_DEBUG_ANNOTATION
+#   define BGFX_CONFIG_DEBUG_ANNOTATION 0
 #endif // !USE_D3D11_DYNAMIC_LIB
 
 BX_PRAGMA_DIAGNOSTIC_PUSH();
@@ -40,19 +40,37 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 #include "nvapi.h"
 #include "dxgi.h"
 
-#define BGFX_D3D11_BLEND_STATE_MASK (0 \
-			| BGFX_STATE_BLEND_MASK \
-			| BGFX_STATE_BLEND_EQUATION_MASK \
-			| BGFX_STATE_BLEND_INDEPENDENT \
-			| BGFX_STATE_BLEND_ALPHA_TO_COVERAGE \
-			| BGFX_STATE_WRITE_A \
-			| BGFX_STATE_WRITE_RGB \
-			)
+#define BGFX_D3D11_BLEND_STATE_MASK (0   \
+	| BGFX_STATE_BLEND_MASK              \
+	| BGFX_STATE_BLEND_EQUATION_MASK     \
+	| BGFX_STATE_BLEND_INDEPENDENT       \
+	| BGFX_STATE_BLEND_ALPHA_TO_COVERAGE \
+	| BGFX_STATE_WRITE_A                 \
+	| BGFX_STATE_WRITE_RGB               \
+	)
 
 #define BGFX_D3D11_DEPTH_STENCIL_MASK (0 \
-			| BGFX_STATE_WRITE_Z \
-			| BGFX_STATE_DEPTH_TEST_MASK \
-			)
+	| BGFX_STATE_WRITE_Z                 \
+	| BGFX_STATE_DEPTH_TEST_MASK         \
+	)
+
+#define BGFX_D3D11_PROFILER_BEGIN(_view, _abgr)          \
+	BX_MACRO_BLOCK_BEGIN                                 \
+		PIX_BEGINEVENT(_abgr, s_viewNameW[_view]);       \
+		BGFX_PROFILER_BEGIN(s_viewName[view], _abgr);    \
+	BX_MACRO_BLOCK_END
+
+#define BGFX_D3D11_PROFILER_BEGIN_LITERAL(_name, _abgr)  \
+	BX_MACRO_BLOCK_BEGIN                                 \
+		PIX_BEGINEVENT(_abgr, L"" # _name);              \
+		BGFX_PROFILER_BEGIN_LITERAL("" # _name, _abgr);  \
+	BX_MACRO_BLOCK_END
+
+#define BGFX_D3D11_PROFILER_END()                        \
+	BX_MACRO_BLOCK_BEGIN                                 \
+		BGFX_PROFILER_END();                             \
+		PIX_ENDEVENT();                                  \
+	BX_MACRO_BLOCK_END
 
 namespace bgfx { namespace d3d11
 {
@@ -109,9 +127,9 @@ namespace bgfx { namespace d3d11
 		{
 		}
 
-		void create(uint32_t _size, void* _data, VertexDeclHandle _declHandle, uint16_t _flags);
+		void create(uint32_t _size, void* _data, VertexLayoutHandle _layoutHandle, uint16_t _flags);
 
-		VertexDeclHandle m_decl;
+		VertexLayoutHandle m_layoutHandle;
 	};
 
 	struct ShaderD3D11
@@ -294,6 +312,7 @@ namespace bgfx { namespace d3d11
 		uint32_t m_width;
 		uint32_t m_height;
 		uint32_t m_depth;
+		uint32_t m_numLayers;
 		uint8_t  m_type;
 		uint8_t  m_requestedFormat;
 		uint8_t  m_textureFormat;
@@ -311,6 +330,7 @@ namespace bgfx { namespace d3d11
 			, m_denseIdx(UINT16_MAX)
 			, m_num(0)
 			, m_numTh(0)
+			, m_numUav(0)
 			, m_needPresent(false)
 		{
 		}
@@ -325,9 +345,10 @@ namespace bgfx { namespace d3d11
 		void set();
 		HRESULT present(uint32_t _syncInterval);
 
-		ID3D11RenderTargetView* m_rtv[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
-		ID3D11ShaderResourceView* m_srv[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
-		ID3D11DepthStencilView* m_dsv;
+		ID3D11RenderTargetView*    m_rtv[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
+		ID3D11UnorderedAccessView* m_uav[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
+		ID3D11ShaderResourceView*  m_srv[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
+		ID3D11DepthStencilView*    m_dsv;
 		Dxgi::SwapChainI* m_swapChain;
 		void* m_nwh;
 		uint32_t m_width;
@@ -337,6 +358,7 @@ namespace bgfx { namespace d3d11
 		uint16_t m_denseIdx;
 		uint8_t m_num;
 		uint8_t m_numTh;
+		uint8_t m_numUav;
 		bool m_needPresent;
 	};
 

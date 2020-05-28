@@ -100,8 +100,6 @@ dspp_device::dspp_device(const machine_config &mconfig, device_type type, const 
 		m_dma_write_handler(*this),
 		m_code_config("code", ENDIANNESS_BIG, 16, 10, -1, code_map_ctor),
 		m_data_config("data", ENDIANNESS_BIG, 16, 10, -1, data_map_ctor),
-		m_code(nullptr),
-		m_data(nullptr),
 		m_output_fifo_start(0),
 		m_output_fifo_count(0),
 		m_dspx_reset(0),
@@ -160,12 +158,9 @@ void dspp_device::device_start()
 	m_dma_write_handler.resolve_safe();
 
 	// Get our address spaces
-	m_code = &space(AS_PROGRAM);
-	m_data = &space(AS_DATA);
-	auto code_cache = m_code->cache<1, -1, ENDIANNESS_BIG>();
-	m_code_cache = code_cache;
-	m_code16 = [code_cache](offs_t address) -> uint16_t { return code_cache->read_word(address); };
-	m_codeptr = [code_cache](offs_t address) -> const void * { return code_cache->read_ptr(address); };
+	space(AS_PROGRAM).cache(m_code_cache);
+	space(AS_PROGRAM).specific(m_code);
+	space(AS_DATA).specific(m_data);
 
 	// Register our state for the debugger
 	state_add(DSPP_PC,         "PC",        m_core->m_pc);
@@ -201,22 +196,19 @@ void dspp_device::device_start()
 	save_item(NAME(m_output_fifo_start));
 	save_item(NAME(m_output_fifo_count));
 
-	for (uint32_t i = 0; i < NUM_DMA_CHANNELS; ++i)
-	{
-		save_item(NAME(m_fifo_dma[i].m_current_addr), i);
-		save_item(NAME(m_fifo_dma[i].m_current_count), i);
-		save_item(NAME(m_fifo_dma[i].m_next_addr), i);
-		save_item(NAME(m_fifo_dma[i].m_next_count), i);
-		save_item(NAME(m_fifo_dma[i].m_prev_value), i);
-		save_item(NAME(m_fifo_dma[i].m_prev_current), i);
-		save_item(NAME(m_fifo_dma[i].m_go_forever), i);
-		save_item(NAME(m_fifo_dma[i].m_next_valid), i);
-		save_item(NAME(m_fifo_dma[i].m_reserved), i);
-		save_item(NAME(m_fifo_dma[i].m_fifo), i);
-		save_item(NAME(m_fifo_dma[i].m_dma_ptr), i);
-		save_item(NAME(m_fifo_dma[i].m_dspi_ptr), i);
-		save_item(NAME(m_fifo_dma[i].m_depth), i);
-	}
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_current_addr));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_current_count));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_next_addr));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_next_count));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_prev_value));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_prev_current));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_go_forever));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_next_valid));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_reserved));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_fifo));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_dma_ptr));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_dspi_ptr));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_depth));
 
 	save_item(NAME(m_last_frame_clock));
 	save_item(NAME(m_last_osc_count));
@@ -372,7 +364,7 @@ inline void dspp_device::update_ticks()
 
 uint16_t dspp_device::read_op(offs_t pc)
 {
-	return m_code_cache->read_word(pc);
+	return m_code_cache.read_word(pc);
 }
 
 
@@ -382,7 +374,7 @@ uint16_t dspp_device::read_op(offs_t pc)
 
 inline uint16_t dspp_device::read_data(offs_t addr)
 {
-	return m_data->read_word(addr);
+	return m_data.read_word(addr);
 }
 
 
@@ -392,7 +384,7 @@ inline uint16_t dspp_device::read_data(offs_t addr)
 
 inline void dspp_device::write_data(offs_t addr, uint16_t data)
 {
-	m_data->write_word(addr, data);
+	m_data.write_word(addr, data);
 }
 
 
@@ -653,7 +645,7 @@ inline uint16_t dspp_device::translate_reg(uint16_t reg)
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t dspp_device::execute_min_cycles() const
+uint32_t dspp_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
@@ -664,7 +656,7 @@ uint32_t dspp_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t dspp_device::execute_max_cycles() const
+uint32_t dspp_device::execute_max_cycles() const noexcept
 {
 	return 5; // TODO ?
 }
@@ -2347,12 +2339,12 @@ READ32_MEMBER( dspp_device::read )
 	if (offset < 0x1000/4)
 	{
 		// 16-bit code memory
-		return m_code->read_word(offset);
+		return m_code.read_word(offset);
 	}
 	else if (offset >= 0x1000/4 && offset < 0x2000/4)
 	{
 		// 16-bit data memory and registers
-		return m_data->read_word((offset - 0x1000/4));
+		return m_data.read_word((offset - 0x1000/4));
 	}
 	else if(offset >= 0x5000/4 && offset < 0x6000/4)
 	{
@@ -2508,12 +2500,12 @@ WRITE32_MEMBER( dspp_device::write )
 	if (offset < 0x1000/4)
 	{
 		// 16-bit code memory
-		m_code->write_word(offset, data);
+		m_code.write_word(offset, data);
 	}
 	else if (offset >= 0x1000/4 && offset < 0x2000/4)
 	{
 		// 16-bit data memory and registers
-		m_data->write_word((offset - 0x1000/4), data);
+		m_data.write_word((offset - 0x1000/4), data);
 	}
 	else if(offset >= 0x5000/4 && offset < 0x6000/4)
 	{

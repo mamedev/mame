@@ -1,14 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-<!-- General Purpose Amiga Floppy Software List, anything listed here may, or may not work with any specific system / configuration -->
-
-
 <!--
+license:CC0
+
+General Purpose Amiga Floppy Software List, anything listed here may, or may not work with any specific system / configuration
+
    For the most part this is a TOSEC based list, virused images have been filtered out for now (unless no alternative exists)
 
    Any bad dumps will be removed if they contain nothing of value (and again, no alternatives exist)
-
 -->
 
 <softwarelist name="amiga_flop" description="Commodore Amiga disk images (misc list)">
@@ -1346,7 +1345,8 @@
 	</software>
 
 	<software name="asspd001a" cloneof="asspd001" supported="no">
-		<description>PD Games Volume 001 (Tanx, Roller-Pede, Amigoids, Cave Runner, Avatris) (Alt)</description>            <year>199?</year>
+		<description>PD Games Volume 001 (Tanx, Roller-Pede, Amigoids, Cave Runner, Avatris) (Alt)</description>
+		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />

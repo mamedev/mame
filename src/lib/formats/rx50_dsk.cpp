@@ -29,7 +29,7 @@
          FORMAT A: /F:160 on DOS; turn MEDIACHK ON
 ************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "flopimg.h"
 #include "formats/rx50_dsk.h"

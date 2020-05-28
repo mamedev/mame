@@ -26,63 +26,63 @@ public:
 	void port_map(address_map &map);
 
 	// ports section
-	DECLARE_READ8_MEMBER(pattern_name_table_r);
-	DECLARE_READ8_MEMBER(sprite_data_r);
-	DECLARE_READ8_MEMBER(scroll_data_r);
-	DECLARE_READ8_MEMBER(palette_data_r);
-	DECLARE_READ8_MEMBER(register_data_r);
-//  DECLARE_READ8_MEMBER(register_select_r);
-	DECLARE_READ8_MEMBER(status_port_r);
-	DECLARE_READ8_MEMBER(system_control_r);
-	DECLARE_WRITE8_MEMBER(pattern_name_table_w);
-	DECLARE_WRITE8_MEMBER(sprite_data_w);
-	DECLARE_WRITE8_MEMBER(scroll_data_w);
-	DECLARE_WRITE8_MEMBER(palette_data_w);
-	DECLARE_WRITE8_MEMBER(register_data_w);
-	DECLARE_WRITE8_MEMBER(register_select_w);
-	DECLARE_WRITE8_MEMBER(status_port_w);
-	DECLARE_WRITE8_MEMBER(system_control_w);
+	uint8_t pattern_name_table_r();
+	uint8_t sprite_data_r();
+	uint8_t scroll_data_r();
+	uint8_t palette_data_r();
+	uint8_t register_data_r();
+//  uint8_t register_select_r();
+	uint8_t status_port_r();
+	uint8_t system_control_r();
+	void pattern_name_table_w(uint8_t data);
+	void sprite_data_w(uint8_t data);
+	void scroll_data_w(uint8_t data);
+	void palette_data_w(uint8_t data);
+	void register_data_w(uint8_t data);
+	void register_select_w(uint8_t data);
+	void status_port_w(uint8_t data);
+	void system_control_w(uint8_t data);
 
 	// register section
-	DECLARE_READ8_MEMBER(pattern_name_table_x_r);
-	DECLARE_WRITE8_MEMBER(pattern_name_table_x_w);
-	DECLARE_READ8_MEMBER(pattern_name_table_y_r);
-	DECLARE_WRITE8_MEMBER(pattern_name_table_y_w);
-	DECLARE_READ8_MEMBER(ram_access_ctrl_r);
-	DECLARE_WRITE8_MEMBER(ram_access_ctrl_w);
-	DECLARE_READ8_MEMBER(sprite_address_r);
-	DECLARE_WRITE8_MEMBER(sprite_address_w);
-	DECLARE_READ8_MEMBER(scroll_address_r);
-	DECLARE_WRITE8_MEMBER(scroll_address_w);
-	DECLARE_READ8_MEMBER(palette_address_r);
-	DECLARE_WRITE8_MEMBER(palette_address_w);
-	DECLARE_READ8_MEMBER(sprite_bank_r);
-	DECLARE_WRITE8_MEMBER(sprite_bank_w);
-	DECLARE_READ8_MEMBER(screen_ctrl_7_r);
-	DECLARE_WRITE8_MEMBER(screen_ctrl_7_w);
-	DECLARE_READ8_MEMBER(screen_ctrl_8_r);
-	DECLARE_WRITE8_MEMBER(screen_ctrl_8_w);
-	DECLARE_READ8_MEMBER(screen_ctrl_9_r);
-	DECLARE_WRITE8_MEMBER(screen_ctrl_9_w);
-	DECLARE_READ8_MEMBER(screen_ctrl_10_r);
-	DECLARE_WRITE8_MEMBER(screen_ctrl_10_w);
-	DECLARE_READ8_MEMBER(screen_ctrl_11_r);
-	DECLARE_WRITE8_MEMBER(screen_ctrl_11_w);
-	DECLARE_READ8_MEMBER(screen_ctrl_12_r);
-	DECLARE_WRITE8_MEMBER(screen_ctrl_12_w);
-	DECLARE_READ8_MEMBER(irq_mask_r);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_READ8_MEMBER(irq_ctrl_r);
-	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
-	DECLARE_WRITE8_MEMBER(crtc_w);
-	DECLARE_WRITE8_MEMBER(base_address_w);
-	DECLARE_WRITE8_MEMBER(roz_ax_w);
-	DECLARE_WRITE8_MEMBER(roz_dx_w);
-	DECLARE_WRITE8_MEMBER(roz_dxy_w);
-	DECLARE_WRITE8_MEMBER(roz_ay_w);
-	DECLARE_WRITE8_MEMBER(roz_dy_w);
-	DECLARE_WRITE8_MEMBER(roz_dyx_w);
-	DECLARE_WRITE8_MEMBER(border_color_w);
+	uint8_t pattern_name_table_x_r();
+	void pattern_name_table_x_w(uint8_t data);
+	uint8_t pattern_name_table_y_r();
+	void pattern_name_table_y_w(uint8_t data);
+	uint8_t ram_access_ctrl_r();
+	void ram_access_ctrl_w(uint8_t data);
+	uint8_t sprite_address_r();
+	void sprite_address_w(uint8_t data);
+	uint8_t scroll_address_r();
+	void scroll_address_w(uint8_t data);
+	uint8_t palette_address_r();
+	void palette_address_w(uint8_t data);
+	uint8_t sprite_bank_r();
+	void sprite_bank_w(uint8_t data);
+	uint8_t screen_ctrl_7_r();
+	void screen_ctrl_7_w(uint8_t data);
+	uint8_t screen_ctrl_8_r();
+	void screen_ctrl_8_w(uint8_t data);
+	uint8_t screen_ctrl_9_r();
+	void screen_ctrl_9_w(uint8_t data);
+	uint8_t screen_ctrl_10_r();
+	void screen_ctrl_10_w(uint8_t data);
+	uint8_t screen_ctrl_11_r();
+	void screen_ctrl_11_w(uint8_t data);
+	uint8_t screen_ctrl_12_r();
+	void screen_ctrl_12_w(uint8_t data);
+	uint8_t irq_mask_r();
+	void irq_mask_w(uint8_t data);
+	uint8_t irq_ctrl_r(offs_t offset);
+	void irq_ctrl_w(offs_t offset, uint8_t data);
+	void crtc_w(offs_t offset, uint8_t data);
+	void base_address_w(offs_t offset, uint8_t data);
+	void roz_ax_w(offs_t offset, uint8_t data);
+	void roz_dx_w(offs_t offset, uint8_t data);
+	void roz_dxy_w(offs_t offset, uint8_t data);
+	void roz_ay_w(offs_t offset, uint8_t data);
+	void roz_dy_w(offs_t offset, uint8_t data);
+	void roz_dyx_w(offs_t offset, uint8_t data);
+	void border_color_w(uint8_t data);
 
 	// TODO: is this even a real connection?
 	void set_gfxbank(uint8_t gfxbank);
@@ -272,16 +272,16 @@ private:
 	};
 
 	struct {
-		int htotal;             /**< HTL: horizontal total number of dots x 2 */
-		int vtotal;             /**< VTL: vertical total number of lines x 1 */
-		int display_hstart;     /**< HDS: horizontal display starting position x 2*/
-		int display_vstart;     /**< VDS: vertical display starting position x 1 */
-		int display_width;      /**< HDW: horizontal display size x 16 */
-		int display_height;     /**< VDW: vertical display size x 8 */
-		int display_hsync;      /**< HSW: horizontal sync signal x 16 */
-		int display_vsync;      /**< VSW: vertical sync signal x 1 */
-		int border_width;       /**< HBW: horizontal border size x 16 */
-		int border_height;      /**< VBW: vertical border size x 8 */
+		int htotal = 0;             /**< HTL: horizontal total number of dots x 2 */
+		int vtotal = 0;             /**< VTL: vertical total number of lines x 1 */
+		int display_hstart = 0;     /**< HDS: horizontal display starting position x 2*/
+		int display_vstart = 0;     /**< VDS: vertical display starting position x 1 */
+		int display_width = 0;      /**< HDW: horizontal display size x 16 */
+		int display_height = 0;     /**< VDW: vertical display size x 8 */
+		int display_hsync = 0;      /**< HSW: horizontal sync signal x 16 */
+		int display_vsync = 0;      /**< VSW: vertical sync signal x 1 */
+		int border_width = 0;       /**< HBW: horizontal border size x 16 */
+		int border_height = 0;      /**< VBW: vertical border size x 8 */
 	}m_crtc;
 
 	// rotation, zoom shortcuts

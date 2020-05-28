@@ -342,11 +342,11 @@ void scc2698b_channel::recompute_pin_output(bool force)
 
 
 
-WRITE_LINE_MEMBER( scc2698b_channel::mpi0_w )
+void scc2698b_channel::mpi0_w(int state)
 {
 
 }
-WRITE_LINE_MEMBER( scc2698b_channel::mpi1_w )
+void scc2698b_channel::mpi1_w(int state)
 {
 
 }
@@ -359,11 +359,10 @@ scc2698b_device::scc2698b_device(const machine_config &mconfig, const char *tag,
 	write_intr_B(*this),
 	write_intr_C(*this),
 	write_intr_D(*this),
-	write_tx{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this} },
-	write_mpp1{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
-	write_mpp2{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
-	write_mpo{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } }
-
+	write_tx(*this),
+	write_mpp1(*this),
+	write_mpp2(*this),
+	write_mpo(*this)
 {
 
 }
@@ -383,14 +382,10 @@ void scc2698b_device::device_start()
 	write_intr_C.resolve_safe();
 	write_intr_D.resolve_safe();
 
-	for (auto &cb : write_tx)
-		cb.resolve_safe();
-	for (auto &cb : write_mpp1)
-		cb.resolve_safe();
-	for (auto &cb : write_mpp2)
-		cb.resolve_safe();
-	for (auto &cb : write_mpo)
-		cb.resolve_safe();
+	write_tx.resolve_all_safe();
+	write_mpp1.resolve_all_safe();
+	write_mpp2.resolve_all_safe();
+	write_mpo.resolve_all_safe();
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -439,19 +434,7 @@ void scc2698b_device::write_line_mpo(int port, int value)
 		logerror("Unsupported port %d in write_line_mpo\n", port);
 }
 
-
-READ8_MEMBER(scc2698b_device::read)
-{
-	return read_reg(offset);
-}
-
-WRITE8_MEMBER(scc2698b_device::write)
-{
-	write_reg(offset, data);
-}
-
-
-uint8_t scc2698b_device::read_reg(int offset)
+uint8_t scc2698b_device::read(offs_t offset)
 {
 	int device = (offset >> 4) & 3;
 	int reg = (offset & 15);
@@ -501,7 +484,7 @@ uint8_t scc2698b_device::read_reg(int offset)
 	return data;
 }
 
-void scc2698b_device::write_reg(int offset, uint8_t data)
+void scc2698b_device::write(offs_t offset, u8 data)
 {
 	int device = (offset >> 4) & 3;
 	int reg = (offset & 15);
@@ -581,14 +564,14 @@ void scc2698b_device::write_reg(int offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(scc2698b_device::port_a_rx_w) { m_channel[0]->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_b_rx_w) { m_channel[1]->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_c_rx_w) { m_channel[2]->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_d_rx_w) { m_channel[3]->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_e_rx_w) { m_channel[4]->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_f_rx_w) { m_channel[5]->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_g_rx_w) { m_channel[6]->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_h_rx_w) { m_channel[7]->rx_w(state); }
+void scc2698b_device::port_a_rx_w(int state) { m_channel[0]->rx_w(state); }
+void scc2698b_device::port_b_rx_w(int state) { m_channel[1]->rx_w(state); }
+void scc2698b_device::port_c_rx_w(int state) { m_channel[2]->rx_w(state); }
+void scc2698b_device::port_d_rx_w(int state) { m_channel[3]->rx_w(state); }
+void scc2698b_device::port_e_rx_w(int state) { m_channel[4]->rx_w(state); }
+void scc2698b_device::port_f_rx_w(int state) { m_channel[5]->rx_w(state); }
+void scc2698b_device::port_g_rx_w(int state) { m_channel[6]->rx_w(state); }
+void scc2698b_device::port_h_rx_w(int state) { m_channel[7]->rx_w(state); }
 
 
 scc2698b_channel* scc2698b_device::get_channel(int port)

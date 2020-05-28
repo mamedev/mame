@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="a800_cass" description="Atari 400 / 800 cassettes">
+
+	<software name="serpent" supported="no">
+		<description>Serpentine</description>
+		<year>1982</year>
+		<publisher>Broderbund</publisher>
+		<part name="cass1" interface="a800_cass">
+			<dataarea name="cass" size="18938">
+				<rom name="serpentine (atari 400) (side a).cas" size="18938" crc="7a42459f" sha1="f717fdf02c55ecdbd8f4284da249bd87abb09708"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="a800_cass">
+			<dataarea name="cass" size="19059">
+				<rom name="serpentine (atari 400) (side b).cas" size="19059" crc="386999b4" sha1="4a308f95f94c00ee861ba7facbfcd0ca31e01f1f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxxon" supported="no">
+		<description>Zaxxon (set 1)</description>
+		<year>1983</year>
+		<publisher>Datasoft</publisher>
+		<info name="developer" value="Ron J. Fortier"/>
+		<part name="cass1" interface="a800_cass">
+			<dataarea name="cass" size="20596">
+				<rom name="zaxxon (1983, datasoft, inc.).cas" size="20596" crc="bd63c369" sha1="8dda73ce267d9fe7afe0a0d6833525144c746c41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxxona" cloneof="zaxxon" supported="no">
+		<description>Zaxxon (set 2)</description>
+		<year>1984</year>
+		<publisher>US Gold</publisher>
+		<info name="developer" value="Ron J. Fortier"/>
+		<part name="cass1" interface="a800_cass">
+			<dataarea name="cass" size="20612">
+				<rom name="zaxxon (us_gold).cas" size="20612" crc="83f30fc0" sha1="3e26e3b98bd17a5097b80b27d8b595fe1411b66b"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -1,29 +1,34 @@
 --
--- Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2019 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
 group "tools/shaderc"
 
 local GLSL_OPTIMIZER = path.join(BGFX_DIR, "3rdparty/glsl-optimizer")
-local FCPP_DIR = path.join(BGFX_DIR, "3rdparty/fcpp")
-local GLSLANG = path.join(BGFX_DIR, "3rdparty/glslang")
-local SPIRV_TOOLS = path.join(BGFX_DIR, "3rdparty/spirv-tools")
+local FCPP_DIR       = path.join(BGFX_DIR, "3rdparty/fcpp")
+local GLSLANG        = path.join(BGFX_DIR, "3rdparty/glslang")
+local SPIRV_CROSS    = path.join(BGFX_DIR, "3rdparty/spirv-cross")
+local SPIRV_HEADERS  = path.join(BGFX_DIR, "3rdparty/spirv-headers")
+local SPIRV_TOOLS    = path.join(BGFX_DIR, "3rdparty/spirv-tools")
 
 project "spirv-opt"
 	kind "StaticLib"
 
 	includedirs {
+		SPIRV_TOOLS,
+
 		path.join(SPIRV_TOOLS, "include"),
 		path.join(SPIRV_TOOLS, "include/generated"),
 		path.join(SPIRV_TOOLS, "source"),
-		path.join(SPIRV_TOOLS),
-		path.join(SPIRV_TOOLS, "external/SPIRV-Headers/include"),
+		path.join(SPIRV_HEADERS, "include"),
 	}
 
 	files {
 		path.join(SPIRV_TOOLS, "source/opt/**.cpp"),
 		path.join(SPIRV_TOOLS, "source/opt/**.h"),
+		path.join(SPIRV_TOOLS, "source/reduce/**.cpp"),
+		path.join(SPIRV_TOOLS, "source/reduce/**.h"),
 
 		-- libspirv
 		path.join(SPIRV_TOOLS, "source/assembly_grammar.cpp"),
@@ -42,8 +47,6 @@ project "spirv-opt"
 		path.join(SPIRV_TOOLS, "source/ext_inst.h"),
 		path.join(SPIRV_TOOLS, "source/extensions.cpp"),
 		path.join(SPIRV_TOOLS, "source/extensions.h"),
-		path.join(SPIRV_TOOLS, "source/id_descriptor.cpp"),
-		path.join(SPIRV_TOOLS, "source/id_descriptor.h"),
 		path.join(SPIRV_TOOLS, "source/instruction.h"),
 		path.join(SPIRV_TOOLS, "source/latest_version_glsl_std_450_header.h"),
 		path.join(SPIRV_TOOLS, "source/latest_version_opencl_std_header.h"),
@@ -65,6 +68,8 @@ project "spirv-opt"
 		path.join(SPIRV_TOOLS, "source/spirv_definition.h"),
 		path.join(SPIRV_TOOLS, "source/spirv_endian.cpp"),
 		path.join(SPIRV_TOOLS, "source/spirv_endian.h"),
+		path.join(SPIRV_TOOLS, "source/spirv_optimizer_options.cpp"),
+		path.join(SPIRV_TOOLS, "source/spirv_reducer_options.cpp"),
 		path.join(SPIRV_TOOLS, "source/spirv_target_env.cpp"),
 		path.join(SPIRV_TOOLS, "source/spirv_target_env.h"),
 		path.join(SPIRV_TOOLS, "source/spirv_validator_options.cpp"),
@@ -89,6 +94,8 @@ project "spirv-opt"
 		path.join(SPIRV_TOOLS, "source/val/decoration.h"),
 		path.join(SPIRV_TOOLS, "source/val/function.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/instruction.cpp"),
+		path.join(SPIRV_TOOLS, "source/val/validate.cpp"),
+		path.join(SPIRV_TOOLS, "source/val/validate.h"),
 		path.join(SPIRV_TOOLS, "source/val/validate_adjacency.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_annotation.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_arithmetics.cpp"),
@@ -101,27 +108,28 @@ project "spirv-opt"
 		path.join(SPIRV_TOOLS, "source/val/validate_composites.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_constants.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_conversion.cpp"),
-		path.join(SPIRV_TOOLS, "source/val/validate_datarules.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_debug.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_decorations.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_derivatives.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_execution_limitations.cpp"),
-		path.join(SPIRV_TOOLS, "source/val/validate_ext_inst.cpp"),
+		path.join(SPIRV_TOOLS, "source/val/validate_extensions.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_function.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_id.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_image.cpp"),
-		path.join(SPIRV_TOOLS, "source/val/validate_interfaces.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_instruction.cpp"),
+		path.join(SPIRV_TOOLS, "source/val/validate_interfaces.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_layout.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_literals.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_logicals.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_memory.cpp"),
+		path.join(SPIRV_TOOLS, "source/val/validate_memory_semantics.cpp"),
+		path.join(SPIRV_TOOLS, "source/val/validate_misc.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_mode_setting.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_non_uniform.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_primitives.cpp"),
+		path.join(SPIRV_TOOLS, "source/val/validate_scopes.cpp"),
+		path.join(SPIRV_TOOLS, "source/val/validate_small_type_uses.cpp"),
 		path.join(SPIRV_TOOLS, "source/val/validate_type.cpp"),
-		path.join(SPIRV_TOOLS, "source/val/validate.cpp"),
-		path.join(SPIRV_TOOLS, "source/val/validate.h"),
 		path.join(SPIRV_TOOLS, "source/val/validation_state.cpp"),
 	}
 
@@ -132,6 +140,64 @@ project "spirv-opt"
 			"/wd4702", -- warning C4702: unreachable code
 			"/wd4706", -- warning C4706: assignment within conditional expression
 		}
+
+	configuration { "mingw* or linux or osx" }
+		buildoptions {
+			"-Wno-switch",
+		}
+
+	configuration { "mingw* or linux-gcc-*" }
+		buildoptions {
+			"-Wno-misleading-indentation",
+		}
+
+	configuration {}
+
+project "spirv-cross"
+	kind "StaticLib"
+
+	defines {
+		"SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS",
+	}
+
+	includedirs {
+		path.join(SPIRV_CROSS, "include"),
+	}
+
+	files {
+		path.join(SPIRV_CROSS, "spirv.hpp"),
+		path.join(SPIRV_CROSS, "spirv_cfg.cpp"),
+		path.join(SPIRV_CROSS, "spirv_cfg.hpp"),
+		path.join(SPIRV_CROSS, "spirv_common.hpp"),
+		path.join(SPIRV_CROSS, "spirv_cpp.cpp"),
+		path.join(SPIRV_CROSS, "spirv_cpp.hpp"),
+		path.join(SPIRV_CROSS, "spirv_cross.cpp"),
+		path.join(SPIRV_CROSS, "spirv_cross.hpp"),
+		path.join(SPIRV_CROSS, "spirv_cross_parsed_ir.cpp"),
+		path.join(SPIRV_CROSS, "spirv_cross_parsed_ir.hpp"),
+		path.join(SPIRV_CROSS, "spirv_cross_util.cpp"),
+		path.join(SPIRV_CROSS, "spirv_cross_util.hpp"),
+		path.join(SPIRV_CROSS, "spirv_glsl.cpp"),
+		path.join(SPIRV_CROSS, "spirv_glsl.hpp"),
+		path.join(SPIRV_CROSS, "spirv_hlsl.cpp"),
+		path.join(SPIRV_CROSS, "spirv_hlsl.hpp"),
+		path.join(SPIRV_CROSS, "spirv_msl.cpp"),
+		path.join(SPIRV_CROSS, "spirv_msl.hpp"),
+		path.join(SPIRV_CROSS, "spirv_parser.cpp"),
+		path.join(SPIRV_CROSS, "spirv_parser.hpp"),
+		path.join(SPIRV_CROSS, "spirv_reflect.cpp"),
+		path.join(SPIRV_CROSS, "spirv_reflect.hpp"),
+	}
+
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4018", -- warning C4018: '<': signed/unsigned mismatch
+			"/wd4245", -- warning C4245: 'return': conversion from 'int' to 'unsigned int', signed/unsigned mismatch
+			"/wd4706", -- warning C4706: assignment within conditional expression
+			"/wd4715", -- warning C4715: '': not all control paths return a value
+		}
+
+	configuration {}
 
 project "glslang"
 	kind "StaticLib"
@@ -244,14 +310,168 @@ project "glsl-optimizer"
 	}
 
 	files {
-		path.join(GLSL_OPTIMIZER, "src/mesa/**.c"),
-		path.join(GLSL_OPTIMIZER, "src/glsl/**.cpp"),
-		path.join(GLSL_OPTIMIZER, "src/mesa/**.h"),
-		path.join(GLSL_OPTIMIZER, "src/glsl/**.c"),
-		path.join(GLSL_OPTIMIZER, "src/glsl/**.cpp"),
-		path.join(GLSL_OPTIMIZER, "src/glsl/**.h"),
-		path.join(GLSL_OPTIMIZER, "src/util/**.c"),
-		path.join(GLSL_OPTIMIZER, "src/util/**.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glcpp/glcpp.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glcpp/glcpp-lex.c"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glcpp/glcpp-parse.c"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glcpp/glcpp-parse.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glcpp/pp.c"),
+
+		path.join(GLSL_OPTIMIZER, "src/glsl/ast.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ast_array_index.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ast_expr.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ast_function.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ast_to_hir.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ast_type.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/builtin_functions.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/builtin_type_macros.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/builtin_types.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/builtin_variables.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glsl_lexer.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glsl_optimizer.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glsl_optimizer.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glsl_parser.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glsl_parser.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glsl_parser_extras.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glsl_parser_extras.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glsl_symbol_table.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glsl_symbol_table.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glsl_types.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/glsl_types.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/hir_field_selection.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_basic_block.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_basic_block.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_builder.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_builder.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_clone.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_constant_expression.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_equals.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_expression_flattening.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_expression_flattening.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_function.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_function_can_inline.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_function_detect_recursion.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_function_inlining.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_hierarchical_visitor.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_hierarchical_visitor.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_hv_accept.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_import_prototypes.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_optimization.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_print_glsl_visitor.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_print_glsl_visitor.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_print_metal_visitor.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_print_metal_visitor.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_print_visitor.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_print_visitor.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_rvalue_visitor.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_rvalue_visitor.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_stats.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_stats.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_uniform.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_unused_structs.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_unused_structs.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_validate.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_variable_refcount.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_variable_refcount.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/ir_visitor.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/link_atomics.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/link_functions.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/link_interface_blocks.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/link_uniform_block_active_visitor.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/link_uniform_block_active_visitor.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/link_uniform_blocks.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/link_uniform_initializers.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/link_uniforms.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/link_varyings.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/link_varyings.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/linker.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/linker.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/list.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/loop_analysis.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/loop_analysis.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/loop_controls.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/loop_unroll.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_clip_distance.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_discard.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_discard_flow.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_if_to_cond_assign.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_instructions.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_jumps.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_mat_op_to_vec.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_named_interface_blocks.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_noise.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_offset_array.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_output_reads.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_packed_varyings.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_packing_builtins.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_ubo_reference.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_variable_index_to_cond_assign.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_vec_index_to_cond_assign.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_vec_index_to_swizzle.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_vector.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_vector_insert.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/lower_vertex_id.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_algebraic.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_array_splitting.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_constant_folding.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_constant_propagation.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_constant_variable.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_copy_propagation.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_copy_propagation_elements.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_cse.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_dead_builtin_variables.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_dead_builtin_varyings.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_dead_code.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_dead_code_local.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_dead_functions.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_flatten_nested_if_blocks.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_flip_matrices.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_function_inlining.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_if_simplification.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_minmax.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_noop_swizzle.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_rebalance_tree.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_redundant_jumps.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_structure_splitting.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_swizzle_swizzle.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_tree_grafting.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/opt_vectorize.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/program.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/s_expression.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/s_expression.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/standalone_scaffolding.cpp"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/standalone_scaffolding.h"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/strtod.c"),
+		path.join(GLSL_OPTIMIZER, "src/glsl/strtod.h"),
+
+		path.join(GLSL_OPTIMIZER, "src/mesa/main/compiler.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/main/config.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/main/context.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/main/core.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/main/dd.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/main/errors.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/main/glheader.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/main/glminimal.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/main/imports.c"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/main/imports.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/main/macros.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/main/mtypes.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/main/simple_list.h"),
+
+		path.join(GLSL_OPTIMIZER, "src/mesa/program/hash_table.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/program/prog_hash_table.c"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/program/prog_instruction.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/program/prog_parameter.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/program/prog_statevars.h"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/program/symbol_table.c"),
+		path.join(GLSL_OPTIMIZER, "src/mesa/program/symbol_table.h"),
+
+		path.join(GLSL_OPTIMIZER, "src/util/hash_table.c"),
+		path.join(GLSL_OPTIMIZER, "src/util/hash_table.h"),
+		path.join(GLSL_OPTIMIZER, "src/util/macros.h"),
+		path.join(GLSL_OPTIMIZER, "src/util/ralloc.c"),
+		path.join(GLSL_OPTIMIZER, "src/util/ralloc.h"),
 	}
 
 	removefiles {
@@ -307,6 +527,7 @@ project "glsl-optimizer"
 			"-fno-strict-aliasing", -- glsl-optimizer has bugs if strict aliasing is used.
 
 			"-Wno-implicit-fallthrough",
+			"-Wno-parentheses",
 			"-Wno-sign-compare",
 			"-Wno-unused-function",
 			"-Wno-unused-parameter",
@@ -362,6 +583,7 @@ project "fcpp"
 	configuration { "not vs*" }
 		buildoptions {
 			"-Wno-implicit-fallthrough",
+			"-Wno-incompatible-pointer-types",
 			"-Wno-parentheses-equality",
 		}
 
@@ -376,6 +598,7 @@ project "shaderc"
 		path.join(BGFX_DIR, "include"),
 
 		path.join(BGFX_DIR, "3rdparty/dxsdk/include"),
+
 		FCPP_DIR,
 
 		path.join(BGFX_DIR, "3rdparty/glslang/glslang/Public"),
@@ -384,6 +607,10 @@ project "shaderc"
 
 		path.join(GLSL_OPTIMIZER, "include"),
 		path.join(GLSL_OPTIMIZER, "src/glsl"),
+
+		SPIRV_CROSS,
+
+		path.join(SPIRV_TOOLS, "include"),
 	}
 
 	links {
@@ -392,6 +619,7 @@ project "shaderc"
 		"glslang",
 		"glsl-optimizer",
 		"spirv-opt",
+		"spirv-cross",
 	}
 
 	files {
@@ -419,12 +647,17 @@ project "shaderc"
 			"psapi",
 		}
 
+	configuration { "osx or linux*" }
+		links {
+			"pthread",
+		}
+
 	configuration {}
 
-	if filesexist(BGFX_DIR, path.join(BGFX_DIR, "../bgfx-ext"), {
+	if filesexist(BGFX_DIR, path.join(BGFX_DIR, "../bgfx-gnm"), {
 		path.join(BGFX_DIR, "scripts/shaderc.lua"), }) then
 
-		if filesexist(BGFX_DIR, path.join(BGFX_DIR, "../bgfx-ext"), {
+		if filesexist(BGFX_DIR, path.join(BGFX_DIR, "../bgfx-gnm"), {
 			path.join(BGFX_DIR, "tools/shaderc/shaderc_pssl.cpp"), }) then
 
 			removefiles {
@@ -432,15 +665,8 @@ project "shaderc"
 			}
 		end
 
-		dofile(path.join(BGFX_DIR, "../bgfx-ext/scripts/shaderc.lua") )
+		dofile(path.join(BGFX_DIR, "../bgfx-gnm/scripts/shaderc.lua") )
 	end
-
-	configuration { "osx or linux*" }
-		links {
-			"pthread",
-		}
-
-	configuration {}
 
 	strip()
 

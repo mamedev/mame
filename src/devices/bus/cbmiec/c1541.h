@@ -22,26 +22,18 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define C1541_TAG           "c1541"
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c1541_base_t
+// ======================> c1541_device_base
 
-class c1541_base_t :  public device_t,
+class c1541_device_base :  public device_t,
 					  public device_cbm_iec_interface,
 					  public device_c64_floppy_parallel_interface
 {
 protected:
 	// construction/destruction
-	c1541_base_t(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	c1541_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -56,7 +48,7 @@ protected:
 	virtual void cbm_iec_reset(int state) override;
 
 	// device_c64_floppy_parallel_interface overrides
-	virtual void parallel_data_w(uint8_t data) override;
+	virtual void parallel_data_w(u8 data) override;
 	virtual void parallel_strobe_w(int state) override;
 
 	required_device<floppy_image_device> m_floppy;
@@ -77,14 +69,14 @@ private:
 	inline void set_iec_data();
 
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
-	virtual DECLARE_READ8_MEMBER( via0_pa_r );
-	DECLARE_WRITE8_MEMBER( via0_pa_w );
-	DECLARE_READ8_MEMBER( via0_pb_r );
-	DECLARE_WRITE8_MEMBER( via0_pb_w );
+	virtual uint8_t via0_pa_r();
+	void via0_pa_w(uint8_t data);
+	uint8_t via0_pb_r();
+	void via0_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via0_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
-	DECLARE_READ8_MEMBER( via1_pb_r );
-	DECLARE_WRITE8_MEMBER( via1_pb_w );
+	uint8_t via1_pb_r();
+	void via1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
 
@@ -105,13 +97,13 @@ private:
 };
 
 
-// ======================> c1540_t
+// ======================> c1540_device
 
-class c1540_t :  public c1541_base_t
+class c1540_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1540_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -119,13 +111,13 @@ protected:
 };
 
 
-// ======================> c1541_t
+// ======================> c1541_device
 
-class c1541_t :  public c1541_base_t
+class c1541_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -133,13 +125,13 @@ protected:
 };
 
 
-// ======================> c1541c_t
+// ======================> c1541c_device
 
-class c1541c_t :  public c1541_base_t
+class c1541c_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541c_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -147,18 +139,17 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	// not really public
-	virtual DECLARE_READ8_MEMBER( via0_pa_r ) override;
+	virtual uint8_t via0_pa_r() override;
 };
 
 
-// ======================> c1541ii_t
+// ======================> c1541ii_device
 
-class c1541ii_t :  public c1541_base_t
+class c1541ii_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541ii_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -166,13 +157,13 @@ protected:
 };
 
 
-// ======================> sx1541_t
+// ======================> sx1541_device
 
-class sx1541_t :  public c1541_base_t
+class sx1541_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	sx1541_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -180,13 +171,13 @@ protected:
 };
 
 
-// ======================> fsd1_t
+// ======================> fsd1_device
 
-class fsd1_t :  public c1541_base_t
+class fsd1_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	fsd1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fsd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -194,13 +185,13 @@ protected:
 };
 
 
-// ======================> fsd2_t
+// ======================> fsd2_device
 
-class fsd2_t :  public c1541_base_t
+class fsd2_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	fsd2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fsd2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -211,13 +202,13 @@ protected:
 };
 
 
-// ======================> csd1_t
+// ======================> csd1_device
 
-class csd1_t :  public c1541_base_t
+class csd1_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	csd1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	csd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -225,28 +216,13 @@ protected:
 };
 
 
-// ======================> c1541_dolphin_dos_t
+// ======================> c1541_dolphin_dos_device
 
-class c1541_dolphin_dos_t : public c1541_base_t
+class c1541_dolphin_dos_device : public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541_dolphin_dos_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-};
-
-
-// ======================> c1541_professional_dos_v1_t
-
-class c1541_professional_dos_v1_t :  public c1541_base_t
-{
-public:
-	// construction/destruction
-	c1541_professional_dos_v1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1541_dolphin_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -255,13 +231,28 @@ protected:
 };
 
 
-// ======================> c1541_prologic_dos_classic_t
+// ======================> c1541_professional_dos_v1_device
 
-class c1541_prologic_dos_classic_t :  public c1541_base_t
+class c1541_professional_dos_v1_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541_prologic_dos_classic_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+
+// ======================> c1541_prologic_dos_classic_device
+
+class c1541_prologic_dos_classic_device :  public c1541_device_base
+{
+public:
+	// construction/destruction
+	c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -275,9 +266,9 @@ private:
 
 	DECLARE_READ8_MEMBER( pia_r );
 	DECLARE_WRITE8_MEMBER( pia_w );
-	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	DECLARE_READ8_MEMBER( pia_pb_r );
-	DECLARE_WRITE8_MEMBER( pia_pb_w );
+	void pia_pa_w(uint8_t data);
+	uint8_t pia_pb_r();
+	void pia_pb_w(uint8_t data);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -285,13 +276,13 @@ private:
 };
 
 
-// ======================> indus_gt_t
+// ======================> indus_gt_device
 
-class indus_gt_t :  public c1541_base_t
+class indus_gt_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	indus_gt_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	indus_gt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -299,13 +290,13 @@ protected:
 };
 
 
-// ======================> technica_t
+// ======================> technica_device
 
-class technica_t :  public c1541_base_t
+class technica_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	technica_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	technica_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -313,13 +304,13 @@ protected:
 };
 
 
-// ======================> blue_chip_t
+// ======================> blue_chip_device
 
-class blue_chip_t :  public c1541_base_t
+class blue_chip_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	blue_chip_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	blue_chip_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -327,13 +318,13 @@ protected:
 };
 
 
-// ======================> commander_c2_t
+// ======================> commander_c2_device
 
-class commander_c2_t :  public c1541_base_t
+class commander_c2_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	commander_c2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	commander_c2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -341,13 +332,13 @@ protected:
 };
 
 
-// ======================> enhancer_2000_t
+// ======================> enhancer_2000_device
 
-class enhancer_2000_t :  public c1541_base_t
+class enhancer_2000_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	enhancer_2000_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	enhancer_2000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -355,13 +346,13 @@ protected:
 };
 
 
-// ======================> fd148_t
+// ======================> fd148_device
 
-class fd148_t :  public c1541_base_t
+class fd148_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	fd148_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd148_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -369,13 +360,13 @@ protected:
 };
 
 
-// ======================> msd_sd1_t
+// ======================> msd_sd1_device
 
-class msd_sd1_t :  public c1541_base_t
+class msd_sd1_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	msd_sd1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msd_sd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -383,13 +374,13 @@ protected:
 };
 
 
-// ======================> msd_sd2_t
+// ======================> msd_sd2_device
 
-class msd_sd2_t :  public c1541_base_t
+class msd_sd2_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	msd_sd2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msd_sd2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -398,25 +389,25 @@ protected:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(C1540,                      c1540_t)
-DECLARE_DEVICE_TYPE(C1541,                      c1541_t)
-DECLARE_DEVICE_TYPE(C1541C,                     c1541c_t)
-DECLARE_DEVICE_TYPE(C1541II,                    c1541ii_t)
-DECLARE_DEVICE_TYPE(SX1541,                     sx1541_t)
-DECLARE_DEVICE_TYPE(FSD1,                       fsd1_t)
-DECLARE_DEVICE_TYPE(FSD2,                       fsd2_t)
-DECLARE_DEVICE_TYPE(CSD1,                       csd1_t)
-DECLARE_DEVICE_TYPE(C1541_DOLPHIN_DOS,          c1541_dolphin_dos_t)
-DECLARE_DEVICE_TYPE(C1541_PROFESSIONAL_DOS_V1,  c1541_professional_dos_v1_t)
-DECLARE_DEVICE_TYPE(C1541_PROLOGIC_DOS_CLASSIC, c1541_prologic_dos_classic_t)
-DECLARE_DEVICE_TYPE(INDUS_GT,                   indus_gt_t)
-DECLARE_DEVICE_TYPE(TECHNICA,                   technica_t)
-DECLARE_DEVICE_TYPE(BLUE_CHIP,                  blue_chip_t)
-DECLARE_DEVICE_TYPE(COMMANDER_C2,               commander_c2_t)
-DECLARE_DEVICE_TYPE(ENHANCER_2000,              enhancer_2000_t)
-DECLARE_DEVICE_TYPE(FD148,                      fd148_t)
-DECLARE_DEVICE_TYPE(MSD_SD1,                    msd_sd1_t)
-DECLARE_DEVICE_TYPE(MSD_SD2,                    msd_sd2_t)
+DECLARE_DEVICE_TYPE(C1540,                      c1540_device)
+DECLARE_DEVICE_TYPE(C1541,                      c1541_device)
+DECLARE_DEVICE_TYPE(C1541C,                     c1541c_device)
+DECLARE_DEVICE_TYPE(C1541II,                    c1541ii_device)
+DECLARE_DEVICE_TYPE(SX1541,                     sx1541_device)
+DECLARE_DEVICE_TYPE(FSD1,                       fsd1_device)
+DECLARE_DEVICE_TYPE(FSD2,                       fsd2_device)
+DECLARE_DEVICE_TYPE(CSD1,                       csd1_device)
+DECLARE_DEVICE_TYPE(C1541_DOLPHIN_DOS,          c1541_dolphin_dos_device)
+DECLARE_DEVICE_TYPE(C1541_PROFESSIONAL_DOS_V1,  c1541_professional_dos_v1_device)
+DECLARE_DEVICE_TYPE(C1541_PROLOGIC_DOS_CLASSIC, c1541_prologic_dos_classic_device)
+DECLARE_DEVICE_TYPE(INDUS_GT,                   indus_gt_device)
+DECLARE_DEVICE_TYPE(TECHNICA,                   technica_device)
+DECLARE_DEVICE_TYPE(BLUE_CHIP,                  blue_chip_device)
+DECLARE_DEVICE_TYPE(COMMANDER_C2,               commander_c2_device)
+DECLARE_DEVICE_TYPE(ENHANCER_2000,              enhancer_2000_device)
+DECLARE_DEVICE_TYPE(FD148,                      fd148_device)
+DECLARE_DEVICE_TYPE(MSD_SD1,                    msd_sd1_device)
+DECLARE_DEVICE_TYPE(MSD_SD2,                    msd_sd2_device)
 
 
 #endif // MAME_BUS_CBMIEC_C1541_H

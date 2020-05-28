@@ -24,8 +24,8 @@
 class cultures_state : public driver_device
 {
 public:
-	cultures_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cultures_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_vrambank(*this, "vrambank"),
@@ -68,10 +68,10 @@ public:
 	int      m_irq_enable;
 	int      m_bg1_bank;
 	int      m_bg2_bank;
-	DECLARE_WRITE8_MEMBER(cpu_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(bg0_videoram_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(bg_bank_w);
+	void cpu_bankswitch_w(uint8_t data);
+	void bg0_videoram_w(offs_t offset, uint8_t data);
+	void misc_w(uint8_t data);
+	void bg_bank_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
@@ -92,26 +92,26 @@ public:
 TILE_GET_INFO_MEMBER(cultures_state::get_bg1_tile_info)
 {
 	int const code = m_bg1_rom[0x200000/2 + m_bg1_bank * 0x80000/2 + tile_index];
-	SET_TILE_INFO_MEMBER(1, code, code >> 12, 0);
+	tileinfo.set(1, code, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(cultures_state::get_bg2_tile_info)
 {
 	int const code = m_bg2_rom[0x200000/2 + m_bg2_bank * 0x80000/2 + tile_index];
-	SET_TILE_INFO_MEMBER(2, code, code >> 12, 0);
+	tileinfo.set(2, code, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(cultures_state::get_bg0_tile_info)
 {
 	int const code = m_bg0_videoram[tile_index * 2] + (m_bg0_videoram[tile_index * 2 + 1] << 8);
-	SET_TILE_INFO_MEMBER(0, code, code >> 12, 0);
+	tileinfo.set(0, code, code >> 12, 0);
 }
 
 void cultures_state::video_start()
 {
-	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 128);
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
+	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cultures_state::get_bg0_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 128);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cultures_state::get_bg1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cultures_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
 
 	m_bg1_tilemap->set_transparent_pen(0);
 	m_bg0_tilemap->set_transparent_pen(0);
@@ -154,26 +154,26 @@ uint32_t cultures_state::screen_update_cultures(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(cultures_state::cpu_bankswitch_w)
+void cultures_state::cpu_bankswitch_w(uint8_t data)
 {
 	m_prgbank->set_entry(data & 0x0f);
 	m_vrambank->set_bank((data & 0x20)>>5);
 }
 
 
-WRITE8_MEMBER(cultures_state::bg0_videoram_w)
+void cultures_state::bg0_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg0_videoram[offset] = data;
 	m_bg0_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(cultures_state::misc_w)
+void cultures_state::misc_w(uint8_t data)
 {
 	m_okibank->set_entry(data&0x0f);
 	m_irq_enable = data & 0x80;
 }
 
-WRITE8_MEMBER(cultures_state::bg_bank_w)
+void cultures_state::bg_bank_w(uint8_t data)
 {
 	if (m_bg1_bank != (data & 3))
 	{

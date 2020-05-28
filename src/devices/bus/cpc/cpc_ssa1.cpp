@@ -177,8 +177,8 @@ void cpc_ssa1_device::device_start()
 
 	m_rom = memregion("sp0256")->base();
 
-	space.install_readwrite_handler(0xfaee,0xfaee,read8_delegate(FUNC(cpc_ssa1_device::ssa1_r),this),write8_delegate(FUNC(cpc_ssa1_device::ssa1_w),this));
-	space.install_readwrite_handler(0xfbee,0xfbee,read8_delegate(FUNC(cpc_ssa1_device::ssa1_r),this),write8_delegate(FUNC(cpc_ssa1_device::ssa1_w),this));
+	space.install_readwrite_handler(0xfaee,0xfaee, read8_delegate(*this, FUNC(cpc_ssa1_device::ssa1_r)), write8_delegate(*this, FUNC(cpc_ssa1_device::ssa1_w)));
+	space.install_readwrite_handler(0xfbee,0xfbee, read8_delegate(*this, FUNC(cpc_ssa1_device::ssa1_r)), write8_delegate(*this, FUNC(cpc_ssa1_device::ssa1_w)));
 }
 
 void cpc_dkspeech_device::device_start()
@@ -188,7 +188,7 @@ void cpc_dkspeech_device::device_start()
 
 	m_rom = memregion("sp0256")->base();
 
-	space.install_readwrite_handler(0xfbfe,0xfbfe,read8_delegate(FUNC(cpc_dkspeech_device::dkspeech_r),this),write8_delegate(FUNC(cpc_dkspeech_device::dkspeech_w),this));
+	space.install_readwrite_handler(0xfbfe,0xfbfe, read8_delegate(*this, FUNC(cpc_dkspeech_device::dkspeech_r)), write8_delegate(*this, FUNC(cpc_dkspeech_device::dkspeech_w)));
 }
 
 //-------------------------------------------------

@@ -30,7 +30,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_cart(*this, "cartslot")
-		, m_laser_file(*this, {FLOPPY_0, FLOPPY_1})
+		, m_laser_file(*this, "floppy%u", 0U)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_videoram(*this, "videoram")

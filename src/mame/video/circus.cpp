@@ -13,18 +13,18 @@
 #include "includes/circus.h"
 
 
-WRITE8_MEMBER(circus_state::circus_videoram_w)
+void circus_state::circus_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(circus_state::circus_clown_x_w)
+void circus_state::circus_clown_x_w(uint8_t data)
 {
 	m_clown_x = 240 - data;
 }
 
-WRITE8_MEMBER(circus_state::circus_clown_y_w)
+void circus_state::circus_clown_y_w(uint8_t data)
 {
 	m_clown_y = 240 - data;
 }
@@ -33,12 +33,12 @@ TILE_GET_INFO_MEMBER(circus_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void circus_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(circus_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(circus_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 void circus_state::draw_line( bitmap_ind16 &bitmap, const rectangle &cliprect, int x1, int y1, int x2, int y2, int dotted )

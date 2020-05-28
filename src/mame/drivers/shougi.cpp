@@ -2,7 +2,7 @@
 // copyright-holders:Jarek Burczynski, Tomasz Slanina
 /***************************************************************************
 
-Driver by Jarek Burczynski, started by Tomasz Slanina  dox@space.pl
+Driver by Jarek Burczynski, started by Tomasz Slanina
 Lots of hardware info from Guru
 
 memory map :
@@ -391,7 +391,7 @@ void shougi_state::shougi(machine_config &config)
 	mainlatch.q_out_cb<4>().set(m_alpha_8201, FUNC(alpha_8201_device::bus_dir_w)).invert(); // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
 	mainlatch.q_out_cb<7>().set_nop(); // nothing? connected to +5v via resistor
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 0x10); // assuming it's the same as champbas
 

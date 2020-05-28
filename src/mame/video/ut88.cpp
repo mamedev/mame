@@ -24,20 +24,14 @@ const gfx_layout ut88_charlayout =
 	8*8                 /* size of one char */
 };
 
-VIDEO_START_MEMBER(ut88_state,ut88)
+uint32_t ut88_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-}
-
-uint32_t ut88_state::screen_update_ut88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int x,y;
-
-	for(y = 0; y < 28; y++ )
+	for (int y = 0; y < 28; y++)
 	{
-		for(x = 0; x < 64; x++ )
+		for (int x = 0; x < 64; x++)
 		{
-			int code = m_p_videoram[ x + y*64 ] & 0x7f;
-			int attr = m_p_videoram[ x+1 + y*64 ] & 0x80;
+			int code = m_p_videoram[x +   y*64] & 0x7f;
+			int attr = m_p_videoram[x+1 + y*64] & 0x80;
 			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, code | attr, 0, 0,0, x*8,y*8);
 		}
 	}

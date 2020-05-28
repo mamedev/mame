@@ -7,9 +7,9 @@
     Device by Angelo Salese
 
     TODO:
-	- The only current example (Trivia R Us touchscreen) expects to read 
-	  stuff before transmitting anything, except for loopback test and a 
-	  signal break enabling at POST (!?).
+    - The only current example (Trivia R Us touchscreen) expects to read
+      stuff before transmitting anything, except for loopback test and a
+      signal break enabling at POST (!?).
 
 ***************************************************************************/
 
@@ -67,7 +67,7 @@ void vr0uart_device::device_reset()
 	m_ucon = 0x001;
 	m_ubdr = 1;
 	m_urxb_fifo.clear();
-	
+
 	update_serial_config();
 }
 
@@ -87,11 +87,11 @@ inline uint32_t vr0uart_device::calculate_baud_rate()
 void vr0uart_device::update_serial_config()
 {
 	const parity_t parity_modes[4] = { PARITY_NONE, PARITY_NONE, PARITY_EVEN, PARITY_ODD };
-	
+
 	uint8_t word_length = m_ucon & 1 ? 8 : 7;
-	parity_t parity_mode = parity_modes[(m_ucon & 0xc) >> 2]; 
+	parity_t parity_mode = parity_modes[(m_ucon & 0xc) >> 2];
 	stop_bits_t stop_bits = m_ucon & 2 ? STOP_BITS_2 : STOP_BITS_1;
-	
+
 	set_data_frame(1, word_length, parity_mode, stop_bits);
 
 	if (m_ucon & 0x100) // UART Enable
@@ -135,7 +135,7 @@ void vr0uart_device::rcv_complete()
 	}
 	else
 		m_ustat |= 1; // overrun
-	
+
 	if (m_ucon & 0x20 && m_ustat & 0xf)
 		m_parent->IntReq(m_channel_num ? 16 : 13);
 	else
@@ -182,7 +182,7 @@ READ32_MEMBER( vr0uart_device::status_r )
 {
 	uint32_t res = m_ustat;
 	if (!m_urxb_fifo.empty())
-	{	
+	{
 		res |= 0x10;
 		res |= (m_urxb_fifo.queue_length() << 8);
 	}
@@ -201,7 +201,7 @@ READ32_MEMBER( vr0uart_device::receive_buffer_r )
 {
 	// TODO: unknown value & behaviour attempting to read this on empty FIFO (stall?)
 	uint8_t res = 0;
-	
+
 	if (ACCESSING_BITS_0_7 && !m_urxb_fifo.empty())
 		res = m_urxb_fifo.dequeue();
 

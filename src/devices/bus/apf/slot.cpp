@@ -25,10 +25,10 @@ DEFINE_DEVICE_TYPE(APF_CART_SLOT, apf_cart_slot_device, "apf_cart_slot", "APF Ca
 //  device_apf_cart_interface - constructor
 //-------------------------------------------------
 
-device_apf_cart_interface::device_apf_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0)
+device_apf_cart_interface::device_apf_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "apfcart"),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
 
@@ -75,8 +75,9 @@ void device_apf_cart_interface::ram_alloc(uint32_t size)
 apf_cart_slot_device::apf_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, APF_CART_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
-	m_type(APF_STD), m_cart(nullptr)
+	device_single_card_slot_interface<device_apf_cart_interface>(mconfig, *this),
+	m_type(APF_STD),
+	m_cart(nullptr)
 {
 }
 
@@ -95,7 +96,7 @@ apf_cart_slot_device::~apf_cart_slot_device()
 
 void apf_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_apf_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 
@@ -226,10 +227,10 @@ std::string apf_cart_slot_device::get_default_card_software(get_default_card_sof
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(apf_cart_slot_device::read_rom)
+uint8_t apf_cart_slot_device::read_rom(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom(space, offset);
+		return m_cart->read_rom(offset);
 	else
 		return 0xff;
 }
@@ -238,10 +239,10 @@ READ8_MEMBER(apf_cart_slot_device::read_rom)
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(apf_cart_slot_device::extra_rom)
+uint8_t apf_cart_slot_device::extra_rom(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->extra_rom(space, offset);
+		return m_cart->extra_rom(offset);
 	else
 		return 0xff;
 }
@@ -250,10 +251,10 @@ READ8_MEMBER(apf_cart_slot_device::extra_rom)
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(apf_cart_slot_device::read_ram)
+uint8_t apf_cart_slot_device::read_ram(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_ram(space, offset);
+		return m_cart->read_ram(offset);
 	else
 		return 0xff;
 }
@@ -262,8 +263,8 @@ READ8_MEMBER(apf_cart_slot_device::read_ram)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(apf_cart_slot_device::write_ram)
+void apf_cart_slot_device::write_ram(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_ram(space, offset, data);
+		m_cart->write_ram(offset, data);
 }

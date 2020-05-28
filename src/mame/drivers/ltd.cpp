@@ -74,10 +74,10 @@ public:
 private:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_WRITE8_MEMBER(port2_w);
+	uint8_t port1_r();
+	void port1_w(uint8_t data);
+	uint8_t port2_r();
+	void port2_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(count_reset_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
 	void ltd3_map(address_map &map);
@@ -114,7 +114,7 @@ void ltd_state::ltd4_map(address_map &map)
 	map(0x1000, 0x1000).w("aysnd_0", FUNC(ay8910_device::address_w));
 	map(0x1400, 0x1400).w("aysnd_0", FUNC(ay8910_device::reset_w));
 	map(0x1800, 0x1800).w("aysnd_1", FUNC(ay8910_device::address_w));
-	//AM_RANGE(0x2800, 0x2800) AM_WRITE(auxlamps_w)
+	//map(0x2800, 0x2800).w(FUNC(ltd_state::auxlamps_w));
 	map(0x3000, 0x3000).w("aysnd_0", FUNC(ay8910_device::data_w));
 	map(0x3800, 0x3800).w("aysnd_1", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xdfff).rom().mirror(0x2000).region("roms", 0);
@@ -274,7 +274,7 @@ WRITE8_MEMBER( ltd_state::io_w )
 	offset >>= 10; // reduces offsets to 1 per bank
 }
 
-READ8_MEMBER( ltd_state:: port1_r )
+uint8_t ltd_state:: port1_r()
 {
 	if (~m_port2 & 0x10)
 	{
@@ -307,7 +307,7 @@ READ8_MEMBER( ltd_state:: port1_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( ltd_state::port1_w )
+void ltd_state::port1_w(uint8_t data)
 {
 	if (m_port2 & 0x10)
 	{
@@ -348,12 +348,12 @@ WRITE8_MEMBER( ltd_state::port1_w )
 	}
 }
 
-READ8_MEMBER( ltd_state:: port2_r )
+uint8_t ltd_state:: port2_r()
 {
 	return m_port2;
 }
 
-WRITE8_MEMBER( ltd_state::port2_w )
+void ltd_state::port2_w(uint8_t data)
 {
 	if (~m_port2 & data & 0x10)
 		m_counter++;
@@ -524,8 +524,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 void ltd_state::ltd3(machine_config &config)
 {
 	/* basic machine hardware */
-	M6802(config, m_maincpu, XTAL(3'579'545));
-	m_maincpu->set_addrmap(AS_PROGRAM, &ltd_state::ltd3_map);
+	m6802_cpu_device &maincpu(M6802(config, m_maincpu, XTAL(3'579'545)));
+	maincpu.set_ram_enable(false); // FIXME: needs standby support
+	maincpu.set_addrmap(AS_PROGRAM, &ltd_state::ltd3_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -728,7 +729,7 @@ ROM_END
 /-------------------------------------------------------------------*/
 ROM_START(tmacltd4)
 	ROM_REGION(0x2000, "roms", 0)
-	ROM_LOAD("tm4-l.bin", 0x0000, 0x1000, NO_DUMP)
+	ROM_LOAD("tm4-l.bin", 0x0000, 0x1000, CRC(69691662) SHA1(3d86314967075e3f5b168c8d7bf6b26bbbb957bd))
 	ROM_LOAD("tm4-h.bin", 0x1000, 0x1000, CRC(f5f97992) SHA1(ba31f71a600e7061b500e0750f50643503e52a80))
 ROM_END
 

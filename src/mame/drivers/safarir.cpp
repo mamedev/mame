@@ -184,7 +184,7 @@ TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
 			color |= (tile_index & 0xc0) ? 1 : 0;
 	}
 
-	SET_TILE_INFO_MEMBER(0, code & 0x7f, color, 0);
+	tileinfo.set(0, code & 0x7f, color, 0);
 }
 
 
@@ -201,14 +201,14 @@ TILE_GET_INFO_MEMBER(safarir_state::get_fg_tile_info)
 
 	flags = ((tile_index & 0x1f) >= 0x03) ? 0 : TILE_FORCE_LAYER0;
 
-	SET_TILE_INFO_MEMBER(1, code & 0x7f, color, flags);
+	tileinfo.set(1, code & 0x7f, color, flags);
 }
 
 
 void safarir_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(safarir_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(safarir_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(safarir_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(safarir_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }

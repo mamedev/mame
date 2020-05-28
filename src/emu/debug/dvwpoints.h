@@ -43,8 +43,8 @@ private:
 
 
 	// internal state
-	bool (*m_sortType)(const device_debug::watchpoint *, const device_debug::watchpoint *);
-	std::vector<device_debug::watchpoint *> m_buffer;
+	bool (*m_sortType)(const debug_watchpoint *, const debug_watchpoint *);
+	std::vector<debug_watchpoint *> m_buffer;
 };
 
 #endif // MAME_EMU_DEBUG_DVWPOINTS_H

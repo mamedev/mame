@@ -61,12 +61,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
-	DECLARE_READ8_MEMBER(ppi_porta_r);
-	DECLARE_WRITE8_MEMBER(ppi_porta_w);
-	DECLARE_READ8_MEMBER(ppi_portb_r);
-	DECLARE_WRITE8_MEMBER(ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
-	DECLARE_READ8_MEMBER(ppi_portc_r);
+	uint8_t ppi_porta_r();
+	void ppi_porta_w(uint8_t data);
+	uint8_t ppi_portb_r();
+	void ppi_portb_w(uint8_t data);
+	void ppi_portc_w(uint8_t data);
+	uint8_t ppi_portc_r();
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 

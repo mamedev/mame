@@ -379,7 +379,7 @@ void namcond1_state::namcond1(machine_config &config)
 	m_mcu->set_addrmap(AS_IO, &namcond1_state::nd1h8iomap);
 	m_mcu->set_vblank_int("screen", FUNC(namcond1_state::mcu_interrupt));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	YGV608(config, m_ygv608, 0);
 	m_ygv608->vblank_callback().set(FUNC(namcond1_state::vblank_irq_w));

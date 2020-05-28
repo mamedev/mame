@@ -165,9 +165,9 @@ private:
 	required_device<tms9902_device> m_uart_ic5;
 	required_device<tms9902_device> m_uart_ic10;
 
-	DECLARE_WRITE8_MEMBER(jpmmps_meters_w);
-	DECLARE_WRITE8_MEMBER(jpmmps_psg_buf_w);
-	DECLARE_WRITE8_MEMBER(jpmmps_ic22_portc_w);
+	void jpmmps_meters_w(uint8_t data);
+	void jpmmps_psg_buf_w(uint8_t data);
+	void jpmmps_ic22_portc_w(uint8_t data);
 };
 
 void jpmmps_state::jpmmps_map(address_map &map)
@@ -187,13 +187,13 @@ void jpmmps_state::jpmmps_io_map(address_map &map)
 	map.global_mask(0x1ff);
 	map(0x0000, 0x003f).rw(UART_IC5, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
 
-//  AM_RANGE(0x0040, 0x0041) // power fail
-//  AM_RANGE(0x0042, 0x0043) // wd timeout
-//  AM_RANGE(0x0044, 0x0045) // invalid access
-//  AM_RANGE(0x0046, 0x0047) // clear down
+//  map(0x0040, 0x0041) // power fail
+//  map(0x0042, 0x0043) // wd timeout
+//  map(0x0044, 0x0045) // invalid access
+//  map(0x0046, 0x0047) // clear down
 
-//  AM_RANGE(0x004c, 0x004d) // uart4 int
-//  AM_RANGE(0x004e, 0x004f) // uart2 int
+//  map(0x004c, 0x004d) // uart4 int
+//  map(0x004e, 0x004f) // uart2 int
 
 	map(0x0080, 0x00bf).rw(UART_IC10, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
 	map(0x00c0, 0x00cf).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -203,7 +203,7 @@ void jpmmps_state::jpmmps_io_map(address_map &map)
 static INPUT_PORTS_START( jpmmps )
 INPUT_PORTS_END
 
-WRITE8_MEMBER(jpmmps_state::jpmmps_meters_w)
+void jpmmps_state::jpmmps_meters_w(uint8_t data)
 {
 	for (int meter = 0; meter < 8; meter ++)
 	{
@@ -212,12 +212,12 @@ WRITE8_MEMBER(jpmmps_state::jpmmps_meters_w)
 }
 
 
-WRITE8_MEMBER(jpmmps_state::jpmmps_psg_buf_w)
+void jpmmps_state::jpmmps_psg_buf_w(uint8_t data)
 {
 	m_sound_buffer = data;
 }
 
-WRITE8_MEMBER(jpmmps_state::jpmmps_ic22_portc_w)
+void jpmmps_state::jpmmps_ic22_portc_w(uint8_t data)
 {
 	//Handle PSG
 

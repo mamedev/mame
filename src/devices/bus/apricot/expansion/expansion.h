@@ -57,7 +57,7 @@ class device_apricot_expansion_card_interface;
 
 // ======================> apricot_expansion_slot_device
 
-class apricot_expansion_slot_device : public device_t, public device_slot_interface
+class apricot_expansion_slot_device : public device_t, public device_single_card_slot_interface<device_apricot_expansion_card_interface>
 {
 public:
 	// construction/destruction
@@ -151,7 +151,7 @@ DECLARE_DEVICE_TYPE(APRICOT_EXPANSION_BUS, apricot_expansion_bus_device)
 
 // ======================> device_apricot_expansion_card_interface
 
-class device_apricot_expansion_card_interface : public device_slot_card_interface
+class device_apricot_expansion_card_interface : public device_interface
 {
 	template <class ElementType> friend class simple_list;
 

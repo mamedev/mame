@@ -662,33 +662,11 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout tilelayout =
-{
-	8,8,    /* tile size */
-	RGN_FRAC(1,1),  /* number of tiles */
-	4,  /* 4 bits per pixel */
-	{ STEP4(0,1) }, /* the bitplanes are packed in one nibble */
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	4*8*8    /* offset to next tile */
-};
-
-static const gfx_layout tile2layout =
-{
-	16,16,  /* tile size */
-	RGN_FRAC(1,1),  /* number of tiles */
-	4,  /* 4 bits per pixel */
-	{ STEP4(0,1) }, /* the bitplanes are packed in one nibble */
-	{ STEP8(0,4), STEP8(4*8*8,4) },
-	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
-	4*8*8*2*2   /* offset to next tile */
-};
-
 static GFXDECODE_START( gfx_gaiden )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0x100,    16 ) /* tiles 8x8  */
-	GFXDECODE_ENTRY( "gfx2", 0, tile2layout, 0x000, 0x100 ) /* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile2layout, 0x000, 0x100 ) /* tiles 16x16 (only colors 0x00-0x0f and 0x80-0x8f are used) */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,  0x000, 0x100 ) /* sprites 8x8 (only colors 0x00-0x0f and 0x80-0x8f are used) */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x100,    16 ) /* tiles 8x8  */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 0x100 ) /* tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 0x100 ) /* tiles 16x16 (only colors 0x00-0x0f and 0x80-0x8f are used) */
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_packed_msb,               0x000, 0x100 ) /* sprites 8x8 (only colors 0x00-0x0f and 0x80-0x8f are used) */
 GFXDECODE_END
 
 static const gfx_layout mastninj_tile2layout =
@@ -714,10 +692,10 @@ static const gfx_layout mastninj_spritelayout =
 };
 
 static GFXDECODE_START( gfx_mastninj )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0x000, 16 )  /* tiles 8x8  */
-	GFXDECODE_ENTRY( "gfx2", 0, mastninj_tile2layout,       0x300, 16 ) /* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, mastninj_tile2layout,       0x200, 16 ) /* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, mastninj_spritelayout,      0x100, 16 ) /* sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,  0x000, 16 )  /* tiles 8x8  */
+	GFXDECODE_ENTRY( "gfx2", 0, mastninj_tile2layout,  0x300, 16 ) /* tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, mastninj_tile2layout,  0x200, 16 ) /* tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, mastninj_spritelayout, 0x100, 16 ) /* sprites 16x16 */
 GFXDECODE_END
 
 static const gfx_layout drgnbowl_tile2layout =
@@ -743,7 +721,7 @@ static const gfx_layout drgnbowl_spritelayout =
 };
 
 static GFXDECODE_START( gfx_drgnbowl )
-	GFXDECODE_ENTRY( "gfx1", 0,       tilelayout,                0, 16 )    /* tiles 8x8  */
+	GFXDECODE_ENTRY( "gfx1", 0,       gfx_8x8x4_packed_msb,      0, 16 )    /* tiles 8x8  */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, drgnbowl_tile2layout,  0x300, 16 )    /* tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0x20000, drgnbowl_tile2layout,  0x200, 16 )    /* tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0,       drgnbowl_spritelayout, 0x100, 16 )    /* sprites 16x16 */
@@ -829,7 +807,7 @@ void gaiden_state::raiga(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,raiga)
 
 	m_screen->set_screen_update(FUNC(gaiden_state::screen_update_raiga));
-	m_screen->screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	m_screen->screen_vblank().set(FUNC(gaiden_state::screen_vblank_raiga));
 }
 
 void gaiden_state::drgnbowl(machine_config &config)
@@ -968,19 +946,19 @@ void gaiden_state::mastninj_map(address_map &map)
 	map(0x074000, 0x075fff).ram().w(FUNC(gaiden_state::bg_videoram_w)).share("videoram3");
 	map(0x076000, 0x077fff).ram().share("spriteram");
 	map(0x078000, 0x079fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-//  AM_RANGE(0x078800, 0x079fff) AM_RAM
+//  map(0x078800, 0x079fff).ram();
 	map(0x07a000, 0x07a001).portr("SYSTEM");
 	map(0x07a002, 0x07a003).portr("P1_P2");
 	map(0x07a004, 0x07a005).portr("DSW");
-//  AM_RANGE(0x07a104, 0x07a105) AM_WRITE(gaiden_txscrolly_w)
-//  AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE(gaiden_txscrollx_w)
+//  map(0x07a104, 0x07a105).w(FUNC(gaiden_state::gaiden_txscrolly_w));
+//  map(0x07a10c, 0x07a10d).w(FUNC(gaiden_state::gaiden_txscrollx_w));
 	map(0x07f000, 0x07f001).w(FUNC(gaiden_state::gaiden_bgscrolly_w));
 	map(0x07f002, 0x07f003).w(FUNC(gaiden_state::gaiden_bgscrollx_w));
 	map(0x07f004, 0x07f005).w(FUNC(gaiden_state::gaiden_fgscrolly_w));
 	map(0x07f006, 0x07f007).w(FUNC(gaiden_state::gaiden_fgscrollx_w));
 	map(0x07a800, 0x07a801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-//  AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
-//  AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
+//  map(0x07a806, 0x07a807).nopw();
+//  map(0x07a808, 0x07a809).w(FUNC(gaiden_state::gaiden_flip_w));
 	map(0x07a00e, 0x07a00e).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x07e000, 0x07e000).w(FUNC(gaiden_state::drgnbowl_irq_ack_w));
 }

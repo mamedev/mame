@@ -13,13 +13,14 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
-#include "machine/nvram.h"
-#include "machine/segaic16.h"
-#include "machine/upd4701.h"
+#include "machine/315_5195.h"
 #include "machine/315_5296.h"
+#include "machine/nvram.h"
+#include "machine/upd4701.h"
 #include "video/315_5313.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
+#include "screen.h"
 
 
 // ======================> segas18_state
@@ -38,15 +39,18 @@ public:
 		, m_vdp(*this, "gen_vdp")
 		, m_io(*this, "io")
 		, m_nvram(*this, "nvram")
+		, m_screen(*this, "screen")
 		, m_sprites(*this, "sprites")
 		, m_segaic16vid(*this, "segaic16vid")
 		, m_gfxdecode(*this, "gfxdecode")
-		, m_upd4701(*this, {"upd1", "upd2", "upd3"})
+		, m_upd4701(*this, "upd%u", 1U)
 		, m_workram(*this, "workram")
 		, m_sprites_region(*this, "sprites")
 		, m_soundbank(*this, "soundbank")
 		, m_gun_recoil(*this, "P%u_Gun_Recoil", 1U)
 		, m_romboard(ROM_BOARD_INVALID)
+		, m_custom_io_r(*this)
+		, m_custom_io_w(*this)
 		, m_grayscale_enable(false)
 		, m_vdp_enable(false)
 		, m_vdp_mixing(0)
@@ -78,18 +82,18 @@ private:
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
 
 	// read/write handlers
-	DECLARE_WRITE8_MEMBER( rom_5874_bank_w );
+	void rom_5874_bank_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER( rom_5987_bank_w );
 	DECLARE_WRITE16_MEMBER( rom_837_7525_bank_w );
-	DECLARE_WRITE8_MEMBER( misc_outputs_w );
+	void misc_outputs_w(uint8_t data);
 	DECLARE_READ16_MEMBER( misc_io_r );
 	DECLARE_WRITE16_MEMBER( misc_io_w );
-	DECLARE_WRITE8_MEMBER( soundbank_w );
+	void soundbank_w(uint8_t data);
 
 	// custom I/O
 	DECLARE_READ16_MEMBER( ddcrew_custom_io_r );
 	DECLARE_READ16_MEMBER( lghost_custom_io_r );
-	DECLARE_WRITE8_MEMBER( lghost_gun_recoil_w );
+	void lghost_gun_recoil_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER( lghost_custom_io_w );
 	DECLARE_READ16_MEMBER( wwally_custom_io_r );
 	DECLARE_WRITE16_MEMBER( wwally_custom_io_w );
@@ -152,6 +156,7 @@ private:
 	required_device<sega315_5313_device> m_vdp;
 	required_device<sega_315_5296_device> m_io;
 	required_device<nvram_device> m_nvram;
+	required_device<screen_device> m_screen;
 	required_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<gfxdecode_device> m_gfxdecode;

@@ -276,6 +276,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0804.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
@@ -391,16 +392,16 @@ WRITE16_MEMBER(wecleman_state::selected_ip_w)
 }
 
 /* $140021.b - Return the previously selected input port's value */
-READ16_MEMBER(wecleman_state::selected_ip_r)
+uint8_t wecleman_state::selected_ip_r()
 {
 	switch ( (m_selected_ip >> 5) & 3 )
 	{                                                                   // From WEC Le Mans Schems:
 		case 0:  return ioport("ACCEL")->read();        // Accel - Schems: Accelevr
-		case 1:  return ~0;                                             // ????? - Schems: Not Used
+		case 1:  return 0;                                              // ????? - Schems: Not Used
 		case 2:  return ioport("STEER")->read();        // Wheel - Schems: Handlevr
-		case 3:  return ~0;                                             // Table - Schems: Turnvr
+		case 3:  return 0;                                              // Table - Schems: Turnvr
 
-		default: return ~0;
+		default: return 0;
 	}
 }
 
@@ -539,8 +540,7 @@ void wecleman_state::wecleman_map(address_map &map)
 	map(0x140012, 0x140013).portr("IN1");    // ??
 	map(0x140014, 0x140015).portr("DSWA");   // DSW 2
 	map(0x140016, 0x140017).portr("DSWB");   // DSW 1
-	map(0x140020, 0x140021).writeonly();   // Paired with writes to $140003
-	map(0x140020, 0x140021).r(FUNC(wecleman_state::selected_ip_r)); // Accelerator or Wheel or ..
+	map(0x140021, 0x140021).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 	map(0x140030, 0x140031).nopw();    // toggles between 0 & 1 on hitting bumps and crashes (vibration?)
 }
 
@@ -572,7 +572,7 @@ void wecleman_state::hotchase_map(address_map &map)
 	map(0x140012, 0x140013).portr("IN1");    // ?? bit 4 from sound cpu
 	map(0x140014, 0x140015).portr("DSW2");   // DSW 2
 	map(0x140016, 0x140017).portr("DSW1");   // DSW 1
-	map(0x140020, 0x140021).r(FUNC(wecleman_state::selected_ip_r)).nopw(); // Paired with writes to $140003
+	map(0x140021, 0x140021).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write)); // Paired with writes to $140003
 	map(0x140022, 0x140023).nopr(); // read and written at $601c0, unknown purpose
 	map(0x140030, 0x140031).nopw();    // signal to cabinet vibration motors?
 }
@@ -635,7 +635,7 @@ WRITE8_MEMBER(wecleman_state::multiply_w)
 
 ** sample playing ends when a byte with bit 7 set is reached **/
 
-WRITE8_MEMBER(wecleman_state::wecleman_volume_callback)
+void wecleman_state::wecleman_volume_callback(uint8_t data)
 {
 	m_k007232[0]->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232[0]->set_volume(1, 0, (data & 0x0f) * 0x11);
@@ -722,13 +722,13 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_hs_w)
 template<int Chip>
 READ8_MEMBER(wecleman_state::hotchase_k007232_r)
 {
-	return m_k007232[Chip]->read(space, offset ^ 1);
+	return m_k007232[Chip]->read(offset ^ 1);
 }
 
 template<int Chip>
 WRITE8_MEMBER(wecleman_state::hotchase_k007232_w)
 {
-	m_k007232[Chip]->write(space, offset ^ 1, data);
+	m_k007232[Chip]->write(offset ^ 1, data);
 }
 
 void wecleman_state::hotchase_sound_map(address_map &map)
@@ -764,7 +764,7 @@ static INPUT_PORTS_START( wecleman )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Right SW")  // right sw
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Left SW")  // left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Thermo SW")  // thermo
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   // from sound cpu ?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0804_device, intr_r)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSWA")  /* $140015.b */
@@ -841,7 +841,7 @@ INPUT_PORTS_END
                             Hot Chase Input Ports
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(wecleman_state::hotchase_sound_status_r)
+READ_LINE_MEMBER(wecleman_state::hotchase_sound_status_r)
 {
 	return m_hotchase_sound_hs;
 }
@@ -861,8 +861,8 @@ static INPUT_PORTS_START( hotchase )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Right SW")   // right sw
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Left SW")  // left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Thermo SW")  // thermo
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // from sound cpu
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wecleman_state,hotchase_sound_status_r, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0804_device, intr_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(wecleman_state, hotchase_sound_status_r)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW2")  /* $140015.b */
@@ -1063,10 +1063,13 @@ void wecleman_state::wecleman(machine_config &config)
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wecleman_state::wecleman_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_START_OVERRIDE(wecleman_state, wecleman)
 	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, wecleman)
+
+	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown "ADCCLK" (generated on video board?)
+	adc.vin_callback().set(FUNC(wecleman_state::selected_ip_r));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1139,10 +1142,13 @@ void wecleman_state::hotchase(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wecleman_state::hotchase_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(wecleman_state::hotchase_sound_timer), attotime::from_hz(496));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, hotchase)
 	MCFG_MACHINE_START_OVERRIDE(wecleman_state, hotchase)
+
+	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown clock (generated on video board?)
+	adc.vin_callback().set(FUNC(wecleman_state::selected_ip_r));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1162,12 +1168,12 @@ void wecleman_state::hotchase(machine_config &config)
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_offsets(-0xb0 / 2, -16);
 	m_k051316[0]->set_wrap(1);
-	m_k051316[0]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_1), this);
+	m_k051316[0]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_1));
 
 	K051316(config, m_k051316[1], 0);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_offsets(-0xb0 / 2, -16);
-	m_k051316[1]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_2), this);
+	m_k051316[1]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_2));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

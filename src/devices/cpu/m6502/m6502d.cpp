@@ -62,6 +62,11 @@ offs_t m6502_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		flags |= 3;
 		break;
 
+	case DASM_amr:
+		util::stream_format(stream, " $%02x%02x, #$%02x, $%04x", params.r8(pc+2), params.r8(pc+1), params.r8(pc+3), uint16_t(pc + 5 + int8_t(params.r8(pc+4))));
+		flags |= 5;
+		break;
+
 	case DASM_bzp:
 		util::stream_format(stream, "%d $%02x", (opcodes.r8(pc) >> 4) & 7, params.r8(pc+1));
 		flags |= 2;
@@ -87,6 +92,11 @@ offs_t m6502_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		flags |= 2;
 		break;
 
+	case DASM_ima:
+		util::stream_format(stream, " #$%02x, $%02x%02x", params.r8(pc+1), params.r8(pc+3), params.r8(pc+2));
+		flags |= 4;
+		break;
+
 	case DASM_imm:
 		util::stream_format(stream, " #$%02x", params.r8(pc+1));
 		flags |= 2;
@@ -99,6 +109,11 @@ offs_t m6502_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 	case DASM_ind:
 		util::stream_format(stream, " ($%02x%02x)", params.r8(pc+2), params.r8(pc+1));
 		flags |= 3;
+		break;
+
+	case DASM_ipx:
+		util::stream_format(stream, " ($%02x), x", params.r8(pc+1));
+		flags |= 2;
 		break;
 
 	case DASM_isy:
@@ -124,6 +139,11 @@ offs_t m6502_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 	case DASM_rw2:
 		util::stream_format(stream, " $%04x", (pc & 0xf0000) | uint16_t(pc + 2 + int16_t((params.r8(pc+2) << 8) | params.r8(pc+1))));
 		flags |= 3;
+		break;
+
+	case DASM_vec:
+		util::stream_format(stream, "%d", (opcodes.r8(pc) >> 4) & 7);
+		flags |= 1;
 		break;
 
 	case DASM_zpb:

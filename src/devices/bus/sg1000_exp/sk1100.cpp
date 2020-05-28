@@ -235,7 +235,7 @@ bool sega_sk1100_device::is_readable(uint8_t offset)
     I8255 INTERFACE
 -------------------------------------------------*/
 
-READ8_MEMBER( sega_sk1100_device::ppi_pa_r )
+uint8_t sega_sk1100_device::ppi_pa_r()
 {
 	/*
 	    Signal  Description
@@ -253,7 +253,7 @@ READ8_MEMBER( sega_sk1100_device::ppi_pa_r )
 	return m_pa[m_keylatch]->read();
 }
 
-READ8_MEMBER( sega_sk1100_device::ppi_pb_r )
+uint8_t sega_sk1100_device::ppi_pb_r()
 {
 	/*
 	    Signal  Description
@@ -284,7 +284,7 @@ READ8_MEMBER( sega_sk1100_device::ppi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( sega_sk1100_device::ppi_pc_w )
+void sega_sk1100_device::ppi_pc_w(uint8_t data)
 {
 	/*
 	    Signal  Description

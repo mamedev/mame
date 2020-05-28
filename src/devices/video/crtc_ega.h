@@ -34,9 +34,9 @@ public:
 	auto res_out_vsync_callback() { return m_res_out_vsync_cb.bind(); }
 	auto res_out_vblank_callback() { return m_res_out_vblank_cb.bind(); }
 
-	template <typename... T> void set_begin_update_callback(T &&... args) { m_begin_update_cb = begin_update_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_row_update_callback(T &&... args) { m_row_update_cb = row_update_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_end_update_callback(T &&... args) { m_end_update_cb = end_update_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_begin_update_callback(T &&... args) { m_begin_update_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_row_update_callback(T &&... args) { m_row_update_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_end_update_callback(T &&... args) { m_end_update_cb.set(std::forward<T>(args)...); }
 	void config_set_hpixels_per_column(int hpixels_per_column) { m_hpixels_per_column = hpixels_per_column; }
 
 	/* select one of the registers for reading or writing */

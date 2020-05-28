@@ -25,12 +25,6 @@
 #define SOFTWARE_SUPPORTED_PARTIAL  1
 #define SOFTWARE_SUPPORTED_NO       2
 
-enum softlist_type
-{
-	SOFTWARE_LIST_ORIGINAL_SYSTEM,
-	SOFTWARE_LIST_COMPATIBLE_SYSTEM
-};
-
 enum software_compatibility
 {
 	SOFTWARE_IS_COMPATIBLE,
@@ -100,18 +94,26 @@ class software_list_device : public device_t
 	friend class softlist_parser;
 
 public:
+	enum class softlist_type
+	{
+		ORIGINAL_SYSTEM,
+		COMPATIBLE_SYSTEM
+	};
+
 	// construction/destruction
 	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// inline configuration helpers
 	software_list_device &set_type(const char *list, softlist_type list_type) { m_list_name.assign(list); m_list_type = list_type; return *this; }
-	software_list_device &set_original(const char *list) { return set_type(list, SOFTWARE_LIST_ORIGINAL_SYSTEM); }
-	software_list_device &set_compatible(const char *list) { return set_type(list, SOFTWARE_LIST_COMPATIBLE_SYSTEM); }
+	software_list_device &set_original(const char *list) { return set_type(list, softlist_type::ORIGINAL_SYSTEM); }
+	software_list_device &set_compatible(const char *list) { return set_type(list, softlist_type::COMPATIBLE_SYSTEM); }
 	software_list_device &set_filter(const char *filter) { m_filter = filter; return *this; }
 
 	// getters
 	const std::string &list_name() const { return m_list_name; }
 	softlist_type list_type() const { return m_list_type; }
+	bool is_original() const { return softlist_type::ORIGINAL_SYSTEM == m_list_type; }
+	bool is_compatible() const { return softlist_type::COMPATIBLE_SYSTEM == m_list_type; }
 	const char *filter() const { return m_filter; }
 	const char *filename() { return m_file.filename(); }
 

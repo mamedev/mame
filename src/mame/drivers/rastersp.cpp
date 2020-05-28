@@ -129,8 +129,8 @@ private:
 	DECLARE_WRITE32_MEMBER(dsp_486_int_w);
 	DECLARE_READ32_MEMBER(dsp_speedup_r);
 	DECLARE_WRITE32_MEMBER(dsp_speedup_w);
-	DECLARE_READ32_MEMBER(ncr53c700_read);
-	DECLARE_WRITE32_MEMBER(ncr53c700_write);
+	uint32_t ncr53c700_read(offs_t offset, uint32_t mem_mask = ~0);
+	void ncr53c700_write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 
 	TIMER_CALLBACK_MEMBER(tms_timer1);
@@ -186,8 +186,8 @@ void rastersp_state::machine_start()
 		m_tms_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rastersp_state::tms_tx_timer), this));
 
 #if USE_SPEEDUP_HACK
-	m_dsp->space(AS_PROGRAM).install_read_handler(0x809923, 0x809923, read32_delegate(FUNC(rastersp_state::dsp_speedup_r), this));
-	m_dsp->space(AS_PROGRAM).install_write_handler(0x809923, 0x809923, write32_delegate(FUNC(rastersp_state::dsp_speedup_w), this));
+	m_dsp->space(AS_PROGRAM).install_read_handler(0x809923, 0x809923, read32_delegate(*this, FUNC(rastersp_state::dsp_speedup_r)));
+	m_dsp->space(AS_PROGRAM).install_write_handler(0x809923, 0x809923, write32_delegate(*this, FUNC(rastersp_state::dsp_speedup_w)));
 #endif
 }
 
@@ -842,12 +842,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ32_MEMBER(rastersp_state::ncr53c700_read)
+uint32_t rastersp_state::ncr53c700_read(offs_t offset, uint32_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_dword(offset, mem_mask);
 }
 
-WRITE32_MEMBER(rastersp_state::ncr53c700_write)
+void rastersp_state::ncr53c700_write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_maincpu->space(AS_PROGRAM).write_dword(offset, data, mem_mask);
 }
@@ -935,10 +935,10 @@ void rastersp_state::rastersp(machine_config &config)
  *************************************/
 
 ROM_START( rotr )
-	ROM_REGION(0x100000, "bios", 0)
+	ROM_REGION32_LE(0x100000, "bios", 0)
 	ROM_LOAD( "rasterspeed2.1_bootrom4.u10", 0x00000, 0x10000, CRC(6da142d1) SHA1(e2dbd479034677726fc26fd1ba85c4458d89286c) )
 
-	ROM_REGION(0x1000000, "dspboot", 0)
+	ROM_REGION32_LE(0x1000000, "dspboot", 0)
 	ROM_LOAD32_BYTE( "rasterspeed2.1_bootrom4.u10", 0x00000, 0x10000, CRC(6da142d1) SHA1(e2dbd479034677726fc26fd1ba85c4458d89286c) )
 
 	ROM_REGION(0x8000, "proms", 0) /* Xilinx FPGA PROMs */
@@ -954,10 +954,10 @@ ROM_END
 
 
 ROM_START( rotra )
-	ROM_REGION(0x100000, "bios", 0)
+	ROM_REGION32_LE(0x100000, "bios", 0)
 	ROM_LOAD( "rasterspeed2.1_bootrom4.u10", 0x00000, 0x10000, CRC(6da142d1) SHA1(e2dbd479034677726fc26fd1ba85c4458d89286c) )
 
-	ROM_REGION(0x1000000, "dspboot", 0)
+	ROM_REGION32_LE(0x1000000, "dspboot", 0)
 	ROM_LOAD32_BYTE( "rasterspeed2.1_bootrom4.u10", 0x00000, 0x10000, CRC(6da142d1) SHA1(e2dbd479034677726fc26fd1ba85c4458d89286c) )
 
 	ROM_REGION(0x8000, "proms", 0) /* Xilinx FPGA PROMs */
@@ -987,10 +987,10 @@ ROM_END
 // the rom also exists in some odd hex format like this
 // ROM_LOAD( "95751937.hex", 0x0000, 0x025f91, CRC(8f412e97) SHA1(a5ff924fbc327114e59d75de644ed0d5cd7fa6b3) )
 ROM_START( fbcrazy )
-	ROM_REGION(0x100000, "bios", 0)
+	ROM_REGION32_LE(0x100000, "bios", 0)
 	ROM_LOAD( "95751937.bin", 0x0000, 0x010000, CRC(4a99ee11) SHA1(335398ebc64bbfe86e2652ac080a5943dd413928) )
 
-	ROM_REGION(0x1000000, "dspboot", 0)
+	ROM_REGION32_LE(0x1000000, "dspboot", 0)
 	ROM_LOAD32_BYTE( "95751937.bin", 0x0000, 0x010000, CRC(4a99ee11) SHA1(335398ebc64bbfe86e2652ac080a5943dd413928) )
 
 	ROM_REGION(0x8000, "proms", ROMREGION_ERASEFF )

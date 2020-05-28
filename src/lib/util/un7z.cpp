@@ -115,7 +115,7 @@ public:
 			{
 				ptr result;
 				std::swap(s_cache[cachenum], result);
-				osd_printf_verbose("un7z: found %s in cache\n", filename.c_str());
+				osd_printf_verbose("un7z: found %s in cache\n", filename);
 				return result;
 			}
 		}
@@ -314,7 +314,7 @@ archive_file::error m7z_file_impl::initialize()
 	if (err != osd_file::error::NONE)
 		return archive_file::error::FILE_ERROR;
 
-	osd_printf_verbose("un7z: opened archive file %s\n", m_filename.c_str());
+	osd_printf_verbose("un7z: opened archive file %s\n", m_filename);
 
 	CrcGenerateTable(); // FIXME: doesn't belong here - it should be called once statically
 
@@ -323,7 +323,7 @@ archive_file::error m7z_file_impl::initialize()
 	SRes const res = SzArEx_Open(&m_db, &m_look_stream.s, &m_alloc_imp, &m_alloc_temp_imp);
 	if (res != SZ_OK)
 	{
-		osd_printf_error("un7z: error opening %s as 7z archive (%d)\n", m_filename.c_str(), int(res));
+		osd_printf_error("un7z: error opening %s as 7z archive (%d)\n", m_filename, int(res));
 		switch (res)
 		{
 		case SZ_ERROR_UNSUPPORTED:  return archive_file::error::UNSUPPORTED;
@@ -347,7 +347,7 @@ void m7z_file_impl::close(ptr &&archive)
 	if (!archive) return;
 
 	// close the open files
-	osd_printf_verbose("un7z: closing archive file %s and sending to cache\n", archive->m_filename.c_str());
+	osd_printf_verbose("un7z: closing archive file %s and sending to cache\n", archive->m_filename);
 	archive->m_archive_stream.osdfile.reset();
 
 	// find the first nullptr entry in the cache
@@ -361,7 +361,7 @@ void m7z_file_impl::close(ptr &&archive)
 	if (cachenum == s_cache.size())
 	{
 		cachenum--;
-		osd_printf_verbose("un7z: removing %s from cache to make space\n", s_cache[cachenum]->m_filename.c_str());
+		osd_printf_verbose("un7z: removing %s from cache to make space\n", s_cache[cachenum]->m_filename);
 		s_cache[cachenum].reset();
 	}
 
@@ -387,7 +387,7 @@ archive_file::error m7z_file_impl::decompress(void *buffer, std::uint32_t length
 	// if we don't have enough buffer, error
 	if (length < m_curr_length)
 	{
-		osd_printf_error("un7z: buffer too small to decompress %s from %s\n", m_curr_name.c_str(), m_filename.c_str());
+		osd_printf_error("un7z: buffer too small to decompress %s from %s\n", m_curr_name, m_filename);
 		return archive_file::error::BUFFER_TOO_SMALL;
 	}
 
@@ -398,10 +398,10 @@ archive_file::error m7z_file_impl::decompress(void *buffer, std::uint32_t length
 		osd_file::error const err = osd_file::open(m_filename, OPEN_FLAG_READ, m_archive_stream.osdfile, m_archive_stream.length);
 		if (err != osd_file::error::NONE)
 		{
-			osd_printf_error("un7z: error reopening archive file %s (%d)\n", m_filename.c_str(), int(err));
+			osd_printf_error("un7z: error reopening archive file %s (%d)\n", m_filename, int(err));
 			return archive_file::error::FILE_ERROR;
 		}
-		osd_printf_verbose("un7z: reopened archive file %s\n", m_filename.c_str());
+		osd_printf_verbose("un7z: reopened archive file %s\n", m_filename);
 	}
 
 	std::size_t offset(0);
@@ -413,7 +413,7 @@ archive_file::error m7z_file_impl::decompress(void *buffer, std::uint32_t length
 			&m_alloc_imp, &m_alloc_temp_imp);                   // allocator helpers
 	if (res != SZ_OK)
 	{
-		osd_printf_error("un7z: error decompressing %s from %s (%d)\n", m_curr_name.c_str(), m_filename.c_str(), int(res));
+		osd_printf_error("un7z: error decompressing %s from %s (%d)\n", m_curr_name, m_filename, int(res));
 		switch (res)
 		{
 		case SZ_ERROR_UNSUPPORTED:  return archive_file::error::UNSUPPORTED;

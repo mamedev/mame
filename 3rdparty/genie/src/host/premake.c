@@ -15,9 +15,9 @@
 
 
 #define COPYRIGHT \
-			"Copyright (c) 2014-2015 Branimir Karadžić, Neil Richardson,\n" \
+			"Copyright (c) 2014-2018 Branimir Karadžić, Neil Richardson,\n" \
 			"Mike Popoloski, Drew Solomon, Ted de Munnik, Miodrag Milanović\n" \
-			"Brett Vickers, Terry Hendrix II.\n" \
+			"Brett Vickers, Terry Hendrix II, Johan Skoeld.\n" \
 			"Copyright (C) 2002-2013 Jason Perkins and the Premake Project"
 #define ERROR_MESSAGE  "%s\n"
 
@@ -265,7 +265,7 @@ int process_option(lua_State* L, const char* arg)
 	char* ptr = strchr(arg, '=');
 	if (ptr)
 	{
-		int len = ptr - arg;
+		int len = (int)(ptr - arg);
 		if (len > 511) len = 511;
 		strncpy(key, arg, len);
 		key[len] = '\0';

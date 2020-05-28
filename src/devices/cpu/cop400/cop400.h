@@ -113,8 +113,8 @@ public:
 	void set_cko(cop400_cko_bond cko) { m_cko = cko; }
 	void set_microbus(bool has_microbus) { m_has_microbus = has_microbus; }
 
-	DECLARE_READ8_MEMBER( microbus_rd );
-	DECLARE_WRITE8_MEMBER( microbus_wr );
+	uint8_t microbus_rd();
+	void microbus_wr(uint8_t data);
 
 	void data_128b(address_map &map);
 	void data_32b(address_map &map);
@@ -131,11 +131,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + m_cki - 1) / m_cki; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * m_cki); }
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 2; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + m_cki - 1) / m_cki; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * m_cki); }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 2; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -184,9 +184,8 @@ protected:
 	bool m_has_counter;
 	bool m_has_inil;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_data;
+	memory_access<11, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
+	memory_access< 7, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 
 	uint8_t m_featuremask;
 
@@ -265,7 +264,7 @@ protected:
 
 	uint8_t get_flags() const;
 	void set_flags(uint8_t flags);
-	uint8_t get_m() const;
+	uint8_t get_m();
 	void set_m(uint8_t m);
 
 	void illegal(uint8_t operand);

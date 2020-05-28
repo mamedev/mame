@@ -5,12 +5,13 @@
 
 #pragma once
 
-#include "video/sega16sp.h"
 #include "machine/74157.h"
 #include "machine/gen_latch.h"
-#include "machine/segaic16.h"
 #include "sound/msm5205.h"
 #include "sound/upd7759.h"
+#include "video/sega16sp.h"
+#include "video/segaic16.h"
+#include "screen.h"
 #include "tilemap.h"
 
 class segas1x_bootleg_state : public sega_16bit_common_base
@@ -28,6 +29,7 @@ public:
 		, m_soundcpu_region(*this, "soundcpu")
 		, m_soundbank(*this, "soundbank")
 		, m_okibank(*this, "okibank")
+		, m_screen(*this, "screen")
 		, m_sprites(*this, "sprites")
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
@@ -225,6 +227,7 @@ private:
 	optional_memory_bank m_soundbank;
 	optional_memory_bank m_okibank;
 
+	required_device<screen_device> m_screen;
 	optional_device<sega_16bit_sprite_device> m_sprites;
 
 	uint16_t m_coinctrl;

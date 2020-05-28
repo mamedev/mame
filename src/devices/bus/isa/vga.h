@@ -34,7 +34,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	vga_device *m_vga;
+	required_device<vga_device> m_vga;
 };
 
 

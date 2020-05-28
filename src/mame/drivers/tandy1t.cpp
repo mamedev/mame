@@ -34,13 +34,17 @@ Tandy 1000 (80286) variations:
 1000RLX-HD          1024MB RAM          10.0/5.0 MHz    v02.00.00
 
 Tandy 1000 (80386) variations:
-1000RSX/1000RSX-HD  1M-9M RAM           25.0/8.0 MHz    v01.10.00 */
+1000RSX/1000RSX-HD  1M-9M RAM           25.0/8.0 MHz    v01.10.00
+
+According to http://nerdlypleasures.blogspot.com/2014/04/the-original-8-bit-ide-interface.html
+the 286 based Tandy 1000 TL/2, TL/3, RLX, RLX-B and the 8086 based Tandy 1000RL & RL-HD
+used XTA (8-bit IDE) harddisks.
+*/
 
 #include "emu.h"
 #include "machine/genpc.h"
 #include "machine/pckeybrd.h"
 #include "machine/nvram.h"
-#include "machine/pc_fdc.h"
 #include "machine/bankdev.h"
 #include "video/pc_t1t.h"
 #include "sound/sn76496.h"
@@ -339,7 +343,7 @@ READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
 	case 0:
 		if (m_tandy_ppi_ack)
 		{
-			m_tandy_ppi_porta = m_keyboard->read(space, 0);
+			m_tandy_ppi_porta = m_keyboard->read();
 			m_tandy_ppi_ack = 0;
 		}
 		data = m_tandy_ppi_porta;
@@ -359,7 +363,7 @@ READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
 
 WRITE8_MEMBER( tandy1000_state::nmi_vram_bank_w )
 {
-	m_mb->nmi_enable_w(space, 0, data & 0x80);
+	m_mb->nmi_enable_w(data & 0x80);
 	vram_bank_w(space, 0, data & 0x1e);
 	m_video->disable_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -428,10 +432,10 @@ void tandy1000_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - (128*1024) - 1, &m_ram->pointer()[128*1024]);
 	if(m_maincpu->space(AS_PROGRAM).data_width() == 8)
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
-			read8_delegate(FUNC(tandy1000_state::vram_r), this), write8_delegate(FUNC(tandy1000_state::vram_w), this));
+				read8_delegate(*this, FUNC(tandy1000_state::vram_r)), write8_delegate(*this, FUNC(tandy1000_state::vram_w)));
 	else
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
-			read8_delegate(FUNC(tandy1000_state::vram_r), this), write8_delegate(FUNC(tandy1000_state::vram_w), this), 0xffff);
+				read8_delegate(*this, FUNC(tandy1000_state::vram_r)), write8_delegate(*this, FUNC(tandy1000_state::vram_w)), 0xffff);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
 }
 
@@ -645,13 +649,13 @@ void tandy1000_state::cfg_fdc_35(device_t *device)
 {
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
 }
 
 void tandy1000_state::cfg_fdc_525(device_t *device)
 {
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
 }
 
 static GFXDECODE_START( gfx_t1000 )
@@ -662,6 +666,8 @@ void tandy1000_state::tandy1000_common(machine_config &config)
 {
 	T1000_MOTHERBOARD(config, m_mb, 0);
 	m_mb->set_cputag("maincpu");
+	m_mb->int_callback().set_inputline("maincpu", 0);
+	m_mb->nmi_callback().set_inputline("maincpu", INPUT_LINE_NMI);
 
 	/* video hardware */
 	PCVIDEO_T1000(config, m_video, 0);
@@ -898,7 +904,7 @@ ROM_END
 
 
 ROM_START( t1000tx )
-	ROM_REGION(0x20000,"bios", 0)
+	ROM_REGION16_LE(0x20000, "bios", 0)
 	// There should be 2 32KBx8 ROMs, one for odd at u38, one for even at u39
 	// The machine already boots up with just this one rom
 	ROM_LOAD("t1000tx.bin", 0x18000, 0x8000, BAD_DUMP CRC(9b34765c) SHA1(0b07e87f6843393f7d4ca4634b832b0c0bec304e))
@@ -912,7 +918,7 @@ ROM_END
 
 ROM_START( t1000rl )
 	// bankable ROM regions
-	ROM_REGION(0x80000, "rom", 0)
+	ROM_REGION16_LE(0x80000, "rom", 0)
 	/* v2.0.0.1 */
 	/* Rom is labeled "(C) TANDY CORP. 1990 // 8079073 // LH534G70 JAPAN // 9034 D" */
 	ROM_LOAD("8079073.u23", 0x00000, 0x80000, CRC(6fab50f7) SHA1(2ccc02bee4c250dc1b7c17faef2590bc158860b0) )
@@ -925,7 +931,7 @@ ROM_END
 
 ROM_START( t1000sl2 )
 	// bankable ROM regions
-	ROM_REGION(0x80000, "rom", 0)
+	ROM_REGION16_LE(0x80000, "rom", 0)
 	// v01.04.04 BIOS
 	// Fix up memory region (highest address bit flipped??)
 	ROM_LOAD16_BYTE("8079047.hu1", 0x40000, 0x20000, CRC(c773ec0e) SHA1(7deb71f14c2c418400b639d60066ab61b7e9df32))
@@ -942,7 +948,7 @@ ROM_END
 
 
 ROM_START( t1000tl2 )
-	ROM_REGION(0x20000, "bios", 0)
+	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROM_LOAD( "t10000tl2.bin", 0x10000, 0x10000, CRC(e288f12c) SHA1(9d54ccf773cd7202c9906323f1b5a68b1b3a3a67))
 
 	ROM_REGION(0x08000,"gfx1", 0)

@@ -17,7 +17,6 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "machine/z80dart.h"
 #include "machine/z80dma.h"
 #include "machine/wd_fdc.h"
 #include "machine/clock.h"
@@ -46,15 +45,15 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 private:
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
-	DECLARE_READ8_MEMBER(port08_r);
-	DECLARE_READ8_MEMBER(port09_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_WRITE8_MEMBER(port09_w);
-	DECLARE_WRITE8_MEMBER(port14_w);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
+	uint8_t port08_r();
+	uint8_t port09_r();
+	void port08_w(uint8_t data);
+	void port09_w(uint8_t data);
+	void port14_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 
@@ -103,14 +102,14 @@ void altos5_state::mem_map(address_map &map)
 void altos5_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x00, 0x03).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x04, 0x07).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
 	map(0x08, 0x0b).rw(m_pio0, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x0c, 0x0f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw("pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x14, 0x17).w(FUNC(altos5_state::port14_w));
 	map(0x1c, 0x1f).rw("dart", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
-	//AM_RANGE(0x20, 0x23) // Hard drive
+	//map(0x20, 0x23) // Hard drive
 	map(0x2c, 0x2f).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 }
 
@@ -211,31 +210,31 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 
 // turns off IPL mode, removes boot rom from memory map
-WRITE8_MEMBER( altos5_state::port14_w )
+void altos5_state::port14_w(uint8_t data)
 {
 	m_ipl = 0;
 	setup_banks(2);
 }
 
-READ8_MEMBER(altos5_state::memory_read_byte)
+uint8_t altos5_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(altos5_state::memory_write_byte)
+void altos5_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(altos5_state::io_read_byte)
+uint8_t altos5_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(altos5_state::io_write_byte)
+void altos5_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);
@@ -256,7 +255,7 @@ d2: unused configuration input (must be H to skip HD boot)
 d3: selected floppy is single(L) or double sided(H)
 d7: IRQ from FDC
 */
-READ8_MEMBER( altos5_state::port08_r )
+uint8_t altos5_state::port08_r()
 {
 	uint8_t data = m_port08 | 0x87;
 	if (m_floppy)
@@ -267,7 +266,7 @@ READ8_MEMBER( altos5_state::port08_r )
 /*
 d0: HD IRQ
 */
-READ8_MEMBER( altos5_state::port09_r )
+uint8_t altos5_state::port09_r()
 {
 	return m_port09 & 0xfe;
 }
@@ -277,7 +276,7 @@ d4: DDEN (H = double density)
 d5: DS (H = drive 2)
 d6: SS (H = side 2)
 */
-WRITE8_MEMBER( altos5_state::port08_w )
+void altos5_state::port08_w(uint8_t data)
 {
 	m_port08 = data & 0x70;
 
@@ -303,7 +302,7 @@ d3, 4: CPU bank select
 d5:    H = Write protect of common area
 d6, 7: DMA bank select (not emulated)
 */
-WRITE8_MEMBER( altos5_state::port09_w )
+void  altos5_state::port09_w(uint8_t data)
 {
 	m_port09 = data;
 	setup_banks(2);
@@ -475,7 +474,7 @@ void altos5_state::altos5(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("altos5");
-	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(altos5_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(altos5_state::quickload_cb));
 }
 
 

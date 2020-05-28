@@ -419,6 +419,7 @@ each direction to assign the boundries.
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/s2650/s2650.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "sound/pokey.h"
@@ -457,7 +458,7 @@ MACHINE_RESET_MEMBER(centiped_state,centiped)
 	m_prg_bank = 0;
 
 	if (m_earom.found())
-		earom_control_w(machine().dummy_space(), 0, 0);
+		earom_control_w(0);
 }
 
 
@@ -615,7 +616,7 @@ READ8_MEMBER(centiped_state::bullsdrt_data_port_r)
  *
  *************************************/
 
-READ8_MEMBER(centiped_state::caterplr_unknown_r)
+uint8_t centiped_state::caterplr_unknown_r()
 {
 	return machine().rand() % 0xff;
 }
@@ -663,7 +664,7 @@ WRITE8_MEMBER(centiped_state::earom_write)
 	m_earom->set_data(data);
 }
 
-WRITE8_MEMBER(centiped_state::earom_control_w)
+void centiped_state::earom_control_w(uint8_t data)
 {
 	// CK = DB0, C1 = /DB1, C2 = DB2, CS1 = DB3, /CS2 = GND
 	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 1), BIT(data, 2));

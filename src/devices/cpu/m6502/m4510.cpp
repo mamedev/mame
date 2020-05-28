@@ -15,7 +15,7 @@
 #include "m4510.h"
 #include "m4510d.h"
 
-DEFINE_DEVICE_TYPE(M4510, m4510_device, "m4510", "CSG M4510")
+DEFINE_DEVICE_TYPE(M4510, m4510_device, "m4510", "CSG 4510")
 
 m4510_device::m4510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m65ce02_device(mconfig, M4510, tag, owner, clock),
@@ -37,10 +37,7 @@ std::unique_ptr<util::disasm_interface> m4510_device::create_disassembler()
 
 void m4510_device::device_start()
 {
-	if(cache_disabled)
-		mintf = std::make_unique<mi_4510_nd>(this);
-	else
-		mintf = std::make_unique<mi_4510_normal>(this);
+	mintf = std::make_unique<mi_4510>(this);
 
 	m65ce02_device::init();
 
@@ -70,43 +67,29 @@ bool m4510_device::memory_translate(int spacenum, int intention, offs_t &address
 	return true;
 }
 
-m4510_device::mi_4510_normal::mi_4510_normal(m4510_device *_base)
+m4510_device::mi_4510::mi_4510(m4510_device *_base)
 {
 	base = _base;
 }
 
-uint8_t m4510_device::mi_4510_normal::read(uint16_t adr)
+uint8_t m4510_device::mi_4510::read(uint16_t adr)
 {
-	return program->read_byte(base->map(adr));
+	return program.read_byte(base->map(adr));
 }
 
-uint8_t m4510_device::mi_4510_normal::read_sync(uint16_t adr)
+uint8_t m4510_device::mi_4510::read_sync(uint16_t adr)
 {
-	return scache->read_byte(base->map(adr));
+	return csprogram.read_byte(base->map(adr));
 }
 
-uint8_t m4510_device::mi_4510_normal::read_arg(uint16_t adr)
+uint8_t m4510_device::mi_4510::read_arg(uint16_t adr)
 {
-	return cache->read_byte(base->map(adr));
+	return cprogram.read_byte(base->map(adr));
 }
 
-void m4510_device::mi_4510_normal::write(uint16_t adr, uint8_t val)
+void m4510_device::mi_4510::write(uint16_t adr, uint8_t val)
 {
-	program->write_byte(base->map(adr), val);
-}
-
-m4510_device::mi_4510_nd::mi_4510_nd(m4510_device *_base) : mi_4510_normal(_base)
-{
-}
-
-uint8_t m4510_device::mi_4510_nd::read_sync(uint16_t adr)
-{
-	return sprogram->read_byte(base->map(adr));
-}
-
-uint8_t m4510_device::mi_4510_nd::read_arg(uint16_t adr)
-{
-	return program->read_byte(base->map(adr));
+	program.write_byte(base->map(adr), val);
 }
 
 #include "cpu/m6502/m4510.hxx"

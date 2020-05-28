@@ -1,9 +1,7 @@
-// license:BSD-3-Clause
+// license:CC0
 // copyright-holders:Vas Crabb, Couriersud
 
-#include "audio/nl_zac1b11142.h"
 #include "netlist/devices/net_lib.h"
-
 
 #ifndef __PLIB_PREPROCESSOR__
 
@@ -18,11 +16,10 @@ NETLIST_START(zac1b11142_schematics)
 	TTL_7474_DIP(U3A) // FIXME: need 74LS family model (higher input impedance, half the sink capability)
 	CD4016_DIP(U5D)
 
-	NET_C(VCC, /*U3A.14,*/ U5D.14) // 7474 model doesn't have Vcc pin
-	NET_C(GND, /*U3A.7,*/ U5D.7) // 7474 model doesn't have GND pin
+	NET_C(VCC, U3A.14, U5D.14)
+	NET_C(GND, U3A.7, U5D.7)
 
 	NET_C(VCC, U3A.10, U3A.11, U3A.12, U3A.13) // only half of this chip is used in this audio section - tie up the other inputs
-
 
 	// ANAL1/IOA3/IOA4 -> RULLANTE/CASSA
 
@@ -213,7 +210,7 @@ NETLIST_START(zac1b11142_schematics)
 	NET_C(R112.2, U5D.1, C50.1, R113.1, U5B1.MINUS)
 	NET_C(R95.2, U5B1.PLUS)
 	NET_C(U5D.2, C50.2, R113.2, U5B1.OUT, R96.1)
-	NET_C(VCC, R64.1, R65.1, R94.1, R110.1, U5B1.VCC)
+	NET_C(VCC, R64.1, R65.1, R94.1, R110.1, U5B1.VCC, U4A1.VCC)
 	NET_C(GND, R66.2, C28.2, R40.2, T6.E, C37.2, R108.2, R111.2, U5B1.GND, U4A1.GND)
 	ALIAS(TROMBA, R96.2)
 
@@ -360,7 +357,7 @@ NETLIST_START(zac1b11142)
 	ALIAS(VCC, I_P5.Q)
 	ALIAS(I_V0.Q, GND)
 
-	NET_MODEL("AY8910PORT FAMILY(OVL=0.05 OVH=0.05 ORL=100.0 ORH=0.5k)")
+	NET_MODEL("AY8910PORT FAMILY(TYPE=NMOS OVL=0.05 OVH=0.05 ORL=100.0 ORH=0.5k)")
 
 	// AY-3-8910 4G/4H digital outputs
 	LOGIC_INPUT(I_IOA0,   1, "AY8910PORT")
@@ -371,6 +368,7 @@ NETLIST_START(zac1b11142)
 	LOGIC_INPUT(I_LEVEL,  1, "AY8910PORT")
 	LOGIC_INPUT(I_LEVELT, 1, "AY8910PORT")
 	LOGIC_INPUT(I_SW1,    1, "AY8910PORT")
+
 	ALIAS(IOA0,   I_IOA0.Q)
 	ALIAS(IOA1,   I_IOA1.Q)
 	ALIAS(IOA2,   I_IOA2.Q)
@@ -379,6 +377,11 @@ NETLIST_START(zac1b11142)
 	ALIAS(LEVEL,  I_LEVEL.Q)
 	ALIAS(LEVELT, I_LEVELT.Q)
 	ALIAS(SW1,    I_SW1.Q)
+
+	NET_C(VCC, I_IOA0.VCC, I_IOA1.VCC, I_IOA2.VCC, I_IOA3.VCC, I_IOA4.VCC,
+		I_LEVEL.VCC, I_LEVELT.VCC, I_SW1.VCC)
+	NET_C(GND, I_IOA0.GND, I_IOA1.GND, I_IOA2.GND, I_IOA3.GND, I_IOA4.GND,
+		I_LEVEL.GND, I_LEVELT.GND, I_SW1.GND)
 
 	// AY-3-8910 4G/4H analog outputs
 	RES(R_AY4G_A, 1000)
@@ -422,9 +425,6 @@ NETLIST_START(zac1b11142)
 	/* -----------------------------------------------------------------------
 	 * Power terminals
 	 * -----------------------------------------------------------------------*/
-
-	NET_C(VCC, U3A.14)
-	NET_C(GND, U3A.7)
 
 	// Reverse so that volume raises with raising percentage in ui
 	PARAM(P1.REVERSE, 1)

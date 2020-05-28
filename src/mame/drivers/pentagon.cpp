@@ -137,7 +137,7 @@ void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		irq_off(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in pentagon_state::device_timer");
+		throw emu_fatalerror("Unknown id in pentagon_state::device_timer");
 	}
 }
 
@@ -225,8 +225,8 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 	m_program = &m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 
-	m_program->install_write_handler(0x4000, 0x5aff, write8_delegate(FUNC(pentagon_state::pentagon_scr_w), this));
-	m_program->install_write_handler(0xc000, 0xdaff, write8_delegate(FUNC(pentagon_state::pentagon_scr2_w), this));
+	m_program->install_write_handler(0x4000, 0x5aff, write8_delegate(*this, FUNC(pentagon_state::pentagon_scr_w)));
+	m_program->install_write_handler(0xc000, 0xdaff, write8_delegate(*this, FUNC(pentagon_state::pentagon_scr2_w)));
 
 	if (m_beta->started())
 	{

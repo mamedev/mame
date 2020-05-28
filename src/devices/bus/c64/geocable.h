@@ -23,8 +23,7 @@
 
 // ======================> c64_geocable_device
 
-class c64_geocable_device : public device_t,
-	public device_pet_user_port_interface
+class c64_geocable_device : public device_t, public device_pet_user_port_interface
 {
 public:
 	// construction/destruction

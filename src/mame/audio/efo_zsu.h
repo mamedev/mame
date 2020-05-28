@@ -32,8 +32,8 @@ public:
 	required_device<cmos_40105_device> m_fifo;
 	required_device<msm5205_device> m_adpcm;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(adpcm_fifo_w);
+	void sound_command_w(u8 data);
+	void adpcm_fifo_w(u8 data);
 
 	void zsu_io(address_map &map);
 	void zsu_map(address_map &map);
@@ -44,7 +44,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(ay1_porta_w);
+	void ay1_porta_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(ctc1_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc1_z1_w);
@@ -81,7 +81,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(ay0_porta_w);
+	void ay0_porta_w(u8 data);
 };
 
 #endif // MAME_AUDIO_EFO_ZSU_H

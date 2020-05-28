@@ -7,7 +7,6 @@
     Internal MAME menus for the user interface.
 
 ***************************************************************************/
-
 #ifndef MAME_FRONTEND_UI_MENU_H
 #define MAME_FRONTEND_UI_MENU_H
 
@@ -24,6 +23,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <vector>
 
 
 namespace ui {
@@ -47,6 +47,37 @@ public:
 		FLAG_UI_DATS        = 1U << 6,
 		FLAG_UI_HEADING     = 1U << 7,
 		FLAG_COLOR_BOX      = 1U << 8
+	};
+
+	enum : unsigned {
+		INPUT_GROUPS,
+		INPUT_SPECIFIC,
+		SETTINGS_DIP_SWITCHES,
+		SETTINGS_DRIVER_CONFIG,
+		ANALOG,
+		BOOKKEEPING,
+		GAME_INFO,
+		IMAGE_MENU_IMAGE_INFO,
+		IMAGE_MENU_FILE_MANAGER,
+		TAPE_CONTROL,
+		SLOT_DEVICES,
+		NETWORK_DEVICES,
+		KEYBOARD_MODE,
+		SLIDERS,
+		VIDEO_TARGETS,
+		VIDEO_OPTIONS,
+		CROSSHAIR,
+		CHEAT,
+		PLUGINS,
+		SELECT_GAME,
+		BIOS_SELECTION,
+		BARCODE_READ,
+		PTY_INFO,
+		EXTERNAL_DATS,
+		ADD_FAVORITE,
+		REMOVE_FAVORITE,
+		QUIT_GAME,
+		ABOUT
 	};
 
 	virtual ~menu();
@@ -136,9 +167,6 @@ protected:
 	running_machine &machine() const { return m_ui.machine(); }
 	render_container &container() const { return m_container; }
 
-	// allocate temporary memory from the menu's memory pool
-	void *m_pool_alloc(size_t size);
-
 	void reset(reset_options options);
 	void reset_parent(reset_options options) { m_parent->reset(options); }
 
@@ -213,6 +241,7 @@ protected:
 			rgb_t fgcolor, rgb_t bgcolor, float text_size)
 	{
 		// size up the text
+		float const lrborder(ui().box_lr_border() * machine().render().ui_aspect(&container()));
 		float maxwidth(origx2 - origx1);
 		for (Iter it = begin; it != end; ++it)
 		{
@@ -222,7 +251,7 @@ protected:
 					0.0f, 0.0f, 1.0f, justify, wrap,
 					mame_ui_manager::NONE, rgb_t::black(), rgb_t::white(),
 					&width, nullptr, text_size);
-			width += 2.0f * ui().box_lr_border();
+			width += 2.0f * lrborder;
 			maxwidth = (std::max)(maxwidth, width);
 		}
 		if (scale && ((origx2 - origx1) < maxwidth))
@@ -237,8 +266,8 @@ protected:
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, bgcolor);
 
 		// inset box and draw content
-		x1 += ui().box_lr_border();
-		x2 -= ui().box_lr_border();
+		x1 += lrborder;
+		x2 -= lrborder;
 		y1 += ui().box_tb_border();
 		y2 -= ui().box_tb_border();
 		for (Iter it = begin; it != end; ++it)
@@ -334,13 +363,6 @@ private:
 	using global_state_ptr = std::shared_ptr<global_state>;
 	using global_state_map = std::map<running_machine *, global_state_ptr>;
 
-	struct pool
-	{
-		pool       *next;    // chain to next one
-		uint8_t    *top;     // top of the pool
-		uint8_t    *end;     // end of the pool
-	};
-
 	// request the specific handling of the game selection main menu
 	bool is_special_main_menu() const;
 	void set_special_main_menu(bool disable);
@@ -371,7 +393,6 @@ private:
 
 protected: // TODO: remove need to expose these
 	int top_line;           // main box top line
-	int skip_main_items;
 	int m_visible_lines;    // main box visible lines
 	int m_visible_items;    // number of visible items
 
@@ -382,7 +403,6 @@ private:
 	render_container        &m_container;       // render_container we render to
 	std::unique_ptr<menu>   m_parent;           // pointer to parent menu
 	event                   m_event;            // the UI event that occurred
-	pool                    *m_pool;            // list of memory pools
 
 	float                   m_customtop;        // amount of extra height to add at the top
 	float                   m_custombottom;     // amount of extra height to add at the bottom

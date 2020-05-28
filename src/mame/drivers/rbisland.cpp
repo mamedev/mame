@@ -401,7 +401,7 @@ void rbisland_state::jumping_map(address_map &map)
               Jumping uses two YM2203's
 ***********************************************************/
 
-WRITE8_MEMBER(rbisland_state::bankswitch_w)
+void rbisland_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 3);
 }
@@ -621,7 +621,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rbisland_state::cchip_irq_clear_cb)
 	m_cchip->ext_interrupt(CLEAR_LINE);
 }
 
-WRITE8_MEMBER(rbisland_state::counters_w)
+void rbisland_state::counters_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
 	machine().bookkeeping().coin_lockout_w(0, data & 0x40);
@@ -648,7 +648,7 @@ void rbisland_state::rbisland(machine_config &config)
 
 	TIMER(config, m_cchip_irq_clear).configure_generic(FUNC(rbisland_state::cchip_irq_clear_cb));
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -668,7 +668,7 @@ void rbisland_state::rbisland(machine_config &config)
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_palette(m_palette);
-	m_pc090oj->set_colpri_callback(FUNC(rbisland_state::rbisland_colpri_cb), this);
+	m_pc090oj->set_colpri_callback(FUNC(rbisland_state::rbisland_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -696,7 +696,7 @@ void rbisland_state::jumping(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(24'000'000)/4); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &rbisland_state::jumping_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - enough unless otherwise */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - enough unless otherwise */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

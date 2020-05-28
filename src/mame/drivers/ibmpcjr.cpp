@@ -6,7 +6,6 @@
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
-#include "machine/pc_fdc.h"
 #include "machine/pc_lpt.h"
 #include "machine/pckeybrd.h"
 #include "machine/pic8259.h"
@@ -71,8 +70,8 @@ private:
 	DECLARE_READ8_MEMBER(pcjr_nmi_enable_r);
 	DECLARE_WRITE_LINE_MEMBER(pic8259_set_int_line);
 
-	DECLARE_WRITE8_MEMBER(pcjr_ppi_portb_w);
-	DECLARE_READ8_MEMBER(pcjr_ppi_portc_r);
+	void pcjr_ppi_portb_w(uint8_t data);
+	uint8_t pcjr_ppi_portc_r();
 	DECLARE_WRITE8_MEMBER(pcjr_fdc_dor_w);
 	DECLARE_READ8_MEMBER(pcjx_port_1ff_r);
 	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
@@ -271,7 +270,7 @@ WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 {
 	int data;
 
-	if(state && (data = m_keyboard->read(machine().dummy_space(), 0)))
+	if(state && (data = m_keyboard->read()))
 	{
 		uint8_t   parity = 0;
 		int     i;
@@ -324,7 +323,7 @@ WRITE8_MEMBER(pcjr_state::pc_nmi_enable_w)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, m_nmi_enabled && m_latch);
 }
 
-WRITE8_MEMBER(pcjr_state::pcjr_ppi_portb_w)
+void pcjr_state::pcjr_ppi_portb_w(uint8_t data)
 {
 	/* KB controller port B */
 	m_ppi_portb = data;
@@ -346,7 +345,7 @@ WRITE8_MEMBER(pcjr_state::pcjr_ppi_portb_w)
  * PC6 - KYBD IN
  * PC7 - (keyboard) CABLE CONNECTED
  */
-READ8_MEMBER(pcjr_state::pcjr_ppi_portc_r)
+uint8_t pcjr_state::pcjr_ppi_portc_r()
 {
 	int data=0xff;
 
@@ -666,8 +665,8 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	m_keyboard->keypress().set(FUNC(pcjr_state::keyb_interrupt));
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot1", generic_plain_slot, "ibmpcjr_cart", "bin,jrc").set_device_load(FUNC(pcjr_state::cart1_load), this);
-	GENERIC_CARTSLOT(config, "cartslot2", generic_plain_slot, "ibmpcjr_cart", "bin,jrc").set_device_load(FUNC(pcjr_state::cart2_load), this);
+	GENERIC_CARTSLOT(config, "cartslot1", generic_plain_slot, "ibmpcjr_cart", "bin,jrc").set_device_load(FUNC(pcjr_state::cart1_load));
+	GENERIC_CARTSLOT(config, "cartslot2", generic_plain_slot, "ibmpcjr_cart", "bin,jrc").set_device_load(FUNC(pcjr_state::cart2_load));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");

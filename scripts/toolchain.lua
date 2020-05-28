@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2015 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2020 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
@@ -55,6 +55,7 @@ newoption {
 		{ "vs2015-xp",     "Visual Studio 2015 targeting XP" },
 		{ "vs2017-clang",  "Clang 3.6"         },
 		{ "vs2017-xp",     "Visual Studio 2017 targeting XP" },
+		{ "clangcl",       "Visual Studio 2019 using Clang/LLVM" },
 		{ "winphone8",     "Windows Phone 8.0" },
 		{ "winphone81",    "Windows Phone 8.1" },
 		{ "winstore81",    "Windows Store 8.1" },
@@ -261,14 +262,7 @@ function toolchain(_buildDir, _subDir)
 			end
 			premake.gcc.cc  = toolchainPrefix .. "gcc"
 			premake.gcc.cxx = toolchainPrefix .. "g++"
--- work around GCC 4.9.2 not having proper linker for LTO=1 usage
-			local version_4_ar = str_to_version(_OPTIONS["gcc_version"])
-			if (version_4_ar < 50000) then
-				premake.gcc.ar  = toolchainPrefix .. "ar"
-			end
-			if (version_4_ar >= 50000) then
-				premake.gcc.ar  = toolchainPrefix .. "gcc-ar"
-			end
+			premake.gcc.ar  = toolchainPrefix .. "gcc-ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw32-gcc")
 		end
 
@@ -281,14 +275,7 @@ function toolchain(_buildDir, _subDir)
 			end
 			premake.gcc.cc  = toolchainPrefix .. "gcc"
 			premake.gcc.cxx = toolchainPrefix .. "g++"
--- work around GCC 4.9.2 not having proper linker for LTO=1 usage
-			local version_4_ar = str_to_version(_OPTIONS["gcc_version"])
-			if (version_4_ar < 50000) then
-				premake.gcc.ar  = toolchainPrefix .. "ar"
-			end
-			if (version_4_ar >= 50000) then
-				premake.gcc.ar  = toolchainPrefix .. "gcc-ar"
-			end
+			premake.gcc.ar  = toolchainPrefix .. "gcc-ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw64-gcc")
 		end
 
@@ -451,6 +438,33 @@ function toolchain(_buildDir, _subDir)
 		if ("vs2017-xp") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v141_xp")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
+		end
+	elseif _ACTION == "vs2019" or _ACTION == "vs2019-fastbuild" then
+
+		if "clangcl" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = ("ClangCL")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-clang")
+		end
+
+		if "winstore82" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "v142"
+			premake.vstudio.storeapp = "10.0"
+
+			-- If needed, depending on GENie version, enable file-level configuration
+			if enablefilelevelconfig ~= nil then
+				enablefilelevelconfig()
+			end
+
+			local action = premake.action.current()
+			action.vstudio.windowsTargetPlatformVersion = windowsPlatform
+
+			platforms { "ARM" }
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winstore82")
+		end
+
+		if "intel-15" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "Intel C++ Compiler XE 15.0"
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-intel")
 		end
 	elseif _ACTION == "xcode4" then
 
@@ -672,6 +686,9 @@ function toolchain(_buildDir, _subDir)
 		targetdir (_buildDir .. "ci20/bin/Debug")
 
 	configuration { "mingw-clang" }
+		buildoptions {
+			"-femulated-tls",
+		}
 		linkoptions {
 			"-Wl,--allow-multiple-definition",
 		}

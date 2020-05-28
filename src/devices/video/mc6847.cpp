@@ -135,6 +135,7 @@ mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device
 	, device_video_interface(mconfig, *this)
 	, m_write_hsync(*this)
 	, m_write_fsync(*this)
+	, m_charrom_cb(*this)
 	, m_character_map(fontdata, is_mc6847t1)
 	, m_tpfs(tpfs)
 	, m_divider(divider)
@@ -599,7 +600,7 @@ void mc6847_base_device::device_config_complete()
 	}
 
 	if (!screen().has_screen_update())
-		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(mc6847_base_device::screen_update), this));
+		screen().set_screen_update(*this, FUNC(mc6847_base_device::screen_update));
 }
 
 
@@ -617,7 +618,7 @@ void mc6847_base_device::device_start()
 
 	/* resolve callbacks */
 	m_input_cb.resolve_safe(0);
-	m_charrom_cb.bind_relative_to(*owner());
+	m_charrom_cb.resolve();
 
 	/* set up fixed mode */
 	setup_fixed_mode();

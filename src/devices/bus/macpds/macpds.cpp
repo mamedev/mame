@@ -136,7 +136,7 @@ void macpds_device::set_irq_line(int line, int state)
 //-------------------------------------------------
 
 device_macpds_card_interface::device_macpds_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
+	: device_interface(device, "macpds"),
 		m_macpds(nullptr),
 		m_macpds_tag(nullptr), m_macpds_slottag(nullptr), m_next(nullptr)
 {

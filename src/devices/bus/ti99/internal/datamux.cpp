@@ -123,31 +123,25 @@ datamux_device::datamux_device(const machine_config &mconfig, const char *tag, d
 
 void datamux_device::read_all(uint16_t addr, uint8_t *value)
 {
-	// Valid access
-	bool validaccess = ((addr & 0x0400)==0);
-
-	if (validaccess)
+	// GROM access
+	if ((addr & 0xfc01)==0x9800)
 	{
-		// GROM access
-		if ((addr & 0xf801)==0x9800)
+		if (m_console_groms_present)
 		{
-			if (m_console_groms_present)
-			{
-				m_grom0->readz(value);
-				m_grom1->readz(value);
-				m_grom2->readz(value);
-			}
-			// GROMport (GROMs)
-			m_gromport->readz(addr, value);
-			m_grom_idle = false;
+			m_grom0->readz(value);
+			m_grom1->readz(value);
+			m_grom2->readz(value);
 		}
+		// GROMport (GROMs)
+		m_gromport->readz(addr, value);
+		m_grom_idle = false;
+	}
 
-		// Video
-		if ((addr & 0xf801)==0x8800)
-		{
-			// Forward to VDP unless we have an EVPC
-			if (m_video != nullptr) *value = m_video->read(addr>>1); // A14 determines data or register read
-		}
+	// Video
+	if ((addr & 0xfc01)==0x8800)
+	{
+		// Forward to VDP unless we have an EVPC
+		if (m_video != nullptr) *value = m_video->read((addr>>1)&1); // A14 determines data or register read
 	}
 
 	// GROMport (ROMs)
@@ -185,10 +179,10 @@ void datamux_device::write_all(uint16_t addr, uint8_t value)
 	}
 
 	// Video
-	if ((addr & 0xf801)==0x8800)
+	if ((addr & 0xfc01)==0x8c00)
 	{
 		// Forward to VDP unless we have an EVPC
-		if (m_video != nullptr) m_video->write(addr>>1, value);   // A14 determines data or register write
+		if (m_video != nullptr) m_video->write((addr>>1)&1, value);   // A14 determines data or register write
 	}
 
 	// I/O port gets all accesses
@@ -378,7 +372,7 @@ uint16_t datamux_device::read(offs_t offset)
 				// Reading the even address now (addr)
 				uint8_t hbyte = 0;
 				read_all(m_addr_buf, &hbyte);
-				LOGMASKED(LOG_ACCESS, "Read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
+				LOGMASKED(LOG_ACCESS, "%04x -> %02x\n",  m_addr_buf, hbyte);
 
 				value = (hbyte<<8) | m_latch;
 			}
@@ -506,9 +500,11 @@ WRITE_LINE_MEMBER( datamux_device::clock_in )
 				}
 				if (m_waitcount==2)
 				{
+					// Clear the latch (if no device responds on the bus, we assume the data lines as 0)
+					m_latch = 0;
 					// read odd byte
 					read_all(m_addr_buf+1, &m_latch);
-					LOGMASKED(LOG_ACCESS, "Read odd byte from address %04x -> %02x\n",  m_addr_buf+1, m_latch);
+					LOGMASKED(LOG_ACCESS, "%04x -> %02x\n",  m_addr_buf+1, m_latch);
 					// do the setaddress for the even address
 					setaddress_all(m_addr_buf);
 				}

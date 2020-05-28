@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 /***************************************************************************
 
     K200 64K RAM expansion
@@ -74,6 +75,9 @@ dmv_k208_device::dmv_k208_device(const machine_config &mconfig, const char *tag,
 void dmv_ram_device_base::device_start()
 {
 	m_ram = machine().memory().region_alloc( "expram", m_size * 0x10000, 1, ENDIANNESS_LITTLE )->base();
+
+	// register for state saving
+	save_pointer(NAME(m_ram), m_size * 0x10000);
 }
 
 //-------------------------------------------------

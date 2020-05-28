@@ -145,16 +145,16 @@ void microdec_state::microdec_io(address_map &map)
 	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xfc, 0xfd).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xfe, 0xff).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	// AM_RANGE(0xf0, 0xf3) 8253 PIT (md3 only) used as a baud rate generator for serial ports
-	// AM_RANGE(0xf4, 0xf4) Centronics data
-	// AM_RANGE(0xf5, 0xf5) motor check (md1/2)
-	// AM_RANGE(0xf5, 0xf5) Centronics status (md3) read bit 3 (ack=1); read bit 4 (busy=1); write bit 7 (stb=0)
-	// AM_RANGE(0xf6, 0xf6) rom enable (w=enable; r=disable)
-	// AM_RANGE(0xf7, 0xf7) VFO Count set
-	// AM_RANGE(0xf8, 0xf8) Motor and Shift control
-	// AM_RANGE(0xfa, 0xfb) uPD765C fdc FA=status; FB=data
-	// AM_RANGE(0xfc, 0xfd) Serial Port 1 (terminal) FC=data FD=status
-	// AM_RANGE(0xfe, 0xff) Serial Port 2 (printer) FE=data FF=status
+	// map(0xf0, 0xf3) 8253 PIT (md3 only) used as a baud rate generator for serial ports
+	// map(0xf4, 0xf4) Centronics data
+	// map(0xf5, 0xf5) motor check (md1/2)
+	// map(0xf5, 0xf5) Centronics status (md3) read bit 3 (ack=1); read bit 4 (busy=1); write bit 7 (stb=0)
+	// map(0xf6, 0xf6) rom enable (w=enable; r=disable)
+	// map(0xf7, 0xf7) VFO Count set
+	// map(0xf8, 0xf8) Motor and Shift control
+	// map(0xfa, 0xfb) uPD765C fdc FA=status; FB=data
+	// map(0xfc, 0xfd) Serial Port 1 (terminal) FC=data FD=status
+	// map(0xfe, 0xff) Serial Port 2 (printer) FE=data FF=status
 }
 
 /* Input ports */

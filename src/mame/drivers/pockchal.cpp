@@ -92,7 +92,7 @@ void pockchalv1_state::machine_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	if (m_cart->exists())
-		space.install_read_handler(0x0000, 0x7fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		space.install_read_handler(0x0000, 0x7fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 }
 
 void pockchalv1_state::machine_reset()
@@ -120,7 +120,7 @@ void pockchalv1_state::pockchalv1(machine_config &config)
 	screen.set_palette("palette");
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pockchalw_cart", "bin"));
-	cartslot.set_device_load(FUNC(pockchalv1_state::cart_load), this);
+	cartslot.set_device_load(FUNC(pockchalv1_state::cart_load));
 	cartslot.set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "pc1_list").set_compatible("pockchalw");

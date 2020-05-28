@@ -34,7 +34,6 @@
 #include "sound/mos7360.h"
 #include "sound/t6721a.h"
 
-#define MOS7501_TAG         "u2"
 #define MOS7360_TAG         "u1"
 #define MOS6551_TAG         "u3"
 #define MOS6529_USER_TAG    "u5"
@@ -52,7 +51,7 @@ class plus4_state : public driver_device
 public:
 	plus4_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, MOS7501_TAG),
+		m_maincpu(*this, "u2"),
 		m_pla(*this, PLA_TAG),
 		m_ted(*this, MOS7360_TAG),
 		m_acia(*this, MOS6551_TAG),
@@ -76,7 +75,7 @@ public:
 
 	void plus4(machine_config &config);
 
-	DECLARE_WRITE8_MEMBER( cpu_w );
+	void cpu_w(uint8_t data);
 
 protected:
 	required_device<m7501_device> m_maincpu;
@@ -103,15 +102,15 @@ protected:
 	virtual void machine_reset() override;
 
 	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal);
-	uint8_t read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
+	uint8_t read_memory(offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( ted_videoram_r );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t ted_videoram_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER( cpu_r );
+	uint8_t cpu_r();
 
-	DECLARE_READ8_MEMBER( ted_k_r );
+	uint8_t ted_k_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( write_kb0 ) { if (state) m_kb |= 1; else m_kb &= ~1; }
 	DECLARE_WRITE_LINE_MEMBER( write_kb1 ) { if (state) m_kb |= 2; else m_kb &= ~2; }
@@ -166,7 +165,7 @@ public:
 	void plus4n(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( cpu_r );
+	uint8_t cpu_r();
 };
 
 
@@ -272,22 +271,22 @@ void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs
 //  read_memory -
 //-------------------------------------------------
 
-uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal)
+uint8_t plus4_state::read_memory(offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal)
 {
 	int cs0 = 1, cs1 = 1, c1l = 1, c1h = 1, c2l = 1, c2h = 1;
-	uint8_t data = m_ted->read(space, offset, cs0, cs1);
+	uint8_t data = m_ted->read(offset, cs0, cs1);
 
 	//logerror("offset %04x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
 
 	if (!scs && m_vslsi)
 	{
-		data = m_vslsi->read(space, offset & 0x03);
+		data = m_vslsi->read(offset & 0x03);
 	}
 	else if (!user)
 	{
 		if (m_spi_user)
 		{
-			data = m_spi_user->read(space, 0);
+			data = m_spi_user->read();
 		}
 
 		data &= ~0x04;
@@ -299,7 +298,7 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 	}
 	else if (!keyport)
 	{
-		data = m_spi_kb->read(space, 0);
+		data = m_spi_kb->read();
 	}
 	else if (!cs0)
 	{
@@ -379,14 +378,14 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( plus4_state::read )
+uint8_t plus4_state::read(offs_t offset)
 {
 	int phi0 = 1, mux = 0, ras = 0, ba = 1;
 	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
 
 	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal);
 
-	return read_memory(space, offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal);
+	return read_memory(offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal);
 }
 
 
@@ -394,7 +393,7 @@ READ8_MEMBER( plus4_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( plus4_state::write )
+void plus4_state::write(offs_t offset, uint8_t data)
 {
 	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
 	int phi0 = 1, mux = 0, ras = 0, ba = 1;
@@ -402,17 +401,17 @@ WRITE8_MEMBER( plus4_state::write )
 
 	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal);
 
-	m_ted->write(space, offset, data, cs0, cs1);
+	m_ted->write(offset, data, cs0, cs1);
 
 	//logerror("write offset %04x data %02x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,data,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
 
 	if (!scs && m_vslsi)
 	{
-		m_vslsi->write(space, offset & 0x03, data);
+		m_vslsi->write(offset & 0x03, data);
 	}
 	else if (!user && m_spi_user)
 	{
-		m_spi_user->write(space, 0, data);
+		m_spi_user->write(data);
 	}
 	else if (!_6551 && m_acia)
 	{
@@ -424,7 +423,7 @@ WRITE8_MEMBER( plus4_state::write )
 	}
 	else if (!keyport)
 	{
-		m_spi_kb->write(space, 0, data);
+		m_spi_kb->write(data);
 	}
 	else if (offset < 0xfd00 || offset >= 0xff20)
 	{
@@ -439,14 +438,14 @@ WRITE8_MEMBER( plus4_state::write )
 //  ted_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( plus4_state::ted_videoram_r )
+uint8_t plus4_state::ted_videoram_r(offs_t offset)
 {
 	int phi0 = 1, mux = 0, ras = 1, ba = 0;
 	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
 
 	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal);
 
-	return read_memory(space, offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal);
+	return read_memory(offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal);
 }
 
 
@@ -604,7 +603,7 @@ INPUT_PORTS_END
 //  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( plus4_state::cpu_r )
+uint8_t plus4_state::cpu_r()
 {
 	/*
 
@@ -635,7 +634,7 @@ READ8_MEMBER( plus4_state::cpu_r )
 	return data;
 }
 
-READ8_MEMBER( c16_state::cpu_r )
+uint8_t c16_state::cpu_r()
 {
 	/*
 
@@ -666,7 +665,7 @@ READ8_MEMBER( c16_state::cpu_r )
 	return data;
 }
 
-WRITE8_MEMBER( plus4_state::cpu_w )
+void plus4_state::cpu_w(uint8_t data)
 {
 	/*
 
@@ -706,7 +705,7 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 //  ted7360_interface ted_intf
 //-------------------------------------------------
 
-READ8_MEMBER( plus4_state::ted_k_r )
+uint8_t plus4_state::ted_k_r(offs_t offset)
 {
 	/*
 
@@ -845,11 +844,10 @@ void plus4_state::plus4(machine_config &config)
 	// basic machine hardware
 	M7501(config, m_maincpu, 0);
 	m_maincpu->set_addrmap(AS_PROGRAM, &plus4_state::plus4_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(plus4_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
 	m_maincpu->set_pulls(0x00, 0xc0);
-	config.m_perfect_cpu_quantum = subtag(MOS7501_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m7501_device::IRQ_LINE);
 
@@ -928,9 +926,9 @@ void plus4_state::plus4(machine_config &config)
 	m_exp->irq_wr_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_exp->cd_rd_callback().set(FUNC(plus4_state::read));
 	m_exp->cd_wr_callback().set(FUNC(plus4_state::write));
-	m_exp->aec_wr_callback().set_inputline(MOS7501_TAG, INPUT_LINE_HALT);
+	m_exp->aec_wr_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
-	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(plus4_state::quickload_c16), this);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(plus4_state::quickload_c16));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K");

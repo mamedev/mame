@@ -121,6 +121,11 @@ protected:
 		, m_led_active_bank(*this, "led_active_bank_%u", 0U)
 		, m_led_execution(*this, "led_execution_x%u_%u", 2U, 0U)
 		, m_led_last_ptr(*this, "led_last_ptr_x%u_%u", 2U, 0U)
+		, m_led_status_ptr_valid(*this, "led_status_ptr_valid")
+		, m_led_status_search(*this, "led_status_search")
+		, m_led_mode_mon(*this, "led_mode_mon")
+		, m_led_mode_ram(*this, "led_mode_ram")
+		, m_led_mode_prom(*this, "led_mode_prom")
 	{
 	}
 
@@ -199,6 +204,11 @@ private:
 	output_finder<4>            m_led_active_bank;
 	output_finder<2, 4>         m_led_execution;
 	output_finder<2, 4>         m_led_last_ptr;
+	output_finder<>             m_led_status_ptr_valid;
+	output_finder<>             m_led_status_search;
+	output_finder<>             m_led_mode_mon;
+	output_finder<>             m_led_mode_ram;
+	output_finder<>             m_led_mode_prom;
 
 	emu_timer   *m_reset_timer = nullptr;
 
@@ -339,7 +349,7 @@ void intellec4_state::bus_cycle(mcs40_cpu_device_base::phase step, u8 sync, u8 d
 		break;
 	case mcs40_cpu_device_base::phase::X3:
 		if (m_search_complete != m_adr_cmp_latch)
-			machine().output().set_value("led_status_search", m_search_complete = m_adr_cmp_latch);
+			m_led_status_search = m_search_complete = m_adr_cmp_latch;
 		if (!m_search_complete && !m_cma_enable)
 		{
 			display_execution(data, 0x0fU);
@@ -347,7 +357,7 @@ void intellec4_state::bus_cycle(mcs40_cpu_device_base::phase step, u8 sync, u8 d
 			{
 				display_pointer(data, 0x0fU);
 				if (!m_panel_reset && !m_pointer_valid)
-					machine().output().set_value("led_status_ptr_valid", m_pointer_valid = true);
+					m_led_status_ptr_valid = m_pointer_valid = true;
 			}
 		}
 		if (!m_panel_reset && !m_adr_cmp_latch)
@@ -355,7 +365,7 @@ void intellec4_state::bus_cycle(mcs40_cpu_device_base::phase step, u8 sync, u8 d
 		if (!m_search_complete && !m_panel_reset && !m_cma_enable && !m_sw_run && (m_latched_addr == m_display_addr))
 			m_pass_counter = (m_pass_counter + 1U) & 0x0fU;
 		if (m_adr_cmp_latch && !m_next_inst && !m_search_complete)
-			machine().output().set_value("led_status_search", m_search_complete = true);
+			m_led_status_search = m_search_complete = true;
 		if (!m_cpu_reset && !m_cma_enable && !m_sw_run)
 			m_panel_reset = false;
 		break;
@@ -525,9 +535,10 @@ INPUT_CHANGED_MEMBER(intellec4_state::sw_reset_mode)
 
 template <unsigned N> INPUT_CHANGED_MEMBER(intellec4_state::sw_prg_mode)
 {
-	static constexpr char const *const mode_leds[3] = { "led_mode_mon", "led_mode_ram", "led_mode_prom" };
 	static constexpr int prg_banks[3] = { BANK_PRG_MON, BANK_PRG_RAM, BANK_PRG_PROM };
 	static constexpr int io_banks[3] = { BANK_IO_MON, BANK_IO_NEITHER, BANK_IO_PROM };
+
+	std::tuple<output_finder<> &, output_finder<> &, output_finder<> &> mode_leds(m_led_mode_mon, m_led_mode_ram, m_led_mode_prom);
 
 	if (oldval && !newval)
 	{
@@ -537,7 +548,7 @@ template <unsigned N> INPUT_CHANGED_MEMBER(intellec4_state::sw_prg_mode)
 			{
 				m_program_banks->set_bank(prg_banks[N]);
 				m_rom_port_banks->set_bank(io_banks[N]);
-				machine().output().set_value(mode_leds[N], m_ff_prg_mode[N] = true);
+				std::get<N>(mode_leds) = m_ff_prg_mode[N] = true;
 			}
 			trigger_reset();
 		}
@@ -547,11 +558,11 @@ template <unsigned N> INPUT_CHANGED_MEMBER(intellec4_state::sw_prg_mode)
 			m_rom_port_banks->set_bank(BANK_IO_NEITHER);
 		}
 		if ((0U != N) && m_ff_prg_mode[0])
-			machine().output().set_value(mode_leds[0], m_ff_prg_mode[0] = false);
+			std::get<0>(mode_leds) = m_ff_prg_mode[0] = false;
 		if ((1U != N) && m_ff_prg_mode[1])
-			machine().output().set_value(mode_leds[1], m_ff_prg_mode[1] = false);
+			std::get<1>(mode_leds) = m_ff_prg_mode[1] = false;
 		if ((2U != N) && m_ff_prg_mode[2])
-			machine().output().set_value(mode_leds[2], m_ff_prg_mode[2] = false);
+			std::get<2>(mode_leds) = m_ff_prg_mode[2] = false;
 	}
 	m_sw_prg_mode[N] = !bool(newval);
 }
@@ -635,6 +646,11 @@ void intellec4_state::driver_start()
 	m_led_active_bank.resolve();
 	m_led_execution.resolve();
 	m_led_last_ptr.resolve();
+	m_led_status_ptr_valid.resolve();
+	m_led_status_search.resolve();
+	m_led_mode_mon.resolve();
+	m_led_mode_ram.resolve();
+	m_led_mode_prom.resolve();
 
 	save_item(NAME(m_ram_page));
 	save_item(NAME(m_ram_data));
@@ -714,11 +730,11 @@ void intellec4_state::driver_reset()
 	m_prom_programmer->prgm_prom_pwr(BIT(sw_prom_prgm, BIT_SW_PRGM_PWR));
 
 	// set front panel LEDs
-	machine().output().set_value("led_status_ptr_valid", m_pointer_valid);
-	machine().output().set_value("led_status_search",    m_search_complete);
-	machine().output().set_value("led_mode_mon",         m_ff_prg_mode[0]);
-	machine().output().set_value("led_mode_ram",         m_ff_prg_mode[1]);
-	machine().output().set_value("led_mode_prom",        m_ff_prg_mode[2]);
+	m_led_status_ptr_valid = m_pointer_valid;
+	m_led_status_search    = m_search_complete;
+	m_led_mode_mon         = m_ff_prg_mode[0];
+	m_led_mode_ram         = m_ff_prg_mode[1];
+	m_led_mode_prom        = m_ff_prg_mode[2];
 }
 
 
@@ -1001,9 +1017,9 @@ void intellec4_state::reset_panel()
 		m_panel_reset = true;
 		m_adr_cmp_latch = false;
 		if (m_search_complete && !m_next_inst)
-			machine().output().set_value("led_status_search", m_search_complete = false);
+			m_led_status_search = m_search_complete = false;
 		if (m_pointer_valid)
-			machine().output().set_value("led_status_ptr_valid", m_pointer_valid = false);
+			m_led_status_ptr_valid = m_pointer_valid = false;
 	}
 }
 
@@ -1018,6 +1034,7 @@ class mod4_state : public intellec4_state
 public:
 	mod4_state(machine_config const &mconfig, device_type type, char const *tag)
 		: intellec4_state(mconfig, type, tag)
+		, m_led_status_cpu(*this, "led_status_cpu")
 	{
 	}
 
@@ -1042,6 +1059,8 @@ private:
 	};
 
 	TIMER_CALLBACK_MEMBER(one_shot_expired);
+
+	output_finder<> m_led_status_cpu;
 
 	emu_timer   *m_one_shot_timer = nullptr;
 
@@ -1133,7 +1152,7 @@ void mod4_state::mod4(machine_config &config)
 	cpu.set_ram_status_map(&mod4_state::intellec4_ram_status);
 	cpu.set_ram_ports_map(&mod4_state::intellec4_ram_ports);
 	cpu.set_program_memory_map(&mod4_state::intellec4_program_memory);
-	cpu.set_bus_cycle_cb(FUNC(mod4_state::bus_cycle), this);
+	cpu.set_bus_cycle_cb(FUNC(mod4_state::bus_cycle));
 	cpu.sync_cb().set(m_bus, FUNC(bus::intellec4::univ_bus_device::sync_in));
 
 	m_bus->test_out_cb().set(FUNC(mod4_state::bus_test));
@@ -1149,6 +1168,8 @@ void mod4_state::mod4(machine_config &config)
 void mod4_state::driver_start()
 {
 	intellec4_state::driver_start();
+
+	m_led_status_cpu.resolve();
 
 	m_one_shot_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mod4_state::one_shot_expired), this));
 
@@ -1176,7 +1197,7 @@ void mod4_state::driver_reset()
 	m_bus->test_in((m_one_shot || m_sw_hold) ? 0 : 1);
 
 	// set front panel LEDs
-	machine().output().set_value("led_status_cpu", true); // actually driven by clock phase 2 - let's assume it's always running
+	m_led_status_cpu = true; // actually driven by clock phase 2 - let's assume it's always running
 }
 
 
@@ -1359,7 +1380,7 @@ void mod40_state::mod40(machine_config &config)
 	cpu.set_ram_status_map(&mod40_state::intellec4_ram_status);
 	cpu.set_ram_ports_map(&mod40_state::intellec4_ram_ports);
 	cpu.set_program_memory_map(&mod40_state::intellec4_program_memory);
-	cpu.set_bus_cycle_cb(FUNC(mod40_state::bus_cycle), this);
+	cpu.set_bus_cycle_cb(FUNC(mod40_state::bus_cycle));
 	cpu.sync_cb().set(m_bus, FUNC(bus::intellec4::univ_bus_device::sync_in));
 	cpu.stp_ack_cb().set(FUNC(mod40_state::stp_ack));
 

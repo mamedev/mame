@@ -42,15 +42,14 @@
 ************************************************************
 
     The device has active high(!) SO strobes triggered by
-    read accesses, which transfer data from the the 8 SI
-    lines to the bus. Logically SO0-7 and SI0-7 ought to
-    be hooked up to the same input matrix, but this only
-    appears to be the case with the Astrocade home systems.
-    The arcade games instead channel the SI inputs through
-    a quartet of MC14539B (pin-compatible with 74153) CMOS
-    multiplexers and connect the SO strobes to unrelated
-    outputs which generally use the upper 8 address bits
-    as data.
+    read accesses, which transfer data from the 8 SI lines
+    to the bus. Logically SO0-7 and SI0-7 ought to be hooked
+    up to the same input matrix, but this only appears to be
+    the case with the Astrocade home systems.  The arcade
+    games instead channel the SI inputs through a quartet of
+    MC14539B (pin-compatible with 74153) CMOS multiplexers
+    and connect the SO strobes to unrelated outputs which
+    generally use the upper 8 address bits as data.
 
 ***********************************************************/
 
@@ -85,8 +84,8 @@ astrocade_io_device::astrocade_io_device(const machine_config &mconfig, const ch
 	, m_c_count(0)
 	, m_c_state(0)
 	, m_si_callback(*this)
-	, m_so_callback{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_pots{{*this}, {*this}, {*this}, {*this}}
+	, m_so_callback(*this)
+	, m_pots(*this)
 {
 	memset(m_reg, 0, sizeof(uint8_t)*8);
 	memset(m_bitswap, 0, sizeof(uint8_t)*256);
@@ -102,10 +101,8 @@ astrocade_io_device::astrocade_io_device(const machine_config &mconfig, const ch
 void astrocade_io_device::device_resolve_objects()
 {
 	m_si_callback.resolve_safe(0);
-	for (auto &cb : m_so_callback)
-		cb.resolve_safe();
-	for (auto &pot : m_pots)
-		pot.resolve_safe(0);
+	m_so_callback.resolve_all_safe();
+	m_pots.resolve_all_safe(0);
 }
 
 
@@ -300,7 +297,7 @@ void astrocade_io_device::state_save_register()
  *
  *************************************/
 
-WRITE8_MEMBER(astrocade_io_device::write)
+void astrocade_io_device::write(offs_t offset, uint8_t data)
 {
 	if ((offset & 8) != 0)
 		offset = (offset >> 8) & 7;
@@ -315,14 +312,14 @@ WRITE8_MEMBER(astrocade_io_device::write)
 }
 
 
-READ8_MEMBER(astrocade_io_device::read)
+uint8_t astrocade_io_device::read(offs_t offset)
 {
 	if ((offset & 0x0f) < 0x08)
 	{
 		if (!machine().side_effects_disabled())
-			m_so_callback[offset & 7](space, 0, offset >> 8);
+			m_so_callback[offset & 7](0, offset >> 8);
 
-		return m_si_callback(space, offset & 7);
+		return m_si_callback(offset & 7);
 	}
 	else if ((offset & 0x0f) >= 0x0c)
 		return m_pots[offset & 3]();

@@ -71,20 +71,20 @@ private:
 
 	DECLARE_READ16_MEMBER(extra_ram_r);
 	DECLARE_WRITE16_MEMBER(extra_ram_w);
-	DECLARE_WRITE8_MEMBER(bios_banksel_w);
-	DECLARE_WRITE8_MEMBER(bios_gamesel_w);
+	void bios_banksel_w(uint8_t data);
+	void bios_gamesel_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER(mp_io_write);
 	DECLARE_READ16_MEMBER(mp_io_read);
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(bios_6402_r);
-	DECLARE_WRITE8_MEMBER(bios_6402_w);
-	DECLARE_READ8_MEMBER(bios_6204_r);
-	DECLARE_WRITE8_MEMBER(bios_width_w);
-	DECLARE_READ8_MEMBER(bios_6404_r);
-	DECLARE_WRITE8_MEMBER(bios_6404_w);
-	DECLARE_READ8_MEMBER(bios_6600_r);
-	DECLARE_WRITE8_MEMBER(bios_6600_w);
+	uint8_t bios_6402_r();
+	void bios_6402_w(uint8_t data);
+	uint8_t bios_6204_r();
+	void bios_width_w(uint8_t data);
+	uint8_t bios_6404_r();
+	void bios_6404_w(uint8_t data);
+	uint8_t bios_6600_r();
+	void bios_6600_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(game_w);
 	DECLARE_READ8_MEMBER(vdp1_count_r);
 
@@ -103,7 +103,6 @@ private:
 	uint32_t m_bios_bank_addr;
 
 	uint32_t m_bios_width;  // determines the way the game info ROM is read
-	uint8_t m_bios_ctrl[6];
 	uint8_t m_bios_6600;
 	uint8_t m_bios_6403;
 	uint8_t m_bios_6404;
@@ -411,7 +410,7 @@ READ_LINE_MEMBER(mplay_state::start2_r)
 	return BIT(m_bios_bank, 5);
 }
 
-WRITE8_MEMBER(mplay_state::bios_banksel_w)
+void mplay_state::bios_banksel_w(uint8_t data)
 {
 /*  Multi-slot note:
     Bits 0 and 1 appear to determine the selected game slot.
@@ -427,7 +426,7 @@ WRITE8_MEMBER(mplay_state::bios_banksel_w)
 //  logerror("BIOS: ROM bank %i selected [0x%02x]\n", m_bios_bank >> 6, data);
 }
 
-WRITE8_MEMBER(mplay_state::bios_gamesel_w)
+void mplay_state::bios_gamesel_w(uint8_t data)
 {
 	m_bios_6403 = data;
 
@@ -472,7 +471,7 @@ READ8_MEMBER(mplay_state::bank_r)
 		}
 		else
 		{
-			return memregion("maincpu")->base()[fulladdress ^ 1];
+			return memregion("maincpu")->as_u8(BYTE_XOR_BE(fulladdress));
 		}
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <= 0xa1001f) // IO access
@@ -512,38 +511,38 @@ WRITE8_MEMBER(mplay_state::bank_w)
 /* Megaplay BIOS handles regs[2] at start in a different way compared to megadrive */
 /* other io data/ctrl regs are dealt with exactly like in the console              */
 
-READ8_MEMBER(mplay_state::bios_6402_r)
+uint8_t mplay_state::bios_6402_r()
 {
 	return m_megadrive_io_data_regs[2];// & 0xfe;
 }
 
-WRITE8_MEMBER(mplay_state::bios_6402_w)
+void mplay_state::bios_6402_w(uint8_t data)
 {
 	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0x70) >> 1);
 //  logerror("BIOS: 0x6402 write: 0x%02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::bios_6204_r)
+uint8_t mplay_state::bios_6204_r()
 {
 	return m_megadrive_io_data_regs[2];
 //  return (m_bios_width & 0xf8) + (m_bios_6204 & 0x07);
 }
 
-WRITE8_MEMBER(mplay_state::bios_width_w)
+void mplay_state::bios_width_w(uint8_t data)
 {
 	m_bios_width = data;
 	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0xf8));
 //  logerror("BIOS: 0x6204 - Width write: %02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::bios_6404_r)
+uint8_t mplay_state::bios_6404_r()
 {
 //  logerror("BIOS: 0x6404 read: returned 0x%02x\n",bios_6404 | (bios_6403 & 0x10) >> 4);
 	return ((m_bios_6403 & 0x10) >> 4);
 //  return m_bios_6404 | (m_bios_6403 & 0x10) >> 4;
 }
 
-WRITE8_MEMBER(mplay_state::bios_6404_w)
+void mplay_state::bios_6404_w(uint8_t data)
 {
 	if(((m_bios_6404 & 0x0c) == 0x00) && ((data & 0x0c) == 0x0c))
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -552,7 +551,7 @@ WRITE8_MEMBER(mplay_state::bios_6404_w)
 //  logerror("BIOS: 0x6404 write: 0x%02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::bios_6600_r)
+uint8_t mplay_state::bios_6600_r()
 {
 /*  Multi-slot note:
     0x6600 appears to be used to check for extra slots being used.
@@ -563,7 +562,7 @@ READ8_MEMBER(mplay_state::bios_6600_r)
 	return m_bios_6600;// & 0xfe;
 }
 
-WRITE8_MEMBER(mplay_state::bios_6600_w)
+void mplay_state::bios_6600_w(uint8_t data)
 {
 	m_bios_6600 = data;
 //  logerror("BIOS: 0x6600 write: 0x%02x\n",data);
@@ -630,23 +629,28 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	//m_vdp1->screen_update(screen, bitmap, cliprect);
 
 	// TODO : the overlay (256 pixels wide) is actually stretched over the 320 resolution genesis output, reference is https://youtu.be/Oir1Wp6yOq0.
-	// if it's meant to be stretched we'll have to multiply the entire outut x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
+	// if it's meant to be stretched we'll have to multiply the entire output x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
 
 	// overlay, only drawn for pixels != 0
+	const u32 width = sega315_5124_device::WIDTH - (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH);
 	for (int y = 0; y < 224; y++)
 	{
 		uint32_t* lineptr = &bitmap.pix32(y);
-		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT);
+		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH);
+		uint8_t* y1ptr = &m_vdp1->get_y1_bitmap().pix8(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH);
 
-		for (int x = 0; x < sega315_5124_device::WIDTH; x++)
+		for (int srcx = 0, xx = 0, dstx = 0; srcx < width; dstx++)
 		{
-			uint32_t src = srcptr[x] & 0xffffff;
+			uint32_t src = srcptr[srcx] & 0xffffff;
 
-			if (src)
+			if (y1ptr[srcx])
 			{
-				if (x>=16)
-					lineptr[x-16] = src;
-
+				lineptr[dstx] = src;
+			}
+			if (++xx >= 5)
+			{
+				srcx++;
+				xx = 0;
 			}
 		}
 	}
@@ -673,16 +677,16 @@ void mplay_state::megaplay(machine_config &config)
 	m_bioscpu->set_addrmap(AS_PROGRAM, &mplay_state::megaplay_bios_map);
 	m_bioscpu->set_addrmap(AS_IO, &mplay_state::megaplay_bios_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	cxd1095_device &io1(CXD1095(config, "io1"));
 	io1.in_porta_cb().set_ioport("DSW0");
 	io1.in_portb_cb().set_ioport("DSW1");
 	io1.out_portd_cb().set(FUNC(mplay_state::bios_banksel_w));
 	io1.in_porte_cb().set(FUNC(mplay_state::bios_6204_r));
 	io1.out_porte_cb().set(FUNC(mplay_state::bios_width_w));
 
-	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	cxd1095_device &io2(CXD1095(config, "io2"));
 	io2.in_porta_cb().set_ioport("TEST");
 	io2.in_portb_cb().set_ioport("COIN");
 	io2.in_portc_cb().set(FUNC(mplay_state::bios_6402_r));
@@ -691,15 +695,18 @@ void mplay_state::megaplay(machine_config &config)
 	io2.in_porte_cb().set(FUNC(mplay_state::bios_6404_r));
 	io2.out_porte_cb().set(FUNC(mplay_state::bios_6404_w));
 
+	m_vdp->set_lcm_scaling(true);
+
 	/* New update functions to handle the extra layer */
-	subdevice<screen_device>("megadriv")->set_raw(XTAL(10'738'635)/2, \
-			sega315_5124_device::WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
+	subdevice<screen_device>("megadriv")->set_raw((XTAL(10'738'635) * 5)/2,
+			sega315_5124_device::WIDTH * 5, (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH) * 5, (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256) * 5,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
 	subdevice<screen_device>("megadriv")->set_screen_update(FUNC(mplay_state::screen_update_megplay));
 
 	// Megaplay has an additional SMS VDP as an overlay
 	SEGA315_5246(config, m_vdp1, MASTER_CLOCK / 5); /* ?? */
 	m_vdp1->set_screen("megadriv");
+	m_vdp1->set_hcounter_divide(5);
 	m_vdp1->set_is_pal(false);
 	m_vdp1->n_int().set_inputline(m_bioscpu, 0);
 	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
@@ -731,7 +738,7 @@ ROM_END
 
    This probably means the maximum 68k rom size is 0x2fffff for MegaPlay
 */
-
+/* pcb  171-5834 */
 ROM_START( mp_sonic ) /* Sonic */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ep15177.ic2", 0x000000, 0x040000, CRC(a389b03b) SHA1(8e9e1cf3dd65ddf08757f5a1ce472130c902ea2c) )
@@ -928,17 +935,17 @@ void mplay_state::init_megaplay()
 	m_ic37_ram = std::make_unique<uint8_t[]>(0x10000);
 
 	init_megadrij();
-	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
-	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
+	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
+	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
 
 	// for now ...
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(FUNC(mplay_state::mp_io_read),this), write16_delegate(FUNC(mplay_state::mp_io_write),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(*this, FUNC(mplay_state::mp_io_read)), write16_delegate(*this, FUNC(mplay_state::mp_io_write)));
 
 	// megaplay has ram shared with the bios cpu here
 	m_z80snd->space(AS_PROGRAM).install_ram(0x2000, 0x3fff, &m_ic36_ram[0]);
 
 	// instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(FUNC(mplay_state::extra_ram_r),this), write16_delegate(FUNC(mplay_state::extra_ram_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(*this, FUNC(mplay_state::extra_ram_r)), write16_delegate(*this, FUNC(mplay_state::extra_ram_w)));
 }
 
 /*
@@ -954,7 +961,7 @@ PCB 171-5834 has locations for 3 ROMs and is dated 1989.
                                                                        |                                                                   |
 Game                 PCB #       Sticker on PCB    Sticker on cart      IC1                     IC2                    IC3
 -------------------------------------------------------------------------------------------------------------------------------------------
-Sonic The Hedgehog                                    -    -01
+Sonic The Hedgehog   171-5834    610-0298-01       610-0297-01          EPR-15176   (27C2001)   EPR-15177    (27C2001) EPR-15175-01 (27C256)
 Golden Axe 2                                          -    -02
 Grand Slam           171-5834    837-9165-03       610-0297-03          EPR-15180   (27C020)    EPR-15181    (27C020)  EPR-15175-03 (27256)
 Tecmo World Cup                                       -    -04
@@ -986,11 +993,3 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 /* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, init_megaplay, ROT0, "Sega",                  "Mazin Wars / Mazin Saga (Mega Play)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, megaplay, mplay_state, init_megaplay, ROT0, "Sega",                  "Columns III (Mega Play)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-
-/* Not confirmed to exist:
-
-system16.com lists 'Streets of Rage' but this seems unlikely, there are no gaps in
-the numbering prior to 'Streets of Rage 2'
-
-*/

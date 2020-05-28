@@ -29,17 +29,18 @@ public:
 
 	void _4004clk(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
-	DECLARE_WRITE8_MEMBER( nixie_w );
-	DECLARE_WRITE8_MEMBER( neon_w );
+	void nixie_w(offs_t offset, uint8_t data);
+	void neon_w(uint8_t data);
 
 	void _4004clk_mem(address_map &map);
 	void _4004clk_mp(address_map &map);
 	void _4004clk_rom(address_map &map);
 	void _4004clk_rp(address_map &map);
 	void _4004clk_stat(address_map &map);
-
-	virtual void machine_start() override;
 
 	static constexpr uint8_t nixie_to_num(uint16_t val)
 	{
@@ -62,7 +63,7 @@ private:
 	output_finder<4> m_neon_out;
 };
 
-WRITE8_MEMBER(nixieclock_state::nixie_w)
+void nixieclock_state::nixie_w(offs_t offset, uint8_t data)
 {
 	m_nixie[offset >> 4] = data;
 	m_nixie_out[5] = nixie_to_num(((m_nixie[2] & 3)<<8) | (m_nixie[1] << 4) | m_nixie[0]);
@@ -73,7 +74,7 @@ WRITE8_MEMBER(nixieclock_state::nixie_w)
 	m_nixie_out[0] = nixie_to_num((m_nixie[14] << 6) | (m_nixie[13] << 2) | (m_nixie[12] >>2));
 }
 
-WRITE8_MEMBER(nixieclock_state::neon_w)
+void nixieclock_state::neon_w(uint8_t data)
 {
 	m_neon_out[0] = BIT(data,3);
 	m_neon_out[1] = BIT(data,2);

@@ -32,8 +32,8 @@ sound system appears to be the same as 'spartanxtec.cpp'
 class spyhuntertec_state : public driver_device
 {
 public:
-	spyhuntertec_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	spyhuntertec_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_analog_timer(*this, "analog_timer"),
@@ -96,11 +96,11 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_irq_ack);
 
 
-	DECLARE_WRITE8_MEMBER(ay1_porta_w);
-	DECLARE_READ8_MEMBER(ay1_porta_r);
+	void ay1_porta_w(uint8_t data);
+	uint8_t ay1_porta_r();
 
-	DECLARE_WRITE8_MEMBER(ay2_porta_w);
-	DECLARE_READ8_MEMBER(ay2_porta_r);
+	void ay2_porta_w(uint8_t data);
+	uint8_t ay2_porta_r();
 
 	DECLARE_READ8_MEMBER(spyhuntertec_in2_r);
 	DECLARE_READ8_MEMBER(spyhuntertec_in3_r);
@@ -121,12 +121,12 @@ private:
 	void spyhuntertec_sound_portmap(address_map &map);
 };
 
-WRITE8_MEMBER(spyhuntertec_state::ay1_porta_w)
+void spyhuntertec_state::ay1_porta_w(uint8_t data)
 {
 //  printf("ay1_porta_w %02x\n", data);
 }
 
-READ8_MEMBER(spyhuntertec_state::ay1_porta_r)
+uint8_t spyhuntertec_state::ay1_porta_r()
 {
 //  printf("ay1_porta_r\n");
 	return 0;
@@ -145,7 +145,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(spyhuntertec_state::analog_count_callback)
 	reset_analog_timer();
 }
 
-WRITE8_MEMBER(spyhuntertec_state::ay2_porta_w)
+void spyhuntertec_state::ay2_porta_w(uint8_t data)
 {
 	// d7: latch analog counter on falling edge, d0 selects which one
 	if (~data & m_analog_select & 0x80)
@@ -157,7 +157,7 @@ WRITE8_MEMBER(spyhuntertec_state::ay2_porta_w)
 	m_analog_select = data;
 }
 
-READ8_MEMBER(spyhuntertec_state::ay2_porta_r)
+uint8_t spyhuntertec_state::ay2_porta_r()
 {
 // read often, even if port is set to output mode
 // maybe latches something?
@@ -228,13 +228,13 @@ TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_bg_tile_info)
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int code = (data & 0x3f) | ((data >> 1) & 0x40);
-	SET_TILE_INFO_MEMBER(0, code, 0, (data & 0x40) ? TILE_FLIPY : 0);
+	tileinfo.set(0, code, 0, (data & 0x40) ? TILE_FLIPY : 0);
 }
 
 
 TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_alpha_tile_info)
 {
-	SET_TILE_INFO_MEMBER(2, m_spyhunt_alpharam[tile_index], 0, 0);
+	tileinfo.set(2, m_spyhunt_alpharam[tile_index], 0, 0);
 }
 
 
@@ -242,10 +242,10 @@ TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_alpha_tile_info)
 void spyhuntertec_state::video_start()
 {
 	/* initialize the background tilemap */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spyhuntertec_state::spyhunt_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(spyhuntertec_state::spyhunt_bg_scan),this),  64,16, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spyhuntertec_state::spyhunt_get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(spyhuntertec_state::spyhunt_bg_scan)),  64,16, 64,32);
 
 	/* initialize the text tilemap */
-	m_alpha_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spyhuntertec_state::spyhunt_get_alpha_tile_info),this), TILEMAP_SCAN_COLS,  16,8, 32,32);
+	m_alpha_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spyhuntertec_state::spyhunt_get_alpha_tile_info)), TILEMAP_SCAN_COLS,  16,8, 32,32);
 	m_alpha_tilemap->set_transparent_pen(0);
 	m_alpha_tilemap->set_scrollx(0, 16);
 
@@ -437,7 +437,7 @@ void spyhuntertec_state::spyhuntertec_map(address_map &map)
 
 	map(0xe000, 0xe7ff).ram().w(FUNC(spyhuntertec_state::spyhunt_videoram_w)).share("videoram");
 	map(0xe800, 0xebff).mirror(0x0400).ram().w(FUNC(spyhuntertec_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
-	map(0xf000, 0xf7ff).ram(); //AM_SHARE("nvram")
+	map(0xf000, 0xf7ff).ram(); //.share("nvram");
 	map(0xf800, 0xf9ff).ram().share("spriteram"); // origional spriteram
 	map(0xfa00, 0xfa7f).mirror(0x0180).ram().w(FUNC(spyhuntertec_state::spyhuntertec_paletteram_w)).share("paletteram");
 
@@ -468,7 +468,7 @@ void spyhuntertec_state::spyhuntertec_portmap(address_map &map)
 	map(0x04, 0x04).w(FUNC(spyhuntertec_state::spyhuntertec_port04_w));
 	map(0x84, 0x86).w(FUNC(spyhuntertec_state::spyhunt_scroll_value_w));
 	map(0xe0, 0xe0).nopw(); // was watchdog
-//  AM_RANGE(0xe8, 0xe8) AM_WRITENOP
+//  map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf0).w(FUNC(spyhuntertec_state::spyhuntertec_portf0_w));
 }
 

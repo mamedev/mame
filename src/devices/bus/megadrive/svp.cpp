@@ -320,8 +320,8 @@ INPUT_PORTS_END
 
 void md_rom_svp_device::md_svp_ssp_map(address_map &map)
 {
-//  AM_RANGE(0x0000, 0x03ff) AM_READ(rom_read1)
-//  AM_RANGE(0x0400, 0xffff) AM_READ(rom_read2)
+//  map(0x0000, 0x03ff).r(FUNC(md_rom_svp_device::rom_read1));
+//  map(0x0400, 0xffff).r(FUNC(md_rom_svp_device::rom_read2));
 	map(0x0000, 0x03ff).bankr("iram_svp");
 	map(0x0400, 0xffff).bankr("cart_svp");
 }

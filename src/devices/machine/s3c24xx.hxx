@@ -15,7 +15,7 @@
     MACROS & CONSTANTS
 *******************************************************************************/
 
-//#define UART_PRINTF
+#define UART_PRINTF
 
 #define CLOCK_MULTIPLIER 1
 
@@ -77,6 +77,47 @@
 
 #endif
 
+#define LOG_RESET           (u64(1) << 1)
+#define LOG_ADC             (u64(1) << 2)
+#define LOG_LCD_DMA         (u64(1) << 3)
+#define LOG_LCD_TIMER       (u64(1) << 4)
+#define LOG_LCD_REGS        (u64(1) << 5)
+#define LOG_SPI             (u64(1) << 6)
+#define LOG_LCD_CFG         (u64(1) << 7)
+#define LOG_LCD_TFT         (u64(1) << 8)
+#define LOG_LCD_STN         (u64(1) << 9)
+#define LOG_CLKPOW          (u64(1) << 10)
+#define LOG_MMC             (u64(1) << 11)
+#define LOG_IRQS            (u64(1) << 12)
+#define LOG_IRQ_REGS        (u64(1) << 13)
+#define LOG_FLASH           (u64(1) << 14)
+#define LOG_PWM             (u64(1) << 15)
+#define LOG_PWM_REGS        (u64(1) << 16)
+#define LOG_CAM             (u64(1) << 17)
+#define LOG_DMA             (u64(1) << 18)
+#define LOG_DMA_REQS        (u64(1) << 19)
+#define LOG_DMA_REGS        (u64(1) << 20)
+#define LOG_AC97            (u64(1) << 21)
+#define LOG_DMA_TIMERS      (u64(1) << 22)
+#define LOG_GPIO            (u64(1) << 23)
+#define LOG_MEMCON          (u64(1) << 24)
+#define LOG_USBHOST         (u64(1) << 25)
+#define LOG_UART            (u64(1) << 26)
+#define LOG_USB             (u64(1) << 27)
+#define LOG_WDT             (u64(1) << 28)
+#define LOG_I2C             (u64(1) << 29)
+#define LOG_I2S             (u64(1) << 30)
+#define LOG_RTC             (u64(1) << 31)
+#define LOG_SDI             (u64(1) << 32)
+
+#define LOG_ALL             (LOG_RESET | LOG_ADC | LOG_LCD_DMA | LOG_LCD_TIMER | LOG_LCD_REGS | LOG_SPI | LOG_LCD_CFG | LOG_LCD_TFT | LOG_LCD_STN \
+							| LOG_CLKPOW | LOG_MMC | LOG_IRQS | LOG_IRQ_REGS | LOG_FLASH | LOG_PWM | LOG_PWM_REGS | LOG_CAM | LOG_DMA | LOG_DMA_REQS \
+							| LOG_DMA_REGS | LOG_AC97 | LOG_DMA_TIMERS | LOG_GPIO | LOG_MEMCON | LOG_USBHOST | LOG_UART | LOG_USB \
+							| LOG_WDT | LOG_I2C | LOG_I2S | LOG_RTC | LOG_SDI)
+
+//#define VERBOSE             (LOG_ALL & ~(LOG_FLASH | LOG_UART))
+#include "logmacro.h"
+
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
@@ -85,7 +126,7 @@
 
 void S3C24_CLASS_NAME::s3c24xx_reset()
 {
-	verboselog( *this, 1, "reset\n");
+	LOGMASKED(LOG_RESET, "reset\n");
 	m_cpu->reset();
 	this->reset();
 }
@@ -228,7 +269,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_dma_reload()
 			m_lcd.pagewidth_max = (m_lcd.hpos_max - m_lcd.hpos_min + 1) / 16 * 12;
 		}
 	}
-	verboselog( *this, 3, "LCD - vramaddr %08X %08X offsize %08X pagewidth %08X\n", m_lcd.vramaddr_cur, m_lcd.vramaddr_max, m_lcd.offsize, m_lcd.pagewidth_max);
+	LOGMASKED(LOG_LCD_DMA, "LCD - vramaddr %08X %08X offsize %08X pagewidth %08X\n", m_lcd.vramaddr_cur, m_lcd.vramaddr_max, m_lcd.offsize, m_lcd.pagewidth_max);
 	m_lcd.dma_data = 0;
 	m_lcd.dma_bits = 0;
 }
@@ -240,7 +281,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_dma_init()
 	m_lcd.bswp = BIT( m_lcd.regs.lcdcon5, 1);
 	m_lcd.hwswp = BIT( m_lcd.regs.lcdcon5, 0);
 	m_lcd.tpal = m_lcd.regs.tpal;
-	verboselog( *this, 3, "LCD - bppmode %d hwswp %d bswp %d\n", m_lcd.bppmode, m_lcd.hwswp, m_lcd.bswp);
+	LOGMASKED(LOG_LCD_DMA, "LCD - bppmode %d hwswp %d bswp %d\n", m_lcd.bppmode, m_lcd.hwswp, m_lcd.bswp);
 	m_lcd.dma_data = 0;
 	m_lcd.dma_bits = 0;
 }
@@ -248,20 +289,17 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_dma_init()
 #if 0
 uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 {
-	address_space& space = m_cpu->memory().space( AS_PROGRAM);
-	uint8_t *vram, data[4];
-	vram = (uint8_t *)space.get_read_ptr( m_lcd.vramaddr_cur);
+	uint8_t data[4];
 	for (int i = 0; i < 2; i++)
 	{
-		data[i*2+0] = *vram++;
-		data[i*2+1] = *vram++;
+		data[i*2+0] = m_cache.read_byte(m_lcd.vramaddr_cur + 0);
+		data[i*2+1] = m_cache.read_byte(m_lcd.vramaddr_cur + 1);
 		m_lcd.vramaddr_cur += 2;
 		m_lcd.pagewidth_cur++;
 		if (m_lcd.pagewidth_cur >= m_lcd.pagewidth_max)
 		{
 			m_lcd.vramaddr_cur += m_lcd.offsize << 1;
 			m_lcd.pagewidth_cur = 0;
-			vram = (uint8_t *)space.get_read_ptr( m_lcd.vramaddr_cur);
 		}
 	}
 	if (m_lcd.hwswp == 0)
@@ -291,9 +329,7 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 
 uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 {
-	address_space& space = m_cpu->memory().space( AS_PROGRAM);
-	uint8_t *vram, data[4];
-	vram = (uint8_t *)space.get_read_ptr( m_lcd.vramaddr_cur);
+	uint8_t data[4];
 	for (int i = 0; i < 2; i++)
 	{
 		if (m_lcd.hwswp == 0)
@@ -302,39 +338,39 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 			{
 				if ((m_lcd.vramaddr_cur & 2) == 0)
 				{
-					data[i*2+0] = *(vram + 3);
-					data[i*2+1] = *(vram + 2);
+					data[i*2+0] = m_cache.read_byte(m_lcd.vramaddr_cur + 3);
+					data[i*2+1] = m_cache.read_byte(m_lcd.vramaddr_cur + 2);
 				}
 				else
 				{
-					data[i*2+0] = *(vram - 1);
-					data[i*2+1] = *(vram - 2);
+					data[i*2+0] = m_cache.read_byte(m_lcd.vramaddr_cur - 1);
+					data[i*2+1] = m_cache.read_byte(m_lcd.vramaddr_cur - 2);
 				}
 			}
 			else
 			{
-				data[i*2+0] = *(vram + 0);
-				data[i*2+1] = *(vram + 1);
+				data[i*2+0] = m_cache.read_byte(m_lcd.vramaddr_cur + 0);
+				data[i*2+1] = m_cache.read_byte(m_lcd.vramaddr_cur + 1);
 			}
 		}
 		else
 		{
 			if (m_lcd.bswp == 0)
 			{
-				data[i*2+0] = *(vram + 1);
-				data[i*2+1] = *(vram + 0);
+				data[i*2+0] = m_cache.read_byte(m_lcd.vramaddr_cur + 1);
+				data[i*2+1] = m_cache.read_byte(m_lcd.vramaddr_cur + 0);
 			}
 			else
 			{
 				if ((m_lcd.vramaddr_cur & 2) == 0)
 				{
-					data[i*2+0] = *(vram + 2);
-					data[i*2+1] = *(vram + 3);
+					data[i*2+0] = m_cache.read_byte(m_lcd.vramaddr_cur + 2);
+					data[i*2+1] = m_cache.read_byte(m_lcd.vramaddr_cur + 3);
 				}
 				else
 				{
-					data[i*2+0] = *(vram - 2);
-					data[i*2+1] = *(vram - 1);
+					data[i*2+0] = m_cache.read_byte(m_lcd.vramaddr_cur - 2);
+					data[i*2+1] = m_cache.read_byte(m_lcd.vramaddr_cur - 1);
 				}
 			}
 		}
@@ -344,11 +380,6 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 		{
 			m_lcd.vramaddr_cur += m_lcd.offsize << 1;
 			m_lcd.pagewidth_cur = 0;
-			vram = (uint8_t *)space.get_read_ptr( m_lcd.vramaddr_cur);
-		}
-		else
-		{
-			vram += 2;
 		}
 	}
 	if (m_flags & S3C24XX_INTERFACE_LCD_REVERSE)
@@ -669,10 +700,10 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_16()
 
 TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_timer_exp )
 {
-	verboselog( *this, 2, "LCD timer callback\n");
+	LOGMASKED(LOG_LCD_TIMER, "LCD timer callback\n");
 	m_lcd.vpos = m_screen->vpos();
 	m_lcd.hpos = m_screen->hpos();
-	verboselog( *this, 3, "LCD - vpos %d hpos %d\n", m_lcd.vpos, m_lcd.hpos);
+	LOGMASKED(LOG_LCD_TIMER, "LCD - vpos %d hpos %d\n", m_lcd.vpos, m_lcd.hpos);
 	uint32_t tpalen = S3C24XX_TPAL_GET_TPALEN( m_lcd.tpal);
 	if (tpalen == 0)
 	{
@@ -680,7 +711,7 @@ TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_timer_exp )
 		{
 			s3c24xx_lcd_dma_reload();
 		}
-		verboselog( *this, 3, "LCD - vramaddr %08X\n", m_lcd.vramaddr_cur);
+		LOGMASKED(LOG_LCD_TIMER, "LCD - vramaddr %08X\n", m_lcd.vramaddr_cur);
 		while (m_lcd.vramaddr_cur < m_lcd.vramaddr_max)
 		{
 			switch (m_lcd.bppmode)
@@ -696,7 +727,7 @@ TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_timer_exp )
 			case S3C24XX_BPPMODE_TFT_04:    s3c24xx_lcd_render_tft_04();   break;
 			case S3C24XX_BPPMODE_TFT_08:    s3c24xx_lcd_render_tft_08();   break;
 			case S3C24XX_BPPMODE_TFT_16:    s3c24xx_lcd_render_tft_16();   break;
-			default:  verboselog( *this, 0, "s3c24xx_lcd_timer_exp: bppmode %d not supported\n", m_lcd.bppmode); break;
+			default:  LOGMASKED(LOG_LCD_TIMER, "s3c24xx_lcd_timer_exp: bppmode %d not supported\n", m_lcd.bppmode); break;
 			}
 			if ((m_lcd.vpos == m_lcd.vpos_min) && (m_lcd.hpos == m_lcd.hpos_min)) break;
 		}
@@ -712,6 +743,8 @@ void S3C24_CLASS_NAME::s3c24xx_video_start()
 {
 	m_lcd.bitmap[0] = std::make_unique<bitmap_rgb32>(m_screen->width(), m_screen->height());
 	m_lcd.bitmap[1] = std::make_unique<bitmap_rgb32>(m_screen->width(), m_screen->height());
+
+	m_cpu->space(AS_PROGRAM).cache(m_cache);
 }
 
 void S3C24_CLASS_NAME::bitmap_blend( bitmap_rgb32 &bitmap_dst, bitmap_rgb32 &bitmap_src_1, bitmap_rgb32 &bitmap_src_2)
@@ -758,7 +791,7 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_video_update(screen_device &screen, bitmap_rg
 }
 
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_lcd.regs)[offset];
 	switch (offset)
@@ -770,6 +803,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_r )
 			if (vpos < m_lcd.vpos_min) vpos = m_lcd.vpos_min;
 			if (vpos > m_lcd.vpos_max) vpos = m_lcd.vpos_max;
 			data = (data & ~0xFFFC0000) | ((m_lcd.vpos_max - vpos) << 18);
+			LOGMASKED(LOG_LCD_REGS, "%s: lcd read: LCDCON1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		}
 		break;
 	case S3C24XX_LCDCON5:
@@ -779,16 +813,17 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_r )
 			if (vpos < m_lcd.vpos_min) data = data | 0x00000000;
 			if (vpos > m_lcd.vpos_max) data = data | 0x00018000;
 			// todo: 00 = VSYNC, 01 = BACK Porch, 10 = ACTIVE, 11 = FRONT Porch
+			LOGMASKED(LOG_LCD_REGS, "%s: lcd read: LCDCON5 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		}
 		break;
 	}
-	verboselog( *this, 9, "(LCD) %08X -> %08X\n", S3C24XX_BASE_LCD + (offset << 2), data);
+	LOGMASKED(LOG_LCD_REGS, "%s: lcd read: %08X = %08X & %08x\n", machine().describe_context(), S3C24XX_BASE_LCD + (offset << 2), data, mem_mask);
 	return data;
 }
 
 int S3C24_CLASS_NAME::s3c24xx_lcd_configure_tft()
 {
-	verboselog( *this, 5, "s3c24xx_lcd_configure_tft\n");
+	LOGMASKED(LOG_LCD_TFT, "s3c24xx_lcd_configure_tft\n");
 	uint32_t vspw = BITS( m_lcd.regs.lcdcon2, 5, 0);
 	uint32_t vbpd = BITS( m_lcd.regs.lcdcon2, 31, 24);
 	uint32_t lineval = BITS( m_lcd.regs.lcdcon2, 23, 14);
@@ -799,13 +834,13 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_tft()
 	uint32_t hozval = BITS( m_lcd.regs.lcdcon3, 18, 8);
 	uint32_t clkval = BITS( m_lcd.regs.lcdcon1, 17, 8);
 	uint32_t hclk = s3c24xx_get_hclk();
-	verboselog( *this, 3, "LCD - vspw %d vbpd %d lineval %d vfpd %d hspw %d hbpd %d hfpd %d hozval %d clkval %d hclk %d\n", vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk);
+	LOGMASKED(LOG_LCD_TFT, "LCD - vspw %d vbpd %d lineval %d vfpd %d hspw %d hbpd %d hfpd %d hozval %d clkval %d hclk %d\n", vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk);
 
 	double vclk = (double)(hclk / ((clkval + 1) * 2));
-	verboselog( *this, 3, "LCD - vclk %f\n", vclk);
+	LOGMASKED(LOG_LCD_TFT, "LCD - vclk %f\n", vclk);
 
 	double framerate = vclk / (((vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1)) * ((hspw + 1) + (hbpd + 1) + (hozval + 1) + (hfpd + 1)));
-	verboselog( *this, 3, "LCD - framerate %f\n", framerate);
+	LOGMASKED(LOG_LCD_TFT, "LCD - framerate %f\n", framerate);
 	m_lcd.framerate = framerate;
 
 	uint32_t width = (hspw + 1) + (hbpd + 1) + (hozval + 1) + (hfpd + 1);
@@ -816,8 +851,8 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_tft()
 	visarea.min_y = (vspw + 1) + (vbpd + 1);
 	visarea.max_x = visarea.min_x + (hozval + 1) - 1;
 	visarea.max_y = visarea.min_y + (lineval + 1) - 1;
-	verboselog(*this, 3, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
-	verboselog(*this, 3, "video_screen_configure %d %d %f\n", width, height, m_lcd.framerate);
+	LOGMASKED(LOG_LCD_TFT, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	LOGMASKED(LOG_LCD_TFT, "screen->configure %d %d %f\n", width, height, m_lcd.framerate);
 
 	m_lcd.hpos_min = (hspw + 1) + (hbpd + 1);
 	m_lcd.hpos_max = m_lcd.hpos_min + (hozval + 1) - 1;
@@ -829,7 +864,7 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_tft()
 
 int S3C24_CLASS_NAME::s3c24xx_lcd_configure_stn()
 {
-	verboselog( *this, 5, "s3c24xx_lcd_configure_stn\n");
+	LOGMASKED(LOG_LCD_STN, "s3c24xx_lcd_configure_stn\n");
 
 	uint32_t pnrmode = BITS( m_lcd.regs.lcdcon1, 6, 5);
 	uint32_t bppmode = BITS( m_lcd.regs.lcdcon1, 4, 1);
@@ -840,16 +875,16 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_stn()
 	uint32_t lineblank = BITS( m_lcd.regs.lcdcon3, 7, 0);
 	uint32_t wlh = BITS( m_lcd.regs.lcdcon4, 1, 0);
 	uint32_t hclk = s3c24xx_get_hclk();
-	verboselog( *this, 3, "LCD - pnrmode %d bppmode %d clkval %d lineval %d wdly %d hozval %d lineblank %d wlh %d hclk %d\n", pnrmode, bppmode, clkval, lineval, wdly, hozval, lineblank, wlh, hclk);
+	LOGMASKED(LOG_LCD_STN, "LCD - pnrmode %d bppmode %d clkval %d lineval %d wdly %d hozval %d lineblank %d wlh %d hclk %d\n", pnrmode, bppmode, clkval, lineval, wdly, hozval, lineblank, wlh, hclk);
 	if (clkval == 0)
 	{
 		return false;
 	}
 
 	double vclk = (double)(hclk / ((clkval + 0) * 2));
-	verboselog( *this, 3, "LCD - vclk %f\n", vclk);
+	LOGMASKED(LOG_LCD_STN, "LCD - vclk %f\n", vclk);
 	double framerate = 1 / (((1 / vclk) * (hozval + 1) + (1 / hclk) * ((1 << (4 + wlh)) + (1 << (4 + wdly)) + (lineblank * 8))) * (lineval + 1));
-	verboselog( *this, 3, "LCD - framerate %f\n", framerate);
+	LOGMASKED(LOG_LCD_STN, "LCD - framerate %f\n", framerate);
 	m_lcd.framerate = framerate;
 
 	uint32_t width = 0;
@@ -865,8 +900,8 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_stn()
 
 	rectangle visarea;
 	visarea.set(0, width - 1, 0, height - 1);
-	verboselog( *this, 3, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
-	verboselog( *this, 3, "video_screen_configure %d %d %f\n", width, height, m_lcd.framerate);
+	LOGMASKED(LOG_LCD_STN, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	LOGMASKED(LOG_LCD_STN, "screen->configure %d %d %f\n", width, height, m_lcd.framerate);
 
 	m_lcd.hpos_min = 0;
 	m_lcd.hpos_max = width - 1;
@@ -878,7 +913,7 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_stn()
 
 int S3C24_CLASS_NAME::s3c24xx_lcd_configure()
 {
-	verboselog( *this, 5, "s3c24xx_lcd_configure\n");
+	LOGMASKED(LOG_LCD_CFG, "s3c24xx_lcd_configure\n");
 	uint32_t bppmode = BITS(m_lcd.regs.lcdcon1, 4, 1);
 	if ((bppmode & (1 << 3)) == 0)
 	{
@@ -892,7 +927,7 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure()
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_start()
 {
-	verboselog(*this, 1, "LCD start\n");
+	LOGMASKED(LOG_LCD_CFG, "LCD start\n");
 	if (s3c24xx_lcd_configure())
 	{
 		s3c24xx_lcd_dma_init();
@@ -902,7 +937,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_start()
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_stop()
 {
-	verboselog( *this, 1, "LCD stop\n");
+	LOGMASKED(LOG_LCD_CFG, "LCD stop\n");
 	m_lcd.timer->adjust(attotime::never);
 }
 
@@ -918,10 +953,10 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_recalc()
 	}
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_w )
+void S3C24_CLASS_NAME::s3c24xx_lcd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_lcd.regs)[offset];
-	verboselog( *this, 9, "(LCD) %08X <- %08X\n", S3C24XX_BASE_LCD + (offset << 2), data);
+	LOGMASKED(LOG_LCD_REGS, "%s: lcd write: %08X = %08X & %08x\n", machine().describe_context(), S3C24XX_BASE_LCD + (offset << 2), data, mem_mask);
 	COMBINE_DATA(&((uint32_t*)&m_lcd.regs)[offset]);
 	switch (offset)
 	{
@@ -941,17 +976,17 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_w )
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_palette_r )
 {
 	uint32_t data = m_lcdpal.regs.data[offset];
-	verboselog( *this, 9, "(LCD) %08X -> %08X\n", S3C24XX_BASE_LCDPAL + (offset << 2), data);
+	LOGMASKED(LOG_LCD_REGS, "%s: lcd palette read: %08X = %08X & %08x\n", machine().describe_context(), S3C24XX_BASE_LCDPAL + (offset << 2), data, mem_mask);
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_palette_w )
 {
-	verboselog( *this, 9, "(LCD) %08X <- %08X\n", S3C24XX_BASE_LCDPAL + (offset << 2), data);
+	LOGMASKED(LOG_LCD_REGS, "%s: lcd palette write: %08X = %08X & %08x\n", machine().describe_context(), S3C24XX_BASE_LCDPAL + (offset << 2), data, mem_mask);
 	COMBINE_DATA(&m_lcdpal.regs.data[offset]);
 	if (mem_mask != 0xffffffff)
 	{
-		verboselog( *this, 0, "s3c24xx_lcd_palette_w: unknown mask %08x\n", mem_mask);
+		LOGMASKED(LOG_LCD_REGS, "s3c24xx_lcd_palette_w: unknown mask %08x\n", mem_mask);
 	}
 	m_palette->set_pen_color( offset, s3c24xx_get_color_tft_16(data & 0xFFFF));
 }
@@ -996,7 +1031,7 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_get_fclk()
 	temp2 = (double)((pdiv + 2) * (1 << sdiv));
 	fclk = (uint32_t)(temp1 / temp2);
 	clkslow = m_clkpow.regs.clkslow;
-	if (BIT( clkslow, 4) == 1)
+	if (BIT(clkslow, 4) == 1)
 	{
 		uint32_t slow_val = BITS( clkslow, 2, 0);
 		if (slow_val > 0)
@@ -1010,14 +1045,14 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_get_fclk()
 uint32_t S3C24_CLASS_NAME::s3c24xx_get_hclk()
 {
 #if defined(DEVICE_S3C2400) || defined(DEVICE_S3C2410)
-	return s3c24xx_get_fclk() / (BIT( m_clkpow.regs.clkdivn, 1) + 1);
+	return s3c24xx_get_fclk() / (BIT(m_clkpow.regs.clkdivn, 1) + 1);
 #else
-	switch (BITS( m_clkpow.regs.clkdivn, 2, 1))
+	switch (BITS(m_clkpow.regs.clkdivn, 2, 1))
 	{
 	case 0: return s3c24xx_get_fclk() / 1;
 	case 1: return s3c24xx_get_fclk() / 2;
-	case 2: return s3c24xx_get_fclk() / (4 * (BIT( m_clkpow.regs.camdivn, 9) + 1));
-	case 3: return s3c24xx_get_fclk() / (3 * (BIT( m_clkpow.regs.camdivn, 8) + 1));
+	case 2: return s3c24xx_get_fclk() / (4 * (BIT(m_clkpow.regs.camdivn, 9) + 1));
+	case 3: return s3c24xx_get_fclk() / (3 * (BIT(m_clkpow.regs.camdivn, 8) + 1));
 	}
 	return 0;
 #endif
@@ -1025,30 +1060,39 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_get_hclk()
 
 uint32_t S3C24_CLASS_NAME::s3c24xx_get_pclk()
 {
-	return s3c24xx_get_hclk() / (1 << BIT( m_clkpow.regs.clkdivn, 0));
+	return s3c24xx_get_hclk() / (1 << BIT(m_clkpow.regs.clkdivn, 0));
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_clkpow_r )
 {
 	uint32_t data = ((uint32_t*)&m_clkpow.regs)[offset];
-	verboselog( *this, 9, "(CLKPOW) %08X -> %08X\n", S3C24XX_BASE_CLKPOW + (offset << 2), data);
+	LOGMASKED(LOG_CLKPOW, "%s: clock/power read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_CLKPOW + (offset << 2), data, mem_mask);
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_clkpow_w )
 {
-	verboselog( *this, 9, "(CLKPOW) %08X <- %08X\n", S3C24XX_BASE_CLKPOW + (offset << 2), data);
+	const uint32_t old = ((uint32_t*)&m_clkpow.regs)[offset];
 	COMBINE_DATA(&((uint32_t*)&m_clkpow.regs)[offset]);
 	switch (offset)
 	{
-	case S3C24XX_MPLLCON :
-		verboselog( *this, 5, "CLKPOW - fclk %d hclk %d pclk %d\n", s3c24xx_get_fclk(), s3c24xx_get_hclk(), s3c24xx_get_pclk());
+	case S3C24XX_MPLLCON:
+		LOGMASKED(LOG_CLKPOW, "%s: clock/power write: MPLLCON = %08x & %08x - fclk %d hclk %d pclk %d\n", machine().describe_context(), data, mem_mask, s3c24xx_get_fclk(), s3c24xx_get_hclk(), s3c24xx_get_pclk());
 		m_cpu->set_unscaled_clock(s3c24xx_get_fclk() * CLOCK_MULTIPLIER);
 		break;
-	case S3C24XX_CLKSLOW :
-		verboselog( *this, 5, "CLKPOW - fclk %d hclk %d pclk %d\n", s3c24xx_get_fclk(), s3c24xx_get_hclk(), s3c24xx_get_pclk());
+	case S3C24XX_CLKSLOW:
+		LOGMASKED(LOG_CLKPOW, "%s: clock/power write: CLKSLOW = %08x & %08x - fclk %d hclk %d pclk %d\n", machine().describe_context(), data, mem_mask, s3c24xx_get_fclk(), s3c24xx_get_hclk(), s3c24xx_get_pclk());
 		m_cpu->set_unscaled_clock(s3c24xx_get_fclk() * CLOCK_MULTIPLIER);
 		break;
+	case S3C24XX_CLKCON:
+		LOGMASKED(LOG_CLKPOW, "%s: clock/power write: CLKCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		if (BIT(data, 2) && !BIT(old, 2))
+		{
+			m_cpu->suspend(SUSPEND_REASON_HALT, 1);
+		}
+		break;
+	default:
+		LOGMASKED(LOG_CLKPOW, "%s: clock/power write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_CLKPOW + (offset << 2), data, mem_mask);
 	}
 }
 
@@ -1078,19 +1122,20 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 		if (temp != 0)
 		{
 			uint32_t int_type = 0;
-			verboselog( *this, 5, "srcpnd %08X intmsk %08X intmod %08X\n", m_irq.regs.srcpnd, m_irq.regs.intmsk, m_irq.regs.intmod);
+			LOGMASKED(LOG_IRQS, "IRQ: srcpnd %08X intmsk %08X intmod %08X\n", m_irq.regs.srcpnd, m_irq.regs.intmsk, m_irq.regs.intmod);
 			while ((temp & 1) == 0)
 			{
 				int_type++;
 				temp = temp >> 1;
 			}
-			verboselog( *this, 5, "intpnd set bit %d\n", int_type);
+			LOGMASKED(LOG_IRQS, "IRQ: intpnd set bit %d\n", int_type);
 			m_irq.regs.intpnd |= (1 << int_type);
 			m_irq.regs.intoffset = int_type;
 			if (m_irq.line_irq != ASSERT_LINE)
 			{
-				verboselog( *this, 5, "ARM7_IRQ_LINE -> ASSERT_LINE\n");
-				m_cpu->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+				LOGMASKED(LOG_IRQS, "triggering IRQ line\n");
+				m_cpu->resume(SUSPEND_REASON_HALT);
+				m_cpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 				m_irq.line_irq = ASSERT_LINE;
 			}
 		}
@@ -1098,9 +1143,9 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 		{
 			if (m_irq.line_irq != CLEAR_LINE)
 			{
-				verboselog( *this, 5, "srcpnd %08X intmsk %08X intmod %08X\n", m_irq.regs.srcpnd, m_irq.regs.intmsk, m_irq.regs.intmod);
-				verboselog( *this, 5, "ARM7_IRQ_LINE -> CLEAR_LINE\n");
-				m_cpu->execute().set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+				LOGMASKED(LOG_IRQS, "IRQ: srcpnd %08X intmsk %08X intmod %08X\n", m_irq.regs.srcpnd, m_irq.regs.intmsk, m_irq.regs.intmod);
+				LOGMASKED(LOG_IRQS, "clearing IRQ line\n");
+				m_cpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 				m_irq.line_irq = CLEAR_LINE;
 			}
 		}
@@ -1118,8 +1163,9 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 		}
 		if (m_irq.line_fiq != ASSERT_LINE)
 		{
-			verboselog( *this, 5, "ARM7_FIRQ_LINE -> ASSERT_LINE\n");
-			m_cpu->execute().set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
+			LOGMASKED(LOG_IRQS, "asserting FIQ line\n");
+			m_cpu->resume(SUSPEND_REASON_HALT);
+			m_cpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
 			m_irq.line_fiq = ASSERT_LINE;
 		}
 	}
@@ -1127,8 +1173,8 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 	{
 		if (m_irq.line_fiq != CLEAR_LINE)
 		{
-			verboselog( *this, 5, "ARM7_FIRQ_LINE -> CLEAR_LINE\n");
-			m_cpu->execute().set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+			LOGMASKED(LOG_IRQS, "clearing FIQ line\n");
+			m_cpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
 			m_irq.line_fiq = CLEAR_LINE;
 		}
 	}
@@ -1136,7 +1182,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 
 void S3C24_CLASS_NAME::s3c24xx_request_irq(uint32_t int_type)
 {
-	verboselog( *this, 5, "request irq %d\n", int_type);
+	LOGMASKED(LOG_IRQS, "request irq %d\n", int_type);
 	m_irq.regs.srcpnd |= (1 << int_type);
 	s3c24xx_check_pending_irq();
 }
@@ -1160,7 +1206,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_subirq()
 
 ATTR_UNUSED void S3C24_CLASS_NAME::s3c24xx_request_subirq( uint32_t int_type)
 {
-	verboselog( *this, 5, "request subirq %d\n", int_type);
+	LOGMASKED(LOG_IRQS, "request subirq %d\n", int_type);
 	m_irq.regs.subsrcpnd |= (1 << int_type);
 	s3c24xx_check_pending_subirq();
 }
@@ -1189,7 +1235,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_eint()
 
 ATTR_UNUSED void S3C24_CLASS_NAME::s3c24xx_request_eint(uint32_t number)
 {
-	verboselog( *this, 5, "request external interrupt %d\n", number);
+	LOGMASKED(LOG_IRQS, "request external interrupt %d\n", number);
 	if (number < 4)
 	{
 		s3c24xx_request_irq( S3C24XX_INT_EINT0 + number);
@@ -1205,40 +1251,78 @@ ATTR_UNUSED void S3C24_CLASS_NAME::s3c24xx_request_eint(uint32_t number)
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_irq_r )
 {
-	uint32_t data = ((uint32_t*)&m_irq.regs)[offset];
-	verboselog( *this, 9, "(IRQ) %08X -> %08X\n", S3C24XX_BASE_INT + (offset << 2), data);
+	const uint32_t data = ((uint32_t*)&m_irq.regs)[offset];
+	switch (offset)
+	{
+		case S3C24XX_SRCPND:
+			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: SRCPND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			break;
+		case S3C24XX_INTMOD:
+			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTMOD = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			break;
+		case S3C24XX_INTMSK:
+			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTMSK = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			break;
+		case S3C24XX_PRIORITY:
+			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: PRIORITY = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			break;
+		case S3C24XX_INTPND:
+			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTPND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			break;
+		case S3C24XX_INTOFFSET:
+			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTOFFSET = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			break;
+#if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
+		case S3C24XX_SUBSRCPND:
+			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: SUBSRCPND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			break;
+		case S3C24XX_INTSUBMSK:
+			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTSUBMSK = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			break;
+#endif
+		default:
+			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_INT + (offset << 2), data, mem_mask);
+			break;
+	}
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_irq_w )
 {
 	uint32_t old_value = ((uint32_t*)&m_irq.regs)[offset];
-	verboselog( *this, 9, "(IRQ) %08X <- %08X\n", S3C24XX_BASE_INT + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_irq.regs)[offset]);
 	switch (offset)
 	{
 	case S3C24XX_SRCPND:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq write: SRCPND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_irq.regs.srcpnd = (old_value & ~data); // clear only the bit positions of SRCPND corresponding to those set to one in the data
 		m_irq.regs.intoffset = 0; // "This bit can be cleared automatically by clearing SRCPND and INTPND."
 		s3c24xx_check_pending_irq();
 		break;
 	case S3C24XX_INTMSK:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq write: INTMSK = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		s3c24xx_check_pending_irq();
 		break;
 	case S3C24XX_INTPND:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq write: INTPND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_irq.regs.intpnd = (old_value & ~data); // clear only the bit positions of INTPND corresponding to those set to one in the data
 		m_irq.regs.intoffset = 0; // "This bit can be cleared automatically by clearing SRCPND and INTPND."
 		s3c24xx_check_pending_irq();
 		break;
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
-	case S3C24XX_SUBSRCPND :
+	case S3C24XX_SUBSRCPND:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq write: SUBSRCPND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_irq.regs.subsrcpnd = (old_value & ~data); // clear only the bit positions of SRCPND corresponding to those set to one in the data
 		s3c24xx_check_pending_subirq();
 		break;
 	case S3C24XX_INTSUBMSK:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq write: INTSUBMSK = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		s3c24xx_check_pending_subirq();
 		break;
 #endif
+	default:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_INT + (offset << 2), data, mem_mask);
+		break;
 	}
 }
 
@@ -1251,21 +1335,27 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_pwm_r )
 	{
 	case pwm_t::TCNTO0:
 		data = (data & ~0x0000FFFF) | m_pwm.calc_observation(0);
+		LOGMASKED(LOG_PWM_REGS, "%s: pwm read: TCNTO0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case pwm_t::TCNTO1:
 		data = (data & ~0x0000FFFF) | m_pwm.calc_observation(1);
+		LOGMASKED(LOG_PWM_REGS, "%s: pwm read: TCNTO1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case pwm_t::TCNTO2:
 		data = (data & ~0x0000FFFF) | m_pwm.calc_observation(2);
+		LOGMASKED(LOG_PWM_REGS, "%s: pwm read: TCNTO2 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case pwm_t::TCNTO3:
 		data = (data & ~0x0000FFFF) | m_pwm.calc_observation(3);
+		LOGMASKED(LOG_PWM_REGS, "%s: pwm read: TCNTO3 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case pwm_t::TCNTO4:
 		data = (data & ~0x0000FFFF) | m_pwm.calc_observation(4);
+		LOGMASKED(LOG_PWM_REGS, "%s: pwm read: TCNTO4 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
+	default:
+		LOGMASKED(LOG_PWM_REGS, "%s: pwm read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_PWM + (offset << 2), data, mem_mask);
 	}
-	verboselog( *this, 9, "(PWM) %08X -> %08X\n", S3C24XX_BASE_PWM + (offset << 2), data);
 	return data;
 }
 
@@ -1274,12 +1364,12 @@ void S3C24_CLASS_NAME::s3c24xx_pwm_start(int timer)
 	static constexpr int mux_table[] = { 2, 4, 8, 16 };
 	static constexpr int prescaler_shift[] = { 0, 0, 8, 8, 8 };
 	static constexpr int mux_shift[] = { 0, 4, 8, 12, 16 };
-	uint32_t pclk, prescaler, mux, cnt, cmp, auto_reload;
+	uint32_t cnt, cmp, auto_reload;
 	double freq, hz;
-	verboselog( *this, 1, "PWM %d start\n", timer);
-	pclk = s3c24xx_get_pclk();
-	prescaler = (m_pwm.regs.tcfg0 >> prescaler_shift[timer]) & 0xFF;
-	mux = (m_pwm.regs.tcfg1 >> mux_shift[timer]) & 0x0F;
+	LOGMASKED(LOG_PWM, "PWM %d start\n", timer);
+	uint32_t pclk = s3c24xx_get_pclk();
+	uint32_t prescaler = (m_pwm.regs.tcfg0 >> prescaler_shift[timer]) & 0xFF;
+	uint32_t mux = (m_pwm.regs.tcfg1 >> mux_shift[timer]) & 0x0F;
 	if (mux < 4)
 	{
 		freq = (double)pclk / (prescaler + 1) / mux_table[mux];
@@ -1329,13 +1419,13 @@ void S3C24_CLASS_NAME::s3c24xx_pwm_start(int timer)
 	{
 		hz = freq / cnt;
 	}
-	verboselog(*this, 5, "PWM %d - pclk=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, pclk, prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
+	LOGMASKED(LOG_PWM, "PWM %d - pclk=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, pclk, prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
 	m_pwm.cnt[timer] = cnt;
 	m_pwm.cmp[timer] = cmp;
 	m_pwm.freq[timer] = freq;
 	if (auto_reload)
 	{
-		m_pwm.timer[timer]->adjust(attotime::from_hz( hz), timer, attotime::from_hz(hz));
+		m_pwm.timer[timer]->adjust(attotime::from_hz(hz), timer, attotime::from_hz(hz));
 	}
 	else
 	{
@@ -1345,7 +1435,7 @@ void S3C24_CLASS_NAME::s3c24xx_pwm_start(int timer)
 
 void S3C24_CLASS_NAME::s3c24xx_pwm_stop(int timer)
 {
-	verboselog(*this, 1, "PWM %d stop\n", timer);
+	LOGMASKED(LOG_PWM, "PWM %d stop\n", timer);
 	m_pwm.timer[timer]->adjust(attotime::never);
 }
 
@@ -1365,11 +1455,11 @@ void S3C24_CLASS_NAME::s3c24xx_pwm_recalc(int timer)
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_pwm_w )
 {
 	uint32_t const old_value = ((uint32_t*)&m_pwm.regs)[offset];
-	verboselog( *this, 9, "(PWM) %08X <- %08X\n", S3C24XX_BASE_PWM + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_pwm.regs)[offset]);
 	switch (offset)
 	{
 	case pwm_t::TCON:
+		LOGMASKED(LOG_PWM_REGS, "%s: pwm write: TCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		if (BIT(data ^ old_value, 0))
 		{
 			s3c24xx_pwm_recalc(0);
@@ -1391,6 +1481,9 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_pwm_w )
 			s3c24xx_pwm_recalc(4);
 		}
 		break;
+	default:
+		LOGMASKED(LOG_PWM_REGS, "%s: pwm write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_PWM + (offset << 2), data, mem_mask);
+		break;
 	}
 }
 
@@ -1398,7 +1491,7 @@ TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_pwm_timer_exp )
 {
 	int ch = param;
 	static constexpr int ch_int[] = { S3C24XX_INT_TIMER0, S3C24XX_INT_TIMER1, S3C24XX_INT_TIMER2, S3C24XX_INT_TIMER3, S3C24XX_INT_TIMER4 };
-	verboselog(*this, 2, "PWM %d timer callback\n", ch);
+	LOGMASKED(LOG_PWM, "PWM %d timer callback\n", ch);
 	if (BITS(m_pwm.regs.tcfg1, 23, 20) == (ch + 1))
 	{
 		s3c24xx_dma_request_pwm();
@@ -1432,10 +1525,10 @@ void S3C24_CLASS_NAME::s3c24xx_dma_trigger(int ch)
 {
 	dma_regs_t *regs = &m_dma[ch].regs;
 	uint32_t curr_tc, curr_src, curr_dst;
-	address_space &space = m_cpu->memory().space(AS_PROGRAM);
+	address_space &space = m_cpu->space(AS_PROGRAM);
 	int dsz, inc_src, inc_dst, servmode, tsz;
 	static constexpr uint32_t ch_int[] = { S3C24XX_INT_DMA0, S3C24XX_INT_DMA1, S3C24XX_INT_DMA2, S3C24XX_INT_DMA3 };
-	verboselog(*this, 5, "DMA %d trigger\n", ch);
+	LOGMASKED(LOG_DMA, "DMA %d trigger\n", ch);
 	curr_tc = S3C24XX_DSTAT_GET_CURR_TC(regs->dstat);
 	dsz = S3C24XX_DCON_GET_DSZ(regs->dcon);
 	curr_src = S3C24XX_DCSRC_GET_CURR_SRC(regs->dcsrc);
@@ -1449,7 +1542,7 @@ void S3C24_CLASS_NAME::s3c24xx_dma_trigger(int ch)
 	inc_src = BIT( regs->disrcc, 0);
 	inc_dst = BIT(regs->didstc, 0);
 #endif
-	verboselog(*this, 5, "DMA %d - curr_src %08X curr_dst %08X curr_tc %d dsz %d\n", ch, curr_src, curr_dst, curr_tc, dsz);
+	LOGMASKED(LOG_DMA, "DMA %d - curr_src %08X curr_dst %08X curr_tc %d dsz %d\n", ch, curr_src, curr_dst, curr_tc, dsz);
 	while (curr_tc > 0)
 	{
 		curr_tc--;
@@ -1489,14 +1582,14 @@ void S3C24_CLASS_NAME::s3c24xx_dma_trigger(int ch)
 void S3C24_CLASS_NAME::s3c24xx_dma_request_iis()
 {
 	dma_regs_t *regs = &m_dma[2].regs;
-	verboselog( *this, 5, "s3c24xx_dma_request_iis\n");
+	LOGMASKED(LOG_DMA_REQS, "s3c24xx_dma_request_iis\n");
 	if ((S3C24XX_DMASKTRIG_GET_ON_OFF(regs->dmasktrig) != 0) && (S3C24XX_DCON_GET_SWHWSEL(regs->dcon) != 0) && (S3C24XX_DCON_GET_HWSRCSEL(regs->dcon) == 0))
 		s3c24xx_dma_trigger(2);
 }
 
 void S3C24_CLASS_NAME::s3c24xx_dma_request_pwm()
 {
-	verboselog( *this, 5, "s3c24xx_dma_request_pwm\n");
+	LOGMASKED(LOG_DMA_REQS, "s3c24xx_dma_request_pwm\n");
 	for (int i = 0; i < 4; i++)
 	{
 		if (i != 1)
@@ -1516,7 +1609,7 @@ void S3C24_CLASS_NAME::s3c24xx_dma_start(int ch)
 	dma_regs_t *regs = &m_dma[ch].regs;
 	uint32_t dsz, tsz, reload;
 	int inc_src, inc_dst, _int, servmode, swhwsel, hwsrcsel;
-	verboselog(*this, 1, "DMA %d start\n", ch);
+	LOGMASKED(LOG_DMA, "DMA %d start\n", ch);
 	addr_src = S3C24XX_DISRC_GET_SADDR(regs->disrc);
 	addr_dst = S3C24XX_DIDST_GET_DADDR(regs->didst);
 	tc = S3C24XX_DCON_GET_TC(regs->dcon);
@@ -1534,8 +1627,8 @@ void S3C24_CLASS_NAME::s3c24xx_dma_start(int ch)
 	inc_src = BIT(regs->disrcc, 0);
 	inc_dst = BIT(regs->didstc, 0);
 #endif
-	verboselog(*this, 5, "DMA %d - addr_src %08X inc_src %d addr_dst %08X inc_dst %d int %d tsz %d servmode %d hwsrcsel %d swhwsel %d reload %d dsz %d tc %d\n", ch, addr_src, inc_src, addr_dst, inc_dst, _int, tsz, servmode, hwsrcsel, swhwsel, reload, dsz, tc);
-	verboselog(*this, 5, "DMA %d - copy %08X bytes from %08X (%s) to %08X (%s)\n", ch, (tc << dsz) << (tsz << 1), addr_src, inc_src ? "fix" : "inc", addr_dst, inc_dst ? "fix" : "inc");
+	LOGMASKED(LOG_DMA, "DMA %d - addr_src %08X inc_src %d addr_dst %08X inc_dst %d int %d tsz %d servmode %d hwsrcsel %d swhwsel %d reload %d dsz %d tc %d\n", ch, addr_src, inc_src, addr_dst, inc_dst, _int, tsz, servmode, hwsrcsel, swhwsel, reload, dsz, tc);
+	LOGMASKED(LOG_DMA, "DMA %d - copy %08X bytes from %08X (%s) to %08X (%s)\n", ch, (tc << dsz) << (tsz << 1), addr_src, inc_src ? "fix" : "inc", addr_dst, inc_dst ? "fix" : "inc");
 	s3c24xx_dma_reload(ch);
 	if (swhwsel == 0)
 		s3c24xx_dma_trigger(ch);
@@ -1543,7 +1636,7 @@ void S3C24_CLASS_NAME::s3c24xx_dma_start(int ch)
 
 void S3C24_CLASS_NAME::s3c24xx_dma_stop(int ch)
 {
-	verboselog(*this, 1, "DMA %d stop\n", ch);
+	LOGMASKED(LOG_DMA, "DMA %d stop\n", ch);
 }
 
 void S3C24_CLASS_NAME::s3c24xx_dma_recalc(int ch)
@@ -1556,11 +1649,15 @@ void S3C24_CLASS_NAME::s3c24xx_dma_recalc(int ch)
 
 uint32_t S3C24_CLASS_NAME::s3c24xx_dma_r(uint32_t ch, uint32_t offset)
 {
-	return ((uint32_t*)&m_dma[ch].regs)[offset];
+	static const uint32_t s_bases[4] = { S3C24XX_BASE_DMA_0, S3C24XX_BASE_DMA_1, S3C24XX_BASE_DMA_2, S3C24XX_BASE_DMA_3 };
+	const uint32_t data = ((uint32_t*)&m_dma[ch].regs)[offset];
+	LOGMASKED(LOG_DMA_REGS, "%s: dma %d read: %08x = %08x\n", machine().describe_context(), ch, s_bases[ch] + (offset << 2), data);
+	return data;
 }
 
 void S3C24_CLASS_NAME::s3c24xx_dma_w(uint32_t ch, uint32_t offset, uint32_t data, uint32_t mem_mask)
 {
+	static const uint32_t s_bases[4] = { S3C24XX_BASE_DMA_0, S3C24XX_BASE_DMA_1, S3C24XX_BASE_DMA_2, S3C24XX_BASE_DMA_3 };
 	uint32_t old_value = ((uint32_t*)&m_dma[ch].regs)[offset];
 	COMBINE_DATA(&((uint32_t*)&m_dma[ch].regs)[offset]);
 	switch (offset)
@@ -1573,70 +1670,63 @@ void S3C24_CLASS_NAME::s3c24xx_dma_w(uint32_t ch, uint32_t offset, uint32_t data
 			regs->dmasktrig &= ~(1 << 1); // clear on/off
 		}
 #endif
+		LOGMASKED(LOG_DMA_REGS, "%s: dma %d write: DCON = %08x & %08x\n", machine().describe_context(), ch, data, mem_mask);
 		break;
 	case S3C24XX_DMASKTRIG :
+		LOGMASKED(LOG_DMA_REGS, "%s: dma %d write: DMASKTRIG = %08x & %08x\n", machine().describe_context(), ch, data, mem_mask);
 		if (BIT(data ^ old_value, 1))
 			s3c24xx_dma_recalc(ch);
+		break;
+	default:
+		LOGMASKED(LOG_DMA_REGS, "%s: dma %d write: %08x = %08x & %08x\n", machine().describe_context(), ch, s_bases[ch] + (offset << 2), data, mem_mask);
 		break;
 	}
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_0_r )
 {
-	uint32_t data = s3c24xx_dma_r( 0, offset);
-	verboselog(*this, 9, "(DMA 0) %08X -> %08X\n", S3C24XX_BASE_DMA_0 + (offset << 2), data);
-	return data;
+	return s3c24xx_dma_r(0, offset);
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_1_r )
 {
-	uint32_t data = s3c24xx_dma_r(1, offset);
-	verboselog(*this, 9, "(DMA 1) %08X -> %08X\n", S3C24XX_BASE_DMA_1 + (offset << 2), data);
-	return data;
+	return s3c24xx_dma_r(1, offset);
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_2_r )
 {
-	uint32_t data = s3c24xx_dma_r( 2, offset);
-	verboselog(*this, 9, "(DMA 2) %08X -> %08X\n", S3C24XX_BASE_DMA_2 + (offset << 2), data);
-	return data;
+	return s3c24xx_dma_r(2, offset);
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_3_r )
 {
-	uint32_t data = s3c24xx_dma_r( 3, offset);
-	verboselog(*this, 9, "(DMA 3) %08X -> %08X\n", S3C24XX_BASE_DMA_3 + (offset << 2), data);
-	return data;
+	return s3c24xx_dma_r(3, offset);
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_0_w )
 {
-	verboselog(*this, 9, "(DMA 0) %08X <- %08X\n", S3C24XX_BASE_DMA_0 + (offset << 2), data);
 	s3c24xx_dma_w(0, offset, data, mem_mask);
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_1_w )
 {
-	verboselog(*this, 9, "(DMA 1) %08X <- %08X\n", S3C24XX_BASE_DMA_1 + (offset << 2), data);
 	s3c24xx_dma_w(1, offset, data, mem_mask);
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_2_w )
 {
-	verboselog(*this, 9, "(DMA 2) %08X <- %08X\n", S3C24XX_BASE_DMA_2 + (offset << 2), data);
 	s3c24xx_dma_w(2, offset, data, mem_mask);
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_3_w )
 {
-	verboselog(*this, 9, "(DMA 3) %08X <- %08X\n", S3C24XX_BASE_DMA_3 + (offset << 2), data);
 	s3c24xx_dma_w(3, offset, data, mem_mask);
 }
 
 TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_timer_exp )
 {
 	int ch = param;
-	verboselog(*this, 2, "DMA %d timer callback\n", ch);
+	LOGMASKED(LOG_DMA_TIMERS, "DMA %d timer callback\n", ch);
 }
 
 /* I/O Port */
@@ -1709,37 +1799,48 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_gpio_r )
 	{
 	case S3C24XX_GPADAT :
 		data = iface_gpio_port_r( S3C24XX_GPIO_PORT_A, 0) & S3C24XX_GPADAT_MASK;
+		LOGMASKED(LOG_GPIO, "%s: GPIO read: GPADAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case S3C24XX_GPBDAT :
 		data = iface_gpio_port_r( S3C24XX_GPIO_PORT_B, s3c24xx_gpio_get_mask(m_gpio.regs.gpbcon, 0) & S3C24XX_GPBDAT_MASK) & S3C24XX_GPBDAT_MASK;
+		LOGMASKED(LOG_GPIO, "%s: GPIO read: GPBDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case S3C24XX_GPCDAT :
 		data = iface_gpio_port_r( S3C24XX_GPIO_PORT_C, s3c24xx_gpio_get_mask(m_gpio.regs.gpccon, 0) & S3C24XX_GPCDAT_MASK) & S3C24XX_GPCDAT_MASK;
+		LOGMASKED(LOG_GPIO, "%s: GPIO read: GPCDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
-	case S3C24XX_GPDDAT :
+	case S3C24XX_GPDDAT:
 		data = iface_gpio_port_r( S3C24XX_GPIO_PORT_D, s3c24xx_gpio_get_mask(m_gpio.regs.gpdcon, 0) & S3C24XX_GPDDAT_MASK) & S3C24XX_GPDDAT_MASK;
+		LOGMASKED(LOG_GPIO, "%s: GPIO read: GPDDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
-	case S3C24XX_GPEDAT :
+	case S3C24XX_GPEDAT:
 		data = iface_gpio_port_r( S3C24XX_GPIO_PORT_E, s3c24xx_gpio_get_mask(m_gpio.regs.gpecon, 0) & S3C24XX_GPEDAT_MASK) & S3C24XX_GPEDAT_MASK;
+		//LOGMASKED(LOG_GPIO, "%s: GPIO read: GPEDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
-	case S3C24XX_GPFDAT :
+	case S3C24XX_GPFDAT:
 		data = iface_gpio_port_r( S3C24XX_GPIO_PORT_F, s3c24xx_gpio_get_mask(m_gpio.regs.gpfcon, 0) & S3C24XX_GPFDAT_MASK) & S3C24XX_GPFDAT_MASK;
+		LOGMASKED(LOG_GPIO, "%s: GPIO read: GPFDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
-	case S3C24XX_GPGDAT :
+	case S3C24XX_GPGDAT:
 		data = iface_gpio_port_r( S3C24XX_GPIO_PORT_G, s3c24xx_gpio_get_mask(m_gpio.regs.gpgcon, 0) & S3C24XX_GPGDAT_MASK) & S3C24XX_GPGDAT_MASK;
+		LOGMASKED(LOG_GPIO, "%s: GPIO read: GPGDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
-	case S3C24XX_GPHDAT :
+	case S3C24XX_GPHDAT:
 		data = iface_gpio_port_r( S3C24XX_GPIO_PORT_H, s3c24xx_gpio_get_mask(m_gpio.regs.gphcon, 0) & S3C24XX_GPHDAT_MASK) & S3C24XX_GPHDAT_MASK;
+		LOGMASKED(LOG_GPIO, "%s: GPIO read: GPHDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 #endif
 #if defined(DEVICE_S3C2440)
-	case S3C24XX_GPJDAT :
+	case S3C24XX_GPJDAT:
 		data = iface_gpio_port_r( S3C24XX_GPIO_PORT_J, s3c24xx_gpio_get_mask(m_gpio.regs.gpjcon, 0) & S3C24XX_GPJDAT_MASK) & S3C24XX_GPJDAT_MASK;
+		LOGMASKED(LOG_GPIO, "%s: GPIO read: GPJDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 #endif
+	default:
+		LOGMASKED(LOG_GPIO, "%s: GPIO read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_GPIO + (offset << 2), data, mem_mask);
+		break;
 	}
-	verboselog(*this, 9, "(GPIO) %08X -> %08X\n", S3C24XX_BASE_GPIO + (offset << 2), data);
 	return data;
 }
 
@@ -1748,51 +1849,69 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_gpio_w )
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 	uint32_t old_value = ((uint32_t*)&m_gpio.regs)[offset];
 #endif
-	verboselog(*this, 9, "(GPIO) %08X <- %08X\n", S3C24XX_BASE_GPIO + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_gpio.regs)[offset]);
 	switch (offset)
 	{
 	case S3C24XX_GPADAT:
+		LOGMASKED(LOG_GPIO, "%s: GPIO write: GPADAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		iface_gpio_port_w(S3C24XX_GPIO_PORT_A, m_gpio.regs.gpacon ^ 0xFFFFFFFF, data & S3C24XX_GPADAT_MASK);
 		break;
 	case S3C24XX_GPBDAT:
+		LOGMASKED(LOG_GPIO, "%s: GPIO write: GPBDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		iface_gpio_port_w(S3C24XX_GPIO_PORT_B, s3c24xx_gpio_get_mask(m_gpio.regs.gpbcon, 1) & S3C24XX_GPBDAT_MASK, data & S3C24XX_GPBDAT_MASK);
 		break;
 	case S3C24XX_GPCDAT:
+		LOGMASKED(LOG_GPIO, "%s: GPIO write: GPCDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		iface_gpio_port_w(S3C24XX_GPIO_PORT_C, s3c24xx_gpio_get_mask(m_gpio.regs.gpccon, 1) & S3C24XX_GPCDAT_MASK, data & S3C24XX_GPCDAT_MASK);
 		break;
 	case S3C24XX_GPDDAT:
+		LOGMASKED(LOG_GPIO, "%s: GPIO write: GPDDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		iface_gpio_port_w(S3C24XX_GPIO_PORT_D, s3c24xx_gpio_get_mask(m_gpio.regs.gpdcon, 1) & S3C24XX_GPDDAT_MASK, data & S3C24XX_GPDDAT_MASK);
 		break;
 	case S3C24XX_GPEDAT:
+		//LOGMASKED(LOG_GPIO, "%s: GPIO write: GPEDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		iface_gpio_port_w(S3C24XX_GPIO_PORT_E, s3c24xx_gpio_get_mask(m_gpio.regs.gpecon, 1) & S3C24XX_GPEDAT_MASK, data & S3C24XX_GPEDAT_MASK);
 		break;
 	case S3C24XX_GPFDAT:
+		LOGMASKED(LOG_GPIO, "%s: GPIO write: GPFDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		iface_gpio_port_w(S3C24XX_GPIO_PORT_F, s3c24xx_gpio_get_mask(m_gpio.regs.gpfcon, 1) & S3C24XX_GPFDAT_MASK, data & S3C24XX_GPFDAT_MASK);
 		break;
 	case S3C24XX_GPGDAT:
+		LOGMASKED(LOG_GPIO, "%s: GPIO write: GPGDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		iface_gpio_port_w(S3C24XX_GPIO_PORT_G, s3c24xx_gpio_get_mask(m_gpio.regs.gpgcon, 1) & S3C24XX_GPGDAT_MASK, data & S3C24XX_GPGDAT_MASK);
 		break;
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 	case S3C24XX_GPHDAT:
+		LOGMASKED(LOG_GPIO, "%s: GPIO write: GPHDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		iface_gpio_port_w(S3C24XX_GPIO_PORT_H, s3c24xx_gpio_get_mask(m_gpio.regs.gphcon, 1) & S3C24XX_GPHDAT_MASK, data & S3C24XX_GPHDAT_MASK);
 		break;
 	case S3C24XX_EINTPEND:
+		LOGMASKED(LOG_GPIO, "%s: GPIO write: EINTPEND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_gpio.regs.eintpend = (old_value & ~data);
 		s3c24xx_check_pending_eint();
 		break;
 	case S3C24XX_EINTMASK:
+		LOGMASKED(LOG_GPIO, "%s: GPIO write: EINTMASK = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		s3c24xx_check_pending_eint();
 		break;
 	case S3C24XX_GSTATUS2:
+		LOGMASKED(LOG_GPIO, "%s: GPIO write: GSTATUS2 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_gpio.regs.gstatus2 = (old_value & ~data) & 7; // "The setting is cleared by writing '1' to this bit"
 		break;
 #endif
 #if defined(DEVICE_S3C2440)
+	case S3C24XX_GPJCON:
+	case S3C24XX_GPJUP:
+		// Don't log anything, it's really chatty
+		break;
 	case S3C24XX_GPJDAT:
+		//LOGMASKED(LOG_GPIO, "%s: GPIO write: GPJDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		iface_gpio_port_w(S3C24XX_GPIO_PORT_J, s3c24xx_gpio_get_mask(m_gpio.regs.gpjcon, 1) & S3C24XX_GPJDAT_MASK, data & S3C24XX_GPJDAT_MASK);
 		break;
 #endif
+	default:
+		LOGMASKED(LOG_GPIO, "%s: GPIO write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_GPIO + (offset << 2), data, mem_mask);
+		break;
 	}
 }
 
@@ -1802,13 +1921,13 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_memcon_r )
 {
 	assert(offset < ARRAY_LENGTH(m_memcon.regs.data));
 	uint32_t data = m_memcon.regs.data[offset];
-	verboselog(*this, 9, "(MEMCON) %08X -> %08X\n", S3C24XX_BASE_MEMCON + (offset << 2), data);
+	LOGMASKED(LOG_MEMCON, "%s: memcon read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_MEMCON + (offset << 2), data, mem_mask);
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_memcon_w )
 {
-	verboselog(*this, 9, "(MEMCON) %08X <- %08X\n", S3C24XX_BASE_MEMCON + (offset << 2), data);
+	LOGMASKED(LOG_MEMCON, "%s: memcon write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_MEMCON + (offset << 2), data, mem_mask);
 	COMBINE_DATA(&m_memcon.regs.data[offset]);
 }
 
@@ -1819,41 +1938,39 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_usb_host_r )
 	uint32_t data = m_usbhost.regs.data[offset];
 	switch (offset)
 	{
-		// HcCommandStatus
-		case 0x08 / 4 :
-		{
-			data = data & ~(1 << 0); // [bit 0] HostControllerReset
-		}
+	// HcCommandStatus
+	case 0x08 / 4:
+		data = data & ~(1 << 0); // [bit 0] HostControllerReset
+		LOGMASKED(LOG_USBHOST, "%s: USB host read: HcCommandStatus = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
-		// HcPeriodStart
-		case 0x40 / 4:
-		{
-			// "After a hardware reset, this field is cleared. This is then set by"
-			// "HCD during the HC initialization. The value is calculated"
-			// "roughly as 10% off from HcFmInterval.. A typical value will be 3E67h."
-			data = (data & ~0x00003FFF) | 0x3E67;
-		}
+	// HcPeriodStart
+	case 0x40 / 4:
+		// "After a hardware reset, this field is cleared. This is then set by"
+		// "HCD during the HC initialization. The value is calculated"
+		// "roughly as 10% off from HcFmInterval.. A typical value will be 3E67h."
+		data = (data & ~0x00003FFF) | 0x3E67;
+		LOGMASKED(LOG_USBHOST, "%s: USB host read: HcPeriodStart = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
-		// HcRhDescriptorA
-		case 0x48 / 4:
-		{
-			data = (data & ~0xFF) | 2; // number of ports
-		}
+	// HcRhDescriptorA
+	case 0x48 / 4:
+		data = (data & ~0xFF) | 2; // number of ports
+		LOGMASKED(LOG_USBHOST, "%s: USB host read: HcRhDescriptorA = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
-		// HcRhStatus
-		case 0x50 / 4:
-		{
-			data = data & ~(1 << 16); // "The Root Hub does not support the local power status feature; thus, this bit is always read as ?0?."
-		}
+	// HcRhStatus
+	case 0x50 / 4:
+		data = data & ~(1 << 16); // "The Root Hub does not support the local power status feature; thus, this bit is always read as ?0?."
+		LOGMASKED(LOG_USBHOST, "%s: USB host read: HcRhStatus = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	default:
+		LOGMASKED(LOG_USBHOST, "%s: USB host read: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 		break;
 	}
-	verboselog(*this, 9, "(USB H) %08X -> %08X\n", S3C24XX_BASE_USBHOST + (offset << 2), data);
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_usb_host_w )
 {
-	verboselog(*this, 9, "(USB H) %08X <- %08X\n", S3C24XX_BASE_USBHOST + (offset << 2), data);
+	LOGMASKED(LOG_USBHOST, "%s: USB host write: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 	COMBINE_DATA(&m_usbhost.regs.data[offset]);
 }
 
@@ -1865,16 +1982,18 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_uart_r(uint32_t ch, uint32_t offset)
 	switch (offset)
 	{
 	case uart_t::UTRSTAT:
-		{
-			data = (data & ~0x00000006) | 0x00000004 | 0x00000002; // [bit 2] Transmitter empty / [bit 1] Transmit buffer empty
-		}
+		data = (data & ~0x00000006) | 0x00000004 | 0x00000002; // [bit 2] Transmitter empty / [bit 1] Transmit buffer empty
+		LOGMASKED(LOG_UART, "%s: UART %d read: UTRSTAT = %08x\n", machine().describe_context(), ch, data);
 		break;
 	case uart_t::URXH:
 		{
 			uint8_t rxdata = data & 0xFF;
-			verboselog(*this, 5, "UART %d read %02X (%c)\n", ch, rxdata, ((rxdata >= 32) && (rxdata < 128)) ? (char)rxdata : '?');
 			m_uart[ch].regs.utrstat &= ~1; // [bit 0] Receive buffer data ready
+			LOGMASKED(LOG_UART, "%s: UART %d read: URXH = %08x (%c)\n", machine().describe_context(), ch, data, ((rxdata >= 0x20 && rxdata < 0x7f) ? (char)rxdata : '?'));
 		}
+		break;
+	default:
+		LOGMASKED(LOG_UART, "%s: UART %d read: %08x = %08x\n", machine().describe_context(), ch, offset << 2, data);
 		break;
 	}
 	return data;
@@ -1886,56 +2005,50 @@ void S3C24_CLASS_NAME::s3c24xx_uart_w(uint32_t ch, uint32_t offset, uint32_t dat
 	switch (offset)
 	{
 	case uart_t::UFCON :
-		{
-			m_uart[ch].regs.ufcon &= ~((1 << 2) | (1 << 1)); // bits 1 and 2 are auto-cleared after resetting FIFO
-		}
+		m_uart[ch].regs.ufcon &= ~((1 << 2) | (1 << 1)); // bits 1 and 2 are auto-cleared after resetting FIFO
+		LOGMASKED(LOG_UART, "%s: UART %d write: UFCON = %08x & %08x\n", machine().describe_context(), ch, data, mem_mask);
 		break;
 	case uart_t::UTXH :
 		{
 			uint8_t txdata = data & 0xFF;
-			verboselog( *this, 5, "UART %d write %02X (%c)\n", ch, txdata, ((txdata >= 32) && (txdata < 128)) ? (char)txdata : '?');
 #ifdef UART_PRINTF
-			printf("%c", ((txdata >= 32) && (txdata < 128)) ? (char)txdata : '?');
+			printf("%c", (txdata >= 32 && txdata < 128) ? (char)txdata : '?');
 #endif
+			LOGMASKED(LOG_UART, "%s: UART %d write: UTXH = %08x & %08x (%c)\n", machine().describe_context(), ch, data, mem_mask, ((txdata >= 32 && txdata < 128) ? (char)txdata : '?'));
 		}
+		break;
+	default:
+		LOGMASKED(LOG_UART, "%s: UART %d write: %08x = %08x & %08x\n", machine().describe_context(), ch, offset << 2, data, mem_mask);
 		break;
 	}
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_0_r )
 {
-	uint32_t data = s3c24xx_uart_r(0, offset);
-//  verboselog( *this, 9, "(UART 0) %08X -> %08X\n", S3C24XX_BASE_UART_0 + (offset << 2), data);
-	return data;
+	return s3c24xx_uart_r(0, offset);
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_1_r )
 {
-	uint32_t data = s3c24xx_uart_r(1, offset);
-//  verboselog( *this, 9, "(UART 1) %08X -> %08X\n", S3C24XX_BASE_UART_1 + (offset << 2), data);
-	return data;
+	return s3c24xx_uart_r(1, offset);
 }
 
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_2_r )
 {
-	uint32_t data = s3c24xx_uart_r(2, offset);
-//  verboselog( *this, 9, "(UART 2) %08X -> %08X\n", S3C24XX_BASE_UART_2 + (offset << 2), data);
-	return data;
+	return s3c24xx_uart_r(2, offset);
 }
 
 #endif
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_0_w )
 {
-//  verboselog( *this, 9, "(UART 0) %08X <- %08X\n", S3C24XX_BASE_UART_0 + (offset << 2), data);
 	s3c24xx_uart_w(0, offset, data, mem_mask);
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_1_w )
 {
-//  verboselog( *this, 9, "(UART 1) %08X <- %08X\n", S3C24XX_BASE_UART_1 + (offset << 2), data);
 	s3c24xx_uart_w(1, offset, data, mem_mask);
 }
 
@@ -1943,7 +2056,6 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_1_w )
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_2_w )
 {
-//  verboselog( *this, 9, "(UART 2) %08X <- %08X\n", S3C24XX_BASE_UART_2 + (offset << 2), data);
 	s3c24xx_uart_w(2, offset, data, mem_mask);
 }
 
@@ -1951,9 +2063,29 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_2_w )
 
 void S3C24_CLASS_NAME::s3c24xx_uart_fifo_w(int uart, uint8_t data)
 {
-//  printf( "s3c24xx_uart_fifo_w (%c)\n", data);
+#if defined(DEVICE_S3C2400)
+	static const uint32_t s_int_bits[2] = { S3C24XX_INT_URXD0, S3C24XX_INT_URXD1 };
+#else
+	static const uint32_t s_int_bits[3] = { S3C24XX_SUBINT_RXD0, S3C24XX_SUBINT_RXD1, S3C24XX_SUBINT_RXD2 };
+#endif
+
 	m_uart[uart].regs.urxh = data;
 	m_uart[uart].regs.utrstat |= 1; // [bit 0] Receive buffer data ready
+
+	bool request_irq = true;
+	if (BIT(m_uart[uart].regs.ufcon, 0))
+	{
+		request_irq = false;
+	}
+
+	if (request_irq)
+	{
+#if defined(DEVICE_S3C2400)
+		s3c24xx_request_irq(s_int_bits[uart]);
+#else
+		s3c24xx_request_subirq(s_int_bits[uart]);
+#endif
+	}
 }
 
 /* USB Device */
@@ -1980,14 +2112,14 @@ void S3C24_CLASS_NAME::s3c24xx_usb_device_reset()
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_usb_device_r )
 {
-	uint32_t data = m_usbdev.regs.data[offset];
-	verboselog(*this, 9, "(USB D) %08X -> %08X\n", S3C24XX_BASE_USBDEV + (offset << 2), data);
+	const uint32_t data = m_usbdev.regs.data[offset];
+	LOGMASKED(LOG_USB, "%s: USB read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_USBDEV + (offset << 2), data, mem_mask);
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_usb_device_w )
 {
-	verboselog(*this, 9, "(USB D) %08X <- %08X\n", S3C24XX_BASE_USBDEV + (offset << 2), data);
+	LOGMASKED(LOG_USB, "%s: USB read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_USBDEV + (offset << 2), data, mem_mask);
 	COMBINE_DATA(&m_usbdev.regs.data[offset]);
 }
 
@@ -2008,9 +2140,12 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_wdt_r )
 			data = 0;
 #endif
 		}
+		LOGMASKED(LOG_WDT, "%s: watchdog read: WTCNT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	default:
+		LOGMASKED(LOG_WDT, "%s: watchdog read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_WDT + (offset << 2), data, mem_mask);
 		break;
 	}
-	verboselog(*this, 9, "(WDT) %08X -> %08X\n", S3C24XX_BASE_WDT + (offset << 2), data);
 	return data;
 }
 
@@ -2018,13 +2153,13 @@ void S3C24_CLASS_NAME::s3c24xx_wdt_start()
 {
 	uint32_t pclk, prescaler, clock;
 	double freq, hz;
-	verboselog(*this, 1, "WDT start\n");
+	LOGMASKED(LOG_WDT, "WDT start\n");
 	pclk = s3c24xx_get_pclk();
 	prescaler = BITS(m_wdt.regs.wtcon, 15, 8);
 	clock = 16 << BITS(m_wdt.regs.wtcon, 4, 3);
 	freq = (double)pclk / (prescaler + 1) / clock;
 	hz = freq / m_wdt.regs.wtcnt;
-	verboselog(*this, 5, "WDT pclk %d prescaler %d clock %d freq %f hz %f\n", pclk, prescaler, clock, freq, hz);
+	LOGMASKED(LOG_WDT, "watchdog start: pclk %d prescaler %d clock %d freq %f hz %f\n", pclk, prescaler, clock, freq, hz);
 	m_wdt.timer->adjust( attotime::from_hz( hz), 0, attotime::from_hz( hz));
 #if defined(DEVICE_S3C2410)
 	m_wdt.freq = freq;
@@ -2034,7 +2169,7 @@ void S3C24_CLASS_NAME::s3c24xx_wdt_start()
 
 void S3C24_CLASS_NAME::s3c24xx_wdt_stop()
 {
-	verboselog( *this, 1, "WDT stop\n");
+	LOGMASKED(LOG_WDT, "watchdog stop\n");
 #if defined(DEVICE_S3C2410)
 	m_wdt.regs.wtcnt = m_wdt.calc_current_count();
 #else
@@ -2054,20 +2189,23 @@ void S3C24_CLASS_NAME::s3c24xx_wdt_recalc()
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_wdt_w )
 {
 	uint32_t old_value = ((uint32_t*)&m_wdt.regs)[offset];
-	verboselog( *this, 9, "(WDT) %08X <- %08X\n", S3C24XX_BASE_WDT + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_wdt.regs)[offset]);
 	switch (offset)
 	{
-	case wdt_t::WTCON :
+	case wdt_t::WTCON:
+		LOGMASKED(LOG_WDT, "%s: watchdog write: WTCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		if (BIT(data ^ old_value, 5))
 			s3c24xx_wdt_recalc();
+		break;
+	default:
+		LOGMASKED(LOG_WDT, "%s: watchdog write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_WDT + (offset << 2), data, mem_mask);
 		break;
 	}
 }
 
 TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_wdt_timer_exp )
 {
-	verboselog( *this, 2, "WDT timer callback\n");
+	LOGMASKED(LOG_WDT, "WDT timer callback\n");
 	if (BIT(m_wdt.regs.wtcon, 2))
 	{
 #if defined(DEVICE_S3C2400) || defined(DEVICE_S3C2410)
@@ -2117,7 +2255,7 @@ int S3C24_CLASS_NAME::iface_i2c_sda_r()
 void S3C24_CLASS_NAME::i2c_send_start()
 {
 	// FIXME: this needs to sense busy condition and use realistic timing
-	verboselog(*this, 5, "i2c_send_start\n");
+	LOGMASKED(LOG_I2C, "i2c_send_start\n");
 	iface_i2c_sda_w(1);
 	iface_i2c_scl_w(1);
 	iface_i2c_sda_w(0);
@@ -2127,7 +2265,7 @@ void S3C24_CLASS_NAME::i2c_send_start()
 void S3C24_CLASS_NAME::i2c_send_stop()
 {
 	// FIXME: this needs realistic timing
-	verboselog(*this, 5, "i2c_send_stop\n");
+	LOGMASKED(LOG_I2C, "i2c_send_stop\n");
 	iface_i2c_sda_w(0);
 	iface_i2c_scl_w(1);
 	iface_i2c_sda_w(1);
@@ -2137,7 +2275,7 @@ void S3C24_CLASS_NAME::i2c_send_stop()
 uint8_t S3C24_CLASS_NAME::i2c_receive_byte(int ack)
 {
 	uint8_t data = 0;
-	verboselog(*this, 5, "i2c_receive_byte ...\n");
+	LOGMASKED(LOG_I2C, "i2c_receive_byte ...\n");
 	iface_i2c_sda_w(1);
 	for (int i = 0; i < 8; i++)
 	{
@@ -2145,8 +2283,8 @@ uint8_t S3C24_CLASS_NAME::i2c_receive_byte(int ack)
 		data = (data << 1) + (iface_i2c_sda_r() ? 1 : 0);
 		iface_i2c_scl_w( 0);
 	}
-	verboselog(*this, 5, "recv data %02X\n", data);
-	verboselog(*this, 5, "send ack %d\n", ack);
+	LOGMASKED(LOG_I2C, "recv data %02X\n", data);
+	LOGMASKED(LOG_I2C, "send ack %d\n", ack);
 	iface_i2c_sda_w(ack ? 0 : 1);
 	iface_i2c_scl_w(1);
 	iface_i2c_scl_w(0);
@@ -2156,8 +2294,8 @@ uint8_t S3C24_CLASS_NAME::i2c_receive_byte(int ack)
 int S3C24_CLASS_NAME::i2c_send_byte(uint8_t data)
 {
 	int ack;
-	verboselog(*this, 5, "i2c_send_byte ...\n");
-	verboselog(*this, 5, "send data %02X\n", data);
+	LOGMASKED(LOG_I2C, "i2c_send_byte ...\n");
+	LOGMASKED(LOG_I2C, "send data %02X\n", data);
 	for (int i = 0; i < 8; i++)
 	{
 		iface_i2c_sda_w((data & 0x80) ? 1 : 0);
@@ -2168,41 +2306,39 @@ int S3C24_CLASS_NAME::i2c_send_byte(uint8_t data)
 	iface_i2c_sda_w(1); // ack bit
 	iface_i2c_scl_w(1);
 	ack = iface_i2c_sda_r();
-	verboselog(*this, 5, "recv ack %d\n", ack);
+	LOGMASKED(LOG_I2C, "recv ack %d\n", ack);
 	iface_i2c_scl_w(0);
 	return ack;
 }
 
 void S3C24_CLASS_NAME::iic_start()
 {
-	int mode_selection;
-	verboselog(*this, 1, "IIC start\n");
+	LOGMASKED(LOG_I2C, "I2C start\n");
 	i2c_send_start();
-	mode_selection = BITS( m_iic.regs.iicstat, 7, 6);
+	int mode_selection = BITS(m_iic.regs.iicstat, 7, 6);
 	switch (mode_selection)
 	{
-		case 2: i2c_send_byte( m_iic.regs.iicds | 0x01); break;
-		case 3: i2c_send_byte( m_iic.regs.iicds & 0xFE); break;
+		case 2: i2c_send_byte(m_iic.regs.iicds | 0x01); break;
+		case 3: i2c_send_byte(m_iic.regs.iicds & 0xFE); break;
 	}
 	m_iic.timer->adjust( attotime::from_usec( 1));
 }
 
 void S3C24_CLASS_NAME::iic_stop()
 {
-	verboselog(*this, 1, "IIC stop\n");
+	LOGMASKED(LOG_I2C, "IIC stop\n");
 	i2c_send_stop();
 	m_iic.timer->adjust(attotime::never);
 }
 
 void S3C24_CLASS_NAME::iic_resume()
 {
-	int mode_selection;
-	verboselog(*this, 1, "IIC resume\n");
-	mode_selection = BITS(m_iic.regs.iicstat, 7, 6);
+	LOGMASKED(LOG_I2C, "IIC resume\n");
+	int mode_selection = BITS(m_iic.regs.iicstat, 7, 6);
 	switch (mode_selection)
 	{
-		case 2: m_iic.regs.iicds = i2c_receive_byte(BIT( m_iic.regs.iiccon, 7)); break;
-		case 3: i2c_send_byte( m_iic.regs.iicds & 0xFF); break;
+		case 2: m_iic.regs.iicds = i2c_receive_byte(BIT(m_iic.regs.iiccon, 7)); break;
+		case 3: i2c_send_byte(m_iic.regs.iicds & 0xFF); break;
 	}
 	m_iic.timer->adjust(attotime::from_usec(1));
 }
@@ -2214,32 +2350,32 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iic_r )
 	{
 	case S3C24XX_IICSTAT:
 		data = data & ~0x0000000F;
+		LOGMASKED(LOG_I2C, "%s: i2c read: IICSTAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	default:
+		LOGMASKED(LOG_I2C, "%s: i2c read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_IIC + (offset << 2), data, mem_mask);
 		break;
 	}
-	verboselog(*this, 9, "(IIC) %08X -> %08X\n", S3C24XX_BASE_IIC + (offset << 2), data);
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iic_w )
 {
 	uint32_t old_value = ((uint32_t*)&m_iic.regs)[offset];
-	verboselog(*this, 9, "(IIC) %08X <- %08X\n", S3C24XX_BASE_IIC + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_iic.regs)[offset]);
 	switch (offset)
 	{
 	case S3C24XX_IICCON:
 		{
-			int interrupt_pending_flag;
+			LOGMASKED(LOG_I2C, "%s: i2c write: IICCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 #if 0
 			static constexpr int div_table[] = { 16, 512 };
-			int enable_interrupt, transmit_clock_value, tx_clock_source_selection
-			double clock;
-			transmit_clock_value = (data >> 0) & 0xF;
-			tx_clock_source_selection = (data >> 6) & 1;
-			enable_interrupt = (data >> 5) & 1;
-			clock = (double)s3c24xx_get_pclk() / div_table[tx_clock_source_selection] / (transmit_clock_value + 1);
+			int transmit_clock_value = (data >> 0) & 0xF;
+			int tx_clock_source_selection = (data >> 6) & 1;
+			int enable_interrupt = (data >> 5) & 1;
+			double clock = (double)s3c24xx_get_pclk() / div_table[tx_clock_source_selection] / (transmit_clock_value + 1);
 #endif
-			interrupt_pending_flag = BIT(old_value, 4);
+			int interrupt_pending_flag = BIT(old_value, 4);
 			if (interrupt_pending_flag != 0)
 			{
 				interrupt_pending_flag = BIT(data, 4);
@@ -2269,13 +2405,12 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iic_w )
 		break;
 	case S3C24XX_IICSTAT:
 		{
-			int interrupt_pending_flag;
+			LOGMASKED(LOG_I2C, "%s: i2c write: IICSTAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			m_iic.count = 0;
-			interrupt_pending_flag = BIT( m_iic.regs.iiccon, 4);
+			int interrupt_pending_flag = BIT(m_iic.regs.iiccon, 4);
 			if (interrupt_pending_flag == 0)
 			{
-				int start_stop_condition;
-				start_stop_condition = BIT( data, 5);
+				int start_stop_condition = BIT(data, 5);
 				if (start_stop_condition != 0)
 				{
 					if (m_iic.count == 0)
@@ -2295,13 +2430,16 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iic_w )
 			}
 		}
 		break;
+	default:
+		LOGMASKED(LOG_I2C, "%s: i2c write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_IIC + (offset << 2), data, mem_mask);
+		break;
 	}
 }
 
 TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_iic_timer_exp )
 {
 	int enable_interrupt;
-	verboselog(*this, 2, "IIC timer callback\n");
+	LOGMASKED(LOG_I2C, "I2C timer callback\n");
 	m_iic.count++;
 	enable_interrupt = BIT(m_iic.regs.iiccon, 5);
 	if (enable_interrupt)
@@ -2322,23 +2460,21 @@ void S3C24_CLASS_NAME::iface_i2s_data_w(int ch, uint16_t data)
 void S3C24_CLASS_NAME::s3c24xx_iis_start()
 {
 	const uint32_t codeclk_table[] = { 256, 384};
-	double freq;
-	int pclk, prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk;
-	verboselog( *this, 1, "IIS start\n");
-	prescaler_enable = BIT( m_iis.regs.iiscon, 1);
-	prescaler_control_a = BITS( m_iis.regs.iispsr, 9, 5);
-	prescaler_control_b = BITS( m_iis.regs.iispsr, 4, 0);
-	codeclk = BIT( m_iis.regs.iismod, 2);
-	pclk = s3c24xx_get_pclk();
-	freq = ((double)pclk / (prescaler_control_a + 1) / codeclk_table[codeclk]) * 2; // why do I have to multiply by two?
-	verboselog( *this, 5, "IIS - pclk %d psc_enable %d psc_a %d psc_b %d codeclk %d freq %f\n", pclk, prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk_table[codeclk], freq);
+	LOGMASKED(LOG_I2S, "IIS start\n");
+	int prescaler_enable = BIT(m_iis.regs.iiscon, 1);
+	int prescaler_control_a = BITS(m_iis.regs.iispsr, 9, 5);
+	int prescaler_control_b = BITS(m_iis.regs.iispsr, 4, 0);
+	int codeclk = BIT(m_iis.regs.iismod, 2);
+	int pclk = s3c24xx_get_pclk();
+	double freq = ((double)pclk / (prescaler_control_a + 1) / codeclk_table[codeclk]) * 2; // why do I have to multiply by two?
+	LOGMASKED(LOG_I2S, "IIS - pclk %d psc_enable %d psc_a %d psc_b %d codeclk %d freq %f\n", pclk, prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk_table[codeclk], freq);
 	m_iis.timer->adjust( attotime::from_hz( freq), 0, attotime::from_hz( freq));
 }
 
 void S3C24_CLASS_NAME::s3c24xx_iis_stop()
 {
-	verboselog( *this, 1, "IIS stop\n");
-	m_iis.timer->adjust( attotime::never);
+	LOGMASKED(LOG_I2S, "IIS stop\n");
+	m_iis.timer->adjust(attotime::never);
 }
 
 void S3C24_CLASS_NAME::s3c24xx_iis_recalc()
@@ -2355,27 +2491,29 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iis_r )
 #if 0
 	switch (offset)
 	{
-	case iis_t::IISCON :
+	case iis_t::IISCON:
 		data = data & ~1; // hack for mp3 player
+		LOGMASKED(LOG_I2S, "%s: i2s read: IISCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	}
 #endif
-	verboselog(*this, 9, "(IIS) %08X -> %08X\n", S3C24XX_BASE_IIS + (offset << 2), data);
+	LOGMASKED(LOG_I2S, "%s: i2s read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_IIS + (offset << 2), data, mem_mask);
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iis_w )
 {
 	uint32_t old_value = ((uint32_t*)&m_iis.regs)[offset];
-	verboselog(*this, 9, "(IIS) %08X <- %08X\n", S3C24XX_BASE_IIS + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_iis.regs)[offset]);
 	switch (offset)
 	{
-	case iis_t::IISCON :
+	case iis_t::IISCON:
+		LOGMASKED(LOG_I2S, "%s: i2s write: IISCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		if (BIT(data ^ old_value, 0))
 			s3c24xx_iis_recalc();
 		break;
-	case iis_t::IISFIFO :
+	case iis_t::IISFIFO:
+		LOGMASKED(LOG_I2S, "%s: i2s write: IISFIFO = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		if (ACCESSING_BITS_16_31)
 		{
 			m_iis.fifo[m_iis.fifo_index++] = BITS(data, 31, 16);
@@ -2391,12 +2529,15 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iis_w )
 			iface_i2s_data_w(1, m_iis.fifo[1]);
 		}
 		break;
+	default:
+		LOGMASKED(LOG_I2S, "%s: i2s write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_IIS + (offset << 2), data, mem_mask);
+		break;
 	}
 }
 
 TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_iis_timer_exp )
 {
-	verboselog(*this, 2, "IIS timer callback\n");
+	LOGMASKED(LOG_I2S, "IIS timer callback\n");
 	s3c24xx_dma_request_iis();
 }
 
@@ -2405,32 +2546,35 @@ TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_iis_timer_exp )
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_rtc_r )
 {
 	uint32_t data = ((uint32_t*)&m_rtc.regs)[offset];
-	verboselog( *this, 9, "(RTC) %08X -> %08X\n", S3C24XX_BASE_RTC + (offset << 2), data);
+	LOGMASKED(LOG_RTC, "%s: rtc read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_RTC + (offset << 2), data, mem_mask);
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_rtc_w )
 {
-	verboselog( *this, 9, "(RTC) %08X <- %08X\n", S3C24XX_BASE_RTC + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_rtc.regs)[offset]);
 	switch (offset)
 	{
-	case rtc_t::TICNT :
+	case rtc_t::TICNT:
+		LOGMASKED(LOG_RTC, "%s: rtc write: TICNT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_rtc.recalc();
+		break;
+	default:
+		LOGMASKED(LOG_RTC, "%s: rtc write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_RTC + (offset << 2), data, mem_mask);
 		break;
 	}
 }
 
 TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_rtc_timer_tick_count_exp )
 {
-	verboselog(*this, 2, "RTC timer callback (tick count)\n");
+	LOGMASKED(LOG_RTC, "RTC timer callback (tick count)\n");
 	s3c24xx_request_irq(S3C24XX_INT_TICK);
 }
 
 void S3C24_CLASS_NAME::s3c24xx_rtc_update()
 {
 	m_rtc.update();
-	verboselog( *this, 5, "RTC - %04d/%02d/%02d %02d:%02d:%02d\n", bcd_2_dec( m_rtc.regs.bcdyear) + 2000, bcd_2_dec( m_rtc.regs.bcdmon), bcd_2_dec( m_rtc.regs.bcdday), bcd_2_dec( m_rtc.regs.bcdhour), bcd_2_dec( m_rtc.regs.bcdmin), bcd_2_dec( m_rtc.regs.bcdsec));
+	LOGMASKED(LOG_RTC, "RTC - %04d/%02d/%02d %02d:%02d:%02d\n", bcd_2_dec( m_rtc.regs.bcdyear) + 2000, bcd_2_dec( m_rtc.regs.bcdmon), bcd_2_dec( m_rtc.regs.bcdday), bcd_2_dec( m_rtc.regs.bcdhour), bcd_2_dec( m_rtc.regs.bcdmin), bcd_2_dec( m_rtc.regs.bcdsec));
 }
 
 void S3C24_CLASS_NAME::s3c24xx_rtc_check_alarm()
@@ -2441,7 +2585,7 @@ void S3C24_CLASS_NAME::s3c24xx_rtc_check_alarm()
 
 TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_rtc_timer_update_exp )
 {
-	verboselog(*this, 2, "RTC timer callback (update)\n");
+	LOGMASKED(LOG_RTC, "RTC timer callback (update)\n");
 	s3c24xx_rtc_update();
 	s3c24xx_rtc_check_alarm();
 }
@@ -2485,23 +2629,28 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_adc_r )
 #if defined(DEVICE_S3C2400)
 	case S3C24XX_ADCDAT:
 		data = (data & ~0x3FF) | (iface_adc_data_r(0) & 0x3FF);
+		LOGMASKED(LOG_ADC, "%s: ADC read: ADCDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 #else
 	case S3C24XX_ADCDAT0:
 		data = (data & ~0x3FF) | (iface_adc_data_r(0) & 0x3FF);
+		LOGMASKED(LOG_ADC, "%s: ADC read: ADCDAT0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case S3C24XX_ADCDAT1:
 		data = (data & ~0x3FF) | (iface_adc_data_r(1) & 0x3FF);
+		LOGMASKED(LOG_ADC, "%s: ADC read: ADCDAT1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 #endif
+	default:
+		LOGMASKED(LOG_ADC, "%s: ADC read: %08x = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
 	}
-	verboselog(*this, 9, "(ADC) %08X -> %08X\n", S3C24XX_BASE_ADC + (offset << 2), data);
 	return data;
 }
 
 void S3C24_CLASS_NAME::s3c24xx_adc_start()
 {
-	verboselog(*this, 1, "ADC start\n");
+	LOGMASKED(LOG_ADC, "ADC start\n");
 	m_adc.regs.adccon &= ~(1 << 0); // A/D conversion is completed
 	m_adc.regs.adccon |= (1 << 15); // End of A/D conversion
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
@@ -2512,18 +2661,19 @@ void S3C24_CLASS_NAME::s3c24xx_adc_start()
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_adc_w )
 {
 	uint32_t old_value = ((uint32_t*)&m_adc.regs)[offset];
-	verboselog(*this, 9, "(ADC) %08X <- %08X\n", S3C24XX_BASE_ADC + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_adc.regs)[offset]);
 	switch (offset)
 	{
-		case S3C24XX_ADCCON :
-		{
+		case S3C24XX_ADCCON:
 			if (((old_value & (1 << 0)) == 0) && ((data & (1 << 0)) != 0))
 			{
 				s3c24xx_adc_start();
 			}
-		}
-		break;
+			LOGMASKED(LOG_ADC, "%s: ADC write: ADCCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			break;
+		default:
+			LOGMASKED(LOG_ADC, "%s: ADC write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_ADC + (offset << 2), data, mem_mask);
+			break;
 	}
 }
 
@@ -2571,8 +2721,8 @@ void S3C24_CLASS_NAME::s3c24xx_spi_w(uint32_t ch, uint32_t offset, uint32_t data
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_0_r )
 {
-	uint32_t data = s3c24xx_spi_r(0, offset);
-	verboselog(*this, 9, "(SPI 0) %08X -> %08X\n", S3C24XX_BASE_SPI_0 + (offset << 2), data);
+	const uint32_t data = s3c24xx_spi_r(0, offset);
+	LOGMASKED(LOG_SPI, "%s: SPI 0 read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_SPI_0 + (offset << 2), data, mem_mask);
 	return data;
 }
 
@@ -2580,8 +2730,8 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_0_r )
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_1_r )
 {
-	uint32_t data = s3c24xx_spi_r(1, offset);
-	verboselog(*this, 9, "(SPI 1) %08X -> %08X\n", S3C24XX_BASE_SPI_1 + (offset << 2), data);
+	const uint32_t data = s3c24xx_spi_r(1, offset);
+	LOGMASKED(LOG_SPI, "%s: SPI 0 read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_SPI_0 + (offset << 2), data, mem_mask);
 	return data;
 }
 
@@ -2589,7 +2739,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_1_r )
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_0_w )
 {
-	verboselog( *this, 9, "(SPI 0) %08X <- %08X\n", S3C24XX_BASE_SPI_0 + (offset << 2), data);
+	LOGMASKED(LOG_SPI, "%s: SPI 0 write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_SPI_0 + (offset << 2), data, mem_mask);
 	s3c24xx_spi_w( 0, offset, data, mem_mask);
 }
 
@@ -2597,7 +2747,7 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_0_w )
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_1_w )
 {
-	verboselog( *this, 9, "(SPI 1) %08X <- %08X\n", S3C24XX_BASE_SPI_1 + (offset << 2), data);
+	LOGMASKED(LOG_SPI, "%s: SPI 1 write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_SPI_0 + (offset << 2), data, mem_mask);
 	s3c24xx_spi_w( 1, offset, data, mem_mask);
 }
 
@@ -2609,14 +2759,14 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_1_w )
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_mmc_r )
 {
-	uint32_t data = m_mmc.regs.data[offset];
-	verboselog(*this, 9, "(MMC) %08X -> %08X\n", S3C24XX_BASE_MMC + (offset << 2), data);
+	const uint32_t data = m_mmc.regs.data[offset];
+	LOGMASKED(LOG_MMC, "%s: MMC read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_MMC + (offset << 2), data, mem_mask);
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_mmc_w )
 {
-	verboselog(*this, 9, "(MMC) %08X <- %08X\n", S3C24XX_BASE_MMC + (offset << 2), data);
+	LOGMASKED(LOG_MMC, "%s: MMC write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_MMC + (offset << 2), data, mem_mask);
 	COMBINE_DATA(&m_mmc.regs.data[offset]);
 }
 
@@ -2640,13 +2790,13 @@ void S3C24_CLASS_NAME::s3c24xx_sdi_reset()
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_sdi_r )
 {
 	uint32_t data = m_sdi.regs.data[offset];
-	verboselog( *this, 9, "(SDI) %08X -> %08X\n", S3C24XX_BASE_SDI + (offset << 2), data);
+	LOGMASKED(LOG_SDI, "%s: SDI read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_SDI + (offset << 2), data, mem_mask);
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_sdi_w )
 {
-	verboselog( *this, 9, "(SDI) %08X <- %08X\n", S3C24XX_BASE_SDI + (offset << 2), data);
+	LOGMASKED(LOG_SDI, "%s: SDI write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_SDI + (offset << 2), data, mem_mask);
 	COMBINE_DATA(&m_sdi.regs.data[offset]);
 }
 
@@ -2768,7 +2918,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_update_ecc(uint8_t data)
 	temp[1] = m_nand.mecc[1];
 	temp[2] = m_nand.mecc[2];
 	nand_update_mecc(m_nand.mecc, m_nand.ecc_pos++, data);
-	verboselog(*this, 5, "NAND - MECC %03X - %02X %02X %02X -> %02X %02X %02X\n", m_nand.ecc_pos - 1, temp[0], temp[1], temp[2], m_nand.mecc[0], m_nand.mecc[1], m_nand.mecc[2]);
+	LOGMASKED(LOG_FLASH, "%s: NAND - MECC %03X - %02X %02X %02X -> %02X %02X %02X\n", machine().describe_context(), m_nand.ecc_pos - 1, temp[0], temp[1], temp[2], m_nand.mecc[0], m_nand.mecc[1], m_nand.mecc[2]);
 	if (m_nand.ecc_pos == 512)
 		m_nand.ecc_pos = 0;
 #else
@@ -2779,7 +2929,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_update_ecc(uint8_t data)
 		temp[2] = m_nand.mecc[2];
 		temp[3] = m_nand.mecc[3];
 		nand_update_mecc( m_nand.mecc, m_nand.ecc_pos++, data);
-		verboselog( *this, 5, "NAND - MECC %03X - %02X %02X %02X %02X -> %02X %02X %02X %02X\n", m_nand.ecc_pos - 1, temp[0], temp[1], temp[2], temp[3], m_nand.mecc[0], m_nand.mecc[1], m_nand.mecc[2], m_nand.mecc[3]);
+		LOGMASKED(LOG_FLASH, "%s: NAND - MECC %03X - %02X %02X %02X %02X -> %02X %02X %02X %02X\n", machine().describe_context(), m_nand.ecc_pos - 1, temp[0], temp[1], temp[2], temp[3], m_nand.mecc[0], m_nand.mecc[1], m_nand.mecc[2], m_nand.mecc[3]);
 		if (m_nand.ecc_pos == 2048) m_nand.ecc_pos = 0;
 	}
 	if (!BIT(m_nand.regs.nfcont, 6))
@@ -2787,7 +2937,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_update_ecc(uint8_t data)
 		temp[0] = m_nand.secc[0];
 		temp[1] = m_nand.secc[1];
 		nand_update_secc(m_nand.secc, m_nand.ecc_pos++, data);
-		verboselog( *this, 5, "NAND - SECC %02X - %02X %02X -> %02X %02X\n", m_nand.ecc_pos - 1, temp[0], temp[1], m_nand.secc[0], m_nand.secc[1]);
+		LOGMASKED(LOG_FLASH, "%s: NAND - SECC %02X - %02X %02X -> %02X %02X\n", machine().describe_context(), m_nand.ecc_pos - 1, temp[0], temp[1], m_nand.secc[0], m_nand.secc[1]);
 		if (m_nand.ecc_pos == 16)
 			m_nand.ecc_pos = 0;
 	}
@@ -2796,31 +2946,31 @@ void S3C24_CLASS_NAME::s3c24xx_nand_update_ecc(uint8_t data)
 
 void S3C24_CLASS_NAME::s3c24xx_nand_command_w(uint8_t data)
 {
-	verboselog(*this, 5, "NAND write command %02X\n", data);
+	LOGMASKED(LOG_FLASH, "%s: NAND write command %02X\n", machine().describe_context(), data);
 	m_nand.data_count = 0;
-	iface_nand_command_w( data);
+	iface_nand_command_w(data);
 }
 
 void S3C24_CLASS_NAME::s3c24xx_nand_address_w(uint8_t data)
 {
-	verboselog( *this, 5, "NAND write address %02X\n", data);
+	LOGMASKED(LOG_FLASH, "%s: NAND write address %02X\n", machine().describe_context(), data);
 	m_nand.data_count = 0;
-	iface_nand_address_w( data);
+	iface_nand_address_w(data);
 }
 
 uint8_t S3C24_CLASS_NAME::s3c24xx_nand_data_r()
 {
 	uint8_t data = iface_nand_data_r();
-	verboselog( *this, 5, "NAND read data %02X [%04X]\n", data, m_nand.data_count++);
-	s3c24xx_nand_update_ecc( data);
+	LOGMASKED(LOG_FLASH, "%s: NAND read data %02X [%04X]\n", machine().describe_context(), data, m_nand.data_count++);
+	s3c24xx_nand_update_ecc(data);
 	return data;
 }
 
 void S3C24_CLASS_NAME::s3c24xx_nand_data_w(uint8_t data)
 {
-	verboselog( *this, 5, "NAND write data %02X [%04X]\n", data, m_nand.data_count++);
-	iface_nand_data_w( data);
-	s3c24xx_nand_update_ecc( data);
+	LOGMASKED(LOG_FLASH, "%s: NAND write data %02X [%04X]\n", machine().describe_context(), data, m_nand.data_count++);
+	iface_nand_data_w(data);
+	s3c24xx_nand_update_ecc(data);
 }
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_nand_r )
@@ -2842,30 +2992,37 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_nand_r )
 #if defined(DEVICE_S3C2410)
 	case S3C24XX_NFECC :
 		data = ((m_nand.mecc[2] << 16) | (m_nand.mecc[1] << 8) | (m_nand.mecc[0] << 0));
+		LOGMASKED(LOG_FLASH, "%s: NAND read: NFECC = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 #endif
 #if defined(DEVICE_S3C2440)
 	case S3C24XX_NFMECC0 :
 		data = (m_nand.mecc[3] << 24) | (m_nand.mecc[2] << 16) | (m_nand.mecc[1] << 8) | (m_nand.mecc[0] << 0);
+		LOGMASKED(LOG_FLASH, "%s: NAND read: NFMECC0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case S3C24XX_NFSECC :
 		data = (m_nand.secc[1] << 8) | (m_nand.secc[0] << 0);
+		LOGMASKED(LOG_FLASH, "%s: NAND read: NFSECC = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case S3C24XX_NFESTAT0 :
 		data &= ~0x000000F; // no main/spare ECC errors
+		LOGMASKED(LOG_FLASH, "%s: NAND read: NFESTAT0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case S3C24XX_NFESTAT1 :
 		data &= ~0x000000F; // no main/spare ECC errors
+		LOGMASKED(LOG_FLASH, "%s: NAND read: NFESTAT1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 #endif
+	default:
+		LOGMASKED(LOG_FLASH, "%s: NAND read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_NAND + (offset << 2), data, mem_mask);
+		break;
 	}
-	verboselog(*this, 9, "(NAND) %08X -> %08X (%08X)\n", S3C24XX_BASE_NAND + (offset << 2), data, mem_mask);
 	return data;
 }
 
 void S3C24_CLASS_NAME::s3c24xx_nand_init_ecc()
 {
-	verboselog( *this, 5, "NAND - init ecc\n");
+	LOGMASKED(LOG_FLASH, "NAND - init ecc\n");
 	m_nand.mecc[0] = 0xFF;
 	m_nand.mecc[1] = 0xFF;
 	m_nand.mecc[2] = 0xFF;
@@ -2880,23 +3037,25 @@ void S3C24_CLASS_NAME::s3c24xx_nand_init_ecc()
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_nand_w )
 {
 	uint32_t old_value = ((uint32_t*)&m_nand.regs)[offset];
-	verboselog( *this, 9, "(NAND) %08X <- %08X (%08X)\n", S3C24XX_BASE_NAND + (offset << 2), data, mem_mask);
 	COMBINE_DATA(&((uint32_t*)&m_nand.regs)[offset]);
 	switch (offset)
 	{
 #if defined(DEVICE_S3C2410)
 	case S3C24XX_NFCONF:
+		LOGMASKED(LOG_FLASH, "%s: NAND write: NFCONF = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		if ((data & (1 << 12)) != 0)
 			s3c24xx_nand_init_ecc();
 		break;
 #endif
 #if defined(DEVICE_S3C2440)
 	case S3C24XX_NFCONT:
+		LOGMASKED(LOG_FLASH, "%s: NAND write: NFCONT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		if ((data & (1 << 4)) != 0)
 			s3c24xx_nand_init_ecc();
 		break;
 #endif
 	case S3C24XX_NFSTAT:
+		LOGMASKED(LOG_FLASH, "%s: NAND write: NFSTAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_nand.regs.nfstat = (m_nand.regs.nfstat & ~0x03) | (old_value & 0x03); // read-only
 #if defined(DEVICE_S3C2440)
 		if ((data & (1 << 2)) != 0)
@@ -2904,9 +3063,11 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_nand_w )
 #endif
 		break;
 	case S3C24XX_NFCMD:
+		LOGMASKED(LOG_FLASH, "%s: NAND write: NFCMD = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		s3c24xx_nand_command_w(data);
 		break;
 	case S3C24XX_NFADDR:
+		LOGMASKED(LOG_FLASH, "%s: NAND write: NFADDR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		s3c24xx_nand_address_w(data);
 		break;
 	case S3C24XX_NFDATA:
@@ -2919,12 +3080,15 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_nand_w )
 		if ((mem_mask & 0xFF000000) != 0) s3c24xx_nand_data_w((data >> 24) & 0xFF);
 #endif
 		break;
+	default:
+		LOGMASKED(LOG_FLASH, "%s: NAND write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_NAND + (offset << 2), data, mem_mask);
+		break;
 	}
 }
 
 ATTR_UNUSED WRITE_LINE_MEMBER( S3C24_CLASS_NAME::s3c24xx_pin_frnb_w )
 {
-	verboselog( *this, 9, "s3c24xx_pin_frnb_w (%d)\n", state);
+	LOGMASKED(LOG_FLASH, "s3c24xx_pin_frnb_w (%d)\n", state);
 #if defined(DEVICE_S3C2440)
 	if ((BIT( m_nand.regs.nfstat, 0) == 0) && (state != 0))
 	{
@@ -2948,13 +3112,13 @@ ATTR_UNUSED WRITE_LINE_MEMBER( S3C24_CLASS_NAME::s3c24xx_pin_frnb_w )
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_cam_r )
 {
 	uint32_t data = m_cam.regs.data[offset];
-	verboselog(*this, 9, "(CAM) %08X -> %08X\n", S3C24XX_BASE_CAM + (offset << 2), data);
+	LOGMASKED(LOG_CAM, "%s: camera read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_CAM + (offset << 2), data, mem_mask);
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_cam_w )
 {
-	verboselog(*this, 9, "(CAM) %08X <- %08X\n", S3C24XX_BASE_CAM + (offset << 2), data);
+	LOGMASKED(LOG_CAM, "%s: camera write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_CAM + (offset << 2), data, mem_mask);
 	COMBINE_DATA(&m_cam.regs.data[offset]);
 }
 
@@ -2966,14 +3130,14 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_cam_w )
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_ac97_r )
 {
-	uint32_t data = m_ac97.regs.data[offset];
-	verboselog(*this, 9, "(AC97) %08X -> %08X\n", S3C24XX_BASE_AC97 + (offset << 2), data);
+	const uint32_t data = m_ac97.regs.data[offset];
+	LOGMASKED(LOG_AC97, "%s: audio codec read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_AC97 + (offset << 2), data, mem_mask);
 	return data;
 }
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_ac97_w )
 {
-	verboselog(*this, 9, "(AC97) %08X <- %08X\n", S3C24XX_BASE_AC97 + (offset << 2), data);
+	LOGMASKED(LOG_AC97, "%s: audio codec write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_AC97 + (offset << 2), data, mem_mask);
 	COMBINE_DATA(&m_ac97.regs.data[offset]);
 }
 
@@ -3055,7 +3219,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_auto_boot()
 
 void S3C24_CLASS_NAME::s3c24xx_device_reset()
 {
-	verboselog( *this, 1, "s3c24xx device reset\n");
+	LOGMASKED(LOG_RESET, "s3c24xx device reset\n");
 	for (uart_t &uart : m_uart)
 		uart.reset();
 	m_pwm.reset();
@@ -3091,7 +3255,7 @@ void S3C24_CLASS_NAME::s3c24xx_device_reset()
 
 void S3C24_CLASS_NAME::s3c24xx_device_start()
 {
-	verboselog(*this, 1, "s3c24xx device start\n");
+	LOGMASKED(LOG_RESET, "s3c24xx device start\n");
 	m_pin_r_cb.resolve();
 	m_pin_w_cb.resolve_safe();
 	m_port_r_cb.resolve();
@@ -3123,7 +3287,7 @@ void S3C24_CLASS_NAME::s3c24xx_device_start()
 	int om1 = iface_core_pin_r(S3C24XX_CORE_PIN_OM1);
 	if ((om0 == 0) && (om1 == 0))
 	{
-		address_space &space = m_cpu->memory().space(AS_PROGRAM);
+		address_space &space = m_cpu->space(AS_PROGRAM);
 		space.install_ram(0x00000000, 0x00000fff, m_steppingstone);
 		space.install_ram(0x40000000, 0x40000fff, m_steppingstone);
 	}

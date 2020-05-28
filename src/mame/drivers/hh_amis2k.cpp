@@ -146,8 +146,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE16_MEMBER(write_a);
+	void write_d(u8 data);
+	void write_a(u16 data);
 	DECLARE_WRITE_LINE_MEMBER(write_f);
 
 	void speaker_update();
@@ -190,14 +190,14 @@ void wildfire_state::update_display()
 	m_display->matrix(~m_a, m_d);
 }
 
-WRITE8_MEMBER(wildfire_state::write_d)
+void wildfire_state::write_d(u8 data)
 {
 	// D0-D7: led/7seg data
 	m_d = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	update_display();
 }
 
-WRITE16_MEMBER(wildfire_state::write_a)
+void wildfire_state::write_a(u16 data)
 {
 	// A0-A2: digit select
 	// A3-A11: led select

@@ -49,7 +49,7 @@ private:
 
 
 device_disasm_interface::device_disasm_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "disasm"), m_disasm(), m_dasm_override(), m_started(false)
+	: device_interface(device, "disasm"), m_disasm(), m_dasm_override(device), m_started(false)
 {
 }
 
@@ -69,6 +69,6 @@ void device_disasm_interface::interface_pre_start()
 	if (!m_started)
 	{
 		m_started = true;
-		m_dasm_override.bind_relative_to(*device().owner());
+		m_dasm_override.resolve();
 	}
 }

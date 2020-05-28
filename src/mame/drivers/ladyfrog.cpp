@@ -108,7 +108,7 @@ WRITE8_MEMBER(ladyfrog_state::nmi_enable_w)
 	}
 }
 
-WRITE8_MEMBER(ladyfrog_state::unk_w)
+void ladyfrog_state::unk_w(uint8_t data)
 {
 }
 
@@ -299,7 +299,7 @@ void ladyfrog_state::ladyfrog(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ladyfrog_state::ladyfrog_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(ladyfrog_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

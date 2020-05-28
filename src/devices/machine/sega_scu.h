@@ -110,8 +110,8 @@ private:
 	void dma_start_factor_ack(uint8_t event);
 
 	DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
-	DECLARE_READ16_MEMBER(scudsp_dma_r);
-	DECLARE_WRITE16_MEMBER(scudsp_dma_w);
+	uint16_t scudsp_dma_r(offs_t offset, uint16_t mem_mask = ~0);
+	void scudsp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// DMA
 	DECLARE_READ32_MEMBER(dma_lv0_r);

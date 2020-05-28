@@ -79,8 +79,8 @@ private:
 	emu_timer *m_serial_timer;
 	emu_timer *m_reset_timer;
 
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	uint8_t p1_r();
+	void p2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( t1_r );
 	DECLARE_WRITE_LINE_MEMBER( prog_w );
 	DECLARE_WRITE8_MEMBER( j3_w );

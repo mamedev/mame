@@ -86,9 +86,9 @@ public:
 	void pcm(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( pcm_85_r );
+	uint8_t pcm_85_r();
 	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
-	DECLARE_WRITE8_MEMBER( pcm_85_w );
+	void pcm_85_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void pcm_io(address_map &map);
@@ -139,7 +139,7 @@ There is also a HALT LED, connected directly to the processor.
 */
 
 
-READ8_MEMBER( pcm_state::pcm_85_r )
+uint8_t pcm_state::pcm_85_r()
 {
 	uint8_t data = m_85 & 0x7f;
 
@@ -149,7 +149,7 @@ READ8_MEMBER( pcm_state::pcm_85_r )
 	return data;
 }
 
-WRITE8_MEMBER( pcm_state::pcm_85_w )
+void pcm_state::pcm_85_w(uint8_t data)
 {
 	if (BIT(data, 5))
 		m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
@@ -179,9 +179,9 @@ void pcm_state::pcm_io(address_map &map)
 	map(0x88, 0x8B).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO
 	map(0x8C, 0x8F).rw(m_ctc_u, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // user CTC
 	map(0x90, 0x93).rw(m_pio_u, FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // user PIO
-	//AM_RANGE(0x94, 0x97) // bank select
-	//AM_RANGE(0x98, 0x9B) // NMI generator
-	//AM_RANGE(0x9C, 0x9F) // io ports available to the user
+	//map(0x94, 0x97) // bank select
+	//map(0x98, 0x9B) // NMI generator
+	//map(0x9C, 0x9F) // io ports available to the user
 	// disk controller?
 }
 
@@ -308,7 +308,7 @@ void pcm_state::pcm(machine_config &config)
 
 /* ROM definition */
 ROM_START( pcm )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v202", "Version 2.02" )
 	ROMX_LOAD( "bios_v202.d14", 0x0000, 0x0800, CRC(27c24892) SHA1(a97bf9ef075de91330dc0c7cfd3bb6c7a88bb585), ROM_BIOS(0))
 	ROMX_LOAD( "bios_v202.d15", 0x0800, 0x0800, CRC(e9cedc70) SHA1(913c526283d9289d0cb2157985bb48193df7aa16), ROM_BIOS(0))

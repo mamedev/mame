@@ -728,7 +728,7 @@ void uml::instruction::simplify()
 	    {
 	        std::string disasm1 = orig.disasm(block->drcuml);
 	        std::string disasm2 = inst->disasm(block->drcuml);
-	        osd_printf_debug("Simplified: %-50.50s -> %s\n", disasm1.c_str(), disasm2.c_str());
+	        osd_printf_debug("Simplified: %-50.50s -> %s\n", disasm1, disasm2);
 	    }
 	*/
 

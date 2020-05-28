@@ -168,21 +168,21 @@ INPUT_PORTS_END
 //  I8255A 0 Interface
 //-------------------------------------------------
 
-READ8_MEMBER( softbox_state::ppi0_pa_r )
+uint8_t softbox_state::ppi0_pa_r()
 {
-	return m_ieee->read_dio() ^ 0xff;
+	return m_ieee->dio_r() ^ 0xff;
 }
 
-WRITE8_MEMBER( softbox_state::ppi0_pb_w )
+void softbox_state::ppi0_pb_w(uint8_t data)
 {
-	m_ieee->write_dio(data ^ 0xff);
+	m_ieee->host_dio_w(data ^ 0xff);
 }
 
 //-------------------------------------------------
 //  I8255A 1 Interface
 //-------------------------------------------------
 
-READ8_MEMBER( softbox_state::ppi1_pa_r )
+uint8_t softbox_state::ppi1_pa_r()
 {
 	/*
 
@@ -213,7 +213,7 @@ READ8_MEMBER( softbox_state::ppi1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( softbox_state::ppi1_pb_w )
+void softbox_state::ppi1_pb_w(uint8_t data)
 {
 	/*
 
@@ -240,7 +240,7 @@ WRITE8_MEMBER( softbox_state::ppi1_pb_w )
 	m_ieee->host_ifc_w(!BIT(data, 7));
 }
 
-READ8_MEMBER( softbox_state::ppi1_pc_r )
+uint8_t softbox_state::ppi1_pc_r()
 {
 	/*
 
@@ -257,7 +257,7 @@ READ8_MEMBER( softbox_state::ppi1_pc_r )
 
 	*/
 
-	uint8_t status = m_hdc->status_r(space, 0);
+	uint8_t status = m_hdc->status_r();
 	uint8_t data = 0;
 
 	data |= (status & corvus_hdc_device::CONTROLLER_BUSY) ? 0 : 0x10;
@@ -266,7 +266,7 @@ READ8_MEMBER( softbox_state::ppi1_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( softbox_state::ppi1_pc_w )
+void softbox_state::ppi1_pc_w(uint8_t data)
 {
 	/*
 
@@ -397,7 +397,7 @@ void softbox_state::softbox(machine_config &config)
 	HARDDISK(config, "harddisk3", "corvus_hdd");
 	HARDDISK(config, "harddisk4", "corvus_hdd");
 
-	imi7000_bus_device::add_config(config, "imi5000h", nullptr, nullptr, nullptr);
+	IMI7000_BUS(config, "imi7000").set_slot_default_options("imi5000h", nullptr, nullptr, nullptr);
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("softbox");

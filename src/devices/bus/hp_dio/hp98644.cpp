@@ -161,8 +161,8 @@ void dio16_98644_device::device_reset()
 		dio().install_memory(
 				0x600000 + (code * 0x10000),
 				0x6007ff + (code * 0x10000),
-				read16_delegate(FUNC(dio16_98644_device::io_r), this),
-				write16_delegate(FUNC(dio16_98644_device::io_w), this));
+				read16_delegate(*this, FUNC(dio16_98644_device::io_r)),
+				write16_delegate(*this, FUNC(dio16_98644_device::io_w)));
 		m_installed_io = true;
 	}
 }

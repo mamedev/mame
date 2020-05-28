@@ -58,14 +58,14 @@
 
 ***************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "avhuff.h"
 #include "huffman.h"
 #include "chd.h"
 
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdlib>
 #include <new>
 
 

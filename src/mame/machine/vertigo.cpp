@@ -19,7 +19,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(vertigo_state::update_irq)
+void vertigo_state::update_irq(uint8_t data)
 {
 	if (m_irq_state < 7)
 		m_maincpu->set_input_line(m_irq_state ^ 7, CLEAR_LINE);

@@ -119,7 +119,7 @@ public:
 	virtual movie_info const &get_movie_info() const = 0;
 	virtual std::uint32_t first_sample_in_frame(std::uint32_t framenum) const = 0;
 
-	virtual error read_uncompressed_video_frame(std::uint32_t framenum, bitmap_rgb32 &bitmap) = 0;
+	virtual error read_uncompressed_video_frame(std::uint32_t framenum, bitmap_argb32 &bitmap) = 0;
 	virtual error read_video_frame(std::uint32_t framenum, bitmap_yuy16 &bitmap) = 0;
 	virtual error read_sound_samples(int channel, std::uint32_t firstsample, std::uint32_t numsamples, std::int16_t *output) = 0;
 

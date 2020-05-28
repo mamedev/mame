@@ -117,9 +117,10 @@ void ym2610_device::device_start()
 
 	/**** initialize YM2610 ****/
 	m_chip = ym2610_init(this, clock(), rate,
-		&ym2610_device::static_adpcm_a_read_byte, &ym2610_device::static_adpcm_b_read_byte,
-		&ym2610_device::static_timer_handler, &ym2610_device::static_irq_handler, &psgintf);
-	assert_always(m_chip != nullptr, "Error creating YM2610 chip");
+			&ym2610_device::static_adpcm_a_read_byte, &ym2610_device::static_adpcm_b_read_byte,
+			&ym2610_device::static_timer_handler, &ym2610_device::static_irq_handler, &psgintf);
+	if (!m_chip)
+		throw emu_fatalerror("ym2610_device(%s): Error creating YM2610 chip", tag());
 }
 
 //-------------------------------------------------

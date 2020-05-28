@@ -40,7 +40,7 @@ public:
 
 private:
 
-	DECLARE_READ8_MEMBER( homez80_keyboard_r );
+	uint8_t homez80_keyboard_r(offs_t offset);
 	INTERRUPT_GEN_MEMBER(homez80_interrupt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -55,7 +55,7 @@ private:
 };
 
 
-READ8_MEMBER( homez80_state::homez80_keyboard_r )
+uint8_t homez80_state::homez80_keyboard_r(offs_t offset)
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"LINE%d",offset);

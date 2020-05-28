@@ -12,6 +12,9 @@
     Known bugs:
         * none at this time
 
+    The video sync chain is almost identical to System 2, though many other
+    hardware aspects are very different.
+
 ****************************************************************************
 
     Memory map (TBA)
@@ -37,23 +40,15 @@ static constexpr XTAL MASTER_CLOCK = 32_MHz_XTAL;
  *
  *************************************/
 
-WRITE_LINE_MEMBER(toobin_state::sound_int_write_line)
+TIMER_CALLBACK_MEMBER(toobin_state::scanline_interrupt)
 {
-	m_sound_int_state = state;
-	update_interrupts();
-}
-
-void toobin_state::update_interrupts()
-{
-	m_maincpu->set_input_line(1, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(2, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(3, m_scanline_int_state && m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_IPL0, ASSERT_LINE);
+	m_scanline_interrupt_timer->adjust(m_screen->frame_period());
 }
 
 void toobin_state::machine_start()
 {
-	atarigen_state::machine_start();
-	save_item(NAME(m_sound_int_state));
+	m_scanline_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(toobin_state::scanline_interrupt), this));
 }
 
 
@@ -74,8 +69,13 @@ WRITE16_MEMBER(toobin_state::interrupt_scan_w)
 	if (oldword != newword)
 	{
 		m_interrupt_scan[offset] = newword;
-		scanline_int_set(*m_screen, newword & 0x1ff);
+		m_scanline_interrupt_timer->adjust(m_screen->time_until_pos(newword & 0x1ff));
 	}
+}
+
+void toobin_state::scanline_int_ack_w(uint16_t data)
+{
+	m_maincpu->set_input_line(M68K_IRQ_IPL0, CLEAR_LINE);
 }
 
 
@@ -206,8 +206,9 @@ GFXDECODE_END
 void toobin_state::toobin(machine_config &config)
 {
 	/* basic machine hardware */
-	M68010(config, m_maincpu, MASTER_CLOCK/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &toobin_state::main_map);
+	m68010_device &maincpu(M68010(config, m_maincpu, MASTER_CLOCK/4));
+	maincpu.set_addrmap(AS_PROGRAM, &toobin_state::main_map);
+	maincpu.disable_interrupt_mixer();
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
@@ -233,7 +234,7 @@ void toobin_state::toobin(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ATARI_JSA_I(config, m_jsa, 0);
-	m_jsa->main_int_cb().set(FUNC(toobin_state::sound_int_write_line));
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_IPL1);
 	m_jsa->test_read_cb().set_ioport("FF9000").bit(12);
 	m_jsa->add_route(0, "lspeaker", 1.0);
 	m_jsa->add_route(1, "rspeaker", 1.0);

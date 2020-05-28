@@ -7,14 +7,13 @@
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
-DECLARE_DEVICE_TYPE(MICRODISC, microdisc_device)
+DECLARE_DEVICE_TYPE(ORIC_MICRODISC, oric_microdisc_device)
 
-class microdisc_device : public oricext_device
+class oric_microdisc_device : public device_t, public device_oricext_interface
 {
 public:
-	microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~microdisc_device();
-
+	oric_microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~oric_microdisc_device();
 
 protected:
 	enum {
@@ -46,9 +45,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
 
-	DECLARE_WRITE8_MEMBER(port_314_w);
-	DECLARE_READ8_MEMBER(port_314_r);
-	DECLARE_READ8_MEMBER(port_318_r);
+	void port_314_w(uint8_t data);
+	uint8_t port_314_r();
+	uint8_t port_318_r();
 
 	void map(address_map &map);
 

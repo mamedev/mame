@@ -25,7 +25,7 @@ RAM: 640K
 Bus: 3x ISA
 Video: On board: MDA/CGA/Hercules/Plantronics
 Mass storage: 1x Floppy 5.25" 360K and (PC10) another 360K or (PC20) 3.5" harddisk
-On board ports: Floppy, XT-IDE Harddisk, Mouse, serial, parallel, RTC, Speaker
+On board ports: Floppy, XTA(8-bit IDE) Harddisk, Mouse, serial, parallel, RTC, Speaker
 Options: 8087 FPU
 ***************************************************************************/
 
@@ -55,10 +55,10 @@ public:
 
 	void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(pioiii_w);
-	DECLARE_READ8_MEMBER(pioiii_r);
-	DECLARE_WRITE8_MEMBER(pio_w);
-	DECLARE_READ8_MEMBER(pio_r);
+	void pioiii_w(offs_t offset, u8 data);
+	u8 pioiii_r(offs_t offset);
+	void pio_w(offs_t offset, u8 data);
+	u8 pio_r(offs_t offset);
 
 	void compc(machine_config &config);
 	void pc10iii(machine_config &config);
@@ -76,7 +76,7 @@ void compc_state::machine_reset()
 	m_dips = 0;
 }
 
-WRITE8_MEMBER(compc_state::pio_w)
+void compc_state::pio_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -92,13 +92,13 @@ WRITE8_MEMBER(compc_state::pio_w)
 }
 
 
-READ8_MEMBER(compc_state::pio_r)
+u8 compc_state::pio_r(offs_t offset)
 {
 	int data = 0;
 	switch (offset)
 	{
 		case 0:
-			data = m_keyboard->read(space, 0);
+			data = m_keyboard->read();
 			break;
 		case 1:
 			data = m_portb;
@@ -121,7 +121,7 @@ READ8_MEMBER(compc_state::pio_r)
 	return data;
 }
 
-WRITE8_MEMBER(compc_state::pioiii_w)
+void compc_state::pioiii_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -140,13 +140,13 @@ WRITE8_MEMBER(compc_state::pioiii_w)
 }
 
 
-READ8_MEMBER(compc_state::pioiii_r)
+u8 compc_state::pioiii_r(offs_t offset)
 {
 	int data = 0;
 	switch (offset)
 	{
 		case 0:
-			data = m_keyboard->read(space, 0);
+			data = m_keyboard->read();
 			break;
 		case 1:
 			data = m_portb;
@@ -228,7 +228,9 @@ void compc_state::compc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &compc_state::compc_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	m_mb->int_callback().set_inputline(m_maincpu, 0);
+	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	config.device_remove("mb:pit8253");
 	fe2010_pit_device &pit(FE2010_PIT(config, "mb:pit8253", 0));
 	pit.set_clk<0>(XTAL(14'318'181)/12.0); /* heartbeat IRQ */

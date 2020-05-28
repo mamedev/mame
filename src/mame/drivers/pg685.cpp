@@ -86,10 +86,10 @@ Memory:         54x 64KBit RAM, 18 empty sockets, 9 bit and 4 bit wire straps
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
-#include "machine/mc2661.h"
 #include "machine/mm58167.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/scn_pci.h"
 #include "machine/wd2010.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
@@ -187,7 +187,7 @@ void pg685_state::pg685_mem(address_map &map)
 	map.unmap_value_high();
 	pg675_mem(map);
 	map(0xf9f34, 0xf9f37).rw(m_bppit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(scn2661b_device::read), FUNC(scn2661b_device::write));
 	map(0xf9f3c, 0xf9f3d).rw("bppic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf9f3e, 0xf9f3e).w(FUNC(pg685_state::f9f3e_w));
 	map(0xf9f70, 0xf9f77).rw("hdc", FUNC(wd2010_device::read), FUNC(wd2010_device::write));
@@ -213,7 +213,7 @@ void pg685_state::pg685oua12_mem(address_map &map)
 	map(0xf9f32, 0xf9f32).w(FUNC(pg685_state::f9f32_w));
 	map(0xf9f33, 0xf9f33).r(FUNC(pg685_state::f9f33_r));
 	map(0xf9f34, 0xf9f37).rw(m_bppit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(scn2661b_device::read), FUNC(scn2661b_device::write));
 	map(0xf9f3c, 0xf9f3d).rw("bppic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf9f3e, 0xf9f3e).w(FUNC(pg685_state::f9f3e_w));
 	map(0xf9f3f, 0xf9f3f).r(FUNC(pg685_state::f9f3f_r));
@@ -406,7 +406,7 @@ void pg685_state::pg685_backplane(machine_config &config)
 	pic8259_device &bppic(PIC8259(config, "bppic", 0));
 	bppic.out_int_callback().set_nop(); // configured in single 8086 mode?
 
-	MC2661(config, "bpuart", 4915200);
+	SCN2661B(config, "bpuart", 4915200);
 }
 
 void pg685_state::pg685_module(machine_config &config)
@@ -446,7 +446,7 @@ void pg685_state::pg675(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row));
 
 	// sound hardware
 
@@ -494,7 +494,7 @@ void pg685_state::pg685(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row));
 
 	// sound hardware
 
@@ -546,7 +546,7 @@ void pg685_state::pg685oua12(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row_oua12), this);
+	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row_oua12));
 
 	// sound hardware
 
@@ -589,7 +589,7 @@ ROM_START( pg685 )
 ROM_END
 
 ROM_START( pg685oua12 )
-	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x4000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD( "pg685_oua12_bios.bin", 0x0000, 0x4000, CRC(94b8499b) SHA1(e29086a88f1f9fa17921c3d157cce725d4591328))
 
 	ROM_REGION( 0x4000, "chargen", 0 )

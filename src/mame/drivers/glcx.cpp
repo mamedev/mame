@@ -117,7 +117,15 @@ ROM_START( bs9009cx )
 	ROM_LOAD( "mcu.u5", 0x000, 0x800, NO_DUMP )
 ROM_END
 
+ROM_START( gtbmcx )
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "27-6455-00.u5", 0x0000, 0x200000, CRC(166f11b7) SHA1(5d57573f3c97cfd75a07c333833f920ebc417867) )
 
-COMP( 1999, gl6600cx, 0, 0, glcx, glcx, glcx_state, empty_init, "Video Technology", "Genius Leader 6600 CX (Germany)", MACHINE_IS_SKELETON )
-COMP( 1999, gl8008cx, 0, 0, glcx, glcx, glcx_state, empty_init, "Video Technology", "Genius Leader 8008 CX (Germany)", MACHINE_IS_SKELETON)
-COMP( 1999, bs9009cx, 0, 0, glcx, glcx, glcx_state, empty_init, "Video Technology", "BrainStation 9009 CXL (Germany)", MACHINE_IS_SKELETON)
+	// Cartridge "EUROPA" contains no ROM
+ROM_END
+
+
+COMP( 1999, gl6600cx, 0, 0, glcx, glcx, glcx_state, empty_init, "VTech", "Genius Leader 6600 CX (Germany)", MACHINE_IS_SKELETON )
+COMP( 1999, gl8008cx, 0, 0, glcx, glcx, glcx_state, empty_init, "VTech", "Genius Leader 8008 CX (Germany)", MACHINE_IS_SKELETON)
+COMP( 1999, bs9009cx, 0, 0, glcx, glcx, glcx_state, empty_init, "VTech", "BrainStation 9009 CXL (Germany)", MACHINE_IS_SKELETON)
+COMP( 2000, gtbmcx,   0, 0, glcx, glcx, glcx_state, empty_init, "VTech", "Genius Tabletop Black Magic CX (Germany)", MACHINE_IS_SKELETON)

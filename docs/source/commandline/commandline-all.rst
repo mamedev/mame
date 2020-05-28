@@ -1087,7 +1087,17 @@ Core Performance Options
 
     **-str** *<n>* **-video none -sound none -nothrottle**
 
+.. _mame-commandline-lowlatency:
 
+**-lowlatency**
+
+    This tells MAME to draw a new frame before throttling to reduce input
+    latency.  This is particularly effective with VRR (Variable Refresh Rate)
+    displays.
+
+    This may cause frame pacing issues in the form of jitter with some 
+    systems (especially newer 3D-based systems or systems that run software
+    akin to an operating system), so the default is off (**-nolowlatency**).
 
 Core Rotation Options
 ---------------------
@@ -2347,7 +2357,7 @@ Core Misc Options
 
 **\-confirm_quit**
 
-    Display a Confirm Quit dialong to screen on exit, requiring one extra step
+    Display a Confirm Quit dialog to screen on exit, requiring one extra step
     to exit MAME.
 
     The default is OFF (**-noconfirm_quit**).

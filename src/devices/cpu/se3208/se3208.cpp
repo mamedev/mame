@@ -51,9 +51,12 @@ DEFINE_DEVICE_TYPE(SE3208, se3208_device, "se3208", "ADChips SE3208")
 se3208_device::se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SE3208, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_program(nullptr), m_cache(nullptr), m_IRQ(0), m_NMI(0), m_icount(0)
+	, m_machinex_cb(*this)
+	, m_iackx_cb(*this)
+	, m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_IRQ(0), m_NMI(0), m_icount(0)
 {
 }
+
 device_memory_interface::space_config_vector se3208_device::memory_space_config() const
 {
 	return space_config_vector {
@@ -62,88 +65,73 @@ device_memory_interface::space_config_vector se3208_device::memory_space_config(
 }
 
 
-uint32_t se3208_device::read_dword_unaligned(address_space &space, uint32_t address)
+void se3208_device::device_resolve_objects()
+{
+	m_machinex_cb.resolve_safe();
+	m_iackx_cb.resolve_safe(0);
+}
+
+
+uint8_t se3208_device::SE3208_Read8(uint32_t address)
+{
+	return m_program.read_byte(address);
+}
+
+uint16_t se3208_device::SE3208_Read16(uint32_t address)
+{
+	if (!WORD_ALIGNED(address))
+		return m_program.read_byte(address) | m_program.read_byte(address+1)<<8;
+	else
+		return m_program.read_word(address);
+}
+
+uint32_t se3208_device::SE3208_Read32(uint32_t address)
 {
 	if (DWORD_ALIGNED(address))
-		return space.read_dword(address);
+		return m_program.read_dword(address);
 	else
 	{
 		osd_printf_debug("%08x: dword READ unaligned %08x\n", m_PC, address);
 #if ALLOW_UNALIGNED_DWORD_ACCESS
-		return space.read_byte(address) | space.read_byte(address + 1) << 8 | space.read_byte(address + 2) << 16 | space.read_byte(address + 3) << 24;
+		return m_program.read_byte(address) | m_program.read_byte(address + 1) << 8 | m_program.read_byte(address + 2) << 16 | m_program.read_byte(address + 3) << 24;
 #else
 		return 0;
 #endif
 	}
 }
 
-uint16_t se3208_device::read_word_unaligned(address_space &space, uint32_t address)
+void se3208_device::SE3208_Write8(uint32_t address,uint8_t data)
 {
-	if (!WORD_ALIGNED(address))
-		return space.read_byte(address) | space.read_byte(address+1)<<8;
-	else
-		return space.read_word(address);
+	m_program.write_byte(address,data);
 }
 
-void se3208_device::write_dword_unaligned(address_space &space, uint32_t address, uint32_t data)
+void se3208_device::SE3208_Write16(uint32_t address,uint16_t data)
+{
+	if (!WORD_ALIGNED(address))
+	{
+		m_program.write_byte(address, data & 0xff);
+		m_program.write_byte(address+1, (data>>8)&0xff);
+	}
+	else
+	{
+		m_program.write_word(address, data);
+	}
+}
+
+void se3208_device::SE3208_Write32(uint32_t address, uint32_t data)
 {
 	if (DWORD_ALIGNED(address))
-		space.write_dword(address, data);
+		m_program.write_dword(address, data);
 	else
 	{
 #if ALLOW_UNALIGNED_DWORD_ACCESS
-		space.write_byte(address, data & 0xff);
-		space.write_byte(address + 1, (data >> 8) & 0xff);
-		space.write_byte(address + 2, (data >> 16) & 0xff);
-		space.write_byte(address + 3, (data >> 24) & 0xff);
+		m_program.write_byte(address, data & 0xff);
+		m_program.write_byte(address + 1, (data >> 8) & 0xff);
+		m_program.write_byte(address + 2, (data >> 16) & 0xff);
+		m_program.write_byte(address + 3, (data >> 24) & 0xff);
 #endif
 		osd_printf_debug("%08x: dword WRITE unaligned %08x\n", m_PC, address);
 	}
-
-}
-
-void se3208_device::write_word_unaligned(address_space &space, uint32_t address, uint16_t data)
-{
-	if (!WORD_ALIGNED(address))
-	{
-		space.write_byte(address, data & 0xff);
-		space.write_byte(address+1, (data>>8)&0xff);
-	}
-	else
-	{
-		space.write_word(address, data);
-	}
-}
-
-
-uint8_t se3208_device::SE3208_Read8(uint32_t addr)
-{
-	return m_program->read_byte(addr);
-}
-
-uint16_t se3208_device::SE3208_Read16(uint32_t addr)
-{
-	return read_word_unaligned(*m_program,addr);
-}
-
-uint32_t se3208_device::SE3208_Read32(uint32_t addr)
-{
-	return read_dword_unaligned(*m_program,addr);
-}
-
-void se3208_device::SE3208_Write8(uint32_t addr,uint8_t val)
-{
-	m_program->write_byte(addr,val);
-}
-
-void se3208_device::SE3208_Write16(uint32_t addr,uint16_t val)
-{
-	write_word_unaligned(*m_program,addr,val);
-}
-
-void se3208_device::SE3208_Write32(uint32_t addr,uint32_t val)
-{
-	write_dword_unaligned(*m_program,addr,val);
 }
 
 
@@ -1428,7 +1416,9 @@ INST(SWI)
 
 INST(HALT)
 {
-//  uint32_t Imm=EXTRACT(Opcode,0,3);
+	uint32_t Imm=EXTRACT(Opcode,0,3);
+
+	m_machinex_cb(0x10 | Imm);
 
 //  DEBUGMESSAGE("HALT\t0x%x",Imm);
 }
@@ -1720,8 +1710,8 @@ void se3208_device::device_reset()
 	m_SP = 0;
 	m_ER = 0;
 	m_PPC = 0;
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 	m_PC=SE3208_Read32(0);
 	m_SR=0;
 	m_IRQ=CLEAR_LINE;
@@ -1730,6 +1720,9 @@ void se3208_device::device_reset()
 
 void se3208_device::SE3208_NMI()
 {
+	standard_irq_callback(INPUT_LINE_NMI);
+	m_machinex_cb(0x00);
+
 	PushVal(m_PC);
 	PushVal(m_SR);
 
@@ -1743,16 +1736,18 @@ void se3208_device::SE3208_Interrupt()
 	if(!TESTFLAG(FLAG_ENI))
 		return;
 
+	standard_irq_callback(0);
+	m_machinex_cb(0x01);
+
 	PushVal(m_PC);
 	PushVal(m_SR);
 
 	CLRFLAG(FLAG_ENI|FLAG_E|FLAG_M);
 
-
 	if(!(TESTFLAG(FLAG_AUT)))
 		m_PC=SE3208_Read32(8);
 	else
-		m_PC=SE3208_Read32(4*standard_irq_callback(0));
+		m_PC=SE3208_Read32(4*m_iackx_cb());
 }
 
 
@@ -1760,7 +1755,7 @@ void se3208_device::execute_run()
 {
 	do
 	{
-		uint16_t Opcode=m_cache->read_word(m_PC, WORD_XOR_LE(0));
+		uint16_t Opcode=m_cache.read_word(m_PC, WORD_XOR_LE(0));
 
 		m_PPC = m_PC;
 		debugger_instruction_hook(m_PC);
@@ -1785,8 +1780,8 @@ void se3208_device::device_start()
 {
 	BuildTable();
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	save_item(NAME(m_R));
 	save_item(NAME(m_PC));

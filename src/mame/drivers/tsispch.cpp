@@ -431,9 +431,9 @@ ROM_START( prose2k )
 	// TSI/Speech plus DSP firmware v3.12 8/9/88, NEC UPD77P20
 	ROM_REGION( 0x600, "dspprgload", 0) // packed 24 bit data
 	ROM_LOAD( "v3.12__8-9-88__dsp_prog.u29", 0x0000, 0x0600, CRC(9e46425a) SHA1(80a915d731f5b6863aeeb448261149ff15e5b786))
-	ROM_REGION( 0x800, "dspprg", ROMREGION_ERASEFF) // for unpacking 24 bit data into 32 bit data which cpu core can understand
-	ROM_REGION( 0x400, "dspdata", 0)
-	ROM_LOAD( "v3.12__8-9-88__dsp_data.u29", 0x0000, 0x0400, CRC(f4e4dd16) SHA1(6e184747db2f26e45d0e02907105ff192e51baba))
+	ROM_REGION32_BE( 0x800, "dspprg", ROMREGION_ERASEFF) // for unpacking 24 bit data into 32 bit data which cpu core can understand
+	ROM_REGION16_BE( 0x400, "dspdata", 0)
+	ROM_LOAD16_WORD_SWAP( "v3.12__8-9-88__dsp_data.u29", 0x0000, 0x0400, CRC(f4e4dd16) SHA1(6e184747db2f26e45d0e02907105ff192e51baba))
 
 	// mapping PROMs:
 	// All are am27s19 32x8 TriState PROMs (equivalent to 82s123/6331)
@@ -534,10 +534,10 @@ ROM_START( prose2ko )
 	ROM_REGION( 0x600, "dspprgload", 0) // packed 24 bit data
 	ROM_LOAD( "s140025__dsp_prog.u29", 0x0000, 0x0600, NO_DUMP)
 	ROM_LOAD( "v3.12__8-9-88__dsp_prog.u29", 0x0000, 0x0600, CRC(9e46425a) SHA1(80a915d731f5b6863aeeb448261149ff15e5b786)) // temp placeholder
-	ROM_REGION( 0x800, "dspprg", ROMREGION_ERASEFF) // for unpacking 24 bit data into 32 bit data which cpu core can understand
-	ROM_REGION( 0x400, "dspdata", 0)
+	ROM_REGION32_BE( 0x800, "dspprg", ROMREGION_ERASEFF) // for unpacking 24 bit data into 32 bit data which cpu core can understand
+	ROM_REGION16_BE( 0x400, "dspdata", 0)
 	ROM_LOAD( "s140025__dsp_data.u29", 0x0000, 0x0400, NO_DUMP)
-	ROM_LOAD( "v3.12__8-9-88__dsp_data.u29", 0x0000, 0x0400, CRC(f4e4dd16) SHA1(6e184747db2f26e45d0e02907105ff192e51baba)) // temp placeholder
+	ROM_LOAD16_WORD_SWAP( "v3.12__8-9-88__dsp_data.u29", 0x0000, 0x0400, CRC(f4e4dd16) SHA1(6e184747db2f26e45d0e02907105ff192e51baba)) // temp placeholder
 
 	ROM_REGION(0x1000, "proms", 0)
 	ROM_LOAD( "dm74s288n.u77", 0x0000, 0x0020, CRC(a88757fc) SHA1(9066d6dbc009d7a126d75b8461ca464ddf134412)) // == am27s19.u77

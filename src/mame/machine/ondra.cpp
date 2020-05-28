@@ -49,7 +49,7 @@ void ondra_state::ondra_update_banks()
 		m_bank3->set_base(m_ram->pointer() + 0xe000);
 	} else {
 		space.unmap_write(0xe000, 0xffff);
-		space.install_read_handler (0xe000, 0xffff, read8_delegate(FUNC(ondra_state::ondra_keyboard_r),this));
+		space.install_read_handler (0xe000, 0xffff, read8_delegate(*this, FUNC(ondra_state::ondra_keyboard_r)));
 	}
 }
 

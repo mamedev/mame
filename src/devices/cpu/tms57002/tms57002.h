@@ -38,9 +38,9 @@ protected:
 	virtual void device_reset() override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 	virtual space_config_vector memory_space_config() const override;
-	virtual u32 execute_min_cycles() const override;
-	virtual u32 execute_max_cycles() const override;
-	virtual u32 execute_input_lines() const override;
+	virtual u32 execute_min_cycles() const noexcept override;
+	virtual u32 execute_max_cycles() const noexcept override;
+	virtual u32 execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 

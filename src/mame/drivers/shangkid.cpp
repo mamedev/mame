@@ -132,14 +132,14 @@ WRITE_LINE_MEMBER(shangkid_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(shangkid_state::chinhero_ay8910_porta_w)
+void shangkid_state::chinhero_ay8910_porta_w(uint8_t data)
 {
 	if (BIT(data, 0))
 		/* 0->1 transition triggers interrupt on Sound CPU */
 		m_audiocpu->set_input_line(0, HOLD_LINE );
 }
 
-WRITE8_MEMBER(shangkid_state::shangkid_ay8910_porta_w)
+void shangkid_state::shangkid_ay8910_porta_w(uint8_t data)
 {
 	if (BIT(data, 0))
 		/* 0->1 transition triggers interrupt on Sound CPU */
@@ -148,7 +148,7 @@ WRITE8_MEMBER(shangkid_state::shangkid_ay8910_porta_w)
 	membank("bank2")->set_entry((data & 0xfe) ? 0 : 1);
 }
 
-WRITE8_MEMBER(shangkid_state::ay8910_portb_w)
+void shangkid_state::ay8910_portb_w(uint8_t data)
 {
 	m_sound_latch = data;
 }
@@ -400,7 +400,7 @@ void shangkid_state::chinhero(machine_config &config)
 	mainlatch.q_out_cb<6>().set(FUNC(shangkid_state::coin_counter_1_w));
 	mainlatch.q_out_cb<7>().set(FUNC(shangkid_state::coin_counter_2_w));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -546,26 +546,26 @@ static INPUT_PORTS_START( dynamski )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Unknown ) )
-	/* what's 00 ? */
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Unknown ) )         PORT_DIPLOCATION("SW1:!1,!2")  // possibly difficulty?
+	PORT_DIPSETTING(    0x00, "?" )  // what's 00 ?
 	PORT_DIPSETTING(    0x01, "A" )
 	PORT_DIPSETTING(    0x02, "B" )
 	PORT_DIPSETTING(    0x03, "C" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )         PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )         PORT_DIPLOCATION("SW1:!4,!5")
 	PORT_DIPSETTING(    0x18, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) /* unused? */
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )     PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )         PORT_DIPLOCATION("SW1:!7")  // unused?
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) /* unused? */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )         PORT_DIPLOCATION("SW1:!8")  // unused?
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -602,23 +602,23 @@ static INPUT_PORTS_START( chinhero )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )           PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
 	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )         PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )         PORT_DIPLOCATION("SW1:!4,!5")
 	PORT_DIPSETTING(    0x18, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )     PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) ) /* not verified */
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )      PORT_DIPLOCATION("SW1:!7,!8") // not verified
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
@@ -662,7 +662,7 @@ static INPUT_PORTS_START( shangkid )
 	**  RV1 - Music
 	**  RV2 - Sound Effects
 	*/
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:2")
@@ -680,7 +680,7 @@ static INPUT_PORTS_START( shangkid )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )

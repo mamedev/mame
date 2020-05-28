@@ -102,8 +102,8 @@ private:
 	DECLARE_READ8_MEMBER(royalqn_comm_r);
 	DECLARE_WRITE8_MEMBER(royalqn_comm_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(input_1p_r);
-	DECLARE_READ8_MEMBER(input_2p_r);
+	uint8_t input_1p_r();
+	uint8_t input_2p_r();
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_READ8_MEMBER(sexygal_soundram_r);
 	DECLARE_READ8_MEMBER(sexygal_unknown_sound_r);
@@ -309,7 +309,7 @@ WRITE8_MEMBER(nightgal_state::mux_w)
 	//printf("%02x\n", m_mux_data);
 }
 
-READ8_MEMBER(nightgal_state::input_1p_r)
+uint8_t nightgal_state::input_1p_r()
 {
 	uint8_t cr_clear = m_io_cr_clear->read();
 
@@ -328,7 +328,7 @@ READ8_MEMBER(nightgal_state::input_1p_r)
 			m_io_pl1_4->read() & m_io_pl1_5->read() & m_io_pl1_6->read()) | cr_clear;
 }
 
-READ8_MEMBER(nightgal_state::input_2p_r)
+uint8_t nightgal_state::input_2p_r()
 {
 	uint8_t coin_port = m_io_coins->read();
 
@@ -374,7 +374,6 @@ WRITE8_MEMBER(nightgal_state::output_w)
 
 void nightgal_state::common_nsc_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x0080, 0x0080).portr("BLIT_PORT");
 	map(0x0081, 0x0083).r(FUNC(nightgal_state::royalqn_nsc_blit_r));
 	map(0x00a0, 0x00af).w(m_blitter, FUNC(jangou_blitter_device::vregs_w));
@@ -481,7 +480,6 @@ void nightgal_state::sgaltrop_nsc_map(address_map &map)
 
 void nightgal_state::sexygal_audio_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x0080, 0x0080).r(FUNC(nightgal_state::sexygal_unknown_sound_r));
 	map(0x1000, 0x1000).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x2000, 0x207f).ram().share("sound_ram");
@@ -799,7 +797,7 @@ void nightgal_state::royalqn(machine_config &config)
 	NSC8105(config, m_subcpu, MASTER_CLOCK / 8);
 	m_subcpu->set_addrmap(AS_PROGRAM, &nightgal_state::royalqn_nsc_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	JANGOU_BLITTER(config, m_blitter, MASTER_CLOCK/4);
 
@@ -1325,8 +1323,8 @@ READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
 
 void nightgal_state::init_ngalsumr()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(nightgal_state::ngalsumr_prot_latch_w), this) );
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8_delegate(FUNC(nightgal_state::ngalsumr_prot_value_r), this) );
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_latch_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_value_r)));
 	// 0x6003 some kind of f/f state
 }
 

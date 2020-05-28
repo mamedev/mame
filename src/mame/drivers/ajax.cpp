@@ -151,7 +151,7 @@ WRITE8_MEMBER(ajax_state::sound_bank_w)
 	m_k007232_2->set_bank(bank_A, bank_B);
 }
 
-WRITE8_MEMBER(ajax_state::volume_callback0)
+void ajax_state::volume_callback0(uint8_t data)
 {
 	m_k007232_1->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232_1->set_volume(1, 0, (data & 0x0f) * 0x11);
@@ -163,7 +163,7 @@ WRITE8_MEMBER(ajax_state::k007232_extvol_w)
 	m_k007232_2->set_volume(0, (data & 0x0f) * 0x11/2, (data & 0x0f) * 0x11/2);
 }
 
-WRITE8_MEMBER(ajax_state::volume_callback1)
+void ajax_state::volume_callback1(uint8_t data)
 {
 	/* channel B volume/pan */
 	m_k007232_2->set_volume(1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
@@ -182,7 +182,7 @@ void ajax_state::ajax(machine_config &config)
 	Z80(config, m_audiocpu, 3579545);  /* 3.58 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ajax_state::ajax_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -200,19 +200,19 @@ void ajax_state::ajax(machine_config &config)
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
-	m_k052109->set_tile_callback(FUNC(ajax_state::tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(ajax_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_subcpu, M6809_IRQ_LINE);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
-	m_k051960->set_sprite_callback(FUNC(ajax_state::sprite_callback), this);
+	m_k051960->set_sprite_callback(FUNC(ajax_state::sprite_callback));
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K051316(config, m_k051316, 0);
 	m_k051316->set_palette(m_palette);
 	m_k051316->set_bpp(7);
-	m_k051316->set_zoom_callback(FUNC(ajax_state::zoom_callback), this);
+	m_k051316->set_zoom_callback(FUNC(ajax_state::zoom_callback));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

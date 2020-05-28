@@ -166,7 +166,7 @@ void pgm_028_025_state::init_olds()
 {
 	pgm_basic_init();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xdcb400, 0xdcb403, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::olds_w), (igs025_device*)m_igs025));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xdcb400, 0xdcb403, read16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_r)), write16_delegate(*m_igs025, FUNC(igs025_device::olds_w)));
 	m_igs028->m_sharedprotram = m_sharedprotram;
 	m_igs025->m_kb_source_data = m_olds_source_data;
 }
@@ -192,7 +192,7 @@ void pgm_028_025_state::pgm_028_025_ol(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_028_025_state::olds_mem);
 
 	IGS025(config, m_igs025, 0);
-	m_igs025->set_external_cb(FUNC(pgm_028_025_state::igs025_to_igs028_callback), this);
+	m_igs025->set_external_cb(FUNC(pgm_028_025_state::igs025_to_igs028_callback));
 
 	IGS028(config, m_igs028, 0);
 }

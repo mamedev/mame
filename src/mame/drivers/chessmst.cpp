@@ -2,10 +2,12 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-        Chess-Master
+Chess-Master (G-5003-500) (10*U505 roms)
+Chess-Master (G-5003-501) (2 roms set)
+Chess-Master Diamond (G-5004-500)
 
-        TODO:
-        - figure out why chessmsta won't work, for starters it assume z80 carry flag is set at poweron?
+TODO:
+- figure out why chessmsta won't work, u2616 is probably a bad dump or misplaced
 
 ****************************************************************************/
 
@@ -55,12 +57,12 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( digits_w );
-	DECLARE_WRITE8_MEMBER( pio1_port_a_w );
-	DECLARE_WRITE8_MEMBER( pio1_port_b_w );
-	DECLARE_WRITE8_MEMBER( pio1_port_b_dm_w );
-	DECLARE_READ8_MEMBER( pio2_port_a_r );
-	DECLARE_WRITE8_MEMBER( pio2_port_b_w );
+	void digits_w(uint8_t data);
+	void pio1_port_a_w(uint8_t data);
+	void pio1_port_b_w(uint8_t data);
+	void pio1_port_b_dm_w(uint8_t data);
+	uint8_t  pio2_port_a_r();
+	void  pio2_port_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( timer_555_w );
 
 	void chessmst_io(address_map &map);
@@ -109,7 +111,7 @@ void chessmst_state::chessmst_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	//AM_RANGE(0x00, 0x03) AM_MIRROR(0xf0) read/write in both, not used by the software
+	//map(0x00, 0x03).mirror(0xf0); read/write in both, not used by the software
 	map(0x04, 0x07).mirror(0xf0).rw(m_pio[0], FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x08, 0x0b).mirror(0xf0).rw(m_pio[1], FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
@@ -201,7 +203,7 @@ void chessmst_state::update_display()
 	}
 }
 
-WRITE8_MEMBER( chessmst_state::digits_w )
+void chessmst_state::digits_w(uint8_t data)
 {
 	m_digit = (m_digit << 4) | (data & 0x0f);
 	m_digit_matrix = (data >> 4) & 0x0f;
@@ -209,7 +211,7 @@ WRITE8_MEMBER( chessmst_state::digits_w )
 	update_display();
 }
 
-WRITE8_MEMBER( chessmst_state::pio1_port_a_w )
+void chessmst_state::pio1_port_a_w(uint8_t data)
 {
 	for (int row = 0; row < 8; row++)
 	{
@@ -228,7 +230,7 @@ WRITE8_MEMBER( chessmst_state::pio1_port_a_w )
 	m_led_sel = 0;
 }
 
-WRITE8_MEMBER( chessmst_state::pio1_port_b_w )
+void chessmst_state::pio1_port_b_w(uint8_t data)
 {
 	m_matrix = (m_matrix & 0xff) | ((data & 0x01)<<8);
 	m_led_sel = (m_led_sel & 0xff) | ((data & 0x03)<<8);
@@ -236,7 +238,7 @@ WRITE8_MEMBER( chessmst_state::pio1_port_b_w )
 	m_speaker->level_w(BIT(data, 6));
 }
 
-WRITE8_MEMBER( chessmst_state::pio1_port_b_dm_w )
+void chessmst_state::pio1_port_b_dm_w(uint8_t data)
 {
 	m_matrix = (m_matrix & 0xff) | ((data & 0x04)<<6);
 
@@ -250,7 +252,7 @@ WRITE8_MEMBER( chessmst_state::pio1_port_b_dm_w )
 	output().set_value("playmode_led", !BIT(data, 6));
 }
 
-READ8_MEMBER( chessmst_state::pio2_port_a_r )
+uint8_t chessmst_state::pio2_port_a_r()
 {
 	uint8_t data = 0x00;
 
@@ -268,7 +270,7 @@ READ8_MEMBER( chessmst_state::pio2_port_a_r )
 	return data;
 }
 
-WRITE8_MEMBER( chessmst_state::pio2_port_b_w )
+void chessmst_state::pio2_port_b_w(uint8_t data)
 {
 	m_matrix = (data & 0xff) | (m_matrix & 0x100);
 	m_led_sel = (data & 0xff) | (m_led_sel & 0x300);
@@ -384,33 +386,34 @@ void chessmst_state::chessmstdm(machine_config &config)
 /* ROM definition */
 ROM_START( chessmst )
 	ROM_REGION( 0x2800, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "056.bin", 0x0000, 0x0400, CRC(2b90e5d3) SHA1(c47445964b2e6cb11bd1f27e395cf980c97af196) )
-	ROM_LOAD( "057.bin", 0x0400, 0x0400, CRC(e666fc56) SHA1(3fa75b82cead81973bea94191a5c35f0acaaa0e6) )
-	ROM_LOAD( "058.bin", 0x0800, 0x0400, CRC(6a17fbec) SHA1(019051e93a5114477c50eaa87e1ff01b02eb404d) )
-	ROM_LOAD( "059.bin", 0x0c00, 0x0400, CRC(e96e3d07) SHA1(20fab75f206f842231f0414ebc473ce2a7371e7f) )
-	ROM_LOAD( "060.bin", 0x1000, 0x0400, CRC(0e31f000) SHA1(daac924b79957a71a4b276bf2cef44badcbe37d3) )
-	ROM_LOAD( "061.bin", 0x1400, 0x0400, CRC(69ad896d) SHA1(25d999b59d4cc74bd339032c26889af00e64df60) )
-	ROM_LOAD( "062.bin", 0x1800, 0x0400, CRC(c42925fe) SHA1(c42d8d7c30a9b6d91ac994cec0cc2723f41324e9) )
-	ROM_LOAD( "063.bin", 0x1c00, 0x0400, CRC(86be4cdb) SHA1(741f984c15c6841e227a8722ba30cf9e6b86d878) )
-	ROM_LOAD( "064.bin", 0x2000, 0x0400, CRC(e82f5480) SHA1(38a939158052f5e6484ee3725b86e522541fe4aa) )
-	ROM_LOAD( "065.bin", 0x2400, 0x0400, CRC(4ec0e92c) SHA1(0b748231a50777391b04c1778750fbb46c21bee8) )
+	ROM_LOAD("056.bin", 0x0000, 0x0400, CRC(2b90e5d3) SHA1(c47445964b2e6cb11bd1f27e395cf980c97af196) )
+	ROM_LOAD("057.bin", 0x0400, 0x0400, CRC(e666fc56) SHA1(3fa75b82cead81973bea94191a5c35f0acaaa0e6) )
+	ROM_LOAD("058.bin", 0x0800, 0x0400, CRC(6a17fbec) SHA1(019051e93a5114477c50eaa87e1ff01b02eb404d) )
+	ROM_LOAD("059.bin", 0x0c00, 0x0400, CRC(e96e3d07) SHA1(20fab75f206f842231f0414ebc473ce2a7371e7f) )
+	ROM_LOAD("060.bin", 0x1000, 0x0400, CRC(0e31f000) SHA1(daac924b79957a71a4b276bf2cef44badcbe37d3) )
+	ROM_LOAD("061.bin", 0x1400, 0x0400, CRC(69ad896d) SHA1(25d999b59d4cc74bd339032c26889af00e64df60) )
+	ROM_LOAD("062.bin", 0x1800, 0x0400, CRC(c42925fe) SHA1(c42d8d7c30a9b6d91ac994cec0cc2723f41324e9) )
+	ROM_LOAD("063.bin", 0x1c00, 0x0400, CRC(86be4cdb) SHA1(741f984c15c6841e227a8722ba30cf9e6b86d878) )
+	ROM_LOAD("064.bin", 0x2000, 0x0400, CRC(e82f5480) SHA1(38a939158052f5e6484ee3725b86e522541fe4aa) )
+	ROM_LOAD("065.bin", 0x2400, 0x0400, CRC(4ec0e92c) SHA1(0b748231a50777391b04c1778750fbb46c21bee8) )
 ROM_END
 
 ROM_START( chessmsta )
 	ROM_REGION( 0x2800, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "2764.bin",       0x0000, 0x2000, CRC(6be28876) SHA1(fd7d77b471e7792aef3b2b3f7ff1de4cdafc94c9) )
-	ROM_LOAD( "u2616bm108.bin", 0x2000, 0x0800, CRC(6e69ace3) SHA1(e099b6b6cc505092f64b8d51ab9c70aa64f58f70) )
+	ROM_LOAD("2764.bin", 0x0000, 0x2000, CRC(6be28876) SHA1(fd7d77b471e7792aef3b2b3f7ff1de4cdafc94c9) )
+	ROM_LOAD("u2616bm108.bin", 0x2000, 0x0800, BAD_DUMP CRC(6e69ace3) SHA1(e099b6b6cc505092f64b8d51ab9c70aa64f58f70) )
 ROM_END
 
 ROM_START( chessmstdm )
 	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD("cmd_bm002_bm201.bin", 0x0000, 0x4000, CRC(47858079) SHA1(eeae1126b514e4853d056690e72e7f5c6dfb3008))
+	ROM_LOAD("002", 0x0000, 0x2000, CRC(bed56fef) SHA1(dad0f8ddbd9b10013a5bdcc09ee6db39cfb26b78) ) // U2364D45
+	ROM_LOAD("201", 0x2000, 0x2000, CRC(c9dc7f29) SHA1(a3e1b66d0e15ffe83a9165d15c4a83013852c2fe) ) // "
 ROM_END
 
 
 /* Driver */
 
-//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY                       FULLNAME                FLAGS
-COMP( 1984, chessmst,   0,        0,      chessmst,   chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1984, chessmsta,  chessmst, 0,      chessmsta,  chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1987, chessmstdm, 0,        0,      chessmstdm, chessmstdm, chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY, FULLNAME, FLAGS
+COMP( 1984, chessmst,   0,        0,      chessmst,   chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1984, chessmsta,  chessmst, 0,      chessmsta,  chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1987, chessmstdm, 0,        0,      chessmstdm, chessmstdm, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

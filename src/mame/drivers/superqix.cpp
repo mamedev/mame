@@ -185,7 +185,7 @@ SAMPLES_START_CB_MEMBER(hotsmash_state::pbillian_sh_start)
 		m_samplebuf[i] = s8(m_samples_region[i] ^ 0x80) * 256;
 }
 
-WRITE8_MEMBER(hotsmash_state::pbillian_sample_trigger_w)
+void hotsmash_state::pbillian_sample_trigger_w(u8 data)
 {
 	//logerror("sample trigger write of %02x\n", data);
 
@@ -226,12 +226,12 @@ The MCU acts this way:
 
 **************************************************************************/
 
-CUSTOM_INPUT_MEMBER(superqix_state::fromz80_semaphore_input_r)
+READ_LINE_MEMBER(superqix_state::fromz80_semaphore_input_r)
 {
 	return (m_z80_has_written ? 1 : 0);
 }
 
-CUSTOM_INPUT_MEMBER(superqix_state::frommcu_semaphore_input_r)
+READ_LINE_MEMBER(superqix_state::frommcu_semaphore_input_r)
 {
 	return (m_mcu_has_written ? 1 : 0);
 }
@@ -299,18 +299,18 @@ TIMER_CALLBACK_MEMBER(superqix_state::z80_ay2_iob_w_cb)
 	m_from_z80 = param;
 }
 
-WRITE8_MEMBER(superqix_state::z80_ay1_sync_address_w)
+void superqix_state::z80_ay1_sync_address_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::z80_ay1_sync_address_w_cb), this), data);
 }
 
-READ8_MEMBER(superqix_state::z80_ay2_iob_r)
+uint8_t superqix_state::z80_ay2_iob_r()
 {
 //  logerror("%0s: read mcu answer (%02x)\n",machine().describe_context(), m_from_mcu);
 	return m_from_mcu;
 }
 
-READ8_MEMBER(superqix_state::z80_semaphore_assert_r)
+uint8_t superqix_state::z80_semaphore_assert_r()
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -319,12 +319,12 @@ READ8_MEMBER(superqix_state::z80_semaphore_assert_r)
 	return 0;
 }
 
-WRITE8_MEMBER(superqix_state::z80_ay2_iob_w)
+void superqix_state::z80_ay2_iob_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::z80_ay2_iob_w_cb), this), data);
 }
 
-WRITE8_MEMBER(superqix_state::mcu_port3_w)
+void superqix_state::mcu_port3_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::mcu_port3_w_cb), this), data);
 }
@@ -355,15 +355,15 @@ TIMER_CALLBACK_MEMBER(superqix_state::bootleg_mcu_port1_w_cb)
 		//already after a synchronize, and doing another one would be redundant
 	}
 
-	mcu_port2_w(m_mcu->space(AS_PROGRAM), 0, m_bl_fake_port2, 0xff); // finally write to port 2, which will do another synchronize
+	mcu_port2_w(m_bl_fake_port2); // finally write to port 2, which will do another synchronize
 }
 
-WRITE8_MEMBER(superqix_state::bootleg_mcu_port1_w)
+void superqix_state::bootleg_mcu_port1_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::bootleg_mcu_port1_w_cb), this), data);
 }
 
-READ8_MEMBER(superqix_state::bootleg_mcu_port3_r)
+uint8_t superqix_state::bootleg_mcu_port3_r()
 {
 	if ((m_bl_port1 & 0x10) == 0)
 	{
@@ -386,7 +386,7 @@ READ8_MEMBER(superqix_state::bootleg_mcu_port3_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(superqix_state::bootleg_mcu_port3_w)
+void superqix_state::bootleg_mcu_port3_w(uint8_t data)
 {
 	// unlike the 8751, the 8031 bootleg port3 does not directly connect to ay2
 	// iob; there is a 74ls374 octal latch next to the 8031 which probably
@@ -395,19 +395,19 @@ WRITE8_MEMBER(superqix_state::bootleg_mcu_port3_w)
 	m_bl_port3_out = data;
 }
 
-WRITE8_MEMBER(superqix_state::mcu_port2_w)
+void superqix_state::mcu_port2_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::mcu_port2_w_cb), this), data);
 }
 
-READ8_MEMBER(superqix_state::mcu_port3_r)
+uint8_t superqix_state::mcu_port3_r()
 {
 //  logerror("%s: read Z80 command %02x\n",machine().describe_context(), m_from_z80);
 	return m_from_z80;
 }
 
 
-READ8_MEMBER(superqix_state_base::nmi_ack_r)
+uint8_t superqix_state_base::nmi_ack_r()
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -419,12 +419,12 @@ READ8_MEMBER(superqix_state_base::nmi_ack_r)
 		return ioport("SYSTEM")->read(); // only on the bootleg sets
 }
 
-READ8_MEMBER(superqix_state::bootleg_in0_r)
+uint8_t superqix_state::bootleg_in0_r()
 {
 	return bitswap<8>(ioport("DSW1")->read(), 0,1,2,3,4,5,6,7);
 }
 
-WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
+void superqix_state::bootleg_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(~data & 1);
 }
@@ -795,17 +795,17 @@ int hotsmash_state::read_inputs(int player) // if called with player=1, we're mu
 		return (launchbtn_state<<4 | ((m_dial_oldpos[player] & 1) << 3) | (m_dial_sign[player] << 2) | (newpos_plunger&2) | ((newpos_plunger^(newpos_plunger>>1))&1) );
 }
 
-READ8_MEMBER(hotsmash_state::hotsmash_68705_porta_r)
+u8 hotsmash_state::hotsmash_68705_porta_r()
 {
 	return m_porta_in;
 }
 
-WRITE8_MEMBER(hotsmash_state::hotsmash_68705_portb_w)
+void hotsmash_state::hotsmash_68705_portb_w(u8 data)
 {
 	m_portb_out = data;
 }
 
-WRITE8_MEMBER(hotsmash_state::hotsmash_68705_portc_w)
+void hotsmash_state::hotsmash_68705_portc_w(u8 data)
 {
 	u8 const changed_m_portc_out = m_portc_out ^ data;
 	m_portc_out = data;
@@ -863,7 +863,7 @@ WRITE8_MEMBER(hotsmash_state::hotsmash_68705_portc_w)
 	}
 }
 
-WRITE8_MEMBER(hotsmash_state::hotsmash_z80_mcu_w)
+void hotsmash_state::hotsmash_z80_mcu_w(u8 data)
 {
 	m_from_z80 = data;
 	//if ((m_from_z80 != 0x04) && (m_from_z80 != 0x08))
@@ -873,7 +873,7 @@ WRITE8_MEMBER(hotsmash_state::hotsmash_z80_mcu_w)
 	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 }
 
-READ8_MEMBER(hotsmash_state::hotsmash_z80_mcu_r)
+u8 hotsmash_state::hotsmash_z80_mcu_r()
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -955,7 +955,7 @@ MACHINE_RESET_MEMBER(superqix_state, superqix)
 		// the act of clearing this latch asserts the z80 reset, and the mcu must clear it itself by writing
 		// to the p2 latch with bit 5 set.
 		m_port2_raw = 0x01; // force the following function into latching a zero write by having bit 0 falling edge
-		mcu_port2_w(m_mcu->space(AS_PROGRAM), 0, 0x00, 0xff);
+		mcu_port2_w(0x00);
 		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 }
@@ -991,7 +991,7 @@ void superqix_state_base::main_map(address_map &map)
 void hotsmash_state::pbillian_port_map(address_map &map)
 { // used by both pbillian and hotsmash
 	map(0x0000, 0x01ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // 6116 sram near the jamma connector, "COLOR RAM" during POST
-	//AM_RANGE(0x0200, 0x03ff) AM_RAM // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
+	//map(0x0200, 0x03ff).ram(); // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
 	map(0x0401, 0x0401).r(m_ay1, FUNC(ay8910_device::data_r)); // ay i/o ports connect to "SYSTEM" and "BUTTONS" inputs which includes mcu semaphore flags
 	map(0x0402, 0x0403).w(m_ay1, FUNC(ay8910_device::data_address_w));
 	map(0x0408, 0x0408).rw(FUNC(hotsmash_state::hotsmash_z80_mcu_r), FUNC(hotsmash_state::hotsmash_z80_mcu_w));
@@ -1000,6 +1000,16 @@ void hotsmash_state::pbillian_port_map(address_map &map)
 	map(0x0419, 0x0419).nopw(); // ??? is this a watchdog, or something else? manual reset of mcu semaphores? manual nmi TRIGGER? used by prebillian
 	map(0x041a, 0x041a).w(FUNC(hotsmash_state::pbillian_sample_trigger_w));
 	map(0x041b, 0x041b).nopr();  // input related? but probably not used, may be 'sample has stopped playing' flag? used by prebillian
+}
+
+void hotsmash_state::pbillianb_port_map(address_map &map)
+{
+	pbillian_port_map(map);
+	map(0x0408, 0x0408).unmaprw(); // no MCU on PCB, still reads/writes here
+	map(0x0c00, 0x0c00).portr("DSW1");
+	map(0x0c01, 0x0c01).portr("DSW2");
+	map(0x0c06, 0x0c06).portr("CONTROLS");
+	map(0x0c07, 0x0c07).portr("CONTROLS2");
 }
 
 void superqix_state::sqix_port_map(address_map &map)
@@ -1016,7 +1026,7 @@ void superqix_state::sqix_port_map(address_map &map)
 	// following two ranges are made of two 64kx4 4464 DRAM chips at 9L and 9M, "GRAPHICS RAM" or "GRP BIT" if there is an error in POST
 	map(0x0800, 0x77ff).ram().w(FUNC(superqix_state::superqix_bitmapram_w)).share("bitmapram");
 	map(0x8800, 0xf7ff).ram().w(FUNC(superqix_state::superqix_bitmapram2_w)).share("bitmapram2");
-	//AM_RANGE(0xf970, 0xfa6f) AM_RAM // this is probably a portion of the remainder of the chips at 9L and 9M which isn't used or tested for graphics ram
+	//map(0xf970, 0xfa6f).ram(); // this is probably a portion of the remainder of the chips at 9L and 9M which isn't used or tested for graphics ram
 }
 
 void superqix_state::sqix_8031_map(address_map &map)
@@ -1093,7 +1103,7 @@ static INPUT_PORTS_START( pbillian )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // P2 fire (M powerup) + high score initials
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hotsmash_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(hotsmash_state, pbillian_semaphore_input_r)  // Z80 and MCU Semaphores
 
 	PORT_START("PLUNGER1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -1114,6 +1124,98 @@ static INPUT_PORTS_START( pbillian )
 	PORT_START("LAUNCH2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pbillianb )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPSETTING(    0x18, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                    PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x0c, "10/20/300K Points" )
+	PORT_DIPSETTING(    0x00, "10/30/500K Points" )
+	PORT_DIPSETTING(    0x08, "20/30/400K Points" )
+	PORT_DIPSETTING(    0x04, "30/40/500K Points" )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SYSTEM") // ay port B (register F)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // hblank?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+
+	PORT_START("CONTROLS") // 0xc06: both players in upright, player 1 in cocktail
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("CONTROLS2") // 0xc07: player 2 in cocktail
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("BUTTONS") // ay port A (register E)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )     // N/C
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )    // P1 fire (M powerup) + high score initials
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     // N/C
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // P2 fire (M powerup) + high score initials
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Z80 and MCU Semaphores for the parent, needs to be high in this MCU-less bootleg, too
 
 INPUT_PORTS_END
 
@@ -1183,7 +1285,7 @@ static INPUT_PORTS_START( hotsmash )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // p2 button 2, unused on this game?
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hotsmash_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(hotsmash_state, pbillian_semaphore_input_r)  // Z80 and MCU Semaphores
 
 	PORT_START("PLUNGER1")  // plunger isn't present on hotsmash though the pins exist for it
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
@@ -1261,7 +1363,7 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) // JAMMA #R ("Service")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT ) // JAMMA #S ("Tilt")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) // JAMMA #15 ("Test")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, fromz80_semaphore_input_r, nullptr)  // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(superqix_state, fromz80_semaphore_input_r)  // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
 
 	PORT_START("P1") /* AY-3-8910 #1 @3P Port A */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY // JAMMA #18
@@ -1280,8 +1382,8 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL // JAMMA #Y
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL // JAMMA #Z
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL // JAMMA #a
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, frommcu_semaphore_input_r, nullptr) // 74ls174 @1J pin 5 (Q1), this is the mcu->z80 semaphore
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, fromz80_semaphore_input_r, nullptr) // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(superqix_state, frommcu_semaphore_input_r) // 74ls174 @1J pin 5 (Q1), this is the mcu->z80 semaphore
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(superqix_state, fromz80_semaphore_input_r) // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
 
 INPUT_PORTS_END
 
@@ -1386,6 +1488,15 @@ void hotsmash_state::pbillian(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+void hotsmash_state::pbillianb(machine_config &config)
+{
+	pbillian(config);
+
+	m_maincpu->set_addrmap(AS_IO, &hotsmash_state::pbillianb_port_map);
+
+	config.device_remove("mcu");
+}
+
 void superqix_state::sqix(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1480,6 +1591,20 @@ ROM_START( pbillian )
 	ROM_LOAD( "mitsubishi__electric__4.m5l27256k.1n",  0x00000, 0x08000, CRC(9c08a072) SHA1(25f31fcf72216cf42528b07ad8c09113aa69861a) )
 	ROM_LOAD( "mitsubishi__electric__5.m5l27256k.1r",  0x08000, 0x08000, CRC(2dd5b83f) SHA1(b05e3a008050359d0207757b9cbd8cee87abc697) )
 	ROM_LOAD( "mitsubishi__electric__6.m5l27256k.1t",  0x10000, 0x08000, CRC(33b855b0) SHA1(5a1df4f82fc0d6f78883b759fd61f395942645eb) )
+ROM_END
+
+ROM_START( pbillianb ) // EV-97 PCB
+	ROM_REGION( 0x018000, "maincpu", 0 )
+	ROM_LOAD( "1",  0x00000, 0x08000, CRC(cd8e34f0) SHA1(6598a594b4e305a6139d03e6d1d564c093da713a) ) // different
+	ROM_LOAD( "2",  0x10000, 0x08000, CRC(e60a2cb0) SHA1(949bb7ff5df36ee10d910a33f595e6a90350304e) ) // 2nd half identical to the corresponding ROM of the parent
+
+	ROM_REGION( 0x8000, "samples", 0 ) // identical to the parent
+	ROM_LOAD( "3",  0x0000, 0x08000, CRC(3f9bc7f1) SHA1(0b0c2ec3bea6a7f3fc6c0c8b750318f3f9ec3d1f) )
+
+	ROM_REGION( 0x018000, "gfx1", 0 ) // only 5 differs from the parent
+	ROM_LOAD( "4",  0x00000, 0x08000, CRC(9c08a072) SHA1(25f31fcf72216cf42528b07ad8c09113aa69861a) )
+	ROM_LOAD( "5",  0x08000, 0x08000, CRC(63f3437b) SHA1(a2234019bac27256692d4b059d39caaddfb9fb08) )
+	ROM_LOAD( "6",  0x10000, 0x08000, CRC(33b855b0) SHA1(5a1df4f82fc0d6f78883b759fd61f395942645eb) )
 ROM_END
 
 ROM_START( hotsmash )
@@ -1723,14 +1848,15 @@ void superqix_state_base::init_hotsmash()
 	m_invert_p2_spinner = true;
 }
 
-/*    YEAR  NAME      PARENT    MACHINE     INPUT     CLASS           INIT           ROT    COMPANY           FULLNAME */
-GAME( 1986, pbillian, 0,        pbillian,   pbillian, hotsmash_state, init_pbillian, ROT0,  "Kaneko / Taito", "Prebillian", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hotsmash, 0,        pbillian,   hotsmash, hotsmash_state, init_hotsmash, ROT90, "Kaneko / Taito", "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqix,     0,        sqix,       superqix, superqix_state, init_sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixr1,   sqix,     sqix,       superqix, superqix_state, init_sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixr0,   sqix,     sqix,       superqix, superqix_state, init_sqixr0,   ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixu,    sqix,     sqix,       superqix, superqix_state, init_sqix,     ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixb1,   sqix,     sqix_8031,  superqix, superqix_state, init_sqixr0,   ROT90, "bootleg", "Super Qix (bootleg of V1.0, 8031 MCU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixb2,   sqix,     sqix_nomcu, superqix, superqix_state, init_sqix,     ROT90, "bootleg", "Super Qix (bootleg, No MCU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, perestro, 0,        sqix_nomcu, superqix, superqix_state, init_perestro, ROT90, "Promat", "Perestroika Girls", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, perestrof,perestro, sqix_nomcu, superqix, superqix_state, init_perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME       PARENT    MACHINE     INPUT      CLASS           INIT           ROT    COMPANY                             FULLNAME */
+GAME( 1986, pbillian,  0,        pbillian,   pbillian,  hotsmash_state, init_pbillian, ROT0,  "Kaneko / Taito",                   "Prebillian", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pbillianb, pbillian, pbillianb,  pbillianb, hotsmash_state, init_pbillian, ROT0,  "bootleg (Game Corp.)",             "Prebillian (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hotsmash,  0,        pbillian,   hotsmash,  hotsmash_state, init_hotsmash, ROT90, "Kaneko / Taito",                   "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqix,      0,        sqix,       superqix,  superqix_state, init_sqix,     ROT90, "Kaneko / Taito",                   "Super Qix (World/Japan, V1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr1,    sqix,     sqix,       superqix,  superqix_state, init_sqix,     ROT90, "Kaneko / Taito",                   "Super Qix (World/Japan, V1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr0,    sqix,     sqix,       superqix,  superqix_state, init_sqixr0,   ROT90, "Kaneko / Taito",                   "Super Qix (World/Japan, V1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixu,     sqix,     sqix,       superqix,  superqix_state, init_sqix,     ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixb1,    sqix,     sqix_8031,  superqix,  superqix_state, init_sqixr0,   ROT90, "bootleg",                          "Super Qix (bootleg of V1.0, 8031 MCU)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixb2,    sqix,     sqix_nomcu, superqix,  superqix_state, init_sqix,     ROT90, "bootleg",                          "Super Qix (bootleg, No MCU)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, perestro,  0,        sqix_nomcu, superqix,  superqix_state, init_perestro, ROT90, "Promat",                           "Perestroika Girls", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, perestrof, perestro, sqix_nomcu, superqix,  superqix_state, init_perestro, ROT90, "Promat (Fuuki license)",           "Perestroika Girls (Fuuki license)", MACHINE_SUPPORTS_SAVE )

@@ -33,7 +33,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(coin_output_w);
+	void coin_output_w(uint8_t data);
 	uint32_t screen_update_buster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void buster(machine_config &config);
 	void mainmap(address_map &map);
@@ -73,7 +73,7 @@ uint32_t buster_state::screen_update_buster(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-WRITE8_MEMBER(buster_state::coin_output_w)
+void buster_state::coin_output_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
@@ -83,7 +83,7 @@ WRITE8_MEMBER(buster_state::coin_output_w)
 
 void buster_state::mainmap(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();// AM_SHARE("rom")
+	map(0x0000, 0x3fff).rom();// .share("rom");
 	map(0x4000, 0x47ff).ram().share("wram");
 	map(0x5000, 0x5fff).ram().share("vram");
 	map(0x6000, 0x6000).w("crtc", FUNC(mc6845_device::address_w));

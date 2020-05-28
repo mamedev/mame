@@ -7,10 +7,12 @@
 local ninja = premake.ninja
 
 function ninja.esc(value)
-	value = value:gsub("%$", "$$") -- TODO maybe there is better way
-	value = value:gsub(":", "$:")
-	value = value:gsub("\n", "$\n")
-	value = value:gsub(" ", "$ ")
+	if value then
+		value = string.gsub(value, "%$", "$$") -- TODO maybe there is better way
+		value = string.gsub(value, ":", "$:")
+		value = string.gsub(value, "\n", "$\n")
+		value = string.gsub(value, " ", "$ ")
+	end
 	return value
 end
 
@@ -113,13 +115,15 @@ function new_cfg_proxy(cfg)
 		location    = new,
 		objectsdir  = path.rebase(cfg.objectsdir, old, new),
 		buildtarget = rebasekeys(table.deepcopy(cfg.buildtarget), keys, old, new),
-		linktarget  = rebasekeys(table.deepcopy(cfg.buildtarget), keys, old, new),
+		linktarget  = rebasekeys(table.deepcopy(cfg.linktarget), keys, old, new),
 	}
 	
-	v.files           = rebasearray(cfg.files, old, new)
-	v.includedirs     = rebasearray(cfg.includedirs, old, new)
-	v.userincludedirs = rebasearray(cfg.userincludedirs, old, new)
-	v.swiftmodulemaps = rebasearray(cfg.swiftmodulemaps, old, new)
+	v.files             = rebasearray(cfg.files, old, new)
+	v.includedirs       = rebasearray(cfg.includedirs, old, new)
+	v.libdirs       	= rebasearray(cfg.libdirs, old, new)
+	v.userincludedirs   = rebasearray(cfg.userincludedirs, old, new)
+	v.systemincludedirs = rebasearray(cfg.systemincludedirs, old, new)
+	v.swiftmodulemaps   = rebasearray(cfg.swiftmodulemaps, old, new)
 	
 	return setmetatable(v, cfg_proxy)
 end

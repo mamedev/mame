@@ -65,17 +65,20 @@
 #include "cpu/nec/nec.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 #include "screen.h"
 #include "emupal.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
 #define LOG_KEYBOARD  (1U <<  1)
 #define LOG_DEBUG     (1U <<  2)
 
-#define VERBOSE (LOG_DEBUG)
+//#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
@@ -103,17 +106,18 @@ public:
 		, m_isabus(*this, "isa")
 		, m_pic8259(*this, "pic8259")
 		, m_pit8254(*this, "pit8254")
+		, m_dac(*this, "dac")
 		, m_screen(*this, "screen")
 		, m_p_videoram(*this, "video")
 		, m_p_chargen(*this, "gfx1")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(d300_w);
-	DECLARE_READ8_MEMBER(d300_r);
-	DECLARE_WRITE8_MEMBER(e300_w);
-	DECLARE_READ8_MEMBER(e300_r);
-	DECLARE_WRITE8_MEMBER(f300_w);
-	DECLARE_READ8_MEMBER(f300_r);
+	void d300_w(offs_t offset, uint8_t data);
+	uint8_t d300_r(offs_t offset);
+	void e300_w(offs_t offset, uint8_t data);
+	uint8_t e300_r(offs_t offset);
+	void f300_w(offs_t offset, uint8_t data);
+	uint8_t f300_r(offs_t offset);
 
 	void hp95lx(machine_config &config);
 protected:
@@ -133,6 +137,7 @@ protected:
 	required_device<isa8_device> m_isabus;
 	required_device<pic8259_device> m_pic8259;
 	required_device<pit8254_device> m_pit8254;
+	required_device<dac_8bit_r2r_device> m_dac;
 	required_device<screen_device> m_screen;
 
 private:
@@ -140,14 +145,14 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_WRITE8_MEMBER(video_address_w);
-	DECLARE_READ8_MEMBER(video_register_r);
-	DECLARE_WRITE8_MEMBER(video_register_w);
-	DECLARE_WRITE8_MEMBER(debug_w);
+	uint8_t keyboard_r(offs_t offset);
+	void keyboard_w(offs_t offset, uint8_t data);
+	uint8_t video_r(offs_t offset);
+	void video_w(offs_t offset, uint8_t data);
+	void video_address_w(uint8_t data);
+	uint8_t video_register_r();
+	void video_register_w(uint8_t data);
+	void debug_w(offs_t offset, uint8_t data);
 
 	void hp95lx_io(address_map &map);
 	void hp95lx_map(address_map &map);
@@ -287,10 +292,12 @@ void hp95lx_state::machine_reset()
 	m_kbit = 0;
 	m_scancode = 0;
 	m_kbdflag = 0;
+
+	m_dac->write(0x7f);
 }
 
 
-WRITE8_MEMBER(hp95lx_state::d300_w)
+void hp95lx_state::d300_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: IO %04x <- %02x\n", machine().describe_context(), 0xd300 + offset, data);
 
@@ -314,7 +321,7 @@ WRITE8_MEMBER(hp95lx_state::d300_w)
 	}
 }
 
-READ8_MEMBER(hp95lx_state::d300_r)
+uint8_t hp95lx_state::d300_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -343,7 +350,7 @@ READ8_MEMBER(hp95lx_state::d300_r)
 	return data;
 }
 
-WRITE8_MEMBER(hp95lx_state::e300_w)
+void hp95lx_state::e300_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: IO %04x <- %02x\n", machine().describe_context(), 0xe300 + offset, data);
 
@@ -356,6 +363,7 @@ WRITE8_MEMBER(hp95lx_state::e300_w)
 		break;
 
 	case 5: // DAC out (per snd.c)
+		m_dac->write(data);
 		break;
 
 	case 9: // b1 = 'a2d power' (per snd.c)
@@ -376,7 +384,7 @@ WRITE8_MEMBER(hp95lx_state::e300_w)
 	}
 }
 
-READ8_MEMBER(hp95lx_state::e300_r)
+uint8_t hp95lx_state::e300_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -413,7 +421,7 @@ READ8_MEMBER(hp95lx_state::e300_r)
 	return data;
 }
 
-WRITE8_MEMBER(hp95lx_state::f300_w)
+void hp95lx_state::f300_w(offs_t offset, uint8_t data)
 {
 	address_map_bank_device *mapper;
 	const char *mapname;
@@ -512,7 +520,7 @@ WRITE8_MEMBER(hp95lx_state::f300_w)
 	}
 }
 
-READ8_MEMBER(hp95lx_state::f300_r)
+uint8_t hp95lx_state::f300_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -523,7 +531,7 @@ READ8_MEMBER(hp95lx_state::f300_r)
 
 /* keyboard HLE -- adapted from pt68k4.cpp */
 
-READ8_MEMBER(hp95lx_state::keyboard_r)
+uint8_t hp95lx_state::keyboard_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -535,7 +543,7 @@ READ8_MEMBER(hp95lx_state::keyboard_r)
 		return 0;
 }
 
-WRITE8_MEMBER(hp95lx_state::keyboard_w)
+void hp95lx_state::keyboard_w(offs_t offset, uint8_t data)
 {
 	LOGKBD("kbd: write %02X <= %02X\n", offset + 0x60, data);
 	m_pic8259->ir1_w(CLEAR_LINE);
@@ -581,7 +589,7 @@ WRITE_LINE_MEMBER(hp95lx_state::keyboard_data_w)
 
 /* video HLE */
 
-READ8_MEMBER(hp95lx_state::video_register_r)
+uint8_t hp95lx_state::video_register_r()
 {
 	uint8_t ret = 0;
 
@@ -603,7 +611,7 @@ READ8_MEMBER(hp95lx_state::video_register_r)
 	return ret;
 }
 
-WRITE8_MEMBER(hp95lx_state::video_register_w)
+void hp95lx_state::video_register_w(uint8_t data)
 {
 	switch (m_register_address_latch)
 	{
@@ -630,19 +638,19 @@ WRITE8_MEMBER(hp95lx_state::video_register_w)
 	}
 }
 
-WRITE8_MEMBER(hp95lx_state::video_address_w)
+void hp95lx_state::video_address_w(uint8_t data)
 {
 	m_register_address_latch = data & 0x3f;
 }
 
-READ8_MEMBER(hp95lx_state::video_r)
+uint8_t hp95lx_state::video_r(offs_t offset)
 {
 	int data = 0xff;
 
 	switch (offset)
 	{
 	case 1: case 3: case 5: case 7:
-		data = video_register_r(space, offset);
+		data = video_register_r();
 		break;
 
 	case 10:
@@ -653,21 +661,21 @@ READ8_MEMBER(hp95lx_state::video_r)
 	return data;
 }
 
-WRITE8_MEMBER(hp95lx_state::video_w)
+void hp95lx_state::video_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 	case 0: case 2: case 4: case 6:
-		video_address_w(space, offset, data);
+		video_address_w(data);
 		break;
 
 	case 1: case 3: case 5: case 7:
-		video_register_w(space, offset, data);
+		video_register_w(data);
 		break;
 	}
 }
 
-WRITE8_MEMBER(hp95lx_state::debug_w)
+void hp95lx_state::debug_w(offs_t offset, uint8_t data)
 {
 	LOGDBG("%11.6f %s debug: port %02X <= %02X\n", machine().time().as_double(), machine().describe_context(), offset + 0x90, data);
 }
@@ -746,6 +754,13 @@ void hp95lx_state::hp95lx(machine_config &config)
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
 	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // card slot
 
+	SPEAKER(config, "speaker").front_center();
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
+
 	// XXX When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.
 	// XXX When the AC adapter is not plugged in (ie, running off of batteries) the refresh rate is 56.8 Hz.
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD, rgb_t::white());
@@ -760,7 +775,7 @@ void hp95lx_state::hp95lx(machine_config &config)
 
 
 ROM_START( hp95lx )
-	ROM_REGION16_LE(0x100000, "romdos", 0)
+	ROM_REGION(0x100000, "romdos", 0)
 	// Version A ... ROM BIOS Ver 2.14 ... 04/02/91
 	ROM_LOAD("18-5301.abd.bin", 0, 0x100000, CRC(18121c48) SHA1(c3bfb45cbbf4f57ae67fb5659da40f371d8e5c54))
 

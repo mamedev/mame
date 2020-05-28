@@ -98,8 +98,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(bullsdrt_coin_count_w);
 	DECLARE_READ8_MEMBER(earom_read);
 	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
-	DECLARE_READ8_MEMBER(caterplr_unknown_r);
+	void earom_control_w(uint8_t data);
+	uint8_t caterplr_unknown_r();
 	DECLARE_WRITE8_MEMBER(caterplr_AY8910_w);
 	DECLARE_READ8_MEMBER(caterplr_AY8910_r);
 	DECLARE_READ8_MEMBER(multiped_eeprom_r);

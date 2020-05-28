@@ -29,8 +29,8 @@ void mb90082_device::mb90082_vram(address_map &map)
 	{
 		map(0x0000, 0x023f).ram(); // main screen vram
 		map(0x0400, 0x063f).ram(); // main screen attr
-//  AM_RANGE(0x0800, 0x0a3f) AM_RAM // sub screen vram
-//  AM_RANGE(0x0c00, 0x0e3f) AM_RAM // sub screen attr
+//  map(0x0800, 0x0a3f).ram(); // sub screen vram
+//  map(0x0c00, 0x0e3f).ram(); // sub screen attr
 	}
 }
 
@@ -132,7 +132,7 @@ void mb90082_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE_LINE_MEMBER( mb90082_device::set_cs_line )
+void mb90082_device::set_cs_line(int state)
 {
 	m_reset_line = state;
 
@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER( mb90082_device::set_cs_line )
 }
 
 
-WRITE8_MEMBER( mb90082_device::write )
+void mb90082_device::write(uint8_t data)
 {
 	uint16_t dat;
 

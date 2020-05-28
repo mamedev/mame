@@ -14,8 +14,8 @@
  * Edited and translated to English by Kenji RIKITAKE
  */
 
-#include <string.h>
-#include <assert.h>
+#include <cstring>
+#include <cassert>
 #include "pool.h"
 #include "flopimg.h"
 

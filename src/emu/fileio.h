@@ -16,6 +16,13 @@
 #include "corefile.h"
 #include "hash.h"
 
+#include <iterator>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
+
 // some systems use macros for getc/putc rather than functions
 #ifdef getc
 #undef getc
@@ -37,6 +44,17 @@ public:
 	path_iterator(path_iterator &&that);
 	path_iterator(path_iterator const &that);
 
+	template <typename T>
+	path_iterator(T &&searchpath, std::enable_if_t<std::is_constructible<std::string, T>::value, int> = 0)
+		: path_iterator(std::string(std::forward<T>(searchpath)))
+	{ }
+
+	// TODO: this doesn't work with C arrays (only vector, std::array, etc.)
+	template <typename T>
+	path_iterator(T &&paths, std::enable_if_t<std::is_constructible<std::string, typename std::remove_reference_t<T>::value_type>::value, int> = 0)
+		: path_iterator(concatenate_paths(std::forward<T>(paths)))
+	{ m_separator = '\0'; }
+
 	// assignment operators
 	path_iterator &operator=(path_iterator &&that);
 	path_iterator &operator=(path_iterator const &that);
@@ -46,9 +64,30 @@ public:
 	void reset();
 
 private:
+	// helpers
+	template <typename T>
+	static std::string concatenate_paths(T &&paths)
+	{
+		std::string result;
+		auto it(std::begin(paths));
+		if (std::end(paths) != it)
+		{
+			result.append(*it);
+			++it;
+		}
+		while (std::end(paths) != it)
+		{
+			result.append(1, '\0');
+			result.append(*it);
+			++it;
+		}
+		return result;
+	}
+
 	// internal state
 	std::string                 m_searchpath;
 	std::string::const_iterator m_current;
+	char                        m_separator;
 	bool                        m_is_first;
 };
 
@@ -83,10 +122,24 @@ private:
 
 class emu_file
 {
+	enum empty_t { EMPTY };
+	using searchpath_vector = std::vector<std::pair<path_iterator, std::string> >;
+
 public:
 	// file open/creation
 	emu_file(u32 openflags);
-	emu_file(std::string &&searchpath, u32 openflags);
+	template <typename T>
+	emu_file(T &&searchpath, std::enable_if_t<std::is_constructible<path_iterator, T>::value, u32> openflags)
+		: emu_file(path_iterator(std::forward<T>(searchpath)), openflags)
+	{ }
+	template <typename T, typename U, typename V, typename... W>
+	emu_file(T &&searchpath, U &&x, V &&y, W &&... z)
+		: emu_file(0U, EMPTY)
+	{
+		m_iterator.reserve(sizeof...(W) + 1);
+		m_mediapaths.reserve(sizeof...(W) + 1);
+		set_searchpaths(std::forward<T>(searchpath), std::forward<U>(x), std::forward<V>(y), std::forward<W>(z)...);
+	}
 	virtual ~emu_file();
 
 	// getters
@@ -96,23 +149,15 @@ public:
 	const char *fullpath() const { return m_fullpath.c_str(); }
 	u32 openflags() const { return m_openflags; }
 	util::hash_collection &hashes(const char *types);
-	bool restrict_to_mediapath() const { return m_restrict_to_mediapath; }
-	bool part_of_mediapath(std::string path);
 
 	// setters
 	void remove_on_close() { m_remove_on_close = true; }
 	void set_openflags(u32 openflags) { assert(!m_file); m_openflags = openflags; }
-	void set_restrict_to_mediapath(bool rtmp = true) { m_restrict_to_mediapath = rtmp; }
+	void set_restrict_to_mediapath(int rtmp) { m_restrict_to_mediapath = rtmp; }
 
 	// open/close
 	osd_file::error open(const std::string &name);
-	osd_file::error open(const std::string &name1, const std::string &name2);
-	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3);
-	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4);
 	osd_file::error open(const std::string &name, u32 crc);
-	osd_file::error open(const std::string &name1, const std::string &name2, u32 crc);
-	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, u32 crc);
-	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4, u32 crc);
 	osd_file::error open_next();
 	osd_file::error open_ram(const void *data, u32 length);
 	void close();
@@ -145,7 +190,26 @@ public:
 	void flush();
 
 private:
-	bool compressed_file_ready(void);
+	emu_file(u32 openflags, empty_t);
+	emu_file(path_iterator &&searchpath, u32 openflags);
+
+	template <typename T>
+	void set_searchpaths(T &&searchpath, u32 openflags)
+	{
+		m_iterator.emplace_back(searchpath, "");
+		m_mediapaths.emplace_back(std::forward<T>(searchpath), "");
+		m_openflags = openflags;
+	}
+	template <typename T, typename U, typename V, typename... W>
+	void set_searchpaths(T &&searchpath, U &&x, V &&y, W &&... z)
+	{
+		m_iterator.emplace_back(searchpath, "");
+		m_mediapaths.emplace_back(std::forward<T>(searchpath), "");
+		set_searchpaths(std::forward<U>(x), std::forward<V>(y), std::forward<W>(z)...);
+	}
+
+	bool part_of_mediapath(const std::string &path);
+	bool compressed_file_ready();
 
 	// internal helpers
 	osd_file::error attempt_zipped();
@@ -155,18 +219,36 @@ private:
 	std::string             m_filename;             // original filename provided
 	std::string             m_fullpath;             // full filename
 	util::core_file::ptr    m_file;                 // core file pointer
-	path_iterator           m_iterator;             // iterator for paths
-	path_iterator           m_mediapaths;           // media-path iterator
+	searchpath_vector       m_iterator;             // iterator for paths
+	searchpath_vector       m_mediapaths;           // media-path iterator
+	bool                    m_first;                // true if this is the start of iteration
 	u32                     m_crc;                  // file's CRC
 	u32                     m_openflags;            // flags we used for the open
 	util::hash_collection   m_hashes;               // collection of hashes
 
 	std::unique_ptr<util::archive_file> m_zipfile;  // ZIP file pointer
-	std::vector<u8>         m_zipdata;               // ZIP file data
-	u64                     m_ziplength;             // ZIP file length
+	std::vector<u8>         m_zipdata;              // ZIP file data
+	u64                     m_ziplength;            // ZIP file length
 
-	bool                    m_remove_on_close;       // flag: remove the file when closing
-	bool                    m_restrict_to_mediapath; // flag: restrict to paths inside the media-path
+	bool                    m_remove_on_close;      // flag: remove the file when closing
+	int                     m_restrict_to_mediapath; // flag: restrict to paths inside the media-path
 };
+
+
+extern template path_iterator::path_iterator(char *&, int);
+extern template path_iterator::path_iterator(char * const &, int);
+extern template path_iterator::path_iterator(char const *&, int);
+extern template path_iterator::path_iterator(char const * const &, int);
+extern template path_iterator::path_iterator(std::vector<std::string> &, int);
+extern template path_iterator::path_iterator(const std::vector<std::string> &, int);
+
+extern template emu_file::emu_file(std::string &, u32);
+extern template emu_file::emu_file(const std::string &, u32);
+extern template emu_file::emu_file(char *&, u32);
+extern template emu_file::emu_file(char * const &, u32);
+extern template emu_file::emu_file(char const *&, u32);
+extern template emu_file::emu_file(char const * const &, u32);
+extern template emu_file::emu_file(std::vector<std::string> &, u32);
+extern template emu_file::emu_file(const std::vector<std::string> &, u32);
 
 #endif // MAME_EMU_FILEIO_H

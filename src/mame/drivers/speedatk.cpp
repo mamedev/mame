@@ -298,7 +298,7 @@ static GFXDECODE_START( gfx_speedatk )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout_3bpp,   0, 32 )
 GFXDECODE_END
 
-WRITE8_MEMBER(speedatk_state::output_w)
+void speedatk_state::output_w(uint8_t data)
 {
 	m_flip_scr = data & 0x80;
 

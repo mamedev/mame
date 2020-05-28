@@ -50,7 +50,7 @@ private:
 	virtual void video_start() override;
 	void hanaawas_palette(palette_device &palette) const;
 	uint32_t screen_update_hanaawas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(hanaawas_portB_w);
+	void hanaawas_portB_w(uint8_t data);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void hanaawas_map(address_map &map);

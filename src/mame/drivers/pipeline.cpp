@@ -105,10 +105,10 @@ protected:
 private:
 	DECLARE_WRITE8_MEMBER(vram2_w);
 	DECLARE_WRITE8_MEMBER(vram1_w);
-	DECLARE_WRITE8_MEMBER(mcu_porta_w);
-	DECLARE_WRITE8_MEMBER(vidctrl_w);
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_WRITE8_MEMBER(protection_w);
+	void mcu_porta_w(uint8_t data);
+	void vidctrl_w(uint8_t data);
+	uint8_t protection_r();
+	void protection_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
@@ -148,21 +148,21 @@ void pipeline_state::machine_start()
 TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info)
 {
 	int code = m_vram2[tile_index] + m_vram2[tile_index + 0x800] * 256;
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info2)
 {
 	int code = m_vram1[tile_index] + ((m_vram1[tile_index + 0x800] >> 4)) * 256;
 	int color = ((m_vram1[tile_index + 0x800]) & 0xf);
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 void pipeline_state::video_start()
 {
 	m_palram=std::make_unique<u8[]>(0x1000);
-	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
-	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
+	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pipeline_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pipeline_state::get_tile_info2)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 	m_tilemap2->set_transparent_pen(0);
 
 	save_item(NAME(m_vidctrl));
@@ -177,7 +177,7 @@ u32 pipeline_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 
-WRITE8_MEMBER(pipeline_state::vidctrl_w)
+void pipeline_state::vidctrl_w(uint8_t data)
 {
 	m_vidctrl = data;
 }
@@ -206,17 +206,17 @@ WRITE8_MEMBER(pipeline_state::vram1_w)
 	m_vram1[offset] = data;
 }
 
-READ8_MEMBER(pipeline_state::protection_r)
+uint8_t pipeline_state::protection_r()
 {
 	return m_from_mcu;
 }
 
 TIMER_CALLBACK_MEMBER(pipeline_state::protection_deferred_w)
 {
-	m_mcu->pa_w(m_mcu->space(AS_PROGRAM), 0, param);
+	m_mcu->pa_w(param);
 }
 
-WRITE8_MEMBER(pipeline_state::protection_w)
+void pipeline_state::protection_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipeline_state::protection_deferred_w),this), data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
@@ -248,7 +248,7 @@ void pipeline_state::sound_port(address_map &map)
 	map(0x06, 0x07).noprw();
 }
 
-WRITE8_MEMBER(pipeline_state::mcu_porta_w)
+void pipeline_state::mcu_porta_w(uint8_t data)
 {
 	m_from_mcu = data;
 }

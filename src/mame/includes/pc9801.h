@@ -44,8 +44,8 @@
 #include "machine/pc9801_kbd.h"
 #include "machine/pc9801_cd.h"
 
-#include "machine/idectrl.h"
-#include "machine/idehd.h"
+#include "bus/ata/atadev.h"
+#include "bus/ata/ataintf.h"
 
 #include "debugger.h"
 #include "emupal.h"
@@ -204,8 +204,8 @@ private:
 	DECLARE_READ16_MEMBER(ide_cs1_r);
 	DECLARE_WRITE16_MEMBER(ide_cs1_w);
 
-	DECLARE_WRITE8_MEMBER(sasi_data_w);
-	DECLARE_READ8_MEMBER(sasi_data_r);
+	void sasi_data_w(uint8_t data);
+	uint8_t sasi_data_r();
 	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
 	DECLARE_WRITE_LINE_MEMBER(write_sasi_req);
 	DECLARE_READ8_MEMBER(sasi_status_r);
@@ -288,25 +288,25 @@ private:
 
 	void pc9801_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(vrtc_irq);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
-	DECLARE_READ8_MEMBER(dma_read_byte);
-	DECLARE_WRITE8_MEMBER(dma_write_byte);
+	uint8_t dma_read_byte(offs_t offset);
+	void dma_write_byte(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(dack3_w);
-	DECLARE_WRITE8_MEMBER(ppi_sys_portc_w);
+	void ppi_sys_portc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
 	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_drq);
 
-	DECLARE_READ8_MEMBER(ppi_mouse_porta_r);
-	DECLARE_WRITE8_MEMBER(ppi_mouse_porta_w);
-	DECLARE_WRITE8_MEMBER(ppi_mouse_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi_mouse_portc_w);
+	uint8_t ppi_mouse_porta_r();
+	void ppi_mouse_porta_w(uint8_t data);
+	void ppi_mouse_portb_w(uint8_t data);
+	void ppi_mouse_portc_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
 	DECLARE_READ8_MEMBER(unk_r);
 

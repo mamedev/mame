@@ -240,7 +240,7 @@ void toaplan1_state::machine_reset()
 MACHINE_RESET_MEMBER(toaplan1_state,zerowing)
 {
 	machine_reset();
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(toaplan1_state::reset_callback),this));
+	m_maincpu->set_reset_callback(*this, FUNC(toaplan1_state::reset_callback));
 }
 
 void toaplan1_demonwld_state::machine_reset()

@@ -1,46 +1,61 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/***************************************************************************
-
-    net_lib.h
-
-    Discrete netlist implementation.
-
-****************************************************************************/
 
 #ifndef NET_LIB_H
 #define NET_LIB_H
 
+///
+/// \file net_lib.h
+///
+/// Discrete netlist implementation.
+///
+
 #include "netlist/nl_setup.h"
 
-//#define NL_AUTO_DEVICES 1
+#ifdef RES_R
+#warning "Do not include rescap.h in a netlist environment"
+#endif
+#ifndef RES_R
+#define RES_R(res) (res)
+#define RES_K(res) ((res) * 1e3)
+#define RES_M(res) ((res) * 1e6)
+#define CAP_U(cap) ((cap) * 1e-6)
+//#define CAP_U(cap) ((cap) * 1μ)
+#define CAP_N(cap) ((cap) * 1e-9)
+#define CAP_P(cap) ((cap) * 1e-12)
+#define IND_U(ind) ((ind) * 1e-6)
+#define IND_N(ind) ((ind) * 1e-9)
+#define IND_P(ind) ((ind) * 1e-12)
+#endif
 
-#define SOLVER(name, freq)                                                  \
-		NET_REGISTER_DEV(SOLVER, name)                                      \
-		PARAM(name.FREQ, freq)
-
-#ifdef NL_AUTO_DEVICES
+#if NL_AUTO_DEVICES
 #include "nld_devinc.h"
 
-#include "macro/nlm_cd4xxx.h"
-#include "macro/nlm_ttl74xx.h"
-#include "macro/nlm_opamp.h"
-#include "macro/nlm_other.h"
+#include "netlist/macro/nlm_cd4xxx.h"
+#include "netlist/macro/nlm_opamp.h"
+#include "netlist/macro/nlm_other.h"
+#include "netlist/macro/nlm_ttl74xx.h"
+#include "netlist/macro/nlm_roms.h"
 
 #include "nld_7448.h"
 
 #else
 
+#define SOLVER(name, freq)                                                  \
+		NET_REGISTER_DEVEXT(SOLVER, name, freq)
+
 #include "nld_system.h"
 
 #include "nld_2102A.h"
-#include "nld_2716.h"
+#include "nld_4006.h"
+#include "nld_4013.h"
 #include "nld_4020.h"
 #include "nld_4066.h"
+#include "nld_4316.h"
 #include "nld_74107.h"
 #include "nld_74123.h"
+#include "nld_74125.h"
 #include "nld_74153.h"
-#include "nld_74161.h"
 #include "nld_74164.h"
 #include "nld_74165.h"
 #include "nld_74166.h"
@@ -50,6 +65,8 @@
 #include "nld_74193.h"
 #include "nld_74194.h"
 #include "nld_74365.h"
+#include "nld_74377.h"
+#include "nld_74393.h"
 #include "nld_7448.h"
 #include "nld_7450.h"
 #include "nld_7473.h"
@@ -62,10 +79,7 @@
 #include "nld_7497.h"
 #include "nld_74ls629.h"
 #include "nld_82S115.h"
-#include "nld_82S123.h"
-#include "nld_82S126.h"
 #include "nld_82S16.h"
-#include "nld_9310.h"
 #include "nld_9316.h"
 #include "nld_9322.h"
 #include "nld_tms4800.h"
@@ -79,6 +93,8 @@
 
 #include "nld_r2r_dac.h"
 
+#include "nld_roms.h"
+
 #include "nld_schmitt.h"
 
 #include "nld_tristate.h"
@@ -89,6 +105,7 @@
 #include "netlist/macro/nlm_opamp.h"
 #include "netlist/macro/nlm_other.h"
 #include "netlist/macro/nlm_ttl74xx.h"
+#include "netlist/macro/nlm_roms.h"
 
 #include "netlist/analog/nld_bjt.h"
 #include "netlist/analog/nld_fourterm.h"

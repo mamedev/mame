@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="evio" description="Tomy evio Media cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
+
+	***********************************************************************************
+
+	evio Media cart listing
+
+	* = dumped
+
+	 eM1    - evio Selection 01
+	*eM2    - evio Selection 02 (translucent red)
+	*eM3    - Anime Mix 1 (yellow)
+	*eM4    - I Love Classic 1 (brown)
+	 eM5    - Healing Air 1
+	 eM6    - Drama Mix 1
+	*eM7    - Pure Kiss 1 (pink)
+	*eM8    - Hard Soul 1 (black)
+	*eM9    - evio Selection 03 (translucent red)
+	 eM10   - Anime Special - Pocket Monsters
+	 eM11   - Anime Mix 2
+	 eM12   - I Love Classic 2
+	 eM13   - Concerto Selection
+	 eM14   - Disney Special 1
+	 eM15   - evio Selection 04
+	*eM16   - Chisako Takashima Selection (cream/gold)
+	 eM17   - Minna no evio
+	*eM18   - Evio Challenge! (red/pink)
+
+	(more?)
+
+	-->
+
+	<software name="em2" supported="no">
+		<description>evio Selection 02</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="エヴィオセレクション02"/>
+		<info name="serial" value="eM2"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em02.bin" size="0x080000" crc="f4c25b10" sha1="97627f6753bf21f30ec497656dbae3eaf4ca8386"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="em3" supported="no">
+		<description>Anime Mix 1</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="アニメミックス1"/>
+		<info name="serial" value="eM3"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em03.bin" size="0x080000" crc="2aa0107f" sha1="1f2302b0121819b8ea02409e23a7c21402e2632e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="em4" supported="no">
+		<description>I Love Classic 1</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="アイラブクラッシク1"/>
+		<info name="serial" value="eM4"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em04.bin" size="0x080000" crc="22ad3e5b" sha1="e25269b1957e10cff6bb7590b912db9e62864c2d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="em7" supported="no">
+		<description>Pure Kiss 1</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ピュアキッス1"/>
+		<info name="serial" value="eM7"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em07.bin" size="0x080000" crc="b507b926" sha1="af2872b738e57a42e22904c3f6df15b2bf5ead87"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="em8" supported="no">
+		<description>Hard Soul 1</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ハードソウル1"/>
+		<info name="serial" value="eM8"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em08.bin" size="0x080000" crc="f41469c0" sha1="381e43b2a2fd716f3d91d47c7e899f02b2f52b91"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="em9" supported="no">
+		<description>evio Selection 03</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="エヴィオセレクション03"/>
+		<info name="serial" value="eM9"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em09.bin" size="0x080000" crc="17818b14" sha1="84058d60567972a336b36d8c406b1649956c8a2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="em16" supported="no">
+		<description>Chisako Takashima Selection</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="高嶋ちさ子セレクション"/>
+		<info name="serial" value="eM16"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em16.bin" size="0x080000" crc="39c86418" sha1="8442cb3923e1f09b369ece58ca52bbb2f0a7ab19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- has eeprom -->
+	<software name="em18" supported="no">
+		<description>evio Challenge!</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="エヴィオチャレンジ!"/>
+		<info name="serial" value="eM18"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em18.bin" size="0x100000" crc="725a5720" sha1="062316f860cb6ca3c29d9c1e63ea4973b1eebcd8"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

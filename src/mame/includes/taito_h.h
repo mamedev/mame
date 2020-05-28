@@ -56,7 +56,7 @@ private:
 	optional_ioport m_io_p2x;
 	optional_ioport m_io_p2y;
 
-	DECLARE_WRITE8_MEMBER(coin_control_w);
+	void coin_control_w(u8 data);
 	DECLARE_READ8_MEMBER(syvalion_input_bypass_r);
 	void sound_bankswitch_w(u8 data);
 	u32 screen_update_syvalion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

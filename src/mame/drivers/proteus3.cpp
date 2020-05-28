@@ -81,7 +81,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
-	DECLARE_WRITE8_MEMBER(video_w);
+	void video_w(uint8_t data);
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(acia1_clock_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
@@ -173,7 +173,7 @@ void proteus3_state::kbd_put(u8 data)
 {
 	if (data == 0x08)
 		data = 0x0f; // take care of backspace (bios 1 and 2)
-	m_pia->write_portb(data);
+	m_pia->portb_w(data);
 	m_pia->cb1_w(1);
 	m_pia->cb1_w(0);
 }
@@ -248,7 +248,7 @@ WRITE_LINE_MEMBER( proteus3_state::acia1_clock_w )
 /******************************************************************************
  Video
 ******************************************************************************/
-WRITE8_MEMBER( proteus3_state::video_w )
+void proteus3_state::video_w(uint8_t data)
 {
 	m_video_data = data;
 }

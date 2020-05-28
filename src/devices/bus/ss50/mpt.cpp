@@ -21,8 +21,8 @@ public:
 		: device_t(mconfig, SS50_MPT, tag, owner, clock)
 		, ss50_card_interface(mconfig, *this)
 		, m_pia(*this, "pia")
-		, m_irqa_jumper(*this, "irqa")
-		, m_irqb_jumper(*this, "irqb")
+		, m_irqa_jumper(*this, "IRQA")
+		, m_irqb_jumper(*this, "IRQB")
 	{
 	}
 
@@ -35,8 +35,8 @@ protected:
 	virtual void register_write(offs_t offset, u8 data) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(pia_b_w);
-	DECLARE_READ8_MEMBER(pia_cb1_r);
+	void pia_b_w(uint8_t data);
+	uint8_t pia_cb1_r();
 	DECLARE_WRITE_LINE_MEMBER(pia_irq_b);
 	TIMER_CALLBACK_MEMBER(mpt_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
@@ -53,12 +53,12 @@ private:
 
 
 static INPUT_PORTS_START( mpt )
-	PORT_START("irqa")
+	PORT_START("IRQA")
 	PORT_DIPNAME(1, 0, "IRQ-A")
 	PORT_DIPSETTING(0, DEF_STR(Off))
 	PORT_DIPSETTING(1, DEF_STR(On))
 
-	PORT_START("irqb")
+	PORT_START("IRQB")
 	PORT_DIPNAME(1, 1, "IRQ-B")
 	PORT_DIPSETTING(0, DEF_STR(Off))
 	PORT_DIPSETTING(1, DEF_STR(On))
@@ -92,6 +92,8 @@ void ss50_mpt_device::device_start()
 {
 	m_mpt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ss50_mpt_device::mpt_timer_callback),this));
 	m_mpt_timer_state = 0;
+
+	save_item(NAME(m_mpt_timer_state));
 }
 
 //-------------------------------------------------
@@ -113,7 +115,7 @@ void ss50_mpt_device::register_write(offs_t offset, u8 data)
 }
 
 
-WRITE8_MEMBER(ss50_mpt_device::pia_b_w)
+void ss50_mpt_device::pia_b_w(uint8_t data)
 {
 	if (data & 0x80)
 	{
@@ -169,7 +171,7 @@ WRITE8_MEMBER(ss50_mpt_device::pia_b_w)
 	m_mpt_timer->enable(true);
 }
 
-READ8_MEMBER(ss50_mpt_device::pia_cb1_r)
+uint8_t ss50_mpt_device::pia_cb1_r()
 {
 	return m_mpt_timer_state;
 }

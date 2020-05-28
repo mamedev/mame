@@ -29,7 +29,7 @@
 
 #include "emu.h"
 #include "includes/suna8.h"
-#include "drawgfxm.h"
+#include "drawgfxt.ipp"
 
 /***************************************************************************
     For Debug: there's no tilemap, just sprites.
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(suna8_state::get_tile_info)
 		code = m_spriteram[ 2 * tile_index + 0 ];
 		attr = m_spriteram[ 2 * tile_index + 1 ];
 	}
-	SET_TILE_INFO_MEMBER(m_page / 8,
+	tileinfo.set(m_page / 8,
 			( (attr & 0x03) << 8 ) + code + m_tiles*0x400,
 			(attr >> 2) & 0xf,
 			TILE_FLIPYX( (attr >> 6) & 3 ));
@@ -155,10 +155,8 @@ void suna8_state::suna8_vh_start_common(bool has_text, GFXBANK_TYPE_T gfxbank_ty
 	}
 
 #if TILEMAPS
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(suna8_state::get_tile_info),this), TILEMAP_SCAN_COLS,
-
-								8, 8, 0x20*(m_has_text ? 4 : 16), 0x20);
-
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suna8_state::get_tile_info)), TILEMAP_SCAN_COLS,
+			8, 8, 0x20*(m_has_text ? 4 : 16), 0x20);
 	m_bg_tilemap->set_transparent_pen(15);
 #endif
 }
@@ -187,19 +185,6 @@ do                                                                              
 	}                                                                               \
 }                                                                                   \
 while (0)
-
-class mygfx_element : public gfx_element
-{
-public:
-	void prio_mask_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
-			uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
-			bitmap_ind8 &priority, uint32_t trans_pen)
-	{
-		color = colorbase() + granularity() * (color % colors());
-		code %= elements();
-		DRAWGFX_CORE(uint16_t, PIXEL_OP_REBASE_TRANSPEN_PRIORITY_MASK, uint8_t);
-	}
-};
 
 /***************************************************************************
 
@@ -434,8 +419,13 @@ void suna8_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 				int color = (((attr >> 2) & 0xf) ^ colorbank) + 0x10 * m_palettebank;    // player2 in hardhea2 and sparkman
 
 				if (read_mask)
-					((mygfx_element*)(m_gfxdecode->gfx(which)))->prio_mask_transpen(bitmap, cliprect,
-								code, color, tile_flipx, tile_flipy, sx, sy, screen.priority(), 0xf);
+				{
+					gfx_element *mygfx = m_gfxdecode->gfx(which);
+					color = mygfx->colorbase() + mygfx->granularity() * (color % mygfx->colors());
+					mygfx->drawgfx_core(bitmap, cliprect, code % mygfx->elements(),
+								tile_flipx, tile_flipy, sx, sy, screen.priority(),
+								[color, trans_pen = 0xf](uint16_t &destp, uint8_t &pri, const uint8_t &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY_MASK(destp, pri, srcp); });
+				}
 				else
 					m_gfxdecode->gfx(which)->transpen(bitmap, cliprect,
 								code, color, tile_flipx, tile_flipy, sx, sy, 0xf);

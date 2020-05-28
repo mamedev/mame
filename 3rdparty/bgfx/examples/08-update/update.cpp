@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -26,17 +26,17 @@ struct PosTexcoordVertex
 
 	static void init()
 	{
-		ms_decl
+		ms_layout
 			.begin()
 			.add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float)
 			.add(bgfx::Attrib::TexCoord0, 3, bgfx::AttribType::Float)
 			.end();
 	};
 
-	static bgfx::VertexDecl ms_decl;
+	static bgfx::VertexLayout ms_layout;
 };
 
-bgfx::VertexDecl PosTexcoordVertex::ms_decl;
+bgfx::VertexLayout PosTexcoordVertex::ms_layout;
 
 static PosTexcoordVertex s_cubeVertices[] =
 {
@@ -99,6 +99,16 @@ static const uint16_t s_cubeIndices[] =
 };
 BX_STATIC_ASSERT(BX_COUNTOF(s_cubeIndices) == 36);
 
+bx::Vec3 s_faceColors[] =
+{
+	{ 0.75f, 0.0f,  0.0f  },
+	{ 0.75f, 0.75f, 0.0f  },
+	{ 0.75f, 0.0f,  0.75f },
+	{ 0.0f,  0.75f, 0.0f  },
+	{ 0.0f,  0.75f, 0.75f },
+	{ 0.0f,  0.0f,  0.75f },
+};
+
 static void updateTextureCubeRectBgra8(
 	  bgfx::TextureHandle _handle
 	, uint8_t _side
@@ -135,8 +145,8 @@ static const uint32_t kTexture2dSize = 256;
 class ExampleUpdate : public entry::AppI
 {
 public:
-	ExampleUpdate(const char* _name, const char* _description)
-		: entry::AppI(_name, _description)
+	ExampleUpdate(const char* _name, const char* _description, const char* _url)
+		: entry::AppI(_name, _description, _url)
 		, m_cube(kTextureSide)
 	{
 	}
@@ -229,7 +239,7 @@ public:
 		}
 
 		// Create static vertex buffer.
-		m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(s_cubeVertices, sizeof(s_cubeVertices) ), PosTexcoordVertex::ms_decl);
+		m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(s_cubeVertices, sizeof(s_cubeVertices) ), PosTexcoordVertex::ms_layout);
 
 		// Create static index buffer.
 		m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(s_cubeIndices, sizeof(s_cubeIndices) ) );
@@ -250,8 +260,8 @@ public:
 		}
 
 		// Create texture sampler uniforms.
-		s_texCube  = bgfx::createUniform("s_texCube",  bgfx::UniformType::Int1);
-		s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
+		s_texCube  = bgfx::createUniform("s_texCube",  bgfx::UniformType::Sampler);
+		s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
 
 		// Create time uniform.
 		u_time = bgfx::createUniform("u_time", bgfx::UniformType::Vec4);
@@ -289,6 +299,17 @@ public:
 				, bgfx::TextureFormat::RGBA8
 				, BGFX_TEXTURE_COMPUTE_WRITE
 				);
+		}
+
+		{
+			m_textureCube[3] = bgfx::createTextureCube(kTextureSide, false, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+
+			for (uint32_t ii = 0; ii < BX_COUNTOF(m_textureCubeFaceFb); ++ii)
+			{
+				bgfx::Attachment at;
+				at.init(m_textureCube[3], bgfx::Access::Write, uint16_t(ii));
+				m_textureCubeFaceFb[ii] = bgfx::createFrameBuffer(1, &at);
+			}
 		}
 
 		m_texture2d = bgfx::createTexture2D(
@@ -344,6 +365,14 @@ public:
 			if (bgfx::isValid(m_textureCube[ii]))
 			{
 				bgfx::destroy(m_textureCube[ii]);
+			}
+		}
+
+		for (uint32_t ii = 0; ii<BX_COUNTOF(m_textureCubeFaceFb); ++ii)
+		{
+			if (bgfx::isValid(m_textureCubeFaceFb[ii]))
+			{
+				bgfx::destroy(m_textureCubeFaceFb[ii]);
 			}
 		}
 
@@ -503,12 +532,29 @@ public:
 				bgfx::dispatch(0, m_programCompute, kTextureSide/16, kTextureSide/16);
 			}
 
+			for (uint32_t ii = 0; ii < BX_COUNTOF(m_textureCubeFaceFb); ++ii)
+			{
+				bgfx::ViewId viewId = bgfx::ViewId(ii+2);
+				bgfx::setViewFrameBuffer(viewId, m_textureCubeFaceFb[ii]);
+
+				bx::Vec3 color = bx::add(s_faceColors[ii], bx::sin(time*4.0f)*0.25f);
+				uint32_t colorRGB8 =
+						  uint32_t(bx::toUnorm(color.x, 255.0f) ) << 24
+						| uint32_t(bx::toUnorm(color.y, 255.0f) ) << 16
+						| uint32_t(bx::toUnorm(color.z, 255.0f) ) << 8;
+
+				bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR, colorRGB8);
+				bgfx::setViewRect(viewId, 0,0,512,512);
+
+				bgfx::touch(viewId);
+			}
+
 			for (uint32_t ii = 0; ii < BX_COUNTOF(m_textureCube); ++ii)
 			{
 				if (bgfx::isValid(m_textureCube[ii]))
 				{
 					float mtx[16];
-					bx::mtxSRT(mtx, 0.7f, 0.7f, 0.7f, time, time*0.37f, 0.0f, -2.0f +ii*2.0f, 0.0f, 0.0f);
+					bx::mtxSRT(mtx, 0.65f, 0.65f, 0.65f, time, time*0.37f, 0.0f, -2.5f +ii*1.8f, 0.0f, 0.0f);
 
 					// Set model matrix for rendering.
 					bgfx::setTransform(mtx);
@@ -601,7 +647,7 @@ public:
 				bgfx::submit(1, m_program3d);
 			}
 
-			for (uint32_t ii = 0; ii < 4; ++ii)
+			for (uint32_t ii = 0; ii < 5; ++ii)
 			{
 				bx::mtxTranslate(mtx, sizeX - margin - 1.0f, -sizeY + margin + 1.0f + ii*2.1f, 0.0f);
 
@@ -661,7 +707,8 @@ public:
 	bgfx::TextureHandle m_textures[12];
 	bgfx::TextureHandle m_textures3d[3];
 	bgfx::TextureHandle m_texture2d;
-	bgfx::TextureHandle m_textureCube[3];
+	bgfx::TextureHandle m_textureCube[4];
+	bgfx::FrameBufferHandle m_textureCubeFaceFb[6];
 	bgfx::IndexBufferHandle m_ibh;
 	bgfx::VertexBufferHandle m_vbh;
 	bgfx::ProgramHandle m_program3d;
@@ -676,4 +723,9 @@ public:
 
 } // namespace
 
-ENTRY_IMPLEMENT_MAIN(ExampleUpdate, "08-update", "Updating textures.");
+ENTRY_IMPLEMENT_MAIN(
+	  ExampleUpdate
+	, "08-update"
+	, "Updating textures."
+	, "https://bkaradzic.github.io/bgfx/examples.html#update"
+	);

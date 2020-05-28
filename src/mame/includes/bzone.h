@@ -31,7 +31,7 @@ public:
 		m_startled(*this, "startled")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	DECLARE_READ_LINE_MEMBER(clock_r);
 	void init_bradley();
 	void bzone(machine_config &config);
 

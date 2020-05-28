@@ -63,8 +63,8 @@ struct zeus2_poly_extra_data
 *  Macros
 *************************************/
 
-#define WAVERAM_BLOCK0(blocknum)                ((void *)((uint8_t *)waveram + 8 * (blocknum)))
-#define WAVERAM_BLOCK0_EXT(blocknum)                ((void *)((uint8_t *)m_state->waveram + 8 * (blocknum)))
+#define WAVERAM_BLOCK0(blocknum)                ((void *)((uint8_t *)m_waveram.get() + 8 * (blocknum)))
+#define WAVERAM_BLOCK0_EXT(blocknum)            ((void *)((uint8_t *)m_state->m_waveram.get() + 8 * (blocknum)))
 
 #define WAVERAM_PTR8(base, bytenum)             ((uint8_t *)(base) + BYTE4_XOR_LE(bytenum))
 #define WAVERAM_READ8(base, bytenum)            (*WAVERAM_PTR8(base, bytenum))
@@ -107,8 +107,8 @@ public:
 	zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ32_MEMBER( zeus2_r );
-	DECLARE_WRITE32_MEMBER( zeus2_w );
+	uint32_t zeus2_r(offs_t offset);
+	void zeus2_w(offs_t offset, uint32_t data);
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(display_irq);
 
@@ -124,7 +124,7 @@ public:
 	uint32_t m_zeusbase[0x80];
 	uint32_t m_renderRegs[0x50];
 
-	zeus2_renderer* poly;
+	std::unique_ptr<zeus2_renderer> poly;
 
 	rectangle zeus_cliprect;
 
@@ -136,7 +136,7 @@ public:
 	int zeus_quad_size;
 	bool m_useZOffset;
 
-	uint32_t *waveram;
+	std::unique_ptr<uint32_t[]> m_waveram;
 	std::unique_ptr<uint32_t[]> m_frameColor;
 	std::unique_ptr<int32_t[]> m_frameDepth;
 	uint32_t m_pal_table[0x100];

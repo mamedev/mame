@@ -42,7 +42,7 @@ ROM_END
 qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, QSOUND_HLE, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 24)
+	, device_rom_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_dsp_rom(*this, "dsp")
 	, m_data_latch(0)
@@ -70,29 +70,25 @@ void qsound_hle_device::device_start()
 
 	// state save
 	// PCM registers
-	for (int j = 0; j < 16; j++) // PCM voices
-	{
-		save_item(NAME(m_voice[j].m_bank), j);
-		save_item(NAME(m_voice[j].m_addr), j);
-		save_item(NAME(m_voice[j].m_phase), j);
-		save_item(NAME(m_voice[j].m_rate), j);
-		save_item(NAME(m_voice[j].m_loop_len), j);
-		save_item(NAME(m_voice[j].m_end_addr), j);
-		save_item(NAME(m_voice[j].m_volume), j);
-		save_item(NAME(m_voice[j].m_echo), j);
-	}
+	// PCM voices
+	save_item(STRUCT_MEMBER(m_voice, m_bank));
+	save_item(STRUCT_MEMBER(m_voice, m_addr));
+	save_item(STRUCT_MEMBER(m_voice, m_phase));
+	save_item(STRUCT_MEMBER(m_voice, m_rate));
+	save_item(STRUCT_MEMBER(m_voice, m_loop_len));
+	save_item(STRUCT_MEMBER(m_voice, m_end_addr));
+	save_item(STRUCT_MEMBER(m_voice, m_volume));
+	save_item(STRUCT_MEMBER(m_voice, m_echo));
 
-	for (int j = 0; j < 3; j++) // ADPCM voices
-	{
-		save_item(NAME(m_adpcm[j].m_start_addr), j);
-		save_item(NAME(m_adpcm[j].m_end_addr), j);
-		save_item(NAME(m_adpcm[j].m_bank), j);
-		save_item(NAME(m_adpcm[j].m_volume), j);
-		save_item(NAME(m_adpcm[j].m_flag), j);
-		save_item(NAME(m_adpcm[j].m_cur_vol), j);
-		save_item(NAME(m_adpcm[j].m_step_size), j);
-		save_item(NAME(m_adpcm[j].m_cur_addr), j);
-	}
+	// ADPCM voices
+	save_item(STRUCT_MEMBER(m_adpcm, m_start_addr));
+	save_item(STRUCT_MEMBER(m_adpcm, m_end_addr));
+	save_item(STRUCT_MEMBER(m_adpcm, m_bank));
+	save_item(STRUCT_MEMBER(m_adpcm, m_volume));
+	save_item(STRUCT_MEMBER(m_adpcm, m_flag));
+	save_item(STRUCT_MEMBER(m_adpcm, m_cur_vol));
+	save_item(STRUCT_MEMBER(m_adpcm, m_step_size));
+	save_item(STRUCT_MEMBER(m_adpcm, m_cur_addr));
 
 	// PCM voices
 	save_item(NAME(m_voice_pan));
@@ -105,32 +101,30 @@ void qsound_hle_device::device_start()
 	save_item(NAME(m_echo.m_delay_line));
 	save_item(NAME(m_echo.m_delay_pos));
 
-	for (int j = 0; j < 2; j++)  // left, right
-	{
-		save_item(NAME(m_filter[j].m_tap_count), j);
-		save_item(NAME(m_filter[j].m_delay_pos), j);
-		save_item(NAME(m_filter[j].m_table_pos), j);
-		save_item(NAME(m_filter[j].m_taps), j);
-		save_item(NAME(m_filter[j].m_delay_line), j);
+	// left, right
+	save_item(STRUCT_MEMBER(m_filter, m_tap_count));
+	save_item(STRUCT_MEMBER(m_filter, m_delay_pos));
+	save_item(STRUCT_MEMBER(m_filter, m_table_pos));
+	save_item(STRUCT_MEMBER(m_filter, m_taps));
+	save_item(STRUCT_MEMBER(m_filter, m_delay_line));
 
-		save_item(NAME(m_alt_filter[j].m_tap_count), j);
-		save_item(NAME(m_alt_filter[j].m_delay_pos), j);
-		save_item(NAME(m_alt_filter[j].m_table_pos), j);
-		save_item(NAME(m_alt_filter[j].m_taps), j);
-		save_item(NAME(m_alt_filter[j].m_delay_line), j);
+	save_item(STRUCT_MEMBER(m_alt_filter, m_tap_count));
+	save_item(STRUCT_MEMBER(m_alt_filter, m_delay_pos));
+	save_item(STRUCT_MEMBER(m_alt_filter, m_table_pos));
+	save_item(STRUCT_MEMBER(m_alt_filter, m_taps));
+	save_item(STRUCT_MEMBER(m_alt_filter, m_delay_line));
 
-		save_item(NAME(m_wet[j].m_delay), j);
-		save_item(NAME(m_wet[j].m_volume), j);
-		save_item(NAME(m_wet[j].m_write_pos), j);
-		save_item(NAME(m_wet[j].m_read_pos), j);
-		save_item(NAME(m_wet[j].m_delay_line), j);
+	save_item(STRUCT_MEMBER(m_wet, m_delay));
+	save_item(STRUCT_MEMBER(m_wet, m_volume));
+	save_item(STRUCT_MEMBER(m_wet, m_write_pos));
+	save_item(STRUCT_MEMBER(m_wet, m_read_pos));
+	save_item(STRUCT_MEMBER(m_wet, m_delay_line));
 
-		save_item(NAME(m_dry[j].m_delay), j);
-		save_item(NAME(m_dry[j].m_volume), j);
-		save_item(NAME(m_dry[j].m_write_pos), j);
-		save_item(NAME(m_dry[j].m_read_pos), j);
-		save_item(NAME(m_dry[j].m_delay_line), j);
-	}
+	save_item(STRUCT_MEMBER(m_dry, m_delay));
+	save_item(STRUCT_MEMBER(m_dry, m_volume));
+	save_item(STRUCT_MEMBER(m_dry, m_write_pos));
+	save_item(STRUCT_MEMBER(m_dry, m_read_pos));
+	save_item(STRUCT_MEMBER(m_dry, m_delay_line));
 
 	save_item(NAME(m_state));
 	save_item(NAME(m_next_state));
@@ -182,7 +176,7 @@ void qsound_hle_device::sound_stream_update(sound_stream &stream, stream_sample_
 }
 
 
-WRITE8_MEMBER(qsound_hle_device::qsound_w)
+void qsound_hle_device::qsound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -206,7 +200,7 @@ WRITE8_MEMBER(qsound_hle_device::qsound_w)
 }
 
 
-READ8_MEMBER(qsound_hle_device::qsound_r)
+uint8_t qsound_hle_device::qsound_r()
 {
 	// ready bit (0x00 = busy, 0x80 == ready)
 	m_stream->update();

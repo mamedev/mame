@@ -32,7 +32,7 @@
 
 /* Memory Banking */
 
-READ8_MEMBER( tiki100_state::mrq_r )
+uint8_t tiki100_state::mrq_r(offs_t offset)
 {
 	bool mdis = 1;
 
@@ -66,7 +66,7 @@ READ8_MEMBER( tiki100_state::mrq_r )
 	return data;
 }
 
-WRITE8_MEMBER( tiki100_state::mrq_w )
+void tiki100_state::mrq_w(offs_t offset, uint8_t data)
 {
 	bool mdis = 1;
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
@@ -541,7 +541,7 @@ DECLARE_WRITE_LINE_MEMBER( tiki100_state::write_centronics_perror )
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER( tiki100_state::pio_pb_r )
+uint8_t tiki100_state::pio_pb_r()
 {
 	/*
 
@@ -571,7 +571,7 @@ READ8_MEMBER( tiki100_state::pio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( tiki100_state::pio_pb_w )
+void tiki100_state::pio_pb_w(uint8_t data)
 {
 	/*
 
@@ -637,7 +637,7 @@ static void tiki100_floppies(device_slot_interface &device)
 
 /* AY-3-8912 Interface */
 
-WRITE8_MEMBER( tiki100_state::video_scroll_w )
+void tiki100_state::video_scroll_w(uint8_t data)
 {
 	m_scroll = data;
 }
@@ -720,9 +720,9 @@ void tiki100_state::tiki100(machine_config &config)
 	m_exp->busrq_wr_callback().set(FUNC(tiki100_state::busrq_w));
 	m_exp->mrq_rd_callback().set(FUNC(tiki100_state::mrq_r));
 	m_exp->mrq_wr_callback().set(FUNC(tiki100_state::mrq_w));
-	TIKI100_BUS_SLOT(config, "slot1", tiki100_cards, "8088");
-	TIKI100_BUS_SLOT(config, "slot2", tiki100_cards, "hdc");
-	TIKI100_BUS_SLOT(config, "slot3", tiki100_cards, nullptr);
+	TIKI100_BUS_SLOT(config, "slot1", m_exp, tiki100_cards, "8088");
+	TIKI100_BUS_SLOT(config, "slot2", m_exp, tiki100_cards, "hdc");
+	TIKI100_BUS_SLOT(config, "slot3", m_exp, tiki100_cards, nullptr);
 
 	/* devices */
 	Z80DART(config, m_dart, 8_MHz_XTAL / 4);
@@ -736,8 +736,8 @@ void tiki100_state::tiki100(machine_config &config)
 
 	Z80PIO(config, m_pio, 8_MHz_XTAL / 4);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio->in_pa_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
-	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->in_pa_callback().set("cent_data_in", FUNC(input_buffer_device::read));
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pio->in_pb_callback().set(FUNC(tiki100_state::pio_pb_r));
 	m_pio->out_pb_callback().set(FUNC(tiki100_state::pio_pb_w));
 

@@ -12,10 +12,11 @@
 
 #pragma once
 
+#include "dirom.h"
 
 #define YMZ280B_MAKE_WAVS 0
 
-class ymz280b_device : public device_t, public device_sound_interface, public device_rom_interface
+class ymz280b_device : public device_t, public device_sound_interface, public device_rom_interface<24>
 {
 public:
 	ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

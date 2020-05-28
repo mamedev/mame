@@ -131,7 +131,7 @@ void phc25_state::phc25_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00, 0x00).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x40, 0x40).rw(FUNC(phc25_state::port40_r), FUNC(phc25_state::port40_w));
 	map(0x80, 0x80).portr("KEY0");
 	map(0x81, 0x81).portr("KEY1");
@@ -266,7 +266,7 @@ INPUT_PORTS_END
 
 /* Video */
 
-READ8_MEMBER( phc25_state::video_ram_r )
+uint8_t phc25_state::video_ram_r(offs_t offset)
 {
 	if (BIT(m_port40, 7)) // graphics
 	{

@@ -478,22 +478,22 @@ READ8_MEMBER(grchamp_state::soundlatch_flags_r)
 	return (m_soundlatch_flag?8:0) /*| (m_sound_semaphore2?4:0)*/ | 3;
 }
 
-WRITE8_MEMBER(grchamp_state::portA_0_w)
+void grchamp_state::portA_0_w(uint8_t data)
 {
 	m_discrete->write(GRCHAMP_A_DATA, data);
 }
 
-WRITE8_MEMBER(grchamp_state::portB_0_w)
+void grchamp_state::portB_0_w(uint8_t data)
 {
 	m_discrete->write(GRCHAMP_B_DATA, 255-data);
 }
 
-WRITE8_MEMBER(grchamp_state::portA_2_w)
+void grchamp_state::portA_2_w(uint8_t data)
 {
 	/* A0/A1 modify the output of AY8910 #2 with filter capacitors */
 	/* A7 contributes to the volume control for the discrete logic dac hanging off of AY8910 #0's i/o ports */
 }
-WRITE8_MEMBER(grchamp_state::portB_2_w)
+void grchamp_state::portB_2_w(uint8_t data)
 {
 	/* B0 is the sound nmi enable, active low */
 	m_soundnmi->in_w<0>((~data)&1);
@@ -756,7 +756,7 @@ void grchamp_state::grchamp(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(grchamp_state::irq0_line_hold), attotime::from_hz((double)SOUND_CLOCK/4/16/16/10/16));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_grchamp);

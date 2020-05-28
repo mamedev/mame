@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+    Game cartridges for Bandai Design Master
+
+    Design carts, these plug into the Game carts, they're data ROMs, they do not contain boot vectors
+
+    M.01 - Dragon Ball Z
+    M.02 - From TV Animation Slam Dunk
+    M.03 - Super Street Fighter 2
+    M.04 - Rockman X3 Buster Battle
+    Weekly Shonen Jump Special
+
+    Cart info:
+
+    M-Cartridge (DESIGN):
+
+           FRONT                        BACK
+     __________________          __________________
+    |  ___     _       |        |                  |
+    | |1mb|   | |HC74  |        |                  |
+    | |ROM|    ‾       |        |                  |
+    |  ‾‾‾             |        |                  |
+    |__________________|        |                  |
+    ||||||||||||||||||||        ||||||||||||||||||||
+    1‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾18      19‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾36
+
+    PINOUT:
+
+     1|NC         19|NC
+     2|GND        20|NC
+     3|GND        21|A2
+     4|VCC        22|A3
+     5|CE         23|A4
+     6|NC         24|A5
+     7|OE         25|A6
+     8|D0         26|A7
+     9|D1         27|A8
+    10|D2         28|A9
+    11|D3         29|A10
+    12|D4         30|A11
+    13|D5         31|A12
+    14|D6         32|A13
+    15|D7         33|A14
+    16|A0         34|Pin3 & Pin11 of HC74 -> Clock Signal
+    17|A1         35|VCC
+    18|NC         36|GND
+
+    HC74:
+          ________
+     VCC-|        |-VCC
+      D0-|        |-VCC
+     CLK-|        |-D1
+     VCC-|        |-CLK
+     A15-|        |-VCC
+      NC-|        |-A16
+     GND-|        |-NC
+          ‾‾‾‾‾‾‾‾
+-->
+
+<softwarelist name="bdesignm_design_cart" description="Bandai Design Master 'Design / Media' cartridges">
+
+	<software name="dbzm" supported="no">
+		<description>Dragon Ball Z (design)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="m01_dragonballz.bin" size="0x20000" crc="5a514a14" sha1="e79f215255b230bec5835e229f415d277dd8d762" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slamdunkm" supported="no">
+		<description>From TV Animation Slam Dunk (design)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="m02_slamdunk.bin" size="0x20000" crc="7771b8b3" sha1="e133f61202e31424ce2c4638a65f11e14ace6f6e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sf2m" supported="no">
+		<description>Super Street Fighter 2 (design)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="m03_streetfighterii.bin" size="0x20000" crc="f4a59015" sha1="a607628a4fbae143e34294a4363c286feb21d770" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockmanm" supported="no">
+		<description>Rockman X3 Buster Battle (design)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="m04_rockman.bin" size="0x20000" crc="54c0e613" sha1="2927224268b0ef0a99513d8fda10be23395cabf6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shonen" supported="no">
+		<description>Weekly Shonen Jump Special (design)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="weekly_shonen_jump_special.bin" size="0x20000" crc="eb255397" sha1="c16b4f7194dbf486775ace47a54afee198565a80" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

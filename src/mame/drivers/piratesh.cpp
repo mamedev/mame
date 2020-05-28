@@ -490,7 +490,7 @@ static INPUT_PORTS_START( piratesh )
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("k053250", k053250ps_device, dmairq_r)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // FIXME: NCPU from 053246 (DMA)
-	PORT_BIT( 0x0c00, IP_ACTIVE_HIGH, IPT_CUSTOM )PORT_CUSTOM_MEMBER(DEVICE_SELF, piratesh_state, battery_r, nullptr)
+	PORT_BIT( 0x0c00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(piratesh_state, battery_r)
 
 	PORT_START("HELM")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1)
@@ -507,7 +507,7 @@ static INPUT_PORTS_START( piratesh )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x1800, IP_ACTIVE_HIGH, IPT_CUSTOM )PORT_CUSTOM_MEMBER(DEVICE_SELF, piratesh_state, helm_r, nullptr)
+	PORT_BIT( 0x1800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(piratesh_state, helm_r)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -626,7 +626,7 @@ void piratesh_state::piratesh(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::BGRx_888, 2048).enable_shadows().enable_hilights();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(piratesh_state::piratesh_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(piratesh_state::piratesh_tile_callback));
 	m_k056832->set_config(K056832_BPP_4PIRATESH, 1, 0);
 	m_k056832->set_palette("palette");
 
@@ -635,13 +635,13 @@ void piratesh_state::piratesh(machine_config &config)
 	K053250PS(config, m_k053250, 12000000, "palette", "screen", -16, 0);
 
 	K055673(config, m_k055673, 0);
-	m_k055673->set_sprite_callback(FUNC(piratesh_state::piratesh_sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(piratesh_state::piratesh_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_PS, -60, 24);
 	m_k055673->set_palette("palette");
 
 	// ????
 	//K053246(config, m_k053246, 0);
-	//m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	//m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback));
 	//m_k053246->set_config("k053246", NORMAL_PLANE_ORDER, -48+1, 23);
 	//m_k053246->set_palette(m_palette);
 

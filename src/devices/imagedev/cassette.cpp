@@ -92,26 +92,26 @@ void cassette_image_device::update()
 	{
 		double new_position = m_position + (cur_time - m_position_time)*m_speed*m_direction;
 
-		switch(m_state & CASSETTE_MASK_UISTATE)
+		switch (int(m_state & CASSETTE_MASK_UISTATE)) // cast to int to suppress unhandled enum value warning
 		{
 		case CASSETTE_RECORD:
 			cassette_put_sample(m_cassette, m_channel, m_position, new_position - m_position, m_value);
 			break;
 
 		case CASSETTE_PLAY:
-			if ( m_cassette )
+			if (m_cassette)
 			{
 				cassette_get_sample(m_cassette, m_channel, new_position, 0.0, &m_value);
-				/* See if reached end of tape */
+				// See if reached end of tape
 				double length = get_length();
 				if (new_position > length)
 				{
-					m_state = (cassette_state)(( m_state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
+					m_state = (m_state & ~CASSETTE_MASK_UISTATE) | CASSETTE_STOPPED;
 					new_position = length;
 				}
 				else if (new_position < 0)
 				{
-					m_state = (cassette_state)(( m_state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
+					m_state = (m_state & ~CASSETTE_MASK_UISTATE) | CASSETTE_STOPPED;
 					new_position = 0;
 				}
 			}
@@ -124,12 +124,17 @@ void cassette_image_device::update()
 
 void cassette_image_device::change_state(cassette_state state, cassette_state mask)
 {
-	cassette_state new_state = m_state;
-	new_state = (cassette_state)(new_state & ~mask);
-	new_state = (cassette_state)(new_state | (state & mask));
-	if ((m_state ^ new_state) & (CASSETTE_MASK_UISTATE | CASSETTE_MASK_MOTOR))
-		m_position_time = machine().time().as_double();
-	m_state = new_state;
+	cassette_state new_state;
+
+	new_state = m_state;
+	new_state &= ~mask;
+	new_state |= (state & mask);
+
+	if (new_state != m_state)
+	{
+		update();
+		m_state = new_state;
+	}
 }
 
 
@@ -138,7 +143,7 @@ double cassette_image_device::input()
 {
 	update();
 	int32_t sample = m_value;
-	double double_value = sample / ((double) 0x7FFFFFFF);
+	double double_value = sample / (double(0x7FFFFFFF));
 
 	LOGMASKED(LOG_DETAIL, "cassette_input(): time_index=%g value=%g\n", m_position, double_value);
 
@@ -156,14 +161,18 @@ void cassette_image_device::output(double value)
 		value = std::min(value, 1.0);
 		value = std::max(value, -1.0);
 
-		m_value = (int32_t) (value * 0x7FFFFFFF);
+		m_value = int32_t(value * 0x7FFFFFFF);
 	}
 }
 
 
 double cassette_image_device::get_position()
 {
-	return m_position;
+	double position = m_position;
+
+	if (is_motor_on())
+		position += (machine().time().as_double() - m_position_time)*m_speed*m_direction;
+	return position;
 }
 
 
@@ -199,6 +208,8 @@ void cassette_image_device::go_reverse()
 
 void cassette_image_device::seek(double time, int origin)
 {
+	update();
+
 	double length = get_length();
 
 	switch(origin) {
@@ -292,8 +303,7 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 	}
 
 	/* set to default state, but only change the UI state */
-	//change_state(m_default_state, CASSETTE_MASK_UISTATE);
-	m_state = m_default_state;
+	change_state(m_default_state, CASSETTE_MASK_UISTATE);
 
 	/* reset the position */
 	m_position = 0.0;
@@ -366,7 +376,7 @@ std::string cassette_image_device::call_display()
 		// figure out where we are in the cassette
 		double position = get_position();
 		double length = get_length();
-		cassette_state uistate = cassette_state(get_state() & CASSETTE_MASK_UISTATE);
+		cassette_state uistate = get_state() & CASSETTE_MASK_UISTATE;
 
 		// choose which frame of the animation we are at
 		int n = (int(position) / ANIMATION_FPS) % ARRAY_LENGTH(shapes);
@@ -376,7 +386,7 @@ std::string cassette_image_device::call_display()
 			? u8"\u25BA"
 			: u8"\u25CF";
 
-		// Since you can have anything in a BDF file, we will use crude ascii characters instead
+		// create information string
 		result = string_format("%s %s %02d:%02d (%04d) [%02d:%02d (%04d)]",
 			shapes[n],                  // animation
 			status_icon,                // play or record
@@ -386,6 +396,18 @@ std::string cassette_image_device::call_display()
 			((int)length / 60),
 			((int)length % 60),
 			(int)length);
+
+		// make sure tape stops at end when playing
+		if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+		{
+			if (m_cassette)
+			{
+				if (get_position() > get_length())
+				{
+					m_state = ((m_state & ~CASSETTE_MASK_UISTATE) | CASSETTE_STOPPED);
+				}
+			}
+		}
 	}
 	return result;
 }
@@ -402,7 +424,7 @@ void cassette_image_device::sound_stream_update(sound_stream &stream, stream_sam
 	if (m_stereo)
 		right_buffer = outputs[1];
 
-	cassette_state state = get_state();
+	cassette_state state = get_state() & (CASSETTE_MASK_UISTATE | CASSETTE_MASK_MOTOR | CASSETTE_MASK_SPEAKER);
 
 	if (exists() && (state == (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)))
 	{

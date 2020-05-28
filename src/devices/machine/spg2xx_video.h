@@ -19,6 +19,10 @@ class spg2xx_video_device : public device_t
 public:
 	spg2xx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	auto guny_in() { return m_guny_in.bind(); }
+	auto gunx_in() { return m_gunx_in.bind(); }
+
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
@@ -26,11 +30,13 @@ public:
 	DECLARE_WRITE16_MEMBER(video_w);
 
 	auto sprlimit_read_callback() { return m_sprlimit_read_cb.bind(); };
-	auto rowscrolloffset_read_callback() { return m_rowscrolloffset_read_cb.bind(); };
 
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
 protected:
+
+	devcb_read16 m_guny_in;
+	devcb_read16 m_gunx_in;
 
 	enum
 	{
@@ -83,7 +89,8 @@ protected:
 	void apply_fade(const rectangle &cliprect);
 
 	template<blend_enable_t Blend, rowscroll_enable_t RowScroll, flipx_t FlipX>
-	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint16_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset);
+	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint16_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset, int yscroll);
+	void draw_bitmap(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t* regs);
 	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs);
 	void draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr);
 	void draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority);
@@ -105,7 +112,6 @@ protected:
 	uint16_t m_video_regs[0x100];
 
 	devcb_read16 m_sprlimit_read_cb;
-	devcb_read16 m_rowscrolloffset_read_cb;
 
 	emu_timer *m_screenpos_timer;
 

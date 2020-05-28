@@ -153,7 +153,7 @@ void mx2178_state::mx2178(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(mx2178_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(mx2178_state::crtc_update_row));
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL(18'869'600) / 30));

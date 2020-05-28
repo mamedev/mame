@@ -13,6 +13,7 @@ enum {
 
 DECLARE_DEVICE_TYPE(MC68HC11A1, mc68hc11a1_device)
 DECLARE_DEVICE_TYPE(MC68HC11D0, mc68hc11d0_device)
+DECLARE_DEVICE_TYPE(MC68HC11F1, mc68hc11f1_device)
 DECLARE_DEVICE_TYPE(MC68HC11K1, mc68hc11k1_device)
 DECLARE_DEVICE_TYPE(MC68HC11M0, mc68hc11m0_device)
 
@@ -48,7 +49,7 @@ public:
 	auto out_spi2_data_callback() { return m_spi2_data_output_cb.bind(); }
 
 protected:
-	mc68hc11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int reg_bits, uint16_t internal_ram_size, uint8_t init_value, address_map_constructor reg_map);
+	mc68hc11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t internal_ram_size, uint16_t reg_block_size, uint8_t init_value, address_map_constructor reg_map);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -56,9 +57,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 41; }
-	virtual uint32_t execute_input_lines() const override { return 2; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 41; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -138,13 +141,13 @@ private:
 	int m_ad_channel;
 
 	uint8_t m_irq_state[2];
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
-	address_space *m_program;
-	address_space *m_data;
-	address_space *m_io;
-	devcb_read8 m_port_input_cb[8];
-	devcb_write8 m_port_output_cb[8];
-	devcb_read8 m_analog_cb[8];
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access<11, 0, 0, ENDIANNESS_BIG>::specific m_data;
+	memory_access< 8, 0, 0, ENDIANNESS_BIG>::specific m_io;
+	devcb_read8::array<8> m_port_input_cb;
+	devcb_write8::array<8> m_port_output_cb;
+	devcb_read8::array<8> m_analog_cb;
 	devcb_read8 m_spi2_data_input_cb;
 	devcb_write8 m_spi2_data_output_cb;
 	int m_icount;
@@ -152,8 +155,8 @@ private:
 	int m_ram_position;
 	int m_reg_position;
 
-	const uint16_t m_reg_block_size; // size of internal I/O space
 	const uint16_t m_internal_ram_size;
+	const uint16_t m_reg_block_size; // size of internal I/O space
 	const uint8_t m_init_value; // default value for INIT register
 
 	uint8_t m_wait_state;
@@ -342,6 +345,7 @@ private:
 	void hc11_eorb_ext();
 	void hc11_eorb_indx();
 	void hc11_eorb_indy();
+	void hc11_fdiv();
 	void hc11_idiv();
 	void hc11_inca();
 	void hc11_incb();
@@ -538,6 +542,16 @@ protected:
 	uint8_t pactl_r();
 	void pactl_w(uint8_t data);
 
+	void io_map(address_map &map);
+};
+
+class mc68hc11f1_device : public mc68hc11_cpu_device
+{
+public:
+	// construction/destruction
+	mc68hc11f1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
 	void io_map(address_map &map);
 };
 

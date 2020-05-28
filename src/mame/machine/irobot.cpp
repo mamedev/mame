@@ -62,7 +62,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(irobot_state::irobot_irvg_done_callback)
 	m_irvg_running = 0;
 }
 
-WRITE8_MEMBER(irobot_state::irobot_statwr_w)
+void irobot_state::irobot_statwr_w(uint8_t data)
 {
 	logerror("write %2x ", data);
 	IR_CPU_STATE();
@@ -96,7 +96,7 @@ WRITE8_MEMBER(irobot_state::irobot_statwr_w)
 	m_statwr = data;
 }
 
-WRITE8_MEMBER(irobot_state::irobot_out0_w)
+void irobot_state::irobot_out0_w(uint8_t data)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
@@ -118,7 +118,7 @@ WRITE8_MEMBER(irobot_state::irobot_out0_w)
 	m_alphamap = (data & 0x80);
 }
 
-WRITE8_MEMBER(irobot_state::irobot_rom_banksel_w)
+void irobot_state::irobot_rom_banksel_w(uint8_t data)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
@@ -188,10 +188,9 @@ void irobot_state::machine_reset()
 	m_irvg_running = 0;
 	m_irmb_running = 0;
 
-	address_space &space = machine().dummy_space();
-	irobot_rom_banksel_w(space, 0, 0);
-	irobot_out0_w(space, 0, 0);
-	irobot_statwr_w(space, 0, 0);
+	irobot_rom_banksel_w(0);
+	irobot_out0_w(0);
+	irobot_statwr_w(0);
 	m_outx = 0;
 }
 
@@ -319,7 +318,7 @@ void irobot_state::load_oproms()
 	int i;
 
 	/* allocate RAM */
-	m_mbops = auto_alloc_array(machine(), irmb_ops, 1024);
+	m_mbops = std::make_unique<irmb_ops[]>(1024);
 
 	for (i = 0; i < 1024; i++)
 	{

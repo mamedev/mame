@@ -56,19 +56,19 @@ public:
 private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 
-	DECLARE_READ8_MEMBER( ay_port_a_r );
-	DECLARE_READ8_MEMBER( ay_port_b_r );
-	DECLARE_WRITE8_MEMBER( ay_port_a_w );
-	DECLARE_WRITE8_MEMBER( ay_port_b_w );
+	uint8_t ay_port_a_r();
+	uint8_t ay_port_b_r();
+	void ay_port_a_w(uint8_t data);
+	void ay_port_b_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( i8255_porta_r );
-	DECLARE_WRITE8_MEMBER( i8255_porta_w );
-	DECLARE_READ8_MEMBER( i8255_portb_r );
-	DECLARE_WRITE8_MEMBER( i8255_portb_w );
-	DECLARE_READ8_MEMBER( i8255_portc_r );
-	DECLARE_WRITE8_MEMBER( i8255_portc_w );
+	uint8_t i8255_porta_r();
+	void i8255_porta_w(uint8_t data);
+	uint8_t i8255_portb_r();
+	void i8255_portb_w(uint8_t data);
+	uint8_t i8255_portc_r();
+	void i8255_portc_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( mc6847_videoram_r );
+	uint8_t mc6847_videoram_r(offs_t offset);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -101,7 +101,7 @@ private:
 void sv8000_state::sv8000_mem(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x0000, 0x0fff)      // mapped by the cartslot
+	//map(0x0000, 0x0fff)      // mapped by the cartslot
 	map(0x8000, 0x83ff).ram(); // Work RAM??
 	map(0xc000, 0xcbff).ram().share("videoram");
 }
@@ -182,7 +182,7 @@ void sv8000_state::machine_start()
 	m_inv = 0;
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 	save_item(NAME(m_column));
 	save_item(NAME(m_ag));
@@ -219,20 +219,20 @@ DEVICE_IMAGE_LOAD_MEMBER( sv8000_state::cart_load )
 }
 
 
-READ8_MEMBER( sv8000_state::i8255_porta_r )
+uint8_t sv8000_state::i8255_porta_r()
 {
 	//logerror("i8255_porta_r\n");
 	return m_io_joy->read();
 }
 
 
-WRITE8_MEMBER( sv8000_state::i8255_porta_w )
+void sv8000_state::i8255_porta_w(uint8_t data)
 {
 	//logerror("i8255_porta_w: %02X\n", data);
 }
 
 
-READ8_MEMBER( sv8000_state::i8255_portb_r )
+uint8_t sv8000_state::i8255_portb_r()
 {
 	uint8_t data = 0xff;
 
@@ -254,27 +254,27 @@ READ8_MEMBER( sv8000_state::i8255_portb_r )
 }
 
 
-WRITE8_MEMBER( sv8000_state::i8255_portb_w )
+void sv8000_state::i8255_portb_w(uint8_t data)
 {
 	//logerror("i8255_portb_w: %02X\n", data);
 }
 
 
-READ8_MEMBER( sv8000_state::i8255_portc_r )
+uint8_t sv8000_state::i8255_portc_r()
 {
 	//logerror("i8255_portc_r\n");
 	return 0xff;
 }
 
 
-WRITE8_MEMBER( sv8000_state::i8255_portc_w )
+void sv8000_state::i8255_portc_w(uint8_t data)
 {
 	//logerror("i8255_portc_w: %02X\n", data);
 	m_column = data;
 }
 
 
-READ8_MEMBER( sv8000_state::ay_port_a_r )
+uint8_t sv8000_state::ay_port_a_r()
 {
 	uint8_t data = 0xff;
 
@@ -283,7 +283,7 @@ READ8_MEMBER( sv8000_state::ay_port_a_r )
 }
 
 
-READ8_MEMBER( sv8000_state::ay_port_b_r )
+uint8_t sv8000_state::ay_port_b_r()
 {
 	uint8_t data = 0xff;
 
@@ -320,7 +320,7 @@ READ8_MEMBER( sv8000_state::ay_port_b_r )
 // beamgala:
 // 0x5A 01011010 graphics 3KB in 6KB mode?
 //
-WRITE8_MEMBER( sv8000_state::ay_port_a_w )
+void sv8000_state::ay_port_a_w(uint8_t data)
 {
 	//logerror("ay_port_a_w: %02X\n", data);
 
@@ -341,12 +341,12 @@ WRITE8_MEMBER( sv8000_state::ay_port_a_w )
 }
 
 
-WRITE8_MEMBER( sv8000_state::ay_port_b_w )
+void sv8000_state::ay_port_b_w(uint8_t data)
 {
 	//logerror("ay_port_b_w: %02X\n", data);
 }
 
-READ8_MEMBER( sv8000_state::mc6847_videoram_r )
+uint8_t sv8000_state::mc6847_videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 
@@ -410,7 +410,7 @@ void sv8000_state::sv8000(machine_config &config)
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "sv8000_cart"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(sv8000_state::cart_load), this);
+	cartslot.set_device_load(FUNC(sv8000_state::cart_load));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("sv8000");

@@ -52,10 +52,10 @@ private:
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( sc_w );
+	uint8_t dma_r();
+	void sc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( da_w );
-	template <unsigned N> DECLARE_WRITE8_MEMBER( digit_w ) { m_7segs[N] = data; }
+	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( quickload_cb );
 	void elf2_io(address_map &map);

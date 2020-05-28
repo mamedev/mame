@@ -11,7 +11,7 @@ TILE_GET_INFO_MEMBER(aquarium_state::get_txt_tile_info)
 {
 	const u32 tileno = (m_txt_videoram[tile_index] & 0x0fff);
 	const u32 colour = (m_txt_videoram[tile_index] & 0xf000) >> 12;
-	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
+	tileinfo.set(0, tileno, colour, 0);
 
 	tileinfo.category = (m_txt_videoram[tile_index] & 0x8000) >> 15;
 }
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(aquarium_state::get_mid_tile_info)
 	const u32 colour = (m_mid_videoram[tile_index * 2 + 1] & 0x001f);
 	const int flag = TILE_FLIPYX((m_mid_videoram[tile_index * 2 + 1] & 0x300) >> 8);
 
-	SET_TILE_INFO_MEMBER(1, tileno, colour, flag);
+	tileinfo.set(1, tileno, colour, flag);
 
 	tileinfo.category = (m_mid_videoram[tile_index * 2 + 1] & 0x20) >> 5;
 }
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(aquarium_state::get_bak_tile_info)
 	const u32 colour = (m_bak_videoram[tile_index * 2 + 1] & 0x001f);
 	const int flag = TILE_FLIPYX((m_bak_videoram[tile_index * 2 + 1] & 0x300) >> 8);
 
-	SET_TILE_INFO_MEMBER(2, tileno, colour, flag);
+	tileinfo.set(2, tileno, colour, flag);
 
 	tileinfo.category = (m_bak_videoram[tile_index * 2 + 1] & 0x20) >> 5;
 }
@@ -60,9 +60,9 @@ void aquarium_state::bak_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 
 void aquarium_state::video_start()
 {
-	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aquarium_state::get_txt_tile_info),this), TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
-	m_mid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aquarium_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_bak_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aquarium_state::get_bak_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aquarium_state::get_txt_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_mid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aquarium_state::get_mid_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bak_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aquarium_state::get_bak_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_txt_tilemap->set_transparent_pen(0);
 	m_mid_tilemap->set_transparent_pen(0);

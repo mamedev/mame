@@ -69,7 +69,7 @@ private:
 
 	static const double known_xtals[];
 	static double last_correct_value, xtal_error_low, xtal_error_high;
-	static void fail(double base_clock, std::string message);
+	static void fail(double base_clock, const std::string &message);
 	static bool validate(double base_clock);
 	static void check_ordering();
 };

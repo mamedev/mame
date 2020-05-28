@@ -16,8 +16,8 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
@@ -57,7 +57,7 @@ public:
 		m_floppy1(*this, FD1797_TAG":1"),
 		m_cassette(*this, CASSETTE_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
-		m_exp(*this, TIKI100_BUS_TAG),
+		m_exp(*this, "tiki100bus"),
 		m_rom(*this, Z80_TAG),
 		m_prom(*this, "u4"),
 		m_video_ram(*this, "video_ram"),
@@ -74,8 +74,8 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( mrq_r );
-	DECLARE_WRITE8_MEMBER( mrq_w );
+	uint8_t mrq_r(offs_t offset);
+	void mrq_w(offs_t offset, uint8_t data);
 	DECLARE_READ8_MEMBER( iorq_r );
 	DECLARE_WRITE8_MEMBER( iorq_w );
 
@@ -86,10 +86,10 @@ private:
 	DECLARE_WRITE8_MEMBER( system_w );
 	DECLARE_WRITE_LINE_MEMBER( bar0_w );
 	DECLARE_WRITE_LINE_MEMBER( bar2_w );
-	DECLARE_WRITE8_MEMBER( video_scroll_w );
+	void video_scroll_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( pio_pb_r );
-	DECLARE_WRITE8_MEMBER( pio_pb_w );
+	uint8_t pio_pb_r();
+	void pio_pb_w(uint8_t data);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

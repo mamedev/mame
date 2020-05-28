@@ -279,11 +279,11 @@ protected:
 	DECLARE_WRITE16_MEMBER(namcos22_dspram16_bank_w);
 	DECLARE_READ16_MEMBER(namcos22_dspram16_r);
 	DECLARE_WRITE16_MEMBER(namcos22_dspram16_w);
-	DECLARE_READ16_MEMBER(pdp_status_r);
+	u16 pdp_status_r();
 	DECLARE_READ16_MEMBER(pdp_begin_r);
-	DECLARE_READ16_MEMBER(dsp_hold_signal_r);
-	DECLARE_WRITE16_MEMBER(dsp_hold_ack_w);
-	DECLARE_WRITE16_MEMBER(dsp_xf_output_w);
+	u16 dsp_hold_signal_r();
+	void dsp_hold_ack_w(u16 data);
+	void dsp_xf_output_w(u16 data);
 	DECLARE_WRITE16_MEMBER(point_address_w);
 	DECLARE_WRITE16_MEMBER(point_loword_iw);
 	DECLARE_WRITE16_MEMBER(point_hiword_w);
@@ -295,13 +295,13 @@ protected:
 	DECLARE_READ16_MEMBER(dsp_unk8_r);
 	DECLARE_READ16_MEMBER(custom_ic_status_r);
 	DECLARE_READ16_MEMBER(dsp_upload_status_r);
-	DECLARE_WRITE16_MEMBER(slave_serial_io_w);
-	DECLARE_READ16_MEMBER(master_serial_io_r);
+	void slave_serial_io_w(u16 data);
+	u16 master_serial_io_r();
 	DECLARE_WRITE16_MEMBER(dsp_unk_porta_w);
 	DECLARE_WRITE16_MEMBER(dsp_led_w);
 	DECLARE_WRITE16_MEMBER(dsp_unk8_w);
 	DECLARE_WRITE16_MEMBER(master_render_device_w);
-	DECLARE_READ16_MEMBER(dsp_slave_bioz_r);
+	u16 dsp_slave_bioz_r();
 	DECLARE_READ16_MEMBER(dsp_slave_port3_r);
 	DECLARE_READ16_MEMBER(dsp_slave_port4_r);
 	DECLARE_READ16_MEMBER(dsp_slave_port5_r);
@@ -320,8 +320,8 @@ protected:
 	DECLARE_WRITE16_MEMBER(namcos22_portbit_w);
 	DECLARE_READ16_MEMBER(namcos22_dipswitch_r);
 	DECLARE_WRITE16_MEMBER(namcos22_cpuleds_w);
-	DECLARE_READ8_MEMBER(mcu_port4_s22_r);
-	DECLARE_READ8_MEMBER(iomcu_port4_s22_r);
+	u8 mcu_port4_s22_r();
+	u8 iomcu_port4_s22_r();
 	DECLARE_READ16_MEMBER(mcuc74_speedup_r);
 	DECLARE_WRITE16_MEMBER(mcu_speedup_w);
 
@@ -533,7 +533,7 @@ public:
 	void init_alpiner();
 	void init_alpinesa();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(alpine_motor_read);
+	template <int N> DECLARE_READ_LINE_MEMBER(alpine_motor_r);
 
 protected:
 	virtual void machine_start() override;
@@ -563,17 +563,17 @@ private:
 	DECLARE_READ32_MEMBER(alpinesa_prot_r);
 	DECLARE_WRITE32_MEMBER(alpinesa_prot_w);
 	DECLARE_READ16_MEMBER(timecris_gun_r);
-	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
+	void mb87078_gain_changed(offs_t offset, u8 data);
 	DECLARE_WRITE32_MEMBER(namcos22s_chipselect_w);
 
-	DECLARE_WRITE8_MEMBER(mcu_port4_w);
-	DECLARE_READ8_MEMBER(mcu_port4_r);
-	DECLARE_WRITE8_MEMBER(mcu_port5_w);
-	DECLARE_READ8_MEMBER(mcu_port5_r);
-	DECLARE_WRITE8_MEMBER(mcu_port6_w);
-	DECLARE_READ8_MEMBER(mcu_port6_r);
+	void mcu_port4_w(u8 data);
+	u8 mcu_port4_r();
+	void mcu_port5_w(u8 data);
+	u8 mcu_port5_r();
+	void mcu_port6_w(u8 data);
+	u8 mcu_port6_r();
 	template <int Channel> u16 mcu_adc_r();
-	DECLARE_WRITE8_MEMBER(alpine_mcu_port4_w);
+	void alpine_mcu_port4_w(u8 data);
 	DECLARE_READ16_MEMBER(mcu130_speedup_r);
 	DECLARE_READ16_MEMBER(mcu141_speedup_r);
 

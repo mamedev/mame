@@ -19,7 +19,7 @@
 h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	program_config("program", ENDIANNESS_BIG, 16, 16, 0, map_delegate),
-	io_config("io", ENDIANNESS_BIG, 16, 16, -1), program(nullptr), io(nullptr), cache(nullptr), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),
+	io_config("io", ENDIANNESS_BIG, 16, 16, -1), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),
 	TMP1(0), TMP2(0), TMPR(0), inst_state(0), inst_substate(0), icount(0), bcount(0), irq_vector(0), taken_irq_vector(0), irq_level(0), taken_irq_level(0), irq_required(false), irq_nmi(false)
 {
 	supports_advanced = false;
@@ -38,18 +38,25 @@ void h8_device::device_config_complete()
 
 void h8_device::device_start()
 {
-	program = &space(AS_PROGRAM);
-	cache   = program->cache<1, 0, ENDIANNESS_BIG>();
-	io      = &space(AS_IO);
+	space(AS_PROGRAM).cache(cache);
+	space(AS_PROGRAM).specific(program);
+	space(AS_IO).specific(io);
 
-	state_add(STATE_GENPC,     "GENPC",     NPC).noshow();
-	state_add(STATE_GENPCBASE, "CURPC",     PPC).noshow();
+	uint32_t pcmask = mode_advanced ? 0xffffff : 0xffff;
+	state_add<uint32_t>(H8_PC, "PC",
+		[this]() { return NPC; },
+		[this](uint32_t pc) { PC = PPC = NPC = pc; prefetch_noirq_notrace(); }
+	).mask(pcmask);
+	state_add<uint32_t>(STATE_GENPC, "GENPC",
+		[this]() { return NPC; },
+		[this](uint32_t pc) { PC = PPC = NPC = pc; prefetch_noirq_notrace(); }
+	).mask(pcmask).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     PPC).mask(pcmask).noshow();
+	state_add(H8_CCR,          "CCR",       CCR);
 	if(has_exr)
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  CCR).formatstr("%11s").noshow();
 	else
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  CCR).formatstr("%8s").noshow();
-	state_add(H8_PC,           "PC",        NPC);
-	state_add(H8_CCR,          "CCR",       CCR);
 
 	if(has_exr)
 		state_add(H8_EXR,          "EXR",       EXR);
@@ -169,22 +176,22 @@ void h8_device::request_state(int state)
 	requested_state = state;
 }
 
-uint32_t h8_device::execute_min_cycles() const
+uint32_t h8_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
 
-uint32_t h8_device::execute_max_cycles() const
+uint32_t h8_device::execute_max_cycles() const noexcept
 {
 	return 1;
 }
 
-uint32_t h8_device::execute_input_lines() const
+uint32_t h8_device::execute_input_lines() const noexcept
 {
 	return 0;
 }
 
-bool h8_device::execute_input_edge_triggered(int inputnum) const
+bool h8_device::execute_input_edge_triggered(int inputnum) const noexcept
 {
 	return inputnum == INPUT_LINE_NMI;
 }
@@ -331,7 +338,7 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 	case H8_R6:
 	case H8_R7: {
 		int r = entry.index() - H8_R0;
-		str = string_format("%04x %04x", R[r + 8], R[r]);
+		str = string_format("%04X %04X", R[r + 8], R[r]);
 		break;
 	}
 	}
@@ -340,7 +347,7 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 uint16_t h8_device::read16i(uint32_t adr)
 {
 	icount--;
-	return cache->read_word(adr & ~1);
+	return cache.read_word(adr & ~1);
 }
 
 uint16_t h8_device::fetch()
@@ -353,25 +360,25 @@ uint16_t h8_device::fetch()
 uint8_t h8_device::read8(uint32_t adr)
 {
 	icount--;
-	return program->read_byte(adr);
+	return program.read_byte(adr);
 }
 
 void h8_device::write8(uint32_t adr, uint8_t data)
 {
 	icount--;
-	program->write_byte(adr, data);
+	program.write_byte(adr, data);
 }
 
 uint16_t h8_device::read16(uint32_t adr)
 {
 	icount--;
-	return program->read_word(adr & ~1);
+	return program.read_word(adr & ~1);
 }
 
 void h8_device::write16(uint32_t adr, uint16_t data)
 {
 	icount--;
-	program->write_word(adr & ~1, data);
+	program.write_word(adr & ~1, data);
 }
 
 bool h8_device::exr_in_stack() const

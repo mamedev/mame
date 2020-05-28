@@ -116,7 +116,7 @@ static bool s_aggressive_focus;
 //============================================================
 
 
-static void create_window_class(void);
+static void create_window_class();
 
 //============================================================
 //  window_init
@@ -204,7 +204,7 @@ bool windows_osd_interface::window_init()
 
 void windows_osd_interface::update_slider_list()
 {
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 	{
 		// check if any window has dirty sliders
 		if (window->has_renderer() && window->renderer().sliders_dirty())
@@ -224,7 +224,7 @@ void windows_osd_interface::build_slider_list()
 {
 	m_sliders.clear();
 
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 	{
 		if (window->has_renderer())
 		{
@@ -418,7 +418,7 @@ void winwindow_process_events_periodic(running_machine &machine)
 
 static bool is_mame_window(HWND hwnd)
 {
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 		if (std::static_pointer_cast<win_window_info>(window)->platform_window() == hwnd)
 			return true;
 
@@ -577,12 +577,12 @@ void winwindow_dispatch_message(running_machine &machine, MSG *message)
 //  (main thread)
 //============================================================
 
-void winwindow_take_snap(void)
+void winwindow_take_snap()
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// iterate over windows and request a snap
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 	{
 		window->renderer().save();
 	}
@@ -595,12 +595,12 @@ void winwindow_take_snap(void)
 //  (main thread)
 //============================================================
 
-void winwindow_toggle_fsfx(void)
+void winwindow_toggle_fsfx()
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// iterate over windows and request a snap
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 	{
 		window->renderer().toggle_fsfx();
 	}
@@ -613,12 +613,12 @@ void winwindow_toggle_fsfx(void)
 //  (main thread)
 //============================================================
 
-void winwindow_take_video(void)
+void winwindow_take_video()
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// iterate over windows and request a snap
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 	{
 		window->renderer().record();
 	}
@@ -631,12 +631,12 @@ void winwindow_take_video(void)
 //  (main thread)
 //============================================================
 
-void winwindow_toggle_full_screen(void)
+void winwindow_toggle_full_screen()
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// if we are in debug mode, never go full screen
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 		if (window->machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
 			return;
 
@@ -644,7 +644,7 @@ void winwindow_toggle_full_screen(void)
 	video_config.windowed = !video_config.windowed;
 
 	// iterate over windows and toggle their fullscreen state
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 		SendMessage(std::static_pointer_cast<win_window_info>(window)->platform_window(), WM_USER_SET_FULLSCREEN, !video_config.windowed, 0);
 
 	// Set the first window as foreground
@@ -658,10 +658,10 @@ void winwindow_toggle_full_screen(void)
 //  (main or window thread)
 //============================================================
 
-bool winwindow_has_focus(void)
+bool winwindow_has_focus()
 {
 	// see if one of the video windows has focus
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 	{
 		switch (std::static_pointer_cast<win_window_info>(window)->focus())
 		{
@@ -752,7 +752,7 @@ void win_window_info::create(running_machine &machine, int index, std::shared_pt
 	// set main window
 	if (window->m_index > 0)
 	{
-		for (auto w : osd_common_t::s_window_list)
+		for (const auto &w : osd_common_t::s_window_list)
 		{
 			if (w->m_index == 0)
 			{
@@ -769,7 +769,7 @@ void win_window_info::create(running_machine &machine, int index, std::shared_pt
 
 	// see if we are safe for fullscreen
 	window->m_fullscreen_safe = TRUE;
-	for (auto win : osd_common_t::s_window_list)
+	for (const auto &win : osd_common_t::s_window_list)
 		if (win->monitor() == monitor.get())
 			window->m_fullscreen_safe = FALSE;
 
@@ -780,7 +780,7 @@ void win_window_info::create(running_machine &machine, int index, std::shared_pt
 	window->m_target = machine.render().target_alloc();
 
 	// set the specific view
-	windows_options &options = downcast<windows_options &>(machine.options());
+	auto &options = downcast<windows_options &>(machine.options());
 
 	const char *defview = options.view();
 	window->set_starting_view(index, defview, options.view(index));
@@ -930,7 +930,7 @@ void win_window_info::update()
 //  (main thread)
 //============================================================
 
-static void create_window_class(void)
+static void create_window_class()
 {
 	static int classes_created = FALSE;
 
@@ -1180,7 +1180,7 @@ int win_window_info::complete_create()
 LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
 	LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
-	win_window_info *window = (win_window_info *)ptr;
+	auto *window = (win_window_info *)ptr;
 
 	// we may get called before SetWindowLongPtr is called
 	if (window != nullptr)
@@ -1293,7 +1293,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		// get min/max info: set the minimum window size
 		case WM_GETMINMAXINFO:
 		{
-			MINMAXINFO *minmax = (MINMAXINFO *)lparam;
+			auto *minmax = (MINMAXINFO *)lparam;
 			minmax->ptMinTrackSize.x = MIN_WINDOW_DIM;
 			minmax->ptMinTrackSize.y = MIN_WINDOW_DIM;
 			break;
@@ -1812,6 +1812,7 @@ void win_window_info::set_fullscreen(int fullscreen)
 	m_fullscreen = fullscreen;
 
 	// reset UI to main menu
+	// FIXME: this cause crash if called when running_machine.m_ui not yet initialised. e.g. when trying to show error/warning messagebox at startup (during auto-switch from full screen to windowed mode).
 	machine().ui().menu_reset();
 
 	// kill off the drawers

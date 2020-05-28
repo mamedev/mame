@@ -64,6 +64,7 @@ public:
 	// general overridables
 	virtual void init(running_machine &machine) = 0;
 	virtual void update(bool skip_redraw) = 0;
+	virtual void input_update() = 0;
 	virtual void set_verbose(bool print_verbose) = 0;
 
 	// debugger overridables
@@ -76,7 +77,7 @@ public:
 	virtual bool no_sound() = 0;
 
 	// input overridables
-	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) = 0;
+	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) = 0;
 
 	// video overridables
 	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) = 0;

@@ -418,35 +418,35 @@ private:
 	int m_printer_motor;
 	emu_timer *m_power_timer;
 
-	DECLARE_READ8_MEMBER(ldsw);
-	DECLARE_READ8_MEMBER(cgdrr);
-	DECLARE_WRITE8_MEMBER(cgdrw);
-	DECLARE_WRITE8_MEMBER(u3_p0);
-	DECLARE_READ8_MEMBER(u3_p2);
-	DECLARE_READ8_MEMBER(u3_p3);
-	DECLARE_READ8_MEMBER(bv_p0);
-	DECLARE_READ8_MEMBER(bv_p1);
-	DECLARE_READ8_MEMBER(mkiv_pia_ina);
-	DECLARE_WRITE8_MEMBER(mkiv_pia_outa);
-	DECLARE_WRITE8_MEMBER(mlamps);
-	DECLARE_READ8_MEMBER(cashcade_r);
-	DECLARE_WRITE8_MEMBER(mk4_printer_w);
-	DECLARE_READ8_MEMBER(mk4_printer_r);
+	uint8_t ldsw();
+	uint8_t cgdrr();
+	void cgdrw(uint8_t data);
+	void u3_p0(uint8_t data);
+	uint8_t u3_p2();
+	uint8_t u3_p3();
+	uint8_t bv_p0();
+	uint8_t bv_p1();
+	uint8_t mkiv_pia_ina();
+	void mkiv_pia_outa(uint8_t data);
+	void mlamps(uint8_t data);
+	uint8_t cashcade_r();
+	void mk4_printer_w(uint8_t data);
+	uint8_t mk4_printer_r();
 	DECLARE_WRITE_LINE_MEMBER(mkiv_pia_ca2);
 	DECLARE_WRITE_LINE_MEMBER(mkiv_pia_cb2);
-	DECLARE_WRITE8_MEMBER(mkiv_pia_outb);
-	DECLARE_READ8_MEMBER(via_a_r);
-	DECLARE_READ8_MEMBER(via_b_r);
-	DECLARE_WRITE8_MEMBER(via_a_w);
-	DECLARE_WRITE8_MEMBER(via_b_w);
+	void mkiv_pia_outb(uint8_t data);
+	uint8_t via_a_r();
+	uint8_t via_b_r();
+	void via_a_w(uint8_t data);
+	void via_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
-	DECLARE_WRITE8_MEMBER(pblp_out);
-	DECLARE_WRITE8_MEMBER(pbltlp_out);
-	DECLARE_WRITE8_MEMBER(zn434_w);
-	DECLARE_READ8_MEMBER(pa1_r);
-	DECLARE_READ8_MEMBER(pb1_r);
-	DECLARE_READ8_MEMBER(pc1_r);
+	void pblp_out(uint8_t data);
+	void pbltlp_out(uint8_t data);
+	void zn434_w(uint8_t data);
+	uint8_t pa1_r();
+	uint8_t pb1_r();
+	uint8_t pc1_r();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -539,7 +539,7 @@ uint32_t aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-READ8_MEMBER(aristmk4_state::ldsw)
+uint8_t aristmk4_state::ldsw()
 {
 	int U3_p2_ret= ioport("5002")->read();
 	if(U3_p2_ret & 0x1)
@@ -549,7 +549,7 @@ READ8_MEMBER(aristmk4_state::ldsw)
 	return m_cgdrsw = ioport("5005")->read();
 }
 
-READ8_MEMBER(aristmk4_state::cgdrr)
+uint8_t aristmk4_state::cgdrr()
 {
 	if(m_cgdrsw) // is the LC closed
 	{
@@ -558,12 +558,12 @@ READ8_MEMBER(aristmk4_state::cgdrr)
 	return 0x0; // otherwise the counter outputs are set low.
 }
 
-WRITE8_MEMBER(aristmk4_state::cgdrw)
+void aristmk4_state::cgdrw(uint8_t data)
 {
 	m_ripple = data;
 }
 
-WRITE8_MEMBER(aristmk4_state::u3_p0)
+void aristmk4_state::u3_p0(uint8_t data)
 {
 	m_u3_p0_w = data;
 
@@ -575,7 +575,7 @@ WRITE8_MEMBER(aristmk4_state::u3_p0)
 	//logerror("u3_p0_w: %02X\n",m_u3_p0_w);
 }
 
-READ8_MEMBER(aristmk4_state::u3_p2)
+uint8_t aristmk4_state::u3_p2()
 {
 	int u3_p2_ret= ioport("5002")->read();
 	int u3_p3_ret= ioport("5003")->read();
@@ -600,7 +600,7 @@ READ8_MEMBER(aristmk4_state::u3_p2)
 	return u3_p2_ret;
 }
 
-READ8_MEMBER(aristmk4_state::u3_p3)
+uint8_t aristmk4_state::u3_p3()
 {
 	int u3_p3_ret= ioport("5003")->read();
 
@@ -621,7 +621,7 @@ TIMER_CALLBACK_MEMBER(aristmk4_state::note_input_reset)
 	m_insnote=0; //reset note input after 150msec
 }
 
-READ8_MEMBER(aristmk4_state::bv_p0)
+uint8_t aristmk4_state::bv_p0()
 {
 	int bv_p0_ret=0x00;
 
@@ -644,7 +644,7 @@ READ8_MEMBER(aristmk4_state::bv_p0)
 
 }
 
-READ8_MEMBER(aristmk4_state::bv_p1)
+uint8_t aristmk4_state::bv_p1()
 {
 	int bv_p1_ret=0x00;
 
@@ -676,7 +676,7 @@ PORTB - MECHANICAL METERS
 ******************************************************************************/
 
 //input a
-READ8_MEMBER(aristmk4_state::mkiv_pia_ina)
+uint8_t aristmk4_state::mkiv_pia_ina()
 {
 	/* uncomment this code once RTC is fixed */
 
@@ -685,7 +685,7 @@ READ8_MEMBER(aristmk4_state::mkiv_pia_ina)
 }
 
 //output a
-WRITE8_MEMBER(aristmk4_state::mkiv_pia_outa)
+void aristmk4_state::mkiv_pia_outa(uint8_t data)
 {
 	if(m_rtc_data_strobe)
 	{
@@ -714,7 +714,7 @@ WRITE_LINE_MEMBER(aristmk4_state::mkiv_pia_cb2)
 }
 
 //output b
-WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
+void aristmk4_state::mkiv_pia_outb(uint8_t data)
 {
 	uint8_t emet[5];
 	int i = 0;
@@ -792,7 +792,7 @@ TIMER_CALLBACK_MEMBER(aristmk4_state::hopper_reset)
 }
 
 // Port A read (SW1)
-READ8_MEMBER(aristmk4_state::via_a_r)
+uint8_t aristmk4_state::via_a_r()
 {
 	int psg_ret=0;
 
@@ -810,7 +810,7 @@ READ8_MEMBER(aristmk4_state::via_a_r)
 	return psg_ret;
 }
 
-READ8_MEMBER(aristmk4_state::via_b_r)
+uint8_t aristmk4_state::via_b_r()
 {
 	int ret=ioport("via_port_b")->read();
 
@@ -861,13 +861,13 @@ READ8_MEMBER(aristmk4_state::via_b_r)
 	return ret;
 }
 
-WRITE8_MEMBER(aristmk4_state::via_a_w)
+void aristmk4_state::via_a_w(uint8_t data)
 {
 	//logerror("VIA port A write %02X\n",data);
 	m_psg_data = data;
 }
 
-WRITE8_MEMBER(aristmk4_state::via_b_w)
+void aristmk4_state::via_b_w(uint8_t data)
 {
 	m_ay8910_1 = ( data & 0x0F ) ; //only need first 4 bits per schematics
 		//NOTE: when bit 4 is off, we write to AY1, when bit 4 is on, we write to AY2
@@ -963,7 +963,7 @@ WRITE_LINE_MEMBER(aristmk4_state::via_cb2_w)
 
 // Lamp output
 
-WRITE8_MEMBER(aristmk4_state::pblp_out)
+void aristmk4_state::pblp_out(uint8_t data)
 {
 	m_lamps[ 1] = BIT(data, 0);
 	m_lamps[ 5] = BIT(data, 1);
@@ -976,7 +976,7 @@ WRITE8_MEMBER(aristmk4_state::pblp_out)
 	//logerror("Lights port A %02X\n",data);
 }
 
-WRITE8_MEMBER(aristmk4_state::pbltlp_out)
+void aristmk4_state::pbltlp_out(uint8_t data)
 {
 	m_lamps[ 8] = BIT(data, 0);
 	m_lamps[12] = BIT(data, 1);
@@ -989,32 +989,32 @@ WRITE8_MEMBER(aristmk4_state::pbltlp_out)
 	//logerror("Lights port B: %02X\n",data);
 }
 
-WRITE8_MEMBER(aristmk4_state::mlamps)
+void aristmk4_state::mlamps(uint8_t data)
 {
 	/* TAKE WIN AND GAMBLE LAMPS */
 	m_lamps[18] = BIT(data, 5);
 	m_lamps[13] = BIT(data, 6);
 }
 
-WRITE8_MEMBER(aristmk4_state::zn434_w)
+void aristmk4_state::zn434_w(uint8_t data)
 {
-	// Introducted to prevent warning in log for write to AY1 PORT B
-	// this is a write to the ZN434 DA convertors..
+	// Introduced to prevent warning in log for write to AY1 PORT B
+	// this is a write to the ZN434 DA converters..
 }
 
 
-READ8_MEMBER(aristmk4_state::cashcade_r)
+uint8_t aristmk4_state::cashcade_r()
 {
 	/* work around for cashcade games */
 	return cashcade_p[(m_cashcade_c++)%15];
 }
 
-WRITE8_MEMBER(aristmk4_state::mk4_printer_w)
+void aristmk4_state::mk4_printer_w(uint8_t data)
 {
 	//logerror("Printer: %c %d\n",data,data);
 }
 
-READ8_MEMBER(aristmk4_state::mk4_printer_r)
+uint8_t aristmk4_state::mk4_printer_r()
 {
 	return 0;
 }
@@ -1685,17 +1685,17 @@ GFXDECODE_END
 
 /* read m/c number */
 
-READ8_MEMBER(aristmk4_state::pa1_r)
+uint8_t aristmk4_state::pa1_r()
 {
 	return (ioport("SW3")->read() << 4) + ioport("SW4")->read();
 }
 
-READ8_MEMBER(aristmk4_state::pb1_r)
+uint8_t aristmk4_state::pb1_r()
 {
 	return (ioport("SW5")->read() << 4) + ioport("SW6")->read();
 }
 
-READ8_MEMBER(aristmk4_state::pc1_r)
+uint8_t aristmk4_state::pc1_r()
 {
 	return 0;
 }
@@ -1754,7 +1754,7 @@ void aristmk4_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_POWER_FAIL: power_fail(); break;
-	default: assert_always(false, "Unknown id in aristmk4_state::device_timer");
+	default: throw emu_fatalerror("Unknown id in aristmk4_state::device_timer");
 	}
 }
 

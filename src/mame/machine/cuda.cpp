@@ -100,7 +100,7 @@ const tiny_rom_entry *cuda_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-void cuda_device::send_port(address_space &space, uint8_t offset, uint8_t data)
+void cuda_device::send_port(uint8_t offset, uint8_t data)
 {
 //    printf("PORT %c write %02x (DDR = %02x) (PC=%x)\n", 'A' + offset, data, ddrs[offset], m_maincpu->pc());
 
@@ -187,21 +187,21 @@ void cuda_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 	}
 }
 
-READ8_MEMBER( cuda_device::ddr_r )
+uint8_t cuda_device::ddr_r(offs_t offset)
 {
 	return ddrs[offset];
 }
 
-WRITE8_MEMBER( cuda_device::ddr_w )
+void cuda_device::ddr_w(offs_t offset, uint8_t data)
 {
 //    printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
 
-	send_port(space, offset, ports[offset] & data);
+	send_port(offset, ports[offset] & data);
 
 	ddrs[offset] = data;
 }
 
-READ8_MEMBER( cuda_device::ports_r )
+uint8_t cuda_device::ports_r(offs_t offset)
 {
 	uint8_t incoming = 0;
 
@@ -260,19 +260,19 @@ READ8_MEMBER( cuda_device::ports_r )
 	return incoming;
 }
 
-WRITE8_MEMBER( cuda_device::ports_w )
+void cuda_device::ports_w(offs_t offset, uint8_t data)
 {
-	send_port(space, offset, data);
+	send_port(offset, data);
 
 	ports[offset] = data;
 }
 
-READ8_MEMBER( cuda_device::pll_r )
+uint8_t cuda_device::pll_r()
 {
 	return pll_ctrl;
 }
 
-WRITE8_MEMBER( cuda_device::pll_w )
+void cuda_device::pll_w(uint8_t data)
 {
 	#ifdef CUDA_SUPER_VERBOSE
 	if (pll_ctrl != data)
@@ -289,12 +289,12 @@ WRITE8_MEMBER( cuda_device::pll_w )
 	pll_ctrl = data;
 }
 
-READ8_MEMBER( cuda_device::timer_ctrl_r )
+uint8_t cuda_device::timer_ctrl_r()
 {
 	return timer_ctrl;
 }
 
-WRITE8_MEMBER( cuda_device::timer_ctrl_w )
+void cuda_device::timer_ctrl_w(uint8_t data)
 {
 	static const attotime rates[4][5] =
 	{
@@ -331,24 +331,24 @@ WRITE8_MEMBER( cuda_device::timer_ctrl_w )
 	timer_ctrl |= (data & ~0xc0);
 }
 
-READ8_MEMBER( cuda_device::timer_counter_r )
+uint8_t cuda_device::timer_counter_r()
 {
 	return timer_counter;
 }
 
-WRITE8_MEMBER( cuda_device::timer_counter_w )
+void cuda_device::timer_counter_w(uint8_t data)
 {
 //    printf("%02x to timer counter (PC=%x)\n", data, m_maincpu->pc());
 	timer_counter = data;
 	ripple_counter = timer_counter;
 }
 
-READ8_MEMBER( cuda_device::onesec_r )
+uint8_t cuda_device::onesec_r()
 {
 	return onesec;
 }
 
-WRITE8_MEMBER( cuda_device::onesec_w )
+void cuda_device::onesec_w(uint8_t data)
 {
 	m_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
@@ -360,12 +360,12 @@ WRITE8_MEMBER( cuda_device::onesec_w )
 	onesec = data;
 }
 
-READ8_MEMBER( cuda_device::pram_r )
+uint8_t cuda_device::pram_r(offs_t offset)
 {
 	return pram[offset];
 }
 
-WRITE8_MEMBER( cuda_device::pram_w )
+void cuda_device::pram_w(offs_t offset, uint8_t data)
 {
 	pram[offset] = data;
 }
@@ -421,7 +421,7 @@ void cuda_device::device_start()
 	save_item(NAME(pram));
 	save_item(NAME(disk_pram));
 
-	uint8_t *rom = device().machine().root_device().memregion(device().subtag(CUDA_CPU_TAG).c_str())->base();
+	uint8_t *rom = device().machine().root_device().memregion(device().subtag(CUDA_CPU_TAG))->base();
 
 	if (rom)
 	{

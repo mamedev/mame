@@ -29,10 +29,9 @@ DEFINE_DEVICE_TYPE(VTECH_MEMEXP_SLOT, vtech_memexp_slot_device, "vtech_memexp_sl
 
 vtech_memexp_slot_device::vtech_memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VTECH_MEMEXP_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_vtech_memexp_interface>(mconfig, *this),
 	m_program(*this, finder_base::DUMMY_TAG, -1),
 	m_io(*this, finder_base::DUMMY_TAG, -1),
-	m_cart(nullptr),
 	m_int_handler(*this),
 	m_nmi_handler(*this),
 	m_reset_handler(*this)
@@ -81,14 +80,6 @@ void vtech_memexp_slot_device::device_start()
 	m_reset_handler.resolve_safe();
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void vtech_memexp_slot_device::device_reset()
-{
-}
-
 
 //**************************************************************************
 //  CARTRIDGE INTERFACE
@@ -99,7 +90,7 @@ void vtech_memexp_slot_device::device_reset()
 //-------------------------------------------------
 
 device_vtech_memexp_interface::device_vtech_memexp_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "vtechmemexp")
 {
 	m_slot = dynamic_cast<vtech_memexp_slot_device *>(device.owner());
 }

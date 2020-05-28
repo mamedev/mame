@@ -22,8 +22,7 @@
 
 // ======================> c64_4tba_device
 
-class c64_4tba_device : public device_t,
-	public device_pet_user_port_interface
+class c64_4tba_device : public device_t, public device_pet_user_port_interface
 {
 public:
 	// construction/destruction

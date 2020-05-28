@@ -489,9 +489,9 @@ texture_info *d3d_texture_manager::find_texinfo(const render_texinfo *texinfo, u
 	// find a match
 	for (auto it = m_texture_list.begin(); it != m_texture_list.end(); it++)
 	{
-		uint32_t test_screen = (uint32_t)((*it)->get_texinfo().unique_id >> 57);
+		auto test_screen = (uint32_t)((*it)->get_texinfo().unique_id >> 57);
 		uint32_t test_page = (uint32_t)((*it)->get_texinfo().unique_id >> 56) & 1;
-		uint32_t prim_screen = (uint32_t)(texinfo->unique_id >> 57);
+		auto prim_screen = (uint32_t)(texinfo->unique_id >> 57);
 		uint32_t prim_page = (uint32_t)(texinfo->unique_id >> 56) & 1;
 		if (test_screen != prim_screen || test_page != prim_page)
 			continue;
@@ -778,7 +778,7 @@ void renderer_d3d9::update_gamma_ramp()
 	if (win->fullscreen())
 	{
 		// only set the gamma if it's not 1.0
-		windows_options &options = downcast<windows_options &>(win->machine().options());
+		auto &options = downcast<windows_options &>(win->machine().options());
 		float brightness = options.full_screen_brightness();
 		float contrast = options.full_screen_contrast();
 		float gamma = options.full_screen_gamma();
@@ -801,8 +801,12 @@ void renderer_d3d9::update_gamma_ramp()
 //  device_create
 //============================================================
 
-int renderer_d3d9::device_create(HWND device_hwnd)
+int renderer_d3d9::device_create(HWND hwnd)
 {
+	// identify the actual window; this is needed so that -attach_window
+	// can work on a non-root HWND
+	HWND device_hwnd = GetAncestor(hwnd, GA_ROOT);
+
 	// if a device exists, free it
 	if (m_device != nullptr)
 	{
@@ -1227,7 +1231,7 @@ int renderer_d3d9::config_adapter_mode()
 		// make sure it's a pixel format we can get behind
 		if (m_pixformat != D3DFMT_X1R5G5B5 && m_pixformat != D3DFMT_R5G6B5 && m_pixformat != D3DFMT_X8R8G8B8)
 		{
-			osd_printf_error("Device %s currently in an unsupported mode\n", win->monitor()->devicename().c_str());
+			osd_printf_error("Device %s currently in an unsupported mode\n", win->monitor()->devicename());
 			return 1;
 		}
 	}
@@ -1250,7 +1254,7 @@ int renderer_d3d9::config_adapter_mode()
 	result = d3dintf->d3dobj->CheckDeviceType(m_adapter, D3DDEVTYPE_HAL, m_pixformat, m_pixformat, !win->fullscreen());
 	if (FAILED(result))
 	{
-		osd_printf_error("Proposed video mode not supported on device %s\n", win->monitor()->devicename().c_str());
+		osd_printf_error("Proposed video mode not supported on device %s\n", win->monitor()->devicename());
 		return 1;
 	}
 
@@ -1480,8 +1484,8 @@ void renderer_d3d9::batch_vectors(int vector_count)
 			((rotation_0 || rotation_90) && orientation_swap_xy) ||
 			((rotation_180 || rotation_90) && !orientation_swap_xy);
 
-		float screen_width = float(this->get_width());
-		float screen_height = float(this->get_height());
+		auto screen_width = float(this->get_width());
+		auto screen_height = float(this->get_height());
 		float half_screen_width = screen_width * 0.5f;
 		float half_screen_height = screen_height * 0.5f;
 		float screen_swap_x_factor = 1.0f / screen_width * screen_height;
@@ -1610,10 +1614,10 @@ void renderer_d3d9::batch_vector(const render_primitive &prim)
 	}
 
 	// determine the color of the line
-	int32_t r = (int32_t)(prim.color.r * 255.0f);
-	int32_t g = (int32_t)(prim.color.g * 255.0f);
-	int32_t b = (int32_t)(prim.color.b * 255.0f);
-	int32_t a = (int32_t)(prim.color.a * 255.0f);
+	auto r = (int32_t)(prim.color.r * 255.0f);
+	auto g = (int32_t)(prim.color.g * 255.0f);
+	auto b = (int32_t)(prim.color.b * 255.0f);
+	auto a = (int32_t)(prim.color.a * 255.0f);
 	DWORD color = D3DCOLOR_ARGB(a, r, g, b);
 
 	// set the color, Z parameters to standard values
@@ -1680,10 +1684,10 @@ void renderer_d3d9::draw_line(const render_primitive &prim)
 	vertex[3].v0 = stop.c.y;
 
 	// determine the color of the line
-	int32_t r = (int32_t)(prim.color.r * 255.0f);
-	int32_t g = (int32_t)(prim.color.g * 255.0f);
-	int32_t b = (int32_t)(prim.color.b * 255.0f);
-	int32_t a = (int32_t)(prim.color.a * 255.0f);
+	auto r = (int32_t)(prim.color.r * 255.0f);
+	auto g = (int32_t)(prim.color.g * 255.0f);
+	auto b = (int32_t)(prim.color.b * 255.0f);
+	auto a = (int32_t)(prim.color.a * 255.0f);
 	DWORD color = D3DCOLOR_ARGB(a, r, g, b);
 
 	// set the color, Z parameters to standard values
@@ -1749,10 +1753,10 @@ void renderer_d3d9::draw_quad(const render_primitive &prim)
 	}
 
 	// determine the color, allowing for over modulation
-	int32_t r = (int32_t)(prim.color.r * 255.0f);
-	int32_t g = (int32_t)(prim.color.g * 255.0f);
-	int32_t b = (int32_t)(prim.color.b * 255.0f);
-	int32_t a = (int32_t)(prim.color.a * 255.0f);
+	auto r = (int32_t)(prim.color.r * 255.0f);
+	auto g = (int32_t)(prim.color.g * 255.0f);
+	auto b = (int32_t)(prim.color.b * 255.0f);
+	auto a = (int32_t)(prim.color.a * 255.0f);
 	DWORD color = D3DCOLOR_ARGB(a, r, g, b);
 
 	// adjust half pixel X/Y offset, set the color, Z parameters to standard values
@@ -2702,8 +2706,8 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, int source_width, int source_he
 	float scale_factor = 0.75f;
 	int scale_count = vector_screen ? MAX_BLOOM_COUNT : HALF_BLOOM_COUNT;
 
-	float bloom_width = (float)source_width;
-	float bloom_height = (float)source_height;
+	auto bloom_width = (float)source_width;
+	auto bloom_height = (float)source_height;
 	float bloom_size = bloom_width < bloom_height ? bloom_width : bloom_height;
 	for (int bloom_index = 0; bloom_index < scale_count && bloom_size >= 2.0f; bloom_size *= scale_factor)
 	{

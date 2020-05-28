@@ -91,27 +91,27 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( op00 );
-	DECLARE_READ8_MEMBER( ip40 );
-	DECLARE_WRITE8_MEMBER( op40 );
-	DECLARE_WRITE8_MEMBER( op41 );
-	DECLARE_WRITE8_MEMBER( op42 );
-	DECLARE_READ8_MEMBER( ip43 );
-	DECLARE_WRITE8_MEMBER( op43 );
-	DECLARE_WRITE8_MEMBER( op43_1_4 );
-	DECLARE_WRITE8_MEMBER( op44 );
-	DECLARE_WRITE8_MEMBER( op45 );
-	DECLARE_READ8_MEMBER( ip46 );
-	DECLARE_WRITE8_MEMBER( op46 );
-	DECLARE_WRITE8_MEMBER( op47 );
-	DECLARE_READ8_MEMBER( acia_rxd_r );
-	DECLARE_WRITE8_MEMBER( acia_txd_w );
-	DECLARE_READ8_MEMBER( acia_status_r );
-	DECLARE_WRITE8_MEMBER( acia_reset_w );
-	DECLARE_READ8_MEMBER( acia_command_r );
-	DECLARE_WRITE8_MEMBER( acia_command_w );
-	DECLARE_READ8_MEMBER( acia_control_r );
-	DECLARE_WRITE8_MEMBER( acia_control_w );
+	void op00(uint8_t data);
+	uint8_t ip40();
+	void op40(uint8_t data);
+	void op41(uint8_t data);
+	void op42(uint8_t data);
+	uint8_t ip43();
+	void op43(uint8_t data);
+	void op43_1_4(uint8_t data);
+	void op44(uint8_t data);
+	void op45(uint8_t data);
+	uint8_t ip46();
+	void op46(uint8_t data);
+	void op47(uint8_t data);
+	uint8_t acia_rxd_r();
+	void acia_txd_w(uint8_t data);
+	uint8_t acia_status_r();
+	void acia_reset_w(uint8_t data);
+	uint8_t acia_command_r();
+	void acia_command_w(uint8_t data);
+	uint8_t acia_control_r();
+	void acia_control_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 
@@ -205,19 +205,19 @@ void digel804_state::machine_reset()
 	m_vfd->reset();
 }
 
-READ8_MEMBER( digel804_state::ip40 ) // eprom data bus read
+uint8_t digel804_state::ip40() // eprom data bus read
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	return 0xFF;
 }
 
-WRITE8_MEMBER( digel804_state::op40 ) // eprom data bus write
+void digel804_state::op40(uint8_t data) // eprom data bus write
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	logerror("Digel804: port 40, eprom databus had %02X written to it!\n", data);
 }
 
-WRITE8_MEMBER( digel804_state::op41 ) // eprom address low write AND SIM write, d6 also controls memory map somehow
+void digel804_state::op41(uint8_t data) // eprom address low write AND SIM write, d6 also controls memory map somehow
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	logerror("Digel804: port 41, eprom address low/sim/memorybank had %02X written to it!\n", data);
@@ -225,13 +225,13 @@ WRITE8_MEMBER( digel804_state::op41 ) // eprom address low write AND SIM write, 
 	m_op41 = data;
 }
 
-WRITE8_MEMBER( digel804_state::op42 ) // eprom address hi and control write
+void digel804_state::op42(uint8_t data) // eprom address hi and control write
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	logerror("Digel804: port 42, eprom address hi/control had %02X written to it!\n", data);
 }
 
-READ8_MEMBER( digel804_state::ip43 )
+uint8_t digel804_state::ip43()
 {
 	/* Register 0x43: status/mode register read
 	 bits 76543210
@@ -274,13 +274,13 @@ READ8_MEMBER( digel804_state::ip43 )
 
 }
 
-WRITE8_MEMBER( digel804_state::op00 )
+void digel804_state::op00(uint8_t data)
 {
 	m_ram_bank = data;
 	m_rambank->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
 }
 
-WRITE8_MEMBER( digel804_state::op43 )
+void digel804_state::op43(uint8_t data)
 {
 	/* writes to 0x43 control the ram banking on firmware which supports it
 	 * bits:76543210
@@ -301,12 +301,12 @@ WRITE8_MEMBER( digel804_state::op43 )
 	m_rambank->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
 }
 
-WRITE8_MEMBER( digel804_state::op43_1_4 )
+void digel804_state::op43_1_4(uint8_t data)
 {
 	m_overload_state = 0; // writes to port 43 clear overload state
 }
 
-WRITE8_MEMBER( digel804_state::op44 ) // state write
+void digel804_state::op44(uint8_t data) // state write
 {
 	/* writes to 0x44 control the 10937 vfd chip, z80 power/busrq, eprom driving and some eprom power ctl lines
 	 * bits:76543210
@@ -331,7 +331,7 @@ WRITE8_MEMBER( digel804_state::op44 ) // state write
 	m_vfd->sclk(data&1);
 }
 
-WRITE8_MEMBER( digel804_state::op45 ) // speaker write
+void digel804_state::op45(uint8_t data) // speaker write
 {
 	// all writes to here invert the speaker state, verified from schematics
 #ifdef PORT45_W_VERBOSE
@@ -341,7 +341,7 @@ WRITE8_MEMBER( digel804_state::op45 ) // speaker write
 	m_speaker->level_w(m_speaker_state);
 }
 
-READ8_MEMBER( digel804_state::ip46 ) // keypad read
+uint8_t digel804_state::ip46() // keypad read
 {
 	/* reads E* for a keypad number 0-F
 	 * reads F0 for enter
@@ -361,7 +361,7 @@ READ8_MEMBER( digel804_state::ip46 ) // keypad read
 	return bitswap<8>(kbd,7,6,5,4,1,0,3,2);   // verified from schematics
 }
 
-WRITE8_MEMBER( digel804_state::op46 )
+void digel804_state::op46(uint8_t data)
 {
 	/* writes to 0x46 control the LEDS on the front panel
 	 * bits:76543210
@@ -385,7 +385,7 @@ WRITE8_MEMBER( digel804_state::op46 )
 		m_func_leds[i] = (!(data & 0x10) && ((~data & 0x0f) == i)) ? 1 : 0;
 }
 
-WRITE8_MEMBER( digel804_state::op47 ) // eprom timing/power and control write
+void digel804_state::op47(uint8_t data) // eprom timing/power and control write
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	logerror("Digel804: port 47, eprom timing/power and control had %02X written to it!\n", data);
@@ -422,44 +422,44 @@ INPUT_CHANGED_MEMBER( digel804_state::mode_change )
 }
 
 /* ACIA Trampolines */
-READ8_MEMBER( digel804_state::acia_rxd_r )
+uint8_t digel804_state::acia_rxd_r()
 {
 	return m_acia->read(0);
 }
 
-WRITE8_MEMBER( digel804_state::acia_txd_w )
+void digel804_state::acia_txd_w(uint8_t data)
 {
 	m_acia->write(0, data);
 }
 
-READ8_MEMBER( digel804_state::acia_status_r )
+uint8_t digel804_state::acia_status_r()
 {
 	return m_acia->read(1);
 }
 
-WRITE8_MEMBER( digel804_state::acia_reset_w )
+void digel804_state::acia_reset_w(uint8_t data)
 {
 	m_acia->write(1, data);
 }
 
-READ8_MEMBER( digel804_state::acia_command_r )
+uint8_t digel804_state::acia_command_r()
 {
 	return m_acia->read(2);
 }
 
-WRITE8_MEMBER( digel804_state::acia_command_w )
+void digel804_state::acia_command_w(uint8_t data)
 {
 	data |= 0x08;   // HACK for ep804 remote mode
 
 	m_acia->write(2, data);
 }
 
-READ8_MEMBER( digel804_state::acia_control_r )
+uint8_t digel804_state::acia_control_r()
 {
 	return m_acia->read(3);
 }
 
-WRITE8_MEMBER( digel804_state::acia_control_w )
+void digel804_state::acia_control_w(uint8_t data)
 {
 	m_acia->write(3, data);
 }
@@ -473,10 +473,10 @@ void digel804_state::z80_mem_804_1_4(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom(); // 3f in mapper = rom J3
-	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("main_ram") // 6f in mapper = RAM D43 (6164)
-	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("main_ram") // 77 in mapper = RAM D44 (6164)
-	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("main_ram") // 7b in mapper = RAM D45 (6164)
-	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("main_ram") // 7d in mapper = RAM D46 (6164)
+	//map(0x4000, 0x5fff).ram().share("main_ram"); // 6f in mapper = RAM D43 (6164)
+	//map(0x6000, 0x7fff).ram().share("main_ram"); // 77 in mapper = RAM D44 (6164)
+	//map(0x8000, 0x9fff).ram().share("main_ram"); // 7b in mapper = RAM D45 (6164)
+	//map(0xa000, 0xbfff).ram().share("main_ram"); // 7d in mapper = RAM D46 (6164)
 	map(0x4000, 0xbfff).bankrw("bankedram");
 	// c000-cfff is open bus in mapper, 7f
 	map(0xd000, 0xd7ff).ram(); // 7e in mapper = RAM P3 (6116)
@@ -489,13 +489,13 @@ void ep804_state::z80_mem_804_1_2(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom(); // 3f in mapper = rom D41
 	map(0x2000, 0x3fff).rom(); // 5f in mapper = rom D42
-	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("main_ram") // 6f in mapper = RAM D43 (6164)
-	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("main_ram") // 77 in mapper = RAM D44 (6164)
-	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("main_ram") // 7b in mapper = RAM D45 (6164)
-	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("main_ram") // 7d in mapper = RAM D46 (6164)
+	//map(0x4000, 0x5fff).ram().share("main_ram"); // 6f in mapper = RAM D43 (6164)
+	//map(0x6000, 0x7fff).ram().share("main_ram"); // 77 in mapper = RAM D44 (6164)
+	//map(0x8000, 0x9fff).ram().share("main_ram"); // 7b in mapper = RAM D45 (6164)
+	//map(0xa000, 0xbfff).ram().share("main_ram"); // 7d in mapper = RAM D46 (6164)
 	map(0x4000, 0xbfff).bankrw("bankedram");
 	// c000-cfff is open bus in mapper, 7f
-	//AM_RANGE(0xc000, 0xc7ff) AM_RAM // hack for now to test, since sometimes it writes to c3ff
+	//map(0xc000, 0xc7ff).ram(); // hack for now to test, since sometimes it writes to c3ff
 	map(0xd000, 0xd7ff).ram(); // 7e in mapper = RAM D47 (6116)
 	// d800-ffff is open bus in mapper, 7f
 }
@@ -525,7 +525,7 @@ void digel804_state::z80_io_1_4(address_map &map)
 	map(0x85, 0x85).mirror(0x38).r(FUNC(digel804_state::acia_command_r)); // (ACIA command reg)
 	map(0x86, 0x86).mirror(0x38).w(FUNC(digel804_state::acia_control_w)); // (ACIA control reg)
 	map(0x87, 0x87).mirror(0x38).r(FUNC(digel804_state::acia_control_r)); // (ACIA control reg)
-	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", mos6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
+	//map(0x80,0x87).mirror(0x38).shift(-1).rw("acia", FUNC(mos6551_device::read, FUNC(mos6551_device::write)); // this doesn't work since we lack a shift() command
 
 }
 
@@ -553,7 +553,7 @@ void ep804_state::z80_io_1_2(address_map &map)
 	map(0x85, 0x85).mirror(0x38).r(FUNC(ep804_state::acia_command_r)); // (ACIA command reg)
 	map(0x86, 0x86).mirror(0x38).w(FUNC(ep804_state::acia_control_w)); // (ACIA control reg)
 	map(0x87, 0x87).mirror(0x38).r(FUNC(ep804_state::acia_control_r)); // (ACIA control reg)
-	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", mos6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
+	//map(0x80,0x87).mirror(0x38).shift(-1).rw("acia", FUNC(mos6551_device::read, FUNC(mos6551_device::write)); // this doesn't work since we lack a shift() command
 
 }
 
@@ -637,7 +637,7 @@ void digel804_state::digel804(machine_config &config)
 	Z80(config, m_maincpu, 3.6864_MHz_XTAL/2); /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &digel804_state::z80_mem_804_1_4);
 	m_maincpu->set_addrmap(AS_IO, &digel804_state::z80_io_1_4);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ROC10937(config, m_vfd); // RIGHT_TO_LEFT
 
@@ -695,10 +695,10 @@ void ep804_state::ep804(machine_config &config)
 
 /*
 "Hardware Revisions"
-For pcb 1.0, there are at least 6 hardware revisions (i.e. small changes/component changes/greenwire fixes)
-which revison the hardware is is shown on the sticker on the bottom.
+For pcb 1.0, there are at least 6 hardware revisions (i.e. small changes/component changes/greenwire fixes).
+The hardware revision is shown on the sticker on the bottom.
 
-known features:
+Known features:
 
 1.0 - ?
 1.1 - does not support driving pin 1 of the socket, i.e. max size is 27256; pin 1 is pulled high; several components unpopulated

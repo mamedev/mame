@@ -46,8 +46,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_subcpu;
-	DECLARE_READ8_MEMBER(angeklds_ff_r) { return 0xff; };
-	DECLARE_WRITE8_MEMBER(angelkds_cpu_bank_write);
+	uint8_t angeklds_ff_r() { return 0xff; };
+	void angelkds_cpu_bank_write(uint8_t data);
 	DECLARE_WRITE8_MEMBER(angelkds_main_sound_w);
 	DECLARE_READ8_MEMBER(angelkds_main_sound_r);
 	DECLARE_WRITE8_MEMBER(angelkds_sub_sound_w);

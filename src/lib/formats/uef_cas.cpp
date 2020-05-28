@@ -18,9 +18,9 @@ Not nice, but it works...
 
 */
 
-#include <string.h>
-#include <math.h>
-#include <assert.h>
+#include <cstring>
+#include <cmath>
+#include <cassert>
 
 #include <zlib.h>
 #include "uef_cas.h"

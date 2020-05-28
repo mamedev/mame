@@ -107,7 +107,7 @@ DEFINE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device, "nes_cart_slot", "NES Ca
 //-------------------------------------------------
 
 device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "nescart")
 	, m_prg(nullptr)
 	, m_vrom(nullptr)
 	, m_ciram(nullptr)
@@ -779,7 +779,7 @@ void device_nes_cart_interface::nes_banks_restore()
 nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_CART_SLOT, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_nes_cart_interface>(mconfig, *this)
 	, m_crc_hack(0)
 	, m_cart(nullptr)
 	, m_pcb_id(NO_BOARD)
@@ -801,7 +801,7 @@ nes_cart_slot_device::~nes_cart_slot_device()
 
 void nes_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_nes_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 

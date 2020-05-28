@@ -31,18 +31,8 @@ public:
 
 	// static configuration helpers
 	void set_lcd_size(int lines, int chars) { m_lines = lines; m_chars = chars; }
-	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb = pixel_update_delegate(std::forward<T>(args)...); }
-	void set_pixel_update_cb(pixel_update_delegate callback) { m_pixel_update_cb = callback; }
-	template <class FunctionClass> void set_pixel_update_cb(const char *devname,
-		void (FunctionClass::*callback)(bitmap_ind16 &, u8, u8, u8, u8, int), const char *name)
-	{
-		set_pixel_update_cb(pixel_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_pixel_update_cb(
-		void (FunctionClass::*callback)(bitmap_ind16 &, u8, u8, u8, u8, int), const char *name)
-	{
-		set_pixel_update_cb(pixel_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb.set(std::forward<T>(args)...); }
+	void set_busy_factor(float f) { m_busy_factor = f; } // it's a workaround for inaccurate busy flag emulation
 
 	// device interface
 	void write(offs_t offset, u8 data);
@@ -76,6 +66,7 @@ protected:
 	enum
 	{
 		CHARSET_HD44780_A00,
+		CHARSET_SED1278_0B,
 		CHARSET_KS0066_F05 /*,
 		CHARSET_HD44780_A01,
 		CHARSET_HD44780_A02,
@@ -114,6 +105,7 @@ private:
 	u8           m_chars;          // chars for line
 	pixel_update_delegate m_pixel_update_cb; // pixel update callback
 
+	float       m_busy_factor;
 	bool        m_busy_flag;      // busy flag
 	u8          m_ddram[0x80];    // internal display data RAM
 	u8          m_cgram[0x40];    // internal chargen RAM
@@ -147,6 +139,15 @@ private:
 	enum        { DDRAM, CGRAM };
 };
 
+// ======================> sed1278_0b_device
+
+class sed1278_0b_device :  public hd44780_device
+{
+public:
+	// construction/destruction
+	sed1278_0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 // ======================> ks0066_f05_device
 
 class ks0066_f05_device :  public hd44780_device
@@ -158,6 +159,7 @@ public:
 
 // device type definition
 DECLARE_DEVICE_TYPE(HD44780,    hd44780_device)
+DECLARE_DEVICE_TYPE(SED1278_0B, sed1278_0b_device)
 DECLARE_DEVICE_TYPE(KS0066_F05, ks0066_f05_device)
 
 #endif // MAME_VIDEO_HD44780_H

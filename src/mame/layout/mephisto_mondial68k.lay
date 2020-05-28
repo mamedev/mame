@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 <!-- define elements -->
 
@@ -442,23 +445,23 @@
 
 	<!-- chessboard leds -->
 
-		<bezel name="led0"  element="led"><bounds x="15.5" y="77.25" width="1" height="1.5" /></bezel>
-		<bezel name="led1"  element="led"><bounds x="15.5" y="67.25" width="1" height="1.5" /></bezel>
-		<bezel name="led2"  element="led"><bounds x="15.5" y="57.25" width="1" height="1.5" /></bezel>
-		<bezel name="led3"  element="led"><bounds x="15.5" y="47.25" width="1" height="1.5" /></bezel>
-		<bezel name="led4"  element="led"><bounds x="15.5" y="37.25" width="1" height="1.5" /></bezel>
-		<bezel name="led5"  element="led"><bounds x="15.5" y="27.25" width="1" height="1.5" /></bezel>
-		<bezel name="led6"  element="led"><bounds x="15.5" y="17.25" width="1" height="1.5" /></bezel>
-		<bezel name="led7"  element="led"><bounds x="15.5" y="7.25" width="1" height="1.5" /></bezel>
+		<bezel name="1.0"  element="led"><bounds x="15.5" y="77.25" width="1" height="1.5" /></bezel>
+		<bezel name="1.1"  element="led"><bounds x="15.5" y="67.25" width="1" height="1.5" /></bezel>
+		<bezel name="1.2"  element="led"><bounds x="15.5" y="57.25" width="1" height="1.5" /></bezel>
+		<bezel name="1.3"  element="led"><bounds x="15.5" y="47.25" width="1" height="1.5" /></bezel>
+		<bezel name="1.4"  element="led"><bounds x="15.5" y="37.25" width="1" height="1.5" /></bezel>
+		<bezel name="1.5"  element="led"><bounds x="15.5" y="27.25" width="1" height="1.5" /></bezel>
+		<bezel name="1.6"  element="led"><bounds x="15.5" y="17.25" width="1" height="1.5" /></bezel>
+		<bezel name="1.7"  element="led"><bounds x="15.5" y="7.25" width="1" height="1.5" /></bezel>
 
-		<bezel name="led8"  element="led"><bounds x="22.25" y="84.5" width="1.5" height="1" /></bezel>
-		<bezel name="led9"  element="led"><bounds x="32.25" y="84.5" width="1.5" height="1" /></bezel>
-		<bezel name="led10" element="led"><bounds x="42.25" y="84.5" width="1.5" height="1" /></bezel>
-		<bezel name="led11" element="led"><bounds x="52.25" y="84.5" width="1.5" height="1" /></bezel>
-		<bezel name="led12" element="led"><bounds x="62.25" y="84.5" width="1.5" height="1" /></bezel>
-		<bezel name="led13" element="led"><bounds x="72.25" y="84.5" width="1.5" height="1" /></bezel>
-		<bezel name="led14" element="led"><bounds x="82.25" y="84.5" width="1.5" height="1" /></bezel>
-		<bezel name="led15" element="led"><bounds x="92.25" y="84.5" width="1.5" height="1" /></bezel>
+		<bezel name="0.0" element="led"><bounds x="22.25" y="84.5" width="1.5" height="1" /></bezel>
+		<bezel name="0.1" element="led"><bounds x="32.25" y="84.5" width="1.5" height="1" /></bezel>
+		<bezel name="0.2" element="led"><bounds x="42.25" y="84.5" width="1.5" height="1" /></bezel>
+		<bezel name="0.3" element="led"><bounds x="52.25" y="84.5" width="1.5" height="1" /></bezel>
+		<bezel name="0.4" element="led"><bounds x="62.25" y="84.5" width="1.5" height="1" /></bezel>
+		<bezel name="0.5" element="led"><bounds x="72.25" y="84.5" width="1.5" height="1" /></bezel>
+		<bezel name="0.6" element="led"><bounds x="82.25" y="84.5" width="1.5" height="1" /></bezel>
+		<bezel name="0.7" element="led"><bounds x="92.25" y="84.5" width="1.5" height="1" /></bezel>
 
 
 	<!-- LCD panel -->

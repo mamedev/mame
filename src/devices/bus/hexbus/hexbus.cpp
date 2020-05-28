@@ -150,7 +150,8 @@
 // Devices
 #include "hx5102.h"
 
-#define LOG_WRITE          (1U<<1)   // Write operation
+#define LOG_LINES          (1U<<1)   // Line changes
+#define LOG_ENABLED        (1U<<2)   // Enabled
 
 #define VERBOSE ( LOG_GENERAL )
 
@@ -161,16 +162,23 @@ DEFINE_DEVICE_TYPE_NS(HEXBUS, bus::hexbus, hexbus_device,  "hexbus",  "Hexbus co
 
 namespace bus { namespace hexbus {
 
+device_hexbus_interface::device_hexbus_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "hexbus")
+{
+}
+
+
 hexbus_device::hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, HEXBUS, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	m_next_dev(nullptr)
+	device_single_card_slot_interface<device_hexbus_interface>(mconfig, *this),
+	m_next_dev(nullptr),
+	m_chain_element(nullptr)
 {
 }
 
 void hexbus_device::device_start()
 {
-	m_next_dev = dynamic_cast<device_hexbus_interface *>(get_card_device());
+	m_next_dev = get_card_device();
 }
 
 /*
@@ -215,10 +223,11 @@ uint8_t hexbus_device::read(int dir)
 
 hexbus_chained_device::hexbus_chained_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
 	device_t(mconfig, type, tag, owner, clock),
-	device_hexbus_interface(mconfig, *this)
+	device_hexbus_interface(mconfig, *this),
+	m_enabled(false),
+	m_myvalue(0xff)
 {
 	m_hexbus_inbound = dynamic_cast<hexbus_device *>(owner);
-	m_myvalue = 0xff;
 }
 
 void hexbus_chained_device::device_start()
@@ -235,21 +244,31 @@ void hexbus_chained_device::device_start()
 */
 void hexbus_chained_device::hexbus_write(uint8_t data)
 {
+	uint8_t oldvalue = m_myvalue;
 	m_myvalue = data;
+	set_communication_enabled(true);
 
 	uint8_t otherval = hexbus_get_levels();
-	// LOGMASKED(LOG_WRITE, ".. otherval=%02x\n", otherval);
-
 	// What is the new bus level?
 	// The data lines are not supposed to be set by multiple devices
 	// We assume that sending data overrides all data line levels.
 	// This is emulated by pulling the data lines to ones.
 	uint8_t newvalue = (otherval | 0xc3) & m_myvalue;
 
+	if (hsk_line(oldvalue)==ASSERT_LINE && own_hsk_level()==CLEAR_LINE)
+		LOGMASKED(LOG_LINES, "Release HSK*\n");
+
+	bool hsk_changed = (hsk_line(newvalue) != hsk_line(m_current_bus_value));
+	bool bav_changed = (bav_line(newvalue) != bav_line(m_current_bus_value));
+
 	// If it changed (with respect to HSK* or BAV*), propagate to both directions.
-	if ((newvalue & (HEXBUS_LINE_HSK | HEXBUS_LINE_BAV)) != (m_current_bus_value & (HEXBUS_LINE_HSK | HEXBUS_LINE_BAV)))
+	if (hsk_changed || bav_changed)
 	{
-		LOGMASKED(LOG_WRITE, "Trying to write %02x, actually: %02x (current=%02x)\n", data, newvalue, m_current_bus_value);
+		if (hsk_changed && own_hsk_level()==ASSERT_LINE)
+			LOGMASKED(LOG_LINES, "Pull down HSK*, send data=%x\n", data_lines(m_myvalue));
+
+		if (bav_changed)
+			LOGMASKED(LOG_LINES, "%s BAV*\n", (own_bav_level()==ASSERT_LINE)? "Pull down" : "Release");
 
 		m_current_bus_value = newvalue;
 
@@ -258,9 +277,38 @@ void hexbus_chained_device::hexbus_write(uint8_t data)
 
 		if (m_hexbus_outbound != nullptr)
 			m_hexbus_outbound->write(OUTBOUND, m_current_bus_value);
-
 	}
-	else LOGMASKED(LOG_WRITE, "No change on hexbus\n");
+}
+
+/*
+    Assert or release the HSK* line.
+*/
+void hexbus_chained_device::set_hsk_line(line_state level)
+{
+	if (level==ASSERT_LINE)
+		hexbus_write(m_myvalue & ~HEXBUS_LINE_HSK);
+	else
+		hexbus_write(m_myvalue | HEXBUS_LINE_HSK);
+}
+
+/*
+    Assert or release the BAV* line.
+*/
+void hexbus_chained_device::set_bav_line(line_state level)
+{
+	if (level==ASSERT_LINE)
+		hexbus_write(m_myvalue & ~HEXBUS_LINE_BAV);
+	else
+		hexbus_write(m_myvalue | HEXBUS_LINE_BAV);
+}
+
+void hexbus_chained_device::set_data_latch(int value, int pos)
+{
+	const uint8_t hexbval[4] = { 0x01, 0x02, 0x40, 0x80 };
+	if (value==0)
+		m_myvalue &= ~hexbval[pos];
+	else
+		m_myvalue |= hexbval[pos];
 }
 
 /*
@@ -318,14 +366,42 @@ void hexbus_chained_device::bus_write(int dir, uint8_t data)
 	uint8_t oldvalue = m_current_bus_value;
 	m_current_bus_value = data;
 
+	// When disabled, just propagate, and then return
+	if (!m_enabled) return;
+
+	bool hsk_changed = (hsk_line(data) != hsk_line(oldvalue));
+
 	// Notify device
 	// Caution: Calling hexbus_value_changed may cause further activities that change the bus again
 	// Data changes alone shall not trigger the callback
-	if ((data & (HEXBUS_LINE_HSK | HEXBUS_LINE_BAV)) != (oldvalue & (HEXBUS_LINE_HSK | HEXBUS_LINE_BAV)))
+	if (hsk_changed || (bav_line(data) != bav_line(oldvalue)))
 	{
-		LOGMASKED(LOG_WRITE, "Hexbus value changed: %02x -> %02x\n", oldvalue, data);
+		if (hsk_changed)
+		{
+			if (hsk_line(data)==ASSERT_LINE) LOGMASKED(LOG_LINES, "Sense HSK*=0, got data=%x\n", data_lines(data));
+			else
+			{
+				LOGMASKED(LOG_LINES, "Sense HSK*=1\n");
+				// According to [1], HSK* going high writes ones into the data latch
+				m_myvalue |= 0xc3;
+			}
+		}
+		else LOGMASKED(LOG_LINES, "Sense BAV*=%d\n", bav_line(data)==CLEAR_LINE? 1:0);
+
 		hexbus_value_changed(data);
 	}
+}
+
+/*
+    Enable or disable this component.
+*/
+void hexbus_chained_device::set_communication_enabled(bool set)
+{
+	if (m_enabled != set)
+		LOGMASKED(LOG_ENABLED, "Hexbus listen %s\n", set? "enabled" : "disabled");
+	m_enabled = set;
+
+	if (!m_enabled) m_myvalue = 0xff;
 }
 
 /*
@@ -337,6 +413,15 @@ uint8_t hexbus_chained_device::to_line_state(uint8_t data, bool bav, bool hsk)
 	if (!bav) lines |= 0x04;
 	if (!hsk) lines |= 0x10;
 	return lines;
+}
+
+/*
+    Convenience function to get a data bit.
+*/
+int hexbus_chained_device::data_bit(int n)
+{
+	const uint8_t testbit[4] = { 0x01, 0x02, 0x40, 0x80 };
+	return (m_current_bus_value & testbit[n&3])? 1:0;
 }
 
 // ------------------------------------------------------------------------

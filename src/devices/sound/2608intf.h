@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "dirom.h"
 #include "ay8910.h"
 
 
@@ -12,7 +13,7 @@ struct ssg_callbacks;
 
 
 class ym2608_device : public ay8910_device,
-	public device_rom_interface
+					  public device_rom_interface<21>
 {
 public:
 	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

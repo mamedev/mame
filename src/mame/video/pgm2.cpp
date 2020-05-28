@@ -351,7 +351,7 @@ TILE_GET_INFO_MEMBER(pgm2_state::get_fg_tile_info)
 	u8 const colour  = (m_fg_videoram[tile_index] & 0x007c0000) >> 18; // 5 bits
 	u8 const flipxy  = (m_fg_videoram[tile_index] & 0x01800000) >> 23;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPXY(flipxy));
+	tileinfo.set(0, tileno, colour, TILE_FLIPXY(flipxy));
 }
 
 WRITE32_MEMBER(pgm2_state::bg_videoram_w)
@@ -366,15 +366,15 @@ TILE_GET_INFO_MEMBER(pgm2_state::get_bg_tile_info)
 	u8 const colour  = (m_bg_videoram[tile_index] & 0x003c0000) >> 18; // 4 bits
 	u8 const flipxy  = (m_bg_videoram[tile_index] & 0x01800000) >> 23;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPXY(flipxy));
+	tileinfo.set(0, tileno, colour, TILE_FLIPXY(flipxy));
 }
 
 void pgm2_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode2, tilemap_get_info_delegate(FUNC(pgm2_state::get_fg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 96, 64); // 0x6000 bytes
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode2, tilemap_get_info_delegate(*this, FUNC(pgm2_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 96, 64); // 0x6000 bytes
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode3, tilemap_get_info_delegate(FUNC(pgm2_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 32, 32, 64, 32); // 0x2000 bytes
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode3, tilemap_get_info_delegate(*this, FUNC(pgm2_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 32, 32, 64, 32); // 0x2000 bytes
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_rows(32 * 32);
 

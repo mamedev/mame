@@ -2,6 +2,7 @@
 // copyright-holders:Luca Elia
 
 #include "machine/gen_latch.h"
+#include "video/ms32_sprite.h"
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -12,6 +13,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
+		m_sprite(*this, "sprite"),
+		m_rocknms_sub_sprite(*this, "sub_sprite"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
 		m_vram_fg(*this, "vram_fg"),
@@ -97,10 +100,10 @@ protected:
 	DECLARE_VIDEO_START(nndmseal);
 	DECLARE_VIDEO_START(rockntread);
 	DECLARE_VIDEO_START(rocknms);
-	uint32_t screen_update_tetrisp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_rockntread(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_rocknms_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_rocknms_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_tetrisp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_rockntread(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_rocknms_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_rocknms_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(rockn_timer_level4_callback);
 	TIMER_CALLBACK_MEMBER(rockn_timer_sub_level4_callback);
 	TIMER_CALLBACK_MEMBER(rockn_timer_level1_callback);
@@ -119,45 +122,48 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 
-	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_spriteram2;
+	required_device<ms32_sprite_device> m_sprite;
+	optional_device<ms32_sprite_device> m_rocknms_sub_sprite;
 
-	uint16_t m_systemregs[0x10];
-	required_shared_ptr<uint16_t> m_vram_fg;
-	required_shared_ptr<uint16_t> m_vram_bg;
-	required_shared_ptr<uint16_t> m_vram_rot;
-	required_shared_ptr<uint16_t> m_nvram;
-	required_shared_ptr<uint16_t> m_scroll_fg;
-	required_shared_ptr<uint16_t> m_scroll_bg;
-	required_shared_ptr<uint16_t> m_rotregs;
-	std::unique_ptr<uint8_t[]> m_priority;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_priority;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_vram_rot;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_vram_fg;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_vram_bg;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_scroll_fg;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_scroll_bg;
-	optional_shared_ptr<uint16_t> m_rocknms_sub_rotregs;
+	required_shared_ptr<u16> m_spriteram;
+	optional_shared_ptr<u16> m_spriteram2;
+
+	u16 m_systemregs[0x10];
+	required_shared_ptr<u16> m_vram_fg;
+	required_shared_ptr<u16> m_vram_bg;
+	required_shared_ptr<u16> m_vram_rot;
+	required_shared_ptr<u16> m_nvram;
+	required_shared_ptr<u16> m_scroll_fg;
+	required_shared_ptr<u16> m_scroll_bg;
+	required_shared_ptr<u16> m_rotregs;
+	std::unique_ptr<u8[]> m_priority;
+	optional_shared_ptr<u16> m_rocknms_sub_priority;
+	optional_shared_ptr<u16> m_rocknms_sub_vram_rot;
+	optional_shared_ptr<u16> m_rocknms_sub_vram_fg;
+	optional_shared_ptr<u16> m_rocknms_sub_vram_bg;
+	optional_shared_ptr<u16> m_rocknms_sub_scroll_fg;
+	optional_shared_ptr<u16> m_rocknms_sub_scroll_bg;
+	optional_shared_ptr<u16> m_rocknms_sub_rotregs;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<gfxdecode_device> m_sub_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<palette_device> m_sub_palette;
-	required_shared_ptr<uint16_t> m_paletteram;
-	optional_shared_ptr<uint16_t> m_sub_paletteram;
+	required_shared_ptr<u16> m_paletteram;
+	optional_shared_ptr<u16> m_sub_paletteram;
 	output_finder<45> m_leds;
 
-	uint16_t m_rocknms_sub_systemregs[0x10];
-	uint16_t m_rockn_protectdata;
-	uint16_t m_rockn_adpcmbank;
-	uint16_t m_rockn_soundvolume;
+	u16 m_rocknms_sub_systemregs[0x10];
+	u16 m_rockn_protectdata;
+	u16 m_rockn_adpcmbank;
+	u16 m_rockn_soundvolume;
 	emu_timer *m_rockn_timer_l4;
 	emu_timer *m_rockn_timer_sub_l4;
 	emu_timer *m_rockn_timer_l1;
 	emu_timer *m_rockn_timer_sub_l1;
 	int m_bank_lo;
 	int m_bank_hi;
-	uint16_t m_rocknms_main2sub;
-	uint16_t m_rocknms_sub2main;
+	u16 m_rocknms_main2sub;
+	u16 m_rocknms_sub2main;
 	int m_flipscreen_old;
 	tilemap_t *m_tilemap_bg;
 	tilemap_t *m_tilemap_fg;
@@ -172,11 +178,11 @@ class stepstag_state : public tetrisp2_state
 public:
 	stepstag_state(const machine_config &mconfig, device_type type, const char *tag) :
 		tetrisp2_state(mconfig, type, tag),
+		m_vj_sprite_l(*this, "sprite_l"),
+		m_vj_sprite_m(*this, "sprite_m"),
+		m_vj_sprite_r(*this, "sprite_r"),
 		m_spriteram1(*this, "spriteram1"),
 		m_spriteram3(*this, "spriteram3"),
-		m_vj_gfxdecode_l(*this, "gfxdecode_l"),
-		m_vj_gfxdecode_m(*this, "gfxdecode_m"),
-		m_vj_gfxdecode_r(*this, "gfxdecode_r"),
 		m_vj_palette_l(*this, "lpalette"),
 		m_vj_palette_m(*this, "mpalette"),
 		m_vj_palette_r(*this, "rpalette"),
@@ -195,7 +201,7 @@ public:
 
 private:
 	DECLARE_READ16_MEMBER(stepstag_coins_r);
-	uint16_t vj_upload_idx;
+	u16 vj_upload_idx;
 	bool vj_upload_fini;
 	DECLARE_WRITE16_MEMBER(stepstag_b00000_w);
 	DECLARE_WRITE16_MEMBER(stepstag_b20000_w);
@@ -211,27 +217,27 @@ private:
 	DECLARE_WRITE16_MEMBER( stepstag_palette_mid_w );
 	DECLARE_WRITE16_MEMBER( stepstag_palette_right_w );
 
-	uint32_t screen_update_stepstag_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_stepstag_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_stepstag_main(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_stepstag_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_stepstag_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_stepstag_main(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 //  inline int mypal(int x);
 
 	void stepstag_map(address_map &map);
 	void stepstag_sub_map(address_map &map);
 	void vjdash_map(address_map &map);
 
-	required_shared_ptr<uint16_t> m_spriteram1;
-	required_shared_ptr<uint16_t> m_spriteram3;
-	optional_device<gfxdecode_device> m_vj_gfxdecode_l;
-	optional_device<gfxdecode_device> m_vj_gfxdecode_m;
-	optional_device<gfxdecode_device> m_vj_gfxdecode_r;
+	optional_device<ms32_sprite_device> m_vj_sprite_l;
+	optional_device<ms32_sprite_device> m_vj_sprite_m;
+	optional_device<ms32_sprite_device> m_vj_sprite_r;
+	required_shared_ptr<u16> m_spriteram1;
+	required_shared_ptr<u16> m_spriteram3;
 	optional_device<palette_device> m_vj_palette_l;
 	optional_device<palette_device> m_vj_palette_m;
 	optional_device<palette_device> m_vj_palette_r;
-	optional_shared_ptr<uint16_t> m_vj_paletteram_l;
-	optional_shared_ptr<uint16_t> m_vj_paletteram_m;
-	optional_shared_ptr<uint16_t> m_vj_paletteram_r;
+	optional_shared_ptr<u16> m_vj_paletteram_l;
+	optional_shared_ptr<u16> m_vj_paletteram_m;
+	optional_shared_ptr<u16> m_vj_paletteram_r;
 	required_device<generic_latch_16_device> m_soundlatch;
-	void convert_yuv422_to_rgb888(palette_device *paldev, uint16_t *palram,uint32_t offset);
+	void convert_yuv422_to_rgb888(palette_device *paldev, u16 *palram,u32 offset);
 };

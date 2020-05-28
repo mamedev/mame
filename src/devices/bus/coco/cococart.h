@@ -30,7 +30,7 @@ typedef delegate<void (uint8_t *)> cococart_base_update_delegate;
 class device_cococart_interface;
 
 class cococart_slot_device final : public device_t,
-								public device_slot_interface,
+								public device_single_card_slot_interface<device_cococart_interface>,
 								public device_image_interface
 {
 public:
@@ -75,15 +75,15 @@ public:
 	virtual image_init_result call_load() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "coco_cart"; }
-	virtual const char *file_extensions() const override { return "ccc,rom"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "coco_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "ccc,rom"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
@@ -159,7 +159,7 @@ public:
 
 // ======================> device_cococart_interface
 
-class device_cococart_interface : public device_slot_card_interface
+class device_cococart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -176,11 +176,10 @@ public:
 	void set_cart_base_update(cococart_base_update_delegate update);
 	virtual memory_region* get_cart_memregion();
 
-
+protected:
 	virtual void interface_config_complete() override;
 	virtual void interface_pre_start() override;
 
-protected:
 	device_cococart_interface(const machine_config &mconfig, device_t &device);
 
 	void cart_base_changed(void);

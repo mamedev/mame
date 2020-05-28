@@ -32,7 +32,7 @@ void sam_state::sam(machine_config &config)
 }
 
 #define ROM_LOAD_BOOT_EPROM \
-	ROM_REGION( 0x100000, "boot", ROMREGION_ERASEFF ) \
+	ROM_REGION32_LE( 0x100000, "boot", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "boot_eprom_01_02.bin", 0x0000, 0x100000, CRC(92c93cba) SHA1(aed7ba2f988df8c95e2ad08f70409152d5caa49a)) \
 	ROM_LOAD( "boot_eprom_01_06.bin", 0x0000, 0x0e8ac8, CRC(fe7bcece) SHA1(775590bbd52c24950db86cc231566ba3780030d8)) \
 	ROM_LOAD( "boot_eprom_02_10.bin", 0x0000, 0x0f0304, CRC(0f3fd4a4) SHA1(115d0b73c40fcdb2d202a0a9065472d216ca89e0)) \
@@ -545,6 +545,11 @@ ROM_END
 /*-------------------------------------------------------------------
 / Spider-Man
 /-------------------------------------------------------------------*/
+ROM_START(sman_102ef)
+	ROM_LOAD_BOOT_EPROM
+	ROM_REGION( 0x2000000, "flash", ROMREGION_ERASEFF )
+	ROM_LOAD( "sman_102af.bin", 0x0000, 0xfbb834, CRC(1e77651c) SHA1(fbce7dbe4ce70cd8bd1c01279a774f410f5aaeff))
+ROM_END
 ROM_START(sman_130ef)
 	ROM_LOAD_BOOT_EPROM
 	ROM_REGION( 0x2000000, "flash", ROMREGION_ERASEFF )
@@ -1179,6 +1184,7 @@ GAME( 2006, skc_090      ,skc_105,  sam, sam, sam_state, empty_init, ROT0, "Ster
 GAME( 2006, skc_103      ,skc_105,  sam, sam, sam_state, empty_init, ROT0, "Stern", "Simpsons Kooky Carnival (Redemption) v1.03",            MACHINE_FLAGS)
 // Missing version 1.04  May 12, 2006
 GAME( 2006, skc_105      ,0,        sam, sam, sam_state, empty_init, ROT0, "Stern", "Simpsons Kooky Carnival (Redemption) v1.05",            MACHINE_FLAGS)
+GAME( 2007, sman_102ef   ,sman_240, sam, sam, sam_state, empty_init, ROT0, "Stern", "Spider-Man v1.02 (English,French)",                     MACHINE_FLAGS)
 GAME( 2007, sman_130ef   ,sman_240, sam, sam, sam_state, empty_init, ROT0, "Stern", "Spider-Man v1.30 (English,French)",                     MACHINE_FLAGS)
 GAME( 2007, sman_130ei   ,sman_240, sam, sam, sam_state, empty_init, ROT0, "Stern", "Spider-Man v1.30 (English,Italian)",                    MACHINE_FLAGS)
 GAME( 2007, sman_130es   ,sman_240, sam, sam, sam_state, empty_init, ROT0, "Stern", "Spider-Man v1.30 (English,Spanish)",                    MACHINE_FLAGS)

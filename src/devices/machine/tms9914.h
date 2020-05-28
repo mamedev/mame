@@ -98,7 +98,7 @@ private:
 
 	devcb_read8 m_dio_read_func;
 	devcb_write8 m_dio_write_func;
-	devcb_write_line m_signal_wr_fns[ IEEE_488_SIGNAL_COUNT ];
+	devcb_write_line::array<IEEE_488_SIGNAL_COUNT> m_signal_wr_fns;
 	devcb_write_line m_int_write_func;
 	devcb_write_line m_accrq_write_func;
 	bool m_int_line;
@@ -117,6 +117,7 @@ private:
 	uint8_t m_reg_int1_mask;
 	uint8_t m_reg_address;
 	uint8_t m_reg_serial_p;
+	uint8_t m_reg_2nd_serial_p;
 	uint8_t m_reg_parallel_p;
 	uint8_t m_reg_2nd_parallel_p;
 	uint8_t m_reg_di;
@@ -137,6 +138,7 @@ private:
 	bool m_stdl;
 	bool m_shdw;
 	bool m_vstdl;
+	bool m_rsvd2;
 
 	// AH (Acceptor Handshake) states
 	enum {

@@ -16,21 +16,22 @@
 
 DEFINE_DEVICE_TYPE(SPG110, spg110_device, "spg110", "SPG110 System-on-a-Chip")
 
-spg110_device::spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
-	: unsp_device(mconfig, type, tag, owner, clock, internal)
-	, device_mixer_interface(mconfig, *this, 2)
-	, m_screen(*this, finder_base::DUMMY_TAG)
-	, m_spg_io(*this, "spg_io")
-	, m_spg_video(*this, "spg_video")
-	, m_spg_audio(*this, "spgaudio")
-	, m_porta_out(*this)
-	, m_portb_out(*this)
-	, m_portc_out(*this)
-	, m_porta_in(*this)
-	, m_portb_in(*this)
-	, m_portc_in(*this)
-	, m_adc_in{{*this}, {*this}}
-	, m_chip_sel(*this)
+spg110_device::spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal) :
+	unsp_device(mconfig, type, tag, owner, clock, internal),
+	device_mixer_interface(mconfig, *this, 2),
+	m_screen(*this, finder_base::DUMMY_TAG),
+	m_spg_io(*this, "spg_io"),
+	m_spg_video(*this, "spg_video"),
+	m_spg_audio(*this, "spgaudio"),
+	m_porta_out(*this),
+	m_portb_out(*this),
+	m_portc_out(*this),
+	m_porta_in(*this),
+	m_portb_in(*this),
+	m_portc_in(*this),
+	m_adc_in(*this),
+	m_chip_sel(*this),
+	m_is_spiderman(false)
 {
 }
 
@@ -44,6 +45,15 @@ WRITE_LINE_MEMBER(spg110_device::videoirq_w)
 {
 	set_state_unsynced(UNSP_IRQ0_LINE, state);
 }
+
+WRITE_LINE_MEMBER(spg110_device::ffreq1_w)
+{
+}
+
+WRITE_LINE_MEMBER(spg110_device::ffreq2_w)
+{
+}
+
 
 void spg110_device::configure_spg_io(spg2xx_io_device* io)
 {
@@ -60,11 +70,11 @@ void spg110_device::configure_spg_io(spg2xx_io_device* io)
 //  io->write_timer_irq_callback().set(FUNC(spg110_device::timerirq_w));
 //  io->write_uart_adc_irq_callback().set(FUNC(spg110_device::uartirq_w));
 //  io->write_external_irq_callback().set(FUNC(spg110_device::extirq_w));
-//  io->write_ffrq_tmr1_irq_callback().set(FUNC(spg110_device::ffreq1_w));
-//  io->write_ffrq_tmr2_irq_callback().set(FUNC(spg110_device::ffreq2_w));
+	io->write_ffrq_tmr1_irq_callback().set(FUNC(spg110_device::ffreq1_w));
+	io->write_ffrq_tmr2_irq_callback().set(FUNC(spg110_device::ffreq2_w));
 }
 
-READ16_MEMBER(spg110_device::space_r)
+uint16_t spg110_device::space_r(offs_t offset)
 {
 	address_space &cpuspace = this->space(AS_PROGRAM);
 	return cpuspace.read_word(offset);
@@ -90,7 +100,6 @@ void spg110_device::device_add_mconfig(machine_config &config)
 
 	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
-
 }
 
 void spg110_device::internal_map(address_map &map)
@@ -167,13 +176,12 @@ void spg110_device::device_start()
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
 	m_portc_in.resolve_safe(0);
-	m_adc_in[0].resolve_safe(0x0fff);
-	m_adc_in[1].resolve_safe(0x0fff);
+	m_adc_in.resolve_all_safe(0x0fff);
 	m_chip_sel.resolve_safe();
 }
 
 void spg110_device::device_reset()
 {
 	unsp_device::device_reset();
+	m_spg_video->set_video_irq_spidman(m_is_spiderman);
 }
-

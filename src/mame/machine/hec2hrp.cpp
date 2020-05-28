@@ -327,9 +327,9 @@ WRITE8_MEMBER(hec2hrp_state::color_a_w)
 		if (m_write_cassette==0)
 		{
 				m_cassette->change_state(
-						CASSETTE_MOTOR_ENABLED ,
+						CASSETTE_MOTOR_ENABLED,
 						CASSETTE_MASK_MOTOR);
-			// m_cassette->set_state((cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED ));
+			// m_cassette->set_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 		}
 	}
 	else
@@ -349,8 +349,8 @@ WRITE8_MEMBER(hec2hrp_state::color_a_w)
 			m_counter_write = 6;
 			if (m_write_cassette==0)
 			{   /* C'est la 1er fois => record*/
-							m_cassette->change_state(
-						CASSETTE_MOTOR_ENABLED ,
+				m_cassette->change_state(
+						CASSETTE_MOTOR_ENABLED,
 						CASSETTE_MASK_MOTOR);
 				m_cassette->set_state(CASSETTE_RECORD);
 				m_write_cassette=1;

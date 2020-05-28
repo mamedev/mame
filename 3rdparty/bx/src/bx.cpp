@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -44,29 +44,29 @@ namespace bx
 #endif // BX_CRT_NONE
 	}
 
-	void memCopy(void* _dst, const void* _src, uint32_t _size, uint32_t _num, uint32_t _srcPitch, uint32_t _dstPitch)
+	void memCopy(
+		  void* _dst
+		, uint32_t _dstStride
+		, const void* _src
+		, uint32_t _srcStride
+		, uint32_t _stride
+		, uint32_t _num
+		)
 	{
-		const uint8_t* src = (const uint8_t*)_src;
-		uint8_t* dst = (uint8_t*)_dst;
-
-		for (uint32_t ii = 0; ii < _num; ++ii)
+		if (_stride == _srcStride
+		&&  _stride == _dstStride)
 		{
-			memCopy(dst, src, _size);
-			src += _srcPitch;
-			dst += _dstPitch;
+			memCopy(_dst, _src, _stride*_num);
+			return;
 		}
-	}
 
-	///
-	void gather(void* _dst, const void* _src, uint32_t _size, uint32_t _num, uint32_t _srcPitch)
-	{
-		memCopy(_dst, _src, _size, _num, _srcPitch, _size);
-	}
+		const uint8_t* src = (const uint8_t*)_src;
+		      uint8_t* dst = (uint8_t*)_dst;
 
-	///
-	void scatter(void* _dst, const void* _src, uint32_t _size, uint32_t _num, uint32_t _dstPitch)
-	{
-		memCopy(_dst, _src, _size, _num, _size, _dstPitch);
+		for (uint32_t ii = 0; ii < _num; ++ii, src += _srcStride, dst += _dstStride)
+		{
+			memCopy(dst, src, _stride);
+		}
 	}
 
 	void memMoveRef(void* _dst, const void* _src, size_t _numBytes)
@@ -102,6 +102,31 @@ namespace bx
 #endif // BX_CRT_NONE
 	}
 
+	void memMove(
+		  void* _dst
+		, uint32_t _dstStride
+		, const void* _src
+		, uint32_t _srcStride
+		, uint32_t _stride
+		, uint32_t _num
+		)
+	{
+		if (_stride == _srcStride
+		&&  _stride == _dstStride)
+		{
+			memMove(_dst, _src, _stride*_num);
+			return;
+		}
+
+		const uint8_t* src = (const uint8_t*)_src;
+		      uint8_t* dst = (uint8_t*)_dst;
+
+		for (uint32_t ii = 0; ii < _num; ++ii, src += _srcStride, dst += _dstStride)
+		{
+			memMove(dst, src, _stride);
+		}
+	}
+
 	void memSetRef(void* _dst, uint8_t _ch, size_t _numBytes)
 	{
 		uint8_t* dst = (uint8_t*)_dst;
@@ -119,6 +144,22 @@ namespace bx
 #else
 		::memset(_dst, _ch, _numBytes);
 #endif // BX_CRT_NONE
+	}
+
+	void memSet(void* _dst, uint32_t _dstStride, uint8_t _ch, uint32_t _stride, uint32_t _num)
+	{
+		if (_stride == _dstStride)
+		{
+			memSet(_dst, _ch, _stride*_num);
+			return;
+		}
+
+		uint8_t* dst = (uint8_t*)_dst;
+
+		for (uint32_t ii = 0; ii < _num; ++ii, dst += _dstStride)
+		{
+			memSet(dst, _ch, _stride);
+		}
 	}
 
 	int32_t memCmpRef(const void* _lhs, const void* _rhs, size_t _numBytes)
@@ -142,6 +183,18 @@ namespace bx
 #else
 		return ::memcmp(_lhs, _rhs, _numBytes);
 #endif // BX_CRT_NONE
+	}
+
+	///
+	void gather(void* _dst, const void* _src, uint32_t _srcStride, uint32_t _stride, uint32_t _num)
+	{
+		memMove(_dst, _stride, _src, _srcStride, _stride, _num);
+	}
+
+	///
+	void scatter(void* _dst, uint32_t _dstStride, const void* _src, uint32_t _stride, uint32_t _num)
+	{
+		memMove(_dst, _dstStride, _src, _stride, _num, _stride);
 	}
 
 } // namespace bx

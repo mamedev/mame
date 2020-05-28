@@ -280,7 +280,7 @@ void pgm_arm_type1_state::init_photoy2k()
 	pgm_photoy2k_decrypt(machine());
 	arm7_type1_latch_init();
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(*this, FUNC(pgm_arm_type1_state::kovsh_fake_region_r)));
 }
 
 void pgm_arm_type1_state::init_kovsh()
@@ -289,7 +289,7 @@ void pgm_arm_type1_state::init_kovsh()
 	pgm_kovsh_decrypt(machine());
 	arm7_type1_latch_init();
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(*this, FUNC(pgm_arm_type1_state::kovsh_fake_region_r)));
 }
 
 /* Fake remapping of ASIC commands to the ones used by KOVSH due to the lack of the real ARM rom for this set */
@@ -357,8 +357,8 @@ void pgm_arm_type1_state::init_kovshp()
 	pgm_basic_init();
 	pgm_kovshp_decrypt(machine());
 	arm7_type1_latch_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16sm_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(*this, FUNC(pgm_arm_type1_state::kovsh_fake_region_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16sm_delegate(*this, FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word)));
 }
 
 
@@ -369,8 +369,8 @@ void pgm_arm_type1_state::init_kovshxas()
 	pgm_basic_init();
 //  pgm_kovshp_decrypt(machine());
 	arm7_type1_latch_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16sm_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(*this, FUNC(pgm_arm_type1_state::kovsh_fake_region_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16sm_delegate(*this, FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word)));
 }
 
 void pgm_arm_type1_state::pgm_decode_kovlsqh2_tiles()
@@ -461,8 +461,8 @@ void pgm_arm_type1_state::init_kovlsqh2()
 	pgm_decode_kovlsqh2_samples();
 	pgm_basic_init();
 	arm7_type1_latch_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16sm_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(*this, FUNC(pgm_arm_type1_state::kovsh_fake_region_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16sm_delegate(*this, FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word)));
 }
 
 void pgm_arm_type1_state::init_kovqhsgs()
@@ -483,7 +483,7 @@ void pgm_arm_type1_state::init_kovqhsgs()
 	pgm_basic_init();
 	arm7_type1_latch_init();
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(*this, FUNC(pgm_arm_type1_state::kovsh_fake_region_r)));
 }
 
 /*
@@ -1789,7 +1789,7 @@ void pgm_arm_type1_state::init_ddp3()
 	pgm_basic_init(false);
 	pgm_py2k2_decrypt(machine()); // yes, it's the same as photo y2k2
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 }
 
 void pgm_arm_type1_state::init_ket()
@@ -1797,7 +1797,7 @@ void pgm_arm_type1_state::init_ket()
 	pgm_basic_init(false);
 	pgm_ket_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 }
 
 void pgm_arm_type1_state::init_espgal()
@@ -1805,7 +1805,7 @@ void pgm_arm_type1_state::init_espgal()
 	pgm_basic_init(false);
 	pgm_espgal_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 }
 
 
@@ -2090,8 +2090,8 @@ void pgm_arm_type1_state::init_puzzli2()
 
 	pgm_puzzli2_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_puzzli2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 	m_irq4_disabled = 1; // // doesn't like this irq?? - seems to be RTC related
 
 	hackcount = 0;
@@ -2219,8 +2219,8 @@ void pgm_arm_type1_state::init_py2k2()
 	pgm_basic_init();
 	pgm_py2k2_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_py2k2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 }
 
 void pgm_arm_type1_state::init_pgm3in1()
@@ -2228,8 +2228,8 @@ void pgm_arm_type1_state::init_pgm3in1()
 	pgm_basic_init();
 	pgm_decrypt_pgm3in1(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_py2k2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005,read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005,read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 	m_irq4_disabled = 1; // // doesn't like this irq??
 }
 
@@ -2248,8 +2248,8 @@ void pgm_arm_type1_state::init_pstar()
 	memset(m_slots, 0, 16 * sizeof(u32));
 
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_pstars;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::pstars_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::pstars_arm7_type1_sim_protram_r)));
 
 	save_item(NAME(m_pstar_e7_value));
 	save_item(NAME(m_pstar_b1_value));
@@ -2267,8 +2267,8 @@ void pgm_arm_type1_state::init_kov()
 	m_kov_cb_value = 0;
 	m_kov_fe_value = 0;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_kov;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 }
 
 void pgm_arm_type1_state::init_kovboot()
@@ -2281,8 +2281,8 @@ void pgm_arm_type1_state::init_kovboot()
 	m_kov_cb_value = 0;
 	m_kov_fe_value = 0;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_kov;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 
 }
 
@@ -2294,8 +2294,8 @@ void pgm_arm_type1_state::init_oldsplus()
 	memset(m_extra_ram, 0, 0x100 * sizeof(u16));
 	memset(m_slots, 0, 0x100 * sizeof(u32));
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_oldsplus;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 	save_item(NAME(m_extra_ram));
 }
 

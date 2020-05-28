@@ -56,7 +56,7 @@ TAP - has an ID header of TAP_DGOS_BEE or MBEE, null terminated.
 
 ********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "mbee_cas.h"
 

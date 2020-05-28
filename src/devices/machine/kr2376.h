@@ -60,7 +60,7 @@ public:
 	auto strobe() { return m_write_strobe.bind(); }
 
 	/* keyboard data */
-	DECLARE_READ8_MEMBER( data_r );
+	uint8_t data_r();
 
 	/* Set an input pin */
 	void set_input_pin( input_pin_t pin, int data );
@@ -88,7 +88,7 @@ private:
 
 	/* timers */
 	emu_timer *m_scan_timer;          /* keyboard scan timer */
-	devcb_read16 m_read_x[8];
+	devcb_read16::array<8> m_read_x;
 	devcb_read_line m_read_shift, m_read_control;
 	devcb_write_line m_write_strobe;
 

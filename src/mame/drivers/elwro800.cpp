@@ -63,13 +63,13 @@ private:
 	uint8_t m_NR;
 
 	uint8_t nmi_r();
-	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
-	DECLARE_READ8_MEMBER(elwro800jr_io_r);
-	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
+	void elwro800jr_fdc_control_w(uint8_t data);
+	uint8_t elwro800jr_io_r(offs_t offset);
+	void elwro800jr_io_w(offs_t offset, uint8_t data);
 	DECLARE_MACHINE_RESET(elwro800);
 	INTERRUPT_GEN_MEMBER(elwro800jr_interrupt);
-	DECLARE_READ8_MEMBER(i8255_port_c_r);
-	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
+	uint8_t i8255_port_c_r();
+	void i8255_port_c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
 	void elwro800_bank1(address_map &map);
@@ -117,7 +117,7 @@ uint8_t elwro800_state::nmi_r()
  *
  *************************************/
 
-WRITE8_MEMBER(elwro800_state::elwro800jr_fdc_control_w)
+void elwro800_state::elwro800jr_fdc_control_w(uint8_t data)
 {
 	for (int i = 0; i < 2; i++)
 		if (m_flop[i]->get_device())
@@ -203,12 +203,12 @@ WRITE_LINE_MEMBER(elwro800_state::write_centronics_ack)
 	m_i8255->pc2_w(state);
 }
 
-READ8_MEMBER(elwro800_state::i8255_port_c_r)
+uint8_t elwro800_state::i8255_port_c_r()
 {
 	return m_centronics_ack << 2;
 }
 
-WRITE8_MEMBER(elwro800_state::i8255_port_c_w)
+void elwro800_state::i8255_port_c_w(uint8_t data)
 {
 	m_centronics->write_strobe((data >> 7) & 0x01);
 }
@@ -235,7 +235,7 @@ WRITE8_MEMBER(elwro800_state::i8255_port_c_w)
  *  0x??FE, 0x??7F, 0x??7B (read): keyboard reading
  *************************************/
 
-READ8_MEMBER(elwro800_state::elwro800jr_io_r)
+uint8_t elwro800_state::elwro800jr_io_r(offs_t offset)
 {
 	uint8_t *prom = memregion("proms")->base();
 	uint8_t cs = prom[offset & 0x1ff];
@@ -312,7 +312,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
+void elwro800_state::elwro800jr_io_w(offs_t offset, uint8_t data)
 {
 	uint8_t *prom = memregion("proms")->base();
 	uint8_t cs = prom[offset & 0x1ff];
@@ -320,7 +320,7 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 	if (!BIT(cs,0))
 	{
 		// CFE
-		spectrum_port_fe_w(space, 0, data);
+		spectrum_port_fe_w(data);
 	}
 	else if (!BIT(cs,1))
 	{
@@ -348,7 +348,7 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 	else if (!BIT(cs,5))
 	{
 		// CF1
-		elwro800jr_fdc_control_w(space, 0, data);
+		elwro800jr_fdc_control_w(data);
 	}
 	else
 	{
@@ -587,8 +587,8 @@ void elwro800_state::elwro800(machine_config &config)
 
 	I8255A(config, m_i8255, 0);
 	m_i8255->in_pa_callback().set_ioport("JOY");
-	m_i8255->in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
-	m_i8255->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_i8255->in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::read));
+	m_i8255->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_i8255->in_pc_callback().set(FUNC(elwro800_state::i8255_port_c_r));
 	m_i8255->out_pc_callback().set(FUNC(elwro800_state::i8255_port_c_w));
 

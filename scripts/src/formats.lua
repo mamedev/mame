@@ -931,6 +931,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/h8_cas.h,FORMATS["H8_CAS"] = true
+--------------------------------------------------
+
+if (FORMATS["H8_CAS"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/h8_cas.cpp",
+		MAME_DIR.. "src/lib/formats/h8_cas.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/hector_minidisc.h,FORMATS["HECTOR_MINIDISC"] = true
 --------------------------------------------------
 
@@ -998,6 +1010,18 @@ if (FORMATS["HP_IPC_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/hp_ipc_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/hp_ipc_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/img_dsk.h,FORMATS["IMG_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["IMG_DSK"]~=null or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/img_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/img_dsk.h",
 	}
 end
 
@@ -1346,6 +1370,18 @@ if (FORMATS["ORIC_TAP"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/oric_tap.cpp",
 		MAME_DIR.. "src/lib/formats/oric_tap.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/ibmxdf_dsk.h,FORMATS["IBMXDF_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["IBMXDF_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/ibmxdf_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/ibmxdf_dsk.h",
 	}
 end
 

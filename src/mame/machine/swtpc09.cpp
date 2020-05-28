@@ -20,6 +20,7 @@
 #define UNIFLEX_DMAF2 2
 #define UNIFLEX_DMAF3 3
 #define FLEX_DC5_PIAIDE 4
+#define OS9_DC5 5
 
 
 READ8_MEMBER(swtpc09_state::unmapped_r)
@@ -45,7 +46,7 @@ WRITE_LINE_MEMBER(swtpc09_state::io_irq_w)
 
 /******* MC6840 PTM on MPID Board *******/
 
-/* 6840 PTM handlers */
+// 6840 PTM handlers
 WRITE_LINE_MEMBER( swtpc09_state::ptm_o1_callback )
 {
 	m_pia_counter++;
@@ -55,7 +56,7 @@ WRITE_LINE_MEMBER( swtpc09_state::ptm_o1_callback )
 
 WRITE_LINE_MEMBER( swtpc09_state::ptm_o3_callback )
 {
-	/* the output from timer3 is the input clock for timer2 */
+	// the output from timer3 is the input clock for timer2
 	//m_ptm->set_c2(state);
 }
 
@@ -70,12 +71,12 @@ WRITE_LINE_MEMBER( swtpc09_state::ptm_irq )
 /******* MC6821 PIA on MPID Board *******/
 /* Read/Write handlers for pia */
 
-READ8_MEMBER( swtpc09_state::pia0_a_r )
+uint8_t swtpc09_state::pia0_a_r()
 {
 	return m_pia_counter;
 }
 
-READ8_MEMBER( swtpc09_state::pia0_ca1_r )
+uint8_t swtpc09_state::pia0_ca1_r()
 {
 	return 0;
 }
@@ -138,8 +139,7 @@ void swtpc09_state::validate_floppy_side(uint8_t cmd)
 				}
 			}
 		}
-
-		if (expected_sectors)
+		else if (expected_sectors)
 		{
 			uint8_t expected_side = sector > expected_sectors ? 1 : 0;
 
@@ -169,13 +169,13 @@ uint8_t swtpc09_state::validate_fdc_dden(uint8_t dden)
 			return 1;
 		case 2:
 		{
-			// Double density with track zero single density.
+			// Double density with track zero head zero single density.
 			uint8_t track = m_fdc->track_r();
 
-			if (track == 0)
+			if (track == 0 && m_fdc_side == 0)
 			{
 				if (!dden)
-					logerror("%s Unexpected DDEN %d for single density trak 0\n", machine().describe_context(), dden);
+					logerror("%s Unexpected DDEN %d for single density track 0 head 0\n", machine().describe_context(), dden);
 				return 1;
 			}
 			if (dden)
@@ -183,6 +183,21 @@ uint8_t swtpc09_state::validate_fdc_dden(uint8_t dden)
 			return 0;
 		}
 		case 3:
+		{
+			// Double density with track zero all heads single density.
+			uint8_t track = m_fdc->track_r();
+
+			if (track == 0)
+			{
+				if (!dden)
+					logerror("%s Unexpected DDEN %d for single density track 0\n", machine().describe_context(), dden);
+				return 1;
+			}
+			if (dden)
+				logerror("%s Unexpected DDEN %d for double density\n", machine().describe_context(), dden);
+			return 0;
+		}
+		case 4:
 			// Pure double density.
 			if (dden)
 				logerror("%s Unexpected DDEN %d for double density\n", machine().describe_context(), dden);
@@ -229,6 +244,7 @@ WRITE8_MEMBER ( swtpc09_state::dmaf2_fdc_w )
 
 	if (offset == 0) {
 		validate_floppy_side(data);
+		m_fdc->dden_w(validate_fdc_dden(m_fdc_dden));
 		data = validate_fdc_sector_size(data);
 	}
 
@@ -298,6 +314,7 @@ WRITE8_MEMBER ( swtpc09_state::dmaf2_control_reg_w )
 	uint8_t dden = BIT(data, 5);
 	dden = validate_fdc_dden(dden);
 	m_fdc->dden_w(dden);
+	m_fdc_dden = dden;
 }
 
 /* common interrupt handler */
@@ -410,6 +427,7 @@ WRITE8_MEMBER ( swtpc09_state::dmaf3_fdc_w )
 
 	if (offset == 0) {
 		validate_floppy_side(data);
+		m_fdc->dden_w(validate_fdc_dden(m_fdc_dden));
 		data = validate_fdc_sector_size(data);
 	}
 
@@ -417,12 +435,12 @@ WRITE8_MEMBER ( swtpc09_state::dmaf3_fdc_w )
 }
 
 /* via on dmaf3 board */
-READ8_MEMBER( swtpc09_state::dmaf3_via_read_porta )
+uint8_t swtpc09_state::dmaf3_via_read_porta()
 {
 	return m_dmaf3_via_porta;
 }
 
-READ8_MEMBER( swtpc09_state::dmaf3_via_read_portb )
+uint8_t swtpc09_state::dmaf3_via_read_portb()
 {
 	// Bit 0 - output ?
 	// Bit 1 - output, tape drive request strobe.
@@ -438,12 +456,12 @@ READ8_MEMBER( swtpc09_state::dmaf3_via_read_portb )
 	return m_dmaf3_via_portb | 0x20;
 }
 
-WRITE8_MEMBER( swtpc09_state::dmaf3_via_write_porta )
+void swtpc09_state::dmaf3_via_write_porta(uint8_t data)
 {
 	m_dmaf3_via_porta &= data;
 }
 
-WRITE8_MEMBER( swtpc09_state::dmaf3_via_write_portb )
+void swtpc09_state::dmaf3_via_write_portb(uint8_t data)
 {
 	m_dmaf3_via_portb &= data;
 }
@@ -517,6 +535,7 @@ WRITE8_MEMBER ( swtpc09_state::dmaf3_control_reg_w )
 	uint8_t dden = BIT(data, 5);
 	dden = validate_fdc_dden(dden);
 	m_fdc->dden_w(dden);
+	m_fdc_dden = dden;
 }
 
 // DMAF3 WD1000 hard disk controller.
@@ -604,29 +623,24 @@ offs_t swtpc09_state::dat_translate(offs_t offset) const
 READ8_MEMBER(swtpc09_state::main_r)
 {
 	if (offset < 0xff00)
-	{
 		return m_banked_space->read_byte(dat_translate(offset));
-	}
+	else if (m_system_type == OS9_DC5)
+		return m_banked_space->read_byte(offset | 0x0ff00);
 	else
-	{
 		return m_banked_space->read_byte(offset | 0xfff00);
-	}
 }
 
 WRITE8_MEMBER(swtpc09_state::main_w)
 {
 	if (offset < 0xff00)
-	{
 		m_banked_space->write_byte(dat_translate(offset), data);
-	}
+	else if (m_system_type == OS9_DC5)
+		m_banked_space->write_byte(offset | 0x0ff00, data);
 	else
-	{
 		m_banked_space->write_byte(offset | 0xfff00, data);
-	}
 }
 
 /*  MC6844 DMA controller I/O */
-
 
 void swtpc09_state::m6844_update_interrupt()
 {
@@ -735,10 +749,10 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 {
 	uint8_t result = 0;
 
-	/* switch off the offset we were given */
+	// switch off the offset we were given
 	switch (offset)
 	{
-		/* upper byte of address */
+		// upper byte of address
 		case 0x00:
 		case 0x04:
 		case 0x08:
@@ -746,7 +760,7 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 			result = m_m6844_channel[offset / 4].address >> 8;
 			break;
 
-		/* lower byte of address */
+		// lower byte of address
 		case 0x01:
 		case 0x05:
 		case 0x09:
@@ -754,7 +768,7 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 			result = m_m6844_channel[offset / 4].address & 0xff;
 			break;
 
-		/* upper byte of counter */
+		// upper byte of counter
 		case 0x02:
 		case 0x06:
 		case 0x0a:
@@ -762,7 +776,7 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 			result = m_m6844_channel[offset / 4].counter >> 8;
 			break;
 
-		/* lower byte of counter */
+		// lower byte of counter
 		case 0x03:
 		case 0x07:
 		case 0x0b:
@@ -770,7 +784,7 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 			result = m_m6844_channel[offset / 4].counter & 0xff;
 			break;
 
-		/* channel control */
+		// channel control
 		case 0x10:
 		case 0x11:
 		case 0x12:
@@ -787,33 +801,30 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 			}
 			break;
 
-		/* priority control */
+		// priority control
 		case 0x14:
 			result = m_m6844_priority;
 			break;
 
-		/* interrupt control */
+		// interrupt control
 		case 0x15:
 			result = m_m6844_interrupt;
 			break;
 
-		/* chaining control */
+		// chaining control
 		case 0x16:
 			result = m_m6844_chain;
 			break;
 
-		/* 0x17-0x1f not used */
+		// 0x17-0x1f not used
 		default: break;
 	}
 
-	if (m_system_type == UNIFLEX_DMAF2 || m_system_type == FLEX_DMAF2)   // if DMAF2 controller data bus is inverted to 6844
-	{
+	// if DMAF2 controller data bus is inverted to 6844
+	if (m_system_type == UNIFLEX_DMAF2 || m_system_type == FLEX_DMAF2)
 		return ~result & 0xff;
-	}
 	else
-	{
 		return result & 0xff;
-	}
 }
 
 
@@ -821,13 +832,14 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 {
 	int i;
 
-	if (m_system_type == UNIFLEX_DMAF2 || m_system_type == FLEX_DMAF2)   // if DMAF2 controller data bus is inverted to 6844
+	// if DMAF2 controller data bus is inverted to 6844
+	if (m_system_type == UNIFLEX_DMAF2 || m_system_type == FLEX_DMAF2)
 		data = ~data & 0xff;
 
-	/* switch off the offset we were given */
+	// switch off the offset we were given
 	switch (offset)
 	{
-		/* upper byte of address */
+		// upper byte of address
 		case 0x00:
 		case 0x04:
 		case 0x08:
@@ -835,7 +847,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 			m_m6844_channel[offset / 4].address = (m_m6844_channel[offset / 4].address & 0xff) | (data << 8);
 			break;
 
-		/* lower byte of address */
+		// lower byte of address
 		case 0x01:
 		case 0x05:
 		case 0x09:
@@ -843,7 +855,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 			m_m6844_channel[offset / 4].address = (m_m6844_channel[offset / 4].address & 0xff00) | (data & 0xff);
 			break;
 
-		/* upper byte of counter */
+		// upper byte of counter
 		case 0x02:
 		case 0x06:
 		case 0x0a:
@@ -851,7 +863,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 			m_m6844_channel[offset / 4].counter = (m_m6844_channel[offset / 4].counter & 0xff) | (data << 8);
 			break;
 
-		/* lower byte of counter */
+		// lower byte of counter
 		case 0x03:
 		case 0x07:
 		case 0x0b:
@@ -859,7 +871,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 			m_m6844_channel[offset / 4].counter = (m_m6844_channel[offset / 4].counter & 0xff00) | (data & 0xff);
 			break;
 
-		/* channel control */
+		// channel control
 		case 0x10:
 		case 0x11:
 		case 0x12:
@@ -867,55 +879,71 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 			m_m6844_channel[offset - 0x10].control = (m_m6844_channel[offset - 0x10].control & 0xc0) | (data & 0x3f);
 			break;
 
-		/* priority control */
+		// priority control
 		case 0x14:
 			m_m6844_priority = data;
 
-			/* update each channel */
+			// update each channel
 			for (i = 0; i < 4; i++)
 			{
-				/* if we're going active... */
+				// if we're going active...
 				if (!m_m6844_channel[i].active && (data & (1 << i)))
 				{
-					/* mark us active */
+					// mark us active
 					m_m6844_channel[i].active = 1;
 
-					/* set the DMA busy bit and clear the DMA end bit */
+					// set the DMA busy bit and clear the DMA end bit
 					m_m6844_channel[i].control |= 0x40;
 					m_m6844_channel[i].control &= ~0x80;
 
-					/* set the starting address, counter, and time */
+					// set the starting address, counter, and time
 					m_m6844_channel[i].start_address = m_m6844_channel[i].address;
 					m_m6844_channel[i].start_counter = m_m6844_channel[i].counter;
-
-
-					/* generate and play the sample */
-					//play_cvsd(space->machine, i);
 				}
 
-				/* if we're going inactive... */
+				// if we're going inactive...
 				else if (m_m6844_channel[i].active && !(data & (1 << i)))
 				{
-					/* mark us inactive */
+					//mark us inactive
 					m_m6844_channel[i].active = 0;
 				}
 			}
 			break;
 
-		/* interrupt control */
+		// interrupt control
 		case 0x15:
 			m_m6844_interrupt = (m_m6844_interrupt & 0x80) | (data & 0x7f);
 			m6844_update_interrupt();
 			break;
 
-		/* chaining control */
+		// chaining control
 		case 0x16:
 			m_m6844_chain = data;
 			break;
 
-		/* 0x17-0x1f not used */
+		// 0x17-0x1f not used
 		default: break;
 	}
+}
+
+INPUT_CHANGED_MEMBER(swtpc09_state::maincpu_clock_change)
+{
+	m_maincpu->set_clock(newval * 4);
+}
+
+INPUT_CHANGED_MEMBER(swtpc09_state::fdc_clock_change)
+{
+	if (m_system_type == FLEX_DMAF2 ||
+		m_system_type == UNIFLEX_DMAF2 ||
+		m_system_type == UNIFLEX_DMAF3)
+	{
+		m_fdc->set_unscaled_clock(newval);
+	}
+}
+
+INPUT_CHANGED_MEMBER(swtpc09_state::baud_rate_high_change)
+{
+	m_brg->rsa_w(newval);
 }
 
 void swtpc09_state::machine_reset()
@@ -933,13 +961,13 @@ void swtpc09_state::machine_reset()
 
 	// Divider select X64 is the default Low baud rate setting. A High
 	// baud rate setting is also available that selects a X16 divider, so
-	// gives rate four times as high. Note the schematic appears to have
-	// mislabeled the this setting.
+	// gives a rate four times as high. Note the schematic appears to have
+	// mislabeled this setting.
 	uint8_t baud_rate_high = m_baud_rate_high->read();
 	m_brg->rsa_w(baud_rate_high);
 	m_brg->rsb_w(1);
 
-	m_pia->write_portb(0);
+	m_pia->portb_w(0);
 	m_pia->cb1_w(0);
 	m_pia->ca2_w(0);
 	m_pia->cb2_w(0);
@@ -947,7 +975,7 @@ void swtpc09_state::machine_reset()
 	// Note UNIBUG has a smarter boot loader in ROM and will toggle the
 	// density on failure so this is not necessary for UniFLEX.
 	if ((m_system_type == FLEX_DMAF2 ||
-		 m_system_type == FLEX_DC5_PIAIDE) &&
+		m_system_type == FLEX_DC5_PIAIDE) &&
 		m_sbug_double_density->read())
 	{
 		// Patch the boot ROM to load the boot sector in double density.
@@ -971,12 +999,13 @@ void swtpc09_state::machine_reset()
 
 void swtpc09_state::machine_start()
 {
-	m_pia_counter = 0;  // init ptm/pia counter to 0
+	m_pia_counter = 0;   // init ptm/pia counter to 0
 	m_fdc_status = 0;    // for floppy controller
 	m_interrupt = 0;
 	m_active_interrupt = false;
 
 	m_fdc_side = 0;
+	m_fdc_dden = 0;
 
 	// Start with the IRQ disabled?
 	m_dmaf2_interrupt_enable = 0;
@@ -1000,6 +1029,31 @@ void swtpc09_state::machine_start()
 	m_m6844_chain = 0x00;
 
 	m_banked_space = &subdevice<address_map_bank_device>("bankdev")->space(AS_PROGRAM);
+
+	save_item(NAME(m_pia_counter));
+	save_item(NAME(m_dmaf_high_address));
+	save_item(NAME(m_dmaf2_interrupt_enable));
+	save_item(NAME(m_system_type));
+	save_item(NAME(m_fdc_status));
+	save_item(NAME(m_floppy_motor_on));
+	save_item(NAME(m_fdc_side));
+	save_item(NAME(m_fdc_dden));
+	save_item(NAME(m_dmaf3_via_porta));
+	save_item(NAME(m_dmaf3_via_portb));
+	save_item(NAME(m_active_interrupt));
+	save_item(NAME(m_interrupt));
+	for (int i = 0; i < 4; i++)
+	{
+		save_item(NAME(m_m6844_channel[i].active), i);
+		save_item(NAME(m_m6844_channel[i].address), i);
+		save_item(NAME(m_m6844_channel[i].counter), i);
+		save_item(NAME(m_m6844_channel[i].control), i);
+		save_item(NAME(m_m6844_channel[i].start_address), i);
+		save_item(NAME(m_m6844_channel[i].start_counter), i);
+	}
+	save_item(NAME(m_m6844_priority));
+	save_item(NAME(m_m6844_interrupt));
+	save_item(NAME(m_m6844_chain));
 }
 
 void swtpc09_state::init_swtpc09()
@@ -1022,4 +1076,9 @@ void swtpc09_state::init_swtpc09d3()
 	m_system_type = UNIFLEX_DMAF3;
 	// UniFLEX numbers sectors from 1.
 	m_hdc->set_sector_base(1);
+}
+
+void swtpc09_state::init_swtpc09o()
+{
+	m_system_type = OS9_DC5;
 }

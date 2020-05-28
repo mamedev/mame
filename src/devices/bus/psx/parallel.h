@@ -14,7 +14,7 @@
 
 class psx_parallel_interface;
 
-class psx_parallel_slot_device : public device_t, public device_slot_interface
+class psx_parallel_slot_device : public device_t, public device_single_card_slot_interface<psx_parallel_interface>
 {
 public:
 	// construction/destruction
@@ -33,25 +33,20 @@ public:
 	DECLARE_READ16_MEMBER(exp_r);
 	DECLARE_WRITE16_MEMBER(exp_w);
 
-	const bool hascard() const
-	{
-		return bool(m_card);
-	};
+	bool hascard() const { return bool(m_card); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	psx_parallel_interface *m_card;
 
 private:
+	psx_parallel_interface *m_card;
 };
 
 
 // ======================> psx_parallel_interface
 
-class psx_parallel_interface : public device_slot_card_interface
+class psx_parallel_interface : public device_interface
 {
 public:
 	// construction/destruction

@@ -471,12 +471,12 @@ WRITE_LINE_MEMBER(hp9895_device::phi_ren_w)
 	m_bus->ren_w(this , state);
 }
 
-READ8_MEMBER(hp9895_device::phi_dio_r)
+uint8_t hp9895_device::phi_dio_r()
 {
-	return m_bus->read_dio();
+	return m_bus->dio_r();
 }
 
-WRITE8_MEMBER(hp9895_device::phi_dio_w)
+void hp9895_device::phi_dio_w(uint8_t data)
 {
 	m_bus->dio_w(this , data);
 }
@@ -492,7 +492,7 @@ WRITE_LINE_MEMBER(hp9895_device::phi_int_w)
 
 READ8_MEMBER(hp9895_device::phi_reg_r)
 {
-	uint16_t reg = m_phi->reg16_r(space , offset , mem_mask);
+	uint16_t reg = m_phi->reg16_r(offset);
 
 	// Reading D1=1 from a register sets the Z80 IRQ line
 	if (BIT(reg , 14) && !m_cpu_irq) {
@@ -503,7 +503,7 @@ READ8_MEMBER(hp9895_device::phi_reg_r)
 	return (uint8_t)reg;
 }
 
-WRITE8_MEMBER(hp9895_device::z80_m1_w)
+void hp9895_device::z80_m1_w(uint8_t data)
 {
 	// Every M1 cycle of Z80 clears the IRQ line
 	if (m_cpu_irq) {
@@ -893,14 +893,14 @@ void hp9895_device::device_add_mconfig(machine_config &config)
 	m_cpu->refresh_cb().set(FUNC(hp9895_device::z80_m1_w));
 
 	PHI(config, m_phi, 0);
-	m_phi->signal_write_cb<phi_device::PHI_488_EOI>().set(FUNC(hp9895_device::phi_eoi_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_DAV>().set(FUNC(hp9895_device::phi_dav_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_NRFD>().set(FUNC(hp9895_device::phi_nrfd_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_NDAC>().set(FUNC(hp9895_device::phi_ndac_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_IFC>().set(FUNC(hp9895_device::phi_ifc_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_SRQ>().set(FUNC(hp9895_device::phi_srq_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_ATN>().set(FUNC(hp9895_device::phi_atn_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_REN>().set(FUNC(hp9895_device::phi_ren_w));
+	m_phi->eoi_write_cb().set(FUNC(hp9895_device::phi_eoi_w));
+	m_phi->dav_write_cb().set(FUNC(hp9895_device::phi_dav_w));
+	m_phi->nrfd_write_cb().set(FUNC(hp9895_device::phi_nrfd_w));
+	m_phi->ndac_write_cb().set(FUNC(hp9895_device::phi_ndac_w));
+	m_phi->ifc_write_cb().set(FUNC(hp9895_device::phi_ifc_w));
+	m_phi->srq_write_cb().set(FUNC(hp9895_device::phi_srq_w));
+	m_phi->atn_write_cb().set(FUNC(hp9895_device::phi_atn_w));
+	m_phi->ren_write_cb().set(FUNC(hp9895_device::phi_ren_w));
 	m_phi->dio_read_cb().set(FUNC(hp9895_device::phi_dio_r));
 	m_phi->dio_write_cb().set(FUNC(hp9895_device::phi_dio_w));
 	m_phi->int_write_cb().set(FUNC(hp9895_device::phi_int_w));

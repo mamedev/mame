@@ -339,7 +339,7 @@ GFXDECODE_END
 void offtwall_state::offtwall(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &offtwall_state::main_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
@@ -352,14 +352,14 @@ void offtwall_state::offtwall(machine_config &config)
 
 	ATARI_VAD(config, m_vad, 0, "screen");
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
-	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(offtwall_state::get_playfield_tile_info));
+	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(offtwall_state::get_playfield_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, "screen", offtwall_state::s_mob_config).set_gfxdecode("gfxdecode");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
-	screen.set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	screen.set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	screen.set_screen_update(FUNC(offtwall_state::screen_update_offtwall));
 	screen.set_palette("palette");
 
@@ -445,9 +445,9 @@ ROM_END
 void offtwall_state::init_offtwall()
 {
 	/* install son-of-slapstic workarounds */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037ec2, 0x037f39, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf1e, 0x3fdf1f, read16_delegate(FUNC(offtwall_state::unknown_verify_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(*this, FUNC(offtwall_state::spritecache_count_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037ec2, 0x037f39, read16_delegate(*this, FUNC(offtwall_state::bankswitch_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf1e, 0x3fdf1f, read16_delegate(*this, FUNC(offtwall_state::unknown_verify_r)));
 	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800)/2;
 	m_bankswitch_base = (uint16_t *)(memregion("maincpu")->base() + 0x37ec2);
 	m_unknown_verify_base = m_mainram + (0x3fdf1e - 0x3fd800)/2;
@@ -457,9 +457,9 @@ void offtwall_state::init_offtwall()
 void offtwall_state::init_offtwalc()
 {
 	/* install son-of-slapstic workarounds */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037eca, 0x037f43, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf24, 0x3fdf25, read16_delegate(FUNC(offtwall_state::unknown_verify_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(*this, FUNC(offtwall_state::spritecache_count_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037eca, 0x037f43, read16_delegate(*this, FUNC(offtwall_state::bankswitch_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf24, 0x3fdf25, read16_delegate(*this, FUNC(offtwall_state::unknown_verify_r)));
 	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800)/2;
 	m_bankswitch_base = (uint16_t *)(memregion("maincpu")->base() + 0x37eca);
 	m_unknown_verify_base = m_mainram + (0x3fdf24 - 0x3fd800)/2;

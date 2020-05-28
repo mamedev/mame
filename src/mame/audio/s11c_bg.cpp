@@ -43,9 +43,9 @@ WRITE_LINE_MEMBER( s11c_bg_device::pia40_cb2_w)
 //  m_pia34->cb1_w(state);  // To Widget MCB1 through CPU Data interface
 }
 
-WRITE8_MEMBER( s11c_bg_device::pia40_pb_w )
+void s11c_bg_device::pia40_pb_w(uint8_t data)
 {
-//  m_pia34->write_portb(data);
+//  m_pia34->portb_w(data);
 }
 
 void s11c_bg_device::ctrl_w(uint8_t data)
@@ -55,14 +55,14 @@ void s11c_bg_device::ctrl_w(uint8_t data)
 
 void s11c_bg_device::data_w(uint8_t data)
 {
-	m_pia40->write_portb(data);
+	m_pia40->portb_w(data);
 }
 
 void s11c_bg_device::device_add_mconfig(machine_config &config)
 {
 	MC6809E(config, m_cpu, XTAL(8'000'000) / 4); // MC68B09E
 	m_cpu->set_addrmap(AS_PROGRAM, &s11c_bg_device::s11c_bg_map);
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	YM2151(config, m_ym2151, XTAL(3'579'545)); // "3.58 MHz" on schematics and parts list
 	m_ym2151->irq_handler().set(FUNC(s11c_bg_device::ym2151_irq_w));
@@ -104,19 +104,19 @@ WRITE_LINE_MEMBER( s11c_bg_device::ym2151_irq_w)
 		m_pia40->ca1_w(0);
 }
 
-WRITE8_MEMBER( s11c_bg_device::bg_speech_clock_w )
+void s11c_bg_device::bg_speech_clock_w(uint8_t data)
 {
 	// pulses clock input?
 	m_hc55516->clock_w(1);
 	m_hc55516->clock_w(0);
 }
 
-WRITE8_MEMBER( s11c_bg_device::bg_speech_digit_w )
+void s11c_bg_device::bg_speech_digit_w(uint8_t data)
 {
 	m_hc55516->digit_w(data);
 }
 
-WRITE8_MEMBER( s11c_bg_device::bgbank_w )
+void s11c_bg_device::bgbank_w(uint8_t data)
 {
 	uint8_t bank = ((data & 0x04) >> 2) | ((data & 0x03) << 1);
 	m_cpubank->set_entry(bank);

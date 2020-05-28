@@ -70,6 +70,7 @@ micropolis_device::micropolis_device(const machine_config &mconfig, const char *
 	m_read_dden(*this),
 	m_write_intrq(*this),
 	m_write_drq(*this),
+	m_floppy_drive(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG}),
 	m_data(0),
 	m_drive_num(0),
 	m_track(0),
@@ -83,7 +84,6 @@ micropolis_device::micropolis_device(const machine_config &mconfig, const char *
 	m_drive(nullptr)
 {
 	std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
-	std::fill(std::begin(m_floppy_drive_tags), std::end(m_floppy_drive_tags), nullptr);
 }
 
 //-------------------------------------------------
@@ -115,18 +115,13 @@ void micropolis_device::device_start()
 
 void micropolis_device::device_reset()
 {
-	for (auto & elem : m_floppy_drive_tags)
+	for (auto &img : m_floppy_drive)
 	{
-		if (elem)
+		if (img.found())
 		{
-			legacy_floppy_image_device *img = siblingdevice<legacy_floppy_image_device>(elem);
-
-			if (img)
-			{
-				img->floppy_drive_set_controller(this);
-				//img->floppy_drive_set_index_pulse_callback(wd17xx_index_pulse_callback);
-				img->floppy_drive_set_rpm(300.);
-			}
+			img->floppy_drive_set_controller(this);
+			//img->floppy_drive_set_index_pulse_callback(wd17xx_index_pulse_callback);
+			img->floppy_drive_set_rpm(300.);
 		}
 	}
 
@@ -185,8 +180,7 @@ void micropolis_device::set_drive(uint8_t drive)
 	if (VERBOSE)
 		logerror("micropolis_set_drive: $%02x\n", drive);
 
-	if (m_floppy_drive_tags[drive])
-		m_drive = siblingdevice<legacy_floppy_image_device>(m_floppy_drive_tags[drive]);
+	m_drive = m_floppy_drive[drive].target();
 }
 
 
@@ -196,7 +190,7 @@ void micropolis_device::set_drive(uint8_t drive)
 
 
 /* read the FDC status register. */
-READ8_MEMBER( micropolis_device::status_r )
+uint8_t micropolis_device::status_r(offs_t offset)
 {
 	static int inv = 0;
 
@@ -214,7 +208,7 @@ READ8_MEMBER( micropolis_device::status_r )
 
 
 /* read the FDC data register */
-READ8_MEMBER( micropolis_device::data_r )
+uint8_t micropolis_device::data_r()
 {
 	if (m_data_offset >= m_sector_length)
 		return 0;
@@ -223,7 +217,7 @@ READ8_MEMBER( micropolis_device::data_r )
 }
 
 /* write the FDC command register */
-WRITE8_MEMBER( micropolis_device::command_w )
+void micropolis_device::command_w(uint8_t data)
 {
 /* List of commands:
 Command (bits 5,6,7)      Options (bits 0,1,2,3,4)
@@ -283,7 +277,7 @@ Command (bits 5,6,7)      Options (bits 0,1,2,3,4)
 
 
 /* write the FDC data register */
-WRITE8_MEMBER( micropolis_device::data_w )
+void micropolis_device::data_w(uint8_t data)
 {
 	if (m_data_count > 0)
 	{
@@ -308,28 +302,28 @@ WRITE8_MEMBER( micropolis_device::data_w )
 	m_data = data;
 }
 
-READ8_MEMBER( micropolis_device::read )
+uint8_t micropolis_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
 	switch (offset & 0x03)
 	{
-	case 0: data = status_r(space, 0); break;
-	case 1: data = status_r(space, 1); break;
+	case 0: data = status_r(0); break;
+	case 1: data = status_r(1); break;
 	case 2:
-	case 3: data = data_r(space, 0); break;
+	case 3: data = data_r(); break;
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER( micropolis_device::write )
+void micropolis_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x03)
 	{
 	case 0:
-	case 1: command_w(space, 0, data); break;
+	case 1: command_w(data); break;
 	case 2:
-	case 3: data_w(space, 0, data);    break;
+	case 3: data_w(data);    break;
 	}
 }

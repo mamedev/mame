@@ -73,13 +73,15 @@ public:
 
 	void quantum(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override { m_leds.resolve(); }
-	DECLARE_READ16_MEMBER(trackball_r);
-	DECLARE_WRITE16_MEMBER(led_w);
-	DECLARE_WRITE16_MEMBER(nvram_recall_w);
-	DECLARE_READ8_MEMBER(input_1_r);
-	DECLARE_READ8_MEMBER(input_2_r);
+
+private:
+	uint16_t trackball_r();
+	void led_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void nvram_recall_w(uint16_t data);
+	uint8_t input_1_r(offs_t offset);
+	uint8_t input_2_r(offs_t offset);
 	void main_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -99,19 +101,19 @@ static constexpr XTAL CLOCK_3KHZ   = MASTER_CLOCK / 4096;
  *
  *************************************/
 
-READ16_MEMBER(quantum_state::trackball_r)
+uint16_t quantum_state::trackball_r()
 {
 	return (ioport("TRACKY")->read() << 4) | ioport("TRACKX")->read();
 }
 
 
-READ8_MEMBER(quantum_state::input_1_r)
+uint8_t quantum_state::input_1_r(offs_t offset)
 {
 	return (ioport("DSW0")->read() << (7 - (offset - pokey_device::POT0_C))) & 0x80;
 }
 
 
-READ8_MEMBER(quantum_state::input_2_r)
+uint8_t quantum_state::input_2_r(offs_t offset)
 {
 	return (ioport("DSW1")->read() << (7 - (offset - pokey_device::POT0_C))) & 0x80;
 }
@@ -124,7 +126,7 @@ READ8_MEMBER(quantum_state::input_2_r)
  *
  *************************************/
 
-WRITE16_MEMBER(quantum_state::led_w)
+void quantum_state::led_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -146,7 +148,7 @@ WRITE16_MEMBER(quantum_state::led_w)
 	}
 }
 
-WRITE16_MEMBER(quantum_state::nvram_recall_w)
+void quantum_state::nvram_recall_w(uint16_t data)
 {
 	m_nvram->recall(1);
 	m_nvram->recall(0);
@@ -188,7 +190,7 @@ void quantum_state::main_map(address_map &map)
 static INPUT_PORTS_START( quantum )
 	PORT_START("SYSTEM")
 	/* YHALT here MUST BE ALWAYS 0  */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_quantum_device, done_r, nullptr) /* vg YHALT */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_quantum_device, done_r) // vg YHALT
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )

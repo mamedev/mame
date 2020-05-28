@@ -53,12 +53,12 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	uint32_t screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(k052109_051960_r);
-	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	uint8_t k052109_051960_r(offs_t offset);
+	void k052109_051960_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(sound_irq_w);
+	void sound_irq_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(uint8_t data);
 
 	void blockhl(machine_config &config);
 	void audio_map(address_map &map);
@@ -148,7 +148,7 @@ uint32_t blockhl_state::screen_update_blockhl(screen_device &screen, bitmap_ind1
 }
 
 // special handlers to combine 052109 & 051960
-READ8_MEMBER( blockhl_state::k052109_051960_r )
+uint8_t blockhl_state::k052109_051960_r(offs_t offset)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
@@ -163,7 +163,7 @@ READ8_MEMBER( blockhl_state::k052109_051960_r )
 		return m_k052109->read(offset);
 }
 
-WRITE8_MEMBER( blockhl_state::k052109_051960_w )
+void blockhl_state::k052109_051960_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
 		m_k051960->k051937_w(offset - 0x3800, data);
@@ -178,7 +178,7 @@ WRITE8_MEMBER( blockhl_state::k052109_051960_w )
 //  AUDIO EMULATION
 //**************************************************************************
 
-WRITE8_MEMBER( blockhl_state::sound_irq_w )
+void blockhl_state::sound_irq_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
@@ -194,7 +194,7 @@ void blockhl_state::machine_start()
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 }
 
-WRITE8_MEMBER( blockhl_state::banking_callback )
+void blockhl_state::banking_callback(uint8_t data)
 {
 	// bits 0-1 = ROM bank
 	m_rombank->set_entry(data & 0x03);
@@ -306,13 +306,13 @@ void blockhl_state::blockhl(machine_config &config)
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
-	m_k052109->set_tile_callback(FUNC(blockhl_state::tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(blockhl_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
-	m_k051960->set_sprite_callback(FUNC(blockhl_state::sprite_callback), this);
+	m_k051960->set_sprite_callback(FUNC(blockhl_state::sprite_callback));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

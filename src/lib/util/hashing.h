@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
     hashing.h
@@ -7,7 +7,6 @@
     Hashing helper classes.
 
 ***************************************************************************/
-
 #ifndef MAME_UTIL_HASHING_H
 #define MAME_UTIL_HASHING_H
 
@@ -16,13 +15,14 @@
 #include "osdcore.h"
 #include "corestr.h"
 #include "md5.h"
-#include "sha1.h"
 
+#include <array>
 #include <functional>
 #include <string>
 
 
 namespace util {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -50,19 +50,13 @@ public:
 	sha1_creator() { reset(); }
 
 	// reset
-	void reset() { sha1_init(&m_context); }
+	void reset();
 
 	// append data
-	void append(const void *data, uint32_t length) { sha1_update(&m_context, length, reinterpret_cast<const uint8_t *>(data)); }
+	void append(const void *data, uint32_t length);
 
 	// finalize and compute the final digest
-	sha1_t finish()
-	{
-		sha1_t result;
-		sha1_final(&m_context);
-		sha1_digest(&m_context, sizeof(result.m_raw), result.m_raw);
-		return result;
-	}
+	sha1_t finish();
 
 	// static wrapper to just get the digest from a block
 	static sha1_t simple(const void *data, uint32_t length)
@@ -73,8 +67,9 @@ public:
 	}
 
 protected:
-	// internal state
-	struct sha1_ctx     m_context;      // internal context
+	uint64_t m_cnt;
+	std::array<uint32_t, 5> m_st;
+	uint32_t m_buf[16];
 };
 
 

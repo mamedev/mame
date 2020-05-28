@@ -177,12 +177,12 @@ void t5182_device::device_start()
 	save_item(NAME(m_semaphore_snd));
 }
 
-READ8_MEMBER(t5182_device::sharedram_r)
+uint8_t t5182_device::sharedram_r(offs_t offset)
 {
 	return m_sharedram[offset];
 }
 
-WRITE8_MEMBER(t5182_device::sharedram_w)
+void t5182_device::sharedram_w(offs_t offset, uint8_t data)
 {
 	m_sharedram[offset] = data;
 }
@@ -225,25 +225,25 @@ void t5182_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 {
 	switch (id)
 	{
-		case SETIRQ_CB:
-			setirq_callback(ptr, param);
-			break;
-		default:
-			assert_always(false, "Unknown id in t5182_device::device_timer");
+	case SETIRQ_CB:
+		setirq_callback(ptr, param);
+		break;
+	default:
+		throw emu_fatalerror("Unknown id in t5182_device::device_timer");
 	}
 }
 
-WRITE8_MEMBER( t5182_device::sound_irq_w )
+void t5182_device::sound_irq_w(uint8_t data)
 {
 	synchronize(SETIRQ_CB, CPU_ASSERT);
 }
 
-WRITE8_MEMBER( t5182_device::ym2151_irq_ack_w )
+void t5182_device::ym2151_irq_ack_w(uint8_t data)
 {
 	synchronize(SETIRQ_CB, YM2151_ACK);
 }
 
-WRITE8_MEMBER( t5182_device::cpu_irq_ack_w )
+void t5182_device::cpu_irq_ack_w(uint8_t data)
 {
 	synchronize(SETIRQ_CB, CPU_CLEAR);
 }
@@ -256,32 +256,32 @@ WRITE_LINE_MEMBER(t5182_device::ym2151_irq_handler)
 		synchronize(SETIRQ_CB, YM2151_CLEAR);
 }
 
-READ8_MEMBER(t5182_device::sharedram_semaphore_snd_r)
+uint8_t t5182_device::sharedram_semaphore_snd_r()
 {
 	return m_semaphore_snd;
 }
 
-WRITE8_MEMBER(t5182_device::sharedram_semaphore_main_acquire_w)
+void t5182_device::sharedram_semaphore_main_acquire_w(uint8_t data)
 {
 	m_semaphore_main = 1;
 }
 
-WRITE8_MEMBER(t5182_device::sharedram_semaphore_main_release_w)
+void t5182_device::sharedram_semaphore_main_release_w(uint8_t data)
 {
 	m_semaphore_main = 0;
 }
 
-WRITE8_MEMBER(t5182_device::sharedram_semaphore_snd_acquire_w)
+void t5182_device::sharedram_semaphore_snd_acquire_w(uint8_t data)
 {
 	m_semaphore_snd = 1;
 }
 
-WRITE8_MEMBER(t5182_device::sharedram_semaphore_snd_release_w)
+void t5182_device::sharedram_semaphore_snd_release_w(uint8_t data)
 {
 	m_semaphore_snd = 0;
 }
 
-READ8_MEMBER(t5182_device::sharedram_semaphore_main_r)
+uint8_t t5182_device::sharedram_semaphore_main_r()
 {
 	return m_semaphore_main | (m_irqstate & 2);
 }

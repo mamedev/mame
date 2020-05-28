@@ -2189,6 +2189,8 @@ void amigo_device::device_start()
 {
 	m_mainboard = downcast<mainboard8_device*>(owner());
 
+	std::fill(std::begin(m_base_register), std::end(m_base_register), 0);
+
 	save_item(NAME(m_memen));
 	save_pointer(NAME(m_base_register),16);
 	save_item(NAME(m_logical_space));
@@ -2667,12 +2669,10 @@ void oso_device::update_hexbus()
 
 	// Check how the bus has changed. This depends on the states of all
 	// connected peripherals
-	uint8_t value1 = hexbus_read();
-	// if (value1 != value) LOGMASKED(LOG_OSO, "actually: %02x (BAV*=%d, HSK*=%d, data=%01x)\n", value1, (value1 & 0x04)? 1:0, (value1 & 0x10)? 1:0, ((value1>>4)&0x0c) | (value1&0x03));
 
 	// Update the state of BAV and HSK
-	m_bav = ((value1 & bus::hexbus::HEXBUS_LINE_BAV)==0);
-	m_hsk = ((value1 & bus::hexbus::HEXBUS_LINE_HSK)==0);
+	m_bav = (bus_bav_level()==ASSERT_LINE);
+	m_hsk = (bus_hsk_level()==ASSERT_LINE);
 
 	// Sometimes, Oso does not have a chance to advance its state after the
 	// last byte was read. In that case, a change of rdsetin would not be
@@ -2680,7 +2680,7 @@ void oso_device::update_hexbus()
 	// has happened.
 	if (m_hsk==false) m_rdsetold = false;
 
-	m_oldvalue = value1;
+	m_oldvalue = m_current_bus_value;
 }
 
 /*
@@ -2689,8 +2689,8 @@ void oso_device::update_hexbus()
 void oso_device::hexbus_value_changed(uint8_t data)
 {
 //  LOGMASKED(LOG_OSO, "Hexbus value changed to %02x\n", data);
-	bool bav = (data & bus::hexbus::HEXBUS_LINE_BAV)==0;
-	bool hsk = (data & bus::hexbus::HEXBUS_LINE_HSK)==0;
+	bool bav = (bus_bav_level()==ASSERT_LINE);
+	bool hsk = (bus_hsk_level()==ASSERT_LINE);
 
 	if ((bav != m_bav) || (hsk != m_hsk))
 	{
@@ -2698,7 +2698,7 @@ void oso_device::hexbus_value_changed(uint8_t data)
 		m_hsk = hsk;
 
 		LOGMASKED(LOG_HEXBUS, "BAV*=%d, HSK*=%d\n", m_bav? 0:1, m_hsk? 0:1);
-		int nibble = ((data & bus::hexbus::HEXBUS_LINE_BIT32)>>4) | (data & bus::hexbus::HEXBUS_LINE_BIT10);
+		int nibble = data_lines(data);
 
 		// The real devices are driven at a similar clock rate like the 99/8.
 		// The designers assumed that there is a clock tick of Oso between

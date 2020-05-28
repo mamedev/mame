@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 
 	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
@@ -524,8 +527,8 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="0" right="101" top="0" bottom="104" />
-		<bezel element="cblack"><bounds x="14" y="0" width="87" height="87" /></bezel>
+		<bounds left="0" right="102" top="-2" bottom="104" />
+		<bezel element="cblack"><bounds x="13" y="-2" width="89" height="89" /></bezel>
 		<bezel element="cwhite"><bounds x="17" y="2" width="81" height="81" /></bezel>
 
 		<group ref="panel"><bounds x="37.5" y="91" width="20" height="8" /></group>
@@ -537,14 +540,14 @@
 
 	<!-- chessboard coords -->
 
-		<bezel element="text_8"><bounds x="14.7" y="6.5" width="2" height="2" /></bezel>
-		<bezel element="text_7"><bounds x="14.7" y="16.5" width="2" height="2" /></bezel>
-		<bezel element="text_6"><bounds x="14.7" y="26.5" width="2" height="2" /></bezel>
-		<bezel element="text_5"><bounds x="14.7" y="36.5" width="2" height="2" /></bezel>
-		<bezel element="text_4"><bounds x="14.7" y="46.5" width="2" height="2" /></bezel>
-		<bezel element="text_3"><bounds x="14.7" y="56.5" width="2" height="2" /></bezel>
-		<bezel element="text_2"><bounds x="14.7" y="66.5" width="2" height="2" /></bezel>
-		<bezel element="text_1"><bounds x="14.7" y="76.5" width="2" height="2" /></bezel>
+		<bezel element="text_8"><bounds x="14.2" y="6.5" width="2" height="2" /></bezel>
+		<bezel element="text_7"><bounds x="14.2" y="16.5" width="2" height="2" /></bezel>
+		<bezel element="text_6"><bounds x="14.2" y="26.5" width="2" height="2" /></bezel>
+		<bezel element="text_5"><bounds x="14.2" y="36.5" width="2" height="2" /></bezel>
+		<bezel element="text_4"><bounds x="14.2" y="46.5" width="2" height="2" /></bezel>
+		<bezel element="text_3"><bounds x="14.2" y="56.5" width="2" height="2" /></bezel>
+		<bezel element="text_2"><bounds x="14.2" y="66.5" width="2" height="2" /></bezel>
+		<bezel element="text_1"><bounds x="14.2" y="76.5" width="2" height="2" /></bezel>
 
 		<bezel element="text_a"><bounds x="21.5" y="84" width="2" height="2" /></bezel>
 		<bezel element="text_b"><bounds x="31.5" y="84" width="2" height="2" /></bezel>

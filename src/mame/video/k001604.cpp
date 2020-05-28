@@ -73,17 +73,17 @@ void k001604_device::device_start()
 
 	if (m_layer_size)
 	{
-		m_layer_8x8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k001604_device::tile_info_layer_8x8),this), tilemap_mapper_delegate(FUNC(k001604_device::scan_layer_8x8_0_size1),this), 8, 8, 64, 64);
-		m_layer_8x8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k001604_device::tile_info_layer_8x8),this), tilemap_mapper_delegate(FUNC(k001604_device::scan_layer_8x8_1_size1),this), 8, 8, 64, 64);
+		m_layer_8x8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_layer_8x8)), tilemap_mapper_delegate(*this, FUNC(k001604_device::scan_layer_8x8_0_size1)), 8, 8, 64, 64);
+		m_layer_8x8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_layer_8x8)), tilemap_mapper_delegate(*this, FUNC(k001604_device::scan_layer_8x8_1_size1)), 8, 8, 64, 64);
 
-		m_layer_roz = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k001604_device::tile_info_layer_roz),this), tilemap_mapper_delegate(FUNC(k001604_device::scan_layer_roz_256),this), roz_tile_size, roz_tile_size, 128, 64);
+		m_layer_roz = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_layer_roz)), tilemap_mapper_delegate(*this, FUNC(k001604_device::scan_layer_roz_256)), roz_tile_size, roz_tile_size, 128, 64);
 	}
 	else
 	{
-		m_layer_8x8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k001604_device::tile_info_layer_8x8),this), tilemap_mapper_delegate(FUNC(k001604_device::scan_layer_8x8_0_size0),this), 8, 8, 64, 64);
-		m_layer_8x8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k001604_device::tile_info_layer_8x8),this), tilemap_mapper_delegate(FUNC(k001604_device::scan_layer_8x8_1_size0),this), 8, 8, 64, 64);
+		m_layer_8x8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_layer_8x8)), tilemap_mapper_delegate(*this, FUNC(k001604_device::scan_layer_8x8_0_size0)), 8, 8, 64, 64);
+		m_layer_8x8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_layer_8x8)), tilemap_mapper_delegate(*this, FUNC(k001604_device::scan_layer_8x8_1_size0)), 8, 8, 64, 64);
 
-		m_layer_roz = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k001604_device::tile_info_layer_roz),this), tilemap_mapper_delegate(FUNC(k001604_device::scan_layer_roz_128),this), roz_tile_size, roz_tile_size, 128, 64);
+		m_layer_roz = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_layer_roz)), tilemap_mapper_delegate(*this, FUNC(k001604_device::scan_layer_roz_128)), roz_tile_size, roz_tile_size, 128, 64);
 	}
 
 	m_layer_8x8[0]->set_transparent_pen(0);
@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_8x8)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, flags);
+	tileinfo.set(0, tile, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_roz)
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_roz)
 
 	tile += m_roz_size ? 0x800 : 0x2000;
 
-	SET_TILE_INFO_MEMBER(m_roz_size, tile, color, flags);
+	tileinfo.set(m_roz_size, tile, color, flags);
 }
 
 
@@ -342,12 +342,12 @@ void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitm
 	}
 }
 
-READ32_MEMBER( k001604_device::tile_r )
+uint32_t k001604_device::tile_r(offs_t offset)
 {
 	return m_tile_ram[offset];
 }
 
-READ32_MEMBER( k001604_device::char_r )
+uint32_t k001604_device::char_r(offs_t offset)
 {
 	int set, bank;
 	uint32_t addr;
@@ -364,7 +364,7 @@ READ32_MEMBER( k001604_device::char_r )
 	return m_char_ram[addr];
 }
 
-READ32_MEMBER( k001604_device::reg_r )
+uint32_t k001604_device::reg_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -375,7 +375,7 @@ READ32_MEMBER( k001604_device::reg_r )
 	return m_reg[offset];
 }
 
-WRITE32_MEMBER( k001604_device::tile_w )
+void k001604_device::tile_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int x/*, y*/;
 	COMBINE_DATA(m_tile_ram.get() + offset);
@@ -421,7 +421,7 @@ WRITE32_MEMBER( k001604_device::tile_w )
 	}
 }
 
-WRITE32_MEMBER( k001604_device::char_w )
+void k001604_device::char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int set, bank;
 	uint32_t addr;
@@ -441,7 +441,7 @@ WRITE32_MEMBER( k001604_device::char_w )
 	gfx(1)->mark_dirty(addr / 128);
 }
 
-WRITE32_MEMBER( k001604_device::reg_w )
+void k001604_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_reg.get() + offset);
 

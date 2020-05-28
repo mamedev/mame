@@ -49,8 +49,8 @@ private:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ16_MEMBER(test_hi_r);
-	DECLARE_READ8_MEMBER(pc_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	uint8_t pc_dma_read_byte(offs_t offset);
+	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint32_t screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void paso1600_io(address_map &map);
@@ -253,7 +253,7 @@ void paso1600_state::paso1600_io(address_map &map)
 	map(0x0048, 0x0049).r(FUNC(paso1600_state::test_hi_r));
 	map(0x0090, 0x0090).rw(FUNC(paso1600_state::paso1600_6845_status_r), FUNC(paso1600_state::paso1600_6845_address_w));
 	map(0x0091, 0x0091).rw(FUNC(paso1600_state::paso1600_6845_data_r), FUNC(paso1600_state::paso1600_6845_data_w));
-//  AM_RANGE(0x00d8,0x00df) //fdc, unknown type
+//  map(0x00d8,0x00df) //fdc, unknown type
 // other undefined ports: 18, 1C, 92
 }
 
@@ -287,21 +287,24 @@ void paso1600_state::machine_reset()
 {
 }
 
-READ8_MEMBER(paso1600_state::pc_dma_read_byte)
+uint8_t paso1600_state::pc_dma_read_byte(offs_t offset)
 {
 	//offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 	//  & 0xFF0000;
 
-	return space.read_byte(offset);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	return program.read_byte(offset);
 }
 
 
-WRITE8_MEMBER(paso1600_state::pc_dma_write_byte)
+void paso1600_state::pc_dma_write_byte(offs_t offset, uint8_t data)
 {
 	//offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 	//  & 0xFF0000;
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	space.write_byte(offset, data);
+	program.write_byte(offset, data);
 }
 
 void paso1600_state::paso1600(machine_config &config)
@@ -347,7 +350,7 @@ ROM_START( paso1600 )
 	ROM_REGION( 0x800, "chargen", ROMREGION_ERASEFF )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(a91c45a9) SHA1(a472adf791b9bac3dfa6437662e1a9e94a88b412)) //stolen from pasopia7
 
-	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x20000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, NO_DUMP)
 
 ROM_END

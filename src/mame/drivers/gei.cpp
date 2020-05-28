@@ -117,20 +117,20 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(gei_drawctrl_w);
-	DECLARE_WRITE8_MEMBER(gei_bitmap_w);
-	DECLARE_READ8_MEMBER(catchall);
-	template <unsigned N> DECLARE_WRITE8_MEMBER(banksel_w) { m_rombank->set_entry(N); }
-	DECLARE_WRITE8_MEMBER(geimulti_bank_w);
-	template <unsigned N> DECLARE_READ8_MEMBER(banksel_r);
-	DECLARE_READ8_MEMBER(signature_r);
-	DECLARE_WRITE8_MEMBER(signature_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(sound2_w);
-	DECLARE_WRITE8_MEMBER(lamps2_w);
-	DECLARE_WRITE8_MEMBER(nmi_w);
-	DECLARE_READ8_MEMBER(portC_r);
+	void gei_drawctrl_w(offs_t offset, uint8_t data);
+	void gei_bitmap_w(offs_t offset, uint8_t data);
+	uint8_t catchall(offs_t offset);
+	template <unsigned N> void banksel_w(uint8_t data) { m_rombank->set_entry(N); }
+	void geimulti_bank_w(offs_t offset, uint8_t data);
+	template <unsigned N> uint8_t banksel_r();
+	uint8_t signature_r();
+	void signature_w(uint8_t data);
+	void lamps_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void sound2_w(uint8_t data);
+	void lamps2_w(uint8_t data);
+	void nmi_w(uint8_t data);
+	uint8_t portC_r();
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
@@ -168,7 +168,7 @@ private:
 };
 
 
-WRITE8_MEMBER(gei_state::gei_drawctrl_w)
+void gei_state::gei_drawctrl_w(offs_t offset, uint8_t data)
 {
 	m_drawctrl[offset] = data;
 
@@ -179,7 +179,7 @@ WRITE8_MEMBER(gei_state::gei_drawctrl_w)
 	}
 }
 
-WRITE8_MEMBER(gei_state::gei_bitmap_w)
+void gei_state::gei_bitmap_w(offs_t offset, uint8_t data)
 {
 	m_yadd = (offset == m_prevoffset) ? (m_yadd + 1) : 0;
 	m_prevoffset = offset;
@@ -216,7 +216,7 @@ uint32_t gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-WRITE8_MEMBER(gei_state::lamps_w)
+void gei_state::lamps_w(uint8_t data)
 {
 	/* 5 button lamps */
 	m_lamps[0] = BIT(data, 0);
@@ -232,7 +232,7 @@ WRITE8_MEMBER(gei_state::lamps_w)
 	m_lamps[6] = BIT(data, 7);
 }
 
-WRITE8_MEMBER(gei_state::sound_w)
+void gei_state::sound_w(uint8_t data)
 {
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
 	machine().bookkeeping().coin_lockout_global_w(BIT(~data, 3));
@@ -249,7 +249,7 @@ WRITE8_MEMBER(gei_state::sound_w)
 	m_dac->write(BIT(data, 7));
 }
 
-WRITE8_MEMBER(gei_state::sound2_w)
+void gei_state::sound2_w(uint8_t data)
 {
 	/* bit 3,6 - coin lockout, lamp 10 + 11 in selection test mode */
 	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 3));
@@ -266,13 +266,13 @@ WRITE8_MEMBER(gei_state::sound2_w)
 	m_dac->write(BIT(data, 7));
 }
 
-WRITE8_MEMBER(gei_state::lamps2_w)
+void gei_state::lamps2_w(uint8_t data)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in poker test mode  */
 	m_lamps[8] = BIT(data, 4);
 }
 
-WRITE8_MEMBER(gei_state::nmi_w)
+void gei_state::nmi_w(uint8_t data)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
 	m_lamps[8] = BIT(data, 4);
@@ -281,7 +281,7 @@ WRITE8_MEMBER(gei_state::nmi_w)
 	m_nmi_mask = data & 0x40;
 }
 
-READ8_MEMBER(gei_state::catchall)
+uint8_t gei_state::catchall(offs_t offset)
 {
 	int pc = m_maincpu->pc();
 
@@ -291,13 +291,13 @@ READ8_MEMBER(gei_state::catchall)
 	return 0xff;
 }
 
-READ8_MEMBER(gei_state::portC_r)
+uint8_t gei_state::portC_r()
 {
 	return 4;
 }
 
 
-WRITE8_MEMBER(gei_state::geimulti_bank_w)
+void gei_state::geimulti_bank_w(offs_t offset, uint8_t data)
 {
 	int bank = -1;
 
@@ -326,7 +326,7 @@ WRITE8_MEMBER(gei_state::geimulti_bank_w)
 }
 
 template <unsigned N>
-READ8_MEMBER(gei_state::banksel_r)
+uint8_t gei_state::banksel_r()
 {
 	if (!machine().side_effects_disabled())
 		m_rombank->set_entry(N);
@@ -335,12 +335,12 @@ READ8_MEMBER(gei_state::banksel_r)
 
 /* This signature is used to validate the ROMs in sportauth. Simple protection check? */
 
-READ8_MEMBER(gei_state::signature_r)
+uint8_t gei_state::signature_r()
 {
 	return m_signature_answer;
 }
 
-WRITE8_MEMBER(gei_state::signature_w)
+void gei_state::signature_w(uint8_t data)
 {
 	if (data == 0) m_signature_pos = 0;
 

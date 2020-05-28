@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -229,8 +229,8 @@ struct Emitter
 class ExampleParticles : public entry::AppI
 {
 public:
-	ExampleParticles(const char* _name, const char* _description)
-		: entry::AppI(_name, _description)
+	ExampleParticles(const char* _name, const char* _description, const char* _url)
+		: entry::AppI(_name, _description, _url)
 	{
 	}
 
@@ -290,8 +290,7 @@ public:
 
 		cameraCreate();
 
-		const float initialPos[3] = { 0.0f, 2.0f, -12.0f };
-		cameraSetPosition(initialPos);
+		cameraSetPosition({ 0.0f, 2.0f, -12.0f });
 		cameraSetVerticalAngle(0.0f);
 
 		m_timeOffset = bx::getHPCounter();
@@ -407,16 +406,14 @@ public:
 			DebugDrawEncoder dde;
 			dde.begin(0);
 
-			float center[3] = { 0.0f, 0.0f, 0.0f };
-			dde.drawGrid(Axis::Y, center);
+			dde.drawGrid(Axis::Y, { 0.0f, 0.0f, 0.0f });
 
-			float eye[3];
-			cameraGetPosition(eye);
+			const bx::Vec3 eye = cameraGetPosition();
 
 			m_emitter[currentEmitter].update();
 
 			psUpdate(deltaTime * timeScale);
-			psRender(0, view, bx::load(eye) );
+			psRender(0, view, eye);
 
 			if (showBounds)
 			{
@@ -455,4 +452,9 @@ public:
 
 } // namespace
 
-ENTRY_IMPLEMENT_MAIN(ExampleParticles, "32-particles", "Particles.");
+ENTRY_IMPLEMENT_MAIN(
+	  ExampleParticles
+	, "32-particles"
+	, "Particles."
+	, "https://bkaradzic.github.io/bgfx/examples.html#particles"
+	);

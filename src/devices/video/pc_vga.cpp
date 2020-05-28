@@ -134,6 +134,7 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
+	, vga(*this)
 {
 }
 
@@ -252,7 +253,7 @@ void vga_device::device_start()
 
 
 	// copy over interfaces
-	vga.read_dipswitch = read8_delegate(); //read_dipswitch;
+	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.seq_regcount = 0x05;
 	vga.svga_intf.crtc_regcount = 0x19;
 	vga.svga_intf.vram_size = 0x100000;
@@ -1149,17 +1150,18 @@ uint32_t s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		uint16_t cy = s3.cursor_y & 0x07ff;
 		uint32_t bg_col;
 		uint32_t fg_col;
+		int r,g,b;
+		uint32_t datax;
 
 		if(cur_mode == SCREEN_OFF || cur_mode == TEXT_MODE || cur_mode == MONO_MODE || cur_mode == CGA_MODE || cur_mode == EGA_MODE)
 			return 0;  // cursor only works in VGA or SVGA modes
 
 		src = s3.cursor_start_addr * 1024;  // start address is in units of 1024 bytes
 
-		if(cur_mode == RGB16_MODE)
+		switch(cur_mode)
 		{
-			int r,g,b;
-			uint16_t datax;
-
+		case RGB15_MODE:
+		case RGB16_MODE:
 			datax = s3.cursor_bg[0]|s3.cursor_bg[1]<<8;
 			r = (datax&0xf800)>>11;
 			g = (datax&0x07e0)>>5;
@@ -1177,11 +1179,25 @@ uint32_t s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			g = (g << 2) | (g & 0x3);
 			b = (b << 3) | (b & 0x7);
 			fg_col = (0xff<<24)|(r<<16)|(g<<8)|(b<<0);
-		}
-		else /* TODO: other modes */
-		{
+			break;
+		case RGB24_MODE:
+			datax = s3.cursor_bg[0]|s3.cursor_bg[1]<<8|s3.cursor_bg[2]<<16;
+			r = (datax&0xff0000)>>16;
+			g = (datax&0x00ff00)>>8;
+			b = (datax&0x0000ff)>>0;
+			bg_col = (0xff<<24)|(r<<16)|(g<<8)|(b<<0);
+
+			datax = s3.cursor_fg[0]|s3.cursor_fg[1]<<8|s3.cursor_fg[2]<<16;
+			r = (datax&0xff0000)>>16;
+			g = (datax&0x00ff00)>>8;
+			b = (datax&0x0000ff)>>0;
+			fg_col = (0xff<<24)|(r<<16)|(g<<8)|(b<<0);
+			break;
+		case RGB8_MODE:
+		default:
 			bg_col = pen(s3.cursor_bg[0]);
 			fg_col = pen(s3.cursor_fg[0]);
+			break;
 		}
 
 		//popmessage("%08x %08x",(s3.cursor_bg[0])|(s3.cursor_bg[1]<<8)|(s3.cursor_bg[2]<<16)|(s3.cursor_bg[3]<<24)
@@ -2205,12 +2221,12 @@ WRITE8_MEMBER(vga_device::mem_w)
 	}
 }
 
-READ8_MEMBER(vga_device::mem_linear_r)
+uint8_t vga_device::mem_linear_r(offs_t offset)
 {
 	return vga.memory[offset % vga.svga_intf.vram_size];
 }
 
-WRITE8_MEMBER(vga_device::mem_linear_w)
+void vga_device::mem_linear_w(offs_t offset, uint8_t data)
 {
 	vga.memory[offset % vga.svga_intf.vram_size] = data;
 }
@@ -3312,9 +3328,8 @@ READ8_MEMBER(ati_vga_device::port_03c0_r)
 
 void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 {
-	address_space &space = machine().dummy_space();
 	offset %= m_vga->vga.svga_intf.vram_size;
-	uint8_t dst = m_vga->mem_linear_r(space,offset,0xff);
+	uint8_t dst = m_vga->mem_linear_r(offset);
 	uint8_t src = 0;
 
 	// check clipping rectangle
@@ -3341,7 +3356,7 @@ void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 		break;
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
-		src = m_vga->mem_linear_r(space,((ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x),0xff);
+		src = m_vga->mem_linear_r(((ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x));
 		break;
 	}
 
@@ -3349,61 +3364,60 @@ void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 	switch(ibm8514.fgmix & 0x000f)
 	{
 	case 0x0000:
-		m_vga->mem_linear_w(space,offset,~dst,0xff);
+		m_vga->mem_linear_w(offset,~dst);
 		break;
 	case 0x0001:
-		m_vga->mem_linear_w(space,offset,0x00,0xff);
+		m_vga->mem_linear_w(offset,0x00);
 		break;
 	case 0x0002:
-		m_vga->mem_linear_w(space,offset,0xff,0xff);
+		m_vga->mem_linear_w(offset,0xff);
 		break;
 	case 0x0003:
-		m_vga->mem_linear_w(space,offset,dst,0xff);
+		m_vga->mem_linear_w(offset,dst);
 		break;
 	case 0x0004:
-		m_vga->mem_linear_w(space,offset,~src,0xff);
+		m_vga->mem_linear_w(offset,~src);
 		break;
 	case 0x0005:
-		m_vga->mem_linear_w(space,offset,src ^ dst,0xff);
+		m_vga->mem_linear_w(offset,src ^ dst);
 		break;
 	case 0x0006:
-		m_vga->mem_linear_w(space,offset,~(src ^ dst),0xff);
+		m_vga->mem_linear_w(offset,~(src ^ dst));
 		break;
 	case 0x0007:
-		m_vga->mem_linear_w(space,offset,src,0xff);
+		m_vga->mem_linear_w(offset,src);
 		break;
 	case 0x0008:
-		m_vga->mem_linear_w(space,offset,~(src & dst),0xff);
+		m_vga->mem_linear_w(offset,~(src & dst));
 		break;
 	case 0x0009:
-		m_vga->mem_linear_w(space,offset,(~src) | dst,0xff);
+		m_vga->mem_linear_w(offset,(~src) | dst);
 		break;
 	case 0x000a:
-		m_vga->mem_linear_w(space,offset,src | (~dst),0xff);
+		m_vga->mem_linear_w(offset,src | (~dst));
 		break;
 	case 0x000b:
-		m_vga->mem_linear_w(space,offset,src | dst,0xff);
+		m_vga->mem_linear_w(offset,src | dst);
 		break;
 	case 0x000c:
-		m_vga->mem_linear_w(space,offset,src & dst,0xff);
+		m_vga->mem_linear_w(offset,src & dst);
 		break;
 	case 0x000d:
-		m_vga->mem_linear_w(space,offset,src & (~dst),0xff);
+		m_vga->mem_linear_w(offset,src & (~dst));
 		break;
 	case 0x000e:
-		m_vga->mem_linear_w(space,offset,(~src) & dst,0xff);
+		m_vga->mem_linear_w(offset,(~src) & dst);
 		break;
 	case 0x000f:
-		m_vga->mem_linear_w(space,offset,~(src | dst),0xff);
+		m_vga->mem_linear_w(offset,~(src | dst));
 		break;
 	}
 }
 
 void ibm8514a_device::ibm8514_write_bg(uint32_t offset)
 {
-	address_space &space = machine().dummy_space();
 	offset %= m_vga->vga.svga_intf.vram_size;
-	uint8_t dst = m_vga->mem_linear_r(space,offset,0xff);
+	uint8_t dst = m_vga->mem_linear_r(offset);
 	uint8_t src = 0;
 
 	// check clipping rectangle
@@ -3430,7 +3444,7 @@ void ibm8514a_device::ibm8514_write_bg(uint32_t offset)
 		break;
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
-		src = m_vga->mem_linear_r(space,((ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x),0xff);
+		src = m_vga->mem_linear_r(((ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x));
 		break;
 	}
 
@@ -3438,52 +3452,52 @@ void ibm8514a_device::ibm8514_write_bg(uint32_t offset)
 	switch(ibm8514.bgmix & 0x000f)
 	{
 	case 0x0000:
-		m_vga->mem_linear_w(space,offset,~dst,0xff);
+		m_vga->mem_linear_w(offset,~dst);
 		break;
 	case 0x0001:
-		m_vga->mem_linear_w(space,offset,0x00,0xff);
+		m_vga->mem_linear_w(offset,0x00);
 		break;
 	case 0x0002:
-		m_vga->mem_linear_w(space,offset,0xff,0xff);
+		m_vga->mem_linear_w(offset,0xff);
 		break;
 	case 0x0003:
-		m_vga->mem_linear_w(space,offset,dst,0xff);
+		m_vga->mem_linear_w(offset,dst);
 		break;
 	case 0x0004:
-		m_vga->mem_linear_w(space,offset,~src,0xff);
+		m_vga->mem_linear_w(offset,~src);
 		break;
 	case 0x0005:
-		m_vga->mem_linear_w(space,offset,src ^ dst,0xff);
+		m_vga->mem_linear_w(offset,src ^ dst);
 		break;
 	case 0x0006:
-		m_vga->mem_linear_w(space,offset,~(src ^ dst),0xff);
+		m_vga->mem_linear_w(offset,~(src ^ dst));
 		break;
 	case 0x0007:
-		m_vga->mem_linear_w(space,offset,src,0xff);
+		m_vga->mem_linear_w(offset,src);
 		break;
 	case 0x0008:
-		m_vga->mem_linear_w(space,offset,~(src & dst),0xff);
+		m_vga->mem_linear_w(offset,~(src & dst));
 		break;
 	case 0x0009:
-		m_vga->mem_linear_w(space,offset,(~src) | dst,0xff);
+		m_vga->mem_linear_w(offset,(~src) | dst);
 		break;
 	case 0x000a:
-		m_vga->mem_linear_w(space,offset,src | (~dst),0xff);
+		m_vga->mem_linear_w(offset,src | (~dst));
 		break;
 	case 0x000b:
-		m_vga->mem_linear_w(space,offset,src | dst,0xff);
+		m_vga->mem_linear_w(offset,src | dst);
 		break;
 	case 0x000c:
-		m_vga->mem_linear_w(space,offset,src & dst,0xff);
+		m_vga->mem_linear_w(offset,src & dst);
 		break;
 	case 0x000d:
-		m_vga->mem_linear_w(space,offset,src & (~dst),0xff);
+		m_vga->mem_linear_w(offset,src & (~dst));
 		break;
 	case 0x000e:
-		m_vga->mem_linear_w(space,offset,(~src) & dst,0xff);
+		m_vga->mem_linear_w(offset,(~src) & dst);
 		break;
 	case 0x000f:
-		m_vga->mem_linear_w(space,offset,~(src | dst),0xff);
+		m_vga->mem_linear_w(offset,~(src | dst));
 		break;
 	}
 }
@@ -3531,7 +3545,7 @@ void ibm8514a_device::ibm8514_write(uint32_t offset, uint32_t src)
 			ibm8514.src_x = 0;
 		break;
 	case 0x00c0:  // use source plane
-		if (m_vga->mem_linear_r(machine().dummy_space(), src, 0xff) != 0x00)
+		if (m_vga->mem_linear_r(src) != 0x00)
 			ibm8514_write_fg(offset);
 		else
 			ibm8514_write_bg(offset);
@@ -3869,7 +3883,7 @@ WRITE16_MEMBER(ibm8514a_device::ibm8514_cmd_w)
 				if((ibm8514.pixel_control & 0xc0) == 0xc0)
 				{
 					// only check read mask if Mix Select is set to 11 (VRAM determines mix)
-					if(m_vga->mem_linear_r(space,(src+x),0xff) & ~readmask)
+					if(m_vga->mem_linear_r((src+x)) & ~readmask)
 					{
 						// presumably every program is going to be smart enough to set the FG mix to use VRAM (0x6x)
 						if(data & 0x0020)

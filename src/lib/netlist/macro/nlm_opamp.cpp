@@ -1,18 +1,21 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-#include "nlm_opamp.h"
+
 #include "netlist/devices/net_lib.h"
 
 /*
  * 0 = Basic hack (Norton with just amplification, no voltage cutting)
  * 1 = Model from LTSPICE mailing list - slow!
- * 2 = Simplified model using diode inputs and netlist TYPE=3
+ * 2 = Simplified model using diode inputs and netlist
  * 3 = Model according to datasheet
+ * 4 = Faster model by Colin Howell
  *
  * For Money Money 1 and 3 delivery comparable results.
  * 3 is simpler (less BJTs) and converges a lot faster.
+ *
+ * Model 4 uses a lot less resources and pn-junctions. The preferred new normal.
  */
-#define USE_LM3900_MODEL (3)
+#define USE_LM3900_MODEL (4)
 
 /*
  *   Generic layout with 4 opamps, VCC on pin 4 and GND on pin 11
@@ -69,21 +72,17 @@ NETLIST_END()
 
 /*
  *   Generic layout with 1 opamp, VCC+ on pin 7, VCC- on pin 4 and compensation
+ *   // FIXME: Offset inputs are not supported!
  */
 
 static NETLIST_START(opamp_layout_1_7_4)
-	DIPPINS(        /*   +--------------+   */
-		OFFSET.N1,  /*   |1     ++     8|   */ NC,
-		MINUS,      /*   |2            7|   */ VCC.PLUS,
-		PLUS,       /*   |3            6|   */ OUT,
-		VCC.MINUS,  /*   |4            5|   */ OFFSET.N2
-					/*   +--------------+   */
+	DIPPINS(             /*   +--------------+   */
+		NC /* OFFSET */, /*   |1     ++     8|   */ NC,
+		A.MINUS,         /*   |2            7|   */ A.VCC,
+		A.PLUS,          /*   |3            6|   */ A.OUT,
+		A.GND,           /*   |4            5|   */ NC /* OFFSET */
+						 /*   +--------------+   */
 	)
-	NET_C(A.GND, VCC.MINUS)
-	NET_C(A.VCC, VCC.PLUS)
-	NET_C(A.MINUS, MINUS)
-	NET_C(A.PLUS, PLUS)
-	NET_C(A.OUT, OUT)
 NETLIST_END()
 
 /*
@@ -133,6 +132,23 @@ static NETLIST_START(MB3614_DIP)
 	OPAMP(B, "MB3614")
 	OPAMP(C, "MB3614")
 	OPAMP(D, "MB3614")
+
+	INCLUDE(opamp_layout_4_4_11)
+
+NETLIST_END()
+
+static NETLIST_START(TL081_DIP)
+	OPAMP(A, "TL084")
+
+	INCLUDE(opamp_layout_1_7_4)
+
+NETLIST_END()
+
+static NETLIST_START(TL084_DIP)
+	OPAMP(A, "TL084")
+	OPAMP(B, "TL084")
+	OPAMP(C, "TL084")
+	OPAMP(D, "TL084")
 
 	INCLUDE(opamp_layout_4_4_11)
 
@@ -219,9 +235,10 @@ static NETLIST_START(LM3900)
 	ALIAS(MINUS, R2.1) // Negative input
 	ALIAS(OUT, G1.OP) // Opamp output ...
 	ALIAS(GND, G1.ON)  // V- terminal
-	ALIAS(VCC, DUMMY.I)  // V+ terminal
+	ALIAS(VCC, DUMMY.1)  // V+ terminal
 
-	DUMMY_INPUT(DUMMY)
+	RES(DUMMY, RES_K(1))
+	NET_C(DUMMY.2, GND)
 
 	/* The opamp model */
 
@@ -230,8 +247,7 @@ static NETLIST_START(LM3900)
 	NET_C(R1.1, G1.IP)
 	NET_C(R2.1, G1.IN)
 	NET_C(R1.2, R2.2, G1.ON)
-	VCVS(G1)
-	PARAM(G1.G, 10000000)
+	VCVS(G1, 10000000)
 	//PARAM(G1.RI, 1)
 	PARAM(G1.RO, RES_K(8))
 
@@ -260,7 +276,7 @@ static NETLIST_START(LM3900)
 	//CS(B1/*I=LIMIT(0, V(VCC,VSS)/10K, 0.2m)*/)
 	CS(B1, 2e-4)
 	CAP(C1, CAP_P(6.000000))
-	VCVS(E1)
+	VCVS(E1, 1)
 	QBJT_EB(Q1, "LM3900_NPN1")
 	QBJT_EB(Q10, "LM3900_NPN1")
 	QBJT_EB(Q11, "LM3900_NPN1")
@@ -295,7 +311,7 @@ static NETLIST_START(LM3900)
 	OPAMP(A, "LM3900")
 
 	DIODE(D1, "D(IS=1e-15 N=1)")
-	CCCS(CS1) // Current Mirror
+	CCCS(CS1, 1) // Current Mirror
 
 	ALIAS(VCC, A.VCC)
 	ALIAS(GND, A.GND)
@@ -305,8 +321,8 @@ static NETLIST_START(LM3900)
 
 	NET_C(A.PLUS, CS1.IP)
 	NET_C(D1.A, CS1.IN)
-	NET_C(CS1.OP, A.MINUS)
-	NET_C(CS1.ON, A.GND, D1.K)
+	NET_C(CS1.ON, A.MINUS)
+	NET_C(CS1.OP, A.GND, D1.K)
 
 NETLIST_END()
 #endif
@@ -339,6 +355,37 @@ static NETLIST_START(LM3900)
 NETLIST_END()
 #endif
 
+#if USE_LM3900_MODEL == 4
+static NETLIST_START(LM3900)
+	OPAMP(A, "OPAMP(TYPE=3 VLH=0.5 VLL=0.03 FPF=2k UGF=2.5M SLEW=1M RI=10M RO=100 DAB=0.0015)")
+
+	DIODE(D1, "D(IS=6e-15 N=1)")
+	DIODE(D2, "D(IS=6e-15 N=1)")
+	CCCS(CS1, 1) // Current Mirror
+
+	ALIAS(VCC, A.VCC)
+	ALIAS(GND, A.GND)
+	ALIAS(OUT, A.OUT)
+
+	ALIAS(PLUS, CS1.IP)
+	NET_C(D1.A, CS1.IN)
+	NET_C(A.GND, D1.K)
+
+	CS(CS_BIAS, 10e-6)
+	NET_C(A.VCC, CS_BIAS.P)
+
+	ALIAS(MINUS, CS1.OP)
+	NET_C(CS1.ON, A.GND)
+
+	CCVS(VS1, 200000) // current-to-voltage gain
+	NET_C(CS1.OP, VS1.IP)
+	NET_C(VS1.IN, CS_BIAS.N, D2.A)
+	NET_C(D2.K, A.GND)
+	NET_C(VS1.OP, A.MINUS)
+	NET_C(VS1.ON, A.PLUS, A.GND)
+NETLIST_END()
+#endif
+
 NETLIST_START(OPAMP_lib)
 	LOCAL_LIB_ENTRY(opamp_layout_4_4_11)
 	LOCAL_LIB_ENTRY(opamp_layout_2_8_4)
@@ -347,13 +394,18 @@ NETLIST_START(OPAMP_lib)
 	LOCAL_LIB_ENTRY(opamp_layout_1_8_5)
 	LOCAL_LIB_ENTRY(opamp_layout_1_11_6)
 
+	// FIXME: JFET Opamp may need better model
+	// VLL and VHH for +-6V  RI=10^12 (for numerical stability 10^9 is used below
+	// RO from data sheet
+	NET_MODEL("TL084       OPAMP(TYPE=3 VLH=0.75 VLL=0.75 FPF=10 UGF=3000k SLEW=13M RI=1000M RO=192 DAB=0.0014)")
+
 	NET_MODEL("LM324       OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=500k SLEW=0.3M RI=1000k RO=50 DAB=0.00075)")
 	NET_MODEL("LM358       OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=500k SLEW=0.3M RI=1000k RO=50 DAB=0.001)")
-	NET_MODEL("MB3614      OPAMP(TYPE=3 VLH=1.4 VLL=0.02 FPF=10 UGF=1000k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
+	NET_MODEL("MB3614      OPAMP(TYPE=3 VLH=1.4 VLL=0.02 FPF=3 UGF=1000k SLEW=0.6M RI=1000k RO=100 DAB=0.002)")
 	NET_MODEL("UA741       OPAMP(TYPE=3 VLH=1.0 VLL=1.0 FPF=5 UGF=1000k SLEW=0.5M RI=2000k RO=75 DAB=0.0017)")
 	NET_MODEL("LM747       OPAMP(TYPE=3 VLH=1.0 VLL=1.0 FPF=5 UGF=1000k SLEW=0.5M RI=2000k RO=50 DAB=0.0017)")
 	NET_MODEL("LM747A      OPAMP(TYPE=3 VLH=2.0 VLL=2.0 FPF=5 UGF=1000k SLEW=0.7M RI=6000k RO=50 DAB=0.0015)")
-	// TI and Motorola Datasheets differ - below are Motorola values values SLEW is average of LH and HL
+	// TI and Motorola Datasheets differ - below are Motorola values, SLEW is average of LH and HL
 	NET_MODEL("LM3900      OPAMP(TYPE=3 VLH=1.0 VLL=0.03 FPF=2k UGF=4M SLEW=10M RI=10M RO=2k DAB=0.0015)")
 
 #if USE_LM3900_MODEL == 1
@@ -361,6 +413,8 @@ NETLIST_START(OPAMP_lib)
 	NET_MODEL("LM3900_PNP1 PNP(IS=1E-14 BF=40 TF=1E-7 CJC=1E-12 CJE=1E-12 VAF=150 RB=100 RE=5)")
 #endif
 	LOCAL_LIB_ENTRY(MB3614_DIP)
+	LOCAL_LIB_ENTRY(TL081_DIP)
+	LOCAL_LIB_ENTRY(TL084_DIP)
 	LOCAL_LIB_ENTRY(LM324_DIP)
 	LOCAL_LIB_ENTRY(LM358_DIP)
 	LOCAL_LIB_ENTRY(LM2902_DIP)

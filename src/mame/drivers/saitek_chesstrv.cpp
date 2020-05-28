@@ -17,12 +17,15 @@ SciSys/Novag's "Chess Champion: Pocket Chess" is assumed to be the same game,
 it has the same MCU serial (SL90387). They added battery low voltage detection
 to it (rightmost digit DP lights up).
 
+TODO:
+- MCU frequency was actually measured ~3MHz, but this is much too slow when compared
+  to a video recording (of Novag Pocket Chess), need to reverify
+
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
-#include "machine/sensorboard.h"
 #include "video/pwm.h"
 
 // internal artwork
@@ -56,15 +59,15 @@ private:
 	void chesstrv_io(address_map &map);
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(matrix_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void matrix_w(u8 data);
+	void digit_w(u8 data);
+	u8 input_r();
 
 	// 256 bytes data RAM accessed via I/O ports
-	DECLARE_READ8_MEMBER(ram_address_r) { return m_ram_address; }
-	DECLARE_WRITE8_MEMBER(ram_address_w) { m_ram_address = data; }
-	DECLARE_READ8_MEMBER(ram_data_r) { return m_ram[m_ram_address]; }
-	DECLARE_WRITE8_MEMBER(ram_data_w) { m_ram[m_ram_address] = data; }
+	u8 ram_address_r() { return m_ram_address; }
+	void ram_address_w(u8 data) { m_ram_address = data; }
+	u8 ram_data_r() { return m_ram[m_ram_address]; }
+	void ram_data_w(u8 data) { m_ram[m_ram_address] = data; }
 
 	std::unique_ptr<u8[]> m_ram;
 	u8 m_ram_address;
@@ -100,21 +103,21 @@ void chesstrv_state::update_display()
 	m_display->matrix(~m_inp_mux, m_7seg_data);
 }
 
-WRITE8_MEMBER(chesstrv_state::digit_w)
+void chesstrv_state::digit_w(u8 data)
 {
 	// digit segments
 	m_7seg_data = bitswap<8>(data,0,1,2,3,4,5,6,7) & 0x7f;
 	update_display();
 }
 
-WRITE8_MEMBER(chesstrv_state::matrix_w)
+void chesstrv_state::matrix_w(u8 data)
 {
 	// d0-d3: input/digit select (active low)
 	m_inp_mux = data;
 	update_display();
 }
 
-READ8_MEMBER(chesstrv_state::input_r)
+u8 chesstrv_state::input_r()
 {
 	u8 data = m_inp_mux;
 
@@ -191,19 +194,15 @@ INPUT_PORTS_END
 void chesstrv_state::chesstrv(machine_config &config)
 {
 	/* basic machine hardware */
-	F8(config, m_maincpu, 3000000/2); // Fairchild 3870, measured ~3MHz
+	F8(config, m_maincpu, 4500000/2); // approximation
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesstrv_state::chesstrv_mem);
 	m_maincpu->set_addrmap(AS_IO, &chesstrv_state::chesstrv_io);
 
-	f38t56_device &psu(F38T56(config, "psu", 3000000/2));
+	f38t56_device &psu(F38T56(config, "psu", 4500000/2));
 	psu.read_a().set(FUNC(chesstrv_state::ram_data_r));
 	psu.write_a().set(FUNC(chesstrv_state::ram_data_w));
 	psu.read_b().set(FUNC(chesstrv_state::input_r));
 	psu.write_b().set(FUNC(chesstrv_state::matrix_w));
-
-	// built-in chessboard is not electronic
-	sensorboard_device &board(SENSORBOARD(config, "board").set_type(sensorboard_device::NOSENSORS));
-	board.init_cb().set("board", FUNC(sensorboard_device::preset_chess));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
@@ -219,7 +218,7 @@ void chesstrv_state::chesstrv(machine_config &config)
 
 ROM_START( chesstrv )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD("3870-sl90387", 0x0000, 0x0800, CRC(b76214d8) SHA1(7760903a64d9c513eb54c4787f535dabec62eb64) )
+	ROM_LOAD("sl90387", 0x0000, 0x0800, CRC(b76214d8) SHA1(7760903a64d9c513eb54c4787f535dabec62eb64) )
 ROM_END
 
 } // anonymous namespace

@@ -65,7 +65,7 @@ public:
 
 	bool m_bios_disable;
 
-	DECLARE_WRITE8_MEMBER(gb_io_w);
+	void gb_io_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE8_MEMBER(gb_io2_w);
 	DECLARE_WRITE8_MEMBER(sgb_io_w);
 	DECLARE_READ8_MEMBER(gb_ie_r);
@@ -82,7 +82,7 @@ public:
 	DECLARE_MACHINE_START(gbc);
 	DECLARE_MACHINE_RESET(gbc);
 	void gbc_palette(palette_device &palette) const;
-	DECLARE_WRITE8_MEMBER(gb_timer_callback);
+	void gb_timer_callback(uint8_t data);
 
 	DECLARE_READ8_MEMBER(gb_cart_r);
 	DECLARE_READ8_MEMBER(gbc_cart_r);

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "dirom.h"
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -15,8 +17,8 @@
 // ======================> rf5c400_device
 
 class rf5c400_device : public device_t,
-						public device_sound_interface,
-						public device_rom_interface
+					   public device_sound_interface,
+					   public device_rom_interface<25, 1, 0, ENDIANNESS_LITTLE>
 {
 public:
 	rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

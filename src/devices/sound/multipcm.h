@@ -5,15 +5,23 @@
 
 #pragma once
 
+#include "dirom.h"
+
+#define MULTIPCM_LOG_SAMPLES    0
+
+#if MULTIPCM_LOG_SAMPLES
+#include <map>
+#endif
+
 class multipcm_device : public device_t,
 						public device_sound_interface,
-						public device_rom_interface
+						public device_rom_interface<24>
 {
 public:
 	multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(offs_t offset, uint8_t data);
+	uint8_t read();
 
 protected:
 	// device-level overrides
@@ -73,7 +81,6 @@ private:
 
 	struct slot_t
 	{
-		uint8_t m_slot_index;
 		uint8_t m_regs[8];
 		bool m_playing;
 		sample_t m_sample;
@@ -92,24 +99,24 @@ private:
 
 	// internal state
 	sound_stream *m_stream;
-	slot_t *m_slots;
+	std::unique_ptr<slot_t[]> m_slots;
 	uint32_t m_cur_slot;
 	uint32_t m_address;
 	float m_rate;
 
-	uint32_t *m_attack_step;
-	uint32_t *m_decay_release_step;   // Envelope step tables
-	uint32_t *m_freq_step_table;      // Frequency step table
+	std::unique_ptr<uint32_t[]> m_attack_step;
+	std::unique_ptr<uint32_t[]> m_decay_release_step;   // Envelope step tables
+	std::unique_ptr<uint32_t[]> m_freq_step_table;      // Frequency step table
 
-	int32_t *m_left_pan_table;
-	int32_t *m_right_pan_table;
-	int32_t *m_linear_to_exp_volume;
-	int32_t *m_total_level_steps;
+	std::unique_ptr<int32_t[]> m_left_pan_table;
+	std::unique_ptr<int32_t[]> m_right_pan_table;
+	std::unique_ptr<int32_t[]> m_linear_to_exp_volume;
+	std::unique_ptr<int32_t[]> m_total_level_steps;
 
-	int32_t *m_pitch_table;
-	int32_t **m_pitch_scale_tables;
-	int32_t *m_amplitude_table;
-	int32_t **m_amplitude_scale_tables;
+	std::unique_ptr<int32_t[]> m_pitch_table;
+	std::unique_ptr<int32_t[]> m_pitch_scale_tables[8];
+	std::unique_ptr<int32_t[]> m_amplitude_table;
+	std::unique_ptr<int32_t[]> m_amplitude_scale_tables[8];
 
 	uint32_t value_to_fixed(const uint32_t bits, const float value);
 
@@ -117,18 +124,23 @@ private:
 
 	// Internal LFO functions
 	void lfo_init();
-	void lfo_compute_step(lfo_t *lfo, uint32_t lfo_frequency, uint32_t LFOS, int32_t amplitude_lfo);
-	int32_t pitch_lfo_step(lfo_t *lfo);
-	int32_t amplitude_lfo_step(lfo_t *lfo);
+	void lfo_compute_step(lfo_t &lfo, uint32_t lfo_frequency, uint32_t LFOS, int32_t amplitude_lfo);
+	int32_t pitch_lfo_step(lfo_t &lfo);
+	int32_t amplitude_lfo_step(lfo_t &lfo);
 
 	// Internal envelope functions
-	int32_t envelope_generator_update(slot_t *slot);
-	void envelope_generator_calc(slot_t *slot);
+	int32_t envelope_generator_update(slot_t &slot);
+	void envelope_generator_calc(slot_t &slot);
 	uint32_t get_rate(uint32_t *steps, uint32_t rate, uint32_t val);
 
-	void write_slot(slot_t *slot, int32_t reg, uint8_t data);
+	void write_slot(slot_t &slot, int32_t reg, uint8_t data);
 
 	int16_t clamp_to_int16(int32_t value);
+
+#if MULTIPCM_LOG_SAMPLES
+	void dump_sample(slot_t &slot);
+	std::map<uint32_t, bool> m_logged_map;
+#endif
 
 	static constexpr uint32_t TL_SHIFT = 12;
 

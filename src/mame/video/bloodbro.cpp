@@ -24,7 +24,7 @@
 TILE_GET_INFO_MEMBER(bloodbro_state::get_bg_tile_info)
 {
 	int code = m_bgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code & 0xfff,
 			(code >> 12),
 			0);
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(bloodbro_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(bloodbro_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			(code & 0xfff)+0x1000,
 			(code >> 12),
 			0);
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(bloodbro_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(bloodbro_state::get_tx_tile_info)
 {
 	int code = m_txvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code & 0xfff,
 			code >> 12,
 			0);
@@ -58,9 +58,9 @@ TILE_GET_INFO_MEMBER(bloodbro_state::get_tx_tile_info)
 
 void bloodbro_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bloodbro_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bloodbro_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bloodbro_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bloodbro_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bloodbro_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bloodbro_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);

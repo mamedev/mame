@@ -124,14 +124,14 @@ public:
 
 	uint16_t m_dsw_pc_hack;
 
-	DECLARE_WRITE8_MEMBER(cyclemb_bankswitch_w);
-//  DECLARE_READ8_MEMBER(mcu_status_r);
-//  DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(cyclemb_flip_w);
-	DECLARE_READ8_MEMBER(skydest_i8741_0_r);
-	DECLARE_WRITE8_MEMBER(skydest_i8741_0_w);
-	DECLARE_READ8_MEMBER(skydest_i8741_1_r);
-	DECLARE_WRITE8_MEMBER(skydest_i8741_1_w);
+	void cyclemb_bankswitch_w(uint8_t data);
+//  uint8_t mcu_status_r();
+//  void sound_cmd_w(uint8_t data);
+	void cyclemb_flip_w(uint8_t data);
+	uint8_t skydest_i8741_0_r(offs_t offset);
+	void skydest_i8741_0_w(offs_t offset, uint8_t data);
+	uint8_t skydest_i8741_1_r(offs_t offset);
+	void skydest_i8741_1_w(offs_t offset, uint8_t data);
 //  DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
 	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(pad_r);
@@ -396,13 +396,13 @@ uint32_t cyclemb_state::screen_update_skydest(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE8_MEMBER(cyclemb_state::cyclemb_bankswitch_w)
+void cyclemb_state::cyclemb_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 3);
 }
 
 #if 0
-WRITE8_MEMBER(cyclemb_state::sound_cmd_w)
+void cyclemb_state::sound_cmd_w(uint8_t data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -410,24 +410,24 @@ WRITE8_MEMBER(cyclemb_state::sound_cmd_w)
 #endif
 
 #if 0
-READ8_MEMBER(cyclemb_state::mcu_status_r)
+uint8_t cyclemb_state::mcu_status_r()
 {
 	return 1;
 }
 
 
-WRITE8_MEMBER(cyclemb_state::sound_cmd_w)//actually ciom
+void cyclemb_state::sound_cmd_w(uint8_t data) //actually ciom
 {
 	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 #endif
 
-WRITE8_MEMBER(cyclemb_state::cyclemb_flip_w)
+void cyclemb_state::cyclemb_flip_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
 
-	// a bunch of other things are setted here
+	// a bunch of other things are set here
 }
 
 void cyclemb_state::skydest_i8741_reset()
@@ -439,7 +439,7 @@ void cyclemb_state::skydest_i8741_reset()
 	m_mcu[0].packet_type = 0;
 }
 
-READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
+uint8_t cyclemb_state::skydest_i8741_0_r(offs_t offset)
 {
 	if(offset == 1) //status port
 	{
@@ -519,7 +519,7 @@ READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
 	}
 }
 
-WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
+void cyclemb_state::skydest_i8741_0_w(offs_t offset, uint8_t data)
 {
 	if(offset == 1) //command port
 	{
@@ -592,9 +592,9 @@ void cyclemb_state::cyclemb_map(address_map &map)
 
 void cyclemb_state::cyclemb_io(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
-	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
+	//map(0xc020, 0xc020).nopw(); // ?
 	map(0xc09e, 0xc09f).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
 	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
@@ -602,11 +602,11 @@ void cyclemb_state::cyclemb_io(address_map &map)
 
 void cyclemb_state::skydest_io(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
-	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
+	//map(0xc020, 0xc020).nopw(); // ?
 	map(0xc080, 0xc081).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
-	//AM_RANGE(0xc0a0, 0xc0a0) AM_WRITENOP // ?
+	//map(0xc0a0, 0xc0a0).nopw(); // ?
 	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
 
@@ -618,7 +618,7 @@ void cyclemb_state::cyclemb_sound_map(address_map &map)
 
 }
 
-READ8_MEMBER(cyclemb_state::skydest_i8741_1_r)
+uint8_t cyclemb_state::skydest_i8741_1_r(offs_t offset)
 {
 	// status
 	if(offset == 1)
@@ -630,7 +630,7 @@ READ8_MEMBER(cyclemb_state::skydest_i8741_1_r)
 	return m_soundlatch->read();
 }
 
-WRITE8_MEMBER(cyclemb_state::skydest_i8741_1_w)
+void cyclemb_state::skydest_i8741_1_w(offs_t offset, uint8_t data)
 {
 //  printf("%02x %02x\n",offset,data);
 	if(offset == 1)
@@ -708,7 +708,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1_1")
-	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cyclemb_state, pad_r<0>, nullptr)
+	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cyclemb_state, pad_r<0>)
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("PAD_P1")
@@ -731,7 +731,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_1")
-	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cyclemb_state, pad_r<1>, nullptr)
+	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cyclemb_state, pad_r<1>)
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("PAD_P2")

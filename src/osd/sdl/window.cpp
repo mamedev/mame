@@ -16,7 +16,7 @@
 #include <SDL2/SDL.h>
 
 // standard C headers
-#include <math.h>
+#include <cmath>
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
@@ -140,7 +140,10 @@ bool sdl_osd_interface::window_init()
 
 	osd_printf_verbose("\nHints:\n");
 	for (int i = 0; hints[i] != nullptr; i++)
-		osd_printf_verbose("\t%-40s %s\n", hints[i], SDL_GetHint(hints[i]));
+	{
+		char const *const hint(SDL_GetHint(hints[i]));
+		osd_printf_verbose("\t%-40s %s\n", hints[i], hint ? hint : "(NULL)");
+	}
 
 	// set up the window list
 	osd_printf_verbose("Leave sdlwindow_init\n");
@@ -601,9 +604,6 @@ void sdl_window_info::update()
 
 			// and redraw now
 
-			// Some configurations require events to be polled in the worker thread
-			downcast< sdl_osd_interface& >(machine().osd()).process_events_buf();
-
 			// Check whether window has vector screens
 
 			{
@@ -697,24 +697,10 @@ int sdl_window_info::complete_create()
 	if (renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL) && !video_config.novideo)
 	{
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-
-		/* FIXME: A reminder that gamma is wrong throughout MAME. Currently, SDL2.0 doesn't seem to
-		    * support the following attribute although my hardware lists GL_ARB_framebuffer_sRGB as an extension.
-		    *
-		    * SDL_GL_SetAttribute( SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1 );
-		    *
-		    */
 		m_extra_flags = SDL_WINDOW_OPENGL;
 	}
 	else
 		m_extra_flags = 0;
-
-#ifdef SDLMAME_MACOSX
-	/* FIMXE: On OSX, SDL_WINDOW_FULLSCREEN_DESKTOP seems to be more reliable.
-	 *        It however creates issues with white borders, i.e. the screen clear
-	 *        does not work. This happens both with opengl and accel.
-	 */
-#endif
 
 	// We need to workaround an issue in SDL 2.0.4 for OS X where setting the
 	// relative mode on the mouse in fullscreen mode makes mouse events stop

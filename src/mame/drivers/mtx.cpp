@@ -53,7 +53,7 @@ void mtx_state::mtx_io(address_map &map)
 	map(0x01, 0x01).rw("tms9929a", FUNC(tms9929a_device::vram_read), FUNC(tms9929a_device::vram_write));
 	map(0x02, 0x02).rw("tms9929a", FUNC(tms9929a_device::register_read), FUNC(tms9929a_device::register_write));
 	map(0x03, 0x03).rw(FUNC(mtx_state::mtx_sound_strobe_r), FUNC(mtx_state::mtx_cst_w));
-	map(0x04, 0x04).r(FUNC(mtx_state::mtx_prt_r)).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x04, 0x04).r(FUNC(mtx_state::mtx_prt_r)).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x05, 0x05).rw(FUNC(mtx_state::mtx_key_lo_r), FUNC(mtx_state::mtx_sense_w));
 	map(0x06, 0x06).rw(FUNC(mtx_state::mtx_key_hi_r), FUNC(mtx_state::mtx_sound_latch_w));
 	//  map(0x07, 0x07) PIO
@@ -269,15 +269,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::cassette_tick)
 	}
 }
 
-/*-------------------------------------------------
-    mtx_tms9928a_interface
--------------------------------------------------*/
-
-WRITE_LINE_MEMBER(mtx_state::mtx_tms9929a_interrupt)
-{
-	m_z80ctc->trg0(state ? 0 : 1);
-}
-
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -298,7 +289,7 @@ void mtx_state::mtx512(machine_config &config)
 	tms9929a_device &vdp(TMS9929A(config, "tms9929a", 10.6875_MHz_XTAL));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(mtx_state::mtx_tms9929a_interrupt));
+	vdp.int_callback().set(m_z80ctc, FUNC(z80ctc_device::trg0)).invert();
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
@@ -322,8 +313,8 @@ void mtx_state::mtx512(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	SNAPSHOT(config, "snapshot", "mtx", attotime::from_seconds(1)).set_load_callback(FUNC(mtx_state::snapshot_cb), this);
-	QUICKLOAD(config, "quickload", "run", attotime::from_seconds(1)).set_load_callback(FUNC(mtx_state::quickload_cb), this);
+	SNAPSHOT(config, "snapshot", "mtx", attotime::from_seconds(1)).set_load_callback(FUNC(mtx_state::snapshot_cb));
+	QUICKLOAD(config, "quickload", "run", attotime::from_seconds(1)).set_load_callback(FUNC(mtx_state::quickload_cb));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
@@ -336,7 +327,7 @@ void mtx_state::mtx512(machine_config &config)
 
 	/* rom extension board */
 	GENERIC_SOCKET(config, m_extrom, generic_plain_slot, "mtx_rom", "bin,rom");
-	m_extrom->set_device_load(FUNC(mtx_state::extrom_load), this);
+	m_extrom->set_device_load(FUNC(mtx_state::extrom_load));
 
 	/* rs232 board with disk drive bus */
 	MTX_EXP_SLOT(config, m_exp, mtx_expansion_devices, nullptr);
@@ -348,7 +339,7 @@ void mtx_state::mtx512(machine_config &config)
 
 	/* cartridge slot */
 	GENERIC_CARTSLOT(config, m_rompak, generic_plain_slot, "mtx_cart", "bin,rom");
-	m_rompak->set_device_load(FUNC(mtx_state::rompak_load), this);
+	m_rompak->set_device_load(FUNC(mtx_state::rompak_load));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("mtx_cass");

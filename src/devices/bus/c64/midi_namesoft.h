@@ -22,8 +22,7 @@
 
 // ======================> c64_namesoft_midi_cartridge_device
 
-class c64_namesoft_midi_cartridge_device : public device_t,
-	public device_c64_expansion_card_interface
+class c64_namesoft_midi_cartridge_device : public device_t, public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction

@@ -297,29 +297,29 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txb);
-	DECLARE_WRITE8_MEMBER(cat_duart_output);
+	void cat_duart_output(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(prn_ack_ff);
 
-	DECLARE_READ16_MEMBER(cat_floppy_control_r);
-	DECLARE_WRITE16_MEMBER(cat_floppy_control_w);
-	DECLARE_WRITE16_MEMBER(cat_printer_data_w);
-	DECLARE_READ16_MEMBER(cat_floppy_data_r);
-	DECLARE_WRITE16_MEMBER(cat_floppy_data_w);
-	DECLARE_READ16_MEMBER(cat_keyboard_r);
-	DECLARE_WRITE16_MEMBER(cat_keyboard_w);
-	DECLARE_WRITE16_MEMBER(cat_video_control_w);
-	DECLARE_READ16_MEMBER(cat_floppy_status_r);
-	DECLARE_READ16_MEMBER(cat_battery_r);
-	DECLARE_WRITE16_MEMBER(cat_printer_control_w);
-	DECLARE_READ16_MEMBER(cat_modem_r);
-	DECLARE_WRITE16_MEMBER(cat_modem_w);
-	DECLARE_READ16_MEMBER(cat_6ms_counter_r);
-	DECLARE_WRITE16_MEMBER(cat_opr_w);
-	DECLARE_READ16_MEMBER(cat_wdt_r);
-	DECLARE_WRITE16_MEMBER(cat_tcb_w);
-	DECLARE_READ16_MEMBER(cat_2e80_r);
-	DECLARE_READ16_MEMBER(cat_0080_r);
-	DECLARE_READ16_MEMBER(cat_0000_r);
+	uint16_t cat_floppy_control_r(offs_t offset);
+	void cat_floppy_control_w(offs_t offset, uint16_t data);
+	void cat_printer_data_w(offs_t offset, uint16_t data);
+	uint16_t cat_floppy_data_r(offs_t offset);
+	void cat_floppy_data_w(offs_t offset, uint16_t data);
+	uint16_t cat_keyboard_r(offs_t offset);
+	void cat_keyboard_w(uint16_t data);
+	void cat_video_control_w(offs_t offset, uint16_t data);
+	uint16_t cat_floppy_status_r(offs_t offset);
+	uint16_t cat_battery_r();
+	void cat_printer_control_w(offs_t offset, uint16_t data);
+	uint16_t cat_modem_r(offs_t offset);
+	void cat_modem_w(offs_t offset, uint16_t data);
+	uint16_t cat_6ms_counter_r();
+	void cat_opr_w(offs_t offset, uint16_t data);
+	uint16_t cat_wdt_r();
+	void cat_tcb_w(offs_t offset, uint16_t data);
+	uint16_t cat_2e80_r();
+	uint16_t cat_0080_r();
+	uint16_t cat_0000_r();
 
 
 	/* gate array 2 has a 16-bit counter inside which counts at 10mhz and
@@ -406,7 +406,7 @@ void cat_state::init_cat()
  650xxx - HSS (HSync Start)
  658xxx - VOC (Video Control)
  */
-WRITE16_MEMBER( cat_state::cat_video_control_w )
+void cat_state::cat_video_control_w(offs_t offset, uint16_t data)
 {
 	/*
 	 * 006500AE ,          ( HSS HSync Start    89 )
@@ -463,7 +463,7 @@ WRITE16_MEMBER( cat_state::cat_video_control_w )
 	 * [2] this bit's function is unknown. it could possibly be an FM vs MFM selector bit, where high = MFM, low = FM ? or MFM vs GCR?
 	 */
 // 0x800000-0x800001 read
-READ16_MEMBER( cat_state::cat_floppy_control_r )
+uint16_t cat_state::cat_floppy_control_r(offs_t offset)
 {
 #ifdef DEBUG_FLOPPY_CONTROL_R
 	fprintf(stderr,"Read from Floppy Status address %06X\n", 0x800000+(offset<<1));
@@ -471,7 +471,7 @@ READ16_MEMBER( cat_state::cat_floppy_control_r )
 	return (m_floppy_control << 8)|0x80; // LOW 8 BITS ARE OPEN BUS
 }
 // 0x800000-0x800001 write
-WRITE16_MEMBER( cat_state::cat_floppy_control_w )
+void cat_state::cat_floppy_control_w(offs_t offset, uint16_t data)
 {
 #ifdef DEBUG_FLOPPY_CONTROL_W
 	fprintf(stderr,"Write to Floppy Control address %06X, data %04X\n", 0x800000+(offset<<1), data);
@@ -481,7 +481,7 @@ WRITE16_MEMBER( cat_state::cat_floppy_control_w )
 
 // 0x800002-0x800003 read = 0x0080, see open bus
 // 0x800002-0x800003 write
-WRITE16_MEMBER( cat_state::cat_keyboard_w )
+void cat_state::cat_keyboard_w(uint16_t data)
 {
 	m_keyboard_line = data >> 8;
 }
@@ -489,7 +489,7 @@ WRITE16_MEMBER( cat_state::cat_keyboard_w )
 // 0x800004-0x800005 'pr.data' write
 // /DSTB (centronics pin 1) is implied by the cat source code to be pulsed
 // low (for some unknown period of time) upon any write to this port.
-WRITE16_MEMBER( cat_state::cat_printer_data_w )
+void cat_state::cat_printer_data_w(offs_t offset, uint16_t data)
 {
 #ifdef DEBUG_PRINTER_DATA_W
 	fprintf(stderr,"Write to Printer Data address %06X, data %04X\n", 0x800004+(offset<<1), data);
@@ -500,14 +500,14 @@ WRITE16_MEMBER( cat_state::cat_printer_data_w )
 	m_ctx->write_strobe(1);
 }
 // 0x800006-0x800007: Floppy data register (called fd.dwr in the cat source code)
-READ16_MEMBER( cat_state::cat_floppy_data_r )
+uint16_t cat_state::cat_floppy_data_r(offs_t offset)
 {
 #ifdef DEBUG_FLOPPY_DATA_R
 	fprintf(stderr,"Read from Floppy Data address %06X\n", 0x800006+(offset<<1));
 #endif
 	return 0x0080;
 }
-WRITE16_MEMBER( cat_state::cat_floppy_data_w )
+void cat_state::cat_floppy_data_w(offs_t offset, uint16_t data)
 {
 #ifdef DEBUG_FLOPPY_DATA_W
 	fprintf(stderr,"Write to Floppy Data address %06X, data %04X\n", 0x800006+(offset<<1), data);
@@ -526,7 +526,7 @@ WRITE16_MEMBER( cat_state::cat_floppy_data_w )
 	 * \--------- ? this bit may indicate 'data separator overflow'; it is usually low but becomes high if you manually select the floppy drive
 	 ALL of these bits except bit F seem to be reset when the selected drive in floppy control is switched
 	 */
-READ16_MEMBER( cat_state::cat_floppy_status_r )
+uint16_t cat_state::cat_floppy_status_r(offs_t offset)
 {
 #ifdef DEBUG_FLOPPY_STATUS_R
 	fprintf(stderr,"Read from Floppy Status address %06X\n", 0x800008+(offset<<1));
@@ -535,7 +535,7 @@ READ16_MEMBER( cat_state::cat_floppy_status_r )
 }
 
 // 0x80000a-0x80000b
-READ16_MEMBER( cat_state::cat_keyboard_r )
+uint16_t cat_state::cat_keyboard_r(offs_t offset)
 {
 	uint16_t retVal = 0;
 	// Read country code
@@ -570,7 +570,7 @@ READ16_MEMBER( cat_state::cat_keyboard_r )
 // 0x80000c-0x80000d (unused in cat source code; may have originally been a separate read only port where 800006 would have been write-only)
 
 // 0x80000e-0x80000f 'pr.cont' read
-READ16_MEMBER( cat_state::cat_battery_r )
+uint16_t cat_state::cat_battery_r()
 {
 	/*
 	 * FEDCBA98 (76543210 is open bus)
@@ -589,7 +589,7 @@ READ16_MEMBER( cat_state::cat_battery_r )
 	return 0x0080;
 }
 // 0x80000e-0x80000f 'pr.cont' write
-WRITE16_MEMBER( cat_state::cat_printer_control_w )
+void cat_state::cat_printer_control_w(offs_t offset, uint16_t data)
 {
 	/*
 	 * FEDCBA98 (76543210 is ignored)
@@ -611,7 +611,7 @@ WRITE16_MEMBER( cat_state::cat_printer_control_w )
 }
 
 // 0x820000: AMI S35213 300/1200 Single Chip Modem (datasheet found at http://bitsavers.trailing-edge.com/pdf/ami/_dataBooks/1985_AMI_MOS_Products_Catalog.pdf on pdf page 243)
-READ16_MEMBER( cat_state::cat_modem_r )
+uint16_t cat_state::cat_modem_r(offs_t offset)
 {
 #ifdef DEBUG_MODEM_R
 	fprintf(stderr,"Read from s35213 modem address %06X\n", 0x820000+(offset<<1));
@@ -620,7 +620,7 @@ READ16_MEMBER( cat_state::cat_modem_r )
 	return 0x00;
 }
 
-WRITE16_MEMBER( cat_state::cat_modem_w )
+void cat_state::cat_modem_w(offs_t offset, uint16_t data)
 {
 #ifdef DEBUG_MODEM_W
 	fprintf(stderr,"Write to s35213 modem address %06X, data %04X\n", 0x820000+(offset<<1), data);
@@ -628,7 +628,7 @@ WRITE16_MEMBER( cat_state::cat_modem_w )
 }
 
 // 0x830000: 6ms counter (counts KTOBF pulses and does not reset; 16 bits wide)
-READ16_MEMBER( cat_state::cat_6ms_counter_r )
+uint16_t cat_state::cat_6ms_counter_r()
 {
 	return m_6ms_counter;
 }
@@ -638,7 +638,7 @@ READ16_MEMBER( cat_state::cat_6ms_counter_r )
  * if the watchdog expires /NMI (and maybe /RESET) are asserted to the cpu
  * watchdog counter (counts KTOBF pulses and is reset on any ga2opr write with bit 3 set; <9 bits wide)
  */
-WRITE16_MEMBER( cat_state::cat_opr_w )
+void cat_state::cat_opr_w(offs_t offset, uint16_t data)
 {
 	/*
 	 * 76543210 (FEDCBA98 are ignored)
@@ -679,7 +679,7 @@ WRITE16_MEMBER( cat_state::cat_opr_w )
 	 * |\-------- (always 0?)
 	 * \--------- (always 0?)
 	 */
-READ16_MEMBER( cat_state::cat_wdt_r )
+uint16_t cat_state::cat_wdt_r()
 {
 	uint16 Retval = 0x0100; // set pfail to 1; should this be a dipswitch?
 	return Retval | m_wdt_counter;
@@ -688,7 +688,7 @@ READ16_MEMBER( cat_state::cat_wdt_r )
 // 0x860000: 'tcb' "test control bits" test mode register; what the bits do is
 // unknown. 0x0000 is written here to disable test mode, and that is the extent
 // of the cat touching this register.
-WRITE16_MEMBER( cat_state::cat_tcb_w )
+void cat_state::cat_tcb_w(offs_t offset, uint16_t data)
 {
 #ifdef DEBUG_TEST_W
 	fprintf(stderr, "Test reg write: offset %06X, data %04X\n", 0x860000+(offset<<1), data);
@@ -696,17 +696,17 @@ WRITE16_MEMBER( cat_state::cat_tcb_w )
 }
 
 // open bus etc handlers
-READ16_MEMBER( cat_state::cat_2e80_r )
+uint16_t cat_state::cat_2e80_r()
 {
 	return 0x2e80;
 }
 
-READ16_MEMBER( cat_state::cat_0000_r )
+uint16_t cat_state::cat_0000_r()
 {
 	return 0x0000;
 }
 
-READ16_MEMBER( cat_state::cat_0080_r )
+uint16_t cat_state::cat_0080_r()
 {
 	return 0x0080;
 }
@@ -902,7 +902,7 @@ void cat_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		counter_6ms_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in cat_state::device_timer");
+		throw emu_fatalerror("Unknown id in cat_state::device_timer");
 	}
 }
 
@@ -919,7 +919,7 @@ TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 void cat_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff3, 0xfffff3).lr8("interrupt 1", [this]() { m_maincpu->set_input_line(1, CLEAR_LINE); return m68000_device::autovector(1); });
+	map(0xfffff3, 0xfffff3).lr8(NAME([this]() { m_maincpu->set_input_line(1, CLEAR_LINE); return m68000_device::autovector(1); }));
 }
 
 MACHINE_START_MEMBER(cat_state,cat)
@@ -1032,7 +1032,7 @@ WRITE_LINE_MEMBER(cat_state::cat_duart_txb) // memit sends stuff here; connects 
  * OP6: TD01 "
  * OP7: TD00 "
  */
-WRITE8_MEMBER(cat_state::cat_duart_output)
+void cat_state::cat_duart_output(uint8_t data)
 {
 #ifdef DEBUG_DUART_OUTPUT_LINES
 	fprintf(stderr,"Duart output io lines changed to: %02X\n", data);
@@ -1134,7 +1134,7 @@ ROM_START( cat )
 	// According to Sandy Bumgarner, there should be a 2.42 version which fixes some bugs in the calc command vs 2.40
 	// According to the Cat Repair Manual page 4-20, there should be a version called B91U0x (maybe 1.91 or 0.91?) with sum16s of 9F1F, FF0A, 79BF and 03FF
 
-	ROM_REGION( 0x80000, "svrom", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x80000, "svrom", ROMREGION_ERASE00 )
 	// SPELLING VERIFICATION ROM (SVROM)
 	/* Romspace here is a little strange: there are 3 ROM sockets on the board:
 	 * svrom-0 maps to 200000-21ffff every ODD byte (d8-d0)
@@ -1155,7 +1155,7 @@ ROM_START( cat )
 	 * Each of these will also have its own code ROMset as well.
 	 */
 	// NH7-0684 (US, dumped):
-	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00000, 0x20000, CRC(229ca210) SHA1(564b57647a34acdd82159993a3990a412233da14), ROM_SKIP(1)) // this is a 28pin tc531000 mask ROM, 128KB long; "US" SVROM
+	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00001, 0x20000, CRC(229ca210) SHA1(564b57647a34acdd82159993a3990a412233da14), ROM_SKIP(1)) // this is a 28pin tc531000 mask ROM, 128KB long; "US" SVROM
 
 	/* There is an unpopulated PAL16L8 at IC9 whose original purpose (based
 	 * on the schematics) was probably to cause a 68k bus error when

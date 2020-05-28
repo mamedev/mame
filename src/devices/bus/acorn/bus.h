@@ -26,7 +26,7 @@ class device_acorn_bus_interface;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class acorn_bus_slot_device : public device_t, public device_slot_interface
+class acorn_bus_slot_device : public device_t, public device_single_card_slot_interface<device_acorn_bus_interface>
 {
 public:
 	// construction/destruction
@@ -44,7 +44,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 
 	// configuration
@@ -96,7 +95,7 @@ DECLARE_DEVICE_TYPE(ACORN_BUS, acorn_bus_device)
 // ======================> device_acorn_bus_interface
 
 // class representing interface-specific live acorn bus card
-class device_acorn_bus_interface : public device_slot_card_interface
+class device_acorn_bus_interface : public device_interface
 {
 public:
 	friend class acorn_bus_device;
@@ -105,7 +104,7 @@ public:
 	virtual ~device_acorn_bus_interface();
 
 	// inline configuration
-	void set_acorn_bus(acorn_bus_device &bus) { m_bus = &bus; }
+	void set_acorn_bus(acorn_bus_device &bus) { assert(!device().started()); m_bus = &bus; }
 
 protected:
 	device_acorn_bus_interface(const machine_config &mconfig, device_t &device);

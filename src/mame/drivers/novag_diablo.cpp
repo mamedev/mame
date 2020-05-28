@@ -55,7 +55,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void diablo68k(machine_config &config);
 	void scorpio68k(machine_config &config);
 
@@ -128,9 +128,9 @@ void diablo_state::machine_start()
 
 void diablo_state::lcd_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
-	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
+	palette.set_pen_color(0, rgb_t(0xff, 0xff, 0xff)); // background
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(0xe8, 0xe8, 0xe8)); // lcd pixel off
 }
 
 HD44780_PIXEL_UPDATE(diablo_state::lcd_pixel_update)
@@ -279,7 +279,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void diablo_state::diablo68k(machine_config &config)
@@ -293,16 +293,6 @@ void diablo_state::diablo68k(machine_config &config)
 	TIMER(config, m_irq_on).configure_periodic(FUNC(diablo_state::irq_on<M68K_IRQ_IPL1>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1100)); // active for 1.1us
 	TIMER(config, "irq_off").configure_periodic(FUNC(diablo_state::irq_off<M68K_IRQ_IPL1>), irq_period);
-
-	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL);
-	m_acia->irq_handler().set_inputline("maincpu", M68K_IRQ_IPL2);
-	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
-	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
-
-	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
-	m_rs232->dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -323,7 +313,7 @@ void diablo_state::diablo68k(machine_config &config)
 
 	HD44780(config, m_lcd, 0);
 	m_lcd->set_lcd_size(2, 8);
-	m_lcd->set_pixel_update_cb(FUNC(diablo_state::lcd_pixel_update), this);
+	m_lcd->set_pixel_update_cb(FUNC(diablo_state::lcd_pixel_update));
 
 	PWM_DISPLAY(config, m_display).set_size(8, 8+2);
 	config.set_default_layout(layout_novag_diablo68k);
@@ -332,6 +322,17 @@ void diablo_state::diablo68k(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 32.768_kHz_XTAL/32); // 1024Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	/* uart (configure after video) */
+	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL);
+	m_acia->irq_handler().set_inputline("maincpu", M68K_IRQ_IPL2);
+	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
+	m_rs232->dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
 }
 
 void diablo_state::scorpio68k(machine_config &config)
@@ -353,7 +354,7 @@ void diablo_state::scorpio68k(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( diablo68 )
+ROM_START( diablo68 ) // ID = D 1.08
 	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("evenurom.bin", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
 	ROM_LOAD16_BYTE("oddlrom.bin",  0x00001, 0x8000, CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5) )
@@ -361,7 +362,7 @@ ROM_START( diablo68 )
 ROM_END
 
 
-ROM_START( scorpio68 )
+ROM_START( scorpio68 ) // ID = S 1.08
 	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("s_evn_904.u3", 0x00000, 0x8000, CRC(a8f63245) SHA1(0ffdc6eb8ecad730440b0bfb2620fb00820e1aea) )
 	ROM_LOAD16_BYTE("s_odd_c18.u2", 0x00001, 0x8000, CRC(4f033319) SHA1(fce228b1705b7156d4d01ef92b22a875d0f6f321) )

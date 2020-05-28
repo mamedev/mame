@@ -22,11 +22,6 @@
     - dips - lives
     - visible area .. a bit smaller (at least bg 'generation' is not visible for scrolling levels)
     - cpu clock .. now 4 mhz
-
-  TODO :
-    - Bridgepiece helicopters joining from the right side don't fly forward, this is especially a problem
-      on the 3rd level making it impossible to complete it.
-      What is it not caused by: memory map mirrors, spriteram writeonly, power-on ram contents
 */
 
 #include "emu.h"
@@ -110,7 +105,7 @@ TILE_GET_INFO_MEMBER(skyarmy_state::get_tile_info)
 	int code = m_videoram[tile_index];
 	int attr = bitswap<3>(m_colorram[tile_index], 0, 1, 2);
 
-	SET_TILE_INFO_MEMBER(0, code, attr, 0);
+	tileinfo.set(0, code, attr, 0);
 }
 
 WRITE8_MEMBER(skyarmy_state::videoram_w)
@@ -153,7 +148,7 @@ void skyarmy_state::skyarmy_palette(palette_device &palette) const
 
 void skyarmy_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skyarmy_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skyarmy_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap->set_scroll_cols(32);
 }
 
@@ -362,7 +357,7 @@ void skyarmy_state::skyarmy(machine_config &config)
 
 ROM_START( skyarmy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a1h.bin", 0x0000, 0x2000, CRC(e3fb9d70) SHA1(b8e3a6d7d6ef30c1397f9b741132c5257c16be2d) )
+	ROM_LOAD( "a1h.bin", 0x0000, 0x2000, CRC(46507488) SHA1(a9a43caa6f3eab48c3fd9e2f34fe2b4aacfd4641) )
 	ROM_LOAD( "a2h.bin", 0x2000, 0x2000, CRC(0417653e) SHA1(4f6ad7335b5b7e85b4e16cce3c127488c02401b2) )
 	ROM_LOAD( "a3h.bin", 0x4000, 0x2000, CRC(95485e56) SHA1(c4cbcd31ba68769d2d0d0875e2a92982265339ae) )
 	ROM_LOAD( "j4.bin",  0x6000, 0x2000, CRC(843783df) SHA1(256d8375a8af7de080d456dbc6290a22473d011b) )

@@ -14,7 +14,7 @@
 #include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
 #include "machine/input_merger.h"
-#include "machine/mc2661.h"
+#include "machine/scn_pci.h"
 
 
 class dual68_state : public driver_device
@@ -40,7 +40,7 @@ private:
 	void sio4_mem(address_map &map);
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device_array<mc2661_device, 4> m_usart;
+	required_device_array<scn_pci_device, 4> m_usart;
 	required_shared_ptr<uint16_t> m_p_ram;
 };
 
@@ -70,10 +70,10 @@ void dual68_state::dual68_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).ram().share("ram");
-	map(0x080000, 0x081fff).rom().region("user1", 0);
+	map(0x080000, 0x081fff).rom().region("mainbios", 0);
 	map(0x7f0000, 0x7f0001).rw(FUNC(dual68_state::sio_direct_r), FUNC(dual68_state::sio_direct_w));
 	map(0x7f00c0, 0x7f00c0).r(FUNC(dual68_state::fdc_status_r));
-	map(0x800000, 0x801fff).rom().region("user1", 0);
+	map(0x800000, 0x801fff).rom().region("mainbios", 0);
 }
 
 void dual68_state::sio4_mem(address_map &map)
@@ -89,26 +89,21 @@ void dual68_state::sio4_io(address_map &map)
 	map.unmap_value_high();
 	map(0x06, 0x06).r(FUNC(dual68_state::sio_status_r));
 	map(0x18, 0x18).nopw();
-	map(0x20, 0x23).rw("usart1", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
-	map(0x28, 0x2b).rw("usart2", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
-	map(0x30, 0x33).rw("usart3", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
-	map(0x38, 0x3b).rw("usart4", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0x20, 0x23).rw("usart1", FUNC(scn_pci_device::read), FUNC(scn_pci_device::write));
+	map(0x28, 0x2b).rw("usart2", FUNC(scn_pci_device::read), FUNC(scn_pci_device::write));
+	map(0x30, 0x33).rw("usart3", FUNC(scn_pci_device::read), FUNC(scn_pci_device::write));
+	map(0x38, 0x3b).rw("usart4", FUNC(scn_pci_device::read), FUNC(scn_pci_device::write));
 }
 
 /* Input ports */
 static INPUT_PORTS_START( dual68 )
 INPUT_PORTS_END
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_7200 ) // FIXME: should be 9600 with actual 2661B
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_7200 )
-DEVICE_INPUT_DEFAULTS_END
-
 void dual68_state::machine_reset()
 {
-	uint8_t* user1 = memregion("user1")->base();
+	uint8_t *mainbios = memregion("mainbios")->base();
 
-	memcpy((uint8_t*)m_p_ram.target(),user1,0x2000);
+	memcpy((uint8_t*)m_p_ram.target(),mainbios,0x2000);
 }
 
 void dual68_state::dual68(machine_config &config)
@@ -122,7 +117,7 @@ void dual68_state::dual68(machine_config &config)
 	siocpu.set_addrmap(AS_IO, &dual68_state::sio4_io);
 
 	for (auto &usart : m_usart)
-		MC2661(config, usart, 9.8304_MHz_XTAL / 2); // SCN2661B
+		SCN2661B(config, usart, 9.8304_MHz_XTAL / 2);
 	m_usart[0]->rxrdy_handler().set("usartint", FUNC(input_merger_device::in_w<0>));
 	m_usart[1]->rxrdy_handler().set("usartint", FUNC(input_merger_device::in_w<1>));
 	m_usart[2]->rxrdy_handler().set("usartint", FUNC(input_merger_device::in_w<2>));
@@ -134,23 +129,22 @@ void dual68_state::dual68(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "usartint").output_handler().set_inputline("siocpu", I8085_RST65_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set(m_usart[0], FUNC(mc2661_device::rx_w));
-	rs232.dsr_handler().set(m_usart[0], FUNC(mc2661_device::dsr_w));
-	rs232.dcd_handler().set(m_usart[0], FUNC(mc2661_device::dcd_w));
-	rs232.cts_handler().set(m_usart[0], FUNC(mc2661_device::cts_w));
-	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	rs232.rxd_handler().set(m_usart[0], FUNC(scn_pci_device::rxd_w));
+	rs232.dsr_handler().set(m_usart[0], FUNC(scn_pci_device::dsr_w));
+	rs232.dcd_handler().set(m_usart[0], FUNC(scn_pci_device::dcd_w));
+	rs232.cts_handler().set(m_usart[0], FUNC(scn_pci_device::cts_w));
 }
 
 /* ROM definition */
 ROM_START( dual68 )
-	ROM_REGION( 0x2000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x2000, "mainbios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1", "2 * 4KB" )
-	ROMX_LOAD("dual_cpu68000_1.bin", 0x0001, 0x1000, CRC(d1785c08) SHA1(73c1f68875f1d8eb5e92f4347f509c61103da90f),ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("dual_cpu68000_2.bin", 0x0000, 0x1000, CRC(b9f1ba3c) SHA1(8fd02936ad06d5a22d435d96f06e2442fc7d00ec),ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("dual_cpu68000_1.bin", 0x0000, 0x1000, CRC(d1785c08) SHA1(73c1f68875f1d8eb5e92f4347f509c61103da90f),ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("dual_cpu68000_2.bin", 0x0001, 0x1000, CRC(b9f1ba3c) SHA1(8fd02936ad06d5a22d435d96f06e2442fc7d00ec),ROM_SKIP(1) | ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "v2", "2 * 2KB" )
-	ROMX_LOAD("dual.u2.bin", 0x0001, 0x0800, CRC(e9c44fcd) SHA1(d5cc609d6f5e6745d5f0af1aa6dc66012333ed60),ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("dual.u3.bin", 0x0000, 0x0800, CRC(827b049f) SHA1(8209f8ab3d1068e5bab51e7eb12be46d4ea28354),ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("dual.u2.bin", 0x0000, 0x0800, CRC(e9c44fcd) SHA1(d5cc609d6f5e6745d5f0af1aa6dc66012333ed60),ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("dual.u3.bin", 0x0001, 0x0800, CRC(827b049f) SHA1(8209f8ab3d1068e5bab51e7eb12be46d4ea28354),ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_REGION( 0x10000, "siocpu", ROMREGION_ERASEFF )
 	ROM_LOAD("dual_sio4.bin", 0x0000, 0x0800, CRC(6b0a1965) SHA1(5d2dc6c6a315293ded4b9fc95c8ac1599bf31dd3))

@@ -24,12 +24,7 @@
 
     - Verify LFO frequency from real hardware.
 
-    - Add shared index for waveform playback and sample writes. Almost every
-      game will reset the index prior to playback so this isn't an issue.
-
-    - While the noise emulation is complete, the data for the pseudo-random
-      bitstream is calculated by machine().rand() and is not a representation of what
-      the actual hardware does.
+    - Noise generating algorithm is shared in all channels?
 
     For some background on Hudson Soft's C62 chipset:
 
@@ -45,75 +40,65 @@
 #include "emu.h"
 #include "c6280.h"
 
+#include <algorithm>
 
 void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	static const int scale_tab[] = {
-		0x00, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F,
-		0x10, 0x13, 0x15, 0x17, 0x19, 0x1B, 0x1D, 0x1F
-	};
-
-	int lmal = (m_balance >> 4) & 0x0F;
-	int rmal = (m_balance >> 0) & 0x0F;
-
-	lmal = scale_tab[lmal];
-	rmal = scale_tab[rmal];
+	const u8 lmal = (m_balance >> 4) & 0x0f;
+	const u8 rmal = (m_balance >> 0) & 0x0f;
 
 	/* Clear buffer */
-	for (int i = 0; i < samples; i++)
-	{
-		outputs[0][i] = 0;
-		outputs[1][i] = 0;
-	}
+	std::fill_n(&outputs[0][0], samples, 0);
+	std::fill_n(&outputs[1][0], samples, 0);
 
 	for (int ch = 0; ch < 6; ch++)
 	{
+		channel *chan = &m_channel[ch];
 		/* Only look at enabled channels */
-		if(m_channel[ch].m_control & 0x80)
+		if (chan->control & 0x80)
 		{
-			int lal = (m_channel[ch].m_balance >> 4) & 0x0F;
-			int ral = (m_channel[ch].m_balance >> 0) & 0x0F;
-			int al  = m_channel[ch].m_control & 0x1F;
+			const u8 lal = (chan->balance >> 4) & 0x0f;
+			const u8 ral = (chan->balance >> 0) & 0x0f;
+			const u8 al  = (chan->control >> 1) & 0x0f; // only high 4 bit is affected to calculating volume, low 1 bit is independent
 
-			lal = scale_tab[lal];
-			ral = scale_tab[ral];
+			// verified from both patent and manual
+			int vll = (0xf - lmal) + (0xf - al) + (0xf - lal);
+			if (vll > 0xf) vll = 0xf;
 
-			/* Calculate volume just as the patent says */
-			int vll = (0x1F - lal) + (0x1F - al) + (0x1F - lmal);
-			if(vll > 0x1F) vll = 0x1F;
+			int vlr = (0xf - rmal) + (0xf - al) + (0xf - ral);
+			if (vlr > 0xf) vlr = 0xf;
 
-			int vlr = (0x1F - ral) + (0x1F - al) + (0x1F - rmal);
-			if(vlr > 0x1F) vlr = 0x1F;
-
-			vll = m_volume_table[vll];
-			vlr = m_volume_table[vlr];
+			vll = m_volume_table[(vll << 1) | (chan->control & 1)];
+			vlr = m_volume_table[(vlr << 1) | (chan->control & 1)];
 
 			/* Check channel mode */
-			if((ch >= 4) && (m_channel[ch].m_noise_control & 0x80))
+			if ((ch >= 4) && (chan->noise_control & 0x80))
 			{
 				/* Noise mode */
-				uint32_t step = (m_channel[ch].m_noise_control & 0x1F) ^ 0x1F;
+				const u32 step = (chan->noise_control & 0x1f) ^ 0x1f;
 				for (int i = 0; i < samples; i += 1)
 				{
-					static int data = 0;
-					if(m_channel[ch].m_noise_counter <= 0)
+					s16 data = BIT(chan->noise_seed, 0) ? 0x1f : 0;
+					chan->noise_counter--;
+					if (chan->noise_counter <= 0)
 					{
-						m_channel[ch].m_noise_counter = step << 2;
-						data = (machine().rand() & 1) ? 0x1F : 0;
+						chan->noise_counter = step << 6; // 32 * 2
+						const u32 seed = chan->noise_seed;
+						// based on Charles MacDonald's research
+						chan->noise_seed = (seed >> 1) | ((BIT(seed, 0) ^ BIT(seed, 1) ^ BIT(seed, 11) ^ BIT(seed, 12) ^ BIT(seed, 17)) << 17);
 					}
-					m_channel[ch].m_noise_counter--;
-					outputs[0][i] += (int16_t)(vll * (data - 16));
-					outputs[1][i] += (int16_t)(vlr * (data - 16));
+					outputs[0][i] += (s16)(vll * (data - 16));
+					outputs[1][i] += (s16)(vlr * (data - 16));
 				}
 			}
 			else
-			if(m_channel[ch].m_control & 0x40)
+			if (chan->control & 0x40)
 			{
 				/* DDA mode */
 				for (int i = 0; i < samples; i++)
 				{
-					outputs[0][i] += (int16_t)(vll * (m_channel[ch].m_dda - 16));
-					outputs[1][i] += (int16_t)(vlr * (m_channel[ch].m_dda - 16));
+					outputs[0][i] += (s16)(vll * (chan->dda - 16));
+					outputs[1][i] += (s16)(vlr * (chan->dda - 16));
 				}
 			}
 			else
@@ -123,56 +108,55 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 					if (ch == 0) // CH 0 only, CH 1 is muted
 					{
 						/* Waveform mode with LFO */
-						uint16_t lfo_step = m_channel[1].m_frequency ? m_channel[1].m_frequency : 0x1000;
+						channel *lfo_srcchan = &m_channel[1];
+						channel *lfo_dstchan = &m_channel[0];
+						const u16 lfo_step = lfo_srcchan->frequency ? lfo_srcchan->frequency : 0x1000;
 						for (int i = 0; i < samples; i += 1)
 						{
-							int32_t step = m_channel[0].m_frequency ? m_channel[0].m_frequency : 0x1000;
+							s32 step = lfo_dstchan->frequency ? lfo_dstchan->frequency : 0x1000;
 							if (m_lfo_control & 0x80) // reset LFO
 							{
-								m_channel[1].m_tick = lfo_step * m_lfo_frequency;
-								m_channel[1].m_counter = 0;
+								lfo_srcchan->tick = lfo_step * m_lfo_frequency;
+								lfo_srcchan->index = 0;
 							}
 							else
 							{
-								int lfooffset = m_channel[1].m_counter;
-								m_channel[1].m_tick--;
-								if (m_channel[1].m_tick <= 0)
+								const s16 lfo_data = lfo_srcchan->waveform[lfo_srcchan->index];
+								lfo_srcchan->tick--;
+								if (lfo_srcchan->tick <= 0)
 								{
-									m_channel[1].m_tick = lfo_step * m_lfo_frequency; // TODO : multiply? verify this from real hardware.
-									m_channel[1].m_counter = (m_channel[1].m_counter + 1) & 0x1f;
+									lfo_srcchan->tick = lfo_step * m_lfo_frequency; // verified from manual
+									lfo_srcchan->index = (lfo_srcchan->index + 1) & 0x1f;
 								}
-								int16_t lfo_data = m_channel[1].m_waveform[lfooffset];
-								step += ((lfo_data - 16) << (((m_lfo_control & 3)-1)<<1)); // verified from patent, TODO : same in real hardware?
+								step += ((lfo_data - 16) << (((m_lfo_control & 3)-1)<<1)); // verified from manual
 							}
-							int offset = m_channel[0].m_counter;
-							m_channel[0].m_tick--;
-							if (m_channel[0].m_tick <= 0)
+							const s16 data = lfo_dstchan->waveform[lfo_dstchan->index];
+							lfo_dstchan->tick--;
+							if (lfo_dstchan->tick <= 0)
 							{
-								m_channel[0].m_tick = step;
-								m_channel[0].m_counter = (m_channel[0].m_counter + 1) & 0x1f;
+								lfo_dstchan->tick = step;
+								lfo_dstchan->index = (lfo_dstchan->index + 1) & 0x1f;
 							}
-							int16_t data = m_channel[0].m_waveform[offset];
-							outputs[0][i] += (int16_t)(vll * (data - 16));
-							outputs[1][i] += (int16_t)(vlr * (data - 16));
+							outputs[0][i] += (s16)(vll * (data - 16));
+							outputs[1][i] += (s16)(vlr * (data - 16));
 						}
 					}
 				}
 				else
 				{
 					/* Waveform mode */
-					uint32_t step = m_channel[ch].m_frequency ? m_channel[ch].m_frequency : 0x1000;
+					const u32 step = chan->frequency ? chan->frequency : 0x1000;
 					for (int i = 0; i < samples; i += 1)
 					{
-						int offset = m_channel[ch].m_counter;
-						m_channel[ch].m_tick--;
-						if (m_channel[ch].m_tick <= 0)
+						const s16 data = chan->waveform[chan->index];
+						chan->tick--;
+						if (chan->tick <= 0)
 						{
-							m_channel[ch].m_tick = step;
-							m_channel[ch].m_counter = (m_channel[ch].m_counter + 1) & 0x1f;
+							chan->tick = step;
+							chan->index = (chan->index + 1) & 0x1f;
 						}
-						int16_t data = m_channel[ch].m_waveform[offset];
-						outputs[0][i] += (int16_t)(vll * (data - 16));
-						outputs[1][i] += (int16_t)(vlr * (data - 16));
+						outputs[0][i] += (s16)(vll * (data - 16));
+						outputs[1][i] += (s16)(vlr * (data - 16));
 					}
 				}
 			}
@@ -185,14 +169,58 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 /* MAME specific code                                                       */
 /*--------------------------------------------------------------------------*/
 
-WRITE8_MEMBER( c6280_device::c6280_w )
+/* Write Register Layout
+
+       76543210
+    00 -----xxx Channel Select
+       -----000 Channel 0
+       -----001 Channel 1
+       -----010 Channel 2
+       -----011 Channel 3
+       -----100 Channel 4
+       -----101 Channel 5
+
+    01 xxxx---- Overall Left Volume
+       ----xxxx Overall Right Volume
+
+    02 xxxxxxxx Frequency (Low 8 bits)
+
+    03 ----xxxx Frequency (High 4 bits)
+
+    04 x------- Channel Enable
+       -x------ Direct D/A
+       00------ Write Data
+       01------ Reset Counter
+       10------ Mixing (Sound Output)
+       11------ Direct D/A
+       ---xxxxx Channel Master Volume
+
+    05 xxxx---- Channel Left Volume
+       ----xxxx Channel Right Volume
+
+    06 ---xxxxx Waveform Data
+
+    07 x------- Noise Enable (channel 5, 6 only)
+       ---xxxxx Noise Frequency ^ 0x1f
+
+    08 xxxxxxxx LFO Frequency
+
+    09 x------- LFO Reset
+       ------xx LFO Control
+       ------00 LFO off
+       ------01 Direct Addition
+       ------10 2 bit Shift Addition
+       ------11 4 bit Shift Addition
+*/
+
+void c6280_device::c6280_w(offs_t offset, uint8_t data)
 {
 	channel *chan = &m_channel[m_select];
 
 	/* Update stream */
 	m_stream->update();
 
-	switch(offset & 0x0F)
+	switch (offset & 0x0f)
 	{
 		case 0x00: /* Channel select */
 			m_select = data & 0x07;
@@ -203,59 +231,50 @@ WRITE8_MEMBER( c6280_device::c6280_w )
 			break;
 
 		case 0x02: /* Channel frequency (LSB) */
-			chan->m_frequency = (chan->m_frequency & 0x0F00) | data;
-			chan->m_frequency &= 0x0FFF;
+			chan->frequency = (chan->frequency & 0x0f00) | data;
 			break;
 
 		case 0x03: /* Channel frequency (MSB) */
-			chan->m_frequency = (chan->m_frequency & 0x00FF) | (data << 8);
-			chan->m_frequency &= 0x0FFF;
+			chan->frequency = (chan->frequency & 0x00ff) | ((data << 8) & 0x0f00);
 			break;
 
 		case 0x04: /* Channel control (key-on, DDA mode, volume) */
 
 			/* 1-to-0 transition of DDA bit resets waveform index */
-			if((chan->m_control & 0x40) && ((data & 0x40) == 0))
+			if ((chan->control & 0x40) && ((data & 0x40) == 0))
 			{
-				chan->m_index = 0;
+				chan->index = 0;
 			}
-			if(((chan->m_control & 0x80) == 0) && (data & 0x80))
+			if (((chan->control & 0x80) == 0) && (data & 0x80))
 			{
-				chan->m_tick = chan->m_frequency;
+				chan->tick = chan->frequency;
 			}
-			chan->m_control = data;
+			chan->control = data;
 			break;
 
 		case 0x05: /* Channel balance */
-			chan->m_balance = data;
+			chan->balance = data;
 			break;
 
 		case 0x06: /* Channel waveform data */
 
-			switch(chan->m_control & 0xC0)
+			switch (chan->control & 0x40)
 			{
-				case 0x00:
-					chan->m_waveform[chan->m_index & 0x1F] = data & 0x1F;
-					chan->m_index = (chan->m_index + 1) & 0x1F;
+				case 0x00: // Waveform
+					chan->waveform[chan->index & 0x1f] = data & 0x1f;
+					if (!(chan->control & 0x80)) // TODO : wave pointer is increased at writing data when sound playback is off??
+						chan->index = (chan->index + 1) & 0x1f;
 					break;
 
-				case 0x40:
-					break;
-
-				case 0x80:
-					chan->m_waveform[chan->m_index & 0x1F] = data & 0x1F;
-					chan->m_index = (chan->m_index + 1) & 0x1F;
-					break;
-
-				case 0xC0:
-					chan->m_dda = data & 0x1F;
+				case 0x40: // Direct D/A
+					chan->dda = data & 0x1f;
 					break;
 			}
 
 			break;
 
 		case 0x07: /* Noise control (enable, frequency) */
-			chan->m_noise_control = data;
+			chan->noise_control = data;
 			break;
 
 		case 0x08: /* LFO frequency */
@@ -273,7 +292,7 @@ WRITE8_MEMBER( c6280_device::c6280_w )
 
 DEFINE_DEVICE_TYPE(C6280, c6280_device, "c6280", "Hudson Soft HuC6280 PSG")
 
-c6280_device::c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c6280_device::c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, C6280, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {
@@ -305,28 +324,37 @@ void c6280_device::device_start()
 	/* Make volume table */
 	/* PSG has 48dB volume range spread over 32 steps */
 	double step = 48.0 / 32.0;
-	for (int i = 0; i < 31; i++)
+	for (int i = 0; i < 30; i++)
 	{
-		m_volume_table[i] = (uint16_t)level;
+		m_volume_table[i] = (u16)level;
 		level /= pow(10.0, step / 20.0);
 	}
-	m_volume_table[31] = 0;
+	m_volume_table[30] = m_volume_table[31] = 0;
 
 	save_item(NAME(m_select));
 	save_item(NAME(m_balance));
 	save_item(NAME(m_lfo_frequency));
 	save_item(NAME(m_lfo_control));
-	for (int chan = 0; chan < 8; chan++)
+
+	save_item(STRUCT_MEMBER(m_channel, frequency));
+	save_item(STRUCT_MEMBER(m_channel, control));
+	save_item(STRUCT_MEMBER(m_channel, balance));
+	save_item(STRUCT_MEMBER(m_channel, waveform));
+	save_item(STRUCT_MEMBER(m_channel, index));
+	save_item(STRUCT_MEMBER(m_channel, dda));
+	save_item(STRUCT_MEMBER(m_channel, noise_control));
+	save_item(STRUCT_MEMBER(m_channel, noise_counter));
+	save_item(STRUCT_MEMBER(m_channel, noise_seed));
+	save_item(STRUCT_MEMBER(m_channel, tick));
+}
+
+void c6280_device::device_reset()
+{
+	for (int ch = 0; ch < 6; ch++)
 	{
-		save_item(NAME(m_channel[chan].m_frequency), chan);
-		save_item(NAME(m_channel[chan].m_control), chan);
-		save_item(NAME(m_channel[chan].m_balance), chan);
-		save_item(NAME(m_channel[chan].m_waveform), chan);
-		save_item(NAME(m_channel[chan].m_index), chan);
-		save_item(NAME(m_channel[chan].m_dda), chan);
-		save_item(NAME(m_channel[chan].m_noise_control), chan);
-		save_item(NAME(m_channel[chan].m_noise_counter), chan);
-		save_item(NAME(m_channel[chan].m_counter), chan);
-		save_item(NAME(m_channel[chan].m_tick), chan);
+		channel *chan = &m_channel[ch];
+		chan->index = 0;
+		if (ch >= 4)
+			chan->noise_seed = 1;
 	}
 }

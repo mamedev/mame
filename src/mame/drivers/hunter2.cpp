@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert,Barry Rodewald
+// copyright-holders:Barry Rodewald
 /***************************************************************************
 
     Husky Hunter, Hunter 2
@@ -68,17 +68,17 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(display_ctrl_w);
-	DECLARE_WRITE8_MEMBER(serial_tx_w);
-	DECLARE_WRITE8_MEMBER(serial_dtr_w);
-	DECLARE_WRITE8_MEMBER(serial_rts_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(irqctrl_w);
-	DECLARE_WRITE8_MEMBER(memmap_w);
+	uint8_t keyboard_r();
+	uint8_t portb_r();
+	void keyboard_w(uint8_t data);
+	uint8_t portc_r();
+	void display_ctrl_w(uint8_t data);
+	void serial_tx_w(uint8_t data);
+	void serial_dtr_w(uint8_t data);
+	void serial_rts_w(uint8_t data);
+	void speaker_w(uint8_t data);
+	void irqctrl_w(uint8_t data);
+	void memmap_w(uint8_t data);
 	void hunter2_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
@@ -212,7 +212,7 @@ static INPUT_PORTS_START( hunter2 )
 	PORT_CONFSETTING(0x04, "Low")
 INPUT_PORTS_END
 
-READ8_MEMBER( hunter2_state::keyboard_r )
+uint8_t hunter2_state::keyboard_r()
 {
 	uint8_t data = 0xff;
 	for (int i = 0; i < 7; i++)
@@ -225,7 +225,7 @@ READ8_MEMBER( hunter2_state::keyboard_r )
 	return data;
 }
 
-READ8_MEMBER( hunter2_state::portb_r )
+uint8_t hunter2_state::portb_r()
 {
 	uint8_t res = 0x00;
 
@@ -235,7 +235,7 @@ READ8_MEMBER( hunter2_state::portb_r )
 	return res;
 }
 
-WRITE8_MEMBER( hunter2_state::keyboard_w )
+void hunter2_state::keyboard_w(uint8_t data)
 {
 	m_keydata = data;
 }
@@ -247,7 +247,7 @@ Bit 1 = DCD (inverted from RS-232 line)
 Bit 2 = Power low warning (0 = Power OK, 1 = Power low)
 Bit 3 = TXCLK (inverted from RS-232 line)
 */
-READ8_MEMBER( hunter2_state::portc_r )
+uint8_t hunter2_state::portc_r()
 {
 	uint8_t res = 0x28;
 
@@ -263,7 +263,7 @@ READ8_MEMBER( hunter2_state::portc_r )
 /*
 ANGLE - Controls display viewing angle. Input value in the range 0-0x1F.
 */
-WRITE8_MEMBER( hunter2_state::display_ctrl_w )
+void hunter2_state::display_ctrl_w(uint8_t data)
 {
 /* according to the website,
 Bit 2: Backlight toggle
@@ -276,7 +276,7 @@ Bits 1,0,7,6: Contrast level.
 V24OUT - Directly outputs to the V24 data line signal on bit 0.
 The output is voltage inverted ie. 0 = +ve, 1 = -ve
 */
-WRITE8_MEMBER( hunter2_state::serial_tx_w )
+void hunter2_state::serial_tx_w(uint8_t data)
 {
 	m_rs232->write_txd(data & 0x01);
 }
@@ -284,7 +284,7 @@ WRITE8_MEMBER( hunter2_state::serial_tx_w )
 /*
 DTR output bit
 */
-WRITE8_MEMBER( hunter2_state::serial_dtr_w )
+void hunter2_state::serial_dtr_w(uint8_t data)
 {
 	m_rs232->write_dtr(data & 0x01);
 }
@@ -292,12 +292,12 @@ WRITE8_MEMBER( hunter2_state::serial_dtr_w )
 /*
 RTS output bit
 */
-WRITE8_MEMBER( hunter2_state::serial_rts_w )
+void hunter2_state::serial_rts_w(uint8_t data)
 {
 	m_rs232->write_rts(data & 0x01);
 }
 
-WRITE8_MEMBER( hunter2_state::speaker_w )
+void hunter2_state::speaker_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 0));
 }
@@ -309,7 +309,7 @@ Bit 1 = Enable RSTC interrupts
 Bit 2 = Enable RSTB interrupts
 Bit 3 = Enable RSTA interrupts
 */
-WRITE8_MEMBER( hunter2_state::irqctrl_w )
+void hunter2_state::irqctrl_w(uint8_t data)
 {
 	m_irq_mask = data;
 	if(!(data & 0x08))
@@ -323,7 +323,7 @@ WRITE8_MEMBER( hunter2_state::irqctrl_w )
 /*
 PAGE - Memory paging register
 */
-WRITE8_MEMBER( hunter2_state::memmap_w )
+void hunter2_state::memmap_w(uint8_t data)
 {
 	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
 	uint8_t bank = data & 0x0f;

@@ -104,8 +104,8 @@ private:
 
 public:
 	variant_wrapper()
-		: m_variant({0})
 	{
+		VariantInit(&m_variant);
 	}
 
 	~variant_wrapper()

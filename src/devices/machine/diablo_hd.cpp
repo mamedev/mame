@@ -93,7 +93,7 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 	m_head(-1),
 	m_sector(-1),
 	m_page(-1),
-	m_bits(nullptr),
+	m_bits(),
 	m_rdfirst(-1),
 	m_rdlast(-1),
 	m_wrfirst(-1),
@@ -434,7 +434,7 @@ uint32_t* diablo_hd_device::expand_sector()
 		return nullptr;
 	/* already expanded this sector? */
 	if (m_bits[m_page])
-		return m_bits[m_page];
+		return m_bits[m_page].get();
 
 	/* allocate a sector buffer */
 	if (!m_cache[m_page]) {
@@ -444,7 +444,8 @@ uint32_t* diablo_hd_device::expand_sector()
 	diablo_sector_t *s = reinterpret_cast<diablo_sector_t *>(m_cache[m_page].get());
 
 	/* allocate a bits image */
-	uint32_t *bits = auto_alloc_array_clear(machine(), uint32_t, 400);
+	m_bits[m_page] = make_unique_clear<uint32_t[]>(400);
+	uint32_t* bits = m_bits[m_page].get();
 
 	if (m_diablo31) {
 		/* write sync bit after (MFROBL-MRPAL) words - 1 bit */
@@ -483,7 +484,6 @@ uint32_t* diablo_hd_device::expand_sector()
 		/* fill MWPAL words of clock and 0 data bits */
 		dst = expand_zeroes(bits, dst, MWPAL);
 	}
-	m_bits[m_page] = bits;
 
 	LOG_DRIVE(0,"[DHD%u]   CHS:%03d/%d/%02d #%5d bits\n", m_unit, m_cylinder, m_head, m_sector, dst);
 	if (DIABLO_DEBUG)
@@ -722,7 +722,7 @@ void diablo_hd_device::squeeze_sector()
 		LOG_DRIVE(0,"[DHD%u]   no bits\n", m_unit);
 		return;
 	}
-	uint32_t *bits = m_bits[m_page];
+	uint32_t *bits = m_bits[m_page].get();
 
 	// pointer to sector buffer
 	s = reinterpret_cast<diablo_sector_t *>(m_cache[m_page].get());
@@ -767,8 +767,7 @@ void diablo_hd_device::squeeze_sector()
 	if (cksum_header || cksum_label || cksum_data) {
 		LOG_DRIVE(0,"[DHD%u]   cksum check - header:%06o label:%06o data:%06o\n", m_unit, cksum_header, cksum_label, cksum_data);
 	}
-	auto_free(machine(), m_bits[m_page]);
-	m_bits[m_page] = nullptr;
+	m_bits[m_page].reset();
 
 	if (m_disk) {
 		if (!hard_disk_write(m_disk, m_page, m_cache[m_page].get())) {
@@ -1328,13 +1327,7 @@ void diablo_hd_device::device_reset()
 		if (m_cache[page])
 			m_cache[page] = nullptr;
 	// free previous bits cache
-	if (m_bits) {
-		for (int page = 0; page < m_pages; page++)
-			if (m_bits[page])
-				auto_free(machine(), m_bits[page]);
-		auto_free(machine(), m_bits);
-		m_bits = nullptr;
-	}
+	m_bits.reset();
 	m_handle = m_image->get_chd_file();
 	m_diablo31 = true;  // FIXME: get from m_handle meta data?
 	m_disk = m_image->get_hard_disk_file();
@@ -1395,7 +1388,7 @@ void diablo_hd_device::device_reset()
 	if (!m_handle)
 		return;
 	// for units with a CHD assigned to them start the timer
-	m_bits = auto_alloc_array_clear(machine(), uint32_t*, m_pages);
+	m_bits = std::make_unique<std::unique_ptr<uint32_t[]>[]>(m_pages);
 	timer_set(m_sector_time - m_sector_mark_0_time, 1, 0);
 	read_sector();
 }

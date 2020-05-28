@@ -19,6 +19,7 @@
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/adc0808.h"
+#include "machine/rescap.h"
 #include "sound/2203intf.h"
 #include "sound/flt_vol.h"
 #include "speaker.h"
@@ -403,7 +404,7 @@ WRITE_LINE_MEMBER(lockon_state::ym2203_irq)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE8_MEMBER(lockon_state::ym2203_out_b)
+void lockon_state::ym2203_out_b(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, ~data & 0x40);
@@ -477,7 +478,7 @@ void lockon_state::lockon(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &lockon_state::sound_io);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096);
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	m58990_device &adc(M58990(config, "adc", 16_MHz_XTAL / 16));
 	adc.in_callback<0>().set_ioport("ADC_BANK");

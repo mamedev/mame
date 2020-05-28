@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /****************************************************************************
 
@@ -14,9 +14,9 @@
 *****************************************************************************/
 
 
-#include <time.h>
-#include <string.h>
-#include <ctype.h>
+#include <ctime>
+#include <cstring>
+#include <cctype>
 
 #include "imgtool.h"
 #include "iflopimg.h"

@@ -16,8 +16,6 @@
 //**************************************************************************
 
 #define M6510T_TAG      "u2"
-#define M6523_0_TAG     "u3"
-#define M6523_1_TAG     "ci_u2"
 #define C64H156_TAG     "u6"
 #define PLA_TAG         "u1"
 
@@ -341,15 +339,15 @@ void c1551_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1551_device::c1551_mem);
 	m_maincpu->read_callback().set(FUNC(c1551_device::port_r));
 	m_maincpu->write_callback().set(FUNC(c1551_device::port_w));
-	config.m_perfect_cpu_quantum = subtag(M6510T_TAG);
+	//config.set_perfect_quantum(m_maincpu); FIXME: not safe in a slot device - add barriers
 
 	PLS100(config, m_pla);
 
 	TPI6525(config, m_tpi0, 0);
 	m_tpi0->in_pa_cb().set(FUNC(c1551_device::tcbm_data_r));
 	m_tpi0->out_pa_cb().set(FUNC(c1551_device::tcbm_data_w));
-	m_tpi0->in_pb_cb().set(C64H156_TAG, FUNC(c64h156_device::yb_r));
-	m_tpi0->out_pb_cb().set(C64H156_TAG, FUNC(c64h156_device::yb_w));
+	m_tpi0->in_pb_cb().set(m_ga, FUNC(c64h156_device::yb_r));
+	m_tpi0->out_pb_cb().set(m_ga, FUNC(c64h156_device::yb_w));
 	m_tpi0->in_pc_cb().set(FUNC(c1551_device::tpi0_pc_r));
 	m_tpi0->out_pc_cb().set(FUNC(c1551_device::tpi0_pc_w));
 
@@ -361,7 +359,7 @@ void c1551_device::device_add_mconfig(machine_config &config)
 	m_tpi1->out_pc_cb().set(FUNC(c1551_device::tpi1_pc_w));
 
 	C64H156(config, m_ga, XTAL(16'000'000));
-	m_ga->byte_callback().set(C64H156_TAG, FUNC(c64h156_device::atni_w));
+	m_ga->byte_callback().set(m_ga, FUNC(c64h156_device::atni_w));
 
 	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0", 0));
 	connector.option_add("525ssqd", FLOPPY_525_SSQD);
@@ -413,8 +411,8 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, C1551, tag, owner, clock)
 	, device_plus4_expansion_card_interface(mconfig, *this)
 	, m_maincpu(*this, M6510T_TAG)
-	, m_tpi0(*this, M6523_0_TAG)
-	, m_tpi1(*this, M6523_1_TAG)
+	, m_tpi0(*this, "u3")
+	, m_tpi1(*this, "ci_u2")
 	, m_ga(*this, C64H156_TAG)
 	, m_pla(*this, PLA_TAG)
 	, m_floppy(*this, C64H156_TAG":0:525ssqd")

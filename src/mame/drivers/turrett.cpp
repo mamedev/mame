@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "includes/turrett.h"
 
+#include "bus/ata/idehd.h"
+
+
 /*************************************
  *
  *  Definitions

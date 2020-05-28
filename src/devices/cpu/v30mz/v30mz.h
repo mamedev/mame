@@ -3,6 +3,7 @@
 #ifndef MAME_CPU_V32MZ_V30MZ_H
 #define MAME_CPU_V32MZ_V30MZ_H
 
+#include "cpu/nec/necdasm.h"
 
 struct nec_config
 {
@@ -22,7 +23,7 @@ enum
 
 DECLARE_DEVICE_TYPE(V30MZ, v30mz_cpu_device)
 
-class v30mz_cpu_device : public cpu_device
+class v30mz_cpu_device : public cpu_device, public nec_disassembler::config
 {
 public:
 	// construction/destruction
@@ -34,10 +35,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 80; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 80; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -49,6 +50,7 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual int get_mode() const override { return 1; };
 
 	void interrupt(int int_num);
 
@@ -187,9 +189,9 @@ protected:
 	uint8_t   m_no_interrupt;
 	uint8_t   m_fire_trap;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_io;
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	int m_icount;
 
 	uint32_t m_prefix_base;   /* base address of the latest prefix segment */

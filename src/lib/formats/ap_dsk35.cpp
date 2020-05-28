@@ -98,11 +98,11 @@
 
 *********************************************************************/
 
-#include <stdio.h>
-#include <assert.h>
-
-#include "emu.h" // logerror
 #include "ap_dsk35.h"
+
+#include <cassert>
+#include <cstdio>
+
 
 struct apple35_tag
 {

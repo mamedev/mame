@@ -422,6 +422,8 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 
 		case 0x71:
 			memcpy(data, &GDROM_Cmd71_Reply[0], sizeof(GDROM_Cmd71_Reply));
+			if (is_real_gdrom_disc)
+				data[10] = 0x1f; // needed by dimm board firmware
 			break;
 
 		case 0x40: // Get Subchannel status
@@ -465,11 +467,22 @@ void gdrom_device::WriteData( uint8_t *data, int dataLength )
 	}
 }
 
+void gdrom_device::SetDevice(void *device)
+{
+	t10mmc::SetDevice(device);
+
+	// try to find if the mounted chd is from an actual gd-rom disc
+	if (m_cdrom)
+		if (cdrom_get_toc(m_cdrom)->flags & CD_FLAG_GDROM)
+			is_real_gdrom_disc = true;
+}
+
 // device type definition
 DEFINE_DEVICE_TYPE(GDROM, gdrom_device, "gdrom", "GD-ROM")
 
 gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	atapi_cdrom_device(mconfig, GDROM, tag, owner, clock)
+	atapi_cdrom_device(mconfig, GDROM, tag, owner, clock),
+	is_real_gdrom_disc(false)
 {
 }
 
@@ -522,4 +535,13 @@ void gdrom_device::process_buffer()
 {
 	atapi_hle_device::process_buffer();
 	m_sector_number = 0x80 | GDROM_PAUSE_STATE; /// HACK: find out when this should be updated
+}
+
+void gdrom_device::signature()
+{
+	atapi_hle_device::signature();
+
+	// naomi dimm board firmware needs the upper nibble to be 8 at the beginning
+	if (is_real_gdrom_disc)
+		m_sector_number = 0x81;
 }

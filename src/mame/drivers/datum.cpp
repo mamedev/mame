@@ -55,6 +55,7 @@ Z1000G
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "bus/rs232/rs232.h"
+#include "video/pwm.h"
 #include "datum.lh"
 
 
@@ -66,9 +67,9 @@ public:
 		, m_pia1(*this, "pia1")
 		, m_pia2(*this, "pia2")
 		, m_acia(*this, "acia")
-		, m_keyboard(*this, "X%u", 0)
 		, m_maincpu(*this, "maincpu")
-		, m_digits(*this, "digit%u", 0U)
+		, m_display(*this, "display")
+		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void datum(machine_config &config);
@@ -76,32 +77,31 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 
 private:
-	DECLARE_READ8_MEMBER(pa_r);
-	DECLARE_WRITE8_MEMBER(pa_w);
-	DECLARE_WRITE8_MEMBER(pb_w);
+	uint8_t pa_r();
+	void pa_w(uint8_t data);
+	void pb_w(uint8_t data);
 	void datum_mem(address_map &map);
-	uint8_t m_keydata;
+	uint8_t m_digit;
+	uint8_t m_seg;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	required_device<acia6850_device> m_acia;
-	required_ioport_array<4> m_keyboard;
 	required_device<cpu_device> m_maincpu;
-	output_finder<16> m_digits;
+	required_device<pwm_display_device> m_display;
+	required_ioport_array<4> m_io_keyboard;
 };
 
 
 void datum_state::datum_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0x7fff); // A15 not used
-	map(0x0000, 0x007f).ram(); // inside CPU
-	map(0x1000, 0x13ff).mirror(0x0c00).ram(); // main ram 2x 2114
-	map(0x4000, 0x4001).mirror(0x0ffe).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0x5000, 0x5003).mirror(0x0ffc).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x6000, 0x6003).mirror(0x0ffc).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x7000, 0x77ff).mirror(0x0800).rom().region("roms", 0);
+	map(0x1000, 0x13ff).mirror(0x8c00).ram(); // main ram 2x 2114
+	map(0x4000, 0x4001).mirror(0x8ffe).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x5000, 0x5003).mirror(0x8ffc).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x6003).mirror(0x8ffc).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x7000, 0x77ff).mirror(0x8800).rom().region("roms", 0);
 }
 
 
@@ -155,38 +155,39 @@ INPUT_CHANGED_MEMBER( datum_state::trigger_nmi )
 }
 
 
+void datum_state::machine_start()
+{
+	save_item(NAME(m_digit));
+	save_item(NAME(m_seg));
+}
+
 void datum_state::machine_reset()
 {
-	m_keydata = 0;
+	m_digit = 0;
+	m_seg = 0;
 }
 
 // read keyboard
-READ8_MEMBER( datum_state::pa_r )
+uint8_t datum_state::pa_r()
 {
-	if (m_keydata < 4)
-		return m_keyboard[m_keydata]->read();
+	if (m_digit < 4)
+		return m_io_keyboard[m_digit]->read();
 
 	return 0xff;
 }
 
 // write display segments
-WRITE8_MEMBER( datum_state::pa_w )
+void datum_state::pa_w(uint8_t data)
 {
-	data ^= 0xff;
-	if (m_keydata > 3)
-	{
-		m_digits[m_keydata] = bitswap<8>(data & 0x7f, 7, 0, 5, 6, 4, 2, 1, 3);
-		m_keydata = 0;
-	}
-
-	return;
+	m_seg = bitswap<8>(~data, 7, 0, 5, 6, 4, 2, 1, 3);
+	m_display->matrix(1<<m_digit, m_seg);
 }
 
 // select keyboard row, select a digit
-WRITE8_MEMBER( datum_state::pb_w )
+void datum_state::pb_w(uint8_t data)
 {
-	m_keydata = bitswap<8>(data, 7, 6, 5, 4, 0, 1, 2, 3) & 15;
-	return;
+	m_digit = bitswap<8>(data, 7, 6, 5, 4, 0, 1, 2, 3) & 15;
+	m_display->matrix(1<<m_digit, m_seg);
 }
 
 
@@ -198,6 +199,8 @@ void datum_state::datum(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_datum);
+	PWM_DISPLAY(config, m_display).set_size(10, 7);
+	m_display->set_segmask(0x3f0, 0x7f);
 
 	/* Devices */
 	PIA6821(config, m_pia1, 0); // keyboard & display
@@ -227,4 +230,4 @@ ROM_START( datum )
 ROM_END
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
-COMP( 1982, datum, 0,      0,      datum,   datum, datum_state, empty_init, "Gammatron", "Datum",  MACHINE_NO_SOUND_HW )
+COMP( 1982, datum, 0,      0,      datum,   datum, datum_state, empty_init, "Gammatron", "Datum",  MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

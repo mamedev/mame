@@ -229,7 +229,8 @@ void pmmu_atc_flush_fc_ea(const u16 modes)
 		{
 			if ((e & M68K_MMU_ATC_VALID) &&
 				(((e >> 24) & fcmask) == fc) &&
-				(((e >> ps) << (ps - 8)) == ((ea >> ps) << (ps - 8))))
+//              (((e >> ps) << (ps - 8)) == ((ea >> ps) << (ps - 8))))
+				( (e << ps) == (ea >> 8 << ps) ))
 			{
 				MMULOG("flushing entry %08x\n", e);
 				e = 0;
@@ -560,13 +561,8 @@ u32 pmmu_translate_addr_with_fc(u32 addr_in, u8 fc, bool rw, const int limit = 7
 		return addr_out;
 	}
 
-	if (!ptest && pmmu_atc_lookup<false>(addr_in, fc, rw, addr_out))
+	if (!ptest && !pload && pmmu_atc_lookup<false>(addr_in, fc, rw, addr_out))
 	{
-		if (pload)
-		{
-			return addr_out;
-		}
-
 		if ((m_mmu_tmp_sr & M68K_MMU_SR_BUS_ERROR) || (!rw && (m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT)))
 		{
 			MMULOG("set atc hit buserror: addr_in=%08x, addr_out=%x, rw=%x, fc=%d, sz=%d\n",

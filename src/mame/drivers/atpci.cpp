@@ -27,11 +27,11 @@ public:
 protected:
 	void at_softlists(machine_config &config);
 
-	DECLARE_WRITE8_MEMBER(boot_state_w);
+	void boot_state_w(uint8_t data);
 
-	static void tx_config(device_t *device);
-	static void sb_config(device_t *device);
-	static void superio_config(device_t *device);
+	void tx_config(device_t *device);
+	void sb_config(device_t *device);
+	void superio_config(device_t *device);
 
 	void at586_io(address_map &map);
 	void at586_map(address_map &map);
@@ -40,7 +40,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE8_MEMBER(at586_state::boot_state_w)
+void at586_state::boot_state_w(uint8_t data)
 {
 	logerror("Boot state %02x\n", data);
 	printf("[%02X]",data);
@@ -48,15 +48,16 @@ WRITE8_MEMBER(at586_state::boot_state_w)
 
 void at586_state::tx_config(device_t *device)
 {
-	downcast<i82439tx_device *>(device)->set_cpu("maincpu");
+	downcast<i82439tx_device *>(device)->set_cpu(m_maincpu);
 	downcast<i82439tx_device *>(device)->set_region("isa");
 }
 
 void at586_state::sb_config(device_t *device)
 {
 	i82371sb_device &sb = *downcast<i82371sb_device *>(device);
+	sb.set_cpu(m_maincpu);
 	sb.boot_state_hook().set(":", FUNC(at586_state::boot_state_w));
-	sb.smi().set_inputline(":maincpu", INPUT_LINE_SMI);
+	sb.smi().set_inputline(m_maincpu, INPUT_LINE_SMI);
 }
 
 
@@ -64,8 +65,8 @@ void at586_state::superio_config(device_t *device)
 {
 	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
 	fdc.set_sysopt_pin(1);
-	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.gp20_reset().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(m_maincpu, INPUT_LINE_A20);
 	fdc.irq1().set(":pcibus:7:i82371sb:pic8259_master", FUNC(pic8259_device::ir1_w));
 }
 
@@ -102,6 +103,7 @@ void at586_state::at_softlists(machine_config &config)
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
 	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 }
 
 void at586_state::at586(machine_config &config)
@@ -114,7 +116,7 @@ void at586_state::at586(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");
 
 	PCI_BUS(config, "pcibus", 0).set_busnum(0);
-	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "i82439tx", true).set_option_machine_config("i82439tx", tx_config);
+	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "i82439tx", true).set_option_machine_config("i82439tx", [this](device_t *device) { tx_config(device); });
 	PCI_CONNECTOR(config, "pcibus:1", pci_devices, "i82371ab", true);
 
 	// FIXME: determine ISA bus clock
@@ -138,8 +140,8 @@ void at586_state::at586x3(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");
 
 	PCI_BUS(config, "pcibus", 0).set_busnum(0);
-	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "i82439tx", true).set_option_machine_config("i82439tx", tx_config);
-	PCI_CONNECTOR(config, "pcibus:1", pci_devices, "i82371sb", true).set_option_machine_config("i82371sb", sb_config);
+	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "i82439tx", true).set_option_machine_config("i82439tx", [this](device_t *device) { tx_config(device); });
+	PCI_CONNECTOR(config, "pcibus:1", pci_devices, "i82371sb", true).set_option_machine_config("i82371sb", [this](device_t *device) { sb_config(device); });
 
 	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "isa1", 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, "svga_et4k", false);
@@ -166,10 +168,10 @@ void at586_state::at586m55(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");
 
 	PCI_BUS(config, "pcibus", 0).set_busnum(0);
-	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "i82439tx", true).set_option_machine_config("i82439tx", tx_config);
-	PCI_CONNECTOR(config, "pcibus:7", pci_devices, "i82371sb", true).set_option_machine_config("i82371sb", sb_config);
+	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "i82439tx", true).set_option_machine_config("i82439tx", [this](device_t *device) { tx_config(device); });
+	PCI_CONNECTOR(config, "pcibus:7", pci_devices, "i82371sb", true).set_option_machine_config("i82371sb", [this](device_t *device) { sb_config(device); });
 
-	ISA16_SLOT(config, "board4", 0, "pcibus:7:i82371sb:isabus",  isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
+	ISA16_SLOT(config, "board4", 0, "pcibus:7:i82371sb:isabus",  isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", [this](device_t *device) { superio_config(device); });
 	ISA16_SLOT(config, "isa1", 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, "svga_et4k", false);
 	ISA16_SLOT(config, "isa2", 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
@@ -193,6 +195,19 @@ ROM_START( at586 )
 	ROM_SYSTEM_BIOS(4, "txp4", "ASUS TXP4") // W83977TF-A I/O
 	ROMX_LOAD("asus_txp4.bin",   0x20000, 0x20000, CRC(a1321bb1) SHA1(92e5f14d8505119f85b148a63510617ac12bcdf3), ROM_BIOS(4))
 ROM_END
+
+// Elitegroup SI5PI AIO Rev. 1.1 - Chipset: SiS 85C501, 85C502, 85C502, FDC37C666GT, UM82C865F, PCI0640B - CPU: Socket 4 - RAM: 4xSIMM72, Cache: 18x32pin
+// BIOS: Award 32pin - Keyboard-BIOS: AMIKEY-2 - ISA16: 4, PCI: 4 - On board: 2xISA, 2xser, Floppy, par
+ROM_START( ecssi5pi )
+	ROM_REGION32_LE(0x40000, "isa", 0)
+	// BIOS-String: 11/17/94-SiS-501-503-2A5IAE11-00 / SI5PI AIO 11/18/94
+	ROM_SYSTEM_BIOS(0, "111894", "11/18/94")
+	ROMX_LOAD("si5piaio11_isa_pci_bios_013908435.bin", 0x20000, 0x20000, CRC(c39aa47c) SHA1(6b31bdc5441c5f7a29d0ceb8989ccfed92c49900), ROM_BIOS(0))
+	// BIOS-String: 12/02/94-SiS-501-503-2A5IAE11-00 / SI5PI AIO 12/02/94
+	ROM_SYSTEM_BIOS(1, "120294", "12/02/94")
+	ROMX_LOAD("si5piaio.bin", 0x20000, 0x20000, CRC(9dfb8510) SHA1(b86cc1930dc78db3c4c9d1ed13ec60b2333db7d1), ROM_BIOS(1))
+ROM_END
+
 
 ROM_START(at586x3)
 	ROM_REGION32_LE(0x40000, "isa", 0)
@@ -245,3 +260,4 @@ COMP( 1990, at586,    ibm5170, 0,       at586,    0,        at586_state, empty_i
 COMP( 1990, at586x3,  ibm5170, 0,       at586x3,  0,        at586_state, empty_init, "<generic>", "PC/AT 586 (PIIX3)", MACHINE_NOT_WORKING )
 COMP( 1997, ficvt503, ibm5170, 0,       at586,    0,        at586_state, empty_init, "FIC",       "VT-503",            MACHINE_NOT_WORKING )
 COMP( 1990, m55hipl,  ibm5170, 0,       at586m55, at586m55, at586_state, empty_init, "Micronics", "M55Hi-Plus",        MACHINE_NOT_WORKING )
+COMP( 199?, ecssi5pi, ibm5170, 0,       at586,    0,        at586_state, empty_init, "Elitegroup","SI5PI AIO",         MACHINE_NOT_WORKING )

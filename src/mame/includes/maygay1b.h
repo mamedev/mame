@@ -5,13 +5,6 @@
 
 #pragma once
 
-
-#define VERBOSE 0
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-
-#define M1_MASTER_CLOCK (XTAL(8'000'000))
-#define M1_DUART_CLOCK  (XTAL(3'686'400))
-
 #include "cpu/m6809/m6809.h"
 #include "machine/i8279.h"
 
@@ -29,6 +22,7 @@
 #include "sound/upd7759.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
+
 
 class maygay1b_state : public driver_device
 {
@@ -99,11 +93,11 @@ private:
 	uint8_t m_Lamps[256];
 	int m_optic_pattern;
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
-	DECLARE_WRITE8_MEMBER(scanlines_w);
-	DECLARE_WRITE8_MEMBER(scanlines_2_w);
-	DECLARE_WRITE8_MEMBER(lamp_data_w);
-	DECLARE_WRITE8_MEMBER(lamp_data_2_w);
-	DECLARE_READ8_MEMBER(kbd_r);
+	void scanlines_w(uint8_t data);
+	void scanlines_2_w(uint8_t data);
+	void lamp_data_w(uint8_t data);
+	void lamp_data_2_w(uint8_t data);
+	uint8_t kbd_r();
 	DECLARE_WRITE8_MEMBER(reel12_w);
 	DECLARE_WRITE8_MEMBER(reel34_w);
 	DECLARE_WRITE8_MEMBER(reel56_w);
@@ -118,10 +112,10 @@ private:
 	DECLARE_READ8_MEMBER(latch_st_hi);
 	DECLARE_READ8_MEMBER(latch_st_lo);
 	DECLARE_WRITE8_MEMBER(m1ab_no_oki_w);
-	DECLARE_WRITE8_MEMBER(m1_pia_porta_w);
-	DECLARE_WRITE8_MEMBER(m1_pia_portb_w);
-	DECLARE_WRITE8_MEMBER(m1_lockout_w);
-	DECLARE_WRITE8_MEMBER(m1_meter_w);
+	void m1_pia_porta_w(uint8_t data);
+	void m1_pia_portb_w(uint8_t data);
+	void m1_lockout_w(uint8_t data);
+	void m1_meter_w(uint8_t data);
 	DECLARE_READ8_MEMBER(m1_meter_r);
 	DECLARE_READ8_MEMBER(m1_firq_clr_r);
 	DECLARE_READ8_MEMBER(m1_firq_trg_r);
@@ -130,13 +124,13 @@ private:
 	DECLARE_WRITE8_MEMBER(nec_bank0_w);
 	DECLARE_WRITE8_MEMBER(nec_bank1_w);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_READ8_MEMBER(m1_duart_r);
-	DECLARE_WRITE8_MEMBER(mcu_port0_w);
-	DECLARE_WRITE8_MEMBER(mcu_port1_w);
-	DECLARE_WRITE8_MEMBER(mcu_port2_w);
-	DECLARE_WRITE8_MEMBER(mcu_port3_w);
-	DECLARE_READ8_MEMBER(mcu_port0_r);
-	DECLARE_READ8_MEMBER(mcu_port2_r);
+	uint8_t m1_duart_r();
+	void mcu_port0_w(uint8_t data);
+	void mcu_port1_w(uint8_t data);
+	void mcu_port2_w(uint8_t data);
+	void mcu_port3_w(uint8_t data);
+	uint8_t mcu_port0_r();
+	uint8_t mcu_port2_r();
 
 	DECLARE_WRITE8_MEMBER(main_to_mcu_0_w);
 	DECLARE_WRITE8_MEMBER(main_to_mcu_1_w);
@@ -150,5 +144,7 @@ private:
 	void m1_memmap(address_map &map);
 	void m1_nec_memmap(address_map &map);
 };
+
+INPUT_PORTS_EXTERN( maygay_m1 );
 
 #endif // MAME_INCLUDES_MAYGAY1B_H

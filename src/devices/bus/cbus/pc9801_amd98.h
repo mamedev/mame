@@ -42,8 +42,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	DECLARE_WRITE8_MEMBER(ay3_address_w);
-	DECLARE_WRITE8_MEMBER(ay3_data_latch_w);
+	void ay3_address_w(uint8_t data);
+	void ay3_data_latch_w(uint8_t data);
 
 	uint8_t m_ay3_latch;
 

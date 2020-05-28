@@ -45,8 +45,8 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_memory_bank m_vrambank;
 
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_READ16_MEMBER(eolith16_custom_r);
+	void eeprom_w(uint16_t data);
+	uint16_t eolith16_custom_r();
 
 	void eolith16_palette(palette_device &palette) const;
 
@@ -56,7 +56,7 @@ private:
 
 
 
-WRITE16_MEMBER(eolith16_state::eeprom_w)
+void eolith16_state::eeprom_w(uint16_t data)
 {
 	m_vrambank->set_entry(((data & 0x80) >> 7) ^ 1);
 	machine().bookkeeping().coin_counter_w(0, data & 1);
@@ -66,7 +66,7 @@ WRITE16_MEMBER(eolith16_state::eeprom_w)
 	//data & 0x100 and data & 0x004 always set
 }
 
-READ16_MEMBER(eolith16_state::eolith16_custom_r)
+uint16_t eolith16_state::eolith16_custom_r()
 {
 	speedup_read();
 	return m_special_io->read();
@@ -90,7 +90,7 @@ void eolith16_state::eolith16_map(address_map &map)
 static INPUT_PORTS_START( eolith16 )
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith16_state, eolith_speedup_getvblank, nullptr)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(eolith16_state, speedup_vblank_r)
 	PORT_BIT( 0xff6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")

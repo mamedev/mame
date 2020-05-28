@@ -38,14 +38,14 @@ private:
 	required_device<isa8_device> m_isabus;
 	required_ioport_array<4> m_inp;
 
-	DECLARE_READ8_MEMBER(fruit_inp_r);
-	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
+	uint8_t fruit_inp_r(offs_t offset);
+	void dma8237_1_dack_w(uint8_t data);
 	static void fruitpc_sb_conf(device_t *device);
 	void fruitpc_io(address_map &map);
 	void fruitpc_map(address_map &map);
 };
 
-READ8_MEMBER(fruitpc_state::fruit_inp_r)
+uint8_t fruitpc_state::fruit_inp_r(offs_t offset)
 {
 	return m_inp[offset & 0x03]->read();
 }
@@ -98,7 +98,7 @@ static INPUT_PORTS_START( fruitpc )
 INPUT_PORTS_END
 
 //TODO: use atmb device
-WRITE8_MEMBER( fruitpc_state::dma8237_1_dack_w ){ m_isabus->dack_w(1, data); }
+void fruitpc_state::dma8237_1_dack_w(uint8_t data) { m_isabus->dack_w(1, data); }
 
 static void fruitpc_isa8_cards(device_slot_interface &device)
 {
@@ -151,7 +151,7 @@ void fruitpc_state::fruitpc(machine_config &config)
 }
 
 ROM_START( fruitpc )
-	ROM_REGION( 0x20000, "bios", 0 )
+	ROM_REGION32_LE( 0x20000, "bios", 0 )
 	ROM_LOAD( "at-gs001.bin", 0x000000, 0x020000, CRC(7dec34d0) SHA1(81d194d67fef9f6531bd3cd1ee0baacb5c2558bf) )
 
 	DISK_REGION( "ide:0:hdd:image" )    // 8 MB Compact Flash card
@@ -163,7 +163,7 @@ GAME( 2006, fruitpc, 0, fruitpc, fruitpc, fruitpc_state, empty_init, ROT0, "<unk
 // this doesn't really belong here, but is some kind of x86 pc-like hardware, exact CPU type etc. unknown
 // hardware ia by Paokai, motherboard has logos, large chip with logo too, http://www.paokai.com.tw/
 ROM_START( gogostrk )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "39sf020a.rom1", 0x000000, 0x040000, CRC(236d4d95) SHA1(50579acddc93c05d5f8e17ad3669a29d2dc49965) )
 
 	DISK_REGION( "ide:0:hdd:image" )    // 128 MB CF Card

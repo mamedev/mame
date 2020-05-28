@@ -1556,7 +1556,7 @@ static char const *const reg_names[] = {
 	"Unused",  "Unused",   "Unused",   "Unused",
 };
 
-READ32_MEMBER(gba_lcd_device::video_r)
+uint32_t gba_lcd_device::video_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t retval = 0;
 
@@ -1577,34 +1577,30 @@ READ32_MEMBER(gba_lcd_device::video_r)
 		break;
 	}
 
-	assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_lcd_device");
+	if (offset >= ARRAY_LENGTH(reg_names) / 2)
+		throw emu_fatalerror("gba_lcd_device::video_r: Not enough register names in gba_lcd_device");
 
 	if (ACCESSING_BITS_0_15)
-	{
 		verboselog(*this, 2, "GBA I/O Read: %s = %04x\n", reg_names[offset * 2], retval & 0x0000ffff);
-	}
+
 	if (ACCESSING_BITS_16_31)
-	{
 		verboselog(*this, 2, "GBA I/O Read: %s = %04x\n", reg_names[offset * 2 + 1], (retval & 0xffff0000) >> 16);
-	}
 
 	return retval;
 }
 
-WRITE32_MEMBER(gba_lcd_device::video_w)
+void gba_lcd_device::video_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_regs[offset]);
 
-	assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_lcd_device");
+	if (offset >= ARRAY_LENGTH(reg_names) / 2)
+		throw emu_fatalerror("gba_lcd_device::video_w: Not enough register names in gba_lcd_device");
 
 	if (ACCESSING_BITS_0_15)
-	{
 		verboselog(*this, 2, "GBA I/O Write: %s = %04x\n", reg_names[offset * 2], data & 0x0000ffff);
-	}
+
 	if (ACCESSING_BITS_16_31)
-	{
 		verboselog(*this, 2, "GBA I/O Write: %s = %04x\n", reg_names[offset * 2 + 1], (data & 0xffff0000) >> 16);
-	}
 
 	switch (offset)
 	{
@@ -1623,32 +1619,32 @@ WRITE32_MEMBER(gba_lcd_device::video_w)
 	}
 }
 
-READ32_MEMBER(gba_lcd_device::gba_pram_r)
+uint32_t gba_lcd_device::gba_pram_r(offs_t offset)
 {
 	return m_pram[offset];
 }
 
-WRITE32_MEMBER(gba_lcd_device::gba_pram_w)
+void gba_lcd_device::gba_pram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_pram[offset]);
 }
 
-READ32_MEMBER(gba_lcd_device::gba_vram_r)
+uint32_t gba_lcd_device::gba_vram_r(offs_t offset)
 {
 	return m_vram[offset];
 }
 
-WRITE32_MEMBER(gba_lcd_device::gba_vram_w)
+void gba_lcd_device::gba_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 }
 
-READ32_MEMBER(gba_lcd_device::gba_oam_r)
+uint32_t gba_lcd_device::gba_oam_r(offs_t offset)
 {
 	return m_oam[offset];
 }
 
-WRITE32_MEMBER(gba_lcd_device::gba_oam_w)
+void gba_lcd_device::gba_oam_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_oam[offset]);
 }

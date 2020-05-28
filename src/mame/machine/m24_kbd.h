@@ -35,10 +35,10 @@ private:
 	required_device<i8049_device> m_mcu;
 	emu_timer *m_reset_timer;
 
-	DECLARE_WRITE8_MEMBER(bus_w);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p2_r);
+	void bus_w(uint8_t data);
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
+	uint8_t p2_r();
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_READ_LINE_MEMBER(t1_r);
 };

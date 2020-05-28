@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 
-<!-- define elements -->
+	<!-- define elements -->
 
 	<element name="static_orange"><rect><color red="0.9" green="0.65" blue="0.3" /></rect></element>
 	<element name="static_offblack"><rect><color red="0.3" green="0.3" blue="0.29" /></rect></element>
@@ -113,7 +116,7 @@
 	<element name="text_b12"><text string="12"><color red="0.94" green="0.94" blue="0.94" /></text></element>
 
 
-<!-- build screen -->
+	<!-- build screen -->
 
 	<view name="Internal Layout">
 		<bounds left="0" right="42" top="0" bottom="75" />
@@ -121,7 +124,7 @@
 		<bezel element="static_offwhite"><bounds x="0" y="0" width="42" height="6" /></bezel>
 		<bezel element="static_offwhite"><bounds x="0" y="69" width="42" height="6" /></bezel>
 
-	<!-- misc buttons -->
+		<!-- misc buttons -->
 
 		<bezel element="static_orange"><bounds x="12" y="2" width="2" height="2" /></bezel>
 		<bezel element="static_orange"><bounds x="28" y="2" width="2" height="2" /></bezel>
@@ -161,8 +164,8 @@
 		<bezel element="text_play"><bounds x="24" y="73.2" width="10" height="1.4" /></bezel>
 
 
-	<!-- coloured lighted buttons -->
-	<!-- row 1 5 9 -->
+		<!-- coloured lighted buttons -->
+		<!-- row 1 5 9 -->
 
 		<bezel element="button1">
 			<bounds x="3" y="9" width="10" height="12" />
@@ -218,7 +221,7 @@
 			<bounds x="29" y="9" width="10" height="12" />
 		</bezel>
 
-	<!-- row 2 6 10 -->
+		<!-- row 2 6 10 -->
 
 		<bezel element="button2">
 			<bounds x="3" y="24" width="10" height="12" />
@@ -274,7 +277,7 @@
 			<bounds x="29" y="24" width="10" height="12" />
 		</bezel>
 
-	<!-- row 3 7 11 -->
+		<!-- row 3 7 11 -->
 
 		<bezel element="button3">
 			<bounds x="3" y="39" width="10" height="12" />
@@ -330,7 +333,7 @@
 			<bounds x="29" y="39" width="10" height="12" />
 		</bezel>
 
-	<!-- row 4 8 12 -->
+		<!-- row 4 8 12 -->
 
 		<bezel element="button4">
 			<bounds x="3" y="54" width="10" height="12" />
@@ -387,7 +390,7 @@
 		</bezel>
 
 
-	<!-- gamename labels -->
+		<!-- gamename labels -->
 
 		<bezel element="text_g1"><bounds x="4" y="21.8" width="12" height="1.4" /></bezel>
 		<bezel element="text_g5"><bounds x="17" y="21.8" width="12" height="1.4" /></bezel>
@@ -406,7 +409,7 @@
 		<bezel element="text_g12"><bounds x="30" y="66.8" width="12" height="1.4" /></bezel>
 
 
-	<!-- number labels -->
+		<!-- number labels -->
 
 		<bezel element="text_b1"><bounds x="12.8" y="20.8" width="2" height="2" /></bezel>
 		<bezel element="text_b5"><bounds x="25.8" y="20.8" width="2" height="2" /></bezel>

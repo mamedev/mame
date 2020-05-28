@@ -21,7 +21,7 @@
  *
  */
 
-#include <assert.h>
+#include <cassert>
 
 #include "x1_tap.h"
 

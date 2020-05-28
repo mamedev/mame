@@ -1437,9 +1437,9 @@ void x07_state::machine_start()
 	{
 		// 0x4000 - 0x4fff   4KB RAM
 		// 0x6000 - 0x7fff   8KB ROM
-		program.install_read_handler(ram_size, ram_size + 0xfff, read8sm_delegate(FUNC(generic_slot_device::read_ram),(generic_slot_device*)m_card));
-		program.install_write_handler(ram_size, ram_size + 0xfff, write8sm_delegate(FUNC(generic_slot_device::write_ram),(generic_slot_device*)m_card));
-		program.install_read_handler(0x6000, 0x7fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
+		program.install_read_handler(ram_size, ram_size + 0xfff, read8sm_delegate(*m_card, FUNC(generic_slot_device::read_ram)));
+		program.install_write_handler(ram_size, ram_size + 0xfff, write8sm_delegate(*m_card, FUNC(generic_slot_device::write_ram)));
+		program.install_read_handler(0x6000, 0x7fff, read8sm_delegate(*m_card, FUNC(generic_slot_device::read_rom)));
 
 		m_card->save_ram();
 	}
@@ -1519,7 +1519,7 @@ void x07_state::x07(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("8K,12K,20K,24K");
 
 	/* Memory Card */
-	GENERIC_CARTSLOT(config, "cardslot", generic_romram_plain_slot, "x07_card", "rom,bin").set_device_load(FUNC(x07_state::card_load), this);
+	GENERIC_CARTSLOT(config, "cardslot", generic_romram_plain_slot, "x07_card", "rom,bin").set_device_load(FUNC(x07_state::card_load));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

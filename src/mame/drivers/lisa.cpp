@@ -2,7 +2,7 @@
 // copyright-holders:Raphael Nabet
 /*********************************************************************
 
-    drivers/lisa.c
+    drivers/lisa.cpp
 
     Experimental LISA driver
 
@@ -117,7 +117,7 @@ void lisa_state::lisa(machine_config &config)
 	M6504(config, m_fdc_cpu, 2000000);        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
 	m_fdc_cpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa_fdc_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	LS259(config, m_latch); // U4E (CPU board)
 	m_latch->q_out_cb<0>().set(FUNC(lisa_state::diag1_w));
@@ -147,11 +147,11 @@ void lisa_state::lisa(machine_config &config)
 	m_nvram->set_custom_handler(FUNC(lisa_state::nvram_init));
 
 	/* devices */
-	IWM(config, m_fdc, &lisa2_fdc_interface);
+	LEGACY_IWM(config, m_fdc, &lisa2_fdc_interface);
 	sonydriv_floppy_image_device::legacy_2_drives_add(config, &lisa_floppy_interface);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "disk_list").set_type("lisa", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "disk_list").set_original("lisa");
 
 	/* via */
 	VIA6522(config, m_via0, 20.37504_MHz_XTAL / 40); // CPU E clock (nominally 500 kHz)

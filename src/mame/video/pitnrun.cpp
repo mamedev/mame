@@ -26,7 +26,7 @@ In debug build press 'w' for spotlight and 'e' for lightning
 TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info1)
 {
 	int code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code,
 		0,
 		0);
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info1)
 TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info2)
 {
 	int code = m_videoram2[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 		code + (m_char_bank<<8),
 		m_color_select&1,
 		0);
@@ -170,8 +170,8 @@ void pitnrun_state::pitnrun_palette(palette_device &palette) const
 
 void pitnrun_state::video_start()
 {
-	m_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pitnrun_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
-	m_bg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pitnrun_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,32*4,32 );
+	m_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pitnrun_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pitnrun_state::get_tile_info2)), TILEMAP_SCAN_ROWS, 8, 8, 32*4, 32);
 	m_fg->set_transparent_pen(0 );
 	m_tmp_bitmap[0] = std::make_unique<bitmap_ind16>(128,128);
 	m_tmp_bitmap[1] = std::make_unique<bitmap_ind16>(128,128);

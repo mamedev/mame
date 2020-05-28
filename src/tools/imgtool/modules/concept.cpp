@@ -8,10 +8,10 @@
     Raphael Nabet, 2003
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <limits.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <climits>
 #include "imgtool.h"
 
 struct UINT16xE

@@ -29,7 +29,7 @@ public:
 	DECLARE_WRITE8_MEMBER(phoenix_scroll_w);
 	DECLARE_READ8_MEMBER(survival_input_port_0_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(pleiads_protection_r);
+	DECLARE_READ_LINE_MEMBER(pleiads_protection_r);
 	void init_oneprom();
 	void init_coindsw();
 	void init_oneprom_coindsw();
@@ -41,7 +41,7 @@ public:
 	void survival_palette(palette_device &palette) const;
 	void pleiads_palette(palette_device &palette) const;
 	uint32_t screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(survival_protection_r);
+	uint8_t survival_protection_r();
 	DECLARE_READ_LINE_MEMBER(survival_sid_callback);
 
 	void condor(machine_config &config);

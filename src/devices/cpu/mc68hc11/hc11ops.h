@@ -149,7 +149,7 @@ const mc68hc11_cpu_device::hc11_opcode_list_struct mc68hc11_cpu_device::hc11_opc
 	{   0,      0xf8,           &HC11OP(eorb_ext)           },
 	{   0,      0xe8,           &HC11OP(eorb_indx)          },
 	{   0x18,   0xe8,           &HC11OP(eorb_indy)          },
-//  {   0,      0x03,           &HC11OP(fdiv)               },
+	{   0,      0x03,           &HC11OP(fdiv)               },
 	{   0,      0x02,           &HC11OP(idiv)               },
 	{   0,      0x4c,           &HC11OP(inca)               },
 	{   0,      0x5c,           &HC11OP(incb)               },

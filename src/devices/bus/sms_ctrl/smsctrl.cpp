@@ -39,7 +39,7 @@ DEFINE_DEVICE_TYPE(SMS_CONTROL_PORT, sms_control_port_device, "sms_control_port"
 //-------------------------------------------------
 
 device_sms_control_port_interface::device_sms_control_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+	: device_interface(device, "smsctrl")
 {
 	m_port = dynamic_cast<sms_control_port_device *>(device.owner());
 }

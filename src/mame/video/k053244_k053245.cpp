@@ -82,14 +82,15 @@ GFXDECODE_MEMBER( k05324x_device::gfxinfo_6bpp )
 GFXDECODE_END
 
 
-k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053244, tag, owner, clock),
+k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, K053244, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(nullptr),
 	m_buffer(nullptr),
 	m_sprite_rom(*this, DEVICE_SELF),
 	m_dx(0),
 	m_dy(0),
+	m_k05324x_cb(*this),
 	m_rombank(0),
 	m_ramsize(0),
 	m_z_rejection(0)
@@ -121,6 +122,9 @@ void k05324x_device::device_start()
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
+	// bind callbacks
+	m_k05324x_cb.resolve();
+
 	/* decode the graphics */
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
@@ -133,9 +137,6 @@ void k05324x_device::device_start()
 	m_z_rejection = -1;
 	m_ram = make_unique_clear<uint16_t[]>(m_ramsize / 2);
 	m_buffer = make_unique_clear<uint16_t[]>(m_ramsize / 2);
-
-	// bind callbacks
-	m_k05324x_cb.bind_relative_to(*owner());
 
 	save_pointer(NAME(m_ram), m_ramsize / 2);
 	save_pointer(NAME(m_buffer), m_ramsize / 2);

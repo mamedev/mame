@@ -39,17 +39,16 @@ public:
 
 	void ccs300(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<z80_device> m_maincpu;
 
 	void ccs300_io(address_map &map);
 	void ccs300_mem(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(port40_w);
+	void port40_w(u8 data);
 };
 
 void ccs300_state::ccs300_mem(address_map &map)
@@ -91,7 +90,7 @@ static const z80_daisy_config daisy_chain[] =
 //  Machine
 //
 //*************************************
-WRITE8_MEMBER( ccs300_state::port40_w )
+void ccs300_state::port40_w(u8 data)
 {
 	membank("bankr0")->set_entry( (data) ? 1 : 0);
 }
@@ -104,7 +103,7 @@ void ccs300_state::machine_reset()
 
 void ccs300_state::machine_start()
 {
-	uint8_t *main = memregion("maincpu")->base();
+	u8 *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);
@@ -153,7 +152,7 @@ void ccs300_state::ccs300(machine_config & config)
 	ctc.set_clk<0>(16_MHz_XTAL / 8);
 	ctc.set_clk<1>(16_MHz_XTAL / 8);
 	ctc.set_clk<2>(16_MHz_XTAL / 8);
-	ctc.set_clk<3>(16_MHz_XTAL / 8);
+	//ctc.set_clk<3>(16_MHz_XTAL / 8);   // this causes an IRQ storm, hanging the machine
 	ctc.zc_callback<0>().set("sio", FUNC(z80sio_device::txca_w));
 	ctc.zc_callback<0>().append("sio", FUNC(z80sio_device::rxca_w));
 	ctc.zc_callback<2>().append("sio", FUNC(z80sio_device::rxtxcb_w));

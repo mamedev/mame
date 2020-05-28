@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(atarigx2_state::get_alpha_tile_info)
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 	int opaque = data & 0x8000;
-	SET_TILE_INFO_MEMBER(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	tileinfo.set(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(atarigx2_state::get_playfield_tile_info)
 	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = (m_playfield_tile_bank << 12) | (data & 0xfff);
 	int color = (m_playfield_base >> 5) + ((m_playfield_color_bank << 3) & 0x18) + ((data >> 12) & 7);
-	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
+	tileinfo.set(0, code, color, (data >> 15) & 1);
 	tileinfo.category = (m_playfield_color_bank >> 2) & 7;
 }
 
@@ -97,9 +97,9 @@ WRITE16_MEMBER( atarigx2_state::atarigx2_mo_control_w )
 }
 
 
-void atarigx2_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(atarigx2_state::scanline_update)
 {
-	int i;
+	int scanline = param;
 
 	if (scanline == 0) logerror("-------\n");
 
@@ -109,7 +109,7 @@ void atarigx2_state::scanline_update(screen_device &screen, int scanline)
 		return;
 
 	/* update the playfield scrolls */
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		uint16_t word = m_alpha_tilemap->basemem_read(offset++);
 
@@ -120,14 +120,14 @@ void atarigx2_state::scanline_update(screen_device &screen, int scanline)
 			if (newscroll != m_playfield_xscroll)
 			{
 				if (scanline + i > 0)
-					screen.update_partial(scanline + i - 1);
+					m_screen->update_partial(scanline + i - 1);
 				m_playfield_tilemap->set_scrollx(0, newscroll);
 				m_playfield_xscroll = newscroll;
 			}
 			if (newbank != m_playfield_color_bank)
 			{
 				if (scanline + i > 0)
-					screen.update_partial(scanline + i - 1);
+					m_screen->update_partial(scanline + i - 1);
 				m_playfield_tilemap->mark_all_dirty();
 				m_playfield_color_bank = newbank;
 			}
@@ -141,14 +141,14 @@ void atarigx2_state::scanline_update(screen_device &screen, int scanline)
 			if (newscroll != m_playfield_yscroll)
 			{
 				if (scanline + i > 0)
-					screen.update_partial(scanline + i - 1);
+					m_screen->update_partial(scanline + i - 1);
 				m_playfield_tilemap->set_scrolly(0, newscroll);
 				m_playfield_yscroll = newscroll;
 			}
 			if (newbank != m_playfield_tile_bank)
 			{
 				if (scanline + i > 0)
-					screen.update_partial(scanline + i - 1);
+					m_screen->update_partial(scanline + i - 1);
 				m_playfield_tilemap->mark_all_dirty();
 				m_playfield_tile_bank = newbank;
 			}

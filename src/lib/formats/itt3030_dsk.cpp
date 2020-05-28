@@ -10,7 +10,7 @@
 
 *********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/itt3030_dsk.h"
 

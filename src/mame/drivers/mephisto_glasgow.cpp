@@ -160,18 +160,18 @@ WRITE8_MEMBER( amsterd_state::write_lcd )
 
 WRITE8_MEMBER( amsterd_state::write_lcd_flag )
 {
+	// The key function in the rom expects a value from the
+	// second key row after writing to here
 	m_key_select = 1;
 
-	// The key function in the rom expects after writing to
-	// the  a value from the second key row;
 	m_led7 = data ? 255 : 0;
 }
 
 WRITE8_MEMBER( amsterd_state::write_board )
 {
 	m_key_select = 0;
-	m_board->led_w(space, offset, 0);
-	m_board->mux_w(space, offset, data);
+	m_board->led_w(0);
+	m_board->mux_w(data);
 }
 
 WRITE8_MEMBER( amsterd_state::write_beeper )

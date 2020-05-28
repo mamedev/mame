@@ -17,7 +17,7 @@ WRITE_LINE_MEMBER( cidelsa_state::q_w )
 
 /* Sound Interface */
 
-WRITE8_MEMBER( draco_state::sound_bankswitch_w )
+void draco_state::sound_bankswitch_w(uint8_t data)
 {
 	/*
 
@@ -35,7 +35,7 @@ WRITE8_MEMBER( draco_state::sound_bankswitch_w )
 	membank("bank1")->set_entry(bank);
 }
 
-WRITE8_MEMBER( draco_state::sound_g_w )
+void draco_state::sound_g_w(uint8_t data)
 {
 	/*
 
@@ -64,24 +64,24 @@ WRITE8_MEMBER( draco_state::sound_g_w )
 	}
 }
 
-READ8_MEMBER( draco_state::sound_in_r )
+uint8_t draco_state::sound_in_r()
 {
 	return ~(m_sound) & 0x07;
 }
 
-READ8_MEMBER( draco_state::psg_r )
+uint8_t draco_state::psg_r()
 {
 	return m_psg_latch;
 }
 
-WRITE8_MEMBER( draco_state::psg_w )
+void draco_state::psg_w(uint8_t data)
 {
 	m_psg_latch = data;
 }
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER( cidelsa_state::destryer_out1_w )
+void cidelsa_state::destryer_out1_w(uint8_t data)
 {
 	/*
 	  bit   description
@@ -99,7 +99,7 @@ WRITE8_MEMBER( cidelsa_state::destryer_out1_w )
 
 /* CDP1852 Interfaces */
 
-WRITE8_MEMBER( cidelsa_state::altair_out1_w )
+void cidelsa_state::altair_out1_w(uint8_t data)
 {
 	/*
 	  bit   description
@@ -119,7 +119,7 @@ WRITE8_MEMBER( cidelsa_state::altair_out1_w )
 	m_leds[2] = BIT(data, 5); // FIRE
 }
 
-WRITE8_MEMBER( draco_state::out1_w )
+void draco_state::out1_w(uint8_t data)
 {
 	/*
 	  bit   description
@@ -364,7 +364,7 @@ void cidelsa_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_reset = 1;
 		break;
 	default:
-		assert_always(false, "Unknown id in cidelsa_state::device_timer");
+		throw emu_fatalerror("Unknown id in cidelsa_state::device_timer");
 	}
 }
 

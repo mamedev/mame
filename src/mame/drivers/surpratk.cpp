@@ -155,7 +155,7 @@ void surpratk_state::machine_reset()
 	m_sprite_colorbase = 0;
 }
 
-WRITE8_MEMBER( surpratk_state::banking_callback )
+void surpratk_state::banking_callback(uint8_t data)
 {
 //  logerror("%s: setlines %02x\n", machine().describe_context(), data);
 	membank("bank1")->set_entry(data & 0x1f);
@@ -187,12 +187,12 @@ void surpratk_state::surpratk(machine_config &config)
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
-	m_k052109->set_tile_callback(FUNC(surpratk_state::tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(surpratk_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K053244(config, m_k053244, 0);
 	m_k053244->set_palette(m_palette);
-	m_k053244->set_sprite_callback(FUNC(surpratk_state::sprite_callback), this);
+	m_k053244->set_sprite_callback(FUNC(surpratk_state::sprite_callback));
 
 	K053251(config, m_k053251, 0);
 

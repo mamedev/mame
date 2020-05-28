@@ -325,7 +325,8 @@ void segag80v_state::sega_generate_vector_list()
 
 void segag80v_state::video_start()
 {
-	assert_always(m_vectorram.bytes() != 0, "vectorram==0");
+	if (!m_vectorram.bytes())
+		throw emu_fatalerror("segag80v_state::video_start: !vectorram.bytes()");
 
 	m_min_x =m_screen->visible_area().min_x;
 	m_min_y =m_screen->visible_area().min_y;

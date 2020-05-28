@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(toki_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(toki_state::get_back_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color,
 			0);
@@ -68,7 +68,7 @@ TILE_GET_INFO_MEMBER(toki_state::get_fore_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			tile,
 			color,
 			0);
@@ -83,9 +83,9 @@ TILE_GET_INFO_MEMBER(toki_state::get_fore_tile_info)
 
 void toki_state::video_start()
 {
-	m_text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(toki_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,32,32);
-	m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(toki_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(toki_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toki_state::get_text_tile_info)), TILEMAP_SCAN_ROWS,   8,8, 32,32);
+	m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toki_state::get_back_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,32);
+	m_foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toki_state::get_fore_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,32);
 
 	m_text_layer->set_transparent_pen(15);
 	m_background_layer->set_transparent_pen(15);

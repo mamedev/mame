@@ -22,14 +22,15 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram", 0),
-		m_spriteram2(*this, "spriteram2", 0)
+		m_spriteram2(*this, "spriteram2", 0),
+		m_wheel(*this, "WHEEL%u", 0U)
 	{ }
 
 	void fantland(machine_config &config);
 	void wheelrun(machine_config &config);
 	void galaxygn(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(wheelrun_wheel_r);
+	template <int Player> DECLARE_CUSTOM_INPUT_MEMBER(wheelrun_wheel_r);
 
 protected:
 	/* misc */
@@ -46,6 +47,8 @@ protected:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_spriteram2;
+
+	optional_ioport_array<2> m_wheel;
 
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(soundlatch_w);

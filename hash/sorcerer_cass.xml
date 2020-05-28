@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-<softwarelist name="sorcerer_cass" description="Exidy Sorcerer cassettes">
-
 <!--
+license:CC0
+
 Compiled by Robbbert
 -->
+
+<softwarelist name="sorcerer_cass" description="Exidy Sorcerer cassettes">
 
 <!--
      These come from tapes.
@@ -1193,6 +1194,32 @@ Compiled by Robbbert
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="0x105082c">
 				<rom name="misil.wav" size="0x105082c" crc="aa61589b" sha1="a548ef24efec02745ed0346922edbdf2ad71f989" />
+			</dataarea>
+		</part>
+	</software>
+	<!-- Added 2020-04-19 -->
+	<software name="kilopede">
+		<description>Kilopede (with sound)</description>
+		<year>1982</year>
+		<publisher>System Software</publisher>
+		<info name="developer" value="Matthew B. Hickey"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="9273164">
+				<rom name="kilopede.wav" size="9273164" crc="b41be460" sha1="040213a2eec80260b17bf3f93508e45db7e710f2" />
+			</dataarea>
+		</part>
+	</software>
+	<!-- Added 2020-04-22 -->
+	<software name="starf">
+		<description>Starfighter</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<info name="developer" value="Sparky Starks"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="17570860">
+				<rom name="starf.wav" size="17570860" crc="72ba90c4" sha1="89c992b2a132b2b6eecabfe180d5b5becd2f5de1" />
 			</dataarea>
 		</part>
 	</software>

@@ -387,7 +387,7 @@ void sb2m600_state::floppy_index_callback(floppy_image_device *floppy, int state
 	m_fdc_index = state;
 }
 
-READ8_MEMBER( c1pmf_state::osi470_pia_pa_r )
+uint8_t c1pmf_state::osi470_pia_pa_r()
 {
 	/*
 
@@ -407,7 +407,7 @@ READ8_MEMBER( c1pmf_state::osi470_pia_pa_r )
 	return (m_fdc_index << 7);
 }
 
-WRITE8_MEMBER( c1pmf_state::osi470_pia_pa_w )
+void c1pmf_state::osi470_pia_pa_w(uint8_t data)
 {
 	/*
 
@@ -425,7 +425,7 @@ WRITE8_MEMBER( c1pmf_state::osi470_pia_pa_w )
 	*/
 }
 
-WRITE8_MEMBER( c1pmf_state::osi470_pia_pb_w )
+void c1pmf_state::osi470_pia_pb_w(uint8_t data)
 {
 	/*
 
@@ -918,7 +918,7 @@ void c1p_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		m_beeper->set_clock(300);
 		break;
 	default:
-		assert_always(false, "Unknown id in sb2m600_state::device_timer");
+		throw emu_fatalerror("Unknown id in c1p_state::device_timer");
 	}
 }
 

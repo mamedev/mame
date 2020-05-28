@@ -30,6 +30,7 @@ $c088-$c095 player tiles
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/segacrpt_device.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
 #include "sound/msm5205.h"
@@ -61,9 +62,9 @@ public:
 	void roylcrdn(machine_config &config);
 	void cntrygrl(machine_config &config);
 	void jangou(machine_config &config);
+	void luckygrl(machine_config &config);
 
 	void init_jngolady();
-	void init_luckygrl();
 
 protected:
 	virtual void machine_start() override;
@@ -109,8 +110,7 @@ private:
 	DECLARE_READ8_MEMBER(slave_com_r);
 	DECLARE_WRITE8_MEMBER(slave_com_w);
 	DECLARE_READ8_MEMBER(jngolady_rng_r);
-	DECLARE_READ8_MEMBER(input_mux_r);
-	DECLARE_READ8_MEMBER(input_system_r);
+	uint8_t input_mux_r();
 
 	void jangou_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(jngolady);
@@ -133,6 +133,8 @@ private:
 	void nsc_map(address_map &map);
 	void roylcrdn_cpu0_io(address_map &map);
 	void roylcrdn_cpu0_map(address_map &map);
+	void luckygrl_cpu0_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
 };
 
 
@@ -231,7 +233,7 @@ WRITE8_MEMBER(jangou_state::output_w)
 //  machine().bookkeeping().coin_lockout_w(0, ~data & 0x20);
 }
 
-READ8_MEMBER(jangou_state::input_mux_r)
+uint8_t jangou_state::input_mux_r()
 {
 	switch(m_mux_data)
 	{
@@ -244,11 +246,6 @@ READ8_MEMBER(jangou_state::input_mux_r)
 	}
 
 	return ioport("IN_NOMUX")->read();
-}
-
-READ8_MEMBER(jangou_state::input_system_r)
-{
-	return ioport("SYSTEM")->read();
 }
 
 
@@ -297,10 +294,10 @@ WRITE8_MEMBER(jangou_state::adpcm_w)
 WRITE_LINE_MEMBER(jangou_state::jngolady_vclk_cb)
 {
 	if (m_msm5205_vclk_toggle == 0)
-		m_msm->write_data(m_adpcm_byte >> 4);
+		m_msm->data_w(m_adpcm_byte >> 4);
 	else
 	{
-		m_msm->write_data(m_adpcm_byte & 0xf);
+		m_msm->data_w(m_adpcm_byte & 0xf);
 		m_cpu_1->set_input_line(0, HOLD_LINE);
 	}
 
@@ -406,7 +403,6 @@ void jangou_state::jngolady_cpu1_io(address_map &map)
 
 void jangou_state::nsc_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram(); //internal ram for irq etc.
 	map(0x8000, 0x8000).nopw(); //write-only,irq related?
 	map(0x9000, 0x9000).rw(FUNC(jangou_state::slave_com_r), FUNC(jangou_state::slave_com_w));
 	map(0xc000, 0xc7ff).ram().share("share1");
@@ -422,7 +418,7 @@ void jangou_state::nsc_map(address_map &map)
 void jangou_state::cntrygrl_cpu0_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-//  AM_RANGE(0xc000, 0xc7ff) AM_RAM
+//  map(0xc000, 0xc7ff).ram();
 	map(0xe000, 0xefff).ram();
 }
 
@@ -437,7 +433,24 @@ void jangou_state::cntrygrl_cpu0_io(address_map &map)
 	map(0x12, 0x17).m(m_blitter, FUNC(jangou_blitter_device::blit_v1_regs));
 	map(0x20, 0x2f).w(m_blitter, FUNC(jangou_blitter_device::vregs_w));
 	map(0x30, 0x30).nopw(); //? polls 0x03 continuously
-//  AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
+//  map(0x31, 0x31).w(FUNC(jangou_state::sound_latch_w));
+}
+
+/*************************************
+ *
+ *  Lucky Girl Memory Map
+ *
+ *************************************/
+
+void jangou_state::luckygrl_cpu0_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
+	map(0xc000, 0xc7ff).ram();
+}
+
+void jangou_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom().share("decrypted_opcodes");
 }
 
 /*************************************
@@ -812,6 +825,75 @@ static INPUT_PORTS_START( roylcrdn )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( luckygrl )
+	PORT_START("PL1_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("1P Bet1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("1P Bet2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("1P Bet3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("1P Bet4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("1P Bet5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("1P Bet6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("1P Start")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("1P Flip-Flop")
+
+	PORT_START("PL1_2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("1P Take Score")          /* 1P Take Score */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("1P Hi-Lo (W-Up)")        /* 1P W-Up */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("1P Hi (Big)")            /* 1P Big */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("1P Lo (Small)")          /* 1P Small */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("1P Stand")               /* 1P Stand */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("1P Hit")                 /* 1P Hit */
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PL2_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("2P Bet1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2P Bet2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("2P Bet3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("2P Bet4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("2P Bet5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("2P Bet6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("2P Start")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("2P Flip-Flop")
+
+	PORT_START("PL2_2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)  PORT_NAME("2P Take Score")      /* 2P Take Score */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("2P Hi-Lo (W-Up)")    /* 2P W-Up */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)    PORT_NAME("2P Hi (Big)")        /* 2P Big */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)  PORT_NAME("2P Lo (Small)")      /* 2P Small */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("2P Stand")           /* 2P Stand */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("2P Hit")             /* 2P Hit */
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PL1_3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PL2_3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )                                                                 /* Spare 2 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                                      PORT_NAME("Note In")        /* Note In */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE  PORT_CODE(KEYCODE_9)                         /* Memory Reset */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE  PORT_CODE(KEYCODE_0)  PORT_NAME("Analyzer")       /* Analyzer */
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                                                                         /* Test Mode */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )                                      PORT_NAME("Coin In")        /* Coin In */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                              PORT_NAME("Credit Clear")   /* Credit Clear */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                                                                 /* Spare 1 */
+
+	PORT_START("DSW") // 6 dips bank
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+
+	PORT_START("IN_NOMUX")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -899,7 +981,7 @@ void jangou_state::jangou(machine_config &config)
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK / 16));
 	aysnd.port_a_read_callback().set(FUNC(jangou_state::input_mux_r));
-	aysnd.port_b_read_callback().set(FUNC(jangou_state::input_system_r));
+	aysnd.port_b_read_callback().set_ioport("SYSTEM");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	HC55516(config, m_cvsd, MASTER_CLOCK / 1024);
@@ -967,6 +1049,18 @@ void jangou_state::roylcrdn(machine_config &config)
 	/* sound hardware */
 	config.device_remove("cvsd");
 	config.device_remove("soundlatch");
+}
+
+void jangou_state::luckygrl(machine_config &config)
+{
+	cntrygrl(config);
+
+	sega_315_spat_device &maincpu(SEGA_315_SPAT(config.replace(), m_cpu_0, MASTER_CLOCK / 8)); // actually Falcon 03155096 encrypted Z80
+	maincpu.set_addrmap(AS_PROGRAM, &jangou_state::luckygrl_cpu0_map);
+	maincpu.set_addrmap(AS_IO, &jangou_state::cntrygrl_cpu0_io);
+	maincpu.set_addrmap(AS_OPCODES, &jangou_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+	maincpu.set_vblank_int("screen", FUNC(jangou_state::irq0_line_hold));
 }
 
 
@@ -1242,10 +1336,10 @@ ROM_END
 
 
 ROM_START( luckygrl )
-	ROM_REGION( 0x10000, "cpu0", 0 ) //encrypted z80 cpu
+	ROM_REGION( 0x10000, "cpu0", 0 )
 	ROM_LOAD( "5.9c", 0x00000, 0x01000, CRC(79b34eb2) SHA1(4b4916e09bfd6573fd2c7a7254fa4419164e0c4d) )
-	ROM_LOAD( "7.9f", 0x01000, 0x01000, CRC(14a44d23) SHA1(4f84a8f986a8fd9d5ac0636be1bb036c3b2746c2) )
 	ROM_LOAD( "6.9e", 0x02000, 0x01000, CRC(06850aa8) SHA1(c23cb6b7b26d5586b1a095dee88228d1613ae7d0) )
+	ROM_LOAD( "7.9f", 0x04000, 0x01000, CRC(14a44d23) SHA1(4f84a8f986a8fd9d5ac0636be1bb036c3b2746c2) )
 
 	ROM_REGION( 0x10000, "gfx", 0 )
 	ROM_LOAD( "1.5r",      0x00000, 0x2000, CRC(fb429678) SHA1(00e37e90550d9190d06977a5f5ed75b691750cc1) )
@@ -1272,46 +1366,7 @@ READ8_MEMBER(jangou_state::jngolady_rng_r)
 
 void jangou_state::init_jngolady()
 {
-	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8_delegate(FUNC(jangou_state::jngolady_rng_r),this) );
-}
-
-void jangou_state::init_luckygrl()
-{
-	// this is WRONG, plaintext in the 0x1800 - 0x1dff range
-	uint8_t *ROM = memregion("cpu0")->base();
-
-	for (int A = 0; A < 0x3000; A++)
-	{
-		uint8_t x = ROM[A];
-
-		switch(A & 0x111)
-		{
-			case 0x000: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x001: x = bitswap<8>(x ^ 0xa0, 3, 6, 5, 4, 7, 2, 1, 0); break;
-			case 0x010: x = bitswap<8>(x ^ 0x88, 5, 6, 7, 4, 3, 2, 1, 0); break;
-			case 0x011: x = bitswap<8>(x ^ 0x28, 3, 6, 7, 4, 5, 2, 1, 0); break;
-			case 0x100: x = bitswap<8>(x ^ 0x28, 3, 6, 7, 4, 5, 2, 1, 0); break;
-			case 0x101: x = bitswap<8>(x ^ 0x20, 5, 6, 7, 4, 3, 2, 1, 0); break;
-			case 0x110: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
-			case 0x111: x = bitswap<8>(x ^ 0x88, 5, 6, 7, 4, 3, 2, 1, 0); break;
-		}
-
-		ROM[A] = x;
-	}
-
-	#if 0
-	{
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		FILE *fp = fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(ROM, 0x3000, 1, fp);
-			fclose(fp);
-		}
-	}
-	#endif
-
+	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8_delegate(*this, FUNC(jangou_state::jngolady_rng_r)));
 }
 
 
@@ -1321,17 +1376,15 @@ void jangou_state::init_luckygrl()
  *
  *************************************/
 
-GAME( 1983,  jangou,    0,        jangou,   jangou,   jangou_state,  empty_init,    ROT0, "Nichibutsu",   "Jangou [BET] (Japan)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1983,  macha,     0,        jangou,   macha,    jangou_state,  empty_init,    ROT0, "Logitec",      "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  jngolady,  0,        jngolady, jngolady, jangou_state,  init_jngolady, ROT0, "Nichibutsu",   "Jangou Lady (Japan)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrl,  0,        cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Royal Denshi", "Country Girl (Japan set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrla, cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",   "Country Girl (Japan set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  fruitbun,  cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",   "Fruits & Bunny (World?)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1985,  roylcrdn,  0,        roylcrdn, roylcrdn, jangou_state,  empty_init,    ROT0, "Amusement",    "Royal Card (Nichibutsu HW)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1982,  roylcrdna, roylcrdn, roylcrdn, roylcrdn, jangou_state,  empty_init,    ROT0, "Miki Corp.",   "Royal Card Part-Two (Nichibutsu HW, Ver. 1.02)",  MACHINE_SUPPORTS_SAVE )
-
-/* The following might not run there... */
-GAME( 1985,  luckygrl,  0,        cntrygrl, cntrygrl, jangou_state,  init_luckygrl, ROT0, "Wing Co., Ltd.", "Lucky Girl? (Wing)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  jangou,    0,        jangou,   jangou,   jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Jangou [BET] (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  macha,     0,        jangou,   macha,    jangou_state,  empty_init,    ROT0, "Logitec",        "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  jngolady,  0,        jngolady, jngolady, jangou_state,  init_jngolady, ROT0, "Nichibutsu",     "Jangou Lady (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrl,  0,        cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrla, cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  fruitbun,  cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Fruits & Bunny (World?)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985,  roylcrdn,  0,        roylcrdn, roylcrdn, jangou_state,  empty_init,    ROT0, "Amusement",      "Royal Card (Nichibutsu HW)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1982,  roylcrdna, roylcrdn, roylcrdn, roylcrdn, jangou_state,  empty_init,    ROT0, "Miki Corp.",     "Royal Card Part-Two (Nichibutsu HW, Ver. 1.02)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985,  luckygrl,  0,        luckygrl, luckygrl, jangou_state,  empty_init,    ROT0, "Wing Co., Ltd.", "Lucky Girl (Wing)",                     MACHINE_SUPPORTS_SAVE )
 
 /*
 Some other games that might run on this HW:

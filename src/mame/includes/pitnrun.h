@@ -65,11 +65,11 @@ private:
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_WRITE8_MEMBER(mcu_data_w);
 	DECLARE_READ8_MEMBER(mcu_status_r);
-	DECLARE_READ8_MEMBER(m68705_porta_r);
-	DECLARE_WRITE8_MEMBER(m68705_porta_w);
-	DECLARE_READ8_MEMBER(m68705_portb_r);
-	DECLARE_WRITE8_MEMBER(m68705_portb_w);
-	DECLARE_READ8_MEMBER(m68705_portc_r);
+	uint8_t m68705_porta_r();
+	void m68705_porta_w(uint8_t data);
+	uint8_t m68705_portb_r();
+	void m68705_portb_w(uint8_t data);
+	uint8_t m68705_portc_r();
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(videoram2_w);
 	DECLARE_WRITE_LINE_MEMBER(char_bank_select_w);

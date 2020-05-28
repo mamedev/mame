@@ -405,7 +405,7 @@ void bigevglf_state::bigevglf(machine_config &config)
 
 	TAITO68705_MCU(config, m_bmcu, 2000000); /* ??? */
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - interleaving is forced on the fly */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - interleaving is forced on the fly */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

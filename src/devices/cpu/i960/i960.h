@@ -87,9 +87,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; } /* ???? TODO: Exact timing unknown */
-	virtual uint32_t execute_max_cycles() const override { return 1; } /* ???? TODO: Exact timing unknown */
-	virtual uint32_t execute_input_lines() const override { return 4; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; } /* ???? TODO: Exact timing unknown */
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; } /* ???? TODO: Exact timing unknown */
+	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -106,10 +106,10 @@ private:
 	void burst_stall_save(uint32_t t1, uint32_t t2, int index, int size, bool iswriteop);
 
 	struct {
-		uint32_t t1,t2;
-		int index,size;
-		bool burst_mode;
-		bool iswriteop;
+		uint32_t t1 = 0, t2 = 0;
+		int index = 0, size = 0;
+		bool burst_mode = false;
+		bool iswriteop = false;
 	}m_stall_state;
 	bool m_stalled;
 
@@ -137,8 +137,8 @@ private:
 	int m_immediate_vector;
 	int  m_immediate_pri;
 
-	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	int m_icount;
 

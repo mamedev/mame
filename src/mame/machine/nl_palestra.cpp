@@ -21,10 +21,8 @@
 
 ***************************************************************************/
 
-#ifndef __PLIB_PREPROCESSOR__
-	#define NL_PROHIBIT_BASEH_INCLUDE   1
-	#include "netlist/devices/net_lib.h"
-#endif
+#define NL_PROHIBIT_BASEH_INCLUDE   1
+#include "netlist/devices/net_lib.h"
 
 #define SLOW_BUT_ACCURATE 0
 
@@ -42,6 +40,8 @@ NETLIST_START(palestra)
 
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)
+	NET_C(VCC, high.VCC, low.VCC)
+	NET_C(GND, high.GND, low.GND)
 
 /*
  * board A2 -- score display
@@ -706,6 +706,11 @@ NETLIST_START(palestra)
 #if 0
 	HINT(clk, NO_DEACTIVATE)
 #endif
+
+	// Connect power terminals
+
+	NET_C(VCC, N1X1.VCC, N1X2.VCC, N1X3.VCC, N1X4.VCC, N1X5.VCC, N1X6a.VCC, N1X7a.VCC, N1X8.VCC)
+	NET_C(GND, N1X1.GND, N1X2.GND, N1X3.GND, N1X4.GND, N1X5.GND, N1X7a.GND, N1X6a.GND, N1X8.GND)
 
 NETLIST_END()
 

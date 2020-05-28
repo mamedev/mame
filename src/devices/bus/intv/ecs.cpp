@@ -28,8 +28,8 @@
 
 DEFINE_DEVICE_TYPE(INTV_ROM_ECS, intv_ecs_device, "intv_ecs", "Intellivision ECS Expansion")
 
-intv_ecs_device::intv_ecs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intv_rom_device(mconfig, INTV_ROM_ECS, tag, owner, clock),
+intv_ecs_device::intv_ecs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	intv_rom_device(mconfig, INTV_ROM_ECS, tag, owner, clock),
 	m_snd(*this, "ay8914"),
 	m_subslot(*this, "subslot"),
 	m_voice_enabled(false),
@@ -99,9 +99,9 @@ void intv_ecs_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono_ecs").front_center();
 
 	AY8914(config, m_snd, XTAL(3'579'545)/2);
-	m_snd->port_a_read_callback().set("ctrl_port", FUNC(intvecs_control_port_device::portA_r));
-	m_snd->port_b_read_callback().set("ctrl_port", FUNC(intvecs_control_port_device::portB_r));
-	m_snd->port_a_write_callback().set("ctrl_port", FUNC(intvecs_control_port_device::portA_w));
+	m_snd->port_a_read_callback().set("ctrl_port", FUNC(intvecs_control_port_device::porta_r));
+	m_snd->port_b_read_callback().set("ctrl_port", FUNC(intvecs_control_port_device::portb_r));
+	m_snd->port_a_write_callback().set("ctrl_port", FUNC(intvecs_control_port_device::porta_w));
 	m_snd->add_route(ALL_OUTPUTS, "mono_ecs", 0.33);
 
 	INTVECS_CONTROL_PORT(config, "ctrl_port", intvecs_control_port_devices, "keybd");

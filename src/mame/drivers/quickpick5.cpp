@@ -57,7 +57,7 @@ private:
 
 	K05324X_CB_MEMBER(sprite_callback);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
-	DECLARE_WRITE8_MEMBER(ccu_int_time_w);
+	void ccu_int_time_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	READ8_MEMBER(control_r) { return m_control; }
@@ -107,7 +107,7 @@ private:
 	int         m_ccu_int_time, m_ccu_int_time_count;
 };
 
-WRITE8_MEMBER(quickpick5_state::ccu_int_time_w)
+void quickpick5_state::ccu_int_time_w(uint8_t data)
 {
 	logerror("ccu_int_time rewritten with value of %02x\n", data);
 	m_ccu_int_time = data;
@@ -197,7 +197,7 @@ void quickpick5_state::video_start()
 	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_palette, charlayout, memregion("ttl")->base(), 0, m_palette->entries() / 16, 0));
 	m_ttl_gfx_index = gfx_index;
 
-	m_ttl_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quickpick5_state::ttl_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_ttl_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quickpick5_state::ttl_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_ttl_tilemap->set_transparent_pen(0);
 	m_ttl_tilemap->set_scrollx(80);
 	m_ttl_tilemap->set_scrolly(28);
@@ -217,7 +217,7 @@ TILE_GET_INFO_MEMBER(quickpick5_state::ttl_get_tile_info)
 	attr >>= 3;
 	attr &= ~1;
 
-	SET_TILE_INFO_MEMBER(m_ttl_gfx_index, code, attr, 0);
+	tileinfo.set(m_ttl_gfx_index, code, attr, 0);
 }
 
 uint32_t quickpick5_state::screen_update_quickpick5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -428,7 +428,7 @@ void quickpick5_state::quickpick5(machine_config &config)
 	K053245(config, m_k053245, 0);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_offsets(-(44+80), 20);
-	m_k053245->set_sprite_callback(FUNC(quickpick5_state::sprite_callback), this);
+	m_k053245->set_sprite_callback(FUNC(quickpick5_state::sprite_callback));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 

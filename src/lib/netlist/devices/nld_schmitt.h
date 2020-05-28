@@ -5,11 +5,8 @@
  *
  */
 
-//#pragma once
-
 #ifndef NLD_SCHMITT_H_
 #define NLD_SCHMITT_H_
-
 
 #include "netlist/nl_setup.h"
 
@@ -19,7 +16,6 @@
 
 #define SCHMITT_TRIGGER(name, model)                                           \
 		NET_REGISTER_DEV(SCHMITT_TRIGGER, name)                                \
-		NETDEV_PARAMI(name, MODEL, model)
-
+		NETDEV_PARAMI(name, STMODEL, model)
 
 #endif /* NLD_SCHMITT_H_ */

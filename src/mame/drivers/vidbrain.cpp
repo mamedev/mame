@@ -343,7 +343,7 @@ WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
 	}
 }
 
-READ8_MEMBER(vidbrain_state::memory_read_byte)
+uint8_t vidbrain_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
@@ -427,7 +427,7 @@ void vidbrain_state::vidbrain(machine_config &config)
 	m_smi->int_req_callback().set_inputline(m_maincpu, F8_INPUT_LINE_INT_REQ);
 
 	// cartridge
-	VIDEOBRAIN_EXPANSION_SLOT(config, VIDEOBRAIN_EXPANSION_SLOT_TAG, vidbrain_expansion_cards, nullptr);
+	VIDEOBRAIN_EXPANSION_SLOT(config, m_exp, vidbrain_expansion_cards, nullptr);
 
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("vidbrain");

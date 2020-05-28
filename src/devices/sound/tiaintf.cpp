@@ -33,7 +33,8 @@ void tia_device::device_start()
 {
 	m_channel = stream_alloc(0, 1, clock());
 	m_chip = tia_sound_init(this, clock(), clock(), 16);
-	assert_always(m_chip != nullptr, "Error creating TIA chip");
+	if (!m_chip)
+		throw emu_fatalerror("tia_device(%s): Error creating TIA chip", tag());
 }
 
 
@@ -57,7 +58,7 @@ void tia_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 }
 
 
-WRITE8_MEMBER( tia_device::tia_sound_w )
+void tia_device::tia_sound_w(offs_t offset, uint8_t data)
 {
 	m_channel->update();
 	tia_write(m_chip, offset, data);

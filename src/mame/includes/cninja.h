@@ -58,8 +58,8 @@ public:
 	uint16_t m_priority;
 
 	template<int Chip> DECLARE_WRITE16_MEMBER(cninja_pf_control_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(cninjabl2_oki_bank_w);
+	void sound_bankswitch_w(uint8_t data);
+	void cninjabl2_oki_bank_w(uint8_t data);
 	void init_mutantf();
 	void init_cninjabl2();
 	DECLARE_MACHINE_START(robocop2);
@@ -81,6 +81,7 @@ public:
 	DECO16IC_BANK_CB_MEMBER(mutantf_2_bank_callback);
 
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
+	u16 robocop2_mix_callback(u16 p, u16 p2);
 
 	DECLARE_READ16_MEMBER( edrandy_protection_region_6_146_r );
 	DECLARE_WRITE16_MEMBER( edrandy_protection_region_6_146_w );

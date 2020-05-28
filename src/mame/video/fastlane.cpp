@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info0)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code+bank*256,
 			1 + 64 * (attr & 0x0f),
 			0);
@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info1)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code+bank*256,
 			0 + 64 * (attr & 0x0f),
 			0);
@@ -87,8 +87,8 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info1)
 
 void fastlane_state::video_start()
 {
-	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info0)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_layer0->set_scroll_rows(32);
 

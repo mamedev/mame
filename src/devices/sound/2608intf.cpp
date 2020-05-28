@@ -97,10 +97,11 @@ void ym2608_device::device_start()
 
 	/* initialize YM2608 */
 	m_chip = ym2608_init(this,clock(),rate,
-		&ym2608_device::static_internal_read_byte,
-		&ym2608_device::static_external_read_byte, &ym2608_device::static_external_write_byte,
-		&ym2608_device::static_timer_handler,&ym2608_device::static_irq_handler,&psgintf);
-	assert_always(m_chip != nullptr, "Error creating YM2608 chip");
+			&ym2608_device::static_internal_read_byte,
+			&ym2608_device::static_external_read_byte, &ym2608_device::static_external_write_byte,
+			&ym2608_device::static_timer_handler,&ym2608_device::static_irq_handler,&psgintf);
+	if (!m_chip)
+		throw emu_fatalerror("ym2608_device(%s): Error creating YM2608 chip", tag());
 }
 
 //-------------------------------------------------
@@ -155,7 +156,7 @@ DEFINE_DEVICE_TYPE(YM2608, ym2608_device, "ym2608", "YM2608 OPNA")
 
 ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YM2608, tag, owner, clock, PSG_TYPE_YM, 1, 2)
-	, device_rom_interface(mconfig, *this, 21)
+	, device_rom_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_timer{ nullptr, nullptr }
 	, m_chip(nullptr)

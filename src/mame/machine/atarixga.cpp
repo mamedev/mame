@@ -396,7 +396,6 @@ WRITE32_MEMBER(atari_136095_0072_device::polylsb_write)
 {
 	m_update.addr = offset;
 	m_update.data[offset] = data;
-	return;
 }
 
 READ32_MEMBER(atari_136095_0072_device::polylsb_read)
@@ -470,8 +469,6 @@ WRITE32_MEMBER(atari_136095_0072_device::write)
 		default:
 			break;
 	}
-
-	return;
 }
 
 READ32_MEMBER(atari_136095_0072_device::read)

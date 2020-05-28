@@ -28,6 +28,8 @@
 
 #include "emu.h"
 
+#include "cpu/mcs51/mcs51.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -40,19 +42,25 @@ class leapfrog_leappad_state : public driver_device
 public:
 	leapfrog_leappad_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_cart(*this, "cartslot")
 		, m_cart_region(nullptr)
 	{ }
 
 	void leapfrog_leappad(machine_config &config);
 	void leapfrog_mfleappad(machine_config &config);
+	void leapfrog_ltleappad(machine_config &config);
 
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void prog_map(address_map &map);
+	void ext_map(address_map &map);
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
+	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
 };
@@ -73,6 +81,15 @@ void leapfrog_leappad_state::machine_reset()
 {
 }
 
+void leapfrog_leappad_state::prog_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("maincpu", 0x10000); // TODO: banking
+}
+
+void leapfrog_leappad_state::ext_map(address_map &map)
+{
+}
+
 DEVICE_IMAGE_LOAD_MEMBER(leapfrog_leappad_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
@@ -90,31 +107,49 @@ INPUT_PORTS_END
 
 void leapfrog_leappad_state::leapfrog_leappad(machine_config &config)
 {
-	//ARCA5(config, m_maincpu, 96000000/10); //  LeapPad Leapfrog 05-9-01 FS80A363  (doesn't appear to be Arcompact, what is it?)
-	//m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_leappad_state::map);
+	I8032(config, m_maincpu, 96000000/10); //  LeapPad Leapfrog 05-9-01 FS80A363  (which exact type is it?)
+	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_leappad_state::prog_map);
+	m_maincpu->set_addrmap(AS_IO, &leapfrog_leappad_state::ext_map);
 
 	// screenless
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_leappad_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(FUNC(leapfrog_leappad_state::cart_load), this);
+	m_cart->set_device_load(FUNC(leapfrog_leappad_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_leappad_cart");
 }
 
 void leapfrog_leappad_state::leapfrog_mfleappad(machine_config &config)
 {
-	//ARCA5(config, m_maincpu, 96000000/10); //  LeapPad Leapfrog 05-9-01 FS80A363  (doesn't appear to be Arcompact, what is it?)
-	//m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_leappad_state::map);
+	I8032(config, m_maincpu, 96000000/10); //  LeapPad Leapfrog 05-9-01 FS80A363  (which exact type is it?)
+	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_leappad_state::prog_map);
+	m_maincpu->set_addrmap(AS_IO, &leapfrog_leappad_state::ext_map);
 
 	// screenless
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_mfleappad_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(FUNC(leapfrog_leappad_state::cart_load), this);
+	m_cart->set_device_load(FUNC(leapfrog_leappad_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_mfleappad_cart");
 }
+
+void leapfrog_leappad_state::leapfrog_ltleappad(machine_config &config)
+{
+	I8032(config, m_maincpu, 96000000/10); // (which exact type is it?)
+	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_leappad_state::prog_map);
+	m_maincpu->set_addrmap(AS_IO, &leapfrog_leappad_state::ext_map);
+
+	// screenless
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_ltleappad_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(leapfrog_leappad_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_ltleappad_cart");
+}
+
 
 // All of these contain the string "Have you copied our ROM?" near the date codes
 
@@ -138,8 +173,14 @@ ROM_START( mfleappadus )
 	ROM_LOAD( "myfirstleappadbios.bin", 0x000000, 0x400000, CRC(19174c16) SHA1(e0ba644fdf38fd5f91ab8c4b673c4a658cc3e612) ) // contains "Feb 13 2004.10:58:53.152-10573.MFLP US Base ROM - 2004" and "Copyright (c) 2004 LeapFrog Enterprises, Inc."
 ROM_END
 
+ROM_START( ltleappad )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "littletouchleappadbios.bin", 0x000000, 0x400000, CRC(13687b26) SHA1(6ec1a47aaef9c9ed134bb143c2631f4d89d7c236) ) // contains "Mar 10 2005 07:01:53 152-11244" and "Copyright (c) 2002-2005 LeapFrog Enterprises, Inc."
+ROM_END
+
 //    year, name,        parent,    compat, machine,            input,            class,                  init,       company,    fullname,                         flags
 CONS( 2001, leappad,     0,         0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad (World)",                MACHINE_IS_SKELETON )
 CONS( 2004, leappadca,   leappad,   0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad (Canada)",               MACHINE_IS_SKELETON )
 CONS( 2002, mfleappad,   0,         0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad (World, V1.3)", MACHINE_IS_SKELETON )
 CONS( 2004, mfleappadus, mfleappad, 0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad (US)",          MACHINE_IS_SKELETON )
+CONS( 2005, ltleappad,   0,         0,      leapfrog_ltleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "Little Touch LeapPad",           MACHINE_IS_SKELETON )

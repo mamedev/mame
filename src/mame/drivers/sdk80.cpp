@@ -149,7 +149,8 @@ void sdk80_state::sdk80(machine_config &config)
 /* ROM definition */
 ROM_START( sdk80 )
 	ROM_REGION( 0x01400, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "mcs80.a14", 0x0000, 0x0400, BAD_DUMP CRC(3ce7bd37) SHA1(04cc67875b53d4cdfefce07041af12be3acedf4f)) // Compiled from manual listing
+	//ROM_LOAD( "mcs80.a14", 0x0000, 0x0400, BAD_DUMP CRC(3ce7bd37) SHA1(04cc67875b53d4cdfefce07041af12be3acedf4f)) // Compiled from manual listing
+	ROM_LOAD( "mcs80.a14", 0x0000, 0x0400, BAD_DUMP CRC(9bb1c268) SHA1(e84e358f81f181f40f4f8d4c4f76370b7d82e615) ) // Compiled from corrected listing - see issue #6324
 ROM_END
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY   FULLNAME     FLAGS */

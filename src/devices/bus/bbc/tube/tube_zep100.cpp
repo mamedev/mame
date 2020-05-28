@@ -86,7 +86,7 @@ void bbc_tube_zep100_device::device_add_mconfig(machine_config &config)
 	RAM(config, m_ram).set_default_size("64K").set_default_value(0x00);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "flop_ls_torch").set_type("bbc_flop_torch", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter("Z80");
+	SOFTWARE_LIST(config, "flop_ls_torch").set_original("bbc_flop_torch").set_filter("Z80");
 }
 
 //-------------------------------------------------

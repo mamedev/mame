@@ -14,7 +14,7 @@ Kozure Ookami
 Crazy Climber 2
 (c)1988 Nichibutsu
 
-Armed Formation
+Armed F (アームドF, not "Formation Armed F")
 (c)1988 Nichibutsu
 
 Sky Robo / Tatakae! Big Fighter
@@ -27,9 +27,11 @@ actually bootlegs.
 
 TODO:
 - identify and decap the NB1414M4 chip, it could be either a MCU or a fancy blitter chip;
-- time over doesn't kill the player in Kozure Ookami, check (1) note;
 - Fix Armed F and Tatakae Big Fighter text tilemap usage, they both doesn't use the NB1414M4
   (as shown by the per-game kludge)
+- kozure: time over doesn't kill the player, check (1) note for further details (kludged to work for now);
+- kozure: POST screen should have green as backdrop, this is actually drawn by the text layer but not seen
+  because being mapped on pen 15 (-> unimplemented opaque flag?)
 
 Notes:
 - the initial level color fade in effect in Armed F is confirmed on real HW, i.e. goes from
@@ -185,7 +187,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 Tatakae! Big Fighter (c)1989 Nichibutsu
 
- based on armedf.c
+ based on armedf.cpp
 
  TODO:
  - scroll
@@ -322,7 +324,6 @@ Notes:
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "screen.h"
 #include "speaker.h"
 
 #define LEGION_HACK 0
@@ -345,12 +346,10 @@ Notes:
     ---- ---- ---- --x- coin counter 1
     ---- ---- ---- ---x coin counter 0
 */
-
-WRITE16_MEMBER(armedf_state::terraf_io_w)
+void armedf_state::terraf_io_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
-		m_nb1414m4->exec((m_text_videoram[0] << 8) | (m_text_videoram[1] & 0xff),m_text_videoram.get(),m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
-
+	if (data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
+		m_nb1414m4->exec((m_text_videoram[0] << 8) | (m_text_videoram[1] & 0xff),m_text_videoram.target(),m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
 
 	COMBINE_DATA(&m_vreg);
 
@@ -360,9 +359,9 @@ WRITE16_MEMBER(armedf_state::terraf_io_w)
 	flip_screen_set(m_vreg & 0x1000);
 }
 
-WRITE16_MEMBER(armedf_state::terrafjb_io_w)
+void armedf_state::terrafjb_io_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
+	if (data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
 		m_extra->set_input_line(0, HOLD_LINE);
 
 	COMBINE_DATA(&m_vreg);
@@ -373,13 +372,9 @@ WRITE16_MEMBER(armedf_state::terrafjb_io_w)
 	flip_screen_set(m_vreg & 0x1000);
 }
 
-WRITE16_MEMBER(armedf_state::bootleg_io_w)
+void armedf_state::armedf_io_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
-	{
-		// NOP
-	}
-
+	// no NB1414M4 present
 	COMBINE_DATA(&m_vreg);
 
 	machine().bookkeeping().coin_counter_w(0, (data & 1) >> 0);
@@ -388,28 +383,31 @@ WRITE16_MEMBER(armedf_state::bootleg_io_w)
 	flip_screen_set(m_vreg & 0x1000);
 }
 
-WRITE16_MEMBER(armedf_state::sound_command_w)
+void armedf_state::sound_command_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-		m_soundlatch->write(((data & 0x7f) << 1) | 1);
+	m_soundlatch->write(((data & 0x7f) << 1) | 1);
 }
 
-READ8_MEMBER(armedf_state::soundlatch_clear_r)
+u8 armedf_state::soundlatch_clear_r()
 {
-	m_soundlatch->clear_w();
+	if (!machine().side_effects_disabled())
+		m_soundlatch->clear_w();
 	return 0;
 }
 
-WRITE16_MEMBER(armedf_state::irq_lv1_ack_w)
+void armedf_state::irq_lv1_ack_w(u16 data)
 {
+	if (m_nb1414m4 != nullptr)
+		m_nb1414m4->vblank_trigger();
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(armedf_state::irq_lv2_ack_w)
+void armedf_state::irq_lv2_ack_w(u16 data)
 {
+	if (m_nb1414m4 != nullptr)
+		m_nb1414m4->vblank_trigger();
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
-
 
 
 /*************************************
@@ -422,28 +420,49 @@ void armedf_state::common_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::nb1414m4_text_videoram_r), FUNC(armedf_state::nb1414m4_text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
 	map(0x06a000, 0x06a9ff).ram();
 	map(0x06c000, 0x06cfff).ram().share("spr_pal_clut");
-	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::armedf_fg_videoram_w)).share("fg_videoram");
-	map(0x074000, 0x074fff).ram().w(FUNC(armedf_state::armedf_bg_videoram_w)).share("bg_videoram");
+	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
+	map(0x074000, 0x074fff).ram().w(FUNC(armedf_state::bg_videoram_w)).share("bg_videoram");
 	map(0x078000, 0x078001).portr("P1");
 	map(0x078002, 0x078003).portr("P2");
 	map(0x078004, 0x078005).portr("DSW1");
 	map(0x078006, 0x078007).portr("DSW2");
-//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(terraf_io_w) handled in DRIVER_INIT
-	map(0x07c002, 0x07c003).w(FUNC(armedf_state::armedf_bg_scrollx_w));
-	map(0x07c004, 0x07c005).w(FUNC(armedf_state::armedf_bg_scrolly_w));
-	map(0x07c00a, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
+//  map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w)); handled in DRIVER_INIT
+	map(0x07c002, 0x07c003).w(FUNC(armedf_state::bg_scrollx_w));
+	map(0x07c004, 0x07c005).w(FUNC(armedf_state::bg_scrolly_w));
+	map(0x07c00b, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
 	map(0x07c00c, 0x07c00d).nopw();                    /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv1_ack_w));
 }
 
-void armedf_state::terraf_map(address_map &map)
+void armedf_state::terraf_common_map(address_map &map)
 {
 	common_map(map);
 	map(0x060000, 0x0603ff).ram().share("spriteram");
 	map(0x060400, 0x063fff).ram();
+}
+
+void armedf_state::terraf_map(address_map &map)
+{
+	terraf_common_map(map);
+	map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w));
+}
+
+void armedf_state::terrafb_map(address_map &map)
+{
+	terraf_common_map(map);
+	map(0x07c000, 0x07c001).w(FUNC(armedf_state::armedf_io_w));
+	map(0x07c006, 0x07c006).w(FUNC(armedf_state::terrafb_fg_scrolly_w));
+	map(0x07c008, 0x07c008).w(FUNC(armedf_state::terrafb_fg_scrollx_w));
+	map(0x0c0000, 0x0c0000).w(FUNC(armedf_state::terrafb_fg_scroll_msb_arm_w));
+}
+
+void armedf_state::terrafjb_map(address_map &map)
+{
+	terraf_common_map(map);
+	map(0x07c000, 0x07c001).w(FUNC(armedf_state::terrafjb_io_w));
 }
 
 void armedf_state::kozure_map(address_map &map)
@@ -451,9 +470,9 @@ void armedf_state::kozure_map(address_map &map)
 	common_map(map);
 	map(0x060000, 0x060fff).ram().share("spriteram");
 	map(0x061000, 0x063fff).ram();
-//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kozure_io_w)
-//  AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
-//  AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* passes crc ROM information to MCU, I guess */
+	map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w));
+//  map(0x0c0000, 0x0c0001).nopw(); /* watchdog? */
+//  map(0xffd000, 0xffd001).nopw(); /* passes crc ROM information to MCU, I guess */
 }
 
 void armedf_state::cclimbr2_map(address_map &map)
@@ -462,19 +481,19 @@ void armedf_state::cclimbr2_map(address_map &map)
 	map(0x060000, 0x060fff).ram().share("spriteram");
 	map(0x061000, 0x063fff).ram();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::nb1414m4_text_videoram_r), FUNC(armedf_state::nb1414m4_text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
 	map(0x06a000, 0x06a9ff).ram();
 	map(0x06c000, 0x06cfff).ram().share("spr_pal_clut");
-	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::armedf_fg_videoram_w)).share("fg_videoram");
-	map(0x074000, 0x074fff).ram().w(FUNC(armedf_state::armedf_bg_videoram_w)).share("bg_videoram");
+	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
+	map(0x074000, 0x074fff).ram().w(FUNC(armedf_state::bg_videoram_w)).share("bg_videoram");
 	map(0x078000, 0x078001).portr("P1");
 	map(0x078002, 0x078003).portr("P2");
 	map(0x078004, 0x078005).portr("DSW1");
 	map(0x078006, 0x078007).portr("DSW2");
-//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(io_w)
-	map(0x07c002, 0x07c003).w(FUNC(armedf_state::armedf_bg_scrollx_w));
-	map(0x07c004, 0x07c005).w(FUNC(armedf_state::armedf_bg_scrolly_w));
-	map(0x07c00a, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
+	map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w));
+	map(0x07c002, 0x07c003).w(FUNC(armedf_state::bg_scrollx_w));
+	map(0x07c004, 0x07c005).w(FUNC(armedf_state::bg_scrolly_w));
+	map(0x07c00b, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
 	map(0x07c00c, 0x07c00d).nopw(); /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv2_ack_w));
 }
@@ -487,15 +506,15 @@ void armedf_state::legion_common_map(address_map &map)
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x06a000, 0x06a9ff).ram();
 	map(0x06c000, 0x06cfff).ram().share("spr_pal_clut");
-	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::armedf_fg_videoram_w)).share("fg_videoram");
-	map(0x074000, 0x074fff).ram().w(FUNC(armedf_state::armedf_bg_videoram_w)).share("bg_videoram");
+	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
+	map(0x074000, 0x074fff).ram().w(FUNC(armedf_state::bg_videoram_w)).share("bg_videoram");
 	map(0x078000, 0x078001).portr("P1");
 	map(0x078002, 0x078003).portr("P2");
 	map(0x078004, 0x078005).portr("DSW1");
 	map(0x078006, 0x078007).portr("DSW2");
-	map(0x07c002, 0x07c003).w(FUNC(armedf_state::armedf_bg_scrollx_w));
-	map(0x07c004, 0x07c005).w(FUNC(armedf_state::armedf_bg_scrolly_w));
-	map(0x07c00a, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
+	map(0x07c002, 0x07c003).w(FUNC(armedf_state::bg_scrollx_w));
+	map(0x07c004, 0x07c005).w(FUNC(armedf_state::bg_scrolly_w));
+	map(0x07c00b, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
 	map(0x07c00c, 0x07c00d).nopw();        /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv2_ack_w));
 }
@@ -504,13 +523,13 @@ void armedf_state::legion_map(address_map &map)
 {
 	legion_common_map(map);
 
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::nb1414m4_text_videoram_r), FUNC(armedf_state::nb1414m4_text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w));
 }
 
-WRITE8_MEMBER(armedf_state::legionjb_fg_scroll_w)
+void armedf_state::legionjb_fg_scroll_w(offs_t offset, u8 data)
 {
-	if(offset >= 0xb && offset < 0xf)
+	if (offset >= 0xb && offset < 0xf)
 		m_legion_cmd[offset-0xb] = data & 0xff;
 
 	m_fg_scrollx = (m_legion_cmd[0x02] & 0xff) | ((m_legion_cmd[0x03] & 0x3) << 8);
@@ -522,8 +541,8 @@ void armedf_state::legionjb_map(address_map &map)
 	legion_common_map(map);
 
 	map(0x040000, 0x04003f).w(FUNC(armedf_state::legionjb_fg_scroll_w)).umask16(0x00ff);
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::armedf_text_videoram_r), FUNC(armedf_state::armedf_text_videoram_w)).umask16(0x00ff);
-	map(0x07c000, 0x07c001).w(FUNC(armedf_state::bootleg_io_w));
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
+	map(0x07c000, 0x07c001).w(FUNC(armedf_state::armedf_io_w));
 }
 
 void armedf_state::legionjb2_map(address_map &map)
@@ -531,8 +550,8 @@ void armedf_state::legionjb2_map(address_map &map)
 	legion_common_map(map);
 
 	map(0x000000, 0x00003f).w(FUNC(armedf_state::legionjb_fg_scroll_w)).umask16(0x00ff);
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::armedf_text_videoram_r), FUNC(armedf_state::armedf_text_videoram_w)).umask16(0x00ff);
-	map(0x07c000, 0x07c001).w(FUNC(armedf_state::bootleg_io_w));
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
+	map(0x07c000, 0x07c001).w(FUNC(armedf_state::armedf_io_w));
 	//also writes to 7c0010 / 70c020 / 70c030. These could possibly be the scroll registers on this bootleg and the writes to 000000 - 00003f could just be leftovers.
 }
 
@@ -541,9 +560,9 @@ void armedf_state::armedf_map(address_map &map)
 	map(0x000000, 0x05ffff).rom();
 	map(0x060000, 0x060fff).ram().share("spriteram");
 	map(0x061000, 0x065fff).ram();
-	map(0x066000, 0x066fff).ram().w(FUNC(armedf_state::armedf_bg_videoram_w)).share("bg_videoram");
-	map(0x067000, 0x067fff).ram().w(FUNC(armedf_state::armedf_fg_videoram_w)).share("fg_videoram");
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::armedf_text_videoram_r), FUNC(armedf_state::armedf_text_videoram_w)).umask16(0x00ff);
+	map(0x066000, 0x066fff).ram().w(FUNC(armedf_state::bg_videoram_w)).share("bg_videoram");
+	map(0x067000, 0x067fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
 	map(0x06a000, 0x06afff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x06b000, 0x06bfff).ram().share("spr_pal_clut");
 	map(0x06c000, 0x06c7ff).ram();
@@ -551,179 +570,34 @@ void armedf_state::armedf_map(address_map &map)
 	map(0x06c002, 0x06c003).portr("P2");
 	map(0x06c004, 0x06c005).portr("DSW1");
 	map(0x06c006, 0x06c007).portr("DSW2");
-	map(0x06d000, 0x06d001).w(FUNC(armedf_state::terraf_io_w));
-	map(0x06d002, 0x06d003).w(FUNC(armedf_state::armedf_bg_scrollx_w));
-	map(0x06d004, 0x06d005).w(FUNC(armedf_state::armedf_bg_scrolly_w));
-	map(0x06d006, 0x06d007).w(FUNC(armedf_state::armedf_fg_scrollx_w));
-	map(0x06d008, 0x06d009).w(FUNC(armedf_state::armedf_fg_scrolly_w));
-	map(0x06d00a, 0x06d00b).w(FUNC(armedf_state::sound_command_w));
-	map(0x06d00c, 0x06d00d).nopw(); //watchdog
+	map(0x06d000, 0x06d001).w(FUNC(armedf_state::armedf_io_w));
+	map(0x06d002, 0x06d003).w(FUNC(armedf_state::bg_scrollx_w));
+	map(0x06d004, 0x06d005).w(FUNC(armedf_state::bg_scrolly_w));
+	map(0x06d006, 0x06d007).w(FUNC(armedf_state::fg_scrollx_w));
+	map(0x06d008, 0x06d009).w(FUNC(armedf_state::fg_scrolly_w));
+	map(0x06d00b, 0x06d00b).w(FUNC(armedf_state::sound_command_w));
+	map(0x06d00c, 0x06d00d).nopw(); //watchdog?
 	map(0x06d00e, 0x06d00f).w(FUNC(armedf_state::irq_lv1_ack_w));
 }
 
-READ16_MEMBER(bigfghtr_state::latch_r)
+u16 bigfghtr_state::latch_r()
 {
-	m_mcu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
+	if (!machine().side_effects_disabled())
+		m_mcu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 	return 0;
 }
 
-#if 0
-// reference code, in case anything goes bad
-WRITE16_MEMBER(bigfghtr_state::sharedram_w)
-{
-	data &= mem_mask;
-	COMBINE_DATA(&m_sharedram[offset]);
-
-	switch(offset)
-	{
-		case 0x40/2:
-			m_mcu_input_snippet = (data == 0x100);
-			m_mcu_jsr_snippet = (data == 0x300);
-			break;
-	}
-}
-
-READ16_MEMBER(bigfghtr_state::sharedram_r)
-{
-	if(m_mcu_input_snippet)
-	{
-		switch(offset+0x600/2)
-		{
-			case 0x640/2:
-				if(m_read_latch)
-				{
-					m_read_latch = 0;
-					return machine().rand(); // TODO
-				}
-				break;
-
-			case 0x642/2:
-				return (ioport("DSW0")->read() & 0xffff) ^ 0xffff;
-
-			case 0x644/2:
-				return (ioport("DSW1")->read() & 0xffff) ^ 0xffff;
-
-			case 0x646/2:
-				return (ioport("P1")->read() & 0xffff) ^ 0xffff;
-
-			case 0x648/2:
-				return (ioport("P2")->read() & 0xffff) ^ 0xffff;
-		}
-	}
-
-	if(m_mcu_jsr_snippet)
-	{
-		switch(offset+0x600/2)
-		{
-			case 0x640/2:
-				if(m_read_latch)
-				{
-					m_read_latch = 0;
-					return machine().rand(); // TODO
-				}
-				break;
-			case 0x642/2:
-				return (ioport("DSW0")->read() & 0xffff) ^ 0xffff;
-
-			case 0x644/2:
-				return (ioport("DSW1")->read() & 0xffff) ^ 0xffff;
-
-			case 0x646/2:
-				return (ioport("P1")->read() & 0xffff) ^ 0xffff;
-
-			case 0x648/2:
-				return (ioport("P2")->read() & 0xffff) ^ 0xffff;
-
-			/*
-			protection controls where the program code should jump to.
-
-			example snippet:
-			00DB2A: 41FA FE86                  lea     (-$17a,PC), A0; ($d9b2) ;base program vector
-			00DB2E: 4DF9 0008 0E2A             lea     $80e2a.l, A6 ;base RAM vector, used by the i8751 to send the value, this value is added to the above A0
-			00DB34: 3039 0008 0E62             move.w  $80e62.l, D0 ;number of snippets to execute
-			00DB3A: 6100 00F0                  bsr     $dc2c
-			*/
-
-			/* bp daee, A0 = 0xdd02, A6 = 0x808ca, D0 = 0x80902 */
-			//case 0x902/2:
-			//  return 0x0001;
-			//case (0x90a+0x24)/2:
-			//  return 0x0001;
-			//case (0x902+8)/2:
-			//  return 0x0004; // 0xf86a
-
-			/* bp db02, A0 = 0xdc2e, A6 = 0x80912, D0 = 0x8094a */
-			//case 0x94a/2:
-			//  return 1;
-			//case (0x94a+8)/2:
-			//  return 0x00dc; // 0xd62e
-
-			/* bp db16, A0 = 0xda86, A6 = 0x80c22, D0 = 0x80c5a */
-			//case 0xc5a/2:
-			//  return 1;
-			//case (0xc5a+8)/2:
-			//  return 0x0288; // 0x345f4
-
-			/* bp db2a, A0 = 0xd9b2, A6 = 0x80e2a, D0 = 0x80e62 */
-
-			/* bp db3e, A0 = 0xd8da, A6 = 0x81132, D0 = 0x8116a */
-
-			/* bp db52, A0 = 0xd806, A6 = 0x8133a, D0 = 0x81372 */
-
-			/* bp db66, A0 = 0xd7aa, A6 = 0x81742, D0 = 0x8177a */
-
-			/* bp db7a, A0 = 0xd746, A6 = 0x81b4a, D0 = 0x81b82 */
-
-			/* bp db8e, A0 = 0xd672, A6 = 0x81f52, D0 = 0x81f8a */
-
-			/* bp dba4, A0 = 0xd5ae, A6 = 0x8205a, D0 = 0x82092 */
-
-			/* bp dbba, A0 = 0xd5be, A6 = 0x82862, D0 = 0x8289a */
-
-			/* bp dbd0, A0 = 0xd512, A6 = 0x8296a, D0 = 0x829a2 */
-
-			/* bp dbe6, A0 = 0xd466, A6 = 0x82d72, D0 = 0x82daa */
-
-			/* bp dbfc, A0 = 0xd43e, A6 = 0x8357a, D0 = 0x835b2 */
-
-			/* following is separated from the others, dunno why ... */
-			/* bp dc14, A0 = 0xd3aa, A6 = 0x835a2, D0 = 0x835b2 */
-
-
-			/*case 0x
-			case 0x94a/2:
-			    return 0x0002*4;
-			case (0x90a+2*0x40)/2:
-			case (0x90a+3*0x40)/2:
-			    return 0x0003*4;
-			case (0x90a+4*0x40)/2:
-			    return 0x000c*4; // 0x13d74
-			case (0x90a+5*0x40)/2:
-			    return 0x000d*4; // 0x130f6
-			case (0x90a+6*0x40)/2:
-			    return 0x000e*4; // 0x1817e
-			case (0x90a+7*0x40)/2:
-			    return 0x0010*4; // 0x15924
-			//case (0x90a+0x25)/2:
-			//  return 2;*/
-		}
-	}
-
-	return m_sharedram[offset];
-}
-#endif
-
-READ8_MEMBER(bigfghtr_state::main_sharedram_r)
+u8 bigfghtr_state::main_sharedram_r(offs_t offset)
 {
 	return m_sharedram[offset];
 }
 
-WRITE8_MEMBER(bigfghtr_state::main_sharedram_w)
+void bigfghtr_state::main_sharedram_w(offs_t offset, u8 data)
 {
 	m_sharedram[offset] = data;
 }
 
-WRITE8_MEMBER(bigfghtr_state::mcu_spritelist_w)
+void bigfghtr_state::mcu_spritelist_w(offs_t offset, u8 data)
 {
 	// add a warning in case it happens for now.
 	popmessage("MCU access spritelist %04x = %02x, contact MAMEdev",offset,data);
@@ -735,21 +609,21 @@ void bigfghtr_state::bigfghtr_map(address_map &map)
 	map(0x080000, 0x0805ff).ram().share("spriteram");
 	map(0x080600, 0x083fff).rw(FUNC(bigfghtr_state::main_sharedram_r), FUNC(bigfghtr_state::main_sharedram_w));
 	map(0x084000, 0x085fff).ram(); //work ram
-	map(0x086000, 0x086fff).ram().w(FUNC(bigfghtr_state::armedf_bg_videoram_w)).share("bg_videoram");
-	map(0x087000, 0x087fff).ram().w(FUNC(bigfghtr_state::armedf_fg_videoram_w)).share("fg_videoram");
-	map(0x088000, 0x089fff).rw(FUNC(bigfghtr_state::armedf_text_videoram_r), FUNC(bigfghtr_state::armedf_text_videoram_w)).umask16(0x00ff);
+	map(0x086000, 0x086fff).ram().w(FUNC(bigfghtr_state::bg_videoram_w)).share("bg_videoram");
+	map(0x087000, 0x087fff).ram().w(FUNC(bigfghtr_state::fg_videoram_w)).share("fg_videoram");
+	map(0x088000, 0x089fff).rw(FUNC(bigfghtr_state::text_videoram_r), FUNC(bigfghtr_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
 	map(0x08a000, 0x08afff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08b000, 0x08bfff).ram().share("spr_pal_clut");
 	map(0x08c000, 0x08c001).portr("P1");
 	map(0x08c002, 0x08c003).portr("P2");
 	map(0x08c004, 0x08c005).portr("DSW0");
 	map(0x08c006, 0x08c007).portr("DSW1");
-	map(0x08d000, 0x08d001).w(FUNC(bigfghtr_state::terraf_io_w));  //807b0
-	map(0x08d002, 0x08d003).w(FUNC(bigfghtr_state::armedf_bg_scrollx_w));
-	map(0x08d004, 0x08d005).w(FUNC(bigfghtr_state::armedf_bg_scrolly_w));
-	map(0x08d006, 0x08d007).w(FUNC(bigfghtr_state::armedf_fg_scrollx_w));
-	map(0x08d008, 0x08d009).w(FUNC(bigfghtr_state::armedf_fg_scrolly_w));
-	map(0x08d00a, 0x08d00b).w(FUNC(bigfghtr_state::sound_command_w));
+	map(0x08d000, 0x08d001).w(FUNC(bigfghtr_state::armedf_io_w));  //807b0
+	map(0x08d002, 0x08d003).w(FUNC(bigfghtr_state::bg_scrollx_w));
+	map(0x08d004, 0x08d005).w(FUNC(bigfghtr_state::bg_scrolly_w));
+	map(0x08d006, 0x08d007).w(FUNC(bigfghtr_state::fg_scrollx_w));
+	map(0x08d008, 0x08d009).w(FUNC(bigfghtr_state::fg_scrolly_w));
+	map(0x08d00b, 0x08d00b).w(FUNC(bigfghtr_state::sound_command_w));
 	map(0x08d00c, 0x08d00d).nopw(); //watchdog
 	map(0x08d00e, 0x08d00f).w(FUNC(bigfghtr_state::irq_lv1_ack_w));
 
@@ -779,28 +653,24 @@ void armedf_state::cclimbr2_soundmap(address_map &map)
 	map(0xc000, 0xffff).ram();
 }
 
-READ8_MEMBER(armedf_state::blitter_txram_r)
-{
-	return m_text_videoram[offset];
-}
-
-WRITE8_MEMBER(armedf_state::blitter_txram_w)
+void armedf_state::blitter_txram_w(offs_t offset, u8 data)
 {
 	m_text_videoram[offset] = data;
-	m_tx_tilemap->mark_tile_dirty(offset);
+	if (offset < 0x1000)
+		m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(armedf_state::fg_scrollx_w)
+void armedf_state::terrafjb_fg_scrollx_w(u8 data)
 {
 	m_fg_scrollx = (data & 0xff) | (m_fg_scrollx & 0x300);
 }
 
-WRITE8_MEMBER(armedf_state::fg_scrolly_w)
+void armedf_state::terrafjb_fg_scrolly_w(u8 data)
 {
 	m_fg_scrolly = (data & 0xff) | (m_fg_scrolly & 0x300);
 }
 
-WRITE8_MEMBER(armedf_state::fg_scroll_msb_w)
+void armedf_state::terrafjb_fg_scroll_msb_w(u8 data)
 {
 	m_fg_scrolly = (((data & 0x03) >> 0) << 8) | (m_fg_scrolly & 0xff);
 	m_fg_scrollx = (((data & 0x0c) >> 2) << 8) | (m_fg_scrollx & 0xff);
@@ -810,16 +680,16 @@ WRITE8_MEMBER(armedf_state::fg_scroll_msb_w)
 void armedf_state::terrafjb_extraz80_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x5fff).rw(FUNC(armedf_state::blitter_txram_r), FUNC(armedf_state::blitter_txram_w));
+	map(0x4000, 0x5fff).ram().w(FUNC(armedf_state::blitter_txram_w)).share("text_videoram");
 	map(0x8000, 0x87ff).ram();
 }
 
 void armedf_state::terrafjb_extraz80_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(armedf_state::fg_scrollx_w));
-	map(0x01, 0x01).w(FUNC(armedf_state::fg_scrolly_w));
-	map(0x02, 0x02).w(FUNC(armedf_state::fg_scroll_msb_w));
+	map(0x00, 0x00).w(FUNC(armedf_state::terrafjb_fg_scrollx_w));
+	map(0x01, 0x01).w(FUNC(armedf_state::terrafjb_fg_scrolly_w));
+	map(0x02, 0x02).w(FUNC(armedf_state::terrafjb_fg_scroll_msb_w));
 }
 
 void armedf_state::sound_portmap(address_map &map)
@@ -968,6 +838,7 @@ static INPUT_PORTS_START( legion )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 #else
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )                /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 #endif
 INPUT_PORTS_END
 
@@ -1179,50 +1050,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout char_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4, 0, 12, 8, 20, 16, 28, 24},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout tile_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4, 0, 12, 8, 20, 16, 28, 24,
-			32+4, 32+0, 32+12, 32+8, 32+20, 32+16, 32+28, 32+24 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
-};
-
-static const gfx_layout sprite_layout =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4, 0, RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 12, 8, RGN_FRAC(1,2)+12, RGN_FRAC(1,2)+8,
-			20, 16, RGN_FRAC(1,2)+20, RGN_FRAC(1,2)+16, 28, 24, RGN_FRAC(1,2)+28, RGN_FRAC(1,2)+24 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	64*8
-};
-
 static GFXDECODE_START( gfx_armedf )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout,         0*16,  32 )
-	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,        64*16,  32 )
-	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,        96*16,  32 )
-	GFXDECODE_ENTRY( "gfx4", 0, sprite_layout,  32*16,  32 )
+	GFXDECODE_ENTRY( "text",       0, gfx_8x8x4_packed_lsb,    0*16,  32 )
+	GFXDECODE_ENTRY( "foreground", 0, gfx_16x16x4_packed_lsb, 64*16,  32 )
+	GFXDECODE_ENTRY( "background", 0, gfx_16x16x4_packed_lsb, 96*16,  32 )
+	GFXDECODE_ENTRY( "sprite",     0, gfx_16x16x4_packed_lsb, 32*16,  32 )
 GFXDECODE_END
-
 
 
 /*************************************
@@ -1255,8 +1088,24 @@ void armedf_state::machine_reset()
 	m_bg_scrolly = 0;
 }
 
+void armedf_state::video_config(machine_config &config, int hchar_start, int vstart, int vend)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// assume all games on this HW running at ~59.1358Hz (trusted for Big Fighter)
+	// TODO: recheck if visible area isn't just 320x240 for everything (overscan may be masked by the text layer).
+	// TODO: bootlegs may not run at this speed
+	m_screen->set_raw(XTAL(16'000'000)/2,531,hchar_start*8,(64-hchar_start)*8, 255, vstart, vend);
+	m_screen->set_palette(m_palette);
+	m_screen->set_screen_update(FUNC(armedf_state::screen_update));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
-void armedf_state::terraf_sound(machine_config &config)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
+
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+}
+
+void armedf_state::sound_config(machine_config &config)
 {
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/6));      // 4mhz
 	audiocpu.set_addrmap(AS_PROGRAM, &armedf_state::sound_map);
@@ -1278,39 +1127,23 @@ void armedf_state::terraf_sound(machine_config &config)
 
 void armedf_state::terraf(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::terraf_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
 
 	NB1414M4(config, m_nb1414m4, 0);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 1*8, 31*8-1 );
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-
+	video_config(config, 12, 8, 248);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
-
 	/* sound hardware */
-	terraf_sound(config);
+	sound_config(config);
 }
 
 void armedf_state::terrafjb(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz
-	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::terraf_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::terrafjb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/6));      // 4mhz
@@ -1322,22 +1155,8 @@ void armedf_state::terrafjb(machine_config &config)
 	m_extra->set_addrmap(AS_PROGRAM, &armedf_state::terrafjb_extraz80_map);
 	m_extra->set_addrmap(AS_IO, &armedf_state::terrafjb_extraz80_portmap);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 1*8, 31*8-1 );
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-
+	video_config(config, 12, 8, 248);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1356,12 +1175,12 @@ void armedf_state::terrafjb(machine_config &config)
 void armedf_state::terrafb(machine_config &config)
 {
 	terraf(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::terrafb_map);
 	config.device_remove("nb1414m4");
 }
 
 void armedf_state::kozure(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::kozure_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
@@ -1369,29 +1188,15 @@ void armedf_state::kozure(machine_config &config)
 	NB1414M4(config, m_nb1414m4, 0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 1*8, 31*8-1 ); // 320 x 240, trusted
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-
+	video_config(config, 12, 8, 248);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
-
 	/* sound hardware */
-	terraf_sound(config);
+	sound_config(config);
 }
 
 void armedf_state::armedf(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::armedf_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
@@ -1401,22 +1206,8 @@ void armedf_state::armedf(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &armedf_state::sound_portmap);
 	audiocpu.set_periodic_int(FUNC(armedf_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));    // ?
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 1*8, 31*8-1 );
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-
+	video_config(config, 12, 16, 240);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1425,8 +1216,8 @@ void armedf_state::armedf(machine_config &config)
 
 	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5);      // 4mhz
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
@@ -1434,7 +1225,6 @@ void armedf_state::armedf(machine_config &config)
 
 void armedf_state::cclimbr2(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::cclimbr2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq2_line_assert));
@@ -1446,22 +1236,8 @@ void armedf_state::cclimbr2(machine_config &config)
 
 	NB1414M4(config, m_nb1414m4, 0);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1 );
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-
+	video_config(config, 14, 16, 240);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1470,8 +1246,8 @@ void armedf_state::cclimbr2(machine_config &config)
 
 	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5); // or YM3526?
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
@@ -1479,7 +1255,6 @@ void armedf_state::cclimbr2(machine_config &config)
 
 void armedf_state::legion_common(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq2_line_assert));
 
@@ -1487,30 +1262,16 @@ void armedf_state::legion_common(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &armedf_state::cclimbr2_soundmap);
 	audiocpu.set_periodic_int(FUNC(armedf_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));    // ?
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1 );
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-
+	video_config(config, 14, 16, 240);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // 10-pin SIP with 74HC374P latch
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // 10-pin SIP with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
@@ -1549,7 +1310,6 @@ void armedf_state::legionjb2(machine_config &config)
 
 void bigfghtr_state::bigfghtr(machine_config &config)
 {
-
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &bigfghtr_state::bigfghtr_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
@@ -1559,22 +1319,10 @@ void bigfghtr_state::bigfghtr(machine_config &config)
 	mcu.set_addrmap(AS_IO, &bigfghtr_state::bigfghtr_mcu_io_map);
 	mcu.port_in_cb<1>().set_constant(0xdf); // bit 5: bus contention related?
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(16'000'000)/2,531,12*8,(64-12)*8, 254, 1*8, 31*8); // guess, matches 59.3 Hz from reference - measured at 59.1358Hz
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	video_config(config, 12, 8, 248);
+	MCFG_VIDEO_START_OVERRIDE(bigfghtr_state,armedf)
 
-	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
-
-	/* sound hardware */
-	terraf_sound(config);
+	sound_config(config);
 }
 
 /*************************************
@@ -1594,19 +1342,19 @@ ROM_START( legion )
 	ROM_LOAD( "legion.1h", 0x00000, 0x04000, CRC(2ca4f7f0) SHA1(7cf997af9dd74ced9d28c047069ccfb67d72e257) ) // lg9
 	ROM_LOAD( "legion.1i", 0x04000, 0x08000, CRC(79f4a827) SHA1(25e4c1b5b8466627244b7226310e67e4261333b6) ) // lg10
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "lg8.bin", 0x00000, 0x08000, CRC(e0596570) SHA1(68ddc950efc55a16e6abc699e3bad18ea19d579f) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "foreground", 0 )
 	ROM_LOAD( "legion.1e", 0x00000, 0x10000, CRC(a9d70faf) SHA1(8b8b60ae49c55e931d6838e863463f6b2bf7adb0) ) // lg5
 	ROM_LOAD( "legion.1f", 0x18000, 0x08000, CRC(f018313b) SHA1(860bc9937202dc3a40c9fa7caad11c2c2aa19f5c) ) // lg6
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "legion.1l", 0x00000, 0x10000, CRC(29b8adaa) SHA1(10338ebe7324960683de1f796dd311ed662e42b4) ) // lg13
 
-	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "legion.1k", 0x000000, 0x010000, CRC(ff5a0db9) SHA1(9308deb363d3b7686cc69485ec14201dd68f9a97) ) // lg12
-	ROM_LOAD( "legion.1j", 0x010000, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) ) // lg11
+	ROM_REGION( 0x20000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "legion.1k", 0x000000, 0x010000, CRC(ff5a0db9) SHA1(9308deb363d3b7686cc69485ec14201dd68f9a97) ) // lg12
+	ROM_LOAD16_BYTE( "legion.1j", 0x000001, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) ) // lg11
 
 	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter */
 	ROM_LOAD ( "lg7.bin", 0x0000, 0x4000, CRC(533e2b58) SHA1(a13ea4a530038760ffa87713903c59a932452717) )
@@ -1623,19 +1371,19 @@ ROM_START( legionj )
 	ROM_LOAD( "legion.1h", 0x00000, 0x04000, CRC(2ca4f7f0) SHA1(7cf997af9dd74ced9d28c047069ccfb67d72e257) )
 	ROM_LOAD( "legion.1i", 0x04000, 0x08000, CRC(79f4a827) SHA1(25e4c1b5b8466627244b7226310e67e4261333b6) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "legion.1g", 0x00000, 0x08000, CRC(c50b0125) SHA1(83b5e9707152d97777fb65fa8820ba34ec2fac8d) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "foreground", 0 )
 	ROM_LOAD( "legion.1e", 0x00000, 0x10000, CRC(a9d70faf) SHA1(8b8b60ae49c55e931d6838e863463f6b2bf7adb0) )
 	ROM_LOAD( "legion.1f", 0x18000, 0x08000, CRC(f018313b) SHA1(860bc9937202dc3a40c9fa7caad11c2c2aa19f5c) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "legion.1l", 0x00000, 0x10000, CRC(29b8adaa) SHA1(10338ebe7324960683de1f796dd311ed662e42b4) )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "legion.1k", 0x000000, 0x010000, CRC(ff5a0db9) SHA1(9308deb363d3b7686cc69485ec14201dd68f9a97) )
-	ROM_LOAD( "legion.1j", 0x010000, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) )
+	ROM_REGION( 0x20000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "legion.1k", 0x000000, 0x010000, CRC(ff5a0db9) SHA1(9308deb363d3b7686cc69485ec14201dd68f9a97) )
+	ROM_LOAD16_BYTE( "legion.1j", 0x000001, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) )
 
 	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter */
 	ROM_LOAD ( "lg7.bin", 0x0000, 0x4000, CRC(533e2b58) SHA1(a13ea4a530038760ffa87713903c59a932452717) )
@@ -1652,19 +1400,19 @@ ROM_START( legionjb )
 	ROM_LOAD( "legion.1h", 0x00000, 0x04000, CRC(2ca4f7f0) SHA1(7cf997af9dd74ced9d28c047069ccfb67d72e257) )
 	ROM_LOAD( "legion.1i", 0x04000, 0x08000, CRC(79f4a827) SHA1(25e4c1b5b8466627244b7226310e67e4261333b6) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "legion.1g", 0x00000, 0x08000, CRC(c50b0125) SHA1(83b5e9707152d97777fb65fa8820ba34ec2fac8d) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "foreground", 0 )
 	ROM_LOAD( "legion.1e", 0x00000, 0x10000, CRC(a9d70faf) SHA1(8b8b60ae49c55e931d6838e863463f6b2bf7adb0) )
 	ROM_LOAD( "legion.1f", 0x18000, 0x08000, CRC(f018313b) SHA1(860bc9937202dc3a40c9fa7caad11c2c2aa19f5c) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "legion.1l", 0x00000, 0x10000, CRC(29b8adaa) SHA1(10338ebe7324960683de1f796dd311ed662e42b4) )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "legion.1k", 0x000000, 0x010000, CRC(ff5a0db9) SHA1(9308deb363d3b7686cc69485ec14201dd68f9a97) )
-	ROM_LOAD( "legion.1j", 0x010000, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) )
+	ROM_REGION( 0x20000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "legion.1k", 0x000000, 0x010000, CRC(ff5a0db9) SHA1(9308deb363d3b7686cc69485ec14201dd68f9a97) )
+	ROM_LOAD16_BYTE( "legion.1j", 0x000001, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) )
 ROM_END
 
 ROM_START( legionjb2 )
@@ -1678,19 +1426,19 @@ ROM_START( legionjb2 )
 	ROM_LOAD( "9-legion-24128.h15", 0x00000, 0x04000, CRC(2ca4f7f0) SHA1(7cf997af9dd74ced9d28c047069ccfb67d72e257) )
 	ROM_LOAD( "8-legion-24256.h17", 0x04000, 0x08000, CRC(79f4a827) SHA1(25e4c1b5b8466627244b7226310e67e4261333b6) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "7-legion-24256.c9", 0x00000, 0x08000, CRC(c50b0125) SHA1(83b5e9707152d97777fb65fa8820ba34ec2fac8d) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "foreground", 0 )
 	ROM_LOAD( "2-legion-27512.e12", 0x00000, 0x10000, CRC(a9d70faf) SHA1(8b8b60ae49c55e931d6838e863463f6b2bf7adb0) )
 	ROM_LOAD( "1-legion-24256.e14", 0x18000, 0x08000, CRC(f018313b) SHA1(860bc9937202dc3a40c9fa7caad11c2c2aa19f5c) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "10-legion-27512.e15", 0x00000, 0x10000, CRC(29b8adaa) SHA1(10338ebe7324960683de1f796dd311ed662e42b4) )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "11-legion-27512.e10", 0x000000, 0x010000, CRC(ff5a0db9) SHA1(9308deb363d3b7686cc69485ec14201dd68f9a97) )
-	ROM_LOAD( "12-legion-27512.e7", 0x010000, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) )
+	ROM_REGION( 0x20000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "11-legion-27512.e10", 0x000000, 0x010000, CRC(ff5a0db9) SHA1(9308deb363d3b7686cc69485ec14201dd68f9a97) )
+	ROM_LOAD16_BYTE( "12-legion-27512.e7",  0x000001, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) )
 ROM_END
 
 ROM_START( terraf )
@@ -1705,20 +1453,20 @@ ROM_START( terraf )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code (sound) */
 	ROM_LOAD( "11.17k", 0x00000, 0x10000,  CRC(4407d475) SHA1(96e86c7ef4dc997812436f7d0ddea332b4e6cb2b) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "9.11e", 0x00000, 0x08000, CRC(bc6f7cbc) SHA1(20b8a34de4bfa0c2fdcd2f7743a0ab35141f4bf9) ) /* characters */
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "foreground", 0 )
 	ROM_LOAD( "5.15h", 0x00000, 0x10000, CRC(25d23dfd) SHA1(da32895c1aca403209b7fb181fa4fa23a8e74d32) ) /* foreground tiles */
 	ROM_LOAD( "4.13h", 0x10000, 0x10000, CRC(b9b0fe27) SHA1(983c48239ba1524b517f89f281f2b70564bea1e9) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "15.8a", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) ) /* background tiles */
 	ROM_LOAD( "14.6a", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "12.7d", 0x00000, 0x10000, CRC(2d1f2ceb) SHA1(77544e1c4bda06feac135a96bb76af7c79278dc0) ) /* sprites */
-	ROM_LOAD( "13.9d", 0x10000, 0x10000, CRC(1d2f92d6) SHA1(e842c6bf95a5958a6ca2c85e68b9bc3cc15211a4) )
+	ROM_REGION( 0x20000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "12.7d", 0x00000, 0x10000, CRC(2d1f2ceb) SHA1(77544e1c4bda06feac135a96bb76af7c79278dc0) ) /* sprites */
+	ROM_LOAD16_BYTE( "13.9d", 0x00001, 0x10000, CRC(1d2f92d6) SHA1(e842c6bf95a5958a6ca2c85e68b9bc3cc15211a4) )
 
 	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter */
 	ROM_LOAD( "10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
@@ -1739,20 +1487,20 @@ ROM_START( terrafu ) /* Bootleg of the USA version?, uses some roms common to bo
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code (sound) */
 	ROM_LOAD( "tf-001.17k", 0x00000, 0x10000, CRC(eb6b4138) SHA1(04c53bf46d87a156d3fad86f051985d0df79bd20) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "9.11e", 0x00000, 0x08000, CRC(bc6f7cbc) SHA1(20b8a34de4bfa0c2fdcd2f7743a0ab35141f4bf9) ) /* characters */
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "foreground", 0 )
 	ROM_LOAD( "5.15h", 0x00000, 0x10000, CRC(25d23dfd) SHA1(da32895c1aca403209b7fb181fa4fa23a8e74d32) ) /* foreground tiles */
 	ROM_LOAD( "4.13h", 0x10000, 0x10000, CRC(b9b0fe27) SHA1(983c48239ba1524b517f89f281f2b70564bea1e9) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "15.8a", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) ) /* background tiles */
 	ROM_LOAD( "14.6a", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "tf-003.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
-	ROM_LOAD( "tf-002.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
+	ROM_REGION( 0x20000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "tf-003.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
+	ROM_LOAD16_BYTE( "tf-002.9d", 0x00001, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
 
 	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter */
 	ROM_LOAD( "10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
@@ -1773,20 +1521,20 @@ ROM_START( terrafj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code (sound) */
 	ROM_LOAD( "11.17k", 0x00000, 0x10000,  CRC(4407d475) SHA1(96e86c7ef4dc997812436f7d0ddea332b4e6cb2b) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "9.11e", 0x00000, 0x08000, CRC(bc6f7cbc) SHA1(20b8a34de4bfa0c2fdcd2f7743a0ab35141f4bf9) ) /* characters */
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "foreground", 0 )
 	ROM_LOAD( "5.15h", 0x00000, 0x10000, CRC(25d23dfd) SHA1(da32895c1aca403209b7fb181fa4fa23a8e74d32) ) /* foreground tiles */
 	ROM_LOAD( "4.13h", 0x10000, 0x10000, CRC(b9b0fe27) SHA1(983c48239ba1524b517f89f281f2b70564bea1e9) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "15.8a", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) ) /* background tiles */
 	ROM_LOAD( "14.6a", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "tfj-12.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
-	ROM_LOAD( "tfj-13.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
+	ROM_REGION( 0x20000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "tfj-12.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
+	ROM_LOAD16_BYTE( "tfj-13.9d", 0x00001, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
 
 	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter */
 	ROM_LOAD( "10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
@@ -1840,20 +1588,20 @@ ROM_START( terrafjb )
 	ROM_REGION( 0x4000, "extra", 0 )    /* z80 program (replacement mcu/blitter) */
 	ROM_LOAD( "tfb-10.bin", 0x0000, 0x4000, CRC(3f9aa367) SHA1(8278fb357b2d68869e39efa01ff19005807b41f8) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "9.11e", 0x00000, 0x08000, CRC(bc6f7cbc) SHA1(20b8a34de4bfa0c2fdcd2f7743a0ab35141f4bf9) ) /* characters */
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "foreground", 0 )
 	ROM_LOAD( "5.15h", 0x00000, 0x10000, CRC(25d23dfd) SHA1(da32895c1aca403209b7fb181fa4fa23a8e74d32) ) /* foreground tiles */
 	ROM_LOAD( "4.13h", 0x10000, 0x10000, CRC(b9b0fe27) SHA1(983c48239ba1524b517f89f281f2b70564bea1e9) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "15.8a", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) ) /* background tiles */
 	ROM_LOAD( "14.6a", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "tfj-12.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
-	ROM_LOAD( "tfj-13.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
+	ROM_REGION( 0x20000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "tfj-12.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
+	ROM_LOAD16_BYTE( "tfj-13.9d", 0x00001, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
 
 	ROM_REGION( 0x0100, "proms", 0 )    /* Unknown use */
 	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
@@ -1887,20 +1635,20 @@ ROM_START( terrafb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code (sound) */
 	ROM_LOAD( "f-1.1a", 0x00000, 0x10000, CRC(eb6b4138) SHA1(04c53bf46d87a156d3fad86f051985d0df79bd20) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "f-11.4g", 0x00000, 0x08000, CRC(bc6f7cbc) SHA1(20b8a34de4bfa0c2fdcd2f7743a0ab35141f4bf9) ) /* characters */
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "foreground", 0 )
 	ROM_LOAD( "f-6.3c", 0x00000, 0x10000, CRC(25d23dfd) SHA1(da32895c1aca403209b7fb181fa4fa23a8e74d32) ) /* foreground tiles */
 	ROM_LOAD( "f-7.3e", 0x10000, 0x10000, CRC(b9b0fe27) SHA1(983c48239ba1524b517f89f281f2b70564bea1e9) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "f-4.9k", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) ) /* background tiles */
 	ROM_LOAD( "f-5.9m", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "f-3.6l", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
-	ROM_LOAD( "f-2.6j", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
+	ROM_REGION( 0x20000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "f-3.6l", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
+	ROM_LOAD16_BYTE( "f-2.6j", 0x00001, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
 ROM_END
 
 ROM_START( kozure )
@@ -1915,19 +1663,19 @@ ROM_START( kozure )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code (sound) */
 	ROM_LOAD( "kozure11.17k", 0x00000, 0x10000, CRC(dba51e2d) SHA1(49e799d39d298cd3e01602ae5a2d123dfbfa9134) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "kozure9.11e", 0x00000, 0x08000, CRC(e041356e) SHA1(3e4c8564e7a8c940bbe72db11759903aa295287f) )   /* characters */
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "foreground", 0 )
 	ROM_LOAD( "kozure5.15h", 0x00000, 0x20000, CRC(0b510258) SHA1(e7ec89faa574b755605ddb67d6c908a9f5f2d6ac) )   /* foreground tiles */
 	ROM_LOAD( "kozure4.14h", 0x20000, 0x10000, CRC(fb8e13e6) SHA1(f2eafcf6d7362dc62e808f582a7bd2970e5e1ad1) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_REGION( 0x10000, "background", 0 )
 	ROM_LOAD( "kozure14.8a", 0x00000, 0x10000, CRC(94a9c3d0) SHA1(7a5d810ea370d158b2099c17f4d656fbd3deeac8) )   /* background tiles */
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "kozure12.8d", 0x00000, 0x20000, CRC(15f4021d) SHA1(b2ba6fda1a7bdaae97de4b0157b9b656b4385e08) )   /* sprites */
-	ROM_LOAD( "kozure13.9d", 0x20000, 0x20000, CRC(b3b6c753) SHA1(9ad061cac9558320b5cfd1ac1ac8d7f1788270cc) )
+	ROM_REGION( 0x40000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "kozure12.8d", 0x00000, 0x20000, CRC(15f4021d) SHA1(b2ba6fda1a7bdaae97de4b0157b9b656b4385e08) )   /* sprites */
+	ROM_LOAD16_BYTE( "kozure13.9d", 0x00001, 0x20000, CRC(b3b6c753) SHA1(9ad061cac9558320b5cfd1ac1ac8d7f1788270cc) )
 
 	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter */
 	ROM_LOAD( "kozure10.11c", 0x0000, 0x4000, CRC(f48be21d) SHA1(5d6db049f30cab98f672814a86a06609c1fa8fb4) )
@@ -1949,22 +1697,22 @@ ROM_START( cclimbr2 )
 	ROM_LOAD( "11.bin", 0x00000, 0x04000, CRC(fe0175be) SHA1(5c50fa07d8fa61d58a825bbc2cc5a7b85ff3e42e) )
 	ROM_LOAD( "12.bin", 0x04000, 0x08000, CRC(5ddf18f2) SHA1(b66da5ad400d00b07160986e4841a309a3572bd1) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "10.bin", 0x00000, 0x08000, CRC(7f475266) SHA1(73d544731fcfd7266bca451880120c555d19ea5d) ) /* characters */
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "foreground", 0 )
 	ROM_LOAD( "7.bin",  0x00000, 0x10000, CRC(cbdd3906) SHA1(0525599a5981f1e25ec6faf008e547da7a9ee2cb) ) /* foreground tiles */
 	ROM_LOAD( "8.bin",  0x10000, 0x10000, CRC(b2a613c0) SHA1(1d92b85a0dd4b7e533677c454ec23359867defda) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "17.bin", 0x00000, 0x10000, CRC(e24bb2d7) SHA1(8f4b8410b77a50ae735d72f2f37e63784ebc10d9) ) /* background tiles */
 	ROM_LOAD( "18.bin", 0x10000, 0x10000, CRC(56834554) SHA1(6d579c32fb57eb4eddc062cb2cc78b546f6607b2) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "15.bin", 0x00000, 0x10000, CRC(4bf838be) SHA1(6b1d7448caf406e47268a1276225bb0619b80cc9) ) /* sprites */
-	ROM_LOAD( "16.bin", 0x10000, 0x10000, CRC(21a265c5) SHA1(a2b3a1e5aa545030d933c0f058f4f9a18e1af1c9) )
-	ROM_LOAD( "13.bin", 0x20000, 0x10000, CRC(6b6ec999) SHA1(7749ce435f497732bd1b6958974cd95e960fc9fe) )
-	ROM_LOAD( "14.bin", 0x30000, 0x10000, CRC(f426a4ad) SHA1(facccb21ca73c560d3a38e05e677782516d5b0c0) )
+	ROM_REGION( 0x40000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "15.bin", 0x00000, 0x10000, CRC(4bf838be) SHA1(6b1d7448caf406e47268a1276225bb0619b80cc9) ) /* sprites */
+	ROM_LOAD16_BYTE( "13.bin", 0x00001, 0x10000, CRC(6b6ec999) SHA1(7749ce435f497732bd1b6958974cd95e960fc9fe) )
+	ROM_LOAD16_BYTE( "16.bin", 0x20000, 0x10000, CRC(21a265c5) SHA1(a2b3a1e5aa545030d933c0f058f4f9a18e1af1c9) )
+	ROM_LOAD16_BYTE( "14.bin", 0x20001, 0x10000, CRC(f426a4ad) SHA1(facccb21ca73c560d3a38e05e677782516d5b0c0) )
 
 	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter */
 	ROM_LOAD( "9.bin",  0x0000, 0x4000, CRC(740d260f) SHA1(5b4487930c7a1fb0a796aec2243bec631b1b5104) )
@@ -1983,22 +1731,22 @@ ROM_START( cclimbr2a )
 	ROM_LOAD( "11.bin", 0x00000, 0x04000, CRC(fe0175be) SHA1(5c50fa07d8fa61d58a825bbc2cc5a7b85ff3e42e) )
 	ROM_LOAD( "12.bin", 0x04000, 0x08000, CRC(5ddf18f2) SHA1(b66da5ad400d00b07160986e4841a309a3572bd1) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "10.bin", 0x00000, 0x08000, CRC(7f475266) SHA1(73d544731fcfd7266bca451880120c555d19ea5d) ) /* characters */
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "foreground", 0 )
 	ROM_LOAD( "7.bin",  0x00000, 0x10000, CRC(cbdd3906) SHA1(0525599a5981f1e25ec6faf008e547da7a9ee2cb) ) /* foreground tiles */
 	ROM_LOAD( "8.bin",  0x10000, 0x10000, CRC(b2a613c0) SHA1(1d92b85a0dd4b7e533677c454ec23359867defda) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "17.bin", 0x00000, 0x10000, CRC(e24bb2d7) SHA1(8f4b8410b77a50ae735d72f2f37e63784ebc10d9) ) /* background tiles */
 	ROM_LOAD( "18.bin", 0x10000, 0x10000, CRC(56834554) SHA1(6d579c32fb57eb4eddc062cb2cc78b546f6607b2) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "15.bin", 0x00000, 0x10000, CRC(4bf838be) SHA1(6b1d7448caf406e47268a1276225bb0619b80cc9) ) /* sprites */
-	ROM_LOAD( "16.bin", 0x10000, 0x10000, CRC(21a265c5) SHA1(a2b3a1e5aa545030d933c0f058f4f9a18e1af1c9) )
-	ROM_LOAD( "13.bin", 0x20000, 0x10000, CRC(6b6ec999) SHA1(7749ce435f497732bd1b6958974cd95e960fc9fe) )
-	ROM_LOAD( "14.bin", 0x30000, 0x10000, CRC(f426a4ad) SHA1(facccb21ca73c560d3a38e05e677782516d5b0c0) )
+	ROM_REGION( 0x40000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "15.bin", 0x00000, 0x10000, CRC(4bf838be) SHA1(6b1d7448caf406e47268a1276225bb0619b80cc9) ) /* sprites */
+	ROM_LOAD16_BYTE( "13.bin", 0x00001, 0x10000, CRC(6b6ec999) SHA1(7749ce435f497732bd1b6958974cd95e960fc9fe) )
+	ROM_LOAD16_BYTE( "16.bin", 0x20000, 0x10000, CRC(21a265c5) SHA1(a2b3a1e5aa545030d933c0f058f4f9a18e1af1c9) )
+	ROM_LOAD16_BYTE( "14.bin", 0x20001, 0x10000, CRC(f426a4ad) SHA1(facccb21ca73c560d3a38e05e677782516d5b0c0) )
 
 	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter */
 	ROM_LOAD( "9.bin",  0x0000, 0x4000, CRC(740d260f) SHA1(5b4487930c7a1fb0a796aec2243bec631b1b5104) )
@@ -2016,20 +1764,20 @@ ROM_START( armedf )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code (sound) */
 	ROM_LOAD( "af_10.rom", 0x00000, 0x10000, CRC(c5eacb87) SHA1(33af84b48fbda26729975b02cfb70f23c0bce6a2) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "09.11c", 0x00000, 0x08000, CRC(5c6993d5) SHA1(3991851e5c4d2b3d72c372afdfbb710796874c15) ) /* characters */
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "foreground", 0 )
 	ROM_LOAD( "af_04.rom", 0x00000, 0x10000, CRC(44d3af4f) SHA1(0c2cb54357c314e43cec6f959fe9d4a2c8bc8834) ) /* foreground tiles */
 	ROM_LOAD( "af_05.rom", 0x10000, 0x10000, CRC(92076cab) SHA1(f47424817373a6735da2b2049b53da5b38178cec) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "af_14.rom", 0x00000, 0x10000, CRC(8c5dc5a7) SHA1(758140ddb9e60fb3950fe58bf53c7aea769a1a94) ) /* background tiles */
 	ROM_LOAD( "af_13.rom", 0x10000, 0x10000, CRC(136a58a3) SHA1(5481e3ce404881a0470f8740f0de6e42283bedf2) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "af_11.rom", 0x00000, 0x20000, CRC(b46c473c) SHA1(d8573225e2d8b133b3bdd4fa5a12d445c71d5e0e) ) /* sprites */
-	ROM_LOAD( "af_12.rom", 0x20000, 0x20000, CRC(23cb6bfe) SHA1(34cb013827206bea71f5336b308ba92bee688506) )
+	ROM_REGION( 0x40000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "af_11.rom", 0x00000, 0x20000, CRC(b46c473c) SHA1(d8573225e2d8b133b3bdd4fa5a12d445c71d5e0e) ) /* sprites */
+	ROM_LOAD16_BYTE( "af_12.rom", 0x00001, 0x20000, CRC(23cb6bfe) SHA1(34cb013827206bea71f5336b308ba92bee688506) )
 ROM_END
 
 ROM_START( armedff )
@@ -2044,20 +1792,20 @@ ROM_START( armedff )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code (sound) */
 	ROM_LOAD( "af_10.rom", 0x00000, 0x10000, CRC(c5eacb87) SHA1(33af84b48fbda26729975b02cfb70f23c0bce6a2) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "af_09.rom", 0x00000, 0x08000, CRC(7025e92d) SHA1(e590682092c25bbfb674afeccbfc0e613c51d188) ) /* characters */
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "foreground", 0 )
 	ROM_LOAD( "af_04.rom", 0x00000, 0x10000, CRC(44d3af4f) SHA1(0c2cb54357c314e43cec6f959fe9d4a2c8bc8834) ) /* foreground tiles */
 	ROM_LOAD( "af_05.rom", 0x10000, 0x10000, CRC(92076cab) SHA1(f47424817373a6735da2b2049b53da5b38178cec) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "af_14.rom", 0x00000, 0x10000, CRC(8c5dc5a7) SHA1(758140ddb9e60fb3950fe58bf53c7aea769a1a94) ) /* background tiles */
 	ROM_LOAD( "af_13.rom", 0x10000, 0x10000, CRC(136a58a3) SHA1(5481e3ce404881a0470f8740f0de6e42283bedf2) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "af_11.rom", 0x00000, 0x20000, CRC(b46c473c) SHA1(d8573225e2d8b133b3bdd4fa5a12d445c71d5e0e) ) /* sprites */
-	ROM_LOAD( "af_12.rom", 0x20000, 0x20000, CRC(23cb6bfe) SHA1(34cb013827206bea71f5336b308ba92bee688506) )
+	ROM_REGION( 0x40000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "af_11.rom", 0x00000, 0x20000, CRC(b46c473c) SHA1(d8573225e2d8b133b3bdd4fa5a12d445c71d5e0e) ) /* sprites */
+	ROM_LOAD16_BYTE( "af_12.rom", 0x00001, 0x20000, CRC(23cb6bfe) SHA1(34cb013827206bea71f5336b308ba92bee688506) )
 ROM_END
 
 ROM_START( skyrobo )
@@ -2074,20 +1822,20 @@ ROM_START( skyrobo )
 	// coming from Tatakae Big Fighter, might or might not be correct for this version
 	ROM_LOAD( "i8751.bin", 0x00000, 0x1000, BAD_DUMP CRC(64a0d225) SHA1(ccc5c33c0c412bf9e3a4f7de5e39b042e00c41dd) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "7", 0x00000, 0x08000, CRC(f556ef28) SHA1(2acb83cdf23356091056f2cfbbc2b9828ee25b6f) ) /* Rom location 11C */
 
-	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_REGION( 0x30000, "foreground", 0 )
 	ROM_LOAD( "5.13f", 0x00000, 0x20000, CRC(d440a29f) SHA1(9e6ea7c9903e5e3e8e10ac7680c6120e1aa27250) )
 	ROM_LOAD( "6.15f", 0x20000, 0x10000, CRC(27469a76) SHA1(ebf2c60e1f70a589680c05adf10771ac2097b9d0) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "12.8a", 0x00000, 0x10000, CRC(a5694ea9) SHA1(ea94174495b3a65b3797932074a94df3b55fa0a2) )
 	ROM_LOAD( "11.6a", 0x10000, 0x10000, CRC(10b74e2c) SHA1(e3ec68726e7f277dc2043424f2e4d863eb01b3dc) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "9.8d",  0x00000, 0x20000, CRC(fe67800e) SHA1(0d3c4c3cb185270260fa691a97cddf082d6a056e) )
-	ROM_LOAD( "10.9d", 0x20000, 0x20000, CRC(dcb828c4) SHA1(607bc86580a6fe6e15e91131532b0eecd8b7a0cb) )
+	ROM_REGION( 0x40000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "9.8d",  0x00000, 0x20000, CRC(fe67800e) SHA1(0d3c4c3cb185270260fa691a97cddf082d6a056e) )
+	ROM_LOAD16_BYTE( "10.9d", 0x00001, 0x20000, CRC(dcb828c4) SHA1(607bc86580a6fe6e15e91131532b0eecd8b7a0cb) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tf.13h", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* Prom is a N82S129AN type */
@@ -2106,20 +1854,20 @@ ROM_START( bigfghtr )
 	ROM_REGION( 0x10000, "mcu", 0 ) /* Intel C8751 read protected MCU */
 	ROM_LOAD( "i8751.bin", 0x00000, 0x1000,  CRC(64a0d225) SHA1(ccc5c33c0c412bf9e3a4f7de5e39b042e00c41dd) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "text", 0 )
 	ROM_LOAD( "7.11c", 0x00000, 0x08000, CRC(1809e79f) SHA1(730547771f803857acb552a84a8bc21bd3bda33f) )
 
-	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_REGION( 0x30000, "foreground", 0 )
 	ROM_LOAD( "5.13f", 0x00000, 0x20000, CRC(d440a29f) SHA1(9e6ea7c9903e5e3e8e10ac7680c6120e1aa27250) )
 	ROM_LOAD( "6.15f", 0x20000, 0x10000, CRC(27469a76) SHA1(ebf2c60e1f70a589680c05adf10771ac2097b9d0) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "background", 0 )
 	ROM_LOAD( "12.8a", 0x00000, 0x10000, CRC(a5694ea9) SHA1(ea94174495b3a65b3797932074a94df3b55fa0a2) )
 	ROM_LOAD( "11.6a", 0x10000, 0x10000, CRC(10b74e2c) SHA1(e3ec68726e7f277dc2043424f2e4d863eb01b3dc) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "9.8d",  0x00000, 0x20000, CRC(fe67800e) SHA1(0d3c4c3cb185270260fa691a97cddf082d6a056e) )
-	ROM_LOAD( "10.9d", 0x20000, 0x20000, CRC(dcb828c4) SHA1(607bc86580a6fe6e15e91131532b0eecd8b7a0cb) )
+	ROM_REGION( 0x40000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "9.8d",  0x00000, 0x20000, CRC(fe67800e) SHA1(0d3c4c3cb185270260fa691a97cddf082d6a056e) )
+	ROM_LOAD16_BYTE( "10.9d", 0x00001, 0x20000, CRC(dcb828c4) SHA1(607bc86580a6fe6e15e91131532b0eecd8b7a0cb) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tf.13h", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* Prom is a N82S129AN type */
@@ -2134,25 +1882,6 @@ ROM_END
 void armedf_state::init_terraf()
 {
 	m_scroll_type = 0;
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c006, 0x07c007, write16_delegate(FUNC(armedf_state::terraf_fg_scrolly_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c008, 0x07c009, write16_delegate(FUNC(armedf_state::terraf_fg_scrollx_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0c0001, write16_delegate(FUNC(armedf_state::terraf_fg_scroll_msb_arm_w),this));
-}
-
-void armedf_state::init_terrafu()
-{
-	m_scroll_type = 0;
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
-}
-
-void armedf_state::init_terrafjb()
-{
-	m_scroll_type = 0;
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terrafjb_io_w),this));
 }
 
 void armedf_state::init_armedf()
@@ -2160,19 +1889,15 @@ void armedf_state::init_armedf()
 	m_scroll_type = 1;
 }
 
-
 void armedf_state::init_kozure()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	u16 *ROM = (u16 *)memregion("maincpu")->base();
 
 	/* patch "time over" bug, see notes on top. */
 	ROM[0x1016c/2] = 0x4e71;
 	/* ROM check at POST. */
 	ROM[0x04fc6/2] = 0x4e71;
 	m_scroll_type = 0;
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
-
 }
 
 void armedf_state::init_legion()
@@ -2180,10 +1905,10 @@ void armedf_state::init_legion()
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
 	     of 3 of the "Unused" Dip Switches (see notes above). */
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-	RAM[0x0001d6 / 2] = 0x0001;
+	u16 *ROM = (u16 *)memregion("maincpu")->base();
+	ROM[0x0001d6 / 2] = 0x0001;
 	/* To avoid checksum error */
-	RAM[0x000488 / 2] = 0x4e71;
+	ROM[0x000488 / 2] = 0x4e71;
 #endif
 
 	m_scroll_type = 2;
@@ -2194,8 +1919,8 @@ void armedf_state::init_legionjb()
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
 	     of 3 of the "Unused" Dip Switches (see notes above). */
-	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
-	RAM[0x0001d6/2] = 0x0001;
+	u16 *ROM = (u16 *)memregion("maincpu")->base();
+	ROM[0x0001d6/2] = 0x0001;
 	/* No need to patch the checksum routine (see notes) ! */
 #endif
 
@@ -2206,8 +1931,6 @@ void armedf_state::init_legionjb()
 
 void armedf_state::init_cclimbr2()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
-
 	m_scroll_type = 3;
 }
 
@@ -2223,10 +1946,10 @@ GAME( 1987, legionj,   legion,   legion,    legion,   armedf_state,   init_legio
 GAME( 1987, legionjb,  legion,   legionjb,  legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg set 1)", MACHINE_SUPPORTS_SAVE) /* blitter protection removed */
 GAME( 1987, legionjb2, legion,   legionjb2, legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg set 2)", MACHINE_SUPPORTS_SAVE)
 
-GAME( 1987, terraf,    0,        terraf,    terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, terrafu,   terraf,   terraf,    terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, terrafj,   terraf,   terraf,    terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, terrafjb,  terraf,   terrafjb,  terraf,   armedf_state,   init_terrafjb, ROT0,   "bootleg",                       "Terra Force (Japan, bootleg with additional Z80)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terraf,    0,        terraf,    terraf,   armedf_state,   init_terraf,   ROT0,   "Nichibutsu",                    "Terra Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafu,   terraf,   terraf,    terraf,   armedf_state,   init_terraf,   ROT0,   "Nichibutsu USA",                "Terra Force (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafj,   terraf,   terraf,    terraf,   armedf_state,   init_terraf,   ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafjb,  terraf,   terrafjb,  terraf,   armedf_state,   init_terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg with additional Z80)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, terrafb,   terraf,   terrafb,   terraf,   armedf_state,   init_terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, kozure,    0,        kozure,    kozure,   armedf_state,   init_kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -2234,8 +1957,8 @@ GAME( 1987, kozure,    0,        kozure,    kozure,   armedf_state,   init_kozur
 GAME( 1988, cclimbr2,  0,        cclimbr2,  cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, cclimbr2a, cclimbr2, cclimbr2,  cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", MACHINE_SUPPORTS_SAVE  )
 
-GAME( 1988, armedf,    0,        armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu",                    "Armed Formation", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, armedff,   armedf,   armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armedf,    0,        armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu",                    "Armed F (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armedff,   armedf,   armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed F (Fillmore license)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, skyrobo,   0,        bigfghtr,  bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bigfghtr,  skyrobo,  bigfghtr,  bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_SUPPORTS_SAVE )

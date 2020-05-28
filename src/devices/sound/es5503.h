@@ -5,11 +5,13 @@
 
 #pragma once
 
+#include "dirom.h"
+
 // ======================> es5503_device
 
 class es5503_device : public device_t,
-						public device_sound_interface,
-						public device_rom_interface
+					  public device_sound_interface,
+					  public device_rom_interface<17>
 {
 public:
 	// construction/destruction

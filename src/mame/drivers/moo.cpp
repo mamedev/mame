@@ -528,12 +528,12 @@ void moo_state::moo(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -48+1, 23);
 	m_k053246->set_palette("palette");
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette("palette");
 
@@ -582,12 +582,12 @@ void moo_state::moobl(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -48+1, 23);
 	m_k053246->set_palette("palette");
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette("palette");
 

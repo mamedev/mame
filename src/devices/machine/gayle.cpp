@@ -103,9 +103,9 @@ READ16_MEMBER( gayle_device::gayle_r )
 		if (!BIT(offset, 14))
 		{
 			if (BIT(offset, 13))
-				data = m_cs0_read(space, (offset >> 2) & 0x07, mem_mask);
+				data = m_cs0_read((offset >> 2) & 0x07, mem_mask);
 			else
-				data = m_cs1_read(space, (offset >> 2) & 0x07, mem_mask);
+				data = m_cs1_read((offset >> 2) & 0x07, mem_mask);
 		}
 	}
 
@@ -153,9 +153,9 @@ WRITE16_MEMBER( gayle_device::gayle_w )
 		if (!BIT(offset, 14))
 		{
 			if (BIT(offset, 13))
-				m_cs0_write(space, (offset >> 2) & 0x07, data, mem_mask);
+				m_cs0_write((offset >> 2) & 0x07, data, mem_mask);
 			else
-				m_cs1_write(space, (offset >> 2) & 0x07, data, mem_mask);
+				m_cs1_write((offset >> 2) & 0x07, data, mem_mask);
 		}
 	}
 }

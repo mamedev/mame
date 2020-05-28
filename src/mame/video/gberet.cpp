@@ -106,12 +106,12 @@ TILE_GET_INFO_MEMBER(gberet_state::get_bg_tile_info)
 	tileinfo.group = color;
 	tileinfo.category = (attr & 0x80) >> 7;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 VIDEO_START_MEMBER(gberet_state,gberet)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gberet_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gberet_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x10);
 	m_bg_tilemap->set_scroll_rows(32);
 }

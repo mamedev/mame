@@ -66,9 +66,9 @@ void tim011_state::tim011_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x007f).ram(); /* Z180 internal registers */
 	map(0x0080, 0x009f).m(m_fdc, FUNC(upd765a_device::map));
-	//AM_RANGE(0x00a0, 0x00a0) AM_MIRROR(0x001f)  AM_WRITE(fdc_dma_w)
-	//AM_RANGE(0x00c0, 0x00c1) AM_MIRROR(0x000e)  AM_READWRITE(print_r,print_w)
-	//AM_RANGE(0x00d0, 0x00d0) AM_MIRROR(0x000f)  AM_READWRITE(scroll_r,scroll_w)
+	//map(0x00a0, 0x00a0).mirror(0x001f).w(FUNC(tim011_state::fdc_dma_w));
+	//map(0x00c0, 0x00c1).mirror(0x000e).rw(FUNC(tim011_state::print_r), FUNC(tim011_state::print_w));
+	//map(0x00d0, 0x00d0).mirror(0x000f).rw(FUNC(tim011_state::scroll_r), FUNC(tim011_state::scroll_w));
 	map(0x8000, 0xffff).ram(); // Video RAM 43256 SRAM  (32KB)
 }
 
@@ -135,7 +135,7 @@ static const floppy_format_type tim011_floppy_formats[] = {
 void tim011_state::tim011(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'288'000) / 2); // location U17 HD64180
+	HD64180RP(config, m_maincpu, XTAL(12'288'000)); // location U17 HD64180
 	m_maincpu->set_addrmap(AS_PROGRAM, &tim011_state::tim011_mem);
 	m_maincpu->set_addrmap(AS_IO, &tim011_state::tim011_io);
 	m_maincpu->set_vblank_int("screen", FUNC(tim011_state::irq0_line_hold));

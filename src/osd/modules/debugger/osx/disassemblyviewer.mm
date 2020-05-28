@@ -16,6 +16,7 @@
 #include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/points.h"
 
 #include "util/xmlfile.h"
 
@@ -109,7 +110,7 @@
 	[actionButton release];
 
 	// set default state
-	[dasmView selectSubviewForDevice:machine->debugger().cpu().get_visible_cpu()];
+	[dasmView selectSubviewForDevice:machine->debugger().console().get_visible_cpu()];
 	[dasmView setExpression:@"curpc"];
 	[expressionField setStringValue:@"curpc"];
 	[expressionField selectText:self];
@@ -176,7 +177,7 @@
 	{
 		device_t &device = *[dasmView source]->device();
 		offs_t const address = [dasmView selectedAddress];
-		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:address forDevice:device];
+		const debug_breakpoint *bp = device.debug()->breakpoint_find(address);
 
 		// if it doesn't exist, add a new one
 		if (bp == nullptr)
@@ -203,7 +204,7 @@
 	{
 		device_t &device = *[dasmView source]->device();
 		offs_t const address = [dasmView selectedAddress];
-		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:address forDevice:device];
+		const debug_breakpoint *bp = device.debug()->breakpoint_find(address);
 		if (bp != nullptr)
 		{
 			device.debug()->breakpoint_enable(bp->index(), !bp->enabled());
@@ -252,11 +253,10 @@
 	BOOL const inContextMenu = ([item menu] == [dasmView menu]);
 	BOOL const haveCursor = [dasmView cursorVisible];
 
-	device_debug::breakpoint *breakpoint = nullptr;
+	const debug_breakpoint *breakpoint = nullptr;
 	if (haveCursor)
 	{
-		breakpoint = [[self class] findBreakpointAtAddress:[dasmView selectedAddress]
-												 forDevice:*[dasmView source]->device()];
+		breakpoint = [dasmView source]->device()->debug()->breakpoint_find([dasmView selectedAddress]);
 	}
 
 	if (action == @selector(debugToggleBreakpoint:))

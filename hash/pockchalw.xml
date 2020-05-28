@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
 
  List of software from ja.wikipedia.org
  Notice that this list might be missing different variants (for different ages),
@@ -31,13 +31,11 @@
  高校受験(英・社・理)      [dumped]
  実技4教科              [dumped]
 
- -->
-
-
+-->
 
 <softwarelist name="pockchalw" description="Pocket Challenge W cartridges">
 
-	<software name="chukomn1" supported="no" >
+	<software name="chukomn1" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Koumin (1K)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -58,7 +56,7 @@
 		</part>
 	</software>
 
-	<software name="chukomnn" supported="no" >
+	<software name="chukomnn" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Koumin (NK)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -79,7 +77,7 @@
 		</part>
 	</software>
 
-	<software name="chuchi" supported="no" >
+	<software name="chuchi" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Chiri (9C)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -100,7 +98,7 @@
 		</part>
 	</software>
 
-	<software name="chuchire" supported="no" >
+	<software name="chuchire" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Chiri - Rekishi Pack (PS)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -128,7 +126,7 @@
 		</part>
 	</software>
 
-	<software name="churika" supported="no" >
+	<software name="churika" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika Pack (PL)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -156,7 +154,7 @@
 		</part>
 	</software>
 
-	<software name="chukkjuk" supported="no" >
+	<software name="chukkjuk" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Koukou Juken (Kuni - Suu) (0G2)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -177,7 +175,7 @@
 		</part>
 	</software>
 
-	<software name="chukkesr" supported="no" >
+	<software name="chukkesr" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Koukou Juken (Ei - Sha - Ri) (N-G1)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -196,13 +194,13 @@
 			<feature name="u310" value="LH5168N-10L" />
 			<feature name="u311" value="74HC139A" />
 			<feature name="bt301" value="[empty?]" />
-			<dataarea name="rom" size="1048576">
-				<rom name="n-g1 7bi711 98cj4mb c1d1.u307" size="1048576" crc="efef730e" sha1="6f4906d36fc751cf2c52bf9ff4a388fd19ae51d2" offset="0" />
+			<dataarea name="rom" size="4194304">
+				<rom name="n-g1 7bi711 98cj4mb c1d1.u307" size="4194304" crc="53c2ff43" sha1="1baba9ecb24b46d9319bf0b13b1d8e5409ff5214" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="jitsugi4" supported="no" >
+	<software name="jitsugi4" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Jitsugi 4 Kyouka (BG)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -223,7 +221,7 @@
 		</part>
 	</software>
 
-	<software name="hineijuk" supported="no" >
+	<software name="hineijuk" supported="no">
 		<description>Shinkenzemi Koukou Kouza - Hinshutsu Ei Jukugo (J)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -244,7 +242,7 @@
 		</part>
 	</software>
 
-	<software name="jukokor" supported="no" >
+	<software name="jukokor" supported="no">
 		<description>Shinkenzemi Koukou Kouza - Juuyou Kobun Kouryaku (A)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>

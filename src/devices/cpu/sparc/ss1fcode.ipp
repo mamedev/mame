@@ -7,7 +7,7 @@
 //
 //================================================================
 
-void mb86901_device::log_fcodes()
+void sparc_base_device::log_fcodes()
 {
 	if (PC != 0xffef0000 && PC != m_ss1_next_entry_point)
 		return;
@@ -57,7 +57,7 @@ void mb86901_device::log_fcodes()
 	}
 }
 
-void mb86901_device::indent()
+void sparc_base_device::indent()
 {
 	uint32_t program_depth = (0xffeff000 - (REG(6) - 4)) / 4;
 
@@ -71,7 +71,7 @@ void mb86901_device::indent()
 	}
 }
 
-void mb86901_device::disassemble_ss1_fcode(uint32_t r5, uint32_t opcode, uint32_t handler_base, uint32_t entry_point, uint32_t stack)
+void sparc_base_device::disassemble_ss1_fcode(uint32_t r5, uint32_t opcode, uint32_t handler_base, uint32_t entry_point, uint32_t stack)
 {
 	std::string opdesc = m_ss1_fcode_table[opcode];
 	if (opdesc.length() == 0)

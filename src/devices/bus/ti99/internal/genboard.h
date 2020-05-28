@@ -23,6 +23,7 @@
 #include "machine/mm58274c.h"
 #include "machine/at29x.h"
 #include "machine/ram.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 
 enum
 {
@@ -37,136 +38,98 @@ enum
 	GENEVE_PFM512A
 };
 
-#define GENEVE_KEYBOARD_TAG   "gkeyboard"
-#define GENEVE_MAPPER_TAG     "gmapper"
+#define GENEVE_GATE_ARRAY_TAG     "gatearray"
+#define GENMOD_DECODER_TAG     "genmod"
+#define GENEVE_PAL_TAG     "pal"
 #define GENEVE_MOUSE_TAG      "gmouse"
-#define GENEVE_CLOCK_TAG      "mm58274c"
 #define GENEVE_PFM512_TAG      "pfm512"
 #define GENEVE_PFM512A_TAG     "pfm512a"
-
-#define GENEVE_SRAM_TAG  "sram"
-#define GENEVE_DRAM_TAG  "dram"
-#define GENEVE_SRAM_PAR_TAG  ":sram"
-#define GENEVE_DRAM_PAR_TAG  ":dram"
+#define GENEVE_KEYBOARD_CONN_TAG "keybconn"
 
 namespace bus { namespace ti99 { namespace internal {
 
 /*****************************************************************************/
 
-class geneve_keyboard_device : public device_t
+class geneve_pal_device;
+class genmod_decoder_device;
+
+class geneve_gate_array_device : public device_t
 {
+	// friend class genmod_decoder_device;
+
 public:
-	geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_WRITE_LINE_MEMBER( reset_line );
-	DECLARE_WRITE_LINE_MEMBER( send_scancodes );
-	DECLARE_WRITE_LINE_MEMBER( clock_control );
-	uint8_t get_recent_key();
+	geneve_gate_array_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto int_cb() { return m_interrupt.bind(); }
-
-protected:
-	void               device_start() override;
-	void               device_reset() override;
-	ioport_constructor device_input_ports() const override;
-	void               device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	devcb_write_line  m_interrupt;    // Keyboard interrupt to console
-	required_ioport_array<8> m_keys;
-
-private:
-	static constexpr unsigned KEYQUEUESIZE = 256;
-	static constexpr unsigned MAXKEYMSGLENGTH = 10;
-	static constexpr unsigned KEYAUTOREPEATDELAY = 30;
-	static constexpr unsigned KEYAUTOREPEATRATE = 6;
-
-	void    post_in_key_queue(int keycode);
-	void    signal_when_key_available();
-	void    poll();
-
-	bool    m_key_reset;
-	int     m_key_queue_length;
-	uint8_t   m_key_queue[KEYQUEUESIZE];
-	int     m_key_queue_head;
-	bool    m_key_in_buffer;
-	uint32_t  m_key_state_save[4];
-	bool    m_key_numlock_state;
-
-	int     m_key_ctrl_state;
-	int     m_key_alt_state;
-	int     m_key_real_shift_state;
-
-	bool    m_key_fake_shift_state;
-	bool    m_key_fake_unshift_state;
-
-	int     m_key_autorepeat_key;
-	int     m_key_autorepeat_timer;
-
-	bool    m_keep_keybuf;
-	bool    m_keyboard_clock;
-
-	emu_timer*      m_timer;
-};
-
-/*****************************************************************************/
-
-class geneve_mapper_device : public device_t
-{
-public:
-	geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	void set_geneve_mode(bool geneve);
-	void set_direct_mode(bool direct);
-	void set_cartridge_size(int size);
-	void set_cartridge_writable(int base, bool write);
-	void set_video_waitstates(bool wait);
-	void set_extra_waitstates(bool wait);
-
-	uint8_t readm(offs_t offset);
-	void writem(offs_t offset, uint8_t data);
+	// Set the internal state and output lines according to the address
 	void setaddress(offs_t offset, uint8_t busctrl);
 
-	DECLARE_INPUT_CHANGED_MEMBER( settings_changed );
+	// Access to Gate Array-internal registers. Depends on the previous
+	// call of setaddress
+	// - Mapper
+	// - Keyboard
+	// - Grom address counter
+	// - Cartridge bank switch
+	void readz(uint8_t& value);
+	void write(uint8_t data);
 
+	// Inputs
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
+	DECLARE_WRITE_LINE_MEMBER( extready_in );
+	DECLARE_WRITE_LINE_MEMBER( sndready_in );
+	DECLARE_WRITE8_MEMBER( cru_sstep_write );
+	DECLARE_WRITE8_MEMBER( cru_ctrl_write );
 
-	// PFM support
-	DECLARE_WRITE_LINE_MEMBER( pfm_select_lsb );
-	DECLARE_WRITE_LINE_MEMBER( pfm_select_msb );
-	DECLARE_WRITE_LINE_MEMBER( pfm_output_enable );
+	// Outputs
+	DECLARE_READ_LINE_MEMBER( csr_out );
+	DECLARE_READ_LINE_MEMBER( csw_out );
+	DECLARE_READ_LINE_MEMBER( rtcen_out );
+	DECLARE_READ_LINE_MEMBER( romen_out );
+	DECLARE_READ_LINE_MEMBER( ramen_out );
+	DECLARE_READ_LINE_MEMBER( ramenx_out );
+	DECLARE_READ_LINE_MEMBER( snden_out );
+	DECLARE_READ_LINE_MEMBER( dben_out );
+	DECLARE_READ_LINE_MEMBER( gaready_out );
 
-	auto ready_cb() { return m_ready.bind(); }
+	int get_prefix(int lines);
+	bool accessing_dram();
+	static bool accessing_dram_s(int function);
+	static bool accessing_sram_s(int function);
+	static bool accessing_box_s(int function, bool genmod);
+	static bool accessing_devs_s(int function);
 
-protected:
-	geneve_mapper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	void    device_start() override;
-	virtual void device_reset() override;
+	bool accessing_grom();
+	offs_t get_dram_address();
+
+	// Keyboard support
+	DECLARE_WRITE_LINE_MEMBER( set_keyboard_clock );
+	DECLARE_WRITE_LINE_MEMBER( enable_shift_register );
+	DECLARE_WRITE_LINE_MEMBER( kbdclk );
+	DECLARE_WRITE_LINE_MEMBER( kbddata );
+	auto kbdint_cb() { return m_keyint.bind(); }
+
+	// Miscellaneous
+	void set_debug(bool deb) { m_debug = deb; }
+	bool geneve_mode() { return m_geneve_mode; }
+	int  get_function() { return m_debug? m_decdebug.function : m_decoded.function; }
+
+private:
+	geneve_gate_array_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	void    common_reset();
 
-	// GROM simulation
-	bool    m_gromwaddr_LSB;
-	bool    m_gromraddr_LSB;
-	int     m_grom_address;
-	uint8_t read_grom(offs_t offset);
-	void write_grom(offs_t offset, uint8_t data);
+	// Mapper function
+	typedef struct
+	{
+		bool    read;           // Reading
+		int     function;       // must be a fundamental type to be saveable
+		offs_t  offset;         // Logical address
+		int     physpage;       // Physical page
+	} decdata;
 
-	// wait states
-	void    set_wait(int min);
-	void    set_video_waitcount(int min);
-	bool    m_video_waitstates;
-	bool    m_extra_waitstates;
-	bool    m_ready_asserted;
-
-	bool    m_read_mode;
-
-	bool    m_debug_no_ws;
-	bool    m_geneve_mode;
-	bool    m_direct_mode;
-	int     m_cartridge_size;
-	bool    m_cartridge_secondpage;
-	bool    m_cartridge6_writable;
-	bool    m_cartridge7_writable;
-	int     m_map[8];
+	// Functions
+	void    decode_logical(decdata* dec);
+	void    get_page(decdata* dec);
+	void    decode_physical(decdata* dec);
 
 	/*
 	Constants for mapper decoding. Naming scheme:
@@ -181,27 +144,54 @@ protected:
 		MLKEY,
 		MLSOUND,
 		MLCLOCK,
+		MLEXT,
 		MLGROM,
+		MLGROMAD,
+		MLCARTROM,
+		MLCARTBANK,
 
 		MPDRAM,
 		MPEXP,
 		MPEPROM,
 		MPSRAM,
+		MPSRAMX,
+		MBOX,
 
-		MBOX
+		CARTPROT
+
 	} decfunct_t;
 
-	// Mapper function
-	typedef struct
-	{
-		int     function;       // must be a fundamental type to be saveable
-		offs_t  offset;         // Logical address
-		offs_t  physaddr;       // Physical address
-		int     wait;           // Wait states
-	} decdata;
+	void    device_start() override;
+	virtual void device_reset() override;
+
+	// Wait state creation
+	bool    m_have_waitstate;
+	bool    m_have_extra_waitstate;
+	bool    m_enable_extra_waitstates;
+	bool    m_extready;
+	bool    m_sndready;
+
+	// Cartridge and GROM support
+	int     m_grom_address;
+	bool    m_cartridge_banked;
+	bool    m_cartridge_secondpage;
+	bool    m_cartridge6_writable;
+	bool    m_cartridge7_writable;
+	bool    m_load_lsb;
+	void    increase_grom_address();
+
+	// Global modes
+	bool    m_geneve_mode;
+	bool    m_direct_mode;
+
+	// Mapper file
+	int     m_map[8];
 
 	// The result of decoding
 	decdata m_decoded;
+	decdata m_decdebug;
+
+	// ====== Decoding ============
 
 	// Static decoder entry for the logical space
 	// Not all entries apply for native mode, e.g. there is no GROM in native
@@ -219,95 +209,120 @@ protected:
 		const char* description;   // Good for logging
 	} logentry_t;
 
-	logentry_t m_logmap[7] =
-	{
-		{ 0xf100, 0x000e, 0x8800, 0x03fe, 0x0400, MLVIDEO,  "video" },
-		{ 0xf110, 0x0007, 0x8000, 0x0007, 0x0000, MLMAPPER, "mapper" },
-		{ 0xf118, 0x0007, 0x8008, 0x0007, 0x0000, MLKEY,    "keyboard" },
-		{ 0xf120, 0x000e, 0x8400, 0x03fe, 0x0000, MLSOUND,  "sound" },
-		{ 0xf130, 0x000f, 0x8010, 0x000f, 0x0000, MLCLOCK,  "clock" },
-		{ 0x0000, 0x0000, 0x9000, 0x03fe, 0x0400, MBOX,     "speech (in P-Box)" },
-		{ 0x0000, 0x0000, 0x9800, 0x03fe, 0x0400, MLGROM,   "GROM" },
-	};
-
 	// Static decoder entry for the physical space
 	// There are no differences between native mode and TI mode.
 	typedef struct
 	{
-		offs_t      base;           // Base address
+		offs_t      base;           // Base page
 		int         mask;           // Bits that also match this entry
 		decfunct_t  function;       // Decoded function
-		int         wait;           // Wait states
 		const char* description;    // Good for logging
 	} physentry_t;
 
-	physentry_t m_physmap[4] =
-	{
-		{ 0x000000, 0x07ffff, MPDRAM,  1, "DRAM" },
-		{ 0x080000, 0x07ffff, MPEXP,   1, "on-board expansion" },
-		{ 0x1e0000, 0x01ffff, MPEPROM, 0, "EPROM" },
-		{ 0x180000, 0x07ffff, MPSRAM,  0, "SRAM" }
-	};
+	// Tables
+	static const geneve_gate_array_device::logentry_t s_logmap[];
+	static const geneve_gate_array_device::physentry_t s_physmap[];
 
-	void    decode_logical(bool reading, decdata* dec);
-	void    map_address(bool reading, decdata* dec);
-	void    decode_physical(decdata* dec);
-	// This is the hook for Genmod. The normal Geneve just does nothing here.
-	virtual void decode_mod(decdata* dec) { };
+	// Keyboard support
+	devcb_write_line    m_keyint;
+	uint16_t            m_keyboard_shift_reg;
+	line_state          m_keyboard_last_clock;
+	line_state          m_keyboard_data_in;
+	bool                m_shift_reg_enabled;
+	void                shift_reg_changed();
 
-	// PFM mod (0 = none, 1 = AT29C040, 2 = AT29C040A)
-	uint8_t boot_rom(offs_t offset);
-	void write_to_pfm(offs_t offset, uint8_t data);
-	int     m_boot_rom;
-	int     m_pfm_bank;
-	bool    m_pfm_output_enable;
+	// Devices
+	required_device<geneve_pal_device>                  m_pal;
+	required_device<bus::ti99::peb::peribox_device>     m_peribox;
+	required_device<pc_kbdc_device>                     m_keyb_conn;
 
-	int     m_pbox_prefix;
+	// Emulation-specific: Is the debugger active?
+	bool    m_debug;
+};
 
-	// SRAM access
-	int     m_sram_mask;
-	int     m_sram_val;
+/*****************************************************************************/
+
+/*
+   PAL circuit, controlling the READY line to the CPU and MEMEN/WE
+   to the peribox
+*/
+
+class geneve_pal_device : public device_t
+{
+public:
+	geneve_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_WRITE_LINE_MEMBER( gaready_in );
+	DECLARE_WRITE_LINE_MEMBER( csw_in );
+	DECLARE_WRITE_LINE_MEMBER( csr_in );
+	DECLARE_WRITE_LINE_MEMBER( memen );
+	DECLARE_WRITE_LINE_MEMBER( vwaiten );   // pin 19
+	DECLARE_WRITE_LINE_MEMBER( sysspeed );  // pin 5
+	DECLARE_WRITE_LINE_MEMBER( clock_in );
+
+	auto ready_cb() { return m_ready.bind(); }
+
+private:
+	void device_start() override;
+	void set_ready();
+
+	// Pins
+	bool m_pin3;
+	bool m_pin4;
+	bool m_pin5;
+	bool m_pin9;
+	bool m_pin19;
+	bool m_pin14d,m_pin14q;
+	bool m_pin15d,m_pin15q;
+	bool m_pin16d,m_pin16q;
+	bool m_pin17d,m_pin17q;
+
+	// Debugging
+	int  m_prev_ready;
+
+	required_device<bus::ti99::peb::peribox_device> m_peribox;
 
 	// Ready line to the CPU
 	devcb_write_line m_ready;
-
-	// Counter for the wait states.
-	int     m_waitcount;
-	int     m_video_waitcount;
-
-	// Devices
-	required_device<mm58274c_device>     m_clock;
-	required_device<tms9995_device>      m_cpu;
-	required_device<at29c040_device>     m_pfm512;
-	required_device<at29c040a_device>    m_pfm512a;
-	required_device<sn76496_base_device> m_sound;
-
-	required_device<bus::ti99::internal::geneve_keyboard_device> m_keyboard;
-	required_device<v9938_device>           m_video;
-	required_device<bus::ti99::peb::peribox_device>         m_peribox;
-	uint8_t*                  m_eprom;
-	required_device<ram_device> m_sram;
-	required_device<ram_device> m_dram;
 };
 
-class genmod_mapper_device : public geneve_mapper_device
+class genmod_decoder_device : public device_t
 {
 public:
-	genmod_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void decode_mod(decdata* dec) override;
-	void device_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER( setgm_changed );
+	genmod_decoder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// Set the internal state and output lines according to the address
+	void set_function(int func, int page);
+	void set_debug(bool deb) { m_debug = deb; }
+	void set_turbo(bool turbo) { m_turbo = turbo; }
+	void set_timode(bool timode) { m_timode = timode; }
+
+	DECLARE_READ_LINE_MEMBER( gaready_out );
+	DECLARE_READ_LINE_MEMBER( dben_out );
+	DECLARE_WRITE_LINE_MEMBER( gaready_in );
+	DECLARE_WRITE_LINE_MEMBER( extready_in );
+	DECLARE_WRITE_LINE_MEMBER( sndready_in );
 
 private:
-	// Genmod modifications
-	bool    m_gm_timode;
+	void device_start() override;
+
+	// Emulation-specific: Is the debugger active?
+	bool    m_debug;
 	bool    m_turbo;
+	bool    m_timode;
+	int     m_function;
+	int     m_function_debug;
+	int     m_page;
+	int     m_page_debug;
+	int     m_gaready;
+	int     m_extready;
+	int     m_sndready;
 };
 
 } } } // end namespace bus::ti99::internal
 
-DECLARE_DEVICE_TYPE_NS(GENEVE_KEYBOARD, bus::ti99::internal, geneve_keyboard_device)
-DECLARE_DEVICE_TYPE_NS(GENEVE_MAPPER,   bus::ti99::internal, geneve_mapper_device)
-DECLARE_DEVICE_TYPE_NS(GENMOD_MAPPER,   bus::ti99::internal, genmod_mapper_device)
+DECLARE_DEVICE_TYPE_NS(GENEVE_GATE_ARRAY,   bus::ti99::internal, geneve_gate_array_device)
+DECLARE_DEVICE_TYPE_NS(GENEVE_PAL,          bus::ti99::internal, geneve_pal_device)
+DECLARE_DEVICE_TYPE_NS(GENMOD_DECODER,      bus::ti99::internal, genmod_decoder_device)
 
 #endif // MAME_BUS_TI99_INTERNAL_GENBOARD_H

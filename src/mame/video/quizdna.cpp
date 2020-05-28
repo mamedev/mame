@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(quizdna_state::get_bg_tile_info)
 	if (code>0x7fff)
 		code &= 0x83ff;
 
-	SET_TILE_INFO_MEMBER(1, code, col, 0);
+	tileinfo.set(1, code, col, 0);
 }
 
 TILE_GET_INFO_MEMBER(quizdna_state::get_fg_tile_info)
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(quizdna_state::get_fg_tile_info)
 	col >>= 5;
 	col = (col & 3) | ((col & 4) << 1);
 
-	SET_TILE_INFO_MEMBER(0, code, col, 0);
+	tileinfo.set(0, code, col, 0);
 }
 
 
@@ -56,10 +56,10 @@ void quizdna_state::video_start()
 	m_bg_ram = std::make_unique<uint8_t[]>(0x2000);
 	m_fg_ram = std::make_unique<uint8_t[]>(0x1000);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quizdna_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quizdna_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,8,32,32 );
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quizdna_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quizdna_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 
-	m_fg_tilemap->set_transparent_pen(0 );
+	m_fg_tilemap->set_transparent_pen(0);
 
 	save_pointer(NAME(m_bg_ram), 0x2000);
 	save_pointer(NAME(m_fg_ram), 0x1000);

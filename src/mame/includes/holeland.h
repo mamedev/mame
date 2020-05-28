@@ -51,7 +51,7 @@ private:
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(pal_offs_w);
+	void pal_offs_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);

@@ -204,7 +204,7 @@ public:
 	virtual bool no_sound() override;
 
 	// input overridables
-	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
+	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
 
 	// video overridables
 	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) override;
@@ -245,7 +245,7 @@ public:
 	virtual osd_options &options() { return m_options; }
 
 	// osd_output interface ...
-	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args)  override;
+	virtual void output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args)  override;
 	bool verbose() const { return m_print_verbose; }
 	virtual void set_verbose(bool print_verbose) override { m_print_verbose = print_verbose; }
 
@@ -279,7 +279,7 @@ private:
 			opt_val = "";
 		else if (!m_mod_man.type_has_name(opt_name.c_str(), opt_val.c_str()))
 		{
-			osd_printf_warning("Value %s not supported for option %s - falling back to auto\n", opt_val.c_str(), opt_name.c_str());
+			osd_printf_warning("Value %s not supported for option %s - falling back to auto\n", opt_val, opt_name);
 			opt_val = "";
 		}
 		return m_mod_man.select_module(opt_name.c_str(), opt_val.c_str());

@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "necdasm.h"
 
 #define NEC_INPUT_LINE_INTP0 10
 #define NEC_INPUT_LINE_INTP1 11
@@ -15,13 +16,15 @@
 enum
 {
 	V25_PC=0,
-	V25_IP, V25_AW, V25_CW, V25_DW, V25_BW, V25_SP, V25_BP, V25_IX, V25_IY,
-	V25_FLAGS, V25_ES, V25_CS, V25_SS, V25_DS,
+	V25_AW, V25_CW, V25_DW, V25_BW, V25_SP, V25_BP, V25_IX, V25_IY,
+	V25_DS1, V25_PS, V25_SS, V25_DS0,
+	V25_AL, V25_AH, V25_CL, V25_CH, V25_DL, V25_DH, V25_BL, V25_BH,
+	V25_PSW,
 	V25_IDB,
 	V25_PENDING
 };
 
-class v25_common_device : public cpu_device
+class v25_common_device : public cpu_device, public nec_disassembler::config
 {
 public:
 	// configuration helpers
@@ -48,13 +51,13 @@ protected:
 	virtual void device_post_load() override { notify_clock_changed(); }
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return clocks / m_PCK; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return cycles * m_PCK; }
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 80; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI || (inputnum >= NEC_INPUT_LINE_INTP0 && inputnum <= NEC_INPUT_LINE_INTP2); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return clocks / m_PCK; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return cycles * m_PCK; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 80; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI || (inputnum >= NEC_INPUT_LINE_INTP0 && inputnum <= NEC_INPUT_LINE_INTP2); }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -68,16 +71,21 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual int get_mode() const override { return 1; };
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::cache m_cache8;
+	memory_access<20, 1, 0, ENDIANNESS_LITTLE>::cache m_cache16;
+
 	/* internal RAM and register banks */
 	required_shared_ptr<uint16_t> m_internal_ram;
 
 	uint16_t  m_ip;
+	uint16_t  m_prev_ip;
 
 	/* PSW flags */
 	int32_t   m_SignVal;

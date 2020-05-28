@@ -58,72 +58,74 @@ public:
 	uint16_t      m_i8751_needs_ack;
 	uint16_t      m_i8751_coin_pending;
 	uint16_t      m_i8751_command_queue;
-	int         m_i8751_level;  // needed by chelnov
 	int         m_microcontroller_id;
 	int         m_coin_mask;
 	int         m_latch;
 
-	u16 mcu_r();
-	void mcu_w(u16 data);
-	DECLARE_WRITE16_MEMBER(mcu_ack_w);
-	DECLARE_WRITE16_MEMBER(mcu_reset_w);
+	u16 mcusim_r();
+	void mcusim_w(u16 data);
+	DECLARE_WRITE16_MEMBER(mcusim_ack_w);
+	DECLARE_WRITE16_MEMBER(mcusim_reset_w);
 	DECLARE_WRITE16_MEMBER(vint_ack_w);
 	DECLARE_WRITE16_MEMBER(videoram_w);
 	void playfield_w(offs_t offset, u16 data, u16 mem_mask);
 	void init_wndrplnt();
 	void init_karnov();
 	void init_karnovj();
-	void init_chelnovu();
-	void init_chelnovj();
-	void init_chelnov();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(karnov);
 	DECLARE_VIDEO_START(wndrplnt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vbint_w);
-	void chelnovjbl_vbint_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(mcusim_vbint_w);
+	void vbint_w(int state);
+
 	void karnov_i8751_w( int data );
 	void wndrplnt_i8751_w( int data );
-	void chelnov_i8751_w( int data );
+
+	void chelnov(machine_config &config);
 	void chelnovjbl(machine_config &config);
 	void karnov(machine_config &config);
 	void wndrplnt(machine_config &config);
 	void karnovjbl(machine_config &config);
+
 	void base_sound_map(address_map &map);
 	void chelnovjbl_mcu_map(address_map &map);
 	void chelnovjbl_mcu_io_map(address_map &map);
 	void karnov_map(address_map &map);
-	void chelnovjbl_map(address_map &map);
+	void chelnov_map(address_map &map);
 	void karnov_sound_map(address_map &map);
 	void karnovjbl_sound_map(address_map &map);
 
-private:
-	// protection mcu (bootleg)
-	void chelnovjbl_mcu_ack_w(uint16_t data);
-	uint16_t chelnovjbl_mcu_r();
-	void chelnovjbl_mcu_w(uint16_t data);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
+private:
+	// protection mcu
+	void mcu_coin_irq(int state);
+	void mcu_ack_w(uint16_t data);
+	uint16_t mcu_r();
+	void mcu_w(uint16_t data);
+	void mcu_p2_w(uint8_t data);
+
+	// protection mcu (bootleg specific)
 	uint8_t mcu_data_l_r();
 	void mcu_data_l_w(uint8_t data);
 	uint8_t mcu_data_h_r();
 	void mcu_data_h_w(uint8_t data);
+	void mcubl_p1_w(uint8_t data);
 
-	void mcu_p1_w(uint8_t data);
-
+	uint8_t m_mcu_p0;
 	uint8_t m_mcu_p1;
-
+	uint8_t m_mcu_p2;
 	uint16_t m_mcu_to_maincpu;
 	uint16_t m_maincpu_to_mcu;
+	bool m_coin_state;
 };
 
 enum {
 	KARNOV = 0,
 	KARNOVJ,
-	CHELNOV,
-	CHELNOVU,
-	CHELNOVJ,
 	WNDRPLNT
 };

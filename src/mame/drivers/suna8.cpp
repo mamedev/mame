@@ -19,7 +19,7 @@ Year + Game         Game     PCB         Epoxy CPU  Samples  Notes
 88  Rough Ranger    K030087  ?           S562008    Yes      Not Encrypted
 89  Spark Man       KRB-16   60136-081   T568009    Yes      Encryption + Protection
 90  Star Fighter    KRB-17   60484-0082  T568009    Yes      Encryption + Protection
-91  Hard Head 2     ?        ?           T568009    -        Encryption + Protection
+91  Hard Head 2     KRB-18   70523-0083  T568009    -        Encryption + Protection
 92  Brick Zone      KRB-19   70523-0084  Yes        -        Encryption + Protection
 --------------------------------------------------------------------------------------
 
@@ -738,7 +738,7 @@ void suna8_state::brickzn11_map(address_map &map)
 	map(0xc060, 0xc060).w(FUNC(suna8_state::brickzn_rombank_w));   // ROM Bank
 	map(0xc080, 0xc080).w(FUNC(suna8_state::brickzn_leds_w));   // Leds
 	map(0xc0a0, 0xc0a0).w(FUNC(suna8_state::brickzn_palbank_w));   // Palette RAM Bank
-//  AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(brickzn_prot2_w       )   // Protection 2
+//  map(0xc0c0, 0xc0c0).w(FUNC(suna8_state::brickzn_prot2_w));   // Protection 2
 
 	map(0xc100, 0xc100).portr("P1");                 // P1 (Buttons)
 	map(0xc101, 0xc101).portr("P2");                 // P2 (Buttons)
@@ -1016,6 +1016,19 @@ void suna8_state::hardhea2_map(address_map &map)
 }
 
 
+void suna8_state::hardhea2b_map(address_map &map)
+{
+	hardhea2_map(map);
+
+	map(0x0000, 0x7fff).rom().region("maincpu", 0x8000); // data is in the second half of the ROM
+}
+
+void suna8_state::hardhea2b_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0x0000); // opcodes are in the first half of the ROM
+}
+
+
 /***************************************************************************
                                 Star Fighter
 ***************************************************************************/
@@ -1233,7 +1246,7 @@ void suna8_state::sparkman_map(address_map &map)
 	map(0xc001, 0xc001).portr("P2");                         // P2
 	map(0xc002, 0xc002).portr("DSW1");                       // DSW 1
 	map(0xc003, 0xc003).portr("DSW2");                       // DSW 2
-	map(0xc080, 0xc080).portr("BUTTONS");                    // Buttons
+	map(0xc080, 0xc080).mirror(0x01).portr("BUTTONS");       // Buttons
 	map(0xc0a3, 0xc0a3).r(FUNC(suna8_state::sparkman_c0a3_r));   // ???
 
 	map(0xc200, 0xc27f).w(FUNC(suna8_state::sparkman_spritebank_w));   // Sprite RAM Bank
@@ -1520,7 +1533,7 @@ static INPUT_PORTS_START( brickzn )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x38, 0x18, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW-A:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW-A:4,5,6")
 	PORT_DIPSETTING(    0x38, DEF_STR( Easiest ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Very_Easy) )
 	PORT_DIPSETTING(    0x28, DEF_STR( Easy ) )
@@ -1544,7 +1557,7 @@ static INPUT_PORTS_START( brickzn )
 	PORT_DIPNAME( 0x04, 0x04, "Play Together" )     PORT_DIPLOCATION("SW-B:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x38, 0x30, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW-B:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW-B:4,5,6")
 	PORT_DIPSETTING(    0x30, "10K" )
 	PORT_DIPSETTING(    0x28, "30K" )
 	PORT_DIPSETTING(    0x18, "50K, Every 50K" )
@@ -1586,14 +1599,13 @@ static INPUT_PORTS_START( brickzn )
 	PORT_CONFSETTING(    0x40, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Finish Stage (Cheat)")
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( brickznv6 )
 	PORT_INCLUDE(brickzn)
 
 	PORT_MODIFY("DSW2") // DSW 2 - $c103
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW-B:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW-B:4,5")
 	PORT_DIPSETTING(    0x18, "None" )
 	PORT_DIPSETTING(    0x10, "10K" )
 	PORT_DIPSETTING(    0x08, "30K" )
@@ -2104,7 +2116,8 @@ void suna8_state::hardhea2b(machine_config &config)
 {
 	hardhea2(config);
 	Z80(config.replace(), m_maincpu, SUNA8_MASTER_CLOCK / 4); //bootleg clock not verified (?)
-	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhea2_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhea2b_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &suna8_state::hardhea2b_decrypted_opcodes_map);
 }
 
 
@@ -2380,6 +2393,40 @@ ROM_START( hardheadb2 )
 
 	ROM_REGION( 0x8000, "samples", 0 )  /* Samples */
 	ROM_LOAD( "1_14.11m", 0x00000, 0x8000, CRC(41314ac1) SHA1(1ac9213b0ac4ce9fe6256e93875672e128a5d069) ) // = p14
+ROM_END
+
+ROM_START( hardheadb3 ) // almost identical to pop_hh, only unique ROM is p8
+	ROM_REGION( 0x48000+0x8000, "maincpu", 0 ) /* Main Z80 Code */
+	ROM_LOAD( "1_27512.l6",  0x48000, 0x8000, CRC(bb4aa9ac) SHA1(da6310a1034cf610139d74fc30dd13e5fbd1d8dd) )
+	ROM_CONTINUE(            0x00000, 0x8000 )
+	ROM_LOAD( "2_27256.k6",  0x10000, 0x8000, CRC(8fcc1248) SHA1(5da0b7dc63f7bc00e81e9e5bac02ee6b0076ffaa) )
+	ROM_LOAD( "p3",          0x18000, 0x8000, CRC(3d24755e) SHA1(519a179594956f7c3ddfaca362c42b453c928e25) )
+	ROM_LOAD( "p4",          0x20000, 0x8000, CRC(0241ac79) SHA1(b3c3b98fb29836cbc9fd35ac49e02bfefd3b0c79) )
+	ROM_LOAD( "p7",          0x28000, 0x8000, CRC(beba8313) SHA1(20aa4e07ec560a89d07ec73cc93311ceaed899a3) )
+	ROM_LOAD( "p8",          0x30000, 0x8000, CRC(11729c89) SHA1(a8f548891f7d3d620b7eaa71a827cbc19c632ac3) )
+	ROM_LOAD( "p9",          0x38000, 0x8000, CRC(2ad430c4) SHA1(286a5b1042e077c3ae741d01311d4c91f8f87054) )
+	ROM_LOAD( "10_27256.i8", 0x40000, 0x8000, CRC(84fc6574) SHA1(ab33e6c656f25e65bb08d0a2689693df83cab43d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound Z80 Code */
+	ROM_LOAD( "p13", 0x0000, 0x8000, CRC(493c0b41) SHA1(994a334253e905c39ec912765e8b0f4b1be900bc) )
+
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_INVERT ) /* Sprites */
+	ROM_LOAD( "p5",  0x00000, 0x8000, CRC(e9aa6fba) SHA1(f286727541f08b136a7d45e13975652bdc8fd663) )
+	ROM_RELOAD(      0x08000, 0x8000             )
+	ROM_LOAD( "p6",  0x10000, 0x8000, CRC(15d5f5dd) SHA1(4441344701fcdb2be55bdd76a8a5fd59f5de813c) )
+	ROM_RELOAD(      0x18000, 0x8000             )
+	ROM_LOAD( "11_27256.d8", 0x20000, 0x8000, CRC(3751b99d) SHA1(dc4082e481a79f0389e59b4b38698df8f7b94053) )
+	ROM_RELOAD(      0x28000, 0x8000             )
+	ROM_LOAD( "p12", 0x30000, 0x8000, CRC(9582e6db) SHA1(a2b34d740e07bd35a3184365e7f3ab7476075d70) )
+	ROM_RELOAD(      0x38000, 0x8000             )
+
+	ROM_REGION( 0x8000, "samples", 0 )  /* Samples */
+	ROM_LOAD( "p14", 0x0000, 0x8000, CRC(41314ac1) SHA1(1ac9213b0ac4ce9fe6256e93875672e128a5d069) )
+
+	ROM_REGION( 0x600, "plds", 0 )
+	ROM_LOAD( "cpu-1-pal16l8a.bin", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "cpu-2-pal16r4a.bin", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "cpu-3-pal16r4a.bin", 0x400, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( pop_hh )
@@ -3084,7 +3131,8 @@ GAME( 1988, srangerb,  sranger,  rranger,  rranger,  suna8_state, init_suna8,   
 GAME( 1988, hardhead,  0,        hardhead, hardhead, suna8_state, init_hardhead,  ROT0,  "SunA",                       "Hard Head",                   0 )
 GAME( 1988, hardheadb, hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 1)",  0 )
 GAME( 1988, hardheadb2,hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 2)",  MACHINE_NOT_WORKING )
-GAME( 1988, pop_hh,    hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Popper (Hard Head bootleg)",  0 )
+GAME( 1989, hardheadb3,hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 3)",  0 )
+GAME( 1989, pop_hh,    hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Popper (Hard Head bootleg)",  0 )
 
 GAME( 1989, sparkman,  0,        sparkman, sparkman, suna8_state, init_sparkman,  ROT0,  "SunA",                       "Spark Man (v2.0, set 1)",     0 )
 GAME( 1989, sparkmana, sparkman, sparkman, sparkman, suna8_state, init_sparkman,  ROT0,  "SunA",                       "Spark Man (v2.0, set 2)",     0 )

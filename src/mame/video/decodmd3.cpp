@@ -14,12 +14,12 @@
 
 DEFINE_DEVICE_TYPE(DECODMD3, decodmd_type3_device, "decodmd3", "Data East Pinball Dot Matrix Display Type 3")
 
-WRITE8_MEMBER( decodmd_type3_device::data_w )
+void decodmd_type3_device::data_w(uint8_t data)
 {
 	m_latch = data;
 }
 
-READ8_MEMBER( decodmd_type3_device::busy_r )
+uint8_t decodmd_type3_device::busy_r()
 {
 	uint8_t ret = 0x00;
 
@@ -31,7 +31,7 @@ READ8_MEMBER( decodmd_type3_device::busy_r )
 		return 0x00 | ret;
 }
 
-WRITE8_MEMBER( decodmd_type3_device::ctrl_w )
+void decodmd_type3_device::ctrl_w(uint8_t data)
 {
 	if(!(m_ctrl & 0x01) && (data & 0x01))
 	{
@@ -47,17 +47,17 @@ WRITE8_MEMBER( decodmd_type3_device::ctrl_w )
 	m_ctrl = data;
 }
 
-READ16_MEMBER( decodmd_type3_device::status_r )
+uint16_t decodmd_type3_device::status_r()
 {
 	return m_status;
 }
 
-WRITE16_MEMBER( decodmd_type3_device::status_w )
+void decodmd_type3_device::status_w(uint16_t data)
 {
 	m_status = data & 0x0f;
 }
 
-READ16_MEMBER( decodmd_type3_device::latch_r )
+uint16_t decodmd_type3_device::latch_r()
 {
 	// clear IRQ?
 	m_cpu->set_input_line(M68K_IRQ_1,CLEAR_LINE);
@@ -70,7 +70,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type3_device::dmd_irq)
 	m_cpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }
 
-WRITE16_MEMBER( decodmd_type3_device::crtc_address_w )
+void decodmd_type3_device::crtc_address_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_8_15)
 	{
@@ -79,7 +79,7 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_address_w )
 	}
 }
 
-READ16_MEMBER( decodmd_type3_device::crtc_status_r )
+uint16_t decodmd_type3_device::crtc_status_r(offs_t offset, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_8_15)
 		return m_mc6845->register_r();
@@ -87,7 +87,7 @@ READ16_MEMBER( decodmd_type3_device::crtc_status_r )
 		return 0xff;
 }
 
-WRITE16_MEMBER( decodmd_type3_device::crtc_register_w )
+void decodmd_type3_device::crtc_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_8_15)
 	{
@@ -136,15 +136,15 @@ void decodmd_type3_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_cpu, XTAL(12'000'000));
 	m_cpu->set_addrmap(AS_PROGRAM, &decodmd_type3_device::decodmd3_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
-	TIMER(config, "irq_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(decodmd_type3_device::dmd_irq), this), attotime::from_hz(150));
+	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(decodmd_type3_device::dmd_irq), attotime::from_hz(150));
 
 	MC6845(config, m_mc6845, XTAL(12'000'000) / 4);  // TODO: confirm clock speed
 	m_mc6845->set_screen(nullptr);
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(16);
-	m_mc6845->set_update_row_callback(FUNC(decodmd_type3_device::crtc_update_row), this);
+	m_mc6845->set_update_row_callback(FUNC(decodmd_type3_device::crtc_update_row));
 
 	screen_device &screen(SCREEN(config, "dmd", SCREEN_TYPE_RASTER));
 	screen.set_native_aspect();

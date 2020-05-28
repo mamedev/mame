@@ -139,7 +139,7 @@ void tiamc1_state::machine_reset()
 	tiamc1_bankswitch_w(space, 0, 0);
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_control_w)
+void tiamc1_state::tiamc1_control_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x02);
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);

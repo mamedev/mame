@@ -29,15 +29,15 @@ public:
 	// construction/destruction
 	nt7534_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb = pixel_update_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb.set(std::forward<T>(args)...); }
 
 	// device interface
-	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(control_write);
-	virtual DECLARE_READ8_MEMBER(control_read);
-	virtual DECLARE_WRITE8_MEMBER(data_write);
-	virtual DECLARE_READ8_MEMBER(data_read);
+	virtual void write(offs_t offset, uint8_t data);
+	virtual uint8_t read(offs_t offset);
+	virtual void control_write(uint8_t data);
+	virtual uint8_t control_read();
+	virtual void data_write(uint8_t data);
+	virtual uint8_t data_read();
 
 	const uint8_t *render();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

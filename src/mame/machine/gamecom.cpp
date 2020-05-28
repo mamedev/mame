@@ -457,7 +457,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 /* The manual is not conclusive as to which bit of the DMVP register (offset 0x3D) determines
    which page for source or destination is used.
    Also, there's nothing about what happens if the block overflows the source or destination. */
-WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
+void gamecom_state::gamecom_handle_dma(uint8_t data)
 {
 	u8 dmc = m_p_ram[SM8521_DMC];
 	if (!BIT(dmc, 7))
@@ -573,7 +573,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 	m_maincpu->set_input_line(sm8500_cpu_device::DMA_INT, ASSERT_LINE );
 }
 
-WRITE8_MEMBER( gamecom_state::gamecom_update_timers )
+void gamecom_state::gamecom_update_timers(uint8_t data)
 {
 	if ( m_timer[0].enabled )
 	{

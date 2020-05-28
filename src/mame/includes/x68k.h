@@ -114,7 +114,7 @@ protected:
 	required_device<palette_device> m_pcgpalette;
 	required_device<mc68901_device> m_mfpdev;
 	required_device<rp5c15_device> m_rtc;
-	required_device<scc8530_t> m_scc;
+	required_device<scc8530_legacy_device> m_scc;
 	required_device<ym2151_device> m_ym2151;
 	required_device<i8255_device> m_ppi;
 	required_device<screen_device> m_screen;
@@ -262,18 +262,18 @@ protected:
 	TIMER_CALLBACK_MEMBER(md_6button_port1_timeout);
 	TIMER_CALLBACK_MEMBER(md_6button_port2_timeout);
 	TIMER_CALLBACK_MEMBER(bus_error);
-	DECLARE_READ8_MEMBER(ppi_port_a_r);
-	DECLARE_READ8_MEMBER(ppi_port_b_r);
-	DECLARE_READ8_MEMBER(ppi_port_c_r);
-	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
+	uint8_t ppi_port_a_r();
+	uint8_t ppi_port_b_r();
+	uint8_t ppi_port_c_r();
+	void ppi_port_c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE8_MEMBER(ct_w);
+	void ct_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
 
 	//dmac
 	DECLARE_WRITE_LINE_MEMBER(dma_irq);
-	DECLARE_WRITE8_MEMBER(dma_end);
+	void dma_end(offs_t offset, uint8_t data);
 
 	int read_mouse();
 	void set_adpcm();
@@ -315,10 +315,10 @@ protected:
 	DECLARE_WRITE16_MEMBER(spritereg_w);
 	DECLARE_READ16_MEMBER(spriteram_r);
 	DECLARE_WRITE16_MEMBER(spriteram_w);
-	DECLARE_READ16_MEMBER(tvram_read);
-	DECLARE_WRITE16_MEMBER(tvram_write);
-	DECLARE_READ16_MEMBER(gvram_read);
-	DECLARE_WRITE16_MEMBER(gvram_write);
+	uint16_t tvram_read(offs_t offset);
+	void tvram_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gvram_read(offs_t offset);
+	void gvram_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void update_ipl();
 	uint8_t iack1();

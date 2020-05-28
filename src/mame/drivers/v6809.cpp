@@ -86,15 +86,16 @@ public:
 	void v6809(machine_config &config);
 
 private:
+	virtual void machine_reset() override;
+
 	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	DECLARE_READ8_MEMBER(pb_r);
-	DECLARE_WRITE8_MEMBER(pa_w);
+	uint8_t pb_r();
+	void pa_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(v6809_address_w);
 	DECLARE_WRITE8_MEMBER(v6809_register_w);
 	void kbd_put(u8 data);
-	DECLARE_MACHINE_RESET(v6809);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
@@ -139,7 +140,7 @@ void v6809_state::v6809_mem(address_map &map)
 static INPUT_PORTS_START( v6809 )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( v6809_state, v6809)
+void v6809_state::machine_reset()
 {
 	m_term_data = 0;
 	m_pia0->cb1_w(1);
@@ -234,7 +235,7 @@ void v6809_state::kbd_put(u8 data)
 	m_pia0->cb1_w(1);
 }
 
-READ8_MEMBER( v6809_state::pb_r )
+uint8_t v6809_state::pb_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
@@ -242,7 +243,7 @@ READ8_MEMBER( v6809_state::pb_r )
 }
 
 // can support 4 drives
-WRITE8_MEMBER( v6809_state::pa_w )
+void v6809_state::pa_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 	if ((data & 3) == 0) floppy = m_floppy0->get_device();
@@ -287,7 +288,6 @@ void v6809_state::v6809(machine_config &config)
 	/* basic machine hardware */
 	MC6809(config, m_maincpu, 16_MHz_XTAL / 4); // divided by 4 again internally
 	m_maincpu->set_addrmap(AS_PROGRAM, &v6809_state::v6809_mem);
-	MCFG_MACHINE_RESET_OVERRIDE(v6809_state, v6809)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -308,8 +308,8 @@ void v6809_state::v6809(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(v6809_state::crtc_update_row), this);
-	m_crtc->set_on_update_addr_change_callback(FUNC(v6809_state::crtc_update_addr), this);
+	m_crtc->set_update_row_callback(FUNC(v6809_state::crtc_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(v6809_state::crtc_update_addr));
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(v6809_state::kbd_put));

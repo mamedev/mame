@@ -2,6 +2,7 @@
 	"author": "Ryan Holtz",
 	"passes": [
 		{	"effect": "misc/blit",
+			"applytint": true,
 			"name": "Unfiltered Upscale",
 			"input": [
 				{ "sampler": "s_tex", "texture": "screen" }

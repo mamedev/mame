@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(BBC_ACORN1770, bbc_acorn1770_device, "bbc_acorn1770", "Acorn 
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( acorn )
+//  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( bbc_acorn8271_device::floppy_formats )
@@ -30,7 +30,7 @@ FLOPPY_FORMATS_MEMBER( bbc_acorn8271_device::floppy_formats )
 	FLOPPY_ACORN_DOS_FORMAT,
 	FLOPPY_FSD_FORMAT,
 	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END0
+FLOPPY_FORMATS_END
 
 static void bbc_floppies_525(device_slot_interface &device)
 {
@@ -40,6 +40,10 @@ static void bbc_floppies_525(device_slot_interface &device)
 	device.option_add("525dd",   FLOPPY_525_DD);
 	device.option_add("525qd",   FLOPPY_525_QD);
 }
+
+//-------------------------------------------------
+//  ROM( acorn )
+//-------------------------------------------------
 
 ROM_START( acorn8271 )
 	ROM_REGION(0x4000, "dfs_rom", 0)

@@ -5,9 +5,10 @@
 //  debugviewinfo.h - Win32 debug window handling
 //
 //============================================================
+#ifndef MAME_DEBUGGER_WIN_DEBUGVIEWINFO_H
+#define MAME_DEBUGGER_WIN_DEBUGVIEWINFO_H
 
-#ifndef __DEBUG_WIN_DEBUG_VIEW_INFO_H__
-#define __DEBUG_WIN_DEBUG_VIEW_INFO_H__
+#pragma once
 
 #include "debugwin.h"
 

@@ -10,8 +10,8 @@
 
 *********************************************************************/
 
-#include <string.h>
-#include <assert.h>
+#include <cstring>
+#include <cassert>
 #include "thom_dsk.h"
 #include "basicdsk.h"
 

@@ -25,10 +25,10 @@ DEFINE_DEVICE_TYPE(CRVISION_CART_SLOT, crvision_cart_slot_device, "crvision_cart
 //  device_crvision_cart_interface - constructor
 //-------------------------------------------------
 
-device_crvision_cart_interface::device_crvision_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0)
+device_crvision_cart_interface::device_crvision_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "crvisioncart"),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
 
@@ -65,7 +65,7 @@ void device_crvision_cart_interface::rom_alloc(uint32_t size, const char *tag)
 crvision_cart_slot_device::crvision_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CRVISION_CART_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_crvision_cart_interface>(mconfig, *this),
 	m_type(CRV_4K), m_cart(nullptr)
 {
 }
@@ -85,7 +85,7 @@ crvision_cart_slot_device::~crvision_cart_slot_device()
 
 void crvision_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_crvision_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 
@@ -253,18 +253,18 @@ std::string crvision_cart_slot_device::get_default_card_software(get_default_car
  read_rom
  -------------------------------------------------*/
 
-READ8_MEMBER(crvision_cart_slot_device::read_rom40)
+uint8_t crvision_cart_slot_device::read_rom40(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom40(space, offset);
+		return m_cart->read_rom40(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(crvision_cart_slot_device::read_rom80)
+uint8_t crvision_cart_slot_device::read_rom80(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom80(space, offset);
+		return m_cart->read_rom80(offset);
 	else
 		return 0xff;
 }

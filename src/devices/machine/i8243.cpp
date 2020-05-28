@@ -27,8 +27,8 @@ i8243_device::i8243_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, I8243, tag, owner, clock)
 	, m_p{0, 0, 0, 0}
 	, m_p2out(0x0f), m_p2(0x0f), m_opcode(0), m_prog(1), m_cs(0)
-	, m_readhandler{{*this}, {*this}, {*this}, {*this}}
-	, m_writehandler{{*this}, {*this}, {*this}, {*this}}
+	, m_readhandler(*this)
+	, m_writehandler(*this)
 {
 }
 
@@ -38,10 +38,8 @@ i8243_device::i8243_device(const machine_config &mconfig, const char *tag, devic
 
 void i8243_device::device_start()
 {
-	for (auto &cb : m_readhandler)
-		cb.resolve();
-	for (auto &cb : m_writehandler)
-		cb.resolve();
+	m_readhandler.resolve_all();
+	m_writehandler.resolve_all();
 
 	save_item(NAME(m_p));
 	save_item(NAME(m_p2out));

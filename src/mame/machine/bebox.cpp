@@ -98,7 +98,7 @@
 #include "bus/lpci/cirrus.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/mc146818.h"
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 #include "bus/lpci/pci.h"
 
 #define LOG_CPUIMASK    1
@@ -306,11 +306,12 @@ void bebox_state::bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 	if (LOG_INTERRUPTS)
 	{
 		/* make sure that we don't shoot ourself in the foot */
-		assert_always((interrupt_bit < ARRAY_LENGTH(interrupt_names)) && (interrupt_names[interrupt_bit] != nullptr), "Raising invalid interrupt");
+		if ((interrupt_bit >= ARRAY_LENGTH(interrupt_names)) || !interrupt_names[interrupt_bit])
+			throw emu_fatalerror("bebox_state::bebox_set_irq_bit: Raising invalid interrupt");
 
 		logerror("bebox_set_irq_bit(): pc[0]=0x%08x pc[1]=0x%08x %s interrupt #%u (%s)\n",
-			(unsigned) m_ppc[0]->pc(),
-			(unsigned) m_ppc[1]->pc(),
+			unsigned(m_ppc[0]->pc()),
+			unsigned(m_ppc[1]->pc()),
 			val ? "Asserting" : "Clearing",
 			interrupt_bit, interrupt_names[interrupt_bit]);
 	}
@@ -368,12 +369,6 @@ WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_slave_set_int_line)
 {
 	m_pic8259[0]->ir2_w(state);
 }
-
-READ8_MEMBER(bebox_state::get_slave_ack)
-{
-	return m_pic8259[1]->acknowledge();
-}
-
 
 /*************************************
  *
@@ -535,7 +530,7 @@ WRITE_LINE_MEMBER(bebox_state::bebox_dma_hrq_changed)
 }
 
 
-READ8_MEMBER(bebox_state::bebox_dma_read_byte )
+uint8_t bebox_state::bebox_dma_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_ppc[0]->space(AS_PROGRAM); // get the right address space
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
@@ -544,24 +539,13 @@ READ8_MEMBER(bebox_state::bebox_dma_read_byte )
 }
 
 
-WRITE8_MEMBER(bebox_state::bebox_dma_write_byte )
+void bebox_state::bebox_dma_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_ppc[0]->space(AS_PROGRAM); // get the right address space
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0x7FFF0000;
 	prog_space.write_byte(page_offset + offset, data);
 }
-
-
-READ8_MEMBER(bebox_state::bebox_dma8237_fdc_dack_r){
-	return m_smc37c78->dma_r();
-}
-
-
-WRITE8_MEMBER(bebox_state::bebox_dma8237_fdc_dack_w){
-	m_smc37c78->dma_w(data);
-}
-
 
 WRITE_LINE_MEMBER(bebox_state::bebox_dma8237_out_eop){
 	m_smc37c78->tc_w(state);
@@ -750,7 +734,7 @@ void bebox_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	case TIMER_GET_DEVICES:
 		break;
 	default:
-		assert_always(false, "Unknown id in bebox_state::device_timer");
+		throw emu_fatalerror("Unknown id in bebox_state::device_timer");
 	}
 }
 

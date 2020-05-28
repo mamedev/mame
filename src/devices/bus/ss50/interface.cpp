@@ -103,12 +103,12 @@ DEFINE_DEVICE_TYPE(SS50_INTERFACE, ss50_interface_port_device, "ss50_interface",
 //  ss50_interface_port_device - construction
 //-------------------------------------------------
 
-ss50_interface_port_device::ss50_interface_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SS50_INTERFACE, tag, owner, clock),
-		device_slot_interface(mconfig, *this),
-		m_irq_cb(*this),
-		m_firq_cb(*this),
-		m_card(nullptr)
+ss50_interface_port_device::ss50_interface_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, SS50_INTERFACE, tag, owner, clock),
+	device_single_card_slot_interface<ss50_card_interface>(mconfig, *this),
+	m_irq_cb(*this),
+	m_firq_cb(*this),
+	m_card(nullptr)
 {
 }
 
@@ -120,12 +120,10 @@ ss50_interface_port_device::ss50_interface_port_device(const machine_config &mco
 
 void ss50_interface_port_device::device_resolve_objects()
 {
-	logerror("Resolving objects...\n");
-
 	m_irq_cb.resolve_safe();
 	m_firq_cb.resolve_safe();
 
-	m_card = dynamic_cast<ss50_card_interface *>(get_card_device());
+	m_card = get_card_device();
 	if (m_card != nullptr)
 		m_card->m_slot = this;
 }
@@ -214,10 +212,16 @@ template class device_finder<ss50_card_interface, true>;
 //  ss50_card_interface - construction
 //-------------------------------------------------
 
-ss50_card_interface::ss50_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_slot(nullptr)
+ss50_card_interface::ss50_card_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "ss50card"),
+	m_slot(nullptr)
 {
+}
+
+void ss50_card_interface::interface_pre_start()
+{
+	if (!m_slot)
+		throw device_missing_dependencies();
 }
 
 void ss50_default_2rs_devices(device_slot_interface &device)

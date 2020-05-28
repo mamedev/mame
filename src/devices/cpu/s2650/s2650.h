@@ -42,10 +42,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 5; }
-	virtual uint32_t execute_max_cycles() const override { return 13; }
-	virtual uint32_t execute_input_lines() const override { return 2; }
-	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 13; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -68,7 +68,7 @@ private:
 
 	devcb_read_line m_sense_handler;
 	devcb_write_line m_flag_handler;
-	devcb_write_line m_intack_handler;
+	devcb_read8 m_intack_handler;
 
 	uint16_t  m_ppc;    /* previous program counter (page + iar) */
 	uint16_t  m_page;   /* 8K page select register (A14..A13) */
@@ -84,7 +84,10 @@ private:
 	uint8_t   m_irq_state;
 
 	int     m_icount;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<15, 0, 0, ENDIANNESS_BIG>::cache m_cprogram;
+	memory_access<15, 0, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 1, 0, 0, ENDIANNESS_BIG>::specific m_data;
+	memory_access< 8, 0, 0, ENDIANNESS_BIG>::specific m_io;
 
 	// For debugger
 	uint16_t  m_debugger_temp;

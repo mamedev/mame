@@ -14,7 +14,7 @@
 
 #include <algorithm>
 
-#include <ctype.h>
+#include <cctype>
 
 
 

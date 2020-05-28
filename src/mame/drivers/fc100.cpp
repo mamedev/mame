@@ -72,13 +72,13 @@ public:
 	void init_fc100();
 
 private:
-	DECLARE_READ8_MEMBER(mc6847_videoram_r);
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_WRITE8_MEMBER(port31_w);
-	DECLARE_WRITE8_MEMBER(port33_w);
-	DECLARE_WRITE8_MEMBER(port43_w);
-	DECLARE_WRITE8_MEMBER(port60_w);
-	DECLARE_WRITE8_MEMBER(port70_w);
+	uint8_t mc6847_videoram_r(offs_t offset);
+	uint8_t port00_r(offs_t offset);
+	void port31_w(uint8_t data);
+	void port33_w(uint8_t data);
+	void port43_w(uint8_t data);
+	void port60_w(offs_t offset, uint8_t data);
+	void port70_w(offs_t offset, uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
@@ -124,7 +124,7 @@ void fc100_state::fc100_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x5fff).rom().region("roms", 0);
-	//AM_RANGE(0x6000, 0x6fff)      // mapped by the cartslot
+	//map(0x6000, 0x6fff)      // mapped by the cartslot
 	map(0x7800, 0x7fff).bankr("bankr").bankw("bankw"); // Banked RAM/ROM
 	map(0x8000, 0xbfff).ram(); // expansion ram pack - if omitted you get a 'Pages?' prompt at boot
 	map(0xc000, 0xffff).ram().share("videoram");
@@ -135,16 +135,16 @@ void fc100_state::fc100_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x0F).r(FUNC(fc100_state::port00_r));
-	// AM_RANGE(0x10, 0x10) AM_WRITE(port10_w)  // vdg, unknown effects
+	// map(0x10, 0x10).w(FUNC(fc100_state::port10_w));  // vdg, unknown effects
 	map(0x21, 0x21).w("psg", FUNC(ay8910_device::data_w));
 	map(0x22, 0x22).r("psg", FUNC(ay8910_device::data_r));
 	map(0x23, 0x23).w("psg", FUNC(ay8910_device::address_w));
 	map(0x31, 0x31).w(FUNC(fc100_state::port31_w));
 	map(0x33, 0x33).w(FUNC(fc100_state::port33_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x42, 0x42).nopw(); // bit 0 could be printer select
 	map(0x43, 0x43).w(FUNC(fc100_state::port43_w));
-	map(0x44, 0x44).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0x44, 0x44).r("cent_status_in", FUNC(input_buffer_device::read));
 	map(0x60, 0x61).w(FUNC(fc100_state::port60_w));
 	map(0x70, 0x71).w(FUNC(fc100_state::port70_w));
 	map(0xb0, 0xb0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
@@ -288,7 +288,7 @@ static INPUT_PORTS_START( fc100 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-READ8_MEMBER( fc100_state::port00_r )
+uint8_t fc100_state::port00_r(offs_t offset)
 {
 	return m_keyboard[offset]->read();
 }
@@ -331,7 +331,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_k)
 
 //********************* AUDIO **********************************
 #if 0
-WRITE8_MEMBER( fc100_state::ay_port_a_w )
+void fc100_state::ay_port_a_w(uint8_t data)
 {
 	m_ag = BIT(data, 4);
 	m_gm2 = BIT(data, 6);
@@ -350,7 +350,7 @@ WRITE8_MEMBER( fc100_state::ay_port_a_w )
 
 //******************** VIDEO **********************************
 
-READ8_MEMBER( fc100_state::mc6847_videoram_r )
+uint8_t fc100_state::mc6847_videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 
@@ -401,7 +401,7 @@ GFXDECODE_END
 
 //********************** CENTRONICS PRINTER ***********************************
 
-WRITE8_MEMBER( fc100_state::port43_w )
+void fc100_state::port43_w(uint8_t data)
 {
 	m_centronics->write_strobe(BIT(data, 2));
 	m_centronics->write_init(BIT(data, 3));
@@ -409,13 +409,13 @@ WRITE8_MEMBER( fc100_state::port43_w )
 
 //********************** UART/CASSETTE ***********************************
 
-WRITE8_MEMBER( fc100_state::port31_w )
+void fc100_state::port31_w(uint8_t data)
 {
 	if (data == 8)
 		m_cass->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
-WRITE8_MEMBER( fc100_state::port33_w )
+void fc100_state::port33_w(uint8_t data)
 {
 	if (data == 0)
 		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -465,7 +465,7 @@ void fc100_state::machine_start()
 	m_inv = 0;
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 	save_item(NAME(m_ag));
 	save_item(NAME(m_gm2));
@@ -488,13 +488,13 @@ void fc100_state::machine_reset()
 	m_uart->write_cts(0);
 }
 
-WRITE8_MEMBER( fc100_state::port60_w )
+void fc100_state::port60_w(offs_t offset, uint8_t data)
 {
 	if (m_banksw_unlocked)
 		membank("bankr")->set_entry(offset);
 }
 
-WRITE8_MEMBER( fc100_state::port70_w )
+void fc100_state::port70_w(offs_t offset, uint8_t data)
 {
 	m_banksw_unlocked = (bool)offset;
 }

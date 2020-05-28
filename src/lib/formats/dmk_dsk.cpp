@@ -13,7 +13,7 @@ TODO:
 
 *********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "dmk_dsk.h"
 

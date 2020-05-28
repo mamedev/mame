@@ -442,7 +442,7 @@ void applefdc_base_device::iwm_access(int offset)
 //  read - reads a byte from the FDC
 //-------------------------------------------------
 
-uint8_t applefdc_base_device::read(uint8_t offset)
+uint8_t applefdc_base_device::read(offs_t offset)
 {
 	const applefdc_interface *intf = get_interface();
 	uint8_t result = 0;
@@ -505,7 +505,7 @@ uint8_t applefdc_base_device::read(uint8_t offset)
 //  write - writes a byte to the FDC
 //-------------------------------------------------
 
-void applefdc_base_device::write(uint8_t offset, uint8_t data)
+void applefdc_base_device::write(offs_t offset, uint8_t data)
 {
 	const applefdc_interface *intf = get_interface();
 
@@ -565,10 +565,10 @@ uint8_t applefdc_base_device::get_lines()
     APPLE FDC - Used on Apple II
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(APPLEFDC, applefdc_device, "apple_fdc", "Apple FDC")
+DEFINE_DEVICE_TYPE(LEGACY_APPLEFDC, applefdc_device, "apple_fdcl", "Apple FDC (legacy)")
 
 applefdc_device::applefdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: applefdc_base_device(APPLEFDC_APPLE2, mconfig, APPLEFDC, tag, owner, clock)
+	: applefdc_base_device(APPLEFDC_APPLE2, mconfig, LEGACY_APPLEFDC, tag, owner, clock)
 {
 }
 
@@ -578,9 +578,9 @@ applefdc_device::applefdc_device(const machine_config &mconfig, const char *tag,
     IWM - Used on early Macs
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(IWM, iwm_device, "iwm", "Apple IWM (Integrated Woz Machine)")
+DEFINE_DEVICE_TYPE(LEGACY_IWM, legacy_iwm_device, "iwml", "Apple IWM (Integrated Woz Machine) (legacy)")
 
-iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: applefdc_base_device(APPLEFDC_IWM, mconfig, IWM, tag, owner, clock)
+legacy_iwm_device::legacy_iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: applefdc_base_device(APPLEFDC_IWM, mconfig, LEGACY_IWM, tag, owner, clock)
 {
 }

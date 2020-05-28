@@ -15,8 +15,7 @@
 
 #include "debugvw.h"
 
-#include "softfloat/mamesf.h"
-#include "softfloat/softfloat.h"
+#include "softfloat3/source/include/softfloat.h"
 
 
 //**************************************************************************
@@ -28,21 +27,23 @@ class debug_view_memory_source : public debug_view_source
 {
 	friend class debug_view_memory;
 
-	debug_view_memory_source(const char *name, address_space &space);
-	debug_view_memory_source(const char *name, memory_region &region);
-	debug_view_memory_source(const char *name, void *base, int element_size, int num_elements);
-
 public:
+	debug_view_memory_source(std::string &&name, address_space &space);
+	debug_view_memory_source(std::string &&name, memory_region &region);
+	debug_view_memory_source(std::string &&name, void *base, int element_size, int num_elements, int num_blocks, int block_stride);
+
 	address_space *space() const { return m_space; }
 
 private:
-	address_space *m_space;                     // address space we reference (if any)
+	address_space           *m_space;           // address space we reference (if any)
 	device_memory_interface *m_memintf;         // pointer to the memory interface of the device
-	void *              m_base;                 // pointer to memory base
-	offs_t              m_length;               // length of memory
-	offs_t              m_offsetxor;            // XOR to apply to offsets
-	endianness_t        m_endianness;           // endianness of memory
-	u8                  m_prefsize;             // preferred bytes per chunk
+	void *                  m_base;             // pointer to memory base
+	offs_t                  m_blocklength;      // length of each block of memory
+	offs_t                  m_numblocks;        // number of blocks of memory
+	offs_t                  m_blockstride;      // stride between blocks of memory
+	offs_t                  m_offsetxor;        // XOR to apply to offsets
+	endianness_t            m_endianness;       // endianness of memory
+	u8                      m_prefsize;         // preferred bytes per chunk
 };
 
 
@@ -101,8 +102,9 @@ private:
 	// memory access
 	bool read(u8 size, offs_t offs, u64 &data);
 	void write(u8 size, offs_t offs, u64 data);
-	bool read(u8 size, offs_t offs, floatx80 &data);
+	bool read(u8 size, offs_t offs, extFloat80_t &data);
 	bool read_chunk(offs_t address, int chunknum, u64 &chunkdata);
+	void generate_row(debug_view_char *destmin, debug_view_char *destmax, debug_view_char *destrow, offs_t address);
 
 	// internal state
 	debug_view_expression m_expression;         // expression describing the start address

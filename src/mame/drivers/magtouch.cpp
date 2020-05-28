@@ -104,7 +104,7 @@ private:
 
 	DECLARE_READ8_MEMBER(magtouch_io_r);
 	DECLARE_WRITE8_MEMBER(magtouch_io_w);
-	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
+	void dma8237_1_dack_w(uint8_t data);
 	virtual void machine_start() override;
 	static void magtouch_sb_conf(device_t *device);
 	void magtouch_io(address_map &map);
@@ -169,7 +169,7 @@ static INPUT_PORTS_START( magtouch )
 INPUT_PORTS_END
 
 //TODO: use atmb device
-WRITE8_MEMBER( magtouch_state::dma8237_1_dack_w ){ m_isabus->dack_w(1, data); }
+void magtouch_state::dma8237_1_dack_w(uint8_t data) { m_isabus->dack_w(1, data); }
 
 void magtouch_state::machine_start()
 {
@@ -240,7 +240,7 @@ ROM_START(magtouch)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("mtouch.u13", 0x00000, 0x10000, CRC(e74fb144) SHA1(abc99e84832c30606374da542fd94f0fbc8cbaa6) )
 
-	ROM_REGION(0x08000, "video_bios", 0)
+	ROM_REGION32_LE(0x08000, "video_bios", 0)
 	//this is a phoenix standard vga only bios from 1991 despite the notes above saying the machine has a trident svga adapter
 	//ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
 	//ROM_CONTINUE(                                     0x00001, 0x04000 )

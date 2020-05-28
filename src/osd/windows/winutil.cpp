@@ -51,7 +51,7 @@ std::chrono::system_clock::time_point win_time_point_from_filetime(LPFILETIME fi
 //  win_is_gui_application
 //============================================================
 
-BOOL win_is_gui_application(void)
+BOOL win_is_gui_application()
 {
 	static BOOL is_gui_frontend;
 	static BOOL is_first_time = TRUE;

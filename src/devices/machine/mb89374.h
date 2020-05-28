@@ -49,18 +49,18 @@ public:
 	template <unsigned N> auto out_po_callback() { return m_out_po_cb[N].bind(); }
 
 	// read/write handlers
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( pi0_w );
-	DECLARE_WRITE_LINE_MEMBER( pi1_w );
-	DECLARE_WRITE_LINE_MEMBER( pi2_w );
-	DECLARE_WRITE_LINE_MEMBER( pi3_w );
+	void pi0_w(int state);
+	void pi1_w(int state);
+	void pi2_w(int state);
+	void pi3_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( ci_w );
+	void ci_w(int state);
 
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	uint8_t dma_r();
+	void dma_w(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -78,8 +78,8 @@ private:
 	inline void set_po2(int state);
 	inline void set_po3(int state);
 
-	devcb_write_line   m_out_irq_cb;
-	devcb_write_line   m_out_po_cb[4];
+	devcb_write_line m_out_irq_cb;
+	devcb_write_line::array<4> m_out_po_cb;
 
 	// pins
 	int m_irq;

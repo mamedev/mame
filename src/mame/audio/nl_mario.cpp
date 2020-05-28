@@ -227,6 +227,10 @@ NETLIST_START(mario)
 
 	ANALOG_INPUT(V5, 5)
 	ALIAS(VCC, V5) // no-ttl-dip devices need VCC!
+	TTL_INPUT(ttlhigh, 1)
+	TTL_INPUT(ttllow, 0)
+	NET_C(VCC, ttlhigh.VCC, ttllow.VCC, SOUND0.VCC, SOUND1.VCC, SOUND7.VCC)
+	NET_C(GND, ttlhigh.GND, ttllow.GND, SOUND0.GND, SOUND1.GND, SOUND7.GND)
 
 	TTL_INPUT(SOUND0, 1)
 	INCLUDE(nl_mario_snd0)

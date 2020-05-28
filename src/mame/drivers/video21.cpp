@@ -45,7 +45,7 @@ public:
 	{ }
 
 	void video21(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_coinout_r);
+	DECLARE_READ_LINE_MEMBER(hopper_coinout_r);
 
 protected:
 	virtual void machine_start() override;
@@ -166,7 +166,7 @@ void video21_state::io_map(address_map &map) {
 }
 
 
-CUSTOM_INPUT_MEMBER(video21_state::hopper_coinout_r)
+READ_LINE_MEMBER(video21_state::hopper_coinout_r)
 {
 	return m_hopper_coin;
 }
@@ -203,7 +203,7 @@ static INPUT_PORTS_START( video21 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Card")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stop")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, video21_state, hopper_coinout_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(video21_state, hopper_coinout_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN44")

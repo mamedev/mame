@@ -282,9 +282,9 @@ void xerox_820_keyboard_device::device_reset_after_children()
 //  kb_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( xerox_820_keyboard_device::kb_p1_r )
+uint8_t xerox_820_keyboard_device::kb_p1_r()
 {
-	return m_p1; // TODO: move to mcs48.c
+	return m_p1; // TODO: move to mcs48.cpp
 }
 
 
@@ -292,7 +292,7 @@ READ8_MEMBER( xerox_820_keyboard_device::kb_p1_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( xerox_820_keyboard_device::kb_p1_w )
+void xerox_820_keyboard_device::kb_p1_w(uint8_t data)
 {
 	/*
 
@@ -319,7 +319,7 @@ WRITE8_MEMBER( xerox_820_keyboard_device::kb_p1_w )
 //  kb_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( xerox_820_keyboard_device::kb_p2_r )
+uint8_t xerox_820_keyboard_device::kb_p2_r()
 {
 	return m_y[m_p1 & 0x0f]->read();
 }
@@ -357,7 +357,7 @@ READ_LINE_MEMBER( xerox_820_keyboard_device::kb_t1_r )
 //  kb_bus_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( xerox_820_keyboard_device::kb_bus_w )
+void xerox_820_keyboard_device::kb_bus_w(uint8_t data)
 {
 	m_bus = data;
 }

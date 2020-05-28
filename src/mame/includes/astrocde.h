@@ -114,7 +114,7 @@ public:
 	DECLARE_WRITE8_MEMBER(protected_ram_enable_w);
 	DECLARE_READ8_MEMBER(protected_ram_r);
 	DECLARE_WRITE8_MEMBER(protected_ram_w);
-	DECLARE_READ8_MEMBER(input_mux_r);
+	uint8_t input_mux_r(offs_t offset);
 	template<int Coin> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	template<int Bit> DECLARE_WRITE_LINE_MEMBER(sparkle_w);
 	DECLARE_WRITE_LINE_MEMBER(gorf_sound_switch_w);
@@ -158,8 +158,8 @@ public:
 	void init_sparklestar();
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(votrax_speech_w);
-	CUSTOM_INPUT_MEMBER( votrax_speech_status_r );
+	void votrax_speech_w(uint8_t data);
+	DECLARE_READ_LINE_MEMBER( votrax_speech_status_r );
 
 	void astrocade_base(machine_config &config);
 	void astrocade_16color_base(machine_config &config);

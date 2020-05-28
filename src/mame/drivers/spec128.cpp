@@ -323,12 +323,12 @@ void spectrum_state::spectrum_128(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_128_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_128_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_128 )
 
 	/* video hardware */
-	m_screen->set_raw(X1_128_SINCLAIR / 2.5f, 456, 0, 352,  311, 0, 296);
+	m_screen->set_raw(X1_128_SINCLAIR / 2.5, 456, 0, 352,  311, 0, 296);
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);

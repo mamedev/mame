@@ -95,7 +95,7 @@ void menu_control_device_image::test_create(bool &can_create, bool &need_confirm
 	auto path = util::zippath_combine(m_current_directory, m_current_file);
 
 	// does a file or a directory exist at the path
-	auto entry = osd_stat(path.c_str());
+	auto entry = osd_stat(path);
 	auto file_type = (entry != nullptr) ? entry->type : osd::directory::entry::entry_type::NONE;
 
 	switch(file_type)
@@ -138,7 +138,7 @@ void menu_control_device_image::load_software_part()
 	driver_enumerator drivlist(machine().options(), machine().options().system_name());
 	drivlist.next();
 	media_auditor auditor(drivlist);
-	media_auditor::summary summary = auditor.audit_software(m_sld->list_name(), (software_info *)m_swi, AUDIT_VALIDATE_FAST);
+	media_auditor::summary summary = auditor.audit_software(*m_sld, *m_swi, AUDIT_VALIDATE_FAST);
 	// if everything looks good, load software
 	if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 	{
@@ -211,7 +211,7 @@ void menu_control_device_image::handle()
 		break;
 
 	case SELECT_PARTLIST:
-		m_swi = m_sld->find(m_software_info_name.c_str());
+		m_swi = m_sld->find(m_software_info_name);
 		if (!m_swi)
 			m_state = START_SOFTLIST;
 		else if (m_swi->has_multiple_parts(m_image.image_interface()))

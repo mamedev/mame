@@ -16,7 +16,7 @@
         * not done yet
 
 According to a Midway service bulletin
-As of 2/12/2001 the lastest software levels:
+As of 2/12/2001 the latest software levels:
 
 Game Title       Level  Released
 ----------------------------------
@@ -305,7 +305,7 @@ READ32_MEMBER(midzeus_state::disk_asic_jr_r)
 	uint32_t retVal = disk_asic_jr[offset];
 	switch (offset)
 	{
-		// miscelaneous hw wait states
+		// miscellaneous hw wait states
 		case 1:
 			break;
 		/* CMOS/ZPRAM write enable; only low bit is used */
@@ -453,11 +453,15 @@ WRITE32_MEMBER(midzeus2_state::crusnexo_leds_w)
 }
 
 
+
 /*************************************
  *
- *  Firewwire access (Zeus 2 only)
+ *  Firewire/IEEE 1394 access (Zeus 2 only)
+ *
+ *  Hardware: TSB12LV01A link layer controller and IBM IBM21S851 physical layer (PHY) transceiver.
  *
  *************************************/
+
 READ32_MEMBER(midzeus_state::firewire_r)
 {
 	uint32_t retVal = 0;
@@ -509,7 +513,7 @@ WRITE32_MEMBER(midzeus_state::firewire_w)
 	// Bit 25: Async Rx Enable
 	// Bit 26: Async Tx Enable
 	// Bit 30: Rx Self ID packets
-	// Bit 31: Rx Packets adddressed to phy
+	// Bit 31: Rx Packets addressed to phy
 	// 0x00200000 Reset Tx
 	// 0x00100000 Reset Rx
 	// 0x1c // FIFO Control
@@ -1100,7 +1104,7 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, midzeus_state, keypad_r, nullptr )
+	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(midzeus_state, keypad_r )
 	PORT_BIT( 0xfff8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEYPAD")
@@ -1216,7 +1220,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midzeus_state, custom_49way_r, nullptr)
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(midzeus_state, custom_49way_r)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("49WAYX")
@@ -1336,6 +1340,7 @@ void midzeus2_state::crusnexo(machine_config &config)
 void midzeus2_state::thegrid(machine_config &config)
 {
 	midzeus2(config);
+	PIC16C57(config, "pic", 8000000).disabled();  // unverified clock, not hooked up
 	m_ioasic->set_upper(474/* or 491 */);
 }
 
@@ -1615,6 +1620,9 @@ ROM_START( thegrid ) /* Version 1.2 Program ROMs */
 	ROM_LOAD( "the_grid.u3", 0x400000, 0x400000, CRC(40be7585) SHA1(e481081edffa07945412a6eab17b4d3e7b42cfd3) )
 	ROM_LOAD( "the_grid.u4", 0x800000, 0x400000, CRC(7a15c203) SHA1(a0a49dd08bba92402640ed2d1fb4fee112c4ab5f) )
 
+	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C57
+	ROM_LOAD( "pic16c57.u76", 0x0000, 0x1fff, CRC(8234d466) SHA1(5737e355d3262cd0b13191cdf9b49dd74f69dd15) ) // decapped but not hooked up
+
 	ROM_REGION32_LE( 0x0800000, "user1", 0 )
 	ROM_LOAD32_WORD( "thegrid-12.u10", 0x0000000, 0x100000, CRC(eb6c2d54) SHA1(ddd32757a9be011988b7add3c091e93292a0867c) )
 	ROM_LOAD32_WORD( "thegrid-12.u11", 0x0000002, 0x100000, CRC(b9b5f92b) SHA1(36e16f109af9a5172869344f09b337b67e0b3e11) )
@@ -1636,6 +1644,9 @@ ROM_START( thegrida ) /* Version 1.1 Program ROMs */
 	ROM_LOAD( "the_grid.u2", 0x000000, 0x400000, CRC(e6a39ee9) SHA1(4ddc62f5d278ea9791205098fa5f018ab1e698b4) )
 	ROM_LOAD( "the_grid.u3", 0x400000, 0x400000, CRC(40be7585) SHA1(e481081edffa07945412a6eab17b4d3e7b42cfd3) )
 	ROM_LOAD( "the_grid.u4", 0x800000, 0x400000, CRC(7a15c203) SHA1(a0a49dd08bba92402640ed2d1fb4fee112c4ab5f) )
+
+	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C57
+	ROM_LOAD( "pic16c57.u76", 0x0000, 0x1fff, CRC(8234d466) SHA1(5737e355d3262cd0b13191cdf9b49dd74f69dd15) ) // decapped but not hooked up
 
 	ROM_REGION32_LE( 0x0800000, "user1", 0 )
 	ROM_LOAD32_WORD( "thegrid-11.u10", 0x0000000, 0x100000, CRC(87ea0e9e) SHA1(618de2ca87b7a3e0225d1f7e65f8fc1356de1421) )
@@ -1667,23 +1678,23 @@ void midzeus_state::init_mk4()
 
 void midzeus_state::init_invasn()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9c0000, 0x9c0000, read32_delegate(FUNC(midzeus_state::invasn_gun_r),this), write32_delegate(FUNC(midzeus_state::invasn_gun_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9c0000, 0x9c0000, read32_delegate(*this, FUNC(midzeus_state::invasn_gun_r)), write32_delegate(*this, FUNC(midzeus_state::invasn_gun_w)));
 }
 
 
 void midzeus2_state::init_crusnexo()
 {
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(FUNC(midzeus2_state::crusnexo_leds_r),this), write32_delegate(FUNC(midzeus2_state::crusnexo_leds_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler    (0x8d0009, 0x8d000a, write32_delegate(FUNC(midzeus_state::keypad_select_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(*this, FUNC(midzeus2_state::crusnexo_leds_r)), write32_delegate(*this, FUNC(midzeus2_state::crusnexo_leds_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler    (0x8d0009, 0x8d000a, write32_delegate(*this, FUNC(midzeus_state::keypad_select_w)));
 }
 
 
 void midzeus2_state::init_thegrid()
 {
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c0000, 0x8c0001, read32_delegate(FUNC(midzeus_state::trackball_r), this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9b0000, 0x9b0004, read32_delegate(FUNC(midzeus_state::grid_keypad_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c0000, 0x8c0001, read32_delegate(*this, FUNC(midzeus_state::trackball_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9b0000, 0x9b0004, read32_delegate(*this, FUNC(midzeus_state::grid_keypad_r)));
 }
 
 

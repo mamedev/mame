@@ -24,7 +24,7 @@ UNDUMPED:
 ***************************************************************************/
 
 #include "emu.h"
-//#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68000.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -44,11 +44,21 @@ public:
 		return 0;
 	}
 	void magreel(machine_config &config);
+
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
+	void mem_map(address_map &map);
 };
+
+
+void magreel_state::mem_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+}
 
 
 static INPUT_PORTS_START( magreel )
@@ -120,9 +130,8 @@ void magreel_state::machine_reset()
 
 void magreel_state::magreel(machine_config &config)
 {
-	/* basic machine hardware - all information unknown */
-//  m68000_device &maincpu(M68000(config, "maincpu", MAIN_CLOCK/12));
-//  maincpu.set_addrmap(AS_PROGRAM, &magreel_state::magreel_map);
+	m68000_device &maincpu(M68000(config, "maincpu", MAIN_CLOCK/12));
+	maincpu.set_addrmap(AS_PROGRAM, &magreel_state::mem_map);
 
 	/* video hardware */
 //  screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -149,16 +158,22 @@ void magreel_state::magreel(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( magreel ) // roms have not been looked at
+ROM_START( magreel )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "m27c800ic18",  0x000000, 0x100000, CRC(2af3d8e7) SHA1(729cd2c1011d8018cf8d77c2d118d1815e30f475) ) // TODO: figure out the line swapping
+
+	ROM_REGION( 0x800000, "reels", 0 )
 	ROM_LOAD( "m27c160.ic3",  0x000000, 0x200000, CRC(707a835a) SHA1(4edbb2279298f330514512147166b9382c79861d) )
 	ROM_LOAD( "m27c160.ic4",  0x200000, 0x200000, CRC(d5590a3c) SHA1(69dacb370b630fd7fee3ddd4beeb34a336dd2d16) )
 	ROM_LOAD( "m27c160.ic5",  0x400000, 0x200000, CRC(72da9809) SHA1(19516432c4cfc33c3db20aab0c64fafb72ed1a19) )
 	ROM_LOAD( "m27c160.ic6",  0x600000, 0x200000, CRC(0f3274d0) SHA1(1abb45ebc74a09f1832cf80775a35966e8d5cd84) )
-	ROM_LOAD( "mx29f161.ic24",0x800000, 0x200000, CRC(61accab0) SHA1(0fee6bf6071849d1b00fbfc248ab654a8abc3b99) )
-	ROM_LOAD( "m27c800ic18",  0xa00000, 0x100000, CRC(2af3d8e7) SHA1(729cd2c1011d8018cf8d77c2d118d1815e30f475) )
-	ROM_LOAD( "m28c64.ic19",  0xb00000, 0x002000, CRC(d0238e5c) SHA1(513bb97487d33c3b844877104bb2af3220851583) )
-	ROM_LOAD( "m28c64.ic20",  0xb02000, 0x002000, CRC(4e6abd42) SHA1(5b1741b755f0fddd94e16d41d5d39a03f37fb23b) )
+
+	ROM_REGION( 0x200000, "flash", 0 )
+	ROM_LOAD( "mx29f161.ic24",0x000000, 0x200000, CRC(61accab0) SHA1(0fee6bf6071849d1b00fbfc248ab654a8abc3b99) )
+
+	ROM_REGION( 0x4000, "eeproms", 0 )
+	ROM_LOAD( "m28c64.ic19",  0x000000, 0x002000, CRC(d0238e5c) SHA1(513bb97487d33c3b844877104bb2af3220851583) )
+	ROM_LOAD( "m28c64.ic20",  0x002000, 0x002000, CRC(4e6abd42) SHA1(5b1741b755f0fddd94e16d41d5d39a03f37fb23b) )
 ROM_END
 
 GAME( 199?, magreel, 0, magreel, magreel, magreel_state, empty_init, ROT0, "Play System",      "Magic Reels", MACHINE_IS_SKELETON )

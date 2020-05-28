@@ -51,7 +51,7 @@ private:
 	TIMER_CALLBACK_MEMBER(sound_command_w);
 	DECLARE_WRITE_LINE_MEMBER(v_irq4_w);
 	DECLARE_WRITE_LINE_MEMBER(v_irq3_w);
-	DECLARE_WRITE8_MEMBER(update_irq);
+	void update_irq(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

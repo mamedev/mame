@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include <ctype.h>
+#include <cctype>
 
 static int irq_mask;
 
@@ -455,7 +455,7 @@ the top of this file. It is included here for completeness.
 //
 // Comments, questions to: david@indigita.com
 
-#include <stdio.h>
+#include <cstdio>
 
 typedef uint8_t byte;
 

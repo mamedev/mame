@@ -466,7 +466,7 @@ READ16_MEMBER(pasha2_state::pasha2_speedup_r)
 
 void pasha2_state::init_pasha2()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x95744, 0x95747, read16_delegate(FUNC(pasha2_state::pasha2_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x95744, 0x95747, read16_delegate(*this, FUNC(pasha2_state::pasha2_speedup_r)));
 
 	m_mainbank->configure_entries(0, 6, memregion("bankeddata")->base(), 0x400000);
 	m_mainbank->set_entry(0);

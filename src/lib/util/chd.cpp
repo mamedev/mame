@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "chd.h"
 #include "avhuff.h"
@@ -17,9 +17,9 @@
 #include "cdrom.h"
 #include "coretmpl.h"
 #include <zlib.h>
-#include <time.h>
-#include <stddef.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstddef>
+#include <cstdlib>
 #include <new>
 #include "eminline.h"
 
@@ -888,7 +888,7 @@ chd_error chd_file::read_hunk(uint32_t hunknum, void *buffer)
 		uint32_t blocklen;
 		util::crc32_t blockcrc;
 		uint8_t *rawmap;
-		uint8_t *dest = reinterpret_cast<uint8_t *>(buffer);
+		auto *dest = reinterpret_cast<uint8_t *>(buffer);
 		switch (m_version)
 		{
 			// v3/v4 map entries
@@ -1045,7 +1045,7 @@ chd_error chd_file::write_hunk(uint32_t hunknum, const void *buffer)
 		{
 			// first make sure we need to allocate it
 			bool all_zeros = true;
-			const uint32_t *scan = reinterpret_cast<const uint32_t *>(buffer);
+			const auto *scan = reinterpret_cast<const uint32_t *>(buffer);
 			for (uint32_t index = 0; index < m_hunkbytes / 4; index++)
 				if (scan[index] != 0)
 				{
@@ -1140,7 +1140,7 @@ chd_error chd_file::read_bytes(uint64_t offset, void *buffer, uint32_t bytes)
 	// iterate over hunks
 	uint32_t first_hunk = offset / m_hunkbytes;
 	uint32_t last_hunk = (offset + bytes - 1) / m_hunkbytes;
-	uint8_t *dest = reinterpret_cast<uint8_t *>(buffer);
+	auto *dest = reinterpret_cast<uint8_t *>(buffer);
 	for (uint32_t curhunk = first_hunk; curhunk <= last_hunk; curhunk++)
 	{
 		// determine start/end boundaries
@@ -1193,7 +1193,7 @@ chd_error chd_file::write_bytes(uint64_t offset, const void *buffer, uint32_t by
 	// iterate over hunks
 	uint32_t first_hunk = offset / m_hunkbytes;
 	uint32_t last_hunk = (offset + bytes - 1) / m_hunkbytes;
-	const uint8_t *source = reinterpret_cast<const uint8_t *>(buffer);
+	const auto *source = reinterpret_cast<const uint8_t *>(buffer);
 	for (uint32_t curhunk = first_hunk; curhunk <= last_hunk; curhunk++)
 	{
 		// determine start/end boundaries
@@ -2947,7 +2947,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 			hunk_write_compressed(item.m_hunknum, item.m_compression, item.m_compressed, item.m_complen, item.m_hash[0].m_crc16);
 			m_total_out += item.m_complen;
 			m_current_map.add(item.m_hunknum, item.m_hash[0].m_crc16, item.m_hash[0].m_sha1);
-		} while (0);
+		} while (false);
 
 		// reset the item and advance
 		item.m_status = WS_READY;
@@ -3010,7 +3010,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 
 void *chd_file_compressor::async_walk_parent_static(void *param, int threadid)
 {
-	work_item *item = reinterpret_cast<work_item *>(param);
+	auto *item = reinterpret_cast<work_item *>(param);
 	item->m_compressor->async_walk_parent(*item);
 	return nullptr;
 }
@@ -3052,7 +3052,7 @@ void chd_file_compressor::async_walk_parent(work_item &item)
 
 void *chd_file_compressor::async_compress_hunk_static(void *param, int threadid)
 {
-	work_item *item = reinterpret_cast<work_item *>(param);
+	auto *item = reinterpret_cast<work_item *>(param);
 	item->m_compressor->async_compress_hunk(*item, threadid);
 	return nullptr;
 }

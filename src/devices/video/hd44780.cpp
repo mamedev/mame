@@ -6,7 +6,8 @@
 
         TODO:
         - dump internal CGROM
-        - emulate osc pin, determine video timings and busy flag duration from it
+        - emulate osc pin, determine video timings and busy flag duration from it,
+          and if possible, remove m_busy_factor
 
 ***************************************************************************/
 
@@ -22,6 +23,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(HD44780,    hd44780_device,    "hd44780_a00", "Hitachi HD44780 A00 LCD Controller")
+DEFINE_DEVICE_TYPE(SED1278_0B, sed1278_0b_device, "sed1278_0b",  "Epson SED1278-0B LCD Controller") // packaged as either SED1278F0B or SED1278D0B
 DEFINE_DEVICE_TYPE(KS0066_F05, ks0066_f05_device, "ks0066_f05",  "Samsung KS0066 F05 LCD Controller")
 
 
@@ -32,6 +34,11 @@ DEFINE_DEVICE_TYPE(KS0066_F05, ks0066_f05_device, "ks0066_f05",  "Samsung KS0066
 ROM_START( hd44780_a00 )
 	ROM_REGION( 0x1000, "cgrom", 0 )
 	ROM_LOAD( "hd44780_a00.bin",    0x0000, 0x1000,  BAD_DUMP CRC(01d108e2) SHA1(bc0cdf0c9ba895f22e183c7bd35a3f655f2ca96f)) // from page 17 of the HD44780 datasheet
+ROM_END
+
+ROM_START( sed1278_0b )
+	ROM_REGION( 0x1000, "cgrom", 0 )
+	ROM_LOAD( "sed1278_0b.bin",    0x0000, 0x1000,  BAD_DUMP CRC(eef342fa) SHA1(d6ac58a48e428e7cff26fb9c8ea9b4eeaa853038)) // from page 9-33 of the SED1278 datasheet
 ROM_END
 
 ROM_START( ks0066_f05 )
@@ -55,6 +62,8 @@ hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, d
 
 hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_pixel_update_cb(*this)
+	, m_busy_factor(1.0)
 	, m_cgrom(nullptr)
 	, m_cgrom_region(*this, DEVICE_SELF)
 	, m_rs_input(0)
@@ -62,6 +71,12 @@ hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, 
 	, m_db_input(0)
 	, m_enabled(false)
 {
+}
+
+sed1278_0b_device::sed1278_0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	hd44780_device(mconfig, SED1278_0B, tag, owner, clock)
+{
+	set_charset_type(CHARSET_SED1278_0B);
 }
 
 ks0066_f05_device::ks0066_f05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -80,6 +95,7 @@ const tiny_rom_entry *hd44780_device::device_rom_region() const
 	switch (m_charset_type)
 	{
 		case CHARSET_HD44780_A00:   return ROM_NAME( hd44780_a00 );
+		case CHARSET_SED1278_0B:    return ROM_NAME( sed1278_0b );
 		case CHARSET_KS0066_F05:    return ROM_NAME( ks0066_f05 );
 	}
 
@@ -94,13 +110,14 @@ void hd44780_device::device_start()
 {
 	m_cgrom = m_cgrom_region.found() ? m_cgrom_region : memregion("cgrom")->base();
 
-	m_pixel_update_cb.bind_relative_to(*owner());
+	m_pixel_update_cb.resolve();
 
 	m_busy_timer = timer_alloc(TIMER_BUSY);
 	m_blink_timer = timer_alloc(TIMER_BLINKING);
 	m_blink_timer->adjust(attotime::from_msec(409), 0, attotime::from_msec(409));
 
 	// state saving
+	save_item(NAME(m_busy_factor));
 	save_item(NAME(m_busy_flag));
 	save_item(NAME(m_ac));
 	save_item(NAME(m_dr));
@@ -190,7 +207,9 @@ void hd44780_device::set_charset_type(int type)
 void hd44780_device::set_busy_flag(uint16_t usec)
 {
 	m_busy_flag = true;
-	m_busy_timer->adjust( attotime::from_usec( usec ) );
+
+	usec = float(usec) * m_busy_factor + 0.5;
+	m_busy_timer->adjust(attotime::from_usec(usec));
 }
 
 void hd44780_device::correct_ac()
@@ -470,9 +489,10 @@ void hd44780_device::control_write(u8 data)
 		// function set
 		if (!m_first_cmd && m_data_len == (BIT(m_ir, 4) ? 8 : 4) && (m_char_size != (BIT(m_ir, 2) ? 10 : 8) || m_num_line != (BIT(m_ir, 3) + 1)))
 		{
-			logerror("HD44780 '%s': function set cannot be executed after other instructions unless the interface data length is changed\n", tag());
+			logerror("HD44780: function set cannot be executed after other instructions unless the interface data length is changed\n");
 			return;
 		}
+		m_first_cmd = true;
 
 		m_char_size = BIT(m_ir, 2) ? 10 : 8;
 		m_data_len  = BIT(m_ir, 4) ? 8 : 4;
@@ -538,6 +558,9 @@ void hd44780_device::control_write(u8 data)
 		m_disp_shift = 0;
 		memset(m_ddram, 0x20, sizeof(m_ddram));
 		set_busy_flag(1520);
+
+		// Some machines do a "clear display" first, even though the datasheet insists "function set" must come before all else
+		return;
 	}
 
 	m_first_cmd = false;

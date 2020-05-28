@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 
 <!-- define elements -->
@@ -26,6 +29,11 @@
 	<element name="disk_red">
 		<disk>
 			<color red="0.8" green="0.1" blue="0.0" />
+		</disk>
+	</element>
+	<element name="disk_yellow">
+		<disk>
+			<color red="0.95" green="0.8" blue="0.1" />
 		</disk>
 	</element>
 
@@ -175,39 +183,43 @@
 <!-- info box -->
 
 		<bezel element="static_red">
-			<bounds x="18" y="5" width="210" height="69" />
+			<bounds x="22" y="5" width="202" height="69" />
+		</bezel>
+		<bezel element="static_red">
+			<bounds x="18" y="9" width="210" height="61" />
 		</bezel>
 
-		<bezel element="static_blue">
-			<bounds x="18" y="5" width="4" height="4" />
-		</bezel>
 		<bezel element="disk_red">
 			<bounds x="18" y="5" width="8" height="8" />
-		</bezel>
-
-		<bezel element="static_blue">
-			<bounds x="18" y="70" width="4" height="4" />
 		</bezel>
 		<bezel element="disk_red">
 			<bounds x="18" y="66" width="8" height="8" />
 		</bezel>
-
-		<bezel element="static_blue">
-			<bounds x="224" y="5" width="4" height="4" />
-		</bezel>
 		<bezel element="disk_red">
 			<bounds x="220" y="5" width="8" height="8" />
-		</bezel>
-
-		<bezel element="static_blue">
-			<bounds x="224" y="70" width="4" height="4" />
 		</bezel>
 		<bezel element="disk_red">
 			<bounds x="220" y="66" width="8" height="8" />
 		</bezel>
 
 		<bezel element="static_yellow">
-			<bounds x="20" y="7" width="206" height="65" />
+			<bounds x="22" y="7" width="202" height="65" />
+		</bezel>
+		<bezel element="static_yellow">
+			<bounds x="20" y="9" width="206" height="61" />
+		</bezel>
+
+		<bezel element="disk_yellow">
+			<bounds x="20" y="7" width="4" height="4" />
+		</bezel>
+		<bezel element="disk_yellow">
+			<bounds x="222" y="7" width="4" height="4" />
+		</bezel>
+		<bezel element="disk_yellow">
+			<bounds x="20" y="68" width="4" height="4" />
+		</bezel>
+		<bezel element="disk_yellow">
+			<bounds x="222" y="68" width="4" height="4" />
 		</bezel>
 
 

@@ -24,8 +24,8 @@ DEFINE_DEVICE_TYPE(PSX_PARALLEL_SLOT, psx_parallel_slot_device, "psx_parallel_sl
 //  psx_parallel_interface - constructor
 //-------------------------------------------------
 
-psx_parallel_interface::psx_parallel_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+psx_parallel_interface::psx_parallel_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "psxparallel")
 {
 }
 
@@ -48,7 +48,7 @@ psx_parallel_interface::~psx_parallel_interface()
 
 psx_parallel_slot_device::psx_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PSX_PARALLEL_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<psx_parallel_interface>(mconfig, *this),
 	m_card(nullptr)
 {
 }
@@ -67,15 +67,7 @@ psx_parallel_slot_device::~psx_parallel_slot_device()
 
 void psx_parallel_slot_device::device_start()
 {
-	m_card = dynamic_cast<psx_parallel_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void psx_parallel_slot_device::device_reset()
-{
+	m_card = get_card_device();
 }
 
 //-------------------------------------------------

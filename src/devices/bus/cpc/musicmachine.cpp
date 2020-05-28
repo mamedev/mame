@@ -61,9 +61,9 @@ void cpc_musicmachine_device::device_start()
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
 
-	space.install_write_handler(0xf8e8,0xf8e8,write8_delegate(FUNC(cpc_musicmachine_device::irqsel_w),this));
-	space.install_readwrite_handler(0xf8ec,0xf8ef,read8_delegate(FUNC(cpc_musicmachine_device::acia_r), this),write8_delegate(FUNC(cpc_musicmachine_device::acia_w),this));
-	space.install_write_handler(0xf8f0,0xf8f0,write8_delegate(FUNC(cpc_musicmachine_device::dac_w),this));
+	space.install_write_handler(0xf8e8,0xf8e8, write8_delegate(*this, FUNC(cpc_musicmachine_device::irqsel_w)));
+	space.install_readwrite_handler(0xf8ec,0xf8ef, read8_delegate(*this, FUNC(cpc_musicmachine_device::acia_r)), write8_delegate(*this, FUNC(cpc_musicmachine_device::acia_w)));
+	space.install_write_handler(0xf8f0,0xf8f0, write8_delegate(*this, FUNC(cpc_musicmachine_device::dac_w)));
 	// 0xf8f4 - ADC read8_delegate
 	// 0xf8f8 - ADC start
 }

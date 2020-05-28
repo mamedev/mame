@@ -13,15 +13,19 @@
 //============================================================
 
 // standard C headers
-#include <math.h>
-#include <stdio.h>
+#include <cmath>
+#include <cstdio>
 
 // MAME headers
 #include "osdcomm.h"
 #include "emu.h"
 #include "emuopts.h"
 
-#ifndef OSD_WINDOWS
+#ifdef OSD_MAC
+#define GL_SILENCE_DEPRECATION (1)
+#endif
+
+#if !defined(OSD_WINDOWS) && !defined(OSD_MAC)
 // standard SDL headers
 #define TOBEMIGRATED 1
 #include <SDL2/SDL.h>
@@ -36,7 +40,12 @@
 #include "modules/opengl/gl_shader_tool.h"
 #include "modules/opengl/gl_shader_mgr.h"
 
-#if defined(SDLMAME_MACOSX)
+#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
+#include <cstring>
+#include <cstdio>
+#include <sys/types.h>
+#include <sys/sysctl.h>
+
 #ifndef APIENTRY
 #define APIENTRY
 #endif
@@ -237,7 +246,7 @@ void renderer_ogl::set_blendmode(int blendmode)
 //============================================================
 
 // OGL 1.3
-#ifdef GL_ARB_multitexture
+#if defined(GL_ARB_multitexture) && !defined(OSD_MAC)
 static PFNGLACTIVETEXTUREARBPROC pfn_glActiveTexture    = nullptr;
 #else
 static PFNGLACTIVETEXTUREPROC pfn_glActiveTexture   = nullptr;
@@ -558,6 +567,9 @@ int renderer_ogl::create()
 	// create renderer
 #if defined(OSD_WINDOWS)
 	m_gl_context = global_alloc(win_gl_context(std::static_pointer_cast<win_window_info>(win)->platform_window()));
+#elif defined(OSD_MAC)
+// TODO
+//  m_gl_context = global_alloc(mac_gl_context(std::static_pointer_cast<mac_window_info>(win)->platform_window()));
 #else
 	m_gl_context = global_alloc(sdl_gl_context(std::static_pointer_cast<sdl_window_info>(win)->platform_window()));
 #endif
@@ -886,7 +898,7 @@ void renderer_ogl::loadGLExtensions()
 
 	if ( m_useglsl )
 	{
-		#ifdef GL_ARB_multitexture
+		#if defined(GL_ARB_multitexture) && !defined(OSD_MAC)
 		pfn_glActiveTexture = (PFNGLACTIVETEXTUREARBPROC) m_gl_context->getProcAddress("glActiveTextureARB");
 		#else
 		pfn_glActiveTexture = (PFNGLACTIVETEXTUREPROC) m_gl_context->getProcAddress("glActiveTexture");
@@ -1109,7 +1121,40 @@ int renderer_ogl::draw(const int update)
 		//   |_________|
 		// (0,h)     (w,h)
 
-		glViewport(0.0, 0.0, (GLsizei) m_width, (GLsizei) m_height);
+		GLsizei iScale = 1;
+
+		/*
+		    Mac hack: macOS version 10.15 and later flipped from assuming you don't support Retina to
+		    assuming you do support Retina.  SDL 2.0.11 is scheduled to fix this, but it's not out yet.
+		    So we double-scale everything if you're on 10.15 or later and SDL is not at least version 2.0.11.
+		*/
+		#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
+		SDL_version sdlVers;
+		SDL_GetVersion(&sdlVers);
+		// Only do this if SDL is not at least 2.0.11.
+		if ((sdlVers.major == 2) && (sdlVers.minor == 0) && (sdlVers.patch < 11))
+		{
+			// now get the Darwin kernel version
+			int dMaj, dMin, dPatch;
+			char versStr[64];
+			dMaj = dMin = dPatch = 0;
+			size_t size = sizeof(versStr);
+			int retVal = sysctlbyname("kern.osrelease", versStr, &size, NULL, 0);
+			if (retVal == 0)
+			{
+			  sscanf(versStr, "%d.%d.%d", &dMaj, &dMin, &dPatch);
+			  // 10.15 Catalina is Darwin version 19
+			  if (dMaj >= 19)
+			  {
+				  // do the workaround for Retina being forced on
+				  osd_printf_verbose("OpenGL: enabling Retina workaround\n");
+				  iScale = 2;
+			  }
+			}
+		}
+		#endif
+
+		glViewport(0.0, 0.0, (GLsizei) m_width * iScale, (GLsizei) m_height * iScale);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glOrtho(0.0, (GLdouble) m_width, (GLdouble) m_height, 0.0, 0.0, -1.0);
@@ -1189,6 +1234,7 @@ int renderer_ogl::draw(const int update)
 
 				if(pendingPrimitive!=curPrimitive)
 				{
+					glLineWidth(prim.width);
 					glBegin(curPrimitive);
 					pendingPrimitive=curPrimitive;
 				}
@@ -1603,7 +1649,7 @@ void renderer_ogl::texture_compute_size_type(const render_texinfo *texsource, og
 //  texture_create
 //============================================================
 
-static int gl_checkFramebufferStatus(void)
+static int gl_checkFramebufferStatus()
 {
 	GLenum status;
 	status=(GLenum)pfn_glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT);
@@ -1668,8 +1714,8 @@ static int texture_fbo_create(uint32_t text_unit, uint32_t text_name, uint32_t f
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	pfn_glFramebufferTexture2D(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 					GL_TEXTURE_2D, text_name, 0);
@@ -1847,8 +1893,8 @@ int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 	}
 	else
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	}
 
 	GL_CHECK_ERROR_NORMAL();
@@ -1969,8 +2015,8 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 		if( texture->texTarget==GL_TEXTURE_RECTANGLE_ARB )
 		{
 			// texture rectangles can't wrap
-			glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-			glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+			glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		} else {
 			// set wrapping mode appropriately
 			if (texture->flags & PRIMFLAG_TEXWRAP_MASK)
@@ -1980,8 +2026,8 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 			}
 			else
 			{
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			}
 		}
 	}
@@ -2019,10 +2065,11 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 				m_texhash[i] = texture;
 				break;
 			}
-		assert_always(i < HASH_SIZE + OVERFLOW_SIZE, "texture hash exhausted ...");
+		if ((HASH_SIZE + OVERFLOW_SIZE) <= i)
+			throw emu_fatalerror("renderer_ogl::texture_create: texture hash exhausted ...");
 	}
 
-	if(m_usevbo)
+	if (m_usevbo)
 	{
 		// Generate And Bind The Texture Coordinate Buffer
 		pfn_glGenBuffers( 1, &(texture->texCoordBufferName) );
@@ -2414,7 +2461,7 @@ static int compare_texture_primitive(const ogl_texture_info *texture, const rend
 		texture->texinfo.width == prim->texture.width &&
 		texture->texinfo.height == prim->texture.height &&
 		texture->texinfo.rowpixels == prim->texture.rowpixels &&
-		/* texture->texinfo.palette == prim->texture.palette && */
+		texture->texinfo.palette == prim->texture.palette &&
 		((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
 		return 1;
 	else

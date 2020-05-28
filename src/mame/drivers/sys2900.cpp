@@ -116,7 +116,7 @@ void sys2900_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in sys2900_state::device_timer");
+		throw emu_fatalerror("Unknown id in sys2900_state::device_timer");
 	}
 }
 

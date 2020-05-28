@@ -14,11 +14,11 @@ Video hardware driver by Uki
 #include "includes/xxmissio.h"
 
 
-WRITE8_MEMBER(xxmissio_state::scroll_x_w)
+void xxmissio_state::scroll_x_w(uint8_t data)
 {
 	m_xscroll = data;
 }
-WRITE8_MEMBER(xxmissio_state::scroll_y_w)
+void xxmissio_state::scroll_y_w(uint8_t data)
 {
 	m_yscroll = data;
 }
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(xxmissio_state::get_bg_tile_info)
 	int code = ((m_bgram[0x400 | tile_index] & 0xc0) << 2) | m_bgram[0x000 | tile_index];
 	int color =  m_bgram[0x400 | tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(xxmissio_state::get_fg_tile_info)
@@ -58,13 +58,13 @@ TILE_GET_INFO_MEMBER(xxmissio_state::get_fg_tile_info)
 	int code = m_fgram[0x000 | tile_index];
 	int color = m_fgram[0x400 | tile_index] & 0x07;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void xxmissio_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xxmissio_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xxmissio_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xxmissio_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xxmissio_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_cols(1);
 	m_bg_tilemap->set_scroll_rows(1);

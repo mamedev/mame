@@ -575,7 +575,7 @@ void i7220_device::write_data_continue(bubble_info &bi)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER(i7220_device::read)
+uint8_t i7220_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -643,7 +643,7 @@ READ8_MEMBER(i7220_device::read)
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( i7220_device::write )
+void i7220_device::write(offs_t offset, uint8_t data)
 {
 	static const char *commands[] = {
 		"Write Bootloop Register Masked",

@@ -32,7 +32,7 @@ public:
 	void init_pirates();
 	void init_genix();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
+	DECLARE_READ_LINE_MEMBER(prot_r);
 
 private:
 	required_device<cpu_device> m_maincpu;

@@ -35,22 +35,9 @@
  *
  *************************************/
 
-void atarig1_state::update_interrupts()
+void atarig1_state::video_int_ack_w(uint16_t data)
 {
-	m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-MACHINE_START_MEMBER(atarig1_state,atarig1)
-{
-	atarigen_state::machine_start();
-}
-
-
-MACHINE_RESET_MEMBER(atarig1_state,atarig1)
-{
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
 
@@ -156,7 +143,7 @@ READ16_MEMBER(atarig1_state::pitfightb_cheap_slapstic_r)
 void atarig1_state::pitfightb_cheap_slapstic_init()
 {
 	/* install a read handler */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x038000, 0x03ffff, read16_delegate(FUNC(atarig1_state::pitfightb_cheap_slapstic_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x038000, 0x03ffff, read16_delegate(*this, FUNC(atarig1_state::pitfightb_cheap_slapstic_r)));
 	m_bslapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0x38000);
 
 	/* allocate memory for a copy of bank 0 */
@@ -191,7 +178,7 @@ void atarig1_state::main_map(address_map &map)
 	map(0xfc8000, 0xfc8007).rw(FUNC(atarig1_state::a2d_data_r), FUNC(atarig1_state::a2d_select_w));
 	map(0xfd0000, 0xfd0000).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0xfd8000, 0xfdffff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
-/*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
+/*  map(0xfe0000, 0xfe7fff).r(FUNC(atarig1_state::from_r));*/
 	map(0xfe8000, 0xfe89ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xff0fff).ram().share("rle");
 	map(0xff1000, 0xff1fff).ram();
@@ -401,13 +388,12 @@ static const atari_rle_objects_config modesc_pitfight =
 void atarig1_state::atarig1(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::main_map);
 
-	MCFG_MACHINE_START_OVERRIDE(atarig1_state,atarig1)
-	MCFG_MACHINE_RESET_OVERRIDE(atarig1_state,atarig1)
-
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(atarig1_state::scanline_update), m_screen, 0, 8);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -422,10 +408,10 @@ void atarig1_state::atarig1(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(atarig1_state::screen_update_atarig1));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(atarig1_state::video_int_write_line));
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_1, ASSERT_LINE);
 
 	MCFG_VIDEO_START_OVERRIDE(atarig1_state,atarig1)
 
@@ -443,7 +429,7 @@ void atarig1_state::hydrap(machine_config &config)
 {
 	atarig1(config);
 
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");
 	m_adc->in_callback<1>().set_ioport("ADC1");
 	m_adc->in_callback<2>().set_ioport("ADC2");
@@ -1341,7 +1327,7 @@ ROM_END
 
 void atarig1_state::init_hydra()
 {
-	slapstic_configure(*m_maincpu, 0x078000, 0, memregion("maincpu")->base() + 0x78000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x078000, 0, memregion("maincpu")->base() + 0x78000);
 	m_is_pitfight = false;
 }
 
@@ -1352,7 +1338,7 @@ void atarig1_state::init_hydrap()
 
 void atarig1_state::init_pitfight()
 {
-	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
 	m_is_pitfight = true;
 }
 

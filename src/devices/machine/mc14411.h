@@ -63,10 +63,10 @@ public:
 
 	template <std::size_t Line> auto out_f() { return m_out_fx_cbs[Line-1].bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_WRITE8_MEMBER(rate_select_w);
-	DECLARE_WRITE_LINE_MEMBER(rsa_w);
-	DECLARE_WRITE_LINE_MEMBER(rsb_w);
+	void reset_w(int state);
+	void rate_select_w(uint8_t data);
+	void rsa_w(int state);
+	void rsb_w(int state);
 
 	void timer_enable(timer_id i, bool enable);
 	void timer_disable_all();
@@ -92,7 +92,7 @@ private:
 	static const int s_counter_divider[16];
 	static const int s_divider_select[4];
 
-	devcb_write_line m_out_fx_cbs[16];
+	devcb_write_line::array<16> m_out_fx_cbs;
 
 	uint32_t m_divider; // main divider to use, 0-3 column index into counter_divider
 	uint32_t m_reset;   // Reset line state

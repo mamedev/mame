@@ -1417,6 +1417,7 @@ mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, MCD212, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_int_callback(*this)
+	, m_scanline_callback(*this)
 	, m_planea(*this, "planea")
 	, m_planeb(*this, "planeb")
 {
@@ -1431,7 +1432,7 @@ mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, dev
 void mcd212_device::device_resolve_objects()
 {
 	m_int_callback.resolve_safe();
-	m_scanline_callback.bind_relative_to(*owner());
+	m_scanline_callback.resolve();
 }
 
 //-------------------------------------------------

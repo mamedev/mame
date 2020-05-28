@@ -53,8 +53,8 @@ public:
 	auto in_pb_callback() { return m_in_pb_cb.bind(); }
 	auto out_pb_callback() { return m_out_pb_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint8_t porta_in_get();
 	uint8_t portb_in_get();

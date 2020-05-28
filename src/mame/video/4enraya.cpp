@@ -21,12 +21,12 @@ WRITE8_MEMBER(_4enraya_state::fenraya_videoram_w)
 TILE_GET_INFO_MEMBER(_4enraya_state::get_tile_info)
 {
 	int code = m_videoram[tile_index * 2] + (m_videoram[tile_index * 2 + 1] << 8);
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void _4enraya_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_4enraya_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_4enraya_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t _4enraya_state::screen_update_4enraya(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

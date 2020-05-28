@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
 	attr = (lvram[BYTE_XOR_LE(tile_index<<2)] & 0xf0) >> 4;
 	code = ((lvram[BYTE_XOR_LE(tile_index<<2)] & 0x0f) << 8) | (lvram[BYTE_XOR_LE((tile_index<<2)+2)]);
 
-	SET_TILE_INFO_MEMBER(m_ttl_gfx_index, code, attr, 0);
+	tileinfo.set(m_ttl_gfx_index, code, attr, 0);
 }
 
 K055673_CB_MEMBER(rungun_state::sprite_callback)
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(rungun_state::get_rng_936_tile_info)
 	flipx = (m_psac2_vram[tile_index * 2 + 1 + base_addr] & 0xc000) >> 14;
 	colour = 0x10 + (m_psac2_vram[tile_index * 2 + base_addr] & 0x000f);
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPYX(flipx));
+	tileinfo.set(0, tileno, colour, TILE_FLIPYX(flipx));
 }
 
 
@@ -101,11 +101,11 @@ void rungun_state::video_start()
 	// create the tilemaps
 	for(uint32_t screen_num = 0;screen_num < 2;screen_num++)
 	{
-		m_ttl_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::ttl_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+		m_ttl_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rungun_state::ttl_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 		m_ttl_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x2000));
 		m_ttl_tilemap[screen_num]->set_transparent_pen(0);
 
-		m_936_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::get_rng_936_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+		m_936_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rungun_state::get_rng_936_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 		m_936_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x80000));
 		m_936_tilemap[screen_num]->set_transparent_pen(0);
 

@@ -62,20 +62,20 @@ public:
 	void itaten(machine_config &config);
 	void dacholer(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
+	DECLARE_READ_LINE_MEMBER(snd_ack_r);
 
 private:
-	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
-	DECLARE_WRITE8_MEMBER(bg_scroll_y_w);
-	DECLARE_WRITE8_MEMBER(background_w);
-	DECLARE_WRITE8_MEMBER(foreground_w);
-	DECLARE_WRITE8_MEMBER(bg_bank_w);
-	DECLARE_WRITE8_MEMBER(coins_w);
-	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
-	DECLARE_WRITE8_MEMBER(snd_ack_w);
-	DECLARE_WRITE8_MEMBER(snd_irq_w);
-	DECLARE_WRITE8_MEMBER(music_irq_w);
+	void bg_scroll_x_w(uint8_t data);
+	void bg_scroll_y_w(uint8_t data);
+	void background_w(offs_t offset, uint8_t data);
+	void foreground_w(offs_t offset, uint8_t data);
+	void bg_bank_w(uint8_t data);
+	void coins_w(uint8_t data);
+	void main_irq_ack_w(uint8_t data);
+	void adpcm_w(uint8_t data);
+	void snd_ack_w(uint8_t data);
+	void snd_irq_w(uint8_t data);
+	void music_irq_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void dacholer_palette(palette_device &palette) const;
@@ -128,28 +128,28 @@ private:
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1, m_bgvideoram[tile_index] + m_bg_bank * 0x100, 0, 0);
+	tileinfo.set(1, m_bgvideoram[tile_index] + m_bg_bank * 0x100, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_fg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_fgvideoram[tile_index], 0, 0);
+	tileinfo.set(0, m_fgvideoram[tile_index], 0, 0);
 }
 
 void dacholer_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dacholer_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dacholer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dacholer_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dacholer_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-WRITE8_MEMBER(dacholer_state::bg_scroll_x_w)
+void dacholer_state::bg_scroll_x_w(uint8_t data)
 {
 	m_scroll_x = data;
 }
 
-WRITE8_MEMBER(dacholer_state::bg_scroll_y_w)
+void dacholer_state::bg_scroll_y_w(uint8_t data)
 {
 	m_scroll_y = data;
 }
@@ -204,19 +204,19 @@ uint32_t dacholer_state::screen_update_dacholer(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(dacholer_state::background_w)
+void dacholer_state::background_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(dacholer_state::foreground_w)
+void dacholer_state::foreground_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(dacholer_state::bg_bank_w)
+void dacholer_state::bg_bank_w(uint8_t data)
 {
 	if ((data & 3) != m_bg_bank)
 	{
@@ -228,7 +228,7 @@ WRITE8_MEMBER(dacholer_state::bg_bank_w)
 
 }
 
-WRITE8_MEMBER(dacholer_state::coins_w)
+void dacholer_state::coins_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
@@ -237,7 +237,7 @@ WRITE8_MEMBER(dacholer_state::coins_w)
 	m_leds[1] = BIT(data, 3);
 }
 
-WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
+void dacholer_state::main_irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -291,28 +291,28 @@ void dacholer_state::itaten_snd_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(dacholer_state::adpcm_w)
+void dacholer_state::adpcm_w(uint8_t data)
 {
 	m_msm_data = data;
 	m_msm_toggle = 0;
 }
 
-WRITE8_MEMBER(dacholer_state::snd_ack_w)
+void dacholer_state::snd_ack_w(uint8_t data)
 {
 	m_snd_ack = data;
 }
 
-CUSTOM_INPUT_MEMBER(dacholer_state::snd_ack_r)
+READ_LINE_MEMBER(dacholer_state::snd_ack_r)
 {
 	return m_snd_ack;       //guess ...
 }
 
-WRITE8_MEMBER(dacholer_state::snd_irq_w)
+void dacholer_state::snd_irq_w(uint8_t data)
 {
 	m_snd_interrupt_enable = data;
 }
 
-WRITE8_MEMBER(dacholer_state::music_irq_w)
+void dacholer_state::music_irq_w(uint8_t data)
 {
 	m_music_interrupt_enable = data;
 }
@@ -382,7 +382,7 @@ static INPUT_PORTS_START( dacholer )
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dacholer_state,snd_ack_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dacholer_state, snd_ack_r)
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            /* table at 0x0a9c */
@@ -594,7 +594,7 @@ WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
 {
 	if (m_snd_interrupt_enable == 1 || (m_snd_interrupt_enable == 0 && m_msm_toggle == 1))
 	{
-		m_msm->write_data(m_msm_data >> 4);
+		m_msm->data_w(m_msm_data >> 4);
 		m_msm_data <<= 4;
 		m_msm_toggle ^= 1;
 		if (m_msm_toggle == 0)
@@ -714,7 +714,7 @@ void dacholer_state::itaten(machine_config &config)
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dacholer_state::itaten_snd_map);
 	m_audiocpu->set_addrmap(AS_IO, &dacholer_state::itaten_snd_io_map);
-	m_audiocpu->set_vblank_int(device_interrupt_delegate(), nullptr);
+	m_audiocpu->remove_vblank_int();
 
 	m_gfxdecode->set_info(gfx_itaten);
 

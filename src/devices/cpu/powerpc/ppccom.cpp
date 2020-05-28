@@ -217,6 +217,12 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 	, m_flavor(flavor)
 	, m_cap(cap)
 	, m_tb_divisor(tb_divisor)
+	, m_spu(*this)
+	, m_dcr_read_func(*this)
+	, m_dcr_write_func(*this)
+	, m_dcstore_cb(*this)
+	, m_ext_dma_read_cb(*this)
+	, m_ext_dma_write_cb(*this)
 	, m_cache(CACHE_SIZE + sizeof(internal_ppc_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
@@ -449,9 +455,9 @@ inline void ppc_device::set_decrementer(uint32_t newdec)
 	if (PRINTF_DECREMENTER)
 	{
 		uint64_t total = total_cycles();
-		osd_printf_debug("set_decrementer: olddec=%08X newdec=%08X divisor=%d totalcyc=%08X%08X timer=%08X%08X\n",
+		osd_printf_debug("set_decrementer: olddec=%08X newdec=%08X divisor=%d totalcyc=%016X timer=%016X\n",
 				curdec, newdec, m_tb_divisor,
-				(uint32_t)(total >> 32), (uint32_t)total, (uint32_t)(cycles_until_done >> 32), (uint32_t)cycles_until_done);
+				total, cycles_until_done);
 	}
 
 	m_dec_zero_cycles = total_cycles() + cycles_until_done;
@@ -716,32 +722,32 @@ void ppc_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	if(m_cap & PPCCAP_4XX)
 	{
-		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+		m_program->cache(m_cache32);
+		m_pr32 = [this](offs_t address) -> u32 { return m_cache32.read_dword(address); };
+		m_prptr = [this](offs_t address) -> const void * { return m_cache32.read_ptr(address); };
 	}
 	else
 	{
-		auto cache = m_program->cache<3, 0, ENDIANNESS_BIG>();
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_program->cache(m_cache64);
+		m_pr32 = [this](offs_t address) -> u32 { return m_cache64.read_dword(address); };
 		if(space_config()->m_endianness != ENDIANNESS_NATIVE)
-			m_prptr = [cache](offs_t address) -> const void * {
-				const u32 *ptr = static_cast<u32 *>(cache->read_ptr(address & ~7));
+			m_prptr = [this](offs_t address) -> const void * {
+				const u32 *ptr = static_cast<u32 *>(m_cache64.read_ptr(address & ~7));
 				if(!(address & 4))
 					ptr++;
 				return ptr;
 			};
 		else
-			m_prptr = [cache](offs_t address) -> const void * {
-				const u32 *ptr = static_cast<u32 *>(cache->read_ptr(address & ~7));
+			m_prptr = [this](offs_t address) -> const void * {
+				const u32 *ptr = static_cast<u32 *>(m_cache64.read_ptr(address & ~7));
 				if(address & 4)
 					ptr++;
 				return ptr;
 			};
 	}
 	m_system_clock = c_bus_frequency != 0 ? c_bus_frequency : clock();
-	m_dcr_read_func = read32_delegate();
-	m_dcr_write_func = write32_delegate();
+	m_dcr_read_func.set(nullptr);
+	m_dcr_write_func.set(nullptr);
 
 	m_tb_divisor = (m_tb_divisor * clock() + m_system_clock / 2 - 1) / m_system_clock;
 
@@ -2766,7 +2772,7 @@ updateirq:
     ppc4xx_spu_r - serial port read handler
 -------------------------------------------------*/
 
-READ8_MEMBER( ppc4xx_device::ppc4xx_spu_r )
+uint8_t ppc4xx_device::ppc4xx_spu_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -2792,7 +2798,7 @@ READ8_MEMBER( ppc4xx_device::ppc4xx_spu_r )
     ppc4xx_spu_w - serial port write handler
 -------------------------------------------------*/
 
-WRITE8_MEMBER( ppc4xx_device::ppc4xx_spu_w )
+void ppc4xx_device::ppc4xx_spu_w(offs_t offset, uint8_t data)
 {
 	uint8_t oldstate, newstate;
 

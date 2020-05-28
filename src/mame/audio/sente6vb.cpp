@@ -113,7 +113,7 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 	uartclock.signal_handler().append(m_uart, FUNC(acia6850_device::write_txc));
 	uartclock.signal_handler().append(m_uart, FUNC(acia6850_device::write_rxc));
 
-	TIMER(config, m_counter_0_timer, 0).configure_generic(timer_device::expired_delegate(FUNC(sente6vb_device::clock_counter_0_ff), this));
+	TIMER(config, m_counter_0_timer, 0).configure_generic(FUNC(sente6vb_device::clock_counter_0_ff));
 
 	PIT8253(config, m_pit, 0);
 	m_pit->out_handler<0>().set(FUNC(sente6vb_device::counter_0_set_out));
@@ -131,12 +131,12 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 		cem_device->add_route(ALL_OUTPUTS, "mono", 0.90);
 	}
 
-	m_cem_device[0]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_0), this);
-	m_cem_device[1]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_1), this);
-	m_cem_device[2]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_2), this);
-	m_cem_device[3]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_3), this);
-	m_cem_device[4]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_4), this);
-	m_cem_device[5]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_5), this);
+	m_cem_device[0]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_0));
+	m_cem_device[1]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_1));
+	m_cem_device[2]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_2));
+	m_cem_device[3]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_3));
+	m_cem_device[4]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_4));
+	m_cem_device[5]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_5));
 }
 
 
@@ -374,7 +374,7 @@ void sente6vb_device::update_counter_0_timer()
  *
  *************************************/
 
-READ8_MEMBER(sente6vb_device::counter_state_r)
+uint8_t sente6vb_device::counter_state_r()
 {
 	// bit D0 is the inverse of the flip-flop state
 	int result = !m_counter_0_ff;
@@ -386,7 +386,7 @@ READ8_MEMBER(sente6vb_device::counter_state_r)
 }
 
 
-WRITE8_MEMBER(sente6vb_device::counter_control_w)
+void sente6vb_device::counter_control_w(uint8_t data)
 {
 	uint8_t diff_counter_control = m_counter_control ^ data;
 
@@ -439,7 +439,7 @@ WRITE8_MEMBER(sente6vb_device::counter_control_w)
  *
  *************************************/
 
-WRITE8_MEMBER(sente6vb_device::chip_select_w)
+void sente6vb_device::chip_select_w(uint8_t data)
 {
 	static constexpr uint8_t register_map[8] =
 	{
@@ -502,7 +502,7 @@ WRITE8_MEMBER(sente6vb_device::chip_select_w)
 
 
 
-WRITE8_MEMBER(sente6vb_device::dac_data_w)
+void sente6vb_device::dac_data_w(offs_t offset, uint8_t data)
 {
 	// LSB or MSB?
 	if (offset & 1)
@@ -514,13 +514,13 @@ WRITE8_MEMBER(sente6vb_device::dac_data_w)
 	if ((m_chip_select & 0x3f) != 0x3f)
 	{
 		uint8_t temp = m_chip_select;
-		chip_select_w(space, 0, 0x3f);
-		chip_select_w(space, 0, temp);
+		chip_select_w(0x3f);
+		chip_select_w(temp);
 	}
 }
 
 
-WRITE8_MEMBER(sente6vb_device::register_addr_w)
+void sente6vb_device::register_addr_w(uint8_t data)
 {
 	m_dac_register = data & 7;
 }

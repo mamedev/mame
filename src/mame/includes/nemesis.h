@@ -61,6 +61,7 @@ public:
 	void blkpnthr(machine_config &config);
 
 	void bubsys_init();
+	void bubsys_twinbeeb_init();
 
 private:
 	/* memory pointers */
@@ -94,7 +95,7 @@ private:
 	int       m_irq1_on;
 	int       m_irq2_on;
 	int       m_irq4_on;
-	uint16_t    m_selected_ip; /* Copied from WEC Le Mans 24 driver, explicity needed for Hyper Crash */
+	uint8_t    m_selected_ip; // needed for Hyper Crash
 	int       m_gx400_irq1_cnt;
 	uint8_t     m_frame_counter;
 	uint16_t    m_scanline_counter;
@@ -124,8 +125,8 @@ private:
 	DECLARE_READ16_MEMBER(gx400_sharedram_word_r);
 	DECLARE_WRITE16_MEMBER(gx400_sharedram_word_w);
 	DECLARE_READ16_MEMBER(konamigt_input_word_r);
-	DECLARE_WRITE16_MEMBER(selected_ip_word_w);
-	DECLARE_READ16_MEMBER(selected_ip_word_r);
+	void selected_ip_w(uint8_t data);
+	uint8_t selected_ip_r();
 	DECLARE_WRITE16_MEMBER(bubsys_mcu_w);
 	DECLARE_READ8_MEMBER(wd_r);
 	DECLARE_WRITE_LINE_MEMBER(gfx_flipx_w);
@@ -140,7 +141,7 @@ private:
 	DECLARE_WRITE8_MEMBER(nemesis_filter_w);
 	DECLARE_WRITE8_MEMBER(gx400_speech_start_w);
 	DECLARE_WRITE8_MEMBER(salamand_speech_start_w);
-	DECLARE_READ8_MEMBER(nemesis_portA_r);
+	uint8_t nemesis_portA_r();
 	DECLARE_WRITE8_MEMBER(city_sound_bank_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -159,7 +160,7 @@ private:
 	void create_palette_lookups();
 	void nemesis_postload();
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(uint8_t data);
 	void set_screen_raw_params(machine_config &config);
 
 	void blkpnthr_map(address_map &map);

@@ -72,6 +72,9 @@ pci_device::pci_device(const machine_config &mconfig, device_type type, const ch
 	revision = 0x00;
 	pclass = 0xffffff;
 	subsystem_id = 0xffffffff;
+	expansion_rom = nullptr;
+	expansion_rom_size = 0;
+	expansion_rom_base = 0;
 	is_multifunction_device = false;
 	intr_pin = 0x0;
 	intr_line = 0xff;
@@ -101,10 +104,6 @@ void pci_device::device_start()
 
 	bank_count = 0;
 	bank_reg_count = 0;
-
-	expansion_rom = nullptr;
-	expansion_rom_size = 0;
-	expansion_rom_base = 0;
 
 	for (int i = 0; i < ARRAY_LENGTH(bank_infos); i++) {
 		save_item(NAME(bank_infos[i].adr), i);
@@ -328,12 +327,12 @@ void pci_device::map_device(uint64_t memory_window_start, uint64_t memory_window
 		}
 		uint64_t end = start + bi.size-1;
 		switch(i) {
-		case 0: space->install_readwrite_handler(start, end, read32_delegate(FUNC(pci_device::unmapped0_r), this), write32_delegate(FUNC(pci_device::unmapped0_w), this)); break;
-		case 1: space->install_readwrite_handler(start, end, read32_delegate(FUNC(pci_device::unmapped1_r), this), write32_delegate(FUNC(pci_device::unmapped1_w), this)); break;
-		case 2: space->install_readwrite_handler(start, end, read32_delegate(FUNC(pci_device::unmapped2_r), this), write32_delegate(FUNC(pci_device::unmapped2_w), this)); break;
-		case 3: space->install_readwrite_handler(start, end, read32_delegate(FUNC(pci_device::unmapped3_r), this), write32_delegate(FUNC(pci_device::unmapped3_w), this)); break;
-		case 4: space->install_readwrite_handler(start, end, read32_delegate(FUNC(pci_device::unmapped4_r), this), write32_delegate(FUNC(pci_device::unmapped4_w), this)); break;
-		case 5: space->install_readwrite_handler(start, end, read32_delegate(FUNC(pci_device::unmapped5_r), this), write32_delegate(FUNC(pci_device::unmapped5_w), this)); break;
+		case 0: space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(pci_device::unmapped0_r)), write32_delegate(*this, FUNC(pci_device::unmapped0_w))); break;
+		case 1: space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(pci_device::unmapped1_r)), write32_delegate(*this, FUNC(pci_device::unmapped1_w))); break;
+		case 2: space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(pci_device::unmapped2_r)), write32_delegate(*this, FUNC(pci_device::unmapped2_w))); break;
+		case 3: space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(pci_device::unmapped3_r)), write32_delegate(*this, FUNC(pci_device::unmapped3_w))); break;
+		case 4: space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(pci_device::unmapped4_r)), write32_delegate(*this, FUNC(pci_device::unmapped4_w))); break;
+		case 5: space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(pci_device::unmapped5_r)), write32_delegate(*this, FUNC(pci_device::unmapped5_w))); break;
 		}
 
 		space->install_device_delegate(start, end, *bi.device, bi.map);

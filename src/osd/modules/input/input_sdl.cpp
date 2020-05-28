@@ -18,9 +18,9 @@
 
 // standard sdl header
 #include <SDL2/SDL.h>
-#include <ctype.h>
+#include <cctype>
 // ReSharper disable once CppUnusedIncludeDirective
-#include <stddef.h>
+#include <cstddef>
 #include <mutex>
 #include <memory>
 #include <queue>
@@ -386,6 +386,19 @@ public:
 			keyboard.state[sdlevent.key.keysym.scancode] = 0x80;
 			if (sdlevent.key.keysym.sym < 0x20)
 				machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), sdlevent.key.keysym.sym);
+			else if (keyboard.state[SDL_SCANCODE_LCTRL] == 0x80 || keyboard.state[SDL_SCANCODE_RCTRL] == 0x80)
+			{
+				// SDL filters out control characters for text input, so they are decoded here
+				if (sdlevent.key.keysym.sym >= 0x40 && sdlevent.key.keysym.sym < 0x7f)
+					machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), sdlevent.key.keysym.sym & 0x1f);
+				else if (keyboard.state[SDL_SCANCODE_LSHIFT] == 0x80 || keyboard.state[SDL_SCANCODE_RSHIFT] == 0x80)
+				{
+					if (sdlevent.key.keysym.sym == SDLK_6) // Ctrl-^ (RS)
+						machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), 0x1e);
+					else if (sdlevent.key.keysym.sym == SDLK_MINUS) // Ctrl-_ (US)
+						machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), 0x1f);
+				}
+			}
 			break;
 
 		case SDL_KEYUP:
@@ -657,7 +670,8 @@ public:
 
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
-			joystick.buttons[sdlevent.jbutton.button] = (sdlevent.jbutton.state == SDL_PRESSED) ? 0x80 : 0;
+			if (sdlevent.jbutton.button < MAX_BUTTONS)
+				joystick.buttons[sdlevent.jbutton.button] = (sdlevent.jbutton.state == SDL_PRESSED) ? 0x80 : 0;
 			break;
 		}
 	}
@@ -1032,11 +1046,16 @@ public:
 
 			physical_stick = m_joy_map.map[stick].physical;
 			SDL_Joystick *joy = SDL_JoystickOpen(physical_stick);
+			SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
+			char guid_str[256];
+			guid_str[0] = '\0';
+			SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str)-1);
+
 			devinfo->sdl_state.device = joy;
 			devinfo->sdl_state.joystick_id = SDL_JoystickInstanceID(joy);
 			devinfo->sdl_state.hapdevice = SDL_HapticOpenFromJoystick(joy);
 
-			osd_printf_verbose("Joystick: %s\n", SDL_JoystickNameForIndex(physical_stick));
+			osd_printf_verbose("Joystick: %s [GUID %s]\n", SDL_JoystickNameForIndex(physical_stick), guid_str);
 			osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy), SDL_JoystickNumBalls(joy));
 			osd_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick + 1);
 			if (devinfo->sdl_state.hapdevice != nullptr)
@@ -1065,7 +1084,9 @@ public:
 			}
 
 			// loop over all buttons
-			for (int button = 0; button < SDL_JoystickNumButtons(joy); button++)
+			if (SDL_JoystickNumButtons(joy) > MAX_BUTTONS)
+				osd_printf_verbose("Joystick:   ...  Has %d buttons which exceeds supported %d buttons\n", SDL_JoystickNumButtons(joy), MAX_BUTTONS);
+			for (int button = 0; (button < MAX_BUTTONS) && (button < SDL_JoystickNumButtons(joy)); button++)
 			{
 				input_item_id itemid;
 
@@ -1151,6 +1172,9 @@ private:
 	sdl_joystick_device* create_joystick_device(running_machine &machine, device_map_t *devmap, int index, input_device_class devclass)
 	{
 		char tempname[20];
+		char guid_str[256];
+		SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(m_joy_map.map[index].physical);
+		SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str)-1);
 
 		if (devmap->map[index].name.empty())
 		{
@@ -1159,16 +1183,16 @@ private:
 			{
 				snprintf(tempname, ARRAY_LENGTH(tempname), "NC%d", index);
 				m_sixaxis_mode
-					? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, tempname, tempname, *this)
-					: devicelist()->create_device<sdl_joystick_device>(machine, tempname, tempname, *this);
+					? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, tempname, guid_str, *this)
+					: devicelist()->create_device<sdl_joystick_device>(machine, tempname, guid_str, *this);
 			}
 
 			return nullptr;
 		}
 
 		return m_sixaxis_mode
-			? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, devmap->map[index].name.c_str(), devmap->map[index].name.c_str(), *this)
-			: devicelist()->create_device<sdl_joystick_device>(machine, devmap->map[index].name.c_str(), devmap->map[index].name.c_str(), *this);
+			? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, devmap->map[index].name.c_str(), guid_str, *this)
+			: devicelist()->create_device<sdl_joystick_device>(machine, devmap->map[index].name.c_str(), guid_str, *this);
 	}
 };
 

@@ -113,13 +113,13 @@ private:
 	DECLARE_WRITE8_MEMBER( bank_w );
 	DECLARE_WRITE8_MEMBER( dint_w );
 	DECLARE_WRITE8_MEMBER( dvint_clr_w );
-	DECLARE_WRITE8_MEMBER( misc_ppi_pa_w );
-	DECLARE_WRITE8_MEMBER( misc_ppi_pc_w );
-	DECLARE_READ8_MEMBER( rtc_ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( rtc_ppi_pa_w );
-	DECLARE_WRITE8_MEMBER( rtc_ppi_pb_w );
-	DECLARE_READ8_MEMBER( rtc_ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( rtc_ppi_pc_w );
+	void misc_ppi_pa_w(uint8_t data);
+	void misc_ppi_pc_w(uint8_t data);
+	uint8_t rtc_ppi_pa_r();
+	void rtc_ppi_pa_w(uint8_t data);
+	void rtc_ppi_pb_w(uint8_t data);
+	uint8_t rtc_ppi_pc_r();
+	void rtc_ppi_pc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( kb_rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_txrdy_w );
@@ -146,9 +146,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_sio_clock);
 	DECLARE_WRITE_LINE_MEMBER(pic_int_w);
-	DECLARE_WRITE8_MEMBER(disp_ppi_pc_w);
-	DECLARE_WRITE8_MEMBER(m6502_ppi_pc_w);
-	DECLARE_READ8_MEMBER(misc_ppi_pc_r);
+	void disp_ppi_pc_w(uint8_t data);
+	void m6502_ppi_pc_w(uint8_t data);
+	uint8_t misc_ppi_pc_r();
 	IRQ_CALLBACK_MEMBER(v1050_int_ack);
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);

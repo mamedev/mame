@@ -24,13 +24,13 @@ Todo:
 
 WRITE8_MEMBER(glass_state::shareram_w)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
 }
 
 READ8_MEMBER(glass_state::shareram_r)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
 }
 
@@ -259,6 +259,7 @@ void glass_state::glass_ds5002fp(machine_config &config)
 	glass(config);
 	gaelco_ds5002fp_device &ds5002fp(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2)); /* verified on pcb */
 	ds5002fp.set_addrmap(0, &glass_state::mcu_hostmem_map);
+	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 }
 
 ROM_START( glass ) /* Version 1.1 */

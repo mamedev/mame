@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::ld_get_bg_tile_info)
 {
 	int const tile = m_vram[1][2 * tile_index] & 0x1fff;
 	int const color = m_vram[1][2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,color & 0xf,
 			TILE_FLIPYX((color & 0x60) >> 5));
 }
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::ld_get_fg_tile_info)
 {
 	int const tile = m_vram[0][2 * tile_index] & 0x1fff;
 	int const color = m_vram[0][2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			tile,
 			color & 0xf,
 			TILE_FLIPYX((color & 0x60) >> 5));
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_bg_tile_info)
 {
 	int const tile = m_vram[1][tile_index] & 0x1fff;
 	int const color = m_vram[1][tile_index + 0x0800];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color & 0xf,
 			TILE_FLIPYX((color & 0x60) >> 5));
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_fg_tile_info)
 {
 	int const tile = m_vram[0][tile_index] & 0x1fff;
 	int const color = m_vram[0][tile_index + 0x0800];
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			tile,
 			color & 0xf,
 			TILE_FLIPYX((color & 0x60) >> 5));
@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(lastduel_state::get_fix_info)
 {
 	int const tile = m_txram[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile & 0x7ff,
 			tile>>12,
 			(tile & 0x800) ? TILE_FLIPY : 0);
@@ -78,9 +78,9 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_fix_info)
 
 VIDEO_START_MEMBER(lastduel_state,lastduel)
 {
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_fix_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lastduel_state::ld_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lastduel_state::ld_get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lastduel_state::get_fix_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_tilemap[0]->set_transmask(0, 0xffff, 0x0001);
 	m_tilemap[0]->set_transmask(1, 0xf07f, 0x0f81);
@@ -93,9 +93,9 @@ VIDEO_START_MEMBER(lastduel_state,lastduel)
 
 VIDEO_START_MEMBER(lastduel_state,madgear)
 {
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_fix_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lastduel_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lastduel_state::get_fg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lastduel_state::get_fix_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_tilemap[0]->set_transmask(0, 0xffff, 0x8000);
 	m_tilemap[0]->set_transmask(1, 0x80ff, 0xff00);

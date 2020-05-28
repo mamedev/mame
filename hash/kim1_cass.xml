@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="kim1_cass" description="KIM-1 cassettes">
 
@@ -13,7 +16,7 @@
 		<!-- Typed in from book -->
 		<part name="cass" interface="kim1_cass">
 			<dataarea name="cass" size="22961384">
-				<rom name="microchess (1976)(micro-ware ltd).wav" size="22961384" crc="e4eb54e3" sha1="44037ea1e736e9ea9336093cc8abc7dc23cc567a" offset="0" />
+				<rom name="microchess (1976)(micro-ware ltd).wav" size="22961384" crc="e4eb54e3" sha1="44037ea1e736e9ea9336093cc8abc7dc23cc567a"/>
 			</dataarea>
 		</part>
 	</software>

@@ -40,10 +40,10 @@ public:
 	void kim1(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(kim1_u2_read_a);
-	DECLARE_WRITE8_MEMBER(kim1_u2_write_a);
-	DECLARE_READ8_MEMBER(kim1_u2_read_b);
-	DECLARE_WRITE8_MEMBER(kim1_u2_write_b);
+	uint8_t kim1_u2_read_a();
+	void kim1_u2_write_a(uint8_t data);
+	uint8_t kim1_u2_read_b();
+	void kim1_u2_write_b(uint8_t data);
 
 	// device overrides
 	virtual void machine_start() override;

@@ -52,8 +52,8 @@ private:
 	DECLARE_WRITE8_MEMBER(nova2001_bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(ninjakun_bg_videoram_w);
 	DECLARE_READ8_MEMBER(ninjakun_bg_videoram_r);
-	DECLARE_WRITE8_MEMBER(scroll_x_w);
-	DECLARE_WRITE8_MEMBER(scroll_y_w);
+	void scroll_x_w(u8 data);
+	void scroll_y_w(u8 data);
 	DECLARE_WRITE8_MEMBER(nova2001_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(pkunwar_flipscreen_w);
 

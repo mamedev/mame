@@ -32,20 +32,11 @@
 #include <utility>
 #include <vector>
 
-// Generate a N-bit mask at compile time.  N better be constant.
-// Works even for signed types
-
-template<typename T> constexpr T make_bitmask(unsigned int N)
-{
-	return T((N < (8 * sizeof(T)) ? (std::make_unsigned_t<T>(1) << N) : std::make_unsigned_t<T>(0)) - 1);
-}
-
-
 // ======================> simple_list
 
 // a simple_list is a singly-linked list whose 'next' pointer is owned
 // by the object
-template<class _ElementType>
+template<class ElementType>
 class simple_list final
 {
 public:
@@ -53,36 +44,31 @@ public:
 	{
 	public:
 		typedef int difference_type;
-		typedef _ElementType value_type;
-		typedef _ElementType *pointer;
-		typedef _ElementType &reference;
+		typedef ElementType value_type;
+		typedef ElementType *pointer;
+		typedef ElementType &reference;
 		typedef std::forward_iterator_tag iterator_category;
 
 		// construction/destruction
 		auto_iterator() noexcept : m_current(nullptr) { }
-		auto_iterator(_ElementType *ptr) noexcept : m_current(ptr) { }
+		auto_iterator(ElementType *ptr) noexcept : m_current(ptr) { }
 
 		// required operator overloads
 		bool operator==(const auto_iterator &iter) const noexcept { return m_current == iter.m_current; }
 		bool operator!=(const auto_iterator &iter) const noexcept { return m_current != iter.m_current; }
-		_ElementType &operator*() const noexcept { return *m_current; }
-		_ElementType *operator->() const noexcept { return m_current; }
-		// note that _ElementType::next() must not return a const ptr
+		ElementType &operator*() const noexcept { return *m_current; }
+		ElementType *operator->() const noexcept { return m_current; }
+		// note that ElementType::next() must not return a const ptr
 		auto_iterator &operator++() noexcept { m_current = m_current->next(); return *this; }
 		auto_iterator operator++(int) noexcept { auto_iterator result(*this); m_current = m_current->next(); return result; }
 
 	private:
 		// private state
-		_ElementType *m_current;
+		ElementType *m_current;
 	};
 
 	// construction/destruction
-	simple_list() noexcept
-		: m_head(nullptr)
-		, m_tail(nullptr)
-		, m_count(0)
-	{
-	}
+	simple_list() noexcept { }
 	~simple_list() noexcept { reset(); }
 
 	// we don't support deep copying
@@ -90,18 +76,19 @@ public:
 	simple_list &operator=(const simple_list &) = delete;
 
 	// but we do support cheap swap/move
-	simple_list(simple_list &&list) : simple_list() { operator=(std::move(list)); }
+	simple_list(simple_list &&list) noexcept { operator=(std::move(list)); }
 	simple_list &operator=(simple_list &&list)
 	{
 		using std::swap;
 		swap(m_head, list.m_head);
 		swap(m_tail, list.m_tail);
 		swap(m_count, list.m_count);
+		return *this;
 	}
 
 	// simple getters
-	_ElementType *first() const noexcept { return m_head; }
-	_ElementType *last() const noexcept { return m_tail; }
+	ElementType *first() const noexcept { return m_head; }
+	ElementType *last() const noexcept { return m_tail; }
 	int count() const noexcept { return m_count; }
 	bool empty() const noexcept { return m_count == 0; }
 
@@ -117,7 +104,7 @@ public:
 	}
 
 	// add the given object to the head of the list
-	_ElementType &prepend(_ElementType &object) noexcept
+	ElementType &prepend(ElementType &object) noexcept
 	{
 		object.m_next = m_head;
 		m_head = &object;
@@ -128,13 +115,13 @@ public:
 	}
 
 	// add the given list to the head of the list
-	void prepend_list(simple_list<_ElementType> &list) noexcept
+	void prepend_list(simple_list<ElementType> &list) noexcept
 	{
 		int count = list.count();
 		if (count == 0)
 			return;
-		_ElementType *tail = list.last();
-		_ElementType *head = list.detach_all();
+		ElementType *tail = list.last();
+		ElementType *head = list.detach_all();
 		tail->m_next = m_head;
 		m_head = head;
 		if (m_tail == nullptr)
@@ -143,7 +130,7 @@ public:
 	}
 
 	// add the given object to the tail of the list
-	_ElementType &append(_ElementType &object) noexcept
+	ElementType &append(ElementType &object) noexcept
 	{
 		object.m_next = nullptr;
 		if (m_tail != nullptr)
@@ -155,13 +142,13 @@ public:
 	}
 
 	// add the given list to the tail of the list
-	void append_list(simple_list<_ElementType> &list) noexcept
+	void append_list(simple_list<ElementType> &list) noexcept
 	{
 		int count = list.count();
 		if (count == 0)
 			return;
-		_ElementType *tail = list.last();
-		_ElementType *head = list.detach_all();
+		ElementType *tail = list.last();
+		ElementType *head = list.detach_all();
 		if (m_tail != nullptr)
 			m_tail->m_next = head;
 		else
@@ -171,7 +158,7 @@ public:
 	}
 
 	// insert the given object after a particular object (nullptr means prepend)
-	_ElementType &insert_after(_ElementType &object, _ElementType *insert_after) noexcept
+	ElementType &insert_after(ElementType &object, ElementType *insert_after) noexcept
 	{
 		if (insert_after == nullptr)
 			return prepend(object);
@@ -184,11 +171,11 @@ public:
 	}
 
 	// insert the given object before a particular object (nullptr means append)
-	_ElementType &insert_before(_ElementType &object, _ElementType *insert_before) noexcept
+	ElementType &insert_before(ElementType &object, ElementType *insert_before) noexcept
 	{
 		if (insert_before == nullptr)
 			return append(object);
-		for (_ElementType **curptr = &m_head; *curptr != nullptr; curptr = &(*curptr)->m_next)
+		for (ElementType **curptr = &m_head; *curptr != nullptr; curptr = &(*curptr)->m_next)
 			if (*curptr == insert_before)
 			{
 				object.m_next = insert_before;
@@ -202,10 +189,10 @@ public:
 	}
 
 	// replace an item in the list at the same location, and remove it
-	_ElementType &replace_and_remove(_ElementType &object, _ElementType &toreplace) noexcept
+	ElementType &replace_and_remove(ElementType &object, ElementType &toreplace) noexcept
 	{
-		_ElementType *prev = nullptr;
-		for (_ElementType *cur = m_head; cur != nullptr; prev = cur, cur = cur->m_next)
+		ElementType *prev = nullptr;
+		for (ElementType *cur = m_head; cur != nullptr; prev = cur, cur = cur->m_next)
 			if (cur == &toreplace)
 			{
 				if (prev != nullptr)
@@ -222,9 +209,9 @@ public:
 	}
 
 	// detach the head item from the list, but don't free its memory
-	_ElementType *detach_head() noexcept
+	ElementType *detach_head() noexcept
 	{
-		_ElementType *result = m_head;
+		ElementType *result = m_head;
 		if (result != nullptr)
 		{
 			m_head = result->m_next;
@@ -236,10 +223,10 @@ public:
 	}
 
 	// detach the given item from the list, but don't free its memory
-	_ElementType &detach(_ElementType &object) noexcept
+	ElementType &detach(ElementType &object) noexcept
 	{
-		_ElementType *prev = nullptr;
-		for (_ElementType *cur = m_head; cur != nullptr; prev = cur, cur = cur->m_next)
+		ElementType *prev = nullptr;
+		for (ElementType *cur = m_head; cur != nullptr; prev = cur, cur = cur->m_next)
 			if (cur == &object)
 			{
 				if (prev != nullptr)
@@ -255,34 +242,34 @@ public:
 	}
 
 	// detach the entire list, returning the head, but don't free memory
-	_ElementType *detach_all() noexcept
+	ElementType *detach_all() noexcept
 	{
-		_ElementType *result = m_head;
+		ElementType *result = m_head;
 		m_head = m_tail = nullptr;
 		m_count = 0;
 		return result;
 	}
 
 	// remove the given object and free its memory
-	void remove(_ElementType &object) noexcept
+	void remove(ElementType &object) noexcept
 	{
 		global_free(&detach(object));
 	}
 
 	// find an object by index in the list
-	_ElementType *find(int index) const noexcept
+	ElementType *find(int index) const noexcept
 	{
-		for (_ElementType *cur = m_head; cur != nullptr; cur = cur->m_next)
+		for (ElementType *cur = m_head; cur != nullptr; cur = cur->m_next)
 			if (index-- == 0)
 				return cur;
 		return nullptr;
 	}
 
 	// return the index of the given object in the list
-	int indexof(const _ElementType &object) const noexcept
+	int indexof(const ElementType &object) const noexcept
 	{
 		int index = 0;
-		for (_ElementType *cur = m_head; cur != nullptr; cur = cur->m_next)
+		for (ElementType *cur = m_head; cur != nullptr; cur = cur->m_next)
 		{
 			if (cur == &object)
 				return index;
@@ -293,49 +280,16 @@ public:
 
 private:
 	// internal state
-	_ElementType *  m_head;         // head of the singly-linked list
-	_ElementType *  m_tail;         // tail of the singly-linked list
-	int             m_count;        // number of objects in the list
-};
-
-
-// ======================> simple_list_wrapper
-
-// a simple_list_wrapper wraps an existing object with a next pointer so it
-// can live in a simple_list without requiring the object to have a next
-// pointer
-template<class _ObjectType>
-class simple_list_wrapper
-{
-public:
-	template<class U> friend class simple_list;
-
-	// construction/destruction
-	simple_list_wrapper(_ObjectType *object)
-		: m_next(nullptr),
-			m_object(object) { }
-
-	// operators
-	operator _ObjectType *() { return m_object; }
-	operator _ObjectType *() const { return m_object; }
-	_ObjectType *operator *() { return m_object; }
-	_ObjectType *operator *() const { return m_object; }
-
-	// getters
-	simple_list_wrapper *next() const { return m_next; }
-	_ObjectType *object() const { return m_object; }
-
-private:
-	// internal state
-	simple_list_wrapper *   m_next;
-	_ObjectType *           m_object;
+	ElementType *   m_head = nullptr;   // head of the singly-linked list
+	ElementType *   m_tail = nullptr;   // tail of the singly-linked list
+	int             m_count = 0;        // number of objects in the list
 };
 
 
 // ======================> fixed_allocator
 
 // a fixed_allocator is a simple class that maintains a free pool of objects
-template<class _ItemType>
+template<class ItemType>
 class fixed_allocator
 {
 	// we don't support deep copying
@@ -347,24 +301,24 @@ public:
 	fixed_allocator() { }
 
 	// allocate a new item, either by recycling an old one, or by allocating a new one
-	_ItemType *alloc()
+	ItemType *alloc()
 	{
-		_ItemType *result = m_freelist.detach_head();
+		ItemType *result = m_freelist.detach_head();
 		if (result == nullptr)
-			result = global_alloc(_ItemType);
+			result = global_alloc(ItemType);
 		return result;
 	}
 
 	// reclaim an item by adding it to the free list
-	void reclaim(_ItemType *item) { if (item != nullptr) m_freelist.append(*item); }
-	void reclaim(_ItemType &item) { m_freelist.append(item); }
+	void reclaim(ItemType *item) { if (item != nullptr) m_freelist.append(*item); }
+	void reclaim(ItemType &item) { m_freelist.append(item); }
 
 	// reclaim all items from a list
-	void reclaim_all(simple_list<_ItemType> &_list) { m_freelist.append_list(_list); }
+	void reclaim_all(simple_list<ItemType> &_list) { m_freelist.append_list(_list); }
 
 private:
 	// internal state
-	simple_list<_ItemType>  m_freelist;     // list of free objects
+	simple_list<ItemType>   m_freelist;     // list of free objects
 };
 
 
@@ -798,6 +752,7 @@ public:
 			m_mapping.insert(it);
 		assert(m_elements.size() == m_size);
 		assert(m_mapping.size() == m_size);
+		return *this;
 	}
 
 private:
@@ -975,23 +930,116 @@ constexpr typename std::enable_if_t<std::is_enum<E>::value && std::is_integral<T
 }
 
 
-// useful functions to deal with bit shuffling
+/// \defgroup bitutils Useful functions for bit shuffling
+/// \{
+
+/// \brief Generate a right-aligned bit mask
+///
+/// Generates a right aligned mask of the specified width.  Works with
+/// signed and unsigned integer types.
+/// \tparam T Desired output type.
+/// \tparam U Type of the input (generally resolved by the compiler).
+/// \param [in] n Width of the mask to generate in bits.
+/// \return Right-aligned mask of the specified width.
+
+template <typename T, typename U> constexpr T make_bitmask(U n)
+{
+	return T((n < (8 * sizeof(T)) ? (std::make_unsigned_t<T>(1) << n) : std::make_unsigned_t<T>(0)) - 1);
+}
+
+
+/// \brief Extract a single bit from an integer
+///
+/// Extracts a single bit from an integer into the least significant bit
+/// position.
+///
+/// \param [in] x The integer to extract the bit from.
+/// \param [in] n The bit to extract, where zero is the least
+///   significant bit of the input.
+/// \return Zero if the specified bit is unset, or one if it is set.
+/// \sa bitswap
 template <typename T, typename U> constexpr T BIT(T x, U n) noexcept { return (x >> n) & T(1); }
 
+
+/// \brief Extract a bit field from an integer
+///
+/// Extracts and right-aligns a bit field from an integer.
+///
+/// \param [in] x The integer to extract the bit field from.
+/// \param [in] n The least significant bit position of the field to
+///   extract, where zero is the least significant bit of the input.
+/// \param [in] w The width of the field to extract in bits.
+/// \return The field [n..(n+w-1)] from the input.
+/// \sa bitswap
+template <typename T, typename U, typename V> constexpr T BIT(T x, U n, V w)
+{
+	return (x >> n) & make_bitmask<T>(w);
+}
+
+
+/// \brief Extract and right-align a single bit field
+///
+/// This overload is used to terminate a recursive template
+/// implementation.  It is functionally equivalent to the BIT
+/// function for extracting a single bit.
+///
+/// \param [in] val The integer to extract the bit from.
+/// \param [in] b The bit to extract, where zero is the least
+///   significant bit of the input.
+/// \return The specified bit of the input extracted to the least
+///   significant position.
 template <typename T, typename U> constexpr T bitswap(T val, U b) noexcept { return BIT(val, b) << 0U; }
 
+
+/// \brief Extract bits in arbitrary order
+///
+/// Extracts bits from an integer.  Specify the bits in the order they
+/// should be arranged in the output, from most significant to least
+/// significant.  The extracted bits will be packed into a right-aligned
+/// field in the output.
+///
+/// \param [in] val The integer to extract bits from.
+/// \param [in] b The first bit to extract from the input
+///   extract, where zero is the least significant bit of the input.
+///   This bit will appear in the most significant position of the
+///   right-aligned output field.
+/// \param [in] c The remaining bits to extract, where zero is the
+///   least significant bit of the input.
+/// \return The extracted bits packed into a right-aligned field.
 template <typename T, typename U, typename... V> constexpr T bitswap(T val, U b, V... c) noexcept
 {
 	return (BIT(val, b) << sizeof...(c)) | bitswap(val, c...);
 }
 
-// explicit version that checks number of bit position arguments
+
+/// \brief Extract bits in arbitrary order with explicit count
+///
+/// Extracts bits from an integer.  Specify the bits in the order they
+/// should be arranged in the output, from most significant to least
+/// significant.  The extracted bits will be packed into a right-aligned
+/// field in the output.  The number of bits to extract must be supplied
+/// as a template argument.
+///
+/// A compile error will be generated if the number of bit positions
+/// supplied does not match the specified number of bits to extract, or
+/// if the output type is too small to hold the extracted bits.  This
+/// guards against some simple errors.
+///
+/// \tparam B The number of bits to extract.  Must match the number of
+///   bit positions supplied.
+/// \param [in] val The integer to extract bits from.
+/// \param [in] b Bits to extract, where zero is the least significant
+///   bit of the input.  Specify bits in the order they should appear in
+///   the output field, from most significant to least significant.
+/// \return The extracted bits packed into a right-aligned field.
 template <unsigned B, typename T, typename... U> T bitswap(T val, U... b) noexcept
 {
 	static_assert(sizeof...(b) == B, "wrong number of bits");
 	static_assert((sizeof(std::remove_reference_t<T>) * 8) >= B, "return type too small for result");
 	return bitswap(val, b...);
 }
+
+/// \}
 
 
 // constexpr absolute value of an integer

@@ -28,60 +28,138 @@ DEFINE_DEVICE_TYPE(TMP91641,  tmp91641_device,  "tmp91641",  "Toshiba TMP91641")
 DEFINE_DEVICE_TYPE(TMP90PH44, tmp90ph44_device, "tmp90ph44", "Toshiba TMP90PH44")
 
 
-#define T90_IOBASE  0xffc0
-
-enum e_ir
+void tlcs90_device::tmp90840_regs(address_map &map)
 {
-	T90_P0=T90_IOBASE,  T90_P1,     T90_P01CR_IRFL, T90_IRFH,   T90_P2,     T90_P2CR,   T90_P3,     T90_P3CR,
-	T90_P4,             T90_P4CR,   T90_P5,         T90_SMMOD,  T90_P6,     T90_P7,     T90_P67CR,  T90_SMCR,
-	T90_P8,             T90_P8CR,   T90_WDMOD,      T90_WDCR,   T90_TREG0,  T90_TREG1,  T90_TREG2,  T90_TREG3,
-	T90_TCLK,           T90_TFFCR,  T90_TMOD,       T90_TRUN,   T90_CAP1L,  T90_CAP1H,  T90_CAP2L,  T90_CAL2H,
-	T90_TREG4L,         T90_TREG4H, T90_TREG5L,     T90_TREG5H, T90_T4MOD,  T90_T4FFCR, T90_INTEL,  T90_INTEH,
-	T90_DMAEH,          T90_SCMOD,  T90_SCCR,       T90_SCBUF,  T90_BX,     T90_BY,     T90_ADREG,  T90_ADMOD
-};
-
+	map(0xffc0, 0xffef).rw(FUNC(tlcs90_device::reserved_r), FUNC(tlcs90_device::reserved_w));
+	//map(0xffc0, 0xffc0).rw(FUNC(tlcs90_device::p0_r), FUNC(tlcs90_device::p0_w));
+	//map(0xffc1, 0xffc1).rw(FUNC(tlcs90_device::p1_r), FUNC(tlcs90_device::p1_w));
+	//map(0xffc2, 0xffc2).rw(FUNC(tlcs90_device::irfl_r), FUNC(tlcs90_device::p01cr_w));
+	map(0xffc3, 0xffc3). /*r(FUNC(tlcs90_device::irfh_r)).*/ w(FUNC(tlcs90_device::irf_clear_w));
+	//map(0xffc4, 0xffc4).rw(FUNC(tlcs90_device::p2_r), FUNC(tlcs90_device::p2_w));
+	//map(0xffc5, 0xffc5).w(FUNC(tlcs90_device::p2cr_w));
+	map(0xffc6, 0xffc6).rw(FUNC(tlcs90_device::p3_r), FUNC(tlcs90_device::p3_w));
+	//map(0xffc7, 0xffc7).w(FUNC(tlcs90_device::p3cr_w));
+	map(0xffc8, 0xffc8).rw(FUNC(tlcs90_device::p4_r), FUNC(tlcs90_device::p4_w));
+	map(0xffc9, 0xffc9).w(FUNC(tlcs90_device::p4cr_w));
+	map(0xffca, 0xffca).r(FUNC(tlcs90_device::p5_r));
+	map(0xffcb, 0xffcb).rw(FUNC(tlcs90_device::smmod_r), FUNC(tlcs90_device::smmod_w));
+	map(0xffcc, 0xffcc).rw(FUNC(tlcs90_device::p6_r), FUNC(tlcs90_device::p6_w));
+	map(0xffcd, 0xffcd).rw(FUNC(tlcs90_device::p7_r), FUNC(tlcs90_device::p7_w));
+	map(0xffce, 0xffce).w(FUNC(tlcs90_device::p67cr_w));
+	//map(0xffcf, 0xffcf).rw(FUNC(tlcs90_device::smcr_r), FUNC(tlcs90_device::smcr_w));
+	map(0xffd0, 0xffd0).rw(FUNC(tlcs90_device::p8_r), FUNC(tlcs90_device::p8_w));
+	map(0xffd1, 0xffd1).w(FUNC(tlcs90_device::p8cr_w));
+	//map(0xffd2, 0xffd2).rw(FUNC(tlcs90_device::wdmod_r), FUNC(tlcs90_device::wdmod_w));
+	//map(0xffd3, 0xffd3).w(FUNC(tlcs90_device::wdcr_w));
+	map(0xffd4, 0xffd7).w(FUNC(tlcs90_device::treg_8bit_w));
+	map(0xffd8, 0xffd8).rw(FUNC(tlcs90_device::tclk_r), FUNC(tlcs90_device::tclk_w));
+	//map(0xffd9, 0xffd9).rw(FUNC(tlcs90_device::tffcr_r), FUNC(tlcs90_device::tffcr_w));
+	map(0xffda, 0xffda).rw(FUNC(tlcs90_device::tmod_r), FUNC(tlcs90_device::tmod_w));
+	map(0xffdb, 0xffdb).rw(FUNC(tlcs90_device::trun_r), FUNC(tlcs90_device::trun_w));
+	//map(0xffdc, 0xffdf).r(FUNC(tlcs90_device::cap_16bit_r));
+	map(0xffe0, 0xffe3).w(FUNC(tlcs90_device::treg_16bit_w));
+	map(0xffe4, 0xffe4).rw(FUNC(tlcs90_device::t4mod_r), FUNC(tlcs90_device::t4mod_w));
+	//map(0xffe5, 0xffe5).rw(FUNC(tlcs90_device::t4ffcr_r), FUNC(tlcs90_device::t4ffcr_w));
+	map(0xffe6, 0xffe6). /*r(FUNC(tlcs90_device::intel_r).*/ w(FUNC(tlcs90_device::intel_w));
+	map(0xffe7, 0xffe7). /*r(FUNC(tlcs90_device::inteh_r).*/ w(FUNC(tlcs90_device::inteh_w));
+	//map(0xffe8, 0xffe8).rw(FUNC(tlcs90_device::dmaeh_r), FUNC(tlcs90_device::dmaeh_w));
+	//map(0xffe9, 0xffe9).rw(FUNC(tlcs90_device::scmod_r), FUNC(tlcs90_device::scmod_w));
+	//map(0xffea, 0xffea).rw(FUNC(tlcs90_device::sccr_r), FUNC(tlcs90_device::sccr_w));
+	//map(0xffeb, 0xffeb).rw(FUNC(tlcs90_device::scbuf_r), FUNC(tlcs90_device::scbuf_w));
+	map(0xffec, 0xffec).rw(FUNC(tlcs90_device::bx_r), FUNC(tlcs90_device::bx_w));
+	map(0xffed, 0xffed).rw(FUNC(tlcs90_device::by_r), FUNC(tlcs90_device::by_w));
+	//map(0xffee, 0xffee).r(FUNC(tlcs90_device::adreg_r));
+	//map(0xffef, 0xffef).rw(FUNC(tlcs90_device::admod_r), FUNC(tlcs90_device::admod_w));
+}
 
 void tlcs90_device::tmp90840_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();  // 8KB ROM (internal)
 	map(0xfec0, 0xffbf).ram();  // 256b RAM (internal)
-	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+	tmp90840_regs(map);
 }
 
 void tlcs90_device::tmp90841_mem(address_map &map)
 {
-//  AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // rom-less
+//  map(0x0000, 0x1fff).rom();   // rom-less
 	map(0xfec0, 0xffbf).ram();  // 256b RAM (internal)
-	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+	tmp90840_regs(map);
 }
 
 void tlcs90_device::tmp91640_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();    // 16KB ROM (internal)
 	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
-	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+	tmp90840_regs(map);
 }
 
 void tlcs90_device::tmp91641_mem(address_map &map)
 {
-//  AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // rom-less
+//  map(0x0000, 0x3fff).rom();     // rom-less
 	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
-	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+	tmp90840_regs(map);
+}
+
+void tlcs90_device::tmp90844_regs(address_map &map)
+{
+	map(0xffc0, 0xfff7).rw(FUNC(tlcs90_device::reserved_r), FUNC(tlcs90_device::reserved_w));
+	//map(0xffc0, 0xffc0).rw(FUNC(tlcs90_device::p0_r), FUNC(tlcs90_device::p0_w));
+	//map(0xffc1, 0xffc1).w(FUNC(tlcs90_device::p0cr_w));
+	//map(0xffc2, 0xffc2).rw(FUNC(tlcs90_device::p1_r), FUNC(tlcs90_device::p1_w));
+	//map(0xffc3, 0xffc3).w(FUNC(tlcs90_device::p1cr_w));
+	//map(0xffc4, 0xffc4).rw(FUNC(tlcs90_device::p2_r), FUNC(tlcs90_device::p2_w));
+	//map(0xffc5, 0xffc5).w(FUNC(tlcs90_device::p2cr_w));
+	map(0xffc6, 0xffc6).rw(FUNC(tlcs90_device::p3_r), FUNC(tlcs90_device::p3_w));
+	//map(0xffc7, 0xffc7).w(FUNC(tlcs90_device::p3cr_w));
+	map(0xffc8, 0xffc8).rw(FUNC(tlcs90_device::p4_r), FUNC(tlcs90_device::p4_w));
+	//map(0xffc9, 0xffc9).w(FUNC(tlcs90_device::p4cr_w));
+	map(0xffca, 0xffca).r(FUNC(tlcs90_device::p5_r)) /*w(FUNC(tlcs90_device::p5_w))*/;
+	map(0xffcb, 0xffcb).rw(FUNC(tlcs90_device::p6_r), FUNC(tlcs90_device::p6_w));
+	map(0xffcc, 0xffcc).rw(FUNC(tlcs90_device::p7_r), FUNC(tlcs90_device::p7_w));
+	map(0xffcd, 0xffcd).w(FUNC(tlcs90_device::p67cr_w));
+	//map(0xffce, 0xffce).rw(FUNC(tlcs90_device::p23fr_r), FUNC(tlcs90_device::p23fr_w));
+	//map(0xffcf, 0xffcf).rw(FUNC(tlcs90_device::p4fr_r), FUNC(tlcs90_device::p4fr_w));
+	//map(0xffd0, 0xffd0).rw(FUNC(tlcs90_device::p67fr_r), FUNC(tlcs90_device::p67fr_w));
+	//map(0xffd1, 0xffd1).rw(FUNC(tlcs90_device::p25fr_r), FUNC(tlcs90_device::p25fr_w));
+	//map(0xffd2, 0xffd2).rw(FUNC(tlcs90_device::wdmod_r), FUNC(tlcs90_device::wdmod_w));
+	//map(0xffd3, 0xffd3).w(FUNC(tlcs90_device::wdcr_w));
+	map(0xffd4, 0xffd7).w(FUNC(tlcs90_device::treg_8bit_w));
+	map(0xffd8, 0xffd8).rw(FUNC(tlcs90_device::t01mod_r), FUNC(tlcs90_device::t01mod_w));
+	map(0xffd9, 0xffd9).rw(FUNC(tlcs90_device::t23mod_r), FUNC(tlcs90_device::t23mod_w));
+	//map(0xffda, 0xffda).rw(FUNC(tlcs90_device::tffcr_r), FUNC(tlcs90_device::tffcr_w));
+	//map(0xffdb, 0xffdb).rw(FUNC(tlcs90_device::trdc_r), FUNC(tlcs90_device::trdc_w));
+	map(0xffdc, 0xffdc).rw(FUNC(tlcs90_device::trun_r), FUNC(tlcs90_device::trun_w));
+	map(0xffe0, 0xffe3). /*r(FUNC(tlcs90_device::cap_16bit_r)).*/ w(FUNC(tlcs90_device::treg_16bit_w));
+	map(0xffe4, 0xffe4).rw(FUNC(tlcs90_device::t4mod_r), FUNC(tlcs90_device::t4mod_w));
+	//map(0xffe5, 0xffe5).rw(FUNC(tlcs90_device::t4ffcr_r), FUNC(tlcs90_device::t4ffcr_w));
+	//map(0xffe6, 0xffe6).rw(FUNC(tlcs90_device::scmod_r), FUNC(tlcs90_device::scmod_w));
+	//map(0xffe7, 0xffe7).rw(FUNC(tlcs90_device::sccr_r), FUNC(tlcs90_device::sccr_w));
+	//map(0xffe8, 0xffe8).rw(FUNC(tlcs90_device::scbuf_r), FUNC(tlcs90_device::scbuf_w));
+	//map(0xffe9, 0xffe9).rw(FUNC(tlcs90_device::brgcr_r), FUNC(tlcs90_device::brgcr_w));
+	map(0xffea, 0xffea). /*r(FUNC(tlcs90_device::irfl_r).*/ w(FUNC(tlcs90_device::irf_clear_w));
+	//map(0xffeb, 0xffeb).rw(FUNC(tlcs90_device::irfh_r), FUNC(tlcs90_device::p1fr_w));
+	//map(0xffef, 0xffef).rw(FUNC(tlcs90_device::status_r), FUNC(tlcs90_device::status_w));
+	//map(0xffef, 0xffef).rw(FUNC(tlcs90_device::admod_r), FUNC(tlcs90_device::admod_w));
+	//map(0xfff0, 0xfff3).r(FUNC(tlcs90_device::adreg_r));
+	map(0xfff4, 0xfff4). /*r(FUNC(tlcs90_device::intel_r).*/ w(FUNC(tlcs90_device::intel_w));
+	map(0xfff5, 0xfff5). /*r(FUNC(tlcs90_device::inteh_r).*/ w(FUNC(tlcs90_device::inteh_w));
+	//map(0xfff6, 0xfff6).rw(FUNC(tlcs90_device::dmael_r), FUNC(tlcs90_device::dmael_w));
+	//map(0xfff7, 0xfff7).rw(FUNC(tlcs90_device::dmaeh_r), FUNC(tlcs90_device::dmaeh_w));
 }
 
 void tlcs90_device::tmp90ph44_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();    // 16KB PROM (internal)
 	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
-	map(T90_IOBASE, T90_IOBASE+55).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w)); // TODO: has 8 more registers
+	tmp90844_regs(map);
 }
 
 
 tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, program_map)
-	, m_port_read_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_port_write_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_read_cb(*this)
+	, m_port_write_cb(*this)
 {
 }
 
@@ -2305,49 +2383,302 @@ FFED    BX      R/W     Reset   Description
 
 *************************************************************************************************************/
 
-READ8_MEMBER( tlcs90_device::t90_internal_registers_r )
+uint8_t tlcs90_device::p3_r()
 {
-	switch ( T90_IOBASE + offset )
+	// 7,4,1,0
+	return (m_port_latch[3] & 0x6c) | (m_port_read_cb[3]() & 0x93);
+}
+
+void tlcs90_device::p3_w(uint8_t data)
+{
+	m_port_latch[3] = data & 0x6c;
+	m_port_write_cb[3](m_port_latch[3]);
+}
+
+uint8_t tlcs90_device::p4_r()
+{
+	// only output
+	return m_port_latch[4] & 0x0f;
+}
+
+void tlcs90_device::p4_w(uint8_t data)
+{
+	m_port_latch[4] = data & 0x0f;
+	uint8_t out_mask = ~m_p4cr & 0x0f;
+	if (out_mask)
 	{
-		case T90_P3:    // 7,4,1,0
-			return (m_port_latch[3] & 0x6c) | (m_port_read_cb[3]() & 0x93);
+		m_port_write_cb[4](m_port_latch[4] & out_mask);
+	}
+}
 
-		case T90_P4:    // only output
-			return m_port_latch[4] & 0x0f;
+void tlcs90_device::p4cr_w(uint8_t data)
+{
+	m_p4cr = data;
+}
 
-		case T90_P5:
-			return (m_port_read_cb[5]() & 0x3f);
+uint8_t tlcs90_device::p5_r()
+{
+	return m_port_read_cb[5]() & 0x3f;
+}
 
-		case T90_P6:
-			return (m_port_latch[6] & 0xf0) | (m_port_read_cb[6]() & 0x0f);
+uint8_t tlcs90_device::p6_r()
+{
+	return (m_port_latch[6] & 0xf0) | (m_port_read_cb[6]() & 0x0f);
+}
 
-		case T90_P7:
-			return (m_port_latch[7] & 0xf0) | (m_port_read_cb[7]() & 0x0f);
-
-		case T90_P8:    // 2,1,0
-			return (m_port_latch[8] & 0x08) | (m_port_read_cb[8]() & 0x07);
-
-		case T90_BX:
-			return 0xf0 | (m_ixbase >> 16);
-
-		case T90_BY:
-			return 0xf0 | (m_iybase >> 16);
-
-		case T90_TMOD:
-			return m_tmod;
-
-		case T90_TCLK:
-			return m_tclk;
-
-		case T90_TRUN:
-			return m_trun;
-
-		case T90_T4MOD:
-			return m_t4mod;
+void tlcs90_device::p6_w(uint8_t data)
+{
+	m_port_latch[6] = data & 0x0f;
+	uint8_t out_mask = m_p67cr & 0x0f;
+	switch (m_smmod & 0x03)
+	{
+		case 1:
+			data &= ~0x01;
+			// add TO1 here
+			break;
+		case 2:
+		case 3:
+			data &= ~0x0f;
+			// add M0 here
+			break;
 	}
 
-	logerror("Read from unimplemented SFR at %04X\n", T90_IOBASE + offset);
+	if (out_mask)
+	{
+		m_port_write_cb[6](m_port_latch[6] & out_mask);
+	}
+}
+
+uint8_t tlcs90_device::p7_r()
+{
+	return (m_port_latch[7] & 0xf0) | (m_port_read_cb[7]() & 0x0f);
+}
+
+void tlcs90_device::p7_w(uint8_t data)
+{
+	m_port_latch[7] = data & 0x0f;
+	uint8_t out_mask = m_p67cr >> 4;
+	switch ((m_smmod >> 4) & 0x03)
+	{
+		case 1:
+			data &= ~0x01;
+			// add TO3 here
+			break;
+		case 2:
+		case 3:
+			data &= ~0x0f;
+			// add M1 here
+			break;
+	}
+
+	if (out_mask)
+	{
+		m_port_write_cb[7](m_port_latch[7] & out_mask);
+	}
+}
+
+void tlcs90_device::p67cr_w(uint8_t data)
+{
+	m_p67cr = data;
+}
+
+uint8_t tlcs90_device::p8_r()
+{
+	// 2,1,0
+	return (m_port_latch[8] & 0x08) | (m_port_read_cb[8]() & 0x07);
+}
+
+void tlcs90_device::p8_w(uint8_t data)
+{
+	m_port_latch[8] = data & 0x0f;
+	uint8_t out_mask = ~m_p8cr & 0x08;
+	if (out_mask)
+	{
+		m_port_write_cb[8](m_port_latch[8] & out_mask);
+	}
+}
+
+void tlcs90_device::p8cr_w(uint8_t data)
+{
+	m_p8cr = data;
+}
+
+uint8_t tlcs90_device::smmod_r()
+{
+	return 0x88 | m_smmod;
+}
+
+void tlcs90_device::smmod_w(uint8_t data)
+{
+	m_smmod = data;
+}
+
+uint8_t tlcs90_device::tmod_r()
+{
+	return m_tmod;
+}
+
+void tlcs90_device::tmod_w(uint8_t data)
+{
+	m_tmod = data;
+}
+
+uint8_t tlcs90_device::tclk_r()
+{
+	return m_tclk;
+}
+
+void tlcs90_device::tclk_w(uint8_t data)
+{
+	m_tclk = data;
+}
+
+uint8_t tlcs90_device::t01mod_r()
+{
+	return (m_tmod & 0x0f) << 4 | (m_tclk & 0x0f);
+}
+
+void tlcs90_device::t01mod_w(uint8_t data)
+{
+	m_tmod = (m_tmod & 0xf0) | (data & 0xf0) >> 4;
+	m_tclk = (m_tclk & 0xf0) | (data & 0x0f);
+}
+
+uint8_t tlcs90_device::t23mod_r()
+{
+	return (m_tmod & 0xf0) | (m_tclk & 0xf0) >> 4;
+}
+
+void tlcs90_device::t23mod_w(uint8_t data)
+{
+	m_tmod = (data & 0xf0) | (m_tmod & 0x0f);
+	m_tclk = (data & 0x0f) << 4 | (m_tclk & 0x0f);
+}
+
+void tlcs90_device::treg_8bit_w(offs_t offset, uint8_t data)
+{
+	m_treg_8bit[offset] = data;
+}
+
+uint8_t tlcs90_device::t4mod_r()
+{
+	return m_t4mod;
+}
+
+void tlcs90_device::t4mod_w(uint8_t data)
+{
+	m_t4mod = data;
+}
+
+void tlcs90_device::treg_16bit_w(offs_t offset, uint8_t data)
+{
+	if (util::BIT(offset, 0))
+		m_treg_16bit[offset >> 1] = (m_treg_16bit[offset >> 1] & 0x00ff) | (data << 8);
+	else
+		m_treg_16bit[offset >> 1] = (m_treg_16bit[offset >> 1] & 0xff00) | data;
+}
+
+uint8_t tlcs90_device::trun_r()
+{
+	return m_trun;
+}
+
+void tlcs90_device::trun_w(uint8_t data)
+{
+	uint8_t old = m_trun;
+
+	// Timers 0-3
+	for (int i = 0; i < 4; i++)
+	{
+		uint8_t mask = 0x20 | (1 << i);
+		if ( (old ^ data) & mask ) // if timer bit or prescaler bit changed
+		{
+			if ( (data & mask) == mask )    t90_start_timer(i);
+			else                            t90_stop_timer(i);
+		}
+	}
+
+	// Timer 4
+	uint8_t mask = 0x20 | 0x10;
+	if ( (old ^ data) & mask )
+	{
+		if ( (data & mask) == mask )    t90_start_timer4();
+		else                            t90_stop_timer4();
+	}
+
+	m_trun = data;
+}
+
+void tlcs90_device::intel_w(uint8_t data)
+{
+	m_irq_mask  &=  ~(  (1 << INTT2 ) |
+							(1 << INTT3 ) |
+							(1 << INTT4 ) |
+							(1 << INT1  ) |
+							(1 << INTT5 ) |
+							(1 << INT2  ) |
+							(1 << INTRX ) |
+							(1 << INTTX )   );
+
+	m_irq_mask  |=  ((data & 0x80) ? (1 << INTT2 ) : 0) |
+						((data & 0x40) ? (1 << INTT3 ) : 0) |
+						((data & 0x20) ? (1 << INTT4 ) : 0) |
+						((data & 0x10) ? (1 << INT1  ) : 0) |
+						((data & 0x08) ? (1 << INTT5 ) : 0) |
+						((data & 0x04) ? (1 << INT2  ) : 0) |
+						((data & 0x02) ? (1 << INTRX ) : 0) |
+						((data & 0x01) ? (1 << INTTX ) : 0) ;
+}
+
+void tlcs90_device::inteh_w(uint8_t data)
+{
+	m_irq_mask  &=  ~(  (1 << INT0 ) |
+							(1 << INTT0) |
+							(1 << INTT1)    );
+
+	m_irq_mask  |=  ((data & 0x04) ? (1 << INT0 ) : 0) |
+						((data & 0x02) ? (1 << INTT0) : 0) |
+						((data & 0x01) ? (1 << INTT1) : 0) ;
+}
+
+void tlcs90_device::irf_clear_w(uint8_t data)
+{
+	if (data >= int(INTSWI) + 2 && data < int(INTMAX) + 2)
+		clear_irq(data - 2);
+}
+
+uint8_t tlcs90_device::bx_r()
+{
+	return 0xf0 | (m_ixbase >> 16);
+}
+
+void tlcs90_device::bx_w(uint8_t data)
+{
+	m_ixbase = (data & 0xf) << 16;
+}
+
+uint8_t tlcs90_device::by_r()
+{
+	return 0xf0 | (m_iybase >> 16);
+}
+
+void tlcs90_device::by_w(uint8_t data)
+{
+	m_iybase = (data & 0xf) << 16;
+}
+
+uint8_t tlcs90_device::reserved_r(offs_t offset)
+{
+	uint16_t iobase = 0xffc0;
+	if (!machine().side_effects_disabled())
+		logerror("%04X: Read from unimplemented SFR at %04X\n", m_pc.w.l, iobase + offset);
 	return 0;
+}
+
+void tlcs90_device::reserved_w(offs_t offset, uint8_t data)
+{
+	uint16_t iobase = 0xffc0;
+	logerror("%04X: Write %02X to unimplemented SFR at %04X\n", m_pc.w.l, data, iobase + offset);
 }
 
 void tlcs90_device::t90_start_timer(int i)
@@ -2514,223 +2845,11 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 	}
 }
 
-WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
-{
-	uint8_t out_mask;
-
-	switch ( T90_IOBASE + offset )
-	{
-		case T90_TMOD:
-			m_tmod = data;
-			break;
-
-		case T90_TCLK:
-			m_tclk = data;
-			break;
-
-		case T90_TREG0:
-			m_treg_8bit[0] = data;
-			break;
-
-		case T90_TREG1:
-			m_treg_8bit[1] = data;
-			break;
-
-		case T90_TREG2:
-			m_treg_8bit[2] = data;
-			break;
-
-		case T90_TREG3:
-			m_treg_8bit[3] = data;
-			break;
-
-		case T90_T4MOD:
-			m_t4mod = data;
-			break;
-
-		case T90_TREG4L:
-			m_treg_16bit[0] = (m_treg_16bit[0] & 0xff00) | data;
-			break;
-
-		case T90_TREG4H:
-			m_treg_16bit[0] = (m_treg_16bit[0] & 0x00ff) | (data << 8);
-			break;
-
-		case T90_TREG5L:
-			m_treg_16bit[1] = (m_treg_16bit[1] & 0xff00) | data;
-			break;
-
-		case T90_TREG5H:
-			m_treg_16bit[1] = (m_treg_16bit[1] & 0x00ff) | (data << 8);
-			break;
-
-		case T90_TRUN:
-		{
-			int i;
-			uint8_t mask;
-			uint8_t old = m_trun;
-			// Timers 0-3
-			for (i = 0; i < 4; i++)
-			{
-				mask = 0x20 | (1 << i);
-				if ( (old ^ data) & mask ) // if timer bit or prescaler bit changed
-				{
-					if ( (data & mask) == mask )    t90_start_timer(i);
-					else                            t90_stop_timer(i);
-				}
-			}
-
-			// Timer 4
-			mask = 0x20 | 0x10;
-			if ( (old ^ data) & mask )
-			{
-				if ( (data & mask) == mask )    t90_start_timer4();
-				else                            t90_stop_timer4();
-			}
-
-			m_trun = data;
-			break;
-		}
-
-		case T90_INTEL:
-			m_irq_mask  &=  ~(  (1 << INTT2 ) |
-									(1 << INTT3 ) |
-									(1 << INTT4 ) |
-									(1 << INT1  ) |
-									(1 << INTT5 ) |
-									(1 << INT2  ) |
-									(1 << INTRX ) |
-									(1 << INTTX )   );
-
-			m_irq_mask  |=  ((data & 0x80) ? (1 << INTT2 ) : 0) |
-								((data & 0x40) ? (1 << INTT3 ) : 0) |
-								((data & 0x20) ? (1 << INTT4 ) : 0) |
-								((data & 0x10) ? (1 << INT1  ) : 0) |
-								((data & 0x08) ? (1 << INTT5 ) : 0) |
-								((data & 0x04) ? (1 << INT2  ) : 0) |
-								((data & 0x02) ? (1 << INTRX ) : 0) |
-								((data & 0x01) ? (1 << INTTX ) : 0) ;
-			break;
-
-		case T90_INTEH:
-			m_irq_mask  &=  ~(  (1 << INT0 ) |
-									(1 << INTT0) |
-									(1 << INTT1)    );
-
-			m_irq_mask  |=  ((data & 0x04) ? (1 << INT0 ) : 0) |
-								((data & 0x02) ? (1 << INTT0) : 0) |
-								((data & 0x01) ? (1 << INTT1) : 0) ;
-			break;
-
-		case T90_IRFH:
-			if (data >= int(INTSWI) + 2 && data < int(INTMAX) + 2)
-				clear_irq(data - 2);
-			break;
-
-		case T90_P3:
-			m_port_latch[3] = data & 0x6c;
-			m_port_write_cb[3](m_port_latch[3]);
-			break;
-
-		case T90_P4:
-			m_port_latch[4] = data & 0x0f;
-			out_mask = ~m_p4cr & 0x0f;
-			if (out_mask)
-			{
-				m_port_write_cb[4](m_port_latch[4] & out_mask);
-			}
-			break;
-
-		case T90_P6:
-			m_port_latch[6] = data & 0x0f;
-			out_mask = m_p67cr & 0x0f;
-			switch (m_smmod & 0x03)
-			{
-				case 1:
-					data &= ~0x01;
-					// add TO1 here
-					break;
-				case 2:
-				case 3:
-					data &= ~0x0f;
-					// add M0 here
-					break;
-			}
-
-			if (out_mask)
-			{
-				m_port_write_cb[6](m_port_latch[6] & out_mask);
-			}
-			break;
-
-		case T90_P7:
-			m_port_latch[7] = data & 0x0f;
-			out_mask = m_p67cr >> 4;
-			switch ((m_smmod >> 4) & 0x03)
-			{
-				case 1:
-					data &= ~0x01;
-					// add TO3 here
-					break;
-				case 2:
-				case 3:
-					data &= ~0x0f;
-					// add M1 here
-					break;
-			}
-
-			if (out_mask)
-			{
-				m_port_write_cb[7](m_port_latch[7] & out_mask);
-			}
-			break;
-
-		case T90_P8:
-			m_port_latch[8] = data & 0x0f;
-			out_mask = ~m_p8cr & 0x08;
-			if (out_mask)
-			{
-				m_port_write_cb[8](m_port_latch[8] & out_mask);
-			}
-			break;
-
-		case T90_P4CR:
-			m_p4cr = data;
-			break;
-
-		case T90_P67CR:
-			m_p67cr = data;
-			break;
-
-		case T90_P8CR:
-			m_p8cr = data;
-			break;
-
-		case T90_SMMOD:
-			m_smmod = data;
-			break;
-
-		case T90_BX:
-			m_ixbase = (data & 0xf) << 16;
-			break;
-
-		case T90_BY:
-			m_iybase = (data & 0xf) << 16;
-			break;
-
-		default:
-			logerror("Write to unimplemented SFR at %04X\n", T90_IOBASE + offset);
-			break;
-	}
-}
-
 
 void tlcs90_device::device_start()
 {
-	for (auto &cb : m_port_read_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_write_cb)
-		cb.resolve_safe();
+	m_port_read_cb.resolve_all_safe(0xff);
+	m_port_write_cb.resolve_all_safe();
 
 	save_item(NAME(m_prvpc.w.l));
 	save_item(NAME(m_pc.w.l));
@@ -2877,7 +2996,32 @@ void tlcs90_device::state_string_export(const device_state_entry &entry, std::st
 	}
 }
 
-std::unique_ptr<util::disasm_interface> tlcs90_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tmp90840_device::create_disassembler()
 {
-	return std::make_unique<tlcs90_disassembler>();
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp90841_device::create_disassembler()
+{
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp90845_device::create_disassembler()
+{
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp91640_device::create_disassembler()
+{
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp91641_device::create_disassembler()
+{
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp90ph44_device::create_disassembler()
+{
+	return std::make_unique<tmp90844_disassembler>();
 }

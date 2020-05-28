@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
 
 To investigate:
   - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GB version?
@@ -18,10 +18,6 @@ Unreleased (music source code exists, possibly no prototypes exist)
 - Katharsis
 - Hero's Quest
 
--->
-
-
-<!--
 
  Info on the PCB codes, based on Tauwasser's notes and research
 
@@ -880,7 +876,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="arthur's absolutely fun day! (usa).bin" size="1048576" crc="f03599a3" sha1="cf1323cfd3fbe8ba8c9766a87a7c68d8b7e729f9"/>
+				<rom name="arthur's absolutely fun day (usa).bin" size="1048576" crc="f03599a3" sha1="cf1323cfd3fbe8ba8c9766a87a7c68d8b7e729f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1017,7 +1013,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="austin powers - oh, behave! (europe) (en,fr,de,es,it).bin" size="4194304" crc="bf99f8cb" sha1="a5d29d48b9bc3e1fa476e475da24c2d80985188d"/>
+				<rom name="austin powers - oh, behave (europe) (en,fr,de,es,it).bin" size="4194304" crc="bf99f8cb" sha1="a5d29d48b9bc3e1fa476e475da24c2d80985188d"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -1033,7 +1029,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="austin powers - oh, behave! (usa).bin" size="4194304" crc="bb89190e" sha1="aa6cb6ab4fe083cbe0274c40bd30e0013a2f7645"/>
+				<rom name="austin powers - oh, behave (usa).bin" size="4194304" crc="bb89190e" sha1="aa6cb6ab4fe083cbe0274c40bd30e0013a2f7645"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -1049,7 +1045,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="austin powers - welcome to my underground lair! (europe) (en,fr,de,es,it).bin" size="4194304" crc="693f50da" sha1="02c7c61928ab82b4a8a07bb067d5f5ca32511df7"/>
+				<rom name="austin powers - welcome to my underground lair (europe) (en,fr,de,es,it).bin" size="4194304" crc="693f50da" sha1="02c7c61928ab82b4a8a07bb067d5f5ca32511df7"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -1065,7 +1061,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="austin powers - welcome to my underground lair! (usa).bin" size="4194304" crc="aba42b78" sha1="69b5106a124bde38184875c0dd08de437360bc14"/>
+				<rom name="austin powers - welcome to my underground lair (usa).bin" size="4194304" crc="aba42b78" sha1="69b5106a124bde38184875c0dd08de437360bc14"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -1083,7 +1079,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="azarashi sentai inazuma - dokidoki daisakusen! (japan).bin" size="1048576" crc="98f63bd4" sha1="f4278b01f445562d17a9a2fd8dd5c9bc9d32008e"/>
+				<rom name="azarashi sentai inazuma - dokidoki daisakusen (japan).bin" size="1048576" crc="98f63bd4" sha1="f4278b01f445562d17a9a2fd8dd5c9bc9d32008e"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -1263,7 +1259,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="bakukyuu renpatsu!! super b-daman - gekitan! rising valkyrie!! (japan).bin" size="1048576" crc="5c95d5a2" sha1="952933a658f0b4182619e7184f49aa4a47fc5f84"/>
+				<rom name="bakukyuu renpatsu super b-daman - gekitan rising valkyrie (japan).bin" size="1048576" crc="5c95d5a2" sha1="952933a658f0b4182619e7184f49aa4a47fc5f84"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -2074,7 +2070,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="bob the builder - fix it fun! (europe) (en,fr,de,es,nl).bin" size="1048576" crc="ea33fe3d" sha1="167561998c356253c7092ad200dd1bc5386446a7"/>
+				<rom name="bob the builder - fix it fun (europe) (en,fr,de,es,nl).bin" size="1048576" crc="ea33fe3d" sha1="167561998c356253c7092ad200dd1bc5386446a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2122,7 +2118,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="bob the builder - fix it fun! (usa).bin" size="1048576" crc="93fa37bd" sha1="68bd9a1932d4e5333ab5b4dfe0d28f126e5d470f"/>
+				<rom name="bob the builder - fix it fun (usa).bin" size="1048576" crc="93fa37bd" sha1="68bd9a1932d4e5333ab5b4dfe0d28f126e5d470f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2353,7 +2349,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="bouken! dondoko-tou (japan).bin" size="2097152" crc="5fe759c7" sha1="c054abfea01a3ceb7b20b27e7ea937abe5157834"/>
+				<rom name="bouken dondoko-tou (japan).bin" size="2097152" crc="5fe759c7" sha1="c054abfea01a3ceb7b20b27e7ea937abe5157834"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -3141,7 +3137,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="chibi maruko-chan - go chounai minna de game dayo! (japan).bin" size="1048576" crc="20faa0d1" sha1="31a0e557b36382f260a8297226e14737217c9763"/>
+				<rom name="chibi maruko-chan - go chounai minna de game dayo (japan).bin" size="1048576" crc="20faa0d1" sha1="31a0e557b36382f260a8297226e14737217c9763"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -3572,7 +3568,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="daa! daa! daa! - totsuzen card de battle de uranai de! (japan).bin" size="1048576" crc="f41bb392" sha1="b716720f25ec84fa51181125494a009345d0b20f"/>
+				<rom name="daa daa daa - totsuzen card de battle de uranai de (japan).bin" size="1048576" crc="f41bb392" sha1="b716720f25ec84fa51181125494a009345d0b20f"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -4006,7 +4002,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="denki blocks! (europe) (en,fr,de,es,it).bin" size="1048576" crc="38f00974" sha1="cf4037db23525937e6dceea7343a9ea7a22f928d"/>
+				<rom name="denki blocks (europe) (en,fr,de,es,it).bin" size="1048576" crc="38f00974" sha1="cf4037db23525937e6dceea7343a9ea7a22f928d"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -4024,7 +4020,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="densha de go! (japan).bin" size="4194304" crc="14375072" sha1="9661a5cfa2dc4fedbca1f15b69cf81a3fc7fc097"/>
+				<rom name="densha de go (japan).bin" size="4194304" crc="14375072" sha1="9661a5cfa2dc4fedbca1f15b69cf81a3fc7fc097"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -4287,7 +4283,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="dokapon! - millennium quest (japan).bin" size="2097152" crc="4fe9e966" sha1="2ac27b1f9b8821fcf1cb4bf347156e29dcde689c"/>
+				<rom name="dokapon - millennium quest (japan).bin" size="2097152" crc="4fe9e966" sha1="2ac27b1f9b8821fcf1cb4bf347156e29dcde689c"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -4305,7 +4301,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="doki x doki sasete!! (japan).bin" size="2097152" crc="19a73f60" sha1="d2d424bdd151222aa8316db1fd1df2cafcb3a15d"/>
+				<rom name="doki x doki sasete (japan).bin" size="2097152" crc="19a73f60" sha1="d2d424bdd151222aa8316db1fd1df2cafcb3a15d"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -4359,7 +4355,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="donald duck - daisy o sukue! (japan).bin" size="4194304" crc="333c124c" sha1="46ecfe890cb225563bcd45f8607962840b5fd587"/>
+				<rom name="donald duck - daisy o sukue (japan).bin" size="4194304" crc="333c124c" sha1="46ecfe890cb225563bcd45f8607962840b5fd587"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6264,7 +6260,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="from tv animation one piece - yume no luffy kaizokudan tanjou! (japan) (rev. a).bin" size="4194304" crc="a4dde805" sha1="53da28b16a4bf0efab1f65c21f7931ce4948865b"/>
+				<rom name="from tv animation one piece - yume no luffy kaizokudan tanjou (japan) (rev. a).bin" size="4194304" crc="a4dde805" sha1="53da28b16a4bf0efab1f65c21f7931ce4948865b"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6598,7 +6594,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="ganbare goemon - hoshizorashi dynamites arawaru!! (japan).bin" size="1048576" crc="2ea8d9d4" sha1="fc44dd6ac4a91ab32dc7096a364406433b48b7d8"/>
+				<rom name="ganbare goemon - hoshizorashi dynamites arawaru (japan).bin" size="1048576" crc="2ea8d9d4" sha1="fc44dd6ac4a91ab32dc7096a364406433b48b7d8"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6616,7 +6612,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="ganbare goemon - mononoke douchuu tobisuise nabebugyou! (japan).bin" size="2097152" crc="73311cfa" sha1="4bc3928f3528a2c566b09613e538253dd128864c"/>
+				<rom name="ganbare goemon - mononoke douchuu tobisuise nabebugyou (japan).bin" size="2097152" crc="73311cfa" sha1="4bc3928f3528a2c566b09613e538253dd128864c"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6652,7 +6648,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="ganbare! nippon! olympic 2000 (japan).bin" size="1048576" crc="ffd919a7" sha1="5abaac9c4cb3d06e20fcb4c9985a6c4b52e62871"/>
+				<rom name="ganbare nippon olympic 2000 (japan).bin" size="1048576" crc="ffd919a7" sha1="5abaac9c4cb3d06e20fcb4c9985a6c4b52e62871"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -7047,7 +7043,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="golf daisuki! (japan).bin" size="2097152" crc="80444a86" sha1="d245a267b1b1d056e0f5af4ba732c66c8deadde2"/>
+				<rom name="golf daisuki (japan).bin" size="2097152" crc="80444a86" sha1="d245a267b1b1d056e0f5af4ba732c66c8deadde2"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -7117,7 +7113,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="goraku ou tango! (japan).bin" size="1048576" crc="81fb43e1" sha1="1d49232763c1422a00cbb893d0f900c44a2ccf54"/>
+				<rom name="goraku ou tango (japan).bin" size="1048576" crc="81fb43e1" sha1="1d49232763c1422a00cbb893d0f900c44a2ccf54"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -7605,7 +7601,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="hamtaro - ham-hams unite! (europe) (en,fr,de,es,it).bin" size="4194304" crc="45be9d9b" sha1="047d9dedb77a448d31cd5dce23f4c3dd8714dafe"/>
+				<rom name="hamtaro - ham-hams unite (europe) (en,fr,de,es,it).bin" size="4194304" crc="45be9d9b" sha1="047d9dedb77a448d31cd5dce23f4c3dd8714dafe"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -7621,7 +7617,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="hamtaro - ham-hams unite! (usa).bin" size="2097152" crc="1271117f" sha1="9770bf59e932b41882839ce9eec033f576094fee"/>
+				<rom name="hamtaro - ham-hams unite (usa).bin" size="2097152" crc="1271117f" sha1="9770bf59e932b41882839ce9eec033f576094fee"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -8850,7 +8846,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="jet de go! (japan).bin" size="2097152" crc="20c4ccf6" sha1="97bf75afa0089ddb342ea7046b7cd113ba2c6fec"/>
+				<rom name="jet de go (japan).bin" size="2097152" crc="20c4ccf6" sha1="97bf75afa0089ddb342ea7046b7cd113ba2c6fec"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -8882,7 +8878,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="jinsei game - tomodachi takusan tsukurou yo! (japan).bin" size="1048576" crc="c8d46e99" sha1="d2c4ae3808d9a24cbd4c6c8e43184ca0ef2d8373"/>
+				<rom name="jinsei game - tomodachi takusan tsukurou yo (japan).bin" size="1048576" crc="c8d46e99" sha1="d2c4ae3808d9a24cbd4c6c8e43184ca0ef2d8373"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -9046,7 +9042,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="kaitei densetsu!! treasure world (japan).bin" size="1048576" crc="4c7258d9" sha1="fe1cba586c0ff61628e52890b5ac40d1b7c4cbee"/>
+				<rom name="kaitei densetsu treasure world (japan).bin" size="1048576" crc="4c7258d9" sha1="fe1cba586c0ff61628e52890b5ac40d1b7c4cbee"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -9215,7 +9211,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="karamuchou wa oosawagi! - okawari! (japan) (np).bin" size="1048576" crc="6c568e06" sha1="9217169dc3f42562d71a7edabc3b42e36ec8304b"/>
+				<rom name="karamuchou wa oosawagi - okawari (japan) (np).bin" size="1048576" crc="6c568e06" sha1="9217169dc3f42562d71a7edabc3b42e36ec8304b"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -9233,7 +9229,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="karamuchou wa oosawagi! - polinkies to okashina nakama-tachi (japan).bin" size="1048576" crc="dd948071" sha1="cb6079dc290ace0daafdd40353e4477e4a37c8f7"/>
+				<rom name="karamuchou wa oosawagi - polinkies to okashina nakama-tachi (japan).bin" size="1048576" crc="dd948071" sha1="cb6079dc290ace0daafdd40353e4477e4a37c8f7"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -9375,7 +9371,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="keibajou e ikou! wide (japan).bin" size="1048576" crc="710286ea" sha1="120c3888f7206ac8b06cea5e9b81dbcd87109ebf"/>
+				<rom name="keibajou e ikou wide (japan).bin" size="1048576" crc="710286ea" sha1="120c3888f7206ac8b06cea5e9b81dbcd87109ebf"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -9539,7 +9535,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="kinniku banzuke gb - chousensha wa kimida! (japan).bin" size="1048576" crc="e2e4328b" sha1="75d7e35fea257d8da4c1efcdd6ebdca020c648a6"/>
+				<rom name="kinniku banzuke gb - chousensha wa kimida (japan).bin" size="1048576" crc="e2e4328b" sha1="75d7e35fea257d8da4c1efcdd6ebdca020c648a6"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -9577,7 +9573,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="kinniku banzuke gb3 - shinseiki survival retsuden! (japan).bin" size="4194304" crc="e2f6253e" sha1="2e5d5adcdbedf45c6ebda0f90ccfa787a24c24d0"/>
+				<rom name="kinniku banzuke gb3 - shinseiki survival retsuden (japan).bin" size="4194304" crc="e2f6253e" sha1="2e5d5adcdbedf45c6ebda0f90ccfa787a24c24d0"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -10724,7 +10720,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="looney tunes - twouble! (usa) (en,fr,es).bin" size="1048576" crc="698d7be4" sha1="f08bd36a0933ac56eeed2dd235d476d3b80a1f50"/>
+				<rom name="looney tunes - twouble (usa) (en,fr,es).bin" size="1048576" crc="698d7be4" sha1="f08bd36a0933ac56eeed2dd235d476d3b80a1f50"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10738,7 +10734,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="looney tunes collector - alert! (usa) (en,fr,es).bin" size="2097152" crc="54509d24" sha1="54c4f732a8c328a9331a8a500438b1b1e9472b39"/>
+				<rom name="looney tunes collector - alert (usa) (en,fr,es).bin" size="2097152" crc="54509d24" sha1="54c4f732a8c328a9331a8a500438b1b1e9472b39"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -10754,7 +10750,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="looney tunes collector - martian alert! (europe) (en,fr,de,es,it,nl).bin" size="2097152" crc="5d85dfad" sha1="645c4cf67faf33248d2102f137a605de94305796"/>
+				<rom name="looney tunes collector - martian alert (europe) (en,fr,de,es,it,nl).bin" size="2097152" crc="5d85dfad" sha1="645c4cf67faf33248d2102f137a605de94305796"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -10794,7 +10790,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="looney tunes collector - martian revenge! (europe) (en,fr,de,es,it,nl).bin" size="2097152" crc="22952662" sha1="9e17af53ef89e2d436096c88dd293b838026b75f"/>
+				<rom name="looney tunes collector - martian revenge (europe) (en,fr,de,es,it,nl).bin" size="2097152" crc="22952662" sha1="9e17af53ef89e2d436096c88dd293b838026b75f"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11108,7 +11104,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="524288">
-				<rom name="luca no puzzle de daibouken! (japan).bin" size="524288" crc="3aebfad8" sha1="3c06fe05909ad632b761c6a1c00bc69da81aa358"/>
+				<rom name="luca no puzzle de daibouken (japan).bin" size="524288" crc="3aebfad8" sha1="3c06fe05909ad632b761c6a1c00bc69da81aa358"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11263,7 +11259,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="macross 7 - ginga no heart o furuwasero!! (japan).bin" size="2097152" crc="2b7abba4" sha1="88746c361cfbdac49e5d72807b396a6667c42229"/>
+				<rom name="macross 7 - ginga no heart o furuwasero (japan).bin" size="2097152" crc="2b7abba4" sha1="88746c361cfbdac49e5d72807b396a6667c42229"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11671,7 +11667,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="marvin strikes back! (usa) (en,fr,es).bin" size="2097152" crc="11b4788c" sha1="6e420ef902a52a5a932e0932d0aeb11c3d71fda2"/>
+				<rom name="marvin strikes back (usa) (en,fr,es).bin" size="2097152" crc="11b4788c" sha1="6e420ef902a52a5a932e0932d0aeb11c3d71fda2"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -13068,7 +13064,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="524288">
-				<rom name="montezuma's return! (europe) (en,fr,de,es,it).bin" size="524288" crc="659693de" sha1="014b174f569984360442fb2142a0e4ae09366dc4"/>
+				<rom name="montezuma's return (europe) (en,fr,de,es,it).bin" size="524288" crc="659693de" sha1="014b174f569984360442fb2142a0e4ae09366dc4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13081,7 +13077,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="524288">
-				<rom name="montezuma's return! (usa) (en,es).bin" size="524288" crc="de04772f" sha1="616bb04e0254ef2ba9e1ea629493efdcc37d807c"/>
+				<rom name="montezuma's return (usa) (en,es).bin" size="524288" crc="de04772f" sha1="616bb04e0254ef2ba9e1ea629493efdcc37d807c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13720,7 +13716,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="naminori yarou! (japan) (np).bin" size="1048576" crc="ac5e477d" sha1="d305a76307bf05f4d31d395785784ba317a9689f"/>
+				<rom name="naminori yarou (japan) (np).bin" size="1048576" crc="ac5e477d" sha1="d305a76307bf05f4d31d395785784ba317a9689f"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -14219,7 +14215,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="nisemon puzzle da mon! - feromon kyuushutsu daisakusen! (japan).bin" size="2097152" crc="2f7d62f3" sha1="8d60e4af5504fe68277e1da162e6352d8438900e"/>
+				<rom name="nisemon puzzle da mon - feromon kyuushutsu daisakusen (japan).bin" size="2097152" crc="2f7d62f3" sha1="8d60e4af5504fe68277e1da162e6352d8438900e"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -14419,7 +14415,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="ojarumaru - mangan jinja no ennichi de ojaru! (japan).bin" size="1048576" crc="d86507c9" sha1="f17175f7744f97ad4f9943c5dadd4776ad85e5cb"/>
+				<rom name="ojarumaru - mangan jinja no ennichi de ojaru (japan).bin" size="1048576" crc="d86507c9" sha1="f17175f7744f97ad4f9943c5dadd4776ad85e5cb"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -14744,7 +14740,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="pia carrot e youkoso!! 2.2 (japan).bin" size="4194304" crc="2267360b" sha1="e18cd437c52ca37c6c13ba71e0bd50f1b517a8d6"/>
+				<rom name="pia carrot e youkoso 2.2 (japan).bin" size="4194304" crc="2267360b" sha1="e18cd437c52ca37c6c13ba71e0bd50f1b517a8d6"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -15720,7 +15716,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="pokemon card gb2 - gr dan sanjou! (japan).bin" size="2097152" crc="6c933a14" sha1="a7e12bcc5f514e3aad8de570fd511aab0a308822"/>
+				<rom name="pokemon card gb2 - gr dan sanjou (japan).bin" size="2097152" crc="6c933a14" sha1="a7e12bcc5f514e3aad8de570fd511aab0a308822"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -16853,7 +16849,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="puzzle de shoubuyo! wootama-chan (japan).bin" size="1048576" crc="73ed3042" sha1="2c8630324767675e7f3da67e3a3071c73174a47d"/>
+				<rom name="puzzle de shoubuyo wootama-chan (japan).bin" size="1048576" crc="73ed3042" sha1="2c8630324767675e7f3da67e3a3071c73174a47d"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -17214,7 +17210,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="524288">
-				<rom name="rats! (usa) (en,es).bin" size="524288" crc="17635ad1" sha1="5e423dfab8221b69a641d2e535ebfe1e3759a2e4"/>
+				<rom name="rats (usa) (en,es).bin" size="524288" crc="17635ad1" sha1="5e423dfab8221b69a641d2e535ebfe1e3759a2e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17376,7 +17372,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="524288">
-				<rom name="real pro yakyuu! - central league hen (japan).bin" size="524288" crc="afff6bb9" sha1="02c18d98a07b3af9a1d26d0c3003f8e75c81f4d9"/>
+				<rom name="real pro yakyuu - central league hen (japan).bin" size="524288" crc="afff6bb9" sha1="02c18d98a07b3af9a1d26d0c3003f8e75c81f4d9"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -17394,7 +17390,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="524288">
-				<rom name="real pro yakyuu! - pacific league hen (japan).bin" size="524288" crc="16b81c36" sha1="a7a2cd7bbb4cae171b5f2c798293afefe2882afc"/>
+				<rom name="real pro yakyuu - pacific league hen (japan).bin" size="524288" crc="16b81c36" sha1="a7a2cd7bbb4cae171b5f2c798293afefe2882afc"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -17676,7 +17672,6 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="u5" value="U5 [LVX04]" />
 			<feature name="batt" value="Batt CR2025" />
-			<feature name="slot" value="rom_huc3" />
 			<feature name="slot" value="rom_huc3" />
 			<dataarea name="rom" size="1048576">
 				<rom name="robopon - sun version (usa).bin" size="1048576" crc="32caef11" sha1="399c928a38a3901b7a1093bd61f5a4d8c05b9771"/>
@@ -18068,7 +18063,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="razmoket, les - 100% angelica (france).bin" size="1048576" crc="1d66cb29" sha1="a04285ae27def1e0b808561099cc2cb86ba94f07"/>
+				<rom name="razmoket, les - 100 angelica (france).bin" size="1048576" crc="1d66cb29" sha1="a04285ae27def1e0b808561099cc2cb86ba94f07"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18207,7 +18202,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="sabrina - the animated series - zapped! (europe) (en,fr,de).bin" size="2097152" crc="818f3af6" sha1="d2e207a07ffa7cd0cc5b168c95ad409cd3df3fa3"/>
+				<rom name="sabrina - the animated series - zapped (europe) (en,fr,de).bin" size="2097152" crc="818f3af6" sha1="d2e207a07ffa7cd0cc5b168c95ad409cd3df3fa3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18264,7 +18259,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="sakura taisen gb - geki hana kumi nyuutai! (japan).bin" size="4194304" crc="ef503d50" sha1="4e30a9b06b5048449057376c8f37b3f687fabd18"/>
+				<rom name="sakura taisen gb - geki hana kumi nyuutai (japan).bin" size="4194304" crc="ef503d50" sha1="4e30a9b06b5048449057376c8f37b3f687fabd18"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -19145,7 +19140,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="soreike! anpanman - 5-tsu no tou no ousama (japan).bin" size="1048576" crc="c9a25b0c" sha1="e3e4d1e2d1fe6d0683db9d17356080542e1a6905"/>
+				<rom name="soreike anpanman - 5-tsu no tou no ousama (japan).bin" size="1048576" crc="c9a25b0c" sha1="e3e4d1e2d1fe6d0683db9d17356080542e1a6905"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -19163,7 +19158,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="soreike! anpanman - fushigi na nikoniko album (japan).bin" size="1048576" crc="a80eeead" sha1="fe75b7b7a904ce76130d65b67d24e291ba3c2693"/>
+				<rom name="soreike anpanman - fushigi na nikoniko album (japan).bin" size="1048576" crc="a80eeead" sha1="fe75b7b7a904ce76130d65b67d24e291ba3c2693"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -19693,7 +19688,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="524288">
-				<rom name="super breakout! (europe) (en,fr,de,es,it,nl).bin" size="524288" crc="6833923d" sha1="5bd06600b35cd2b2e8d51ede6f79db76ba97e78e"/>
+				<rom name="super breakout (europe) (en,fr,de,es,it,nl).bin" size="524288" crc="6833923d" sha1="5bd06600b35cd2b2e8d51ede6f79db76ba97e78e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19706,7 +19701,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="super breakout! (usa).bin" size="1048576" crc="52f51cb5" sha1="8c795b6d8ebc3a796821a6b2879f3e5cebf9215c"/>
+				<rom name="super breakout (usa).bin" size="1048576" crc="52f51cb5" sha1="8c795b6d8ebc3a796821a6b2879f3e5cebf9215c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19782,7 +19777,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="super gals! kotobuki ran 2 (japan).bin" size="4194304" crc="e77fa0f2" sha1="a724c6dd33b84ae9120d041fc49d66692c798dd0"/>
+				<rom name="super gals kotobuki ran 2 (japan).bin" size="4194304" crc="e77fa0f2" sha1="a724c6dd33b84ae9120d041fc49d66692c798dd0"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -20003,7 +19998,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="survival kids 2 - dasshutsu!! futago shima! (japan).bin" size="1048576" crc="ab8b25d8" sha1="8fd720d5b035939b553910a3ec45c1bd052484eb"/>
+				<rom name="survival kids 2 - dasshutsu futago shima (japan).bin" size="1048576" crc="ab8b25d8" sha1="8fd720d5b035939b553910a3ec45c1bd052484eb"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -20142,7 +20137,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="sylvanian melodies - mori no nakama to odori mashi! (japan).bin" size="1048576" crc="6dd8ac91" sha1="55230e865958f7301076a4354b6b8b083a494bae"/>
+				<rom name="sylvanian melodies - mori no nakama to odori mashi (japan).bin" size="1048576" crc="6dd8ac91" sha1="55230e865958f7301076a4354b6b8b083a494bae"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -20878,7 +20873,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="tom and jerry in mouse attacks! (europe) (en,fr,de,es,it,nl,da).bin" size="2097152" crc="9d9c84f4" sha1="ff3a39ccdf4e9802b38c3095d4a2ae056defc476"/>
+				<rom name="tom and jerry in mouse attacks (europe) (en,fr,de,es,it,nl,da).bin" size="2097152" crc="9d9c84f4" sha1="ff3a39ccdf4e9802b38c3095d4a2ae056defc476"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20892,7 +20887,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="tom and jerry in mouse attacks! (usa).bin" size="2097152" crc="38ce3f76" sha1="a58215e2c6240b42779665d85484f02b79a0f9d8"/>
+				<rom name="tom and jerry in mouse attacks (usa).bin" size="2097152" crc="38ce3f76" sha1="a58215e2c6240b42779665d85484f02b79a0f9d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21316,7 +21311,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="totsugeki! papparatai (japan).bin" size="4194304" crc="0aeae8fb" sha1="4c98beab325cd058445102c85d30b3724325f2ce"/>
+				<rom name="totsugeki papparatai (japan).bin" size="4194304" crc="0aeae8fb" sha1="4c98beab325cd058445102c85d30b3724325f2ce"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -21576,7 +21571,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="tsuriiko!! (japan).bin" size="2097152" crc="6f2cbd1d" sha1="b14cc1e8aca284517d964a909736da6b4540de85"/>
+				<rom name="tsuriiko (japan).bin" size="2097152" crc="6f2cbd1d" sha1="b14cc1e8aca284517d964a909736da6b4540de85"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -21690,7 +21685,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="tweety sekaiisshuu - 80 hiki no neko o sagase! (japan).bin" size="1048576" crc="147f427a" sha1="cf04dac11119c9be4ca6e247e33b935bd0cdc62d"/>
+				<rom name="tweety sekaiisshuu - 80 hiki no neko o sagase (japan).bin" size="1048576" crc="147f427a" sha1="cf04dac11119c9be4ca6e247e33b935bd0cdc62d"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -22158,7 +22153,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="warau inu no bouken - silly go lucky! (japan).bin" size="1048576" crc="e93f1582" sha1="3c337b71aeba3b937caada4c84f2b29add517d03"/>
+				<rom name="warau inu no bouken - silly go lucky (japan).bin" size="1048576" crc="e93f1582" sha1="3c337b71aeba3b937caada4c84f2b29add517d03"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -22655,7 +22650,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="woody woodpecker no go! go! racing (japan).bin" size="1048576" crc="f59daa99" sha1="42d841bdead319aa43d6bc09d88b4c32b4304ced"/>
+				<rom name="woody woodpecker no go go racing (japan).bin" size="1048576" crc="f59daa99" sha1="42d841bdead319aa43d6bc09d88b4c32b4304ced"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -23148,7 +23143,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="yu-gi-oh! - dark duel stories (usa).bin" size="4194304" crc="803a56ae" sha1="1952d343bdfb5625bd23a8569cde6fd61a911502"/>
+				<rom name="yu-gi-oh - dark duel stories (usa).bin" size="4194304" crc="803a56ae" sha1="1952d343bdfb5625bd23a8569cde6fd61a911502"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -23166,7 +23161,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="yu-gi-oh! - monster capsule gb (japan).bin" size="1048576" crc="1371e872" sha1="4ed5607dd83ebe7975c492b08d36870f8dd6e302"/>
+				<rom name="yu-gi-oh - monster capsule gb (japan).bin" size="1048576" crc="1371e872" sha1="4ed5607dd83ebe7975c492b08d36870f8dd6e302"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -23190,7 +23185,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="yu-gi-oh! duel monsters 4 - saikyou kettousha senki - jounouchi deck (japan).bin" size="4194304" crc="298bd054" sha1="2fdf56c2b52ba83fee778f3c2961a90ab69ea899"/>
+				<rom name="yu-gi-oh duel monsters 4 - saikyou kettousha senki - jounouchi deck (japan).bin" size="4194304" crc="298bd054" sha1="2fdf56c2b52ba83fee778f3c2961a90ab69ea899"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -23208,7 +23203,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="yu-gi-oh! duel monsters 4 - saikyou kettousha senki - kaiba deck (japan).bin" size="4194304" crc="a4d06001" sha1="ee769a23750e48c5ba4949f83236b18814316de2"/>
+				<rom name="yu-gi-oh duel monsters 4 - saikyou kettousha senki - kaiba deck (japan).bin" size="4194304" crc="a4d06001" sha1="ee769a23750e48c5ba4949f83236b18814316de2"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -23232,7 +23227,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="yu-gi-oh! duel monsters 4 - saikyou kettousha senki - yuugi deck (japan).bin" size="4194304" crc="4d6105f6" sha1="3199283039089fdf1e1b3cbb5b95fe7b26c6765f"/>
+				<rom name="yu-gi-oh duel monsters 4 - saikyou kettousha senki - yuugi deck (japan).bin" size="4194304" crc="4d6105f6" sha1="3199283039089fdf1e1b3cbb5b95fe7b26c6765f"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -23279,7 +23274,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="yu-gi-oh! duel monsters iii - sanseisenshin kourin (japan).bin" size="4194304" crc="9f9dbab4" sha1="dc4753a2f12360d921a147287673b4448394a9d3"/>
+				<rom name="yu-gi-oh duel monsters iii - sanseisenshin kourin (japan).bin" size="4194304" crc="9f9dbab4" sha1="dc4753a2f12360d921a147287673b4448394a9d3"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -23300,7 +23295,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="slot" value="rom_mbc5" />
 			<feature name="rumble" value="yes" />
 			<dataarea name="rom" size="1048576">
-				<rom name="zebco fishing! (usa).bin" size="1048576" crc="3cc6b1f9" sha1="9b6c536b403c62af102e3800658c9dec258be249"/>
+				<rom name="zebco fishing (usa).bin" size="1048576" crc="3cc6b1f9" sha1="9b6c536b403c62af102e3800658c9dec258be249"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23412,7 +23407,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="zen-nihon shounen soccer taikai - mezase nihon ichi! (japan).bin" size="2097152" crc="efad8b34" sha1="bffe5fdb803f0872d1c0de9d152eb626c5b36147"/>
+				<rom name="zen-nihon shounen soccer taikai - mezase nihon ichi (japan).bin" size="2097152" crc="efad8b34" sha1="bffe5fdb803f0872d1c0de9d152eb626c5b36147"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -23460,7 +23455,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="zoids - jashin fukkatsu! genobreaker hen (japan) (rev a).bin" size="2097152" crc="96461918" sha1="bfe8cdb8a8da37d5c8d9db57e8a5eeedee24d4cc"/>
+				<rom name="zoids - jashin fukkatsu genobreaker hen (japan) (rev a).bin" size="2097152" crc="96461918" sha1="bfe8cdb8a8da37d5c8d9db57e8a5eeedee24d4cc"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -23478,7 +23473,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="zoids - jashin fukkatsu! genobreaker hen (japan).bin" size="2097152" crc="f36c874d" sha1="4ddb1d66d909d453374bd195a4a7dbe328ed41be"/>
+				<rom name="zoids - jashin fukkatsu genobreaker hen (japan).bin" size="2097152" crc="f36c874d" sha1="4ddb1d66d909d453374bd195a4a7dbe328ed41be"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -26121,7 +26116,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="pocket monsters go! go! - the pikachu nightmare (chi).bin" size="1048576" crc="202b413b" sha1="5056a38a4584192df0cee8d1dd7198fc6983c3fe"/>
+				<rom name="pocket monsters go go - the pikachu nightmare (chi).bin" size="1048576" crc="202b413b" sha1="5056a38a4584192df0cee8d1dd7198fc6983c3fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26133,7 +26128,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="pocket monsters go!go!go! (chi).bin" size="524288" crc="dd13f234" sha1="8e687d6b2439db522b238361bc2d7458296c9b62"/>
+				<rom name="pocket monsters go go go (chi).bin" size="524288" crc="dd13f234" sha1="8e687d6b2439db522b238361bc2d7458296c9b62"/>
 			</dataarea>
 		</part>
 	</software>

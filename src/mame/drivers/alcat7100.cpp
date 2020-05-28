@@ -100,7 +100,7 @@ void alcat7100_state::alcat7100(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_char_width(12);
 	crtc.set_show_border_area(false);
-	crtc.set_update_row_callback(FUNC(alcat7100_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(alcat7100_state::update_row));
 
 	AY31015(config, "uart"); // AMI S1602P
 }

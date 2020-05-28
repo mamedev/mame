@@ -76,7 +76,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C64_CURRAH_SPEECH, c64_currah_speech_cartridge_device, "c64_cs", "C64 Currah Speech")
+DEFINE_DEVICE_TYPE(C64_CURRAH_SPEECH, c64_currah_speech_cartridge_device, "c64_cspeech", "C64 Currah Speech")
 
 
 //-------------------------------------------------

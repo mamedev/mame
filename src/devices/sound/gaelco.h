@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -12,9 +13,11 @@
 
 // ======================> gaelco_gae1_device
 
+#include "dirom.h"
+
 class gaelco_gae1_device : public device_t,
 							public device_sound_interface,
-							public device_rom_interface
+							public device_rom_interface<27> // Unknown address bits
 {
 public:
 	gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);

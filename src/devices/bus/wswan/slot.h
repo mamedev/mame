@@ -1,5 +1,66 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
+/***************************************************************************
+ Bandai WonderSwan cartridge slot
+
+ 48-pin single-sided PCB edge connector
+
+ The SoC maps the following ranges to the cartridge slot:
+ * Memory  0x10000-0x1ffff  8-bit read/write (typically used for cartridge SRAM)
+                            3-cycle access on WonderSwan, 1-cycle access on WonderSwan Color
+ * Memory  0x20000-0xfffff  16-bit read-only (writes not emitted)
+ * I/O     0xc0-0xff
+
+ Pin  Name  Notes
+   1  GND
+   2  A15
+   3  A10
+   4  A11
+   5  A9
+   6  A8
+   7  A13
+   8  A14
+   9  A12
+  10  A7
+  11  A6
+  12  A5
+  13  A4
+  14  D15
+  15  D14
+  16  D7
+  17  D6
+  18  D5
+  19  D4
+  20  D3
+  21  D2
+  22  D1
+  23  D0
+  24  +3.3V
+  25  +3.3V
+  26  A0
+  27  A1
+  28  A2
+  29  A3
+  30  A19
+  31  A18
+  32  A17
+  33  A16
+  34  D8
+  35  D9
+  36  D10
+  37  D11
+  38  D12
+  39  D13
+  40  /RESET
+  41  ?       input used while authenticating cartridge
+  42  IO/M    low when accessing I/O ports
+  43  /RD
+  44  /WR
+  45  /CART   low when accessing cartridge
+  46  INT     usually used for RTC alarm interrupt
+  47  CLK     384 kHz on WonderSwan
+  48  GND
+ ***************************************************************************/
 #ifndef MAME_BUS_WSWAN_SLOT_H
 #define MAME_BUS_WSWAN_SLOT_H
 
@@ -24,7 +85,7 @@ enum
 
 // ======================> device_ws_cart_interface
 
-class device_ws_cart_interface : public device_slot_card_interface
+class device_ws_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -68,7 +129,7 @@ protected:
 
 class ws_cart_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_ws_cart_interface>
 {
 public:
 	// construction/destruction
@@ -87,7 +148,18 @@ public:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return true; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "wswan_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "ws,wsc,bin"; }
+
+	// slot interface overrides
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
 	int get_is_rotated() { return m_cart->get_is_rotated(); }
@@ -95,18 +167,6 @@ public:
 	void internal_header_logging(uint8_t *ROM, uint32_t offs, uint32_t len);
 
 	void save_nvram()   { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
-
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 1; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "wswan_cart"; }
-	virtual const char *file_extensions() const override { return "ws,wsc,bin"; }
-
-	// slot interface overrides
-	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual uint8_t read_rom20(offs_t offset);
@@ -120,6 +180,9 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int m_type;
 	device_ws_cart_interface* m_cart;

@@ -88,6 +88,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SLEEP,                                      "1",         OPTION_BOOLEAN,    "enable sleeping, which gives time back to other applications when idle" },
 	{ OPTION_SPEED "(0.01-100)",                         "1.0",       OPTION_FLOAT,      "controls the speed of gameplay, relative to realtime; smaller numbers are slower" },
 	{ OPTION_REFRESHSPEED ";rs",                         "0",         OPTION_BOOLEAN,    "automatically adjust emulation speed to keep the emulated refresh rate slower than the host screen" },
+	{ OPTION_LOWLATENCY ";lolat",                        "0",         OPTION_BOOLEAN,    "draws new frame before throttling to reduce input latency" },
 
 	// render options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE RENDER OPTIONS" },
@@ -139,7 +140,7 @@ const options_entry emu_options::s_option_entries[] =
 
 	// input options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE INPUT OPTIONS" },
-	{ OPTION_COIN_LOCKOUT ";coinlock",                   "1",         OPTION_BOOLEAN,    "ignore coin inputs if coin lockout ouput is active" },
+	{ OPTION_COIN_LOCKOUT ";coinlock",                   "1",         OPTION_BOOLEAN,    "ignore coin inputs if coin lockout output is active" },
 	{ OPTION_CTRLR,                                      nullptr,     OPTION_STRING,     "preconfigure for specified controller" },
 	{ OPTION_MOUSE,                                      "0",         OPTION_BOOLEAN,    "enable mouse input" },
 	{ OPTION_JOYSTICK ";joy",                            "1",         OPTION_BOOLEAN,    "enable joystick input" },
@@ -236,7 +237,7 @@ namespace
 		{
 		}
 
-		virtual const char *value() const override
+		virtual const char *value() const noexcept override
 		{
 			// This is returning an empty string instead of nullptr to signify that
 			// specifying the value is a meaningful operation.  The option types that
@@ -286,7 +287,7 @@ namespace
 		{
 		}
 
-		virtual const char *value() const override
+		virtual const char *value() const noexcept override
 		{
 			const char *result = nullptr;
 			if (m_host.specified())
@@ -297,6 +298,7 @@ namespace
 				// happen in practice
 				//
 				// In reality, I want to really return std::optional<std::string> here
+				// FIXME: the std::string assignment can throw exceptions, and returning std::optional<std::string> also isn't safe in noexcept
 				m_temp = m_host.specified_value();
 				result = m_temp.c_str();
 			}
@@ -324,7 +326,7 @@ namespace
 		{
 		}
 
-		virtual const char *value() const override
+		virtual const char *value() const noexcept override
 		{
 			return m_host.value().c_str();
 		}
@@ -1054,7 +1056,7 @@ void emu_options::command_argument_processed()
 {
 	// some command line arguments require that the system name be set, so we can get slot options
 	if (command_arguments().size() == 1 && !core_iswildstr(command_arguments()[0].c_str()) &&
-		(command() == "listdevices" || (command() == "listslots") || (command() == "listmedia")))
+		(command() == "listdevices" || (command() == "listslots") || (command() == "listmedia") || (command() == "listsoftware")))
 	{
 		set_system_name(command_arguments()[0]);
 	}

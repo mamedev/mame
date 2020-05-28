@@ -58,10 +58,10 @@ private:
 	DECLARE_WRITE8_MEMBER( fdc_tc_w );
 
 	// hd6303 i/o
-	DECLARE_READ8_MEMBER( port1_r );
-	DECLARE_WRITE8_MEMBER( port1_w );
-	DECLARE_READ8_MEMBER( port2_r );
-	DECLARE_WRITE8_MEMBER( port2_w );
+	uint8_t port1_r();
+	void port1_w(uint8_t data);
+	uint8_t port2_r();
+	void port2_w(uint8_t data);
 
 	void cpu_mem(address_map &map);
 

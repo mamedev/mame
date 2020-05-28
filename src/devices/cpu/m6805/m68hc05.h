@@ -32,8 +32,14 @@ class m68hc05_device : public m6805_base_device
 {
 public:
 	//  configuration helpers
-	template <std::size_t N> auto port_r() { return m_port_cb_r[N].bind(); }
-	template <std::size_t N> auto port_w() { return m_port_cb_w[N].bind(); }
+	auto porta_r() { return m_port_cb_r[0].bind(); }
+	auto portb_r() { return m_port_cb_r[1].bind(); }
+	auto portc_r() { return m_port_cb_r[2].bind(); }
+	auto portd_r() { return m_port_cb_r[3].bind(); }
+	auto porta_w() { return m_port_cb_w[0].bind(); }
+	auto portb_w() { return m_port_cb_w[1].bind(); }
+	auto portc_w() { return m_port_cb_w[2].bind(); }
+	auto portd_w() { return m_port_cb_w[3].bind(); }
 	auto tcmp() { return m_tcmp_cb.bind(); }
 
 protected:
@@ -69,7 +75,9 @@ protected:
 		M68HC05_COPCR,
 		M68HC05_PCOP,
 		M68HC05_NCOPE,
-		M68HC05_NCOP
+		M68HC05_NCOP,
+
+		M68HC705C8A_OPTION
 	};
 
 	enum { PORT_COUNT = 4 };
@@ -109,8 +117,8 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const override;
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const override;
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override;
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -143,8 +151,8 @@ private:
 	u8      copcr_cm() const    { return m_copcr & 0x03; }
 
 	// digital I/O
-	devcb_read8         m_port_cb_r[PORT_COUNT];
-	devcb_write8        m_port_cb_w[PORT_COUNT];
+	devcb_read8::array<PORT_COUNT> m_port_cb_r;
+	devcb_write8::array<PORT_COUNT> m_port_cb_w;
 	u8                  m_port_bits[PORT_COUNT];
 	u8                  m_port_interrupt[PORT_COUNT];
 	u8                  m_port_input[PORT_COUNT];
@@ -235,6 +243,17 @@ protected:
 	virtual void device_reset() override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+private:
+	required_region_ptr<u8> m_rom;
+
+	DECLARE_READ8_MEMBER(ram0_r);
+	DECLARE_WRITE8_MEMBER(ram0_w);
+	DECLARE_READ8_MEMBER(ram1_r);
+	DECLARE_WRITE8_MEMBER(ram1_w);
+
+	u8 m_ram[0x80];
+	u8 m_option;
 };
 
 

@@ -54,6 +54,17 @@
 	end
 	
 	
+	function suite.SimpleObjectFile()
+		files { "hello.obj" }
+		prepare()
+		test.capture [[
+	<ItemGroup>
+		<Object Include="hello.obj" />
+	</ItemGroup>
+		]]
+	end
+
+
 	function suite.SimpleNoneFile()
 		files { "docs/hello.txt" }
 		prepare()

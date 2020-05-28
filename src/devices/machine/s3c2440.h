@@ -182,6 +182,8 @@ public:
 	void s3c2440_touch_screen( int state);
 	void s3c2440_request_eint( uint32_t number);
 
+	void s3c2440_uart_fifo_w(int uart, uint8_t data);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -218,14 +220,14 @@ protected:
 	void s3c24xx_video_start();
 	void bitmap_blend( bitmap_rgb32 &bitmap_dst, bitmap_rgb32 &bitmap_src_1, bitmap_rgb32 &bitmap_src_2);
 	uint32_t s3c24xx_video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	READ32_MEMBER( s3c24xx_lcd_r );
+	uint32_t s3c24xx_lcd_r(offs_t offset, uint32_t mem_mask = ~0);
 	int s3c24xx_lcd_configure_tft();
 	int s3c24xx_lcd_configure_stn();
 	int s3c24xx_lcd_configure();
 	void s3c24xx_lcd_start();
 	void s3c24xx_lcd_stop();
 	void s3c24xx_lcd_recalc();
-	WRITE32_MEMBER( s3c24xx_lcd_w );
+	void s3c24xx_lcd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	READ32_MEMBER( s3c24xx_lcd_palette_r );
 	WRITE32_MEMBER( s3c24xx_lcd_palette_w );
 	void s3c24xx_clkpow_reset();
@@ -363,7 +365,6 @@ protected:
 	void s3c24xx_device_reset();
 	void s3c24xx_device_start();
 
-	void s3c2440_uart_fifo_w( int uart, uint8_t data);
 	void s3c2440_request_irq( uint32_t int_type);
 
 private:
@@ -603,9 +604,10 @@ private:
 	};
 
 	// internal state
-	required_device<device_t> m_cpu;
+	required_device<arm7_cpu_device> m_cpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	memory_access<24, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
 
 	uint8_t m_steppingstone[4*1024];
 	memcon_t m_memcon;

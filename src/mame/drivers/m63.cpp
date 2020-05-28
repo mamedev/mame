@@ -200,8 +200,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin2_w);
 	DECLARE_WRITE8_MEMBER(snd_irq_w);
 	DECLARE_WRITE8_MEMBER(snddata_w);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	void p1_w(uint8_t data);
+	void p2_w(uint8_t data);
 	DECLARE_READ8_MEMBER(snd_status_r);
 	DECLARE_READ_LINE_MEMBER(irq_r);
 	DECLARE_READ8_MEMBER(snddata_r);
@@ -323,20 +323,20 @@ TILE_GET_INFO_MEMBER(m63_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] | ((attr & 0x30) << 4);
 	int color = (attr & 0x0f) + (m_pal_bank << 4);
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(m63_state::get_fg_tile_info)
 {
 	int code = m_videoram2[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, m_fg_flag);
+	tileinfo.set(0, code, 0, m_fg_flag);
 }
 
 VIDEO_START_MEMBER(m63_state,m63)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m63_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m63_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m63_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m63_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_cols(32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -425,12 +425,12 @@ WRITE8_MEMBER(m63_state::snddata_w)
 		m_sound_status = offset;
 }
 
-WRITE8_MEMBER(m63_state::p1_w)
+void m63_state::p1_w(uint8_t data)
 {
 	m_p1 = data;
 }
 
-WRITE8_MEMBER(m63_state::p2_w)
+void m63_state::p2_w(uint8_t data)
 {
 	m_p2 = data;
 	if((m_p2 & 0xf0) == 0x50)

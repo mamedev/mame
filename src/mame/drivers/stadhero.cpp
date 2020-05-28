@@ -6,20 +6,86 @@
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
-=== PCB Info ===
+    PCB Layout and Hardware Info by Guru
 
-  The OSC on the CPU board(DE-0303-3) is 20MHz
-  The OSC on the video board(DE-0304-3) is 24MHz
-  68000 =  20 / 2  (10)
-  6502 =   24 / 16 (1.5)
-  YM3812 = 24 / 8  (3)
-  YM2203 = 24 / 16 (1.5)
-  M6295 is driven by a 1.056MHz resonator, pin 7 is high
-  HSync = 15.6246kHz
-  VSync = 57.4434Hz
 
-TODO : RNG issue? Some behavior isn't correct (ex: BGM randomizer).
+    PCB Layouts
+    -----------
+
+    DE-0303-3    |-----------|     |------------|
+    |------------|-----------|-----|------------|-------------|
+    |                                                         |
+    |                    20MHz                           6264 |
+    |          PV-2A                                          |
+    |          (PAL)                                     X    |
+    |                                 |----|                  |
+    |    SW2                          |    |                  |
+    |                                 | 6  |             X    |
+    |J                                | 8  |                  |
+    |A                                | 0  |                  |
+    |M      EF18.7F   65C02           | 0  |           EF15.9A|
+    |M                                | 0  |                  |
+    |A      5814                      |    |                  |
+    |                                 |----|             X    |
+    |    SW1                                                  |
+    |                                  PV-1                   |
+    |       YM2203   YM3812           (PAL)  PV-0        X    |
+    |                                        (PAL)            |
+    | YM3014  YM3014 M6295                             EF13.4A|
+    | UPC3403  UPC3403  1.056MHz                              |
+    |                                                    6264 |
+    | MB3730         EF17.1E                                  |
+    |---------------------------------------------------------|
+    Notes:
+      68000  - Clock 10.000MHz [20/2]
+      65C02  - Clock 1.500MHz [24/16]
+      YM3812 - Clock 3.000MHz [24/8]
+      YM2203 - Clock 1.500MHz [24/16]
+      M6295  - Clock 1.056MHz (via resonator), pin 7 HIGH
+      YM3014 - Yamaha YM3014B Serial Input Floating D/A Converter
+      6264   - 8kx8 SRAM
+      5814   - 2kx8 SRAM
+      X      - unpopulated DIP28 socket
+      SW1/2  - 8-position DIP Switch
+      MB3730 - Fujitsu MB3730 Audio Power AMP
+      uPC3403- NEC uPC3403 High Performance Quad Operational Amplifier
+      HSync  - 15.6246kHz
+      VSync  - 57.4434Hz
+
+
+    DE-0304-3    |-----------|     |------------|
+    |------------|-----------|-----|------------|-------------|
+    |EF12.14J                                                 |
+    |                                      HM3-65728          |
+    |EF11.13J                                                 |
+    |             |--------|               HM3-65728  EF07.12A|
+    |EF10.11J     |DATAEAST|          PV-3                    |
+    |             |L7B0072 |         (PAL)            EF06.11A|
+    | 2063        |BAC 06  |                                  |
+    |             |--------|                          EF05.9A |
+    | 2063                          5814                      |
+    |           5814                                  EF04.8A |
+    |                                                         |
+    |                               5814                      |
+    |           5814                       |--------| EF03.6A |
+    |                                      |DATAEAST|         |
+    |                                      |L7B0073 | EF02.5A |
+    |                                      |MXC 06  |         |
+    |                  |--------|          |--------| EF01.4A |
+    |EF09.4J           |DATAEAST|                             |
+    |                  |TC17G042|    EF-19.3D         EF00.2A |
+    |EF08.2J           |        |                             |
+    |                  |--------|                      24MHz  |
+    |---------------------------------------------------------|
+    Notes:
+      HM3-65728 - 2kx8 SRAM
+      2063      - 8kx8 SRAM
+      5814      - 2kx8 SRAM
+
+    TODO : RNG issue? Some behavior isn't correct (ex: BGM randomizer).
     reference: https://youtu.be/6azneK6uUnA
+
+
 
 ***************************************************************************/
 
@@ -32,7 +98,6 @@ TODO : RNG issue? Some behavior isn't correct (ex: BGM randomizer).
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -41,6 +106,13 @@ TODO : RNG issue? Some behavior isn't correct (ex: BGM randomizer).
 WRITE16_MEMBER(stadhero_state::int_ack_w)
 {
 	m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
+}
+
+uint8_t stadhero_state::mystery_r()
+{
+	// Polled, very frequently at times, to randomly determine stage music
+	// selection, attract mode teams, base-stealing attempts, etc. etc.
+	return m_screen->hpos() / 2;
 }
 
 
@@ -54,7 +126,8 @@ void stadhero_state::main_map(address_map &map)
 	map(0x240010, 0x240017).w(m_tilegen, FUNC(deco_bac06_device::pf_control_1_w));
 	map(0x260000, 0x261fff).rw(m_tilegen, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 	map(0x30c000, 0x30c001).portr("INPUTS");
-	map(0x30c002, 0x30c003).lr8("30c002", [this]() { return uint8_t(m_coin->read()); });
+	map(0x30c002, 0x30c002).lr8(NAME([this] () { return uint8_t(m_coin->read()); }));
+	map(0x30c003, 0x30c003).r(FUNC(stadhero_state::mystery_r));
 	map(0x30c004, 0x30c005).portr("DSW").w(FUNC(stadhero_state::int_ack_w));
 	map(0x30c007, 0x30c007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x310000, 0x3107ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -132,11 +205,8 @@ static INPUT_PORTS_START( stadhero )
 	PORT_DIPUNUSED( 0x4000, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x8000, IP_ACTIVE_LOW )
 
-	PORT_START("COIN")  /* 0x30c002 & 0x30c003 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
+	PORT_START("COIN")  /* 0x30c002 */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )

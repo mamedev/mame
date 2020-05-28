@@ -93,8 +93,8 @@
 #define HRES_MULT                   (1)
 // end
 
-#define SC_VIDCLOCK     (14318181/2)
-#define SC_HTOTAL       (0x1C8+1)       // 456
+#define SC_VIDCLOCK     (14318000/2)
+#define SC_HTOTAL       (0x1C8+0)       // 456
 #define SC_VTOTAL       (0x103+1)       // 259
 #define SC_HBSTART      (SC_HTOTAL)
 #define SC_HBEND        (32)
@@ -138,33 +138,9 @@ public:
 	stuntcyc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		//, m_video(*this, "fixfreq")
-		, m_probe_screen(*this, "screen")
-		, m_probe_bit0(0.0)
-		, m_probe_bit1(0.0)
-		, m_probe_bit2(0.0)
-		, m_probe_bit3(0.0)
-		, m_probe_bit4(0.0)
-		, m_probe_bit5(0.0)
-		, m_probe_bit6(0.0)
-		, m_probe_data(nullptr)
-		, m_last_beam(0.0)
-		, m_last_hpos(0)
-		, m_last_vpos(0)
-		, m_last_fraction(0.0)
+		, m_video(*this, "fixfreq")
 	{
 	}
-
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit0_cb);
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit1_cb);
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit2_cb);
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit3_cb);
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit4_cb);
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit5_cb);
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit6_cb);
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_clock_cb);
-
-	uint32_t screen_update_stuntcyc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void stuntcyc(machine_config &config);
 protected:
@@ -175,23 +151,7 @@ protected:
 
 private:
 	required_device<netlist_mame_device> m_maincpu;
-	//required_device<fixedfreq_device> m_video;
-	required_device<screen_device> m_probe_screen;
-
-	int m_probe_bit0;
-	int m_probe_bit1;
-	int m_probe_bit2;
-	int m_probe_bit3;
-	int m_probe_bit4;
-	int m_probe_bit5;
-	int m_probe_bit6;
-
-	std::unique_ptr<int[]> m_probe_data;
-
-	int m_last_beam;
-	int m_last_hpos;
-	int m_last_vpos;
-	double m_last_fraction;
+	required_device<fixedfreq_device> m_video;
 };
 
 class gtrak10_state : public driver_device
@@ -236,99 +196,16 @@ void atarikee_state::video_start()
 
 void stuntcyc_state::machine_start()
 {
-	save_item(NAME(m_probe_bit0));
-	save_item(NAME(m_probe_bit1));
-	save_item(NAME(m_probe_bit2));
-	save_item(NAME(m_probe_bit3));
-	save_item(NAME(m_probe_bit4));
-	save_item(NAME(m_probe_bit5));
-	save_item(NAME(m_probe_bit6));
-	save_item(NAME(m_last_beam));
-	save_item(NAME(m_last_hpos));
-	save_item(NAME(m_last_vpos));
-	save_item(NAME(m_last_fraction));
-
-	m_probe_bit0 = 0;
-	m_probe_bit1 = 0;
-	m_probe_bit2 = 0;
-	m_probe_bit3 = 0;
-	m_probe_bit4 = 0;
-	m_probe_bit5 = 0;
-	m_probe_bit6 = 0;
-
-	m_probe_data = std::make_unique<int[]>(SC_HTOTAL * SC_VTOTAL);
 }
 
 void stuntcyc_state::machine_reset()
 {
-	m_probe_bit0 = 0;
-	m_probe_bit1 = 0;
-	m_probe_bit2 = 0;
-	m_probe_bit3 = 0;
-	m_probe_bit4 = 0;
-	m_probe_bit5 = 0;
-	m_probe_bit6 = 0;
-}
-
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit0_cb) { m_probe_bit0 = data; }
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit1_cb) { m_probe_bit1 = data; }
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit2_cb) { m_probe_bit2 = data; }
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit3_cb) { m_probe_bit3 = data; }
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit4_cb) { m_probe_bit4 = data; }
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit5_cb) { m_probe_bit5 = data; }
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit6_cb) { m_probe_bit6 = data; }
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_clock_cb)
-{
-	synchronize();
-	attotime second_fraction(0, time.attoseconds());
-	attotime frame_fraction(0, (second_fraction * 60).attoseconds());
-	attotime pixel_time = frame_fraction * (SC_HTOTAL * SC_VTOTAL);
-	int32_t pixel_index = (frame_fraction * (SC_HTOTAL * SC_VTOTAL)).seconds();
-	double pixel_fraction = ATTOSECONDS_TO_DOUBLE(pixel_time.attoseconds());
-
-	const int hpos = pixel_index % SC_HTOTAL;//m_screen->hpos();
-	const int vpos = pixel_index / SC_HTOTAL;//m_screen->vpos();
-	const int curr_index = vpos * SC_HTOTAL + hpos;
-
-	int last_index = m_last_vpos * SC_HTOTAL + m_last_hpos;
-	if (last_index != curr_index)
-	{
-		m_probe_data[last_index] = int(double(m_probe_data[last_index]) * m_last_fraction);
-		m_probe_data[last_index] += int(double(m_last_beam) * (1.0 - m_last_fraction));
-		last_index++;
-		while (last_index <= curr_index)
-			m_probe_data[last_index++] = m_last_beam;
-	}
-
-	//m_last_beam = float(data);
-	m_last_beam = m_probe_bit0 + m_probe_bit1 * 2 + m_probe_bit2 * 4 + m_probe_bit3 * 8 + m_probe_bit4 * 16 + m_probe_bit5 * 32 + m_probe_bit6 * 64;
-	m_last_hpos = hpos;
-	m_last_vpos = vpos;
-	m_last_fraction = pixel_fraction;
-}
-
-uint32_t stuntcyc_state::screen_update_stuntcyc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_last_hpos = 0;
-	m_last_vpos = 0;
-
-	uint32_t pixindex = 0;
-	for (int y = 0; y < SC_VTOTAL; y++)
-	{
-		uint32_t *scanline = &bitmap.pix32(y);
-		pixindex = y * SC_HTOTAL;
-		for (int x = 0; x < SC_HTOTAL; x++)
-			*scanline++ = 0xff000000 | (m_probe_data[pixindex++] * 0x010101);
-			//*scanline++ = 0xff000000 | (uint8_t(m_screen_buf[pixindex++] * 63.0) * 0x010101);
-	}
-
-	return 0;
 }
 
 void atarikee_state::atarikee(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_atarikee);
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_atarikee);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -347,34 +224,29 @@ void stuntcyc_state::stuntcyc(machine_config &config)
 {
 	/* basic machine hardware */
 	NETLIST_CPU(config, m_maincpu, STUNTCYC_NL_CLOCK).set_source(netlist_stuntcyc);
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw", "coinsw.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:startsw1", "START1.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:startsw2", "START2.POS", 0);
 
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit0", 0).set_params("probe_bit0", FUNC(stuntcyc_state::probe_bit0_cb));
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit1", 0).set_params("probe_bit1", FUNC(stuntcyc_state::probe_bit1_cb));
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit2", 0).set_params("probe_bit2", FUNC(stuntcyc_state::probe_bit2_cb));
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit3", 0).set_params("probe_bit3", FUNC(stuntcyc_state::probe_bit3_cb));
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit4", 0).set_params("probe_bit4", FUNC(stuntcyc_state::probe_bit4_cb));
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit5", 0).set_params("probe_bit5", FUNC(stuntcyc_state::probe_bit5_cb));
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit6", 0).set_params("probe_bit6", FUNC(stuntcyc_state::probe_bit6_cb));
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_clock", 0).set_params("probe_clock", FUNC(stuntcyc_state::probe_clock_cb));
-
-/* video hardware */
-	SCREEN(config, m_probe_screen, SCREEN_TYPE_RASTER);
-	m_probe_screen->set_screen_update(FUNC(stuntcyc_state::screen_update_stuntcyc));
-	m_probe_screen->set_raw(SC_HTOTAL*SC_VTOTAL*60, SC_HTOTAL, 0, SC_HTOTAL, SC_VTOTAL, 0, SC_VTOTAL);
-	//FIXFREQ(config, m_video).set_screen("screen");
-	//m_video->set_monitor_clock(SC_VIDCLOCK);
-	//m_video->set_horz_params(SC_HTOTAL-67,SC_HTOTAL-40,SC_HTOTAL-8, SC_HTOTAL);
-	//m_video->set_vert_params(SC_VTOTAL-22,SC_VTOTAL-19,SC_VTOTAL-12,SC_VTOTAL);
-	//m_video->set_fieldcount(1);
-	//m_video->set_threshold(0.30);
+	/* video hardware */
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(SC_VIDCLOCK);
+	m_video->set_horz_params(SC_HTOTAL-84,SC_HTOTAL-64,SC_HTOTAL-16, SC_HTOTAL);
+	m_video->set_vert_params(SC_VTOTAL-21,SC_VTOTAL-17,SC_VTOTAL-12, SC_VTOTAL);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(0.89);
+	m_video->set_gain(0.2);
+	m_video->set_horz_scale(4);
 }
 
 void gtrak10_state::gtrak10(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(netlist_gtrak10);
+	NETLIST_CPU(config, "maincpu", netlist::config::DEFAULT_CLOCK()).set_source(netlist_gtrak10);
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	/* video hardware */
 
@@ -411,6 +283,13 @@ void gtrak10_state::gtrak10(machine_config &config)
 
 static INPUT_PORTS_START( gtrak10 )
 	// TODO
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( stuntcyc )
+	PORT_START("IN0") /* fake */
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1)     NETLIST_LOGIC_PORT_CHANGED("maincpu", "coinsw")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START1)    NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_START2)    NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw2")
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -702,23 +581,23 @@ ROM_END
 
 */
 
-GAME(1975,  antiairc,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
-GAME(1975,  crashnsc,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
-GAME(1974,  gtrak10,   0,        gtrak10,  gtrak10,  gtrak10_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1974,  gtrak10a,  gtrak10,  atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K (older) [TTL]",     MACHINE_IS_SKELETON)
-GAME(1974,  gtrak20,   0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer [TTL]",    MACHINE_IS_SKELETON)
-GAME(1976,  indy4,     0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
-GAME(1975,  indy800,   0,        atarikee,       0, atarikee_state, empty_init, ROT90, "Atari/Kee",    "Indy 800 [TTL]",         MACHINE_IS_SKELETON)
-GAME(1975,  jetfight,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1) [TTL]",      MACHINE_IS_SKELETON)
-GAME(1975,  jetfighta, jetfight, atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2) [TTL]",      MACHINE_IS_SKELETON)
-GAME(1976,  lemans,    0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Le Mans [TTL]",          MACHINE_IS_SKELETON)
-GAME(1976,  outlaw,    0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Outlaw [TTL]",           MACHINE_IS_SKELETON)
-GAME(1974,  qwakttl,   0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
-GAME(1975,  sharkjaw,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Horror Games",    "Shark JAWS [TTL]",     MACHINE_IS_SKELETON)
-GAME(1975,  steeplec,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
-GAME(1976,  stuntcyc,  0,        stuntcyc,       0, stuntcyc_state, empty_init, ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
-GAME(1974,  tank,      0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank/Tank Cocktail [TTL]",     MACHINE_IS_SKELETON)
-GAME(1975,  tankii,    0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank II [TTL]",          MACHINE_IS_SKELETON)
+GAME(1975,  antiairc,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
+GAME(1975,  crashnsc,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
+GAME(1974,  gtrak10,   0,        gtrak10,   gtrak10,  gtrak10_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1974,  gtrak10a,  gtrak10,  atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K (older) [TTL]",     MACHINE_IS_SKELETON)
+GAME(1974,  gtrak20,   0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer [TTL]",    MACHINE_IS_SKELETON)
+GAME(1976,  indy4,     0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
+GAME(1975,  indy800,   0,        atarikee,        0, atarikee_state, empty_init, ROT90, "Atari/Kee",    "Indy 800 [TTL]",         MACHINE_IS_SKELETON)
+GAME(1975,  jetfight,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1) [TTL]",      MACHINE_IS_SKELETON)
+GAME(1975,  jetfighta, jetfight, atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2) [TTL]",      MACHINE_IS_SKELETON)
+GAME(1976,  lemans,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Le Mans [TTL]",          MACHINE_IS_SKELETON)
+GAME(1976,  outlaw,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Outlaw [TTL]",           MACHINE_IS_SKELETON)
+GAME(1974,  qwakttl,   0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
+GAME(1975,  sharkjaw,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Horror Games",    "Shark JAWS [TTL]",     MACHINE_IS_SKELETON)
+GAME(1975,  steeplec,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
+GAME(1976,  stuntcyc,  0,        stuntcyc, stuntcyc, stuntcyc_state, empty_init, ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
+GAME(1974,  tank,      0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank/Tank Cocktail [TTL]",     MACHINE_IS_SKELETON)
+GAME(1975,  tankii,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank II [TTL]",          MACHINE_IS_SKELETON)
 
 // MISSING ROM DUMPS
 //GAME(1975,  astrotrf,  steeplec, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Astroturf [TTL]",        MACHINE_IS_SKELETON)

@@ -85,19 +85,17 @@ private:
 	void draw_line(uint32_t *pixptr, int minx, int maxx, int line, bool last_line, u16 rowaddr, u16 rowattr, u8 scrattr);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(c000_ram_r);
-	DECLARE_WRITE8_MEMBER(c000_ram_w);
-	DECLARE_READ8_MEMBER(e0_latch_r);
-	DECLARE_WRITE8_MEMBER(e0_latch_w);
+	u8 c000_ram_r(offs_t offset);
+	void c000_ram_w(offs_t offset, u8 data);
+	u8 e0_latch_r();
+	void e0_latch_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(blink_w);
-	DECLARE_WRITE8_MEMBER(screen_control_w);
-	DECLARE_WRITE8_MEMBER(brightness_w);
+	void screen_control_w(u8 data);
+	void brightness_w(u8 data);
 
-	DECLARE_WRITE8_MEMBER(nvr_address_w);
-	DECLARE_READ8_MEMBER(nvr_data_r);
-	DECLARE_WRITE8_MEMBER(nvr_data_w);
-	DECLARE_WRITE8_MEMBER(nvr_control_w);
+	void nvr_address_w(u8 data);
+	void nvr_control_w(u8 data);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -219,25 +217,25 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 }
 
 
-READ8_MEMBER(cit101_state::c000_ram_r)
+u8 cit101_state::c000_ram_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		m_e0_latch = m_extraram[offset];
 	return m_mainram[offset];
 }
 
-WRITE8_MEMBER(cit101_state::c000_ram_w)
+void cit101_state::c000_ram_w(offs_t offset, u8 data)
 {
 	m_extraram[offset] = m_e0_latch;
 	m_mainram[offset] = data;
 }
 
-READ8_MEMBER(cit101_state::e0_latch_r)
+u8 cit101_state::e0_latch_r()
 {
 	return m_e0_latch;
 }
 
-WRITE8_MEMBER(cit101_state::e0_latch_w)
+void cit101_state::e0_latch_w(u8 data)
 {
 	m_e0_latch = data;
 }
@@ -247,7 +245,7 @@ WRITE_LINE_MEMBER(cit101_state::blink_w)
 	m_blink = state;
 }
 
-WRITE8_MEMBER(cit101_state::screen_control_w)
+void cit101_state::screen_control_w(u8 data)
 {
 	if ((m_extraram[0] & 0x06) != (data & 0x06))
 	{
@@ -270,29 +268,19 @@ WRITE8_MEMBER(cit101_state::screen_control_w)
 	m_extraram[0] = data;
 }
 
-WRITE8_MEMBER(cit101_state::brightness_w)
+void cit101_state::brightness_w(u8 data)
 {
 	// Function of upper 3 bits is unknown
 	m_brightness = pal5bit(~data & 0x1f);
 }
 
-WRITE8_MEMBER(cit101_state::nvr_address_w)
+void cit101_state::nvr_address_w(u8 data)
 {
 	m_nvr->set_address(data & 0x3f);
 	m_nvr->set_clk(BIT(data, 6));
 }
 
-READ8_MEMBER(cit101_state::nvr_data_r)
-{
-	return m_nvr->data();
-}
-
-WRITE8_MEMBER(cit101_state::nvr_data_w)
-{
-	m_nvr->set_data(data);
-}
-
-WRITE8_MEMBER(cit101_state::nvr_control_w)
+void cit101_state::nvr_control_w(u8 data)
 {
 	m_nvr->set_control(BIT(data, 5), !BIT(data, 4), BIT(data, 7), BIT(data, 6));
 }
@@ -391,8 +379,8 @@ void cit101_state::cit101(machine_config &config)
 
 	i8255_device &ppi(I8255A(config, "ppi", 0));
 	ppi.out_pa_callback().set(FUNC(cit101_state::nvr_address_w));
-	ppi.in_pb_callback().set(FUNC(cit101_state::nvr_data_r));
-	ppi.out_pb_callback().set(FUNC(cit101_state::nvr_data_w));
+	ppi.in_pb_callback().set(m_nvr, FUNC(er2055_device::data));
+	ppi.out_pb_callback().set(m_nvr, FUNC(er2055_device::set_data));
 	ppi.in_pc_callback().set("comm", FUNC(rs232_port_device::cts_r)).lshift(0);
 	ppi.in_pc_callback().append("comm", FUNC(rs232_port_device::dcd_r)).lshift(1); // tied to DSR for loopback test
 	ppi.in_pc_callback().append("comm", FUNC(rs232_port_device::ri_r)).lshift(2); // tied to CTS for loopback test

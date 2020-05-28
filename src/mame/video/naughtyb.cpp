@@ -118,7 +118,7 @@ void naughtyb_state::video_start()
 WRITE8_MEMBER(naughtyb_state::naughtyb_videoreg_w)
 {
 	// bits 4+5 control the sound circuit
-	m_naughtyb_custom->control_c_w(space,offset,data);
+	m_naughtyb_custom->control_c_w(data);
 
 	m_cocktail =
 		( ( ioport("DSW0")->read() & 0x80 ) &&  // cabinet == cocktail
@@ -130,7 +130,7 @@ WRITE8_MEMBER(naughtyb_state::naughtyb_videoreg_w)
 WRITE8_MEMBER(naughtyb_state::popflame_videoreg_w)
 {
 	// bits 4+5 control the sound circuit
-	m_popflame_custom->control_c_w(space,offset,data);
+	m_popflame_custom->control_c_w(data);
 
 	m_cocktail =
 		( ( ioport("DSW0")->read() & 0x80 ) &&  // cabinet == cocktail

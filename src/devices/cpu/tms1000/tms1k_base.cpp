@@ -79,6 +79,7 @@ tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type 
 	, m_mpla(*this, "mpla")
 	, m_ipla(*this, "ipla")
 	, m_opla(*this, "opla")
+	, m_opla_b(*this, "opla_b")
 	, m_spla(*this, "spla")
 	, m_o_pins(o_pins)
 	, m_r_pins(r_pins)
@@ -93,6 +94,7 @@ tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type 
 	, m_read_ctl(*this)
 	, m_write_ctl(*this)
 	, m_write_pdc(*this)
+	, m_decode_micro(*this)
 {
 }
 
@@ -137,6 +139,10 @@ void tms1k_base_device::device_start()
 	m_read_ctl.resolve_safe(0);
 	m_write_ctl.resolve_safe();
 	m_write_pdc.resolve_safe();
+	m_decode_micro.resolve();
+
+	if (m_opla_b != nullptr && m_output_pla_table == nullptr)
+		set_output_pla(&m_opla_b->as_u16());
 
 	// zerofill
 	m_pc = 0;

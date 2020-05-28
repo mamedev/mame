@@ -1,6 +1,28 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
+/*********************************************************************************************
+The keyboard has a sticker that proclaims it was made by Fujitsu Limited.
+
+[ASC] [ESC] [F1 ] [F2 ] [F3 ] [F4 ] [F5 ] [F6 ] [F7 ] [F8 ] [F9 ] [F10] [F11] [F11] [PRN]
+[mu°] [1 !] [2 "] [3 §] [4 $] [5 %] [6 &] [7 /] [8 (] [9 )] [0 =] [ß ?] [´ `] [BKS] [ C ]   [ 7 ] [ 8 ] [ 9 ] [<- ] [ ->]
+[ TAB ]  [ Q ] [ W ] [ E ] [ R ] [ T ] [ Z ] [ U ] [ I ] [ O ] [ P ] [ Ü ] [+ *]  [ DEL ]   [ 4 ] [ 5 ] [ 5 ] [ - ] [HOM]
+[SHIFTLOCK] [ A ] [ S ] [ D ] [ F ] [ G ] [ H ] [ J ] [ K ] [ L ] [ Ö ] [ Ä ] [# '] [RET]   [ 1 ] [ 2 ] [ 3 ] [RET] [UP ]
+[SHIFT] [2 3]  [ Y ] [ X ] [ C ] [ V ] [ B ] [ N ] [ M ] [, ;] [. :] [- _] [ Ü ]    [URN]   [    0    ] [ . ] [URN] [DWN]
+[ CTRL  ] [                    SPACE                     ]
+
+* The ASC key top left has a red LED, "Depressing the ASCII key, [...], switches off the LED indicator. This key acts as a
+  toggle between the ASCII character set, and your country's standard (NATIONAL) character set. You would use this feature if
+  you wanted to work with another character set, such as French or Spanish."
+* the mu° has the Greek lowercase mu and the degree characters
+* PRN is PRINT
+* BKS is the full word BACKSPACE
+* the C to the right of BKS has a red keycap, it deletes the complete line
+* the five direction keys are all marked with arrows, HOME being diagonally to the top left
+* SHIFTLOCK also has an LED indicator, and is released by pressing one of the SHIFT keys
+
+**********************************************************************************************/
+
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "imagedev/floppy.h"
@@ -30,6 +52,7 @@ public:
 		m_flop0(*this, "upd765:0"),
 		m_flop1(*this, "upd765:1"),
 		m_dmac(*this, "i8257"),
+		m_crtc(*this, "h46505"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_gvram(*this, "gvram"),
 		m_cvram(*this, "cvram"),
@@ -48,26 +71,28 @@ private:
 	required_device<floppy_connector> m_flop0;
 	required_device<floppy_connector> m_flop1;
 	required_device<i8257_device> m_dmac;
+	required_device<hd6845s_device> m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_gvram;
 	required_shared_ptr<uint16_t> m_cvram;
 	std::vector<uint8_t> m_charram;
 
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE16_MEMBER(charram_w);
 	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
 	DECLARE_WRITE8_MEMBER(dmapg_w);
+	DECLARE_WRITE8_MEMBER(p7c_w);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	image_init_result floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
 
-	uint8_t m_dma0pg;
+	uint8_t m_dma0pg, m_p7c;
 	void peoplepc_io(address_map &map);
 	void peoplepc_map(address_map &map);
 
@@ -95,24 +120,28 @@ MC6845_UPDATE_ROW(peoplepc_state::update_row)
 
 	for(i = 0; i < x_count; i++)
 	{
-		if(0)
+		if(BIT(m_p7c, 1))
 		{
-			uint16_t offset = ((ma | (ra << 1)) << 4) + i;
-			uint8_t data = m_gvram[offset] >> (offset & 1 ? 8 : 0);
+			uint16_t data = m_gvram[((((ma / 40) * 16) + ra) * 64) + i];
 
-			for(j = 8; j >= 0; j--)
-				bitmap.pix32(y, (i * 8) + j) = palette[( data & 1 << j ) ? 1 : 0];
+			for(j = 15; j >= 0; j--)
+				bitmap.pix32(y, (i * 16) + j) = palette[BIT(data, j)];
 		}
 		else
 		{
-			uint8_t data = m_charram[(m_cvram[(ma + i) & 0x3fff] & 0x7f) * 32 + ra];
+			uint16_t data = m_cvram[(ma + i) & 0x3fff];
+			uint8_t chr = m_charram[(data & 0x7f) * 32 + ra];
+			if(data & 0x1000)
+				chr ^= 0xff;
+			if(((data & 0x800) && (ra > 14)) || (i == cursor_x))
+				chr = 0xff;
 			for(j = 0; j < 8; j++)
-				bitmap.pix32(y, (i * 8) + j) = palette[(data & (1 << j)) ? 1 : 0];
+				bitmap.pix32(y, (i * 8) + j) = palette[BIT(chr, j)];
 		}
 	}
 }
 
-READ8_MEMBER(peoplepc_state::get_slave_ack)
+uint8_t peoplepc_state::get_slave_ack(offs_t offset)
 {
 	if (offset == 7)
 		return m_pic_1->acknowledge();
@@ -143,6 +172,12 @@ WRITE8_MEMBER(peoplepc_state::dmapg_w)
 	m_dma0pg = data;
 }
 
+WRITE8_MEMBER(peoplepc_state::p7c_w)
+{
+	m_p7c = data;
+	m_crtc->set_hpixels_per_column(BIT(data, 1) ? 16 : 8);
+}
+
 WRITE_LINE_MEMBER(peoplepc_state::tc_w)
 {
 	m_fdc->tc_w(state);
@@ -154,13 +189,13 @@ WRITE_LINE_MEMBER(peoplepc_state::hrq_w)
 	m_dmac->hlda_w(state);
 }
 
-READ8_MEMBER(peoplepc_state::memory_read_byte)
+uint8_t peoplepc_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset | (m_dma0pg << 16));
 }
 
-WRITE8_MEMBER(peoplepc_state::memory_write_byte)
+void peoplepc_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset | (m_dma0pg << 16), data);
@@ -219,6 +254,7 @@ void peoplepc_state::peoplepc_io(address_map &map)
 	map(0x006c, 0x006c).w("h46505", FUNC(mc6845_device::address_w));
 	map(0x006e, 0x006e).rw("h46505", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0070, 0x0070).w(FUNC(peoplepc_state::dmapg_w));
+	map(0x007c, 0x007c).w(FUNC(peoplepc_state::p7c_w));
 }
 
 static void peoplepc_floppies(device_slot_interface &device)
@@ -277,11 +313,11 @@ void peoplepc_state::olypeopl(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	mc6845_device &crtc(MC6845(config, "h46505", XTAL(22'000'000)/8)); // unknown variant
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(peoplepc_state::update_row), this);
+	HD6845S(config, m_crtc, XTAL(22'000'000)/8); // HD46505SP according to User's Guide
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(peoplepc_state::update_row));
 
 	I8257(config, m_dmac, XTAL(14'745'600)/3);
 	m_dmac->out_hrq_cb().set(FUNC(peoplepc_state::hrq_w));

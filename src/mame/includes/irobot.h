@@ -65,9 +65,9 @@ private:
 	DECLARE_WRITE8_MEMBER(irobot_clearfirq_w);
 	DECLARE_READ8_MEMBER(irobot_sharedmem_r);
 	DECLARE_WRITE8_MEMBER(irobot_sharedmem_w);
-	DECLARE_WRITE8_MEMBER(irobot_statwr_w);
-	DECLARE_WRITE8_MEMBER(irobot_out0_w);
-	DECLARE_WRITE8_MEMBER(irobot_rom_banksel_w);
+	void irobot_statwr_w(uint8_t data);
+	void irobot_out0_w(uint8_t data);
+	void irobot_rom_banksel_w(uint8_t data);
 	DECLARE_READ8_MEMBER(irobot_status_r);
 	DECLARE_WRITE8_MEMBER(irobot_paletteram_w);
 	DECLARE_READ8_MEMBER(quad_pokeyn_r);
@@ -102,7 +102,7 @@ private:
 	uint8_t m_outx;
 	uint8_t m_mpage;
 	uint8_t *m_combase_mb;
-	irmb_ops *m_mbops;
+	std::unique_ptr<irmb_ops[]> m_mbops;
 	const irmb_ops *m_irmb_stack[16];
 	uint32_t m_irmb_regs[16];
 	uint32_t m_irmb_latch;

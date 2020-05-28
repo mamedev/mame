@@ -15,6 +15,7 @@
 #include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/points.h"
 
 //#include "winutf8.h"
 
@@ -105,7 +106,7 @@ void disasmbasewin_info::update_menu()
 {
 	editwin_info::update_menu();
 
-	disasmview_info *const dasmview = downcast<disasmview_info *>(m_views[0].get());
+	auto *const dasmview = downcast<disasmview_info *>(m_views[0].get());
 	HMENU const menu = GetMenu(window());
 
 	bool const disasm_cursor_visible = dasmview->cursor_visible();
@@ -115,9 +116,7 @@ void disasmbasewin_info::update_menu()
 		device_debug *const debug = dasmview->source_device()->debug();
 
 		// first find an existing breakpoint at this address
-		device_debug::breakpoint *bp = debug->breakpoint_first();
-		while ((bp != nullptr) && (bp->address() != address))
-			bp = bp->next();
+		const debug_breakpoint *bp = debug->breakpoint_find(address);
 
 		if (bp == nullptr)
 		{
@@ -153,7 +152,7 @@ void disasmbasewin_info::update_menu()
 
 bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 {
-	disasmview_info *const dasmview = downcast<disasmview_info *>(m_views[0].get());
+	auto *const dasmview = downcast<disasmview_info *>(m_views[0].get());
 
 	switch (HIWORD(wparam))
 	{
@@ -166,28 +165,21 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 			{
 				offs_t const address = dasmview->selected_address();
 				device_debug *const debug = dasmview->source_device()->debug();
-				int32_t bpindex = -1;
 
 				// first find an existing breakpoint at this address
-				for (device_debug::breakpoint *bp = debug->breakpoint_first(); bp != nullptr; bp = bp->next())
-				{
-					if (address == bp->address())
-					{
-						bpindex = bp->index();
-						break;
-					}
-				}
+				const debug_breakpoint *bp = debug->breakpoint_find(address);
 
 				// if it doesn't exist, add a new one
 				if (!is_main_console())
 				{
-					if (bpindex == -1)
+					if (bp == nullptr)
 					{
-						bpindex = debug->breakpoint_set(address, nullptr, nullptr);
+						int32_t bpindex = debug->breakpoint_set(address, nullptr, nullptr);
 						machine().debugger().console().printf("Breakpoint %X set\n", bpindex);
 					}
 					else
 					{
+						int32_t bpindex = bp->index();
 						debug->breakpoint_clear(bpindex);
 						machine().debugger().console().printf("Breakpoint %X cleared\n", bpindex);
 					}
@@ -197,11 +189,11 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				else if (dasmview->source_is_visible_cpu())
 				{
 					std::string command;
-					if (bpindex == -1)
+					if (bp == nullptr)
 						command = string_format("bpset 0x%X", address);
 					else
-						command = string_format("bpclear 0x%X", bpindex);
-					machine().debugger().console().execute_command(command.c_str(), true);
+						command = string_format("bpclear 0x%X", bp->index());
+					machine().debugger().console().execute_command(command, true);
 				}
 			}
 			return true;
@@ -213,9 +205,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				device_debug *const debug = dasmview->source_device()->debug();
 
 				// first find an existing breakpoint at this address
-				device_debug::breakpoint *bp = debug->breakpoint_first();
-				while ((bp != nullptr) && (bp->address() != address))
-					bp = bp->next();
+				const debug_breakpoint *bp = debug->breakpoint_find(address);
 
 				// if it doesn't exist, add a new one
 				if (bp != nullptr)
@@ -231,7 +221,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					{
 						std::string command;
 						command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", (uint32_t)bp->index());
-						machine().debugger().console().execute_command(command.c_str(), true);
+						machine().debugger().console().execute_command(command, true);
 					}
 				}
 			}
@@ -245,7 +235,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				{
 					std::string command;
 					command = string_format("go 0x%X", address);
-					machine().debugger().console().execute_command(command.c_str(), true);
+					machine().debugger().console().execute_command(command, true);
 				}
 				else
 				{

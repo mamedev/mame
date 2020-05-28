@@ -22,12 +22,17 @@
 
 
 #include "emu.h"
+#include "bus/ata/atadev.h"
 #include "cpu/i386/athlon.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/intelfsh.h"
-#include "machine/atapicdr.h"
-#include "machine/idehd.h"
+#include "video/virge_pci.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "includes/xbox_pci.h"
 #include "includes/nforcepc.h"
 
@@ -54,12 +59,6 @@ static const uint8_t test_spd_data[] = {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 };
 #endif
-
-void nforcepc_ata_devices(device_slot_interface &device)
-{
-	device.option_add("hdd", IDE_HARDDISK);
-	device.option_add("cdrom", ATAPI_CDROM);
-}
 
 /*
   Pci devices
@@ -305,6 +304,11 @@ int as99127f_device::execute_command(int command, int rw, int data)
 void as99127f_device::device_start()
 {
 	memset(buffer, 0, sizeof(buffer));
+	// used to read voltages by bios, measured in mV
+	buffer[0x20] = 0x70; // multiplied by 0x10
+	buffer[0x2] = 0x7e; // multiplied by 0x10
+	buffer[0x23] = 0x96; // multiplied by 0x540 then divided by 0x32
+	buffer[0x24] = 0x9e; // multiplied by 0x260 then divided by 0xa
 }
 
 DEFINE_DEVICE_TYPE(AS99127F_SENSOR2, as99127f_sensor2_device, "as99127f_sensor2", "Asus AS99127F temperature sensor 2")
@@ -367,10 +371,33 @@ it8703f_device::it8703f_device(const machine_config &mconfig, const char *tag, d
 	, logical_device(0)
 	, pin_reset_callback(*this)
 	, pin_gatea20_callback(*this)
+	, m_txd1_callback(*this)
+	, m_ndtr1_callback(*this)
+	, m_nrts1_callback(*this)
+	, m_txd2_callback(*this)
+	, m_ndtr2_callback(*this)
+	, m_nrts2_callback(*this)
+	, floppy_controller_fdcdev(*this, "fdc")
+	, pc_lpt_lptdev(*this, "lpt")
+	, pc_serial1_comdev(*this, "uart_0")
+	, pc_serial2_comdev(*this, "uart_1")
 	, m_kbdc(*this, "pc_kbdc")
+	, enabled_game_port(false)
+	, enabled_midi_port(false)
 {
 	memset(global_configuration_registers, 0, sizeof(global_configuration_registers));
+	global_configuration_registers[0x20] = 0x87; // identifies it8703f
+	global_configuration_registers[0x21] = 1;
+	global_configuration_registers[0x24] = 4;
 	memset(configuration_registers, 0, sizeof(configuration_registers));
+	configuration_registers[LogicalDevice::FDC][0x60] = 3;
+	configuration_registers[LogicalDevice::FDC][0x61] = 0xf0;
+	configuration_registers[LogicalDevice::FDC][0x70] = 6;
+	configuration_registers[LogicalDevice::FDC][0x74] = 2;
+	configuration_registers[LogicalDevice::FDC][0xf0] = 0xe;
+	configuration_registers[LogicalDevice::FDC][0xf2] = 0xff;
+	configuration_registers[LogicalDevice::Parallel][0x74] = 4;
+	configuration_registers[LogicalDevice::Parallel][0xf0] = 0x3f;
 	for (int n = 0; n < 13; n++)
 		enabled_logical[n] = false;
 }
@@ -379,6 +406,12 @@ void it8703f_device::device_start()
 {
 	pin_reset_callback.resolve_safe();
 	pin_gatea20_callback.resolve_safe();
+	m_txd1_callback.resolve_safe();
+	m_ndtr1_callback.resolve_safe();
+	m_nrts1_callback.resolve_safe();
+	m_txd2_callback.resolve_safe();
+	m_ndtr2_callback.resolve_safe();
+	m_nrts2_callback.resolve_safe();
 }
 
 void it8703f_device::internal_memory_map(address_map &map)
@@ -399,6 +432,28 @@ uint16_t it8703f_device::get_base_address(int logical, int index)
 
 void it8703f_device::device_add_mconfig(machine_config &config)
 {
+	// floppy disc controller
+	smc37c78_device& fdcdev(SMC37C78(config, floppy_controller_fdcdev, 24'000'000));
+	fdcdev.intrq_wr_callback().set(FUNC(it8703f_device::irq_floppy_w));
+	fdcdev.drq_wr_callback().set(FUNC(it8703f_device::drq_floppy_w));
+
+	// parallel port
+	PC_LPT(config, pc_lpt_lptdev);
+	pc_lpt_lptdev->irq_handler().set(FUNC(it8703f_device::irq_parallel_w));
+
+	// serial ports
+	NS16450(config, pc_serial1_comdev, XTAL(1'843'200)); // or NS16550 ?
+	pc_serial1_comdev->out_int_callback().set(FUNC(it8703f_device::irq_serial1_w));
+	pc_serial1_comdev->out_tx_callback().set(FUNC(it8703f_device::txd_serial1_w));
+	pc_serial1_comdev->out_dtr_callback().set(FUNC(it8703f_device::dtr_serial1_w));
+	pc_serial1_comdev->out_rts_callback().set(FUNC(it8703f_device::rts_serial1_w));
+
+	NS16450(config, pc_serial2_comdev, XTAL(1'843'200));
+	pc_serial2_comdev->out_int_callback().set(FUNC(it8703f_device::irq_serial2_w));
+	pc_serial2_comdev->out_tx_callback().set(FUNC(it8703f_device::txd_serial2_w));
+	pc_serial2_comdev->out_dtr_callback().set(FUNC(it8703f_device::dtr_serial2_w));
+	pc_serial2_comdev->out_rts_callback().set(FUNC(it8703f_device::rts_serial2_w));
+
 	// keyboard
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
@@ -488,24 +543,155 @@ void it8703f_device::write_logical_configuration_register(int index, int data)
 	configuration_registers[logical_device][index] = data;
 	switch (logical_device)
 	{
+	case LogicalDevice::FDC:
+		write_fdd_configuration_register(index, data);
+		break;
+	case LogicalDevice::Serial1:
+		write_serial1_configuration_register(index, data);
+		break;
+	case LogicalDevice::Serial2:
+		write_serial2_configuration_register(index, data);
+		break;
+	case LogicalDevice::Parallel:
+		write_parallel_configuration_register(index, data);
+		break;
 	case LogicalDevice::Keyboard:
+		write_keyboard_configuration_register(index, data);
+		break;
+	case LogicalDevice::Gpio1:
 		if (index == 0x30)
 		{
 			if (data & 1)
-			{
-				if (enabled_logical[LogicalDevice::Keyboard] == false)
-					map_keyboard_addresses();
-				enabled_logical[LogicalDevice::Keyboard] = true;
-				logerror("Enabled Keyboard\n");
-			}
-			else
-			{
-				if (enabled_logical[LogicalDevice::Keyboard] == true)
-					unmap_keyboard_addresses();
-				enabled_logical[LogicalDevice::Keyboard] = false;
-			}
+				enabled_game_port = true;
+			if (data & 2)
+				enabled_midi_port = true;
 		}
 		break;
+	}
+}
+
+void it8703f_device::write_fdd_configuration_register(int index, int data)
+{
+	if (index == 0x30)
+	{
+		if (data & 1)
+		{
+			if (enabled_logical[LogicalDevice::FDC] == false)
+			{
+				enabled_logical[LogicalDevice::FDC] = true;
+				lpchost->remap();
+			}
+			logerror("Enabled FDD at %04X\n", get_base_address(LogicalDevice::FDC, 0));
+		}
+		else
+		{
+			if (enabled_logical[LogicalDevice::FDC] == true)
+			{
+				enabled_logical[LogicalDevice::FDC] = false;
+				lpchost->remap();
+			}
+			logerror("Disabled FDD at %04X\n", get_base_address(LogicalDevice::FDC, 0));
+		}
+	}
+	if (index == 0x74)
+		logerror("Set FDD dma channel %d\n", configuration_registers[LogicalDevice::FDC][0x74]);
+}
+
+void it8703f_device::write_parallel_configuration_register(int index, int data)
+{
+	if (index == 0x30)
+	{
+		if (data & 1)
+		{
+			if (enabled_logical[LogicalDevice::Parallel] == false)
+			{
+				enabled_logical[LogicalDevice::Parallel] = true;
+				lpchost->remap();
+			}
+			logerror("Enabled LPT at %04X\n", get_base_address(LogicalDevice::Parallel, 0));
+		}
+		else
+		{
+			if (enabled_logical[LogicalDevice::Parallel] == true)
+			{
+				enabled_logical[LogicalDevice::Parallel] = false;
+				lpchost->remap();
+			}
+		}
+	}
+	if (index == 0x74)
+		logerror("Set LPT dma channel %d\n", configuration_registers[LogicalDevice::Parallel][0x74]);
+}
+
+void it8703f_device::write_serial1_configuration_register(int index, int data)
+{
+	if (index == 0x30)
+	{
+		if (data & 1)
+		{
+			if (enabled_logical[LogicalDevice::Serial1] == false)
+			{
+				enabled_logical[LogicalDevice::Serial1] = true;
+				lpchost->remap();
+			}
+			logerror("Enabled Serial1 at %04X\n", get_base_address(LogicalDevice::Serial1, 0));
+		}
+		else
+		{
+			if (enabled_logical[LogicalDevice::Serial1] == true)
+			{
+				enabled_logical[LogicalDevice::Serial1] = false;
+				lpchost->remap();
+			}
+		}
+	}
+}
+
+void it8703f_device::write_serial2_configuration_register(int index, int data)
+{
+	if (index == 0x30)
+	{
+		if (data & 1)
+		{
+			if (enabled_logical[LogicalDevice::Serial2] == false)
+			{
+				enabled_logical[LogicalDevice::Serial2] = true;
+				lpchost->remap();
+			}
+			logerror("Enabled Serial2 at %04X\n", get_base_address(LogicalDevice::Serial2, 0));
+		}
+		else
+		{
+			if (enabled_logical[LogicalDevice::Serial2] == true)
+			{
+				enabled_logical[LogicalDevice::Serial2] = false;
+				lpchost->remap();
+			}
+		}
+	}
+}
+
+void it8703f_device::write_keyboard_configuration_register(int index, int data)
+{
+	if (index == 0x30)
+	{
+		if (data & 1)
+		{
+			if (enabled_logical[LogicalDevice::Keyboard] == false)
+			{
+				enabled_logical[LogicalDevice::Keyboard] = true;
+				lpchost->remap();
+			}
+			logerror("Enabled Keyboard\n");
+		}
+		else
+		{
+			if (enabled_logical[LogicalDevice::Keyboard] == true)
+			{
+				enabled_logical[LogicalDevice::Keyboard] = false;
+				lpchost->remap();
+			}
+		}
 	}
 }
 
@@ -526,7 +712,164 @@ uint16_t it8703f_device::read_global_configuration_register(int index)
 
 uint16_t it8703f_device::read_logical_configuration_register(int index)
 {
-	return configuration_registers[logical_device][index];
+	uint16_t ret = 0;
+
+	switch (logical_device)
+	{
+	case LogicalDevice::FDC:
+		ret = read_fdd_configuration_register(index);
+		break;
+	case LogicalDevice::Parallel:
+		ret = read_parallel_configuration_register(index);
+		break;
+	case LogicalDevice::Serial1:
+		ret = read_serial1_configuration_register(index);
+		break;
+	case LogicalDevice::Serial2:
+		ret = read_serial2_configuration_register(index);
+		break;
+	case LogicalDevice::Keyboard:
+		ret = read_keyboard_configuration_register(index);
+		break;
+	default:
+		ret = configuration_registers[logical_device][index];
+		break;
+	}
+	return ret;
+}
+
+WRITE_LINE_MEMBER(it8703f_device::irq_floppy_w)
+{
+	if (enabled_logical[LogicalDevice::FDC] == false)
+		return;
+	lpchost->set_virtual_line(configuration_registers[LogicalDevice::FDC][0x70], state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::drq_floppy_w)
+{
+	if (enabled_logical[LogicalDevice::FDC] == false)
+		return;
+	lpchost->set_virtual_line(configuration_registers[LogicalDevice::FDC][0x74] + 16, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::irq_parallel_w)
+{
+	if (enabled_logical[LogicalDevice::Parallel] == false)
+		return;
+	lpchost->set_virtual_line(configuration_registers[LogicalDevice::Parallel][0x70], state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::drq_parallel_w)
+{
+	if (enabled_logical[LogicalDevice::Parallel] == false)
+		return;
+	lpchost->set_virtual_line(configuration_registers[LogicalDevice::Parallel][0x74] + 16, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::irq_serial1_w)
+{
+	if (enabled_logical[LogicalDevice::Serial1] == false)
+		return;
+	lpchost->set_virtual_line(configuration_registers[LogicalDevice::Serial1][0x70], state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::txd_serial1_w)
+{
+	if (enabled_logical[LogicalDevice::Serial1] == false)
+		return;
+	m_txd1_callback(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::dtr_serial1_w)
+{
+	if (enabled_logical[LogicalDevice::Serial1] == false)
+		return;
+	m_ndtr1_callback(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::rts_serial1_w)
+{
+	if (enabled_logical[LogicalDevice::Serial1] == false)
+		return;
+	m_nrts1_callback(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::irq_serial2_w)
+{
+	if (enabled_logical[LogicalDevice::Serial2] == false)
+		return;
+	lpchost->set_virtual_line(configuration_registers[LogicalDevice::Serial2][0x70], state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::txd_serial2_w)
+{
+	if (enabled_logical[LogicalDevice::Serial2] == false)
+		return;
+	m_txd2_callback(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::dtr_serial2_w)
+{
+	if (enabled_logical[LogicalDevice::Serial2] == false)
+		return;
+	m_ndtr2_callback(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::rts_serial2_w)
+{
+	if (enabled_logical[LogicalDevice::Serial2] == false)
+		return;
+	m_nrts2_callback(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::rxd1_w)
+{
+	pc_serial1_comdev->rx_w(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::ndcd1_w)
+{
+	pc_serial1_comdev->dcd_w(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::ndsr1_w)
+{
+	pc_serial1_comdev->dsr_w(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::nri1_w)
+{
+	pc_serial1_comdev->ri_w(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::ncts1_w)
+{
+	pc_serial1_comdev->cts_w(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::rxd2_w)
+{
+	pc_serial2_comdev->rx_w(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::ndcd2_w)
+{
+	pc_serial2_comdev->dcd_w(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::ndsr2_w)
+{
+	pc_serial2_comdev->dsr_w(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::nri2_w)
+{
+	pc_serial2_comdev->ri_w(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::ncts2_w)
+{
+	pc_serial2_comdev->cts_w(state);
 }
 
 WRITE_LINE_MEMBER(it8703f_device::irq_keyboard_w)
@@ -550,16 +893,83 @@ WRITE_LINE_MEMBER(it8703f_device::kbdp20_gp20_reset_w)
 	pin_reset_callback(state);
 }
 
+void it8703f_device::map_fdc_addresses()
+{
+	uint16_t base = get_base_address(LogicalDevice::FDC, 0);
+
+	iospace->install_device(base, base + 7, *floppy_controller_fdcdev, &smc37c78_device::map);
+}
+
+void it8703f_device::map_lpt(address_map& map)
+{
+	map(0x0, 0x3).rw(FUNC(it8703f_device::lpt_read), FUNC(it8703f_device::lpt_write));
+}
+
+READ8_MEMBER(it8703f_device::lpt_read)
+{
+	return pc_lpt_lptdev->read(offset);
+}
+
+WRITE8_MEMBER(it8703f_device::lpt_write)
+{
+	pc_lpt_lptdev->write(offset, data);
+}
+
+void it8703f_device::map_lpt_addresses()
+{
+	uint16_t base = get_base_address(LogicalDevice::Parallel, 0);
+
+	iospace->install_device(base, base + 3, *this, &it8703f_device::map_lpt);
+}
+
+void it8703f_device::map_serial1(address_map& map)
+{
+	map(0x0, 0x7).rw(FUNC(it8703f_device::serial1_read), FUNC(it8703f_device::serial1_write));
+}
+
+READ8_MEMBER(it8703f_device::serial1_read)
+{
+	return pc_serial1_comdev->ins8250_r(offset);
+}
+
+WRITE8_MEMBER(it8703f_device::serial1_write)
+{
+	pc_serial1_comdev->ins8250_w(offset, data);
+}
+
+void it8703f_device::map_serial1_addresses()
+{
+	uint16_t base = get_base_address(LogicalDevice::Serial1, 0);
+
+	iospace->install_device(base, base + 7, *this, &it8703f_device::map_serial1);
+}
+
+void it8703f_device::map_serial2(address_map& map)
+{
+	map(0x0, 0x7).rw(FUNC(it8703f_device::serial2_read), FUNC(it8703f_device::serial2_write));
+}
+
+READ8_MEMBER(it8703f_device::serial2_read)
+{
+	return pc_serial2_comdev->ins8250_r(offset);
+}
+
+WRITE8_MEMBER(it8703f_device::serial2_write)
+{
+	pc_serial2_comdev->ins8250_w(offset, data);
+}
+
+void it8703f_device::map_serial2_addresses()
+{
+	uint16_t base = get_base_address(LogicalDevice::Serial2, 0);
+
+	iospace->install_device(base, base + 7, *this, &it8703f_device::map_serial2);
+}
+
 void it8703f_device::map_keyboard(address_map &map)
 {
 	map(0x0, 0x0).rw(FUNC(it8703f_device::at_keybc_r), FUNC(it8703f_device::at_keybc_w));
 	map(0x4, 0x4).rw(FUNC(it8703f_device::keybc_status_r), FUNC(it8703f_device::keybc_command_w));
-}
-
-void it8703f_device::unmap_keyboard(address_map &map)
-{
-	map(0x0, 0x0).noprw();
-	map(0x4, 0x4).noprw();
 }
 
 READ8_MEMBER(it8703f_device::at_keybc_r)
@@ -567,7 +977,7 @@ READ8_MEMBER(it8703f_device::at_keybc_r)
 	switch (offset) //m_kbdc
 	{
 	case 0:
-		return m_kbdc->data_r(space, 0);
+		return m_kbdc->data_r(0);
 	}
 
 	return 0xff;
@@ -578,20 +988,19 @@ WRITE8_MEMBER(it8703f_device::at_keybc_w)
 	switch (offset)
 	{
 	case 0:
-		m_kbdc->data_w(space, 0, data);
+		m_kbdc->data_w(0, data);
 	}
 }
 
 READ8_MEMBER(it8703f_device::keybc_status_r)
 {
-	return m_kbdc->data_r(space, 4);
+	return m_kbdc->data_r(4);
 }
 
 WRITE8_MEMBER(it8703f_device::keybc_command_w)
 {
-	m_kbdc->data_w(space, 4, data);
+	m_kbdc->data_w(4, data);
 }
-
 
 void it8703f_device::map_keyboard_addresses()
 {
@@ -600,18 +1009,19 @@ void it8703f_device::map_keyboard_addresses()
 	iospace->install_device(base, base + 7, *this, &it8703f_device::map_keyboard);
 }
 
-void it8703f_device::unmap_keyboard_addresses()
-{
-	uint16_t base = get_base_address(LogicalDevice::Keyboard, 0);
-
-	iospace->install_device(base, base + 7, *this, &it8703f_device::unmap_keyboard);
-}
-
 void it8703f_device::map_extra(address_space *memory_space, address_space *io_space)
 {
 	memspace = memory_space;
 	iospace = io_space;
 	io_space->install_device(0, 0xffff, *this, &it8703f_device::internal_io_map);
+	if (enabled_logical[LogicalDevice::FDC] == true)
+		map_fdc_addresses();
+	if (enabled_logical[LogicalDevice::Parallel] == true)
+		map_lpt_addresses();
+	if (enabled_logical[LogicalDevice::Serial1] == true)
+		map_serial1_addresses();
+	if (enabled_logical[LogicalDevice::Serial2] == true)
+		map_serial2_addresses();
 	if (enabled_logical[LogicalDevice::Keyboard] == true)
 		map_keyboard_addresses();
 }
@@ -644,7 +1054,7 @@ public:
 private:
 	void nforce_map(address_map &map);
 	void nforce_map_io(address_map &map);
-	DECLARE_WRITE8_MEMBER(boot_state_award_w);
+	void boot_state_award_w(uint8_t data);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(maincpu_interrupt);
 
@@ -678,7 +1088,7 @@ const nforcepc_state::boot_state_info nforcepc_state::boot_state_infos_award[] =
 	{ 0, nullptr }
 };
 
-WRITE8_MEMBER(nforcepc_state::boot_state_award_w)
+void nforcepc_state::boot_state_award_w(uint8_t data)
 {
 	const char *desc = "";
 	for (int i = 0; boot_state_infos_award[i].message; i++)
@@ -710,6 +1120,31 @@ void nforcepc_state::nforce_map_io(address_map &map)
 	map.unmap_value_high();
 }
 
+static void isa_com(device_slot_interface& device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+}
+
+static void pc_hd_floppies(device_slot_interface& device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
+
+DECLARE_FLOPPY_FORMATS(floppy_formats) = {
+	FLOPPY_PC_FORMAT,
+	FLOPPY_NASLITE_FORMAT
+FLOPPY_FORMATS_END
+
 /*
   Machine configuration
 */
@@ -734,6 +1169,12 @@ void nforcepc_state::nforcepc(machine_config &config)
 	it8703f_device &ite(IT8703F(config, ":pci:01.0:0", 0));
 	ite.pin_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
 	ite.pin_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	ite.txd1().set("serport0", FUNC(rs232_port_device::write_txd));
+	ite.ndtr1().set("serport0", FUNC(rs232_port_device::write_dtr));
+	ite.nrts1().set("serport0", FUNC(rs232_port_device::write_rts));
+	ite.txd2().set("serport1", FUNC(rs232_port_device::write_txd));
+	ite.ndtr2().set("serport1", FUNC(rs232_port_device::write_dtr));
+	ite.nrts2().set("serport1", FUNC(rs232_port_device::write_rts));
 	MCPX_SMBUS(config, ":pci:01.1", 0); // 10de:01b4 NVIDIA Corporation nForce PCI System Management (SMBus)
 	SMBUS_ROM(config, ":pci:01.1:050", 0, test_spd_data, sizeof(test_spd_data)); // these 3 are on smbus number 0
 	SMBUS_LOGGER(config, ":pci:01.1:051", 0);
@@ -753,9 +1194,28 @@ void nforcepc_state::nforcepc(machine_config &config)
 	mcpx_ide_device &ide(MCPX_IDE(config, ":pci:09.0", 0)); // 10de:01bc NVIDIA Corporation nForce IDE
 	ide.pri_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq14));
 	ide.sec_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq15));
-		/*subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(nforcepc_ata_devices, "hdd", "cdrom", true);*/
+	ide.subdevice<ide_controller_32_device>("ide1")->options(ata_devices, "hdd", nullptr, true);
+	ide.subdevice<ide_controller_32_device>("ide2")->options(ata_devices, "cdrom", nullptr, true);
 	NV2A_AGP(config, ":pci:1e.0", 0, 0x10de01b7, 0); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
+	VIRGEDX_PCI(config, ":pci:0a.0", 0);
 	SST_49LF020(config, "bios", 0);
+
+	FLOPPY_CONNECTOR(config, ":pci:01.0:0:fdc:0", pc_hd_floppies, "35hd", floppy_formats);
+	FLOPPY_CONNECTOR(config, ":pci:01.0:0:fdc:1", pc_hd_floppies, "35hd", floppy_formats);
+
+	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	serport0.rxd_handler().set(":pci:01.0:0", FUNC(it8703f_device::rxd1_w));
+	serport0.dcd_handler().set(":pci:01.0:0", FUNC(it8703f_device::ndcd1_w));
+	serport0.dsr_handler().set(":pci:01.0:0", FUNC(it8703f_device::ndsr1_w));
+	serport0.ri_handler().set(":pci:01.0:0", FUNC(it8703f_device::nri1_w));
+	serport0.cts_handler().set(":pci:01.0:0", FUNC(it8703f_device::ncts1_w));
+
+	rs232_port_device& serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set(":pci:01.0:0", FUNC(it8703f_device::rxd2_w));
+	serport1.dcd_handler().set(":pci:01.0:0", FUNC(it8703f_device::ndcd2_w));
+	serport1.dsr_handler().set(":pci:01.0:0", FUNC(it8703f_device::ndsr2_w));
+	serport1.ri_handler().set(":pci:01.0:0", FUNC(it8703f_device::nri2_w));
+	serport1.cts_handler().set(":pci:01.0:0", FUNC(it8703f_device::ncts2_w));
 }
 
 ROM_START(nforcepc)
@@ -764,6 +1224,16 @@ ROM_START(nforcepc)
 	ROMX_LOAD("a7n266c.bin", 0, 0x40000, CRC(f4f0e4fc) SHA1(87f11545db178914623e41fb51e328da479a2efc), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "a7n266c1001d", "a7n266c1001d") // bios version 1001.D downloaded from Asus website
 	ROMX_LOAD("a7nc101d.awd", 0, 0x40000, CRC(ead1147c) SHA1(27227df98e0c5fb9fecdb4bb6ef72df19766c330), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "a7n266c1001e", "a7n266c1001e") // bios version 1001.E
+	ROMX_LOAD("a7nc101e.awd", 0, 0x40000, CRC(a029cd42) SHA1(e257915534bc725f389e57945b45c81e7ef40dcc), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "a7n266c1002c", "a7n266c1002c") // beta bios version 1002C.003 ?
+	ROMX_LOAD("1002c.003", 0, 0x40000, CRC(57ced539) SHA1(525d15523be3b373a10c1f6ae355803613506ce2), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "a7n266c1003", "a7n266c1003") // bios version 1003
+	ROMX_LOAD("a7nc1003.awd", 0, 0x40000, CRC(ac27f751) SHA1(96d5539ee2a40ea58a32013c16109159a3c41bb8), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "a7n266c1004", "a7n266c1004") // bios version 1004
+	ROMX_LOAD("a7nc1004.awd", 0, 0x40000, CRC(04124e4f) SHA1(8778a6722eddaf83101f89834969f0037af65cb9), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "a7n266c1005", "a7n266c1005") // beta bios version 1005.005 ?
+	ROMX_LOAD("1005nc.005", 0, 0x40000, CRC(9ca5a9c9) SHA1(5ffb57b9f1e0e163b33c093a3e017020b247b3d3), ROM_BIOS(6))
 ROM_END
 
 static INPUT_PORTS_START(nforcepc)

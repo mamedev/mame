@@ -22,7 +22,7 @@ READ8_MEMBER(slapfght_state::tigerh_mcu_status_r)
 			((m_bmcu && (CLEAR_LINE == m_bmcu->mcu_semaphore_r())) ? 0x04 : 0x00);
 }
 
-WRITE8_MEMBER(slapfght_state::scroll_from_mcu_w)
+void slapfght_state::scroll_from_mcu_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

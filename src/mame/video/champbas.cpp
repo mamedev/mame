@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(champbas_state::champbas_get_bg_tile_info)
 	int const code = m_vram[tile_index] | (m_gfx_bank << 8);
 	int const color = (m_vram[tile_index + 0x400] & 0x1f) | 0x20;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(exctsccr_state::exctsccr_get_bg_tile_info)
@@ -146,7 +146,7 @@ TILE_GET_INFO_MEMBER(exctsccr_state::exctsccr_get_bg_tile_info)
 	int const code = m_vram[tile_index] | (m_gfx_bank << 8);
 	int const color = m_vram[tile_index + 0x400] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -159,12 +159,12 @@ TILE_GET_INFO_MEMBER(exctsccr_state::exctsccr_get_bg_tile_info)
 
 void champbas_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(champbas_state::champbas_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(champbas_state::champbas_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 void exctsccr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(exctsccr_state::exctsccr_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(exctsccr_state::exctsccr_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

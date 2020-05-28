@@ -516,7 +516,7 @@ void lethal_state::lethalen(machine_config &config)
 	m_palette->enable_shadows();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(lethal_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(lethal_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_8LE, 1, 0);
 	m_k056832->set_palette(m_palette);
 
@@ -524,7 +524,7 @@ void lethal_state::lethalen(machine_config &config)
 	m_k053244->set_palette(m_palette);
 	m_k053244->set_bpp(6);
 	m_k053244->set_offsets(95, 0);
-	m_k053244->set_sprite_callback(FUNC(lethal_state::sprite_callback), this);
+	m_k053244->set_sprite_callback(FUNC(lethal_state::sprite_callback));
 
 	K054000(config, "k054000", 0);
 

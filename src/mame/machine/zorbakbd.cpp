@@ -269,19 +269,19 @@ WRITE_LINE_MEMBER(zorba_keyboard_device::txd_w)
 }
 
 
-READ8_MEMBER(zorba_keyboard_device::mcu_pa_r)
+u8 zorba_keyboard_device::mcu_pa_r()
 {
 	return m_rows[m_row_select]->read();
 }
 
 
-READ8_MEMBER(zorba_keyboard_device::mcu_pb_r)
+u8 zorba_keyboard_device::mcu_pb_r()
 {
 	return m_txd_high ? 0x7f : 0xff;
 }
 
 
-WRITE8_MEMBER(zorba_keyboard_device::mcu_pb_w)
+void zorba_keyboard_device::mcu_pb_w(u8 data)
 {
 	// TODO: bits 2/3/4 do something; some photos show F17/F18/F19 with LED windows
 	m_rxd_cb(BIT(data, 6) ? 0 : 1);
@@ -291,7 +291,7 @@ WRITE8_MEMBER(zorba_keyboard_device::mcu_pb_w)
 }
 
 
-WRITE8_MEMBER(zorba_keyboard_device::mcu_pc_w)
+void zorba_keyboard_device::mcu_pc_w(u8 data)
 {
 	m_row_select = data & 0x0f;
 }

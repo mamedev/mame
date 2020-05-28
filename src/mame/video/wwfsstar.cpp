@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_fg0_tile_info)
 	tilebase =  &m_fg0_videoram[tile_index*2];
 	tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	colbank = (tilebase[0] & 0x00f0) >> 4;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tileno,
 			colbank,
 			0);
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_bg0_tile_info)
 	tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	colbank = (tilebase[0] & 0x0070) >> 4;
 	flipx   = (tilebase[0] & 0x0080) >> 7;
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tileno,
 			colbank,
 			flipx ? TILE_FLIPX : 0);
@@ -204,10 +204,10 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void wwfsstar_state::video_start()
 {
-	m_fg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wwfsstar_state::get_fg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_fg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wwfsstar_state::get_fg0_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg0_tilemap->set_transparent_pen(0);
 
-	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wwfsstar_state::get_bg0_tile_info),this),tilemap_mapper_delegate(FUNC(wwfsstar_state::bg0_scan),this), 16, 16,32,32);
+	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wwfsstar_state::get_bg0_tile_info)), tilemap_mapper_delegate(*this, FUNC(wwfsstar_state::bg0_scan)), 16, 16, 32, 32);
 	m_fg0_tilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_vblank));

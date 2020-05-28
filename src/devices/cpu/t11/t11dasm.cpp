@@ -24,11 +24,9 @@ u16 t11_disassembler::r16p(offs_t &pc, const data_buffer &opcodes)
 	return r;
 }
 
-template <int Width> std::string t11_disassembler::MakeEA (int lo, offs_t &pc, const data_buffer &opcodes)
+template <bool Byte> std::string t11_disassembler::MakeEA (int lo, offs_t &pc, const data_buffer &opcodes)
 {
 	int reg, pm;
-
-	static_assert((Width == 2) || (Width == 4), "invalid width - must be 2 or 4");
 
 	reg = lo & 7;
 
@@ -44,7 +42,7 @@ template <int Width> std::string t11_disassembler::MakeEA (int lo, offs_t &pc, c
 			if (reg == 7) // immediate
 			{
 				pm = r16p(pc, opcodes);
-				return util::string_format ("#%0*X", Width, pm & ((Width == 2) ? 0xff : 0xffff));
+				return util::string_format ("#%0*o", Byte ? 3 : 6, pm & (Byte ? 0377 : 0177777));
 			}
 			else
 			{
@@ -55,7 +53,7 @@ template <int Width> std::string t11_disassembler::MakeEA (int lo, offs_t &pc, c
 			if (reg == 7) // absolute
 			{
 				pm = r16p(pc, opcodes);
-				return util::string_format ("@#%04X", pm &= 0xffff);
+				return util::string_format ("@#%06o", pm & 0177777);
 			}
 			else
 			{
@@ -72,13 +70,13 @@ template <int Width> std::string t11_disassembler::MakeEA (int lo, offs_t &pc, c
 			pm = r16p(pc, opcodes);
 			if (reg == 7) // relative
 			{
-				return util::string_format ("%04X", (pm + pc) & 0xffff);
+				return util::string_format ("%06o", (pm + pc) & 0177777);
 			}
 			else
 			{
-				return util::string_format ("%s%X(%s)",
-					(pm&0x8000)?"-":"",
-					(pm&0x8000)?-(signed short)pm:pm,
+				return util::string_format ("%s%o(%s)",
+					BIT(pm,15)?"-":"",
+					BIT(pm,15)?-(int16_t)pm:pm,
 					regs[reg]);
 			}
 			break;
@@ -86,13 +84,13 @@ template <int Width> std::string t11_disassembler::MakeEA (int lo, offs_t &pc, c
 			pm = r16p(pc, opcodes);
 			if (reg == 7) // relative deferred
 			{
-				return util::string_format ("@%04X", (pm + pc) & 0xffff);
+				return util::string_format ("@%06o", (pm + pc) & 0177777);
 			}
 			else
 			{
-				return util::string_format ("@%s%X(%s)",
-					(pm&0x8000)?"-":"",
-					(pm&0x8000)?-(signed short)pm:pm,
+				return util::string_format ("@%s%o(%s)",
+					BIT(pm,15)?"-":"",
+					BIT(pm,15)?-(int16_t)pm:pm,
 					regs[reg]);
 			}
 			break;
@@ -113,26 +111,26 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 	lo = op & 077;
 	hi = (op >> 6) & 077;
 
-	switch (op & 0xffc0)
+	switch (op & 0177700)
 	{
-		case 0x0000:
+		case 0000000:
 			switch (lo)
 			{
-				case 0x00:  util::stream_format(stream, "HALT"); break;
-				case 0x01:  util::stream_format(stream, "WAIT"); break;
-				case 0x02:  util::stream_format(stream, "RTI"); flags = STEP_OUT; break;
-				case 0x03:  util::stream_format(stream, "BPT"); break;
-				case 0x04:  util::stream_format(stream, "IOT"); break;
-				case 0x05:  util::stream_format(stream, "RESET"); break;
-				case 0x06:  util::stream_format(stream, "RTT"); break;
-				default:    util::stream_format(stream, "???? (%04X)", op); break;
+				case 000:  util::stream_format(stream, "HALT"); break;
+				case 001:  util::stream_format(stream, "WAIT"); break;
+				case 002:  util::stream_format(stream, "RTI"); flags = STEP_OUT; break;
+				case 003:  util::stream_format(stream, "BPT"); break;
+				case 004:  util::stream_format(stream, "IOT"); break;
+				case 005:  util::stream_format(stream, "RESET"); break;
+				case 006:  util::stream_format(stream, "RTT"); break;
+				default:   util::stream_format(stream, ".WORD %06o", op); break;
 			}
 			break;
-		case 0x0040:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0000100:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "JMP   %s", ea1);
 			break;
-		case 0x0080:
+		case 0000200:
 			switch (lo & 070)
 			{
 				case 000:
@@ -146,136 +144,139 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 				case 050:
 					switch( lo & 15 )
 					{
-						case 0x00:  util::stream_format(stream, "NOP"); break;
-						case 0x0f:  util::stream_format(stream, "CCC"); break;
-						case 0x01:  util::stream_format(stream, "CEC"); break;
-						case 0x02:  util::stream_format(stream, "CEV"); break;
-						case 0x04:  util::stream_format(stream, "CEZ"); break;
-						case 0x08:  util::stream_format(stream, "CEN"); break;
-						default:    util::stream_format(stream, "Ccc   #%X", lo & 15); break;
+						case 000:  util::stream_format(stream, "NOP"); break;
+						case 017:  util::stream_format(stream, "CCC"); break;
+						case 001:  util::stream_format(stream, "CEC"); break;
+						case 002:  util::stream_format(stream, "CEV"); break;
+						case 004:  util::stream_format(stream, "CEZ"); break;
+						case 010:  util::stream_format(stream, "CEN"); break;
+						default:   util::stream_format(stream, "Ccc   #%02o", lo & 15); break;
 					}
 					break;
 				case 060:
 				case 070:
 					switch( lo & 15 )
 					{
-						case 0x00:  util::stream_format(stream, "NOP"); break;
-						case 0x0f:  util::stream_format(stream, "SCC"); break;
-						case 0x01:  util::stream_format(stream, "SEC"); break;
-						case 0x02:  util::stream_format(stream, "SEV"); break;
-						case 0x04:  util::stream_format(stream, "SEZ"); break;
-						case 0x08:  util::stream_format(stream, "SEN"); break;
-						default:    util::stream_format(stream, "Scc   #%X", lo & 15); break;
+						case 000:  util::stream_format(stream, "NOP"); break;
+						case 017:  util::stream_format(stream, "SCC"); break;
+						case 001:  util::stream_format(stream, "SEC"); break;
+						case 002:  util::stream_format(stream, "SEV"); break;
+						case 004:  util::stream_format(stream, "SEZ"); break;
+						case 010:  util::stream_format(stream, "SEN"); break;
+						default:   util::stream_format(stream, "Scc   #%02o", lo & 15); break;
 					}
+					break;
+				default:
+					util::stream_format(stream, ".WORD %06o", op);
 					break;
 			}
 			break;
-		case 0x00c0:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0000300:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "SWAB  %s", ea1);
 			break;
-		case 0x0100: case 0x0140: case 0x0180: case 0x01c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BR    %04X", pc + offset);
+		case 0000400: case 0000500: case 0000600: case 0000700:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BR    %06o", (pc + offset) & 0177777);
 			break;
-		case 0x0200: case 0x0240: case 0x0280: case 0x02c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BNE   %04X", pc + offset);
+		case 0001000: case 0001100: case 0001200: case 0001300:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BNE   %06o", (pc + offset) & 0177777);
 			break;
-		case 0x0300: case 0x0340: case 0x0380: case 0x03c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BEQ   %04X", pc + offset);
+		case 0001400: case 0001500: case 0001600: case 0001700:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BEQ   %06o", (pc + offset) & 0177777);
 			break;
-		case 0x0400: case 0x0440: case 0x0480: case 0x04c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BGE   %04X", pc + offset);
+		case 0002000: case 0002100: case 0002200: case 0002300:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BGE   %06o", (pc + offset) & 0177777);
 			break;
-		case 0x0500: case 0x0540: case 0x0580: case 0x05c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BLT   %04X", pc + offset);
+		case 0002400: case 0002500: case 0002600: case 0002700:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BLT   %06o", (pc + offset) & 0177777);
 			break;
-		case 0x0600: case 0x0640: case 0x0680: case 0x06c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BGT   %04X", pc + offset);
+		case 0003000: case 0003100: case 0003200: case 0003300:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BGT   %06o", (pc + offset) & 0177777);
 			break;
-		case 0x0700: case 0x0740: case 0x0780: case 0x07c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BLE   %04X", pc + offset);
+		case 0003400: case 0003500: case 0003600: case 0003700:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BLE   %06o", (pc + offset) & 0177777);
 			break;
-		case 0x0800: case 0x0840: case 0x0880: case 0x08c0:
-		case 0x0900: case 0x0940: case 0x0980: case 0x09c0:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0004000: case 0004100: case 0004200: case 0004300:
+		case 0004400: case 0004500: case 0004600: case 0004700:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			if ( (hi & 7) == 7 )
 				util::stream_format(stream, "JSR   %s", ea1);
 			else
 				util::stream_format(stream, "JSR   %s,%s", regs[hi & 7], ea1);
 			flags = STEP_OVER;
 			break;
-		case 0x0a00:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0005000:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "CLR   %s", ea1);
 			break;
-		case 0x0a40:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0005100:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "COM   %s", ea1);
 			break;
-		case 0x0a80:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0005200:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "INC   %s", ea1);
 			break;
-		case 0x0ac0:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0005300:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "DEC   %s", ea1);
 			break;
-		case 0x0b00:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0005400:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "NEG   %s", ea1);
 			break;
-		case 0x0b40:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0005500:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "ADC   %s", ea1);
 			break;
-		case 0x0b80:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0005600:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "SBC   %s", ea1);
 			break;
-		case 0x0bc0:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0005700:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "TST   %s", ea1);
 			break;
-		case 0x0c00:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0006000:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "ROR   %s", ea1);
 			break;
-		case 0x0c40:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0006100:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "ROL   %s", ea1);
 			break;
-		case 0x0c80:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0006200:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "ASR   %s", ea1);
 			break;
-		case 0x0cc0:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0006300:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "ASL   %s", ea1);
 			break;
-/*      case 0x0d00:
-            util::stream_format(stream, "MARK  #%X", lo);
+/*      case 0006400:
+            util::stream_format(stream, "MARK  #%o", lo);
             break;*/
-		case 0x0dc0:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0006700:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "SXT   %s", ea1);
 			break;
-		case 0x1000: case 0x1040: case 0x1080: case 0x10c0: case 0x1100: case 0x1140: case 0x1180: case 0x11c0:
-		case 0x1200: case 0x1240: case 0x1280: case 0x12c0: case 0x1300: case 0x1340: case 0x1380: case 0x13c0:
-		case 0x1400: case 0x1440: case 0x1480: case 0x14c0: case 0x1500: case 0x1540: case 0x1580: case 0x15c0:
-		case 0x1600: case 0x1640: case 0x1680: case 0x16c0: case 0x1700: case 0x1740: case 0x1780: case 0x17c0:
-		case 0x1800: case 0x1840: case 0x1880: case 0x18c0: case 0x1900: case 0x1940: case 0x1980: case 0x19c0:
-		case 0x1a00: case 0x1a40: case 0x1a80: case 0x1ac0: case 0x1b00: case 0x1b40: case 0x1b80: case 0x1bc0:
-		case 0x1c00: case 0x1c40: case 0x1c80: case 0x1cc0: case 0x1d00: case 0x1d40: case 0x1d80: case 0x1dc0:
-		case 0x1e00: case 0x1e40: case 0x1e80: case 0x1ec0: case 0x1f00: case 0x1f40: case 0x1f80: case 0x1fc0:
-			ea1 = MakeEA<4> (hi, pc, opcodes);
-			ea2 = MakeEA<4> (lo, pc, opcodes);
+		case 0010000: case 0010100: case 0010200: case 0010300: case 0010400: case 0010500: case 0010600: case 0010700:
+		case 0011000: case 0011100: case 0011200: case 0011300: case 0011400: case 0011500: case 0011600: case 0011700:
+		case 0012000: case 0012100: case 0012200: case 0012300: case 0012400: case 0012500: case 0012600: case 0012700:
+		case 0013000: case 0013100: case 0013200: case 0013300: case 0013400: case 0013500: case 0013600: case 0013700:
+		case 0014000: case 0014100: case 0014200: case 0014300: case 0014400: case 0014500: case 0014600: case 0014700:
+		case 0015000: case 0015100: case 0015200: case 0015300: case 0015400: case 0015500: case 0015600: case 0015700:
+		case 0016000: case 0016100: case 0016200: case 0016300: case 0016400: case 0016500: case 0016600: case 0016700:
+		case 0017000: case 0017100: case 0017200: case 0017300: case 0017400: case 0017500: case 0017600: case 0017700:
+			ea1 = MakeEA<false> (hi, pc, opcodes);
+			ea2 = MakeEA<false> (lo, pc, opcodes);
 			if (lo == 046)      /* MOV src,-(SP) */
 				util::stream_format(stream, "PUSH  %s", ea1);
 			else
@@ -284,247 +285,250 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			else                /* all other */
 				util::stream_format(stream, "MOV   %s,%s", ea1, ea2);
 			break;
-		case 0x2000: case 0x2040: case 0x2080: case 0x20c0: case 0x2100: case 0x2140: case 0x2180: case 0x21c0:
-		case 0x2200: case 0x2240: case 0x2280: case 0x22c0: case 0x2300: case 0x2340: case 0x2380: case 0x23c0:
-		case 0x2400: case 0x2440: case 0x2480: case 0x24c0: case 0x2500: case 0x2540: case 0x2580: case 0x25c0:
-		case 0x2600: case 0x2640: case 0x2680: case 0x26c0: case 0x2700: case 0x2740: case 0x2780: case 0x27c0:
-		case 0x2800: case 0x2840: case 0x2880: case 0x28c0: case 0x2900: case 0x2940: case 0x2980: case 0x29c0:
-		case 0x2a00: case 0x2a40: case 0x2a80: case 0x2ac0: case 0x2b00: case 0x2b40: case 0x2b80: case 0x2bc0:
-		case 0x2c00: case 0x2c40: case 0x2c80: case 0x2cc0: case 0x2d00: case 0x2d40: case 0x2d80: case 0x2dc0:
-		case 0x2e00: case 0x2e40: case 0x2e80: case 0x2ec0: case 0x2f00: case 0x2f40: case 0x2f80: case 0x2fc0:
-			ea1 = MakeEA<4> (hi, pc, opcodes);
-			ea2 = MakeEA<4> (lo, pc, opcodes);
+		case 0020000: case 0020100: case 0020200: case 0020300: case 0020400: case 0020500: case 0020600: case 0020700:
+		case 0021000: case 0021100: case 0021200: case 0021300: case 0021400: case 0021500: case 0021600: case 0021700:
+		case 0022000: case 0022100: case 0022200: case 0022300: case 0022400: case 0022500: case 0022600: case 0022700:
+		case 0023000: case 0023100: case 0023200: case 0023300: case 0023400: case 0023500: case 0023600: case 0023700:
+		case 0024000: case 0024100: case 0024200: case 0024300: case 0024400: case 0024500: case 0024600: case 0024700:
+		case 0025000: case 0025100: case 0025200: case 0025300: case 0025400: case 0025500: case 0025600: case 0025700:
+		case 0026000: case 0026100: case 0026200: case 0026300: case 0026400: case 0026500: case 0026600: case 0026700:
+		case 0027000: case 0027100: case 0027200: case 0027300: case 0027400: case 0027500: case 0027600: case 0027700:
+			ea1 = MakeEA<false> (hi, pc, opcodes);
+			ea2 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "CMP   %s,%s", ea1, ea2);
 			break;
-		case 0x3000: case 0x3040: case 0x3080: case 0x30c0: case 0x3100: case 0x3140: case 0x3180: case 0x31c0:
-		case 0x3200: case 0x3240: case 0x3280: case 0x32c0: case 0x3300: case 0x3340: case 0x3380: case 0x33c0:
-		case 0x3400: case 0x3440: case 0x3480: case 0x34c0: case 0x3500: case 0x3540: case 0x3580: case 0x35c0:
-		case 0x3600: case 0x3640: case 0x3680: case 0x36c0: case 0x3700: case 0x3740: case 0x3780: case 0x37c0:
-		case 0x3800: case 0x3840: case 0x3880: case 0x38c0: case 0x3900: case 0x3940: case 0x3980: case 0x39c0:
-		case 0x3a00: case 0x3a40: case 0x3a80: case 0x3ac0: case 0x3b00: case 0x3b40: case 0x3b80: case 0x3bc0:
-		case 0x3c00: case 0x3c40: case 0x3c80: case 0x3cc0: case 0x3d00: case 0x3d40: case 0x3d80: case 0x3dc0:
-		case 0x3e00: case 0x3e40: case 0x3e80: case 0x3ec0: case 0x3f00: case 0x3f40: case 0x3f80: case 0x3fc0:
-			ea1 = MakeEA<4> (hi, pc, opcodes);
-			ea2 = MakeEA<4> (lo, pc, opcodes);
+		case 0030000: case 0030100: case 0030200: case 0030300: case 0030400: case 0030500: case 0030600: case 0030700:
+		case 0031000: case 0031100: case 0031200: case 0031300: case 0031400: case 0031500: case 0031600: case 0031700:
+		case 0032000: case 0032100: case 0032200: case 0032300: case 0032400: case 0032500: case 0032600: case 0032700:
+		case 0033000: case 0033100: case 0033200: case 0033300: case 0033400: case 0033500: case 0033600: case 0033700:
+		case 0034000: case 0034100: case 0034200: case 0034300: case 0034400: case 0034500: case 0034600: case 0034700:
+		case 0035000: case 0035100: case 0035200: case 0035300: case 0035400: case 0035500: case 0035600: case 0035700:
+		case 0036000: case 0036100: case 0036200: case 0036300: case 0036400: case 0036500: case 0036600: case 0036700:
+		case 0037000: case 0037100: case 0037200: case 0037300: case 0037400: case 0037500: case 0037600: case 0037700:
+			ea1 = MakeEA<false> (hi, pc, opcodes);
+			ea2 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "BIT   %s,%s", ea1, ea2);
 			break;
-		case 0x4000: case 0x4040: case 0x4080: case 0x40c0: case 0x4100: case 0x4140: case 0x4180: case 0x41c0:
-		case 0x4200: case 0x4240: case 0x4280: case 0x42c0: case 0x4300: case 0x4340: case 0x4380: case 0x43c0:
-		case 0x4400: case 0x4440: case 0x4480: case 0x44c0: case 0x4500: case 0x4540: case 0x4580: case 0x45c0:
-		case 0x4600: case 0x4640: case 0x4680: case 0x46c0: case 0x4700: case 0x4740: case 0x4780: case 0x47c0:
-		case 0x4800: case 0x4840: case 0x4880: case 0x48c0: case 0x4900: case 0x4940: case 0x4980: case 0x49c0:
-		case 0x4a00: case 0x4a40: case 0x4a80: case 0x4ac0: case 0x4b00: case 0x4b40: case 0x4b80: case 0x4bc0:
-		case 0x4c00: case 0x4c40: case 0x4c80: case 0x4cc0: case 0x4d00: case 0x4d40: case 0x4d80: case 0x4dc0:
-		case 0x4e00: case 0x4e40: case 0x4e80: case 0x4ec0: case 0x4f00: case 0x4f40: case 0x4f80: case 0x4fc0:
-			ea1 = MakeEA<4> (hi, pc, opcodes);
-			ea2 = MakeEA<4> (lo, pc, opcodes);
+		case 0040000: case 0040100: case 0040200: case 0040300: case 0040400: case 0040500: case 0040600: case 0040700:
+		case 0041000: case 0041100: case 0041200: case 0041300: case 0041400: case 0041500: case 0041600: case 0041700:
+		case 0042000: case 0042100: case 0042200: case 0042300: case 0042400: case 0042500: case 0042600: case 0042700:
+		case 0043000: case 0043100: case 0043200: case 0043300: case 0043400: case 0043500: case 0043600: case 0043700:
+		case 0044000: case 0044100: case 0044200: case 0044300: case 0044400: case 0044500: case 0044600: case 0044700:
+		case 0045000: case 0045100: case 0045200: case 0045300: case 0045400: case 0045500: case 0045600: case 0045700:
+		case 0046000: case 0046100: case 0046200: case 0046300: case 0046400: case 0046500: case 0046600: case 0046700:
+		case 0047000: case 0047100: case 0047200: case 0047300: case 0047400: case 0047500: case 0047600: case 0047700:
+			ea1 = MakeEA<false> (hi, pc, opcodes);
+			ea2 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "BIC   %s,%s", ea1, ea2);
 			break;
-		case 0x5000: case 0x5040: case 0x5080: case 0x50c0: case 0x5100: case 0x5140: case 0x5180: case 0x51c0:
-		case 0x5200: case 0x5240: case 0x5280: case 0x52c0: case 0x5300: case 0x5340: case 0x5380: case 0x53c0:
-		case 0x5400: case 0x5440: case 0x5480: case 0x54c0: case 0x5500: case 0x5540: case 0x5580: case 0x55c0:
-		case 0x5600: case 0x5640: case 0x5680: case 0x56c0: case 0x5700: case 0x5740: case 0x5780: case 0x57c0:
-		case 0x5800: case 0x5840: case 0x5880: case 0x58c0: case 0x5900: case 0x5940: case 0x5980: case 0x59c0:
-		case 0x5a00: case 0x5a40: case 0x5a80: case 0x5ac0: case 0x5b00: case 0x5b40: case 0x5b80: case 0x5bc0:
-		case 0x5c00: case 0x5c40: case 0x5c80: case 0x5cc0: case 0x5d00: case 0x5d40: case 0x5d80: case 0x5dc0:
-		case 0x5e00: case 0x5e40: case 0x5e80: case 0x5ec0: case 0x5f00: case 0x5f40: case 0x5f80: case 0x5fc0:
-			ea1 = MakeEA<4> (hi, pc, opcodes);
-			ea2 = MakeEA<4> (lo, pc, opcodes);
+		case 0050000: case 0050100: case 0050200: case 0050300: case 0050400: case 0050500: case 0050600: case 0050700:
+		case 0051000: case 0051100: case 0051200: case 0051300: case 0051400: case 0051500: case 0051600: case 0051700:
+		case 0052000: case 0052100: case 0052200: case 0052300: case 0052400: case 0052500: case 0052600: case 0052700:
+		case 0053000: case 0053100: case 0053200: case 0053300: case 0053400: case 0053500: case 0053600: case 0053700:
+		case 0054000: case 0054100: case 0054200: case 0054300: case 0054400: case 0054500: case 0054600: case 0054700:
+		case 0055000: case 0055100: case 0055200: case 0055300: case 0055400: case 0055500: case 0055600: case 0055700:
+		case 0056000: case 0056100: case 0056200: case 0056300: case 0056400: case 0056500: case 0056600: case 0056700:
+		case 0057000: case 0057100: case 0057200: case 0057300: case 0057400: case 0057500: case 0057600: case 0057700:
+			ea1 = MakeEA<false> (hi, pc, opcodes);
+			ea2 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "BIS   %s,%s", ea1, ea2);
 			break;
-		case 0x6000: case 0x6040: case 0x6080: case 0x60c0: case 0x6100: case 0x6140: case 0x6180: case 0x61c0:
-		case 0x6200: case 0x6240: case 0x6280: case 0x62c0: case 0x6300: case 0x6340: case 0x6380: case 0x63c0:
-		case 0x6400: case 0x6440: case 0x6480: case 0x64c0: case 0x6500: case 0x6540: case 0x6580: case 0x65c0:
-		case 0x6600: case 0x6640: case 0x6680: case 0x66c0: case 0x6700: case 0x6740: case 0x6780: case 0x67c0:
-		case 0x6800: case 0x6840: case 0x6880: case 0x68c0: case 0x6900: case 0x6940: case 0x6980: case 0x69c0:
-		case 0x6a00: case 0x6a40: case 0x6a80: case 0x6ac0: case 0x6b00: case 0x6b40: case 0x6b80: case 0x6bc0:
-		case 0x6c00: case 0x6c40: case 0x6c80: case 0x6cc0: case 0x6d00: case 0x6d40: case 0x6d80: case 0x6dc0:
-		case 0x6e00: case 0x6e40: case 0x6e80: case 0x6ec0: case 0x6f00: case 0x6f40: case 0x6f80: case 0x6fc0:
-			ea1 = MakeEA<4> (hi, pc, opcodes);
-			ea2 = MakeEA<4> (lo, pc, opcodes);
+		case 0060000: case 0060100: case 0060200: case 0060300: case 0060400: case 0060500: case 0060600: case 0060700:
+		case 0061000: case 0061100: case 0061200: case 0061300: case 0061400: case 0061500: case 0061600: case 0061700:
+		case 0062000: case 0062100: case 0062200: case 0062300: case 0062400: case 0062500: case 0062600: case 0062700:
+		case 0063000: case 0063100: case 0063200: case 0063300: case 0063400: case 0063500: case 0063600: case 0063700:
+		case 0064000: case 0064100: case 0064200: case 0064300: case 0064400: case 0064500: case 0064600: case 0064700:
+		case 0065000: case 0065100: case 0065200: case 0065300: case 0065400: case 0065500: case 0065600: case 0065700:
+		case 0066000: case 0066100: case 0066200: case 0066300: case 0066400: case 0066500: case 0066600: case 0066700:
+		case 0067000: case 0067100: case 0067200: case 0067300: case 0067400: case 0067500: case 0067600: case 0067700:
+			ea1 = MakeEA<false> (hi, pc, opcodes);
+			ea2 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "ADD   %s,%s", ea1, ea2);
 			break;
 
-		case 0x7800: case 0x7840: case 0x7880: case 0x78c0: case 0x7900: case 0x7940: case 0x7980: case 0x79c0:
-			ea1 = MakeEA<4> (lo, pc, opcodes);
+		case 0074000: case 0074100: case 0074200: case 0074300: case 0074400: case 0074500: case 0074600: case 0074700:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "XOR   %s,%s", regs[hi & 7], ea1);
 			break;
 
-		case 0x7e00: case 0x7e40: case 0x7e80: case 0x7ec0: case 0x7f00: case 0x7f40: case 0x7f80: case 0x7fc0:
-			addr = (pc + 2 - 2 * lo) & 0xffff;
-			util::stream_format(stream, "SOB   %s,%04X", regs[hi & 7], addr);
+		case 0077000: case 0077100: case 0077200: case 0077300: case 0077400: case 0077500: case 0077600: case 0077700:
+			addr = (pc - 2 * lo) & 0177777;
+			util::stream_format(stream, "SOB   %s,%06o", regs[hi & 7], addr);
 			break;
 
-		case 0x8000: case 0x8040: case 0x8080: case 0x80c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BPL   %04X", pc + offset);
+		case 0100000: case 0100100: case 0100200: case 0100300:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BPL   %06o", (pc + offset) & 0177777);
 			break;
-		case 0x8100: case 0x8140: case 0x8180: case 0x81c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BMI   %04X", pc + offset);
+		case 0100400: case 0100500: case 0100600: case 0100700:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BMI   %06o", (pc + offset) & 0177777);
 			break;
-		case 0x8200: case 0x8240: case 0x8280: case 0x82c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BHI   %04X", pc + offset);
+		case 0101000: case 0101100: case 0101200: case 0101300:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BHI   %06o", (pc + offset) & 0177777);
 			break;
-		case 0x8300: case 0x8340: case 0x8380: case 0x83c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BLOS  %04X", pc + offset);
+		case 0101400: case 0101500: case 0101600: case 0101700:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BLOS  %06o", (pc + offset) & 0177777);
 			break;
-		case 0x8400: case 0x8440: case 0x8480: case 0x84c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BVC   %04X", pc + offset);
+		case 0102000: case 0102100: case 0102200: case 0102300:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BVC   %06o", (pc + offset) & 0177777);
 			break;
-		case 0x8500: case 0x8540: case 0x8580: case 0x85c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BVS   %04X", pc + offset);
+		case 0102400: case 0102500: case 0102600: case 0102700:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BVS   %06o", (pc + offset) & 0177777);
 			break;
-		case 0x8600: case 0x8640: case 0x8680: case 0x86c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BCC   %04X", pc + offset);
+		case 0103000: case 0103100: case 0103200: case 0103300:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BCC   %06o", (pc + offset) & 0177777);
 			break;
-		case 0x8700: case 0x8740: case 0x8780: case 0x87c0:
-			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BCS   %04X", pc + offset);
+		case 0103400: case 0103500: case 0103600: case 0103700:
+			offset = 2 * (int8_t)(op & 0377);
+			util::stream_format(stream, "BCS   %06o", (pc + offset) & 0177777);
 			break;
-		case 0x8800: case 0x8840: case 0x8880: case 0x88c0:
-			util::stream_format(stream, "EMT   %02X", op & 0xff);
+		case 0104000: case 0104100: case 0104200: case 0104300:
+			util::stream_format(stream, "EMT   %03o", op & 0377);
 			break;
-		case 0x8900: case 0x8940: case 0x8980: case 0x89c0:
-			util::stream_format(stream, "TRAP  %02X", op & 0xff);
+		case 0104400: case 0104500: case 0104600: case 0104700:
+			util::stream_format(stream, "TRAP  %03o", op & 0377);
 			break;
 
-		case 0x8a00:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0105000:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "CLRB  %s", ea1);
 			break;
-		case 0x8a40:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0105100:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "COMB  %s", ea1);
 			break;
-		case 0x8a80:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0105200:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "INCB  %s", ea1);
 			break;
-		case 0x8ac0:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0105300:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "DECB  %s", ea1);
 			break;
-		case 0x8b00:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0105400:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "NEGB  %s", ea1);
 			break;
-		case 0x8b40:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0105500:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "ADCB  %s", ea1);
 			break;
-		case 0x8b80:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0105600:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "SBCB  %s", ea1);
 			break;
-		case 0x8bc0:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0105700:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "TSTB  %s", ea1);
 			break;
-		case 0x8c00:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0106000:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "RORB  %s", ea1);
 			break;
-		case 0x8c40:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0106100:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "ROLB  %s", ea1);
 			break;
-		case 0x8c80:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0106200:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "ASRB  %s", ea1);
 			break;
-		case 0x8cc0:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0106300:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "ASLB  %s", ea1);
 			break;
-		case 0x8d00:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0106400:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "MTPS  %s", ea1);
 			break;
-		case 0x8dc0:
-			ea1 = MakeEA<2> (lo, pc, opcodes);
+		case 0106700:
+			ea1 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "MFPS  %s", ea1);
 			break;
-		case 0x9000: case 0x9040: case 0x9080: case 0x90c0: case 0x9100: case 0x9140: case 0x9180: case 0x91c0:
-		case 0x9200: case 0x9240: case 0x9280: case 0x92c0: case 0x9300: case 0x9340: case 0x9380: case 0x93c0:
-		case 0x9400: case 0x9440: case 0x9480: case 0x94c0: case 0x9500: case 0x9540: case 0x9580: case 0x95c0:
-		case 0x9600: case 0x9640: case 0x9680: case 0x96c0: case 0x9700: case 0x9740: case 0x9780: case 0x97c0:
-		case 0x9800: case 0x9840: case 0x9880: case 0x98c0: case 0x9900: case 0x9940: case 0x9980: case 0x99c0:
-		case 0x9a00: case 0x9a40: case 0x9a80: case 0x9ac0: case 0x9b00: case 0x9b40: case 0x9b80: case 0x9bc0:
-		case 0x9c00: case 0x9c40: case 0x9c80: case 0x9cc0: case 0x9d00: case 0x9d40: case 0x9d80: case 0x9dc0:
-		case 0x9e00: case 0x9e40: case 0x9e80: case 0x9ec0: case 0x9f00: case 0x9f40: case 0x9f80: case 0x9fc0:
-			ea1 = MakeEA<2> (hi, pc, opcodes);
-			ea2 = MakeEA<2> (lo, pc, opcodes);
+
+		case 0110000: case 0110100: case 0110200: case 0110300: case 0110400: case 0110500: case 0110600: case 0110700:
+		case 0111000: case 0111100: case 0111200: case 0111300: case 0111400: case 0111500: case 0111600: case 0111700:
+		case 0112000: case 0112100: case 0112200: case 0112300: case 0112400: case 0112500: case 0112600: case 0112700:
+		case 0113000: case 0113100: case 0113200: case 0113300: case 0113400: case 0113500: case 0113600: case 0113700:
+		case 0114000: case 0114100: case 0114200: case 0114300: case 0114400: case 0114500: case 0114600: case 0114700:
+		case 0115000: case 0115100: case 0115200: case 0115300: case 0115400: case 0115500: case 0115600: case 0115700:
+		case 0116000: case 0116100: case 0116200: case 0116300: case 0116400: case 0116500: case 0116600: case 0116700:
+		case 0117000: case 0117100: case 0117200: case 0117300: case 0117400: case 0117500: case 0117600: case 0117700:
+			ea1 = MakeEA<true> (hi, pc, opcodes);
+			ea2 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "MOVB  %s,%s", ea1, ea2);
 			break;
-		case 0xa000: case 0xa040: case 0xa080: case 0xa0c0: case 0xa100: case 0xa140: case 0xa180: case 0xa1c0:
-		case 0xa200: case 0xa240: case 0xa280: case 0xa2c0: case 0xa300: case 0xa340: case 0xa380: case 0xa3c0:
-		case 0xa400: case 0xa440: case 0xa480: case 0xa4c0: case 0xa500: case 0xa540: case 0xa580: case 0xa5c0:
-		case 0xa600: case 0xa640: case 0xa680: case 0xa6c0: case 0xa700: case 0xa740: case 0xa780: case 0xa7c0:
-		case 0xa800: case 0xa840: case 0xa880: case 0xa8c0: case 0xa900: case 0xa940: case 0xa980: case 0xa9c0:
-		case 0xaa00: case 0xaa40: case 0xaa80: case 0xaac0: case 0xab00: case 0xab40: case 0xab80: case 0xabc0:
-		case 0xac00: case 0xac40: case 0xac80: case 0xacc0: case 0xad00: case 0xad40: case 0xad80: case 0xadc0:
-		case 0xae00: case 0xae40: case 0xae80: case 0xaec0: case 0xaf00: case 0xaf40: case 0xaf80: case 0xafc0:
-			ea1 = MakeEA<2> (hi, pc, opcodes);
-			ea2 = MakeEA<2> (lo, pc, opcodes);
+		case 0120000: case 0120100: case 0120200: case 0120300: case 0120400: case 0120500: case 0120600: case 0120700:
+		case 0121000: case 0121100: case 0121200: case 0121300: case 0121400: case 0121500: case 0121600: case 0121700:
+		case 0122000: case 0122100: case 0122200: case 0122300: case 0122400: case 0122500: case 0122600: case 0122700:
+		case 0123000: case 0123100: case 0123200: case 0123300: case 0123400: case 0123500: case 0123600: case 0123700:
+		case 0124000: case 0124100: case 0124200: case 0124300: case 0124400: case 0124500: case 0124600: case 0124700:
+		case 0125000: case 0125100: case 0125200: case 0125300: case 0125400: case 0125500: case 0125600: case 0125700:
+		case 0126000: case 0126100: case 0126200: case 0126300: case 0126400: case 0126500: case 0126600: case 0126700:
+		case 0127000: case 0127100: case 0127200: case 0127300: case 0127400: case 0127500: case 0127600: case 0127700:
+			ea1 = MakeEA<true> (hi, pc, opcodes);
+			ea2 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "CMPB  %s,%s", ea1, ea2);
 			break;
-		case 0xb000: case 0xb040: case 0xb080: case 0xb0c0: case 0xb100: case 0xb140: case 0xb180: case 0xb1c0:
-		case 0xb200: case 0xb240: case 0xb280: case 0xb2c0: case 0xb300: case 0xb340: case 0xb380: case 0xb3c0:
-		case 0xb400: case 0xb440: case 0xb480: case 0xb4c0: case 0xb500: case 0xb540: case 0xb580: case 0xb5c0:
-		case 0xb600: case 0xb640: case 0xb680: case 0xb6c0: case 0xb700: case 0xb740: case 0xb780: case 0xb7c0:
-		case 0xb800: case 0xb840: case 0xb880: case 0xb8c0: case 0xb900: case 0xb940: case 0xb980: case 0xb9c0:
-		case 0xba00: case 0xba40: case 0xba80: case 0xbac0: case 0xbb00: case 0xbb40: case 0xbb80: case 0xbbc0:
-		case 0xbc00: case 0xbc40: case 0xbc80: case 0xbcc0: case 0xbd00: case 0xbd40: case 0xbd80: case 0xbdc0:
-		case 0xbe00: case 0xbe40: case 0xbe80: case 0xbec0: case 0xbf00: case 0xbf40: case 0xbf80: case 0xbfc0:
-			ea1 = MakeEA<2> (hi, pc, opcodes);
-			ea2 = MakeEA<2> (lo, pc, opcodes);
+		case 0130000: case 0130100: case 0130200: case 0130300: case 0130400: case 0130500: case 0130600: case 0130700:
+		case 0131000: case 0131100: case 0131200: case 0131300: case 0131400: case 0131500: case 0131600: case 0131700:
+		case 0132000: case 0132100: case 0132200: case 0132300: case 0132400: case 0132500: case 0132600: case 0132700:
+		case 0133000: case 0133100: case 0133200: case 0133300: case 0133400: case 0133500: case 0133600: case 0133700:
+		case 0134000: case 0134100: case 0134200: case 0134300: case 0134400: case 0134500: case 0134600: case 0134700:
+		case 0135000: case 0135100: case 0135200: case 0135300: case 0135400: case 0135500: case 0135600: case 0135700:
+		case 0136000: case 0136100: case 0136200: case 0136300: case 0136400: case 0136500: case 0136600: case 0136700:
+		case 0137000: case 0137100: case 0137200: case 0137300: case 0137400: case 0137500: case 0137600: case 0137700:
+			ea1 = MakeEA<true> (hi, pc, opcodes);
+			ea2 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "BITB  %s,%s", ea1, ea2);
 			break;
-		case 0xc000: case 0xc040: case 0xc080: case 0xc0c0: case 0xc100: case 0xc140: case 0xc180: case 0xc1c0:
-		case 0xc200: case 0xc240: case 0xc280: case 0xc2c0: case 0xc300: case 0xc340: case 0xc380: case 0xc3c0:
-		case 0xc400: case 0xc440: case 0xc480: case 0xc4c0: case 0xc500: case 0xc540: case 0xc580: case 0xc5c0:
-		case 0xc600: case 0xc640: case 0xc680: case 0xc6c0: case 0xc700: case 0xc740: case 0xc780: case 0xc7c0:
-		case 0xc800: case 0xc840: case 0xc880: case 0xc8c0: case 0xc900: case 0xc940: case 0xc980: case 0xc9c0:
-		case 0xca00: case 0xca40: case 0xca80: case 0xcac0: case 0xcb00: case 0xcb40: case 0xcb80: case 0xcbc0:
-		case 0xcc00: case 0xcc40: case 0xcc80: case 0xccc0: case 0xcd00: case 0xcd40: case 0xcd80: case 0xcdc0:
-		case 0xce00: case 0xce40: case 0xce80: case 0xcec0: case 0xcf00: case 0xcf40: case 0xcf80: case 0xcfc0:
-			ea1 = MakeEA<2> (hi, pc, opcodes);
-			ea2 = MakeEA<2> (lo, pc, opcodes);
+		case 0140000: case 0140100: case 0140200: case 0140300: case 0140400: case 0140500: case 0140600: case 0140700:
+		case 0141000: case 0141100: case 0141200: case 0141300: case 0141400: case 0141500: case 0141600: case 0141700:
+		case 0142000: case 0142100: case 0142200: case 0142300: case 0142400: case 0142500: case 0142600: case 0142700:
+		case 0143000: case 0143100: case 0143200: case 0143300: case 0143400: case 0143500: case 0143600: case 0143700:
+		case 0144000: case 0144100: case 0144200: case 0144300: case 0144400: case 0144500: case 0144600: case 0144700:
+		case 0145000: case 0145100: case 0145200: case 0145300: case 0145400: case 0145500: case 0145600: case 0145700:
+		case 0146000: case 0146100: case 0146200: case 0146300: case 0146400: case 0146500: case 0146600: case 0146700:
+		case 0147000: case 0147100: case 0147200: case 0147300: case 0147400: case 0147500: case 0147600: case 0147700:
+			ea1 = MakeEA<true> (hi, pc, opcodes);
+			ea2 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "BICB  %s,%s", ea1, ea2);
 			break;
-		case 0xd000: case 0xd040: case 0xd080: case 0xd0c0: case 0xd100: case 0xd140: case 0xd180: case 0xd1c0:
-		case 0xd200: case 0xd240: case 0xd280: case 0xd2c0: case 0xd300: case 0xd340: case 0xd380: case 0xd3c0:
-		case 0xd400: case 0xd440: case 0xd480: case 0xd4c0: case 0xd500: case 0xd540: case 0xd580: case 0xd5c0:
-		case 0xd600: case 0xd640: case 0xd680: case 0xd6c0: case 0xd700: case 0xd740: case 0xd780: case 0xd7c0:
-		case 0xd800: case 0xd840: case 0xd880: case 0xd8c0: case 0xd900: case 0xd940: case 0xd980: case 0xd9c0:
-		case 0xda00: case 0xda40: case 0xda80: case 0xdac0: case 0xdb00: case 0xdb40: case 0xdb80: case 0xdbc0:
-		case 0xdc00: case 0xdc40: case 0xdc80: case 0xdcc0: case 0xdd00: case 0xdd40: case 0xdd80: case 0xddc0:
-		case 0xde00: case 0xde40: case 0xde80: case 0xdec0: case 0xdf00: case 0xdf40: case 0xdf80: case 0xdfc0:
-			ea1 = MakeEA<2> (hi, pc, opcodes);
-			ea2 = MakeEA<2> (lo, pc, opcodes);
+		case 0150000: case 0150100: case 0150200: case 0150300: case 0150400: case 0150500: case 0150600: case 0150700:
+		case 0151000: case 0151100: case 0151200: case 0151300: case 0151400: case 0151500: case 0151600: case 0151700:
+		case 0152000: case 0152100: case 0152200: case 0152300: case 0152400: case 0152500: case 0152600: case 0152700:
+		case 0153000: case 0153100: case 0153200: case 0153300: case 0153400: case 0153500: case 0153600: case 0153700:
+		case 0154000: case 0154100: case 0154200: case 0154300: case 0154400: case 0154500: case 0154600: case 0154700:
+		case 0155000: case 0155100: case 0155200: case 0155300: case 0155400: case 0155500: case 0155600: case 0155700:
+		case 0156000: case 0156100: case 0156200: case 0156300: case 0156400: case 0156500: case 0156600: case 0156700:
+		case 0157000: case 0157100: case 0157200: case 0157300: case 0157400: case 0157500: case 0157600: case 0157700:
+			ea1 = MakeEA<true> (hi, pc, opcodes);
+			ea2 = MakeEA<true> (lo, pc, opcodes);
 			util::stream_format(stream, "BISB  %s,%s", ea1, ea2);
 			break;
-		case 0xe000: case 0xe040: case 0xe080: case 0xe0c0: case 0xe100: case 0xe140: case 0xe180: case 0xe1c0:
-		case 0xe200: case 0xe240: case 0xe280: case 0xe2c0: case 0xe300: case 0xe340: case 0xe380: case 0xe3c0:
-		case 0xe400: case 0xe440: case 0xe480: case 0xe4c0: case 0xe500: case 0xe540: case 0xe580: case 0xe5c0:
-		case 0xe600: case 0xe640: case 0xe680: case 0xe6c0: case 0xe700: case 0xe740: case 0xe780: case 0xe7c0:
-		case 0xe800: case 0xe840: case 0xe880: case 0xe8c0: case 0xe900: case 0xe940: case 0xe980: case 0xe9c0:
-		case 0xea00: case 0xea40: case 0xea80: case 0xeac0: case 0xeb00: case 0xeb40: case 0xeb80: case 0xebc0:
-		case 0xec00: case 0xec40: case 0xec80: case 0xecc0: case 0xed00: case 0xed40: case 0xed80: case 0xedc0:
-		case 0xee00: case 0xee40: case 0xee80: case 0xeec0: case 0xef00: case 0xef40: case 0xef80: case 0xefc0:
-			ea1 = MakeEA<4> (hi, pc, opcodes);
-			ea2 = MakeEA<4> (lo, pc, opcodes);
+		case 0160000: case 0160100: case 0160200: case 0160300: case 0160400: case 0160500: case 0160600: case 0160700:
+		case 0161000: case 0161100: case 0161200: case 0161300: case 0161400: case 0161500: case 0161600: case 0161700:
+		case 0162000: case 0162100: case 0162200: case 0162300: case 0162400: case 0162500: case 0162600: case 0162700:
+		case 0163000: case 0163100: case 0163200: case 0163300: case 0163400: case 0163500: case 0163600: case 0163700:
+		case 0164000: case 0164100: case 0164200: case 0164300: case 0164400: case 0164500: case 0164600: case 0164700:
+		case 0165000: case 0165100: case 0165200: case 0165300: case 0165400: case 0165500: case 0165600: case 0165700:
+		case 0166000: case 0166100: case 0166200: case 0166300: case 0166400: case 0166500: case 0166600: case 0166700:
+		case 0167000: case 0167100: case 0167200: case 0167300: case 0167400: case 0167500: case 0167600: case 0167700:
+			ea1 = MakeEA<false> (hi, pc, opcodes);
+			ea2 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "SUB   %s,%s", ea1, ea2);
 			break;
 
+		// 17xxxx: floating point (not implemented on T-11)
+
 		default:
-			util::stream_format(stream, "???? (%06o)", op);
+			util::stream_format(stream, ".WORD %06o", op);
 			break;
 	}
 

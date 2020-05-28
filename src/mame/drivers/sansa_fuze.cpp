@@ -17,8 +17,8 @@ class sansa_fuze_state : public driver_device
 {
 public:
 	sansa_fuze_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void sansa_fuze(machine_config &config);
@@ -46,7 +46,7 @@ INPUT_PORTS_END
 void sansa_fuze_state::sansa_fuze(machine_config &config)
 {
 	/* basic machine hardware */
-	 ARM7(config, m_maincpu, 50000000); // arm based, speed unknown
+	ARM7(config, m_maincpu, 50000000); // arm based, speed unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &sansa_fuze_state::sansa_fuze_map);
 }
 

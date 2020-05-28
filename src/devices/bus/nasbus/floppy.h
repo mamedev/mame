@@ -28,9 +28,9 @@ public:
 	// construction/destruction
 	nascom_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(select_r);
-	DECLARE_WRITE8_MEMBER(select_w);
-	DECLARE_READ8_MEMBER(status_r);
+	uint8_t select_r();
+	void select_w(uint8_t data);
+	uint8_t status_r();
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

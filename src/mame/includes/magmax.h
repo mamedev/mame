@@ -64,8 +64,8 @@ private:
 	DECLARE_WRITE16_MEMBER(cpu_irq_ack_w);
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE16_MEMBER(vreg_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portB_0_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portA_0_w);
+	void ay8910_portB_0_w(uint8_t data);
+	void ay8910_portA_0_w(uint8_t data);
 
 	void magmax_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

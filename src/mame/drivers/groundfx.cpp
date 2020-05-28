@@ -328,7 +328,7 @@ READ32_MEMBER(groundfx_state::irq_speedup_r)
 void groundfx_state::init_groundfx()
 {
 	/* Speedup handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(*this, FUNC(groundfx_state::irq_speedup_r)));
 }
 
 

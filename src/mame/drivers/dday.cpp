@@ -35,15 +35,15 @@ read:
 write:
 
 4000 Search light image and flip
-6400 AY8910 #1 Control Port
-6401 AY8910 #1 Write Port
-6800 AY8910 #2 Control Port
-6801 AY8910 #2 Write Port
+6400 AY8912 #1 Control Port
+6401 AY8912 #1 Write Port
+6800 AY8912 #2 Control Port
+6801 AY8912 #2 Write Port
 7800 Bit 0 - Coin Counter 1
      Bit 1 - Coin Counter 2
      Bit 2 - ??? Pulsated when the player is hit
      Bit 3 - ??? Seems to be unused
-     Bit 4 - Tied to AY8910 RST. Used to turn off sound
+     Bit 4 - Tied to AY8912 RST. Used to turn off sound
      Bit 5 - ??? Seem to be always on
      Bit 6 - Search light enable
      Bit 7 - ???
@@ -67,8 +67,8 @@ void dday_state::dday_map(address_map &map)
 	map(0x5800, 0x5bff).ram().w(FUNC(dday_state::dday_bgvideoram_w)).share("bgvideoram");
 	map(0x5c00, 0x5fff).rw(FUNC(dday_state::dday_colorram_r), FUNC(dday_state::dday_colorram_w)).share("colorram");
 	map(0x6000, 0x63ff).ram();
-	map(0x6400, 0x6401).mirror(0x000e).w(m_ay1, FUNC(ay8910_device::address_data_w));
-	map(0x6800, 0x6801).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x6400, 0x6401).mirror(0x000e).w(m_ay1, FUNC(ay8912_device::address_data_w));
+	map(0x6800, 0x6801).w("ay2", FUNC(ay8912_device::address_data_w));
 	map(0x6c00, 0x6c00).portr("BUTTONS");
 	map(0x7000, 0x7000).portr("DSW0");
 	map(0x7400, 0x7400).portr("DSW1");
@@ -277,8 +277,8 @@ void dday_state::dday(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay1, 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
-	AY8910(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8912(config, m_ay1, 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8912(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 

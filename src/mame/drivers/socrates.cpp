@@ -3,7 +3,7 @@
 /******************************************************************************
 *
 *  V-tech Socrates-series devices
-*  Copyright (C) 2009-2019 Jonathan Gevaryahu AKA Lord Nightmare
+*  Copyright (C) 2009-2020 Jonathan Gevaryahu AKA Lord Nightmare
 *  with dumping help from Kevin 'kevtris' Horton
 *
 *  The devices in this driver all use a similar ASIC, presumably produced by
@@ -117,8 +117,9 @@ public:
 		m_kbdrow(*this, "IN%u", 0)
 	{ }
 
-	void socrates_pal(machine_config &config);
 	void socrates(machine_config &config);
+	void socrates_pal(machine_config &config);
+	void vpainter_pal(machine_config &config);
 
 	void init_socrates();
 	void init_iqunlimz();
@@ -135,7 +136,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
 	required_device<screen_device> m_screen;
-	required_device<generic_slot_device> m_cart;
+	optional_device<generic_slot_device> m_cart;
 	memory_region *m_cart_reg;
 	required_memory_region m_bios_reg;
 	required_memory_region m_vram_reg;
@@ -371,7 +372,7 @@ void socrates_state::machine_start()
 
 void socrates_state::machine_reset()
 {
-	m_cart_reg = memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str());
+	m_cart_reg = m_cart ? memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str()) : nullptr;
 	kbmcu_sim_reset();
 	m_kb_spi_request = true;
 	m_oldkeyvalue = 0;
@@ -399,7 +400,7 @@ void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		clear_irq_cb(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in socrates_state::device_timer");
+		throw emu_fatalerror("Unknown id in socrates_state::device_timer");
 	}
 }
 
@@ -470,8 +471,9 @@ READ8_MEMBER(socrates_state::socrates_cart_r)
 	offset = ((offset&0x3FFFF)|((offset&0xF80000)>>1));
 	if (m_cart_reg)
 	{
-		offset &= (m_cart->get_rom_size()-1);
-		return (*(m_cart_reg->base()+offset));
+		assert(m_cart);
+		offset &= m_cart->get_rom_size()-1;
+		return *(m_cart_reg->base()+offset);
 	}
 	else
 		return 0xF3;
@@ -1489,7 +1491,7 @@ void socrates_state::socrates(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &socrates_state::socrates_mem);
 	m_maincpu->set_addrmap(AS_IO, &socrates_state::socrates_io);
 	m_maincpu->set_vblank_int("screen", FUNC(socrates_state::assert_irq));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ADDRESS_MAP_BANK(config, "rombank1").set_map(&socrates_state::socrates_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "rambank1").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
@@ -1522,7 +1524,7 @@ void socrates_state::socrates_pal(machine_config &config)
 
 	m_maincpu->set_clock(XTAL(26'601'712)/8); // XTAL verified, divider NOT verified; this is a later ASIC so the divider may be different
 
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
@@ -1531,6 +1533,14 @@ void socrates_state::socrates_pal(machine_config &config)
 	m_screen->set_screen_update(FUNC(socrates_state::screen_update_socrates));
 
 	m_sound->set_clock(XTAL(26'601'712)/(512+256)); // this is correct, as strange as it sounds.
+}
+
+void socrates_state::vpainter_pal(machine_config &config)
+{
+	socrates_pal(config);
+
+	config.device_remove("cartslot");
+	config.device_remove("cart_list");
 }
 
 void iqunlimz_state::iqunlimz(machine_config &config)
@@ -1570,9 +1580,9 @@ void iqunlimz_state::iqunlimz(machine_config &config)
 
 ROM_START(socrates)
 	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASEVAL(0xF3)) /* can technically address 4mb of rom via bankswitching; open bus area reads as 0xF3 on fluke */
-	/* Socrates US NTSC */
-	/* all cart roms are 28 pin 23c1000/tc531000 128Kx8 roms */
-	/* cart port pinout:
+	/* Socrates English (same ROM for NTSC and PAL) */
+	/* All cart ROMs are 28 pin 23c1000/tc531000 128Kx8 ROMs */
+	/* Cart port pinout:
 	(looking into end of disk-shaped cartridge with label/top side pointing to the right)
 	A15 -> 19  18 -- VCC
 	A14 -> 20  17 <- A16
@@ -1595,9 +1605,9 @@ ROM_START(socrates)
 	Note that a17 goes to what would be pin 2 on a rom chip if a 32 pin rom were installed, which is not the case. (pins 1, 31 and 32 would be tied to vcc)
 	It is likely that at least one of the 6 unknown lines is R/W from the z80, and another may be phi1/m1/clock etc to allow for ram to live in cart space
 
-	Cartridge check procedure by socrates is, after screen init and check for speech synth,
+	Cartridge check procedure by Socrates is, after screen init and check for speech synth,
 	bankswitch to bank 0x10 (i.e. first 0x4000 of cart appears at 4000-7fff in z80 space),
-	do following tests; if any tests fail, jump to 0x0015 (socrates main menu)
+	do following tests; if any tests fail, jump to 0x0015 (Socrates main menu)
 	* read 0x7ff0(0x3ff0 in cart rom) and compare to 0xAA
 	* read 0x7ff1(0x3ff1 in cart rom) and compare to 0x55
 	* read 0x7ff2(0x3ff2 in cart rom) and compare to 0xE7
@@ -1692,7 +1702,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     STATE           INIT           COMPANY                    FULLNAME                             FLAGS
-COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English NTSC, no title copyright
+COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English, no title copyright, same ROM for NTSC and PAL
 COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates SAITOUT",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // French Canandian NTSC, 1988 title copyright
 // Yeno Professeur Saitout (French SECAM) matches the Socrates SAITOUT dump (same ROM 27-00884-001-000)
 COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, init_socrates, "Video Technology / Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
@@ -1700,5 +1710,5 @@ COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, 
 
 COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlimz_state, init_iqunlimz, "Video Technology",        "IQ Unlimited (Z80)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-COMP( 1991, vpainter, 0,        0,      socrates_pal, socrates, socrates_state, init_vpainter, "Video Technology", "Video Painter (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1991, vpainter, 0,        0,      vpainter_pal, socrates, socrates_state, init_vpainter, "Video Technology",        "Video Painter (PAL)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // Master Video Painter goes here

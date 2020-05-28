@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best, Nigel Barnes
 /***************************************************************************
 
@@ -43,6 +43,11 @@ int acorn_ssd_format::find_size(io_generic *io, uint32_t form_factor)
 		// test for Torch CPN - test pattern at sector &0018
 		io_generic_read(io, cat, 0x32800, 8);
 		if (memcmp(cat, "\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd", 4) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
+			return i;
+
+		// test for HADFS - test pattern at sector 70
+		io_generic_read(io, cat, 0x04610, 8);
+		if (memcmp(cat, "\x00\x28\x43\x29\x4a\x47\x48\x00", 4) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 			return i;
 
 		// read sector count from side 0 catalogue
@@ -168,6 +173,11 @@ int acorn_dsd_format::find_size(io_generic *io, uint32_t form_factor)
 		// test for Torch CPN - test pattern at sector &0018
 		io_generic_read(io, cat, 0x1200, 8);
 		if (memcmp(cat, "\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd", 4) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
+			return i;
+
+		// test for HADFS - test pattern at sector 70
+		io_generic_read(io, cat, 0x08c10, 8);
+		if (memcmp(cat, "\x00\x28\x43\x29\x4a\x47\x48\x00", 4) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 			return i;
 
 		// read sector count from side 0 catalogue

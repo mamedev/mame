@@ -23,8 +23,8 @@ public:
 
 	auto req() { return m_write_req.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -54,9 +54,9 @@ private:
 		double bw, last_bw;         /* bandwidth, in Hz */
 		double output, last_output; /* filter state */
 #else
-		uint16_t fm, last_fm;
-		uint16_t bw, last_bw;
-		int32_t  output, last_output;
+		uint16_t fm = 0, last_fm = 0;
+		uint16_t bw = 0, last_bw = 0;
+		int32_t  output = 0, last_output = 0;
 #endif
 	};
 
@@ -87,31 +87,31 @@ private:
 	devcb_write8 m_write_req;
 
 	/* state */
-	mea8000_state m_state; /* current state */
+	mea8000_state m_state = mea8000_state::STOPPED; /* current state */
 
-	uint8_t m_buf[4]; /* store 4 consecutive data to form a frame info */
-	uint8_t m_bufpos; /* new byte to write in frame info buffer */
+	uint8_t m_buf[4] = { 0, 0, 0, 0 }; /* store 4 consecutive data to form a frame info */
+	uint8_t m_bufpos = 0; /* new byte to write in frame info buffer */
 
-	uint8_t m_cont; /* if no data 0=stop 1=repeat last frame */
-	uint8_t m_roe;  /* enable req output, now unimplemented */
+	uint8_t m_cont = 0; /* if no data 0=stop 1=repeat last frame */
+	uint8_t m_roe = 0;  /* enable req output, now unimplemented */
 
-	uint16_t m_framelength;  /* in samples */
-	uint16_t m_framepos;     /* in samples */
-	uint16_t m_framelog;     /* log2 of framelength */
+	uint16_t m_framelength = 0;  /* in samples */
+	uint16_t m_framepos = 0;     /* in samples */
+	uint16_t m_framelog = 0;     /* log2 of framelength */
 
-	int16_t m_lastsample, m_sample; /* output samples are interpolated */
+	int16_t m_lastsample = 0, m_sample = 0; /* output samples are interpolated */
 
-	uint32_t m_phi; /* absolute phase for frequency / noise generator */
+	uint32_t m_phi = 0; /* absolute phase for frequency / noise generator */
 
 	filter_t m_f[4]; /* filters */
 
-	uint16_t m_last_ampl, m_ampl;    /* amplitude * 1000 */
-	uint16_t m_last_pitch, m_pitch;  /* pitch of sawtooth signal, in Hz */
-	uint8_t  m_noise;
+	uint16_t m_last_ampl = 0, m_ampl = 0;    /* amplitude * 1000 */
+	uint16_t m_last_pitch = 0, m_pitch = 0;  /* pitch of sawtooth signal, in Hz */
+	uint8_t  m_noise = 0;
 
-	emu_timer *m_timer;
-	sound_stream * m_stream;
-	stream_sample_t m_output;
+	emu_timer *m_timer = nullptr;
+	sound_stream * m_stream = nullptr;
+	stream_sample_t m_output = 0;
 
 	int m_cos_table[TABLE_LEN];  /* fm => cos coefficient */
 	int m_exp_table[TABLE_LEN];  /* bw => exp coefficient */

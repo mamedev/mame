@@ -1,31 +1,49 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="microvision" description="Milton Bradley MicroVision cartridges">
 <!--
-The following board types are known to exist:
-4952 REV-A - used for tms1100 games, 2 varations exist, one with and one without paddle circuitry
-4952-79 REV-B - used for tms1100 games, 2 variations exists, one with and one without paddle circuitry
-4971-REV-C - used for i8021 based game(s). Found in Connect Four
-7924952D02 - used for shrink DIP version of the tms1100. Found in Super Blockbuster
-
-The "pcb" feature is used to indicate the board type
-The "paddle" feature is used to indicate whether there is paddle circuitry on the board
-The "rc" feature is used to indicate the source of the clock signal
+license:CC0
 -->
 
+<!--
+
+All known games are dumped, see below for list in chronological order.
+But, 1st revisions of Block Buster and Bowling (8021 MCU) are not yet dumped.
+One more game "Barrage" was announced but not released.
+
+4952 - Block Buster
+4971 - Connect Four (TMS1100 and 8021 versions)
+4972 - Bowling
+4973 - Star Trek: Phaser Strike (aka Shooting Star in Europe)
+4974 - Pinball
+4975 - Vegas Slots
+4976 - Mindbuster
+4063 - Baseball
+4064 - Sea Duel
+4176 - Alien Raiders (aka Space Blitz or Blitz in Europe)
+4177 - Cosmic Hunter
+4241 - Super Blockbuster
+
+The "clock" feature is used to indicate MCU clock frequency
+The "pla" feature is for TMS1100 output PLA type
+The "paddle" feature is used to indicate if paddle circuitry exists on the PCB
+The "butmask" feature indicates cartridge button restrict mask (active-low)
+-->
+
+<softwarelist name="microvision" description="Milton Bradley Microvision cartridges">
 
 	<software name="alienrdr">
 		<description>Alien Raiders</description>
 		<year>1981</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="M34009" />
+		<info name="pcb" value="4952-79 REV-B" />
+		<info name="serial" value="4176" />
 		<part name="cart" interface="microvision_cart">
+			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
 			<feature name="pla" value="1" />
-			<feature name="pcb" value="4952-79 REV-B" />
-			<feature name="paddle" value="yes" />
-			<feature name="rc" value="100pf/23.2K" />
-			<dataarea name="rom" size="2048">
-				<rom name="m34009-n1" size="2048" crc="b1632712" sha1="515040a3bf6386590c025e12a9512c98efdd7e1e" offset="0" />
+			<feature name="paddle" value="1" />
+			<feature name="butmask" value="0xaaa" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
+				<rom name="m34009-n1" size="0x800" crc="b1632712" sha1="515040a3bf6386590c025e12a9512c98efdd7e1e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34,28 +52,32 @@ The "rc" feature is used to indicate the source of the clock signal
 		<description>Baseball</description>
 		<year>1980</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="MP3479" />
+		<info name="pcb" value="4952-79 REV-B" /> <!-- also seen with 4952-56 REV- -->
+		<info name="serial" value="4063" />
 		<part name="cart" interface="microvision_cart">
-			<feature name="pcb" value="4952-79 REV-B" />
-			<feature name="paddle" value="yes" />
-			<feature name="rc" value="100pf/23.2K" />
-			<dataarea name="rom" size="2048">
-				<rom name="mp3479-n1nll_4063" size="2048" crc="40e3327a" sha1="c1b52a081c7fe6a51c5cfe41a4d446f1f8cfe24e" offset="0" />
+			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
+			<feature name="pla" value="0" />
+			<feature name="paddle" value="1" />
+			<feature name="butmask" value="0xaaa" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
+				<rom name="mp3479-n1nll_4063" size="0x800" crc="40e3327a" sha1="c1b52a081c7fe6a51c5cfe41a4d446f1f8cfe24e"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="blckbstr">
-		<description>Blockbuster</description>
+		<description>Block Buster</description>
 		<year>1979</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="MP3450A" />
+		<info name="pcb" value="4952 REV-A" />
+		<info name="serial" value="4952" /> <!-- pack-in game, serial of Microvision console -->
 		<part name="cart" interface="microvision_cart">
-			<feature name="pcb" value="4952 REV-A" />
-			<feature name="paddle" value="yes" />
-			<feature name="rc" value="100pf/23.2K" />
-			<dataarea name="rom" size="2048">
-				<rom name="mp3450a" size="2048" crc="fd18ea6d" sha1="30203278d7f2b0817e59bdf7e451be2d64a90f5a" offset="0" />
+			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
+			<feature name="pla" value="0" />
+			<feature name="paddle" value="1" />
+			<feature name="butmask" value="0xbab" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU, die label 1100B, MP3450A -->
+				<rom name="mp3450a" size="0x800" crc="fd18ea6d" sha1="30203278d7f2b0817e59bdf7e451be2d64a90f5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,45 +86,48 @@ The "rc" feature is used to indicate the source of the clock signal
 		<description>Bowling</description>
 		<year>1979</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="MP3475" />
+		<info name="pcb" value="4952-79 REV-B" /> <!-- also seen with 4952 REV-A -->
+		<info name="serial" value="4972" />
 		<part name="cart" interface="microvision_cart">
-			<!-- also seen with 4952 REV-A -->
+			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
 			<feature name="pla" value="1" />
-			<feature name="pcb" value="4952-79 REV-B" />
-			<feature name="paddle" value="no" />
-			<feature name="rc" value="100pf/23.2K" />
-			<dataarea name="rom" size="2048">
-				<rom name="mp3475nll_4972" size="2048" crc="460ac30e" sha1="93ffb75b82d1f48f451e0e1158d5a8d1cd465fe5" offset="0" />
+			<feature name="paddle" value="0" />
+			<feature name="butmask" value="0x7a7" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU, die label 1100E, MP3475 -->
+				<rom name="mp3475nll_4972" size="0x800" crc="460ac30e" sha1="93ffb75b82d1f48f451e0e1158d5a8d1cd465fe5"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="connect4">
-		<description>Connect Four (8021)</description>
+		<description>Connect Four (TMS1100 version)</description>
 		<year>1979</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="MP3481" />
+		<info name="pcb" value="4952-79 REV-B" /> <!-- correct? -->
+		<info name="serial" value="4971" />
 		<part name="cart" interface="microvision_cart">
-			<feature name="pcb" value="4971-REV-C" />
-			<feature name="paddle" value="yes" />
-			<dataarea name="rom" size="1024">
-				<!-- 8021 on cart has no label -->
-				<rom name="connect4.bin" size="1024" crc="bdd8660b" sha1="971f9117dc809f7b9796134208b47ea34990ae71" offset="0" />
+			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K? (matches video recording) -->
+			<feature name="pla" value="1" />
+			<feature name="paddle" value="1" />
+			<feature name="butmask" value="0xaaa" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
+				<rom name="mp3481" size="0x800" crc="6a4cf60b" sha1="e93d848784205ab49234ad26718e04d267b776ed"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="connect4t" cloneof="connect4">
-		<description>Connect Four (TMS1100)</description>
+	<software name="connect4o" cloneof="connect4">
+		<description>Connect Four (8021 version)</description>
 		<year>1979</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="MP3481" />
+		<info name="pcb" value="4971-REV-C" />
+		<info name="serial" value="4971" />
 		<part name="cart" interface="microvision_cart">
-			<feature name="pla" value="1" />  <!-- correct? -->
-			<feature name="pcb" value="4952-79 REV-B" />  <!-- correct? -->
-			<feature name="paddle" value="yes" />
-			<dataarea name="rom" size="2048">
-				<rom name="connect4t.bin" size="2048" crc="6a4cf60b" sha1="e93d848784205ab49234ad26718e04d267b776ed" offset="0" />
+			<feature name="clock" value="3000000" /> <!-- LC circuit, correct? (matches video recording) -->
+			<feature name="paddle" value="1" />
+			<feature name="butmask" value="0xaaa" />
+			<dataarea name="rom" size="0x400"> <!-- Intel 8021 MCU -->
+				<rom name="4971" size="0x400" crc="bdd8660b" sha1="971f9117dc809f7b9796134208b47ea34990ae71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -111,14 +136,15 @@ The "rc" feature is used to indicate the source of the clock signal
 		<description>Cosmic hunter</description>
 		<year>1981</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="M34017" />
+		<info name="pcb" value="4952-79 REV-B" />
+		<info name="serial" value="4177" />
 		<part name="cart" interface="microvision_cart">
+			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
 			<feature name="pla" value="1" />
-			<feature name="pcb" value="4952-79 REV-B" />
-			<feature name="paddle" value="no" />
-			<feature name="rc" value="100pf/23.2K" />
-			<dataarea name="rom" size="2048">
-				<rom name="m34017-n1" size="2048" crc="d8ba1377" sha1="a8dabd296aefc46849db2b7d2d8e0de7c77b5b38" offset="0" />
+			<feature name="paddle" value="0" />
+			<feature name="butmask" value="0x505" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
+				<rom name="m34017-n1" size="0x800" crc="d8ba1377" sha1="a8dabd296aefc46849db2b7d2d8e0de7c77b5b38"/>
 			</dataarea>
 		</part>
 	</software>
@@ -127,43 +153,49 @@ The "rc" feature is used to indicate the source of the clock signal
 		<description>Mindbuster</description>
 		<year>1979</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="MP3457" />
+		<info name="pcb" value="4952 REV-A" />
+		<info name="serial" value="4976" />
 		<part name="cart" interface="microvision_cart">
-			<feature name="pcb" value="4952 REV-A" />
-			<feature name="paddle" value="no" />
-			<feature name="rc" value="100pf/21.0K" />
-			<dataarea name="rom" size="2048">
-				<rom name="mp3457nll_4976" size="2048" crc="d5dc1f7d" sha1="9e53bd7e9b718ced3bffbdd50cf9ea1547183ea3" offset="0" />
+			<feature name="clock" value="550000" /> <!-- RC = 100pf/21.0K -->
+			<feature name="pla" value="0" />
+			<feature name="paddle" value="0" />
+			<feature name="butmask" value="0" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
+				<rom name="mp3457nll_4976" size="0x800" crc="d5dc1f7d" sha1="9e53bd7e9b718ced3bffbdd50cf9ea1547183ea3"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="phsrstrk">
-		<description>Star Trek Phaser Strike</description>
+		<description>Star Trek: Phaser Strike</description>
 		<year>1979</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="MP3454" />
+		<info name="pcb" value="4952-79 REV-B" />
+		<info name="serial" value="4973" />
 		<part name="cart" interface="microvision_cart">
-			<feature name="pcb" value="4952-79 REV-B" />
-			<feature name="paddle" value="no" />
-			<feature name="rc" value="100pf/21.0K" />
-			<dataarea name="rom" size="2048">
-				<rom name="mp3454" size="2048" crc="c7768d04" sha1="e477d49fc835649164cff5ed158ee31dcf244efc" offset="0" />
+			<feature name="clock" value="550000" /> <!-- RC = 100pf/21.0K -->
+			<feature name="pla" value="0" />
+			<feature name="paddle" value="0" />
+			<feature name="butmask" value="0x515" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
+				<rom name="mp3454" size="0x800" crc="c7768d04" sha1="e477d49fc835649164cff5ed158ee31dcf244efc"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="pinball">
 		<description>Pinball</description>
-		<year>1980</year>
+		<year>1979</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="MP3455" />
+		<info name="pcb" value="4952-79 REV-B" /> <!-- also seen with 4952 REV-A -->
+		<info name="serial" value="4974" />
 		<part name="cart" interface="microvision_cart">
-			<feature name="pcb" value="4952-79 REV-B" />
-			<feature name="paddle" value="yes" />
-			<feature name="rc" value="100pf/21.0K" />
-			<dataarea name="rom" size="2048">
-				<rom name="mp3455nll_4974" size="2048" crc="906544ea" sha1="7ba8460369e1bb0708b0ef076342774059fd03d2" offset="0" />
+			<feature name="clock" value="550000" /> <!-- RC = 100pf/21.0K -->
+			<feature name="pla" value="0" />
+			<feature name="paddle" value="1" />
+			<feature name="butmask" value="0xbab" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU, die label 1100E, MP3455 -->
+				<rom name="mp3455nll_4974" size="0x800" crc="906544ea" sha1="7ba8460369e1bb0708b0ef076342774059fd03d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -172,14 +204,15 @@ The "rc" feature is used to indicate the source of the clock signal
 		<description>Sea Duel</description>
 		<year>1980</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="MP3496" />
+		<info name="pcb" value="4952-79 REV-B" />
+		<info name="serial" value="4064" />
 		<part name="cart" interface="microvision_cart">
+			<feature name="clock" value="350000" /> <!-- RC = 100pf/39.4K -->
 			<feature name="pla" value="1" />
-			<feature name="pcb" value="4952-79 REV-B" />
-			<feature name="paddle" value="no" />
-			<feature name="rc" value="100pf/39.4K" />
-			<dataarea name="rom" size="2048">
-				<rom name="mp3496-n1_4064" size="2048" crc="77a8f71b" sha1="1f95ecf3b1ec6a17db92e1ae903be269aa0b47d8" offset="0" />
+			<feature name="paddle" value="0" />
+			<feature name="butmask" value="0" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
+				<rom name="mp3496-n1_4064" size="0x800" crc="77a8f71b" sha1="1f95ecf3b1ec6a17db92e1ae903be269aa0b47d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -188,14 +221,15 @@ The "rc" feature is used to indicate the source of the clock signal
 		<description>Super Blockbuster</description>
 		<year>1982</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="M34047" />
+		<info name="pcb" value="7924952D02" />
+		<info name="serial" value="4241" />
 		<part name="cart" interface="microvision_cart">
+			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
 			<feature name="pla" value="1" />
-			<feature name="pcb" value="7924952D02" />
-			<feature name="paddle" value="yes" />
-			<feature name="rc" value="100pf/23.2K" />
-			<dataarea name="rom" size="2048">
-				<rom name="m34047-n2ll_4241" size="2048" crc="796660e3" sha1="1b758369849cc7dea3918774244f747895607377" offset="0" />
+			<feature name="paddle" value="1" />
+			<feature name="butmask" value="0xbfb" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
+				<rom name="m34047-n2ll_4241" size="0x800" crc="796660e3" sha1="1b758369849cc7dea3918774244f747895607377"/>
 			</dataarea>
 		</part>
 	</software>
@@ -204,58 +238,83 @@ The "rc" feature is used to indicate the source of the clock signal
 		<description>Vegas Slots</description>
 		<year>1979</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="MP3474" />
+		<info name="pcb" value="4952 REV-A" />
+		<info name="serial" value="4975" />
 		<part name="cart" interface="microvision_cart">
+			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
 			<feature name="pla" value="1" />
-			<feature name="pcb" value="4952 REV-A" />
-			<feature name="paddle" value="no" />
-			<feature name="rc" value="100pf/23.2K" />
-			<dataarea name="rom" size="2048">
-				<rom name="mp3474nll_4975" size="2048" crc="4500c1d9" sha1="d49522dbe265e71b86488b5533d01bc9050811c9" offset="0" />
+			<feature name="paddle" value="0" />
+			<feature name="butmask" value="0x555" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU, die label 1100E, MP3474 -->
+				<rom name="mp3474nll_4975" size="0x800" crc="4500c1d9" sha1="d49522dbe265e71b86488b5533d01bc9050811c9"/>
 			</dataarea>
 		</part>
 	</software>
 
-<!-- Homebrew -->
+
+<!-- Homebrew (real hardware) -->
+
+	<software name="microbrd">
+		<description>MicroBird</description>
+		<year>2018</year>
+		<publisher>Ayza</publisher>
+		<part name="cart" interface="microvision_cart">
+			<feature name="clock" value="3000000" />
+			<feature name="paddle" value="0" />
+			<dataarea name="rom" size="0x400"> <!-- Intel 8748 MCU, reassembled to 8021 here -->
+				<rom name="microbrd.bin" size="0x400" crc="475a093d" sha1="6e3d2f47c836c43e8a3e74fffe30a64964e8df8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris (TMS1100 version)</description>
+		<year>2019</year>
+		<publisher>Ayza</publisher>
+		<part name="cart" interface="microvision_cart">
+			<feature name="clock" value="500000" />
+			<feature name="pla" value="1" />
+			<feature name="paddle" value="0" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1098 MCU + MBM2716 EPROM -->
+				<rom name="tetris.bin" size="0x800" crc="f08ebfe3" sha1="a1318228235189c9dcdc567a4b71bc82301ee5b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetriso" cloneof="tetris">
+		<description>Tetris (8021 version)</description>
+		<year>2018</year>
+		<publisher>Ayza</publisher>
+		<part name="cart" interface="microvision_cart">
+			<feature name="clock" value="3000000" />
+			<feature name="paddle" value="0" />
+			<dataarea name="rom" size="0x400"> <!-- Intel 8748 MCU, reassembled to 8021 here -->
+				<rom name="tetriso.bin" size="0x400" crc="1170e3e7" sha1="0ce4fd165e12585ca70b86333262576ec2edc880"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Homebrew (emulator or Arduino version, untested on real console) -->
 
 	<software name="bomber">
 		<description>Bomber</description>
 		<year>2014</year>
 		<publisher>Paul Robson</publisher>
 		<part name="cart" interface="microvision_cart">
-			<feature name="pcb" value="4952 REV-A" />
-			<feature name="paddle" value="no" />
-			<feature name="rc" value="100pf/23.2K" />
-			<dataarea name="rom" size="2048">
-				<rom name="bomber.bin" size="2048" crc="badbd0f8" sha1="3c31c24b58b1d6ac1c7313b690ec796cc5010cb7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="demo">
-		<description>Demo</description>
-		<year>2013</year>
-		<publisher>Paul Robson</publisher>
-		<part name="cart" interface="microvision_cart">
-			<feature name="pcb" value="4952 REV-A" />
-			<feature name="paddle" value="no" />
-			<feature name="rc" value="100pf/23.2K" />
-			<dataarea name="rom" size="2048">
-				<rom name="demo.bin" size="2048" crc="54f1b288" sha1="9fcd930dff5f09979d3ed1278a928330b7000068" offset="0" />
+			<dataarea name="rom" size="0x800">
+				<rom name="bomber.bin" size="0x800" crc="badbd0f8" sha1="3c31c24b58b1d6ac1c7313b690ec796cc5010cb7"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="invaders">
-		<description>Invaders</description>
+		<description>Space Invaders</description>
 		<year>2014</year>
 		<publisher>Paul Robson</publisher>
 		<part name="cart" interface="microvision_cart">
-			<feature name="pcb" value="4952 REV-A" />
-			<feature name="paddle" value="no" />
-			<feature name="rc" value="100pf/23.2K" />
-			<dataarea name="rom" size="2048">
-				<rom name="invaders.bin" size="2048" crc="d520ff6e" sha1="c979d7004fc205ee050045f13e2d6f2c31e2083e" offset="0" />
+			<dataarea name="rom" size="0x800">
+				<rom name="invaders.bin" size="0x800" crc="d520ff6e" sha1="c979d7004fc205ee050045f13e2d6f2c31e2083e"/>
 			</dataarea>
 		</part>
 	</software>

@@ -72,13 +72,13 @@ public:
 	void tranqgun(machine_config &config);
 	void tranqgun_audio(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(read_coin_status);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_64v);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank_comp);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_composite_blank_comp);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_timer_value);
-	DECLARE_CUSTOM_INPUT_MEMBER(fake_lives_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(samurai_protection_r);
+	DECLARE_READ_LINE_MEMBER(coin_status_r);
+	DECLARE_READ_LINE_MEMBER(get_64v);
+	DECLARE_READ_LINE_MEMBER(vblank_comp_r);
+	DECLARE_READ_LINE_MEMBER(cblank_comp_r);
+	DECLARE_READ_LINE_MEMBER(timer_value_r);
+	template <int Param> DECLARE_READ_LINE_MEMBER(fake_lives_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(samurai_protection_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
 
 protected:
@@ -284,11 +284,11 @@ protected:
 	DECLARE_WRITE8_MEMBER( carnival_audio_1_w );
 	DECLARE_WRITE8_MEMBER( carnival_audio_2_w );
 	DECLARE_READ_LINE_MEMBER( carnival_music_port_t1_r );
-	DECLARE_WRITE8_MEMBER( carnivala_music_port_1_w );
-	DECLARE_WRITE8_MEMBER( carnivala_music_port_2_w );
+	void carnivala_music_port_1_w(uint8_t data);
+	void carnivala_music_port_2_w(uint8_t data);
 	void carnival_psg_latch();
-	DECLARE_WRITE8_MEMBER( carnivalb_music_port_1_w );
-	DECLARE_WRITE8_MEMBER( carnivalb_music_port_2_w );
+	void carnivalb_music_port_1_w(uint8_t data);
+	void carnivalb_music_port_2_w(uint8_t data);
 };
 
 class headonsa_state : public vicdual_state

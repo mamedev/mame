@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -15,6 +15,7 @@ int runAllTests(int _argc, const char* _argv[])
 		", CRT: " BX_CRT_NAME
 		", Date: " __DATE__
 		", Time: " __TIME__
+		", C++: " BX_CPP_NAME
 		);
 	return Catch::Session().run(_argc, _argv);
 }

@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 
 <mamelayout version="2">
 	<element name="background">
@@ -18,7 +21,7 @@
 	</element>
 
 	<view name="Default">
-		<!-- workaround for MAME selecting a 3-screen view by default -->
+		<!-- workaround for MAME selecting a 2-screen view by default -->
 		<screen tag="ioboard:screen"><bounds left="0" top="0" right="1" bottom="1" /></screen>
 
 		<screen tag="screen">

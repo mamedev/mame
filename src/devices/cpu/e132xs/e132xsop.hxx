@@ -2118,7 +2118,7 @@ void hyperstone_device::hyperstone_mulsu()
 	(DST_GLOBAL ? m_core->global_regs : m_core->local_regs)[dstf_code] = (uint32_t)double_word;
 
 	m_core->icount -= m_core->clock_cycles_6;
-	if(SIGNED == IS_SIGNED && (sreg >= 0xffff8000 && sreg <= 0x7fff) && (dreg >= 0xffff8000 && dreg <= 0x7fff))
+	if(SIGNED == IS_SIGNED && ((int32_t) sreg >= -0x8000 && (int32_t) sreg <= 0x7fff) && ((int32_t) dreg >= -0x8000 && (int32_t) dreg <= 0x7fff))
 		m_core->icount += m_core->clock_cycles_2;
 	else if(SIGNED == IS_UNSIGNED && sreg <= 0xffff && dreg <= 0xffff)
 		m_core->icount += m_core->clock_cycles_2;
@@ -2210,7 +2210,7 @@ void hyperstone_device::hyperstone_mul()
 
 	(DST_GLOBAL ? m_core->global_regs : m_core->local_regs)[dst_code] = result;
 
-	if (sreg < 0xffff8000 || sreg > 0x7fff || dreg < 0xffff8000 || dreg > 0x7fff)
+	if ((int32_t)sreg < -0x8000 || (int32_t) sreg > 0x7fff || (int32_t) dreg < -0x8000 || (int32_t) dreg > 0x7fff)
 		m_core->icount -= 5 << m_core->clck_scale;
 	else
 		m_core->icount -= 3 << m_core->clck_scale;

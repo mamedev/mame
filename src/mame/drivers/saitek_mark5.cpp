@@ -13,6 +13,9 @@ by Nick Toop. These credits are in the ROM data.
 Mark VI/Philidor was released a year later, it was a plug-in module for the Mark V.
 It's not much stronger than Mark V(retroactively called Mark V/Travemunde).
 
+When using the MAME sensorboard interface with MK VI, reset the board by pressing
+CLEAR before RESET, needed when starting a new game.
+
 Hardware notes:
 - SY6502A @ ~2MHz (19.6608MHz XTAL, bunch of 74113 dividers)
 - 16KB RAM (8*HM4716AP-4N)
@@ -34,7 +37,6 @@ was the Chess Champion Sensory Board. A piece-recognition chessboard was also
 announced but not released. Maybe it existed as prototype, see patent GB2103943A.
 
 TODO:
-- WIP
 - /2 CPU divider when accessing 0x5000 (the nvram)
 - reading from 0x4400 will write to the LCD too, open bus? it wouldn't make
   sense to use it (and as expected, it never is used)
@@ -56,8 +58,8 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-//#include "saitek_mark5.lh" // clickable
-//#include "saitek_mark6.lh" // clickable
+#include "saitek_mark5.lh" // clickable
+#include "saitek_mark6.lh" // clickable
 
 
 namespace {
@@ -78,7 +80,7 @@ public:
 		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void mark5(machine_config &config);
 	void mark6(machine_config &config);
 
@@ -97,7 +99,7 @@ private:
 	required_device_array<hlcd0538_device, 3> m_lcd;
 	required_device<dac_bit_interface> m_dac;
 	required_shared_ptr<u8> m_nvram;
-	required_ioport_array<7+1> m_inputs;
+	required_ioport_array<7+2> m_inputs;
 	output_finder<3, 8, 34> m_out_x;
 
 	// address maps
@@ -110,20 +112,20 @@ private:
 	DECLARE_WRITE8_MEMBER(lcd_data_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(reset_irq_w);
+	void reset_irq_w(u8 data);
 	DECLARE_READ8_MEMBER(reset_irq_r);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(cb_rom_r);
 	DECLARE_WRITE8_MEMBER(cb_w);
 	DECLARE_READ8_MEMBER(cb_r);
 
-	template<int N> DECLARE_WRITE8_MEMBER(pwm_output_w);
-	template<int N> DECLARE_WRITE64_MEMBER(lcd_output_w);
+	template<int N> void pwm_output_w(offs_t offset, u8 data);
+	template<int N> void lcd_output_w(u64 data);
 
-	u8 m_dac_data;
-	u8 m_lcd_lcd;
-	u8 m_lcd_rowsel;
-	u8 m_cb_mux;
+	u8 m_dac_data = 0;
+	u8 m_lcd_lcd = 0;
+	u8 m_lcd_rowsel = 0;
+	u8 m_cb_mux = 0;
 
 	emu_timer *m_irqtimer;
 	TIMER_CALLBACK_MEMBER(interrupt);
@@ -135,12 +137,6 @@ void mark5_state::machine_start()
 	m_out_x.resolve();
 	m_irqtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mark5_state::interrupt),this));
 
-	// zerofill
-	m_dac_data = 0;
-	m_lcd_lcd = 0;
-	m_lcd_rowsel = 0;
-	m_cb_mux = 0;
-
 	// register for savestates
 	save_item(NAME(m_dac_data));
 	save_item(NAME(m_lcd_lcd));
@@ -150,7 +146,7 @@ void mark5_state::machine_start()
 
 void mark5_state::machine_reset()
 {
-	reset_irq_w(machine().dummy_space(), 0, 0);
+	reset_irq_w(0);
 }
 
 
@@ -171,13 +167,13 @@ READ8_MEMBER(mark5_state::nvram_r)
 }
 
 template<int N>
-WRITE8_MEMBER(mark5_state::pwm_output_w)
+void mark5_state::pwm_output_w(offs_t offset, u8 data)
 {
 	m_out_x[N][offset & 0x3f][offset >> 6] = data;
 }
 
 template<int N>
-WRITE64_MEMBER(mark5_state::lcd_output_w)
+void mark5_state::lcd_output_w(u64 data)
 {
 	if (N == 0)
 	{
@@ -208,7 +204,7 @@ TIMER_CALLBACK_MEMBER(mark5_state::interrupt)
 	write_lcd(m_lcd_lcd ^ 1);
 }
 
-WRITE8_MEMBER(mark5_state::reset_irq_w)
+void mark5_state::reset_irq_w(u8 data)
 {
 	// MC14020 R
 	m_irqtimer->adjust(attotime::from_hz((19.6608_MHz_XTAL / 10 / 0x1000) * 2));
@@ -218,7 +214,7 @@ WRITE8_MEMBER(mark5_state::reset_irq_w)
 READ8_MEMBER(mark5_state::reset_irq_r)
 {
 	if (!machine().side_effects_disabled())
-		reset_irq_w(space, offset, 0);
+		reset_irq_w(0);
 
 	return 0xff;
 }
@@ -362,11 +358,11 @@ static INPUT_PORTS_START( mark5 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Mode")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Start Clock")
 
-	PORT_START("IN.5") // square 'd-pad' (8-way, so define joystick)
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_CODE(KEYCODE_UP) PORT_NAME("Cursor Up")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Cursor Down")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Cursor Right")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Cursor Left")
+	PORT_START("IN.5") // d-pad reads here
+	PORT_BIT(0x01, 0x01, IPT_CUSTOM) PORT_CONDITION("IN.8", 0x31, NOTEQUALS, 0x00)
+	PORT_BIT(0x02, 0x02, IPT_CUSTOM) PORT_CONDITION("IN.8", 0xc2, NOTEQUALS, 0x00)
+	PORT_BIT(0x04, 0x04, IPT_CUSTOM) PORT_CONDITION("IN.8", 0xa4, NOTEQUALS, 0x00)
+	PORT_BIT(0x08, 0x08, IPT_CUSTOM) PORT_CONDITION("IN.8", 0x58, NOTEQUALS, 0x00)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 
@@ -387,6 +383,16 @@ static INPUT_PORTS_START( mark5 )
 	PORT_CONFNAME( 0x02, 0x02, "LCD Light" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+
+	PORT_START("IN.8") // square 'd-pad' (8-way, so define joystick)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_CODE(KEYCODE_UP) PORT_NAME("Cursor Up")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Cursor Down")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Cursor Right")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Cursor Left")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) // ul
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) // ur
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) // dl
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) // dr
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mark6 )
@@ -401,7 +407,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void mark5_state::mark5(machine_config &config)
@@ -433,7 +439,7 @@ void mark5_state::mark5(machine_config &config)
 	screen.set_size(942, 1080);
 	screen.set_visarea_full();
 
-	//config.set_default_layout(layout_saitek_mark5);
+	config.set_default_layout(layout_saitek_mark5);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -454,7 +460,7 @@ void mark5_state::mark6(machine_config &config)
 
 	PWM_DISPLAY(config, m_display[3]).set_size(8, 8);
 	m_display[3]->set_bri_levels(0.001);
-	//config.set_default_layout(layout_saitek_mark6);
+	config.set_default_layout(layout_saitek_mark6);
 }
 
 
@@ -470,8 +476,8 @@ ROM_START( ccmk5 )
 	ROM_LOAD("c47026_syp_2364-3-y5c", 0xc000, 0x2000, CRC(1754ccab) SHA1(d246b6aa2e2a1858dd6608a4dbf496778f79b22e) ) // "
 	ROM_LOAD("c47027_syp_2364-3-y5d", 0xe000, 0x2000, CRC(7c0f7bd8) SHA1(68b4566f0501005f6b1739bb24a4bec990421a6f) ) // "
 
-	ROM_REGION( 1887311, "screen", 0)
-	ROM_LOAD( "ccmk5.svg", 0, 1887311, CRC(3261bcb2) SHA1(46b38a2877faa36ef1adea2b8f484a97b46ea529) )
+	ROM_REGION( 1887415, "screen", 0)
+	ROM_LOAD("ccmk5.svg", 0, 1887415, CRC(656a2263) SHA1(4557979c62b1240f7a0d813ec5f4d54b8a27218e) )
 ROM_END
 
 ROM_START( ccmk6 )
@@ -484,8 +490,8 @@ ROM_START( ccmk6 )
 	ROM_REGION( 0x1000, "chessboard", 0 )
 	ROM_LOAD("d2732c-e.u1", 0x0000, 0x1000, CRC(93221b4c) SHA1(8561b52c80cab7c04d30eaa14f9520a362d7f822) ) // no label, identical halves
 
-	ROM_REGION( 1887311, "screen", 0)
-	ROM_LOAD( "ccmk5.svg", 0, 1887311, CRC(3261bcb2) SHA1(46b38a2877faa36ef1adea2b8f484a97b46ea529) )
+	ROM_REGION( 1887415, "screen", 0)
+	ROM_LOAD("ccmk5.svg", 0, 1887415, CRC(656a2263) SHA1(4557979c62b1240f7a0d813ec5f4d54b8a27218e) )
 ROM_END
 
 } // anonymous namespace
@@ -497,5 +503,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT CMP MACHINE INPUT  STATE        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, ccmk5, 0,      0, mark5,  mark5, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark V", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1982, ccmk6, ccmk5,  0, mark6,  mark6, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark VI/Philidor", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1981, ccmk5, 0,      0, mark5,  mark5, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark V", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, ccmk6, ccmk5,  0, mark6,  mark6, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark VI/Philidor", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

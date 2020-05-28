@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -20,10 +20,9 @@
 #include <entry/entry.h>
 #include <entry/input.h>
 #include <entry/cmd.h>
+#include <entry/dialog.h>
 #include <imgui/imgui.h>
 #include <bgfx_utils.h>
-
-#include <dirent.h>
 
 #include <tinystl/allocator.h>
 #include <tinystl/vector.h>
@@ -109,6 +108,18 @@ struct Geometry
 		Quad,
 		Cross,
 		Hexagon,
+
+		Count
+	};
+};
+
+struct Output
+{
+	enum Enum
+	{
+		sRGB,
+		scRGB,
+		HDR10,
 
 		Count
 	};
@@ -213,10 +224,34 @@ static const InputBinding* s_binding[] =
 };
 BX_STATIC_ASSERT(Binding::Count == BX_COUNTOF(s_binding) );
 
+static const char* s_filter = ""
+	"All Image Formats (bmp, dds, exr, gif, gnf, jpg, jpeg, hdr, ktx, pgm, png, ppm, psd, pvr, tga) | *.bmp *.dds *.exr *.gif *.gnf *.jpg *.jpeg *.hdr *.ktx *.pgm *.png *.ppm *.psd *.pvr *.tga\n"
+	"Windows Bitmap (bmp) | *.bmp\n"
+	"Direct Draw Surface (dds) | *.dds\n"
+	"OpenEXR (exr) | *.exr\n"
+	"Graphics Interchange Format (gif) | *.gif\n"
+	"JPEG Interchange Format (jpg, jpeg) | *.jpg *.jpeg\n"
+	"Radiance RGBE (hdr) | *.hdr\n"
+	"Khronos Texture (ktx) | *.ktx\n"
+	"Portable Graymap/Pixmap Format (pgm, ppm) | *.pgm *.ppm\n"
+	"Portable Network Graphics (png) | *.png\n"
+	"Photoshop Document (psd) | *.psd\n"
+	"PowerVR (pvr) | *.pvr\n"
+	"Truevision TGA (tga) | *.tga\n"
+	;
+
+#if BX_PLATFORM_WINDOWS
+
+extern "C" void*    __stdcall GetModuleHandleA(const char* _moduleName);
+extern "C" uint32_t __stdcall GetModuleFileNameA(void* _module, char* _outFilePath, uint32_t _size);
+
+#endif // BX_PLATFORM_WINDOWS
+
 struct View
 {
 	View()
 		: m_cubeMapGeo(Geometry::Quad)
+		, m_outputFormat(Output::sRGB)
 		, m_fileIndex(0)
 		, m_scaleFn(0)
 		, m_mip(0)
@@ -586,6 +621,46 @@ struct View
 					m_cubeMapGeo = Geometry::Enum( (m_cubeMapGeo + 1) % Geometry::Count);
 				}
 			}
+			else if (0 == bx::strCmp(_argv[1], "output") )
+			{
+				Output::Enum outputPrev = m_outputFormat;
+				if (_argc >= 3)
+				{
+					if (0 == bx::strCmp(_argv[2], "srgb") )
+					{
+						m_outputFormat = Output::sRGB;
+					}
+					else if (0 == bx::strCmp(_argv[2], "scrgb") )
+					{
+						m_outputFormat = Output::scRGB;
+					}
+					else if (0 == bx::strCmp(_argv[2], "hdr10") )
+					{
+						m_outputFormat = Output::HDR10;
+					}
+				}
+				else
+				{
+					m_outputFormat = Output::Enum( (m_outputFormat + 1) % Output::Count);
+				}
+
+				if (outputPrev != m_outputFormat)
+				{
+				    bgfx::TextureFormat::Enum format = bgfx::TextureFormat::RGBA8;
+					uint32_t formatFlag = 0;
+					if (Output::scRGB == m_outputFormat)
+					{
+						format = bgfx::TextureFormat::RGBA16F;
+					}
+					else if (Output::HDR10 == m_outputFormat)
+					{
+						format = bgfx::TextureFormat::RGB10A2;
+						formatFlag = BGFX_RESET_HDR10;
+					}
+
+					bgfx::reset(m_width, m_height, BGFX_RESET_VSYNC | formatFlag, format);
+				}
+			}
 			else if (0 == bx::strCmp(_argv[1], "help") )
 			{
 				m_help ^= true;
@@ -618,68 +693,84 @@ struct View
 
 	void updateFileList(const bx::FilePath& _filePath)
 	{
-		DIR* dir = opendir(_filePath.get() );
+		bx::DirectoryReader dr;
 
-		if (NULL == dir)
-		{
-			m_path = _filePath.getPath();
-			dir = opendir(m_path.get() );
-		}
-		else
+		if (bx::open(&dr, _filePath) )
 		{
 			m_path = _filePath;
 		}
-
-		if (NULL != dir)
+		else if (bx::open(&dr, _filePath.getPath() ) )
 		{
-			for (dirent* item = readdir(dir); NULL != item; item = readdir(dir) )
-			{
-				if (0 == (item->d_type & DT_DIR) )
-				{
-					const bx::StringView fileName(item->d_name);
-					bx::StringView ext = bx::strRFind(fileName, '.');
-					if (!ext.isEmpty() )
-					{
-						ext.set(ext.getPtr()+1, fileName.getTerm() );
-						bool supported = false;
-						for (uint32_t ii = 0; ii < BX_COUNTOF(s_supportedExt); ++ii)
-						{
-							if (0 == bx::strCmpI(ext, s_supportedExt[ii]) )
-							{
-								supported = true;
-								break;
-							}
-						}
+			m_path = _filePath.getPath();
+		}
+		else
+		{
+			DBG("File path `%s` not found.", _filePath.getCPtr() );
+			return;
+		}
 
-						if (supported)
+		bx::Error err;
+
+		m_fileList.clear();
+
+		while (err.isOk() )
+		{
+			bx::FileInfo fi;
+			bx::read(&dr, fi, &err);
+
+			if (err.isOk()
+			&&  bx::FileType::File == fi.type)
+			{
+				bx::StringView ext = fi.filePath.getExt();
+
+				if (!ext.isEmpty() )
+				{
+					ext.set(ext.getPtr()+1, ext.getTerm() );
+
+					bool supported = false;
+					for (uint32_t ii = 0; ii < BX_COUNTOF(s_supportedExt); ++ii)
+					{
+						const bx::StringView supportedExt(s_supportedExt[ii]);
+
+						if (0 == bx::strCmpI(bx::max(ext.getPtr(), ext.getTerm() - supportedExt.getLength() ), supportedExt) )
 						{
-							m_fileList.push_back(item->d_name);
+							supported = true;
+							break;
 						}
+					}
+
+					if (supported)
+					{
+						const bx::StringView fileName = fi.filePath.getFileName();
+						m_fileList.push_back(std::string(fileName.getPtr(), fileName.getTerm() ) );
 					}
 				}
 			}
+		}
 
-			std::sort(m_fileList.begin(), m_fileList.end(), sortNameAscending);
+		bx::close(&dr);
 
-			m_fileIndex = 0;
-			uint32_t idx = 0;
-			for (FileList::const_iterator it = m_fileList.begin(); it != m_fileList.end(); ++it, ++idx)
+		std::sort(m_fileList.begin(), m_fileList.end(), sortNameAscending);
+
+		m_fileIndex = 0;
+		uint32_t idx = 0;
+
+		const bx::StringView fileName = _filePath.getFileName();
+
+		for (FileList::const_iterator it = m_fileList.begin(); it != m_fileList.end(); ++it, ++idx)
+		{
+			if (0 == bx::strCmpI(it->c_str(), fileName) )
 			{
-				if (0 == bx::strCmpI(it->c_str(), _filePath.getFileName() ) )
-				{
-					// If it is case-insensitive match then might be correct one, but keep
-					// searching.
-					m_fileIndex = idx;
+				// If it is case-insensitive match then might be correct one, but keep
+				// searching.
+				m_fileIndex = idx;
 
-					if (0 == bx::strCmp(it->c_str(), _filePath.getFileName() ) )
-					{
-						// If it is exact match we're done.
-						break;
-					}
+				if (0 == bx::strCmp(it->c_str(), fileName) )
+				{
+					// If it is exact match we're done.
+					break;
 				}
 			}
-
-			closedir(dir);
 		}
 	}
 
@@ -748,6 +839,7 @@ struct View
 
 	bgfx::TextureInfo m_textureInfo;
 	Geometry::Enum m_cubeMapGeo;
+	Output::Enum m_outputFormat;
 	uint32_t m_fileIndex;
 	uint32_t m_scaleFn;
 	uint32_t m_mip;
@@ -796,7 +888,7 @@ struct PosUvwColorVertex
 
 	static void init()
 	{
-		ms_decl
+		ms_layout
 			.begin()
 			.add(bgfx::Attrib::Position,  2, bgfx::AttribType::Float)
 			.add(bgfx::Attrib::TexCoord0, 3, bgfx::AttribType::Float)
@@ -814,10 +906,10 @@ struct PosUvwColorVertex
 		m_abgr = _abgr;
 	}
 
-	static bgfx::VertexDecl ms_decl;
+	static bgfx::VertexLayout ms_layout;
 };
 
-bgfx::VertexDecl PosUvwColorVertex::ms_decl;
+bgfx::VertexLayout PosUvwColorVertex::ms_layout;
 
 static uint32_t addQuad(uint16_t* _indices, uint16_t _idx0, uint16_t _idx1, uint16_t _idx2, uint16_t _idx3)
 {
@@ -845,10 +937,10 @@ void setGeometry(
 {
 	if (Geometry::Quad == _type)
 	{
-		if (6 == bgfx::getAvailTransientVertexBuffer(6, PosUvwColorVertex::ms_decl) )
+		if (6 == bgfx::getAvailTransientVertexBuffer(6, PosUvwColorVertex::ms_layout) )
 		{
 			bgfx::TransientVertexBuffer vb;
-			bgfx::allocTransientVertexBuffer(&vb, 6, PosUvwColorVertex::ms_decl);
+			bgfx::allocTransientVertexBuffer(&vb, 6, PosUvwColorVertex::ms_layout);
 			PosUvwColorVertex* vertex = (PosUvwColorVertex*)vb.data;
 
 			const float widthf  = float(_width);
@@ -879,10 +971,10 @@ void setGeometry(
 	{
 		const uint32_t numVertices = 14;
 		const uint32_t numIndices  = 36;
-		if (checkAvailTransientBuffers(numVertices, PosUvwColorVertex::ms_decl, numIndices) )
+		if (checkAvailTransientBuffers(numVertices, PosUvwColorVertex::ms_layout, numIndices) )
 		{
 			bgfx::TransientVertexBuffer tvb;
-			bgfx::allocTransientVertexBuffer(&tvb, numVertices, PosUvwColorVertex::ms_decl);
+			bgfx::allocTransientVertexBuffer(&tvb, numVertices, PosUvwColorVertex::ms_layout);
 
 			bgfx::TransientIndexBuffer tib;
 			bgfx::allocTransientIndexBuffer(&tib, numIndices);
@@ -981,7 +1073,7 @@ struct InterpolatorT
 	{
 		from     = _value;
 		to       = _value;
-		duration = 0.0;
+		duration = 0.0f;
 		offset   = bx::getHPCounter();
 	}
 
@@ -1003,7 +1095,7 @@ struct InterpolatorT
 			const double freq = double(bx::getHPFrequency() );
 			int64_t now = bx::getHPCounter();
 			float time = (float)(double(now - offset) / freq);
-			float lerp = bx::clamp(time, 0.0f, duration) / duration;
+			float lerp = duration != 0.0f ? bx::clamp(time, 0.0f, duration) / duration : 0.0f;
 			return lerpT(from, to, easeT(lerp) );
 		}
 
@@ -1036,8 +1128,8 @@ void associate()
 #if BX_PLATFORM_WINDOWS
 	std::string str;
 
-	char exec[MAX_PATH];
-	GetModuleFileNameA(GetModuleHandleA(NULL), exec, MAX_PATH);
+	char exec[bx::kMaxFilePath];
+	GetModuleFileNameA(GetModuleHandleA(NULL), exec, sizeof(exec) );
 
 	std::string strExec = bx::replaceAll<std::string>(exec, "\\", "\\\\");
 
@@ -1076,7 +1168,7 @@ void associate()
 		if (err.isOk() )
 		{
 			std::string cmd;
-			bx::stringPrintf(cmd, "/s %s", filePath.get() );
+			bx::stringPrintf(cmd, "/s %s", filePath.getCPtr() );
 
 			bx::ProcessReader reader;
 			if (bx::open(&reader, "regedit.exe", cmd.c_str(), &err) )
@@ -1122,31 +1214,31 @@ void help(const char* _error = NULL)
 {
 	if (NULL != _error)
 	{
-		fprintf(stderr, "Error:\n%s\n\n", _error);
+		bx::printf("Error:\n%s\n\n", _error);
 	}
 
-	fprintf(stderr
-		, "texturev, bgfx texture viewer tool, version %d.%d.%d.\n"
-		  "Copyright 2011-2018 Branimir Karadzic. All rights reserved.\n"
+	bx::printf(
+		  "texturev, bgfx texture viewer tool, version %d.%d.%d.\n"
+		  "Copyright 2011-2019 Branimir Karadzic. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
 		, BGFX_TEXTUREV_VERSION_MAJOR
 		, BGFX_TEXTUREV_VERSION_MINOR
 		, BGFX_API_VERSION
 		);
 
-	fprintf(stderr
-		, "Usage: texturev <file path>\n"
+	bx::printf(
+		  "Usage: texturev <file path>\n"
 		  "\n"
 		  "Supported input file types:\n"
 		  );
 
 	for (uint32_t ii = 0; ii < BX_COUNTOF(s_supportedExt); ++ii)
 	{
-		fprintf(stderr, "    *.%s\n", s_supportedExt[ii]);
+		bx::printf("    *.%s\n", s_supportedExt[ii]);
 	}
 
-	fprintf(stderr
-		, "\n"
+	bx::printf(
+		  "\n"
 		  "Options:\n"
 		  "  -h, --help               Help.\n"
 		  "  -v, --version            Version information only.\n"
@@ -1162,8 +1254,8 @@ int _main_(int _argc, char** _argv)
 
 	if (cmdLine.hasArg('v', "version") )
 	{
-		fprintf(stderr
-			, "texturev, bgfx texture viewer tool, version %d.%d.%d.\n"
+		bx::printf(
+			  "texturev, bgfx texture viewer tool, version %d.%d.%d.\n"
 			, BGFX_TEXTUREV_VERSION_MAJOR
 			, BGFX_TEXTUREV_VERSION_MINOR
 			, BGFX_API_VERSION
@@ -1215,9 +1307,10 @@ int _main_(int _argc, char** _argv)
 	const bgfx::Caps* caps = bgfx::getCaps();
 	bgfx::RendererType::Enum type = caps->rendererType;
 
-	bgfx::UniformHandle s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
+	bgfx::UniformHandle s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
 	bgfx::UniformHandle u_mtx      = bgfx::createUniform("u_mtx",      bgfx::UniformType::Mat4);
-	bgfx::UniformHandle u_params   = bgfx::createUniform("u_params",   bgfx::UniformType::Vec4);
+	bgfx::UniformHandle u_params0  = bgfx::createUniform("u_params0",  bgfx::UniformType::Vec4);
+	bgfx::UniformHandle u_params1  = bgfx::createUniform("u_params1",  bgfx::UniformType::Vec4);
 
 	bgfx::ShaderHandle vsTexture      = bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_texture");
 	bgfx::ShaderHandle fsTexture      = bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture");
@@ -1381,6 +1474,20 @@ int _main_(int _argc, char** _argv)
 			{
 				if (ImGui::BeginMenu("File"))
 				{
+					if (ImGui::MenuItem("Open File") )
+					{
+						bx::FilePath tmp = view.m_path;
+						if (openFileSelectionDialog(
+							  tmp
+							, FileSelectionDialogType::Open
+							, "texturev: Open File"
+							, s_filter
+							) )
+						{
+							view.updateFileList(tmp);
+						}
+					}
+
 					if (ImGui::MenuItem("Show File List", NULL, view.m_files) )
 					{
 						cmdExec("view files");
@@ -1435,6 +1542,31 @@ int _main_(int _argc, char** _argv)
 						if (ImGui::MenuItem("Hexagon", NULL, Geometry::Hexagon == view.m_cubeMapGeo) )
 						{
 							cmdExec("view geo hexagon");
+						}
+
+						ImGui::EndMenu();
+					}
+
+					if (ImGui::BeginMenu("Output") )
+					{
+						const bool hdrCap = (bgfx::getCaps()->supported & BGFX_CAPS_HDR10);
+
+						if (ImGui::MenuItem("sRGB", NULL, Output::sRGB == view.m_outputFormat) )
+						{
+							cmdExec("view output srgb");
+						}
+
+						if (hdrCap)
+						{
+							if (ImGui::MenuItem("scRGB", NULL, Output::scRGB == view.m_outputFormat) )
+							{
+								cmdExec("view output scrgb");
+							}
+
+							if (ImGui::MenuItem("HDR10", NULL, Output::HDR10 == view.m_outputFormat) )
+							{
+								cmdExec("view output hdr10");
+							}
 						}
 
 						ImGui::EndMenu();
@@ -1675,7 +1807,7 @@ int _main_(int _argc, char** _argv)
 			if (view.m_files)
 			{
 				char temp[bx::kMaxFilePath];
-				bx::snprintf(temp, BX_COUNTOF(temp), "%s##File", view.m_path.get() );
+				bx::snprintf(temp, BX_COUNTOF(temp), "%s##File", view.m_path.getCPtr() );
 
 				ImGui::SetNextWindowSize(
 					  ImVec2(400.0f, 400.0f)
@@ -1745,7 +1877,7 @@ int _main_(int _argc, char** _argv)
 
 				ImGui::Text(
 					"texturev, bgfx texture viewer tool " ICON_KI_WRENCH ", version %d.%d.%d.\n"
-					"Copyright 2011-2018 Branimir Karadzic. All rights reserved.\n"
+					"Copyright 2011-2019 Branimir Karadzic. All rights reserved.\n"
 					"License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n"
 					, BGFX_TEXTUREV_VERSION_MAJOR
 					, BGFX_TEXTUREV_VERSION_MINOR
@@ -1834,7 +1966,7 @@ int _main_(int _argc, char** _argv)
 				fp.join(view.m_fileList[view.m_fileIndex].c_str() );
 
 				bimg::Orientation::Enum orientation;
-				texture = loadTexture(fp.get()
+				texture = loadTexture(fp.getCPtr()
 					, 0
 					| BGFX_SAMPLER_U_CLAMP
 					| BGFX_SAMPLER_V_CLAMP
@@ -1883,7 +2015,7 @@ int _main_(int _argc, char** _argv)
 					}
 
 					bx::stringPrintf(title, "%s (%d x %d%s, mips: %d, layers %d, %s)"
-						, fp.get()
+						, fp.getCPtr()
 						, view.m_textureInfo.width
 						, view.m_textureInfo.height
 						, name
@@ -1974,14 +2106,11 @@ int _main_(int _argc, char** _argv)
 
 			if (view.m_fit)
 			{
-				float wh[3] = { float(view.m_textureInfo.width), float(view.m_textureInfo.height), 0.0f };
-				float result[3];
-				bx::vec3MulMtx(result, wh, orientation);
-				result[0] = bx::round(bx::abs(result[0]) );
-				result[1] = bx::round(bx::abs(result[1]) );
+				const bx::Vec3 wh = { float(view.m_textureInfo.width), float(view.m_textureInfo.height), 0.0f };
+				const bx::Vec3 result = bx::round(bx::abs(bx::mul(wh, orientation) ) );
 
-				scale.set(bx::min(float(view.m_width)  / result[0]
-					,             float(view.m_height) / result[1])
+				scale.set(bx::min(float(view.m_width)  / result.x
+					,             float(view.m_height) / result.y)
 					, 0.1f*view.m_transitionTime
 					);
 			}
@@ -2023,7 +2152,10 @@ int _main_(int _argc, char** _argv)
 				params[1] = layer.getValue()/float(bx::max(1, view.m_textureInfo.depth >> view.m_mip) );
 			}
 
-			bgfx::setUniform(u_params, params);
+			bgfx::setUniform(u_params0, params);
+
+			float params1[4] = { float(view.m_outputFormat), 80.0f, 0.0, 0.0f };
+			bgfx::setUniform(u_params1, params1);
 
 			const uint32_t textureFlags = 0
 				| BGFX_SAMPLER_U_CLAMP
@@ -2103,7 +2235,8 @@ int _main_(int _argc, char** _argv)
 	bgfx::destroy(checkerBoard);
 	bgfx::destroy(s_texColor);
 	bgfx::destroy(u_mtx);
-	bgfx::destroy(u_params);
+	bgfx::destroy(u_params0);
+	bgfx::destroy(u_params1);
 	bgfx::destroy(textureProgram);
 	bgfx::destroy(textureArrayProgram);
 	bgfx::destroy(textureCubeProgram);

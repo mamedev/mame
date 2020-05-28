@@ -616,5 +616,5 @@ void nes_sunsoft_5_device::device_add_mconfig(machine_config &config)
 
 	// TODO: this is not how Sunsoft 5B clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!
-	YM2149(config, m_ym2149, (XTAL(21'477'272)/12)/2).add_route(ALL_OUTPUTS, "addon", 0.50); // divide by 2 for the internal divider
+	SUNSOFT_5B_SOUND(config, m_ym2149, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.50);
 }

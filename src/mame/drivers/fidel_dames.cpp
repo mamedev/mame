@@ -11,7 +11,7 @@ Hardware notes:
 - 4-digit 7seg panel, sensory board with 50 buttons
 - PCB label 510-1030A01
 
-It's a checkers game for once instead of chess.
+Instead of chess, it's a checkers game for once (international rules).
 
 When playing it on MAME with the sensorboard device, use the modifier keys
 (eg. hold CTRL to ignore sensor). The game expects the player to press a sensor
@@ -50,7 +50,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void dsc(machine_config &config);
 
 protected:
@@ -74,9 +74,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(select_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	void select_w(u8 data);
+	u8 input_r();
 
 	void init_board(int state);
 	u8 read_board_row(u8 row);
@@ -148,14 +148,14 @@ void dsc_state::update_display()
 	m_display->matrix(m_led_select, m_inp_mux);
 }
 
-WRITE8_MEMBER(dsc_state::control_w)
+void dsc_state::control_w(u8 data)
 {
 	// d0-d7: input mux, 7seg data
 	m_inp_mux = data;
 	update_display();
 }
 
-WRITE8_MEMBER(dsc_state::select_w)
+void dsc_state::select_w(u8 data)
 {
 	// d4: speaker out
 	m_dac->write(BIT(~data, 4));
@@ -165,7 +165,7 @@ WRITE8_MEMBER(dsc_state::select_w)
 	update_display();
 }
 
-READ8_MEMBER(dsc_state::input_r)
+u8 dsc_state::input_r()
 {
 	u8 data = 0;
 
@@ -224,7 +224,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void dsc_state::dsc(machine_config &config)

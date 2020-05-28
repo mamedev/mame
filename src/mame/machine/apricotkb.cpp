@@ -287,7 +287,7 @@ uint8_t apricot_keyboard_device::read_keyboard()
 //  kb_lo_r -
 //-------------------------------------------------
 
-READ8_MEMBER( apricot_keyboard_device::kb_lo_r )
+uint8_t apricot_keyboard_device::kb_lo_r()
 {
 	return read_keyboard() & 0x0f;
 }
@@ -297,7 +297,7 @@ READ8_MEMBER( apricot_keyboard_device::kb_lo_r )
 //  kb_hi_r -
 //-------------------------------------------------
 
-READ8_MEMBER( apricot_keyboard_device::kb_hi_r )
+uint8_t apricot_keyboard_device::kb_hi_r()
 {
 	return read_keyboard() >> 4;
 }
@@ -307,7 +307,7 @@ READ8_MEMBER( apricot_keyboard_device::kb_hi_r )
 //  kb_p6_r -
 //-------------------------------------------------
 
-READ8_MEMBER( apricot_keyboard_device::kb_p6_r )
+uint8_t apricot_keyboard_device::kb_p6_r()
 {
 	/*
 
@@ -329,7 +329,7 @@ READ8_MEMBER( apricot_keyboard_device::kb_p6_r )
 //  kb_p3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( apricot_keyboard_device::kb_p3_w )
+void apricot_keyboard_device::kb_p3_w(uint8_t data)
 {
 	// bit 1 controls the IR LEDs
 }
@@ -339,7 +339,7 @@ WRITE8_MEMBER( apricot_keyboard_device::kb_p3_w )
 //  kb_y0_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( apricot_keyboard_device::kb_y0_w )
+void apricot_keyboard_device::kb_y0_w(uint8_t data)
 {
 	m_kb_y = (m_kb_y & 0xfff0) | (data & 0x0f);
 }
@@ -349,7 +349,7 @@ WRITE8_MEMBER( apricot_keyboard_device::kb_y0_w )
 //  kb_y4_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( apricot_keyboard_device::kb_y4_w )
+void apricot_keyboard_device::kb_y4_w(uint8_t data)
 {
 	m_kb_y = (m_kb_y & 0xff0f) | ((data & 0x0f) << 4);
 }
@@ -359,7 +359,7 @@ WRITE8_MEMBER( apricot_keyboard_device::kb_y4_w )
 //  kb_y8_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( apricot_keyboard_device::kb_y8_w )
+void apricot_keyboard_device::kb_y8_w(uint8_t data)
 {
 	m_kb_y = (m_kb_y & 0xf0ff) | ((data & 0x0f) << 8);
 }
@@ -369,7 +369,7 @@ WRITE8_MEMBER( apricot_keyboard_device::kb_y8_w )
 //  kb_yc_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( apricot_keyboard_device::kb_yc_w )
+void apricot_keyboard_device::kb_yc_w(uint8_t data)
 {
 	m_kb_y = (m_kb_y & 0xf0ff) | ((data & 0x0f) << 12);
 }

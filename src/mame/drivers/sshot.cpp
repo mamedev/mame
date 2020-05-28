@@ -207,12 +207,12 @@ private:
 TILE_GET_INFO_MEMBER(supershot_state::get_supershot_text_tile_info)
 {
 	uint8_t code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void supershot_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supershot_state::get_supershot_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supershot_state::get_supershot_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t supershot_state::screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -348,7 +348,7 @@ GFXDECODE_END
 void supershot_state::supershot(machine_config &config)
 {
 	/* basic machine hardware */
-	SCMP(config, m_maincpu, XTAL(11'289'000)/4);
+	INS8060(config, m_maincpu, XTAL(11'289'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &supershot_state::supershot_map);
 
 	/* video hardware */

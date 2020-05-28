@@ -29,7 +29,7 @@ void pcd_keyboard_device::pcd_keyboard_map(address_map &map)
 
 void pcd_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	i8035_device &mcu(I8035(config, "mcu", 5760000*2)); // FIXME: the mc2661 baud rate calculation
+	i8035_device &mcu(I8035(config, "mcu", 5760000));
 	mcu.set_addrmap(AS_PROGRAM, &pcd_keyboard_device::pcd_keyboard_map);
 	mcu.bus_in_cb().set(FUNC(pcd_keyboard_device::bus_r));
 	mcu.p1_in_cb().set(FUNC(pcd_keyboard_device::p1_r));
@@ -234,19 +234,19 @@ void pcd_keyboard_device::device_start()
 	m_out_tx_handler(1);
 }
 
-READ8_MEMBER( pcd_keyboard_device::bus_r )
+uint8_t pcd_keyboard_device::bus_r()
 {
 	if(m_p1 & 0x10)
 		return m_rows[16]->read();
 	return m_rows[m_p1 & 0xf]->read();
 }
 
-READ8_MEMBER( pcd_keyboard_device::p1_r )
+uint8_t pcd_keyboard_device::p1_r()
 {
 	return m_p1;
 }
 
-WRITE8_MEMBER( pcd_keyboard_device::p1_w )
+void pcd_keyboard_device::p1_w(uint8_t data)
 {
 	m_p1 = data;
 	m_out_tx_handler(BIT(data, 5));

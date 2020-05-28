@@ -20,17 +20,17 @@
 #include "ui/selsoft.h"
 #include "ui/ui.h"
 
-#include "../info.h"
+#include "infoxml.h"
+#include "luaengine.h"
+#include "mame.h"
 
 #include "audit.h"
 #include "drivenum.h"
 #include "emuopts.h"
-#include "mame.h"
 #include "rendutil.h"
 #include "romload.h"
 #include "softlist_dev.h"
 #include "uiinput.h"
-#include "luaengine.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -251,7 +251,7 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 		ui_globals::rpanel = std::min<int>(std::max<int>(moptions.last_right_panel(), RP_FIRST), RP_LAST);
 
 		std::string tmp(moptions.last_used_filter());
-		std::size_t const found = tmp.find_first_of(",");
+		std::size_t const found = tmp.find_first_of(',');
 		std::string fake_ini;
 		if (found == std::string::npos)
 		{
@@ -306,8 +306,8 @@ menu_select_game::~menu_select_game()
 
 	ui_options &mopt = ui().options();
 	mopt.set_value(OPTION_LAST_RIGHT_PANEL, ui_globals::rpanel, OPTION_PRIORITY_CMDLINE);
-	mopt.set_value(OPTION_LAST_USED_FILTER, filter.c_str(), OPTION_PRIORITY_CMDLINE);
-	mopt.set_value(OPTION_LAST_USED_MACHINE, last_driver.c_str(), OPTION_PRIORITY_CMDLINE);
+	mopt.set_value(OPTION_LAST_USED_FILTER, filter, OPTION_PRIORITY_CMDLINE);
+	mopt.set_value(OPTION_LAST_USED_MACHINE, last_driver, OPTION_PRIORITY_CMDLINE);
 	mopt.set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE);
 	ui().save_ui_options();
 }
@@ -371,10 +371,6 @@ void menu_select_game::handle()
 		case IPT_UI_END:
 			if (get_focus() == focused_menu::LEFT)
 				m_filter_highlight = machine_filter::LAST;
-			break;
-
-		case IPT_UI_CONFIGURE:
-			inkey_navigation();
 			break;
 
 		case IPT_UI_EXPORT:
@@ -898,10 +894,10 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		driver_enumerator drv(machine().options(), *ui_swinfo->driver);
 		media_auditor auditor(drv);
 		drv.next();
-		software_list_device *swlist = software_list_device::find_by_name(*drv.config(), ui_swinfo->listname.c_str());
-		const software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+		software_list_device *swlist = software_list_device::find_by_name(*drv.config(), ui_swinfo->listname);
+		const software_info *swinfo = swlist->find(ui_swinfo->shortname);
 
-		media_auditor::summary const summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
+		media_auditor::summary const summary = auditor.audit_software(*swlist, *swinfo, AUDIT_VALIDATE_FAST);
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
@@ -1248,12 +1244,12 @@ render_texture *menu_select_game::get_icon_texture(int linenum, void *selectedre
 
 		bitmap_argb32 tmp;
 		emu_file snapfile(std::string(m_icon_paths), OPEN_FLAG_READ);
-		if (snapfile.open(std::string(driver->name), ".ico") == osd_file::error::NONE)
+		if (snapfile.open(std::string(driver->name) + ".ico") == osd_file::error::NONE)
 		{
 			render_load_ico_highest_detail(snapfile, tmp);
 			snapfile.close();
 		}
-		if (!tmp.valid() && cloneof && (snapfile.open(std::string(driver->parent), ".ico") == osd_file::error::NONE))
+		if (!tmp.valid() && cloneof && (snapfile.open(std::string(driver->parent) + ".ico") == osd_file::error::NONE))
 		{
 			render_load_ico_highest_detail(snapfile, tmp);
 			snapfile.close();
@@ -1298,7 +1294,7 @@ bool menu_select_game::load_available_machines()
 {
 	// try to load available drivers from file
 	emu_file file(ui().options().ui_path(), OPEN_FLAG_READ);
-	if (file.open(emulator_info::get_configname(), "_avail.ini") != osd_file::error::NONE)
+	if (file.open(std::string(emulator_info::get_configname()) + "_avail.ini") != osd_file::error::NONE)
 		return false;
 
 	char rbuf[MAX_CHAR_INFO];
@@ -1351,7 +1347,7 @@ bool menu_select_game::load_available_machines()
 void menu_select_game::load_custom_filters()
 {
 	emu_file file(ui().options().ui_path(), OPEN_FLAG_READ);
-	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == osd_file::error::NONE)
+	if (file.open(util::string_format("custom_%s_filter.ini", emulator_info::get_configname())) == osd_file::error::NONE)
 	{
 		machine_filter::ptr flt(machine_filter::create(file, m_persistent_data.filter_data()));
 		if (flt)
@@ -1396,7 +1392,7 @@ void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, 
 	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"),
 			emulator_info::get_appname(),
 			bare_build_version,
-			visible_items,
+			m_available_items,
 			(driver_list::total() - 1),
 			m_persistent_data.bios_count());
 
@@ -1446,7 +1442,7 @@ void menu_select_game::filter_selected()
 					if (machine_filter::CUSTOM == new_type)
 					{
 						emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-						if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == osd_file::error::NONE)
+						if (file.open(util::string_format("custom_%s_filter.ini", emulator_info::get_configname())) == osd_file::error::NONE)
 						{
 							filter.save_ini(file, 0);
 							file.close();

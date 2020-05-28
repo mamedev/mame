@@ -57,7 +57,7 @@ public:
 	{ }
 
 	// read/write
-	DECLARE_WRITE8_MEMBER(sound_select);
+	void sound_select(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sound_int);
 
 	void as2888_map(address_map &map);
@@ -114,7 +114,7 @@ public:
 
 	// read/write
 	DECLARE_INPUT_CHANGED_MEMBER(sw1);
-	DECLARE_WRITE8_MEMBER(sound_select);
+	void sound_select(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sound_int);
 
 	void as3022_map(address_map &map);
@@ -151,7 +151,7 @@ protected:
 	optional_device<mc3417_device> m_mc3417;
 
 	// overwridden by children
-	DECLARE_WRITE8_MEMBER(pia_portb_w);
+	void pia_portb_w(uint8_t data);
 
 private:
 	bool m_bc1;
@@ -162,11 +162,11 @@ private:
 	// internal communications
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
-	DECLARE_READ8_MEMBER(pia_porta_r);
-	DECLARE_WRITE8_MEMBER(pia_porta_w);
+	uint8_t pia_porta_r();
+	void pia_porta_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irq_w);
-	DECLARE_READ8_MEMBER(ay_io_r);
+	uint8_t ay_io_r();
 
 	void update_ay_bus();
 };
@@ -192,7 +192,7 @@ protected:
 
 private:
 	// internal communications
-	DECLARE_WRITE8_MEMBER(vocalizer_pia_portb_w);
+	void vocalizer_pia_portb_w(uint8_t data);
 };
 
 
@@ -213,7 +213,7 @@ public:
 
 	// read/write
 	DECLARE_INPUT_CHANGED_MEMBER(sw1);
-	DECLARE_WRITE8_MEMBER(sound_select);
+	void sound_select(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sound_int);
 
 	void cheap_squeak_map(address_map &map);
@@ -251,9 +251,9 @@ private:
 	// internal communications
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
-	DECLARE_WRITE8_MEMBER(out_p1_cb);
-	DECLARE_READ8_MEMBER(in_p2_cb);
-	DECLARE_WRITE8_MEMBER(out_p2_cb);
+	void out_p1_cb(uint8_t data);
+	uint8_t in_p2_cb();
+	void out_p2_cb(uint8_t data);
 
 	void update_led();
 };
@@ -275,7 +275,7 @@ public:
 
 	// read/write
 	DECLARE_INPUT_CHANGED_MEMBER(sw1);
-	DECLARE_WRITE8_MEMBER(sound_select);
+	void sound_select(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sound_int);
 
 	void squawk_n_talk_map(address_map &map);
@@ -318,13 +318,13 @@ protected:
 
 	uint8_t m_sound_select;
 
-	DECLARE_READ8_MEMBER(pia2_porta_r);
+	uint8_t pia2_porta_r();
 
 private:
 	// internal communications
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
-	DECLARE_WRITE8_MEMBER(pia1_portb_w);
+	void pia1_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia2_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irq_w);
 };
@@ -346,17 +346,17 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
-	DECLARE_READ8_MEMBER(pia2_porta_r);
+	uint8_t pia2_porta_r();
 
 private:
 	bool m_bc1;
 	bool m_bdir;
 	uint8_t m_ay_data;
 
-	DECLARE_WRITE8_MEMBER(pia2_porta_w);
-	DECLARE_WRITE8_MEMBER(pia2_portb_w);
+	void pia2_porta_w(uint8_t data);
+	void pia2_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia2_cb2_w);
-	DECLARE_READ8_MEMBER(ay_io_r);
+	uint8_t ay_io_r();
 
 	void update_ay_bus();
 };

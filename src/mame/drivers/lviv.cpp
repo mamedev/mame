@@ -426,7 +426,7 @@ void lviv_state::lviv(machine_config &config)
 	I8080(config, m_maincpu, 2500000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lviv_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &lviv_state::io_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	I8255(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set(FUNC(lviv_state::ppi_0_porta_r));
@@ -460,7 +460,7 @@ void lviv_state::lviv(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot */
-	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(lviv_state::snapshot_cb), this);
+	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(lviv_state::snapshot_cb));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(lviv_lvt_format);

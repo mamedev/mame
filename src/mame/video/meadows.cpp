@@ -23,7 +23,7 @@
 TILE_GET_INFO_MEMBER(meadows_state::get_tile_info)
 {
 	uint8_t *videoram = m_videoram;
-	SET_TILE_INFO_MEMBER(0, videoram[tile_index] & 0x7f, 0, 0);
+	tileinfo.set(0, videoram[tile_index] & 0x7f, 0, 0);
 }
 
 
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(meadows_state::get_tile_info)
 
 void meadows_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(meadows_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,30);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(meadows_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,30);
 }
 
 

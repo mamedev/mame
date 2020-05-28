@@ -389,8 +389,7 @@ READ8_MEMBER(isa8_pgc_device::init_r)
 	membank("eram")->set_base(m_eram.get());
 
 	LOG("INIT: mapping LUT\n");
-	space.install_write_handler(0xf8400, 0xf85ff,
-		write8_delegate(FUNC(isa8_pgc_device::lut_w), this));
+	space.install_write_handler(0xf8400, 0xf85ff, write8_delegate(*this, FUNC(isa8_pgc_device::lut_w)));
 
 	return 0; // XXX ignored
 }

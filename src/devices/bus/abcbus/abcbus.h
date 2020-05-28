@@ -103,14 +103,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define ABCBUS_TAG          "bus"
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -118,35 +110,35 @@
 
 class abcbus_slot_device;
 
-class device_abcbus_card_interface : public device_slot_card_interface
+class device_abcbus_card_interface : public device_interface
 {
 public:
 	// required operation overrides
 	virtual void abcbus_cs(uint8_t data) = 0;
 
 	// optional operation overrides
-	virtual uint8_t abcbus_inp() { return 0xff; };
-	virtual void abcbus_out(uint8_t data) { };
-	virtual uint8_t abcbus_stat() { return 0xff; };
-	virtual void abcbus_c1(uint8_t data) { };
-	virtual void abcbus_c2(uint8_t data) { };
-	virtual void abcbus_c3(uint8_t data) { };
-	virtual void abcbus_c4(uint8_t data) { };
+	virtual uint8_t abcbus_inp() { return 0xff; }
+	virtual void abcbus_out(uint8_t data) { }
+	virtual uint8_t abcbus_stat() { return 0xff; }
+	virtual void abcbus_c1(uint8_t data) { }
+	virtual void abcbus_c2(uint8_t data) { }
+	virtual void abcbus_c3(uint8_t data) { }
+	virtual void abcbus_c4(uint8_t data) { }
 
 	// optional operation overrides for ABC 80
-	virtual uint8_t abcbus_xmemfl(offs_t offset) { return 0xff; };
-	virtual void abcbus_xmemw(offs_t offset, uint8_t data) { };
+	virtual uint8_t abcbus_xmemfl(offs_t offset) { return 0xff; }
+	virtual void abcbus_xmemw(offs_t offset, uint8_t data) { }
 
 	// optional operation overrides for ABC 1600
 	virtual int abcbus_csb() { return 1; }
-	virtual uint8_t abcbus_ops() { return 0xff; };
-	virtual void abcbus_tren(int state) { };
-	virtual void abcbus_prac(int state) { };
-	virtual uint8_t abcbus_exp() { return 0xff; };
-	virtual int abcbus_xcsb2() { return 1; };
-	virtual int abcbus_xcsb3() { return 1; };
-	virtual int abcbus_xcsb4() { return 1; };
-	virtual int abcbus_xcsb5() { return 1; };
+	virtual uint8_t abcbus_ops() { return 0xff; }
+	virtual void abcbus_tren(int state) { }
+	virtual void abcbus_prac(int state) { }
+	virtual uint8_t abcbus_exp() { return 0xff; }
+	virtual int abcbus_xcsb2() { return 1; }
+	virtual int abcbus_xcsb3() { return 1; }
+	virtual int abcbus_xcsb4() { return 1; }
+	virtual int abcbus_xcsb5() { return 1; }
 
 protected:
 	// construction/destruction
@@ -161,7 +153,7 @@ protected:
 // ======================> abcbus_slot_device
 
 class abcbus_slot_device : public device_t,
-							public device_slot_interface
+							public device_single_card_slot_interface<device_abcbus_card_interface>
 {
 public:
 	// construction/destruction
@@ -209,17 +201,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tren_w ) { if (m_card) m_card->abcbus_tren(state); }
 	DECLARE_WRITE_LINE_MEMBER( prac_w ) { if (m_card) m_card->abcbus_prac(state); }
 
-	DECLARE_WRITE8_MEMBER( cs_w ) { write_cs(data); }
-	DECLARE_READ8_MEMBER( rst_r ) { return read_rst(); }
-	DECLARE_READ8_MEMBER( inp_r ) { return read_inp(); }
-	DECLARE_WRITE8_MEMBER( out_w ) { write_out(data); }
-	DECLARE_READ8_MEMBER( stat_r ) { return read_stat(); }
-	DECLARE_WRITE8_MEMBER( c1_w ) { write_c1(data); }
-	DECLARE_WRITE8_MEMBER( c2_w ) { write_c2(data); }
-	DECLARE_WRITE8_MEMBER( c3_w ) { write_c3(data); }
-	DECLARE_WRITE8_MEMBER( c4_w ) { write_c4(data); }
-	DECLARE_READ8_MEMBER( xmemfl_r ) { return xmemfl_r(offset); }
-	DECLARE_WRITE8_MEMBER( xmemw_w ) { xmemw_w(offset, data); }
+	void cs_w(uint8_t data) { write_cs(data); }
+	uint8_t rst_r() { return read_rst(); }
+	uint8_t inp_r() { return read_inp(); }
+	void out_w(uint8_t data) { write_out(data); }
+	uint8_t stat_r() { return read_stat(); }
+	void c1_w(uint8_t data) { write_c1(data); }
+	void c2_w(uint8_t data) { write_c2(data); }
+	void c3_w(uint8_t data) { write_c3(data); }
+	void c4_w(uint8_t data) { write_c4(data); }
 
 	DECLARE_READ_LINE_MEMBER( irq_r ) { return m_irq; }
 	DECLARE_READ_LINE_MEMBER( nmi_r ) { return m_nmi; }
@@ -245,7 +235,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override { if (m_card) get_card_device()->reset(); }
 
 	devcb_write_line   m_write_irq;
 	devcb_write_line   m_write_nmi;

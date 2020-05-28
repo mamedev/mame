@@ -543,7 +543,7 @@ void psx1_state::psx_base(machine_config &config)
 	spu.add_route(0, "lspeaker", 1.00);
 	spu.add_route(1, "rspeaker", 1.00);
 
-	QUICKLOAD(config, "quickload", "cpe,exe,psf,psx").set_load_callback(FUNC(psx1_state::quickload_exe), this);
+	QUICKLOAD(config, "quickload", "cpe,exe,psf,psx").set_load_callback(FUNC(psx1_state::quickload_exe));
 
 	PSX_PARALLEL_SLOT(config, "parallel", psx_parallel_devices, nullptr);
 

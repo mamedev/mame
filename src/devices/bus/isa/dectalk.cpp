@@ -224,7 +224,7 @@ READ8_MEMBER(dectalk_isa_device::read)
 void dectalk_isa_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0250, 0x0257, read8_delegate(FUNC(dectalk_isa_device::read), this), write8_delegate(FUNC(dectalk_isa_device::write), this));
+	m_isa->install_device(0x0250, 0x0257, read8_delegate(*this, FUNC(dectalk_isa_device::read)), write8_delegate(*this, FUNC(dectalk_isa_device::write)));
 }
 
 void dectalk_isa_device::device_reset()

@@ -7,6 +7,9 @@
 
 #include "modules/osdmodule.h"
 
+#include <algorithm>
+
+
 osd_module_manager::osd_module_manager()
 {
 	for (int i=0; i<MAX_MODULES; i++)
@@ -25,17 +28,15 @@ osd_module_manager::~osd_module_manager()
 
 void osd_module_manager::register_module(const module_type &mod_type)
 {
+	auto const slot = std::find(std::begin(m_modules), std::end(m_modules), nullptr);
+	if (std::end(m_modules) == slot)
+		throw emu_fatalerror("osd_module_manager::register_module: Module registration beyond MAX_MODULES!");
+
 	osd_module *module = mod_type();
 	if (module->probe())
 	{
 		osd_printf_verbose("===> registered module %s %s\n", module->name(), module->type());
-
-		int i;
-		for (i = 0; i < MAX_MODULES && m_modules[i] != nullptr; i++)
-			;
-
-		assert_always(i < MAX_MODULES, "Module registration beyond MAX_MODULES!");
-		m_modules[i] = module;
+		*slot = module;
 	}
 	else
 	{
@@ -51,8 +52,8 @@ bool osd_module_manager::type_has_name(const char *type, const char *name) const
 
 osd_module *osd_module_manager::get_module_generic(const char *type, const char *name)
 {
-	int i = get_module_index(type, name);
-	if (i>=0)
+	int const i = get_module_index(type, name);
+	if (i >= 0)
 		return m_modules[i];
 	else
 		return nullptr;

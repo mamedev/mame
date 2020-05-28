@@ -31,6 +31,7 @@
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
+#include "video/mc6845.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
@@ -45,6 +46,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_crtc(*this, "crtc"),
 		m_aysnd(*this, "aysnd"),
 		m_mainbank(*this, "mainbank")
 	{ }
@@ -72,20 +74,21 @@ private:
 
 	required_device<i8039_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<mc6845_device> m_crtc;
 	required_device<ay8912_device> m_aysnd;
 	required_memory_bank m_mainbank;
 
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	void p1_w(uint8_t data);
+	void p2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(prog_w);
-	DECLARE_WRITE8_MEMBER(bus_w);
-	DECLARE_WRITE8_MEMBER(io_w);
+	void bus_w(uint8_t data);
+	void io_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_READ_LINE_MEMBER(t1_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_READ8_MEMBER(bus_r);
-	DECLARE_READ8_MEMBER(io_r);
+	uint8_t p1_r();
+	uint8_t p2_r();
+	uint8_t bus_r();
+	uint8_t io_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void drw80pkr_palette(palette_device &palette) const;
@@ -96,7 +99,6 @@ private:
 };
 
 
-#define CPU_CLOCK           XTAL(8'000'000)
 #define DATA_NVRAM_SIZE     0x100
 
 
@@ -109,12 +111,12 @@ void drw80pkr_state::machine_start()
 * Write Handlers *
 ******************/
 
-WRITE8_MEMBER(drw80pkr_state::p1_w)
+void drw80pkr_state::p1_w(uint8_t data)
 {
 	m_p1 = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::p2_w)
+void drw80pkr_state::p2_w(uint8_t data)
 {
 	m_p2 = data;
 }
@@ -132,12 +134,12 @@ WRITE_LINE_MEMBER(drw80pkr_state::prog_w)
 	}
 }
 
-WRITE8_MEMBER(drw80pkr_state::bus_w)
+void drw80pkr_state::bus_w(uint8_t data)
 {
 	m_bus = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::io_w)
+void drw80pkr_state::io_w(offs_t offset, uint8_t data)
 {
 	uint16_t n_offs;
 
@@ -157,33 +159,10 @@ WRITE8_MEMBER(drw80pkr_state::io_w)
 	}
 
 	if (m_p2 == 0xc7)
-	{
-		// CRTC Register
-		// R0 = 0x1f(31)    Horizontal Total
-		// R1 = 0x18(24)    Horizontal Displayed
-		// R2 = 0x1a(26)    Horizontal Sync Position
-		// R3 = 0x34(52)    HSYNC/VSYNC Widths
-		// R4 = 0x1f(31)    Vertical Total
-		// R5 = 0x01(01)    Vertical Total Adjust
-		// R6 = 0x1b(27)    Vertical Displayed
-		// R7 = 0x1c(28)    Vertical Sync Position
-		// R8 = 0x10        Mode Control
-		//                  Non-interlace
-		//                  Straight Binary - Ram Addressing
-		//                  Shared Memory - Ram Access
-		//                  Delay Display Enable one character time
-		//                  No Delay Cursor Skew
-		// R9 = 0x07(07)    Scan Line
-		// R10 = 0x00       Cursor Start
-		// R11 = 0x00       Cursor End
-		// R12 = 0x00       Display Start Address (High)
-		// R13 = 0x00       Display Start Address (Low)
-	}
+		m_crtc->address_w(data);
 
 	if (m_p2 == 0xd7)
-	{
-		// CRTC Address
-	}
+		m_crtc->register_w(data);
 
 	if (m_p2 == 0xfb) {
 		m_pkr_io_ram[offset] = data;
@@ -225,22 +204,22 @@ READ_LINE_MEMBER(drw80pkr_state::t1_r)
 	return m_t1;
 }
 
-READ8_MEMBER(drw80pkr_state::p1_r)
+uint8_t drw80pkr_state::p1_r()
 {
 	return m_p1;
 }
 
-READ8_MEMBER(drw80pkr_state::p2_r)
+uint8_t drw80pkr_state::p2_r()
 {
 	return m_p2;
 }
 
-READ8_MEMBER(drw80pkr_state::bus_r)
+uint8_t drw80pkr_state::bus_r()
 {
 	return m_bus;
 }
 
-READ8_MEMBER(drw80pkr_state::io_r)
+uint8_t drw80pkr_state::io_r(offs_t offset)
 {
 	uint8_t ret;
 	uint16_t kbdin;
@@ -333,12 +312,12 @@ TILE_GET_INFO_MEMBER(drw80pkr_state::get_bg_tile_info)
 	int color = m_color_ram[tile_index];
 	int code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void drw80pkr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(drw80pkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(drw80pkr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
 }
 
 uint32_t drw80pkr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -456,7 +435,7 @@ INPUT_PORTS_END
 void drw80pkr_state::drw80pkr(machine_config &config)
 {
 	// basic machine hardware
-	I8039(config, m_maincpu, CPU_CLOCK);
+	I8039(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &drw80pkr_state::map);
 	m_maincpu->set_addrmap(AS_IO, &drw80pkr_state::io_map);
 	m_maincpu->t0_in_cb().set(FUNC(drw80pkr_state::t0_r));
@@ -468,21 +447,24 @@ void drw80pkr_state::drw80pkr(machine_config &config)
 	m_maincpu->prog_out_cb().set(FUNC(drw80pkr_state::prog_w));
 	m_maincpu->bus_in_cb().set(FUNC(drw80pkr_state::bus_r));
 	m_maincpu->bus_out_cb().set(FUNC(drw80pkr_state::bus_w));
-	m_maincpu->set_vblank_int("screen", FUNC(drw80pkr_state::irq0_line_hold));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((31+1)*8, (31+1)*8);
-	screen.set_visarea(0*8, 24*8-1, 0*8, 27*8-1);
+	screen.set_raw(8_MHz_XTAL / 2, 256, 0, 192, 257, 0, 216); // 4 MHz?
 	screen.set_screen_update(FUNC(drw80pkr_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_drw80pkr);
+
 	PALETTE(config, "palette", FUNC(drw80pkr_state::drw80pkr_palette), 16 * 16);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MC6845(config, m_crtc, 8_MHz_XTAL / 16); // 0.5 MHz?
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->out_vsync_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

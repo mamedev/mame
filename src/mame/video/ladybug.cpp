@@ -36,7 +36,7 @@ ladybug_video_device::ladybug_video_device(machine_config const &mconfig, char c
 {
 }
 
-WRITE8_MEMBER(ladybug_video_device::bg_w)
+void ladybug_video_device::bg_w(offs_t offset, uint8_t data)
 {
 	m_bg_ram[offset & 0x07ff] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x03ff);
@@ -101,7 +101,7 @@ void ladybug_video_device::device_start()
 	std::fill_n(m_spr_ram.get(), 0x0400, 0);
 	std::fill_n(m_bg_ram.get(), 0x0800, 0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ladybug_video_device::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ladybug_video_device::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 	m_bg_tilemap->set_transparent_pen(0);
 
@@ -114,7 +114,7 @@ TILE_GET_INFO_MEMBER(ladybug_video_device::get_bg_tile_info)
 	int const code = m_bg_ram[tile_index] + (BIT(m_bg_ram[0x0400 | tile_index], 3) << 8);
 	int const color = m_bg_ram[0x0400 | tile_index] & 0x07;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -393,13 +393,13 @@ TILE_GET_INFO_MEMBER(sraider_state::get_grid_tile_info)
 {
 	if (tile_index < 512)
 	{
-		SET_TILE_INFO_MEMBER(3, tile_index, 0, 0);
+		tileinfo.set(3, tile_index, 0, 0);
 	}
 	else
 	{
 		int temp = tile_index / 32;
 		tile_index = (31 - temp) * 32 + (tile_index % 32);
-		SET_TILE_INFO_MEMBER(4, tile_index, 0, 0);
+		tileinfo.set(4, tile_index, 0, 0);
 	}
 }
 
@@ -432,7 +432,7 @@ void sraider_state::video_start()
 {
 	ladybug_base_state::video_start();
 
-	m_grid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sraider_state::get_grid_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_grid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sraider_state::get_grid_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_grid_tilemap->set_scroll_rows(32);
 	m_grid_tilemap->set_transparent_pen(0);
 }

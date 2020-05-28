@@ -1,28 +1,278 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="sega_beena_cart" description="Sega Beena Cartridges">
 	<!-- you must byteswap ROMs to see text, due to endian? -->
+
+	<software name="asngnk" supported="no">
+		<description>Shoku Iku Series 1 Soreike! Anpanman-Sukikirai Nai Ko Genki na Ko!</description>
+		<year>2005</year>
+		<publisher>Sega Toys</publisher>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100008-1000 - Shoku Iku Series 1 Soreike Anpanman-Sukikirai Nai Ko Genki na Ko.bin" size="0x00800000" crc="e7d8333d" sha1="7488dddf64cb0c93b17235db93cf6a1bd5c05c0f" />
+			</dataarea>
+			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x01d4aed0" crc="b023d113" sha1="6ac75a2710a140d39276d620638b596735290938"  />
+				<rom name="0 - 0002.png" size="0x01ce8218" crc="ed4180db" sha1="6867123542392c3282fecc40645443bbb5f7aa43"  />
+				<rom name="0 - 0003.png" size="0x01d45080" crc="c4fa1860" sha1="6e9f6c45275eedb1bd8f66239ea31ce37138d006"  />
+				<rom name="0 - 0004.png" size="0x01fca2df" crc="e357a704" sha1="d5c65a085b86c74b03ec5e5a4ac5e5b7a5442c7f"  />
+				<rom name="0 - 0005.png" size="0x01fad4a6" crc="eafa1e83" sha1="4fd2309b32486ba047ec80f8b928a7019300b8bf"  />
+				<rom name="0 - 0006.png" size="0x01d8f1bc" crc="8679d842" sha1="b4c2242b7813b3fdc3c9a863069a6384930349a0"  />
+				<rom name="0 - 0007.png" size="0x01afa23b" crc="bfe7bf50" sha1="ce14030e60e5552a08174fff2e99bbba6aea1d68"  />
+				<rom name="0 - 0008.png" size="0x01debbaf" crc="a6435cf9" sha1="60e48945065a3af2b99db7936c3f0c045f96206b"  />
+				<rom name="0 - 0009.png" size="0x01d3ab11" crc="1407e768" sha1="52ecbfe3a8ce3a5b68a046b4c18221781443b050"  />
+				<rom name="0 - 0010.png" size="0x013b58bc" crc="6afd75f3" sha1="7f77f972a2605cf9e154383a2c3b07f74c06645b"  />
+				<rom name="0 - 0011.png" size="0x015acf2a" crc="3e46f77e" sha1="44ec480201e79ef2d0bdc23fd1b3881cf0de0eb2"  />
+				<rom name="0 - 0012.png" size="0x016d1853" crc="ed4ce2e5" sha1="75302e842a5e09378070866dbd3fb370e464e387"  />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="frpc" supported="no">
 		<description>Issho ni Henshin Fresh Pretty Cure</description>
 		<year>2009</year>
-		<publisher>Sega</publisher>
+		<publisher>Bandai</publisher>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="beena.bin" size="0x800000" crc="afa3466c" sha1="b49914f97db95f611489487f558d13d7cceb3299" offset="0" />
+				<rom loadflag="load16_word_swap" name="beena.bin" size="0x800000" crc="afa3466c" sha1="b49914f97db95f611489487f558d13d7cceb3299" />
 			</dataarea>
 			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
-				<rom name="0 - 0001.png" size="0x1ca26ec" crc="d8e18a54" sha1="887a96931bf622cb673f2550323ad3923eff337e" offset="0" />
-				<rom name="0 - 0002.png" size="0x1e37a3d" crc="62ae3535" sha1="d8f6c19c466715df5a568ac7cac8dacb53f2e04a" offset="0" />
-				<rom name="0 - 0003.png" size="0x1ce4f16" crc="fe6c72d9" sha1="2c4412eb518fbac2e8519c87e53270d960ecab53" offset="0" />
-				<rom name="0 - 0004.png" size="0x19a864d" crc="edede3ea" sha1="81914894358c74064aa5f9e980ac37f7140f80c3" offset="0" />
-				<rom name="0 - 0005.png" size="0x18998f4" crc="16837cc0" sha1="eb86b2943cf603a63cd5b94faa0d06ee8a3139d6" offset="0" />
-				<rom name="0 - 0006.png" size="0x195b7e5" crc="3e307e6d" sha1="23ed9ab2a4122d7cb33d8d6174ca901b88647b4d" offset="0" />
-				<rom name="0 - 0007.png" size="0x195df07" crc="efccbb5b" sha1="83de26d52cb6578d8323551a289223c8a305e37d" offset="0" />
-				<rom name="0 - 0008.png" size="0x18a9dd8" crc="7455ebb2" sha1="34576eee067534535cda838a9e94794e2cfee585" offset="0" />
-				<rom name="0 - 0009.png" size="0x17a5c57" crc="59ead843" sha1="29c4cd7929cfd68f41d65024ee5ca3cc62fa4a8b" offset="0" />
-				<rom name="0 - 0010.png" size="0x186546b" crc="6d3d8c91" sha1="9909322c09277ddd306f10f9a04a897b0fe74961" offset="0" />
-				<rom name="0 - 0011.png" size="0x179d3a8" crc="c3911254" sha1="2d2932e97a0b20a9b5e5fd78a3bbad0f1e146813" offset="0" />
-				<rom name="0 - 0012.png" size="0x187a9df" crc="f1cdc95d" sha1="aa926c9360edcecdaa3a9ce1b5e17ee61048cee4" offset="0" />
+				<rom name="0 - 0001.png" size="0x1ca26ec" crc="d8e18a54" sha1="887a96931bf622cb673f2550323ad3923eff337e" />
+				<rom name="0 - 0002.png" size="0x1e37a3d" crc="62ae3535" sha1="d8f6c19c466715df5a568ac7cac8dacb53f2e04a" />
+				<rom name="0 - 0003.png" size="0x1ce4f16" crc="fe6c72d9" sha1="2c4412eb518fbac2e8519c87e53270d960ecab53" />
+				<rom name="0 - 0004.png" size="0x19a864d" crc="edede3ea" sha1="81914894358c74064aa5f9e980ac37f7140f80c3" />
+				<rom name="0 - 0005.png" size="0x18998f4" crc="16837cc0" sha1="eb86b2943cf603a63cd5b94faa0d06ee8a3139d6" />
+				<rom name="0 - 0006.png" size="0x195b7e5" crc="3e307e6d" sha1="23ed9ab2a4122d7cb33d8d6174ca901b88647b4d" />
+				<rom name="0 - 0007.png" size="0x195df07" crc="efccbb5b" sha1="83de26d52cb6578d8323551a289223c8a305e37d" />
+				<rom name="0 - 0008.png" size="0x18a9dd8" crc="7455ebb2" sha1="34576eee067534535cda838a9e94794e2cfee585" />
+				<rom name="0 - 0009.png" size="0x17a5c57" crc="59ead843" sha1="29c4cd7929cfd68f41d65024ee5ca3cc62fa4a8b" />
+				<rom name="0 - 0010.png" size="0x186546b" crc="6d3d8c91" sha1="9909322c09277ddd306f10f9a04a897b0fe74961" />
+				<rom name="0 - 0011.png" size="0x179d3a8" crc="c3911254" sha1="2d2932e97a0b20a9b5e5fd78a3bbad0f1e146813" />
+				<rom name="0 - 0012.png" size="0x187a9df" crc="f1cdc95d" sha1="aa926c9360edcecdaa3a9ce1b5e17ee61048cee4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hirakata" supported="no">
+		<description>Soreike! Anpanman Hajimete Kaketa yo! Oboeta yo! Hiragana Katakana - Gojuuon Board Kinou-tsuki</description>
+		<year>2005</year>
+		<publisher>Sega Toys</publisher>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100002-1200 - Soreike Anpanman Hajimete Kaketa yo Oboeta yo Hiragana Katakana - Gojuuon Board Kinou-tsuki.bin" size="0x00800000" crc="b6e038c9" sha1="b12bd91e8ead04f558d32ce9086102a3c99f13eb" />
+			</dataarea>
+			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x01b8b6ae" crc="e4c3a37a" sha1="de492d61bf91bee346734f62a6db257a6ce74f1c" />
+				<rom name="0 - 0002.png" size="0x01c3f600" crc="ef0fccc9" sha1="cc014da292163146e08d89672149ba7dc181f1fc" />
+				<rom name="0 - 0003.png" size="0x01d61a02" crc="84682ff3" sha1="216425eb85d6cc5855e853d0b135a6426fe2c0a0" />
+				<rom name="0 - 0004.png" size="0x01e10787" crc="d5aa2d56" sha1="42902317bef31b659e9c40f4c51f554aefd610cf" />
+				<rom name="0 - 0005.png" size="0x01da7955" crc="e4795152" sha1="5bd9bd97721b1b69b1362b4261052b9e3a58b8c6" />
+				<rom name="0 - 0006.png" size="0x01d3ac0d" crc="1a58e117" sha1="aa8bb93b8157cc0c8dc895f72203d9ed807e164b" />
+				<rom name="0 - 0007.png" size="0x01ec5159" crc="f354c1d8" sha1="05959842511ce24faaaf16b7beefc1f3cee3a1e3" />
+				<rom name="0 - 0008.png" size="0x01e66848" crc="95a956fc" sha1="72e116dd2400d321b704e35e1b8d13d2129cae6c" />
+				<rom name="0 - 0009.png" size="0x01e5551d" crc="42973b09" sha1="182c26df4a2a29893a6a2efe769a4744084e67aa" />
+				<rom name="0 - 0010.png" size="0x012bc820" crc="05f22b7f" sha1="a87f840b3c84e7f1886eead28ea9879ca3630e79" />
+				<rom name="0 - 0011.png" size="0x01213cba" crc="e1e8b81a" sha1="4c0a484b4156fd07a4f2b8eb96d7475e8559c6d0" />
+				<rom name="0 - 0012.png" size="0x01421db2" crc="6b5728a5" sha1="024d1e0deae7bcbdf7f3b6c4483de91b7fd96961" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kazokum" supported="no">
+		<description>Kazoku Minna no Nouryoku Trainer</description>
+		<year>2005</year>
+		<publisher>Sega Toys</publisher>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100006-1000 - Kazoku Minna no Nouryoku Trainer (Japan).bin" size="0x00400000" crc="8097f3ec" sha1="1e65579b74f141591db2122b34ce293d1d2120ff" />
+			</dataarea>
+			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x01e37832" crc="8de70b0f" sha1="d198caa20060f49774c2e2103fe1ef168f16e13a" />
+				<rom name="0 - 0002.png" size="0x01d7eeb6" crc="c8677ffc" sha1="85419e7ae1f6f85659ab848855be4db192b20e21" />
+				<rom name="0 - 0003.png" size="0x01e24e0f" crc="ffd4762a" sha1="9a84422272bed23c77392031c1b858c6ec5e2d1a" />
+				<rom name="0 - 0004.png" size="0x01d465df" crc="cb60e2d6" sha1="5324a22fdde1e24f8797cba51e9589f3b81d3e41" />
+				<rom name="0 - 0005.png" size="0x01b9db20" crc="fabd3a8f" sha1="255574ae14304d9068029189aeb722357a257c5c" />
+				<rom name="0 - 0006.png" size="0x01d98d45" crc="f560da1d" sha1="857ba8882146b2cf8c35b17fb66711310741f52d" />
+				<rom name="0 - 0007.png" size="0x01a0648c" crc="6b83e144" sha1="b33cd0ba66270ca99661b28eab5892e21ac42b2f" />
+				<rom name="0 - 0008.png" size="0x01dfa9e0" crc="3fd345d6" sha1="8ef21ccfa7dd473f269996bf5de8c7b7c320cd88" />
+				<rom name="0 - 0009.png" size="0x01124676" crc="b1a8e3cc" sha1="231048de3bc7863e47a8b5da79a8a5bed501d7b6" />
+				<rom name="0 - 0010.png" size="0x01e618a8" crc="571593da" sha1="4125714a58e526b74e7c2e60294bb6450c2bdc8c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbubbub" supported="no">
+		<description>Meet Bub-Bub to Eigo Tanken</description>
+		<year>2010</year>
+		<publisher>Moonshot</publisher>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-160001-1000 - Meet Bub-Bub to Eigo Tanken (Japan).bin" size="0x00800000" crc="283b3c85" sha1="343c27c192da191d91fea43246da924b8f1af6ee" />
+			</dataarea>
+			<dataarea name="pages" size="0x3000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x01f47bf2" crc="05abebd9" sha1="3ebe1d84e05630c62b87206c3cb2963164690971" />
+				<rom name="0 - 0002.png" size="0x01cfada2" crc="4bb75849" sha1="368b151b3f2028766ca1b4980e7610021b9ba6fa" />
+				<rom name="0 - 0003.png" size="0x01e36d07" crc="198755b3" sha1="24d3a83077de597d1b47db5c1ab97913dacbda8d" />
+				<rom name="0 - 0004.png" size="0x020d41a2" crc="2c0032fc" sha1="df25c4886d7ea107c1566e9e3576735db47af503" />
+				<rom name="0 - 0005.png" size="0x021a5c58" crc="501027f7" sha1="828ee2de3de6d478c57e256c72b37361b38c11c5" />
+				<rom name="0 - 0006.png" size="0x01f3b8c8" crc="7eb4cb7e" sha1="150bafd30d89360366a6052117b76bdb22e0cfc3" />
+				<rom name="0 - 0007.png" size="0x020a9378" crc="89106788" sha1="0ae76653260ca74e6fa137836eab8724486e116c" />
+				<rom name="0 - 0008.png" size="0x02006605" crc="b74b7bb6" sha1="5fdd587235c8228e3aa41a8e9ffd9b2fc970cf26" />
+				<rom name="0 - 0009.png" size="0x01e9bba4" crc="25cf2047" sha1="fb63bf3c6927d51ecc5e7e4de4a8a9f40b78d996" />
+				<rom name="0 - 0010.png" size="0x01d6ff5c" crc="316c4d0a" sha1="ecdef9b4e1fec98534f8142ec0eca253eb30ea28" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osharem" supported="no">
+		<description>Oshare Majo Love and Berry-Cute ni Oshare</description>
+		<year>20??</year>
+		<publisher>Sega Toys</publisher>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100013-1101 - Oshare Majo Love and Berry-Cute ni Oshare (Japan).bin" size="0x00800000" crc="f5245eea" sha1="2006c3fd2b662f4bb77388bfeefc2c885908fc5f" />
+			</dataarea>
+			<dataarea name="pages" size="0x3000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x0198d462" crc="2d538544" sha1="b941ee5a0ab7b10a72fb966084ed7adbc384fa91" />
+				<rom name="0 - 0002.png" size="0x01af32a1" crc="f141c0d1" sha1="89c0ff1ca5beff44a1e044f8aae2e55e549105e6" />
+				<rom name="0 - 0003.png" size="0x01c30083" crc="87954a64" sha1="d9d84721d283189626d19655235033c654e9813f" />
+				<rom name="0 - 0004.png" size="0x01dffa11" crc="3746d018" sha1="937fd82e8882920f3194eb0c97420a68a4a1132b" />
+				<rom name="0 - 0005.png" size="0x01f0860b" crc="ee2776b4" sha1="0b2b099030489551f912a90fbce6a38eb0a56229" />
+				<rom name="0 - 0006.png" size="0x01acb747" crc="2f595a0c" sha1="7ce02197c82688c48f6bfd8175ee647c01bcef3a" />
+				<rom name="0 - 0007.png" size="0x01d60cb6" crc="74a97b09" sha1="cea02a52355ca503d8702aca202017a0971057e9" />
+				<rom name="0 - 0008.png" size="0x01983b69" crc="0fb3c5a8" sha1="be5b3831dc5de811eb18b9439511aad9cd22bf86" />
+				<rom name="0 - 0009.png" size="0x01d24a30" crc="4d409c74" sha1="fd4c84ac9f3cc922eb1c8fc2dd141594eff1d6a5" />
+				<rom name="0 - 0010.png" size="0x01b31796" crc="c3b9cd4a" sha1="165817c2cc83797bfd6015b49205385df9a1290e" />
+				<rom name="0 - 0011.png" size="0x01b0a1b4" crc="38abc9e1" sha1="06321f73833d10c9f2fc76ca0d554eee835a7ea1" />
+				<rom name="0 - 0012.png" size="0x019ad5a7" crc="5d3cfe64" sha1="b6170feb62793945dc3fab6bd196990542e1f03a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokebw" supported="no">
+		<description>Pocket Monsters Best Wishes! Chinou Ikusei Pokémon Daiundoukai</description>
+		<year>2010</year>
+		<publisher>Sega Toys</publisher>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100042-1000 - Pocket Monsters Best Wishes Chinou Ikusei Pokemon Daiundoukai (Japan).bin" size="0x00800000" crc="a88ec549" sha1="866b56789fcb118e1ac50a8214a630a092aadd2f" />
+			</dataarea>
+			<dataarea name="pages" size="0x3000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x00800000" crc="a88ec549" sha1="866b56789fcb118e1ac50a8214a630a092aadd2f" />
+				<rom name="0 - 0002.png" size="0x02000723" crc="0b8cc1e4" sha1="c68e79627e0c13ea1165ce11c4a45ab34afa28f3" />
+				<rom name="0 - 0003.png" size="0x01f19d2f" crc="eb600fef" sha1="b16c3698d201fc27fbe94065e3b7392971cb9b70" />
+				<rom name="0 - 0004.png" size="0x01e2f618" crc="2e154295" sha1="001d44b79abdeb3ec48d1c898cad98a36fc407a0" />
+				<rom name="0 - 0005.png" size="0x01e276d7" crc="4136418f" sha1="733c9c80f8614aaa24e9174e9a5f1c524232cd4c" />
+				<rom name="0 - 0006.png" size="0x01e2b00c" crc="1dc6ee4e" sha1="a6d96b70759d50b54fbfff91b03e63a7270907d7" />
+				<rom name="0 - 0007.png" size="0x01cff872" crc="1a607e99" sha1="16d3a2f2788b38f451e8cbb44e6a31525586ae5f" />
+				<rom name="0 - 0008.png" size="0x01ad9529" crc="6701731b" sha1="d2b6718907513239f664e184cfa5d150d6957289" />
+				<rom name="0 - 0009.png" size="0x01b85a1c" crc="5670b958" sha1="84576ba7e1155f3155f65b42af757d41aee80934" />
+				<rom name="0 - 0010.png" size="0x01c6296e" crc="66df1325" sha1="49778e96652a113785e3d75b0e6de17d4ebce4ef" />
+				<rom name="0 - 0011.png" size="0x01d3f5a5" crc="63fe33c2" sha1="130acb3c9317e21f2fee4e524226ade5df85cec2" />
+				<rom name="0 - 0012.png" size="0x01c292dc" crc="c47162c8" sha1="0cb2a72e71082f5ded491dac93562977af6fa984" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokedp" supported="no">
+		<description>Pocket Monsters Diamond &amp; Pearl Pokemon o Sagase! Meiro de Daibouken!</description>
+		<year>2009</year>
+		<publisher>Sega Toys</publisher>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100039-1100 - Pocket Monsters Diamond and Pearl Pokemon o Sagase Meiro de Daibouken.bin" size="0x00800000" crc="7bbf9599" sha1="25aba3628c627c3ed603f14cb50cfe6101816db7" />
+			</dataarea>
+			<dataarea name="pages" size="0x4000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x0204f417" crc="088c3d4c" sha1="d66a27f30374568998cff2ed89e494ac7f449687" />
+				<rom name="0 - 0002.png" size="0x020d5ff7" crc="3f992374" sha1="b5dd1f438afc18ac6ca78aa2757129bb1f53b54e" />
+				<rom name="0 - 0003.png" size="0x020912fe" crc="b064c6ea" sha1="a4107dbcdc40713a651da52653b9e639b2d9addc" />
+				<rom name="0 - 0004.png" size="0x01d4bccc" crc="6e36704b" sha1="8c92b5ea3f0c6b5fe32b38aa6cb4d53643979305" />
+				<rom name="0 - 0005.png" size="0x01cc6307" crc="3d97eea3" sha1="274e3f8fa546e123737ee8a835dadcb9ab856cb9" />
+				<rom name="0 - 0006.png" size="0x0213b831" crc="175f961f" sha1="32dd1aec5d9cdc21b7271c3d03fa7fb40efd8e13" />
+				<rom name="0 - 0007.png" size="0x0218c656" crc="93c42240" sha1="4c28d441a1869c4575606afd6740cee7f643c427" />
+				<rom name="0 - 0008.png" size="0x01c103b2" crc="776645c5" sha1="6d2d4ab8e0fb414f9adc3cbb8d800a66fabe52ca" />
+				<rom name="0 - 0009.png" size="0x01d39b58" crc="aaeeba31" sha1="b14cf1b928f6dd776fe07025af57ca3025adc09e" />
+				<rom name="0 - 0010.png" size="0x01f12421" crc="b15278dc" sha1="676b0ad811e37fccb4752f0c7dea918feaafe30f" />
+				<rom name="0 - 0011.png" size="0x01f95984" crc="7ab6d5a4" sha1="730c62496f275e2afa8cb541820393a343406065" />
+				<rom name="0 - 0012.png" size="0x01caf8d8" crc="4bde2da0" sha1="4cd3056b090baea6c31e22033595d6d62642310d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="precure5" supported="no">
+		<description>Yes! PreCure 5 Asonde Oboeyou Hiragana!</description>
+		<year>2007</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-110008-1101 - Yes PreCure 5 Asonde Oboeyou Hiragana.bin" size="0x00800000" crc="6ae77335" sha1="29650349b117b96105882da7b12cac8fe9a04813" />
+			</dataarea>
+			<dataarea name="pages" size="0x4000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x01fd2372" crc="9290ac04" sha1="d106071e01ee790d85d46a2378ce5f638331b67a"  />
+				<rom name="0 - 0002.png" size="0x0200a259" crc="d919d19b" sha1="20444680d29b6a66471cbdb77537ba054753b9d6"  />
+				<rom name="0 - 0003.png" size="0x01fd80c8" crc="97c2ba5e" sha1="128b226187bfc53e4b1abf7be04c068a61c88240"  />
+				<rom name="0 - 0004.png" size="0x01e53520" crc="05504999" sha1="5e0367e18c3b592c14bda31c07ffae9ec11b1c31"  />
+				<rom name="0 - 0005.png" size="0x01d820ff" crc="586f06b0" sha1="89e66342feb2bf31f3137549999c43e1db3cb5e0"  />
+				<rom name="0 - 0006.png" size="0x01f19795" crc="bb34e7ae" sha1="d4cf3a99400876b25101036ffd4eac3fa2294c36"  />
+				<rom name="0 - 0007.png" size="0x01ea5f1a" crc="b3fe0898" sha1="8d8adc11188e72b7a611463aa02f79f594c1ac5f"  />
+				<rom name="0 - 0008.png" size="0x01c861fa" crc="97768994" sha1="c79a1578ad7af9fc26c6f31a1feaeeeac9e50844"  />
+				<rom name="0 - 0009.png" size="0x01b8988d" crc="b0d4350e" sha1="c9286072197320be847c5a06bc548a10316e344c"  />
+				<rom name="0 - 0010.png" size="0x01c6cf67" crc="057776ac" sha1="b4de54d5242557de642828444da7744031555160"  />
+				<rom name="0 - 0011.png" size="0x01cb84db" crc="ab9576a2" sha1="02e90539aed46f6813cca5a15ade32f323927678"  />
+				<rom name="0 - 0012.png" size="0x02068f02" crc="9122ba08" sha1="4989f83caf182b87721ef839eaf35605e0fa3490"  />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="precurehc" supported="no">
+		<description>Oshare ni Henshin HeartCatch PreCure!</description>
+		<year>2010</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-110015-1000 - Oshare ni Henshin HeartCatch PreCure (Japan).bin" size="0x00800000" crc="e2575324" sha1="500ad94f4dda4b886ff1991ddc4a730d94b37cd6" />
+			</dataarea>
+			<dataarea name="pages" size="0x3000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x01e37d48" crc="579e4159" sha1="75fd0eaa077c12507c78711ce099a76878eb532d" />
+				<rom name="0 - 0002.png" size="0x01db5256" crc="9f453453" sha1="b51e2ed7a73b0aff4a8b3510fdffff08b65e91ce" />
+				<rom name="0 - 0003.png" size="0x01dfb0f8" crc="68311309" sha1="0194118cb242910b0607fd582374e516c146c04d" />
+				<rom name="0 - 0004.png" size="0x01d0e912" crc="4aec06f8" sha1="4ec004b883d2049245c195612aff1f5432eee5ee" />
+				<rom name="0 - 0005.png" size="0x01daf868" crc="29825290" sha1="3b7f871b42e93f4c5e0628e58e4ac9167b31e742" />
+				<rom name="0 - 0006.png" size="0x01c8de2e" crc="1599df83" sha1="24195c85a66abd87088dafad14765965f4bd11ad" />
+				<rom name="0 - 0007.png" size="0x01ce0348" crc="4756a0ae" sha1="bc331f2986b1f412286969212954c61202b49374" />
+				<rom name="0 - 0008.png" size="0x01f35f14" crc="b1a80b5a" sha1="8e7fc65993db25d11e9f9c7077b40733fd203f62" />
+				<rom name="0 - 0009.png" size="0x0203ebe3" crc="4eb371b4" sha1="01fb11361a2eda3dc636281d0cc8670c065f56f8" />
+				<rom name="0 - 0010.png" size="0x01bb54b5" crc="70c6cd1f" sha1="24d1b18ff1540c2d23671ab88aaca4e08dbe3865" />
+				<rom name="0 - 0011.png" size="0x01c4a92a" crc="37bbe4a9" sha1="cdc876ae65a91384791b689db8024eb2f169a158" />
+				<rom name="0 - 0012.png" size="0x01e16773" crc="8f7ec572" sha1="6433b383cdd164fbb07fccdfed5ce4b37bea7476" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sssbat" supported="no">
+		<description>Samurai Sentai Shinkenger Battle ga Ippai! Iza Mairu!</description>
+		<year>2009</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-110012-1000 - Samurai Sentai Shinkenger Battle ga Ippai Iza Mairu.bin" size="0x00800000" crc="41ed4615" sha1="f0106c4a79f9aff9815318eadc272c7c62a50ec2" />
+			</dataarea>
+			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x019ac721" crc="2d276d8a" sha1="ff068e3823c692a21c2134b6a34aa4835d6d8ac1" />
+				<rom name="0 - 0002.png" size="0x019e6a2b" crc="cea0a7a0" sha1="8bba02926c08b1f976ae62221ef03674d807b50c" />
+				<rom name="0 - 0003.png" size="0x019e2c25" crc="c983678b" sha1="1526f789405ee21ccd1c6ff0dbf131adca6749fa" />
+				<rom name="0 - 0004.png" size="0x01854a14" crc="1cd4866e" sha1="edafdd7b34fe2baac8374fc692e91c0e62d3c4c5" />
+				<rom name="0 - 0005.png" size="0x019e157b" crc="ffbfc659" sha1="f0fdd96f2a641671c0e55b64be11d6fa279c3014" />
+				<rom name="0 - 0006.png" size="0x018ba810" crc="6b904c5a" sha1="46ca949377cd473a2ad3d67c70c8d12f2cbaaead" />
+				<rom name="0 - 0007.png" size="0x01969cc7" crc="4bb32ec7" sha1="f7a28ce039dd3dc7ada8eae1d617631391135f66" />
+				<rom name="0 - 0008.png" size="0x0172a1fe" crc="f41e7f36" sha1="52af6f1b1dd31c75c0004b8280ec6e8da3f57cf1" />
+				<rom name="0 - 0009.png" size="0x01a7a889" crc="9914b734" sha1="b64ab24e3bf41b07310da2cde90aa2088602aaa1" />
+				<rom name="0 - 0010.png" size="0x01876e20" crc="937ce7ea" sha1="664e8bdb23ff2be1183ea235504fba289f5af279" />
+				<rom name="0 - 0011.png" size="0x018f0769" crc="aeb76e32" sha1="797ebb767c30496d1caddb15a24c397941b295fd" />
+				<rom name="0 - 0012.png" size="0x018bfb44" crc="ed48a893" sha1="e0ca297e88dec53c74462a3018c904d41ffde037" />
 			</dataarea>
 		</part>
 	</software>

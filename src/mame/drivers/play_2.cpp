@@ -77,14 +77,14 @@ private:
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_READ_LINE_MEMBER(ef1_r);
 	DECLARE_READ_LINE_MEMBER(ef4_r);
-	DECLARE_WRITE16_MEMBER(clockcnt_w);
+	void clockcnt_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(clock2_w);
 	// Zira
-	DECLARE_WRITE8_MEMBER(sound_d_w);
-	DECLARE_WRITE8_MEMBER(sound_g_w);
-	DECLARE_READ8_MEMBER(psg_r);
-	DECLARE_WRITE8_MEMBER(psg_w);
-	DECLARE_READ8_MEMBER(sound_in_r);
+	void sound_d_w(uint8_t data);
+	void sound_g_w(uint8_t data);
+	uint8_t psg_r();
+	void psg_w(uint8_t data);
+	uint8_t sound_in_r();
 
 	void play_2_io(address_map &map);
 	void play_2_map(address_map &map);
@@ -300,7 +300,7 @@ READ_LINE_MEMBER( play_2_state::ef4_r )
 	return BIT(m_keyboard[7]->read(), 0); // inverted test button - doesn't seem to do anything
 }
 
-WRITE16_MEMBER( play_2_state::clockcnt_w )
+void play_2_state::clockcnt_w(uint16_t data)
 {
 	if ((data & 0x3ff) == 0)
 		m_4013b->preset_w(BIT(data, 10)); // Q10 output
@@ -313,13 +313,13 @@ WRITE_LINE_MEMBER( play_2_state::clock2_w )
 }
 
 // *********** Zira Sound handlers ***************** (same as cidelsa.cpp)
-WRITE8_MEMBER( play_2_state::sound_d_w )
+void play_2_state::sound_d_w(uint8_t data)
 {
 //    D3      2716 A10
 	membank("bank1")->set_entry(BIT(data, 3));
 }
 
-WRITE8_MEMBER( play_2_state::sound_g_w )
+void play_2_state::sound_g_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -337,17 +337,17 @@ WRITE8_MEMBER( play_2_state::sound_g_w )
 	}
 }
 
-READ8_MEMBER( play_2_state::sound_in_r )
+uint8_t play_2_state::sound_in_r()
 {
 	return m_soundlatch;
 }
 
-READ8_MEMBER( play_2_state::psg_r )
+uint8_t play_2_state::psg_r()
 {
 	return m_psg_latch;
 }
 
-WRITE8_MEMBER( play_2_state::psg_w )
+void play_2_state::psg_w(uint8_t data)
 {
 	m_psg_latch = data;
 }

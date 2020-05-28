@@ -1,16 +1,16 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #include "test.h"
 
-static const char* s_argv[] = { "bx.test" };
-
 int runAllTests(int _argc, const char* _argv[]);
 
 #if BX_PLATFORM_ANDROID
 #	include <android/native_activity.h>
+
+static const char* s_argv[] = { "bx.test" };
 
 void ANativeActivity_onCreate(ANativeActivity*, void*, size_t)
 {

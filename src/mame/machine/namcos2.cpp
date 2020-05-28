@@ -114,7 +114,7 @@ void namcos2_state::reset_all_subcpus(int state)
 	}
 }
 
-WRITE8_MEMBER(namcos2_state::sound_reset_w)
+void namcos2_state::sound_reset_w(uint8_t data)
 {
 	if (data & 0x01)
 	{
@@ -129,7 +129,7 @@ WRITE8_MEMBER(namcos2_state::sound_reset_w)
 	}
 }
 
-WRITE8_MEMBER(namcos2_state::system_reset_w)
+void namcos2_state::system_reset_w(uint8_t data)
 {
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 
@@ -396,4 +396,35 @@ WRITE16_MEMBER( namcos2_state::namcos2_68k_key_w )
 WRITE8_MEMBER( namcos2_state::sound_bankselect_w )
 {
 	m_audiobank->set_entry(data>>4);
+}
+
+READ16_MEMBER( namcos2_state::c140_rom_r )
+{
+	/*
+		Verified from schematics:
+		MD0-MD3 : Connected in 3N "voice0" D0-D3 or D4-D7, Nibble changeable with 74LS157
+		MD4-MD11 : Connected in 3M "voice1" or 3L "voice2" D0-D7
+		MA0-MA18 : Connected in Address bus of ROMs
+		MA19 : Connected in 74LS157 Select Pin
+		MA20 : Connected in 74LS157 Strobe(Enable) Pin
+		MA21 : ROM select in MD4-MD11 area
+	*/
+	if (m_c140_region != nullptr)
+	{
+		bool romsel = BIT(offset, 21);
+		bool lsb_en = BIT(~offset, 20);
+		bool lsb_swap = BIT(~offset, 19);
+		offset &= 0x7ffff;
+		u16 ret = m_c140_region[(romsel << 19) | offset] & 0xff00; // voice1 or voice2
+		if (lsb_en)
+		{
+			u8 lsb = m_c140_region[offset] & 0xff; // voice0
+			if (lsb_swap)
+				lsb <<= 4; // D0-D3
+
+			ret |= (lsb & 0xf0);
+		}
+		return ret;
+	}
+	return 0;
 }

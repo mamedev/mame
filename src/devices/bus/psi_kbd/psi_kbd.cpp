@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(PSI_KEYBOARD_INTERFACE, psi_keyboard_bus_device, "psi_kbd", "
 
 psi_keyboard_bus_device::psi_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PSI_KEYBOARD_INTERFACE, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_psi_keyboard_interface>(mconfig, *this),
 	m_kbd(nullptr),
 	m_rx_handler(*this),
 	m_key_strobe_handler(*this),
@@ -52,7 +52,7 @@ psi_keyboard_bus_device::~psi_keyboard_bus_device()
 void psi_keyboard_bus_device::device_start()
 {
 	// get connected keyboard
-	m_kbd = dynamic_cast<device_psi_keyboard_interface *>(get_card_device());
+	m_kbd = get_card_device();
 
 	// resolve callbacks
 	m_rx_handler.resolve_safe();
@@ -65,7 +65,7 @@ void psi_keyboard_bus_device::device_start()
 
 void psi_keyboard_bus_device::device_reset()
 {
-	m_key_data = 0xff;
+	m_key_data = 0xff; // FIXME: dumb port devices shouldn't mess with data - the keyboard should push this if lines change state on reset
 }
 
 //-------------------------------------------------
@@ -88,7 +88,7 @@ WRITE_LINE_MEMBER( psi_keyboard_bus_device::tx_w )
 //-------------------------------------------------
 
 device_psi_keyboard_interface::device_psi_keyboard_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "psikbd")
 {
 	m_host = dynamic_cast<psi_keyboard_bus_device *>(device.owner());
 }

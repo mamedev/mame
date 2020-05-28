@@ -66,7 +66,7 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
 }
 
 
-void z80ne_state::init_z80ne()
+void z80ne_state::driver_init()
 {
 	/* first two entries point to rom on reset */
 	uint8_t *RAM = m_region_z80ne->base();
@@ -75,16 +75,12 @@ void z80ne_state::init_z80ne()
 	m_bank2->configure_entry(0, &RAM[0x14000]); /* ep382 at 0x8000 */
 }
 
-void z80ne_state::init_z80net()
+void z80net_state::driver_init()
 {
-	init_z80ne();
+	z80ne_state::driver_init();
 }
 
-void z80ne_state::init_z80netb()
-{
-}
-
-void z80netf_state::init_z80netf()
+void z80netf_state::driver_init()
 {
 	/* first two entries point to rom on reset */
 	uint8_t *RAM = m_region_z80ne->base();
@@ -162,7 +158,7 @@ void z80ne_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	}
 }
 
-void z80ne_state::reset_lx387()
+void z80net_state::reset_lx387()
 {
 	m_lx387_kr2376->set_input_pin( kr2376_device::KR2376_DSII, 0);
 	m_lx387_kr2376->set_input_pin( kr2376_device::KR2376_PII, 0);
@@ -231,13 +227,9 @@ void z80netf_state::reset_lx390_banking()
 	 */
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
+void z80ne_state::base_reset()
 {
-	int i;
-
-	LOG("In machine_reset z80ne_base\n");
-
-	for ( i=0; i<LX383_KEYS; i++)
+	for (int i = 0; i < LX383_KEYS; i++)
 		m_lx383_key[i] = 0xf0 | i;
 	m_lx383_scan_counter = 0x0f;
 	m_lx383_downsampler = LX383_DOWNSAMPLING;
@@ -278,36 +270,32 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 	m_uart->write_cs(1);
 	m_uart_clock->set_unscaled_clock(m_cass_data.speed * 16);
 
-	lx385_ctrl_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+	lx385_ctrl_w(0);
 
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80ne)
+void z80ne_state::machine_reset()
 {
-	LOG("In machine_reset z80ne\n");
 	reset_lx382_banking();
-	MACHINE_RESET_CALL_MEMBER( z80ne_base );
+	base_reset();
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80net)
+void z80net_state::machine_reset()
 {
-	LOG("In machine_reset z80net\n");
-	MACHINE_RESET_CALL_MEMBER( z80ne );
+	z80ne_state::machine_reset();
 	reset_lx387();
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80netb)
+void z80netb_state::machine_reset()
 {
-	LOG("In machine_reset z80netb\n");
-	MACHINE_RESET_CALL_MEMBER( z80ne_base );
+	base_reset();
 	reset_lx387();
 }
 
-MACHINE_RESET_MEMBER(z80netf_state,z80netf)
+void z80netf_state::machine_reset()
 {
-	LOG("In machine_reset z80netf\n");
 	reset_lx390_banking();
-	MACHINE_RESET_CALL_MEMBER( z80ne_base );
+	base_reset();
 	reset_lx387();
 }
 
@@ -322,7 +310,7 @@ INPUT_CHANGED_MEMBER(z80ne_state::z80ne_reset)
 	}
 }
 
-INPUT_CHANGED_MEMBER(z80ne_state::z80ne_nmi)
+INPUT_CHANGED_MEMBER(z80net_state::z80net_nmi)
 {
 	uint8_t nmi;
 	nmi = m_io_lx387_brk->read();
@@ -333,10 +321,8 @@ INPUT_CHANGED_MEMBER(z80ne_state::z80ne_nmi)
 	}
 }
 
-MACHINE_START_MEMBER(z80ne_state,z80ne)
+void z80ne_state::machine_start()
 {
-	LOG("In MACHINE_START z80ne\n");
-
 	m_timer_nmi = timer_alloc(0);
 	m_timer_reset = timer_alloc(1);
 
@@ -351,23 +337,9 @@ MACHINE_START_MEMBER(z80ne_state,z80ne)
 	m_kbd_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
 }
 
-MACHINE_START_MEMBER(z80ne_state,z80net)
+void z80netf_state::machine_start()
 {
-	MACHINE_START_CALL_MEMBER( z80ne );
-	LOG("In MACHINE_START z80net\n");
-}
-
-MACHINE_START_MEMBER(z80ne_state,z80netb)
-{
-	MACHINE_START_CALL_MEMBER( z80net );
-	LOG("In MACHINE_START z80netb\n");
-}
-
-MACHINE_START_MEMBER(z80netf_state,z80netf)
-{
-	MACHINE_START_CALL_MEMBER( z80net );
-	LOG("In MACHINE_START z80netf\n");
-
+	z80ne_state::machine_start();
 	m_drv_led.resolve();
 }
 
@@ -376,7 +348,7 @@ MACHINE_START_MEMBER(z80netf_state,z80netf)
 ******************************************************************************/
 
 /* LX.383 - LX.384 HEX keyboard and display */
-READ8_MEMBER(z80ne_state::lx383_r)
+uint8_t z80ne_state::lx383_r()
 {
 	/*
 	 * Keyboard scanning
@@ -398,7 +370,7 @@ READ8_MEMBER(z80ne_state::lx383_r)
 	return m_lx383_key[m_lx383_scan_counter];
 }
 
-WRITE8_MEMBER(z80ne_state::lx383_w)
+void z80ne_state::lx383_w(offs_t offset, uint8_t data)
 {
 	/*
 	 * First 8 locations (F0-F7) are mapped to a dual-port 8-byte RAM
@@ -482,7 +454,7 @@ WRITE8_MEMBER(z80ne_state::lx383_w)
     pin 2 for an old PMOS UART.
  *
  */
-READ8_MEMBER(z80ne_state::lx385_ctrl_r)
+uint8_t z80ne_state::lx385_ctrl_r()
 {
 	/* set unused bits high */
 	uint8_t data = 0xc0;
@@ -501,7 +473,7 @@ READ8_MEMBER(z80ne_state::lx385_ctrl_r)
 
 #define LX385_CASSETTE_MOTOR_MASK ((1<<3)|(1<<4))
 
-WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
+void z80ne_state::lx385_ctrl_w(uint8_t data)
 {
 	/* Translate data to control signals
 	 *     0 bit1=0, bit0=0   UART Reset pulse
@@ -557,41 +529,38 @@ WRITE_LINE_MEMBER(z80ne_state::lx385_uart_tx_clock_w)
 		m_uart->write_tcp(state);
 }
 
-READ_LINE_MEMBER(z80ne_state::lx387_shift_r)
+READ_LINE_MEMBER(z80net_state::lx387_shift_r)
 {
 	return BIT(m_io_modifiers->read(), 0) || BIT(m_io_modifiers->read(), 2);
 }
 
-READ_LINE_MEMBER(z80ne_state::lx387_control_r)
+READ_LINE_MEMBER(z80net_state::lx387_control_r)
 {
 	return BIT(m_io_modifiers->read(), 1);
 }
 
-READ8_MEMBER(z80ne_state::lx388_mc6847_videoram_r)
+uint8_t z80net_state::lx388_mc6847_videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 
-	uint8_t *videoram = m_videoram;
-	int d6 = BIT(videoram[offset], 6);
-	int d7 = BIT(videoram[offset], 7);
+	int d6 = BIT(m_videoram[offset], 6);
+	int d7 = BIT(m_videoram[offset], 7);
 
 	m_vdg->inv_w(d6 && d7);
 	m_vdg->as_w(!d6 && d7);
 	m_vdg->intext_w(!d6 && d7);
 
-	return videoram[offset];
+	return m_videoram[offset];
 }
 
-READ8_MEMBER(z80ne_state::lx387_data_r)
+uint8_t z80net_state::lx387_data_r()
 {
-	uint8_t data;
-
-	data = m_lx387_kr2376->data_r(space, 0) & 0x7f;
+	uint8_t data = m_lx387_kr2376->data_r() & 0x7f;
 	data |= m_lx387_kr2376->get_output_pin(kr2376_device::KR2376_SO) << 7;
 	return data;
 }
 
-READ8_MEMBER(z80ne_state::lx388_read_field_sync)
+uint8_t z80net_state::lx388_read_field_sync()
 {
 	return m_vdg->fs_r() << 7;
 }
@@ -605,7 +574,7 @@ READ8_MEMBER(z80ne_state::lx388_read_field_sync)
  *
  */
 
-WRITE8_MEMBER(z80netf_state::lx390_motor_w)
+void z80netf_state::lx390_motor_w(uint8_t data)
 {
 	/* Selection of drive and parameters
 	 A write also causes the selected drive motor to turn on for about 3 seconds.
@@ -644,7 +613,7 @@ WRITE8_MEMBER(z80netf_state::lx390_motor_w)
 	}
 }
 
-READ8_MEMBER(z80netf_state::lx390_reset_bank)
+uint8_t z80netf_state::lx390_reset_bank()
 {
 	offs_t pc;
 
@@ -662,7 +631,7 @@ READ8_MEMBER(z80netf_state::lx390_reset_bank)
 	return 0xff;
 }
 
-READ8_MEMBER(z80netf_state::lx390_fdc_r)
+uint8_t z80netf_state::lx390_fdc_r(offs_t offset)
 {
 	uint8_t d;
 
@@ -686,7 +655,7 @@ READ8_MEMBER(z80netf_state::lx390_fdc_r)
 		break;
 	case 6:
 		d = 0xff;
-		lx390_reset_bank(space, 0);
+		lx390_reset_bank();
 		break;
 	case 7:
 		d = m_wd1771->data_r() ^ 0xff;
@@ -698,11 +667,9 @@ READ8_MEMBER(z80netf_state::lx390_fdc_r)
 	return d;
 }
 
-WRITE8_MEMBER(z80netf_state::lx390_fdc_w)
+void z80netf_state::lx390_fdc_w(offs_t offset, uint8_t data)
 {
-	uint8_t d;
-
-	d = data;
+	uint8_t d = data;
 	switch(offset)
 	{
 	case 0:
@@ -727,7 +694,7 @@ WRITE8_MEMBER(z80netf_state::lx390_fdc_w)
 		break;
 	case 6:
 		LOG("lx390_fdc_w, motor_w:   %02x\n", d);
-		lx390_motor_w(space, 0, d);
+		lx390_motor_w(d);
 		break;
 	case 7:
 		LOG("lx390_fdc_w, WD17xx data7, force:   %02x\n", d);

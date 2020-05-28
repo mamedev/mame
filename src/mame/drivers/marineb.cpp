@@ -129,12 +129,12 @@ static INPUT_PORTS_START( marineb )
 	PORT_DIPSETTING(    0x03, "6" )
 	PORT_DIPNAME( 0x1c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4,5") /* coinage doesn't work?? - always 1C / 1C or Free Play?? */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x14, DEF_STR( 2C_1C ) ) /* This is the correct Coinage according to manual */
-//	PORT_DIPSETTING(    0x18, DEF_STR( 3C_2C ) )
-//	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-//	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
-//	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-//	PORT_DIPSETTING(    0x10, DEF_STR( 1C_6C ) )
+//  PORT_DIPSETTING(    0x14, DEF_STR( 2C_1C ) ) /* This is the correct Coinage according to manual */
+//  PORT_DIPSETTING(    0x18, DEF_STR( 3C_2C ) )
+//  PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+//  PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+//  PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+//  PORT_DIPSETTING(    0x10, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x1c, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "20000 50000" )
@@ -178,9 +178,9 @@ static INPUT_PORTS_START( changes )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4") /* coinage doesn't work?? - always 1C / 1C or Free Play?? */
-//	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) ) /* This is the correct Coinage according to manual */
+//  PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) ) /* This is the correct Coinage according to manual */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+//  PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x10, 0x00, "1st Bonus Life" ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "20000" )

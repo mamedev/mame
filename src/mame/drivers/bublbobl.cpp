@@ -732,8 +732,8 @@ static INPUT_PORTS_START( tokio )
 	PORT_INCLUDE( tokio_base )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, host_semaphore_r, nullptr)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, mcu_semaphore_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", taito68705_mcu_device, host_semaphore_r)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", taito68705_mcu_device, mcu_semaphore_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bublboblp )
@@ -843,8 +843,8 @@ MACHINE_START_MEMBER(bublbobl_state,tokio)
 MACHINE_RESET_MEMBER(bublbobl_state,tokio)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
-	tokio_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
-	tokio_videoctrl_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // TODO: does /RESET clear this the same as above? probably yes, needs tracing...
+	tokio_bankswitch_w(0x00); // force a bankswitch write of all zeroes, as /RESET clears the latch
+	tokio_videoctrl_w(0x00); // TODO: does /RESET clear this the same as above? probably yes, needs tracing...
 }
 
 void bublbobl_state::tokio(machine_config &config)
@@ -863,7 +863,7 @@ void bublbobl_state::tokio(machine_config &config)
 
 	TAITO68705_MCU(config, "bmcu", MAIN_XTAL/8); // 3 Mhz
 
-	config.m_perfect_cpu_quantum = subtag("maincpu"); // is this necessary?
+	config.set_perfect_quantum(m_maincpu); // is this necessary?
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
@@ -943,7 +943,7 @@ MACHINE_START_MEMBER(bublbobl_state,bublbobl)
 MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
-	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
+	bublbobl_bankswitch_w(0x00); // force a bankswitch write of all zeroes, as /RESET clears the latch
 
 	m_ddr1 = 0;
 	m_ddr2 = 0;
@@ -972,7 +972,7 @@ void bublbobl_state::bublbobl_nomcu(machine_config &config)
 	Z80(config, m_audiocpu, MAIN_XTAL/8); // 3 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bublbobl_state::sound_map); // IRQs are triggered by the YM2203
 
-	config.m_minimum_quantum = attotime::from_hz(6000); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
@@ -1026,7 +1026,7 @@ MACHINE_START_MEMBER(bublbobl_state,boblbobl)
 MACHINE_RESET_MEMBER(bublbobl_state,boblbobl)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
-	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xff); // force a bankswitch write of all zeroes, as /RESET clears the latch
+	bublbobl_bankswitch_w(0x00); // force a bankswitch write of all zeroes, as /RESET clears the latch
 
 	m_ic43_a = 0;
 	m_ic43_b = 0;
@@ -1061,7 +1061,7 @@ MACHINE_START_MEMBER(bub68705_state, bub68705)
 MACHINE_RESET_MEMBER(bub68705_state, bub68705)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
-	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xff); // force a bankswitch write of all zeroes, as /RESET clears the latch
+	bublbobl_bankswitch_w(0x00); // force a bankswitch write of all zeroes, as /RESET clears the latch
 
 	m_address = 0;
 	m_latch = 0;

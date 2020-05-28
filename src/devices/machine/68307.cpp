@@ -56,13 +56,17 @@ void m68307_cpu_device::device_add_mconfig(machine_config &config)
 }
 
 
-m68307_cpu_device::m68307_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_device(mconfig, tag, owner, clock, M68307, 16, 24, address_map_constructor(FUNC(m68307_cpu_device::internal_map), this)),
+m68307_cpu_device::m68307_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	m68000_device(mconfig, tag, owner, clock, M68307, 16, 24, address_map_constructor(FUNC(m68307_cpu_device::internal_map), this)),
 	m_write_irq(*this),
 	m_write_a_tx(*this),
 	m_write_b_tx(*this),
 	m_read_inport(*this),
 	m_write_outport(*this),
+	m_porta_r(*this),
+	m_porta_w(*this),
+	m_portb_r(*this),
+	m_portb_w(*this),
 	m_duart(*this, "internal68681")
 {
 	m_m68307SIM = nullptr;
@@ -126,15 +130,16 @@ inline int m68307_cpu_device::calc_cs(offs_t address) const
 void m68307_cpu_device::init16_m68307(address_space &space)
 {
 	m_space = &space;
-	auto cache = space.cache<1, 0, ENDIANNESS_BIG>();
+	space.cache(m_oprogram16);
+	space.specific(m_program16);
 
-	m_readimm16 = [cache](offs_t address) -> u16 { /* m_m68307_currentcs = calc_cs(address); */ return cache->read_word(address); };
-	m_read8   = [this](offs_t address) -> u8     { /* m_m68307_currentcs = calc_cs(address); */ return m_space->read_byte(address); };
-	m_read16  = [this](offs_t address) -> u16    { /* m_m68307_currentcs = calc_cs(address); */ return m_space->read_word(address); };
-	m_read32  = [this](offs_t address) -> u32    { /* m_m68307_currentcs = calc_cs(address); */ return m_space->read_dword(address); };
-	m_write8  = [this](offs_t address, u8 data)  { /* m_m68307_currentcs = calc_cs(address); */ m_space->write_byte(address, data); };
-	m_write16 = [this](offs_t address, u16 data) { /* m_m68307_currentcs = calc_cs(address); */ m_space->write_word(address, data); };
-	m_write32 = [this](offs_t address, u32 data) { /* m_m68307_currentcs = calc_cs(address); */ m_space->write_dword(address, data); };
+	m_readimm16 = [this](offs_t address) -> u16 { /* m_m68307_currentcs = calc_cs(address); */ return m_oprogram16.read_word(address); };
+	m_read8   = [this](offs_t address) -> u8     { /* m_m68307_currentcs = calc_cs(address); */ return m_program16.read_byte(address); };
+	m_read16  = [this](offs_t address) -> u16    { /* m_m68307_currentcs = calc_cs(address); */ return m_program16.read_word(address); };
+	m_read32  = [this](offs_t address) -> u32    { /* m_m68307_currentcs = calc_cs(address); */ return m_program16.read_dword(address); };
+	m_write8  = [this](offs_t address, u8 data)  { /* m_m68307_currentcs = calc_cs(address); */ m_program16.write_byte(address, data); };
+	m_write16 = [this](offs_t address, u16 data) { /* m_m68307_currentcs = calc_cs(address); */ m_program16.write_word(address, data); };
+	m_write32 = [this](offs_t address, u32 data) { /* m_m68307_currentcs = calc_cs(address); */ m_program16.write_dword(address, data); };
 }
 
 
@@ -266,7 +271,10 @@ void m68307_cpu_device::device_start()
 	m_read_inport.resolve();
 	m_write_outport.resolve_safe();
 
-	set_port_callbacks(porta_read_delegate(), porta_write_delegate(), portb_read_delegate(), portb_write_delegate());
+	m_porta_r.set(nullptr);
+	m_porta_w.set(nullptr);
+	m_portb_r.set(nullptr);
+	m_portb_w.set(nullptr);
 }
 
 
@@ -312,10 +320,10 @@ WRITE16_MEMBER( m68307_cpu_device::m68307_internal_base_w )
 			base = (m_m68307_base & 0x0fff) << 12;
 			//mask = (m_m68307_base & 0xe000) >> 13;
 			//if ( m_m68307_base & 0x1000 ) mask |= 7;
-			m_internal->install_readwrite_handler(base + 0x000, base + 0x04f, read16_delegate(FUNC(m68307_cpu_device::m68307_internal_sim_r),this),    write16_delegate(FUNC(m68307_cpu_device::m68307_internal_sim_w),this));
-			m_internal->install_readwrite_handler(base + 0x100, base + 0x11f, read8_delegate(FUNC(m68307_cpu_device::m68307_internal_serial_r),this), write8_delegate(FUNC(m68307_cpu_device::m68307_internal_serial_w),this), 0xffff);
-			m_internal->install_readwrite_handler(base + 0x120, base + 0x13f, read16_delegate(FUNC(m68307_cpu_device::m68307_internal_timer_r),this),  write16_delegate(FUNC(m68307_cpu_device::m68307_internal_timer_w),this));
-			m_internal->install_readwrite_handler(base + 0x140, base + 0x149, read8_delegate(FUNC(m68307_cpu_device::m68307_internal_mbus_r),this),   write8_delegate(FUNC(m68307_cpu_device::m68307_internal_mbus_w),this), 0xffff);
+			m_internal->install_readwrite_handler(base + 0x000, base + 0x04f, read16_delegate(*this, FUNC(m68307_cpu_device::m68307_internal_sim_r)),   write16_delegate(*this, FUNC(m68307_cpu_device::m68307_internal_sim_w)));
+			m_internal->install_readwrite_handler(base + 0x100, base + 0x11f, read8_delegate(*this, FUNC(m68307_cpu_device::m68307_internal_serial_r)), write8_delegate(*this, FUNC(m68307_cpu_device::m68307_internal_serial_w)), 0xffff);
+			m_internal->install_readwrite_handler(base + 0x120, base + 0x13f, read16_delegate(*this, FUNC(m68307_cpu_device::m68307_internal_timer_r)), write16_delegate(*this, FUNC(m68307_cpu_device::m68307_internal_timer_w)));
+			m_internal->install_readwrite_handler(base + 0x140, base + 0x149, read8_delegate(*this, FUNC(m68307_cpu_device::m68307_internal_mbus_r)),   write8_delegate(*this, FUNC(m68307_cpu_device::m68307_internal_mbus_w)), 0xffff);
 
 
 			break;

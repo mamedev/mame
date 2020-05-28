@@ -43,7 +43,7 @@ READ8_MEMBER(magmax_state::sound_r)
 	return (m_soundlatch->read() << 1) | m_LS74_q;
 }
 
-WRITE8_MEMBER(magmax_state::ay8910_portB_0_w)
+void magmax_state::ay8910_portB_0_w(uint8_t data)
 {
 	/*bit 0 is input to CLR line of the LS74*/
 	m_LS74_clr = data & 1;
@@ -93,7 +93,7 @@ void magmax_state::machine_reset()
 
 
 
-WRITE8_MEMBER(magmax_state::ay8910_portA_0_w)
+void magmax_state::ay8910_portA_0_w(uint8_t data)
 {
 /*There are three AY8910 chips and four(!) separate amplifiers on the board
 * Each of AY channels is hardware mapped in following way:
@@ -336,7 +336,7 @@ void magmax_state::magmax(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &magmax_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &magmax_state::sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 
 	/* video hardware */

@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edstrom
 /*
- * The Dbox-1 CPU board.
+ * The Dbox-1 is a DVB Satellite and cable digital television set-top box.
+ *
+ * The CPU board:
  *__________________________________________________________________________________________________________
  *                                                                                                          |
  *                                                                                                          |
@@ -33,15 +35,15 @@
  * History of Nokia Multimedia Division
  *-------------------------------------
  * Luxor AB was a swedish home electronics and computer manufacturer located in Motala from 1923 and acquired
- * by Nokia 1985. Luxor designed among other things TV setsm Radios and the famous ABC-80. The Nokia Multimedia
- * Division was formed in Linköping as a result of the Luxor aquesition. Their main design was a satellite
+ * by Nokia 1985. Luxor designed among other things TV sets, Radios and the famous ABC-80. The Nokia Multimedia
+ * Division was formed in Linköping as a result of the Luxor aquisition. Their main design was a satellite
  * receiver, the first satellite in Europe was launched in 1988 and the market was growing fast however it took
  * a long time, almost 10 years before the breakthrough came for Nokia, a deal with the Kirsch Gruppe was struck and
  * in 1996 the 68340 based Dbox-1 was released in Germany. The original design was expensive, so soon a cost reduced
  * version based on PPC, the Dbox-2, was released. The boxes sold in millions but the margins were negative or very
  * low at best and the Kirsch Gruppe went bankrupt in 2002 and Nokia decided to shutdown the facility in Linköping.
  *
- * The heavily subsidiced Dbox was very popular in Holland since Kirsch Gruppe didn't lock use to themselfs. This was
+ * The heavily subsidised Dbox was very popular in Holland since Kirsch Gruppe didn't lock usage to themselves. This was
  * corrected in a forced firmware upgrade leaving the "customers" in Holland without a working box. Pretty soon a
  * shareware software developed by Uli Hermann appeared called DVB98 and later DVB2000 reenabling the boxes in  Holland
  * and blocking upgrades. Uli's software was by many considered better than the original software.
@@ -55,7 +57,7 @@
  *
  * Misc findings
  *--------------
- * - Serial port on the back runs at 19200 at issues modem commands when attached to terminal
+ * - Serial port on the back runs at 19200 and issues modem commands when attached to terminal
  * - It is possible to attach a BDM emulator and retrieve the ROM through it.
  * - It is possible to flash new firmware through BDM by adding jumper XP06 (under the modem board)
  * - The bootstrap is based on RTXC 3.2g RTOS
@@ -235,7 +237,7 @@
  *                            - ignore FREEZE
  *                            - The crystal clock is the clear-to-send input capture clock for both channels
  *  SIM40 + 0x0701: 0x8A     Serial Module - MCR Low Byte
- *                            - The serial control regosters are only accessable from supervisor mode
+ *                            - The serial control registers are only accessable from supervisor mode
  *                            - IARB = 0x0A - serial module has priority level 10d
  *  SIM40 + 0x0704: 0x01     Serial Module - ILR Interrupt Level
  *  SIM40 + 0x0705: 0x44     Serial Module - IVR Interrupt Vector
@@ -454,15 +456,15 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	DECLARE_WRITE8_MEMBER(sda5708_reset);
-	DECLARE_WRITE8_MEMBER(sda5708_clk);
-	DECLARE_WRITE8_MEMBER(write_pa);
+	void sda5708_reset(uint8_t data);
+	void sda5708_clk(uint8_t data);
+	void write_pa(uint8_t data);
 
 	void dbox_map(address_map &map);
 
 #if LOCALFLASH
-	DECLARE_READ16_MEMBER(sysflash_r);
-	DECLARE_WRITE16_MEMBER(sysflash_w);
+	uint16_t sysflash_r(offs_t offset);
+	void sysflash_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 private:
 	uint16_t * m_sysflash;
 	uint32_t m_sf_mode;
@@ -490,26 +492,26 @@ void dbox_state::machine_reset()
 }
 
 // TODO: Hookup the reset latch correctly
-WRITE8_MEMBER (dbox_state::sda5708_reset){
+void dbox_state::sda5708_reset(uint8_t data) {
 	LOGDISPLAY("%s - not implemented\n", FUNCNAME);
 }
 
-WRITE8_MEMBER (dbox_state::sda5708_clk){
+void dbox_state::sda5708_clk(uint8_t data) {
 	LOGDISPLAY("%s\n", FUNCNAME);
 	m_display->sdclk_w(CLEAR_LINE);
 	m_display->data_w((0x80 & data) != 0 ? ASSERT_LINE : CLEAR_LINE);
 	m_display->sdclk_w(ASSERT_LINE);
 }
 
-WRITE8_MEMBER (dbox_state::write_pa){
+void dbox_state::write_pa(uint8_t data) {
 	LOGDISPLAY("%s\n", FUNCNAME);
 	m_display->load_w((0x04 & data) == 0 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 #if LOCALFLASH
-/* Lcoal emulation of the 29F800B 8Mbit flashes if the intelflsh bugs, relies on a complete command cycle is done per device, not in parallell */
+/* Local emulation of the 29F800B 8Mbit flashes if the intelflsh bugs, relies on a complete command cycle is done per device, not in parallel */
 /* TODO: Make a flash device of this and support programming per sector and persistance, as settings etc may be stored in a 8Kb sector  */
-WRITE16_MEMBER (dbox_state::sysflash_w){
+void dbox_state::sysflash_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
 	LOGFLASH("%s pc:%08x offset:%08x data:%08x mask:%08x\n", FUNCNAME, m_maincpu->pc(), offset, data, mem_mask);
 
 	/*Data bits DQ15–DQ8 are don’t cares for unlock and command cycles.*/
@@ -547,7 +549,7 @@ WRITE16_MEMBER (dbox_state::sysflash_w){
 	}
 }
 
-READ16_MEMBER (dbox_state::sysflash_r){
+uint16_t dbox_state::sysflash_r(offs_t offset) {
 
   if (m_sf_mode == 0)
   {
@@ -586,11 +588,11 @@ void dbox_state::dbox_map(address_map &map)
 // CS2 - CS demux
 // 0000009a Address mask CS2 00000050, 00007fff (ffffffff) - Mask: 00007f00 FCM:0f DD:3 PS: External DSACK response
 // 000000a2 Base address CS2 00000054, 00700003 (ffffffff) - Base: 00700000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
-	//AM_RANGE(0x700000, 0x77ffff)
+	//map(0x700000, 0x77ffff)
 // CS3 - 8 bit devices
 // 000000aa Address mask CS3 00000058, 000007f2 (ffffffff) - Mask: 00000700 FCM:0f DD:0 PS: 8-bit
 // 000000b2 Base address CS3 0000005c, 00780003 (ffffffff) - Base: 00780000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
-	// AM_RANGE(0x780000, 0x7807ff)
+	// map(0x780000, 0x7807ff)
 	map(0x780100, 0x7801ff).w(FUNC(dbox_state::sda5708_reset));
 	map(0x780600, 0x7806ff).w(FUNC(dbox_state::sda5708_clk));
 // CS1 - RAM area
@@ -610,7 +612,7 @@ void dbox_state::dbox(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dbox_state::dbox_map);
 	m_maincpu->pa_out_callback().set(FUNC(dbox_state::write_pa));
 
-	/* Timer 2 is used to communicate with the descrambler module TODO: Write the descrambler  module */
+	/* Timer 2 is used to communicate with the descrambler module TODO: Write the descrambler module */
 	//m_maincpu->tout2_out_callback().set("dcs", FUNC(descrambler_device::txd_receiver));
 	//m_maincpu->tgate2_in_callback().set("dsc", FUNC(descrambler_device::rxd_receiver));
 

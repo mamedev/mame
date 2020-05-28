@@ -199,7 +199,7 @@ protected:
 private:
 
 	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void xavix_map(address_map &map);
 
@@ -453,19 +453,19 @@ private:
 	}
 
 
-	DECLARE_READ8_MEMBER(adc0_r) { return m_an_in[0]->read(); };
-	DECLARE_READ8_MEMBER(adc1_r) { return m_an_in[1]->read(); };
-	DECLARE_READ8_MEMBER(adc2_r) { return m_an_in[2]->read(); };
-	DECLARE_READ8_MEMBER(adc3_r) { return m_an_in[3]->read(); };
-	DECLARE_READ8_MEMBER(adc4_r) { return m_an_in[4]->read(); };
-	DECLARE_READ8_MEMBER(adc5_r) { return m_an_in[5]->read(); };
-	DECLARE_READ8_MEMBER(adc6_r) { return m_an_in[6]->read(); };
-	DECLARE_READ8_MEMBER(adc7_r) { return m_an_in[7]->read(); };
+	uint8_t adc0_r() { return m_an_in[0]->read(); };
+	uint8_t adc1_r() { return m_an_in[1]->read(); };
+	uint8_t adc2_r() { return m_an_in[2]->read(); };
+	uint8_t adc3_r() { return m_an_in[3]->read(); };
+	uint8_t adc4_r() { return m_an_in[4]->read(); };
+	uint8_t adc5_r() { return m_an_in[5]->read(); };
+	uint8_t adc6_r() { return m_an_in[6]->read(); };
+	uint8_t adc7_r() { return m_an_in[7]->read(); };
 
-	DECLARE_READ8_MEMBER(anport0_r) { logerror("%s: unhandled anport0_r\n", machine().describe_context()); return 0xff; };
-	DECLARE_READ8_MEMBER(anport1_r) { logerror("%s: unhandled anport1_r\n", machine().describe_context()); return 0xff; };
-	DECLARE_READ8_MEMBER(anport2_r) { logerror("%s: unhandled anport2_r\n", machine().describe_context()); return 0xff; };
-	DECLARE_READ8_MEMBER(anport3_r) { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; };
+	uint8_t anport0_r() { logerror("%s: unhandled anport0_r\n", machine().describe_context()); return 0xff; };
+	uint8_t anport1_r() { logerror("%s: unhandled anport1_r\n", machine().describe_context()); return 0xff; };
+	uint8_t anport2_r() { logerror("%s: unhandled anport2_r\n", machine().describe_context()); return 0xff; };
+	uint8_t anport3_r() { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; };
 
 	void update_irqs();
 	uint8_t m_irqsource;
@@ -534,11 +534,11 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	void update_pen(int pen, uint8_t shval, uint8_t lval);
-	void draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
-	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
-	void draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int line);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int line);
+	void draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
+	void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which);
+	void draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which, int line);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int line);
 	void decode_inline_header(int &flipx, int &flipy, int &test, int& pal, int debug_packets);
 
 	bitmap_ind16 m_zbuffer;
@@ -559,7 +559,7 @@ private:
 	required_device<xavix_sound_device> m_sound;
 
 
-	DECLARE_READ8_MEMBER(sound_regram_read_cb);
+	uint8_t sound_regram_read_cb(offs_t offset);
 
 protected:
 	required_device<xavix_adc_device> m_adc;
@@ -592,7 +592,7 @@ public:
 protected:
 
 private:
-	DECLARE_READ8_MEMBER(guru_anport2_r) { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
+	uint8_t guru_anport2_r() { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
 };
 
 
@@ -608,10 +608,10 @@ public:
 protected:
 
 private:
-	DECLARE_READ8_MEMBER(sdb_anport0_r) { return m_mouse0x->read()^0x7f; }
-	DECLARE_READ8_MEMBER(sdb_anport1_r) { return m_mouse0y->read()^0x7f; }
-	DECLARE_READ8_MEMBER(sdb_anport2_r) { return m_mouse1x->read()^0x7f; }
-	DECLARE_READ8_MEMBER(sdb_anport3_r) { return m_mouse1y->read()^0x7f; }
+	uint8_t sdb_anport0_r() { return m_mouse0x->read()^0x7f; }
+	uint8_t sdb_anport1_r() { return m_mouse0y->read()^0x7f; }
+	uint8_t sdb_anport2_r() { return m_mouse1x->read()^0x7f; }
+	uint8_t sdb_anport3_r() { return m_mouse1y->read()^0x7f; }
 
 };
 
@@ -626,7 +626,6 @@ public:
 		hackaddress2(-1)
 	{ }
 
-	void xavix_i2c_24lc02(machine_config &config);
 	void xavix_i2c_24lc04(machine_config &config);
 	void xavix_i2c_24c02(machine_config &config);
 	void xavix_i2c_24c08(machine_config &config);
@@ -635,6 +634,7 @@ public:
 	void xavix2000_i2c_24c02(machine_config &config);
 
 	void xavix2002_i2c_24c04(machine_config &config);
+	void xavix2002_i2c_mrangbat(machine_config& config);
 
 	void init_epo_efdx()
 	{
@@ -642,8 +642,6 @@ public:
 		hackaddress1 = 0x958a;
 		hackaddress2 = 0x8524;
 	}
-
-	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
 
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
@@ -668,10 +666,10 @@ private:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 private:
-	DECLARE_READ8_MEMBER(tam_anport0_r) { return m_mouse0x->read()^0x7f; }
-	DECLARE_READ8_MEMBER(tam_anport1_r) { return m_mouse0y->read()^0x7f; }
-	DECLARE_READ8_MEMBER(tam_anport2_r) { return m_mouse1x->read()^0x7f; }
-	DECLARE_READ8_MEMBER(tam_anport3_r) { return m_mouse1y->read()^0x7f; }
+	uint8_t tam_anport0_r() { return m_mouse0x->read()^0x7f; }
+	uint8_t tam_anport1_r() { return m_mouse0y->read()^0x7f; }
+	uint8_t tam_anport2_r() { return m_mouse1x->read()^0x7f; }
+	uint8_t tam_anport3_r() { return m_mouse1y->read()^0x7f; }
 };
 
 
@@ -685,12 +683,12 @@ public:
 	void xavix2002_i2c_jmat(machine_config &config);
 
 private:
-	READ8_MEMBER(read_extended_io0);
-	READ8_MEMBER(read_extended_io1);
-	READ8_MEMBER(read_extended_io2);
-	WRITE8_MEMBER(write_extended_io0);
-	WRITE8_MEMBER(write_extended_io1);
-	WRITE8_MEMBER(write_extended_io2);
+	uint8_t read_extended_io0();
+	uint8_t read_extended_io1();
+	uint8_t read_extended_io2();
+	void write_extended_io0(uint8_t data);
+	void write_extended_io1(uint8_t data);
+	void write_extended_io2(uint8_t data);
 };
 
 
@@ -701,7 +699,7 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(camera_r);
+	DECLARE_READ_LINE_MEMBER(camera_r);
 
 protected:
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
@@ -714,7 +712,7 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(camera_r);
+	DECLARE_READ_LINE_MEMBER(camera_r);
 };
 
 
@@ -730,7 +728,7 @@ public:
 	void xavix_mtrk(machine_config &config);
 	void xavix_mtrkp(machine_config &config);
 
-	CUSTOM_INPUT_MEMBER( mtrk_wheel_r );
+	DECLARE_READ_LINE_MEMBER( mtrk_wheel_r );
 
 protected:
 	required_device<xavix_mtrk_wheel_device> m_wheel;
@@ -754,15 +752,18 @@ protected:
 class xavix_cart_state : public xavix_state
 {
 public:
-	xavix_cart_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_state(mconfig, type, tag),
+	xavix_cart_state(const machine_config &mconfig, device_type type, const char *tag) :
+		xavix_state(mconfig, type, tag),
 		m_cartslot(*this, "cartslot")
-	{ }
+	{
+		m_cartlimit = 0x400000;
+	}
 
 	void xavix_cart(machine_config &config);
 	void xavix_cart_ekara(machine_config &config);
 	void xavix_cart_popira(machine_config &config);
 	void xavix_cart_ddrfammt(machine_config &config);
+	void xavix_cart_evio(machine_config &config);
 
 protected:
 
@@ -772,7 +773,7 @@ protected:
 	{
 		if (offset & 0x8000)
 		{
-			if (offset & 0x400000)
+			if ((offset & 0x7fffff) >= m_cartlimit)
 			{
 				return m_rgn[(offset) & (m_rgnlen - 1)];
 			}
@@ -780,7 +781,7 @@ protected:
 			{
 				if (m_cartslot->has_cart())
 				{
-					return m_cartslot->read_cart(*m_cpuspace, offset);
+					return m_cartslot->read_cart(offset);
 				}
 				else
 				{
@@ -796,7 +797,7 @@ protected:
 
 	virtual uint8_t opcodes_800000_r(offs_t offset) override
 	{
-		if (offset & 0x400000)
+		if ((offset & 0x7fffff) >= m_cartlimit)
 		{
 			return m_rgn[(offset) & (m_rgnlen - 1)];
 		}
@@ -804,7 +805,7 @@ protected:
 		{
 			if (m_cartslot->has_cart())
 			{
-				return m_cartslot->read_cart(*m_cpuspace, offset);
+				return m_cartslot->read_cart(offset);
 			}
 			else
 			{
@@ -826,7 +827,7 @@ protected:
 		if (offset < 3)
 		{
 			if (m_cartslot->has_cart())
-				m_cartslot->write_bus_control(space,offset,data,mem_mask);
+				m_cartslot->write_bus_control(offset,data);
 		}
 	};
 
@@ -835,11 +836,11 @@ protected:
 		if (m_cartslot->has_cart() && m_cartslot->is_read_access_not_rom())
 		{
 			logerror("%s: read from external bus %06x (SEEPROM READ?)\n", machine().describe_context(), offset);
-			return m_cartslot->read_extra(*m_cpuspace, offset);
+			return m_cartslot->read_extra(offset);
 		}
 		else
 		{
-			if (offset & 0x400000)
+			if ((offset & 0x7fffff) >= m_cartlimit)
 			{
 				return m_rgn[(offset) & (m_rgnlen - 1)];
 			}
@@ -847,7 +848,7 @@ protected:
 			{
 				if (m_cartslot->has_cart())
 				{
-					return m_cartslot->read_cart(*m_cpuspace, offset);
+					return m_cartslot->read_cart(offset);
 				}
 				else
 				{
@@ -861,13 +862,13 @@ protected:
 		if (m_cartslot->has_cart() && m_cartslot->is_write_access_not_rom())
 		{
 			logerror("%s: write to external bus %06x %02x (SEEPROM WRITE?)\n", machine().describe_context(), offset, data);
-			return m_cartslot->write_extra(*m_cpuspace, offset, data);
+			return m_cartslot->write_extra(offset, data);
 		}
 		else
 		{
 			if (m_cartslot->has_cart())
 			{
-				return m_cartslot->write_cart(*m_cpuspace, offset, data);
+				return m_cartslot->write_cart(offset, data);
 			}
 			else
 			{
@@ -882,7 +883,7 @@ protected:
 
 		if (databank >= 0x80)
 		{
-			if (offset & 0x400000)
+			if ((offset & 0x7fffff) >= m_cartlimit)
 			{
 				return m_rgn[(offset) & (m_rgnlen - 1)];
 			}
@@ -890,7 +891,7 @@ protected:
 			{
 				if (m_cartslot->has_cart())
 				{
-					return m_cartslot->read_cart(*m_cpuspace, offset);
+					return m_cartslot->read_cart(offset);
 				}
 				else
 				{
@@ -902,7 +903,7 @@ protected:
 		{
 			if ((offset & 0xffff) >= 0x8000)
 			{
-				if (offset & 0x400000)
+				if ((offset & 0x7fffff) >= m_cartlimit)
 				{
 					return m_rgn[(offset) & (m_rgnlen - 1)];
 				}
@@ -910,7 +911,7 @@ protected:
 				{
 					if (m_cartslot->has_cart())
 					{
-						return m_cartslot->read_cart(*m_cpuspace, offset);
+						return m_cartslot->read_cart(offset);
 					}
 					else
 					{
@@ -925,7 +926,23 @@ protected:
 		}
 	}
 
+	int m_cartlimit;
 	required_device<ekara_cart_slot_device> m_cartslot;
+};
+
+
+class xavix_cart_gcslottv_state : public xavix_cart_state
+{
+public:
+	xavix_cart_gcslottv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		xavix_cart_state(mconfig, type, tag)
+	{
+		m_cartlimit = 0x800000;
+	}
+
+	void xavix_cart_gcslottv(machine_config &config);
+
+protected:
 };
 
 class xavix_i2c_cart_state : public xavix_cart_state
@@ -938,8 +955,6 @@ public:
 
 	void xavix_i2c_taiko(machine_config &config);
 	void xavix_i2c_jpopira(machine_config &config);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
 
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
@@ -957,14 +972,14 @@ public:
 
 	void xavix_cart_popira2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+	DECLARE_READ_LINE_MEMBER(i2c_r);
 
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 private:
-	DECLARE_READ8_MEMBER(popira2_adc0_r);
-	DECLARE_READ8_MEMBER(popira2_adc1_r);
+	uint8_t popira2_adc0_r();
+	uint8_t popira2_adc1_r();
 
 	required_ioport m_p2;
 };
@@ -981,8 +996,8 @@ public:
 		m_extraiowrite(0)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi1_r);
+	DECLARE_READ_LINE_MEMBER(ekara_multi0_r);
+	DECLARE_READ_LINE_MEMBER(ekara_multi1_r);
 
 //  void xavix_ekara(machine_config &config);
 

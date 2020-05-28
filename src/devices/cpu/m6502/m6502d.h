@@ -36,19 +36,23 @@ protected:
 		DASM_aby,    /* absolute + Y */
 		DASM_acc,    /* accumulator */
 		DASM_adr,    /* absolute address (jmp,jsr) */
+		DASM_amr,    /* absolute address, mask byte and relative address (r65c19) */
 		DASM_bzp,    /* zero page with bit selection */
 		DASM_iax,    /* indirect + X (65c02 jmp) */
 		DASM_idx,    /* zero page pre indexed */
 		DASM_idy,    /* zero page post indexed */
 		DASM_idz,    /* zero page post indexed (65ce02) */
+		DASM_ima,    /* immediate byte and absolute address (r65c19) */
 		DASM_imm,    /* immediate */
 		DASM_imp,    /* implicit */
 		DASM_ind,    /* indirect (jmp) */
+		DASM_ipx,    /* zero page post indexed (r65c19) */
 		DASM_isy,    /* zero page pre indexed sp and post indexed Y (65ce02) */
 		DASM_iw2,    /* immediate word (65ce02) */
 		DASM_iw3,    /* augment (65ce02) */
 		DASM_rel,    /* relative */
 		DASM_rw2,    /* relative word (65cs02, 65ce02) */
+		DASM_vec,    /* vector (r65c19 jbs) */
 		DASM_zpb,    /* zero page and branch (65c02 bbr, bbs) */
 		DASM_zpg,    /* zero page */
 		DASM_zpi,    /* zero page indirect (65c02) */

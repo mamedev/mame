@@ -105,13 +105,13 @@ public:
 	_SpriteRAMType *buffer() { return &m_buffer[0]; }
 
 	// configuration
-	void set_spriteram(_SpriteRAMType *base, uint32_t bytes) { m_spriteram = base; m_spriteram_bytes = bytes; m_buffer.resize(m_spriteram_bytes / sizeof(_SpriteRAMType)); }
+	void set_spriteram(_SpriteRAMType *base, uint32_t bytes) { assert(base != nullptr && bytes != 0); m_spriteram = base; m_spriteram_bytes = bytes; m_buffer.resize(m_spriteram_bytes / sizeof(_SpriteRAMType)); }
 	void set_origin(int32_t xorigin = 0, int32_t yorigin = 0) { m_xorigin = xorigin; m_yorigin = yorigin; }
 	void set_xorigin(int32_t xorigin) { m_xorigin = xorigin; }
 	void set_yorigin(int32_t yorigin) { m_yorigin = yorigin; }
 
 	// buffering
-	void copy_to_buffer() { memcpy(m_buffer, m_spriteram, m_spriteram_bytes); }
+	void copy_to_buffer() { assert(m_spriteram != nullptr); memcpy(m_buffer, m_spriteram, m_spriteram_bytes); }
 
 	// clearing
 	void clear() { clear(m_bitmap.cliprect()); }

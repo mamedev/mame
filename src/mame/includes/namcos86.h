@@ -50,8 +50,8 @@ private:
 	DECLARE_WRITE8_MEMBER(int_ack2_w);
 	DECLARE_WRITE8_MEMBER(watchdog1_w);
 	DECLARE_WRITE8_MEMBER(watchdog2_w);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(led_w);
+	void coin_w(uint8_t data);
+	void led_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(cus115_w);
 	DECLARE_WRITE8_MEMBER(videoram1_w);
 	DECLARE_WRITE8_MEMBER(videoram2_w);
@@ -93,7 +93,7 @@ private:
 
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;
-	required_device<hd63701_cpu_device> m_mcu;
+	required_device<hd63701v0_cpu_device> m_mcu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;

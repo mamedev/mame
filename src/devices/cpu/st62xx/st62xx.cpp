@@ -24,10 +24,10 @@ st6228_device::st6228_device(const machine_config &mconfig, const char *tag, dev
 	, m_prev_mode(MODE_NORMAL)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(st6228_device::st6228_program_map), this))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(st6228_device::st6228_data_map), this))
-	, m_porta_out{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_portb_out{{*this}, {*this}, {*this}}
-	, m_portc_out{{*this}, {*this}, {*this}, {*this}}
-	, m_portd_out{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_porta_out(*this)
+	, m_portb_out(*this)
+	, m_portc_out(*this)
+	, m_portd_out(*this)
 	, m_program(nullptr)
 	, m_data(nullptr)
 	, m_rambank(*this, "rambank")
@@ -100,18 +100,10 @@ void st6228_device::device_start()
 	m_program_rombank->configure_entries(0, 4, m_rom->base(), 0x800);
 	m_data_rombank->configure_entries(0, 128, m_rom->base(), 0x40);
 
-	// TODO: magic numbers
-	for (uint8_t bit = 0; bit < 6; bit++)
-		m_porta_out[bit].resolve_safe();
-
-	for (uint8_t bit = 0; bit < 3; bit++)
-		m_portb_out[bit].resolve_safe();
-
-	for (uint8_t bit = 0; bit < 4; bit++)
-		m_portc_out[bit].resolve_safe();
-
-	for (uint8_t bit = 0; bit < 7; bit++)
-		m_portd_out[bit].resolve_safe();
+	m_porta_out.resolve_all_safe();
+	m_portb_out.resolve_all_safe();
+	m_portc_out.resolve_all_safe();
+	m_portd_out.resolve_all_safe();
 }
 
 void st6228_device::device_reset()
@@ -260,7 +252,7 @@ void st6228_device::update_port_mode(uint8_t index, uint8_t changed)
 	}
 }
 
-WRITE8_MEMBER(st6228_device::regs_w)
+void st6228_device::regs_w(offs_t offset, uint8_t data)
 {
 	offset += 0x80;
 
@@ -373,7 +365,7 @@ WRITE8_MEMBER(st6228_device::regs_w)
 	}
 }
 
-READ8_MEMBER(st6228_device::regs_r)
+uint8_t st6228_device::regs_r(offs_t offset)
 {
 	uint8_t ret = 0;
 	offset += 0x80;
@@ -438,17 +430,17 @@ READ8_MEMBER(st6228_device::regs_r)
 	return ret;
 }
 
-uint32_t st6228_device::execute_min_cycles() const
+uint32_t st6228_device::execute_min_cycles() const noexcept
 {
 	return 2;
 }
 
-uint32_t st6228_device::execute_max_cycles() const
+uint32_t st6228_device::execute_max_cycles() const noexcept
 {
 	return 5;
 }
 
-uint32_t st6228_device::execute_input_lines() const
+uint32_t st6228_device::execute_input_lines() const noexcept
 {
 	return 0;
 }

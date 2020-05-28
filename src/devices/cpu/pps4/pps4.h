@@ -57,9 +57,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual u32 execute_min_cycles() const override { return 1; }
-	virtual u32 execute_max_cycles() const override { return 3; }
-	virtual u32 execute_input_lines() const override { return 0; }
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 3; }
+	virtual u32 execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -79,10 +79,10 @@ protected:
 	devcb_read8 m_dib_cb;
 	devcb_write8 m_do_cb;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_data;
-	address_space *m_io;
+	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access< 8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	int     m_icount;
 
 	u8        m_A;        //!< Accumulator A(4:1)
@@ -178,8 +178,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides (NOTE: these assume internal XTAL divider is always used)
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 18 - 1) / 18; }
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * 18); }
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 18 - 1) / 18; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 18); }
 
 	virtual void iDIB() override;
 	virtual void iDOA() override;

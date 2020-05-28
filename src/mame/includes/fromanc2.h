@@ -35,9 +35,9 @@ public:
 	void init_fromanc4();
 	void init_fromanc2();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_int_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(sndcpu_nmi_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_nmi_r);
+	DECLARE_READ_LINE_MEMBER(subcpu_int_r);
+	DECLARE_READ_LINE_MEMBER(sndcpu_nmi_r);
+	DECLARE_READ_LINE_MEMBER(subcpu_nmi_r);
 
 private:
 	/* memory pointers */

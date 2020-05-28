@@ -73,7 +73,7 @@ public:
 	// assume that RESET button is tied to CPU RESET pin
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
-	// machine drivers
+	// machine configs
 	void debutm(machine_config &config);
 
 protected:
@@ -94,8 +94,8 @@ private:
 
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(latch_w);
+	u8 input_r(offs_t offset);
+	void latch_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(lcd_update_w);
 
 	u8 m_latch[5];
@@ -130,7 +130,7 @@ INTERRUPT_GEN_MEMBER(debut_state::interrupt)
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // I8086
 }
 
-READ8_MEMBER(debut_state::input_r)
+u8 debut_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 	u8 sel = m_latch[0] & 0xf;
@@ -147,7 +147,7 @@ READ8_MEMBER(debut_state::input_r)
 	return ~data;
 }
 
-WRITE8_MEMBER(debut_state::latch_w)
+void debut_state::latch_w(offs_t offset, u8 data)
 {
 	u8 mask = 1 << offset;
 	u8 prev = m_latch[0];

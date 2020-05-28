@@ -17,7 +17,7 @@
 #include "vrc6.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(VRC6, vrc6snd_device, "vrc6snd", "Konami VRC6 (Sound)")
+DEFINE_DEVICE_TYPE(VRC6, vrc6snd_device, "vrc6snd", "Konami 053329 VRC VI (Sound)")
 
 //**************************************************************************
 //  LIVE DEVICE

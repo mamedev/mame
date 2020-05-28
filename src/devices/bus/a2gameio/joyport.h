@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #ifndef MAME_BUS_A2GAMEIO_JOYPORT_H
-#define MAME_BUS_A2GAMEIO_JOYPORT_H 1
+#define MAME_BUS_A2GAMEIO_JOYPORT_H
 
 #pragma once
 

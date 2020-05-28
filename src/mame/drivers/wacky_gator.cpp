@@ -1,7 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:FelipeSanches, Sandro Ronco
 //
-// Wacky Gator
+// Namco Gator Panic (Wani Wani Panic)
+// USA version distributed by Data East and renamed "Wacky Gator"
 //
 // Driver by Sandro Ronco and
 //  Felipe Correa da Silva Sanches <juca@members.fsf.org>
@@ -55,15 +56,15 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	DECLARE_WRITE8_MEMBER(sample_ctrl_w);
-	DECLARE_WRITE8_MEMBER(alligators_ctrl1_w);
-	DECLARE_WRITE8_MEMBER(alligators_ctrl2_w);
+	void alligators_ctrl1_w(uint8_t data);
+	void alligators_ctrl2_w(uint8_t data);
 
 	void set_lamps(int p, uint8_t value);
-	DECLARE_WRITE8_MEMBER(status_lamps_w);
-	template <unsigned N> DECLARE_WRITE8_MEMBER(timing_lamps_w) { set_lamps((N + 1) << 3, data); }
+	void status_lamps_w(uint8_t data);
+	template <unsigned N> void timing_lamps_w(uint8_t data) { set_lamps((N + 1) << 3, data); }
 
 	void set_digits(int p, uint8_t value);
-	template <unsigned N> DECLARE_WRITE8_MEMBER(disp_w) { set_digits(N << 1, data); }
+	template <unsigned N> void disp_w(uint8_t data) { set_digits(N << 1, data); }
 
 	void pmm8713_ck(int i, int state);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(alligator_ck) { pmm8713_ck(N, state); }
@@ -93,7 +94,7 @@ private:
 };
 
 
-WRITE8_MEMBER(wackygtr_state::status_lamps_w)
+void wackygtr_state::status_lamps_w(uint8_t data)
 {
 	/*
 	    ---x xxxx   status lamps
@@ -122,7 +123,7 @@ WRITE8_MEMBER(wackygtr_state::sample_ctrl_w)
 	m_msm->reset_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER(wackygtr_state::alligators_ctrl1_w)
+void wackygtr_state::alligators_ctrl1_w(uint8_t data)
 {
 	m_pit8253[0]->write_gate0(BIT(data, 0));
 	m_pit8253[0]->write_gate1(BIT(data, 1));
@@ -133,7 +134,7 @@ WRITE8_MEMBER(wackygtr_state::alligators_ctrl1_w)
 	machine().bookkeeping().coin_lockout_w(0, data & 0x40 ? 0 : 1);
 }
 
-WRITE8_MEMBER(wackygtr_state::alligators_ctrl2_w)
+void wackygtr_state::alligators_ctrl2_w(uint8_t data)
 {
 	/*
 	    ---- ---x    PMM8713 0 U/D
@@ -213,13 +214,13 @@ void wackygtr_state::set_lamps(int p, uint8_t value)
 
 static INPUT_PORTS_START( wackygtr )
 	PORT_START("IN0")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(DEVICE_SELF, wackygtr_state, alligators_rear_sensors_r, nullptr)
+	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(wackygtr_state, alligators_rear_sensors_r)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SERVICE)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN1)
 
 	PORT_START("IN1")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM)   PORT_CUSTOM_MEMBER(DEVICE_SELF, wackygtr_state, alligators_front_sensors_r, nullptr)
+	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(wackygtr_state, alligators_front_sensors_r)
 	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_1C ) )
@@ -252,7 +253,7 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 	if (!(m_adpcm_ctrl & 0x80))
 	{
 		uint8_t data = m_samples->base()[m_adpcm_pos & 0xffff];
-		m_msm->write_data((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
+		m_msm->data_w((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
 		m_adpcm_pos += m_adpcm_sel;
 		m_adpcm_sel ^= 1;
 	}
@@ -345,4 +346,4 @@ ROM_START( wackygtr )
 	ROM_LOAD("wp3-vo0.2h", 0x0000, 0x10000, CRC(91c7986f) SHA1(bc9fa0d41c1caa0f909a349f511d022b7e42c6cd))
 ROM_END
 
-GAME(1990, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, empty_init, ROT0, "Data East", "Wacky Gator", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_CLICKABLE_ARTWORK)
+GAME(1988, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, empty_init, ROT0, "Namco (Data East license)", "Wacky Gator (US)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_CLICKABLE_ARTWORK)

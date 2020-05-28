@@ -13,7 +13,6 @@
 
 #include "emu.h"
 #include "a2cffa.h"
-#include "machine/ataintf.h"
 #include "imagedev/harddriv.h"
 #include "softlist.h"
 
@@ -53,7 +52,7 @@ ROM_END
 
 void a2bus_cffa2000_device::device_add_mconfig(machine_config &config)
 {
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", "hdd", false);
 
 // not yet, the core explodes
 //  SOFTWARE_LIST(config, "hdd_list").set_original("apple2gs_hdd");
@@ -146,7 +145,7 @@ uint8_t a2bus_cffa2000_device::read_c0nx(uint8_t offset)
 			// Apple /// driver uses sta $c080,x when writing, which causes spurious reads of c088
 			if (!m_inwritecycle)
 			{
-				m_lastreaddata = m_ata->read_cs0(offset - 8);
+				m_lastreaddata = m_ata->cs0_r(offset - 8);
 			}
 			return m_lastreaddata & 0xff;
 
@@ -157,7 +156,7 @@ uint8_t a2bus_cffa2000_device::read_c0nx(uint8_t offset)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ata->read_cs0(offset-8, 0xff);
+			return m_ata->cs0_r(offset-8, 0xff);
 	}
 
 	return 0xff;
@@ -193,7 +192,7 @@ void a2bus_cffa2000_device::write_c0nx(uint8_t offset, uint8_t data)
 			m_lastdata &= 0xff00;
 			m_lastdata |= data;
 //          printf("%02x to 8, m_lastdata = %x\n", data, m_lastdata);
-			m_ata->write_cs0(offset-8, m_lastdata);
+			m_ata->cs0_w(offset-8, m_lastdata);
 			break;
 
 		case 9:
@@ -203,7 +202,7 @@ void a2bus_cffa2000_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			m_ata->write_cs0(offset-8, data, 0xff);
+			m_ata->cs0_w(offset-8, data, 0xff);
 			break;
 	}
 }

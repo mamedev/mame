@@ -504,7 +504,7 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE8_MEMBER(dassault_state::sound_bankswitch_w)
+void dassault_state::sound_bankswitch_w(uint8_t data)
 {
 	/* the second OKIM6295 ROM is bank switched */
 	m_oki2->set_rom_bank(data & 1);
@@ -538,8 +538,8 @@ void dassault_state::dassault(machine_config &config)
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
-//  config.m_minimum_quantum = attotime::from_hz(8400); /* 140 CPU slices per frame */
-	config.m_perfect_cpu_quantum = subtag("maincpu"); // I was seeing random lockups.. let's see if this helps
+//  config.set_maximum_quantum(attotime::from_hz(8400)); /* 140 CPU slices per frame */
+	config.set_perfect_quantum(m_maincpu); // I was seeing random lockups.. let's see if this helps
 
 	mb8421_mb8431_16_device &sharedram(MB8421_MB8431_16BIT(config, "sharedram"));
 	sharedram.intl_callback().set_inputline("maincpu", M68K_IRQ_5);
@@ -559,14 +559,12 @@ void dassault_state::dassault(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0);
 	m_deco_tilegen[0]->set_pf2_col_bank(16);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(dassault_state::bank_callback), this);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(dassault_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(dassault_state::bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(dassault_state::bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
@@ -574,14 +572,12 @@ void dassault_state::dassault(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0);
 	m_deco_tilegen[1]->set_pf2_col_bank(16);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(dassault_state::bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(dassault_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(dassault_state::bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(dassault_state::bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");

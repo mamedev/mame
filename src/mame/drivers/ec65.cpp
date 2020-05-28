@@ -178,7 +178,7 @@ void ec65_state::ec65(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8); /*?*/
-	crtc.set_update_row_callback(FUNC(ec65_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(ec65_state::crtc_update_row));
 
 	/* devices */
 	PIA6821(config, PIA6821_TAG, 0);

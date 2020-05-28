@@ -39,7 +39,7 @@
 
 #include "screen.h"
 
-#include <limits.h>
+#include <climits>
 #include <atomic>
 
 

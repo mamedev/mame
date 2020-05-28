@@ -18,6 +18,9 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
+#define horizontalAdvance width
+#endif
 
 MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	WindowQt(machine, nullptr)
@@ -166,7 +169,7 @@ MemoryWindow::~MemoryWindow()
 
 void MemoryWindow::memoryRegionChanged(int index)
 {
-	m_memTable->view()->set_source(*m_memTable->view()->source_list().find(index));
+	m_memTable->view()->set_source(*m_memTable->view()->source(index));
 	m_memTable->viewport()->update();
 
 	// Update the data format radio buttons to the memory region's default
@@ -283,19 +286,25 @@ void MemoryWindow::populateComboBox()
 		return;
 
 	m_memoryComboBox->clear();
-	for (const debug_view_source &source : m_memTable->view()->source_list())
+	for (auto &source : m_memTable->view()->source_list())
 	{
-		m_memoryComboBox->addItem(source.name());
+		m_memoryComboBox->addItem(source->name());
 	}
 }
 
 
 void MemoryWindow::setToCurrentCpu()
 {
-	device_t* curCpu = m_machine->debugger().cpu().get_visible_cpu();
-	const debug_view_source *source = m_memTable->view()->source_for_device(curCpu);
-	const int listIndex = m_memTable->view()->source_list().indexof(*source);
-	m_memoryComboBox->setCurrentIndex(listIndex);
+	device_t* curCpu = m_machine->debugger().console().get_visible_cpu();
+	if (curCpu)
+	{
+		const debug_view_source *source = m_memTable->view()->source_for_device(curCpu);
+		if (source)
+		{
+			const int listIndex = m_memTable->view()->source_index(*source);
+			m_memoryComboBox->setCurrentIndex(listIndex);
+		}
+	}
 }
 
 
@@ -328,7 +337,7 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 	if (leftClick || rightClick)
 	{
 		QFontMetrics actualFont = fontMetrics();
-		const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
+		const double fontWidth = actualFont.horizontalAdvance(QString(100, '_')) / 100.;
 		const int fontHeight = std::max(1, actualFont.lineSpacing());
 
 		debug_view_xy topLeft = view()->visible_position();
@@ -346,27 +355,51 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 			const offs_t address = memView->addressAtCursorPosition(clickViewPosition);
 			const debug_view_memory_source* source = downcast<const debug_view_memory_source*>(memView->source());
 			address_space* addressSpace = source->space();
-			const int nativeDataWidth = addressSpace->data_width() / 8;
-			const uint64_t memValue = source->device()->machine().debugger().cpu().read_memory(*addressSpace,
-														addressSpace->address_to_byte(address),
-														nativeDataWidth,
-														true);
-			const offs_t pc = source->device()->debug()->track_mem_pc_from_space_address_data(addressSpace->spacenum(),
-																								address,
-																								memValue);
-			if (pc != (offs_t)(-1))
+			offs_t a = address & addressSpace->logaddrmask();
+			if (!addressSpace->device().memory().translate(addressSpace->spacenum(), TRANSLATE_READ_DEBUG, a))
 			{
-				// TODO: You can specify a box that the tooltip stays alive within - might be good?
-				const QString addressAndPc = QString("Address %1 written at PC=%2").arg(address, 2, 16).arg(pc, 2, 16);
-				QToolTip::showText(QCursor::pos(), addressAndPc, nullptr);
-
-				// Copy the PC into the clipboard as well
-				QClipboard *clipboard = QApplication::clipboard();
-				clipboard->setText(QString("%1").arg(pc, 2, 16));
+				QToolTip::showText(QCursor::pos(), "Bad address", nullptr);
 			}
 			else
 			{
-				QToolTip::showText(QCursor::pos(), "UNKNOWN PC", nullptr);
+				uint64_t memValue = addressSpace->unmap();
+				auto dis = addressSpace->device().machine().disable_side_effects();
+				switch (addressSpace->data_width())
+				{
+				case 8:
+					memValue = addressSpace->read_byte(a);
+					break;
+
+				case 16:
+					memValue = addressSpace->read_word_unaligned(a);
+					break;
+
+				case 32:
+					memValue = addressSpace->read_dword_unaligned(a);
+					break;
+
+				case 64:
+					memValue = addressSpace->read_qword_unaligned(a);
+					break;
+				}
+
+				const offs_t pc = source->device()->debug()->track_mem_pc_from_space_address_data(addressSpace->spacenum(),
+																								address,
+																								memValue);
+				if (pc != (offs_t)(-1))
+				{
+					// TODO: You can specify a box that the tooltip stays alive within - might be good?
+					const QString addressAndPc = QString("Address %1 written at PC=%2").arg(address, 2, 16).arg(pc, 2, 16);
+					QToolTip::showText(QCursor::pos(), addressAndPc, nullptr);
+
+					// Copy the PC into the clipboard as well
+					QClipboard *clipboard = QApplication::clipboard();
+					clipboard->setText(QString("%1").arg(pc, 2, 16));
+				}
+				else
+				{
+					QToolTip::showText(QCursor::pos(), "UNKNOWN PC", nullptr);
+				}
 			}
 		}
 

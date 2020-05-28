@@ -102,19 +102,19 @@ public:
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_timer_callback);
-	DECLARE_WRITE8_MEMBER(keyboard_line_write);
-	DECLARE_READ8_MEMBER(keyboard_data_read);
-	DECLARE_READ8_MEMBER(reset_r);
-	DECLARE_WRITE8_MEMBER(reset_w);
-	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_WRITE8_MEMBER(rom_w);
+	void keyboard_line_write(uint8_t data);
+	uint8_t keyboard_data_read();
+	uint8_t reset_r();
+	void reset_w(uint8_t data);
+	uint8_t rom_r();
+	void rom_w(uint8_t data);
 	template <int src> DECLARE_WRITE_LINE_MEMBER(int_w);
-	DECLARE_READ8_MEMBER(kybint_msk_r);
-	DECLARE_WRITE8_MEMBER(kybint_msk_w);
-	DECLARE_WRITE8_MEMBER(adcint_msk_w);
-	DECLARE_WRITE8_MEMBER(fireint_msk_w);
-	DECLARE_WRITE8_MEMBER(evdpint_msk_w);
-	DECLARE_WRITE8_MEMBER(drsel_w);
+	uint8_t kybint_msk_r();
+	void kybint_msk_w(uint8_t data);
+	void adcint_msk_w(uint8_t data);
+	void fireint_msk_w(uint8_t data);
+	void evdpint_msk_w(uint8_t data);
+	void drsel_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
@@ -122,16 +122,16 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ardy_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(strobe_callback);
 
-	DECLARE_READ8_MEMBER(system_r);
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(porta_int_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_READ8_MEMBER(pseudo_adc_r);
-	DECLARE_WRITE8_MEMBER(pseudo_adc_w);
-	DECLARE_READ8_MEMBER(alpha_lock_r);
-	DECLARE_WRITE8_MEMBER(alpha_lock_w);
+	uint8_t system_r();
+	uint8_t porta_r();
+	void porta_w(uint8_t data);
+	void porta_int_w(uint8_t data);
+	uint8_t portb_r();
+	void portb_w(uint8_t data);
+	uint8_t pseudo_adc_r();
+	void pseudo_adc_w(uint8_t data);
+	uint8_t alpha_lock_r();
+	void alpha_lock_w(uint8_t data);
 
 	void einstein_io(address_map &map);
 	void einstein_mem(address_map &map);
@@ -225,7 +225,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( einstein_state::keyboard_timer_callback )
 		m_keyboard_daisy->int_w(ASSERT_LINE);
 }
 
-WRITE8_MEMBER( einstein_state::keyboard_line_write )
+void einstein_state::keyboard_line_write(uint8_t data)
 {
 	if (VERBOSE_KEYBOARD)
 		logerror("einstein_keyboard_line_write: %02x\n", data);
@@ -236,7 +236,7 @@ WRITE8_MEMBER( einstein_state::keyboard_line_write )
 	einstein_scan_keyboard();
 }
 
-READ8_MEMBER( einstein_state::keyboard_data_read )
+uint8_t einstein_state::keyboard_data_read()
 {
 	/* re-scan the keyboard */
 	einstein_scan_keyboard();
@@ -252,7 +252,7 @@ READ8_MEMBER( einstein_state::keyboard_data_read )
     FLOPPY DRIVES
 ***************************************************************************/
 
-WRITE8_MEMBER(einstein_state::drsel_w)
+void einstein_state::drsel_w(uint8_t data)
 {
 	if (VERBOSE_DISK)
 		logerror("%s: drsel_w %02x\n", machine().describe_context(), data);
@@ -360,7 +360,7 @@ template <int src> WRITE_LINE_MEMBER( einstein_state::int_w )
 	}
 }
 
-READ8_MEMBER( einstein_state::kybint_msk_r )
+uint8_t einstein_state::kybint_msk_r()
 {
 	uint8_t data = 0;
 
@@ -387,25 +387,25 @@ READ8_MEMBER( einstein_state::kybint_msk_r )
 	return data;
 }
 
-WRITE8_MEMBER( einstein_state::kybint_msk_w )
+void einstein_state::kybint_msk_w(uint8_t data)
 {
 	logerror("KEY interrupt %s\n", BIT(data, 0) ? "disabled" : "enabled");
 	m_keyboard_daisy->mask_w(BIT(data, 0));
 }
 
-WRITE8_MEMBER( einstein_state::adcint_msk_w )
+void einstein_state::adcint_msk_w(uint8_t data)
 {
 	logerror("ADC interrupt %s\n", BIT(data, 0) ? "disabled" : "enabled");
 	m_adc_daisy->mask_w(BIT(data, 0));
 }
 
-WRITE8_MEMBER( einstein_state::fireint_msk_w )
+void einstein_state::fireint_msk_w(uint8_t data)
 {
 	logerror("FIRE interrupt %s\n", BIT(data, 0) ? "disabled" : "enabled");
 	m_fire_daisy->mask_w(BIT(data, 0));
 }
 
-WRITE8_MEMBER(einstein_state::evdpint_msk_w)
+void einstein_state::evdpint_msk_w(uint8_t data)
 {
 	logerror("EVDP interrupt %s\n", BIT(data, 0) ? "disabled" : "enabled");
 	logerror("Printer STROBE %s\n", BIT(data, 1) ? "disabled" : "enabled");
@@ -417,21 +417,24 @@ WRITE8_MEMBER(einstein_state::evdpint_msk_w)
     MACHINE EMULATION
 ***************************************************************************/
 
-READ8_MEMBER( einstein_state::rom_r )
+uint8_t einstein_state::rom_r()
 {
-	m_rom_enabled ^= 1;
-	m_bank1->set_entry(m_rom_enabled);
+	if (!machine().side_effects_disabled())
+	{
+		m_rom_enabled ^= 1;
+		m_bank1->set_entry(m_rom_enabled);
+	}
 
 	return 0xff;
 }
 
-WRITE8_MEMBER( einstein_state::rom_w )
+void einstein_state::rom_w(uint8_t data)
 {
 	m_rom_enabled ^= 1;
 	m_bank1->set_entry(m_rom_enabled);
 }
 
-READ8_MEMBER( einstein_state::reset_r )
+uint8_t einstein_state::reset_r()
 {
 	m_psg->reset();
 	m_fdc->reset();
@@ -439,7 +442,7 @@ READ8_MEMBER( einstein_state::reset_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( einstein_state::reset_w )
+void einstein_state::reset_w(uint8_t data)
 {
 	m_psg->reset();
 	m_fdc->reset();
@@ -476,7 +479,7 @@ void einstein_state::machine_reset()
     256 MACHINE EMULATION
 ***************************************************************************/
 
-READ8_MEMBER(einstein_state::system_r)
+uint8_t einstein_state::system_r()
 {
 	uint8_t data = 0;
 
@@ -497,7 +500,7 @@ READ8_MEMBER(einstein_state::system_r)
 	return data;
 }
 
-READ8_MEMBER(einstein_state::porta_r)
+uint8_t einstein_state::porta_r()
 {
 	uint8_t data = 0;
 
@@ -508,7 +511,7 @@ READ8_MEMBER(einstein_state::porta_r)
 	return data;
 }
 
-WRITE8_MEMBER(einstein_state::porta_w)
+void einstein_state::porta_w(uint8_t data)
 {
 	m_centronics->write_data0(BIT(data, 0));
 	m_centronics->write_data1(BIT(data, 1));
@@ -517,14 +520,14 @@ WRITE8_MEMBER(einstein_state::porta_w)
 	m_centronics->write_strobe(BIT(data, 4));
 }
 
-WRITE8_MEMBER(einstein_state::porta_int_w)
+void einstein_state::porta_int_w(uint8_t data)
 {
 	// TODO: Implement Port A interrupts (not used for printing!)
 	logerror("Port A interrupt %s\n", BIT(data, 7) ? "enabled" : "disabled");
 	m_porta_int = data;
 }
 
-READ8_MEMBER(einstein_state::portb_r)
+uint8_t einstein_state::portb_r()
 {
 	uint8_t data = 0;
 
@@ -535,7 +538,7 @@ READ8_MEMBER(einstein_state::portb_r)
 	return data;
 }
 
-WRITE8_MEMBER(einstein_state::portb_w)
+void einstein_state::portb_w(uint8_t data)
 {
 	m_centronics->write_data4(BIT(data, 0));
 	m_centronics->write_data5(BIT(data, 1));
@@ -543,7 +546,7 @@ WRITE8_MEMBER(einstein_state::portb_w)
 	m_centronics->write_data7(BIT(data, 3));
 }
 
-READ8_MEMBER(einstein_state::pseudo_adc_r)
+uint8_t einstein_state::pseudo_adc_r()
 {
 	uint8_t data = 0x7f; // centre
 
@@ -571,20 +574,20 @@ READ8_MEMBER(einstein_state::pseudo_adc_r)
 	return data;
 }
 
-WRITE8_MEMBER(einstein_state::pseudo_adc_w)
+void einstein_state::pseudo_adc_w(uint8_t data)
 {
 	m_pseudo_adc = data;
 	m_adc_daisy->int_w(ASSERT_LINE);
 }
 
-READ8_MEMBER(einstein_state::alpha_lock_r)
+uint8_t einstein_state::alpha_lock_r()
 {
 	m_alpha_lock_led ^= 1;
 	output().set_value("alpha_lock_led", m_alpha_lock_led);
 	return 0xff;
 }
 
-WRITE8_MEMBER(einstein_state::alpha_lock_w)
+void einstein_state::alpha_lock_w(uint8_t data)
 {
 	m_alpha_lock_led ^= 1;
 	output().set_value("alpha_lock_led", m_alpha_lock_led);
@@ -831,7 +834,7 @@ void einstein_state::einstein(machine_config &config)
 
 	z80pio_device& pio(Z80PIO(config, IC_I063, XTAL_X002 / 2));
 	pio.out_int_callback().set(FUNC(einstein_state::int_w<0>));
-	pio.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	pio.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	pio.out_ardy_callback().set(FUNC(einstein_state::ardy_w));
 	pio.in_pb_callback().set("user", FUNC(einstein_userport_device::read));
 	pio.out_pb_callback().set("user", FUNC(einstein_userport_device::write));

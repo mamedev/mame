@@ -6,11 +6,18 @@
 
     RTC + BACKUP RAM
 
+    FIXME: This device implements a parallel interface provided by the
+    Seibu SEI600 for the convenience of SPI emulation. It does not
+    implement the 1-Wire protocol actually used with that ASIC, nor
+    does it implement the alternate 3-Wire serial interface.
+
 **********************************************************************/
 
 #include "emu.h"
 #include "ds2404.h"
-#include <time.h>
+
+#include <algorithm>
+#include <ctime> // FIXME: re-write in terms of device_rtc_interface and remove this
 
 
 //**************************************************************************
@@ -34,7 +41,7 @@ ds2404_device::ds2404_device(const machine_config &mconfig, const char *tag, dev
 		m_a2(0),
 		m_state_ptr(0)
 {
-	memset(m_ram, 0, sizeof(m_ram));
+	std::fill(std::begin(m_ram), std::end(m_ram), 0);
 }
 
 
@@ -64,19 +71,19 @@ void ds2404_device::device_start()
 	m_rtc[4] = (current_time >> 24) & 0xff;
 
 	for (auto & elem : m_state)
-		elem = DS2404_STATE_IDLE;
+		elem = STATE_IDLE;
 
 	m_tick_timer = timer_alloc(0);
 	m_tick_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
 }
 
 
-void ds2404_device::ds2404_rom_cmd(uint8_t cmd)
+void ds2404_device::rom_cmd(uint8_t cmd)
 {
 	switch(cmd)
 	{
 		case 0xcc:      /* Skip ROM */
-			m_state[0] = DS2404_STATE_COMMAND;
+			m_state[0] = STATE_COMMAND;
 			m_state_ptr = 0;
 			break;
 
@@ -85,32 +92,32 @@ void ds2404_device::ds2404_rom_cmd(uint8_t cmd)
 	}
 }
 
-void ds2404_device::ds2404_cmd(uint8_t cmd)
+void ds2404_device::cmd(uint8_t cmd)
 {
 	switch(cmd)
 	{
 		case 0x0f:      /* Write scratchpad */
-			m_state[0] = DS2404_STATE_ADDRESS1;
-			m_state[1] = DS2404_STATE_ADDRESS2;
-			m_state[2] = DS2404_STATE_INIT_COMMAND;
-			m_state[3] = DS2404_STATE_WRITE_SCRATCHPAD;
+			m_state[0] = STATE_ADDRESS1;
+			m_state[1] = STATE_ADDRESS2;
+			m_state[2] = STATE_INIT_COMMAND;
+			m_state[3] = STATE_WRITE_SCRATCHPAD;
 			m_state_ptr = 0;
 			break;
 
 		case 0x55:      /* Copy scratchpad */
-			m_state[0] = DS2404_STATE_ADDRESS1;
-			m_state[1] = DS2404_STATE_ADDRESS2;
-			m_state[2] = DS2404_STATE_OFFSET;
-			m_state[3] = DS2404_STATE_INIT_COMMAND;
-			m_state[4] = DS2404_STATE_COPY_SCRATCHPAD;
+			m_state[0] = STATE_ADDRESS1;
+			m_state[1] = STATE_ADDRESS2;
+			m_state[2] = STATE_OFFSET;
+			m_state[3] = STATE_INIT_COMMAND;
+			m_state[4] = STATE_COPY_SCRATCHPAD;
 			m_state_ptr = 0;
 			break;
 
 		case 0xf0:      /* Read memory */
-			m_state[0] = DS2404_STATE_ADDRESS1;
-			m_state[1] = DS2404_STATE_ADDRESS2;
-			m_state[2] = DS2404_STATE_INIT_COMMAND;
-			m_state[3] = DS2404_STATE_READ_MEMORY;
+			m_state[0] = STATE_ADDRESS1;
+			m_state[1] = STATE_ADDRESS2;
+			m_state[2] = STATE_INIT_COMMAND;
+			m_state[3] = STATE_READ_MEMORY;
 			m_state_ptr = 0;
 			break;
 
@@ -119,7 +126,7 @@ void ds2404_device::ds2404_cmd(uint8_t cmd)
 	}
 }
 
-uint8_t ds2404_device::ds2404_readmem()
+uint8_t ds2404_device::readmem()
 {
 	if( m_address < 0x200 )
 	{
@@ -132,7 +139,7 @@ uint8_t ds2404_device::ds2404_readmem()
 	return 0;
 }
 
-void ds2404_device::ds2404_writemem(uint8_t value)
+void ds2404_device::writemem(uint8_t value)
 {
 	if( m_address < 0x200 )
 	{
@@ -144,36 +151,36 @@ void ds2404_device::ds2404_writemem(uint8_t value)
 	}
 }
 
-WRITE8_MEMBER( ds2404_device::ds2404_1w_reset_w )
+void ds2404_device::_1w_reset_w(uint8_t data)
 {
-	m_state[0] = DS2404_STATE_IDLE;
+	m_state[0] = STATE_IDLE;
 	m_state_ptr = 0;
 }
 
-WRITE8_MEMBER( ds2404_device::ds2404_3w_reset_w )
+void ds2404_device::_3w_reset_w(uint8_t data)
 {
-	m_state[0] = DS2404_STATE_COMMAND;
+	m_state[0] = STATE_COMMAND;
 	m_state_ptr = 0;
 }
 
-READ8_MEMBER( ds2404_device::ds2404_data_r )
+uint8_t ds2404_device::data_r()
 {
 	uint8_t value = 0;
 	switch(m_state[m_state_ptr])
 	{
-		case DS2404_STATE_IDLE:
-		case DS2404_STATE_COMMAND:
-		case DS2404_STATE_ADDRESS1:
-		case DS2404_STATE_ADDRESS2:
-		case DS2404_STATE_OFFSET:
-		case DS2404_STATE_INIT_COMMAND:
+		case STATE_IDLE:
+		case STATE_COMMAND:
+		case STATE_ADDRESS1:
+		case STATE_ADDRESS2:
+		case STATE_OFFSET:
+		case STATE_INIT_COMMAND:
 			break;
 
-		case DS2404_STATE_READ_MEMORY:
-			value = ds2404_readmem();
+		case STATE_READ_MEMORY:
+			value = readmem();
 			break;
 
-		case DS2404_STATE_READ_SCRATCHPAD:
+		case STATE_READ_SCRATCHPAD:
 			if(m_offset < 0x20)
 			{
 				value = m_ram[m_offset];
@@ -181,52 +188,52 @@ READ8_MEMBER( ds2404_device::ds2404_data_r )
 			}
 			break;
 
-		case DS2404_STATE_WRITE_SCRATCHPAD:
+		case STATE_WRITE_SCRATCHPAD:
 			break;
 
-		case DS2404_STATE_COPY_SCRATCHPAD:
+		case STATE_COPY_SCRATCHPAD:
 			break;
 	}
 	return value;
 }
 
-WRITE8_MEMBER( ds2404_device::ds2404_data_w )
+void ds2404_device::data_w(uint8_t data)
 {
 	switch( m_state[m_state_ptr] )
 	{
-		case DS2404_STATE_IDLE:
-			ds2404_rom_cmd(data & 0xff);
+		case STATE_IDLE:
+			rom_cmd(data & 0xff);
 			break;
 
-		case DS2404_STATE_COMMAND:
-			ds2404_cmd(data & 0xff);
+		case STATE_COMMAND:
+			cmd(data & 0xff);
 			break;
 
-		case DS2404_STATE_ADDRESS1:
+		case STATE_ADDRESS1:
 			m_a1 = data & 0xff;
 			m_state_ptr++;
 			break;
 
-		case DS2404_STATE_ADDRESS2:
+		case STATE_ADDRESS2:
 			m_a2 = data & 0xff;
 			m_state_ptr++;
 			break;
 
-		case DS2404_STATE_OFFSET:
+		case STATE_OFFSET:
 			m_end_offset = data & 0xff;
 			m_state_ptr++;
 			break;
 
-		case DS2404_STATE_INIT_COMMAND:
+		case STATE_INIT_COMMAND:
 			break;
 
-		case DS2404_STATE_READ_MEMORY:
+		case STATE_READ_MEMORY:
 			break;
 
-		case DS2404_STATE_READ_SCRATCHPAD:
+		case STATE_READ_SCRATCHPAD:
 			break;
 
-		case DS2404_STATE_WRITE_SCRATCHPAD:
+		case STATE_WRITE_SCRATCHPAD:
 			if( m_offset < 0x20 )
 			{
 				m_ram[m_offset] = data & 0xff;
@@ -238,43 +245,43 @@ WRITE8_MEMBER( ds2404_device::ds2404_data_w )
 			}
 			break;
 
-		case DS2404_STATE_COPY_SCRATCHPAD:
+		case STATE_COPY_SCRATCHPAD:
 			break;
 	}
 
-	if( m_state[m_state_ptr] == DS2404_STATE_INIT_COMMAND )
+	if( m_state[m_state_ptr] == STATE_INIT_COMMAND )
 	{
 		switch( m_state[m_state_ptr + 1] )
 		{
-			case DS2404_STATE_IDLE:
-			case DS2404_STATE_COMMAND:
-			case DS2404_STATE_ADDRESS1:
-			case DS2404_STATE_ADDRESS2:
-			case DS2404_STATE_OFFSET:
-			case DS2404_STATE_INIT_COMMAND:
+			case STATE_IDLE:
+			case STATE_COMMAND:
+			case STATE_ADDRESS1:
+			case STATE_ADDRESS2:
+			case STATE_OFFSET:
+			case STATE_INIT_COMMAND:
 				break;
 
-			case DS2404_STATE_READ_MEMORY:
+			case STATE_READ_MEMORY:
 				m_address = (m_a2 << 8) | m_a1;
 				m_address -= 1;
 				break;
 
-			case DS2404_STATE_WRITE_SCRATCHPAD:
+			case STATE_WRITE_SCRATCHPAD:
 				m_address = (m_a2 << 8) | m_a1;
 				m_offset = m_address & 0x1f;
 				break;
 
-			case DS2404_STATE_READ_SCRATCHPAD:
+			case STATE_READ_SCRATCHPAD:
 				m_address = (m_a2 << 8) | m_a1;
 				m_offset = m_address & 0x1f;
 				break;
 
-			case DS2404_STATE_COPY_SCRATCHPAD:
+			case STATE_COPY_SCRATCHPAD:
 				m_address = (m_a2 << 8) | m_a1;
 
 				for(int i = 0; i <= m_end_offset; i++)
 				{
-					ds2404_writemem(m_ram[i]);
+					writemem(m_ram[i]);
 					m_address++;
 				}
 				break;
@@ -283,29 +290,29 @@ WRITE8_MEMBER( ds2404_device::ds2404_data_w )
 	}
 }
 
-WRITE8_MEMBER( ds2404_device::ds2404_clk_w )
+void ds2404_device::clk_w(uint8_t data)
 {
 	switch( m_state[m_state_ptr] )
 	{
-		case DS2404_STATE_IDLE:
-		case DS2404_STATE_COMMAND:
-		case DS2404_STATE_ADDRESS1:
-		case DS2404_STATE_ADDRESS2:
-		case DS2404_STATE_OFFSET:
-		case DS2404_STATE_INIT_COMMAND:
+		case STATE_IDLE:
+		case STATE_COMMAND:
+		case STATE_ADDRESS1:
+		case STATE_ADDRESS2:
+		case STATE_OFFSET:
+		case STATE_INIT_COMMAND:
 			break;
 
-		case DS2404_STATE_READ_MEMORY:
+		case STATE_READ_MEMORY:
 			m_address++;
 			break;
 
-		case DS2404_STATE_READ_SCRATCHPAD:
+		case STATE_READ_SCRATCHPAD:
 			break;
 
-		case DS2404_STATE_WRITE_SCRATCHPAD:
+		case STATE_WRITE_SCRATCHPAD:
 			break;
 
-		case DS2404_STATE_COPY_SCRATCHPAD:
+		case STATE_COPY_SCRATCHPAD:
 			break;
 	}
 }
@@ -315,23 +322,17 @@ void ds2404_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	switch(id)
 	{
 		case 0:
-		{
 			// tick
-			for(auto & elem : m_rtc)
+			for(auto &elem : m_rtc)
 			{
 				elem++;
 				if(elem != 0)
-				{
 					break;
-				}
 			}
-
 			break;
-		}
 
 		default:
-			assert_always(false, "Unknown id in ds2404_device::device_timer");
-			break;
+			throw emu_fatalerror("Unknown id in ds2404_device::device_timer");
 	}
 }
 

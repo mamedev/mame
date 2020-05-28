@@ -43,11 +43,11 @@ public:
 	void jeutel(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(ppi0a_w);
-	DECLARE_WRITE8_MEMBER(ppi0b_w);
-	DECLARE_WRITE8_MEMBER(sndcmd_w);
+	uint8_t portb_r();
+	void porta_w(uint8_t data);
+	void ppi0a_w(uint8_t data);
+	void ppi0b_w(uint8_t data);
+	void sndcmd_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 	void jeutel_cpu2(address_map &map);
 	void jeutel_cpu3(address_map &map);
@@ -105,33 +105,33 @@ void jeutel_state::jeutel_cpu3_io(address_map &map)
 static INPUT_PORTS_START( jeutel )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( jeutel_state::sndcmd_w )
+void jeutel_state::sndcmd_w(uint8_t data)
 {
 	m_sndcmd = data;
 }
 
-READ8_MEMBER( jeutel_state::portb_r )
+uint8_t jeutel_state::portb_r()
 {
 	return m_sndcmd;
 }
 
-WRITE8_MEMBER( jeutel_state::porta_w )
+void jeutel_state::porta_w(uint8_t data)
 {
 	if ((data & 0xf0) == 0xf0)
 	{
-		m_tms->ctl_w(space, offset, tms5110_device::CMD_RESET);
+		m_tms->ctl_w(tms5110_device::CMD_RESET);
 		m_tms->pdc_w(1);
 		m_tms->pdc_w(0);
 	}
 	else if ((data & 0xf0) == 0xd0)
 	{
-		m_tms->ctl_w(space, offset, tms5110_device::CMD_SPEAK);
+		m_tms->ctl_w(tms5110_device::CMD_SPEAK);
 		m_tms->pdc_w(1);
 		m_tms->pdc_w(0);
 	}
 }
 
-WRITE8_MEMBER( jeutel_state::ppi0a_w )
+void jeutel_state::ppi0a_w(uint8_t data)
 {
 	uint16_t segment;
 	bool blank = !BIT(data, 7);
@@ -171,7 +171,7 @@ WRITE8_MEMBER( jeutel_state::ppi0a_w )
 	}
 }
 
-WRITE8_MEMBER( jeutel_state::ppi0b_w )
+void jeutel_state::ppi0b_w(uint8_t data)
 {
 	m_digit = data & 0x0f;
 	if (m_digit > 7)

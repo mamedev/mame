@@ -72,10 +72,10 @@ private:
 	DECLARE_READ_LINE_MEMBER( eacc_cb1_r );
 	DECLARE_READ_LINE_MEMBER( eacc_distance_r );
 	DECLARE_READ_LINE_MEMBER( eacc_fuel_sensor_r );
-	DECLARE_READ8_MEMBER( eacc_keyboard_r );
+	uint8_t eacc_keyboard_r();
 	DECLARE_WRITE_LINE_MEMBER( eacc_cb2_w );
-	DECLARE_WRITE8_MEMBER( eacc_digit_w );
-	DECLARE_WRITE8_MEMBER( eacc_segment_w );
+	void eacc_digit_w(uint8_t data);
+	void eacc_segment_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
 	void eacc_mem(address_map &map);
@@ -85,7 +85,7 @@ private:
 	bool m_nmi;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<m6802_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_shared_ptr<uint8_t> m_p_nvram;
 	output_finder<7> m_digits;
@@ -104,7 +104,7 @@ void eacc_state::eacc_mem(address_map &map)
 	map.global_mask(0xc7ff); // A11,A12,A13 not connected
 	map(0x0000, 0x001f).ram().share("nvram"); // inside cpu, battery-backed
 	map(0x0020, 0x007f).ram(); // inside cpu
-	map(0x4000, 0x47ff).rom().mirror(0x8000);
+	map(0x4000, 0x47ff).rom().mirror(0x8000).region("maincpu",0);
 	map(0x8000, 0x8003).mirror(0x7fc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 }
 
@@ -180,7 +180,7 @@ WRITE_LINE_MEMBER( eacc_state::eacc_cb2_w )
 	m_cb2 = state;
 }
 
-READ8_MEMBER( eacc_state::eacc_keyboard_r )
+uint8_t eacc_state::eacc_keyboard_r()
 {
 	uint8_t data = m_digit;
 
@@ -196,7 +196,7 @@ READ8_MEMBER( eacc_state::eacc_keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( eacc_state::eacc_segment_w )
+void eacc_state::eacc_segment_w(uint8_t data)
 {
 	//d7 segment dot
 	//d6 segment c
@@ -230,7 +230,7 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 	}
 }
 
-WRITE8_MEMBER( eacc_state::eacc_digit_w )
+void eacc_state::eacc_digit_w(uint8_t data)
 {
 	if (m_nmi)
 	{
@@ -249,6 +249,7 @@ void eacc_state::eacc(machine_config &config)
 {
 	/* basic machine hardware */
 	M6802(config, m_maincpu, XTAL(3'579'545));  /* Divided by 4 inside the m6802*/
+	m_maincpu->set_ram_enable(false); // FIXME: needs standby support
 	m_maincpu->set_addrmap(AS_PROGRAM, &eacc_state::eacc_mem);
 
 	config.set_default_layout(layout_eacc);
@@ -276,8 +277,8 @@ void eacc_state::eacc(machine_config &config)
 ******************************************************************************/
 
 ROM_START(eacc)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("eacc.bin", 0x4000, 0x0800, CRC(287a63c0) SHA1(f61b397d33ea40e5742e34d5f5468572125e8b39) )
+	ROM_REGION(0x0800, "maincpu", 0)
+	ROM_LOAD("eacc.bin", 0x0000, 0x0800, CRC(287a63c0) SHA1(f61b397d33ea40e5742e34d5f5468572125e8b39) )
 ROM_END
 
 

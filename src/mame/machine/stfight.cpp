@@ -125,7 +125,7 @@ void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80
 		break;
 	default:
-		assert_always(false, "Unknown id in stfight_state::device_timer");
+		throw emu_fatalerror("Unknown id in stfight_state::device_timer");
 	}
 }
 
@@ -183,7 +183,7 @@ WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 			adpcm_data >>= 4;
 		++m_adpcm_data_offs;
 
-		m_msm->write_data(adpcm_data & 0x0f);
+		m_msm->data_w(adpcm_data & 0x0f);
 	}
 }
 
@@ -220,12 +220,12 @@ WRITE8_MEMBER(stfight_state::stfight_mcu_w)
 	m_cpu_to_mcu_empty = false;
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_port_a_w)
+void stfight_state::stfight_68705_port_a_w(uint8_t data)
 {
 	m_port_a_out = data;
 }
 
-READ8_MEMBER(stfight_state::stfight_68705_port_b_r)
+uint8_t stfight_state::stfight_68705_port_b_r()
 {
 	return
 			(m_coin_mech->read() << 6) |
@@ -233,14 +233,14 @@ READ8_MEMBER(stfight_state::stfight_68705_port_b_r)
 			(m_cpu_to_mcu_data & 0x0f);
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_port_b_w)
+void stfight_state::stfight_68705_port_b_w(uint8_t data)
 {
 	// Acknowledge Z80 command
 	if (!BIT(data, 5))
 		m_cpu_to_mcu_empty = true;
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_port_c_w)
+void stfight_state::stfight_68705_port_c_w(uint8_t data)
 {
 	// Signal a valid coin on the falling edge
 	if (BIT(m_port_c_out, 0) && !BIT(data, 0))

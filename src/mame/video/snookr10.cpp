@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::get_bg_tile_info)
 	int code = attr & 0xfff;
 	int color = m_colorram[offs] >> 4;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::apple10_get_bg_tile_info)
 	int code = bitswap<16>((attr & 0xfff),15,14,13,12,8,9,10,11,0,1,2,3,4,5,6,7); /* encrypted tile matrix */
 	int color = m_colorram[offs] >> 4;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -231,23 +231,23 @@ TILE_GET_INFO_MEMBER(snookr10_state::crystalc_get_bg_tile_info)
 	int code = bitswap<16>((attr & 0xfff),15,14,13,12,0,10,5,1,7,6,9,4,3,2,8,11); /* encrypted tile matrix */
 	int color = m_colorram[offs] >> 4;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
 void snookr10_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snookr10_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snookr10_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
 VIDEO_START_MEMBER(snookr10_state, apple10)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snookr10_state::apple10_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snookr10_state::apple10_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
 VIDEO_START_MEMBER(snookr10_state, crystalc)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snookr10_state::crystalc_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snookr10_state::crystalc_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
 uint32_t snookr10_state::screen_update_snookr10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

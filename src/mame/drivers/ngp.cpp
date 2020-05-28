@@ -868,8 +868,8 @@ void ngp_state::ngp(machine_config &config)
 	subdevice<screen_device>("screen")->set_palette("k1ge:palette");
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));
-	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart), this);
-	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart), this);
+	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart));
+	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("ngp");
@@ -887,8 +887,8 @@ void ngp_state::ngpc(machine_config &config)
 	subdevice<screen_device>("screen")->set_palette("k1ge:palette");
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));
-	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart), this);
-	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart), this);
+	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart));
+	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("ngpc");

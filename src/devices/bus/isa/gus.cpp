@@ -33,14 +33,6 @@
 //#define SAVE_WAVE_RAM 1
 //#define LOG_SOUND 1
 
-static const uint16_t rate_table[33] =
-{
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	44100, 41160, 38587, 36317, 34300, 32494, 30870, 29400,
-	28063, 26843, 25725, 24696, 23746, 22866, 22050, 21289,
-	20580, 19916, 19293
-};
-
 static const uint16_t volume_ramp_table[4] =
 {
 	1, 8, 64, 512
@@ -366,7 +358,7 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 gf1_device::gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	acia6850_device(mconfig, GGF1, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_dma_dram_ctrl(0), m_dma_start_addr(0), m_dram_addr(0), m_timer_ctrl(0), m_timer1_count(0), m_timer2_count(0), m_timer1_value(0), m_timer2_value(0), m_sampling_freq(0), m_sampling_ctrl(0), m_joy_trim_dac(0), m_reset(0), m_active_voices(0), m_irq_source(0),
+	m_dma_dram_ctrl(0), m_dma_start_addr(0), m_dram_addr(0), m_timer_ctrl(0), m_timer1_count(0), m_timer2_count(0), m_timer1_value(0), m_timer2_value(0), m_sampling_freq(0), m_sampling_ctrl(0), m_joy_trim_dac(0), m_reset(0), m_active_voices(14), m_irq_source(0),
 	m_stream(nullptr),
 	m_timer1(nullptr), m_timer2(nullptr), m_dmatimer(nullptr), m_voltimer(nullptr),
 	m_current_voice(0), m_current_reg(0), m_adlib_cmd(0), m_mix_ctrl(0), m_gf1_irq(0), m_midi_irq(0), m_dma_channel1(0), m_dma_channel2(0), m_irq_combine(0), m_dma_combine(0), m_adlib_timer_cmd(0), m_adlib_timer1_enable(0), m_adlib_timer2_enable(0), m_adlib_status(0), m_adlib_data(0), m_voice_irq_ptr(0), m_voice_irq_current(0), m_dma_16bit(0), m_statread(0), m_sb_data_2xc(0), m_sb_data_2xe(0), m_reg_ctrl(0), m_fake_adlib_status(0), m_dma_current(0), m_txirq(0), m_rxirq(0),
@@ -411,7 +403,7 @@ void gf1_device::device_start()
 	m_wave_ram.resize(1024*1024);
 	memset(&m_wave_ram[0], 0, 1024*1024);
 
-	m_stream = stream_alloc(0,2,44100);
+	m_stream = stream_alloc(0,2,clock() / (14 * 16));
 
 	// init timers
 	m_timer1 = timer_alloc(ADLIB_TIMER1);
@@ -458,7 +450,7 @@ void gf1_device::device_reset()
 	m_irq_source = 0xe0;
 	m_reg_ctrl = 0;
 	m_active_voices = 14;
-	m_stream->set_sample_rate(44100);
+	m_stream->set_sample_rate(clock() / (m_active_voices * 16));
 	m_voltimer->adjust(attotime::zero,0,attotime::from_usec(1000/(1.6*m_active_voices)));
 }
 
@@ -473,6 +465,11 @@ void gf1_device::device_stop()
 #ifdef LOG_SOUND
 	fclose(f);
 #endif
+}
+
+void gf1_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / (m_active_voices * 16));
 }
 // ------------------------------------------------
 //   device I/O handlers
@@ -592,7 +589,7 @@ READ8_MEMBER(gf1_device::global_reg_data_r)
 			return m_voice[m_current_voice].vol_ramp_ctrl;
 	case 0x8e:  // Active voices (6 bits, high 2 bits are always 1)
 		if(offset == 1)
-			return m_active_voices | 0xc0;
+			return (m_active_voices - 1) | 0xc0;
 	case 0x8f:  // IRQ source register
 		if(offset == 1)
 		{
@@ -738,15 +735,15 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 	case 0x0e:  // Active voices (6 bits, high 2 bits are always 1)
 		if(offset == 1)
 		{
-			m_active_voices = data & 0x3f;
-			if((data & 0x3f) < 14)
+			m_active_voices = (data & 0x3f) + 1;
+			if(m_active_voices < 14)
 				m_active_voices = 14;
-			if((data & 0x3f) > 32)
+			if(m_active_voices > 32)
 				m_active_voices = 32;
-			m_stream->set_sample_rate(rate_table[m_active_voices]);
+			m_stream->set_sample_rate(clock() / (m_active_voices * 16));
 			m_voltimer->adjust(attotime::zero,0,attotime::from_usec(1000/(1.6*m_active_voices)));
 		}
-		logerror("GUS: Active Voices write %02x (%i Hz)\n", data, rate_table[m_active_voices]);
+		logerror("GUS: Active Voices write %02x (%d voices at %u Hz)\n", data, m_active_voices, clock() / (m_active_voices * 16));
 		break;
 	case 0x41:
 /* bit 0 - Enable the DMA channel.
@@ -826,7 +823,7 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 		{
 			m_timer1_count = data;
 			m_timer1_value = data;
-			logerror("GUS: Timer 1 count write %02x\n",data);
+			logerror("GUS: Timer 1 count write %02x (%d usec)\n",data,data*80);
 		}
 		break;
 	case 0x47:  // Timer 2 count
@@ -834,7 +831,7 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 		{
 			m_timer2_count = data;
 			m_timer2_value = data;
-			logerror("GUS: Timer 2 count write %02x\n",data);
+			logerror("GUS: Timer 2 count write %02x (%d usec)\n",data,data*320);
 		}
 		break;
 	case 0x48:  // Sampling Frequency - 9878400/(16*(FREQ+2))
@@ -1296,10 +1293,10 @@ isa16_gus_device::isa16_gus_device(const machine_config &mconfig, const char *ta
 void isa16_gus_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0200, 0x0201, read8_delegate(FUNC(isa16_gus_device::joy_r),this), write8_delegate(FUNC(isa16_gus_device::joy_w),this) );
-	m_isa->install_device(0x0220, 0x022f, read8_delegate(FUNC(isa16_gus_device::board_r),this), write8_delegate(FUNC(isa16_gus_device::board_w),this) );
-	m_isa->install_device(0x0320, 0x0327, read8_delegate(FUNC(isa16_gus_device::synth_r),this), write8_delegate(FUNC(isa16_gus_device::synth_w),this) );
-	m_isa->install_device(0x0388, 0x0389, read8_delegate(FUNC(isa16_gus_device::adlib_r),this), write8_delegate(FUNC(isa16_gus_device::adlib_w),this) );
+	m_isa->install_device(0x0200, 0x0201, read8_delegate(*this, FUNC(isa16_gus_device::joy_r)), write8_delegate(*this, FUNC(isa16_gus_device::joy_w)));
+	m_isa->install_device(0x0220, 0x022f, read8_delegate(*this, FUNC(isa16_gus_device::board_r)), write8_delegate(*this, FUNC(isa16_gus_device::board_w)));
+	m_isa->install_device(0x0320, 0x0327, read8_delegate(*this, FUNC(isa16_gus_device::synth_r)), write8_delegate(*this, FUNC(isa16_gus_device::synth_w)));
+	m_isa->install_device(0x0388, 0x0389, read8_delegate(*this, FUNC(isa16_gus_device::adlib_r)), write8_delegate(*this, FUNC(isa16_gus_device::adlib_w)));
 }
 
 void isa16_gus_device::device_reset()

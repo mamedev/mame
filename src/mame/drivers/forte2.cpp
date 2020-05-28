@@ -55,14 +55,16 @@ public:
 	void init_pesadelo();
 	void pesadelo(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
 	void io_mem(address_map &map);
 	void program_mem(address_map &map);
 
-	DECLARE_READ8_MEMBER(ay8910_read_input);
-	DECLARE_WRITE8_MEMBER(ay8910_set_input_mask);
+	uint8_t ay8910_read_input();
+	void ay8910_set_input_mask(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 
@@ -84,8 +86,8 @@ void forte2_state::io_mem(address_map &map)
 	map(0x98, 0x99).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r));
-//  AM_RANGE(0xa8, 0xa8) AM_RAM // Ports a8-ab are originally for communicating with the i8255 PPI on MSX.
-//  AM_RANGE(0xa9, 0xab) AM_NOP // Since this arcade board doesn't have one, those ports should be unmapped.
+//  map(0xa8, 0xa8).ram(); // Ports a8-ab are originally for communicating with the i8255 PPI on MSX.
+//  map(0xa9, 0xab).noprw(); // Since this arcade board doesn't have one, those ports should be unmapped.
 }
 
 static INPUT_PORTS_START( pesadelo )
@@ -101,12 +103,12 @@ static INPUT_PORTS_START( pesadelo )
 INPUT_PORTS_END
 
 
-READ8_MEMBER(forte2_state::ay8910_read_input)
+uint8_t forte2_state::ay8910_read_input()
 {
 	return ioport("IN0")->read() | (m_input_mask & 0x3f);
 }
 
-WRITE8_MEMBER(forte2_state::ay8910_set_input_mask)
+void forte2_state::ay8910_set_input_mask(uint8_t data)
 {
 	/* PSG reg 15, writes 0 at coin insert, 0xff at boot and game over */
 	m_input_mask = data;
@@ -171,4 +173,4 @@ ROM_START( pesadelo )
 	ROM_LOAD( "epr2764.15", 0x00000, 0x10000, CRC(1ae2f724) SHA1(12880dd7ad82acf04861843fb9d4f0f926d18f6b) )
 ROM_END
 
-GAME( 1989, pesadelo, 0, pesadelo, pesadelo, forte2_state, init_pesadelo, ROT0, "bootleg (Forte II Games) / Konami", "Pesadelo (bootleg of Knightmare on MSX)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pesadelo, 0, pesadelo, pesadelo, forte2_state, init_pesadelo, ROT0, "bootleg (Forte II Games)", "Pesadelo (bootleg of Konami Knightmare)", MACHINE_SUPPORTS_SAVE )

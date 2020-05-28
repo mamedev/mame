@@ -14,6 +14,7 @@
 #pragma once
 
 #include "sound/okiadpcm.h"
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -24,7 +25,7 @@
 
 class okim6295_device : public device_t,
 						public device_sound_interface,
-						public device_rom_interface
+						public device_rom_interface<18>
 {
 public:
 	enum pin7_state

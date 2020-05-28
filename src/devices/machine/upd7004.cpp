@@ -40,7 +40,7 @@ ALLOW_SAVE_TYPE(upd7004_device::state);
 upd7004_device::upd7004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, UPD7004, tag, owner, clock),
 	m_eoc_cb(*this), m_eoc_ff_cb(*this),
-	m_in_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
+	m_in_cb(*this),
 	m_state(STATE_IDLE),
 	m_cycle_timer(nullptr),
 	m_div(1), m_code(false), m_address(0), m_sar(0x3ff)
@@ -56,9 +56,7 @@ void upd7004_device::device_start()
 	// resolve callbacks
 	m_eoc_cb.resolve_safe();
 	m_eoc_ff_cb.resolve_safe();
-
-	for (int i = 0; i < 8; i++)
-		m_in_cb[i].resolve_safe(0x3ff);
+	m_in_cb.resolve_all_safe(0x3ff);
 
 	// allocate timers
 	m_cycle_timer = timer_alloc();
@@ -114,7 +112,7 @@ void upd7004_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  INTERFACE
 //**************************************************************************
 
-READ8_MEMBER(upd7004_device::read)
+uint8_t upd7004_device::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -137,7 +135,7 @@ READ8_MEMBER(upd7004_device::read)
 	return data;
 }
 
-WRITE8_MEMBER(upd7004_device::write)
+void upd7004_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

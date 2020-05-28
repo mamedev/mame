@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(O2_CART_SLOT, o2_cart_slot_device, "o2_cart_slot", "Odyssey 2
 //-------------------------------------------------
 
 device_o2_cart_interface::device_o2_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "odyssey2cart")
 	, m_rom(nullptr)
 	, m_rom_size(0)
 {
@@ -75,8 +75,9 @@ void device_o2_cart_interface::ram_alloc(uint32_t size)
 o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, O2_CART_SLOT, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
-	, device_slot_interface(mconfig, *this)
-	, m_type(O2_STD), m_cart(nullptr)
+	, device_single_card_slot_interface<device_o2_cart_interface>(mconfig, *this)
+	, m_type(O2_STD)
+	, m_cart(nullptr)
 {
 }
 
@@ -95,7 +96,7 @@ o2_cart_slot_device::~o2_cart_slot_device()
 
 void o2_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_o2_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 
@@ -213,18 +214,18 @@ std::string o2_cart_slot_device::get_default_card_software(get_default_card_soft
  read_rom**
  -------------------------------------------------*/
 
-READ8_MEMBER(o2_cart_slot_device::read_rom04)
+uint8_t o2_cart_slot_device::read_rom04(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom04(space, offset);
+		return m_cart->read_rom04(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(o2_cart_slot_device::read_rom0c)
+uint8_t o2_cart_slot_device::read_rom0c(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom0c(space, offset);
+		return m_cart->read_rom0c(offset);
 	else
 		return 0xff;
 }
@@ -233,10 +234,10 @@ READ8_MEMBER(o2_cart_slot_device::read_rom0c)
  io_write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(o2_cart_slot_device::io_write)
+void o2_cart_slot_device::io_write(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->io_write(space, offset, data);
+		m_cart->io_write(offset, data);
 }
 
 

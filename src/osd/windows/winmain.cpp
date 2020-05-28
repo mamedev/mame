@@ -21,9 +21,9 @@
 #include "modules/monitor/monitor_common.h"
 
 // standard C headers
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdio.h>
+#include <cctype>
+#include <cstdarg>
+#include <cstdio>
 
 // standard windows headers
 #include <windows.h>
@@ -66,21 +66,20 @@ using namespace Windows::UI::Popups;
 class winui_output_error : public osd_output
 {
 public:
-	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) override
+	virtual void output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args) override
 	{
 		if (channel == OSD_OUTPUT_CHANNEL_ERROR)
 		{
-			char buffer[1024];
-
 			// if we are in fullscreen mode, go to windowed mode
 			if ((video_config.windowed == 0) && !osd_common_t::s_window_list.empty())
 				winwindow_toggle_full_screen();
 
-			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
-			win_message_box_utf8(!osd_common_t::s_window_list.empty() ? std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window() : nullptr, buffer, emulator_info::get_appname(), MB_OK);
+			std::ostringstream buffer;
+			util::stream_format(buffer, args);
+			win_message_box_utf8(!osd_common_t::s_window_list.empty() ? std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window() : nullptr, buffer.str().c_str(), emulator_info::get_appname(), MB_OK);
 		}
 		else
-			chain_output(channel, msg, args);
+			chain_output(channel, args);
 	}
 };
 
@@ -524,7 +523,7 @@ void windows_osd_interface::init(running_machine &machine)
 	osd_common_t::init(machine);
 
 	const char *stemp;
-	windows_options &options = downcast<windows_options &>(machine.options());
+	auto &options = downcast<windows_options &>(machine.options());
 
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options.bench();
@@ -567,7 +566,7 @@ void windows_osd_interface::init(running_machine &machine)
 	osd_common_t::init_subsystems();
 
 	// notify listeners of screen configuration
-	for (auto info : osd_common_t::s_window_list)
+	for (const auto &info : osd_common_t::s_window_list)
 	{
 		machine.output().set_value(string_format("Orientation(%s)", info->monitor()->devicename()).c_str(), std::static_pointer_cast<win_window_info>(info)->m_targetorient);
 	}

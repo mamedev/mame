@@ -28,9 +28,10 @@ public:
 	}
 
 	void harriet(machine_config &config);
+
 private:
-	DECLARE_READ8_MEMBER(zpram_r);
-	DECLARE_WRITE8_MEMBER(zpram_w);
+	uint8_t zpram_r(offs_t offset);
+	void zpram_w(offs_t offset, uint8_t data);
 
 	void harriet_map(address_map &map);
 
@@ -41,12 +42,12 @@ private:
 	std::unique_ptr<u8[]> m_zpram_data;
 };
 
-READ8_MEMBER(harriet_state::zpram_r)
+uint8_t harriet_state::zpram_r(offs_t offset)
 {
 	return m_zpram_data[offset];
 }
 
-WRITE8_MEMBER(harriet_state::zpram_w)
+void harriet_state::zpram_w(offs_t offset, uint8_t data)
 {
 	m_zpram_data[offset] = data;
 }
@@ -82,6 +83,17 @@ void harriet_state::machine_reset()
 }
 
 
+static const input_device_default terminal_defaults[] =
+{
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+	{ nullptr, 0, 0 }
+};
+
 void harriet_state::harriet(machine_config &config)
 {
 	M68010(config, m_maincpu, 40_MHz_XTAL / 4); // MC68010FN10
@@ -91,11 +103,9 @@ void harriet_state::harriet(machine_config &config)
 
 	mc68901_device &mfp(MC68901(config, "mfp", 40_MHz_XTAL / 16));
 	mfp.set_timer_clock(2.4576_MHz_XTAL);
-	mfp.set_rx_clock(9600);
-	mfp.set_tx_clock(9600);
 	mfp.out_so_cb().set("rs232", FUNC(rs232_port_device::write_txd));
-	//mfp.out_tco_cb().set("mfp", FUNC(mc68901_device::rc_w));
-	//mfp.out_tdo_cb().set("mfp", FUNC(mc68901_device::tc_w));
+	mfp.out_tco_cb().set("mfp", FUNC(mc68901_device::rc_w));
+	mfp.out_tdo_cb().set("mfp", FUNC(mc68901_device::tc_w));
 
 	HD63450(config, "dmac", 40_MHz_XTAL / 4, "maincpu"); // MC68450R10 (or HD68450Y-10)
 
@@ -103,8 +113,9 @@ void harriet_state::harriet(machine_config &config)
 	NVRAM(config, "zpram", nvram_device::DEFAULT_ALL_0); // MK48Z02
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set("mfp", FUNC(mc68901_device::write_rx));
+	rs232.rxd_handler().set("mfp", FUNC(mc68901_device::si_w));
 	rs232.rxd_handler().append("mfp", FUNC(mc68901_device::tbi_w));
+	rs232.set_option_device_input_defaults("terminal", terminal_defaults);
 
 	NSCSI_BUS(config, "scsia");
 	NSCSI_CONNECTOR(config, "scsia:7").option_set("wdc", WD33C93A).clock(40_MHz_XTAL / 4);

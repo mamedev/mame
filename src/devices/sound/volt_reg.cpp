@@ -2,15 +2,13 @@
 // copyright-holders:smf
 /***************************************************************************
 
-    volt_reg.c
+    volt_reg.cpp
 
     Direct current.
 
     TODO:
     - If we continue having this device in MAME, add support for default voltage other
       than (currently hardcoded) 5.0
-    - When used in combination with a DAC, vreg device 1st stream update is skipped,
-      causing the DAC to fetch invalid input data. Why does this happen?
 
 ***************************************************************************/
 
@@ -29,7 +27,7 @@ voltage_regulator_device::voltage_regulator_device(const machine_config &mconfig
 
 void voltage_regulator_device::device_start()
 {
-	m_stream = stream_alloc(0, 1, 500);
+	m_stream = stream_alloc(0, 1, 48000 * 4);
 }
 
 void voltage_regulator_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)

@@ -159,7 +159,7 @@ enum
 
 // ======================> device_nes_cart_interface
 
-class device_nes_cart_interface : public device_slot_card_interface
+class device_nes_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -348,7 +348,7 @@ public:
 
 class nes_cart_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_nes_cart_interface>
 {
 public:
 	// construction/destruction
@@ -364,34 +364,22 @@ public:
 	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_cart_slot_device();
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	void call_load_ines();
-	void call_load_unif();
-	void call_load_pcb();
-
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return m_must_be_loaded; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "nes_cart"; }
-	virtual const char *file_extensions() const override { return "nes,unf,unif"; }
-	virtual u32 unhashed_header_length() const override { return 16; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return m_must_be_loaded; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "nes_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "nes,unf,unif"; }
+	virtual u32 unhashed_header_length() const noexcept override { return 16; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
-	const char * get_default_card_ines(get_default_card_software_hook &hook, const uint8_t *ROM, uint32_t len) const;
-	static const char * get_default_card_unif(const uint8_t *ROM, uint32_t len);
-	static const char * nes_get_slot(int pcb_id);
-	int nes_get_pcb_id(const char *slot);
 
 	// reading and writing
 	virtual uint8_t read_l(offs_t offset);
@@ -422,6 +410,22 @@ public:
 	device_nes_cart_interface*      m_cart;
 	int m_pcb_id;
 	bool                            m_must_be_loaded;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+
+	const char * get_default_card_ines(get_default_card_software_hook &hook, const uint8_t *ROM, uint32_t len) const;
+	static const char * get_default_card_unif(const uint8_t *ROM, uint32_t len);
+	static const char * nes_get_slot(int pcb_id);
+	int nes_get_pcb_id(const char *slot);
+
+	void call_load_ines();
+	void call_load_unif();
+	void call_load_pcb();
 };
 
 // device type definition

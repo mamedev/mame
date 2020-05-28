@@ -18,9 +18,9 @@
    -   (used with MP-1802 floppy disk controller card)
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 #include "imgtool.h"
 #include "iflopimg.h"
 

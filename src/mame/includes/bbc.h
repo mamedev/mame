@@ -21,7 +21,6 @@
 #include "machine/clock.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
-#include "machine/i8271.h"
 #include "machine/wd_fdc.h"
 #include "machine/upd7002.h"
 #include "machine/mc146818.h"
@@ -42,14 +41,13 @@
 #include "bus/bbc/fdc/fdc.h"
 #include "bus/bbc/analogue/analogue.h"
 #include "bus/bbc/1mhzbus/1mhzbus.h"
-//#include "bus/bbc/internal/internal.h"
+#include "bus/bbc/modem/modem.h"
+#include "bus/bbc/internal/internal.h"
 #include "bus/bbc/tube/tube.h"
 #include "bus/bbc/userport/userport.h"
 #include "bus/bbc/exp/exp.h"
 #include "bus/bbc/joyport/joyport.h"
-
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "bus/bbc/cart/slot.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -76,7 +74,7 @@ public:
 		, m_acia(*this, "acia6850")
 		, m_acia_clock(*this, "acia_clock")
 		, m_latch(*this, "latch")
-		, m_rs232(*this, "rs232")
+		, m_rs232(*this, "rs423")
 		, m_via6522_0(*this, "via6522_0")
 		, m_via6522_1(*this, "via6522_1")
 		, m_upd7002(*this, "upd7002")
@@ -86,13 +84,13 @@ public:
 		, m_intube(*this, "intube")
 		, m_extube(*this, "extube")
 		, m_1mhzbus(*this, "1mhzbus")
+		, m_modem(*this, "modem")
 		, m_userport(*this, "userport")
-//      , m_internal(*this, "internal")
+		, m_internal(*this, "internal")
 		, m_exp(*this, "exp")
 		, m_rtc(*this, "rtc")
 		, m_i2cmem(*this, "i2cmem")
 		, m_fdc(*this, "fdc")
-		, m_i8271(*this, "i8271")
 		, m_wd1770(*this, "wd1770")
 		, m_wd1772(*this, "wd1772")
 		, m_rom(*this, "romslot%u", 0U)
@@ -101,48 +99,57 @@ public:
 		, m_region_swr(*this, "swr")
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
 		, m_bankdev(*this, "bankdev")
 		, m_bbcconfig(*this, "BBCCONFIG")
 	{ }
 
-	enum monitor_type_t
+	enum class monitor_type
 	{
-		COLOUR = 0,
-		BLACKWHITE = 1,
-		GREEN = 2,
-		AMBER = 3
+		COLOUR,
+		BLACKWHITE,
+		GREEN,
+		AMBER
 	};
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_WRITE8_MEMBER(bbc_romsel_w);
-	DECLARE_READ8_MEMBER(bbc_paged_r);
-	DECLARE_WRITE8_MEMBER(bbc_paged_w);
-	DECLARE_READ8_MEMBER(bbcbp_fetch_r);
-	DECLARE_WRITE8_MEMBER(bbcbp_romsel_w);
-	DECLARE_READ8_MEMBER(bbcbp_paged_r);
-	DECLARE_WRITE8_MEMBER(bbcbp_paged_w);
-	DECLARE_READ8_MEMBER(bbcm_fetch_r);
-	DECLARE_READ8_MEMBER(bbcm_acccon_r);
-	DECLARE_WRITE8_MEMBER(bbcm_acccon_w);
-	DECLARE_WRITE8_MEMBER(bbcm_romsel_w);
-	DECLARE_READ8_MEMBER(bbcm_paged_r);
-	DECLARE_WRITE8_MEMBER(bbcm_paged_w);
-	DECLARE_READ8_MEMBER(bbcm_hazel_r);
-	DECLARE_WRITE8_MEMBER(bbcm_hazel_w);
-	DECLARE_READ8_MEMBER(bbcm_tube_r);
-	DECLARE_WRITE8_MEMBER(bbcm_tube_w);
-	DECLARE_WRITE8_MEMBER(bbcbp_drive_control_w);
-	DECLARE_WRITE8_MEMBER(bbcm_drive_control_w);
-	DECLARE_WRITE8_MEMBER(bbcmc_drive_control_w);
-	DECLARE_WRITE8_MEMBER(serial_ula_w);
-	DECLARE_WRITE8_MEMBER(video_ula_w);
-	DECLARE_READ8_MEMBER(bbc_fe_r) { return 0xfe; };
+	uint8_t bbc_ram_r(offs_t offset);
+	void bbc_ram_w(offs_t offset, uint8_t data);
+	uint8_t bbc_romsel_r(offs_t offset);
+	void bbc_romsel_w(offs_t offset, uint8_t data);
+	uint8_t bbc_paged_r(offs_t offset);
+	void bbc_paged_w(offs_t offset, uint8_t data);
+	uint8_t bbc_mos_r(offs_t offset);
+	void bbc_mos_w(offs_t offset, uint8_t data);
+	uint8_t bbc_fred_r(offs_t offset);
+	void bbc_fred_w(offs_t offset, uint8_t data);
+	uint8_t bbc_jim_r(offs_t offset);
+	void bbc_jim_w(offs_t offset, uint8_t data);
+	uint8_t bbcbp_fetch_r(offs_t offset);
+	void bbcbp_romsel_w(offs_t offset, uint8_t data);
+	uint8_t bbcbp_paged_r(offs_t offset);
+	void bbcbp_paged_w(offs_t offset, uint8_t data);
+	uint8_t bbcm_fetch_r(offs_t offset);
+	uint8_t bbcm_acccon_r();
+	void bbcm_acccon_w(uint8_t data);
+	void bbcm_romsel_w(offs_t offset, uint8_t data);
+	uint8_t bbcm_paged_r(offs_t offset);
+	void bbcm_paged_w(offs_t offset, uint8_t data);
+	uint8_t bbcm_hazel_r(offs_t offset);
+	void bbcm_hazel_w(offs_t offset, uint8_t data);
+	uint8_t bbcm_tube_r(offs_t offset);
+	void bbcm_tube_w(offs_t offset, uint8_t data);
+	uint8_t bbcmc_paged_r(offs_t offset);
+	void bbcmc_paged_w(offs_t offset, uint8_t data);
+	void bbcbp_drive_control_w(uint8_t data);
+	void bbcm_drive_control_w(uint8_t data);
+	void bbcmc_drive_control_w(uint8_t data);
+	void serial_ula_w(uint8_t data);
+	void video_ula_w(offs_t offset, uint8_t data);
+	uint8_t bbc_fe_r() { return 0xfe; };
 
 	DECLARE_VIDEO_START(bbc);
 
-	void bbc_colours(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
 	TIMER_CALLBACK_MEMBER(tape_timer_cb);
 	TIMER_CALLBACK_MEMBER(reset_timer_cb);
@@ -155,15 +162,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kbd_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(capslock_led_w);
 	DECLARE_WRITE_LINE_MEMBER(shiftlock_led_w);
-	DECLARE_READ8_MEMBER(via_system_porta_r);
-	DECLARE_WRITE8_MEMBER(via_system_porta_w);
-	DECLARE_READ8_MEMBER(via_system_portb_r);
-	DECLARE_WRITE8_MEMBER(via_system_portb_w);
+	uint8_t via_system_porta_r();
+	void via_system_porta_w(uint8_t data);
+	uint8_t via_system_portb_r();
+	void via_system_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(lpstb_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_de_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_palette);
+	void update_palette(monitor_type monitor_type);
 
 	void update_acia_rxd();
 	void update_acia_dcd();
@@ -177,8 +185,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(side_w);
 
 	int get_analogue_input(int channel_number);
 	void upd7002_eoc(int data);
@@ -187,27 +193,18 @@ public:
 	void insert_device_rom(memory_region *rom);
 	void setup_device_roms();
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart1_load) { return load_cart(image, m_cart[0]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart2_load) { return load_cart(image, m_cart[1]); }
-
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void bbca(machine_config &config);
 	void bbcb(machine_config &config);
 	void bbcb_de(machine_config &config);
 	void bbcb_us(machine_config &config);
-	void torchf(machine_config &config);
-	void torchh21(machine_config &config);
-	void torchh10(machine_config &config);
 
 	void bbca_mem(address_map &map);
 	void bbc_base(address_map &map);
 	void bbcb_mem(address_map &map);
-	void bbcb_nofdc_mem(address_map &map);
 
 	void init_bbc();
-	void init_bbcm();
 	void init_ltmp();
 	void init_cfa();
 
@@ -216,17 +213,18 @@ protected:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
+	virtual void video_reset() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<hd6845s_device> m_hd6845;
+	required_device<mc6845_device> m_hd6845;
 	required_device<screen_device> m_screen;
 	required_device<input_merger_device> m_irqs;
 	required_device<palette_device> m_palette;
 	optional_device<mc6854_device> m_adlc;
 	optional_device<sn76489a_device> m_sn;
 	optional_device<samples_device> m_samples;
-	required_ioport_array<13> m_keyboard;
+	required_ioport_array<16> m_keyboard;
 	optional_device<saa5050_device> m_trom;
 	optional_device<tms5220_device> m_tms;
 	optional_device<cassette_image_device> m_cassette;
@@ -243,33 +241,28 @@ protected:
 	optional_device<bbc_tube_slot_device> m_intube;
 	optional_device<bbc_tube_slot_device> m_extube;
 	optional_device<bbc_1mhzbus_slot_device> m_1mhzbus;
+	optional_device<bbc_modem_slot_device> m_modem;
 	optional_device<bbc_userport_slot_device> m_userport;
-	//optional_device<bbc_internal_slot_device> m_internal;
+	optional_device<bbc_internal_slot_device> m_internal;
 	optional_device<bbc_exp_slot_device> m_exp;
 	optional_device<mc146818_device> m_rtc;
 	optional_device<i2cmem_device> m_i2cmem;
 	optional_device<bbc_fdc_slot_device> m_fdc;
-	optional_device<i8271_device> m_i8271;
 	optional_device<wd1770_device> m_wd1770;
 	optional_device<wd1772_device> m_wd1772;
 	optional_device_array<bbc_romslot_device, 16> m_rom;
-	optional_device_array<generic_slot_device, 2> m_cart;
+	optional_device_array<bbc_cartslot_device, 2> m_cart;
 
 	required_memory_region m_region_mos;
 	required_memory_region m_region_swr;
-	required_memory_bank m_bank1; // bbca bbcb bbcbp bbcbp128 bbcm
+	optional_memory_bank m_bank1; //           bbcbp bbcbp128 bbcm
 	optional_memory_bank m_bank2; //           bbcbp bbcbp128 bbcm
-	optional_memory_bank m_bank3; // bbca bbcb
 	optional_device<address_map_bank_device> m_bankdev; //    bbcm
 	optional_ioport m_bbcconfig;
 
-	int m_monitortype;      // monitor type (colour, green, amber)
-	int m_swramtype;        // this stores the setting for the SWRAM type being used
-	int m_swrbank;          // This is the latch that holds the sideways ROM bank to read
+	int m_romsel;           // This is the latch that holds the sideways ROM bank to read
 	int m_paged_ram;        // BBC B+ memory handling
 	int m_vdusel;           // BBC B+ memory handling
-	bool m_lk18_ic41_paged_rom;  // BBC Master Paged ROM/RAM select IC41
-	bool m_lk19_ic37_paged_rom;  // BBC Master Paged ROM/RAM select IC37
 
 	/*
 	    ACCCON
@@ -356,30 +349,29 @@ protected:
 	int m_vsync;
 
 	uint8_t m_teletext_latch;
+	uint8_t m_vula_ctrl;
 
-	struct {
-		// control register
-		int master_cursor_size;
-		int width_of_cursor;
-		int clock_rate_6845;
-		int characters_per_line;
-		int teletext_normal_select;
-		int flash_colour_select;
-		// inputs
-		int de;
-	} m_video_ula;
+	struct video_nula {
+		uint8_t palette_mode;
+		uint8_t horiz_offset;
+		uint8_t left_blank;
+		uint8_t disable;
+		uint8_t attr_mode;
+		uint8_t attr_text;
+		uint8_t flash[8];
+		uint8_t palette_byte;
+		uint8_t palette_write;
+	} m_vnula;
 
 	int m_pixels_per_byte;
 	int m_cursor_size;
 
-	int m_videoULA_palette0[16];
-	int m_videoULA_palette1[16];
-	int *m_videoULA_palette_lookup;
-
-	rgb_t out_rgb(rgb_t entry);
+	uint8_t m_vula_palette[16];
+	uint8_t m_vula_palette_lookup[16];
 
 	void setvideoshadow(int vdusel);
 	void set_pixel_lookup();
+	uint8_t bus_video_data();
 	int bbc_keyboard(int data);
 
 	void mc6850_receive_clock(int new_clock);
@@ -397,6 +389,11 @@ class torch_state : public bbc_state
 public:
 	using bbc_state::bbc_state;
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
+
+	void torchf(machine_config &config);
+	void torchh(machine_config &config);
+	void torch301(machine_config &config);
+	void torch725(machine_config &config);
 };
 
 
@@ -435,6 +432,7 @@ public:
 	void bbcm512(machine_config &config);
 	void bbcmarm(machine_config &config);
 	void cfa3000(machine_config &config);
+	void daisy(machine_config &config);
 	void discmon(machine_config &config);
 	void discmate(machine_config &config);
 	void bbcmc(machine_config &config);
@@ -448,7 +446,9 @@ protected:
 	void bbcm_mem(address_map &map);
 	void bbcm_bankdev(address_map &map);
 	void bbcmet_bankdev(address_map &map);
+	void bbcmc_mem(address_map &map);
 	void bbcmc_bankdev(address_map &map);
+	void autoc15_bankdev(address_map &map);
 	void bbcm_fetch(address_map &map);
 };
 

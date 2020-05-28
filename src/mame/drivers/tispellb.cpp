@@ -94,18 +94,18 @@ private:
 	void power_subcpu();
 	void update_display();
 
-	DECLARE_READ8_MEMBER(main_read_k);
-	DECLARE_WRITE16_MEMBER(main_write_o);
-	DECLARE_WRITE16_MEMBER(main_write_r);
+	u8 main_read_k();
+	void main_write_o(u16 data);
+	void main_write_r(u16 data);
 
-	DECLARE_READ8_MEMBER(rev1_ctl_r);
-	DECLARE_WRITE8_MEMBER(rev1_ctl_w);
-	DECLARE_READ8_MEMBER(sub_read_k);
-	DECLARE_WRITE16_MEMBER(sub_write_o);
-	DECLARE_WRITE16_MEMBER(sub_write_r);
+	u8 rev1_ctl_r();
+	void rev1_ctl_w(u8 data);
+	u8 sub_read_k();
+	void sub_write_o(u16 data);
+	void sub_write_r(u16 data);
 
-	DECLARE_WRITE16_MEMBER(rev2_write_o);
-	DECLARE_WRITE16_MEMBER(rev2_write_r);
+	void rev2_write_o(u16 data);
+	void rev2_write_r(u16 data);
 
 	virtual void machine_start() override;
 };
@@ -154,14 +154,14 @@ void tispellb_state::update_display()
 	m_display->matrix(m_grid & gridmask, m_plate);
 }
 
-WRITE16_MEMBER(tispellb_state::main_write_o)
+void tispellb_state::main_write_o(u16 data)
 {
 	// reorder opla to led14seg, plus DP as d14 and AP as d15, same as snspell
 	m_plate = bitswap<16>(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
 	update_display();
 }
 
-WRITE16_MEMBER(tispellb_state::main_write_r)
+void tispellb_state::main_write_r(u16 data)
 {
 	// R13: power-off request, on falling edge
 	if (~data & m_r & 0x2000)
@@ -176,7 +176,7 @@ WRITE16_MEMBER(tispellb_state::main_write_r)
 	update_display();
 }
 
-READ8_MEMBER(tispellb_state::main_read_k)
+u8 tispellb_state::main_read_k()
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inputs[7]->read() | read_inputs(7);
@@ -185,31 +185,31 @@ READ8_MEMBER(tispellb_state::main_read_k)
 
 // 1st revision mcu/mcu comms
 
-WRITE8_MEMBER(tispellb_state::rev1_ctl_w)
+void tispellb_state::rev1_ctl_w(u8 data)
 {
 	// main CTL write data
 	m_rev1_ctl = data & 0xf;
 }
 
-READ8_MEMBER(tispellb_state::sub_read_k)
+u8 tispellb_state::sub_read_k()
 {
 	// sub K8421 <- main CTL3210
 	return m_rev1_ctl;
 }
 
-WRITE16_MEMBER(tispellb_state::sub_write_o)
+void tispellb_state::sub_write_o(u16 data)
 {
 	// sub O write data
 	m_sub_o = data;
 }
 
-READ8_MEMBER(tispellb_state::rev1_ctl_r)
+u8 tispellb_state::rev1_ctl_r()
 {
 	// main CTL3210 <- sub O6043
 	return bitswap<4>(m_sub_o,6,0,4,3);
 }
 
-WRITE16_MEMBER(tispellb_state::sub_write_r)
+void tispellb_state::sub_write_r(u16 data)
 {
 	// sub R: unused?
 	m_sub_r = data;
@@ -218,16 +218,16 @@ WRITE16_MEMBER(tispellb_state::sub_write_r)
 
 // 2nd revision specifics
 
-WRITE16_MEMBER(tispellb_state::rev2_write_o)
+void tispellb_state::rev2_write_o(u16 data)
 {
 	// SEG DP: speaker out
 	m_speaker->level_w(data >> 15 & 1);
 
 	// SEG DP and SEG AP are not connected to VFD, rest is same as rev1
-	main_write_o(space, offset, data & 0x6fff);
+	main_write_o(data & 0x6fff);
 }
 
-WRITE16_MEMBER(tispellb_state::rev2_write_r)
+void tispellb_state::rev2_write_r(u16 data)
 {
 	// R12: TMC0355 CS
 	// R4: TMC0355 M1
@@ -239,7 +239,7 @@ WRITE16_MEMBER(tispellb_state::rev2_write_r)
 	m_tms6100->clk_w(0);
 
 	// rest is same as rev1
-	main_write_r(space, offset, data);
+	main_write_r(data);
 }
 
 
@@ -353,7 +353,7 @@ void tispellb_state::rev1(machine_config &config)
 	m_subcpu->o().set(FUNC(tispellb_state::sub_write_o));
 	m_subcpu->r().set(FUNC(tispellb_state::sub_write_r));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(16, 16);

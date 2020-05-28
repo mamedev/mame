@@ -178,7 +178,7 @@ void voodoo_banshee_pci_device::map_extra(uint64_t memory_window_start, uint64_t
 	// Should really be dependent on voodoo VGAINIT0 bit 8 and IO base + 0xc3 bit 0
 	uint64_t start = io_offset + 0x3b0;
 	uint64_t end = io_offset + 0x3df;
-	io_space->install_readwrite_handler(start, end, read32_delegate(FUNC(voodoo_pci_device::vga_r), this), write32_delegate(FUNC(voodoo_pci_device::vga_w), this));
+	io_space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(voodoo_pci_device::vga_r)), write32s_delegate(*this, FUNC(voodoo_pci_device::vga_w)));
 	logerror("%s: map %s at %0*x-%0*x\n", this->tag(), "vga_r/w", 4, uint32_t(start), 4, uint32_t(end));
 }
 
@@ -191,7 +191,7 @@ void voodoo_3_pci_device::map_extra(uint64_t memory_window_start, uint64_t memor
 	// Should really be dependent on voodoo VGAINIT0 bit 8 and IO base + 0xc3 bit 0
 	uint64_t start = io_offset + 0x3b0;
 	uint64_t end = io_offset + 0x3df;
-	io_space->install_readwrite_handler(start, end, read32_delegate(FUNC(voodoo_pci_device::vga_r), this), write32_delegate(FUNC(voodoo_pci_device::vga_w), this));
+	io_space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(voodoo_pci_device::vga_r)), write32s_delegate(*this, FUNC(voodoo_pci_device::vga_w)));
 	logerror("%s: map %s at %0*x-%0*x\n", this->tag(), "vga_r/w", 4, uint32_t(start), 4, uint32_t(end));
 }
 
@@ -201,7 +201,7 @@ uint32_t voodoo_pci_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 }
 
 // PCI bus control
-READ32_MEMBER (voodoo_pci_device::pcictrl_r)
+uint32_t voodoo_pci_device::pcictrl_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_pcictrl_reg[offset];
 	// The address map starts at 0x40
@@ -227,7 +227,7 @@ READ32_MEMBER (voodoo_pci_device::pcictrl_r)
 		logerror("%s:voodoo_pci_device pcictrl_r from offset %02X = %08X & %08X\n", machine().describe_context(), offset*4 + 0x40, result, mem_mask);
 	return result;
 }
-WRITE32_MEMBER (voodoo_pci_device::pcictrl_w)
+void voodoo_pci_device::pcictrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_pcictrl_reg[offset]);
 	// The address map starts at 0x40
@@ -244,7 +244,7 @@ WRITE32_MEMBER (voodoo_pci_device::pcictrl_w)
 }
 
 // VGA legacy accesses
-READ32_MEMBER(voodoo_pci_device::vga_r)
+uint32_t voodoo_pci_device::vga_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	if (ACCESSING_BITS_0_7)
@@ -259,7 +259,7 @@ READ32_MEMBER(voodoo_pci_device::vga_r)
 		logerror("%s voodoo_pci_device vga_r from offset %02X = %08X & %08X\n", machine().describe_context(), offset * 4, result, mem_mask);
 	return result;
 }
-WRITE32_MEMBER(voodoo_pci_device::vga_w)
+void voodoo_pci_device::vga_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		downcast<voodoo_banshee_device *>(m_voodoo.target())->banshee_vga_w(offset * 4 + 0 + 0xb0, data >> 0);

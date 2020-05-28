@@ -40,7 +40,7 @@
 
 */
 
-#include <assert.h>
+#include <cassert>
 
 #include "atom_tap.h"
 #include "csw_cas.h"

@@ -1218,6 +1218,11 @@ tya_imp
 
 #   exceptions
 reset
+	read_pc_noinc();
+	read_pc_noinc();
+	read(SP); dec_SP();
+	read(SP); dec_SP();
+	read(SP); dec_SP();
 	P |= F_I; PC = read_arg(0xfffc);
 	PC = set_h(PC, read_arg(0xfffd));
 	prefetch();

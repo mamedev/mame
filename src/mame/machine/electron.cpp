@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, Nigel Barnes
 /******************************************************************************
     Acorn Electron driver
 
@@ -42,7 +42,7 @@ void electron_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		electron_scanline_interrupt(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in electron_state::device_timer");
+		throw emu_fatalerror("Unknown id in electron_state::device_timer");
 	}
 }
 
@@ -121,12 +121,12 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 			case 9: /* stop bit */
 				m_ula.stop_bit = ( ( m_ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
 				//logerror( "++ Read stop bit: %d\n", m_ula.stop_bit );
-				if ( m_ula.start_bit && m_ula.stop_bit && m_ula.tape_byte == 0xFF && ! m_ula.high_tone_set )
+				if ( m_ula.start_bit && m_ula.stop_bit && m_ula.tape_byte == 0xFF && !m_ula.high_tone_set )
 				{
 					electron_interrupt_handler( INT_SET, INT_HIGH_TONE );
 					m_ula.high_tone_set = 1;
 				}
-				else if ( ! m_ula.start_bit && m_ula.stop_bit )
+				else if ( !m_ula.start_bit && m_ula.stop_bit )
 				{
 					//logerror( "-- Byte read from tape: %02x\n", m_ula.tape_byte );
 					electron_interrupt_handler( INT_SET, INT_RECEIVE_FULL );
@@ -251,6 +251,69 @@ WRITE8_MEMBER(electron_state::electron_paged_w)
 	m_exp->expbus_w(0x8000 + offset, data);
 }
 
+READ8_MEMBER(electronsp_state::electron_paged_r)
+{
+	uint8_t data = 0;
+
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
+	if ((m_ula.rompage & 0x0e) == m_rompages->read())
+	{
+		data = m_romi[m_ula.rompage & 0x01]->read_rom(offset);
+	}
+	else
+	{
+		switch (m_ula.rompage)
+		{
+		case 10:
+			/* SP64 ROM utilises the spare BASIC ROM page */
+			if (BIT(m_sp64_bank, 7) && (offset & 0x2000))
+			{
+				data = m_sp64_ram[offset & 0x1fff];
+			}
+			else
+			{
+				data = m_region_sp64->base()[(!BIT(m_sp64_bank, 0) << 14) | offset];
+			}
+			break;
+
+		default:
+			data = electron_state::electron_paged_r(space, offset, mem_mask);
+			break;
+		}
+	}
+	return data;
+}
+
+WRITE8_MEMBER(electronsp_state::electron_paged_w)
+{
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
+	if ((m_ula.rompage & 0x0e) == m_rompages->read())
+	{
+		/* TODO: sockets are writeable if RAM */
+	}
+	else
+	{
+		switch (m_ula.rompage)
+		{
+		case 10:
+			/* SP64 ROM utilises the spare BASIC ROM page */
+			if (BIT(m_sp64_bank, 7) && (offset & 0x2000))
+			{
+				m_sp64_ram[offset & 0x1fff] = data;
+			}
+			break;
+
+		default:
+			electronsp_state::electron_paged_w(space, offset, data, mem_mask);
+			break;
+		}
+	}
+}
+
 READ8_MEMBER(electron_state::electron_mos_r)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
@@ -288,6 +351,41 @@ WRITE8_MEMBER(electron_state::electron_fred_w)
 
 	//logerror("FRED: write fc%02x\n", offset);
 	m_exp->expbus_w(0xfc00 + offset, data);
+}
+
+READ8_MEMBER(electronsp_state::electron_fred_r)
+{
+	uint8_t data = 0;
+
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
+	if ((offset & 0xf0) == 0xb0)
+	{
+		data = m_via->read(offset & 0x0f);
+	}
+	else
+	{
+		data = electron_state::electron_fred_r(space, offset, mem_mask);
+	}
+	return data;;
+}
+
+WRITE8_MEMBER(electronsp_state::electron_fred_w)
+{
+	/* The processor will run at 2MHz during an access cycle to the ROM */
+	m_maincpu->set_clock_scale(1.0f);
+
+	electron_state::electron_fred_w(space, offset, data, mem_mask);
+
+	if ((offset & 0xf0) == 0xb0)
+	{
+		m_via->write(offset & 0x0f, data);
+	}
+	else if (offset == 0xfa)
+	{
+		m_sp64_bank = data;
+	}
 }
 
 READ8_MEMBER(electron_state::electron_jim_r)
@@ -467,12 +565,12 @@ void electron_state::electron_interrupt_handler(int mode, int interrupt)
 	if ( m_ula.interrupt_status & m_ula.interrupt_control & ~0x83 )
 	{
 		m_ula.interrupt_status |= 0x01;
-		m_maincpu->set_input_line(0, ASSERT_LINE );
+		m_irqs->in_w<0>(ASSERT_LINE);
 	}
 	else
 	{
 		m_ula.interrupt_status &= ~0x01;
-		m_maincpu->set_input_line(0, CLEAR_LINE );
+		m_irqs->in_w<0>(CLEAR_LINE);
 	}
 }
 
@@ -484,6 +582,31 @@ TIMER_CALLBACK_MEMBER(electron_state::setup_beep)
 {
 	m_beeper->set_state( 0 );
 	m_beeper->set_clock( 300 );
+}
+
+void electron_state::machine_start()
+{
+	m_ula.interrupt_status = 0x82;
+	m_ula.interrupt_control = 0x00;
+	timer_set(attotime::zero, TIMER_SETUP_BEEP);
+	m_tape_timer = timer_alloc(TIMER_TAPE_HANDLER);
+
+	/* register save states */
+	save_item(STRUCT_MEMBER(m_ula, interrupt_status));
+	save_item(STRUCT_MEMBER(m_ula, interrupt_control));
+	save_item(STRUCT_MEMBER(m_ula, rompage));
+	save_item(STRUCT_MEMBER(m_ula, screen_start));
+	save_item(STRUCT_MEMBER(m_ula, screen_base));
+	save_item(STRUCT_MEMBER(m_ula, screen_size));
+	save_item(STRUCT_MEMBER(m_ula, screen_addr));
+	save_item(STRUCT_MEMBER(m_ula, screen_dispend));
+	save_item(STRUCT_MEMBER(m_ula, current_pal));
+	save_item(STRUCT_MEMBER(m_ula, communication_mode));
+	save_item(STRUCT_MEMBER(m_ula, screen_mode));
+	save_item(STRUCT_MEMBER(m_ula, cassette_motor_mode));
+	save_item(STRUCT_MEMBER(m_ula, capslock_mode));
+	save_item(NAME(m_mrb_mapped));
+	save_item(NAME(m_vdu_drivers));
 }
 
 void electron_state::machine_reset()
@@ -502,10 +625,35 @@ void electron_state::machine_reset()
 	m_vdu_drivers = false;
 }
 
-void electron_state::machine_start()
+void electronsp_state::machine_start()
 {
-	m_ula.interrupt_status = 0x82;
-	m_ula.interrupt_control = 0x00;
-	timer_set(attotime::zero, TIMER_SETUP_BEEP);
-	m_tape_timer = timer_alloc(TIMER_TAPE_HANDLER);
+	electron_state::machine_start();
+
+	m_sp64_ram = std::make_unique<uint8_t[]>(0x2000);
+
+	/* register save states */
+	save_item(NAME(m_sp64_bank));
+	save_pointer(NAME(m_sp64_ram), 0x2000);
+}
+
+
+image_init_result electronsp_state::load_rom(device_image_interface &image, generic_slot_device *slot)
+{
+	uint32_t size = slot->common_get_size("rom");
+
+	// socket accepts 8K and 16K ROM only
+	if (size != 0x2000 && size != 0x4000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only 8K/16K is supported");
+		return image_init_result::FAIL;
+	}
+
+	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	slot->common_load_rom(slot->get_rom_base(), size, "rom");
+
+	// mirror 8K ROMs
+	uint8_t *crt = slot->get_rom_base();
+	if (size <= 0x2000) memcpy(crt + 0x2000, crt, 0x2000);
+
+	return image_init_result::PASS;
 }

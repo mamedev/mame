@@ -91,15 +91,15 @@ private:
 	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
 	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);
 	DECLARE_READ8_MEMBER(term_status_r);
-	DECLARE_READ8_MEMBER(term_r);
-	DECLARE_READ8_MEMBER(okean240_port40_r);
-	DECLARE_READ8_MEMBER(okean240_port41_r);
-	DECLARE_WRITE8_MEMBER(okean240_port42_w);
-	DECLARE_READ8_MEMBER(okean240a_port40_r);
-	DECLARE_READ8_MEMBER(okean240a_port41_r);
-	DECLARE_READ8_MEMBER(okean240a_port42_r);
+	uint8_t term_r();
+	uint8_t okean240_port40_r();
+	uint8_t okean240_port41_r();
+	void okean240_port42_w(uint8_t data);
+	uint8_t okean240a_port40_r();
+	uint8_t okean240a_port41_r();
+	uint8_t okean240a_port42_r();
 	void kbd_put(u8 data);
-	DECLARE_WRITE8_MEMBER(scroll_w);
+	void scroll_w(uint8_t data);
 	uint32_t screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void okean240_io(address_map &map);
@@ -118,7 +118,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	optional_ioport m_io_modifiers;
 	ioport_port *m_io_port[11];
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppikbd;
 };
 
@@ -154,20 +154,20 @@ READ8_MEMBER(okean240_state::term_status_r)
 	return (m_term_data) ? 3 : 1;
 }
 
-READ8_MEMBER(okean240_state::okean240_port40_r)
+uint8_t okean240_state::okean240_port40_r()
 {
 	// port 40 (get ascii key value)
-	return term_r(space, offset);
+	return term_r();
 }
 
-READ8_MEMBER(okean240_state::okean240_port41_r)
+uint8_t okean240_state::okean240_port41_r()
 {
 	// port 41 bit 1 (test rom status bit)
 	m_tog ^= 6;
 	return m_tog;
 }
 
-READ8_MEMBER(okean240_state::okean240a_port40_r)
+uint8_t okean240_state::okean240a_port40_r()
 {
 	// port 40 (get a column)
 	for (uint8_t i = 0; i < 11; i++)
@@ -184,7 +184,7 @@ READ8_MEMBER(okean240_state::okean240a_port40_r)
 	return 0;
 }
 
-READ8_MEMBER(okean240_state::okean240a_port41_r)
+uint8_t okean240_state::okean240a_port41_r()
 {
 	// port 41 bits 6&7 (modifier keys), and bit 1 (test rom status bit)
 	{
@@ -193,7 +193,7 @@ READ8_MEMBER(okean240_state::okean240a_port41_r)
 	}
 }
 
-READ8_MEMBER(okean240_state::okean240a_port42_r)
+uint8_t okean240_state::okean240a_port42_r()
 {
 	// port 42 (get a row)
 	for (uint8_t i = 0; i < 11; i++)
@@ -206,21 +206,21 @@ READ8_MEMBER(okean240_state::okean240a_port42_r)
 
 // This is a keyboard acknowledge pulse, it goes high then
 // straightaway low, if reading port 40 indicates a key is pressed.
-WRITE8_MEMBER(okean240_state::okean240_port42_w)
+void okean240_state::okean240_port42_w(uint8_t data)
 {
 // okean240: port 42 bit 7
 // okean240a: port 42 bit 4
 }
 
 // for test rom
-READ8_MEMBER(okean240_state::term_r)
+uint8_t okean240_state::term_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER(okean240_state::scroll_w)
+void okean240_state::scroll_w(uint8_t data)
 {
 	m_scroll = data;
 }
@@ -258,16 +258,16 @@ void okean240_state::okean240a_io(address_map &map)
 	map(0xa0, 0xa1).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xc0, 0xc3).rw("ppic", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe0, 0xe3).rw("ppie", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	// AM_RANGE(0x00, 0x1f)=ppa00.data
-	// AM_RANGE(0x20, 0x23)=dsk.data
-	// AM_RANGE(0x24, 0x24)=dsk.wait
-	// AM_RANGE(0x25, 0x25)=dskctl.data
-	// AM_RANGE(0x40, 0x5f)=ppa40.data
-	// AM_RANGE(0x60, 0x7f)=tim.data
-	// AM_RANGE(0x80, 0x81)=intctl.data
-	// AM_RANGE(0xa0, 0xa1)=comport.data
-	// AM_RANGE(0xc0, 0xdf)=ppaC0.data
-	// AM_RANGE(0xe0, 0xff)=ppaE0.data
+	// map(0x00, 0x1f)=ppa00.data
+	// map(0x20, 0x23)=dsk.data
+	// map(0x24, 0x24)=dsk.wait
+	// map(0x25, 0x25)=dskctl.data
+	// map(0x40, 0x5f)=ppa40.data
+	// map(0x60, 0x7f)=tim.data
+	// map(0x80, 0x81)=intctl.data
+	// map(0xa0, 0xa1)=comport.data
+	// map(0xc0, 0xdf)=ppaC0.data
+	// map(0xe0, 0xff)=ppaE0.data
 }
 
 void okean240_state::okean240t_io(address_map &map)
@@ -414,7 +414,7 @@ void okean240_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in okean240_state::device_timer");
+		throw emu_fatalerror("Unknown id in okean240_state::device_timer");
 	}
 }
 
@@ -513,6 +513,7 @@ void okean240_state::okean240t(machine_config &config)
 	I8080(config, m_maincpu, XTAL(12'000'000) / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &okean240_state::okean240_mem);
 	m_maincpu->set_addrmap(AS_IO, &okean240_state::okean240t_io);
+	m_maincpu->in_inta_func().set("pic", FUNC(pic8259_device::acknowledge));
 
 	i8251_device &uart(I8251(config, "uart", 0));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

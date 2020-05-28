@@ -9,6 +9,7 @@
 #ifndef MAME_INCLUDES_S11_H
 #define MAME_INCLUDES_S11_H
 
+#include "cpu/m6800/m6800.h"
 #include "audio/s11c_bg.h"
 #include "machine/6821pia.h"
 #include "machine/genpin.h"
@@ -55,22 +56,22 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
-	DECLARE_READ8_MEMBER(sound_r);
+	uint8_t sound_r();
 	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
+	void dig0_w(uint8_t data);
+	void dig1_w(uint8_t data);
+	void lamp0_w(uint8_t data);
+	void lamp1_w(uint8_t data) { };
+	void sol2_w(uint8_t data) { }; // solenoids 8-15
 	DECLARE_WRITE8_MEMBER(sol3_w); // solenoids 0-7
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void sound_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
-	DECLARE_WRITE8_MEMBER(pia34_pa_w);
-	DECLARE_WRITE8_MEMBER(pia34_pb_w);
+	void pia2c_pa_w(uint8_t data);
+	void pia2c_pb_w(uint8_t data);
+	void pia34_pa_w(uint8_t data);
+	void pia34_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia34_cb2_w);
-	DECLARE_WRITE8_MEMBER(pia40_pb_w);
+	void pia40_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
 
 	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
@@ -84,9 +85,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ8_MEMBER(pia28_w7_r);
+	uint8_t switch_r();
+	void switch_w(uint8_t data);
+	uint8_t pia28_w7_r();
 
 protected:
 	DECLARE_MACHINE_RESET(s11);
@@ -96,7 +97,7 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
+	optional_device<m6802_cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_bgcpu;
 	optional_device<hc55516_device> m_hc55516;
 	optional_device<pia6821_device> m_pias;

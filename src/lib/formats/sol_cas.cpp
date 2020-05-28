@@ -34,7 +34,7 @@ SVT - The full explanation may be found on the Solace web site,
 
 ********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "sol_cas.h"
 

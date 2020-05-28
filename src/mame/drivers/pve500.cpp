@@ -52,6 +52,7 @@
 #include "machine/cxd1095.h"
 #include "machine/eepromser.h"
 #include "machine/mb8421.h"
+#include "machine/z80sio.h"
 #include "sound/beep.h"
 #include "speaker.h"
 
@@ -87,13 +88,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(cxdio_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(external_monitor_w);
 
-	DECLARE_READ8_MEMBER(io_ky_r);
-	DECLARE_WRITE8_MEMBER(io_sc_w);
-	DECLARE_WRITE8_MEMBER(io_le_w);
-	DECLARE_WRITE8_MEMBER(io_ld_w);
-	DECLARE_WRITE8_MEMBER(io_sel_w);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
+	uint8_t io_ky_r();
+	void io_sc_w(uint8_t data);
+	void io_le_w(uint8_t data);
+	void io_ld_w(uint8_t data);
+	void io_sel_w(uint8_t data);
+	void eeprom_w(uint8_t data);
+	uint8_t eeprom_r();
 	void maincpu_io(address_map &map);
 	void maincpu_prg(address_map &map);
 	void subcpu_io(address_map &map);
@@ -138,7 +139,7 @@ static const z80_daisy_config maincpu_daisy_chain[] =
 
 void pve500_state::maincpu_io(address_map &map)
 {
-	map(0x00, 0x03).mirror(0xff00).rw("external_sio", FUNC(z80sio0_device::cd_ba_r), FUNC(z80sio0_device::cd_ba_w));
+	map(0x00, 0x03).mirror(0xff00).rw("external_sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x08, 0x0B).mirror(0xff00).rw("external_ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
@@ -281,19 +282,19 @@ WRITE_LINE_MEMBER(pve500_state::mb8421_intr)
 	m_subcpu->trg1(state);
 }
 
-READ8_MEMBER(pve500_state::eeprom_r)
+uint8_t pve500_state::eeprom_r()
 {
 	return (m_eeprom->ready_read() << 1) | m_eeprom->do_read();
 }
 
-WRITE8_MEMBER(pve500_state::eeprom_w)
+void pve500_state::eeprom_w(uint8_t data)
 {
 	m_eeprom->di_write( (data & (1 << 2)) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->clk_write( (data & (1 << 3)) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->cs_write( (data & (1 << 4)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(pve500_state::io_ky_r)
+uint8_t pve500_state::io_ky_r()
 {
 	io_KY = 0x00;
 	if (!BIT(io_SC, 0)) io_KY |= ioport("SCAN0")->read();
@@ -310,7 +311,7 @@ READ8_MEMBER(pve500_state::io_ky_r)
 	return io_KY;
 }
 
-WRITE8_MEMBER(pve500_state::io_sc_w)
+void pve500_state::io_sc_w(uint8_t data)
 {
 	const int swap[4] = {2,1,0,3};
 
@@ -331,7 +332,7 @@ WRITE8_MEMBER(pve500_state::io_sc_w)
 	}
 }
 
-WRITE8_MEMBER(pve500_state::io_le_w)
+void pve500_state::io_le_w(uint8_t data)
 {
 #if LOG_7SEG_DISPLAY_SIGNALS
 	printf("CXD1095 PORTB (io_LE=%02X)\n", data);
@@ -339,7 +340,7 @@ WRITE8_MEMBER(pve500_state::io_le_w)
 	io_LE = data;
 }
 
-WRITE8_MEMBER(pve500_state::io_ld_w)
+void pve500_state::io_ld_w(uint8_t data)
 {
 #if LOG_7SEG_DISPLAY_SIGNALS
 	printf("CXD1095 PORTD (io_LD=%02X)\n", data);
@@ -347,7 +348,7 @@ WRITE8_MEMBER(pve500_state::io_ld_w)
 	io_LD = data;
 }
 
-WRITE8_MEMBER(pve500_state::io_sel_w)
+void pve500_state::io_sel_w(uint8_t data)
 {
 #if LOG_7SEG_DISPLAY_SIGNALS
 	printf("CXD1095 PORTE (io_SEL=%02X)\n", data);
@@ -375,7 +376,7 @@ void pve500_state::pve500(machine_config &config)
 	z80ctc_device& ctc(Z80CTC(config, "external_ctc", 12_MHz_XTAL / 2));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	z80sio0_device& sio(Z80SIO0(config, "external_sio", 12_MHz_XTAL / 2));
+	z80sio_device& sio(Z80SIO(config, "external_sio", 12_MHz_XTAL / 2)); // TMPZ84C40AP-8
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	sio.out_txda_callback().set("player2", FUNC(rs232_port_device::write_txd));
 	sio.out_txdb_callback().set("edl_inout", FUNC(rs232_port_device::write_txd));
@@ -394,7 +395,7 @@ void pve500_state::pve500(machine_config &config)
 	m_subcpu->out_pa_callback().set(FUNC(pve500_state::eeprom_w));
 
 	// ICG3: I/O Expander
-	CXD1095(config, m_cxdio, 0);
+	CXD1095(config, m_cxdio);
 	m_cxdio->out_porta_cb().set(FUNC(pve500_state::io_sc_w));
 	m_cxdio->out_portb_cb().set(FUNC(pve500_state::io_le_w));
 	m_cxdio->in_portc_cb().set(FUNC(pve500_state::io_ky_r));
@@ -417,10 +418,10 @@ void pve500_state::pve500(machine_config &config)
 	player1.rxd_handler().set(m_maincpu, FUNC(tmpz84c015_device::rxb_w));
 
 	rs232_port_device &player2(RS232_PORT(config, "player2", default_rs232_devices, nullptr));
-	player2.rxd_handler().set("external_sio", FUNC(z80dart_device::rxa_w));
+	player2.rxd_handler().set("external_sio", FUNC(z80sio_device::rxa_w));
 
 	rs232_port_device &edl_inout(RS232_PORT(config, "edl_inout", default_rs232_devices, nullptr));
-	edl_inout.rxd_handler().set("external_sio", FUNC(z80dart_device::rxb_w));
+	edl_inout.rxd_handler().set("external_sio", FUNC(z80sio_device::rxb_w));
 
 	rs232_port_device &switcher(RS232_PORT(config, "switcher", default_rs232_devices, nullptr));
 	switcher.rxd_handler().set(m_subcpu, FUNC(tmpz84c015_device::rxa_w));

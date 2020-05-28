@@ -88,12 +88,11 @@ std::unique_ptr<util::disasm_interface> mb86233_device::create_disassembler()
 
 void mb86233_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache  = m_program->cache<2, -2, ENDIANNESS_LITTLE>();
-
-	m_data     = &space(AS_DATA);
-	m_io       = &space(AS_IO);
-	m_rf       = &space(AS_RF);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
+	space(AS_IO).specific(m_io);
+	space(AS_RF).specific(m_rf);
 
 	state_add(STATE_GENPC,     "GENPC", m_pc);
 	state_add(STATE_GENPCBASE, "PC",    m_ppc).noshow();
@@ -606,7 +605,7 @@ u32 mb86233_device::read_reg(u32 r)
 {
 	r &= 0x3f;
 	if(r >= 0x20 && r < 0x30)
-		return m_rf->read_dword(r & 0x1f);
+		return m_rf.read_dword(r & 0x1f);
 	switch(r) {
 	case 0x00: return m_b0;
 	case 0x01: return m_b1;
@@ -634,7 +633,7 @@ u32 mb86233_device::read_reg(u32 r)
 	case 0x34: return m_rpc;
 
 	default:
-		logerror("unimplemented read_reg(%02x)\n", r);
+		logerror("unimplemented read_reg(%02x) (%x)\n", r, m_ppc);
 		return 0;
 	}
 }
@@ -643,7 +642,7 @@ void mb86233_device::write_reg(u32 r, u32 v)
 {
 	r &= 0x3f;
 	if(r >= 0x20 && r < 0x30) {
-		m_rf->write_dword(r & 0x1f, v);
+		m_rf.write_dword(r & 0x1f, v);
 		return;
 	}
 	switch(r) {
@@ -696,7 +695,7 @@ void mb86233_device::write_reg(u32 r, u32 v)
 	case 0x3c: m_mask = v; break;
 
 	default:
-		logerror("unimplemented write_reg(%02x, %08x)\n", r, v);
+		logerror("unimplemented write_reg(%02x, %08x) (%x)\n", r, v, m_ppc);
 		break;
 	}
 }
@@ -706,14 +705,14 @@ void mb86233_device::write_mem_internal_1(u32 r, u32 v, bool bank)
 	u16 ea = ea_pre_1(r);
 	if(bank)
 		ea += 0x200;
-	m_data->write_dword(ea, v);
+	m_data.write_dword(ea, v);
 	ea_post_1(r);
 }
 
 void mb86233_device::write_mem_io_1(u32 r, u32 v)
 {
 	u16 ea = ea_pre_1(r);
-	m_io->write_dword(ea, v);
+	m_io.write_dword(ea, v);
 	ea_post_1(r);
 }
 
@@ -722,7 +721,7 @@ void mb86233_device::execute_run()
 	while(m_icount > 0) {
 		m_ppc = m_pc;
 		debugger_instruction_hook(m_ppc);
-		u32 opcode = m_cache->read_dword(m_pc++);
+		u32 opcode = m_cache.read_dword(m_pc++);
 
 		switch((opcode >> 26) & 0x3f) {
 		case 0x00: {
@@ -739,11 +738,11 @@ void mb86233_device::execute_run()
 				// lab mem, mem (e)
 
 				u32 ea1 = ea_pre_0(r1);
-				u32 v1 = m_data->read_dword(ea1);
+				u32 v1 = m_data.read_dword(ea1);
 				if(m_stall) goto do_stall;
 
 				u32 ea2 = ea_pre_1(r2);
-				u32 v2 = m_io->read_dword(ea2);
+				u32 v2 = m_io.read_dword(ea2);
 				if(m_stall) goto do_stall;
 
 				ea_post_0(r1);
@@ -758,11 +757,11 @@ void mb86233_device::execute_run()
 				// lab mem, mem + 0x200
 
 				u32 ea1 = ea_pre_0(r1);
-				u32 v1 = m_data->read_dword(ea1);
+				u32 v1 = m_data.read_dword(ea1);
 				if(m_stall) goto do_stall;
 
 				u32 ea2 = ea_pre_1(r2) + 0x200;
-				u32 v2 = m_data->read_dword(ea2);
+				u32 v2 = m_data.read_dword(ea2);
 				if(m_stall) goto do_stall;
 
 				ea_post_0(r1);
@@ -777,11 +776,11 @@ void mb86233_device::execute_run()
 				// lab mem + 0x200, mem
 
 				u32 ea1 = ea_pre_0(r1) + 0x200;
-				u32 v1 = m_data->read_dword(ea1);
+				u32 v1 = m_data.read_dword(ea1);
 				if(m_stall) goto do_stall;
 
 				u32 ea2 = ea_pre_1(r2);
-				u32 v2 = m_data->read_dword(ea2);
+				u32 v2 = m_data.read_dword(ea2);
 				if(m_stall) goto do_stall;
 
 				ea_post_0(r1);
@@ -817,7 +816,7 @@ void mb86233_device::execute_run()
 			case 0: {
 				// mov mem, mem (e)
 				u32 ea = ea_pre_0(r1);
-				u32 v = m_data->read_dword(ea);
+				u32 v = m_data.read_dword(ea);
 				if(m_stall) goto do_stall;
 				ea_post_0(r1);
 				write_mem_io_1(r2, v);
@@ -825,9 +824,9 @@ void mb86233_device::execute_run()
 			}
 
 			case 1: {
-				// mov mem + 0x200, mem (e)
-				u32 ea = ea_pre_0(r1) + 0x200*0;
-				u32 v = m_data->read_dword(ea);
+				// mov mem, mem (e)
+				u32 ea = ea_pre_0(r1);
+				u32 v = m_data.read_dword(ea);
 				if(m_stall) goto do_stall;
 				ea_post_0(r1);
 				write_mem_io_1(r2, v);
@@ -837,7 +836,7 @@ void mb86233_device::execute_run()
 			case 2: {
 				// mov mem (e), mem
 				u32 ea = ea_pre_0(r1);
-				u32 v = m_io->read_dword(ea);
+				u32 v = m_io.read_dword(ea);
 				if(m_stall) goto do_stall;
 				ea_post_0(r1);
 				write_mem_internal_1(r2, v, false);
@@ -847,7 +846,7 @@ void mb86233_device::execute_run()
 			case 3: {
 				// mov mem, mem + 0x200
 				u32 ea = ea_pre_0(r1);
-				u32 v = m_data->read_dword(ea);
+				u32 v = m_data.read_dword(ea);
 				if(m_stall) goto do_stall;
 				ea_post_0(r1);
 				write_mem_internal_1(r2, v, true);
@@ -857,7 +856,7 @@ void mb86233_device::execute_run()
 			case 4: {
 				// mov mem + 0x200, mem
 				u32 ea = ea_pre_0(r1) + 0x200;
-				u32 v = m_data->read_dword(ea);
+				u32 v = m_data.read_dword(ea);
 				if(m_stall) goto do_stall;
 				ea_post_0(r1);
 				write_mem_internal_1(r2, v, false);
@@ -867,7 +866,7 @@ void mb86233_device::execute_run()
 			case 5: {
 				// mov mem (o), mem
 				u32 ea = ea_pre_0(r1);
-				u32 v = m_program->read_dword(ea);
+				u32 v = m_program.read_dword(ea);
 				if(m_stall) goto do_stall;
 				ea_post_0(r1);
 				write_mem_internal_1(r2, v, false);
@@ -895,7 +894,7 @@ void mb86233_device::execute_run()
 				case 2: {
 					// mov mem + 0x200, reg
 					u32 ea = ea_pre_1(r1) + 0x200;
-					u32 v = m_data->read_dword(ea);
+					u32 v = m_data.read_dword(ea);
 					if(m_stall) goto do_stall;
 					ea_post_1(r1);
 					write_reg(r2, v);
@@ -905,7 +904,7 @@ void mb86233_device::execute_run()
 				case 3: {
 					// mov mem, reg
 					u32 ea = ea_pre_1(r1);
-					u32 v = m_data->read_dword(ea);
+					u32 v = m_data.read_dword(ea);
 					if(m_stall) goto do_stall;
 					ea_post_1(r1);
 					write_reg(r2, v);
@@ -915,7 +914,7 @@ void mb86233_device::execute_run()
 				case 4: {
 					// mov mem (e), reg
 					u32 ea = ea_pre_1(r1);
-					u32 v = m_io->read_dword(ea);
+					u32 v = m_io.read_dword(ea);
 					if(m_stall) goto do_stall;
 					ea_post_1(r1);
 					write_reg(r2, v);
@@ -925,7 +924,7 @@ void mb86233_device::execute_run()
 				case 5: {
 					// mov mem (o), reg
 					u32 ea = ea_pre_0(r1);
-					u32 v = m_program->read_dword(ea);
+					u32 v = m_program.read_dword(ea);
 					if(m_stall) goto do_stall;
 					ea_post_0(r1);
 					write_reg(r2, v);
@@ -941,14 +940,14 @@ void mb86233_device::execute_run()
 				}
 
 				default:
-					logerror("unhandler ld/mov subop 7/%x\n", r2 >> 6);
+					logerror("unhandled ld/mov subop 7/%x (%x)\n", r2 >> 6, m_ppc);
 					break;
 				}
 				break;
 			}
 
 			default:
-				logerror("unhandler ld/mov subop %x\n", op);
+				logerror("unhandled ld/mov subop %x (%x)\n", op, m_ppc);
 				break;
 			}
 
@@ -971,7 +970,7 @@ void mb86233_device::execute_run()
 				break;
 
 			default:
-				logerror("unimplemented opcode 0d/%x\n", sub2);
+				logerror("unimplemented opcode 0d/%x (%x)\n", sub2, m_ppc);
 				break;
 			}
 			break;
@@ -1030,7 +1029,7 @@ void mb86233_device::execute_run()
 				break;
 
 			default:
-				logerror("unimplemented opcode 0f/%x\n", sub2);
+				logerror("unimplemented opcode 0f/%x (%x)\n", sub2, m_ppc);
 				break;
 			}
 
@@ -1096,7 +1095,7 @@ void mb86233_device::execute_run()
 				break;
 
 			default:
-				logerror("unimplemented condition %x\n", cond);
+				logerror("unimplemented condition %x (%x)\n", cond, m_ppc);
 				break;
 			}
 			if(invert)
@@ -1117,7 +1116,7 @@ void mb86233_device::execute_run()
 					} else {
 						// brul adr
 						u32 ea = ea_pre_0(opcode);
-						u32 v = m_data->read_dword(ea);
+						u32 v = m_data.read_dword(ea);
 						if(m_stall) goto do_stall;
 						ea_post_0(opcode);
 						m_pc = v;
@@ -1139,7 +1138,7 @@ void mb86233_device::execute_run()
 					} else {
 						// bsul adr
 						u32 ea = ea_pre_0(opcode);
-						u32 v = m_data->read_dword(ea);
+						u32 v = m_data.read_dword(ea);
 						if(m_stall) goto do_stall;
 						ea_post_0(opcode);
 						pcs_push();
@@ -1153,7 +1152,7 @@ void mb86233_device::execute_run()
 
 				case 6: { // ldif adr, rn
 					u32 ea = ea_pre_0(opcode);
-					u32 v = m_data->read_dword(ea);
+					u32 v = m_data.read_dword(ea);
 					if(m_stall) goto do_stall;
 					ea_post_0(opcode);
 					write_reg(opcode >> 9, v);
@@ -1161,7 +1160,7 @@ void mb86233_device::execute_run()
 				}
 
 				default:
-					logerror("unimplemented branch subtype %x\n", subtype);
+					logerror("unimplemented branch subtype %x (%x)\n", subtype, m_ppc);
 					break;
 				}
 			}
@@ -1189,7 +1188,7 @@ void mb86233_device::execute_run()
 		}
 
 		default:
-			logerror("unimplemented opcode type %02x\n", (opcode >> 26) & 0x3f);
+			logerror("unimplemented opcode type %02x (%x)\n", (opcode >> 26) & 0x3f, m_ppc);
 			break;
 		}
 

@@ -300,7 +300,7 @@ void suprslam_state::suprslam(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 0x800);
 
 	VSYSTEM_SPR(config, m_spr, 0);
-	m_spr->set_tile_indirect_cb(FUNC(suprslam_state::suprslam_tile_callback), this);
+	m_spr->set_tile_indirect_cb(FUNC(suprslam_state::suprslam_tile_callback));
 	m_spr->set_gfx_region(1);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 

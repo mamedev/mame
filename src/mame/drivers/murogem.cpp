@@ -161,7 +161,6 @@ WRITE8_MEMBER(murogem_state::outport_w)
 
 void murogem_state::murogem_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x4000, 0x4000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x4001, 0x4001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x5000, 0x5000).portr("IN0");

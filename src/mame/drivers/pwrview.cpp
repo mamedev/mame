@@ -11,7 +11,7 @@
 #include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/i8251.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/pit8253.h"
 #include "machine/bankdev.h"
 #include "screen.h"
@@ -392,7 +392,7 @@ void pwrview_state::pwrview_io(address_map &map)
 	map(0xc08a, 0xc08a).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0xc280, 0xc287).rw(FUNC(pwrview_state::unk3_r), FUNC(pwrview_state::unk3_w)).umask16(0x00ff);
 	map(0xc288, 0xc28f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0xc2a0, 0xc2a7).rw("sio", FUNC(z80sio2_device::cd_ba_r), FUNC(z80sio2_device::cd_ba_w)).umask16(0x00ff);
+	map(0xc2a0, 0xc2a7).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
 	map(0xc2c0, 0xc2c3).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xc2e0, 0xc2e3).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0xc2e4, 0xc2e5).ram();
@@ -429,17 +429,17 @@ void pwrview_state::pwrview(machine_config &config)
 
 	I8251(config, "uart", 0);
 
-	Z80SIO2(config, "sio", 4000000);
+	Z80SIO(config, "sio", 4000000); // Z8442BPS (SIO/2)
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(64'000'000)/64)); // clock unknown
 	crtc.set_char_width(32);   /* ? */
-	crtc.set_update_row_callback(FUNC(pwrview_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(pwrview_state::update_row));
 
 	ADDRESS_MAP_BANK(config, "bios_bank").set_map(&pwrview_state::bios_bank).set_options(ENDIANNESS_LITTLE, 16, 17, 0x8000);
 }
 
 ROM_START(pwrview)
-	ROM_REGION(0x8000, "bios", 0)
+	ROM_REGION16_LE(0x8000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "bios", "bios")
 	ROMX_LOAD("215856-003.bin", 0x0000, 0x4000, CRC(1fa2cd11) SHA1(b4755c7d5200a423a750ecf71c0aed33e364138b), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("215856-004.bin", 0x0001, 0x4000, CRC(4fd01e0a) SHA1(c4d1d40d4e8e529c03857f4a3c8428ccf6b8ff99), ROM_SKIP(1) | ROM_BIOS(0))

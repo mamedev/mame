@@ -12,17 +12,15 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6800/m6801.h"
+#include "imagedev/floppy.h"
 #include "machine/6850acia.h"
 #include "machine/am25s55x.h"
+#include "machine/am2901b.h"
 #include "machine/am2910.h"
 #include "machine/com8116.h"
+#include "machine/fdc_pll.h"
 #include "machine/input_merger.h"
 #include "machine/tdc1008.h"
-#include "video/dpb_brushproc.h"
-#include "video/dpb_brushstore.h"
-#include "video/dpb_combiner.h"
-#include "video/dpb_framestore.h"
-#include "video/dpb_storeaddr.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -37,10 +35,15 @@
 #define LOG_FDC_CTRL        (1 << 6)
 #define LOG_FDC_PORT        (1 << 7)
 #define LOG_FDC_CMD         (1 << 8)
-#define LOG_OUTPUT_TIMING   (1 << 9)
-#define LOG_BRUSH_ADDR      (1 << 10)
-#define LOG_ALL             (LOG_UNKNOWN | LOG_UCODE | LOG_MORE_UCODE | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | \
-							 LOG_OUTPUT_TIMING | LOG_BRUSH_ADDR)
+#define LOG_FDC_MECH		(1 << 9)
+#define LOG_OUTPUT_TIMING   (1 << 10)
+#define LOG_BRUSH_ADDR      (1 << 11)
+#define LOG_STORE_ADDR		(1 << 12)
+#define LOG_COMBINER		(1 << 13)
+#define LOG_SIZE_CARD		(1 << 14)
+#define LOG_FILTER_CARD		(1 << 15)
+#define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_ADDR | \
+							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD)
 
 #define VERBOSE             (LOG_ALL &~ LOG_FDC_CTRL)
 #include "logmacro.h"
@@ -68,15 +71,16 @@ public:
 		, m_diskseq_prom(*this, "diskseq_prom")
 		, m_fddcpu(*this, "fddcpu")
 		, m_fdd_serial(*this, "fddserial")
-		, m_filter_cd(*this, "filter_cd")
-		, m_filter_ce(*this, "filter_ce")
-		, m_filter_cf(*this, "filter_cf")
-		, m_filter_cg(*this, "filter_cg")
-		, m_store_addr(*this, "store_addr%u", 0U)
-		, m_brush_proc(*this, "brush_proc%u", 0U)
-		, m_brush_store(*this, "brush_store")
-		, m_combiner(*this, "combiner")
-		, m_framestore(*this, "framestore%u", 0U)
+		, m_floppy0(*this, "0")
+		, m_floppy(nullptr)
+		, m_filter_signalprom(*this, "filter_signalprom")
+		, m_filter_multprom(*this, "filter_multprom")
+		, m_filter_signal(nullptr)
+		, m_filter_mult(nullptr)
+		, m_size_yl(*this, "filter_de")
+		, m_size_yh(*this, "filter_df")
+		, m_size_xl(*this, "filter_dg")
+		, m_size_xh(*this, "filter_dh")
 	{
 	}
 
@@ -87,31 +91,38 @@ private:
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	static constexpr device_timer_id TIMER_DISKSEQ = 0;
+	template <int StoreNum> uint32_t store_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	static constexpr device_timer_id TIMER_DISKSEQ_COMPLETE = 0;
 	static constexpr device_timer_id TIMER_FIELD_IN = 1;
 	static constexpr device_timer_id TIMER_FIELD_OUT = 2;
 
 	void main_map(address_map &map);
 	void fddcpu_map(address_map &map);
 
-	DECLARE_READ16_MEMBER(bus_error_r);
-	DECLARE_WRITE16_MEMBER(bus_error_w);
+	uint16_t bus_error_r(offs_t offset);
+	void bus_error_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE8_MEMBER(csr_w);
-	DECLARE_READ8_MEMBER(csr_r);
+	void csr_w(uint8_t data);
+	uint8_t csr_r();
 
-	DECLARE_READ16_MEMBER(cpu_ctrlbus_r);
-	DECLARE_WRITE16_MEMBER(cpu_ctrlbus_w);
+	uint16_t cpu_ctrlbus_r();
+	void cpu_ctrlbus_w(uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(req_a_w);
 	DECLARE_WRITE_LINE_MEMBER(req_b_w);
 
-	DECLARE_READ8_MEMBER(fdd_ctrl_r);
-	DECLARE_READ8_MEMBER(fdd_cmd_r);
-	DECLARE_WRITE8_MEMBER(fddcpu_p1_w);
-	DECLARE_READ8_MEMBER(fddcpu_p2_r);
-	DECLARE_WRITE8_MEMBER(fddcpu_p2_w);
+	void fdd_index_callback(floppy_image_device *floppy, int state);
+	uint8_t fdd_ctrl_r();
+	uint8_t fdd_cmd_r();
+	void fddcpu_p1_w(uint8_t data);
+	uint8_t fddcpu_p2_r();
+	void fddcpu_p2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fddcpu_debug_rx);
+
+	void handle_command(uint16_t data);
+	void store_address_w(uint8_t card, uint16_t data);
+	void combiner_reg_w(uint16_t data);
 
 	enum : uint16_t
 	{
@@ -122,14 +133,14 @@ private:
 		SYSCTRL_REQ_B_IN        = 0x8000
 	};
 
-	DECLARE_READ16_MEMBER(cpu_sysctrl_r);
-	DECLARE_WRITE16_MEMBER(cpu_sysctrl_w);
+	uint16_t cpu_sysctrl_r();
+	void cpu_sysctrl_w(uint16_t data);
 	void update_req_irqs();
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr_changed);
 
-	DECLARE_WRITE16_MEMBER(diskseq_y_w);
+	void diskseq_y_w(uint16_t data);
 	void diskseq_tick();
 
 	required_device<m68000_base_device> m_maincpu;
@@ -154,25 +165,18 @@ private:
 	required_device<m6803_cpu_device> m_fddcpu;
 	required_device<rs232_port_device> m_fdd_serial;
 	std::deque<int> m_fdd_debug_rx_bits;
-	size_t m_fdd_debug_rx_bit_count;
-	size_t m_fdd_debug_rx_byte_count;
-	size_t m_fdd_debug_rx_recv_count;
+	uint32_t m_fdd_debug_rx_bit_count;
+	uint32_t m_fdd_debug_rx_byte_count;
+	uint32_t m_fdd_debug_rx_recv_count;
 	uint8_t m_fdd_ctrl;
 	uint8_t m_fdd_port1;
 	uint8_t m_fdd_track;
+	fdc_pll_t m_fdd_pll;
 
-	required_device<tdc1008_device> m_filter_cd;
-	required_device<tdc1008_device> m_filter_ce;
-	required_device<tdc1008_device> m_filter_cf;
-	required_device<tdc1008_device> m_filter_cg;
+	required_device<floppy_connector> m_floppy0;
+	floppy_image_device *m_floppy;
 
-	required_device_array<dpb7000_storeaddr_card_device, 2> m_store_addr;
-	required_device_array<dpb7000_brushproc_card_device, 2> m_brush_proc;
-	required_device<dpb7000_brush_store_card_device> m_brush_store;
-	required_device<dpb7000_combiner_card_device> m_combiner;
-	required_device_array<dpb7000_framestore_card_device, 6> m_framestore;
-
-	emu_timer *m_diskseq_clk;
+	emu_timer *m_diskseq_complete_clk;
 	emu_timer *m_field_in_clk;
 	emu_timer *m_field_out_clk;
 
@@ -235,6 +239,12 @@ private:
 	uint8_t m_diskseq_status_out;       // BC
 	uint8_t m_diskseq_ucode_latch[7];   // GG/GF/GE/GD/GC/GB/GA
 	uint8_t m_diskseq_cc_inputs[4];     // Inputs to FE/FD/FC/FB
+	bool m_diskseq_cyl_read_pending;
+
+	// Disc Data Buffer Card
+	uint16_t m_diskbuf_ram_addr;
+	uint8_t m_diskbuf_ram[14 * 0x800];
+	uint16_t m_diskbuf_data_count;
 
 	// Output Timing Card
 	uint16_t m_cursor_origin_x;
@@ -247,10 +257,64 @@ private:
 	uint8_t m_bif;
 	uint8_t m_bixos;
 	uint8_t m_biyos;
-	uint8_t m_bxlen;
-	uint8_t m_bylen;
+	uint16_t m_bxlen;
+	uint16_t m_bylen;
+	uint16_t m_bxlen_counter;
+	uint16_t m_bylen_counter;
 	uint8_t m_plum;
 	uint8_t m_pchr;
+	std::unique_ptr<uint8_t[]> m_framestore_chr[2];
+	std::unique_ptr<uint8_t[]> m_framestore_lum[2];
+	std::unique_ptr<uint8_t[]> m_framestore_ext[2];
+
+	// Brush Store Card
+	uint8_t m_bs_y_latch;
+	uint8_t m_bs_u_latch;
+	uint8_t m_bs_v_latch;
+	std::unique_ptr<uint8_t[]> m_brushstore_chr;
+	std::unique_ptr<uint8_t[]> m_brushstore_lum;
+	std::unique_ptr<uint8_t[]> m_brushstore_ext;
+
+	// Store Address Card
+	uint16_t m_rhscr[2];
+	uint16_t m_rvscr[2];
+	uint16_t m_rzoom[2];
+	uint16_t m_fld_sel[2];
+	uint16_t m_window_enable[2];
+	uint16_t m_cxpos[2];
+	uint16_t m_cypos[2];
+	uint16_t m_ca0;
+
+	// Combiner Card
+	uint8_t m_cursor_y;
+	uint8_t m_cursor_u;
+	uint8_t m_cursor_v;
+	uint8_t m_invert_mask;
+	bool m_select_matte[2];
+	uint8_t m_matte_ext[2];
+	uint8_t m_matte_y[2];
+	uint8_t m_matte_u[2];
+	uint8_t m_matte_v[2];
+
+	// Filter Card
+	required_memory_region m_filter_signalprom;
+	required_memory_region m_filter_multprom;
+	uint8_t *m_filter_signal;
+	uint8_t *m_filter_mult;
+	uint8_t m_filter_acbc[16];
+	uint8_t m_filter_abbb[16];
+
+	// Size Card
+	required_device<am2901b_device> m_size_yl;
+	required_device<am2901b_device> m_size_yh;
+	required_device<am2901b_device> m_size_xl;
+	required_device<am2901b_device> m_size_xh;
+
+	uint8_t m_size_h;
+	uint8_t m_size_v;
+
+	// Utility
+	std::unique_ptr<uint32_t[]> m_yuv_lut;
 };
 
 void dpb7000_state::main_map(address_map &map)
@@ -357,49 +421,49 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
 	PORT_START("CONFIGSW34")
-	PORT_DIPNAME( 0x0003, 0x0003, "Disc Group 1 Count" )
+	PORT_DIPNAME( 0x0003, 0x0003, "Disc Group 0 Count" )
 	PORT_DIPSETTING(    0x0003, "One" )
 	PORT_DIPSETTING(    0x0002, "Two" )
 	PORT_DIPSETTING(    0x0001, "Three" )
 	PORT_DIPSETTING(    0x0000, "Four" )
-	PORT_DIPNAME( 0x001c, 0x001c, "Disc Group 0 Type" )
-	PORT_DIPSETTING(    0x001c, "160Mb CDC Fixed" )
-	PORT_DIPSETTING(    0x0018, "80Mb CDC Removable" )
-	PORT_DIPSETTING(    0x0014, "NTSC/Floppy/PAL/Conv" )
-	PORT_DIPSETTING(    0x0010, "Floppy Disc" )
-	PORT_DIPSETTING(    0x000c, "80Mb Fujitsu" )
-	PORT_DIPSETTING(    0x0008, "330Mb Fujitsu" )
-	PORT_DIPSETTING(    0x0004, "160Mb Fujitsu" )
-	PORT_DIPSETTING(    0x0000, "Unsupported" )
+	PORT_DIPNAME( 0x001c, 0x0018, "Disc Group 0 Type" )
+	PORT_DIPSETTING(    0x001c, "None" )
+	PORT_DIPSETTING(    0x0018, "160Mb Fujitsu" )
+	PORT_DIPSETTING(    0x0014, "330Mb Fujitsu" )
+	PORT_DIPSETTING(    0x0010, "80Mb Fujitsu" )
+	PORT_DIPSETTING(    0x000c, "Floppy Disc" )
+	PORT_DIPSETTING(    0x0008, "NTSC/Floppy/PAL/Conv" )
+	PORT_DIPSETTING(    0x0004, "80Mb CDC Removable" )
+	PORT_DIPSETTING(    0x0000, "160Mb CDC Fixed" )
 	PORT_DIPNAME( 0x0060, 0x0060, "Disc Group 1 Count" )
 	PORT_DIPSETTING(    0x0060, "One" )
 	PORT_DIPSETTING(    0x0040, "Two" )
 	PORT_DIPSETTING(    0x0020, "Three" )
 	PORT_DIPSETTING(    0x0000, "Four" )
-	PORT_DIPNAME( 0x0380, 0x0380, "Disc Group 1 Type" )
-	PORT_DIPSETTING(    0x0380, "160Mb CDC Fixed" )
-	PORT_DIPSETTING(    0x0300, "80Mb CDC Removable" )
-	PORT_DIPSETTING(    0x0280, "NTSC/Floppy/PAL/Conv" )
-	PORT_DIPSETTING(    0x0200, "Floppy Disc" )
-	PORT_DIPSETTING(    0x0180, "80Mb Fujitsu" )
-	PORT_DIPSETTING(    0x0100, "330Mb Fujitsu" )
-	PORT_DIPSETTING(    0x0080, "160Mb Fujitsu" )
-	PORT_DIPSETTING(    0x0000, "Unsupported" )
+	PORT_DIPNAME( 0x0380, 0x0180, "Disc Group 1 Type" )
+	PORT_DIPSETTING(    0x0380, "None" )
+	PORT_DIPSETTING(    0x0300, "160Mb Fujitsu" )
+	PORT_DIPSETTING(    0x0280, "330Mb Fujitsu" )
+	PORT_DIPSETTING(    0x0200, "80Mb Fujitsu" )
+	PORT_DIPSETTING(    0x0180, "Floppy Disc" )
+	PORT_DIPSETTING(    0x0100, "NTSC/Floppy/PAL/Conv" )
+	PORT_DIPSETTING(    0x0080, "80Mb CDC Removable" )
+	PORT_DIPSETTING(    0x0000, "160Mb CDC Fixed" )
 	PORT_DIPNAME( 0x0c00, 0x0c00, "Disc Group 2 Count" )
 	PORT_DIPSETTING(    0x0c00, "One" )
 	PORT_DIPSETTING(    0x0800, "Two" )
 	PORT_DIPSETTING(    0x0400, "Three" )
 	PORT_DIPSETTING(    0x0000, "Four" )
 	PORT_DIPNAME( 0x7000, 0x7000, "Disc Group 2 Type" )
-	PORT_DIPSETTING(    0x7000, "160Mb CDC Fixed" )
-	PORT_DIPSETTING(    0x6000, "80Mb CDC Removable" )
-	PORT_DIPSETTING(    0x5000, "NTSC/Floppy/PAL/Conv" )
-	PORT_DIPSETTING(    0x4000, "Floppy Disc" )
-	PORT_DIPSETTING(    0x3000, "80Mb Fujitsu" )
-	PORT_DIPSETTING(    0x2000, "330Mb Fujitsu" )
-	PORT_DIPSETTING(    0x1000, "160Mb Fujitsu" )
-	PORT_DIPSETTING(    0x0000, "Unsupported" )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x7000, "None" )
+	PORT_DIPSETTING(    0x6000, "160Mb Fujitsu" )
+	PORT_DIPSETTING(    0x5000, "330Mb Fujitsu" )
+	PORT_DIPSETTING(    0x4000, "80Mb Fujitsu" )
+	PORT_DIPSETTING(    0x3000, "Floppy Disc" )
+	PORT_DIPSETTING(    0x2000, "NTSC/Floppy/PAL/Conv" )
+	PORT_DIPSETTING(    0x1000, "80Mb CDC Removable" )
+	PORT_DIPSETTING(    0x0000, "160Mb CDC Fixed" )
+	PORT_DIPNAME( 0x8000, 0x8000, "Start Up In Dialogue" )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -431,6 +495,11 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_diskseq_status_out));
 	save_item(NAME(m_diskseq_ucode_latch));
 	save_item(NAME(m_diskseq_cc_inputs));
+	save_item(NAME(m_diskseq_cyl_read_pending));
+	m_diskseq_complete_clk = timer_alloc(TIMER_DISKSEQ_COMPLETE);
+	m_diskseq_complete_clk->adjust(attotime::never);
+
+	// Floppy Disc Controller Card
 	save_item(NAME(m_fdd_debug_rx_bit_count));
 	save_item(NAME(m_fdd_debug_rx_byte_count));
 	save_item(NAME(m_fdd_debug_rx_recv_count));
@@ -438,8 +507,10 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_fdd_port1));
 	save_item(NAME(m_fdd_track));
 
-	m_diskseq_clk = timer_alloc(TIMER_DISKSEQ);
-	m_diskseq_clk->adjust(attotime::never);
+	// Disc Data Buffer Card
+	save_item(NAME(m_diskbuf_ram_addr));
+	save_item(NAME(m_diskbuf_ram));
+	save_item(NAME(m_diskbuf_data_count));
 
 	// Output Timing Card
 	save_item(NAME(m_cursor_origin_x));
@@ -454,8 +525,84 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_biyos));
 	save_item(NAME(m_bxlen));
 	save_item(NAME(m_bylen));
+	save_item(NAME(m_bxlen_counter));
+	save_item(NAME(m_bylen_counter));
 	save_item(NAME(m_plum));
 	save_item(NAME(m_pchr));
+
+	// Frame Store Cards, 640x1024
+	for (int i = 0; i < 2; i++)
+	{
+		m_framestore_chr[i] = std::make_unique<uint8_t[]>(10 * 0x10000);
+		m_framestore_lum[i] = std::make_unique<uint8_t[]>(10 * 0x10000);
+		m_framestore_ext[i] = std::make_unique<uint8_t[]>(10 * 0x10000);
+	}
+	save_pointer(&m_framestore_chr[0][0], "m_framestore_chr[0]", 10 * 0x10000);
+	save_pointer(&m_framestore_lum[0][0], "m_framestore_lum[0]", 10 * 0x10000);
+	save_pointer(&m_framestore_ext[0][0], "m_framestore_ext[0]", 10 * 0x10000);
+	save_pointer(&m_framestore_chr[1][0], "m_framestore_chr[1]", 10 * 0x10000);
+	save_pointer(&m_framestore_lum[1][0], "m_framestore_lum[1]", 10 * 0x10000);
+	save_pointer(&m_framestore_ext[1][0], "m_framestore_ext[1]", 10 * 0x10000);
+
+	// Brush Store Card
+	save_item(NAME(m_bs_y_latch));
+	save_item(NAME(m_bs_u_latch));
+	save_item(NAME(m_bs_v_latch));
+	m_brushstore_chr = std::make_unique<uint8_t[]>(0x10000);
+	m_brushstore_lum = std::make_unique<uint8_t[]>(0x10000);
+	m_brushstore_ext = std::make_unique<uint8_t[]>(0x10000);
+	save_pointer(&m_brushstore_chr[0], "m_brushstore_chr", 0x10000);
+	save_pointer(&m_brushstore_lum[0], "m_brushstore_lum", 0x10000);
+	save_pointer(&m_brushstore_ext[0], "m_brushstore_ext", 0x10000);
+
+	// Store Address Cards
+	save_item(NAME(m_rhscr));
+	save_item(NAME(m_rvscr));
+	save_item(NAME(m_rzoom));
+	save_item(NAME(m_fld_sel));
+	save_item(NAME(m_window_enable));
+	save_item(NAME(m_cxpos));
+	save_item(NAME(m_cypos));
+	save_item(NAME(m_ca0));
+
+	// Combiner Card
+	save_item(NAME(m_cursor_y));
+	save_item(NAME(m_cursor_u));
+	save_item(NAME(m_cursor_v));
+	save_item(NAME(m_invert_mask));
+	save_item(NAME(m_select_matte));
+	save_item(NAME(m_matte_ext));
+	save_item(NAME(m_matte_y));
+	save_item(NAME(m_matte_u));
+	save_item(NAME(m_matte_v));
+
+	// Size Card
+	save_item(NAME(m_size_h));
+	save_item(NAME(m_size_v));
+
+	// Filter Card
+	m_filter_signal = m_filter_signalprom->base();
+	m_filter_mult = m_filter_multprom->base();
+	save_item(NAME(m_filter_acbc));
+	save_item(NAME(m_filter_abbb));
+
+	m_yuv_lut = std::make_unique<uint32_t[]>(0x1000000);
+	for (uint16_t u = 0; u < 256; u++)
+	{
+		for (uint16_t v = 0; v < 256; v++)
+		{
+			for (uint16_t y = 0; y < 256; y++)
+			{
+				float fr = y + 1.4075f * (v - 128);
+				float fg = y - 0.3455f * (u - 128) - (0.7169f * (v - 128));
+				float fb = y + 1.7790f * (u - 128);
+				uint8_t r = (fr < 0.0f) ? 0 : (fr > 255.0f ? 255 : (uint8_t)fr);
+				uint8_t g = (fg < 0.0f) ? 0 : (fg > 255.0f ? 255 : (uint8_t)fg);
+				uint8_t b = (fb < 0.0f) ? 0 : (fb > 255.0f ? 255 : (uint8_t)fb);
+				m_yuv_lut[(u << 16) | (v << 8) | y] = 0xff000000 | (r << 16) | (g << 8) | b;
+			}
+		}
+	}
 }
 
 void dpb7000_state::machine_reset()
@@ -480,13 +627,13 @@ void dpb7000_state::machine_reset()
 	m_diskseq_cyl_to_ctrl = 0;
 	m_diskseq_cmd_to_ctrl = 0;
 	m_diskseq_status_in = 0;
-	m_diskseq_status_out = 0;
+	m_diskseq_status_out = 0xff;
 	memset(m_diskseq_ucode_latch, 0, 7);
 	memset(m_diskseq_cc_inputs, 0, 4);
+	m_diskseq_cyl_read_pending = false;
+	m_diskseq_complete_clk->adjust(attotime::never);
 
-	m_diskseq_clk->adjust(attotime::from_hz(1000000), 0, attotime::from_hz(1000000));
-
-	// Floppy Disc Controller
+	// Floppy Disc Controller Card
 	m_fdd_debug_rx_bits.clear();
 	m_fdd_debug_rx_bit_count = 0;
 	m_fdd_debug_rx_byte_count = 0;
@@ -494,16 +641,20 @@ void dpb7000_state::machine_reset()
 	m_fdd_ctrl = 0;
 	m_fdd_port1 = 0;
 	m_fdd_track = 20;
+	m_fdd_pll.set_clock(attotime::from_hz(1000000));
+	m_fdd_pll.reset(machine().time());
+	m_floppy = nullptr;
+
+	// Disc Data Buffer Card
+	m_diskbuf_ram_addr = 0;
+	memset(m_diskbuf_ram, 0, 14 * 0x800);
+	m_diskbuf_data_count = 0;
 
 	// Output Timing Card
 	m_cursor_origin_x = 0;
 	m_cursor_origin_y = 0;
 	m_cursor_size_x = 0;
 	m_cursor_size_y = 0;
-
-	// Store Address Card
-	m_store_addr[0]->s_type_w(0);
-	m_store_addr[1]->s_type_w(1);
 
 	// Brush Address Card
 	m_brush_addr_func = 0;
@@ -512,14 +663,61 @@ void dpb7000_state::machine_reset()
 	m_biyos = 0;
 	m_bxlen = 0;
 	m_bylen = 0;
+	m_bxlen_counter = 0;
+	m_bylen_counter = 0;
 	m_plum = 0;
 	m_pchr = 0;
+
+	// Frame Store Cards, 640x1024
+	for (int i = 0; i < 2; i++)
+	{
+		memset(&m_framestore_chr[i][0], 0, 10 * 0x10000);
+		memset(&m_framestore_lum[i][0], 0, 10 * 0x10000);
+		memset(&m_framestore_ext[i][0], 0, 10 * 0x10000);
+	}
+
+	// Brush Store Card
+	m_bs_y_latch = 0;
+	m_bs_u_latch = 0;
+	m_bs_v_latch = 0;
+	memset(&m_brushstore_chr[0], 0, 0x10000);
+	memset(&m_brushstore_lum[0], 0, 0x10000);
+	memset(&m_brushstore_ext[0], 0, 0x10000);
+
+	// Store Address Card
+	memset(m_rhscr, 0, sizeof(uint16_t) * 2);
+	memset(m_rvscr, 0, sizeof(uint16_t) * 2);
+	memset(m_rzoom, 0, sizeof(uint16_t) * 2);
+	memset(m_fld_sel, 0, sizeof(uint16_t) * 2);
+	memset(m_window_enable, 0, sizeof(uint16_t) * 2);
+	memset(m_cxpos, 0, sizeof(uint16_t) * 2);
+	memset(m_cypos, 0, sizeof(uint16_t) * 2);
+	m_ca0 = 0;
+
+	// Combiner Card
+	m_cursor_y = 0;
+	m_cursor_u = 0;
+	m_cursor_v = 0;
+	m_invert_mask = 0;
+	memset(m_select_matte, 0, 2);
+	memset(m_matte_ext, 0, 2);
+	memset(m_matte_y, 0, 2);
+	memset(m_matte_u, 0, 2);
+	memset(m_matte_v, 0, 2);
+
+	// Filter Card
+	memset(m_filter_acbc, 0, 16);
+	memset(m_filter_abbb, 0, 16);
+
+	// Size Card
+	m_size_h = 0;
+	m_size_v = 0;
 }
 
 void dpb7000_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (id == TIMER_DISKSEQ)
-		diskseq_tick();
+	if (id == TIMER_DISKSEQ_COMPLETE)
+		req_b_w(1);
 	else if (id == TIMER_FIELD_IN)
 		req_a_w(1);
 	else if (id == TIMER_FIELD_OUT)
@@ -558,7 +756,8 @@ MC6845_ON_UPDATE_ADDR_CHANGED(dpb7000_state::crtc_addr_changed)
 {
 }
 
-WRITE16_MEMBER(dpb7000_state::diskseq_y_w)
+// NOTE: This function is not used, but is retained in the event we wish for low-level disk sequencer emulation.
+void dpb7000_state::diskseq_y_w(uint16_t data)
 {
 	uint8_t old_prom_latch[7];
 	memcpy(old_prom_latch, m_diskseq_ucode_latch, 7);
@@ -723,6 +922,7 @@ WRITE16_MEMBER(dpb7000_state::diskseq_y_w)
 	}
 }
 
+// NOTE: This function is not used, but is retained in the event we wish for low-level disk sequencer emulation.
 void dpb7000_state::diskseq_tick()
 {
 	m_diskseq_cp = (m_diskseq_cp ? 0 : 1);
@@ -734,7 +934,7 @@ void dpb7000_state::diskseq_tick()
 	}
 }
 
-READ16_MEMBER(dpb7000_state::bus_error_r)
+uint16_t dpb7000_state::bus_error_r(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -745,7 +945,7 @@ READ16_MEMBER(dpb7000_state::bus_error_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(dpb7000_state::bus_error_w)
+void dpb7000_state::bus_error_w(offs_t offset, uint16_t data)
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -755,19 +955,19 @@ WRITE16_MEMBER(dpb7000_state::bus_error_w)
 	}
 }
 
-WRITE8_MEMBER(dpb7000_state::csr_w)
+void dpb7000_state::csr_w(uint8_t data)
 {
 	LOGMASKED(LOG_CSR, "%s: Card Select write: %02x\n", machine().describe_context(), data & 0x0f);
 	m_csr = data & 0x0f;
 }
 
-READ8_MEMBER(dpb7000_state::csr_r)
+uint8_t dpb7000_state::csr_r()
 {
 	LOGMASKED(LOG_CSR, "%s: Card Select read(?): %02x\n", machine().describe_context(), m_csr);
 	return m_csr;
 }
 
-READ16_MEMBER(dpb7000_state::cpu_ctrlbus_r)
+uint16_t dpb7000_state::cpu_ctrlbus_r()
 {
 	uint16_t ret = 0;
 	switch (m_csr)
@@ -779,6 +979,12 @@ READ16_MEMBER(dpb7000_state::cpu_ctrlbus_r)
 	case 1:
 		LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Disk Sequencer Card status: %02x\n", machine().describe_context(), m_diskseq_status_out);
 		ret = m_diskseq_status_out;
+		//req_b_w(0);
+		break;
+	case 0x7:
+		ret = m_diskbuf_ram[m_diskbuf_ram_addr];
+		LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Disc Data Buffer Card RAM read: %04x = %02x\n", machine().describe_context(), m_diskbuf_ram_addr, ret);
+		m_diskbuf_ram_addr++;
 		break;
 	case 12:
 		ret = m_config_sw34->read();
@@ -795,7 +1001,181 @@ READ16_MEMBER(dpb7000_state::cpu_ctrlbus_r)
 	return ret;
 }
 
-WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
+void dpb7000_state::store_address_w(uint8_t card, uint16_t data)
+{
+	switch ((data >> 12) & 7)
+	{
+	case 0:
+		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set RHSCR: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
+		m_rhscr[card] = data & 0xfff;
+		break;
+	case 1:
+		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set RVSCR: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
+		m_rvscr[card] = data & 0xfff;
+		break;
+	case 2:
+		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set R ZOOM: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
+		m_rzoom[card] = data & 0xf;
+		break;
+	case 3:
+		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set FLDSEL: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
+		m_fld_sel[card] = data & 0xf;
+		m_window_enable[card] = BIT(m_fld_sel[card], 2);
+		break;
+	case 4:
+		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set CXPOS: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
+		m_cxpos[card] = data & 0xfff;
+		break;
+	case 5:
+		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, set CYPOS: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
+		m_cypos[card] = data & 0xfff;
+		break;
+	default:
+		LOGMASKED(LOG_STORE_ADDR, "%s: Store Address Card %d, unknown register: %04x\n", machine().describe_context(), card + 1, data);
+		break;
+	}
+}
+
+void dpb7000_state::combiner_reg_w(uint16_t data)
+{
+	static const char* const s_const_names[16] = { "Y0", "CY", "CU", "CV", "ES", "EI", "EII", "Y7", "IS", "IY", "IU", "IV", "IIS", "IIY", "IIU", "IIV" };
+	LOGMASKED(LOG_COMBINER, "%s: Combiner Card register write: %s = %02x\n", machine().describe_context(), s_const_names[(data >> 10) & 0xf], (uint8_t)data);
+	switch ((data >> 10) & 0xf)
+	{
+		case 1: // CY
+			m_cursor_y = (uint8_t)data;
+			break;
+		case 2: // CU
+			m_cursor_u = (uint8_t)data;
+			break;
+		case 3: // CV
+			m_cursor_v = (uint8_t)data;
+			break;
+		case 4: // ES
+			m_invert_mask = (uint8_t)data;
+			break;
+		case 5: // EI
+			m_matte_ext[0] = (uint8_t)data;
+			break;
+		case 6: // EII
+			m_matte_ext[1] = (uint8_t)data;
+			break;
+		case 8: // IS
+			m_select_matte[0] = BIT(data, 0);
+			break;
+		case 9: // IY
+			m_matte_y[0] = (uint8_t)data;
+			break;
+		case 10: // IU
+			m_matte_u[0] = (uint8_t)data;
+			break;
+		case 11: // IV
+			m_matte_v[0] = (uint8_t)data;
+			break;
+		case 12: // IIS
+			m_select_matte[1] = BIT(data, 0);
+			break;
+		case 13: // IIY
+			m_matte_y[1] = (uint8_t)data;
+			break;
+		case 14: // IIU
+			m_matte_u[1] = (uint8_t)data;
+			break;
+		case 15: // IIV
+			m_matte_v[1] = (uint8_t)data;
+			break;
+	}
+}
+
+void dpb7000_state::handle_command(uint16_t data)
+{
+	//printf("handle_command %d, cxpos %d, cypos %d\n", (data >> 1) & 0xf, m_cxpos[1], m_cypos[1]);
+	switch ((data >> 1) & 0xf)
+	{
+	case 0: // Live Video
+		break;
+	case 1: // Brush Store Read
+		break;
+	case 2: // Brush Store Write
+		break;
+	case 3: // Framestore Read
+		break;
+	case 4: // Framestore Write
+		break;
+	case 5: // Fast Wipe Video
+		break;
+	case 6: // Fast Wipe Brush Store
+		break;
+	case 7: // Fast Wipe Framestore
+		for (int i = 0; i < 2; i++)
+		{
+			if (!BIT(data, 5 + i) && m_cxpos[i] < 800 && m_cypos[i] < 768)
+			{
+				m_bylen_counter = m_bylen;
+				for (uint16_t y = m_cypos[i]; m_bylen_counter != 0x1000 && y < 768; m_bylen_counter++, y++)
+				{
+					uint8_t *lum = &m_framestore_lum[i][y * 800];
+					uint8_t *chr = &m_framestore_chr[i][y * 800];
+					m_bxlen_counter = m_bxlen;
+					for (uint16_t x = m_cxpos[i]; m_bxlen_counter != 0x1000 && x < 800; m_bxlen_counter++, x++)
+					{
+						lum[x] = m_bs_y_latch;
+						chr[x] = (x & 1) ? m_bs_v_latch : m_bs_u_latch;
+					}
+				}
+			}
+		}
+		break;
+	case 8: // Draw
+		for (int i = 0; i < 2; i++)
+		{
+			if (!BIT(data, 5 + i) && m_cxpos[i] < 800 && m_cypos[i] < 768)
+			{
+				uint16_t bxlen = (((m_bxlen << 3) | (m_bixos & 7)) >> (m_bif & 3)) & 0xfff;
+				uint16_t bylen = (((m_bylen << 3) | (m_biyos & 7)) >> ((m_bif >> 2) & 3)) & 0xfff;
+				for (uint16_t y = m_cypos[i], by = bylen; by != 0x1000 && y < 768; by++, y++)
+				{
+					uint8_t *lum = &m_framestore_lum[i][y * 800];
+					uint8_t *chr = &m_framestore_chr[i][y * 800];
+					for (uint16_t x = m_cxpos[i], bx = bxlen; bx != 0x1000 && x < 800; bx++, x++)
+					{
+						if (BIT(data, 13)) // Fixed Colour Select
+						{
+							uint8_t y = 0x00;
+							uint8_t u = 0x80;
+							uint8_t v = 0x80;
+							if (!BIT(data, 12)) // Brush Zero
+							{
+								y = m_bs_y_latch;
+								u = m_bs_u_latch;
+								v = m_bs_v_latch;
+							}
+							lum[x] = y;
+							chr[x] = (m_cxpos[i] & 1) ? v : u;
+						}
+					}
+				}
+			}
+		}
+		break;
+	case 9: // Draw with Stencil I
+		break;
+	case 10: // Draw with Stencil II
+		break;
+	case 11: // Copy to Framestore
+		break;
+	case 12: // Copy to Brush Store
+		break;
+	case 13: // Paste with Stencil I
+		break;
+	case 14: // Paste with Stencil II
+		break;
+	case 15: // Copy to same Framestore (Invert)
+		break;
+	}
+}
+
+void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 {
 	switch (m_csr)
 	{
@@ -808,19 +1188,23 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 			"Draw",                 "Draw with Stencil I",  "Draw with Stencil II",     "Copy to Framestore",
 			"Copy to Brush Store",  "Paste with Stencil I", "Paste with Stencil II",    "Copy to same Framestore (Invert)"
 		};
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Function Select: %04x\n", machine().describe_context(), data);
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Function:           %s\n", s_func_names[(data >> 1) & 0xf]);
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                /Store I:           %d\n", BIT(data, 5));
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                /Store II:          %d\n", BIT(data, 6));
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Luma Enable:        %d\n", BIT(data, 7));
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Chroma Enable:      %d\n", BIT(data, 8));
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Brush Select:       %d\n", BIT(data, 9));
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Disc Enable:        %d\n", BIT(data, 10));
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                /Brush Invert:      %d\n", BIT(data, 11));
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Brush Zero:         %d\n", BIT(data, 12));
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Fixed Color Select: %d\n", BIT(data, 13));
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Go:                 %d\n", BIT(data, 0));
+		LOGMASKED(LOG_BRUSH_ADDR, "%s: Brush Address Card, Function Select: %04x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_BRUSH_ADDR, "                Function:           %s\n", s_func_names[(data >> 1) & 0xf]);
+		LOGMASKED(LOG_BRUSH_ADDR, "                Store I:            %d\n", BIT(data, 5));
+		LOGMASKED(LOG_BRUSH_ADDR, "                Store II:           %d\n", BIT(data, 6));
+		LOGMASKED(LOG_BRUSH_ADDR, "                Luma Enable:        %d\n", BIT(data, 7));
+		LOGMASKED(LOG_BRUSH_ADDR, "                Chroma Enable:      %d\n", BIT(data, 8));
+		LOGMASKED(LOG_BRUSH_ADDR, "                Brush Select:       %d\n", BIT(data, 9));
+		LOGMASKED(LOG_BRUSH_ADDR, "                Disc Enable:        %d\n", BIT(data, 10));
+		LOGMASKED(LOG_BRUSH_ADDR, "                Brush Invert:       %d\n", BIT(data, 11));
+		LOGMASKED(LOG_BRUSH_ADDR, "                Brush Zero:         %d\n", BIT(data, 12));
+		LOGMASKED(LOG_BRUSH_ADDR, "                Fixed Color Select: %d\n", BIT(data, 13));
+		LOGMASKED(LOG_BRUSH_ADDR, "                Go:                 %d\n", BIT(data, 0));
 		m_brush_addr_func = data & ~1;
+		if (BIT(data, 0))
+		{
+			handle_command(data);
+		}
 		break;
 	}
 
@@ -829,15 +1213,127 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 		const uint8_t hi_nybble = data >> 12;
 		if (hi_nybble == 0)
 		{
+			uint16_t old_cyl = m_diskseq_cyl_from_cpu;
 			m_diskseq_cyl_from_cpu = data & 0x3ff;
 			LOGMASKED(LOG_CTRLBUS, "%s: CPU write to Control Bus, Disk Sequencer Card, Cylinder Number: %04x\n", machine().describe_context(), m_diskseq_cyl_from_cpu);
+			if (old_cyl != m_diskseq_cyl_from_cpu && m_diskseq_cyl_from_cpu < 78 && m_floppy != nullptr)
+			{
+				if (m_diskseq_cyl_from_cpu < old_cyl)
+				{
+					m_floppy->dir_w(1);
+					for (uint16_t i = m_diskseq_cyl_from_cpu; i < old_cyl; i++)
+					{
+						m_floppy->stp_w(1);
+						m_floppy->stp_w(0);
+						m_floppy->stp_w(1);
+					}
+				}
+				else
+				{
+					m_floppy->dir_w(0);
+					for (uint16_t i = old_cyl; i < m_diskseq_cyl_from_cpu; i++)
+					{
+						m_floppy->stp_w(1);
+						m_floppy->stp_w(0);
+						m_floppy->stp_w(1);
+					}
+				}
+				LOGMASKED(LOG_CTRLBUS, "%s: New floppy cylinder: %04x\n", machine().describe_context(), m_floppy->get_cyl());
+			}
+		}
+		else if (hi_nybble == 1)
+		{
+			LOGMASKED(LOG_CTRLBUS, "%s: CPU write to Control Bus, Disc Data Buffer Card, Preset RAM Address: %04x\n", machine().describe_context(), data & 0xfff);
+			m_diskbuf_ram_addr = data & 0xfff;
 		}
 		else if (hi_nybble == 2)
 		{
 			m_diskseq_cmd_from_cpu = data & 0xfff;
-			m_diskseq_halt = false;
-			req_b_w(0);
-			LOGMASKED(LOG_CTRLBUS, "%s: CPU write to Control Bus, Disk Sequencer Card, Command: %04x\n", machine().describe_context(), m_diskseq_cmd_from_cpu);
+			req_b_w(0); // Flag ourselves as in-use
+			LOGMASKED(LOG_CTRLBUS, "%s: CPU write to Control Bus, Disk Sequencer Card, Command: %x (%04x)\n", machine().describe_context(), (data >> 8) & 0xf, data);
+			LOGMASKED(LOG_CTRLBUS, "%s                                                    Head: %x\n", machine().describe_context(), data & 0xf);
+			LOGMASKED(LOG_CTRLBUS, "%s                                                   Drive: %x\n", machine().describe_context(), (data >> 5) & 7);
+			switch ((data >> 8) & 0xf)
+			{
+			case 1:
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Unknown command nybble 1\n", machine().describe_context());
+				req_b_w(1);
+				//m_diskseq_complete_clk->adjust(attotime::from_msec(1));
+				break;
+			case 0:
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read (floppy?) track to RAM buffer?\n", machine().describe_context());
+				if (!BIT(m_diskseq_status_out, 3))
+				{
+					m_diskseq_cyl_read_pending = true;
+				}
+				break;
+			case 6:
+			case 4:
+			{
+				//req_b_w(1);
+				m_diskseq_cyl_read_pending = true;
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: %s track read to Brush Store (ignored for now)\n", machine().describe_context(),
+					((data >> 8) & 0xf) == 6 ? "Initiate" : "Continue");
+				/*if (((data >> 8) & 0xf) == 6)
+				{
+					m_size_h = 0;
+					m_size_v = 0;
+				}
+				uint16_t disc_buffer_addr = 0;
+				uint16_t bx = m_bxlen_counter - m_bxlen;
+				uint16_t by = m_bylen_counter - m_bylen;
+				while (m_diskbuf_data_count > 0 && m_bylen_counter < 0x1000)
+				{
+					uint8_t hv = (m_size_h << 4) | m_size_v;
+					uint8_t hv_permuted = bitswap<8>(hv,4,6,0,2,5,7,1,3);
+
+					if (BIT(m_brush_addr_func, 7)) // Luma Enable
+					{
+						//printf("%02x ", m_diskbuf_ram[disc_buffer_addr]);
+						m_brushstore_lum[by * 256 + hv_permuted] = m_diskbuf_ram[disc_buffer_addr];
+					}
+
+					disc_buffer_addr++;
+					m_diskbuf_data_count--;
+
+					if (BIT(m_brush_addr_func, 8)) // Chroma Enable
+					{
+						m_brushstore_chr[by * 256 + hv_permuted] = m_diskbuf_ram[disc_buffer_addr];
+					}
+
+					disc_buffer_addr++;
+					m_diskbuf_data_count--;
+
+					m_size_h++;
+					if (m_size_h == 16)
+					{
+						m_size_h = 0;
+						m_size_v++;
+						if (m_size_v == 16)
+						{
+							m_size_v = 0;
+						}
+					}
+
+					bx++;
+					m_bxlen_counter++;
+					if (m_bxlen_counter == 0x1000)
+					{
+						bx = 0;
+						by++;
+						m_bxlen_counter = m_bxlen;
+						m_bylen_counter++;
+						//printf("\n");
+					}
+				}*/
+				m_diskseq_complete_clk->adjust(attotime::from_msec(1));
+				break;
+			}
+			default:
+				LOGMASKED(LOG_CTRLBUS, "%s: Unknown Disk Sequencer Card command.\n", machine().describe_context());
+				m_diskseq_complete_clk->adjust(attotime::from_msec(1));
+				break;
+			}
 		}
 		else
 		{
@@ -847,13 +1343,47 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 	}
 
 	case 2: // Store Address Card
-		m_store_addr[1]->reg_w(data);
+		store_address_w(1, data);
 		if (BIT(data, 15))
-			m_store_addr[0]->reg_w(data);
+			store_address_w(0, data);
 		break;
 
-	case 8: // Brush Address Card, "Select 8" signal to PAL 16L8, BE
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Select 8\n", machine().describe_context());
+	case 3: // Size Card, Y6/Y7
+		if (BIT(data, 15))
+		{
+			LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card Y7 (Flags): %04x\n", machine().describe_context(), data & 0x7fff);
+		}
+		else
+		{
+			LOGMASKED(LOG_CTRLBUS | LOG_SIZE_CARD, "%s:    Size Card Y6 (Coefficients): %04x\n", machine().describe_context(), data & 0x7fff);
+		}
+		break;
+
+	case 5: // Filter Card
+		if (BIT(data, 15))
+		{
+			LOGMASKED(LOG_CTRLBUS | LOG_FILTER_CARD, "%s: Coefficient(?) RAM B: Index %x = %02x\n", machine().describe_context(), (data >> 8) & 0xf, data & 0xff);
+			m_filter_abbb[(data >> 8) & 0xf] = data & 0xff;
+		}
+		else
+		{
+			LOGMASKED(LOG_CTRLBUS | LOG_FILTER_CARD, "%s: Coefficient(?) RAM C: Index %x = %02x\n", machine().describe_context(), (data >> 8) & 0xf, data & 0xff);
+			m_filter_acbc[(data >> 8) & 0xf] = data & 0xff;
+		}
+		break;
+
+	case 8: // Brush Store Card color latches
+		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Store Card color latches (%s): %04x\n", machine().describe_context(), m_ca0 ? "VY" : "UY", data);
+		if (m_ca0)
+		{
+			m_bs_v_latch = (uint8_t)(data >> 8);
+			m_bs_y_latch = (uint8_t)data;
+		}
+		else
+		{
+			m_bs_u_latch = (uint8_t)(data >> 8);
+		}
+		m_ca0 = 1 - m_ca0;
 		break;
 
 	case 9: // Brush Address Card, register write/select
@@ -872,12 +1402,14 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 			m_biyos = data & 0x7;
 			break;
 		case 4:
-			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: BXLEN = %02x\n", machine().describe_context(), data & 0x3f);
-			m_bxlen = data & 0x3f;
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: BXLEN = %03x\n", machine().describe_context(), data & 0xfff);
+			m_bxlen = data & 0xfff;
+			m_bxlen_counter = data & 0xfff;
 			break;
 		case 5:
-			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: BYLEN = %02x\n", machine().describe_context(), data & 0x3f);
-			m_bylen = data & 0x3f;
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: BYLEN = %03x\n", machine().describe_context(), data & 0xfff);
+			m_bylen = data & 0xfff;
+			m_bylen_counter = data & 0xfff;
 			break;
 		case 6:
 			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: PLUM = %03x(?)\n", machine().describe_context(), data & 0xff);
@@ -919,7 +1451,7 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 		}
 		else if (hi_bits == 3) // Combiner Card, constant registers
 		{
-			m_combiner->reg_w(data);
+			combiner_reg_w(data);
 		}
 		else
 		{
@@ -959,7 +1491,7 @@ WRITE_LINE_MEMBER(dpb7000_state::req_b_w)
 	update_req_irqs();
 }
 
-READ16_MEMBER(dpb7000_state::cpu_sysctrl_r)
+uint16_t dpb7000_state::cpu_sysctrl_r()
 {
 	const uint16_t ctrl = m_sys_ctrl &~ SYSCTRL_AUTO_START;
 	const uint16_t auto_start = m_auto_start->read() ? SYSCTRL_AUTO_START : 0;
@@ -968,7 +1500,7 @@ READ16_MEMBER(dpb7000_state::cpu_sysctrl_r)
 	return ret;
 }
 
-WRITE16_MEMBER(dpb7000_state::cpu_sysctrl_w)
+void dpb7000_state::cpu_sysctrl_w(uint16_t data)
 {
 	const uint16_t mask = (SYSCTRL_REQ_A_EN | SYSCTRL_REQ_B_EN);
 	LOGMASKED(LOG_SYS_CTRL, "%s: CPU to Control Bus write: %04x\n", machine().describe_context(), data);
@@ -984,7 +1516,7 @@ void dpb7000_state::update_req_irqs()
 	m_maincpu->set_input_line(4, (m_sys_ctrl & SYSCTRL_REQ_B_IN) && (m_sys_ctrl & SYSCTRL_REQ_B_EN) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(dpb7000_state::fdd_ctrl_r)
+uint8_t dpb7000_state::fdd_ctrl_r()
 {
 	// D4: Command Tag Flag
 	// D5: Restore Flag
@@ -996,39 +1528,144 @@ READ8_MEMBER(dpb7000_state::fdd_ctrl_r)
 	return ret;
 }
 
-WRITE8_MEMBER(dpb7000_state::fddcpu_p1_w)
+void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
+{
+	if (!state && m_diskseq_cyl_read_pending && m_floppy)
+	{
+		m_fdd_pll.read_reset(machine().time());
+
+		static const uint16_t PREGAP_MARK = 0xaaaa;
+		static const uint16_t SYNC_MARK = 0x9125;
+
+		m_floppy->ss_w(0);
+
+		for (int side = 0; side < 2; side++)
+		{
+			bool seen_pregap = false;
+			bool in_track = false;
+			int curr_bit = -1;
+			uint16_t curr_window = 0;
+			uint16_t bit_idx = 0;
+
+			attotime tm = machine().time();
+			attotime limit = machine().time() + attotime::from_ticks(1, 6); // One revolution at 360rpm on a Shugart SA850
+			do
+			{
+				curr_bit = m_fdd_pll.get_next_bit(tm, m_floppy, limit);
+				if (curr_bit < 0)
+				{
+					LOGMASKED(LOG_FDC_MECH, "Warning: Unable to retrieve full track %d side %d!\n", m_floppy->get_cyl(), side);
+				}
+				else
+				{
+					curr_window <<= 1;
+					curr_window |= curr_bit;
+					bit_idx++;
+					//if ((bit_idx % 8) == 0)
+					//{
+					//	printf("%02x ", (uint8_t)curr_window);
+					//}
+
+					if (!seen_pregap && curr_window == PREGAP_MARK)
+					{
+						seen_pregap = true;
+						//printf("\nFound pregap area.\n");
+						bit_idx = 0;
+						curr_window = 0;
+					}
+					else if (seen_pregap && !in_track && curr_window == SYNC_MARK)
+					{
+						in_track = true;
+						//printf("\nOh hi, mark.\n");
+						bit_idx = 0;
+						curr_window = 0;
+					}
+					else if (seen_pregap && in_track && bit_idx == 16)
+					{
+						uint8_t data_byte = (uint8_t)bitswap<16>((uint16_t)curr_window, 15, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 0);
+						m_diskbuf_ram[m_diskbuf_ram_addr] = data_byte;
+						m_diskbuf_ram_addr++;
+						if (m_diskbuf_ram_addr >= 0x2700 && side == 0)
+						{
+							// If we've read the side 0 portion of the cylinder, yield out and begin processing side 1
+							curr_bit = -1;
+							m_floppy->ss_w(1);
+							//printf("\nCatch you on the flip side!\n");
+						}
+						else if(m_diskbuf_ram_addr >= 0x4b00 && side == 1)
+						{
+							// If we've read the side 1 portion of the cylinder, yield out, we're done
+							curr_bit = -1;
+							//printf("\nYou're my favorite customer.\n");
+						}
+						bit_idx = 0;
+						curr_window = 0;
+					}
+				}
+			} while (curr_bit != -1);
+		}
+		m_diskseq_cyl_read_pending = false;
+		req_b_w(1);
+	}
+}
+
+void dpb7000_state::fddcpu_p1_w(uint8_t data)
 {
 	LOGMASKED(LOG_FDC_PORT, "%s: Floppy CPU Port 1 Write: %02x\n", machine().describe_context(), data);
 	const uint8_t old_value = m_fdd_port1;
 	m_fdd_port1 = data;
-	if (!BIT(old_value, 0) && BIT(m_fdd_port1, 0))
+
+	floppy_image_device *newflop = m_floppy0->get_device();
+	if (newflop != m_floppy)
 	{
-		if (BIT(m_fdd_port1, 1) && m_fdd_track < 40)
+		if (m_floppy)
 		{
-			m_fdd_track++;
+			m_floppy->mon_w(1);
+			m_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
 		}
-		else if (!BIT(m_fdd_port1, 1) && m_fdd_track > 0)
+		if (newflop)
 		{
-			m_fdd_track--;
+			newflop->set_rpm(360);
+			newflop->mon_w(BIT(old_value, 2));
+			newflop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&dpb7000_state::fdd_index_callback, this));
+			m_fdd_track = newflop->get_cyl();
 		}
+		m_floppy = newflop;
+	}
+
+	if (m_floppy)
+	{
+		m_floppy->mon_w(BIT(m_fdd_port1, 2));
+		m_floppy->dir_w(1 - BIT(m_fdd_port1, 1));
+		m_floppy->stp_w(1 - BIT(m_fdd_port1, 0));
+		m_fdd_track = m_floppy->get_cyl();
 
 		if (m_fdd_track == 0)
-			m_fdd_ctrl |= 4;
+		{
+			m_fdd_ctrl |= 0x04;
+		}
 		else
-			m_fdd_ctrl &= ~4;
+		{
+			m_fdd_ctrl &= ~0x04;
+		}
 	}
-	if (BIT(m_fdd_port1, 7))
-		m_diskseq_status_in |= (1 << DSEQ_STATUS_READY_BIT);
 	else
-		m_diskseq_status_in &= ~(1 << DSEQ_STATUS_READY_BIT);
+	{
+		m_fdd_ctrl &= ~0x04;
+	}
+
+	if (BIT(m_fdd_port1, 7))
+		m_diskseq_status_out &= ~0x08;
+	else
+		m_diskseq_status_out |= 0x08;
 }
 
-WRITE8_MEMBER(dpb7000_state::fddcpu_p2_w)
+void dpb7000_state::fddcpu_p2_w(uint8_t data)
 {
 	m_fdd_serial->write_txd(BIT(data, 4));
 }
 
-READ8_MEMBER(dpb7000_state::fddcpu_p2_r)
+uint8_t dpb7000_state::fddcpu_p2_r()
 {
 	uint8_t ret = 0;
 	if (m_fdd_debug_rx_byte_count)
@@ -1050,7 +1687,7 @@ READ8_MEMBER(dpb7000_state::fddcpu_p2_r)
 	return ret;
 }
 
-READ8_MEMBER(dpb7000_state::fdd_cmd_r)
+uint8_t dpb7000_state::fdd_cmd_r()
 {
 	LOGMASKED(LOG_FDC_CMD, "%s: Floppy CPU command read: %02x\n", m_diskseq_cmd_to_ctrl);
 	return m_diskseq_cmd_to_ctrl;
@@ -1068,6 +1705,54 @@ WRITE_LINE_MEMBER(dpb7000_state::fddcpu_debug_rx)
 		m_fdd_debug_rx_bit_count = 0;
 		m_fdd_debug_rx_byte_count++;
 	}
+}
+
+template <int StoreNum>
+uint32_t dpb7000_state::store_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (int py = 0; py < 768; py++)
+	{
+		uint8_t *src_lum = &m_framestore_lum[StoreNum][py * 800];
+		uint8_t *src_chr = &m_framestore_chr[StoreNum][py * 800];
+		uint32_t *dst = &bitmap.pix32(py);
+		for (int px = 0; px < 800; px++)
+		{
+			const uint32_t u = *src_chr++ << 16;
+			const uint32_t v = *src_chr++ << 8;
+			*dst++ = m_yuv_lut[u | v | *src_lum++];
+			*dst++ = m_yuv_lut[u | v | *src_lum++];
+		}
+	}
+
+	if (StoreNum == 0)
+	{
+		for (int py = 512; py < 768; py++)
+		{
+			uint8_t *src_lum = &m_brushstore_lum[(py - 512) * 256];
+			uint8_t *src_chr = &m_brushstore_chr[(py - 512) * 256];
+			uint32_t *dst = &bitmap.pix32(py);
+			for (int px = 0; px < 256; px++)
+			{
+				const uint32_t u = *src_chr++ << 16;
+				const uint32_t v = *src_chr++ << 8;
+				*dst++ = m_yuv_lut[u | v | *src_lum++];
+				*dst++ = m_yuv_lut[u | v | *src_lum++];
+			}
+		}
+	}
+	return 0;
+}
+
+static const floppy_format_type dpb7000_floppy_formats[] =
+{
+	FLOPPY_HFE_FORMAT,
+	FLOPPY_MFM_FORMAT,
+	nullptr
+};
+
+static void dpb7000_floppies(device_slot_interface &device)
+{
+	device.option_add("8", FLOPPY_8_DSDD);
 }
 
 void dpb7000_state::dpb7000(machine_config &config)
@@ -1108,6 +1793,18 @@ void dpb7000_state::dpb7000(machine_config &config)
 	screen.set_visarea(56, 695, 36, 275);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
+	screen_device &store_screen1(SCREEN(config, "store_screen1", SCREEN_TYPE_RASTER));
+	store_screen1.set_refresh_hz(60);
+	store_screen1.set_size(800, 768);
+	store_screen1.set_visarea(0, 799, 0, 767);
+	store_screen1.set_screen_update(FUNC(dpb7000_state::store_screen_update<0>));
+
+	screen_device &store_screen2(SCREEN(config, "store_screen2", SCREEN_TYPE_RASTER));
+	store_screen2.set_refresh_hz(60);
+	store_screen2.set_size(800, 768);
+	store_screen2.set_visarea(0, 799, 0, 767);
+	store_screen2.set_screen_update(FUNC(dpb7000_state::store_screen_update<1>));
+
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// The 6545's clock is driven by the QD output of a 4-bit binary counter, which has its preset wired to 0010.
@@ -1116,8 +1813,8 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_crtc->set_char_width(8);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_screen("screen");
-	m_crtc->set_update_row_callback(FUNC(dpb7000_state::crtc_update_row), this);
-	m_crtc->set_on_update_addr_change_callback(FUNC(dpb7000_state::crtc_addr_changed), this);
+	m_crtc->set_update_row_callback(FUNC(dpb7000_state::crtc_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(dpb7000_state::crtc_addr_changed));
 
 	// Disc Sequencer Card
 	AM2910(config, m_diskseq, 0); // We drive the clock manually from the driver
@@ -1133,57 +1830,18 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_fddcpu->in_p2_cb().set(FUNC(dpb7000_state::fddcpu_p2_r));
 	m_fddcpu->out_p2_cb().set(FUNC(dpb7000_state::fddcpu_p2_w));
 
+	FLOPPY_CONNECTOR(config, m_floppy0, dpb7000_floppies, "8", dpb7000_floppy_formats);
+
 	RS232_PORT(config, m_fdd_serial, default_rs232_devices, nullptr);
 	m_fdd_serial->rxd_handler().set(FUNC(dpb7000_state::fddcpu_debug_rx));
 
-	config.m_perfect_cpu_quantum = subtag("fddcpu");
+	config.set_perfect_quantum(m_fddcpu);
 
-	// Filter Card
-	TDC1008(config, m_filter_cd);
-	TDC1008(config, m_filter_ce);
-	TDC1008(config, m_filter_cf);
-	TDC1008(config, m_filter_cg);
-
-	// Store Address Cards
-	DPB7000_STOREADDR(config, m_store_addr[0]);
-	DPB7000_STOREADDR(config, m_store_addr[1]);
-
-	// Brush Processor Cards
-	DPB7000_BRUSHPROC(config, m_brush_proc[0]);
-	DPB7000_BRUSHPROC(config, m_brush_proc[1]);
-
-	// Brush Store Card
-	DPB7000_BRUSHSTORE(config, m_brush_store);
-
-	// Combiner Card
-	DPB7000_COMBINER(config, m_combiner, 14.318181_MHz_XTAL);
-
-	// Framestore Cards
-	for (size_t i = 0; i < FRAMESTORE_COUNT; i++)
-	{
-		DPB7000_FRAMESTORE(config, m_framestore[i]);
-	}
-
-	for (size_t i = 0; i < 2; i++)
-	{
-		for (size_t j = 0; j < FRAMESTORE_COUNT; j++)
-		{
-			m_store_addr[i]->ipsel().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::ipsel_w));
-			m_store_addr[i]->csel().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::csel_w));
-			m_store_addr[i]->rck().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::rck_w));
-			m_store_addr[i]->cck().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::cck_w));
-			m_store_addr[i]->ra().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::ra_w));
-			m_store_addr[i]->opstr().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::opstr_w));
-			m_store_addr[i]->opwa().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::opwa_w));
-			m_store_addr[i]->opwb().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::opwb_w));
-			m_store_addr[i]->opra().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::opra_w));
-			m_store_addr[i]->oprb().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::oprb_w));
-			m_store_addr[i]->a().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::a_w));
-			m_store_addr[i]->ras().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::ras_w));
-			m_store_addr[i]->cas().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::cas_w));
-			m_store_addr[i]->write().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::write_w));
-		}
-	}
+	// Size Card
+	AM2901B(config, m_size_yl);
+	AM2901B(config, m_size_yh);
+	AM2901B(config, m_size_xl);
+	AM2901B(config, m_size_xh);
 }
 
 
@@ -1230,6 +1888,51 @@ ROM_START( dpb7000 )
 	ROM_LOAD("pb-037-17418-cda.bin", 0x0800, 0x400, CRC(a31f3793) SHA1(4e74e528088c155e2c2592fa937e4cabfe6324c8))
 	ROM_LOAD("pb-037-17418-dfa.bin", 0x0c00, 0x400, CRC(ca2ec308) SHA1(4232f44ea5bd3fa240eaf7c14e4b925140f90a1e))
 	ROM_LOAD("pb-037-17418-bfa.bin", 0x1000, 0x200, CRC(db84a171) SHA1(ed63f384928a017dafd694c7bcf99e315af6bd3c))
+
+	ROM_REGION(0x800, "keyboard", 0)
+	ROM_LOAD("etc2716 63b2.bin", 0x000, 0x800, CRC(04614a50) SHA1(e547458f2c9cf29cf52f02b8824b32e5e91807fd))
+
+	ROM_REGION(0x2000, "tablet", 0)
+	ROM_LOAD("hn482764g.bin", 0x0000, 0x2000, CRC(3626059c) SHA1(1a4f5c8b337f31c7b2b93096b59234ffbc2f1f00))
+
+	ROM_REGION(0x2000, "tds", 0)
+	ROM_LOAD("nmc27c64q.bin", 0x0000, 0x2000, CRC(a453928f) SHA1(f4a25298fb446f0046c6f9f3ce70e7169dcebd01))
+
+	ROM_REGION(0x200, "brushproc_prom", 0)
+	ROM_LOAD("pb-02c-17593-baa.bin", 0x000, 0x200, CRC(a74cc1f5) SHA1(3b789d5a29c70c93dec56f44be8c14b41915bdef))
+
+	ROM_REGION16_BE(0x800, "brushproc_pal", 0)
+	ROMX_LOAD("pb-02c-17593-hba.bin", 0x000, 0x800, CRC(76018e4f) SHA1(73d995e2e78410676061d45857756d5305a9984a), ROM_GROUPWORD)
+
+	ROM_REGION(0x100, "brushstore_pal", 0)
+	ROM_LOAD("pb-02a-17421-ada.bin", 0x000, 0x100, CRC(84bf7029) SHA1(9d58322994f6f7e99a9c6478577559c8171670ed))
+
+	ROM_REGION(0x400, "framestore_back_pal", 0)
+	ROM_LOAD("pb-02f-01748a-aba.bin", 0x000, 0x400, CRC(24b31494) SHA1(f9185a00e5470ec95d234a76c15acbf33cfb285d))
+
+	ROM_REGION(0x400, "framestore_front_pal", 0)
+	ROM_LOAD("pb-02f-01748a-bba.bin", 0x000, 0x400, CRC(8f06b632) SHA1(233b841c3957a6df229f3a693f9288cb8feec58c))
+
+	ROM_REGION(0x100, "filter_signalprom", 0)
+	ROM_LOAD("pb-027-17427a-dab.bin", 0x000, 0x100, CRC(6deac5cc) SHA1(184c34267e1b390bad0ca4a94befceece979e677))
+
+	ROM_REGION(0x200, "filter_multprom", 0)
+	ROM_LOAD("pb-027-17427a-afa-bfa.bin", 0x000, 0x200, CRC(58164a20) SHA1(c32997350bae22be075a8eee7fe4d1bdd8a34fd2))
+
+	ROM_REGION(0x100, "size_pal", 0)
+	ROM_LOAD("pb-012-17428a-aca.bin", 0x000, 0x100, CRC(0003b9ec) SHA1(8484e4c3b57069c5166201a7cb43d028c87e06cc))
+
+	ROM_REGION(0x200, "size_prom_yh", 0)
+	ROM_LOAD("pb-012-17428a-fda.bin", 0x000, 0x200, CRC(159418f4) SHA1(4e4c9be6d2e3ccdfdf8edfcb5cad106887e03fd2))
+
+	ROM_REGION(0x200, "size_prom_yl", 0)
+	ROM_LOAD("pb-012-17428a-gda.bin", 0x000, 0x200, CRC(1207291a) SHA1(ea44cf510169fdba2cfb0570a508fb3b0c93b06e))
+
+	ROM_REGION(0x200, "size_prom_xh", 0)
+	ROM_LOAD("pb-012-17428a-ecb.bin", 0x000, 0x200, CRC(1e324bf1) SHA1(efd88294dcb9fba58b2bb2b8d4715ba2c16f511d))
+
+	ROM_REGION(0x200, "size_prom_xl", 0)
+	ROM_LOAD("pb-012-17428a-gca.bin", 0x000, 0x200, CRC(ec7d26f3) SHA1(8bdbec33218f903294c135554d61271fa18d1a8d))
 ROM_END
 
 COMP( 1981, dpb7000, 0, 0, dpb7000, dpb7000, dpb7000_state, empty_init, "Quantel", "DPB-7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

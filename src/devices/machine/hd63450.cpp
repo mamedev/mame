@@ -15,12 +15,12 @@
 DEFINE_DEVICE_TYPE(HD63450, hd63450_device, "hd63450", "Hitachi HD63450 DMAC")
 
 hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HD63450, tag, owner, clock),
-		m_irq_callback(*this),
-		m_dma_end(*this),
-		m_dma_read{{*this}, {*this}, {*this}, {*this}},
-		m_dma_write{{*this}, {*this}, {*this}, {*this}},
-		m_cpu(*this, finder_base::DUMMY_TAG)
+	: device_t(mconfig, HD63450, tag, owner, clock)
+	, m_irq_callback(*this)
+	, m_dma_end(*this)
+	, m_dma_read(*this)
+	, m_dma_write(*this)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -45,34 +45,30 @@ void hd63450_device::device_start()
 	// resolve callbacks
 	m_irq_callback.resolve_safe();
 	m_dma_end.resolve_safe();
-	for (auto &cb : m_dma_read)
-		cb.resolve();
-	for (auto &cb : m_dma_write)
-		cb.resolve();
+	m_dma_read.resolve_all();
+	m_dma_write.resolve_all();
 
 	// Initialise timers and registers
 	for (int x = 0; x < 4; x++)
-	{
 		m_timer[x] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hd63450_device::dma_transfer_timer), this));
 
-		save_item(NAME(m_reg[x].csr), x);
-		save_item(NAME(m_reg[x].cer), x);
-		save_item(NAME(m_reg[x].dcr), x);
-		save_item(NAME(m_reg[x].ocr), x);
-		save_item(NAME(m_reg[x].scr), x);
-		save_item(NAME(m_reg[x].ccr), x);
-		save_item(NAME(m_reg[x].mtc), x);
-		save_item(NAME(m_reg[x].mar), x);
-		save_item(NAME(m_reg[x].dar), x);
-		save_item(NAME(m_reg[x].btc), x);
-		save_item(NAME(m_reg[x].niv), x);
-		save_item(NAME(m_reg[x].eiv), x);
-		save_item(NAME(m_reg[x].mfc), x);
-		save_item(NAME(m_reg[x].cpr), x);
-		save_item(NAME(m_reg[x].dfc), x);
-		save_item(NAME(m_reg[x].bfc), x);
-		save_item(NAME(m_reg[x].gcr), x);
-	}
+	save_item(STRUCT_MEMBER(m_reg, csr));
+	save_item(STRUCT_MEMBER(m_reg, cer));
+	save_item(STRUCT_MEMBER(m_reg, dcr));
+	save_item(STRUCT_MEMBER(m_reg, ocr));
+	save_item(STRUCT_MEMBER(m_reg, scr));
+	save_item(STRUCT_MEMBER(m_reg, ccr));
+	save_item(STRUCT_MEMBER(m_reg, mtc));
+	save_item(STRUCT_MEMBER(m_reg, mar));
+	save_item(STRUCT_MEMBER(m_reg, dar));
+	save_item(STRUCT_MEMBER(m_reg, btc));
+	save_item(STRUCT_MEMBER(m_reg, niv));
+	save_item(STRUCT_MEMBER(m_reg, eiv));
+	save_item(STRUCT_MEMBER(m_reg, mfc));
+	save_item(STRUCT_MEMBER(m_reg, cpr));
+	save_item(STRUCT_MEMBER(m_reg, dfc));
+	save_item(STRUCT_MEMBER(m_reg, bfc));
+	save_item(STRUCT_MEMBER(m_reg, gcr));
 
 	save_item(NAME(m_transfer_size));
 	save_item(NAME(m_halted));

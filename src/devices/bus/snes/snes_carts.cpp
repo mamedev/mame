@@ -32,7 +32,8 @@ void snes_cart(device_slot_interface &device)
 	device.option_add_internal("lorom_obc1",    SNS_LOROM_OBC1);
 	device.option_add_internal("lorom_sa1",     SNS_LOROM_SA1);         // Cart + SA1 - unsupported
 	device.option_add_internal("lorom_sdd1",    SNS_LOROM_SDD1);
-	device.option_add_internal("lorom_sfx",     SNS_LOROM_SUPERFX);
+	device.option_add_internal("lorom_gsu1",    SNS_LOROM_SUPERFX1);
+	device.option_add_internal("lorom_gsu2",    SNS_LOROM_SUPERFX2);
 	device.option_add_internal("lorom_sgb",     SNS_LOROM_SUPERGB);     // SuperGB base cart - unsupported
 	device.option_add_internal("lorom_sgb2",    SNS_LOROM_SUPERGB2);    // SuperGB2 base cart - unsupported
 	device.option_add_internal("lorom_st010",   SNS_LOROM_SETA10);

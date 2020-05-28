@@ -47,6 +47,7 @@ f3853_device::f3853_device(const machine_config &mconfig, device_type type, cons
 	device_t(mconfig, type, tag, owner, clock),
 	m_int_req_callback(*this),
 	m_pri_out_callback(*this),
+	m_int_daisy_chain_callback(*this),
 	m_int_vector(0),
 	m_prescaler(31),
 	m_priority_line(false),
@@ -59,8 +60,8 @@ f3853_device::f3853_device(const machine_config &mconfig, const char *tag, devic
 
 f3851_device::f3851_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	f3853_device(mconfig, type, tag, owner, clock),
-	m_read_port{{*this}, {*this}},
-	m_write_port{{*this}, {*this}}
+	m_read_port(*this),
+	m_write_port(*this)
 { }
 
 f3851_device::f3851_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -89,7 +90,7 @@ void f3853_device::device_resolve_objects()
 {
 	m_int_req_callback.resolve_safe();
 	m_pri_out_callback.resolve_safe(); // TODO: not implemented
-	m_int_daisy_chain_callback.bind_relative_to(*owner());
+	m_int_daisy_chain_callback.resolve();
 }
 
 void f3851_device::device_resolve_objects()
@@ -97,10 +98,8 @@ void f3851_device::device_resolve_objects()
 	f3853_device::device_resolve_objects();
 
 	// 2 I/O ports
-	for (devcb_read8 &cb : m_read_port)
-		cb.resolve_safe(0);
-	for (devcb_write8 &cb : m_write_port)
-		cb.resolve_safe();
+	m_read_port.resolve_all_safe(0);
+	m_write_port.resolve_all_safe();
 }
 
 void f3853_device::device_start()
@@ -150,7 +149,7 @@ void f3853_device::device_reset()
 
 	// clear ports at power-on
 	for (int i = 0; i < 4; i++)
-		write(machine().dummy_space(), i, 0);
+		write(i, 0);
 }
 
 
@@ -225,7 +224,7 @@ WRITE_LINE_MEMBER(f3853_device::pri_in_w)
 }
 
 
-READ8_MEMBER(f3853_device::read)
+uint8_t f3853_device::read(offs_t offset)
 {
 	switch (offset & 3)
 	{
@@ -241,7 +240,7 @@ READ8_MEMBER(f3853_device::read)
 	}
 }
 
-WRITE8_MEMBER(f3853_device::write)
+void f3853_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
@@ -274,7 +273,7 @@ WRITE8_MEMBER(f3853_device::write)
 //  f3851_device-specific handlers
 //-------------------------------------------------
 
-READ8_MEMBER(f3851_device::read)
+uint8_t f3851_device::read(offs_t offset)
 {
 	switch (offset & 3)
 	{
@@ -288,7 +287,7 @@ READ8_MEMBER(f3851_device::read)
 	}
 }
 
-WRITE8_MEMBER(f3851_device::write)
+void f3851_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
@@ -299,7 +298,7 @@ WRITE8_MEMBER(f3851_device::write)
 
 	// interrupt control, timer: same as 3853
 	case 2: case 3:
-		f3853_device::write(space, offset, data);
+		f3853_device::write(offset, data);
 		break;
 	}
 }
@@ -332,7 +331,7 @@ TIMER_CALLBACK_MEMBER(f3856_device::timer_callback)
 	timer_start(m_timer_count);
 }
 
-READ8_MEMBER(f3856_device::read)
+uint8_t f3856_device::read(offs_t offset)
 {
 	switch (offset & 3)
 	{
@@ -342,17 +341,17 @@ READ8_MEMBER(f3856_device::read)
 
 	// other: same as 3851
 	default:
-		return f3851_device::read(space, offset);
+		return f3851_device::read(offset);
 	}
 }
 
-WRITE8_MEMBER(f3856_device::write)
+void f3856_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
 	// I/O ports: same as 3851
 	case 0: case 1:
-		f3851_device::write(space, offset, data);
+		f3851_device::write(offset, data);
 		break;
 
 	// interrupt/timer control
@@ -377,7 +376,7 @@ WRITE8_MEMBER(f3856_device::write)
 
 	// set timer
 	case 3:
-		f3853_device::write(space, offset, data);
+		f3853_device::write(offset, data);
 		break;
 	}
 }
@@ -387,7 +386,7 @@ WRITE8_MEMBER(f3856_device::write)
 //  f38t56_device-specific handlers
 //-------------------------------------------------
 
-READ8_MEMBER(f38t56_device::read)
+uint8_t f38t56_device::read(offs_t offset)
 {
 	switch (offset & 3)
 	{
@@ -397,17 +396,17 @@ READ8_MEMBER(f38t56_device::read)
 
 	// other: same as 3856
 	default:
-		return f3856_device::read(space, offset);
+		return f3856_device::read(offset);
 	}
 }
 
-WRITE8_MEMBER(f38t56_device::write)
+void f38t56_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
 	// I/O ports: same as 3851
 	case 0: case 1:
-		f3851_device::write(space, offset, data);
+		f3851_device::write(offset, data);
 		break;
 
 	// interrupt/timer control
@@ -435,7 +434,7 @@ WRITE8_MEMBER(f38t56_device::write)
 	// set timer
 	case 3:
 		m_timer_modulo = data;
-		f3853_device::write(space, offset, data);
+		f3853_device::write(offset, data);
 		break;
 	}
 }

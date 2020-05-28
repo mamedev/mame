@@ -94,6 +94,9 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 #include "screen.h"
 #include "speaker.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 
 class vcombat_state : public driver_device
 {
@@ -104,8 +107,7 @@ public:
 		m_framebuffer_ctrl(*this, "fb_control"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_vid_0(*this, "vid_0"),
-		m_vid_1(*this, "vid_1"),
+		m_vid(*this, "vid_%u", 0U),
 		m_dac(*this, "dac"),
 		m_crtc(*this, "crtc") { }
 
@@ -115,13 +117,15 @@ public:
 	void shadfgtr(machine_config &config);
 	void vcombat(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<uint16_t> m_framebuffer_ctrl;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<i860_cpu_device> m_vid_0;
-	optional_device<i860_cpu_device> m_vid_1;
+	optional_device_array<i860_cpu_device, 2> m_vid;
 	required_device<dac_word_interface> m_dac;
 	optional_device<mc6845_device> m_crtc;
 
@@ -133,6 +137,7 @@ private:
 	DECLARE_READ16_MEMBER(control_1_r);
 	DECLARE_READ16_MEMBER(control_2_r);
 	DECLARE_READ16_MEMBER(control_3_r);
+	void wiggle_i860_common(int which, uint16_t data);
 	DECLARE_WRITE16_MEMBER(wiggle_i860p0_pins_w);
 	DECLARE_WRITE16_MEMBER(wiggle_i860p1_pins_w);
 	DECLARE_READ16_MEMBER(main_irqiack_r);
@@ -143,8 +148,6 @@ private:
 	DECLARE_WRITE16_MEMBER(vcombat_dac_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_update);
 
-	DECLARE_MACHINE_RESET(vcombat);
-	DECLARE_MACHINE_RESET(shadfgtr);
 	uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
 	uint32_t screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -246,46 +249,47 @@ READ16_MEMBER(vcombat_state::control_3_r)
 	return (ioport("IN2")->read() << 8);
 }
 
-static void wiggle_i860_common(i860_cpu_device *device, uint16_t data)
+void vcombat_state::wiggle_i860_common(int which, uint16_t data)
 {
 	int bus_hold = (data & 0x03) == 0x03;
 	int reset = data & 0x10;
-	if (!device)
+	if (!m_vid[which].found())
 		return;
 
+	i860_cpu_device &device = *m_vid[which];
 	if (bus_hold)
 	{
-		fprintf(stderr, "M0 asserting bus HOLD to i860 %s\n", device->tag());
-		device->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
+		LOG("M0 asserting bus HOLD to i860 #%d\n", which);
+		device.i860_set_pin(DEC_PIN_BUS_HOLD, 1);
 	}
 	else
 	{
-		fprintf(stderr, "M0 clearing bus HOLD to i860 %s\n", device->tag());
-		device->i860_set_pin(DEC_PIN_BUS_HOLD, 0);
+		LOG("M0 clearing bus HOLD to i860 #%d\n", which);
+		device.i860_set_pin(DEC_PIN_BUS_HOLD, 0);
 	}
 
 	if (reset)
 	{
-		fprintf(stderr, "M0 asserting RESET to i860 %s\n", device->tag());
-		device->i860_set_pin(DEC_PIN_RESET, 1);
+		LOG("M0 asserting RESET to i860 #%d\n", which);
+		device.i860_set_pin(DEC_PIN_RESET, 1);
 	}
 	else
-		device->i860_set_pin(DEC_PIN_RESET, 0);
+		device.i860_set_pin(DEC_PIN_RESET, 0);
 }
 
 WRITE16_MEMBER(vcombat_state::wiggle_i860p0_pins_w)
 {
-	wiggle_i860_common(m_vid_0, data);
+	wiggle_i860_common(0, data);
 }
 
 WRITE16_MEMBER(vcombat_state::wiggle_i860p1_pins_w)
 {
-	wiggle_i860_common(m_vid_1, data);
+	wiggle_i860_common(1, data);
 }
 
 READ16_MEMBER(vcombat_state::main_irqiack_r)
 {
-	//fprintf(stderr, "M0: irq iack\n");
+	//LOG("M0: irq iack\n");
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 	//m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	return 0;
@@ -293,7 +297,7 @@ READ16_MEMBER(vcombat_state::main_irqiack_r)
 
 READ16_MEMBER(vcombat_state::sound_resetmain_r)
 {
-	//fprintf(stderr, "M1: reset line to M0\n");
+	//LOG("M1: reset line to M0\n");
 	//m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	return 0;
 }
@@ -359,7 +363,7 @@ WRITE16_MEMBER(vcombat_state::vcombat_dac_w)
 {
 	m_dac->write(data >> 5);
 	if (data & 0x801f)
-		fprintf(stderr, "dac overflow %04x\n", data & 0x801f);
+		LOG("dac overflow %04x\n", data & 0x801f);
 }
 
 void vcombat_state::main_map(address_map &map)
@@ -390,8 +394,8 @@ void vcombat_state::main_map(address_map &map)
 	map(0x702000, 0x702001).r(FUNC(vcombat_state::control_3_r));
 	map(0x705000, 0x705001).ram().share("share4");      /* M1->M0 */
 
-	//AM_RANGE(0x703000, 0x703001)      /* Headset rotation axis? */
-	//AM_RANGE(0x704000, 0x704001)      /* Headset rotation axis? */
+	//map(0x703000, 0x703001)      /* Headset rotation axis? */
+	//map(0x704000, 0x704001)      /* Headset rotation axis? */
 
 	map(0x706000, 0x70601f).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 }
@@ -434,17 +438,11 @@ void vcombat_state::sound_map(address_map &map)
 }
 
 
-MACHINE_RESET_MEMBER(vcombat_state,vcombat)
+void vcombat_state::machine_reset()
 {
-	m_vid_0->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
-	m_vid_1->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
-
-	m_crtc_select = 0;
-}
-
-MACHINE_RESET_MEMBER(vcombat_state,shadfgtr)
-{
-	m_vid_0->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
+	for (auto &i860 : m_vid)
+		if (i860.found())
+			i860->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
 
 	m_crtc_select = 0;
 }
@@ -567,12 +565,12 @@ void vcombat_state::vcombat(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(vcombat_state::irq1_line_assert));
 
 	/* The middle board i860 */
-	I860(config, m_vid_0, XTAL(20'000'000));
-	m_vid_0->set_addrmap(AS_PROGRAM, &vcombat_state::vid_0_map);
+	I860(config, m_vid[0], XTAL(20'000'000));
+	m_vid[0]->set_addrmap(AS_PROGRAM, &vcombat_state::vid_0_map);
 
 	/* The top board i860 */
-	I860(config, m_vid_1, XTAL(20'000'000));
-	m_vid_1->set_addrmap(AS_PROGRAM, &vcombat_state::vid_1_map);
+	I860(config, m_vid[1], XTAL(20'000'000));
+	m_vid[1]->set_addrmap(AS_PROGRAM, &vcombat_state::vid_1_map);
 
 	/* Sound CPU */
 	M68000(config, m_soundcpu, XTAL(12'000'000));
@@ -580,11 +578,10 @@ void vcombat_state::vcombat(machine_config &config)
 	m_soundcpu->set_periodic_int(FUNC(vcombat_state::irq1_line_hold), attotime::from_hz(15000)); /* Remove this if MC6845 is enabled */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,vcombat)
 
 /* Temporary hack for experimenting with timing. */
 #if 0
-	//config.m_minimum_quantum = attotime::from_hz(1200);
+	//config.set_maximum_quantum(attotime::from_hz(1200));
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 #endif
 
@@ -618,15 +615,14 @@ void vcombat_state::shadfgtr(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(vcombat_state::irq1_line_assert));
 
 	/* The middle board i860 */
-	I860(config, m_vid_0, XTAL(20'000'000));
-	m_vid_0->set_addrmap(AS_PROGRAM, &vcombat_state::vid_0_map);
+	I860(config, m_vid[0], XTAL(20'000'000));
+	m_vid[0]->set_addrmap(AS_PROGRAM, &vcombat_state::vid_0_map);
 
 	/* Sound CPU */
 	M68000(config, m_soundcpu, XTAL(12'000'000));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &vcombat_state::sound_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,shadfgtr)
 
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
@@ -657,7 +653,7 @@ ROM_START( vcombat )
 	ROM_LOAD16_BYTE( "ep1v2.b42", 0x00000, 0x20000, CRC(560b2e6c) SHA1(e35c0466a1e14beab080e3155f873e9c2a1c028b) )
 	ROM_LOAD16_BYTE( "ep6v2.b33", 0x00001, 0x20000, CRC(37928a5d) SHA1(7850be26dbd356cdeef2a0d87738de16420f6291) )
 
-	ROM_REGION( 0x180000, "samples", 0 )
+	ROM_REGION16_BE( 0x180000, "samples", 0 )
 	ROM_LOAD16_BYTE( "ep2v2.b41", 0x000000, 0x80000, CRC(7dad3458) SHA1(deae5ebef0346250d3f9744933423253a336bb67) )
 	ROM_LOAD16_BYTE( "ep4v2.b37", 0x000001, 0x80000, CRC(b0be2e91) SHA1(66f3a9f5abeb4b95ac806e4bb165f938dca38b2d) )
 	ROM_LOAD16_BYTE( "ep3v2.b40", 0x100000, 0x40000, CRC(8c491526) SHA1(95c6bcbe0adcfffb12fd2b86c9f4ca26aa188bbf) )
@@ -667,7 +663,7 @@ ROM_START( vcombat )
 	ROM_LOAD( "ds1220y.b53", 0x000, 0x800, CRC(b21cfe5f) SHA1(898ace3cd0913ea4b0dc84320219777773ef856f) )
 
 	/* These roms are identical on both of the upper boards */
-	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_REGION64_LE( 0x200000, "gfx", 0 )
 	ROM_LOAD64_WORD( "9.u55",  0x000000, 0x80000, CRC(a276e18b) SHA1(6d60e519196a4858b82241504592413df498e12f) )
 	ROM_LOAD64_WORD( "10.u57", 0x000002, 0x80000, CRC(8921f20e) SHA1(6e9ca2eaad3e1108ba0e1d7792fd5d0305bec201) )
 	ROM_LOAD64_WORD( "11.u54", 0x000004, 0x80000, CRC(a83094ce) SHA1(c3512375fecdb5e7eb02a4aa140ae4efe0233cb8) )
@@ -687,14 +683,14 @@ ROM_START( shadfgtr )
 	ROM_LOAD16_BYTE( "shadfgtr.b42", 0x00000, 0x20000, CRC(f8605dcd) SHA1(1b29f47856ccc757bc96674682ae48f87e6b0e54) )
 	ROM_LOAD16_BYTE( "shadfgtr.b33", 0x00001, 0x20000, CRC(291d59ac) SHA1(cc4904c2ac8ef6a12033c10893246a438ac44014) )
 
-	ROM_REGION( 0x180000, "samples", 0 )
+	ROM_REGION16_BE( 0x180000, "samples", 0 )
 	ROM_LOAD16_BYTE( "shadfgtr.b41", 0x00000, 0x80000, CRC(9e4b4df3) SHA1(8101197275e9f728acdeef85737eecbdec132b27) )
 	ROM_LOAD16_BYTE( "shadfgtr.b37", 0x00001, 0x80000, CRC(98446ba2) SHA1(1c8cc0d9c5de54d9e53699a5ab281579d15edc96) )
 
 	ROM_REGION( 0x800, "user1", 0 ) /* The SRAM module */
 	ROM_LOAD( "shadfgtr.b53", 0x000, 0x800, CRC(e766a3ab) SHA1(e7696ec08d5c86f64d768480f43edbd19ded162d) )
 
-	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_REGION64_LE( 0x200000, "gfx", 0 )
 	ROM_LOAD64_WORD( "shadfgtr.u55", 0x000000, 0x80000, CRC(e807631d) SHA1(9027ff7dc60b808434dac292c08f0630d3d52186) )
 	ROM_LOAD64_WORD( "shadfgtr.u57", 0x000002, 0x80000, CRC(60d701d7) SHA1(936473b5e3b2e9e9e3b50cf977fc5a670a097850) )
 	ROM_LOAD64_WORD( "shadfgtr.u54", 0x000004, 0x80000, CRC(c45d68d6) SHA1(a133e4f13d3af18bccf0d060a659d64ac699b159) )

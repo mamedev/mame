@@ -191,9 +191,9 @@ struct dsp56156_core
 	int             interrupt_cycles;
 	void            (*output_pins_changed)(uint32_t pins);
 	cpu_device *device;
-	address_space *program;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *cache;
-	address_space *data;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::cache cache;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific program;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific data;
 
 	uint16_t peripheral_ram[0x40];
 	uint16_t *program_ram;
@@ -221,12 +221,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); }
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 8; }
-	virtual uint32_t execute_input_lines() const override { return 4; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == DSP56156_IRQ_RESET; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 8; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == DSP56156_IRQ_RESET; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

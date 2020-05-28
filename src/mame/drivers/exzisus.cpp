@@ -247,7 +247,7 @@ void exzisus_state::exzisus(machine_config &config)
 	z80_device &audiocpu(Z80(config, "audiocpu", 4000000));
 	audiocpu.set_addrmap(AS_PROGRAM, &exzisus_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

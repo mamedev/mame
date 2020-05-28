@@ -146,8 +146,8 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
-	DECLARE_READ16_MEMBER(lance_dma_r);
-	DECLARE_WRITE16_MEMBER(lance_dma_w);
+	u16 lance_dma_r(offs_t offset);
+	void lance_dma_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	required_device<bert_device> m_bert;
 };
@@ -172,8 +172,8 @@ private:
 	u8 mcu_status_r();
 	void irq_w(u8 data);
 
-	DECLARE_READ16_MEMBER(lance_dma_r);
-	DECLARE_WRITE16_MEMBER(lance_dma_w);
+	u16 lance_dma_r(offs_t offset);
+	void lance_dma_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	required_device<bt478_device> m_ramdac;
 };
@@ -194,8 +194,8 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
-	DECLARE_READ16_MEMBER(lance_dma_r);
-	DECLARE_WRITE16_MEMBER(lance_dma_w);
+	u16 lance_dma_r(offs_t offset);
+	void lance_dma_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 };
 
 void ncd68k_state::machine_reset()
@@ -383,7 +383,7 @@ void ncd17c_state::irq_w(u8 data)
 	m_maincpu->set_input_line(M68K_IRQ_1, BIT(data, 7));
 }
 
-READ16_MEMBER(ncd16_state::lance_dma_r)
+u16 ncd16_state::lance_dma_r(offs_t offset)
 {
 	if (offset < 0x380000)
 		fatalerror("lance_dma_r DMA target %08x not handled", offset);
@@ -396,7 +396,7 @@ READ16_MEMBER(ncd16_state::lance_dma_r)
 	return data;
 }
 
-WRITE16_MEMBER(ncd16_state::lance_dma_w)
+void ncd16_state::lance_dma_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (offset < 0x380000)
 		fatalerror("lance_dma_w DMA target %08x not handled", offset);
@@ -409,7 +409,7 @@ WRITE16_MEMBER(ncd16_state::lance_dma_w)
 		m_ram->write(BYTE_XOR_BE(offset + 1), u8(data >> 0));
 }
 
-READ16_MEMBER(ncd17c_state::lance_dma_r)
+u16 ncd17c_state::lance_dma_r(offs_t offset)
 {
 	u16 const data =
 		(u16(m_ram->read(BYTE4_XOR_BE(offset + 0))) << 8) | m_ram->read(BYTE4_XOR_BE(offset + 1));
@@ -417,7 +417,7 @@ READ16_MEMBER(ncd17c_state::lance_dma_r)
 	return data;
 }
 
-WRITE16_MEMBER(ncd17c_state::lance_dma_w)
+void ncd17c_state::lance_dma_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_ram->write(BYTE4_XOR_BE(offset + 0), u8(data >> 8));
@@ -425,7 +425,7 @@ WRITE16_MEMBER(ncd17c_state::lance_dma_w)
 		m_ram->write(BYTE4_XOR_BE(offset + 1), u8(data >> 0));
 }
 
-READ16_MEMBER(ncd19_state::lance_dma_r)
+u16 ncd19_state::lance_dma_r(offs_t offset)
 {
 	if (offset < 0x800000)
 		fatalerror("lance_dma_r DMA target %08x not handled!", offset);
@@ -436,7 +436,7 @@ READ16_MEMBER(ncd19_state::lance_dma_r)
 	return data;
 }
 
-WRITE16_MEMBER(ncd19_state::lance_dma_w)
+void ncd19_state::lance_dma_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (offset < 0x800000)
 		fatalerror("lance_dma_w DMA target %08x not handled!", offset);
@@ -505,18 +505,18 @@ void ncd16_state::configure(machine_config &config)
 	common(config);
 
 	m_duart->outport_cb().set(
-		[this](u8 data)
-		{
-			m_serial[0]->write_rts(BIT(data, 0));
-			m_serial[1]->write_rts(BIT(data, 1));
-			m_serial[0]->write_dtr(BIT(data, 2));
-			m_serial[1]->write_dtr(BIT(data, 3));
-			m_bert->set_qlc_mode(BIT(data, 5));
+			[this] (u8 data)
+			{
+				m_serial[0]->write_rts(BIT(data, 0));
+				m_serial[1]->write_rts(BIT(data, 1));
+				m_serial[0]->write_dtr(BIT(data, 2));
+				m_serial[1]->write_dtr(BIT(data, 3));
+				m_bert->set_qlc_mode(BIT(data, 5));
 
-			// TODO: bit 4 - usually set
-			// TODO: bit 6 - usually set
-			// TODO: bit 7 - set/cleared continuously
-		});
+				// TODO: bit 4 - usually set
+				// TODO: bit 6 - usually set
+				// TODO: bit 7 - set/cleared continuously
+			});
 }
 
 void ncd17c_state::configure(machine_config &config)
@@ -590,7 +590,7 @@ void ncd19_state::configure(machine_config &config)
 void ncd68k_state::common(machine_config &config)
 {
 	// HACK: this makes the ncd16 and ncd19 keyboard work
-	config.m_perfect_cpu_quantum = subtag("mcu");
+	config.set_perfect_quantum(m_mcu);
 
 	// mcu ports
 	m_mcu->porta_w().set(FUNC(ncd68k_state::mcu_porta_w));
@@ -604,13 +604,13 @@ void ncd68k_state::common(machine_config &config)
 	PC_KBDC(config, m_kbd_con, 0);
 	m_kbd_con->out_clock_cb().set_inputline(m_mcu, M6805_IRQ_LINE).invert();
 	m_kbd_con->out_data_cb().set(
-		[this](int state)
-		{
-			if (state)
-				m_porta_in |= 0x01;
-			else
-				m_porta_in &= ~0x01;
-		});
+			[this] (int state)
+			{
+				if (state)
+					m_porta_in |= 0x01;
+				else
+					m_porta_in &= ~0x01;
+			});
 
 	// keyboard port
 	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
@@ -618,30 +618,30 @@ void ncd68k_state::common(machine_config &config)
 
 	// mouse and auxiliary ports
 	RS232_PORT(config, m_serial[0],
-		[](device_slot_interface &device)
-		{
-			default_rs232_devices(device);
-			device.option_add("mouse", LOGITECH_HLE_SERIAL_MOUSE);
-		},
-		"mouse");
+			[] (device_slot_interface &device)
+			{
+				default_rs232_devices(device);
+				device.option_add("mouse", LOGITECH_HLE_SERIAL_MOUSE);
+			},
+			"mouse");
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
 
 	// duart outputs
 	m_duart->a_tx_cb().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 	m_duart->b_tx_cb().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 	m_duart->outport_cb().set(
-		[this](u8 data)
-		{
-			m_serial[0]->write_rts(BIT(data, 0));
-			m_serial[1]->write_rts(BIT(data, 1));
-			m_serial[0]->write_dtr(BIT(data, 2));
-			m_serial[1]->write_dtr(BIT(data, 3));
+			[this] (u8 data)
+			{
+				m_serial[0]->write_rts(BIT(data, 0));
+				m_serial[1]->write_rts(BIT(data, 1));
+				m_serial[0]->write_dtr(BIT(data, 2));
+				m_serial[1]->write_dtr(BIT(data, 3));
 
-			// TODO: bit 4 - usually set
-			// TODO: bit 5 - usually clear
-			// TODO: bit 6 - usually set
-			// TODO: bit 7 - set/cleared continuously
-		});
+				// TODO: bit 4 - usually set
+				// TODO: bit 5 - usually clear
+				// TODO: bit 6 - usually set
+				// TODO: bit 7 - set/cleared continuously
+			});
 
 	// duart inputs
 	// FIXME: rts/dsr external loopback test fails - dsr might not be correct?

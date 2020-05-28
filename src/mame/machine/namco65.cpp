@@ -20,8 +20,8 @@ namcoc65_device::namcoc65_device(const machine_config &mconfig, const char *tag,
 	m_in_pc_cb(*this),
 	m_in_ph_cb(*this),
 	m_in_pdsw_cb(*this),
-	m_port_analog_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
-	m_port_dial_in_cb{{*this}, {*this}, {*this}, {*this}},
+	m_port_analog_in_cb(*this),
+	m_port_dial_in_cb(*this),
 	m_dp_in(*this),
 	m_dp_out(*this)
 {
@@ -33,12 +33,12 @@ ROM_START( namcoc65 )
 ROM_END
 
 
-WRITE8_MEMBER( namcoc65_device::namcos2_mcu_port_d_w )
+void namcoc65_device::namcos2_mcu_port_d_w(uint8_t data)
 {
 	/* Undefined operation on write */
 }
 
-READ8_MEMBER(namcoc65_device::namcos2_mcu_port_d_r)
+uint8_t namcoc65_device::namcos2_mcu_port_d_r()
 {
 	/* Provides a digital version of the analog ports */
 	int threshold = 0x7f;
@@ -59,7 +59,7 @@ READ8_MEMBER(namcoc65_device::namcos2_mcu_port_d_r)
 }
 
 
-READ8_MEMBER(namcoc65_device::namcos2_mcu_analog_ctrl_r)
+uint8_t namcoc65_device::namcos2_mcu_analog_ctrl_r()
 {
 	int data = 0;
 
@@ -73,18 +73,18 @@ READ8_MEMBER(namcoc65_device::namcos2_mcu_analog_ctrl_r)
 	return data;
 }
 
-WRITE8_MEMBER( namcoc65_device::namcos2_mcu_analog_port_w )
+void namcoc65_device::namcos2_mcu_analog_port_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(namcoc65_device::namcos2_mcu_analog_port_r)
+uint8_t namcoc65_device::namcos2_mcu_analog_port_r()
 {
 	if (m_mcu_analog_complete == 1) m_mcu_analog_complete = 0;
 	return m_mcu_analog_data;
 }
 
 
-WRITE8_MEMBER(namcoc65_device::namcos2_mcu_analog_ctrl_w)
+void namcoc65_device::namcos2_mcu_analog_ctrl_w(uint8_t data)
 {
 	m_mcu_analog_ctrl = data & 0xff;
 
@@ -135,12 +135,12 @@ WRITE8_MEMBER(namcoc65_device::namcos2_mcu_analog_ctrl_w)
 	}
 }
 
-READ8_MEMBER(namcoc65_device::dpram_byte_r)
+uint8_t namcoc65_device::dpram_byte_r(offs_t offset)
 {
 	return m_dp_in(offset);
 }
 
-WRITE8_MEMBER(namcoc65_device::dpram_byte_w)
+void namcoc65_device::dpram_byte_w(offs_t offset, uint8_t data)
 {
 	m_dp_out(offset,data);
 }
@@ -180,12 +180,8 @@ void namcoc65_device::device_resolve_objects()
 	m_in_pc_cb.resolve_safe(0xff);
 	m_in_ph_cb.resolve_safe(0xff);
 	m_in_pdsw_cb.resolve_safe(0xff);
-
-	for (auto &cb : m_port_analog_in_cb)
-		cb.resolve_safe(0xff);
-
-	for (auto &cb : m_port_dial_in_cb)
-		cb.resolve_safe(0xff);
+	m_port_analog_in_cb.resolve_all_safe(0xff);
+	m_port_dial_in_cb.resolve_all_safe(0xff);
 
 	m_dp_in.resolve_safe(0xff);
 	m_dp_out.resolve_safe();
@@ -193,6 +189,9 @@ void namcoc65_device::device_resolve_objects()
 
 void namcoc65_device::device_start()
 {
+	save_item(NAME(m_mcu_analog_ctrl));
+	save_item(NAME(m_mcu_analog_data));
+	save_item(NAME(m_mcu_analog_complete));
 }
 
 void namcoc65_device::device_reset()

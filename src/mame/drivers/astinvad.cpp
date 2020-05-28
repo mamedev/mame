@@ -78,17 +78,17 @@ private:
 		TIMER_INT_GEN
 	};
 
-	DECLARE_WRITE8_MEMBER(color_latch_w);
-	DECLARE_WRITE8_MEMBER(spaceint_videoram_w);
-	DECLARE_READ8_MEMBER(kamikaze_ppi_r);
-	DECLARE_WRITE8_MEMBER(kamikaze_ppi_w);
-	DECLARE_WRITE8_MEMBER(spaceint_sound1_w);
-	DECLARE_WRITE8_MEMBER(spaceint_sound2_w);
-	DECLARE_WRITE8_MEMBER(kamikaze_sound1_w);
-	DECLARE_WRITE8_MEMBER(kamikaze_sound2_w);
-	DECLARE_WRITE8_MEMBER(spcking2_sound1_w);
-	DECLARE_WRITE8_MEMBER(spcking2_sound2_w);
-	DECLARE_WRITE8_MEMBER(spcking2_sound3_w);
+	void color_latch_w(uint8_t data);
+	void spaceint_videoram_w(offs_t offset, uint8_t data);
+	uint8_t kamikaze_ppi_r(offs_t offset);
+	void kamikaze_ppi_w(offs_t offset, uint8_t data);
+	void spaceint_sound1_w(uint8_t data);
+	void spaceint_sound2_w(uint8_t data);
+	void kamikaze_sound1_w(uint8_t data);
+	void kamikaze_sound2_w(uint8_t data);
+	void spcking2_sound1_w(uint8_t data);
+	void spcking2_sound2_w(uint8_t data);
+	void spcking2_sound3_w(uint8_t data);
 	DECLARE_MACHINE_START(kamikaze);
 	DECLARE_MACHINE_RESET(kamikaze);
 	DECLARE_MACHINE_START(spaceint);
@@ -144,13 +144,13 @@ VIDEO_START_MEMBER(astinvad_state,spaceint)
 }
 
 
-WRITE8_MEMBER(astinvad_state::color_latch_w)
+void astinvad_state::color_latch_w(uint8_t data)
 {
 	m_color_latch = data & 0x0f;
 }
 
 
-WRITE8_MEMBER(astinvad_state::spaceint_videoram_w)
+void astinvad_state::spaceint_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_colorram[offset] = m_color_latch;
@@ -262,7 +262,7 @@ void astinvad_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		kamizake_int_gen(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in astinvad_state::device_timer");
+		throw emu_fatalerror("Unknown id in astinvad_state::device_timer");
 	}
 }
 
@@ -334,7 +334,7 @@ INPUT_CHANGED_MEMBER(astinvad_state::spaceint_coin_inserted)
  *
  *************************************/
 
-READ8_MEMBER(astinvad_state::kamikaze_ppi_r)
+uint8_t astinvad_state::kamikaze_ppi_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -347,7 +347,7 @@ READ8_MEMBER(astinvad_state::kamikaze_ppi_r)
 }
 
 
-WRITE8_MEMBER(astinvad_state::kamikaze_ppi_w)
+void astinvad_state::kamikaze_ppi_w(offs_t offset, uint8_t data)
 {
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
@@ -365,7 +365,7 @@ WRITE8_MEMBER(astinvad_state::kamikaze_ppi_w)
  *************************************/
 
 // Kamikaze
-WRITE8_MEMBER(astinvad_state::kamikaze_sound1_w)
+void astinvad_state::kamikaze_sound1_w(uint8_t data)
 {
 	// d0: ufo sound generator
 	// d1: fire sound generator
@@ -388,7 +388,7 @@ WRITE8_MEMBER(astinvad_state::kamikaze_sound1_w)
 	machine().sound().system_enable(data & 0x20);
 }
 
-WRITE8_MEMBER(astinvad_state::kamikaze_sound2_w)
+void astinvad_state::kamikaze_sound2_w(uint8_t data)
 {
 	// d0: red screen -> to video board
 	// d1: invaders advancing sound generator
@@ -407,7 +407,7 @@ WRITE8_MEMBER(astinvad_state::kamikaze_sound2_w)
 }
 
 // Space King 2
-WRITE8_MEMBER(astinvad_state::spcking2_sound1_w)
+void astinvad_state::spcking2_sound1_w(uint8_t data)
 {
 	int bits_gone_hi = data & ~m_sound_state[0];
 	m_sound_state[0] = data;
@@ -422,7 +422,7 @@ WRITE8_MEMBER(astinvad_state::spcking2_sound1_w)
 	m_screen_red = data & 0x04; // ?
 }
 
-WRITE8_MEMBER(astinvad_state::spcking2_sound2_w)
+void astinvad_state::spcking2_sound2_w(uint8_t data)
 {
 	int bits_gone_hi = data & ~m_sound_state[1];
 	m_sound_state[1] = data;
@@ -437,13 +437,13 @@ WRITE8_MEMBER(astinvad_state::spcking2_sound2_w)
 	m_player = BIT(data, 5);
 }
 
-WRITE8_MEMBER(astinvad_state::spcking2_sound3_w)
+void astinvad_state::spcking2_sound3_w(uint8_t data)
 {
 	// ?
 }
 
 // Space Intruder
-WRITE8_MEMBER(astinvad_state::spaceint_sound1_w)
+void astinvad_state::spaceint_sound1_w(uint8_t data)
 {
 	int bits_gone_hi = data & ~m_sound_state[0];
 	m_sound_state[0] = data;
@@ -460,7 +460,7 @@ WRITE8_MEMBER(astinvad_state::spaceint_sound1_w)
 	if (bits_gone_hi & 0x80) m_samples->start(5, SND_FLEET4);
 }
 
-WRITE8_MEMBER(astinvad_state::spaceint_sound2_w)
+void astinvad_state::spaceint_sound2_w(uint8_t data)
 {
 	int bits_gone_hi = data & ~m_sound_state[1];
 	m_sound_state[1] = data;

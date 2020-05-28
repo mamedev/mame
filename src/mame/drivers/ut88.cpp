@@ -38,15 +38,15 @@ static GFXDECODE_START( gfx_ut88 )
 GFXDECODE_END
 
 /* Address maps */
-void ut88_state::ut88mini_mem(address_map &map)
+void ut88mini_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).rom();  // System ROM
 	map(0xc000, 0xc3ff).ram();  // RAM
-	map(0x9000, 0x9fff).w(FUNC(ut88_state::ut88mini_write_led)); // 7seg LED
+	map(0x9000, 0x9fff).w(FUNC(ut88mini_state::led_w)); // 7seg LED
 }
 
-void ut88_state::ut88_mem(address_map &map)
+void ut88_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x07ff).bankrw("bank1"); // First bank
 	map(0x0800, 0xdfff).ram();  // RAM
@@ -56,16 +56,16 @@ void ut88_state::ut88_mem(address_map &map)
 	map(0xf800, 0xffff).rom();  // System ROM
 }
 
-void ut88_state::ut88mini_io(address_map &map)
+void ut88mini_state::io_map(address_map &map)
 {
-	map(0xA0, 0xA0).r(FUNC(ut88_state::ut88mini_keyboard_r));
-	map(0xA1, 0xA1).r(FUNC(ut88_state::ut88_tape_r));
+	map(0xA0, 0xA0).r(FUNC(ut88mini_state::keyboard_r));
+	map(0xA1, 0xA1).r(FUNC(ut88mini_state::tape_r));
 }
 
-void ut88_state::ut88_io(address_map &map)
+void ut88_state::io_map(address_map &map)
 {
-	map(0x04, 0x07).rw(FUNC(ut88_state::ut88_keyboard_r), FUNC(ut88_state::ut88_keyboard_w));
-	map(0xA1, 0xA1).rw(FUNC(ut88_state::ut88_tape_r), FUNC(ut88_state::ut88_sound_w));
+	map(0x04, 0x07).rw(FUNC(ut88_state::keyboard_r), FUNC(ut88_state::keyboard_w));
+	map(0xA1, 0xA1).rw(FUNC(ut88_state::tape_r), FUNC(ut88_state::sound_w));
 }
 
 /* Input ports */
@@ -191,9 +191,8 @@ void ut88_state::ut88(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, 2000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ut88_state::ut88_mem);
-	m_maincpu->set_addrmap(AS_IO, &ut88_state::ut88_io);
-	MCFG_MACHINE_RESET_OVERRIDE(ut88_state, ut88 )
+	m_maincpu->set_addrmap(AS_PROGRAM, &ut88_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &ut88_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -201,10 +200,8 @@ void ut88_state::ut88(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*8, 28*8);
 	screen.set_visarea(0, 64*8-1, 0, 28*8-1);
-	screen.set_screen_update(FUNC(ut88_state::screen_update_ut88));
+	screen.set_screen_update(FUNC(ut88_state::screen_update));
 	screen.set_palette(m_palette);
-
-	MCFG_VIDEO_START_OVERRIDE(ut88_state,ut88)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ut88);
@@ -217,9 +214,9 @@ void ut88_state::ut88(machine_config &config)
 
 	/* Devices */
 	I8255A(config, m_ppi);
-	m_ppi->out_pa_callback().set(FUNC(ut88_state::ut88_8255_porta_w));
-	m_ppi->in_pb_callback().set(FUNC(ut88_state::ut88_8255_portb_r));
-	m_ppi->in_pc_callback().set(FUNC(ut88_state::ut88_8255_portc_r));
+	m_ppi->out_pa_callback().set(FUNC(ut88_state::ppi_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(ut88_state::ppi_portb_r));
+	m_ppi->in_pc_callback().set(FUNC(ut88_state::ppi_portc_r));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(rku_cassette_formats);
@@ -230,14 +227,12 @@ void ut88_state::ut88(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("ut88");
 }
 
-void ut88_state::ut88mini(machine_config &config)
+void ut88mini_state::ut88mini(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, 2000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ut88_state::ut88mini_mem);
-	m_maincpu->set_addrmap(AS_IO, &ut88_state::ut88mini_io);
-	MCFG_MACHINE_START_OVERRIDE(ut88_state,ut88mini)
-	MCFG_MACHINE_RESET_OVERRIDE(ut88_state, ut88mini )
+	m_maincpu->set_addrmap(AS_PROGRAM, &ut88mini_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &ut88mini_state::io_map);
 
 	/* video hardware */
 	config.set_default_layout(layout_ut88mini);
@@ -272,6 +267,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS       INIT           COMPANY      FULLNAME      FLAGS */
-COMP( 1989, ut88mini, 0,        0,      ut88mini, ut88mini, ut88_state, init_ut88mini, "<unknown>", "UT-88 mini", 0)
-COMP( 1989, ut88,     ut88mini, 0,      ut88,     ut88,     ut88_state, init_ut88,     "<unknown>", "UT-88",      0)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME      FLAGS */
+COMP( 1989, ut88mini, 0,        0,      ut88mini, ut88mini, ut88mini_state, empty_init, "<unknown>", "UT-88 mini", 0)
+COMP( 1989, ut88,     ut88mini, 0,      ut88,     ut88,     ut88_state,     empty_init, "<unknown>", "UT-88",      0)

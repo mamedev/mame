@@ -2,7 +2,7 @@
 // copyright-holders:Tomasz Slanina
 /*********************************************************
 Sega hardware based on their SG-1000 console
-Driver by Tomasz Slanina  analog [at] op.pl
+Driver by Tomasz Slanina
 
 
 Supported games :
@@ -293,7 +293,7 @@ public:
 	void init_sderby();
 
 private:
-	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
+	void sg1000a_coin_counter_w(uint8_t data);
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void decrypted_opcodes_map(address_map &map);
@@ -455,7 +455,7 @@ static INPUT_PORTS_START( sderbys )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER(sg1000a_state::sg1000a_coin_counter_w)
+void sg1000a_state::sg1000a_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }

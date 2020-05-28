@@ -58,14 +58,14 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(phi_ren_w);
 
 	// PHI DIO r/w CBs
-	DECLARE_READ8_MEMBER(phi_dio_r);
-	DECLARE_WRITE8_MEMBER(phi_dio_w);
+	uint8_t phi_dio_r();
+	void phi_dio_w(uint8_t data);
 
 	// PHI IRQ/Z80 NMI
 	DECLARE_WRITE_LINE_MEMBER(phi_int_w);
 
 	// Z80 IRQ
-	DECLARE_WRITE8_MEMBER(z80_m1_w);
+	void z80_m1_w(uint8_t data);
 
 	// Floppy interface
 	DECLARE_WRITE8_MEMBER(data_w);

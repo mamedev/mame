@@ -15,6 +15,8 @@ DECLARE_DEVICE_TYPE(M6805R3, m6805r3_device)
 //DECLARE_DEVICE_TYPE(M6805S3, m6805s3_device) // A/D, SPI, multiple timers
 DECLARE_DEVICE_TYPE(M6805U2, m6805u2_device)
 DECLARE_DEVICE_TYPE(M6805U3, m6805u3_device)
+DECLARE_DEVICE_TYPE(HD6805S1, hd6805s1_device)
+DECLARE_DEVICE_TYPE(HD6805U1, hd6805u1_device)
 
 DECLARE_DEVICE_TYPE(M68705P3, m68705p3_device)
 DECLARE_DEVICE_TYPE(M68705P5, m68705p5_device)
@@ -112,6 +114,8 @@ private:
 	u8 m_tcr;
 };
 
+DECLARE_ENUM_BITWISE_OPERATORS(m6805_timer::timer_options);
+
 // abstract device classes
 class m6805_hmos_device : public m6805_base_device
 {
@@ -167,7 +171,7 @@ protected:
 
 	template <std::size_t N> void set_port_open_drain(bool value);
 	template <std::size_t N> void set_port_mask(u8 mask);
-	template <std::size_t N> DECLARE_WRITE8_MEMBER(port_input_w) { m_port_input[N] = data & ~m_port_mask[N]; }
+	template <std::size_t N> void port_input_w(uint8_t data) { m_port_input[N] = data & ~m_port_mask[N]; }
 	template <std::size_t N> DECLARE_READ8_MEMBER(port_r);
 	template <std::size_t N> DECLARE_WRITE8_MEMBER(port_latch_w);
 	template <std::size_t N> DECLARE_WRITE8_MEMBER(port_ddr_w);
@@ -204,8 +208,8 @@ private:
 	u8              m_port_input[PORT_COUNT];
 	u8              m_port_latch[PORT_COUNT];
 	u8              m_port_ddr[PORT_COUNT];
-	devcb_read8     m_port_cb_r[PORT_COUNT];
-	devcb_write8    m_port_cb_w[PORT_COUNT];
+	devcb_read8::array<PORT_COUNT> m_port_cb_r;
+	devcb_write8::array<PORT_COUNT> m_port_cb_w;
 
 	// miscellaneous register
 	enum mr_mask : u8
@@ -279,9 +283,9 @@ private:
 class m68705p_device : public m68705_device
 {
 public:
-	DECLARE_WRITE8_MEMBER(pa_w) { port_input_w<0>(space, offset, data, mem_mask); }
-	DECLARE_WRITE8_MEMBER(pb_w) { port_input_w<1>(space, offset, data, mem_mask); }
-	DECLARE_WRITE8_MEMBER(pc_w) { port_input_w<2>(space, offset, data, mem_mask); }
+	void pa_w(u8 data) { port_input_w<0>(data); }
+	void pb_w(u8 data) { port_input_w<1>(data); }
+	void pc_w(u8 data) { port_input_w<2>(data); }
 
 protected:
 	virtual void internal_map(address_map &map) override;
@@ -296,10 +300,10 @@ protected:
 class m68705u_device : public m68705_device
 {
 public:
-	DECLARE_WRITE8_MEMBER(pa_w) { port_input_w<0>(space, offset, data, mem_mask); }
-	DECLARE_WRITE8_MEMBER(pb_w) { port_input_w<1>(space, offset, data, mem_mask); }
-	DECLARE_WRITE8_MEMBER(pc_w) { port_input_w<2>(space, offset, data, mem_mask); }
-	DECLARE_WRITE8_MEMBER(pd_w) { port_input_w<3>(space, offset, data, mem_mask); } // TODO: PD6 is also /INT2
+	void pa_w(u8 data) { port_input_w<0>(data); }
+	void pb_w(u8 data) { port_input_w<1>(data); }
+	void pc_w(u8 data) { port_input_w<2>(data); }
+	void pd_w(u8 data) { port_input_w<3>(data); } // TODO: PD6 is also /INT2
 
 protected:
 	virtual void internal_map(address_map &map) override;
@@ -369,6 +373,18 @@ public:
 	m6805u3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
+};
+
+class hd6805s1_device : public m6805_mrom_device
+{
+public:
+	hd6805s1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+};
+
+class hd6805u1_device : public m6805_mrom_device
+{
+public:
+	hd6805u1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
 class m68705p3_device : public m68705p_device

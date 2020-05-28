@@ -72,13 +72,13 @@ public:
 	void init_hyprduel();
 
 private:
-	DECLARE_READ8_MEMBER(irq_cause_r);
-	DECLARE_WRITE8_MEMBER(irq_cause_w);
-	DECLARE_WRITE16_MEMBER(subcpu_control_w);
-	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger1_r);
-	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger1_w);
-	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger2_r);
-	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger2_w);
+	uint8_t irq_cause_r();
+	void irq_cause_w(uint8_t data);
+	void subcpu_control_w(uint16_t data);
+	uint16_t hyprduel_cpusync_trigger1_r(offs_t offset);
+	void hyprduel_cpusync_trigger1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t hyprduel_cpusync_trigger2_r(offs_t offset);
+	void hyprduel_cpusync_trigger2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_MACHINE_START(hyprduel);
 	DECLARE_MACHINE_START(magerror);
 	TIMER_CALLBACK_MEMBER(vblank_end_callback);
@@ -149,12 +149,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_state::interrupt)
 	update_irq_state();
 }
 
-READ8_MEMBER(hyprduel_state::irq_cause_r)
+uint8_t hyprduel_state::irq_cause_r()
 {
 	return m_requested_int;
 }
 
-WRITE8_MEMBER(hyprduel_state::irq_cause_w)
+void hyprduel_state::irq_cause_w(uint8_t data)
 {
 	if (data == m_int_num)
 		m_requested_int &= ~(m_int_num & ~*m_irq_enable);
@@ -165,7 +165,7 @@ WRITE8_MEMBER(hyprduel_state::irq_cause_w)
 }
 
 
-WRITE16_MEMBER(hyprduel_state::subcpu_control_w)
+void hyprduel_state::subcpu_control_w(uint16_t data)
 {
 	switch (data)
 	{
@@ -196,7 +196,7 @@ WRITE16_MEMBER(hyprduel_state::subcpu_control_w)
 }
 
 
-READ16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_r)
+uint16_t hyprduel_state::hyprduel_cpusync_trigger1_r(offs_t offset)
 {
 	if (m_cpu_trigger == 1001)
 	{
@@ -207,7 +207,7 @@ READ16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_r)
 	return m_sharedram[0][0x000408 / 2 + offset];
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_w)
+void hyprduel_state::hyprduel_cpusync_trigger1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sharedram[0][0x00040e / 2 + offset]);
 
@@ -222,7 +222,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_w)
 }
 
 
-READ16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_r)
+uint16_t hyprduel_state::hyprduel_cpusync_trigger2_r(offs_t offset)
 {
 	if (m_cpu_trigger == 1002)
 	{
@@ -233,7 +233,7 @@ READ16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_r)
 	return m_sharedram[2][(0xfff34c - 0xfe4000) / 2 + offset];
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_w)
+void hyprduel_state::hyprduel_cpusync_trigger2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sharedram[0][0x000408 / 2 + offset]);
 
@@ -554,10 +554,10 @@ void hyprduel_state::init_hyprduel()
 	m_int_num = 0x02;
 
 	/* cpu synchronization (severe timings) */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc0040e, 0xc00411, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_w),this));
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0xc00408, 0xc00409, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00408, 0xc00409, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_w),this));
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0xfff34c, 0xfff34d, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc0040e, 0xc00411, write16s_delegate(*this, FUNC(hyprduel_state::hyprduel_cpusync_trigger1_w)));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0xc00408, 0xc00409, read16sm_delegate(*this, FUNC(hyprduel_state::hyprduel_cpusync_trigger1_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00408, 0xc00409, write16s_delegate(*this, FUNC(hyprduel_state::hyprduel_cpusync_trigger2_w)));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0xfff34c, 0xfff34d, read16sm_delegate(*this, FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r)));
 }
 
 void hyprduel_state::init_magerror()
@@ -566,6 +566,6 @@ void hyprduel_state::init_magerror()
 }
 
 
-GAME( 1993, hyprduel,  0,        hyprduel, hyprduel, hyprduel_state, init_hyprduel, ROT0, "Technosoft",          "Hyper Duel (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hyprduel2, hyprduel, hyprduel, hyprduel, hyprduel_state, init_hyprduel, ROT0, "Technosoft",          "Hyper Duel (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hyprduel,  0,        hyprduel, hyprduel, hyprduel_state, init_hyprduel, ROT0, "Technosoft",          "Hyper Duel (Japan set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hyprduel2, hyprduel, hyprduel, hyprduel, hyprduel_state, init_hyprduel, ROT0, "Technosoft",          "Hyper Duel (Japan set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, magerror,  0,        magerror, magerror, hyprduel_state, init_magerror, ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase",  MACHINE_SUPPORTS_SAVE )

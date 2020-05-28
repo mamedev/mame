@@ -481,7 +481,7 @@ void darius_state::adpcm_nmi_enable(u8 data)
 
 void darius_state::adpcm_data_w(u8 data)
 {
-	m_msm->write_data(data);
+	m_msm->data_w(data);
 	m_msm->reset_w(!(data & 0x20));    /* my best guess, but it could be output enable as well */
 }
 
@@ -705,7 +705,7 @@ void darius_state::darius(machine_config &config)
 	m_adpcm->set_addrmap(AS_PROGRAM, &darius_state::darius_sound2_map);
 	m_adpcm->set_addrmap(AS_IO, &darius_state::darius_sound2_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame ? */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame ? */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

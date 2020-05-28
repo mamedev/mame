@@ -11,17 +11,21 @@
 #pragma once
 
 #include "machine/adc0808.h"
-#include "machine/atarigen.h"
+#include "machine/timer.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
-class eprom_state : public atarigen_state
+class eprom_state : public driver_device
 {
 public:
 	eprom_state(const machine_config &mconfig, device_type type, const char *tag) :
-		atarigen_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_playfield_tilemap(*this, "playfield"),
 		m_alpha_tilemap(*this, "alpha"),
 		m_mob(*this, "mob"),
@@ -40,11 +44,11 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_READ16_MEMBER(special_port1_r);
-	DECLARE_READ8_MEMBER(adc_r);
-	DECLARE_WRITE16_MEMBER(eprom_latch_w);
+	void video_int_ack_w(uint16_t data);
+	void video_int_ack_extra_w(uint16_t data);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
+	uint8_t adc_r(offs_t offset);
+	void eprom_latch_w(uint8_t data);
 	template<bool maincpu> DECLARE_WRITE16_MEMBER(sync_w);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
@@ -59,6 +63,9 @@ protected:
 	void main_map(address_map &map);
 
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_motion_objects_device> m_mob;

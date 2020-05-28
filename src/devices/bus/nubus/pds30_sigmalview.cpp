@@ -90,9 +90,9 @@ void nubus_lview_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
 
-	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_lview_device::vram_r), this), write32_delegate(FUNC(nubus_lview_device::vram_w), this));
-	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_lview_device::vram_r), this), write32_delegate(FUNC(nubus_lview_device::vram_w), this));
-	nubus().install_device(slotspace+0xb0000, slotspace+0xbffff, read32_delegate(FUNC(nubus_lview_device::lview_r), this), write32_delegate(FUNC(nubus_lview_device::lview_w), this));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(*this, FUNC(nubus_lview_device::vram_r)), write32_delegate(*this, FUNC(nubus_lview_device::vram_w)));
+	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(*this, FUNC(nubus_lview_device::vram_r)), write32_delegate(*this, FUNC(nubus_lview_device::vram_w)));
+	nubus().install_device(slotspace+0xb0000, slotspace+0xbffff, read32_delegate(*this, FUNC(nubus_lview_device::lview_r)), write32_delegate(*this, FUNC(nubus_lview_device::lview_w)));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(screen().time_until_pos(599, 0), 0);
@@ -163,9 +163,9 @@ READ32_MEMBER( nubus_lview_device::lview_r )
 {
 	uint32_t rv = 0;
 
-//    printf("%s prot_r: @ %x, mask %08x [state %d]\n", machine().describe_context().c_str(), offset, mem_mask, m_protstate);
+   // printf("%s prot_r: @ %x, mask %08x [state %d] [PC=%x]\n", machine().describe_context().c_str(), offset, mem_mask, m_protstate, machine().device<cpu_device>("maincpu")->pc());
 
-	if ((m_protstate == 1) || (m_protstate == 10) || (machine().device<cpu_device>("maincpu")->pc() == 0x5aac))
+	if ((m_protstate == 1) || (m_protstate == 10) || (m_protstate == 17) || (m_protstate == 20) || (m_protstate == 22))
 	{
 		rv = 0x02020202;
 	}
@@ -185,7 +185,7 @@ WRITE32_MEMBER( nubus_lview_device::lview_w )
 
 	if (offset == 0x7a)
 	{
-		if (data == 1)
+		if (data != 1)
 		{
 			m_vbl_disable = 0;
 			lower_slot_irq();

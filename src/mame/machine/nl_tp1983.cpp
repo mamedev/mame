@@ -7,10 +7,8 @@
 
 ***************************************************************************/
 
-#ifndef __PLIB_PREPROCESSOR__
-	#define NL_PROHIBIT_BASEH_INCLUDE   1
-	#include "netlist/devices/net_lib.h"
-#endif
+#define NL_PROHIBIT_BASEH_INCLUDE   1
+#include "netlist/devices/net_lib.h"
 
 // gray scale
 #define SB3 0
@@ -40,6 +38,8 @@ NETLIST_START(tp1983)
 
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)
+	NET_C(VCC, high.VCC, low.VCC)
+	NET_C(GND, high.GND, low.GND)
 
 	// skipping D7.1 D7.2 D8.2 clock generator circuit
 	MAINCLOCK(clk, 250000.0)

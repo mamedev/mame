@@ -36,6 +36,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scsi0_int_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi1_int_w);
 	DECLARE_WRITE_LINE_MEMBER(enet_int_w);
+	DECLARE_WRITE_LINE_MEMBER(video_int_w);
 
 	void raise_local_irq(int channel, uint8_t mask);
 	void lower_local_irq(int channel, uint8_t mask);
@@ -60,7 +61,7 @@ public:
 		INT3_LOCAL1_MAPPABLE1 = 0x08,
 		INT3_LOCAL1_HPC_DMA   = 0x10,
 		INT3_LOCAL1_AC_FAIL   = 0x20,
-		INT3_LOCAL1_VSYNC     = 0x40,
+		INT3_LOCAL1_VIDEO     = 0x40,
 		INT3_LOCAL1_RETRACE   = 0x80,
 	};
 

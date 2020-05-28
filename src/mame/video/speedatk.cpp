@@ -87,9 +87,9 @@ uint32_t speedatk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	{
 		for(x=0;x<m_crtc_vreg[1];x++)
 		{
-			tile = m_videoram[count] + ((m_colorram[count] & 0xe0) << 3);
+			tile = m_videoram[count] + ((m_colorram[count] & 0x60) << 3);
 			color = m_colorram[count] & 0x1f;
-			region = (m_colorram[count] & 0x10) >> 4;
+			region = (m_colorram[count] & 0x80) >> 7;
 
 			m_gfxdecode->gfx(region)->opaque(bitmap,cliprect,tile,color,m_flip_scr,m_flip_scr,x*8,y*8);
 

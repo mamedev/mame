@@ -71,9 +71,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
 	DECLARE_READ_LINE_MEMBER(kc85_sid_r);
 
-	DECLARE_WRITE8_MEMBER( i8155_pa_w );
-	DECLARE_WRITE8_MEMBER( i8155_pb_w );
-	DECLARE_READ8_MEMBER( i8155_pc_r );
+	void i8155_pa_w(uint8_t data);
+	void i8155_pb_w(uint8_t data);
+	uint8_t i8155_pc_r();
 
 	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
@@ -99,13 +99,14 @@ protected:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( uart_status_r );
-	DECLARE_WRITE8_MEMBER( uart_ctrl_w );
-	DECLARE_WRITE8_MEMBER( modem_w );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_READ8_MEMBER( lcd_r );
-	DECLARE_WRITE8_MEMBER( lcd_w );
+	uint8_t uart_r();
+	uint8_t uart_status_r();
+	void uart_ctrl_w(uint8_t data);
+	void modem_w(uint8_t data);
+	void ctrl_w(uint8_t data);
+	uint8_t keyboard_r();
+	uint8_t lcd_r(offs_t offset);
+	void lcd_w(offs_t offset, uint8_t data);
 
 	/* memory state */
 	uint8_t m_bank;           /* memory bank selection */
@@ -149,14 +150,14 @@ public:
 	virtual void machine_start() override;
 	required_device<generic_slot_device> m_cas_cart;
 
-	DECLARE_READ8_MEMBER( bank_r );
-	DECLARE_WRITE8_MEMBER( bank_w );
-	DECLARE_WRITE8_MEMBER( scp_w );
-	DECLARE_READ8_MEMBER( uart_status_r );
-	DECLARE_WRITE8_MEMBER( romah_w );
-	DECLARE_WRITE8_MEMBER( romal_w );
-	DECLARE_WRITE8_MEMBER( romam_w );
-	DECLARE_READ8_MEMBER( romrd_r );
+	uint8_t bank_r();
+	void bank_w(uint8_t data);
+	void scp_w(uint8_t data);
+	uint8_t uart_status_r();
+	void romah_w(uint8_t data);
+	void romal_w(uint8_t data);
+	void romam_w(uint8_t data);
+	uint8_t romrd_r();
 
 	void bankswitch(uint8_t data);
 
@@ -209,13 +210,13 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( bank_r );
-	DECLARE_WRITE8_MEMBER( bank_w );
-	DECLARE_READ8_MEMBER( stbk_r );
-	DECLARE_WRITE8_MEMBER( stbk_w );
-	DECLARE_WRITE8_MEMBER( i8155_pa_w );
-	DECLARE_WRITE8_MEMBER( i8155_pb_w );
-	DECLARE_READ8_MEMBER( i8155_pc_r );
+	uint8_t bank_r();
+	void bank_w(uint8_t data);
+	uint8_t stbk_r();
+	void stbk_w(uint8_t data);
+	void i8155_pa_w(uint8_t data);
+	void i8155_pb_w(uint8_t data);
+	uint8_t i8155_pc_r();
 	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
 	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
 	DECLARE_READ_LINE_MEMBER(kc85_sid_r);

@@ -1,5 +1,5 @@
 #
-# Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+# Copyright 2011-2019 Branimir Karadzic. All rights reserved.
 # License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
 #
 
@@ -47,6 +47,7 @@ projgen: ## Generate project files for all configurations.
 	$(GENIE) --with-tools --xcode=ios         xcode8
 	$(GENIE)              --gcc=freebsd       gmake
 	$(GENIE)                                --gcc=android-arm     gmake
+	$(GENIE)                                --gcc=android-arm64   gmake
 	$(GENIE)                                --gcc=android-mips    gmake
 	$(GENIE)                                --gcc=android-x86     gmake
 	$(GENIE)                                --gcc=asmjs           gmake
@@ -63,6 +64,14 @@ android-arm-debug: .build/projects/gmake-android-arm ## Build - Android ARM Debu
 android-arm-release: .build/projects/gmake-android-arm ## Build - Android ARM Release
 	$(MAKE) -R -C .build/projects/gmake-android-arm config=release
 android-arm: android-arm-debug android-arm-release ## Build - Android ARM Debug and Release
+
+.build/projects/gmake-android-arm64:
+	$(GENIE) --gcc=android-arm64 gmake
+android-arm64-debug: .build/projects/gmake-android-arm64 ## Build - Android ARM64 Debug
+	$(MAKE) -R -C .build/projects/gmake-android-arm64 config=debug
+android-arm64-release: .build/projects/gmake-android-arm64 ## Build - Android ARM64 Release
+	$(MAKE) -R -C .build/projects/gmake-android-arm64 config=release
+android-arm64: android-arm64-debug android-arm64-release ## Build - Android ARM64 Debug and Release
 
 .build/projects/gmake-android-mips:
 	$(GENIE) --gcc=android-mips gmake

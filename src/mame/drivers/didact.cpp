@@ -170,10 +170,10 @@ public:
 	void md6802(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER( pia2_kbA_r );
-	DECLARE_WRITE8_MEMBER( pia2_kbA_w );
-	DECLARE_READ8_MEMBER( pia2_kbB_r );
-	DECLARE_WRITE8_MEMBER( pia2_kbB_w );
+	uint8_t pia2_kbA_r();
+	void pia2_kbA_w(uint8_t data);
+	uint8_t pia2_kbB_r();
+	void pia2_kbB_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia2_ca2_w );
 
 	virtual void machine_reset() override;
@@ -191,7 +191,7 @@ private:
 };
 
 /* Keyboard */
-READ8_MEMBER( md6802_state::pia2_kbA_r )
+uint8_t md6802_state::pia2_kbA_r()
 {
 	uint8_t ls145;
 	uint8_t pa = 0xff;
@@ -221,7 +221,7 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 }
 
 /* Pull the cathodes low enabling the correct digit and lit the segments held by port B */
-WRITE8_MEMBER( md6802_state::pia2_kbA_w )
+void md6802_state::pia2_kbA_w(uint8_t data)
 {
 //  LOG("--->%s(%02x)\n", FUNCNAME, data);
 
@@ -232,15 +232,15 @@ WRITE8_MEMBER( md6802_state::pia2_kbA_w )
 }
 
 /* PIA 2 Port B is all outputs to drive the display so it is very unlikely that this function is called */
-READ8_MEMBER( md6802_state::pia2_kbB_r )
+uint8_t md6802_state::pia2_kbB_r()
 {
 	LOG("Warning, trying to read from Port B designated to drive the display, please check why\n");
 	logerror("Warning, trying to read from Port B designated to drive the display, please check why\n");
 	return 0;
 }
 
-/* Port B is fully used ouputting the segment pattern to the display */
-WRITE8_MEMBER( md6802_state::pia2_kbB_w )
+/* Port B is fully used outputting the segment pattern to the display */
+void  md6802_state::pia2_kbB_w(uint8_t data)
 {
 //  LOG("--->%s(%02x)\n", FUNCNAME, data);
 
@@ -347,12 +347,12 @@ class mp68a_state : public didact_state
 	required_device_array<dm9368_device, 6> m_digits;
 	output_finder<6> m_7segs;
 
-	DECLARE_READ8_MEMBER( pia2_kbA_r );
-	DECLARE_WRITE8_MEMBER( pia2_kbA_w );
-	DECLARE_READ8_MEMBER( pia2_kbB_r );
-	DECLARE_WRITE8_MEMBER( pia2_kbB_w );
+	uint8_t pia2_kbA_r();
+	void pia2_kbA_w(uint8_t data);
+	uint8_t pia2_kbB_r();
+	void pia2_kbB_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( pia2_cb1_r );
-	template <unsigned N> DECLARE_WRITE8_MEMBER( digit_w ) { m_7segs[N] = data; }
+	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -377,14 +377,14 @@ INPUT_CHANGED_MEMBER(didact_state::trigger_shift)
 	}
 }
 
-READ8_MEMBER( mp68a_state::pia2_kbA_r )
+uint8_t mp68a_state::pia2_kbA_r()
 {
 	LOG("--->%s\n", FUNCNAME);
 
 	return 0;
 }
 
-WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
+void mp68a_state::pia2_kbA_w(uint8_t data)
 {
 	/* Display memory is at $702 to $708 in AAAADD format (A=address digit, D=Data digit)
 	   but we are using data read from the port. */
@@ -409,7 +409,7 @@ WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
 	}
 }
 
-READ8_MEMBER( mp68a_state::pia2_kbB_r )
+uint8_t mp68a_state::pia2_kbB_r()
 {
 	uint8_t a012, line, pb;
 
@@ -444,7 +444,7 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 	return pb;
 }
 
-WRITE8_MEMBER( mp68a_state::pia2_kbB_w )
+void mp68a_state::pia2_kbB_w(uint8_t data)
 {
 	LOG("--->%s(%02x)\n", FUNCNAME, data);
 	m_cass->output(BIT(data, 4) ? -1.0 : +1.0);
@@ -551,8 +551,8 @@ class modulab_state : public didact_state
 	virtual void machine_start() override;
 	void modulab(machine_config &config);
 protected:
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 private:
 	void modulab_map(address_map &map);
@@ -585,7 +585,7 @@ WRITE_LINE_MEMBER( modulab_state::da_w )
 	m_da = state == CLEAR_LINE ? 0 : 1; // Capture data available signal
 }
 
-READ8_MEMBER(modulab_state::io_r)
+uint8_t modulab_state::io_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -603,7 +603,7 @@ READ8_MEMBER(modulab_state::io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(modulab_state::io_w)
+void modulab_state::io_w(offs_t offset, u8 data)
 {
 	LOG("--->%s()\n", FUNCNAME);
 	uint8_t b = data & 1;
@@ -649,7 +649,6 @@ void modulab_state::machine_start()
 // This address map is traced from pcb
 void modulab_state::modulab_map(address_map &map)
 {
-	//map(0x0000, 0x007f).ram() // Schematics holds RAM enable low so that the M6802 internal RAM is disabled.
 	map(0x0000, 0x03ff).ram().mirror(0xe000); // RAM0 always present 2114
 	map(0x0400, 0x07ff).ram().mirror(0xe000); // RAM1 optional 2114
 	// map(0x0800, 0x13ff).ram().mirror(0xe000); // expansion port area consisting of 3 chip selects each selecting 0x3ff byte addresses
@@ -781,8 +780,9 @@ INPUT_CHANGED_MEMBER(didact_state::trigger_reset)
 
 void modulab_state::modulab(machine_config &config)
 {
-	M6802(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &modulab_state::modulab_map);
+	m6802_cpu_device &maincpu(M6802(config, m_maincpu, XTAL(4'000'000)));
+	maincpu.set_ram_enable(false); // Schematics holds RAM enable low so that the M6802 internal RAM is disabled.
+	maincpu.set_addrmap(AS_PROGRAM, &modulab_state::modulab_map);
 	config.set_default_layout(layout_modulab);
 
 	/* Devices */
@@ -805,8 +805,9 @@ void modulab_state::modulab(machine_config &config)
 
 void md6802_state::md6802(machine_config &config)
 {
-	M6802(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &md6802_state::md6802_map);
+	m6802_cpu_device &maincpu(M6802(config, m_maincpu, XTAL(4'000'000)));
+	maincpu.set_ram_enable(false);
+	maincpu.set_addrmap(AS_PROGRAM, &md6802_state::md6802_map);
 	config.set_default_layout(layout_md6802);
 
 	/* Devices */

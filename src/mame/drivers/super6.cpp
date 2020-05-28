@@ -100,7 +100,7 @@ void super6_state::bankswitch()
 //  s100_w - S-100 bus extended address A16-A23
 //-------------------------------------------------
 
-WRITE8_MEMBER( super6_state::s100_w )
+void super6_state::s100_w(uint8_t data)
 {
 	/*
 
@@ -125,7 +125,7 @@ WRITE8_MEMBER( super6_state::s100_w )
 //  bank0_w - on-board memory control port #0
 //-------------------------------------------------
 
-WRITE8_MEMBER( super6_state::bank0_w )
+void super6_state::bank0_w(uint8_t data)
 {
 	/*
 
@@ -152,7 +152,7 @@ WRITE8_MEMBER( super6_state::bank0_w )
 //  bank1_w - on-board memory control port #1
 //-------------------------------------------------
 
-WRITE8_MEMBER( super6_state::bank1_w )
+void super6_state::bank1_w(uint8_t data)
 {
 	/*
 
@@ -184,7 +184,7 @@ WRITE8_MEMBER( super6_state::bank1_w )
 //  floppy_r - FDC synchronization/drive/density
 //-------------------------------------------------
 
-READ8_MEMBER( super6_state::fdc_r )
+uint8_t super6_state::fdc_r()
 {
 	/*
 
@@ -211,7 +211,7 @@ READ8_MEMBER( super6_state::fdc_r )
 //  floppy_w - FDC synchronization/drive/density
 //-------------------------------------------------
 
-WRITE8_MEMBER( super6_state::fdc_w )
+void super6_state::fdc_w(uint8_t data)
 {
 	/*
 
@@ -277,14 +277,14 @@ void super6_state::super6_io(address_map &map)
 	map(0x04, 0x07).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x08, 0x0b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
-	map(0x10, 0x10).mirror(0x03).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x10, 0x10).mirror(0x03).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x14, 0x14).rw(FUNC(super6_state::fdc_r), FUNC(super6_state::fdc_w));
 	map(0x15, 0x15).portr("J7").w(FUNC(super6_state::s100_w));
 	map(0x16, 0x16).w(FUNC(super6_state::bank0_w));
 	map(0x17, 0x17).w(FUNC(super6_state::bank1_w));
 	map(0x18, 0x18).mirror(0x03).w(BR1945_TAG, FUNC(com8116_device::stt_str_w));
-//  AM_RANGE(0x40, 0x40) ?
-//  AM_RANGE(0xe0, 0xe7) HDC?
+//  map(0x40, 0x40) ?
+//  map(0xe0, 0xe7) HDC?
 }
 
 
@@ -345,25 +345,25 @@ INPUT_PORTS_END
 //  Z80DMA
 //-------------------------------------------------
 
-READ8_MEMBER(super6_state::memory_read_byte)
+uint8_t super6_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(super6_state::memory_write_byte)
+void super6_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(super6_state::io_read_byte)
+uint8_t super6_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(super6_state::io_write_byte)
+void super6_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);

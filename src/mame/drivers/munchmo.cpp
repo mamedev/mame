@@ -102,7 +102,7 @@ void munchmo_state::mnchmobl_map(address_map &map)
 	map(0xbaba, 0xbaba).nopw(); /* ? */
 	map(0xbc00, 0xbc7f).ram().share(m_status_vram);
 	map(0xbe00, 0xbe00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xbe01, 0xbe01).select(0x0070).lw8("mainlatch_w", [this](offs_t offset, u8 data){ m_mainlatch->write_d0(offset >> 4, data); });
+	map(0xbe01, 0xbe01).select(0x0070).lw8(NAME([this] (offs_t offset, u8 data){ m_mainlatch->write_d0(offset >> 4, data); }));
 	map(0xbe02, 0xbe02).portr("DSW1");
 	map(0xbe03, 0xbe03).portr("DSW2");
 	map(0xbf00, 0xbf00).w(FUNC(munchmo_state::nmi_ack_w)); // CNI 1-8C

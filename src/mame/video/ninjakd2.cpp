@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::get_fg_tile_info)
 	int const flipyx = (hi & 0x30) >> 4;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			TILE_FLIPYX(flipyx));
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::ninjakd2_get_bg_tile_info)
 	int const flipyx = (hi & 0x30) >> 4;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color,
 			TILE_FLIPYX(flipyx));
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(mnight_state::mnight_get_bg_tile_info)
 	int const flipy = (hi & 0x20) >> 5;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color,
 			flipy ? TILE_FLIPY : 0);
@@ -79,7 +79,7 @@ TILE_GET_INFO_MEMBER(robokid_state::robokid_get_bg_tile_info)
 	int const tile = ((hi & 0x10) << 7) | ((hi & 0x20) << 5) | ((hi & 0xc0) << 2) | lo;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(Layer + 2,
+	tileinfo.set(Layer + 2,
 			tile,
 			color,
 			0);
@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(robokid_state::robokid_get_bg_tile_info)
 
 void ninjakd2_state::video_init_common()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ninjakd2_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0xf);
 
 	m_screen->register_screen_bitmap(m_sprites_bitmap);
@@ -135,7 +135,7 @@ void ninjakd2_state::video_start()
 {
 	video_init_common();
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::ninjakd2_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ninjakd2_state::ninjakd2_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_stencil_compare_function = stencil_ninjakd2;
 }
@@ -144,7 +144,7 @@ VIDEO_START_MEMBER(mnight_state,mnight)
 {
 	video_init_common();
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mnight_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mnight_state::mnight_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_stencil_compare_function = stencil_mnight;
 }
@@ -153,7 +153,7 @@ VIDEO_START_MEMBER(mnight_state,arkarea)
 {
 	video_init_common();
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mnight_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mnight_state::mnight_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_stencil_compare_function = stencil_arkarea;
 }
@@ -164,9 +164,9 @@ VIDEO_START_MEMBER(robokid_state,robokid)
 	video_init_banked(0x0800);
 	m_robokid_sprites = 1;
 
-	m_robokid_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(robokid_state::robokid_get_bg_tile_info<0>),this), tilemap_mapper_delegate(FUNC(robokid_state::robokid_bg_scan),this), 16, 16, 32, 32);
-	m_robokid_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(robokid_state::robokid_get_bg_tile_info<1>),this), tilemap_mapper_delegate(FUNC(robokid_state::robokid_bg_scan),this), 16, 16, 32, 32);
-	m_robokid_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(robokid_state::robokid_get_bg_tile_info<2>),this), tilemap_mapper_delegate(FUNC(robokid_state::robokid_bg_scan),this), 16, 16, 32, 32);
+	m_robokid_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(robokid_state::robokid_get_bg_tile_info<0>)), tilemap_mapper_delegate(*this, FUNC(robokid_state::robokid_bg_scan)), 16, 16, 32, 32);
+	m_robokid_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(robokid_state::robokid_get_bg_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(robokid_state::robokid_bg_scan)), 16, 16, 32, 32);
+	m_robokid_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(robokid_state::robokid_get_bg_tile_info<2>)), tilemap_mapper_delegate(*this, FUNC(robokid_state::robokid_bg_scan)), 16, 16, 32, 32);
 
 	m_robokid_tilemap[1]->set_transparent_pen(0xf);
 	m_robokid_tilemap[2]->set_transparent_pen(0xf);
@@ -180,9 +180,9 @@ VIDEO_START_MEMBER(omegaf_state,omegaf)
 	video_init_banked(0x2000);
 	m_robokid_sprites = 1;
 
-	m_robokid_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(omegaf_state::robokid_get_bg_tile_info<0>),this), tilemap_mapper_delegate(FUNC(omegaf_state::omegaf_bg_scan),this), 16, 16, 128, 32);
-	m_robokid_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(omegaf_state::robokid_get_bg_tile_info<1>),this), tilemap_mapper_delegate(FUNC(omegaf_state::omegaf_bg_scan),this), 16, 16, 128, 32);
-	m_robokid_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(omegaf_state::robokid_get_bg_tile_info<2>),this), tilemap_mapper_delegate(FUNC(omegaf_state::omegaf_bg_scan),this), 16, 16, 128, 32);
+	m_robokid_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(omegaf_state::robokid_get_bg_tile_info<0>)), tilemap_mapper_delegate(*this, FUNC(omegaf_state::omegaf_bg_scan)), 16, 16, 128, 32);
+	m_robokid_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(omegaf_state::robokid_get_bg_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(omegaf_state::omegaf_bg_scan)), 16, 16, 128, 32);
+	m_robokid_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(omegaf_state::robokid_get_bg_tile_info<2>)), tilemap_mapper_delegate(*this, FUNC(omegaf_state::omegaf_bg_scan)), 16, 16, 128, 32);
 
 	m_robokid_tilemap[0]->set_transparent_pen(0xf);
 	m_robokid_tilemap[1]->set_transparent_pen(0xf);

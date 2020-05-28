@@ -342,11 +342,11 @@ private:
 	required_region_ptr<uint16_t> m_charmap;
 	required_ioport m_dsw2;
 
-	DECLARE_READ8_MEMBER(dwarfd_ram_r);
-	DECLARE_WRITE8_MEMBER(dwarfd_ram_w);
-	DECLARE_WRITE8_MEMBER(output1_w);
-	DECLARE_WRITE8_MEMBER(output2_w);
-	DECLARE_READ8_MEMBER(qc_b8_r);
+	uint8_t dwarfd_ram_r(offs_t offset);
+	void dwarfd_ram_w(offs_t offset, uint8_t data);
+	void output1_w(uint8_t data);
+	void output2_w(uint8_t data);
+	uint8_t qc_b8_r();
 	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	void dwarfd_palette(palette_device &palette) const;
@@ -361,7 +361,7 @@ private:
 };
 
 
-READ8_MEMBER(dwarfd_state::dwarfd_ram_r)
+uint8_t dwarfd_state::dwarfd_ram_r(offs_t offset)
 {
 	if (m_crt_access == 0)
 	{
@@ -369,17 +369,17 @@ READ8_MEMBER(dwarfd_state::dwarfd_ram_r)
 	}
 	else
 	{
-		m_crtc->dack_w(space, 0, m_dw_ram[offset], mem_mask);
+		m_crtc->dack_w(m_dw_ram[offset]);
 		return m_dw_ram[offset];
 	}
 }
 
-WRITE8_MEMBER(dwarfd_state::dwarfd_ram_w)
+void dwarfd_state::dwarfd_ram_w(offs_t offset, uint8_t data)
 {
 	m_dw_ram[offset] = data;
 }
 
-WRITE8_MEMBER(dwarfd_state::output1_w)
+void dwarfd_state::output1_w(uint8_t data)
 {
 /*
  bits:
@@ -394,7 +394,7 @@ WRITE8_MEMBER(dwarfd_state::output1_w)
 */
 }
 
-WRITE8_MEMBER(dwarfd_state::output2_w)
+void dwarfd_state::output2_w(uint8_t data)
 {
 /*
  bits:
@@ -410,7 +410,7 @@ WRITE8_MEMBER(dwarfd_state::output2_w)
 }
 
 
-READ8_MEMBER(dwarfd_state::qc_b8_r)
+uint8_t dwarfd_state::qc_b8_r()
 {
 	return machine().rand();
 }

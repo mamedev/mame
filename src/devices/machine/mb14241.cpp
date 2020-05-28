@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(MB14241, mb14241_device, "mb14241", "MB14241 Data Shifter")
 
-mb14241_device::mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mb14241_device::mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MB14241, tag, owner, clock), m_shift_data(0), m_shift_count(0)
 {
 }
@@ -47,17 +47,17 @@ void mb14241_device::device_reset()
     IMPLEMENTATION
 *****************************************************************************/
 
-WRITE8_MEMBER( mb14241_device::shift_count_w )
+void mb14241_device::shift_count_w(u8 data)
 {
 	m_shift_count = ~data & 0x07;
 }
 
-WRITE8_MEMBER( mb14241_device::shift_data_w )
+void mb14241_device::shift_data_w(u8 data)
 {
-	m_shift_data = (m_shift_data >> 8) | ((uint16_t)data << 7);
+	m_shift_data = (m_shift_data >> 8) | (u16(data) << 7);
 }
 
-READ8_MEMBER( mb14241_device::shift_result_r )
+u8 mb14241_device::shift_result_r()
 {
-	return m_shift_data >> m_shift_count;
+	return u8((m_shift_data >> m_shift_count) & 0x00ff);
 }

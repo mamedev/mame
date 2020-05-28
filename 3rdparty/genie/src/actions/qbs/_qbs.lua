@@ -19,7 +19,7 @@ newaction
 	valid_kinds     = {"ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle"},
 	valid_languages = {"C", "C++"},
 	valid_tools     = {
-		cc = { "gcc" },
+		cc = { "gcc", "msc" },
 	},
 
 	-- Solution and project generation logic

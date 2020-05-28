@@ -62,7 +62,7 @@ public:
 	void init_spk116it();
 	void init_3super8();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 protected:
 	virtual void machine_start() override;
@@ -97,11 +97,11 @@ private:
 	DECLARE_WRITE8_MEMBER(bg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
+	void nmi_and_coins_w(uint8_t data);
+	void leds_w(uint8_t data);
 
 	// spk116it and spk115it specific
-	DECLARE_WRITE8_MEMBER(video_and_leds_w);
+	void video_and_leds_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(magic_w);
 	DECLARE_READ8_MEMBER(magic_r);
 
@@ -128,13 +128,13 @@ WRITE8_MEMBER(spoker_state::bg_tile_w)
 TILE_GET_INFO_MEMBER(spoker_state::get_bg_tile_info)
 {
 	int code = m_bg_tile_ram[tile_index];
-	SET_TILE_INFO_MEMBER(1 + (tile_index & 3), code & 0xff, 0, 0);
+	tileinfo.set(1 + (tile_index & 3), code & 0xff, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(spoker_state::get_fg_tile_info)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
-	SET_TILE_INFO_MEMBER(0, code, (4*(code >> 14)+3), 0);
+	tileinfo.set(0, code, (4*(code >> 14)+3), 0);
 }
 
 WRITE8_MEMBER(spoker_state::fg_tile_w)
@@ -151,8 +151,8 @@ WRITE8_MEMBER(spoker_state::fg_color_w)
 
 void spoker_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  32, 128, 8);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  128, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spoker_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,  32, 128, 8);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spoker_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,  8,  128, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
@@ -169,7 +169,7 @@ uint32_t spoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
                                Misc Handlers
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(spoker_state::hopper_r)
+READ_LINE_MEMBER(spoker_state::hopper_r)
 {
 	if (m_hopper) return !(m_screen->frame_number()%10);
 	return machine().input().code_pressed(KEYCODE_H);
@@ -182,7 +182,7 @@ static void show_out(running_machine &machine,  uint8_t *out)
 #endif
 }
 
-WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
+void spoker_state::nmi_and_coins_w(uint8_t data)
 {
 	if ((data) & (0x22))
 	{
@@ -206,7 +206,7 @@ WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 	show_out(machine(), m_out);
 }
 
-WRITE8_MEMBER(spoker_state::video_and_leds_w)
+void spoker_state::video_and_leds_w(uint8_t data)
 {
 	m_leds[4] = BIT(data, 0); // start?
 	m_leds[5] = BIT(data, 2); // l_bet?
@@ -218,7 +218,7 @@ WRITE8_MEMBER(spoker_state::video_and_leds_w)
 	show_out(machine(), m_out);
 }
 
-WRITE8_MEMBER(spoker_state::leds_w)
+void spoker_state::leds_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 0);  // stop_1
 	m_leds[1] = BIT(data, 1);  // stop_2
@@ -297,7 +297,7 @@ void spoker_state::spoker_portmap(address_map &map)
 
 void spoker_state::_3super8_portmap(address_map &map)
 {
-//  AM_RANGE(0x1000, 0x1fff) AM_WRITENOP
+//  map(0x1000, 0x1fff).nopw();
 	map(0x2000, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2800, 0x2fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x3000, 0x33ff).ram().w(FUNC(spoker_state::bg_tile_w)).share(m_bg_tile_ram);
@@ -306,7 +306,7 @@ void spoker_state::_3super8_portmap(address_map &map)
 	map(0x4002, 0x4002).portr("DSW3");
 	map(0x4003, 0x4003).portr("DSW4");
 	map(0x4004, 0x4004).portr("DSW5");
-//  AM_RANGE(0x4000, 0x40ff) AM_WRITENOP
+//  map(0x4000, 0x40ff).nopw();
 	map(0x5000, 0x5fff).ram().w(FUNC(spoker_state::fg_tile_w)).share(m_fg_tile_ram);
 
 //  The following one (0x6480) should be output. At beginning of code, there is a PPI initialization
@@ -409,7 +409,7 @@ static INPUT_PORTS_START( spoker )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Memory Clear") // stats, memory
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, nullptr) PORT_NAME("HPSW")   // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(spoker_state, hopper_r) PORT_NAME("HPSW")   // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
@@ -478,7 +478,7 @@ static INPUT_PORTS_START( 3super8 )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, nullptr) PORT_NAME("HPSW")   // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(spoker_state, hopper_r) PORT_NAME("HPSW")   // hopper sensor
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1   )
@@ -612,7 +612,7 @@ void spoker_state::machine_reset()
 void spoker_state::spoker(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 2);   /* HD64180RP8, 8 MHz? */
+	HD64180RP(config, m_maincpu, XTAL(12'000'000));   /* HD64180RP8, 8 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &spoker_state::spoker_map);
 	m_maincpu->set_addrmap(AS_IO, &spoker_state::spoker_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(spoker_state::nmi_line_assert));

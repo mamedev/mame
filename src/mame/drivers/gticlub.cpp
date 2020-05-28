@@ -255,6 +255,7 @@ public:
 		m_dsp(*this, "dsp"),
 		m_dsp2(*this, "dsp2"),
 		m_k056800(*this, "k056800"),
+		m_gn680(*this, "gn680"),
 		m_adc1038(*this, "adc1038"),
 		m_eeprom(*this, "eeprom"),
 		m_palette(*this, "palette"),
@@ -297,6 +298,7 @@ private:
 	required_device<adsp21062_device> m_dsp;
 	optional_device<adsp21062_device> m_dsp2;
 	required_device<k056800_device> m_k056800;
+	optional_device<cpu_device> m_gn680;
 	required_device<adc1038_device> m_adc1038;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
@@ -318,23 +320,24 @@ private:
 
 	required_ioport_array<4> m_ports;
 
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
-	DECLARE_READ32_MEMBER(gticlub_k001604_tile_r);
-	DECLARE_WRITE32_MEMBER(gticlub_k001604_tile_w);
-	DECLARE_READ32_MEMBER(gticlub_k001604_char_r);
-	DECLARE_WRITE32_MEMBER(gticlub_k001604_char_w);
-	DECLARE_READ32_MEMBER(gticlub_k001604_reg_r);
-	DECLARE_WRITE32_MEMBER(gticlub_k001604_reg_w);
-	DECLARE_READ8_MEMBER(sysreg_r);
-	DECLARE_WRITE8_MEMBER(sysreg_w);
-	DECLARE_READ32_MEMBER(dsp_dataram0_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
-	DECLARE_READ32_MEMBER(dsp_dataram1_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
+	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gticlub_k001604_tile_r(offs_t offset);
+	void gticlub_k001604_tile_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gticlub_k001604_char_r(offs_t offset);
+	void gticlub_k001604_char_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gticlub_k001604_reg_r(offs_t offset);
+	void gticlub_k001604_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t sysreg_r(offs_t offset);
+	void sysreg_w(offs_t offset, uint8_t data);
+	void gn680_sysctrl_w(uint16_t data);
+	uint32_t dsp_dataram0_r(offs_t offset);
+	void dsp_dataram0_w(offs_t offset, uint32_t data);
+	uint32_t dsp_dataram1_r(offs_t offset);
+	void dsp_dataram1_w(offs_t offset, uint32_t data);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
-	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
-	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
+	void soundtimer_en_w(uint16_t data);
+	void soundtimer_count_w(uint16_t data);
 
 	DECLARE_MACHINE_START(gticlub);
 	DECLARE_MACHINE_RESET(gticlub);
@@ -351,6 +354,7 @@ private:
 
 	void gticlub_map(address_map &map);
 	void hangplt_map(address_map &map);
+	void gn680_memmap(address_map &map);
 	void hangplt_sharc0_map(address_map &map);
 	void hangplt_sharc1_map(address_map &map);
 	void sharc_map(address_map &map);
@@ -365,7 +369,7 @@ private:
 };
 
 
-WRITE32_MEMBER(gticlub_state::paletteram32_w)
+void gticlub_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -382,47 +386,47 @@ WRITE_LINE_MEMBER(gticlub_state::voodoo_vblank_1)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ32_MEMBER(gticlub_state::gticlub_k001604_tile_r)
+uint32_t gticlub_state::gticlub_k001604_tile_r(offs_t offset)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	return k001604->tile_r(space, offset, mem_mask);
+	return k001604->tile_r(offset);
 }
 
-WRITE32_MEMBER(gticlub_state::gticlub_k001604_tile_w)
+void gticlub_state::gticlub_k001604_tile_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->tile_w(space, offset, data, mem_mask);
+	k001604->tile_w(offset, data, mem_mask);
 }
 
 
-READ32_MEMBER(gticlub_state::gticlub_k001604_char_r)
+uint32_t gticlub_state::gticlub_k001604_char_r(offs_t offset)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	return k001604->char_r(space, offset, mem_mask);
+	return k001604->char_r(offset);
 }
 
-WRITE32_MEMBER(gticlub_state::gticlub_k001604_char_w)
+void gticlub_state::gticlub_k001604_char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->char_w(space, offset, data, mem_mask);
+	k001604->char_w(offset, data, mem_mask);
 }
 
-READ32_MEMBER(gticlub_state::gticlub_k001604_reg_r)
+uint32_t gticlub_state::gticlub_k001604_reg_r(offs_t offset)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	return k001604->reg_r(space, offset, mem_mask);
+	return k001604->reg_r(offset);
 }
 
-WRITE32_MEMBER(gticlub_state::gticlub_k001604_reg_w)
+void gticlub_state::gticlub_k001604_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->reg_w(space, offset, data, mem_mask);
+	k001604->reg_w(offset, data);
 }
 
 
 /******************************************************************/
 
-READ8_MEMBER(gticlub_state::sysreg_r)
+uint8_t gticlub_state::sysreg_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -454,7 +458,7 @@ READ8_MEMBER(gticlub_state::sysreg_r)
 	return 0;
 }
 
-WRITE8_MEMBER(gticlub_state::sysreg_w)
+void gticlub_state::sysreg_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -492,7 +496,7 @@ TIMER_CALLBACK_MEMBER(gticlub_state::sound_irq)
 }
 
 
-WRITE16_MEMBER(gticlub_state::soundtimer_en_w)
+void gticlub_state::soundtimer_en_w(uint16_t data)
 {
 	if (data & 1)
 	{
@@ -507,7 +511,7 @@ WRITE16_MEMBER(gticlub_state::soundtimer_en_w)
 	}
 }
 
-WRITE16_MEMBER(gticlub_state::soundtimer_count_w)
+void gticlub_state::soundtimer_count_w(uint16_t data)
 {
 	// Reset the count
 	m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
@@ -579,22 +583,42 @@ void gticlub_state::sound_memmap(address_map &map)
 
 /*****************************************************************************/
 
-READ32_MEMBER(gticlub_state::dsp_dataram0_r)
+void gticlub_state::gn680_sysctrl_w(uint16_t data)
+{
+	// bit 15 = watchdog toggle
+	// lower 4 bits = LEDs?
+}
+
+// WORD at 30000e: IRQ 5 tests bits 6 and 7, IRQ 6 tests bits 4 and 5
+// IRQ 3 tests for network/056230 at 310000 to communicate with the main pcb
+
+void gticlub_state::gn680_memmap(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x200000, 0x203fff).ram();
+	map(0x300000, 0x300001).w(FUNC(gticlub_state::gn680_sysctrl_w));
+//	map(0x310000, 0x311fff).nopw(); //056230 regs?
+//	map(0x312000, 0x313fff).nopw(); //056230 ram?
+}
+
+/*****************************************************************************/
+
+uint32_t gticlub_state::dsp_dataram0_r(offs_t offset)
 {
 	return m_sharc_dataram_0[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(gticlub_state::dsp_dataram0_w)
+void gticlub_state::dsp_dataram0_w(offs_t offset, uint32_t data)
 {
 	m_sharc_dataram_0[offset] = data;
 }
 
-READ32_MEMBER(gticlub_state::dsp_dataram1_r)
+uint32_t gticlub_state::dsp_dataram1_r(offs_t offset)
 {
 	return m_sharc_dataram_1[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(gticlub_state::dsp_dataram1_w)
+void gticlub_state::dsp_dataram1_w(offs_t offset, uint32_t data)
 {
 	m_sharc_dataram_1[offset] = data;
 }
@@ -948,7 +972,7 @@ void gticlub_state::gticlub(machine_config &config)
 	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp->set_addrmap(AS_DATA, &gticlub_state::sharc_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 
@@ -1006,13 +1030,16 @@ void gticlub_state::gticlub(machine_config &config)
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
 }
 
-void gticlub_state::thunderh(machine_config &config) //todo: add 68000 and K056230 from the I/O board
+void gticlub_state::thunderh(machine_config &config) // Todo: K056230 from the I/O board
 {
 	gticlub(config);
 
 	m_adc1038->set_gti_club_hack(false);
 
 	m_k056230->set_thunderh_hack(true);
+	
+	M68000(config, m_gn680, XTAL(32'000'000) / 2); // 16MHz
+	m_gn680->set_addrmap(AS_PROGRAM, &gticlub_state::gn680_memmap);
 }
 
 void gticlub_state::slrasslt(machine_config &config)
@@ -1050,7 +1077,7 @@ void gticlub_state::hangplt(machine_config &config)
 	m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp2->set_addrmap(AS_DATA, &gticlub_state::hangplt_sharc1_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 
@@ -1259,7 +1286,7 @@ ROM_START( thunderh ) /* Euro version EAA */
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
-	ROM_REGION(0x20000, "dsp", 0)       /* GN680 program */
+	ROM_REGION(0x20000, "gn680", 0)       /* GN680 program */
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
 	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
@@ -1289,7 +1316,7 @@ ROM_START( thunderhu ) /* USA version UAA */
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
-	ROM_REGION(0x20000, "dsp", 0)       /* GN680 program */
+	ROM_REGION(0x20000, "gn680", 0)       /* GN680 program */
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
 	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */

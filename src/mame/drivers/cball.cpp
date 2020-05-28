@@ -45,9 +45,9 @@ public:
 	emu_timer *m_int_timer;
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(wram_r);
-	DECLARE_WRITE8_MEMBER(wram_w);
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t wram_r(offs_t offset);
+	void wram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -69,11 +69,11 @@ TILE_GET_INFO_MEMBER(cball_state::get_tile_info)
 {
 	uint8_t code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, code >> 7, 0);
+	tileinfo.set(0, code, code >> 7, 0);
 }
 
 
-WRITE8_MEMBER(cball_state::vram_w)
+void cball_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -82,7 +82,7 @@ WRITE8_MEMBER(cball_state::vram_w)
 
 void cball_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cball_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cball_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -110,7 +110,7 @@ void cball_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in cball_state::device_timer");
+		throw emu_fatalerror("Unknown id in cball_state::device_timer");
 	}
 }
 
@@ -152,13 +152,13 @@ void cball_state::cball_palette(palette_device &palette) const
 }
 
 
-READ8_MEMBER(cball_state::wram_r)
+uint8_t cball_state::wram_r(offs_t offset)
 {
 	return m_video_ram[0x380 + offset];
 }
 
 
-WRITE8_MEMBER(cball_state::wram_w)
+void cball_state::wram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[0x380 + offset] = data;
 }

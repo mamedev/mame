@@ -54,46 +54,46 @@ void jensen_state::local_memory(address_map &map)
 void jensen_state::local_io(address_map &map)
 {
 	map(0x00000000, 0x0000001f); // EISA INTA cycle
-	map(0x80000000, 0x9fffffff).lr8("feprom0", [this](offs_t offset) { return m_feprom[0]->read(offset >> 9); });
-	map(0xa0000000, 0xbfffffff).lr8("feprom1", [this](offs_t offset) { return m_feprom[1]->read(offset >> 9); });
+	map(0x80000000, 0x9fffffff).lr8(NAME([this] (offs_t offset) { return m_feprom[0]->read(offset >> 9); }));
+	map(0xa0000000, 0xbfffffff).lr8(NAME([this] (offs_t offset) { return m_feprom[1]->read(offset >> 9); }));
 
 	//map(0xc0000000, 0xc1ffffff); // vl82c106 bits 24:9 -> vlsi 15:0 i.e. >> 9
 
-	map(0xd0000000, 0xd0000000).lrw8("hae", [this]() { return m_hae; }, [this](u8 data) { m_hae = data & 0x7f; });
-	map(0xe0000000, 0xe0000000).lrw8("sysctl", [this]() { return m_sysctl; }, [this](u8 data) { m_sysctl = data; logerror("led %x\n", data & 0xf); });
-	map(0xf0000000, 0xf0000000).lrw8("spare", [this]() { return m_spare; }, [this](u8 data) { m_spare = data; });
+	map(0xd0000000, 0xd0000000).lrw8(NAME([this] () { return m_hae; }), NAME([this] (u8 data) { m_hae = data & 0x7f; }));
+	map(0xe0000000, 0xe0000000).lrw8(NAME([this] () { return m_sysctl; }), NAME([this] (u8 data) { m_sysctl = data; logerror("led %x\n", data & 0xf); }));
+	map(0xf0000000, 0xf0000000).lrw8(NAME([this] () { return m_spare; }), NAME([this] (u8 data) { m_spare = data; }));
 }
 
 void jensen_state::eisa_memory(address_map &map)
 {
-	map(0x00000000, 0xffffffff).lrw8("eisa_memory",
-		[this](offs_t offset)
-		{
-			LOG("eisa_memory_r 0x%08x\n", (u32(m_hae) << 25) | (offset >> 7));
+	map(0x00000000, 0xffffffff).lrw8(
+			NAME([this] (offs_t offset)
+			{
+				LOG("eisa_memory_r 0x%08x\n", (u32(m_hae) << 25) | (offset >> 7));
 
-			return 0;
-		},
-		[this](offs_t offset, u8 data)
-		{
-			LOG("eisa_memory_w 0x%08x data 0x%02x\n", (u32(m_hae) << 25) | (offset >> 7), data);
-		});
+				return 0;
+			}),
+			NAME([this] (offs_t offset, u8 data)
+			{
+				LOG("eisa_memory_w 0x%08x data 0x%02x\n", (u32(m_hae) << 25) | (offset >> 7), data);
+			}));
 }
 
 void jensen_state::eisa_io(address_map &map)
 {
-	map(0x00000000, 0xffffffff).lrw8("eisa_io",
-		[this](offs_t offset)
-		{
-			LOG("eisa_io_r offset 0x%08x address 0x%08x count %d (%s)\n", offset,
-				(u32(m_hae) << 25) | (offset >> 7), (offset >> 5) & 3, machine().describe_context());
+	map(0x00000000, 0xffffffff).lrw8(
+			NAME([this] (offs_t offset)
+			{
+				LOG("eisa_io_r offset 0x%08x address 0x%08x count %d (%s)\n", offset,
+					(u32(m_hae) << 25) | (offset >> 7), (offset >> 5) & 3, machine().describe_context());
 
-			return 0;
-		},
-		[this](offs_t offset, u8 data)
-		{
-			LOG("eisa_io_w offset 0x%08x address 0x%08x count %d data 0x%02x (%s)\n",
-				offset, (u32(m_hae) << 25) | (offset >> 7), (offset >> 5) & 3, data, machine().describe_context());
-		});
+				return 0;
+			}),
+			NAME([this] (offs_t offset, u8 data)
+			{
+				LOG("eisa_io_w offset 0x%08x address 0x%08x count %d data 0x%02x (%s)\n",
+					offset, (u32(m_hae) << 25) | (offset >> 7), (offset >> 5) & 3, data, machine().describe_context());
+			}));
 }
 
 void jensen_state::jensen(machine_config &config)

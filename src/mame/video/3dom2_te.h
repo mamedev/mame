@@ -32,10 +32,10 @@ public:
 	auto listend_int_handler() { return m_listend_int_handler.bind(); }
 	auto winclip_int_handler() { return m_winclip_int_handler.bind(); }
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset);
+	void write(offs_t offset, uint32_t data);
 
-	uint32_t *tram_ptr() const { return m_tram; }
+	uint32_t *tram_ptr() const { return &m_tram[0]; }
 
 	enum te_reg_wmode
 	{
@@ -48,7 +48,6 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -190,7 +189,6 @@ private:
 	void load_texture();
 
 	m2_bda_device       *m_bda;
-	const address_space_config  m_space_config; // TODO: Why is this still here?
 
 	devcb_write_line    m_general_int_handler;
 	devcb_write_line    m_dfinstr_int_handler;
@@ -409,8 +407,8 @@ private:
 
 	te_state    m_state;
 
-	uint32_t        *m_pipram;
-	uint32_t        *m_tram;
+	std::unique_ptr<uint32_t[]> m_pipram;
+	std::unique_ptr<uint32_t[]> m_tram;
 };
 
 DECLARE_DEVICE_TYPE(M2_TE, m2_te_device)
