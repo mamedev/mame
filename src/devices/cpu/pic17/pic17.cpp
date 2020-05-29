@@ -22,7 +22,7 @@
     — All instructions execute in a single cycle except for program
       transfers and table reads/writes
     – Signed overflow flag and decimal adjustment for addition
-    - 8 x 8 unsigned multiplication in hardware (except PIC17C42)
+    — 8 x 8 unsigned multiplication in hardware (except PIC17C42)
     — Single-bit instructions can manipulate any addressable register
     — MOVFP and MOVPF can transfer data between registers without
       touching the working register
@@ -54,6 +54,7 @@
       precede TABLWT to refresh the alternate half of TABLAT.
     — “Long” writes to internal EPROM (not emulated) can be aborted
       by the setting of any interrupt flag, whether enabled or not.
+    — SFR bank 15 is “reserved for Microchip use.”
 
 **********************************************************************/
 
