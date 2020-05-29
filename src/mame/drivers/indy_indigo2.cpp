@@ -535,7 +535,7 @@ ROM_START( indigo2_4415 )
 ROM_END
 
 //    YEAR  NAME          PARENT     COMPAT  MACHINE       INPUT CLASS       INIT        COMPANY                 FULLNAME                   FLAGS
-COMP( 1993, indy_4610,    0,         0,      indy_4610,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 100MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
-COMP( 1993, indy_4613,    indy_4610, 0,      indy_4613,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
-COMP( 1996, indy_5015,    indy_4610, 0,      indy_5015,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
+COMP( 1993, indy_4610,    0,         0,      indy_4610,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 100MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_MICROPHONE )
+COMP( 1993, indy_4613,    indy_4610, 0,      indy_4613,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_MICROPHONE )
+COMP( 1996, indy_5015,    indy_4610, 0,      indy_5015,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_MICROPHONE )
 COMP( 1993, indigo2_4415, 0,         0,      indigo2_4415, ip24, ip22_state, empty_init, "Silicon Graphics Inc", "Indigo2 (R4400, 150MHz)", MACHINE_NOT_WORKING )
