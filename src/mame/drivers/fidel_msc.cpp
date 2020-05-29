@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:Sean Riddle
 /******************************************************************************
 
 Fidelity Mini Sensory Chess Challenger (model MSC, 1981 version)
