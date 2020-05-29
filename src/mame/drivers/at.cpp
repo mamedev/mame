@@ -2294,6 +2294,7 @@ ROM_END
 // Model 220, Schneider Tower-CPU 286 (Baugr.Nr. 50229 Rev.3B): Dallas DS1287, MBL8042H (Compatibility Software 1986/K Phoenix Technologies Ltd - 805931) - Chipset: 2x G2 GC102, G2 GC101
 // OSC: 20.000MHz, 14.318180, beeper, CPU: AMD N80L286-10/S, FPU socket provided - RAM: solder pads for 4xSIMM30, 4x16pin (empty), 4x or 8x51C4256 (512KB or 1MB)
 // The Tower AT was available with the Schneider VGA I/O that is described in the tower386sx section. The Tower VGA System 40 and System 70 models had the 12.5MHz CPU card.
+// Its BIOS version 2.03 is undumped so far.
 // blank screen, beeps 1-2-4
 ROM_START( towerat2xx )
 	ROM_REGION16_LE( 0x20000, "bios", 0 )

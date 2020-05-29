@@ -1921,7 +1921,7 @@ ROM_START( dtkerso )
 	ROMX_LOAD( "dtk2.42.bin", 0xe000, 0x2000, CRC(3f2d2a76) SHA1(02fa057f2c22ab199a8d9795ab1ae570f2b13a36),ROM_BIOS(4))
 ROM_END
 
-/************************************************** DTK-Group PC-XT-Clones ***
+/*********************************************************** Corona PPC-21 ***
 
 identical to the Olivetti M18P (one online source shows a ROM version 3.06 with the Olivetti)
 a BIOS version 1.53 exists
