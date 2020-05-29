@@ -2820,8 +2820,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ergo201.cpp",
 	MAME_DIR .. "src/mame/drivers/microterm.cpp",
 	MAME_DIR .. "src/mame/drivers/microterm_f8.cpp",
-	MAME_DIR .. "src/mame/machine/ergo201_kbd.cpp",
-	MAME_DIR .. "src/mame/machine/ergo201_kbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "mips")
