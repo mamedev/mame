@@ -420,7 +420,7 @@ uint32_t gticlub_state::gticlub_k001604_reg_r(offs_t offset)
 void gticlub_state::gticlub_k001604_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->reg_w(offset, data);
+	k001604->reg_w(offset, data, mem_mask);
 }
 
 
