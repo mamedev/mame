@@ -556,7 +556,7 @@ void svision_state::svisionn(machine_config &config)
 void svision_state::tvlinkp(machine_config &config)
 {
 	svisionp(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::tvlink_mem, tag(), this));
+	m_maincpu->set_addrmap(AS_PROGRAM, &svision_state::tvlink_mem);
 
 	m_screen->set_no_palette();
 	m_screen->set_screen_update(FUNC(svision_state::screen_update_tvlink));

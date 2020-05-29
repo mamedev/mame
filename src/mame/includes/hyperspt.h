@@ -36,6 +36,7 @@ public:
 
 	void hyperspt(machine_config &config);
 	void roadf(machine_config &config);
+	void roadfu(machine_config &config);
 	void hypersptb(machine_config &config);
 
 private:
