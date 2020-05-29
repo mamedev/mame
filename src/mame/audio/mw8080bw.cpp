@@ -572,6 +572,7 @@ DEFINE_DEVICE_TYPE(SPCENCTR_AUDIO, spcenctr_audio_device, "spcenctr_audio", "Mid
 DEFINE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device, "phantom2_audio", "Midway Phantom 2 Audio")
 DEFINE_DEVICE_TYPE(INVADERS_AUDIO, invaders_audio_device, "invaders_audio", "Taito Space Invaders Audio")
 DEFINE_DEVICE_TYPE(INVAD2CT_AUDIO, invad2ct_audio_device, "invad2ct_audio", "Midway Space Invaders II Audio")
+DEFINE_DEVICE_TYPE(ZZZAP_AUDIO,    zzzap_audio_device,    "zzzap_audio",    "Midway 280-ZZZAP Audio")
 
 
 /*************************************
@@ -3611,13 +3612,13 @@ WRITE8_MEMBER(mw8080bw_state::tornbase_audio_w)
  *
  *************************************/
 
-void mw8080bw_state::zzzap_audio(machine_config &config)
+zzzap_audio_device::zzzap_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, ZZZAP_AUDIO, tag, owner, clock)
 {
-	SPEAKER(config, "mono").front_center();
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::zzzap_audio_1_w)
+void zzzap_audio_device::p1_w(u8 data)
 {
 	/* set ENGINE SOUND FREQ(data & 0x0f)  the value written is
 	                                       the gas pedal position */
@@ -3630,7 +3631,7 @@ WRITE8_MEMBER(mw8080bw_state::zzzap_audio_1_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::zzzap_audio_2_w)
+void zzzap_audio_device::p2_w(u8 data)
 {
 	/* if (data & 0x01)  enable BOOM sound */
 
@@ -3645,6 +3646,17 @@ WRITE8_MEMBER(mw8080bw_state::zzzap_audio_2_w)
 	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
 
 	/* D4, D6 and D7 are not connected */
+}
+
+
+void zzzap_audio_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+}
+
+
+void zzzap_audio_device::device_start()
+{
 }
 
 

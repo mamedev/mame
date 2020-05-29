@@ -300,6 +300,20 @@ private:
 };
 
 
+class zzzap_audio_device : public device_t
+{
+public:
+	zzzap_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+
+	void p1_w(u8 data);
+	void p2_w(u8 data);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+};
+
+
 DECLARE_DEVICE_TYPE(SEAWOLF_AUDIO,  seawolf_audio_device)
 DECLARE_DEVICE_TYPE(GUNFIGHT_AUDIO, gunfight_audio_device)
 DECLARE_DEVICE_TYPE(BOOTHILL_AUDIO, boothill_audio_device)
@@ -314,5 +328,6 @@ DECLARE_DEVICE_TYPE(SPCENCTR_AUDIO, spcenctr_audio_device)
 DECLARE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device)
 DECLARE_DEVICE_TYPE(INVADERS_AUDIO, invaders_audio_device)
 DECLARE_DEVICE_TYPE(INVAD2CT_AUDIO, invad2ct_audio_device)
+DECLARE_DEVICE_TYPE(ZZZAP_AUDIO, zzzap_audio_device)
 
 #endif // MAME_AUDIO_MW8080BW_H
