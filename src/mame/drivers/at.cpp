@@ -2284,7 +2284,7 @@ ROM_START( euroat )
 ROM_END
 
 // Schneider Tower AT 220 (other designations for the 10 MHz 80826, 512KB RAM series are 201, 202, 240), the last two digits are related to the originally installed
-// number of 3.5" 720K floppy drives or the size of the MFM harddisk), // Model 260 has a 60MB harddisk and can have a 12.5 MHz CPU (depending on where you look and
+// number of 3.5" 720K floppy drives or the size of the MFM harddisk), Model 260 has a 60MB harddisk and can have a 12.5 MHz CPU (depending on where you look and
 // probably what was available in Schneider's part bin), systems with a "mega" in the name have 1MB RAM and 1.44MB floppy drives. All have an EGA graphcis card on board
 // The case looks like a stack of three thinner slices, and extra modules were available that clamped on: a tape streamer, and a 5.25" 1.2MB or a 360KB drive. They were
 // connected to the "External drive" port of the Tower AT, much like with Schneider's other PCs. The mainboard as such is divided between the I/O and video portion that resides on
@@ -2293,11 +2293,12 @@ ROM_END
 // 104 pin CPU card connector (ISA without the key), 3xISA16, 1xISA8 - on board: parallel, serial, bus mouse (Atari compatible), EGA, internal floppy (26pin), external floppy (DB25)
 // Model 220, Schneider Tower-CPU 286 (Baugr.Nr. 50229 Rev.3B): Dallas DS1287, MBL8042H (Compatibility Software 1986/K Phoenix Technologies Ltd - 805931) - Chipset: 2x G2 GC102, G2 GC101
 // OSC: 20.000MHz, 14.318180, beeper, CPU: AMD N80L286-10/S, FPU socket provided - RAM: solder pads for 4xSIMM30, 4x16pin (empty), 4x or 8x51C4256 (512KB or 1MB)
+// The Tower AT was available with the Schneider VGA I/O that is described in the tower386sx section. The Tower VGA System 40 and System 70 models had the 12.5MHz CPU card.
 // blank screen, beeps 1-2-4
 ROM_START( towerat2xx )
 	ROM_REGION16_LE( 0x20000, "bios", 0 )
 	ROM_SYSTEM_BIOS(0, "v2.02", "V2.02" ) // from a model 220
-	ROM_SYSTEM_BIOS(1, "v2.01", "V2.01" )
+	ROM_SYSTEM_BIOS(1, "v2.01", "V2.01" ) 
 	ROM_SYSTEM_BIOS(2, "v1.07", "V1.07" ) // seen on a model 240 "mega"
 	ROM_SYSTEM_BIOS(3, "v1.06", "V1.06" ) // from a model 220
 	ROM_SYSTEM_BIOS(4, "v1.05a", "V1.05a" )
