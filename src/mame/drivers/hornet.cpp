@@ -1157,7 +1157,7 @@ void hornet_state::hornet(machine_config &config)
 //  PCB description at top doesn't mention any EEPROM on the base board...
 //  EEPROM_93C46_16BIT(config, "eeprom");
 
-	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[0], XTAL(50'000'000));
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(4,0);
 	m_voodoo[0]->set_screen_tag("screen");
@@ -1168,10 +1168,8 @@ void hornet_state::hornet(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	// Screeen size and timing is re-calculated later in voodoo card
-	screen.set_refresh_hz(60);
-	screen.set_size(64 * 8, 48 * 8);
-	screen.set_visarea(0, 64 * 8 - 1, 0, 48 * 8 - 1);
+	// default 24KHz parameter in both 037122 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
+	screen.set_raw(XTAL(64'000'000) / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
 	screen.set_screen_update(FUNC(hornet_state::screen_update));
 
 	PALETTE(config, "palette").set_entries(65536);
@@ -1223,13 +1221,13 @@ void hornet_state::sscope(machine_config &config)
 	m_k037122_1->set_screen("lscreen");
 	m_k037122_1->set_palette("palette");
 
-	K037122(config, m_k037122_2, 0);
+	K037122(config, m_k037122_2, 0); // unknown input clock
 	m_k037122_2->set_screen("rscreen");
 	m_k037122_2->set_palette("palette");
 
 	m_voodoo[0]->set_screen_tag("lscreen");
 
-	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[1], XTAL(50'000'000));
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(4, 0);
 	m_voodoo[1]->set_screen_tag("rscreen");
@@ -1242,17 +1240,13 @@ void hornet_state::sscope(machine_config &config)
 	config.device_remove("screen");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
-	// Screeen size and timing is re-calculated later in voodoo card
-	lscreen.set_refresh_hz(60);
-	lscreen.set_size(512, 384);
-	lscreen.set_visarea(0, 512 - 1, 0, 384 - 1);
+	// default 24KHz parameter in both 037122 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
+	lscreen.set_raw(XTAL(64'000'000) / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
 	lscreen.set_screen_update(FUNC(hornet_state::screen_update));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
-	// Screeen size and timing is re-calculated later in voodoo card
-	rscreen.set_refresh_hz(60);
-	rscreen.set_size(512, 384);
-	rscreen.set_visarea(0, 512 - 1, 0, 384 - 1);
+	// default 24KHz parameter in both 037122 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
+	rscreen.set_raw(XTAL(64'000'000) / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
 	rscreen.set_screen_update(FUNC(hornet_state::screen_update_rscreen));
 
 /*  ADC12138(config, m_adc12138_2, 0);
