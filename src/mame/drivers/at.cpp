@@ -2290,7 +2290,7 @@ ROM_END
 // connected to the "External drive" port of the Tower AT, much like with Schneider's other PCs. The mainboard as such is divided between the I/O and video portion that resides on
 // the backplane board and the CPU and RAM on the CPU card that also contains the keyboard connector.
 // Model 220, Schneider Tower-EGA I/O: Chipset: JIM 50101-1 (cf. EuroPC), WD37C65BJM, Gemini VC-001, VLSI VL16C450-PC, Paradise Systems Inc PPC1 38302C
-// 104 pin CPU card connector, 3xISA16, 1xISA8 - on board: parallel, serial, bus mouse (Atari compatible), EGA, external floppy
+// 104 pin CPU card connector (ISA without the key), 3xISA16, 1xISA8 - on board: parallel, serial, bus mouse (Atari compatible), EGA, internal floppy (26pin), external floppy (DB25)
 // Model 220, Schneider Tower-CPU 286 (Baugr.Nr. 50229 Rev.3B): Dallas DS1287, MBL8042H (Compatibility Software 1986/K Phoenix Technologies Ltd - 805931) - Chipset: 2x G2 GC102, G2 GC101
 // OSC: 20.000MHz, 14.318180, beeper, CPU: AMD N80L286-10/S, FPU socket provided - RAM: solder pads for 4xSIMM30, 4x16pin (empty), 4x or 8x51C4256 (512KB or 1MB)
 // blank screen, beeps 1-2-4
@@ -3637,6 +3637,31 @@ ROM_END
 //**************************************************************************
 //  80386 SX and DX Desktop
 //**************************************************************************
+
+// Schneider 386SX VGA System 40 (the number indicates the size of the harddisk, there were System 70 as well) - uses the same case as the Schneider Tower AT
+// Schneider Tower VGA I/O: Chipset: WD37C65BJM, BIGJIM 50773 1108-0056, two other bigger chips can't be read on the photos
+// 104 pin CPU card connector (ISA without the key), 4xISA16, 1xISA8 - on board: IDE, parallel, serial, bus mouse (Atari compatible), VGA, internal floppy (26pin), external floppy (DB25)
+// On board graphics: ATI VGA Wonder-16 (256KB), ATI18800-1 1138-0069
+// CPU card: CPU: Intel NG680386SX-16 (C-Step), FPU socket provided - Chipset: DDA14-075E, Chips P82C812, P82C811, P82C206, P82C215-12 (16MHz) - RAM: 8xSIMM30
+// OSC: 20.000, 14.31818, 24.000000MHz, 32.000000MHz, - keyboard
+// beeps 1-2-4
+ROM_START( tower386sx )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "v103", "V1.03") // from a 386SX System 70
+	ROMX_LOAD("t386s103.bin", 0x10000, 0x10000, CRC(d4e177e6) SHA1(fa11d49d629cdcac4467a9deedd25171ae499346), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v100", "V1.00") // from a 386SX System 40
+	ROMX_LOAD("schneider_ag_386sx_bios_1_version_1.00a_id.nr.52504.u16", 0x10000, 0x8000, CRC(2fec2d3a) SHA1(4227da07f6652b89b9d02d7570ad0476672fd80d), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("schneider_ag_386sx_bios_0_version_1.00a_id.nr.52504.u15", 0x10001, 0x8000, CRC(b3331429) SHA1(b214bccfb62add9caea3d734885bc945b868967a), ROM_SKIP(1) |ROM_BIOS(1))
+
+	// models upgraded to 512KB video memory were sold as "CEG" models as the memory upgrade enabled some sort of antialiasing ("continuous edge graphics")
+	// in a 256 color mode with a choice from 792.096 colors.
+	// according to https://archive.org/stream/byte-magazine-1991-01/1991_01_BYTE_16-01_1990_BYTE_Award_of_Excellence#page/n197/mode/2up this needs an EDSUN D/A chip, it is unknown
+	// if it's contained on the platter or on the graphics upgrade piggyback card
+	// The 12.5MHz version of the towerat2xx (VGA Tower System 40 or 70) used the same I/O backplane and were also offered with the CEG upgrade.
+	ROM_REGION16_LE(0x10000, "vga", 0)
+	ROM_LOAD16_BYTE("schneider_ag_vga_bios_low_v1.00_id.nr_51368.u13", 0x0000, 0x8000, CRC(ec4ef170) SHA1(0049ae5eab1a21838e674cf77e88994b954b1da3))
+	ROM_LOAD16_BYTE("schneider_ag_vga_bios_high_v1.00_id.nr_51368.u14", 0x0001, 0x8000, CRC(5354962a) SHA1(11a503473e2011f323cc81c0b63d24f231c54c31))
+ROM_END
 
 // Atari PC 5 - American Megatrends 386XT Series-4 motherboard - on board EGA
 // screen remains blank, 1 beep repeated (DRAM refresh failure)
@@ -5358,7 +5383,8 @@ COMP( 1987, n8810m15,  ibm5170, 0,       n8810m15,  0,     at_state,     init_at
 COMP( 1990, n8810m16c, ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 CGA version", MACHINE_NOT_WORKING )
 COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M55", MACHINE_NOT_WORKING )
 COMP( 1989, euroat,    ibm5170, 0,       euroat,    0,     at_state,     init_at,        "Schneider Rundfunkwerke AG", "Euro AT", MACHINE_NOT_WORKING )
-COMP( 198?, towerat2xx,ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Schneider Rundfunkwerke", "Tower AT 201, 202, 220, 240 and 260 (286,EGA)", MACHINE_NOT_WORKING )
+COMP( 198?, towerat2xx,ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Schneider Rundfunkwerke AG", "Tower AT 201, 202, 220, 240 and 260 (286,EGA)", MACHINE_NOT_WORKING )
+COMP( 198?, tower386sx,ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Schneider Rundfunkwerke AG", "386SX System 40 (VGA)", MACHINE_NOT_WORKING )
 COMP( 199?, alaleolx,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Alaris RYC", "LEOPARD LX", MACHINE_NOT_WORKING )
 COMP( 199?, anch386s,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "ANIX",        "CH-386S-16/20/25G", MACHINE_NOT_WORKING )
 COMP( 1993, cxsxd,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "CX Technology", "CX SXD", MACHINE_NOT_WORKING )
