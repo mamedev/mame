@@ -34,14 +34,14 @@ Konami 037122
 
 	Offset Bits                              Description
 	       fedcba9876543210 fedcba9876543210
-	00     xxxxxxxxxxxxxxxx ---------------- Horizontal total pixels
-	       ---------------- xxxxxxxxxxxxxxxx Horizontal sync width?
-	04     xxxxxxxxxxxxxxxx ---------------- Horizontal front porch?
-	       ---------------- xxxxxxxxxxxxxxxx Horizontal back porch?
-	08     xxxxxxxxxxxxxxxx ---------------- Vertical total pixels
-	       ---------------- xxxxxxxxxxxxxxxx Vertical sync width?
-	0c     xxxxxxxxxxxxxxxx ---------------- Vertical front porch?
-	       ---------------- xxxxxxxxxxxxxxxx Vertical back porch?
+	00     xxxxxxxxxxxxxxxx ---------------- Horizontal total pixels - 1
+	       ---------------- xxxxxxxxxxxxxxxx Horizontal sync width - 1
+	04     xxxxxxxxxxxxxxxx ---------------- Horizontal front porch - 5
+	       ---------------- xxxxxxxxxxxxxxxx Horizontal back porch + 5
+	08     xxxxxxxxxxxxxxxx ---------------- Vertical total pixels - 1
+	       ---------------- xxxxxxxxxxxxxxxx Vertical sync width - 1
+	0c     xxxxxxxxxxxxxxxx ---------------- Vertical front porch + 1
+	       ---------------- xxxxxxxxxxxxxxxx Vertical back porch - 2
 	20     sxxxxxxxxxxxxxxx ---------------- X counter starting value (12.4 fixed point)
 	       ---------------- sxxxxxxxxxxxxxxx Y counter starting value (12.4 fixed point)
 	24     ---------------- sxxxxxxxxxxxxxxx amount to add to the Y counter after each line (4.12 fixed point)
