@@ -1336,6 +1336,7 @@ void megast_state::megast_map(address_map &map)
 void ste_state::ste_map(address_map &map)
 {
 	st_map(map);
+	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
 	map(0xff9200, 0xff9201).portr("JOY0");
 	map(0xff9202, 0xff9203).portr("JOY1");
 	map(0xff9210, 0xff9211).portr("PADDLE0X");
@@ -1354,6 +1355,7 @@ void ste_state::ste_map(address_map &map)
 void megaste_state::megaste_map(address_map &map)
 {
 	st_map(map);
+	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
 	map(0xff8c80, 0xff8c87).rw(Z8530_TAG, FUNC(scc8530_legacy_device::reg_r), FUNC(scc8530_legacy_device::reg_w)).umask16(0x00ff);
 	map(0xfffc20, 0xfffc3f).rw(RP5C15_TAG, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
 }
