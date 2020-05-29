@@ -1309,6 +1309,25 @@ if (CPUS["PIC16"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- Microchip PIC17
+--@src/devices/cpu/pic17/pic17.h,CPUS["PIC17"] = true
+--------------------------------------------------
+
+if (CPUS["PIC17"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/pic17/pic17.cpp",
+		MAME_DIR .. "src/devices/cpu/pic17/pic17.h",
+		MAME_DIR .. "src/devices/cpu/pic17/pic17c4x.cpp",
+		MAME_DIR .. "src/devices/cpu/pic17/pic17c4x.h",
+	}
+end
+
+if (CPUS["PIC17"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic17/pic17d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic17/pic17d.h")
+end
+
+--------------------------------------------------
 -- MIPS R3000 (MIPS I/II) series
 --@src/devices/cpu/mips/mips1.h,CPUS["MIPS1"] = true
 --------------------------------------------------

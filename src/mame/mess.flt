@@ -1081,6 +1081,7 @@ x1twin.cpp
 x68k.cpp
 xavix.cpp
 xavix2.cpp
+xbase09.cpp
 xbox.cpp
 xerox820.cpp
 xor100.cpp
