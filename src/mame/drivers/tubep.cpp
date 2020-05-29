@@ -111,6 +111,13 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 #include "sound/msm5205.h"
 #include "speaker.h"
 
+#define LOG_IRQ (1U << 0)
+//#define VERBOSE (LOG_IRQ)
+
+#include "logmacro.h"
+
+#define LOGIRQ(...) LOGMASKED(LOG_IRQ, __VA_ARGS__)
+
 
 /*************************************
  *
@@ -143,15 +150,10 @@ void tubep_state::tubep_main_map(address_map &map)
 WRITE8_MEMBER(tubep_state::main_cpu_irq_line_clear_w)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
-	logerror("CPU#0 VBLANK int clear at scanline=%3i\n", m_curr_scanline);
+	LOGIRQ("CPU#0 VBLANK int clear at scanline=%3i\n", m_curr_scanline);
 	return;
 }
 
-
-WRITE8_MEMBER(tubep_state::tubep_soundlatch_w)
-{
-	m_sound_latch = (data&0x7f) | 0x80;
-}
 
 void tubep_state::tubep_main_portmap(address_map &map)
 {
@@ -166,7 +168,7 @@ void tubep_state::tubep_main_portmap(address_map &map)
 
 	map(0x80, 0x80).w(FUNC(tubep_state::main_cpu_irq_line_clear_w));
 	map(0xb0, 0xb7).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xd0, 0xd0).w(FUNC(tubep_state::tubep_soundlatch_w));
+	map(0xd0, 0xd0).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 
@@ -180,7 +182,7 @@ void tubep_state::tubep_main_portmap(address_map &map)
 WRITE8_MEMBER(tubep_state::second_cpu_irq_line_clear_w)
 {
 	m_slave->set_input_line(0, CLEAR_LINE);
-	logerror("CPU#1 VBLANK int clear at scanline=%3i\n", m_curr_scanline);
+	LOGIRQ("CPU#1 VBLANK int clear at scanline=%3i\n", m_curr_scanline);
 	return;
 }
 
@@ -201,29 +203,19 @@ void tubep_state::tubep_second_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x7f, 0x7f).w(FUNC(tubep_state::second_cpu_irq_line_clear_w));
+	map(0xb6, 0xb6).nopw(); // ?
 }
 
 
 READ8_MEMBER(tubep_state::tubep_soundlatch_r)
 {
-	int res;
-
-	res = m_sound_latch;
-	m_sound_latch = 0; /* "=0" ????  or "&= 0x7f" ?????  works either way */
-
-	return res;
+	return (m_soundlatch->pending_r() << 7) | (m_soundlatch->read() & 0x7f);
 }
 
 READ8_MEMBER(tubep_state::tubep_sound_irq_ack)
 {
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
 	return 0;
-}
-
-WRITE8_MEMBER(tubep_state::tubep_sound_unknown)
-{
-	/*logerror("Sound CPU writes to port 0x07 - unknown function\n");*/
-	return;
 }
 
 
@@ -242,7 +234,7 @@ void tubep_state::tubep_sound_portmap(address_map &map)
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x04, 0x05).w("ay3", FUNC(ay8910_device::address_data_w));
 	map(0x06, 0x06).r(FUNC(tubep_state::tubep_soundlatch_r));
-	map(0x07, 0x07).w(FUNC(tubep_state::tubep_sound_unknown));
+	map(0x07, 0x07).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 }
 
 
@@ -275,7 +267,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 	/* activates at the start of VBLANK signal which happens at the beginning of scaline number 240 */
 	if (scanline == 240)
 	{
-		logerror("VBLANK CPU#0\n");
+		LOGIRQ("VBLANK CPU#0\n");
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 
@@ -284,7 +276,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 	/* activates at the _end_ of VBLANK signal which happens at the beginning of scanline number 16 */
 	if (scanline == 16)
 	{
-		logerror("/VBLANK CPU#1\n");
+		LOGIRQ("/VBLANK CPU#1\n");
 		m_slave->set_input_line(0, ASSERT_LINE);
 	}
 
@@ -293,7 +285,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 	/* activates at the _end_ of VBLANK signal which happens at the beginning of scanline number 16 */
 	if (scanline == 16)
 	{
-		logerror("/nmi CPU#3\n");
+		LOGIRQ("/nmi CPU#3\n");
 		tubep_vblank_end(); /* switch buffered sprite RAM page */
 		m_mcu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -301,7 +293,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 	/* deactivates at the start of VBLANK signal which happens at the beginning of scanline number 240*/
 	if (scanline == 240)
 	{
-		logerror("CPU#3 nmi clear\n");
+		LOGIRQ("CPU#3 nmi clear\n");
 		m_mcu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
@@ -317,7 +309,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 	m_screen->update_partial(m_screen->vpos());
 
 	//debug
-	logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,m_screen->vpos());
+	LOGIRQ("scanline=%3i scrgetvpos(0)=%3i\n",scanline,m_screen->vpos());
 
 	scanline++;
 	if (scanline >= 264)
@@ -337,7 +329,6 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 void tubep_state::tubep_setup_save_state()
 {
 	/* Set up save state */
-	save_item(NAME(m_sound_latch));
 	save_item(NAME(m_ls74));
 	save_item(NAME(m_ls377));
 }
@@ -437,7 +428,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 	/* activates at the start of VBLANK signal which happens at the beginning of scaline number 240 */
 	if (scanline == 240)
 	{
-		logerror("VBLANK CPU#0\n");
+		LOGIRQ("VBLANK CPU#0\n");
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 
@@ -446,7 +437,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 	/* activates at the _end_ of VBLANK signal which happens at the beginning of scanline number 16 */
 	if (scanline == 16)
 	{
-		logerror("/VBLANK CPU#1\n");
+		LOGIRQ("/VBLANK CPU#1\n");
 		m_slave->set_input_line(0, HOLD_LINE);
 	}
 
@@ -455,7 +446,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 	/* activates at the _end_ of VBLANK signal which happens at the beginning of scanline number 16 */
 	if (scanline == 16)
 	{
-		logerror("/nmi CPU#3\n");
+		LOGIRQ("/nmi CPU#3\n");
 		tubep_vblank_end(); /* switch buffered sprite RAM page */
 		m_mcu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -463,7 +454,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 	/* deactivates at the start of VBLANK signal which happens at the beginning of scanline number 240*/
 	if (scanline == 240)
 	{
-		logerror("CPU#3 nmi clear\n");
+		LOGIRQ("CPU#3 nmi clear\n");
 		m_mcu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
@@ -478,7 +469,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 
 	m_screen->update_partial(m_screen->vpos());
 
-	logerror("scanline=%3i scrgetvpos(0)=%3i\n", scanline, m_screen->vpos());
+	LOGIRQ("scanline=%3i scrgetvpos(0)=%3i\n", scanline, m_screen->vpos());
 
 	scanline++;
 	if (scanline >= 264)
@@ -716,9 +707,7 @@ static INPUT_PORTS_START( tubep )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "In Game Sounds" ) PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -847,6 +836,9 @@ void tubep_state::tubep(machine_config &config)
 	mainlatch.q_out_cb<5>().set(FUNC(tubep_state::screen_flip_w));
 	mainlatch.q_out_cb<6>().set(FUNC(tubep_state::background_romselect_w));
 	mainlatch.q_out_cb<7>().set(FUNC(tubep_state::colorproms_A4_line_w));
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_MACHINE_START_OVERRIDE(tubep_state,tubep)
 	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,tubep)
