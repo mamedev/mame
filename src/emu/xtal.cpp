@@ -294,12 +294,14 @@ const double XTAL::known_xtals[] = {
 	 21'254'400, /* 21.2544_MHz_XTAL       TeleVideo 970 132-column display clock */
 	 21'281'370, /* 21.28137_MHz_XTAL      Radica Tetris (PAL) */
 	 21'300'000, /* 21.3_MHz_XTAL          - */
+	 21'328'100, /* 21.3281_MHz_XTAL       Philips NMS8245 */
 	 21'477'272, /* 21.477272_MHz_XTAL     BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
 	 21'667'500, /* 21.6675_MHz_XTAL       AT&T 610 (80-column display clock) */
 	 22'000'000, /* 22_MHz_XTAL            - */
 	 22'032'000, /* 22.032_MHz_XTAL        Intellec Series II I/O controller */
 	 22'096'000, /* 22.096_MHz_XTAL        ADDS Viewpoint 122 */
 	 22'118'400, /* 22.1184_MHz_XTAL       Amusco Poker */
+	 22'168'000, /* 22.168_MHz_XTAL        Sony HB-10P VDP (5x PAL subcarrier) */
 	 22'248'000, /* 22.248_MHz_XTAL        Quantel DPB-7000 */
 	 22'321'000, /* 22.321_MHz_XTAL        Apple LaserWriter II NT */
 	 22'464'000, /* 22.464_MHz_XTAL        CIT-101 132-column display clock */

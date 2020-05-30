@@ -4359,9 +4359,8 @@ GAME( 1990, airduelu,    airduel,  m82,          airduel,      m72_state, empty_
 
 GAME( 1990, dkgensanm82, hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M82 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 2009, rtypem82b,   rtype,    m82,          rtype,        m72_state, empty_init,      ROT0,   "bootleg", "R-Type (Japan, bootleg Major Title conversion)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // unofficial conversion of Major Title, extensive wiremods, made in 2009 by Paul Swan
-
-GAME( 1997, rtype2m82b,  rtype2,   m82,          rtype2,       m72_state, empty_init,      ROT0,   "bootleg", "R-Type II (Japan, bootleg Major Title conversion)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made in 1997 by Chris Hardy
+GAME( 2009, rtypem82b,   rtype,    m82,          rtype,        m72_state, empty_init,      ROT0,   "bootleg", "R-Type (Japan, bootleg M82 conversion)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // unofficial conversion of Major Title, extensive wiremods, made in 2009 by Paul Swan
+GAME( 1997, rtype2m82b,  rtype2,   m82,          rtype2,       m72_state, empty_init,      ROT0,   "bootleg", "R-Type II (Japan, bootleg M82 conversion)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made in 1997 by Chris Hardy
 
 /* M84 */
 GAME( 1990, hharryu,     hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem America", "Hammerin' Harry (US, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

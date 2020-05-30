@@ -106,7 +106,6 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/74259.h"
-#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "speaker.h"

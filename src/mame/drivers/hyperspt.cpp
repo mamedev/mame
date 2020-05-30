@@ -629,7 +629,7 @@ ROM_START( roadfh ) // This hack was found on an original GX330 (Hyper Sports) P
 	ROM_LOAD( "5-6.g15", 0xc000, 0x4000, CRC(91c1788b) SHA1(2ccb084cd751a605d551e0c83b223ff3c887dc9d) ) // almost identical to g13_f05.bin + g15_f06.bin
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sound7.a9",  0x0000, 0x2000, CRC(c33c927e) SHA1(f1a8522e3bfc3a07bb42408d2937a4129e4c3fee) ) // identical to a17_d10.bin
+	ROM_LOAD( "suond7.a9",  0x0000, 0x2000, CRC(c33c927e) SHA1(f1a8522e3bfc3a07bb42408d2937a4129e4c3fee) ) // yes: "SUOND", identical to a17_d10.bin
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "j19.bin",  0x00000, 0x2000, CRC(5eeb0283) SHA1(67e3a079e091a41e10be7c8584d7069455780a24) ) // j19.bin + j18.bin identical to j19_e14.bin
