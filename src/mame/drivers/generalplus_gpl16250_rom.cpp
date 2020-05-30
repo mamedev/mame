@@ -400,6 +400,13 @@ ROM_START( tkmag220 )
 ROM_END
 
 
+ROM_START( myac220 )
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+		 
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )                   
+	ROM_LOAD16_WORD_SWAP( "myarcadegogamerportable.bin", 0x0000000, 0x8000000, BAD_DUMP CRC(c929a2fa) SHA1(e99007ccc45a268267b4ea0efaf22e3117f5a6bd) ) // again several sections seemed to be erased, was repaired with data from tkmag220, likely good but should be verified
+ROM_END
 
 void tkmag220_game_state::tkmag220(machine_config &config)
 {
@@ -465,7 +472,9 @@ CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init,
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)
 // do "go A1595" then "r1 = 0" in debugger to show menu, controls not yet working (which might be why it drops to test mode by default) will need banking hookup later.
 // This could be useful for figuring out how the sound registers have been remapped when compared to spg2xx
-CONS(200?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS(201?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// DGUN-2891 or DGUN-2864 ? both look the same, no indication on unboxed unit?
+CONS(201?, myac220,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "dreamGEAR",      "My Arcade Go Gamer Portable (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // die on this one is 'GCM420'
 CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

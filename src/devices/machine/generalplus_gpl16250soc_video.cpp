@@ -934,8 +934,8 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 	}
 	else
 	{
-		flip_x = 0;// (attr & TILE_X_FLIP);
-		yflipmask = 0;// attr& TILE_Y_FLIP ? h - 1 : 0;
+		flip_x = 0;// (attr & 0x0004);
+		yflipmask = 0;// attr& 0x0008 ? h - 1 : 0;
 
 		bpp = attr & 0x0003;
 		palette_offset = (attr & 0x0f00) >> 4;
@@ -998,10 +998,10 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 		uint16_t ctrl3 = m_tmap3_regs[1];
 
 		popmessage(
-			"p0ctrl u:%02x Bl:%d HC:%d u:%d u:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
-			"p1ctrl u:%02x Bl:%d HC:%d u:%d u:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
-			"p2ctrl u:%02x Bl:%d HC:%d u:%d u:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
-			"p3ctrl u:%02x Bl:%d HC:%d u:%d u:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
+			"p0ctrl u:%02x Bl:%d HC:%d Ycmp:%d Hcmp:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
+			"p1ctrl u:%02x Bl:%d HC:%d Ycmp:%d Hcmp:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
+			"p2ctrl u:%02x Bl:%d HC:%d Ycmp:%d Hcmp:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
+			"p3ctrl u:%02x Bl:%d HC:%d Ycmp:%d Hcmp:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
 			"p0attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
 			"p1attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
 			"p2attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
