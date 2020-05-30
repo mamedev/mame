@@ -374,6 +374,7 @@ protected:
 	void galaxian_map(address_map &map);
 	void galaxian_map_base(address_map &map);
 	void galaxian_map_discrete(address_map &map);
+	void highroll_map(address_map &map);
 	void jumpbug_map(address_map &map);
 	void jungsub_map(address_map &map);
 	void jungsub_io_map(address_map &map);
