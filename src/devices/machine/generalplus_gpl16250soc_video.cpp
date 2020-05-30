@@ -986,7 +986,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 	// jak_s500 briely sets pen 0 of the layer to magenta, but then ends up erasing it
 
-	if (1)
+	if (0)
 	{
 		uint16_t attr0 = m_tmap0_regs[0];
 		uint16_t attr1 = m_tmap1_regs[0];
