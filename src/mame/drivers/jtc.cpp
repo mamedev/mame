@@ -47,38 +47,33 @@ public:
 		, m_video_ram(*this, "videoram")
 	{ }
 
-	virtual void machine_start() override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void p2_w(uint8_t data);
-	uint8_t p3_r();
-	void p3_w(uint8_t data);
-	void es40_palette(palette_device &palette) const;
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-
-	int m_centronics_busy;
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	void basic(machine_config &config);
 	void jtc(machine_config &config);
-	void jtc_mem(address_map &map);
 
+protected:
+	virtual void machine_start() override;
+	void p2_w(u8 data);
+	u8 p3_r();
+	void p3_w(u8 data);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+	int m_centronics_busy;
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	required_device<z8_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_centronics;
-	optional_shared_ptr<uint8_t> m_video_ram;
-};
+	optional_shared_ptr<u8> m_video_ram;
 
+private:
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void jtc_mem(address_map &map);
+};
 
 class jtces88_state : public jtc_state
 {
 public:
-	jtces88_state(const machine_config &mconfig, device_type type, const char *tag)
-		: jtc_state(mconfig, type, tag)
-	{ }
-
+	using jtc_state::jtc_state;
 	void jtces88(machine_config &config);
 };
 
@@ -86,13 +81,10 @@ public:
 class jtces23_state : public jtc_state
 {
 public:
-	jtces23_state(const machine_config &mconfig, device_type type, const char *tag)
-		: jtc_state(mconfig, type, tag)
-	{ }
-
+	using jtc_state::jtc_state;
 	void jtces23(machine_config &config);
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void jtc_es23_mem(address_map &map);
 };
 
@@ -100,30 +92,26 @@ private:
 class jtces40_state : public jtc_state
 {
 public:
-	jtces40_state(const machine_config &mconfig, device_type type, const char *tag)
-		: jtc_state(mconfig, type, tag)
-	{ }
-
+	using jtc_state::jtc_state;
 	void jtces40(machine_config &config);
 private:
 	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	uint8_t videoram_r(offs_t offset);
-	void videoram_w(offs_t offset, uint8_t data);
-	void banksel_w(uint8_t data);
-
-	uint8_t m_video_bank;
-	std::unique_ptr<uint8_t[]> m_color_ram_r;
-	std::unique_ptr<uint8_t[]> m_color_ram_g;
-	std::unique_ptr<uint8_t[]> m_color_ram_b;
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u8 videoram_r(offs_t offset);
+	void videoram_w(offs_t offset, u8 data);
+	void banksel_w(u8 data);
+	u8 m_video_bank;
+	std::unique_ptr<u8[]> m_color_ram_r;
+	std::unique_ptr<u8[]> m_color_ram_g;
+	std::unique_ptr<u8[]> m_color_ram_b;
 	void jtc_es40_mem(address_map &map);
+	void es40_palette(palette_device &palette) const;
 };
 
 
 /* Read/Write Handlers */
 
-void jtc_state::p2_w(uint8_t data)
+void jtc_state::p2_w(u8 data)
 {
 	/*
 
@@ -148,7 +136,7 @@ DECLARE_WRITE_LINE_MEMBER( jtc_state::write_centronics_busy )
 	m_centronics_busy = state;
 }
 
-uint8_t jtc_state::p3_r()
+u8 jtc_state::p3_r()
 {
 	/*
 
@@ -161,7 +149,7 @@ uint8_t jtc_state::p3_r()
 
 	*/
 
-	uint8_t data = 0;
+	u8 data = 0;
 
 	data |= ((m_cassette)->input() < 0.0) ? 1 : 0;
 	data |= m_centronics_busy << 3;
@@ -169,7 +157,7 @@ uint8_t jtc_state::p3_r()
 	return data;
 }
 
-void jtc_state::p3_w(uint8_t data)
+void jtc_state::p3_w(u8 data)
 {
 	/*
 
@@ -190,9 +178,9 @@ void jtc_state::p3_w(uint8_t data)
 		m_speaker->level_w(BIT(data, 6));
 }
 
-uint8_t jtces40_state::videoram_r(offs_t offset)
+u8 jtces40_state::videoram_r(offs_t offset)
 {
-	uint8_t data = 0;
+	u8 data = 0;
 
 	if (BIT(m_video_bank, 7)) data |= m_color_ram_r[offset];
 	if (BIT(m_video_bank, 6)) data |= m_color_ram_g[offset];
@@ -202,7 +190,7 @@ uint8_t jtces40_state::videoram_r(offs_t offset)
 	return data;
 }
 
-void jtces40_state::videoram_w(offs_t offset, uint8_t data)
+void jtces40_state::videoram_w(offs_t offset, u8 data)
 {
 	if (BIT(m_video_bank, 7)) m_color_ram_r[offset] = data;
 	if (BIT(m_video_bank, 6)) m_color_ram_g[offset] = data;
@@ -210,7 +198,7 @@ void jtces40_state::videoram_w(offs_t offset, uint8_t data)
 	if (BIT(m_video_bank, 4)) m_video_ram[offset] = data;
 }
 
-void jtces40_state::banksel_w(uint8_t data)
+void jtces40_state::banksel_w(u8 data)
 {
 	m_video_bank = data;
 }
@@ -593,7 +581,7 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	u16 i, quick_addr, quick_length;
-	std::vector<uint8_t> quick_data;
+	std::vector<u8> quick_data;
 	image_init_result result = image_init_result::FAIL;
 
 	quick_length = image.length();
@@ -679,7 +667,7 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 
 /* Video */
 
-uint32_t jtc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 jtc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 i, y, sx;
 
@@ -697,7 +685,7 @@ uint32_t jtc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-uint32_t jtces23_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 jtces23_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 i, y, sx;
 
@@ -715,7 +703,7 @@ uint32_t jtces23_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-void jtc_state::es40_palette(palette_device &palette) const
+void jtces40_state::es40_palette(palette_device &palette) const
 {
 	for (u8 i = 8; i < 16; i++)
 		palette.set_pen_color(i, rgb_t(BIT(i, 0) ? 0xc0 : 0, BIT(i, 1) ? 0xc0 : 0, BIT(i, 2) ? 0xc0 : 0));
@@ -725,9 +713,9 @@ void jtces40_state::video_start()
 {
 	/* allocate memory */
 	m_video_ram.allocate(JTC_ES40_VIDEORAM_SIZE);
-	m_color_ram_r = std::make_unique<uint8_t[]>(JTC_ES40_VIDEORAM_SIZE);
-	m_color_ram_g = std::make_unique<uint8_t[]>(JTC_ES40_VIDEORAM_SIZE);
-	m_color_ram_b = std::make_unique<uint8_t[]>(JTC_ES40_VIDEORAM_SIZE);
+	m_color_ram_r = std::make_unique<u8[]>(JTC_ES40_VIDEORAM_SIZE);
+	m_color_ram_g = std::make_unique<u8[]>(JTC_ES40_VIDEORAM_SIZE);
+	m_color_ram_b = std::make_unique<u8[]>(JTC_ES40_VIDEORAM_SIZE);
 
 	/* register for state saving */
 	save_item(NAME(m_video_bank));
@@ -738,7 +726,7 @@ void jtces40_state::video_start()
 	save_item(NAME(m_centronics_busy));
 }
 
-uint32_t jtces40_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 jtces40_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u16 ma = 0;
 
@@ -898,7 +886,7 @@ void jtces40_state::jtces40(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_jtces40);
-	PALETTE(config, "palette", FUNC(jtc_state::es40_palette), 16);
+	PALETTE(config, "palette", FUNC(jtces40_state::es40_palette), 16);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K,32K");

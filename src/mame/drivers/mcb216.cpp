@@ -5,8 +5,6 @@
 2013-12-01 Driver for Cromemco MCB-216 SCC (Single Card Computer),
 and also the earlier CB-308.
 
-TODO:
-- Confirm cpu clock speed
 
 Memory allocation
 - 0000 to 0FFF - standard roms
@@ -47,25 +45,30 @@ public:
 	{ }
 
 	void mcb216(machine_config &config);
+
+protected:
+	u8 tms5501_status_r();
+	IRQ_CALLBACK_MEMBER(irq_callback);
+	void mcb216_io(address_map &map);
+	required_device<cpu_device> m_maincpu;
+	required_device<tms5501_device> m_tms5501;
+
+private:
+	void mcb216_mem(address_map &map);
+};
+
+class cb308_state : public mcb216_state
+{
+public:
+	using mcb216_state::mcb216_state;
 	void cb308(machine_config &config);
 
 private:
-	uint8_t tms5501_status_r();
-
-	DECLARE_MACHINE_RESET(mcb216);
-	DECLARE_MACHINE_RESET(cb308);
-
-	IRQ_CALLBACK_MEMBER(irq_callback);
-
 	void cb308_mem(address_map &map);
-	void mcb216_io(address_map &map);
-	void mcb216_mem(address_map &map);
-
-	required_device<cpu_device> m_maincpu;
-	required_device<tms5501_device> m_tms5501;
+	void machine_reset() override;
 };
 
-uint8_t mcb216_state::tms5501_status_r()
+u8 mcb216_state::tms5501_status_r()
 {
 	// D7  D6  D5  D4  D3  D2  D1  D0
 	// TBE RDA IPG TBE RDA SRV ORE FME
@@ -75,7 +78,7 @@ uint8_t mcb216_state::tms5501_status_r()
 void mcb216_state::mcb216_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).rom().region("roms", 0);
+	map(0x0000, 0x1fff).rom().region("roms", 0);  // SCC board has space for 2k of roms
 	map(0x2000, 0x23ff).ram();
 	map(0x2400, 0xffff).ram();
 }
@@ -92,7 +95,7 @@ void mcb216_state::mcb216_io(address_map &map)
 	map(0x05, 0x09).w(m_tms5501, FUNC(tms5501_device::tmr_w));
 }
 
-void mcb216_state::cb308_mem(address_map &map)
+void cb308_state::cb308_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram();
@@ -110,11 +113,7 @@ IRQ_CALLBACK_MEMBER(mcb216_state::irq_callback)
 	return m_tms5501->get_vector();
 }
 
-MACHINE_RESET_MEMBER( mcb216_state, mcb216 )
-{
-}
-
-MACHINE_RESET_MEMBER( mcb216_state, cb308 )
+void cb308_state::machine_reset()
 {
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
@@ -127,8 +126,6 @@ void mcb216_state::mcb216(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mcb216_state::mcb216_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(mcb216_state::irq_callback));
 
-	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, mcb216)
-
 	TMS5501(config, m_tms5501, 8_MHz_XTAL / 4);
 	m_tms5501->xmt_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_tms5501->int_callback().set_inputline(m_maincpu, 0);
@@ -137,27 +134,15 @@ void mcb216_state::mcb216(machine_config &config)
 	rs232.rxd_handler().set(m_tms5501, FUNC(tms5501_device::rcv_w));
 }
 
-void mcb216_state::cb308(machine_config &config)
+void cb308_state::cb308(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mcb216_state::cb308_mem);
-	m_maincpu->set_addrmap(AS_IO, &mcb216_state::mcb216_io);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(mcb216_state::irq_callback));
-
-	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, cb308)
-
-	TMS5501(config, m_tms5501, 8_MHz_XTAL / 4);
-	m_tms5501->xmt_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_tms5501->int_callback().set_inputline(m_maincpu, 0);
-
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set(m_tms5501, FUNC(tms5501_device::rcv_w));
+	mcb216(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cb308_state::cb308_mem);
 }
 
 /* ROM definition */
 ROM_START( mcb216 )
-	ROM_REGION(0x1000, "roms", 0)
+	ROM_REGION(0x2000, "roms", 0)
 	ROM_LOAD( "mcb216r0", 0x0000, 0x0800, CRC(86d20cea) SHA1(9fb8fdbcb8d31bd3304a0b3339c7f423188e9d37) )
 	ROM_LOAD( "mcb216r1", 0x0800, 0x0800, CRC(68a25b2c) SHA1(3eadd4a5d65726f767742deb4b51a97df813f37d) )
 
@@ -166,7 +151,7 @@ ROM_START( mcb216 )
 ROM_END
 
 ROM_START( cb308 )
-	ROM_REGION(0x1000, "roms", 0)
+	ROM_REGION(0x2000, "roms", 0)
 	ROM_LOAD( "cb308r0",  0x0000, 0x0400, CRC(62f50531) SHA1(3071e2ab7fc6b2ca889e4fb5cf7cc9ee8fbe53d3) )
 	ROM_LOAD( "cb308r1",  0x0400, 0x0400, CRC(03191ac1) SHA1(84665dfc797c9f51bb659291b18399986ed846fb) )
 	ROM_LOAD( "cb308r2",  0x0800, 0x0400, CRC(695ea521) SHA1(efe36a712e2a038ee804e556c5ebe05443cf798e) )
@@ -179,5 +164,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY     FULLNAME   FLAGS */
-COMP( 1979, mcb216, 0,      0,      mcb216,  mcb216, mcb216_state, empty_init, "Cromemco", "MCB-216", MACHINE_NO_SOUND_HW )
-COMP( 1977, cb308,  mcb216, 0,      cb308,   mcb216, mcb216_state, empty_init, "Cromemco", "CB-308",  MACHINE_NO_SOUND_HW )
+COMP( 1979, mcb216, 0,      0,      mcb216,  mcb216, mcb216_state, empty_init, "Cromemco", "MCB-216", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1977, cb308,  mcb216, 0,      cb308,   mcb216, cb308_state,  empty_init, "Cromemco", "CB-308",  MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
