@@ -69,17 +69,17 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(neoprint_calendar_r);
-	DECLARE_WRITE8_MEMBER(neoprint_calendar_w);
-	DECLARE_READ8_MEMBER(neoprint_unk_r);
-	DECLARE_READ8_MEMBER(neoprint_audio_result_r);
-	DECLARE_WRITE8_MEMBER(audio_cpu_clear_nmi_w);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
-	DECLARE_READ8_MEMBER(audio_command_r);
-	DECLARE_WRITE8_MEMBER(audio_result_w);
-	DECLARE_WRITE16_MEMBER(nprsp_palette_w);
-	DECLARE_WRITE8_MEMBER(nprsp_bank_w);
-	DECLARE_READ16_MEMBER(rom_window_r);
+	uint8_t neoprint_calendar_r();
+	void neoprint_calendar_w(uint8_t data);
+	uint8_t neoprint_unk_r();
+	uint8_t neoprint_audio_result_r();
+	void audio_cpu_clear_nmi_w(uint8_t data);
+	void audio_command_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint8_t audio_command_r();
+	void audio_result_w(uint8_t data);
+	void nprsp_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void nprsp_bank_w(uint8_t data);
+	uint16_t rom_window_r(offs_t offset);
 	DECLARE_MACHINE_RESET(nprsp);
 	uint32_t screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -180,19 +180,19 @@ uint32_t neoprint_state::screen_update_nprsp(screen_device &screen, bitmap_ind16
 }
 
 
-READ8_MEMBER(neoprint_state::neoprint_calendar_r)
+uint8_t neoprint_state::neoprint_calendar_r()
 {
 	return (m_upd4990a->data_out_r() << 7) | (m_upd4990a->tp_r() << 6);
 }
 
-WRITE8_MEMBER(neoprint_state::neoprint_calendar_w)
+void neoprint_state::neoprint_calendar_w(uint8_t data)
 {
 	m_upd4990a->data_in_w(data >> 0 & 1);
 	m_upd4990a->clk_w(data >> 1 & 1);
 	m_upd4990a->stb_w(data >> 2 & 1);
 }
 
-READ8_MEMBER(neoprint_state::neoprint_unk_r)
+uint8_t neoprint_state::neoprint_unk_r()
 {
 	/* ---x ---- tested in irq routine, odd/even field number? */
 	/* ---- xx-- one of these two must be high */
@@ -206,7 +206,7 @@ READ8_MEMBER(neoprint_state::neoprint_unk_r)
 	return m_vblank| 4 | 3;
 }
 
-READ8_MEMBER(neoprint_state::neoprint_audio_result_r)
+uint8_t neoprint_state::neoprint_audio_result_r()
 {
 	return m_audio_result;
 }
@@ -217,12 +217,12 @@ void neoprint_state::audio_cpu_assert_nmi()
 }
 
 
-WRITE8_MEMBER(neoprint_state::audio_cpu_clear_nmi_w)
+void neoprint_state::audio_cpu_clear_nmi_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(neoprint_state::audio_command_w)
+void neoprint_state::audio_command_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(data);
 
@@ -235,21 +235,21 @@ WRITE8_MEMBER(neoprint_state::audio_command_w)
 }
 
 
-READ8_MEMBER(neoprint_state::audio_command_r)
+uint8_t neoprint_state::audio_command_r()
 {
 	uint8_t ret = m_soundlatch->read();
 
 	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", m_audiocpu->pc(), ret);
 
 	/* this is a guess */
-	audio_cpu_clear_nmi_w(space, 0, 0);
+	audio_cpu_clear_nmi_w(0);
 
 	return ret;
 }
 
 
 
-WRITE8_MEMBER(neoprint_state::audio_result_w)
+void neoprint_state::audio_result_w(uint8_t data)
 {
 	//if (LOG_CPU_COMM && (m_audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", m_audiocpu->pc(), data);
 
@@ -278,7 +278,7 @@ void neoprint_state::neoprint_map(address_map &map)
 	map(0x70001e, 0x70001f).nopw(); //watchdog
 }
 
-WRITE16_MEMBER(neoprint_state::nprsp_palette_w)
+void neoprint_state::nprsp_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t r,g,b,i;
 
@@ -305,7 +305,7 @@ WRITE16_MEMBER(neoprint_state::nprsp_palette_w)
 	}
 }
 
-WRITE8_MEMBER(neoprint_state::nprsp_bank_w)
+void neoprint_state::nprsp_bank_w(uint8_t data)
 {
 	/* this register seems flip-flop based ... */
 
@@ -318,7 +318,7 @@ WRITE8_MEMBER(neoprint_state::nprsp_bank_w)
 	}
 }
 
-READ16_MEMBER(neoprint_state::rom_window_r)
+uint16_t neoprint_state::rom_window_r(offs_t offset)
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 

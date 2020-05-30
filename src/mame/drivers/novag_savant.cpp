@@ -87,19 +87,19 @@ private:
 	void mcu_io(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(nvram_w);
-	DECLARE_READ8_MEMBER(nvram_r);
-	DECLARE_READ8_MEMBER(stall_r);
-	DECLARE_WRITE8_MEMBER(stall_w);
-	DECLARE_READ8_MEMBER(mcustatus_r);
+	void nvram_w(offs_t offset, u8 data);
+	u8 nvram_r(offs_t offset);
+	u8 stall_r(offs_t offset);
+	void stall_w(offs_t offset, u8 data);
+	u8 mcustatus_r();
 
 	void lcd1_output_w(u64 data);
 	void lcd2_output_w(u64 data);
 
-	DECLARE_READ8_MEMBER(databus_r);
-	DECLARE_WRITE8_MEMBER(databus_w);
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
+	u8 databus_r();
+	void databus_w(u8 data);
+	u8 control_r();
+	void control_w(u8 data);
 	void lcd_w(u8 data);
 	u8 input_r();
 
@@ -135,18 +135,18 @@ void savant_state::machine_start()
 
 // Z80 side
 
-WRITE8_MEMBER(savant_state::nvram_w)
+void savant_state::nvram_w(offs_t offset, u8 data)
 {
 	// nvram is only d0-d3
 	m_nvram[offset] = data & 0xf;
 }
 
-READ8_MEMBER(savant_state::nvram_r)
+u8 savant_state::nvram_r(offs_t offset)
 {
 	return m_nvram[offset] & 0xf;
 }
 
-WRITE8_MEMBER(savant_state::stall_w)
+void savant_state::stall_w(offs_t offset, u8 data)
 {
 	// any access to port C0 puts the Z80 into WAIT, sets BUSRQ, and sets MCU EXT INT
 	m_databus = offset >> 8;
@@ -155,16 +155,16 @@ WRITE8_MEMBER(savant_state::stall_w)
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, ASSERT_LINE);
 }
 
-READ8_MEMBER(savant_state::stall_r)
+u8 savant_state::stall_r(offs_t offset)
 {
 	m_wait_in = true;
-	stall_w(space, offset, 0);
+	stall_w(offset, 0);
 
 	// return value is databus (see control_w)
 	return 0;
 }
 
-READ8_MEMBER(savant_state::mcustatus_r)
+u8 savant_state::mcustatus_r()
 {
 	// d0: MCU P1.2
 	return BIT(~m_control, 2);
@@ -186,22 +186,22 @@ void savant_state::lcd2_output_w(u64 data)
 	m_lcd_data = data >> 5 & 0x7ffffff;
 }
 
-READ8_MEMBER(savant_state::databus_r)
+u8 savant_state::databus_r()
 {
 	return ~m_databus;
 }
 
-WRITE8_MEMBER(savant_state::databus_w)
+void savant_state::databus_w(u8 data)
 {
 	m_databus = ~data;
 }
 
-READ8_MEMBER(savant_state::control_r)
+u8 savant_state::control_r()
 {
 	return m_control;
 }
 
-WRITE8_MEMBER(savant_state::control_w)
+void savant_state::control_w(u8 data)
 {
 	// d0: clear EXT INT, clear Z80 WAIT
 	if (data & ~m_control & 1)

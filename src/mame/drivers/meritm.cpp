@@ -240,14 +240,14 @@ private:
 	int m_psd_a15;
 	uint16_t m_questions_loword_address;
 
-	DECLARE_WRITE8_MEMBER(crt250_bank_w);
-	DECLARE_WRITE8_MEMBER(psd_a15_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(crt250_questions_lo_w);
-	DECLARE_WRITE8_MEMBER(crt250_questions_hi_w);
-	DECLARE_WRITE8_MEMBER(crt250_questions_bank_w);
-	DECLARE_WRITE8_MEMBER(ds1644_w);
-	DECLARE_READ8_MEMBER(ds1644_r);
+	void crt250_bank_w(uint8_t data);
+	void psd_a15_w(uint8_t data);
+	void bank_w(uint8_t data);
+	void crt250_questions_lo_w(uint8_t data);
+	void crt250_questions_hi_w(uint8_t data);
+	void crt250_questions_bank_w(uint8_t data);
+	void ds1644_w(offs_t offset, uint8_t data);
+	uint8_t ds1644_r(offs_t offset);
 	uint8_t _8255_port_c_r();
 	void crt250_port_b_w(uint8_t data);
 	void ay8930_port_b_w(uint8_t data);
@@ -386,7 +386,7 @@ void meritm_state::crt250_switch_banks(  )
 	m_banks[0]->set_entry(rombank );
 }
 
-WRITE8_MEMBER(meritm_state::crt250_bank_w)
+void meritm_state::crt250_bank_w(uint8_t data)
 {
 	crt250_switch_banks();
 }
@@ -405,14 +405,14 @@ void meritm_state::switch_banks(  )
 	m_banks[2]->set_entry(rambank);
 }
 
-WRITE8_MEMBER(meritm_state::psd_a15_w)
+void meritm_state::psd_a15_w(uint8_t data)
 {
 	m_psd_a15 = data;
 	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, m_maincpu->pc() );
 	switch_banks();
 }
 
-WRITE8_MEMBER(meritm_state::bank_w)
+void meritm_state::bank_w(uint8_t data)
 {
 	switch_banks();
 }
@@ -424,19 +424,19 @@ WRITE8_MEMBER(meritm_state::bank_w)
  *************************************/
 
 
-WRITE8_MEMBER(meritm_state::crt250_questions_lo_w)
+void meritm_state::crt250_questions_lo_w(uint8_t data)
 {
 	m_questions_loword_address &= 0xff00;
 	m_questions_loword_address |= data;
 }
 
-WRITE8_MEMBER(meritm_state::crt250_questions_hi_w)
+void meritm_state::crt250_questions_hi_w(uint8_t data)
 {
 	m_questions_loword_address &= 0x00ff;
 	m_questions_loword_address |= (data << 8);
 }
 
-WRITE8_MEMBER(meritm_state::crt250_questions_bank_w)
+void meritm_state::crt250_questions_bank_w(uint8_t data)
 {
 	uint32_t questions_address;
 
@@ -486,7 +486,7 @@ WRITE8_MEMBER(meritm_state::crt250_questions_bank_w)
  *
  *************************************/
 
-WRITE8_MEMBER(meritm_state::ds1644_w)
+void meritm_state::ds1644_w(offs_t offset, uint8_t data)
 {
 	int rambank = (m_psd_a15 >> 2) & 0x3;
 	if (rambank < 3)
@@ -510,7 +510,7 @@ uint8_t meritm_state::binary_to_BCD(uint8_t data)
 	return ((data / 10) << 4) | (data %10);
 }
 
-READ8_MEMBER(meritm_state::ds1644_r)
+uint8_t meritm_state::ds1644_r(offs_t offset)
 {
 	system_time systime;
 	int rambank = (m_psd_a15 >> 2) & 0x3;
@@ -2423,7 +2423,7 @@ ROM_END
 
 void meritm_state::init_megat3te()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(*this, FUNC(meritm_state::ds1644_r)), write8_delegate(*this, FUNC(meritm_state::ds1644_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8sm_delegate(*this, FUNC(meritm_state::ds1644_r)), write8sm_delegate(*this, FUNC(meritm_state::ds1644_w)));
 }
 
 /* CRT-250 */

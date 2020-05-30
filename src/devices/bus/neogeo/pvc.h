@@ -21,8 +21,8 @@ public:
 
 	// reading and writing
 	virtual uint32_t get_bank_base(uint16_t sel) override { return m_pvc_prot->get_bank_base(); }
-	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_pvc_prot->protection_r(space, offset, mem_mask); }
-	virtual DECLARE_WRITE16_MEMBER(protection_w) override { m_pvc_prot->protection_w(space, offset, data, mem_mask); }
+	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_pvc_prot->protection_r(offset); }
+	virtual DECLARE_WRITE16_MEMBER(protection_w) override { m_pvc_prot->protection_w(offset, data, mem_mask); }
 
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override { }
 	virtual int get_fixed_bank_type() override { return 0; }

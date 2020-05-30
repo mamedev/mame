@@ -342,19 +342,19 @@ private:
 	std::unique_ptr<uint8_t[]> m_lanc2_ram;
 	std::unique_ptr<uint32_t[]> m_sharc0_dataram;
 	std::unique_ptr<uint32_t[]> m_sharc1_dataram;
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
-	DECLARE_READ32_MEMBER(sysreg_r);
-	DECLARE_WRITE32_MEMBER(sysreg_w);
-	DECLARE_READ32_MEMBER(lanc1_r);
-	DECLARE_WRITE32_MEMBER(lanc1_w);
-	DECLARE_READ32_MEMBER(lanc2_r);
-	DECLARE_WRITE32_MEMBER(lanc2_w);
-	DECLARE_READ32_MEMBER(dsp_dataram0_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
-	DECLARE_READ32_MEMBER(dsp_dataram1_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
-	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
-	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
+	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sysreg_r(offs_t offset, uint32_t mem_mask = ~0);
+	void sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t lanc1_r(offs_t offset);
+	void lanc1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t lanc2_r(offs_t offset, uint32_t mem_mask = ~0);
+	void lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dsp_dataram0_r(offs_t offset);
+	void dsp_dataram0_w(offs_t offset, uint32_t data);
+	uint32_t dsp_dataram1_r(offs_t offset);
+	void dsp_dataram1_w(offs_t offset, uint32_t data);
+	void soundtimer_en_w(uint16_t data);
+	void soundtimer_count_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
 	double adc12138_input_callback(uint8_t input);
@@ -375,7 +375,7 @@ private:
 
 
 
-WRITE32_MEMBER(nwktr_state::paletteram32_w)
+void nwktr_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -426,7 +426,7 @@ uint32_t nwktr_state::screen_update_rscreen(screen_device &screen, bitmap_rgb32 
 
 /*****************************************************************************/
 
-READ32_MEMBER(nwktr_state::sysreg_r)
+uint32_t nwktr_state::sysreg_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	if (offset == 0)
@@ -458,7 +458,7 @@ READ32_MEMBER(nwktr_state::sysreg_r)
 	return r;
 }
 
-WRITE32_MEMBER(nwktr_state::sysreg_w)
+void nwktr_state::sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if( offset == 0 )
 	{
@@ -508,7 +508,7 @@ void nwktr_state::lanc2_init()
 	m_lanc2_ram = std::make_unique<uint8_t[]>(0x8000);
 }
 
-READ32_MEMBER(nwktr_state::lanc1_r)
+uint32_t nwktr_state::lanc1_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -530,12 +530,12 @@ READ32_MEMBER(nwktr_state::lanc1_r)
 	}
 }
 
-WRITE32_MEMBER(nwktr_state::lanc1_w)
+void nwktr_state::lanc1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
 }
 
-READ32_MEMBER(nwktr_state::lanc2_r)
+uint32_t nwktr_state::lanc2_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -565,7 +565,7 @@ READ32_MEMBER(nwktr_state::lanc2_r)
 	return r;
 }
 
-WRITE32_MEMBER(nwktr_state::lanc2_w)
+void nwktr_state::lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -650,7 +650,7 @@ TIMER_CALLBACK_MEMBER(nwktr_state::sound_irq)
 }
 
 
-WRITE16_MEMBER(nwktr_state::soundtimer_en_w)
+void nwktr_state::soundtimer_en_w(uint16_t data)
 {
 	if (data & 1)
 	{
@@ -665,7 +665,7 @@ WRITE16_MEMBER(nwktr_state::soundtimer_en_w)
 	}
 }
 
-WRITE16_MEMBER(nwktr_state::soundtimer_count_w)
+void nwktr_state::soundtimer_count_w(uint16_t data)
 {
 	// Reset the count
 	m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
@@ -719,22 +719,22 @@ void nwktr_state::sound_memmap(address_map &map)
 /*****************************************************************************/
 
 
-READ32_MEMBER(nwktr_state::dsp_dataram0_r)
+uint32_t nwktr_state::dsp_dataram0_r(offs_t offset)
 {
 	return m_sharc0_dataram[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(nwktr_state::dsp_dataram0_w)
+void nwktr_state::dsp_dataram0_w(offs_t offset, uint32_t data)
 {
 	m_sharc0_dataram[offset] = data;
 }
 
-READ32_MEMBER(nwktr_state::dsp_dataram1_r)
+uint32_t nwktr_state::dsp_dataram1_r(offs_t offset)
 {
 	return m_sharc1_dataram[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(nwktr_state::dsp_dataram1_w)
+void nwktr_state::dsp_dataram1_w(offs_t offset, uint32_t data)
 {
 	m_sharc1_dataram[offset] = data;
 }

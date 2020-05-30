@@ -1838,7 +1838,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::dma_timer_callback )
 	// todo: accurate timing of this!
 
 	#define RATE 256
-	m_lc89510_temp->CDC_Do_DMA(machine(), RATE);
+	m_lc89510_temp->CDC_Do_DMA(RATE);
 
 	// timed reset of flags
 	scd_mode_dmna_ret_flags |= 0x0021;

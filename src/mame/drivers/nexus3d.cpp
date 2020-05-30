@@ -51,10 +51,10 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-//  DECLARE_READ32_MEMBER(nexus3d_unk2_r);
-//  DECLARE_READ32_MEMBER(nexus3d_unk3_r);
-//  DECLARE_WRITE32_MEMBER(nexus3d_unk2_w);
-//  DECLARE_WRITE32_MEMBER(nexus3d_unk3_w);
+//  uint32_t nexus3d_unk2_r();
+//  uint32_t nexus3d_unk3_r();
+//  void nexus3d_unk2_w(uint32_t data);
+//  void nexus3d_unk3_w(uint32_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -64,22 +64,22 @@ private:
 	void nexus3d_map(address_map &map);
 
 	uint32_t m_intpend, m_intmask, m_intlevel;
-	DECLARE_READ32_MEMBER(int_pending_r);
-	DECLARE_WRITE32_MEMBER(int_ack_w);
-	DECLARE_READ32_MEMBER(int_level_r);
-	DECLARE_READ32_MEMBER(int_mask_r);
-	DECLARE_WRITE32_MEMBER(int_mask_w);
+	uint32_t int_pending_r();
+	void int_ack_w(uint32_t data);
+	uint32_t int_level_r();
+	uint32_t int_mask_r();
+	void int_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void IntReq(int level);
 
-	DECLARE_READ32_MEMBER(vrender3d_status_r);
-	DECLARE_WRITE32_MEMBER(rop_data_w);
-	DECLARE_WRITE16_MEMBER(rop_register_w);
-	DECLARE_READ16_MEMBER(rop_status_r);
+	uint32_t vrender3d_status_r();
+	void rop_data_w(uint32_t data);
+	void rop_register_w(uint16_t data);
+	uint16_t rop_status_r();
 
-	DECLARE_READ32_MEMBER(timer_status_r);
-	DECLARE_WRITE32_MEMBER(timer_status_w);
-	DECLARE_READ32_MEMBER(timer_count_r);
-	DECLARE_WRITE32_MEMBER(timer_count_w);
+	uint32_t timer_status_r();
+	void timer_status_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t timer_count_r();
+	void timer_count_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t m_timer_status;
 	uint32_t m_timer_count;
 	emu_timer  *m_timer;
@@ -87,7 +87,7 @@ private:
 	bool m_timer_irq;
 	bool m_timer_result;
 
-	DECLARE_READ32_MEMBER(crtc_vblank_r);
+	uint32_t crtc_vblank_r();
 };
 
 void nexus3d_state::video_start()
@@ -109,7 +109,7 @@ uint32_t nexus3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-READ32_MEMBER(nexus3d_state::vrender3d_status_r)
+uint32_t nexus3d_state::vrender3d_status_r()
 {
 	return (0xbf<<16) | m_screen->vpos();
 }
@@ -130,54 +130,54 @@ void nexus3d_state::IntReq(int level)
 }
 
 
-READ32_MEMBER(nexus3d_state::int_mask_r)
+uint32_t nexus3d_state::int_mask_r()
 {
 	return m_intmask;
 }
 
-WRITE32_MEMBER(nexus3d_state::int_mask_w)
+void nexus3d_state::int_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_intmask);
 }
 
-READ32_MEMBER(nexus3d_state::int_pending_r)
+uint32_t nexus3d_state::int_pending_r()
 {
 	return m_intpend;
 }
 
-WRITE32_MEMBER(nexus3d_state::int_ack_w)
+void nexus3d_state::int_ack_w(uint32_t data)
 {
 	m_intpend &= ~data;
 	IntReq(-1);
 }
 
-READ32_MEMBER(nexus3d_state::int_level_r)
+uint32_t nexus3d_state::int_level_r()
 {
 	return m_intlevel;
 }
 
-WRITE16_MEMBER(nexus3d_state::rop_register_w)
+void nexus3d_state::rop_register_w(uint16_t data)
 {
 	//printf("%04x REG\n",data);
 }
 
-WRITE32_MEMBER(nexus3d_state::rop_data_w)
+void nexus3d_state::rop_data_w(uint32_t data)
 {
 	//printf("%04x DATA\n",data);
 }
 
-READ16_MEMBER(nexus3d_state::rop_status_r)
+uint16_t nexus3d_state::rop_status_r()
 {
 	return machine().rand() & 0x1000;
 }
 
-READ32_MEMBER(nexus3d_state::timer_status_r)
+uint32_t nexus3d_state::timer_status_r()
 {
 	uint32_t res = (m_timer_status & ~0x30) | ((m_timer_irq == true) << 5) | ((m_timer_result == true) << 4);
 	return res;
 }
 
-WRITE32_MEMBER(nexus3d_state::timer_status_w)
+void nexus3d_state::timer_status_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_timer_status);
 	//printf("%08x %08x\n",m_timer_status, m_timer_count);
@@ -194,12 +194,12 @@ WRITE32_MEMBER(nexus3d_state::timer_status_w)
 	}
 }
 
-READ32_MEMBER(nexus3d_state::timer_count_r)
+uint32_t nexus3d_state::timer_count_r()
 {
 	return m_timer_count;
 }
 
-WRITE32_MEMBER(nexus3d_state::timer_count_w)
+void nexus3d_state::timer_count_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_timer_count);
 }
@@ -219,7 +219,7 @@ TIMER_CALLBACK_MEMBER(nexus3d_state::timercb)
 }
 
 
-READ32_MEMBER(nexus3d_state::crtc_vblank_r)
+uint32_t nexus3d_state::crtc_vblank_r()
 {
 	uint16_t res = (m_screen->vblank()<<1) | (m_screen->hblank()<<0);
 

@@ -133,7 +133,7 @@ private:
 	void port05_w(uint8_t data);
 	uint8_t port01_r();
 	uint8_t port13_r();
-	DECLARE_READ8_MEMBER(bank_r);
+	uint8_t bank_r(address_space &space, offs_t offset);
 	uint8_t keyboard_r();
 	void scanlines_w(uint8_t data);
 	void digit_w(uint8_t data);
@@ -288,7 +288,7 @@ C  D  E  F      MEM  REGS  AUX  CANCEL
 
 */
 
-READ8_MEMBER( mmd2_state::bank_r )
+uint8_t mmd2_state::bank_r(address_space &space, offs_t offset)
 {
 	for (auto &bank : m_banks)
 		bank->set_entry(offset);

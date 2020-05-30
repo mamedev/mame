@@ -105,12 +105,12 @@ protected:
 
 	// I/O handlers
 	void update_display();
-	virtual DECLARE_WRITE8_MEMBER(lcd_control_w);
-	virtual DECLARE_WRITE8_MEMBER(lcd_data_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_READ8_MEMBER(input2_r);
+	virtual void lcd_control_w(u8 data);
+	virtual void lcd_data_w(u8 data);
+	void leds_w(u8 data);
+	void mux_w(u8 data);
+	u8 input1_r();
+	u8 input2_r();
 
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 	void lcd_palette(palette_device &palette) const;
@@ -173,8 +173,8 @@ private:
 	void sforte_map(address_map &map);
 
 	// I/O handlers
-	virtual DECLARE_WRITE8_MEMBER(lcd_control_w) override;
-	virtual DECLARE_WRITE8_MEMBER(lcd_data_w) override;
+	virtual void lcd_control_w(u8 data) override;
+	virtual void lcd_data_w(u8 data) override;
 
 	TIMER_CALLBACK_MEMBER(beep) { m_beeper->set_state(param); }
 	emu_timer *m_beeptimer;
@@ -223,7 +223,7 @@ void sexpert_state::update_display()
 	m_display->matrix(m_inp_mux, m_led_data);
 }
 
-WRITE8_MEMBER(sexpert_state::lcd_control_w)
+void sexpert_state::lcd_control_w(u8 data)
 {
 	// d0: HD44780 RS
 	// d1: HD44780 R/W
@@ -233,20 +233,20 @@ WRITE8_MEMBER(sexpert_state::lcd_control_w)
 	m_lcd_control = data & 7;
 }
 
-WRITE8_MEMBER(sexpert_state::lcd_data_w)
+void sexpert_state::lcd_data_w(u8 data)
 {
 	// d0-d7: HD44780 data
 	m_lcd_data = data;
 }
 
-WRITE8_MEMBER(sexpert_state::leds_w)
+void sexpert_state::leds_w(u8 data)
 {
 	// d0-d7: chessboard leds
 	m_led_data = data;
 	update_display();
 }
 
-WRITE8_MEMBER(sexpert_state::mux_w)
+void sexpert_state::mux_w(u8 data)
 {
 	// d0: rom bankswitch
 	m_rombank->set_entry(data & 1);
@@ -259,7 +259,7 @@ WRITE8_MEMBER(sexpert_state::mux_w)
 	update_display();
 }
 
-READ8_MEMBER(sexpert_state::input1_r)
+u8 sexpert_state::input1_r()
 {
 	u8 data = 0;
 
@@ -271,7 +271,7 @@ READ8_MEMBER(sexpert_state::input1_r)
 	return ~data;
 }
 
-READ8_MEMBER(sexpert_state::input2_r)
+u8 sexpert_state::input2_r()
 {
 	u8 data = 0;
 
@@ -288,17 +288,17 @@ READ8_MEMBER(sexpert_state::input2_r)
 
 // sforte-specific
 
-WRITE8_MEMBER(sforte_state::lcd_control_w)
+void sforte_state::lcd_control_w(u8 data)
 {
 	// d3: rom bankswitch
 	m_rombank->set_entry(data >> 3 & 1);
 
 	// LCD pins: same as sexpert
-	sexpert_state::lcd_control_w(space, offset, data);
-	lcd_data_w(space, 0, m_lcd_data); // refresh inp mux
+	sexpert_state::lcd_control_w(data);
+	lcd_data_w(m_lcd_data); // refresh inp mux
 }
 
-WRITE8_MEMBER(sforte_state::lcd_data_w)
+void sforte_state::lcd_data_w(u8 data)
 {
 	// d0-d2: 74145 to input mux/led select
 	// 74145 D from lcd control d2 (HD44780 E)
@@ -315,7 +315,7 @@ WRITE8_MEMBER(sforte_state::lcd_data_w)
 		m_beeptimer->adjust(attotime::from_msec(1), param);
 
 	// LCD pins: same as sexpert
-	sexpert_state::lcd_data_w(space, offset, data);
+	sexpert_state::lcd_data_w(data);
 }
 
 

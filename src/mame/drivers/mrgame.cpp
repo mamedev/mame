@@ -78,24 +78,24 @@ protected:
 
 private:
 	void mrgame_palette(palette_device &palette) const;
-	DECLARE_WRITE8_MEMBER(ack1_w);
-	DECLARE_WRITE8_MEMBER(ack2_w);
+	void ack1_w(uint8_t data);
+	void ack2_w(uint8_t data);
 	void portb_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(row_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(triple_w);
-	DECLARE_WRITE8_MEMBER(video_w);
+	void row_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void triple_w(uint8_t data);
+	void video_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(video_a11_w);
 	DECLARE_WRITE_LINE_MEMBER(video_a12_w);
 	DECLARE_WRITE_LINE_MEMBER(video_a13_w);
 	DECLARE_WRITE_LINE_MEMBER(intst_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_intst_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_w);
-	DECLARE_READ8_MEMBER(col_r);
-	DECLARE_READ8_MEMBER(sound_r);
+	uint8_t col_r();
+	uint8_t sound_r();
 	uint8_t porta_r();
 	uint8_t portc_r();
-	DECLARE_READ8_MEMBER(rsw_r);
+	uint8_t rsw_r();
 	DECLARE_WRITE_LINE_MEMBER(vblank_int_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_nmi_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
@@ -255,13 +255,13 @@ static INPUT_PORTS_START( mrgame )
 	PORT_BIT( 0xe9, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-READ8_MEMBER(mrgame_state::rsw_r)
+uint8_t mrgame_state::rsw_r()
 {
 	return m_io_dsw0->read() | ((uint8_t)m_ack1 << 5) | ((uint8_t)m_ack2 << 4);
 }
 
 // this is like a keyboard, energise a row and read the column data
-READ8_MEMBER(mrgame_state::col_r)
+uint8_t mrgame_state::col_r()
 {
 	if (m_row_data == 0)
 		return m_io_x0->read();
@@ -276,17 +276,17 @@ READ8_MEMBER(mrgame_state::col_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mrgame_state::row_w)
+void mrgame_state::row_w(uint8_t data)
 {
 	m_row_data = data & 7;
 }
 
-READ8_MEMBER(mrgame_state::sound_r)
+uint8_t mrgame_state::sound_r()
 {
 	return m_sound_data;
 }
 
-WRITE8_MEMBER(mrgame_state::sound_w)
+void mrgame_state::sound_w(uint8_t data)
 {
 	m_sound_data = data;
 	m_audiocpu1->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
@@ -294,13 +294,13 @@ WRITE8_MEMBER(mrgame_state::sound_w)
 }
 
 // this produces 24 outputs from three driver chips to drive lamps & solenoids
-WRITE8_MEMBER(mrgame_state::triple_w)
+void mrgame_state::triple_w(uint8_t data)
 {
 	if ((data & 0x18)==0)
 		m_ackv = BIT(data, 7);
 }
 
-WRITE8_MEMBER(mrgame_state::video_w)
+void mrgame_state::video_w(uint8_t data)
 {
 	m_video_data = data;
 }
@@ -339,12 +339,12 @@ WRITE_LINE_MEMBER(mrgame_state::flip_w)
 	m_flip = state;
 }
 
-WRITE8_MEMBER(mrgame_state::ack1_w)
+void mrgame_state::ack1_w(uint8_t data)
 {
 	m_ack1 = BIT(data, 0);
 }
 
-WRITE8_MEMBER(mrgame_state::ack2_w)
+void mrgame_state::ack2_w(uint8_t data)
 {
 	m_ack2 = BIT(data, 0);
 }

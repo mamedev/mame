@@ -103,11 +103,11 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_WRITE8_MEMBER(port01_w);
-	DECLARE_WRITE8_MEMBER(port02_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(port13_r);
+	void port00_w(uint8_t data);
+	void port01_w(uint8_t data);
+	void port02_w(uint8_t data);
+	uint8_t keyboard_r();
+	uint8_t port13_r();
 	DECLARE_READ_LINE_MEMBER(si);
 	DECLARE_WRITE_LINE_MEMBER(so);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
@@ -128,7 +128,7 @@ private:
 };
 
 
-WRITE8_MEMBER( mmd1_state::port00_w )
+void  mmd1_state::port00_w(uint8_t data)
 {
 	m_p[0][7] = BIT(data,7) ? 0 : 1;
 	m_p[0][6] = BIT(data,6) ? 0 : 1;
@@ -140,7 +140,7 @@ WRITE8_MEMBER( mmd1_state::port00_w )
 	m_p[0][0] = BIT(data,0) ? 0 : 1;
 }
 
-WRITE8_MEMBER( mmd1_state::port01_w )
+void mmd1_state::port01_w(uint8_t data)
 {
 	m_p[1][7] = BIT(data,7) ? 0 : 1;
 	m_p[1][6] = BIT(data,6) ? 0 : 1;
@@ -152,7 +152,7 @@ WRITE8_MEMBER( mmd1_state::port01_w )
 	m_p[1][0] = BIT(data,0) ? 0 : 1;
 }
 
-WRITE8_MEMBER( mmd1_state::port02_w )
+void mmd1_state::port02_w(uint8_t data)
 {
 	m_p[2][7] = BIT(data,7) ? 0 : 1;
 	m_p[2][6] = BIT(data,6) ? 0 : 1;
@@ -165,7 +165,7 @@ WRITE8_MEMBER( mmd1_state::port02_w )
 }
 
 // keyboard has a keydown and a keyup code. Keyup = last keydown + bit 7 set
-READ8_MEMBER( mmd1_state::keyboard_r )
+uint8_t mmd1_state::keyboard_r()
 {
 	uint8_t line1 = ioport("LINE1")->read();
 	uint8_t line2 = ioport("LINE2")->read();
@@ -193,7 +193,7 @@ READ8_MEMBER( mmd1_state::keyboard_r )
 		return m_return_code;
 }
 
-READ8_MEMBER(mmd1_state::port13_r)
+uint8_t mmd1_state::port13_r()
 {
 	u8 data = 0xfa;
 	data |= m_uart->dav_r() ? 1 : 0;

@@ -59,7 +59,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(tc_w);
+	void tc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
@@ -108,7 +108,7 @@ void nanos_state::mem_map(address_map &map)
 	map(0x1000, 0xffff).bankrw(m_bank2);
 }
 
-WRITE8_MEMBER(nanos_state::tc_w)
+void nanos_state::tc_w(uint8_t data)
 {
 	m_fdc->tc_w(BIT(data,1));
 }

@@ -76,10 +76,10 @@ private:
 	// I/O handlers
 	void update_display();
 	void lcd_output_w(u64 data);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_READ8_MEMBER(input2_r);
+	void mux_w(u8 data);
+	void control_w(u8 data);
+	u8 input1_r();
+	u8 input2_r();
 
 	u8 m_inp_mux;
 	u8 m_led_select;
@@ -134,14 +134,14 @@ void cforte_state::update_display()
 	m_display->matrix_partial(0, 3, m_led_select, m_inp_mux);
 }
 
-WRITE8_MEMBER(cforte_state::mux_w)
+void cforte_state::mux_w(u8 data)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = data;
 	update_display();
 }
 
-WRITE8_MEMBER(cforte_state::control_w)
+void cforte_state::control_w(u8 data)
 {
 	// d0: HLCD0538 data in
 	// d1: HLCD0538 clk
@@ -160,7 +160,7 @@ WRITE8_MEMBER(cforte_state::control_w)
 	m_beeper->set_state(data >> 7 & 1);
 }
 
-READ8_MEMBER(cforte_state::input1_r)
+u8 cforte_state::input1_r()
 {
 	u8 data = 0;
 
@@ -172,7 +172,7 @@ READ8_MEMBER(cforte_state::input1_r)
 	return ~data;
 }
 
-READ8_MEMBER(cforte_state::input2_r)
+u8 cforte_state::input2_r()
 {
 	u8 data = 0;
 

@@ -43,8 +43,8 @@ private:
 	required_device<screen_device> m_screen;
 	optional_shared_ptr<uint32_t> m_mainram;
 
-	DECLARE_READ32_MEMBER(unk_r);
-	DECLARE_WRITE32_MEMBER(tty_w);
+	uint32_t unk_r();
+	void tty_w(uint32_t data);
 
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 };
@@ -78,12 +78,12 @@ uint32_t ncd_ppc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-READ32_MEMBER(ncd_ppc_state::unk_r)
+uint32_t ncd_ppc_state::unk_r()
 {
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(ncd_ppc_state::tty_w)
+void ncd_ppc_state::tty_w(uint32_t data)
 {
 	printf("%c", (data>>24) & 0x7f);
 }

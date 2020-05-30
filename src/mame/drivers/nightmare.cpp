@@ -241,7 +241,7 @@ protected:
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 	void ic10_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER( unkout_w );
+	void unkout_w(uint8_t data);
 
 	void nightmare_map(address_map &map);
 	void nightmare_io_map(address_map &map);
@@ -334,7 +334,7 @@ void nightmare_state::ic10_w(uint8_t data)
 }
 
 
-WRITE8_MEMBER( nightmare_state::unkout_w )
+void nightmare_state::unkout_w(uint8_t data)
 {
   // J3
 }
