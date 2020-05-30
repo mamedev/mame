@@ -1891,8 +1891,7 @@ CONS( 2009, gssytts,    0,        0, gssytts,   guitarss,  spg2xx_game_gssytts_s
 CONS( 2006, vtechtvssp, 0,        0, abltenni,  fordrace,  spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
 CONS( 2006, vtechtvsgr, 0,        0, abltenni,  fordrace,  spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
 
-CONS( 2006, senspeed, 0,        0, abltenni,  senspeed,  spg2xx_game_state,          empty_init,    "VffTech",                                                  "TV Leffarning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
-
+CONS( 2008, senspeed,  0,         0, abltenni,  senspeed,  spg2xx_game_state,          empty_init,    "Senario",                                                "Speed Racer (Senario)",                                                 MACHINE_NOT_WORKING )
 
 CONS( 200?, jjstrip,    0,        0, tvsprt10,  jjstrip,   spg2xx_game_state,          empty_init,    "Shiggles Inc.",                                          "Club Jenna Presents: Jenna Jameson's Strip Poker",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

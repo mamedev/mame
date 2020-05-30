@@ -92,7 +92,7 @@ void spg2xx_video_device::device_reset()
 *************************/
 
 
-void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* regs)
+void spg2xx_video_device::draw_linemap(const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* regs)
 {
 	if ((scanline < 0) || (scanline >= 240))
 		return;
@@ -135,7 +135,7 @@ void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanli
 
 			if (!(data & 0x8000))
 			{
-				m_screenbuf[i] = m_rgb555_to_rgb888[data & 0x7fff];
+				dst[i] = m_rgb555_to_rgb888[data & 0x7fff];
 			}
 		}
 	}
@@ -152,7 +152,7 @@ void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanli
 
 			if (!(color & 0x8000))
 			{
-				m_screenbuf[(i * 2) + 0] = m_rgb555_to_rgb888[color & 0x7fff];
+				dst[(i * 2) + 0] = m_rgb555_to_rgb888[color & 0x7fff];
 			}
 
 			palette_entry = (data & 0xff00) >> 8;
@@ -160,7 +160,7 @@ void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanli
 
 			if (!(color & 0x8000))
 			{
-				m_screenbuf[(i * 2) + 1] = m_rgb555_to_rgb888[color & 0x7fff];
+				dst[(i * 2) + 1] = m_rgb555_to_rgb888[color & 0x7fff];
 			}
 		}
 	}
@@ -243,7 +243,7 @@ inline uint8_t spg2xx_video_device::mix_channel(uint8_t bottom, uint8_t top)
 }
 
 template<spg2xx_video_device::blend_enable_t Blend, spg2xx_video_device::flipx_t FlipX>
-void spg2xx_video_device::draw_tilestrip(const rectangle& cliprect, uint32_t scanline, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint16_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile)
+void spg2xx_video_device::draw_tilestrip(const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint16_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
 	const uint32_t yflipmask = flip_y ? tile_h - 1 : 0;
@@ -277,20 +277,20 @@ void spg2xx_video_device::draw_tilestrip(const rectangle& cliprect, uint32_t sca
 			{
 				if (Blend)
 				{
-					m_screenbuf[realdrawpos] = (mix_channel((uint8_t)(m_screenbuf[realdrawpos] >> 16), m_rgb5_to_rgb8[(rgb >> 10) & 0x1f]) << 16) |
-						(mix_channel((uint8_t)(m_screenbuf[realdrawpos] >> 8), m_rgb5_to_rgb8[(rgb >> 5) & 0x1f]) << 8) |
-						(mix_channel((uint8_t)(m_screenbuf[realdrawpos] >> 0), m_rgb5_to_rgb8[rgb & 0x1f]));
+					dst[realdrawpos] = (mix_channel((uint8_t)(dst[realdrawpos] >> 16), m_rgb5_to_rgb8[(rgb >> 10) & 0x1f]) << 16) |
+						(mix_channel((uint8_t)(dst[realdrawpos] >> 8), m_rgb5_to_rgb8[(rgb >> 5) & 0x1f]) << 8) |
+						(mix_channel((uint8_t)(dst[realdrawpos] >> 0), m_rgb5_to_rgb8[rgb & 0x1f]));
 				}
 				else
 				{
-					m_screenbuf[realdrawpos] = m_rgb555_to_rgb888[rgb];
+					dst[realdrawpos] = m_rgb555_to_rgb888[rgb];
 				}
 			}
 		}
 	}
 }
 
-void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t *regs)
+void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t *regs)
 {
 	const uint32_t xscroll = regs[0];
 	const uint32_t yscroll = regs[1];
@@ -309,9 +309,9 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 		return;
 	}
 
-	if (ctrl & 0x0001) // Bitmap mode! (basically screen width tile mode)
+	if (ctrl & 0x0001) // Bitmap / Linemap mode! (basically screen width tile mode)
 	{
-		draw_bitmap(cliprect, scanline, priority, tilegfxdata_addr, regs);
+		draw_linemap(cliprect, dst, scanline, priority, tilegfxdata_addr, regs);
 		return;
 	}
 
@@ -360,28 +360,28 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 		{
 			if (flip_x)
 			{
-				draw_tilestrip<BlendOn, FlipXOn>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+				draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 			}
 			else
 			{
-				draw_tilestrip<BlendOn, FlipXOff>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+				draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 			}
 		}
 		else
 		{
 			if (flip_x)
 			{
-				draw_tilestrip<BlendOff, FlipXOn>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+				draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 			}
 			else
 			{
-				draw_tilestrip<BlendOff, FlipXOff>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+				draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 			}
 		}
 	}
 }
 
-void spg2xx_video_device::draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t base_addr)
+void spg2xx_video_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t base_addr)
 {
 	uint32_t tilegfxdata_addr = 0x40 * m_video_regs[0x22];
 	uint16_t tile = m_spriteram[base_addr + 0];
@@ -435,22 +435,22 @@ void spg2xx_video_device::draw_sprite(const rectangle& cliprect, uint32_t scanli
 			{
 				if (flip_x)
 				{
-					draw_tilestrip<BlendOn, FlipXOn>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+					draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 				}
 				else
 				{
-					draw_tilestrip<BlendOn, FlipXOff>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+					draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 				}
 			}
 			else
 			{
 				if (flip_x)
 				{
-					draw_tilestrip<BlendOff, FlipXOn>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+					draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 				}
 				else
 				{
-					draw_tilestrip<BlendOff, FlipXOff>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+					draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 				}
 			}
 		}
@@ -468,22 +468,22 @@ void spg2xx_video_device::draw_sprite(const rectangle& cliprect, uint32_t scanli
 			{
 				if (flip_x)
 				{
-					draw_tilestrip<BlendOn, FlipXOn>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+					draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 				}
 				else
 				{
-					draw_tilestrip<BlendOn, FlipXOff>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+					draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 				}
 			}
 			else
 			{
 				if (flip_x)
 				{
-					draw_tilestrip<BlendOff, FlipXOn>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+					draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 				}
 				else
 				{
-					draw_tilestrip<BlendOff, FlipXOff>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+					draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 				}
 			}
 		}
@@ -498,29 +498,29 @@ void spg2xx_video_device::draw_sprite(const rectangle& cliprect, uint32_t scanli
 			{
 				if (flip_x)
 				{
-					draw_tilestrip<BlendOn, FlipXOn>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+					draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 				}
 				else
 				{
-					draw_tilestrip<BlendOn, FlipXOff>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+					draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 				}
 			}
 			else
 			{
 				if (flip_x)
 				{
-					draw_tilestrip<BlendOff, FlipXOn>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+					draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 				}
 				else
 				{
-					draw_tilestrip<BlendOff, FlipXOff>(cliprect, scanline, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
+					draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
 				}
 			}
 		}
 	}
 }
 
-void spg2xx_video_device::draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority)
+void spg2xx_video_device::draw_sprites(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority)
 {
 	if (!(m_video_regs[0x42] & 0x0001))
 	{
@@ -529,7 +529,7 @@ void spg2xx_video_device::draw_sprites(const rectangle &cliprect, uint32_t scanl
 
 	for (uint32_t n = 0; n < m_sprlimit_read_cb(); n++)
 	{
-		draw_sprite(cliprect, scanline, priority, 4 * n);
+		draw_sprite(cliprect, dst, scanline, priority, 4 * n);
 	}
 }
 
@@ -543,7 +543,8 @@ void spg2xx_video_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const 
 
 	const uint16_t fade_offset = m_video_regs[0x30];
 
-	uint32_t* src = &m_screenbuf[cliprect.min_x];
+	uint32_t* src = &bitmap.pix32(scanline, cliprect.min_x);
+
 	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 	{
 		if ((m_video_regs[0x3c] & 0x00ff) != 0x0020) // apply saturation
@@ -582,10 +583,6 @@ void spg2xx_video_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const 
 		src++;
 	}
 
-	uint32_t* dest2 = &bitmap.pix32(scanline, cliprect.min_x);
-	uint32_t* src2 = &m_screenbuf[cliprect.min_x];
-
-	memcpy(dest2, src2, sizeof(uint32_t) * ((cliprect.max_x - cliprect.min_x) + 1));
 
 }
 
@@ -619,15 +616,17 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 	uint16_t *page1_regs = m_video_regs + 0x10;
 	uint16_t *page2_regs = m_video_regs + 0x16;
 
+	bitmap.fill(0, cliprect);
+
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
-		memset(m_screenbuf, 0, 4 * 320);
+		uint32_t* dst = &bitmap.pix32(scanline, cliprect.min_x);
 
 		for (int i = 0; i < 4; i++)
 		{
-			draw_page(cliprect, scanline, i, page1_addr, page1_regs);
-			draw_page(cliprect, scanline, i, page2_addr, page2_regs);
-			draw_sprites(cliprect, scanline, i);
+			draw_page(cliprect, dst, scanline, i, page1_addr, page1_regs);
+			draw_page(cliprect, dst, scanline, i, page2_addr, page2_regs);
+			draw_sprites(cliprect, dst, scanline, i);
 		}
 
 		apply_saturation_and_fade(bitmap, cliprect, scanline);

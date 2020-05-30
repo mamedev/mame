@@ -68,20 +68,18 @@ protected:
 
 	void apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline);
 
-	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t *regs);
-	void draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority);
+	void draw_page(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t *regs);
+	void draw_sprites(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority);
 
-	inline void draw_bitmap(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* regs);
-	inline void draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr);
-
+	inline void draw_sprite(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t base_addr);
+	inline void draw_linemap(const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* regs);
 	inline bool get_tile_info(uint32_t tilemap_rambase, uint32_t palettemap_rambase, uint32_t x0, uint32_t y0, uint32_t tile_count_x, uint32_t ctrl, uint32_t attr, uint16_t& tile, bool& blend, bool& flip_x, bool& flip_y, uint32_t& palette_offset);
 
 	template<spg2xx_video_device::blend_enable_t Blend, spg2xx_video_device::flipx_t FlipX>
-	inline void draw_tilestrip(const rectangle& cliprect, uint32_t scanline, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint16_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile);
+	inline void draw_tilestrip(const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint16_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile);
 
 	uint8_t mix_channel(uint8_t a, uint8_t b);
 
-	uint32_t m_screenbuf[320];
 	uint8_t m_rgb5_to_rgb8[32];
 	uint32_t m_rgb555_to_rgb888[0x8000];
 
