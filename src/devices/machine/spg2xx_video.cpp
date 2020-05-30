@@ -331,7 +331,8 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t* dst, ui
 	int realxscroll = xscroll;
 	if (row_scroll)
 	{
-		realxscroll += (int16_t)m_scrollram[scanline & 0xff];
+		// Tennis in My Wireless Sports confirms the need to add the scroll value here rather than rowscroll being screen-aligned
+		realxscroll += (int16_t)m_scrollram[(scanline+yscroll) & 0xff];
 	}
 
 	for (uint32_t x0 = 0; x0 < (320+tile_w)/tile_w; x0++)
@@ -417,7 +418,12 @@ void spg2xx_video_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, 
 	const uint32_t words_per_tile = bits_per_row * tile_h;
 
 	bool flip_y = (attr & 0x0008);
-	const uint32_t palette_offset = (attr & 0x0f00) >> 4;
+	uint32_t palette_offset = (attr & 0x0f00) >> 4;
+	
+	// the Circuit Racing game in PDC100 needs this or some graphics have bad colours at the edges when turning as it leaves stray lower bits set
+	palette_offset >>= nc_bpp;
+	palette_offset <<= nc_bpp;
+
 
 	if (firstline < lastline)
 	{
