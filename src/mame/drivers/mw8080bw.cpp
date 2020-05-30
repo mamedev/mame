@@ -3094,7 +3094,7 @@ ROM_END
 /* 597 */ GAMEL( 1975, gunfighto,  gunfight, gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_SUPPORTS_SAVE, layout_gunfight )
 /* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME(  1976, tornbase,   0,        tornbase, tornbase, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    zzzap_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_280zzzap )
+/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    zzzap_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
 /* 611 */ GAMEL( 1976, maze,       0,        maze,     maze,     mw8080bw_state, empty_init, ROT0,   "Midway", "Amazing Maze", MACHINE_SUPPORTS_SAVE, layout_maze )
 /* 612 */ GAME(  1977, boothill,   0,        boothill, boothill, boothill_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", MACHINE_SUPPORTS_SAVE )
 /* 615 */ GAME(  1977, checkmat,   0,        checkmat, checkmat, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

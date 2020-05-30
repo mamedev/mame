@@ -2735,6 +2735,8 @@ files {
 	MAME_DIR .. "src/mame/audio/mw8080bw.h",
 	MAME_DIR .. "src/mame/audio/nl_gunfight.cpp",
 	MAME_DIR .. "src/mame/audio/nl_gunfight.h",
+	MAME_DIR .. "src/mame/audio/nl_280zzzap.cpp",
+	MAME_DIR .. "src/mame/audio/nl_280zzzap.h",
 	MAME_DIR .. "src/mame/video/mw8080bw.cpp",
 	MAME_DIR .. "src/mame/drivers/rotaryf.cpp",
 }

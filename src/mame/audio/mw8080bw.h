@@ -311,6 +311,18 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
+
+private:
+	required_device<netlist_mame_logic_input_device> m_pedal_bit0;
+	required_device<netlist_mame_logic_input_device> m_pedal_bit1;
+	required_device<netlist_mame_logic_input_device> m_pedal_bit2;
+	required_device<netlist_mame_logic_input_device> m_pedal_bit3;
+	required_device<netlist_mame_logic_input_device> m_hi_shift;
+	required_device<netlist_mame_logic_input_device> m_lo_shift;
+	required_device<netlist_mame_logic_input_device> m_boom;
+	required_device<netlist_mame_logic_input_device> m_engine_sound_off;
+	required_device<netlist_mame_logic_input_device> m_noise_cr_1;
+	required_device<netlist_mame_logic_input_device> m_noise_cr_2;
 };
 
 
