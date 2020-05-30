@@ -125,8 +125,6 @@ void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanli
 	//const int linewidth = 320 / 2;
 	int sourcebase = tile | (palette << 16);
 
-	uint32_t* dest = &m_screenbuf[320 * scanline];
-
 	uint32_t ctrl = regs[3];
 
 	if (ctrl & 0x80) // HiColor mode (rad_digi)
@@ -137,7 +135,7 @@ void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanli
 
 			if (!(data & 0x8000))
 			{
-				dest[i] = m_rgb555_to_rgb888[data & 0x7fff];
+				m_screenbuf[i] = m_rgb555_to_rgb888[data & 0x7fff];
 			}
 		}
 	}
@@ -154,7 +152,7 @@ void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanli
 
 			if (!(color & 0x8000))
 			{
-				dest[(i * 2) + 0] = m_rgb555_to_rgb888[color & 0x7fff];
+				m_screenbuf[(i * 2) + 0] = m_rgb555_to_rgb888[color & 0x7fff];
 			}
 
 			palette_entry = (data & 0xff00) >> 8;
@@ -162,7 +160,7 @@ void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanli
 
 			if (!(color & 0x8000))
 			{
-				dest[(i * 2) + 1] = m_rgb555_to_rgb888[color & 0x7fff];
+				m_screenbuf[(i * 2) + 1] = m_rgb555_to_rgb888[color & 0x7fff];
 			}
 		}
 	}
@@ -615,7 +613,6 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 	}
 
-	memset(m_screenbuf, 0, 4 * 320);
 
 	const uint32_t page1_addr = 0x40 * m_video_regs[0x20];
 	const uint32_t page2_addr = 0x40 * m_video_regs[0x21];
@@ -624,6 +621,8 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
+		memset(m_screenbuf, 0, 4 * 320);
+
 		for (int i = 0; i < 4; i++)
 		{
 			draw_page(cliprect, scanline, i, page1_addr, page1_regs);
