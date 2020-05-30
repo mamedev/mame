@@ -1051,8 +1051,7 @@ void segas1x_bootleg_state::sound_18_map(address_map &map)
 	map(0x0000, 0x9fff).rom();
 	map(0xa000, 0xbfff).r(FUNC(segas1x_bootleg_state::system18_bank_r));
 	/**** D/A register ****/
-	map(0xc000, 0xc008).w("5c68", FUNC(rf5c68_device::rf5c68_w));
-	map(0xd000, 0xdfff).rw("5c68", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w));
+	map(0xc000, 0xdfff).m("5c68", FUNC(rf5c68_device::map));
 	map(0xe000, 0xffff).ram(); //??
 }
 

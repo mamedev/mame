@@ -16,6 +16,14 @@ DEFINE_DEVICE_TYPE(RF5C68, rf5c68_device, "rf5c68", "Ricoh RF5C68")
 DEFINE_DEVICE_TYPE(RF5C164, rf5c164_device, "rf5c164", "Ricoh RF5C164")
 
 
+void rf5c68_device::map(address_map &map)
+{
+	// TODO: Mirroring is sega arcade boards only?
+	map(0x0000, 0x0008).mirror(0x0ff0).w(FUNC(rf5c68_device::rf5c68_w)); // A12 = 0 : Register
+	map(0x1000, 0x1fff).rw(FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w)); // A12 = 1 : Waveform data
+}
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -189,6 +197,7 @@ void rf5c68_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 //    RF5C68 write register
 //-------------------------------------------------
 
+// TODO: RF5C164 only?
 u8 rf5c68_device::rf5c68_r(offs_t offset)
 {
 	uint8_t shift;
