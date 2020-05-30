@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "audio/mw8080bw.h"
 #include "audio/nl_gunfight.h"
+#include "audio/nl_280zzzap.h"
 
 #include "includes/mw8080bw.h"
 #include "speaker.h"
@@ -572,6 +573,7 @@ DEFINE_DEVICE_TYPE(SPCENCTR_AUDIO, spcenctr_audio_device, "spcenctr_audio", "Mid
 DEFINE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device, "phantom2_audio", "Midway Phantom 2 Audio")
 DEFINE_DEVICE_TYPE(INVADERS_AUDIO, invaders_audio_device, "invaders_audio", "Taito Space Invaders Audio")
 DEFINE_DEVICE_TYPE(INVAD2CT_AUDIO, invad2ct_audio_device, "invad2ct_audio", "Midway Space Invaders II Audio")
+DEFINE_DEVICE_TYPE(ZZZAP_AUDIO,    zzzap_audio_device,    "zzzap_audio",    "Midway 280-ZZZAP Audio")
 
 
 /*************************************
@@ -3611,40 +3613,88 @@ WRITE8_MEMBER(mw8080bw_state::tornbase_audio_w)
  *
  *************************************/
 
-void mw8080bw_state::zzzap_audio(machine_config &config)
+zzzap_audio_device::zzzap_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, ZZZAP_AUDIO, tag, owner, clock),
+	m_pedal_bit0(*this, "sound_nl:pedal_bit0"),
+	m_pedal_bit1(*this, "sound_nl:pedal_bit1"),
+	m_pedal_bit2(*this, "sound_nl:pedal_bit2"),
+	m_pedal_bit3(*this, "sound_nl:pedal_bit3"),
+	m_hi_shift(*this, "sound_nl:hi_shift"),
+	m_lo_shift(*this, "sound_nl:lo_shift"),
+	m_boom(*this, "sound_nl:boom"),
+	m_engine_sound_off(*this, "sound_nl:engine_sound_off"),
+	m_noise_cr_1(*this, "sound_nl:noise_cr_1"),
+	m_noise_cr_2(*this, "sound_nl:noise_cr_2")
 {
-	SPEAKER(config, "mono").front_center();
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::zzzap_audio_1_w)
+void zzzap_audio_device::p1_w(u8 data)
 {
 	/* set ENGINE SOUND FREQ(data & 0x0f)  the value written is
 	                                       the gas pedal position */
+	m_pedal_bit0->write_line(BIT(data, 0));
+	m_pedal_bit1->write_line(BIT(data, 1));
+	m_pedal_bit2->write_line(BIT(data, 2));
+	m_pedal_bit3->write_line(BIT(data, 3));
 
 	/* if (data & 0x10)  enable HI SHIFT engine sound modifier */
+	m_hi_shift->write_line(BIT(data, 4));
 
 	/* if (data & 0x20)  enable LO SHIFT engine sound modifier */
+	m_lo_shift->write_line(BIT(data, 5));
 
 	/* D6 and D7 are not connected */
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::zzzap_audio_2_w)
+void zzzap_audio_device::p2_w(u8 data)
 {
 	/* if (data & 0x01)  enable BOOM sound */
+	m_boom->write_line(BIT(data, 0));
 
 	/* if (data & 0x02)  enable ENGINE sound (global) */
+	m_engine_sound_off->write_line(BIT(data, 1));
 
 	/* if (data & 0x04)  enable CR 1 (screeching sound) */
+	m_noise_cr_1->write_line(BIT(data, 2));
 
 	/* if (data & 0x08)  enable NOISE CR 2 (happens only after the car blows up, but
 	                                        before it appears again, not sure what
 	                                        it is supposed to sound like) */
+	m_noise_cr_2->write_line(BIT(data, 3));
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
 
 	/* D4, D6 and D7 are not connected */
+}
+
+
+void zzzap_audio_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(280zzzap))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit0", "I_PEDAL_BIT0", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit1", "I_PEDAL_BIT1", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit2", "I_PEDAL_BIT2", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit3", "I_PEDAL_BIT3", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:hi_shift", "I_HI_SHIFT", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:lo_shift", "I_LO_SHIFT", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:boom", "I_BOOM", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:engine_sound_off", "I_ENGINE_SOUND_OFF", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_1", "I_NOISE_CR_1", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_2", "I_NOISE_CR_2", 0);
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0 / 2.5, -30000.0);
+}
+
+
+void zzzap_audio_device::device_start()
+{
 }
 
 

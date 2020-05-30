@@ -65,7 +65,6 @@ public:
 	void phantom2(machine_config &config);
 	void shuffle(machine_config &config);
 	void tornbase(machine_config &config);
-	void zzzap(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(direct_coin_count);
 
@@ -125,8 +124,6 @@ private:
 	DECLARE_READ8_MEMBER(bowler_shift_result_r);
 	DECLARE_WRITE8_MEMBER(bowler_lights_1_w);
 	DECLARE_WRITE8_MEMBER(bowler_lights_2_w);
-	DECLARE_WRITE8_MEMBER(zzzap_audio_1_w);
-	DECLARE_WRITE8_MEMBER(zzzap_audio_2_w);
 	DECLARE_WRITE8_MEMBER(bowler_audio_2_w);
 	DECLARE_WRITE8_MEMBER(bowler_audio_3_w);
 	DECLARE_WRITE8_MEMBER(bowler_audio_4_w);
@@ -159,7 +156,6 @@ private:
 	void maze_audio(machine_config &config);
 	void shuffle_audio(machine_config &config);
 	void tornbase_audio(machine_config &config);
-	void zzzap_audio(machine_config &config);
 
 	void blueshrk_io_map(address_map &map);
 	void bowler_io_map(address_map &map);
@@ -172,7 +168,6 @@ private:
 	void phantom2_io_map(address_map &map);
 	void shuffle_io_map(address_map &map);
 	void tornbase_io_map(address_map &map);
-	void zzzap_io_map(address_map &map);
 };
 
 
@@ -377,6 +372,26 @@ private:
 	u8 m_trench_slope[16];  // 16x4 bit RAM
 	u8 m_bright_control;
 	u8 m_brightness;
+};
+
+
+class zzzap_state : public mw8080bw_state
+{
+public:
+	zzzap_state(machine_config const &mconfig, device_type type, char const *tag) :
+		mw8080bw_state(mconfig, type, tag),
+		m_soundboard(*this, "soundboard")
+	{
+	}
+
+	void zzzap(machine_config &config);
+
+private:
+	void io_w(offs_t offset, u8 data);
+
+	void io_map(address_map &map);
+
+	required_device<zzzap_audio_device> m_soundboard;
 };
 
 
