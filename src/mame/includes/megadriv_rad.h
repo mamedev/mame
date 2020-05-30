@@ -14,6 +14,7 @@ public:
 	{}
 
 	void init_megadriv_radica_6button_pal();
+	void init_megadriv_radica_6button_ntsc();
 
 	DECLARE_MACHINE_START(megadriv_radica_6button);
 	DECLARE_MACHINE_START(megadriv_radica_3button);
@@ -22,6 +23,7 @@ public:
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_READ16_MEMBER(read_a13);
 
+	void megadriv_radica_6button_ntsc(machine_config &config);
 	void megadriv_radica_6button_pal(machine_config &config);
 	void megadriv_radica_3button_ntsc(machine_config &config);
 	void megadriv_radica_3button_pal(machine_config &config);

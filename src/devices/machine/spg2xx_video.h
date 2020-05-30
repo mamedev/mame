@@ -38,25 +38,6 @@ protected:
 	devcb_read16 m_guny_in;
 	devcb_read16 m_gunx_in;
 
-	enum
-	{
-		PAGE_ENABLE_MASK        = 0x0008,
-		PAGE_WALLPAPER_MASK     = 0x0004,
-
-		SPRITE_ENABLE_MASK      = 0x0001,
-		SPRITE_COORD_TL_MASK    = 0x0002,
-
-		PAGE_PRIORITY_FLAG_MASK    = 0x3000,
-		PAGE_PRIORITY_FLAG_SHIFT   = 12,
-		PAGE_TILE_HEIGHT_MASK   = 0x00c0,
-		PAGE_TILE_HEIGHT_SHIFT  = 6,
-		PAGE_TILE_WIDTH_MASK    = 0x0030,
-		PAGE_TILE_WIDTH_SHIFT   = 4,
-		TILE_X_FLIP             = 0x0004,
-		TILE_Y_FLIP             = 0x0008
-	};
-
-
 	inline void check_video_irq();
 
 	static const device_timer_id TIMER_SCREENPOS = 2;
@@ -85,29 +66,27 @@ protected:
 		FlipXOn = true
 	};
 
-	void apply_saturation(const rectangle &cliprect);
-	void apply_fade(const rectangle &cliprect);
+	void apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline);
 
-	template<blend_enable_t Blend, rowscroll_enable_t RowScroll, flipx_t FlipX>
-	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint16_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset, int yscroll);
-	void draw_bitmap(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t* regs);
-	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs);
-	void draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr);
+	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t *regs);
 	void draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority);
+
+	inline void draw_bitmap(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* regs);
+	inline void draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr);
+
+	inline bool get_tile_info(uint32_t tilemap_rambase, uint32_t palettemap_rambase, uint32_t x0, uint32_t y0, uint32_t tile_count_x, uint32_t ctrl, uint32_t attr, uint16_t& tile, bool& blend, bool& flip_x, bool& flip_y, uint32_t& palette_offset);
+
+	template<spg2xx_video_device::blend_enable_t Blend, spg2xx_video_device::flipx_t FlipX>
+	inline void draw_tilestrip(const rectangle& cliprect, uint32_t scanline, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint16_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile);
 
 	uint8_t mix_channel(uint8_t a, uint8_t b);
 
-	uint32_t m_screenbuf[320 * 240];
+	uint32_t m_screenbuf[320];
 	uint8_t m_rgb5_to_rgb8[32];
 	uint32_t m_rgb555_to_rgb888[0x8000];
 
-	bool m_hide_page0;
-	bool m_hide_page1;
-	bool m_hide_sprites;
-	bool m_debug_sprites;
-	bool m_debug_blit;
-	bool m_debug_palette;
-	uint8_t m_sprite_index_to_debug;
+	int m_ycmp_table[480];
+	void update_vcmp_table();
 
 	uint16_t m_video_regs[0x100];
 
@@ -118,6 +97,7 @@ protected:
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint16_t> m_scrollram;
+	required_shared_ptr<uint16_t> m_hcompram;
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
