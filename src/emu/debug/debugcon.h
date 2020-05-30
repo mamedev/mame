@@ -122,6 +122,9 @@ private:
 	CMDERR internal_execute_command(bool execute, int params, char **param);
 	CMDERR internal_parse_command(const std::string &original_command, bool execute);
 
+	void print_core(const char *text);                   // core text output
+	void print_core_wrap(const char *text, int wrapcol); // core text output
+
 	struct debug_command
 	{
 		debug_command(const char *_command, u32 _flags, int _ref, int _minparams, int _maxparams, std::function<void(int, const std::vector<std::string> &)> _handler);
@@ -147,6 +150,7 @@ private:
 	std::forward_list<debug_command> m_commandlist;
 
 	std::unique_ptr<std::istream> m_source_file;        // script source file
+	std::unique_ptr<emu_file> m_logfile;                // logfile for debug console output
 };
 
 #endif // MAME_EMU_DEBUG_DEBUGCON_H

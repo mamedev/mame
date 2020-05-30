@@ -38,6 +38,7 @@ debugger_console::debugger_console(running_machine &machine)
 	, m_visiblecpu(nullptr)
 	, m_console_textbuf(nullptr)
 	, m_errorlog_textbuf(nullptr)
+	, m_logfile(nullptr)
 {
 	/* allocate text buffers */
 	m_console_textbuf = text_buffer_alloc(CONSOLE_BUF_SIZE, CONSOLE_MAX_LINES);
@@ -47,6 +48,9 @@ debugger_console::debugger_console(running_machine &machine)
 	m_errorlog_textbuf = text_buffer_alloc(ERRORLOG_BUF_SIZE, ERRORLOG_MAX_LINES);
 	if (!m_errorlog_textbuf)
 		return;
+
+	/* due to initialization order, @machine is holding our debug.log handle */
+	m_logfile = machine.steal_debuglogfile();
 
 	/* print the opening lines */
 	printf("%s debugger version %s\n", emulator_info::get_appname(), emulator_info::get_build_version());
@@ -96,6 +100,9 @@ void debugger_console::exit()
 
 	/* free the command list */
 	m_commandlist.clear();
+
+	/* close the logfile, if any */
+	m_logfile = nullptr;
 }
 
 
@@ -538,6 +545,34 @@ std::string debugger_console::cmderr_to_string(CMDERR error)
 
 ***************************************************************************/
 
+
+/*-------------------------------------------------
+	print_core - write preformatted text
+	to the debug console
+-------------------------------------------------*/
+
+void debugger_console::print_core(const char *text)
+{
+	// FIXME: this invokes strlen() twice; compute it once and pass it to text_buffer_print
+	text_buffer_print(m_console_textbuf, text);
+	if (m_logfile)
+		m_logfile->write(text, strlen(text));
+}
+
+/*-------------------------------------------------
+	print_core_wrap - write preformatted text
+	to the debug console, with wrapping
+-------------------------------------------------*/
+
+void debugger_console::print_core_wrap(const char *text, int wrapcol)
+{
+	// FIXME: this invokes strlen() twice; compute it once and pass it to text_buffer_print
+	// FIXME: also look into honoring wrapcol for the logfile
+	text_buffer_print_wrap(m_console_textbuf, text, wrapcol);
+	if (m_logfile)
+		m_logfile->write(text, strlen(text));
+}
+
 /*-------------------------------------------------
     vprintf - vprintfs the given arguments using
     the format to the debug console
@@ -545,7 +580,7 @@ std::string debugger_console::cmderr_to_string(CMDERR error)
 
 void debugger_console::vprintf(util::format_argument_pack<std::ostream> const &args)
 {
-	text_buffer_print(m_console_textbuf, util::string_format(args).c_str());
+	print_core(util::string_format(args).c_str());
 
 	/* force an update of any console views */
 	m_machine.debug_view().update_all(DVT_CONSOLE);
@@ -553,7 +588,7 @@ void debugger_console::vprintf(util::format_argument_pack<std::ostream> const &a
 
 void debugger_console::vprintf(util::format_argument_pack<std::ostream> &&args)
 {
-	text_buffer_print(m_console_textbuf, util::string_format(std::move(args)).c_str());
+	print_core(util::string_format(std::move(args)).c_str());
 
 	/* force an update of any console views */
 	m_machine.debug_view().update_all(DVT_CONSOLE);
@@ -567,7 +602,7 @@ void debugger_console::vprintf(util::format_argument_pack<std::ostream> &&args)
 
 void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> const &args)
 {
-	text_buffer_print_wrap(m_console_textbuf, util::string_format(args).c_str(), wrapcol);
+	print_core_wrap(util::string_format(args).c_str(), wrapcol);
 
 	/* force an update of any console views */
 	m_machine.debug_view().update_all(DVT_CONSOLE);
@@ -575,7 +610,7 @@ void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<std:
 
 void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> &&args)
 {
-	text_buffer_print_wrap(m_console_textbuf, util::string_format(std::move(args)).c_str(), wrapcol);
+	print_core_wrap(util::string_format(std::move(args)).c_str(), wrapcol);
 
 	/* force an update of any console views */
 	m_machine.debug_view().update_all(DVT_CONSOLE);
