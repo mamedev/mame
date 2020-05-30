@@ -177,34 +177,34 @@ private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
-	DECLARE_READ8_MEMBER(bank_sel_r);
-	DECLARE_WRITE8_MEMBER(bank_sel_w);
+	uint8_t bank_sel_r(offs_t offset);
+	void bank_sel_w(offs_t offset, uint8_t data);
 	uint8_t dma_read(offs_t offset);
 	void dma_write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
-	DECLARE_READ8_MEMBER(system_r);
-	DECLARE_WRITE8_MEMBER(system_w);
+	uint8_t system_r(offs_t offset);
+	void system_w(offs_t offset, uint8_t data);
 	uint8_t cntl_r();
 	void cntl_w(uint8_t data);
 	uint8_t gpo_r();
 	void gpo_w(uint8_t data);
-	DECLARE_READ8_MEMBER(vidcontrol_r);
-	DECLARE_WRITE8_MEMBER(vidcontrol_w);
-	DECLARE_READ8_MEMBER(z80_io_r);
-	DECLARE_WRITE8_MEMBER(z80_io_w);
+	uint8_t vidcontrol_r();
+	void vidcontrol_w(uint8_t data);
+	uint8_t z80_io_r();
+	void z80_io_w(uint8_t data);
 	IRQ_CALLBACK_MEMBER(x86_irq_cb);
 	uint8_t rtc_r();
 	void rtc_w(uint8_t data);
-	DECLARE_READ8_MEMBER(z80_vector_r);
-	DECLARE_WRITE8_MEMBER(z80_vector_w);
-	DECLARE_READ8_MEMBER(parallel_r);
-	DECLARE_WRITE8_MEMBER(parallel_w);
-	DECLARE_READ8_MEMBER(video_latch_r);
-	DECLARE_WRITE8_MEMBER(video_latch_w);
+	uint8_t z80_vector_r(offs_t offset);
+	void z80_vector_w(offs_t offset, uint8_t data);
+	uint8_t parallel_r(offs_t offset);
+	void parallel_w(offs_t offset, uint8_t data);
+	uint8_t video_latch_r(offs_t offset);
+	void video_latch_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(spk_w);
 	DECLARE_WRITE_LINE_MEMBER(spk_freq_w);
@@ -379,13 +379,13 @@ void octopus_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-WRITE8_MEMBER(octopus_state::vram_w)
+void octopus_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = m_char_latch_w;
 	m_vram[offset+0x1000] = m_attr_latch_w;
 }
 
-READ8_MEMBER(octopus_state::vram_r)
+uint8_t octopus_state::vram_r(offs_t offset)
 {
 	m_char_latch_r = m_vram[offset];
 	m_attr_latch_r = m_vram[offset+0x1000];
@@ -397,7 +397,7 @@ WRITE_LINE_MEMBER(octopus_state::fdc_drq)
 	// TODO
 }
 
-READ8_MEMBER(octopus_state::bank_sel_r)
+uint8_t octopus_state::bank_sel_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -411,7 +411,7 @@ READ8_MEMBER(octopus_state::bank_sel_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(octopus_state::bank_sel_w)
+void octopus_state::bank_sel_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -437,7 +437,7 @@ WRITE8_MEMBER(octopus_state::bank_sel_w)
 //       write: parity fail reset
 // ports 0x20 and 0x21 read out the DIP switch configuration (the firmware function to get system config simply does IN AX,20h)
 // 0x28: write: Z80 enable
-WRITE8_MEMBER(octopus_state::system_w)
+void octopus_state::system_w(offs_t offset, uint8_t data)
 {
 	logerror("SYS: System control offset %i data %02x\n",offset+1,data);
 	switch(offset)
@@ -450,7 +450,7 @@ WRITE8_MEMBER(octopus_state::system_w)
 	}
 }
 
-READ8_MEMBER(octopus_state::system_r)
+uint8_t octopus_state::system_r(offs_t offset)
 {
 	uint8_t val = 0x00;
 	switch(offset)
@@ -466,13 +466,13 @@ READ8_MEMBER(octopus_state::system_r)
 }
 
 // Any I/O cycle relinquishes control of the bus
-READ8_MEMBER(octopus_state::z80_io_r)
+uint8_t octopus_state::z80_io_r()
 {
-	z80_io_w(space,offset,0);
+	z80_io_w(0);
 	return 0x00;
 }
 
-WRITE8_MEMBER(octopus_state::z80_io_w)
+void octopus_state::z80_io_w(uint8_t data)
 {
 	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
@@ -480,7 +480,7 @@ WRITE8_MEMBER(octopus_state::z80_io_w)
 }
 
 // Z80 vector for RS232 and RS422
-READ8_MEMBER(octopus_state::z80_vector_r)
+uint8_t octopus_state::z80_vector_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -494,7 +494,7 @@ READ8_MEMBER(octopus_state::z80_vector_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(octopus_state::z80_vector_w)
+void octopus_state::z80_vector_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -612,12 +612,12 @@ void octopus_state::gpo_w(uint8_t data)
 // bit 6 - cursor mode (colour only) - 0=inverse cursor, 1=white cursor (normal)
 // bit 7 - 1=monochrome mode, 0=colour mode
 // Is bit 7 writable, or just mirrors DIP switch setting?  Tech manual is unclear.
-READ8_MEMBER(octopus_state::vidcontrol_r)
+uint8_t octopus_state::vidcontrol_r()
 {
 	return m_vidctrl;
 }
 
-WRITE8_MEMBER(octopus_state::vidcontrol_w)
+void octopus_state::vidcontrol_w(uint8_t data)
 {
 	m_fdc->dden_w(BIT(data, 2));
 	m_fdc->set_unscaled_clock(16_MHz_XTAL / (BIT(data, 3) ? 16 : 8));
@@ -676,7 +676,7 @@ WRITE_LINE_MEMBER(octopus_state::serial_clock_w)
 // 0xf1 : control
 //      bit 2 = INIT?  On boot, bits 0 and 1 are set high, bit 2 is set low then high again, all other bits are set low
 // can generate interrupts - tech manual suggests that Strobe, Init, Ack, and Busy can trigger an interrupt (IRQ14)
-READ8_MEMBER(octopus_state::parallel_r)
+uint8_t octopus_state::parallel_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -688,7 +688,7 @@ READ8_MEMBER(octopus_state::parallel_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(octopus_state::parallel_w)
+void octopus_state::parallel_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -782,7 +782,7 @@ void octopus_state::video_start()
 	m_vram.allocate(0x10000);
 }
 
-READ8_MEMBER(octopus_state::video_latch_r)
+uint8_t octopus_state::video_latch_r(offs_t offset)
 {
 	if(offset & 0x01)
 		return m_attr_latch_r;
@@ -790,7 +790,7 @@ READ8_MEMBER(octopus_state::video_latch_r)
 		return m_char_latch_r;
 }
 
-WRITE8_MEMBER(octopus_state::video_latch_w)
+void octopus_state::video_latch_w(offs_t offset, uint8_t data)
 {
 	if(offset & 0x01)
 		m_attr_latch_w = data;

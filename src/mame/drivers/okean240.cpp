@@ -88,9 +88,9 @@ private:
 		TIMER_OKEAN_BOOT
 	};
 
-	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
-	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);
-	DECLARE_READ8_MEMBER(term_status_r);
+	uint8_t okean240_kbd_status_r();
+	uint8_t okean240a_kbd_status_r();
+	uint8_t term_status_r();
 	uint8_t term_r();
 	uint8_t okean240_port40_r();
 	uint8_t okean240_port41_r();
@@ -123,7 +123,7 @@ private:
 };
 
 // okean240 requires bit 4 to change
-READ8_MEMBER(okean240_state::okean240_kbd_status_r)
+uint8_t okean240_state::okean240_kbd_status_r()
 {
 	m_tog ^= 0x18;
 	if (m_term_data)
@@ -133,7 +133,7 @@ READ8_MEMBER(okean240_state::okean240_kbd_status_r)
 }
 
 // see if a key is pressed and indicate status
-READ8_MEMBER(okean240_state::okean240a_kbd_status_r)
+uint8_t okean240_state::okean240a_kbd_status_r()
 {
 	uint8_t i,j;
 	m_tog ^= 0x18;
@@ -149,7 +149,7 @@ READ8_MEMBER(okean240_state::okean240a_kbd_status_r)
 }
 
 // for test rom
-READ8_MEMBER(okean240_state::term_status_r)
+uint8_t okean240_state::term_status_r()
 {
 	return (m_term_data) ? 3 : 1;
 }
