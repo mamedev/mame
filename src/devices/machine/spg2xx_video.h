@@ -48,19 +48,19 @@ protected:
 
 	void do_sprite_dma(uint32_t len);
 
-	enum blend_enable_t : bool
+	enum blend_enable_t : const bool
 	{
 		BlendOff = false,
 		BlendOn = true
 	};
 
-	enum rowscroll_enable_t : bool
+	enum rowscroll_enable_t : const bool
 	{
 		RowScrollOff = false,
 		RowScrollOn = true
 	};
 
-	enum flipx_t : bool
+	enum flipx_t : const bool
 	{
 		FlipXOff = false,
 		FlipXOn = true

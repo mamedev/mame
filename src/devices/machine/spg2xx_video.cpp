@@ -292,12 +292,8 @@ void spg2xx_video_device::draw_tilestrip(const rectangle& cliprect, uint32_t* ds
 
 void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t *regs)
 {
-	const uint32_t xscroll = regs[0];
-	const uint32_t yscroll = regs[1];
 	const uint32_t attr = regs[2];
 	const uint32_t ctrl = regs[3];
-	const uint32_t tilemap_rambase = regs[4];
-	const uint32_t palettemap_rambase = regs[5];
 
 	if (!(ctrl & 0x0008))
 	{
@@ -315,24 +311,22 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t* dst, ui
 		return;
 	}
 
-	int tile_width = (attr & 0x0030) >> 4;
-
-	uint32_t tile_h = 8 << ((attr & 0x00c0) >> 6);
-	uint32_t tile_w = 8 << (tile_width);
-
-	uint32_t tile_count_x = 512 / tile_w; // all tilemaps are 512 pixels wide
-
-	uint32_t bitmap_y = (scanline + yscroll) & 0xff; // all tilemaps are 256 pixels high
-	uint32_t y0 = bitmap_y / tile_h;
-	
-	uint32_t tile_scanline = bitmap_y % tile_h;
-	uint8_t bpp = attr & 0x0003;
-
+	const uint32_t xscroll = regs[0];
+	const uint32_t yscroll = regs[1];
+	const uint32_t tilemap_rambase = regs[4];
+	const uint32_t palettemap_rambase = regs[5];
+	const int tile_width = (attr & 0x0030) >> 4;
+	const uint32_t tile_h = 8 << ((attr & 0x00c0) >> 6);
+	const uint32_t tile_w = 8 << (tile_width);
+	const uint32_t tile_count_x = 512 / tile_w; // all tilemaps are 512 pixels wide
+	const uint32_t bitmap_y = (scanline + yscroll) & 0xff; // all tilemaps are 256 pixels high
+	const uint32_t y0 = bitmap_y / tile_h;
+	const uint32_t tile_scanline = bitmap_y % tile_h;
+	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
 	const uint32_t words_per_tile = bits_per_row * tile_h;
-
-	bool row_scroll = (ctrl & 0x0010);
+	const bool row_scroll = (ctrl & 0x0010);
 
 	int realxscroll = xscroll;
 	if (row_scroll)
