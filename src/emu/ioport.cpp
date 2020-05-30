@@ -650,7 +650,14 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 
 void ioport_field::set_value(ioport_value value)
 {
-	m_digital_value = value != 0;
+	if( is_analog() )
+	{
+		live().analog->set_accum( value );
+	}
+	else
+	{
+		m_digital_value = value != 0;
+	}
 }
 
 

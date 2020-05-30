@@ -1265,6 +1265,7 @@ public:
 	void read(ioport_value &value);
 	float crosshair_read();
 	void frame_update(running_machine &machine);
+	void set_accum(s32 accum) {m_accum = accum;}
 
 private:
 	// helpers
