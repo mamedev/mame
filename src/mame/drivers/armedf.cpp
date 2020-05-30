@@ -1206,7 +1206,7 @@ void armedf_state::armedf(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &armedf_state::sound_portmap);
 	audiocpu.set_periodic_int(FUNC(armedf_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));    // ?
 
-	video_config(config, 12, 16, 240);
+	video_config(config, 12, 8, 248);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
 
 	/* sound hardware */
