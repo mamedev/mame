@@ -41839,6 +41839,9 @@ kof2002umj                      // (c)2009 SNK Playmore / New Channel
 yiear                           // GX407 (c) 1985
 yiear2                          // GX407 (c) 1985
 
+@source:ymdx11.cpp
+dx11                            //
+
 @source:ymmu50.cpp
 mu50                            // 1995 MU-50
 
