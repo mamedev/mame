@@ -2589,7 +2589,12 @@ hot409                          // Shuttle HOT-409
 ibm5162                         // 1986 IBM XT 5162 (XT w/80286)
 ibm5170                         // 1984 IBM PC/AT 5170, original 6 MHz model
 ibm5170a                        // 1985 IBM PC/AT 5170, enhanced 8 MHz model
-ibmps1es                        // IBM PS/1 (Spanish)
+ibm2011                         // IBM PS/1 2011
+ibm2011rd                       // IBM PS/1 2011 (international models with ROM DOS)
+ibm2121                         // IBM PS/1 2121
+ibm2121rd                       // IBM PS/1 2021 (international models with ROM DOS)
+ibm2123                         // IBM PS/1 2123
+ibm2133                         // IBM PS/1 2133
 k286i                           // 1985 Kaypro 286i
 elanht286                       // Leanord Elan High Tech 286
 kt216wb5                        // KT216WB5-HI Rev.2
@@ -2603,6 +2608,7 @@ megapcpl                        //
 megapcpla                       // AMI BIOS version with Winbond WINBUS chipset
 neat                            // 1989 New Enhanced AT chipset, AMI BIOS
 ncrpc8                          // 1986 NCR PC-8
+ncr3302                         // NCR Class 3302 Model 0110
 n8810m15                        // 1987 Nixdorf 8810 M15 Laptop - PC07
 n8810m16c                       // 1990 Nixdorf 8810 M16 Laptop - PC17 - CGA version
 n8810m16v                       // 1990 Nixdorf 8810 M16 Laptop - PC17 - VGA version
@@ -2749,6 +2755,8 @@ td4ipaio                        // TD-4IP-UMC-AIO motherboard (486)
 dvbslan                         // Datavan Book-Size LAN station (386sx)
 486igb21                        // 486IG-B-2-1 motherboard (486)
 euroat                          // Schneider Euro AT
+towerat2xx                      // Schneider Tower AT 201, 202, 220, 240 and 260 (286, EGA)
+tower386sx                      // Schneider 386SX System 40 (386sx, VGA)
 pg750                           // Siemens PG 750
 pg750eisa                       // Siemens PG 750 486 EISA
 samdm286                        // Samsung Deskmaster 286-12
@@ -32456,16 +32464,19 @@ ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 cadd810                         // CompuAdd 810
 comport                         // Compaq Portable
+coppc21                         // Corona PPC-21 portable
 coppc400                        // Cordata PPC-400 portable
 dgone                           // 1984 Data General/One
 eagle1600                       //
+dtkerso                         // 198? PC-XT clones with a DTK/ERSO BIOS
 eaglespirit                     // Eagle PC Spirit
 eppc                            // 1985 Ericsson Portable PC
 hyo88t                          // Hyosung Topstar 88T
 ibm5550                         //
 iskr3104                        //
 ittxtra                         // 1984 ITT XTRA
-juko16
+juko8                           // JUKO NEST motherboards with 8088/V20 CPU
+juko16                          // JUKO NEST motherboards with 8086/V30 CPU
 kaypro16                        // Kaypro 16
 kaypropc                        // Kaypro PC
 kyoxt                           // Kyocera XT

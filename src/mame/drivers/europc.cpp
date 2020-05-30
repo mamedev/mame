@@ -546,10 +546,12 @@ ROM_START( euroxt )
 	ROMX_LOAD("euroxt_bios_v1.01.bin", 0x8000, 0x8000, CRC(1e1fe931) SHA1(bb7cae224d66ae48045f323ecb9ad59bf49ed0a2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v1.02", "EuroXT v1.02" )
 	ROMX_LOAD("euro_xt_bios_id.nr.51463_v1.02.bin", 0x8000, 0x8000, CRC(c36de60e) SHA1(c668cc9c5f3325233f30eac654678e1b8b7a7847), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 2, "v1.04", "EuroXT v1.04" )
+	ROM_SYSTEM_BIOS( 2, "v1.04", "EuroXT v1.04" ) // no display
 	ROMX_LOAD("euro_xt_bios_v1.04_cs8b00_5.12.89_21_25.bin", 0x8000, 0x8000, CRC(24033a62) SHA1(9d1d89cb8b99569b6c0aaa7c6aceb355dc20b2fd), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 3, "v1.05", "EuroXT v1.05" ) // no display
+	ROMX_LOAD("euro-xt_bios_id.nr.51463_v1.05.bin", 0x8000, 0x8000, CRC(e3d2591d) SHA1(710cdbafeb913f2e436b64eedd7a1794c589a48a), ROM_BIOS(3))
 
-	// BIOS ROM versions 1.02 and 1.04 were accompanied by identical char ROM versions 50146, which in turn match the one used in /bus/isa/aga.cpp
+	// BIOS ROM versions 1.02, 1.04 and 1.05 were accompanied by identical char ROM versions 50146, which in turn match the one used in /bus/isa/aga.cpp
 ROM_END
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS            INIT         COMPANY              FULLNAME      FLAGS
