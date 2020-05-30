@@ -1216,8 +1216,7 @@ void segas32_state::system32_sound_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom().region("soundcpu", 0);
 	map(0xa000, 0xbfff).bankr("soundbank");
-	map(0xc000, 0xc00f).mirror(0x0ff0).w("rfsnd", FUNC(rf5c68_device::rf5c68_w));
-	map(0xd000, 0xdfff).rw("rfsnd", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w));
+	map(0xc000, 0xdfff).m("rfsnd", FUNC(rf5c68_device::map));
 	map(0xe000, 0xffff).ram().share("z80_shared_ram");
 }
 
