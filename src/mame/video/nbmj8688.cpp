@@ -635,11 +635,6 @@ uint32_t nbmj8688_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	int x, y;
 
-if(machine().input().code_pressed_once(KEYCODE_T))
-{
-	//
-}
-
 	if (m_screen_refresh)
 	{
 		m_screen_refresh = 0;
