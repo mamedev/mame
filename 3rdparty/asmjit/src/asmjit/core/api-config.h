@@ -432,7 +432,7 @@
 
 #if ASMJIT_CXX_HAS_ATTRIBUTE(attribute_deprecated_with_message, ASMJIT_CXX_GNU >= ASMJIT_CXX_MAKE_VER(4, 5, 0))
   #define ASMJIT_DEPRECATED(DECL, MESSAGE) DECL __attribute__((__deprecated__(MESSAGE)))
-#elif ASMJIT_MSC
+#elif ASMJIT_CXX_MSC
   #define ASMJIT_DEPRECATED(DECL, MESSAGE) __declspec(deprecated(MESSAGE)) DECL
 #else
   #define ASMJIT_DEPRECATED(DECL, MESSAGE) DECL
