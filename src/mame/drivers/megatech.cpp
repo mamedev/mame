@@ -160,7 +160,6 @@ private:
 	uint32_t m_bios_port_ctrl;
 	int m_current_machine_is_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
 	uint32_t m_bios_ctrl_inputs;
-	uint8_t m_bios_ctrl[6];
 	int m_mt_bank_addr;
 
 	int m_cart_is_genesis[8];
