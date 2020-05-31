@@ -146,7 +146,7 @@ protected:
 	DECLARE_READ8_MEMBER(spectrum_data_r);
 	DECLARE_WRITE8_MEMBER(spectrum_data_w);
 
-	void spectrum_port_fe_w(uint8_t data);
+	void spectrum_port_fe_w(offs_t offset, uint8_t data);
 	DECLARE_READ8_MEMBER(spectrum_port_fe_r);
 	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
 	DECLARE_READ8_MEMBER(spectrum_clone_port_ula_r);

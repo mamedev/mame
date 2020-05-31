@@ -54,12 +54,11 @@ protected:
 	required_device<spectrum_expansion_slot_device> m_exp;
 
 	int m_romcs;
-	int m_romlatch;
-//  int m_masterportdisable;
+    int m_masterportdisable;
 	u8 m_control;
 	bool m_motor_active;
 	void fdc_hld_w(int state);
-	void motors_control();
+	virtual void motors_control();
 
 	void fetch(offs_t offset);
 };
@@ -75,6 +74,8 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void iorq_w(offs_t offset, uint8_t data) override;
+	virtual void motors_control() override;
 
 };
 
