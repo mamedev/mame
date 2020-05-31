@@ -469,6 +469,13 @@ void vrender0soc_device::dmac_w(offs_t offset, u32 data, u32 mem_mask)
 	data = COMBINE_DATA(&m_dma[Which].ctrl);
 	if ((!(old & DMA_ENABLE)) && (data & DMA_ENABLE))   //DMAOn
 	{
+		if ((data & (DMA_POLARITY)) != 0)
+			logerror("%s: DMA%d with unimplemented register %04x\n",this->tag(),Which,data & DMA_POLARITY);
+
+		if ((data & (DMA_REPEAT | DMA_RELOAD_ADDR)) != 0)
+			popmessage("DMA%d with unhandled mode %04x, contact MAMEdev",Which,data);
+
+		// TODO: correct?
 		m_dma[Which].int_src = m_dma[Which].src;
 		m_dma[Which].int_dst = m_dma[Which].dst;
 		m_dma[Which].int_cnt = m_dma[Which].size;
@@ -484,6 +491,8 @@ TIMER_CALLBACK_MEMBER(vrender0soc_device::dma_timer_cb)
 		if (m_dma[which].int_cnt <= 0)
 		{
 			IntReq(7 + which); // TODO: not for repeat mode?
+#if 0
+			// TODO: not tested yet
 			if (m_dma[which].ctrl & DMA_REPEAT) // repeat mode
 			{
 				m_dma[which].int_cnt = m_dma[which].size; // reload counter
@@ -494,6 +503,7 @@ TIMER_CALLBACK_MEMBER(vrender0soc_device::dma_timer_cb)
 				}
 			}
 			else // single transfer mode
+#endif
 			{
 				m_dma[which].ctrl &= ~DMA_ENABLE;
 				m_dma[which].size = 0;
