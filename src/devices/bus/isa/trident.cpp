@@ -787,7 +787,7 @@ void trident_vga_device::trident_gc_reg_write(uint8_t index, uint8_t data)
 	if(LOG) logerror("Trident GC%02X: write %02x\n",index,data);
 }
 
-READ8_MEMBER(trident_vga_device::port_03c0_r)
+uint8_t trident_vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -803,27 +803,27 @@ READ8_MEMBER(trident_vga_device::port_03c0_r)
 			if(tri.dac_active)
 				res = tri.dac;
 			else
-				res = vga_device::port_03c0_r(space,offset,mem_mask);
+				res = vga_device::port_03c0_r(offset);
 			break;
 		case 0x07:
 		case 0x08:
 		case 0x09:
 			tri.dac_active = false;
 			tri.dac_count = 0;
-			res = vga_device::port_03c0_r(space,offset,mem_mask);
+			res = vga_device::port_03c0_r(offset);
 			break;
 		case 0x0f:
 			res = trident_gc_reg_read(vga.gc.index);
 			break;
 		default:
-			res = vga_device::port_03c0_r(space,offset,mem_mask);
+			res = vga_device::port_03c0_r(offset);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(trident_vga_device::port_03c0_w)
+void trident_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -839,26 +839,26 @@ WRITE8_MEMBER(trident_vga_device::port_03c0_w)
 				trident_define_video_mode();
 			}
 			else
-				vga_device::port_03c0_w(space,offset,data,mem_mask);
+				vga_device::port_03c0_w(offset,data);
 			break;
 		case 0x07:
 		case 0x08:
 		case 0x09:
 			tri.dac_active = false;
 			tri.dac_count = 0;
-			vga_device::port_03c0_w(space,offset,data,mem_mask);
+			vga_device::port_03c0_w(offset,data);
 			break;
 		case 0x0f:
 			trident_gc_reg_write(vga.gc.index,data);
 			break;
 		default:
-			vga_device::port_03c0_w(space,offset,data,mem_mask);
+			vga_device::port_03c0_w(offset,data);
 			break;
 	}
 }
 
 
-READ8_MEMBER(trident_vga_device::port_03d0_r)
+uint8_t trident_vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -890,7 +890,7 @@ READ8_MEMBER(trident_vga_device::port_03d0_r)
 				res = tri.port_3db;
 				break;
 			default:
-				res = vga_device::port_03d0_r(space,offset,mem_mask);
+				res = vga_device::port_03d0_r(offset);
 				break;
 		}
 	}
@@ -898,7 +898,7 @@ READ8_MEMBER(trident_vga_device::port_03d0_r)
 	return res;
 }
 
-WRITE8_MEMBER(trident_vga_device::port_03d0_w)
+void trident_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -934,13 +934,13 @@ WRITE8_MEMBER(trident_vga_device::port_03d0_w)
 				tri.port_3db = data;  // no info on this port?  Bit 5 appears to be a clock divider...
 				break;
 			default:
-				vga_device::port_03d0_w(space,offset,data,mem_mask);
+				vga_device::port_03d0_w(offset,data);
 				break;
 		}
 	}
 }
 
-READ8_MEMBER(trident_vga_device::port_43c6_r)
+uint8_t trident_vga_device::port_43c6_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 	switch(offset)
@@ -961,7 +961,7 @@ READ8_MEMBER(trident_vga_device::port_43c6_r)
 	return res;
 }
 
-WRITE8_MEMBER(trident_vga_device::port_43c6_w)
+void trident_vga_device::port_43c6_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -998,7 +998,7 @@ WRITE8_MEMBER(trident_vga_device::port_43c6_w)
 
 // Trident refers to these registers as a LUTDAC
 // Not much else is known.  XFree86 uses register 4 for something related to DPMS
-READ8_MEMBER(trident_vga_device::port_83c6_r)
+uint8_t trident_vga_device::port_83c6_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 	switch(offset)
@@ -1015,7 +1015,7 @@ READ8_MEMBER(trident_vga_device::port_83c6_r)
 	return res;
 }
 
-WRITE8_MEMBER(trident_vga_device::port_83c6_w)
+void trident_vga_device::port_83c6_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -1030,7 +1030,7 @@ WRITE8_MEMBER(trident_vga_device::port_83c6_w)
 	}
 }
 
-READ8_MEMBER(trident_vga_device::vram_r)
+uint8_t trident_vga_device::vram_r(offs_t offset)
 {
 	if (tri.linear_active)
 		return vga.memory[offset % vga.svga_intf.vram_size];
@@ -1038,7 +1038,7 @@ READ8_MEMBER(trident_vga_device::vram_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(trident_vga_device::vram_w)
+void trident_vga_device::vram_w(offs_t offset, uint8_t data)
 {
 	if (tri.linear_active)
 	{
@@ -1053,11 +1053,11 @@ WRITE8_MEMBER(trident_vga_device::vram_w)
 	}
 }
 
-READ8_MEMBER(trident_vga_device::mem_r )
+uint8_t trident_vga_device::mem_r(offs_t offset)
 {
 	if((tri.cr20 & 0x10) && (offset >= 0x1ff00)) // correct for old MMIO?
 	{
-		return old_mmio_r(space,offset-0x1ff00);
+		return old_mmio_r(offset-0x1ff00);
 	}
 
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
@@ -1076,14 +1076,14 @@ READ8_MEMBER(trident_vga_device::mem_r )
 		return data;
 	}
 
-	return vga_device::mem_r(space,offset,mem_mask);
+	return vga_device::mem_r(offset);
 }
 
-WRITE8_MEMBER(trident_vga_device::mem_w)
+void trident_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	if((tri.cr20 & 0x10) && (offset >= 0x1ff00)) // correct for old MMIO?
 	{
-		old_mmio_w(space,offset-0x1ff00,data);
+		old_mmio_w(offset-0x1ff00,data);
 		return;
 	}
 
@@ -1109,17 +1109,17 @@ WRITE8_MEMBER(trident_vga_device::mem_w)
 		return;
 	}
 
-	vga_device::mem_w(space,offset,data,mem_mask);
+	vga_device::mem_w(offset,data);
 }
 
 // Old style MMIO (maps to 0xbff00)
-void trident_vga_device::old_mmio_w(address_space& space, uint32_t offset, uint8_t data)
+void trident_vga_device::old_mmio_w(offs_t offset, uint8_t data)
 {
 	if(offset >= 0x20)
-		accel_w(space,offset-0x20,data);
+		accel_w(offset-0x20,data);
 }
 
-uint8_t trident_vga_device::old_mmio_r(address_space& space, uint32_t offset)
+uint8_t trident_vga_device::old_mmio_r(offs_t offset)
 {
 	if(offset == 0x20)
 	{
@@ -1127,7 +1127,7 @@ uint8_t trident_vga_device::old_mmio_r(address_space& space, uint32_t offset)
 			return 0x20;
 	}
 	if(offset > 0x20)
-		return accel_r(space,offset-0x20);
+		return accel_r(offset-0x20);
 	else
 		return 0x00;
 }
@@ -1195,7 +1195,7 @@ Graphics Engine for 9440/9660/9680
 #define GER_DSTCLIP_Y   0x214E      // Word
 */
 
-READ8_MEMBER(trident_vga_device::accel_r)
+uint8_t trident_vga_device::accel_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -1230,7 +1230,7 @@ READ8_MEMBER(trident_vga_device::accel_r)
 	return res;
 }
 
-WRITE8_MEMBER(trident_vga_device::accel_w)
+void trident_vga_device::accel_w(offs_t offset, uint8_t data)
 {
 	if(offset >= 0x60)
 	{

@@ -26,14 +26,14 @@ public:
 	virtual void zero();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual READ8_MEMBER(port_03b0_r);
-	virtual WRITE8_MEMBER(port_03b0_w);
-	virtual READ8_MEMBER(port_03c0_r);
-	virtual WRITE8_MEMBER(port_03c0_w);
-	virtual READ8_MEMBER(port_03d0_r);
-	virtual WRITE8_MEMBER(port_03d0_w);
-	virtual READ8_MEMBER(mem_r);
-	virtual WRITE8_MEMBER(mem_w);
+	virtual uint8_t port_03b0_r(offs_t offset);
+	virtual void port_03b0_w(offs_t offset, uint8_t data);
+	virtual uint8_t port_03c0_r(offs_t offset);
+	virtual void port_03c0_w(offs_t offset, uint8_t data);
+	virtual uint8_t port_03d0_r(offs_t offset);
+	virtual void port_03d0_w(offs_t offset, uint8_t data);
+	virtual uint8_t mem_r(offs_t offset);
+	virtual void mem_w(offs_t offset, uint8_t data);
 	virtual uint8_t mem_linear_r(offs_t offset);
 	virtual void mem_linear_w(offs_t offset,uint8_t data);
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
@@ -77,8 +77,8 @@ protected:
 	void crtc_reg_write(uint8_t index, uint8_t data);
 	void seq_reg_write(uint8_t index, uint8_t data);
 	uint8_t vga_vblank();
-	READ8_MEMBER(vga_crtc_r);
-	WRITE8_MEMBER(vga_crtc_w);
+	uint8_t vga_crtc_r(offs_t offset);
+	void vga_crtc_w(offs_t offset, uint8_t data);
 	uint8_t gc_reg_read(uint8_t index);
 	void attribute_reg_write(uint8_t index, uint8_t data);
 	void gc_reg_write(uint8_t index,uint8_t data);
@@ -114,7 +114,7 @@ protected:
 	{
 		vga_t(device_t &owner) : read_dipswitch(owner) { }
 
-		read8_delegate read_dipswitch;
+		read8smo_delegate read_dipswitch;
 		struct
 		{
 			size_t vram_size;
@@ -294,8 +294,8 @@ public:
 	WRITE16_MEMBER(ibm8514_display_ctrl_w);
 	READ16_MEMBER(ibm8514_line_error_r);
 	WRITE16_MEMBER(ibm8514_line_error_w);
-	READ8_MEMBER(ibm8514_status_r);
-	WRITE8_MEMBER(ibm8514_htotal_w);
+	uint8_t ibm8514_status_r(offs_t offset);
+	void ibm8514_htotal_w(offs_t offset, uint8_t data);
 	READ16_MEMBER(ibm8514_substatus_r);
 	WRITE16_MEMBER(ibm8514_subcontrol_w);
 	READ16_MEMBER(ibm8514_subcontrol_r);
@@ -499,14 +499,14 @@ public:
 	// construction/destruction
 	tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual READ8_MEMBER(port_03b0_r) override;
-	virtual WRITE8_MEMBER(port_03b0_w) override;
-	virtual READ8_MEMBER(port_03c0_r) override;
-	virtual WRITE8_MEMBER(port_03c0_w) override;
-	virtual READ8_MEMBER(port_03d0_r) override;
-	virtual WRITE8_MEMBER(port_03d0_w) override;
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t port_03b0_r(offs_t offset) override;
+	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03c0_r(offs_t offset) override;
+	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03d0_r(offs_t offset) override;
+	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mem_r(offs_t offset) override;
+	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_start() override;
@@ -546,13 +546,13 @@ public:
 	// construction/destruction
 	ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t mem_r(offs_t offset) override;
+	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 	// VGA registers
-	virtual READ8_MEMBER(port_03c0_r) override;
-	READ8_MEMBER(ati_port_ext_r);
-	WRITE8_MEMBER(ati_port_ext_w);
+	virtual uint8_t port_03c0_r(offs_t offset) override;
+	uint8_t ati_port_ext_r(offs_t offset);
+	void ati_port_ext_w(offs_t offset, uint8_t data);
 
 	virtual uint16_t offset() override;
 
@@ -587,14 +587,14 @@ public:
 	// construction/destruction
 	s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual READ8_MEMBER(port_03b0_r) override;
-	virtual WRITE8_MEMBER(port_03b0_w) override;
-	virtual READ8_MEMBER(port_03c0_r) override;
-	virtual WRITE8_MEMBER(port_03c0_w) override;
-	virtual READ8_MEMBER(port_03d0_r) override;
-	virtual WRITE8_MEMBER(port_03d0_w) override;
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t port_03b0_r(offs_t offset) override;
+	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03c0_r(offs_t offset) override;
+	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03d0_r(offs_t offset) override;
+	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mem_r(offs_t offset) override;
+	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
@@ -680,14 +680,14 @@ public:
 	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
-	virtual READ8_MEMBER(port_03b0_r) override;
-	virtual WRITE8_MEMBER(port_03b0_w) override;
-	virtual READ8_MEMBER(port_03c0_r) override;
-	virtual WRITE8_MEMBER(port_03c0_w) override;
-	virtual READ8_MEMBER(port_03d0_r) override;
-	virtual WRITE8_MEMBER(port_03d0_w) override;
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t port_03b0_r(offs_t offset) override;
+	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03c0_r(offs_t offset) override;
+	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03d0_r(offs_t offset) override;
+	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mem_r(offs_t offset) override;
+	virtual void mem_w(offs_t offset, uint8_t data) override;
 };
 
 

@@ -19,8 +19,8 @@ class vis_audio_device : public device_t,
 public:
 	vis_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(pcm_r);
-	DECLARE_WRITE8_MEMBER(pcm_w);
+	uint8_t pcm_r(offs_t offset);
+	void pcm_w(offs_t offset, uint8_t data);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -56,7 +56,7 @@ void vis_audio_device::device_start()
 {
 	set_isa_device();
 	m_isa->set_dma_channel(7, this, false);
-	m_isa->install_device(0x0220, 0x022f, read8_delegate(*this, FUNC(vis_audio_device::pcm_r)), write8_delegate(*this, FUNC(vis_audio_device::pcm_w)));
+	m_isa->install_device(0x0220, 0x022f, read8sm_delegate(*this, FUNC(vis_audio_device::pcm_r)), write8sm_delegate(*this, FUNC(vis_audio_device::pcm_w)));
 	m_isa->install_device(0x0388, 0x038b, read8sm_delegate(*subdevice<ymf262_device>("ymf262"), FUNC(ymf262_device::read)), write8sm_delegate(*subdevice<ymf262_device>("ymf262"), FUNC(ymf262_device::write)));
 	m_pcm = timer_alloc();
 	m_pcm->adjust(attotime::never);
@@ -149,7 +149,7 @@ void vis_audio_device::device_add_mconfig(machine_config &config)
 	vreg.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
-READ8_MEMBER(vis_audio_device::pcm_r)
+uint8_t vis_audio_device::pcm_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -182,7 +182,7 @@ READ8_MEMBER(vis_audio_device::pcm_r)
 	return 0;
 }
 
-WRITE8_MEMBER(vis_audio_device::pcm_w)
+void vis_audio_device::pcm_w(offs_t offset, uint8_t data)
 {
 	u8 oldmode = m_mode;
 	switch(offset)
@@ -235,10 +235,10 @@ class vis_vga_device : public svga_device,
 {
 public:
 	vis_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ8_MEMBER(vga_r);
-	DECLARE_WRITE8_MEMBER(vga_w);
-	DECLARE_READ8_MEMBER(visvgamem_r);
-	DECLARE_WRITE8_MEMBER(visvgamem_w);
+	uint8_t vga_r(offs_t offset);
+	void vga_w(offs_t offset, uint8_t data);
+	uint8_t visvgamem_r(offs_t offset);
+	void visvgamem_w(offs_t offset, uint8_t data);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -386,8 +386,8 @@ void vis_vga_device::vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect
 void vis_vga_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x03b0, 0x03df, read8_delegate(*this, FUNC(vis_vga_device::vga_r)), write8_delegate(*this, FUNC(vis_vga_device::vga_w)));
-	m_isa->install_memory(0x0a0000, 0x0bffff, read8_delegate(*this, FUNC(vis_vga_device::visvgamem_r)), write8_delegate(*this, FUNC(vis_vga_device::visvgamem_w)));
+	m_isa->install_device(0x03b0, 0x03df, read8sm_delegate(*this, FUNC(vis_vga_device::vga_r)), write8sm_delegate(*this, FUNC(vis_vga_device::vga_w)));
+	m_isa->install_memory(0x0a0000, 0x0bffff, read8sm_delegate(*this, FUNC(vis_vga_device::visvgamem_r)), write8sm_delegate(*this, FUNC(vis_vga_device::visvgamem_w)));
 	svga_device::device_start();
 	vga.svga_intf.seq_regcount = 0x2d;
 	save_pointer(m_crtc_regs,"VIS CRTC",0x32);
@@ -441,22 +441,22 @@ uint32_t vis_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-READ8_MEMBER(vis_vga_device::visvgamem_r)
+uint8_t vis_vga_device::visvgamem_r(offs_t offset)
 {
 	if(!(vga.sequencer.data[0x25] & 0x40))
-		return mem_r(space, offset, mem_mask);
+		return mem_r(offset);
 	u16 win = (vga.sequencer.data[0x1e] & 0x0f) == 3 ? m_wina : m_winb; // this doesn't seem quite right
 	return mem_linear_r((offset + (win * 64)) & 0x3ffff);
 }
 
-WRITE8_MEMBER(vis_vga_device::visvgamem_w)
+void vis_vga_device::visvgamem_w(offs_t offset, uint8_t data)
 {
 	if(!(vga.sequencer.data[0x25] & 0x40))
-		return mem_w(space, offset, data, mem_mask);
+		return mem_w(offset, data);
 	return mem_linear_w((offset + (m_wina * 64)) & 0x3ffff, data);
 }
 
-READ8_MEMBER(vis_vga_device::vga_r)
+uint8_t vis_vga_device::vga_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -473,14 +473,14 @@ READ8_MEMBER(vis_vga_device::vga_r)
 			return m_crtc_regs[vga.crtc.index];
 	}
 	if(offset < 0x10)
-		return port_03b0_r(space, offset, mem_mask);
+		return port_03b0_r(offset);
 	else if(offset < 0x20)
-		return port_03c0_r(space, offset - 0x10, mem_mask);
+		return port_03c0_r(offset - 0x10);
 	else
-		return port_03d0_r(space, offset - 0x20, mem_mask);
+		return port_03d0_r(offset - 0x20);
 }
 
-WRITE8_MEMBER(vis_vga_device::vga_w)
+void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -694,11 +694,11 @@ WRITE8_MEMBER(vis_vga_device::vga_w)
 			break;
 	}
 	if(offset < 0x10)
-		port_03b0_w(space, offset, data, mem_mask);
+		port_03b0_w(offset, data);
 	else if(offset < 0x20)
-		port_03c0_w(space, offset - 0x10, data, mem_mask);
+		port_03c0_w(offset - 0x10, data);
 	else
-		port_03d0_w(space, offset - 0x20, data, mem_mask);
+		port_03d0_w(offset - 0x20, data);
 }
 
 class vis_state : public driver_device
@@ -722,16 +722,16 @@ private:
 	required_device<pic8259_device> m_pic2;
 	required_ioport m_pad;
 
-	DECLARE_READ8_MEMBER(sysctl_r);
-	DECLARE_WRITE8_MEMBER(sysctl_w);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_READ8_MEMBER(unk2_r);
-	DECLARE_READ8_MEMBER(unk3_r);
+	uint8_t sysctl_r();
+	void sysctl_w(uint8_t data);
+	uint8_t unk_r(offs_t offset);
+	void unk_w(offs_t offset, uint8_t data);
+	uint8_t unk2_r();
+	uint8_t unk3_r();
 	DECLARE_READ16_MEMBER(pad_r);
 	DECLARE_WRITE16_MEMBER(pad_w);
-	DECLARE_READ8_MEMBER(unk1_r);
-	DECLARE_WRITE8_MEMBER(unk1_w);
+	uint8_t unk1_r(offs_t offset);
+	void unk1_w(offs_t offset, uint8_t data);
 	void io_map(address_map &map);
 	void main_map(address_map &map);
 
@@ -757,14 +757,14 @@ INPUT_CHANGED_MEMBER(vis_state::update)
 }
 
 //chipset registers?
-READ8_MEMBER(vis_state::unk_r)
+uint8_t vis_state::unk_r(offs_t offset)
 {
 	if(offset)
 		return m_unk[m_unkidx];
 	return 0;
 }
 
-WRITE8_MEMBER(vis_state::unk_w)
+void vis_state::unk_w(offs_t offset, uint8_t data)
 {
 	if(offset)
 		m_unk[m_unkidx] = data;
@@ -772,13 +772,13 @@ WRITE8_MEMBER(vis_state::unk_w)
 		m_unkidx = data & 0xf;
 }
 
-READ8_MEMBER(vis_state::unk2_r)
+uint8_t vis_state::unk2_r()
 {
 	return 0x40;
 }
 
 //memory card reader?
-READ8_MEMBER(vis_state::unk3_r)
+uint8_t vis_state::unk3_r()
 {
 	return 0x00;
 }
@@ -813,14 +813,14 @@ WRITE16_MEMBER(vis_state::pad_w)
 	}
 }
 
-READ8_MEMBER(vis_state::unk1_r)
+uint8_t vis_state::unk1_r(offs_t offset)
 {
 	if(offset == 2)
 		return 0xde;
 	return 0;
 }
 
-WRITE8_MEMBER(vis_state::unk1_w)
+void vis_state::unk1_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -833,12 +833,12 @@ WRITE8_MEMBER(vis_state::unk1_w)
 	m_unk1[offset] = data;
 }
 
-READ8_MEMBER(vis_state::sysctl_r)
+uint8_t vis_state::sysctl_r()
 {
 	return m_sysctl;
 }
 
-WRITE8_MEMBER(vis_state::sysctl_w)
+void vis_state::sysctl_w(uint8_t data)
 {
 	if(BIT(data, 0) && !BIT(m_sysctl, 0))
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);

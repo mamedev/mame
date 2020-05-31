@@ -113,8 +113,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 
-	DECLARE_READ8_MEMBER(smram_r);
-	DECLARE_WRITE8_MEMBER(smram_w);
+	uint8_t smram_r(offs_t offset);
+	void smram_w(offs_t offset, uint8_t data);
 
 	void savquest_io(address_map &map);
 	void savquest_map(address_map &map);
@@ -717,22 +717,22 @@ WRITE8_MEMBER(savquest_state::parallel_port_w)
 	}
 }
 
-READ8_MEMBER(savquest_state::smram_r)
+uint8_t savquest_state::smram_r(offs_t offset)
 {
 	/* TODO: way more complex than this */
 	if(m_mtxc_config_reg[0x72] & 0x40)
 		return m_smram[offset];
 	else
-		return m_vga->mem_r(space,offset,0xff);
+		return m_vga->mem_r(offset);
 }
 
-WRITE8_MEMBER(savquest_state::smram_w)
+void savquest_state::smram_w(offs_t offset, uint8_t data)
 {
 	/* TODO: way more complex than this */
 	if(m_mtxc_config_reg[0x72] & 0x40)
 		m_smram[offset] = data;
 	else
-		m_vga->mem_w(space,offset,data,0xff);
+		m_vga->mem_w(offset,data);
 
 }
 

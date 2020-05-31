@@ -1635,7 +1635,7 @@ uint8_t vga_device::vga_vblank()
 	return res;
 }
 
-READ8_MEMBER(vga_device::vga_crtc_r)
+uint8_t vga_device::vga_crtc_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -1685,7 +1685,7 @@ READ8_MEMBER(vga_device::vga_crtc_r)
 	return data;
 }
 
-WRITE8_MEMBER(vga_device::vga_crtc_w)
+void vga_device::vga_crtc_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1718,11 +1718,11 @@ WRITE8_MEMBER(vga_device::vga_crtc_w)
 
 
 
-READ8_MEMBER(vga_device::port_03b0_r)
+uint8_t vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 	if (CRTC_PORT_ADDR==0x3b0)
-		data=vga_crtc_r(space, offset, mem_mask);
+		data = vga_crtc_r(offset);
 	return data;
 }
 
@@ -1774,7 +1774,7 @@ uint8_t vga_device::gc_reg_read(uint8_t index)
 	return res;
 }
 
-READ8_MEMBER(vga_device::port_03c0_r)
+uint8_t vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -1797,25 +1797,25 @@ READ8_MEMBER(vga_device::port_03c0_r)
 			switch ((vga.miscellaneous_output>>2)&3)
 			{
 				case 3:
-					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x01)
+					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch() & 0x01)
 						data |= 0x10;
 					else
 						data |= 0x10;
 					break;
 				case 2:
-					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x02)
+					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch() & 0x02)
 						data |= 0x10;
 					else
 						data |= 0x10;
 					break;
 				case 1:
-					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x04)
+					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch() & 0x04)
 						data |= 0x10;
 					else
 						data |= 0x10;
 					break;
 				case 0:
-					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x08)
+					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch() & 0x08)
 						data |= 0x10;
 					else
 						data |= 0x10;
@@ -1891,11 +1891,11 @@ READ8_MEMBER(vga_device::port_03c0_r)
 	return data;
 }
 
-READ8_MEMBER(vga_device::port_03d0_r)
+uint8_t vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 	if (CRTC_PORT_ADDR == 0x3d0)
-		data = vga_crtc_r(space, offset, mem_mask);
+		data = vga_crtc_r(offset);
 	if(offset == 8)
 	{
 		logerror("VGA: 0x3d8 read %s\n", machine().describe_context());
@@ -1905,13 +1905,13 @@ READ8_MEMBER(vga_device::port_03d0_r)
 	return data;
 }
 
-WRITE8_MEMBER(vga_device::port_03b0_w)
+void vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
 	if (LOG_ACCESSES)
 		logerror("vga_port_03b0_w(): port=0x%04x data=0x%02x\n", offset + 0x3b0, data);
 
 	if (CRTC_PORT_ADDR == 0x3b0)
-		vga_crtc_w(space, offset, data, mem_mask);
+		vga_crtc_w(offset, data);
 }
 
 void vga_device::attribute_reg_write(uint8_t index, uint8_t data)
@@ -1980,7 +1980,7 @@ void vga_device::gc_reg_write(uint8_t index,uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(vga_device::port_03c0_w)
+void vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	if (LOG_ACCESSES)
 		logerror("vga_port_03c0_w(): port=0x%04x data=0x%02x\n", offset + 0x3c0, data);
@@ -2068,13 +2068,13 @@ WRITE8_MEMBER(vga_device::port_03c0_w)
 
 
 
-WRITE8_MEMBER(vga_device::port_03d0_w)
+void vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
 	if (LOG_ACCESSES)
 		logerror("vga_port_03d0_w(): port=0x%04x data=0x%02x\n", offset + 0x3d0, data);
 
 	if (CRTC_PORT_ADDR == 0x3d0)
-		vga_crtc_w(space, offset, data, mem_mask);
+		vga_crtc_w(offset, data);
 }
 
 void vga_device::device_reset()
@@ -2116,7 +2116,7 @@ void s3_vga_device::device_reset()
 	s3.sr11 = 0x41;
 }
 
-READ8_MEMBER(vga_device::mem_r)
+uint8_t vga_device::mem_r(offs_t offset)
 {
 	/* TODO: check me */
 	switch(vga.gc.memory_map_sel & 0x03)
@@ -2183,7 +2183,7 @@ READ8_MEMBER(vga_device::mem_r)
 	//return 0;
 }
 
-WRITE8_MEMBER(vga_device::mem_w)
+void vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	//Inside each case must prevent writes to non-mapped VGA memory regions, not only mask the offset.
 	switch(vga.gc.memory_map_sel & 0x03)
@@ -2400,7 +2400,7 @@ void tseng_vga_device::tseng_seq_reg_write(uint8_t index, uint8_t data)
 	}
 }
 
-READ8_MEMBER(tseng_vga_device::port_03b0_r)
+uint8_t tseng_vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -2415,7 +2415,7 @@ READ8_MEMBER(tseng_vga_device::port_03b0_r)
 				res = et4k.reg_3d8;
 				break;
 			default:
-				res = vga_device::port_03b0_r(space,offset,mem_mask);
+				res = vga_device::port_03b0_r(offset);
 				break;
 		}
 	}
@@ -2423,7 +2423,7 @@ READ8_MEMBER(tseng_vga_device::port_03b0_r)
 	return res;
 }
 
-WRITE8_MEMBER(tseng_vga_device::port_03b0_w)
+void tseng_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3b0)
 	{
@@ -2441,7 +2441,7 @@ WRITE8_MEMBER(tseng_vga_device::port_03b0_w)
 					et4k.ext_reg_ena = false;
 				break;
 			default:
-				vga_device::port_03b0_w(space,offset,data,mem_mask);
+				vga_device::port_03b0_w(offset,data);
 				break;
 		}
 	}
@@ -2482,7 +2482,7 @@ void tseng_vga_device::tseng_attribute_reg_write(uint8_t index, uint8_t data)
 
 }
 
-READ8_MEMBER(tseng_vga_device::port_03c0_r)
+uint8_t tseng_vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -2494,7 +2494,7 @@ READ8_MEMBER(tseng_vga_device::port_03c0_r)
 				case 0x16: res = et4k.misc1; break;
 				case 0x17: res = et4k.misc2; break;
 				default:
-					res = vga_device::port_03c0_r(space,offset,mem_mask);
+					res = vga_device::port_03c0_r(offset);
 					break;
 			}
 
@@ -2516,19 +2516,19 @@ READ8_MEMBER(tseng_vga_device::port_03c0_r)
 				break;
 			}
 			et4k.dac_state++;
-			res = vga_device::port_03c0_r(space,offset,mem_mask);
+			res = vga_device::port_03c0_r(offset);
 			break;
 		case 0x08:
 			et4k.dac_state = 0;
 		default:
-			res = vga_device::port_03c0_r(space,offset,mem_mask);
+			res = vga_device::port_03c0_r(offset);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(tseng_vga_device::port_03c0_w)
+void tseng_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -2558,13 +2558,13 @@ WRITE8_MEMBER(tseng_vga_device::port_03c0_w)
 				break;
 			}
 		default:
-			vga_device::port_03c0_w(space,offset,data,mem_mask);
+			vga_device::port_03c0_w(offset,data);
 			break;
 	}
 	tseng_define_video_mode();
 }
 
-READ8_MEMBER(tseng_vga_device::port_03d0_r)
+uint8_t tseng_vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -2579,7 +2579,7 @@ READ8_MEMBER(tseng_vga_device::port_03d0_r)
 				res = et4k.reg_3d8;
 				break;
 			default:
-				res = vga_device::port_03d0_r(space,offset,mem_mask);
+				res = vga_device::port_03d0_r(offset);
 				break;
 		}
 	}
@@ -2587,7 +2587,7 @@ READ8_MEMBER(tseng_vga_device::port_03d0_r)
 	return res;
 }
 
-WRITE8_MEMBER(tseng_vga_device::port_03d0_w)
+void tseng_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -2607,14 +2607,14 @@ WRITE8_MEMBER(tseng_vga_device::port_03d0_w)
 					et4k.ext_reg_ena = false;
 				break;
 			default:
-				vga_device::port_03d0_w(space,offset,data,mem_mask);
+				vga_device::port_03d0_w(offset,data);
 				break;
 		}
 	}
 	tseng_define_video_mode();
 }
 
-READ8_MEMBER(tseng_vga_device::mem_r)
+uint8_t tseng_vga_device::mem_r(offs_t offset)
 {
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
@@ -2622,10 +2622,10 @@ READ8_MEMBER(tseng_vga_device::mem_r)
 		return vga.memory[(offset+svga.bank_r*0x10000)];
 	}
 
-	return vga_device::mem_r(space,offset,mem_mask);
+	return vga_device::mem_r(offset);
 }
 
-WRITE8_MEMBER(tseng_vga_device::mem_w)
+void tseng_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
@@ -2633,7 +2633,7 @@ WRITE8_MEMBER(tseng_vga_device::mem_w)
 		vga.memory[(offset+svga.bank_w*0x10000)] = data;
 	}
 	else
-		vga_device::mem_w(space,offset,data,mem_mask);
+		vga_device::mem_w(offset,data);
 }
 
 /******************************************
@@ -3202,7 +3202,7 @@ void s3_vga_device::s3_seq_reg_write(uint8_t index, uint8_t data)
 
 
 
-READ8_MEMBER(s3_vga_device::port_03b0_r)
+uint8_t s3_vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -3214,7 +3214,7 @@ READ8_MEMBER(s3_vga_device::port_03b0_r)
 				res = s3_crtc_reg_read(vga.crtc.index);
 				break;
 			default:
-				res = vga_device::port_03b0_r(space,offset,mem_mask);
+				res = vga_device::port_03b0_r(offset);
 				break;
 		}
 	}
@@ -3222,7 +3222,7 @@ READ8_MEMBER(s3_vga_device::port_03b0_r)
 	return res;
 }
 
-WRITE8_MEMBER(s3_vga_device::port_03b0_w)
+void s3_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3b0)
 	{
@@ -3233,13 +3233,13 @@ WRITE8_MEMBER(s3_vga_device::port_03b0_w)
 				s3_crtc_reg_write(vga.crtc.index,data);
 				break;
 			default:
-				vga_device::port_03b0_w(space,offset,data,mem_mask);
+				vga_device::port_03b0_w(offset,data);
 				break;
 		}
 	}
 }
 
-READ8_MEMBER(s3_vga_device::port_03c0_r)
+uint8_t s3_vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -3249,14 +3249,14 @@ READ8_MEMBER(s3_vga_device::port_03c0_r)
 			res = s3_seq_reg_read(vga.sequencer.index);
 			break;
 		default:
-			res = vga_device::port_03c0_r(space,offset,mem_mask);
+			res = vga_device::port_03c0_r(offset);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(s3_vga_device::port_03c0_w)
+void s3_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -3264,12 +3264,12 @@ WRITE8_MEMBER(s3_vga_device::port_03c0_w)
 			s3_seq_reg_write(vga.sequencer.index,data);
 			break;
 		default:
-			vga_device::port_03c0_w(space,offset,data,mem_mask);
+			vga_device::port_03c0_w(offset,data);
 			break;
 	}
 }
 
-READ8_MEMBER(s3_vga_device::port_03d0_r)
+uint8_t s3_vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -3281,7 +3281,7 @@ READ8_MEMBER(s3_vga_device::port_03d0_r)
 				res = s3_crtc_reg_read(vga.crtc.index);
 				break;
 			default:
-				res = vga_device::port_03d0_r(space,offset,mem_mask);
+				res = vga_device::port_03d0_r(offset);
 				break;
 		}
 	}
@@ -3289,7 +3289,7 @@ READ8_MEMBER(s3_vga_device::port_03d0_r)
 	return res;
 }
 
-WRITE8_MEMBER(s3_vga_device::port_03d0_w)
+void s3_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -3300,13 +3300,13 @@ WRITE8_MEMBER(s3_vga_device::port_03d0_w)
 				s3_crtc_reg_write(vga.crtc.index,data);
 				break;
 			default:
-				vga_device::port_03d0_w(space,offset,data,mem_mask);
+				vga_device::port_03d0_w(offset,data);
 				break;
 		}
 	}
 }
 
-READ8_MEMBER(ati_vga_device::port_03c0_r)
+uint8_t ati_vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -3317,7 +3317,7 @@ READ8_MEMBER(ati_vga_device::port_03c0_r)
 			data = vga.attribute.data[vga.attribute.index&0x1f];
 		break;
 	default:
-		data = vga_device::port_03c0_r(space,offset,mem_mask);
+		data = vga_device::port_03c0_r(offset);
 		break;
 	}
 	return data;
@@ -4748,7 +4748,7 @@ WRITE16_MEMBER(ibm8514a_device::ibm8514_pixel_xfer_w)
 	if(LOG_8514) logerror("8514/A: Pixel Transfer = %08x\n",ibm8514.pixel_xfer);
 }
 
-READ8_MEMBER(s3_vga_device::mem_r)
+uint8_t s3_vga_device::mem_r(offs_t offset)
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
 	{
@@ -4777,12 +4777,12 @@ READ8_MEMBER(s3_vga_device::mem_r)
 		return data;
 	}
 	if((offset + (svga.bank_r*0x10000)) < vga.svga_intf.vram_size)
-		return vga_device::mem_r(space,offset,mem_mask);
+		return vga_device::mem_r(offset);
 	else
 		return 0xff;
 }
 
-WRITE8_MEMBER(s3_vga_device::mem_w)
+void s3_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	ibm8514a_device* dev = get_8514();
 	// bit 4 of CR53 enables memory-mapped I/O
@@ -4882,7 +4882,7 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 		case 0x8119:
 		case 0x9ae9:
 			s3.mmio_9ae8 = (s3.mmio_9ae8 & 0x00ff) | (data << 8);
-			dev->ibm8514_cmd_w(space,0,s3.mmio_9ae8,0xffff);
+			dev->ibm8514_cmd_w(machine().dummy_space(),0,s3.mmio_9ae8,0xffff);
 			break;
 		case 0x8120:
 		case 0xa2e8:
@@ -5002,14 +5002,14 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 			break;
 		case 0xbee9:
 			s3.mmio_bee8 = (s3.mmio_bee8 & 0x00ff) | (data << 8);
-			dev->ibm8514_multifunc_w(space,0,s3.mmio_bee8,0xffff);
+			dev->ibm8514_multifunc_w(machine().dummy_space(),0,s3.mmio_bee8,0xffff);
 			break;
 		case 0x96e8:
 			s3.mmio_96e8 = (s3.mmio_96e8 & 0xff00) | data;
 			break;
 		case 0x96e9:
 			s3.mmio_96e8 = (s3.mmio_96e8 & 0x00ff) | (data << 8);
-			dev->ibm8514_width_w(space,0,s3.mmio_96e8,0xffff);
+			dev->ibm8514_width_w(machine().dummy_space(),0,s3.mmio_96e8,0xffff);
 			break;
 		case 0xe2e8:
 			dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0xffffff00) | data;
@@ -5047,7 +5047,7 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 	}
 
 	if((offset + (svga.bank_w*0x10000)) < vga.svga_intf.vram_size)
-		vga_device::mem_w(space,offset,data,mem_mask);
+		vga_device::mem_w(offset,data);
 }
 
 /******************************************
@@ -5056,85 +5056,85 @@ gamtor.c implementation (TODO: identify the video card)
 
 ******************************************/
 
-READ8_MEMBER(gamtor_vga_device::mem_r)
+uint8_t gamtor_vga_device::mem_r(offs_t offset)
 {
 	return vga.memory[offset];
 }
 
-WRITE8_MEMBER(gamtor_vga_device::mem_w)
+void gamtor_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	vga.memory[offset] = data;
 }
 
 
-READ8_MEMBER(gamtor_vga_device::port_03b0_r)
+uint8_t gamtor_vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res;
 
 	switch(offset)
 	{
 		default:
-			res = vga_device::port_03b0_r(space,offset ^ 3,mem_mask);
+			res = vga_device::port_03b0_r(offset ^ 3);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(gamtor_vga_device::port_03b0_w)
+void gamtor_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 		default:
-			vga_device::port_03b0_w(space,offset ^ 3,data,mem_mask);
+			vga_device::port_03b0_w(offset ^ 3,data);
 			break;
 	}
 }
 
-READ8_MEMBER(gamtor_vga_device::port_03c0_r)
+uint8_t gamtor_vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t res;
 
 	switch(offset)
 	{
 		default:
-			res = vga_device::port_03c0_r(space,offset ^ 3,mem_mask);
+			res = vga_device::port_03c0_r(offset ^ 3);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(gamtor_vga_device::port_03c0_w)
+void gamtor_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 		default:
-			vga_device::port_03c0_w(space,offset ^ 3,data,mem_mask);
+			vga_device::port_03c0_w(offset ^ 3,data);
 			break;
 	}
 }
 
-READ8_MEMBER(gamtor_vga_device::port_03d0_r)
+uint8_t gamtor_vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res;
 
 	switch(offset)
 	{
 		default:
-			res = vga_device::port_03d0_r(space,offset ^ 3,mem_mask);
+			res = vga_device::port_03d0_r(offset ^ 3);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(gamtor_vga_device::port_03d0_w)
+void gamtor_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 		default:
-			vga_device::port_03d0_w(space,offset ^ 3,data,mem_mask);
+			vga_device::port_03d0_w(offset ^ 3,data);
 			break;
 	}
 }
@@ -5230,7 +5230,7 @@ void ati_vga_device::ati_define_video_mode()
 	set_dot_clock();
 }
 
-READ8_MEMBER(ati_vga_device::mem_r)
+uint8_t ati_vga_device::mem_r(offs_t offset)
 {
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
@@ -5246,10 +5246,10 @@ READ8_MEMBER(ati_vga_device::mem_r)
 		}
 	}
 
-	return vga_device::mem_r(space,offset,mem_mask);
+	return vga_device::mem_r(offset);
 }
 
-WRITE8_MEMBER(ati_vga_device::mem_w)
+void ati_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
@@ -5265,11 +5265,11 @@ WRITE8_MEMBER(ati_vga_device::mem_w)
 		}
 	}
 	else
-		vga_device::mem_w(space,offset,data,mem_mask);
+		vga_device::mem_w(offset,data);
 }
 
 
-READ8_MEMBER(ati_vga_device::ati_port_ext_r)
+uint8_t ati_vga_device::ati_port_ext_r(offs_t offset)
 {
 	uint8_t ret = 0xff;
 
@@ -5317,7 +5317,7 @@ READ8_MEMBER(ati_vga_device::ati_port_ext_r)
 	return ret;
 }
 
-WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
+void ati_vga_device::ati_port_ext_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -5438,25 +5438,25 @@ bit     0  SENSE is the result of a wired-OR of 3 comparators, one
            This bit toggles every time a HSYNC pulse starts
      3-15  Reserved(0)
  */
-READ8_MEMBER(ibm8514a_device::ibm8514_status_r)
+uint8_t ibm8514a_device::ibm8514_status_r(offs_t offset)
 {
 	switch(offset)
 	{
 		case 0:
 			return m_vga->vga_vblank() << 1;
 		case 2:
-			return m_vga->port_03c0_r(space,6,mem_mask);
+			return m_vga->port_03c0_r(6);
 		case 3:
-			return m_vga->port_03c0_r(space,7,mem_mask);
+			return m_vga->port_03c0_r(7);
 		case 4:
-			return m_vga->port_03c0_r(space,8,mem_mask);
+			return m_vga->port_03c0_r(8);
 		case 5:
-			return m_vga->port_03c0_r(space,9,mem_mask);
+			return m_vga->port_03c0_r(9);
 	}
 	return 0;
 }
 
-WRITE8_MEMBER(ibm8514a_device::ibm8514_htotal_w)
+void ibm8514a_device::ibm8514_htotal_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -5464,16 +5464,16 @@ WRITE8_MEMBER(ibm8514a_device::ibm8514_htotal_w)
 			ibm8514.htotal = data & 0xff;
 			break;
 		case 2:
-			m_vga->port_03c0_w(space,6,data,mem_mask);
+			m_vga->port_03c0_w(6,data);
 			break;
 		case 3:
-			m_vga->port_03c0_w(space,7,data,mem_mask);
+			m_vga->port_03c0_w(7,data);
 			break;
 		case 4:
-			m_vga->port_03c0_w(space,8,data,mem_mask);
+			m_vga->port_03c0_w(8,data);
 			break;
 		case 5:
-			m_vga->port_03c0_w(space,9,data,mem_mask);
+			m_vga->port_03c0_w(9,data);
 			break;
 	}
 	//vga.crtc.horz_total = data & 0x01ff;

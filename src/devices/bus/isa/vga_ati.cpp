@@ -155,9 +155,9 @@ isa16_vga_mach64_device::isa16_vga_mach64_device(const machine_config &mconfig, 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_vga_gfxultra_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
-READ8_MEMBER(isa16_vga_gfxultrapro_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
-READ8_MEMBER(isa16_vga_mach64_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
+uint8_t isa16_vga_gfxultra_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
+uint8_t isa16_vga_gfxultrapro_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
+uint8_t isa16_vga_mach64_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_vga_gfxultra_device::device_start()
 {
@@ -165,11 +165,11 @@ void isa16_vga_gfxultra_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga", "gfxultra");
 
-	m_isa->install_device(0x1ce, 0x1cf, read8_delegate(*m_vga, FUNC(ati_vga_device::ati_port_ext_r)), write8_delegate(*m_vga, FUNC(ati_vga_device::ati_port_ext_w)));
-	m_isa->install_device(0x2e8, 0x2ef, read8_delegate(*m_8514, FUNC(mach8_device::ibm8514_status_r)), write8_delegate(*m_8514, FUNC(mach8_device::ibm8514_htotal_w)));
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*m_vga, FUNC(ati_vga_device::port_03b0_r)), write8_delegate(*m_vga, FUNC(vga_device::port_03b0_w)));
-	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(*m_vga, FUNC(ati_vga_device::port_03c0_r)), write8_delegate(*m_vga, FUNC(vga_device::port_03c0_w)));
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*m_vga, FUNC(ati_vga_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(vga_device::port_03d0_w)));
+	m_isa->install_device(0x1ce, 0x1cf, read8sm_delegate(*m_vga, FUNC(ati_vga_device::ati_port_ext_r)), write8sm_delegate(*m_vga, FUNC(ati_vga_device::ati_port_ext_w)));
+	m_isa->install_device(0x2e8, 0x2ef, read8sm_delegate(*m_8514, FUNC(mach8_device::ibm8514_status_r)), write8sm_delegate(*m_8514, FUNC(mach8_device::ibm8514_htotal_w)));
+	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*m_vga, FUNC(ati_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(vga_device::port_03b0_w)));
+	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*m_vga, FUNC(ati_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(vga_device::port_03c0_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*m_vga, FUNC(ati_vga_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(vga_device::port_03d0_w)));
 	m_isa->install16_device(0x12e8, 0x12eb, read16_delegate(*m_8514, FUNC(mach8_device::ibm8514_vtotal_r)), write16_delegate(*m_8514, FUNC(mach8_device::ibm8514_vtotal_w)));
 	m_isa->install16_device(0x12ec, 0x12ef, read16_delegate(*m_8514, FUNC(mach8_device::mach8_config1_r)), write16_delegate(*this));
 	m_isa->install16_device(0x16e8, 0x16eb, read16_delegate(*m_8514, FUNC(mach8_device::ibm8514_vdisp_r)), write16_delegate(*m_8514, FUNC(mach8_device::ibm8514_vdisp_w)));
@@ -217,7 +217,7 @@ void isa16_vga_gfxultra_device::device_start()
 	m_isa->install16_device(0xdeec, 0xdeef, read16_delegate(*m_8514, FUNC(mach8_device::mach8_sourcey_r)), write16_delegate(*m_8514, FUNC(mach8_device::mach8_ext_topscissor_w)));
 	m_isa->install16_device(0xfeec, 0xfeef, read16_delegate(*m_8514, FUNC(mach8_device::mach8_linedraw_r)), write16_delegate(*m_8514, FUNC(mach8_device::mach8_linedraw_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(ati_vga_device::mem_r)), write8_delegate(*m_vga, FUNC(ati_vga_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(ati_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(ati_vga_device::mem_w)));
 }
 
 void isa16_vga_gfxultrapro_device::device_start()
@@ -226,11 +226,11 @@ void isa16_vga_gfxultrapro_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga", "gfxultrapro");
 
-	m_isa->install_device(0x1ce, 0x1cf, read8_delegate(*m_vga, FUNC(mach32_device::ati_port_ext_r)), write8_delegate(*m_vga, FUNC(mach32_device::ati_port_ext_w)));
-	m_isa->install_device(0x2e8, 0x2ef, read8_delegate(*m_vga, FUNC(mach32_device::mach32_status_r)), write8_delegate(*m_vga, FUNC(mach32_device::ibm8514_htotal_w)));
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*m_vga, FUNC(mach32_device::port_03b0_r)), write8_delegate(*m_vga, FUNC(mach32_device::port_03b0_w)));
-	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(*m_vga, FUNC(mach32_device::port_03c0_r)), write8_delegate(*m_vga, FUNC(mach32_device::port_03c0_w)));
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*m_vga, FUNC(mach32_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(mach32_device::port_03d0_w)));
+	m_isa->install_device(0x1ce, 0x1cf, read8sm_delegate(*m_vga, FUNC(mach32_device::ati_port_ext_r)), write8sm_delegate(*m_vga, FUNC(mach32_device::ati_port_ext_w)));
+	m_isa->install_device(0x2e8, 0x2ef, read8sm_delegate(*m_vga, FUNC(mach32_device::mach32_status_r)), write8sm_delegate(*m_vga, FUNC(mach32_device::ibm8514_htotal_w)));
+	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*m_vga, FUNC(mach32_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(mach32_device::port_03b0_w)));
+	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*m_vga, FUNC(mach32_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(mach32_device::port_03c0_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*m_vga, FUNC(mach32_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(mach32_device::port_03d0_w)));
 	m_isa->install16_device(0xaec, 0xaef, read16_delegate(*m_vga, FUNC(mach32_device::mach32_readonly_r)), write16_delegate(*m_vga, FUNC(mach32_device::mach32_cursor_l_w)));
 	m_isa->install16_device(0xeec, 0xeef, read16_delegate(*m_vga, FUNC(mach32_device::mach32_readonly_r)), write16_delegate(*m_vga, FUNC(mach32_device::mach32_cursor_h_w)));
 	m_isa->install16_device(0x12e8, 0x12eb, read16_delegate(*m_vga, FUNC(mach32_device::ibm8514_vtotal_r)), write16_delegate(*m_vga, FUNC(mach32_device::ibm8514_vtotal_w)));
@@ -286,7 +286,7 @@ void isa16_vga_gfxultrapro_device::device_start()
 	m_isa->install16_device(0xfaec, 0xfaef, read16_delegate(*m_vga, FUNC(mach32_device::mach32_chipid_r)), write16_delegate(*this));
 	m_isa->install16_device(0xfeec, 0xfeef, read16_delegate(*m_vga, FUNC(mach32_device::mach8_linedraw_r)), write16_delegate(*m_vga, FUNC(mach32_device::mach8_linedraw_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(mach32_device::mem_r)), write8_delegate(*m_vga, FUNC(mach32_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(mach32_device::mem_r)), write8sm_delegate(*m_vga, FUNC(mach32_device::mem_w)));
 }
 
 void isa16_vga_mach64_device::device_start()
@@ -295,11 +295,11 @@ void isa16_vga_mach64_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga", "mach64");
 
-	m_isa->install_device(0x1ce, 0x1cf, read8_delegate(*m_vga, FUNC(mach64_device::ati_port_ext_r)), write8_delegate(*m_vga, FUNC(mach64_device::ati_port_ext_w)));
-	m_isa->install_device(0x2e8, 0x2ef, read8_delegate(*m_vga, FUNC(mach64_device::mach32_status_r)), write8_delegate(*m_vga, FUNC(mach64_device::ibm8514_htotal_w)));
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*m_vga, FUNC(mach64_device::port_03b0_r)), write8_delegate(*m_vga, FUNC(mach64_device::port_03b0_w)));
-	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(*m_vga, FUNC(mach64_device::port_03c0_r)), write8_delegate(*m_vga, FUNC(mach64_device::port_03c0_w)));
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*m_vga, FUNC(mach64_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(mach64_device::port_03d0_w)));
+	m_isa->install_device(0x1ce, 0x1cf, read8sm_delegate(*m_vga, FUNC(mach64_device::ati_port_ext_r)), write8sm_delegate(*m_vga, FUNC(mach64_device::ati_port_ext_w)));
+	m_isa->install_device(0x2e8, 0x2ef, read8sm_delegate(*m_vga, FUNC(mach64_device::mach32_status_r)), write8sm_delegate(*m_vga, FUNC(mach64_device::ibm8514_htotal_w)));
+	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*m_vga, FUNC(mach64_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(mach64_device::port_03b0_w)));
+	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*m_vga, FUNC(mach64_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(mach64_device::port_03c0_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*m_vga, FUNC(mach64_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(mach64_device::port_03d0_w)));
 	m_isa->install16_device(0x12e8, 0x12eb, read16_delegate(*m_vga, FUNC(mach64_device::ibm8514_vtotal_r)), write16_delegate(*m_vga, FUNC(mach64_device::ibm8514_vtotal_w)));
 	m_isa->install16_device(0x12ec, 0x12ef, read16_delegate(*m_vga, FUNC(mach64_device::mach32_config1_r)), write16_delegate(*m_vga, FUNC(mach64_device::mach64_config1_w)));
 	m_isa->install16_device(0x16e8, 0x16eb, read16_delegate(*m_vga, FUNC(mach64_device::ibm8514_vdisp_r)), write16_delegate(*m_vga, FUNC(mach64_device::ibm8514_vdisp_w)));
@@ -348,7 +348,7 @@ void isa16_vga_mach64_device::device_start()
 	m_isa->install16_device(0xfaec, 0xfaef, read16_delegate(*m_vga, FUNC(mach64_device::mach32_chipid_r)), write16_delegate(*this));
 	m_isa->install16_device(0xfeec, 0xfeef, read16_delegate(*m_vga, FUNC(mach64_device::mach8_linedraw_r)), write16_delegate(*m_vga, FUNC(mach64_device::mach8_linedraw_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(mach64_device::mem_r)), write8_delegate(*m_vga, FUNC(mach64_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(mach64_device::mem_r)), write8sm_delegate(*m_vga, FUNC(mach64_device::mem_w)));
 }
 
 //-------------------------------------------------

@@ -93,7 +93,7 @@ public:
 	DECLARE_READ16_MEMBER(ibm8514_vtotal_r) { return m_8514a->ibm8514_vtotal_r(space,offset,mem_mask); }
 	DECLARE_WRITE16_MEMBER(ibm8514_vtotal_w) { m_8514a->ibm8514_vtotal_w(space,offset,data,mem_mask); }
 	DECLARE_READ16_MEMBER(ibm8514_htotal_r) { return m_8514a->ibm8514_htotal_r(space,offset,mem_mask); }
-	DECLARE_WRITE8_MEMBER(ibm8514_htotal_w) { m_8514a->ibm8514_htotal_w(space,offset,data,mem_mask); }
+	void ibm8514_htotal_w(offs_t offset, uint8_t data) { m_8514a->ibm8514_htotal_w(offset,data); }
 	DECLARE_READ16_MEMBER(ibm8514_vdisp_r) { return m_8514a->ibm8514_vdisp_r(space,offset,mem_mask); }
 	DECLARE_WRITE16_MEMBER(ibm8514_vdisp_w) { m_8514a->ibm8514_vdisp_w(space,offset,data,mem_mask); }
 	DECLARE_READ16_MEMBER(ibm8514_vsync_r) { return m_8514a->ibm8514_vsync_r(space,offset,mem_mask); }
@@ -140,7 +140,7 @@ public:
 	DECLARE_WRITE16_MEMBER(mach8_clksel_w) { m_8514a->mach8_clksel_w(space,offset,data,mem_mask); }  // read only on the mach8
 	DECLARE_READ16_MEMBER(mach32_mem_boundary_r) { return m_8514a->mach32_mem_boundary_r(space,offset,mem_mask); }
 	DECLARE_WRITE16_MEMBER(mach32_mem_boundary_w) { m_8514a->mach32_mem_boundary_w(space,offset,data,mem_mask); }  // read only on the mach8
-	DECLARE_READ8_MEMBER(mach32_status_r) { return m_8514a->ibm8514_status_r(space,offset,mem_mask); }
+	uint8_t mach32_status_r(offs_t offset) { return m_8514a->ibm8514_status_r(offset); }
 	DECLARE_READ16_MEMBER(mach32_config1_r) { return m_8514a->mach32_config1_r(space,offset,mem_mask); }
 	DECLARE_WRITE16_MEMBER(mach32_horz_overscan_w) { m_8514a->mach32_horz_overscan_w(space,offset,data,mem_mask); }
 	DECLARE_WRITE16_MEMBER(mach32_ge_ext_config_w) { m_8514a->mach32_ge_ext_config_w(space,offset,data,mem_mask); ati_define_video_mode(); }
