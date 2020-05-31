@@ -118,25 +118,24 @@ private:
 
 	void megatech(machine_config &config);
 
-	DECLARE_READ8_MEMBER(cart_select_r);
 	void cart_select_w(uint8_t data);
 	uint8_t bios_portc_r();
 	uint8_t bios_porte_r();
 	void bios_portd_w(uint8_t data);
 	void bios_porte_w(uint8_t data);
-	DECLARE_READ8_MEMBER(read_68k_banked_data);
-	DECLARE_WRITE8_MEMBER(write_68k_banked_data);
-	DECLARE_WRITE8_MEMBER(mt_z80_bank_w);
-	DECLARE_READ8_MEMBER(banked_ram_r);
-	DECLARE_WRITE8_MEMBER(banked_ram_w);
-	DECLARE_WRITE8_MEMBER(bios_port_ctrl_w);
-	DECLARE_READ8_MEMBER(bios_joypad_r);
-	DECLARE_WRITE8_MEMBER(bios_port_7f_w);
-	DECLARE_READ8_MEMBER(vdp1_count_r);
+	uint8_t read_68k_banked_data(offs_t offset);
+	void write_68k_banked_data(offs_t offset, uint8_t data);
+	void mt_z80_bank_w(uint8_t data);
+	uint8_t banked_ram_r(offs_t offset);
+	void banked_ram_w(offs_t offset, uint8_t data);
+	void bios_port_ctrl_w(uint8_t data);
+	uint8_t bios_joypad_r(offs_t offset);
+	void bios_port_7f_w(uint8_t data);
+	uint8_t vdp1_count_r(offs_t offset);
 	u8 sms_count_r(offs_t offset);
-	DECLARE_READ8_MEMBER(sms_ioport_dc_r);
-	DECLARE_READ8_MEMBER(sms_ioport_dd_r);
-	DECLARE_WRITE8_MEMBER(mt_sms_standard_rom_bank_w);
+	uint8_t sms_ioport_dc_r();
+	uint8_t sms_ioport_dd_r();
+	void mt_sms_standard_rom_bank_w(address_space &space, offs_t offset, uint8_t data);
 
 	DECLARE_MACHINE_RESET(megatech);
 
@@ -328,14 +327,14 @@ u8 mtech_state::sms_count_r(offs_t offset)
 		return m_vdp->vcount_read();
 }
 
-READ8_MEMBER (mtech_state::sms_ioport_dc_r)
+uint8_t mtech_state::sms_ioport_dc_r()
 {
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 4: TL-A; bit 5: TR-A */
 	return (machine().root_device().ioport("PAD1")->read() & 0x3f) | ((machine().root_device().ioport("PAD2")->read() & 0x03) << 6);
 }
 
-READ8_MEMBER (mtech_state::sms_ioport_dd_r)
+uint8_t mtech_state::sms_ioport_dd_r()
 {
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
@@ -343,7 +342,7 @@ READ8_MEMBER (mtech_state::sms_ioport_dd_r)
 }
 
 
-WRITE8_MEMBER( mtech_state::mt_sms_standard_rom_bank_w )
+void mtech_state::mt_sms_standard_rom_bank_w(address_space &space, offs_t offset, uint8_t data)
 {
 	int bank = data & 0x1f;
 	//logerror("bank w %02x %02x\n", offset, data);
@@ -386,7 +385,7 @@ void mtech_state::set_genz80_as_sms()
 
 	memcpy(sms_rom.get(), m_region_maincpu->base(), 0xc000);
 
-	prg.install_write_handler(0xfffc, 0xffff, write8_delegate(*this, FUNC(mtech_state::mt_sms_standard_rom_bank_w)));
+	prg.install_write_handler(0xfffc, 0xffff, write8m_delegate(*this, FUNC(mtech_state::mt_sms_standard_rom_bank_w)));
 
 	// ports
 	io.install_read_handler      (0x40, 0x41, 0, 0x3e, 0, read8sm_delegate(*this, FUNC(mtech_state::sms_count_r)));
@@ -394,12 +393,12 @@ void mtech_state::set_genz80_as_sms()
 	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8smo_delegate(*m_vdp, FUNC(sega315_5124_device::data_read)), write8smo_delegate(*m_vdp, FUNC(sega315_5124_device::data_write)));
 	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8smo_delegate(*m_vdp, FUNC(sega315_5124_device::control_read)), write8smo_delegate(*m_vdp, FUNC(sega315_5124_device::control_write)));
 
-	io.install_read_handler      (0x10, 0x10, read8_delegate(*this, FUNC(mtech_state::sms_ioport_dd_r))); // super tetris
+	io.install_read_handler      (0x10, 0x10, read8smo_delegate(*this, FUNC(mtech_state::sms_ioport_dd_r))); // super tetris
 
-	io.install_read_handler      (0xdc, 0xdc, read8_delegate(*this, FUNC(mtech_state::sms_ioport_dc_r)));
-	io.install_read_handler      (0xdd, 0xdd, read8_delegate(*this, FUNC(mtech_state::sms_ioport_dd_r)));
-	io.install_read_handler      (0xde, 0xde, read8_delegate(*this, FUNC(mtech_state::sms_ioport_dd_r)));
-	io.install_read_handler      (0xdf, 0xdf, read8_delegate(*this, FUNC(mtech_state::sms_ioport_dd_r))); // adams family
+	io.install_read_handler      (0xdc, 0xdc, read8smo_delegate(*this, FUNC(mtech_state::sms_ioport_dc_r)));
+	io.install_read_handler      (0xdd, 0xdd, read8smo_delegate(*this, FUNC(mtech_state::sms_ioport_dd_r)));
+	io.install_read_handler      (0xde, 0xde, read8smo_delegate(*this, FUNC(mtech_state::sms_ioport_dd_r)));
+	io.install_read_handler      (0xdf, 0xdf, read8smo_delegate(*this, FUNC(mtech_state::sms_ioport_dd_r))); // adams family
 }
 
 
@@ -414,11 +413,11 @@ void mtech_state::set_genz80_as_md()
 	prg.install_ram(0x0000, 0x1fff, m_genz80.z80_prgram.get());
 
 	prg.install_readwrite_handler(0x4000, 0x4003, read8sm_delegate(*m_ymsnd, FUNC(ym2612_device::read)), write8sm_delegate(*m_ymsnd, FUNC(ym2612_device::write)));
-	prg.install_write_handler    (0x6000, 0x6000, write8_delegate(*this, FUNC(mtech_state::megadriv_z80_z80_bank_w)));
-	prg.install_write_handler    (0x6001, 0x6001, write8_delegate(*this, FUNC(mtech_state::megadriv_z80_z80_bank_w)));
-	prg.install_read_handler     (0x6100, 0x7eff, read8_delegate(*this, FUNC(mtech_state::megadriv_z80_unmapped_read)));
-	prg.install_readwrite_handler(0x7f00, 0x7fff, read8_delegate(*this, FUNC(mtech_state::megadriv_z80_vdp_read)), write8_delegate(*this, FUNC(mtech_state::megadriv_z80_vdp_write)));
-	prg.install_readwrite_handler(0x8000, 0xffff, read8_delegate(*this, FUNC(mtech_state::z80_read_68k_banked_data)), write8_delegate(*this, FUNC(mtech_state::z80_write_68k_banked_data)));
+	prg.install_write_handler    (0x6000, 0x6000, write8smo_delegate(*this, FUNC(mtech_state::megadriv_z80_z80_bank_w)));
+	prg.install_write_handler    (0x6001, 0x6001, write8smo_delegate(*this, FUNC(mtech_state::megadriv_z80_z80_bank_w)));
+	prg.install_read_handler     (0x6100, 0x7eff, read8smo_delegate(*this, FUNC(mtech_state::megadriv_z80_unmapped_read)));
+	prg.install_readwrite_handler(0x7f00, 0x7fff, read8sm_delegate(*this, FUNC(mtech_state::megadriv_z80_vdp_read)), write8sm_delegate(*this, FUNC(mtech_state::megadriv_z80_vdp_write)));
+	prg.install_readwrite_handler(0x8000, 0xffff, read8sm_delegate(*this, FUNC(mtech_state::z80_read_68k_banked_data)), write8sm_delegate(*this, FUNC(mtech_state::z80_write_68k_banked_data)));
 }
 
 
@@ -499,30 +498,30 @@ void mtech_state::bios_porte_w(uint8_t data)
 /* this sets 0x300000 which may indicate that the 68k can see the instruction rom
    there, this limiting the max game rom capacity to 3meg. */
 
-READ8_MEMBER(mtech_state::read_68k_banked_data )
+uint8_t mtech_state::read_68k_banked_data(offs_t offset)
 {
 	address_space &space68k = m_maincpu->space();
 	uint8_t ret = space68k.read_byte(m_mt_bank_addr + offset);
 	return ret;
 }
 
-WRITE8_MEMBER(mtech_state::write_68k_banked_data )
+void mtech_state::write_68k_banked_data(offs_t offset, uint8_t data)
 {
 	address_space &space68k = m_maincpu->space();
 	space68k.write_byte(m_mt_bank_addr + offset,data);
 }
 
-WRITE8_MEMBER(mtech_state::mt_z80_bank_w )
+void mtech_state::mt_z80_bank_w(uint8_t data)
 {
 	m_mt_bank_addr = ((m_mt_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
-READ8_MEMBER(mtech_state::banked_ram_r )
+uint8_t mtech_state::banked_ram_r(offs_t offset)
 {
 	return m_banked_ram[offset + 0x1000 * (m_mt_cart_select_reg & 0x07)];
 }
 
-WRITE8_MEMBER(mtech_state::banked_ram_w )
+void mtech_state::banked_ram_w(offs_t offset, uint8_t data)
 {
 	m_banked_ram[offset + 0x1000 * (m_mt_cart_select_reg & 0x07)] = data;
 }
@@ -543,13 +542,13 @@ void mtech_state::megatech_bios_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(mtech_state::bios_port_ctrl_w )
+void mtech_state::bios_port_ctrl_w(uint8_t data)
 {
 	m_bios_port_ctrl = data;
 }
 
 /* the test mode accesses the joypad/stick inputs like this */
-READ8_MEMBER(mtech_state::bios_joypad_r )
+uint8_t mtech_state::bios_joypad_r(offs_t offset)
 {
 	uint8_t retdata = 0;
 
@@ -569,13 +568,13 @@ READ8_MEMBER(mtech_state::bios_joypad_r )
 	return retdata;
 }
 
-WRITE8_MEMBER(mtech_state::bios_port_7f_w)
+void mtech_state::bios_port_7f_w(uint8_t data)
 {
 //  popmessage("CPU #3: I/O port 0x7F write, data %02x", data);
 }
 
 
-READ8_MEMBER(mtech_state::vdp1_count_r)
+uint8_t mtech_state::vdp1_count_r(offs_t offset)
 {
 	if (offset & 0x01)
 		return m_vdp1->hcount_read();

@@ -1009,8 +1009,8 @@ void md_boot_state::init_mk3mdb()
 
 	init_megadriv();
 	// 6 button game, so overwrite 3 button io handlers
-	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
-	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
+	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
+	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
 }
 
 void md_boot_state::init_ssf2mdb()
@@ -1025,8 +1025,8 @@ void md_boot_state::init_ssf2mdb()
 
 	init_megadrij();
 	// 6 button game, so overwrite 3 button io handlers
-	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
-	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
+	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
+	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
 }
 
 void md_boot_state::init_srmdb()

@@ -197,16 +197,16 @@ void megadriv_radica_state::init_megadriv_radica_6button_pal()
 {
 	init_megadrie();
 	// 6 button game, so overwrite 3 button io handlers
-	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
-	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
+	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
+	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
 }
 
 void megadriv_radica_state::init_megadriv_radica_6button_ntsc()
 {
 	init_megadriv();
 	// 6 button game, so overwrite 3 button io handlers
-	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
-	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
+	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
+	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
 }
 
 CONS( 2004, rad_sonic, 0,     0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (USA)", 0)
