@@ -344,13 +344,13 @@ uint8_t spectrum_betav2_device::iorq_r(offs_t offset)
 
 	if (!m_masterportdisable)
 	{
-		switch (offset & 0xe7)
+		switch (offset & 0x87)
 		{
-		case 0x07: case 0x27: case 0x47: case 0x67:
+		case 0x07:
 			data = m_fdc->read((offset >> 5) & 0x03);
 			break;
 
-		case 0x87: case 0xa7 : case 0xc7 : case 0xe7 :
+		case 0x87:
 			data &= 0x3f; // actually open bus
 			data |= m_fdc->drq_r() ? 0x40 : 0;
 			data |= m_fdc->intrq_r() ? 0x80 : 0;
