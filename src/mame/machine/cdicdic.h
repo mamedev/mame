@@ -69,7 +69,9 @@ protected:
 	virtual void device_reset() override;
 
 	// internal callbacks
+	TIMER_CALLBACK_MEMBER( periodic_sample_trigger );
 	TIMER_CALLBACK_MEMBER( audio_sample_trigger );
+	TIMER_CALLBACK_MEMBER( initial_sample_trigger );
 	TIMER_CALLBACK_MEMBER( trigger_readback_int );
 
 private:
@@ -141,17 +143,22 @@ private:
 	cdrom_file *m_cd;
 
 	emu_timer *m_audio_sample_timer;
+	emu_timer *m_audio_playback_timer;
+	emu_timer *m_periodic_sample_timer[2];
 	int32_t m_audio_sample_freq;
 	int32_t m_audio_sample_size;
 
 	uint16_t m_decode_addr;
+	uint16_t m_next_decode_addr;
 	uint8_t m_decode_delay;
 	attotime m_decode_period;
+	bool m_break_on_achan;
+	bool m_valid_audio_sample;
 
 	int m_xa_last[4];
 	std::unique_ptr<uint16_t[]> m_ram;
+	std::unique_ptr<int16_t[]> m_samples[2];
 
-	// static internal members
 	static void decode_xa_mono(int32_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
 	static void decode_xa_mono8(int32_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
 	static void decode_xa_stereo(int32_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
@@ -159,10 +166,10 @@ private:
 
 	static const int32_t s_cdic_adpcm_filter_coef[5][2];
 
-	// non-static internal members
 	uint32_t increment_cdda_frame_bcd(uint32_t bcd);
 	uint32_t increment_cdda_sector_bcd(uint32_t bcd);
 	void decode_audio_sector(const uint8_t *xa, int32_t triggered);
+	void play_audio_sector();
 };
 
 // device type definition

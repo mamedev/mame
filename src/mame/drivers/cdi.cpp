@@ -451,14 +451,14 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(384, 302);
 	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
 	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
-	m_lcd->set_refresh_hz(60);
+	m_lcd->set_refresh_hz(50);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_lcd->set_size(192, 22);
 	m_lcd->set_visarea(0, 192-1, 0, 22-1);
@@ -557,10 +557,10 @@ void cdi_state::cdi910(machine_config &config)
 	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(384, 302);
-	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
+	screen.set_size(384, 312);
+	screen.set_visarea(0, 384-1, 32, 312-1); // TODO: dynamic resolution
 	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
