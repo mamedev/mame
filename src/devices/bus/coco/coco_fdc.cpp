@@ -280,6 +280,8 @@ void coco_fdc_device_base::device_start()
 
 void coco_fdc_device_base::device_reset()
 {
+	coco_family_fdc_device_base::device_reset();
+
 	m_cache_controler = 0x80;
 	m_cache_pointer = 0;
 }
