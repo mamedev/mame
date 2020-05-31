@@ -360,8 +360,10 @@ void v6809_state::v6809(machine_config &config)
 /* ROM definition */
 ROM_START( v6809 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "v6809.rom", 0x0000, 0x0800, CRC(54bf5f32) SHA1(10d1d70f0b51e2b90e5c29249d3eab4c6b0033a1) )
-
+	ROM_SYSTEM_BIOS(0, "v1", "Original")
+	ROMX_LOAD( "v6809.rom",   0x0000, 0x0800, CRC(54bf5f32) SHA1(10d1d70f0b51e2b90e5c29249d3eab4c6b0033a1), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v3", "Ver 3.3")
+	ROMX_LOAD( "v6809v3.bin", 0x0000, 0x0800, CRC(f9cd126d) SHA1(2da719820e393efde801057d76b2a63dcfbd8541), ROM_BIOS(1))
 	/* character generator not dumped, using the one from 'h19' for now */
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, BAD_DUMP CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
