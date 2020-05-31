@@ -222,7 +222,7 @@ void spg2xx_video_device::update_vcmp_table()
 	if (step & 0x80)
 		step = step - 0x100;
 
-	int current_inc_value = (m_video_regs[0x1c]<<6);
+	int current_inc_value = (m_video_regs[0x1c]<<4);
 
 	int counter = 0;
 
@@ -241,13 +241,14 @@ void spg2xx_video_device::update_vcmp_table()
 			
 			counter += current_inc_value;
 
-			while (counter >= (0x20<<6))
+			while (counter >= (0x20<<4))
 			{
 				currentline++;
-				counter -= (0x20<<6);
+				current_inc_value += step;
+
+				counter -= (0x20<<4);
 			}
 
-			current_inc_value += step;
 
 		}
 	}
