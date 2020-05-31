@@ -67,6 +67,10 @@ void spg2xx_video_device::device_start()
 
 	save_item(NAME(m_video_regs));
 
+	save_item(NAME(m_ycmp_table));
+
+	
+
 	m_sprlimit_read_cb.resolve_safe(0);
 
 	m_video_irq_cb.resolve();
@@ -83,7 +87,7 @@ void spg2xx_video_device::device_reset()
 
 	for (int i = 0; i < 480; i++)
 	{
-		m_ycmp_table[i] = -1;
+		m_ycmp_table[i] = 0xffffffff;
 	}
 }
 
@@ -208,29 +212,43 @@ bool spg2xx_video_device::get_tile_info(uint32_t tilemap_rambase, uint32_t palet
 
 	return true;
 }
-
-
+// 3 is good
+// this builds up a line table for the vcmp effect, this is not correct when step is used
 void spg2xx_video_device::update_vcmp_table()
 {
+	int currentline = 0;
+
+	int step = m_video_regs[0x1e] & 0xff;
+	if (step & 0x80)
+		step = step - 0x100;
+
+	int current_inc_value = (m_video_regs[0x1c]<<6);
+
+	int counter = 0;
+
 	for (int i = 0; i < 480; i++)
 	{
-		int currentline = 0;
-
 		if (i < m_video_regs[0x1d])
 		{
-			m_ycmp_table[i] = -1;
+			m_ycmp_table[i] = 0xffffffff;
 		}
 		else
 		{
-			if (currentline < 240)
+			if ((currentline >= 0) && (currentline < 240))
 			{
 				m_ycmp_table[i] = currentline;
-				currentline += m_video_regs[0x1c];
 			}
-			else
+			
+			counter += current_inc_value;
+
+			while (counter >= (0x20<<6))
 			{
-				m_ycmp_table[i] = -1;
+				currentline++;
+				counter -= (0x20<<6);
 			}
+
+			current_inc_value += step;
+
 		}
 	}
 }
@@ -311,6 +329,21 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t* dst, ui
 		return;
 	}
 
+	uint32_t logical_scanline = scanline;
+
+	if (ctrl & 0x0040) // 'vertical compression feature' (later models only?)
+	{
+		if (m_video_regs[0x1e] != 0x0000)
+			popmessage("vertical compression mode with non-0 step amount %04x offset %04x step %04x\n", m_video_regs[0x1c], m_video_regs[0x1d], m_video_regs[0x1e]);
+		
+		logical_scanline = m_ycmp_table[scanline];
+		if (logical_scanline == 0xffffffff)
+			return;
+
+		//logical_scanline >>= 5;
+	}
+
+
 	const uint32_t xscroll = regs[0];
 	const uint32_t yscroll = regs[1];
 	const uint32_t tilemap_rambase = regs[4];
@@ -319,7 +352,7 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t* dst, ui
 	const uint32_t tile_h = 8 << ((attr & 0x00c0) >> 6);
 	const uint32_t tile_w = 8 << (tile_width);
 	const uint32_t tile_count_x = 512 / tile_w; // all tilemaps are 512 pixels wide
-	const uint32_t bitmap_y = (scanline + yscroll) & 0xff; // all tilemaps are 256 pixels high
+	const uint32_t bitmap_y = (logical_scanline + yscroll) & 0xff; // all tilemaps are 256 pixels high
 	const uint32_t y0 = bitmap_y / tile_h;
 	const uint32_t tile_scanline = bitmap_y % tile_h;
 	const uint8_t bpp = attr & 0x0003;
@@ -332,7 +365,7 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t* dst, ui
 	if (row_scroll)
 	{
 		// Tennis in My Wireless Sports confirms the need to add the scroll value here rather than rowscroll being screen-aligned
-		realxscroll += (int16_t)m_scrollram[(scanline+yscroll) & 0xff];
+		realxscroll += (int16_t)m_scrollram[(logical_scanline+yscroll) & 0xff];
 	}
 
 	for (uint32_t x0 = 0; x0 < (320+tile_w)/tile_w; x0++)
