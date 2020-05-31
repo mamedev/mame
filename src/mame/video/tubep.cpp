@@ -583,9 +583,10 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 	{
 		uint32_t h;
 		uint32_t sp_data0=0,sp_data1=0,sp_data2=0;
-		
-		/* Text and sprite layers draw a drop shadow with 1 dot width to the left. */
-		/* See the gameplay video on the PCB. https://www.youtube.com/watch?v=xxONzbUOOsw */
+
+		// It appears there is a 1 pixel delay when renderer switches from background to sprite/text,
+		// this causes text and sprite layers to draw a drop shadow with 1 dot width to the left.
+		// See the gameplay video on the PCB. https://www.youtube.com/watch?v=xxONzbUOOsw
 		bool prev_text_or_sprite_pixel = true;
 
 		for (h = 0*8; h < 32*8; h++)
@@ -655,11 +656,9 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 				bitmap.pix16(v, h) = pen_base + bg_data*64 + romB_data_h;
 			}
 
-			/* text and sprite drop shadow */
+			// text and sprite drop shadow
 			if (draw_text_or_sprite_pixel && !prev_text_or_sprite_pixel && h > 0)
-			{
 				bitmap.pix16(v, h - 1) = 0x0;
-			}
 			prev_text_or_sprite_pixel = draw_text_or_sprite_pixel;
 		}
 	}
