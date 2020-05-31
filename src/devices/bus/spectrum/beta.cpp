@@ -12,12 +12,16 @@
      - 4k ROM
      - FORMAT, COPY etc. must be loaded from a disk to be used
      - disks are password protected
-     - uses 1771 disk controller
+     - uses FD1771 disk controller
+     - disk format: FM, 7 or 10 256-byte sectors per track, 2 system sectors
+     - supports up to 3 drives
        https://www.youtube.com/watch?v=gSJIuZjbFYs
 
     Original Beta Disk release with V3 ROM:
      - same features as above
      - uses a 1793 controller
+     - disk format: MFM, 16 256-byte sectors per track, 9 system sectors
+     - supports up to 4 drives
 
     Re-release dubbed "Beta Disk plus" with V4 ROM:
      - many operations moved into a larger capacity (8k) ROM rather
@@ -30,8 +34,10 @@
     Many clones exist, some specific to the various Spectrum clones.
     (not yet added)
 
+    Original Beta Disk (V2) clones
+     - Sandy FDD2 SP-DOS (match 2.0 ROM, only name text and checksum was changed)
+
     Original Beta Disk (V3) clones
-     - Sandy FDD2 SP-DOS
      - AC DOS P.Z.APINA
 
     Beta Disk plus (V4) clones
@@ -71,7 +77,9 @@
 
     while master_latch is enabled access to regular Spectrum IO is blocked (output /IORQ forced to 1) but enabled BDI ports:
 
-    IO write to port 0b1xxxx111 -> D7 BDI ROM_latch (0=enable, 1=disble), D6 - FDC DDEN, D4 - SIDE, D3 - FDC HLT, D2 - FDC /MR (reset), D0-1 - floppy drive select.
+    IO write to port 0b1xxxx111 ->
+      V2: D7 BDI ROM_latch (0=enable, 1=disble), D4 - FDC HLT, D3 - SIDE, D0-2 - floppy drive select (bitmask, active low).
+      V3-V4: D7 BDI ROM_latch (0=enable, 1=disble), D6 - FDC DDEN, D4 - SIDE, D3 - FDC HLT, D2 - FDC /MR (reset), D0-1 - floppy drive select (binary value).
     IO read port 0b1xxxx111 <- D7 - FDC INTRQ, D6 - FDC DRQ
     IO read/write ports 0b0YYxx111 - access FDC ports YY
 
@@ -98,7 +106,6 @@ DEFINE_DEVICE_TYPE(SPECTRUM_BETAPLUS, spectrum_betaplus_device, "spectrum_betapl
 
 static void beta_floppies(device_slot_interface &device)
 {
-	device.option_add("525sd", FLOPPY_525_SD);
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
@@ -173,6 +180,8 @@ ROM_END
 
 void spectrum_betav2_device::device_add_mconfig_base(machine_config& config)
 {
+	FLOPPY_CONNECTOR(config, "fdc:0", beta_floppies, "525qd", spectrum_betav2_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", beta_floppies, "525qd", spectrum_betav2_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", beta_floppies, nullptr, spectrum_betav2_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", beta_floppies, nullptr, spectrum_betav2_device::floppy_formats).enable_sound(true);
 
@@ -187,9 +196,6 @@ void spectrum_betav2_device::device_add_mconfig(machine_config &config)
 	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->hld_wr_callback().set(FUNC(spectrum_betav2_device::fdc_hld_w));
 
-	FLOPPY_CONNECTOR(config, "fdc:0", beta_floppies, "525sd", spectrum_betav2_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", beta_floppies, "525sd", spectrum_betav2_device::floppy_formats).enable_sound(true);
-
 	device_add_mconfig_base(config);
 }
 
@@ -197,9 +203,6 @@ void spectrum_betav3_device::device_add_mconfig(machine_config& config)
 {
 	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->hld_wr_callback().set(FUNC(spectrum_betav3_device::fdc_hld_w));
-
-	FLOPPY_CONNECTOR(config, "fdc:0", beta_floppies, "525qd", spectrum_betav2_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", beta_floppies, "525qd", spectrum_betav2_device::floppy_formats).enable_sound(true);
 
 	device_add_mconfig_base(config);
 }
@@ -235,6 +238,7 @@ spectrum_betav2_device::spectrum_betav2_device(const machine_config &mconfig, de
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fdc:%u", 0)
 	, m_exp(*this, "exp")
+	, m_control(0)
 {
 }
 
@@ -292,9 +296,8 @@ void spectrum_betav2_device::device_reset()
 {
 	// always paged in on boot? (no mode switch like beta128)
 	m_romcs = 1;
-	m_romlatch = 0;
 	m_control = 0;
-//  m_masterportdisable = 1;
+	m_masterportdisable = 1;
 }
 
 //**************************************************************************
@@ -315,7 +318,7 @@ void spectrum_betav2_device::fetch(offs_t offset)
 		else
 			m_romcs = 0;
 
-		if (!m_romlatch)
+		if (!(m_control & 0x80))
 		{
 			if (offset < 0x4000)
 				m_romcs = 1;
@@ -337,65 +340,99 @@ void spectrum_betav2_device::pre_data_fetch(offs_t offset)
 
 uint8_t spectrum_betav2_device::iorq_r(offs_t offset)
 {
-	uint8_t data = m_exp->iorq_r(offset);
+	uint8_t data = 0xff;
 
-//  if (!m_masterportdisable)
-	if (m_romcs)
+	if (!m_masterportdisable)
 	{
-		switch (offset & 0xff)
+		switch (offset & 0x87)
 		{
-		case 0x1f: case 0x3f: case 0x5f: case 0x7f:
+		case 0x07:
 			data = m_fdc->read((offset >> 5) & 0x03);
 			break;
 
-		case 0xff:
+		case 0x87:
 			data &= 0x3f; // actually open bus
 			data |= m_fdc->drq_r() ? 0x40 : 0;
 			data |= m_fdc->intrq_r() ? 0x80 : 0;
 			break;
 		}
 	}
+	else
+		data = m_exp->iorq_r(offset);
 
 	return data;
 }
 
 void spectrum_betav2_device::iorq_w(offs_t offset, uint8_t data)
 {
-//  if ((offset & 0x03) == 0x00)
-//  {
-//      m_masterportdisable = data & 0x80;
-//  }
+	if ((offset & 3) == 0)
+		m_masterportdisable = data & 0x80;
 
-//  if (!m_masterportdisable)
-	if (m_romcs)
+	if (!m_masterportdisable)
 	{
-		switch (offset & 0xff)
+		switch (offset & 0x87)
 		{
-		case 0x1f: case 0x3f: case 0x5f: case 0x7f:
+		case 0x07:
 			m_fdc->write((offset >> 5) & 0x03, data);
 			break;
 
-		case 0xff:
-			m_romlatch = data & 0x80;
+		case 0x87:
+			m_control = data;
+
+			floppy_image_device* floppy = nullptr;
+			for (int i = 0; i < 3; i++)
+				if (!(data & (1 << i)))
+				{
+					floppy = m_floppy[i]->get_device();
+					break;
+				}
+
+			m_fdc->set_floppy(floppy);
+			if (floppy)
+				floppy->ss_w(BIT(data, 3) ? 0 : 1);
+
+			m_fdc->hlt_w(BIT(data, 4));
+
+			motors_control();
+			break;
+		}
+	}
+	else
+		m_exp->iorq_w(offset, data);
+}
+
+void spectrum_betav3_device::iorq_w(offs_t offset, uint8_t data)
+{
+	if ((offset & 3) == 0)
+		m_masterportdisable = data & 0x80;
+
+	if (!m_masterportdisable)
+	{
+		switch (offset & 0x87)
+		{
+		case 0x07:
+			m_fdc->write((offset >> 5) & 0x03, data);
+			break;
+
+		case 0x87:
+			m_control = data;
 
 			floppy_image_device* floppy = m_floppy[data & 3]->get_device();
 
-			m_control = data;
 			m_fdc->set_floppy(floppy);
 			if (floppy)
 				floppy->ss_w(BIT(data, 4) ? 0 : 1);
 			m_fdc->dden_w(BIT(data, 6));
 
-			// bit 3 connected to pin 23 "HLT" of FDC and via diode to INDEX
-			//m_fdc->hlt_w(BIT(data, 3)); // not handled in current wd_fdc
+			m_fdc->hlt_w(BIT(data, 3));
 
 			m_fdc->mr_w(BIT(data, 2));
 			motors_control();
 			break;
 		}
 	}
-
-	m_exp->iorq_w(offset, data);
+	else
+		m_exp->iorq_w(offset, data);
 }
 
 uint8_t spectrum_betav2_device::mreq_r(offs_t offset)
@@ -422,12 +459,26 @@ void spectrum_betav2_device::mreq_w(offs_t offset, uint8_t data)
 
 void spectrum_betav2_device::fdc_hld_w(int state)
 {
-	// TODO: HLD connected to RDY pin (current wd_fdc have no external RDY control)
+	m_fdc->set_force_ready(state); // HLD connected to RDY pin
 	m_motor_active = state;
 	motors_control();
 }
 
 void spectrum_betav2_device::motors_control()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		floppy_image_device* floppy = m_floppy[i]->get_device();
+		if (!floppy)
+			continue;
+		if (m_motor_active && !(m_control & (1 << i)))
+			floppy->mon_w(CLEAR_LINE);
+		else
+			floppy->mon_w(ASSERT_LINE);
+	}
+}
+
+void spectrum_betav3_device::motors_control()
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -459,7 +510,7 @@ INPUT_CHANGED_MEMBER(spectrum_betaplus_device::magic_button)
 	{
 		m_slot->nmi_w(ASSERT_LINE);
 		m_romcs = 1;
-		m_romlatch = 0;
+		m_control &= ~0x80;
 	}
 	else
 	{

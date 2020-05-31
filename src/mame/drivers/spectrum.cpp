@@ -341,7 +341,7 @@ READ8_MEMBER(spectrum_state::spectrum_rom_r)
  bit 2-0: border colour
 */
 
-void spectrum_state::spectrum_port_fe_w(uint8_t data)
+void spectrum_state::spectrum_port_fe_w(offs_t offset, uint8_t data)
 {
 	unsigned char Changed;
 
@@ -364,6 +364,9 @@ void spectrum_state::spectrum_port_fe_w(uint8_t data)
 		/* write cassette data */
 		m_cassette->output((data & (1<<3)) ? -1.0 : +1.0);
 	}
+
+	if (m_exp)
+		m_exp->iorq_w(offset, data);
 
 	m_port_fe_data = data;
 }
@@ -457,6 +460,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 	offset |= 1;
 	//logerror("fb: %04x\n", offset);
 
+#if 0 // TODO make this expansion devices friendly
 	// Arkanoid, Cobra, Renegade, Short Circuit, Terra Cresta
 	if (offset == 0x28ff)
 		return floating_bus_r();
@@ -464,6 +468,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 	// Sidewize
 	if (offset == 0x40ff)
 		return floating_bus_r();
+#endif
 
 	// Pass through to expansion device if present
 	if (m_exp->get_card_device())

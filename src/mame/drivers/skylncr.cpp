@@ -323,9 +323,9 @@ uint32_t skylncr_state::screen_update_skylncr(screen_device &screen, bitmap_rgb3
 	m_reel_1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// are these hardcoded, or registers?
-	const rectangle visible1(0*8, (20+48)*8-1,  4*8,  (4+7)*8-1);
-	const rectangle visible2(0*8, (20+48)*8-1, 12*8, (12+7)*8-1);
-	const rectangle visible3(0*8, (20+48)*8-1, 20*8, (20+7)*8-1);
+	const rectangle visible1(0*8, (16+48)*8-1,  4*8,  (4+7)*8-1);
+	const rectangle visible2(0*8, (16+48)*8-1, 12*8, (12+7)*8-1);
+	const rectangle visible3(0*8, (16+48)*8-1, 20*8, (20+7)*8-1);
 
 	for (i= 0;i < 64;i++)
 	{

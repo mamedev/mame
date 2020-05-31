@@ -136,8 +136,9 @@ void beta_disk_device::param_w(uint8_t data)
 		m_wd179x->dden_w(BIT(data, 6));
 		m_wd179x->mr_w(BIT(data, 2));
 
-		// bit 3 connected to pin 23 "HLT" of FDC and via diode to INDEX
-		//m_wd179x->hlt_w(BIT(data, 3)); // not handled in current wd_fdc
+		m_wd179x->hlt_w(BIT(data, 3));
+		// bit 3 also connected to FDC /IP pin via diode, AND logic: if this bit is 0 - /IP will be forcibly set to low.
+		// used for bitbang index pulses generation to stop FDD drive motor with no disk inserted, currently not emulated.
 
 		motors_control();
 	}
@@ -173,7 +174,7 @@ void beta_disk_device::data_w(uint8_t data)
 
 void beta_disk_device::fdc_hld_w(int state)
 {
-	// TODO: HLD connected to RDY pin (current wd_fdc have no external RDY control)
+	m_wd179x->set_force_ready(state); // HLD connected to RDY pin
 	m_motor_active = state;
 	motors_control();
 }

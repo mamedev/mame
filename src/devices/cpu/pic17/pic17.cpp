@@ -84,6 +84,7 @@ pic17_cpu_device::pic17_cpu_device(const machine_config &mconfig, device_type ty
 	, m_alusta(0)
 	, m_cpusta(0x3c)
 	, m_intsta(0)
+	, m_intsample(0)
 	, m_tblptr(0)
 	, m_tablat(0)
 	, m_tlwt(0)
@@ -438,7 +439,7 @@ u16 pic17_cpu_device::stack_pop()
 
 u16 pic17_cpu_device::interrupt_vector()
 {
-	u8 active_ints = (m_intsta >> 4) & m_intsta;
+	u8 active_ints = m_intsample & m_intsta;
 	if (BIT(active_ints, 0))
 	{
 		// Interrupt on RA0/INT pin edge
@@ -469,7 +470,7 @@ u16 pic17_cpu_device::interrupt_vector()
 	else
 	{
 		// This may happen when interrupt enable flags are cleared at the wrong moment
-		logerror("%04X: Spurious interrupt taken\n");
+		logerror("%04X: Spurious interrupt taken\n", m_pc);
 		return 0x0000;
 	}
 }
@@ -923,6 +924,8 @@ void pic17_cpu_device::execute_run()
 			}
 
 		case exec_phase::Q2:
+			if ((m_execflags & INTRPT) == 0)
+				m_intsample = BIT(m_cpusta, 4) ? 0 : m_intsta >> 4;
 			if ((m_execflags & (TABLRD | TABLWT)) != 0)
 			{
 				m_paddr = m_tblptr;
@@ -947,13 +950,14 @@ void pic17_cpu_device::execute_run()
 				{
 					m_execflags &= ~INTRPT;
 
-					// Set global interrupt disable flag
-					m_cpusta |= 0x10;
-
 					// Call to interrupt vector
 					stack_push(m_pc);
 					m_pc = interrupt_vector();
 					m_execflags |= FORCENOP;
+
+					// Set global interrupt disable flag
+					m_cpusta |= 0x10;
+					m_intsample = 0;
 				}
 				else
 					q3_execute();
@@ -965,7 +969,7 @@ void pic17_cpu_device::execute_run()
 			}
 
 		case exec_phase::Q4:
-			if (!BIT(m_cpusta, 4) && ((m_intsta >> 4) & m_intsta) != 0)
+			if ((m_intsample & m_intsta) != 0)
 				m_execflags = (m_execflags | INTRPT) & ~SLEEP;
 			increment_timers();
 			if ((m_execflags & TABLWT) != 0)
@@ -1052,6 +1056,7 @@ void pic17_cpu_device::device_start()
 	save_item(NAME(m_alusta));
 	save_item(NAME(m_cpusta));
 	save_item(NAME(m_intsta));
+	save_item(NAME(m_intsample));
 	save_item(NAME(m_tblptr));
 	save_item(NAME(m_tablat));
 	save_item(NAME(m_tlwt));
@@ -1075,6 +1080,7 @@ void pic17_cpu_device::device_reset()
 	m_t0sta = 0;
 	m_cpusta |= 0x3c;
 	m_intsta = 0;
+	m_intsample = 0;
 	m_tblptr = 0; // not cleared on PIC17C42
 	m_bsr = 0;
 	m_stkptr = 0;
