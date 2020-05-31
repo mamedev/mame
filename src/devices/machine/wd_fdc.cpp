@@ -23,7 +23,7 @@
 #define LOG_LIVE    (1U << 13) // Live states
 #define LOG_FUNC    (1U << 14) // Function calls
 
-#define VERBOSE (LOG_GENERAL )
+#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -93,6 +93,7 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	force_ready = false;
 	disable_motor_control = false;
 	spinup_on_interrupt = false;
+	hlt = true; // assume tied to VCC
 }
 
 void wd_fdc_device_base::set_force_ready(bool _force_ready)
@@ -284,23 +285,17 @@ void wd_fdc_device_base::command_end()
 
 void wd_fdc_device_base::seek_start(int state)
 {
-	LOGCOMMAND("cmd: seek %d %x (track=%d)\n", state, data, track);
+	LOGCOMMAND("cmd: seek %d %x (track=%u)\n", state, data, track);
 	main_state = state;
 	status &= ~(S_CRC|S_RNF|S_SPIN);
+	sub_state = motor_control ? SPINUP : SPINUP_DONE;
+	status_type_1 = true;
 	if(head_control) {
 		if(BIT(command, 3))
 			set_hld();
 		else
 			drop_hld();
-
-		// TODO get value from HLT callback
-		if(hld)
-			status |= S_HLD;
-		else
-			status &= ~S_HLD;
 	}
-	sub_state = motor_control ? SPINUP : SPINUP_DONE;
-	status_type_1 = true;
 	seek_continue();
 }
 
@@ -401,8 +396,8 @@ void wd_fdc_device_base::seek_continue()
 
 		case SEEK_WAIT_STABILIZATION_TIME_DONE:
 			LOGSTATE("SEEK_WAIT_STABILIZATION_TIME_DONE\n");
-			if(hld)
-				status |= S_HLD;
+			if (command & 0x04)
+				set_hld();
 			sub_state = SEEK_DONE;
 			break;
 
@@ -1124,10 +1119,15 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 
 	if ((val & 0xf0) == 0xd0)
 	{
-		// checkme
+		// checkme timings
 		delay_cycles(t_cmd, dden ? delay_register_commit * 2 : delay_register_commit);
-		if (spinup_on_interrupt)  // see note in WD1772 constructor
-			spinup();
+		if (spinup_on_interrupt)  // see note in WD1772 constructor, might be true for other FDC types as well.
+		{
+			if (head_control)
+				set_hld();
+			if (motor_control)
+				spinup();
+		}
 	}
 	else
 	{
@@ -1156,6 +1156,14 @@ uint8_t wd_fdc_device_base::status_r()
 			status |= S_DRQ;
 		else
 			status &= ~S_DRQ;
+	}
+
+	if (status_type_1 && head_control)
+	{ // note: this status bit is AND of HLD latch and HLT input line
+		if (hld && hlt)
+			status |= S_HLD;
+		else
+			status &= ~S_HLD;
 	}
 
 	if(status_type_1) {
@@ -1346,10 +1354,8 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 					floppy->mon_w(1);
 			}
 
-			if(head_control && motor_timeout >= hld_timeout) {
+			if(head_control && motor_timeout >= hld_timeout)
 				drop_hld();
-				status &= ~S_HLD; // todo: should get this value from the drive
-			}
 		}
 
 		if(!intrq && (intrq_cond & I_IDX)) {
@@ -2523,8 +2529,8 @@ fd1771_device::fd1771_device(const machine_config &mconfig, const char *tag, dev
 	constexpr static int fd1771_step_times[4] = { 12000, 12000, 20000, 40000 };
 
 	step_times = fd1771_step_times;
-	delay_register_commit = 16;
-	delay_command_commit = 20; // x2 due to fm
+	delay_register_commit = 16/2; // will became x2 later due to FM
+	delay_command_commit = 20/2;  // same as above
 	disable_mfm = true;
 	inverted_bus = true;
 	side_control = false;
@@ -2533,6 +2539,7 @@ fd1771_device::fd1771_device(const machine_config &mconfig, const char *tag, dev
 	hld_timeout = 3;
 	motor_control = false;
 	ready_hooked = true;
+	spinup_on_interrupt = true; // ZX-Spectrum Beta-disk V2 require this, or ReadSector command should set HLD before RDY check
 }
 
 int fd1771_device::calc_sector_size(uint8_t size, uint8_t command) const
