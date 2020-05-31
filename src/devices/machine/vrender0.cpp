@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(VRENDER0_SOC, vrender0soc_device, "vrender0", "MagicEyes VRen
 //  vrender0soc_device - constructor
 //-------------------------------------------------
 
-vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, VRENDER0_SOC, tag, owner, clock),
 	m_host_cpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, "screen"),
@@ -156,14 +156,17 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 void vrender0soc_device::device_start()
 {
 	int i;
-	m_textureram = auto_alloc_array_clear(machine(), uint16_t, 0x00800000/2);
-	m_frameram = auto_alloc_array_clear(machine(), uint16_t, 0x00800000/2);
+	m_textureram = auto_alloc_array_clear(machine(), u16, 0x00800000/2);
+	m_frameram = auto_alloc_array_clear(machine(), u16, 0x00800000/2);
 
 	m_vr0vid->set_areas(m_textureram, m_frameram);
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 
 	if (this->clock() == 0)
 		fatalerror("%s: bus clock not setup properly",this->tag());
+
+	for (i = 0; i < 2; i++)
+		m_dma[i].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::dma_timer_cb),this), (void*)(uintptr_t)i);
 
 	for (i = 0; i < 4; i++)
 		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb),this), (void*)(uintptr_t)i);
@@ -180,24 +183,22 @@ void vrender0soc_device::device_start()
 	save_item(NAME(m_intst));
 	save_item(NAME(m_IntHigh));
 
-	save_pointer(NAME(m_timer_control), 4);
-	save_pointer(NAME(m_timer_count), 4);
-	save_item(NAME(m_dma[0].src));
-	save_item(NAME(m_dma[0].dst));
-	save_item(NAME(m_dma[0].size));
-	save_item(NAME(m_dma[0].ctrl));
-
-	save_item(NAME(m_dma[1].ctrl));
-	save_item(NAME(m_dma[1].src));
-	save_item(NAME(m_dma[1].dst));
-	save_item(NAME(m_dma[1].size));
+	save_item(NAME(m_timer_control));
+	save_item(NAME(m_timer_count));
+	save_item(STRUCT_MEMBER(m_dma, src));
+	save_item(STRUCT_MEMBER(m_dma, dst));
+	save_item(STRUCT_MEMBER(m_dma, size));
+	save_item(STRUCT_MEMBER(m_dma, ctrl));
+	save_item(STRUCT_MEMBER(m_dma, int_src));
+	save_item(STRUCT_MEMBER(m_dma, int_dst));
+	save_item(STRUCT_MEMBER(m_dma, int_cnt));
 
 #ifdef IDLE_LOOP_SPEEDUP
 	save_item(NAME(m_FlipCntRead));
 #endif
 }
 
-void vrender0soc_device::write_line_tx(int port, uint8_t value)
+void vrender0soc_device::write_line_tx(int port, u8 value)
 {
 	//printf("callback %d %02x\n",port,value);
 	write_tx[port & 1](value);
@@ -217,8 +218,13 @@ void vrender0soc_device::device_reset()
 	//m_FlipCount = 0;
 	m_IntHigh = 0;
 
-	m_dma[0].ctrl = 0;
-	m_dma[1].ctrl = 0;
+	for (int dma = 0; dma < 2; dma++)
+	{
+		m_dma[dma].timer->adjust(attotime::never);
+		m_dma[dma].ctrl = DMA_INTERNAL_WRITE;
+		m_dma[dma].src = m_dma[dma].dst = m_dma[dma].size = 0;
+		m_dma[dma].int_src = m_dma[dma].int_dst = m_dma[dma].int_cnt = 0;
+	}
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -242,22 +248,22 @@ void vrender0soc_device::device_reset()
  *
  */
 
-READ16_MEMBER(vrender0soc_device::textureram_r)
+u16 vrender0soc_device::textureram_r(offs_t offset)
 {
 	return m_textureram[offset];
 }
 
-WRITE16_MEMBER(vrender0soc_device::textureram_w)
+void vrender0soc_device::textureram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_textureram[offset]);
 }
 
-READ16_MEMBER(vrender0soc_device::frameram_r)
+u16 vrender0soc_device::frameram_r(offs_t offset)
 {
 	return m_frameram[offset];
 }
 
-WRITE16_MEMBER(vrender0soc_device::frameram_w)
+void vrender0soc_device::frameram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_frameram[offset]);
 }
@@ -268,12 +274,12 @@ WRITE16_MEMBER(vrender0soc_device::frameram_w)
  *
  */
 
-READ32_MEMBER(vrender0soc_device::intvec_r)
+u32 vrender0soc_device::intvec_r()
 {
 	return (m_IntHigh & 7) << 8;
 }
 
-WRITE32_MEMBER(vrender0soc_device::intvec_w)
+void vrender0soc_device::intvec_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -285,12 +291,12 @@ WRITE32_MEMBER(vrender0soc_device::intvec_w)
 		m_IntHigh = (data >> 8) & 7;
 }
 
-READ32_MEMBER( vrender0soc_device::inten_r )
+u32 vrender0soc_device::inten_r()
 {
 	return m_inten;
 }
 
-WRITE32_MEMBER( vrender0soc_device::inten_w )
+void vrender0soc_device::inten_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_inten);
 	// P'S Attack has a timer 0 irq service with no call to intvec_w but just this
@@ -299,12 +305,12 @@ WRITE32_MEMBER( vrender0soc_device::inten_w )
 		m_host_cpu->set_input_line(SE3208_INT, CLEAR_LINE);
 }
 
-READ32_MEMBER( vrender0soc_device::intst_r )
+u32 vrender0soc_device::intst_r()
 {
 	return m_intst;
 }
 
-WRITE32_MEMBER( vrender0soc_device::intst_w )
+void vrender0soc_device::intst_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// TODO: contradicts with documentation, games writes to this?
 	// ...
@@ -324,7 +330,7 @@ void vrender0soc_device::IntReq( int num )
 }
 
 
-uint8_t vrender0soc_device::irq_callback()
+u8 vrender0soc_device::irq_callback()
 {
 	for (int i = 0; i < 32; ++i)
 	{
@@ -354,8 +360,8 @@ WRITE_LINE_MEMBER(vrender0soc_device::soundirq_cb)
 
 void vrender0soc_device::TimerStart(int which)
 {
-	int PD = (m_timer_control[which] >> 8) & 0xff;
-	int TCV = m_timer_count[which] & 0xffff;
+	const int PD = (m_timer_control[which] >> 8) & 0xff;
+	const int TCV = m_timer_count[which] & 0xffff;
 	// TODO: documentation claims this is bus clock, may be slower than the CPU itself
 	attotime period = attotime::from_hz(this->clock()) * ((PD + 1) * (TCV + 1));
 	m_Timer[which]->adjust(period);
@@ -365,7 +371,7 @@ void vrender0soc_device::TimerStart(int which)
 
 TIMER_CALLBACK_MEMBER(vrender0soc_device::Timercb)
 {
-	int which = (int)(uintptr_t)ptr;
+	const int which = (int)(uintptr_t)ptr;
 	static const int num[] = { 0, 1, 9, 10 };
 
 	if (m_timer_control[which] & 2)
@@ -377,15 +383,15 @@ TIMER_CALLBACK_MEMBER(vrender0soc_device::Timercb)
 }
 
 template<int Which>
-READ32_MEMBER(vrender0soc_device::tmcon_r)
+u32 vrender0soc_device::tmcon_r()
 {
 	return m_timer_control[Which];
 }
 
 template<int Which>
-WRITE32_MEMBER(vrender0soc_device::tmcon_w)
+void vrender0soc_device::tmcon_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	uint32_t old = m_timer_control[Which];
+	u32 old = m_timer_control[Which];
 	data = COMBINE_DATA(&m_timer_control[Which]);
 
 	if ((data ^ old) & 1)
@@ -404,13 +410,13 @@ WRITE32_MEMBER(vrender0soc_device::tmcon_w)
 }
 
 template<int Which>
-READ16_MEMBER(vrender0soc_device::tmcnt_r)
+u16 vrender0soc_device::tmcnt_r()
 {
 	return m_timer_count[Which] & 0xffff;
 }
 
 template<int Which>
-WRITE16_MEMBER(vrender0soc_device::tmcnt_w)
+void vrender0soc_device::tmcnt_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_timer_count[Which]);
 }
@@ -422,66 +428,108 @@ WRITE16_MEMBER(vrender0soc_device::tmcnt_w)
  */
 
 // helper
-// bit 5 and bit 3 of the DMA control don't increment source/destination addresses if enabled.
+// bit 5 and bit 3 of the DMA control don't increment/decrement source/destination addresses if enabled.
 // At the time of writing P's Attack is the only SW that uses this feature,
 // in a work RAM to area $4500000 transfer, probably to extend something ...
-inline int vrender0soc_device::dma_setup_hold(uint8_t setting, uint8_t bitmask)
+static inline int dma_setup_hold_dec(u8 setting, u8 bitmask, u8 decmask)
 {
-	return setting & bitmask ? 0 : (setting & 2) ? 4 : (1 << (setting & 1));
+	const int inc = setting & bitmask ? 0 : (setting & 2) ? 4 : (1 << (setting & 1));
+	return setting & decmask ? -inc : inc;
 }
 
-template<int Which> READ32_MEMBER(vrender0soc_device::dmasa_r) { return m_dma[Which].src; }
-template<int Which> WRITE32_MEMBER(vrender0soc_device::dmasa_w) { COMBINE_DATA(&m_dma[Which].src); }
-template<int Which> READ32_MEMBER(vrender0soc_device::dmada_r) { return m_dma[Which].dst; }
-template<int Which> WRITE32_MEMBER(vrender0soc_device::dmada_w) { COMBINE_DATA(&m_dma[Which].dst); }
-template<int Which> READ32_MEMBER(vrender0soc_device::dmatc_r) { return m_dma[Which].size; }
-template<int Which> WRITE32_MEMBER(vrender0soc_device::dmatc_w) { COMBINE_DATA(&m_dma[Which].size); }
-template<int Which> READ32_MEMBER(vrender0soc_device::dmac_r) { return m_dma[Which].ctrl; }
-template<int Which>
-WRITE32_MEMBER(vrender0soc_device::dmac_w)
+template<int Which> u32 vrender0soc_device::dmasa_r() { return m_dma[Which].src; }
+template<int Which> void vrender0soc_device::dmasa_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (((data ^ m_dma[Which].ctrl) & (1 << 10)) && (data & (1 << 10)))   //DMAOn
+	COMBINE_DATA(&m_dma[Which].src);
+	if (m_dma[Which].ctrl & DMA_INTERNAL_WRITE) // write internal counter
+		m_dma[Which].int_src = m_dma[Which].src;
+}
+
+template<int Which> u32 vrender0soc_device::dmada_r() { return m_dma[Which].dst; }
+template<int Which> void vrender0soc_device::dmada_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_dma[Which].dst);
+	if (m_dma[Which].ctrl & DMA_INTERNAL_WRITE) // write internal counter
+		m_dma[Which].int_dst = m_dma[Which].dst;
+}
+
+template<int Which> u32 vrender0soc_device::dmatc_r() { return m_dma[Which].size; }
+template<int Which> void vrender0soc_device::dmatc_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	mem_mask &= 0xffffff; // 24 bit
+	COMBINE_DATA(&m_dma[Which].size);
+	m_dma[Which].int_cnt = m_dma[Which].size; // write internal counter?
+}
+
+template<int Which> u32 vrender0soc_device::dmac_r() { return m_dma[Which].ctrl; }
+template<int Which>
+void vrender0soc_device::dmac_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	const u32 old = m_dma[Which].ctrl;
+	data = COMBINE_DATA(&m_dma[Which].ctrl);
+	if ((!(old & DMA_ENABLE)) && (data & DMA_ENABLE))   //DMAOn
 	{
-		uint32_t const CTR = data;
-		uint32_t const SRC = m_dma[Which].src;
-		uint32_t const DST = m_dma[Which].dst;
-		uint32_t const CNT = m_dma[Which].size;
-		const int src_inc = dma_setup_hold(CTR, 0x20);
-		const int dst_inc = dma_setup_hold(CTR, 0x08);
+		m_dma[Which].int_src = m_dma[Which].src;
+		m_dma[Which].int_dst = m_dma[Which].dst;
+		m_dma[Which].int_cnt = m_dma[Which].size;
+		m_dma[Which].timer->adjust(attotime::from_hz(this->clock())); // TODO: timing?
+	}
+}
 
-		if ((CTR & 0xd4) != 0)
-			popmessage("DMA%d with unhandled mode %02x, contact MAMEdev",Which,CTR);
-
-		if (CTR & 0x2)  //32 bits
+TIMER_CALLBACK_MEMBER(vrender0soc_device::dma_timer_cb)
+{
+	const int which = (int)(uintptr_t)ptr;
+	if (m_dma[which].ctrl & DMA_ENABLE)
+	{
+		if (m_dma[which].int_cnt <= 0)
 		{
-			for (int i = 0; i < CNT; ++i)
+			IntReq(7 + which); // TODO: not for repeat mode?
+			if (m_dma[which].ctrl & DMA_REPEAT) // repeat mode
 			{
-				uint32_t v = m_host_space->read_dword(SRC + i * src_inc);
-				m_host_space->write_dword(DST + i * dst_inc, v);
+				m_dma[which].int_cnt = m_dma[which].size; // reload counter
+				if (m_dma[which].ctrl & DMA_RELOAD_ADDR) // reload address
+				{
+					m_dma[which].int_src = m_dma[which].src;
+					m_dma[which].int_dst = m_dma[which].dst;
+				}
+			}
+			else // single transfer mode
+			{
+				m_dma[which].ctrl &= ~DMA_ENABLE;
+				m_dma[which].size = 0;
+				m_dma[which].timer->adjust(attotime::never);
+				return;
 			}
 		}
-		else if (CTR & 0x1) //16 bits
+		u32 const CTR = m_dma[which].ctrl;
+		u32 const SRC = m_dma[which].int_src;
+		u32 const DST = m_dma[which].int_dst;
+		const int src_inc = dma_setup_hold_dec(CTR, DMA_SRCHOLD, DMA_SRCDEC);
+		const int dst_inc = dma_setup_hold_dec(CTR, DMA_DSTHOLD, DMA_DSTDEC);
+
+		if (CTR & DMA_32BIT)  //32 bits
 		{
-			for (int i = 0; i < CNT; ++i)
-			{
-				uint16_t v = m_host_space->read_word(SRC + i * src_inc);
-				m_host_space->write_word(DST + i * dst_inc, v);
-			}
+			const u32 v = m_host_space->read_dword(SRC);
+			m_host_space->write_dword(DST, v);
+		}
+		else if (CTR & DMA_16BIT) //16 bits
+		{
+			const u16 v = m_host_space->read_word(SRC);
+			m_host_space->write_word(DST, v);
 		}
 		else    //8 bits
 		{
-			for (int i = 0; i < CNT; ++i)
-			{
-				uint8_t v = m_host_space->read_byte(SRC + i * src_inc);
-				m_host_space->write_byte(DST + i * dst_inc, v);
-			}
+			const u8 v = m_host_space->read_byte(SRC);
+			m_host_space->write_byte(DST, v);
 		}
-		data &= ~(1 << 10);
-		// TODO: insta-DMA
-		m_dma[Which].size = 0;
-		IntReq(7 + Which);
+
+		m_dma[which].int_src += src_inc;
+		m_dma[which].int_dst += dst_inc;
+		m_dma[which].int_cnt--;
+		m_dma[which].timer->adjust(attotime::from_hz(this->clock())); // TODO: timing?
 	}
-	COMBINE_DATA(&m_dma[Which].ctrl);
+	else
+		m_dma[which].timer->adjust(attotime::never);
 }
 
 /*
@@ -490,11 +538,11 @@ WRITE32_MEMBER(vrender0soc_device::dmac_w)
  *
  */
 
-READ32_MEMBER(vrender0soc_device::crtc_r)
+u32 vrender0soc_device::crtc_r(offs_t offset)
 {
-	uint32_t res = m_crtcregs[offset];
-	uint32_t hdisp = (m_crtcregs[0x0c / 4] + 1);
-	uint32_t vdisp = (m_crtcregs[0x1c / 4] + 1);
+	u32 res = m_crtcregs[offset];
+	u32 hdisp = (m_crtcregs[0x0c / 4] + 1);
+	u32 vdisp = (m_crtcregs[0x1c / 4] + 1);
 	switch (offset)
 	{
 		case 0: // CRTC Status / Mode
@@ -516,12 +564,12 @@ READ32_MEMBER(vrender0soc_device::crtc_r)
 	return res;
 }
 
-WRITE32_MEMBER(vrender0soc_device::crtc_w)
+void vrender0soc_device::crtc_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (((m_crtcregs[0] & 0x0100) == 0x0100) && (offset > 0) && (offset < 0x28/4)) // Write protect
 		return;
 
-	uint32_t old = m_crtcregs[offset];
+	u32 old = m_crtcregs[offset];
 	switch (offset * 4)
 	{
 		case 0: // CRTC Status / Mode Register (CRTMOD)
@@ -607,8 +655,8 @@ bool vrender0soc_device::crt_active_vblank_irq()
 
 void vrender0soc_device::crtc_update()
 {
-	uint32_t hdisp = m_crtcregs[0x0c / 4] + 1;
-	uint32_t vdisp = m_crtcregs[0x1c / 4];
+	u32 hdisp = m_crtcregs[0x0c / 4] + 1;
+	u32 vdisp = m_crtcregs[0x1c / 4];
 	if (hdisp == 0 || vdisp == 0)
 		return;
 
@@ -617,8 +665,8 @@ void vrender0soc_device::crtc_update()
 	if (interlace_mode)
 		vdisp <<= 1;
 
-	uint32_t htot = (m_crtcregs[0x20 / 4] & 0x3ff) + 1;
-	uint32_t vtot = (m_crtcregs[0x24 / 4] & 0x7ff);
+	u32 htot = (m_crtcregs[0x20 / 4] & 0x3ff) + 1;
+	u32 vtot = (m_crtcregs[0x24 / 4] & 0x7ff);
 
 	// adjust htotal in case it's not setup by the game
 	// (datasheet mentions that it can be done automatically shrug):
@@ -628,9 +676,9 @@ void vrender0soc_device::crtc_update()
 	// TODO: we may as well just ditch reading from HTOTAL and VTOTAL and use these instead
 	if (htot <= 1 || htot <= hdisp)
 	{
-		uint32_t hbp = (m_crtcregs[0x08 / 4] & 0xff00) >> 8;
-		uint32_t hsw = (m_crtcregs[0x08 / 4] & 0xff);
-		uint32_t hsfp = m_crtcregs[0x10 / 4] & 0xff;
+		u32 hbp = (m_crtcregs[0x08 / 4] & 0xff00) >> 8;
+		u32 hsw = (m_crtcregs[0x08 / 4] & 0xff);
+		u32 hsfp = m_crtcregs[0x10 / 4] & 0xff;
 		if (hbp == 0 && hsw == 0 && hsfp == 0)
 			return;
 
@@ -641,7 +689,7 @@ void vrender0soc_device::crtc_update()
 	// urachamu
 	if (vtot == 0)
 	{
-		uint32_t vbp = (m_crtcregs[0x08 / 4] & 0xff);
+		u32 vbp = (m_crtcregs[0x08 / 4] & 0xff);
 		if (vbp == 0)
 			return;
 
@@ -650,7 +698,7 @@ void vrender0soc_device::crtc_update()
 	}
 
 	// ext vclk set up by Sealy games in menghong.cpp
-	uint32_t pixel_clock = (BIT(m_crtcregs[0x04 / 4], 3)) ? 14318180 : m_ext_vclk;
+	u32 pixel_clock = (BIT(m_crtcregs[0x04 / 4], 3)) ? 14318180 : m_ext_vclk;
 	if (pixel_clock == 0)
 		fatalerror("%s: Accessing external vclk in CRTC parameters, please set it up via setter in config\n",this->tag());
 
@@ -682,7 +730,7 @@ void vrender0soc_device::crtc_update()
 }
 
 // accessed by cross puzzle
-READ32_MEMBER(vrender0soc_device::sysid_r)
+u32 vrender0soc_device::sysid_r()
 {
 	// Device ID: VRender0+ -> 0x0a
 	// Revision Number -> 0x00
@@ -690,7 +738,7 @@ READ32_MEMBER(vrender0soc_device::sysid_r)
 	return 0x00000a00;
 }
 
-READ32_MEMBER(vrender0soc_device::cfgr_r)
+u32 vrender0soc_device::cfgr_r()
 {
 	// TODO: this truly needs real HW verification,
 	//       only Cross Puzzle reads this so far so leaving a logerror
@@ -708,7 +756,7 @@ READ32_MEMBER(vrender0soc_device::cfgr_r)
  *
  */
 
-uint32_t vrender0soc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 vrender0soc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (crt_is_blanked()) // Blank Screen
 	{
