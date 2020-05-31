@@ -169,7 +169,7 @@ private:
 	{
 		DMA_ENABLE         = (1 << 10), // DMA enable
 		DMA_POLARITY       = (1 << 9), // DMA polarity, not implemented
-		DMA_INTERNAL_WRITE = (1 << 8), // Enable writing DMASA, DMADA register and internal counter
+		DMA_INTERNAL_WRITE = (1 << 8), // Enable writing DMASA, DMADA register and internal counter simultaneously
 		DMA_REPEAT         = (1 << 7), // DMA repeat mode
 		DMA_RELOAD_ADDR    = (1 << 6), // Reload address in DMA repeat mode
 		DMA_SRCHOLD        = (1 << 5), // Hold source address
