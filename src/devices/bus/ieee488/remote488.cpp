@@ -487,32 +487,24 @@ void remote488_device::update_signals_from_rem(uint8_t to_set , uint8_t to_clear
 	m_in_signals |= to_set;
 	m_in_signals &= ~to_clear;
 	diff ^= m_in_signals;
-	m_out_signals = m_in_signals;
 
 	//LOG("REM SIG %02x %02x\n" , m_in_signals , diff);
 	m_no_propagation = true;
-	uint8_t tmp = m_out_signals;
 
 	if (BIT(diff , SIGNAL_ATN_BIT)) {
 		m_bus->atn_w(this , BIT(m_in_signals , SIGNAL_ATN_BIT));
-		COPY_BIT(m_bus->atn_r() , tmp , SIGNAL_ATN_BIT);
 	}
 	if (BIT(diff , SIGNAL_IFC_BIT)) {
 		m_bus->ifc_w(this , BIT(m_in_signals , SIGNAL_IFC_BIT));
-		COPY_BIT(m_bus->ifc_r() , tmp , SIGNAL_IFC_BIT);
 	}
 	if (BIT(diff , SIGNAL_REN_BIT)) {
 		m_bus->ren_w(this , BIT(m_in_signals , SIGNAL_REN_BIT));
-		COPY_BIT(m_bus->ren_r() , tmp , SIGNAL_REN_BIT);
 	}
 	if (BIT(diff , SIGNAL_SRQ_BIT)) {
 		m_bus->srq_w(this , BIT(m_in_signals , SIGNAL_SRQ_BIT));
-		COPY_BIT(m_bus->srq_r() , tmp , SIGNAL_SRQ_BIT);
 	}
 
 	m_no_propagation = false;
-
-	update_state(tmp);
 }
 
 void remote488_device::update_signal(signal_bit bit , int state)
