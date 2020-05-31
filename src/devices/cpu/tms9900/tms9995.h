@@ -3,7 +3,7 @@
 /*
   tms9995.h
 
-  See tms9995.c for documentation
+  See tms9995.cpp for documentation
   Also see tms9900.h for types of TMS99xx processors.
 */
 
