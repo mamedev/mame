@@ -122,13 +122,13 @@ DEFINE_DEVICE_TYPE(ISA16_SAD8852, isa16_sad8852_device, "sad8852", "SAD8852 IBM 
 //-------------------------------------------------
 //  Access methods from ISA bus
 //-------------------------------------------------
-READ8_MEMBER( isa16_sad8852_device::sad8852_r )
+uint8_t isa16_sad8852_device::sad8852_r(offs_t offset)
 {
 	LOG("%s sad8852_r(): offset=%d\n", FUNCNAME, offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER( isa16_sad8852_device::sad8852_w )
+void isa16_sad8852_device::sad8852_w(offs_t offset, uint8_t data)
 {
 	LOG("%s : offset=%d data=0x%02x\n", FUNCNAME, offset, data);
 }
@@ -236,8 +236,8 @@ void isa16_sad8852_device::device_reset()
 	{
 		m_isa->install_device(
 				0x378, 0x378, // Wrong, need to find real i/o addresses
-				read8_delegate(*this, FUNC(isa16_sad8852_device::sad8852_r)),
-				write8_delegate(*this, FUNC(isa16_sad8852_device::sad8852_w)));
+				read8sm_delegate(*this, FUNC(isa16_sad8852_device::sad8852_r)),
+				write8sm_delegate(*this, FUNC(isa16_sad8852_device::sad8852_w)));
 		m_irq = m_isairq->read();
 		m_installed = true;
 	}

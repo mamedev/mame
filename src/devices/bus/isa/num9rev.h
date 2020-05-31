@@ -37,18 +37,18 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(pal8_r);
-	DECLARE_WRITE8_MEMBER(pal8_w);
-	DECLARE_READ8_MEMBER(pal12_r);
-	DECLARE_WRITE8_MEMBER(pal12_w);
-	DECLARE_READ8_MEMBER(overlay_r);
-	DECLARE_WRITE8_MEMBER(overlay_w);
-	DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(ctrl_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_READ8_MEMBER(read8);
-	DECLARE_WRITE8_MEMBER(write8);
+	uint8_t pal8_r(offs_t offset);
+	void pal8_w(offs_t offset, uint8_t data);
+	uint8_t pal12_r(offs_t offset);
+	void pal12_w(offs_t offset, uint8_t data);
+	uint8_t overlay_r(offs_t offset);
+	void overlay_w(offs_t offset, uint8_t data);
+	uint8_t bank_r();
+	void bank_w(uint8_t data);
+	uint8_t ctrl_r(offs_t offset);
+	void ctrl_w(offs_t offset, uint8_t data);
+	uint8_t read8(offs_t offset);
+	void write8(offs_t offset, uint8_t data);
 
 	void upd7220_map(address_map &map);
 

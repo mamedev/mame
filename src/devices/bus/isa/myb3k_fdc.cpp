@@ -227,7 +227,7 @@ void isa8_myb3k_fdc471x_device_base::eop_w(int state)
 //--------------------------------------------------------
 //  myb3k_inv_fdc_data_r - a LS240 inverts databus for FDC
 //--------------------------------------------------------
-READ8_MEMBER( isa8_myb3k_fdc471x_device_base::myb3k_inv_fdc_data_r )
+uint8_t isa8_myb3k_fdc471x_device_base::myb3k_inv_fdc_data_r(offs_t offset)
 {
 	uint8_t tmp = m_fdc->read(offset);
 	LOGR("%s: %02x -> %02x\n", FUNCNAME, tmp, (~tmp) & 0xff);
@@ -237,7 +237,7 @@ READ8_MEMBER( isa8_myb3k_fdc471x_device_base::myb3k_inv_fdc_data_r )
 //--------------------------------------------------------
 //  myb3k_inv_fdc_data_w - a LS240 inverts databus for FDC
 //--------------------------------------------------------
-WRITE8_MEMBER( isa8_myb3k_fdc471x_device_base::myb3k_inv_fdc_data_w )
+void isa8_myb3k_fdc471x_device_base::myb3k_inv_fdc_data_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: %02x -> %02x\n", FUNCNAME, data, (~data) & 0xff);
 	m_fdc->write(offset, (~data) & 0xff);
@@ -247,7 +247,7 @@ WRITE8_MEMBER( isa8_myb3k_fdc471x_device_base::myb3k_inv_fdc_data_w )
 //  myb3k_fdc_command - descrete fdc card features
 //-------------------------------------------------
 
-WRITE8_MEMBER( isa8_myb3k_fdc471x_device_base::myb3k_fdc_command )
+void isa8_myb3k_fdc471x_device_base::myb3k_fdc_command(uint8_t data)
 {
 	LOG("%s: %02x\n", FUNCNAME, data);
 
@@ -282,10 +282,10 @@ WRITE8_MEMBER( isa8_myb3k_fdc471x_device_base::myb3k_fdc_command )
 	m_fdc->dden_w(dden ? 0 : 1); // active low == MFM
 }
 
-WRITE8_MEMBER( isa8_myb3k_fdc4712_device::myb3k_fdc_command )
+void isa8_myb3k_fdc4712_device::myb3k_fdc_command(uint8_t data)
 {
 	selected_drive = data & FDC_DRIVE_SEL;
-	isa8_myb3k_fdc471x_device_base::myb3k_fdc_command(space, offset, data, mem_mask);
+	isa8_myb3k_fdc471x_device_base::myb3k_fdc_command(data);
 }
 
 //-------------------------------------------------
@@ -293,7 +293,7 @@ WRITE8_MEMBER( isa8_myb3k_fdc4712_device::myb3k_fdc_command )
 //-------------------------------------------------
 #define FDC_MSM_END_IR 0x01
 
-READ8_MEMBER( isa8_myb3k_fdc471x_device_base::myb3k_fdc_status )
+uint8_t isa8_myb3k_fdc471x_device_base::myb3k_fdc_status()
 {
 	LOG("%s\n", FUNCNAME);
 
@@ -301,9 +301,9 @@ READ8_MEMBER( isa8_myb3k_fdc471x_device_base::myb3k_fdc_status )
 	return 0x00;
 }
 
-READ8_MEMBER( isa8_myb3k_fdc4712_device::myb3k_fdc_status )
+uint8_t isa8_myb3k_fdc4712_device::myb3k_fdc_status()
 {
-	uint8_t status = isa8_myb3k_fdc471x_device_base::myb3k_fdc_status(space, offset, mem_mask);
+	uint8_t status = isa8_myb3k_fdc471x_device_base::myb3k_fdc_status();
 
 	auto floppy_connector = m_floppy_connectors[selected_drive];
 	floppy_image_device *floppy = nullptr;

@@ -310,7 +310,7 @@ void omti8621_device::device_reset()
 		int esdi_base = io_bases[m_iobase->read() & 7];
 
 		// install the ESDI ports
-		m_isa->install16_device(esdi_base, esdi_base + 7, read16_delegate(*this, FUNC(omti8621_device::read)), write16_delegate(*this, FUNC(omti8621_device::write)));
+		m_isa->install16_device(esdi_base, esdi_base + 7, read16s_delegate(*this, FUNC(omti8621_device::read)), write16s_delegate(*this, FUNC(omti8621_device::write)));
 
 		// and the onboard AT FDC ports
 		if (m_iobase->read() & 8)
@@ -1033,16 +1033,16 @@ void omti8621_device::set_data(uint16_t data)
  OMTI8621 Disk Controller-AT Registers
 ***************************************************************************/
 
-WRITE16_MEMBER(omti8621_device::write)
+void omti8621_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (mem_mask)
 	{
 		case 0x00ff:
-			write8(space, offset*2, data, mem_mask);
+			write8(offset*2, data);
 			break;
 
 		case 0xff00:
-			write8(space, offset*2+1, data>>8, mem_mask>>8);
+			write8(offset*2+1, data>>8);
 			break;
 
 		default:
@@ -1051,7 +1051,7 @@ WRITE16_MEMBER(omti8621_device::write)
 	}
 }
 
-WRITE8_MEMBER(omti8621_device::write8)
+void omti8621_device::write8(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1145,20 +1145,20 @@ WRITE8_MEMBER(omti8621_device::write8)
 	}
 }
 
-READ16_MEMBER(omti8621_device::read)
+uint16_t omti8621_device::read(offs_t offset, uint16_t mem_mask)
 {
 	switch (mem_mask)
 	{
 		case 0x00ff:
-			return read8(space, offset*2, mem_mask);
+			return read8(offset*2);
 		case 0xff00:
-			return read8(space, offset*2+1, mem_mask >> 8) << 8;
+			return read8(offset*2+1) << 8;
 		default:
 			return get_data();
 	}
 }
 
-READ8_MEMBER(omti8621_device::read8)
+uint8_t omti8621_device::read8(offs_t offset)
 {
 	uint8_t data = 0xff;
 	static uint8_t last_data = 0xff;

@@ -273,7 +273,7 @@ WRITE_LINE_MEMBER(isa8_ibm_mfc_device::ibm_mfc_ym_irq)
 //  ISA interface
 //-------------------------------------------------
 
-READ8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_r )
+uint8_t isa8_ibm_mfc_device::ibm_mfc_r(offs_t offset)
 {
 	uint8_t val;
 
@@ -306,7 +306,7 @@ READ8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_r )
 	return val;
 }
 
-WRITE8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_w )
+void isa8_ibm_mfc_device::ibm_mfc_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -462,7 +462,7 @@ isa8_ibm_mfc_device::isa8_ibm_mfc_device(const machine_config &mconfig, const ch
 void isa8_ibm_mfc_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x2a20, 0x2a20 + 15, read8_delegate(*this, FUNC(isa8_ibm_mfc_device::ibm_mfc_r)), write8_delegate(*this, FUNC(isa8_ibm_mfc_device::ibm_mfc_w)));
+	m_isa->install_device(0x2a20, 0x2a20 + 15, read8sm_delegate(*this, FUNC(isa8_ibm_mfc_device::ibm_mfc_r)), write8sm_delegate(*this, FUNC(isa8_ibm_mfc_device::ibm_mfc_w)));
 }
 
 

@@ -14,13 +14,14 @@
 
 DEFINE_DEVICE_TYPE(ISA8_STEREO_FX, stereo_fx_device, "stereo_fx", "ATi Stereo F/X Audio Adapter")
 
-READ8_MEMBER( stereo_fx_device::dev_dsp_data_r )
+uint8_t stereo_fx_device::dev_dsp_data_r()
 {
-	m_data_in = false;
+	if (!machine().side_effects_disabled())
+		m_data_in = false;
 	return m_in_byte;
 }
 
-WRITE8_MEMBER( stereo_fx_device::dev_dsp_data_w )
+void stereo_fx_device::dev_dsp_data_w(uint8_t data)
 {
 	m_data_out = true;
 	m_out_byte = data;
@@ -48,12 +49,12 @@ void stereo_fx_device::p3_w(uint8_t data)
 	m_t1 = (data & 0x20) >> 5;
 }
 
-WRITE8_MEMBER( stereo_fx_device::dev_host_irq_w )
+void stereo_fx_device::dev_host_irq_w(uint8_t data)
 {
 	m_isa->irq5_w(1);
 }
 
-WRITE8_MEMBER( stereo_fx_device::raise_drq_w )
+void stereo_fx_device::raise_drq_w(uint8_t data)
 {
 	m_isa->drq1_w(1);
 }
@@ -68,7 +69,7 @@ WRITE8_MEMBER( stereo_fx_device::raise_drq_w )
  * bit6 -
  * bit7 -
 */
-WRITE8_MEMBER( stereo_fx_device::port20_w )
+void stereo_fx_device::port20_w(uint8_t data)
 {
 	m_port20 = data;
 }
@@ -83,7 +84,7 @@ WRITE8_MEMBER( stereo_fx_device::port20_w )
  * bit6 -
  * bit7 -
 */
-WRITE8_MEMBER( stereo_fx_device::port00_w )
+void stereo_fx_device::port00_w(uint8_t data)
 {
 	m_port00 = data;
 }
@@ -142,13 +143,14 @@ void stereo_fx_device::device_add_mconfig(machine_config &config)
 	PC_JOY(config, m_joy);
 }
 
-READ8_MEMBER( stereo_fx_device::dsp_data_r )
+uint8_t stereo_fx_device::dsp_data_r()
 {
-	m_data_out = false;
+	if (!machine().side_effects_disabled())
+		m_data_out = false;
 	return m_out_byte;
 }
 
-WRITE8_MEMBER( stereo_fx_device::dsp_cmd_w )
+void stereo_fx_device::dsp_cmd_w(uint8_t data)
 {
 	m_data_in = true;
 	m_in_byte = data;
@@ -168,31 +170,33 @@ void stereo_fx_device::dack_w(int line, uint8_t data)
 	m_in_byte = data;
 }
 
-WRITE8_MEMBER( stereo_fx_device::dsp_reset_w )
+void stereo_fx_device::dsp_reset_w(uint8_t data)
 {
 	device_reset();
 	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-READ8_MEMBER( stereo_fx_device::dsp_wbuf_status_r )
+uint8_t stereo_fx_device::dsp_wbuf_status_r()
 {
 	return m_data_in << 7;
 }
 
-READ8_MEMBER( stereo_fx_device::dsp_rbuf_status_r )
+uint8_t stereo_fx_device::dsp_rbuf_status_r()
 {
-	m_isa->irq5_w(0);
+	if (!machine().side_effects_disabled())
+		m_isa->irq5_w(0);
 	return m_data_out << 7;
 }
 
-WRITE8_MEMBER( stereo_fx_device::invalid_w )
+void stereo_fx_device::invalid_w(uint8_t data)
 {
 	logerror("stereo fx: invalid port write\n");
 }
 
-READ8_MEMBER( stereo_fx_device::invalid_r )
+uint8_t stereo_fx_device::invalid_r()
 {
-	logerror("stereo fx: invalid port read\n");
+	if (!machine().side_effects_disabled())
+		logerror("stereo fx: invalid port read\n");
 	return 0xff;
 }
 
@@ -211,10 +215,10 @@ void stereo_fx_device::device_start()
 	set_isa_device();
 
 	m_isa->install_device(0x0200, 0x0207, read8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
-	m_isa->install_device(0x0226, 0x0227, read8_delegate(*this, FUNC(stereo_fx_device::invalid_r)), write8_delegate(*this, FUNC(stereo_fx_device::dsp_reset_w)));
-	m_isa->install_device(0x022a, 0x022b, read8_delegate(*this, FUNC(stereo_fx_device::dsp_data_r)), write8_delegate(*this, FUNC(stereo_fx_device::invalid_w)));
-	m_isa->install_device(0x022c, 0x022d, read8_delegate(*this, FUNC(stereo_fx_device::dsp_wbuf_status_r)), write8_delegate(*this, FUNC(stereo_fx_device::dsp_cmd_w)));
-	m_isa->install_device(0x022e, 0x022f, read8_delegate(*this, FUNC(stereo_fx_device::dsp_rbuf_status_r)), write8_delegate(*this, FUNC(stereo_fx_device::invalid_w)));
+	m_isa->install_device(0x0226, 0x0227, read8smo_delegate(*this, FUNC(stereo_fx_device::invalid_r)), write8smo_delegate(*this, FUNC(stereo_fx_device::dsp_reset_w)));
+	m_isa->install_device(0x022a, 0x022b, read8smo_delegate(*this, FUNC(stereo_fx_device::dsp_data_r)), write8smo_delegate(*this, FUNC(stereo_fx_device::invalid_w)));
+	m_isa->install_device(0x022c, 0x022d, read8smo_delegate(*this, FUNC(stereo_fx_device::dsp_wbuf_status_r)), write8smo_delegate(*this, FUNC(stereo_fx_device::dsp_cmd_w)));
+	m_isa->install_device(0x022e, 0x022f, read8smo_delegate(*this, FUNC(stereo_fx_device::dsp_rbuf_status_r)), write8smo_delegate(*this, FUNC(stereo_fx_device::invalid_w)));
 	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(ym3812, FUNC(ym3812_device::read)), write8sm_delegate(ym3812, FUNC(ym3812_device::write)));
 	m_isa->install_device(0x0228, 0x0229, read8sm_delegate(ym3812, FUNC(ym3812_device::read)), write8sm_delegate(ym3812, FUNC(ym3812_device::write)));
 	m_timer = timer_alloc();

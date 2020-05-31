@@ -20,10 +20,10 @@ public:
 	// construction/destruction
 	isa8_epc_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(io_read);
-	DECLARE_WRITE8_MEMBER(io_write);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(mode_control_w);
+	uint8_t io_read(offs_t offset);
+	void io_write(offs_t offset, uint8_t data);
+	uint8_t status_r();
+	void mode_control_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 

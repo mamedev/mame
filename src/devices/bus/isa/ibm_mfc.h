@@ -59,8 +59,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( ibm_mfc_ym_irq );
 
-	DECLARE_READ8_MEMBER( ibm_mfc_r );
-	DECLARE_WRITE8_MEMBER( ibm_mfc_w );
+	uint8_t ibm_mfc_r(offs_t offset);
+	void ibm_mfc_w(offs_t offset, uint8_t data);
 
 	void io_map(address_map &map);
 	void prg_map(address_map &map);

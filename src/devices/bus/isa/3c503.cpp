@@ -32,8 +32,8 @@ void el2_3c503_device::device_start() {
 	memset(m_rom, 0, 8*1024); // empty
 	m_dp8390->set_mac(mac);
 	set_isa_device();
-	m_isa->install_device(0x0300, 0x030f, read8_delegate(*this, FUNC(el2_3c503_device::el2_3c503_loport_r)), write8_delegate(*this, FUNC(el2_3c503_device::el2_3c503_loport_w)));
-	m_isa->install_device(0x0700, 0x070f, read8_delegate(*this, FUNC(el2_3c503_device::el2_3c503_hiport_r)), write8_delegate(*this, FUNC(el2_3c503_device::el2_3c503_hiport_w)));
+	m_isa->install_device(0x0300, 0x030f, read8sm_delegate(*this, FUNC(el2_3c503_device::el2_3c503_loport_r)), write8sm_delegate(*this, FUNC(el2_3c503_device::el2_3c503_loport_w)));
+	m_isa->install_device(0x0700, 0x070f, read8sm_delegate(*this, FUNC(el2_3c503_device::el2_3c503_hiport_r)), write8sm_delegate(*this, FUNC(el2_3c503_device::el2_3c503_hiport_w)));
 
 	// TODO: This is wrong, fix if anything actually uses it
 	//  DMA can change in runtime
@@ -107,7 +107,7 @@ void el2_3c503_device::dack_w(int line, uint8_t data) {
 	el2_3c503_mem_write(m_regs.da++, data);
 }
 
-READ8_MEMBER(el2_3c503_device::el2_3c503_loport_r) {
+uint8_t el2_3c503_device::el2_3c503_loport_r(offs_t offset) {
 	switch((m_regs.ctrl >> 2) & 3) {
 	case 0:
 		m_dp8390->dp8390_cs(CLEAR_LINE);
@@ -122,7 +122,7 @@ READ8_MEMBER(el2_3c503_device::el2_3c503_loport_r) {
 	return 0;
 }
 
-WRITE8_MEMBER(el2_3c503_device::el2_3c503_loport_w) {
+void el2_3c503_device::el2_3c503_loport_w(offs_t offset, uint8_t data) {
 	switch((m_regs.ctrl >> 2) & 3) {
 	case 0:
 		m_dp8390->dp8390_cs(CLEAR_LINE);
@@ -137,7 +137,7 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_loport_w) {
 	}
 }
 
-READ8_MEMBER(el2_3c503_device::el2_3c503_hiport_r) {
+uint8_t el2_3c503_device::el2_3c503_hiport_r(offs_t offset) {
 	switch(offset) {
 	case 0:
 		return m_regs.pstr;
@@ -177,7 +177,7 @@ READ8_MEMBER(el2_3c503_device::el2_3c503_hiport_r) {
 	return 0;
 }
 
-WRITE8_MEMBER(el2_3c503_device::el2_3c503_hiport_w) {
+void el2_3c503_device::el2_3c503_hiport_w(offs_t offset, uint8_t data) {
 	switch(offset) {
 	case 0:
 		m_regs.pstr = data;  // pstr and pspr are supposed to be set same as 8390 pstart and pstop
