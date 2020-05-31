@@ -164,6 +164,7 @@ private:
 	u8 m_alusta;
 	u8 m_cpusta;
 	u8 m_intsta;
+	u8 m_intsample;
 	u16 m_tblptr;
 	u16 m_tablat;
 	u16 m_tlwt;
