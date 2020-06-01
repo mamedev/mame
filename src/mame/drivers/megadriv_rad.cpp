@@ -180,6 +180,11 @@ ROM_START( rad_gen1 )
 	ROM_LOAD16_WORD_SWAP( "radicav1.bin", 0x000000, 0x400000,  CRC(3b4c8438) SHA1(5ed9c053f9ebc8d4bf571d57e562cf347585d158) )
 ROM_END
 
+ROM_START( rad_gen2 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "genesisred.bin", 0x000000, 0x400000, CRC(7c1a0f0e) SHA1(a6441f75a4cd48f1563aeafdfbdde00202d4067c) )
+ROM_END
+
 ROM_START( rad_ssoc )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "sensiblesoccer.bin", 0x000000, 0x400000,  CRC(b8745ab3) SHA1(0ab3f26e5ffd288e5a3a5db676951b9095299eb0) ) // should be byteswapped?
@@ -209,9 +214,10 @@ void megadriv_radica_state::init_megadriv_radica_6button_ntsc()
 	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
 }
 
-CONS( 2004, rad_sonic, 0,     0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (USA)", 0)
 
 CONS( 2004, rad_gen1,  0,     0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
+CONS( 2004, rad_gen2,  0,     0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 2 (Radica, Arcade Legends) (USA)", 0)
+CONS( 2004, rad_sonic, 0,     0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (USA)", 0) // box calls this Volume 3
 
 CONS( 2004, rad_sf2,   0,     0, megadriv_radica_6button_ntsc, megadriv_radica_6button,         megadriv_radica_state, init_megadriv_radica_6button_ntsc,"Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (USA)", 0)
 CONS( 2004, rad_sf2p, rad_sf2,0, megadriv_radica_6button_pal,  megadriv_radica_6button,         megadriv_radica_state, init_megadriv_radica_6button_pal, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (Europe)", 0)

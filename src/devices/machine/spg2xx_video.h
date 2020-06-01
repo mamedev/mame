@@ -83,7 +83,7 @@ protected:
 	uint8_t m_rgb5_to_rgb8[32];
 	uint32_t m_rgb555_to_rgb888[0x8000];
 
-	int m_ycmp_table[480];
+	uint32_t m_ycmp_table[480];
 	void update_vcmp_table();
 
 	uint16_t m_video_regs[0x100];
