@@ -34,9 +34,9 @@
 
 #include "pconfig.h"
 
+#include <algorithm>
 #include <cstdint> // uintptr_t
 #include <utility>
-#include <algorithm>
 
 //============================================================
 //  Macro magic
@@ -97,6 +97,8 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wundefined-reinterpret-cast"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif
 
 #if (PPMF_TYPE == PPMF_TYPE_GNUC_PMF_CONV)
@@ -144,7 +146,7 @@ namespace plib {
 				auto *o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 
 				// if the low bit of the vtable index is clear, then it is just a raw function pointer
-				if (!(m_function & 1))
+				if ((m_function & 1) == 0)
 					func = reinterpret_cast<generic_function>(m_function);
 				else
 				{

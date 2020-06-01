@@ -51,7 +51,7 @@ TIDY_SOURCES = $(SOURCES)
 
 #TIDY_SOURCES = $(SRC)/devices/nld_7442.cpp $(SRC)/devices/nld_7492.cpp
 
-#TIDY_FLAGS = -checks=llvm-include-order,llvm-namespace-comment,modernize-use-override,modernize-use-using -fix
+#TIDY_FLAGS = -p $(OBJ) -checks=llvm-include-order,llvm-namespace-comment,modernize-use-override,modernize-use-using -fix
 #TIDY_FLAGS = -checks=llvm-include-order -fix
 #TIDY_FLAGS = -checks=llvm-namespace-comment -fix
 #TIDY_FLAGS = -checks=modernize-use-override -fix
@@ -72,10 +72,10 @@ endif
 TIDY_DB = $(OBJ)/compile_commands.json
 
 
-# LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
+#LTO decreases performance :-(
+#LTO = -flto=4  -fuse-linker-plugin -Wodr
 
 CCOREFLAGS = -g -O3 -std=c++14 -I$(CURDIR)/.. -I$(CURDIR)/../..
-
 
 CFLAGS =  $(LTO) $(CCOREFLAGS) $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++14 $(LDEXTRAFLAGS)
@@ -85,7 +85,7 @@ CC = g++
 LD = @g++
 MD = @mkdir
 RM = @rm
-CLANG_TIDY = clang-tidy-11
+CLANG_TIDY = clang-tidy-10
 DEPENDCC=$(CC)
 
 
@@ -232,7 +232,7 @@ ALL_TIDY_FILES = $(ALL_OBJS:.o=.json)
 SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
 ALLFILES = $(SOURCES) $(VSBUILDS) $(DOCS)
 
-MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw nvcc clang-libc
+MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree
 
 
 # git archive HEAD --prefix=project-name-version/ \
@@ -242,7 +242,7 @@ MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw nvcc clang-libc
 # PHONY
 #-------------------------------------------------
 
-.PHONY: clang clang-5 mingw doc native maketree $(DEPEND) depend 
+.PHONY: all gcc9 clang clang-5 mingw doc native maketree $(DEPEND) depend 
 
 #-------------------------------------------------
 # all
@@ -287,13 +287,13 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
 gcc9:
-	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -finline-limit=100 -fpermissive -fext-numeric-literals -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra " EXTRALIBS="-lquadmath"
+	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -fext-numeric-literals -Wall -pedantic -Wpedantic -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
 
 clang:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
 	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native \
 		-mllvm -inline-threshold=2000 \
-		-msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
+		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
 		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wno-unused-template \
 		-Wno-missing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
@@ -303,7 +303,7 @@ clang-libc:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
 	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
 		-stdlib=libc++ -mllvm -inline-threshold=2000 \
-		-msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
+		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
 		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wno-unused-template \
 		-Wno-missing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \

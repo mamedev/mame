@@ -11,12 +11,10 @@
 #define NLINTERFACE_H_
 
 #include "nl_base.h"
+#include "nl_setup.h"
 
-#include <initializer_list>
 #include <memory>
-#include <stack>
-#include <unordered_map>
-#include <vector>
+#include <array>
 
 namespace netlist
 {

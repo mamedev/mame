@@ -12,10 +12,10 @@
 #include "netlist/nl_errstr.h"
 #include "netlist/plib/mat_cr.h"
 #include "netlist/plib/palloc.h"
+#include "netlist/plib/penum.h"
 #include "netlist/plib/pmatrix2d.h"
 #include "netlist/plib/putil.h"
 #include "netlist/plib/vector_ops.h"
-#include "netlist/plib/penum.h"
 
 #include <numeric>
 

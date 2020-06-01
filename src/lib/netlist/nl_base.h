@@ -1106,7 +1106,7 @@ namespace netlist
 			if (!m_force_logic)
 				if (v != m_tristate)
 				{
-					logic_output_t::push(v ? OUT_TRISTATE() : m_last_logic, v ? ts_off_on : ts_on_off);
+					logic_output_t::push((v != 0) ? OUT_TRISTATE() : m_last_logic, v ? ts_off_on : ts_on_off);
 					m_tristate = v;
 				}
 		}
@@ -2329,11 +2329,11 @@ namespace netlist
 		return net().Q_Analog();
 	}
 
-	inline void analog_output_t::push(nl_fptype newQ) noexcept
+	inline void analog_output_t::push(nl_fptype val) noexcept
 	{
-		if (newQ != m_my_net.Q_Analog())
+		if (val != m_my_net.Q_Analog())
 		{
-			m_my_net.set_Q_Analog(newQ);
+			m_my_net.set_Q_Analog(val);
 			m_my_net.toggle_and_push_to_queue(netlist_time::quantum());
 		}
 	}

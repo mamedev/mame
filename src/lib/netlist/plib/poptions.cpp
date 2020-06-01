@@ -223,7 +223,7 @@ namespace plib {
 					{
 						line += "=";
 						auto *ol = dynamic_cast<option_str_limit_base *>(opt);
-						if (ol)
+						if (ol != nullptr)
 						{
 							for (const auto &v : ol->limit())
 							{
@@ -274,7 +274,7 @@ namespace plib {
 		for (const auto & optbase : m_opts)
 		{
 			auto *opt = dynamic_cast<option *>(optbase);
-			if (opt && arg != "" && opt->short_opt() == arg)
+			if (opt != nullptr && arg != "" && opt->short_opt() == arg)
 				return opt;
 		}
 		return nullptr;
@@ -284,7 +284,7 @@ namespace plib {
 		for (const auto & optbase : m_opts)
 		{
 			auto *opt = dynamic_cast<option *>(optbase);
-			if (opt && arg !="" && opt->long_opt() == arg)
+			if (opt != nullptr && arg !="" && opt->long_opt() == arg)
 				return opt;
 		}
 		return nullptr;

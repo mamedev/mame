@@ -75,7 +75,7 @@ public:
 	void write(const T &val)
 	{
 		static_assert(sizeof(std::ostream::char_type) == 1, "char_type size must be 1");
-		auto ptr(reinterpret_cast<const std::ostream::char_type *>(&val));
+		const auto *ptr(reinterpret_cast<const std::ostream::char_type *>(&val));
 		m_f.write(ptr, sizeof(T));
 	}
 
@@ -718,7 +718,7 @@ pstring nlwav_app::usage()
 }
 
 template <typename F>
-static void open_ostream_and_exec(pstring fname, bool binary, F func)
+static void open_ostream_and_exec(const pstring &fname, bool binary, F func)
 {
 	if (fname != "-")
 	{

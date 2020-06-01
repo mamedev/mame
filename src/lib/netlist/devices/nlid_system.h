@@ -10,8 +10,8 @@
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_factory.h"
-#include "netlist/plib/putil.h"
 #include "netlist/plib/prandom.h"
+#include "netlist/plib/putil.h"
 
 #include <random>
 
@@ -417,7 +417,7 @@ namespace devices
 			if (state != m_last_state)
 			{
 				m_last_state = state;
-				const nl_fptype R = state ? m_RON() : m_ROFF();
+				const nl_fptype R = (state != 0) ? m_RON() : m_ROFF();
 
 				m_R.change_state([this, &R]()
 				{
@@ -476,8 +476,8 @@ namespace devices
 			{
 				m_last_state = state;
 				//printf("Here %d\n", state);
-				const nl_fptype G1 = state ? m_GON() : m_GOFF();
-				const nl_fptype G2 = state ? m_GOFF() : m_GON();
+				const nl_fptype G1 = (state != 0) ? m_GON() : m_GOFF();
+				const nl_fptype G2 = (state != 0) ? m_GOFF() : m_GON();
 				if (m_R1.solver() == m_R2.solver())
 				{
 					m_R1.change_state([this, &G1, &G2]()

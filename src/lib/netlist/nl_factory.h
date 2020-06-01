@@ -13,9 +13,9 @@
 #include "plib/ptypes.h"
 #include "plib/putil.h"
 
-#include <vector>
 #include <tuple>
 #include <utility>
+#include <vector>
 
 #define NETLIB_DEVICE_IMPL_ALIAS(p_alias, chip, p_name, p_def_param) \
 	NETLIB_DEVICE_IMPL_BASE(devices, p_alias, chip, p_name, p_def_param) \

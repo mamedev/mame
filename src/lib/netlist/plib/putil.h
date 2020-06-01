@@ -123,6 +123,8 @@ namespace plib
 
 		PCOPYASSIGNMOVE(source_location, default)
 
+		~source_location() = default;
+
 		unsigned line() const noexcept { return m_line; }
 		unsigned column() const noexcept { return m_col; }
 		pstring file_name() const noexcept { return m_file; }

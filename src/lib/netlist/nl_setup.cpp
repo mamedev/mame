@@ -2,8 +2,6 @@
 // copyright-holders:Couriersud
 
 #include "plib/palloc.h"
-#include "plib/putil.h"
-#include "plib/penum.h"
 #include "analog/nld_twoterm.h"
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_system.h"
@@ -12,6 +10,8 @@
 #include "nl_factory.h"
 #include "nl_parser.h"
 #include "nl_setup.h"
+#include "plib/penum.h"
+#include "plib/putil.h"
 
 #include "solver/nld_solver.h"
 
@@ -55,7 +55,7 @@ namespace netlist
 		std::initializer_list<const char *> more_parameters)
 	{
 		std::vector<pstring> params;
-		auto i(more_parameters.begin());
+		const auto *i(more_parameters.begin());
 		pstring name(*i);
 		++i;
 		for (; i != more_parameters.end(); ++i)

@@ -89,7 +89,7 @@ public:
 		opt_ex4(*this,     "nltool --cmd static --output src/lib/netlist/generated/static_solvers.cpp src/mame/audio/nl_*.cpp src/mame/machine/nl_*.cpp",
 				"Create static solvers for the MAME project.")
 		{}
-public:
+
 	int execute() override;
 	pstring usage() override;
 
@@ -153,7 +153,7 @@ private:
 
 	struct compile_map_entry
 	{
-		compile_map_entry(pstring mod, pstring code)
+		compile_map_entry(const pstring &mod, const pstring &code)
 		: m_module(mod), m_code(code) { }
 		pstring m_module;
 		pstring m_code;
@@ -216,7 +216,7 @@ private:
 class netlist_tool_callbacks_t : public netlist::callbacks_t
 {
 public:
-	explicit netlist_tool_callbacks_t(tool_app_t &app, pstring boostlib)
+	explicit netlist_tool_callbacks_t(tool_app_t &app, const pstring &boostlib)
 	: m_app(app), m_boostlib(boostlib)
 	{ }
 
@@ -594,7 +594,7 @@ void tool_app_t::static_compile()
 
 	netlist::solver::static_compile_target target = netlist::solver::CXX_STATIC;
 
-	if (!(opt_dir.was_specified() ^ opt_out.was_specified()))
+	if ((opt_dir.was_specified() ^ opt_out.was_specified()) == 0)
 		throw netlist::nl_exception("either --dir or --output option needed");
 
 	if (opt_dir.was_specified())
@@ -851,7 +851,7 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 
 void tool_app_t::create_header()
 {
-	if (opt_files().size() > 0)
+	if (!opt_files().empty())
 		throw netlist::nl_exception("Header doesn't support input files, but {1} where given", opt_files().size());
 
 	netlist_tool_t nt(*this, "netlist", opt_boostlib());
@@ -878,9 +878,9 @@ void tool_app_t::create_header()
 
 	for (auto &e : nt.parser().factory())
 	{
-		bool found(opt_pattern().size() == 0);
+		bool found(opt_pattern().empty());
 
-		for (auto &p : opt_pattern())
+		for (const auto &p : opt_pattern())
 			found |= (e->name().find(p) != pstring::npos);
 
 		if (found)

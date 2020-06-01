@@ -70,7 +70,7 @@ namespace plib {
 			}
 			if (icount()-- == 1)
 			{
-				if (sinfo().size() != 0)
+				if (!sinfo().empty())
 					plib::perrlogger("Still found {} info blocks after last mempool deleted\n", sinfo().size());
 			}
 		}

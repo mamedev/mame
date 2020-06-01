@@ -8,10 +8,10 @@
 /// \file poptions.h
 ///
 
+#include "pfmtlog.h"
 #include "pstonum.h"
 #include "pstring.h"
 #include "putil.h"
-#include "pfmtlog.h"
 
 namespace plib {
 

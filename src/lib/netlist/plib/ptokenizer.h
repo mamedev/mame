@@ -11,8 +11,8 @@
 #include "pstream.h"
 #include "pstring.h"
 
-#include "putil.h" // psource_t
 #include "penum.h"
+#include "putil.h" // psource_t
 
 #include <unordered_map>
 #include <vector>

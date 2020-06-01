@@ -2,9 +2,9 @@
 // copyright-holders:Couriersud
 
 #include "putil.h"
+#include "penum.h"
 #include "pstrutil.h"
 #include "ptypes.h"
-#include "penum.h"
 
 #include <algorithm>
 #include <cstdlib> // needed for getenv ...

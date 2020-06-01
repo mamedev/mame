@@ -10,9 +10,9 @@
 #include "putil.h"
 
 #include <array>
+#include <map>
 #include <stack>
 #include <type_traits>
-#include <map>
 #include <utility>
 
 namespace plib {

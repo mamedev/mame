@@ -6,8 +6,8 @@
  */
 
 #include "nlid_proxy.h"
-#include "solver/nld_solver.h"
 #include "nl_errstr.h"
+#include "solver/nld_solver.h"
 
 namespace netlist
 {
@@ -187,7 +187,7 @@ namespace netlist
 							nlconst::zero());
 						break;
 					default:
-						throw nl_exception("unknown state for proxy: this should never happen! %d\n", static_cast<int>(state));
+						plib::terminate("unknown state for proxy: this should never happen!");
 				}
 			});
 			m_last_state = state;

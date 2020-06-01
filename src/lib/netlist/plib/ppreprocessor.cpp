@@ -556,7 +556,7 @@ namespace plib {
 					pstring n = args.next();
 					if (!is_valid_token(n))
 						error("define expected identifier");
-					auto prevdef = get_define(n);
+					auto *prevdef = get_define(n);
 					if (lti.size() == 2)
 					{
 						if (prevdef != nullptr && prevdef->m_replace != "")

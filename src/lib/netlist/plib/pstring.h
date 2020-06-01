@@ -132,7 +132,7 @@ public:
 
 	explicit pstring_t(size_type n, code_t code)
 	{
-		while (n--)
+		while (n-- != 0)
 			*this += code;
 	}
 

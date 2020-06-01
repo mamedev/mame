@@ -170,7 +170,7 @@ namespace plib
 	std::size_t strlen(const T *str)
 	{
 		const T *p = str;
-		while (*p)
+		while (*p != 0)
 			p++;
 		return static_cast<std::size_t>(p - str);
 	}

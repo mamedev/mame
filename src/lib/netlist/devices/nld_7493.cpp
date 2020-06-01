@@ -94,10 +94,6 @@ namespace netlist
 		{
 		}
 
-		void printer(pstring a)
-		{
-			printf("printer %s\n", a.c_str());
-		}
 	private:
 		NETLIB_RESETI()
 		{

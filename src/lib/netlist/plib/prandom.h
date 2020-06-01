@@ -9,6 +9,7 @@
 ///
 
 #include "pconfig.h"
+#include "pmath.h"
 #include "ptypes.h"
 
 //#include <algorithm>

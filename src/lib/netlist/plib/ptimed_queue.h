@@ -10,8 +10,8 @@
 
 #include "palloc.h"
 #include "pchrono.h"
-#include "pstring.h"
 #include "pmulti_threading.h"
+#include "pstring.h"
 
 #include <algorithm>
 #include <mutex>
