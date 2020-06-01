@@ -79,7 +79,8 @@ class NETLIB_NAME(name) : public delegator_t<NETLIB_NAME(pclass)>
 #define NETLIB_BASE_OBJECT(name)                                               \
 class NETLIB_NAME(name) : public delegator_t<base_device_t>
 
-#define NETLIB_CONSTRUCTOR_PASS(cname, ...)                      \
+#define NETLIB_CONSTRUCTOR_PASS(cname, ...)                                    \
+	using this_type = NETLIB_NAME(cname);                                      \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name) \
 	: base_type(owner, name, __VA_ARGS__)
 
@@ -88,6 +89,7 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 ///  Use this to define the constructor of a netlist device. Please refer to
 ///  #NETLIB_OBJECT for an example.
 #define NETLIB_CONSTRUCTOR(cname)                                              \
+	using this_type = NETLIB_NAME(cname);                                      \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name) \
 		: base_type(owner, name)
 
@@ -101,6 +103,7 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 ///      };
 ///
 #define NETLIB_CONSTRUCTOR_MODEL(cname, cmodel)                                              \
+	using this_type = NETLIB_NAME(cname);                                      \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name) \
 		: base_type(owner, name, cmodel)
 
@@ -108,6 +111,7 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 /// The macro allows to add further parameters to a device constructor. This is
 /// normally used for sub-devices and system devices only.
 #define NETLIB_CONSTRUCTOR_EX(cname, ...)                                      \
+	using this_type = NETLIB_NAME(cname);                                      \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name, __VA_ARGS__) \
 		: base_type(owner, name)
 
@@ -173,7 +177,7 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 #define NETLIB_TIMESTEP(cname)                                                 \
 	void NETLIB_NAME(cname) :: timestep(nl_fptype step) noexcept
 
-#define NETLIB_DELEGATE(chip, name) nldelegate(&NETLIB_NAME(chip) :: name, this)
+#define NETLIB_DELEGATE(name) nldelegate(&this_type :: name, this)
 
 #define NETLIB_UPDATE_TERMINALSI() virtual void update_terminals() noexcept override
 #define NETLIB_HANDLERI(name) void name() noexcept
@@ -2169,10 +2173,12 @@ namespace netlist
 	class nld_power_pins
 	{
 	public:
+		using this_type = nld_power_pins;
+
 		explicit nld_power_pins(device_t &owner, const pstring &sVCC = sPowerVCC,
 			const pstring &sGND = sPowerGND)
-		: m_VCC(owner, sVCC, NETLIB_DELEGATE(power_pins, noop))
-		, m_GND(owner, sGND, NETLIB_DELEGATE(power_pins, noop))
+		: m_VCC(owner, sVCC, NETLIB_DELEGATE(noop))
+		, m_GND(owner, sGND, NETLIB_DELEGATE(noop))
 		{
 		}
 

@@ -18,7 +18,7 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(74175)
 		, m_D(*this, {"D1", "D2", "D3", "D4"})
 		, m_CLRQ(*this, "CLRQ")
-		, m_CLK(*this, "CLK", NETLIB_DELEGATE(74175, clk))
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4"})
 		, m_QQ(*this, {"Q1Q", "Q2Q", "Q3Q", "Q4Q"})
 		, m_data(*this, "m_data", 0)

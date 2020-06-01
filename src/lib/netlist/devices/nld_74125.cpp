@@ -36,8 +36,8 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(74125_base)
 		, m_TE(*this, "FORCE_TRISTATE_LOGIC", 0)
-		, m_A(*this, "A", NETLIB_DELEGATE(74125_base, A))
-		, m_G(*this, pstring(D::invert_g::value ? "GQ" : "G"), NETLIB_DELEGATE(74125_base, G))
+		, m_A(*this, "A", NETLIB_DELEGATE(A))
+		, m_G(*this, pstring(D::invert_g::value ? "GQ" : "G"), NETLIB_DELEGATE(G))
 		, m_Y(*this, "Y", m_TE())
 		//, m_Y(*this, "Y")
 		, m_power_pins(*this)
