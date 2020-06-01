@@ -263,10 +263,11 @@ class netlist_mame_sub_interface
 {
 public:
 	// construction/destruction
-	netlist_mame_sub_interface(device_t &aowner)
+	netlist_mame_sub_interface(device_t &owner)
 		: m_offset(0.0), m_mult(1.0)
-		, m_owner(dynamic_cast<netlist_mame_device *>(&aowner))
-		, m_sound(dynamic_cast<netlist_mame_sound_device *>(&aowner))
+		, m_owner(dynamic_cast<netlist_mame_device *>(&owner))
+		, m_sound(dynamic_cast<netlist_mame_sound_device *>(&owner))
+		, m_cpu(dynamic_cast<netlist_mame_cpu_device *>(&owner))
 	{
 	}
 
@@ -274,7 +275,7 @@ public:
 	{
 	}
 
-	virtual void custom_netlist_additions(netlist::netlist_state_t &nlstate) { }
+	virtual void custom_netlist_additions(netlist::nlparse_t &parser) { }
 	virtual void pre_parse_action(netlist::nlparse_t &parser) { }
 	virtual void validity_helper(validity_checker &valid,
 		netlist::netlist_state_t &nlstate) const { }
@@ -292,13 +293,16 @@ public:
 	void set_mult_offset(const double mult, const double offset);
 
 	netlist_mame_sound_device *sound() { return m_sound;}
+	netlist_mame_cpu_device   *cpu()   { return m_cpu;}
+
 protected:
 	double m_offset;
 	double m_mult;
 
 private:
-	netlist_mame_device *const m_owner;
+	netlist_mame_device       *const m_owner;
 	netlist_mame_sound_device *const m_sound;
+	netlist_mame_cpu_device   *const m_cpu;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -357,7 +361,8 @@ public:
 	// construction/destruction
 	netlist_mame_analog_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <typename... T> void set_params(const char *in_name, T &&... args)
+	template <typename... T>
+	void set_params(const char *in_name, T &&... args)
 	{
 		m_in = in_name;
 		m_delegate.set(std::forward<T>(args)...);
@@ -367,7 +372,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void custom_netlist_additions(netlist::netlist_state_t &nlstate) override;
+	virtual void pre_parse_action(netlist::nlparse_t &parser) override;
+	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 
 private:
 	const char *m_in;
@@ -395,7 +401,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void custom_netlist_additions(netlist::netlist_state_t &nlstate) override;
+	virtual void pre_parse_action(netlist::nlparse_t &parser) override;
+	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 
 private:
 	const char *m_in;
@@ -531,7 +538,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void custom_netlist_additions(netlist::netlist_state_t &nlstate) override;
+	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 private:
 	uint32_t m_channel;
 	const char *m_param_name;
@@ -557,7 +564,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void custom_netlist_additions(netlist::netlist_state_t &nlstate) override;
+	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 
 private:
 	uint32_t m_channel;

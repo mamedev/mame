@@ -14,6 +14,8 @@
 #include "plib/putil.h"
 
 #include <vector>
+#include <tuple>
+#include <utility>
 
 #define NETLIB_DEVICE_IMPL_ALIAS(p_alias, chip, p_name, p_def_param) \
 	NETLIB_DEVICE_IMPL_BASE(devices, p_alias, chip, p_name, p_def_param) \
@@ -112,25 +114,47 @@ namespace factory {
 		properties m_properties;                    ///< source file and other information and settings
 	};
 
-	template <class C>
+	template <class C, typename... Args>
 	class device_element_t : public element_t
 	{
 	public:
 
-		device_element_t(const pstring &name, properties &&props)
-		: element_t(name, std::move(props)) { }
+		device_element_t(const pstring &name, properties &&props, Args&&... args)
+		: element_t(name, std::move(props))
+		, m_args(std::forward<Args>(args)...)
+		{ }
+
+
+	    template <std::size_t... Is>
+	    dev_uptr make_device(nlmempool &pool,
+	    	    			netlist_state_t &anetlist,
+	    	    			const pstring &name, std::tuple<Args...>& args, std::index_sequence<Is...>)
+	    {
+	    	return pool.make_unique<C>(anetlist, name, std::forward<Args>(std::get<Is>(args))...);
+	    }
+
+	    dev_uptr make_device(nlmempool &pool,
+	    			netlist_state_t &anetlist,
+	    			const pstring &name, std::tuple<Args...>& args)
+	    {
+	        return make_device(pool, anetlist, name, args, std::index_sequence_for<Args...>{});
+	    }
 
 		dev_uptr make_device(nlmempool &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) override
 		{
-			return pool.make_unique<C>(anetlist, name);
+			return make_device(pool, anetlist, name, m_args);
+			//return pool.make_unique<C>(anetlist, name);
 		}
 
-		static uptr create(const pstring &name, properties &&props)
+		static uptr create(const pstring &name, properties &&props, Args&&... args)
 		{
-			return plib::make_unique<device_element_t<C>>(name, std::move(props));
+			return plib::make_unique<device_element_t<C, Args...>>(name,
+				std::move(props), std::forward<Args>(args)...);
 		}
+	private:
+		std::tuple<Args...> m_args;
 	};
 
 	class list_t : public std::vector<element_t::uptr>
@@ -141,10 +165,11 @@ namespace factory {
 
 		PCOPYASSIGNMOVE(list_t, delete)
 
-		template<class device_class>
-		void add(const pstring &name, properties &&props)
+		template<class device_class, typename... Args>
+		void add(const pstring &name, properties &&props, Args&&... args)
 		{
-			add(device_element_t<device_class>::create(name, std::move(props)));
+			add(device_element_t<device_class, Args...>::create(name, std::move(props),
+				std::forward<Args>(args)...));
 		}
 
 		void add(element_t::uptr &&factory) noexcept(false);

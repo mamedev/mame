@@ -81,7 +81,6 @@ namespace netlist
 			include(f->name());
 			namespace_pop();
 		}
-		//f->macro_actions(*this, name);
 
 		pstring key = build_fqn(name);
 		if (device_exists(key))

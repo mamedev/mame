@@ -15,6 +15,7 @@
 #include "netlist/nl_setup.h"
 #include "netlist/nl_factory.h"
 #include "netlist/nl_parser.h"
+#include "netlist/nl_interface.h"
 #include "netlist/devices/net_lib.h"
 #include "netlist/devices/nlid_system.h"
 
@@ -187,114 +188,6 @@ private:
 
 namespace {
 
-// ----------------------------------------------------------------------------------------
-// analog_callback
-// ----------------------------------------------------------------------------------------
-
-class NETLIB_NAME(analog_callback) : public netlist::device_t
-{
-public:
-	NETLIB_NAME(analog_callback)(netlist::netlist_state_t &anetlist, const pstring &name)
-		: device_t(anetlist, name)
-		, m_in(*this, "IN")
-		, m_cpu_device(nullptr)
-		, m_last(*this, "m_last", 0)
-	{
-		auto *nl = dynamic_cast<netlist_mame_device::netlist_mame_t *>(&state());
-		if (nl != nullptr)
-			m_cpu_device = downcast<netlist_mame_cpu_device *>(&nl->parent());
-	}
-
-	void reset() override
-	{
-		m_last = 0.0;
-	}
-
-	void register_callback(netlist_mame_analog_output_device::output_delegate &&callback)
-	{
-		m_callback.reset(new netlist_mame_analog_output_device::output_delegate(std::move(callback)));
-	}
-
-	NETLIB_UPDATEI()
-	{
-		netlist::nl_fptype cur = m_in();
-
-		// FIXME: make this a parameter
-		// avoid calls due to noise
-		if (plib::abs(cur - m_last) > 1e-6)
-		{
-			m_cpu_device->update_icount(exec().time());
-			(*m_callback)(cur, m_cpu_device->local_time());
-			m_cpu_device->check_mame_abort_slice();
-			m_last = cur;
-		}
-	}
-
-private:
-	netlist::analog_input_t m_in;
-	std::unique_ptr<netlist_mame_analog_output_device::output_delegate> m_callback; // TODO: change to std::optional for C++17
-	netlist_mame_cpu_device *m_cpu_device;
-	netlist::state_var<netlist::nl_fptype> m_last;
-};
-
-// ----------------------------------------------------------------------------------------
-// logic_callback
-//
-// This device must be connected to a logic net. It has no power terminals
-// and conversion with proxies will not work.
-//
-// Background: This is inserted later into the driver and should not modify
-// the resulting analog representation of the netlist.
-//
-// ----------------------------------------------------------------------------------------
-
-class NETLIB_NAME(logic_callback) : public netlist::device_t
-{
-public:
-	NETLIB_NAME(logic_callback)(netlist::netlist_state_t &anetlist, const pstring &name)
-		: device_t(anetlist, name)
-		, m_in(*this, "IN")
-		, m_cpu_device(nullptr)
-		, m_last(*this, "m_last", 0)
-//      , m_supply(*this)
-	{
-		auto *nl = dynamic_cast<netlist_mame_device::netlist_mame_t *>(&state());
-		if (nl != nullptr)
-			m_cpu_device = downcast<netlist_mame_cpu_device *>(&nl->parent());
-	}
-
-	void reset() override
-	{
-		m_last = 0;
-	}
-
-	void register_callback(netlist_mame_logic_output_device::output_delegate &&callback)
-	{
-		m_callback.reset(new netlist_mame_logic_output_device::output_delegate(std::move(callback)));
-	}
-
-	NETLIB_UPDATEI()
-	{
-		netlist::netlist_sig_t cur = m_in();
-
-		// FIXME: make this a parameter
-		// avoid calls due to noise
-		if (cur != m_last)
-		{
-			m_cpu_device->update_icount(exec().time());
-			(*m_callback)(cur, m_cpu_device->local_time());
-			m_cpu_device->check_mame_abort_slice();
-			m_last = cur;
-		}
-	}
-
-private:
-	netlist::logic_input_t m_in;
-	std::unique_ptr<netlist_mame_logic_output_device::output_delegate> m_callback; // TODO: change to std::optional for C++17
-	netlist_mame_cpu_device *m_cpu_device;
-	netlist::state_var<netlist::netlist_sig_t> m_last;
-	//netlist::devices::NETLIB_NAME(power_pins) m_supply;
-};
 
 
 // ----------------------------------------------------------------------------------------
@@ -799,19 +692,38 @@ netlist_mame_analog_output_device::netlist_mame_analog_output_device(const machi
 {
 }
 
-void netlist_mame_analog_output_device::custom_netlist_additions(netlist::netlist_state_t &nlstate)
-{
-	const pstring pin(m_in);
-	pstring dname = pstring("OUT_") + pin;
 
+
+void netlist_mame_analog_output_device::custom_netlist_additions(netlist::nlparse_t &parser)
+{
 	/* ignore if no running machine -> called within device_validity_check context */
 	if (owner()->has_running_machine())
 		m_delegate.resolve();
 
-	auto dev = nlstate.make_pool_object<NETLIB_NAME(analog_callback)>(nlstate, dname);
-	dev->register_callback(std::move(m_delegate));
-	nlstate.register_device(dname, std::move(dev));
-	nlstate.parser().register_link(dname + ".IN", pin);
+	const pstring pin(m_in);
+	pstring dname = pstring("OUT_") + pin;
+
+	parser.register_dev(dname, dname);
+	parser.register_link(dname + ".IN", pin);
+}
+
+void netlist_mame_analog_output_device::pre_parse_action(netlist::nlparse_t &parser)
+{
+	const pstring pin(m_in);
+	pstring dname = pstring("OUT_") + pin;
+
+	const auto lambda = [this](auto &in, netlist::nl_fptype val)
+	{
+		this->cpu()->update_icount(in.exec().time());
+		this->m_delegate(val, this->cpu()->local_time());
+		this->cpu()->check_mame_abort_slice();
+	};
+
+	using lb_t = decltype(lambda);
+	using cb_t = netlist::interface::NETLIB_NAME(analog_callback)<lb_t>;
+
+	parser.factory().add<cb_t, netlist::nl_fptype, lb_t>(dname,
+		netlist::factory::properties("-", PSOURCELOC()), 1e-6, std::forward<lb_t>(lambda));
 }
 
 void netlist_mame_analog_output_device::device_start()
@@ -832,20 +744,38 @@ netlist_mame_logic_output_device::netlist_mame_logic_output_device(const machine
 {
 }
 
-void netlist_mame_logic_output_device::custom_netlist_additions(netlist::netlist_state_t &nlstate)
+void netlist_mame_logic_output_device::custom_netlist_additions(netlist::nlparse_t &parser)
 {
-	pstring pin(m_in);
-	pstring dname = "OUT_" + pin;
-
 	/* ignore if no running machine -> called within device_validity_check context */
 	if (owner()->has_running_machine())
 		m_delegate.resolve();
 
-	auto dev = nlstate.make_pool_object<NETLIB_NAME(logic_callback)>(nlstate, dname);
-	dev->register_callback(std::move(m_delegate));
-	nlstate.register_device(dname, std::move(dev));
-	nlstate.parser().register_link(dname + ".IN", pin);
+	const pstring pin(m_in);
+	pstring dname = pstring("OUT_") + pin;
+
+	parser.register_dev(dname, dname);
+	parser.register_link(dname + ".IN", pin);
 }
+
+void netlist_mame_logic_output_device::pre_parse_action(netlist::nlparse_t &parser)
+{
+	const pstring pin(m_in);
+	pstring dname = pstring("OUT_") + pin;
+
+	const auto lambda = [this](auto &in, netlist::netlist_sig_t val)
+	{
+		this->cpu()->update_icount(in.exec().time());
+		this->m_delegate(val, this->cpu()->local_time());
+		this->cpu()->check_mame_abort_slice();
+	};
+
+	using lb_t = decltype(lambda);
+	using cb_t = netlist::interface::NETLIB_NAME(logic_callback)<lb_t>;
+
+	parser.factory().add<cb_t, lb_t>(dname,
+		netlist::factory::properties("-", PSOURCELOC()), std::forward<lb_t>(lambda));
+}
+
 
 void netlist_mame_logic_output_device::device_start()
 {
@@ -1015,17 +945,17 @@ void netlist_mame_stream_input_device::device_start()
 	LOGDEVCALLS("start\n");
 }
 
-void netlist_mame_stream_input_device::custom_netlist_additions(netlist::netlist_state_t &nlstate)
+void netlist_mame_stream_input_device::custom_netlist_additions(netlist::nlparse_t &parser)
 {
-	if (!nlstate.parser().device_exists("STREAM_INPUT"))
-		nlstate.parser().register_dev("NETDEV_SOUND_IN", "STREAM_INPUT");
+	if (!parser.device_exists("STREAM_INPUT"))
+		parser.register_dev("NETDEV_SOUND_IN", "STREAM_INPUT");
 
 	pstring sparam = plib::pfmt("STREAM_INPUT.CHAN{1}")(m_channel);
-	nlstate.parser().register_param(sparam, pstring(m_param_name));
+	parser.register_param(sparam, pstring(m_param_name));
 	sparam = plib::pfmt("STREAM_INPUT.MULT{1}")(m_channel);
-	nlstate.parser().register_param_val(sparam, m_mult);
+	parser.register_param_val(sparam, m_mult);
 	sparam = plib::pfmt("STREAM_INPUT.OFFSET{1}")(m_channel);
-	nlstate.parser().register_param_val(sparam, m_offset);
+	parser.register_param_val(sparam, m_offset);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -1051,18 +981,18 @@ void netlist_mame_stream_output_device::device_start()
 	LOGDEVCALLS("start\n");
 }
 
-void netlist_mame_stream_output_device::custom_netlist_additions(netlist::netlist_state_t &nlstate)
+void netlist_mame_stream_output_device::custom_netlist_additions(netlist::nlparse_t &parser)
 {
 	//NETLIB_NAME(sound_out) *snd_out;
 	pstring sname = plib::pfmt("STREAM_OUT_{1}")(m_channel);
 
 	//snd_out = dynamic_cast<NETLIB_NAME(sound_out) *>(setup.register_dev("nld_sound_out", sname));
-	nlstate.parser().register_dev("NETDEV_SOUND_OUT", sname);
+	parser.register_dev("NETDEV_SOUND_OUT", sname);
 
-	nlstate.parser().register_param_val(sname + ".CHAN" , m_channel);
-	nlstate.parser().register_param_val(sname + ".MULT",  m_mult);
-	nlstate.parser().register_param_val(sname + ".OFFSET",  m_offset);
-	nlstate.parser().register_link(sname + ".IN", pstring(m_out_name));
+	parser.register_param_val(sname + ".CHAN" , m_channel);
+	parser.register_param_val(sname + ".MULT",  m_mult);
+	parser.register_param_val(sname + ".OFFSET",  m_offset);
+	parser.register_link(sname + ".IN", pstring(m_out_name));
 }
 
 
@@ -1127,20 +1057,20 @@ void netlist_mame_device::common_dev_start(netlist::netlist_state_t *lnetlist) c
 		}
 	}
 
-	/* add default data provider for roms - if not in validity check*/
-	//if (has_running_machine())
-		lsetup.parser().register_source<netlist_data_memregions_t>(*this);
+	// add default data provider for roms - if not in validity check
+	lsetup.parser().register_source<netlist_data_memregions_t>(*this);
 
+	// Read the netlist
 	m_setup_func(lsetup.parser());
 
-	/* let sub-devices tweak the netlist */
+	// let sub-devices tweak the netlist
 	for (device_t &d : subdevices())
 	{
 		netlist_mame_sub_interface *sdev = dynamic_cast<netlist_mame_sub_interface *>(&d);
 		if( sdev != nullptr )
 		{
 			LOGDEVCALLS("Found subdevice %s/%s\n", d.name(), d.shortname());
-			sdev->custom_netlist_additions(*lnetlist);
+			sdev->custom_netlist_additions(lsetup.parser());
 		}
 	}
 }
@@ -1402,8 +1332,6 @@ void netlist_mame_cpu_device::device_start()
 
 void netlist_mame_cpu_device::nl_register_devices(netlist::nlparse_t &parser) const
 {
-	parser.factory().add<nld_analog_callback>( "NETDEV_CALLBACK",
-		netlist::factory::properties("-", PSOURCELOC()));
 }
 
 uint64_t netlist_mame_cpu_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept

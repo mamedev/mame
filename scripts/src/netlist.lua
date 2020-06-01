@@ -44,6 +44,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/nl_dice_compat.h",
 		MAME_DIR .. "src/lib/netlist/nl_factory.cpp",
 		MAME_DIR .. "src/lib/netlist/nl_factory.h",
+		MAME_DIR .. "src/lib/netlist/nl_interface.h",
 		MAME_DIR .. "src/lib/netlist/nl_parser.cpp",
 		MAME_DIR .. "src/lib/netlist/nl_parser.h",
 		MAME_DIR .. "src/lib/netlist/nl_setup.cpp",
