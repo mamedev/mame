@@ -39,7 +39,7 @@ TODO:
 #define LOG_RAM			(1 << 9)
 #define LOG_ALL			(LOG_DECODES | LOG_SAMPLES | LOG_COMMANDS | LOG_SECTORS | LOG_IRQS | LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_RAM)
 
-#define VERBOSE         (0)
+#define VERBOSE         (LOG_ALL)
 #include "logmacro.h"
 
 // device type definition
@@ -725,34 +725,36 @@ void cdicdic_device::process_delayed_command()
 			m_data_buffer &= ~0x0004;
 			m_data_buffer ^= 0x0001;
 
-			if ((buffer[CDIC_SECTOR_FILE2] << 8) == m_file)
+			const bool file_match = (buffer[CDIC_SECTOR_FILE2] << 8) == m_file;
+			const bool channel_match = (m_channel & (1 << buffer[CDIC_SECTOR_CHAN2])) != 0;
+			const bool audio_channel_match = (m_audio_channel & (1 << buffer[CDIC_SECTOR_CHAN2])) != 0;
+			const bool is_audio = (buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_FORM | CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == (CDIC_SUBMODE_FORM | CDIC_SUBMODE_AUDIO);
+			if (file_match)
 			{
-				if (((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_FORM | CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == (CDIC_SUBMODE_FORM | CDIC_SUBMODE_AUDIO)))
+				if (is_audio && channel_match && audio_channel_match)
 				{
-					if ((m_channel & (1 << buffer[CDIC_SECTOR_CHAN2])))
+					m_x_buffer |= 0x8000;
+					//m_data_buffer |= 0x4000;
+					m_data_buffer |= 4;
+
+					LOGMASKED(LOG_SECTORS, "%s: Audio sector into %04x\n", machine().describe_context(), (m_data_buffer & 5) * 0xa00);
+
+					for (int index = 6; index < 2352/2; index++)
 					{
-						m_x_buffer |= 0x8000;
-						//m_data_buffer |= 0x4000;
-						m_data_buffer |= 4;
-
-						LOGMASKED(LOG_SECTORS, "%s: Audio sector into %04x\n", machine().describe_context(), (m_data_buffer & 5) * 0xa00);
-
-						for (int index = 6; index < 2352/2; index++)
-						{
-							m_ram[(m_data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
-						}
-
-						decode_audio_sector(((uint8_t*)m_ram.get()) + ((m_data_buffer & 5) * 0xa00 + 4), 0);
-
-						LOGMASKED(LOG_IRQS, "%s: Setting CDIC interrupt line for audio sector\n", machine().describe_context());
-						m_intreq_callback(ASSERT_LINE);
+						m_ram[(m_data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 					}
-					else
-					{
-						LOGMASKED(LOG_IRQS, "%s: Setting CDIC interrupt line for ignored audio sector (m_channel %04x, m_audio_channel %04x, sector channel %04x\n",
-							machine().describe_context(), m_channel, m_audio_channel, (1 << buffer[CDIC_SECTOR_CHAN2]));
-						//m_intreq_callback(ASSERT_LINE);
-					}
+
+					decode_audio_sector(((uint8_t*)m_ram.get()) + ((m_data_buffer & 5) * 0xa00 + 4), 0);
+
+					LOGMASKED(LOG_IRQS, "%s: Setting CDIC interrupt line for audio sector\n", machine().describe_context());
+					//}
+					m_intreq_callback(ASSERT_LINE);
+					//else
+					//{
+					//	LOGMASKED(LOG_IRQS, "%s: Setting CDIC interrupt line for ignored audio sector (m_channel %04x, m_audio_channel %04x, sector channel %04x\n",
+					//		machine().describe_context(), m_channel, m_audio_channel, (1 << buffer[CDIC_SECTOR_CHAN2]));
+					//	m_intreq_callback(ASSERT_LINE);
+					//}
 				}
 				else if ((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)
 				{
@@ -773,14 +775,20 @@ void cdicdic_device::process_delayed_command()
 					}
 					else
 					{
-						LOGMASKED(LOG_SECTORS, "%s: Message sector, ignored\n", machine().describe_context());
+						LOGMASKED(LOG_SECTORS, "%s: Setting CDIC interrupt line for ignored message sector\n", machine().describe_context());
 						m_intreq_callback(ASSERT_LINE);
 					}
 				}
-				else
+				else if (channel_match)
 				{
 					m_x_buffer |= 0x8000;
 					//m_data_buffer |= 0x4000;
+
+					if (is_audio)
+					{
+						//m_data_buffer |= 4;
+						//m_z_buffer = (m_data_buffer & 5) * 0xa00;
+					}
 
 					for (int index = 6; index < 2352/2; index++)
 					{
@@ -791,7 +799,12 @@ void cdicdic_device::process_delayed_command()
 					LOGMASKED(LOG_IRQS, "%s: Channel reg is: %08x, versus submode channel: %08x\n", machine().describe_context(), m_channel, (1 << buffer[CDIC_SECTOR_CHAN2]));
 					if (!BIT(m_channel, buffer[CDIC_SECTOR_CHAN2]))
 					{
-						LOGMASKED(LOG_IRQS, "%s: Channel mismatch\n");
+						LOGMASKED(LOG_IRQS, "%s: Channel mismatch\n", machine().describe_context());
+						m_intreq_callback(ASSERT_LINE);
+					}
+					else
+					{
+						m_intreq_callback(ASSERT_LINE);
 					}
 					const uint16_t submode2 = buffer[CDIC_SECTOR_SUBMODE2];
 					if (submode2 & CDIC_SUBMODE_EOF)   LOGMASKED(LOG_IRQS, "%s: CDIC_SUBMODE_EOF\n", machine().describe_context());
@@ -802,7 +815,23 @@ void cdicdic_device::process_delayed_command()
 					if (submode2 & CDIC_SUBMODE_AUDIO) LOGMASKED(LOG_IRQS, "%s: CDIC_SUBMODE_AUDIO\n", machine().describe_context());
 					if (submode2 & CDIC_SUBMODE_VIDEO) LOGMASKED(LOG_IRQS, "%s: CDIC_SUBMODE_VIDEO\n", machine().describe_context());
 					if (submode2 & CDIC_SUBMODE_EOR)   LOGMASKED(LOG_IRQS, "%s: CDIC_SUBMODE_EOR\n", machine().describe_context());
-					m_intreq_callback(ASSERT_LINE);
+				}
+				else
+				{
+					//m_x_buffer |= 0x8000;
+
+					LOGMASKED(LOG_IRQS, "%s: No match: m_channel %04x, m_audio_channel %04x, sector channel %04x\n",
+						machine().describe_context(), m_channel, m_audio_channel, (1 << buffer[CDIC_SECTOR_CHAN2]));
+					const uint16_t submode2 = buffer[CDIC_SECTOR_SUBMODE2];
+					if (submode2 & CDIC_SUBMODE_EOF)   LOGMASKED(LOG_IRQS, "%s: CDIC_SUBMODE_EOF\n", machine().describe_context());
+					if (submode2 & CDIC_SUBMODE_RT)    LOGMASKED(LOG_IRQS, "%s: CDIC_SUBMODE_RT\n", machine().describe_context());
+					if (submode2 & CDIC_SUBMODE_FORM)  LOGMASKED(LOG_IRQS, "%s: CDIC_SUBMODE_FORM\n", machine().describe_context());
+					if (submode2 & CDIC_SUBMODE_TRIG)  LOGMASKED(LOG_IRQS, "%s: CDIC_SUBMODE_TRIG\n", machine().describe_context());
+					if (submode2 & CDIC_SUBMODE_DATA)  LOGMASKED(LOG_IRQS, "%s: CDIC_SUBMODE_DATA\n", machine().describe_context());
+					if (submode2 & CDIC_SUBMODE_AUDIO) LOGMASKED(LOG_IRQS, "%s: CDIC_SUBMODE_AUDIO\n", machine().describe_context());
+					if (submode2 & CDIC_SUBMODE_VIDEO) LOGMASKED(LOG_IRQS, "%s: CDIC_SUBMODE_VIDEO\n", machine().describe_context());
+					if (submode2 & CDIC_SUBMODE_EOR)   LOGMASKED(LOG_IRQS, "%s: CDIC_SUBMODE_EOR\n", machine().describe_context());
+					//m_intreq_callback(ASSERT_LINE);
 				}
 
 				if ((buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF) == 0 && m_command != 0x23)
@@ -1010,6 +1039,10 @@ uint16_t cdicdic_device::regs_r(offs_t offset, uint16_t mem_mask)
 		case 0x3ffa/2: // AUDCTL
 		{
 			LOGMASKED(LOG_READS, "%s: cdic_r: Z-Buffer Register Read: %04x & %04x\n", machine().describe_context(), m_z_buffer, mem_mask);
+			if (m_audio_playback_timer->remaining().is_never() && m_audio_sample_timer->remaining().is_never())
+			{
+				return m_z_buffer | 1;
+			}
 			return m_z_buffer;
 		}
 
@@ -1161,7 +1194,7 @@ void cdicdic_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 						//m_periodic_sample_timer->adjust(attotime::never);
 						m_dmadac[0]->enable(0);
 						m_dmadac[1]->enable(0);
-						m_data_buffer &= 0x7fff;
+						m_data_buffer &= 0x3fff;
 						break;
 					case 0x2b: // Stop CDDA
 						LOGMASKED(LOG_WRITES, "%s: cdic_w: Stop CDDA\n", machine().describe_context());
