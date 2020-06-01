@@ -301,13 +301,14 @@ clang:
 
 clang-libc:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
-	$(MAKE) CC=clang++-libc++ LD=clang++-libc++ OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
-		-mllvm -inline-threshold=2000 \
+	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
+		-stdlib=libc++ -mllvm -inline-threshold=2000 \
 		-msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
 		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wno-unused-template \
 		-Wno-missing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
-		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override"
+		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override" \
+		LDEXTRAFLAGS=-stdlib=libc++
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"

@@ -16,8 +16,7 @@
 #include "netlist/nl_factory.h"
 #include "netlist/nl_parser.h"
 #include "netlist/nl_interface.h"
-#include "netlist/devices/net_lib.h"
-#include "netlist/devices/nlid_system.h"
+//#include "netlist/devices/nlid_system.h"
 
 #include "netlist/plib/palloc.h"
 
@@ -29,6 +28,21 @@
 #include <memory>
 #include <string>
 #include <utility>
+
+#define LOG_GENERAL     (1U << 0)
+#define LOG_DEV_CALLS   (1U << 1)
+#define LOG_DEBUG       (1U << 2)
+
+//#define LOG_MASK (LOG_GENERAL | LOG_DEV_CALLS | LOG_DEBUG)
+#define LOG_MASK		(0)
+
+#define LOGDEVCALLS(...) LOGMASKED(LOG_DEV_CALLS, __VA_ARGS__)
+#define LOGDEBUG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
+#define LOG_OUTPUT_FUNC printf
+
+#define LOGMASKED(mask, ...) do { if (LOG_MASK & (mask)) (LOG_OUTPUT_FUNC)(__VA_ARGS__); } while (false)
+
 
 // Workaround for return value optimization failure in some older versions of clang
 #if defined(__APPLE__) && defined(__clang__) && __clang_major__ < 8
@@ -318,225 +332,18 @@ plib::unique_ptr<std::istream> netlist_data_memregions_t::stream(const pstring &
 
 } // anonymous namespace
 
-
-
-// ----------------------------------------------------------------------------------------
-// sound_out
-// ----------------------------------------------------------------------------------------
-
-class NETLIB_NAME(sound_out) : public netlist::device_t
-{
-public:
-	NETLIB_NAME(sound_out)(netlist::netlist_state_t &anetlist, const pstring &name)
-		: netlist::device_t(anetlist, name)
-		, m_channel(*this, "CHAN", 0)
-		, m_mult(*this, "MULT", 1000.0)
-		, m_offset(*this, "OFFSET", 0.0)
-		, m_sample_time(netlist::netlist_time::from_hz(1))
-		, m_in(*this, "IN")
-		, m_cur(0.0)
-		, m_last_buffer_time(*this, "m_last_buffer", netlist::netlist_time_ext::zero())
-	{
-	}
-
-protected:
-
-	void reset() override
-	{
-		m_cur = 0.0;
-		m_last_buffer_time = netlist::netlist_time_ext::zero();
-	}
-
-	NETLIB_UPDATEI()
-	{
-		netlist::nl_fptype val = m_in() * m_mult() + m_offset();
-		sound_update(exec().time());
-		/* ignore spikes */
-		if (plib::abs(val) < 32767.0)
-			m_cur = val;
-		else if (val > 0.0)
-			m_cur = 32767.0;
-		else
-			m_cur = -32767.0;
-
-	}
-
-public:
-	void buffer_reset(const netlist::netlist_time_ext &upto)
-	{
-		m_last_buffer_time = upto;
-		m_buffer.clear();
-	}
-
-	void sound_update(const netlist::netlist_time_ext &upto)
-	{
-		int pos = (upto - m_last_buffer_time()) / m_sample_time;
-		//if (pos > m_bufsize)
-		//	throw emu_fatalerror("sound %s: pos %d exceeded bufsize %d\n", name().c_str(), pos, m_bufsize);
-		while (m_buffer.size() < pos )
-		{
-			m_buffer.push_back(static_cast<stream_sample_t>(m_cur));
-		}
-	}
-
-	void sound_update_fill(int samples, stream_sample_t *target)
-	{
-		if (samples < m_buffer.size())
-			throw emu_fatalerror("sound %s: samples %d less bufsize %d\n", name().c_str(), samples, m_buffer.size());
-		std::copy(m_buffer.begin(), m_buffer.end(), target);
-		std::size_t pos = m_buffer.size();
-		while (pos < samples )
-		{
-			target[pos++] = static_cast<stream_sample_t>(m_cur);
-		}
-	}
-
-
-	netlist::param_int_t m_channel;
-	netlist::param_fp_t m_mult;
-	netlist::param_fp_t m_offset;
-	std::vector<stream_sample_t> m_buffer;
-
-	netlist::netlist_time m_sample_time;
-
-private:
-	netlist::analog_input_t m_in;
-	double m_cur;
-	netlist::state_var<netlist::netlist_time_ext> m_last_buffer_time;
-};
-
 // ----------------------------------------------------------------------------------------
 // sound_in
 // ----------------------------------------------------------------------------------------
 
-class NETLIB_NAME(sound_in) : public netlist::device_t
+using sound_in_type = netlist::interface::NETLIB_NAME(buffered_param_setter)<stream_sample_t, 16>;
+
+class NETLIB_NAME(sound_in) : public sound_in_type
 {
 public:
-
-	static const int MAX_INPUT_CHANNELS = 16;
-
-	NETLIB_NAME(sound_in)(netlist::netlist_state_t &anetlist, const pstring &name)
-	: netlist::device_t(anetlist, name)
-	, m_sample_time(netlist::netlist_time::zero())
-	, m_feedback(*this, "FB") // clock part
-	, m_Q(*this, "Q")
-	, m_pos(0)
-	, m_samples(0)
-	, m_num_channels(0)
-	{
-		connect(m_feedback, m_Q);
-
-		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
-		{
-			m_channels[i].m_param_name = anetlist.make_pool_object<netlist::param_str_t>(*this, plib::pfmt("CHAN{1}")(i), "");
-			m_channels[i].m_param_mult = anetlist.make_pool_object<netlist::param_fp_t>(*this, plib::pfmt("MULT{1}")(i), 1.0);
-			m_channels[i].m_param_offset = anetlist.make_pool_object<netlist::param_fp_t>(*this, plib::pfmt("OFFSET{1}")(i), 0.0);
-		}
-	}
-
-protected:
-	void reset() override
-	{
-		m_pos = 0;
-		for (auto & elem : m_channels)
-			elem.m_buffer = nullptr;
-	}
-
-	NETLIB_UPDATEI()
-	{
-		if (m_pos < m_samples)
-		{
-			for (int i=0; i<m_num_channels; i++)
-			{
-				if (m_channels[i].m_buffer == nullptr)
-					break; // stop, called outside of stream_update
-				const netlist::nl_fptype v = m_channels[i].m_buffer[m_pos];
-				m_channels[i].m_param->set(v * (*m_channels[i].m_param_mult)() + (*m_channels[i].m_param_offset)());
-			}
-		}
-		else
-		{
-			// FIXME: The logic has a rounding issue because time resolution divided
-			//        by 48,000 is not a natural number. The fractional part
-			//        adds up to one samples every 13 seconds for 100 ps resolution.
-			//        Fixing this is possible but complicated and expensive.
-		}
-		m_pos++;
-
-		m_Q.net().toggle_and_push_to_queue(m_sample_time);
-	}
-
-public:
-	void resolve(attotime sample_time)
-	{
-		m_pos = 0;
-		m_sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(sample_time).as_raw()));
-
-		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
-		{
-			if ((*m_channels[i].m_param_name)() != pstring(""))
-			{
-				if (i != m_num_channels)
-					state().log().fatal("sound input numbering has to be sequential!");
-				m_num_channels++;
-				m_channels[i].m_param = dynamic_cast<netlist::param_fp_t *>(
-					&state().setup().find_param((*m_channels[i].m_param_name)()).param()
-				);
-			}
-		}
-	}
-
-	template <typename S>
-	void buffer_reset(attotime sample_time, int num_samples, S **inputs)
-	{
-		m_samples = num_samples;
-		m_sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(sample_time).as_raw()));
-
-		m_pos = 0;
-		for (int i=0; i < m_num_channels; i++)
-		{
-			m_channels[i].m_buffer = inputs[i];
-		}
-	}
-
-	struct channel
-	{
-		netlist::unique_pool_ptr<netlist::param_str_t> m_param_name;
-		netlist::param_fp_t *m_param;
-		stream_sample_t *m_buffer;
-		netlist::unique_pool_ptr<netlist::param_fp_t> m_param_mult;
-		netlist::unique_pool_ptr<netlist::param_fp_t> m_param_offset;
-	};
-
-	int num_channels() { return m_num_channels; }
-
-private:
-	channel m_channels[MAX_INPUT_CHANNELS];
-	netlist::netlist_time m_sample_time;
-
-	netlist::logic_input_t m_feedback;
-	netlist::logic_output_t m_Q;
-
-	int m_pos;
-	int m_samples;
-	int m_num_channels;
+	using base_type = sound_in_type;
+	using base_type::base_type;
 };
-
-
-// netlib #defines this and it fights with logmacro.h
-#undef LOG
-
-#define LOG_GENERAL     (1U << 0)
-#define LOG_DEV_CALLS   (1U << 1)
-#define LOG_DEBUG       (1U << 2)
-
-//#define VERBOSE (LOG_GENERAL | LOG_DEV_CALLS | LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
-#include "logmacro.h"
-
-#define LOGDEVCALLS(...) LOGMASKED(LOG_DEV_CALLS, __VA_ARGS__)
-#define LOGDEBUG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
-
 
 netlist::setup_t &netlist_mame_device::setup()
 {
@@ -958,6 +765,7 @@ void netlist_mame_stream_input_device::custom_netlist_additions(netlist::nlparse
 	parser.register_param_val(sparam, m_offset);
 }
 
+
 // ----------------------------------------------------------------------------------------
 // netlist_mame_stream_output_device
 // ----------------------------------------------------------------------------------------
@@ -967,6 +775,9 @@ netlist_mame_stream_output_device::netlist_mame_stream_output_device(const machi
 	, netlist_mame_sub_interface(*owner)
 	, m_channel(0)
 	, m_out_name("")
+	, m_cur(0.0)
+	, m_sample_time(netlist::netlist_time::from_hz(1))
+	, m_last_buffer_time(netlist::netlist_time_ext::zero())
 {
 }
 
@@ -974,25 +785,104 @@ void netlist_mame_stream_output_device::set_params(int channel, const char *out_
 {
 	m_out_name = out_name;
 	m_channel = channel;
+	sound()->register_stream_output(channel, this);
 }
+
+/// \brief save state helper for plib classes supporting the save_state interface
+///
+struct save_helper
+{
+	save_helper(device_t *dev, pstring prefix)
+	: m_device(dev), m_prefix(prefix)
+	{}
+
+	template<typename T>
+	void save_item(T &&item, pstring name)
+	{
+		m_device->save_item(item, (m_prefix + "_" + name).c_str());
+	}
+private:
+	device_t *m_device;
+	pstring m_prefix;
+};
 
 void netlist_mame_stream_output_device::device_start()
 {
-	LOGDEVCALLS("start\n");
+	LOGDEVCALLS("start %s\n", name());
+	m_cur = 0.0;
+	m_last_buffer_time = netlist::netlist_time_ext::zero();
+
+	save_item(NAME(m_cur));
+	m_sample_time.save_state(save_helper(this, "m_sample_time"));
+	m_last_buffer_time.save_state(save_helper(this, "m_last_buffer_time"));
 }
+
+void netlist_mame_stream_output_device::device_reset()
+{
+	LOGDEVCALLS("reset %s\n", name());
+	m_cur = 0.0;
+	m_last_buffer_time = netlist::netlist_time_ext::zero();
+}
+
+void netlist_mame_stream_output_device::sound_update_fill(std::size_t samples, stream_sample_t *target)
+{
+	if (samples < m_buffer.size())
+		throw emu_fatalerror("sound %s: samples %d less bufsize %d\n", name(), samples, m_buffer.size());
+
+	std::copy(m_buffer.begin(), m_buffer.end(), target);
+	std::size_t pos = m_buffer.size();
+	while (pos < samples)
+	{
+		target[pos++] = m_cur;
+	}
+}
+
+
+void netlist_mame_stream_output_device::pre_parse_action(netlist::nlparse_t &parser)
+{
+	pstring dname = plib::pfmt("STREAM_OUT_{1}")(m_channel);
+
+	const auto lambda = [this](auto &in, netlist::nl_fptype val)
+	{
+		this->process(in.exec().time(), val);;
+	};
+
+	using lb_t = decltype(lambda);
+	using cb_t = netlist::interface::NETLIB_NAME(analog_callback)<lb_t>;
+
+	parser.factory().add<cb_t, netlist::nl_fptype, lb_t>(dname,
+		netlist::factory::properties("-", PSOURCELOC()), 1e-9, std::forward<lb_t>(lambda));
+}
+
 
 void netlist_mame_stream_output_device::custom_netlist_additions(netlist::nlparse_t &parser)
 {
-	//NETLIB_NAME(sound_out) *snd_out;
-	pstring sname = plib::pfmt("STREAM_OUT_{1}")(m_channel);
+	pstring dname = plib::pfmt("STREAM_OUT_{1}")(m_channel);
 
-	//snd_out = dynamic_cast<NETLIB_NAME(sound_out) *>(setup.register_dev("nld_sound_out", sname));
-	parser.register_dev("NETDEV_SOUND_OUT", sname);
+	parser.register_dev(dname, dname);
+	parser.register_link(dname + ".IN", pstring(m_out_name));
+}
 
-	parser.register_param_val(sname + ".CHAN" , m_channel);
-	parser.register_param_val(sname + ".MULT",  m_mult);
-	parser.register_param_val(sname + ".OFFSET",  m_offset);
-	parser.register_link(sname + ".IN", pstring(m_out_name));
+void netlist_mame_stream_output_device::process(netlist::netlist_time_ext tim, netlist::nl_fptype val)
+{
+	val = val * m_mult + m_offset;
+
+	int pos = (tim - m_last_buffer_time) / m_sample_time;
+	//if (pos > m_bufsize)
+	//	throw emu_fatalerror("sound %s: pos %d exceeded bufsize %d\n", name().c_str(), pos, m_bufsize);
+	while (m_buffer.size() < pos )
+	{
+		m_buffer.push_back(static_cast<stream_sample_t>(m_cur));
+	}
+
+	/* ignore spikes */
+	if (plib::abs(val) < 32767.0)
+		m_cur = val;
+	else if (val > 0.0)
+		m_cur = 32767.0;
+	else
+		m_cur = -32767.0;
+
 }
 
 
@@ -1141,6 +1031,7 @@ void netlist_mame_device::device_start()
 	common_dev_start(m_netlist.get());
 	m_netlist->setup().prepare_to_run();
 
+	// FIXME: use save_helper
 	m_netlist->save(*this, m_rem, pstring(this->name()), "m_rem");
 	m_netlist->save(*this, m_div, pstring(this->name()), "m_div");
 	m_netlist->save(*this, m_old, pstring(this->name()), "m_old");
@@ -1414,16 +1305,14 @@ void netlist_mame_sound_device::device_validity_check(validity_checker &valid) c
 	if (lnetlist)
 	{
 		/*Ok - do some more checks */
-		std::vector<nld_sound_out *> outdevs = lnetlist->get_device_list<nld_sound_out>();
-		if (outdevs.size() == 0)
+		if (m_out.size() == 0)
 			osd_printf_error("No output devices\n");
 		else
 		{
-			for (auto &outdev : outdevs)
+			for (auto &outdev : m_out)
 			{
-				int chan = outdev->m_channel();
-				if (chan < 0 || chan >= outdevs.size())
-					osd_printf_error("illegal channel number %d\n", chan);
+				if (outdev.first < 0 || outdev.first >= m_out.size())
+					osd_printf_error("illegal channel number %d\n", outdev.first);
 			}
 		}
 		std::vector<nld_sound_in *> indevs = lnetlist->get_device_list<nld_sound_in>();
@@ -1447,24 +1336,18 @@ void netlist_mame_sound_device::device_start()
 
 	// Configure outputs
 
-	std::vector<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out>();
-	if (outdevs.size() == 0)
+	if (m_out.size() == 0)
 		fatalerror("No output devices");
 
 	//m_num_outputs = outdevs.size();
 
 	/* resort channels */
-	for (auto &outdev : outdevs)
+	for (auto &outdev : m_out)
 	{
-		int chan = outdev->m_channel();
-
-		netlist().log().verbose("Output %s on channel %d", outdev->name(), chan);
-
-		if (chan < 0 || chan >= outdevs.size())
-			fatalerror("illegal channel number");
-		m_out[chan] = outdev;
-		m_out[chan]->m_sample_time = netlist::netlist_time::from_hz(clock());
-		m_out[chan]->buffer_reset(netlist::netlist_time_ext::zero());
+		if (outdev.first < 0 || outdev.first >= m_out.size())
+			fatalerror("illegal channel number %d", outdev.first);
+		outdev.second->set_sample_time(netlist::netlist_time::from_hz(clock()));
+		outdev.second->buffer_reset(netlist::netlist_time_ext::zero());
 	}
 
 	// Configure inputs
@@ -1479,7 +1362,8 @@ void netlist_mame_sound_device::device_start()
 	if (indevs.size() == 1)
 	{
 		m_in = indevs[0];
-		m_in->resolve(clocks_to_attotime(1));
+		const auto sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(clocks_to_attotime(1)).as_raw()));
+		m_in->resolve_params(sample_time);
 	}
 
 	/* initialize the stream(s) */
@@ -1490,10 +1374,15 @@ void netlist_mame_sound_device::device_start()
 
 void netlist_mame_sound_device::nl_register_devices(netlist::nlparse_t &parser) const
 {
-	parser.factory().add<nld_sound_out>("NETDEV_SOUND_OUT",
-		netlist::factory::properties("+CHAN", PSOURCELOC()));
+	//parser.factory().add<nld_sound_out>("NETDEV_SOUND_OUT",
+	//	netlist::factory::properties("+CHAN", PSOURCELOC()));
 	parser.factory().add<nld_sound_in>("NETDEV_SOUND_IN",
 		netlist::factory::properties("-", PSOURCELOC()));
+}
+
+void netlist_mame_sound_device::register_stream_output(int channel, netlist_mame_stream_output_device *so)
+{
+	m_out[channel] = so;
 }
 
 void netlist_mame_sound_device::device_clock_changed()
@@ -1502,7 +1391,7 @@ void netlist_mame_sound_device::device_clock_changed()
 
 	for (auto &e : m_out)
 	{
-		e.second->m_sample_time = nltime_from_clocks(1);
+		e.second->set_sample_time(nltime_from_clocks(1));
 	}
 }
 
@@ -1542,7 +1431,8 @@ void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream
 
 	if (m_in)
 	{
-		m_in->buffer_reset(m_attotime_per_clock, samples, inputs);
+		auto sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(m_attotime_per_clock).as_raw()));
+		m_in->buffer_reset(sample_time, samples, inputs);
 	}
 
 	m_cur_time += (samples * m_attotime_per_clock);

@@ -15,7 +15,7 @@
 
 #include "../../lib/netlist/nltypes.h"
 
-class nld_sound_out;
+class netlist_mame_stream_output_device;
 class nld_sound_in;
 
 namespace netlist {
@@ -239,6 +239,8 @@ public:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
+	void register_stream_output(int channel, netlist_mame_stream_output_device *so);
+
 protected:
 	// netlist_mame_device
 	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
@@ -249,7 +251,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 private:
-	std::map<int, nld_sound_out *> m_out;
+	std::map<int, netlist_mame_stream_output_device *> m_out;
 	nld_sound_in *m_in;
 	sound_stream *m_stream;
 	bool m_is_device_call;
@@ -367,7 +369,6 @@ public:
 		m_in = in_name;
 		m_delegate.set(std::forward<T>(args)...);
 	}
-
 
 protected:
 	// device-level overrides
@@ -561,14 +562,34 @@ public:
 
 	void set_params(int channel, const char *out_name);
 
+	void process(netlist::netlist_time_ext tim, netlist::nl_fptype val);
+
+	void buffer_reset(const netlist::netlist_time_ext &upto)
+	{
+		m_last_buffer_time = upto;
+		m_buffer.clear();
+	}
+
+	void sound_update_fill(std::size_t samples, stream_sample_t *target);
+
+	void set_sample_time(netlist::netlist_time t) { m_sample_time = t; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
+	virtual void pre_parse_action(netlist::nlparse_t &parser) override;
 
 private:
-	uint32_t m_channel;
-	const char *m_out_name;
+	uint32_t                     m_channel;
+	const char *                 m_out_name;
+
+	std::vector<stream_sample_t> m_buffer;
+	double                       m_cur;
+
+	netlist::netlist_time        m_sample_time;
+	netlist::netlist_time_ext    m_last_buffer_time;
 };
 
 

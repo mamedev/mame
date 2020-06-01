@@ -177,7 +177,7 @@ namespace plib
 		constexpr internal_type *get_internaltype_ptr() noexcept { return &m_time; }
 #endif
 		template <typename ST>
-		void save_state(ST &st)
+		void save_state(ST &&st)
 		{
 			st.save_item(m_time, "m_time");
 		}

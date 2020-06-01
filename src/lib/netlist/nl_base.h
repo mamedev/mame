@@ -1972,11 +1972,11 @@ namespace netlist
 				this->emplace(i, dev, formatted(fmt, i));
 		}
 
-		template<class D>
-		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt,  bool force_logic = false)
+		template<class D, typename... Args>
+		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt, Args&&... args)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, formatted(fmt, i+offset), force_logic);
+				this->emplace(i, dev, formatted(fmt, i+offset), std::forward<Args>(args)...);
 		}
 
 		template<class D>
