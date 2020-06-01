@@ -326,8 +326,14 @@ void wd_fdc_device_base::seek_continue()
 			}
 
 			if(main_state == SEEK && track == data) {
-				sub_state = SEEK_WAIT_STABILIZATION_TIME;
-				delay_cycles(t_gen, 30000);
+				if (command & 0x04) {
+					set_hld();
+					sub_state = SEEK_WAIT_STABILIZATION_TIME;
+					delay_cycles(t_gen, 30000);
+					return;
+				}
+				else
+					sub_state = SEEK_DONE;
 			}
 
 			if(sub_state == SPINUP_DONE) {
@@ -396,8 +402,7 @@ void wd_fdc_device_base::seek_continue()
 
 		case SEEK_WAIT_STABILIZATION_TIME_DONE:
 			LOGSTATE("SEEK_WAIT_STABILIZATION_TIME_DONE\n");
-			if (command & 0x04)
-				set_hld();
+			// TODO: here should be HLT wait
 			sub_state = SEEK_DONE;
 			break;
 
