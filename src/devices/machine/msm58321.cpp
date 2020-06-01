@@ -189,7 +189,8 @@ msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag,
 	m_test(0),
 	m_cs1(0),
 	m_address(0xf),
-	m_reg{}
+	m_reg{},
+	m_khz_ctr(0)
 {
 }
 
@@ -238,6 +239,7 @@ void msm58321_device::device_start()
 	save_item(NAME(m_cs1));
 	save_item(NAME(m_address));
 	save_item(NAME(m_reg));
+	save_item(NAME(m_khz_ctr));
 }
 
 
