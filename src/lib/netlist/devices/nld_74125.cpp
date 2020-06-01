@@ -24,7 +24,7 @@ namespace netlist
 		: unique_pool_ptr<T>(owner.template make_pool_object<T>(owner, name, std::forward<Args>(args)...))
 		{ }
 
-		C14CONSTEXPR auto operator ()() noexcept -> decltype((*unique_pool_ptr<T>::get())()) { return (*this->get())(); }
+		constexpr auto operator ()() noexcept -> decltype((*unique_pool_ptr<T>::get())()) { return (*this->get())(); }
 		constexpr auto operator ()() const noexcept -> const decltype((*unique_pool_ptr<T>::get())()) { return (*this->get())(); }
 	};
 

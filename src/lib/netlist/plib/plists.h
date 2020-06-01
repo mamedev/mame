@@ -150,11 +150,11 @@ namespace plib {
 
 			constexpr bool operator==(const iter_t& rhs) const noexcept { return p == rhs.p; }
 			constexpr bool operator!=(const iter_t& rhs) const noexcept { return p != rhs.p; }
-			C14CONSTEXPR LC& operator*() noexcept { return *p; }
-			C14CONSTEXPR LC* operator->() noexcept { return p; }
+			constexpr LC& operator*() noexcept { return *p; }
+			constexpr LC* operator->() noexcept { return p; }
 
-			C14CONSTEXPR LC& operator*() const noexcept { return *p; }
-			C14CONSTEXPR LC* operator->() const noexcept { return p; }
+			constexpr LC& operator*() const noexcept { return *p; }
+			constexpr LC* operator->() const noexcept { return p; }
 		};
 
 		constexpr linkedlist_t() noexcept : m_head(nullptr) {}

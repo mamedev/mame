@@ -46,8 +46,8 @@ namespace plib
 		constexpr ptime(ptime &&rhs) noexcept = default;
 		constexpr explicit ptime(const internal_type &time) noexcept : m_time(time) {}
 		constexpr explicit ptime(internal_type &&time) noexcept : m_time(time) {}
-		C14CONSTEXPR ptime &operator=(const ptime &rhs) noexcept = default;
-		C14CONSTEXPR ptime &operator=(ptime &&rhs) noexcept  = default;
+		constexpr ptime &operator=(const ptime &rhs) noexcept = default;
+		constexpr ptime &operator=(ptime &&rhs) noexcept  = default;
 
 		constexpr explicit ptime(const double t) = delete;
 		constexpr explicit ptime(const internal_type nom, const internal_type den) noexcept
@@ -60,14 +60,14 @@ namespace plib
 		}
 
 		template <typename O>
-		C14CONSTEXPR ptime &operator+=(const ptime<O, RES> &rhs) noexcept
+		constexpr ptime &operator+=(const ptime<O, RES> &rhs) noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
 			m_time += rhs.m_time;
 			return *this;
 		}
 		template <typename O>
-		C14CONSTEXPR ptime &operator-=(const ptime<O, RES> &rhs) noexcept
+		constexpr ptime &operator-=(const ptime<O, RES> &rhs) noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
 			m_time -= rhs.m_time;
@@ -75,7 +75,7 @@ namespace plib
 		}
 
 		template <typename M>
-		C14CONSTEXPR ptime &operator*=(const M &factor) noexcept
+		constexpr ptime &operator*=(const M &factor) noexcept
 		{
 			static_assert(plib::is_integral<M>::value, "Factor must be an integral type");
 			m_time *= factor;
@@ -174,7 +174,7 @@ namespace plib
 
 		// for save states ....
 #if 0
-		C14CONSTEXPR internal_type *get_internaltype_ptr() noexcept { return &m_time; }
+		constexpr internal_type *get_internaltype_ptr() noexcept { return &m_time; }
 #endif
 		template <typename ST>
 		void save_state(ST &st)

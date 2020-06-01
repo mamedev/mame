@@ -47,7 +47,7 @@ namespace plib
 			m_v.resize(N * m_stride);
 		}
 
-		C14CONSTEXPR T * operator[] (size_type row) noexcept
+		constexpr T * operator[] (size_type row) noexcept
 		{
 			return assume_aligned_ptr<T, align_size>(&m_v[m_stride * row]);
 		}

@@ -129,7 +129,7 @@ namespace plib {
 
 		bool empty() const noexcept { return size() == 0; }
 
-		C14CONSTEXPR reference operator[](size_type i) noexcept
+		constexpr reference operator[](size_type i) noexcept
 		{
 			return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(&m_a[0])[i];
 		}

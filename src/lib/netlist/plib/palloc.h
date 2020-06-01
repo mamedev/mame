@@ -408,7 +408,7 @@ namespace plib {
 	};
 
 	template <typename T, std::size_t ALIGN>
-	C14CONSTEXPR T *assume_aligned_ptr(T *p) noexcept
+	constexpr T *assume_aligned_ptr(T *p) noexcept
 	{
 		static_assert(ALIGN >= alignof(T), "Alignment must be greater or equal to alignof(T)");
 		static_assert(is_pow2(ALIGN), "Alignment must be a power of 2");
@@ -489,7 +489,7 @@ namespace plib {
 		base & as_base() noexcept { return *this; }
 		const base & as_base() const noexcept { return *this; }
 
-		C14CONSTEXPR reference operator[](size_type i) noexcept
+		constexpr reference operator[](size_type i) noexcept
 		{
 			return assume_aligned_ptr<T, ALIGN>(&(base::operator[](0)))[i];
 		}

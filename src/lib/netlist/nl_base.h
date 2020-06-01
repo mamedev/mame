@@ -388,25 +388,25 @@ namespace netlist
 		//! Copy Constructor removed.
 		constexpr state_var(const state_var &rhs) = delete;
 		//! Assignment operator to assign value of a state var.
-		C14CONSTEXPR state_var &operator=(const state_var &rhs) noexcept { m_value = rhs.m_value; return *this; } // OSX doesn't like noexcept
+		constexpr state_var &operator=(const state_var &rhs) noexcept { m_value = rhs.m_value; return *this; } // OSX doesn't like noexcept
 		//! Assignment operator to assign value of type T.
-		C14CONSTEXPR state_var &operator=(const T &rhs) noexcept { m_value = rhs; return *this; }
+		constexpr state_var &operator=(const T &rhs) noexcept { m_value = rhs; return *this; }
 		//! Assignment move operator to assign value of type T.
-		C14CONSTEXPR state_var &operator=(T &&rhs) noexcept { std::swap(m_value, rhs); return *this; }
+		constexpr state_var &operator=(T &&rhs) noexcept { std::swap(m_value, rhs); return *this; }
 		//! Return non-const value of state variable.
-		C14CONSTEXPR operator T & () noexcept { return m_value; }
+		constexpr operator T & () noexcept { return m_value; }
 		//! Return const value of state variable.
 		constexpr operator const T & () const noexcept { return m_value; }
 		//! Return non-const value of state variable.
-		C14CONSTEXPR T & var() noexcept { return m_value; }
+		constexpr T & var() noexcept { return m_value; }
 		//! Return const value of state variable.
 		constexpr const T & var() const noexcept { return m_value; }
 		//! Return non-const value of state variable.
-		C14CONSTEXPR T & operator ()() noexcept { return m_value; }
+		constexpr T & operator ()() noexcept { return m_value; }
 		//! Return const value of state variable.
 		constexpr const T & operator ()() const noexcept { return m_value; }
 		//! Access state variable by ->.
-		C14CONSTEXPR T * operator->() noexcept { return &m_value; }
+		constexpr T * operator->() noexcept { return &m_value; }
 		//! Access state variable by const ->.
 		constexpr const T * operator->() const noexcept{ return &m_value; }
 
