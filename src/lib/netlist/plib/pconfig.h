@@ -113,7 +113,7 @@
 //============================================================
 
 
-#ifdef NVCCBUILD
+#if (NVCCBUILD > 0)
 	#define C14CONSTEXPR constexpr
 	#if NVCCBUILD == 101
 		#define NVCC_CONSTEXPR constexpr

@@ -247,6 +247,11 @@ namespace netlist
 		ENTRY_EX(sizeof(pstring))
 		ENTRY_EX(sizeof(core_device_t::stats_t))
 		ENTRY_EX(sizeof(plib::plog_level))
+
+		ENTRY_EX(sizeof(nldelegate))
+		ENTRY(PPMF_TYPE)
+		ENTRY(PHAS_PMF_INTERNAL)
+
 	#undef ENTRY
 	#undef ENTRY_EX
 	}
