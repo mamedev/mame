@@ -6469,6 +6469,19 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="ink">
+		<description>Ink</description>
+		<year>2006</year>
+		<publisher>Matra</publisher>
+		<info name="alt_title" value="Ink - Exxon Surfing" />
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="524288">
+				<!-- Am29F040B flashrom dump -->
+				<rom name="ink.bin" size="524288" crc="23049642" sha1="4d74d3bad55a9b1deb88b81bd4ad5165383508d5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="theseus">
 		<description>Theseus - Iligks I (Jpn)</description>
 		<year>1984</year>
