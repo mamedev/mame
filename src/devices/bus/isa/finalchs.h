@@ -41,8 +41,8 @@ private:
 
 	bool m_installed;
 
-	DECLARE_READ8_MEMBER(finalchs_r);
-	DECLARE_WRITE8_MEMBER(finalchs_w);
+	uint8_t finalchs_r(offs_t offset);
+	void finalchs_w(offs_t offset, uint8_t data);
 
 	void finalchs_mem(address_map &map);
 };

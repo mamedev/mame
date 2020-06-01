@@ -187,8 +187,8 @@ sega_sk1100_device::sega_sk1100_device(const machine_config &mconfig, const char
 	m_cassette(*this, "cassette"),
 	m_ppi(*this, UPD9255_0_TAG),
 	m_printer_port(*this, "printer"),
-	m_pa(*this, {"PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7"}),
-	m_pb(*this, {"PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7"}),
+	m_pa(*this, "PA%u", 0U),
+	m_pb(*this, "PB%u", 0U),
 	m_keylatch(0)
 {
 }
@@ -209,7 +209,7 @@ void sega_sk1100_device::device_start()
 //  peripheral_r - keyboard read
 //-------------------------------------------------
 
-READ8_MEMBER(sega_sk1100_device::peripheral_r)
+uint8_t sega_sk1100_device::peripheral_r(offs_t offset)
 {
 	return m_ppi->read(offset & 0x03);
 }
@@ -219,7 +219,7 @@ READ8_MEMBER(sega_sk1100_device::peripheral_r)
 //  peripheral_w - keyboard write
 //-------------------------------------------------
 
-WRITE8_MEMBER(sega_sk1100_device::peripheral_w)
+void sega_sk1100_device::peripheral_w(offs_t offset, uint8_t data)
 {
 	m_ppi->write(offset & 0x03, data);
 }

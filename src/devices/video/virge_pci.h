@@ -43,8 +43,8 @@ public:
 	DECLARE_WRITE32_MEMBER(vga_3c0_w);
 	DECLARE_READ32_MEMBER(vga_3d0_r);
 	DECLARE_WRITE32_MEMBER(vga_3d0_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
 	DECLARE_READ32_MEMBER(base_address_r);
 	DECLARE_WRITE32_MEMBER(base_address_w);
 

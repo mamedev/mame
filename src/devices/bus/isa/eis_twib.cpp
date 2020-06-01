@@ -79,13 +79,13 @@ DEFINE_DEVICE_TYPE(ISA8_EIS_TWIB, isa8_eistwib_device, "eistwib", "EIS TWIB IBM 
 //-------------------------------------------------
 //  Access methods from ISA bus
 //-------------------------------------------------
-READ8_MEMBER( isa8_eistwib_device::twib_r )
+uint8_t isa8_eistwib_device::twib_r(offs_t offset)
 {
 	LOGR("%s : offset=%d\n", FUNCNAME, offset);
 	return m_uart8274->cd_ba_r(offset);
 }
 
-WRITE8_MEMBER( isa8_eistwib_device::twib_w )
+void isa8_eistwib_device::twib_w(offs_t offset, uint8_t data)
 {
 	LOG("%s : offset=%d data=0x%02x\n", FUNCNAME, offset, data);
 	m_uart8274->cd_ba_w(offset, data);
@@ -249,8 +249,8 @@ void isa8_eistwib_device::device_reset()
 		LOG("Installing twib device at %04x\n", base);
 		m_isa->install_device(
 				base, base + 0x0f,
-				read8_delegate(*this, FUNC( isa8_eistwib_device::twib_r )),
-				write8_delegate(*this, FUNC( isa8_eistwib_device::twib_w )));
+				read8sm_delegate(*this, FUNC( isa8_eistwib_device::twib_r )),
+				write8sm_delegate(*this, FUNC( isa8_eistwib_device::twib_w )));
 		m_installed = true;
 	}
 	// CD and CTS input are tied to ground

@@ -2238,11 +2238,6 @@ project "asmjit"
 
 	configuration { }
 
-	configuration { "osx*"}
-	buildoptions {
-		"-DASMJIT_MSC=0",
-	}
-
 	files {
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/asmjit.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core.h",

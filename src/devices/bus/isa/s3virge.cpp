@@ -731,7 +731,7 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 }
 
 
-READ8_MEMBER(s3virge_vga_device::port_03b0_r)
+uint8_t s3virge_vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -743,7 +743,7 @@ READ8_MEMBER(s3virge_vga_device::port_03b0_r)
 				res = s3_crtc_reg_read(vga.crtc.index);
 				break;
 			default:
-				res = vga_device::port_03b0_r(space,offset,mem_mask);
+				res = vga_device::port_03b0_r(offset);
 				break;
 		}
 	}
@@ -751,7 +751,7 @@ READ8_MEMBER(s3virge_vga_device::port_03b0_r)
 	return res;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::port_03b0_w)
+void s3virge_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3b0)
 	{
@@ -762,37 +762,37 @@ WRITE8_MEMBER(s3virge_vga_device::port_03b0_w)
 				s3_crtc_reg_write(vga.crtc.index,data);
 				break;
 			default:
-				vga_device::port_03b0_w(space,offset,data,mem_mask);
+				vga_device::port_03b0_w(offset,data);
 				break;
 		}
 	}
 }
 
-READ8_MEMBER(s3virge_vga_device::port_03c0_r)
+uint8_t s3virge_vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t res;
 
 	switch(offset)
 	{
 		default:
-			res = s3_vga_device::port_03c0_r(space,offset,mem_mask);
+			res = s3_vga_device::port_03c0_r(offset);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::port_03c0_w)
+void s3virge_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 		default:
-			s3_vga_device::port_03c0_w(space,offset,data,mem_mask);
+			s3_vga_device::port_03c0_w(offset,data);
 			break;
 	}
 }
 
-READ8_MEMBER(s3virge_vga_device::port_03d0_r)
+uint8_t s3virge_vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -804,7 +804,7 @@ READ8_MEMBER(s3virge_vga_device::port_03d0_r)
 				res = s3_crtc_reg_read(vga.crtc.index);
 				break;
 			default:
-				res = vga_device::port_03d0_r(space,offset,mem_mask);
+				res = vga_device::port_03d0_r(offset);
 				break;
 		}
 	}
@@ -812,7 +812,7 @@ READ8_MEMBER(s3virge_vga_device::port_03d0_r)
 	return res;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::port_03d0_w)
+void s3virge_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -823,13 +823,13 @@ WRITE8_MEMBER(s3virge_vga_device::port_03d0_w)
 				s3_crtc_reg_write(vga.crtc.index,data);
 				break;
 			default:
-				vga_device::port_03d0_w(space,offset,data,mem_mask);
+				vga_device::port_03d0_w(offset,data);
 				break;
 		}
 	}
 }
 
-READ8_MEMBER(s3virge_vga_device::mem_r)
+uint8_t s3virge_vga_device::mem_r(offs_t offset)
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
 	{
@@ -858,12 +858,12 @@ READ8_MEMBER(s3virge_vga_device::mem_r)
 		return data;
 	}
 	if((offset + (svga.bank_r*0x10000)) < vga.svga_intf.vram_size)
-		return vga_device::mem_r(space,offset,mem_mask);
+		return vga_device::mem_r(offset);
 	else
 		return 0xff;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::mem_w)
+void s3virge_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	// bit 4 of CR53 enables memory-mapped I/O
 	if(s3.cr53 & 0x10)
@@ -897,17 +897,17 @@ WRITE8_MEMBER(s3virge_vga_device::mem_w)
 	}
 
 	if((offset + (svga.bank_w*0x10000)) < vga.svga_intf.vram_size)
-		vga_device::mem_w(space,offset,data,mem_mask);
+		vga_device::mem_w(offset,data);
 }
 
-READ8_MEMBER(s3virge_vga_device::fb_r)
+uint8_t s3virge_vga_device::fb_r(offs_t offset)
 {
 	if(offset < s3virge.linear_address_size_full)
 		return vga.memory[offset % vga.svga_intf.vram_size];
 	return 0xff;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::fb_w)
+void s3virge_vga_device::fb_w(offs_t offset, uint8_t data)
 {
 	if(offset < s3virge.linear_address_size_full)
 		vga.memory[offset % vga.svga_intf.vram_size] = data;

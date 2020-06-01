@@ -52,13 +52,14 @@ READ16_MEMBER(dectalk_isa_device::host_irq_r)
 	return 0;
 }
 
-READ8_MEMBER(dectalk_isa_device::dma_r)
+uint8_t dectalk_isa_device::dma_r()
 {
-	m_cpu->drq1_w(0);
+	if (!machine().side_effects_disabled())
+		m_cpu->drq1_w(0);
 	return m_dma;
 }
 
-WRITE8_MEMBER(dectalk_isa_device::dma_w)
+void dectalk_isa_device::dma_w(uint8_t data)
 {
 	m_cpu->drq1_w(0);
 	m_dma = data;
@@ -176,7 +177,7 @@ void dectalk_isa_device::device_add_mconfig(machine_config &config)
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
-WRITE8_MEMBER(dectalk_isa_device::write)
+void dectalk_isa_device::write(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -202,7 +203,7 @@ WRITE8_MEMBER(dectalk_isa_device::write)
 	}
 }
 
-READ8_MEMBER(dectalk_isa_device::read)
+uint8_t dectalk_isa_device::read(offs_t offset)
 {
 	switch(offset)
 	{
@@ -215,7 +216,8 @@ READ8_MEMBER(dectalk_isa_device::read)
 		case 3:
 			return m_data >> 8;
 		case 4:
-			m_cpu->drq1_w(1);
+			if (!machine().side_effects_disabled())
+				m_cpu->drq1_w(1);
 			return m_dma;
 	}
 	return 0;
@@ -224,7 +226,7 @@ READ8_MEMBER(dectalk_isa_device::read)
 void dectalk_isa_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0250, 0x0257, read8_delegate(*this, FUNC(dectalk_isa_device::read)), write8_delegate(*this, FUNC(dectalk_isa_device::write)));
+	m_isa->install_device(0x0250, 0x0257, read8sm_delegate(*this, FUNC(dectalk_isa_device::read)), write8sm_delegate(*this, FUNC(dectalk_isa_device::write)));
 }
 
 void dectalk_isa_device::device_reset()

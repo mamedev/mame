@@ -44,13 +44,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(stateparam_w);
-	DECLARE_READ8_MEMBER(stateparam_r);
-	DECLARE_WRITE8_MEMBER(lut_w);
-	DECLARE_READ8_MEMBER(init_r);
-	DECLARE_WRITE8_MEMBER(accel_w);
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t vram_r(offs_t offset);
+	void stateparam_w(offs_t offset, uint8_t data);
+	uint8_t stateparam_r(offs_t offset);
+	void lut_w(offs_t offset, uint8_t data);
+	uint8_t init_r();
+	void accel_w(offs_t offset, uint8_t data);
 
 	void reset_common();
 

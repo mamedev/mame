@@ -529,7 +529,7 @@ READ16_MEMBER(apollo_state::apollo_atbus_io_r)
 	uint32_t isa_addr = (offset & 3) + ((offset & ~0x1ff) >> 7);
 
 	// Motorola CPU is MSB first, ISA Bus is LSB first
-	uint16_t data = m_isa->io16_swap_r(space, isa_addr, mem_mask);
+	uint16_t data = m_isa->io16_swap_r(isa_addr, mem_mask);
 
 	SLOG2(("apollo_atbus_io_r at %08x -> %04x = %04x & %04x", ATBUS_IO_BASE + offset*2, isa_addr*2, data, mem_mask));
 
@@ -543,7 +543,7 @@ WRITE16_MEMBER(apollo_state::apollo_atbus_io_w)
 	SLOG2(("apollo_atbus_io_w at %08x -> %04x = %04x & %04x", ATBUS_IO_BASE + offset*2, isa_addr*2, data, mem_mask));
 
 	// Motorola CPU is MSB first, ISA Bus is LSB first
-	m_isa->io16_swap_w(space, isa_addr, data, mem_mask);
+	m_isa->io16_swap_w(isa_addr, data, mem_mask);
 }
 
 /***************************************************************************
@@ -555,7 +555,7 @@ READ16_MEMBER(apollo_state::apollo_atbus_memory_r)
 	uint16_t data;
 
 	// Motorola CPU is MSB first, ISA Bus is LSB first
-	data = m_isa->mem16_swap_r(space, offset, mem_mask);
+	data = m_isa->mem16_swap_r(offset, mem_mask);
 
 	SLOG2(("apollo_atbus_memory_r at %08x = %04x & %04x", ATBUS_MEMORY_BASE + offset * 2, data, mem_mask));
 	return data;
@@ -566,7 +566,7 @@ WRITE16_MEMBER(apollo_state::apollo_atbus_memory_w)
 	SLOG2(("apollo_atbus_memory_w at %08x = %04x & %04x", ATBUS_MEMORY_BASE + offset*2, data, mem_mask));
 
 	// Motorola CPU is MSB first, ISA Bus is LSB first
-	m_isa->mem16_swap_w(space, offset, data, mem_mask);
+	m_isa->mem16_swap_w(offset, data, mem_mask);
 }
 
 /***************************************************************************

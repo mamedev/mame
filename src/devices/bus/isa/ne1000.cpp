@@ -31,7 +31,7 @@ void ne1000_device::device_start() {
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
 	set_isa_device();
-	m_isa->install_device(0x0300, 0x031f, read8_delegate(*this, FUNC(ne1000_device::ne1000_port_r)), write8_delegate(*this, FUNC(ne1000_device::ne1000_port_w)));
+	m_isa->install_device(0x0300, 0x031f, read8sm_delegate(*this, FUNC(ne1000_device::ne1000_port_r)), write8sm_delegate(*this, FUNC(ne1000_device::ne1000_port_w)));
 }
 
 void ne1000_device::device_reset() {
@@ -39,7 +39,7 @@ void ne1000_device::device_reset() {
 	m_irq = ioport("CONFIG")->read() & 3;
 }
 
-READ8_MEMBER(ne1000_device::ne1000_port_r) {
+uint8_t ne1000_device::ne1000_port_r(offs_t offset) {
 	if(offset < 16) {
 		m_dp8390->dp8390_cs(CLEAR_LINE);
 		return m_dp8390->dp8390_r(offset);
@@ -57,7 +57,7 @@ READ8_MEMBER(ne1000_device::ne1000_port_r) {
 	return 0;
 }
 
-WRITE8_MEMBER(ne1000_device::ne1000_port_w) {
+void ne1000_device::ne1000_port_w(offs_t offset, uint8_t data) {
 	if(offset < 16) {
 		m_dp8390->dp8390_cs(CLEAR_LINE);
 		m_dp8390->dp8390_w(offset, data);

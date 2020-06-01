@@ -64,7 +64,7 @@ void isa8_chessmsr_device::device_reset()
 	{
 		// MAME doesn't allow reading ioport at device_start
 		u16 port = ioport("DSW")->read() * 0x40 + 0x10;
-		m_isa->install_device(port, port+1, read8_delegate(*this, FUNC(isa8_chessmsr_device::chessmsr_r)), write8_delegate(*this, FUNC(isa8_chessmsr_device::chessmsr_w)));
+		m_isa->install_device(port, port+1, read8sm_delegate(*this, FUNC(isa8_chessmsr_device::chessmsr_r)), write8sm_delegate(*this, FUNC(isa8_chessmsr_device::chessmsr_w)));
 
 		m_maincpu->set_unscaled_clock(ioport("CPU")->read() ? (32_MHz_XTAL) : (30_MHz_XTAL/2));
 
@@ -80,7 +80,7 @@ void isa8_chessmsr_device::device_reset()
 void isa8_chessmsr_device::device_reset_after_children()
 {
 	// hold ARM CPU in reset state
-	chessmsr_w(machine().dummy_space(), 1, 0);
+	chessmsr_w(1, 0);
 }
 
 
@@ -152,7 +152,7 @@ void isa8_chessmsr_device::device_add_mconfig(machine_config &config)
 
 // External handlers
 
-READ8_MEMBER(isa8_chessmsr_device::chessmsr_r)
+uint8_t isa8_chessmsr_device::chessmsr_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_mainlatch->read();
@@ -160,7 +160,7 @@ READ8_MEMBER(isa8_chessmsr_device::chessmsr_r)
 		return m_mainlatch->pending_r() ? 0 : 2;
 }
 
-WRITE8_MEMBER(isa8_chessmsr_device::chessmsr_w)
+void isa8_chessmsr_device::chessmsr_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
