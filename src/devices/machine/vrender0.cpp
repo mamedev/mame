@@ -434,7 +434,10 @@ void vrender0soc_device::tmcnt_w(offs_t offset, u16 data, u16 mem_mask)
 static inline int dma_setup_hold_dec(u8 setting, u8 bitmask, u8 decmask)
 {
 	const int inc = setting & bitmask ? 0 : (setting & 2) ? 4 : (1 << (setting & 1));
+#if 0
 	return setting & decmask ? -inc : inc;
+#endif
+	return inc;
 }
 
 template<int Which> u32 vrender0soc_device::dmasa_r() { return m_dma[Which].src; }
@@ -472,7 +475,7 @@ void vrender0soc_device::dmac_w(offs_t offset, u32 data, u32 mem_mask)
 		if ((data & (DMA_POLARITY)) != 0)
 			logerror("%s: DMA%d with unimplemented register %04x\n",this->tag(),Which,data & DMA_POLARITY);
 
-		if ((data & (DMA_REPEAT | DMA_RELOAD_ADDR)) != 0)
+		if ((data & (DMA_REPEAT | DMA_RELOAD_ADDR | DMA_SRCDEC | DMA_DSTDEC)) != 0)
 			popmessage("DMA%d with unhandled mode %04x, contact MAMEdev",Which,data);
 
 		// TODO: correct?
