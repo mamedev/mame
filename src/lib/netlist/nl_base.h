@@ -405,10 +405,6 @@ namespace netlist
 		C14CONSTEXPR T & operator ()() noexcept { return m_value; }
 		//! Return const value of state variable.
 		constexpr const T & operator ()() const noexcept { return m_value; }
-		//! Return pointer to state variable.
-		C14CONSTEXPR T * ptr() noexcept { return &m_value; }
-		//! Return const pointer to state variable.
-		constexpr const T * ptr() const noexcept{ return &m_value; }
 		//! Access state variable by ->.
 		C14CONSTEXPR T * operator->() noexcept { return &m_value; }
 		//! Access state variable by const ->.
@@ -829,9 +825,6 @@ namespace netlist
 			// internal state support
 			// FIXME: get rid of this and implement export/import in MAME
 
-			// only used for logic nets
-			netlist_sig_t *Q_state_ptr() noexcept { return m_cur_Q.ptr(); }
-
 		private:
 			state_var<netlist_sig_t>     m_new_Q;
 			state_var<netlist_sig_t>     m_cur_Q;
@@ -994,7 +987,6 @@ namespace netlist
 		using detail::net_t::initial;
 		using detail::net_t::set_Q_and_push;
 		using detail::net_t::set_Q_time;
-		using detail::net_t::Q_state_ptr;
 	};
 
 	class analog_net_t : public detail::net_t
@@ -1007,7 +999,8 @@ namespace netlist
 
 		nl_fptype Q_Analog() const noexcept { return m_cur_Analog; }
 		void set_Q_Analog(nl_fptype v) noexcept { m_cur_Analog = v; }
-		nl_fptype *Q_Analog_state_ptr() noexcept { return m_cur_Analog.ptr(); }
+		// used by solver code ...
+		nl_fptype *Q_Analog_state_ptr() noexcept { return &m_cur_Analog(); }
 
 		//FIXME: needed by current solver code
 		solver::matrix_solver_t *solver() const noexcept { return m_solver; }
@@ -1141,11 +1134,10 @@ namespace netlist
 	public:
 		analog_output_t(core_device_t &dev, const pstring &aname);
 
-		void push(nl_fptype val) noexcept { set_Q(val); }
+		void push(nl_fptype val) noexcept;
 		void initial(nl_fptype val) noexcept;
 
 	private:
-		void set_Q(nl_fptype newQ) noexcept;
 		analog_net_t m_my_net;
 	};
 
@@ -1517,6 +1509,7 @@ namespace netlist
 
 		~device_t() noexcept override = default;
 
+		nldelegate default_delegate() { return nldelegate(&device_t::update, this); }
 	protected:
 
 		NETLIB_UPDATEI() { }
@@ -2336,7 +2329,7 @@ namespace netlist
 		return net().Q_Analog();
 	}
 
-	inline void analog_output_t::set_Q(nl_fptype newQ) noexcept
+	inline void analog_output_t::push(nl_fptype newQ) noexcept
 	{
 		if (newQ != m_my_net.Q_Analog())
 		{

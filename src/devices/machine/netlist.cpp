@@ -1334,6 +1334,35 @@ netlist_mame_cpu_device::netlist_mame_cpu_device(const machine_config &mconfig, 
 }
 
 
+// Fixes overflow error in device_pseudo_state_register
+template<>
+class device_pseudo_state_register<double> : public device_state_entry
+{
+public:
+	typedef typename std::function<double ()> getter_func;
+	typedef typename std::function<void (double)> setter_func;
+
+	// construction/destruction
+	device_pseudo_state_register(int index, const char *symbol, getter_func &&getter, setter_func &&setter, device_state_interface *dev)
+		: device_state_entry(index, symbol, sizeof(double), ~u64(0), DSF_FLOATING_POINT, dev),
+			m_getter(std::move(getter)),
+			m_setter(std::move(setter))
+	{
+	}
+
+protected:
+	// device_state_entry overrides
+	virtual u64 entry_value() const override { return u64(m_getter()); }
+	virtual void entry_set_value(u64 value) const override { m_setter(double(value)); }
+	virtual double entry_dvalue() const override { return m_getter(); }
+	virtual void entry_set_dvalue(double value) const override { m_setter(value); }
+
+private:
+	getter_func             m_getter;               // function to retrieve the data
+	setter_func             m_setter;               // function to store the data
+};
+
+
 void netlist_mame_cpu_device::device_start()
 {
 	netlist_mame_device::device_start();
@@ -1346,13 +1375,23 @@ void netlist_mame_cpu_device::device_start()
 	int index = 0;
 	for (auto &n : netlist().nets())
 	{
+		pstring name = n->name(); //plib::replace_all(n->name(), ".", "_");
 		if (n->is_logic())
 		{
-			state_add(index++, n->name().c_str(), *(downcast<netlist::logic_net_t &>(*n).Q_state_ptr()));
+			auto nl = downcast<netlist::logic_net_t *>(n.get());
+			state_add<netlist::netlist_sig_t>(index++, name.c_str(),
+				[nl]() { return nl->Q(); },
+				[nl](netlist::netlist_sig_t data) { nl->set_Q_and_push(data, netlist::netlist_time::quantum()); });
 		}
 		else
 		{
-			//state_add(index++, n->name().c_str(), *(downcast<netlist::analog_net_t &>(*n).Q_Analog_state_ptr()));
+			auto nl = downcast<netlist::analog_net_t *>(n.get());
+			state_add(std::make_unique<device_pseudo_state_register<double>>(
+				index++,
+				name.c_str(),
+				[nl]() { return nl->Q_Analog(); },
+				[nl](double data) { nl->set_Q_Analog(data); },
+				this));
 		}
 	}
 
