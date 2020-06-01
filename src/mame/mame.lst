@@ -32513,6 +32513,11 @@ nms9100                         // Philips NMS 9100 series
 to16                            // Thomson TO16
 alphatp10                       // Triumph-Adler Alphatronic P10
 alphatp50                       // Triumph-Adler Alphatronic P50
+sergeysxt                       // Sergey's XT
+xiprocessor                     // Xi processor board
+micro88                         // Micro 8088
+mononuxt                        // monotech NuXT
+mononuxt2                       // monotech NuXT v2
 
 @source:pc100.cpp
 pc100                           //
