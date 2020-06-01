@@ -258,7 +258,7 @@ private:
 	TIMER_CALLBACK_MEMBER(line_off_callback);
 	TIMER_CALLBACK_MEMBER(video_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	int get_tilemap_Region(int layer);
+	int get_tilemap_region(int layer);
 	void get_tilemap_info_common(int layer, tile_data &tileinfo, int count);
 	void get_roz_tilemap_info(int layer, tile_data &tileinfo, int count);
 	int get_tilemap_dimensions(int &xsize, int &ysize, int layer);
@@ -273,7 +273,7 @@ private:
 };
 
 
-int supracan_state::get_tilemap_Region(int layer)
+int supracan_state::get_tilemap_region(int layer)
 {
 	// HACK!!!
 	if (layer == 2)
@@ -305,7 +305,7 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 
 	uint32_t base = m_tilemap_base_addr[layer];
 	int gfx_mode = (m_tilemap_mode[layer] & 0x7000) >> 12;
-	int region = get_tilemap_Region(layer);
+	int region = get_tilemap_region(layer);
 
 	count += base;
 
@@ -367,7 +367,7 @@ void supracan_state::get_roz_tilemap_info(int layer, tile_data &tileinfo, int co
 	uint16_t tile_bank = 0;
 	uint16_t palette_bank = 0;
 
-	region = get_tilemap_Region(layer);
+	region = get_tilemap_region(layer);
 
 	switch (m_roz_mode & 3) // FIXME: fix gfx bpp order
 	{
@@ -1028,7 +1028,7 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 //            tilemap_num = layer;
 				int which_tilemap_size = get_tilemap_dimensions(xsize, ysize, layer);
 				bitmap_ind16 &src_bitmap = m_tilemap_sizes[layer][which_tilemap_size]->pixmap();
-				int gfx_region = get_tilemap_Region(layer);
+				int gfx_region = get_tilemap_region(layer);
 				int transmask = 0xff;
 
 				switch (gfx_region)
