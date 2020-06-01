@@ -1187,6 +1187,42 @@ ROM_START( galsnewk ) /* EXPRO-02 PCB, Korean title is "Ddang Dda Meok Gi" */
 	ROM_LOAD( "pm007k.u47", 0x80000, 0x80000, CRC(a8dc1fd5) SHA1(c324f7eab7302e4a71d505c915ab2ad591b8ff33) )
 ROM_END
 
+ROM_START( galsnewt ) // EXPRO-02 PCB
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "pm110t.u87",  0x000000, 0x20000, CRC(356c65de) SHA1(2f9b6a403488f9a05d8d4b341598f05914cfd9ea) )
+	ROM_LOAD16_BYTE( "pm109t.u88",  0x000001, 0x20000, CRC(6d7b4131) SHA1(fa7e2f1010a66ea069533e00d05133829247f115) )
+
+	ROM_REGION16_BE( 0x300000, "user1", 0 ) // 68000 data
+	ROM_LOAD16_BYTE( "pm004e.u86", 0x000001, 0x80000, CRC(d3af52bc) SHA1(46be057106388578defecab1cdd1793ec76ebe92) )
+	ROM_LOAD16_BYTE( "pm005e.u85", 0x000000, 0x80000, CRC(d7ec650c) SHA1(6c2250c74381497154bf516e0cf1db6bb56bb446) )
+	ROM_LOAD16_BYTE( "pm000e.u74", 0x100001, 0x80000, CRC(5d220f3f) SHA1(7ff373e01027c8832712f7a2d732f8e49b875878) )
+	ROM_LOAD16_BYTE( "pm001e.u73", 0x100000, 0x80000, CRC(90433eb1) SHA1(8688a85747ad9ecac395d782f130baa64fb9d12b) )
+	ROM_LOAD16_BYTE( "pm002e.u76", 0x200001, 0x80000, CRC(713ee898) SHA1(c9f608a57fb90e5ee15eb76a74a7afcc406d5b4e) )
+	ROM_LOAD16_BYTE( "pm003e.u75", 0x200000, 0x80000, CRC(6bb060fd) SHA1(4fc3946866c5a55e8340b62b5ad9beae723ce0da) )
+
+	ROM_REGION16_BE( 0x80000, "user2", 0 )
+	ROM_LOAD16_WORD_SWAP( "pm017e.u84", 0x00000, 0x80000, CRC(bc41b6ca) SHA1(0aeaf024dd7c84550e7df27230a1d4f04cc1d61c) )
+
+	ROM_REGION( 0x200000, "kan_spr", ROMREGION_ERASEFF ) // sprites
+	// The 06e rom from the other type gals panic board ends up split across 2 roms here
+	ROM_LOAD( "pm006e.u83", 0x000000, 0x080000, CRC(a7555d9a) SHA1(f95821b3358d9ab03ca9ead38fd358062259d89d) )
+	ROM_LOAD( "pm206e.u82", 0x080000, 0x080000, CRC(cc978baa) SHA1(59a95bcbaeca9d356f61ea42af4da116afbb1491) )
+	ROM_LOAD( "pm018e.u94", 0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
+	// U93 is an empty socket and not used with this set
+
+	ROM_REGION( 0x200000, "view2", ROMREGION_ERASEFF ) // sprites
+
+	ROM_REGION( 0x200000, "gfx3", 0 ) // tiles - encrypted
+	ROM_LOAD( "pm013e.u89", 0x000000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
+	ROM_LOAD( "pm014e.u90", 0x080000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
+	ROM_LOAD( "pm015e.u91", 0x100000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
+	ROM_LOAD( "pm016e.u92", 0x180000, 0x080000, CRC(c0b9494c) SHA1(f0b066dd78eb9fcf947da90ddb6c7b62299c5743) )
+
+	ROM_REGION( 0x100000, "oki", 0 ) // OKIM6295 samples (Japanese versions on the Taiwan board)
+	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
+	ROM_LOAD( "pm008j.u46", 0x00000, 0x80000, CRC(f394670e) SHA1(171f8dc519a13f352e6440aaadebe490c82361f0) )
+	ROM_LOAD( "pm007j.u47", 0x80000, 0x80000, CRC(06780287) SHA1(8b9b57f6604b86d6dff42e5e51cd59a7111e1e79) )
+ROM_END
 
 /*
 
@@ -1873,14 +1909,15 @@ void expro02_state::init_expro02()
  *
  *************************************/
 
-GAME( 1990, galsnew,   0,        expro02,  expro02,   expro02_state, init_expro02, ROT90, "Kaneko",                   "Gals Panic (US, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galsnew,   0,        expro02,  expro02,   expro02_state, init_expro02, ROT90, "Kaneko",                   "Gals Panic (US, EXPRO-02 PCB)",     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, galsnewa,  galsnew,  expro02,  galsnewa,  expro02_state, init_expro02, ROT90, "Kaneko",                   "Gals Panic (Export, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galsnewj,  galsnew,  expro02,  galsnewj,  expro02_state, init_expro02, ROT90, "Kaneko (Taito license)",   "Gals Panic (Japan, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galsnewk,  galsnew,  expro02,  galsnewj,  expro02_state, init_expro02, ROT90, "Kaneko (Inter license)",   "Gals Panic (Korea, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galsnewj,  galsnew,  expro02,  galsnewj,  expro02_state, init_expro02, ROT90, "Kaneko (Taito license)",   "Gals Panic (Japan, EXPRO-02 PCB)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galsnewk,  galsnew,  expro02,  galsnewj,  expro02_state, init_expro02, ROT90, "Kaneko (Inter license)",   "Gals Panic (Korea, EXPRO-02 PCB)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galsnewt,  galsnew,  expro02,  galsnewj,  expro02_state, init_expro02, ROT90, "Kaneko",                   "Gals Panic (Taiwan, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 /* the first version of Fantasia clones the EXPRO02 almost exactly, including the encrypted tiles*/
 GAME( 1994, fantasia,  0,        comad,    fantasia,  expro02_state, init_expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, fantasiab, fantasia, comad,    fantasia,  expro02_state, init_expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fantasiaa, fantasia, comad,    fantasia,  expro02_state, init_expro02, ROT90, "Comad & New Japan System", "Fantasia (940307 PCB)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fantasiaa, fantasia, comad,    fantasia,  expro02_state, init_expro02, ROT90, "Comad & New Japan System", "Fantasia (940307 PCB)",        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* subsequent releases remove the encrypted tile (View2 layer) but leave the unused writes to it in the program code */
 GAME( 1994, fantasian, fantasia, fantasia, fantasiaa, expro02_state, empty_init,   ROT90, "Comad & New Japan System", "Fantasia (940803 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
@@ -1888,28 +1925,28 @@ GAME( 1994, supmodel,  0,        supmodel, fantasiaa, expro02_state, empty_init,
 
 GAME( 1995, newfant,   0,        fantasia, fantasiaa, expro02_state, empty_init,   ROT90, "Comad & New Japan System", "New Fantasia (1995 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the only difference between the two is the gfx rom containing the copyright
 GAME( 1994, newfanta,  newfant,  fantasia, fantasiaa, expro02_state, empty_init,   ROT90, "Comad & New Japan System", "New Fantasia (1994 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fantsy95,  newfant,  fantasia, fantasiaa, expro02_state, empty_init,   ROT90, "Hi-max Technology Inc.",   "Fantasy '95", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
+GAME( 1995, fantsy95,  newfant,  fantasia, fantasiaa, expro02_state, empty_init,   ROT90, "Hi-max Technology Inc.",   "Fantasy '95",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
 
 // the PCB label (A/B) could be related to the 3 different levels of nudity Comad offered
 GAME( 1996, missw96,   0,        fantasia, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
 GAME( 1996, missw96a,  missw96,  fantasia, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
 GAME( 1996, missw96b,  missw96,  fantasia, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
-GAME( 1996, missw96c,  missw96,  fantasia, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000B PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )        // "B" nudity level
+GAME( 1996, missw96c,  missw96,  fantasia, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000B PCB)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
 
 GAME( 1996, missmw96,  missw96,  fantasia, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Miss Mister World '96 (Nude)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, smissw,    0,        smissw,   missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Super Miss World", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // 951127 PCB
 
-GAME( 1997, fantsia2,  0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Fantasia II (Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // "A" nudity level
+GAME( 1997, fantsia2,  0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Fantasia II (Explicit)",      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // "A" nudity level
 GAME( 1997, fantsia2a, fantsia2, fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Fantasia II (Less Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
-GAME( 1998, fantsia2n, fantsia2, fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Fantasia II (1998)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )          // "A" nudity level
+GAME( 1998, fantsia2n, fantsia2, fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Fantasia II (1998)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )          // "A" nudity level
 
 GAME( 2002, wownfant,  0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "WOW New Fantasia", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
-GAME( 2002, missw02,   0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Daigom",                   "Miss World 2002", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )  // "A" nudity level
+GAME( 2002, missw02,   0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Daigom",                   "Miss World 2002",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )  // "A" nudity level
 
 GAME( 1996, pgalvip,   0,        galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
 GAME( 1997, pgalvipa,  pgalvip,  galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, galhustl,  pgalvip,  galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "ACE International",        "Gals Hustler", MACHINE_SUPPORTS_SAVE ) // hack of the above?
+GAME( 1997, galhustl,  pgalvip,  galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "ACE International",        "Gals Hustler",              MACHINE_SUPPORTS_SAVE ) // hack of the above?
 
-GAME( 1995, zipzap,    0,        zipzap,   zipzap,    expro02_state, empty_init,   ROT90, "Barko Corp",               "Zip & Zap (Explicit)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+GAME( 1995, zipzap,    0,        zipzap,   zipzap,    expro02_state, empty_init,   ROT90, "Barko Corp",               "Zip & Zap (Explicit)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
 GAME( 1995, zipzapa,   zipzap,   zipzap,   zipzap,    expro02_state, empty_init,   ROT90, "Barko Corp",               "Zip & Zap (Less Explicit)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
