@@ -67,65 +67,13 @@ void spg2xx_video_device::device_reset()
 
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
-	m_video_regs[0x3c] = 0x0020;
+	//m_video_regs[0x3c] = 0x0020;
 	//m_video_regs[0x42] = 0x0001;
 }
 
 /*************************
 *     Video Hardware     *
 *************************/
-
-void spg2xx_video_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline)
-{
-	static const float s_u8_to_float = 1.0f / 255.0f;
-	static const float s_gray_r = 0.299f;
-	static const float s_gray_g = 0.587f;
-	static const float s_gray_b = 0.114f;
-	const float sat_adjust = (0xff - (m_video_regs[0x3c] & 0x00ff)) / (float)(0xff - 0x20);
-
-	const uint16_t fade_offset = m_video_regs[0x30];
-
-	uint32_t* src = &bitmap.pix32(scanline, cliprect.min_x);
-
-	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-	{
-		if ((m_video_regs[0x3c] & 0x00ff) != 0x0020) // apply saturation
-		{
-			const uint32_t src_rgb = *src;
-			const float src_r = (uint8_t)(src_rgb >> 16) * s_u8_to_float;
-			const float src_g = (uint8_t)(src_rgb >> 8) * s_u8_to_float;
-			const float src_b = (uint8_t)(src_rgb >> 0) * s_u8_to_float;
-			const float luma = src_r * s_gray_r + src_g * s_gray_g + src_b * s_gray_b;
-			const float adjusted_r = luma + (src_r - luma) * sat_adjust;
-			const float adjusted_g = luma + (src_g - luma) * sat_adjust;
-			const float adjusted_b = luma + (src_b - luma) * sat_adjust;
-			const int integer_r = (int)floor(adjusted_r * 255.0f);
-			const int integer_g = (int)floor(adjusted_g * 255.0f);
-			const int integer_b = (int)floor(adjusted_b * 255.0f);
-			*src = (integer_r > 255 ? 0xff0000 : (integer_r < 0 ? 0 : ((uint8_t)integer_r << 16))) |
-				(integer_g > 255 ? 0x00ff00 : (integer_g < 0 ? 0 : ((uint8_t)integer_g << 8))) |
-				(integer_b > 255 ? 0x0000ff : (integer_b < 0 ? 0 : (uint8_t)integer_b));
-
-		}
-
-		if (fade_offset != 0) // apply fade
-		{
-			const uint32_t src_rgb = *src;
-			const uint8_t src_r = (src_rgb >> 16) & 0xff;
-			const uint8_t src_g = (src_rgb >> 8) & 0xff;
-			const uint8_t src_b = (src_rgb >> 0) & 0xff;
-			const uint8_t r = src_r - fade_offset;
-			const uint8_t g = src_g - fade_offset;
-			const uint8_t b = src_b - fade_offset;
-			*src = (r > src_r ? 0 : (r << 16)) |
-				(g > src_g ? 0 : (g << 8)) |
-				(b > src_b ? 0 : (b << 0));
-		}
-
-		src++;
-	}
-}
-
 
 uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -155,8 +103,10 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 	const uint32_t page1_addr = 0x40 * m_video_regs[0x20];
 	const uint32_t page2_addr = 0x40 * m_video_regs[0x21];
-	uint16_t *page1_regs = m_video_regs + 0x10;
-	uint16_t *page2_regs = m_video_regs + 0x16;
+	uint16_t *page1_scroll = m_video_regs + 0x10;
+	uint16_t *page2_scroll = m_video_regs + 0x16;
+	uint16_t *page1_regs = m_video_regs + 0x12;
+	uint16_t *page2_regs = m_video_regs + 0x18;
 
 	bitmap.fill(0, cliprect);
 
@@ -166,12 +116,12 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(cliprect, dst, scanline, i, page1_addr, page1_regs, mem, m_paletteram, m_scrollram);
-			m_renderer->draw_page(cliprect, dst, scanline, i, page2_addr, page2_regs, mem, m_paletteram, m_scrollram);
+			m_renderer->draw_page(cliprect, dst, scanline, i, page1_addr, page1_scroll, page1_regs, mem, m_paletteram, m_scrollram);
+			m_renderer->draw_page(cliprect, dst, scanline, i, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram);
 			m_renderer->draw_sprites(cliprect, dst, scanline, i, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
 		}
 
-		apply_saturation_and_fade(bitmap, cliprect, scanline);
+		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);
 	}
 
 	return 0;
@@ -233,9 +183,18 @@ READ16_MEMBER(spg2xx_video_device::video_r)
 		LOGMASKED(LOG_PPU_READS, "video_r: Blend Level Control\n");
 		return m_renderer->get_video_reg_2a();
 
+	case 0x30: // Fade Effect Control
+		LOGMASKED(LOG_PPU_READS, "video_r: Fade Effect Control\n");
+		return m_renderer->get_video_reg_30();
+		break;
+
 	case 0x38: // Current Line
 		LOGMASKED(LOG_VLINES, "video_r: Current Line: %04x\n", m_screen->vpos());
 		return m_screen->vpos();
+
+	case 0x3c: // TV Control 1
+		LOGMASKED(LOG_PPU_READS, "video_r: TV Control 1\n");
+		return m_renderer->get_video_reg_3c();
 
 	case 0x3e: // Light Pen Y Position
 		LOGMASKED(LOG_PPU_READS, "video_r: Light Pen Y / Lightgun Y\n");
@@ -383,6 +342,7 @@ WRITE16_MEMBER(spg2xx_video_device::video_w)
 	case 0x30: // Fade Effect Control
 		LOGMASKED(LOG_PPU_WRITES, "video_w: Fade Effect Control = %04x\n", data & 0x00ff);
 		m_video_regs[offset] = data & 0x00ff;
+		m_renderer->set_video_reg_30(data);
 		break;
 
 	case 0x36: // IRQ pos V
@@ -403,6 +363,7 @@ WRITE16_MEMBER(spg2xx_video_device::video_w)
 	case 0x3c: // TV Control 1
 		LOGMASKED(LOG_PPU_WRITES, "video_w: TV Control 1 = %04x (Hue:%02x, Saturation:%02x)\n", data, data >> 8, data & 0x00ff);
 		m_video_regs[offset] = data;
+		m_renderer->set_video_reg_3c(data);
 		break;
 
 	case 0x3d: // TV Control 2

@@ -50,8 +50,6 @@ protected:
 
 	void do_sprite_dma(uint32_t len);
 
-	void apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline);
-
 	uint16_t m_video_regs[0x100];
 
 	devcb_read16 m_sprlimit_read_cb;
