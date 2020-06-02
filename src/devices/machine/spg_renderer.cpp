@@ -194,7 +194,7 @@ void spg_renderer_device::draw_linemap(const rectangle& cliprect, uint32_t* dst,
 }
 
 
-bool spg_renderer_device::get_tile_info(uint32_t tilemap_rambase, uint32_t palettemap_rambase, uint32_t x0, uint32_t y0, uint32_t tile_count_x, uint32_t ctrl, uint32_t attr, uint16_t& tile, bool& blend, bool& flip_x, bool& flip_y, uint32_t& palette_offset, address_space &spc)
+bool spg_renderer_device::get_tile_info(uint32_t tilemap_rambase, uint32_t palettemap_rambase, uint32_t x0, uint32_t y0, uint32_t tile_count_x, uint32_t ctrl, uint32_t attr, uint16_t& tile, spg_renderer_device::blend_enable_t& blend, spg_renderer_device::flipx_t& flip_x, bool& flip_y, uint32_t& palette_offset, address_space &spc)
 {
 	uint32_t tile_address = x0 + (tile_count_x * y0);
 
@@ -225,8 +225,8 @@ bool spg_renderer_device::get_tile_info(uint32_t tilemap_rambase, uint32_t palet
 		tilectrl |= (palette << 2) & 0x0100;    // blend
 	}
 
-	blend = (tileattr & 0x4000 || tilectrl & 0x0100);
-	flip_x = (tileattr & 0x0004);
+	blend = ((tileattr & 0x4000 || tilectrl & 0x0100)) ? BlendOn : BlendOff;
+	flip_x = (tileattr & 0x0004) ? FlipXOn : FlipXOff;
 	flip_y= (tileattr & 0x0008);
 
 	palette_offset = (tileattr & 0x0f00) >> 4;
@@ -275,6 +275,32 @@ void spg_renderer_device::update_vcmp_table()
 	}
 }
 
+void spg_renderer_device::draw_tilestrip(spg_renderer_device::blend_enable_t blend, spg_renderer_device::flipx_t flip_x, const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint16_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space& spc, uint16_t* paletteram)
+{
+	if (blend)
+	{
+		if (flip_x)
+		{
+			draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
+		}
+		else
+		{
+			draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
+		}
+	}
+	else
+	{
+		if (flip_x)
+		{
+			draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
+		}
+		else
+		{
+			draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
+		}
+	}
+}
+
 void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram)
 {
 	const uint32_t attr = tilemapregs[0];
@@ -308,7 +334,6 @@ void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t* dst, ui
 			return;
 	}
 
-
 	const uint32_t xscroll = scrollregs[0];
 	const uint32_t yscroll = scrollregs[1];
 	const uint32_t tilemap_rambase = tilemapregs[2];
@@ -335,8 +360,9 @@ void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t* dst, ui
 
 	for (uint32_t x0 = 0; x0 < (320+tile_w)/tile_w; x0++)
 	{
-
-		bool blend, flip_x, flip_y;
+		spg_renderer_device::blend_enable_t blend;
+		spg_renderer_device::flipx_t flip_x;
+		bool flip_y;
 		uint16_t tile;
 		uint32_t palette_offset;
 
@@ -346,31 +372,8 @@ void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t* dst, ui
 		palette_offset >>= nc_bpp;
 		palette_offset <<= nc_bpp;
 
-		int drawx = (x0 * tile_w);
-		drawx = drawx - (realxscroll & (tile_w-1));
-
-		if (blend)
-		{
-			if (flip_x)
-			{
-				draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-			}
-			else
-			{
-				draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-			}
-		}
-		else
-		{
-			if (flip_x)
-			{
-				draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-			}
-			else
-			{
-				draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-			}
-		}
+		const int drawx = (x0 * tile_w) - (realxscroll & (tile_w-1));
+		draw_tilestrip(blend,flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
 	}
 }
 
@@ -408,8 +411,8 @@ void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, 
 	int lastline = y + (tile_h - 1);
 	lastline &= 0x1ff;
 
-	bool blend = (attr & 0x4000);
-	bool flip_x = (attr & 0x0004);
+	const spg_renderer_device::blend_enable_t blend = (attr & 0x4000) ? BlendOn : BlendOff;
+	const spg_renderer_device::flipx_t flip_x = (attr & 0x0004) ? FlipXOn : FlipXOff;
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
@@ -429,28 +432,7 @@ void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, 
 
 		if ((scanx >= 0) && (scanline <= lastline))
 		{
-			if (blend)
-			{
-				if (flip_x)
-				{
-					draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-				}
-				else
-				{
-					draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-				}
-			}
-			else
-			{
-				if (flip_x)
-				{
-					draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-				}
-				else
-				{
-					draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-				}
-			}
+			draw_tilestrip(blend, flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
 		}
 	}
 	else
@@ -462,28 +444,7 @@ void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, 
 
 		if ((scanx >= 0) && (scanline <= templastline))
 		{
-			if (blend)
-			{
-				if (flip_x)
-				{
-					draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-				}
-				else
-				{
-					draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-				}
-			}
-			else
-			{
-				if (flip_x)
-				{
-					draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-				}
-				else
-				{
-					draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-				}
-			}
+			draw_tilestrip(blend, flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
 		}
 		// clipped against the bottom
 		tempfirstline = firstline;
@@ -492,28 +453,7 @@ void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, 
 
 		if ((scanx >= 0) && (scanline <= templastline))
 		{
-			if (blend)
-			{
-				if (flip_x)
-				{
-					draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-				}
-				else
-				{
-					draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-				}
-			}
-			else
-			{
-				if (flip_x)
-				{
-					draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-				}
-				else
-				{
-					draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
-				}
-			}
+			draw_tilestrip(blend, flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
 		}
 	}
 }
