@@ -305,16 +305,19 @@ WRITE16_MEMBER(spg2xx_video_device::video_w)
 
 	case 0x1c: // vertical compression, amount, 0x20 = no scale? (not on spg288?)
 		LOGMASKED(LOG_PPU_WRITES, "video_w: Ycmp_Value = %04x\n", data);
+		m_video_regs[offset] = data;
 		m_renderer->set_video_reg_1c(data);
 		break;
 
 	case 0x1d: // (not on spg288?)
 		LOGMASKED(LOG_PPU_WRITES, "video_w: Ycmp_Y_Offset = %04x\n", data);
+		m_video_regs[offset] = data;
 		m_renderer->set_video_reg_1d(data);
 		break;
 
 	case 0x1e: // (not on spg288?)
 		LOGMASKED(LOG_PPU_WRITES, "video_w: Ycmp_Step = %04x\n", data);
+		m_video_regs[offset] = data;
 		m_renderer->set_video_reg_1e(data);
 		break;
 
@@ -330,13 +333,14 @@ WRITE16_MEMBER(spg2xx_video_device::video_w)
 
 	case 0x22: // Sprite Segment Address
 		LOGMASKED(LOG_PPU_WRITES, "video_w: Sprite Segment Address = %04x\n", data);
+		m_video_regs[offset] = data;
 		m_renderer->set_video_reg_22(data);
 		break;
 
 	case 0x2a: // Blend Level Control
 		LOGMASKED(LOG_PPU_WRITES, "video_w: Blend Level Control = %04x\n", data & 0x0003);
-		m_renderer->set_video_reg_2a(data);
 		m_video_regs[offset] = data & 0x0003;
+		m_renderer->set_video_reg_2a(data);
 		break;
 
 	case 0x30: // Fade Effect Control
@@ -385,6 +389,7 @@ WRITE16_MEMBER(spg2xx_video_device::video_w)
 
 	case 0x42: // Sprite Control
 		LOGMASKED(LOG_PPU_WRITES, "video_w: Sprite Control = %04x (TopLeft:%d, Enable:%d)\n", data, BIT(data, 1), BIT(data, 0));
+		m_video_regs[offset] = data;
 		m_renderer->set_video_reg_42(data);
 		break;
 
