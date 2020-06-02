@@ -10558,6 +10558,9 @@ concept                         // 1982 Corvus Concept
 @source:conic_cchess2.cpp
 cncchess2
 
+@source:consola_emt.cpp
+consoemt                        //
+
 @source:contra.cpp
 contra                          // GX633 (c) 1987
 contra1                         // GX633 (c) 1987
