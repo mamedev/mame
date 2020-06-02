@@ -49,17 +49,6 @@ spg24x_video_device::spg24x_video_device(const machine_config &mconfig, const ch
 
 void spg2xx_video_device::device_start()
 {
-	for (uint8_t i = 0; i < 32; i++)
-	{
-		m_rgb5_to_rgb8[i] = (i << 3) | (i >> 2);
-	}
-	for (uint16_t i = 0; i < 0x8000; i++)
-	{
-		m_rgb555_to_rgb888[i] = (m_rgb5_to_rgb8[(i >> 10) & 0x1f] << 16) |
-								(m_rgb5_to_rgb8[(i >>  5) & 0x1f] <<  8) |
-								(m_rgb5_to_rgb8[(i >>  0) & 0x1f] <<  0);
-	}
-
 	m_guny_in.resolve_safe(0);
 	m_gunx_in.resolve_safe(0);
 
@@ -68,12 +57,7 @@ void spg2xx_video_device::device_start()
 
 	save_item(NAME(m_video_regs));
 
-	save_item(NAME(m_ycmp_table));
-
-	
-
 	m_sprlimit_read_cb.resolve_safe(0);
-
 	m_video_irq_cb.resolve();
 }
 
@@ -84,332 +68,12 @@ void spg2xx_video_device::device_reset()
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
 	m_video_regs[0x3c] = 0x0020;
-	m_video_regs[0x42] = 0x0001;
-
-	for (int i = 0; i < 480; i++)
-	{
-		m_ycmp_table[i] = 0xffffffff;
-	}
+	//m_video_regs[0x42] = 0x0001;
 }
 
 /*************************
 *     Video Hardware     *
 *************************/
-
-
-void spg2xx_video_device::draw_linemap(const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* regs)
-{
-	if ((scanline < 0) || (scanline >= 240))
-		return;
-
-	address_space &space = m_cpu->space(AS_PROGRAM);
-
-	uint32_t tilemap = regs[4];
-	uint32_t palette_map = regs[5];
-
-	//printf("draw bitmap bases %04x %04x\n", tilemap, palette_map);
-
-	//uint32_t xscroll = regs[0];
-	uint32_t yscroll = regs[1];
-
-	int realline = (scanline + yscroll) & 0xff;
-
-
-	uint16_t tile = space.read_word(tilemap + realline);
-	uint16_t palette = 0;
-
-	//if (!tile)
-	//  continue;
-
-	palette = space.read_word(palette_map + realline / 2);
-	if (scanline & 1)
-		palette >>= 8;
-	else
-		palette &= 0x00ff;
-
-	//const int linewidth = 320 / 2;
-	int sourcebase = tile | (palette << 16);
-
-	uint32_t ctrl = regs[3];
-
-	if (ctrl & 0x80) // HiColor mode (rad_digi)
-	{
-		for (int i = 0; i < 320; i++)
-		{
-			const uint16_t data = space.read_word(sourcebase + i);
-
-			if (!(data & 0x8000))
-			{
-				dst[i] = m_rgb555_to_rgb888[data & 0x7fff];
-			}
-		}
-	}
-	else
-	{
-		for (int i = 0; i < 320 / 2; i++)
-		{
-			uint8_t palette_entry;
-			uint16_t color;
-			const uint16_t data = space.read_word(sourcebase + i);
-
-			palette_entry = (data & 0x00ff);
-			color = m_paletteram[palette_entry];
-
-			if (!(color & 0x8000))
-			{
-				dst[(i * 2) + 0] = m_rgb555_to_rgb888[color & 0x7fff];
-			}
-
-			palette_entry = (data & 0xff00) >> 8;
-			color = m_paletteram[palette_entry];
-
-			if (!(color & 0x8000))
-			{
-				dst[(i * 2) + 1] = m_rgb555_to_rgb888[color & 0x7fff];
-			}
-		}
-	}
-}
-
-
-bool spg2xx_video_device::get_tile_info(uint32_t tilemap_rambase, uint32_t palettemap_rambase, uint32_t x0, uint32_t y0, uint32_t tile_count_x, uint32_t ctrl, uint32_t attr, uint16_t& tile, bool& blend, bool& flip_x, bool& flip_y, uint32_t& palette_offset)
-{
-	address_space &space = m_cpu->space(AS_PROGRAM);
-	uint32_t tile_address = x0 + (tile_count_x * y0);
-
-	tile = (ctrl & 0x0004) ? space.read_word(tilemap_rambase) : space.read_word(tilemap_rambase + tile_address);
-
-	if (!tile)
-		return false;
-
-	uint32_t tileattr = attr;
-	uint32_t tilectrl = ctrl;
-	if ((ctrl & 2) == 0)
-	{   // -(1) bld(1) flip(2) pal(4)
-
-		uint16_t palette = (ctrl & 0x0004) ? space.read_word(palettemap_rambase) : space.read_word(palettemap_rambase + tile_address / 2);
-		if (x0 & 1)
-			palette >>= 8;
-		else
-			palette &= 0x00ff;
-
-
-		tileattr &= ~0x000c;
-		tileattr |= (palette >> 2) & 0x000c;    // flip
-
-		tileattr &= ~0x0f00;
-		tileattr |= (palette << 8) & 0x0f00;    // palette
-
-		tilectrl &= ~0x0100;
-		tilectrl |= (palette << 2) & 0x0100;    // blend
-	}
-
-	blend = (tileattr & 0x4000 || tilectrl & 0x0100);
-	flip_x = (tileattr & 0x0004);
-	flip_y= (tileattr & 0x0008);
-
-	palette_offset = (tileattr & 0x0f00) >> 4;
-
-
-	return true;
-}
-// 3 is good
-// this builds up a line table for the vcmp effect, this is not correct when step is used
-void spg2xx_video_device::update_vcmp_table()
-{
-	int currentline = 0;
-
-	int step = m_video_regs[0x1e] & 0xff;
-	if (step & 0x80)
-		step = step - 0x100;
-
-	int current_inc_value = (m_video_regs[0x1c]<<4);
-
-	int counter = 0;
-
-	for (int i = 0; i < 480; i++)
-	{
-		if (i < m_video_regs[0x1d])
-		{
-			m_ycmp_table[i] = 0xffffffff;
-		}
-		else
-		{
-			if ((currentline >= 0) && (currentline < 240))
-			{
-				m_ycmp_table[i] = currentline;
-			}
-			
-			counter += current_inc_value;
-
-			while (counter >= (0x20<<4))
-			{
-				currentline++;
-				current_inc_value += step;
-
-				counter -= (0x20<<4);
-			}
-
-
-		}
-	}
-}
-
-// Perform a lerp between a and b
-inline uint8_t spg2xx_video_device::mix_channel(uint8_t bottom, uint8_t top)
-{
-	uint8_t alpha = (m_video_regs[0x2a] & 3) << 6;
-	return ((256 - alpha) * bottom + alpha * top) >> 8;
-}
-
-template<spg2xx_video_device::blend_enable_t Blend, spg2xx_video_device::flipx_t FlipX>
-void spg2xx_video_device::draw_tilestrip(const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint16_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile)
-{
-	address_space &space = m_cpu->space(AS_PROGRAM);
-	const uint32_t yflipmask = flip_y ? tile_h - 1 : 0;
-	uint32_t m = tilegfxdata_addr + words_per_tile * tile + bits_per_row * (tile_scanline ^ yflipmask);
-	uint32_t bits = 0;
-	uint32_t nbits = 0;
-
-	for (int32_t x = FlipX ? (tile_w - 1) : 0; FlipX ? x >= 0 : x < tile_w; FlipX ? x-- : x++)
-	{
-		int realdrawpos = (drawx + x) & 0x1ff;
-
-		bits <<= nc_bpp;
-
-		if (nbits < nc_bpp)
-		{
-			uint16_t b = space.read_word(m++ & 0x3fffff);
-			b = (b << 8) | (b >> 8);
-			bits |= b << (nc_bpp - nbits);
-			nbits += 16;
-		}
-		nbits -= nc_bpp;
-
-		uint32_t pal = palette_offset + (bits >> 16);
-		bits &= 0xffff;
-
-		if (realdrawpos >= 0 && realdrawpos < 320)
-		{
-			uint16_t rgb = m_paletteram[pal];
-
-			if (!(rgb & 0x8000))
-			{
-				if (Blend)
-				{
-					dst[realdrawpos] = (mix_channel((uint8_t)(dst[realdrawpos] >> 16), m_rgb5_to_rgb8[(rgb >> 10) & 0x1f]) << 16) |
-						(mix_channel((uint8_t)(dst[realdrawpos] >> 8), m_rgb5_to_rgb8[(rgb >> 5) & 0x1f]) << 8) |
-						(mix_channel((uint8_t)(dst[realdrawpos] >> 0), m_rgb5_to_rgb8[rgb & 0x1f]));
-				}
-				else
-				{
-					dst[realdrawpos] = m_rgb555_to_rgb888[rgb];
-				}
-			}
-		}
-	}
-}
-
-void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t *regs)
-{
-	const uint32_t attr = regs[2];
-	const uint32_t ctrl = regs[3];
-
-	if (!(ctrl & 0x0008))
-	{
-		return;
-	}
-
-	if (((attr & 0x3000) >> 12) != priority)
-	{
-		return;
-	}
-
-	if (ctrl & 0x0001) // Bitmap / Linemap mode! (basically screen width tile mode)
-	{
-		draw_linemap(cliprect, dst, scanline, priority, tilegfxdata_addr, regs);
-		return;
-	}
-
-	uint32_t logical_scanline = scanline;
-
-	if (ctrl & 0x0040) // 'vertical compression feature' (later models only?)
-	{
-		if (m_video_regs[0x1e] != 0x0000)
-			popmessage("vertical compression mode with non-0 step amount %04x offset %04x step %04x\n", m_video_regs[0x1c], m_video_regs[0x1d], m_video_regs[0x1e]);
-		
-		logical_scanline = m_ycmp_table[scanline];
-		if (logical_scanline == 0xffffffff)
-			return;
-
-		//logical_scanline >>= 5;
-	}
-
-
-	const uint32_t xscroll = regs[0];
-	const uint32_t yscroll = regs[1];
-	const uint32_t tilemap_rambase = regs[4];
-	const uint32_t palettemap_rambase = regs[5];
-	const int tile_width = (attr & 0x0030) >> 4;
-	const uint32_t tile_h = 8 << ((attr & 0x00c0) >> 6);
-	const uint32_t tile_w = 8 << (tile_width);
-	const uint32_t tile_count_x = 512 / tile_w; // all tilemaps are 512 pixels wide
-	const uint32_t bitmap_y = (logical_scanline + yscroll) & 0xff; // all tilemaps are 256 pixels high
-	const uint32_t y0 = bitmap_y / tile_h;
-	const uint32_t tile_scanline = bitmap_y % tile_h;
-	const uint8_t bpp = attr & 0x0003;
-	const uint32_t nc_bpp = ((bpp)+1) << 1;
-	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
-	const uint32_t words_per_tile = bits_per_row * tile_h;
-	const bool row_scroll = (ctrl & 0x0010);
-
-	int realxscroll = xscroll;
-	if (row_scroll)
-	{
-		// Tennis in My Wireless Sports confirms the need to add the scroll value here rather than rowscroll being screen-aligned
-		realxscroll += (int16_t)m_scrollram[(logical_scanline+yscroll) & 0xff];
-	}
-
-	for (uint32_t x0 = 0; x0 < (320+tile_w)/tile_w; x0++)
-	{
-
-		bool blend, flip_x, flip_y;
-		uint16_t tile;
-		uint32_t palette_offset;
-
-		if (!get_tile_info(tilemap_rambase, palettemap_rambase, (x0 + (realxscroll >> (tile_width+3))) & (tile_count_x-1) , y0, tile_count_x, ctrl, attr, tile, blend, flip_x, flip_y, palette_offset))
-			continue;
-
-		palette_offset >>= nc_bpp;
-		palette_offset <<= nc_bpp;
-
-		int drawx = (x0 * tile_w);
-		drawx = drawx - (realxscroll & (tile_w-1));
-
-		if (blend)
-		{
-			if (flip_x)
-			{
-				draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-			}
-			else
-			{
-				draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-			}
-		}
-		else
-		{
-			if (flip_x)
-			{
-				draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-			}
-			else
-			{
-				draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-			}
-		}
-	}
-}
 
 void spg2xx_video_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline)
 {
@@ -502,8 +166,8 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 		for (int i = 0; i < 4; i++)
 		{
-			draw_page(cliprect, dst, scanline, i, page1_addr, page1_regs);
-			draw_page(cliprect, dst, scanline, i, page2_addr, page2_regs);
+			m_renderer->draw_page(cliprect, dst, scanline, i, page1_addr, page1_regs, mem, m_paletteram, m_scrollram);
+			m_renderer->draw_page(cliprect, dst, scanline, i, page2_addr, page2_regs, mem, m_paletteram, m_scrollram);
 			m_renderer->draw_sprites(cliprect, dst, scanline, i, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
 		}
 
@@ -548,6 +212,18 @@ READ16_MEMBER(spg2xx_video_device::video_r)
 	case 0x11: // Page 1 Y scroll
 		LOGMASKED(LOG_PPU_READS, "video_r: Page 1 Y Scroll\n");
 		return m_video_regs[offset];
+
+	case 0x1c: // vertical compression, amount, 0x20 = no scale? (not on spg288?)
+		LOGMASKED(LOG_PPU_READS, "video_r: Ycmp_Value\n");
+		return m_renderer->get_video_reg_1c();
+
+	case 0x1d: // (not on spg288?)
+		LOGMASKED(LOG_PPU_READS, "video_r: Ycmp_Y_Offset\n");
+		return m_renderer->get_video_reg_1d();
+
+	case 0x1e: // (not on spg288?)
+		LOGMASKED(LOG_PPU_READS, "video_r: Ycmp_Step\n");
+		return m_renderer->get_video_reg_1e();
 
 	case 0x22: // Sprite Segment Address
 		LOGMASKED(LOG_PPU_READS, "video_r: Sprite Segment Address\n");
@@ -670,20 +346,17 @@ WRITE16_MEMBER(spg2xx_video_device::video_w)
 
 	case 0x1c: // vertical compression, amount, 0x20 = no scale? (not on spg288?)
 		LOGMASKED(LOG_PPU_WRITES, "video_w: Ycmp_Value = %04x\n", data);
-		m_video_regs[offset] = data;
-		update_vcmp_table();
+		m_renderer->set_video_reg_1c(data);
 		break;
 
 	case 0x1d: // (not on spg288?)
 		LOGMASKED(LOG_PPU_WRITES, "video_w: Ycmp_Y_Offset = %04x\n", data);
-		m_video_regs[offset] = data;
-		update_vcmp_table();
+		m_renderer->set_video_reg_1d(data);
 		break;
 
 	case 0x1e: // (not on spg288?)
 		LOGMASKED(LOG_PPU_WRITES, "video_w: Ycmp_Step = %04x\n", data);
-		m_video_regs[offset] = data;
-		update_vcmp_table();
+		m_renderer->set_video_reg_1e(data);
 		break;
 
 	case 0x20: // Page 1 Segment Address
