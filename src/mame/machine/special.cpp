@@ -20,7 +20,7 @@ void special_state::init_special()
 {
 	/* set initialy ROM to be visible on first bank */
 	uint8_t *RAM = m_region_maincpu->base();
-	memset(RAM,0x0000,0x3000); // make first page empty by default
+	memset(RAM,0x0000,0x4000); // make first page empty by default
 	m_bank1->configure_entries(1, 2, RAM, 0x0000);
 	m_bank1->configure_entries(0, 2, RAM, 0xc000);
 }
@@ -109,15 +109,23 @@ void special_state::specialist_8255_portc_w(uint8_t data)
 	m_cassette->output(BIT(data, 7) ? 1 : -1);
 
 	m_dac->write(BIT(data, 5)); //beeper
+
+	m_bank1->set_entry(BIT(data, 4));
+}
+
+void special_state::specialistmx_8255_portc_w(uint8_t data)
+{
+	m_specialist_8255_portc = data;
+
+	m_cassette->output(BIT(data, 7) ? 1 : -1);
+
+	m_dac->write(BIT(data, 5)); //beeper
 }
 
 void special_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
-	case TIMER_RESET:
-		m_bank1->set_entry(0);
-		break;
 	case TIMER_PIT8253_GATES:
 		m_pit->write_gate0(0);
 		m_pit->write_gate1(0);
@@ -126,13 +134,6 @@ void special_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	default:
 		throw emu_fatalerror("Unknown id in special_state::device_timer");
 	}
-}
-
-
-MACHINE_RESET_MEMBER(special_state,special)
-{
-	timer_set(attotime::from_usec(10), TIMER_RESET);
-	m_bank1->set_entry(1);
 }
 
 

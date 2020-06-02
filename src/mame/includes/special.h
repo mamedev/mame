@@ -66,7 +66,6 @@ protected:
 private:
 	enum
 	{
-		TIMER_RESET,
 		TIMER_PIT8253_GATES
 	};
 
@@ -89,8 +88,8 @@ private:
 	void specialist_8255_porta_w(uint8_t data);
 	void specialist_8255_portb_w(uint8_t data);
 	void specialist_8255_portc_w(uint8_t data);
+	void specialistmx_8255_portc_w(uint8_t data);
 
-	DECLARE_MACHINE_RESET(special);
 	DECLARE_MACHINE_RESET(erik);
 	void erik_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(specimx);
