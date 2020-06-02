@@ -13,7 +13,7 @@
     for the moment.
 
     Screen goes crazy during the memory test, just ignore it.
-    System freezes if ^G pressed.
+    System freezes if ^G or ^Z pressed. Pressing ^Q is the same as Enter.
 
     25/04/2011 Added partial keyboard.
     26/06/2011 Added modifier keys.
@@ -22,6 +22,9 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/i8251.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -34,6 +37,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
+		, m_uart1(*this, "uart1")
+		, m_uart2(*this, "uart2")
+		, m_rs232a(*this, "rs232a")
+		, m_rs232b(*this, "rs232b")
+		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void beehive(machine_config &config);
@@ -41,24 +49,25 @@ public:
 private:
 	void beehive_io(address_map &map);
 	void beehive_mem(address_map &map);
+	virtual void machine_start() override;
+	u8 m_keyline;
 	u8 beehive_60_r();
 	void beehive_62_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
-	u8 m_keyline;
-	virtual void machine_reset() override;
+	required_device<i8251_device> m_uart1;
+	required_device<i8251_device> m_uart2;
+	required_device<rs232_port_device> m_rs232a;
+	required_device<rs232_port_device> m_rs232b;
+	required_ioport_array<16> m_io_keyboard;
 };
 
 u8 beehive_state::beehive_60_r()
 {
 	if (BIT(m_keyline, 4))
-	{
-		char kbdrow[6];
-		sprintf(kbdrow,"X%d", m_keyline&15);
-		return ioport(kbdrow)->read();
-	}
+		return m_io_keyboard[m_keyline & 15]->read();
 	else
 		return 0xff;
 }
@@ -80,6 +89,10 @@ void beehive_state::beehive_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x11, 0x11).portr("DIPS");
+	map(0x20, 0x20).rw(m_uart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x21, 0x21).rw(m_uart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x30, 0x30).rw(m_uart2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x31, 0x31).rw(m_uart2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x60, 0x60).r(FUNC(beehive_state::beehive_60_r));
 	map(0x61, 0x61).portr("MODIFIERS");
 	map(0x62, 0x62).w(FUNC(beehive_state::beehive_62_w));
@@ -235,8 +248,9 @@ static INPUT_PORTS_START( beehive )
 INPUT_PORTS_END
 
 
-void beehive_state::machine_reset()
+void beehive_state::machine_start()
 {
+	save_item(NAME(m_keyline));
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.
@@ -308,11 +322,37 @@ void beehive_state::beehive(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
+
+	I8251(config, m_uart1, 0);
+	m_uart1->txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_uart1->dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	m_uart1->rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
+
+	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
+	m_rs232a->rxd_handler().set("uart1", FUNC(i8251_device::write_rxd));
+	m_rs232a->dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
+	m_rs232a->cts_handler().set("uart1", FUNC(i8251_device::write_cts));
+
+	I8251(config, m_uart2, 0);
+	m_uart2->txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_uart2->dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	m_uart2->rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
+
+	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
+	m_rs232b->rxd_handler().set("uart2", FUNC(i8251_device::write_rxd));
+	m_rs232b->dsr_handler().set("uart2", FUNC(i8251_device::write_dsr));
+	m_rs232b->cts_handler().set("uart2", FUNC(i8251_device::write_cts));
+
+	clock_device &rs232_clock(CLOCK(config, "rs232_clock", 153'600));
+	rs232_clock.signal_handler().set(m_uart1, FUNC(i8251_device::write_rxc));
+	rs232_clock.signal_handler().append(m_uart1, FUNC(i8251_device::write_txc));
+	rs232_clock.signal_handler().append(m_uart2, FUNC(i8251_device::write_rxc));
+	rs232_clock.signal_handler().append(m_uart2, FUNC(i8251_device::write_txc));
 }
 
 /* ROM definition */
 ROM_START( beehive )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1800, "maincpu", 0 )
 	ROM_LOAD( "dm3270-1.rom", 0x0000, 0x0800, CRC(781bde32) SHA1(a3fe25baadd2bfc2b1791f509bb0f4960281ee32) )
 	ROM_LOAD( "dm3270-2.rom", 0x0800, 0x0800, CRC(4d3476b7) SHA1(627ad42029ca6c8574cda8134d047d20515baf53) )
 	ROM_LOAD( "dm3270-3.rom", 0x1000, 0x0800, CRC(dbf15833) SHA1(ae93117260a259236c50885c5cecead2aad9b3c4) )
@@ -325,4 +365,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME  FLAGS
-COMP( 1982, beehive, 0,      0,      beehive, beehive, beehive_state, empty_init, "BeeHive", "DM3270", MACHINE_NO_SOUND)
+COMP( 1982, beehive, 0,      0,      beehive, beehive, beehive_state, empty_init, "BeeHive", "DM3270", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
