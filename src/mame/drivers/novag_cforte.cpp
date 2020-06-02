@@ -81,16 +81,12 @@ private:
 	u8 input1_r();
 	u8 input2_r();
 
-	u8 m_inp_mux;
-	u8 m_led_select;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
 };
 
 void cforte_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_select = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
