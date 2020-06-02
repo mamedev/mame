@@ -133,7 +133,8 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 //	m_pal_sprites(0x100),
 //	m_pal_back(0x000),
 	m_alt_extrasprite_hack(0),
-	m_alt_tile_addressing(0)
+	m_alt_tile_addressing(0),
+	m_renderer(*this, "renderer")
 {
 }
 
@@ -1801,6 +1802,7 @@ void gcm394_base_video_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256*0x10);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 
+	SPG_RENDERER(config, m_renderer, 0);
 }
 
 
