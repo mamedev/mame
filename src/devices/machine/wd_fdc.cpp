@@ -784,6 +784,12 @@ void wd_fdc_device_base::write_track_continue()
 
 		case SETTLE_DONE:
 			LOGSTATE("SETTLE_DONE\n");
+			if (floppy && floppy->wpt_r()) {
+				LOGSTATE("WRITE_PROT\n");
+				status |= S_WP;
+				command_end();
+				return;
+			}
 			set_drq();
 			sub_state = DATA_LOAD_WAIT;
 			delay_cycles(t_gen, 192);
@@ -890,6 +896,12 @@ void wd_fdc_device_base::write_sector_continue()
 
 		case SETTLE_DONE:
 			LOGSTATE("SETTLE_DONE\n");
+			if (floppy && floppy->wpt_r()) {
+				LOGSTATE("WRITE_PROT\n");
+				status |= S_WP;
+				command_end();
+				return;
+			}
 			sub_state = SCAN_ID;
 			counter = 0;
 			live_start(SEARCH_ADDRESS_MARK_HEADER);
