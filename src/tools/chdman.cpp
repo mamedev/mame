@@ -38,8 +38,8 @@
 //**************************************************************************
 //  CONSTANTS & DEFINES
 //**************************************************************************
-/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
-#if defined(WIN32)
+// MINGW has adopted the MSVC formatting for 64-bit ints as of GCC 4.4 and deprecated it as of GCC 10
+#if defined(WIN32) && defined(__GNUC__) && (__GNUC__ < 10)
 #define I64FMT   "I64"
 #elif !defined(__APPLE__) && defined(__LP64__)
 #define I64FMT   "l"

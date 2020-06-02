@@ -96,7 +96,7 @@ protected:
 		{
 			for (const auto &monitor : list())
 			{
-				osd_printf_verbose("Video: Monitor %I64u = \"%s\" %s\n", monitor->oshandle(), monitor->devicename(), monitor->is_primary() ? "(primary)" : "");
+				osd_printf_verbose("Video: Monitor %u = \"%s\" %s\n", monitor->oshandle(), monitor->devicename(), monitor->is_primary() ? "(primary)" : "");
 			}
 		}
 

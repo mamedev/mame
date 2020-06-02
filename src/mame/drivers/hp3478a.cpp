@@ -513,7 +513,7 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 				//changing to SELECTED_ISA
 				m_lcdstate = lcd_state::SYNC_SKIP;
 				if (m_lcd_bitcount) {
-					LOGMASKED(DEBUG_LCD, "LCD : IWA->ISA, %d stray bits (0x%I64X)\n", m_lcd_bitcount, m_lcd_bitbuf);
+					LOGMASKED(DEBUG_LCD, "LCD : IWA->ISA, %d stray bits (0x%X)\n", m_lcd_bitcount, m_lcd_bitbuf);
 				} else {
 					LOGMASKED(DEBUG_LCD, "LCD : IWA->ISA\n");
 				}
@@ -529,7 +529,7 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 			if (m_lcd_bitcount != m_lcd_want) {
 				break;
 			}
-			LOGMASKED(DEBUG_LCD, "LCD : data 0x%I64X\n", m_lcd_bitbuf);
+			LOGMASKED(DEBUG_LCD, "LCD : data 0x%X\n", m_lcd_bitbuf);
 			switch (m_lcdiwa) {
 			case lcd_iwatype::ANNUNS:
 				LOGMASKED(DEBUG_LCD2, "LCD : write annuns 0x%02X\n", m_lcd_bitbuf & 0xFF);
@@ -537,12 +537,12 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 			case lcd_iwatype::REG_A:
 				lcd_update_lonib(m_lcd_bitbuf);
 				lcd_map_chars();
-				LOGMASKED(DEBUG_LCD2, "LCD : write reg A (lonib) %I64X, text=%s\n", m_lcd_bitbuf, (char *) m_lcd_text);
+				LOGMASKED(DEBUG_LCD2, "LCD : write reg A (lonib) %X, text=%s\n", m_lcd_bitbuf, (char *) m_lcd_text);
 				break;
 			case lcd_iwatype::REG_B:
 				lcd_update_hinib(m_lcd_bitbuf);
 				lcd_map_chars();
-				LOGMASKED(DEBUG_LCD2, "LCD : write reg B (lonib) %I64X, text=%s\n", m_lcd_bitbuf, (char *) m_lcd_text);
+				LOGMASKED(DEBUG_LCD2, "LCD : write reg B (lonib) %X, text=%s\n", m_lcd_bitbuf, (char *) m_lcd_text);
 				break;
 			default:
 				//discard
