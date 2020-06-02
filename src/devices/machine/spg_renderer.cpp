@@ -379,9 +379,9 @@ void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t* dst, ui
 	}
 }
 
-void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
+void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
 {
-	uint32_t tilegfxdata_addr = 0x40 * m_video_regs_22;
+	uint32_t tilegfxdata_addr = spritegfxdata_addr;
 	uint16_t tile = spriteram[base_addr + 0];
 	int16_t x = spriteram[base_addr + 1];
 	int16_t y = spriteram[base_addr + 2];
@@ -460,7 +460,7 @@ void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, 
 	}
 }
 
-void spg_renderer_device::draw_sprites(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
+void spg_renderer_device::draw_sprites(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
 {
 	if (!(m_video_regs_42 & 0x0001))
 	{
@@ -469,7 +469,7 @@ void spg_renderer_device::draw_sprites(const rectangle &cliprect, uint32_t* dst,
 
 	for (uint32_t n = 0; n < sprlimit; n++)
 	{
-		draw_sprite(cliprect, dst, scanline, priority, 4 * n, spc, paletteram, spriteram);
+		draw_sprite(cliprect, dst, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
 	}
 }
 

@@ -177,7 +177,7 @@ protected:
 
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
-//  required_shared_ptr<uint16_t> m_scrollram;
+ // required_shared_ptr<uint16_t> m_scrollram;
 
 	uint16_t m_page0_addr_lsb;
 	uint16_t m_page0_addr_msb;
