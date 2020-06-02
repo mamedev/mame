@@ -37,7 +37,8 @@ spg2xx_video_device::spg2xx_video_device(const machine_config &mconfig, device_t
 	m_hcompram(*this, "hcompram"),
 	m_paletteram(*this, "paletteram"),
 	m_spriteram(*this, "spriteram"),
-	m_video_irq_cb(*this)
+	m_video_irq_cb(*this),
+	m_renderer(*this, "renderer")
 {
 }
 
@@ -410,163 +411,6 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t* dst, ui
 	}
 }
 
-void spg2xx_video_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t base_addr)
-{
-	uint32_t tilegfxdata_addr = 0x40 * m_video_regs[0x22];
-	uint16_t tile = m_spriteram[base_addr + 0];
-	int16_t x = m_spriteram[base_addr + 1];
-	int16_t y = m_spriteram[base_addr + 2];
-	uint16_t attr = m_spriteram[base_addr + 3];
-
-	if (!tile)
-	{
-		return;
-	}
-
-	if (((attr & 0x3000) >> 12) != priority)
-	{
-		return;
-	}
-
-	const uint32_t tile_h = 8 << ((attr & 0x00c0) >> 6);
-	const uint32_t tile_w = 8 << ((attr & 0x0030) >> 4);
-
-	if (!(m_video_regs[0x42] & 0x0002))
-	{
-		x = (160 + x) - tile_w / 2;
-		y = (120 - y) - (tile_h / 2) + 8;
-	}
-
-	x &= 0x01ff;
-	y &= 0x01ff;
-
-	int firstline = y;
-	int lastline = y + (tile_h - 1);
-	lastline &= 0x1ff;
-
-	bool blend = (attr & 0x4000);
-	bool flip_x = (attr & 0x0004);
-	const uint8_t bpp = attr & 0x0003;
-	const uint32_t nc_bpp = ((bpp)+1) << 1;
-	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
-	const uint32_t words_per_tile = bits_per_row * tile_h;
-
-	bool flip_y = (attr & 0x0008);
-	uint32_t palette_offset = (attr & 0x0f00) >> 4;
-	
-	// the Circuit Racing game in PDC100 needs this or some graphics have bad colours at the edges when turning as it leaves stray lower bits set
-	palette_offset >>= nc_bpp;
-	palette_offset <<= nc_bpp;
-
-
-	if (firstline < lastline)
-	{
-		int scanx = scanline - firstline;
-
-		if ((scanx >= 0) && (scanline <= lastline))
-		{
-			if (blend)
-			{
-				if (flip_x)
-				{
-					draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-				}
-				else
-				{
-					draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-				}
-			}
-			else
-			{
-				if (flip_x)
-				{
-					draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-				}
-				else
-				{
-					draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-				}
-			}
-		}
-	}
-	else
-	{
-		// clipped from top
-		int tempfirstline = firstline - 0x200;
-		int templastline = lastline;
-		int scanx = scanline - tempfirstline;
-
-		if ((scanx >= 0) && (scanline <= templastline))
-		{
-			if (blend)
-			{
-				if (flip_x)
-				{
-					draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-				}
-				else
-				{
-					draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-				}
-			}
-			else
-			{
-				if (flip_x)
-				{
-					draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-				}
-				else
-				{
-					draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-				}
-			}
-		}
-		// clipped against the bottom
-		tempfirstline = firstline;
-		templastline = lastline + 0x200;
-		scanx = scanline - tempfirstline;
-
-		if ((scanx >= 0) && (scanline <= templastline))
-		{
-			if (blend)
-			{
-				if (flip_x)
-				{
-					draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-				}
-				else
-				{
-					draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-				}
-			}
-			else
-			{
-				if (flip_x)
-				{
-					draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-				}
-				else
-				{
-					draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile);
-				}
-			}
-		}
-	}
-}
-
-void spg2xx_video_device::draw_sprites(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority)
-{
-	if (!(m_video_regs[0x42] & 0x0001))
-	{
-		return;
-	}
-
-	for (uint32_t n = 0; n < m_sprlimit_read_cb(); n++)
-	{
-		draw_sprite(cliprect, dst, scanline, priority, 4 * n);
-	}
-}
-
 void spg2xx_video_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline)
 {
 	static const float s_u8_to_float = 1.0f / 255.0f;
@@ -616,13 +460,13 @@ void spg2xx_video_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const 
 
 		src++;
 	}
-
-
 }
 
 
 uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	address_space &mem = m_cpu->space(AS_PROGRAM);
+
 	if (0)
 	{
 		uint16_t attr1 = m_video_regs[0x12];
@@ -660,7 +504,7 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 		{
 			draw_page(cliprect, dst, scanline, i, page1_addr, page1_regs);
 			draw_page(cliprect, dst, scanline, i, page2_addr, page2_regs);
-			draw_sprites(cliprect, dst, scanline, i);
+			m_renderer->draw_sprites(cliprect, dst, scanline, i, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
 		}
 
 		apply_saturation_and_fade(bitmap, cliprect, scanline);
@@ -668,6 +512,7 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 	return 0;
 }
+
 
 void spg2xx_video_device::do_sprite_dma(uint32_t len)
 {
@@ -697,13 +542,20 @@ READ16_MEMBER(spg2xx_video_device::video_r)
 	switch (offset)
 	{
 	case 0x10: // Page 1 X scroll
-		LOGMASKED(LOG_PPU_WRITES, "video_r: Page 1 X Scroll\n");
+		LOGMASKED(LOG_PPU_READS, "video_r: Page 1 X Scroll\n");
 		return m_video_regs[offset];
 
 	case 0x11: // Page 1 Y scroll
-		LOGMASKED(LOG_PPU_WRITES, "video_r: Page 1 Y Scroll\n");
+		LOGMASKED(LOG_PPU_READS, "video_r: Page 1 Y Scroll\n");
 		return m_video_regs[offset];
 
+	case 0x22: // Sprite Segment Address
+		LOGMASKED(LOG_PPU_READS, "video_r: Sprite Segment Address\n");
+		return m_renderer->get_video_reg_22();
+
+	case 0x2a: // Blend Level Control
+		LOGMASKED(LOG_PPU_READS, "video_r: Blend Level Control\n");
+		return m_renderer->get_video_reg_2a();
 
 	case 0x38: // Current Line
 		LOGMASKED(LOG_VLINES, "video_r: Current Line: %04x\n", m_screen->vpos());
@@ -716,6 +568,10 @@ READ16_MEMBER(spg2xx_video_device::video_r)
 	case 0x3f: // Light Pen X Position
 		LOGMASKED(LOG_PPU_READS, "video_r: Light Pen X / Lightgun X\n");
 		return m_gunx_in();
+
+	case 0x42: // Sprite Control
+		LOGMASKED(LOG_PPU_READS, "video_w: Sprite Control\n");
+		return m_renderer->get_video_reg_42();
 
 	case 0x62: // Video IRQ Enable
 		LOGMASKED(LOG_IRQS, "video_r: Video IRQ Enable: %04x\n", VIDEO_IRQ_ENABLE);
@@ -842,11 +698,12 @@ WRITE16_MEMBER(spg2xx_video_device::video_w)
 
 	case 0x22: // Sprite Segment Address
 		LOGMASKED(LOG_PPU_WRITES, "video_w: Sprite Segment Address = %04x\n", data);
-		m_video_regs[offset] = data;
+		m_renderer->set_video_reg_22(data);
 		break;
 
 	case 0x2a: // Blend Level Control
 		LOGMASKED(LOG_PPU_WRITES, "video_w: Blend Level Control = %04x\n", data & 0x0003);
+		m_renderer->set_video_reg_2a(data);
 		m_video_regs[offset] = data & 0x0003;
 		break;
 
@@ -893,8 +750,8 @@ WRITE16_MEMBER(spg2xx_video_device::video_w)
 		break;
 
 	case 0x42: // Sprite Control
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Sprite Control = %04x (TopLeft:%d, Enable:%d)\n", data & 0x0003, BIT(data, 1), BIT(data, 0));
-		m_video_regs[offset] = data & 0x0003;
+		LOGMASKED(LOG_PPU_WRITES, "video_w: Sprite Control = %04x (TopLeft:%d, Enable:%d)\n", data, BIT(data, 1), BIT(data, 0));
+		m_renderer->set_video_reg_42(data);
 		break;
 
 	case 0x62: // Video IRQ Enable
@@ -986,4 +843,10 @@ void spg2xx_video_device::device_timer(emu_timer &timer, device_timer_id id, int
 			break;
 		}
 	}
+}
+
+
+void spg2xx_video_device::device_add_mconfig(machine_config &config)
+{
+	SPG_RENDERER(config, m_renderer, 0);
 }

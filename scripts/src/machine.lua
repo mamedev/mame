@@ -2902,6 +2902,9 @@ if (MACHINES["SPG2XX"]~=null) then
 		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc.h",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc_video.cpp",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc_video.h",
+		MAME_DIR .. "src/devices/machine/spg_renderer.cpp",
+		MAME_DIR .. "src/devices/machine/spg_renderer.h",
+
 	}
 end
 

@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "spg_renderer.h"
 #include "cpu/unsp/unsp.h"
 #include "screen.h"
 
@@ -34,6 +35,7 @@ public:
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	devcb_read16 m_guny_in;
 	devcb_read16 m_gunx_in;
@@ -69,9 +71,7 @@ protected:
 	void apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline);
 
 	void draw_page(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t *regs);
-	void draw_sprites(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority);
 
-	inline void draw_sprite(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t base_addr);
 	inline void draw_linemap(const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* regs);
 	inline bool get_tile_info(uint32_t tilemap_rambase, uint32_t palettemap_rambase, uint32_t x0, uint32_t y0, uint32_t tile_count_x, uint32_t ctrl, uint32_t attr, uint16_t& tile, bool& blend, bool& flip_x, bool& flip_y, uint32_t& palette_offset);
 
@@ -100,6 +100,8 @@ protected:
 	required_shared_ptr<uint16_t> m_spriteram;
 
 	devcb_write_line m_video_irq_cb;
+
+	required_device<spg_renderer_device> m_renderer;
 };
 
 class spg24x_video_device : public spg2xx_video_device
