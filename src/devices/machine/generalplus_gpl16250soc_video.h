@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "spg_renderer.h"
 #include "cpu/unsp/unsp.h"
 #include "screen.h"
 #include "emupal.h"
@@ -261,6 +262,7 @@ protected:
 	int m_alt_extrasprite_hack;
 	int m_alt_tile_addressing;
 
+	required_device<spg_renderer_device> m_renderer;
 };
 
 class gcm394_video_device : public gcm394_base_video_device
