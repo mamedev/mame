@@ -358,7 +358,9 @@ void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t* dst, ui
 		realxscroll += (int16_t)scrollram[(logical_scanline+yscroll) & 0xff];
 	}
 
-	for (uint32_t x0 = 0; x0 < (320+tile_w)/tile_w; x0++)
+	const int upperscrollbits = (realxscroll >> (tile_width + 3));
+	const int endpos = (320 + tile_w) / tile_w;
+	for (uint32_t x0 = 0; x0 < endpos; x0++)
 	{
 		spg_renderer_device::blend_enable_t blend;
 		spg_renderer_device::flipx_t flip_x;
@@ -366,7 +368,7 @@ void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t* dst, ui
 		uint16_t tile;
 		uint32_t palette_offset;
 
-		if (!get_tile_info(tilemap_rambase, palettemap_rambase, (x0 + (realxscroll >> (tile_width+3))) & (tile_count_x-1) , y0, tile_count_x, ctrl, attr, tile, blend, flip_x, flip_y, palette_offset, spc))
+		if (!get_tile_info(tilemap_rambase, palettemap_rambase, (x0 + upperscrollbits) & (tile_count_x-1) , y0, tile_count_x, ctrl, attr, tile, blend, flip_x, flip_y, palette_offset, spc))
 			continue;
 
 		palette_offset >>= nc_bpp;
