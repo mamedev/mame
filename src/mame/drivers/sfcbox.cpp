@@ -146,13 +146,13 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( port_81_r );
-	DECLARE_READ8_MEMBER( port_83_r );
-	DECLARE_WRITE8_MEMBER( port_80_w );
-	DECLARE_WRITE8_MEMBER( port_81_w );
-	DECLARE_WRITE8_MEMBER( port_83_w );
-	DECLARE_WRITE8_MEMBER( snes_map_0_w );
-	DECLARE_WRITE8_MEMBER( snes_map_1_w );
+	uint8_t port_81_r();
+	uint8_t port_83_r();
+	void port_80_w(uint8_t data);
+	void port_81_w(uint8_t data);
+	void port_83_w(uint8_t data);
+	void snes_map_0_w(uint8_t data);
+	void snes_map_1_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void sfcbox_io(address_map &map);
@@ -188,7 +188,7 @@ void sfcbox_state::sfcbox_map(address_map &map)
 }
 
 
-WRITE8_MEMBER( sfcbox_state::port_80_w )
+void sfcbox_state::port_80_w(uint8_t data)
 {
 /*
     x--- ----   (often same as bit5)
@@ -206,7 +206,7 @@ WRITE8_MEMBER( sfcbox_state::port_80_w )
 }
 
 
-READ8_MEMBER( sfcbox_state::port_81_r )
+uint8_t sfcbox_state::port_81_r()
 {
 /*
     x--- ----   Vblank, Vsync, or Whatever flag (must toggle on/off at whatever speed)
@@ -232,7 +232,7 @@ READ8_MEMBER( sfcbox_state::port_81_r )
 	return res;
 }
 
-WRITE8_MEMBER( sfcbox_state::port_81_w )
+void sfcbox_state::port_81_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
@@ -240,16 +240,16 @@ WRITE8_MEMBER( sfcbox_state::port_81_w )
 	ioport("OSD_CS")->write(data, 0xff);
 }
 
-READ8_MEMBER( sfcbox_state::port_83_r )
+uint8_t sfcbox_state::port_83_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( sfcbox_state::port_83_w )
+void sfcbox_state::port_83_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( sfcbox_state::snes_map_0_w )
+void sfcbox_state::snes_map_0_w(uint8_t data)
 {
 	const char *const rom_socket[4] = { "ROM5", "ROM1/7/12", "ROM3/9", "IC23" };
 
@@ -262,7 +262,7 @@ WRITE8_MEMBER( sfcbox_state::snes_map_0_w )
 	printf("%s ROM / DSP / SRAM maps\n",(data & 0x80) ? "HiROM" : "LoROM");
 }
 
-WRITE8_MEMBER( sfcbox_state::snes_map_1_w )
+void sfcbox_state::snes_map_1_w(uint8_t data)
 {
 	/* Reserved for ROM DSP SRAM probably means bank ATROM */
 	const char *const rom_dsp_sram[4] = {   "Reserved?", "GSU", "LoROM", "HiROM" };

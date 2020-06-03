@@ -374,33 +374,33 @@ private:
 	int8_t m_wheel_force;
 	int m_wheel_offset;
 	bool m_wheel_calibrated;
-	DECLARE_READ32_MEMBER(interrupt_state_r);
-	DECLARE_READ32_MEMBER(interrupt_state2_r);
-	DECLARE_READ32_MEMBER(interrupt_config_r);
-	DECLARE_WRITE32_MEMBER(interrupt_config_w);
-	DECLARE_READ32_MEMBER(seattle_interrupt_enable_r);
-	DECLARE_WRITE32_MEMBER(seattle_interrupt_enable_w);
-	DECLARE_WRITE32_MEMBER(vblank_clear_w);
+	uint32_t interrupt_state_r();
+	uint32_t interrupt_state2_r();
+	uint32_t interrupt_config_r();
+	void interrupt_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t seattle_interrupt_enable_r();
+	void seattle_interrupt_enable_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void vblank_clear_w(uint32_t data);
 	uint32_t analog_port_r();
 	void analog_port_w(uint32_t data);
-	DECLARE_READ32_MEMBER(carnevil_gun_r);
-	DECLARE_WRITE32_MEMBER(carnevil_gun_w);
-	DECLARE_WRITE32_MEMBER(cmos_w);
-	DECLARE_READ32_MEMBER(cmos_r);
-	DECLARE_WRITE32_MEMBER(cmos_protect_w);
-	DECLARE_READ32_MEMBER(cmos_protect_r);
-	DECLARE_WRITE32_MEMBER(seattle_watchdog_w);
-	DECLARE_READ32_MEMBER(asic_reset_r);
-	DECLARE_WRITE32_MEMBER(asic_reset_w);
-	DECLARE_WRITE32_MEMBER(asic_fifo_w);
-	DECLARE_READ32_MEMBER(status_leds_r);
-	DECLARE_WRITE32_MEMBER(status_leds_w);
-	DECLARE_READ32_MEMBER(ethernet_r);
-	DECLARE_WRITE32_MEMBER(ethernet_w);
+	uint32_t carnevil_gun_r(offs_t offset);
+	void carnevil_gun_w(offs_t offset, uint32_t data);
+	void cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cmos_r(offs_t offset);
+	void cmos_protect_w(uint32_t data);
+	uint32_t cmos_protect_r();
+	void seattle_watchdog_w(uint32_t data);
+	uint32_t asic_reset_r();
+	void asic_reset_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void asic_fifo_w(uint32_t data);
+	uint32_t status_leds_r();
+	void status_leds_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ethernet_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ethernet_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t output_r();
 	void output_w(uint32_t data);
-	DECLARE_READ32_MEMBER(widget_r);
-	DECLARE_WRITE32_MEMBER(widget_w);
+	uint32_t widget_r(offs_t offset, uint32_t mem_mask = ~0);
+	void widget_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void wheel_board_w(offs_t offset, uint32_t data);
 
 
@@ -531,7 +531,7 @@ WRITE_LINE_MEMBER(seattle_state::ioasic_irq)
 *
 *************************************/
 
-READ32_MEMBER(seattle_state::interrupt_state_r)
+uint32_t seattle_state::interrupt_state_r()
 {
 	uint32_t result = 0;
 	result |= m_ethernet_irq_state << ETHERNET_IRQ_SHIFT;
@@ -540,20 +540,20 @@ READ32_MEMBER(seattle_state::interrupt_state_r)
 }
 
 
-READ32_MEMBER(seattle_state::interrupt_state2_r)
+uint32_t seattle_state::interrupt_state2_r()
 {
-	uint32_t result = interrupt_state_r(space, offset, mem_mask);
+	uint32_t result = interrupt_state_r();
 	result |= m_vblank_state << 8;
 	return result;
 }
 
 
-READ32_MEMBER(seattle_state::interrupt_config_r)
+uint32_t seattle_state::interrupt_config_r()
 {
 	return m_interrupt_config;
 }
 
-WRITE32_MEMBER(seattle_state::interrupt_config_w)
+void seattle_state::interrupt_config_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int irq;
 	COMBINE_DATA(&m_interrupt_config);
@@ -597,12 +597,12 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 }
 
 
-READ32_MEMBER(seattle_state::seattle_interrupt_enable_r)
+uint32_t seattle_state::seattle_interrupt_enable_r()
 {
 	return m_interrupt_enable;
 }
 
-WRITE32_MEMBER(seattle_state::seattle_interrupt_enable_w)
+void seattle_state::seattle_interrupt_enable_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = m_interrupt_enable;
 	COMBINE_DATA(&m_interrupt_enable);
@@ -639,7 +639,7 @@ void seattle_state::update_vblank_irq()
 }
 
 
-WRITE32_MEMBER(seattle_state::vblank_clear_w)
+void seattle_state::vblank_clear_w(uint32_t data)
 {
 	// clear the latch and update the IRQ
 	m_vblank_latch = 0;
@@ -754,7 +754,7 @@ DECLARE_CUSTOM_INPUT_MEMBER(seattle_state::gearshift_r)
 *
 *************************************/
 
-READ32_MEMBER(seattle_state::carnevil_gun_r)
+uint32_t seattle_state::carnevil_gun_r(offs_t offset)
 {
 	uint32_t result = 0;
 
@@ -800,7 +800,7 @@ READ32_MEMBER(seattle_state::carnevil_gun_r)
 }
 
 
-WRITE32_MEMBER(seattle_state::carnevil_gun_w)
+void seattle_state::carnevil_gun_w(offs_t offset, uint32_t data)
 {
 	logerror("carnevil_gun_w(%d) = %02X\n", offset, data);
 }
@@ -811,25 +811,25 @@ WRITE32_MEMBER(seattle_state::carnevil_gun_w)
 *
 *************************************/
 
-READ32_MEMBER(seattle_state::ethernet_r)
+uint32_t seattle_state::ethernet_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 	if (!(offset & 8))
-		data = m_ethernet->read(space, offset & 7, mem_mask & 0xffff);
+		data = m_ethernet->read(offset & 7, mem_mask & 0xffff);
 	else
-		data = m_ethernet->read(space, offset & 7, mem_mask & 0x00ff);
+		data = m_ethernet->read(offset & 7, mem_mask & 0x00ff);
 	//logerror("ethernet_r: @%08x=%08x mask: %08x\n", offset, data, mem_mask);
 	return data;
 }
 
 
-WRITE32_MEMBER(seattle_state::ethernet_w)
+void seattle_state::ethernet_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//logerror("ethernet_w: @%08x=%08x mask: %08x\n", offset, data, mem_mask);
 	if (!(offset & 8))
-		m_ethernet->write(space, offset & 7, data & 0xffff, mem_mask | 0xffff);
+		m_ethernet->write(offset & 7, data & 0xffff, mem_mask | 0xffff);
 	else
-		m_ethernet->write(space, offset & 7, data & 0x00ff, mem_mask | 0x00ff);
+		m_ethernet->write(offset & 7, data & 0x00ff, mem_mask | 0x00ff);
 }
 
 /*************************************
@@ -915,7 +915,7 @@ void seattle_state::output_w(uint32_t data)
 }
 
 
-READ32_MEMBER(seattle_state::widget_r)
+uint32_t seattle_state::widget_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = ~0;
 
@@ -939,7 +939,7 @@ READ32_MEMBER(seattle_state::widget_r)
 			break;
 
 		case WREG_ETHER_DATA:
-			result = m_ethernet->read(space, m_widget.ethernet_addr & 7, mem_mask & 0xffff);
+			result = m_ethernet->read(m_widget.ethernet_addr & 7, mem_mask & 0xffff);
 			break;
 	}
 
@@ -949,7 +949,7 @@ READ32_MEMBER(seattle_state::widget_r)
 }
 
 
-WRITE32_MEMBER(seattle_state::widget_w)
+void seattle_state::widget_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (LOG_WIDGET)
 		logerror("Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
@@ -974,7 +974,7 @@ WRITE32_MEMBER(seattle_state::widget_w)
 			break;
 
 		case WREG_ETHER_DATA:
-			m_ethernet->write(space, m_widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
+			m_ethernet->write(m_widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
 			break;
 	}
 }
@@ -986,7 +986,7 @@ WRITE32_MEMBER(seattle_state::widget_w)
 *
 *************************************/
 
-WRITE32_MEMBER(seattle_state::cmos_w)
+void seattle_state::cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cmos_write_enabled)
 		COMBINE_DATA(&m_nvram_data[offset]);
@@ -994,19 +994,19 @@ WRITE32_MEMBER(seattle_state::cmos_w)
 }
 
 
-READ32_MEMBER(seattle_state::cmos_r)
+uint32_t seattle_state::cmos_r(offs_t offset)
 {
 	return m_nvram_data[offset];
 }
 
 
-WRITE32_MEMBER(seattle_state::cmos_protect_w)
+void seattle_state::cmos_protect_w(uint32_t data)
 {
 	m_cmos_write_enabled = true;
 }
 
 
-READ32_MEMBER(seattle_state::cmos_protect_r)
+uint32_t seattle_state::cmos_protect_r()
 {
 	return m_cmos_write_enabled;
 }
@@ -1019,17 +1019,17 @@ READ32_MEMBER(seattle_state::cmos_protect_r)
 *
 *************************************/
 
-WRITE32_MEMBER(seattle_state::seattle_watchdog_w)
+void seattle_state::seattle_watchdog_w(uint32_t data)
 {
 	m_maincpu->eat_cycles(100);
 }
 
-READ32_MEMBER(seattle_state::asic_reset_r)
+uint32_t seattle_state::asic_reset_r()
 {
 	return m_asic_reset;
 }
 
-WRITE32_MEMBER(seattle_state::asic_reset_w)
+void seattle_state::asic_reset_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_asic_reset);
 	if (!(m_asic_reset & 0x0002))
@@ -1037,19 +1037,19 @@ WRITE32_MEMBER(seattle_state::asic_reset_w)
 }
 
 
-WRITE32_MEMBER(seattle_state::asic_fifo_w)
+void seattle_state::asic_fifo_w(uint32_t data)
 {
 	m_ioasic->fifo_w(data);
 }
 
 
-READ32_MEMBER(seattle_state::status_leds_r)
+uint32_t seattle_state::status_leds_r()
 {
 	return m_status_leds | 0xffffff00;
 }
 
 
-WRITE32_MEMBER(seattle_state::status_leds_w)
+void seattle_state::status_leds_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_status_leds = data;

@@ -51,10 +51,10 @@ public:
 	void sacstate(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_READ8_MEMBER(port04_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
+	uint8_t port00_r();
+	uint8_t port01_r();
+	uint8_t port04_r();
+	void port08_w(uint8_t data);
 	void kbd_put(u8 data);
 	void sacstate_io(address_map &map);
 	void sacstate_mem(address_map &map);
@@ -66,7 +66,7 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-READ8_MEMBER( sacstate_state::port01_r )
+uint8_t sacstate_state::port01_r()
 {
 	uint8_t ret = m_val;
 	if (m_term_data)
@@ -74,20 +74,20 @@ READ8_MEMBER( sacstate_state::port01_r )
 	return ret;
 }
 
-READ8_MEMBER( sacstate_state::port00_r )
+uint8_t sacstate_state::port00_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( sacstate_state::port04_r )
+uint8_t sacstate_state::port04_r()
 {
 	logerror("unknown_r\n");
 	return 0;
 }
 
-WRITE8_MEMBER( sacstate_state::port08_w )
+void sacstate_state::port08_w(uint8_t data)
 {
 	if (data == 0x40)
 		m_val = 0x40;

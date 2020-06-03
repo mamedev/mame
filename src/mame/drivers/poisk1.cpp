@@ -134,14 +134,14 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(p1_pit8253_out2_changed);
 	DECLARE_WRITE_LINE_MEMBER(p1_speaker_set_spkrdata);
-	DECLARE_READ8_MEMBER(p1_trap_r);
-	DECLARE_WRITE8_MEMBER(p1_trap_w);
-	DECLARE_READ8_MEMBER(p1_cga_r);
-	DECLARE_WRITE8_MEMBER(p1_cga_w);
-	DECLARE_WRITE8_MEMBER(p1_vram_w);
+	uint8_t p1_trap_r(offs_t offset);
+	void p1_trap_w(offs_t offset, uint8_t data);
+	uint8_t p1_cga_r(offs_t offset);
+	void p1_cga_w(offs_t offset, uint8_t data);
+	void p1_vram_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(p1_ppi_r);
-	DECLARE_WRITE8_MEMBER(p1_ppi_w);
+	uint8_t p1_ppi_r(offs_t offset);
+	void p1_ppi_w(offs_t offset, uint8_t data);
 	void p1_ppi_porta_w(uint8_t data);
 	uint8_t p1_ppi_porta_r();
 	uint8_t p1_ppi_portb_r();
@@ -168,7 +168,7 @@ private:
  * Port 2AH (offset 2) -- data
  */
 
-READ8_MEMBER(p1_state::p1_trap_r)
+uint8_t p1_state::p1_trap_r(offs_t offset)
 {
 	uint8_t data = m_video.trap[offset];
 	LOG("trap R %.2x $%02x\n", 0x28 + offset, data);
@@ -176,12 +176,12 @@ READ8_MEMBER(p1_state::p1_trap_r)
 	return data;
 }
 
-WRITE8_MEMBER(p1_state::p1_trap_w)
+void p1_state::p1_trap_w(offs_t offset, uint8_t data)
 {
 	LOG("trap W %.2x $%02x\n", 0x28 + offset, data);
 }
 
-READ8_MEMBER(p1_state::p1_cga_r)
+uint8_t p1_state::p1_cga_r(offs_t offset)
 {
 	uint16_t port = offset + 0x3d0;
 
@@ -192,7 +192,7 @@ READ8_MEMBER(p1_state::p1_cga_r)
 	return 0;
 }
 
-WRITE8_MEMBER(p1_state::p1_cga_w)
+void p1_state::p1_cga_w(offs_t offset, uint8_t data)
 {
 	uint16_t port = offset + 0x3d0;
 
@@ -203,7 +203,7 @@ WRITE8_MEMBER(p1_state::p1_cga_w)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(p1_state::p1_vram_w)
+void p1_state::p1_vram_w(offs_t offset, uint8_t data)
 {
 	LOG("vram W %.4x $%02x\n", offset, data);
 	if (m_video.videoram_base) m_video.videoram_base[offset] = data;
@@ -240,7 +240,7 @@ void p1_state::p1_ppi2_porta_w(uint8_t data)
 		else
 		{
 			program.install_read_bank(0xb8000, 0xbbfff, "bank11");
-			program.install_write_handler(0xb8000, 0xbbfff, write8_delegate(*this, FUNC(p1_state::p1_vram_w)));
+			program.install_write_handler(0xb8000, 0xbbfff, write8sm_delegate(*this, FUNC(p1_state::p1_vram_w)));
 		}
 	}
 	// DISPLAY BANK
@@ -545,7 +545,7 @@ void p1_state::p1_ppi2_portb_w(uint8_t data)
 	p1_speaker_set_spkrdata(data & 0x02);
 }
 
-READ8_MEMBER(p1_state::p1_ppi_r)
+uint8_t p1_state::p1_ppi_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -567,7 +567,7 @@ READ8_MEMBER(p1_state::p1_ppi_r)
 	}
 }
 
-WRITE8_MEMBER(p1_state::p1_ppi_w)
+void p1_state::p1_ppi_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

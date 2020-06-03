@@ -55,8 +55,8 @@ private:
 	uint8_t m_port_l;
 	required_device<avr8_device> m_maincpu;
 
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
+	uint8_t port_r(offs_t offset);
+	void port_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -69,7 +69,7 @@ void rambo_state::machine_start()
 {
 }
 
-READ8_MEMBER(rambo_state::port_r)
+uint8_t rambo_state::port_r(offs_t offset)
 {
 	switch( offset )
 	{
@@ -86,7 +86,7 @@ READ8_MEMBER(rambo_state::port_r)
 	return 0;
 }
 
-WRITE8_MEMBER(rambo_state::port_w)
+void rambo_state::port_w(offs_t offset, uint8_t data)
 {
 	switch( offset )
 	{

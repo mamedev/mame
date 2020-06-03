@@ -178,16 +178,16 @@ private:
 	uint32_t m_flashN;
 
 	// ssfindo and ppcar
-	DECLARE_READ32_MEMBER(io_r);
-	DECLARE_WRITE32_MEMBER(io_w);
+	uint32_t io_r();
+	void io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// ssfindo
-	DECLARE_WRITE32_MEMBER(debug_w);
-	DECLARE_READ32_MEMBER(ff4_r);
-	DECLARE_READ32_MEMBER(SIMPLEIO_r);
+	void debug_w(uint32_t data);
+	uint32_t ff4_r();
+	uint32_t SIMPLEIO_r();
 
 	// ppcar
-	DECLARE_READ32_MEMBER(randomized_r);
+	uint32_t randomized_r();
 
 	void ssfindo_speedups();
 	void ppcar_speedups();
@@ -221,8 +221,8 @@ private:
 	DECLARE_READ_LINE_MEMBER(iocr_od1_r);
 	DECLARE_WRITE_LINE_MEMBER(iocr_od0_w);
 	DECLARE_WRITE_LINE_MEMBER(iocr_od1_w);
-	DECLARE_READ32_MEMBER(tetfight_unk_r);
-	DECLARE_WRITE32_MEMBER(tetfight_unk_w);
+	uint32_t tetfight_unk_r();
+	void tetfight_unk_w(uint32_t data);
 };
 
 //TODO: eeprom  24c01 & 24c02
@@ -293,7 +293,7 @@ void ssfindo_state::ppcar_speedups()
 		m_maincpu->spin_until_time(attotime::from_usec(20));
 }
 
-READ32_MEMBER(ssfindo_state::io_r)
+uint32_t ssfindo_state::io_r()
 {
 	int adr=m_flashAdr*0x200+(m_flashOffset);
 
@@ -318,7 +318,7 @@ READ32_MEMBER(ssfindo_state::io_r)
 	return 0;
 }
 
-WRITE32_MEMBER(ssfindo_state::io_w)
+void ssfindo_state::io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t temp = 0;
 	COMBINE_DATA(&temp);
@@ -337,24 +337,24 @@ WRITE32_MEMBER(ssfindo_state::io_w)
 	m_adrLatch=(m_adrLatch+1)%3;
 }
 
-WRITE32_MEMBER(ssfindo_state::debug_w)
+void ssfindo_state::debug_w(uint32_t data)
 {
 #if 0
 	osd_printf_debug("%c",data&0xff); //debug texts - malloc (ie "64 KBytes allocated, elapsed : 378 KBytes, free : 2231 KBytes")
 #endif
 }
 
-READ32_MEMBER(ssfindo_state::ff4_r)
+uint32_t ssfindo_state::ff4_r()
 {
 	return machine().rand()&0x20;
 }
 
-READ32_MEMBER(ssfindo_state::SIMPLEIO_r)
+uint32_t ssfindo_state::SIMPLEIO_r()
 {
 	return machine().rand()&1;
 }
 
-READ32_MEMBER(ssfindo_state::randomized_r)
+uint32_t ssfindo_state::randomized_r()
 {
 	return machine().rand();
 }
@@ -394,13 +394,13 @@ void ssfindo_state::ppcar_map(address_map &map)
 	map(0x10000000, 0x10ffffff).ram();
 }
 
-READ32_MEMBER(tetfight_state::tetfight_unk_r)
+uint32_t tetfight_state::tetfight_unk_r()
 {
 	//sound status ?
 	return machine().rand();
 }
 
-WRITE32_MEMBER(tetfight_state::tetfight_unk_w)
+void tetfight_state::tetfight_unk_w(uint32_t data)
 {
 	//sound latch ?
 }

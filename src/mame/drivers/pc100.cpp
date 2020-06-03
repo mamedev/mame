@@ -106,19 +106,19 @@ private:
 	required_region_ptr<uint16_t> m_vram;
 	required_ioport_array<6> m_keys;
 
-	DECLARE_READ16_MEMBER(pc100_vram_r);
-	DECLARE_WRITE16_MEMBER(pc100_vram_w);
-	DECLARE_READ16_MEMBER(pc100_kanji_r);
-	DECLARE_WRITE16_MEMBER(pc100_kanji_w);
-	DECLARE_READ8_MEMBER(pc100_key_r);
-	DECLARE_WRITE8_MEMBER(pc100_output_w);
-	DECLARE_WRITE8_MEMBER(pc100_tc_w);
-	DECLARE_READ8_MEMBER(pc100_shift_r);
-	DECLARE_WRITE8_MEMBER(pc100_shift_w);
-	DECLARE_READ8_MEMBER(pc100_vs_vreg_r);
-	DECLARE_WRITE8_MEMBER(pc100_vs_vreg_w);
-	DECLARE_WRITE8_MEMBER(pc100_crtc_addr_w);
-	DECLARE_WRITE8_MEMBER(pc100_crtc_data_w);
+	uint16_t pc100_vram_r(offs_t offset);
+	void pc100_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t pc100_kanji_r();
+	void pc100_kanji_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t pc100_key_r(offs_t offset);
+	void pc100_output_w(offs_t offset, uint8_t data);
+	void pc100_tc_w(uint8_t data);
+	uint8_t pc100_shift_r();
+	void pc100_shift_w(uint8_t data);
+	uint8_t pc100_vs_vreg_r(offs_t offset);
+	void pc100_vs_vreg_w(offs_t offset, uint8_t data);
+	void pc100_crtc_addr_w(uint8_t data);
+	void pc100_crtc_data_w(uint8_t data);
 	void lower_mask_w(uint8_t data);
 	void upper_mask_w(uint8_t data);
 	void crtc_bank_w(uint8_t data);
@@ -222,17 +222,15 @@ WRITE_LINE_MEMBER(pc100_state::drqnmi_w)
 	m_drq_state = state == ASSERT_LINE;
 }
 
-READ16_MEMBER( pc100_state::pc100_vram_r )
+uint16_t pc100_state::pc100_vram_r(offs_t offset)
 {
 	return m_vram[offset+m_bank_r*0x10000];
 }
 
-WRITE16_MEMBER( pc100_state::pc100_vram_w )
+void pc100_state::pc100_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old_vram;
-	int i;
-
-	for(i=0;i<4;i++)
+	for(int i=0;i<4;i++)
 	{
 		if((m_bank_w >> i) & 1)
 		{
@@ -258,18 +256,18 @@ void pc100_state::pc100_map(address_map &map)
 	map(0xf8000, 0xfffff).rom().region("ipl", 0);
 }
 
-READ16_MEMBER( pc100_state::pc100_kanji_r )
+uint16_t pc100_state::pc100_kanji_r()
 {
 	return m_kanji_rom[m_kanji_addr];
 }
 
 
-WRITE16_MEMBER( pc100_state::pc100_kanji_w )
+void pc100_state::pc100_kanji_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_kanji_addr);
 }
 
-READ8_MEMBER( pc100_state::pc100_key_r )
+uint8_t pc100_state::pc100_key_r(offs_t offset)
 {
 	if(offset)
 		return ioport("DSW")->read(); // bit 5: horizontal/vertical monitor dsw
@@ -282,7 +280,7 @@ READ8_MEMBER( pc100_state::pc100_key_r )
 	return 0;
 }
 
-WRITE8_MEMBER( pc100_state::pc100_output_w )
+void pc100_state::pc100_output_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 	{
@@ -292,22 +290,22 @@ WRITE8_MEMBER( pc100_state::pc100_output_w )
 	}
 }
 
-WRITE8_MEMBER( pc100_state::pc100_tc_w )
+void pc100_state::pc100_tc_w(uint8_t data)
 {
 	m_fdc->tc_w(data & 0x40);
 }
 
-READ8_MEMBER( pc100_state::pc100_shift_r )
+uint8_t pc100_state::pc100_shift_r()
 {
 	return m_crtc.shift;
 }
 
-WRITE8_MEMBER( pc100_state::pc100_shift_w )
+void pc100_state::pc100_shift_w(uint8_t data)
 {
 	m_crtc.shift = data & 0xf;
 }
 
-READ8_MEMBER( pc100_state::pc100_vs_vreg_r )
+uint8_t pc100_state::pc100_vs_vreg_r(offs_t offset)
 {
 	if(offset)
 		return m_crtc.vstart >> 8;
@@ -315,7 +313,7 @@ READ8_MEMBER( pc100_state::pc100_vs_vreg_r )
 	return m_crtc.vstart & 0xff;
 }
 
-WRITE8_MEMBER( pc100_state::pc100_vs_vreg_w )
+void pc100_state::pc100_vs_vreg_w(offs_t offset, uint8_t data)
 {
 	if(offset)
 		m_crtc.vstart = (m_crtc.vstart & 0xff) | (data << 8);
@@ -323,12 +321,12 @@ WRITE8_MEMBER( pc100_state::pc100_vs_vreg_w )
 		m_crtc.vstart = (m_crtc.vstart & 0xff00) | (data & 0xff);
 }
 
-WRITE8_MEMBER( pc100_state::pc100_crtc_addr_w )
+void pc100_state::pc100_crtc_addr_w(uint8_t data)
 {
 	m_crtc.addr = data & 7;
 }
 
-WRITE8_MEMBER( pc100_state::pc100_crtc_data_w )
+void pc100_state::pc100_crtc_data_w(uint8_t data)
 {
 	m_crtc.reg[m_crtc.addr] = data;
 	//printf("%02x %02x\n",m_crtc.addr,data);

@@ -88,8 +88,8 @@ private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	uint32_t spg290_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ32_MEMBER(spg290_regs_r);
-	DECLARE_WRITE32_MEMBER(spg290_regs_w);
+	uint32_t spg290_regs_r(offs_t offset, uint32_t mem_mask = ~0);
+	void spg290_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void spg290_timers_update();
 	DECLARE_WRITE_LINE_MEMBER(spg290_vblank_irq);
 	inline uint32_t spg290_read_mem(uint32_t offset);
@@ -239,7 +239,7 @@ static void log_spg290_regs(device_t *device,uint8_t module, uint16_t reg, uint3
 #endif
 
 
-READ32_MEMBER(spg29x_game_state::spg290_regs_r)
+uint32_t spg29x_game_state::spg290_regs_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t addr = offset << 2;
 	uint32_t data = 0;
@@ -285,7 +285,7 @@ READ32_MEMBER(spg29x_game_state::spg290_regs_r)
 	return data;
 }
 
-WRITE32_MEMBER(spg29x_game_state::spg290_regs_w)
+void spg29x_game_state::spg290_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t addr = offset << 2;
 

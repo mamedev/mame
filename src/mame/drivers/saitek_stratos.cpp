@@ -108,14 +108,14 @@ private:
 
 	// I/O handlers
 	void update_leds();
-	DECLARE_WRITE8_MEMBER(select_w);
-	DECLARE_READ8_MEMBER(chessboard_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(lcd_data_r);
-	DECLARE_READ8_MEMBER(extrom_r);
+	void select_w(u8 data);
+	u8 chessboard_r();
+	void sound_w(u8 data);
+	void leds_w(u8 data);
+	u8 control_r();
+	void control_w(u8 data);
+	u8 lcd_data_r();
+	u8 extrom_r(offs_t offset);
 
 	std::unique_ptr<u8[]> m_nvram_data;
 
@@ -284,7 +284,7 @@ void stratos_state::update_leds()
 	m_display->matrix_partial(0, 2, 1 << (m_control >> 5 & 1), (~m_led_data & 0xff) | (~m_control << 6 & 0x100));
 }
 
-WRITE8_MEMBER(stratos_state::leds_w)
+void stratos_state::leds_w(u8 data)
 {
 	// d0-d7: button led data
 	m_led_data = data;
@@ -293,12 +293,12 @@ WRITE8_MEMBER(stratos_state::leds_w)
 	m_dac->write(0); // guessed
 }
 
-WRITE8_MEMBER(stratos_state::sound_w)
+void stratos_state::sound_w(u8 data)
 {
 	m_dac->write(1);
 }
 
-WRITE8_MEMBER(stratos_state::select_w)
+void stratos_state::select_w(u8 data)
 {
 	// d0-d3: input/led mux
 	// d4-d7: chessboard led data
@@ -306,13 +306,13 @@ WRITE8_MEMBER(stratos_state::select_w)
 	m_display->matrix_partial(2, 4, ~m_select >> 4 & 0xf, 1 << (m_select & 0xf));
 }
 
-READ8_MEMBER(stratos_state::chessboard_r)
+u8 stratos_state::chessboard_r()
 {
 	// d0-d7: chessboard sensors
 	return ~m_board->read_file(m_select & 0xf);
 }
 
-READ8_MEMBER(stratos_state::control_r)
+u8 stratos_state::control_r()
 {
 	u8 data = 0;
 	u8 sel = m_select & 0xf;
@@ -336,7 +336,7 @@ READ8_MEMBER(stratos_state::control_r)
 	return data;
 }
 
-WRITE8_MEMBER(stratos_state::control_w)
+void stratos_state::control_w(u8 data)
 {
 	u8 prev = m_control;
 	m_control = data;
@@ -356,7 +356,7 @@ WRITE8_MEMBER(stratos_state::control_w)
 		power_off();
 }
 
-READ8_MEMBER(stratos_state::extrom_r)
+u8 stratos_state::extrom_r(offs_t offset)
 {
 	u16 bank = BIT(m_control, 1) * 0x4000;
 	return (m_extrom->exists()) ? m_extrom->read_rom(offset | bank) : 0xff;

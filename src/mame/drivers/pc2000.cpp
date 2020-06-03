@@ -66,13 +66,13 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( key_matrix_r );
-	DECLARE_WRITE8_MEMBER( key_matrix_w );
-	DECLARE_WRITE8_MEMBER( rombank0_w );
-	DECLARE_WRITE8_MEMBER( rombank1_w );
-	DECLARE_WRITE8_MEMBER( rombank2_w );
-	DECLARE_READ8_MEMBER( beep_r );
-	DECLARE_WRITE8_MEMBER( beep_w );
+	uint8_t key_matrix_r(offs_t offset);
+	void key_matrix_w(uint8_t data);
+	void rombank0_w(uint8_t data);
+	void rombank1_w(uint8_t data);
+	void rombank2_w(uint8_t data);
+	uint8_t beep_r();
+	void beep_w(uint8_t data);
 	void pc2000_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -160,11 +160,11 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(kb_r);
-	DECLARE_READ8_MEMBER(lcdc_data_r);
-	DECLARE_WRITE8_MEMBER(lcdc_data_w);
-	DECLARE_READ8_MEMBER(lcdc_control_r);
-	DECLARE_WRITE8_MEMBER(lcdc_control_w);
+	uint8_t kb_r(offs_t offset);
+	uint8_t lcdc_data_r();
+	void lcdc_data_w(uint8_t data);
+	uint8_t lcdc_control_r();
+	void lcdc_control_w(uint8_t data);
 	HD44780_PIXEL_UPDATE(pc1000_pixel_update);
 
 	void pc1000_mem(address_map &map);
@@ -173,7 +173,7 @@ protected:
 
 
 // TODO: put a breakpoint at 1625 and test the inputs, writes at dce4 are the scancode values
-READ8_MEMBER( pc2000_state::key_matrix_r )
+uint8_t pc2000_state::key_matrix_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 	for (int line = 0; line < 8; line++)
@@ -183,22 +183,22 @@ READ8_MEMBER( pc2000_state::key_matrix_r )
 	return data;
 }
 
-WRITE8_MEMBER( pc2000_state::key_matrix_w )
+void pc2000_state::key_matrix_w(uint8_t data)
 {
 	m_mux_data = data;
 }
 
-WRITE8_MEMBER( pc2000_state::rombank0_w )
+void pc2000_state::rombank0_w(uint8_t data)
 {
 	m_bank0->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER( pc2000_state::rombank1_w )
+void pc2000_state::rombank1_w(uint8_t data)
 {
 	m_bank1->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER( pc2000_state::rombank2_w )
+void pc2000_state::rombank2_w(uint8_t data)
 {
 	if (data & 0x80)
 		m_bank2->set_entry(data & 0x8f);   //cartridge
@@ -206,12 +206,12 @@ WRITE8_MEMBER( pc2000_state::rombank2_w )
 		m_bank2->set_entry(data & 0x1f);
 }
 
-READ8_MEMBER( pc2000_state::beep_r )
+uint8_t pc2000_state::beep_r()
 {
 	return m_beep_state;
 }
 
-WRITE8_MEMBER( pc2000_state::beep_w )
+void pc2000_state::beep_w(uint8_t data)
 {
 	m_beep->set_state(BIT(data, 3));
 	m_beep_state = data;
@@ -358,7 +358,7 @@ void gl3000s_state::gl3000s_io(address_map &map)
 	map(0x10, 0x11).rw(FUNC(gl3000s_state::key_matrix_r), FUNC(gl3000s_state::key_matrix_w));
 }
 
-READ8_MEMBER( pc1000_state::kb_r )
+uint8_t pc1000_state::kb_r(offs_t offset)
 {
 	static const char *const bitnames[9] =
 	{
@@ -374,13 +374,13 @@ READ8_MEMBER( pc1000_state::kb_r )
 	return data;
 }
 
-READ8_MEMBER( pc1000_state::lcdc_data_r )
+uint8_t pc1000_state::lcdc_data_r()
 {
 	//logerror("lcdc data r\n");
 	return m_lcdc->data_r() >> 4;
 }
 
-WRITE8_MEMBER( pc1000_state::lcdc_data_w )
+void pc1000_state::lcdc_data_w(uint8_t data)
 {
 	//popmessage("%s", (char*)m_maincpu->space(AS_PROGRAM).get_read_ptr(0x4290));
 
@@ -388,13 +388,13 @@ WRITE8_MEMBER( pc1000_state::lcdc_data_w )
 	m_lcdc->data_w(data << 4);
 }
 
-READ8_MEMBER( pc1000_state::lcdc_control_r )
+uint8_t pc1000_state::lcdc_control_r()
 {
 	//logerror("lcdc control r\n");
 	return m_lcdc->control_r() >> 4;
 }
 
-WRITE8_MEMBER( pc1000_state::lcdc_control_w )
+void pc1000_state::lcdc_control_w(uint8_t data)
 {
 	//logerror("lcdc control w %x\n", data);
 	m_lcdc->control_w(data<<4);

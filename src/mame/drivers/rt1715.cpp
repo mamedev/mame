@@ -83,15 +83,15 @@ private:
 	void io_write_byte(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
-	DECLARE_WRITE8_MEMBER(rt1715_floppy_enable);
-	DECLARE_READ8_MEMBER(k7658_led1_r);
-	DECLARE_READ8_MEMBER(k7658_led2_r);
-	DECLARE_READ8_MEMBER(k7658_data_r);
-	DECLARE_WRITE8_MEMBER(k7658_data_w);
-	DECLARE_WRITE8_MEMBER(rt1715_rom_disable);
-	DECLARE_WRITE8_MEMBER(rt1715w_set_bank);
-	DECLARE_WRITE8_MEMBER(rt1715w_floppy_motor);
-	DECLARE_WRITE8_MEMBER(rt1715w_krfd_w);
+	void rt1715_floppy_enable(uint8_t data);
+	uint8_t k7658_led1_r();
+	uint8_t k7658_led2_r();
+	uint8_t k7658_data_r(offs_t offset);
+	void k7658_data_w(uint8_t data);
+	void rt1715_rom_disable(uint8_t data);
+	void rt1715w_set_bank(uint8_t data);
+	void rt1715w_floppy_motor(uint8_t data);
+	void rt1715w_krfd_w(uint8_t data);
 	void rt1715_palette(palette_device &palette) const;
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 	DECLARE_WRITE_LINE_MEMBER(crtc_drq_w);
@@ -138,12 +138,12 @@ private:
     FLOPPY
 ***************************************************************************/
 
-WRITE8_MEMBER(rt1715_state::rt1715_floppy_enable)
+void rt1715_state::rt1715_floppy_enable(uint8_t data)
 {
 	LOG("%s: rt1715_floppy_enable %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(rt1715_state::rt1715w_floppy_motor)
+void rt1715_state::rt1715w_floppy_motor(uint8_t data)
 {
 	LOG("%s: rt1715w_floppy_motor %02x\n", machine().describe_context(), data);
 
@@ -151,7 +151,7 @@ WRITE8_MEMBER(rt1715_state::rt1715w_floppy_motor)
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(data & 0x08 ? 1 : 0);
 }
 
-WRITE8_MEMBER(rt1715_state::rt1715w_krfd_w)
+void rt1715_state::rt1715w_krfd_w(uint8_t data)
 {
 	LOG("%s: rt1715w_krfd_w %02x\n", machine().describe_context(), data);
 	m_krfd = data;
@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER(rt1715_state::tc_w)
 ***************************************************************************/
 
 /* si/so led */
-READ8_MEMBER(rt1715_state::k7658_led1_r)
+uint8_t rt1715_state::k7658_led1_r()
 {
 	m_led1_val ^= 1;
 	LOG("%s: k7658_led1_r %02x\n", machine().describe_context(), m_led1_val);
@@ -175,7 +175,7 @@ READ8_MEMBER(rt1715_state::k7658_led1_r)
 }
 
 /* caps led */
-READ8_MEMBER(rt1715_state::k7658_led2_r)
+uint8_t rt1715_state::k7658_led2_r()
 {
 	m_led2_val ^= 1;
 	LOG("%s: k7658_led2_r %02x\n", machine().describe_context(), m_led2_val);
@@ -183,7 +183,7 @@ READ8_MEMBER(rt1715_state::k7658_led2_r)
 }
 
 /* read key state */
-READ8_MEMBER(rt1715_state::k7658_data_r)
+uint8_t rt1715_state::k7658_data_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -205,7 +205,7 @@ READ8_MEMBER(rt1715_state::k7658_data_r)
 }
 
 /* serial output on D0 */
-WRITE8_MEMBER(rt1715_state::k7658_data_w)
+void rt1715_state::k7658_data_w(uint8_t data)
 {
 	LOG("%s: k7658_data_w %d\n", machine().describe_context(), BIT(data, 0));
 	m_sio0->rxa_w(BIT(data, 0));
@@ -230,7 +230,7 @@ MACHINE_RESET_MEMBER(rt1715_state, rt1715)
 	membank("bank1")->set_base(memregion("ipl")->base());
 }
 
-WRITE8_MEMBER(rt1715_state::rt1715_rom_disable)
+void rt1715_state::rt1715_rom_disable(uint8_t data)
 {
 	LOGBANK("%s: rt1715_set_bank %02x\n", machine().describe_context(), data);
 
@@ -263,7 +263,7 @@ MACHINE_RESET_MEMBER(rt1715_state, rt1715w)
    4 - RAM-Disk
    5 - RAM-Disk
 */
-WRITE8_MEMBER(rt1715_state::rt1715w_set_bank)
+void rt1715_state::rt1715w_set_bank(uint8_t data)
 {
 	int w = (data >> 4) & 7;
 	int r = data & 7;

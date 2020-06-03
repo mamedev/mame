@@ -52,11 +52,11 @@ private:
 	DECLARE_VIDEO_START(atombjt);
 	uint32_t screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_powerbal( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE16_MEMBER(magicstk_coin_eeprom_w);
-	DECLARE_WRITE16_MEMBER(magicstk_bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(tile_banking_w);
-	DECLARE_WRITE16_MEMBER(atombjt_tile_banking_w);
-	DECLARE_WRITE16_MEMBER(oki_banking);
+	void magicstk_coin_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void magicstk_bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tile_banking_w(uint16_t data);
+	void atombjt_tile_banking_w(uint16_t data);
+	void oki_banking(uint16_t data);
 	void magicstk_main_map(address_map &map);
 	void oki_map(address_map &map);
 	void powerbal_main_map(address_map &map);
@@ -64,7 +64,7 @@ private:
 };
 
 
-WRITE16_MEMBER(powerbal_state::magicstk_coin_eeprom_w)
+void powerbal_state::magicstk_coin_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -76,13 +76,13 @@ WRITE16_MEMBER(powerbal_state::magicstk_coin_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(powerbal_state::magicstk_bgvideoram_w)
+void powerbal_state::magicstk_bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(powerbal_state::tile_banking_w)
+void powerbal_state::tile_banking_w(uint16_t data)
 {
 	if (((data >> 12) & 0x0f) != m_tilebank)
 	{
@@ -91,7 +91,7 @@ WRITE16_MEMBER(powerbal_state::tile_banking_w)
 	}
 }
 
-WRITE16_MEMBER(powerbal_state::atombjt_tile_banking_w)
+void powerbal_state::atombjt_tile_banking_w(uint16_t data)
 {
 	if ((data & 0x0f) != m_tilebank)
 	{
@@ -100,7 +100,7 @@ WRITE16_MEMBER(powerbal_state::atombjt_tile_banking_w)
 	}
 }
 
-WRITE16_MEMBER(powerbal_state::oki_banking)
+void powerbal_state::oki_banking(uint16_t data)
 {
 	int bank = data & 3;
 	m_okibank->set_entry(bank & (m_oki_numbanks - 1));

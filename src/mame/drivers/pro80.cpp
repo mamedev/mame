@@ -47,9 +47,9 @@ public:
 	void pro80(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(segment_w);
-	DECLARE_READ8_MEMBER(kp_r);
+	void digit_w(uint8_t data);
+	void segment_w(uint8_t data);
+	uint8_t kp_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
 	void pro80_io(address_map &map);
@@ -79,7 +79,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::kansas_r )
 	}
 }
 
-WRITE8_MEMBER( pro80_state::digit_w )
+void pro80_state::digit_w(uint8_t data)
 {
 	// --xx xxxx digit select
 	// -x-- ---- cassette out
@@ -88,7 +88,7 @@ WRITE8_MEMBER( pro80_state::digit_w )
 	m_cass->output( BIT(data, 6) ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER( pro80_state::segment_w )
+void pro80_state::segment_w(uint8_t data)
 {
 	if (m_digit_sel)
 	{
@@ -100,7 +100,7 @@ WRITE8_MEMBER( pro80_state::segment_w )
 	}
 }
 
-READ8_MEMBER( pro80_state::kp_r )
+uint8_t pro80_state::kp_r()
 {
 	uint8_t data = 0x0f;
 

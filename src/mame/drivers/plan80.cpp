@@ -52,9 +52,9 @@ private:
 		TIMER_BOOT
 	};
 
-	DECLARE_READ8_MEMBER(port04_r);
-	DECLARE_WRITE8_MEMBER(port09_w);
-	DECLARE_WRITE8_MEMBER(port10_w);
+	uint8_t port04_r();
+	void port09_w(uint8_t data);
+	void port10_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void plan80_io(address_map &map);
@@ -70,7 +70,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 };
 
-READ8_MEMBER( plan80_state::port04_r )
+uint8_t plan80_state::port04_r()
 {
 	uint8_t data = 0xff;
 
@@ -92,12 +92,12 @@ READ8_MEMBER( plan80_state::port04_r )
 	return data;
 }
 
-WRITE8_MEMBER( plan80_state::port09_w )
+void plan80_state::port09_w(uint8_t data)
 {
 	m_kbd_row = data;
 }
 
-WRITE8_MEMBER( plan80_state::port10_w )
+void plan80_state::port10_w(uint8_t data)
 {
 	m_spk_pol ^= 1;
 	m_speaker->level_w(m_spk_pol);

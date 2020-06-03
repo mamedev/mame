@@ -66,7 +66,7 @@ public:
 	void pipbug(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(pipbug_ctrl_w);
+	void pipbug_ctrl_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(serial_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	required_device<rs232_port_device> m_rs232;
@@ -79,7 +79,7 @@ private:
 	bool m_cassold, m_cassinbit;
 };
 
-WRITE8_MEMBER( pipbug_state::pipbug_ctrl_w )
+void pipbug_state::pipbug_ctrl_w(u8 data)
 {
 // 0x80 is written here - not connected in the baby 2650
 }

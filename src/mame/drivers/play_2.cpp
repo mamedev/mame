@@ -67,13 +67,13 @@ public:
 	void init_zira();
 
 private:
-	DECLARE_WRITE8_MEMBER(port01_w);
-	DECLARE_WRITE8_MEMBER(port02_w);
-	DECLARE_WRITE8_MEMBER(port03_w);
-	DECLARE_READ8_MEMBER(port04_r);
-	DECLARE_READ8_MEMBER(port05_r);
-	DECLARE_WRITE8_MEMBER(port06_w);
-	DECLARE_WRITE8_MEMBER(port07_w);
+	void port01_w(uint8_t data);
+	void port02_w(uint8_t data);
+	void port03_w(uint8_t data);
+	uint8_t port04_r();
+	uint8_t port05_r();
+	void port06_w(uint8_t data);
+	void port07_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_READ_LINE_MEMBER(ef1_r);
 	DECLARE_READ_LINE_MEMBER(ef4_r);
@@ -220,7 +220,7 @@ void play_2_state::machine_reset()
 	m_1863->oe_w(1);
 }
 
-WRITE8_MEMBER( play_2_state::port01_w )
+void play_2_state::port01_w(uint8_t data)
 {
 	m_kbdrow = data;
 	if (m_kbdrow && m_disp_sw)
@@ -234,7 +234,7 @@ WRITE8_MEMBER( play_2_state::port01_w )
 	m_1863->set_output_gain(0, BIT(data, 7) ? 1.00 : 0.00);
 }
 
-WRITE8_MEMBER( play_2_state::port02_w )
+void play_2_state::port02_w(uint8_t data)
 {
 	m_segment[4] = m_segment[3];
 	m_segment[3] = m_segment[2];
@@ -244,11 +244,11 @@ WRITE8_MEMBER( play_2_state::port02_w )
 	m_disp_sw = 1;
 }
 
-WRITE8_MEMBER( play_2_state::port03_w )
+void play_2_state::port03_w(uint8_t data)
 {
 }
 
-READ8_MEMBER( play_2_state::port04_r )
+uint8_t play_2_state::port04_r()
 {
 	if (m_kbdrow & 0x3f)
 		for (uint8_t i = 0; i < 6; i++)
@@ -258,17 +258,17 @@ READ8_MEMBER( play_2_state::port04_r )
 	return 0;
 }
 
-READ8_MEMBER( play_2_state::port05_r )
+uint8_t play_2_state::port05_r()
 {
 	return m_keyboard[6]->read();
 }
 
-WRITE8_MEMBER( play_2_state::port06_w )
+void play_2_state::port06_w(uint8_t data)
 {
 	m_port06 = data & 15;
 }
 
-WRITE8_MEMBER( play_2_state::port07_w )
+void play_2_state::port07_w(uint8_t data)
 {
 	m_soundlatch = (data & 0x70) >> 4; // Zira (manual doesn't say where data comes from)
 	m_4013b->clear_w(0);

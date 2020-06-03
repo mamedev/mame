@@ -88,11 +88,11 @@ private:
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void lcd_output_w(offs_t offset, u64 data);
 
-	DECLARE_WRITE8_MEMBER(select_w);
-	DECLARE_READ8_MEMBER(chessboard_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void select_w(u8 data);
+	u8 chessboard_r();
+	void sound_w(u8 data);
+	u8 control_r();
+	void control_w(u8 data);
 
 	bool m_power = false;
 	u8 m_select = 0;
@@ -162,12 +162,12 @@ void simultano_state::lcd_output_w(offs_t offset, u64 data)
 
 // HELIOS
 
-WRITE8_MEMBER(simultano_state::sound_w)
+void simultano_state::sound_w(u8 data)
 {
 	m_dac->write(1);
 }
 
-WRITE8_MEMBER(simultano_state::select_w)
+void simultano_state::select_w(u8 data)
 {
 	m_dac->write(0); // guessed
 
@@ -179,13 +179,13 @@ WRITE8_MEMBER(simultano_state::select_w)
 	m_select = data;
 }
 
-READ8_MEMBER(simultano_state::chessboard_r)
+u8 simultano_state::chessboard_r()
 {
 	// d0-d7: chessboard sensors
 	return ~m_board->read_file(m_select & 0xf);
 }
 
-READ8_MEMBER(simultano_state::control_r)
+u8 simultano_state::control_r()
 {
 	u8 data = 0;
 	u8 sel = m_select & 0xf;
@@ -197,7 +197,7 @@ READ8_MEMBER(simultano_state::control_r)
 	return data;
 }
 
-WRITE8_MEMBER(simultano_state::control_w)
+void simultano_state::control_w(u8 data)
 {
 	u8 prev = m_control;
 	m_control = data;

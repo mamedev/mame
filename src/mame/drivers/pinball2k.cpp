@@ -83,20 +83,20 @@ private:
 
 	uint32_t m_cx5510_regs[256/4];
 
-	DECLARE_READ32_MEMBER(disp_ctrl_r);
-	DECLARE_WRITE32_MEMBER(disp_ctrl_w);
-	DECLARE_READ32_MEMBER(memory_ctrl_r);
-	DECLARE_WRITE32_MEMBER(memory_ctrl_w);
-	DECLARE_READ32_MEMBER(biu_ctrl_r);
-	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
-	DECLARE_READ32_MEMBER(parallel_port_r);
-	DECLARE_WRITE32_MEMBER(parallel_port_w);
-	DECLARE_READ8_MEMBER(io20_r);
-	DECLARE_WRITE8_MEMBER(io20_w);
-	DECLARE_READ32_MEMBER(port400_r);
-	DECLARE_WRITE32_MEMBER(port400_w);
-	DECLARE_READ32_MEMBER(port800_r);
-	DECLARE_WRITE32_MEMBER(port800_w);
+	uint32_t disp_ctrl_r(offs_t offset);
+	void disp_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t memory_ctrl_r(offs_t offset);
+	void memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t biu_ctrl_r(offs_t offset);
+	void biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t parallel_port_r();
+	void parallel_port_w(uint32_t data);
+	uint8_t io20_r(offs_t offset);
+	void io20_w(offs_t offset, uint8_t data);
+	uint32_t port400_r();
+	void port400_w(uint32_t data);
+	uint32_t port800_r();
+	void port800_w(uint32_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -315,7 +315,7 @@ uint32_t pinball2k_state::screen_update_mediagx(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-READ32_MEMBER(pinball2k_state::disp_ctrl_r)
+uint32_t pinball2k_state::disp_ctrl_r(offs_t offset)
 {
 	uint32_t r = m_disp_ctrl_reg[offset];
 
@@ -332,19 +332,19 @@ READ32_MEMBER(pinball2k_state::disp_ctrl_r)
 	return r;
 }
 
-WRITE32_MEMBER(pinball2k_state::disp_ctrl_w)
+void pinball2k_state::disp_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	COMBINE_DATA(m_disp_ctrl_reg + offset);
 }
 
 
-READ32_MEMBER(pinball2k_state::memory_ctrl_r)
+uint32_t pinball2k_state::memory_ctrl_r(offs_t offset)
 {
 	return m_memory_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
+void pinball2k_state::memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
@@ -378,7 +378,7 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 
 
 
-READ32_MEMBER(pinball2k_state::biu_ctrl_r)
+uint32_t pinball2k_state::biu_ctrl_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -387,7 +387,7 @@ READ32_MEMBER(pinball2k_state::biu_ctrl_r)
 	return m_biu_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(pinball2k_state::biu_ctrl_w)
+void pinball2k_state::biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//osd_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
@@ -399,12 +399,12 @@ WRITE32_MEMBER(pinball2k_state::biu_ctrl_w)
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(pinball2k_state::bios_ram_w)
+void pinball2k_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 #endif
 
-READ8_MEMBER(pinball2k_state::io20_r)
+uint8_t pinball2k_state::io20_r(offs_t offset)
 {
 	uint8_t r = 0;
 
@@ -419,7 +419,7 @@ READ8_MEMBER(pinball2k_state::io20_r)
 	return r;
 }
 
-WRITE8_MEMBER(pinball2k_state::io20_w)
+void pinball2k_state::io20_w(offs_t offset, uint8_t data)
 {
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x00)
@@ -432,32 +432,32 @@ WRITE8_MEMBER(pinball2k_state::io20_w)
 	}
 }
 
-READ32_MEMBER(pinball2k_state::port400_r)
+uint32_t pinball2k_state::port400_r()
 {
 	return 0x8000;
 }
 
-WRITE32_MEMBER(pinball2k_state::port400_w)
+void pinball2k_state::port400_w(uint32_t data)
 {
 }
 
-READ32_MEMBER(pinball2k_state::port800_r)
+uint32_t pinball2k_state::port800_r()
 {
 	return 0x80;
 }
 
-WRITE32_MEMBER(pinball2k_state::port800_w)
+void pinball2k_state::port800_w(uint32_t data)
 {
 }
 
-READ32_MEMBER(pinball2k_state::parallel_port_r)
+uint32_t pinball2k_state::parallel_port_r()
 {
 	uint32_t r = 0;
 
 	return r;
 }
 
-WRITE32_MEMBER(pinball2k_state::parallel_port_w)
+void pinball2k_state::parallel_port_w(uint32_t data)
 {
 }
 

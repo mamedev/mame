@@ -88,11 +88,11 @@ private:
 	void port_c_w(uint8_t data);
 
 	uint8_t upd934g_c_data_r(offs_t offset);
-	DECLARE_WRITE8_MEMBER(upd934g_c_w);
+	void upd934g_c_w(offs_t offset, uint8_t data);
 	uint8_t upd934g_b_data_r(offs_t offset);
-	DECLARE_WRITE8_MEMBER(upd934g_b_w);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(leds_w);
+	void upd934g_b_w(offs_t offset, uint8_t data);
+	uint8_t key_r();
+	void leds_w(uint8_t data);
 
 	uint8_t m_port_a;
 	uint8_t m_port_b;
@@ -230,12 +230,12 @@ uint8_t rz1_state::upd934g_b_data_r(offs_t offset)
 		return 0;
 }
 
-WRITE8_MEMBER( rz1_state::upd934g_c_w )
+void rz1_state::upd934g_c_w(offs_t offset, uint8_t data)
 {
 	m_pg[0]->write(offset >> 8, data);
 }
 
-WRITE8_MEMBER( rz1_state::upd934g_b_w )
+void rz1_state::upd934g_b_w(offs_t offset, uint8_t data)
 {
 	m_pg[1]->write(offset >> 8, data);
 }
@@ -296,7 +296,7 @@ void rz1_state::port_c_w(uint8_t data)
 	logerror("port_c_w: %02x\n", data);
 }
 
-READ8_MEMBER( rz1_state::key_r )
+uint8_t rz1_state::key_r()
 {
 	uint8_t data = 0;
 
@@ -312,7 +312,7 @@ READ8_MEMBER( rz1_state::key_r )
 	return data;
 }
 
-WRITE8_MEMBER( rz1_state::leds_w )
+void rz1_state::leds_w(uint8_t data)
 {
 	m_led_song =      BIT(data, 0) == 0 ? 1 : BIT(data, 1) == 0 ? 2 : 0;
 	m_led_pattern =   BIT(data, 2) == 0 ? 1 : BIT(data, 3) == 0 ? 2 : 0;

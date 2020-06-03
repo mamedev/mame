@@ -154,8 +154,8 @@ protected:
 	uint8_t m_page_register;
 
 	uint16_t pico_read_penpos(int pen);
-	DECLARE_READ16_MEMBER(pico_68k_io_read);
-	DECLARE_WRITE16_MEMBER(pico_68k_io_write);
+	uint16_t pico_68k_io_read(offs_t offset);
+	void pico_68k_io_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_irq);
 
 	void pico_mem(address_map &map);
@@ -202,7 +202,7 @@ uint16_t pico_base_state::pico_read_penpos(int pen)
 	return penpos;
 }
 
-READ16_MEMBER(pico_base_state::pico_68k_io_read )
+uint16_t pico_base_state::pico_68k_io_read(offs_t offset)
 {
 	uint8_t retdata = 0;
 
@@ -297,7 +297,7 @@ WRITE_LINE_MEMBER(pico_base_state::sound_cause_irq)
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
+void pico_base_state::pico_68k_io_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  printf("pico_68k_io_write %04x %04x %04x\n", offset*2, data, mem_mask);
 

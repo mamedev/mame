@@ -104,15 +104,10 @@ private:
 
 	void update_interrupts();
 
-	DECLARE_READ16_MEMBER(K056832_rom_r);
-	DECLARE_WRITE16_MEMBER(control1_w);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_WRITE16_MEMBER(control3_w);
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_READ16_MEMBER(k053247_scattered_word_r);
-	DECLARE_WRITE16_MEMBER(k053247_scattered_word_w);
-	DECLARE_READ16_MEMBER(k053247_martchmp_word_r);
-	DECLARE_WRITE16_MEMBER(k053247_martchmp_word_w);
+	uint16_t K056832_rom_r(offs_t offset);
+	void control1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void control3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update_piratesh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
@@ -337,7 +332,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(piratesh_state::piratesh_interrupt)
 
 
 
-READ16_MEMBER(piratesh_state::K056832_rom_r)
+uint16_t piratesh_state::K056832_rom_r(offs_t offset)
 {
 	uint16_t offs;
 
@@ -347,7 +342,7 @@ READ16_MEMBER(piratesh_state::K056832_rom_r)
 
 
 
-WRITE16_MEMBER(piratesh_state::control1_w)
+void piratesh_state::control1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// .... ..xx .... ....      - Unknown
 	// .... .x.. .... ....      - Unknown - Active during attract, clear during game
@@ -357,7 +352,7 @@ WRITE16_MEMBER(piratesh_state::control1_w)
 		logerror("CTRL3: %x %x %x\n", offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(piratesh_state::control2_w)
+void piratesh_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// .... .... ...x ....      - Unknown (always 1?)
 	// .... .... ..x. ....      - Unknown
@@ -379,7 +374,7 @@ WRITE16_MEMBER(piratesh_state::control2_w)
 		logerror("CTRL2: %x %x %x\n", offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(piratesh_state::control3_w)
+void piratesh_state::control3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// .... .... .... ...x      - Watchdog? (051550?)
 	// .... .... .... ..x.      - 056832 ROM bank control

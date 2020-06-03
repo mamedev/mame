@@ -988,9 +988,9 @@ READ32_MEMBER( vegas_state::ethernet_r )
 {
 	uint32_t result = 0;
 	if (ACCESSING_BITS_0_15)
-		result |= m_ethernet->read(space, offset * 2 + 0, mem_mask);
+		result |= m_ethernet->read(offset * 2 + 0, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		result |= m_ethernet->read(space, offset * 2 + 1, mem_mask >> 16) << 16;
+		result |= m_ethernet->read(offset * 2 + 1, mem_mask >> 16) << 16;
 	//logerror("ethernet_r: offset %08x = %08x & %08x\n", offset, result, mem_mask);
 	return result;
 }
@@ -999,9 +999,9 @@ READ32_MEMBER( vegas_state::ethernet_r )
 WRITE32_MEMBER( vegas_state::ethernet_w )
 {
 	if (ACCESSING_BITS_0_15)
-		m_ethernet->write(space, offset * 2 + 0, data, mem_mask);
+		m_ethernet->write(offset * 2 + 0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		m_ethernet->write(space, offset * 2 + 1, data >> 16, mem_mask >> 16);
+		m_ethernet->write(offset * 2 + 1, data >> 16, mem_mask >> 16);
 	//logerror("ethernet_w: offset %08x = %08x & %08x\n", offset, data, mem_mask);
 }
 

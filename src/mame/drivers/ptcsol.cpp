@@ -181,14 +181,14 @@ private:
 		TIMER_SOL20_BOOT
 	};
 
-	DECLARE_READ8_MEMBER( sol20_f8_r );
-	DECLARE_READ8_MEMBER( sol20_fa_r );
-	DECLARE_READ8_MEMBER( sol20_fc_r );
-	DECLARE_READ8_MEMBER( sol20_fd_r );
-	DECLARE_WRITE8_MEMBER( sol20_f8_w );
-	DECLARE_WRITE8_MEMBER( sol20_fa_w );
-	DECLARE_WRITE8_MEMBER( sol20_fd_w );
-	DECLARE_WRITE8_MEMBER( sol20_fe_w );
+	uint8_t sol20_f8_r();
+	uint8_t sol20_fa_r();
+	uint8_t sol20_fc_r();
+	uint8_t sol20_fd_r();
+	void sol20_f8_w(uint8_t data);
+	void sol20_fa_w(uint8_t data);
+	void sol20_fd_w(uint8_t data);
+	void sol20_fe_w(uint8_t data);
 	void kbd_put(u8 data);
 	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sol20_boot);
@@ -344,7 +344,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 	}
 }
 
-READ8_MEMBER( sol20_state::sol20_f8_r )
+uint8_t sol20_state::sol20_f8_r()
 {
 // d7 - TBMT; d6 - DAV; d5 - CTS; d4 - OE; d3 - PE; d2 - FE; d1 - DSR; d0 - CD
 	uint8_t data = 0;
@@ -363,7 +363,7 @@ READ8_MEMBER( sol20_state::sol20_f8_r )
 	return data;
 }
 
-READ8_MEMBER( sol20_state::sol20_fa_r )
+uint8_t sol20_state::sol20_fa_r()
 {
 	/* set unused bits high */
 	uint8_t data = 0x26;
@@ -381,7 +381,7 @@ READ8_MEMBER( sol20_state::sol20_fa_r )
 	return data | (arrowkey & keydown);
 }
 
-READ8_MEMBER( sol20_state::sol20_fc_r )
+uint8_t sol20_state::sol20_fc_r()
 {
 	uint8_t data = m_iop_arrows->read();
 	if (BIT(data, 0)) return 0x32;
@@ -393,19 +393,19 @@ READ8_MEMBER( sol20_state::sol20_fc_r )
 	return m_sol20_fc;
 }
 
-READ8_MEMBER( sol20_state::sol20_fd_r )
+uint8_t sol20_state::sol20_fd_r()
 {
 // Return a byte from parallel interface
 	return 0;
 }
 
-WRITE8_MEMBER( sol20_state::sol20_f8_w )
+void sol20_state::sol20_f8_w(uint8_t data)
 {
 // The only function seems to be to send RTS from bit 4
 	m_rs232->write_rts(BIT(data, 4));
 }
 
-WRITE8_MEMBER( sol20_state::sol20_fa_w )
+void sol20_state::sol20_fa_w(uint8_t data)
 {
 	m_sol20_fa &= 1;
 	m_sol20_fa |= (data & 0xf0);
@@ -427,12 +427,12 @@ WRITE8_MEMBER( sol20_state::sol20_fa_w )
 	m_uart_clock->set_unscaled_clock(BIT(data, 5) ? 4800 : 19200);
 }
 
-WRITE8_MEMBER( sol20_state::sol20_fd_w )
+void sol20_state::sol20_fd_w(uint8_t data)
 {
 // Output a byte to parallel interface
 }
 
-WRITE8_MEMBER( sol20_state::sol20_fe_w )
+void sol20_state::sol20_fe_w(uint8_t data)
 {
 	m_sol20_fe = data;
 }

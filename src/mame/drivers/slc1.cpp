@@ -73,8 +73,8 @@ public:
 	void slc1(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -99,7 +99,7 @@ private:
 
 ***************************************************************************/
 
-WRITE8_MEMBER( slc1_state::io_w )
+void slc1_state::io_w(offs_t offset, uint8_t data)
 {
 	bool const segonoff = BIT(data, 7);
 	bool const busyled = BIT(data, 4);
@@ -139,7 +139,7 @@ WRITE8_MEMBER( slc1_state::io_w )
 
 ***************************************************************************/
 
-READ8_MEMBER( slc1_state::io_r )
+uint8_t slc1_state::io_r(offs_t offset)
 {
 	uint8_t data = 0xff, upper = (offset >> 8) & 7;
 

@@ -95,12 +95,12 @@ public:
 	void ravens2(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(port07_r);
-	DECLARE_READ8_MEMBER(port17_r);
-	DECLARE_WRITE8_MEMBER(port1b_w);
-	DECLARE_WRITE8_MEMBER(port1c_w);
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
+	uint8_t port07_r();
+	uint8_t port17_r();
+	void port1b_w(uint8_t data);
+	void port1c_w(uint8_t data);
+	void display_w(offs_t offset, uint8_t data);
+	void leds_w(uint8_t data);
 	void kbd_put(u8 data);
 	DECLARE_MACHINE_RESET(ravens2);
 	DECLARE_READ_LINE_MEMBER(cass_r);
@@ -130,12 +130,12 @@ READ_LINE_MEMBER( ravens_state::cass_r )
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
 
-WRITE8_MEMBER( ravens_state::display_w )
+void ravens_state::display_w(offs_t offset, uint8_t data)
 {
 	m_digits[offset] = data;
 }
 
-WRITE8_MEMBER( ravens_state::leds_w )
+void ravens_state::leds_w(uint8_t data)
 {
 	char ledname[8];
 	for (int i = 0; i < 8; i++)
@@ -145,14 +145,14 @@ WRITE8_MEMBER( ravens_state::leds_w )
 	}
 }
 
-READ8_MEMBER( ravens_state::port07_r )
+uint8_t ravens_state::port07_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0x80;
 	return ret;
 }
 
-READ8_MEMBER( ravens_state::port17_r )
+uint8_t ravens_state::port17_r()
 {
 	uint8_t keyin, i;
 
@@ -179,7 +179,7 @@ READ8_MEMBER( ravens_state::port17_r )
 	return 0;
 }
 
-WRITE8_MEMBER( ravens_state::port1b_w )
+void ravens_state::port1b_w(uint8_t data)
 {
 	if (BIT(data, 7))
 		return;
@@ -198,7 +198,7 @@ WRITE8_MEMBER( ravens_state::port1b_w )
 	m_terminal->write(data);
 }
 
-WRITE8_MEMBER( ravens_state::port1c_w )
+void ravens_state::port1c_w(uint8_t data)
 {
 	m_term_char = data;
 }

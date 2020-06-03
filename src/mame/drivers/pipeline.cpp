@@ -103,8 +103,8 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(vram2_w);
-	DECLARE_WRITE8_MEMBER(vram1_w);
+	void vram2_w(offs_t offset, uint8_t data);
+	void vram1_w(offs_t offset, uint8_t data);
 	void mcu_porta_w(uint8_t data);
 	void vidctrl_w(uint8_t data);
 	uint8_t protection_r();
@@ -182,7 +182,7 @@ void pipeline_state::vidctrl_w(uint8_t data)
 	m_vidctrl = data;
 }
 
-WRITE8_MEMBER(pipeline_state::vram2_w)
+void pipeline_state::vram2_w(offs_t offset, uint8_t data)
 {
 	if (!(m_vidctrl & 1))
 	{
@@ -200,7 +200,7 @@ WRITE8_MEMBER(pipeline_state::vram2_w)
 	}
 }
 
-WRITE8_MEMBER(pipeline_state::vram1_w)
+void pipeline_state::vram1_w(offs_t offset, uint8_t data)
 {
 	m_tilemap2->mark_tile_dirty(offset & 0x7ff);
 	m_vram1[offset] = data;

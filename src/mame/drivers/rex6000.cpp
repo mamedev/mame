@@ -94,18 +94,18 @@ protected:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(bankswitch_r);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(lcd_base_r);
-	DECLARE_WRITE8_MEMBER(lcd_base_w);
-	DECLARE_READ8_MEMBER(beep_r);
-	DECLARE_WRITE8_MEMBER(beep_w);
-	DECLARE_READ8_MEMBER(lcd_io_r);
-	DECLARE_WRITE8_MEMBER(lcd_io_w);
-	DECLARE_READ8_MEMBER(irq_r);
-	DECLARE_WRITE8_MEMBER(irq_w);
-	DECLARE_READ8_MEMBER(touchscreen_r);
-	DECLARE_WRITE8_MEMBER(touchscreen_w);
+	uint8_t bankswitch_r(offs_t offset);
+	void bankswitch_w(offs_t offset, uint8_t data);
+	uint8_t lcd_base_r(offs_t offset);
+	void lcd_base_w(offs_t offset, uint8_t data);
+	uint8_t beep_r(offs_t offset);
+	void beep_w(offs_t offset, uint8_t data);
+	uint8_t lcd_io_r(offs_t offset);
+	void lcd_io_w(offs_t offset, uint8_t data);
+	uint8_t irq_r(offs_t offset);
+	void irq_w(offs_t offset, uint8_t data);
+	uint8_t touchscreen_r(offs_t offset);
+	void touchscreen_w(offs_t offset, uint8_t data);
 
 	void rex6000_banked_map(address_map &map);
 	void rex6000_io(address_map &map);
@@ -153,9 +153,9 @@ public:
 
 	optional_ioport_array<10> m_keyboard;
 
-	DECLARE_READ8_MEMBER( kb_status_r );
-	DECLARE_READ8_MEMBER( kb_data_r );
-	DECLARE_WRITE8_MEMBER( kb_mask_w );
+	uint8_t kb_status_r();
+	uint8_t kb_data_r();
+	void kb_mask_w(offs_t offset, uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_on_irq);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_oz750);
 
@@ -172,12 +172,12 @@ private:
 };
 
 
-READ8_MEMBER( rex6000_state::bankswitch_r )
+uint8_t rex6000_state::bankswitch_r(offs_t offset)
 {
 	return m_bank[offset];
 }
 
-WRITE8_MEMBER( rex6000_state::bankswitch_w )
+void rex6000_state::bankswitch_w(offs_t offset, uint8_t data)
 {
 	m_bank[offset&3] = data;
 
@@ -199,12 +199,12 @@ WRITE8_MEMBER( rex6000_state::bankswitch_w )
 	}
 }
 
-READ8_MEMBER( rex6000_state::beep_r )
+uint8_t rex6000_state::beep_r(offs_t offset)
 {
 	return m_beep_io[offset];
 }
 
-WRITE8_MEMBER( rex6000_state::beep_w )
+void rex6000_state::beep_w(offs_t offset, uint8_t data)
 {
 	m_beep_io[offset] = data;
 
@@ -245,22 +245,22 @@ WRITE8_MEMBER( rex6000_state::beep_w )
 	}
 }
 
-READ8_MEMBER( rex6000_state::lcd_base_r )
+uint8_t rex6000_state::lcd_base_r(offs_t offset)
 {
 	return m_lcd_base[offset];
 }
 
-WRITE8_MEMBER( rex6000_state::lcd_base_w )
+void rex6000_state::lcd_base_w(offs_t offset, uint8_t data)
 {
 	m_lcd_base[offset&1] = data;
 }
 
-READ8_MEMBER( rex6000_state::lcd_io_r )
+uint8_t rex6000_state::lcd_io_r(offs_t offset)
 {
 	return (offset == 0) ? m_lcd_enabled : m_lcd_cmd;
 }
 
-WRITE8_MEMBER( rex6000_state::lcd_io_w )
+void rex6000_state::lcd_io_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -273,7 +273,7 @@ WRITE8_MEMBER( rex6000_state::lcd_io_w )
 	}
 }
 
-READ8_MEMBER( rex6000_state::irq_r )
+uint8_t rex6000_state::irq_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -301,7 +301,7 @@ READ8_MEMBER( rex6000_state::irq_r )
 	}
 }
 
-WRITE8_MEMBER( rex6000_state::irq_w )
+void rex6000_state::irq_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -321,7 +321,7 @@ WRITE8_MEMBER( rex6000_state::irq_w )
 	}
 }
 
-READ8_MEMBER( rex6000_state::touchscreen_r )
+uint8_t rex6000_state::touchscreen_r(offs_t offset)
 {
 	uint16_t x = m_pen_x->read();
 	uint16_t y = m_pen_y->read();
@@ -350,12 +350,12 @@ READ8_MEMBER( rex6000_state::touchscreen_r )
 	return m_touchscreen[offset&0x0f];
 }
 
-WRITE8_MEMBER( rex6000_state::touchscreen_w )
+void rex6000_state::touchscreen_w(offs_t offset, uint8_t data)
 {
 	m_touchscreen[offset&0x0f] = data;
 }
 
-READ8_MEMBER( oz750_state::kb_status_r )
+uint8_t oz750_state::kb_status_r()
 {
 	uint8_t data = 0x6b;
 	if (m_battery->read() & 0x01)   data |= 0x80;
@@ -363,7 +363,7 @@ READ8_MEMBER( oz750_state::kb_status_r )
 	return data;
 }
 
-READ8_MEMBER( oz750_state::kb_data_r )
+uint8_t oz750_state::kb_data_r()
 {
 	uint8_t data = 0;
 	for(int i=0; i<10; i++)
@@ -374,7 +374,7 @@ READ8_MEMBER( oz750_state::kb_data_r )
 
 	return data;
 }
-WRITE8_MEMBER( oz750_state::kb_mask_w )
+void oz750_state::kb_mask_w(offs_t offset, uint8_t data)
 {
 	if (offset)
 		m_kb_mask = (m_kb_mask & 0x00ff) | (data << 8);

@@ -791,7 +791,7 @@ void smc91c9x_device::process_command(uint16_t data)
     smc91c9x_r - handle a read from the device
 -------------------------------------------------*/
 
-READ16_MEMBER( smc91c9x_device::read )
+u16 smc91c9x_device::read(offs_t offset, u16 mem_mask)
 {
 	uint32_t result;
 
@@ -860,7 +860,7 @@ READ16_MEMBER( smc91c9x_device::read )
     smc91c9x_w - handle a write to the device
 -------------------------------------------------*/
 
-WRITE16_MEMBER( smc91c9x_device::write )
+void smc91c9x_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	/* determine the effective register */
 	offset %= 8;

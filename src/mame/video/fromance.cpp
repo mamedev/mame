@@ -122,7 +122,7 @@ VIDEO_START_MEMBER(fromance_state,hatris)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_gfxreg_w)
+void fromance_state::fromance_gfxreg_w(uint8_t data)
 {
 	m_gfxreg = data;
 	m_flipscreen = (data & 0x01);

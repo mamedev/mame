@@ -77,11 +77,11 @@ public:
 
 private:
 	uint8_t pegasus_keyboard_r();
-	DECLARE_READ8_MEMBER(pegasus_protection_r);
-	DECLARE_READ8_MEMBER(pegasus_pcg_r);
+	uint8_t pegasus_protection_r();
+	uint8_t pegasus_pcg_r(offs_t offset);
 	void pegasus_controls_w(uint8_t data);
 	void pegasus_keyboard_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(pegasus_pcg_w);
+	void pegasus_pcg_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(pegasus_keyboard_irq);
 	DECLARE_READ_LINE_MEMBER(pegasus_cassette_r);
 	DECLARE_WRITE_LINE_MEMBER(pegasus_cassette_w);
@@ -173,13 +173,13 @@ WRITE_LINE_MEMBER( pegasus_state::pegasus_cassette_w )
 	m_cass->output(state ? 1 : -1);
 }
 
-READ8_MEMBER( pegasus_state::pegasus_pcg_r )
+uint8_t  pegasus_state::pegasus_pcg_r(offs_t offset)
 {
 	uint8_t code = m_p_videoram[offset] & 0x7f;
 	return m_p_pcgram[(code << 4) | (~m_kbd_row & 15)];
 }
 
-WRITE8_MEMBER( pegasus_state::pegasus_pcg_w )
+void pegasus_state::pegasus_pcg_w(offs_t offset, uint8_t data)
 {
 //  if (BIT(m_control_bits, 1))
 	{
@@ -189,7 +189,7 @@ WRITE8_MEMBER( pegasus_state::pegasus_pcg_w )
 }
 
 /* Must return the A register except when it is doing a rom search */
-READ8_MEMBER( pegasus_state::pegasus_protection_r )
+uint8_t pegasus_state::pegasus_protection_r()
 {
 	uint8_t data = m_maincpu->state_int(M6809_A);
 	if (data == 0x20) data = 0xff;

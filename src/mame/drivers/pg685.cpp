@@ -124,17 +124,17 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_oua12);
 
-	DECLARE_READ8_MEMBER(f9f04_r);
-	DECLARE_WRITE8_MEMBER(f9f04_w);
-	DECLARE_READ8_MEMBER(f9f24_r);
-	DECLARE_WRITE8_MEMBER(f9f24_w);
-	DECLARE_WRITE8_MEMBER(f9f32_w);
-	DECLARE_READ8_MEMBER(f9f33_r);
-	DECLARE_WRITE8_MEMBER(f9f3e_w);
-	DECLARE_READ8_MEMBER(f9f3f_r);
-	DECLARE_READ8_MEMBER(f9f78_r);
-	DECLARE_WRITE8_MEMBER(f9f78_w);
-	DECLARE_WRITE8_MEMBER(f9f79_w);
+	uint8_t f9f04_r();
+	void f9f04_w(uint8_t data);
+	uint8_t f9f24_r();
+	void f9f24_w(uint8_t data);
+	void f9f32_w(uint8_t data);
+	uint8_t f9f33_r();
+	void f9f3e_w(uint8_t data);
+	uint8_t f9f3f_r();
+	uint8_t f9f78_r();
+	void f9f78_w(uint8_t data);
+	void f9f79_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 
@@ -235,33 +235,33 @@ void pg685_state::pg685oua12_mem(address_map &map)
 static INPUT_PORTS_START( pg685 )
 INPUT_PORTS_END
 
-READ8_MEMBER(pg685_state::f9f04_r)
+uint8_t pg685_state::f9f04_r()
 {
 	// PCP/M-86 keyboard handling code also checks a couple of bits read
 	logerror("Reading byte from F9F04\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(pg685_state::f9f04_w)
+void pg685_state::f9f04_w(uint8_t data)
 {
 	// PCP/M-86 keyboard handling code also checks a couple of bits read
 	logerror("Writing %02X to F9F04\n", data);
 }
 
-WRITE8_MEMBER(pg685_state::f9f32_w)
+void pg685_state::f9f32_w(uint8_t data)
 {
 	// 1D written at startup
 	logerror("Writing %02X to F9F32\n", data);
 }
 
-READ8_MEMBER(pg685_state::f9f33_r)
+uint8_t pg685_state::f9f33_r()
 {
 	// Printer present?
 	logerror("Reading from F9F33\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(pg685_state::f9f3e_w)
+void pg685_state::f9f3e_w(uint8_t data)
 {
 	m_bppit->write_gate0(BIT(data, 6));
 	m_bppit->write_gate1(BIT(data, 7));
@@ -269,7 +269,7 @@ WRITE8_MEMBER(pg685_state::f9f3e_w)
 	// On PC16-11, D5 is AND-ed with the PIT's OUT2, and other bits are used to select the baud rate for a 8251.
 }
 
-READ8_MEMBER(pg685_state::f9f3f_r)
+uint8_t pg685_state::f9f3f_r()
 {
 	logerror("Reading from F9F3F\n");
 	return 0xff;
@@ -290,13 +290,13 @@ static void pg685_floppies(device_slot_interface &device)
 }
 
 
-READ8_MEMBER(pg685_state::f9f24_r)
+uint8_t pg685_state::f9f24_r()
 {
 	logerror("Reading from F9F24\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(pg685_state::f9f24_w)
+void pg685_state::f9f24_w(uint8_t data)
 {
 	logerror("Writing %02X to F9F24\n", data);
 }
@@ -306,19 +306,19 @@ WRITE8_MEMBER(pg685_state::f9f24_w)
 //  HARDDISK
 //**************************************************************************
 
-READ8_MEMBER(pg685_state::f9f78_r)
+uint8_t pg685_state::f9f78_r()
 {
 	logerror("Reading from F9F78\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(pg685_state::f9f78_w)
+void pg685_state::f9f78_w(uint8_t data)
 {
 	// WD 1010 separate drive/head select register
 	logerror("Writing %02X to F9F78\n", data);
 }
 
-WRITE8_MEMBER(pg685_state::f9f79_w)
+void pg685_state::f9f79_w(uint8_t data)
 {
 	// another write-only register (possibly reset or interrupt control)
 	logerror("Writing %02X to F9F79\n", data);

@@ -72,9 +72,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	void digit_w(u8 data);
+	u8 input_r();
 
 	u16 m_inp_mux = 0;
 	u8 m_select = 0;
@@ -102,7 +102,7 @@ void cp2000_state::update_display()
 	m_display->matrix(m_select, m_7seg_data);
 }
 
-WRITE8_MEMBER(cp2000_state::control_w)
+void cp2000_state::control_w(u8 data)
 {
 	// d0-d3: digit select
 	m_select = ~data;
@@ -114,7 +114,7 @@ WRITE8_MEMBER(cp2000_state::control_w)
 	m_dac->write(BIT(~data, 5));
 }
 
-READ8_MEMBER(cp2000_state::input_r)
+u8 cp2000_state::input_r()
 {
 	u8 data = m_inp_mux;
 
@@ -144,7 +144,7 @@ READ8_MEMBER(cp2000_state::input_r)
 	return data;
 }
 
-WRITE8_MEMBER(cp2000_state::digit_w)
+void cp2000_state::digit_w(u8 data)
 {
 	// d0-d3: chessboard input mux (demux)
 	// d0-d7: keypad input mux (direct)

@@ -300,11 +300,11 @@ private:
 	required_shared_ptr<uint32_t> m_disp_ram;
 	required_device<screen_device> m_screen;
 
-	DECLARE_READ32_MEMBER(a0000000_r);
-	DECLARE_WRITE32_MEMBER(a0000000_w);
-	DECLARE_READ32_MEMBER(b0000000_r);
+	uint32_t a0000000_r(offs_t offset);
+	void a0000000_w(uint32_t data);
+	uint32_t b0000000_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER(cmd_callback);
+	void cmd_callback(address_space &space, uint32_t data);
 
 	std::unique_ptr<uint8_t[]> m_texture;
 	std::unique_ptr<rollext_renderer> m_renderer;
@@ -388,7 +388,7 @@ uint32_t rollext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 }
 
 
-READ32_MEMBER(rollext_state::a0000000_r)
+uint32_t rollext_state::a0000000_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -409,12 +409,12 @@ READ32_MEMBER(rollext_state::a0000000_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(rollext_state::a0000000_w)
+void rollext_state::a0000000_w(uint32_t data)
 {
 	// FPGA interface?
 }
 
-READ32_MEMBER(rollext_state::b0000000_r)
+uint32_t rollext_state::b0000000_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -427,7 +427,7 @@ READ32_MEMBER(rollext_state::b0000000_r)
 	return 0;
 }
 
-WRITE32_MEMBER(rollext_state::cmd_callback)
+void rollext_state::cmd_callback(address_space &space, uint32_t data)
 {
 	uint32_t command = data;
 

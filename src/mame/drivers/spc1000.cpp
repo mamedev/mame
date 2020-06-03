@@ -158,16 +158,16 @@ public:
 	void spc1000(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(iplk_w);
-	DECLARE_READ8_MEMBER(iplk_r);
+	void iplk_w(uint8_t data);
+	uint8_t iplk_r();
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE8_MEMBER(gmode_w);
-	DECLARE_READ8_MEMBER(gmode_r);
+	void gmode_w(uint8_t data);
+	uint8_t gmode_r();
 	uint8_t porta_r();
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
 	uint8_t mc6847_videoram_r(offs_t offset);
-	DECLARE_WRITE8_MEMBER(cass_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
+	void cass_w(uint8_t data);
+	uint8_t keyboard_r(offs_t offset);
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
 	{
 		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
@@ -201,14 +201,14 @@ void spc1000_state::spc1000_mem(address_map &map)
 	map(0x8000, 0xffff).bankr("bank3").bankw("bank4");
 }
 
-WRITE8_MEMBER(spc1000_state::iplk_w)
+void spc1000_state::iplk_w(uint8_t data)
 {
 	m_IPLK = m_IPLK ? 0 : 1;
 	membank("bank1")->set_entry(m_IPLK);
 	membank("bank3")->set_entry(m_IPLK);
 }
 
-READ8_MEMBER(spc1000_state::iplk_r)
+uint8_t spc1000_state::iplk_r()
 {
 	m_IPLK = m_IPLK ? 0 : 1;
 	membank("bank1")->set_entry(m_IPLK);
@@ -217,7 +217,7 @@ READ8_MEMBER(spc1000_state::iplk_r)
 	return 0;
 }
 
-WRITE8_MEMBER( spc1000_state::cass_w )
+void spc1000_state::cass_w(uint8_t data)
 {
 	attotime time = machine().scheduler().time();
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
@@ -232,7 +232,7 @@ WRITE8_MEMBER( spc1000_state::cass_w )
 	m_centronics->write_strobe(BIT(data, 2) ? true : false);
 }
 
-WRITE8_MEMBER(spc1000_state::gmode_w)
+void spc1000_state::gmode_w(uint8_t data)
 {
 	m_GMODE = data;
 
@@ -245,12 +245,12 @@ WRITE8_MEMBER(spc1000_state::gmode_w)
 	m_page = ((BIT(data, 5) << 1) | BIT(data, 4)) * 0x200;
 }
 
-READ8_MEMBER(spc1000_state::gmode_r)
+uint8_t spc1000_state::gmode_r()
 {
 	return m_GMODE;
 }
 
-READ8_MEMBER( spc1000_state::keyboard_r )
+uint8_t spc1000_state::keyboard_r(offs_t offset)
 {
 	// most games just read kb in $8000-$8009 but a few of them
 	// (e.g. Toiler Adventure II and Vela) use mirrored addr instead

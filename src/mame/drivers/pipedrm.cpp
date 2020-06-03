@@ -191,9 +191,9 @@ private:
 
 	DECLARE_MACHINE_START(pipedrm);
 	DECLARE_MACHINE_RESET(pipedrm);
-	DECLARE_WRITE8_MEMBER( pipedrm_bankswitch_w );
-	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
-	DECLARE_READ8_MEMBER( pending_command_r );
+	void pipedrm_bankswitch_w(uint8_t data);
+	void sound_bankswitch_w(uint8_t data);
+	uint8_t pending_command_r();
 	void hatris_sound_portmap(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
@@ -208,7 +208,7 @@ private:
  *
  *************************************/
 
-WRITE8_MEMBER(pipedrm_state::pipedrm_bankswitch_w )
+void pipedrm_state::pipedrm_bankswitch_w(uint8_t data)
 {
 	/*
 	    Bit layout:
@@ -225,16 +225,15 @@ WRITE8_MEMBER(pipedrm_state::pipedrm_bankswitch_w )
 	membank("bank1")->set_entry(data & 0x7);
 
 	/* map to the fromance gfx register */
-	fromance_gfxreg_w(space, offset, ((data >> 6) & 0x01) |  /* flipscreen */
-								((~data >> 2) & 0x02)); /* videoram select */
+	fromance_gfxreg_w(((data >> 6) & 0x01) |  /* flipscreen */
+					((~data >> 2) & 0x02)); /* videoram select */
 }
 
 
-WRITE8_MEMBER(pipedrm_state::sound_bankswitch_w )
+void pipedrm_state::sound_bankswitch_w(uint8_t data)
 {
 	membank("bank2")->set_entry(data & 0x01);
 }
-
 
 
 /*************************************
@@ -243,7 +242,7 @@ WRITE8_MEMBER(pipedrm_state::sound_bankswitch_w )
  *
  *************************************/
 
-READ8_MEMBER(pipedrm_state::pending_command_r )
+uint8_t pipedrm_state::pending_command_r()
 {
 	return m_soundlatch->pending_r();
 }
@@ -889,7 +888,7 @@ void pipedrm_state::init_pipedrm()
 
 void pipedrm_state::init_hatris()
 {
-	m_maincpu->space(AS_IO).install_write_handler(0x21, 0x21, write8_delegate(*this, FUNC(pipedrm_state::fromance_gfxreg_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x21, 0x21, write8smo_delegate(*this, FUNC(pipedrm_state::fromance_gfxreg_w)));
 }
 
 

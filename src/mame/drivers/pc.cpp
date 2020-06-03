@@ -79,7 +79,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_READ8_MEMBER(unk_r);
+	u8 unk_r();
 
 	double m_turbo_off_speed;
 
@@ -121,7 +121,7 @@ void pc_state::pc16_io(address_map &map)
 	map(0x0070, 0x007f).ram(); // needed for Poisk-2
 }
 
-READ8_MEMBER(pc_state::unk_r)
+u8 pc_state::unk_r()
 {
 	return 0;
 }

@@ -384,7 +384,7 @@ READ8_MEMBER( snes_state::snes_r_io )
 	// PPU accesses are from 2100 to 213f
 	if (offset >= INIDISP && offset < APU00)
 	{
-		return m_ppu->read(space, offset, SNES_CPU_REG(WRIO) & 0x80);
+		return m_ppu->read(offset, SNES_CPU_REG(WRIO) & 0x80);
 	}
 
 	// APU is mirrored from 2140 to 217f
@@ -472,7 +472,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 	// PPU accesses are from 2100 to 213f
 	if (offset >= INIDISP && offset < APU00)
 	{
-		m_ppu->write(space, offset, data);
+		m_ppu->write(offset, data);
 		return;
 	}
 

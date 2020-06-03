@@ -77,23 +77,23 @@ public:
 	void megaaton(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(port01_w);
-	DECLARE_WRITE8_MEMBER(megaaton_port01_w);
-	DECLARE_WRITE8_MEMBER(port02_w);
-	DECLARE_WRITE8_MEMBER(port03_w);
-	DECLARE_WRITE8_MEMBER(sklflite_port03_w);
-	DECLARE_READ8_MEMBER(port04_r);
-	DECLARE_READ8_MEMBER(port05_r);
-	DECLARE_WRITE8_MEMBER(port06_w);
-	DECLARE_WRITE8_MEMBER(port07_w);
+	void port01_w(u8 data);
+	void megaaton_port01_w(u8 data);
+	void port02_w(u8 data);
+	void port03_w(u8 data);
+	void sklflite_port03_w(u8 data);
+	u8 port04_r();
+	u8 port05_r();
+	void port06_w(u8 data);
+	void port07_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_READ_LINE_MEMBER(ef1_r);
 	DECLARE_READ_LINE_MEMBER(ef4_r);
 	DECLARE_WRITE_LINE_MEMBER(q4013a_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	DECLARE_WRITE_LINE_MEMBER(clock2_w);
-	DECLARE_WRITE8_MEMBER(port01_a_w);
-	DECLARE_READ8_MEMBER(port02_a_r);
+	void port01_a_w(u8 data);
+	u8 port02_a_r();
 	DECLARE_READ_LINE_MEMBER(clear_a_r);
 
 	void megaaton_io(address_map &map);
@@ -282,20 +282,20 @@ void play_3_state::machine_reset()
 	m_soundlatch = 0;
 	m_kbdrow = 0;
 	m_disp_sw = 0;
-	for (uint8_t i = 0; i < 5; i++)
+	for (u8 i = 0; i < 5; i++)
 		m_segment[i] = 0;
 	m_port03_old = 0;
 }
 
-WRITE8_MEMBER( play_3_state::port01_w )
+void play_3_state::port01_w(u8 data)
 {
 	m_kbdrow = data;
 	if (m_kbdrow && m_disp_sw)
 	{
 		m_disp_sw = 0;
-		for (uint8_t j = 0; j < 6; j++)
+		for (u8 j = 0; j < 6; j++)
 			if (BIT(m_kbdrow, j))
-				for (uint8_t i = 0; i < 5; i++)
+				for (u8 i = 0; i < 5; i++)
 				{
 					m_digits[j*10 + i] = m_segment[i] & 0x7f;
 					// decimal dot on tens controls if last 0 shows or not
@@ -306,9 +306,9 @@ WRITE8_MEMBER( play_3_state::port01_w )
 }
 
 // megaaton status digits are rearranged slightly
-WRITE8_MEMBER( play_3_state::megaaton_port01_w )
+void play_3_state::megaaton_port01_w(u8 data)
 {
-	uint8_t i,j,digit;
+	u8 i,j,digit;
 	m_kbdrow = data;
 	if (m_kbdrow && m_disp_sw)
 	{
@@ -328,12 +328,12 @@ WRITE8_MEMBER( play_3_state::megaaton_port01_w )
 	}
 }
 
-WRITE8_MEMBER( play_3_state::port02_w )
+void play_3_state::port02_w(u8 data)
 {
 	m_soundlatch = data;
 }
 
-WRITE8_MEMBER( play_3_state::port03_w )
+void play_3_state::port03_w(u8 data)
 {
 	if (BIT(data, 6))
 		m_audiocpu->ef1_w(1); // inverted
@@ -347,7 +347,7 @@ WRITE8_MEMBER( play_3_state::port03_w )
 
 }
 
-WRITE8_MEMBER( play_3_state::sklflite_port03_w )
+void play_3_state::sklflite_port03_w(u8 data)
 {
 	if (BIT(data, 6) && !BIT(m_port03_old, 6))
 		m_zsu->sound_command_w(m_soundlatch);
@@ -362,19 +362,19 @@ WRITE8_MEMBER( play_3_state::sklflite_port03_w )
 	m_port03_old = data;
 }
 
-READ8_MEMBER( play_3_state::port04_r )
+u8 play_3_state::port04_r()
 {
 	if (m_kbdrow & 0x3f)
-		for (uint8_t i = 0; i < 6; i++)
+		for (u8 i = 0; i < 6; i++)
 			if (BIT(m_kbdrow, i))
 				return m_keyboard[i]->read();
 
 	return 0;
 }
 
-READ8_MEMBER( play_3_state::port05_r )
+u8 play_3_state::port05_r()
 {
-	uint8_t data = 0, key8 = m_keyboard[8]->read() & 0x0f;
+	u8 data = 0, key8 = m_keyboard[8]->read() & 0x0f;
 	if (BIT(m_kbdrow, 0))
 		data |= m_keyboard[6]->read();
 	if (BIT(m_kbdrow, 1))
@@ -382,7 +382,7 @@ READ8_MEMBER( play_3_state::port05_r )
 	return (data & 0xf0) | key8;
 }
 
-WRITE8_MEMBER( play_3_state::port06_w )
+void play_3_state::port06_w(u8 data)
 {
 	m_segment[4] = m_segment[3];
 	m_segment[3] = m_segment[2];
@@ -392,19 +392,19 @@ WRITE8_MEMBER( play_3_state::port06_w )
 	m_disp_sw = 1;
 }
 
-WRITE8_MEMBER( play_3_state::port07_w )
+void play_3_state::port07_w(u8 data)
 {
 	m_4013b->clear_w(0);
 	m_4013b->clear_w(1);
 }
 
-WRITE8_MEMBER( play_3_state::port01_a_w )
+void play_3_state::port01_a_w(u8 data)
 {
 	m_a_irqset = data;
 	m_a_irqcnt = (m_a_irqset << 3) | 7;
 }
 
-READ8_MEMBER( play_3_state::port02_a_r )
+u8 play_3_state::port02_a_r()
 {
 	m_audiocpu->ef1_w(0); // inverted
 	return m_soundlatch;

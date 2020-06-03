@@ -111,11 +111,11 @@ public:
 	DECLARE_READ_LINE_MEMBER(printer_ack_r);
 
 private:
-	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_WRITE8_MEMBER(port30_w);
-	DECLARE_WRITE8_MEMBER(port80_w);
-	DECLARE_WRITE8_MEMBER(portc0_w);
-	DECLARE_READ8_MEMBER(porte2_r);
+	void port10_w(u8 data);
+	void port30_w(u8 data);
+	void port80_w(u8 data);
+	void portc0_w(u8 data);
+	u8 porte2_r();
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	void io_map(address_map &map);
@@ -163,27 +163,27 @@ void pencil2_state::io_map(address_map &map)
 	map(0xf2, 0xf2).portr("F2");
 }
 
-READ8_MEMBER( pencil2_state::porte2_r)
+u8 pencil2_state::porte2_r()
 {
 	return (m_cass->input() > 0.1) ? 0xff : 0x7f;
 }
 
-WRITE8_MEMBER( pencil2_state::port10_w )
+void pencil2_state::port10_w(u8 data)
 {
 	m_centronics->write_strobe(BIT(data, 0));
 }
 
-WRITE8_MEMBER( pencil2_state::port30_w )
+void pencil2_state::port30_w(u8 data)
 {
 	m_cass_state ^= 1;
 	m_cass->output( m_cass_state ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER( pencil2_state::port80_w )
+void pencil2_state::port80_w(u8 data)
 {
 }
 
-WRITE8_MEMBER( pencil2_state::portc0_w )
+void pencil2_state::portc0_w(u8 data)
 {
 }
 

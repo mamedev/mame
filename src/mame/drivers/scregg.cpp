@@ -73,8 +73,8 @@ public:
 	void init_rockduck();
 
 private:
-	DECLARE_WRITE8_MEMBER(scregg_irqack_w);
-	DECLARE_READ8_MEMBER(scregg_irqack_r);
+	void scregg_irqack_w(uint8_t data);
+	uint8_t scregg_irqack_r();
 
 	DECLARE_MACHINE_START(scregg);
 	DECLARE_MACHINE_RESET(scregg);
@@ -92,12 +92,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(scregg_state::scregg_interrupt)
 	m_maincpu->set_input_line(0, (param & 8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(scregg_state::scregg_irqack_w)
+void scregg_state::scregg_irqack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-READ8_MEMBER(scregg_state::scregg_irqack_r)
+uint8_t scregg_state::scregg_irqack_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0;

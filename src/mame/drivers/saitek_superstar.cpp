@@ -91,8 +91,8 @@ private:
 	void tstar432_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	u8 input_r();
 
 	u8 m_inp_mux = 0;
 };
@@ -108,7 +108,7 @@ void star_state::machine_start()
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(star_state::control_w)
+void star_state::control_w(u8 data)
 {
 	// d0-d3: input mux, led select
 	m_inp_mux = data & 0xf;
@@ -120,7 +120,7 @@ WRITE8_MEMBER(star_state::control_w)
 	m_dac->write(BIT(data, 7));
 }
 
-READ8_MEMBER(star_state::input_r)
+u8 star_state::input_r()
 {
 	u8 data = 0;
 

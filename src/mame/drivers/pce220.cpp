@@ -90,26 +90,26 @@ protected:
 	void pce220_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER( lcd_status_r );
-	DECLARE_WRITE8_MEMBER( lcd_control_w );
-	DECLARE_READ8_MEMBER( lcd_data_r );
-	DECLARE_WRITE8_MEMBER( lcd_data_w );
-	DECLARE_READ8_MEMBER( rom_bank_r );
-	DECLARE_WRITE8_MEMBER( rom_bank_w );
-	DECLARE_WRITE8_MEMBER( ram_bank_w );
-	DECLARE_READ8_MEMBER( timer_r );
-	DECLARE_WRITE8_MEMBER( timer_w );
-	DECLARE_WRITE8_MEMBER( boot_bank_w );
-	DECLARE_READ8_MEMBER( port15_r );
-	DECLARE_WRITE8_MEMBER( port15_w );
-	DECLARE_READ8_MEMBER( port18_r );
-	DECLARE_WRITE8_MEMBER( port18_w );
-	DECLARE_READ8_MEMBER( port1f_r );
-	DECLARE_WRITE8_MEMBER( kb_matrix_w );
-	DECLARE_READ8_MEMBER( kb_r );
-	DECLARE_READ8_MEMBER( irq_status_r );
-	DECLARE_WRITE8_MEMBER( irq_ack_w );
-	DECLARE_WRITE8_MEMBER( irq_mask_w );
+	uint8_t lcd_status_r();
+	void lcd_control_w(uint8_t data);
+	uint8_t lcd_data_r();
+	void lcd_data_w(uint8_t data);
+	uint8_t rom_bank_r();
+	void rom_bank_w(uint8_t data);
+	void ram_bank_w(uint8_t data);
+	uint8_t timer_r();
+	void timer_w(uint8_t data);
+	void boot_bank_w(uint8_t data);
+	uint8_t port15_r();
+	void port15_w(uint8_t data);
+	uint8_t port18_r();
+	void port18_w(uint8_t data);
+	uint8_t port1f_r();
+	void kb_matrix_w(offs_t offset, uint8_t data);
+	uint8_t kb_r();
+	uint8_t irq_status_r();
+	void irq_ack_w(uint8_t data);
+	void irq_mask_w(uint8_t data);
 
 	void pce220_io(address_map &map);
 	void pce220_mem(address_map &map);
@@ -134,12 +134,12 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER( g850v_bank_r );
-	DECLARE_WRITE8_MEMBER( g850v_bank_w );
-	DECLARE_READ8_MEMBER( g850v_lcd_status_r );
-	DECLARE_WRITE8_MEMBER( g850v_lcd_control_w );
-	DECLARE_READ8_MEMBER( g850v_lcd_data_r );
-	DECLARE_WRITE8_MEMBER( g850v_lcd_data_w );
+	uint8_t g850v_bank_r();
+	void g850v_bank_w(uint8_t data);
+	uint8_t g850v_lcd_status_r();
+	void g850v_lcd_control_w(uint8_t data);
+	uint8_t g850v_lcd_data_r();
+	void g850v_lcd_data_w(uint8_t data);
 	void pcg850v_io(address_map &map);
 };
 
@@ -287,7 +287,7 @@ uint32_t pcg850v_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-READ8_MEMBER( pce220_state::lcd_status_r )
+uint8_t pce220_state::lcd_status_r()
 {
 	/*
 	x--- ---- Busy (not emulated)
@@ -301,7 +301,7 @@ READ8_MEMBER( pce220_state::lcd_status_r )
 	return data;
 }
 
-WRITE8_MEMBER( pce220_state::lcd_control_w )
+void pce220_state::lcd_control_w(uint8_t data)
 {
 	if((data & 0xfe) == 0x3e)       //Display on/off
 		m_lcd_on = data & 0x01;
@@ -313,24 +313,24 @@ WRITE8_MEMBER( pce220_state::lcd_control_w )
 		m_lcd_start_line = data & 0x3f;
 }
 
-READ8_MEMBER( pce220_state::lcd_data_r )
+uint8_t pce220_state::lcd_data_r()
 {
 	return m_vram[(m_lcd_index_row*0x40 + m_lcd_index_col - 1) & 0x1ff];
 }
 
-WRITE8_MEMBER( pce220_state::lcd_data_w )
+void pce220_state::lcd_data_w(uint8_t data)
 {
 	m_vram[(m_lcd_index_row*0x40 + m_lcd_index_col) & 0x1ff] = data;
 
 	m_lcd_index_col++;
 }
 
-READ8_MEMBER( pce220_state::rom_bank_r )
+uint8_t pce220_state::rom_bank_r()
 {
 	return m_bank_num;
 }
 
-WRITE8_MEMBER( pce220_state::rom_bank_w )
+void pce220_state::rom_bank_w(uint8_t data)
 {
 	uint8_t bank4 = data & 0x07; // bits 0,1,2
 	uint8_t bank3 = (data & 0x70) >> 4; // bits 4,5,6
@@ -341,7 +341,7 @@ WRITE8_MEMBER( pce220_state::rom_bank_w )
 	membank("bank4")->set_entry(bank4);
 }
 
-WRITE8_MEMBER( pce220_state::ram_bank_w )
+void pce220_state::ram_bank_w(uint8_t data)
 {
 	uint8_t bank = BIT(data,2);
 
@@ -349,17 +349,17 @@ WRITE8_MEMBER( pce220_state::ram_bank_w )
 	membank("bank2")->set_entry(bank);
 }
 
-READ8_MEMBER( pce220_state::timer_r )
+uint8_t pce220_state::timer_r()
 {
 	return m_timer_status;
 }
 
-WRITE8_MEMBER( pce220_state::timer_w )
+void pce220_state::timer_w(uint8_t data)
 {
 	m_timer_status = data & 1;
 }
 
-WRITE8_MEMBER( pce220_state::boot_bank_w )
+void pce220_state::boot_bank_w(uint8_t data)
 {
 	// set to 1 after boot for restore the ram in the first bank
 	if (data & 0x01)
@@ -370,7 +370,7 @@ WRITE8_MEMBER( pce220_state::boot_bank_w )
 	}
 }
 
-READ8_MEMBER( pce220_state::port15_r )
+uint8_t pce220_state::port15_r()
 {
 	/*
 	x--- ---- XIN input enabled
@@ -379,14 +379,14 @@ READ8_MEMBER( pce220_state::port15_r )
 	return m_port15;
 }
 
-WRITE8_MEMBER( pce220_state::port15_w )
+void pce220_state::port15_w(uint8_t data)
 {
 	m_serial->enable_interface(BIT(data, 7));
 
 	m_port15 = data;
 }
 
-READ8_MEMBER( pce220_state::port18_r )
+uint8_t pce220_state::port18_r()
 {
 	/*
 	x--- ---- XOUT/TXD
@@ -397,7 +397,7 @@ READ8_MEMBER( pce220_state::port18_r )
 	return m_port18;
 }
 
-WRITE8_MEMBER( pce220_state::port18_w )
+void pce220_state::port18_w(uint8_t data)
 {
 	m_beep->set_state(BIT(data, 7));
 
@@ -408,7 +408,7 @@ WRITE8_MEMBER( pce220_state::port18_w )
 	m_port18 = data;
 }
 
-READ8_MEMBER( pce220_state::port1f_r )
+uint8_t pce220_state::port1f_r()
 {
 	/*
 	x--- ---- ON - resp. break key status (?)
@@ -428,7 +428,7 @@ READ8_MEMBER( pce220_state::port1f_r )
 	return data;
 }
 
-WRITE8_MEMBER( pce220_state::kb_matrix_w )
+void pce220_state::kb_matrix_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -441,7 +441,7 @@ WRITE8_MEMBER( pce220_state::kb_matrix_w )
 	}
 }
 
-READ8_MEMBER( pce220_state::kb_r )
+uint8_t pce220_state::kb_r()
 {
 	uint8_t data = 0x00;
 
@@ -469,7 +469,7 @@ READ8_MEMBER( pce220_state::kb_r )
 	return data;
 }
 
-READ8_MEMBER( pce220_state::irq_status_r )
+uint8_t pce220_state::irq_status_r()
 {
 	/*
 	---- -x-- timer
@@ -479,22 +479,22 @@ READ8_MEMBER( pce220_state::irq_status_r )
 	return m_irq_flag;
 }
 
-WRITE8_MEMBER( pce220_state::irq_ack_w )
+void pce220_state::irq_ack_w(uint8_t data)
 {
 	m_irq_flag &= ~data;
 }
 
-WRITE8_MEMBER( pce220_state::irq_mask_w )
+void pce220_state::irq_mask_w(uint8_t data)
 {
 	m_irq_mask = data;
 }
 
-READ8_MEMBER( pcg850v_state::g850v_bank_r )
+uint8_t pcg850v_state::g850v_bank_r()
 {
 	return m_g850v_bank_num;
 }
 
-WRITE8_MEMBER( pcg850v_state::g850v_bank_w )
+void pcg850v_state::g850v_bank_w(uint8_t data)
 {
 	address_space &space_prg = m_maincpu->space(AS_PROGRAM);
 
@@ -511,7 +511,7 @@ WRITE8_MEMBER( pcg850v_state::g850v_bank_w )
 	m_g850v_bank_num = data;
 }
 
-READ8_MEMBER( pcg850v_state::g850v_lcd_status_r )
+uint8_t pcg850v_state::g850v_lcd_status_r()
 {
 	/*
 	x--- ---- Busy (not emulated)
@@ -524,7 +524,7 @@ READ8_MEMBER( pcg850v_state::g850v_lcd_status_r )
 	return data;
 }
 
-WRITE8_MEMBER( pcg850v_state::g850v_lcd_control_w )
+void pcg850v_state::g850v_lcd_control_w(uint8_t data)
 {
 	if ((data & 0xf0) == 0x00)          // LCD column LSB
 	{
@@ -567,7 +567,7 @@ WRITE8_MEMBER( pcg850v_state::g850v_lcd_control_w )
 	}
 }
 
-READ8_MEMBER( pcg850v_state::g850v_lcd_data_r )
+uint8_t pcg850v_state::g850v_lcd_data_r()
 {
 	uint8_t data = m_vram[(m_lcd_index_row*0x100 + m_lcd_index_col - 1) & 0x7ff];
 
@@ -577,7 +577,7 @@ READ8_MEMBER( pcg850v_state::g850v_lcd_data_r )
 	return data;
 }
 
-WRITE8_MEMBER( pcg850v_state::g850v_lcd_data_w )
+void pcg850v_state::g850v_lcd_data_w(uint8_t data)
 {
 	m_vram[(m_lcd_index_row*0x100 + m_lcd_index_col) & 0x7ff] = data;
 

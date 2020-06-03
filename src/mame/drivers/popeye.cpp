@@ -255,12 +255,12 @@ protected:
 		std::copy_n(buffer.begin(), len, rom);
 	}
 
-	DECLARE_READ8_MEMBER(eeprom_r)
+	uint8_t eeprom_r()
 	{
 		return m_eeprom->do_read();
 	}
 
-	DECLARE_WRITE8_MEMBER(eeprom_w)
+	void eeprom_w(uint8_t data)
 	{
 		m_eeprom->di_write(data & 0x01);
 		m_eeprom->cs_write(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);

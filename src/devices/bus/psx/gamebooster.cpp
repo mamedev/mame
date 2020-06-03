@@ -71,7 +71,7 @@ void psx_gamebooster_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ16_MEMBER(psx_gamebooster_device::exp_r)
+uint16_t psx_gamebooster_device::exp_r(offs_t offset, uint16_t mem_mask)
 {
 	if (offset < 0x20000)
 	{
@@ -95,7 +95,7 @@ READ16_MEMBER(psx_gamebooster_device::exp_r)
 	return 0x0000;
 }
 
-WRITE16_MEMBER(psx_gamebooster_device::exp_w)
+void psx_gamebooster_device::exp_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 
 	if (offset < 0x20000)

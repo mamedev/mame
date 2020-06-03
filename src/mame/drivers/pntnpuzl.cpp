@@ -169,13 +169,13 @@ private:
 	int m_touchscr[5];
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_WRITE16_MEMBER(pntnpuzl_200000_w);
-	DECLARE_WRITE16_MEMBER(pntnpuzl_280018_w);
-	DECLARE_READ16_MEMBER(pntnpuzl_280014_r);
-	DECLARE_READ16_MEMBER(pntnpuzl_28001a_r);
-	DECLARE_READ16_MEMBER(irq1_ack_r);
-	DECLARE_READ16_MEMBER(irq2_ack_r);
-	DECLARE_READ16_MEMBER(irq4_ack_r);
+	void pntnpuzl_200000_w(uint16_t data);
+	void pntnpuzl_280018_w(uint16_t data);
+	uint16_t pntnpuzl_280014_r();
+	uint16_t pntnpuzl_28001a_r();
+	uint16_t irq1_ack_r();
+	uint16_t irq2_ack_r();
+	uint16_t irq4_ack_r();
 	required_device<via6522_device> m_via;
 	void mcu_map(address_map &map);
 	void pntnpuzl_map(address_map &map);
@@ -205,7 +205,7 @@ write                                     read
 01 03 46 31 38 0d                    ---> 80 0c
 */
 
-WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_200000_w)
+void pntnpuzl_state::pntnpuzl_200000_w(uint16_t data)
 {
 // logerror("200000: %04x\n",data);
 	// bit 12: set to 1 when going to serial output to 280018
@@ -219,7 +219,7 @@ WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_200000_w)
 	m_pntpzl_200000 = data;
 }
 
-WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_280018_w)
+void pntnpuzl_state::pntnpuzl_280018_w(uint16_t data)
 {
 // logerror("%04x: 280018: %04x\n",m_maincpu->pc(),data);
 	m_serial >>= 1;
@@ -229,7 +229,7 @@ WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_280018_w)
 	m_via->write(0x18/2, data >> 8);
 }
 
-READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
+uint16_t pntnpuzl_state::pntnpuzl_280014_r()
 {
 	static const int startup[3] = { 0x80, 0x0c, 0x00 };
 	int res;
@@ -261,24 +261,24 @@ READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
 	return res << 8;
 }
 
-READ16_MEMBER(pntnpuzl_state::pntnpuzl_28001a_r)
+uint16_t pntnpuzl_state::pntnpuzl_28001a_r()
 {
 	return 0x4c00;
 }
 
-READ16_MEMBER(pntnpuzl_state::irq1_ack_r)
+uint16_t pntnpuzl_state::irq1_ack_r()
 {
 //  m_maincpu->set_input_line(1, CLEAR_LINE);
 	return 0;
 }
 
-READ16_MEMBER(pntnpuzl_state::irq2_ack_r)
+uint16_t pntnpuzl_state::irq2_ack_r()
 {
 //  m_maincpu->set_input_line(2, CLEAR_LINE);
 	return 0;
 }
 
-READ16_MEMBER(pntnpuzl_state::irq4_ack_r)
+uint16_t pntnpuzl_state::irq4_ack_r()
 {
 //  m_maincpu->set_input_line(4, CLEAR_LINE);
 	return 0;
