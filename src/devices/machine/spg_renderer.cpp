@@ -490,6 +490,14 @@ void spg_renderer_device::draw_sprites(bool usespacecallback, const rectangle &c
 		return;
 	}
 
+	// paccon suggests this, does older hardware have similar (if so, starting at what point?) or only GPL16250?
+	if (sprlimit == -1)
+	{
+		sprlimit = (m_video_regs_42 & 0xff00) >> 8;
+		if (sprlimit == 0)
+			sprlimit = 0x100;
+	}
+
 	for (uint32_t n = 0; n < sprlimit; n++)
 	{
 		draw_sprite(usespacecallback, cliprect, dst, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
