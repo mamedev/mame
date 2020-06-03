@@ -217,46 +217,6 @@ void spg_renderer_device::draw_linemap(const rectangle& cliprect, uint32_t* dst,
 }
 
 
-bool spg_renderer_device::get_tile_info(uint32_t tilemap_rambase, uint32_t palettemap_rambase, uint32_t x0, uint32_t y0, uint32_t tile_count_x, uint32_t ctrl, uint32_t attr, uint32_t& tile, spg_renderer_device::blend_enable_t& blend, spg_renderer_device::flipx_t& flip_x, bool& flip_y, uint32_t& palette_offset, address_space &spc)
-{
-	uint32_t tile_address = x0 + (tile_count_x * y0);
-
-	tile = (ctrl & 0x0004) ? spc.read_word(tilemap_rambase) : spc.read_word(tilemap_rambase + tile_address);
-
-	if (!tile)
-		return false;
-
-	uint32_t tileattr = attr;
-	uint32_t tilectrl = ctrl;
-	if ((ctrl & 2) == 0)
-	{   // -(1) bld(1) flip(2) pal(4)
-
-		uint16_t palette = (ctrl & 0x0004) ? spc.read_word(palettemap_rambase) : spc.read_word(palettemap_rambase + tile_address / 2);
-		if (x0 & 1)
-			palette >>= 8;
-		else
-			palette &= 0x00ff;
-
-
-		tileattr &= ~0x000c;
-		tileattr |= (palette >> 2) & 0x000c;    // flip
-
-		tileattr &= ~0x0f00;
-		tileattr |= (palette << 8) & 0x0f00;    // palette
-
-		tilectrl &= ~0x0100;
-		tilectrl |= (palette << 2) & 0x0100;    // blend
-	}
-
-	blend = ((tileattr & 0x4000 || tilectrl & 0x0100)) ? BlendOn : BlendOff;
-	flip_x = (tileattr & 0x0004) ? FlipXOn : FlipXOff;
-	flip_y= (tileattr & 0x0008);
-
-	palette_offset = (tileattr & 0x0f00) >> 4;
-
-
-	return true;
-}
 
 
 // this builds up a line table for the vcmp effect, this is not correct when step is used
@@ -324,7 +284,7 @@ void spg_renderer_device::draw_tilestrip(bool usespacecallback, uint32_t screenw
 	}
 }
 
-void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_tilemaps, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram)
+void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_tilemaps, bool use_alt_tile_addressing, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram)
 {
 	const uint32_t attr = tilemapregs[0];
 	const uint32_t ctrl = tilemapregs[1];
@@ -393,8 +353,22 @@ void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_til
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
-	const uint32_t words_per_tile = bits_per_row * tile_h;
+	//const uint32_t words_per_tile = bits_per_row * tile_h;
 	const bool row_scroll = (ctrl & 0x0010);
+
+	uint32_t words_per_tile;
+	
+	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
+	if (has_extended_tilemaps && use_alt_tile_addressing)
+	{
+		words_per_tile = 8;
+		// before or after the 0 tile check?
+		//tile |= spriteram[(base_addr / 4) + 0x400] << 16;
+	}
+	else
+	{
+		words_per_tile = bits_per_row * tile_h;
+	}
 
 	int realxscroll = xscroll;
 	if (row_scroll)
@@ -413,8 +387,43 @@ void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_til
 		uint32_t tile;
 		uint32_t palette_offset;
 
-		if (!get_tile_info(tilemap_rambase, palettemap_rambase, (x0 + upperscrollbits) & (tile_count_x-1) , y0, tile_count_x, ctrl, attr, tile, blend, flip_x, flip_y, palette_offset, spc))
-			continue;
+		{
+			const int realx0 = (x0 + upperscrollbits) & (tile_count_x - 1);
+			uint32_t tile_address = realx0 + (tile_count_x * y0);
+
+			tile = (ctrl & 0x0004) ? spc.read_word(tilemap_rambase) : spc.read_word(tilemap_rambase + tile_address);
+
+			if (!tile)
+				continue;
+
+			uint32_t tileattr = attr;
+			uint32_t tilectrl = ctrl;
+			if ((ctrl & 2) == 0)
+			{   // -(1) bld(1) flip(2) pal(4)
+
+				uint16_t palette = (ctrl & 0x0004) ? spc.read_word(palettemap_rambase) : spc.read_word(palettemap_rambase + tile_address / 2);
+				if (realx0 & 1)
+					palette >>= 8;
+				else
+					palette &= 0x00ff;
+
+
+				tileattr &= ~0x000c;
+				tileattr |= (palette >> 2) & 0x000c;    // flip
+
+				tileattr &= ~0x0f00;
+				tileattr |= (palette << 8) & 0x0f00;    // palette
+
+				tilectrl &= ~0x0100;
+				tilectrl |= (palette << 2) & 0x0100;    // blend
+			}
+
+			blend = ((tileattr & 0x4000 || tilectrl & 0x0100)) ? BlendOn : BlendOff;
+			flip_x = (tileattr & 0x0004) ? FlipXOn : FlipXOff;
+			flip_y = (tileattr & 0x0008);
+
+			palette_offset = (tileattr & 0x0f00) >> 4;
+		}
 
 		palette_offset >>= nc_bpp;
 		palette_offset <<= nc_bpp;
