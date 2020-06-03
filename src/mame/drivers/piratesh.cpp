@@ -573,6 +573,9 @@ void piratesh_state::machine_start()
 	save_item(NAME(m_mw_irq_control));
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_nmi_clk));
+#else
+	(void)m_sound_ctrl;
+	(void)m_sound_nmi_clk;
 #endif
 }
 

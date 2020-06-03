@@ -297,8 +297,7 @@ private:
 	uint8_t m_ipl;
 	uint8_t m_palet[3];
 	uint8_t m_paltbl[8];
-	uint16_t m_page;
-	uint8_t m_pcg_char, m_pcg_attr, m_char_change, m_pcg_char0;
+	uint8_t m_pcg_char, m_pcg_attr, m_char_change;
 	uint16_t m_pcg_offset[3];
 	int m_char_count;
 	attotime m_time;
