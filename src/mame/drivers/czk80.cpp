@@ -8,7 +8,7 @@ CZK-80
 2010-11-27 Connected to a terminal
 2014-01-08 Added devices
 
-Only known info: http://forum.z80.de/showtopic.php?threadid=280
+Only known info: http://forumcpm.gaby.de/oldboard/showtopic0adb.html?threadid=280
 
 On main board there are Z80A CPU, Z80A PIO, Z80A DART and Z80A CTC
    there is 8K ROM and XTAL 16MHz
@@ -55,16 +55,17 @@ public:
 	czk80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_terminal(*this, "terminal")
 		, m_fdc(*this, "fdc")
 	{ }
 
 	void czk80(machine_config &config);
-	void init_czk80();
 
 private:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(czk80_reset);
 	u8 port80_r();
 	u8 port81_r();
 	void port40_w(u8 data);
@@ -75,7 +76,11 @@ private:
 	void czk80_io(address_map &map);
 	void czk80_mem(address_map &map);
 	u8 m_term_data;
+	bool m_rom_in_map;
 	required_device<z80_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	memory_passthrough_handler *m_rom_shadow_tap;
+	required_shared_ptr<u8> m_ram;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<upd765a_device> m_fdc;
 };
@@ -83,7 +88,7 @@ private:
 
 void czk80_state::port40_w(u8 data)
 {
-	membank("bankr1")->set_entry(BIT(data, 1));
+	m_rom_in_map = !BIT(data, 1);
 }
 
 u8 czk80_state::port80_r()
@@ -100,9 +105,8 @@ u8 czk80_state::port81_r()
 
 void czk80_state::czk80_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).bankr("bankr0").bankw("bankw0");
-	map(0x2000, 0xdfff).ram();
-	map(0xe000, 0xffff).bankr("bankr1").bankw("bankw1");
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0xe000, 0xffff).lr8(NAME([this] (offs_t offset) { if (m_rom_in_map) return m_rom[offset]; else return m_ram[offset+0xe000]; } ));
 }
 
 void czk80_state::czk80_io(address_map &map)
@@ -147,32 +151,32 @@ WRITE_LINE_MEMBER( czk80_state::ctc_z2_w )
 {
 }
 
-/* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER( czk80_state::czk80_reset)
+void czk80_state::machine_start()
 {
-	membank("bankr0")->set_entry(1);
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_rom_in_map));
 }
 
 void czk80_state::machine_reset()
 {
-	machine().scheduler().timer_set(attotime::from_usec(3), timer_expired_delegate(FUNC(czk80_state::czk80_reset),this));
-	membank("bankr0")->set_entry(0); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
-	membank("bankr1")->set_entry(0); // point at rom
-	membank("bankw1")->set_entry(0); // always write to ram
-}
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x1fff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xe000, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
 
-void czk80_state::init_czk80()
-{
-	u8 *main = memregion("maincpu")->base();
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_ram);
+		}
 
-	membank("bankr0")->configure_entry(1, &main[0x0000]);
-	membank("bankr0")->configure_entry(0, &main[0x10000]);
-	membank("bankw0")->configure_entry(0, &main[0x0000]);
+		// return the original data
+		return data;
+	});
 
-	membank("bankr1")->configure_entry(1, &main[0xe000]);
-	membank("bankr1")->configure_entry(0, &main[0x10000]);
-	membank("bankw1")->configure_entry(0, &main[0xe000]);
+	m_rom_in_map = true;
 }
 
 static void czk80_floppies(device_slot_interface &device)
@@ -217,11 +221,11 @@ void czk80_state::czk80(machine_config &config)
 
 /* ROM definition */
 ROM_START( czk80 )
-	ROM_REGION( 0x12000, "maincpu", 0 )
-	ROM_LOAD( "czk80.rom", 0x10000, 0x2000, CRC(7081b7c6) SHA1(13f75b14ea73b252bdfa2384e6eead6e720e49e3))
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "czk80.rom", 0x0000, 0x2000, CRC(7081b7c6) SHA1(13f75b14ea73b252bdfa2384e6eead6e720e49e3))
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
-COMP( 198?, czk80, 0,      0,      czk80,   czk80, czk80_state, init_czk80, "<unknown>", "CZK-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 198?, czk80, 0,      0,      czk80,   czk80, czk80_state, empty_init, "<unknown>", "CZK-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
