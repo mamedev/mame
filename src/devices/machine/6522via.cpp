@@ -389,6 +389,8 @@ void via6522_device::shift_out()
 	// Only shift out msb on falling edge
 	if (m_shift_counter & 1)
 	{
+		if(m_shift_counter == 15)
+			logerror("shift out %02x\n", m_sr);
 		LOGSHIFT(" %s shift Out SR: %02x->", tag(), m_sr);
 		m_out_cb2 = (m_sr >> 7) & 1;
 		m_sr =  (m_sr << 1) | m_out_cb2;
@@ -400,6 +402,7 @@ void via6522_device::shift_out()
 		{
 			LOGINT("SHIFT EXT out INT request ");
 			set_int(INT_SR); // IRQ on last falling edge for external clock (mode 7)
+			logerror("int on shift out\n");
 		}
 	}
 	else // Check for INT condition, eg the last and raising edge of the 15-0 falling/raising edges
@@ -418,6 +421,7 @@ void via6522_device::shift_out()
 
 void via6522_device::shift_in()
 {
+	logerror("shift in tick %d\n", m_shift_counter);
 	// Only shift in data on raising edge
 	if ( !(m_shift_counter & 1) )
 	{
@@ -427,6 +431,7 @@ void via6522_device::shift_in()
 
 		if (m_shift_counter == 0)
 		{
+			logerror("int on shift in (%02x)\n", m_sr);
 			LOGINT("SHIFT in INT request ");
 //            set_int(INT_SR);// TODO: this interrupt is 1-2 clock cycles too early
 			m_shift_irq_timer->adjust(clocks_to_attotime(2)/2); // Delay IRQ 2 edges for all shift INs (mode 1-3)
@@ -562,6 +567,8 @@ void via6522_device::output_pb()
 /*-------------------------------------------------
     via_r - CPU interface for VIA read
 -------------------------------------------------*/
+static int lpa=-1;
+static int lpb=-1;
 
 u8 via6522_device::read(offs_t offset)
 {
@@ -581,6 +588,11 @@ u8 via6522_device::read(offs_t offset)
 			val = m_latch_b;
 		}
 
+		if(val != lpb) {
+			logerror("pb = %02x\n", val);
+			lpb = val;
+		}
+
 		if (!machine().side_effects_disabled())
 		{
 			LOGINT("PB INT ");
@@ -597,6 +609,11 @@ u8 via6522_device::read(offs_t offset)
 		else
 		{
 			val = m_latch_a;
+		}
+
+		if(val != lpa) {
+			logerror("pa = %02x\n", val);
+			lpa = val;
 		}
 
 		if (!machine().side_effects_disabled())
@@ -625,6 +642,11 @@ u8 via6522_device::read(offs_t offset)
 		else
 		{
 			val = m_latch_a;
+		}
+
+		if(val != lpa) {
+			logerror("pa = %02x\n", val);
+			lpa = val;
 		}
 		break;
 
