@@ -931,14 +931,15 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 	//const uint16_t bgcol = 0x7c1f; // magenta
 //	const uint16_t bgcol = 0x0000; // black
-
-
+	bool highres;
 	if (m_707f & 0x0010)
 	{
+		highres = true;
 		m_screen->set_visible_area(0, 640-1, 0, 480-1);
 	}
 	else
 	{
+		highres = false;
 		m_screen->set_visible_area(0, 320-1, 0, 240-1);
 	}
 
@@ -992,7 +993,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 		{
 			m_renderer->draw_page(true, true, cliprect, dst, scanline, i, page1_addr, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll);
 			m_renderer->draw_page(true, true, cliprect, dst, scanline, i, page2_addr, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll);
-			m_renderer->draw_sprites(true, true, m_703a_palettebank, cliprect, dst, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
+			m_renderer->draw_sprites(true, true, m_703a_palettebank, highres, cliprect, dst, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
 		}
 
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);
