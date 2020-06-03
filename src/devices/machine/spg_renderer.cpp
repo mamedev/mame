@@ -444,14 +444,16 @@ void spg_renderer_device::draw_sprite(bool usespacecallback, bool has_extended_s
 
 
 	uint32_t screenwidth = 320;
-	uint32_t screenheight = 240;
+//	uint32_t screenheight = 240;
+	uint32_t screenheight = 256;
 	uint32_t xmask = 0x1ff;
 	uint32_t ymask = 0x1ff;
 
 	if (highres)
 	{
 		screenwidth = 640;
-		screenheight = 480;
+//		screenheight = 480;
+		screenheight = 512;
 		xmask = 0x3ff;
 	}
 
@@ -461,7 +463,8 @@ void spg_renderer_device::draw_sprite(bool usespacecallback, bool has_extended_s
 	if (!(m_video_regs_42 & 0x0002))
 	{
 		x = ((screenwidth/2) + x) - tile_w / 2;
-		y = ((screenheight/2) - y) - (tile_h / 2) + 8;
+//		y = ((screenheight/2) - y) - (tile_h / 2) + 8;
+		y = ((screenheight/2) - y) - (tile_h / 2);
 	}
 
 	x &= xmask;

@@ -755,12 +755,14 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 	if (m_707f & 0x0010)
 	{
 		screenwidth = 640;
+		//screenheight = 512;
 		screenheight = 480;
 		x_max = 0x400;
 	}
 	else
 	{
 		screenwidth = 320;
+		//screenheight = 256;
 		screenheight = 240;
 		x_max = 0x200;
 	}
@@ -802,6 +804,7 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 	if (!(m_7042_sprite & 0x0002))
 	{
 		x = ((screenwidth / 2) + x) - w / 2;
+		//y = ((screenheight / 2) - y) - (h / 2);
 		y = ((screenheight / 2) - y) - (h / 2) + 8;
 	}
 
