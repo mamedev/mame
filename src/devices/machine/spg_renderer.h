@@ -16,7 +16,7 @@ public:
 
 
 	void draw_sprites(bool usespacecallback, bool has_extended_sprites, uint32_t palbank, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space& spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit);
-	void draw_page(bool usespacecallback, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram);
+	void draw_page(bool usespacecallback, bool has_extended_tilemaps, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram);
 
 	void apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline);
 
@@ -62,9 +62,9 @@ protected:
 
 
 	template<spg_renderer_device::blend_enable_t Blend, spg_renderer_device::flipx_t FlipX>
-	inline void draw_tilestrip(bool usespacecallback, const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t* palette);
+	inline void draw_tilestrip(bool usespacecallback, uint32_t screenwidth, uint32_t drawwidthmask, const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t* palette);
 
-	inline void draw_tilestrip(bool usespacecallback, spg_renderer_device::blend_enable_t blend, spg_renderer_device::flipx_t flip_x, const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space& spc, uint16_t* paletteram);
+	inline void draw_tilestrip(bool usespacecallback, uint32_t screenwidth, uint32_t drawwidthmask, spg_renderer_device::blend_enable_t blend, spg_renderer_device::flipx_t flip_x, const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space& spc, uint16_t* paletteram);
 
 	inline void draw_sprite(bool usespacecallback, bool has_extended_sprites, uint32_t palbank, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space& spc, uint16_t* paletteram, uint16_t* spriteram);
 	
@@ -77,8 +77,6 @@ protected:
 	uint32_t m_rgb555_to_rgb888[0x8000];
 
 private:
-
-
 
 	void update_vcmp_table();
 
@@ -97,11 +95,9 @@ private:
 
 	devcb_read16 m_space_read_cb;
 
-
 	address_space* m_cpuspace;
 	address_space* m_cs_space;
 	int m_csbase;
-
 };
 
 DECLARE_DEVICE_TYPE(SPG_RENDERER, spg_renderer_device)
