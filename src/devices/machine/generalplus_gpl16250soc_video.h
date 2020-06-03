@@ -244,8 +244,8 @@ protected:
 
 	emu_timer *m_screenpos_timer;
 
-	uint16_t m_spriteram[0x400];
-	uint16_t m_spriteextra[0x400];
+	uint16_t m_spriteram[0x400*2];
+	//uint16_t m_spriteextra[0x400];
 	uint16_t m_paletteram[0x100*0x10];
 
 	required_device<palette_device> m_palette;

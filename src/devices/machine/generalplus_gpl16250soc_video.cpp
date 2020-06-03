@@ -274,7 +274,7 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_page3_addr_lsb));
 	save_item(NAME(m_page3_addr_msb));
 	save_item(NAME(m_spriteram));
-	save_item(NAME(m_spriteextra));
+	//save_item(NAME(m_spriteextra));
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_maxgfxelement));
 //	save_item(NAME(m_pal_displaybank_high));
@@ -299,9 +299,8 @@ void gcm394_base_video_device::device_reset()
 		m_tmap1_scroll[i] = 0x0000;
 	}
 
-	for (int i = 0; i < 0x400; i++)
+	for (int i = 0; i < 0x400*2; i++)
 	{
-		m_spriteextra[i] = 0x0000;
 		m_spriteram[i] = 0x0000;
 	}
 
@@ -775,10 +774,10 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 
 	if (m_alt_extrasprite_hack == 0)
 		if (addressing_mode == 0) // smartfp, paccon
-			tile |= m_spriteextra[base_addr / 4] << 16;
+			tile |= m_spriteram[(base_addr / 4) + 0x400] << 16;
 
 	if (m_alt_extrasprite_hack == 1) // jak_prft
-		tile |= (m_spriteextra[base_addr] & 0x000f) << 16;
+		tile |= (m_spriteram[base_addr + 0x400] & 0x000f) << 16;
 
 	if (((attr & 0x3000) >> 12) != priority)
 	{
@@ -993,7 +992,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 		{
 			m_renderer->draw_page(true, cliprect, dst, scanline, i, page1_addr, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll);
 			m_renderer->draw_page(true, cliprect, dst, scanline, i, page2_addr, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll);
-			m_renderer->draw_sprites(true, cliprect, dst, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
+			m_renderer->draw_sprites(true, true, m_703a_palettebank, cliprect, dst, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
 		}
 
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);
@@ -1609,7 +1608,7 @@ WRITE16_MEMBER(gcm394_base_video_device::spriteram_w)
 	}
 	else if (m_707e_spritebank == 0x0001)
 	{
-		m_spriteextra[offset] = data;
+		m_spriteram[offset + 0x400] = data;
 	}
 	else
 	{
@@ -1625,7 +1624,7 @@ READ16_MEMBER(gcm394_base_video_device::spriteram_r)
 	}
 	else if (m_707e_spritebank == 0x0001)
 	{
-		return m_spriteextra[offset];
+		return m_spriteram[offset + 0x400];
 	}
 	else
 	{

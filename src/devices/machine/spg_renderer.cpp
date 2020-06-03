@@ -76,7 +76,7 @@ inline uint8_t spg_renderer_device::mix_channel(uint8_t bottom, uint8_t top)
 }
 
 template<spg_renderer_device::blend_enable_t Blend, spg_renderer_device::flipx_t FlipX>
-void spg_renderer_device::draw_tilestrip(bool usespacecallback, const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint16_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t* paletteram)
+void spg_renderer_device::draw_tilestrip(bool usespacecallback, const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t* paletteram)
 {
 	const uint32_t yflipmask = flip_y ? tile_h - 1 : 0;
 	uint32_t m = tilegfxdata_addr + words_per_tile * tile + bits_per_row * (tile_scanline ^ yflipmask);
@@ -160,7 +160,7 @@ void spg_renderer_device::draw_linemap(const rectangle& cliprect, uint32_t* dst,
 	int realline = (scanline + yscroll) & 0xff;
 
 
-	uint16_t tile = spc.read_word(tilemap + realline);
+	uint32_t tile = spc.read_word(tilemap + realline);
 	uint16_t palette = 0;
 
 	//if (!tile)
@@ -217,7 +217,7 @@ void spg_renderer_device::draw_linemap(const rectangle& cliprect, uint32_t* dst,
 }
 
 
-bool spg_renderer_device::get_tile_info(uint32_t tilemap_rambase, uint32_t palettemap_rambase, uint32_t x0, uint32_t y0, uint32_t tile_count_x, uint32_t ctrl, uint32_t attr, uint16_t& tile, spg_renderer_device::blend_enable_t& blend, spg_renderer_device::flipx_t& flip_x, bool& flip_y, uint32_t& palette_offset, address_space &spc)
+bool spg_renderer_device::get_tile_info(uint32_t tilemap_rambase, uint32_t palettemap_rambase, uint32_t x0, uint32_t y0, uint32_t tile_count_x, uint32_t ctrl, uint32_t attr, uint32_t& tile, spg_renderer_device::blend_enable_t& blend, spg_renderer_device::flipx_t& flip_x, bool& flip_y, uint32_t& palette_offset, address_space &spc)
 {
 	uint32_t tile_address = x0 + (tile_count_x * y0);
 
@@ -280,7 +280,7 @@ void spg_renderer_device::update_vcmp_table()
 		}
 		else
 		{
-			if ((currentline >= 0) && (currentline < 240))
+			if ((currentline >= 0) && (currentline < 256))
 			{
 				m_ycmp_table[i] = currentline;
 			}
@@ -298,7 +298,7 @@ void spg_renderer_device::update_vcmp_table()
 	}
 }
 
-void spg_renderer_device::draw_tilestrip(bool usespacecallback, spg_renderer_device::blend_enable_t blend, spg_renderer_device::flipx_t flip_x, const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint16_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space& spc, uint16_t* paletteram)
+void spg_renderer_device::draw_tilestrip(bool usespacecallback, spg_renderer_device::blend_enable_t blend, spg_renderer_device::flipx_t flip_x, const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space& spc, uint16_t* paletteram)
 {
 	if (blend)
 	{
@@ -388,7 +388,7 @@ void spg_renderer_device::draw_page(bool usespacecallback, const rectangle& clip
 		spg_renderer_device::blend_enable_t blend;
 		spg_renderer_device::flipx_t flip_x;
 		bool flip_y;
-		uint16_t tile;
+		uint32_t tile;
 		uint32_t palette_offset;
 
 		if (!get_tile_info(tilemap_rambase, palettemap_rambase, (x0 + upperscrollbits) & (tile_count_x-1) , y0, tile_count_x, ctrl, attr, tile, blend, flip_x, flip_y, palette_offset, spc))
@@ -402,10 +402,10 @@ void spg_renderer_device::draw_page(bool usespacecallback, const rectangle& clip
 	}
 }
 
-void spg_renderer_device::draw_sprite(bool usespacecallback, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
+void spg_renderer_device::draw_sprite(bool usespacecallback, bool has_extended_sprites, uint32_t palbank, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
 {
 	uint32_t tilegfxdata_addr = spritegfxdata_addr;
-	uint16_t tile = spriteram[base_addr + 0];
+	uint32_t tile = spriteram[base_addr + 0];
 	int16_t x = spriteram[base_addr + 1];
 	int16_t y = spriteram[base_addr + 2];
 	uint16_t attr = spriteram[base_addr + 3];
@@ -441,11 +441,37 @@ void spg_renderer_device::draw_sprite(bool usespacecallback, const rectangle& cl
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
-	const uint32_t words_per_tile = bits_per_row * tile_h;
+	
+	uint32_t words_per_tile;
+	
+	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
+	if (has_extended_sprites && ((m_video_regs_42 & 0x0010) == 0x10))
+	{
+		// paccon and smartfp use this mode
+		words_per_tile = 8;
+		// before or after the 0 tile check?
+		tile |= spriteram[(base_addr / 4) + 0x400] << 16;
+	}
+	else
+	{
+		words_per_tile = bits_per_row * tile_h;
+	}
+
 
 	bool flip_y = (attr & 0x0008);
 	uint32_t palette_offset = (attr & 0x0f00) >> 4;
 	
+	if (has_extended_sprites)
+	{
+		// guess, tkmag220 / myac220 don't set this bit and expect all sprite palettes to be from the same bank as background palettes
+		if (palbank & 1)
+			palette_offset |= 0x100;
+
+		// many other gpl16250 sets have this bit set when they want the upper 256 colours on a per-sprite basis, seems like an extended feature
+		if (attr & 0x8000)
+			palette_offset |= 0x200;
+	}
+
 	// the Circuit Racing game in PDC100 needs this or some graphics have bad colours at the edges when turning as it leaves stray lower bits set
 	palette_offset >>= nc_bpp;
 	palette_offset <<= nc_bpp;
@@ -483,7 +509,7 @@ void spg_renderer_device::draw_sprite(bool usespacecallback, const rectangle& cl
 	}
 }
 
-void spg_renderer_device::draw_sprites(bool usespacecallback, const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
+void spg_renderer_device::draw_sprites(bool usespacecallback, bool has_extended_sprites, uint32_t palbank, const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
 {
 	if (!(m_video_regs_42 & 0x0001))
 	{
@@ -500,7 +526,7 @@ void spg_renderer_device::draw_sprites(bool usespacecallback, const rectangle &c
 
 	for (uint32_t n = 0; n < sprlimit; n++)
 	{
-		draw_sprite(usespacecallback, cliprect, dst, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
+		draw_sprite(usespacecallback, has_extended_sprites, palbank, cliprect, dst, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
 	}
 }
 
