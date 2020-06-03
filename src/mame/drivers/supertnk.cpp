@@ -132,8 +132,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(bankswitch_1_w);
 	DECLARE_WRITE_LINE_MEMBER(interrupt_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(watchdog_reset_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(videoram_r);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint8_t videoram_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(bitplane_select_0_w);
 	DECLARE_WRITE_LINE_MEMBER(bitplane_select_1_w);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -234,7 +234,7 @@ void supertnk_state::video_start()
 }
 
 
-WRITE8_MEMBER(supertnk_state::videoram_w)
+void supertnk_state::videoram_w(offs_t offset, uint8_t data)
 {
 	if (m_bitplane_select > 2)
 	{
@@ -249,7 +249,7 @@ WRITE8_MEMBER(supertnk_state::videoram_w)
 }
 
 
-READ8_MEMBER(supertnk_state::videoram_r)
+uint8_t supertnk_state::videoram_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 

@@ -139,20 +139,20 @@ private:
 	void supracan_mem(address_map &map);
 	void supracan_sound_mem(address_map &map);
 
-	DECLARE_READ16_MEMBER(_68k_soundram_r);
-	DECLARE_WRITE16_MEMBER(_68k_soundram_w);
-	DECLARE_READ8_MEMBER(_6502_soundmem_r);
-	DECLARE_WRITE8_MEMBER(_6502_soundmem_w);
+	uint16_t _68k_soundram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void _68k_soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t _6502_soundmem_r(offs_t offset);
+	void _6502_soundmem_w(offs_t offset, uint8_t data);
 
-	void dma_w(address_space &space, int offset, uint16_t data, uint16_t mem_mask, int ch);
-	DECLARE_WRITE16_MEMBER(dma_channel0_w);
-	DECLARE_WRITE16_MEMBER(dma_channel1_w);
+	void dma_w(int offset, uint16_t data, uint16_t mem_mask, int ch);
+	void dma_channel0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_channel1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(sound_r);
-	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_READ16_MEMBER(video_r);
-	DECLARE_WRITE16_MEMBER(video_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	uint16_t sound_r(offs_t offset, uint16_t mem_mask = 0);
+	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t video_r(offs_t offset, uint16_t mem_mask = 0);
+	void video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	struct dma_regs_t
 	{
@@ -1184,7 +1184,7 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-void supracan_state::dma_w(address_space &space, int offset, uint16_t data, uint16_t mem_mask, int ch)
+void supracan_state::dma_w(int offset, uint16_t data, uint16_t mem_mask, int ch)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
@@ -1253,19 +1253,19 @@ void supracan_state::dma_w(address_space &space, int offset, uint16_t data, uint
 	}
 }
 
-WRITE16_MEMBER(supracan_state::dma_channel0_w)
+void supracan_state::dma_channel0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	dma_w(space, offset, data, mem_mask, 0);
+	dma_w(offset, data, mem_mask, 0);
 }
 
-WRITE16_MEMBER(supracan_state::dma_channel1_w)
+void supracan_state::dma_channel1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	dma_w(space, offset, data, mem_mask, 1);
+	dma_w(offset, data, mem_mask, 1);
 }
 
 
 #if 0
-WRITE16_MEMBER(supracan_state::supracan_pram_w)
+void supracan_state::supracan_pram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_pram[offset] &= ~mem_mask;
 	m_pram[offset] |= data & mem_mask;
@@ -1280,7 +1280,7 @@ void supracan_state::write_swapped_byte(int offset, uint8_t byte)
 	m_vram_addr_swapped[swapped_offset] = byte;
 }
 
-WRITE16_MEMBER(supracan_state::vram_w)
+void supracan_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 
@@ -1322,7 +1322,7 @@ void supracan_state::set_sound_irq(uint8_t mask)
 	}
 }
 
-READ8_MEMBER(supracan_state::_6502_soundmem_r)
+uint8_t supracan_state::_6502_soundmem_r(offs_t offset)
 {
 	uint8_t data = m_soundram[offset];
 
@@ -1391,7 +1391,7 @@ READ8_MEMBER(supracan_state::_6502_soundmem_r)
 	return data;
 }
 
-WRITE8_MEMBER(supracan_state::_6502_soundmem_w)
+void supracan_state::_6502_soundmem_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1491,9 +1491,8 @@ void supracan_state::palette_init(palette_device &palette) const
 	}
 }
 
-WRITE16_MEMBER(supracan_state::_68k_soundram_w)
+void supracan_state::_68k_soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_soundram[offset * 2 + 1] = data & 0xff;
 	m_soundram[offset * 2] = data >> 8;
 
@@ -1501,19 +1500,18 @@ WRITE16_MEMBER(supracan_state::_68k_soundram_w)
 	{
 		if (ACCESSING_BITS_8_15)
 		{
-			_6502_soundmem_w(mem, offset * 2, data >> 8);
+			_6502_soundmem_w(offset * 2, data >> 8);
 		}
 		if (ACCESSING_BITS_0_7)
 		{
-			_6502_soundmem_w(mem, offset * 2 + 1, data & 0xff);
+			_6502_soundmem_w(offset * 2 + 1, data & 0xff);
 		}
 	}
 	LOGMASKED(LOG_68K_SOUND, "%s: 68k sound RAM write: %04x & %04x = %04x\n", machine().describe_context(), offset << 1, mem_mask, (uint16_t)data);
 }
 
-READ16_MEMBER(supracan_state::_68k_soundram_r)
+uint16_t supracan_state::_68k_soundram_r(offs_t offset, uint16_t mem_mask)
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint16_t data = m_soundram[offset * 2] << 8;
 	data |= m_soundram[offset * 2 + 1];
 
@@ -1522,11 +1520,11 @@ READ16_MEMBER(supracan_state::_68k_soundram_r)
 		data = 0;
 		if (ACCESSING_BITS_8_15)
 		{
-			data |= _6502_soundmem_r(mem, offset * 2) << 8;
+			data |= _6502_soundmem_r(offset * 2) << 8;
 		}
 		if (ACCESSING_BITS_0_7)
 		{
-			data |= _6502_soundmem_r(mem, offset * 2 + 1);
+			data |= _6502_soundmem_r(offset * 2 + 1);
 		}
 	}
 	//LOGMASKED(LOG_68K_SOUND, "%s: 68k sound RAM read: %04x & %04x (%04x)\n", machine().describe_context(), offset << 1, mem_mask, data);
@@ -1534,7 +1532,7 @@ READ16_MEMBER(supracan_state::_68k_soundram_r)
 	return data;
 }
 
-READ16_MEMBER(supracan_state::sound_r)
+uint16_t supracan_state::sound_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -1548,7 +1546,7 @@ READ16_MEMBER(supracan_state::sound_r)
 	return data;
 }
 
-WRITE16_MEMBER(supracan_state::sound_w)
+void supracan_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1586,7 +1584,7 @@ WRITE16_MEMBER(supracan_state::sound_w)
 }
 
 
-READ16_MEMBER(supracan_state::video_r)
+uint16_t supracan_state::video_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_video_regs[offset];
 
@@ -1692,7 +1690,7 @@ TIMER_CALLBACK_MEMBER(supracan_state::video_callback)
 	m_video_timer->adjust(m_screen->time_until_pos((vpos + 1) % 256, 0));
 }
 
-WRITE16_MEMBER(supracan_state::video_w)
+void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 

@@ -246,10 +246,10 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
 
-	DECLARE_READ8_MEMBER( cart_400 );
-	DECLARE_READ8_MEMBER( cart_c00 );
-	DECLARE_READ8_MEMBER( rom_000 );
-	DECLARE_READ8_MEMBER( rom_400 );
+	uint8_t cart_400(offs_t offset);
+	uint8_t cart_c00(offs_t offset);
+	uint8_t rom_000(offs_t offset);
+	uint8_t rom_400(offs_t offset);
 
 protected:
 	required_device<cosmac_device> m_maincpu;
@@ -265,9 +265,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( dispon_r );
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_WRITE8_MEMBER( dispon_w );
+	uint8_t dispon_r();
+	void keylatch_w(uint8_t data);
+	void dispon_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
@@ -347,12 +347,12 @@ private:
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER( studio2_state::keylatch_w )
+void studio2_state::keylatch_w(uint8_t data)
 {
 	m_keylatch = data & 0x0f;
 }
 
-READ8_MEMBER( studio2_state::dispon_r )
+uint8_t studio2_state::dispon_r()
 {
 	m_vdc->disp_on_w(1);
 	m_vdc->disp_on_w(0);
@@ -360,7 +360,7 @@ READ8_MEMBER( studio2_state::dispon_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( studio2_state::dispon_w )
+void studio2_state::dispon_w(uint8_t data)
 {
 	m_vdc->disp_on_w(1);
 	m_vdc->disp_on_w(0);
@@ -537,10 +537,10 @@ void mpt02_state::dma_w(offs_t offset, uint8_t data)
 /* Machine Initialization */
 
 // trampolines to cartridge
-READ8_MEMBER( studio2_state::rom_000 ) { return m_rom[offset]; }
-READ8_MEMBER( studio2_state::rom_400 ) { return m_rom[offset+0x400]; }
-READ8_MEMBER( studio2_state::cart_400 ) { return m_cart->read_rom(offset); }
-READ8_MEMBER( studio2_state::cart_c00 ) { return m_cart->read_rom(offset + 0x800); }
+uint8_t studio2_state::rom_000(offs_t offset) { return m_rom[offset]; }
+uint8_t studio2_state::rom_400(offs_t offset) { return m_rom[offset+0x400]; }
+uint8_t studio2_state::cart_400(offs_t offset) { return m_cart->read_rom(offset); }
+uint8_t studio2_state::cart_c00(offs_t offset) { return m_cart->read_rom(offset + 0x800); }
 
 void visicom_state::machine_start()
 {
@@ -551,15 +551,15 @@ void visicom_state::machine_start()
 void studio2_state::machine_start()
 {
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x0000, 0x07ff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x03ff, read8_delegate(*this, FUNC(studio2_state::rom_000)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x03ff, read8sm_delegate(*this, FUNC(studio2_state::rom_000)));
 
 	if (m_cart->exists())
 	{
 		// cart always overlaps the inbuilt game roms
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(*this, FUNC(studio2_state::cart_400)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8sm_delegate(*this, FUNC(studio2_state::cart_400)));
 	}
 	else
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(*this, FUNC(studio2_state::rom_400)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8sm_delegate(*this, FUNC(studio2_state::rom_400)));
 
 	// register for state saving
 	save_item(NAME(m_keylatch));
@@ -570,7 +570,7 @@ void mpt02_state::machine_start()
 	if (m_cart->exists())
 	{
 		// cart always overlaps the inbuilt game roms
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(*this, FUNC(studio2_state::cart_400)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8sm_delegate(*this, FUNC(studio2_state::cart_400)));
 	}
 
 	// register for state saving
@@ -644,7 +644,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 				{
 					logerror("ST2 Reading block %u to 0x%04x\n", block, offset);
 					if (pages[block] == 0xC)
-						m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0fff, read8_delegate(*this, FUNC(studio2_state::cart_c00)));
+						m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0fff, read8sm_delegate(*this, FUNC(studio2_state::cart_c00)));
 					image.fread(m_cart->get_rom_base() + offset - 0x400, 0x100);
 				}
 			}
@@ -668,7 +668,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 			memcpy(m_cart->get_rom_base() + 0x000, image.get_software_region("rom_400"), image.get_software_region_length("rom_400"));
 		if (image.get_software_region("rom_c00"))
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0fff, read8_delegate(*this, FUNC(studio2_state::cart_c00)));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0fff, read8sm_delegate(*this, FUNC(studio2_state::cart_c00)));
 			memcpy(m_cart->get_rom_base() + 0x800, image.get_software_region("rom_c00"), image.get_software_region_length("rom_c00"));
 		}
 	}
