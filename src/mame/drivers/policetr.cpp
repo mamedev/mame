@@ -13,17 +13,21 @@
     Known bugs:
         * Flip screen not supported
 
-Note:   Police Trainer v1.3B runs on the same revision PCB as Sharpshooter - Rev 0.5B
-        If you hold the test button down and boot the game, all program roms
-        fail the checksum.  This has been verified on an original PCB.
+Note:   For Police Trainer v1.3B sets that run on the same Rev 0.5B PCB as Sharpshooter: If you
+        boot the game while holding the test button down until you get to the factory test screen,
+        all program roms fail the checksum.  This result has been verified on original hardware.
         See below for specific information on each set.
-Note:   Police Trainer v1.0 (Rev 0.2 PCB), the checksum results in MAME have been
-        verified to be the same as an original PCB.
+Note:   Police Trainer v1.0 (Rev 0.2 PCB), the checksum results in MAME have been verified to be
+        the same as an original PCB.
+Note:   Starting with Police Trainer v1.3B, support for high scores has been removed.
 
-Note:   All versions of Police Trainer "claim" to be version 1.5 both in an audio sample
-        and during the demo routine the screen shows: POLICE TRAINER   VERSION 1.5
-        The actual version can be verified by checking the labels or in the service mode.
-        To date, no version higher then v1.3B has been found and v1.2 has NEVER been seen.
+Note:   All versions of Police Trainer "claim" to be version 1.5 both in an audio sample and
+        during the demo routine the screen shows: POLICE TRAINER   VERSION 1.5   The actual
+        version can be verified by checking the labels or during the factory test. Boot (or
+        reset) Police Trainer and hold the test button down to get the factory test screen.
+        Police Trainer will show the actual "SOFTWARE REV", except for v1.0 which will show
+        "FACTORY TEST"  To date, no version higher then v1.3B has been found and v1.2 has
+        NEVER been seen.
 
 To ID the version of your SharpShooter, check the 2nd printed line on each type of ROM.
 
@@ -342,11 +346,13 @@ static INPUT_PORTS_START( policetr )
 	PORT_DIPUNUSED_DIPLOC( 0x00020000, 0x00020000, "SW1:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x00040000, 0x00040000, "SW1:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x00080000, 0x00080000, "SW1:4" )
-	PORT_DIPUNUSED_DIPLOC( 0x00100000, 0x00100000, "SW1:5" )
+	PORT_DIPNAME( 0x00100000, 0x00100000, "Special Hardware Test" ) PORT_DIPLOCATION("SW1:5") /* reset game with TEST button held down to see it */
+	PORT_DIPSETTING(          0x00100000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x00200000, 0x00200000, "SW1:6" )
-	PORT_DIPNAME( 0x00400000, 0x00400000, "Monitor Sync") PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(          0x00000000, "+")
-	PORT_DIPSETTING(          0x00400000, "-")
+	PORT_DIPNAME( 0x00400000, 0x00400000, "Monitor Sync" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(          0x00000000, "+" )
+	PORT_DIPSETTING(          0x00400000, "-" )
 	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8") /* For use with mirrored CRTs - Not supported */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00800000, DEF_STR( On ) )   /* Will invert the Y axis of guns */
@@ -383,8 +389,19 @@ static INPUT_PORTS_START( polict10 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( sshooter )
+	PORT_INCLUDE( policetr )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNUSED_DIPLOC( 0x00100000, 0x00100000, "SW1:5" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( sshoot11 )
 	PORT_INCLUDE( policetr )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNUSED_DIPLOC( 0x00100000, 0x00100000, "SW1:5" )
 
 	PORT_MODIFY("GUNX1")                /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.012, 0.208, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -463,7 +480,28 @@ void sshooter_state::sshooter(machine_config &config)
  *
  *************************************/
 
-ROM_START( policetr ) /* Rev 0.3 PCB , with the program chips dated 04/01/97 */
+ROM_START( policetr ) /* Rev 0.3 PCB with the newer AT001 video chip, reports as SOFTWARE REV 1.3B - first version to remove support for high scores */
+	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u125_police_trainer_p-p_marketing.u125", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) ) // mask ROM labeled: U125   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u124_police_trainer_p-p_marketing.u124", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) ) // mask ROM labeled: U124   POLICE TRAINER   P&P MARKETING
+
+	ROM_REGION32_BE( 0x80000, "maincpu", 0 )  /* 2MB for R3000 code */
+	ROM_LOAD32_BYTE( "u113_no_hi_a589.u113", 0x00000, 0x20000, CRC(4bfb0fb5) SHA1(12367688bb821de2c54faed8eec27e74d4dac856) ) // hand written labeled:   U113 NO HI A589
+	ROM_LOAD32_BYTE( "u112_no_hi_36da.u112", 0x00001, 0x20000, CRC(505a89bf) SHA1(77e289311c5d358478d02bf8e5b14adb8ab1caeb) ) // hand written labeled:   U112 NO HI 36DA
+	ROM_LOAD32_BYTE( "u111_no_hi_e6e6.u111", 0x00002, 0x20000, CRC(68e5936e) SHA1(1a8833584a6b74f22fe3bdbb7cd23983da7e6fe1) ) // hand written labeled:   U111 NO HI E6E6
+	ROM_LOAD32_BYTE( "u110_no_hi_9f17.u110", 0x00003, 0x20000, CRC(0392824d) SHA1(c394b9a74d11cf9ff5b4edf97178a85276b63852) ) // hand written labeled:   U110 NO HI 9F17
+
+	ROM_REGION( 0x1000000, "bsmt", 0 )
+	ROM_LOAD( "u160_police_trainer_p-p_marketing.u160", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) ) // mask ROM labeled: U160   POLICE TRAINER   P&P MARKETING
+	ROM_RELOAD(                                         0x3f8000, 0x100000 )
+	ROM_LOAD( "u162_police_trainer_p-p_marketing.u162", 0x100000, 0x100000, CRC(75fe850e) SHA1(ab8cf24ae6e5cf80f6a9a34e46f2b1596879643b) ) // mask ROM labeled: U162   POLICE TRAINER   P&P MARKETING
+	ROM_RELOAD(                                         0x4f8000, 0x100000 )
+ROM_END
+
+
+ROM_START( policetr13 ) /* Rev 0.3 PCB with the program chips dated 04/01/97, reports as SOFTWARE REV 1.3 */
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
@@ -484,7 +522,7 @@ ROM_START( policetr ) /* Rev 0.3 PCB , with the program chips dated 04/01/97 */
 ROM_END
 
 
-ROM_START( policetr11 ) /* Rev 0.3 PCB with the program chips dated 01/06/97 */
+ROM_START( policetr11 ) /* Rev 0.3 PCB with the program chips dated 01/06/97, reports as SOFTWARE REV 1.1 */
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
@@ -505,7 +543,7 @@ ROM_START( policetr11 ) /* Rev 0.3 PCB with the program chips dated 01/06/97 */
 ROM_END
 
 
-ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96, there is no mention of version on any chip */
+ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96, there is no mention of version on any chip or during the "Factory Test" checksum screen */
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	/* Same data as the other sets, but split in 4 meg roms */
 	ROM_LOAD16_BYTE( "u121_10-7-96.u121", 0x000000, 0x080000, CRC(9d31e805) SHA1(482f38e07ddb758e1fb444af7b56a0ef6ea945c8) ) // labeled: U121   10/7/96
@@ -536,7 +574,7 @@ ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96, there is n
 ROM_END
 
 
-ROM_START( policetr13a ) /* Rev 0.5B PCB , unknown program rom date. Actual version is V1.3B */
+ROM_START( policetr13a ) /* Rev 0.5B PCB, unknown program rom date. Actual version is V1.3B */
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
@@ -546,7 +584,7 @@ ROM_START( policetr13a ) /* Rev 0.5B PCB , unknown program rom date. Actual vers
 	ROM_REGION32_BE( 0x100000, "maincpu", 0 ) /* Program roms are type 27C020 */
 /*
 Note: With this version, the program roms are twice the size of those found on all other Police Trainer sets. Like the set listed below,
-      if you set the dipswitch to service mode and reset the game within Mame. All 4 program ROMs fail the checksum code and the listed
+      if you hold the test button down and boot (or reset) the game within Mame. All 4 program ROMs fail the checksum code and the listed
       checksums on the screen match the set below.  IE: U110=556D, U111=E5F1, U112=974C & U113=CB73
 
       However, if you check the Diagnostics screen, the program rom checksum is 6819480C which is different then the set below. So it
@@ -567,7 +605,7 @@ Note: With this version, the program roms are twice the size of those found on a
 ROM_END
 
 
-ROM_START( policetr13b ) /* Rev 0.5B PCB , unknown program rom date Actual version is V1.3B */
+ROM_START( policetr13b ) /* Rev 0.5B PCB, unknown program rom date Actual version is V1.3B */
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
@@ -576,7 +614,7 @@ ROM_START( policetr13b ) /* Rev 0.5B PCB , unknown program rom date Actual versi
 
 	ROM_REGION32_BE( 0x100000, "maincpu", 0 ) /* Program roms are type 27C010 */
 /*
-Note: If you set the dipswitch to service mode and reset the game within Mame. All 4 program ROMs fail the checksum code, IE: they
+Note: If you hold the test button down and boot (or reset) the game within Mame. All 4 program ROMs fail the checksum code, IE: they
       show in red instead of green.  But, the listed checksums on the screen match the checksums printed on the ROM labels. However,
       this has been verified to happen on a real PCB
 
@@ -595,7 +633,7 @@ Note: If you set the dipswitch to service mode and reset the game within Mame. A
 ROM_END
 
 
-ROM_START( sshooter ) /* Rev 0.5B PCB , Added a "Welcome" start-up screen which shows "This is Version C191012" */
+ROM_START( sshooter ) /* Rev 0.5B PCB, Added a "Welcome" start-up screen which shows "This is Version C191012" */
 	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "u121_1-1_g10_021998_ecie-9418_sharpshooter.u121", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // U121 1:1   G10   021998 ECIE:9418   SharpShooter
 	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 1:2   G10   021998 ECIE:3395   SharpShooter
@@ -620,7 +658,7 @@ ROM_START( sshooter ) /* Rev 0.5B PCB , Added a "Welcome" start-up screen which 
 ROM_END
 
 
-ROM_START( sshooter17 ) /* Rev 0.5B PCB , unknown program rom date */
+ROM_START( sshooter17 ) /* Rev 0.5B PCB, unknown program rom date */
 	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "u121_1-1_g10_021998_ecie-9418_sharpshooter.u121", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // U121 1:1   G10   021998 ECIE:9418   SharpShooter
 	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 1:2   G10   021998 ECIE:3395   SharpShooter
@@ -645,7 +683,7 @@ ROM_START( sshooter17 ) /* Rev 0.5B PCB , unknown program rom date */
 ROM_END
 
 
-ROM_START( sshooter12 ) /* Rev 0.5B PCB , program roms dated 04/17/98 */
+ROM_START( sshooter12 ) /* Rev 0.5B PCB, program roms dated 04/17/98 */
 	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "u121_1-1_g10_021998_ecie-9418_sharpshooter.u121", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // U121 1:1   G10   021998 ECIE:9418   SharpShooter
 	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 1:2   G10   021998 ECIE:3395   SharpShooter
@@ -670,7 +708,7 @@ ROM_START( sshooter12 ) /* Rev 0.5B PCB , program roms dated 04/17/98 */
 ROM_END
 
 
-ROM_START( sshooter11 ) /* Rev 0.5B PCB , program roms dated 04/03/98 */
+ROM_START( sshooter11 ) /* Rev 0.5B PCB, program roms dated 04/03/98 */
 	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "u121_1-1_g10_021998_ecie-9418_sharpshooter.u121", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // U121 1:1   G10   021998 ECIE:9418   SharpShooter
 	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 1:2   G10   021998 ECIE:3395   SharpShooter
@@ -716,14 +754,15 @@ void policetr_state::driver_init()
  *
  *************************************/
 
-GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",        0 )
-GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",        0 )
-GAME( 1996, policetr10,  policetr, policetr, polict10, polict10_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",        0 )
+GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B, Rev 0.3 PCB)",        0 )
+GAME( 1996, policetr13,  policetr, policetr, policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",                      0 )
+GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",                      0 )
+GAME( 1996, policetr10,  policetr, policetr, polict10, polict10_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",                      0 )
 
-GAME( 1996, policetr13a, policetr, sshooter, policetr, plctr13b_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
-GAME( 1996, policetr13b, policetr, sshooter, policetr, plctr13b_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)",       0 )
+GAME( 1996, policetr13a, policetr, sshooter, policetr, plctr13b_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer, Rev 0.5B PCB)", 0 )
+GAME( 1996, policetr13b, policetr, sshooter, policetr, plctr13b_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B, Rev 0.5B PCB)",       0 )
 
-GAME( 1998, sshooter,    0,        sshooter, policetr, sshooter_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",          0 )
-GAME( 1998, sshooter17,  sshooter, sshooter, policetr, sshoot17_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",          0 )
-GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, sshoot12_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",          0 )
-GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, sshoot11_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",          0 )
+GAME( 1998, sshooter,    0,        sshooter, sshooter, sshooter_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",                        0 )
+GAME( 1998, sshooter17,  sshooter, sshooter, sshooter, sshoot17_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",                        0 )
+GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, sshoot12_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",                        0 )
+GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, sshoot11_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",                        0 )
