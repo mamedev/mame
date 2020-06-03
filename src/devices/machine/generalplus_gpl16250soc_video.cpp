@@ -344,6 +344,7 @@ void gcm394_base_video_device::device_reset()
 	m_page3_addr_lsb = 0;
 	m_page3_addr_msb = 0;
 
+	m_renderer->set_video_spacees(m_cpuspace, m_cs_space, m_csbase);
 }
 
 /*************************
@@ -975,6 +976,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 		memcpy(dest, src, sizeof(uint32_t) * ((cliprect.max_x - cliprect.min_x) + 1));
 	}
 */
+
 	address_space &mem = m_cpu->space(AS_PROGRAM);
 
 	const uint32_t page1_addr = (m_page0_addr_msb << 16) | m_page0_addr_lsb;
@@ -989,9 +991,9 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(cliprect, dst, scanline, i, page1_addr, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll);
-			m_renderer->draw_page(cliprect, dst, scanline, i, page2_addr, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll);
-			m_renderer->draw_sprites(cliprect, dst, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, 256);
+			m_renderer->draw_page(true, cliprect, dst, scanline, i, page1_addr, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll);
+			m_renderer->draw_page(true, cliprect, dst, scanline, i, page2_addr, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll);
+			m_renderer->draw_sprites(true, cliprect, dst, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, 256);
 		}
 
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);

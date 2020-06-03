@@ -1538,6 +1538,9 @@ void sunplus_gcm394_base_device::device_reset()
 	m_system_dma_memtype = 0x0000;
 
 	m_unk_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+
+	m_spg_video->set_video_spacees(this->space(AS_PROGRAM), *m_cs_space, m_csbase);
+	m_spg_video->reset();
 }
 
 void generalplus_gpac800_device::device_reset()
@@ -1646,7 +1649,6 @@ uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
 
 	return val;
 }
-
 
 
 
