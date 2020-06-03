@@ -342,7 +342,7 @@ void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_til
 	const uint32_t xscroll = scrollregs[0];
 	const uint32_t yscroll = scrollregs[1];
 	const uint32_t tilemap_rambase = tilemapregs[2];
-	const uint32_t palettemap_rambase = tilemapregs[3];
+	const uint32_t exattributemap_rambase = tilemapregs[3];
 	const int tile_width = (attr & 0x0030) >> 4;
 	const uint32_t tile_h = 8 << ((attr & 0x00c0) >> 6);
 	const uint32_t tile_w = 8 << (tile_width);
@@ -357,13 +357,11 @@ void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_til
 	const bool row_scroll = (ctrl & 0x0010);
 
 	uint32_t words_per_tile;
-	
+
 	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
 	if (has_extended_tilemaps && use_alt_tile_addressing)
 	{
 		words_per_tile = 8;
-		// before or after the 0 tile check?
-		//tile |= spriteram[(base_addr / 4) + 0x400] << 16;
 	}
 	else
 	{
@@ -374,7 +372,7 @@ void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_til
 	if (row_scroll)
 	{
 		// Tennis in My Wireless Sports confirms the need to add the scroll value here rather than rowscroll being screen-aligned
-		realxscroll += (int16_t)scrollram[(logical_scanline+yscroll) & 0xff];
+		realxscroll += (int16_t)scrollram[(logical_scanline + yscroll) & 0xff];
 	}
 
 	const int upperscrollbits = (realxscroll >> (tile_width + 3));
@@ -398,24 +396,37 @@ void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_til
 
 			uint32_t tileattr = attr;
 			uint32_t tilectrl = ctrl;
-			if ((ctrl & 2) == 0)
+
+			if (has_extended_tilemaps && use_alt_tile_addressing)
+			{
+				// in this mode what would be the 'palette' bits get used for extra tile bits (even if the usual 'extended table' mode is disabled?)
+				// used by smartfp
+				uint16_t exattribute = (ctrl & 0x0004) ? spc.read_word(exattributemap_rambase) : spc.read_word(exattributemap_rambase + tile_address / 2);
+				if (realx0 & 1)
+					exattribute >>= 8;
+				else
+					exattribute &= 0x00ff;
+
+				tile |= (exattribute & 0x07) << 16;
+			}
+			else if ((ctrl & 2) == 0)
 			{   // -(1) bld(1) flip(2) pal(4)
 
-				uint16_t palette = (ctrl & 0x0004) ? spc.read_word(palettemap_rambase) : spc.read_word(palettemap_rambase + tile_address / 2);
+				uint16_t exattribute = (ctrl & 0x0004) ? spc.read_word(exattributemap_rambase) : spc.read_word(exattributemap_rambase + tile_address / 2);
 				if (realx0 & 1)
-					palette >>= 8;
+					exattribute >>= 8;
 				else
-					palette &= 0x00ff;
+					exattribute &= 0x00ff;
 
 
 				tileattr &= ~0x000c;
-				tileattr |= (palette >> 2) & 0x000c;    // flip
+				tileattr |= (exattribute >> 2) & 0x000c;    // flip
 
 				tileattr &= ~0x0f00;
-				tileattr |= (palette << 8) & 0x0f00;    // palette
+				tileattr |= (exattribute << 8) & 0x0f00;    // palette
 
 				tilectrl &= ~0x0100;
-				tilectrl |= (palette << 2) & 0x0100;    // blend
+				tilectrl |= (exattribute << 2) & 0x0100;    // blend
 			}
 
 			blend = ((tileattr & 0x4000 || tilectrl & 0x0100)) ? BlendOn : BlendOff;
@@ -428,8 +439,8 @@ void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_til
 		palette_offset >>= nc_bpp;
 		palette_offset <<= nc_bpp;
 
-		const int drawx = (x0 * tile_w) - (realxscroll & (tile_w-1));
-		draw_tilestrip(usespacecallback, screenwidth, drawwidthmask, blend,flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
+		const int drawx = (x0 * tile_w) - (realxscroll & (tile_w - 1));
+		draw_tilestrip(usespacecallback, screenwidth, drawwidthmask, blend, flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
 	}
 }
 

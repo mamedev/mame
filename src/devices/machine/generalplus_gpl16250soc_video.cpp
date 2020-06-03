@@ -982,8 +982,11 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 	address_space &mem = m_cpu->space(AS_PROGRAM);
 
-	const uint32_t page1_addr = (m_page0_addr_msb << 16) | m_page0_addr_lsb;
-	const uint32_t page2_addr = (m_page1_addr_msb << 16) | m_page1_addr_lsb;
+	const uint32_t page0_addr = (m_page0_addr_msb << 16) | m_page0_addr_lsb;
+	const uint32_t page1_addr = (m_page1_addr_msb << 16) | m_page1_addr_lsb;
+	const uint32_t page2_addr = (m_page2_addr_msb << 16) | m_page2_addr_lsb;
+	const uint32_t page3_addr = (m_page3_addr_msb << 16) | m_page3_addr_lsb;
+
 	const uint32_t sprites_addr = (m_sprite_702d_gfxbase_msb << 16) | m_sprite_7022_gfxbase_lsb;
 	
 	bitmap.fill(0, cliprect);
@@ -994,8 +997,11 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, cliprect, dst, scanline, i, page1_addr, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll);
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, cliprect, dst, scanline, i, page2_addr, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll);
+			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, cliprect, dst, scanline, i, page0_addr, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll);
+			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, cliprect, dst, scanline, i, page1_addr, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll);
+			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, cliprect, dst, scanline, i, page2_addr, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll);
+			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, cliprect, dst, scanline, i, page3_addr, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll);
+
 			m_renderer->draw_sprites(true, true, m_703a_palettebank, highres, cliprect, dst, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
 		}
 
