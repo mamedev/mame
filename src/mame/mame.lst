@@ -1343,7 +1343,7 @@ tonpuu                          // 200?, ANES
 
 @source:angelkds.cpp
 angelkds                        // 833-6599 (c) 1988 Sega / Nasco?
-spcpostn                        // (c) 1986 Sega / Nasco"
+spcpostn                        // (c) 1986 Sega / Nasco
 
 @source:anzterm.cpp
 anzterm                         // Burroughs EF315-I220
@@ -42054,6 +42054,7 @@ zerozone                        // (c) 1993 Comad
 
 @source:zexall.cpp
 zexall                          // zexall z80 test suite with kevtris' preloader/serial interface at 0000-00ff
+zex8085                         // i8085 Ian Bartholomew
 
 @source:zms8085.cpp
 zephyr                          //

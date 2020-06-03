@@ -9,6 +9,8 @@
 
   NOTE: there's a modified version of this driver in src/zexall
 
+2020-06-04 Added zex8085, it's a modified version of zexall, by Ian Bartholomew. CRCs were obtained by running it on a real machine.
+http://www.vcfed.org/forum/showthread.php?74993
 
   Memory map:
 
@@ -26,6 +28,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/i8085/i8085.h"
 #include "machine/terminal.h"
 
 class zexall_state : public driver_device
@@ -39,24 +42,25 @@ public:
 	{ }
 
 	void zexall(machine_config &config);
+	void zex8085(machine_config &config);
 
 private:
-	uint8_t output_ack_r();
-	uint8_t output_req_r();
-	uint8_t output_data_r();
-	void output_ack_w(uint8_t data);
-	void output_req_w(uint8_t data);
-	void output_data_w(uint8_t data);
+	u8 output_ack_r();
+	u8 output_req_r();
+	u8 output_data_r();
+	void output_ack_w(u8 data);
+	void output_req_w(u8 data);
+	void output_data_w(u8 data);
 
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	required_shared_ptr<uint8_t> m_main_ram;
-	uint8_t m_out_data; // byte written to 0xFFFF
-	uint8_t m_out_req; // byte written to 0xFFFE
-	uint8_t m_out_req_last; // old value at 0xFFFE before the most recent write
-	uint8_t m_out_ack; // byte written to 0xFFFC
+	required_shared_ptr<u8> m_main_ram;
+	u8 m_out_data; // byte written to 0xFFFF
+	u8 m_out_req; // byte written to 0xFFFE
+	u8 m_out_req_last; // old value at 0xFFFE before the most recent write
+	u8 m_out_ack; // byte written to 0xFFFC
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -85,8 +89,8 @@ void zexall_state::machine_reset()
 	m_out_data = 0;
 
 	// program is self-modifying, so need to refresh it on each run
-	uint8_t *program = memregion("maincpu")->base();
-	memcpy(m_main_ram, program, 0x10000);
+	u8 *program = memregion("maincpu")->base();
+	memcpy(m_main_ram, program, 0x8000);
 }
 
 
@@ -94,7 +98,7 @@ void zexall_state::machine_reset()
  I/O Handlers
 ******************************************************************************/
 
-uint8_t zexall_state::output_ack_r()
+u8 zexall_state::output_ack_r()
 {
 	// spit out the byte in out_byte if out_req is not equal to out_req_last
 	if (m_out_req != m_out_req_last)
@@ -106,28 +110,28 @@ uint8_t zexall_state::output_ack_r()
 	return m_out_ack;
 }
 
-void zexall_state::output_ack_w(uint8_t data)
+void zexall_state::output_ack_w(u8 data)
 {
 	m_out_ack = data;
 }
 
-uint8_t zexall_state::output_req_r()
+u8 zexall_state::output_req_r()
 {
 	return m_out_req;
 }
 
-void zexall_state::output_req_w(uint8_t data)
+void zexall_state::output_req_w(u8 data)
 {
 	m_out_req_last = m_out_req;
 	m_out_req = data;
 }
 
-uint8_t zexall_state::output_data_r()
+u8 zexall_state::output_data_r()
 {
 	return m_out_data;
 }
 
-void zexall_state::output_data_w(uint8_t data)
+void zexall_state::output_data_w(u8 data)
 {
 	m_out_data = data;
 }
@@ -168,15 +172,31 @@ void zexall_state::zexall(machine_config &config)
 	GENERIC_TERMINAL(config, m_terminal, 0);
 }
 
+void zexall_state::zex8085(machine_config &config)
+{
+	/* basic machine hardware */
+	I8085A(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &zexall_state::mem_map);
+
+	/* video hardware */
+	GENERIC_TERMINAL(config, m_terminal, 0);
+}
+
 
 /******************************************************************************
  ROM Definitions
 ******************************************************************************/
 
 ROM_START( zexall )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "interface.bin", 0x0000, 0x0051, CRC(4292a574) SHA1(d3ed6d84e2b64e51598f36b4f290972963e1eb6d) ) // written directly in machine code
 	ROM_LOAD( "zexall.bin",    0x0100, 0x2189, CRC(b6f869c3) SHA1(14021f75c1bc9f26688969581065a0efff3af59c) )
+ROM_END
+
+ROM_START( zex8085 )
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "interface.bin", 0x0000, 0x0051, CRC(4292a574) SHA1(d3ed6d84e2b64e51598f36b4f290972963e1eb6d) ) // written directly in machine code
+	ROM_LOAD( "zex8085.bin",   0x0100, 0x1200, CRC(3545bdbd) SHA1(4d6a2205881b62fae459ed9d908ecf7479d1d06c) ) // rename this to .com and run under CP/M
 ROM_END
 
 
@@ -185,4 +205,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                         FULLNAME                            FLAGS
-COMP( 2009, zexall, 0,      0,      zexall,  zexall, zexall_state, empty_init, "Frank Cringle / Kevin Horton", "Zexall (FPGA Z80 test interface)", MACHINE_SUPPORTS_SAVE )
+COMP( 2009, zexall,  0,      0,      zexall,  zexall, zexall_state, empty_init, "Frank Cringle / Kevin Horton", "Zexall (FPGA Z80 test interface)", MACHINE_SUPPORTS_SAVE )
+COMP( 2009, zex8085, 0,      0,      zexall,  zexall, zexall_state, empty_init, "Ian Bartholomew / Kevin Horton", "Zexall (i8085)", MACHINE_SUPPORTS_SAVE )
