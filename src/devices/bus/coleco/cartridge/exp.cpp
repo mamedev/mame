@@ -86,10 +86,13 @@ image_init_result colecovision_cartridge_slot_device::call_load()
 		if (!loaded_through_softlist())
 		{
 			fread(m_card->m_rom, size);
+			m_megacart_bankcount = size >> 14;
+			m_megacart_activebank = 0;
 		}
 		else
 		{
 			// TODO 8000/a000/c000/e000
+			m_megacart_bankcount = 0;
 			memcpy(m_card->m_rom, get_software_region("rom"), size);
 		}
 	}
@@ -120,8 +123,28 @@ std::string colecovision_cartridge_slot_device::get_default_card_software(get_de
 
 uint8_t colecovision_cartridge_slot_device::bd_r(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000)
 {
-	if (m_card != nullptr)
+	// offset zero is the start of cartridge space, 0x8000 in CPU space.
+	if (m_card)
 	{
+		if (m_megacart_bankcount > 2)
+		{
+			if (offset >= 0x7FC0)
+			{
+				// Reads within the final 64 bytes select which megacart bank is active.
+				m_megacart_activebank = offset & (m_megacart_bankcount - 1);
+			}
+
+			if (offset >= 0x4000)
+			{
+				// The offset is within the active megacart bank
+				offset = (m_megacart_activebank << 14) + (offset - 0x4000);
+			}
+			else
+			{
+				// The offset is within the last bank.
+				offset = (m_megacart_bankcount << 14) + (offset - 0x4000);
+			}
+		}
 		data = m_card->bd_r(offset, data, _8000, _a000, _c000, _e000);
 	}
 
