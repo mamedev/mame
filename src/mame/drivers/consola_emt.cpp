@@ -42,8 +42,8 @@ public:
 	consoemt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-        m_mcu(*this, "mcu"),
-        m_lcdc(*this, "lcdc")
+		m_mcu(*this, "mcu"),
+		m_lcdc(*this, "lcdc")
 	{ }
 
 	void consoemt(machine_config &config);
@@ -76,6 +76,9 @@ void consoemt_state::mem_map(address_map &map)
 
 void consoemt_state::io_map(address_map &map)
 {
+	map(0x180, 0x18f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x200, 0x200).lr8(NAME([] () { return 0x00; })); // 0x80 here to get "PANIC 80 GBDS" on lcd
+	map(0x280, 0x281).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 }
 
 
@@ -158,11 +161,11 @@ void consoemt_state::consoemt(machine_config &config)
 //**************************************************************************
 
 ROM_START( consoemt )
-    ROM_REGION(0x40000, "maincpu", 0)
-    ROM_LOAD("pupitre_emt_24_04_03_6adc.ic1", 0x00000, 0x40000, CRC(fbafc173) SHA1(c0366a553125d42f18c24faa71467144eae42972))
+	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_LOAD("pupitre_emt_24_04_03_6adc.ic1", 0x00000, 0x40000, CRC(fbafc173) SHA1(c0366a553125d42f18c24faa71467144eae42972))
 
-    ROM_REGION(0x2000, "mcu", 0)
-    ROM_LOAD("v26_7caa_n87c51fa.ic20", 0x0000, 0x2000, CRC(37e6c202) SHA1(7b240ed6474240090c26de11048a40c5870886dd))
+	ROM_REGION(0x2000, "mcu", 0)
+	ROM_LOAD("v26_7caa_n87c51fa.ic20", 0x0000, 0x2000, CRC(37e6c202) SHA1(7b240ed6474240090c26de11048a40c5870886dd))
 ROM_END
 
 
