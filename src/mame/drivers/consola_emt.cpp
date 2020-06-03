@@ -53,10 +53,10 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-    required_device<mcs51_cpu_device> m_mcu;
-    required_device<hd44780_device> m_lcdc;
+	required_device<mcs51_cpu_device> m_mcu;
+	required_device<hd44780_device> m_lcdc;
 
-    void mem_map(address_map &map);
+	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
 	void consoemt_palette(palette_device &palette) const;
@@ -70,8 +70,8 @@ private:
 
 void consoemt_state::mem_map(address_map &map)
 {
-    map(0x00000, 0x7ffff).ram();
-    map(0xc0000, 0xfffff).rom().region("maincpu", 0);
+	map(0x00000, 0x7ffff).ram();
+	map(0xc0000, 0xfffff).rom().region("maincpu", 0);
 }
 
 void consoemt_state::io_map(address_map &map)
@@ -124,17 +124,17 @@ void consoemt_state::machine_start()
 
 void consoemt_state::consoemt(machine_config &config)
 {
-	I80188(config, m_maincpu, 50_MHz_XTAL / 4); // divisor unknown
+	I80188(config, m_maincpu, 50_MHz_XTAL / 2); // N80C188XL25
 	m_maincpu->set_addrmap(AS_PROGRAM, &consoemt_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &consoemt_state::io_map);
 
 	I80C51(config, m_mcu, 11.0592_MHz_XTAL);
 
-    MSM6242(config, "rtc", XTAL(32'768));
+	MSM6242(config, "rtc", XTAL(32'768));
 
-    SCC85230(config, "uart1", 4.9152_MHz_XTAL);
+	SCC85230(config, "uart1", 4.9152_MHz_XTAL);
 
-    SCC85230(config, "uart2", 4.9152_MHz_XTAL);
+	SCC85230(config, "uart2", 4.9152_MHz_XTAL);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -171,4 +171,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY          FULLNAME       FLAGS
-COMP( 1997, consoemt, 0,      0,      consoemt, consoemt, consoemt_state, empty_init, "Indra / Amper", "Consola EMT", MACHINE_IS_SKELETON )
+COMP( 2003, consoemt, 0,      0,      consoemt, consoemt, consoemt_state, empty_init, "Indra / Amper", "Consola EMT", MACHINE_IS_SKELETON )
