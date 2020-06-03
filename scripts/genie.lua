@@ -1021,6 +1021,13 @@ if _OPTIONS["MAP"] then
 	end
 end
 
+-- On Linux targets link libgcc and libstdc++ statically.  See #137
+if _OPTIONS["targetos"]=="linux" then
+		linkoptions {
+			"-static-libgcc -static-libstdc++"
+		}
+end
+
 
 -- add a basic set of warnings
 	buildoptions {
