@@ -587,7 +587,7 @@ protected:
 	virtual void output_strobe(uint8_t bits, uint8_t data) { }
 	virtual void set_outputs() { }
 
-	virtual DECLARE_WRITE8_MEMBER(io_control_w) override;
+	virtual void io_control_w(offs_t offset, uint8_t data) override;
 
 private:
 	uint8_t m_output_data;
@@ -922,7 +922,7 @@ CUSTOM_INPUT_MEMBER(ngarcade_base_state::startsel_edge_joy_r)
 	return ret;
 }
 
-WRITE8_MEMBER(neogeo_base_state::io_control_w)
+void neogeo_base_state::io_control_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 0x38) == 0x00) // TODO: the mask is supposedly less restrictive on AES?
 	{
@@ -936,12 +936,12 @@ WRITE8_MEMBER(neogeo_base_state::io_control_w)
 	}
 }
 
-WRITE8_MEMBER(ngarcade_base_state::io_control_w)
+void ngarcade_base_state::io_control_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x78)
 	{
 	case 0x00:
-		neogeo_base_state::io_control_w(space, offset, data, mem_mask);
+		neogeo_base_state::io_control_w(offset, data);
 		break;
 
 	case 0x28:
@@ -963,7 +963,7 @@ WRITE8_MEMBER(ngarcade_base_state::io_control_w)
 	}
 }
 
-WRITE8_MEMBER(mvs_state::io_control_w)
+void mvs_state::io_control_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x78)
 	{
@@ -984,7 +984,7 @@ WRITE8_MEMBER(mvs_state::io_control_w)
 		break;
 
 	default:
-		ngarcade_base_state::io_control_w(space, offset, data, mem_mask);
+		ngarcade_base_state::io_control_w(offset, data);
 	}
 }
 

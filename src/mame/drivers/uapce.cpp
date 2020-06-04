@@ -134,9 +134,9 @@ public:
 
 private:
 	uint8_t m_jamma_if_control_latch;
-	DECLARE_WRITE8_MEMBER(jamma_if_control_latch_w);
-	DECLARE_READ8_MEMBER(jamma_if_control_latch_r);
-	DECLARE_READ8_MEMBER(jamma_if_read_dsw);
+	void jamma_if_control_latch_w(uint8_t data);
+	uint8_t jamma_if_control_latch_r();
+	uint8_t jamma_if_read_dsw(offs_t offset);
 	virtual uint8_t joy_read() override;
 	virtual void machine_reset() override;
 	required_device<discrete_device> m_discrete;
@@ -156,7 +156,7 @@ static DISCRETE_SOUND_START(uapce_discrete)
 DISCRETE_SOUND_END
 
 
-WRITE8_MEMBER(uapce_state::jamma_if_control_latch_w)
+void uapce_state::jamma_if_control_latch_w(uint8_t data)
 {
 	uint8_t diff = data ^ m_jamma_if_control_latch;
 	m_jamma_if_control_latch = data;
@@ -199,12 +199,12 @@ WRITE8_MEMBER(uapce_state::jamma_if_control_latch_w)
 /* D0 : Not latched. */
 }
 
-READ8_MEMBER(uapce_state::jamma_if_control_latch_r)
+uint8_t uapce_state::jamma_if_control_latch_r()
 {
 	return m_jamma_if_control_latch & 0x08;
 }
 
-READ8_MEMBER(uapce_state::jamma_if_read_dsw)
+uint8_t uapce_state::jamma_if_read_dsw(offs_t offset)
 {
 	uint8_t dsw_val;
 

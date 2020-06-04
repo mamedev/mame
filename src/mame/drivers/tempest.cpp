@@ -323,17 +323,17 @@ public:
 	DECLARE_READ_LINE_MEMBER(clock_r);
 
 protected:
-	DECLARE_WRITE8_MEMBER(wdclr_w);
-	DECLARE_WRITE8_MEMBER(tempest_led_w);
-	DECLARE_WRITE8_MEMBER(tempest_coin_w);
+	void wdclr_w(uint8_t data);
+	void tempest_led_w(uint8_t data);
+	void tempest_coin_w(uint8_t data);
 	uint8_t input_port_1_bit_r(offs_t offset);
 	uint8_t input_port_2_bit_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER(earom_read);
-	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
+	uint8_t earom_read();
+	void earom_write(offs_t offset, uint8_t data);
+	void earom_control_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(rom_ae1f_r);
+	uint8_t rom_ae1f_r();
 
 	virtual void machine_start() override;
 	void main_map(address_map &map);
@@ -369,7 +369,7 @@ void tempest_state::machine_start()
  *
  *************************************/
 
-WRITE8_MEMBER(tempest_state::wdclr_w)
+void tempest_state::wdclr_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_watchdog->watchdog_reset();
@@ -418,7 +418,7 @@ uint8_t tempest_state::input_port_2_bit_r(offs_t offset)
  *
  *************************************/
 
-WRITE8_MEMBER(tempest_state::tempest_led_w)
+void tempest_state::tempest_led_w(uint8_t data)
 {
 	m_leds[0] = BIT(~data, 1);
 	m_leds[1] = BIT(~data, 0);
@@ -427,7 +427,7 @@ WRITE8_MEMBER(tempest_state::tempest_led_w)
 }
 
 
-WRITE8_MEMBER(tempest_state::tempest_coin_w)
+void tempest_state::tempest_coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, (data & 0x01));
 	machine().bookkeeping().coin_counter_w(1, (data & 0x02));
@@ -444,18 +444,18 @@ WRITE8_MEMBER(tempest_state::tempest_coin_w)
  *
  *************************************/
 
-READ8_MEMBER(tempest_state::earom_read)
+uint8_t tempest_state::earom_read()
 {
 	return m_earom->data();
 }
 
-WRITE8_MEMBER(tempest_state::earom_write)
+void tempest_state::earom_write(offs_t offset, uint8_t data)
 {
 	m_earom->set_address(offset & 0x3f);
 	m_earom->set_data(data);
 }
 
-WRITE8_MEMBER(tempest_state::earom_control_w)
+void tempest_state::earom_control_w(uint8_t data)
 {
 	// CK = EDB0, C1 = /EDB2, C2 = EDB1, CS1 = EDB3, /CS2 = GND
 	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
@@ -470,7 +470,7 @@ WRITE8_MEMBER(tempest_state::earom_control_w)
  *
  *************************************/
 
-READ8_MEMBER(tempest_state::rom_ae1f_r)
+uint8_t tempest_state::rom_ae1f_r()
 {
 	// This is needed to ensure that the routine starting at ae1c passes checks and does not corrupt data;
 	// config.m_perfect_cpu_quantum = subtag("maincpu"); would be very taxing on this driver.

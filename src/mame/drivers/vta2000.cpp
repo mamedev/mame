@@ -43,7 +43,7 @@ public:
 
 	void vta2000(machine_config &config);
 private:
-	DECLARE_WRITE8_MEMBER(output_00);
+	void output_00(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 
 	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -59,7 +59,7 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-WRITE8_MEMBER(vta2000_state::output_00)
+void vta2000_state::output_00(uint8_t data)
 {
 	m_mainpit->write_gate0(BIT(data, 4));
 }

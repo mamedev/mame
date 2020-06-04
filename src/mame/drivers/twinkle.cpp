@@ -287,20 +287,19 @@ public:
 private:
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(twinkle_io_w);
-	DECLARE_READ8_MEMBER(twinkle_io_r);
-	DECLARE_WRITE16_MEMBER(twinkle_output_w);
-	DECLARE_WRITE16_MEMBER(led_w);
-	DECLARE_WRITE16_MEMBER(key_led_w);
-	DECLARE_WRITE16_MEMBER(serial_w);
-	DECLARE_WRITE16_MEMBER(twinkle_spu_ctrl_w);
-	DECLARE_WRITE16_MEMBER(spu_ata_dma_low_w);
-	DECLARE_WRITE16_MEMBER(spu_ata_dma_high_w);
-	DECLARE_READ16_MEMBER(twinkle_waveram_r);
-	DECLARE_WRITE16_MEMBER(twinkle_waveram_w);
-	DECLARE_WRITE16_MEMBER(spu_led_w);
-	DECLARE_WRITE16_MEMBER(spu_wavebank_w);
-	DECLARE_READ16_MEMBER(unk_68k_r);
+	void twinkle_io_w(offs_t offset, uint8_t data);
+	uint8_t twinkle_io_r(offs_t offset);
+	void twinkle_output_w(offs_t offset, uint16_t data);
+	void led_w(uint16_t data);
+	void key_led_w(uint16_t data);
+	void serial_w(uint16_t data);
+	void twinkle_spu_ctrl_w(uint16_t data);
+	void spu_ata_dma_low_w(uint16_t data);
+	void spu_ata_dma_high_w(uint16_t data);
+	uint16_t twinkle_waveram_r(offs_t offset);
+	void twinkle_waveram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void spu_led_w(uint16_t data);
+	void spu_wavebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_irq);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_dmarq);
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
@@ -537,7 +536,7 @@ void twinkle_state::machine_start()
 	save_item(NAME(m_output_clock));
 }
 
-WRITE8_MEMBER(twinkle_state::twinkle_io_w)
+void twinkle_state::twinkle_io_w(offs_t offset, uint8_t data)
 {
 	switch( offset )
 	{
@@ -621,7 +620,7 @@ WRITE8_MEMBER(twinkle_state::twinkle_io_w)
 	}
 }
 
-READ8_MEMBER(twinkle_state::twinkle_io_r)
+uint8_t twinkle_state::twinkle_io_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -668,7 +667,7 @@ READ8_MEMBER(twinkle_state::twinkle_io_r)
 	return data;
 }
 
-WRITE16_MEMBER(twinkle_state::twinkle_output_w)
+void twinkle_state::twinkle_output_w(offs_t offset, uint16_t data)
 {
 	switch( offset )
 	{
@@ -726,7 +725,7 @@ WRITE16_MEMBER(twinkle_state::twinkle_output_w)
 	}
 }
 
-WRITE16_MEMBER(twinkle_state::led_w)
+void twinkle_state::led_w(uint16_t data)
 {
 	m_main_leds[0] = BIT(~data, 0);
 	m_main_leds[1] = BIT(~data, 1);
@@ -744,7 +743,7 @@ WRITE16_MEMBER(twinkle_state::led_w)
 	}
 }
 
-WRITE16_MEMBER(twinkle_state::key_led_w)
+void twinkle_state::key_led_w(uint16_t data)
 {
 	// words are written using a byte write
 	m_key_leds[0][0] = BIT(data, 0);
@@ -765,7 +764,7 @@ WRITE16_MEMBER(twinkle_state::key_led_w)
 	output().set_value("unknown4", (data >> 15) & 1);
 }
 
-WRITE16_MEMBER(twinkle_state::serial_w)
+void twinkle_state::serial_w(uint16_t data)
 {
 	int _do = ( data >> 4 ) & 1;
 	int clock = ( data >> 5 ) & 1;
@@ -836,7 +835,7 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_irq)
 
     Other bits unknown.
 */
-WRITE16_MEMBER(twinkle_state::twinkle_spu_ctrl_w)
+void twinkle_state::twinkle_spu_ctrl_w(uint16_t data)
 {
 	if ((!(data & 0x0080)) && (m_spu_ctrl & 0x0080))
 	{
@@ -858,12 +857,12 @@ WRITE16_MEMBER(twinkle_state::twinkle_spu_ctrl_w)
 	m_spu_ctrl = data;
 }
 
-WRITE16_MEMBER(twinkle_state::spu_ata_dma_low_w)
+void twinkle_state::spu_ata_dma_low_w(uint16_t data)
 {
 	m_spu_ata_dma = (m_spu_ata_dma & ~0xffff) | data;
 }
 
-WRITE16_MEMBER(twinkle_state::spu_ata_dma_high_w)
+void twinkle_state::spu_ata_dma_high_w(uint16_t data)
 {
 	m_spu_ata_dma = (m_spu_ata_dma & 0xffff) | ((uint32_t)data << 16);
 	//printf("DMA now %x\n", m_spu_ata_dma);
@@ -894,7 +893,7 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
 	}
 }
 
-WRITE16_MEMBER(twinkle_state::spu_wavebank_w)
+void twinkle_state::spu_wavebank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("%x to wavebank_w, mask %04x\n", data, mem_mask);
 
@@ -906,19 +905,19 @@ WRITE16_MEMBER(twinkle_state::spu_wavebank_w)
 	m_wave_bank = data * (4*1024*1024);
 }
 
-READ16_MEMBER(twinkle_state::twinkle_waveram_r)
+uint16_t twinkle_state::twinkle_waveram_r(offs_t offset)
 {
 	return m_waveram[offset+m_wave_bank];
 }
 
-WRITE16_MEMBER(twinkle_state::twinkle_waveram_w)
+void twinkle_state::twinkle_waveram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_waveram[offset+m_wave_bank]);
 }
 
-WRITE16_MEMBER(twinkle_state::spu_led_w)
+void twinkle_state::spu_led_w(uint16_t data)
 {
-	// upper 8 bits are occassionally written as all zeros
+	// upper 8 bits are occasionally written as all zeros
 	m_spu_leds[0] = BIT(~data, 0);
 	m_spu_leds[1] = BIT(~data, 1);
 	m_spu_leds[2] = BIT(~data, 2);

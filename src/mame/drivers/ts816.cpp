@@ -41,12 +41,12 @@ public:
 
 private:
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(port68_w);
-	DECLARE_WRITE8_MEMBER(port78_w);
-	DECLARE_WRITE8_MEMBER(porte0_w);
-	DECLARE_WRITE8_MEMBER(portf0_w);
+	uint8_t keyin_r();
+	uint8_t status_r();
+	void port68_w(uint8_t data);
+	void port78_w(uint8_t data);
+	void porte0_w(uint8_t data);
+	void portf0_w(uint8_t data);
 
 	void ts816_io(address_map &map);
 	void ts816_mem(address_map &map);
@@ -124,14 +124,14 @@ static INPUT_PORTS_START( ts816 )
 INPUT_PORTS_END
 
 
-READ8_MEMBER( ts816_state::keyin_r )
+uint8_t ts816_state::keyin_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( ts816_state::status_r )
+uint8_t ts816_state::status_r()
 {
 	if (m_status)
 	{
@@ -142,25 +142,25 @@ READ8_MEMBER( ts816_state::status_r )
 		return 4;
 }
 
-WRITE8_MEMBER( ts816_state::port68_w )
+void ts816_state::port68_w(uint8_t data)
 {
 	m_2ndbank = 1;
 	set_banks();
 }
 
-WRITE8_MEMBER( ts816_state::port78_w )
+void ts816_state::port78_w(uint8_t data)
 {
 	m_2ndbank = 0;
 	set_banks();
 }
 
-WRITE8_MEMBER( ts816_state::porte0_w )
+void ts816_state::porte0_w(uint8_t data)
 {
 	m_endram = 1;
 	set_banks();
 }
 
-WRITE8_MEMBER( ts816_state::portf0_w )
+void ts816_state::portf0_w(uint8_t data)
 {
 	m_endram = 0;
 	set_banks();

@@ -248,13 +248,11 @@ private:
 		}
 		return 0;
 	}
-	DECLARE_WRITE16_MEMBER(wheelfir_scanline_cnt_w);
-	DECLARE_WRITE16_MEMBER(wheelfir_blit_w);
-	DECLARE_WRITE16_MEMBER(wheelfir_7c0000_w);
-	DECLARE_READ16_MEMBER(wheelfir_7c0000_r);
-	DECLARE_WRITE16_MEMBER(wheelfir_snd_w);
-	DECLARE_READ16_MEMBER(wheelfir_snd_r);
-	DECLARE_WRITE16_MEMBER(coin_cnt_w);
+	void wheelfir_scanline_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void wheelfir_7c0000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t wheelfir_7c0000_r(offs_t offset, uint16_t mem_mask = ~0);
+	void coin_cnt_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(adc_eoc_w);
 	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_wheelfir);
@@ -266,13 +264,13 @@ private:
 };
 
 
-WRITE16_MEMBER(wheelfir_state::wheelfir_scanline_cnt_w)
+void wheelfir_state::wheelfir_scanline_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scanline_cnt);
 }
 
 
-WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
+void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_blitter_data[offset]);
 
@@ -535,7 +533,7 @@ WRITE_LINE_MEMBER(wheelfir_state::screen_vblank_wheelfir)
 }
 
 
-WRITE16_MEMBER(wheelfir_state::wheelfir_7c0000_w)
+void wheelfir_state::wheelfir_7c0000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -554,7 +552,7 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_7c0000_w)
 	}
 }
 
-READ16_MEMBER(wheelfir_state::wheelfir_7c0000_r)
+uint16_t wheelfir_state::wheelfir_7c0000_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -573,7 +571,7 @@ READ16_MEMBER(wheelfir_state::wheelfir_7c0000_r)
 	return data;
 }
 
-WRITE16_MEMBER(wheelfir_state::coin_cnt_w)
+void wheelfir_state::coin_cnt_w(uint16_t data)
 {
 	/* bits 0/1 coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);

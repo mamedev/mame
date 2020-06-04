@@ -37,11 +37,11 @@ public:
 	void vd(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(ack_r);
-	DECLARE_WRITE8_MEMBER(col_w);
-	DECLARE_WRITE8_MEMBER(disp_w);
-	DECLARE_WRITE8_MEMBER(lamp_w) { };
-	DECLARE_WRITE8_MEMBER(sol_w) { };
+	uint8_t ack_r();
+	void col_w(uint8_t data);
+	void disp_w(offs_t offset, uint8_t data);
+	void lamp_w(uint8_t data) { };
+	void sol_w(uint8_t data) { };
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	void vd_io(address_map &map);
 	void vd_map(address_map &map);
@@ -55,7 +55,7 @@ private:
 };
 
 
-READ8_MEMBER(vd_state::ack_r)
+uint8_t vd_state::ack_r()
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); // guess
 	return 0; // this value is not used
@@ -159,7 +159,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( vd_state::irq )
 		m_t_c++;
 }
 
-WRITE8_MEMBER( vd_state::disp_w )
+void vd_state::disp_w(offs_t offset, uint8_t data)
 {
 	segment[offset] = data;
 #if 0 // probably not how this works
@@ -168,7 +168,7 @@ WRITE8_MEMBER( vd_state::disp_w )
 #endif
 }
 
-WRITE8_MEMBER( vd_state::col_w )
+void vd_state::col_w(uint8_t data)
 {
 	if (data != 0x3f)
 	{

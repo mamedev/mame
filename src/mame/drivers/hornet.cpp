@@ -470,7 +470,7 @@ private:
 	void soundtimer_en_w(uint16_t data);
 	void soundtimer_count_w(uint16_t data);
 	double adc12138_input_callback(uint8_t input);
-	DECLARE_WRITE8_MEMBER(jamma_jvs_w);
+	void jamma_jvs_w(uint8_t data);
 	uint8_t comm_eeprom_r();
 	void comm_eeprom_w(uint8_t data);
 
@@ -1282,7 +1282,7 @@ void hornet_state::sscope2(machine_config &config)
 
 /*****************************************************************************/
 
-WRITE8_MEMBER(hornet_state::jamma_jvs_w)
+void hornet_state::jamma_jvs_w(uint8_t data)
 {
 	if (m_jvs_sdata_ptr == 0 && data != 0xe0)
 		return;
@@ -1425,7 +1425,7 @@ void hornet_state::init_hornet()
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 }
 
 void hornet_state::init_gradius4()
@@ -1452,7 +1452,7 @@ void hornet_state::init_sscope()
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 }
 
 void hornet_state::init_sscope2() //fixme: eventually set sscope2 to load gfx roms from the comm board
@@ -1461,7 +1461,7 @@ void hornet_state::init_sscope2() //fixme: eventually set sscope2 to load gfx ro
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 }
 
 /*****************************************************************************/

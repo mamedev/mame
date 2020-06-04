@@ -140,8 +140,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 
-	DECLARE_READ16_MEMBER(rtc_r);
-	DECLARE_WRITE16_MEMBER(rtc_w);
+	uint16_t rtc_r(offs_t offset);
+	void rtc_w(offs_t offset, uint16_t data);
 
 	void tmaster_map(address_map &map);
 	void cpu_space_map(address_map &map);
@@ -232,7 +232,7 @@ uint8_t binary_to_bcd(uint8_t data)
 	return ((data / 10) << 4) | (data % 10);
 }
 
-READ16_MEMBER(tmaster_state::rtc_r)
+uint16_t tmaster_state::rtc_r(offs_t offset)
 {
 	system_time systime;
 
@@ -248,7 +248,7 @@ READ16_MEMBER(tmaster_state::rtc_r)
 	return m_rtc_ram[offset];
 }
 
-WRITE16_MEMBER(tmaster_state::rtc_w)
+void tmaster_state::rtc_w(offs_t offset, uint16_t data)
 {
 	if ( offset == 0 )
 	{

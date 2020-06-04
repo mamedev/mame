@@ -420,31 +420,25 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(watchdog_reset);
 	DECLARE_WRITE_LINE_MEMBER(watchdog_irq);
-	DECLARE_WRITE32_MEMBER(timekeeper_w);
-	DECLARE_READ32_MEMBER(timekeeper_r);
+	void timekeeper_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t timekeeper_r(offs_t offset, uint32_t mem_mask = ~0);
 	void reset_sio(void);
-	DECLARE_READ8_MEMBER(sio_r);
-	DECLARE_WRITE8_MEMBER(sio_w);
-	DECLARE_WRITE8_MEMBER( cpu_io_w );
-	DECLARE_READ8_MEMBER( cpu_io_r );
-	DECLARE_READ32_MEMBER( analog_port_r );
-	DECLARE_WRITE32_MEMBER( analog_port_w );
-	DECLARE_WRITE32_MEMBER( asic_fifo_w );
-	DECLARE_READ32_MEMBER( ide_main_r );
-	DECLARE_WRITE32_MEMBER( ide_main_w );
-	DECLARE_READ32_MEMBER( ide_alt_r );
-	DECLARE_WRITE32_MEMBER( ide_alt_w );
-	DECLARE_READ32_MEMBER( ide_bus_master32_r );
-	DECLARE_WRITE32_MEMBER( ide_bus_master32_w );
-	DECLARE_READ32_MEMBER( ethernet_r );
-	DECLARE_WRITE32_MEMBER( ethernet_w );
-	DECLARE_WRITE32_MEMBER( dcs3_fifo_full_w );
+	uint8_t sio_r(offs_t offset);
+	void sio_w(offs_t offset, uint8_t data);
+	void cpu_io_w(offs_t offset, uint8_t data);
+	uint8_t cpu_io_r(offs_t offset);
+	uint32_t analog_port_r(offs_t offset, uint32_t mem_mask = ~0);
+	void analog_port_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void asic_fifo_w(uint32_t data);
+	uint32_t ethernet_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ethernet_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void dcs3_fifo_full_w(uint32_t data);
 	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
-	DECLARE_READ32_MEMBER(unknown_r);
-	DECLARE_READ8_MEMBER(parallel_r);
-	DECLARE_WRITE8_MEMBER(parallel_w);
-	DECLARE_WRITE8_MEMBER(mpsreset_w);
+	uint32_t unknown_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint8_t parallel_r(offs_t offset);
+	void parallel_w(offs_t offset, uint8_t data);
+	void mpsreset_w(offs_t offset, uint8_t data);
 	void i40_w(uint32_t data);
 
 	void wheel_board_w(uint32_t data);
@@ -569,7 +563,7 @@ WRITE_LINE_MEMBER(vegas_state::watchdog_reset)
  *
  *************************************/
 
-WRITE32_MEMBER( vegas_state::timekeeper_w )
+void vegas_state::timekeeper_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cmos_unlocked)
 	{
@@ -590,7 +584,7 @@ WRITE32_MEMBER( vegas_state::timekeeper_w )
 }
 
 
-READ32_MEMBER( vegas_state::timekeeper_r )
+uint32_t vegas_state::timekeeper_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0xffffffff;
 	if (ACCESSING_BITS_0_7)
@@ -692,7 +686,7 @@ void vegas_state::reset_sio()
 	update_sio_irqs();
 }
 
-READ8_MEMBER(vegas_state::sio_r)
+uint8_t vegas_state::sio_r(offs_t offset)
 {
 	uint32_t result = 0x0;
 	int index = offset >> 12;
@@ -770,7 +764,7 @@ READ8_MEMBER(vegas_state::sio_r)
 }
 
 
-WRITE8_MEMBER(vegas_state::sio_w)
+void vegas_state::sio_w(offs_t offset, uint8_t data)
 {
 	// Bit 0 of data is used to program the 6016 FPGA in programming mode (m_cpio_data[3](Bit 0)==0)
 	if (m_cpuio_data[3] & 0x1) {
@@ -839,7 +833,7 @@ WRITE8_MEMBER(vegas_state::sio_w)
  *
  *************************************/
 
-WRITE8_MEMBER(vegas_state::cpu_io_w)
+void vegas_state::cpu_io_w(offs_t offset, uint8_t data)
 {
 	// 0: system LED
 	// 1: PLD Config / Clock Gen
@@ -906,7 +900,7 @@ WRITE8_MEMBER(vegas_state::cpu_io_w)
 	}
 }
 
-READ8_MEMBER( vegas_state::cpu_io_r )
+uint8_t vegas_state::cpu_io_r(offs_t offset)
 {
 	uint32_t result = 0;
 	if (offset < 4)
@@ -924,7 +918,7 @@ READ8_MEMBER( vegas_state::cpu_io_r )
  *
  *************************************/
 
-READ32_MEMBER( vegas_state::analog_port_r )
+uint32_t vegas_state::analog_port_r(offs_t offset, uint32_t mem_mask)
 {
 	//logerror("%s: analog_port_r = %08X & %08X\n", machine().describe_context(), m_pending_analog_read, mem_mask);
 	// Clear interrupt
@@ -937,7 +931,7 @@ READ32_MEMBER( vegas_state::analog_port_r )
 }
 
 
-WRITE32_MEMBER( vegas_state::analog_port_w )
+void vegas_state::analog_port_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t shift_data = data >> m_a2d_shift;
 	int index = shift_data & 0x7;
@@ -979,12 +973,12 @@ WRITE32_MEMBER( vegas_state::analog_port_w )
  *
  *************************************/
 
-WRITE32_MEMBER( vegas_state::asic_fifo_w )
+void vegas_state::asic_fifo_w(uint32_t data)
 {
 	m_ioasic->fifo_w(data);
 }
 
-READ32_MEMBER( vegas_state::ethernet_r )
+uint32_t vegas_state::ethernet_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	if (ACCESSING_BITS_0_15)
@@ -996,7 +990,7 @@ READ32_MEMBER( vegas_state::ethernet_r )
 }
 
 
-WRITE32_MEMBER( vegas_state::ethernet_w )
+void vegas_state::ethernet_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		m_ethernet->write(offset * 2 + 0, data, mem_mask);
@@ -1006,12 +1000,12 @@ WRITE32_MEMBER( vegas_state::ethernet_w )
 }
 
 
-WRITE32_MEMBER( vegas_state::dcs3_fifo_full_w )
+void vegas_state::dcs3_fifo_full_w(uint32_t data)
 {
 	m_ioasic->fifo_full_w(data);
 }
 
-READ32_MEMBER(vegas_state::unknown_r)
+uint32_t vegas_state::unknown_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0xffffffff;
 	if (1)
@@ -1022,14 +1016,14 @@ READ32_MEMBER(vegas_state::unknown_r)
 /*************************************
 * Parallel Port
 *************************************/
-READ8_MEMBER(vegas_state::parallel_r)
+uint8_t vegas_state::parallel_r(offs_t offset)
 {
 	uint8_t result = 0x7;
 	logerror("%s: parallel_r %08x = %02x\n", machine().describe_context(), offset, result);
 	return result;
 }
 
-WRITE8_MEMBER(vegas_state::parallel_w)
+void vegas_state::parallel_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: parallel_w %08x = %02x\n", machine().describe_context(), offset, data);
 }
@@ -1037,7 +1031,7 @@ WRITE8_MEMBER(vegas_state::parallel_w)
 /*************************************
 * MPS Reset
 *************************************/
-WRITE8_MEMBER(vegas_state::mpsreset_w)
+void vegas_state::mpsreset_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: mpsreset_w %08x = %02x\n", machine().describe_context(), offset, data);
 }

@@ -86,7 +86,7 @@ private:
 		m_bdmem->write8(offset, data);
 	}
 
-	DECLARE_READ8_MEMBER( io_r )
+	uint8_t io_r(offs_t offset)
 	{
 		m_pio->port_b_write((!BIT(offset, 0)) << 7);
 		if (BIT(offset, 2))
@@ -94,7 +94,7 @@ private:
 		return 0xff;
 	}
 
-	DECLARE_WRITE8_MEMBER( io_w )
+	void io_w(offs_t offset, uint8_t data)
 	{
 		m_pio->port_b_write((!BIT(offset, 0)) << 7);
 		if (BIT(offset, 2))

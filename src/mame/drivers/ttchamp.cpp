@@ -121,23 +121,23 @@ private:
 	uint16_t* m_rom16;
 	uint8_t* m_rom8;
 
-	DECLARE_WRITE16_MEMBER(paloff_w);
-	DECLARE_WRITE16_MEMBER(paldat_w);
+	void paloff_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void paldat_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(port10_w);
+	void port10_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(port20_w);
-	DECLARE_WRITE16_MEMBER(port62_w);
+	void port20_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void port62_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(port1e_r);
+	uint16_t port1e_r();
 
-	DECLARE_READ16_MEMBER(pic_r);
-	DECLARE_WRITE16_MEMBER(pic_w);
+	uint16_t pic_r(offs_t offset, uint16_t mem_mask = ~0);
+	void pic_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(blit_start_r);
+	uint16_t blit_start_r();
 
-	DECLARE_READ16_MEMBER(mem_r);
-	DECLARE_WRITE16_MEMBER(mem_w);
+	uint16_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -271,19 +271,19 @@ uint32_t ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE16_MEMBER(ttchamp_state::paloff_w)
+void ttchamp_state::paloff_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_paloff);
 }
 
 
-WRITE16_MEMBER(ttchamp_state::paldat_w)
+void ttchamp_state::paldat_w(uint16_t data)
 {
 	// 0x8000 of offset is sometimes set
 	m_palette->set_pen_color(m_paloff & 0x3ff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
 
-READ16_MEMBER(ttchamp_state::pic_r)
+uint16_t ttchamp_state::pic_r(offs_t offset, uint16_t mem_mask)
 {
 //  printf("%06x: read from PIC (%04x)\n", m_maincpu->pc(),mem_mask);
 	if (m_picmodex == picmode::SET_READLATCH)
@@ -298,7 +298,7 @@ READ16_MEMBER(ttchamp_state::pic_r)
 
 }
 
-WRITE16_MEMBER(ttchamp_state::pic_w)
+void ttchamp_state::pic_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  printf("%06x: write to PIC %04x (%04x) (%d)\n", m_maincpu->pc(),data,mem_mask, m_picmodex);
 	if (m_picmodex == picmode::IDLE)
@@ -357,7 +357,7 @@ WRITE16_MEMBER(ttchamp_state::pic_w)
 }
 
 
-READ16_MEMBER(ttchamp_state::mem_r)
+uint16_t ttchamp_state::mem_r(offs_t offset)
 {
 	// bits 0xf0 are used too, so this is likely wrong.
 
@@ -389,7 +389,7 @@ READ16_MEMBER(ttchamp_state::mem_r)
 	}
 }
 
-WRITE16_MEMBER(ttchamp_state::mem_w)
+void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// this is very strange, we use the offset (address bits) not data bits to set values..
 	// I get the impression this might actually overlay the entire address range, including RAM and regular VRAM?
@@ -511,20 +511,20 @@ void ttchamp_state::ttchamp_map(address_map &map)
 }
 
 /* Re-use same parameters as before (one-shot) */
-READ16_MEMBER(ttchamp_state::port1e_r)
+uint16_t ttchamp_state::port1e_r()
 {
 	m_spritesinit = 3;
 	return 0xff;
 }
 
-READ16_MEMBER(ttchamp_state::blit_start_r)
+uint16_t ttchamp_state::blit_start_r()
 {
 	m_spritesinit = 1;
 	return 0xff;
 }
 
 /* blitter mode select */
-WRITE16_MEMBER(ttchamp_state::port10_w)
+void ttchamp_state::port10_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	 --xx ---- fill enable
@@ -535,14 +535,14 @@ WRITE16_MEMBER(ttchamp_state::port10_w)
 }
 
 /* selects upper bank for the blitter */
-WRITE16_MEMBER(ttchamp_state::port20_w)
+void ttchamp_state::port20_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("%06x: port20_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 	m_rombank = 1;
 }
 
 /* selects lower bank for the blitter */
-WRITE16_MEMBER(ttchamp_state::port62_w)
+void ttchamp_state::port62_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("%06x: port62_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 	m_rombank = 0;

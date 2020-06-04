@@ -106,7 +106,7 @@ private:
 	optional_shared_ptr<uint16_t> m_mainram, m_extram, m_vram;
 	required_device<icm7170_device> m_rtc;
 
-	DECLARE_READ16_MEMBER(buserr_r)
+	uint16_t buserr_r()
 	{
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);

@@ -77,7 +77,7 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	DECLARE_WRITE8_MEMBER(row_addr_w);
+	void row_addr_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_crtc_reset_w);
 
 	void tv950_mem(address_map &map);
@@ -222,7 +222,7 @@ WRITE_LINE_MEMBER(tv950_state::via_crtc_reset_w)
 	}
 }
 
-WRITE8_MEMBER(tv950_state::row_addr_w)
+void tv950_state::row_addr_w(uint8_t data)
 {
 	m_row_addr = data;
 }

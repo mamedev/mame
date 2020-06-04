@@ -82,7 +82,7 @@ private:
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void trkfldch_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(read_vector);
+	uint8_t read_vector(offs_t offset);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
@@ -90,38 +90,38 @@ private:
 
 	uint8_t tilemap_scroll_window_r(int which, uint8_t reg, uint16_t real_base);
 
-	DECLARE_READ8_MEMBER(tmap0_scroll_window_r);
-	DECLARE_READ8_MEMBER(tmap1_scroll_window_r);
+	uint8_t tmap0_scroll_window_r(offs_t offset);
+	uint8_t tmap1_scroll_window_r(offs_t offset);
 
 	void tilemap_scroll_window_w(int which, uint8_t reg, uint8_t data, uint16_t real_base);
 
-	DECLARE_WRITE8_MEMBER(tmap0_scroll_window_w);
-	DECLARE_WRITE8_MEMBER(tmap1_scroll_window_w);
+	void tmap0_scroll_window_w(offs_t offset, uint8_t data);
+	void tmap1_scroll_window_w(offs_t offset, uint8_t data);
 
 	uint8_t m_dmaregs[0xe];
 
-	DECLARE_READ8_MEMBER(dmaregs_r);
-	DECLARE_WRITE8_MEMBER(dmaregs_w);
+	uint8_t dmaregs_r(offs_t offset);
+	void dmaregs_w(offs_t offset, uint8_t data);
 
 	uint8_t m_modebank[0xb];
 
-	DECLARE_READ8_MEMBER(modebankregs_r);
-	DECLARE_WRITE8_MEMBER(modebankregs_w);
+	uint8_t modebankregs_r(offs_t offset);
+	void modebankregs_w(offs_t offset, uint8_t data);
 
 	uint8_t m_tilemapbase[0x3];
 
-	DECLARE_READ8_MEMBER(tilemapbase_r);
-	DECLARE_WRITE8_MEMBER(tilemapbase_w);
+	uint8_t tilemapbase_r(offs_t offset);
+	void tilemapbase_w(offs_t offset, uint8_t data);
 
 	uint8_t m_sysregs[0x10];
 
-	DECLARE_READ8_MEMBER(sysregs_r);
-	DECLARE_WRITE8_MEMBER(sysregs_w);
+	uint8_t sysregs_r(offs_t offset);
+	void sysregs_w(offs_t offset, uint8_t data);
 
 	uint8_t m_unkregs[0x90];
 
-	DECLARE_READ8_MEMBER(unkregs_r);
-	DECLARE_WRITE8_MEMBER(unkregs_w);
+	uint8_t unkregs_r(offs_t offset);
+	void unkregs_w(offs_t offset, uint8_t data);
 
 	uint8_t m_tmapscroll_window[2][0x12];
 
@@ -426,13 +426,13 @@ uint8_t trkfldch_state::tilemap_scroll_window_r(int which, uint8_t reg, uint16_t
 	return ret;
 }
 
-READ8_MEMBER(trkfldch_state::tmap0_scroll_window_r)
+uint8_t trkfldch_state::tmap0_scroll_window_r(offs_t offset)
 {
 	uint8_t ret = tilemap_scroll_window_r(0, offset, 0x7820);
 	return ret;
 }
 
-READ8_MEMBER(trkfldch_state::tmap1_scroll_window_r)
+uint8_t trkfldch_state::tmap1_scroll_window_r(offs_t offset)
 {
 	uint8_t ret = tilemap_scroll_window_r(1, offset, 0x7832);
 	return ret;
@@ -522,12 +522,12 @@ void trkfldch_state::tilemap_scroll_window_w(int which, uint8_t reg, uint8_t dat
 	}
 }
 
-WRITE8_MEMBER(trkfldch_state::tmap0_scroll_window_w)
+void trkfldch_state::tmap0_scroll_window_w(offs_t offset, uint8_t data)
 {
 	tilemap_scroll_window_w(0, offset, data, 0x7820);
 }
 
-WRITE8_MEMBER(trkfldch_state::tmap1_scroll_window_w)
+void trkfldch_state::tmap1_scroll_window_w(offs_t offset, uint8_t data)
 {
 	tilemap_scroll_window_w(1, offset, data, 0x7832);
 }
@@ -535,7 +535,7 @@ WRITE8_MEMBER(trkfldch_state::tmap1_scroll_window_w)
 
 
 
-READ8_MEMBER(trkfldch_state::dmaregs_r)
+uint8_t trkfldch_state::dmaregs_r(offs_t offset)
 {
 	uint8_t ret = m_dmaregs[offset];
 
@@ -554,7 +554,7 @@ READ8_MEMBER(trkfldch_state::dmaregs_r)
 	return ret;
 }
 
-WRITE8_MEMBER(trkfldch_state::dmaregs_w)
+void trkfldch_state::dmaregs_w(offs_t offset, uint8_t data)
 {
 	m_dmaregs[offset] = data;
 
@@ -669,14 +669,14 @@ WRITE8_MEMBER(trkfldch_state::dmaregs_w)
 }
 
 
-READ8_MEMBER(trkfldch_state::modebankregs_r)
+uint8_t trkfldch_state::modebankregs_r(offs_t offset)
 {
 	uint8_t ret = m_modebank[offset];
 	logerror("%s: modebankregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 	return ret;
 }
 
-WRITE8_MEMBER(trkfldch_state::modebankregs_w)
+void trkfldch_state::modebankregs_w(offs_t offset, uint8_t data)
 {
 	m_modebank[offset] = data;
 
@@ -729,14 +729,14 @@ WRITE8_MEMBER(trkfldch_state::modebankregs_w)
 }
 
 
-READ8_MEMBER(trkfldch_state::tilemapbase_r)
+uint8_t trkfldch_state::tilemapbase_r(offs_t offset)
 {
 	uint8_t ret = m_tilemapbase[offset];
 	logerror("%s: tilemapbase_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 	return ret;
 }
 
-WRITE8_MEMBER(trkfldch_state::tilemapbase_w)
+void trkfldch_state::tilemapbase_w(offs_t offset, uint8_t data)
 {
 	m_tilemapbase[offset] = data;
 	logerror("%s: tilemapbase_w %04x %02x (tilebase %d)\n", machine().describe_context(), offset, data, offset);
@@ -775,11 +775,11 @@ void trkfldch_state::vectors_map(address_map &map)
 	map(0x00, 0x1f).r(FUNC(trkfldch_state::read_vector));
 }
 
-READ8_MEMBER(trkfldch_state::read_vector)
+uint8_t trkfldch_state::read_vector(offs_t offset)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	/* what appears to be a table of vectors apepars at the START of ROM, maybe this gets copied to RAM, maybe used directly?
+	/* what appears to be a table of vectors appears at the START of ROM, maybe this gets copied to RAM, maybe used directly?
 	00 : (invalid)
 	02 : (invalid)
 	04 : 0xA2C6  (dummy)
@@ -1108,7 +1108,7 @@ GFXDECODE_END
 
 */
 
-READ8_MEMBER(trkfldch_state::sysregs_r)
+uint8_t trkfldch_state::sysregs_r(offs_t offset)
 {
 	uint8_t ret = m_sysregs[offset];
 
@@ -1152,7 +1152,7 @@ READ8_MEMBER(trkfldch_state::sysregs_r)
 }
 
 
-WRITE8_MEMBER(trkfldch_state::sysregs_w)
+void trkfldch_state::sysregs_w(offs_t offset, uint8_t data)
 {
 	m_sysregs[offset] = data;
 
@@ -1191,7 +1191,7 @@ WRITE8_MEMBER(trkfldch_state::sysregs_w)
 
 
 
-READ8_MEMBER(trkfldch_state::unkregs_r)
+uint8_t trkfldch_state::unkregs_r(offs_t offset)
 {
 	uint8_t ret = m_unkregs[offset];
 
@@ -1266,7 +1266,7 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 
 
 
-WRITE8_MEMBER(trkfldch_state::unkregs_w)
+void trkfldch_state::unkregs_w(offs_t offset, uint8_t data)
 {
 	m_unkregs[offset] = data;
 

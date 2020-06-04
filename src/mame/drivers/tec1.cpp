@@ -111,11 +111,11 @@ private:
 	required_ioport m_io_shift;
 	required_device<pwm_display_device> m_display;
 
-	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(tec1_digit_w);
-	DECLARE_WRITE8_MEMBER(tecjmon_digit_w);
-	DECLARE_WRITE8_MEMBER(segment_w);
+	uint8_t kbd_r();
+	uint8_t latch_r();
+	void tec1_digit_w(uint8_t data);
+	void tecjmon_digit_w(uint8_t data);
+	void segment_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(da_w);
 	uint8_t m_seg;
 	uint8_t m_digit;
@@ -135,7 +135,7 @@ private:
 
 ***************************************************************************/
 
-WRITE8_MEMBER( tec1_state::segment_w )
+void tec1_state::segment_w(uint8_t data)
 {
 /*  d7 segment d
     d6 segment e
@@ -150,7 +150,7 @@ WRITE8_MEMBER( tec1_state::segment_w )
 	m_display->matrix(m_digit, m_seg);
 }
 
-WRITE8_MEMBER( tec1_state::tec1_digit_w )
+void tec1_state::tec1_digit_w(uint8_t data)
 {
 /*  d7 speaker
     d6 not used
@@ -167,7 +167,7 @@ WRITE8_MEMBER( tec1_state::tec1_digit_w )
 	m_display->matrix(m_digit, m_seg);
 }
 
-WRITE8_MEMBER( tec1_state::tecjmon_digit_w )
+void tec1_state::tecjmon_digit_w(uint8_t data)
 {
 /*  d7 speaker & cassout
     d6 not used
@@ -191,7 +191,7 @@ WRITE8_MEMBER( tec1_state::tecjmon_digit_w )
 
 ***************************************************************************/
 
-READ8_MEMBER( tec1_state::latch_r )
+uint8_t tec1_state::latch_r()
 {
 // bit 7 - cass in ; bit 6 low = key pressed
 	uint8_t data = (m_key_pressed) ? 0 : 0x40;
@@ -203,7 +203,7 @@ READ8_MEMBER( tec1_state::latch_r )
 }
 
 
-READ8_MEMBER( tec1_state::kbd_r )
+uint8_t tec1_state::kbd_r()
 {
 	return m_kb->read() | m_io_shift->read();
 }

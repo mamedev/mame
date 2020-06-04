@@ -146,28 +146,28 @@ private:
 	uint8_t m_row_num;
 	attotime m_input_latch_time;
 
-	DECLARE_READ32_MEMBER(io_r);
-	DECLARE_WRITE32_MEMBER(io_w);
-	DECLARE_READ16_MEMBER(vip_r);
-	DECLARE_WRITE16_MEMBER(vip_w);
-	DECLARE_WRITE16_MEMBER(font0_w);
-	DECLARE_WRITE16_MEMBER(font1_w);
-	DECLARE_WRITE16_MEMBER(font2_w);
-	DECLARE_WRITE16_MEMBER(font3_w);
-	DECLARE_READ16_MEMBER(font0_r);
-	DECLARE_READ16_MEMBER(font1_r);
-	DECLARE_READ16_MEMBER(font2_r);
-	DECLARE_READ16_MEMBER(font3_r);
-	DECLARE_WRITE16_MEMBER(vboy_bgmap_w);
-	DECLARE_READ16_MEMBER(vboy_bgmap_r);
-	DECLARE_READ8_MEMBER(lfb0_r);
-	DECLARE_READ8_MEMBER(lfb1_r);
-	DECLARE_READ8_MEMBER(rfb0_r);
-	DECLARE_READ8_MEMBER(rfb1_r);
-	DECLARE_WRITE8_MEMBER(lfb0_w);
-	DECLARE_WRITE8_MEMBER(lfb1_w);
-	DECLARE_WRITE8_MEMBER(rfb0_w);
-	DECLARE_WRITE8_MEMBER(rfb1_w);
+	uint32_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint32_t data);
+	uint16_t vip_r(offs_t offset);
+	void vip_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void font0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void font1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void font2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void font3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t font0_r(offs_t offset);
+	uint16_t font1_r(offs_t offset);
+	uint16_t font2_r(offs_t offset);
+	uint16_t font3_r(offs_t offset);
+	void vboy_bgmap_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vboy_bgmap_r(offs_t offset);
+	uint8_t lfb0_r(offs_t offset);
+	uint8_t lfb1_r(offs_t offset);
+	uint8_t rfb0_r(offs_t offset);
+	uint8_t rfb1_r(offs_t offset);
+	void lfb0_w(offs_t offset, uint8_t data);
+	void lfb1_w(offs_t offset, uint8_t data);
+	void rfb0_w(offs_t offset, uint8_t data);
+	void rfb1_w(offs_t offset, uint8_t data);
 
 	void m_timer_tick();
 	void m_scanline_tick(int scanline, uint8_t screen_type);
@@ -557,7 +557,7 @@ uint32_t vboy_state::screen_update_vboy_right(screen_device &screen, bitmap_ind1
  *
  *********************************/
 
-READ32_MEMBER( vboy_state::io_r )
+uint32_t vboy_state::io_r(offs_t offset)
 {
 	uint32_t value = 0x00;
 
@@ -602,7 +602,7 @@ READ32_MEMBER( vboy_state::io_r )
 	return value;
 }
 
-WRITE32_MEMBER( vboy_state::io_w )
+void vboy_state::io_w(offs_t offset, uint32_t data)
 {
 	switch (offset<<2)
 	{
@@ -719,7 +719,7 @@ void vboy_state::m_set_brightness()
 	m_palette->set_pen_color(3, c,0,0);
 }
 
-READ16_MEMBER( vboy_state::vip_r )
+uint16_t vboy_state::vip_r(offs_t offset)
 {
 	switch(offset << 1) {
 		case 0x00:  //INTPND
@@ -842,7 +842,7 @@ READ16_MEMBER( vboy_state::vip_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( vboy_state::vip_w )
+void vboy_state::vip_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(mem_mask != 0xffff)
 		printf("%04x %02x\n",mem_mask,offset*2);
@@ -986,64 +986,64 @@ WRITE16_MEMBER( vboy_state::vip_w )
 
 
 
-WRITE16_MEMBER( vboy_state::font0_w )
+void vboy_state::font0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	WRITE_FONT(offset);
 }
 
-WRITE16_MEMBER( vboy_state::font1_w )
+void vboy_state::font1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	WRITE_FONT(offset+0x1000);
 }
 
-WRITE16_MEMBER( vboy_state::font2_w )
+void vboy_state::font2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	WRITE_FONT(offset+0x2000);
 }
 
-WRITE16_MEMBER( vboy_state::font3_w )
+void vboy_state::font3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	WRITE_FONT(offset+0x3000);
 }
 
-READ16_MEMBER( vboy_state::font0_r )
+uint16_t vboy_state::font0_r(offs_t offset)
 {
 	return READ_FONT(offset);
 }
 
-READ16_MEMBER( vboy_state::font1_r )
+uint16_t vboy_state::font1_r(offs_t offset)
 {
 	return READ_FONT(offset + 0x1000);
 }
 
-READ16_MEMBER( vboy_state::font2_r )
+uint16_t vboy_state::font2_r(offs_t offset)
 {
 	return READ_FONT(offset + 0x2000);
 }
 
-READ16_MEMBER( vboy_state::font3_r )
+uint16_t vboy_state::font3_r(offs_t offset)
 {
 	return READ_FONT(offset + 0x3000);
 }
 
-WRITE16_MEMBER( vboy_state::vboy_bgmap_w )
+void vboy_state::vboy_bgmap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_bgmap[offset] = data | (m_bgmap[offset] & (mem_mask ^ 0xffff));
 }
 
-READ16_MEMBER( vboy_state::vboy_bgmap_r )
+uint16_t vboy_state::vboy_bgmap_r(offs_t offset)
 {
 	return m_bgmap[offset];
 }
 
-READ8_MEMBER( vboy_state::lfb0_r ) { return m_l_frame_0[offset]; }
-READ8_MEMBER( vboy_state::lfb1_r ) { return m_l_frame_1[offset]; }
-READ8_MEMBER( vboy_state::rfb0_r ) { return m_r_frame_0[offset]; }
-READ8_MEMBER( vboy_state::rfb1_r ) { return m_r_frame_1[offset]; }
-WRITE8_MEMBER( vboy_state::lfb0_w ) { m_l_frame_0[offset] = data; }
-WRITE8_MEMBER( vboy_state::lfb1_w ) { m_l_frame_1[offset] = data; }
-WRITE8_MEMBER( vboy_state::rfb0_w ) { m_r_frame_0[offset] = data; }
-WRITE8_MEMBER( vboy_state::rfb1_w ) { m_r_frame_1[offset] = data; }
+uint8_t vboy_state::lfb0_r(offs_t offset) { return m_l_frame_0[offset]; }
+uint8_t vboy_state::lfb1_r(offs_t offset) { return m_l_frame_1[offset]; }
+uint8_t vboy_state::rfb0_r(offs_t offset) { return m_r_frame_0[offset]; }
+uint8_t vboy_state::rfb1_r(offs_t offset) { return m_r_frame_1[offset]; }
+void vboy_state::lfb0_w(offs_t offset, uint8_t data) { m_l_frame_0[offset] = data; }
+void vboy_state::lfb1_w(offs_t offset, uint8_t data) { m_l_frame_1[offset] = data; }
+void vboy_state::rfb0_w(offs_t offset, uint8_t data) { m_r_frame_0[offset] = data; }
+void vboy_state::rfb1_w(offs_t offset, uint8_t data) { m_r_frame_1[offset] = data; }
 
 
 void vboy_state::vboy_mem(address_map &map)

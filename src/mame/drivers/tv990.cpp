@@ -83,10 +83,10 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(tvi1111_r);
-	DECLARE_WRITE16_MEMBER(tvi1111_w);
-	DECLARE_READ8_MEMBER(kbdc_r);
-	DECLARE_WRITE8_MEMBER(kbdc_w);
+	uint16_t tvi1111_r(offs_t offset);
+	void tvi1111_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t kbdc_r(offs_t offset);
+	void kbdc_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(uart0_irq);
 	DECLARE_WRITE_LINE_MEMBER(uart1_irq);
@@ -142,7 +142,7 @@ WRITE_LINE_MEMBER(tv990_state::lpt_irq)
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }
 
-READ16_MEMBER(tv990_state::tvi1111_r)
+uint16_t tv990_state::tvi1111_r(offs_t offset)
 {
 	if (offset == (0x32/2))
 	{
@@ -156,7 +156,7 @@ READ16_MEMBER(tv990_state::tvi1111_r)
 	return tvi1111_regs[offset];
 }
 
-WRITE16_MEMBER(tv990_state::tvi1111_w)
+void tv990_state::tvi1111_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #if 0
 	//if ((offset != 0x50) && (offset != 0x68) && (offset != 0x1d) && (offset != 0x1e) && (offset != 0x17) && (offset != 0x1c))
@@ -300,7 +300,7 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-READ8_MEMBER(tv990_state::kbdc_r)
+uint8_t tv990_state::kbdc_r(offs_t offset)
 {
 	if(offset)
 		return m_kbdc->data_r(4);
@@ -308,7 +308,7 @@ READ8_MEMBER(tv990_state::kbdc_r)
 		return m_kbdc->data_r(0);
 }
 
-WRITE8_MEMBER(tv990_state::kbdc_w)
+void tv990_state::kbdc_w(offs_t offset, uint8_t data)
 {
 	if(offset)
 		m_kbdc->data_w(4, data);

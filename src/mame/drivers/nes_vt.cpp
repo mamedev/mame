@@ -67,8 +67,8 @@ protected:
 
 	required_region_ptr<uint8_t> m_prgrom;
 
-	DECLARE_READ8_MEMBER(vt_rom_r);
-	DECLARE_WRITE8_MEMBER(vtspace_w);
+	uint8_t vt_rom_r(offs_t offset);
+	void vtspace_w(offs_t offset, uint8_t data);
 
 	void configure_soc(nes_vt_soc_device* soc);
 
@@ -123,7 +123,7 @@ public:
 protected:
 	required_device<nes_vt_soc_device> m_soc;
 
-	DECLARE_WRITE8_MEMBER(vt03_8000_mapper_w) { m_soc->vt03_8000_mapper_w(space, offset, data); }
+	void vt03_8000_mapper_w(offs_t offset, uint8_t data) { m_soc->vt03_8000_mapper_w(offset, data); }
 };
 
 
@@ -242,7 +242,7 @@ private:
 
 	void bittboy_412c_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt_rom_banked_r);
+	uint8_t vt_rom_banked_r(offs_t offset);
 };
 
 class nes_vt_cy_lexibook_state : public nes_vt_cy_state
@@ -284,7 +284,7 @@ public:
 protected:
 
 private:
-	READ8_MEMBER(vt_rom_banked_r);
+	uint8_t vt_rom_banked_r(offs_t offset);
 	void vt_external_space_map_fapocket_4x16mbyte(address_map& map);
 
 	void nes_vt_dg_map(address_map& map);
@@ -338,7 +338,7 @@ public:
 	void nes_vt_fp_pal_32mb(machine_config& config);
 
 private:
-	DECLARE_READ8_MEMBER(vt_rom_banked_r);
+	uint8_t vt_rom_banked_r(offs_t offset);
 	void vt_external_space_map_fp_2x32mbyte(address_map& map);
 
 	void nes_vt_fp_map(address_map& map);
@@ -400,12 +400,12 @@ public:
 	void nes_vt_vg_1mb_majgnc(machine_config& config);
 };
 
-READ8_MEMBER(nes_vt_base_state::vt_rom_r)
+uint8_t nes_vt_base_state::vt_rom_r(offs_t offset)
 {
 	return m_prgrom[offset];
 }
 
-WRITE8_MEMBER(nes_vt_base_state::vtspace_w)
+void nes_vt_base_state::vtspace_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: vtspace_w %08x : %02x", machine().describe_context(), offset, data);
 }
@@ -455,7 +455,7 @@ void nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte(address_m
 }
 
 // bitboy is 2 16Mbyte banks
-READ8_MEMBER(nes_vt_cy_state::vt_rom_banked_r)
+uint8_t nes_vt_cy_state::vt_rom_banked_r(offs_t offset)
 {
 	return m_prgrom[m_ahigh | offset];
 }
@@ -466,7 +466,7 @@ void nes_vt_cy_state::vt_external_space_map_bitboy_2x16mbyte(address_map &map)
 }
 
 // fapocket is 4 16Mbyte banks
-READ8_MEMBER(nes_vt_dg_state::vt_rom_banked_r)
+uint8_t nes_vt_dg_state::vt_rom_banked_r(offs_t offset)
 {
 	return m_prgrom[m_ahigh | offset];
 }
@@ -476,7 +476,7 @@ void nes_vt_dg_state::vt_external_space_map_fapocket_4x16mbyte(address_map &map)
 	map(0x0000000, 0x0ffffff).mirror(0x1000000).rw(FUNC(nes_vt_dg_state::vt_rom_banked_r), FUNC(nes_vt_dg_state::vt03_8000_mapper_w));
 }
 
-READ8_MEMBER(nes_vt_hh_state::vt_rom_banked_r)
+uint8_t nes_vt_hh_state::vt_rom_banked_r(offs_t offset)
 {
 	return m_prgrom[m_ahigh | offset];
 }

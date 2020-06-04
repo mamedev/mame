@@ -83,9 +83,9 @@ private:
 	required_region_ptr<uint8_t> m_bootscreen_rom;
 	required_memory_bank m_bank1;
 	optional_device<palette_device> m_palette;
-	DECLARE_WRITE32_MEMBER(pnp_config_w);
-	DECLARE_WRITE32_MEMBER(pnp_data_w);
-	DECLARE_WRITE32_MEMBER(bios_ram_w);
+	void pnp_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void pnp_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 #if !TAITOWLF_ENABLE_VGA
 	void taitowlf_palette(palette_device &palette) const;
@@ -261,7 +261,7 @@ void taitowlf_state::intel82371ab_pci_w(int function, int reg, uint32_t data, ui
 }
 
 // ISA Plug-n-Play
-WRITE32_MEMBER(taitowlf_state::pnp_config_w)
+void taitowlf_state::pnp_config_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -269,7 +269,7 @@ WRITE32_MEMBER(taitowlf_state::pnp_config_w)
 	}
 }
 
-WRITE32_MEMBER(taitowlf_state::pnp_data_w)
+void taitowlf_state::pnp_data_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -279,7 +279,7 @@ WRITE32_MEMBER(taitowlf_state::pnp_data_w)
 
 
 
-WRITE32_MEMBER(taitowlf_state::bios_ram_w)
+void taitowlf_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{

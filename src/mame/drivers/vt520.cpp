@@ -29,7 +29,7 @@ public:
 	void vt420(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(vt520_some_r);
+	uint8_t vt520_some_r();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -51,7 +51,7 @@ void vt520_state::vt520_mem(address_map &map)
     there is 43.320MHz xtal near by
 */
 
-READ8_MEMBER( vt520_state::vt520_some_r )
+uint8_t vt520_state::vt520_some_r()
 {
 	//bit 5 0
 	//bit 6 1

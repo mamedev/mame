@@ -589,8 +589,8 @@ protected:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	uint16_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(GDC_vblank_irq);
 
 	void rainbowz80_io(address_map &map);
@@ -2839,7 +2839,7 @@ WRITE_LINE_MEMBER(rainbow_modelb_state::irq_hi_w)
 // NOTE: "More than one plane at a time can be enabled for a write operation; however,
 //        only one plane can be enabled for a read operation at anyone time."
 
-READ16_MEMBER(rainbow_base_state::vram_r)
+uint16_t rainbow_base_state::vram_r(offs_t offset)
 {
 	if ((!(m_gdc_mode_register & GDC_MODE_VECTOR)) || machine().side_effects_disabled())  // (NOT VECTOR MODE)
 	{
@@ -2860,7 +2860,7 @@ READ16_MEMBER(rainbow_base_state::vram_r)
 }
 
 // NOTE: Rainbow has separate registers for fore and background.
-WRITE16_MEMBER(rainbow_base_state::vram_w)
+void rainbow_base_state::vram_w(offs_t offset, uint16_t data)
 {
 	if (m_gdc_mode_register & GDC_MODE_HIGHRES)
 		offset = (m_gdc_scroll_buffer[(offset & 0x3FC0) >> 6] << 6) | (offset & 0x3F);

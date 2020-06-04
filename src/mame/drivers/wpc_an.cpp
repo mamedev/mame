@@ -55,8 +55,8 @@ private:
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
 	DECLARE_WRITE_LINE_MEMBER(wpc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(wpc_firq_w);
@@ -288,12 +288,12 @@ void wpc_an_state::wpc_sound_s11_w(uint8_t data)
 	}
 }
 
-READ8_MEMBER(wpc_an_state::ram_r)
+uint8_t wpc_an_state::ram_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER(wpc_an_state::ram_w)
+void wpc_an_state::ram_w(offs_t offset, uint8_t data)
 {
 	if((!m_wpc->memprotect_active()) || ((offset & m_wpc->get_memprotect_mask()) != m_wpc->get_memprotect_mask()))
 		m_ram[offset] = data;

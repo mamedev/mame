@@ -86,7 +86,7 @@ protected:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual DECLARE_WRITE8_MEMBER(io_control_w);
+	virtual void io_control_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE8_MEMBER(audio_command_w);
 	DECLARE_WRITE_LINE_MEMBER(set_use_cart_vectors);
 	DECLARE_WRITE_LINE_MEMBER(set_use_cart_audio);
@@ -227,7 +227,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual DECLARE_WRITE8_MEMBER(io_control_w) override;
+	virtual void io_control_w(offs_t offset, uint8_t data) override;
 	DECLARE_WRITE_LINE_MEMBER(set_save_ram_unlock);
 	DECLARE_WRITE16_MEMBER(save_ram_w);
 	DECLARE_READ16_MEMBER(in0_edge_r);
