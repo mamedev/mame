@@ -36,7 +36,7 @@ public:
 	void set_alt_extrasprite(int alt_extrasprite_hack) { m_alt_extrasprite_hack = alt_extrasprite_hack; }
 
 
-	void set_video_spacees(address_space& cpuspace, address_space& cs_space, int csbase) { m_cpuspace = &cpuspace; m_cs_space = &cs_space; m_csbase = csbase; }
+	void set_video_spaces(address_space& cpuspace, address_space& cs_space, int csbase) { m_cpuspace = &cpuspace; m_cs_space = &cs_space; m_csbase = csbase; }
 
 	//void set_pal_sprites(int pal_sprites) { m_pal_sprites = pal_sprites; }
 	//void set_pal_back(int pal_back) { m_pal_back = pal_back; }

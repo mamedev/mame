@@ -320,7 +320,7 @@ void gcm394_base_video_device::device_reset()
 	m_page3_addr_lsb = 0;
 	m_page3_addr_msb = 0;
 
-	m_renderer->set_video_spacees(m_cpuspace, m_cs_space, m_csbase);
+	m_renderer->set_video_spaces(m_cpuspace, m_cs_space, m_csbase);
 }
 
 uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
