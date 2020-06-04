@@ -36,6 +36,9 @@ public:
 	uint16_t get_video_reg_3c(void) { return m_video_regs_3c; }
 	uint16_t get_video_reg_42(void) { return m_video_regs_42; }
 
+	// used by some hack logic for the gpl16250 rendering for now
+	void set_video_reg_7f(uint16_t val) { m_video_regs_7f = val; }
+	uint16_t get_video_reg_7f(void) { return m_video_regs_7f; }
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	void set_video_spacees(address_space* cpuspace, address_space* cs_space, int csbase) { m_cpuspace = cpuspace; m_cs_space = cs_space; m_csbase = csbase; }
@@ -86,6 +89,8 @@ private:
 
 	uint16_t m_video_regs_30;
 	uint16_t m_video_regs_3c;
+
+	uint16_t m_video_regs_7f;
 
 	uint32_t m_ycmp_table[480];
 

@@ -43,6 +43,8 @@ void spg_renderer_device::device_start()
 
 	save_item(NAME(m_video_regs_42));
 
+	save_item(NAME(m_video_regs_7f));
+
 	save_item(NAME(m_ycmp_table));
 }
 
@@ -58,6 +60,8 @@ void spg_renderer_device::device_reset()
 	m_video_regs_3c = 0x0020;
 
 	m_video_regs_42 = 0x0001;
+
+	m_video_regs_7f = 0x0000;
 
 	for (int i = 0; i < 480; i++)
 	{

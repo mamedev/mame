@@ -817,7 +817,7 @@ READ16_MEMBER(gcm394_base_video_device::video_707c_r)
 
 READ16_MEMBER(gcm394_base_video_device::video_707f_r)
 {
-	uint16_t retdata = m_707f;
+	uint16_t retdata = m_renderer->get_video_reg_7f();
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_r (returning %04x)\n", machine().describe_context(), retdata);
 	return retdata;
 }
@@ -843,7 +843,7 @@ WRITE16_MEMBER(gcm394_base_video_device::video_707f_w)
 	}
 
 	m_707f = data;
-
+	m_renderer->set_video_reg_7f(data);
 	//popmessage("707f is %04x\n", data);
 }
 
