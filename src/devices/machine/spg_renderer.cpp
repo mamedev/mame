@@ -146,74 +146,151 @@ void spg_renderer_device::draw_tilestrip(bool usespacecallback, uint32_t screenw
 }
 
 
-void spg_renderer_device::draw_linemap(const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space &spc, uint16_t* paletteram)
+void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space &spc, uint16_t* paletteram)
 {
 	if ((scanline < 0) || (scanline >= 240))
 		return;
 
-
-	uint32_t tilemap = tilemapregs[2];
-	uint32_t palette_map = tilemapregs[3];
-
-	//printf("draw bitmap bases %04x %04x\n", tilemap, palette_map);
-
-	//uint32_t xscroll = scrollregs[0];
-	uint32_t yscroll = scrollregs[1];
-
-	int realline = (scanline + yscroll) & 0xff;
-
-
-	uint32_t tile = spc.read_word(tilemap + realline);
-	uint16_t palette = 0;
-
-	//if (!tile)
-	//  continue;
-
-	palette = spc.read_word(palette_map + realline / 2);
-	if (scanline & 1)
-		palette >>= 8;
-	else
-		palette &= 0x00ff;
-
-	//const int linewidth = 320 / 2;
-	int sourcebase = tile | (palette << 16);
-
-	uint32_t ctrl = tilemapregs[1];
-
-	if (ctrl & 0x80) // HiColor mode (rad_digi)
+	if (has_extended_tilemaps)
 	{
-		for (int i = 0; i < 320; i++)
+		/*
+		if (0)
 		{
-			const uint16_t data = spc.read_word(sourcebase + i);
+			if (ctrl_reg & 0x0010)
+				popmessage("bitmap mode %08x with rowscroll\n", bitmap_addr);
+			else
+				popmessage("bitmap mode %08x\n", bitmap_addr);
+		}
 
-			if (!(data & 0x8000))
+		// note, in interlace modes it appears every other line is unused? (480 entry table, but with blank values)
+		// and furthermore the rowscroll and rowzoom tables only have 240 entries, not enough for every line
+		// the end of the rowscroll table (entries 240-255) contain something else, maybe garbage data as it's offscreen, maybe not
+
+		uint32_t linebase = space.read_word(tilemap + scanline); // every other word is unused, but there are only enough entries for 240 lines then, sometimes to do with interlace mode?
+		uint16_t palette = space.read_word(palette_map + (scanline / 2));
+
+		if (scanline & 1)
+			palette >>= 8;
+		else
+			palette &= 0xff;
+
+		if (!linebase)
+			return;
+
+		linebase = linebase | (palette << 16);
+
+		// this logic works for jak_s500 and the test modes to get the correct base, doesn't seem to work for jak_car2 ingame, maybe data is copied to wrong place?
+		int gfxbase = (bitmap_addr&0x7ffffff) + (linebase&0x7ffffff);
+
+		for (int i = 0; i < 160; i++) // will have to be 320 for jak_car2 ingame, jak_s500 lines are wider than screen, and zoomed
+		{
+			uint16_t pix = m_space_read_cb((gfxbase++)&0x7ffffff);
+			int xx;
+			int y_index = scanline * m_screen->width();
+			uint16_t pal;
+
+			if ((scanline >= 0) && (scanline < 480))
 			{
-				dst[i] = m_rgb555_to_rgb888[data & 0x7fff];
+				xx = i * 2;
+
+				pal = (pix & 0xff) | 0x100;
+
+				if (xx >= 0 && xx <= cliprect.max_x)
+				{
+					int pix_index = xx + y_index;
+
+					uint16_t rgb = m_paletteram[pal];
+
+					if (!(rgb & 0x8000))
+					{
+						m_screenbuf[pix_index] = m_rgb555_to_rgb888[rgb];
+					}
+				}
+
+				xx = (i * 2)+1;
+				pal = (pix >> 8) + 0x100;
+
+				if (xx >= 0 && xx <= cliprect.max_x)
+				{
+					int pix_index = xx + y_index;
+
+					uint16_t rgb = m_paletteram[pal];
+
+					if (!(rgb & 0x8000))
+					{
+						m_screenbuf[pix_index] = m_rgb555_to_rgb888[rgb];
+					}
+				}
 			}
 		}
+		*/
 	}
-	else
+	else // code used for spg2xx cases
 	{
-		for (int i = 0; i < 320 / 2; i++)
+
+		uint32_t tilemap = tilemapregs[2];
+		uint32_t palette_map = tilemapregs[3];
+
+		popmessage("draw draw_linemap bases %04x %04x\n", tilemap, palette_map);
+
+		//uint32_t xscroll = scrollregs[0];
+		uint32_t yscroll = scrollregs[1];
+
+		int realline = (scanline + yscroll) & 0xff;
+
+
+		uint32_t tile = spc.read_word(tilemap + realline);
+		uint16_t palette = 0;
+
+		//if (!tile)
+		//  continue;
+
+		palette = spc.read_word(palette_map + realline / 2);
+		if (scanline & 1)
+			palette >>= 8;
+		else
+			palette &= 0x00ff;
+
+		//const int linewidth = 320 / 2;
+		int sourcebase = tile | (palette << 16);
+
+		uint32_t ctrl = tilemapregs[1];
+
+		if (ctrl & 0x80) // HiColor mode (rad_digi)
 		{
-			uint8_t palette_entry;
-			uint16_t color;
-			const uint16_t data = spc.read_word(sourcebase + i);
-
-			palette_entry = (data & 0x00ff);
-			color = paletteram[palette_entry];
-
-			if (!(color & 0x8000))
+			for (int i = 0; i < 320; i++)
 			{
-				dst[(i * 2) + 0] = m_rgb555_to_rgb888[color & 0x7fff];
+				const uint16_t data = spc.read_word(sourcebase + i);
+
+				if (!(data & 0x8000))
+				{
+					dst[i] = m_rgb555_to_rgb888[data & 0x7fff];
+				}
 			}
-
-			palette_entry = (data & 0xff00) >> 8;
-			color = paletteram[palette_entry];
-
-			if (!(color & 0x8000))
+		}
+		else
+		{
+			for (int i = 0; i < 320 / 2; i++)
 			{
-				dst[(i * 2) + 1] = m_rgb555_to_rgb888[color & 0x7fff];
+				uint8_t palette_entry;
+				uint16_t color;
+				const uint16_t data = spc.read_word(sourcebase + i);
+
+				palette_entry = (data & 0x00ff);
+				color = paletteram[palette_entry];
+
+				if (!(color & 0x8000))
+				{
+					dst[(i * 2) + 0] = m_rgb555_to_rgb888[color & 0x7fff];
+				}
+
+				palette_entry = (data & 0xff00) >> 8;
+				color = paletteram[palette_entry];
+
+				if (!(color & 0x8000))
+				{
+					dst[(i * 2) + 1] = m_rgb555_to_rgb888[color & 0x7fff];
+				}
 			}
 		}
 	}
@@ -287,7 +364,7 @@ void spg_renderer_device::draw_tilestrip(bool usespacecallback, uint32_t screenw
 	}
 }
 
-void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_tilemaps, bool use_alt_tile_addressing, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram, uint32_t which)
+void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_tilemaps, bool use_alt_tile_addressing, uint32_t palbank, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram, uint32_t which)
 {
 	const uint32_t attr = tilemapregs[0];
 	const uint32_t ctrl = tilemapregs[1];
@@ -304,7 +381,7 @@ void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_til
 
 	if (ctrl & 0x0001) // Bitmap / Linemap mode! (basically screen width tile mode)
 	{
-		draw_linemap(cliprect, dst, scanline, priority, tilegfxdata_addr, scrollregs, tilemapregs, spc, paletteram);
+		draw_linemap(has_extended_tilemaps, cliprect, dst, scanline, priority, tilegfxdata_addr, scrollregs, tilemapregs, spc, paletteram);
 		return;
 	}
 
@@ -389,58 +466,97 @@ void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_til
 		uint32_t tile;
 		uint32_t palette_offset;
 
+		// get tile info
+		const int realx0 = (x0 + upperscrollbits) & (tile_count_x - 1);
+		uint32_t tile_address = realx0 + (tile_count_x * y0);
+
+		tile = (ctrl & 0x0004) ? spc.read_word(tilemap_rambase) : spc.read_word(tilemap_rambase + tile_address);
+
+		if (!tile)
+			continue;
+
+		uint32_t tileattr = attr;
+		uint32_t tilectrl = ctrl;
+
+		if (has_extended_tilemaps && use_alt_tile_addressing)
 		{
-			const int realx0 = (x0 + upperscrollbits) & (tile_count_x - 1);
-			uint32_t tile_address = realx0 + (tile_count_x * y0);
+			// in this mode what would be the 'palette' bits get used for extra tile bits (even if the usual 'extended table' mode is disabled?)
+			// used by smartfp
+			uint16_t exattribute = (ctrl & 0x0004) ? spc.read_word(exattributemap_rambase) : spc.read_word(exattributemap_rambase + tile_address / 2);
+			if (realx0 & 1)
+				exattribute >>= 8;
+			else
+				exattribute &= 0x00ff;
 
-			tile = (ctrl & 0x0004) ? spc.read_word(tilemap_rambase) : spc.read_word(tilemap_rambase + tile_address);
+			tile |= (exattribute & 0x07) << 16;
+		}
+		else if ((ctrl & 2) == 0)
+		{   // -(1) bld(1) flip(2) pal(4)
 
-			if (!tile)
-				continue;
-
-			uint32_t tileattr = attr;
-			uint32_t tilectrl = ctrl;
-
-			if (has_extended_tilemaps && use_alt_tile_addressing)
-			{
-				// in this mode what would be the 'palette' bits get used for extra tile bits (even if the usual 'extended table' mode is disabled?)
-				// used by smartfp
-				uint16_t exattribute = (ctrl & 0x0004) ? spc.read_word(exattributemap_rambase) : spc.read_word(exattributemap_rambase + tile_address / 2);
-				if (realx0 & 1)
-					exattribute >>= 8;
-				else
-					exattribute &= 0x00ff;
-
-				tile |= (exattribute & 0x07) << 16;
-			}
-			else if ((ctrl & 2) == 0)
-			{   // -(1) bld(1) flip(2) pal(4)
-
-				uint16_t exattribute = (ctrl & 0x0004) ? spc.read_word(exattributemap_rambase) : spc.read_word(exattributemap_rambase + tile_address / 2);
-				if (realx0 & 1)
-					exattribute >>= 8;
-				else
-					exattribute &= 0x00ff;
+			uint16_t exattribute = (ctrl & 0x0004) ? spc.read_word(exattributemap_rambase) : spc.read_word(exattributemap_rambase + tile_address / 2);
+			if (realx0 & 1)
+				exattribute >>= 8;
+			else
+				exattribute &= 0x00ff;
 
 
-				tileattr &= ~0x000c;
-				tileattr |= (exattribute >> 2) & 0x000c;    // flip
+			tileattr &= ~0x000c;
+			tileattr |= (exattribute >> 2) & 0x000c;    // flip
 
-				tileattr &= ~0x0f00;
-				tileattr |= (exattribute << 8) & 0x0f00;    // palette
+			tileattr &= ~0x0f00;
+			tileattr |= (exattribute << 8) & 0x0f00;    // palette
 
-				tilectrl &= ~0x0100;
-				tilectrl |= (exattribute << 2) & 0x0100;    // blend
-			}
-
-			blend = ((tileattr & 0x4000 || tilectrl & 0x0100)) ? BlendOn : BlendOff;
-			flip_x = (tileattr & 0x0004) ? FlipXOn : FlipXOff;
-			flip_y = (tileattr & 0x0008);
-
-			palette_offset = (tileattr & 0x0f00) >> 4;
+			tilectrl &= ~0x0100;
+			tilectrl |= (exattribute << 2) & 0x0100;    // blend
 		}
 
-		//palette_offset |= 0x100;
+		blend = ((tileattr & 0x4000 || tilectrl & 0x0100)) ? BlendOn : BlendOff;
+		flip_x = (tileattr & 0x0004) ? FlipXOn : FlipXOff;
+		flip_y = (tileattr & 0x0008);
+
+		palette_offset = (tileattr & 0x0f00) >> 4;
+		// got tile info
+
+		if (1)
+		{
+			// HACKS
+			// There must be a select bit for the tilemap palettes somewhere, but where?!
+			// the different games in paccon also expect a variety of different configs here, maybe a good place to look
+			if (palbank & 1) // this actually seems to be the sprite palette bank enable, but for myac220 / tkmag220 (where everything is from a single palette) it gives us an easy way to ignore the logic below
+			{
+				if (which == 0) // tilemap 0
+				{
+					if (ctrl & 0x0002)  // RegSet:1
+					{
+						// smartfp has a conflict between the bootlogos and the first screen, it's in regset mode, no obvious difference in registers but needs palette from different places?
+						// not even m_video_regs_7f changes here, which makes the m_video_regs_7f case specific hacks for jak_s500 below very unlikely to actually be related
+						if ((bpp + 1) * 2 == 4)
+							if (use_alt_tile_addressing == true)
+								palette_offset |= 0x200;
+					}
+				}
+
+				if (which == 1)
+				{
+					// can't do this for jak_s500 logos
+					// jak_s500 also uses this tilemap in both 4 and 6bpp modes expecting the same palette base, so the hack used for smartfp on tilemap 0 is not applicable here
+
+					// m_video_regs_7f != 0x2d3 for jak_S500 main menu
+					if ((m_video_regs_7f != 0x53) && (m_video_regs_7f != 0x63) && (m_video_regs_7f != 0x2d3))
+						palette_offset |= 0x200;
+				}
+
+				// jak_car2 screen transitions use layers 2 and 3 the same way, alternating each frame
+				if (which == 2)
+				{
+					// jak_s500 title screen + loading screen before race
+					if ((m_video_regs_7f == 0x2d3) || (m_video_regs_7f == 0x2db))
+						palette_offset |= 0x200;
+				}
+
+			}
+		}
+
 
 		palette_offset >>= nc_bpp;
 		palette_offset <<= nc_bpp;

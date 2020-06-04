@@ -118,8 +118,8 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(false, false, false, cliprect, dst, scanline, i, page1_addr, page1_scroll, page1_regs, mem, m_paletteram, m_scrollram, 0);
-			m_renderer->draw_page(false, false, false, cliprect, dst, scanline, i, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram, 1);
+			m_renderer->draw_page(false, false, false, 0, cliprect, dst, scanline, i, page1_addr, page1_scroll, page1_regs, mem, m_paletteram, m_scrollram, 0);
+			m_renderer->draw_page(false, false, false, 0, cliprect, dst, scanline, i, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram, 1);
 			m_renderer->draw_sprites(false, false, false, 0, false, cliprect, dst, scanline, i, sprite_addr, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
 		}
 
