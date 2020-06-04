@@ -4488,6 +4488,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/gs6809.cpp",
 	MAME_DIR .. "src/mame/drivers/gscpm.cpp",
 	MAME_DIR .. "src/mame/drivers/gsz80.cpp",
+	MAME_DIR .. "src/mame/drivers/ultim809.cpp",
 }
 
 end
