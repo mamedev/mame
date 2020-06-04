@@ -6470,11 +6470,11 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="ink">
-		<description>Ink</description>
+		<description>Ink - Exxon Surfing</description>
 		<year>2006</year>
 		<publisher>Matra</publisher>
-		<info name="alt_title" value="Ink - Exxon Surfing" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ink" />
 			<dataarea name="rom" size="524288">
 				<!-- Am29F040B flashrom dump -->
 				<rom name="ink.bin" size="524288" crc="23049642" sha1="4d74d3bad55a9b1deb88b81bd4ad5165383508d5" offset="0" />
