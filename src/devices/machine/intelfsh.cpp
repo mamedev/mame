@@ -623,7 +623,7 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 		{
 			// used in Fujitsu 29DL16X 8bits mode
 			// used in AMD 29LV200 8bits mode
-			switch (address)
+			switch (address & 0xff)
 			{
 				case 0: data = m_maker_id; break;
 				case 2: data = m_device_id; break;
@@ -632,7 +632,7 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 		}
 		else
 		{
-			switch (address)
+			switch (address & 0xff)
 			{
 				case 0: data = m_maker_id; break;
 				case 1: data = m_device_id; break;
@@ -643,7 +643,7 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 	case FM_READID:
 		if (m_maker_id == MFG_INTEL && m_device_id == 0x16)
 		{
-			switch (address)
+			switch (address & 0xff)
 			{
 				case 0: data = m_maker_id; break;
 				case 2: data = m_device_id; break;
@@ -652,7 +652,7 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 		}
 		else
 		{
-			switch (address)
+			switch (address & 0xff)
 			{
 			case 0: // maker ID
 				data = m_maker_id;
