@@ -348,7 +348,7 @@ void beehive_state::beehive(machine_config &config)
 	m_usart[1]->dtr_handler().set(m_rs232[1], FUNC(rs232_port_device::write_dtr));
 	m_usart[1]->rts_handler().set(m_rs232[1], FUNC(rs232_port_device::write_rts));
 
-	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
+	RS232_PORT(config, m_rs232[1], default_rs232_devices, nullptr);
 	m_rs232[1]->rxd_handler().set(m_usart[1], FUNC(i8251_device::write_rxd));
 	m_rs232[1]->dsr_handler().set(m_usart[1], FUNC(i8251_device::write_dsr));
 	m_rs232[1]->cts_handler().set(m_usart[1], FUNC(i8251_device::write_cts));
