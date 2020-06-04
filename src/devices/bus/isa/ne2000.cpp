@@ -42,15 +42,13 @@ void ne2000_device::device_reset() {
 READ16_MEMBER(ne2000_device::ne2000_port_r) {
 	offset <<= 1;
 	if(offset < 16) {
-		m_dp8390->dp8390_cs(CLEAR_LINE);
-		return m_dp8390->dp8390_r(offset) |
-				m_dp8390->dp8390_r(offset+1) << 8;
+		return m_dp8390->cs_read(offset) |
+				m_dp8390->cs_read(offset+1) << 8;
 	}
 	if(mem_mask == 0xff00) offset++;
 	switch(offset) {
 	case 16:
-		m_dp8390->dp8390_cs(ASSERT_LINE);
-		return m_dp8390->dp8390_r(offset);
+		return m_dp8390->remote_read();
 	case 31:
 		m_dp8390->dp8390_reset(CLEAR_LINE);
 		return 0;
@@ -63,20 +61,18 @@ READ16_MEMBER(ne2000_device::ne2000_port_r) {
 WRITE16_MEMBER(ne2000_device::ne2000_port_w) {
 	offset <<= 1;
 	if(offset < 16) {
-		m_dp8390->dp8390_cs(CLEAR_LINE);
 		if(mem_mask == 0xff00) {
 			data >>= 8;
 			offset++;
 		}
-		m_dp8390->dp8390_w(offset, data & 0xff);
-		if(mem_mask == 0xffff) m_dp8390->dp8390_w(offset+1, data>>8);
+		m_dp8390->cs_write(offset, data & 0xff);
+		if(mem_mask == 0xffff) m_dp8390->cs_write(offset+1, data>>8);
 		return;
 	}
 	if(mem_mask == 0xff00) offset++;
 	switch(offset) {
 	case 16:
-		m_dp8390->dp8390_cs(ASSERT_LINE);
-		m_dp8390->dp8390_w(offset, data);
+		m_dp8390->remote_write(data);
 		return;
 	case 31:
 		m_dp8390->dp8390_reset(ASSERT_LINE);

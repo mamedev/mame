@@ -124,7 +124,6 @@ void nubus_mac8390_device::device_start()
 void nubus_mac8390_device::device_reset()
 {
 	m_dp83902->dp8390_reset(0);
-	m_dp83902->dp8390_cs(0);
 	memcpy(m_prom, m_dp83902->get_mac(), 6);
 }
 
@@ -145,13 +144,11 @@ WRITE32_MEMBER( nubus_mac8390_device::en_w )
 	if (mem_mask == 0xff000000)
 	{
 //        printf("%02x to 8390 @ %x\n", data>>24, 0xf-offset);
-		m_dp83902->dp8390_w(0xf-offset, data>>24);
+		m_dp83902->cs_write(0xf-offset, data>>24);
 	}
 	else if (mem_mask == 0xffff0000)
 	{
-		m_dp83902->dp8390_cs(1);
-		m_dp83902->dp8390_w(0xf-offset, data>>16);
-		m_dp83902->dp8390_cs(0);
+		m_dp83902->remote_write(data>>16);
 	}
 	else
 	{
@@ -163,13 +160,11 @@ READ32_MEMBER( nubus_mac8390_device::en_r )
 {
 	if (mem_mask == 0xff000000)
 	{
-		return (m_dp83902->dp8390_r(0xf-offset)<<24);
+		return (m_dp83902->cs_read(0xf-offset)<<24);
 	}
 	else if (mem_mask == 0xffff0000)
 	{
-		m_dp83902->dp8390_cs(1);
-		return (m_dp83902->dp8390_r(0xf-offset)<<16);
-		m_dp83902->dp8390_cs(0);
+		return (m_dp83902->remote_read()<<16);
 	}
 	else
 	{
