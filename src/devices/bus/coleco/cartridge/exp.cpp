@@ -131,7 +131,7 @@ uint8_t colecovision_cartridge_slot_device::bd_r(offs_t offset, uint8_t data, in
 		data = m_card->bd_r(offset , data, _8000, _a000, _c000, _e000);
 
 	return data;
-	}
+}
 
 
 //-------------------------------------------------

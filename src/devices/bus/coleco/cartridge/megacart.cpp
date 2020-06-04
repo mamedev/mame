@@ -42,6 +42,8 @@ colecovision_megacart_cartridge_device::colecovision_megacart_cartridge_device(c
 
 void colecovision_megacart_cartridge_device::device_start()
 {
+	save_item(NAME(m_bankcount));
+	save_item(NAME(m_activebank));
 }
 
 

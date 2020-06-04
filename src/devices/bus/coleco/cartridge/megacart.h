@@ -37,8 +37,8 @@ protected:
 	virtual uint8_t bd_r(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000) override;
 
 private:
-	size_t m_bankcount;
-	size_t m_activebank;
+	uint32_t m_bankcount;
+	uint32_t m_activebank;
 };
 
 

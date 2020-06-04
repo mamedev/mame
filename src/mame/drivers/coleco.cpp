@@ -740,6 +740,3 @@ CONS( 1986, czz50,    0,      coleco, czz50,    czz50,  coleco_state, empty_init
 CONS( 1988, dina,     czz50,  0,      dina,     czz50,  coleco_state, empty_init, "Telegames",        "Dina",                             0 )
 CONS( 1988, prsarcde, czz50,  0,      czz50,    czz50,  coleco_state, empty_init, "Telegames",        "Personal Arcade",                  0 )
 COMP( 1983, bit90,    0,      coleco, bit90,    bit90,  bit90_state,  empty_init, "Bit Corporation",  "Bit90",                            0 )
-
-
-
