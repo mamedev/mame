@@ -201,7 +201,7 @@ ioport_constructor isa16_sad8852_device::device_input_ports() const
 //-------------------------------------------------
 void isa16_sad8852_device::device_add_mconfig(machine_config &config)
 {
-	i80188_cpu_device &cpu(I80188(config, I80188_TAG, XTAL(12'000'000) / 2)); // Chip revision is 6 MHz
+	i80188_cpu_device &cpu(I80188(config, I80188_TAG, XTAL(12'000'000))); // Chip revision is 6 MHz
 	cpu.set_addrmap(AS_PROGRAM, &isa16_sad8852_device::sad8852_mem);
 	cpu.set_addrmap(AS_IO, &isa16_sad8852_device::sad8852_io);
 

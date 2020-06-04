@@ -242,7 +242,7 @@ void consoemt_state::machine_start()
 
 void consoemt_state::consoemt(machine_config &config)
 {
-	I80188(config, m_maincpu, 50_MHz_XTAL / 2); // N80C188XL25
+	I80188(config, m_maincpu, 50_MHz_XTAL); // N80C188XL25
 	m_maincpu->set_addrmap(AS_PROGRAM, &consoemt_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &consoemt_state::io_map);
 
