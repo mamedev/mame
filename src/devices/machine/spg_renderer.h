@@ -16,14 +16,13 @@ public:
 
 
 	void draw_sprites(bool usespacecallback, bool has_extended_sprites, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space& spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit);
-	void draw_page(bool usespacecallback, bool has_extended_tilemaps, bool use_alt_tile_addressing, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram);
+	void draw_page(bool usespacecallback, bool has_extended_tilemaps, bool use_alt_tile_addressing, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram, uint32_t which);
 
 	void apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline);
 
 	void set_video_reg_1c(uint16_t val) { m_video_regs_1c = val; update_vcmp_table(); }
 	void set_video_reg_1d(uint16_t val) { m_video_regs_1d = val; update_vcmp_table(); }
 	void set_video_reg_1e(uint16_t val) { m_video_regs_1e = val; update_vcmp_table(); }
-	void set_video_reg_22(uint16_t val) { m_video_regs_22 = val; }
 	void set_video_reg_2a(uint16_t val) { m_video_regs_2a = val; }
 	void set_video_reg_30(uint16_t val) { m_video_regs_30 = val; }
 	void set_video_reg_3c(uint16_t val) { m_video_regs_3c = val; }
@@ -32,7 +31,6 @@ public:
 	uint16_t get_video_reg_1c(void) { return m_video_regs_1c; }
 	uint16_t get_video_reg_1d(void) { return m_video_regs_1d; }
 	uint16_t get_video_reg_1e(void) { return m_video_regs_1e; }
-	uint16_t get_video_reg_22(void) { return m_video_regs_22; }
 	uint16_t get_video_reg_2a(void) { return m_video_regs_2a; }
 	uint16_t get_video_reg_30(void) { return m_video_regs_30; }
 	uint16_t get_video_reg_3c(void) { return m_video_regs_3c; }
@@ -84,7 +82,6 @@ private:
 	uint16_t m_video_regs_1e;
 
 	uint16_t m_video_regs_2a;
-	uint16_t m_video_regs_22;
 	uint16_t m_video_regs_42;
 
 	uint16_t m_video_regs_30;

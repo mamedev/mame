@@ -36,7 +36,6 @@ void spg_renderer_device::device_start()
 	save_item(NAME(m_video_regs_1d));
 	save_item(NAME(m_video_regs_1e));
 
-	save_item(NAME(m_video_regs_22));
 	save_item(NAME(m_video_regs_2a));
 
 	save_item(NAME(m_video_regs_30));
@@ -53,7 +52,6 @@ void spg_renderer_device::device_reset()
 	m_video_regs_1d = 0x0000;
 	m_video_regs_1e = 0x0000;
 
-	m_video_regs_22 = 0x0000;
 	m_video_regs_2a = 0x0000;
 	
 	m_video_regs_30 = 0x0000;
@@ -285,7 +283,7 @@ void spg_renderer_device::draw_tilestrip(bool usespacecallback, uint32_t screenw
 	}
 }
 
-void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_tilemaps, bool use_alt_tile_addressing, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram)
+void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_tilemaps, bool use_alt_tile_addressing, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram, uint32_t which)
 {
 	const uint32_t attr = tilemapregs[0];
 	const uint32_t ctrl = tilemapregs[1];

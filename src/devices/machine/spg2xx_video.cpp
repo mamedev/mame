@@ -118,8 +118,8 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(false, false, false, cliprect, dst, scanline, i, page1_addr, page1_scroll, page1_regs, mem, m_paletteram, m_scrollram);
-			m_renderer->draw_page(false, false, false, cliprect, dst, scanline, i, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram);
+			m_renderer->draw_page(false, false, false, cliprect, dst, scanline, i, page1_addr, page1_scroll, page1_regs, mem, m_paletteram, m_scrollram, 0);
+			m_renderer->draw_page(false, false, false, cliprect, dst, scanline, i, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram, 1);
 			m_renderer->draw_sprites(false, false, 0, false, cliprect, dst, scanline, i, sprite_addr, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
 		}
 
@@ -179,7 +179,7 @@ READ16_MEMBER(spg2xx_video_device::video_r)
 
 	case 0x22: // Sprite Segment Address
 		LOGMASKED(LOG_PPU_READS, "video_r: Sprite Segment Address\n");
-		return m_renderer->get_video_reg_22();
+		return m_video_regs[offset];
 
 	case 0x2a: // Blend Level Control
 		LOGMASKED(LOG_PPU_READS, "video_r: Blend Level Control\n");
@@ -336,7 +336,6 @@ WRITE16_MEMBER(spg2xx_video_device::video_w)
 	case 0x22: // Sprite Segment Address
 		LOGMASKED(LOG_PPU_WRITES, "video_w: Sprite Segment Address = %04x\n", data);
 		m_video_regs[offset] = data;
-		m_renderer->set_video_reg_22(data);
 		break;
 
 	case 0x2a: // Blend Level Control
