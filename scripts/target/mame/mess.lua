@@ -109,6 +109,7 @@ CPUS["SUPERFX"] = true
 CPUS["Z8"] = true
 CPUS["I8008"] = true
 CPUS["SCMP"] = true
+CPUS["MN1880"] = true
 --CPUS["MN10200"] = true
 CPUS["COSMAC"] = true
 CPUS["UNSP"] = true
@@ -1256,6 +1257,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"nokia",
 		"northstar",
 		"novag",
+		"novation",
 		"olivetti",
 		"olympia",
 		"omnibyte",
@@ -3077,6 +3079,12 @@ files {
 	MAME_DIR .. "src/mame/drivers/novag_savant.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_sexpert.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_supremo.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "novation")
+files {
+	MAME_DIR .. "src/mame/drivers/basssta.cpp",
+	MAME_DIR .. "src/mame/drivers/drumsta.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "olivetti")

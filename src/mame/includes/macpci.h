@@ -145,6 +145,7 @@ private:
 
 	void init_pippin();
 	void pippin_mem(address_map &map);
+	void cdmcu_mem(address_map &map);
 	// wait states for accessing the VIA
 	int m_via_cycles;
 

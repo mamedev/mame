@@ -3214,6 +3214,10 @@ barbball                        // (proto)          (c) 1983
 basic31                         //
 basic52                         //
 
+@source:basssta.cpp
+bassstr                         //
+sbasssta                        //
+
 @source:batman.cpp
 batman                          // 136085           (c) 1991
 
@@ -12362,6 +12366,9 @@ drmicro                         // (c) 1983 Sanritsu
 
 @source:drtomy.cpp
 drtomy                          // (c) 1993 no copyright message (1993 on pcb), some code taken from 'Big Karnak'
+
+@source:drumsta.cpp
+drumsta                         //
 
 @source:drw80pkr.cpp
 drw80pk2                        // (c) 1983 IGT

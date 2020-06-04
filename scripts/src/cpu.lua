@@ -2063,6 +2063,23 @@ if (CPUS["RSP"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- Panasonic MN1880
+--@src/devices/cpu/mn1800/mn1880.h,CPUS["MN1880"] = true
+--------------------------------------------------
+
+if (CPUS["MN1880"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/mn1880/mn1880.cpp",
+		MAME_DIR .. "src/devices/cpu/mn1880/mn1880.h",
+	}
+end
+
+if (CPUS["MN1880"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1880/mn1880d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1880/mn1880d.h")
+end
+
+--------------------------------------------------
 -- Panasonic MN10200
 --@src/devices/cpu/mn10200/mn10200.h,CPUS["MN10200"] = true
 --------------------------------------------------

@@ -103,6 +103,7 @@ babbage.cpp
 banctec.cpp
 bandai_design_master.cpp
 basic52.cpp
+basssta.cpp
 bbc.cpp
 bbcbc.cpp
 bbl380.cpp
@@ -232,6 +233,7 @@ dolphunk.cpp
 dpb7000.cpp
 dps1.cpp
 dragon.cpp
+drumsta.cpp
 dsb46.cpp
 dual68.cpp
 duet16.cpp
