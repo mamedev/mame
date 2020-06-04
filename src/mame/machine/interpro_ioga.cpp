@@ -139,6 +139,8 @@ interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device
 	, m_out_irq_vector_func(*this)
 	, m_fdc_tc_func(*this)
 	, m_eth_ca_func(*this)
+	, m_force_state(0)
+	, m_softint(0)
 	, m_dma_channel{
 		{ 0,0,0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_PLOT, DMA_PLOTTER, "plotter" },
 		{ 0,0,0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_SCSI, DMA_SCSI, "scsi" },
@@ -163,6 +165,7 @@ turquoise_ioga_device::turquoise_ioga_device(const machine_config &mconfig, cons
 sapphire_ioga_device::sapphire_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: interpro_ioga_device(mconfig, SAPPHIRE_IOGA, tag, owner, clock)
 {
+	std::fill(std::begin(m_swicr), std::end(m_swicr), 0);
 }
 
 void interpro_ioga_device::device_start()

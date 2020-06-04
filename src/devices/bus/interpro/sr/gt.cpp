@@ -506,6 +506,7 @@ gt_device_base::gt_device_base(const machine_config &mconfig, device_type type, 
 	, m_vram(*this, "vram%u", 0)
 	, m_mram(*this, "mram%u", 0)
 	, m_bpu(*this, "bpu%u", 0)
+	, m_control(0)
 	, m_double_buffered(double_buffered)
 	, m_masked_reads(masked_reads)
 {
