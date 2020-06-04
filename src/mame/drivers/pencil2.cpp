@@ -305,6 +305,11 @@ INPUT_PORTS_END
 
 void pencil2_state::machine_start()
 {
+
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_ack));
+	save_item(NAME(m_cass_state));
+
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 }
@@ -349,11 +354,11 @@ void pencil2_state::pencil2(machine_config &config)
 
 /* ROM definition */
 ROM_START( pencil2 )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD( "mt.u4", 0x0000, 0x2000, CRC(338d7b59) SHA1(2f89985ac06971e00210ff992bf1e30a296d10e7) )
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME     FLAGS
-COMP( 1983, pencil2, 0,      0,      pencil2, pencil2, pencil2_state, empty_init, "Hanimex", "Pencil II", 0 )
+COMP( 1983, pencil2, 0,      0,      pencil2, pencil2, pencil2_state, empty_init, "Hanimex", "Pencil II", MACHINE_SUPPORTS_SAVE )

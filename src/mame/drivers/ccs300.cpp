@@ -175,4 +175,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY                        FULLNAME         FLAGS */
-COMP( 19??, ccs300, ccs2810, 0,      ccs300,  ccs300, ccs300_state, empty_init, "California Computer Systems", "CCS Model 300", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, ccs300, ccs2810, 0,      ccs300,  ccs300, ccs300_state, empty_init, "California Computer Systems", "CCS Model 300", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
