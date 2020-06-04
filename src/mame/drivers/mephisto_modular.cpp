@@ -479,6 +479,11 @@ void mmodular_state::gen32(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
+// sinus table lookup ROM for Mephisto Bavaria chessboard (unused on MAME)
+#define BAVARIA_BOARD_ROM() \
+	ROM_REGION( 0x8000, "bavaria", 0 ) \
+	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+
 ROM_START( alm32 ) // U012 D21A 2FCE
 	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD("alm32.bin", 0x00000, 0x20000, CRC(38f4b305) SHA1(43459a057ff29248c74d656a036ac325202b9c15) )
@@ -490,20 +495,25 @@ ROM_START( alm16 ) // U013 65CE 2FCE
 	ROM_LOAD16_BYTE("almeria_16bit_v013_odd",  0x00001, 0x10000, CRC(d0be4ee4) SHA1(d36c074802d2c9099cd44e75f9de3fc7d1fd9908) )
 ROM_END
 
-ROM_START( port32 ) // V103 C734 1CD7
+ROM_START( port32 ) // V104 3F63 1CD7
+	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD("portorose_32bit_v104", 0x00000, 0x20000, CRC(66a6c84c) SHA1(b71035f91a452901e1765e351fb36c3f18888e42) )
+
+	BAVARIA_BOARD_ROM()
+ROM_END
+
+ROM_START( port32a ) // V103 C734 1CD7
 	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD("portorose_32bit_v103", 0x00000, 0x20000, CRC(02c091b3) SHA1(f1d48e73b24093288dbb8a06617bb62420c07508) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD( "sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
-ROM_START( port32a ) // V101 7805 1CD7
+ROM_START( port32b ) // V101 7805 1CD7
 	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD("portorose_32bit_v101", 0x00000, 0x20000, CRC(405bd668) SHA1(8c6eacff7f6784fa1d38344d594c7e52ac828a23) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( port16 ) // V101 630D 1CD7
@@ -511,16 +521,14 @@ ROM_START( port16 ) // V101 630D 1CD7
 	ROM_LOAD16_BYTE("port16ev.bin", 0x00000, 0x10000, CRC(68e4a37d) SHA1(33e7216db664174a8448e455bba97738a29c0f31) )
 	ROM_LOAD16_BYTE("port16od.bin", 0x00001, 0x10000, CRC(cae77a05) SHA1(9a0ca8bb37325698f8d208f64a340690b9a933b5) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( lyon32 ) // V207 AE64 5805
 	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD("lyon32.bin", 0x00000, 0x20000, CRC(5c128b06) SHA1(954c8f0d3fae29900cb1e9c14a41a9a07a8e185f) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( lyon16 ) // V207 EC82 5805
@@ -528,16 +536,14 @@ ROM_START( lyon16 ) // V207 EC82 5805
 	ROM_LOAD16_BYTE("lyon_16bit_even_v207", 0x00000, 0x10000, CRC(497bd41a) SHA1(3ffefeeac694f49997c10d248ec6a7aa932898a4) )
 	ROM_LOAD16_BYTE("lyon_16bit_odd_v207",  0x00001, 0x10000, CRC(f9de3f54) SHA1(4060e29566d2f40122ccde3c1f84c94a9c1ed54f) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( van32 ) // V309 3FD3 18D3
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("vanc32.bin", 0x00000, 0x40000, CRC(f872beb5) SHA1(9919f207264f74e2b634b723b048ae9ca2cefbc7) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( van16 ) // V309 C8F3 18D3
@@ -545,40 +551,35 @@ ROM_START( van16 ) // V309 C8F3 18D3
 	ROM_LOAD16_BYTE("vancouver_16_even_v309", 0x00000, 0x20000, CRC(e87602d5) SHA1(90cb2767b4ae9e1b265951eb2569b9956b9f7f44) )
 	ROM_LOAD16_BYTE("vancouver_16_odd_v309",  0x00001, 0x20000, CRC(585f3bdd) SHA1(90bb94a12d3153a91e3760020e1ea2a9eaa7ec0a) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( gen32 ) // V401 D1BB 5A88
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("genius_68030_version_4.01", 0x00000, 0x40000, CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( gen32a ) // V400 3B95 5A88
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("gen32_4.bin",  0x00000, 0x40000, CRC(6cc4da88) SHA1(ea72acf9c67ed17c6ac8de56a165784aa629c4a1) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( gen32l ) // V500 EDC1 B0D1
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("gen32l.bin", 0x00000, 0x40000, CRC(853baa4e) SHA1(946951081d4e91e5bdd9e93d0769568a7fe79bad) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( lond32 ) // V500 DF8B B0D1
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("london_program_68020_module", 0x00000, 0x40000, CRC(3225b8da) SHA1(fd8f6f4e9c03b6cdc86d8405e856c26041bfad12) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( lond16 ) // V500 5ED1 B0D1
@@ -586,8 +587,7 @@ ROM_START( lond16 ) // V500 5ED1 B0D1
 	ROM_LOAD16_BYTE("london_program_68000_module_even", 0x00000, 0x20000, CRC(68cfc2de) SHA1(93b551180f01f8ed6991c082795cd9ead922179a) )
 	ROM_LOAD16_BYTE("london_program_68000_module_odd",  0x00001, 0x20000, CRC(2d75e2cf) SHA1(2ec9222c95f4be9667fb3b4be1b6f90fd4ad11c4) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 } // anonymous namespace
@@ -602,8 +602,9 @@ ROM_END
 CONS( 1988, alm32,   0,      0, alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1988, alm16,   alm32,  0, alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, port32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port32a, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32a, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32b, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, port16,  port32, 0, port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1990, lyon32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )

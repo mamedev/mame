@@ -22264,6 +22264,7 @@ alm32                           // 1988 Mephisto Almeria 32 Bit
 port16                          // 1989 Mephisto Portorose 16 Bit
 port32                          // 1989 Mephisto Portorose 32 Bit
 port32a                         // 1989 Mephisto Portorose 32 Bit
+port32b                         // 1989 Mephisto Portorose 32 Bit
 lyon16                          // 1990 Mephisto Lyon 16 Bit
 lyon32                          // 1990 Mephisto Lyon 32 Bit
 van16                           // 1991 Mephisto Vancouver 16 Bit
