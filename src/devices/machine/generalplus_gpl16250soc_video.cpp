@@ -939,7 +939,8 @@ void gcm394_base_video_device::update_raster_split_position()
 	LOGMASKED(LOG_GCM394_VIDEO, "update_raster_split_position: %04x,%04x\n", m_yirqpos, m_xirqpos);
 	if (m_xirqpos < 300 && m_yirqpos < 256)
 	{
-		m_screenpos_timer->adjust(m_screen->time_until_pos(m_yirqpos-16, m_xirqpos));
+		// where does -19 come from? needed for raster on paccon xevious to fire at correct line for bg scrolling to be seamless
+		m_screenpos_timer->adjust(m_screen->time_until_pos(m_yirqpos-19, m_xirqpos));
 		//printf("setting irq timer for y:%d x:%d", m_yirqpos, m_xirqpos);
 	}
 	else
@@ -1136,7 +1137,7 @@ void gcm394_base_video_device::device_timer(emu_timer &timer, device_timer_id id
 			m_screen->update_partial(m_screen->vpos());
 
 			// fire again, jak_dbz pinball needs this
-			m_screenpos_timer->adjust(m_screen->time_until_pos(m_yirqpos-16, m_xirqpos));
+			m_screenpos_timer->adjust(m_screen->time_until_pos(m_yirqpos-19, m_xirqpos));
 			break;
 		}
 	}
