@@ -3,6 +3,10 @@
 // Peripheral code from rmnimbus driver by Phill Harvey-Smith which is
 // based on the Leland sound driver by Aaron Giles and Paul Leaman
 
+// Note: the X1 input (typically an XTAL) is divided by 2 internally.
+// The device clock should therefore be twice the desired operating
+// frequency (and twice the speed rating suffixed to the part number).
+
 #include "emu.h"
 #include "i186.h"
 #include "debugger.h"

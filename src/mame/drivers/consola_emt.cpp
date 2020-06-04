@@ -246,7 +246,7 @@ void consoemt_state::consoemt(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &consoemt_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &consoemt_state::io_map);
 
-	I80C51(config, m_mcu, 11.0592_MHz_XTAL);
+	I87C51FA(config, m_mcu, 11.0592_MHz_XTAL);
 
 	MSM6242(config, "rtc", XTAL(32'768));
 

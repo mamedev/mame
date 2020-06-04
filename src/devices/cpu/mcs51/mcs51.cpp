@@ -238,6 +238,7 @@ DEFINE_DEVICE_TYPE(I87C51, i87c51_device, "i87c51", "Intel 87C51")
 DEFINE_DEVICE_TYPE(I80C32, i80c32_device, "i80c32", "Intel 80C32")
 DEFINE_DEVICE_TYPE(I80C52, i80c52_device, "i80c52", "Intel 80C52")
 DEFINE_DEVICE_TYPE(I87C52, i87c52_device, "i87c52", "Intel 87C52")
+DEFINE_DEVICE_TYPE(I87C51FA, i87c51fa_device, "i87c51fa", "Intel 87C51FA")
 DEFINE_DEVICE_TYPE(I80C51GB, i80c51gb_device, "i80c51gb", "Intel 80C51GB")
 DEFINE_DEVICE_TYPE(AT89C52, at89c52_device, "at89c52", "Atmel AT89C52")
 DEFINE_DEVICE_TYPE(AT89S52, at89s52_device, "at89s52", "Atmel AT89S52")
@@ -375,8 +376,18 @@ i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+i87c51fa_device::i87c51fa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
+	: i80c52_device(mconfig, type, tag, owner, clock, program_width, data_width, features)
+{
+}
+
+i87c51fa_device::i87c51fa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i87c51fa_device(mconfig, I87C51FA, tag, owner, clock, 13, 8)
+{
+}
+
 i80c51gb_device::i80c51gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i80c52_device(mconfig, I80C51GB, tag, owner, clock, 0, 8)
+	: i87c51fa_device(mconfig, I80C51GB, tag, owner, clock, 0, 8)
 {
 }
 
@@ -2524,6 +2535,11 @@ std::unique_ptr<util::disasm_interface> i80c51_device::create_disassembler()
 std::unique_ptr<util::disasm_interface> i80c52_device::create_disassembler()
 {
 	return std::make_unique<i80c52_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> i87c51fa_device::create_disassembler()
+{
+	return std::make_unique<i8xc51fx_disassembler>();
 }
 
 std::unique_ptr<util::disasm_interface> i80c51gb_device::create_disassembler()

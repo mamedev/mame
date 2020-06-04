@@ -338,6 +338,7 @@ DECLARE_DEVICE_TYPE(I87C51, i87c51_device)
 DECLARE_DEVICE_TYPE(I80C32, i80c32_device)
 DECLARE_DEVICE_TYPE(I80C52, i80c52_device)
 DECLARE_DEVICE_TYPE(I87C52, i87c52_device)
+DECLARE_DEVICE_TYPE(I87C51FA, i87c51fa_device)
 DECLARE_DEVICE_TYPE(I80C51GB, i80c51gb_device)
 DECLARE_DEVICE_TYPE(AT89C52, at89c52_device)
 DECLARE_DEVICE_TYPE(AT89S52, at89s52_device)
@@ -467,7 +468,19 @@ public:
 	i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class i80c51gb_device : public i80c52_device
+class i87c51fa_device : public i80c52_device
+{
+public:
+	// construction/destruction
+	i87c51fa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	i87c51fa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
+
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+};
+
+class i80c51gb_device : public i87c51fa_device
 {
 public:
 	// construction/destruction
