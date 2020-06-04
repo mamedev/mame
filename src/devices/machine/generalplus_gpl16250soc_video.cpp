@@ -254,10 +254,8 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_page3_addr_lsb));
 	save_item(NAME(m_page3_addr_msb));
 	save_item(NAME(m_spriteram));
-	//save_item(NAME(m_spriteextra));
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_maxgfxelement));
-//	save_item(NAME(m_pal_displaybank_high));
 	save_item(NAME(m_alt_tile_addressing));
 }
 
