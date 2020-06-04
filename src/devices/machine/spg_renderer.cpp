@@ -7,7 +7,8 @@
 DEFINE_DEVICE_TYPE(SPG_RENDERER, spg_renderer_device, "spg_renderer", "SunPlus / GeneralPlus video rendering")
 
 spg_renderer_device::spg_renderer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock)
+	device_t(mconfig, type, tag, owner, clock),
+	m_space_read_cb(*this)
 {
 }
 
@@ -18,6 +19,8 @@ spg_renderer_device::spg_renderer_device(const machine_config &mconfig, const ch
 
 void spg_renderer_device::device_start()
 {
+	m_space_read_cb.resolve_safe(0);
+
 	for (uint8_t i = 0; i < 32; i++)
 	{
 		m_rgb5_to_rgb8[i] = (i << 3) | (i >> 2);
@@ -33,13 +36,14 @@ void spg_renderer_device::device_start()
 	save_item(NAME(m_video_regs_1d));
 	save_item(NAME(m_video_regs_1e));
 
-	save_item(NAME(m_video_regs_22));
 	save_item(NAME(m_video_regs_2a));
 
 	save_item(NAME(m_video_regs_30));
 	save_item(NAME(m_video_regs_3c));
 
 	save_item(NAME(m_video_regs_42));
+
+	save_item(NAME(m_video_regs_7f));
 
 	save_item(NAME(m_ycmp_table));
 }
@@ -50,13 +54,14 @@ void spg_renderer_device::device_reset()
 	m_video_regs_1d = 0x0000;
 	m_video_regs_1e = 0x0000;
 
-	m_video_regs_22 = 0x0000;
 	m_video_regs_2a = 0x0000;
 	
 	m_video_regs_30 = 0x0000;
 	m_video_regs_3c = 0x0020;
 
 	m_video_regs_42 = 0x0001;
+
+	m_video_regs_7f = 0x0000;
 
 	for (int i = 0; i < 480; i++)
 	{
@@ -66,14 +71,13 @@ void spg_renderer_device::device_reset()
 
 
 // Perform a lerp between a and b
-inline uint8_t spg_renderer_device::mix_channel(uint8_t bottom, uint8_t top)
+inline uint8_t spg_renderer_device::mix_channel(uint8_t bottom, uint8_t top, uint8_t alpha)
 {
-	uint8_t alpha = (m_video_regs_2a & 3) << 6;
 	return ((256 - alpha) * bottom + alpha * top) >> 8;
 }
 
 template<spg_renderer_device::blend_enable_t Blend, spg_renderer_device::flipx_t FlipX>
-void spg_renderer_device::draw_tilestrip(const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint16_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t* paletteram)
+void spg_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screenwidth, uint32_t drawwidthmask, const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t* paletteram, uint8_t blendlevel)
 {
 	const uint32_t yflipmask = flip_y ? tile_h - 1 : 0;
 	uint32_t m = tilegfxdata_addr + words_per_tile * tile + bits_per_row * (tile_scanline ^ yflipmask);
@@ -82,23 +86,44 @@ void spg_renderer_device::draw_tilestrip(const rectangle& cliprect, uint32_t* ds
 
 	for (int32_t x = FlipX ? (tile_w - 1) : 0; FlipX ? x >= 0 : x < tile_w; FlipX ? x-- : x++)
 	{
-		int realdrawpos = (drawx + x) & 0x1ff;
+		int realdrawpos = (drawx + x) & drawwidthmask;
 
 		bits <<= nc_bpp;
 
 		if (nbits < nc_bpp)
 		{
-			uint16_t b = spc.read_word(m++ & 0x3fffff);
-			b = (b << 8) | (b >> 8);
-			bits |= b << (nc_bpp - nbits);
-			nbits += 16;
+			if (!read_from_csspace)
+			{
+				uint16_t b = spc.read_word(m++ & 0x3fffff);
+				b = (b << 8) | (b >> 8);
+				bits |= b << (nc_bpp - nbits);
+				nbits += 16;
+			}
+			else
+			{
+				uint16_t b;
+				const int addr = m & 0x7ffffff;
+				if (addr < m_csbase)
+				{
+					b = m_cpuspace->read_word(addr);
+				}
+				else
+				{
+					b = m_cs_space->read_word(addr-m_csbase);
+				}
+				m++;
+				b = (b << 8) | (b >> 8);
+				bits |= b << (nc_bpp - nbits);
+				nbits += 16;
+			}
 		}
 		nbits -= nc_bpp;
 
 		uint32_t pal = palette_offset + (bits >> 16);
 		bits &= 0xffff;
 
-		if (realdrawpos >= 0 && realdrawpos < 320)
+
+		if (realdrawpos >= 0 && realdrawpos < screenwidth)
 		{
 			uint16_t rgb = paletteram[pal];
 
@@ -106,9 +131,10 @@ void spg_renderer_device::draw_tilestrip(const rectangle& cliprect, uint32_t* ds
 			{
 				if (Blend)
 				{
-					dst[realdrawpos] = (mix_channel((uint8_t)(dst[realdrawpos] >> 16), m_rgb5_to_rgb8[(rgb >> 10) & 0x1f]) << 16) |
-						(mix_channel((uint8_t)(dst[realdrawpos] >> 8), m_rgb5_to_rgb8[(rgb >> 5) & 0x1f]) << 8) |
-						(mix_channel((uint8_t)(dst[realdrawpos] >> 0), m_rgb5_to_rgb8[rgb & 0x1f]));
+
+					dst[realdrawpos] = (mix_channel((uint8_t)(dst[realdrawpos] >> 16),  m_rgb5_to_rgb8[(rgb >> 10) & 0x1f], blendlevel) << 16) |
+						               (mix_channel((uint8_t)(dst[realdrawpos] >> 8),   m_rgb5_to_rgb8[(rgb >> 5)  & 0x1f], blendlevel) << 8) |
+						               (mix_channel((uint8_t)(dst[realdrawpos] >> 0),   m_rgb5_to_rgb8[(rgb >> 0)  & 0x1f], blendlevel) << 0);
 				}
 				else
 				{
@@ -120,120 +146,164 @@ void spg_renderer_device::draw_tilestrip(const rectangle& cliprect, uint32_t* ds
 }
 
 
-void spg_renderer_device::draw_linemap(const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space &spc, uint16_t* paletteram)
+void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space &spc, uint16_t* paletteram)
 {
-	if ((scanline < 0) || (scanline >= 240))
-		return;
-
-
-	uint32_t tilemap = tilemapregs[2];
-	uint32_t palette_map = tilemapregs[3];
-
-	//printf("draw bitmap bases %04x %04x\n", tilemap, palette_map);
-
-	//uint32_t xscroll = scrollregs[0];
-	uint32_t yscroll = scrollregs[1];
-
-	int realline = (scanline + yscroll) & 0xff;
-
-
-	uint16_t tile = spc.read_word(tilemap + realline);
-	uint16_t palette = 0;
-
-	//if (!tile)
-	//  continue;
-
-	palette = spc.read_word(palette_map + realline / 2);
-	if (scanline & 1)
-		palette >>= 8;
-	else
-		palette &= 0x00ff;
-
-	//const int linewidth = 320 / 2;
-	int sourcebase = tile | (palette << 16);
-
-	uint32_t ctrl = tilemapregs[1];
-
-	if (ctrl & 0x80) // HiColor mode (rad_digi)
+	if (has_extended_tilemaps)
 	{
-		for (int i = 0; i < 320; i++)
+		uint32_t ctrl = tilemapregs[1];
+		
+		if (0)
 		{
-			const uint16_t data = spc.read_word(sourcebase + i);
+			if (ctrl & 0x0010)
+				popmessage("bitmap mode %08x with rowscroll\n", tilegfxdata_addr);
+			else
+				popmessage("bitmap mode %08x\n", tilegfxdata_addr);
+		}
 
-			if (!(data & 0x8000))
+		// note, in interlace modes it appears every other line is unused? (480 entry table, but with blank values)
+		// and furthermore the rowscroll and rowzoom tables only have 240 entries, not enough for every line
+		// the end of the rowscroll table (entries 240-255) contain something else, maybe garbage data as it's offscreen, maybe not
+		uint32_t tilemap = tilemapregs[2];
+		uint32_t palette_map = tilemapregs[3];
+
+		uint32_t linebase = spc.read_word(tilemap + scanline); // every other word is unused, but there are only enough entries for 240 lines then, sometimes to do with interlace mode?
+		uint16_t palette = spc.read_word(palette_map + (scanline / 2));
+
+		if (scanline & 1)
+			palette >>= 8;
+		else
+			palette &= 0xff;
+
+		if (!linebase)
+			return;
+
+		linebase = linebase | (palette << 16);
+
+		// this logic works for jak_s500 and the test modes to get the correct base, doesn't seem to work for jak_car2 ingame, maybe data is copied to wrong place?
+		int gfxbase = (tilegfxdata_addr&0x7ffffff) + (linebase&0x7ffffff);
+
+		for (int i = 0; i < 160; i++) // will have to be 320 for jak_car2 ingame, jak_s500 lines are wider than screen, and zoomed
+		{
+			uint16_t pix;
+			const int addr = gfxbase & 0x7ffffff;
+			if (addr < m_csbase)
 			{
-				dst[i] = m_rgb555_to_rgb888[data & 0x7fff];
+				pix = m_cpuspace->read_word(addr);
+			}
+			else
+			{
+				pix = m_cs_space->read_word(addr-m_csbase);
+			}
+			gfxbase++;
+
+			int xx;
+			uint16_t pal;
+
+			if ((scanline >= 0) && (scanline < 480))
+			{
+				xx = i * 2;
+
+				pal = (pix & 0xff) | 0x100;
+
+				if (xx >= 0 && xx <= cliprect.max_x)
+				{
+					uint16_t rgb = paletteram[pal];
+
+					if (!(rgb & 0x8000))
+					{
+						dst[xx] = m_rgb555_to_rgb888[rgb];
+					}
+				}
+
+				xx = (i * 2)+1;
+				pal = (pix >> 8) + 0x100;
+
+				if (xx >= 0 && xx <= cliprect.max_x)
+				{
+					uint16_t rgb = paletteram[pal];
+
+					if (!(rgb & 0x8000))
+					{
+						dst[xx] = m_rgb555_to_rgb888[rgb];
+					}
+				}
 			}
 		}
 	}
-	else
+	else // code used for spg2xx cases
 	{
-		for (int i = 0; i < 320 / 2; i++)
-		{
-			uint8_t palette_entry;
-			uint16_t color;
-			const uint16_t data = spc.read_word(sourcebase + i);
+		if ((scanline < 0) || (scanline >= 240))
+			return;
 
-			palette_entry = (data & 0x00ff);
-			color = paletteram[palette_entry];
+		uint32_t tilemap = tilemapregs[2];
+		uint32_t palette_map = tilemapregs[3];
 
-			if (!(color & 0x8000))
-			{
-				dst[(i * 2) + 0] = m_rgb555_to_rgb888[color & 0x7fff];
-			}
+		popmessage("draw draw_linemap bases %04x %04x\n", tilemap, palette_map);
 
-			palette_entry = (data & 0xff00) >> 8;
-			color = paletteram[palette_entry];
+		//uint32_t xscroll = scrollregs[0];
+		uint32_t yscroll = scrollregs[1];
 
-			if (!(color & 0x8000))
-			{
-				dst[(i * 2) + 1] = m_rgb555_to_rgb888[color & 0x7fff];
-			}
-		}
-	}
-}
+		int realline = (scanline + yscroll) & 0xff;
 
 
-bool spg_renderer_device::get_tile_info(uint32_t tilemap_rambase, uint32_t palettemap_rambase, uint32_t x0, uint32_t y0, uint32_t tile_count_x, uint32_t ctrl, uint32_t attr, uint16_t& tile, spg_renderer_device::blend_enable_t& blend, spg_renderer_device::flipx_t& flip_x, bool& flip_y, uint32_t& palette_offset, address_space &spc)
-{
-	uint32_t tile_address = x0 + (tile_count_x * y0);
+		uint32_t tile = spc.read_word(tilemap + realline);
+		uint16_t palette = 0;
 
-	tile = (ctrl & 0x0004) ? spc.read_word(tilemap_rambase) : spc.read_word(tilemap_rambase + tile_address);
+		//if (!tile)
+		//  continue;
 
-	if (!tile)
-		return false;
-
-	uint32_t tileattr = attr;
-	uint32_t tilectrl = ctrl;
-	if ((ctrl & 2) == 0)
-	{   // -(1) bld(1) flip(2) pal(4)
-
-		uint16_t palette = (ctrl & 0x0004) ? spc.read_word(palettemap_rambase) : spc.read_word(palettemap_rambase + tile_address / 2);
-		if (x0 & 1)
+		palette = spc.read_word(palette_map + realline / 2);
+		if (scanline & 1)
 			palette >>= 8;
 		else
 			palette &= 0x00ff;
 
+		//const int linewidth = 320 / 2;
+		int sourcebase = tile | (palette << 16);
 
-		tileattr &= ~0x000c;
-		tileattr |= (palette >> 2) & 0x000c;    // flip
+		uint32_t ctrl = tilemapregs[1];
 
-		tileattr &= ~0x0f00;
-		tileattr |= (palette << 8) & 0x0f00;    // palette
+		if (ctrl & 0x80) // HiColor mode (rad_digi)
+		{
+			for (int i = 0; i < 320; i++)
+			{
+				const uint16_t data = spc.read_word(sourcebase + i);
 
-		tilectrl &= ~0x0100;
-		tilectrl |= (palette << 2) & 0x0100;    // blend
+				if (!(data & 0x8000))
+				{
+					dst[i] = m_rgb555_to_rgb888[data & 0x7fff];
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 320 / 2; i++)
+			{
+				uint8_t palette_entry;
+				uint16_t color;
+				const uint16_t data = spc.read_word(sourcebase + i);
+
+				palette_entry = (data & 0x00ff);
+				color = paletteram[palette_entry];
+
+				if (!(color & 0x8000))
+				{
+					dst[(i * 2) + 0] = m_rgb555_to_rgb888[color & 0x7fff];
+				}
+
+				palette_entry = (data & 0xff00) >> 8;
+				color = paletteram[palette_entry];
+
+				if (!(color & 0x8000))
+				{
+					dst[(i * 2) + 1] = m_rgb555_to_rgb888[color & 0x7fff];
+				}
+			}
+		}
 	}
-
-	blend = ((tileattr & 0x4000 || tilectrl & 0x0100)) ? BlendOn : BlendOff;
-	flip_x = (tileattr & 0x0004) ? FlipXOn : FlipXOff;
-	flip_y= (tileattr & 0x0008);
-
-	palette_offset = (tileattr & 0x0f00) >> 4;
-
-
-	return true;
 }
+
+
 
 
 // this builds up a line table for the vcmp effect, this is not correct when step is used
@@ -257,7 +327,7 @@ void spg_renderer_device::update_vcmp_table()
 		}
 		else
 		{
-			if ((currentline >= 0) && (currentline < 240))
+			if ((currentline >= 0) && (currentline < 256))
 			{
 				m_ycmp_table[i] = currentline;
 			}
@@ -275,33 +345,33 @@ void spg_renderer_device::update_vcmp_table()
 	}
 }
 
-void spg_renderer_device::draw_tilestrip(spg_renderer_device::blend_enable_t blend, spg_renderer_device::flipx_t flip_x, const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint16_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space& spc, uint16_t* paletteram)
+void spg_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screenwidth, uint32_t drawwidthmask, spg_renderer_device::blend_enable_t blend, spg_renderer_device::flipx_t flip_x, const rectangle& cliprect, uint32_t* dst, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space& spc, uint16_t* paletteram, uint8_t blendlevel)
 {
 	if (blend)
 	{
 		if (flip_x)
 		{
-			draw_tilestrip<BlendOn, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
+			draw_tilestrip<BlendOn, FlipXOn>(read_from_csspace, screenwidth, drawwidthmask, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram, blendlevel);
 		}
 		else
 		{
-			draw_tilestrip<BlendOn, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
+			draw_tilestrip<BlendOn, FlipXOff>(read_from_csspace, screenwidth, drawwidthmask, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram, blendlevel);
 		}
 	}
 	else
 	{
 		if (flip_x)
 		{
-			draw_tilestrip<BlendOff, FlipXOn>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
+			draw_tilestrip<BlendOff, FlipXOn>(read_from_csspace, screenwidth, drawwidthmask, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram, blendlevel);
 		}
 		else
 		{
-			draw_tilestrip<BlendOff, FlipXOff>(cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
+			draw_tilestrip<BlendOff, FlipXOff>(read_from_csspace, screenwidth, drawwidthmask, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram, blendlevel);
 		}
 	}
 }
 
-void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram)
+void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_tilemaps, bool use_alt_tile_addressing, uint32_t palbank, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram, uint32_t which)
 {
 	const uint32_t attr = tilemapregs[0];
 	const uint32_t ctrl = tilemapregs[1];
@@ -318,7 +388,7 @@ void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t* dst, ui
 
 	if (ctrl & 0x0001) // Bitmap / Linemap mode! (basically screen width tile mode)
 	{
-		draw_linemap(cliprect, dst, scanline, priority, tilegfxdata_addr, scrollregs, tilemapregs, spc, paletteram);
+		draw_linemap(has_extended_tilemaps, cliprect, dst, scanline, priority, tilegfxdata_addr, scrollregs, tilemapregs, spc, paletteram);
 		return;
 	}
 
@@ -328,61 +398,186 @@ void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t* dst, ui
 	{
 		if (m_video_regs_1e != 0x0000)
 			popmessage("vertical compression mode with non-0 step amount %04x offset %04x step %04x\n", m_video_regs_1c, m_video_regs_1d, m_video_regs_1e);
-		
+
 		logical_scanline = m_ycmp_table[scanline];
 		if (logical_scanline == 0xffffffff)
 			return;
 	}
 
+	uint32_t total_width;
+	uint32_t y_mask;
+	uint32_t screenwidth;
+	uint32_t drawwidthmask;
+
+	if (read_from_csspace && ((attr >> 15) & 0x1))
+	{
+		// just a guess based on this being set on the higher resolution tilemaps we've seen, could be 100% incorrect register
+		total_width = 1024;
+		y_mask = 0x1ff;
+		screenwidth = 640;
+		drawwidthmask = 0x400 - 1;
+	}
+	else
+	{
+		total_width = 512;
+		y_mask = 0xff;
+		screenwidth = 320;
+		drawwidthmask = 0x200 - 1;
+	}
+
+
 	const uint32_t xscroll = scrollregs[0];
 	const uint32_t yscroll = scrollregs[1];
 	const uint32_t tilemap_rambase = tilemapregs[2];
-	const uint32_t palettemap_rambase = tilemapregs[3];
+	const uint32_t exattributemap_rambase = tilemapregs[3];
 	const int tile_width = (attr & 0x0030) >> 4;
 	const uint32_t tile_h = 8 << ((attr & 0x00c0) >> 6);
 	const uint32_t tile_w = 8 << (tile_width);
-	const uint32_t tile_count_x = 512 / tile_w; // all tilemaps are 512 pixels wide
-	const uint32_t bitmap_y = (logical_scanline + yscroll) & 0xff; // all tilemaps are 256 pixels high
+	const uint32_t tile_count_x = total_width / tile_w; // tilemaps are 512 or 1024 wide depending on screen mode?
+	const uint32_t bitmap_y = (logical_scanline + yscroll) & y_mask; // tilemaps are 256 or 512 high depending on screen mode?
 	const uint32_t y0 = bitmap_y / tile_h;
 	const uint32_t tile_scanline = bitmap_y % tile_h;
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
-	const uint32_t words_per_tile = bits_per_row * tile_h;
+	//const uint32_t words_per_tile = bits_per_row * tile_h;
 	const bool row_scroll = (ctrl & 0x0010);
+	uint8_t blendlevel = (m_video_regs_2a & 3) << 6;
+
+	uint32_t words_per_tile;
+
+	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
+	if (has_extended_tilemaps && use_alt_tile_addressing)
+	{
+		words_per_tile = 8;
+	}
+	else
+	{
+		words_per_tile = bits_per_row * tile_h;
+	}
 
 	int realxscroll = xscroll;
 	if (row_scroll)
 	{
 		// Tennis in My Wireless Sports confirms the need to add the scroll value here rather than rowscroll being screen-aligned
-		realxscroll += (int16_t)scrollram[(logical_scanline+yscroll) & 0xff];
+		realxscroll += (int16_t)scrollram[(logical_scanline + yscroll) & 0xff];
 	}
 
 	const int upperscrollbits = (realxscroll >> (tile_width + 3));
-	const int endpos = (320 + tile_w) / tile_w;
+	const int endpos = (screenwidth + tile_w) / tile_w;
 	for (uint32_t x0 = 0; x0 < endpos; x0++)
 	{
 		spg_renderer_device::blend_enable_t blend;
 		spg_renderer_device::flipx_t flip_x;
 		bool flip_y;
-		uint16_t tile;
+		uint32_t tile;
 		uint32_t palette_offset;
 
-		if (!get_tile_info(tilemap_rambase, palettemap_rambase, (x0 + upperscrollbits) & (tile_count_x-1) , y0, tile_count_x, ctrl, attr, tile, blend, flip_x, flip_y, palette_offset, spc))
+		// get tile info
+		const int realx0 = (x0 + upperscrollbits) & (tile_count_x - 1);
+		uint32_t tile_address = realx0 + (tile_count_x * y0);
+
+		tile = (ctrl & 0x0004) ? spc.read_word(tilemap_rambase) : spc.read_word(tilemap_rambase + tile_address);
+
+		if (!tile)
 			continue;
+
+		uint32_t tileattr = attr;
+		uint32_t tilectrl = ctrl;
+
+		if (has_extended_tilemaps && use_alt_tile_addressing)
+		{
+			// in this mode what would be the 'palette' bits get used for extra tile bits (even if the usual 'extended table' mode is disabled?)
+			// used by smartfp
+			uint16_t exattribute = (ctrl & 0x0004) ? spc.read_word(exattributemap_rambase) : spc.read_word(exattributemap_rambase + tile_address / 2);
+			if (realx0 & 1)
+				exattribute >>= 8;
+			else
+				exattribute &= 0x00ff;
+
+			tile |= (exattribute & 0x07) << 16;
+			//blendlevel = 0x1f; // hack
+		}
+		else if ((ctrl & 2) == 0)
+		{   // -(1) bld(1) flip(2) pal(4)
+
+			uint16_t exattribute = (ctrl & 0x0004) ? spc.read_word(exattributemap_rambase) : spc.read_word(exattributemap_rambase + tile_address / 2);
+			if (realx0 & 1)
+				exattribute >>= 8;
+			else
+				exattribute &= 0x00ff;
+
+
+			tileattr &= ~0x000c;
+			tileattr |= (exattribute >> 2) & 0x000c;    // flip
+
+			tileattr &= ~0x0f00;
+			tileattr |= (exattribute << 8) & 0x0f00;    // palette
+
+			tilectrl &= ~0x0100;
+			tilectrl |= (exattribute << 2) & 0x0100;    // blend
+		}
+
+		blend = ((tileattr & 0x4000 || tilectrl & 0x0100)) ? BlendOn : BlendOff;
+		flip_x = (tileattr & 0x0004) ? FlipXOn : FlipXOff;
+		flip_y = (tileattr & 0x0008);
+
+		palette_offset = (tileattr & 0x0f00) >> 4;
+		// got tile info
+
+		if (1)
+		{
+			// HACKS
+			// There must be a select bit for the tilemap palettes somewhere, but where?!
+			// the different games in paccon also expect a variety of different configs here, maybe a good place to look
+			if (palbank & 1) // this actually seems to be the sprite palette bank enable, but for myac220 / tkmag220 (where everything is from a single palette) it gives us an easy way to ignore the logic below
+			{
+				if (which == 0) // tilemap 0
+				{
+					if (ctrl & 0x0002)  // RegSet:1
+					{
+						// smartfp has a conflict between the bootlogos and the first screen, it's in regset mode, no obvious difference in registers but needs palette from different places?
+						// not even m_video_regs_7f changes here, which makes the m_video_regs_7f case specific hacks for jak_s500 below very unlikely to actually be related
+						if ((bpp + 1) * 2 == 4)
+							if (use_alt_tile_addressing == true)
+								palette_offset |= 0x200;
+					}
+				}
+
+				if (which == 1)
+				{
+					// can't do this for jak_s500 logos
+					// jak_s500 also uses this tilemap in both 4 and 6bpp modes expecting the same palette base, so the hack used for smartfp on tilemap 0 is not applicable here
+
+					// m_video_regs_7f != 0x2d3 for jak_S500 main menu
+					if ((m_video_regs_7f != 0x53) && (m_video_regs_7f != 0x63) && (m_video_regs_7f != 0x2d3))
+						palette_offset |= 0x200;
+				}
+
+				// jak_car2 screen transitions use layers 2 and 3 the same way, alternating each frame
+				if (which == 2)
+				{
+					// jak_s500 title screen + loading screen before race
+					if ((m_video_regs_7f == 0x2d3) || (m_video_regs_7f == 0x2db))
+						palette_offset |= 0x200;
+				}
+
+			}
+		}
+
 
 		palette_offset >>= nc_bpp;
 		palette_offset <<= nc_bpp;
 
-		const int drawx = (x0 * tile_w) - (realxscroll & (tile_w-1));
-		draw_tilestrip(blend,flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
+		const int drawx = (x0 * tile_w) - (realxscroll & (tile_w - 1));
+		draw_tilestrip(read_from_csspace, screenwidth, drawwidthmask, blend, flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram, blendlevel);
 	}
 }
 
-void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
+void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_sprites, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
 {
-	uint32_t tilegfxdata_addr = 0x40 * m_video_regs_22;
-	uint16_t tile = spriteram[base_addr + 0];
+	uint32_t tilegfxdata_addr = spritegfxdata_addr;
+	uint32_t tile = spriteram[base_addr + 0];
 	int16_t x = spriteram[base_addr + 1];
 	int16_t y = spriteram[base_addr + 2];
 	uint16_t attr = spriteram[base_addr + 3];
@@ -397,36 +592,100 @@ void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, 
 		return;
 	}
 
+
+	uint32_t screenwidth = 320;
+//	uint32_t screenheight = 240;
+	uint32_t screenheight = 256;
+	uint32_t xmask = 0x1ff;
+	uint32_t ymask = 0x1ff;
+
+	if (highres)
+	{
+		screenwidth = 640;
+//		screenheight = 480;
+		screenheight = 512;
+		xmask = 0x3ff;
+	}
+
 	const uint32_t tile_h = 8 << ((attr & 0x00c0) >> 6);
 	const uint32_t tile_w = 8 << ((attr & 0x0030) >> 4);
 
 	if (!(m_video_regs_42 & 0x0002))
 	{
-		x = (160 + x) - tile_w / 2;
-		y = (120 - y) - (tile_h / 2) + 8;
+		x = ((screenwidth/2) + x) - tile_w / 2;
+//		y = ((screenheight/2) - y) - (tile_h / 2) + 8;
+		y = ((screenheight/2) - y) - (tile_h / 2);
 	}
 
-	x &= 0x01ff;
-	y &= 0x01ff;
+	x &= xmask;
+	y &= ymask;
 
 	int firstline = y;
 	int lastline = y + (tile_h - 1);
-	lastline &= 0x1ff;
+	lastline &= ymask;
 
 	const spg_renderer_device::blend_enable_t blend = (attr & 0x4000) ? BlendOn : BlendOff;
-	const spg_renderer_device::flipx_t flip_x = (attr & 0x0004) ? FlipXOn : FlipXOff;
+	spg_renderer_device::flipx_t flip_x = (attr & 0x0004) ? FlipXOn : FlipXOff;
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
-	const uint32_t words_per_tile = bits_per_row * tile_h;
+	uint8_t blendlevel = (m_video_regs_2a & 3) << 6;
+
+	uint32_t words_per_tile;
+	
+	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
+	if (has_extended_sprites && ((m_video_regs_42 & 0x0010) == 0x10))
+	{
+		// paccon and smartfp use this mode
+		words_per_tile = 8;
+
+		if (!alt_extrasprite_hack) // 1 extra word for each sprite
+		{
+			// before or after the 0 tile check?
+			tile |= (spriteram[(base_addr / 4) + 0x400] & 0x01ff) << 16;
+			blendlevel = ((spriteram[(base_addr / 4) + 0x400] & 0x3e00) >> 9) << 3;
+		}
+		else // jak_prft - no /4 to offset in this mode - 4 extra words per sprite instead ? (or is RAM content incorrect for one of these cases?)
+		{
+			tile |= spriteram[(base_addr) + 0x400] << 16;
+			blendlevel = ((spriteram[(base_addr) + 0x400] & 0x3e00) >> 9) << 3;
+		}
+	}
+	else
+	{
+		words_per_tile = bits_per_row * tile_h;
+	}
+
 
 	bool flip_y = (attr & 0x0008);
+	
+	// various games don't want the flip bits in the usual place, wrlshunt for example, there's probably a bit to control this
+	// and likewise these bits probably now have a different meaning, so this shouldn't be trusted
+	if (has_extended_sprites)
+	{
+		if (highres || alt_extrasprite_hack)
+		{
+			flip_x = FlipXOff;
+			flip_y = 0;
+		}
+	}
+	
 	uint32_t palette_offset = (attr & 0x0f00) >> 4;
 	
+	if (has_extended_sprites)
+	{
+		// guess, tkmag220 / myac220 don't set this bit and expect all sprite palettes to be from the same bank as background palettes
+		if (palbank & 1)
+			palette_offset |= 0x100;
+
+		// many other gpl16250 sets have this bit set when they want the upper 256 colours on a per-sprite basis, seems like an extended feature
+		if (attr & 0x8000)
+			palette_offset |= 0x200;
+	}
+
 	// the Circuit Racing game in PDC100 needs this or some graphics have bad colours at the edges when turning as it leaves stray lower bits set
 	palette_offset >>= nc_bpp;
 	palette_offset <<= nc_bpp;
-
 
 	if (firstline < lastline)
 	{
@@ -434,7 +693,7 @@ void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, 
 
 		if ((scanx >= 0) && (scanline <= lastline))
 		{
-			draw_tilestrip(blend, flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
+			draw_tilestrip(read_from_csspace, screenwidth, xmask, blend, flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram, blendlevel);
 		}
 	}
 	else
@@ -446,7 +705,7 @@ void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, 
 
 		if ((scanx >= 0) && (scanline <= templastline))
 		{
-			draw_tilestrip(blend, flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
+			draw_tilestrip(read_from_csspace, screenwidth, xmask, blend, flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram, blendlevel);
 		}
 		// clipped against the bottom
 		tempfirstline = firstline;
@@ -455,21 +714,29 @@ void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t* dst, 
 
 		if ((scanx >= 0) && (scanline <= templastline))
 		{
-			draw_tilestrip(blend, flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram);
+			draw_tilestrip(read_from_csspace, screenwidth, xmask, blend, flip_x, cliprect, dst, tile_h, tile_w, tilegfxdata_addr, tile, scanx, x, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram, blendlevel);
 		}
 	}
 }
 
-void spg_renderer_device::draw_sprites(const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
+void spg_renderer_device::draw_sprites(bool read_from_csspace, bool has_extended_sprites, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
 {
 	if (!(m_video_regs_42 & 0x0001))
 	{
 		return;
 	}
 
+	// paccon suggests this, does older hardware have similar (if so, starting at what point?) or only GPL16250?
+	if (sprlimit == -1)
+	{
+		sprlimit = (m_video_regs_42 & 0xff00) >> 8;
+		if (sprlimit == 0)
+			sprlimit = 0x100;
+	}
+
 	for (uint32_t n = 0; n < sprlimit; n++)
 	{
-		draw_sprite(cliprect, dst, scanline, priority, 4 * n, spc, paletteram, spriteram);
+		draw_sprite(read_from_csspace, has_extended_sprites, alt_extrasprite_hack, palbank, highres, cliprect, dst, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
 	}
 }
 
