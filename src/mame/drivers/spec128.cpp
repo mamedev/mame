@@ -167,25 +167,19 @@ resulting mess can be seen in the F4 viewer display.
 
 READ8_MEMBER(spectrum_state::spectrum_128_pre_opcode_fetch_r)
 {
-	/* this allows expansion devices to act upon opcode fetches from MEM addresses */
-	if (BIT(m_port_7ffd_data, 4))
-	{
-		/* this allows expansion devices to act upon opcode fetches from MEM addresses
-		   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
-		   enable paged ROM and then fetches at 0700 to disable it
-		*/
-		m_exp->pre_opcode_fetch(offset);
-		uint8_t retval = m_maincpu->space(AS_PROGRAM).read_byte(offset);
-		m_exp->post_opcode_fetch(offset);
-		return retval;
-	}
-
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	/* this allows expansion devices to act upon opcode fetches from MEM addresses
+	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
+	   enable paged ROM and then fetches at 0700 to disable it
+	*/
+	m_exp->pre_opcode_fetch(offset);
+	uint8_t retval = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	m_exp->post_opcode_fetch(offset);
+	return retval;
 }
 
 WRITE8_MEMBER( spectrum_state::spectrum_128_bank1_w )
 {
-	if (m_exp->romcs() && BIT(m_port_7ffd_data, 4))
+	if (m_exp->romcs())
 		m_exp->mreq_w(offset, data);
 }
 
@@ -193,7 +187,7 @@ READ8_MEMBER( spectrum_state::spectrum_128_bank1_r )
 {
 	uint8_t data;
 
-	if (m_exp->romcs() && BIT(m_port_7ffd_data, 4))
+	if (m_exp->romcs())
 	{
 		data = m_exp->mreq_r(offset);
 	}

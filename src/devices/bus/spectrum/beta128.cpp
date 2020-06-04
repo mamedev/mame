@@ -11,6 +11,7 @@
     is moved from 3cxx to 3dxx for example)
 
     TODO:
+	original ROMs should have bits 0 and 7 swapped
 
     there were many unofficial ROMs available for this, make them
     available for use.
@@ -39,7 +40,8 @@ INPUT_PORTS_START(beta128)
 	PORT_START("SWITCH")
 	PORT_CONFNAME(0x03, 0x01, "System Switch") //PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_beta128_device, switch_changed, 0)
 	PORT_CONFSETTING(0x00, "Off (128)")
-	PORT_CONFSETTING(0x01, "Normal (auto-boot)")
+	PORT_CONFSETTING(0x01, "Normal (auto-boot)") // also enable Beta-disk V3/V4 compatibility, auto-boot feature does not work on Spectrum128.
+	//PORT_CONFSETTING(0x02, "Reset") // TODO: implement RESET callback
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -154,7 +156,7 @@ void spectrum_beta128_device::device_reset()
 	else
 		m_romcs = 0;
 
-	m_128rom_bit = false;
+	m_128rom_bit = true;
 }
 
 //**************************************************************************

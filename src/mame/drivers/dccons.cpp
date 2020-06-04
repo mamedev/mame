@@ -881,6 +881,7 @@ Consists of HKS-0300 main unit and HKS-0100 LCD with touch screen
   HDR-0095 673-01??? Fish Life Episode 1 Basic Edition
   HDR-0096 673-01??? Fish Life Episode 2 Basic Edition
   HDR-0097 673-01??? Fish Life Episode 3 Basic Edition
+  MSD-0001 ???-????? Fish Life Red Sea & Amazon PDP Ver.
  * denotes these games are archived.
 
  Machines high likely based on Fish Life:
