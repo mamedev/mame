@@ -89,9 +89,6 @@ protected:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	device_colecovision_cartridge_interface *m_card;
-
-	size_t m_megacart_bankcount;
-	size_t m_megacart_activebank;
 };
 
 

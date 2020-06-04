@@ -86,13 +86,10 @@ image_init_result colecovision_cartridge_slot_device::call_load()
 		if (!loaded_through_softlist())
 		{
 			fread(m_card->m_rom, size);
-			m_megacart_bankcount = size >> 14;
-			m_megacart_activebank = 0;
 		}
 		else
 		{
 			// TODO 8000/a000/c000/e000
-			m_megacart_bankcount = 0;
 			memcpy(m_card->m_rom, get_software_region("rom"), size);
 		}
 	}
@@ -112,6 +109,12 @@ std::string colecovision_cartridge_slot_device::get_default_card_software(get_de
 		uint32_t length = hook.image_file()->size();
 		if (length == 0x100000 || length == 0x200000)
 			return software_get_default_slot("xin1");
+
+		if (length > 0x8000)
+		{
+			// Assume roms longer than 32K are megacarts.
+			return software_get_default_slot("megacart");
+		}
 	}
 	return software_get_default_slot("standard");
 }
@@ -121,47 +124,28 @@ std::string colecovision_cartridge_slot_device::get_default_card_software(get_de
 //  bd_r - cartridge data read
 //-------------------------------------------------
 
+
 uint8_t colecovision_cartridge_slot_device::bd_r(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000)
 {
-	// offset zero is the start of cartridge space, 0x8000 in CPU space.
 	if (m_card)
-	{
-		if (m_megacart_bankcount > 2)
-		{
-			if (offset >= 0x7FC0)
-			{
-				// Reads within the final 64 bytes select which megacart bank is active.
-				m_megacart_activebank = offset & (m_megacart_bankcount - 1);
-			}
-
-			if (offset >= 0x4000)
-			{
-				// The offset is within the active megacart bank
-				offset = (m_megacart_activebank << 14) + (offset - 0x4000);
-			}
-			else
-			{
-				// The offset is within the last bank.
-				offset = (m_megacart_bankcount << 14) + (offset - 0x4000);
-			}
-		}
-		data = m_card->bd_r(offset, data, _8000, _a000, _c000, _e000);
-	}
+		data = m_card->bd_r(offset , data, _8000, _a000, _c000, _e000);
 
 	return data;
-}
+	}
 
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( colecovision_cartridges )
 //-------------------------------------------------
 
+#include "megacart.h"
 #include "std.h"
 #include "xin1.h"
 
 void colecovision_cartridges(device_slot_interface &device)
 {
 	// the following need ROMs from the software list
+	device.option_add_internal("megacart", COLECOVISION_MEGACART);
 	device.option_add_internal("standard", COLECOVISION_STANDARD);
 	device.option_add_internal("xin1", COLECOVISION_XIN1);
 }
