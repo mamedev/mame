@@ -23,9 +23,9 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
-#include "machine/clock.h"
+#include "machine/i8255.h"
+#include "machine/pit8253.h"
 #include "bus/rs232/rs232.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -37,10 +37,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		, m_uart1(*this, "uart1")
-		, m_uart2(*this, "uart2")
-		, m_rs232a(*this, "rs232a")
-		, m_rs232b(*this, "rs232b")
+		, m_usart(*this, "usart%u", 1U)
+		, m_rs232(*this, "rs232%c", 'a')
 		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
@@ -53,14 +51,12 @@ private:
 	u8 m_keyline;
 	u8 beehive_60_r();
 	void beehive_62_w(u8 data);
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
-	required_device<i8251_device> m_uart1;
-	required_device<i8251_device> m_uart2;
-	required_device<rs232_port_device> m_rs232a;
-	required_device<rs232_port_device> m_rs232b;
+	required_device_array<i8251_device, 2> m_usart;
+	required_device_array<rs232_port_device, 2> m_rs232;
 	required_ioport_array<16> m_io_keyboard;
 };
 
@@ -88,14 +84,12 @@ void beehive_state::beehive_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x11, 0x11).portr("DIPS");
-	map(0x20, 0x20).rw(m_uart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).rw(m_uart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x30, 0x30).rw(m_uart2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x31, 0x31).rw(m_uart2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x60, 0x60).r(FUNC(beehive_state::beehive_60_r));
-	map(0x61, 0x61).portr("MODIFIERS");
-	map(0x62, 0x62).w(FUNC(beehive_state::beehive_62_w));
+	map(0x10, 0x13).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x21).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x30, 0x31).rw(m_usart[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x60, 0x63).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe0, 0xe3).rw("pit1", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xf0, 0xf3).rw("pit2", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 }
 
 /* Input ports */
@@ -255,7 +249,7 @@ void beehive_state::machine_start()
 
 /* This system appears to have inline attribute bytes of unknown meaning.
     Currently they are ignored. */
-u32 beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 beehive_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint16_t cursor_pos = (m_p_videoram[0xcaf] | (m_p_videoram[0xcb0] << 8)) & 0xfff;
 	uint16_t p_linelist;
@@ -271,7 +265,7 @@ u32 beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		for (ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint32_t *p = &bitmap.pix32(sy++);
 			u8 chars = 0;
 
 			for (x = ma; x < ma + line_length; x++)
@@ -290,14 +284,14 @@ u32 beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					chars++;
 
 					/* Display a scanline of a character */
-					*p++ = BIT(gfx, 7);
-					*p++ = BIT(gfx, 6);
-					*p++ = BIT(gfx, 5);
-					*p++ = BIT(gfx, 4);
-					*p++ = BIT(gfx, 3);
-					*p++ = BIT(gfx, 2);
-					*p++ = BIT(gfx, 1);
-					*p++ = BIT(gfx, 0);
+					*p++ = BIT(gfx, 7) ? rgb_t::white() : rgb_t::black();
+					*p++ = BIT(gfx, 6) ? rgb_t::white() : rgb_t::black();
+					*p++ = BIT(gfx, 5) ? rgb_t::white() : rgb_t::black();
+					*p++ = BIT(gfx, 4) ? rgb_t::white() : rgb_t::black();
+					*p++ = BIT(gfx, 3) ? rgb_t::white() : rgb_t::black();
+					*p++ = BIT(gfx, 2) ? rgb_t::white() : rgb_t::black();
+					*p++ = BIT(gfx, 1) ? rgb_t::white() : rgb_t::black();
+					*p++ = BIT(gfx, 0) ? rgb_t::white() : rgb_t::black();
 				}
 			}
 		}
@@ -319,35 +313,45 @@ void beehive_state::beehive(machine_config &config)
 	screen.set_screen_update(FUNC(beehive_state::screen_update));
 	screen.set_size(640, 250);
 	screen.set_visarea(0, 639, 0, 249);
-	screen.set_palette("palette");
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	i8255_device &ppi1(I8255(config, "ppi1"));
+	ppi1.in_pb_callback().set_ioport("DIPS");
 
-	I8251(config, m_uart1, 0);
-	m_uart1->txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
-	m_uart1->dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
-	m_uart1->rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
+	i8255_device &ppi2(I8255(config, "ppi2"));
+	ppi2.in_pa_callback().set(FUNC(beehive_state::beehive_60_r));
+	ppi2.in_pb_callback().set_ioport("MODIFIERS");
+	ppi2.out_pc_callback().set(FUNC(beehive_state::beehive_62_w));
 
-	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
-	m_rs232a->rxd_handler().set("uart1", FUNC(i8251_device::write_rxd));
-	m_rs232a->dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
-	m_rs232a->cts_handler().set("uart1", FUNC(i8251_device::write_cts));
+	PIT8253(config, "pit1");
 
-	I8251(config, m_uart2, 0);
-	m_uart2->txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
-	m_uart2->dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
-	m_uart2->rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
+	pit8253_device &pit2(PIT8253(config, "pit2"));
+	pit2.set_clk<0>(1'536'000);
+	pit2.set_clk<1>(1'536'000);
+	pit2.set_clk<2>(1'536'000);
+	pit2.out_handler<0>().set(m_usart[0], FUNC(i8251_device::write_rxc));
+	pit2.out_handler<1>().set(m_usart[0], FUNC(i8251_device::write_txc));
+	pit2.out_handler<2>().set(m_usart[1], FUNC(i8251_device::write_rxc));
+	pit2.out_handler<2>().append(m_usart[1], FUNC(i8251_device::write_txc));
+
+	I8251(config, m_usart[0], 0);
+	m_usart[0]->txd_handler().set(m_rs232[0], FUNC(rs232_port_device::write_txd));
+	m_usart[0]->dtr_handler().set(m_rs232[0], FUNC(rs232_port_device::write_dtr));
+	m_usart[0]->rts_handler().set(m_rs232[0], FUNC(rs232_port_device::write_rts));
+
+	RS232_PORT(config, m_rs232[0], default_rs232_devices, nullptr);
+	m_rs232[0]->rxd_handler().set(m_usart[0], FUNC(i8251_device::write_rxd));
+	m_rs232[0]->dsr_handler().set(m_usart[0], FUNC(i8251_device::write_dsr));
+	m_rs232[0]->cts_handler().set(m_usart[0], FUNC(i8251_device::write_cts));
+
+	I8251(config, m_usart[1], 0);
+	m_usart[1]->txd_handler().set(m_rs232[1], FUNC(rs232_port_device::write_txd));
+	m_usart[1]->dtr_handler().set(m_rs232[1], FUNC(rs232_port_device::write_dtr));
+	m_usart[1]->rts_handler().set(m_rs232[1], FUNC(rs232_port_device::write_rts));
 
 	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
-	m_rs232b->rxd_handler().set("uart2", FUNC(i8251_device::write_rxd));
-	m_rs232b->dsr_handler().set("uart2", FUNC(i8251_device::write_dsr));
-	m_rs232b->cts_handler().set("uart2", FUNC(i8251_device::write_cts));
-
-	clock_device &rs232_clock(CLOCK(config, "rs232_clock", 153'600));
-	rs232_clock.signal_handler().set(m_uart1, FUNC(i8251_device::write_rxc));
-	rs232_clock.signal_handler().append(m_uart1, FUNC(i8251_device::write_txc));
-	rs232_clock.signal_handler().append(m_uart2, FUNC(i8251_device::write_rxc));
-	rs232_clock.signal_handler().append(m_uart2, FUNC(i8251_device::write_txc));
+	m_rs232[1]->rxd_handler().set(m_usart[1], FUNC(i8251_device::write_rxd));
+	m_rs232[1]->dsr_handler().set(m_usart[1], FUNC(i8251_device::write_dsr));
+	m_rs232[1]->cts_handler().set(m_usart[1], FUNC(i8251_device::write_cts));
 }
 
 /* ROM definition */
