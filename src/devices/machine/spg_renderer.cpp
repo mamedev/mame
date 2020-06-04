@@ -446,7 +446,7 @@ void spg_renderer_device::draw_page(bool usespacecallback, bool has_extended_til
 	}
 }
 
-void spg_renderer_device::draw_sprite(bool usespacecallback, bool has_extended_sprites, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
+void spg_renderer_device::draw_sprite(bool usespacecallback, bool has_extended_sprites, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
 {
 	uint32_t tilegfxdata_addr = spritegfxdata_addr;
 	uint32_t tile = spriteram[base_addr + 0];
@@ -497,7 +497,7 @@ void spg_renderer_device::draw_sprite(bool usespacecallback, bool has_extended_s
 	lastline &= ymask;
 
 	const spg_renderer_device::blend_enable_t blend = (attr & 0x4000) ? BlendOn : BlendOff;
-	const spg_renderer_device::flipx_t flip_x = (attr & 0x0004) ? FlipXOn : FlipXOff;
+	spg_renderer_device::flipx_t flip_x = (attr & 0x0004) ? FlipXOn : FlipXOff;
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
@@ -510,10 +510,18 @@ void spg_renderer_device::draw_sprite(bool usespacecallback, bool has_extended_s
 	{
 		// paccon and smartfp use this mode
 		words_per_tile = 8;
-		// before or after the 0 tile check?
-		tile |= spriteram[(base_addr / 4) + 0x400] << 16;
-		
-		blendlevel = ((spriteram[(base_addr / 4) + 0x400] & 0x3e00) >> 9)<<3;
+
+		if (!alt_extrasprite_hack) // 1 extra word for each sprite
+		{
+			// before or after the 0 tile check?
+			tile |= spriteram[(base_addr / 4) + 0x400] << 16;
+			blendlevel = ((spriteram[(base_addr / 4) + 0x400] & 0x3e00) >> 9) << 3;
+		}
+		else // jak_prft - no /4 to offset in this mode - 4 extra words per sprite instead ? (or is RAM content incorrect for one of these cases?)
+		{
+			tile |= spriteram[(base_addr) + 0x400] << 16;
+			blendlevel = ((spriteram[(base_addr) + 0x400] & 0x3e00) >> 9) << 3;
+		}
 	}
 	else
 	{
@@ -522,6 +530,18 @@ void spg_renderer_device::draw_sprite(bool usespacecallback, bool has_extended_s
 
 
 	bool flip_y = (attr & 0x0008);
+	
+	// various games don't want the flip bits in the usual place, wrlshunt for example, there's probably a bit to control this
+	// and likewise these bits probably now have a different meaning, so this shouldn't be trusted
+	if (has_extended_sprites)
+	{
+		if (highres || alt_extrasprite_hack)
+		{
+			flip_x = FlipXOff;
+			flip_y = 0;
+		}
+	}
+	
 	uint32_t palette_offset = (attr & 0x0f00) >> 4;
 	
 	if (has_extended_sprites)
@@ -571,7 +591,7 @@ void spg_renderer_device::draw_sprite(bool usespacecallback, bool has_extended_s
 	}
 }
 
-void spg_renderer_device::draw_sprites(bool usespacecallback, bool has_extended_sprites, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
+void spg_renderer_device::draw_sprites(bool usespacecallback, bool has_extended_sprites, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
 {
 	if (!(m_video_regs_42 & 0x0001))
 	{
@@ -588,7 +608,7 @@ void spg_renderer_device::draw_sprites(bool usespacecallback, bool has_extended_
 
 	for (uint32_t n = 0; n < sprlimit; n++)
 	{
-		draw_sprite(usespacecallback, has_extended_sprites, palbank, highres, cliprect, dst, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
+		draw_sprite(usespacecallback, has_extended_sprites, alt_extrasprite_hack, palbank, highres, cliprect, dst, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
 	}
 }
 

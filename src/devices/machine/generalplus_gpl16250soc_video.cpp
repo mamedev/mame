@@ -404,7 +404,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, cliprect, dst, scanline, i, page2_addr, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
 			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, cliprect, dst, scanline, i, page3_addr, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
 
-			m_renderer->draw_sprites(true, true, m_703a_palettebank, highres, cliprect, dst, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
+			m_renderer->draw_sprites(true, true, m_alt_extrasprite_hack ? true : false, m_703a_palettebank, highres, cliprect, dst, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
 		}
 
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);
