@@ -149,37 +149,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	enum blend_enable_t : bool
-	{
-		BlendOff = false,
-		BlendOn = true
-	};
-
-	enum rowscroll_enable_t : bool
-	{
-		RowScrollOff = false,
-		RowScrollOn = true
-	};
-
-	enum flipx_t : bool
-	{
-		FlipXOff = false,
-		FlipXOn = true
-	};
-
-	template<blend_enable_t Blend, rowscroll_enable_t RowScroll, flipx_t FlipX>
-	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint32_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset, int addressing_mode);
-	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs, uint16_t *scroll, int which);
-	void draw_sprites(const rectangle& cliprect, uint32_t scanline, int priority);
-	void draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t base_addr);
-
-	uint32_t m_screenbuf[640 * 480];
-	uint8_t m_rgb5_to_rgb8[32];
-	uint32_t m_rgb555_to_rgb888[0x8000];
-
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
- // required_shared_ptr<uint16_t> m_scrollram;
 
 	uint16_t m_page0_addr_lsb;
 	uint16_t m_page0_addr_msb;
@@ -245,7 +216,6 @@ protected:
 	emu_timer *m_screenpos_timer;
 
 	uint16_t m_spriteram[0x400*2];
-	//uint16_t m_spriteextra[0x400];
 	uint16_t m_paletteram[0x100*0x10];
 
 	required_device<palette_device> m_palette;
