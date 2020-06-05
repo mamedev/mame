@@ -47,18 +47,19 @@ public:
 	void pro80(machine_config &config);
 
 private:
-	void digit_w(uint8_t data);
-	void segment_w(uint8_t data);
-	uint8_t kp_r();
+	void digit_w(u8 data);
+	void segment_w(u8 data);
+	u8 kp_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
-	void pro80_io(address_map &map);
-	void pro80_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
-	uint8_t m_digit_sel;
-	uint8_t m_cass_in;
-	uint16_t m_cass_data[4];
-	void machine_reset() override;
+	u8 m_digit_sel;
+	u8 m_cass_in;
+	u16 m_cass_data[4];
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_ioport_array<6> m_io_keyboard;
@@ -68,7 +69,7 @@ private:
 TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::kansas_r )
 {
 	m_cass_data[1]++;
-	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -79,7 +80,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::kansas_r )
 	}
 }
 
-void pro80_state::digit_w(uint8_t data)
+void pro80_state::digit_w(u8 data)
 {
 	// --xx xxxx digit select
 	// -x-- ---- cassette out
@@ -88,7 +89,7 @@ void pro80_state::digit_w(uint8_t data)
 	m_cass->output( BIT(data, 6) ? -1.0 : +1.0);
 }
 
-void pro80_state::segment_w(uint8_t data)
+void pro80_state::segment_w(u8 data)
 {
 	if (m_digit_sel)
 	{
@@ -100,9 +101,9 @@ void pro80_state::segment_w(uint8_t data)
 	}
 }
 
-uint8_t pro80_state::kp_r()
+u8 pro80_state::kp_r()
 {
-	uint8_t data = 0x0f;
+	u8 data = 0x0f;
 
 	for (u8 i = 0; i < 6; i++)
 		if (!BIT(m_digit_sel, i))
@@ -114,7 +115,7 @@ uint8_t pro80_state::kp_r()
 	return data;
 }
 
-void pro80_state::pro80_mem(address_map &map)
+void pro80_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).rom();
@@ -122,7 +123,7 @@ void pro80_state::pro80_mem(address_map &map)
 	map(0x1400, 0x17ff).ram(); // 2nd RAM is optional
 }
 
-void pro80_state::pro80_io(address_map &map)
+void pro80_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -172,12 +173,19 @@ void pro80_state::machine_reset()
 	m_cass_in = 0;
 }
 
+void pro80_state::machine_start()
+{
+	save_item(NAME(m_digit_sel));
+	save_item(NAME(m_cass_in));
+	save_pointer(NAME(m_cass_data) ,4);
+}
+
 void pro80_state::pro80(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pro80_state::pro80_mem);
-	m_maincpu->set_addrmap(AS_IO, &pro80_state::pro80_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pro80_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &pro80_state::io_map);
 
 	/* video hardware */
 	config.set_default_layout(layout_pro80);
@@ -205,4 +213,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME  FLAGS
-COMP( 1981, pro80, 0,      0,      pro80,   pro80, pro80_state, empty_init, "Protec", "Pro-80", MACHINE_NOT_WORKING )
+COMP( 1981, pro80, 0,      0,      pro80,   pro80, pro80_state, empty_init, "Protec", "Pro-80", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
