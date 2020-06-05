@@ -603,6 +603,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 //		screenheight = 480;
 		screenheight = 512;
 		xmask = 0x3ff;
+		ymask = 0x3ff;
 	}
 
 	const uint32_t tile_h = 8 << ((attr & 0x00c0) >> 6);
@@ -697,7 +698,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 	else
 	{
 		// clipped from top
-		int tempfirstline = firstline - 0x200;
+		int tempfirstline = firstline - (screenheight<<1);
 		int templastline = lastline;
 		int scanx = scanline - tempfirstline;
 
@@ -707,7 +708,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 		}
 		// clipped against the bottom
 		tempfirstline = firstline;
-		templastline = lastline + 0x200;
+		templastline = lastline + (screenheight<<1);
 		scanx = scanline - tempfirstline;
 
 		if ((scanx >= 0) && (scanline <= templastline))
