@@ -476,8 +476,16 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 	int realxscroll = xscroll;
 	if (row_scroll)
 	{
-		// Tennis in My Wireless Sports confirms the need to add the scroll value here rather than rowscroll being screen-aligned
-		realxscroll += (int16_t)scrollram[(logical_scanline + yscroll) & 0xff];
+		if (!has_extended_tilemaps)
+		{
+			// Tennis in My Wireless Sports confirms the need to add the scroll value here rather than rowscroll being screen-aligned
+			realxscroll += (int16_t)scrollram[(logical_scanline + yscroll) & 0xff];
+		}
+		else
+		{
+			// the logic seems to be different on GPL16250, see Galaxian in paccon and Crazy Moto in myac220, is this mode be selected or did behavior just change?
+			realxscroll += (int16_t)scrollram[logical_scanline & 0xff];
+		}
 	}
 
 	const int upperscrollbits = (realxscroll >> (tile_width + 3));
