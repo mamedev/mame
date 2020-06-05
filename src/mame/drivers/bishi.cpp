@@ -93,18 +93,18 @@ Notes:
 #include "speaker.h"
 
 
-READ16_MEMBER(bishi_state::control_r)
+uint16_t bishi_state::control_r()
 {
 	return m_cur_control;
 }
 
-WRITE16_MEMBER(bishi_state::control_w)
+void bishi_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// bit 8 = interrupt gate
 	COMBINE_DATA(&m_cur_control);
 }
 
-WRITE16_MEMBER(bishi_state::control2_w)
+void bishi_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// bit 12 = part of the banking calculation for the K056832 ROM readback
 	COMBINE_DATA(&m_cur_control2);
@@ -125,12 +125,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(bishi_state::bishi_scanline)
 }
 
 /* compensate for a bug in the ram/rom test */
-READ16_MEMBER(bishi_state::bishi_mirror_r)
+uint16_t bishi_state::bishi_mirror_r(offs_t offset)
 {
 	return m_palette->basemem().read16(offset);
 }
 
-READ16_MEMBER(bishi_state::bishi_K056832_rom_r)
+uint16_t bishi_state::bishi_K056832_rom_r(offs_t offset)
 {
 	uint16_t ouroffs;
 

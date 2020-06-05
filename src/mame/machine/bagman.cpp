@@ -201,30 +201,27 @@ uint8_t row, column, val;
 }
 
 
-WRITE8_MEMBER(bagman_state::pal16r6_w)
+void bagman_state::pal16r6_w(offs_t offset, uint8_t data)
 {
-uint8_t line;
-
-	line = offset * 4;
+	uint8_t line = offset * 4;
 	m_columnvalue[line    ] = data & 1;
 	m_columnvalue[line + 1] = 1 - (data & 1);
 }
 
 void bagman_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	pal16r6_w(space, 0, 1);  /*pin 2*/
-	pal16r6_w(space, 1, 1);  /*pin 3*/
-	pal16r6_w(space, 2, 1);  /*pin 4*/
-	pal16r6_w(space, 3, 1);  /*pin 5*/
-	pal16r6_w(space, 4, 1);  /*pin 6*/
-	pal16r6_w(space, 5, 1);  /*pin 7*/
-	pal16r6_w(space, 6, 1);  /*pin 8*/
-	pal16r6_w(space, 7, 1);  /*pin 9*/
+	pal16r6_w(0, 1);  /*pin 2*/
+	pal16r6_w(1, 1);  /*pin 3*/
+	pal16r6_w(2, 1);  /*pin 4*/
+	pal16r6_w(3, 1);  /*pin 5*/
+	pal16r6_w(4, 1);  /*pin 6*/
+	pal16r6_w(5, 1);  /*pin 7*/
+	pal16r6_w(6, 1);  /*pin 8*/
+	pal16r6_w(7, 1);  /*pin 9*/
 	update_pal();
 }
 
-READ8_MEMBER(bagman_state::pal16r6_r)
+uint8_t bagman_state::pal16r6_r()
 {
 	update_pal();
 	return  (m_outvalue[6]) + (m_outvalue[5] << 1) + (m_outvalue[4] << 2) +

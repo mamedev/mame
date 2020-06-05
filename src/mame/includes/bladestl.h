@@ -40,11 +40,11 @@ public:
 	{ }
 
 	/* devices */
-	DECLARE_READ8_MEMBER(trackball_r);
-	DECLARE_WRITE8_MEMBER(bladestl_bankswitch_w);
+	uint8_t trackball_r(offs_t offset);
+	void bladestl_bankswitch_w(uint8_t data);
 	void bladestl_port_B_w(uint8_t data);
-	DECLARE_READ8_MEMBER(bladestl_speech_busy_r);
-	DECLARE_WRITE8_MEMBER(bladestl_speech_ctrl_w);
+	uint8_t bladestl_speech_busy_r();
+	void bladestl_speech_ctrl_w(uint8_t data);
 	void bladestl_palette(palette_device &palette) const;
 	uint32_t screen_update_bladestl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bladestl_scanline);

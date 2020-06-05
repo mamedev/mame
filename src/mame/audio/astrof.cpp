@@ -33,7 +33,7 @@
 #define CHANNEL_FUEL      3
 
 
-WRITE8_MEMBER(astrof_state::astrof_audio_1_w)
+void astrof_state::astrof_audio_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last;
 
@@ -78,7 +78,7 @@ WRITE8_MEMBER(astrof_state::astrof_audio_1_w)
 }
 
 
-WRITE8_MEMBER(astrof_state::astrof_audio_2_w)
+void astrof_state::astrof_audio_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last;
 
@@ -156,7 +156,7 @@ void astrof_state::astrof_audio(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(astrof_state::spfghmk2_audio_w)
+void astrof_state::spfghmk2_audio_w(uint8_t data)
 {
 	/* nothing yet */
 }
@@ -175,7 +175,7 @@ void astrof_state::spfghmk2_audio(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(astrof_state::tomahawk_audio_w)
+void astrof_state::tomahawk_audio_w(uint8_t data)
 {
 	/* D0 - sonar */
 

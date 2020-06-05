@@ -42,7 +42,7 @@ void balsente_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::videoram_w)
+void balsente_state::videoram_w(offs_t offset, uint8_t data)
 {
 	/* expand the two pixel values into two bytes */
 	m_videoram[offset] = data;
@@ -59,7 +59,7 @@ WRITE8_MEMBER(balsente_state::videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::palette_select_w)
+void balsente_state::palette_select_w(uint8_t data)
 {
 	/* only update if changed */
 	if (m_palettebank_vis != (data & 3))
@@ -80,7 +80,7 @@ WRITE8_MEMBER(balsente_state::palette_select_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::paletteram_w)
+void balsente_state::paletteram_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 
@@ -101,7 +101,7 @@ WRITE8_MEMBER(balsente_state::paletteram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::shrike_sprite_select_w)
+void balsente_state::shrike_sprite_select_w(uint8_t data)
 {
 	if( m_sprite_data != m_sprite_bank[(data & 0x80 >> 7) ^ 1 ])
 	{
@@ -110,7 +110,7 @@ WRITE8_MEMBER(balsente_state::shrike_sprite_select_w)
 		m_sprite_data = m_sprite_bank[(data & 0x80 >> 7) ^ 1];
 	}
 
-	shrike_shared_6809_w( space, 1, data );
+	shrike_shared_6809_w( 1, data );
 }
 
 

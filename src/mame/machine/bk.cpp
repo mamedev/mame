@@ -74,22 +74,22 @@ void bk_state::machine_reset()
 	m_scrool = 01330;
 }
 
-READ16_MEMBER(bk_state::bk_key_state_r)
+uint16_t bk_state::bk_key_state_r()
 {
 	return m_kbd_state;
 }
-READ16_MEMBER(bk_state::bk_key_code_r)
+uint16_t bk_state::bk_key_code_r()
 {
 	m_kbd_state &= ~0x80; // mark reading done
 	m_key_pressed = 0;
 	return m_key_code;
 }
-READ16_MEMBER(bk_state::bk_vid_scrool_r)
+uint16_t bk_state::bk_vid_scrool_r()
 {
 	return m_scrool;
 }
 
-READ16_MEMBER(bk_state::bk_key_press_r)
+uint16_t bk_state::bk_key_press_r()
 {
 	double level = m_cassette->input();
 	uint16_t cas = (level < 0) ? 0 : 0x20;
@@ -97,27 +97,27 @@ READ16_MEMBER(bk_state::bk_key_press_r)
 	return 0x8080 | m_key_pressed | cas;
 }
 
-WRITE16_MEMBER(bk_state::bk_key_state_w)
+void bk_state::bk_key_state_w(uint16_t data)
 {
 	m_kbd_state = (m_kbd_state & ~0x40) | (data & 0x40);
 }
 
-WRITE16_MEMBER(bk_state::bk_vid_scrool_w)
+void bk_state::bk_vid_scrool_w(uint16_t data)
 {
 	m_scrool = data;
 }
 
-WRITE16_MEMBER(bk_state::bk_key_press_w)
+void bk_state::bk_key_press_w(uint16_t data)
 {
 	m_cassette->output(BIT(data, 6) ? 1.0 : -1.0);
 }
 
-READ16_MEMBER(bk_state::bk_floppy_cmd_r)
+uint16_t bk_state::bk_floppy_cmd_r()
 {
 	return 0;
 }
 
-WRITE16_MEMBER(bk_state::bk_floppy_cmd_w)
+void bk_state::bk_floppy_cmd_w(uint16_t data)
 {
 	if (BIT(data, 0))
 		m_drive = 0;
@@ -135,11 +135,11 @@ WRITE16_MEMBER(bk_state::bk_floppy_cmd_w)
 		m_drive = -1;
 }
 
-READ16_MEMBER(bk_state::bk_floppy_data_r)
+uint16_t bk_state::bk_floppy_data_r()
 {
 	return 0;
 }
 
-WRITE16_MEMBER(bk_state::bk_floppy_data_w)
+void bk_state::bk_floppy_data_w(uint16_t data)
 {
 }

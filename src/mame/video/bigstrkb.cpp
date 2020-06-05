@@ -70,7 +70,7 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_tile_info)
 	tileinfo.set(0,tileno,col>>12,0);
 }
 
-WRITE16_MEMBER(bigstrkb_state::videoram_w)
+void bigstrkb_state::videoram_w(offs_t offset, uint16_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_tile2_info)
 	tileinfo.set(1,tileno,col>>12,0);
 }
 
-WRITE16_MEMBER(bigstrkb_state::videoram2_w)
+void bigstrkb_state::videoram2_w(offs_t offset, uint16_t data)
 {
 	m_videoram2[offset] = data;
 	m_tilemap2->mark_tile_dirty(offset);
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_tile3_info)
 	tileinfo.set(1,tileno+0x2000,(col>>12)+(0x100/16),0);
 }
 
-WRITE16_MEMBER(bigstrkb_state::videoram3_w)
+void bigstrkb_state::videoram3_w(offs_t offset, uint16_t data)
 {
 	m_videoram3[offset] = data;
 	m_tilemap3->mark_tile_dirty(offset);

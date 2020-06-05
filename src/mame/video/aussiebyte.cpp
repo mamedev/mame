@@ -21,7 +21,7 @@
 ************************************************************/
 
 // dummy read port, forces requested action to happen
-READ8_MEMBER( aussiebyte_state::port33_r )
+uint8_t aussiebyte_state::port33_r()
 {
 	return 0xff;
 }
@@ -34,17 +34,17 @@ d5 - /SRRD - controls write of data to either vram or aram (1=vram, 0=aram)
 d6 - /VWR - 0 = enable write vdata to vram, read from aram to vdata ; 1 = enable write to aram from vdata
 d7 - OE on port 35
 */
-WRITE8_MEMBER( aussiebyte_state::port34_w )
+void aussiebyte_state::port34_w(uint8_t data)
 {
 	m_port34 = data;
 }
 
-WRITE8_MEMBER( aussiebyte_state::port35_w )
+void aussiebyte_state::port35_w(uint8_t data)
 {
 	m_port35 = data;
 }
 
-READ8_MEMBER( aussiebyte_state::port36_r )
+uint8_t aussiebyte_state::port36_r()
 {
 	if (BIT(m_port34, 5))
 	{
@@ -57,7 +57,7 @@ READ8_MEMBER( aussiebyte_state::port36_r )
 		return m_p_attribram[m_alpha_address & 0x7ff];
 }
 
-READ8_MEMBER( aussiebyte_state::port37_r )
+uint8_t aussiebyte_state::port37_r()
 {
 	return m_crtc->de_r() ? 0xff : 0xfe;
 }
@@ -74,7 +74,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( aussiebyte_state::crtc_update_addr )
 //  m_video_address = address;// & 0x7ff;
 }
 
-WRITE8_MEMBER( aussiebyte_state::address_w )
+void aussiebyte_state::address_w(uint8_t data)
 {
 	m_crtc->address_w(data);
 
@@ -98,7 +98,7 @@ WRITE8_MEMBER( aussiebyte_state::address_w )
 	}
 }
 
-WRITE8_MEMBER( aussiebyte_state::register_w )
+void aussiebyte_state::register_w(uint8_t data)
 {
 	m_crtc->register_w(data);
 	uint16_t temp = m_alpha_address;

@@ -24,7 +24,7 @@
 #define LOG(x) do { if (AVIGO_VIDEO_DEBUG) logerror x; } while (0)
 
 
-READ8_MEMBER(avigo_state::vid_memory_r)
+uint8_t avigo_state::vid_memory_r(offs_t offset)
 {
 	if (!offset)
 		return m_screen_column;
@@ -39,7 +39,7 @@ READ8_MEMBER(avigo_state::vid_memory_r)
 	return m_video_memory[m_screen_column + ((offset&0xff)*(AVIGO_SCREEN_WIDTH>>3))];
 }
 
-WRITE8_MEMBER(avigo_state::vid_memory_w)
+void avigo_state::vid_memory_w(offs_t offset, uint8_t data)
 {
 	if (!offset)
 	{

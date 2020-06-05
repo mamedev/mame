@@ -163,25 +163,25 @@ void aerofgt_state::setbank( int layer, int num, int bank )
 	}
 }
 
-WRITE8_MEMBER(aerofgt_state::pspikes_gfxbank_w)
+void aerofgt_state::pspikes_gfxbank_w(uint8_t data)
 {
 	setbank(0, 0, (data & 0xf0) >> 4);
 	setbank(0, 1, data & 0x0f);
 }
 
-WRITE8_MEMBER(aerofgt_state::karatblz_gfxbank_w)
+void aerofgt_state::karatblz_gfxbank_w(uint8_t data)
 {
 	setbank(0, 0, (data & 0x01));
 	setbank(1, 1, (data & 0x08) >> 3);
 }
 
-WRITE8_MEMBER(aerofgt_state::spinlbrk_gfxbank_w)
+void aerofgt_state::spinlbrk_gfxbank_w(uint8_t data)
 {
 	setbank(0, 0, (data & 0x07));
 	setbank(1, 1, (data & 0x38) >> 3);
 }
 
-WRITE16_MEMBER(aerofgt_state::turbofrc_gfxbank_w)
+void aerofgt_state::turbofrc_gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_bank[offset]);
 
@@ -191,7 +191,7 @@ WRITE16_MEMBER(aerofgt_state::turbofrc_gfxbank_w)
 	setbank(offset, 4 * offset + 3, (data >> 12) & 0x0f);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_gfxbank_w)
+void aerofgt_state::aerofgt_gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_bank[offset]);
 
@@ -199,14 +199,14 @@ WRITE16_MEMBER(aerofgt_state::aerofgt_gfxbank_w)
 	setbank(offset >> 1, 2 * offset + 1, (data >> 0) & 0xff);
 }
 
-WRITE8_MEMBER(aerofgt_state::kickball_gfxbank_w)
+void aerofgt_state::kickball_gfxbank_w(uint8_t data)
 {
 	// I strongly doubt this logic is correct
 	setbank(0, 0, (data & 0x0f)&~0x01);
 	setbank(0, 1, (data & 0x0f));
 }
 
-WRITE8_MEMBER(aerofgt_state::pspikes_palette_bank_w)
+void aerofgt_state::pspikes_palette_bank_w(uint8_t data)
 {
 	m_spritepalettebank = data & 0x03;
 	if (m_charpalettebank != (data & 0x1c) >> 2)
@@ -219,14 +219,14 @@ WRITE8_MEMBER(aerofgt_state::pspikes_palette_bank_w)
 	m_tilemap[0]->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 }
 
-WRITE8_MEMBER(aerofgt_state::spinlbrk_flip_screen_w)
+void aerofgt_state::spinlbrk_flip_screen_w(uint8_t data)
 {
 	m_flip_screen = BIT(data, 7);
 	m_tilemap[0]->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	m_tilemap[1]->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 }
 
-WRITE8_MEMBER(aerofgt_state::turbofrc_flip_screen_w)
+void aerofgt_state::turbofrc_flip_screen_w(uint8_t data)
 {
 	m_flip_screen = BIT(data, 7);
 	m_tilemap[0]->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -380,7 +380,7 @@ VIDEO_START_MEMBER(aerofgt_state,wbbc97)
 }
 
 // BOOTLEG
-WRITE16_MEMBER(aerofgt_state::pspikesb_gfxbank_w)
+void aerofgt_state::pspikesb_gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rasterram[0x200 / 2]);
 
@@ -389,13 +389,13 @@ WRITE16_MEMBER(aerofgt_state::pspikesb_gfxbank_w)
 }
 
 // BOOTLEG
-WRITE16_MEMBER(aerofgt_state::spikes91_lookup_w)
+void aerofgt_state::spikes91_lookup_w(uint16_t data)
 {
 	m_spikes91_lookup = data & 1;
 }
 
 // BOOTLEG
-WRITE16_MEMBER(aerofgt_state::wbbc97_bitmap_enable_w)
+void aerofgt_state::wbbc97_bitmap_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_wbbc97_bitmap_enable);
 }

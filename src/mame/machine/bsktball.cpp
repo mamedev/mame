@@ -52,7 +52,7 @@ WRITE_LINE_MEMBER(bsktball_state::ld2_w)
     bsktball_in0_r
 ***************************************************************************/
 
-READ8_MEMBER(bsktball_state::bsktball_in0_r)
+uint8_t bsktball_state::bsktball_in0_r()
 {
 	int p1_horiz;
 	int p1_vert;

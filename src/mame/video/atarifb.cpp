@@ -58,21 +58,21 @@ TILE_GET_INFO_MEMBER(atarifb_state::field_get_tile_info)
  *
  *************************************/
 
-WRITE8_MEMBER(atarifb_state::atarifb_alpha1_videoram_w)
+void atarifb_state::atarifb_alpha1_videoram_w(offs_t offset, uint8_t data)
 {
 	m_alphap1_videoram[offset] = data;
 	m_alpha1_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(atarifb_state::atarifb_alpha2_videoram_w)
+void atarifb_state::atarifb_alpha2_videoram_w(offs_t offset, uint8_t data)
 {
 	m_alphap2_videoram[offset] = data;
 	m_alpha2_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(atarifb_state::atarifb_field_videoram_w)
+void atarifb_state::atarifb_field_videoram_w(offs_t offset, uint8_t data)
 {
 	m_field_videoram[offset] = data;
 	m_field_tilemap->mark_tile_dirty(offset);

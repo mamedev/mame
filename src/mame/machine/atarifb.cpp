@@ -11,7 +11,7 @@
 #include "sound/discrete.h"
 
 
-WRITE8_MEMBER(atarifb_state::atarifb_out1_w)
+void atarifb_state::atarifb_out1_w(uint8_t data)
 {
 	m_CTRLD = data;
 
@@ -22,7 +22,7 @@ WRITE8_MEMBER(atarifb_state::atarifb_out1_w)
 }
 
 
-WRITE8_MEMBER(atarifb_state::atarifb4_out1_w)
+void atarifb_state::atarifb4_out1_w(uint8_t data)
 {
 	m_CTRLD = data;
 
@@ -35,7 +35,7 @@ WRITE8_MEMBER(atarifb_state::atarifb4_out1_w)
 }
 
 
-WRITE8_MEMBER(atarifb_state::abaseb_out1_w)
+void atarifb_state::abaseb_out1_w(uint8_t data)
 {
 	m_CTRLD = data;
 
@@ -59,7 +59,7 @@ WRITE8_MEMBER(atarifb_state::abaseb_out1_w)
 }
 
 
-WRITE8_MEMBER(atarifb_state::soccer_out1_w)
+void atarifb_state::soccer_out1_w(uint8_t data)
 {
 	m_CTRLD = data;
 
@@ -81,7 +81,7 @@ WRITE8_MEMBER(atarifb_state::soccer_out1_w)
 }
 
 
-WRITE8_MEMBER(atarifb_state::atarifb_out2_w)
+void atarifb_state::atarifb_out2_w(uint8_t data)
 {
 	m_discrete->write(ATARIFB_CROWD_DATA, data & 0x0f); // Crowd
 
@@ -89,7 +89,7 @@ WRITE8_MEMBER(atarifb_state::atarifb_out2_w)
 }
 
 
-WRITE8_MEMBER(atarifb_state::soccer_out2_w)
+void atarifb_state::soccer_out2_w(uint8_t data)
 {
 	m_discrete->write(ATARIFB_CROWD_DATA, data & 0x0f); // Crowd
 
@@ -107,7 +107,7 @@ WRITE8_MEMBER(atarifb_state::soccer_out2_w)
  *************************************/
 
 /* FIXME: almost surely not tied with screen vertical position */
-WRITE8_MEMBER(atarifb_state::atarifb_out3_w)
+void atarifb_state::atarifb_out3_w(uint8_t data)
 {
 	int loop = m_screen->vpos() >= 123;
 
@@ -134,7 +134,7 @@ WRITE8_MEMBER(atarifb_state::atarifb_out3_w)
 }
 
 
-READ8_MEMBER(atarifb_state::atarifb_in0_r)
+uint8_t atarifb_state::atarifb_in0_r()
 {
 	if ((m_CTRLD & 0x20) == 0x00)
 	{
@@ -171,7 +171,7 @@ READ8_MEMBER(atarifb_state::atarifb_in0_r)
 }
 
 
-READ8_MEMBER(atarifb_state::atarifb_in2_r)
+uint8_t atarifb_state::atarifb_in2_r()
 {
 	if ((m_CTRLD & 0x20) == 0x00)
 	{
@@ -200,7 +200,7 @@ READ8_MEMBER(atarifb_state::atarifb_in2_r)
 	}
 }
 
-READ8_MEMBER(atarifb_state::atarifb4_in0_r)
+uint8_t atarifb_state::atarifb4_in0_r()
 {
 	/* LD1 and LD2 low, return sign bits */
 	if ((m_CTRLD & 0x60) == 0x00)
@@ -266,7 +266,7 @@ READ8_MEMBER(atarifb_state::atarifb4_in0_r)
 }
 
 
-READ8_MEMBER(atarifb_state::atarifb4_in2_r)
+uint8_t atarifb_state::atarifb4_in2_r()
 {
 	if ((m_CTRLD & 0x40) == 0x00)
 	{

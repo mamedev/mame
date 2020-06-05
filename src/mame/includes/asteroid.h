@@ -43,18 +43,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_center_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
-	DECLARE_READ8_MEMBER(asteroid_IN0_r);
-	DECLARE_READ8_MEMBER(asterock_IN0_r);
-	DECLARE_READ8_MEMBER(asteroid_IN1_r);
-	DECLARE_READ8_MEMBER(asteroid_DSW1_r);
-	DECLARE_WRITE8_MEMBER(asteroid_explode_w);
-	DECLARE_WRITE8_MEMBER(asteroid_thump_w);
-	DECLARE_WRITE8_MEMBER(asteroid_noise_reset_w);
-	DECLARE_WRITE8_MEMBER(llander_snd_reset_w);
-	DECLARE_WRITE8_MEMBER(llander_sounds_w);
+	uint8_t asteroid_IN0_r(offs_t offset);
+	uint8_t asterock_IN0_r(offs_t offset);
+	uint8_t asteroid_IN1_r(offs_t offset);
+	uint8_t asteroid_DSW1_r(offs_t offset);
+	void asteroid_explode_w(uint8_t data);
+	void asteroid_thump_w(uint8_t data);
+	void asteroid_noise_reset_w(uint8_t data);
+	void llander_snd_reset_w(uint8_t data);
+	void llander_sounds_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(earom_read);
-	DECLARE_WRITE8_MEMBER(earom_write);
+	uint8_t earom_read();
+	void earom_write(offs_t offset, uint8_t data);
 	void earom_control_w(uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER(clock_r);

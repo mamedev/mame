@@ -144,7 +144,7 @@ VIDEO_START_MEMBER(bosco_state,bosco)
 
 ***************************************************************************/
 
-WRITE8_MEMBER( bosco_state::bosco_videoram_w )
+void bosco_state::bosco_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	if (offset & 0x400)
@@ -153,17 +153,17 @@ WRITE8_MEMBER( bosco_state::bosco_videoram_w )
 		m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER( bosco_state::bosco_scrollx_w )
+void bosco_state::bosco_scrollx_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0,data);
 }
 
-WRITE8_MEMBER( bosco_state::bosco_scrolly_w )
+void bosco_state::bosco_scrolly_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrolly(0,data);
 }
 
-WRITE8_MEMBER( bosco_state::bosco_starclr_w )
+void bosco_state::bosco_starclr_w(uint8_t data)
 {
 	// On any write to $9840, turn on starfield
 	m_bosco_starclr = 0;

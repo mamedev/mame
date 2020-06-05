@@ -10,7 +10,7 @@
 #include "includes/bsktball.h"
 
 
-WRITE8_MEMBER(bsktball_state::bsktball_videoram_w)
+void bsktball_state::bsktball_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

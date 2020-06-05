@@ -97,7 +97,7 @@ INPUT_PORTS_END
     I/O Ports
 
 ************************************************************/
-WRITE8_MEMBER( aussiebyte_state::port15_w )
+void aussiebyte_state::port15_w(uint8_t data)
 {
 	membank("bankr0")->set_entry(m_port15); // point at ram
 	m_port15 = true;
@@ -115,7 +115,7 @@ WRITE8_MEMBER( aussiebyte_state::port15_w )
 5 Disable 5.25 inch floppy spindle motors.
 6 Unused.
 7 Enable write precompensation on WD2797 controller. */
-WRITE8_MEMBER( aussiebyte_state::port16_w )
+void aussiebyte_state::port16_w(uint8_t data)
 {
 	floppy_image_device *m_floppy = nullptr;
 	if ((data & 15) == 0)
@@ -142,7 +142,7 @@ WRITE8_MEMBER( aussiebyte_state::port16_w )
 5 - SIO Ch D
 6 - Ext ready 1
 7 - Ext ready 2 */
-WRITE8_MEMBER( aussiebyte_state::port17_w )
+void aussiebyte_state::port17_w(uint8_t data)
 {
 	m_port17 = data & 7;
 	m_dma->rdy_w(BIT(m_port17_rdy, data));
@@ -151,19 +151,19 @@ WRITE8_MEMBER( aussiebyte_state::port17_w )
 /* FDC params
 2 EXC: WD2797 clock frequency. H = 5.25"; L = 8"
 3 WIEN: WD2797 Double density select. */
-WRITE8_MEMBER( aussiebyte_state::port18_w )
+void aussiebyte_state::port18_w(uint8_t data)
 {
 	m_fdc->set_unscaled_clock(BIT(data, 2) ? 1e6 : 2e6);
 	m_fdc->dden_w(BIT(data, 3));
 }
 
-READ8_MEMBER( aussiebyte_state::port19_r )
+uint8_t aussiebyte_state::port19_r()
 {
 	return m_port19;
 }
 
 // Memory banking
-WRITE8_MEMBER( aussiebyte_state::port1a_w )
+void aussiebyte_state::port1a_w(uint8_t data)
 {
 	data &= 7;
 	switch (data)
@@ -208,12 +208,12 @@ WRITE8_MEMBER( aussiebyte_state::port1a_w )
 }
 
 // Winchester control
-WRITE8_MEMBER( aussiebyte_state::port1b_w )
+void aussiebyte_state::port1b_w(uint8_t data)
 {
 }
 
 // GPEHB control
-WRITE8_MEMBER( aussiebyte_state::port1c_w )
+void aussiebyte_state::port1c_w(uint8_t data)
 {
 }
 
@@ -224,7 +224,7 @@ void aussiebyte_state::port20_w(uint8_t data)
 	m_rtc->hold_w(BIT(data, 0));
 }
 
-READ8_MEMBER( aussiebyte_state::port28_r )
+uint8_t aussiebyte_state::port28_r()
 {
 	return m_port28;
 }
@@ -234,7 +234,7 @@ READ8_MEMBER( aussiebyte_state::port28_r )
     RTC
 
 ************************************************************/
-READ8_MEMBER( aussiebyte_state::rtc_r )
+uint8_t aussiebyte_state::rtc_r(offs_t offset)
 {
 	m_rtc->read_w(1);
 	m_rtc->address_w(offset);
@@ -243,7 +243,7 @@ READ8_MEMBER( aussiebyte_state::rtc_r )
 	return data;
 }
 
-WRITE8_MEMBER( aussiebyte_state::rtc_w )
+void aussiebyte_state::rtc_w(offs_t offset, uint8_t data)
 {
 	m_rtc->address_w(offset);
 	m_rtc->data_w(data);

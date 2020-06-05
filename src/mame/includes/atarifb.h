@@ -42,20 +42,20 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(atarifb_out1_w);
-	DECLARE_WRITE8_MEMBER(atarifb4_out1_w);
-	DECLARE_WRITE8_MEMBER(abaseb_out1_w);
-	DECLARE_WRITE8_MEMBER(soccer_out1_w);
-	DECLARE_WRITE8_MEMBER(atarifb_out2_w);
-	DECLARE_WRITE8_MEMBER(soccer_out2_w);
-	DECLARE_WRITE8_MEMBER(atarifb_out3_w);
-	DECLARE_READ8_MEMBER(atarifb_in0_r);
-	DECLARE_READ8_MEMBER(atarifb_in2_r);
-	DECLARE_READ8_MEMBER(atarifb4_in0_r);
-	DECLARE_READ8_MEMBER(atarifb4_in2_r);
-	DECLARE_WRITE8_MEMBER(atarifb_alpha1_videoram_w);
-	DECLARE_WRITE8_MEMBER(atarifb_alpha2_videoram_w);
-	DECLARE_WRITE8_MEMBER(atarifb_field_videoram_w);
+	void atarifb_out1_w(uint8_t data);
+	void atarifb4_out1_w(uint8_t data);
+	void abaseb_out1_w(uint8_t data);
+	void soccer_out1_w(uint8_t data);
+	void atarifb_out2_w(uint8_t data);
+	void soccer_out2_w(uint8_t data);
+	void atarifb_out3_w(uint8_t data);
+	uint8_t atarifb_in0_r();
+	uint8_t atarifb_in2_r();
+	uint8_t atarifb4_in0_r();
+	uint8_t atarifb4_in2_r();
+	void atarifb_alpha1_videoram_w(offs_t offset, uint8_t data);
+	void atarifb_alpha2_videoram_w(offs_t offset, uint8_t data);
+	void atarifb_field_videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(alpha1_get_tile_info);
 	TILE_GET_INFO_MEMBER(alpha2_get_tile_info);
 	TILE_GET_INFO_MEMBER(field_get_tile_info);

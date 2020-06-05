@@ -36,25 +36,25 @@ void bogeyman_state::bogeyman_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(bogeyman_state::videoram_w)
+void bogeyman_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bogeyman_state::colorram_w)
+void bogeyman_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bogeyman_state::videoram2_w)
+void bogeyman_state::videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bogeyman_state::colorram2_w)
+void bogeyman_state::colorram2_w(offs_t offset, uint8_t data)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);

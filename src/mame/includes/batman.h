@@ -33,7 +33,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	DECLARE_WRITE16_MEMBER(latch_w);
+	void latch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
