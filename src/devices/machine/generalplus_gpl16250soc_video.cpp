@@ -351,23 +351,23 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 		uint16_t ctrl3 = m_tmap3_regs[1];
 
 		popmessage(
-			"p0ct u:%02x Bl:%d HC:%d Ycmp:%d Hcmp:%d RS:%d E:%d WP:%d Rg:%d Bm:%d gfxadr: %08x\n"
-			"p1ct u:%02x Bl:%d HC:%d Ycmp:%d Hcmp:%d RS:%d E:%d WP:%d Rg:%d Bm:%d gfxadr: %08x\n"
-			"p2ct u:%02x Bl:%d HC:%d Ycmp:%d Hcmp:%d RS:%d E:%d WP:%d Rg:%d Bm:%d gfxadr: %08x\n"
-			"p3ct u:%02x Bl:%d HC:%d Ycmp:%d Hcmp:%d RS:%d E:%d WP:%d Rg:%d Bm:%d gfxadr: %08x\n"
-			"p0attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
-			"p1attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
-			"p2attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
-			"p3attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
+			"p0ct u:%02x Bl:%d HC:%d Ycmp:%d Hcmp:%d RS:%d E:%d WP:%d Rg:%d Bm:%d gfxadr: %08x t:%04x p:%04x\n"
+			"p1ct u:%02x Bl:%d HC:%d Ycmp:%d Hcmp:%d RS:%d E:%d WP:%d Rg:%d Bm:%d gfxadr: %08x t:%04x p:%04x\n"
+			"p2ct u:%02x Bl:%d HC:%d Ycmp:%d Hcmp:%d RS:%d E:%d WP:%d Rg:%d Bm:%d gfxadr: %08x t:%04x p:%04x\n"
+			"p3ct u:%02x Bl:%d HC:%d Ycmp:%d Hcmp:%d RS:%d E:%d WP:%d Rg:%d Bm:%d gfxadr: %08x t:%04x p:%04x\n"
+			"p0attr dw:%01x dh:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d xs: %04x ys %04x\n"
+			"p1attr dw:%01x dh:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d xs: %04x ys %04x\n"
+			"p2attr dw:%01x dh:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d xs: %04x ys %04x\n"
+			"p3attr dw:%01x dh:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d xs: %04x ys %04x\n"
 			"palbank %04x 707e: %04x 707f: %04x tvc703c: %04x spr7042: %04x\n",
-			(ctrl0 & 0xfe00) >> 9, BIT(ctrl0, 8), BIT(ctrl0, 7), BIT(ctrl0, 6), BIT(ctrl0, 5), BIT(ctrl0, 4), BIT(ctrl0, 3), BIT(ctrl0, 2), BIT(ctrl0, 1), BIT(ctrl0, 0), page0_addr,
-			(ctrl1 & 0xfe00) >> 9, BIT(ctrl1, 8), BIT(ctrl1, 7), BIT(ctrl1, 6), BIT(ctrl1, 5), BIT(ctrl1, 4), BIT(ctrl1, 3), BIT(ctrl1, 2), BIT(ctrl1, 1), BIT(ctrl1, 0), page1_addr,
-			(ctrl2 & 0xfe00) >> 9, BIT(ctrl2, 8), BIT(ctrl2, 7), BIT(ctrl2, 6), BIT(ctrl2, 5), BIT(ctrl2, 4), BIT(ctrl2, 3), BIT(ctrl2, 2), BIT(ctrl2, 1), BIT(ctrl2, 0), page2_addr,
-			(ctrl3 & 0xfe00) >> 9, BIT(ctrl3, 8), BIT(ctrl3, 7), BIT(ctrl3, 6), BIT(ctrl3, 5), BIT(ctrl3, 4), BIT(ctrl3, 3), BIT(ctrl3, 2), BIT(ctrl3, 1), BIT(ctrl3, 0), page3_addr,
-			(attr0 & 0xc000) >> 14, (attr0 >> 12) & 3, (attr0 >> 8) & 15, 8 << ((attr0 >> 6) & 3), 8 << ((attr0 >> 4) & 3), BIT(attr0, 3), BIT(attr0, 2), 2 * ((attr0 & 3) + 1),
-			(attr1 & 0xc000) >> 14, (attr1 >> 12) & 3, (attr1 >> 8) & 15, 8 << ((attr1 >> 6) & 3), 8 << ((attr1 >> 4) & 3), BIT(attr1, 3), BIT(attr1, 2), 2 * ((attr1 & 3) + 1),
-			(attr2 & 0xc000) >> 14, (attr2 >> 12) & 3, (attr2 >> 8) & 15, 8 << ((attr2 >> 6) & 3), 8 << ((attr2 >> 4) & 3), BIT(attr2, 3), BIT(attr2, 2), 2 * ((attr2 & 3) + 1),
-			(attr3 & 0xc000) >> 14, (attr3 >> 12) & 3, (attr3 >> 8) & 15, 8 << ((attr3 >> 6) & 3), 8 << ((attr3 >> 4) & 3), BIT(attr3, 3), BIT(attr3, 2), 2 * ((attr3 & 3) + 1),
+			(ctrl0 & 0xfe00) >> 9, BIT(ctrl0, 8), BIT(ctrl0, 7), BIT(ctrl0, 6), BIT(ctrl0, 5), BIT(ctrl0, 4), BIT(ctrl0, 3), BIT(ctrl0, 2), BIT(ctrl0, 1), BIT(ctrl0, 0), page0_addr, m_tmap0_regs[2], m_tmap0_regs[3],
+			(ctrl1 & 0xfe00) >> 9, BIT(ctrl1, 8), BIT(ctrl1, 7), BIT(ctrl1, 6), BIT(ctrl1, 5), BIT(ctrl1, 4), BIT(ctrl1, 3), BIT(ctrl1, 2), BIT(ctrl1, 1), BIT(ctrl1, 0), page1_addr, m_tmap1_regs[2], m_tmap1_regs[3],
+			(ctrl2 & 0xfe00) >> 9, BIT(ctrl2, 8), BIT(ctrl2, 7), BIT(ctrl2, 6), BIT(ctrl2, 5), BIT(ctrl2, 4), BIT(ctrl2, 3), BIT(ctrl2, 2), BIT(ctrl2, 1), BIT(ctrl2, 0), page2_addr, m_tmap2_regs[2], m_tmap2_regs[3],
+			(ctrl3 & 0xfe00) >> 9, BIT(ctrl3, 8), BIT(ctrl3, 7), BIT(ctrl3, 6), BIT(ctrl3, 5), BIT(ctrl3, 4), BIT(ctrl3, 3), BIT(ctrl3, 2), BIT(ctrl3, 1), BIT(ctrl3, 0), page3_addr, m_tmap3_regs[2], m_tmap3_regs[3],
+			BIT(attr0, 15), BIT(attr0, 14), (attr0 >> 12) & 3, (attr0 >> 8) & 15, 8 << ((attr0 >> 6) & 3), 8 << ((attr0 >> 4) & 3), BIT(attr0, 3), BIT(attr0, 2), 2 * ((attr0 & 3) + 1), m_tmap0_scroll[0], m_tmap0_scroll[1],
+			BIT(attr1, 15), BIT(attr1, 14), (attr1 >> 12) & 3, (attr1 >> 8) & 15, 8 << ((attr1 >> 6) & 3), 8 << ((attr1 >> 4) & 3), BIT(attr1, 3), BIT(attr1, 2), 2 * ((attr1 & 3) + 1), m_tmap1_scroll[0], m_tmap1_scroll[1],
+			BIT(attr2, 15), BIT(attr2, 14), (attr2 >> 12) & 3, (attr2 >> 8) & 15, 8 << ((attr2 >> 6) & 3), 8 << ((attr2 >> 4) & 3), BIT(attr2, 3), BIT(attr2, 2), 2 * ((attr2 & 3) + 1), m_tmap2_scroll[0], m_tmap2_scroll[1],
+			BIT(attr3, 15), BIT(attr3, 14), (attr3 >> 12) & 3, (attr3 >> 8) & 15, 8 << ((attr3 >> 6) & 3), 8 << ((attr3 >> 4) & 3), BIT(attr3, 3), BIT(attr3, 2), 2 * ((attr3 & 3) + 1), m_tmap3_scroll[0], m_tmap3_scroll[1],
 			m_703a_palettebank, m_707e_spritebank, m_707f, m_703c_tvcontrol1, m_7042_sprite
 		);
 	}
@@ -1058,7 +1058,10 @@ WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 		m_paletteram[offset] = data;
 		
 		// for debug
-		m_palette->set_pen_color(offset, rgb_t((((data >> 15) & 0x1f)<<3), (((data >> 10) & 0x1f)<<3), (((data >> 0) & 0x1f)<<3)));
+		m_palette->set_pen_color(offset, rgb_t(
+			(((data >> 10) & 0x1f)<<3),
+			(((data >> 5)  & 0x1f)<<3),
+			(((data >> 0)  & 0x1f)<<3)));
 	}
 }
 
