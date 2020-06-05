@@ -1089,7 +1089,9 @@ void twinkle_state::twinkle(machine_config &config)
 	/* video hardware */
 	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	//all twinkle cabinets use anamorphic widescreen displays
+	screen.set_physical_aspect(16, 9);
 
 	/* sound hardware */
 	SPEAKER(config, "speakerleft").front_left();
