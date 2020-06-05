@@ -511,7 +511,7 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 
 		tile = (ctrl & 0x0004) ? spc.read_word(tilemap_rambase) : spc.read_word(tilemap_rambase + tile_address);
 
-		if (!tile)
+		if (!has_extended_tilemaps && !tile) // Galaga in paccon won't render '0' characters in the scoring table if you skip empty tiles, so maybe GPL16250 doesn't skip? - extra tile bits from extended read make no difference
 			continue;
 
 		uint32_t tileattr = attr;
