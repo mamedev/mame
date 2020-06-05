@@ -511,8 +511,25 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 
 		tile = (ctrl & 0x0004) ? spc.read_word(tilemap_rambase) : spc.read_word(tilemap_rambase + tile_address);
 
-		if (!has_extended_tilemaps && !tile) // Galaga in paccon won't render '0' characters in the scoring table if you skip empty tiles, so maybe GPL16250 doesn't skip? - extra tile bits from extended read make no difference
-			continue;
+		if (!tile)
+		{
+			if (!has_extended_tilemaps)
+			{
+				// always skip on older SPG types?
+				continue;
+			}
+			else if (m_video_regs_7f & 0x0002)
+			{
+				// Galaga in paccon won't render '0' characters in the scoring table if you skip empty tiles, so maybe GPL16250 doesn't skip? - extra tile bits from extended read make no difference
+
+				// probably not based on register m_video_regs_7f, but paccon galaga needs no skip, jak_gtg and jak_hmhsm needs to skip
+				//49 0100 1001  no skip (paccon galaga)
+				//4b 0100 1011  skip    (paccon pacman)
+				//53 0101 0011  skip    (jak_gtg, jak_hmhsm)
+				continue;
+			}
+		}
+
 
 		uint32_t tileattr = attr;
 		uint32_t tilectrl = ctrl;
