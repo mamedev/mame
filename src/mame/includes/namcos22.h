@@ -267,16 +267,16 @@ protected:
 	virtual void video_start() override;
 	virtual void device_post_load() override;
 
-	void namcos22_textram_w(offs_t offset, u32 data, u32 mem_mask);
+	void namcos22_textram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u16 namcos22_tilemapattr_r(offs_t offset);
-	void namcos22_tilemapattr_w(offs_t offset, u16 data, u16 mem_mask);
+	void namcos22_tilemapattr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u32 namcos22_dspram_r(offs_t offset);
-	void namcos22_dspram_w(offs_t offset, u32 data, u32 mem_mask);
-	void namcos22_cgram_w(offs_t offset, u32 data, u32 mem_mask);
-	void namcos22_paletteram_w(offs_t offset, u32 data, u32 mem_mask);
-	void namcos22_dspram16_bank_w(offs_t offset, u16 data, u16 mem_mask);
+	void namcos22_dspram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void namcos22_cgram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void namcos22_paletteram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void namcos22_dspram16_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 namcos22_dspram16_r(offs_t offset);
-	void namcos22_dspram16_w(offs_t offset, u16 data, u16 mem_mask);
+	void namcos22_dspram16_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 pdp_status_r();
 	u16 pdp_begin_r();
 	u16 dsp_hold_signal_r();
@@ -311,12 +311,12 @@ protected:
 	DECLARE_READ32_MEMBER(namcos22_sci_r);
 	DECLARE_WRITE32_MEMBER(namcos22_sci_w);
 	u16 namcos22_shared_r(offs_t offset);
-	void namcos22_shared_w(offs_t offset, u16 data, u16 mem_mask);
+	void namcos22_shared_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 namcos22_keycus_r(offs_t offset);
-	void namcos22_keycus_w(offs_t offset, u16 data, u16 mem_mask);
+	void namcos22_keycus_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	DECLARE_READ16_MEMBER(namcos22_portbit_r);
 	DECLARE_WRITE16_MEMBER(namcos22_portbit_w);
-	void namcos22_cpuleds_w(offs_t offset, u32 data, u32 mem_mask);
+	void namcos22_cpuleds_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u8 mcu_port4_s22_r();
 	u8 iomcu_port4_s22_r();
 	DECLARE_READ16_MEMBER(mcuc74_speedup_r);
@@ -550,7 +550,7 @@ private:
 
 	DECLARE_WRITE16_MEMBER(namcos22s_czattr_w);
 	DECLARE_READ16_MEMBER(namcos22s_czattr_r);
-	void namcos22s_czram_w(offs_t offset, u32 data, u32 mem_mask);
+	void namcos22s_czram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 namcos22s_czram_r(offs_t offset);
 	DECLARE_READ32_MEMBER(namcos22s_vics_control_r);
 	DECLARE_WRITE32_MEMBER(namcos22s_vics_control_w);

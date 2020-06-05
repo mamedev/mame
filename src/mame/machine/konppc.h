@@ -106,6 +106,4 @@ private:
 DECLARE_DEVICE_TYPE(KONPPC, konppc_device)
 
 
-void draw_7segment_led(bitmap_rgb32 &bitmap, int x, int y, uint8_t value);
-
 #endif // MAME_MACHINE_KONPPC_H
