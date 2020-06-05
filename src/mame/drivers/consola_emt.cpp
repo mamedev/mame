@@ -52,7 +52,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i80188_cpu_device> m_maincpu;
 	required_device<mcs51_cpu_device> m_mcu;
 	required_device<hd44780_device> m_lcdc;
 
@@ -76,12 +76,16 @@ void consoemt_state::mem_map(address_map &map)
 
 void consoemt_state::io_map(address_map &map)
 {
+	map(0x000, 0x003).rw("uart1", FUNC(scc85230_device::ab_dc_r), FUNC(scc85230_device::ab_dc_w));
+	map(0x010, 0x013).rw("uart2", FUNC(scc85230_device::ab_dc_r), FUNC(scc85230_device::ab_dc_w));
 	map(0x180, 0x18f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x200, 0x200).portr("FUNCIONES"); // maybe
+	map(0x200, 0x200).portr("FUNCIONES");
 	map(0x210, 0x210).portr("NUMBUS-L");
 	map(0x220, 0x220).portr("NUMBUS-H");
 	map(0x230, 0x230).portr("NUMFAB-L");
 	map(0x240, 0x240).portr("NUMFAB-H");
+//	map(0x250, 0x250).r // read on int2
+//	map(0x260, 0x260).r // read on int1
 	map(0x280, 0x281).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 }
 
@@ -92,9 +96,15 @@ void consoemt_state::io_map(address_map &map)
 
 static INPUT_PORTS_START( consoemt )
 	PORT_START("FUNCIONES")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "FUNCIONES:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "FUNCIONES:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "FUNCIONES:3")
+	PORT_DIPNAME(0x01, 0x00, "Canceladora 1") PORT_DIPLOCATION("FUNCIONES:1")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+	PORT_DIPNAME(0x02, 0x00, "Canceladora 2") PORT_DIPLOCATION("FUNCIONES:2")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x02, DEF_STR( On ))
+	PORT_DIPNAME(0x04, 0x00, "Canceladora 3") PORT_DIPLOCATION("FUNCIONES:3")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x04, DEF_STR( On ))
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "FUNCIONES:4")
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "FUNCIONES:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "FUNCIONES:6")
@@ -250,9 +260,11 @@ void consoemt_state::consoemt(machine_config &config)
 
 	MSM6242(config, "rtc", XTAL(32'768));
 
-	SCC85230(config, "uart1", 4.9152_MHz_XTAL);
+	scc85230_device &uart1(SCC85230(config, "uart1", 4.9152_MHz_XTAL));
+	uart1.out_int_callback().set(m_maincpu, FUNC(i80188_cpu_device::int0_w));
 
-	SCC85230(config, "uart2", 4.9152_MHz_XTAL);
+	scc85230_device &uart2(SCC85230(config, "uart2", 4.9152_MHz_XTAL));
+	uart2.out_int_callback().set(m_maincpu, FUNC(i80188_cpu_device::int3_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
