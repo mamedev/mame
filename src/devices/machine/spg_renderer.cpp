@@ -179,6 +179,12 @@ void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectang
 
 		linebase = linebase | (palette << 16);
 
+		int upperpalselect = 0;
+		if (has_extended_tilemaps && (tilegfxdata_addr & 0x80000000))
+			upperpalselect = 1;
+
+		tilegfxdata_addr &= 0x7ffffff;
+
 		// this logic works for jak_s500 and the test modes to get the correct base, doesn't seem to work for jak_car2 ingame, maybe data is copied to wrong place?
 		int gfxbase = (tilegfxdata_addr&0x7ffffff) + (linebase&0x7ffffff);
 
@@ -205,6 +211,9 @@ void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectang
 
 				pal = (pix & 0xff) | 0x100;
 
+				if (upperpalselect)
+					pal |= 0x200;
+
 				if (xx >= 0 && xx <= cliprect.max_x)
 				{
 					uint16_t rgb = paletteram[pal];
@@ -216,7 +225,10 @@ void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectang
 				}
 
 				xx = (i * 2)+1;
-				pal = (pix >> 8) + 0x100;
+				pal = (pix >> 8) | 0x100;
+
+				if (upperpalselect)
+					pal |= 0x200;
 
 				if (xx >= 0 && xx <= cliprect.max_x)
 				{
@@ -465,6 +477,13 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 
 	const int upperscrollbits = (realxscroll >> (tile_width + 3));
 	const int endpos = (screenwidth + tile_w) / tile_w;
+
+	int upperpalselect = 0;
+	if (has_extended_tilemaps && (tilegfxdata_addr & 0x80000000))
+		upperpalselect = 1;
+
+	tilegfxdata_addr &= 0x7ffffff;
+
 	for (uint32_t x0 = 0; x0 < endpos; x0++)
 	{
 		spg_renderer_device::blend_enable_t blend;
@@ -525,46 +544,8 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 		palette_offset = (tileattr & 0x0f00) >> 4;
 		// got tile info
 
-		if (1)
-		{
-			// HACKS
-			// There must be a select bit for the tilemap palettes somewhere, but where?!
-			// the different games in paccon also expect a variety of different configs here, maybe a good place to look
-			if (palbank & 1) // this actually seems to be the sprite palette bank enable, but for myac220 / tkmag220 (where everything is from a single palette) it gives us an easy way to ignore the logic below
-			{
-				if (which == 0) // tilemap 0
-				{
-					if (ctrl & 0x0002)  // RegSet:1
-					{
-						// smartfp has a conflict between the bootlogos and the first screen, it's in regset mode, no obvious difference in registers but needs palette from different places?
-						// not even m_video_regs_7f changes here, which makes the m_video_regs_7f case specific hacks for jak_s500 below very unlikely to actually be related
-						if ((bpp + 1) * 2 == 4)
-							if (use_alt_tile_addressing == true)
-								palette_offset |= 0x200;
-					}
-				}
-
-				if (which == 1)
-				{
-					// can't do this for jak_s500 logos
-					// jak_s500 also uses this tilemap in both 4 and 6bpp modes expecting the same palette base, so the hack used for smartfp on tilemap 0 is not applicable here
-
-					// m_video_regs_7f != 0x2d3 for jak_S500 main menu
-					if ((m_video_regs_7f != 0x53) && (m_video_regs_7f != 0x63) && (m_video_regs_7f != 0x2d3))
-						palette_offset |= 0x200;
-				}
-
-				// jak_car2 screen transitions use layers 2 and 3 the same way, alternating each frame
-				if (which == 2)
-				{
-					// jak_s500 title screen + loading screen before race
-					if ((m_video_regs_7f == 0x2d3) || (m_video_regs_7f == 0x2db))
-						palette_offset |= 0x200;
-				}
-
-			}
-		}
-
+		if (upperpalselect)
+			palette_offset |= 0x200;
 
 		palette_offset >>= nc_bpp;
 		palette_offset <<= nc_bpp;
