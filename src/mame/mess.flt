@@ -165,6 +165,7 @@ cit101.cpp
 cit1500.cpp
 cit220.cpp
 cking_master.cpp
+ckz80.cpp
 clcd.cpp
 clickstart.cpp
 clxvme186.cpp
@@ -202,7 +203,6 @@ cxg_sphinx40.cpp
 cxhumax.cpp
 cybiko.cpp
 cz101.cpp
-czk80.cpp
 d400.cpp
 d6800.cpp
 d6809.cpp
@@ -1013,6 +1013,7 @@ tvgame.cpp
 tx0.cpp
 uchroma68.cpp
 uknc.cpp
+ultim809.cpp
 unichamp.cpp
 unior.cpp
 unistar.cpp
