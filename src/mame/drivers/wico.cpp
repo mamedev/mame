@@ -113,7 +113,7 @@ void wico_state::hcpu_map(address_map &map)
 	//map(0x1fed, 0x1fed).r(FUNC(wico_state::solst1_r));
 	//map(0x1fee, 0x1fee).r(FUNC(wico_state::solst0_r));
 	map(0x1fef, 0x1fef).r(FUNC(wico_state::switch_r));
-	map(0xf000, 0xffff).rom();
+	map(0xf000, 0xffff).rom().region("hcpu", 0);
 }
 
 // command cpu
@@ -137,8 +137,8 @@ void wico_state::ccpu_map(address_map &map)
 	//map(0x1fee, 0x1fee).r(FUNC(wico_state::solst0_r)); // switches
 	//map(0x1fef, 0x1fef).r(FUNC(wico_state::switch_r)); // switches
 	map(0x4000, 0x40ff).ram().share("nvram"); // X2212 4bit x 256 NVRAM, stores only when store_w is active
-	map(0x8000, 0x9fff).rom();
-	map(0xe000, 0xffff).rom();
+	map(0x8000, 0x9fff).rom().region("ccpu", 0);
+	map(0xe000, 0xffff).rom().region("ccpu", 0x2000);
 }
 
 static INPUT_PORTS_START( wico )
@@ -466,12 +466,12 @@ void wico_state::wico(machine_config &config)
 / Af-Tor (1984)
 /-------------------------------------------------------------------*/
 ROM_START(aftor)
-	ROM_REGION(0x10000, "hcpu", 0)
-	ROM_LOAD("u25.bin", 0xf000, 0x1000, CRC(d66e95ff) SHA1(f7e8c51f1b37e7ef560406f1968c12a2043646c5))
+	ROM_REGION(0x1000, "hcpu", 0)
+	ROM_LOAD("u25.bin", 0x0000, 0x1000, CRC(d66e95ff) SHA1(f7e8c51f1b37e7ef560406f1968c12a2043646c5))
 
-	ROM_REGION(0x10000, "ccpu", 0)
-	ROM_LOAD("u52.bin", 0x8000, 0x2000, CRC(8035b446) SHA1(3ec59015e259c315bf09f4e2046f9d98e2d7a732))
-	ROM_LOAD("u48.bin", 0xe000, 0x2000, CRC(b4406563) SHA1(6d1a9086eb1f6f947eae3a92ccf7a9b7375d85d3))
+	ROM_REGION(0x4000, "ccpu", 0)
+	ROM_LOAD("u52.bin", 0x0000, 0x2000, CRC(8035b446) SHA1(3ec59015e259c315bf09f4e2046f9d98e2d7a732))
+	ROM_LOAD("u48.bin", 0x2000, 0x2000, CRC(b4406563) SHA1(6d1a9086eb1f6f947eae3a92ccf7a9b7375d85d3))
 ROM_END
 
 /*-------------------------------------------------------------------

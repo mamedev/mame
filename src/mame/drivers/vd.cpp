@@ -218,7 +218,7 @@ void vd_state::vd(machine_config &config)
 / Break '86", and the service manual's title page has "Modbreak."
 /-------------------------------------------------------------------*/
 ROM_START(break86)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("break1.cpu", 0x0000, 0x2000, CRC(c187d263) SHA1(1790566799ccc41cd5445936e86f945150e24e8a))
 	ROM_LOAD("break2.cpu", 0x2000, 0x2000, CRC(ed8f84ab) SHA1(ff5d7e3c373ca345205e8b92c6ce7b02f36a3d95))
 	ROM_LOAD("break3.cpu", 0x4000, 0x2000, CRC(3cdfedc2) SHA1(309fd04c81b8facdf705e6297c0f4d507957ae1f))
@@ -228,7 +228,7 @@ ROM_END
 / Papillon (1986)
 /-------------------------------------------------------------------*/
 ROM_START(papillon)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("u4.dat", 0x0000, 0x2000, CRC(e57bfcdd) SHA1(d0d5c798552a2436693dfee0e2ebf4b6f465b194))
 	ROM_LOAD("u5.dat", 0x2000, 0x2000, CRC(6d2ef02a) SHA1(0b67b2edd85624531630c162ae31af8078be01e3))
 	ROM_LOAD("u6.dat", 0x4000, 0x2000, CRC(6b2867b3) SHA1(720fe8a65b447e839b0eb9ea21e0b3cb0e50cf7a))
