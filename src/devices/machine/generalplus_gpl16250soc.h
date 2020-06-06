@@ -49,8 +49,7 @@ public:
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),
 		m_boot_mode(0),
-		m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback)),
-		m_speedup_address(-1)
+		m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback))
 	{
 	}
 
@@ -91,7 +90,7 @@ public:
 
 	void set_romtype(int romtype) { m_romtype = romtype; }
 
-	void install_speedup_hack(int address, int pc);
+	inline uint16_t get_ram_addr(uint32_t addr) { return m_mainram[addr]; }
 
 protected:
 
@@ -360,10 +359,6 @@ private:
 	// config registers (external pins)
 	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
 	sunplus_gcm394_cs_callback_device m_cs_callback;
-	
-	DECLARE_READ16_MEMBER(speedup_hack_r);
-	int m_speedup_address;
-	int m_speedup_pc;
 };
 
 

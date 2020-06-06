@@ -323,7 +323,14 @@ void lazertag_game_state::machine_reset()
 void paccon_game_state::machine_reset()
 {
 	jak_s500_game_state::machine_reset();
-	m_maincpu->install_speedup_hack(0x6593, 0x30033);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6593, 0x6593, read16_delegate(*this, FUNC(paccon_game_state::paccon_speedup_hack_r)));
+//	install_speedup_hack(0x6593, 0x30033);
+}
+
+void jak_pf_game_state::machine_reset()
+{
+	jak_s500_game_state::machine_reset();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0001, 0x0001, read16_delegate(*this, FUNC(jak_pf_game_state::jak_pf_speedup_hack_r)));
 }
 
 void jak_prft_game_state::machine_reset()
@@ -331,6 +338,23 @@ void jak_prft_game_state::machine_reset()
 	jak_s500_game_state::machine_reset();
 	//m_maincpu->set_alt_tile_addressing_hack(0);
 	m_maincpu->set_alt_extrasprite_hack(1);
+}
+
+
+READ16_MEMBER(paccon_game_state::paccon_speedup_hack_r)
+{
+	u32 const pc = m_maincpu->pc();
+	if (pc == 0x30033)
+		m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(2000));
+	return m_maincpu->get_ram_addr(0x6593);
+}
+
+READ16_MEMBER(jak_pf_game_state::jak_pf_speedup_hack_r)
+{
+	u32 const pc = m_maincpu->pc();
+	if (pc == 0x30010)
+		m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(2000));
+	return m_maincpu->get_ram_addr(0x0001);
 }
 
 ROM_START( paccon )
@@ -507,7 +531,7 @@ CONS(2008, lazertag, 0, 0, wrlshunt, jak_s500, lazertag_game_state, init_wrlshun
 
 CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, jak_smwm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Spider-Man Web Master (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2010, jak_pf,   0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
+CONS(2010, jak_pf,   0, 0, wrlshunt, jak_s500, jak_pf_game_state,   init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
 CONS(200?, jak_totm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
 CONS(2009, jak_prft, 0, 0, wrlshunt, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, jak_tink, 0, 0, wrlshunt, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
