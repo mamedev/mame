@@ -110,11 +110,11 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 	uint16_t *page1_regs = m_video_regs + 0x12;
 	uint16_t *page2_regs = m_video_regs + 0x18;
 
-	bitmap.fill(0, cliprect);
-
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
 		uint32_t* dst = &bitmap.pix32(scanline, cliprect.min_x);
+
+		m_renderer->new_line(cliprect);
 
 		for (int i = 0; i < 4; i++)
 		{

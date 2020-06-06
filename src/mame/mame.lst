@@ -37628,6 +37628,7 @@ zon32bit                        // Zone 32-bit
 oplayer
 dnv200fs
 m505neo
+m521neo
 
 @source:spiders.cpp
 spiders                         // (c) 1981 Sigma Ent. Inc.

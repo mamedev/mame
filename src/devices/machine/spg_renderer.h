@@ -16,6 +16,7 @@ public:
 
 	void draw_sprites(bool read_from_csspace, bool has_extended_sprites, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space& spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit);
 	void draw_page(bool read_from_csspace, bool has_extended_tilemaps, bool use_alt_tile_addressing, uint32_t palbank, const rectangle& cliprect, uint32_t* dst, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram, uint32_t which);
+	void new_line(const rectangle& cliprect);
 
 	void apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline);
 
@@ -96,6 +97,8 @@ private:
 	address_space* m_cpuspace;
 	address_space* m_cs_space;
 	int m_csbase;
+
+	uint16_t m_linebuf[640];
 };
 
 DECLARE_DEVICE_TYPE(SPG_RENDERER, spg_renderer_device)

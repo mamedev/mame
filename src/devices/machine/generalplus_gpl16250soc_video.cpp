@@ -391,10 +391,10 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 	const uint32_t sprites_addr = (m_sprite_702d_gfxbase_msb << 16) | m_sprite_7022_gfxbase_lsb;
 	
-	bitmap.fill(0, cliprect);
-
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
+		m_renderer->new_line(cliprect);
+
 		uint32_t* dst = &bitmap.pix32(scanline, cliprect.min_x);
 
 		for (int i = 0; i < 4; i++)

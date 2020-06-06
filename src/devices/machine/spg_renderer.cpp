@@ -73,7 +73,7 @@ void spg_renderer_device::device_reset()
 // Perform a lerp between a and b
 inline uint8_t spg_renderer_device::mix_channel(uint8_t bottom, uint8_t top, uint8_t alpha)
 {
-	return ((256 - alpha) * bottom + alpha * top) >> 8;
+	return ((0x20 - alpha) * bottom + alpha * top) >> 5;
 }
 
 template<spg_renderer_device::blend_enable_t Blend, spg_renderer_device::flipx_t FlipX>
@@ -132,13 +132,13 @@ void spg_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screen
 				if (Blend)
 				{
 
-					dst[realdrawpos] = (mix_channel((uint8_t)(dst[realdrawpos] >> 16),  m_rgb5_to_rgb8[(rgb >> 10) & 0x1f], blendlevel) << 16) |
-						               (mix_channel((uint8_t)(dst[realdrawpos] >> 8),   m_rgb5_to_rgb8[(rgb >> 5)  & 0x1f], blendlevel) << 8) |
-						               (mix_channel((uint8_t)(dst[realdrawpos] >> 0),   m_rgb5_to_rgb8[(rgb >> 0)  & 0x1f], blendlevel) << 0);
+					m_linebuf[realdrawpos] = (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 10) & 0x1f,  (rgb >> 10) & 0x1f, blendlevel) << 10) |
+						                     (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 5)  & 0x1f,  (rgb >> 5)  & 0x1f, blendlevel) << 5) |
+						                     (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 0)  & 0x1f,  (rgb >> 0)  & 0x1f, blendlevel) << 0);
 				}
 				else
 				{
-					dst[realdrawpos] = m_rgb555_to_rgb888[rgb];
+					m_linebuf[realdrawpos]  = rgb;
 				}
 			}
 		}
@@ -220,7 +220,7 @@ void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectang
 
 					if (!(rgb & 0x8000))
 					{
-						dst[xx] = m_rgb555_to_rgb888[rgb];
+						m_linebuf[xx] = rgb;
 					}
 				}
 
@@ -236,7 +236,7 @@ void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectang
 
 					if (!(rgb & 0x8000))
 					{
-						dst[xx] = m_rgb555_to_rgb888[rgb];
+						m_linebuf[xx] = rgb;
 					}
 				}
 			}
@@ -283,7 +283,7 @@ void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectang
 
 				if (!(data & 0x8000))
 				{
-					dst[i] = m_rgb555_to_rgb888[data & 0x7fff];
+					m_linebuf[i] = data & 0x7fff;
 				}
 			}
 		}
@@ -300,7 +300,7 @@ void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectang
 
 				if (!(color & 0x8000))
 				{
-					dst[(i * 2) + 0] = m_rgb555_to_rgb888[color & 0x7fff];
+					m_linebuf[(i * 2) + 0] = color & 0x7fff;
 				}
 
 				palette_entry = (data & 0xff00) >> 8;
@@ -308,7 +308,7 @@ void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectang
 
 				if (!(color & 0x8000))
 				{
-					dst[(i * 2) + 1] = m_rgb555_to_rgb888[color & 0x7fff];
+					m_linebuf[(i * 2) + 1] = color & 0x7fff;
 				}
 			}
 		}
@@ -459,7 +459,7 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
 	//const uint32_t words_per_tile = bits_per_row * tile_h;
 	const bool row_scroll = (ctrl & 0x0010);
-	uint8_t blendlevel = (m_video_regs_2a & 3) << 6;
+	uint8_t blendlevel = (m_video_regs_2a & 3) << 3;
 
 	uint32_t words_per_tile;
 
@@ -645,7 +645,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
-	uint8_t blendlevel = (m_video_regs_2a & 3) << 6;
+	uint8_t blendlevel = (m_video_regs_2a & 3) << 3;
 
 	uint32_t words_per_tile;
 	
@@ -659,12 +659,12 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 		{
 			// before or after the 0 tile check?
 			tile |= (spriteram[(base_addr / 4) + 0x400] & 0x01ff) << 16;
-			blendlevel = ((spriteram[(base_addr / 4) + 0x400] & 0x3e00) >> 9) << 3;
+			blendlevel = ((spriteram[(base_addr / 4) + 0x400] & 0x3e00) >> 9);
 		}
 		else // jak_prft - no /4 to offset in this mode - 4 extra words per sprite instead ? (or is RAM content incorrect for one of these cases?)
 		{
 			tile |= spriteram[(base_addr) + 0x400] << 16;
-			blendlevel = ((spriteram[(base_addr) + 0x400] & 0x3e00) >> 9) << 3;
+			blendlevel = ((spriteram[(base_addr) + 0x400] & 0x3e00) >> 9);
 		}
 	}
 	else
@@ -756,6 +756,13 @@ void spg_renderer_device::draw_sprites(bool read_from_csspace, bool has_extended
 	}
 }
 
+void spg_renderer_device::new_line(const rectangle& cliprect)
+{
+	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+	{
+		m_linebuf[x] = 0x0000;
+	}
+}
 
 void spg_renderer_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline)
 {
@@ -771,6 +778,8 @@ void spg_renderer_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const 
 
 	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 	{
+		*src = m_rgb555_to_rgb888[m_linebuf[x]];
+
 		if ((m_video_regs_3c & 0x00ff) != 0x0020) // apply saturation
 		{
 			const uint32_t src_rgb = *src;
