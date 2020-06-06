@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Frode van der Meeren
 #ifndef MAME_INCLUDES_TIKI100_H
 #define MAME_INCLUDES_TIKI100_H
 
@@ -46,6 +46,7 @@ class tiki100_state : public driver_device
 public:
 	tiki100_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_screen(*this, "screen"),
 		m_maincpu(*this, Z80_TAG),
 		m_ctc(*this, Z80CTC_TAG),
 		m_fdc(*this, FD1797_TAG),
@@ -95,6 +96,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER( ctc_tick );
 	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
+	TIMER_DEVICE_CALLBACK_MEMBER( scanline_start );
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
@@ -108,6 +110,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	required_device<screen_device> m_screen;
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<fd1797_device> m_fdc;
@@ -123,7 +126,7 @@ private:
 	required_memory_region m_rom;
 	required_memory_region m_prom;
 	optional_shared_ptr<uint8_t> m_video_ram;
-	required_ioport_array<12> m_y;
+	required_ioport_array<13> m_y;
 	required_ioport m_st_io;
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;
@@ -144,6 +147,7 @@ private:
 	uint8_t m_scroll;
 	uint8_t m_mode;
 	uint8_t m_palette_val;
+	uint8_t m_current_pixel;
 
 	// keyboard state
 	int m_keylatch;
