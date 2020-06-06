@@ -95,6 +95,7 @@ void dio16_98643_device::device_start()
 	save_item(NAME(m_sc));
 	save_item(NAME(m_installed_io));
 	save_item(NAME(m_ram));
+	m_installed_io = false;
 }
 
 void dio16_98643_device::device_reset()

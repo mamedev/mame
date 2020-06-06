@@ -141,6 +141,7 @@ void human_interface_device::device_reset()
 	m_gpib_irq_line = false;
 	m_kbd_nmi = false;
 	m_old_latch_enable = true;
+	m_gpib_dma_enable = false;
 	m_rtc->cs1_w(ASSERT_LINE);
 	m_rtc->cs2_w(CLEAR_LINE);
 	m_rtc->write_w(CLEAR_LINE);

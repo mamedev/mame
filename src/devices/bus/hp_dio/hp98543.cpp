@@ -99,6 +99,7 @@ void dio16_98543_device::device_start()
 {
 	save_item(NAME(m_intreg));
 	save_item(NAME(m_ints));
+	m_intreg = 0;
 
 	dio().install_memory(
 			0x200000, 0x27ffff,
