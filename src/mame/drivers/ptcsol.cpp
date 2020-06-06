@@ -174,8 +174,6 @@ public:
 
 	void sol20(machine_config &config);
 
-	void init_sol20();
-
 private:
 	enum
 	{
