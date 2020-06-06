@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Robbbert, AJR
 /***************************************************************************
 
     BEEHIVE DM3270
@@ -12,7 +12,6 @@
     The character gen rom is not dumped. Using the one from 'c10'
     for the moment.
 
-    Screen goes crazy during the memory test, just ignore it.
     System freezes if ^G or ^Z pressed. Pressing ^Q is the same as Enter.
 
     25/04/2011 Added partial keyboard.
@@ -22,9 +21,12 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/input_merger.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/i8257.h"
 #include "machine/pit8253.h"
+#include "video/i8275.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"
 
@@ -35,7 +37,7 @@ public:
 	beehive_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_p_videoram(*this, "videoram")
+		, m_dmac(*this, "dmac")
 		, m_p_chargen(*this, "chargen")
 		, m_usart(*this, "usart%u", 1U)
 		, m_rs232(*this, "rs232%c", 'a')
@@ -44,21 +46,46 @@ public:
 
 	void beehive(machine_config &config);
 
-private:
-	void beehive_io(address_map &map);
-	void beehive_mem(address_map &map);
+protected:
 	virtual void machine_start() override;
-	u8 m_keyline;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(dmac_hrq_w);
+	u8 dmac_mem_r(offs_t offset);
+	void dmac_mem_w(offs_t offset, u8 data);
+	I8275_DRAW_CHARACTER_MEMBER(draw_character);
+
 	u8 beehive_60_r();
 	void beehive_62_w(u8 data);
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void beehive_io(address_map &map);
+	void beehive_mem(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<u8> m_p_videoram;
+	required_device<i8257_device> m_dmac;
 	required_region_ptr<u8> m_p_chargen;
 	required_device_array<i8251_device, 2> m_usart;
 	required_device_array<rs232_port_device, 2> m_rs232;
 	required_ioport_array<16> m_io_keyboard;
+
+	u8 m_keyline;
 };
+
+WRITE_LINE_MEMBER(beehive_state::dmac_hrq_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_dmac->hlda_w(state);
+}
+
+u8 beehive_state::dmac_mem_r(offs_t offset)
+{
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+void beehive_state::dmac_mem_w(offs_t offset, u8 data)
+{
+	return m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
+}
 
 u8 beehive_state::beehive_60_r()
 {
@@ -77,16 +104,18 @@ void beehive_state::beehive_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x17ff).rom();
-	map(0x8000, 0x8fff).ram().share("videoram");
+	map(0x8000, 0x8fff).ram();
 }
 
 void beehive_state::beehive_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
+	map(0x00, 0x09).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x10, 0x13).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x21).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x30, 0x31).rw(m_usart[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x50, 0x51).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x60, 0x63).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe0, 0xe3).rw("pit1", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xf0, 0xf3).rw("pit2", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
@@ -247,56 +276,21 @@ void beehive_state::machine_start()
 	save_item(NAME(m_keyline));
 }
 
-/* This system appears to have inline attribute bytes of unknown meaning.
-    Currently they are ignored. */
-u32 beehive_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+I8275_DRAW_CHARACTER_MEMBER(beehive_state::draw_character)
 {
-	uint16_t cursor_pos = (m_p_videoram[0xcaf] | (m_p_videoram[0xcb0] << 8)) & 0xfff;
-	uint16_t p_linelist;
-	u8 line_length;
-	u8 y,ra,chr,gfx,inv;
-	uint16_t sy=0,ma,x;
+	u8 dots = lten ? 0xff : (vsp || linecount == 9) ? 0 : m_p_chargen[(charcode << 4) | linecount];
+	if (rvv)
+		dots ^= 0xff;
 
-	for (y = 0; y < 25; y++)
+	// HLGT is active on status line
+	rgb_t fg = hlgt ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
+
+	u32 *pix = &bitmap.pix32(y, x);
+	for (int i = 0; i < 8; i++)
 	{
-		p_linelist = 0x1af + y*3;
-		line_length = m_p_videoram[p_linelist]+1;
-		ma = (m_p_videoram[p_linelist+1] | (m_p_videoram[p_linelist+2] << 8)) & 0xfff;
-
-		for (ra = 0; ra < 10; ra++)
-		{
-			uint32_t *p = &bitmap.pix32(sy++);
-			u8 chars = 0;
-
-			for (x = ma; x < ma + line_length; x++)
-			{
-				inv = gfx = chr = 0;
-				if (y == 24) inv=0xff; // status line reverse video
-				if (ra < 9)
-				{
-					if (x == cursor_pos) inv=0xff; // show cursor
-					chr = m_p_videoram[x]; // get char in videoram
-					gfx = m_p_chargen[(chr<<4) | ra ] ^ inv; // get dot pattern in chargen
-				}
-
-				if ((chars < 80) && (!BIT(chr, 7)))  // ignore attribute bytes
-				{
-					chars++;
-
-					/* Display a scanline of a character */
-					*p++ = BIT(gfx, 7) ? rgb_t::white() : rgb_t::black();
-					*p++ = BIT(gfx, 6) ? rgb_t::white() : rgb_t::black();
-					*p++ = BIT(gfx, 5) ? rgb_t::white() : rgb_t::black();
-					*p++ = BIT(gfx, 4) ? rgb_t::white() : rgb_t::black();
-					*p++ = BIT(gfx, 3) ? rgb_t::white() : rgb_t::black();
-					*p++ = BIT(gfx, 2) ? rgb_t::white() : rgb_t::black();
-					*p++ = BIT(gfx, 1) ? rgb_t::white() : rgb_t::black();
-					*p++ = BIT(gfx, 0) ? rgb_t::white() : rgb_t::black();
-				}
-			}
-		}
+		*pix++ = BIT(dots, 7) ? fg : rgb_t::black();
+		dots <<= 1;
 	}
-	return 0;
 }
 
 void beehive_state::beehive(machine_config &config)
@@ -306,13 +300,29 @@ void beehive_state::beehive(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &beehive_state::beehive_mem);
 	m_maincpu->set_addrmap(AS_IO, &beehive_state::beehive_io);
 
+	INPUT_MERGER_ANY_HIGH(config, "usartint").output_handler().set_inputline(m_maincpu, I8085_RST55_LINE);
+
+	I8257(config, m_dmac, 2'000'000);
+	m_dmac->out_hrq_cb().set(FUNC(beehive_state::dmac_hrq_w));
+	m_dmac->in_memr_cb().set(FUNC(beehive_state::dmac_mem_r));
+	m_dmac->out_memw_cb().set(FUNC(beehive_state::dmac_mem_w));
+	m_dmac->out_iow_cb<2>().set("crtc", FUNC(i8275_device::dack_w));
+	m_dmac->out_tc_cb().set_inputline(m_maincpu, I8085_RST75_LINE);
+
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(beehive_state::screen_update));
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_size(640, 250);
 	screen.set_visarea(0, 639, 0, 249);
+
+	i8275_device &crtc(I8275(config, "crtc", 1'944'000)); // calculated for 60 Hz operation
+	crtc.set_screen("screen");
+	crtc.set_character_width(8);
+	crtc.set_display_callback(FUNC(beehive_state::draw_character));
+	crtc.irq_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
+	crtc.drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
 
 	i8255_device &ppi1(I8255(config, "ppi1"));
 	ppi1.in_pb_callback().set_ioport("DIPS");
@@ -337,6 +347,8 @@ void beehive_state::beehive(machine_config &config)
 	m_usart[0]->txd_handler().set(m_rs232[0], FUNC(rs232_port_device::write_txd));
 	m_usart[0]->dtr_handler().set(m_rs232[0], FUNC(rs232_port_device::write_dtr));
 	m_usart[0]->rts_handler().set(m_rs232[0], FUNC(rs232_port_device::write_rts));
+	m_usart[0]->rxrdy_handler().set("usartint", FUNC(input_merger_device::in_w<0>));
+	m_usart[0]->txrdy_handler().set("usartint", FUNC(input_merger_device::in_w<1>));
 
 	RS232_PORT(config, m_rs232[0], default_rs232_devices, nullptr);
 	m_rs232[0]->rxd_handler().set(m_usart[0], FUNC(i8251_device::write_rxd));
@@ -347,6 +359,8 @@ void beehive_state::beehive(machine_config &config)
 	m_usart[1]->txd_handler().set(m_rs232[1], FUNC(rs232_port_device::write_txd));
 	m_usart[1]->dtr_handler().set(m_rs232[1], FUNC(rs232_port_device::write_dtr));
 	m_usart[1]->rts_handler().set(m_rs232[1], FUNC(rs232_port_device::write_rts));
+	m_usart[1]->rxrdy_handler().set("usartint", FUNC(input_merger_device::in_w<2>));
+	m_usart[1]->txrdy_handler().set("usartint", FUNC(input_merger_device::in_w<3>));
 
 	RS232_PORT(config, m_rs232[1], default_rs232_devices, nullptr);
 	m_rs232[1]->rxd_handler().set(m_usart[1], FUNC(i8251_device::write_rxd));
