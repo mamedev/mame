@@ -24,8 +24,20 @@ public:
 	void set_video_reg_1d(uint16_t val) { m_video_regs_1d = val; update_vcmp_table(); }
 	void set_video_reg_1e(uint16_t val) { m_video_regs_1e = val; update_vcmp_table(); }
 	void set_video_reg_2a(uint16_t val) { m_video_regs_2a = val; }
-	void set_video_reg_30(uint16_t val) { m_video_regs_30 = val; }
-	void set_video_reg_3c(uint16_t val) { m_video_regs_3c = val; }
+	void set_video_reg_30(uint16_t val)
+	{
+		if (m_video_regs_30 != val)
+			m_brightness_or_saturation_dirty = true;
+
+		m_video_regs_30 = val;
+	}
+	void set_video_reg_3c(uint16_t val)
+	{
+		if (m_video_regs_3c != val)
+			m_brightness_or_saturation_dirty = true;
+
+		m_video_regs_3c = val;
+	}
 	void set_video_reg_42(uint16_t val) { m_video_regs_42 = val; }
 
 	uint16_t get_video_reg_1c(void) { return m_video_regs_1c; }
@@ -73,6 +85,7 @@ protected:
 
 	uint8_t m_rgb5_to_rgb8[32];
 	uint32_t m_rgb555_to_rgb888[0x8000];
+	uint32_t m_rgb555_to_rgb888_current[0x8000];
 
 private:
 
@@ -97,7 +110,8 @@ private:
 	address_space* m_cpuspace;
 	address_space* m_cs_space;
 	int m_csbase;
-
+	bool m_brightness_or_saturation_dirty;
+	void update_palette_lookup(void);
 	uint16_t m_linebuf[640];
 };
 

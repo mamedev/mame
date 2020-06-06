@@ -67,6 +67,8 @@ void spg_renderer_device::device_reset()
 	{
 		m_ycmp_table[i] = 0xffffffff;
 	}
+
+	m_brightness_or_saturation_dirty = true;
 }
 
 
@@ -758,14 +760,19 @@ void spg_renderer_device::draw_sprites(bool read_from_csspace, bool has_extended
 
 void spg_renderer_device::new_line(const rectangle& cliprect)
 {
+	update_palette_lookup();
+
 	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 	{
 		m_linebuf[x] = 0x0000;
 	}
 }
 
-void spg_renderer_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline)
+void spg_renderer_device::update_palette_lookup()
 {
+	if (!m_brightness_or_saturation_dirty)
+		return;
+
 	static const float s_u8_to_float = 1.0f / 255.0f;
 	static const float s_gray_r = 0.299f;
 	static const float s_gray_g = 0.587f;
@@ -774,15 +781,13 @@ void spg_renderer_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const 
 
 	const uint16_t fade_offset = m_video_regs_30;
 
-	uint32_t* src = &bitmap.pix32(scanline, cliprect.min_x);
-
-	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+	for (uint16_t i = 0; i < 0x8000; i++)
 	{
-		*src = m_rgb555_to_rgb888[m_linebuf[x]];
+		uint32_t src = m_rgb555_to_rgb888[i];
 
 		if ((m_video_regs_3c & 0x00ff) != 0x0020) // apply saturation
 		{
-			const uint32_t src_rgb = *src;
+			const uint32_t src_rgb = src;
 			const float src_r = (uint8_t)(src_rgb >> 16) * s_u8_to_float;
 			const float src_g = (uint8_t)(src_rgb >> 8) * s_u8_to_float;
 			const float src_b = (uint8_t)(src_rgb >> 0) * s_u8_to_float;
@@ -793,26 +798,38 @@ void spg_renderer_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const 
 			const int integer_r = (int)floor(adjusted_r * 255.0f);
 			const int integer_g = (int)floor(adjusted_g * 255.0f);
 			const int integer_b = (int)floor(adjusted_b * 255.0f);
-			*src = (integer_r > 255 ? 0xff0000 : (integer_r < 0 ? 0 : ((uint8_t)integer_r << 16))) |
+			src = (integer_r > 255 ? 0xff0000 : (integer_r < 0 ? 0 : ((uint8_t)integer_r << 16))) |
 				(integer_g > 255 ? 0x00ff00 : (integer_g < 0 ? 0 : ((uint8_t)integer_g << 8))) |
 				(integer_b > 255 ? 0x0000ff : (integer_b < 0 ? 0 : (uint8_t)integer_b));
-
 		}
 
 		if (fade_offset != 0) // apply fade
 		{
-			const uint32_t src_rgb = *src;
+			const uint32_t src_rgb = src;
 			const uint8_t src_r = (src_rgb >> 16) & 0xff;
 			const uint8_t src_g = (src_rgb >> 8) & 0xff;
 			const uint8_t src_b = (src_rgb >> 0) & 0xff;
 			const uint8_t r = src_r - fade_offset;
 			const uint8_t g = src_g - fade_offset;
 			const uint8_t b = src_b - fade_offset;
-			*src = (r > src_r ? 0 : (r << 16)) |
+			src = (r > src_r ? 0 : (r << 16)) |
 				(g > src_g ? 0 : (g << 8)) |
 				(b > src_b ? 0 : (b << 0));
 		}
 
+		m_rgb555_to_rgb888_current[i] = src;
+	}
+
+	m_brightness_or_saturation_dirty = false;
+}
+
+void spg_renderer_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline)
+{
+	uint32_t* src = &bitmap.pix32(scanline, cliprect.min_x);
+
+	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+	{
+		*src = m_rgb555_to_rgb888_current[m_linebuf[x]];
 		src++;
 	}
 }
