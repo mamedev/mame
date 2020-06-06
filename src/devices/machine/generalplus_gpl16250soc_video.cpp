@@ -391,20 +391,18 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 	const uint32_t sprites_addr = (m_sprite_702d_gfxbase_msb << 16) | m_sprite_7022_gfxbase_lsb;
 	
-	bitmap.fill(0, cliprect);
-
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
-		uint32_t* dst = &bitmap.pix32(scanline, cliprect.min_x);
+		m_renderer->new_line(cliprect);
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, dst, scanline, i, page0_addr, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, dst, scanline, i, page1_addr, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, dst, scanline, i, page2_addr, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, dst, scanline, i, page3_addr, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
+			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page0_addr, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
+			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page1_addr, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
+			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page2_addr, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
+			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page3_addr, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
 
-			m_renderer->draw_sprites(true, true, m_alt_extrasprite_hack ? true : false, m_703a_palettebank, highres, cliprect, dst, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
+			m_renderer->draw_sprites(true, true, m_alt_extrasprite_hack ? true : false, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
 		}
 
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);

@@ -94,10 +94,26 @@ public:
 	}
 
 protected:
-	//virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
+	DECLARE_READ16_MEMBER(paccon_speedup_hack_r);
+};
+
+class jak_pf_game_state : public jak_s500_game_state
+{
+public:
+	jak_pf_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		jak_s500_game_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	DECLARE_READ16_MEMBER(jak_pf_speedup_hack_r);
+	DECLARE_READ16_MEMBER(jak_pf_speedup_hack2_r);
 };
 
 
@@ -108,7 +124,6 @@ public:
 		jak_s500_game_state(mconfig, type, tag)
 	{
 	}
-
 
 protected:
 

@@ -1665,23 +1665,6 @@ void sunplus_gcm394_base_device::write_space(uint32_t offset, uint16_t data)
 	}
 }
 
-READ16_MEMBER(sunplus_gcm394_base_device::speedup_hack_r)
-{
-	u32 const pc = this->pc();
-
-	if (pc == m_speedup_pc)
-		this->spin_until_time(this->cycles_to_attotime(2000));
-
-	return m_mainram[m_speedup_address];
-}
-
-
-void sunplus_gcm394_base_device::install_speedup_hack(int address, int pc)
-{
-	this->space(AS_PROGRAM).install_read_handler(address, address, read16_delegate(*this, FUNC(sunplus_gcm394_base_device::speedup_hack_r)));
-	m_speedup_address = address;
-	m_speedup_pc = pc;
-}
 
 
 void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
