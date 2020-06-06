@@ -237,7 +237,7 @@ namespace plib {
 		PCOPYASSIGNMOVE(options, delete)
 
 		void register_option(option_base *opt);
-		int parse(int argc, char **argv);
+		std::size_t parse(const std::vector<putf8string> &argv);
 
 		pstring help(const pstring &description, const pstring &usage,
 				unsigned width = 72, unsigned indent = 20) const;

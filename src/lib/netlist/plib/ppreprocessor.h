@@ -95,7 +95,7 @@ namespace plib {
 				if (this->gptr() == this->egptr())
 				{
 					// clang reports sign error - weird
-					std::size_t bytes = pstring_mem_t_size(m_strm->m_outbuf) - static_cast<std::size_t>(m_strm->m_pos);
+					std::size_t bytes = m_strm->m_outbuf.size() - static_cast<std::size_t>(m_strm->m_pos);
 
 					if (bytes > m_buf.size())
 						bytes = m_buf.size();
@@ -160,7 +160,7 @@ namespace plib {
 
 		// vector used as stack because we need to loop through stack
 		std::vector<input_context> m_stack;
-		pstring_t<pu8_traits> m_outbuf;
+		std::string m_outbuf;
 		std::istream::pos_type m_pos;
 		state_e m_state;
 		pstring m_line;

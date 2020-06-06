@@ -15,13 +15,8 @@ namespace plib
 {
 	namespace util
 	{
-		#ifdef _WIN32
-		static constexpr const char PATH_SEP = '\\';
-		static constexpr const char *PATH_SEPS = "\\/";
-		#else
-		static constexpr const char PATH_SEP = '/';
-		static constexpr const char *PATH_SEPS = "/";
-		#endif
+		static constexpr const char PATH_SEP = compile_info::win32::value ? '\\' : '/';
+		static constexpr const char *PATH_SEPS = compile_info::win32::value ? "\\/" :"/";
 
 		pstring basename(const pstring &filename, const pstring &suffix)
 		{

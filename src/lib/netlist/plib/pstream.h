@@ -194,7 +194,7 @@ public:
 	void write(const pstring &s)
 	{
 		const auto *const sm = reinterpret_cast<const std::ostream::char_type *>(s.c_str());
-		const auto sl(static_cast<std::streamsize>(pstring_mem_t_size(s)));
+		const auto sl(static_cast<std::streamsize>(std::char_traits<std::ostream::char_type>::length(sm)));
 		write(sl);
 		m_strm.write(sm, sl);
 	}
@@ -268,19 +268,15 @@ inline void copystream(std::ostream &dest, std::istream &src)
 class ifstream : public std::ifstream
 {
 public:
-#ifdef _WIN32
+
+	using filename_type = std::conditional<compile_info::win32::value,
+		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
+
 	template <typename T>
 	explicit ifstream(const pstring_t<T> name, ios_base::openmode mode = ios_base::in)
-	: std::ifstream(reinterpret_cast<const wchar_t *>(pstring_t<putf16_traits>(name).c_str()), mode)
+	: std::ifstream(filename_type(name).c_str(), mode)
 	{
 	}
-#else
-	template <typename T>
-	explicit ifstream(const pstring_t<T> name, ios_base::openmode mode = ios_base::in)
-	: std::ifstream(pstring_t<putf8_traits>(name).c_str(), mode)
-	{
-	}
-#endif
 };
 
 ///
@@ -289,19 +285,14 @@ public:
 class ofstream : public std::ofstream
 {
 public:
-#ifdef _WIN32
+	using filename_type = std::conditional<compile_info::win32::value,
+		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
+
 	template <typename T>
 	explicit ofstream(const pstring_t<T> name, ios_base::openmode mode = ios_base::in)
-	: std::ofstream(reinterpret_cast<const wchar_t *>(pstring_t<putf16_traits>(name).c_str()), mode)
+	: std::ofstream(filename_type(name).c_str(), mode)
 	{
 	}
-#else
-	template <typename T>
-	explicit ofstream(const pstring_t<T> name, ios_base::openmode mode = ios_base::in)
-	: std::ofstream(pstring_t<putf8_traits>(name).c_str(), mode)
-	{
-	}
-#endif
 };
 
 

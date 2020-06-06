@@ -128,15 +128,10 @@ namespace netlist
 		NETLIB_HANDLERI(updB)
 		{
 			const auto cnt(++m_bcd &= 0x07);
-#if 1
+
 			m_QB[2].push((cnt >> 2) & 1, out_delay3);
 			m_QB[1].push((cnt >> 1) & 1, out_delay2);
 			m_QB[0].push(cnt & 1, out_delay);
-#else
-			m_QB[0].push(cnt & 1, out_delay);
-			m_QB[1].push((cnt >> 1) & 1, out_delay2);
-			m_QB[2].push((cnt >> 2) & 1, out_delay3);
-#endif
 		}
 
 		logic_input_t m_R1;

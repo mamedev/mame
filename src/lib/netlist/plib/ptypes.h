@@ -35,6 +35,25 @@
 
 namespace plib
 {
+	//============================================================
+	//  compile time information
+	//============================================================
+
+	struct compile_info
+	{
+	#ifdef _WIN32
+		using win32 = std::integral_constant<bool, true>;
+	#ifdef UNICODE
+		using unicode = std::integral_constant<bool, true>;
+	#else
+		using unicode = std::integral_constant<bool, false>;
+	#endif
+	#else
+		using win32 = std::integral_constant<bool, false>;
+		using unicode = std::integral_constant<bool, true>;
+	#endif
+	};
+
 	template<typename T> struct is_integral : public std::is_integral<T> { };
 	template<typename T> struct is_signed : public std::is_signed<T> { };
 	template<typename T> struct is_unsigned : public std::is_unsigned<T> { };

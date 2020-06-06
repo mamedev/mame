@@ -87,4 +87,5 @@ typename pstring_t<F>::size_type pstring_t<F>::find(code_t search, size_type sta
 template struct pstring_t<pu8_traits>;
 template struct pstring_t<putf8_traits>;
 template struct pstring_t<putf16_traits>;
+template struct pstring_t<putf32_traits>;
 template struct pstring_t<pwchar_traits>;

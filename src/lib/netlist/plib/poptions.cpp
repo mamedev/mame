@@ -87,17 +87,17 @@ namespace plib {
 		}
 	}
 
-	int options::parse(int argc, char **argv)
+	std::size_t options::parse(const std::vector<putf8string> &argv)
 	{
 		check_consistency();
-		m_app = pstring(argv[0]);
+		m_app = argv[0];
 		bool seen_other_args = false;
 
-		for (int i=1; i<argc; )
+		for (std::size_t i=1; i < argv.size(); )
 		{
-			pstring arg(argv[i]);
+			putf8string arg(argv[i]);
 			option *opt = nullptr;
-			pstring opt_arg;
+			putf8string opt_arg;
 			bool has_equal_arg = false;
 
 			if (!seen_other_args && plib::startsWith(arg, "--"))
@@ -151,7 +151,7 @@ namespace plib {
 				else
 				{
 					i++;
-					if (i >= argc)
+					if (i >= argv.size())
 						return i - 1;
 					if (opt->do_parse(pstring(argv[i])) != 0)
 						return i - 1;
@@ -165,7 +165,7 @@ namespace plib {
 			}
 			i++;
 		}
-		return argc;
+		return argv.size();
 	}
 
 	pstring options::split_paragraphs(const pstring &text, unsigned width, unsigned indent,

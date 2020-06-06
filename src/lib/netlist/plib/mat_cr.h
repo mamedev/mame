@@ -160,7 +160,7 @@ namespace plib
 		void mult_vec(VTR & res, const VTV & x) const noexcept
 		{
 
-			 // res = A * x
+			// res = A * x
 #if 0
 			//plib::omp::set_num_threads(4);
 			plib::omp::for_static(0, constants<std::size_t>::zero(), m_size, [this, &res, &x](std::size_t row)

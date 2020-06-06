@@ -801,6 +801,16 @@ struct save_helper
 	{
 		m_device->save_item(item, (m_prefix + "_" + name).c_str());
 	}
+
+#if PHAS_INT128
+	void save_item(INT128 &item, pstring name)
+	{
+		auto *p = reinterpret_cast<std::uint64_t *>(&item);
+		m_device->save_item(p[0], (m_prefix + "_" + name + "_1").c_str());
+		m_device->save_item(p[1], (m_prefix + "_" + name + "_2").c_str());
+	}
+#endif
+
 private:
 	device_t *m_device;
 	pstring m_prefix;

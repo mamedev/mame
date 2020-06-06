@@ -53,15 +53,14 @@ namespace plib {
 		template <class C, typename T>
 		static int mainrun(int argc, T **argv)
 		{
-			C application;;
+			C application;
 			return application.main_utfX(argc, argv);
 		}
 
 	private:
-		int main_utfX(int argc, char **argv);
-#ifdef _WIN32
+		int main_utfX(const std::vector<putf8string> &argv);
+		int main_utfX(int argc, char *argv[]);
 		int main_utfX(int argc, wchar_t *argv[]);
-#endif
 
 	};
 
