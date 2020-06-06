@@ -1131,6 +1131,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"bandai",
 		"banctec",
 		"be",
+		"beehive",
 		"bitcorp",
 		"bnpo",
 		"bondwell",
@@ -1854,6 +1855,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/bebox.cpp",
 	MAME_DIR .. "src/mame/includes/bebox.h",
 	MAME_DIR .. "src/mame/machine/bebox.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "beehive")
+files {
+	MAME_DIR .. "src/mame/drivers/microb.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "bitcorp")
@@ -4033,7 +4039,6 @@ files {
 	MAME_DIR .. "src/mame/video/gic.h",
 }
 
-
 createMESSProjects(_target, _subtarget, "unisys")
 files {
 	MAME_DIR .. "src/mame/drivers/univac.cpp",
@@ -4256,7 +4261,6 @@ files {
 	MAME_DIR .. "src/mame/includes/aussiebyte.h",
 	MAME_DIR .. "src/mame/video/aussiebyte.cpp",
 	MAME_DIR .. "src/mame/drivers/ax20.cpp",
-	MAME_DIR .. "src/mame/drivers/beehive.cpp",
 	MAME_DIR .. "src/mame/drivers/binbug.cpp",
 	MAME_DIR .. "src/mame/drivers/bert.cpp",
 	MAME_DIR .. "src/mame/drivers/besta.cpp",

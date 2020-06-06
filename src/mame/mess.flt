@@ -109,7 +109,6 @@ bbcbc.cpp
 bbl380.cpp
 bcs3.cpp
 bebox.cpp
-beehive.cpp
 bert.cpp
 besta.cpp
 beta.cpp
@@ -548,6 +547,7 @@ mfabfz.cpp
 mice.cpp
 micral.cpp
 micro20.cpp
+microb.cpp
 microdec.cpp
 microkit.cpp
 micromon.cpp

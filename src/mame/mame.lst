@@ -3313,9 +3313,6 @@ beathead                        // (proto)          (c) 1993
 bebox                           // BeBox Dual603-66
 bebox2                          // BeBox Dual603-133
 
-@source:beehive.cpp
-beehive                         //
-
 @source:beezer.cpp
 beezer                          // (c) 1982
 beezer1                         // (c) 1982
@@ -22565,6 +22562,9 @@ botss11                         // (c) 1992 Microprose Games Inc.
 f15se                           // (c) 1991 Microprose Games Inc.
 f15se21                         // (c) 1991 Microprose Games Inc.
 tankbatl                        // (c) 1992 Microprose Games Inc.
+
+@source:microb.cpp
+dm3270                          //
 
 @source:microdar.cpp
 microdar                        //
