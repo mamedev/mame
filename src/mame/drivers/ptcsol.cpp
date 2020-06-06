@@ -152,6 +152,8 @@ public:
 	sol20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_screen(*this, "screen")
 		, m_cass1(*this, "cassette")
 		, m_cass2(*this, "cassette2")
@@ -160,7 +162,7 @@ public:
 		, m_uart_clock(*this, "uart_clock")
 		, m_uart_s_clock(*this, "uart_s_clock")
 		, m_rs232(*this, "rs232")
-		, m_p_videoram(*this, "videoram")
+		, m_vram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_iop_arrows(*this, "ARROWS")
 		, m_iop_config(*this, "CONFIG")
@@ -178,36 +180,37 @@ private:
 	enum
 	{
 		TIMER_SOL20_CASSETTE_TC,
-		TIMER_SOL20_BOOT
 	};
 
-	uint8_t sol20_f8_r();
-	uint8_t sol20_fa_r();
-	uint8_t sol20_fc_r();
-	uint8_t sol20_fd_r();
-	void sol20_f8_w(uint8_t data);
-	void sol20_fa_w(uint8_t data);
-	void sol20_fd_w(uint8_t data);
-	void sol20_fe_w(uint8_t data);
+	u8 sol20_f8_r();
+	u8 sol20_fa_r();
+	u8 sol20_fc_r();
+	u8 sol20_fd_r();
+	void sol20_f8_w(u8 data);
+	void sol20_fa_w(u8 data);
+	void sol20_fd_w(u8 data);
+	void sol20_fe_w(u8 data);
 	void kbd_put(u8 data);
 	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
-	TIMER_CALLBACK_MEMBER(sol20_boot);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sol20_io(address_map &map);
-	void sol20_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	uint8_t m_sol20_fa;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	uint8_t m_sol20_fc;
-	uint8_t m_sol20_fe;
-	uint8_t m_framecnt;
+	u8 m_sol20_fa;
+	u8 m_sol20_fc;
+	u8 m_sol20_fe;
+	u8 m_framecnt;
 	cass_data_t m_cass_data;
 	emu_timer *m_cassette_timer;
 	cassette_image_device *cassette_device_image();
+	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<i8080a_cpu_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_device<screen_device> m_screen;
 	required_device<cassette_image_device> m_cass1;
 	required_device<cassette_image_device> m_cass2;
@@ -216,7 +219,7 @@ private:
 	required_device<clock_device> m_uart_clock;
 	required_device<clock_device> m_uart_s_clock;
 	required_device<rs232_port_device> m_rs232;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_p_chargen;
 	required_ioport m_iop_arrows;
 	required_ioport m_iop_config;
@@ -246,9 +249,6 @@ void sol20_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	case TIMER_SOL20_CASSETTE_TC:
 		sol20_cassette_tc(ptr, param);
 		break;
-	case TIMER_SOL20_BOOT:
-		sol20_boot(ptr, param);
-		break;
 	default:
 		throw emu_fatalerror("Unknown id in sol20_state::device_timer");
 	}
@@ -258,7 +258,7 @@ void sol20_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 // identical to sorcerer
 TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 {
-	uint8_t cass_ws = 0;
+	u8 cass_ws = 0;
 	switch (m_sol20_fa & 0x20)
 	{
 		case 0x20:              /* Cassette 300 baud */
@@ -344,10 +344,10 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 	}
 }
 
-uint8_t sol20_state::sol20_f8_r()
+u8 sol20_state::sol20_f8_r()
 {
 // d7 - TBMT; d6 - DAV; d5 - CTS; d4 - OE; d3 - PE; d2 - FE; d1 - DSR; d0 - CD
-	uint8_t data = 0;
+	u8 data = 0;
 
 	m_uart_s->write_swe(0);
 	data |= m_uart_s->tbmt_r() ? 0x80 : 0;
@@ -363,10 +363,10 @@ uint8_t sol20_state::sol20_f8_r()
 	return data;
 }
 
-uint8_t sol20_state::sol20_fa_r()
+u8 sol20_state::sol20_fa_r()
 {
 	/* set unused bits high */
-	uint8_t data = 0x26;
+	u8 data = 0x26;
 
 	m_uart->write_swe(0);
 	data |= m_uart->tbmt_r() ? 0x80 : 0;
@@ -381,9 +381,9 @@ uint8_t sol20_state::sol20_fa_r()
 	return data | (arrowkey & keydown);
 }
 
-uint8_t sol20_state::sol20_fc_r()
+u8 sol20_state::sol20_fc_r()
 {
-	uint8_t data = m_iop_arrows->read();
+	u8 data = m_iop_arrows->read();
 	if (BIT(data, 0)) return 0x32;
 	if (BIT(data, 1)) return 0x34;
 	if (BIT(data, 2)) return 0x36;
@@ -393,19 +393,19 @@ uint8_t sol20_state::sol20_fc_r()
 	return m_sol20_fc;
 }
 
-uint8_t sol20_state::sol20_fd_r()
+u8 sol20_state::sol20_fd_r()
 {
 // Return a byte from parallel interface
 	return 0;
 }
 
-void sol20_state::sol20_f8_w(uint8_t data)
+void sol20_state::sol20_f8_w(u8 data)
 {
 // The only function seems to be to send RTS from bit 4
 	m_rs232->write_rts(BIT(data, 4));
 }
 
-void sol20_state::sol20_fa_w(uint8_t data)
+void sol20_state::sol20_fa_w(u8 data)
 {
 	m_sol20_fa &= 1;
 	m_sol20_fa |= (data & 0xf0);
@@ -427,27 +427,26 @@ void sol20_state::sol20_fa_w(uint8_t data)
 	m_uart_clock->set_unscaled_clock(BIT(data, 5) ? 4800 : 19200);
 }
 
-void sol20_state::sol20_fd_w(uint8_t data)
+void sol20_state::sol20_fd_w(u8 data)
 {
 // Output a byte to parallel interface
 }
 
-void sol20_state::sol20_fe_w(uint8_t data)
+void sol20_state::sol20_fe_w(u8 data)
 {
 	m_sol20_fe = data;
 }
 
-void sol20_state::sol20_mem(address_map &map)
+void sol20_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x07ff).bankrw("boot");
-	map(0x0800, 0xbfff).ram(); // optional s100 ram
-	map(0xc000, 0xc7ff).rom();
+	map(0x0000, 0xbfff).ram().share("mainram"); // optional s100 ram
+	map(0xc000, 0xc7ff).rom().region("maincpu", 0);
 	map(0xc800, 0xcbff).ram(); // system ram
 	map(0xcc00, 0xcfff).ram().share("videoram");
 	map(0xd000, 0xffff).ram(); // optional s100 ram
 }
 
-void sol20_state::sol20_io(address_map &map)
+void sol20_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -561,22 +560,20 @@ static INPUT_PORTS_START( sol20 )
 INPUT_PORTS_END
 
 
-/* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER(sol20_state::sol20_boot)
-{
-	membank("boot")->set_entry(0);
-}
-
 void sol20_state::machine_start()
 {
 	m_cassette_timer = timer_alloc(TIMER_SOL20_CASSETTE_TC);
+	save_item(NAME(m_sol20_fa));
+	save_item(NAME(m_sol20_fc));
+	save_item(NAME(m_sol20_fe));
+	save_item(NAME(m_framecnt)); // unimportant
 }
 
 void sol20_state::machine_reset()
 {
-	uint8_t data = 0, s_count = 0;
+	u8 data = 0, s_count = 0;
 	int s_clock;
-	const uint16_t s_bauds[8]={ 75, 110, 180, 300, 600, 1200, 2400, 4800 };
+	const u16 s_bauds[8]={ 75, 110, 180, 300, 600, 1200, 2400, 4800 };
 	m_sol20_fe=0;
 	m_sol20_fa=1;
 
@@ -615,12 +612,7 @@ void sol20_state::machine_reset()
 	else
 		s_clock = s_bauds[s_count] << 4;
 
-	// these lines could be commented out for now if you want better performance
 	m_uart_s_clock->set_unscaled_clock(s_clock);
-
-	// boot-bank
-	membank("boot")->set_entry(1);
-	timer_set(attotime::from_usec(9), TIMER_SOL20_BOOT);
 
 	m_rs232->write_dtr(0);
 	m_rs232->write_rts(1);
@@ -631,25 +623,38 @@ void sol20_state::machine_reset()
 	// set CPU speed (TODO: also present on bus pin 49)
 	double freq = (14.318181_MHz_XTAL / (4 + ((m_iop_config->read() >> 3) & 3))).dvalue();
 	m_maincpu->set_unscaled_clock(freq);
+
+	// Boot tap
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xc000, 0xc7ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
 }
 
-void sol20_state::init_sol20()
-{
-	uint8_t *RAM = memregion("maincpu")->base();
-	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
-}
 
-uint32_t sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 // Visible screen is 64 x 16, with start position controlled by scroll register.
 // Each character is 9 pixels wide (blank ones at the right) and 13 lines deep.
 // Note on blinking characters:
 // any character with bit 7 set will blink. With DPMON, do DA C000 C2FF to see what happens
-	uint16_t which = (m_iop_config->read() & 2) << 10;
-	uint8_t s1 = m_iop_s1->read();
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma,x,inv;
-	uint8_t polarity = (s1 & 8) ? 0xff : 0;
+	u16 which = (m_iop_config->read() & 2) << 10;
+	u8 s1 = m_iop_s1->read();
+	u8 y,ra,chr,gfx;
+	u16 sy=0,ma,x,inv;
+	u8 polarity = (s1 & 8) ? 0xff : 0;
 
 	bool cursor_inv = false;
 	if (((s1 & 0x30) == 0x20) || (((s1 & 0x30) == 0x10) && (m_framecnt & 0x08)))
@@ -663,12 +668,12 @@ uint32_t sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		for (ra = 0; ra < 13; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x++)
 			{
 				inv = polarity;
-				chr = m_p_videoram[x & 0x3ff];
+				chr = m_vram[x & 0x3ff];
 
 				// cursor
 				if (BIT(chr, 7) && cursor_inv)
@@ -742,8 +747,8 @@ void sol20_state::sol20(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080A(config, m_maincpu, 14.318181_MHz_XTAL / 7); // divider selectable as 5, 6 or 7 through jumpers
-	m_maincpu->set_addrmap(AS_PROGRAM, &sol20_state::sol20_mem);
-	m_maincpu->set_addrmap(AS_IO, &sol20_state::sol20_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sol20_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sol20_state::io_map);
 	m_maincpu->out_inte_func().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	/* video hardware */
@@ -796,20 +801,20 @@ void sol20_state::sol20(machine_config &config)
 
 /* ROM definition */
 ROM_START( sol20 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "solos", "SOLOS")
-	ROMX_LOAD( "solos.bin", 0xc000, 0x0800, CRC(4d0af383) SHA1(ac4510c3380ed4a31ccf4f538af3cb66b76701ef), ROM_BIOS(0) )    // from solace emu
+	ROMX_LOAD( "solos.bin", 0x0000, 0x0800, CRC(4d0af383) SHA1(ac4510c3380ed4a31ccf4f538af3cb66b76701ef), ROM_BIOS(0) )    // from solace emu
 	ROM_SYSTEM_BIOS(1, "dpmon", "DPMON")
-	ROMX_LOAD( "dpmon.bin", 0xc000, 0x0800, BAD_DUMP CRC(2a84f099) SHA1(60ff6e38082c50afcf0f40707ef65668a411008b), ROM_BIOS(1) )
+	ROMX_LOAD( "dpmon.bin", 0x0000, 0x0800, BAD_DUMP CRC(2a84f099) SHA1(60ff6e38082c50afcf0f40707ef65668a411008b), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "consol", "CONSOL")
-	ROMX_LOAD( "consol.bin", 0xc000, 0x0400, BAD_DUMP CRC(80bf6d85) SHA1(84b81c60bb08a3a5435ec1be56a67aa695bce099), ROM_BIOS(2) )
+	ROMX_LOAD( "consol.bin", 0x0000, 0x0400, BAD_DUMP CRC(80bf6d85) SHA1(84b81c60bb08a3a5435ec1be56a67aa695bce099), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(3, "solos2", "Solos Patched")
-	ROMX_LOAD( "solos2.bin", 0xc000, 0x0800, CRC(7776cc7d) SHA1(c4739a9ea7e8146ce7ae3305ed526b6045efa9d6), ROM_BIOS(3) ) // from Nama
+	ROMX_LOAD( "solos2.bin", 0x0000, 0x0800, CRC(7776cc7d) SHA1(c4739a9ea7e8146ce7ae3305ed526b6045efa9d6), ROM_BIOS(3) ) // from Nama
 	ROM_SYSTEM_BIOS(4, "bootload", "BOOTLOAD")
-	ROMX_LOAD( "bootload.bin", 0xc000, 0x0800, BAD_DUMP CRC(4261ac71) SHA1(4752408ac85d88857e8e9171c7f42bd623c9271e), ROM_BIOS(4) ) // from Nama
-//        This one doesn't work
+	ROMX_LOAD( "bootload.bin", 0x0000, 0x0800, BAD_DUMP CRC(4261ac71) SHA1(4752408ac85d88857e8e9171c7f42bd623c9271e), ROM_BIOS(4) ) // from Nama
+	// This one doesn't work
 	ROM_SYSTEM_BIOS(5, "cuter", "CUTER")
-	ROMX_LOAD( "cuter.bin", 0xc000, 0x0800, BAD_DUMP CRC(39cca901) SHA1(33725d6da63e295552ee13f0a735d33aee8f0d17), ROM_BIOS(5) ) // from Nama
+	ROMX_LOAD( "cuter.bin", 0x0000, 0x0800, BAD_DUMP CRC(39cca901) SHA1(33725d6da63e295552ee13f0a735d33aee8f0d17), ROM_BIOS(5) ) // from Nama
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "6574.bin", 0x0000, 0x0800, BAD_DUMP CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
@@ -821,4 +826,4 @@ ROM_END
 
 /* Driver */
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                             FULLNAME                    FLAGS
-COMP( 1976, sol20, 0,      0,      sol20,   sol20, sol20_state, init_sol20, "Processor Technology Corporation", "Sol-20 Terminal Computer", 0 )
+COMP( 1976, sol20, 0,      0,      sol20,   sol20, sol20_state, empty_init, "Processor Technology Corporation", "Sol-20 Terminal Computer", MACHINE_SUPPORTS_SAVE )
