@@ -209,7 +209,7 @@ void SID6581_t::init()
 	{
 		optr[v].sid = this;
 
-		u8 mod_voi = ((v + max_voices) - 1) % max_voices;
+		u8 const mod_voi = ((v + max_voices) - 1) % max_voices;
 		optr[v].modulator = &optr[mod_voi];
 		optr[mod_voi].carrier = &optr[v];
 		optr[v].filtVoiceMask = 1 << v;
