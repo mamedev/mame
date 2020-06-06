@@ -113,6 +113,7 @@ protected:
 
 private:
 	DECLARE_READ16_MEMBER(jak_pf_speedup_hack_r);
+	DECLARE_READ16_MEMBER(jak_pf_speedup_hack2_r);
 };
 
 

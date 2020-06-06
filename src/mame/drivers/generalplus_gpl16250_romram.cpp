@@ -331,6 +331,7 @@ void jak_pf_game_state::machine_reset()
 {
 	jak_s500_game_state::machine_reset();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0001, 0x0001, read16_delegate(*this, FUNC(jak_pf_game_state::jak_pf_speedup_hack_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x13dd, 0x13dd, read16_delegate(*this, FUNC(jak_pf_game_state::jak_pf_speedup_hack2_r)));
 }
 
 void jak_prft_game_state::machine_reset()
@@ -355,6 +356,14 @@ READ16_MEMBER(jak_pf_game_state::jak_pf_speedup_hack_r)
 	if (pc == 0x30010)
 		m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(2000));
 	return m_maincpu->get_ram_addr(0x0001);
+}
+
+READ16_MEMBER(jak_pf_game_state::jak_pf_speedup_hack2_r)
+{
+	u32 const pc = m_maincpu->pc();
+	if (pc == 0x2611b4)
+		m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(2000));
+	return m_maincpu->get_ram_addr(0x13dd);
 }
 
 ROM_START( paccon )
