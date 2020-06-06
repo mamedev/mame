@@ -15,6 +15,7 @@
 #include "putil.h"
 
 #include <memory>
+#include <vector>
 
 #ifdef _WIN32
 #include <cwchar>
@@ -52,8 +53,8 @@ namespace plib {
 		template <class C, typename T>
 		static int mainrun(int argc, T **argv)
 		{
-			auto a = plib::make_unique<C>();
-			return a->main_utfX(argc, argv);
+			C application;;
+			return application.main_utfX(argc, argv);
 		}
 
 	private:

@@ -5,6 +5,7 @@
 #include "penum.h"
 #include "pstrutil.h"
 #include "ptypes.h"
+#include "pstream.h"
 
 #include <algorithm>
 #include <cstdlib> // needed for getenv ...
@@ -40,6 +41,12 @@ namespace plib
 				return filename.substr(0, 1);
 
 			return filename.substr(0, p);
+		}
+
+		bool exists (const pstring &filename)
+		{
+			plib::ifstream f(filename);
+			return f.good();
 		}
 
 		pstring buildpath(std::initializer_list<pstring> list )

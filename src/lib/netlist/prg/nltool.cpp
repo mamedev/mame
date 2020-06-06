@@ -201,7 +201,7 @@ public:
 	stream_ptr stream(const pstring &file) override
 	{
 		pstring name = m_folder + "/" + file;
-		auto strm(plib::make_unique<std::ifstream>(plib::filesystem::u8path(name)));
+		auto strm(plib::make_unique<plib::ifstream>(plib::filesystem::u8path(name)));
 		if (strm->fail())
 			return stream_ptr(nullptr);
 
@@ -385,7 +385,7 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstr
 	std::vector<input_t> ret;
 	if (fname != "")
 	{
-		plib::putf8_reader r = plib::putf8_reader(plib::make_unique<std::ifstream>(plib::filesystem::u8path(fname)));
+		plib::putf8_reader r = plib::putf8_reader(plib::make_unique<plib::ifstream>(plib::filesystem::u8path(fname)));
 		if (r.stream().fail())
 			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
 		r.stream().imbue(std::locale::classic());
@@ -410,6 +410,9 @@ void tool_app_t::run()
 
 	if (opt_files().size() != 1)
 		throw netlist::nl_exception("nltool: run needs exactly one file");
+
+	if (!plib::util::exists(opt_files()[0]))
+		throw netlist::nl_exception("nltool: file doesn't exists: {}", opt_files()[0]);
 
 	netlist_tool_t nt(*this, "netlist", opt_boostlib());
 
@@ -441,7 +444,7 @@ void tool_app_t::run()
 	// FIXME: error handling
 	if (opt_loadstate.was_specified())
 	{
-		std::ifstream strm(plib::filesystem::u8path(opt_loadstate()));
+		plib::ifstream strm(plib::filesystem::u8path(opt_loadstate()));
 		if (strm.fail())
 			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_loadstate()));
 		strm.imbue(std::locale::classic());
@@ -484,7 +487,7 @@ void tool_app_t::run()
 	if (opt_savestate.was_specified())
 	{
 		auto savestate = nt.save_state();
-		std::ofstream strm(plib::filesystem::u8path(opt_savestate()), std::ios_base::binary);
+		plib::ofstream strm(plib::filesystem::u8path(opt_savestate()), std::ios_base::binary);
 		if (strm.fail())
 			throw plib::file_open_e(opt_savestate());
 		strm.imbue(std::locale::classic());
@@ -608,7 +611,7 @@ void tool_app_t::static_compile()
 
 		for (auto &e : mp)
 		{
-			std::ofstream sout(opt_dir() + "/" + e.first + ".c" );
+			plib::ofstream sout(opt_dir() + "/" + e.first + ".c" );
 			sout << e.second.m_code;
 		}
 	}
@@ -623,7 +626,7 @@ void tool_app_t::static_compile()
 				names.push_back(opt_name());
 			else
 			{
-				plib::putf8_reader r = plib::putf8_reader(plib::make_unique<std::ifstream>(plib::filesystem::u8path(f)));
+				plib::putf8_reader r = plib::putf8_reader(plib::make_unique<plib::ifstream>(plib::filesystem::u8path(f)));
 				if (r.stream().fail())
 					throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(f));
 				r.stream().imbue(std::locale::classic());
@@ -655,7 +658,7 @@ void tool_app_t::static_compile()
 				compile_one_and_add_to_map(f, name, target, map);
 			}
 		}
-		std::ofstream sout = std::ofstream(opt_out());
+		plib::ofstream sout(opt_out());
 
 		sout << "#include \"plib/pdynlib.h\"\n\n";
 		for (auto &e : map)
@@ -703,7 +706,7 @@ struct doc_ext
 
 static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 {
-	plib::putf8_reader r = plib::putf8_reader(plib::make_unique<std::ifstream>(plib::filesystem::u8path(fname)));
+	plib::putf8_reader r = plib::putf8_reader(plib::make_unique<plib::ifstream>(plib::filesystem::u8path(fname)));
 	if (r.stream().fail())
 		throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
 	r.stream().imbue(std::locale::classic());
@@ -1109,7 +1112,7 @@ void tool_app_t::convert()
 	}
 	else
 	{
-		std::ifstream strm(plib::filesystem::u8path(opt_files()[0]));
+		plib::ifstream strm(plib::filesystem::u8path(opt_files()[0]));
 		if (strm.fail())
 			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_files()[0]));
 		strm.imbue(std::locale::classic());

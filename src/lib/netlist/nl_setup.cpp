@@ -1611,7 +1611,7 @@ source_mem_t::stream_ptr source_mem_t::stream(const pstring &name)
 source_file_t::stream_ptr source_file_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	auto ret(plib::make_unique<std::ifstream>(plib::filesystem::u8path(m_filename)));
+	auto ret(plib::make_unique<plib::ifstream>(plib::filesystem::u8path(m_filename)));
 	return (ret->is_open()) ? std::move(ret) : stream_ptr(nullptr);
 }
 

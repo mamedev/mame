@@ -723,7 +723,7 @@ static void open_ostream_and_exec(const pstring &fname, bool binary, F func)
 	if (fname != "-")
 	{
 		// FIXME: binary depends on format!
-		std::ofstream outstrm(plib::filesystem::u8path(fname),
+		plib::ofstream outstrm(plib::filesystem::u8path(fname),
 			binary ? (std::ios::out | std::ios::binary) : std::ios::out);
 		if (outstrm.fail())
 			throw plib::file_open_e(fname);
@@ -802,7 +802,7 @@ int nlwav_app::execute()
 			}
 			else
 			{
-				fin = plib::make_unique<std::ifstream>(plib::filesystem::u8path(oi), std::ios::in);
+				fin = plib::make_unique<plib::ifstream>(plib::filesystem::u8path(oi), std::ios::in);
 				if (fin->fail())
 					throw plib::file_open_e(oi);
 			}

@@ -42,7 +42,7 @@
 /// OpenMP adds about 10% to 20% performance for analog netlists.
 ///
 #ifndef PUSE_OPENMP
-#define PUSE_OPENMP              (0)
+#define PUSE_OPENMP              (1)
 #endif
 
 /// \brief Use aligned optimizations.
@@ -173,7 +173,9 @@ typedef __float128 FLOAT128;
 
 #if (PUSE_OPENMP)
 #if (!(PHAS_OPENMP))
-#error To use openmp compile and link with "-fopenmp"
+//#error To use openmp compile and link with "-fopenmp"
+#undef PUSE_OPENMP
+#define PUSE_OPENMP (0)
 #endif
 #endif
 
