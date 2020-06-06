@@ -792,7 +792,7 @@ ROM_START( m505neo )
 ROM_END
 
 ROM_START( m521neo )
-	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )                   
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 ) // was this dumped with some address lines swapped?             
 	ROM_LOAD16_WORD_SWAP( "6gu-1cd-a.u2", 0x0000000, 0x800000, CRC(7cb31b4c) SHA1(8de44756747a292c5d39bd491048d6fac4219953) )
 	ROM_CONTINUE(0x01000000, 0x800000)
 	ROM_CONTINUE(0x00800000, 0x800000)
@@ -812,7 +812,6 @@ ROM_START( m521neo )
 	ROM_CONTINUE(0x07000000, 0x800000)
 	ROM_CONTINUE(0x06800000, 0x800000)
 	ROM_CONTINUE(0x07800000, 0x800000)
-
 ROM_END
 
 
@@ -915,6 +914,7 @@ CONS( 200?, oplayer,   0, 0, zon32bit, oplayer, oplayer_100in1_state, init_oplay
 
 CONS( 2012, m505neo,   0, 0, zon32bit, oplayer, oplayer_100in1_state, init_m505neo, "Millennium 2000 GmbH", "Millennium M505 Arcade Neo Portable Spielkonsole (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+// a version of this exists with the 'newer' style title screen seen in m505neo
 CONS( 2012, m521neo,   0, 0, zon32bit, oplayer, denver_200in1_state,  init_m521neo, "Millennium 2000 GmbH", "Millennium M521 Arcade Neo 2.0 (Family Sport 220-in-1) ", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /*

@@ -30,6 +30,8 @@ void spg_renderer_device::device_start()
 		m_rgb555_to_rgb888[i] = (m_rgb5_to_rgb8[(i >> 10) & 0x1f] << 16) |
 								(m_rgb5_to_rgb8[(i >>  5) & 0x1f] <<  8) |
 								(m_rgb5_to_rgb8[(i >>  0) & 0x1f] <<  0);
+
+		m_rgb555_to_rgb888_current[i] = 0x0000;
 	}
 
 	save_item(NAME(m_video_regs_1c));
@@ -46,6 +48,9 @@ void spg_renderer_device::device_start()
 	save_item(NAME(m_video_regs_7f));
 
 	save_item(NAME(m_ycmp_table));
+
+	save_item(NAME(m_rgb555_to_rgb888_current));
+	save_item(NAME(m_brightness_or_saturation_dirty));
 }
 
 void spg_renderer_device::device_reset()
@@ -252,7 +257,7 @@ void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectang
 		uint32_t tilemap = tilemapregs[2];
 		uint32_t palette_map = tilemapregs[3];
 
-		popmessage("draw draw_linemap bases %04x %04x\n", tilemap, palette_map);
+		//popmessage("draw draw_linemap bases %04x %04x\n", tilemap, palette_map);
 
 		//uint32_t xscroll = scrollregs[0];
 		uint32_t yscroll = scrollregs[1];
