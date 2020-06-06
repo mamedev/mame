@@ -474,7 +474,7 @@ private:
 	bool m_accel_temp_slowdown;
 	bool m_accel_laser;
 	int m_accel_stage;
-	uint m_accel_speed;
+	u32 m_accel_speed;
 	u8 m_accel_slotspk;
 
 	uint8_t *m_ram_ptr, *m_rom_ptr, *m_cec_ptr;
