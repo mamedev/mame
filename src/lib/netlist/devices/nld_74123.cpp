@@ -35,16 +35,16 @@ namespace netlist
 		, m_RI(*this, "RI", nlconst::magic(400.0)) // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
 		{
 
-			register_subalias("GND", m_RN.m_R.N());
-			register_subalias("VCC", m_RP.m_R.P());
-			register_subalias("C",   m_RN.m_R.N());
-			register_subalias("RC",  m_RN.m_R.P());
+			register_subalias("GND", m_RN.N());
+			register_subalias("VCC", m_RP.P());
+			register_subalias("C",   m_RN.N());
+			register_subalias("RC",  m_RN.P());
 
-			connect(m_RP_Q, m_RP.m_I);
-			connect(m_RN_Q, m_RN.m_I);
+			connect(m_RP_Q, m_RP.I());
+			connect(m_RN_Q, m_RN.I());
 
-			connect(m_RN.m_R.P(), m_RP.m_R.N());
-			connect(m_CV, m_RN.m_R.P());
+			connect(m_RN.P(), m_RP.N());
+			connect(m_CV, m_RN.P());
 
 			m_RP.m_RON.set(m_RI());
 			m_RN.m_RON.set(m_RI());
@@ -102,7 +102,7 @@ namespace netlist
 
 			if (m_state == 1)
 			{
-				const nl_fptype vLow = m_KP * m_RP.m_R.P()();
+				const nl_fptype vLow = m_KP * m_RP.P()();
 				if (m_CV() < vLow)
 				{
 					m_RN_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF
@@ -111,7 +111,7 @@ namespace netlist
 			}
 			if (m_state == 2)
 			{
-				const nl_fptype vHigh = m_RP.m_R.P()() * (nlconst::one() - m_KP);
+				const nl_fptype vHigh = m_RP.P()() * (nlconst::one() - m_KP);
 				if (m_CV() > vHigh)
 				{
 					m_RP_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF
@@ -172,20 +172,20 @@ namespace netlist
 			register_subalias("3", m_A.m_CLRQ);
 			register_subalias("4", m_A.m_QQ);
 			register_subalias("5", m_B.m_Q);
-			register_subalias("6", m_B.m_RN.m_R.N());
-			register_subalias("7", m_B.m_RN.m_R.P());
-			register_subalias("8", m_A.m_RN.m_R.N());
-			connect(m_A.m_RN.m_R.N(), m_B.m_RN.m_R.N());
+			register_subalias("6", m_B.m_RN.N());
+			register_subalias("7", m_B.m_RN.P());
+			register_subalias("8", m_A.m_RN.N());
+			connect(m_A.m_RN.N(), m_B.m_RN.N());
 
 			register_subalias("9", m_B.m_A);
 			register_subalias("10", m_B.m_B);
 			register_subalias("11", m_B.m_CLRQ);
 			register_subalias("12", m_B.m_QQ);
 			register_subalias("13", m_A.m_Q);
-			register_subalias("14", m_A.m_RN.m_R.N());
-			register_subalias("15", m_A.m_RN.m_R.P());
-			register_subalias("16", m_A.m_RP.m_R.P());
-			connect(m_A.m_RP.m_R.P(), m_B.m_RP.m_R.P());
+			register_subalias("14", m_A.m_RN.N());
+			register_subalias("15", m_A.m_RN.P());
+			register_subalias("16", m_A.m_RP.P());
+			connect(m_A.m_RP.P(), m_B.m_RP.P());
 		}
 		NETLIB_RESETI() {}
 		NETLIB_UPDATEI() {}
@@ -200,25 +200,25 @@ namespace netlist
 		, m_A(*this, "A")
 		, m_B(*this, "B")
 		{
-			register_subalias("1", m_A.m_RN.m_R.N()); // C1
-			register_subalias("2", m_A.m_RN.m_R.P()); // RC1
+			register_subalias("1", m_A.m_RN.N()); // C1
+			register_subalias("2", m_A.m_RN.P()); // RC1
 			register_subalias("3", m_A.m_CLRQ);
 			register_subalias("4", m_A.m_B);
 			register_subalias("5", m_A.m_A);
 			register_subalias("6", m_A.m_Q);
 			register_subalias("7", m_A.m_QQ);
-			register_subalias("8", m_A.m_RN.m_R.N());
-			connect(m_A.m_RN.m_R.N(), m_B.m_RN.m_R.N());
+			register_subalias("8", m_A.m_RN.N());
+			connect(m_A.m_RN.N(), m_B.m_RN.N());
 
 			register_subalias("9", m_B.m_QQ);
 			register_subalias("10", m_B.m_Q);
 			register_subalias("11", m_B.m_A);
 			register_subalias("12", m_B.m_B);
 			register_subalias("13", m_B.m_CLRQ);
-			register_subalias("14", m_B.m_RN.m_R.P()); // RC2
-			register_subalias("15", m_B.m_RN.m_R.N()); // C2
-			register_subalias("16", m_A.m_RP.m_R.P());
-			connect(m_A.m_RP.m_R.P(), m_B.m_RP.m_R.P());
+			register_subalias("14", m_B.m_RN.P()); // RC2
+			register_subalias("15", m_B.m_RN.N()); // C2
+			register_subalias("16", m_A.m_RP.P());
+			connect(m_A.m_RP.P(), m_B.m_RP.P());
 		}
 		NETLIB_RESETI() { }
 		NETLIB_UPDATEI() { }
@@ -233,25 +233,25 @@ namespace netlist
 		, m_A(*this, "A")
 		, m_B(*this, "B")
 		{
-			register_subalias("1", m_A.m_RN.m_R.N()); // C1
-			register_subalias("2", m_A.m_RN.m_R.P()); // RC1
+			register_subalias("1", m_A.m_RN.N()); // C1
+			register_subalias("2", m_A.m_RN.P()); // RC1
 			register_subalias("3", m_A.m_CLRQ);
 			register_subalias("4", m_A.m_A);
 			register_subalias("5", m_A.m_B);
 			register_subalias("6", m_A.m_Q);
 			register_subalias("7", m_A.m_QQ);
-			register_subalias("8", m_A.m_RN.m_R.N());
-			connect(m_A.m_RN.m_R.N(), m_B.m_RN.m_R.N());
+			register_subalias("8", m_A.m_RN.N());
+			connect(m_A.m_RN.N(), m_B.m_RN.N());
 
 			register_subalias("9", m_B.m_QQ);
 			register_subalias("10", m_B.m_Q);
 			register_subalias("11", m_B.m_B);
 			register_subalias("12", m_B.m_A);
 			register_subalias("13", m_B.m_CLRQ);
-			register_subalias("14", m_B.m_RN.m_R.P()); // RC2
-			register_subalias("15", m_B.m_RN.m_R.N()); // C2
-			register_subalias("16", m_A.m_RP.m_R.P());
-			connect(m_A.m_RP.m_R.P(), m_B.m_RP.m_R.P());
+			register_subalias("14", m_B.m_RN.P()); // RC2
+			register_subalias("15", m_B.m_RN.N()); // C2
+			register_subalias("16", m_A.m_RP.P());
+			connect(m_A.m_RP.P(), m_B.m_RP.P());
 		}
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();

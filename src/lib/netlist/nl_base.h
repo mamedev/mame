@@ -1053,13 +1053,13 @@ namespace netlist
 		/// templatized generic device models do not have to do tons of
 		/// template magic.
 		///
-		/// This function throws an exception if actually called.
+		/// This function terminates if actually called.
 		///
 		[[noreturn]] static void set_tristate(netlist_sig_t v,
 			netlist_time ts_off_on, netlist_time ts_on_off)
 		{
 			plib::unused_var(v, ts_off_on, ts_on_off);
-			throw nl_exception("set_tristate on logic_output should never be called!");
+			plib::terminate("set_tristate on logic_output should never be called!");
 		}
 	private:
 		logic_net_t m_my_net;
