@@ -6,6 +6,7 @@
 
 #include <cfenv>
 #include <iostream>
+#include <cfloat>
 
 #if (defined(__x86_64__) || defined(__i386__)) && defined(__linux__)
 #define HAS_FEENABLE_EXCEPT     (1)
@@ -103,6 +104,8 @@ namespace plib {
 
 	bool fpsignalenabler::m_enable = false;
 
+	//FIXME: mingw needs to be compiled with "-fnon-call-exceptions"
+
 	fpsignalenabler::fpsignalenabler(unsigned fpexceptions)
 	{
 	#if HAS_FEENABLE_EXCEPT
@@ -115,6 +118,18 @@ namespace plib {
 			if (fpexceptions & plib::FP_OVERFLOW) b = b | FE_OVERFLOW;
 			if (fpexceptions & plib::FP_INVALID) b = b | FE_INVALID;
 			m_last_enabled = feenableexcept(b);
+		}
+	#elif defined(_WIN32) && defined(_EM_INEXACT)
+		if (m_enable)
+		{
+			int b = _EM_DENORMAL | _EM_INEXACT | _EM_ZERODIVIDE | _EM_UNDERFLOW | _EM_OVERFLOW | _EM_INVALID;
+			if (fpexceptions & plib::FP_INEXACT) b &= ~_EM_INEXACT;
+			if (fpexceptions & plib::FP_DIVBYZERO) b &= ~_EM_ZERODIVIDE;
+			if (fpexceptions & plib::FP_UNDERFLOW) b &= ~_EM_UNDERFLOW;
+			if (fpexceptions & plib::FP_OVERFLOW) b &= ~_EM_OVERFLOW;
+			if (fpexceptions & plib::FP_INVALID) b &= ~_EM_INVALID;
+			m_last_enabled = _controlfp(0, 0);
+			_controlfp(b, _MCW_EM );
 		}
 	#else
 		m_last_enabled = 0;
@@ -130,12 +145,23 @@ namespace plib {
 			fedisableexcept(FE_ALL_EXCEPT);  // Enable all floating point exceptions but FE_INEXACT
 			feenableexcept(m_last_enabled);  // Enable all floating point exceptions but FE_INEXACT
 		}
+	#elif defined(_WIN32) && defined(_EM_INEXACT)
+		if (m_enable)
+		{
+			_controlfp(m_last_enabled, _MCW_EM);
+		}
 	#endif
 	}
 
 	bool fpsignalenabler::supported()
 	{
+	#if HAS_FEENABLE_EXCEPT
 		return true;
+	#elif defined(_WIN32) && defined(_EM_INEXACT)
+		return true;
+	#else
+		return false;
+	#endif
 	}
 
 	bool fpsignalenabler::global_enable(bool enable)

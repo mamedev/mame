@@ -142,13 +142,9 @@ namespace netlist
 
 	} // namespace detail
 
-#if (PHAS_INT128)
 	using netlist_time = plib::ptime<std::int64_t, config::INTERNAL_RES::value>;
-	using netlist_time_ext = plib::ptime<INT128, config::INTERNAL_RES::value>;
-#else
-	using netlist_time = plib::ptime<std::int64_t, config::INTERNAL_RES::value>;
-	using netlist_time_ext = netlist_time;
-#endif
+	using netlist_time_ext = plib::ptime<std::conditional<NL_PREFER_INT128 && plib::compile_info::has_int128::value, INT128, std::int64_t>::type, config::INTERNAL_RES::value>;
+
 	static_assert(noexcept(netlist_time::from_nsec(1)), "Not evaluated as constexpr");
 
 	//============================================================

@@ -39,6 +39,10 @@ namespace plib
 	//  compile time information
 	//============================================================
 
+	/// \brief Dummy 128 bit types for platforms which don't support 128 bit
+	struct UINT128_DUMMY {};
+	struct INT128_DUMMY {};
+
 	struct compile_info
 	{
 	#ifdef _WIN32
@@ -52,7 +56,27 @@ namespace plib
 		using win32 = std::integral_constant<bool, false>;
 		using unicode = std::integral_constant<bool, true>;
 	#endif
+	#ifdef __SIZEOF_INT128__
+		using has_int128 = std::integral_constant<bool, true>;
+		using int128_type  = __int128_t;
+		using uint128_type = __uint128_t;
+		static constexpr int128_type  int128_max() { return (~static_cast<uint128_type>(0)) >> 1; }
+		static constexpr uint128_type  uint128_max() { return ~(static_cast<uint128_type>(0)); }
+	#else
+		using has_int128 = std::integral_constant<bool, false>;
+		using int128_type  = INT128_DUMMY;
+		using uint128_type = UINT128_DUMMY;
+		static constexpr int128_type int128_max() { return int128_type(); }
+		static constexpr uint128_type uint128_max() { return uint128_type(); }
+	#endif
 	};
+} // namespace plib
+
+using INT128 = plib::compile_info::int128_type;
+using UINT128 = plib::compile_info::uint128_type;
+
+namespace plib
+{
 
 	template<typename T> struct is_integral : public std::is_integral<T> { };
 	template<typename T> struct is_signed : public std::is_signed<T> { };
@@ -60,7 +84,7 @@ namespace plib
 	template<typename T> struct numeric_limits : public std::numeric_limits<T> { };
 
 	// 128 bit support at least on GCC is not fully supported
-#if PHAS_INT128
+
 	template<> struct is_integral<UINT128> { static constexpr bool value = true; };
 	template<> struct is_integral<INT128> { static constexpr bool value = true; };
 
@@ -74,17 +98,16 @@ namespace plib
 	{
 		static constexpr UINT128 max() noexcept
 		{
-			return ~(static_cast<UINT128>(0));
+			return compile_info::uint128_max();
 		}
 	};
 	template<> struct numeric_limits<INT128>
 	{
 		static constexpr INT128 max() noexcept
 		{
-			return (~static_cast<UINT128>(0)) >> 1;
+			return compile_info::int128_max();
 		}
 	};
-#endif
 
 	template<typename T> struct is_floating_point : public std::is_floating_point<T> { };
 
@@ -110,16 +133,13 @@ namespace plib
 	template<unsigned bits>
 	struct size_for_bits
 	{
+		static_assert(bits <= 64 || (bits <= 128 && compile_info::has_int128::value), "not supported");
 		enum { value =
 			bits <= 8       ?   1 :
 			bits <= 16      ?   2 :
 			bits <= 32      ?   4 :
-#if (PHAS_INT128)
 			bits <= 64      ?   8 :
 							   16
-#else
-								8
-#endif
 		};
 	};
 
@@ -128,9 +148,7 @@ namespace plib
 	template<> struct least_type_for_size<2> { using type = uint_least16_t; };
 	template<> struct least_type_for_size<4> { using type = uint_least32_t; };
 	template<> struct least_type_for_size<8> { using type = uint_least64_t; };
-#if (PHAS_INT128)
 	template<> struct least_type_for_size<16> { using type = UINT128; };
-#endif
 
 	// This is different to the standard library. Mappings provided in stdint
 	// are not always fastest.
@@ -139,19 +157,19 @@ namespace plib
 	template<> struct fast_type_for_size<2> { using type = uint32_t; };
 	template<> struct fast_type_for_size<4> { using type = uint32_t; };
 	template<> struct fast_type_for_size<8> { using type = uint_fast64_t; };
-#if (PHAS_INT128)
 	template<> struct fast_type_for_size<16> { using type = UINT128; };
-#endif
 
 	template<unsigned bits>
 	struct least_type_for_bits
 	{
+		static_assert(bits <= 64 || (bits <= 128 && compile_info::has_int128::value), "not supported");
 		using type = typename least_type_for_size<size_for_bits<bits>::value>::type;
 	};
 
 	template<unsigned bits>
 	struct fast_type_for_bits
 	{
+		static_assert(bits <= 64 || (bits <= 128 && compile_info::has_int128::value), "not supported");
 		using type = typename fast_type_for_size<size_for_bits<bits>::value>::type;
 	};
 
