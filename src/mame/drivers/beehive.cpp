@@ -12,7 +12,7 @@
     The character gen rom is not dumped. Using the one from 'c10'
     for the moment.
 
-    System freezes if ^G or ^Z pressed. Pressing ^Q is the same as Enter.
+    System beeps if ^G or ^Z pressed. Pressing ^Q is the same as Enter.
 
     25/04/2011 Added partial keyboard.
     26/06/2011 Added modifier keys.
@@ -28,7 +28,9 @@
 #include "machine/pit8253.h"
 #include "video/i8275.h"
 #include "bus/rs232/rs232.h"
+#include "sound/beep.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 class beehive_state : public driver_device
@@ -39,6 +41,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_dmac(*this, "dmac")
 		, m_p_chargen(*this, "chargen")
+		, m_beep(*this, "beep")
 		, m_usart(*this, "usart%u", 1U)
 		, m_rs232(*this, "rs232%c", 'a')
 		, m_io_keyboard(*this, "X%u", 0U)
@@ -64,6 +67,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dmac;
 	required_region_ptr<u8> m_p_chargen;
+	required_device<beep_device> m_beep;
 	required_device_array<i8251_device, 2> m_usart;
 	required_device_array<rs232_port_device, 2> m_rs232;
 	required_ioport_array<16> m_io_keyboard;
@@ -89,15 +93,13 @@ void beehive_state::dmac_mem_w(offs_t offset, u8 data)
 
 u8 beehive_state::beehive_60_r()
 {
-	if (BIT(m_keyline, 4))
-		return m_io_keyboard[m_keyline & 15]->read();
-	else
-		return 0xff;
+	return m_io_keyboard[m_keyline & 15]->read();
 }
 
 void beehive_state::beehive_62_w(u8 data)
 {
 	m_keyline = data;
+	m_beep->set_state(!BIT(data, 4));
 }
 
 void beehive_state::beehive_mem(address_map &map)
@@ -343,6 +345,9 @@ void beehive_state::beehive(machine_config &config)
 	pit2.out_handler<2>().set(m_usart[1], FUNC(i8251_device::write_rxc));
 	pit2.out_handler<2>().append(m_usart[1], FUNC(i8251_device::write_txc));
 
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.5);
+
 	I8251(config, m_usart[0], 0);
 	m_usart[0]->txd_handler().set(m_rs232[0], FUNC(rs232_port_device::write_txd));
 	m_usart[0]->dtr_handler().set(m_rs232[0], FUNC(rs232_port_device::write_dtr));
@@ -383,4 +388,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME  FLAGS
-COMP( 1982, beehive, 0,      0,      beehive, beehive, beehive_state, empty_init, "BeeHive", "DM3270", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, beehive, 0,      0,      beehive, beehive, beehive_state, empty_init, "BeeHive", "DM3270", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
