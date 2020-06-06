@@ -78,6 +78,13 @@ pci_device::pci_device(const machine_config &mconfig, device_type type, const ch
 	is_multifunction_device = false;
 	intr_pin = 0x0;
 	intr_line = 0xff;
+	for(int i=0; i<6; i++) {
+		bank_infos[i].adr = -1;
+		bank_infos[i].size = 0;
+		bank_infos[i].flags = 0;
+		bank_reg_infos[i].bank = -1;
+		bank_reg_infos[i].hi = 0;
+	}
 }
 
 void pci_device::set_ids(uint32_t _main_id, uint8_t _revision, uint32_t _pclass, uint32_t _subsystem_id)
@@ -93,14 +100,6 @@ void pci_device::device_start()
 	command = 0x0080;
 	command_mask = 0x01bf;
 	status = 0x0000;
-
-	for(int i=0; i<6; i++) {
-		bank_infos[i].adr = -1;
-		bank_infos[i].size = 0;
-		bank_infos[i].flags = 0;
-		bank_reg_infos[i].bank = -1;
-		bank_reg_infos[i].hi = 0;
-	}
 
 	bank_count = 0;
 	bank_reg_count = 0;
