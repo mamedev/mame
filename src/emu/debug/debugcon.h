@@ -117,6 +117,7 @@ private:
 	void exit();
 
 	void execute_help_custom(int ref, const std::vector<std::string> &params);
+	void execute_condump(int ref, const std::vector<std::string>& params);
 
 	void trim_parameter(char **paramptr, bool keep_quotes);
 	CMDERR internal_execute_command(bool execute, int params, char **param);
