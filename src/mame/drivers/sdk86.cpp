@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu, Robbbert
+// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu
 /***************************************************************************
 
         Intel MCS-86 System Design Kit (SDK-86)

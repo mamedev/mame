@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Gabriele D'Antona, Robbbert
+// copyright-holders: Gabriele D'Antona
 /*************************************************************************************************
 
 TeleVideo TS-803(H)

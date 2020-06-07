@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:
 /***************************************************************************
 
 2013-09-10 Skeleton driver for Televideo TS816

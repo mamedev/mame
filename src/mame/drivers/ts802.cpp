@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:
 /***************************************************************************
 
     Skeleton driver for Televideo TS802
@@ -44,10 +44,8 @@ public:
 
 	void init_ts802();
 
-protected:
-	virtual void machine_reset() override;
-
 private:
+	virtual void machine_reset() override;
 	uint8_t port00_r() { return 0x80; };
 	uint8_t port0c_r() { return 1; };
 	uint8_t port0e_r() { return 0; };
