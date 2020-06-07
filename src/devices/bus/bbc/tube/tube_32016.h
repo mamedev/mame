@@ -54,8 +54,8 @@ private:
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	void tube_32016_mem(address_map &map);
 
