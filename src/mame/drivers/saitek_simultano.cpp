@@ -303,7 +303,7 @@ void simultano_state::simultano(machine_config &config)
 	/* basic machine hardware */
 	M65C02(config, m_maincpu, 5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &simultano_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(76));
+	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(76)); // approximation
 
 	ADDRESS_MAP_BANK(config, "rombank").set_map(&simultano_state::rombank_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x8000);
 

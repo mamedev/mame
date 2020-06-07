@@ -23,7 +23,7 @@ Hardware notes:
 - 4KB ROM(AMI 2332)
 - 1KB RAM(2*2114), or 256 bytes RAM(GTE 3539)
 - buzzer, 64+12 leds, button chessboard
-- expansion slot at top-tight (dummy empty cartridge by default)
+- expansion slot at top-right (dummy empty cartridge by default)
 
 Expansion modules: (* denotes not dumped)
 - Strong Play Module
