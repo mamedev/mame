@@ -41,15 +41,15 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		coco_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 		virtual void device_add_mconfig(machine_config &config) override;
 
 	protected:
 		// device-level overrides
 		virtual void device_start() override;
 		virtual void device_reset() override;
-		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
-		virtual DECLARE_READ8_MEMBER(scs_read) override;
+		virtual void scs_write(offs_t offset, u8 data) override;
+		virtual u8 scs_read(offs_t offset) override;
 
 	private:
 		required_device<ram_device>             m_staticram;
@@ -71,7 +71,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_RAM, device_cococart_interface, coco_pak_ram
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
-coco_pak_ram_device::coco_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+coco_pak_ram_device::coco_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, COCO_PAK_RAM, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_staticram(*this, STATICRAM_TAG)
@@ -122,7 +122,7 @@ void coco_pak_ram_device::device_reset()
 //    scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_pak_ram_device::scs_write)
+void coco_pak_ram_device::scs_write(offs_t offset, u8 data)
 {
 // 	int idata = data;
 
@@ -154,9 +154,9 @@ WRITE8_MEMBER(coco_pak_ram_device::scs_write)
 //  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_pak_ram_device::scs_read)
+u8 coco_pak_ram_device::scs_read(offs_t offset)
 {
-	uint8_t data = 0x00;
+	u8 data = 0x00;
 
 	switch (offset)
 	{

@@ -107,7 +107,7 @@ class coco_fdc_device_base : public coco_family_fdc_device_base
 {
 protected:
 	// construction/destruction
-	coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	enum class rtc_type
 	{
@@ -121,14 +121,14 @@ protected:
 	virtual void device_reset() override;
 
 	// device-level overrides
-	virtual DECLARE_READ8_MEMBER(cts_read) override;
-	virtual DECLARE_READ8_MEMBER(scs_read) override;
-	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+	virtual u8 cts_read(offs_t offset) override;
+	virtual u8 scs_read(offs_t offset) override;
+	virtual void scs_write(offs_t offset, u8 data) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// methods
 	virtual void update_lines() override;
-	void dskreg_w(uint8_t data);
+	void dskreg_w(u8 data);
 	rtc_type real_time_clock();
 
 	// devices
@@ -142,13 +142,13 @@ protected:
 	optional_ioport m_rtc;
 
 	// Protected
-	virtual DECLARE_READ8_MEMBER(ff74_read);
-	virtual DECLARE_WRITE8_MEMBER(ff74_write);
+	u8 ff74_read(offs_t offset);
+	void ff74_write(offs_t offset, u8 data);
 
 private:
 	// registers
-	uint8_t m_cache_controler;
-	uint8_t m_cache_pointer;
+	u8 m_cache_controler;
+	u8 m_cache_pointer;
 	required_device<ram_device>     	        m_cache_buffer;
 };
 
@@ -222,7 +222,7 @@ void coco_family_fdc_device_base::device_reset()
 //  coco_family_fdc_device_base::get_cart_base
 //-------------------------------------------------
 
-uint8_t* coco_family_fdc_device_base::get_cart_base()
+u8 *coco_family_fdc_device_base::get_cart_base()
 {
 	return memregion("eprom")->base();
 }
@@ -232,7 +232,7 @@ uint8_t* coco_family_fdc_device_base::get_cart_base()
 //  coco_family_fdc_device_base::get_cart_memregion
 //-------------------------------------------------
 
-memory_region* coco_family_fdc_device_base::get_cart_memregion()
+memory_region *coco_family_fdc_device_base::get_cart_memregion()
 {
 	return memregion("eprom");
 }
@@ -246,7 +246,7 @@ memory_region* coco_family_fdc_device_base::get_cart_memregion()
 //  coco_fdc_device_base - constructor
 //-------------------------------------------------
 
-coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: coco_family_fdc_device_base(mconfig, type, tag, owner, clock)
 	, m_wd17xx(*this, WD_TAG)
 	, m_ds1315(*this, CLOUD9_TAG)
@@ -266,8 +266,8 @@ coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device
 void coco_fdc_device_base::device_start()
 {
 	install_readwrite_handler(0xFF74, 0xFF76,
-			read8_delegate(*this, FUNC(coco_fdc_device_base::ff74_read)),
-			write8_delegate(*this, FUNC(coco_fdc_device_base::ff74_write)));
+			read8sm_delegate(*this, FUNC(coco_fdc_device_base::ff74_read)),
+			write8sm_delegate(*this, FUNC(coco_fdc_device_base::ff74_write)));
 
 	save_item(NAME(m_cache_controler));
 	save_item(NAME(m_cache_pointer));
@@ -291,9 +291,9 @@ void coco_fdc_device_base::device_reset()
 //  ff74_read - no halt registers
 //-------------------------------------------------
 
-READ8_MEMBER(coco_fdc_device_base::ff74_read)
+u8 coco_fdc_device_base::ff74_read(offs_t offset)
 {
-	uint8_t data = 0x0;
+	u8 data = 0x0;
 
 	switch(offset)
 	{
@@ -319,7 +319,7 @@ READ8_MEMBER(coco_fdc_device_base::ff74_read)
 //  ff74_write - no halt registers
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_fdc_device_base::ff74_write)
+void coco_fdc_device_base::ff74_write(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
@@ -394,19 +394,19 @@ void coco_fdc_device_base::update_lines()
 		{
 			if( (m_cache_controler & 0x07) == 0x07) /* Read cache on */
 			{
-				uint8_t data = m_wd17xx->data_r();
+				u8 data = m_wd17xx->data_r();
 				LOG("Cached drq read: %2.2x\n", data );
 				m_cache_buffer->write(m_cache_pointer++, data);
 			}
 			else if( (m_cache_controler & 0x07) == 0x04 ) /* Write cache on */
 			{
-				uint8_t data = m_cache_buffer->read(m_cache_pointer++);
+				u8 data = m_cache_buffer->read(m_cache_pointer++);
 				LOG("Cached drq write: %2.2x\n", data );
 				m_wd17xx->data_w(data);
 			}
 			else if( (m_cache_controler & 0x07) == 0x06 ) /* Copy Write cache to controller */
 			{
-				uint8_t data = m_cache_buffer->read(m_cache_pointer++);
+				u8 data = m_cache_buffer->read(m_cache_pointer++);
 				LOG("Cached drq write: %2.2x\n", data );
 				m_wd17xx->data_w(data);
 			}
@@ -437,10 +437,10 @@ void coco_fdc_device_base::update_lines()
 //  dskreg_w - function to write to CoCo dskreg
 //-------------------------------------------------
 
-void coco_fdc_device_base::dskreg_w(uint8_t data)
+void coco_fdc_device_base::dskreg_w(u8 data)
 {
-	uint8_t drive = 0;
-	uint8_t head;
+	u8 drive = 0;
+	u8 head;
 
 	LOG("fdc_coco_dskreg_w(): %c%c%c%c%c%c%c%c ($%02x)\n",
 		data & 0x80 ? 'H' : 'h',
@@ -496,7 +496,7 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 //  cts_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_fdc_device_base::cts_read)
+u8 coco_fdc_device_base::cts_read(offs_t offset)
 {
 	return memregion("eprom")->base()[offset];
 }
@@ -506,9 +506,9 @@ READ8_MEMBER(coco_fdc_device_base::cts_read)
 //  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_fdc_device_base::scs_read)
+u8 coco_fdc_device_base::scs_read(offs_t offset)
 {
-	uint8_t result = 0;
+	u8 result = 0;
 
 	switch(offset & 0x1F)
 	{
@@ -562,7 +562,7 @@ READ8_MEMBER(coco_fdc_device_base::scs_read)
 //  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_fdc_device_base::scs_write)
+void coco_fdc_device_base::scs_write(offs_t offset, u8 data)
 {
 	switch(offset & 0x1F)
 	{
@@ -619,7 +619,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 			: coco_fdc_device_base(mconfig, COCO_FDC, tag, owner, clock)
 		{
 		}
@@ -656,7 +656,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 			: coco_fdc_device_base(mconfig, COCO_FDC_V11, tag, owner, clock)
 		{
 		}
@@ -691,7 +691,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 			: coco_fdc_device_base(mconfig, COCO3_HDB1, tag, owner, clock)
 		{
 		}
@@ -725,7 +725,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco2_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		coco2_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 			: coco_fdc_device_base(mconfig, COCO2_HDB1, tag, owner, clock)
 		{
 		}
@@ -761,7 +761,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		cp450_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		cp450_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 			: coco_fdc_device_base(mconfig, CP450_FDC, tag, owner, clock)
 		{
 		}
@@ -795,7 +795,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		cd6809_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		cd6809_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 			: coco_fdc_device_base(mconfig, CD6809_FDC, tag, owner, clock)
 		{
 		}

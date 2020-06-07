@@ -104,7 +104,7 @@ void coco_psg_device::device_add_mconfig(machine_config &config)
 //  coco_psg_device - constructor
 //-------------------------------------------------
 
-coco_psg_device::coco_psg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+coco_psg_device::coco_psg_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, COCO_PSG, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_psg(*this, "psg")
@@ -118,7 +118,7 @@ coco_psg_device::coco_psg_device(const machine_config &mconfig, const char *tag,
 
 void coco_psg_device::device_start()
 {
-	m_sram = std::make_unique<uint8_t[]>(0x80000);
+	m_sram = std::make_unique<u8[]>(0x80000);
 
 	/* registers are set to a default of zero */
 	m_bank[0] = 0x00;
@@ -143,7 +143,7 @@ void coco_psg_device::device_reset()
 	install_write_handler(0xbaaa, 0xbaaa, write8sm_delegate(*this, FUNC(coco_psg_device::flash2aaa_w)));
 }
 
-void coco_psg_device::flash2aaa_w(offs_t offset, uint8_t data)
+void coco_psg_device::flash2aaa_w(offs_t offset, u8 data)
 {
 	if (BIT(m_control, 5) && BIT(m_control, 3))
 	{
@@ -151,7 +151,7 @@ void coco_psg_device::flash2aaa_w(offs_t offset, uint8_t data)
 	}
 }
 
-void coco_psg_device::flash5555_w(offs_t offset, uint8_t data)
+void coco_psg_device::flash5555_w(offs_t offset, u8 data)
 {
 	if (BIT(m_control, 5) && BIT(m_control, 3))
 	{
@@ -163,9 +163,9 @@ void coco_psg_device::flash5555_w(offs_t offset, uint8_t data)
 //  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_psg_device::scs_read)
+u8 coco_psg_device::scs_read(offs_t offset)
 {
-	uint8_t data = 0x00;
+	u8 data = 0x00;
 
 	switch (offset)
 	{
@@ -188,7 +188,7 @@ READ8_MEMBER(coco_psg_device::scs_read)
 //  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_psg_device::scs_write)
+void coco_psg_device::scs_write(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -238,9 +238,9 @@ WRITE8_MEMBER(coco_psg_device::scs_write)
 //  cts_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_psg_device::cts_read)
+u8 coco_psg_device::cts_read(offs_t offset)
 {
-	uint8_t data = 0x00;
+	u8 data = 0x00;
 
 	if (m_bank[BIT(offset, 13)] & 0x80)
 	{
@@ -258,7 +258,7 @@ READ8_MEMBER(coco_psg_device::cts_read)
 //  cts_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_psg_device::cts_write)
+void coco_psg_device::cts_write(offs_t offset, u8 data)
 {
 	if (BIT(m_control, 3))
 	{
