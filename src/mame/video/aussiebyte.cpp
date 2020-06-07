@@ -21,7 +21,7 @@
 ************************************************************/
 
 // dummy read port, forces requested action to happen
-uint8_t aussiebyte_state::port33_r()
+u8 aussiebyte_state::port33_r()
 {
 	return 0xff;
 }
@@ -34,30 +34,30 @@ d5 - /SRRD - controls write of data to either vram or aram (1=vram, 0=aram)
 d6 - /VWR - 0 = enable write vdata to vram, read from aram to vdata ; 1 = enable write to aram from vdata
 d7 - OE on port 35
 */
-void aussiebyte_state::port34_w(uint8_t data)
+void aussiebyte_state::port34_w(u8 data)
 {
 	m_port34 = data;
 }
 
-void aussiebyte_state::port35_w(uint8_t data)
+void aussiebyte_state::port35_w(u8 data)
 {
 	m_port35 = data;
 }
 
-uint8_t aussiebyte_state::port36_r()
+u8 aussiebyte_state::port36_r()
 {
 	if (BIT(m_port34, 5))
 	{
-		if (BIT(m_p_attribram[m_alpha_address & 0x7ff], 7))
-			return m_p_videoram[m_alpha_address];
+		if (BIT(m_aram[m_alpha_address & 0x7ff], 7))
+			return m_vram[m_alpha_address];
 		else
-			return m_p_videoram[m_graph_address];
+			return m_vram[m_graph_address];
 	}
 	else
-		return m_p_attribram[m_alpha_address & 0x7ff];
+		return m_aram[m_alpha_address & 0x7ff];
 }
 
-uint8_t aussiebyte_state::port37_r()
+u8 aussiebyte_state::port37_r()
 {
 	return m_crtc->de_r() ? 0xff : 0xfe;
 }
@@ -74,7 +74,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( aussiebyte_state::crtc_update_addr )
 //  m_video_address = address;// & 0x7ff;
 }
 
-void aussiebyte_state::address_w(uint8_t data)
+void aussiebyte_state::address_w(u8 data)
 {
 	m_crtc->address_w(data);
 
@@ -88,20 +88,20 @@ void aussiebyte_state::address_w(uint8_t data)
 
 		if (BIT(m_port34, 5))
 		{
-			if (BIT(m_p_attribram[m_alpha_address & 0x7ff], 7))
-				m_p_videoram[m_alpha_address] = m_port35;
+			if (BIT(m_aram[m_alpha_address & 0x7ff], 7))
+				m_vram[m_alpha_address] = m_port35;
 			else
-				m_p_videoram[m_graph_address] = m_port35;
+				m_vram[m_graph_address] = m_port35;
 		}
 		else
-			m_p_attribram[m_alpha_address & 0x7ff] = m_port35;
+			m_aram[m_alpha_address & 0x7ff] = m_port35;
 	}
 }
 
-void aussiebyte_state::register_w(uint8_t data)
+void aussiebyte_state::register_w(u8 data)
 {
 	m_crtc->register_w(data);
-	uint16_t temp = m_alpha_address;
+	u16 temp = m_alpha_address;
 
 	// Get transparent address
 	if (m_video_index == 18)
@@ -111,9 +111,9 @@ void aussiebyte_state::register_w(uint8_t data)
 		m_alpha_address = data | (temp & 0xff00);
 }
 
-uint8_t aussiebyte_state::crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr, uint16_t ac_cnt, bool ac_curs)
+u8 aussiebyte_state::crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, u16 ac_cnt, bool ac_curs)
 {
-	uint8_t gfx = 0;
+	u8 gfx = 0;
 	switch (ac_attr & 3)
 	{
 		case 0: // lores gfx
@@ -167,20 +167,20 @@ uint8_t aussiebyte_state::crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr
 MC6845_UPDATE_ROW( aussiebyte_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx,attr;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	u8 chr,gfx,attr;
+	u16 mem,x;
+	u32 *p = &bitmap.pix32(y);
 	ra &= 15;
 	m_cnt++;
 
 	for (x = 0; x < x_count; x++)
 	{
 		mem = ma + x;
-		attr = m_p_attribram[mem & 0x7ff];
+		attr = m_aram[mem & 0x7ff];
 		if (BIT(attr, 7))
-			chr = m_p_videoram[mem & 0x3fff]; // alpha
+			chr = m_vram[mem & 0x3fff]; // alpha
 		else
-			chr = m_p_videoram[(mem << 4) | ra]; // gfx
+			chr = m_vram[(mem << 4) | ra]; // gfx
 
 		gfx = crt8002(ra, chr, attr, m_cnt, (x==cursor_x));
 
