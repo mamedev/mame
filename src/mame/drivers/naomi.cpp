@@ -347,6 +347,7 @@ Virtua NBA (prototype)                          no cart  *       21 (64Mb)   pre
 Virtua NBA (prototype, 15.11)                   no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Virtua Tennis / Power Smash (prototype)         no cart  *       21 (64Mb)   present  315-6206  317-0263-COM  * flash-PCB, title screen have label "SOFT R&D Dept.#3", not dumped but known to exist
 Wave Runner GP (USA, Rev A)                   840-0064C  23725A  12 (64Mb)   present  315-6206  317-0306-COM  PCB s/n is 840-0064B-01
+Wave Runner GP                                840-0064C  ?       12 (64Mb)   ?        315-6206  ?             not dumped, IC22 sums 4F04 / BA28
 
 
 PFSB 64M Mask ROM board
