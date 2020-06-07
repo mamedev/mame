@@ -90,11 +90,11 @@ void cpc_symbiface2_device::device_start()
 {
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
-	space.install_readwrite_handler(0xfd00,0xfd07, read8_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs1_r)), write8_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs1_w)));
-	space.install_readwrite_handler(0xfd08,0xfd0f, read8_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs0_r)), write8_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs0_w)));
-	space.install_read_handler(0xfd10,0xfd10, read8_delegate(*this, FUNC(cpc_symbiface2_device::mouse_r)));
-	space.install_readwrite_handler(0xfd14,0xfd15, read8_delegate(*this, FUNC(cpc_symbiface2_device::rtc_r)), write8_delegate(*this, FUNC(cpc_symbiface2_device::rtc_w)));
-	space.install_readwrite_handler(0xfd17,0xfd17, read8_delegate(*this, FUNC(cpc_symbiface2_device::rom_rewrite_r)), write8_delegate(*this, FUNC(cpc_symbiface2_device::rom_rewrite_w)));
+	space.install_readwrite_handler(0xfd00,0xfd07, read8sm_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs1_r)), write8sm_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs1_w)));
+	space.install_readwrite_handler(0xfd08,0xfd0f, read8sm_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs0_r)), write8sm_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs0_w)));
+	space.install_read_handler(0xfd10,0xfd10, read8smo_delegate(*this, FUNC(cpc_symbiface2_device::mouse_r)));
+	space.install_readwrite_handler(0xfd14,0xfd15, read8sm_delegate(*this, FUNC(cpc_symbiface2_device::rtc_r)), write8sm_delegate(*this, FUNC(cpc_symbiface2_device::rtc_w)));
+	space.install_readwrite_handler(0xfd17,0xfd17, read8smo_delegate(*this, FUNC(cpc_symbiface2_device::rom_rewrite_r)), write8smo_delegate(*this, FUNC(cpc_symbiface2_device::rom_rewrite_w)));
 
 	// set up ROM space (these can be writable, when mapped to &4000, or completely disabled, allowing the built-in ROMs to be visible)
 	// 32 banks of 16kB (512kB)
@@ -120,7 +120,7 @@ void cpc_symbiface2_device::device_reset()
 // IDE controller (custom)
 // #FD00-07 - CS1
 // #FD08-0F - CS0
-READ8_MEMBER(cpc_symbiface2_device::ide_cs0_r)
+uint8_t cpc_symbiface2_device::ide_cs0_r(offs_t offset)
 {
 	// data is returned in words, so it must be buffered
 	if(offset == 0x00) // data register
@@ -141,17 +141,17 @@ READ8_MEMBER(cpc_symbiface2_device::ide_cs0_r)
 		return m_ide->cs0_r(offset);
 }
 
-WRITE8_MEMBER(cpc_symbiface2_device::ide_cs0_w)
+void cpc_symbiface2_device::ide_cs0_w(offs_t offset, uint8_t data)
 {
 	m_ide->cs0_w(offset, data);
 }
 
-READ8_MEMBER(cpc_symbiface2_device::ide_cs1_r)
+uint8_t cpc_symbiface2_device::ide_cs1_r(offs_t offset)
 {
 	return m_ide->cs1_r(offset);
 }
 
-WRITE8_MEMBER(cpc_symbiface2_device::ide_cs1_w)
+void cpc_symbiface2_device::ide_cs1_w(offs_t offset, uint8_t data)
 {
 	m_ide->cs1_w(offset, data);
 }
@@ -159,12 +159,12 @@ WRITE8_MEMBER(cpc_symbiface2_device::ide_cs1_w)
 // RTC (Dallas DS1287A)
 // #FD15 (write only) register select
 // #FD14 (read/write) read from or write into selected register
-READ8_MEMBER(cpc_symbiface2_device::rtc_r)
+uint8_t cpc_symbiface2_device::rtc_r(offs_t offset)
 {
 	return m_rtc->read(~offset & 0x01);
 }
 
-WRITE8_MEMBER(cpc_symbiface2_device::rtc_w)
+void cpc_symbiface2_device::rtc_w(offs_t offset, uint8_t data)
 {
 	m_rtc->write(~offset & 0x01, data);
 }
@@ -193,7 +193,7 @@ WRITE8_MEMBER(cpc_symbiface2_device::rtc_w)
                              D[bit4]   = backward button
               D[bit5] = 1 -> D[bit0-4] = scroll wheel offset (signed)
  */
-READ8_MEMBER(cpc_symbiface2_device::mouse_r)
+uint8_t cpc_symbiface2_device::mouse_r()
 {
 	uint8_t ret = 0;
 	int input;
@@ -247,11 +247,11 @@ INPUT_CHANGED_MEMBER(cpc_symbiface2_device::mouse_change_buttons)
 }
 
 // #FD17 (read) - map currently selected ROM to 0x4000 for read/write
-READ8_MEMBER(cpc_symbiface2_device::rom_rewrite_r)
+uint8_t cpc_symbiface2_device::rom_rewrite_r()
 {
 	uint8_t bank = get_rom_bank();
 
-	if(bank >= 32)
+	if(bank >= 32 || machine().side_effects_disabled())
 		return 0xff;
 
 	m_4xxx_ptr_r = (uint8_t*)machine().root_device().membank("bank3")->base();
@@ -267,7 +267,7 @@ READ8_MEMBER(cpc_symbiface2_device::rom_rewrite_r)
 }
 
 // #FD17 (write) - unmap selected ROM at 0x4000
-WRITE8_MEMBER(cpc_symbiface2_device::rom_rewrite_w)
+void cpc_symbiface2_device::rom_rewrite_w(uint8_t data)
 {
 	machine().root_device().membank("bank3")->set_base(m_4xxx_ptr_r);
 	machine().root_device().membank("bank4")->set_base(m_6xxx_ptr_r);
