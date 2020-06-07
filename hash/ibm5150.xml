@@ -1650,7 +1650,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="mspacmanc">
+	<software name="mspacmanc" cloneof="mspacman">
 		<description>Ms. Pac-Man (cracked)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
