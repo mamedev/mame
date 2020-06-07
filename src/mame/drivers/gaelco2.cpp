@@ -2394,8 +2394,8 @@ void wrally2_state::wrally2(machine_config &config)
 	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(34'000'000) / 34));
 	gaelco.set_device_rom_tag("gfx1");
 	gaelco.set_bank_offsets(0 * 0x0200000, 1 * 0x0200000, 0, 0);
-	gaelco.add_route(0, "lspeaker", 1.0);
-	gaelco.add_route(1, "rspeaker", 1.0);
+	gaelco.add_route(0, "rspeaker", 1.0);
+	gaelco.add_route(1, "lspeaker", 1.0);
 }
 
 /*
