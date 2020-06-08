@@ -269,7 +269,7 @@ class ifstream : public std::ifstream
 {
 public:
 
-	using filename_type = std::conditional<compile_info::win32::value,
+	using filename_type = std::conditional<compile_info::win32() && (!compile_info::mingw() || compile_info::version()>=900),
 		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
 
 	template <typename T>
@@ -285,7 +285,7 @@ public:
 class ofstream : public std::ofstream
 {
 public:
-	using filename_type = std::conditional<compile_info::win32::value,
+	using filename_type = std::conditional<compile_info::win32() && (!compile_info::mingw() || compile_info::version()>=900),
 		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
 
 	template <typename T>
