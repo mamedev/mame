@@ -14910,7 +14910,7 @@ gluck2                          // 1992 Yung Yu / CYE
 @source:gmaster.cpp
 gmaster                         // Hartung Gamemaster
 
-@source:gnat.cpp
+@source:gnat10.cpp
 gnat10                          // GNAT System 10
 
 @source:gng.cpp
