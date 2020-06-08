@@ -995,8 +995,6 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 {
 #if 1
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-
 		popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%02X",
 							m_scudhamm_motor_command,
 							scudhamm_motor_pos_r(),
