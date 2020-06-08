@@ -105,12 +105,6 @@
 #pragma GCC diagnostic ignored "-Wpmf-conversions"
 #endif
 
-#if 0
-#if defined(__GNUC__) && (__GNUC__ > 6)
-#pragma GCC diagnostic ignored "-Wnoexcept-type"
-#endif
-#endif
-
 namespace plib {
 
 	///
@@ -226,7 +220,7 @@ namespace plib {
 	};
 
 	template<typename R, typename... Targs>
-	struct mfp_helper<0, 0, R, Targs...>
+	struct mfp_helper<PPMF_TYPE_PMF, 0, R, Targs...>
 	{
 		template <class C>
 		using specific_member_function = R (C::*)(Targs...);
@@ -253,7 +247,7 @@ namespace plib {
 	};
 
 	template<typename R, typename... Targs>
-	struct mfp_helper<1, 0, R, Targs...>
+	struct mfp_helper<PPMF_TYPE_GNUC_PMF_CONV, 0, R, Targs...>
 	{
 		template <class C>
 		using specific_member_function = R (C::*)(Targs...);
@@ -278,11 +272,11 @@ namespace plib {
 		}
 	};
 
-	template<typename R, typename... Targs>
+	template<int PMFTYPE, int PMFINTERNAL, typename R, typename... Targs>
 	class pmfp_base
 	{
 	public:
-		using helper = mfp_helper<PPMF_TYPE, PHAS_PMF_INTERNAL, R, Targs...>;
+		using helper = mfp_helper<PMFTYPE, PMFINTERNAL, R, Targs...>;
 
 		template <class C>
 		using specific_member_function = typename helper::template specific_member_function<C>;
@@ -302,6 +296,32 @@ namespace plib {
 			std::fill(s, s + sizeof(m_resolved), 0);
 		}
 
+		template<typename O>
+		pmfp_base(specific_member_function<O> mftp, O *object)
+		: m_obj(nullptr)
+		{
+			auto *s = reinterpret_cast<std::uint8_t *>(&m_resolved);
+			std::fill(s, s + sizeof(m_resolved), 0);
+			bind(object, &mftp);
+		}
+
+		bool is_set() const noexcept { return m_resolved != nullptr; }
+
+		generic_class *object() const noexcept { return m_obj; }
+		bool has_object() const noexcept { return m_obj != nullptr; }
+
+		template<typename O>
+		void set(specific_member_function<O> mftp, O *object)
+		{
+			bind(object, &mftp);
+		}
+
+		inline R operator()(Targs... args) const noexcept(true)
+		{
+			return this->call(std::forward<Targs>(args)...);
+		}
+
+	private:
 		template<typename O, typename MF>
 		void bind(O * object, MF *fraw)
 		{
@@ -326,65 +346,21 @@ namespace plib {
 				obj, std::forward<Targs>(args)...);
 		}
 
-		bool is_set() const noexcept { return m_resolved != nullptr; }
-
-		generic_class *object() const noexcept { return m_obj; }
-		bool has_object() const noexcept { return m_obj != nullptr; }
-
 		R call(Targs&&... args) const noexcept(true)
 		{
 			return helper::call(reinterpret_cast<const member_abi_function<generic_class> *>(&m_resolved),
 				m_obj, std::forward<Targs>(args)...);
 		}
 
-	protected:
-		template<typename MemberFunctionType, typename O>
-		void set_base(MemberFunctionType mftp, O *object)
-		{
-			//auto raw = reinterpret_cast<specific_member_function<O>>(mftp);
-			//bind(object, &raw);
-			bind(object, &mftp);
-		}
-
-	private:
 		generic_function_storage  m_resolved;
 		generic_class    *m_obj;
 	};
 
 	template<typename R, typename... Targs>
-	class pmfp : public pmfp_base<R, Targs...>
-	{
-	public:
+	using pmfp = pmfp_base<PPMF_TYPE, PHAS_PMF_INTERNAL, R, Targs...>;
 
-		using base_type = pmfp_base<R, Targs...>;
 
-		template <class C>
-		using specific_member_function = typename base_type::template specific_member_function<C>; // noexcept(true) --> c++-17
-
-		using generic_member_function   = typename base_type::generic_member_function;
-		pmfp() : pmfp_base<R, Targs...>() {}
-
-		template<typename O>
-		pmfp(specific_member_function<O> mftp, O *object)
-		: pmfp_base<R, Targs...>()
-		{
-			this->set_base(mftp, object);
-		}
-
-		template<typename O>
-		void set(specific_member_function<O> mftp, O *object)
-		{
-			this->set_base(mftp, object);
-		}
-
-		inline R operator()(Targs... args) const noexcept(true)
-		{
-			return this->call(std::forward<Targs>(args)...);
-		}
-
-	private:
-	};
-
+	///
 	/// \brief Class to support delegate late binding
 	///
 	/// When constructing delegates in constructors AND the referenced function
@@ -440,7 +416,6 @@ namespace plib {
 			auto o = reinterpret_cast<O *>(obj);
 			return return_type(*p, o);
 		}
-
 
 		generic_member_function m_raw;
 		static_creator m_creator;
