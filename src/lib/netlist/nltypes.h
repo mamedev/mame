@@ -78,7 +78,9 @@ namespace netlist
 	/// \note This is not the right location yet.
 	///
 
-	using device_arena = std::conditional<NL_USE_MEMPOOL, plib::mempool_arena, plib::aligned_arena>::type;
+	using device_arena = std::conditional<NL_USE_MEMPOOL,
+		plib::mempool_arena<plib::aligned_arena>,
+		plib::aligned_arena>::type;
 	using host_arena   = plib::aligned_arena;
 
 	/// \brief Interface definition for netlist callbacks into calling code

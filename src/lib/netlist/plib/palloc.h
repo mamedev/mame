@@ -221,7 +221,7 @@ namespace plib {
 
 		//~arena_allocator() noexcept = default;
 
-		explicit arena_allocator(const arena_type & a) noexcept : m_a(a)
+		explicit arena_allocator(arena_type & a) noexcept : m_a(a)
 		{
 		}
 

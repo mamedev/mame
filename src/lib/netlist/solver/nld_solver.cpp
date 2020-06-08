@@ -306,7 +306,7 @@ namespace devices
 			switch (m_params.m_fp_type())
 			{
 				case solver::matrix_fp_type_e::FLOAT:
-					if (NL_USE_FLOAT_MATRIX)
+					if (!NL_USE_FLOAT_MATRIX)
 						log().info("FPTYPE {1} not supported. Using DOUBLE", m_params.m_fp_type().name());
 					ms = create_solvers<std::conditional_t<NL_USE_FLOAT_MATRIX,float, double>>(sname, grp);
 					break;
@@ -314,7 +314,7 @@ namespace devices
 					ms = create_solvers<double>(sname, grp);
 					break;
 				case solver::matrix_fp_type_e::LONGDOUBLE:
-					if (NL_USE_LONG_DOUBLE_MATRIX)
+					if (!NL_USE_LONG_DOUBLE_MATRIX)
 						log().info("FPTYPE {1} not supported. Using DOUBLE", m_params.m_fp_type().name());
 					ms = create_solvers<std::conditional_t<NL_USE_LONG_DOUBLE_MATRIX, long double, double>>(sname, grp);
 					break;
