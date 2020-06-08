@@ -288,16 +288,17 @@ namespace plib {
 	//  Memory allocation
 	//============================================================
 
-	struct aligned_arena
+	template <typename P, bool HSD, bool HSA>
+	struct arena_base
 	{
-		static constexpr const bool has_static_deallocator = true;
+		static constexpr const bool has_static_deallocator = HSD;
 		using size_type = std::size_t;
 
 		template <class T, size_type ALIGN = alignof(T)>
-		using allocator_type = arena_allocator<aligned_arena, T, ALIGN>;
+		using allocator_type = arena_allocator<P, T, ALIGN>;
 
 		template <class T>
-		using deleter_type = arena_deleter<aligned_arena, T>;
+		using deleter_type = arena_deleter<P, T>;
 
 		template <typename T>
 		using unique_ptr = std::unique_ptr<T, deleter_type<T>>;
@@ -305,12 +306,129 @@ namespace plib {
 		template <typename T>
 		using owned_ptr = plib::owned_ptr<T, deleter_type<T>>;
 
-		static inline aligned_arena &instance() noexcept
+		static inline P &instance() noexcept
 		{
-			static aligned_arena s_arena;
+			static P s_arena;
 			return s_arena;
 		}
 
+		template<typename T, typename... Args>
+		static inline std::enable_if_t<HSA, unique_ptr<T>>
+		make_unique(Args&&... args)
+		{
+			auto *mem = P::allocate(alignof(T), sizeof(T));
+			try
+			{
+				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+				auto *mema = new (mem) T(std::forward<Args>(args)...);
+				return unique_ptr<T>(mema, deleter_type<T>());
+			}
+			catch (...)
+			{
+				P::deallocate(mem, sizeof(T));
+				throw;
+			}
+		}
+
+		template<typename T, typename... Args>
+		inline std::enable_if_t<!HSA, unique_ptr<T>>
+		make_unique(Args&&... args)
+		{
+			auto *mem = static_cast<P *>(this)->allocate(alignof(T), sizeof(T));
+			try
+			{
+				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+				auto *mema = new (mem) T(std::forward<Args>(args)...);
+				return unique_ptr<T>(mema, deleter_type<T>());
+			}
+			catch (...)
+			{
+				static_cast<P *>(this)->deallocate(mem, sizeof(T));
+				throw;
+			}
+		}
+
+		template<typename T, typename... Args>
+		static inline std::enable_if_t<HSA, owned_ptr<T>>
+		make_owned(Args&&... args)
+		{
+			auto *mem = P::allocate(alignof(T), sizeof(T));
+			try
+			{
+				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+				auto *mema = new (mem) T(std::forward<Args>(args)...);
+				return owned_ptr<T>(mema, true, deleter_type<T>());
+			}
+			catch (...)
+			{
+				P::deallocate(mem, sizeof(T));
+				throw;
+			}
+		}
+
+		template<typename T, typename... Args>
+		inline std::enable_if_t<!HSA, owned_ptr<T>>
+		make_owned(Args&&... args)
+		{
+			auto *mem = static_cast<P *>(this)->allocate(alignof(T), sizeof(T));
+			try
+			{
+				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+				auto *mema = new (mem) T(std::forward<Args>(args)...);
+				return owned_ptr<T>(mema, true, deleter_type<T>());
+			}
+			catch (...)
+			{
+				static_cast<P *>(this)->deallocate(mem, sizeof(T));
+				throw;
+			}
+		}
+
+		template<typename T, typename... Args>
+		static inline std::enable_if_t<HSA, T *>
+		alloc(Args&&... args)
+		{
+			auto *p = P::allocate(alignof(T), sizeof(T));
+			// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+			return new(p) T(std::forward<Args>(args)...);
+		}
+
+		template<typename T, typename... Args>
+		inline std::enable_if_t<!HSA, T *>
+		alloc(Args&&... args)
+		{
+			auto *p = static_cast<P *>(this)->allocate(alignof(T), sizeof(T));
+			// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+			return new(p) T(std::forward<Args>(args)...);
+		}
+
+		template<typename T>
+		static inline void
+		free(T *ptr, std::enable_if_t<HSD, T *> = nullptr) noexcept
+		{
+			ptr->~T();
+			P::deallocate(ptr, sizeof(T));
+		}
+
+		template<typename T>
+		inline void
+		free(T *ptr, std::enable_if_t<!HSD, T *> = nullptr) noexcept
+		{
+			ptr->~T();
+			static_cast<P *>(this)->deallocate(ptr, sizeof(T));
+		}
+
+		size_type cur_alloc() const noexcept { return m_stat_cur_alloc(); } // NOLINT(readability-convert-member-functions-to-static)
+		size_type max_alloc() const noexcept { return m_stat_max_alloc(); } // NOLINT(readability-convert-member-functions-to-static)
+	protected:
+		static size_t &m_stat_cur_alloc() noexcept { static size_t val = 0; return val; }
+		static size_t &m_stat_max_alloc() noexcept { static size_t val = 0; return val; }
+
+	};
+
+
+	struct aligned_arena : public arena_base<aligned_arena, true, true>
+	{
 		static inline void *allocate( size_t alignment, size_t size )
 		{
 			m_stat_cur_alloc() += size;
@@ -347,53 +465,27 @@ namespace plib {
 			#endif
 		}
 
-		template<typename T, typename... Args>
-		static inline unique_ptr<T> make_unique(Args&&... args)
+		bool operator ==(const aligned_arena &rhs) const noexcept
 		{
-			auto *mem = allocate(alignof(T), sizeof(T));
-			try
-			{
-				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-				auto *mema = new (mem) T(std::forward<Args>(args)...);
-				return unique_ptr<T>(mema, deleter_type<T>());
-			}
-			catch (...)
-			{
-				deallocate(mem, sizeof(T));
-				throw;
-			}
+			plib::unused_var(rhs);
+			return true;
 		}
 
-		template<typename T, typename... Args>
-		static inline owned_ptr<T> make_owned(Args&&... args)
+	};
+
+	struct std_arena : public arena_base<std_arena, true, true>
+	{
+		static inline void *allocate( size_t alignment, size_t size )
 		{
-			auto *mem = allocate(alignof(T), sizeof(T));
-			try
-			{
-				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-				auto *mema = new (mem) T(std::forward<Args>(args)...);
-				return owned_ptr<T>(mema, true, deleter_type<T>());
-			}
-			catch (...)
-			{
-				deallocate(mem, sizeof(T));
-				throw;
-			}
+			m_stat_cur_alloc() += size;
+			unused_var(alignment);
+			return ::operator new(size);
 		}
 
-		template<typename T, typename... Args>
-		static T *alloc(Args&&... args)
+		static inline void deallocate( void *ptr, size_t size ) noexcept
 		{
-			auto *p = allocate(alignof(T), sizeof(T));
-			// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-			return new(p) T(std::forward<Args>(args)...);
-		}
-
-		template<typename T>
-		static void free(T *ptr) noexcept
-		{
-			ptr->~T();
-			aligned_arena::deallocate(ptr, sizeof(T));
+			m_stat_cur_alloc() -= size;
+			::operator delete(ptr);
 		}
 
 		bool operator ==(const aligned_arena &rhs) const noexcept
@@ -401,13 +493,6 @@ namespace plib {
 			plib::unused_var(rhs);
 			return true;
 		}
-
-		size_type cur_alloc() const noexcept { return m_stat_cur_alloc(); } // NOLINT(readability-convert-member-functions-to-static)
-		size_type max_alloc() const noexcept { return m_stat_max_alloc(); } // NOLINT(readability-convert-member-functions-to-static)
-	private:
-		static size_t &m_stat_cur_alloc() noexcept { static size_t val = 0; return val; }
-		static size_t &m_stat_max_alloc() noexcept { static size_t val = 0; return val; }
-
 	};
 
 	template <typename T, std::size_t ALIGN>

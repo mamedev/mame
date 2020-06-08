@@ -27,28 +27,13 @@ namespace plib {
 	//  Memory pool
 	//============================================================
 
-	class mempool_arena
+	class mempool_arena : public arena_base<mempool_arena, true, false>
 	{
 	public:
-
-		using size_type = std::size_t;
-
-		static constexpr const bool has_static_deallocator = true;
-
-		template <class T, size_type ALIGN = alignof(T)>
-		using allocator_type = arena_allocator<mempool_arena, T, ALIGN>;
-
-		template <typename T>
-		using owned_ptr = plib::owned_ptr<T, arena_deleter<mempool_arena, T>>;
-
-		template <typename T>
-		using unique_ptr = std::unique_ptr<T, arena_deleter<mempool_arena, T>>;
 
 		mempool_arena(size_t min_alloc = (1<<21), size_t min_align = PALIGN_CACHELINE)
 		: m_min_alloc(min_alloc)
 		, m_min_align(min_align)
-		, m_stat_cur_alloc(0)
-		, m_stat_max_alloc(0)
 		{
 			icount()++;
 		}
@@ -103,8 +88,9 @@ namespace plib {
 			sinfo().insert({ ret, info(b, b->m_cur)});
 			rs -= (capacity - size);
 			b->m_cur += rs;
-			m_stat_cur_alloc += size;
-			m_stat_max_alloc = std::max(m_stat_max_alloc, m_stat_cur_alloc);
+			m_stat_cur_alloc() += size;
+			if (m_stat_max_alloc() < m_stat_cur_alloc())
+				m_stat_max_alloc() = m_stat_cur_alloc();
 
 			return ret;
 		}
@@ -122,7 +108,7 @@ namespace plib {
 			{
 				mempool_arena &mp = b->m_mempool;
 				b->m_num_alloc--;
-				mp.m_stat_cur_alloc -= size;
+				mp.m_stat_cur_alloc() -= size;
 				if (b->m_num_alloc == 0)
 				{
 					auto itb = std::find(mp.m_blocks.begin(), mp.m_blocks.end(), b);
@@ -135,43 +121,6 @@ namespace plib {
 				sinfo().erase(it);
 			}
 		}
-
-		template<typename T, typename... Args>
-		owned_ptr<T> make_owned(Args&&... args)
-		{
-			auto *mem = this->allocate(alignof(T), sizeof(T));
-			try
-			{
-				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-				auto *mema = new (mem) T(std::forward<Args>(args)...);
-				return owned_ptr<T>(mema, true, arena_deleter<mempool_arena, T>(this));
-			}
-			catch (...)
-			{
-				deallocate(mem, sizeof(T));
-				throw;
-			}
-		}
-
-		template<typename T, typename... Args>
-		unique_ptr<T> make_unique(Args&&... args)
-		{
-			auto *mem = this->allocate(alignof(T), sizeof(T));
-			try
-			{
-				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-				auto *mema = new (mem) T(std::forward<Args>(args)...);
-				return unique_ptr<T>(mema, arena_deleter<mempool_arena, T>(this));
-			}
-			catch (...)
-			{
-				deallocate(mem, sizeof(T));
-				throw;
-			}
-		}
-
-		size_type cur_alloc() const noexcept { return m_stat_cur_alloc; }
-		size_type max_alloc() const noexcept { return m_stat_max_alloc; }
 
 		bool operator ==(const mempool_arena &rhs) const noexcept { return this == &rhs; }
 
@@ -246,8 +195,6 @@ namespace plib {
 
 		plib::aligned_vector<block *> m_blocks;
 
-		size_t m_stat_cur_alloc;
-		size_t m_stat_max_alloc;
 	};
 
 } // namespace plib

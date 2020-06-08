@@ -79,13 +79,8 @@ namespace netlist
 	///
 
 	using device_arena = std::conditional<NL_USE_MEMPOOL, plib::mempool_arena, plib::aligned_arena>::type;
+	using host_arena   = plib::aligned_arena;
 
-	using host_arena = plib::aligned_arena;
-
-#if 0
-	template <typename T>
-	using host_unique_ptr = host_arena::unique_ptr<T>;
-#endif
 	/// \brief Interface definition for netlist callbacks into calling code
 	///
 	/// A class inheriting from netlist_callbacks_t has to be passed to the netlist_t
