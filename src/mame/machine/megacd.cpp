@@ -86,9 +86,7 @@ void sega_segacd_device::segacd_map(address_map &map)
 
 	map(0xfe0000, 0xfe3fff).rw(FUNC(sega_segacd_device::backupram_r), FUNC(sega_segacd_device::backupram_w)).umask16(0x00ff); // backup RAM, odd bytes only!
 
-	map(0xff0000, 0xff001f).w("rfsnd", FUNC(rf5c68_device::rf5c68_w)).umask16(0x00ff);  // PCM, RF5C164
-	map(0xff0020, 0xff003f).r("rfsnd", FUNC(rf5c68_device::rf5c68_r)).umask16(0x00ff);
-	map(0xff2000, 0xff3fff).rw("rfsnd", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w)).umask16(0x00ff);  // PCM, RF5C164
+	map(0xff0000, 0xff3fff).m(m_rfsnd, FUNC(rf5c164_device::rf5c164_map)).umask16(0x00ff);  // PCM, RF5C164
 
 	map(0xff8000, 0xff8001).rw(FUNC(sega_segacd_device::segacd_sub_led_ready_r), FUNC(sega_segacd_device::segacd_sub_led_ready_w));
 	map(0xff8002, 0xff8003).rw(FUNC(sega_segacd_device::segacd_sub_memory_mode_r), FUNC(sega_segacd_device::segacd_sub_memory_mode_w));
@@ -314,7 +312,7 @@ void sega_segacd_device::device_add_mconfig(machine_config &config)
 
 	config.set_default_layout(layout_megacd);
 
-	RF5C68(config, m_rfsnd, SEGACD_CLOCK); // RF5C164!
+	RF5C164(config, m_rfsnd, SEGACD_CLOCK); // or Sega 315-5476A
 	m_rfsnd->add_route( 0, ":lspeaker", 0.50 );
 	m_rfsnd->add_route( 1, ":rspeaker", 0.50 );
 	m_rfsnd->set_addrmap(0, &sega_segacd_device::segacd_pcm_map);

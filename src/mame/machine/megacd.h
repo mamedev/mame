@@ -111,7 +111,7 @@ protected:
 
 	required_device<cpu_device> m_scdcpu;
 	required_device<cpu_device> m_hostcpu;
-	required_device<rf5c68_device> m_rfsnd;
+	required_device<rf5c164_device> m_rfsnd;
 	required_device<lc89510_temp_device> m_lc89510_temp;
 	required_device<timer_device> m_stopwatch_timer;
 	required_device<timer_device> m_stamp_timer;
