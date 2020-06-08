@@ -14910,6 +14910,9 @@ gluck2                          // 1992 Yung Yu / CYE
 @source:gmaster.cpp
 gmaster                         // Hartung Gamemaster
 
+@source:gnat.cpp
+gnat10                          // GNAT System 10
+
 @source:gng.cpp
 diamond                         // (c) 1989 KH Video (NOT A CAPCOM GAME but runs on GnG hardware)
 gng                             // 9/1985 (c) 1985
