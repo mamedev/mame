@@ -459,12 +459,20 @@ void kchamp_state::kchampvs(machine_config &config)
 /********************
 * 1 Player Version  *
 ********************/
-void kchamp_state::kchamp_common(machine_config &config)
+
+void kchamp_state::kchamp(machine_config &config)
 {
-	// Basic machine hardware
-	Z80(config, m_maincpu, XTAL(12'000'000)/4); // 12MHz / 4 = 3.0 MHz
+	/* basic machine hardware */
+	Z80(config, m_maincpu, XTAL(12'000'000)/4);     /* 12MHz / 4 = 3.0 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_map);
 	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchamp_io_map);
+
+	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    /* 12MHz / 4 = 3.0 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchamp_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125)); /* Hz */
+	/* IRQs triggered from main CPU */
+	/* NMIs from 125Hz clock */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC71
 	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
@@ -472,7 +480,7 @@ void kchamp_state::kchamp_common(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchamp)
 
-	// Video hardware
+	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -485,11 +493,14 @@ void kchamp_state::kchamp_common(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kchamp);
 	PALETTE(config, m_palette, FUNC(kchamp_state::kchamp_palette), 256);
 
-	// Sound hardware
+	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
+
+	AY8910(config, m_ay[0], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Guess based on actual pcb recordings of karatedo */
+	AY8910(config, m_ay[1], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Guess based on actual pcb recordings of karatedo */
 
 	DAC08(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // IC11
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
@@ -497,34 +508,13 @@ void kchamp_state::kchamp_common(machine_config &config)
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
-void kchamp_state::kchamp(machine_config &config)
-{
-	kchamp_common(config);
-
-	Z80(config, m_audiocpu, XTAL(12'000'000)/4); // 12MHz / 4 = 3.0 MHz
-	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchamp_sound_io_map);
-	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125)); // Hz
-	// IRQs triggered from main CPU
-	// NMIs from 125Hz clock
-
-	AY8910(config, m_ay[0], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); // Guess based on actual PCB recordings of karatedo
-	AY8910(config, m_ay[1], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); // Guess based on actual PCB recordings of karatedo
-}
-
 void kchamp_state::kchamp_arfyc(machine_config &config)
 {
-	kchamp_common(config);
+	kchamp(config);
 
-	Z80(config, m_audiocpu, XTAL(8'867'238)/2); // 8.867238 MHz xtal / 2, measured on real PCB
-	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchamp_sound_io_map);
-	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125)); // Hz
-	// IRQs triggered from main CPU
-	// NMIs from 125Hz clock
-
-	AY8910(config, m_ay[0], XTAL(8'867'238)/8).add_route(ALL_OUTPUTS, "speaker", 0.3); // 8.867238 MHz xtal / 8, measured on real PCB
-	AY8910(config, m_ay[1], XTAL(8'867'238)/8).add_route(ALL_OUTPUTS, "speaker", 0.3); // 8.867238 MHz xtal / 8, measured on real PCB
+	m_audiocpu->set_clock(XTAL(8'867'238)/2); // 8.867238 MHz xtal / 2, measured on real PCB
+	m_ay[0]->set_clock(XTAL(8'867'238)/8);    // 8.867238 MHz xtal / 8, measured on real PCB
+	m_ay[1]->set_clock(XTAL(8'867'238)/8);    // 8.867238 MHz xtal / 8, measured on real PCB
 }
 
 
@@ -620,7 +610,7 @@ ROM_END
 
 /* Bootleg from the Spanish company "Automaticos Arfyc"
    Just different color PROMs and a few bytes on the K26/BE26 sound ROM
-   Frecuencies measured on the PCB:
+   Frequencies measured on the PCB:
     Program Z80: 2.99684 MHz (12.000 MHz xtal / 4)
     Sound Z80:   4.43141 MHz (8.867238 MHz xtal / 2)
     SN74LS04N:   8.86277 MHz (8.867238 MHz xtal)
