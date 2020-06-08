@@ -31,7 +31,7 @@ the outputs with output_cb() to avoid collisions.
 
 Usage notes:
 
-At reset, the board is in its default starting position. RESET button works the
+At startup, the board is in its default starting position. RESET button works the
 same way, and holding CTRL while pressing it will rotate the board, eg. for placing
 black at the bottom with chess.
 
@@ -67,6 +67,7 @@ DEFINE_DEVICE_TYPE(SENSORBOARD, sensorboard_device, "sensorboard", "Sensorboard"
 
 sensorboard_device::sensorboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SENSORBOARD, tag, owner, clock),
+	m_nvram(*this, "position"),
 	m_out_piece(*this, "piece_%c%u", 0U + 'a', 1U),
 	m_out_pui(*this, "piece_ui%u", 0U),
 	m_out_count(*this, "count_ui%u", 0U),
@@ -110,10 +111,6 @@ void sensorboard_device::device_start()
 		m_out_count.resolve();
 	}
 
-	clear_board();
-	m_custom_init_cb(1);
-	memcpy(m_history[0], m_curstate, m_height * m_width);
-
 	m_undotimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sensorboard_device::undo_tick),this));
 	m_sensortimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sensorboard_device::sensor_off),this));
 	cancel_sensor();
@@ -128,6 +125,8 @@ void sensorboard_device::device_start()
 	m_ufirst = 0;
 	m_ulast = 0;
 	m_usize = ARRAY_LENGTH(m_history);
+
+	m_nvram->set_base(m_curstate, sizeof(m_curstate));
 
 	// register for savestates
 	save_item(NAME(m_magnets));
@@ -153,6 +152,18 @@ void sensorboard_device::device_start()
 	save_item(NAME(m_ulast));
 	save_item(NAME(m_usize));
 	save_item(NAME(m_sensordelay));
+}
+
+void sensorboard_device::nvram_init(nvram_device &nvram, void *data, size_t size)
+{
+	clear_board();
+	m_custom_init_cb(1);
+}
+
+void sensorboard_device::device_add_mconfig(machine_config &config)
+{
+	// 'nvram' is the last board position (m_curstate)
+	NVRAM(config, m_nvram).set_custom_handler(FUNC(sensorboard_device::nvram_init));
 }
 
 void sensorboard_device::preset_chess(int state)
@@ -191,9 +202,8 @@ void sensorboard_device::device_reset()
 {
 	cancel_sensor();
 	cancel_hand();
+	undo_reset();
 
-	clear_board();
-	m_custom_init_cb(0);
 	refresh();
 }
 
@@ -531,6 +541,15 @@ TIMER_CALLBACK_MEMBER(sensorboard_device::undo_tick)
 		m_undotimer->adjust(attotime::from_msec(500), param);
 }
 
+void sensorboard_device::undo_reset()
+{
+	memcpy(m_history[0], m_curstate, m_height * m_width);
+
+	m_upointer = 0;
+	m_ufirst = 0;
+	m_ulast = 0;
+}
+
 INPUT_CHANGED_MEMBER(sensorboard_device::ui_undo)
 {
 	u8 select = (u8)param;
@@ -571,13 +590,7 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_init)
 
 	// reset undo
 	if (m_inp_ui->read() & 1)
-	{
-		memcpy(m_history[0], m_curstate, m_height * m_width);
-
-		m_upointer = 0;
-		m_ufirst = 0;
-		m_ulast = 0;
-	}
+		undo_reset();
 
 	refresh();
 }

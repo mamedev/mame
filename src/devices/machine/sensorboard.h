@@ -11,6 +11,9 @@
 
 #pragma once
 
+#include "machine/nvram.h"
+
+
 class sensorboard_device : public device_t
 {
 public:
@@ -50,7 +53,7 @@ public:
 	// handle board state
 	u8 read_piece(u8 x, u8 y) { return m_curstate[y * m_width + x]; }
 	void write_piece(u8 x, u8 y, u8 id) { m_curstate[y * m_width + x] = id; }
-	void clear_board() { memset(m_curstate, 0, ARRAY_LENGTH(m_curstate)); }
+	void clear_board() { memset(m_curstate, 0, sizeof(m_curstate)); }
 
 	void refresh();
 	void cancel_sensor();
@@ -77,11 +80,13 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_post_load() override { refresh(); }
 
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
+	required_device<nvram_device> m_nvram;
 	output_finder<0x10, 0x10> m_out_piece;
 	output_finder<0x20+1> m_out_pui;
 	output_finder<2> m_out_count;
@@ -118,8 +123,11 @@ private:
 	u32 m_ulast;
 	u32 m_usize;
 
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
+
 	emu_timer *m_undotimer;
 	TIMER_CALLBACK_MEMBER(undo_tick);
+	void undo_reset();
 
 	attotime m_sensordelay;
 	emu_timer *m_sensortimer;
