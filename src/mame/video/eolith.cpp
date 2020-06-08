@@ -4,7 +4,7 @@
 #include "includes/eolith.h"
 
 
-WRITE16_MEMBER(eolith_state::eolith_vram_w)
+void eolith_state::eolith_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((mem_mask == 0xffff) && (~data & 0x8000))
 	{
@@ -16,7 +16,7 @@ WRITE16_MEMBER(eolith_state::eolith_vram_w)
 }
 
 
-READ16_MEMBER(eolith_state::eolith_vram_r)
+uint16_t eolith_state::eolith_vram_r(offs_t offset)
 {
 	return m_vram[offset+(0x40000/2)*m_buffer];
 }

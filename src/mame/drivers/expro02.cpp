@@ -280,8 +280,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	// comad
-	READ16_MEMBER(comad_timer_r);
-	READ8_MEMBER(comad_okim6295_r);
+	uint16_t comad_timer_r();
+	uint8_t comad_okim6295_r();
 	void comad_map(address_map &map);
 	void expro02_map(address_map &map);
 	void expro02_video_base_map(address_map &map);
@@ -879,13 +879,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(expro02_state::scanline)
  *
  *************************************/
 
-READ16_MEMBER(expro02_state::comad_timer_r)
+uint16_t expro02_state::comad_timer_r()
 {
 	return (m_screen->vpos() & 0x07) << 8;
 }
 
 /* a kludge! */
-READ8_MEMBER(expro02_state::comad_okim6295_r)
+uint8_t expro02_state::comad_okim6295_r()
 {
 	uint16_t retvalue;
 //  retvalue = m_oki->read_status(); // doesn't work, causes lockups when girls change..

@@ -53,13 +53,12 @@ public:
 	required_device<alpha_8201_device> m_alpha_8201;
 	required_device<ls259_device> m_mainlatch;
 
-	DECLARE_READ16_MEMBER(equites_spriteram_kludge_r);
-	DECLARE_WRITE8_MEMBER(mainlatch_w);
-	DECLARE_READ8_MEMBER(equites_fg_videoram_r);
-	DECLARE_WRITE8_MEMBER(equites_fg_videoram_w);
-	DECLARE_WRITE16_MEMBER(equites_bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(equites_bgcolor_w);
-	DECLARE_WRITE16_MEMBER(equites_scrollreg_w);
+	uint16_t equites_spriteram_kludge_r();
+	uint8_t equites_fg_videoram_r(offs_t offset);
+	void equites_fg_videoram_w(offs_t offset, uint8_t data);
+	void equites_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void equites_bgcolor_w(offs_t offset, uint8_t data);
+	void equites_scrollreg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	void init_equites();
 	TILE_GET_INFO_MEMBER(equites_fg_info);
@@ -92,7 +91,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	void gekisou_map(address_map &map);
-	DECLARE_WRITE16_MEMBER(gekisou_unknown_bit_w);
+	void gekisou_unknown_bit_w(offs_t offset, uint16_t data);
 
 private:
 	int m_gekisou_unknown_bit;
@@ -110,8 +109,8 @@ protected:
 	virtual void machine_start() override;
 	void splndrbt_map(address_map &map);
 	DECLARE_WRITE_LINE_MEMBER(splndrbt_selchar_w);
-	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrollx_w);
-	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrolly_w);
+	void splndrbt_bg_scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void splndrbt_bg_scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(splndrbt_fg_info);
 	TILE_GET_INFO_MEMBER(splndrbt_bg_info);
 	DECLARE_VIDEO_START(splndrbt);

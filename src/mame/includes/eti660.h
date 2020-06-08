@@ -42,9 +42,9 @@ public:
 	void eti660(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( pia_r );
-	DECLARE_WRITE8_MEMBER( pia_w );
-	DECLARE_WRITE8_MEMBER( colorram_w );
+	uint8_t pia_r();
+	void pia_w(uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );

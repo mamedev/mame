@@ -412,14 +412,14 @@ READ_LINE_MEMBER(gekisou_state::gekisou_unknown_bit_r)
 	return m_gekisou_unknown_bit;
 }
 
-WRITE16_MEMBER(gekisou_state::gekisou_unknown_bit_w)
+void gekisou_state::gekisou_unknown_bit_w(offs_t offset, uint16_t data)
 {
 	// data bit is A17 (offset)
 	m_gekisou_unknown_bit = (offset == 0) ? 0 : 1;;
 }
 
 
-READ16_MEMBER(equites_state::equites_spriteram_kludge_r)
+uint16_t equites_state::equites_spriteram_kludge_r()
 {
 	if (m_spriteram[0] == 0x5555)
 		return 0;

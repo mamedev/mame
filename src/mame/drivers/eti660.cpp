@@ -44,14 +44,14 @@
 /* Read/Write Handlers */
 // Schematic is wrong, PCB layout is correct: D0-7 swapped around on PIA.
 // There's still a bug in the PIA: if ca2 is instructed to go low, nothing happens.
-READ8_MEMBER( eti660_state::pia_r )
+uint8_t eti660_state::pia_r()
 {
 	uint8_t pia_offset = m_maincpu->get_memory_address() & 0x03;
 
 	return bitswap<8>(m_pia->read(pia_offset), 0,1,2,3,4,5,6,7);
 }
 
-WRITE8_MEMBER( eti660_state::pia_w )
+void eti660_state::pia_w(uint8_t data)
 {
 	uint8_t pia_offset = m_maincpu->get_memory_address() & 0x03;
 	data = bitswap<8>(data,0,1,2,3,4,5,6,7);
@@ -68,7 +68,7 @@ WRITE_LINE_MEMBER( eti660_state::ca2_w ) // test with Wipeout game - it should s
 	m_cti->con_w(state);
 }
 
-WRITE8_MEMBER( eti660_state::colorram_w )
+ void eti660_state::colorram_w(offs_t offset, uint8_t data)
 {
 	offset = m_maincpu->get_memory_address() - 0xc80;
 
