@@ -34,6 +34,7 @@ public:
 	void write(offs_t offset, uint8_t data) override;
 	DECLARE_READ8Z_MEMBER( crureadz ) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
+	DECLARE_INPUT_CHANGED_MEMBER( mode_changed );
 
 private:
 	void device_start() override;
