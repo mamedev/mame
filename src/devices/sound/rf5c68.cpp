@@ -74,13 +74,13 @@ void rf5c68_device::device_start()
 	/* allocate the stream */
 	m_stream = stream_alloc(0, 2, clock() / 384);
 
-	save_item(STRUCT_MEMBER(m_chan, enable), NUM_CHANNELS);
-	save_item(STRUCT_MEMBER(m_chan, env), NUM_CHANNELS);
-	save_item(STRUCT_MEMBER(m_chan, pan), NUM_CHANNELS);
-	save_item(STRUCT_MEMBER(m_chan, start), NUM_CHANNELS);
-	save_item(STRUCT_MEMBER(m_chan, addr), NUM_CHANNELS);
-	save_item(STRUCT_MEMBER(m_chan, step), NUM_CHANNELS);
-	save_item(STRUCT_MEMBER(m_chan, loopst), NUM_CHANNELS);
+	save_item(STRUCT_MEMBER(m_chan, enable));
+	save_item(STRUCT_MEMBER(m_chan, env));
+	save_item(STRUCT_MEMBER(m_chan, pan));
+	save_item(STRUCT_MEMBER(m_chan, start));
+	save_item(STRUCT_MEMBER(m_chan, addr));
+	save_item(STRUCT_MEMBER(m_chan, step));
+	save_item(STRUCT_MEMBER(m_chan, loopst));
 
 	save_item(NAME(m_cbank));
 	save_item(NAME(m_wbank));
