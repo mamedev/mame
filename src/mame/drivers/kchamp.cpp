@@ -459,20 +459,12 @@ void kchamp_state::kchampvs(machine_config &config)
 /********************
 * 1 Player Version  *
 ********************/
-
-void kchamp_state::kchamp(machine_config &config)
+void kchamp_state::kchamp_common(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/4);     /* 12MHz / 4 = 3.0 MHz */
+	// Basic machine hardware
+	Z80(config, m_maincpu, XTAL(12'000'000)/4); // 12MHz / 4 = 3.0 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_map);
 	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchamp_io_map);
-
-	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    /* 12MHz / 4 = 3.0 MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchamp_sound_io_map);
-	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125)); /* Hz */
-	/* IRQs triggered from main CPU */
-	/* NMIs from 125Hz clock */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC71
 	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
@@ -480,7 +472,7 @@ void kchamp_state::kchamp(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchamp)
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -493,19 +485,46 @@ void kchamp_state::kchamp(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kchamp);
 	PALETTE(config, m_palette, FUNC(kchamp_state::kchamp_palette), 256);
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	AY8910(config, m_ay[0], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Guess based on actual pcb recordings of karatedo */
-	AY8910(config, m_ay[1], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Guess based on actual pcb recordings of karatedo */
-
 	DAC08(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // IC11
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
+
+void kchamp_state::kchamp(machine_config &config)
+{
+	kchamp_common(config);
+
+	Z80(config, m_audiocpu, XTAL(12'000'000)/4); // 12MHz / 4 = 3.0 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchamp_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125)); // Hz
+	// IRQs triggered from main CPU
+	// NMIs from 125Hz clock
+
+	AY8910(config, m_ay[0], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); // Guess based on actual PCB recordings of karatedo
+	AY8910(config, m_ay[1], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); // Guess based on actual PCB recordings of karatedo
+}
+
+void kchamp_state::kchamp_arfyc(machine_config &config)
+{
+	kchamp_common(config);
+
+	Z80(config, m_audiocpu, XTAL(8'867'238)/2); // 8.867238 MHz xtal / 2, measured on real PCB
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchamp_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125)); // Hz
+	// IRQs triggered from main CPU
+	// NMIs from 125Hz clock
+
+	AY8910(config, m_ay[0], XTAL(8'867'238)/8).add_route(ALL_OUTPUTS, "speaker", 0.3); // 8.867238 MHz xtal / 8, measured on real PCB
+	AY8910(config, m_ay[1], XTAL(8'867'238)/8).add_route(ALL_OUTPUTS, "speaker", 0.3); // 8.867238 MHz xtal / 8, measured on real PCB
 }
 
 
@@ -597,6 +616,56 @@ ROM_START( karatedo )
 	ROM_LOAD( "br27", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) /* red */
 	ROM_LOAD( "br26", 0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) /* green */
 	ROM_LOAD( "br25", 0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) /* blue */
+ROM_END
+
+/* Bootleg from the Spanish company "Automaticos Arfyc"
+   Just different color PROMs and a few bytes on the K26/BE26 sound ROM
+   Frecuencies measured on the PCB:
+    Program Z80: 2.99684 MHz (12.000 MHz xtal / 4)
+    Sound Z80:   4.43141 MHz (8.867238 MHz xtal / 2)
+    SN74LS04N:   8.86277 MHz (8.867238 MHz xtal)
+    2xAY-3-8910: 1.10785 MHz (8.867238 MHz xtal / 8)
+*/
+ROM_START( karateda )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "k14_2764.d1",  0x0000, 0x2000, CRC(44e60aa0) SHA1(6d007d7082c15182832f947444b00b7feb0e7738) )
+	ROM_LOAD( "k15_2764.d2",  0x2000, 0x2000, CRC(a65e3793) SHA1(bf1e8fbc6755e85414eb7629e6fab3bf154f6546) )
+	ROM_LOAD( "k16_2764.d4",  0x4000, 0x2000, CRC(151d8872) SHA1(1bb27142fdb33e3aeaf95c7a0ad7e8c258bbcb66) )
+	ROM_LOAD( "k17_2764.d5",  0x6000, 0x2000, CRC(8f393b6a) SHA1(f246a6e069a2f562c5b7de05a2b8a6a09c1f4d1b) )
+	ROM_LOAD( "k18_2764.d6",  0x8000, 0x2000, CRC(a09046ad) SHA1(665973bffc38e36b8b0f6bc79e10db280be0613e) )
+	ROM_LOAD( "k19_2764.d7",  0xa000, 0x2000, CRC(0cdc4da9) SHA1(405454deda311abb8badd58a47529e42ddce5f6a) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
+	ROM_LOAD( "k26_2764.e10", 0x0000, 0x2000, CRC(645232ba) SHA1(97b78a9bb069d3fdbd348a4e83d5abdf8418e595) )
+	ROM_LOAD( "k25_2764.e9",  0x2000, 0x2000, CRC(253bf0da) SHA1(33bae6401003dc57deaa14bf7f6a7ebad5b7efe3) ) // ADPCM
+	ROM_LOAD( "k24_2764.e8",  0x4000, 0x2000, CRC(e2c188af) SHA1(b7a0801a4c634694f1556873fd21f7e13441be17) ) // ADPCM
+	ROM_LOAD( "k23_2764.e6",  0x6000, 0x2000, CRC(25262de1) SHA1(6264cd82756be9e1cdcd9ad3c3dfc6fef78dab8f) )
+	ROM_LOAD( "k22_2764.e5",  0x8000, 0x2000, CRC(38055c48) SHA1(8406a52aaa7e56093a8d8552e928988b6fdd6c95) )
+	ROM_LOAD( "k21_2764.e4",  0xa000, 0x2000, CRC(5f0efbe7) SHA1(f831efd02c917adac827fe6db8449ca8707b3d44) )
+	ROM_LOAD( "k20_2764.e2",  0xc000, 0x2000, CRC(cbe8a533) SHA1(04cb41c487c2f951417628ed2888e04d59a39d29) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "k0_2764.h3",   0x00000, 0x2000, CRC(cec020f2) SHA1(07c501cc24797000f369fd98a26efe13875107bb) )  // Plane0, tiles
+	ROM_LOAD( "k1_2764.h6",   0x04000, 0x2000, CRC(cd96271c) SHA1(bcc71010e5489b19ad1553141c7b2e366bbbc68f) )  // Plane1, tiles
+
+	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_LOAD( "k13_2764.k15", 0x00000, 0x2000, CRC(fb358707) SHA1(37124f1f545787723fecf466d8dcd31b88cdd75d) )  // Top, plane0, sprites
+	ROM_LOAD( "k4_2764.j15",  0x02000, 0x2000, CRC(48372bf8) SHA1(28231b3bdb1d7226d7856554ba667b6d61f4fe22) )  // Bot, plane0, sprites
+	ROM_LOAD( "k12_2764.k13", 0x04000, 0x2000, CRC(b4842ea9) SHA1(471475f65edbd292b9162ad50e5cb0c7144845b0) )  // Top, plane0, sprites
+	ROM_LOAD( "k3-2764.j13",  0x06000, 0x2000, CRC(8cd166a5) SHA1(4b623c4c0025d75b3ed9746f8b6730bf3e65d85a) )  // Bot, plane0, sprites
+	ROM_LOAD( "k11_2764.k12", 0x08000, 0x2000, CRC(4cbd3aa3) SHA1(a9a683dcc4f52b18450659a20434a4d2a7b411d9) )  // Top, plane0, sprites
+	ROM_LOAD( "k2_2764.j12",  0x0a000, 0x2000, CRC(6be342a6) SHA1(0b8ac7ef7c6a6464fbc027a9fd17fa7ce1ffd962) )  // Bot, plane0, sprites
+	ROM_LOAD( "k7_2764.k4",   0x0c000, 0x2000, CRC(40f2b6fb) SHA1(8d9ee04d917a8e143bd00fa7582990213bfa42d3) )  // Top, plane1, sprites
+	ROM_LOAD( "k10_2764.k9",  0x0e000, 0x2000, CRC(325c0a97) SHA1(0159536ff0ebac8ccf65aac1a524a30b3fca3418) )  // Bot, plane1, sprites
+	ROM_LOAD( "k6_2764.k2",   0x10000, 0x2000, CRC(7346db8a) SHA1(d2b2c1700ae0ff9c614a9981a3da3d69879e9f25) )  // Top, plane1, sprites
+	ROM_LOAD( "k9_2764.k8",   0x12000, 0x2000, CRC(b78714fc) SHA1(4df7f15c37d56a9d66d0049aad65b32063e5c29a) )  // Bot, plane1, sprites
+	ROM_LOAD( "k5_2764.k1",   0x14000, 0x2000, CRC(b2557102) SHA1(ec4285029fc3ee1ad0adb05f363b234c67f8903d) )  // Top, plane1, sprites
+	ROM_LOAD( "k8_2764.k7",   0x16000, 0x2000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) )  // Bot, plane1, sprites
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "1_dm74s287_82s129.f11", 0x0000, 0x0100, CRC(f05bda76) SHA1(0842092e28a15de3b4c198e48f650dbbe3cc95ce) ) // Red
+	ROM_LOAD( "2_dm74s287_82s129.f12", 0x0100, 0x0100, CRC(d26d6fa9) SHA1(72a30bdc3410f2704539a32aeef69ee803e39f82) ) // Green
+	ROM_LOAD( "3_dm74s287_82s129.f13", 0x0200, 0x0100, CRC(111ccb15) SHA1(4928a7ccc8649520cad3b119ff0b0ca1276c95ae) ) // Blue
 ROM_END
 
 ROM_START( kchampvs )
@@ -853,11 +922,11 @@ void kchamp_state::init_kchampvs2()
 }
 
 
-
-GAME( 1984, kchamp,    0,      kchamp,   kchamp,   kchamp_state,  empty_init,     ROT90, "Data East USA",         "Karate Champ (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   kchamp_state,  empty_init,     ROT90, "Data East Corporation", "Karate Dou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs2, ROT90, "Data East USA",         "Karate Champ (US VS version, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs3, kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs4, kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchamp,    0,      kchamp,       kchamp,   kchamp_state,  empty_init,     ROT90, "Data East USA",         "Karate Champ (US)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1984, karatedo,  kchamp, kchamp,       kchamp,   kchamp_state,  empty_init,     ROT90, "Data East Corporation", "Karate Dou (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, karateda,  kchamp, kchamp_arfyc, kchamp,   kchamp_state,  empty_init,     ROT90, "bootleg (Arfyc)",       "Karate Dou (Arfyc bootleg)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs,  kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs2, kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs2, ROT90, "Data East USA",         "Karate Champ (US VS version, set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs3, kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 3)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs4, kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 4)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, karatevs,  kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", MACHINE_SUPPORTS_SAVE )
