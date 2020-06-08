@@ -40,6 +40,7 @@ public:
 
 	void kchamp(machine_config &config);
 	void kchampvs(machine_config &config);
+	void kchamp_arfyc(machine_config &config);
 
 	void init_kchampvs();
 	void init_kchampvs2();
