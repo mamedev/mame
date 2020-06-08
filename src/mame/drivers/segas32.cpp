@@ -2297,7 +2297,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 	ym2.add_route(0, "lspeaker", 0.40);
 	ym2.add_route(1, "rspeaker", 0.40);
 
-	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", RFC_CLOCK/4));
+	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", RFC_CLOCK/4)); // ASSP (RF)5C105 or Sega 315-5476A
 	rfsnd.add_route(0, "lspeaker", 0.55);
 	rfsnd.add_route(1, "rspeaker", 0.55);
 	rfsnd.set_addrmap(0, &segas32_state::rf5c68_map);
