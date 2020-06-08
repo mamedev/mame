@@ -38,15 +38,15 @@ namespace plib {
 
 
 	template <typename P, typename T>
-	struct arena_deleter<P, T, typename std::enable_if<!P::has_static_deallocator>::type>
+	struct arena_deleter<P, T, std::enable_if_t<!P::has_static_deallocator>>
 	{
 		using arena_storage_type = P;
 
 		constexpr arena_deleter(arena_storage_type *a = nullptr) noexcept
 		: m_a(a) { }
 
-		template<typename U, typename = typename
-			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
+		template<typename U, typename =
+			   std::enable_if_t<std::is_convertible< U*, T*>::value>>
 		arena_deleter(const arena_deleter<P, U> &rhs) noexcept
 		: m_a(rhs.m_a) { }
 
@@ -61,7 +61,7 @@ namespace plib {
 	};
 
 	template <typename P, typename T>
-	struct arena_deleter<P, T, typename std::enable_if<P::has_static_deallocator>::type>
+	struct arena_deleter<P, T, std::enable_if_t<P::has_static_deallocator>>
 	{
 		using arena_storage_type = P;
 
@@ -296,11 +296,14 @@ namespace plib {
 		template <class T, size_type ALIGN = alignof(T)>
 		using allocator_type = arena_allocator<aligned_arena, T, ALIGN>;
 
-		template <typename T>
-		using unique_pool_ptr = std::unique_ptr<T, arena_deleter<aligned_arena, T>>;
+		template <class T>
+		using deleter_type = arena_deleter<aligned_arena, T>;
 
 		template <typename T>
-		using owned_pool_ptr = plib::owned_ptr<T, arena_deleter<aligned_arena, T>>;
+		using unique_ptr = std::unique_ptr<T, deleter_type<T>>;
+
+		template <typename T>
+		using owned_ptr = plib::owned_ptr<T, deleter_type<T>>;
 
 		static inline aligned_arena &instance() noexcept
 		{
@@ -345,14 +348,14 @@ namespace plib {
 		}
 
 		template<typename T, typename... Args>
-		unique_pool_ptr<T> make_unique(Args&&... args)
+		static inline unique_ptr<T> make_unique(Args&&... args)
 		{
 			auto *mem = allocate(alignof(T), sizeof(T));
 			try
 			{
 				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
 				auto *mema = new (mem) T(std::forward<Args>(args)...);
-				return unique_pool_ptr<T>(mema, arena_deleter<aligned_arena, T>(this));
+				return unique_ptr<T>(mema, deleter_type<T>());
 			}
 			catch (...)
 			{
@@ -362,14 +365,14 @@ namespace plib {
 		}
 
 		template<typename T, typename... Args>
-		owned_pool_ptr<T> make_owned(Args&&... args)
+		static inline owned_ptr<T> make_owned(Args&&... args)
 		{
 			auto *mem = allocate(alignof(T), sizeof(T));
 			try
 			{
 				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
 				auto *mema = new (mem) T(std::forward<Args>(args)...);
-				return owned_pool_ptr<T>(mema, true, arena_deleter<aligned_arena, T>(*this));
+				return owned_ptr<T>(mema, true, deleter_type<T>());
 			}
 			catch (...)
 			{
@@ -432,15 +435,6 @@ namespace plib {
 #endif
 	}
 
-	template <typename T>
-	using unique_ptr = aligned_arena::unique_pool_ptr<T>;
-
-	template<typename T, typename... Args>
-	plib::unique_ptr<T> make_unique(Args&&... args)
-	{
-		return aligned_arena::instance().make_unique<T>(std::forward<Args>(args)...);
-	}
-
 	template <class T, std::size_t ALIGN = alignof(T)>
 	using aligned_allocator = aligned_arena::allocator_type<T, ALIGN>;
 
@@ -460,7 +454,7 @@ namespace plib {
 	};
 
 	template <typename T>
-	struct align_traits<T, typename std::enable_if<has_align<T>::value, void>::type>
+	struct align_traits<T, std::enable_if_t<has_align<T>::value, void>>
 	{
 		static constexpr const std::size_t align_size = T::align_size;
 		static constexpr const std::size_t value_size = sizeof(typename T::value_type);

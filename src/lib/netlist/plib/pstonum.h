@@ -49,7 +49,7 @@ namespace plib
 	struct pstonum_helper;
 
 	template<typename T>
-	struct pstonum_helper<T, typename std::enable_if<plib::is_integral<T>::value && plib::is_signed<T>::value>::type>
+	struct pstonum_helper<T, std::enable_if_t<plib::is_integral<T>::value && plib::is_signed<T>::value>>
 	{
 		template <typename S>
 		long long operator()(std::locale loc, const S &arg, std::size_t *idx)
@@ -60,7 +60,7 @@ namespace plib
 	};
 
 	template<typename T>
-	struct pstonum_helper<T, typename std::enable_if<plib::is_integral<T>::value && !plib::is_signed<T>::value>::type>
+	struct pstonum_helper<T, std::enable_if_t<plib::is_integral<T>::value && !plib::is_signed<T>::value>>
 	{
 		template <typename S>
 		unsigned long long operator()(std::locale loc, const S &arg, std::size_t *idx)
@@ -71,7 +71,7 @@ namespace plib
 	};
 
 	template<typename T>
-	struct pstonum_helper<T, typename std::enable_if<std::is_floating_point<T>::value>::type>
+	struct pstonum_helper<T, std::enable_if_t<std::is_floating_point<T>::value>>
 	{
 		template <typename S>
 		long double operator()(std::locale loc, const S &arg, std::size_t *idx)

@@ -39,10 +39,10 @@ namespace plib {
 		using allocator_type = arena_allocator<mempool_arena, T, ALIGN>;
 
 		template <typename T>
-		using owned_pool_ptr = plib::owned_ptr<T, arena_deleter<mempool_arena, T>>;
+		using owned_ptr = plib::owned_ptr<T, arena_deleter<mempool_arena, T>>;
 
 		template <typename T>
-		using unique_pool_ptr = std::unique_ptr<T, arena_deleter<mempool_arena, T>>;
+		using unique_ptr = std::unique_ptr<T, arena_deleter<mempool_arena, T>>;
 
 		mempool_arena(size_t min_alloc = (1<<21), size_t min_align = PALIGN_CACHELINE)
 		: m_min_alloc(min_alloc)
@@ -137,14 +137,14 @@ namespace plib {
 		}
 
 		template<typename T, typename... Args>
-		owned_pool_ptr<T> make_owned(Args&&... args)
+		owned_ptr<T> make_owned(Args&&... args)
 		{
 			auto *mem = this->allocate(alignof(T), sizeof(T));
 			try
 			{
 				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
 				auto *mema = new (mem) T(std::forward<Args>(args)...);
-				return owned_pool_ptr<T>(mema, true, arena_deleter<mempool_arena, T>(this));
+				return owned_ptr<T>(mema, true, arena_deleter<mempool_arena, T>(this));
 			}
 			catch (...)
 			{
@@ -154,14 +154,14 @@ namespace plib {
 		}
 
 		template<typename T, typename... Args>
-		unique_pool_ptr<T> make_unique(Args&&... args)
+		unique_ptr<T> make_unique(Args&&... args)
 		{
 			auto *mem = this->allocate(alignof(T), sizeof(T));
 			try
 			{
 				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
 				auto *mema = new (mem) T(std::forward<Args>(args)...);
-				return unique_pool_ptr<T>(mema, arena_deleter<mempool_arena, T>(this));
+				return unique_ptr<T>(mema, arena_deleter<mempool_arena, T>(this));
 			}
 			catch (...)
 			{

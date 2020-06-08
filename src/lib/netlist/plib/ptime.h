@@ -111,7 +111,7 @@ namespace plib
 		}
 
 		template <typename T>
-		constexpr typename std::enable_if<std::is_integral<T>::value, ptime>::type
+		constexpr std::enable_if_t<std::is_integral<T>::value, ptime>
 		operator/(const T &rhs) const noexcept
 		{
 			return ptime(m_time / rhs);
@@ -190,7 +190,7 @@ namespace plib
 		static constexpr ptime from_raw(internal_type raw) noexcept { return ptime(raw); }
 
 		template <typename FT>
-		static constexpr typename std::enable_if<plib::is_floating_point<FT>::value, ptime>::type
+		static constexpr std::enable_if_t<plib::is_floating_point<FT>::value, ptime>
 		from_fp(FT t) noexcept { return ptime(static_cast<internal_type>(plib::floor(t * static_cast<FT>(RES) + static_cast<FT>(0.5))), RES); }
 
 		static constexpr ptime from_double(double t) noexcept

@@ -279,7 +279,7 @@ namespace plib {
 	}
 
 	template <typename NT>
-	static inline typename std::enable_if<plib::is_floating_point<NT>::value, NT>::type
+	static inline std::enable_if_t<plib::is_floating_point<NT>::value, NT>
 	lfsr_random(std::uint16_t &lfsr) noexcept
 	{
 		std::uint16_t lsb = lfsr & 1;
@@ -290,7 +290,7 @@ namespace plib {
 	}
 
 	template <typename NT>
-	static inline typename std::enable_if<plib::is_integral<NT>::value, NT>::type
+	static inline std::enable_if_t<plib::is_integral<NT>::value, NT>
 	lfsr_random(std::uint16_t &lfsr) noexcept
 	{
 		std::uint16_t lsb = lfsr & 1;

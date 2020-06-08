@@ -27,8 +27,7 @@
 	NETLIB_DEVICE_IMPL_BASE(ns, chip, chip, p_name, p_def_param) \
 
 #define NETLIB_DEVICE_IMPL_BASE(ns, p_alias, chip, p_name, p_def_param) \
-	static plib::unique_ptr<factory::element_t> NETLIB_NAME(p_alias ## _c) \
-			() \
+	static factory::element_t::uptr NETLIB_NAME(p_alias ## _c) () \
 	{ \
 		using devtype = factory::device_element_t<ns :: NETLIB_NAME(chip)>; \
 		factory::properties sl(p_def_param, PSOURCELOC()); \
@@ -92,8 +91,8 @@ namespace factory {
 	{
 	public:
 
-		using dev_uptr = unique_pool_ptr<core_device_t>;
-		using uptr = plib::unique_ptr<element_t>;
+		using dev_uptr = device_arena::unique_ptr<core_device_t>;
+		using uptr = host_arena::unique_ptr<element_t>;
 		using pointer = element_t *;
 
 		element_t(const pstring &name, properties &&props);
@@ -101,7 +100,7 @@ namespace factory {
 
 		PCOPYASSIGNMOVE(element_t, default)
 
-		virtual dev_uptr make_device(nlmempool &pool,
+		virtual dev_uptr make_device(device_arena &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) = 0;
 
@@ -126,21 +125,21 @@ namespace factory {
 
 
 	    template <std::size_t... Is>
-	    dev_uptr make_device(nlmempool &pool,
+	    dev_uptr make_device(device_arena &pool,
 	    	    			netlist_state_t &anetlist,
 	    	    			const pstring &name, std::tuple<Args...>& args, std::index_sequence<Is...>)
 	    {
 	    	return pool.make_unique<C>(anetlist, name, std::forward<Args>(std::get<Is>(args))...);
 	    }
 
-	    dev_uptr make_device(nlmempool &pool,
+	    dev_uptr make_device(device_arena &pool,
 	    			netlist_state_t &anetlist,
 	    			const pstring &name, std::tuple<Args...>& args)
 	    {
 	        return make_device(pool, anetlist, name, args, std::index_sequence_for<Args...>{});
 	    }
 
-		dev_uptr make_device(nlmempool &pool,
+		dev_uptr make_device(device_arena &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) override
 		{
@@ -150,7 +149,7 @@ namespace factory {
 
 		static uptr create(const pstring &name, properties &&props, Args&&... args)
 		{
-			return plib::make_unique<device_element_t<C, Args...>>(name,
+			return host_arena::make_unique<device_element_t<C, Args...>>(name,
 				std::move(props), std::forward<Args>(args)...);
 		}
 	private:
@@ -195,7 +194,7 @@ namespace factory {
 	template <typename T>
 	element_t::uptr constructor_t(const pstring &name, properties &&props)
 	{
-		return plib::make_unique<device_element_t<T>>(name, std::move(props));
+		return host_arena::make_unique<device_element_t<T>>(name, std::move(props));
 	}
 
 	// -----------------------------------------------------------------------------
@@ -208,7 +207,7 @@ namespace factory {
 
 		library_element_t(const pstring &name, properties &&props);
 
-		dev_uptr make_device(nlmempool &pool,
+		dev_uptr make_device(device_arena &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) override;
 	};

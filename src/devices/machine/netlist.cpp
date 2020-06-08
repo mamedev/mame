@@ -124,10 +124,10 @@ protected:
 		}
 	}
 
-	plib::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
+	netlist::host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
 	{
 		//return plib::make_unique<plib::dynlib_static>(nullptr);
-		return plib::make_unique<plib::dynlib_static>(nl_static_solver_syms);
+		return netlist::host_arena::make_unique<plib::dynlib_static>(nl_static_solver_syms);
 	}
 
 private:
@@ -167,9 +167,9 @@ protected:
 		}
 	}
 
-	plib::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
+	netlist::host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
 	{
-		return plib::make_unique<plib::dynlib_static>(nullptr);
+		return netlist::host_arena::make_unique<plib::dynlib_static>(nullptr);
 	}
 
 private:
@@ -181,12 +181,12 @@ class netlist_mame_device::netlist_mame_t : public netlist::netlist_state_t
 public:
 
 	netlist_mame_t(netlist_mame_device &parent, const pstring &name)
-		: netlist::netlist_state_t(name, plib::make_unique<netlist_mame_device::netlist_mame_callbacks_t>(parent))
+		: netlist::netlist_state_t(name, netlist::host_arena::make_unique<netlist_mame_device::netlist_mame_callbacks_t>(parent))
 		, m_parent(parent)
 	{
 	}
 
-	netlist_mame_t(netlist_mame_device &parent, const pstring &name, plib::unique_ptr<netlist::callbacks_t> cbs)
+	netlist_mame_t(netlist_mame_device &parent, const pstring &name, netlist::host_arena::unique_ptr<netlist::callbacks_t> cbs)
 		: netlist::netlist_state_t(name, std::move(cbs))
 		, m_parent(parent)
 	{
@@ -234,13 +234,12 @@ class netlist_source_memregion_t : public netlist::source_netlist_t
 {
 public:
 
-
 	netlist_source_memregion_t(device_t &dev, pstring name)
 	: netlist::source_netlist_t(), m_dev(dev), m_name(name)
 	{
 	}
 
-	virtual plib::unique_ptr<std::istream> stream(const pstring &name) override;
+	virtual stream_ptr stream(const pstring &name) override;
 private:
 	device_t &m_dev;
 	pstring m_name;
@@ -251,7 +250,7 @@ class netlist_data_memregions_t : public netlist::source_data_t
 public:
 	netlist_data_memregions_t(const device_t &dev);
 
-	virtual plib::unique_ptr<std::istream> stream(const pstring &name) override;
+	virtual stream_ptr stream(const pstring &name) override;
 
 private:
 	const device_t &m_dev;
@@ -262,12 +261,12 @@ private:
 // memregion source support
 // ----------------------------------------------------------------------------------------
 
-plib::unique_ptr<std::istream> netlist_source_memregion_t::stream(const pstring &name)
+netlist_source_memregion_t::stream_ptr netlist_source_memregion_t::stream(const pstring &name)
 {
 	if (m_dev.has_running_machine())
 	{
 		memory_region *mem = m_dev.memregion(m_name.c_str());
-		auto ret(plib::make_unique<std::istringstream>(pstring(reinterpret_cast<char *>(mem->base()), mem->bytes())));
+		auto ret(std::make_unique<std::istringstream>(pstring(reinterpret_cast<char *>(mem->base()), mem->bytes())));
 		ret->imbue(std::locale::classic());
 		return MOVE_UNIQUE_PTR(ret);
 	}
@@ -300,7 +299,7 @@ static bool rom_exists(device_t &root, pstring name)
 	return false;
 }
 
-plib::unique_ptr<std::istream> netlist_data_memregions_t::stream(const pstring &name)
+netlist_data_memregions_t::stream_ptr netlist_data_memregions_t::stream(const pstring &name)
 {
 	//memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().setup().exec()).parent().memregion(name.c_str());
 	if (m_dev.has_running_machine())
@@ -308,12 +307,12 @@ plib::unique_ptr<std::istream> netlist_data_memregions_t::stream(const pstring &
 		memory_region *mem = m_dev.memregion(name.c_str());
 		if (mem != nullptr)
 		{
-			auto ret(plib::make_unique<std::istringstream>(std::string(reinterpret_cast<char *>(mem->base()), mem->bytes()), std::ios_base::binary));
+			auto ret(std::make_unique<std::istringstream>(std::string(reinterpret_cast<char *>(mem->base()), mem->bytes()), std::ios_base::binary));
 			ret->imbue(std::locale::classic());
 			return MOVE_UNIQUE_PTR(ret);
 		}
 		else
-			return plib::unique_ptr<std::istream>(nullptr);
+			return stream_ptr(nullptr);
 	}
 	else
 	{
@@ -321,12 +320,12 @@ plib::unique_ptr<std::istream> netlist_data_memregions_t::stream(const pstring &
 		if (rom_exists(m_dev.mconfig().root_device(), pstring(m_dev.tag()) + ":" + name))
 		{
 			// Create an empty stream.
-			auto ret(plib::make_unique<std::istringstream>(std::ios_base::binary));
+			auto ret(std::make_unique<std::istringstream>(std::ios_base::binary));
 			ret->imbue(std::locale::classic());
 			return MOVE_UNIQUE_PTR(ret);
 		}
 		else
-			return plib::unique_ptr<std::istream>(nullptr);
+			return stream_ptr(nullptr);
 	}
 }
 
@@ -973,11 +972,11 @@ void netlist_mame_device::common_dev_start(netlist::netlist_state_t *lnetlist) c
 	}
 }
 
-plib::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_check(validity_checker &valid) const
+netlist::host_arena::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_check(validity_checker &valid) const
 {
 	try
 	{
-		auto lnetlist = plib::make_unique<netlist::netlist_state_t>("netlist", plib::make_unique<netlist_validate_callbacks_t>());
+		auto lnetlist = netlist::host_arena::make_unique<netlist::netlist_state_t>("netlist", netlist::host_arena::make_unique<netlist_validate_callbacks_t>());
 		// enable validation mode
 		lnetlist->set_extended_validation(true);
 		common_dev_start(lnetlist.get());
@@ -1008,7 +1007,7 @@ plib::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_ch
 	{
 		osd_printf_error("%s\n", err.what());
 	}
-	return plib::unique_ptr<netlist::netlist_state_t>(nullptr);
+	return netlist::host_arena::unique_ptr<netlist::netlist_state_t>(nullptr);
 }
 
 void netlist_mame_device::device_validity_check(validity_checker &valid) const

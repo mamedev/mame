@@ -201,7 +201,7 @@ public:
 	stream_ptr stream(const pstring &file) override
 	{
 		pstring name = m_folder + "/" + file;
-		auto strm(plib::make_unique<plib::ifstream>(plib::filesystem::u8path(name)));
+		auto strm(std::make_unique<plib::ifstream>(plib::filesystem::u8path(name)));
 		if (strm->fail())
 			return stream_ptr(nullptr);
 
@@ -222,17 +222,17 @@ public:
 
 	void vlog(const plib::plog_level &l, const pstring &ls) const noexcept override;
 
-	plib::unique_ptr<plib::dynlib_base> static_solver_lib() const override
+	netlist::host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const override
 	{
 		if (m_boostlib == "builtin")
-			return plib::make_unique<plib::dynlib_static>(nl_static_solver_syms);
+			return netlist::host_arena::make_unique<plib::dynlib_static>(nl_static_solver_syms);
 		if (m_boostlib == "generic")
-			return plib::make_unique<plib::dynlib_static>(nullptr);
+			return netlist::host_arena::make_unique<plib::dynlib_static>(nullptr);
 		if (NL_DISABLE_DYNAMIC_LOAD)
 			throw netlist::nl_exception("Dynamic library loading not supported due to project security concerns.");
 
 		//pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
-		return plib::make_unique<plib::dynlib>(m_boostlib);
+		return netlist::host_arena::make_unique<plib::dynlib>(m_boostlib);
 	}
 
 private:
@@ -245,7 +245,7 @@ class netlist_tool_t : public netlist::netlist_state_t
 public:
 
 	netlist_tool_t(tool_app_t &app, const pstring &name, const pstring &boostlib)
-	: netlist::netlist_state_t(name, plib::make_unique<netlist_tool_callbacks_t>(app, boostlib))
+	: netlist::netlist_state_t(name, netlist::host_arena::make_unique<netlist_tool_callbacks_t>(app, boostlib))
 	{
 	}
 
@@ -385,7 +385,7 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstr
 	std::vector<input_t> ret;
 	if (fname != "")
 	{
-		plib::putf8_reader r = plib::putf8_reader(plib::make_unique<plib::ifstream>(plib::filesystem::u8path(fname)));
+		plib::putf8_reader r = plib::putf8_reader(std::make_unique<plib::ifstream>(plib::filesystem::u8path(fname)));
 		if (r.stream().fail())
 			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
 		r.stream().imbue(std::locale::classic());
@@ -626,7 +626,7 @@ void tool_app_t::static_compile()
 				names.push_back(opt_name());
 			else
 			{
-				plib::putf8_reader r = plib::putf8_reader(plib::make_unique<plib::ifstream>(plib::filesystem::u8path(f)));
+				plib::putf8_reader r = plib::putf8_reader(std::make_unique<plib::ifstream>(plib::filesystem::u8path(f)));
 				if (r.stream().fail())
 					throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(f));
 				r.stream().imbue(std::locale::classic());
@@ -706,7 +706,7 @@ struct doc_ext
 
 static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 {
-	plib::putf8_reader r = plib::putf8_reader(plib::make_unique<plib::ifstream>(plib::filesystem::u8path(fname)));
+	plib::putf8_reader r = plib::putf8_reader(std::make_unique<plib::ifstream>(plib::filesystem::u8path(fname)));
 	if (r.stream().fail())
 		throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
 	r.stream().imbue(std::locale::classic());
@@ -1057,7 +1057,7 @@ void tool_app_t::listdevices()
 	nt.parser().include("dummy");
 	nt.setup().prepare_to_run();
 
-	std::vector<netlist::unique_pool_ptr<netlist::core_device_t>> devs;
+	std::vector<netlist::device_arena::unique_ptr<netlist::core_device_t>> devs;
 
 	for (auto & fl : list)
 	{
@@ -1123,19 +1123,19 @@ void tool_app_t::convert()
 	pstring result;
 	if (opt_type.as_string() == "spice")
 	{
-		nl_convert_spice_t c;
+		netlist::convert::nl_convert_spice_t c;
 		c.convert(contents);
 		result = c.result();
 	}
 	else if (opt_type.as_string() == "eagle")
 	{
-		nl_convert_eagle_t c;
+		netlist::convert::nl_convert_eagle_t c;
 		c.convert(contents);
 		result = c.result();
 	}
 	else if (opt_type.as_string() == "rinf")
 	{
-		nl_convert_rinf_t c;
+		netlist::convert::nl_convert_rinf_t c;
 		c.convert(contents);
 		result = c.result();
 	}

@@ -42,7 +42,7 @@ namespace factory {
 	{
 	}
 
-	void list_t::add(plib::unique_ptr<element_t> &&factory)
+	void list_t::add(host_arena::unique_ptr<element_t> &&factory)
 	{
 		for (auto & e : *this)
 			if (e->name() == factory->name())
@@ -74,7 +74,7 @@ namespace factory {
 	{
 	}
 
-	unique_pool_ptr<core_device_t> library_element_t::make_device(nlmempool &pool, netlist_state_t &anetlist, const pstring &name)
+	device_arena::unique_ptr<core_device_t> library_element_t::make_device(device_arena &pool, netlist_state_t &anetlist, const pstring &name)
 	{
 		return pool.make_unique<NETLIB_NAME(wrapper)>(anetlist, name);
 	}

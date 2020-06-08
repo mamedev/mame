@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <initializer_list>
 #include <vector>
+#include <sstream>
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
@@ -153,7 +154,7 @@ namespace plib
 	{
 	public:
 
-		using stream_ptr = plib::unique_ptr<std::istream>;
+		using stream_ptr = std::unique_ptr<std::istream>;
 
 		psource_t() noexcept = default;
 
@@ -170,10 +171,7 @@ namespace plib
 	/// Will return the given string when name matches.
 	/// Is used in preprocessor code to eliminate inclusion of certain files.
 	///
-	/// \tparam TS base stream class. Default is psource_t
-	///
-	template <typename TS = psource_t>
-	class psource_str_t : public TS
+	class psource_str_t : public psource_t
 	{
 	public:
 		psource_str_t(pstring name, pstring str)
@@ -183,10 +181,12 @@ namespace plib
 		PCOPYASSIGNMOVE(psource_str_t, delete)
 		~psource_str_t() noexcept override = default;
 
-		typename TS::stream_ptr stream(const pstring &name) override
+		typename psource_t::stream_ptr stream(const pstring &name) override
 		{
-			return (name == m_name) ?
-				plib::make_unique<std::stringstream>(m_str) : typename TS::stream_ptr(nullptr);
+			if (name == m_name)
+				return std::make_unique<std::stringstream>(m_str);
+
+			return psource_t::stream_ptr(nullptr);
 		}
 	private:
 		pstring m_name;
@@ -195,13 +195,13 @@ namespace plib
 
 	/// \brief Generic sources collection.
 	///
-	/// \tparam TS base stream class. Default is psource_t
+	/// \tparam ARENA memory arena, defaults to aligned_arena
 	///
-	template <typename TS = psource_t>
+	template <typename ARENA = aligned_arena>
 	class psource_collection_t
 	{
 	public:
-		using source_type = plib::unique_ptr<TS>;
+		using source_type = std::unique_ptr<psource_t>;
 		using list_t = std::vector<source_type>;
 
 		psource_collection_t() noexcept = default;
@@ -214,8 +214,8 @@ namespace plib
 			m_collection.push_back(std::move(src));
 		}
 
-		template <typename S = TS>
-		typename S::stream_ptr get_stream(pstring name)
+		template <typename S = psource_t>
+		typename psource_t::stream_ptr get_stream(pstring name)
 		{
 			for (auto &s : m_collection)
 			{

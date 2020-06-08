@@ -46,7 +46,7 @@ public:
 	{
 	}
 
-	putf8_reader(plib::unique_ptr<std::istream> &&rhs) noexcept
+	putf8_reader(std::unique_ptr<std::istream> &&rhs) noexcept
 	: m_strm(std::move(rhs))
 	{
 	}
@@ -104,7 +104,7 @@ public:
 
 	std::istream &stream() { return *m_strm; }
 private:
-	plib::unique_ptr<std::istream> m_strm;
+	std::unique_ptr<std::istream> m_strm;
 	putf8string m_linebuf;
 };
 

@@ -380,7 +380,7 @@ namespace devices
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
-		std::vector<unique_pool_ptr<analog_input_t>> m_I;
+		std::vector<device_arena::unique_ptr<analog_input_t>> m_I;
 
 		pf_type::values_container m_vals;
 		state_var<pf_type> m_compiled;

@@ -29,9 +29,9 @@ namespace netlist
 	// callbacks_t
 	// ----------------------------------------------------------------------------------------
 
-	plib::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
+	host_arena::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
 	{
-		return plib::make_unique<plib::dynlib_static>(nullptr);
+		return host_arena::make_unique<plib::dynlib_static>(nullptr);
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -124,7 +124,7 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	netlist_state_t::netlist_state_t(const pstring &name,
-		plib::unique_ptr<callbacks_t> &&callbacks)
+		host_arena::unique_ptr<callbacks_t> &&callbacks)
 	: m_callbacks(std::move(callbacks)) // Order is important here
 	, m_log(*m_callbacks)
 	, m_extended_validation(false)
@@ -133,7 +133,7 @@ namespace netlist
 
 		m_lib = m_callbacks->static_solver_lib();
 
-		m_setup = plib::make_unique<setup_t>(*this);
+		m_setup = host_arena::make_unique<setup_t>(*this);
 		// create the run interface
 		m_netlist = m_pool.make_unique<netlist_t>(*this, name);
 
@@ -145,7 +145,7 @@ namespace netlist
 		devices::initialize_factory(m_setup->parser().factory());
 
 		// Add default include file
-		using a = plib::psource_str_t<plib::psource_t>;
+		using a = plib::psource_str_t;
 		const pstring content =
 		"#define RES_R(res) (res)            \n"
 		"#define RES_K(res) ((res) * 1e3)    \n"
@@ -498,7 +498,7 @@ namespace netlist
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
 		//printf("owned device: %s\n", this->name().c_str());
-		owner.state().register_device(this->name(), owned_pool_ptr<core_device_t>(this, false));
+		owner.state().register_device(this->name(), device_arena::owned_ptr<core_device_t>(this, false));
 		if (exec().stats_enabled())
 			m_stats = owner.state().make_pool_object<stats_t>();
 	}
@@ -778,7 +778,7 @@ namespace netlist
 	{
 		plib::unused_var(dummy);
 		this->set_net(&m_my_net);
-		state().register_net(owned_pool_ptr<logic_net_t>(&m_my_net, false));
+		state().register_net(device_arena::owned_ptr<logic_net_t>(&m_my_net, false));
 		state().setup().register_term(*this);
 	}
 
@@ -807,7 +807,7 @@ namespace netlist
 		: analog_t(dev, aname, STATE_OUT)
 		, m_my_net(dev.state(), name() + ".net", this)
 	{
-		state().register_net(owned_pool_ptr<analog_net_t>(&m_my_net, false));
+		state().register_net(device_arena::owned_ptr<analog_net_t>(&m_my_net, false));
 		this->set_net(&m_my_net);
 
 		//net().m_cur_Analog = NL_FCONST(0.0);
@@ -869,7 +869,7 @@ namespace netlist
 	param_str_t::param_str_t(core_device_t &device, const pstring &name, const pstring &val)
 	: param_t(device, name)
 	{
-		m_param = plib::make_unique<pstring>(val);
+		m_param = host_arena::make_unique<pstring>(val);
 		*m_param = device.state().setup().get_initial_param_val(this->name(),val);
 	}
 
@@ -877,7 +877,7 @@ namespace netlist
 	: param_t(name)
 	{
 		// deviceless parameter, no registration, owner is responsible
-		m_param = plib::make_unique<pstring>(val);
+		m_param = host_arena::make_unique<pstring>(val);
 		*m_param = state.setup().get_initial_param_val(this->name(),val);
 	}
 
@@ -912,7 +912,7 @@ namespace netlist
 	}
 
 
-	plib::unique_ptr<std::istream> param_data_t::stream()
+	std::unique_ptr<std::istream> param_data_t::stream()
 	{
 		return device().state().parser().get_data_stream(str());
 	}

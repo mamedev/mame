@@ -73,6 +73,19 @@ namespace netlist
 	///
 	using netlist_sig_t = std::uint32_t;
 
+	/// \brief The memory pool for netlist objects
+	///
+	/// \note This is not the right location yet.
+	///
+
+	using device_arena = std::conditional<NL_USE_MEMPOOL, plib::mempool_arena, plib::aligned_arena>::type;
+
+	using host_arena = plib::aligned_arena;
+
+#if 0
+	template <typename T>
+	using host_unique_ptr = host_arena::unique_ptr<T>;
+#endif
 	/// \brief Interface definition for netlist callbacks into calling code
 	///
 	/// A class inheriting from netlist_callbacks_t has to be passed to the netlist_t
@@ -99,7 +112,7 @@ namespace netlist
 		/// of a callbacks_t implementation to optionally provide such a collection
 		/// of symbols.
 		///
-		virtual plib::unique_ptr<plib::dynlib_base> static_solver_lib() const;
+		virtual host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const;
 	};
 
 	using log_type =  plib::plog_base<callbacks_t, NL_DEBUG>;
@@ -107,28 +120,6 @@ namespace netlist
 	//============================================================
 	//  Types needed by various includes
 	//============================================================
-
-	/// \brief The memory pool for netlist objects
-	///
-	/// \note This is not the right location yet.
-	///
-
-#if (NL_USE_MEMPOOL)
-	using nlmempool = plib::mempool_arena;
-#else
-	using nlmempool = plib::aligned_arena;
-#endif
-
-	/// \brief Owned pointer type for pooled allocations.
-	///
-	template <typename T>
-	using owned_pool_ptr = nlmempool::owned_pool_ptr<T>;
-
-	/// \brief Unique pointer type for pooled allocations.
-	///
-
-	template <typename T>
-	using unique_pool_ptr = nlmempool::unique_pool_ptr<T>;
 
 	namespace detail {
 

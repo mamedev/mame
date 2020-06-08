@@ -103,14 +103,14 @@ public:
 
 	// mingw treats string constants as char* instead of char[N]
 	template<typename C,
-		class = typename std::enable_if<std::is_same<C, const mem_t>::value>::type>
+		class = std::enable_if_t<std::is_same<C, const mem_t>::value>>
 	pstring_t(const C *string)
 	: m_str(string)
 	{
 	}
 
 	template<typename C, std::size_t N,
-		class = typename std::enable_if<std::is_same<C, const mem_t>::value>::type>
+		class = std::enable_if_t<std::is_same<C, const mem_t>::value>>
 	pstring_t(C (&string)[N]) noexcept(false)  // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 	{
 		static_assert(N > 0,"pstring from array of length 0");
@@ -136,7 +136,7 @@ public:
 	}
 
 	template <typename T,
-		class = typename std::enable_if<!std::is_same<T, pstring_t::traits_type>::value>::type>
+		class = std::enable_if_t<!std::is_same<T, pstring_t::traits_type>::value>>
 	explicit pstring_t(const pstring_t<T> &string)
 	{
 		m_str.clear();
@@ -148,7 +148,7 @@ public:
 
 
 	template <typename T,
-		class = typename std::enable_if<!std::is_same<T, pstring_t::traits_type>::value>::type>
+		class = std::enable_if_t<!std::is_same<T, pstring_t::traits_type>::value>>
 	pstring_t &operator=(const pstring_t<T> &string)
 	{
 		m_str.clear();

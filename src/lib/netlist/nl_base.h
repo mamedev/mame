@@ -186,7 +186,7 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 #define NETLIB_RESETI() virtual void reset() override
 
 #define NETLIB_SUB(chip) nld_ ## chip
-#define NETLIB_SUB_UPTR(ns, chip) unique_pool_ptr< ns :: nld_ ## chip >
+#define NETLIB_SUB_UPTR(ns, chip) device_arena::unique_ptr< ns :: nld_ ## chip >
 
 #define NETLIB_HANDLER(chip, name) void NETLIB_NAME(chip) :: name() noexcept
 #define NETLIB_UPDATE(chip) NETLIB_HANDLER(chip, update)
@@ -296,9 +296,9 @@ namespace netlist
 
 		virtual ~logic_family_desc_t() noexcept = default;
 
-		virtual unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name,
+		virtual device_arena::unique_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name,
 				const logic_output_t *proxied) const = 0;
-		virtual unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
+		virtual device_arena::unique_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
 				const logic_input_t *proxied) const = 0;
 
 		nl_fptype low_thresh_V(nl_fptype VN, nl_fptype VP) const noexcept{ return VN + (VP - VN) * m_low_thresh_PCNT; }
@@ -576,7 +576,7 @@ namespace netlist
 
 			// to ease template design
 			template<typename T, typename... Args>
-			unique_pool_ptr<T> make_pool_object(Args&&... args);
+			device_arena::unique_ptr<T> make_pool_object(Args&&... args);
 
 		private:
 			netlist_t & m_netlist;
@@ -1288,7 +1288,7 @@ namespace netlist
 		virtual void changed() noexcept;
 		pstring str() const noexcept { pstring ret = *m_param; return ret;}
 	private:
-		plib::unique_ptr<pstring> m_param;
+		host_arena::unique_ptr<pstring> m_param;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1303,12 +1303,12 @@ namespace netlist
 		class value_base_t
 		{
 		public:
-			template <typename P, typename Y=T, typename DUMMY = typename std::enable_if<plib::is_arithmetic<Y>::value>::type>
+			template <typename P, typename Y=T, typename DUMMY = std::enable_if_t<plib::is_arithmetic<Y>::value>>
 			value_base_t(P &param, const pstring &name)
 			: m_value(static_cast<T>(param.value(name)))
 			{
 			}
-			template <typename P, typename Y=T, typename std::enable_if<!plib::is_arithmetic<Y>::value, int>::type = 0>
+			template <typename P, typename Y=T, std::enable_if_t<!plib::is_arithmetic<Y>::value, int> = 0>
 			value_base_t(P &param, const pstring &name)
 			: m_value(static_cast<T>(param.value_str(name)))
 			{
@@ -1349,7 +1349,7 @@ namespace netlist
 		{
 		}
 
-		plib::unique_ptr<std::istream> stream();
+		std::unique_ptr<std::istream> stream();
 	protected:
 		void changed() noexcept override { }
 	};
@@ -1452,7 +1452,7 @@ namespace netlist
 	private:
 		bool            m_hint_deactivate;
 		state_var_s32   m_active_outputs;
-		unique_pool_ptr<stats_t> m_stats;
+		device_arena::unique_ptr<stats_t> m_stats;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1470,7 +1470,7 @@ namespace netlist
 		~base_device_t() noexcept override = default;
 
 		template<class O, class C, typename... Args>
-		void create_and_register_subdevice(O& owner, const pstring &name, unique_pool_ptr<C> &dev, Args&&... args);
+		void create_and_register_subdevice(O& owner, const pstring &name, device_arena::unique_ptr<C> &dev, Args&&... args);
 
 		void register_subalias(const pstring &name, const detail::core_terminal_t &term);
 		void register_subalias(const pstring &name, const pstring &aliased);
@@ -1574,12 +1574,12 @@ namespace netlist
 	{
 	public:
 
-		using nets_collection_type = std::vector<owned_pool_ptr<detail::net_t>>;
-		using family_collection_type = std::unordered_map<pstring, plib::unique_ptr<logic_family_desc_t>>;
+		using nets_collection_type = std::vector<device_arena::owned_ptr<detail::net_t>>;
+		using family_collection_type = std::unordered_map<pstring, host_arena::unique_ptr<logic_family_desc_t>>;
 
 		// need to preserve order of device creation ...
-		using devices_collection_type = std::vector<std::pair<pstring, owned_pool_ptr<core_device_t>>>;
-		netlist_state_t(const pstring &name, plib::unique_ptr<callbacks_t> &&callbacks);
+		using devices_collection_type = std::vector<std::pair<pstring, device_arena::owned_ptr<core_device_t>>>;
+		netlist_state_t(const pstring &name, host_arena::unique_ptr<callbacks_t> &&callbacks);
 
 		PCOPYASSIGNMOVE(netlist_state_t, delete)
 
@@ -1659,7 +1659,7 @@ namespace netlist
 		std::size_t find_net_id(const detail::net_t *net) const;
 
 		template <typename T>
-		void register_net(owned_pool_ptr<T> &&net) { m_nets.push_back(std::move(net)); }
+		void register_net(device_arena::owned_ptr<T> &&net) { m_nets.push_back(std::move(net)); }
 
 		/// \brief Get device pointer by name
 		///
@@ -1685,7 +1685,7 @@ namespace netlist
 		/// \param dev Device to be registered
 
 		template <typename T>
-		void register_device(const pstring &name, owned_pool_ptr<T> &&dev) noexcept(false)
+		void register_device(const pstring &name, device_arena::owned_ptr<T> &&dev) noexcept(false)
 		{
 			for (auto & d : m_devices)
 				if (d.first == name)
@@ -1706,9 +1706,9 @@ namespace netlist
 		/// \param dev Device to be registered
 
 		template <typename T>
-		void register_device(const pstring &name, unique_pool_ptr<T> &&dev)
+		void register_device(const pstring &name, device_arena::unique_ptr<T> &&dev)
 		{
-			register_device(name, owned_pool_ptr<T>(dev.release(), true, dev.get_deleter()));
+			register_device(name, device_arena::owned_ptr<T>(dev.release(), true, dev.get_deleter()));
 		}
 
 		/// \brief Remove device
@@ -1751,13 +1751,13 @@ namespace netlist
 		family_collection_type &family_cache() { return m_family_cache; }
 
 		template<typename T, typename... Args>
-		unique_pool_ptr<T> make_pool_object(Args&&... args)
+		device_arena::unique_ptr<T> make_pool_object(Args&&... args)
 		{
 			return m_pool.make_unique<T>(std::forward<Args>(args)...);
 		}
 		// memory pool - still needed in some places
-		nlmempool &pool() noexcept { return m_pool; }
-		const nlmempool &pool() const noexcept { return m_pool; }
+		device_arena &pool() noexcept { return m_pool; }
+		const device_arena &pool() const noexcept { return m_pool; }
 
 		/// \brief set extended validation mode.
 		///
@@ -1792,26 +1792,26 @@ namespace netlist
 
 	private:
 
-		nlmempool                           m_pool; // must be deleted last!
+		device_arena                               m_pool; // must be deleted last!
 
-		unique_pool_ptr<netlist_t>          m_netlist;
-		plib::unique_ptr<plib::dynlib_base> m_lib;
+		device_arena::unique_ptr<netlist_t>        m_netlist;
+		host_arena::unique_ptr<plib::dynlib_base>  m_lib;
 		plib::state_manager_t               m_state;
-		plib::unique_ptr<callbacks_t>       m_callbacks;
-		log_type                            m_log;
+		host_arena::unique_ptr<callbacks_t>        m_callbacks;
+		log_type                                   m_log;
 
 		// FIXME: should only be available during device construcion
-		plib::unique_ptr<setup_t>           m_setup;
+		host_arena::unique_ptr<setup_t>            m_setup;
 
-		nets_collection_type                m_nets;
+		nets_collection_type                       m_nets;
 		// sole use is to manage lifetime of net objects
-		devices_collection_type             m_devices;
+		devices_collection_type                    m_devices;
 		// sole use is to manage lifetime of family objects
-		family_collection_type              m_family_cache;
-		bool                                m_extended_validation;
+		family_collection_type                     m_family_cache;
+		bool                                       m_extended_validation;
 
 		// dummy version
-		int                                 m_dummy_version;
+		int                                        m_dummy_version;
 	};
 
 	namespace devices
@@ -2476,7 +2476,7 @@ namespace netlist
 	}
 
 	template<typename T, typename... Args>
-	inline unique_pool_ptr<T> detail::netlist_object_t::make_pool_object(Args&&... args)
+	inline device_arena::unique_ptr<T> detail::netlist_object_t::make_pool_object(Args&&... args)
 	{
 		return state().make_pool_object<T>(std::forward<Args>(args)...);
 	}
@@ -2544,7 +2544,7 @@ namespace netlist
 	}
 
 	template<class O, class C, typename... Args>
-	void base_device_t::create_and_register_subdevice(O &owner, const pstring &name, unique_pool_ptr<C> &dev, Args&&... args)
+	void base_device_t::create_and_register_subdevice(O &owner, const pstring &name, device_arena::unique_ptr<C> &dev, Args&&... args)
 	{
 		dev = state().make_pool_object<C>(owner, name, std::forward<Args>(args)...);
 	}

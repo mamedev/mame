@@ -289,7 +289,7 @@ namespace solver
 	private:
 
 		plib::aligned_vector<terms_for_net_t> m_rails_temp;
-		std::vector<unique_pool_ptr<proxied_analog_output_t>> m_inps;
+		std::vector<device_arena::unique_ptr<proxied_analog_output_t>> m_inps;
 
 		state_var<std::size_t> m_stat_calculations;
 		state_var<std::size_t> m_stat_newton_raphson;

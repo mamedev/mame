@@ -516,14 +516,14 @@ namespace plib {
 						arg = arg.substr(1, arg.length() - 2);
 						// first try local context
 						auto l(plib::util::buildpath({m_stack.back().m_local_path, arg}));
-						auto lstrm(m_sources.get_stream<>(l));
+						auto lstrm(m_sources.get_stream(l));
 						if (lstrm)
 						{
 							m_stack.emplace_back(input_context(std::move(lstrm), plib::util::path(l), l));
 						}
 						else
 						{
-							auto strm(m_sources.get_stream<>(arg));
+							auto strm(m_sources.get_stream(arg));
 							if (strm)
 							{
 								m_stack.emplace_back(input_context(std::move(strm), plib::util::path(arg), arg));

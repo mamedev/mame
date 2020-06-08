@@ -64,19 +64,19 @@ namespace plib {
 		using value_type = typename base_type::value_type;
 
 		template <int X = SIZE >
-		parray(size_type size, typename std::enable_if<(X==0), int>::type = 0)
+		parray(size_type size, std::enable_if_t<(X==0), int> = 0)
 		: m_a(size), m_size(size)
 		{
 		}
 
 		template <int X = SIZE >
-		parray(size_type size, FT val, typename std::enable_if<(X==0), int>::type = 0)
+		parray(size_type size, FT val, std::enable_if_t<(X==0), int> = 0)
 		: m_a(size, val), m_size(size)
 		{
 		}
 
 		template <int X = SIZE >
-		parray(size_type size, typename std::enable_if<(X != 0), int>::type = 0) noexcept(false)
+		parray(size_type size, std::enable_if_t<(X != 0), int> = 0) noexcept(false)
 		: m_size(size)
 		{
 			if ((SIZE < 0 && size > SIZEABS())
@@ -85,7 +85,7 @@ namespace plib {
 		}
 
 		template <int X = SIZE >
-		parray(size_type size, FT val, typename std::enable_if<(X != 0), int>::type = 0) noexcept(false)
+		parray(size_type size, FT val, std::enable_if_t<(X != 0), int> = 0) noexcept(false)
 		: m_size(size)
 		{
 			if ((SIZE < 0 && size > SIZEABS())
