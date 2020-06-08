@@ -942,6 +942,10 @@ namespace netlist
 		logic_input_t(device_t &dev, const pstring &aname,
 				nldelegate delegate = nldelegate());
 
+#if 0
+		template <class D>
+		logic_input_t(D &dev, const pstring &aname);
+#endif
 		inline netlist_sig_t operator()() const noexcept;
 
 		void inactivate() noexcept;
@@ -2196,6 +2200,17 @@ namespace netlist
 	// Any changes below will impact performance.
 	// -----------------------------------------------------------------------------
 
+	// -----------------------------------------------------------------------------
+	// logic_input_t
+	// -----------------------------------------------------------------------------
+
+#if 0
+	template <class D>
+	logic_input_t::logic_input_t(D &dev, const pstring &aname)
+			: logic_input_t(dev, aname, STATE_INP_ACTIVE, nldelegate(&D :: update, &dev))
+	{
+	}
+#endif
 	inline void logic_input_t::inactivate() noexcept
 	{
 		if (!is_state(STATE_INP_PASSIVE))
