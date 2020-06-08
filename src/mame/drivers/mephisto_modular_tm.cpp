@@ -213,7 +213,7 @@ void mmtm_state::mmtm_v(machine_config &config)
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&mmtm_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
-	subdevice<sensorboard_device>("board:board")->set_nvram(true);
+	subdevice<sensorboard_device>("board:board")->set_nvram_enable(true);
 
 	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_modular_tm);

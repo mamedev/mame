@@ -466,7 +466,7 @@ void elite_state::eas(machine_config &config)
 	m_ppi8255->tri_pc_callback().set_constant(0);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	m_board->set_nvram(true);
+	m_board->set_nvram_enable(true);
 
 	config.set_default_layout(layout_fidel_eas);
 }

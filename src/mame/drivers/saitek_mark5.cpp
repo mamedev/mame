@@ -457,7 +457,7 @@ void mark5_state::mark6(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
-	m_board->set_nvram(true);
+	m_board->set_nvram_enable(true);
 
 	PWM_DISPLAY(config, m_display[3]).set_size(8, 8);
 	m_display[3]->set_bri_levels(0.001);

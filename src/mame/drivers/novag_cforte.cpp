@@ -259,7 +259,7 @@ void cforte_state::cforte(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(200));
-	m_board->set_nvram(true);
+	m_board->set_nvram_enable(true);
 
 	/* video hardware */
 	HLCD0538(config, m_lcd).write_cols().set(FUNC(cforte_state::lcd_output_w));
