@@ -23,7 +23,7 @@ To distinguish between versions, press the Set Level button.
 - version B: default selectivity 3
 - version C: default selectivity 5
 
-Note that the H8 option doesn't appear to work with sexperta1, but when doing a
+Note that the H8 option doesn't appear to work with sexperta2, but when doing a
 hex compare with sexperta, the program differences are minor.
 
 TODO:

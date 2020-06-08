@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Andreas Naive, Tomasz Slanina, ElSemi
+// copyright-holders:Philip Bennett
 /***************************************************************************
 
     Capcom CPS-3 Sound Hardware
