@@ -57,11 +57,11 @@ public:
 	uint32_t crshrace_tile_callback( uint32_t code );
 
 	/* devices */
-	DECLARE_WRITE8_MEMBER(crshrace_sh_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(crshrace_videoram1_w);
-	DECLARE_WRITE16_MEMBER(crshrace_videoram2_w);
-	DECLARE_WRITE16_MEMBER(crshrace_roz_bank_w);
-	DECLARE_WRITE16_MEMBER(crshrace_gfxctrl_w);
+	void crshrace_sh_bankswitch_w(uint8_t data);
+	void crshrace_videoram1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void crshrace_videoram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void crshrace_roz_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void crshrace_gfxctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void init_crshrace2();
 	void init_crshrace();
 	TILE_GET_INFO_MEMBER(get_tile_info1);

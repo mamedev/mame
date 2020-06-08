@@ -842,7 +842,7 @@ void cdicdic_device::process_delayed_command()
 	}
 }
 
-READ16_MEMBER( cdicdic_device::regs_r )
+uint16_t cdicdic_device::regs_r(offs_t offset, uint16_t mem_mask)
 {
 	uint32_t addr = offset + 0x3c00/2;
 
@@ -923,7 +923,7 @@ READ16_MEMBER( cdicdic_device::regs_r )
 	}
 }
 
-WRITE16_MEMBER( cdicdic_device::regs_w )
+void cdicdic_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t addr = offset + 0x3c00/2;
 
@@ -1183,12 +1183,12 @@ void cdicdic_device::device_reset()
 	m_intreq_callback(CLEAR_LINE);
 }
 
-WRITE16_MEMBER( cdicdic_device::ram_w )
+void cdicdic_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 }
 
-READ16_MEMBER( cdicdic_device::ram_r )
+uint16_t cdicdic_device::ram_r(offs_t offset, uint16_t mem_mask)
 {
 	return m_ram[offset];
 }

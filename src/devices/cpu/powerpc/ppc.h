@@ -501,8 +501,8 @@ protected:
 	uint64_t          m_dec_zero_cycles;
 	emu_timer *     m_decrementer_int_timer;
 
-	read32_delegate  m_dcr_read_func;
-	write32_delegate m_dcr_write_func;
+	read32sm_delegate  m_dcr_read_func;
+	write32sm_delegate m_dcr_write_func;
 
 	write32sm_delegate m_dcstore_cb;
 
@@ -756,8 +756,8 @@ public:
 
 	void ppc4xx_set_dma_read_handler(int channel, read32_delegate callback, int rate);
 	void ppc4xx_set_dma_write_handler(int channel, write32sm_delegate callback, int rate);
-	void ppc4xx_set_dcr_read_handler(read32_delegate dcr_read_func);
-	void ppc4xx_set_dcr_write_handler(write32_delegate dcr_write_func);
+	void ppc4xx_set_dcr_read_handler(read32sm_delegate dcr_read_func);
+	void ppc4xx_set_dcr_write_handler(write32sm_delegate dcr_write_func);
 
 	uint8_t ppc4xx_spu_r(offs_t offset);
 	void ppc4xx_spu_w(offs_t offset, uint8_t data);

@@ -77,16 +77,16 @@ private:
 	required_device<bsmt2000_device> m_bsmt;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(eeprom_control_w);
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(sound_control_w);
-	DECLARE_WRITE8_MEMBER(bsmt_data_w);
-	DECLARE_WRITE16_MEMBER(blitter_color_w);
-	DECLARE_WRITE16_MEMBER(blitter_xparam_w);
-	DECLARE_WRITE16_MEMBER(blitter_yparam_w);
-	DECLARE_WRITE16_MEMBER(blitter_vidparam_w);
-	DECLARE_WRITE16_MEMBER(blitter_unknown_w);
-	DECLARE_READ16_MEMBER(blitter_vidparam_r);
+	void eeprom_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 sound_status_r();
+	void sound_control_w(u8 data);
+	void bsmt_data_w(offs_t offset, u8 data);
+	void blitter_color_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void blitter_xparam_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void blitter_yparam_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void blitter_vidparam_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void blitter_unknown_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 blitter_vidparam_r(offs_t offset);
 	void dcheese_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);

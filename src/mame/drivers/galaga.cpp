@@ -809,12 +809,12 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 }
 
 
-READ8_MEMBER(digdug_state::earom_read)
+uint8_t digdug_state::earom_read()
 {
 	return m_earom->data();
 }
 
-WRITE8_MEMBER(digdug_state::earom_write)
+void digdug_state::earom_write(offs_t offset, uint8_t data)
 {
 	m_earom->set_address(offset & 0x3f);
 	m_earom->set_data(data);

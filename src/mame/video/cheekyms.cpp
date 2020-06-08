@@ -40,7 +40,7 @@ void cheekyms_state::cheekyms_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(cheekyms_state::port_40_w)
+void cheekyms_state::port_40_w(uint8_t data)
 {
 	m_sound_board->music_w(BIT(data, 7));
 	m_sound_board->cheese_w(BIT(data, 6));
@@ -52,7 +52,7 @@ WRITE8_MEMBER(cheekyms_state::port_40_w)
 }
 
 
-WRITE8_MEMBER(cheekyms_state::port_80_w)
+void cheekyms_state::port_80_w(uint8_t data)
 {
 	m_sound_board->coin_extra_w(BIT(data, 1));
 	m_sound_board->mute_w(BIT(data, 0));

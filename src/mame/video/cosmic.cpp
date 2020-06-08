@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Lee Taylor
 /***************************************************************************
 
- cosmic.c
+ cosmic.cpp
 
  emulation of video hardware of cosmic machines of 1979-1980(ish)
 
@@ -12,7 +12,7 @@
 #include "includes/cosmic.h"
 
 
-WRITE8_MEMBER(cosmic_state::cosmic_color_register_w)
+void cosmic_state::cosmic_color_register_w(offs_t offset, uint8_t data)
 {
 	m_color_registers[offset] = data ? 1 : 0;
 }
@@ -205,7 +205,7 @@ void cosmic_state::nomnlnd_palette(palette_device &palette)
 }
 
 
-WRITE8_MEMBER(cosmic_state::cosmic_background_enable_w)
+void cosmic_state::cosmic_background_enable_w(uint8_t data)
 {
 	m_background_enable = data;
 }

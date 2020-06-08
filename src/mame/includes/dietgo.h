@@ -49,8 +49,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
-	DECLARE_READ16_MEMBER( dietgo_protection_region_0_104_r );
-	DECLARE_WRITE16_MEMBER( dietgo_protection_region_0_104_w );
+	uint16_t dietgo_protection_region_0_104_r(offs_t offset);
+	void dietgo_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void decrypted_opcodes_map(address_map &map);
 	void dietgo_map(address_map &map);
 	void sound_map(address_map &map);

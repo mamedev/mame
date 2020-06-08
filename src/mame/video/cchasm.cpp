@@ -109,7 +109,7 @@ void cchasm_state::refresh ()
 }
 
 
-WRITE16_MEMBER(cchasm_state::refresh_control_w)
+void cchasm_state::refresh_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{

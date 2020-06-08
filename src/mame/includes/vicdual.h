@@ -154,7 +154,7 @@ protected:
 	TIMER_CALLBACK_MEMBER( frogs_croak_callback );
 
 	/*----------- defined in audio/depthch.cpp -----------*/
-	DECLARE_WRITE8_MEMBER( depthch_audio_w );
+	void depthch_audio_w(uint8_t data);
 
 	/*----------- defined in audio/invinco.cpp -----------*/
 	DECLARE_WRITE8_MEMBER( invinco_audio_w );
@@ -281,8 +281,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(carnival_io_w);
 
 	/*----------- defined in audio/carnival.cpp -----------*/
-	DECLARE_WRITE8_MEMBER( carnival_audio_1_w );
-	DECLARE_WRITE8_MEMBER( carnival_audio_2_w );
+	void carnival_audio_1_w(uint8_t data);
+	void carnival_audio_2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( carnival_music_port_t1_r );
 	void carnivala_music_port_1_w(uint8_t data);
 	void carnivala_music_port_2_w(uint8_t data);

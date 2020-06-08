@@ -119,7 +119,7 @@ ioport_constructor cdislave_hle_device::device_input_ports() const
 	return INPUT_PORTS_NAME(cdislave_mouse);
 }
 
-READ16_MEMBER( cdislave_hle_device::slave_r )
+uint16_t cdislave_hle_device::slave_r(offs_t offset)
 {
 	if (m_channel[offset].m_out_count)
 	{
@@ -172,7 +172,7 @@ void cdislave_hle_device::set_mouse_position()
 	}
 }
 
-WRITE16_MEMBER( cdislave_hle_device::slave_w )
+void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 {
 	LOGMASKED(LOG_WRITES, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff);
 	switch (offset)

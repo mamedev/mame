@@ -22,14 +22,14 @@ Tomasz Slanina
 #include "changela.lh"
 
 
-READ8_MEMBER(changela_state::mcu_r)
+uint8_t changela_state::mcu_r()
 {
 	//osd_printf_debug("Z80 MCU  R = %x\n", m_mcu_out);
 	return m_mcu_out;
 }
 
 /* latch LS374 at U39 */
-WRITE8_MEMBER(changela_state::mcu_w)
+void changela_state::mcu_w(uint8_t data)
 {
 	m_mcu_in = data;
 	if (!BIT(m_port_c_out, 2))
@@ -62,23 +62,23 @@ void changela_state::changela_68705_port_c_w(uint8_t data)
 
 
 /* U30 */
-READ8_MEMBER(changela_state::changela_24_r)
+uint8_t changela_state::changela_24_r()
 {
 	return (BIT(m_port_c_out, 1) << 3) | 0x07;   /* bits 2,1,0-N/C inputs */
 }
 
-READ8_MEMBER(changela_state::changela_25_r)
+uint8_t changela_state::changela_25_r()
 {
 	//collisions on bits 3,2, bits 1,0-N/C inputs
 	return (m_tree1_col << 3) | (m_tree0_col << 2) | 0x03;
 }
 
-READ8_MEMBER(changela_state::changela_30_r)
+uint8_t changela_state::changela_30_r()
 {
 	return ioport("WHEEL")->read() & 0x0f;  //wheel control (clocked input) signal on bits 3,2,1,0
 }
 
-READ8_MEMBER(changela_state::changela_31_r)
+uint8_t changela_state::changela_31_r()
 {
 	/* If the new value is less than the old value, and it did not wrap around,
 	   or if the new value is greater than the old value, and it did wrap around,
@@ -98,7 +98,7 @@ READ8_MEMBER(changela_state::changela_31_r)
 	return (m_dir_31 << 3) | (m_left_bank_col << 2) | (m_right_bank_col << 1) | m_boat_shore_col;
 }
 
-READ8_MEMBER(changela_state::changela_2c_r)
+uint8_t changela_state::changela_2c_r()
 {
 	int val = ioport("IN0")->read();
 
@@ -107,9 +107,9 @@ READ8_MEMBER(changela_state::changela_2c_r)
 	return val;
 }
 
-READ8_MEMBER(changela_state::changela_2d_r)
+uint8_t changela_state::changela_2d_r()
 {
-	/* the schems are unreadable - i'm not sure it is V8 (page 74, SOUND I/O BOARD SCHEMATIC 1 OF 2, FIGURE 24 - in the middle on the right side) */
+	/* the schems are unreadable - I'm not sure it is V8 (page 74, SOUND I/O BOARD SCHEMATIC 1 OF 2, FIGURE 24 - in the middle on the right side) */
 	int v8 = 0;
 	int gas;
 

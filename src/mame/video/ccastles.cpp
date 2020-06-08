@@ -49,20 +49,20 @@ void ccastles_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(ccastles_state::ccastles_hscroll_w)
+void ccastles_state::ccastles_hscroll_w(uint8_t data)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_hscroll = data;
 }
 
 
-WRITE8_MEMBER(ccastles_state::ccastles_vscroll_w)
+void ccastles_state::ccastles_vscroll_w(uint8_t data)
 {
 	m_vscroll = data;
 }
 
 
-WRITE8_MEMBER(ccastles_state::ccastles_video_control_w)
+void ccastles_state::ccastles_video_control_w(offs_t offset, uint8_t data)
 {
 	/* only D3 matters */
 	m_outlatch[1]->write_bit(offset, BIT(data, 3));
@@ -76,7 +76,7 @@ WRITE8_MEMBER(ccastles_state::ccastles_video_control_w)
  *
  *************************************/
 
-WRITE8_MEMBER(ccastles_state::ccastles_paletteram_w)
+void ccastles_state::ccastles_paletteram_w(offs_t offset, uint8_t data)
 {
 	int bit0, bit1, bit2;
 	int r, g, b;
@@ -191,7 +191,7 @@ inline void ccastles_state::bitmode_autoinc(  )
  *
  *************************************/
 
-WRITE8_MEMBER(ccastles_state::ccastles_videoram_w)
+void ccastles_state::ccastles_videoram_w(offs_t offset, uint8_t data)
 {
 	/* direct writes to VRAM go through the write protect PROM as well */
 	ccastles_write_vram(offset, data, 0, 0);
@@ -205,7 +205,7 @@ WRITE8_MEMBER(ccastles_state::ccastles_videoram_w)
  *
  *************************************/
 
-READ8_MEMBER(ccastles_state::ccastles_bitmode_r)
+uint8_t ccastles_state::ccastles_bitmode_r()
 {
 	/* in bitmode, the address comes from the autoincrement latches */
 	uint16_t addr = (m_bitmode_addr[1] << 7) | (m_bitmode_addr[0] >> 1);
@@ -221,7 +221,7 @@ READ8_MEMBER(ccastles_state::ccastles_bitmode_r)
 }
 
 
-WRITE8_MEMBER(ccastles_state::ccastles_bitmode_w)
+void ccastles_state::ccastles_bitmode_w(uint8_t data)
 {
 	/* in bitmode, the address comes from the autoincrement latches */
 	uint16_t addr = (m_bitmode_addr[1] << 7) | (m_bitmode_addr[0] >> 1);
@@ -237,7 +237,7 @@ WRITE8_MEMBER(ccastles_state::ccastles_bitmode_w)
 }
 
 
-WRITE8_MEMBER(ccastles_state::ccastles_bitmode_addr_w)
+void ccastles_state::ccastles_bitmode_addr_w(offs_t offset, uint8_t data)
 {
 	/* write through to video RAM and also to the addressing latches */
 	ccastles_write_vram(offset, data, 0, 0);

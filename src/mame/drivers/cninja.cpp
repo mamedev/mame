@@ -56,14 +56,14 @@ Note about version levels using Mutant Fighter as the example:
 /**********************************************************************************/
 
 template<int Chip>
-WRITE16_MEMBER(cninja_state::cninja_pf_control_w)
+void cninja_state::cninja_pf_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_deco_tilegen[Chip]->pf_control_w(offset, data, mem_mask);
 }
 
 
-READ16_MEMBER( cninja_state::cninja_protection_region_0_104_r )
+uint16_t cninja_state::cninja_protection_region_0_104_r(offs_t offset)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -72,7 +72,7 @@ READ16_MEMBER( cninja_state::cninja_protection_region_0_104_r )
 	return data;
 }
 
-WRITE16_MEMBER( cninja_state::cninja_protection_region_0_104_w )
+void cninja_state::cninja_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -80,7 +80,7 @@ WRITE16_MEMBER( cninja_state::cninja_protection_region_0_104_w )
 	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
 }
 
-READ16_MEMBER(cninja_state::cninjabl2_sprite_dma_r)
+uint16_t cninja_state::cninjabl2_sprite_dma_r()
 {
 	m_spriteram[0]->copy();
 	return 0;
@@ -145,7 +145,7 @@ void cninja_state::cninjabl_map(address_map &map)
 	map(0x1b4000, 0x1b4001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* DMA flag */
 }
 
-READ16_MEMBER( cninja_state::edrandy_protection_region_8_146_r )
+uint16_t cninja_state::edrandy_protection_region_8_146_r(offs_t offset)
 {
 	int real_address = 0x1a0000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -154,7 +154,7 @@ READ16_MEMBER( cninja_state::edrandy_protection_region_8_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( cninja_state::edrandy_protection_region_8_146_w )
+void cninja_state::edrandy_protection_region_8_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0x1a0000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -162,7 +162,7 @@ WRITE16_MEMBER( cninja_state::edrandy_protection_region_8_146_w )
 	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
 }
 
-READ16_MEMBER( cninja_state::edrandy_protection_region_6_146_r )
+uint16_t cninja_state::edrandy_protection_region_6_146_r(offs_t offset)
 {
 //  uint16_t realdat = deco16_60_prot_r(space,offset&0x3ff,mem_mask);
 
@@ -178,7 +178,7 @@ READ16_MEMBER( cninja_state::edrandy_protection_region_6_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( cninja_state::edrandy_protection_region_6_146_w )
+void cninja_state::edrandy_protection_region_6_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  deco16_60_prot_w(space,offset&0x3ff,data,mem_mask);
 
@@ -218,7 +218,7 @@ void cninja_state::edrandy_map(address_map &map)
 	map(0x1bc800, 0x1bcfff).nopw(); /* Another bug in game code?  Sprite list can overrun.  Doesn't seem to mirror */
 }
 
-WRITE16_MEMBER(cninja_state::robocop2_priority_w)
+void cninja_state::robocop2_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_priority);
 }
@@ -254,7 +254,7 @@ void cninja_state::robocop2_map(address_map &map)
 }
 
 
-READ16_MEMBER( cninja_state::mutantf_protection_region_0_146_r )
+uint16_t cninja_state::mutantf_protection_region_0_146_r(offs_t offset)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -263,7 +263,7 @@ READ16_MEMBER( cninja_state::mutantf_protection_region_0_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( cninja_state::mutantf_protection_region_0_146_w )
+void cninja_state::mutantf_protection_region_0_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -271,7 +271,7 @@ WRITE16_MEMBER( cninja_state::mutantf_protection_region_0_146_w )
 	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
 }
 
-READ16_MEMBER( cninja_state::mutantf_71_r )
+uint16_t cninja_state::mutantf_71_r()
 {
 	return 0xffff; // todo
 }
@@ -2170,7 +2170,7 @@ ROM_END
 void cninja_state::init_cninjabl2()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x180000, 0x18ffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b4000, 0x1b4001, read16_delegate(*this, FUNC(cninja_state::cninjabl2_sprite_dma_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b4000, 0x1b4001, read16smo_delegate(*this, FUNC(cninja_state::cninjabl2_sprite_dma_r)));
 
 	m_okibank->configure_entries(0, 8, memregion("oki2")->base(), 0x10000);
 }

@@ -222,22 +222,22 @@ TODO:
 
 /**********************************************************************************/
 
-WRITE16_MEMBER(dassault_state::priority_w)
+void dassault_state::priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_priority);
 }
 
-WRITE16_MEMBER(dassault_state::main_irq_ack_w)
+void dassault_state::main_irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(dassault_state::sub_irq_ack_w)
+void dassault_state::sub_irq_ack_w(uint16_t data)
 {
 	m_subcpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 }
 
-READ16_MEMBER(dassault_state::dassault_control_r)
+uint16_t dassault_state::dassault_control_r(offs_t offset)
 {
 	switch (offset << 1)
 	{
@@ -260,14 +260,14 @@ READ16_MEMBER(dassault_state::dassault_control_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(dassault_state::dassault_control_w)
+void dassault_state::dassault_control_w(uint16_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	if (data & 0xfffe)
 		logerror("Coin cointrol %04x\n", data);
 }
 
-READ16_MEMBER(dassault_state::dassault_sub_control_r)
+uint16_t dassault_state::dassault_sub_control_r()
 {
 	return ioport("VBLANK1")->read();
 }

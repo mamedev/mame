@@ -77,27 +77,27 @@
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( coleco_state::paddle_1_r )
+uint8_t coleco_state::paddle_1_r()
 {
 	return m_joy_d7_state[0] | coleco_paddle_read(0, m_joy_mode, m_joy_analog_state[0]);
 }
 
-READ8_MEMBER( coleco_state::paddle_2_r )
+uint8_t coleco_state::paddle_2_r()
 {
 	return m_joy_d7_state[1] | coleco_paddle_read(1, m_joy_mode, m_joy_analog_state[1]);
 }
 
-WRITE8_MEMBER( coleco_state::paddle_off_w )
+void coleco_state::paddle_off_w(uint8_t data)
 {
 	m_joy_mode = 0;
 }
 
-WRITE8_MEMBER( coleco_state::paddle_on_w )
+void coleco_state::paddle_on_w(uint8_t data)
 {
 	m_joy_mode = 1;
 }
 
-READ8_MEMBER( bit90_state::bankswitch_u4_r )
+uint8_t bit90_state::bankswitch_u4_r(address_space &space)
 {
 	if (!machine().side_effects_disabled()) {
 		LOG("Bankswitch to u4\n");
@@ -106,7 +106,7 @@ READ8_MEMBER( bit90_state::bankswitch_u4_r )
 	return space.unmap();
 }
 
-READ8_MEMBER( bit90_state::bankswitch_u3_r )
+uint8_t bit90_state::bankswitch_u3_r(address_space &space)
 {
 	if (!machine().side_effects_disabled()) {
 		LOG("Bankswitch to u3\n");
@@ -115,7 +115,7 @@ READ8_MEMBER( bit90_state::bankswitch_u3_r )
 	return space.unmap();
 }
 
-READ8_MEMBER( bit90_state::keyboard_r )
+uint8_t bit90_state::keyboard_r(address_space &space)
 {
 	if (m_keyselect < 8) {
 		return m_io_keyboard[m_keyselect]->read();
@@ -123,7 +123,7 @@ READ8_MEMBER( bit90_state::keyboard_r )
 	return space.unmap();
 }
 
-WRITE8_MEMBER( bit90_state::u32_w )
+void bit90_state::u32_w(uint8_t data)
 {
 	// Write to a 74LS174 at u32
 	// Bits 4-7 are connected for keyboard scanning (actually only 4-6 are used)
@@ -392,7 +392,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
 	}
 }
 
-READ8_MEMBER( coleco_state::cart_r )
+uint8_t coleco_state::cart_r(offs_t offset)
 {
 	return m_cart->bd_r(offset & 0x7fff, 0, 0, 0, 0, 0);
 }
@@ -505,7 +505,7 @@ void coleco_state::machine_start()
 	}
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8_delegate(*this, FUNC(coleco_state::cart_r)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8sm_delegate(*this, FUNC(coleco_state::cart_r)));
 
 	save_item(NAME(m_joy_mode));
 	save_item(NAME(m_last_nmi_state));

@@ -308,7 +308,7 @@ READ8_MEMBER(vicdual_state::depthch_io_r)
 WRITE8_MEMBER(vicdual_state::depthch_io_w)
 {
 	if (offset & 0x01)  assert_coin_status();
-	if (offset & 0x04)  depthch_audio_w(space, 0, data);
+	if (offset & 0x04)  depthch_audio_w(data);
 }
 
 
@@ -1159,8 +1159,8 @@ WRITE8_MEMBER(vicdual_state::spacetrk_io_w)
 
 WRITE8_MEMBER(carnival_state::carnival_io_w)
 {
-	if (offset & 0x01)  carnival_audio_1_w(space, 0, data);
-	if (offset & 0x02)  carnival_audio_2_w(space, 0, data);
+	if (offset & 0x01)  carnival_audio_1_w(data);
+	if (offset & 0x02)  carnival_audio_2_w(data);
 	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  palette_bank_w(space, 0, data);
 }

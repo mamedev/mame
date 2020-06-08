@@ -356,13 +356,13 @@ uint8_t quizard_state::mcu_rx()
 *     DVC cartridge      *
 *************************/
 
-READ16_MEMBER( cdi_state::dvc_r )
+uint16_t cdi_state::dvc_r(offs_t offset, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_DVC, "%s: dvc_r: %08x = 0000 & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), mem_mask);
 	return 0;
 }
 
-WRITE16_MEMBER( cdi_state::dvc_w )
+void cdi_state::dvc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_DVC, "%s: dvc_w: %08x = %04x & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), data, mem_mask);
 }

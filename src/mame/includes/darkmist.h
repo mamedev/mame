@@ -60,8 +60,8 @@ private:
 	tilemap_t *m_fgtilemap;
 	tilemap_t *m_txtilemap;
 
-	DECLARE_WRITE8_MEMBER(hw_w);
-	DECLARE_WRITE8_MEMBER(tx_vram_w);
+	void hw_w(uint8_t data);
+	void tx_vram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bgtile_info);
 	TILE_GET_INFO_MEMBER(get_fgtile_info);

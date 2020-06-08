@@ -169,7 +169,7 @@ WRITE_LINE_MEMBER(concept_state::via_irq_func)
 	concept_set_interrupt(TIMINT_level, state);
 }
 
-READ8_MEMBER(concept_state::io_r)
+uint8_t concept_state::io_r(offs_t offset)
 {
 	switch ((offset >> 8) & 7)
 	{
@@ -277,7 +277,7 @@ READ8_MEMBER(concept_state::io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(concept_state::io_w)
+void concept_state::io_w(offs_t offset, uint8_t data)
 {
 	switch ((offset >> 8) & 7)
 	{

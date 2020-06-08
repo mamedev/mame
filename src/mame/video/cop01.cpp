@@ -115,19 +115,19 @@ void cop01_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(cop01_state::cop01_background_w)
+void cop01_state::cop01_background_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(cop01_state::cop01_foreground_w)
+void cop01_state::cop01_foreground_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(cop01_state::cop01_vreg_w)
+void cop01_state::cop01_vreg_w(offs_t offset, uint8_t data)
 {
 	/*  0x40: --xx---- sprite bank, coin counters, flip screen
 	 *        -----x-- flip screen

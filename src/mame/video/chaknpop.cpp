@@ -66,12 +66,12 @@ void chaknpop_state::tx_tilemap_mark_all_dirty()
 	m_tx_tilemap->set_flip(m_flip_x | m_flip_y);
 }
 
-READ8_MEMBER(chaknpop_state::gfxmode_r)
+uint8_t chaknpop_state::gfxmode_r()
 {
 	return m_gfxmode;
 }
 
-WRITE8_MEMBER(chaknpop_state::gfxmode_w)
+void chaknpop_state::gfxmode_w(uint8_t data)
 {
 	if (m_gfxmode != data)
 	{
@@ -97,13 +97,13 @@ WRITE8_MEMBER(chaknpop_state::gfxmode_w)
 	}
 }
 
-WRITE8_MEMBER(chaknpop_state::txram_w)
+void chaknpop_state::txram_w(offs_t offset, uint8_t data)
 {
 	m_tx_ram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(chaknpop_state::attrram_w)
+void chaknpop_state::attrram_w(offs_t offset, uint8_t data)
 {
 	if (m_attr_ram[offset] != data)
 	{

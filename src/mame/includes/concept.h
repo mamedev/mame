@@ -57,8 +57,8 @@ private:
 	uint8_t m_pending_interrupts;
 	bool m_clock_enable;
 	uint8_t m_clock_address;
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

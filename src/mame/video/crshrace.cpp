@@ -56,19 +56,19 @@ void crshrace_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(crshrace_state::crshrace_videoram1_w)
+void crshrace_state::crshrace_videoram1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_tilemap1->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(crshrace_state::crshrace_videoram2_w)
+void crshrace_state::crshrace_videoram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_tilemap2->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(crshrace_state::crshrace_roz_bank_w)
+void crshrace_state::crshrace_roz_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -81,7 +81,7 @@ WRITE16_MEMBER(crshrace_state::crshrace_roz_bank_w)
 }
 
 
-WRITE16_MEMBER(crshrace_state::crshrace_gfxctrl_w)
+void crshrace_state::crshrace_gfxctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

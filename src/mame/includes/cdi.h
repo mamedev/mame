@@ -61,8 +61,8 @@ private:
 	void cdimono2_mem(address_map &map);
 	void cdi070_cpuspace(address_map &map);
 
-	DECLARE_READ16_MEMBER(dvc_r);
-	DECLARE_WRITE16_MEMBER(dvc_w);
+	uint16_t dvc_r(offs_t offset, uint16_t mem_mask = ~0);
+	void dvc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	required_shared_ptr<uint16_t> m_planea;
 	optional_device<cdislave_hle_device> m_slave_hle;

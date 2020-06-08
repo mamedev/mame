@@ -1924,7 +1924,7 @@ void ppc_device::ppccom_execute_mfdcr()
 		else
 			m_core->param1 = 0;
 	} else {
-		m_core->param1 = m_dcr_read_func(*m_program,m_core->param0,0xffffffff);
+		m_core->param1 = m_dcr_read_func(m_core->param0);
 	}
 }
 
@@ -2014,7 +2014,7 @@ void ppc_device::ppccom_execute_mtdcr()
 		if (m_core->param0 < ARRAY_LENGTH(m_dcr))
 			m_dcr[m_core->param0] = m_core->param1;
 	} else {
-		m_dcr_write_func(*m_program,m_core->param0,m_core->param1,0xffffffff);
+		m_dcr_write_func(m_core->param0,m_core->param1);
 	}
 }
 
@@ -2903,7 +2903,7 @@ void ppc4xx_device::ppc4xx_set_dma_write_handler(int channel, write32sm_delegate
     ppc4xx_set_dcr_read_handler
 -------------------------------------------------*/
 
-void ppc4xx_device::ppc4xx_set_dcr_read_handler(read32_delegate dcr_read_func)
+void ppc4xx_device::ppc4xx_set_dcr_read_handler(read32sm_delegate dcr_read_func)
 {
 	m_dcr_read_func = dcr_read_func;
 
@@ -2913,7 +2913,7 @@ void ppc4xx_device::ppc4xx_set_dcr_read_handler(read32_delegate dcr_read_func)
     ppc4xx_set_dcr_write_handler
 -------------------------------------------------*/
 
-void ppc4xx_device::ppc4xx_set_dcr_write_handler(write32_delegate dcr_write_func)
+void ppc4xx_device::ppc4xx_set_dcr_write_handler(write32sm_delegate dcr_write_func)
 {
 	m_dcr_write_func = dcr_write_func;
 }

@@ -58,7 +58,7 @@ void dcheese_state::update_irq_state()
 }
 
 
-uint8_t dcheese_state::iack_r(offs_t offset)
+u8 dcheese_state::iack_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -111,7 +111,7 @@ void dcheese_state::machine_start()
  *
  *************************************/
 
-WRITE16_MEMBER(dcheese_state::eeprom_control_w)
+void dcheese_state::eeprom_control_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/* toggles bit $0100 very frequently while waiting for things */
 	/* bits $0080-$0010 are probably lamps */
@@ -129,14 +129,14 @@ WRITE16_MEMBER(dcheese_state::eeprom_control_w)
  *
  *************************************/
 
-READ8_MEMBER(dcheese_state::sound_status_r)
+u8 dcheese_state::sound_status_r()
 {
 	/* seems to be ready signal on BSMT or latching hardware */
 	return m_bsmt->read_status() << 7;
 }
 
 
-WRITE8_MEMBER(dcheese_state::sound_control_w)
+void dcheese_state::sound_control_w(u8 data)
 {
 	u8 const diff = data ^ m_sound_control;
 	m_sound_control = data;
@@ -150,7 +150,7 @@ WRITE8_MEMBER(dcheese_state::sound_control_w)
 }
 
 
-WRITE8_MEMBER(dcheese_state::bsmt_data_w)
+void dcheese_state::bsmt_data_w(offs_t offset, u8 data)
 {
 	/* writes come in pairs; even bytes latch, odd bytes write */
 	if ((offset & 1) == 0)

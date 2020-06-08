@@ -45,10 +45,10 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank m_rombank;
 
-	DECLARE_WRITE8_MEMBER(crimfght_coin_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(k052109_051960_r);
-	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	void crimfght_coin_w(uint8_t data);
+	void sound_w(uint8_t data);
+	uint8_t k052109_051960_r(offs_t offset);
+	void k052109_051960_w(offs_t offset, uint8_t data);
 	IRQ_CALLBACK_MEMBER(audiocpu_irq_ack);
 	void ym2151_ct_w(uint8_t data);
 	virtual void machine_start() override;

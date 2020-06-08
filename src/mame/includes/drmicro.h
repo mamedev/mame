@@ -42,9 +42,9 @@ private:
 
 	/* devices */
 	required_device<msm5205_device> m_msm;
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(pcm_set_w);
-	DECLARE_WRITE8_MEMBER(drmicro_videoram_w);
+	void nmi_enable_w(uint8_t data);
+	void pcm_set_w(uint8_t data);
+	void drmicro_videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	virtual void machine_start() override;

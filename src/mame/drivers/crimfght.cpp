@@ -23,13 +23,13 @@
 #include "speaker.h"
 
 
-WRITE8_MEMBER(crimfght_state::crimfght_coin_w)
+void crimfght_state::crimfght_coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-READ8_MEMBER(crimfght_state::k052109_051960_r)
+uint8_t crimfght_state::k052109_051960_r(offs_t offset)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
@@ -44,7 +44,7 @@ READ8_MEMBER(crimfght_state::k052109_051960_r)
 		return m_k052109->read(offset);
 }
 
-WRITE8_MEMBER(crimfght_state::k052109_051960_w)
+void crimfght_state::k052109_051960_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
 		m_k051960->k051937_w(offset - 0x3800, data);
@@ -54,7 +54,7 @@ WRITE8_MEMBER(crimfght_state::k052109_051960_w)
 		m_k051960->k051960_w(offset - 0x3c00, data);
 }
 
-WRITE8_MEMBER(crimfght_state::sound_w)
+void crimfght_state::sound_w(uint8_t data)
 {
 	// writing the latch asserts the irq line
 	m_soundlatch->write(data);

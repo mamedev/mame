@@ -125,7 +125,7 @@ Notes:
 
 ***************************************************************************/
 
-READ8_MEMBER(chaknpop_state::mcu_status_r)
+uint8_t chaknpop_state::mcu_status_r()
 {
 	// bit 0 = when 1, MCU is ready to receive data from main CPU
 	// bit 1 = when 1, MCU has sent data to the main CPU
@@ -149,7 +149,7 @@ void chaknpop_state::unknown_port_3_w(uint8_t data)
 	//logerror("%s: write to unknown port 3: 0x%02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(chaknpop_state::coinlock_w)
+void chaknpop_state::coinlock_w(uint8_t data)
 {
 	logerror("%04x: coin lock %sable\n", m_maincpu->pc(), data ? "dis" : "en");
 }

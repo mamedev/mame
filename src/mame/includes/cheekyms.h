@@ -41,8 +41,8 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(port_40_w);
-	DECLARE_WRITE8_MEMBER(port_80_w);
+	void port_40_w(uint8_t data);
+	void port_80_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 

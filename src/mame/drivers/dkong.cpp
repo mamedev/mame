@@ -607,12 +607,12 @@ void dkong_state::p8257_ctl_w(uint8_t data)
  *
  *************************************/
 
-WRITE8_MEMBER(dkong_state::dkong3_coin_counter_w)
+void dkong_state::dkong3_coin_counter_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
-WRITE8_MEMBER(dkong_state::p8257_drq_w)
+void dkong_state::p8257_drq_w(uint8_t data)
 {
 	m_dma8257->dreq0_w(data & 0x01);
 	m_dma8257->dreq1_w(data & 0x01);
@@ -620,7 +620,7 @@ WRITE8_MEMBER(dkong_state::p8257_drq_w)
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100)); // smooth things out a bit
 }
 
-READ8_MEMBER(dkong_state::dkong_in2_r)
+uint8_t dkong_state::dkong_in2_r(offs_t offset)
 {
 	// 2 board DK and all DKjr has a watchdog
 	if (m_watchdog)
@@ -634,7 +634,7 @@ READ8_MEMBER(dkong_state::dkong_in2_r)
 }
 
 
-READ8_MEMBER(dkong_state::epos_decrypt_rom)
+uint8_t dkong_state::epos_decrypt_rom(offs_t offset)
 {
 	if (offset & 0x01)
 	{
@@ -662,7 +662,7 @@ READ8_MEMBER(dkong_state::epos_decrypt_rom)
 }
 
 
-WRITE8_MEMBER(dkong_state::s2650_data_w)
+void dkong_state::s2650_data_w(uint8_t data)
 {
 #if DEBUG_PROTECTION
 	logerror("write : pc = %04x, loopback = %02x\n",m_maincpu->pc(), data);
@@ -683,7 +683,7 @@ WRITE_LINE_MEMBER(dkong_state::s2650_fo_w)
 		m_hunchloopback = 0xfb;
 }
 
-READ8_MEMBER(dkong_state::s2650_port0_r)
+uint8_t dkong_state::s2650_port0_r()
 {
 #if DEBUG_PROTECTION
 	logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",m_maincpu->pc(), m_hunchloopback, m_main_fo);
@@ -707,7 +707,7 @@ READ8_MEMBER(dkong_state::s2650_port0_r)
 }
 
 
-READ8_MEMBER(dkong_state::s2650_port1_r)
+uint8_t dkong_state::s2650_port1_r()
 {
 #if DEBUG_PROTECTION
 	logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",m_maincpu->pc(), m_hunchloopback, m_main_fo);
@@ -728,7 +728,7 @@ READ8_MEMBER(dkong_state::s2650_port1_r)
 }
 
 
-WRITE8_MEMBER(dkong_state::dkong3_2a03_reset_w)
+void dkong_state::dkong3_2a03_reset_w(uint8_t data)
 {
 	if (data & 1)
 	{
@@ -742,7 +742,7 @@ WRITE8_MEMBER(dkong_state::dkong3_2a03_reset_w)
 	}
 }
 
-READ8_MEMBER(dkong_state::strtheat_inputport_0_r)
+uint8_t dkong_state::strtheat_inputport_0_r()
 {
 	if(ioport("DSW0")->read() & 0x40)
 	{
@@ -757,7 +757,7 @@ READ8_MEMBER(dkong_state::strtheat_inputport_0_r)
 }
 
 
-READ8_MEMBER(dkong_state::strtheat_inputport_1_r)
+uint8_t dkong_state::strtheat_inputport_1_r()
 {
 	if(ioport("DSW0")->read() & 0x40)
 	{
@@ -771,12 +771,12 @@ READ8_MEMBER(dkong_state::strtheat_inputport_1_r)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::dkong_z80dma_rdy_w)
+void dkong_state::dkong_z80dma_rdy_w(uint8_t data)
 {
 	m_z80dma->rdy_w(data & 0x01);
 }
 
-WRITE8_MEMBER(dkong_state::nmi_mask_w)
+void dkong_state::nmi_mask_w(uint8_t data)
 {
 	m_nmi_mask = data & 1;
 	if (!m_nmi_mask)
@@ -1612,7 +1612,7 @@ GFXDECODE_END
  *
  *************************************/
 
-READ8_MEMBER(dkong_state::braze_eeprom_r)
+uint8_t dkong_state::braze_eeprom_r()
 {
 	return m_eeprom->do_read();
 }
@@ -1623,12 +1623,12 @@ WRITE_LINE_MEMBER(dkong_state::dk_braze_a15)
 	membank("bank2")->set_entry(state & 0x01);
 }
 
-WRITE8_MEMBER(dkong_state::dk_braze_a15_w)
+void dkong_state::dk_braze_a15_w(uint8_t data)
 {
 	dk_braze_a15(data);
 }
 
-WRITE8_MEMBER(dkong_state::braze_eeprom_w)
+void dkong_state::braze_eeprom_w(uint8_t data)
 {
 	m_eeprom->di_write(data & 0x01);
 	m_eeprom->cs_write(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
@@ -3609,8 +3609,8 @@ void dkong_state::init_strtheat()
 	drakton_decrypt_rom(0x88, 0x1c000, bs[3]);
 
 	/* custom handlers supporting Joystick or Steering Wheel */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8_delegate(*this, FUNC(dkong_state::strtheat_inputport_0_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8_delegate(*this, FUNC(dkong_state::strtheat_inputport_1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8smo_delegate(*this, FUNC(dkong_state::strtheat_inputport_0_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8smo_delegate(*this, FUNC(dkong_state::strtheat_inputport_1_r)));
 }
 
 void dkong_state::dk_braze_decrypt()
@@ -3633,8 +3633,8 @@ void dkong_state::init_dkonghs()
 	dk_braze_decrypt();
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
-	space.install_write_handler(0xc000, 0xc000, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
+	space.install_read_handler(0xc000, 0xc000, read8smo_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc000, 0xc000, write8smo_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkongx()
@@ -3642,10 +3642,10 @@ void dkong_state::init_dkongx()
 	dk_braze_decrypt();
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0xe000, 0xe000, write8_delegate(*this, FUNC(dkong_state::dk_braze_a15_w)));
+	space.install_write_handler(0xe000, 0xe000, write8smo_delegate(*this, FUNC(dkong_state::dk_braze_a15_w)));
 
-	space.install_read_handler(0xc800, 0xc800, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
-	space.install_write_handler(0xc800, 0xc800, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
+	space.install_read_handler(0xc800, 0xc800, read8smo_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc800, 0xc800, write8smo_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkong3hs()
@@ -3658,8 +3658,8 @@ void dkong_state::init_dkong3hs()
 	m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0xffff, m_decrypted.get() + 0x8000);
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
-	space.install_write_handler(0xc000, 0xc000, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
+	space.install_read_handler(0xc000, 0xc000, read8smo_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc000, 0xc000, write8smo_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkingjr()
