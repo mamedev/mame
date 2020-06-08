@@ -39,12 +39,15 @@ public:
 	{ }
 
 	void kchamp(machine_config &config);
+	void kchamp_arfyc(machine_config &config);
 	void kchampvs(machine_config &config);
 
 	void init_kchampvs();
 	void init_kchampvs2();
 
 private:
+	void kchamp_common(machine_config &config);
+
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
