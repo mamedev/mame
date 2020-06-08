@@ -410,8 +410,9 @@ void mmodular_state::alm16(machine_config &config)
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&mmodular_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
 	MEPHISTO_SENSORS_BOARD(config, m_board);
-	m_board->subdevice<sensorboard_device>("board")->set_spawnpoints(12+2); // 2 jokers
-	m_board->subdevice<sensorboard_device>("board")->spawn_cb().set(FUNC(mmodular_state::spawn_cb));
+	subdevice<sensorboard_device>("board:board")->set_spawnpoints(12+2); // 2 jokers
+	subdevice<sensorboard_device>("board:board")->spawn_cb().set(FUNC(mmodular_state::spawn_cb));
+	subdevice<sensorboard_device>("board:board")->set_nvram(true);
 
 	TIMER(config, "bav_busy").configure_generic(nullptr);
 

@@ -233,6 +233,7 @@ void tasc_state::tasc(machine_config &config)
 	m_lcd->set_fs(1); // font size 6x8
 
 	TASC_SB30(config, m_smartboard);
+	subdevice<sensorboard_device>("smartboard:board")->set_nvram(true);
 
 	config.set_default_layout(layout_tascr30);
 

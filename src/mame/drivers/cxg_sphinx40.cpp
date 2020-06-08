@@ -292,6 +292,7 @@ void sphinx40_state::sphinx40(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_nvram(true);
 
 	/* video hardware */
 	HD61603(config, m_lcd, 0);

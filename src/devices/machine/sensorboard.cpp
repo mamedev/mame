@@ -79,6 +79,7 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 	m_custom_spawn_cb(*this),
 	m_custom_output_cb(*this)
 {
+	m_nvram_on = false;
 	m_nosensors = false;
 	m_magnets = false;
 	m_inductive = false;
@@ -202,8 +203,13 @@ void sensorboard_device::device_reset()
 {
 	cancel_sensor();
 	cancel_hand();
-	undo_reset();
 
+	if (!m_nvram_on)
+	{
+		clear_board();
+		m_custom_init_cb(0);
+	}
+	undo_reset();
 	refresh();
 }
 
