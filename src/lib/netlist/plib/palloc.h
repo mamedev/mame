@@ -288,8 +288,16 @@ namespace plib {
 	//  Memory allocation
 	//============================================================
 
-	template <typename P, bool HSD, bool HSA>
-	struct arena_base
+	// MSVC has an issue with SFINAE and overloading resolution.
+	// A discussion can be found here:
+	//
+	// https://stackoverflow.com/questions/31062892/overloading-on-static-in-conjunction-with-sfinae
+	//
+	// The previous code compiled with gcc and clang on all platforms and
+	// compilers apart from MSVC.
+
+	template <typename P, bool HSD>
+	struct arena_core
 	{
 		static constexpr const bool has_static_deallocator = HSD;
 		using size_type = std::size_t;
@@ -297,6 +305,46 @@ namespace plib {
 		template <class T, size_type ALIGN = alignof(T)>
 		using allocator_type = arena_allocator<P, T, ALIGN>;
 
+		static inline P &instance() noexcept
+		{
+			static P s_arena;
+			return s_arena;
+		}
+
+		size_type cur_alloc() const noexcept { return m_stat_cur_alloc(); } // NOLINT(readability-convert-member-functions-to-static)
+		size_type max_alloc() const noexcept { return m_stat_max_alloc(); } // NOLINT(readability-convert-member-functions-to-static)
+	protected:
+		static size_t &m_stat_cur_alloc() noexcept { static size_t val = 0; return val; }
+		static size_t &m_stat_max_alloc() noexcept { static size_t val = 0; return val; }
+
+	};
+
+	template <typename P, bool HSD>
+	struct arena_hsd : public arena_core<P, HSD>
+	{
+		template<typename T>
+		inline void free(T *ptr) noexcept
+		{
+			ptr->~T();
+			static_cast<P *>(this)->deallocate(ptr, sizeof(T));
+		}
+	};
+
+	template <typename P>
+	struct arena_hsd<P, true> : public arena_core<P, true>
+	{
+		template<typename T>
+		static inline void free(T *ptr) noexcept
+		{
+			ptr->~T();
+			P::deallocate(ptr, sizeof(T));
+		}
+	};
+
+
+	template <typename P, bool HSD, bool HSA>
+	struct arena_base : public arena_hsd<P, HSD>
+	{
 		template <class T>
 		using deleter_type = arena_deleter<P, T>;
 
@@ -306,33 +354,8 @@ namespace plib {
 		template <typename T>
 		using owned_ptr = plib::owned_ptr<T, deleter_type<T>>;
 
-		static inline P &instance() noexcept
-		{
-			static P s_arena;
-			return s_arena;
-		}
-
 		template<typename T, typename... Args>
-		static inline std::enable_if_t<HSA, unique_ptr<T>>
-		make_unique(Args&&... args)
-		{
-			auto *mem = P::allocate(alignof(T), sizeof(T));
-			try
-			{
-				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-				auto *mema = new (mem) T(std::forward<Args>(args)...);
-				return unique_ptr<T>(mema, deleter_type<T>());
-			}
-			catch (...)
-			{
-				P::deallocate(mem, sizeof(T));
-				throw;
-			}
-		}
-
-		template<typename T, typename... Args>
-		inline std::enable_if_t<!HSA, unique_ptr<T>>
-		make_unique(Args&&... args)
+		inline unique_ptr<T> make_unique(Args&&... args)
 		{
 			auto *mem = static_cast<P *>(this)->allocate(alignof(T), sizeof(T));
 			try
@@ -349,26 +372,7 @@ namespace plib {
 		}
 
 		template<typename T, typename... Args>
-		static inline std::enable_if_t<HSA, owned_ptr<T>>
-		make_owned(Args&&... args)
-		{
-			auto *mem = P::allocate(alignof(T), sizeof(T));
-			try
-			{
-				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-				auto *mema = new (mem) T(std::forward<Args>(args)...);
-				return owned_ptr<T>(mema, true, deleter_type<T>());
-			}
-			catch (...)
-			{
-				P::deallocate(mem, sizeof(T));
-				throw;
-			}
-		}
-
-		template<typename T, typename... Args>
-		inline std::enable_if_t<!HSA, owned_ptr<T>>
-		make_owned(Args&&... args)
+		inline owned_ptr<T> make_owned(Args&&... args)
 		{
 			auto *mem = static_cast<P *>(this)->allocate(alignof(T), sizeof(T));
 			try
@@ -385,45 +389,68 @@ namespace plib {
 		}
 
 		template<typename T, typename... Args>
-		static inline std::enable_if_t<HSA, T *>
-		alloc(Args&&... args)
-		{
-			auto *p = P::allocate(alignof(T), sizeof(T));
-			// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-			return new(p) T(std::forward<Args>(args)...);
-		}
-
-		template<typename T, typename... Args>
-		inline std::enable_if_t<!HSA, T *>
-		alloc(Args&&... args)
+		inline T * alloc(Args&&... args)
 		{
 			auto *p = static_cast<P *>(this)->allocate(alignof(T), sizeof(T));
 			// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
 			return new(p) T(std::forward<Args>(args)...);
 		}
 
-		template<typename T>
-		static inline void
-		free(T *ptr, std::enable_if_t<HSD, T *> = nullptr) noexcept
+	};
+
+	template <typename P, bool HSD>
+	struct arena_base<P, HSD, true> : public arena_hsd<P, HSD>
+	{
+		template <class T>
+		using deleter_type = arena_deleter<P, T>;
+
+		template <typename T>
+		using unique_ptr = std::unique_ptr<T, deleter_type<T>>;
+
+		template <typename T>
+		using owned_ptr = plib::owned_ptr<T, deleter_type<T>>;
+
+		template<typename T, typename... Args>
+		static inline unique_ptr<T> make_unique(Args&&... args)
 		{
-			ptr->~T();
-			P::deallocate(ptr, sizeof(T));
+			auto *mem = P::allocate(alignof(T), sizeof(T));
+			try
+			{
+				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+				auto *mema = new (mem) T(std::forward<Args>(args)...);
+				return unique_ptr<T>(mema, deleter_type<T>());
+			}
+			catch (...)
+			{
+				P::deallocate(mem, sizeof(T));
+				throw;
+			}
 		}
 
-		template<typename T>
-		inline void
-		free(T *ptr, std::enable_if_t<!HSD, T *> = nullptr) noexcept
+		template<typename T, typename... Args>
+		static inline owned_ptr<T> make_owned(Args&&... args)
 		{
-			ptr->~T();
-			static_cast<P *>(this)->deallocate(ptr, sizeof(T));
+			auto *mem = P::allocate(alignof(T), sizeof(T));
+			try
+			{
+				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+				auto *mema = new (mem) T(std::forward<Args>(args)...);
+				return owned_ptr<T>(mema, true, deleter_type<T>());
+			}
+			catch (...)
+			{
+				P::deallocate(mem, sizeof(T));
+				throw;
+			}
 		}
 
-		size_type cur_alloc() const noexcept { return m_stat_cur_alloc(); } // NOLINT(readability-convert-member-functions-to-static)
-		size_type max_alloc() const noexcept { return m_stat_max_alloc(); } // NOLINT(readability-convert-member-functions-to-static)
-	protected:
-		static size_t &m_stat_cur_alloc() noexcept { static size_t val = 0; return val; }
-		static size_t &m_stat_max_alloc() noexcept { static size_t val = 0; return val; }
-
+		template<typename T, typename... Args>
+		static inline T * alloc(Args&&... args)
+		{
+			auto *p = P::allocate(alignof(T), sizeof(T));
+			// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+			return new(p) T(std::forward<Args>(args)...);
+		}
 	};
 
 
