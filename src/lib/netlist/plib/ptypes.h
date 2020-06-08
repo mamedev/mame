@@ -40,8 +40,39 @@ namespace plib
 	//============================================================
 
 	/// \brief Dummy 128 bit types for platforms which don't support 128 bit
+	///
+	/// Users should always consult compile_info::has_int128 prior to
+	/// using the UINT128/INT128 data type.
+	///
 	struct UINT128_DUMMY {};
 	struct INT128_DUMMY {};
+
+	enum class ci_compiler
+	{
+		UNKNOWN,
+		CLANG,
+		GCC,
+		MSC
+	};
+
+	enum class ci_os
+	{
+		UNKNOWN,
+		LINUX,
+		FREEBSD,
+		OPENBSD,
+		WINDOWS,
+		MACOSX,
+		EMSCRIPTEN
+	};
+
+	enum class ci_arch
+	{
+		UNKNOWN,
+		X86,
+		ARM,
+		MIPS
+	};
 
 	struct compile_info
 	{
@@ -69,7 +100,60 @@ namespace plib
 		static constexpr int128_type int128_max() { return int128_type(); }
 		static constexpr uint128_type uint128_max() { return uint128_type(); }
 	#endif
+	#ifdef __clang__
+		using type = std::integral_constant<ci_compiler, ci_compiler::CLANG>;
+		using version = std::integral_constant<int, (__clang_major__) * 100 + (__clang_minor__)>;
+	#elif defined(__GNUC__)
+		using type = std::integral_constant<ci_compiler, ci_compiler::GCC>;
+		using version = std::integral_constant<int, (__GNUC__) * 100 + (__GNUC_MINOR__)>;
+	#elif defined(_MSC_VER)
+		using type = std::integral_constant<ci_compiler, ci_compiler::MSC>;
+		using version = std::integral_constant<int, _MSC_VER>;
+	#else
+		using type = std::integral_constant<ci_compiler, ci_compiler::UNKNOWN>;
+		using version = std::integral_constant<int, 0>;
+	#endif
+	#ifdef __unix__
+		using is_unix = std::integral_constant<bool, true>;
+	#else
+		using is_unix = std::integral_constant<bool, false>;
+	#endif
+	#if defined(__linux__)
+		using os = std::integral_constant<ci_os, ci_os::LINUX>;
+	#elif defined(__FreeBSD__)
+		using os = std::integral_constant<ci_os, ci_os::FREEBSD>;
+	#elif defined(__OpenBSD__)
+		using os = std::integral_constant<ci_os, ci_os::OPENBSD>;
+	#elif defined(__EMSCRIPTEN__)
+		using os = std::integral_constant<ci_os, ci_os::EMSCRIPTEN>;
+	#elif defined(_WIN32)
+		using os = std::integral_constant<ci_os, ci_os::WINDOWS>;
+	#elif defined(__APPLE__)
+		using os = std::integral_constant<ci_os, ci_os::MACOSX>;
+	#else
+		using os = std::integral_constant<ci_os, ci_os::UNKNOWN>;
+	#endif
+	#if defined(__x86_64__) || defined (_M_X64) || defined(__aarch64__) || defined(__mips64) || defined(_M_AMD64) || defined(_M_ARM64)
+		using m64 = std::integral_constant<bool, true>;
+	#else
+		using m64 = std::integral_constant<bool, false>;
+	#endif
+	#if defined(__x86_64__) || defined(__i386__)
+		using arch = std::integral_constant<ci_arch, ci_arch::X86>;
+	#elif defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__) || defined(_M_ARM)
+		using arch = std::integral_constant<ci_arch, ci_arch::ARM>;
+	#elif defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64)
+		using arch = std::integral_constant<ci_arch, ci_arch::MIPS>;
+ 	#else
+		using arch = std::integral_constant<ci_arch, ci_arch::UNKNOWN>;
+	#endif
+	#if defined(__MINGW32__)
+		using mingw = std::integral_constant<bool, true>;
+	#else
+		using mingw = std::integral_constant<bool, false>;
+	#endif
 	};
+
 } // namespace plib
 
 using INT128 = plib::compile_info::int128_type;

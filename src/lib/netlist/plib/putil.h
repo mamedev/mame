@@ -249,6 +249,24 @@ namespace plib
 		list_t m_collection;
 	};
 
+	/// \brief copy type S to type D byte by byte
+	///
+	/// The purpose of this copy function is to suppress compiler warnings.
+	/// Use at your own risk. This is dangerous.
+	///
+	/// \param s Source object
+	/// \param d Destination object
+	/// \tparam S Type of source object
+	/// \tparam D Type of destination object
+	template <typename S, typename D>
+	void reinterpret_copy(S &s, D &d)
+	{
+		static_assert(sizeof(D) >= sizeof(S), "size mismatch");
+		auto *dp = reinterpret_cast<std::uint8_t *>(&d);
+		const auto *sp = reinterpret_cast<std::uint8_t *>(&s);
+		std::copy(sp, sp + sizeof(S), dp);
+	}
+
 	namespace util
 	{
 		pstring basename(const pstring &filename, const pstring &suffix = "");

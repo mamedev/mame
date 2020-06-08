@@ -33,6 +33,8 @@
 ///
 
 #include "pconfig.h"
+#include "ptypes.h"
+#include "putil.h"
 
 #include <algorithm>
 #include <cstdint> // uintptr_t
@@ -48,15 +50,18 @@
 #define PPMF_TYPE_GNUC_PMF_CONV   1
 #define PPMF_TYPE_INTERNAL        2
 
-#if defined(__GNUC__)
+// FIXME: Remove this macro madmess latest after September, 2020
+// FIXME: Do we still need to support MINGW <= 4.6?
+
+#if defined(__clang__) && defined(__i386__) && defined(_WIN32)
+	#define PHAS_PMF_INTERNAL 0
+#elif defined(__GNUC__) || defined(__clang__)
 	// does not work in versions over 4.7.x of 32bit MINGW
 	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
 		#define PHAS_PMF_INTERNAL 0
 	#elif defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__)
 		#define PHAS_PMF_INTERNAL 1
 		#define MEMBER_ABI _thiscall
-	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
-		#define PHAS_PMF_INTERNAL 0
 	#elif defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__) || defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64) || defined(__EMSCRIPTEN__)
 		#define PHAS_PMF_INTERNAL 2
 	#else
@@ -91,21 +96,39 @@
 	#endif
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__)
 #pragma GCC diagnostic push
-#endif
-
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wundefined-reinterpret-cast"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#endif
-
-#if (PPMF_TYPE == PPMF_TYPE_GNUC_PMF_CONV)
 #pragma GCC diagnostic ignored "-Wpmf-conversions"
 #endif
 
 namespace plib {
+
+	struct ppmf_internal
+	{
+		using ci = compile_info;
+		enum { value =
+			(ci::type() == ci_compiler::CLANG && !ci::m64()
+				&& ci::os() == ci_os::WINDOWS)                                   ? 0 :
+			(ci::mingw() && !ci::m64() && ci::version() >= 407)                  ? 0 :
+			(ci::mingw() && !ci::m64())                                          ? 1 :
+			((ci::type() == ci_compiler::CLANG || ci::type() == ci_compiler::GCC)
+				&& (ci::arch() == ci_arch::MIPS
+					|| ci::arch() == ci_arch::ARM
+					|| ci::os() == ci_os::EMSCRIPTEN))                           ? 2 :
+			(ci::type() == ci_compiler::CLANG || ci::type() == ci_compiler::GCC) ? 1 :
+			(ci::type() == ci_compiler::MSC && ci::m64()) ?                        3 :
+				                                                                   0
+		};
+	};
+
+	// FIXME: on supported platforms we should consider using GNU PMF extensions
+	//        if no internal solution exists
+
+	using ppmf_type = std::integral_constant<int, (ppmf_internal::value > 0 ? PPMF_TYPE_INTERNAL : PPMF_TYPE_PMF)>;
+
+	// check against previous implementation
+	static_assert(ppmf_internal::value == PHAS_PMF_INTERNAL, "internal mismatch");
+	static_assert(ppmf_type::value == PPMF_TYPE, "type mismatch");
 
 	///
 	/// \brief Used to derive a pointer to a member function.
@@ -137,7 +160,7 @@ namespace plib {
 			{
 				// apply the "this" delta to the object first
 				// NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
-				auto *o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
+				generic_class *o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 
 				// if the low bit of the vtable index is clear, then it is just a raw function pointer
 				if ((m_function & 1) == 0)
@@ -335,7 +358,8 @@ namespace plib {
 			static_assert(sizeof(m_resolved) >= sizeof(r.first), "size mismatch 1");
 			static_assert(sizeof(m_resolved) >= sizeof(member_abi_function<O>), "size mismatch 2");
 
-			*reinterpret_cast<member_abi_function<O> *>(&m_resolved) = r.first;
+			//*reinterpret_cast<member_abi_function<O> *>(&m_resolved) = r.first;
+			reinterpret_copy(r.first, m_resolved);
 			m_obj = reinterpret_cast<generic_class *>(r.second);
 		}
 
@@ -357,8 +381,7 @@ namespace plib {
 	};
 
 	template<typename R, typename... Targs>
-	using pmfp = pmfp_base<PPMF_TYPE, PHAS_PMF_INTERNAL, R, Targs...>;
-
+	using pmfp = pmfp_base<ppmf_type::value, ppmf_internal::value, R, Targs...>;
 
 	///
 	/// \brief Class to support delegate late binding
@@ -423,7 +446,7 @@ namespace plib {
 
 } // namespace plib
 
-#if defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
 
