@@ -253,14 +253,14 @@ protected:
 
 	/* Callbacks to host */
 	write_line_delegate m_reset_instr_callback;           /* Called when a RESET instruction is encountered */
-	write32_delegate m_cmpild_instr_callback;             /* Called when a CMPI.L #v, Dn instruction is encountered */
+	write32sm_delegate m_cmpild_instr_callback;           /* Called when a CMPI.L #v, Dn instruction is encountered */
 	write_line_delegate m_rte_instr_callback;             /* Called when a RTE instruction is encountered */
 	write8sm_delegate m_tas_write_callback;               /* Called instead of normal write8 by the TAS instruction,
 	                                                        allowing writeback to be disabled globally or selectively
 	                                                        or other side effects to be implemented */
 
 	address_space *m_program, *m_oprogram, *m_cpu_space;
-	
+
 	memory_access<24, 0, 0, ENDIANNESS_BIG>::cache m_oprogram8;
 	memory_access<24, 1, 0, ENDIANNESS_BIG>::cache m_oprogram16;
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_oprogram32;
