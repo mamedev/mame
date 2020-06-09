@@ -15,6 +15,9 @@ driver provided with thanks to:
 TODO:
 - finish slave DSP emulation
 - emulate System22 I/O board C74 instead of HLE (inputs, outputs, volume control - HLE only handles the inputs)
+- Rave Racer car will sometimes do a 'strafe slide' when playing the game with a small analog device (such as an
+  Xbox 360 pad), does not happen with keyboard controls or larger device like a steering wheel. BTANB or related
+  to HLE I/O board emulation?
 - alpinesa doesn't work, protection related? - depending on value written, it looks like it changes the addressing
   of some of the gfx chips on the fly. This is probably due to the PAL modification on the PROGRAM ROM PCB. Check
   the modification details of the TYPE 4 Program ROM PCB below.
@@ -2762,37 +2765,25 @@ void namcos22_state::handle_driving_io()
 		{
 			case NAMCOS22_RIDGE_RACER:
 			case NAMCOS22_RIDGE_RACER2:
-				steer <<= 4;
 				steer += 0x160;
-				gas <<= 3;
 				gas += 884;
-				brake <<= 3;
 				brake += 809;
 				break;
 
 			case NAMCOS22_RAVE_RACER:
-				steer <<= 4;
 				steer += 32;
-				gas <<= 3;
 				gas += 992;
-				brake <<= 3;
 				brake += 3008;
 				break;
 
 			case NAMCOS22_ACE_DRIVER:
 			case NAMCOS22_VICTORY_LAP:
-				steer <<= 4;
 				steer += 2048;
-				gas <<= 3;
 				gas += 992;
-				brake <<= 3;
 				brake += 3008;
 				break;
 
 			default:
-				steer <<= 4;
-				gas <<= 3;
-				brake <<= 3;
 				break;
 		}
 
@@ -2966,14 +2957,14 @@ static INPUT_PORTS_START( ridgera )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("ADC.0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20, 0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+	PORT_START("ADC.0") // 1152
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x380, 0xc80) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Steering Wheel")
 
-	PORT_START("ADC.1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xd0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+	PORT_START("ADC.1") // 1552
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x610) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Gas Pedal")
 
-	PORT_START("ADC.2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+	PORT_START("ADC.2") // 1552
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x610) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Brake Pedal")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x00010000, 0x00010000, "Test Mode" ) PORT_DIPLOCATION("SW2:1")
@@ -3005,6 +2996,9 @@ static INPUT_PORTS_START( ridgeracf )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("AT Switch")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("MT Switch")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE2 )
+
+	PORT_MODIFY("ADC.0") // 1408
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x280, 0xd80) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Steering Wheel")
 
 	// DIP3-1 to DIP3-3 are for setting up the viewing angle (game used one board per screen?)
 	// Some of the other dipswitches are for debugging, like with Ridge Racer 2.
@@ -3127,14 +3121,14 @@ static INPUT_PORTS_START( acedrvr )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Motion-Stop")
 
-	PORT_START("ADC.0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20, 0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+	PORT_START("ADC.0") // 1536
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x200, 0xe00) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Steering Wheel")
 
-	PORT_START("ADC.1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+	PORT_START("ADC.1") // 1152
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x480) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Gas Pedal")
 
-	PORT_START("ADC.2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0x48) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+	PORT_START("ADC.2") // 576
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x240) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Brake Pedal")
 
 	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x00010000, 0x00010000, "SW2:1" )
