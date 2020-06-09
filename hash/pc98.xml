@@ -3348,7 +3348,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<!-- This probably requires 3.5" floppy emulation -->
-	<software name="aishogi">
+	<software name="aishogi" supported="no">
 		<description>AI Shogi</description>
 		<year>1993</year>
 		<publisher>サムシンググッド (Something Good)</publisher>
@@ -18047,7 +18047,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<!-- This probably requires 3.5" floppy emulation -->
-	<software name="entax">
+	<software name="entax" supported="no">
 		<description>Entax</description>
 		<year>19??</year>
 		<publisher>総合ビジネスアシスト (ABA)</publisher>
@@ -64263,7 +64263,7 @@ SPACE EMPIRE
 	</software>
 
 	<!-- This probably requires 3.5" floppy emulation -->
-	<software name="bkturb">
+	<software name="bkturb" supported="no">
 		<description>BK Turb</description>
 		<year>199?</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
@@ -65333,7 +65333,7 @@ doujin?!?
 	</software>
 
 	<!-- This probably requires 3.5" floppy emulation -->
-	<software name="akihime">
+	<software name="akihime" supported="no">
 		<description>Akihime - Goddess in the Caeseress</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -65475,7 +65475,7 @@ doujin?!?
 	</software>
 
 	<!-- This probably requires 3.5" floppy emulation -->
-	<software name="akemi">
+	<software name="akemi" supported="no">
 		<description>Bounty Hunter Akemi</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -65701,7 +65701,7 @@ doujin?!?
 	</software>
 
 	<!-- This probably requires 3.5" floppy emulation -->
-	<software name="daihinm">
+	<software name="daihinm" supported="no">
 		<description>Dai Hinmin - Taiketsu Seifuku Musume</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -65849,7 +65849,7 @@ doujin?!?
 	</software>
 
 	<!-- This probably requires 3.5" floppy emulation -->
-	<software name="dragnegg">
+	<software name="dragnegg" supported="no">
 		<description>Dragon Egg</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -65875,7 +65875,7 @@ doujin?!?
 	</software>
 
 	<!-- This probably requires 3.5" floppy emulation -->
-	<software name="esp">
+	<software name="esp" supported="no">
 		<description>E.S.P</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
