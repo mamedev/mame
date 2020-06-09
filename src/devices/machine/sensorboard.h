@@ -11,10 +11,7 @@
 
 #pragma once
 
-#include "machine/nvram.h"
-
-
-class sensorboard_device : public device_t
+class sensorboard_device : public device_t, public device_nvram_interface
 {
 public:
 	sensorboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
@@ -81,13 +78,17 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_post_load() override { refresh(); }
 
 	virtual ioport_constructor device_input_ports() const override;
 
+	// device_nvram_interface overrides
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_pre_write() override;
+
 private:
-	required_device<nvram_device> m_nvram;
 	output_finder<0x10, 0x10> m_out_piece;
 	output_finder<0x20+1> m_out_pui;
 	output_finder<2> m_out_count;
@@ -114,6 +115,7 @@ private:
 	int m_droppos;
 	int m_sensorpos;
 	u8 m_ui_enabled;
+	bool m_nvram_on;
 
 	u8 m_curstate[0x100];
 	u8 m_history[1000][0x100];
@@ -123,9 +125,6 @@ private:
 	u32 m_ufirst;
 	u32 m_ulast;
 	u32 m_usize;
-
-	void nvram_init(nvram_device &nvram, void *data, size_t size);
-	bool m_nvram_on;
 
 	emu_timer *m_undotimer;
 	TIMER_CALLBACK_MEMBER(undo_tick);

@@ -67,7 +67,7 @@ DEFINE_DEVICE_TYPE(SENSORBOARD, sensorboard_device, "sensorboard", "Sensorboard"
 
 sensorboard_device::sensorboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SENSORBOARD, tag, owner, clock),
-	m_nvram(*this, "position"),
+	device_nvram_interface(mconfig, *this),
 	m_out_piece(*this, "piece_%c%u", 0U + 'a', 1U),
 	m_out_pui(*this, "piece_ui%u", 0U),
 	m_out_count(*this, "count_ui%u", 0U),
@@ -127,8 +127,6 @@ void sensorboard_device::device_start()
 	m_ulast = 0;
 	m_usize = ARRAY_LENGTH(m_history);
 
-	m_nvram->set_base(m_curstate, sizeof(m_curstate));
-
 	// register for savestates
 	save_item(NAME(m_magnets));
 	save_item(NAME(m_inductive));
@@ -153,18 +151,6 @@ void sensorboard_device::device_start()
 	save_item(NAME(m_ulast));
 	save_item(NAME(m_usize));
 	save_item(NAME(m_sensordelay));
-}
-
-void sensorboard_device::nvram_init(nvram_device &nvram, void *data, size_t size)
-{
-	clear_board();
-	m_custom_init_cb(1);
-}
-
-void sensorboard_device::device_add_mconfig(machine_config &config)
-{
-	// 'nvram' is the last board position (m_curstate)
-	NVRAM(config, m_nvram).set_custom_handler(FUNC(sensorboard_device::nvram_init));
 }
 
 void sensorboard_device::preset_chess(int state)
@@ -211,6 +197,32 @@ void sensorboard_device::device_reset()
 	}
 	undo_reset();
 	refresh();
+}
+
+
+//-------------------------------------------------
+//  device_nvram_interface overrides
+//-------------------------------------------------
+
+void sensorboard_device::nvram_default()
+{
+	clear_board();
+	m_custom_init_cb(1);
+}
+
+void sensorboard_device::nvram_read(emu_file &file)
+{
+	file.read(m_curstate, sizeof(m_curstate));
+}
+
+void sensorboard_device::nvram_write(emu_file &file)
+{
+	file.write(m_curstate, sizeof(m_curstate));
+}
+
+bool sensorboard_device::nvram_pre_write()
+{
+	return m_nvram_on;
 }
 
 

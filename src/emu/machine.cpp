@@ -1203,11 +1203,14 @@ void running_machine::nvram_save()
 {
 	for (device_nvram_interface &nvram : nvram_interface_iterator(root_device()))
 	{
-		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
+		if (nvram.nvram_pre_save())
 		{
-			nvram.nvram_save(file);
-			file.close();
+			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
+			{
+				nvram.nvram_save(file);
+				file.close();
+			}
 		}
 	}
 }
