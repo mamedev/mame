@@ -224,6 +224,21 @@ private:
 	void mem_map_upperbank(address_map& map);
 };
 
+class spg2xx_game_senspeed_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_senspeed_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void senspeed(machine_config &config);
+
+private:
+	uint16_t portb_r();
+	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	required_device<i2cmem_device> m_i2cmem;
+};
 
 
 #endif // MAME_INCLUDES_SPG2XX_H
