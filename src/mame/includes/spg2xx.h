@@ -39,7 +39,7 @@ public:
 	void rad_sktv(machine_config &config);
 	void rad_crik(machine_config &config);
 	void non_spg_base(machine_config &config);
-	void abltenni(machine_config &config);
+	void spg2xx(machine_config &config);
 	void comil(machine_config &config);
 	void tvsprt10(machine_config &config);
 	void guitarfv(machine_config &config);
@@ -238,6 +238,18 @@ private:
 	uint16_t portb_r();
 	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	required_device<i2cmem_device> m_i2cmem;
+};
+
+class spg2xx_game_fordrace_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_fordrace_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void fordrace(machine_config &config);
+
+private:
 };
 
 
