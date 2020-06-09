@@ -312,39 +312,31 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="emsdos50">
-		<description>EPSON MS-DOS 5.0</description>
-		<year>19??</year>
+	<software name="emsdos21">
+		<description>EPSON MS-DOS 2.11 (Rev. E22)</description>
+		<year>1989</year>
 		<publisher>EPSON / Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="edos5_1.fdi" size="1265664" crc="e8e860e5" sha1="7a2cf13d1e3e10f19f9ac4023bf1661be14e88f0" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="edos5_2.fdi" size="1265664" crc="b6d20e53" sha1="9603e00d702c07862c8955f8cce796ee57a35ae1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="edos5_3.fdi" size="1265664" crc="3eb8bb63" sha1="882ac73a66e45ab1979787fea2af15c2052da962" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="edos5_4.fdi" size="1265664" crc="7a9da5ff" sha1="2d4439e2bfc56eb8301d82f255d907eccffb9a48" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="epson ms-dos 2.11 (rev. e22).hdm" size="1261568" crc="d69f0e32" sha1="4b660d939c70b45ee93bb053f4b9db4ce3d6a4ce" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="emsdos50a" cloneof="emsdos50">
-		<description>Epson MS-DOS 5.0 (Alt)</description>
-		<year>19??</year>
+	<software name="emsdos21r15" cloneof="emsdos21">
+		<description>EPSON MS-DOS 2.11 (Rev. R15)</description>
+		<year>1989</year>
+		<publisher>EPSON / Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="epson ms-dos 2.11 (rev. r15).hdm" size="1261568" crc="29cd9cd9" sha1="38d7da776a710366229faf1a8bad98f8fb930ff3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emsdos50">
+		<description>EPSON MS-DOS 5.0 (Release 2)</description>
+		<year>1993</year>
 		<publisher>EPSON / Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System"/>
@@ -353,21 +345,51 @@ only have some part of Windows file and a Video driver(CLGD?).
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Jisho"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="ms-dos_5.0_epson_jisho.fdi" size="1265664" crc="582c5f50" sha1="e27506c10e8150b0ff4583f0857a9c54a11223f5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Utility 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="ms-dos_5.0_epson_utility 01.fdi" size="1265664" crc="3f609504" sha1="06f0595691e22f31562f9b8ffec2add4e0aa2c1a" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Utility 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="ms-dos_5.0_epson_utility 02.fdi" size="1265664" crc="58d0a2fd" sha1="3146f6f6782ebdaff660574325d28ad50e9c5e6b" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
+	</software>
+
+	<software name="emsdos50r1" cloneof="emsdos50">
+		<description>EPSON MS-DOS 5.0 (Release 1)</description>
+		<year>1991</year>
+		<publisher>EPSON / Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="edos5_1.fdi" size="1265664" crc="e8e860e5" sha1="7a2cf13d1e3e10f19f9ac4023bf1661be14e88f0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Jisho"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="ms-dos_5.0_epson_jisho.fdi" size="1265664" crc="582c5f50" sha1="e27506c10e8150b0ff4583f0857a9c54a11223f5" offset="0" />
+				<rom name="edos5_2.fdi" size="1265664" crc="b6d20e53" sha1="9603e00d702c07862c8955f8cce796ee57a35ae1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utility 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="edos5_3.fdi" size="1265664" crc="3eb8bb63" sha1="882ac73a66e45ab1979787fea2af15c2052da962" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Utility 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="edos5_4.fdi" size="1265664" crc="7a9da5ff" sha1="2d4439e2bfc56eb8301d82f255d907eccffb9a48" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -432,7 +454,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="epwin30">
+	<!-- Mouse doesn't work during setup, and hangs on the splash screen after install. Probably related to hardware differences in Epson's PC-98 clones. -->
+	<software name="epwin30" supported="no">
 		<description>EPSON Microsoft Windows 3.0</description>
 		<year>1991</year>
 		<publisher>EPSON / Microsoft</publisher>
@@ -956,7 +979,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="elecom35" cloneof="elecom">
+	<!-- This probably requires 3.5" floppy emulation -->
+	<software name="elecom35" cloneof="elecom" supported="no">
 		<description>Ele Command (3.5&quot; Disk)</description>
 		<year>19??</year>
 		<publisher>Elecom</publisher>
@@ -968,9 +992,10 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<software name="eosys30">
-		<description>EO System 3.0</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>EO System 3.0 (v1.17 installer)</description>
+		<year>1995</year>
+		<publisher>ICM</publisher>
+		<info name="usage" value="Run INST.EXE to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -985,20 +1010,21 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="eosys30a" cloneof="eosys30">
-		<description>EO System 3.0 (Alt Format)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="eosys30i10" cloneof="eosys30">
+		<description>EO System 3.0 (v1.10 installer)</description>
+		<year>1995</year>
+		<publisher>ICM</publisher>
+		<info name="usage" value="Run INST.EXE to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="eo30d1.d88" size="1281968" crc="213f0295" sha1="085d4063c5a4862fb7a0a49a75d3c683869c85de" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="eo system 3 (v1.10) (disk 1).hdm" size="1261568" crc="c1d22678" sha1="0480cf848f05e3bf1ddd225de2c2b63378dc146e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="eo30d2.d88" size="1281968" crc="28cae5c5" sha1="4514fec9fd5d140d53bb907685692c973d54ec4a" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="eo system 3 (v1.10) (disk 2).hdm" size="1261568" crc="39122ba0" sha1="e96cb528bc981d3c5f6d34aea88415aaf998fe68" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1550,7 +1576,86 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="epsonb2h">
+	<software name="epdiag">
+		<description>EPSON Jiko Shindan Program</description>
+		<year>1991</year>
+		<publisher>EPSON</publisher>
+		<info name="alt_title" value="自己診断プログラム" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="epson self-diagnostic program.hdm" size="1261568" crc="3e0c36d7" sha1="9ce4d5a0369ed3af732230890c90915984c0ff20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- "Disk I/O Error" on boot -->
+	<software name="epinstal" supported="no">
+		<description>EPSON Software Installation Program (v3.02)</description>
+		<year>19??</year>
+		<publisher>EPSON</publisher>
+		<info name="alt_title" value="ソフトウェア・インストレーション・プログラム" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="697008">
+				<rom name="epson software installation program (v3.02).d88" size="697008" crc="1f594ec1" sha1="f9c59924380fff8012b259b5857e3aead506d028" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epinstal217" cloneof="epinstal" supported="no">
+		<description>EPSON Software Installation Program (v2.17)</description>
+		<year>19??</year>
+		<publisher>EPSON</publisher>
+		<info name="alt_title" value="ソフトウェア・インストレーション・プログラム" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="697008">
+				<rom name="epson software installation program.d88" size="697008" crc="d2d42ca8" sha1="1b76ee9abfbc4ebce9832a4a62da27c9dc111474" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epinstal223" cloneof="epinstal" supported="no">
+		<description>EPSON Software Installation Program (v2.23)</description>
+		<year>19??</year>
+		<publisher>EPSON</publisher>
+		<info name="alt_title" value="ソフトウェア・インストレーション・プログラム" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="697008">
+				<rom name="epson software installation program (v2.23).d88" size="697008" crc="a7f6dc01" sha1="c9e4a586e59bd5f9776e6f742992d8238f7315e9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epinstal227" cloneof="epinstal" supported="no">
+		<description>EPSON Software Installation Program (v2.27)</description>
+		<year>19??</year>
+		<publisher>EPSON</publisher>
+		<info name="alt_title" value="ソフトウェア・インストレーション・プログラム" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="697008">
+				<rom name="epson software installation program (v2.27).d88" size="697008" crc="53bb2f64" sha1="5f06959cd5e0ae724a039fb84f5ffb3acd30e212" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epsonb2">
+		<description>EPSON Nihongo Disk BASIC v2.0</description>
+		<year>1988</year>
+		<publisher>EPSON</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="epson nihongo disk basic 2.0 (system disk).d88" size="1086448" crc="ad30d0af" sha1="7505c2e53fabc7787042e95a75daf5a7517bf363" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Utility"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="epson nihongo disk basic 2.0 (utility disk).d88" size="1086448" crc="a7842239" sha1="f34362a0543a632ab960925e0b56ee6f52a1b6c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epsonb5">
 		<description>EPSON Nihongo Disk BASIC v5.0</description>
 		<year>1990</year>
 		<publisher>EPSON</publisher>
@@ -17219,12 +17324,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="echigoya">
+	<!-- FM sound doesn't work -->
+	<software name="echigoya" supported="partial">
 		<description>Echigoya - H-GO! Yeah!</description>
 		<year>1994</year>
 		<publisher>天狗プロ (Tengu Pro)</publisher>
 		<info name="alt_title" value="越後屋" />
 		<info name="release" value="19940826" />
+		<info name="usage" value="Run INSTALL.EXE from DOS to create a boot disk or install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -17271,7 +17378,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="edge">
+	<!-- Doesn't recognize disk changes -->
+	<software name="edge" supported="no">
 		<description>Edge</description>
 		<year>1993</year>
 		<publisher>テイジイエル (TGL)</publisher>
@@ -17321,20 +17429,21 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>アートディンク (Artdink)</publisher>
 		<info name="alt_title" value="栄冠は君に 高校野球全国大会" />
 		<info name="release" value="19900719" />
+		<info name="usage" value="First boot from the utility disk and follow the instructions to create the user disk, then boot from the system disk to play the game" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="eikan_wa_kimi_ni_s.d88" size="1281968" crc="6d1a62a1" sha1="54fa6035ec4c94cd18eea47b1ab63aa8fe5622c0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="eikan_wa_kimi_ni_g.d88" size="1281968" crc="9572421e" sha1="47cdaa2e5e66976df4e9a47887cb09fdb8278c3f" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Scenario Disk"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="eikan_wa_kimi_ni_s.d88" size="1281968" crc="6d1a62a1" sha1="54fa6035ec4c94cd18eea47b1ab63aa8fe5622c0" offset="0" />
-			</dataarea>
-		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Utility? Disk"/>
+			<feature name="part_id" value="Utility Disk"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="eikan_wa_kimi_ni_u.d88" size="1281968" crc="e8cf3b2a" sha1="30e1439b97033576b6c3924b69628cdd8be984fd" offset="0" />
 			</dataarea>
@@ -17347,6 +17456,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>アートディンク (Artdink)</publisher>
 		<info name="alt_title" value="栄冠は君に２ 高校野球全国大会" />
 		<info name="release" value="19910628" />
+		<info name="usage" value="First boot from the utility disk and follow the instructions to create the user disk, then boot from the system disk to play the game" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1265664">
@@ -17360,9 +17470,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk"/>
+			<feature name="part_id" value="Utility Disk"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="eikan wa kimi ni 2 (data disk).fdi" size="1265664" crc="3f911214" sha1="ee63a1e3cd75c34a516fca31b9c627cb9ea80617" offset="0" />
+				<rom name="eikan wa kimi ni 2 (utility disk).fdi" size="1265664" crc="3f911214" sha1="ee63a1e3cd75c34a516fca31b9c627cb9ea80617" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -17380,24 +17490,55 @@ only have some part of Windows file and a Video driver(CLGD?).
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Data Disk 1"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="01_disk.d88" size="1281968" crc="4361d14c" sha1="3d0a025c2c2814e74ac697f1b1353170a6d84cdf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Data Disk 2"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="02_disk.d88" size="1281968" crc="568c098f" sha1="b458df173b1c8e893e375240567338e230f5abe9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="eisei3">
+	<!-- Coverdisk for "PC Dolphin Dennou Bishoujo H+ .001" magazine -->
+	<software name="eimmydem">
+		<description>Eimmy to Yobanaide (Demo)</description>
+		<year>1995</year>
+		<publisher>シーズウェア (C's Ware)</publisher>
+		<info name="alt_title" value="エイミーと呼ばないでっ" />
+		<info name="usage" value="Run EMI-DEMO.EXE from DOS to unpack the files, then EMI.BAT to run the demo" />
+		<info name="release" value="19950625" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="eimmy to yobanaide (demo) (pc dolphin dennou bishoujo h+ 001 omake disk).hdm" size="1261568" crc="2cbc3c8a" sha1="1e0d7d654f8617cec441c31e40da8d9ca984811f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Mouse doesn't work correctly -->
+	<software name="eisei2" supported="no">
+		<description>Eisei Meijin II</description>
+		<year>1991</year>
+		<publisher>コナミ (Konami)</publisher>
+		<info name="alt_title" value="永世名人II" />
+		<info name="release" value="19910517" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="eisei meijin ii.hdm" size="1261568" crc="297a241f" sha1="865fd0492befb72e2bbc08345b03f379179d03bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Mouse doesn't work correctly -->
+	<software name="eisei3" supported="no">
 		<description>Eisei Meijin III</description>
 		<year>1992</year>
 		<publisher>コナミ (Konami)</publisher>
-		<info name="alt_title" value="永世名人３" />
+		<info name="alt_title" value="永世名人III" />
 		<info name="release" value="19920904" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -17406,7 +17547,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="eiyuden">
+	<!-- Black screen on boot -->
+	<software name="eiyuden" supported="no">
 		<description>Eiyuu Densetsu Saga</description>
 		<year>1984</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
@@ -17426,7 +17568,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="galhero">
+	<!-- Seems to have some trouble with disk changes. Works when installed to HDD. -->
+	<software name="galhero" supported="partial">
 		<description>Eiyuu Shigan - Gal Act Heroism</description>
 		<year>1994</year>
 		<publisher>マイクロキャビン (Microcabin)</publisher>
@@ -17472,6 +17615,56 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="User Disk"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="eiyuu_shigan_user.fdi" size="1265664" crc="991a29c1" sha1="62652afa9432916a4f1f2d7f24381814ec92d107" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	    This image includes a program called PASSWORD.COM which decodes the USER.ID file and shows the name and serial needed for installation.
+	    Probably not part of the original distribution.
+	-->
+	<software name="ekispert">
+		<description>Ekispert</description>
+		<year>1993</year>
+		<publisher>ヴァル研究所 (Val Laboratory)</publisher>
+		<info name="alt_title" value="駅すぱあと" />
+		<info name="usage" value="Run INSTALL.EXE from DOS" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ekispert.hdm" size="1261568" crc="221c3902" sha1="81483f82d8eca109d8aebcf282b4d65a0e004b03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ekudora">
+		<description>Ekudorado - Kagami no Naka no Oukoku</description>
+		<year>1997</year>
+		<publisher>ブラックパッケージ (Black Package)</publisher>
+		<info name="alt_title" value="エクドラード ～鏡の中の王国～" />
+		<info name="release" value="19970214" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ekudorado - kagami no naka no oukoku (disk a).hdm" size="1261568" crc="15a0356a" sha1="46b30010c34f6586da937fc667a5791e0d3ee4b7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ekudorado - kagami no naka no oukoku (disk b).hdm" size="1261568" crc="36df68c0" sha1="b7419b39f5188b9b9df96328c4379a757f3508ae" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ekudorado - kagami no naka no oukoku (disk c).hdm" size="1261568" crc="8eddaa6e" sha1="45738fed7dac1a56f79f9c70ec2efb05877b6924" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ekudorado - kagami no naka no oukoku (disk d).hdm" size="1261568" crc="98203b49" sha1="1ac57e44fa0e6bf3394583f484c723e45bf220b6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -17534,8 +17727,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="elementl">
-		<description>Elemental ou</description>
+	<!-- Mouse doesn't work correctly -->
+	<software name="elementl" supported="no">
+		<description>Elemental Ou</description>
 		<year>1994</year>
 		<publisher>アップルパイ／コーヒーぶれいく (Apple Pie / Coffee Break)</publisher>
 		<info name="alt_title" value="えれめんたる王" />
@@ -17602,7 +17796,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="elmknigt">
+	<!-- Disk changes don't work -->
+	<software name="elmknigt" supported="no">
 		<description>Elm Knight - A Living Body Armor</description>
 		<year>1992</year>
 		<publisher>マイクロキャビン (Microcabin)</publisher>
@@ -17670,7 +17865,33 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="elves">
+	<software name="elmknigtd">
+		<description>Elm Knight - A Living Body Armor (Demo)</description>
+		<year>1992</year>
+		<publisher>マイクロキャビン (Microcabin)</publisher>
+		<info name="alt_title" value="エルムナイト" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="elm knight - a living body armor (demo).hdm" size="1261568" crc="23ef489b" sha1="9372acb188312225583ffb6c39bbd29da836bc87" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elthlead">
+		<description>Elthlead Senshi</description>
+		<year>1988</year>
+		<publisher>NCS</publisher>
+		<info name="alt_title" value="エルスリード戦史" />
+		<info name="release" value="198805xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1086448">
+				<rom name="elthlead senshi.d88" size="1086448" crc="d0a98483" sha1="004f9388ab1d81dc134187df647ce9b5f7e82595" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Disk changes don't work -->
+	<software name="elves" supported="no">
 		<description>Elves</description>
 		<year>1992</year>
 		<publisher>遊演体 (You-en-tai)</publisher>
@@ -17702,15 +17923,34 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="elysion">
-		<description>Elysion</description>
+	<!-- Can't create the player disk -->
+	<software name="elysion" supported="no">
+		<description>Elysion (2HD version)</description>
 		<year>1986</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="エリュシオン" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="elysium.fdi" size="1265664" crc="9474b984" sha1="9a6748feb8478603b2fe512d2986a1fb20d26066" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Hangs while booting -->
+	<software name="elysiondd" cloneof="elysion" supported="no">
+		<description>Elysion (2DD version)</description>
+		<year>1986</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="エリュシオン" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="676528">
+				<rom name="elysion (2dd version) (system disk).d88" size="676528" crc="e84751d5" sha1="5e5a31afcd95043d13e5729276e41af1a8a70160" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="676528">
+				<rom name="elysion (2dd version) (scenario disk).d88" size="676528" crc="acdb33ad" sha1="b6be039cf0d7783c357ebc194e7cdb223cb1ca09" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -17722,13 +17962,13 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="エメラルド伝説" />
 		<info name="release" value="19900618" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Opening"/>
+			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="edenstop.d88" size="1281968" crc="2acfa7dd" sha1="6ceb2a0c2e5c90b2fe5cdef760fd2ab342a8e24b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Game"/>
+			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="edenstga.d88" size="1281968" crc="912f820d" sha1="1dff217f20d75a35128a6ec274c552aa8442605f" offset="0" />
 			</dataarea>
@@ -17806,6 +18046,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="entax">
 		<description>Entax</description>
 		<year>19??</year>
@@ -17835,6 +18076,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>イマジニア (Imagineer)</publisher>
 		<info name="alt_title" value="エピック" />
 		<info name="release" value="19931210" />
+		<info name="usage" value="Run INSTALL.EXE from DOS to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -17911,6 +18153,33 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="estate">
+		<description>Estate</description>
+		<year>1995</year>
+		<publisher>リップスター (Lip Star)</publisher>
+		<info name="alt_title" value="エステート" />
+		<info name="release" value="19950131" />
+		<info name="usage" value="Run INSTALL.EXE from DOS to copy system files" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="estate (system disk) [original].hdm" size="1261568" crc="ab306019" sha1="1fbf1f1aedeb3951a8f6a4f089bc6d449a94a00a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Game Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="estate (disk 1).hdm" size="1261568" crc="bf8dcc1e" sha1="f819278dcd9d5f3ac73d129e6178c80a1708ddb9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Game Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="estate (disk 2).hdm" size="1261568" crc="d6ab8921" sha1="8d7878a6f676b9a8142733d384443a4b38115d71" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="estoria">
 		<description>Estoria</description>
 		<year>1993</year>
@@ -17937,6 +18206,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>グローディア (Glodia)</publisher>
 		<info name="alt_title" value="エテミブル ＝天壌無窮＝" />
 		<info name="release" value="19950127" />
+		<info name="usage" value="Requires HDD. Installation is launched automatically when the game boots for the first time." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1265664">
@@ -18029,7 +18299,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="executiv">
+	<!-- Black screen on boot -->
+	<software name="executiv" supported="no">
 		<description>Executive e no Michi</description>
 		<year>1987</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
@@ -18044,6 +18315,56 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="676528">
 				<rom name="exectiv2.d88" size="676528" crc="ad2d9cf5" sha1="e1f5871fa0645cc593682a34e679c8762ab1a577" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exon">
+		<description>eXOn</description>
+		<year>1991</year>
+		<publisher>日本ソフテック (Nihon Softec)</publisher>
+		<info name="alt_title" value="エグゾン" />
+		<info name="release" value="19910524" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="exon (disk a).hdm" size="1261568" crc="2acd17b1" sha1="9b16f130a691bdd74ef0a1b01551373bb29493cd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="exon (disk b).hdm" size="1261568" crc="9b6a15dd" sha1="3b190ce0ac9e70d13b94d77ae562e6095cd75d6e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exondemo">
+		<description>eXOn (Demo)</description>
+		<year>1991</year>
+		<publisher>日本ソフテック (Nihon Softec)</publisher>
+		<info name="alt_title" value="エグゾン" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="exon (demo).hdm" size="1261568" crc="2b42b8a4" sha1="978a0760a6d31a51f27858af9a4e4085bbe1c41a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expert98">
+		<description>Expert-98</description>
+		<year>1988</year>
+		<publisher>ソフパル (Softpal)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="expert 98 (system disk).d88" size="1086448" crc="10a87821" sha1="742cff8556e4987b07b97c618a1cce42bbc1b51f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Construction Vol. 1"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="expert 98 (construction vol. 1).d88" size="1086448" crc="26a16af2" sha1="5f952921bd1888662ce356488ae2391417f940a0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -18068,20 +18389,21 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="eyebehol">
+	<!-- Doesn't recognize disk changes, so it's not possible to create the save disk -->
+	<software name="eyebehol" supported="no">
 		<description>Eye of the Beholder</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ アイ オブ ザ ビホルダー" />
 		<info name="release" value="19920618" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="diska.fdi" size="1265664" crc="5eb4a299" sha1="47566ca7c21bd99e004b285b860a974bce25a659" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="diskb.fdi" size="1265664" crc="93ea457c" sha1="28f86f06739cf726109e8ca8c17e583dd775ffb8" offset="0" />
 			</dataarea>
@@ -18114,12 +18436,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="eyebeho3">
+	<!-- Works in 16-color mode, hangs in 256-color mode -->
+	<software name="eyebeho3" supported="partial">
 		<description>Eye of the Beholder III - Assault on Myth Drannor</description>
 		<year>1994</year>
 		<publisher>ビング (Ving)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ アイ オブ ザ ビホルダー３ ＡＳＳＡＵＬＴ ＯＮ ＭＹＴＨ ＤＲＡＮＮＯＲ" />
 		<info name="release" value="19941130" />
+		<info name="usage" value="Run INSTALL.EXE from DOS to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Startup Disk"/>
 			<dataarea name="flop" size="1265664">
@@ -25788,7 +26112,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	<software name="kyokoiji">
 		<description>Kyouko no Ijiwaru</description>
 		<year>1994</year>
-		<publisher>ポニーテールソフト (PonyTale Soft)</publisher>
+		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="alt_title" value="恭子のいじわる" />
 		<info name="release" value="19940715" />
 		<part name="flop1" interface="floppy_5_25">
@@ -27471,7 +27795,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	<software name="mjmu">
 		<description>Mahjong Mu</description>
 		<year>1995</year>
-		<publisher>ポニーテールソフト (PonyTale Soft)</publisher>
+		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="alt_title" value="魔雀夢" />
 		<info name="release" value="19951115" />
 		<part name="flop1" interface="floppy_5_25">
@@ -33550,7 +33874,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="pocky">
 		<description>Pocky</description>
 		<year>1989</year>
-		<publisher>ポニーテールソフト (PonyTale Soft)</publisher>
+		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="alt_title" value="ポッキー" />
 		<info name="release" value="198901xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -33570,7 +33894,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="pockya" cloneof="pocky">
 		<description>Pocky (Alt Format)</description>
 		<year>1989</year>
-		<publisher>ポニーテールソフト (PonyTale Soft)</publisher>
+		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="alt_title" value="ポッキー" />
 		<info name="release" value="198901xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -33590,7 +33914,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="pocky2">
 		<description>Pocky 2 - Kaijin Aka Mantle no Chousen</description>
 		<year>1991</year>
-		<publisher>ポニーテールソフト (PonyTale Soft)</publisher>
+		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="alt_title" value="ポッキー２ ～怪人赤マントの挑戦～" />
 		<info name="release" value="19910831" />
 		<part name="flop1" interface="floppy_5_25">
@@ -33616,7 +33940,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="pocky2a" cloneof="pocky2">
 		<description>Pocky 2 - Kaijin Aka Mantle no Chousen (Alt Format)</description>
 		<year>1991</year>
-		<publisher>ポニーテールソフト (PonyTale Soft)</publisher>
+		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="alt_title" value="ポッキー２ ～怪人赤マントの挑戦～" />
 		<info name="release" value="19910831" />
 		<part name="flop1" interface="floppy_5_25">
@@ -33742,7 +34066,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="ponyon">
 		<description>Ponyon</description>
 		<year>1992</year>
-		<publisher>ポニーテールソフト (PonyTale Soft)</publisher>
+		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="alt_title" value="ポニオン" />
 		<info name="release" value="19920228" />
 		<part name="flop1" interface="floppy_5_25">
@@ -47107,7 +47431,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="yogendom">
 		<description>Yougen Doumu</description>
 		<year>1993</year>
-		<publisher>ポニーテールソフト (PonyTale Soft)</publisher>
+		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="alt_title" value="妖幻道夢" />
 		<info name="release" value="19930413" />
 		<part name="flop1" interface="floppy_5_25">
@@ -49476,6 +49800,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- Black screen on boot -->
 	<software name="tokyoks" supported="no">
 		<description>E Tokyo Kyonyuu Story</description>
 		<year>1992</year>
@@ -52474,7 +52799,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="ponkan" supported="no">
 		<description>Ponkan</description>
 		<year>1994</year>
-		<publisher>ポニーテールソフト (PonyTale Soft)</publisher>
+		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="alt_title" value="ポンカン" />
 		<info name="release" value="19940211" />
 		<part name="flop1" interface="floppy_5_25">
@@ -55012,50 +55337,6 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="eimmy" supported="no">
-		<description>Eimmy to Yobanaide</description>
-		<year>1995</year>
-		<publisher>シーズウェア (C's Ware)</publisher>
-		<info name="alt_title" value="エイミーと呼ばないでっ" />
-		<info name="release" value="19950519" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1310716">
-				<rom name="ami to yobanaide (1995)(c's ware)(disk 1 of 6)(disk a)[req install].fdd" size="1310716" crc="3df0e078" sha1="95f7e2cfd892e8882d813a5fffd1979035350ecf" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1308668">
-				<rom name="ami to yobanaide (1995)(c's ware)(disk 2 of 6)(disk b)[req install].fdd" size="1308668" crc="37a49731" sha1="c8947d759acde8324995b30f068dca7faea7fe82" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1308668">
-				<rom name="ami to yobanaide (1995)(c's ware)(disk 3 of 6)(disk c)[req install].fdd" size="1308668" crc="bbbd099d" sha1="844a1b02f8315c08ffe00c8bd456c07e7348271f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="1201148">
-				<rom name="ami to yobanaide (1995)(c's ware)(disk 4 of 6)(disk d)[req install].fdd" size="1201148" crc="278684b8" sha1="edd1b5f5badc41758d3f87a83de136d5d8261f5d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
-			<dataarea name="flop" size="1225724">
-				<rom name="ami to yobanaide (1995)(c's ware)(disk 5 of 6)(disk e)[req install].fdd" size="1225724" crc="9da04133" sha1="4a76f8c7c61275d5935733b14121a94c404bb0bf" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk F"/>
-			<dataarea name="flop" size="1151996">
-				<rom name="ami to yobanaide (1995)(c's ware)(disk 6 of 6)(disk f)[req install].fdd" size="1151996" crc="dd1ec4a3" sha1="a25a2dbb21a5b897b6759c506d81fd16820eec3e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="angel">
 		<description>U-Jin Presents - Angel</description>
 		<year>1993</year>
@@ -56648,6 +56929,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
+	<!-- Hangs on boot -->
 	<software name="edenkaor" supported="no">
 		<description>Eden no Kaori</description>
 		<year>1996</year>
@@ -56680,6 +56962,51 @@ SPACE EMPIRE
 		</part>
 	</software>
 
+	<software name="eimmy">
+		<description>Eimmy to Yobanaide</description>
+		<year>1995</year>
+		<publisher>シーズウェア (C's Ware)</publisher>
+		<info name="alt_title" value="エイミーと呼ばないでっ" />
+		<info name="release" value="19950519" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1310716">
+				<rom name="ami to yobanaide (1995)(c's ware)(disk 1 of 6)(disk a)[req install].fdd" size="1310716" crc="3df0e078" sha1="95f7e2cfd892e8882d813a5fffd1979035350ecf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1308668">
+				<rom name="ami to yobanaide (1995)(c's ware)(disk 2 of 6)(disk b)[req install].fdd" size="1308668" crc="37a49731" sha1="c8947d759acde8324995b30f068dca7faea7fe82" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1308668">
+				<rom name="ami to yobanaide (1995)(c's ware)(disk 3 of 6)(disk c)[req install].fdd" size="1308668" crc="bbbd099d" sha1="844a1b02f8315c08ffe00c8bd456c07e7348271f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1201148">
+				<rom name="ami to yobanaide (1995)(c's ware)(disk 4 of 6)(disk d)[req install].fdd" size="1201148" crc="278684b8" sha1="edd1b5f5badc41758d3f87a83de136d5d8261f5d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="1225724">
+				<rom name="ami to yobanaide (1995)(c's ware)(disk 5 of 6)(disk e)[req install].fdd" size="1225724" crc="9da04133" sha1="4a76f8c7c61275d5935733b14121a94c404bb0bf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk F"/>
+			<dataarea name="flop" size="1151996">
+				<rom name="ami to yobanaide (1995)(c's ware)(disk 6 of 6)(disk f)[req install].fdd" size="1151996" crc="dd1ec4a3" sha1="a25a2dbb21a5b897b6759c506d81fd16820eec3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Disk changes don't work -->
 	<software name="elle" supported="no">
 		<description>Elle</description>
 		<year>1991</year>
@@ -56712,7 +57039,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="elvira" supported="no">
+	<software name="elvira">
 		<description>Elvira - Mistress of the Dark</description>
 		<year>1992</year>
 		<publisher>アクイレムジャパン (Acclaim Japan)</publisher>
@@ -56738,10 +57065,10 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="engerrnd" supported="no">
-		<description>Engage Errands</description>
+	<software name="engerrnd">
+		<description>Engage Errands - Miwaku no Shito-tachi</description>
 		<year>1993</year>
-		<publisher>ポニーテールソフト (PonyTale Soft)</publisher>
+		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="alt_title" value="エンゲージエランズ ～魅惑の使徒たち～" />
 		<info name="release" value="19930925" />
 		<part name="flop1" interface="floppy_5_25">
@@ -56764,12 +57091,13 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="engerrn2" supported="no">
+	<software name="engerrn2">
 		<description>Engage Errands II - Hikari o Ninau Mono</description>
 		<year>1995</year>
-		<publisher>ポニーテールソフト (PonyTale Soft)</publisher>
-		<info name="alt_title" value="エンゲージエランズ ～魅惑の使徒たち～" />
+		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
+		<info name="alt_title" value="エンゲージエランズII ～光輝を担うもの～" />
 		<info name="release" value="19950210" />
+		<info name="usage" value="Run INST.EXE from DOS to copy system files or install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1062908">
@@ -56838,12 +57166,13 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="es" supported="no">
+	<software name="es">
 		<description>Es no Houteishiki</description>
 		<year>1996</year>
 		<publisher>アボガドパワーズ (Abogado Powers)</publisher>
 		<info name="alt_title" value="Ｅｓの方程式" />
 		<info name="release" value="19960628" />
+		<info name="usage" value="Run INSTHD.EXE from DOS to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1306620">
@@ -56876,7 +57205,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="escape" supported="no">
+	<software name="escape">
 		<description>Escape!</description>
 		<year>1996</year>
 		<publisher>メイビーソフト (May-Be Soft)</publisher>
@@ -56902,33 +57231,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="escapea" cloneof="escape" supported="no">
-		<description>Escape! (Alt Disk 1)</description>
-		<year>1996</year>
-		<publisher>メイビーソフト (May-Be Soft)</publisher>
-		<info name="alt_title" value="エスケイプ！" />
-		<info name="release" value="19960229" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="851964">
-				<rom name="escape (1996)(may-be)(disk 1 of 3)(system disk)[a].fdd" size="851964" crc="93431571" sha1="207d05e63c667dda844bb23ff315fbc798549b26" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1288188">
-				<rom name="escape (1996)(may-be)(disk 2 of 3)(disk a).fdd" size="1288188" crc="97e69a96" sha1="9a7c69ce4b43c5abbcce61dad627feb851f23200" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1279996">
-				<rom name="escape (1996)(may-be)(disk 3 of 3)(disk b).fdd" size="1279996" crc="7eb0f029" sha1="98fab8d8ce32563944ca7a4d7e70e0adced02d0a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="etsuraku" supported="no">
+	<software name="etsuraku">
 		<description>Etsuraku no Gakuen</description>
 		<year>1994</year>
 		<publisher>シーズウェア (C's Ware)</publisher>
@@ -56954,12 +57257,13 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="eveburst" supported="no">
+	<software name="eveburst">
 		<description>EVE - Burst Error</description>
 		<year>1995</year>
 		<publisher>シーズウェア (C's Ware)</publisher>
 		<info name="alt_title" value="イヴ ～バーストエラー～" />
 		<info name="release" value="19951122" />
+		<info name="usage" value="Boot from a DOS floppy, and run HDDINST.BAT from disk A to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1079292">
@@ -57004,12 +57308,13 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="exjack" supported="no">
+	<software name="exjack">
 		<description>Exceed Jack - Casinopolis</description>
 		<year>1995</year>
 		<publisher>ミスティ (Misty)</publisher>
 		<info name="alt_title" value="エクシードジャック" />
 		<info name="release" value="19950811" />
+		<info name="usage" value="Run GO.BAT from DOS to run the game, or HDINST.BAT to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1248252">
@@ -65569,6 +65874,7 @@ doujin?!?
 		</part>
 	</software>
 
+	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="esp">
 		<description>E.S.P</description>
 		<year>1994</year>
@@ -65581,11 +65887,12 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="eteris" supported="no">
+	<software name="eteris">
 		<description>Eteris</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="T. Imokawa" />
+		<info name="usage" value="Run ETE.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="eteris.hdm" size="1261568" crc="c8cb513b" sha1="754ee43b4073500f75f24ab71ee13cec624be3ba" offset="0" />
@@ -65602,19 +65909,6 @@ doujin?!?
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1086448">
 				<rom name="world_flowers.d88" size="1086448" crc="7d161526" sha1="02056be251cdd9610ddb069eb40e3e34a7cf7c79" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wildflowa" cloneof="wildflow" supported="no">
-		<description>Exciting Wild Flowers (Alt Format)</description>
-		<year>19??</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="author" value="TKO Soft" />
-		<info name="alt_title" value="エキサィティング ワイルドフラワーズ" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1089808">
-				<rom name="world_flowers.nfd" size="1089808" crc="3148d5cb" sha1="efb3770964d31d44a3025e468c207031a3c61cdc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
