@@ -272,9 +272,40 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_memtype_w)
 
 }
 
+READ16_MEMBER(sunplus_gcm394_base_device::system_7a35_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_7a35_r\n", machine().describe_context());
+	return machine().rand();
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::system_7a37_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_7a37_r\n", machine().describe_context());
+	return machine().rand();
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::system_7a39_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_7a39_r\n", machine().describe_context());
+	return machine().rand();
+}
+
+
 READ16_MEMBER(sunplus_gcm394_base_device::system_7a3a_r)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_7a3a_r\n", machine().describe_context());
+	return machine().rand();
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::system_7a46_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_7a46_r\n", machine().describe_context());
+	return machine().rand();
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::system_7a54_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_7a54_r\n", machine().describe_context());
 	return machine().rand();
 }
 
@@ -972,7 +1003,12 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	// 7axx region = system (including dma)
 	// ######################################################################################################################################################################################
 
+	map(0x007a35, 0x007a35).r(FUNC(sunplus_gcm394_base_device::system_7a35_r)); // wlsair60
+	map(0x007a37, 0x007a37).r(FUNC(sunplus_gcm394_base_device::system_7a37_r)); // wlsair60
+	map(0x007a39, 0x007a39).r(FUNC(sunplus_gcm394_base_device::system_7a39_r)); // wlsair60
 	map(0x007a3a, 0x007a3a).r(FUNC(sunplus_gcm394_base_device::system_7a3a_r)); // ?
+	map(0x007a46, 0x007a46).r(FUNC(sunplus_gcm394_base_device::system_7a46_r)); // wlsair60
+	map(0x007a54, 0x007a54).r(FUNC(sunplus_gcm394_base_device::system_7a54_r)); // wlsair60
 
 	map(0x007a80, 0x007a87).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel0_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel0_w));
 	map(0x007a88, 0x007a8f).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel1_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel1_w)); // jak_tsm writes here

@@ -346,7 +346,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 
+	DECLARE_READ16_MEMBER(system_7a35_r);
+	DECLARE_READ16_MEMBER(system_7a37_r);
+	DECLARE_READ16_MEMBER(system_7a39_r);
 	DECLARE_READ16_MEMBER(system_7a3a_r);
+	DECLARE_READ16_MEMBER(system_7a46_r);
+	DECLARE_READ16_MEMBER(system_7a54_r);
 
 	void checkirq6();
 
