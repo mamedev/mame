@@ -74,12 +74,13 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 	m_inp_rank(*this, "RANK.%u", 1),
 	m_inp_spawn(*this, "SPAWN"),
 	m_inp_ui(*this, "UI"),
+	m_inp_conf(*this, "CONF"),
 	m_custom_init_cb(*this),
 	m_custom_sensor_cb(*this),
 	m_custom_spawn_cb(*this),
 	m_custom_output_cb(*this)
 {
-	m_nvram_on = false;
+	m_nvram_auto = false;
 	m_nosensors = false;
 	m_magnets = false;
 	m_inductive = false;
@@ -190,7 +191,7 @@ void sensorboard_device::device_reset()
 	cancel_sensor();
 	cancel_hand();
 
-	if (!m_nvram_on)
+	if (!nvram_on())
 	{
 		clear_board();
 		m_custom_init_cb(0);
@@ -198,6 +199,7 @@ void sensorboard_device::device_reset()
 	undo_reset();
 	refresh();
 }
+
 
 
 //-------------------------------------------------
@@ -217,12 +219,18 @@ void sensorboard_device::nvram_read(emu_file &file)
 
 void sensorboard_device::nvram_write(emu_file &file)
 {
+	// save last board position
 	file.write(m_curstate, sizeof(m_curstate));
 }
 
 bool sensorboard_device::nvram_pre_write()
 {
-	return m_nvram_on;
+	return nvram_on();
+}
+
+bool sensorboard_device::nvram_on()
+{
+	return (m_inp_conf->read() & 3) ? bool(m_inp_conf->read() & 2) : m_nvram_auto;
 }
 
 
@@ -327,7 +335,7 @@ void sensorboard_device::refresh()
 	for (int x = 0; x < m_width; x++)
 		for (int y = 0; y < m_height; y++)
 		{
-			u8 piece = read_piece(x, y);
+			u8 piece = (m_inp_conf->read() & 4) ? 0 : read_piece(x, y);
 			int pos = (y << 4 & 0xf0) | (x & 0x0f);
 
 			// selected piece: m_maxid + piece id
@@ -798,6 +806,15 @@ static INPUT_PORTS_START( sensorboard )
 
 	PORT_START("UI_CHECK") // UI enabled (internal use)
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(sensorboard_device, check_ui_enabled)
+
+	PORT_START("CONF")
+	PORT_CONFNAME( 0x03, 0x00, "Remember Position" )
+	PORT_CONFSETTING(    0x01, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_CONFSETTING(    0x00, "Auto" )
+	PORT_CONFNAME( 0x04, 0x00, "Show Pieces" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_refresh, 0)
+	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 ioport_constructor sensorboard_device::device_input_ports() const
