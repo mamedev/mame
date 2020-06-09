@@ -1265,8 +1265,10 @@ public:
 	void read(ioport_value &value);
 	float crosshair_read();
 	void frame_update(running_machine &machine);
-	void set_accum(s32 accum) {m_accum = accum;}
-
+	
+	// setters
+	void set_value(s32 value);
+	
 private:
 	// helpers
 	s32 apply_min_max(s32 value) const;
@@ -1294,6 +1296,7 @@ private:
 	s32                 m_accum;                // accumulated value (including relative adjustments)
 	s32                 m_previous;             // previous adjusted value
 	s32                 m_previousanalog;       // previous analog value
+	s32					m_prog_analog_value;	// programmatically set analog value
 
 	// parameters for modifying live values
 	s32                 m_minimum;              // minimum adjusted value
@@ -1315,6 +1318,7 @@ private:
 	bool                m_single_scale;         // scale joystick differently if default is between min/max
 	bool                m_interpolate;          // should we do linear interpolation for mid-frame reads?
 	bool                m_lastdigital;          // was the last modification caused by a digital form?
+	bool                m_was_written;          // was the last modification caused programmatically?
 };
 
 
