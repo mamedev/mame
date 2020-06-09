@@ -234,14 +234,14 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 
 
 #if 0
-WRITE8_MEMBER(fortyl_state::fortyl_coin_counter_w)
+void fortyl_state::fortyl_coin_counter_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(offset,data);
 }
 #endif
 
 
-WRITE8_MEMBER(fortyl_state::bank_select_w)
+void fortyl_state::bank_select_w(uint8_t data)
 {
 	if ((data != 0x02) && (data != 0xfd))
 	{
@@ -252,7 +252,7 @@ WRITE8_MEMBER(fortyl_state::bank_select_w)
 	membank("bank1")->set_entry(data & 1);
 }
 
-WRITE8_MEMBER(fortyl_state::pix1_w)
+void fortyl_state::pix1_w(uint8_t data)
 {
 //  if (data > 7)
 //      logerror("pix1 = %2x\n", data);
@@ -260,7 +260,7 @@ WRITE8_MEMBER(fortyl_state::pix1_w)
 	m_pix1 = data;
 }
 
-READ8_MEMBER(fortyl_state::fortyl_mcu_status_r)
+uint8_t fortyl_state::fortyl_mcu_status_r()
 {
 	// bit 0 = when 1, MCU is ready to receive data from main CPU
 	// bit 1 = when 1, MCU has sent data to the main CPU
@@ -269,7 +269,7 @@ READ8_MEMBER(fortyl_state::fortyl_mcu_status_r)
 		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
 }
 
-WRITE8_MEMBER(fortyl_state::pix1_mcu_w)
+void fortyl_state::pix1_mcu_w(uint8_t data)
 {
 //  if (data > 7)
 //      logerror("pix1 = %2x\n", data);
@@ -277,7 +277,7 @@ WRITE8_MEMBER(fortyl_state::pix1_mcu_w)
 	m_pix1 = data;
 }
 
-WRITE8_MEMBER(fortyl_state::pix2_w)
+void fortyl_state::pix2_w(uint8_t data)
 {
 //  if ((data!=0x00) && (data != 0xff))
 //      logerror("pix2 = %2x\n", data);
@@ -287,13 +287,13 @@ WRITE8_MEMBER(fortyl_state::pix2_w)
 }
 
 #if 0
-READ8_MEMBER(fortyl_state::pix1_r)
+uint8_t fortyl_state::pix1_r()
 {
 	return m_pix1;
 }
 #endif
 
-READ8_MEMBER(fortyl_state::pix2_r)
+uint8_t fortyl_state::pix2_r()
 {
 	int res;
 	int d1 = m_pix1 & 7;
@@ -319,7 +319,7 @@ void fortyl_state::driver_init()
 
 /***************************************************************************/
 
-READ8_MEMBER(fortyl_state::snd_flag_r)
+uint8_t fortyl_state::snd_flag_r()
 {
 	return (m_soundlatch2->pending_r() ? 2 : 0) | 0xfd;
 }
