@@ -791,17 +791,19 @@ void netlist_mame_stream_output_device::set_params(int channel, const char *out_
 ///
 struct save_helper
 {
-	save_helper(device_t *dev, pstring prefix)
+	save_helper(device_t *dev, const pstring &prefix)
 	: m_device(dev), m_prefix(prefix)
 	{}
 
-	template<typename T>
-	void save_item(T &&item, pstring name)
+	template<typename T, typename X = void *>
+	void save_item(T &&item, const pstring &name, X = nullptr)
 	{
 		m_device->save_item(item, (m_prefix + "_" + name).c_str());
 	}
 
-	void save_item(std::enable_if_t<plib::compile_info::has_int128::value,INT128> &item, pstring name)
+	template <typename X = void *>
+	std::enable_if_t<plib::compile_info::has_int128::value && std::is_pointer<X>::value, void>
+	save_item(INT128 &item, const pstring &name, X = nullptr)
 	{
 		auto *p = reinterpret_cast<std::uint64_t *>(&item);
 		m_device->save_item(p[0], (m_prefix + "_" + name + "_1").c_str());
