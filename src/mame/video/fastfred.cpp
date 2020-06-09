@@ -110,14 +110,14 @@ VIDEO_START_MEMBER(fastfred_state,fastfred)
  *
  *************************************/
 
-WRITE8_MEMBER(fastfred_state::fastfred_videoram_w )
+void fastfred_state::fastfred_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(fastfred_state::fastfred_attributes_w )
+void fastfred_state::fastfred_attributes_w(offs_t offset, uint8_t data)
 {
 	if (m_attributesram[offset] != data)
 	{
@@ -308,7 +308,7 @@ TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_web)
 	tileinfo.set(3, tile_index & 0x1ff, 0, 0);
 }
 
-WRITE8_MEMBER(fastfred_state::imago_fg_videoram_w )
+void fastfred_state::imago_fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_imago_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);

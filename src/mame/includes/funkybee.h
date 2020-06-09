@@ -33,13 +33,13 @@ private:
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	int        m_gfx_bank;
-	DECLARE_READ8_MEMBER(funkybee_input_port_0_r);
+	uint8_t funkybee_input_port_0_r();
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(funkybee_videoram_w);
-	DECLARE_WRITE8_MEMBER(funkybee_colorram_w);
+	void funkybee_videoram_w(offs_t offset, uint8_t data);
+	void funkybee_colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(gfx_bank_w);
-	DECLARE_WRITE8_MEMBER(funkybee_scroll_w);
+	void funkybee_scroll_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(funkybee_tilemap_scan);

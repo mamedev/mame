@@ -53,22 +53,22 @@ protected:
 	DECLARE_MACHINE_RESET(sgyxz);
 	DECLARE_MACHINE_START(wofr1bl);
 
-	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);
+	void fcrash_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fcrash_snd_bankswitch_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(m5205_int1);
 	DECLARE_WRITE_LINE_MEMBER(m5205_int2);
-	DECLARE_WRITE8_MEMBER(fcrash_msm5205_0_data_w);
-	DECLARE_WRITE8_MEMBER(fcrash_msm5205_1_data_w);
-	DECLARE_WRITE16_MEMBER(cawingbl_soundlatch_w);
-	DECLARE_WRITE16_MEMBER(kodb_layer_w);
-	DECLARE_WRITE16_MEMBER(mtwinsb_layer_w);
-	DECLARE_WRITE16_MEMBER(sf2m1_layer_w);
-	DECLARE_WRITE16_MEMBER(varthb_layer_w);
-	DECLARE_WRITE16_MEMBER(varthb_layer2_w);
-	DECLARE_READ16_MEMBER(sgyxz_dsw_r);
-	DECLARE_WRITE16_MEMBER(wofr1bl_layer_w);
-	DECLARE_WRITE16_MEMBER(wofr1bl_layer2_w);
-	DECLARE_WRITE16_MEMBER(wofr1bl_spr_base_w);
+	void fcrash_msm5205_0_data_w(uint8_t data);
+	void fcrash_msm5205_1_data_w(uint8_t data);
+	void cawingbl_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void kodb_layer_w(offs_t offset, uint16_t data);
+	void mtwinsb_layer_w(offs_t offset, uint16_t data);
+	void sf2m1_layer_w(offs_t offset, uint16_t data);
+	void varthb_layer_w(offs_t offset, uint16_t data);
+	void varthb_layer2_w(uint16_t data);
+	uint16_t sgyxz_dsw_r(offs_t offset);
+	void wofr1bl_layer_w(offs_t offset, uint16_t data);
+	void wofr1bl_layer2_w(uint16_t data);
+	void wofr1bl_spr_base_w(uint16_t data);
 
 	uint32_t screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fcrash_update_transmasks();

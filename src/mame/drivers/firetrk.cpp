@@ -67,7 +67,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(firetrk_state::firetrk_scanline)
 }
 
 
-WRITE8_MEMBER(firetrk_state::firetrk_output_w)
+void firetrk_state::firetrk_output_w(uint8_t data)
 {
 	/* BIT0 => START1 LAMP */
 	m_leds[0] = BIT(~data, 0);
@@ -96,7 +96,7 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 }
 
 
-WRITE8_MEMBER(firetrk_state::superbug_output_w)
+void firetrk_state::superbug_output_w(offs_t offset, uint8_t data)
 {
 	/* BIT0 => START LAMP */
 	m_leds[0] = BIT(offset, 0);
@@ -114,7 +114,7 @@ WRITE8_MEMBER(firetrk_state::superbug_output_w)
 }
 
 
-WRITE8_MEMBER(firetrk_state::montecar_output_1_w)
+void firetrk_state::montecar_output_1_w(uint8_t data)
 {
 	/* BIT0 => START LAMP    */
 	m_leds[0] = BIT(~data, 0);
@@ -139,7 +139,7 @@ WRITE8_MEMBER(firetrk_state::montecar_output_1_w)
 }
 
 
-WRITE8_MEMBER(firetrk_state::montecar_output_2_w)
+void firetrk_state::montecar_output_2_w(uint8_t data)
 {
 	m_flash = data & 0x80;
 
@@ -154,7 +154,7 @@ void firetrk_state::machine_reset()
 }
 
 
-READ8_MEMBER(firetrk_state::firetrk_dip_r)
+uint8_t firetrk_state::firetrk_dip_r(offs_t offset)
 {
 	uint8_t val0 = m_dips[0]->read();
 	uint8_t val1 = m_dips[1]->read();
@@ -166,7 +166,7 @@ READ8_MEMBER(firetrk_state::firetrk_dip_r)
 }
 
 
-READ8_MEMBER(firetrk_state::montecar_dip_r)
+uint8_t firetrk_state::montecar_dip_r(offs_t offset)
 {
 	uint8_t val0 = m_dips[0]->read();
 	uint8_t val1 = m_dips[1]->read();
@@ -227,7 +227,7 @@ READ_LINE_MEMBER(firetrk_state::gear_r)
 }
 
 
-READ8_MEMBER(firetrk_state::firetrk_input_r)
+uint8_t firetrk_state::firetrk_input_r(offs_t offset)
 {
 	/* update steering wheels */
 	for (int i = 0; i < 2; i++)
@@ -250,9 +250,9 @@ READ8_MEMBER(firetrk_state::firetrk_input_r)
 }
 
 
-READ8_MEMBER(firetrk_state::montecar_input_r)
+uint8_t firetrk_state::montecar_input_r(offs_t offset)
 {
-	uint8_t ret = firetrk_input_r(space, offset);
+	uint8_t ret = firetrk_input_r(offset);
 
 	if (m_crash[0])
 		ret |= 0x02;
@@ -265,34 +265,34 @@ READ8_MEMBER(firetrk_state::montecar_input_r)
 }
 
 
-WRITE8_MEMBER(firetrk_state::blink_on_w)
+void firetrk_state::blink_on_w(uint8_t data)
 {
 	*m_blink = true;
 }
 
 
-WRITE8_MEMBER(firetrk_state::montecar_car_reset_w)
+void firetrk_state::montecar_car_reset_w(uint8_t data)
 {
 	m_crash[0] = 0;
 	m_skid[0] = 0;
 }
 
 
-WRITE8_MEMBER(firetrk_state::montecar_drone_reset_w)
+void firetrk_state::montecar_drone_reset_w(uint8_t data)
 {
 	m_crash[1] = 0;
 	m_skid[1] = 0;
 }
 
 
-WRITE8_MEMBER(firetrk_state::steer_reset_w)
+void firetrk_state::steer_reset_w(uint8_t data)
 {
 	m_steer_flag[0] = 1;
 	m_steer_flag[1] = 1;
 }
 
 
-WRITE8_MEMBER(firetrk_state::crash_reset_w)
+void firetrk_state::crash_reset_w(uint8_t data)
 {
 	m_crash[0] = 0;
 	m_crash[1] = 0;

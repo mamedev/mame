@@ -113,7 +113,7 @@ brightness circuity present on pcb?
 #define CODE_SIZE            0x400000
 
 
-WRITE16_MEMBER( fcrash_state::fcrash_soundlatch_w )
+void fcrash_state::fcrash_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -122,7 +122,7 @@ WRITE16_MEMBER( fcrash_state::fcrash_soundlatch_w )
 	}
 }
 
-WRITE8_MEMBER( fcrash_state::fcrash_snd_bankswitch_w )
+void fcrash_state::fcrash_snd_bankswitch_w(uint8_t data)
 {
 	m_msm_1->set_output_gain(0, (data & 0x08) ? 0.0 : 1.0);
 	m_msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
@@ -146,17 +146,17 @@ WRITE_LINE_MEMBER(fcrash_state::m5205_int2)
 	m_sample_select2 ^= 1;
 }
 
-WRITE8_MEMBER( fcrash_state::fcrash_msm5205_0_data_w )
+void fcrash_state::fcrash_msm5205_0_data_w(uint8_t data)
 {
 	m_sample_buffer1 = data;
 }
 
-WRITE8_MEMBER( fcrash_state::fcrash_msm5205_1_data_w )
+void fcrash_state::fcrash_msm5205_1_data_w(uint8_t data)
 {
 	m_sample_buffer2 = data;
 }
 
-WRITE16_MEMBER(fcrash_state::cawingbl_soundlatch_w)
+void fcrash_state::cawingbl_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -166,7 +166,7 @@ WRITE16_MEMBER(fcrash_state::cawingbl_soundlatch_w)
 	}
 }
 
-WRITE16_MEMBER(fcrash_state::kodb_layer_w)
+void fcrash_state::kodb_layer_w(offs_t offset, uint16_t data)
 {
 	/* layer enable and mask 1&2 registers are written here - passing them to m_cps_b_regs for now for drawing routines */
 	if (offset == 0x06)
@@ -179,7 +179,7 @@ WRITE16_MEMBER(fcrash_state::kodb_layer_w)
 		m_cps_b_regs[m_layer_mask_reg[2] / 2] = data;
 }
 
-WRITE16_MEMBER(fcrash_state::mtwinsb_layer_w)
+void fcrash_state::mtwinsb_layer_w(offs_t offset, uint16_t data)
 {
 	m_cps_a_regs[0x06 / 2] = 0x9100; // bit of a hack - the game never writes this, but does need it
 
@@ -210,7 +210,7 @@ WRITE16_MEMBER(fcrash_state::mtwinsb_layer_w)
 	}
 }
 
-WRITE16_MEMBER(fcrash_state::sf2m1_layer_w)
+void fcrash_state::sf2m1_layer_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -268,7 +268,7 @@ WRITE16_MEMBER(fcrash_state::sf2m1_layer_w)
 	}
 }
 
-WRITE16_MEMBER(fcrash_state::varthb_layer_w)
+void fcrash_state::varthb_layer_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -296,19 +296,19 @@ WRITE16_MEMBER(fcrash_state::varthb_layer_w)
 	}
 }
 
-WRITE16_MEMBER(fcrash_state::varthb_layer2_w)
+void fcrash_state::varthb_layer2_w(uint16_t data)
 {
 	if (data > 0x9000)
 		m_cps_a_regs[0x06 / 2] = data;
 }
 
-READ16_MEMBER(fcrash_state::sgyxz_dsw_r)
+uint16_t fcrash_state::sgyxz_dsw_r(offs_t offset)
 {
 	int in = m_sgyxz_dsw[offset]->read();
 	return (in << 8) | 0xff;
 }
 
-WRITE16_MEMBER(fcrash_state::wofr1bl_layer_w)
+void fcrash_state::wofr1bl_layer_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -415,12 +415,12 @@ WRITE16_MEMBER(fcrash_state::wofr1bl_layer_w)
 	}
 }
 
-WRITE16_MEMBER(fcrash_state::wofr1bl_layer2_w)
+void fcrash_state::wofr1bl_layer2_w(uint16_t data)
 {
 	m_cps_a_regs[0x06 / 2] = data;
 }
 
-WRITE16_MEMBER(fcrash_state::wofr1bl_spr_base_w)
+void fcrash_state::wofr1bl_spr_base_w(uint16_t data)
 {
 	m_sprite_base = data ? 0x3000 : 0x1000;
 }
@@ -1072,7 +1072,7 @@ MACHINE_START_MEMBER(fcrash_state, ffightblb)
 void fcrash_state::init_cawingbl()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x882000, 0x882001, "IN1");
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x882006, 0x882007, write16_delegate(*this, FUNC(fcrash_state::cawingbl_soundlatch_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x882006, 0x882007, write16s_delegate(*this, FUNC(fcrash_state::cawingbl_soundlatch_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x882008, 0x88200f, read16sm_delegate(*this, FUNC(fcrash_state::cps1_dsw_r)));
 
 	init_cps1();
@@ -1083,7 +1083,7 @@ void fcrash_state::init_kodb()
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x800000, 0x800007, "IN1");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800018, 0x80001f, read16sm_delegate(*this, FUNC(fcrash_state::cps1_dsw_r)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800180, 0x800187, write16s_delegate(*this, FUNC(fcrash_state::cps1_soundlatch_w)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x980000, 0x98002f, write16_delegate(*this, FUNC(fcrash_state::kodb_layer_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x980000, 0x98002f, write16sm_delegate(*this, FUNC(fcrash_state::kodb_layer_w)));
 
 	/* the original game alternates between 2 sprite ram areas to achieve flashing sprites - the bootleg doesn't do the write to the register to achieve this
 	mapping both sprite ram areas to the same bootleg sprite ram - similar to how sf2mdt works */
@@ -1113,7 +1113,7 @@ void fcrash_state::init_wofr1bl()
 {
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x990000, 0x990001, write16_delegate(*this, FUNC(fcrash_state::wofr1bl_spr_base_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x990000, 0x990001, write16smo_delegate(*this, FUNC(fcrash_state::wofr1bl_spr_base_w)));
 	init_cps1();
 }
 

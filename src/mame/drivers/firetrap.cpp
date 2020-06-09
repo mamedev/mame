@@ -183,14 +183,14 @@ the MSM5205-derived interrupt assigned to the NMI line instead.
 #define FIRETRAP_XTAL XTAL(12'000'000)
 
 
-WRITE8_MEMBER(firetrap_state::nmi_disable_w)
+void firetrap_state::nmi_disable_w(uint8_t data)
 {
 	m_nmi_enable = ~data & 1;
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_bankselect_w)
+void firetrap_state::firetrap_bankselect_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }
@@ -248,7 +248,7 @@ void firetrap_state::mcu_p3_w(uint8_t data)
 	m_mcu_p3 = data;
 }
 
-READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
+uint8_t firetrap_state::firetrap_8751_bootleg_r()
 {
 	/* Check for coin insertion */
 	/* the following only works in the bootleg version, which doesn't have an */
@@ -274,7 +274,7 @@ READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
 	return 0;
 }
 
-WRITE8_MEMBER(firetrap_state::sound_flip_flop_w)
+void firetrap_state::sound_flip_flop_w(uint8_t data)
 {
 	m_msm->reset_w(!BIT(data, 0));
 	m_sound_irq_enable = BIT(data, 1);
@@ -282,7 +282,7 @@ WRITE8_MEMBER(firetrap_state::sound_flip_flop_w)
 		m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(firetrap_state::sound_bankselect_w)
+void firetrap_state::sound_bankselect_w(uint8_t data)
 {
 	membank("bank2")->set_entry(data & 0x01);
 }
@@ -299,13 +299,13 @@ WRITE_LINE_MEMBER(firetrap_state::firetrap_adpcm_int)
 	}
 }
 
-WRITE8_MEMBER(firetrap_state::adpcm_data_w)
+void firetrap_state::adpcm_data_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	m_adpcm_select->ba_w(data);
 }
 
-WRITE8_MEMBER(firetrap_state::flip_screen_w)
+void firetrap_state::flip_screen_w(uint8_t data)
 {
 	flip_screen_set(data);
 }

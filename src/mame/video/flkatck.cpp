@@ -80,7 +80,7 @@ void flkatck_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(flkatck_state::vram_w)
+void flkatck_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 	if (offset & 0x800) /* score */
@@ -89,7 +89,7 @@ WRITE8_MEMBER(flkatck_state::vram_w)
 		m_k007121_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(flkatck_state::flkatck_k007121_regs_w)
+void flkatck_state::flkatck_k007121_regs_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

@@ -60,7 +60,7 @@ Year + Game             Main CPU  Sound CPU  Sound                         Video
 
 ***************************************************************************/
 
-WRITE8_MEMBER(fantland_state::nmi_enable_w)
+void fantland_state::nmi_enable_w(uint8_t data)
 {
 	m_nmi_enable = data;
 
@@ -68,7 +68,7 @@ WRITE8_MEMBER(fantland_state::nmi_enable_w)
 		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", m_maincpu->pc(), data);
 }
 
-WRITE8_MEMBER(fantland_state::soundlatch_w)
+void fantland_state::soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -78,22 +78,22 @@ WRITE8_MEMBER(fantland_state::soundlatch_w)
                                 Fantasy Land
 ***************************************************************************/
 
-READ8_MEMBER(fantland_state::spriteram_r)
+uint8_t fantland_state::spriteram_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-READ8_MEMBER(fantland_state::spriteram2_r)
+uint8_t fantland_state::spriteram2_r(offs_t offset)
 {
 	return m_spriteram2[offset];
 }
 
-WRITE8_MEMBER(fantland_state::spriteram_w)
+void fantland_state::spriteram_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
-WRITE8_MEMBER(fantland_state::spriteram2_w)
+void fantland_state::spriteram2_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram2[offset]);
 }
@@ -147,7 +147,7 @@ void fantland_state::galaxygn_map(address_map &map)
 
 // data & 0x31 changes when lightgun fires
 #if 0
-WRITE8_MEMBER(borntofi_state::nmi_enable_w)
+void borntofi_state::nmi_enable_w(uint8_t data)
 {
 	m_nmi_enable = data;
 
@@ -159,7 +159,7 @@ WRITE8_MEMBER(borntofi_state::nmi_enable_w)
 #endif
 
 // Trackball doesn't work correctly
-READ8_MEMBER(borntofi_state::inputs_r)
+uint8_t borntofi_state::inputs_r(offs_t offset)
 {
 	int x, y, f;
 
@@ -308,7 +308,7 @@ void borntofi_state::adpcm_stop(int voice)
 	m_adpcm_playing[voice] = 0;
 }
 
-WRITE8_MEMBER(borntofi_state::msm5205_w)
+void borntofi_state::msm5205_w(offs_t offset, uint8_t data)
 {
 	int voice = offset / 8;
 	int reg = offset % 8;
