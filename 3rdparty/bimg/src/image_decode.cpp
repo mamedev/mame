@@ -140,6 +140,9 @@ namespace bimg
 							palette = true;
 							supported = true;
 							break;
+
+						case LCT_MAX_OCTET_VALUE:
+							break;
 					}
 					break;
 
@@ -193,6 +196,9 @@ namespace bimg
 							break;
 
 						case LCT_PALETTE:
+							break;
+
+						case LCT_MAX_OCTET_VALUE:
 							break;
 					}
 					break;
@@ -370,6 +376,9 @@ namespace bimg
 
 					case LCT_PALETTE:
 						output->m_hasAlpha = lodepng_has_palette_alpha(&state.info_raw);
+						break;
+
+					case LCT_MAX_OCTET_VALUE:
 						break;
 				}
 			}
