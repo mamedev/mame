@@ -468,6 +468,13 @@ static INPUT_PORTS_START( btime3 ) // Used for btime3 and btimem
 	PORT_DIPSETTING(    0x00, "Sound Test Only" )
 	PORT_DIPSETTING(    0x10, "Cross Hatch Only" )
 	PORT_DIPSETTING(    0x20, "Normal Test" )  // Use Coin A to advance the tests
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, "30000" )
+	PORT_DIPSETTING(    0x04, "50000" )
+	PORT_DIPSETTING(    0x02, "80000"  )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cookrace )
