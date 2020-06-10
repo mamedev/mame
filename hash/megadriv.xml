@@ -52,8 +52,6 @@ Known undumped protos
   * Jack Nicklaus Power Challenge
   * Danny Sullivan's Indy Heat
   * Star Trek Starfleet Academy
-  * Teenage Mutant Hero Turtles - The Hyperstone Heist (Europe)
-  * Spot Goes to Hollywood (Europe)
 
 Known undumped pirates
 
@@ -138,7 +136,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-	<!-- Majesco re-release comes on a 010179 REV 1 PCB, with a single chip marked as 6-Pak. Needs to be verified. -->
+<!-- Majesco re-release comes on a 010179 REV 1 PCB, with a single chip marked as 6-Pak. Needs to be verified. -->
 	<software name="6pak">
 		<description>6-Pak (USA)</description>
 		<year>1995</year>
@@ -11044,7 +11042,7 @@ but dumps still have to be confirmed.
 
 	<software name="babyboom">
 		<description>Baby Boom (Prototype, 19940811)</description>
-		<year>1994</year>
+		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11055,7 +11053,7 @@ but dumps still have to be confirmed.
 
 	<software name="babyboom1" cloneof="babyboom">
 		<description>Baby Boom (Prototype, 19940603)</description>
-		<year>1994</year>
+		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11066,7 +11064,7 @@ but dumps still have to be confirmed.
 
 	<software name="babyboom2" cloneof="babyboom">
 		<description>Baby Boom (Prototype, 19940606)</description>
-		<year>1994</year>
+		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -26248,7 +26246,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- Board comes with two chips, proper dumps required. -->
+<!-- Board comes with two chips, proper dumps required. -->
 	<software name="sor3u" cloneof="sor3">
 		<description>Streets of Rage 3 (USA)</description>
 		<year>1994</year>
