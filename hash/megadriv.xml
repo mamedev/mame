@@ -136,7 +136,6 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-	<!-- Majesco re-release comes on a 010179 REV 1 PCB, with a single chip marked as 6-Pak. Needs to be verified. -->
 <!-- Majesco re-release comes on a 010179 REV 1 PCB, with a single chip marked as 6-Pak. Needs to be verified. -->
 	<software name="6pak">
 		<description>6-Pak (USA)</description>
