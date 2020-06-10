@@ -58,9 +58,6 @@ private:
 	virtual void video_start() override;
 
 	void bank_select_w(uint8_t data);
-	void pix1_w(uint8_t data);
-	void pix2_w(uint8_t data);
-	uint8_t pix2_r();
 	uint8_t snd_flag_r();
 	uint8_t fortyl_mcu_status_r();
 	void fortyl_pixram_sel_w(uint8_t data);
@@ -70,7 +67,6 @@ private:
 	uint8_t fortyl_bg_videoram_r(offs_t offset);
 	void fortyl_bg_colorram_w(offs_t offset, uint8_t data);
 	uint8_t fortyl_bg_colorram_r(offs_t offset);
-	void pix1_mcu_w(uint8_t data);
 	void sound_control_0_w(uint8_t data);
 	void sound_control_1_w(uint8_t data);
 	void sound_control_2_w(uint8_t data);
@@ -113,8 +109,6 @@ private:
 
 	/* misc */
 	int         m_pix_color[4];
-	uint8_t       m_pix1;
-	uint8_t       m_pix2[2];
 	int         m_vol_ctrl[16];
 	uint8_t       m_snd_ctrl0;
 	uint8_t       m_snd_ctrl1;
