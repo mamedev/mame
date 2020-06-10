@@ -1296,7 +1296,7 @@ private:
 	s32                 m_accum;                // accumulated value (including relative adjustments)
 	s32                 m_previous;             // previous adjusted value
 	s32                 m_previousanalog;       // previous analog value
-	s32					m_prog_analog_value;	// programmatically set analog value
+	s32                 m_prog_analog_value;    // programmatically set analog value
 
 	// parameters for modifying live values
 	s32                 m_minimum;              // minimum adjusted value
