@@ -129,6 +129,7 @@ void sensorboard_device::device_start()
 	m_usize = ARRAY_LENGTH(m_history);
 
 	// register for savestates
+	save_item(NAME(m_nosensors));
 	save_item(NAME(m_magnets));
 	save_item(NAME(m_inductive));
 	save_item(NAME(m_width));
@@ -151,6 +152,7 @@ void sensorboard_device::device_start()
 	save_item(NAME(m_ufirst));
 	save_item(NAME(m_ulast));
 	save_item(NAME(m_usize));
+	save_item(NAME(m_nvram_auto));
 	save_item(NAME(m_sensordelay));
 }
 
