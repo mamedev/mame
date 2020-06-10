@@ -1542,6 +1542,10 @@ u16 namcos22_state::namcos22_keycus_r(offs_t offset)
 			if (offset == 4) return 0x01a8;
 			break;
 
+		// no keycus
+		case NAMCOS22_AIR_COMBAT22:
+			return 0;
+
 		default:
 			break;
 	}

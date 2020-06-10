@@ -292,7 +292,7 @@ void fortyl_state::_40love_map(address_map &map)
 	map(0x8800, 0x8800).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
 	map(0x8801, 0x8801).r(FUNC(fortyl_state::fortyl_mcu_status_r)).w("mb14241", FUNC(mb14241_device::shift_count_w)); //pixel layer related
 	map(0x8802, 0x8802).w(FUNC(fortyl_state::bank_select_w));
-	map(0x8803, 0x8803).r("mb14241", FUNC(mb14241_device::shift_result_r)).w("mb14241", FUNC(mb14241_device::shift_data_w)); //pixel layer related
+	map(0x8803, 0x8803).rw("mb14241", FUNC(mb14241_device::shift_result_r), FUNC(mb14241_device::shift_data_w)); //pixel layer related
 	map(0x8804, 0x8804).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0x8804, 0x8804).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x8805, 0x8805).r(FUNC(fortyl_state::snd_flag_r)).nopw(); /*sound_reset*/ //????
@@ -321,7 +321,7 @@ void fortyl_state::undoukai_map(address_map &map)
 	map(0xa800, 0xa800).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
 	map(0xa801, 0xa801).r(FUNC(fortyl_state::fortyl_mcu_status_r)).w("mb14241", FUNC(mb14241_device::shift_count_w)); //pixel layer related
 	map(0xa802, 0xa802).w(FUNC(fortyl_state::bank_select_w));
-	map(0xa803, 0xa803).r("mb14241", FUNC(mb14241_device::shift_result_r)).w("mb14241", FUNC(mb14241_device::shift_data_w)); //pixel layer related
+	map(0xa803, 0xa803).rw("mb14241", FUNC(mb14241_device::shift_result_r), FUNC(mb14241_device::shift_data_w)); //pixel layer related
 	map(0xa804, 0xa804).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0xa804, 0xa804).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xa805, 0xa805).r(FUNC(fortyl_state::snd_flag_r)).nopw(); /*sound_reset*/    //????
