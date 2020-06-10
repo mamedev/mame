@@ -651,13 +651,9 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 void ioport_field::set_value(ioport_value value)
 {
 	if (is_analog())
-	{
-		live().analog->set_value( value );
-	}
+		live().analog->set_value(s32(value));
 	else
-	{
 		m_digital_value = value != 0;
-	}
 }
 
 
