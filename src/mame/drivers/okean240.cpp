@@ -1,10 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-/***************************************************************************
+/*******************************************************************************************
 
 Okeah-240 (Ocean-240).
-Rom says "Chernogolovka Mosk. Reg. Tel 51-24". Chernogolovka is a town
-about 43km from Moscow. It has various research facilities.
 
 2011-12-28 Skeleton driver.
 
@@ -30,26 +28,51 @@ ppaC0 : K580ww55
   portB[4-5]=mm.page
   portC=vid.scroll.x
 
+If you leave out the CPM80 roms, the machine will start up in a machine-language monitor.
+
+Okean240: MONITOR 240/7  known commands:
+A ?
+B ?
+D dump
+F fill
+G go
+L load (via uart)
+M move
+R ?
+S substitute
+W ?
+X registers
+
+Okean240a: Turbo MONITOR by Alex Z. There are several emulation bugs noticed. Known commands:
+H hex arithmetic
+J Jamp (set address?)
+M move
+P ? (locks up)
+R read
+W write
+tab switches between the hex and ascii sides
+^C refresh display
 
 NOTE ABOUT THE TEST ROM (okean240t):
-- You need to press a key every so often.
+- You need to press a key every so often, or hold down Insert.
 
 
 ToDo:
-- Add devices
 - Find out if any unconnected keyboard entries are real keys
+- Arrow keys (used in Turbo Monitor)
 - Colours?
 - Sound? (perhaps port E4 bit 3)
-- Add disks
+- Floppy disks and devices
 - Cassette?
 - Add memory banking (perhaps port C1)
+- 80 column mode (used in Turbo Monitor)
 
-Usage of terminal:
-- okean240 - the keyboard
-- okean240a - not used
-- okean240t - the keyboard & screen
+Keyboard:
+- okean240 - external ascii keyboard
+- okean240a - internal keyboard
+- okean240t - serial keyboard & screen
 
-****************************************************************************/
+**********************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -192,12 +215,12 @@ u8 okean240_state::okean240a_port42_r()
 
 // This is a keyboard acknowledge pulse, it goes high then
 // straightaway low, if reading port 40 indicates a key is pressed.
+// okean240: data bit 7
+// okean240a: data bit 4
 void okean240_state::okean240_port42_w(u8 data)
 {
 	m_pic->ir1_w(0);
 	m_key_pressed = false;
-// okean240: port 42 bit 7
-// okean240a: port 42 bit 4
 }
 
 void okean240_state::okean240_porte2_w(u8 data)
@@ -218,7 +241,7 @@ void okean240_state::okean240_mem(address_map &map)
 void okean240_state::okean240_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x20, 0x23).nopw();
+	map(0x20, 0x25).nopw();
 	map(0x40, 0x43).rw(m_ppikbd, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x60, 0x63).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x80, 0x81).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
