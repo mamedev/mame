@@ -168,7 +168,7 @@ void wd_fdc_device_base::soft_reset()
 WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 {
 	if(mr && !state) {
-		command = 0x00;
+		command = 0x03;
 		main_state = IDLE;
 		sub_state = IDLE;
 		cur_live.state = IDLE;
@@ -204,6 +204,7 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 		live_abort();
 	} else if(state && !mr) {
 		// trigger a restore after everything else is reset too, in particular the floppy device itself
+		status |= S_BUSY;
 		sub_state = INITIAL_RESTORE;
 		t_gen->adjust(attotime::zero);
 		mr = true;
