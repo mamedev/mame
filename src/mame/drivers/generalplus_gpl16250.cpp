@@ -71,24 +71,24 @@
 #include "includes/generalplus_gpl16250.h"
 
 
-READ16_MEMBER(gcm394_game_state::cs0_r)
+uint16_t gcm394_game_state::cs0_r(offs_t offset)
 {
 	return m_romregion[offset & 0x3fffff];
 }
 
-WRITE16_MEMBER(gcm394_game_state::cs0_w)
+void gcm394_game_state::cs0_w(offs_t offset, uint16_t data)
 {
 	logerror("cs0_w %04x %04x (to ROM!)\n", offset, data);
 }
 
-READ16_MEMBER(gcm394_game_state::cs1_r) { logerror("cs1_r %06n", offset); return 0x0000; }
-WRITE16_MEMBER(gcm394_game_state::cs1_w) { logerror("cs1_w %06x %04x\n", offset, data); }
-READ16_MEMBER(gcm394_game_state::cs2_r) { logerror("cs2_r %06n", offset); return 0x0000; }
-WRITE16_MEMBER(gcm394_game_state::cs2_w) { logerror("cs2_w %06x %04x\n", offset, data); }
-READ16_MEMBER(gcm394_game_state::cs3_r) { logerror("cs3_r %06n", offset); return 0x0000; }
-WRITE16_MEMBER(gcm394_game_state::cs3_w) { logerror("cs3_w %06x %04x\n", offset, data); }
-READ16_MEMBER(gcm394_game_state::cs4_r) { logerror("cs4_r %06n", offset); return 0x0000; }
-WRITE16_MEMBER(gcm394_game_state::cs4_w) { logerror("cs4_w %06x %04x\n", offset, data); }
+uint16_t gcm394_game_state::cs1_r(offs_t offset) { logerror("cs1_r %06n", offset); return 0x0000; }
+void gcm394_game_state::cs1_w(offs_t offset, uint16_t data) { logerror("cs1_w %06x %04x\n", offset, data); }
+uint16_t gcm394_game_state::cs2_r(offs_t offset) { logerror("cs2_r %06n", offset); return 0x0000; }
+void gcm394_game_state::cs2_w(offs_t offset, uint16_t data) { logerror("cs2_w %06x %04x\n", offset, data); }
+uint16_t gcm394_game_state::cs3_r(offs_t offset) { logerror("cs3_r %06n", offset); return 0x0000; }
+void gcm394_game_state::cs3_w(offs_t offset, uint16_t data) { logerror("cs3_w %06x %04x\n", offset, data); }
+uint16_t gcm394_game_state::cs4_r(offs_t offset) { logerror("cs4_r %06n", offset); return 0x0000; }
+void gcm394_game_state::cs4_w(offs_t offset, uint16_t data) { logerror("cs4_w %06x %04x\n", offset, data); }
 
 void gcm394_game_state::cs_map_base(address_map& map)
 {
@@ -194,31 +194,31 @@ void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, ui
 	size = (((cs0 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs0 handler start_address %08x end_address %08x\n", start_address, end_address);
-	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
 	start_address += size;
 
 	size = (((cs1 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs1 handler start_address %08x end_address %08x\n", start_address, end_address);
-	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs1_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs1_w)));
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs1_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs1_w)));
 	start_address += size;
 
 	size = (((cs2 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs2 handler start_address %08x end_address %08x\n", start_address, end_address);
-	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs2_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs2_w)));
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs2_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs2_w)));
 	start_address += size;
 
 	size = (((cs3 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs3 handler start_address %08x end_address %08x\n", start_address, end_address);
-	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs3_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs3_w)));
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs3_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs3_w)));
 	start_address += size;
 
 	size = (((cs4 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs4 handler start_address %08x end_address %08x\n", start_address, end_address);
-	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs4_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs4_w)));
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs4_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs4_w)));
 	//start_address += size;
 }
 

@@ -637,7 +637,7 @@ VIDEO_START_MEMBER(galaxold_state,ad2083)
 }
 
 
-WRITE8_MEMBER(galaxold_state::racknrol_tiles_bank_w)
+void galaxold_state::racknrol_tiles_bank_w(offs_t offset, uint8_t data)
 {
 	m_racknrol_tiles_bank[offset] = data;
 	m_bg_tilemap->mark_all_dirty();
@@ -763,19 +763,19 @@ VIDEO_START_MEMBER(galaxold_state,dambustr)
 }
 
 
-WRITE8_MEMBER(galaxold_state::galaxold_videoram_w)
+void galaxold_state::galaxold_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(galaxold_state::galaxold_videoram_r)
+uint8_t galaxold_state::galaxold_videoram_r(offs_t offset)
 {
 	return m_videoram[offset];
 }
 
 
-WRITE8_MEMBER(galaxold_state::galaxold_attributesram_w)
+void galaxold_state::galaxold_attributesram_w(offs_t offset, uint8_t data)
 {
 	if (m_attributesram[offset] != data)
 	{
@@ -802,7 +802,7 @@ WRITE8_MEMBER(galaxold_state::galaxold_attributesram_w)
 }
 
 
-WRITE8_MEMBER(galaxold_state::galaxold_flip_screen_x_w)
+void galaxold_state::galaxold_flip_screen_x_w(uint8_t data)
 {
 	if (m_flipscreen_x != (data & 0x01))
 	{
@@ -812,7 +812,7 @@ WRITE8_MEMBER(galaxold_state::galaxold_flip_screen_x_w)
 	}
 }
 
-WRITE8_MEMBER(galaxold_state::galaxold_flip_screen_y_w)
+void galaxold_state::galaxold_flip_screen_y_w(uint8_t data)
 {
 	if (m_flipscreen_y != (data & 0x01))
 	{
@@ -824,47 +824,47 @@ WRITE8_MEMBER(galaxold_state::galaxold_flip_screen_y_w)
 
 
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(galaxold_state::gteikob2_flip_screen_x_w)
+void galaxold_state::gteikob2_flip_screen_x_w(uint8_t data)
 {
-	galaxold_flip_screen_x_w(space, offset, ~data);
+	galaxold_flip_screen_x_w(~data);
 }
 
-WRITE8_MEMBER(galaxold_state::gteikob2_flip_screen_y_w)
+void galaxold_state::gteikob2_flip_screen_y_w(uint8_t data)
 {
-	galaxold_flip_screen_y_w(space, offset, ~data);
+	galaxold_flip_screen_y_w(~data);
 }
 #endif
 
 
-WRITE8_MEMBER(galaxold_state::hotshock_flip_screen_w)
+void galaxold_state::hotshock_flip_screen_w(uint8_t data)
 {
-	galaxold_flip_screen_x_w(space, offset, data);
-	galaxold_flip_screen_y_w(space, offset, data);
+	galaxold_flip_screen_x_w(data);
+	galaxold_flip_screen_y_w(data);
 }
 
 
-WRITE8_MEMBER(galaxold_state::scrambold_background_enable_w)
+void galaxold_state::scrambold_background_enable_w(uint8_t data)
 {
 	m_background_enable = data & 0x01;
 }
 
-WRITE8_MEMBER(galaxold_state::scrambold_background_red_w)
+void galaxold_state::scrambold_background_red_w(uint8_t data)
 {
 	m_background_red = data & 0x01;
 }
 
-WRITE8_MEMBER(galaxold_state::scrambold_background_green_w)
+void galaxold_state::scrambold_background_green_w(uint8_t data)
 {
 	m_background_green = data & 0x01;
 }
 
-WRITE8_MEMBER(galaxold_state::scrambold_background_blue_w)
+void galaxold_state::scrambold_background_blue_w(uint8_t data)
 {
 	m_background_blue = data & 0x01;
 }
 
 
-WRITE8_MEMBER(galaxold_state::galaxold_stars_enable_w)
+void galaxold_state::galaxold_stars_enable_w(uint8_t data)
 {
 	m_stars_on = data & 0x01;
 
@@ -875,14 +875,14 @@ WRITE8_MEMBER(galaxold_state::galaxold_stars_enable_w)
 }
 
 
-WRITE8_MEMBER(galaxold_state::darkplnt_bullet_color_w)
+void galaxold_state::darkplnt_bullet_color_w(uint8_t data)
 {
 	m_darkplnt_bullet_color = data & 0x01;
 }
 
 
 
-WRITE8_MEMBER(galaxold_state::galaxold_gfxbank_w)
+void galaxold_state::galaxold_gfxbank_w(offs_t offset, uint8_t data)
 {
 	if (m_gfxbank[offset] != data)
 	{
@@ -892,13 +892,13 @@ WRITE8_MEMBER(galaxold_state::galaxold_gfxbank_w)
 	}
 }
 
-WRITE8_MEMBER(galaxold_state::rockclim_videoram_w)
+void galaxold_state::rockclim_videoram_w(offs_t offset, uint8_t data)
 {
 	m_rockclim_videoram[offset] = data;
 	m_rockclim_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(galaxold_state::rockclim_scroll_w)
+void galaxold_state::rockclim_scroll_w(offs_t offset, uint8_t data)
 {
 	switch(offset&3)
 	{
@@ -911,19 +911,19 @@ WRITE8_MEMBER(galaxold_state::rockclim_scroll_w)
 }
 
 
-READ8_MEMBER(galaxold_state::rockclim_videoram_r)
+uint8_t galaxold_state::rockclim_videoram_r(offs_t offset)
 {
 	return m_rockclim_videoram[offset];
 }
 
 
-WRITE8_MEMBER(galaxold_state::dambustr_bg_split_line_w)
+void galaxold_state::dambustr_bg_split_line_w(uint8_t data)
 {
 	m_dambustr_bg_split_line = data;
 }
 
 
-WRITE8_MEMBER(galaxold_state::dambustr_bg_color_w)
+void galaxold_state::dambustr_bg_color_w(uint8_t data)
 {
 	m_dambustr_bg_color_1 = (BIT(data,2)<<2) | (BIT(data,1)<<1) | BIT(data,0);
 	m_dambustr_bg_color_2 = (BIT(data,6)<<2) | (BIT(data,5)<<1) | BIT(data,4);

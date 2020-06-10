@@ -70,8 +70,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update_gauntlet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE16_MEMBER( gauntlet_xscroll_w );
-	DECLARE_WRITE16_MEMBER( gauntlet_yscroll_w );
+	void gauntlet_xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gauntlet_yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void gauntlet_base(machine_config &config);
 	void main_map(address_map &map);

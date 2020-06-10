@@ -133,18 +133,18 @@ protected:
 
 	// common
 	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
-	DECLARE_WRITE8_MEMBER(nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(blitter_bank_w);
-	DECLARE_WRITE8_MEMBER(rimrockn_bank_w);
+	void nmi_ack_w(uint8_t data);
+	void blitter_bank_w(offs_t offset, uint8_t data);
+	void rimrockn_bank_w(uint8_t data);
 	void pia_portb_out(uint8_t data);
-	DECLARE_WRITE8_MEMBER(gtg2_sound_data_w);
-	DECLARE_WRITE8_MEMBER(grom_bank_w);
-	DECLARE_WRITE8_MEMBER(palette_w);
+	void gtg2_sound_data_w(uint8_t data);
+	void grom_bank_w(uint8_t data);
+	void palette_w(offs_t offset, uint8_t data);
 	void page_w(u8 data);
-	DECLARE_READ8_MEMBER(blitter_r);
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_WRITE8_MEMBER(tms34061_w);
-	DECLARE_READ8_MEMBER(tms34061_r);
+	uint8_t blitter_r(offs_t offset);
+	void blitter_w(offs_t offset, uint8_t data);
+	void tms34061_w(offs_t offset, uint8_t data);
+	uint8_t tms34061_r(offs_t offset);
 	void pia_porta_out(uint8_t data);
 	void ym2203_portb_out(uint8_t data);
 
@@ -174,12 +174,12 @@ protected:
 
 	/*----------- defined in machine/itech8.cpp -----------*/
 
-	DECLARE_READ8_MEMBER( slikz80_port_r );
-	DECLARE_WRITE8_MEMBER( slikz80_port_w );
+	uint8_t slikz80_port_r();
+	void slikz80_port_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( slikshot_z80_r );
-	DECLARE_READ8_MEMBER( slikshot_z80_control_r );
-	DECLARE_WRITE8_MEMBER( slikshot_z80_control_w );
+	uint8_t slikshot_z80_r();
+	uint8_t slikshot_z80_control_r();
+	void slikshot_z80_control_w(uint8_t data);
 
 	void inters_to_vels(uint16_t inter1, uint16_t inter2, uint16_t inter3, uint8_t beams,
 							uint8_t *xres, uint8_t *vxres, uint8_t *vyres);
@@ -194,9 +194,9 @@ protected:
 	TIMER_CALLBACK_MEMBER( delayed_z80_control_w );
 
 	// ninja clowns
-	DECLARE_READ16_MEMBER(rom_constant_r);
-	DECLARE_READ8_MEMBER(ninclown_palette_r);
-	DECLARE_WRITE8_MEMBER(ninclown_palette_w);
+	uint16_t rom_constant_r(offs_t offset);
+	uint8_t ninclown_palette_r(offs_t offset);
+	void ninclown_palette_w(offs_t offset, uint8_t data);
 
 	void itech8_sound_ym2203(machine_config &config);
 	void itech8_sound_ym2608b(machine_config &config);
@@ -246,8 +246,8 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(xscroll_w);
+	void palette_w(uint8_t data);
+	void xscroll_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

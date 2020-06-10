@@ -40,12 +40,12 @@ public:
 		, m_sub2_nmi_mask(0)
 	{ }
 
-	DECLARE_READ8_MEMBER(bosco_dsw_r);
+	uint8_t bosco_dsw_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE_LINE_MEMBER(irq1_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(irq2_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(nmion_w);
-	DECLARE_WRITE8_MEMBER(galaga_videoram_w);
+	void galaga_videoram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(gatsbee_bank_w);
 	void out(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(lockout);

@@ -239,10 +239,10 @@ public:
 
 private:
 
-	DECLARE_READ8_MEMBER( gamecom_internal_r );
-	DECLARE_READ8_MEMBER( gamecom_pio_r );
-	DECLARE_WRITE8_MEMBER( gamecom_internal_w );
-	DECLARE_WRITE8_MEMBER( gamecom_pio_w );
+	uint8_t gamecom_internal_r(offs_t offset);
+	uint8_t gamecom_pio_r(offs_t offset);
+	void gamecom_internal_w(offs_t offset, uint8_t data);
+	void gamecom_pio_w(offs_t offset, uint8_t data);
 	void gamecom_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
 	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);

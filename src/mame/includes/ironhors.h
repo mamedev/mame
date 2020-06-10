@@ -41,12 +41,12 @@ public:
 	void ironhors(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(charbank_w);
-	DECLARE_WRITE8_MEMBER(palettebank_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void sh_irqtrigger_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void charbank_w(uint8_t data);
+	void palettebank_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
 	void filter_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

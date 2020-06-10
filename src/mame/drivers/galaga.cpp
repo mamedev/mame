@@ -725,7 +725,7 @@ TODO:
 #define STARFIELD_X_LIMIT_BOSCO     224
 
 
-READ8_MEMBER(galaga_state::bosco_dsw_r)
+uint8_t galaga_state::bosco_dsw_r(offs_t offset)
 {
 	int bit0,bit1;
 

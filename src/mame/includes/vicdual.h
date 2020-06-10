@@ -157,7 +157,7 @@ protected:
 	void depthch_audio_w(uint8_t data);
 
 	/*----------- defined in audio/invinco.cpp -----------*/
-	DECLARE_WRITE8_MEMBER( invinco_audio_w );
+	void invinco_audio_w(uint8_t data);
 
 	/*----------- defined in audio/pulsar.cpp -----------*/
 	DECLARE_WRITE8_MEMBER( pulsar_audio_1_w );

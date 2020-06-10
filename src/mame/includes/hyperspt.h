@@ -66,11 +66,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(konami_SN76496_latch_w) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER(konami_SN76496_w) { m_sn->write(m_SN76496_latch); };
+	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; };
+	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); };
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

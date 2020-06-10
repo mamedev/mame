@@ -32,22 +32,22 @@
 #include "includes/generalplus_gpl16250.h"
 #include "includes/generalplus_gpl16250_nand.h"
 
-READ16_MEMBER(generalplus_gpac800_game_state::cs0_r)
+uint16_t generalplus_gpac800_game_state::cs0_r(offs_t offset)
 {
 	return m_sdram2[offset & 0xffff];
 }
 
-WRITE16_MEMBER(generalplus_gpac800_game_state::cs0_w)
+void generalplus_gpac800_game_state::cs0_w(offs_t offset, uint16_t data)
 {
 	m_sdram2[offset & 0xffff] = data;
 }
 
-READ16_MEMBER(generalplus_gpac800_game_state::cs1_r)
+uint16_t generalplus_gpac800_game_state::cs1_r(offs_t offset)
 {
 	return m_sdram[offset & (m_sdram_kwords-1)];
 }
 
-WRITE16_MEMBER(generalplus_gpac800_game_state::cs1_w)
+void generalplus_gpac800_game_state::cs1_w(offs_t offset, uint16_t data)
 {
 	m_sdram[offset & (m_sdram_kwords-1)] = data;
 }

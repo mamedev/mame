@@ -38,9 +38,9 @@ private:
 
 	bitmap_ind16 m_bitmap;
 
-	DECLARE_WRITE16_MEMBER(m6295_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(coin_w);
-	DECLARE_WRITE16_MEMBER(bgvideoram_w);
+	void m6295_bankswitch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void coin_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

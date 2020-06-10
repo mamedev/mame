@@ -437,7 +437,7 @@ void tkmag220_game_state::tkmag220_portd_w(offs_t offset, uint16_t data, uint16_
 }
 
 
-READ16_MEMBER(tkmag220_game_state::cs0_r)
+uint16_t tkmag220_game_state::cs0_r(offs_t offset)
 {
 	// [:] installing cs0 handler start_address 00000000 end_address 007fffff
 	return m_romregion[(offset & 0x07fffff) + m_upperbase];

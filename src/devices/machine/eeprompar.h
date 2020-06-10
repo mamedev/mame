@@ -33,14 +33,14 @@ public:
 	void lock_after_write(bool lock) { m_lock_after_write = lock; }
 
 	// read/write data lines
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read);
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(address_space &space, offs_t offset);
 
 	// control lines
 	DECLARE_WRITE_LINE_MEMBER(oe_w);
-	DECLARE_WRITE8_MEMBER(unlock_write8);
-	DECLARE_WRITE16_MEMBER(unlock_write16);
-	DECLARE_WRITE32_MEMBER(unlock_write32);
+	void unlock_write8(uint8_t data);
+	void unlock_write16(uint16_t data);
+	void unlock_write32(uint32_t data);
 
 protected:
 	// construction/destruction

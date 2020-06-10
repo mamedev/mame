@@ -40,12 +40,12 @@ protected:
 	void gscpm_mem(address_map &map);
 	void gscpm_io(address_map &map);
 
-	READ8_MEMBER( cflash_r );
-	WRITE8_MEMBER( cflash_w );
-	READ8_MEMBER( sio_r );
-	WRITE8_MEMBER( sio_w );
+	uint8_t cflash_r(offs_t offset);
+	void cflash_w(offs_t offset, uint8_t data);
+	uint8_t sio_r(offs_t offset);
+	void sio_w(offs_t offset, uint8_t data);
 
-	WRITE8_MEMBER( switch_to_ram_w );
+	void switch_to_ram_w(uint8_t data);
 
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -69,17 +69,17 @@ void gscpm_state::gscpm_io(address_map &map)
 	map(0x38, 0x3f).w(FUNC(gscpm_state::switch_to_ram_w));
 }
 
-READ8_MEMBER( gscpm_state::cflash_r )
+uint8_t gscpm_state::cflash_r(offs_t offset)
 {
 	return m_ide->cs0_r(offset, 0xff);
 }
 
-WRITE8_MEMBER( gscpm_state::cflash_w )
+void gscpm_state::cflash_w(offs_t offset, uint8_t data)
 {
 	m_ide->cs0_w(offset, data, 0xff);
 }
 
-READ8_MEMBER( gscpm_state::sio_r )
+uint8_t gscpm_state::sio_r(offs_t offset)
 {
 	switch(offset & 3)
 	{
@@ -99,7 +99,7 @@ READ8_MEMBER( gscpm_state::sio_r )
 	return 0x00; // can't happen
 }
 
-WRITE8_MEMBER( gscpm_state::sio_w )
+void gscpm_state::sio_w(offs_t offset, uint8_t data)
 {
 	switch(offset & 3)
 	{
@@ -118,7 +118,7 @@ WRITE8_MEMBER( gscpm_state::sio_w )
 	}
 }
 
-WRITE8_MEMBER( gscpm_state::switch_to_ram_w )
+void gscpm_state::switch_to_ram_w(uint8_t data)
 {
 	// Install the RAM handler here
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x0000, 0x3fff); // Unmap the ROM handler

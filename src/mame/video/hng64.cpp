@@ -147,7 +147,7 @@ TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile3_16x16_info)
 }
 
 
-WRITE32_MEMBER(hng64_state::hng64_videoram_w)
+void hng64_state::hng64_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	const int realoff = (offset * 4);
 	COMBINE_DATA(&m_videoram[offset]);
@@ -1131,7 +1131,7 @@ WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
  */
 
 // Transition Control memory.
-WRITE32_MEMBER(hng64_state::tcram_w)
+void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *hng64_tcram = m_tcram;
 
@@ -1160,7 +1160,7 @@ WRITE32_MEMBER(hng64_state::tcram_w)
 	}
 }
 
-READ32_MEMBER(hng64_state::tcram_r)
+uint32_t hng64_state::tcram_r(offs_t offset)
 {
 	/* is this really a port? this seems treated like RAM otherwise, check if there's code anywhere
 	   to write the desired value here instead */

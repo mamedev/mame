@@ -99,14 +99,14 @@ WRITE_LINE_MEMBER(galaxia_state::vblank_irq)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(galaxia_state::galaxia_video_w)
+void galaxia_state::galaxia_video_w(offs_t offset, uint8_t data)
 {
 //  m_screen->update_partial(m_screen->vpos());
 	m_bg_tilemap->mark_tile_dirty(offset);
 	cvs_video_or_color_ram_w(offset, data);
 }
 
-WRITE8_MEMBER(galaxia_state::galaxia_scroll_w)
+void galaxia_state::galaxia_scroll_w(uint8_t data)
 {
 	m_screen->update_partial(m_screen->vpos());
 
@@ -115,7 +115,7 @@ WRITE8_MEMBER(galaxia_state::galaxia_scroll_w)
 		m_bg_tilemap->set_scrolly(i, data);
 }
 
-WRITE8_MEMBER(galaxia_state::galaxia_ctrlport_w)
+void galaxia_state::galaxia_ctrlport_w(uint8_t data)
 {
 	// d0: triggers on every new credit
 	// d1: coin counter? if you put a coin in slot A, galaxia constantly
@@ -125,18 +125,18 @@ WRITE8_MEMBER(galaxia_state::galaxia_ctrlport_w)
 	// other bits: unknown
 }
 
-WRITE8_MEMBER(galaxia_state::galaxia_dataport_w)
+void galaxia_state::galaxia_dataport_w(uint8_t data)
 {
 	// seems to be related to sound board comms
 }
 
-READ8_MEMBER(galaxia_state::galaxia_collision_r)
+uint8_t galaxia_state::galaxia_collision_r()
 {
 	m_screen->update_partial(m_screen->vpos());
 	return m_collision_register;
 }
 
-READ8_MEMBER(galaxia_state::galaxia_collision_clear)
+uint8_t galaxia_state::galaxia_collision_clear()
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_collision_register = 0;

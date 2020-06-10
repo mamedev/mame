@@ -695,7 +695,7 @@ INPUT_CHANGED_MEMBER(galaxian_state::tenspot_fake)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(galaxian_state::irq_enable_w)
+void galaxian_state::irq_enable_w(uint8_t data)
 {
 	/* the latched D0 bit here goes to the CLEAR line on the interrupt flip-flop */
 	m_irq_enabled = data & 1;
@@ -711,7 +711,7 @@ WRITE8_MEMBER(galaxian_state::irq_enable_w)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::start_lamp_w)
+void galaxian_state::start_lamp_w(offs_t offset, uint8_t data)
 {
 	/* offset 0 = 1P START LAMP */
 	/* offset 1 = 2P START LAMP */
@@ -719,20 +719,20 @@ WRITE8_MEMBER(galaxian_state::start_lamp_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::coin_lock_w)
+void galaxian_state::coin_lock_w(uint8_t data)
 {
 	/* many variants and bootlegs don't have this */
 	machine().bookkeeping().coin_lockout_global_w(~data & 1);
 }
 
 
-WRITE8_MEMBER(galaxian_state::coin_count_0_w)
+void galaxian_state::coin_count_0_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 
-WRITE8_MEMBER(galaxian_state::coin_count_1_w)
+void galaxian_state::coin_count_1_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 1);
 }
@@ -745,7 +745,7 @@ WRITE8_MEMBER(galaxian_state::coin_count_1_w)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::konami_ay8910_r)
+uint8_t galaxian_state::konami_ay8910_r(offs_t offset)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
@@ -755,7 +755,7 @@ READ8_MEMBER(galaxian_state::konami_ay8910_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::konami_ay8910_w)
+void galaxian_state::konami_ay8910_w(offs_t offset, uint8_t data)
 {
 	/* AV 4,5 ==> AY8910 #2 */
 	/* the decoding here is very simplistic, and you can address two simultaneously */
@@ -820,7 +820,7 @@ uint8_t galaxian_state::konami_sound_timer_r()
 			0x0e;                   /* assume remaining bits are high, except B0 which is grounded */
 }
 
-WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
+void galaxian_state::konami_sound_filter_w(offs_t offset, uint8_t data)
 {
 	if (m_netlist != nullptr)
 	{
@@ -864,7 +864,7 @@ void galaxian_state::konami_portc_1_w(uint8_t data)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::theend_ppi8255_r)
+uint8_t galaxian_state::theend_ppi8255_r(offs_t offset)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
@@ -874,7 +874,7 @@ READ8_MEMBER(galaxian_state::theend_ppi8255_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::theend_ppi8255_w)
+void galaxian_state::theend_ppi8255_w(offs_t offset, uint8_t data)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	if (offset & 0x0100) m_ppi8255[0]->write(offset & 3, data);
@@ -949,7 +949,7 @@ READ_LINE_MEMBER(galaxian_state::theend_protection_alt_r)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::explorer_sound_control_w)
+void galaxian_state::explorer_sound_control_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
@@ -969,7 +969,7 @@ uint8_t galaxian_state::explorer_sound_latch_r()
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::sfx_sample_io_r)
+uint8_t galaxian_state::sfx_sample_io_r(offs_t offset)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
@@ -978,7 +978,7 @@ READ8_MEMBER(galaxian_state::sfx_sample_io_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::sfx_sample_io_w)
+void galaxian_state::sfx_sample_io_w(offs_t offset, uint8_t data)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	if (offset & 0x04) m_ppi8255[2]->write(offset & 3, data);
@@ -1014,7 +1014,7 @@ void galaxian_state::sfx_sample_control_w(uint8_t data)
     The data(code) in the extra RAM is later jumped/called to in many parts of the game.
 */
 
-READ8_MEMBER(galaxian_state::monsterz_protection_r)
+uint8_t galaxian_state::monsterz_protection_r()
 {
 	return m_protection_result;
 }
@@ -1061,7 +1061,7 @@ void galaxian_state::monsterz_portc_1_w(uint8_t data)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
+uint8_t galaxian_state::frogger_ppi8255_r(offs_t offset)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
@@ -1071,7 +1071,7 @@ READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::frogger_ppi8255_w)
+void galaxian_state::frogger_ppi8255_w(offs_t offset, uint8_t data)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	if (offset & 0x1000) m_ppi8255[1]->write((offset >> 1) & 3, data);
@@ -1079,7 +1079,7 @@ WRITE8_MEMBER(galaxian_state::frogger_ppi8255_w)
 }
 
 
-READ8_MEMBER(galaxian_state::frogger_ay8910_r)
+uint8_t galaxian_state::frogger_ay8910_r(offs_t offset)
 {
 	/* the decoding here is very simplistic */
 	uint8_t result = 0xff;
@@ -1088,7 +1088,7 @@ READ8_MEMBER(galaxian_state::frogger_ay8910_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::frogger_ay8910_w)
+void galaxian_state::frogger_ay8910_w(offs_t offset, uint8_t data)
 {
 	/* the decoding here is very simplistic */
 	/* AV6,7 ==> AY8910 #1 */
@@ -1107,7 +1107,7 @@ uint8_t galaxian_state::frogger_sound_timer_r()
 }
 
 
-WRITE8_MEMBER(galaxian_state::froggermc_sound_control_w)
+void galaxian_state::froggermc_sound_control_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
@@ -1126,7 +1126,7 @@ IRQ_CALLBACK_MEMBER(galaxian_state::froggermc_audiocpu_irq_ack)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
+uint8_t	galaxian_state::frogf_ppi8255_r(offs_t offset)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
@@ -1136,7 +1136,7 @@ READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::frogf_ppi8255_w)
+void galaxian_state::frogf_ppi8255_w(offs_t offset, uint8_t data)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	if (offset & 0x1000) m_ppi8255[0]->write((offset >> 3) & 3, data);
@@ -1151,10 +1151,10 @@ WRITE8_MEMBER(galaxian_state::frogf_ppi8255_w)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::turtles_ppi8255_0_r){ return m_ppi8255[0]->read((offset >> 4) & 3); }
-READ8_MEMBER(galaxian_state::turtles_ppi8255_1_r){ return m_ppi8255[1]->read((offset >> 4) & 3); }
-WRITE8_MEMBER(galaxian_state::turtles_ppi8255_0_w){ m_ppi8255[0]->write((offset >> 4) & 3, data); }
-WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ m_ppi8255[1]->write((offset >> 4) & 3, data); }
+uint8_t galaxian_state::turtles_ppi8255_0_r(offs_t offset){ return m_ppi8255[0]->read((offset >> 4) & 3); }
+uint8_t galaxian_state::turtles_ppi8255_1_r(offs_t offset){ return m_ppi8255[1]->read((offset >> 4) & 3); }
+void galaxian_state::turtles_ppi8255_0_w(offs_t offset, uint8_t data){ m_ppi8255[0]->write((offset >> 4) & 3, data); }
+void galaxian_state::turtles_ppi8255_1_w(offs_t offset, uint8_t data){ m_ppi8255[1]->write((offset >> 4) & 3, data); }
 
 
 
@@ -1164,7 +1164,7 @@ WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ m_ppi8255[1]->write((offset 
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
+uint8_t galaxian_state::scorpion_ay8910_r(offs_t offset)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
@@ -1175,7 +1175,7 @@ READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scorpion_ay8910_w)
+void galaxian_state::scorpion_ay8910_w(offs_t offset, uint8_t data)
 {
 	/* the decoding here is very simplistic, and you can address all six simultaneously */
 	if (offset & 0x04) m_ay8910[2]->address_w(data);
@@ -1216,7 +1216,7 @@ void galaxian_state::scorpion_protection_w(uint8_t data)
 	}
 }
 
-READ8_MEMBER(galaxian_state::scorpion_digitalker_intr_r)
+uint8_t galaxian_state::scorpion_digitalker_intr_r()
 {
 	return m_digitalker->digitalker_0_intr_r();
 }
@@ -1236,17 +1236,15 @@ void galaxian_state::scorpion_digitalker_control_w(uint8_t data)
 
 INPUT_CHANGED_MEMBER(gmgalax_state::game_changed)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	/* new value is the selected game */
 	m_selected_game = newval;
 
 	/* select the bank and graphics bank based on it */
 	membank("bank1")->set_entry(m_selected_game);
-	galaxian_gfxbank_w(space, 0, m_selected_game);
+	galaxian_gfxbank_w(0, m_selected_game);
 
 	/* reset the stars */
-	galaxian_stars_enable_w(space, 0, 0);
+	galaxian_stars_enable_w(0);
 
 	/* reset the CPU */
 	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -1267,7 +1265,7 @@ CUSTOM_INPUT_MEMBER(gmgalax_state::port_r)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::zigzag_bankswap_w)
+void galaxian_state::zigzag_bankswap_w(uint8_t data)
 {
 	/* Zig Zag can swap ROMs 2 and 3 as a form of copy protection */
 	membank("bank1")->set_entry(data & 1);
@@ -1275,7 +1273,7 @@ WRITE8_MEMBER(galaxian_state::zigzag_bankswap_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::zigzag_ay8910_w)
+void galaxian_state::zigzag_ay8910_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x300)
 	{
@@ -1336,26 +1334,26 @@ READ_LINE_MEMBER(galaxian_state::kingball_noise_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::kingball_speech_dip_w)
+void galaxian_state::kingball_speech_dip_w(uint8_t data)
 {
 	m_kingball_speech_dip = data;
 }
 
 
-WRITE8_MEMBER(galaxian_state::kingball_sound1_w)
+void galaxian_state::kingball_sound1_w(uint8_t data)
 {
 	m_kingball_sound = (m_kingball_sound & ~0x01) | data;
 }
 
 
-WRITE8_MEMBER(galaxian_state::kingball_sound2_w)
+void galaxian_state::kingball_sound2_w(uint8_t data)
 {
 	m_kingball_sound = (m_kingball_sound & ~0x02) | (data << 1);
 	m_soundlatch->write(m_kingball_sound | 0xf0);
 }
 
 
-WRITE8_MEMBER(galaxian_state::kingball_dac_w)
+void galaxian_state::kingball_dac_w(uint8_t data)
 {
 	m_dac->write(data >> 4);
 }
@@ -1368,27 +1366,27 @@ WRITE8_MEMBER(galaxian_state::kingball_dac_w)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_cs_w)
+void galaxian_state::mshuttle_ay8910_cs_w(uint8_t data)
 {
 	m_mshuttle_ay8910_cs = data & 1;
 }
 
 
-WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_control_w)
+void galaxian_state::mshuttle_ay8910_control_w(uint8_t data)
 {
 	if (!m_mshuttle_ay8910_cs)
 		m_ay8910_cclimber->address_w(data);
 }
 
 
-WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_data_w)
+void galaxian_state::mshuttle_ay8910_data_w(uint8_t data)
 {
 	if (!m_mshuttle_ay8910_cs)
 		m_ay8910_cclimber->data_w(data);
 }
 
 
-READ8_MEMBER(galaxian_state::mshuttle_ay8910_data_r)
+uint8_t galaxian_state::mshuttle_ay8910_data_r()
 {
 	if (!m_mshuttle_ay8910_cs)
 		return m_ay8910_cclimber->data_r();
@@ -1403,7 +1401,7 @@ READ8_MEMBER(galaxian_state::mshuttle_ay8910_data_r)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::jumpbug_protection_r)
+uint8_t galaxian_state::jumpbug_protection_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1425,7 +1423,7 @@ READ8_MEMBER(galaxian_state::jumpbug_protection_r)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::checkman_sound_command_w)
+void galaxian_state::checkman_sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -1438,7 +1436,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::checkmaj_irq0_gen)
 }
 
 
-READ8_MEMBER(galaxian_state::checkmaj_protection_r)
+uint8_t galaxian_state::checkmaj_protection_r()
 {
 	switch (m_maincpu->pc())
 	{
@@ -1463,19 +1461,19 @@ READ8_MEMBER(galaxian_state::checkmaj_protection_r)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::dingo_3000_r)
+uint8_t galaxian_state::dingo_3000_r()
 {
 	return 0xaa;
 }
 
 
-READ8_MEMBER(galaxian_state::dingo_3035_r)
+uint8_t galaxian_state::dingo_3035_r()
 {
 	return 0x8c;
 }
 
 
-READ8_MEMBER(galaxian_state::dingoe_3001_r)
+uint8_t galaxian_state::dingoe_3001_r()
 {
 	return 0xaa;
 }
@@ -2211,17 +2209,17 @@ void galaxian_state::videight_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(galaxian_state::tenspot_unk_6000_w)
+void galaxian_state::tenspot_unk_6000_w(uint8_t data)
 {
 	logerror("tenspot_unk_6000_w %02x\n",data);
 }
 
-WRITE8_MEMBER(galaxian_state::tenspot_unk_8000_w)
+void galaxian_state::tenspot_unk_8000_w(uint8_t data)
 {
 	logerror("tenspot_unk_8000_w %02x\n",data);
 }
 
-WRITE8_MEMBER(galaxian_state::tenspot_unk_e000_w)
+void galaxian_state::tenspot_unk_e000_w(uint8_t data)
 {
 	logerror("tenspot_unk_e000_w %02x\n",data);
 }
@@ -2240,7 +2238,7 @@ void galaxian_state::tenspot_select_map(address_map &map)
 }
 
 
-READ8_MEMBER(galaxian_state::froggeram_ppi8255_r)
+uint8_t galaxian_state::froggeram_ppi8255_r(offs_t offset)
 {
 	// same as theend, but accesses are scrambled
 	uint8_t result = 0xff;
@@ -2249,7 +2247,7 @@ READ8_MEMBER(galaxian_state::froggeram_ppi8255_r)
 	return bitswap<8>(result, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
-WRITE8_MEMBER(galaxian_state::froggeram_ppi8255_w)
+void galaxian_state::froggeram_ppi8255_w(offs_t offset, uint8_t data)
 {
 	// same as theend, but accesses are scrambled
 	data = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -7229,7 +7227,7 @@ void galaxian_state::init_pisces()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::pisces_extend_tile_info, &galaxian_state::pisces_extend_sprite_info);
 
 	/* coin lockout replaced by graphics bank */
-	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
+	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8sm_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
 }
 
 
@@ -7241,7 +7239,7 @@ void galaxian_state::init_batman2()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::batman2_extend_tile_info, &galaxian_state::upper_extend_sprite_info);
 
 	/* coin lockout replaced by graphics bank */
-	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
+	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8sm_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
 }
 
 
@@ -7309,7 +7307,7 @@ void galaxian_state::init_mooncrgx()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::mooncrst_extend_tile_info, &galaxian_state::mooncrst_extend_sprite_info);
 
 	/* LEDs and coin lockout replaced by graphics banking */
-	space.install_write_handler(0x6000, 0x6002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
+	space.install_write_handler(0x6000, 0x6002, 0, 0x7f8, 0, write8sm_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
 }
 
 
@@ -7322,7 +7320,7 @@ void galaxian_state::init_moonqsr()
 	decode_mooncrst(0x4000, m_decrypted_opcodes);
 }
 
-WRITE8_MEMBER(galaxian_state::artic_gfxbank_w)
+void galaxian_state::artic_gfxbank_w(uint8_t data)
 {
 //  printf("artic_gfxbank_w %02x\n",data);
 }
@@ -7335,10 +7333,10 @@ void galaxian_state::init_pacmanbl()
 	init_galaxian();
 
 	/* ...but coin lockout disabled/disconnected */
-	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::artic_gfxbank_w)));
+	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::artic_gfxbank_w)));
 }
 
-READ8_MEMBER(galaxian_state::tenspot_dsw_read)
+uint8_t galaxian_state::tenspot_dsw_read()
 {
 	if (m_tenspot_current_game >= 0 && m_tenspot_current_game < 10)
 		return m_tenspot_game_dsw[m_tenspot_current_game]->read();
@@ -7398,18 +7396,18 @@ void galaxian_state::init_tenspot()
 	//common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::batman2_extend_tile_info, &galaxian_state::upper_extend_sprite_info);
 
 	/* coin lockout replaced by graphics bank */
-	//space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
+	//space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8sm_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
 
 
 	init_galaxian();
 
-	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::artic_gfxbank_w)));
+	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::artic_gfxbank_w)));
 
 	m_tenspot_current_game = 0;
 
 	tenspot_set_game_bank(m_tenspot_current_game, 0);
 
-	space.install_read_handler(0x7000, 0x7000, read8_delegate(*this, FUNC(galaxian_state::tenspot_dsw_read)));
+	space.install_read_handler(0x7000, 0x7000, read8smo_delegate(*this, FUNC(galaxian_state::tenspot_dsw_read)));
 }
 
 
@@ -7426,8 +7424,6 @@ void galaxian_state::init_devilfsg()
 
 void galaxian_state::init_zigzag()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	/* video extensions */
 	common_init(nullptr, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
 	m_draw_bullet_ptr = nullptr;
@@ -7440,7 +7436,7 @@ void galaxian_state::init_zigzag()
 	membank("bank2")->configure_entries(0, 2, memregion("maincpu")->base() + 0x2000, 0x1000);
 
 	/* handler for doing the swaps */
-	zigzag_bankswap_w(space, 0, 0);
+	zigzag_bankswap_w(0);
 }
 
 
@@ -7461,10 +7457,10 @@ void galaxian_state::init_checkman()
 
 	/* move the interrupt enable from $b000 to $b001 */
 	space.unmap_write(0xb000, 0xb000, 0x7f8);
-	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::irq_enable_w)));
+	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::irq_enable_w)));
 
 	/* attach the sound command handler */
-	iospace.install_write_handler(0x00, 0x00, 0, 0xffff, 0, write8_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
+	iospace.install_write_handler(0x00, 0x00, 0, 0xffff, 0, write8smo_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
 
 	/* decrypt program code */
 	decode_checkman();
@@ -7479,10 +7475,10 @@ void galaxian_state::init_checkmaj()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
 
 	/* attach the sound command handler */
-	space.install_write_handler(0x7800, 0x7800, 0, 0x7ff, 0, write8_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
+	space.install_write_handler(0x7800, 0x7800, 0, 0x7ff, 0, write8smo_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
 
 	/* for the title screen */
-	space.install_read_handler(0x3800, 0x3800, read8_delegate(*this, FUNC(galaxian_state::checkmaj_protection_r)));
+	space.install_read_handler(0x3800, 0x3800, read8smo_delegate(*this, FUNC(galaxian_state::checkmaj_protection_r)));
 }
 
 
@@ -7494,10 +7490,10 @@ void galaxian_state::init_dingo()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
 
 	/* attach the sound command handler */
-	space.install_write_handler(0x7800, 0x7800, 0, 0x7ff, 0, write8_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
+	space.install_write_handler(0x7800, 0x7800, 0, 0x7ff, 0, write8smo_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
 
-	space.install_read_handler(0x3000, 0x3000, read8_delegate(*this, FUNC(galaxian_state::dingo_3000_r)));
-	space.install_read_handler(0x3035, 0x3035, read8_delegate(*this, FUNC(galaxian_state::dingo_3035_r)));
+	space.install_read_handler(0x3000, 0x3000, read8smo_delegate(*this, FUNC(galaxian_state::dingo_3000_r)));
+	space.install_read_handler(0x3035, 0x3035, read8smo_delegate(*this, FUNC(galaxian_state::dingo_3035_r)));
 }
 
 
@@ -7511,12 +7507,12 @@ void galaxian_state::init_dingoe()
 
 	/* move the interrupt enable from $b000 to $b001 */
 	space.unmap_write(0xb000, 0xb000, 0x7f8);
-	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::irq_enable_w)));
+	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::irq_enable_w)));
 
 	/* attach the sound command handler */
-	iospace.install_write_handler(0x00, 0x00, 0, 0xffff, 0, write8_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
+	iospace.install_write_handler(0x00, 0x00, 0, 0xffff, 0, write8smo_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
 
-	space.install_read_handler(0x3001, 0x3001, read8_delegate(*this, FUNC(galaxian_state::dingoe_3001_r)));   // Protection check
+	space.install_read_handler(0x3001, 0x3001, read8smo_delegate(*this, FUNC(galaxian_state::dingoe_3001_r)));   // Protection check
 
 	/* decrypt program code */
 	decode_dingoe();
@@ -7666,10 +7662,10 @@ void galaxian_state::init_kingball()
 	/* disable the stars */
 	space.unmap_write(0xb004, 0xb004, 0x7f8);
 
-	space.install_write_handler(0xb000, 0xb000, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::kingball_sound1_w)));
-	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::irq_enable_w)));
-	space.install_write_handler(0xb002, 0xb002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::kingball_sound2_w)));
-	space.install_write_handler(0xb003, 0xb003, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::kingball_speech_dip_w)));
+	space.install_write_handler(0xb000, 0xb000, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::kingball_sound1_w)));
+	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::irq_enable_w)));
+	space.install_write_handler(0xb002, 0xb002, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::kingball_sound2_w)));
+	space.install_write_handler(0xb003, 0xb003, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::kingball_speech_dip_w)));
 
 	save_item(NAME(m_kingball_speech_dip));
 	save_item(NAME(m_kingball_sound));

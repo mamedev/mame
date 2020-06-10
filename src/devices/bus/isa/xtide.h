@@ -34,6 +34,7 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	uint8_t eeprom_read(offs_t offset);
 
 	required_device<ata_interface_device> m_ata;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;

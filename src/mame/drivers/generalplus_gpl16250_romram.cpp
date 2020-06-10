@@ -193,23 +193,23 @@ INPUT_PORTS_END
 
 
 
-READ16_MEMBER(wrlshunt_game_state::cs0_r)
+uint16_t wrlshunt_game_state::cs0_r(offs_t offset)
 {
 	return m_romregion[offset & m_romwords_mask];
 }
 
-WRITE16_MEMBER(wrlshunt_game_state::cs0_w)
+void wrlshunt_game_state::cs0_w(offs_t offset, uint16_t data)
 {
 	logerror("cs0_w write to ROM?\n");
 	//m_romregion[offset & 0x3ffffff] = data;
 }
 
-READ16_MEMBER(wrlshunt_game_state::cs1_r)
+uint16_t wrlshunt_game_state::cs1_r(offs_t offset)
 {
 	return m_sdram[offset & 0x3fffff];
 }
 
-WRITE16_MEMBER(wrlshunt_game_state::cs1_w)
+void wrlshunt_game_state::cs1_w(offs_t offset, uint16_t data)
 {
 	m_sdram[offset & 0x3fffff] = data;
 }
@@ -323,15 +323,15 @@ void lazertag_game_state::machine_reset()
 void paccon_game_state::machine_reset()
 {
 	jak_s500_game_state::machine_reset();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6593, 0x6593, read16_delegate(*this, FUNC(paccon_game_state::paccon_speedup_hack_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6593, 0x6593, read16smo_delegate(*this, FUNC(paccon_game_state::paccon_speedup_hack_r)));
 //	install_speedup_hack(0x6593, 0x30033);
 }
 
 void jak_pf_game_state::machine_reset()
 {
 	jak_s500_game_state::machine_reset();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0001, 0x0001, read16_delegate(*this, FUNC(jak_pf_game_state::jak_pf_speedup_hack_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x13dd, 0x13dd, read16_delegate(*this, FUNC(jak_pf_game_state::jak_pf_speedup_hack2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0001, 0x0001, read16smo_delegate(*this, FUNC(jak_pf_game_state::jak_pf_speedup_hack_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x13dd, 0x13dd, read16smo_delegate(*this, FUNC(jak_pf_game_state::jak_pf_speedup_hack2_r)));
 }
 
 void jak_prft_game_state::machine_reset()
@@ -342,7 +342,7 @@ void jak_prft_game_state::machine_reset()
 }
 
 
-READ16_MEMBER(paccon_game_state::paccon_speedup_hack_r)
+uint16_t paccon_game_state::paccon_speedup_hack_r()
 {
 	u32 const pc = m_maincpu->pc();
 	if (pc == 0x30033)
@@ -350,7 +350,7 @@ READ16_MEMBER(paccon_game_state::paccon_speedup_hack_r)
 	return m_maincpu->get_ram_addr(0x6593);
 }
 
-READ16_MEMBER(jak_pf_game_state::jak_pf_speedup_hack_r)
+uint16_t jak_pf_game_state::jak_pf_speedup_hack_r()
 {
 	u32 const pc = m_maincpu->pc();
 	if (pc == 0x30010)
@@ -358,7 +358,7 @@ READ16_MEMBER(jak_pf_game_state::jak_pf_speedup_hack_r)
 	return m_maincpu->get_ram_addr(0x0001);
 }
 
-READ16_MEMBER(jak_pf_game_state::jak_pf_speedup_hack2_r)
+uint16_t jak_pf_game_state::jak_pf_speedup_hack2_r()
 {
 	u32 const pc = m_maincpu->pc();
 	if (pc == 0x2611b4)

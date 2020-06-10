@@ -310,7 +310,7 @@ ROM_END
 'D51 32' @ IC61
 'D51 33' @ IC79*/
 
-READ32_MEMBER(groundfx_state::irq_speedup_r)
+u32 groundfx_state::irq_speedup_r()
 {
 	int ptr;
 	offs_t sp = m_maincpu->sp();
@@ -328,7 +328,7 @@ READ32_MEMBER(groundfx_state::irq_speedup_r)
 void groundfx_state::init_groundfx()
 {
 	/* Speedup handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(*this, FUNC(groundfx_state::irq_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32smo_delegate(*this, FUNC(groundfx_state::irq_speedup_r)));
 }
 
 

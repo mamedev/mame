@@ -43,10 +43,10 @@ private:
 
 	//required_shared_ptr<u16> m_mainram;
 
-	virtual DECLARE_READ16_MEMBER(cs0_r) override;
-	virtual DECLARE_WRITE16_MEMBER(cs0_w) override;
-	virtual DECLARE_READ16_MEMBER(cs1_r) override;
-	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
+	virtual uint16_t cs0_r(offs_t offset) override;
+	virtual void cs0_w(offs_t offset, uint16_t data) override;
+	virtual uint16_t cs1_r(offs_t offset) override;
+	virtual void cs1_w(offs_t offset, uint16_t data) override;
 
 	int m_romwords_mask;
 };
@@ -97,7 +97,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ16_MEMBER(paccon_speedup_hack_r);
+	uint16_t paccon_speedup_hack_r();
 };
 
 class jak_pf_game_state : public jak_s500_game_state
@@ -112,8 +112,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ16_MEMBER(jak_pf_speedup_hack_r);
-	DECLARE_READ16_MEMBER(jak_pf_speedup_hack2_r);
+	uint16_t jak_pf_speedup_hack_r();
+	uint16_t jak_pf_speedup_hack2_r();
 };
 
 

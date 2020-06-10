@@ -38,12 +38,12 @@ private:
 	int        m_mux;
 	uint8_t    m_coin_settings;
 	uint8_t    m_coin_impulse;
-	DECLARE_READ8_MEMBER(hanaawas_input_port_0_r);
-	DECLARE_WRITE8_MEMBER(hanaawas_inputs_mux_w);
-	DECLARE_WRITE8_MEMBER(hanaawas_videoram_w);
-	DECLARE_WRITE8_MEMBER(hanaawas_colorram_w);
-	DECLARE_WRITE8_MEMBER(key_matrix_status_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	uint8_t hanaawas_input_port_0_r();
+	void hanaawas_inputs_mux_w(uint8_t data);
+	void hanaawas_videoram_w(offs_t offset, uint8_t data);
+	void hanaawas_colorram_w(offs_t offset, uint8_t data);
+	void key_matrix_status_w(uint8_t data);
+	void irq_ack_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

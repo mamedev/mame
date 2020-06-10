@@ -129,13 +129,13 @@ void scramble_state::init_scramble_ppi()
 
 void scramble_state::init_scobra()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa803, 0xa803, write8_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa803, 0xa803, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
 }
 
 #ifdef UNUSED_FUNCTION
 void scramble_state::init_atlantis()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6803, 0x6803, write8_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6803, 0x6803, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
 }
 
 void scramble_state::init_scramble()
@@ -146,14 +146,14 @@ void scramble_state::init_scramble()
 
 void scramble_state::init_stratgyx()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb000, 0xb000, write8_delegate(*this, FUNC(scramble_state::scrambold_background_green_w)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb002, 0xb002, write8_delegate(*this, FUNC(scramble_state::scrambold_background_blue_w)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb00a, 0xb00a, write8_delegate(*this, FUNC(scramble_state::scrambold_background_red_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb000, 0xb000, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_green_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb002, 0xb002, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_blue_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb00a, 0xb00a, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_red_w)));
 }
 
 void scramble_state::init_tazmani2()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb002, 0xb002, write8_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb002, 0xb002, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
 }
 
 void scramble_state::init_tazmaniet()
@@ -271,7 +271,7 @@ void scramble_state::init_cavelon()
 
 void scramble_state::init_darkplnt()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb00a, 0xb00a, write8_delegate(*this, FUNC(scramble_state::darkplnt_bullet_color_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb00a, 0xb00a, write8smo_delegate(*this, FUNC(scramble_state::darkplnt_bullet_color_w)));
 }
 
 void scramble_state::init_mimonkey()
@@ -305,17 +305,17 @@ void scramble_state::init_mimonkey()
 		ROM[A] = ROM[A] ^ xortable[line][col];
 		ctr++;
 	}
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa804, 0xa804, write8_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa804, 0xa804, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
 }
 
 void scramble_state::init_mimonsco()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa804, 0xa804, write8_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa804, 0xa804, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
 }
 
 void scramble_state::init_mimonscr()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6804, 0x6804, write8_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6804, 0x6804, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
 }
 
 

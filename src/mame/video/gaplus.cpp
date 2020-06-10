@@ -215,13 +215,13 @@ void gaplus_base_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gaplus_base_state::videoram_w)
+void gaplus_base_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(gaplus_base_state::starfield_control_w)
+void gaplus_base_state::starfield_control_w(offs_t offset, uint8_t data)
 {
 	m_starfield_control[offset & 3] = data;
 }

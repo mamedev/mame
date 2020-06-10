@@ -587,7 +587,7 @@ WRITE_LINE_MEMBER(itech8_state::ninclown_irq)
 }
 
 
-WRITE8_MEMBER(itech8_state::nmi_ack_w)
+void itech8_state::nmi_ack_w(uint8_t data)
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
 /*  m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);*/
@@ -728,18 +728,18 @@ TIMER_CALLBACK_MEMBER(itech8_state::behind_the_beam_update)
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::blitter_bank_w)
+void itech8_state::blitter_bank_w(offs_t offset, uint8_t data)
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
 		m_mainbank->set_entry(((data >> 5) & 1) ^ m_bankxor);
 
 	/* the rest is handled by the video hardware */
-	blitter_w(space, offset, data);
+	blitter_w(offset, data);
 }
 
 
-WRITE8_MEMBER(itech8_state::rimrockn_bank_w)
+void itech8_state::rimrockn_bank_w(uint8_t data)
 {
 	/* banking is controlled here instead of by the blitter output */
 	m_mainbank->set_entry(data & 3);
@@ -808,7 +808,7 @@ void itech8_state::ym2203_portb_out(uint8_t data)
  *************************************/
 
 
-WRITE8_MEMBER(itech8_state::gtg2_sound_data_w)
+void itech8_state::gtg2_sound_data_w(uint8_t data)
 {
 	/* on the later GTG2 board, they swizzle the data lines */
 	data = ((data & 0x80) >> 7) |
@@ -819,7 +819,7 @@ WRITE8_MEMBER(itech8_state::gtg2_sound_data_w)
 }
 
 
-WRITE8_MEMBER(itech8_state::grom_bank_w)
+void itech8_state::grom_bank_w(uint8_t data)
 {
 	m_grom_bank = data;
 }
@@ -832,19 +832,19 @@ WRITE8_MEMBER(itech8_state::grom_bank_w)
  *
  *************************************/
 
-READ16_MEMBER(itech8_state::rom_constant_r)
+uint16_t itech8_state::rom_constant_r(offs_t offset)
 {
 //  Ninja Clowns reads this area for program ROM checksum
 	logerror("Read ROM constant area %04x\n",offset*2+0x40000);
 	return 0xd840;
 }
 
-READ8_MEMBER(itech8_state::ninclown_palette_r)
+uint8_t itech8_state::ninclown_palette_r(offs_t offset)
 {
 	return m_tlc34076->read(offset / 16);
 }
 
-WRITE8_MEMBER(itech8_state::ninclown_palette_w)
+void itech8_state::ninclown_palette_w(offs_t offset, uint8_t data)
 {
 	m_tlc34076->write(offset / 16, data);
 }

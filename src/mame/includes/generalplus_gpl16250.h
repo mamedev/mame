@@ -32,16 +32,16 @@ public:
 
 	void cs_map_base(address_map &map);
 
-	virtual DECLARE_READ16_MEMBER(cs0_r);
-	virtual DECLARE_WRITE16_MEMBER(cs0_w);
-	virtual DECLARE_READ16_MEMBER(cs1_r);
-	virtual DECLARE_WRITE16_MEMBER(cs1_w);
-	virtual DECLARE_READ16_MEMBER(cs2_r);
-	virtual DECLARE_WRITE16_MEMBER(cs2_w);
-	virtual DECLARE_READ16_MEMBER(cs3_r);
-	virtual DECLARE_WRITE16_MEMBER(cs3_w);
-	virtual DECLARE_READ16_MEMBER(cs4_r);
-	virtual DECLARE_WRITE16_MEMBER(cs4_w);
+	virtual uint16_t cs0_r(offs_t offset);
+	virtual void cs0_w(offs_t offset, uint16_t data);
+	virtual uint16_t cs1_r(offs_t offset);
+	virtual void cs1_w(offs_t offset, uint16_t data);
+	virtual uint16_t cs2_r(offs_t offset);
+	virtual void cs2_w(offs_t offset, uint16_t data);
+	virtual uint16_t cs3_r(offs_t offset);
+	virtual void cs3_w(offs_t offset, uint16_t data);
+	virtual uint16_t cs4_r(offs_t offset);
+	virtual void cs4_w(offs_t offset, uint16_t data);
 
 	void cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4);
 
@@ -91,7 +91,7 @@ protected:
 private:
 	int m_upperbase;
 
-	virtual DECLARE_READ16_MEMBER(cs0_r) override;
+	virtual uint16_t cs0_r(offs_t offset) override;
 
 	void tkmag220_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };

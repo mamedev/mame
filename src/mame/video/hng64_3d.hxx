@@ -30,38 +30,38 @@ hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
     30140000-3015ffff is ZBuffer A  (512x256 8-bit?)
 */
 
-READ32_MEMBER(hng64_state::hng64_fbram1_r)
+uint32_t hng64_state::hng64_fbram1_r(offs_t offset)
 {
 	return m_fbram1[offset];
 }
 
-WRITE32_MEMBER(hng64_state::hng64_fbram1_w)
+void hng64_state::hng64_fbram1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA (&m_fbram1[offset]);
 }
 
-READ32_MEMBER(hng64_state::hng64_fbram2_r)
+uint32_t hng64_state::hng64_fbram2_r(offs_t offset)
 {
 	return m_fbram2[offset];
 }
 
-WRITE32_MEMBER(hng64_state::hng64_fbram2_w)
+void hng64_state::hng64_fbram2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA (&m_fbram2[offset]);
 }
 
 // The 3d 'display list'
-WRITE16_MEMBER(hng64_state::dl_w)
+void hng64_state::dl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dl[offset]);
 }
 
-WRITE32_MEMBER(hng64_state::dl_unk_w)
+void hng64_state::dl_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%s: dl_unk_w %08x (%08x)\n", machine().describe_context(), data, mem_mask);
 }
 
-WRITE32_MEMBER(hng64_state::dl_upload_w)
+void hng64_state::dl_upload_w(uint32_t data)
 {
 	// Data is:
 	// 00000b50 for the sams64 games
@@ -88,7 +88,7 @@ TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)
 	set_irq(0x0008);
 }
 
-WRITE32_MEMBER(hng64_state::dl_control_w)
+void hng64_state::dl_control_w(uint32_t data)
 {
 	/* m_activeDisplayList is not currently connected to anything, it seems unlikely there are different banks.
 	   games typically write up to 8 lots of 0x200 data, writing bit 0 between them
@@ -115,7 +115,7 @@ WRITE32_MEMBER(hng64_state::dl_control_w)
 	*/
 }
 
-READ32_MEMBER(hng64_state::dl_vreg_r)
+uint32_t hng64_state::dl_vreg_r()
 {
 	/* tested with possible masked bits 0xf003 (often masking 0xf000 or 0x0003)
 
@@ -1036,13 +1036,13 @@ void hng64_state::clear3d()
  *      3 | ---- ---- |
 */
 
-READ8_MEMBER(hng64_state::hng64_fbcontrol_r)
+uint8_t hng64_state::hng64_fbcontrol_r(offs_t offset)
 {
 	logerror("%s: hng64_fbcontrol_r (%03x)\n", machine().describe_context(), offset);
 	return m_fbcontrol[offset];
 }
 
-WRITE8_MEMBER(hng64_state::hng64_fbcontrol_w)
+void hng64_state::hng64_fbcontrol_w(offs_t offset, uint8_t data)
 {
 
 	/* roadedge does the following to turn off the framebuffer clear (leave trails) and then turn it back on when selecting a car
@@ -1067,21 +1067,21 @@ WRITE8_MEMBER(hng64_state::hng64_fbcontrol_w)
 	m_fbcontrol[offset] = data;
 }
 
-WRITE16_MEMBER(hng64_state::hng64_fbunkpair_w)
+void hng64_state::hng64_fbunkpair_w(offs_t offset, uint16_t data)
 {
 	// set to fixed values?
 
 	logerror("%s: hng64_fbunkpair_w (%03x) %04x\n", machine().describe_context(), offset, data);
 }
 
-WRITE16_MEMBER(hng64_state::hng64_fbscroll_w)
+void hng64_state::hng64_fbscroll_w(offs_t offset, uint16_t data)
 {
 	// this is used ingame on the samsho games, and on the car select screen in xrally (youtube video confirms position of car needs to change)
 
 	logerror("%s: hng64_fbscroll_w (%03x) %04x\n", machine().describe_context(), offset, data);
 }
 
-WRITE8_MEMBER(hng64_state::hng64_fbunkbyte_w)
+void hng64_state::hng64_fbunkbyte_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -1095,13 +1095,13 @@ WRITE8_MEMBER(hng64_state::hng64_fbunkbyte_w)
 }
 
 // this is a table filled with 0x0? data, seems to be 16-bit values
-READ32_MEMBER(hng64_state::hng64_fbtable_r)
+uint32_t hng64_state::hng64_fbtable_r(offs_t offset, uint32_t mem_mask)
 {
 	logerror("%s: hng64_fbtable_r (%03x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
 	return m_fbtable[offset];
 }
 
-WRITE32_MEMBER(hng64_state::hng64_fbtable_w)
+void hng64_state::hng64_fbtable_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%s: hng64_fbtable_w (%03x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 	COMBINE_DATA(&m_fbtable[offset]);

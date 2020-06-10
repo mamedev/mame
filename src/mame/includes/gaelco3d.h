@@ -141,27 +141,27 @@ private:
 	int m_video_changed;
 	std::unique_ptr<gaelco3d_renderer> m_poly;
 
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_READ16_MEMBER(sound_status_r);
-	DECLARE_WRITE16_MEMBER(sound_status_w);
+	void irq_ack_w(uint16_t data);
+	uint16_t sound_status_r(offs_t offset, uint16_t mem_mask = ~0);
+	void sound_status_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(analog_port_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(analog_port_latch_w);
-	DECLARE_READ32_MEMBER(tms_m68k_ram_r);
-	DECLARE_WRITE32_MEMBER(tms_m68k_ram_w);
+	uint32_t tms_m68k_ram_r(offs_t offset);
+	void tms_m68k_ram_w(offs_t offset, uint32_t data);
 	void tms_iack_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tms_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(tms_control3_w);
-	DECLARE_WRITE16_MEMBER(adsp_control_w);
-	DECLARE_WRITE16_MEMBER(adsp_rombank_w);
+	void adsp_control_w(offs_t offset, uint16_t data);
+	void adsp_rombank_w(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(radikalb_lamp_w);
 	DECLARE_WRITE_LINE_MEMBER(unknown_137_w);
 	DECLARE_WRITE_LINE_MEMBER(unknown_13a_w);
-	DECLARE_WRITE32_MEMBER(gaelco3d_render_w);
-	DECLARE_WRITE16_MEMBER(gaelco3d_paletteram_w);
-	DECLARE_WRITE32_MEMBER(gaelco3d_paletteram_020_w);
+	void gaelco3d_render_w(uint32_t data);
+	void gaelco3d_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gaelco3d_paletteram_020_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(ser_irq);
-	DECLARE_READ16_MEMBER(eeprom_data_r);
+	uint16_t eeprom_data_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	DECLARE_MACHINE_RESET(gaelco3d2);
 	DECLARE_MACHINE_RESET(common);

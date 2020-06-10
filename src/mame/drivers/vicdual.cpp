@@ -1108,7 +1108,7 @@ void vicdual_state::digger(machine_config &config)
 WRITE8_MEMBER(vicdual_state::invho2_io_w)
 {
 	if (offset & 0x01)  invho2_audio_w(space, 0, data);
-	if (offset & 0x02)  invinco_audio_w(space, 0, data);
+	if (offset & 0x02)  invinco_audio_w(data);
 	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  palette_bank_w(space, 0, data);
 }
@@ -1116,7 +1116,7 @@ WRITE8_MEMBER(vicdual_state::invho2_io_w)
 
 WRITE8_MEMBER(vicdual_state::invds_io_w)
 {
-	if (offset & 0x01)  invinco_audio_w(space, 0, data);
+	if (offset & 0x01)  invinco_audio_w(data);
 	if (offset & 0x02) { /* deepscan_audio_w(0, data) */ }
 	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  palette_bank_w(space, 0, data);
@@ -1124,7 +1124,7 @@ WRITE8_MEMBER(vicdual_state::invds_io_w)
 
 WRITE8_MEMBER(vicdual_state::carhntds_io_w)
 {
-	if (offset & 0x01) { /* invinco_audio_w(space, 0, data); */ }
+	if (offset & 0x01) { /* invinco_audio_w(data); */ }
 	if (offset & 0x02) { /* deepscan_audio_w(0, data) */ }
 	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  palette_bank_w(space, 0, data);
@@ -2679,7 +2679,7 @@ READ8_MEMBER(vicdual_state::invinco_io_r)
 WRITE8_MEMBER(vicdual_state::invinco_io_w)
 {
 	if (offset & 0x01)  assert_coin_status();
-	if (offset & 0x02)  invinco_audio_w(space, 0, data);
+	if (offset & 0x02)  invinco_audio_w(data);
 	if (offset & 0x04)  palette_bank_w(space, 0, data);
 }
 
