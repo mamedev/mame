@@ -137,6 +137,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 	<!-- Majesco re-release comes on a 010179 REV 1 PCB, with a single chip marked as 6-Pak. Needs to be verified. -->
+<!-- Majesco re-release comes on a 010179 REV 1 PCB, with a single chip marked as 6-Pak. Needs to be verified. -->
 	<software name="6pak">
 		<description>6-Pak (USA)</description>
 		<year>1995</year>
@@ -14703,6 +14704,7 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<!-- Majesco re-release comes on a 670128 REV 1 PCB with a single chip, while original release is split into two chips. -->
 	<software name="ejimu" cloneof="ejim">
 		<description>Earthworm Jim (USA)</description>
 		<year>1994</year>
@@ -26245,6 +26247,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Board comes with two chips, proper dumps required. -->
 	<software name="sor3u" cloneof="sor3">
 		<description>Streets of Rage 3 (USA)</description>
 		<year>1994</year>
