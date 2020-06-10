@@ -160,16 +160,17 @@ ROM_START(betav3)
 	ROM_RELOAD(0x3000,0x1000)
 ROM_END
 
-// some sources indicate these should be 16kb roms with both halves duplicated, others suggest the same but with the first byte being 0x00 instead (maybe an issue with the dumping)
-// there are also some '412' unscrambled dumps with most of the data in the mirror regions as 0xff (maybe official, maybe from clone devices that should be treated separately?)
 ROM_START(betaplus)
 	ROM_REGION(0x4000, "rom", 0)
-	ROM_DEFAULT_BIOS("trd409")
+	ROM_DEFAULT_BIOS("trd412")
 	ROM_SYSTEM_BIOS(0, "trd409", "TR-DOS v4.09")
 	ROMX_LOAD("trd409.bin", 0x0000, 0x2000, CRC(18365bdc) SHA1(a0e7c80905423c54bd497575026ea8821061175a), ROM_BIOS(0))
 	ROM_RELOAD(0x2000,0x2000)
 	ROM_SYSTEM_BIOS(1, "trd411", "TR-DOS v4.11")
 	ROMX_LOAD("trd411.bin", 0x0000, 0x2000, CRC(26902902) SHA1(cb90fc31bf62d5968730db23a600344338e31e7e), ROM_BIOS(1))
+	ROM_RELOAD(0x2000,0x2000)
+	ROM_SYSTEM_BIOS(2, "trd412", "TR-DOS v4.12")
+	ROMX_LOAD("trd412.bin", 0x0000, 0x2000, CRC(f72efdf4) SHA1(b53ea4020be846ffc02ce586f7b52938c2c76f98), ROM_BIOS(2))
 	ROM_RELOAD(0x2000,0x2000)
 ROM_END
 
