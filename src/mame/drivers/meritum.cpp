@@ -12,7 +12,7 @@ Meritum III hires graphics mode added; only pre-production units were made.
 Split from trs80.cpp on 2018-07-15
 
 It is quite similar to the TRS80 Model 1 Level II, however instead of the
-external interface, Intel pheripheral chips were used (i8251, i8253, i8255),
+external interface, Intel peripheral chips were used (i8251, i8253, i8255),
 and 2KB of ROM with new subroutines.
 
 Model II has an additional 8255 to act as a floppy interface, plus it has more
@@ -85,14 +85,14 @@ public:
 	void meritum2(machine_config &config);
 
 private:
-	void port_ff_w(uint8_t data);
-	uint8_t port_ff_r();
-	uint8_t keyboard_r(offs_t offset);
+	void port_ff_w(u8 data);
+	u8 port_ff_r();
+	u8 keyboard_r(offs_t offset);
 
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	uint32_t screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_meritum2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_meritum2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -104,8 +104,8 @@ private:
 	bool m_cassette_data;
 	emu_timer *m_cassette_data_timer;
 	double m_old_cassette_val;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void machine_start() override;
+	void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_region_ptr<u8> m_p_chargen;
@@ -226,13 +226,13 @@ static INPUT_PORTS_START( meritum )
 	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_BACKSPACE) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<1>)
 INPUT_PORTS_END
 
-uint32_t meritum_state::screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 meritum_state::screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 /* lores characters are in the character generator. Each character is 6x12 (basic characters are 6x7 excluding descenders/ascenders). */
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
-	uint8_t cols = m_mode ? 32 : 64;
-	uint8_t skip = m_mode ? 2 : 1;
+	u8 y,ra,chr,gfx;
+	u16 sy=0,ma=0,x;
+	u8 cols = m_mode ? 32 : 64;
+	u8 skip = m_mode ? 2 : 1;
 
 	if (m_mode != m_size_store)
 	{
@@ -244,7 +244,7 @@ uint32_t meritum_state::screen_update_meritum1(screen_device &screen, bitmap_ind
 	{
 		for (ra = 0; ra < 12; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
@@ -275,12 +275,12 @@ uint32_t meritum_state::screen_update_meritum1(screen_device &screen, bitmap_ind
 	return 0;
 }
 
-uint32_t meritum_state::screen_update_meritum2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 meritum_state::screen_update_meritum2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
-	uint8_t cols = m_mode ? 32 : 64;
-	uint8_t skip = m_mode ? 2 : 1;
+	u8 y,ra,chr,gfx;
+	u16 sy=0,ma=0,x;
+	u8 cols = m_mode ? 32 : 64;
+	u8 skip = m_mode ? 2 : 1;
 
 	if (m_mode != m_size_store)
 	{
@@ -326,7 +326,7 @@ TIMER_CALLBACK_MEMBER(meritum_state::cassette_data_callback)
 	m_old_cassette_val = new_val;
 }
 
-uint8_t meritum_state::port_ff_r()
+u8 meritum_state::port_ff_r()
 {
 /* ModeSel and cassette data
     d7 cassette data from tape
@@ -335,7 +335,7 @@ uint8_t meritum_state::port_ff_r()
 	return (m_mode ? 0 : 0x40) | (m_cassette_data ? 0x80 : 0) | 0x3f;
 }
 
-void meritum_state::port_ff_w(uint8_t data)
+void meritum_state::port_ff_w(u8 data)
 {
 /* Standard output port of Model I
     d3 ModeSel bit
@@ -359,7 +359,7 @@ void meritum_state::port_ff_w(uint8_t data)
 	}
 }
 
-uint8_t meritum_state::keyboard_r(offs_t offset)
+u8 meritum_state::keyboard_r(offs_t offset)
 {
 	u8 i, result = 0;
 
@@ -374,6 +374,10 @@ void meritum_state::machine_start()
 {
 	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(meritum_state::cassette_data_callback),this));
 	m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
+	save_item(NAME(m_mode));
+	save_item(NAME(m_size_store));
+	save_item(NAME(m_cassette_data));
+	save_item(NAME(m_old_cassette_val));
 }
 
 void meritum_state::machine_reset()
@@ -404,9 +408,9 @@ QUICKLOAD_LOAD_MEMBER(meritum_state::quickload_cb)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	uint8_t type, length;
-	uint8_t data[0x100];
-	uint8_t addr[2];
+	u8 type, length;
+	u8 data[0x100];
+	u8 addr[2];
 	void *ptr;
 
 	while (!image.image_feof())
@@ -455,7 +459,7 @@ QUICKLOAD_LOAD_MEMBER(meritum_state::quickload_cb)
 
 
 /**************************** F4 CHARACTER DISPLAYER ***********************************************************/
-static const gfx_layout meritum_charlayout =
+static const gfx_layout charlayout =
 {
 	6, 12,          /* 6 x 12 characters */
 	256,            /* 256 characters */
@@ -469,7 +473,7 @@ static const gfx_layout meritum_charlayout =
 };
 
 static GFXDECODE_START(gfx_meritum)
-	GFXDECODE_ENTRY( "chargen", 0, meritum_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -587,6 +591,6 @@ ROM_END
 
 
 //    YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT      CLASS          INIT             COMPANY              FULLNAME                FLAGS
-COMP( 1983, meritum1,    0,        trs80l2,  meritum1, meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 1)",             0 )
-COMP( 1985, meritum2,    meritum1, 0,        meritum2, meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 2)",             0 )
-COMP( 1985, meritum_net, meritum1, 0,        meritum2, meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 2) (network)",   0 )
+COMP( 1983, meritum1,    0,        trs80l2,  meritum1, meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 1)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1985, meritum2,    meritum1, 0,        meritum2, meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 2)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1985, meritum_net, meritum1, 0,        meritum2, meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 2) (network)", MACHINE_SUPPORTS_SAVE )

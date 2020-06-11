@@ -193,6 +193,10 @@ INPUT_PORTS_END
 
 void pulsar_state::machine_reset()
 {
+
+	m_rom_in_map = true;
+	m_rtc->cs_w(1); // always enabled
+
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
 	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
@@ -209,9 +213,6 @@ void pulsar_state::machine_reset()
 		// return the original data
 		return data;
 	});
-
-	m_rom_in_map = true;
-	m_rtc->cs_w(1); // always enabled
 }
 
 void pulsar_state::machine_start()

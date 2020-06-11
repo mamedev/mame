@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert, Mark Garlanger
+// copyright-holders:Mark Garlanger
 /***************************************************************************
 
     Heathkit H19
