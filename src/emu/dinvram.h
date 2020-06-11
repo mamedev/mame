@@ -37,7 +37,7 @@ public:
 	void nvram_reset() { nvram_default(); }
 	void nvram_load(emu_file &file) { nvram_read(file); }
 	void nvram_save(emu_file &file) { nvram_write(file); }
-	bool nvram_can_save() { return nvram_pre_write(); }
+	bool nvram_can_save() { return nvram_can_write(); }
 
 protected:
 	// derived class overrides
