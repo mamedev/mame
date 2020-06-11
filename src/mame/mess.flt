@@ -276,6 +276,7 @@ eva.cpp
 evmbug.cpp
 excali64.cpp
 exelv.cpp
+exorterm.cpp
 exp85.cpp
 facit4440.cpp
 falco5220.cpp

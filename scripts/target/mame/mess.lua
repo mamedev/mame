@@ -497,6 +497,7 @@ MACHINES["E05A30"] = true
 MACHINES["EEPROMDEV"] = true
 MACHINES["ER1400"] = true
 MACHINES["ER2055"] = true
+MACHINES["EXORTERM"] = true
 MACHINES["F3853"] = true
 MACHINES["HD63450"] = true
 MACHINES["HD64610"] = true
@@ -1185,6 +1186,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"epson",
 		"ericsson",
 		"exidy",
+		"exorterm",
 		"fairch",
 		"fairlight",
 		"fidelity",
@@ -2316,6 +2318,11 @@ files {
 	MAME_DIR .. "src/mame/includes/sorcerer.h",
 	MAME_DIR .. "src/mame/machine/micropolis.cpp",
 	MAME_DIR .. "src/mame/machine/micropolis.h",
+}
+
+createMESSProjects(_target, _subtarget, "exorterm")
+files {
+	MAME_DIR .. "src/mame/drivers/exorterm.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "fairch")
