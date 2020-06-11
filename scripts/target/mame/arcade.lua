@@ -4977,6 +4977,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/skyarmy.cpp",
 	MAME_DIR .. "src/mame/drivers/skylncr.cpp",
 	MAME_DIR .. "src/mame/drivers/sliver.cpp",
+	MAME_DIR .. "src/mame/drivers/smotor.cpp",
 	MAME_DIR .. "src/mame/drivers/smsmcorp.cpp",
 	MAME_DIR .. "src/mame/drivers/sothello.cpp",
 	MAME_DIR .. "src/mame/drivers/spool99.cpp",

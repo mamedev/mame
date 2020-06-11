@@ -37140,6 +37140,9 @@ smspal                          // Sega Master System II (PAL)
 smspaln                         // Tec Toy Master System III Compact (PAL-N)
 smssdisp                        // Sega Master System Store Display Unit
 
+@source:smotor.cpp
+smotor                          // (c) 19?? Duintronic
+
 @source:smsmcorp.cpp
 secondch                        // (c) 1985 SMS MFG CORP
 sureshot                        // (c) 1985 SMS MFG CORP
