@@ -149,7 +149,6 @@ private:
 	int32_t m_audio_sample_size;
 
 	uint16_t m_decode_addr;
-	uint16_t m_next_decode_addr;
 	uint8_t m_decode_delay;
 	attotime m_decode_period;
 	bool m_break_on_achan;
