@@ -1203,7 +1203,7 @@ void running_machine::nvram_save()
 {
 	for (device_nvram_interface &nvram : nvram_interface_iterator(root_device()))
 	{
-		if (nvram.nvram_pre_save())
+		if (nvram.nvram_can_save())
 		{
 			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
