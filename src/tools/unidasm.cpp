@@ -118,6 +118,7 @@ using util::BIT;
 #include "cpu/pdp1/tx0dasm.h"
 #include "cpu/pdp8/pdp8dasm.h"
 #include "cpu/pic16/pic16d.h"
+#include "cpu/pic1670/pic1670d.h"
 #include "cpu/pic16c5x/16c5xdsm.h"
 #include "cpu/pic16c62x/16c62xdsm.h"
 #include "cpu/pic17/pic17d.h"
@@ -484,6 +485,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "pdp8",            be,  0, []() -> util::disasm_interface * { return new pdp8_disassembler; } },
 	{ "pic16",           le, -1, []() -> util::disasm_interface * { return new pic16_disassembler; } },
 	{ "pic16c5x",        le, -1, []() -> util::disasm_interface * { return new pic16c5x_disassembler; } },
+	{ "pic1670",         le, -1, []() -> util::disasm_interface * { return new pic1670_disassembler; } },
 	{ "pic16c62x",       le, -1, []() -> util::disasm_interface * { return new pic16c62x_disassembler; } },
 	{ "pic17",           le, -1, []() -> util::disasm_interface * { return new pic17_disassembler; } },
 	{ "powerpc",         be,  0, []() -> util::disasm_interface * { return new powerpc_disassembler; } },

@@ -1282,6 +1282,16 @@ if (CPUS["PIC16C5X"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- PIC1670 - Disassembler only temporarily
+--@src/devices/cpu/pic1670/pic1670.h,CPUS["PIC1670"] = true
+--------------------------------------------------
+
+if (CPUS["PIC1670"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic1670/pic1670d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic1670/pic1670d.h")
+end
+
+--------------------------------------------------
 -- Microchip PIC16C62x
 --@src/devices/cpu/pic16c62x/pic16c62x.h,CPUS["PIC16C62X"] = true
 --------------------------------------------------
