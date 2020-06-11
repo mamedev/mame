@@ -114,17 +114,9 @@ void namco_52xx_device::write(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_52xx_device::latch_callback),this), data);
 
+	// TODO: should use chip_select line for this
 	m_cpu->set_input_line(0, ASSERT_LINE);
-
-	// The execution time of one instruction is ~4us, so we must make sure to
-	// give the cpu time to poll the /IRQ input before we clear it.
-	// The input clock to the 06XX interface chip is 64H, that is
-	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
-	// asserted for one clock cycle ~= 21us.
-
-	/* the 52xx uses TSTI to check for an interrupt; it also may be handling
-	   a timer interrupt, so we need to ensure the IRQ line is held long enough */
-	machine().scheduler().timer_set(attotime::from_usec(5*21), timer_expired_delegate(FUNC(namco_52xx_device::irq_clear),this), 0);
+	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(namco_52xx_device::irq_clear),this), 0);
 }
 
 

@@ -42,7 +42,6 @@ private:
 	bool m_rw_stretch;
 	bool m_rw_change;
 
-
 	required_device<cpu_device> m_nmicpu;
 
 	devcb_write_line::array<4> m_chipsel;

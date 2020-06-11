@@ -1753,8 +1753,7 @@ void galaga_state::galagab(machine_config &config)
 	config.device_remove("06xx");
 	config.device_remove("54xx");
 	ls259_device* misclatch = reinterpret_cast<ls259_device*>(config.device("misclatch"));
-	// galaga has the custom chips on this line, so just set the resets this
-	// board has
+	// galaga has the custom chips on this line, so just set the resets this board has
 	misclatch->q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
 	misclatch->q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
 	misclatch->q_out_cb<3>().append_inputline("sub3", INPUT_LINE_RESET).invert();
@@ -1866,8 +1865,7 @@ void battles_state::battles(machine_config &config)
 	config.device_remove("54xx");
 	config.device_remove("06xx");
 	ls259_device* misclatch = reinterpret_cast<ls259_device*>(config.device("misclatch"));
-	// xevious has the custom chips on this line, so just set the resets
-	// this board has
+	// xevious has the custom chips on this line, so just set the resets this board has
 	misclatch->q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
 	misclatch->q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
 
