@@ -54,13 +54,13 @@ protected:
 	required_device<spectrum_expansion_slot_device> m_exp;
 
 	int m_romcs;
-    int m_masterportdisable;
+	u8 m_masterdisable;
 	u8 m_control;
 	bool m_motor_active;
 	void fdc_hld_w(int state);
 	virtual void motors_control();
 
-	void fetch(offs_t offset);
+	virtual void fetch(offs_t offset);
 };
 
 class spectrum_betav3_device :
@@ -95,9 +95,26 @@ protected:
 
 };
 
+class spectrum_betacbi_device :
+	public spectrum_betaplus_device
+{
+public:
+	// construction/destruction
+	spectrum_betacbi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_betacbi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual uint8_t mreq_r(offs_t offset) override;
+	virtual void fetch(offs_t offset) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(SPECTRUM_BETAV2, spectrum_betav2_device)
 DECLARE_DEVICE_TYPE(SPECTRUM_BETAV3, spectrum_betav3_device)
 DECLARE_DEVICE_TYPE(SPECTRUM_BETAPLUS, spectrum_betaplus_device)
+DECLARE_DEVICE_TYPE(SPECTRUM_BETACBI, spectrum_betacbi_device)
 
 #endif // MAME_BUS_SPECTRUM_BETA_H
