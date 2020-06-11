@@ -52,6 +52,8 @@ Known undumped protos
   * Jack Nicklaus Power Challenge
   * Danny Sullivan's Indy Heat
   * Star Trek Starfleet Academy
+  * Teenage Mutant Hero Turtles - The Hyperstone Heist (Euro)
+  * Spot Goes to Hollywood (Euro)
 
 Known undumped pirates
 
@@ -14703,6 +14705,7 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<!-- Majesco re-release comes on a 670128 REV 1 PCB with a single chip, while original release is split into two chips. -->
 	<software name="ejimu" cloneof="ejim">
 		<description>Earthworm Jim (USA)</description>
 		<year>1994</year>
@@ -26245,6 +26248,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Board comes with two chips, proper dumps required. -->
 	<software name="sor3u" cloneof="sor3">
 		<description>Streets of Rage 3 (USA)</description>
 		<year>1994</year>
