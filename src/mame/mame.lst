@@ -1470,7 +1470,8 @@ arabian                         // TVG13 (c) 1983 Sun Electronics
 arabiana                        // 136019           (c) 1983 Atari
 
 @source:arachnid.cpp
-arac6000                        //
+arac6000                        // (c) 1987/88/89/90 Arachnid Inc.
+arac6spa                        // (c) 1987/88/89/90 Arachnid Inc.
 
 @source:arcadecl.cpp
 arcadecl                        // (proto)          (c) 1992
