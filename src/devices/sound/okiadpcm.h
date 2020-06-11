@@ -24,9 +24,15 @@ public:
 
 	void reset();
 	int16_t clock(uint8_t nibble);
+	int16_t output() { return m_signal; }
+	void save();
+	void restore();
 
 	int32_t   m_signal;
 	int32_t   m_step;
+	int32_t   m_loop_signal;
+	int32_t   m_loop_step;
+	bool      m_saved;
 
 private:
 	static const int8_t s_index_shift[8];
@@ -48,9 +54,15 @@ public:
 
 	void reset();
 	int16_t clock(uint8_t nibble);
+	int16_t output() { return m_signal; }
+	void save();
+	void restore();
 
 	int32_t   m_signal;
 	int32_t   m_step;
+	int32_t   m_loop_signal;
+	int32_t   m_loop_step;
+	bool      m_saved;
 
 private:
 	static const int8_t s_index_shift[8];
