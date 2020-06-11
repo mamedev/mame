@@ -101,7 +101,13 @@ void namco_54xx_device::write(uint8_t data)
 
 	// TODO: should use chip_select line for this
 	m_cpu->set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(namco_54xx_device::irq_clear),this), 0);
+	machine().scheduler().timer_set(m_irq_duration, timer_expired_delegate(FUNC(namco_54xx_device::irq_clear),this), 0);
+}
+
+WRITE_LINE_MEMBER( namco_54xx_device::chip_select )
+{
+	// TODO: broken sound when using this
+	//m_cpu->set_input_line(0, state);
 }
 
 
@@ -120,10 +126,12 @@ namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, NAMCO_54XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_discrete(*this, finder_base::DUMMY_TAG),
+	m_irq_duration(attotime::from_usec(100)),
 	m_basenode(0),
 	m_latched_cmd(0)
 {
 }
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

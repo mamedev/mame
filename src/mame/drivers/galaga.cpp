@@ -1612,6 +1612,7 @@ void bosco_state::bosco(machine_config &config)
 	namco_54xx_device &n54xx(NAMCO_54XX(config, "54xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
 	n54xx.set_discrete("discrete");
 	n54xx.set_basenote(NODE_01);
+	n54xx.set_irq_duration(attotime::from_usec(200));
 
 	namco_06xx_device &n06xx_0(NAMCO_06XX(config, "06xx_0", MASTER_CLOCK/6/64));
 	n06xx_0.set_maincpu(m_maincpu);
@@ -1624,6 +1625,7 @@ void bosco_state::bosco(machine_config &config)
 	n06xx_0.rw_callback<2>().set("50xx_1", FUNC(namco_50xx_device::rw));
 	n06xx_0.write_callback<2>().set("50xx_1", FUNC(namco_50xx_device::write));
 	n06xx_0.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
+	n06xx_0.chip_select_callback<3>().set("54xx", FUNC(namco_54xx_device::chip_select));
 
 	namco_06xx_device &n06xx_1(NAMCO_06XX(config, "06xx_1", MASTER_CLOCK/6/64));
 	n06xx_1.set_maincpu(m_subcpu);
@@ -1632,6 +1634,7 @@ void bosco_state::bosco(machine_config &config)
 	n06xx_1.rw_callback<2>().set("50xx_2", FUNC(namco_50xx_device::rw));
 	n06xx_1.write_callback<0>().set("50xx_2", FUNC(namco_50xx_device::write));
 	n06xx_1.write_callback<1>().set("52xx", FUNC(namco_52xx_device::write));
+	n06xx_1.chip_select_callback<1>().set("52xx", FUNC(namco_52xx_device::chip_select));
 
 	LS259(config, m_videolatch); // 1B on video board
 	m_videolatch->q_out_cb<0>().set(FUNC(galaga_state::flip_screen_w)).invert();
@@ -1645,6 +1648,7 @@ void bosco_state::bosco(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 16, 224+16);
 	m_screen->set_screen_update(FUNC(bosco_state::screen_update_bosco));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // starfield lfsr
 	m_screen->screen_vblank().set(FUNC(bosco_state::screen_vblank_bosco));
 	m_screen->screen_vblank().append(FUNC(galaga_state::vblank_irq));
 	m_screen->screen_vblank().append("51xx", FUNC(namco_51xx_device::vblank));
@@ -1709,6 +1713,7 @@ void galaga_state::galaga(machine_config &config)
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 	n06xx.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
+	n06xx.chip_select_callback<3>().set("54xx", FUNC(namco_54xx_device::chip_select));
 
 	LS259(config, m_videolatch); // 5K on video board
 	// Q0-Q5 to 05XX for starfield control
@@ -1720,6 +1725,7 @@ void galaga_state::galaga(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
 	m_screen->set_screen_update(FUNC(galaga_state::screen_update_galaga));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // starfield lfsr
 	m_screen->screen_vblank().set(FUNC(galaga_state::screen_vblank_galaga));
 	m_screen->screen_vblank().append(FUNC(galaga_state::vblank_irq));
 	m_screen->screen_vblank().append("51xx", FUNC(namco_51xx_device::vblank));
@@ -1829,6 +1835,7 @@ void xevious_state::xevious(machine_config &config)
 	n06xx.read_callback<2>().set("50xx", FUNC(namco_50xx_device::read));
 	n06xx.write_callback<2>().set("50xx", FUNC(namco_50xx_device::write));
 	n06xx.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
+	n06xx.chip_select_callback<3>().set("54xx", FUNC(namco_54xx_device::chip_select));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 

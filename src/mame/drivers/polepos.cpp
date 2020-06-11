@@ -893,7 +893,9 @@ void polepos_state::polepos(machine_config &config)
 	n06xx.read_callback<1>().set("53xx", FUNC(namco_53xx_device::read));
 	n06xx.chip_select_callback<1>().set("53xx", FUNC(namco_53xx_device::chip_select));
 	n06xx.write_callback<2>().set("52xx", FUNC(namco_52xx_device::write));
+	n06xx.chip_select_callback<2>().set("52xx", FUNC(namco_52xx_device::chip_select));
 	n06xx.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
+	n06xx.chip_select_callback<3>().set("54xx", FUNC(namco_54xx_device::chip_select));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
