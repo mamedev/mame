@@ -2909,6 +2909,26 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/spg290_cdservo.h,MACHINES["SPG290"] = true
+--@src/devices/machine/spg290_timer.h,MACHINES["SPG290"] = true
+--@src/devices/machine/spg290_i2c.h,MACHINES["SPG290"] = true
+--@src/devices/machine/spg290_ppu.h,MACHINES["SPG290"] = true
+---------------------------------------------------
+
+if (MACHINES["SPG290"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/spg290_cdservo.cpp",
+		MAME_DIR .. "src/devices/machine/spg290_cdservo.h",
+		MAME_DIR .. "src/devices/machine/spg290_timer.cpp",
+		MAME_DIR .. "src/devices/machine/spg290_timer.h",
+		MAME_DIR .. "src/devices/machine/spg290_i2c.cpp",
+		MAME_DIR .. "src/devices/machine/spg290_i2c.h",
+		MAME_DIR .. "src/devices/machine/spg290_ppu.cpp",
+		MAME_DIR .. "src/devices/machine/spg290_ppu.h",
+	}
+end
+---------------------------------------------------
+--
 --@src/devices/machine/stvcd.h,MACHINES["STVCD"] = true
 ---------------------------------------------------
 

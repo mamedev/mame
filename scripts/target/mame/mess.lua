@@ -650,6 +650,7 @@ MACHINES["SMIOC"] = true
 MACHINES["SEGA_SCU"] = true
 MACHINES["SMPC"] = true
 MACHINES["SPG2XX"] = true
+MACHINES["SPG290"] = true
 MACHINES["STVCD"] = true
 MACHINES["SUN4C_MMU"] = true
 MACHINES["SWTPC8212"] = true
@@ -3976,6 +3977,10 @@ files {
 	MAME_DIR .. "src/mame/drivers/spg2xx_smarttv.cpp",
 	MAME_DIR .. "src/mame/includes/spg2xx.h",
 	MAME_DIR .. "src/mame/drivers/spg29x.cpp",
+	MAME_DIR .. "src/mame/machine/hyperscan_card.cpp",
+	MAME_DIR .. "src/mame/machine/hyperscan_card.h",
+	MAME_DIR .. "src/mame/machine/hyperscan_ctrl.cpp",
+	MAME_DIR .. "src/mame/machine/hyperscan_ctrl.h",
 	MAME_DIR .. "src/mame/drivers/spg29x_lexibook_jg7425.cpp",
 	MAME_DIR .. "src/mame/drivers/generalplus_gpl16250.cpp",
 	MAME_DIR .. "src/mame/drivers/generalplus_gpl16250_rom.cpp",
