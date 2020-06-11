@@ -87,8 +87,8 @@ private:
 	{
 		return m_p_chargen[(ch * 16 + line) & 0xfff];
 	}
-	void fc100_io(address_map &map);
-	void fc100_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -120,7 +120,7 @@ private:
 };
 
 
-void fc100_state::fc100_mem(address_map &map)
+void fc100_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x5fff).rom().region("roms", 0);
@@ -130,7 +130,7 @@ void fc100_state::fc100_mem(address_map &map)
 	map(0xc000, 0xffff).ram().share("videoram");
 }
 
-void fc100_state::fc100_io(address_map &map)
+void fc100_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -455,15 +455,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::kansas_r)
 
 void fc100_state::machine_start()
 {
-	m_ag = 0;
-	m_gm2 = 0;
-	m_gm1 = 0;
-	m_gm0 = 0;
-	m_as = 0;
-	m_css = 0;
-	m_intext = 0;
-	m_inv = 0;
-
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
@@ -475,10 +466,24 @@ void fc100_state::machine_start()
 	save_item(NAME(m_css));
 	save_item(NAME(m_intext));
 	save_item(NAME(m_inv));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_key_pressed));
+	save_item(NAME(m_banksw_unlocked));
 }
 
 void fc100_state::machine_reset()
 {
+	m_ag = 0;
+	m_gm2 = 0;
+	m_gm1 = 0;
+	m_gm0 = 0;
+	m_as = 0;
+	m_css = 0;
+	m_intext = 0;
+	m_inv = 0;
+
 	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
 	m_cassbit = 0;
 	m_cassold = 0;
@@ -513,8 +518,8 @@ void fc100_state::fc100(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(7'159'090)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fc100_state::fc100_mem);
-	m_maincpu->set_addrmap(AS_IO, &fc100_state::fc100_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fc100_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &fc100_state::io_map);
 
 	/* video hardware */
 	M5C6847P1(config, m_vdg, XTAL(7'159'090)/3);  // Clock not verified
@@ -581,4 +586,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
-CONS( 1982, fc100, 0,      0,      fc100,   fc100, fc100_state, init_fc100, "Goldstar", "FC-100", MACHINE_NOT_WORKING )
+CONS( 1982, fc100, 0,      0,      fc100,   fc100, fc100_state, init_fc100, "Goldstar", "FC-100", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

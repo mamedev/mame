@@ -860,7 +860,6 @@ void polepos_state::polepos(machine_config &config)
 	m_subcpu2->set_addrmap(AS_PROGRAM, &polepos_state::z8002_map_2);
 
 	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
-	//n51xx.set_screen_tag(m_screen);
 	n51xx.input_callback<0>().set_ioport("DSWB").mask(0x0f);
 	n51xx.input_callback<1>().set_ioport("DSWB").rshift(4);
 	n51xx.input_callback<2>().set_ioport("IN0").mask(0x0f);

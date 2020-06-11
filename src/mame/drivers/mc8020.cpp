@@ -337,7 +337,7 @@ void mc8020_state::mc8020(machine_config &config)
 
 /* ROM definition */
 ROM_START( mc8020 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x6000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "ver1", "Version 1")
 	ROMX_LOAD( "s01.rom",     0x0000, 0x0400, CRC(0f1c1a62) SHA1(270c0a9e8e165658f3b09d40a3e8bb3dc1b88184), ROM_BIOS(0))
 	ROMX_LOAD( "s02.rom",     0x0400, 0x0400, CRC(93b5811c) SHA1(8559d24072c9b5908a2627ff986d818308f51d59), ROM_BIOS(0))

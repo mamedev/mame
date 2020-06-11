@@ -109,7 +109,7 @@ public:
 
 private:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override;
 	u8 applix_inputs_r();
 	void palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void analog_latch_w(u16 data);
@@ -154,11 +154,11 @@ private:
 	u8 m_palette_latch[4];
 	required_shared_ptr<u16> m_base;
 
-	void applix_mem(address_map &map);
+	void main_mem(address_map &map);
 	void keytronic_pc3270_io(address_map &map);
 	void keytronic_pc3270_program(address_map &map);
-	void subcpu_io(address_map &map);
-	void subcpu_mem(address_map &map);
+	void sub_io(address_map &map);
+	void sub_mem(address_map &map);
 
 	u8 m_pb;
 	u8 m_analog_latch;
@@ -454,7 +454,7 @@ void applix_state::fdc_cmd_w(u16 data)
 	m_data_or_cmd = 1;
 }
 
-void applix_state::applix_mem(address_map &map)
+void applix_state::main_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xffffff);
@@ -480,14 +480,14 @@ void applix_state::applix_mem(address_map &map)
 	//FFFFC0, FFFFFF  disk controller board
 }
 
-void applix_state::subcpu_mem(address_map &map)
+void applix_state::sub_mem(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x7fff).ram();
 	map(0x8000, 0xffff).bankrw("bank1");
 }
 
-void applix_state::subcpu_io(address_map &map)
+void applix_state::sub_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x07).r(FUNC(applix_state::port00_r)); //PORTR
@@ -784,8 +784,29 @@ void applix_state::applix_palette(palette_device &palette) const
 }
 
 
-void applix_state::video_start()
+void applix_state::machine_start()
 {
+	save_item(NAME(m_video_latch));
+	save_item(NAME(m_pa));
+	save_item(NAME(m_palette_latch));
+	save_item(NAME(m_pb));
+	save_item(NAME(m_analog_latch));
+	save_item(NAME(m_dac_latch));
+	save_item(NAME(m_port08));
+	save_item(NAME(m_data_to_fdc));
+	save_item(NAME(m_data_from_fdc));
+	save_item(NAME(m_data));
+	save_item(NAME(m_data_or_cmd));
+	save_item(NAME(m_buffer_empty));
+	save_item(NAME(m_fdc_cmd));
+	save_item(NAME(m_clock_count));
+	save_item(NAME(m_cp));
+	save_item(NAME(m_p1));
+	save_item(NAME(m_p1_data));
+	save_item(NAME(m_p2));
+	save_item(NAME(m_p3));
+	save_item(NAME(m_last_write_addr));
+	save_item(NAME(m_cass_data));
 }
 
 MC6845_UPDATE_ROW( applix_state::crtc_update_row )
@@ -857,11 +878,11 @@ void applix_state::applix(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 30_MHz_XTAL / 4); // MC68000-P10 @ 7.5 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &applix_state::applix_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &applix_state::main_mem);
 
 	z80_device &subcpu(Z80(config, "subcpu", 16_MHz_XTAL / 2)); // Z80H
-	subcpu.set_addrmap(AS_PROGRAM, &applix_state::subcpu_mem);
-	subcpu.set_addrmap(AS_IO, &applix_state::subcpu_io);
+	subcpu.set_addrmap(AS_PROGRAM, &applix_state::sub_mem);
+	subcpu.set_addrmap(AS_IO, &applix_state::sub_io);
 
 	i8051_device &kbdcpu(I8051(config, "kbdcpu", 11060250));
 	kbdcpu.set_addrmap(AS_PROGRAM, &applix_state::keytronic_pc3270_program);
@@ -991,7 +1012,7 @@ void applix_state::init_applix()
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY           FULLNAME       FLAGS
-COMP( 1986, applix, 0,      0,      applix,  applix, applix_state, init_applix, "Applix Pty Ltd", "Applix 1616", 0 )
+COMP( 1986, applix, 0,      0,      applix,  applix, applix_state, init_applix, "Applix Pty Ltd", "Applix 1616", MACHINE_SUPPORTS_SAVE )
 
 
 
