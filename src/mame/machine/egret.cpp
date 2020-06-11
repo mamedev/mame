@@ -133,7 +133,6 @@ void egret_device::send_port(uint8_t offset, uint8_t data)
 
 		case 1: // port B
 			{
-				logerror("portb = %02x\n", data);
 				if (xcvr_session != ((data>>1)&1))
 				{
 					#ifdef EGRET_SUPER_VERBOSE
