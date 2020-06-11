@@ -110,7 +110,7 @@ public:
 private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	u8 applix_inputs_r();
+	u16 applix_inputs_r();
 	void palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void analog_latch_w(u16 data);
 	void dac_latch_w(u16 data);
@@ -272,7 +272,7 @@ d1   = cassette in
 d2,3 = joystick in
 d4-7 = SW2 dipswitch block
 */
-u8 applix_state::applix_inputs_r()
+u16 applix_state::applix_inputs_r()
 {
 	return m_io_dsw->read() | m_cass_data[2];
 }
@@ -1021,14 +1021,14 @@ COMP( 1986, applix, 0,      0,      applix,  applix, applix_state, init_applix, 
 u8 applix_state::internal_data_read(offs_t offset)
 {
 	m_via->write_cb2( BIT(offset, 8) ); // data
-	bool cp = !BIT(offset, 9);
+	bool cp = !BIT(offset, 9);  // clock pulses //TODO tidy this up with real flipflops
 	if (cp != m_cp)
 	{
 		m_cp = cp;
 		if (cp)
 			m_clock_count++;
 	}
-	if (m_clock_count > 2)
+	if (m_clock_count > 1)
 		m_via->write_cb1( cp );
 
 	return 0xff;
