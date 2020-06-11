@@ -50,6 +50,83 @@
     20      DK      EK      FK
     Bull    --      HM      --
 
+Notes about dipswitches:
+
+There's a separate additional subboard just for dipswitches:
+ ___________________________________________________
+ |                                                  |
+ | MM74C14N       __________           _____        |___
+ |  ____         |CD4013BCN|           |SW |          __|
+ |  |  |                               |_1_|          __|
+ |  |  |          __________           _____          __|
+ |  |  |         |HCF4520BE|           |SW |          __|
+ |  |__|                               |_2_|          __|
+ |            __________               _____          __|
+ |           |MC14093BCP|              |SW |          __|
+ |                                     |_3_|         ___|
+ |                                                  |
+ |__________________________________________________|
+
+And a sticker on the cab with the following manufacturer instructions about
+the dipswitches:
+
+--------------------------------------------------
+Coin credit options for 6000 and 7000 series games
+--------------------------------------------------
+
+Figure 1 shows the available coinage variances for each coin slot.
+Set SW1 to desired position shown at FIGURE 1 to control the right facing coin slot.
+Set SW2 in the same manner to control the left facing coin slot.
+Set SW3 so that at least one switch is "ON", it doesn't matter which one(s).
+
+                                                    FIGURE 2
+        FIGURE 1                                  DIP SWITCHES
+        SWITCH #                            (SWITCHES ARE DISPLAYED AS
+  _____________________                         SET AT THE FACTORY)
+  |   | 4 | 3 | 2 | 1 |
+# +---+---+---+---+---|       .....................................................
+  | 1 | 0 | 0 | 0 | 1 |       |                                                   |
+O +---+---+---+---+---|       |  1   2   3   4    1   2   3   4    1   2   3   4  |
+F | 2 | 0 | 0 | 1 | 0 |       |  ON OFF OFF OFF   ON OFF OFF OFF   ON OFF OFF OFF |
+  +---+---+---+---+---|       |       SW3              SW2              SW1       |
+C | 3 | 0 | 0 | 1 | 1 |       |_________                                  ________|
+R +---+---+---+---+---|                 |                                |
+E | 4 | 0 | 1 | 0 | 0 |                 |__|__|__|__|__|__|__|__|__|__|__|
+D +---+---+---+---+---|
+I | 5 | 0 | 1 | 0 | 1 |                                FIGURE 3
+T +---+---+---+---+---|   IMPORTANT: IF USING THE MAIN BOARD DIP SWITCH COIN OPTIONS, SET ALL THREE
+S | 6 | 0 | 1 | 1 | 0 |   COIN CREDIT DIP SWITCHES SO THAT THEY READ 1(ON) 2(OFF) 3(OFF) 4(OFF)
+  +---+---+---+---+---|          ______________________________________________________
+  | 7 | 0 | 1 | 1 | 1 |          |          |                  | MAIN BOARD DIP SWITCH |
+  +---+---+---+---+---|          |          |                  |      POSITIONS        |
+  | 8 | 1 | 0 | 0 | 0 |          |# OF COINS|GIVES # OF CREDITS|-----+-----+-----+-----|
+  +---+---+---+---+---|          |          |                  |  1  |  2  |  3  |  4  |
+  | 9 | 1 | 0 | 0 | 1 |          |----------+------------------+-----+-----+-----+-----|
+  +---+---+---+---+---|          |    4     |         3        |  ON | OFF | OFF | OFF |
+  |10 | 1 | 0 | 1 | 0 |          |----------+------------------+-----+-----+-----+-----|
+  +---+---+---+---+---|          |    4     |         5        | OFF |  ON | OFF | OFF |
+  |11 | 1 | 0 | 1 | 1 |          |----------+------------------+-----+-----+-----+-----|
+  +---+---+---+---+---|          |--------------------------+--------------------------|
+  |12 | 1 | 1 | 0 | 0 |          |   FOR 4 COIN / 3 CREDITS | FOR 4 COIN / 5 CREDITS   |
+  +---+---+---+---+---|          |--------------------------+--------------------------|
+  |13 | 1 | 1 | 0 | 1 |          | COIN 1 = 0 CREDIT        | COIN 1 = 1 CREDIT        |
+  +---+---+---+---+---|          | COIN 2 = 1 CREDIT        | COIN 2 = 1 CREDIT        |
+  |14 | 1 | 1 | 1 | 0 |          | COIN 3 = 1 CREDIT        | COIN 3 = 1 CREDIT        |
+  +---+---+---+---+---|          | COIN 4 = 1 CREDIT        | COIN 4 = 2 CREDIT        |
+  |15 | 1 | 1 | 1 | 1 |          |       -----------------  |       -----------------  |
+  +---+---+---+---+---|          |        = 3 CREDITS TOTAL |        = 5 CREDITS TOTAL |
+                                 |__________________________|__________________________|
+
+
+              FIGURE 4
+     MAIN PC BOARD DIP SWITCHES
+ IMPORTANT: SWITCHES 1&2 MUST BE IN
+THE OFF POSIION UNLESS THE COINAGES
+      LISTED IN FIG.3 ARE USED
+
+            1   2   3   4
+          OFF OFF OFF OFF
+
 
     TODO:
     - Dip Switches (Controls credits per coin), Currently 2 coins per credit
