@@ -48,13 +48,13 @@ private:
 
 	/* misc */
 	int        m_sound_status;
-	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(tomaincpu_w);
-	DECLARE_READ8_MEMBER(int_ack_r);
-	DECLARE_WRITE8_MEMBER(ksayakyu_videoram_w);
-	DECLARE_WRITE8_MEMBER(ksayakyu_videoctrl_w);
+	void bank_select_w(uint8_t data);
+	void latch_w(uint8_t data);
+	uint8_t sound_status_r();
+	void tomaincpu_w(uint8_t data);
+	uint8_t int_ack_r();
+	void ksayakyu_videoram_w(offs_t offset, uint8_t data);
+	void ksayakyu_videoctrl_w(uint8_t data);
 	void dummy1_w(uint8_t data);
 	void dummy2_w(uint8_t data);
 	void dummy3_w(uint8_t data);

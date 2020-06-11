@@ -50,19 +50,19 @@ INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
 
 
 /* Write to the sound latch and generate an IRQ on the sound CPU */
-WRITE8_MEMBER(lasso_state::sound_command_w)
+void lasso_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER(lasso_state::sound_status_r)
+uint8_t lasso_state::sound_status_r()
 {
 	/*  0x01: chip#0 ready; 0x02: chip#1 ready */
 	return 0x03;
 }
 
-WRITE8_MEMBER(lasso_state::sound_select_w)
+void lasso_state::sound_select_w(uint8_t data)
 {
 	uint8_t to_write = bitswap<8>(*m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 

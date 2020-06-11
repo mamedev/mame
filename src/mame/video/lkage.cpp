@@ -44,7 +44,7 @@
 #include "screen.h"
 
 
-WRITE8_MEMBER(lkage_state::lkage_videoram_w)
+void lkage_state::lkage_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 

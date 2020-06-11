@@ -97,7 +97,7 @@ const uint8_t m24_z8000_device::pmem_table[16][4] =
 	{1, 2, 8, 9}, {5, 6, 10, 11}, {1, 2, 8, 9}, {12, 13, 14, 15},
 	{16, 17, 18, 19}, {20, 21, 22, 23}, {24, 25, 26, 27}, {28, 29, 30, 31}};
 
-READ16_MEMBER(m24_z8000_device::pmem_r)
+uint16_t m24_z8000_device::pmem_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret;
 	uint8_t hostseg;
@@ -115,7 +115,7 @@ READ16_MEMBER(m24_z8000_device::pmem_r)
 	return (ret << 8) | (ret >> 8);
 }
 
-WRITE16_MEMBER(m24_z8000_device::pmem_w)
+void m24_z8000_device::pmem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t hostseg;
 	data = (data << 8) | (data >> 8);
@@ -135,7 +135,7 @@ const uint8_t m24_z8000_device::dmem_table[16][4] =
 	{5, 6, 10, 11}, {5, 6, 10, 11}, {1, 2, 8, 9}, {12, 13, 14, 15},
 	{16, 17, 18, 19}, {20, 21, 22, 23}, {24, 25, 26, 27}, {28, 29, 30, 31}};
 
-READ16_MEMBER(m24_z8000_device::dmem_r)
+uint16_t m24_z8000_device::dmem_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret;
 	uint8_t hostseg;
@@ -150,7 +150,7 @@ READ16_MEMBER(m24_z8000_device::dmem_r)
 	return (ret << 8) | (ret >> 8);
 }
 
-WRITE16_MEMBER(m24_z8000_device::dmem_w)
+void m24_z8000_device::dmem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t hostseg;
 	data = (data << 8) | (data >> 8);
@@ -164,13 +164,13 @@ WRITE16_MEMBER(m24_z8000_device::dmem_w)
 	m_maincpu->space(AS_PROGRAM).write_word(offset, data, (mem_mask << 8) | (mem_mask >> 8));
 }
 
-READ16_MEMBER(m24_z8000_device::i86_io_r)
+uint16_t m24_z8000_device::i86_io_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = m_maincpu->space(AS_IO).read_word(offset << 1, (mem_mask << 8) | (mem_mask >> 8));
 	return (ret << 8) | (ret >> 8);
 }
 
-WRITE16_MEMBER(m24_z8000_device::i86_io_w)
+void m24_z8000_device::i86_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = (data << 8) | (data >> 8);
 	m_maincpu->space(AS_IO).write_word(offset << 1, data, (mem_mask << 8) | (mem_mask >> 8));

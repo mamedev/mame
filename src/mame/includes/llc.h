@@ -40,8 +40,8 @@ public:
 	void init_llc1();
 
 private:
-	DECLARE_WRITE8_MEMBER(llc2_rom_disable_w);
-	DECLARE_WRITE8_MEMBER(llc2_basic_enable_w);
+	void llc2_rom_disable_w(uint8_t data);
+	void llc2_basic_enable_w(uint8_t data);
 	void kbd_put(u8 data);
 	uint8_t llc1_port1_a_r();
 	uint8_t llc1_port2_a_r();

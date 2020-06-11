@@ -78,7 +78,7 @@ SRAM:
 #define MAIN_CLOCK XTAL(18'432'000)
 
 
-WRITE8_MEMBER(ksayakyu_state::bank_select_w)
+void ksayakyu_state::bank_select_w(uint8_t data)
 {
 	/*
 	    bits:
@@ -90,24 +90,24 @@ WRITE8_MEMBER(ksayakyu_state::bank_select_w)
 	membank("bank1")->set_entry(data & 0x01);
 }
 
-WRITE8_MEMBER(ksayakyu_state::latch_w)
+void ksayakyu_state::latch_w(uint8_t data)
 {
 	m_sound_status &= ~0x80;
 	m_soundlatch->write(data | 0x80);
 }
 
-READ8_MEMBER(ksayakyu_state::sound_status_r)
+uint8_t ksayakyu_state::sound_status_r()
 {
 	return m_sound_status | 4;
 }
 
-WRITE8_MEMBER(ksayakyu_state::tomaincpu_w)
+void ksayakyu_state::tomaincpu_w(uint8_t data)
 {
 	m_sound_status |= 0x80;
 	m_soundlatch->write(data);
 }
 
-READ8_MEMBER(ksayakyu_state::int_ack_r)
+uint8_t ksayakyu_state::int_ack_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0xff; // value not used

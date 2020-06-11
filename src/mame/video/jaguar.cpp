@@ -542,7 +542,7 @@ if (++reps % 100 == 99)
 	g_profiler.stop();
 }
 
-READ32_MEMBER( jaguar_state::blitter_r )
+uint32_t jaguar_state::blitter_r(offs_t offset, uint32_t mem_mask)
 {
 #if USE_LEGACY_BLITTER
 	switch (offset)
@@ -560,7 +560,7 @@ READ32_MEMBER( jaguar_state::blitter_r )
 }
 
 
-WRITE32_MEMBER( jaguar_state::blitter_w )
+void jaguar_state::blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 #if USE_LEGACY_BLITTER
 	COMBINE_DATA(&m_blitter_regs[offset]);
@@ -588,7 +588,7 @@ WRITE32_MEMBER( jaguar_state::blitter_w )
  *
  *************************************/
 
-READ16_MEMBER( jaguar_state::tom_regs_r )
+uint16_t jaguar_state::tom_regs_r(offs_t offset)
 {
 	if (offset != INT1 && offset != INT2 && offset != HC && offset != VC)
 		logerror("%s:TOM read register @ F00%03X\n", machine().describe_context(), offset * 2);
@@ -619,7 +619,7 @@ READ16_MEMBER( jaguar_state::tom_regs_r )
 	return m_gpu_regs[offset];
 }
 
-WRITE16_MEMBER( jaguar_state::tom_regs_w )
+void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t reg_store = m_gpu_regs[offset];
 	attotime sample_period;
@@ -704,7 +704,7 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
  *
  *************************************/
 
-READ32_MEMBER( jaguar_state::cojag_gun_input_r )
+uint32_t jaguar_state::cojag_gun_input_r(offs_t offset)
 {
 	int beamx, beamy;
 

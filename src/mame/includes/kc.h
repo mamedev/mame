@@ -79,23 +79,23 @@ public:
 	required_device<screen_device> m_screen;
 	required_device_array<kcexp_slot_device, 3> m_expansions;
 
-	// defined in machine/kc.c
+	// defined in machine/kc.cpp
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	// modules read/write
-	DECLARE_READ8_MEMBER ( expansion_read );
-	DECLARE_WRITE8_MEMBER( expansion_write );
-	DECLARE_READ8_MEMBER ( expansion_4000_r );
-	DECLARE_WRITE8_MEMBER( expansion_4000_w );
-	DECLARE_READ8_MEMBER ( expansion_8000_r );
-	DECLARE_WRITE8_MEMBER( expansion_8000_w );
-	DECLARE_READ8_MEMBER ( expansion_c000_r );
-	DECLARE_WRITE8_MEMBER( expansion_c000_w );
-	DECLARE_READ8_MEMBER ( expansion_e000_r );
-	DECLARE_WRITE8_MEMBER( expansion_e000_w );
-	DECLARE_READ8_MEMBER ( expansion_io_read );
-	DECLARE_WRITE8_MEMBER( expansion_io_write );
+	uint8_t expansion_read(offs_t offset);
+	void expansion_write(offs_t offset, uint8_t data);
+	uint8_t expansion_4000_r(offs_t offset);
+	void expansion_4000_w(offs_t offset, uint8_t data);
+	uint8_t expansion_8000_r(offs_t offset);
+	void expansion_8000_w(offs_t offset, uint8_t data);
+	uint8_t expansion_c000_r(offs_t offset);
+	void expansion_c000_w(offs_t offset, uint8_t data);
+	uint8_t expansion_e000_r(offs_t offset);
+	void expansion_e000_w(offs_t offset, uint8_t data);
+	uint8_t expansion_io_read(offs_t offset);
+	void expansion_io_write(offs_t offset, uint8_t data);
 
 	// bankswitch
 	virtual void update_0x00000();
@@ -126,7 +126,7 @@ public:
 	// speaker
 	void speaker_update();
 
-	// defined in video/kc.c
+	// defined in video/kc.cpp
 	virtual void video_start() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER( video_toggle_blink_state );
@@ -171,19 +171,19 @@ public:
 		: kc_state(mconfig, type, tag)
 	{ }
 
-	// defined in machine/kc.c
+	// defined in machine/kc.cpp
 	virtual void machine_reset() override;
 
 	virtual void update_0x04000() override;
 	virtual void update_0x08000() override;
 	virtual void update_0x0c000() override;
 
-	DECLARE_READ8_MEMBER( kc85_4_86_r );
-	DECLARE_READ8_MEMBER( kc85_4_84_r );
-	DECLARE_WRITE8_MEMBER( kc85_4_86_w );
-	DECLARE_WRITE8_MEMBER( kc85_4_84_w );
+	uint8_t kc85_4_86_r();
+	uint8_t kc85_4_84_r();
+	void kc85_4_86_w(uint8_t data);
+	void kc85_4_84_w(uint8_t data);
 
-	// defined in video/kc.c
+	// defined in video/kc.cpp
 	virtual void video_start() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void video_control_w(int data);

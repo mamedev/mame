@@ -39,12 +39,12 @@ void megadriv_radica_state::megadriv_radica_map(address_map &map)
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000).share("megadrive_ram");
 }
 
-READ16_MEMBER(megadriv_radica_state::read)
+uint16_t megadriv_radica_state::read(offs_t offset)
 {
 	return m_rom[(((m_bank * 0x10000) + (offset << 1)) & (0x400000 - 1))/2];
 }
 
-READ16_MEMBER(megadriv_radica_state::read_a13)
+uint16_t megadriv_radica_state::read_a13(offs_t offset)
 {
 	if (offset < 0x80)
 		m_bank = offset & 0x3f;

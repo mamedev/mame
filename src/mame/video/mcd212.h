@@ -129,8 +129,8 @@ public:
 	template <typename... T> void set_scanline_callback(T &&... args) { m_scanline_callback.set(std::forward<T>(args)...); }
 
 	// device members
-	DECLARE_READ16_MEMBER( regs_r );
-	DECLARE_WRITE16_MEMBER( regs_w );
+	uint16_t regs_r(offs_t offset, uint16_t mem_mask = ~0);
+	void regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TIMER_CALLBACK_MEMBER( perform_scan );
 
 	bitmap_rgb32& get_bitmap() { return m_bitmap; }

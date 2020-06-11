@@ -16,8 +16,8 @@ public:
 
 	kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(regs1_r);
-	DECLARE_WRITE16_MEMBER(regs1_go_w);
+	uint16_t regs1_r(offs_t offset, uint16_t mem_mask = ~0);
+	void regs1_go_w(uint16_t data);
 
 	void grap2_map(address_map &map);
 
@@ -35,32 +35,32 @@ public:
 	uint16_t m_regs1_address_regs[0x2];
 	uint16_t m_regs2;
 
-	DECLARE_WRITE16_MEMBER(framebuffer1_enable_w) { m_framebuffer_enable = data; }
+	void framebuffer1_enable_w(uint16_t data) { m_framebuffer_enable = data; }
 
-	DECLARE_WRITE16_MEMBER(framebuffer1_scrolly_w) { m_framebuffer_scrolly = data; }
-	DECLARE_WRITE16_MEMBER(framebuffer1_scrollx_w) { m_framebuffer_scrollx = data; }
-
-
-	DECLARE_READ16_MEMBER(framebuffer1_fbbright1_r) { return m_framebuffer_bright1; }
-	DECLARE_READ16_MEMBER(framebuffer1_fbbright2_r) { return m_framebuffer_bright2; }
+	void framebuffer1_scrolly_w(uint16_t data) { m_framebuffer_scrolly = data; }
+	void framebuffer1_scrollx_w(uint16_t data) { m_framebuffer_scrollx = data; }
 
 
-	DECLARE_WRITE16_MEMBER(framebuffer1_fbbright1_w) { COMBINE_DATA(&m_framebuffer_bright1); }
-	DECLARE_WRITE16_MEMBER(framebuffer1_fbbright2_w) { COMBINE_DATA(&m_framebuffer_bright2); }
+	uint16_t framebuffer1_fbbright1_r() { return m_framebuffer_bright1; }
+	uint16_t framebuffer1_fbbright2_r() { return m_framebuffer_bright2; }
 
-	DECLARE_WRITE16_MEMBER(framebuffer1_bgcol_w);
 
-	DECLARE_WRITE16_MEMBER(regs1_address_w) { COMBINE_DATA(&m_regs1_address_regs[offset]); }
-	DECLARE_WRITE16_MEMBER(regs2_w) { COMBINE_DATA(&m_regs2); }
+	void framebuffer1_fbbright1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_framebuffer_bright1); }
+	void framebuffer1_fbbright2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_framebuffer_bright2); }
 
-	DECLARE_READ16_MEMBER(  framebuffer_r ) { return m_framebuffer[offset]; }
-	DECLARE_WRITE16_MEMBER( framebuffer_w ) { COMBINE_DATA(&m_framebuffer[offset]); }
-	DECLARE_READ16_MEMBER(  pal_r ) { return m_framebuffer_palette[offset]; }
-	DECLARE_WRITE16_MEMBER(framebuffer1_palette_w);
-	DECLARE_READ16_MEMBER(  unk1_r ) { return m_framebuffer_unk1[offset]; }
-	DECLARE_WRITE16_MEMBER( unk1_w ) { COMBINE_DATA(&m_framebuffer_unk1[offset]); }
-	DECLARE_READ16_MEMBER(  unk2_r ) { return m_framebuffer_unk2[offset]; }
-	DECLARE_WRITE16_MEMBER( unk2_w ) { COMBINE_DATA(&m_framebuffer_unk2[offset]); }
+	void framebuffer1_bgcol_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void regs1_address_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_regs1_address_regs[offset]); }
+	void regs2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_regs2); }
+
+	uint16_t framebuffer_r(offs_t offset) { return m_framebuffer[offset]; }
+	void framebuffer_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_framebuffer[offset]); }
+	uint16_t pal_r(offs_t offset) { return m_framebuffer_palette[offset]; }
+	void framebuffer1_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t unk1_r(offs_t offset) { return m_framebuffer_unk1[offset]; }
+	void unk1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_framebuffer_unk1[offset]); }
+	uint16_t unk2_r(offs_t offset) { return m_framebuffer_unk2[offset]; }
+	void unk2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_framebuffer_unk2[offset]); }
 
 	std::unique_ptr<uint16_t[]> m_framebuffer;
 	std::unique_ptr<uint16_t[]> m_framebuffer_palette;

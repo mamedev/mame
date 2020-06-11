@@ -492,7 +492,7 @@ void k053250ps_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 	}
 }
 
-READ16_MEMBER(k053250ps_device::reg_r)
+uint16_t k053250ps_device::reg_r(offs_t offset)
 {
 	return m_regs[offset];
 }
@@ -553,7 +553,7 @@ READ_LINE_MEMBER(k053250ps_device::dmairq_r)
 }
 
 
-WRITE16_MEMBER(k053250ps_device::reg_w)
+void k053250ps_device::reg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #if 0
 	static char const *const regnames[] =
@@ -574,17 +574,17 @@ WRITE16_MEMBER(k053250ps_device::reg_w)
 		m_regs[offset] = data;
 }
 
-READ16_MEMBER(k053250ps_device::ram_r)
+uint16_t k053250ps_device::ram_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER(k053250ps_device::ram_w)
+void k053250ps_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 }
 
-READ16_MEMBER(k053250ps_device::rom_r)
+uint16_t k053250ps_device::rom_r(offs_t offset)
 {
 	return m_rom[0x80000 * m_regs[6] + 0x800 * m_regs[7] + offset/2];
 }

@@ -1231,7 +1231,7 @@ void mcd212_device::draw_scanline(int y)
 	draw_cursor(scanline, y);
 }
 
-READ16_MEMBER( mcd212_device::regs_r )
+uint16_t mcd212_device::regs_r(offs_t offset, uint16_t mem_mask)
 {
 	uint8_t channel = 1 - (offset / 8);
 
@@ -1284,7 +1284,7 @@ READ16_MEMBER( mcd212_device::regs_r )
 	return 0;
 }
 
-WRITE16_MEMBER( mcd212_device::regs_w )
+void mcd212_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{

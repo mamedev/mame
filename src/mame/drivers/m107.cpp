@@ -87,7 +87,7 @@ WRITE8_MEMBER(m107_state::bankswitch_w)
 		logerror("%05x: bankswitch %04x\n", m_maincpu->pc(), data);
 }
 
-WRITE16_MEMBER(m107_state::sound_reset_w)
+void m107_state::sound_reset_w(uint16_t data)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -143,7 +143,7 @@ void m107_state::dsoccr94_io_map(address_map &map)
 }
 
 /* same as M107 but with an extra i/o board */
-WRITE16_MEMBER(m107_state::wpksoc_output_w)
+void m107_state::wpksoc_output_w(uint16_t data)
 {
 	/*
 	x--- ---- ?

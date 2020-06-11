@@ -117,12 +117,12 @@ WRITE_LINE_MEMBER(mac_state::mac_rbv_vbl)
 	}
 }
 
-READ32_MEMBER( mac_state::rbv_ramdac_r )
+uint32_t mac_state::rbv_ramdac_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER( mac_state::rbv_ramdac_w )
+void mac_state::rbv_ramdac_w(offs_t offset, uint32_t data)
 {
 	if (!offset)
 	{
@@ -158,7 +158,7 @@ WRITE32_MEMBER( mac_state::rbv_ramdac_w )
 	}
 }
 
-WRITE32_MEMBER( mac_state::ariel_ramdac_w ) // this is for the "Ariel" style RAMDAC
+void mac_state::ariel_ramdac_w(offs_t offset, uint32_t data, uint32_t mem_mask) // this is for the "Ariel" style RAMDAC
 {
 	if (mem_mask == 0xff000000)
 	{
@@ -422,19 +422,19 @@ VIDEO_START_MEMBER(mac_state,macprtb)
 {
 }
 
-READ16_MEMBER(mac_state::mac_config_r)
+uint16_t mac_state::mac_config_r()
 {
 	return 0xffff;  // returns nonzero if no PDS RAM expansion, 0 if present
 }
 
 // IIfx
-READ32_MEMBER(mac_state::biu_r)
+uint32_t mac_state::biu_r(offs_t offset, uint32_t mem_mask)
 {
 //  printf("biu_r @ %x, mask %08x\n", offset, mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(mac_state::biu_w)
+void mac_state::biu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("biu_w %x @ %x, mask %08x\n", data, offset, mem_mask);
 }
@@ -456,7 +456,7 @@ WRITE8_MEMBER(mac_state::oss_w)
 	m_oss_regs[offset] = data;
 }
 
-READ32_MEMBER(mac_state::buserror_r)
+uint32_t mac_state::buserror_r()
 {
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);

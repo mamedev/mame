@@ -51,13 +51,13 @@ protected:
 private:
 	void regs_map(address_map &map);
 
-	DECLARE_WRITE32_MEMBER(a1_base_w);
-	DECLARE_WRITE16_MEMBER(a1_xstep_w);
-	DECLARE_WRITE16_MEMBER(a1_ystep_w);
-	DECLARE_READ32_MEMBER(status_r);
-	DECLARE_WRITE32_MEMBER(command_w);
-	DECLARE_WRITE16_MEMBER(count_outer_w);
-	DECLARE_WRITE16_MEMBER(count_inner_w);
+	void a1_base_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void a1_xstep_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void a1_ystep_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u32 status_r();
+	void command_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void count_outer_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void count_inner_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	
 	// timer setups
 	emu_timer *m_command_timer;

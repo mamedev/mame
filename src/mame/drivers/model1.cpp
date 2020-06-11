@@ -765,12 +765,12 @@ void model1_state::r360_w(uint8_t data)
 	}
 }
 
-READ16_MEMBER(model1_state::fifoin_status_r)
+u16 model1_state::fifoin_status_r()
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(model1_state::bank_w)
+void model1_state::bank_w(offs_t offset, u16 data, u16 mem_mask)
 {
 
 	if(ACCESSING_BITS_0_7) {

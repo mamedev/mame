@@ -215,7 +215,7 @@ void jaguar_state::sound_start()
  *
  *************************************/
 
-READ16_MEMBER( jaguar_state::jerry_regs_r )
+uint16_t jaguar_state::jerry_regs_r(offs_t offset)
 {
 	if (offset != JINTCTRL && offset != JINTCTRL+2)
 		logerror("%s:jerry read register @ F10%03X\n", machine().describe_context(), offset * 2);
@@ -232,7 +232,7 @@ READ16_MEMBER( jaguar_state::jerry_regs_r )
 }
 
 
-WRITE16_MEMBER( jaguar_state::jerry_regs_w )
+void jaguar_state::jerry_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dsp_regs[offset]);
 
@@ -258,7 +258,7 @@ WRITE16_MEMBER( jaguar_state::jerry_regs_w )
 
 #if ENABLE_SPEEDUP_HACKS
 
-WRITE32_MEMBER( jaguar_state::dsp_flags_w )
+void jaguar_state::dsp_flags_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* write the data through */
 	m_dsp->iobus_w(offset, data, mem_mask);
@@ -321,14 +321,14 @@ void jaguar_state::serial_update()
  *
  *************************************/
 
-READ32_MEMBER( jaguar_state::serial_r )
+uint32_t jaguar_state::serial_r(offs_t offset)
 {
 	logerror("%s:jaguar_serial_r(%X)\n", machine().describe_context(), offset);
 	return 0;
 }
 
 
-WRITE32_MEMBER( jaguar_state::serial_w )
+void jaguar_state::serial_w(offs_t offset, uint32_t data)
 {
 	switch (offset)
 	{

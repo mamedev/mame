@@ -235,28 +235,28 @@ VIDEO_START_MEMBER(megasys1_state,megasys1_z)
 ***************************************************************************/
 
 
-WRITE16_MEMBER(megasys1_state::active_layers_w)
+void megasys1_state::active_layers_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_active_layers);
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE16_MEMBER(megasys1_state::sprite_bank_w)
+void megasys1_state::sprite_bank_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_sprite_bank);
 }
 
-READ16_MEMBER(megasys1_state::sprite_flag_r)
+u16 megasys1_state::sprite_flag_r()
 {
 	return m_sprite_flag;
 }
 
-WRITE16_MEMBER(megasys1_state::sprite_flag_w)
+void megasys1_state::sprite_flag_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_sprite_flag);
 }
 
-WRITE16_MEMBER(megasys1_state::screen_flag_w)
+void megasys1_state::screen_flag_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_screen_flag);
 
@@ -269,39 +269,39 @@ WRITE16_MEMBER(megasys1_state::screen_flag_w)
 	}
 }
 
-WRITE16_MEMBER(megasys1_state::soundlatch_w)
+void megasys1_state::soundlatch_w(u16 data)
 {
 	m_soundlatch[0]->write(data);
 	m_audiocpu->set_input_line(4, HOLD_LINE);
 }
 
-WRITE16_MEMBER(megasys1_state::soundlatch_z_w)
+void megasys1_state::soundlatch_z_w(u16 data)
 {
 	m_soundlatch[0]->write(data & 0xff);
 	m_audiocpu->set_input_line(5, HOLD_LINE);
 }
 
-WRITE16_MEMBER(megasys1_state::soundlatch_c_w)
+void megasys1_state::soundlatch_c_w(u16 data)
 {
 	// Cybattler reads sound latch on irq 2
 	m_soundlatch[0]->write(data);
 	m_audiocpu->set_input_line(2, HOLD_LINE);
 }
 
-WRITE16_MEMBER(megasys1_state::monkelf_scroll0_w)
+void megasys1_state::monkelf_scroll0_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// code in routine $280 does this. protection?
 	if (offset == 0)
 		data = data - (((data & 0x0f) > 0x0d) ? 0x10 : 0);
-	m_tmap[0]->scroll_w(space, offset, data, mem_mask);
+	m_tmap[0]->scroll_w(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(megasys1_state::monkelf_scroll1_w)
+void megasys1_state::monkelf_scroll1_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// code in routine $280 does this. protection?
 	if (offset == 0)
 		data = data - (((data & 0x0f) > 0x0b) ? 0x10 : 0);
-	m_tmap[1]->scroll_w(space, offset, data, mem_mask);
+	m_tmap[1]->scroll_w(offset, data, mem_mask);
 }
 
 

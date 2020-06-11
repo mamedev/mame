@@ -899,7 +899,7 @@ void model3_state::pci_device_set_reg(uint32_t value)
 	}
 }
 
-READ64_MEMBER(model3_state::mpc105_addr_r)
+uint64_t model3_state::mpc105_addr_r(offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -908,7 +908,7 @@ READ64_MEMBER(model3_state::mpc105_addr_r)
 	return 0;
 }
 
-WRITE64_MEMBER(model3_state::mpc105_addr_w)
+void model3_state::mpc105_addr_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -922,7 +922,7 @@ WRITE64_MEMBER(model3_state::mpc105_addr_w)
 	}
 }
 
-READ64_MEMBER(model3_state::mpc105_data_r)
+uint64_t model3_state::mpc105_data_r()
 {
 	if(m_pci_device == 0) {
 		return ((uint64_t)(swapendian_int32(m_mpc105_regs[(m_pci_reg/2)+1])) << 32) |
@@ -931,7 +931,7 @@ READ64_MEMBER(model3_state::mpc105_data_r)
 	return swapendian_int32(pci_device_get_reg());
 }
 
-WRITE64_MEMBER(model3_state::mpc105_data_w)
+void model3_state::mpc105_data_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if(m_pci_device == 0) {
 		m_mpc105_regs[(m_pci_reg/2)+1] = swapendian_int32((uint32_t)(data >> 32));
@@ -944,13 +944,13 @@ WRITE64_MEMBER(model3_state::mpc105_data_w)
 	}
 }
 
-READ64_MEMBER(model3_state::mpc105_reg_r)
+uint64_t model3_state::mpc105_reg_r(offs_t offset)
 {
 	return ((uint64_t)(m_mpc105_regs[(offset*2)+0]) << 32) |
 			(uint64_t)(m_mpc105_regs[(offset*2)+1]);
 }
 
-WRITE64_MEMBER(model3_state::mpc105_reg_w)
+void model3_state::mpc105_reg_w(offs_t offset, uint64_t data)
 {
 	m_mpc105_regs[(offset*2)+0] = (uint32_t)(data >> 32);
 	m_mpc105_regs[(offset*2)+1] = (uint32_t)data;
@@ -975,7 +975,7 @@ void model3_state::mpc105_init()
 /* Motorola MPC106 PCI Bridge/Memory Controller */
 
 
-READ64_MEMBER(model3_state::mpc106_addr_r)
+uint64_t model3_state::mpc106_addr_r(offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -984,7 +984,7 @@ READ64_MEMBER(model3_state::mpc106_addr_r)
 	return 0;
 }
 
-WRITE64_MEMBER(model3_state::mpc106_addr_w)
+void model3_state::mpc106_addr_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -1006,7 +1006,7 @@ WRITE64_MEMBER(model3_state::mpc106_addr_w)
 	}
 }
 
-READ64_MEMBER(model3_state::mpc106_data_r)
+uint64_t model3_state::mpc106_data_r(offs_t offset, uint64_t mem_mask)
 {
 	if(m_pci_device == 0) {
 		return ((uint64_t)(swapendian_int32(m_mpc106_regs[(m_pci_reg/2)+1])) << 32) |
@@ -1022,7 +1022,7 @@ READ64_MEMBER(model3_state::mpc106_data_r)
 	}
 }
 
-WRITE64_MEMBER(model3_state::mpc106_data_w)
+void model3_state::mpc106_data_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if(m_pci_device == 0) {
 		m_mpc106_regs[(m_pci_reg/2)+1] = swapendian_int32((uint32_t)(data >> 32));
@@ -1035,13 +1035,13 @@ WRITE64_MEMBER(model3_state::mpc106_data_w)
 	}
 }
 
-READ64_MEMBER(model3_state::mpc106_reg_r)
+uint64_t model3_state::mpc106_reg_r(offs_t offset)
 {
 	return ((uint64_t)(m_mpc106_regs[(offset*2)+0]) << 32) |
 			(uint64_t)(m_mpc106_regs[(offset*2)+1]);
 }
 
-WRITE64_MEMBER(model3_state::mpc106_reg_w)
+void model3_state::mpc106_reg_w(offs_t offset, uint64_t data)
 {
 	m_mpc106_regs[(offset*2)+0] = (uint32_t)(data >> 32);
 	m_mpc106_regs[(offset*2)+1] = (uint32_t)data;
@@ -1069,7 +1069,7 @@ void model3_state::mpc106_init()
 
 /*****************************************************************************/
 
-READ64_MEMBER(model3_state::scsi_r)
+uint64_t model3_state::scsi_r(offs_t offset, uint64_t mem_mask)
 {
 	int reg = offset*8;
 	uint64_t r = 0;
@@ -1101,7 +1101,7 @@ READ64_MEMBER(model3_state::scsi_r)
 	return r;
 }
 
-WRITE64_MEMBER(model3_state::scsi_w)
+void model3_state::scsi_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int reg = offset*8;
 	if (ACCESSING_BITS_56_63) {
@@ -1146,7 +1146,7 @@ void model3_state::scsi_irq_callback(int state)
 /* Real3D DMA */
 
 
-READ64_MEMBER(model3_state::real3d_dma_r)
+uint64_t model3_state::real3d_dma_r(offs_t offset, uint64_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1162,7 +1162,7 @@ READ64_MEMBER(model3_state::real3d_dma_r)
 	return 0;
 }
 
-WRITE64_MEMBER(model3_state::real3d_dma_w)
+void model3_state::real3d_dma_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1475,7 +1475,7 @@ void model3_state::lostwsga_ser2_w(uint8_t data)
 	m_serial_fifo2 = data;
 }
 
-READ64_MEMBER(model3_state::model3_sys_r)
+uint64_t model3_state::model3_sys_r(offs_t offset, uint64_t mem_mask)
 {
 //  printf("%s model3_sys_r: mask %llx @ %x\n", machine().describe_context().c_str(), mem_mask, offset);
 
@@ -1510,7 +1510,7 @@ READ64_MEMBER(model3_state::model3_sys_r)
 	return 0;
 }
 
-WRITE64_MEMBER(model3_state::model3_sys_w)
+void model3_state::model3_sys_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  printf("model3_sys_w: %llx to %x mask %llx\n", data, offset, mem_mask);
 
@@ -1580,29 +1580,29 @@ WRITE64_MEMBER(model3_state::model3_sys_w)
 	}
 }
 
-READ64_MEMBER(model3_state::model3_rtc_r)
+uint64_t model3_state::model3_rtc_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 	if(ACCESSING_BITS_56_63) {
-		r |= (uint64_t)rtc72421_r(space, (offset*2)+0, (uint32_t)(mem_mask >> 32)) << 32;
+		r |= (uint64_t)rtc72421_r((offset*2)+0) << 32;
 	}
 	if(ACCESSING_BITS_24_31) {
-		r |= (uint64_t)rtc72421_r(space, (offset*2)+1, (uint32_t)(mem_mask));
+		r |= (uint64_t)rtc72421_r((offset*2)+1);
 	}
 	return r;
 }
 
-WRITE64_MEMBER(model3_state::model3_rtc_w)
+void model3_state::model3_rtc_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if(ACCESSING_BITS_56_63) {
-		rtc72421_w(space, (offset*2)+0, (uint32_t)(data >> 32), (uint32_t)(mem_mask >> 32));
+		rtc72421_w((offset*2)+0, (uint32_t)(data >> 32));
 	}
 	if(ACCESSING_BITS_24_31) {
-		rtc72421_w(space, (offset*2)+1, (uint32_t)(data), (uint32_t)(mem_mask));
+		rtc72421_w((offset*2)+1, (uint32_t)(data));
 	}
 }
 
-READ64_MEMBER(model3_state::real3d_status_r)
+uint64_t model3_state::real3d_status_r(offs_t offset)
 {
 	m_real3d_status ^= 0xffffffffffffffffU;
 	if (offset == 0)
@@ -1682,7 +1682,7 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 	}
 }
 
-WRITE64_MEMBER(model3_state::daytona2_rombank_w)
+void model3_state::daytona2_rombank_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_56_63)
 	{
@@ -5840,7 +5840,7 @@ ROM_END
 
 /* Model 3 sound board emulation */
 
-WRITE16_MEMBER(model3_state::model3snd_ctrl)
+void model3_state::model3snd_ctrl(uint16_t data)
 {
 	// handle sample banking
 	if (memregion("samples")->bytes() > 0x800000)
@@ -6115,13 +6115,14 @@ void model3_state::init_model3_10()
 {
 	interleave_vroms();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(*this, FUNC(model3_state::mpc105_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc105_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(*this, FUNC(model3_state::mpc105_data_r)), write64_delegate(*this, FUNC(model3_state::mpc105_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc105_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc105_reg_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64s_delegate(*this, FUNC(model3_state::mpc105_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc105_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf0c00cf8, 0xf0c00cff, read64smo_delegate(*this, FUNC(model3_state::mpc105_data_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf0c00cf8, 0xf0c00cff, write64s_delegate(*this, FUNC(model3_state::mpc105_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64sm_delegate(*this, FUNC(model3_state::mpc105_reg_r)), write64sm_delegate(*this, FUNC(model3_state::mpc105_reg_w)));
 }
 
 void model3_state::init_model3_15()
@@ -6129,9 +6130,10 @@ void model3_state::init_model3_15()
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1");
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(*this, FUNC(model3_state::mpc105_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc105_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(*this, FUNC(model3_state::mpc105_data_r)), write64_delegate(*this, FUNC(model3_state::mpc105_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc105_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc105_reg_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64s_delegate(*this, FUNC(model3_state::mpc105_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc105_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf0c00cf8, 0xf0c00cff, read64smo_delegate(*this, FUNC(model3_state::mpc105_data_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf0c00cf8, 0xf0c00cff, write64s_delegate(*this, FUNC(model3_state::mpc105_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64sm_delegate(*this, FUNC(model3_state::mpc105_reg_r)), write64sm_delegate(*this, FUNC(model3_state::mpc105_reg_w)));
 }
 
 void model3_state::init_model3_20()
@@ -6139,11 +6141,11 @@ void model3_state::init_model3_20()
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc2000000, 0xc20000ff, read64_delegate(*this, FUNC(model3_state::real3d_dma_r)), write64_delegate(*this, FUNC(model3_state::real3d_dma_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc2000000, 0xc20000ff, read64s_delegate(*this, FUNC(model3_state::real3d_dma_r)), write64s_delegate(*this, FUNC(model3_state::real3d_dma_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64sm_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64sm_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
 }
 
 void model3_state::init_lostwsga()
@@ -6151,7 +6153,7 @@ void model3_state::init_lostwsga()
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 
 	init_model3_15();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
 	rom[0x7374f0/4] = 0x38840004;       /* This seems to be an actual bug in the original code */
 }
@@ -6160,7 +6162,7 @@ void model3_state::init_scud()
 {
 	init_model3_15();
 	/* TODO: network device at 0xC0000000 - FF */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
 //  uint32_t *rom = (uint32_t*)memregion("user1")->base();
 //  rom[(0x799de8^4)/4] = 0x00050208;       // secret debug menu
@@ -6169,20 +6171,20 @@ void model3_state::init_scud()
 void model3_state::init_scudplus()
 {
 	init_model3_15();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 }
 
 void model3_state::init_scudplusa()
 {
 	init_model3_15();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 }
 
 void model3_state::init_lemans24()
 {
 	init_model3_15();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
 //  rom[(0x73fe38^4)/4] = 0x38840004;       /* This seems to be an actual bug in the original code */
 }
@@ -6208,13 +6210,13 @@ void model3_state::init_vs215()
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64sm_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64sm_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
 }
 
 void model3_state::init_vs29815()
@@ -6229,13 +6231,13 @@ void model3_state::init_vs29815()
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64sm_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64sm_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
 }
 
 void model3_state::init_bass()
@@ -6245,13 +6247,13 @@ void model3_state::init_bass()
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64sm_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64sm_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
 }
 
 void model3_state::init_getbass()
@@ -6259,11 +6261,12 @@ void model3_state::init_getbass()
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(*this, FUNC(model3_state::mpc105_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc105_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(*this, FUNC(model3_state::mpc105_data_r)), write64_delegate(*this, FUNC(model3_state::mpc105_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc105_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc105_reg_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64s_delegate(*this, FUNC(model3_state::mpc105_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc105_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf0c00cf8, 0xf0c00cff, read64smo_delegate(*this, FUNC(model3_state::mpc105_data_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf0c00cf8, 0xf0c00cff, write64s_delegate(*this, FUNC(model3_state::mpc105_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64sm_delegate(*this, FUNC(model3_state::mpc105_reg_r)), write64sm_delegate(*this, FUNC(model3_state::mpc105_reg_w)));
 }
 
 void model3_state::init_vs2()
@@ -6354,7 +6357,7 @@ void model3_state::init_daytona2()
 //  uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(*this, FUNC(model3_state::daytona2_rombank_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64s_delegate(*this, FUNC(model3_state::daytona2_rombank_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, "bank2");
 
 	//rom[(0x68468c^4)/4] = 0x60000000;
@@ -6368,7 +6371,7 @@ void model3_state::init_dayto2pe()
 //  uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(*this, FUNC(model3_state::daytona2_rombank_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64s_delegate(*this, FUNC(model3_state::daytona2_rombank_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, "bank2");
 
 //  rom[(0x606784^4)/4] = 0x60000000;

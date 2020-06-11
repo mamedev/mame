@@ -150,14 +150,14 @@ void kchamp_state::kchampvs_sound_io_map(address_map &map)
 /********************
 * 1 Player Version  *
 ********************/
-READ8_MEMBER(kchamp_state::sound_reset_r)
+uint8_t kchamp_state::sound_reset_r()
 {
 	if (!machine().side_effects_disabled())
 		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	return 0;
 }
 
-WRITE8_MEMBER(kchamp_state::kc_sound_control_w)
+void kchamp_state::kc_sound_control_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{

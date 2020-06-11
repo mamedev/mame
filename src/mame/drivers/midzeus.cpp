@@ -155,7 +155,7 @@ WRITE_LINE_MEMBER(midzeus2_state::zeus_irq)
  *
  *************************************/
 
-WRITE32_MEMBER(midzeus_state::cmos_w)
+void midzeus_state::cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (disk_asic_jr[2] && !cmos_protected)
 		COMBINE_DATA(&m_nvram[offset]);
@@ -165,13 +165,13 @@ WRITE32_MEMBER(midzeus_state::cmos_w)
 }
 
 
-READ32_MEMBER(midzeus_state::cmos_r)
+uint32_t midzeus_state::cmos_r(offs_t offset)
 {
 	return m_nvram[offset] | 0xffffff00;
 }
 
 
-WRITE32_MEMBER(midzeus_state::cmos_protect_w)
+void midzeus_state::cmos_protect_w(uint32_t data)
 {
 	cmos_protected = false;
 }
@@ -200,13 +200,13 @@ void midzeus2_state::zeus2_timekeeper_w(offs_t offset, uint32_t data)
 }
 
 
-READ32_MEMBER(midzeus_state::zpram_r)
+uint32_t midzeus_state::zpram_r(offs_t offset)
 {
 	return m_nvram[offset] | 0xffffff00;
 }
 
 
-WRITE32_MEMBER(midzeus_state::zpram_w)
+void midzeus_state::zpram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (disk_asic_jr[2])
 		COMBINE_DATA(&m_nvram[offset]);
@@ -221,7 +221,7 @@ WRITE32_MEMBER(midzeus_state::zpram_w)
 *  Disk ASIC registers
 *
 *************************************/
-READ32_MEMBER(midzeus_state::disk_asic_r)
+uint32_t midzeus_state::disk_asic_r(offs_t offset)
 {
 	uint32_t retVal = disk_asic[offset];
 	switch (offset)
@@ -260,7 +260,7 @@ READ32_MEMBER(midzeus_state::disk_asic_r)
 }
 
 
-WRITE32_MEMBER(midzeus_state::disk_asic_w)
+void midzeus_state::disk_asic_w(offs_t offset, uint32_t data)
 {
 	disk_asic[offset] = data;
 
@@ -300,7 +300,7 @@ WRITE32_MEMBER(midzeus_state::disk_asic_w)
  *  Disk ASIC JR registers
  *
  *************************************/
-READ32_MEMBER(midzeus_state::disk_asic_jr_r)
+uint32_t midzeus_state::disk_asic_jr_r(offs_t offset)
 {
 	uint32_t retVal = disk_asic_jr[offset];
 	switch (offset)
@@ -341,7 +341,7 @@ READ32_MEMBER(midzeus_state::disk_asic_jr_r)
 }
 
 
-WRITE32_MEMBER(midzeus_state::disk_asic_jr_w)
+void midzeus_state::disk_asic_jr_w(offs_t offset, uint32_t data)
 {
 	//uint32_t oldval = disk_asic_jr[offset];
 	disk_asic_jr[offset] = data;
@@ -462,7 +462,7 @@ void midzeus2_state::crusnexo_leds_w(offs_t offset, uint32_t data)
  *
  *************************************/
 
-READ32_MEMBER(midzeus_state::firewire_r)
+uint32_t midzeus_state::firewire_r(offs_t offset)
 {
 	uint32_t retVal = 0;
 	if (offset < 0x40)
@@ -498,7 +498,7 @@ READ32_MEMBER(midzeus_state::firewire_r)
 	return retVal;
 }
 
-WRITE32_MEMBER(midzeus_state::firewire_w)
+void midzeus_state::firewire_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// 0x08 // Control
 	// Bit 0: Flush bad packets from Rx FIFO
@@ -538,7 +538,7 @@ WRITE32_MEMBER(midzeus_state::firewire_w)
  *
  *************************************/
 
-READ32_MEMBER(midzeus_state::tms32031_control_r)
+uint32_t midzeus_state::tms32031_control_r(offs_t offset)
 {
 	/* watch for accesses to the timers */
 	if (offset == 0x24 || offset == 0x34)
@@ -557,7 +557,7 @@ READ32_MEMBER(midzeus_state::tms32031_control_r)
 }
 
 
-WRITE32_MEMBER(midzeus_state::tms32031_control_w)
+void midzeus_state::tms32031_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tms32031_control[offset]);
 
@@ -591,7 +591,7 @@ CUSTOM_INPUT_MEMBER(midzeus_state::custom_49way_r)
 }
 
 
-WRITE32_MEMBER(midzeus_state::keypad_select_w)
+void midzeus_state::keypad_select_w(offs_t offset, uint32_t data)
 {
 	if (offset == 1)
 		keypad_select = data;
@@ -610,13 +610,13 @@ CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
 	return bits;
 }
 
-READ32_MEMBER(midzeus_state::grid_keypad_r)
+uint32_t midzeus_state::grid_keypad_r(offs_t offset)
 {
 	uint32_t bits = (m_io_keypad->read() >> ((offset >> 1) << 2)) & 0xf;
 	return bits;
 }
 
-READ32_MEMBER(midzeus_state::trackball_r)
+uint32_t midzeus_state::trackball_r(offs_t offset)
 {
 	if (offset==0)
 		return m_io_tracky->read();
@@ -632,7 +632,7 @@ READ32_MEMBER(midzeus_state::trackball_r)
  *
  *************************************/
 
-READ32_MEMBER(midzeus_state::analog_r)
+uint32_t midzeus_state::analog_r(offs_t offset)
 {
 	if (offset < 8 || offset > 11)
 		logerror("%06X:analog_r(%X)\n", m_maincpu->pc(), offset);
@@ -640,7 +640,7 @@ READ32_MEMBER(midzeus_state::analog_r)
 }
 
 
-WRITE32_MEMBER(midzeus_state::analog_w)
+void midzeus_state::analog_w(uint32_t data)
 {
 	/* 16 writes to the location before a read */
 }
@@ -679,7 +679,7 @@ TIMER_CALLBACK_MEMBER(midzeus_state::invasn_gun_callback)
 }
 
 
-WRITE32_MEMBER(midzeus_state::invasn_gun_w)
+void midzeus_state::invasn_gun_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_control = gun_control;
 	int player;
@@ -705,7 +705,7 @@ WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 }
 
 
-READ32_MEMBER(midzeus_state::invasn_gun_r)
+uint32_t midzeus_state::invasn_gun_r()
 {
 	int beamx = m_screen->hpos();
 	int beamy = m_screen->vpos();
@@ -1678,7 +1678,8 @@ void midzeus_state::init_mk4()
 
 void midzeus_state::init_invasn()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9c0000, 0x9c0000, read32_delegate(*this, FUNC(midzeus_state::invasn_gun_r)), write32_delegate(*this, FUNC(midzeus_state::invasn_gun_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9c0000, 0x9c0000, read32smo_delegate(*this, FUNC(midzeus_state::invasn_gun_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9c0000, 0x9c0000, write32s_delegate(*this, FUNC(midzeus_state::invasn_gun_w)));
 }
 
 
@@ -1686,15 +1687,15 @@ void midzeus2_state::init_crusnexo()
 {
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32sm_delegate(*this, FUNC(midzeus2_state::crusnexo_leds_r)), write32sm_delegate(*this, FUNC(midzeus2_state::crusnexo_leds_w)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler    (0x8d0009, 0x8d000a, write32_delegate(*this, FUNC(midzeus_state::keypad_select_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler    (0x8d0009, 0x8d000a, write32sm_delegate(*this, FUNC(midzeus_state::keypad_select_w)));
 }
 
 
 void midzeus2_state::init_thegrid()
 {
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c0000, 0x8c0001, read32_delegate(*this, FUNC(midzeus_state::trackball_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9b0000, 0x9b0004, read32_delegate(*this, FUNC(midzeus_state::grid_keypad_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c0000, 0x8c0001, read32sm_delegate(*this, FUNC(midzeus_state::trackball_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9b0000, 0x9b0004, read32sm_delegate(*this, FUNC(midzeus_state::grid_keypad_r)));
 }
 
 

@@ -363,7 +363,7 @@ void konamigx_state::daiskiss_esc(address_space &space, uint32_t p1, uint32_t p2
 	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
-WRITE32_MEMBER(konamigx_state::esc_w)
+void konamigx_state::esc_w(address_space &space, uint32_t data)
 {
 	uint32_t opcode;
 	uint32_t params;
@@ -453,7 +453,7 @@ CUSTOM_INPUT_MEMBER(konamigx_state::gx_rdport1_3_r)
 	return (m_gx_rdport1_3 >> 1);
 }
 
-WRITE32_MEMBER(konamigx_state::eeprom_w)
+void konamigx_state::eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t odata;
 
@@ -501,7 +501,7 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 	}
 }
 
-WRITE32_MEMBER(konamigx_state::control_w)
+void konamigx_state::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// TODO: derive from reported PCB XTALs
 	const uint32_t pixclock[4] = { 6'000'000, 8'000'000, 12'000'000, 16'000'000 };
@@ -735,7 +735,7 @@ double konamigx_state::adc0834_callback(uint8_t input)
 }
 
 
-READ32_MEMBER(konamigx_state::le2_gun_H_r)
+uint32_t konamigx_state::le2_gun_H_r()
 {
 	int p1x = m_light0_x->read()*290/0xff+20;
 	int p2x = m_light1_x->read()*290/0xff+20;
@@ -743,7 +743,7 @@ READ32_MEMBER(konamigx_state::le2_gun_H_r)
 	return (p1x<<16)|p2x;
 }
 
-READ32_MEMBER(konamigx_state::le2_gun_V_r)
+uint32_t konamigx_state::le2_gun_V_r()
 {
 	int p1y = m_light0_y->read()*224/0xff;
 	int p2y = m_light1_y->read()*224/0xff;
@@ -758,14 +758,14 @@ READ32_MEMBER(konamigx_state::le2_gun_V_r)
 /**********************************************************************************/
 /* system or game dependent handlers */
 
-READ32_MEMBER(konamigx_state::type1_roz_r1)
+uint32_t konamigx_state::type1_roz_r1(offs_t offset)
 {
 	uint32_t *ROM = (uint32_t *)memregion("gfx3")->base();
 
 	return ROM[offset];
 }
 
-READ32_MEMBER(konamigx_state::type1_roz_r2)
+uint32_t konamigx_state::type1_roz_r2(offs_t offset)
 {
 	uint32_t *ROM = (uint32_t *)memregion("gfx3")->base();
 
@@ -774,7 +774,7 @@ READ32_MEMBER(konamigx_state::type1_roz_r2)
 	return ROM[offset];
 }
 
-READ32_MEMBER(konamigx_state::type3_sync_r)
+uint32_t konamigx_state::type3_sync_r()
 {
 	if(m_konamigx_current_frame==0)
 		return -1;  //  return 0xfffffffe | 1;
@@ -859,7 +859,7 @@ READ32_MEMBER(konamigx_state::type3_sync_r)
     move.l  #$C10400,($C102EC).l       move.l  #$C10400,($C102EC).l
 */
 
-WRITE32_MEMBER(konamigx_state::type4_prot_w)
+void konamigx_state::type4_prot_w(address_space &space, offs_t offset, uint32_t data)
 {
 	int clk;
 	int i;
@@ -1012,7 +1012,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 }
 
 // cabinet lamps for type 1 games
-WRITE32_MEMBER(konamigx_state::type1_cablamps_w)
+void konamigx_state::type1_cablamps_w(uint32_t data)
 {
 	m_lamp = BIT(data, 24);
 }
@@ -1118,14 +1118,14 @@ void konamigx_state::gx_type4_map(address_map &map)
 /**********************************************************************************/
 /* Sound handling */
 
-READ16_MEMBER(konamigx_state::tms57002_status_word_r)
+uint16_t konamigx_state::tms57002_status_word_r()
 {
 	return (m_dasp->dready_r() ? 4 : 0) |
 		(m_dasp->pc0_r() ? 2 : 0) |
 		(m_dasp->empty_r() ? 1 : 0);
 }
 
-WRITE16_MEMBER(konamigx_state::tms57002_control_word_w)
+void konamigx_state::tms57002_control_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -3879,7 +3879,7 @@ static const GXGameInfoT gameDefs[] =
 	{ "",        0xff,0xff,0xff },
 };
 
-READ32_MEMBER( konamigx_state::k_6bpp_rom_long_r )
+uint32_t konamigx_state::k_6bpp_rom_long_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_k056832->k_6bpp_rom_long_r(offset, mem_mask);
 }
@@ -3908,8 +3908,8 @@ void konamigx_state::init_konamigx()
 			switch (gameDefs[i].special)
 			{
 				case 1: // LE2 guns
-					m_maincpu->space(AS_PROGRAM).install_read_handler(0xd44000, 0xd44003, read32_delegate(*this, FUNC(konamigx_state::le2_gun_H_r)));
-					m_maincpu->space(AS_PROGRAM).install_read_handler(0xd44004, 0xd44007, read32_delegate(*this, FUNC(konamigx_state::le2_gun_V_r)));
+					m_maincpu->space(AS_PROGRAM).install_read_handler(0xd44000, 0xd44003, read32smo_delegate(*this, FUNC(konamigx_state::le2_gun_H_r)));
+					m_maincpu->space(AS_PROGRAM).install_read_handler(0xd44004, 0xd44007, read32smo_delegate(*this, FUNC(konamigx_state::le2_gun_V_r)));
 					break;
 				case 2: // tkmmpzdm hack
 				{
@@ -3944,7 +3944,7 @@ void konamigx_state::init_konamigx()
 					break;
 
 				case 7: // install type 4 Xilinx protection for non-type 3/4 games
-					m_maincpu->space(AS_PROGRAM).install_write_handler(0xcc0000, 0xcc0007, write32_delegate(*this, FUNC(konamigx_state::type4_prot_w)));
+					m_maincpu->space(AS_PROGRAM).install_write_handler(0xcc0000, 0xcc0007, write32m_delegate(*this, FUNC(konamigx_state::type4_prot_w)));
 					break;
 
 				case 8: // tbyahhoo
@@ -3961,7 +3961,7 @@ void konamigx_state::init_konamigx()
 	}
 
 	if (readback == BPP66)
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd00000, 0xd01fff, read32_delegate(*this, FUNC(konamigx_state::k_6bpp_rom_long_r)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd00000, 0xd01fff, read32s_delegate(*this, FUNC(konamigx_state::k_6bpp_rom_long_r)));
 
 
 #undef BPP5

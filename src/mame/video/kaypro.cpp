@@ -214,20 +214,20 @@ void kaypro_state::mc6845_screen_configure()
 
 /**************************** I/O PORTS *****************************************************************/
 
-READ8_MEMBER( kaypro_state::kaypro484_status_r )
+uint8_t kaypro_state::kaypro484_status_r()
 {
 /* Need bit 7 high or computer hangs */
 
 	return 0x80 | m_crtc->register_r();
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro484_index_w )
+void kaypro_state::kaypro484_index_w(uint8_t data)
 {
 	m_mc6845_ind = data & 0x1f;
 	m_crtc->address_w(data);
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro484_register_w )
+void kaypro_state::kaypro484_register_w(uint8_t data)
 {
 	static const uint8_t mcmask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 
@@ -245,22 +245,22 @@ WRITE8_MEMBER( kaypro_state::kaypro484_register_w )
 		m_mc6845_video_address = m_mc6845_reg[19] | ((m_mc6845_reg[18] & 0x3f) << 8);   /* internal ULA address */
 }
 
-READ8_MEMBER( kaypro_state::kaypro_videoram_r )
+uint8_t kaypro_state::kaypro_videoram_r(offs_t offset)
 {
 	return m_p_videoram[offset];
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro_videoram_w )
+void kaypro_state::kaypro_videoram_w(offs_t offset, uint8_t data)
 {
 	m_p_videoram[offset] = data;
 }
 
-READ8_MEMBER( kaypro_state::kaypro484_videoram_r )
+uint8_t kaypro_state::kaypro484_videoram_r()
 {
 	return m_p_videoram[m_mc6845_video_address];
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro484_videoram_w )
+void kaypro_state::kaypro484_videoram_w(uint8_t data)
 {
 	m_p_videoram[m_mc6845_video_address] = data;
 }

@@ -110,7 +110,7 @@ public:
 private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	u8 applix_inputs_r();
+	u16 applix_inputs_r();
 	void palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void analog_latch_w(u16 data);
 	void dac_latch_w(u16 data);
@@ -272,7 +272,7 @@ d1   = cassette in
 d2,3 = joystick in
 d4-7 = SW2 dipswitch block
 */
-u8 applix_state::applix_inputs_r()
+u16 applix_state::applix_inputs_r()
 {
 	return m_io_dsw->read() | m_cass_data[2];
 }
