@@ -1014,7 +1014,7 @@ void spg2xx_game_fordrace_state::fordrace(machine_config &config)
 	m_maincpu->porta_in().set(FUNC(spg2xx_game_fordrace_state::base_porta_r));
 	m_maincpu->portb_in().set(FUNC(spg2xx_game_fordrace_state::base_portb_r));
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_fordrace_state::base_portc_r));
-	
+
 	// these do something in test mode, but in game the ADC interrupt is never generated?
 	m_maincpu->adc_in<0>().set_ioport("AD0"); // pedals
 	m_maincpu->adc_in<1>().set_ioport("AD1"); // steering
@@ -1053,7 +1053,7 @@ void spg2xx_game_senspeed_state::senspeed(machine_config &config)
 	/*
 		ATMLH806
 		02B 1
-		A7J4565E	
+		A7J4565E
 	*/
 	I2C_24C01(config, "i2cmem", 0); // saves 0x80 bytes, but loading fails?
 }

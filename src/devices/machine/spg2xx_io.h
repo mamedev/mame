@@ -21,7 +21,7 @@ public:
 	auto portb_in() { return m_portb_in.bind(); }
 	auto portc_in() { return m_portc_in.bind(); }
 
-	template <size_t Line> auto adc_in() { printf("Binding %d\n", (int)Line); return m_adc_in[Line].bind(); }
+	template <size_t Line> auto adc_in() { return m_adc_in[Line].bind(); }
 
 	auto i2c_w() { return m_i2c_w.bind(); }
 	auto i2c_r() { return m_i2c_r.bind(); }
@@ -50,6 +50,8 @@ public:
 	auto write_ffrq_tmr2_irq_callback() { return m_ffreq_tmr2_irq_cb.bind(); };
 
 	auto write_fiq_vector_callback() { return m_fiq_vector_w.bind(); };
+
+	template <size_t Line> uint16_t adc_r() { return m_adc_in[Line](); }
 
 protected:
 	spg2xx_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint32_t sprite_limit)

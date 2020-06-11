@@ -168,10 +168,10 @@ static INPUT_PORTS_START( jak_sith_i2c )
 	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("JOYX")
-	PORT_BIT(0x1fff, 0x0800, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x0000,0x1fff)
+	PORT_BIT(0x0fff, 0x0800, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x0000,0x0fff)
 
 	PORT_START("JOYY")
-	PORT_BIT(0x1fff, 0x0800, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x0000,0x1fff)
+	PORT_BIT(0x0fff, 0x0800, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x0000,0x0fff)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_pooh )
@@ -531,7 +531,9 @@ void jakks_gkr_state::jakks_gkr_sw_i2c(machine_config &config)
 	jakks_gkr_i2c(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
 	m_maincpu->adc_in<0>().set(FUNC(jakks_gkr_state::joy_x_read));
+	m_maincpu->adc_in<1>().set(FUNC(jakks_gkr_state::joy_x_read));
 	m_maincpu->adc_in<2>().set(FUNC(jakks_gkr_state::joy_y_read));
+	m_maincpu->adc_in<3>().set(FUNC(jakks_gkr_state::joy_y_read));
 	SOFTWARE_LIST(config, "jakks_gamekey_sw").set_original("jakks_gamekey_sw");
 }
 

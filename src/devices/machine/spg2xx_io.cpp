@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(SPG28X_IO, spg28x_io_device, "spg28x_io", "SPG280-series Syst
 #define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_TIMERS | LOG_EXTINT | LOG_UNKNOWN_IO | LOG_SPI | LOG_ADC)
 #define LOG_ALL             (LOG_IO | LOG_VLINES | LOG_SEGMENT | LOG_WATCHDOG | LOG_FIQ | LOG_SIO | LOG_EXT_MEM | LOG_ADC)
 
-#define VERBOSE             (LOG_ADC)
+#define VERBOSE             (0)
 #include "logmacro.h"
 
 
@@ -1104,7 +1104,14 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 						check_irqs(changed);
 				}
 			}
-			else if (!BIT(old_ctrl, 12) && BIT(m_io_regs[REG_ADC_CTRL], 12))
+
+			if (BIT(data, 13))
+			{
+				m_io_regs[REG_ADC_CTRL] &= ~0x2000;
+				check_irqs(0x2000);
+			}
+
+			if (!BIT(old_ctrl, 12) && BIT(m_io_regs[REG_ADC_CTRL], 12))
 			{
 				m_io_regs[REG_ADC_CTRL] &= ~0x3000;
 				const uint32_t adc_clocks = 16 << ((m_io_regs[REG_ADC_CTRL] >> 2) & 3);
@@ -1652,7 +1659,7 @@ void spg2xx_io_device::check_irqs(const uint16_t changed)
 
 	if (changed & 0x6100) // UART, SPI, SIO, I2C, ADC IRQ
 	{
-		LOGMASKED(LOG_UART | LOG_SIO | LOG_SPI | LOG_I2C, "%ssserting IRQ3 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x6100) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100), changed);
+		LOGMASKED(LOG_UART | LOG_SIO | LOG_SPI | LOG_I2C | LOG_ADC, "%ssserting IRQ3 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x6100) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100), changed);
 		m_uart_adc_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x6100) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
