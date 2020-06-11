@@ -456,7 +456,6 @@ READ16_MEMBER(spg2xx_io_device::io_r)
 
 	case REG_ADC_DATA:
 	{
-		m_io_regs[REG_ADC_DATA] = 0;
 		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS &= ~0x2000;
 		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
@@ -1116,11 +1115,13 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 				m_io_regs[REG_ADC_CTRL] &= ~0x3000;
 				const uint32_t adc_clocks = 16 << ((m_io_regs[REG_ADC_CTRL] >> 2) & 3);
 				m_adc_timer[channel]->adjust(attotime::from_ticks(adc_clocks, 27000000));
+				m_io_regs[REG_ADC_DATA] &= ~0x8000;
 			}
 
 			// Req_Auto_8K
 			if (BIT(data, 10))
 			{
+				m_io_regs[REG_ADC_DATA] &= ~0x8000;
 				m_adc_timer[channel]->adjust(attotime::from_hz(8000), 0, attotime::from_hz(8000));
 			}
 		}
@@ -1752,7 +1753,7 @@ void spg2xx_io_device::do_gpio(uint32_t offset, bool write)
 
 void spg2xx_io_device::do_adc_capture(int channel)
 {
-	m_io_regs[REG_ADC_DATA] = m_adc_in[channel]() & 0x0fff;
+	m_io_regs[REG_ADC_DATA] = (m_adc_in[channel]() & 0x0fff) | 0x8000;
 	if (BIT(m_io_regs[REG_ADC_DATA], 11))
 	{
 		//m_io_regs[REG_ADC_DATA] |= 0xf000;
