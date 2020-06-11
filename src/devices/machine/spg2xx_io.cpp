@@ -27,10 +27,11 @@ DEFINE_DEVICE_TYPE(SPG28X_IO, spg28x_io_device, "spg28x_io", "SPG280-series Syst
 #define LOG_EXT_MEM         (1U << 27)
 #define LOG_EXTINT          (1U << 28)
 #define LOG_SPI             (1U << 29)
-#define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_TIMERS | LOG_EXTINT | LOG_UNKNOWN_IO | LOG_SPI)
-#define LOG_ALL             (LOG_IO | LOG_VLINES | LOG_SEGMENT | LOG_WATCHDOG | LOG_FIQ | LOG_SIO | LOG_EXT_MEM)
+#define LOG_ADC				(1U << 30)
+#define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_TIMERS | LOG_EXTINT | LOG_UNKNOWN_IO | LOG_SPI | LOG_ADC)
+#define LOG_ALL             (LOG_IO | LOG_VLINES | LOG_SEGMENT | LOG_WATCHDOG | LOG_FIQ | LOG_SIO | LOG_EXT_MEM | LOG_ADC)
 
-#define VERBOSE             (0)
+#define VERBOSE             (LOG_ADC)
 #include "logmacro.h"
 
 
@@ -127,6 +128,12 @@ void spg2xx_io_device::device_start()
 	m_spi_tx_timer = timer_alloc(TIMER_SPI_TX);
 	m_spi_tx_timer->adjust(attotime::never);
 
+	for (int i = 0; i < 4; i++)
+	{
+		m_adc_timer[i] = timer_alloc(TIMER_ADC0 + i);
+		m_adc_timer[i]->adjust(attotime::never);
+	}
+
 	save_item(NAME(m_io_regs));
 
 	save_item(NAME(m_uart_rx_fifo));
@@ -212,6 +219,20 @@ void spg2xx_io_device::device_reset()
 	m_4khz_timer->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
 
 	m_rng_timer->adjust(attotime::from_hz(1234), 0, attotime::from_hz(1234)); // timer value is arbitrary, maybe should match system clock, but that would result in heavy switching
+
+	m_tmb1->adjust(attotime::never);
+	m_tmb2->adjust(attotime::never);
+	m_uart_tx_timer->adjust(attotime::never);
+	m_uart_rx_timer->adjust(attotime::never);
+	m_timer_src_ab->adjust(attotime::never);
+	m_timer_src_c->adjust(attotime::never);
+	m_watchdog_timer->adjust(attotime::never);
+	m_spi_tx_timer->adjust(attotime::never);
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_adc_timer[i]->adjust(attotime::never);
+	}
 
 	m_2khz_divider = 0;
 	m_1khz_divider = 0;
@@ -426,7 +447,11 @@ READ16_MEMBER(spg2xx_io_device::io_r)
 		break;
 
 	case REG_ADC_CTRL:
-		LOGMASKED(LOG_IO_READS, "%s: io_r: ADC Control = %04x\n", machine().describe_context(), val);
+		LOGMASKED(LOG_IO_READS | LOG_ADC, "%s: io_r: ADC Control = %04x\n", machine().describe_context(), val);
+		break;
+
+	case REG_ADC_PAD:
+		LOGMASKED(LOG_IO_READS | LOG_ADC, "%s: io_r: ADC Pad Control = %04x\n", machine().describe_context(), val);
 		break;
 
 	case REG_ADC_DATA:
@@ -437,7 +462,7 @@ READ16_MEMBER(spg2xx_io_device::io_r)
 		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 		if (changed)
 			check_irqs(changed);
-		LOGMASKED(LOG_IO_READS, "%s: io_r: ADC Data = %04x\n", machine().describe_context(), val);
+		LOGMASKED(LOG_IO_READS | LOG_ADC, "%s: io_r: ADC Data = %04x\n", machine().describe_context(), val);
 		break;
 	}
 
@@ -1059,25 +1084,60 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 
 	case REG_ADC_CTRL:
 	{
-		LOGMASKED(LOG_IO_WRITES, "%s: io_w: ADC Control = %04x\n", machine().describe_context(), data);
-		m_io_regs[REG_ADC_CTRL] = data & ~0x1000;
-		if (BIT(data, 0))
+		LOGMASKED(LOG_IO_WRITES | LOG_ADC, "%s: io_w: ADC Control = %04x\n", machine().describe_context(), data);
+
+		const uint16_t old_ctrl = m_io_regs[REG_ADC_CTRL];
+		m_io_regs[REG_ADC_CTRL] = data & ~0x2000;
+
+		const uint16_t channel = (m_io_regs[REG_ADC_CTRL] >> 4) & 3;
+		if (BIT(m_io_regs[REG_ADC_CTRL], 0))
 		{
-			m_io_regs[REG_ADC_DATA] = 0x8000 | (m_adc_in[BIT(data, 5)]() & 0x7fff);
-			m_io_regs[REG_ADC_CTRL] |= 0x2000;
-		}
-		if (BIT(data, 12) && !BIT(m_io_regs[REG_ADC_CTRL], 1))
-		{
-			const uint16_t old = IO_IRQ_STATUS;
-			IO_IRQ_STATUS |= 0x2000;
-			const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
-			if (changed)
+			if (!BIT(old_ctrl, 0))
 			{
-				check_irqs(changed);
+				m_io_regs[REG_ADC_CTRL] |= 0x2000;
+				if (BIT(m_io_regs[REG_ADC_CTRL], 9))
+				{
+					const uint16_t old = IO_IRQ_STATUS;
+					IO_IRQ_STATUS |= 0x2000;
+					const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+					if (changed)
+						check_irqs(changed);
+				}
+			}
+			else if (!BIT(old_ctrl, 12) && BIT(m_io_regs[REG_ADC_CTRL], 12))
+			{
+				m_io_regs[REG_ADC_CTRL] &= ~0x3000;
+				const uint32_t adc_clocks = 16 << ((m_io_regs[REG_ADC_CTRL] >> 2) & 3);
+				m_adc_timer[channel]->adjust(attotime::from_ticks(adc_clocks, 27000000));
+			}
+
+			// Req_Auto_8K
+			if (BIT(data, 10))
+			{
+				m_adc_timer[channel]->adjust(attotime::from_hz(8000), 0, attotime::from_hz(8000));
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				m_adc_timer[i]->adjust(attotime::never);
 			}
 		}
 		break;
 	}
+
+	case REG_ADC_PAD:
+		LOGMASKED(LOG_IO_WRITES | LOG_ADC, "%s: io_w: ADC Pad Control = %04x\n", machine().describe_context(), data);
+		m_io_regs[REG_ADC_PAD] = data;
+		for (int i = 0; i < 4; i++)
+		{
+			if (!BIT(data, i))
+			{
+				m_adc_timer[i]->adjust(attotime::never);
+			}
+		}
+		break;
 
 	case REG_SLEEP_MODE:
 		LOGMASKED(LOG_IO_WRITES, "%s: io_w: Sleep Mode (%s enter value) = %04x\n", machine().describe_context(), data == 0xaa55 ? "valid" : "invalid", data);
@@ -1475,6 +1535,13 @@ void spg2xx_io_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		case TIMER_SPI_TX:
 			do_spi_tx();
 			break;
+
+		case TIMER_ADC0:
+		case TIMER_ADC1:
+		case TIMER_ADC2:
+		case TIMER_ADC3:
+			do_adc_capture(id - TIMER_ADC0);
+			break;
 	}
 }
 
@@ -1674,6 +1741,26 @@ void spg2xx_io_device::do_gpio(uint32_t offset, bool write)
 
 	what |= do_special_gpio(index, special);
 	m_io_regs[5 * index + 1] = what;
+}
+
+void spg2xx_io_device::do_adc_capture(int channel)
+{
+	m_io_regs[REG_ADC_DATA] = m_adc_in[channel]() & 0x0fff;
+	if (BIT(m_io_regs[REG_ADC_DATA], 11))
+	{
+		//m_io_regs[REG_ADC_DATA] |= 0xf000;
+	}
+	m_io_regs[REG_ADC_CTRL] |= 0x2000;
+	const uint16_t old = IO_IRQ_STATUS;
+	if (BIT(m_io_regs[REG_ADC_CTRL], 9))
+	{
+		IO_IRQ_STATUS |= 0x2000;
+		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+		if (changed)
+		{
+			check_irqs(changed);
+		}
+	}
 }
 
 void spg2xx_io_device::do_i2c()

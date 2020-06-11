@@ -21,7 +21,7 @@ public:
 	auto portb_in() { return m_portb_in.bind(); }
 	auto portc_in() { return m_portc_in.bind(); }
 
-	template <size_t Line> auto adc_in() { return m_adc_in[Line].bind(); }
+	template <size_t Line> auto adc_in() { printf("Binding %d\n", (int)Line); return m_adc_in[Line].bind(); }
 
 	auto i2c_w() { return m_i2c_w.bind(); }
 	auto i2c_r() { return m_i2c_r.bind(); }
@@ -95,7 +95,8 @@ protected:
 		REG_EXT_MEMORY_CTRL,
 		REG_WATCHDOG_CLEAR,
 		REG_ADC_CTRL,
-		REG_ADC_DATA = 0x27,
+		REG_ADC_PAD,
+		REG_ADC_DATA,
 
 		REG_SLEEP_MODE,
 		REG_WAKEUP_SOURCE,
@@ -158,6 +159,10 @@ protected:
 	static const device_timer_id TIMER_RNG = 9;
 	static const device_timer_id TIMER_WATCHDOG = 10;
 	static const device_timer_id TIMER_SPI_TX = 11;
+	static const device_timer_id TIMER_ADC0 = 12;
+	static const device_timer_id TIMER_ADC1 = 13;
+	static const device_timer_id TIMER_ADC2 = 14;
+	static const device_timer_id TIMER_ADC3 = 15;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -185,6 +190,8 @@ protected:
 	void update_spi_irqs();
 
 	void do_i2c();
+
+	void do_adc_capture(int channel);
 
 	uint16_t m_io_regs[0x100];
 
@@ -219,7 +226,8 @@ protected:
 	devcb_read16 m_portb_in;
 	devcb_read16 m_portc_in;
 
-	devcb_read16::array<2> m_adc_in;
+	devcb_read16::array<4> m_adc_in;
+	emu_timer *m_adc_timer[4];
 
 	devcb_write8 m_i2c_w;
 	devcb_read8 m_i2c_r;

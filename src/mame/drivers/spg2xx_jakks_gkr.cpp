@@ -16,7 +16,9 @@ public:
 		spg2xx_game_state(mconfig, type, tag),
 		m_porta_key_mode(false),
 		m_cart(*this, "cartslot"),
-		m_cart_region(nullptr)
+		m_cart_region(nullptr),
+		m_analog_x(*this, "JOYX"),
+		m_analog_y(*this, "JOYY")
 	{ }
 
 	void jakks_gkr(machine_config &config);
@@ -46,6 +48,9 @@ protected:
 private:
 	virtual void machine_start() override;
 
+	uint16_t joy_x_read();
+	uint16_t joy_y_read();
+
 	uint16_t jakks_porta_key_io_r();
 
 	void gkr_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -56,6 +61,9 @@ private:
 
 	optional_device<jakks_gamekey_slot_device> m_cart;
 	memory_region *m_cart_region;
+
+	optional_ioport m_analog_x;
+	optional_ioport m_analog_y;
 };
 
 READ_LINE_MEMBER(jakks_gkr_state::i2c_gkr_r)
@@ -104,6 +112,18 @@ void jakks_gkr_state::jakks_portb_w(uint16_t data)
 	//logerror("%s: jakks_portb_w %04x\n", machine().describe_context(), data);
 }
 
+uint16_t jakks_gkr_state::joy_x_read()
+{
+	const uint16_t data = m_analog_x->read();
+	return data > 0x0fff ? 0x0fff : data;
+}
+
+uint16_t jakks_gkr_state::joy_y_read()
+{
+	const uint16_t data = m_analog_y->read();
+	return data > 0x0fff ? 0x0fff : data;
+}
+
 uint16_t jakks_gkr_state::jakks_porta_key_io_r()
 {
 	//logerror("%s: jakks_porta_key_io_r\n", machine().describe_context());
@@ -148,10 +168,10 @@ static INPUT_PORTS_START( jak_sith_i2c )
 	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("JOYX")
-	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+	PORT_BIT(0x1fff, 0x0800, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x0000,0x1fff)
 
 	PORT_START("JOYY")
-	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+	PORT_BIT(0x1fff, 0x0800, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x0000,0x1fff)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_pooh )
@@ -510,8 +530,8 @@ void jakks_gkr_state::jakks_gkr_sw_i2c(machine_config &config)
 {
 	jakks_gkr_i2c(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
-	m_maincpu->adc_in<0>().set_ioport("JOYX");
-	m_maincpu->adc_in<1>().set_ioport("JOYY");
+	m_maincpu->adc_in<0>().set(FUNC(jakks_gkr_state::joy_x_read));
+	m_maincpu->adc_in<2>().set(FUNC(jakks_gkr_state::joy_y_read));
 	SOFTWARE_LIST(config, "jakks_gamekey_sw").set_original("jakks_gamekey_sw");
 }
 
