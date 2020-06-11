@@ -55,9 +55,9 @@ private:
 	rectangle  m_clip0;
 	rectangle  m_clip1;
 
-	DECLARE_WRITE8_MEMBER(labyrunr_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(labyrunr_vram1_w);
-	DECLARE_WRITE8_MEMBER(labyrunr_vram2_w);
+	void labyrunr_bankswitch_w(uint8_t data);
+	void labyrunr_vram1_w(offs_t offset, uint8_t data);
+	void labyrunr_vram2_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	virtual void machine_start() override;

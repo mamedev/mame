@@ -26,7 +26,7 @@ public:
 
 	void set_auto_ack(int state);
 
-	void set_fifo_callbacks(read16smo_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w);
+	void set_fifo_callbacks(read16smo_delegate fifo_data_r, read16mo_delegate fifo_status_r, write_line_delegate fifo_reset_w);
 	void set_io_callbacks(write_line_delegate output_full_cb, write_line_delegate input_empty_cb);
 
 	uint16_t data_r();
@@ -218,7 +218,7 @@ protected:
 	write_line_delegate m_input_empty_cb;
 
 	read16smo_delegate m_fifo_data_r;
-	read16_delegate m_fifo_status_r;
+	read16mo_delegate m_fifo_status_r;
 	write_line_delegate m_fifo_reset_w;
 
 	/* timers */

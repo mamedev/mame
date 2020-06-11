@@ -37,14 +37,14 @@ public:
 	void nvram_reset() { nvram_default(); }
 	void nvram_load(emu_file &file) { nvram_read(file); }
 	void nvram_save(emu_file &file) { nvram_write(file); }
-	bool nvram_pre_save() { return nvram_pre_write(); }
+	bool nvram_can_save() { return nvram_can_write(); }
 
 protected:
 	// derived class overrides
 	virtual void nvram_default() = 0;
 	virtual void nvram_read(emu_file &file) = 0;
 	virtual void nvram_write(emu_file &file) = 0;
-	virtual bool nvram_pre_write() { return true; }
+	virtual bool nvram_can_write() { return true; }
 };
 
 // iterator

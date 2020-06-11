@@ -109,7 +109,7 @@ private:
 	u8 irq_cause_r(offs_t offset);
 	void irq_cause_w(offs_t offset, u8 data);
 	uint8_t irq_vector_r(offs_t offset);
-	DECLARE_WRITE16_MEMBER(mouja_irq_timer_ctrl_w);
+	void mouja_irq_timer_ctrl_w(uint16_t data);
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	TIMER_CALLBACK_MEMBER(sound_data_sync);
 	DECLARE_READ8_MEMBER(soundstatus_r);
@@ -120,13 +120,13 @@ private:
 	void upd7810_portb_w(uint8_t data);
 	void daitorid_portb_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(coin_lockout_1word_w);
-	DECLARE_WRITE16_MEMBER(coin_lockout_4words_w);
-	DECLARE_READ16_MEMBER(balcube_dsw_r);
-	DECLARE_READ16_MEMBER(gakusai_input_r);
+	void coin_lockout_4words_w(offs_t offset, uint16_t data);
+	uint16_t balcube_dsw_r(offs_t offset);
+	uint16_t gakusai_input_r();
 	DECLARE_WRITE8_MEMBER(blzntrnd_sh_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(puzzlet_irq_enable_w);
+	void puzzlet_irq_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void puzzlet_portb_w(uint16_t data);
-	DECLARE_WRITE16_MEMBER(k053936_w);
+	void k053936_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE8_MEMBER(gakusai_oki_bank_hi_w);
 	DECLARE_WRITE8_MEMBER(gakusai_oki_bank_lo_w);
 	DECLARE_READ8_MEMBER(gakusai_eeprom_r);

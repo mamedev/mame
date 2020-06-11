@@ -243,6 +243,9 @@ DEFINE_DEVICE_TYPE(I80C51GB, i80c51gb_device, "i80c51gb", "Intel 80C51GB")
 DEFINE_DEVICE_TYPE(AT89C52, at89c52_device, "at89c52", "Atmel AT89C52")
 DEFINE_DEVICE_TYPE(AT89S52, at89s52_device, "at89s52", "Atmel AT89S52")
 DEFINE_DEVICE_TYPE(AT89C4051, at89c4051_device, "at89c4051", "Atmel AT89C4051")
+DEFINE_DEVICE_TYPE(DS80C320, ds80c320_device, "ds80c320", "Dallas DS80C320 HSM")
+DEFINE_DEVICE_TYPE(SAB80C535, sab80c535_device, "sab80c535", "Siemens SAB80C535")
+DEFINE_DEVICE_TYPE(I8344, i8344_device, "i8344", "Intel 8344AH RUPI-44")
 DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
 
 
@@ -403,6 +406,21 @@ at89s52_device::at89s52_device(const machine_config &mconfig, const char *tag, d
 
 at89c4051_device::at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80c51_device(mconfig, AT89C4051, tag, owner, clock, 12, 7)
+{
+}
+
+ds80c320_device::ds80c320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80c52_device(mconfig, DS80C320, tag, owner, clock, 0, 8)
+{
+}
+
+sab80c535_device::sab80c535_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80c51_device(mconfig, SAB80C535, tag, owner, clock, 0, 8)
+{
+}
+
+i8344_device::i8344_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mcs51_cpu_device(mconfig, I8344, tag, owner, clock, 0, 8)
 {
 }
 
@@ -2545,6 +2563,21 @@ std::unique_ptr<util::disasm_interface> i87c51fa_device::create_disassembler()
 std::unique_ptr<util::disasm_interface> i80c51gb_device::create_disassembler()
 {
 	return std::make_unique<i8xc51gb_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> ds80c320_device::create_disassembler()
+{
+	return std::make_unique<ds80c320_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> sab80c535_device::create_disassembler()
+{
+	return std::make_unique<sab80c515_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> i8344_device::create_disassembler()
+{
+	return std::make_unique<rupi44_disassembler>();
 }
 
 std::unique_ptr<util::disasm_interface> ds5002fp_device::create_disassembler()

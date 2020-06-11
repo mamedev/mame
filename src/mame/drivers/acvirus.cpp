@@ -108,7 +108,7 @@ void acvirus_state::virus_map(address_map &map)
 
 void acvirus_state::virus(machine_config &config)
 {
-	I8052(config, m_maincpu, XTAL(12'000'000));
+	SAB80C535(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::virus_map);
 
 	SPEAKER(config, "lspeaker").front_left();

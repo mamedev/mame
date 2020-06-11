@@ -56,7 +56,7 @@
 #include "speaker.h"
 
 
-READ8_MEMBER( kaypro_state::kaypro484_87_r ) { return 0x7f; }    /* to bypass unemulated HD controller */
+uint8_t kaypro_state::kaypro484_87_r() { return 0x7f; }    /* to bypass unemulated HD controller */
 
 /***********************************************************
 

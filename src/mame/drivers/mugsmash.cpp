@@ -52,7 +52,7 @@ behavior we use .
 #include "speaker.h"
 
 
-WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
+void mugsmash_state::mugsmash_reg2_w(offs_t offset, uint16_t data)
 {
 	m_regs2[offset] = data;
 	//popmessage ("Regs2 %04x, %04x, %04x, %04x", m_regs2[0], m_regs2[1], m_regs2[2], m_regs2[3]);
@@ -151,7 +151,7 @@ WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
 #define USE_FAKE_INPUT_PORTS    0
 
 #if USE_FAKE_INPUT_PORTS
-READ16_MEMBER(mugsmash_state::mugsmash_input_ports_r)
+uint16_t mugsmash_state::mugsmash_input_ports_r(offs_t offset)
 {
 	uint16_t data = 0xffff;
 

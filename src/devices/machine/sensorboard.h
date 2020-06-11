@@ -87,7 +87,7 @@ protected:
 	virtual void nvram_default() override;
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
-	virtual bool nvram_pre_write() override;
+	virtual bool nvram_can_write() override;
 
 private:
 	output_finder<0x10, 0x10> m_out_piece;

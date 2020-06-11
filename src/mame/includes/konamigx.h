@@ -61,26 +61,26 @@ public:
 		, m_lamp(*this, "lamp0")
 	{ }
 
-	DECLARE_WRITE32_MEMBER(esc_w);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_WRITE32_MEMBER(control_w);
-	DECLARE_READ32_MEMBER(le2_gun_H_r);
-	DECLARE_READ32_MEMBER(le2_gun_V_r);
-	DECLARE_READ32_MEMBER(type1_roz_r1);
-	DECLARE_READ32_MEMBER(type1_roz_r2);
-	DECLARE_READ32_MEMBER(type3_sync_r);
-	DECLARE_WRITE32_MEMBER(type4_prot_w);
-	DECLARE_WRITE32_MEMBER(type1_cablamps_w);
-	DECLARE_READ16_MEMBER(tms57002_status_word_r);
-	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
-	DECLARE_READ16_MEMBER(K055550_word_r);
-	DECLARE_WRITE16_MEMBER(K055550_word_w);
-	DECLARE_WRITE16_MEMBER(K053990_martchmp_word_w);
-	DECLARE_WRITE32_MEMBER(fantjour_dma_w);
-	DECLARE_WRITE8_MEMBER(type3_bank_w);
-	DECLARE_WRITE32_MEMBER(konamigx_tilebank_w);
-	DECLARE_WRITE32_MEMBER(konamigx_t1_psacmap_w);
-	DECLARE_WRITE32_MEMBER(konamigx_t4_psacmap_w);
+	void esc_w(address_space &space, uint32_t data);
+	void eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t le2_gun_H_r();
+	uint32_t le2_gun_V_r();
+	uint32_t type1_roz_r1(offs_t offset);
+	uint32_t type1_roz_r2(offs_t offset);
+	uint32_t type3_sync_r();
+	void type4_prot_w(address_space &space, offs_t offset, uint32_t data);
+	void type1_cablamps_w(uint32_t data);
+	uint16_t tms57002_status_word_r();
+	void tms57002_control_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t K055550_word_r(offs_t offset);
+	void K055550_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void K053990_martchmp_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fantjour_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void type3_bank_w(offs_t offset, uint8_t data);
+	void konamigx_tilebank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void konamigx_t1_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void konamigx_t4_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(hblank_irq_ack_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
@@ -120,7 +120,7 @@ public:
 	K055673_CB_MEMBER(le2_sprite_callback);
 
 	void common_init();
-	DECLARE_READ32_MEMBER( k_6bpp_rom_long_r );
+	uint32_t k_6bpp_rom_long_r(offs_t offset, uint32_t mem_mask = ~0);
 	void konamigx_mixer     (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,tilemap_t *sub1, int sub1flags,tilemap_t *sub2, int sub2flags,int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack);
 	void konamigx_mixer_draw(screen_device &Screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						tilemap_t *sub1, int sub1flags,

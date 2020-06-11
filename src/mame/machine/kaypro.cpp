@@ -88,13 +88,13 @@ void kaypro_state::kayproiv_pio_system_w(uint8_t data)
 
 ************************************************************/
 
-READ8_MEMBER( kaypro_state::kaypro484_system_port_r )
+uint8_t kaypro_state::kaypro484_system_port_r()
 {
 	uint8_t data = m_centronics_busy << 6;
 	return (m_system_port & 0xbf) | data;
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro484_system_port_w )
+void kaypro_state::kaypro484_system_port_w(uint8_t data)
 {
 /*  d7 bank select
     d6 alternate character set (write only)

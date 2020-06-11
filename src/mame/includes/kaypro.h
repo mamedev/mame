@@ -42,21 +42,21 @@ public:
 	{}
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_READ8_MEMBER(kaypro484_87_r);
-	DECLARE_READ8_MEMBER(kaypro484_system_port_r);
-	DECLARE_READ8_MEMBER(kaypro484_status_r);
-	DECLARE_READ8_MEMBER(kaypro484_videoram_r);
-	DECLARE_WRITE8_MEMBER(kaypro484_system_port_w);
-	DECLARE_WRITE8_MEMBER(kaypro484_index_w);
-	DECLARE_WRITE8_MEMBER(kaypro484_register_w);
-	DECLARE_WRITE8_MEMBER(kaypro484_videoram_w);
+	uint8_t kaypro484_87_r();
+	uint8_t kaypro484_system_port_r();
+	uint8_t kaypro484_status_r();
+	uint8_t kaypro484_videoram_r();
+	void kaypro484_system_port_w(uint8_t data);
+	void kaypro484_index_w(uint8_t data);
+	void kaypro484_register_w(uint8_t data);
+	void kaypro484_videoram_w(uint8_t data);
 	uint8_t pio_system_r();
 	void kayproii_pio_system_w(uint8_t data);
 	void kayproiv_pio_system_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_READ8_MEMBER(kaypro_videoram_r);
-	DECLARE_WRITE8_MEMBER(kaypro_videoram_w);
+	uint8_t kaypro_videoram_r(offs_t offset);
+	void kaypro_videoram_w(offs_t offset, uint8_t data);
 	DECLARE_MACHINE_START(kayproii);
 	DECLARE_MACHINE_RESET(kaypro);
 	DECLARE_VIDEO_START(kaypro);

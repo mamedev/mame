@@ -473,9 +473,15 @@ ROM_START( arac6000 )
 	ROM_LOAD( "01-0140-6300-v2.7-19910208.u15", 0x0000, 0x8000, CRC(f1c4412d) SHA1(6ff9a8f25f315c2df5c0785043521d036ec0964e) )
 ROM_END
 
+ROM_START( arac6spa )
+	ROM_REGION( 0x8000, M6809_TAG, 0 )
+	ROM_LOAD( "1.u15", 0x0000, 0x8000, CRC(397e890e) SHA1(5b532b046f36dcfbd7118bd5a0fab3436b0b8dc1) )
+ROM_END
+
 /***************************************************************************
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY     FULLNAME */
-GAME( 1990, arac6000, 0,      arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY     FULLNAME
+GAME( 1990, arac6000, 0,        arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1990, arac6spa, arac6000, arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts (Spanish)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

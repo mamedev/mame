@@ -210,6 +210,7 @@ atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, cons
 	add_bank(0),
 	bit_xor(0),
 	m_legacy_configured(false),
+	m_legacy_space(nullptr),
 	m_legacy_memptr(nullptr),
 	m_legacy_bank(0)
 {
@@ -1189,8 +1190,8 @@ void atari_slapstic_device::legacy_configure(cpu_device &device, offs_t base, of
 	save_item(NAME(m_legacy_bank));
 
 	// install the memory handlers
-	address_space &program = device.space(AS_PROGRAM);
-	program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, 0, read16_delegate(*this, FUNC(atari_slapstic_device::slapstic_r)), write16_delegate(*this, FUNC(atari_slapstic_device::slapstic_w)));
+	m_legacy_space = &device.space(AS_PROGRAM);
+	m_legacy_space->install_readwrite_handler(base, base + 0x7fff, 0, mirror, 0, read16s_delegate(*this, FUNC(atari_slapstic_device::slapstic_r)), write16s_delegate(*this, FUNC(atari_slapstic_device::slapstic_w)));
 	m_legacy_memptr = (u16 *)mem;
 
 	// allocate memory for a copy of bank 0
@@ -1208,11 +1209,11 @@ void atari_slapstic_device::legacy_configure(cpu_device &device, offs_t base, of
 //  address and do nothing more.
 //-------------------------------------------------
 
-void atari_slapstic_device::slapstic_w(address_space &space, offs_t offset, u16 data, u16 mem_mask)
+void atari_slapstic_device::slapstic_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	assert(m_legacy_configured);
 
-	legacy_update_bank(slapstic_tweak(space, offset));
+	legacy_update_bank(slapstic_tweak(*m_legacy_space, offset));
 }
 
 
@@ -1221,7 +1222,7 @@ void atari_slapstic_device::slapstic_w(address_space &space, offs_t offset, u16 
 //  address and then reads a word from the underlying memory.
 //-------------------------------------------------
 
-u16 atari_slapstic_device::slapstic_r(address_space &space, offs_t offset, u16 mem_mask)
+u16 atari_slapstic_device::slapstic_r(offs_t offset, u16 mem_mask)
 {
 	assert(m_legacy_configured);
 
@@ -1231,7 +1232,7 @@ u16 atari_slapstic_device::slapstic_r(address_space &space, offs_t offset, u16 m
 	if (!machine().side_effects_disabled())
 	{
 		// then determine the new one
-		legacy_update_bank(slapstic_tweak(space, offset));
+		legacy_update_bank(slapstic_tweak(*m_legacy_space, offset));
 	}
 	return result;
 }

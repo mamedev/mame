@@ -261,7 +261,7 @@ uint32_t kron180_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 /* Interrupt Handling */
 #if 0
-WRITE8_MEMBER(kron180_state::irq0_ack_w)
+void kron180_state::irq0_ack_w(uint8_t data)
 {
 	m_irq0_ack = data;
 	if ((data & 1) == 1)

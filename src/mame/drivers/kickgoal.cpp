@@ -83,7 +83,7 @@ Action Hollywood
 */
 
 
-WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
+void kickgoal_state::actionhw_snd_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	logerror("%s: Writing %04x to Sound CPU - mask %04x\n",machine().describe_context(),data,mem_mask);
 
@@ -351,7 +351,7 @@ void kickgoal_state::oki_map(address_map &map)
 }
 
 
-void kickgoal_state::soundio_port_a_w(uint8_t data)
+void kickgoal_state::soundio_port_a_w(u8 data)
 {
 	// only time this ever gets a different value is the high score name entry, these banks are correct based on sample positions
 	switch (data)
@@ -362,23 +362,23 @@ void kickgoal_state::soundio_port_a_w(uint8_t data)
 	}
 }
 
-uint8_t kickgoal_state::soundio_port_b_r()
+u8 kickgoal_state::soundio_port_b_r()
 {
 	return m_pic_portb;
 }
 
-void kickgoal_state::soundio_port_b_w(uint8_t data)
+void kickgoal_state::soundio_port_b_w(u8 data)
 {
 	m_pic_portb = data;
 }
 
-uint8_t kickgoal_state::soundio_port_c_r()
+u8 kickgoal_state::soundio_port_c_r()
 {
 	// 0x20 = sound command ready?
 	return (m_pic_portc & ~0x20) | m_sound_command_sent;
 }
 
-void kickgoal_state::soundio_port_c_w(uint8_t data)
+void kickgoal_state::soundio_port_c_w(u8 data)
 {
 	if ((data & 0x10) != (m_pic_portc & 0x10))
 	{
@@ -409,7 +409,7 @@ void kickgoal_state::soundio_port_c_w(uint8_t data)
 }
 
 
-WRITE16_MEMBER(kickgoal_state::to_pic_w)
+void kickgoal_state::to_pic_w(u16 data)
 {
 	m_soundlatch->write(data);
 	m_sound_command_sent = 0x20;
@@ -578,7 +578,7 @@ void kickgoal_state::init_kickgoal()
 
 void kickgoal_state::init_actionhw()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800004, 0x800005, write16_delegate(*this, FUNC(kickgoal_state::actionhw_snd_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800004, 0x800005, write16s_delegate(*this, FUNC(kickgoal_state::actionhw_snd_w)));
 }
 
 GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_SUPPORTS_SAVE )

@@ -65,12 +65,12 @@ void m20_8086_device::device_add_mconfig(machine_config &config)
 	m_8086->set_irq_acknowledge_callback(FUNC(m20_8086_device::int_cb));
 }
 
-READ16_MEMBER(m20_8086_device::z8000_io_r)
+uint16_t m20_8086_device::z8000_io_r(offs_t offset, uint16_t mem_mask)
 {
 	return m_maincpu->space(AS_IO).read_word(offset << 1, mem_mask);
 }
 
-WRITE16_MEMBER(m20_8086_device::z8000_io_w)
+void m20_8086_device::z8000_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->space(AS_IO).write_word(offset << 1, data, mem_mask);
 }
@@ -99,7 +99,7 @@ WRITE_LINE_MEMBER(m20_8086_device::vi_w)
 	m_8086->set_input_line(INPUT_LINE_IRQ0, (state || m_nvi) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(m20_8086_device::handshake_w)
+void m20_8086_device::handshake_w(offs_t offset, uint16_t data)
 {
 	if(!offset)
 	{

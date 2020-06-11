@@ -43,13 +43,13 @@ void kopunch_state::kopunch_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(kopunch_state::vram_fg_w)
+void kopunch_state::vram_fg_w(offs_t offset, uint8_t data)
 {
 	m_vram_fg[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kopunch_state::vram_bg_w)
+void kopunch_state::vram_bg_w(offs_t offset, uint8_t data)
 {
 	m_vram_bg[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

@@ -225,7 +225,7 @@ void sensorboard_device::nvram_write(emu_file &file)
 	file.write(m_curstate, sizeof(m_curstate));
 }
 
-bool sensorboard_device::nvram_pre_write()
+bool sensorboard_device::nvram_can_write()
 {
 	return nvram_on();
 }

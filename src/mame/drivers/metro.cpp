@@ -270,7 +270,7 @@ WRITE_LINE_MEMBER(metro_state::karatour_vblank_irq)
 	}
 }
 
-WRITE16_MEMBER(metro_state::mouja_irq_timer_ctrl_w)
+void metro_state::mouja_irq_timer_ctrl_w(uint16_t data)
 {
 	double freq = 58.0 + (0xff - (data & 0xff)) / 2.2; /* 0xff=58Hz, 0x80=116Hz? */
 
@@ -478,7 +478,7 @@ WRITE8_MEMBER(metro_state::coin_lockout_1word_w)
 
 // value written doesn't matter, also each counted coin gets reported after one full second.
 // TODO: maybe the counter also controls lockout?
-WRITE16_MEMBER(metro_state::coin_lockout_4words_w)
+void metro_state::coin_lockout_4words_w(offs_t offset, uint16_t data)
 {
 	machine().bookkeeping().coin_counter_w((offset >> 1) & 1, offset & 1);
 //  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
@@ -528,7 +528,7 @@ void metro_state::ymf278_map(address_map &map)
 ***************************************************************************/
 
 /* Really weird way of mapping 3 DSWs */
-READ16_MEMBER(metro_state::balcube_dsw_r)
+uint16_t metro_state::balcube_dsw_r(offs_t offset)
 {
 	uint16_t dsw1 = ioport("DSW0")->read() >> 0;
 	uint16_t dsw2 = ioport("DSW0")->read() >> 8;
@@ -813,7 +813,7 @@ WRITE8_MEMBER(metro_state::gakusai_oki_bank_lo_w)
 }
 
 
-READ16_MEMBER(metro_state::gakusai_input_r)
+uint16_t metro_state::gakusai_input_r()
 {
 	uint16_t input_sel = (*m_input_sel) ^ 0x3e;
 	// Bit 0 ??
@@ -1238,7 +1238,7 @@ WRITE_LINE_MEMBER(puzzlet_io_device::clk_w)
 }
 
 
-WRITE16_MEMBER(metro_state::puzzlet_irq_enable_w)
+void metro_state::puzzlet_irq_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		*m_irq_enable = data ^ 0xffff;

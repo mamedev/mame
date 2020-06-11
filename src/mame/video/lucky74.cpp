@@ -100,25 +100,25 @@
 #include "includes/lucky74.h"
 
 
-WRITE8_MEMBER(lucky74_state::lucky74_fg_videoram_w)
+void lucky74_state::lucky74_fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lucky74_state::lucky74_fg_colorram_w)
+void lucky74_state::lucky74_fg_colorram_w(offs_t offset, uint8_t data)
 {
 	m_fg_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lucky74_state::lucky74_bg_videoram_w)
+void lucky74_state::lucky74_bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lucky74_state::lucky74_bg_colorram_w)
+void lucky74_state::lucky74_bg_colorram_w(offs_t offset, uint8_t data)
 {
 	m_bg_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

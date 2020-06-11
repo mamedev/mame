@@ -1461,7 +1461,7 @@ void dcs_audio_device::set_io_callbacks(write_line_delegate output_full_cb, writ
 }
 
 
-void dcs_audio_device::set_fifo_callbacks(read16smo_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w)
+void dcs_audio_device::set_fifo_callbacks(read16smo_delegate fifo_data_r, read16mo_delegate fifo_status_r, write_line_delegate fifo_reset_w)
 {
 	m_fifo_data_r = fifo_data_r;
 	m_fifo_status_r = fifo_status_r;
@@ -1506,7 +1506,7 @@ uint16_t dcs_audio_device::latch_status_r(address_space &space)
 	if (IS_OUTPUT_EMPTY())
 		result |= 0x40;
 	if (!m_fifo_status_r.isnull() && (!m_transfer.hle_enabled || m_transfer.state == 0))
-		result |= m_fifo_status_r(space, 0, 0xffff) & 0x38;
+		result |= m_fifo_status_r(space) & 0x38;
 	if (m_transfer.hle_enabled && m_transfer.state != 0)
 		result |= 0x08;
 	return result;
