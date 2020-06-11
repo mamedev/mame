@@ -75,27 +75,27 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(button_0);
 
 private:
-	uint8_t portf0_r();
-	void portf0_w(uint8_t data);
-	void portf1_w(uint8_t data);
-	void h8_status_callback(uint8_t data);
+	u8 portf0_r();
+	void portf0_w(u8 data);
+	void portf1_w(u8 data);
+	void h8_status_callback(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(h8_inte_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_irq_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 
-	void h8_io(address_map &map);
-	void h8_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
-	uint8_t m_digit;
-	uint8_t m_segment;
-	uint8_t m_irq_ctl;
+	u8 m_digit;
+	u8 m_segment;
+	u8 m_irq_ctl;
 	bool m_ff_b;
-	uint8_t m_cass_data[4];
+	u8 m_cass_data[4];
 	bool m_cassbit;
 	bool m_cassold;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<cassette_image_device> m_cass;
@@ -115,7 +115,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_irq_pulse)
 		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf); // I8080
 }
 
-uint8_t h8_state::portf0_r()
+u8 h8_state::portf0_r()
 {
 	// reads the keyboard
 
@@ -123,7 +123,7 @@ uint8_t h8_state::portf0_r()
 	// - if 0 and RTM pressed, causes int10
 	// - if 0 and RST pressed, resets cpu
 
-	uint8_t i,keyin,data = 0xff;
+	u8 i,keyin,data = 0xff;
 
 	keyin = ioport("X0")->read();
 	if (keyin != 0xff)
@@ -145,7 +145,7 @@ uint8_t h8_state::portf0_r()
 	return data;
 }
 
-void h8_state::portf0_w(uint8_t data)
+void h8_state::portf0_w(u8 data)
 {
 	// this will always turn off int10 that was set by the timer
 	// d0-d3 = digit select
@@ -166,7 +166,7 @@ void h8_state::portf0_w(uint8_t data)
 	if (!BIT(data, 4)) m_irq_ctl |= 2;
 }
 
-void h8_state::portf1_w(uint8_t data)
+void h8_state::portf1_w(u8 data)
 {
 	//d7 segment dot
 	//d6 segment f
@@ -181,7 +181,7 @@ void h8_state::portf1_w(uint8_t data)
 	if (m_digit) m_digits[m_digit] = m_segment;
 }
 
-void h8_state::h8_mem(address_map &map)
+void h8_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom(); // main rom
@@ -190,7 +190,7 @@ void h8_state::h8_mem(address_map &map)
 	map(0x2000, 0x9fff).ram(); // main ram
 }
 
-void h8_state::h8_io(address_map &map)
+void h8_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -251,6 +251,19 @@ void h8_state::machine_reset()
 	m_ff_b = 1;
 }
 
+void h8_state::machine_start()
+{
+	m_digits.resolve();
+
+	save_item(NAME(m_digit));
+	save_item(NAME(m_segment));
+	save_item(NAME(m_irq_ctl));
+	save_item(NAME(m_ff_b));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_cassold));
+}
+
 WRITE_LINE_MEMBER( h8_state::h8_inte_callback )
 {
 		// operate the ION LED
@@ -258,7 +271,7 @@ WRITE_LINE_MEMBER( h8_state::h8_inte_callback )
 	m_irq_ctl &= 0x7f | ((state) ? 0 : 0x80);
 }
 
-void h8_state::h8_status_callback(uint8_t data)
+void h8_state::h8_status_callback(u8 data)
 {
 /* This is rather messy, but basically there are 2 D flipflops, one drives the other,
 the data is /INTE while the clock is /M1. If the system is in Single Instruction mode,
@@ -309,7 +322,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::kansas_r)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -323,8 +336,8 @@ void h8_state::h8(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, H8_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &h8_state::h8_mem);
-	m_maincpu->set_addrmap(AS_IO, &h8_state::h8_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &h8_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &h8_state::io_map);
 	m_maincpu->out_status_func().set(FUNC(h8_state::h8_status_callback));
 	m_maincpu->out_inte_func().set(FUNC(h8_state::h8_inte_callback));
 
@@ -379,5 +392,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT    CLASS,    INIT        COMPANY           FULLNAME                      FLAGS */
-COMP( 1977, h8,   0,      0,      h8,      h8,      h8_state, empty_init, "Heath Company", "Heathkit H8 Digital Computer", 0 )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT    CLASS,    INIT          COMPANY           FULLNAME                      FLAGS */
+COMP( 1977, h8,   0,      0,      h8,      h8,      h8_state, empty_init, "Heath Company", "Heathkit H8 Digital Computer", MACHINE_SUPPORTS_SAVE )

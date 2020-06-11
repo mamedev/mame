@@ -87,7 +87,8 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	virtual void machine_reset() override;
+	void machine_reset() override;
+	void machine_start() override;
 	uint16_t m_lar;
 	uint8_t m_digit;
 	u8 m_seg;
@@ -332,6 +333,15 @@ void instruct_state::machine_reset()
 	m_maincpu->set_state_int(S2650_PC, 0x1800);
 }
 
+void instruct_state::machine_start()
+{
+	save_item(NAME(m_lar));
+	save_item(NAME(m_digit));
+	save_item(NAME(m_seg));
+	save_item(NAME(m_cassin));
+	save_item(NAME(m_irqstate));
+}
+
 QUICKLOAD_LOAD_MEMBER(instruct_state::quickload_cb)
 {
 	uint16_t i, exec_addr, quick_length, read_;
@@ -455,4 +465,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME                   FLAGS
-COMP( 1978, instruct, 0,      0,      instruct, instruct, instruct_state, empty_init, "Signetics", "Signetics Instructor 50", 0 )
+COMP( 1978, instruct, 0,      0,      instruct, instruct, instruct_state, empty_init, "Signetics", "Signetics Instructor 50", MACHINE_SUPPORTS_SAVE )
