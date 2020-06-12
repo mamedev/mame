@@ -31,7 +31,7 @@
 
 ASMJIT_BEGIN_NAMESPACE
 
-//! \addtogroup asmjit_support
+//! \addtogroup asmjit_core
 //! \{
 
 // ============================================================================
@@ -41,8 +41,12 @@ ASMJIT_BEGIN_NAMESPACE
 //! CPU information.
 class CpuInfo {
 public:
-  //! CPU architecture information.
-  ArchInfo _archInfo;
+  //! Architecture.
+  uint8_t _arch;
+  //! Sub-architecture.
+  uint8_t _subArch;
+  //! Reserved for future use.
+  uint16_t _reserved;
   //! CPU family ID.
   uint32_t _familyId;
   //! CPU model ID.
@@ -74,15 +78,15 @@ public:
   inline CpuInfo(const CpuInfo& other) noexcept = default;
 
   inline explicit CpuInfo(Globals::NoInit_) noexcept
-    : _archInfo(Globals::NoInit),
-      _features(Globals::NoInit) {};
+    : _features(Globals::NoInit) {};
 
   //! Returns the host CPU information.
   ASMJIT_API static const CpuInfo& host() noexcept;
 
-  //! Initializes CpuInfo to the given architecture, see `ArchInfo`.
-  inline void initArch(uint32_t archId, uint32_t archMode = 0) noexcept {
-    _archInfo.init(archId, archMode);
+  //! Initializes CpuInfo to the given architecture, see \ref Environment.
+  inline void initArch(uint32_t arch, uint32_t subArch = 0u) noexcept {
+    _arch = uint8_t(arch);
+    _subArch = uint8_t(subArch);
   }
 
   inline void reset() noexcept { memset(this, 0, sizeof(*this)); }
@@ -99,12 +103,10 @@ public:
   //! \name Accessors
   //! \{
 
-  //! Returns the CPU architecture information.
-  inline const ArchInfo& archInfo() const noexcept { return _archInfo; }
-  //! Returns the CPU architecture id, see `ArchInfo::Id`.
-  inline uint32_t archId() const noexcept { return _archInfo.archId(); }
-  //! Returns the CPU architecture sub-id, see `ArchInfo::SubId`.
-  inline uint32_t archSubId() const noexcept { return _archInfo.archSubId(); }
+  //! Returns the CPU architecture id, see \ref Environment::Arch.
+  inline uint32_t arch() const noexcept { return _arch; }
+  //! Returns the CPU architecture sub-id, see \ref Environment::SubArch.
+  inline uint32_t subArch() const noexcept { return _subArch; }
 
   //! Returns the CPU family ID.
   inline uint32_t familyId() const noexcept { return _familyId; }

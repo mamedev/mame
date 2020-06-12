@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 cmake_policy(PUSH)
-cmake_policy(SET CMP0063 NEW) # Honor visibility properties.
+
+if(POLICY CMP0063)
+  cmake_policy(SET CMP0063 NEW) # Honor visibility properties.
+endif()
+
+if(POLICY CMP0092)
+  cmake_policy(SET CMP0092 NEW) # Don't add -W3 warning level by default.
+endif()
 
 include(CheckCXXCompilerFlag)
 
@@ -62,9 +69,9 @@ set(ASMJIT_DIR        "${CMAKE_CURRENT_LIST_DIR}" CACHE PATH "Location of 'asmji
 set(ASMJIT_TEST       ${ASMJIT_TEST}              CACHE BOOL "Build 'asmjit' test applications")
 set(ASMJIT_EMBED      ${ASMJIT_EMBED}             CACHE BOOL "Embed 'asmjit' library (no targets)")
 set(ASMJIT_STATIC     ${ASMJIT_STATIC}            CACHE BOOL "Build 'asmjit' library as static")
-set(ASMJIT_SANITIZE   ${ASMJIT_SANITIZE}          CACHE BOOL "Build with C/C++ sanitizers enabled")
+set(ASMJIT_SANITIZE   ${ASMJIT_SANITIZE}          CACHE STRING "Build with sanitizers: 'address', 'undefined', etc...")
 set(ASMJIT_BUILD_X86  ${ASMJIT_BUILD_X86}         CACHE BOOL "Build X86 backends (X86 and X86_64)")
-set(ASMJIT_BUILD_ARM  ${ASMJIT_BUILD_ARM}         CACHE BOOL "Build ARM backends")
+set(ASMJIT_BUILD_ARM  ${ASMJIT_BUILD_ARM}         CACHE BOOL "Build ARM backends (ARM/Trumb and AArch64")
 
 # =============================================================================
 # [AsmJit - Project]
@@ -167,14 +174,13 @@ set(ASMJIT_PRIVATE_CFLAGS_REL "")                # Private compiler flags used b
 set(ASMJIT_SANITIZE_CFLAGS "")                   # Compiler flags required by currently enabled sanitizers.
 set(ASMJIT_SANITIZE_LFLAGS "")                   # Linker flags required by currently enabled sanitizers.
 
-# TODO: Backward compatibility.
+# We will have to keep this most likely forever as some users may still be using it.
 set(ASMJIT_INCLUDE_DIR "${ASMJIT_INCLUDE_DIRS}")
 
 if (NOT ASMJIT_NO_CUSTOM_FLAGS)
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" OR "x${CMAKE_CXX_SIMULATE_ID}" STREQUAL "xMSVC")
     list(APPEND ASMJIT_PRIVATE_CFLAGS
       -MP                      # [+] Multi-Process Compilation.
-      -GR-                     # [-] Runtime type information.
       -GF                      # [+] Eliminate duplicate strings.
       -Zc:inline               # [+] Remove unreferenced COMDAT.
       -Zc:strictStrings        # [+] Strict const qualification of string literals.
@@ -189,7 +195,7 @@ if (NOT ASMJIT_NO_CUSTOM_FLAGS)
       -O2                      # [+] Favor speed over size.
       -Oi)                     # [+] Generate intrinsic functions.
   elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "^(GNU|Clang|AppleClang)$")
-    list(APPEND ASMJIT_PRIVATE_CFLAGS -Wall -Wextra)
+    list(APPEND ASMJIT_PRIVATE_CFLAGS -Wall -Wextra -Wconversion)
     list(APPEND ASMJIT_PRIVATE_CFLAGS -fno-math-errno)
     list(APPEND ASMJIT_PRIVATE_CFLAGS_REL -O2)
 
@@ -197,8 +203,10 @@ if (NOT ASMJIT_NO_CUSTOM_FLAGS)
       -fno-threadsafe-statics
       -fno-semantic-interposition)
 
+    # The following flags can save few bytes in the resulting binary.
     asmjit_detect_cflags(ASMJIT_PRIVATE_CFLAGS_REL
-      -fmerge-all-constants)
+      -fmerge-all-constants    # Merge all constants even if it violates ISO C++.
+      -fno-enforce-eh-specs)   # Don't enforce termination if noexcept function throws.
   endif()
 endif()
 
@@ -248,6 +256,7 @@ foreach(build_option ASMJIT_STATIC
                      ASMJIT_BUILD_X86
                      #ASMJIT_BUILD_ARM
                      ASMJIT_BUILD_A64
+                     ASMJIT_NO_DEPRECATED
                      ASMJIT_NO_JIT
                      ASMJIT_NO_LOGGING
                      ASMJIT_NO_BUILDER
@@ -289,6 +298,7 @@ set(ASMJIT_SRC_LIST
   asmjit/core/builder.h
   asmjit/core/callconv.cpp
   asmjit/core/callconv.h
+  asmjit/core/codebuffer.h
   asmjit/core/codebufferwriter_p.h
   asmjit/core/codeholder.cpp
   asmjit/core/codeholder.h
@@ -301,7 +311,15 @@ set(ASMJIT_SRC_LIST
   asmjit/core/datatypes.h
   asmjit/core/emitter.cpp
   asmjit/core/emitter.h
+  asmjit/core/emitterutils.cpp
+  asmjit/core/emitterutils_p.h
+  asmjit/core/environment.cpp
+  asmjit/core/environment.h
+  asmjit/core/errorhandler.cpp
+  asmjit/core/errorhandler.h
   asmjit/core/features.h
+  asmjit/core/formatter.cpp
+  asmjit/core/formatter.h
   asmjit/core/func.cpp
   asmjit/core/func.h
   asmjit/core/globals.cpp
@@ -312,8 +330,8 @@ set(ASMJIT_SRC_LIST
   asmjit/core/jitallocator.h
   asmjit/core/jitruntime.cpp
   asmjit/core/jitruntime.h
-  asmjit/core/logging.cpp
-  asmjit/core/logging.h
+  asmjit/core/logger.cpp
+  asmjit/core/logger.h
   asmjit/core/misc_p.h
   asmjit/core/operand.cpp
   asmjit/core/operand.h
@@ -353,6 +371,8 @@ set(ASMJIT_SRC_LIST
   asmjit/core/zonevector.h
 
   asmjit/x86.h
+  asmjit/x86/x86archdata.cpp
+  asmjit/x86/x86archdata_p.h
   asmjit/x86/x86assembler.cpp
   asmjit/x86/x86assembler.h
   asmjit/x86/x86builder.cpp
@@ -364,6 +384,8 @@ set(ASMJIT_SRC_LIST
   asmjit/x86/x86emitter.h
   asmjit/x86/x86features.cpp
   asmjit/x86/x86features.h
+  asmjit/x86/x86formatter.cpp
+  asmjit/x86/x86formatter_p.h
   asmjit/x86/x86globals.h
   asmjit/x86/x86internal.cpp
   asmjit/x86/x86internal_p.h
@@ -372,8 +394,6 @@ set(ASMJIT_SRC_LIST
   asmjit/x86/x86instdb_p.h
   asmjit/x86/x86instapi.cpp
   asmjit/x86/x86instapi_p.h
-  asmjit/x86/x86logging.cpp
-  asmjit/x86/x86logging_p.h
   asmjit/x86/x86operand.cpp
   asmjit/x86/x86operand.h
   asmjit/x86/x86rapass.cpp
@@ -473,11 +493,27 @@ if (NOT ASMJIT_EMBED)
                         CFLAGS_REL ${ASMJIT_PRIVATE_CFLAGS_REL})
     endforeach()
 
+    if (NOT ASMJIT_NO_INTROSPECTION)
+      asmjit_add_target(asmjit_test_x86_instinfo TEST
+                        SOURCES    test/asmjit_test_x86_instinfo.cpp
+                        LIBRARIES  AsmJit::AsmJit
+                        CFLAGS     ${ASMJIT_PRIVATE_CFLAGS}
+                        CFLAGS_DBG ${ASMJIT_PRIVATE_CFLAGS_DBG}
+                        CFLAGS_REL ${ASMJIT_PRIVATE_CFLAGS_REL})
+    endif()
+
     if (NOT (ASMJIT_NO_BUILDER OR ASMJIT_NO_COMPILER))
+      # Vectorcall tests and XMM tests require at least SSE2 (required in 32-bit mode).
+      set(sse2_flags "")
+      if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" OR "x${CMAKE_CXX_SIMULATE_ID}" STREQUAL "xMSVC")
+        asmjit_detect_cflags(sse2_flags "-arch:SSE2")
+      else()
+        asmjit_detect_cflags(sse2_flags "-msse2")
+      endif()
       asmjit_add_target(asmjit_test_x86_cc TEST
                         SOURCES    test/asmjit_test_x86_cc.cpp
                         LIBRARIES  AsmJit::AsmJit
-                        CFLAGS     ${ASMJIT_PRIVATE_CFLAGS}
+                        CFLAGS     ${ASMJIT_PRIVATE_CFLAGS} ${sse2_flags}
                         CFLAGS_DBG ${ASMJIT_PRIVATE_CFLAGS_DBG}
                         CFLAGS_REL ${ASMJIT_PRIVATE_CFLAGS_REL})
     endif()

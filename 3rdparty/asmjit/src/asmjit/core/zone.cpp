@@ -144,7 +144,7 @@ void* Zone::_alloc(size_t size, size_t alignment) noexcept {
   size_t newSize = Support::max(blockSize(), size);
 
   // Prevent arithmetic overflow.
-  if (ASMJIT_UNLIKELY(newSize > std::numeric_limits<size_t>::max() - kBlockSize - blockAlignmentOverhead))
+  if (ASMJIT_UNLIKELY(newSize > SIZE_MAX - kBlockSize - blockAlignmentOverhead))
     return nullptr;
 
   // Allocate new block - we add alignment overhead to `newSize`, which becomes the
@@ -200,7 +200,7 @@ void* Zone::dup(const void* data, size_t size, bool nullTerminate) noexcept {
   if (ASMJIT_UNLIKELY(!data || !size))
     return nullptr;
 
-  ASMJIT_ASSERT(size != std::numeric_limits<size_t>::max());
+  ASMJIT_ASSERT(size != SIZE_MAX);
   uint8_t* m = allocT<uint8_t>(size + nullTerminate);
   if (ASMJIT_UNLIKELY(!m)) return nullptr;
 
@@ -318,7 +318,7 @@ void* ZoneAllocator::_alloc(size_t size, size_t& allocatedSize) noexcept {
     size_t kBlockOverhead = sizeof(DynamicBlock) + sizeof(DynamicBlock*) + kBlockAlignment;
 
     // Handle a possible overflow.
-    if (ASMJIT_UNLIKELY(kBlockOverhead >= std::numeric_limits<size_t>::max() - size))
+    if (ASMJIT_UNLIKELY(kBlockOverhead >= SIZE_MAX - size))
       return nullptr;
 
     void* p = ::malloc(size + kBlockOverhead);

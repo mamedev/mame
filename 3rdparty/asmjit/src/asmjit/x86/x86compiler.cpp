@@ -47,20 +47,24 @@ Compiler::~Compiler() noexcept {}
 Error Compiler::finalize() {
   ASMJIT_PROPAGATE(runPasses());
   Assembler a(_code);
+  a.addEncodingOptions(encodingOptions());
+  a.addValidationOptions(validationOptions());
   return serialize(&a);
 }
-
 // ============================================================================
 // [asmjit::x86::Compiler - Events]
 // ============================================================================
 
 Error Compiler::onAttach(CodeHolder* code) noexcept {
-  uint32_t archId = code->archId();
-  if (!ArchInfo::isX86Family(archId))
+  uint32_t arch = code->arch();
+  if (!Environment::isFamilyX86(arch))
     return DebugUtils::errored(kErrorInvalidArch);
 
   ASMJIT_PROPAGATE(Base::onAttach(code));
-  _gpRegInfo.setSignature(archId == ArchInfo::kIdX86 ? uint32_t(Gpd::kSignature) : uint32_t(Gpq::kSignature));
+
+  bool is32Bit = Environment::is32Bit(arch);
+  _gpRegInfo.setSignature(is32Bit ? uint32_t(Gpd::kSignature)
+                                  : uint32_t(Gpq::kSignature));
 
   Error err = addPassT<X86RAPass>();
   if (ASMJIT_UNLIKELY(err)) {

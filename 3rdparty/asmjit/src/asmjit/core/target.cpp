@@ -31,8 +31,7 @@ ASMJIT_BEGIN_NAMESPACE
 // ============================================================================
 
 Target::Target() noexcept
-  : _targetType(kTargetNone),
-    _codeInfo() {}
+  : _environment() {}
 Target::~Target() noexcept {}
 
 ASMJIT_END_NAMESPACE

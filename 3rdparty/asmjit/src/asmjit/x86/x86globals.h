@@ -1652,14 +1652,14 @@ namespace Condition {
     kUnsignedGT           = kA,          //!< Unsigned   `a >  b`.
     kUnsignedGE           = kAE,         //!< Unsigned   `a >= b`.
 
-    kZero                 = kZ,
-    kNotZero              = kNZ,
+    kZero                 = kZ,          //!< Zero flag.
+    kNotZero              = kNZ,         //!< Non-zero flag.
 
-    kNegative             = kS,
-    kPositive             = kNS,
+    kNegative             = kS,          //!< Sign flag.
+    kPositive             = kNS,         //!< No sign flag.
 
-    kParityEven           = kP,
-    kParityOdd            = kPO
+    kParityEven           = kP,          //!< Even parity flag.
+    kParityOdd            = kPO          //!< Odd parity flag.
   };
 
   static constexpr uint8_t reverseTable[kCount] = {
@@ -1696,54 +1696,92 @@ namespace Condition {
 // [asmjit::x86::FpuWord]
 // ============================================================================
 
-//! FPU control and status word.
+//! FPU control and status words.
 namespace FpuWord {
   //! FPU status word.
   enum Status : uint32_t {
+    //! Invalid operation.
     kStatusInvalid        = 0x0001u,
+    //! Denormalized operand.
     kStatusDenormalized   = 0x0002u,
+    //! Division by zero.
     kStatusDivByZero      = 0x0004u,
+    //! Overflown.
     kStatusOverflow       = 0x0008u,
+    //! Underflown.
     kStatusUnderflow      = 0x0010u,
+    //! Precision lost.
     kStatusPrecision      = 0x0020u,
+    //! Stack fault.
     kStatusStackFault     = 0x0040u,
+    //! Interrupt.
     kStatusInterrupt      = 0x0080u,
+    //! C0 flag.
     kStatusC0             = 0x0100u,
+    //! C1 flag.
     kStatusC1             = 0x0200u,
+    //! C2 flag.
     kStatusC2             = 0x0400u,
+    //! Top of the stack.
     kStatusTop            = 0x3800u,
+    //! C3 flag.
     kStatusC3             = 0x4000u,
+    //! FPU is busy.
     kStatusBusy           = 0x8000u
   };
 
   //! FPU control word.
   enum Control : uint32_t {
-    // Bits 0-5.
+    // [Bits 0-5]
+
+    //! Exception mask (0x3F).
     kControlEM_Mask       = 0x003Fu,
+    //! Invalid operation exception.
     kControlEM_Invalid    = 0x0001u,
+    //! Denormalized operand exception.
     kControlEM_Denormal   = 0x0002u,
+    //! Division by zero exception.
     kControlEM_DivByZero  = 0x0004u,
+    //! Overflow exception.
     kControlEM_Overflow   = 0x0008u,
+    //! Underflow exception.
     kControlEM_Underflow  = 0x0010u,
+    //! Inexact operation exception.
     kControlEM_Inexact    = 0x0020u,
 
-    // Bits 8-9.
+    // [Bits 8-9]
+
+    //! Precision control mask.
     kControlPC_Mask       = 0x0300u,
+    //! Single precision (24 bits).
     kControlPC_Float      = 0x0000u,
+    //! Reserved.
     kControlPC_Reserved   = 0x0100u,
+    //! Double precision (53 bits).
     kControlPC_Double     = 0x0200u,
+    //! Extended precision (64 bits).
     kControlPC_Extended   = 0x0300u,
 
-    // Bits 10-11.
+    // [Bits 10-11]
+
+    //! Rounding control mask.
     kControlRC_Mask       = 0x0C00u,
+    //! Round to nearest even.
     kControlRC_Nearest    = 0x0000u,
+    //! Round down (floor).
     kControlRC_Down       = 0x0400u,
+    //! Round up (ceil).
     kControlRC_Up         = 0x0800u,
+    //! Round towards zero (truncate).
     kControlRC_Truncate   = 0x0C00u,
 
-    // Bit 12.
+    // [Bit 12]
+
+    //! Infinity control.
     kControlIC_Mask       = 0x1000u,
+    //! Projective (not supported on X64).
     kControlIC_Projective = 0x0000u,
+    //! Affine (default).
     kControlIC_Affine     = 0x1000u
   };
 }
@@ -1760,26 +1798,39 @@ namespace Status {
     // [Architecture Neutral Flags - 0x000000FF]
     // ------------------------------------------------------------------------
 
-    kCF = 0x00000001u, //!< Carry flag.
-    kOF = 0x00000002u, //!< Signed overflow flag.
-    kSF = 0x00000004u, //!< Sign flag (negative/sign, if set).
-    kZF = 0x00000008u, //!< Zero and/or equality flag (1 if zero/equal).
+    //! Carry flag.
+    kCF = 0x00000001u,
+    //! Signed overflow flag.
+    kOF = 0x00000002u,
+    //! Sign flag (negative/sign, if set).
+    kSF = 0x00000004u,
+    //! Zero and/or equality flag (1 if zero/equal).
+    kZF = 0x00000008u,
 
     // ------------------------------------------------------------------------
     // [Architecture Specific Flags - 0xFFFFFF00]
     // ------------------------------------------------------------------------
 
-    kAF = 0x00000100u, //!< Adjust flag.
-    kPF = 0x00000200u, //!< Parity flag.
-    kDF = 0x00000400u, //!< Direction flag.
-    kIF = 0x00000800u, //!< Interrupt enable flag.
+    //! Adjust flag.
+    kAF = 0x00000100u,
+    //! Parity flag.
+    kPF = 0x00000200u,
+    //! Direction flag.
+    kDF = 0x00000400u,
+    //! Interrupt enable flag.
+    kIF = 0x00000800u,
 
-    kAC = 0x00001000u, //!< Alignment check.
+    //! Alignment check.
+    kAC = 0x00001000u,
 
-    kC0 = 0x00010000u, //!< FPU C0 status flag.
-    kC1 = 0x00020000u, //!< FPU C1 status flag.
-    kC2 = 0x00040000u, //!< FPU C2 status flag.
-    kC3 = 0x00080000u  //!< FPU C3 status flag.
+    //! FPU C0 status flag.
+    kC0 = 0x00010000u,
+    //! FPU C1 status flag.
+    kC1 = 0x00020000u,
+    //! FPU C2 status flag.
+    kC2 = 0x00040000u,
+    //! FPU C3 status flag.
+    kC3 = 0x00080000u
   };
 }
 
@@ -1834,12 +1885,18 @@ namespace Predicate {
 
   //! A predicate used by ROUND[PD|PS|SD|SS] instructions.
   enum Round : uint32_t {
-    kRoundNearest         = 0x00u,       //!< Round to nearest (even).
-    kRoundDown            = 0x01u,       //!< Round to down toward -INF (floor),
-    kRoundUp              = 0x02u,       //!< Round to up toward +INF (ceil).
-    kRoundTrunc           = 0x03u,       //!< Round toward zero (truncate).
-    kRoundCurrent         = 0x04u,       //!< Round to the current rounding mode set (ignores other RC bits).
-    kRoundInexact         = 0x08u        //!< Avoids inexact exception, if set.
+    //! Round to nearest (even).
+    kRoundNearest = 0x00u,
+    //! Round to down toward -INF (floor),
+    kRoundDown = 0x01u,
+    //! Round to up toward +INF (ceil).
+    kRoundUp = 0x02u,
+    //! Round toward zero (truncate).
+    kRoundTrunc = 0x03u,
+    //! Round to the current rounding mode set (ignores other RC bits).
+    kRoundCurrent = 0x04u,
+    //! Avoids inexact exception, if set.
+    kRoundInexact = 0x08u
   };
 
   //! A predicate used by VCMP[PD|PS|SD|SS] instructions.
@@ -1998,25 +2055,46 @@ namespace Predicate {
 //! Bitwise ternary logic between 3 operands introduced by AVX-512.
 namespace TLog {
   //! A predicate that can be used to create a common predicate for VPTERNLOG[D|Q].
+  //!
+  //! There are 3 inputs to the instruction (\ref kA, \ref kB, \ref kC), and
+  //! ternary logic can define any combination that would be performed on these
+  //! 3 inputs to get the desired output - any combination of AND, OR, XOR, NOT.
   enum Operator : uint32_t {
-    k0                    = 0x00u,       //!< 0 value.
-    k1                    = 0xFFu,       //!< 1 value.
-    kA                    = 0xF0u,       //!< A value.
-    kB                    = 0xCCu,       //!< B value.
-    kC                    = 0xAAu,       //!< C value.
-    kNotA                 = kA ^ k1,     //!< `!A` expression.
-    kNotB                 = kB ^ k1,     //!< `!B` expression.
-    kNotC                 = kC ^ k1,     //!< `!C` expression.
+    //! 0 value.
+    k0 = 0x00u,
+    //! 1 value.
+    k1 = 0xFFu,
+    //! A value.
+    kA = 0xF0u,
+    //! B value.
+    kB = 0xCCu,
+    //! C value.
+    kC = 0xAAu,
 
-    kAB                   = kA & kB,     //!< `A & B` expression.
-    kAC                   = kA & kC,     //!< `A & C` expression.
-    kBC                   = kB & kC,     //!< `B & C` expression.
-    kNotAB                = kAB ^ k1,    //!< `!(A & B)` expression.
-    kNotAC                = kAC ^ k1,    //!< `!(A & C)` expression.
-    kNotBC                = kBC ^ k1,    //!< `!(B & C)` expression.
+    //! `!A` expression.
+    kNotA = kA ^ k1,
+    //! `!B` expression.
+    kNotB = kB ^ k1,
+    //! `!C` expression.
+    kNotC = kC ^ k1,
 
-    kABC                  = kAB & kC,    //!< `A & B & C` expression.
-    kNotABC               = kABC ^ k1    //!< `!(A & B & C)` expression.
+    //! `A & B` expression.
+    kAB = kA & kB,
+    //! `A & C` expression.
+    kAC = kA & kC,
+    //! `B & C` expression.
+    kBC = kB & kC,
+    //! `!(A & B)` expression.
+    kNotAB = kAB ^ k1,
+    //! `!(A & C)` expression.
+    kNotAC = kAC ^ k1,
+    //! `!(B & C)` expression.
+    kNotBC = kBC ^ k1,
+
+    //! `A & B & C` expression.
+    kABC = kAB & kC,
+    //! `!(A & B & C)` expression.
+    kNotABC = kABC ^ k1
   };
 
   //! Creates an immediate that can be used by VPTERNLOG[D|Q] instructions.

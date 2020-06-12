@@ -37,12 +37,9 @@ ASMJIT_BEGIN_SUB_NAMESPACE(x86)
 
 //! \cond INTERNAL
 
-//! \defgroup asmjit_x86_ra X86 RA
-//! \ingroup asmjit_x86
-//!
 //! \brief X86/X64 register allocation.
 
-//! \addtogroup asmjit_x86_ra
+//! \addtogroup asmjit_ra
 //! \{
 
 // ============================================================================
@@ -106,7 +103,7 @@ public:
   Error onEmitSave(uint32_t workId, uint32_t srcPhysId) noexcept override;
 
   Error onEmitJump(const Label& label) noexcept override;
-  Error onEmitPreCall(FuncCallNode* node) noexcept override;
+  Error onEmitPreCall(InvokeNode* invokeNode) noexcept override;
 };
 
 //! \}

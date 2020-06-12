@@ -24,6 +24,7 @@
 #include "../core/api-build_p.h"
 #ifndef ASMJIT_NO_COMPILER
 
+#include "../core/formatter.h"
 #include "../core/ralocal_p.h"
 #include "../core/rapass_p.h"
 #include "../core/support.h"
@@ -161,7 +162,7 @@ static void RAPass_resetVirtRegData(RAPass* self) noexcept {
   }
 }
 
-Error RAPass::runOnFunction(Zone* zone, Logger* logger, FuncNode* func) noexcept {
+Error RAPass::runOnFunction(Zone* zone, Logger* logger, FuncNode* func) {
   _allocator.reset(zone);
 
 #ifndef ASMJIT_NO_LOGGING
@@ -194,7 +195,6 @@ Error RAPass::runOnFunction(Zone* zone, Logger* logger, FuncNode* func) noexcept
   // Must be called regardless of the allocation status.
   onDone();
 
-  // TODO: I don't like this...
   // Reset possible connections introduced by the register allocator.
   RAPass_resetVirtRegData(this);
 
@@ -472,7 +472,7 @@ Error RAPass::buildViews() noexcept {
       if (block->hasSuccessors()) {
         sb.appendFormat("  #%u -> {", block->blockId());
         _dumpBlockIds(sb, block->successors());
-        sb.appendString("}\n");
+        sb.append("}\n");
       }
       else {
         sb.appendFormat("  #%u -> {Exit}\n", block->blockId());
@@ -1133,11 +1133,11 @@ static void RAPass_dumpSpans(String& sb, uint32_t index, const LiveRegSpans& liv
 
   for (uint32_t i = 0; i < liveSpans.size(); i++) {
     const LiveRegSpan& liveSpan = liveSpans[i];
-    if (i) sb.appendString(", ");
+    if (i) sb.append(", ");
     sb.appendFormat("[%u:%u@%u]", liveSpan.a, liveSpan.b, liveSpan.id);
   }
 
-  sb.appendChar('\n');
+  sb.append('\n');
 }
 #endif
 
@@ -1296,10 +1296,10 @@ ASMJIT_FAVOR_SPEED Error RAPass::binPack(uint32_t group) noexcept {
       sb.appendFormat("  Unassigned (%u): ", count);
       for (i = 0; i < numWorkRegs; i++) {
         RAWorkReg* workReg = workRegs[i];
-        if (i) sb.appendString(", ");
-        sb.appendString(workReg->name());
+        if (i) sb.append(", ");
+        sb.append(workReg->name());
       }
-      sb.appendChar('\n');
+      sb.append('\n');
       logger->log(sb);
     });
   }
@@ -1380,8 +1380,8 @@ Error RAPass::runLocalAllocator() noexcept {
         }
 
         ASMJIT_PROPAGATE(lra.allocInst(inst));
-        if (inst->type() == BaseNode::kNodeFuncCall)
-          ASMJIT_PROPAGATE(onEmitPreCall(inst->as<FuncCallNode>()));
+        if (inst->type() == BaseNode::kNodeInvoke)
+          ASMJIT_PROPAGATE(onEmitPreCall(inst->as<InvokeNode>()));
         else
           ASMJIT_PROPAGATE(lra.spillAfterAllocation(inst));
       }
@@ -1595,7 +1595,7 @@ Error RAPass::useTemporaryMem(BaseMem& out, uint32_t size, uint32_t alignment) n
   ASMJIT_ASSERT(alignment <= 64);
 
   if (_temporaryMem.isNone()) {
-    ASMJIT_PROPAGATE(cc()->_newStack(_temporaryMem.as<BaseMem>(), size, alignment));
+    ASMJIT_PROPAGATE(cc()->_newStack(&_temporaryMem.as<BaseMem>(), size, alignment));
   }
   else {
     ASMJIT_ASSERT(_temporaryMem.as<BaseMem>().isRegHome());
@@ -1852,27 +1852,31 @@ static void RAPass_dumpRAInst(RAPass* pass, String& sb, const RAInst* raInst) no
   for (uint32_t i = 0; i < tiedCount; i++) {
     const RATiedReg& tiedReg = tiedRegs[i];
 
-    if (i != 0) sb.appendChar(' ');
+    if (i != 0)
+      sb.append(' ');
 
     sb.appendFormat("%s{", pass->workRegById(tiedReg.workId())->name());
-    sb.appendChar(tiedReg.isReadWrite() ? 'X' :
-                  tiedReg.isRead()      ? 'R' :
-                  tiedReg.isWrite()     ? 'W' : '?');
+    sb.append(tiedReg.isReadWrite() ? 'X' :
+              tiedReg.isRead()      ? 'R' :
+              tiedReg.isWrite()     ? 'W' : '?');
 
     if (tiedReg.hasUseId())
       sb.appendFormat("|Use=%u", tiedReg.useId());
     else if (tiedReg.isUse())
-      sb.appendString("|Use");
+      sb.append("|Use");
 
     if (tiedReg.hasOutId())
       sb.appendFormat("|Out=%u", tiedReg.outId());
     else if (tiedReg.isOut())
-      sb.appendString("|Out");
+      sb.append("|Out");
 
-    if (tiedReg.isLast()) sb.appendString("|Last");
-    if (tiedReg.isKill()) sb.appendString("|Kill");
+    if (tiedReg.isLast())
+      sb.append("|Last");
 
-    sb.appendString("}");
+    if (tiedReg.isKill())
+      sb.append("|Kill");
+
+    sb.append("}");
   }
 }
 
@@ -1887,13 +1891,13 @@ ASMJIT_FAVOR_SIZE Error RAPass::annotateCode() noexcept {
     BaseNode* last = block->last();
     for (;;) {
       sb.clear();
-      Logging::formatNode(sb, loggerFlags, cc(), node);
+      Formatter::formatNode(sb, loggerFlags, cc(), node);
 
       if ((loggerFlags & FormatOptions::kFlagDebugRA) != 0 && node->isInst() && node->hasPassData()) {
         const RAInst* raInst = node->passData<RAInst>();
         if (raInst->tiedCount() > 0) {
           sb.padEnd(40);
-          sb.appendString(" | ");
+          sb.append(" | ");
           RAPass_dumpRAInst(this, sb, raInst);
         }
       }
@@ -1940,15 +1944,15 @@ ASMJIT_FAVOR_SIZE Error RAPass::_dumpBlockLiveness(String& sb, const RABlock* bl
         if (!n)
           sb.appendFormat("    %s [", bitsName);
         else
-          sb.appendString(", ");
+          sb.append(", ");
 
-        sb.appendString(wReg->name());
+        sb.append(wReg->name());
         n++;
       }
     }
 
     if (n)
-      sb.appendString("]\n");
+      sb.append("]\n");
   }
 
   return kErrorOk;
@@ -1961,10 +1965,10 @@ ASMJIT_FAVOR_SIZE Error RAPass::_dumpLiveSpans(String& sb) noexcept {
   for (uint32_t workId = 0; workId < numWorkRegs; workId++) {
     RAWorkReg* workReg = _workRegs[workId];
 
-    sb.appendString("  ");
+    sb.append("  ");
 
     size_t oldSize = sb.size();
-    sb.appendString(workReg->name());
+    sb.append(workReg->name());
     sb.padEnd(oldSize + maxSize);
 
     RALiveStats& stats = workReg->liveStats();
@@ -1973,16 +1977,17 @@ ASMJIT_FAVOR_SIZE Error RAPass::_dumpLiveSpans(String& sb) noexcept {
       stats.width(),
       stats.freq(),
       stats.priority());
-    sb.appendString(": ");
+    sb.append(": ");
 
     LiveRegSpans& liveSpans = workReg->liveSpans();
     for (uint32_t x = 0; x < liveSpans.size(); x++) {
       const LiveRegSpan& liveSpan = liveSpans[x];
-      if (x) sb.appendString(", ");
+      if (x)
+        sb.append(", ");
       sb.appendFormat("[%u:%u]", liveSpan.a, liveSpan.b);
     }
 
-    sb.appendChar('\n');
+    sb.append('\n');
   }
 
   return kErrorOk;

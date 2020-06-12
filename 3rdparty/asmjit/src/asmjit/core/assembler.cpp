@@ -25,7 +25,9 @@
 #include "../core/assembler.h"
 #include "../core/codebufferwriter_p.h"
 #include "../core/constpool.h"
-#include "../core/logging.h"
+#include "../core/emitterutils_p.h"
+#include "../core/formatter.h"
+#include "../core/logger.h"
 #include "../core/support.h"
 
 ASMJIT_BEGIN_NAMESPACE
@@ -39,9 +41,7 @@ BaseAssembler::BaseAssembler() noexcept
     _section(nullptr),
     _bufferData(nullptr),
     _bufferEnd(nullptr),
-    _bufferPtr(nullptr),
-    _op4(),
-    _op5() {}
+    _bufferPtr(nullptr) {}
 BaseAssembler::~BaseAssembler() noexcept {}
 
 // ============================================================================
@@ -50,7 +50,7 @@ BaseAssembler::~BaseAssembler() noexcept {}
 
 Error BaseAssembler::setOffset(size_t offset) {
   if (ASMJIT_UNLIKELY(!_code))
-    return DebugUtils::errored(kErrorNotInitialized);
+    return reportError(DebugUtils::errored(kErrorNotInitialized));
 
   size_t size = Support::max<size_t>(_section->bufferSize(), this->offset());
   if (ASMJIT_UNLIKELY(offset > size))
@@ -59,25 +59,6 @@ Error BaseAssembler::setOffset(size_t offset) {
   _bufferPtr = _bufferData + offset;
   return kErrorOk;
 }
-
-// ============================================================================
-// [asmjit::BaseAssembler - Logging]
-// ============================================================================
-
-#ifndef ASMJIT_NO_LOGGING
-static void BaseAssembler_logLabel(BaseAssembler* self, const Label& label) noexcept {
-  Logger* logger = self->_code->_logger;
-
-  StringTmp<512> sb;
-  size_t binSize = logger->hasFlag(FormatOptions::kFlagMachineCode) ? size_t(0) : std::numeric_limits<size_t>::max();
-
-  sb.appendChars(' ', logger->indentation(FormatOptions::kIndentationLabel));
-  Logging::formatLabel(sb, logger->flags(), self, label.id());
-  sb.appendChar(':');
-  Logging::formatLine(sb, nullptr, binSize, 0, 0, self->_inlineComment);
-  logger->log(sb.data(), sb.size());
-}
-#endif
 
 // ============================================================================
 // [asmjit::BaseAssembler - Section Management]
@@ -100,8 +81,8 @@ Error BaseAssembler::section(Section* section) {
     return reportError(DebugUtils::errored(kErrorInvalidSection));
 
 #ifndef ASMJIT_NO_LOGGING
-  if (hasEmitterOption(kOptionLoggingEnabled))
-    _code->_logger->logf(".section %s {#%u}\n", section->name(), section->id());
+  if (_logger)
+    _logger->logf(".section %s {#%u}\n", section->name(), section->id());
 #endif
 
   BaseAssembler_initSection(this, section);
@@ -119,7 +100,8 @@ Label BaseAssembler::newLabel() {
     Error err = _code->newLabelEntry(&le);
     if (ASMJIT_UNLIKELY(err))
       reportError(err);
-    labelId = le->id();
+    else
+      labelId = le->id();
   }
   return Label(labelId);
 }
@@ -131,20 +113,21 @@ Label BaseAssembler::newNamedLabel(const char* name, size_t nameSize, uint32_t t
     Error err = _code->newNamedLabelEntry(&le, name, nameSize, type, parentId);
     if (ASMJIT_UNLIKELY(err))
       reportError(err);
-    labelId = le->id();
+    else
+      labelId = le->id();
   }
   return Label(labelId);
 }
 
 Error BaseAssembler::bind(const Label& label) {
   if (ASMJIT_UNLIKELY(!_code))
-    return DebugUtils::errored(kErrorNotInitialized);
+    return reportError(DebugUtils::errored(kErrorNotInitialized));
 
   Error err = _code->bindLabel(label, _section->id(), offset());
 
 #ifndef ASMJIT_NO_LOGGING
-  if (hasEmitterOption(kOptionLoggingEnabled))
-    BaseAssembler_logLabel(this, label);
+  if (_logger)
+    EmitterUtils::logLabelBound(this, label);
 #endif
 
   resetInlineComment();
@@ -153,125 +136,6 @@ Error BaseAssembler::bind(const Label& label) {
 
   return kErrorOk;
 }
-
-// ============================================================================
-// [asmjit::BaseAssembler - Emit (Low-Level)]
-// ============================================================================
-
-Error BaseAssembler::_emit(uint32_t instId, const Operand_& o0, const Operand_& o1, const Operand_& o2, const Operand_& o3, const Operand_& o4, const Operand_& o5) {
-  _op4 = o4;
-  _op5 = o5;
-  _instOptions |= BaseInst::kOptionOp4Op5Used;
-  return _emit(instId, o0, o1, o2, o3);
-}
-
-Error BaseAssembler::_emitOpArray(uint32_t instId, const Operand_* operands, size_t count) {
-  const Operand_* o0 = &operands[0];
-  const Operand_* o1 = &operands[1];
-  const Operand_* o2 = &operands[2];
-  const Operand_* o3 = &operands[3];
-
-  switch (count) {
-    case 0: o0 = &Globals::none; ASMJIT_FALLTHROUGH;
-    case 1: o1 = &Globals::none; ASMJIT_FALLTHROUGH;
-    case 2: o2 = &Globals::none; ASMJIT_FALLTHROUGH;
-    case 3: o3 = &Globals::none; ASMJIT_FALLTHROUGH;
-    case 4:
-      return _emit(instId, *o0, *o1, *o2, *o3);
-
-    case 5:
-      _op4 = operands[4];
-      _op5.reset();
-      _instOptions |= BaseInst::kOptionOp4Op5Used;
-      return _emit(instId, *o0, *o1, *o2, *o3);
-
-    case 6:
-      _op4 = operands[4];
-      _op5 = operands[5];
-      _instOptions |= BaseInst::kOptionOp4Op5Used;
-      return _emit(instId, *o0, *o1, *o2, *o3);
-
-    default:
-      return DebugUtils::errored(kErrorInvalidArgument);
-  }
-}
-
-#ifndef ASMJIT_NO_LOGGING
-void BaseAssembler::_emitLog(
-  uint32_t instId, uint32_t options, const Operand_& o0, const Operand_& o1, const Operand_& o2, const Operand_& o3,
-  uint32_t relSize, uint32_t immSize, uint8_t* afterCursor) {
-
-  Logger* logger = _code->logger();
-  ASMJIT_ASSERT(logger != nullptr);
-  ASMJIT_ASSERT(options & BaseEmitter::kOptionLoggingEnabled);
-
-  StringTmp<256> sb;
-  uint32_t flags = logger->flags();
-
-  uint8_t* beforeCursor = _bufferPtr;
-  intptr_t emittedSize = (intptr_t)(afterCursor - beforeCursor);
-
-  Operand_ operands[Globals::kMaxOpCount];
-  operands[0].copyFrom(o0);
-  operands[1].copyFrom(o1);
-  operands[2].copyFrom(o2);
-  operands[3].copyFrom(o3);
-
-  if (options & BaseInst::kOptionOp4Op5Used) {
-    operands[4].copyFrom(_op4);
-    operands[5].copyFrom(_op5);
-  }
-  else {
-    operands[4].reset();
-    operands[5].reset();
-  }
-
-  sb.appendChars(' ', logger->indentation(FormatOptions::kIndentationCode));
-  Logging::formatInstruction(sb, flags, this, archId(), BaseInst(instId, options, _extraReg), operands, Globals::kMaxOpCount);
-
-  if ((flags & FormatOptions::kFlagMachineCode) != 0)
-    Logging::formatLine(sb, _bufferPtr, size_t(emittedSize), relSize, immSize, inlineComment());
-  else
-    Logging::formatLine(sb, nullptr, std::numeric_limits<size_t>::max(), 0, 0, inlineComment());
-  logger->log(sb);
-}
-
-Error BaseAssembler::_emitFailed(
-  Error err,
-  uint32_t instId, uint32_t options, const Operand_& o0, const Operand_& o1, const Operand_& o2, const Operand_& o3) {
-
-  StringTmp<256> sb;
-  sb.appendString(DebugUtils::errorAsString(err));
-  sb.appendString(": ");
-
-  Operand_ operands[Globals::kMaxOpCount];
-  operands[0].copyFrom(o0);
-  operands[1].copyFrom(o1);
-  operands[2].copyFrom(o2);
-  operands[3].copyFrom(o3);
-
-  if (options & BaseInst::kOptionOp4Op5Used) {
-    operands[4].copyFrom(_op4);
-    operands[5].copyFrom(_op5);
-  }
-  else {
-    operands[4].reset();
-    operands[5].reset();
-  }
-
-  Logging::formatInstruction(sb, 0, this, archId(), BaseInst(instId, options, _extraReg), operands, Globals::kMaxOpCount);
-
-  if (inlineComment()) {
-    sb.appendString(" ; ");
-    sb.appendString(inlineComment());
-  }
-
-  resetInstOptions();
-  resetExtraReg();
-  resetInlineComment();
-  return reportError(err, sb.data());
-}
-#endif
 
 // ============================================================================
 // [asmjit::BaseAssembler - Embed]
@@ -290,12 +154,12 @@ static const DataSizeByPower dataSizeByPowerTable[] = {
 };
 #endif
 
-Error BaseAssembler::embed(const void* data, uint32_t dataSize) {
+Error BaseAssembler::embed(const void* data, size_t dataSize) {
   if (ASMJIT_UNLIKELY(!_code))
-    return DebugUtils::errored(kErrorNotInitialized);
+    return reportError(DebugUtils::errored(kErrorNotInitialized));
 
   if (dataSize == 0)
-    return DebugUtils::errored(kErrorInvalidArgument);
+    return kErrorOk;
 
   CodeBufferWriter writer(this);
   ASMJIT_PROPAGATE(writer.ensureSpace(this, dataSize));
@@ -303,17 +167,83 @@ Error BaseAssembler::embed(const void* data, uint32_t dataSize) {
   writer.emitData(data, dataSize);
 
 #ifndef ASMJIT_NO_LOGGING
-  if (ASMJIT_UNLIKELY(hasEmitterOption(kOptionLoggingEnabled)))
-    _code->_logger->logBinary(data, dataSize);
+  if (_logger)
+    _logger->logBinary(data, dataSize);
 #endif
 
   writer.done(this);
   return kErrorOk;
 }
 
+Error BaseAssembler::embedDataArray(uint32_t typeId, const void* data, size_t itemCcount, size_t repeatCount) {
+  uint32_t deabstractDelta = Type::deabstractDeltaOfSize(registerSize());
+  uint32_t finalTypeId = Type::deabstract(typeId, deabstractDelta);
+
+  if (ASMJIT_UNLIKELY(!Type::isValid(finalTypeId)))
+    return reportError(DebugUtils::errored(kErrorInvalidArgument));
+
+  if (itemCcount == 0 || repeatCount == 0)
+    return kErrorOk;
+
+  uint32_t typeSize = Type::sizeOf(finalTypeId);
+  Support::FastUInt8 of = 0;
+
+  size_t dataSize = Support::mulOverflow(itemCcount, size_t(typeSize), &of);
+  size_t totalSize = Support::mulOverflow(dataSize, repeatCount, &of);
+
+  if (ASMJIT_UNLIKELY(of))
+    return reportError(DebugUtils::errored(kErrorOutOfMemory));
+
+  CodeBufferWriter writer(this);
+  ASMJIT_PROPAGATE(writer.ensureSpace(this, totalSize));
+
+#ifndef ASMJIT_NO_LOGGING
+  const uint8_t* start = writer.cursor();
+#endif
+
+  for (size_t i = 0; i < repeatCount; i++) {
+    writer.emitData(data, dataSize);
+  }
+
+#ifndef ASMJIT_NO_LOGGING
+  if (_logger)
+    _logger->logBinary(start, totalSize);
+#endif
+
+  writer.done(this);
+  return kErrorOk;
+}
+
+Error BaseAssembler::embedConstPool(const Label& label, const ConstPool& pool) {
+  if (ASMJIT_UNLIKELY(!_code))
+    return reportError(DebugUtils::errored(kErrorNotInitialized));
+
+  if (ASMJIT_UNLIKELY(!isLabelValid(label)))
+    return reportError(DebugUtils::errored(kErrorInvalidLabel));
+
+  ASMJIT_PROPAGATE(align(kAlignData, uint32_t(pool.alignment())));
+  ASMJIT_PROPAGATE(bind(label));
+
+  size_t size = pool.size();
+  CodeBufferWriter writer(this);
+  ASMJIT_PROPAGATE(writer.ensureSpace(this, size));
+
+  pool.fill(writer.cursor());
+
+#ifndef ASMJIT_NO_LOGGING
+  if (_logger)
+    _logger->logBinary(writer.cursor(), size);
+#endif
+
+  writer.advance(size);
+  writer.done(this);
+
+  return kErrorOk;
+}
+
 Error BaseAssembler::embedLabel(const Label& label) {
   if (ASMJIT_UNLIKELY(!_code))
-    return DebugUtils::errored(kErrorNotInitialized);
+    return reportError(DebugUtils::errored(kErrorNotInitialized));
 
   ASMJIT_ASSERT(_code != nullptr);
   RelocEntry* re;
@@ -322,29 +252,21 @@ Error BaseAssembler::embedLabel(const Label& label) {
   if (ASMJIT_UNLIKELY(!le))
     return reportError(DebugUtils::errored(kErrorInvalidLabel));
 
-  uint32_t dataSize = gpSize();
+  uint32_t dataSize = registerSize();
   ASMJIT_ASSERT(dataSize <= 8);
 
   CodeBufferWriter writer(this);
   ASMJIT_PROPAGATE(writer.ensureSpace(this, dataSize));
 
 #ifndef ASMJIT_NO_LOGGING
-  if (ASMJIT_UNLIKELY(hasEmitterOption(kOptionLoggingEnabled))) {
+  if (_logger) {
     StringTmp<256> sb;
-    sb.appendFormat(".%s ", dataSizeByPowerTable[Support::ctz(dataSize)].str);
-    Logging::formatLabel(sb, 0, this, label.id());
-    sb.appendChar('\n');
-    _code->_logger->log(sb);
+    sb.appendFormat("%s ", dataSizeByPowerTable[Support::ctz(dataSize)].str);
+    Formatter::formatLabel(sb, 0, this, label.id());
+    sb.append('\n');
+    _logger->log(sb);
   }
 #endif
-
-  // TODO: Does it make sense to calculate the address here if everything is known?
-  /*
-  if (_code->hasBaseAddress() && currentSection() == _code->textSection() && le->isBound()) {
-    uint64_t addr = _code->baseAddress() + _code->textSection()->offset() + le->offset();
-    writer.emitValueLE(addr, dataSize);
-  }
-  */
 
   Error err = _code->newRelocEntry(&re, RelocEntry::kTypeRelToAbs, dataSize);
   if (ASMJIT_UNLIKELY(err))
@@ -371,9 +293,9 @@ Error BaseAssembler::embedLabel(const Label& label) {
   return kErrorOk;
 }
 
-Error BaseAssembler::embedLabelDelta(const Label& label, const Label& base, uint32_t dataSize) {
+Error BaseAssembler::embedLabelDelta(const Label& label, const Label& base, size_t dataSize) {
   if (ASMJIT_UNLIKELY(!_code))
-    return DebugUtils::errored(kErrorNotInitialized);
+    return reportError(DebugUtils::errored(kErrorNotInitialized));
 
   LabelEntry* labelEntry = _code->labelEntry(label);
   LabelEntry* baseEntry = _code->labelEntry(base);
@@ -382,7 +304,7 @@ Error BaseAssembler::embedLabelDelta(const Label& label, const Label& base, uint
     return reportError(DebugUtils::errored(kErrorInvalidLabel));
 
   if (dataSize == 0)
-    dataSize = gpSize();
+    dataSize = registerSize();
 
   if (ASMJIT_UNLIKELY(!Support::isPowerOf2(dataSize) || dataSize > 8))
     return reportError(DebugUtils::errored(kErrorInvalidOperandSize));
@@ -391,14 +313,14 @@ Error BaseAssembler::embedLabelDelta(const Label& label, const Label& base, uint
   ASMJIT_PROPAGATE(writer.ensureSpace(this, dataSize));
 
 #ifndef ASMJIT_NO_LOGGING
-  if (ASMJIT_UNLIKELY(hasEmitterOption(kOptionLoggingEnabled))) {
+  if (_logger) {
     StringTmp<256> sb;
     sb.appendFormat(".%s (", dataSizeByPowerTable[Support::ctz(dataSize)].str);
-    Logging::formatLabel(sb, 0, this, label.id());
-    sb.appendString(" - ");
-    Logging::formatLabel(sb, 0, this, base.id());
-    sb.appendString(")\n");
-    _code->_logger->log(sb);
+    Formatter::formatLabel(sb, 0, this, label.id());
+    sb.append(" - ");
+    Formatter::formatLabel(sb, 0, this, base.id());
+    sb.append(")\n");
+    _logger->log(sb);
   }
 #endif
 
@@ -409,7 +331,7 @@ Error BaseAssembler::embedLabelDelta(const Label& label, const Label& base, uint
   }
   else {
     RelocEntry* re;
-    Error err = _code->newRelocEntry(&re, RelocEntry::kTypeExpression, dataSize);
+    Error err = _code->newRelocEntry(&re, RelocEntry::kTypeExpression, uint32_t(dataSize));
     if (ASMJIT_UNLIKELY(err))
       return reportError(err);
 
@@ -433,46 +355,18 @@ Error BaseAssembler::embedLabelDelta(const Label& label, const Label& base, uint
   return kErrorOk;
 }
 
-Error BaseAssembler::embedConstPool(const Label& label, const ConstPool& pool) {
-  if (ASMJIT_UNLIKELY(!_code))
-    return DebugUtils::errored(kErrorNotInitialized);
-
-  if (ASMJIT_UNLIKELY(!isLabelValid(label)))
-    return DebugUtils::errored(kErrorInvalidLabel);
-
-  ASMJIT_PROPAGATE(align(kAlignData, uint32_t(pool.alignment())));
-  ASMJIT_PROPAGATE(bind(label));
-
-  size_t size = pool.size();
-  CodeBufferWriter writer(this);
-  ASMJIT_PROPAGATE(writer.ensureSpace(this, size));
-
-  pool.fill(writer.cursor());
-
-#ifndef ASMJIT_NO_LOGGING
-  if (ASMJIT_UNLIKELY(hasEmitterOption(kOptionLoggingEnabled)))
-    _code->_logger->logBinary(writer.cursor(), size);
-#endif
-
-  writer.advance(size);
-  writer.done(this);
-
-  return kErrorOk;
-}
-
 // ============================================================================
 // [asmjit::BaseAssembler - Comment]
 // ============================================================================
 
 Error BaseAssembler::comment(const char* data, size_t size) {
   if (ASMJIT_UNLIKELY(!_code))
-    return DebugUtils::errored(kErrorNotInitialized);
+    return reportError(DebugUtils::errored(kErrorNotInitialized));
 
 #ifndef ASMJIT_NO_LOGGING
-  if (hasEmitterOption(kOptionLoggingEnabled)) {
-    Logger* logger = _code->logger();
-    logger->log(data, size);
-    logger->log("\n", 1);
+  if (_logger) {
+    _logger->log(data, size);
+    _logger->log("\n", 1);
     return kErrorOk;
   }
 #else
@@ -492,10 +386,6 @@ Error BaseAssembler::onAttach(CodeHolder* code) noexcept {
   // Attach to the end of the .text section.
   BaseAssembler_initSection(this, code->_sections[0]);
 
-  // And reset everything that is used temporarily.
-  _op4.reset();
-  _op5.reset();
-
   return kErrorOk;
 }
 
@@ -504,10 +394,6 @@ Error BaseAssembler::onDetach(CodeHolder* code) noexcept {
   _bufferData = nullptr;
   _bufferEnd  = nullptr;
   _bufferPtr  = nullptr;
-
-  _op4.reset();
-  _op5.reset();
-
   return Base::onDetach(code);
 }
 

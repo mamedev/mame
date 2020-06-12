@@ -35,7 +35,7 @@ ASMJIT_BEGIN_NAMESPACE
 // [asmjit::ZoneHashNode]
 // ============================================================================
 
-//! Node used by `ZoneHash<>` template.
+//! Node used by \ref ZoneHash template.
 //!
 //! You must provide function `bool eq(const Key& key)` in order to make
 //! `ZoneHash::get()` working.
@@ -60,6 +60,7 @@ public:
 // [asmjit::ZoneHashBase]
 // ============================================================================
 
+//! Base class used by \ref ZoneHash template
 class ZoneHashBase {
 public:
   ASMJIT_NONCOPYABLE(ZoneHashBase)

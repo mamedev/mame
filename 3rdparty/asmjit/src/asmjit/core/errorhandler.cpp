@@ -1,3 +1,4 @@
+
 // AsmJit - Machine code generation for C++
 //
 //  * Official AsmJit Home Page: https://asmjit.com
@@ -21,52 +22,16 @@
 //    misrepresented as being the original software.
 // 3. This notice may not be removed or altered from any source distribution.
 
-#ifndef ASMJIT_X86_X86LOGGING_P_H_INCLUDED
-#define ASMJIT_X86_X86LOGGING_P_H_INCLUDED
+#include "../core/api-build_p.h"
+#include "../core/errorhandler.h"
 
-#include "../core/api-config.h"
-#ifndef ASMJIT_NO_LOGGING
-
-#include "../core/logging.h"
-#include "../core/string.h"
-#include "../x86/x86globals.h"
-
-ASMJIT_BEGIN_SUB_NAMESPACE(x86)
-
-//! \addtogroup asmjit_x86
-//! \{
+ASMJIT_BEGIN_NAMESPACE
 
 // ============================================================================
-// [asmjit::x86::LoggingInternal]
+// [asmjit::ErrorHandler]
 // ============================================================================
 
-namespace LoggingInternal {
-  Error formatRegister(
-    String& sb,
-    uint32_t flags,
-    const BaseEmitter* emitter,
-    uint32_t archId,
-    uint32_t regType,
-    uint32_t regId) noexcept;
+ErrorHandler::ErrorHandler() noexcept {}
+ErrorHandler::~ErrorHandler() noexcept {}
 
-  Error formatOperand(
-    String& sb,
-    uint32_t flags,
-    const BaseEmitter* emitter,
-    uint32_t archId,
-    const Operand_& op) noexcept;
-
-  Error formatInstruction(
-    String& sb,
-    uint32_t flags,
-    const BaseEmitter* emitter,
-    uint32_t archId,
-    const BaseInst& inst, const Operand_* operands, uint32_t opCount) noexcept;
-};
-
-//! \}
-
-ASMJIT_END_SUB_NAMESPACE
-
-#endif // !ASMJIT_NO_LOGGING
-#endif // ASMJIT_X86_X86LOGGING_P_H_INCLUDED
+ASMJIT_END_NAMESPACE

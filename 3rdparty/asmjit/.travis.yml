@@ -12,6 +12,13 @@ dist: bionic
 
 matrix:
   include:
+    - name: "Source Code Check"
+      env: BUILD_MATRIX="SOURCE_CODE_CHECK=1"
+      os: linux
+      language: node_js
+      node_js:
+        - node
+
     - name: "Linux Clang Default [64-bit] [DBG]"
       env: BUILD_MATRIX="BUILD_TYPE=Debug && CC=clang-9 && CXX=clang++-9"
       os: linux
@@ -57,6 +64,33 @@ matrix:
           - sourceline: "ppa:ubuntu-toolchain-r/test"
           packages: [clang++-9]
 
+    - name: "Linux Clang Default [64-bit] [REL] [NoDeprecated]"
+      env: BUILD_MATRIX="BUILD_TYPE=Release && CC=clang-9 && CXX=clang++-9" EXTRA_OPTIONS="-DASMJIT_NO_DEPRECATED=1"
+      os: linux
+      addons:
+        apt:
+          sources:
+          - sourceline: "ppa:ubuntu-toolchain-r/test"
+          packages: [clang++-9]
+
+    - name: "Linux Clang Default [64-bit] [REL] [NoIntrinsics]"
+      env: BUILD_MATRIX="BUILD_TYPE=Release && CC=clang-9 && CXX=clang++-9" EXTRA_OPTIONS="-DASMJIT_NO_INTRINSICS=1"
+      os: linux
+      addons:
+        apt:
+          sources:
+          - sourceline: "ppa:ubuntu-toolchain-r/test"
+          packages: [clang++-9]
+
+    - name: "Linux Clang Default [64-bit] [REL] [NoLogging]"
+      env: BUILD_MATRIX="BUILD_TYPE=Release && CC=clang-9 && CXX=clang++-9" EXTRA_OPTIONS="-DASMJIT_NO_LOGGING=1"
+      os: linux
+      addons:
+        apt:
+          sources:
+          - sourceline: "ppa:ubuntu-toolchain-r/test"
+          packages: [clang++-9]
+
     - name: "Linux Clang Default [64-bit] [REL] [NoBuilder]"
       env: BUILD_MATRIX="BUILD_TYPE=Release && CC=clang-9 && CXX=clang++-9" EXTRA_OPTIONS="-DASMJIT_NO_BUILDER=1"
       os: linux
@@ -68,15 +102,6 @@ matrix:
 
     - name: "Linux Clang Default [64-bit] [REL] [NoCompiler]"
       env: BUILD_MATRIX="BUILD_TYPE=Release && CC=clang-9 && CXX=clang++-9" EXTRA_OPTIONS="-DASMJIT_NO_COMPILER=1"
-      os: linux
-      addons:
-        apt:
-          sources:
-          - sourceline: "ppa:ubuntu-toolchain-r/test"
-          packages: [clang++-9]
-
-    - name: "Linux Clang Default [64-bit] [REL] [NoLogging]"
-      env: BUILD_MATRIX="BUILD_TYPE=Release && CC=clang-9 && CXX=clang++-9" EXTRA_OPTIONS="-DASMJIT_NO_LOGGING=1"
       os: linux
       addons:
         apt:
@@ -268,36 +293,51 @@ before_install:
   - eval "$BUILD_MATRIX"
 
 before_script:
-  - mkdir build
-  - cd build
   - |
-    if [[ "$BUILD_TOOLCHAIN" =~ ^Visual\ Studio ]]; then
-      cmake .. -G"${BUILD_TOOLCHAIN}" -DASMJIT_TEST=1 ${EXTRA_OPTIONS}
-    else
-      cmake .. -G"${BUILD_TOOLCHAIN}" -DASMJIT_TEST=1 ${EXTRA_OPTIONS} -DCMAKE_PREFIX_PATH="${MINGW_PATH}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}"
+    if [ -z $SOURCE_CODE_CHECK ]; then
+      mkdir build
+      cd build
+      if [[ "$BUILD_TOOLCHAIN" =~ ^Visual\ Studio ]]; then
+        cmake .. -G"${BUILD_TOOLCHAIN}" -DASMJIT_TEST=1 ${EXTRA_OPTIONS}
+      else
+        cmake .. -G"${BUILD_TOOLCHAIN}" -DASMJIT_TEST=1 ${EXTRA_OPTIONS} -DCMAKE_PREFIX_PATH="${MINGW_PATH}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}"
+      fi
+      cd ..
     fi
-  - cd ..
 
 script:
-  - cd build
   - |
-    if [[ "$BUILD_TOOLCHAIN" =~ ^Visual\ Studio ]]; then
-      cmake --build . --config ${BUILD_TYPE} -- -nologo -v:minimal
-      cd ${BUILD_TYPE}
+    if [ -z $SOURCE_CODE_CHECK ]; then
+      cd build
+      if [[ "$BUILD_TOOLCHAIN" =~ ^Visual\ Studio ]]; then
+        cmake --build . --config ${BUILD_TYPE} -- -nologo -v:minimal || exit 1
+        cd ${BUILD_TYPE}
+      else
+        cmake --build . || exit 1
+      fi
+      echo ""
+      echo "=== Starting Tests ==="
+      echo ""
+      if [ "$USE_VALGRIND" = "1" ]; then
+        RUN_CMD="valgrind --leak-check=full --show-reachable=yes --track-origins=yes"
+      fi
+      eval "$RUN_CMD ./asmjit_test_unit --quick" || exit 1
+      echo ""
+      eval "$RUN_CMD ./asmjit_test_opcode > /dev/null" || exit 1
+      echo ""
+      eval "$RUN_CMD ./asmjit_test_x86_asm" || exit 1
+      echo ""
+      eval "$RUN_CMD ./asmjit_test_x86_sections" || exit 1
+      if [ -f ./asmjit_test_x86_instinfo ]; then
+        echo ""
+        eval "$RUN_CMD ./asmjit_test_x86_instinfo" || exit 1
+      fi
+      if [ -f ./asmjit_test_x86_cc ]; then
+        echo ""
+        eval "$RUN_CMD ./asmjit_test_x86_cc" || exit 1
+      fi
     else
-      cmake --build .
-    fi
-
-  - |
-    if [ "$USE_VALGRIND" = "1" ]; then
-      RUN_CMD="valgrind --leak-check=full --show-reachable=yes --track-origins=yes"
-    fi
-
-  - eval "$RUN_CMD ./asmjit_test_unit --quick"
-  - eval "$RUN_CMD ./asmjit_test_opcode > /dev/null"
-  - eval "$RUN_CMD ./asmjit_test_x86_asm"
-  - eval "$RUN_CMD ./asmjit_test_x86_sections"
-  - |
-    if [ -f ./asmjit_test_x86_cc ]; then
-      eval "$RUN_CMD ./asmjit_test_x86_cc"
+      cd tools
+      ./enumgen.sh --verify || exit 1
+      cd ..
     fi

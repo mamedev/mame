@@ -91,7 +91,6 @@ static void generateOpcodes(asmjit::x86::Emitter* e, bool useRex1 = false, bool 
   Zmm zmmA = useRex1 ? zmm8  : zmm0;
   Zmm zmmB = useRex2 ? zmm9  : zmm1;
   Zmm zmmC = useRex2 ? zmm10 : zmm2;
-  Zmm zmmD = useRex2 ? zmm11 : zmm3;
 
   Mem vx_ptr = ptr(gzB, xmmB);
   Mem vy_ptr = ptr(gzB, ymmB);

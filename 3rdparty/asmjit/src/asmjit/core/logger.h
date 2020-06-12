@@ -26,119 +26,28 @@
 
 #include "../core/inst.h"
 #include "../core/string.h"
-
-ASMJIT_BEGIN_NAMESPACE
-
-//! \addtogroup asmjit_core
-//! \{
+#include "../core/formatter.h"
 
 #ifndef ASMJIT_NO_LOGGING
 
-// ============================================================================
-// [Forward Declarations]
-// ============================================================================
+ASMJIT_BEGIN_NAMESPACE
 
-class BaseEmitter;
-class BaseReg;
-class Logger;
-struct Operand_;
-
-#ifndef ASMJIT_NO_BUILDER
-class BaseBuilder;
-class BaseNode;
-#endif
-
-// ============================================================================
-// [asmjit::FormatOptions]
-// ============================================================================
-
-class FormatOptions {
-public:
-  uint32_t _flags;
-  uint8_t _indentation[4];
-
-  enum Flags : uint32_t {
-    //! Show also binary form of each logged instruction (assembler).
-    kFlagMachineCode = 0x00000001u,
-    //! Show a text explanation of some immediate values.
-    kFlagExplainImms = 0x00000002u,
-    //! Use hexadecimal notation of immediate values.
-    kFlagHexImms = 0x00000004u,
-    //! Use hexadecimal notation of address offsets.
-    kFlagHexOffsets = 0x00000008u,
-    //! Show casts between virtual register types (compiler).
-    kFlagRegCasts = 0x00000010u,
-    //! Show positions associated with nodes (compiler).
-    kFlagPositions = 0x00000020u,
-    //! Annotate nodes that are lowered by passes.
-    kFlagAnnotations = 0x00000040u,
-
-    // TODO: These must go, keep this only for formatting.
-    //! Show an additional output from passes.
-    kFlagDebugPasses = 0x00000080u,
-    //! Show an additional output from RA.
-    kFlagDebugRA = 0x00000100u
-  };
-
-  enum IndentationType : uint32_t {
-    //! Indentation used for instructions and directives.
-    kIndentationCode = 0u,
-    //! Indentation used for labels and function nodes.
-    kIndentationLabel = 1u,
-    //! Indentation used for comments (not inline comments).
-    kIndentationComment = 2u,
-    kIndentationReserved = 3u
-  };
-
-  //! \name Construction & Destruction
-  //! \{
-
-  constexpr FormatOptions() noexcept
-    : _flags(0),
-      _indentation { 0, 0, 0, 0 } {}
-
-  constexpr FormatOptions(const FormatOptions& other) noexcept = default;
-  inline FormatOptions& operator=(const FormatOptions& other) noexcept = default;
-
-  inline void reset() noexcept {
-    _flags = 0;
-    _indentation[0] = 0;
-    _indentation[1] = 0;
-    _indentation[2] = 0;
-    _indentation[3] = 0;
-  }
-
-  //! \}
-
-  //! \name Accessors
-  //! \{
-
-  constexpr uint32_t flags() const noexcept { return _flags; }
-  constexpr bool hasFlag(uint32_t flag) const noexcept { return (_flags & flag) != 0; }
-  inline void setFlags(uint32_t flags) noexcept { _flags = flags; }
-  inline void addFlags(uint32_t flags) noexcept { _flags |= flags; }
-  inline void clearFlags(uint32_t flags) noexcept { _flags &= ~flags; }
-
-  constexpr uint8_t indentation(uint32_t type) const noexcept { return _indentation[type]; }
-  inline void setIndentation(uint32_t type, uint32_t n) noexcept { _indentation[type] = uint8_t(n); }
-  inline void resetIndentation(uint32_t type) noexcept { _indentation[type] = uint8_t(0); }
-
-  //! \}
-};
+//! \addtogroup asmjit_logging
+//! \{
 
 // ============================================================================
 // [asmjit::Logger]
 // ============================================================================
 
-//! Abstract logging interface and helpers.
+//! Logging interface.
 //!
-//! This class can be inherited and reimplemented to fit into your logging
-//! subsystem. When reimplementing use `Logger::_log()` method to log into
-//! a custom stream.
+//! This class can be inherited and reimplemented to fit into your own logging
+//! needs. When reimplementing a logger use \ref Logger::_log() method to log
+//! customize the output.
 //!
 //! There are two `Logger` implementations offered by AsmJit:
-//!   - `FileLogger` - allows to log into `FILE*`.
-//!   - `StringLogger` - logs into a `String`.
+//!   - \ref FileLogger - logs into a `FILE*`.
+//!   - \ref StringLogger - concatenates all logs into a \ref String.
 class ASMJIT_VIRTAPI Logger {
 public:
   ASMJIT_BASE_CLASS(Logger)
@@ -160,17 +69,28 @@ public:
   //! \name Format Options
   //! \{
 
+  //! Returns \ref FormatOptions of this logger.
   inline FormatOptions& options() noexcept { return _options; }
+  //! \overload
   inline const FormatOptions& options() const noexcept { return _options; }
 
+  //! Returns formatting flags, see \ref FormatOptions::Flags.
   inline uint32_t flags() const noexcept { return _options.flags(); }
+  //! Tests whether the logger has the given `flag` enabled.
   inline bool hasFlag(uint32_t flag) const noexcept { return _options.hasFlag(flag); }
+  //! Sets formatting flags to `flags`, see \ref FormatOptions::Flags.
   inline void setFlags(uint32_t flags) noexcept { _options.setFlags(flags); }
+  //! Enables the given formatting `flags`, see \ref FormatOptions::Flags.
   inline void addFlags(uint32_t flags) noexcept { _options.addFlags(flags); }
+  //! Disables the given formatting `flags`, see \ref FormatOptions::Flags.
   inline void clearFlags(uint32_t flags) noexcept { _options.clearFlags(flags); }
 
+  //! Returns indentation of `type`, see \ref FormatOptions::IndentationType.
   inline uint32_t indentation(uint32_t type) const noexcept { return _options.indentation(type); }
+  //! Sets indentation of the given indentation `type` to `n` spaces, see \ref
+  //! FormatOptions::IndentationType.
   inline void setIndentation(uint32_t type, uint32_t n) noexcept { _options.setIndentation(type, n); }
+  //! Resets indentation of the given indentation `type` to 0 spaces.
   inline void resetIndentation(uint32_t type) noexcept { _options.resetIndentation(type); }
 
   //! \}
@@ -179,6 +99,11 @@ public:
   //! \{
 
   //! Logs `str` - must be reimplemented.
+  //!
+  //! The function can accept either a null terminated string if `size` is
+  //! `SIZE_MAX` or a non-null terminated string of the given `size`. The
+  //! function cannot assume that the data is null terminated and must handle
+  //! non-null terminated inputs.
   virtual Error _log(const char* data, size_t size) noexcept = 0;
 
   //! Logs string `str`, which is either null terminated or having size `size`.
@@ -186,15 +111,15 @@ public:
   //! Logs content of a string `str`.
   inline Error log(const String& str) noexcept { return _log(str.data(), str.size()); }
 
-  //! Formats the message by using `snprintf()` and then sends the result
-  //! to `log()`.
+  //! Formats the message by using `snprintf()` and then passes the formatted
+  //! string to \ref _log().
   ASMJIT_API Error logf(const char* fmt, ...) noexcept;
 
-  //! Formats the message by using `vsnprintf()` and then sends the result
-  //! to `log()`.
+  //! Formats the message by using `vsnprintf()` and then passes the formatted
+  //! string to \ref _log().
   ASMJIT_API Error logv(const char* fmt, va_list ap) noexcept;
 
-  //! Logs binary data.
+  //! Logs binary `data` of the given `size`.
   ASMJIT_API Error logBinary(const void* data, size_t size) noexcept;
 
   //! \}
@@ -267,6 +192,13 @@ public:
   //! \name Logger Data Accessors
   //! \{
 
+  //! Returns the content of the logger as \ref String.
+  //!
+  //! It can be moved, if desired.
+  inline String& content() noexcept { return _content; }
+  //! \overload
+  inline const String& content() const noexcept { return _content; }
+
   //! Returns aggregated logger data as `char*` pointer.
   //!
   //! The pointer is owned by `StringLogger`, it can't be modified or freed.
@@ -287,69 +219,10 @@ public:
   ASMJIT_API Error _log(const char* data, size_t size = SIZE_MAX) noexcept override;
 };
 
-// ============================================================================
-// [asmjit::Logging]
-// ============================================================================
-
-struct Logging {
-  ASMJIT_API static Error formatRegister(
-    String& sb,
-    uint32_t flags,
-    const BaseEmitter* emitter,
-    uint32_t archId,
-    uint32_t regType,
-    uint32_t regId) noexcept;
-
-  ASMJIT_API static Error formatLabel(
-    String& sb,
-    uint32_t flags,
-    const BaseEmitter* emitter,
-    uint32_t labelId) noexcept;
-
-  ASMJIT_API static Error formatOperand(
-    String& sb,
-    uint32_t flags,
-    const BaseEmitter* emitter,
-    uint32_t archId,
-    const Operand_& op) noexcept;
-
-  ASMJIT_API static Error formatInstruction(
-    String& sb,
-    uint32_t flags,
-    const BaseEmitter* emitter,
-    uint32_t archId,
-    const BaseInst& inst, const Operand_* operands, uint32_t opCount) noexcept;
-
-  ASMJIT_API static Error formatTypeId(
-    String& sb,
-    uint32_t typeId) noexcept;
-
-#ifndef ASMJIT_NO_BUILDER
-  ASMJIT_API static Error formatNode(
-    String& sb,
-    uint32_t flags,
-    const BaseBuilder* cb,
-    const BaseNode* node_) noexcept;
-#endif
-
-  // Only used by AsmJit internals, not available to users.
-#ifdef ASMJIT_EXPORTS
-  enum {
-    // Has to be big to be able to hold all metadata compiler can assign to a
-    // single instruction.
-    kMaxInstLineSize = 44,
-    kMaxBinarySize = 26
-  };
-
-  static Error formatLine(
-    String& sb,
-    const uint8_t* binData, size_t binSize, size_t dispSize, size_t immSize, const char* comment) noexcept;
-#endif
-};
-#endif
-
 //! \}
 
 ASMJIT_END_NAMESPACE
+
+#endif
 
 #endif // ASMJIT_CORE_LOGGER_H_INCLUDED

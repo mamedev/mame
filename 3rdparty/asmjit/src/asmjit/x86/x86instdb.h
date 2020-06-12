@@ -46,9 +46,9 @@ enum Mode : uint32_t {
   kModeAny                = 0x03u        //!< Both X86 and X64 modes supported.
 };
 
-static constexpr uint32_t modeFromArchId(uint32_t archId) noexcept {
-  return archId == ArchInfo::kIdX86 ? kModeX86 :
-         archId == ArchInfo::kIdX64 ? kModeX64 : kModeNone;
+static constexpr uint32_t modeFromArch(uint32_t arch) noexcept {
+  return arch == Environment::kArchX86 ? kModeX86 :
+         arch == Environment::kArchX64 ? kModeX64 : kModeNone;
 }
 
 // ============================================================================
@@ -141,12 +141,6 @@ enum MemFlags : uint32_t {
 //! Details about instruction encoding, operation, features, and some limitations.
 enum Flags : uint32_t {
   kFlagNone               = 0x00000000u, //!< No flags.
-
-  // TODO: Deprecated
-  // ----------------
-
-  kFlagVolatile           = 0x00000040u,
-  kFlagPrivileged         = 0x00000080u, //!< This is a privileged operation that cannot run in user mode.
 
   // Instruction Family
   // ------------------

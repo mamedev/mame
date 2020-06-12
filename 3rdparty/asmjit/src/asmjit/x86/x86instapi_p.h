@@ -36,17 +36,17 @@ ASMJIT_BEGIN_SUB_NAMESPACE(x86)
 namespace InstInternal {
 
 #ifndef ASMJIT_NO_TEXT
-Error instIdToString(uint32_t archId, uint32_t instId, String& output) noexcept;
-uint32_t stringToInstId(uint32_t archId, const char* s, size_t len) noexcept;
+Error instIdToString(uint32_t arch, uint32_t instId, String& output) noexcept;
+uint32_t stringToInstId(uint32_t arch, const char* s, size_t len) noexcept;
 #endif // !ASMJIT_NO_TEXT
 
 #ifndef ASMJIT_NO_VALIDATION
-Error validate(uint32_t archId, const BaseInst& inst, const Operand_* operands, uint32_t opCount) noexcept;
+Error validate(uint32_t arch, const BaseInst& inst, const Operand_* operands, size_t opCount, uint32_t validationFlags) noexcept;
 #endif // !ASMJIT_NO_VALIDATION
 
 #ifndef ASMJIT_NO_INTROSPECTION
-Error queryRWInfo(uint32_t archId, const BaseInst& inst, const Operand_* operands, uint32_t opCount, InstRWInfo& out) noexcept;
-Error queryFeatures(uint32_t archId, const BaseInst& inst, const Operand_* operands, uint32_t opCount, BaseFeatures& out) noexcept;
+Error queryRWInfo(uint32_t arch, const BaseInst& inst, const Operand_* operands, size_t opCount, InstRWInfo* out) noexcept;
+Error queryFeatures(uint32_t arch, const BaseInst& inst, const Operand_* operands, size_t opCount, BaseFeatures* out) noexcept;
 #endif // !ASMJIT_NO_INTROSPECTION
 
 } // {InstInternal}

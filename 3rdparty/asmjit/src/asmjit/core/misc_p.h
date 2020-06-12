@@ -29,7 +29,7 @@
 ASMJIT_BEGIN_NAMESPACE
 
 //! \cond INTERNAL
-//! \addtogroup asmjit_support
+//! \addtogroup asmjit_utilities
 //! \{
 
 #define ASMJIT_LOOKUP_TABLE_8(T, I) T((I)), T((I+1)), T((I+2)), T((I+3)), T((I+4)), T((I+5)), T((I+6)), T((I+7))

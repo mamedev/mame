@@ -30,10 +30,12 @@
 #include "../core/assembler.h"
 #include "../core/codeholder.h"
 #include "../core/constpool.h"
+#include "../core/formatter.h"
 #include "../core/inst.h"
 #include "../core/operand.h"
 #include "../core/string.h"
 #include "../core/support.h"
+#include "../core/type.h"
 #include "../core/zone.h"
 #include "../core/zonevector.h"
 
@@ -68,6 +70,18 @@ class JumpAnnotation;
 // [asmjit::BaseBuilder]
 // ============================================================================
 
+//! Builder interface.
+//!
+//! `BaseBuilder` interface was designed to be used as a \ref BaseAssembler
+//! replacement in case pre-processing or post-processing of the generated code
+//! is required. The code can be modified during or after code generation. Pre
+//! or post processing can be done manually or through a \ref Pass object. \ref
+//! BaseBuilder stores the emitted code as a double-linked list of nodes, which
+//! allows O(1) insertion and removal during processing.
+//!
+//! Check out architecture specific builders for more details and examples:
+//!
+//!   - \ref x86::Builder - X86/X64 builder implementation.
 class ASMJIT_VIRTAPI BaseBuilder : public BaseEmitter {
 public:
   ASMJIT_NONCOPYABLE(BaseBuilder)
@@ -127,33 +141,26 @@ public:
   //! \remarks The pointer returned (if non-null) is owned by the Builder or
   //! Compiler. When the Builder/Compiler is destroyed it destroys all nodes
   //! it created so no manual memory management is required.
-  template<typename T>
-  inline T* newNodeT() noexcept {
-    return _allocator.newT<T>(this);
-  }
-
-  //! \overload
   template<typename T, typename... Args>
-  inline T* newNodeT(Args&&... args) noexcept {
-    return _allocator.newT<T>(this, std::forward<Args>(args)...);
+  inline Error _newNodeT(T** out, Args&&... args) {
+    *out = _allocator.newT<T>(this, std::forward<Args>(args)...);
+    if (ASMJIT_UNLIKELY(!*out))
+      return reportError(DebugUtils::errored(kErrorOutOfMemory));
+    return kErrorOk;
   }
 
-  //! Creates a new `LabelNode`.
-  ASMJIT_API LabelNode* newLabelNode() noexcept;
-  //! Creates a new `AlignNode`.
-  ASMJIT_API AlignNode* newAlignNode(uint32_t alignMode, uint32_t alignment) noexcept;
-  //! Creates a new `EmbedDataNode`.
-  ASMJIT_API EmbedDataNode* newEmbedDataNode(const void* data, uint32_t size) noexcept;
-  //! Creates a new `ConstPoolNode`.
-  ASMJIT_API ConstPoolNode* newConstPoolNode() noexcept;
-  //! Creates a new `CommentNode`.
-  ASMJIT_API CommentNode* newCommentNode(const char* data, size_t size) noexcept;
-
-  ASMJIT_API InstNode* newInstNode(uint32_t instId, uint32_t instOptions, const Operand_& o0) noexcept;
-  ASMJIT_API InstNode* newInstNode(uint32_t instId, uint32_t instOptions, const Operand_& o0, const Operand_& o1) noexcept;
-  ASMJIT_API InstNode* newInstNode(uint32_t instId, uint32_t instOptions, const Operand_& o0, const Operand_& o1, const Operand_& o2) noexcept;
-  ASMJIT_API InstNode* newInstNode(uint32_t instId, uint32_t instOptions, const Operand_& o0, const Operand_& o1, const Operand_& o2, const Operand_& o3) noexcept;
-  ASMJIT_API InstNode* newInstNodeRaw(uint32_t instId, uint32_t instOptions, uint32_t opCount) noexcept;
+  //! Creates a new \ref InstNode.
+  ASMJIT_API Error _newInstNode(InstNode** out, uint32_t instId, uint32_t instOptions, uint32_t opCount);
+  //! Creates a new \ref LabelNode.
+  ASMJIT_API Error _newLabelNode(LabelNode** out);
+  //! Creates a new \ref AlignNode.
+  ASMJIT_API Error _newAlignNode(AlignNode** out, uint32_t alignMode, uint32_t alignment);
+  //! Creates a new \ref EmbedDataNode.
+  ASMJIT_API Error _newEmbedDataNode(EmbedDataNode** out, uint32_t typeId, const void* data, size_t itemCount, size_t repeatCount = 1);
+  //! Creates a new \ref ConstPoolNode.
+  ASMJIT_API Error _newConstPoolNode(ConstPoolNode** out);
+  //! Creates a new \ref CommentNode.
+  ASMJIT_API Error _newCommentNode(CommentNode** out, const char* data, size_t size);
 
   //! Adds `node` after the current and sets the current node to the given `node`.
   ASMJIT_API BaseNode* addNode(BaseNode* node) noexcept;
@@ -173,7 +180,9 @@ public:
   //! added they are always added after the cursor and the cursor is changed
   //! to be that newly added node. Use `setCursor()` to change where new nodes
   //! are inserted.
-  inline BaseNode* cursor() const noexcept { return _cursor; }
+  inline BaseNode* cursor() const noexcept {
+    return _cursor;
+  }
 
   //! Sets the current node to `node` and return the previous one.
   ASMJIT_API BaseNode* setCursor(BaseNode* node) noexcept;
@@ -182,7 +191,9 @@ public:
   //!
   //! Only use this function if you are concerned about performance and want
   //! this inlined (for example if you set the cursor in a loop, etc...).
-  inline void _setCursor(BaseNode* node) noexcept { _cursor = node; }
+  inline void _setCursor(BaseNode* node) noexcept {
+    _cursor = node;
+  }
 
   //! \}
 
@@ -193,7 +204,9 @@ public:
   //!
   //! \note If a section of some id is not associated with the Builder/Compiler
   //! it would be null, so always check for nulls if you iterate over the vector.
-  inline const ZoneVector<SectionNode*>& sectionNodes() const noexcept { return _sectionNodes; }
+  inline const ZoneVector<SectionNode*>& sectionNodes() const noexcept {
+    return _sectionNodes;
+  }
 
   //! Tests whether the `SectionNode` of the given `sectionId` was registered.
   inline bool hasRegisteredSectionNode(uint32_t sectionId) const noexcept {
@@ -205,7 +218,7 @@ public:
   //! \remarks This function will either get the existing `SectionNode` or create
   //! it in case it wasn't created before. You can check whether a section has a
   //! registered `SectionNode` by using `BaseBuilder::hasRegisteredSectionNode()`.
-  ASMJIT_API Error sectionNodeOf(SectionNode** pOut, uint32_t sectionId) noexcept;
+  ASMJIT_API Error sectionNodeOf(SectionNode** out, uint32_t sectionId);
 
   ASMJIT_API Error section(Section* section) override;
 
@@ -221,7 +234,7 @@ public:
   //! \name Label Management
   //! \{
 
-  //! Returns a vector of LabelNode nodes.
+  //! Returns a vector of \ref LabelNode nodes.
   //!
   //! \note If a label of some id is not associated with the Builder/Compiler
   //! it would be null, so always check for nulls if you iterate over the vector.
@@ -237,24 +250,24 @@ public:
     return hasRegisteredLabelNode(label.id());
   }
 
-  //! Gets or creates a `LabelNode` that matches the given `labelId`.
+  //! Gets or creates a \ref LabelNode that matches the given `labelId`.
   //!
   //! \remarks This function will either get the existing `LabelNode` or create
   //! it in case it wasn't created before. You can check whether a label has a
-  //! registered `LabelNode` by using `BaseBuilder::hasRegisteredLabelNode()`.
-  ASMJIT_API Error labelNodeOf(LabelNode** pOut, uint32_t labelId) noexcept;
+  //! registered `LabelNode` by calling \ref BaseBuilder::hasRegisteredLabelNode().
+  ASMJIT_API Error labelNodeOf(LabelNode** out, uint32_t labelId);
 
   //! \overload
-  inline Error labelNodeOf(LabelNode** pOut, const Label& label) noexcept {
-    return labelNodeOf(pOut, label.id());
+  inline Error labelNodeOf(LabelNode** out, const Label& label) {
+    return labelNodeOf(out, label.id());
   }
 
-  //! Registers this label node [Internal].
+  //! Registers this \ref LabelNode (internal).
   //!
   //! This function is used internally to register a newly created `LabelNode`
-  //! with this instance of Builder/Compiler. Use `labelNodeOf()` functions to
-  //! get back `LabelNode` from a label or its identifier.
-  ASMJIT_API Error registerLabelNode(LabelNode* node) noexcept;
+  //! with this instance of Builder/Compiler. Use \ref labelNodeOf() functions
+  //! to get back \ref LabelNode from a label or its identifier.
+  ASMJIT_API Error registerLabelNode(LabelNode* node);
 
   ASMJIT_API Label newLabel() override;
   ASMJIT_API Label newNamedLabel(const char* name, size_t nameSize = SIZE_MAX, uint32_t type = Label::kTypeGlobal, uint32_t parentId = Globals::kInvalidId) override;
@@ -284,12 +297,14 @@ public:
   inline T* newPassT(Args&&... args) noexcept { return _codeZone.newT<T>(std::forward<Args>(args)...); }
 
   template<typename T>
-  inline Error addPassT() noexcept { return addPass(newPassT<T>()); }
+  inline Error addPassT() { return addPass(newPassT<T>()); }
 
   template<typename T, typename... Args>
-  inline Error addPassT(Args&&... args) noexcept { return addPass(newPassT<T, Args...>(std::forward<Args>(args)...)); }
+  inline Error addPassT(Args&&... args) { return addPass(newPassT<T, Args...>(std::forward<Args>(args)...)); }
 
   //! Returns `Pass` by name.
+  //!
+  //! If the pass having the given `name` doesn't exist `nullptr` is returned.
   ASMJIT_API Pass* passByName(const char* name) const noexcept;
   //! Adds `pass` to the list of passes.
   ASMJIT_API Error addPass(Pass* pass) noexcept;
@@ -304,8 +319,7 @@ public:
   //! \name Emit
   //! \{
 
-  ASMJIT_API Error _emit(uint32_t instId, const Operand_& o0, const Operand_& o1, const Operand_& o2, const Operand_& o3) override;
-  ASMJIT_API Error _emit(uint32_t instId, const Operand_& o0, const Operand_& o1, const Operand_& o2, const Operand_& o3, const Operand_& o4, const Operand_& o5) override;
+  ASMJIT_API Error _emit(uint32_t instId, const Operand_& o0, const Operand_& o1, const Operand_& o2, const Operand_* opExt) override;
 
   //! \}
 
@@ -319,10 +333,12 @@ public:
   //! \name Embed
   //! \{
 
-  ASMJIT_API Error embed(const void* data, uint32_t dataSize) override;
-  ASMJIT_API Error embedLabel(const Label& label) override;
-  ASMJIT_API Error embedLabelDelta(const Label& label, const Label& base, uint32_t dataSize) override;
+  ASMJIT_API Error embed(const void* data, size_t dataSize) override;
+  ASMJIT_API Error embedDataArray(uint32_t typeId, const void* data, size_t count, size_t repeat = 1) override;
   ASMJIT_API Error embedConstPool(const Label& label, const ConstPool& pool) override;
+
+  ASMJIT_API Error embedLabel(const Label& label) override;
+  ASMJIT_API Error embedLabelDelta(const Label& label, const Label& base, size_t dataSize) override;
 
   //! \}
 
@@ -345,15 +361,6 @@ public:
 
   //! \}
 
-  //! \name Logging
-  //! \{
-
-#ifndef ASMJIT_NO_LOGGING
-  ASMJIT_API Error dump(String& sb, uint32_t flags = 0) const noexcept;
-#endif
-
-  //! \}
-
   //! \name Events
   //! \{
 
@@ -361,6 +368,15 @@ public:
   ASMJIT_API Error onDetach(CodeHolder* code) noexcept override;
 
   //! \}
+
+#ifndef ASMJIT_NO_DEPRECATED
+#ifndef ASMJIT_NO_LOGGING
+  ASMJIT_DEPRECATED("Use Formatter::formatNodeList(sb, formatFlags, builder)")
+  inline Error dump(String& sb, uint32_t formatFlags = 0) const noexcept {
+    return Formatter::formatNodeList(sb, formatFlags, this);
+  }
+#endif // !ASMJIT_NO_LOGGING
+#endif // !ASMJIT_NO_DEPRECATED
 };
 
 // ============================================================================
@@ -369,11 +385,11 @@ public:
 
 //! Base node.
 //!
-//! Every node represents a building-block used by `BaseBuilder`. It can be
-//! instruction, data, label, comment, directive, or any other high-level
+//! Every node represents a building-block used by \ref BaseBuilder. It can
+//! be instruction, data, label, comment, directive, or any other high-level
 //! representation that can be transformed to the building blocks mentioned.
-//! Every class that inherits `BaseBuilder` can define its own nodes that it
-//! can lower to basic nodes.
+//! Every class that inherits \ref BaseBuilder can define its own high-level
+//! nodes that can be later lowered to basic nodes like instructions.
 class BaseNode {
 public:
   ASMJIT_NONCOPYABLE(BaseNode)
@@ -385,7 +401,7 @@ public:
       //! Next node.
       BaseNode* _next;
     };
-    //! Links (previous and next nodes).
+    //! Links (an alternative view to previous and next nodes).
     BaseNode* _links[2];
   };
 
@@ -401,6 +417,7 @@ public:
     uint8_t _reserved1;
   };
 
+  //! Data used by \ref InstNode.
   struct InstData {
     //! Node type, see \ref NodeType.
     uint8_t _nodeType;
@@ -412,6 +429,19 @@ public:
     uint8_t _opCapacity;
   };
 
+  //! Data used by \ref EmbedDataNode.
+  struct EmbedData {
+    //! Node type, see \ref NodeType.
+    uint8_t _nodeType;
+    //! Node flags, see \ref Flags.
+    uint8_t _nodeFlags;
+    //! Type id, see \ref Type::Id.
+    uint8_t _typeId;
+    //! Size of `_typeId`.
+    uint8_t _typeSize;
+  };
+
+  //! Data used by \ref SentinelNode.
   struct SentinelData {
     //! Node type, see \ref NodeType.
     uint8_t _nodeType;
@@ -423,9 +453,15 @@ public:
     uint8_t _reserved1;
   };
 
+  //! Data that can have different meaning dependning on \ref NodeType.
   union {
+    //! Data useful by any node type.
     AnyData _any;
+    //! Data specific to \ref InstNode.
     InstData _inst;
+    //! Data specific to \ref EmbedDataNode.
+    EmbedData _embed;
+    //! Data specific to \ref SentinelNode.
     SentinelData _sentinel;
   };
 
@@ -434,7 +470,9 @@ public:
 
   //! Value reserved for AsmJit users never touched by AsmJit itself.
   union {
+    //! User data as 64-bit integer.
     uint64_t _userDataU64;
+    //! User data as pointer.
     void* _userDataPtr;
   };
 
@@ -451,54 +489,66 @@ public:
 
     // [BaseBuilder]
 
-    //! Node is `InstNode` or `InstExNode`.
+    //! Node is \ref InstNode or \ref InstExNode.
     kNodeInst = 1,
-    //! Node is `SectionNode`.
+    //! Node is \ref SectionNode.
     kNodeSection = 2,
-    //! Node is `LabelNode`.
+    //! Node is \ref LabelNode.
     kNodeLabel = 3,
-    //! Node is `AlignNode`.
+    //! Node is \ref AlignNode.
     kNodeAlign = 4,
-    //! Node is `EmbedDataNode`.
+    //! Node is \ref EmbedDataNode.
     kNodeEmbedData = 5,
-    //! Node is `EmbedLabelNode`.
+    //! Node is \ref EmbedLabelNode.
     kNodeEmbedLabel = 6,
-    //! Node is `EmbedLabelDeltaNode`.
+    //! Node is \ref EmbedLabelDeltaNode.
     kNodeEmbedLabelDelta = 7,
-    //! Node is `ConstPoolNode`.
+    //! Node is \ref ConstPoolNode.
     kNodeConstPool = 8,
-    //! Node is `CommentNode`.
+    //! Node is \ref CommentNode.
     kNodeComment = 9,
-    //! Node is `SentinelNode`.
+    //! Node is \ref SentinelNode.
     kNodeSentinel = 10,
 
     // [BaseCompiler]
 
-    //! Node is `JumpNode` (acts as InstNode).
+    //! Node is \ref JumpNode (acts as InstNode).
     kNodeJump = 15,
-    //! Node is `FuncNode` (acts as LabelNode).
+    //! Node is \ref FuncNode (acts as LabelNode).
     kNodeFunc = 16,
-    //! Node is `FuncRetNode` (acts as InstNode).
+    //! Node is \ref FuncRetNode (acts as InstNode).
     kNodeFuncRet = 17,
-    //! Node is `FuncCallNode` (acts as InstNode).
-    kNodeFuncCall = 18,
+    //! Node is \ref InvokeNode (acts as InstNode).
+    kNodeInvoke = 18,
 
     // [UserDefined]
 
     //! First id of a user-defined node.
-    kNodeUser = 32
+    kNodeUser = 32,
+
+#ifndef ASMJIT_NO_DEPRECATED
+    kNodeFuncCall = kNodeInvoke
+#endif // !ASMJIT_NO_DEPRECATED
   };
 
   //! Node flags, specify what the node is and/or does.
   enum Flags : uint32_t {
-    kFlagIsCode          = 0x01u,        //!< Node is code that can be executed (instruction, label, align, etc...).
-    kFlagIsData          = 0x02u,        //!< Node is data that cannot be executed (data, const-pool, etc...).
-    kFlagIsInformative   = 0x04u,        //!< Node is informative, can be removed and ignored.
-    kFlagIsRemovable     = 0x08u,        //!< Node can be safely removed if unreachable.
-    kFlagHasNoEffect     = 0x10u,        //!< Node does nothing when executed (label, align, explicit nop).
-    kFlagActsAsInst      = 0x20u,        //!< Node is an instruction or acts as it.
-    kFlagActsAsLabel     = 0x40u,        //!< Node is a label or acts as it.
-    kFlagIsActive        = 0x80u         //!< Node is active (part of the code).
+    //! Node is code that can be executed (instruction, label, align, etc...).
+    kFlagIsCode = 0x01u,
+    //! Node is data that cannot be executed (data, const-pool, etc...).
+    kFlagIsData = 0x02u,
+    //! Node is informative, can be removed and ignored.
+    kFlagIsInformative = 0x04u,
+    //! Node can be safely removed if unreachable.
+    kFlagIsRemovable = 0x08u,
+    //! Node does nothing when executed (label, align, explicit nop).
+    kFlagHasNoEffect = 0x10u,
+    //! Node is an instruction or acts as it.
+    kFlagActsAsInst = 0x20u,
+    //! Node is a label or acts as it.
+    kFlagActsAsLabel = 0x40u,
+    //! Node is active (part of the code).
+    kFlagIsActive = 0x80u
   };
 
   //! \name Construction & Destruction
@@ -572,8 +622,13 @@ public:
   inline bool isFunc() const noexcept { return type() == kNodeFunc; }
   //! Tests whether this node is `FuncRetNode`.
   inline bool isFuncRet() const noexcept { return type() == kNodeFuncRet; }
-  //! Tests whether this node is `FuncCallNode`.
-  inline bool isFuncCall() const noexcept { return type() == kNodeFuncCall; }
+  //! Tests whether this node is `InvokeNode`.
+  inline bool isInvoke() const noexcept { return type() == kNodeInvoke; }
+
+#ifndef ASMJIT_NO_DEPRECATED
+  ASMJIT_DEPRECATED("Use isInvoke")
+  inline bool isFuncCall() const noexcept { return isInvoke(); }
+#endif // !ASMJIT_NO_DEPRECATED
 
   //! Returns the node flags, see \ref Flags.
   inline uint32_t flags() const noexcept { return _any._nodeFlags; }
@@ -697,12 +752,13 @@ public:
     _inst._opCount = uint8_t(opCount);
   }
 
+  //! \cond INTERNAL
   //! Reset all built-in operands, including `extraReg`.
   inline void _resetOps() noexcept {
     _baseInst.resetExtraReg();
-    for (uint32_t i = 0, count = opCapacity(); i < count; i++)
-      _opArray[i].reset();
+    resetOpRange(0, opCapacity());
   }
+  //! \endcond
 
   //! \}
 
@@ -739,12 +795,12 @@ public:
   //! Resets extra register operand.
   inline void resetExtraReg() noexcept { _baseInst.resetExtraReg(); }
 
-  //! Returns operands count.
+  //! Returns operand count.
   inline uint32_t opCount() const noexcept { return _inst._opCount; }
-  //! Returns operands capacity.
+  //! Returns operand capacity.
   inline uint32_t opCapacity() const noexcept { return _inst._opCapacity; }
 
-  //! Sets operands count.
+  //! Sets operand count.
   inline void setOpCount(uint32_t opCount) noexcept { _inst._opCount = uint8_t(opCount); }
 
   //! Returns operands array.
@@ -752,27 +808,32 @@ public:
   //! Returns operands array (const).
   inline const Operand* operands() const noexcept { return (const Operand*)_opArray; }
 
-  inline Operand& opType(uint32_t index) noexcept {
+  //! Returns operand at the given `index`.
+  inline Operand& op(uint32_t index) noexcept {
     ASMJIT_ASSERT(index < opCapacity());
     return _opArray[index].as<Operand>();
   }
 
-  inline const Operand& opType(uint32_t index) const noexcept {
+  //! Returns operand at the given `index` (const).
+  inline const Operand& op(uint32_t index) const noexcept {
     ASMJIT_ASSERT(index < opCapacity());
     return _opArray[index].as<Operand>();
   }
 
+  //! Sets operand at the given `index` to `op`.
   inline void setOp(uint32_t index, const Operand_& op) noexcept {
     ASMJIT_ASSERT(index < opCapacity());
     _opArray[index].copyFrom(op);
   }
 
+  //! Resets operand at the given `index` to none.
   inline void resetOp(uint32_t index) noexcept {
     ASMJIT_ASSERT(index < opCapacity());
     _opArray[index].reset();
   }
 
-  inline void resetOps(uint32_t start, uint32_t end) noexcept {
+  //! Resets operands at `[start, end)` range.
+  inline void resetOpRange(uint32_t start, uint32_t end) noexcept {
     for (uint32_t i = start; i < end; i++)
       _opArray[i].reset();
   }
@@ -816,6 +877,7 @@ public:
   //! \name Rewriting
   //! \{
 
+  //! \cond INTERNAL
   inline uint32_t* _getRewriteArray() noexcept { return &_baseInst._extraReg._id; }
   inline const uint32_t* _getRewriteArray() const noexcept { return &_baseInst._extraReg._id; }
 
@@ -833,12 +895,14 @@ public:
     uint32_t* array = _getRewriteArray();
     array[index] = id;
   }
+  //! \endcond
 
   //! \}
 
   //! \name Static Functions
   //! \{
 
+  //! \cond INTERNAL
   static inline uint32_t capacityOfOpCount(uint32_t opCount) noexcept {
     return opCount <= kBaseOpCapacity ? kBaseOpCapacity : Globals::kMaxOpCount;
   }
@@ -847,6 +911,7 @@ public:
     size_t base = sizeof(InstNode) - kBaseOpCapacity * sizeof(Operand);
     return base + opCapacity * sizeof(Operand);
   }
+  //! \endcond
 
   //! \}
 };
@@ -855,7 +920,7 @@ public:
 // [asmjit::InstExNode]
 // ============================================================================
 
-//! Instruction node with maximum number of operands..
+//! Instruction node with maximum number of operands.
 //!
 //! This node is created automatically by Builder/Compiler in case that the
 //! required number of operands exceeds the default capacity of `InstNode`.
@@ -925,27 +990,33 @@ class LabelNode : public BaseNode {
 public:
   ASMJIT_NONCOPYABLE(LabelNode)
 
-  uint32_t _id;
+  //! Label identifier.
+  uint32_t _labelId;
 
   //! \name Construction & Destruction
   //! \{
 
   //! Creates a new `LabelNode` instance.
-  inline LabelNode(BaseBuilder* cb, uint32_t id = 0) noexcept
+  inline LabelNode(BaseBuilder* cb, uint32_t labelId = 0) noexcept
     : BaseNode(cb, kNodeLabel, kFlagHasNoEffect | kFlagActsAsLabel),
-      _id(id) {}
+      _labelId(labelId) {}
 
   //! \}
 
   //! \name Accessors
   //! \{
 
+  //! Returns \ref Label representation of the \ref LabelNode.
+  inline Label label() const noexcept { return Label(_labelId); }
   //! Returns the id of the label.
-  inline uint32_t id() const noexcept { return _id; }
-  //! Returns the label as `Label` operand.
-  inline Label label() const noexcept { return Label(_id); }
+  inline uint32_t labelId() const noexcept { return _labelId; }
 
   //! \}
+
+#ifndef ASMJIT_NO_DEPRECATED
+  ASMJIT_DEPRECATED("Use labelId() instead")
+  inline uint32_t id() const noexcept { return labelId(); }
+#endif // !ASMJIT_NO_DEPRECATED
 };
 
 // ============================================================================
@@ -1005,37 +1076,28 @@ public:
   ASMJIT_NONCOPYABLE(EmbedDataNode)
 
   enum : uint32_t {
-    kInlineBufferSize = uint32_t(64 - sizeof(BaseNode) - 4)
+    kInlineBufferSize = 128 - (sizeof(BaseNode) + sizeof(size_t) * 2)
   };
 
+  size_t _itemCount;
+  size_t _repeatCount;
+
   union {
-    struct {
-      //! Embedded data buffer.
-      uint8_t _buf[kInlineBufferSize];
-      //! Size of the data.
-      uint32_t _size;
-    };
-    struct {
-      //! Pointer to external data.
-      uint8_t* _externalPtr;
-    };
+    uint8_t* _externalData;
+    uint8_t _inlineData[kInlineBufferSize];
   };
 
   //! \name Construction & Destruction
   //! \{
 
   //! Creates a new `EmbedDataNode` instance.
-  inline EmbedDataNode(BaseBuilder* cb, void* data, uint32_t size) noexcept
-    : BaseNode(cb, kNodeEmbedData, kFlagIsData) {
-
-    if (size <= kInlineBufferSize) {
-      if (data)
-        memcpy(_buf, data, size);
-    }
-    else {
-      _externalPtr = static_cast<uint8_t*>(data);
-    }
-    _size = size;
+  inline EmbedDataNode(BaseBuilder* cb) noexcept
+    : BaseNode(cb, kNodeEmbedData, kFlagIsData),
+      _itemCount(0),
+      _repeatCount(0) {
+    _embed._typeId = uint8_t(Type::kIdU8),
+    _embed._typeSize = uint8_t(1);
+    memset(_inlineData, 0, kInlineBufferSize);
   }
 
   //! \}
@@ -1043,10 +1105,32 @@ public:
   //! \name Accessors
   //! \{
 
-  //! Returns pointer to the data.
-  inline uint8_t* data() const noexcept { return _size <= kInlineBufferSize ? const_cast<uint8_t*>(_buf) : _externalPtr; }
-  //! Returns size of the data.
-  inline uint32_t size() const noexcept { return _size; }
+  //! Returns \ref Type::Id of the data.
+  inline uint32_t typeId() const noexcept { return _embed._typeId; }
+  //! Returns the size of a single data element.
+  inline uint32_t typeSize() const noexcept { return _embed._typeSize; }
+
+  //! Returns a pointer to the data casted to `uint8_t`.
+  inline uint8_t* data() const noexcept {
+    return dataSize() <= kInlineBufferSize ? const_cast<uint8_t*>(_inlineData) : _externalData;
+  }
+
+  //! Returns a pointer to the data casted to `T`.
+  template<typename T>
+  inline T* dataAs() const noexcept { return reinterpret_cast<T*>(data()); }
+
+  //! Returns the number of (typed) items in the array.
+  inline size_t itemCount() const noexcept { return _itemCount; }
+
+  //! Returns how many times the data is repeated (default 1).
+  //!
+  //! Repeated data is useful when defining constants for SIMD, for example.
+  inline size_t repeatCount() const noexcept { return _repeatCount; }
+
+  //! Returns the size of the data, not considering the number of times it repeats.
+  //!
+  //! \note The returned value is the same as `typeSize() * itemCount()`.
+  inline size_t dataSize() const noexcept { return typeSize() * _itemCount; }
 
   //! \}
 };
@@ -1060,32 +1144,37 @@ class EmbedLabelNode : public BaseNode {
 public:
   ASMJIT_NONCOPYABLE(EmbedLabelNode)
 
-  uint32_t _id;
+  uint32_t _labelId;
 
   //! \name Construction & Destruction
   //! \{
 
   //! Creates a new `EmbedLabelNode` instance.
-  inline EmbedLabelNode(BaseBuilder* cb, uint32_t id = 0) noexcept
+  inline EmbedLabelNode(BaseBuilder* cb, uint32_t labelId = 0) noexcept
     : BaseNode(cb, kNodeEmbedLabel, kFlagIsData),
-      _id(id) {}
+      _labelId(labelId) {}
 
   //! \}
 
   //! \name Accessors
   //! \{
 
+  //! Returns the label to embed as \ref Label operand.
+  inline Label label() const noexcept { return Label(_labelId); }
   //! Returns the id of the label.
-  inline uint32_t id() const noexcept { return _id; }
-  //! Sets the label id (use with caution, improper use can break a lot of things).
-  inline void setId(uint32_t id) noexcept { _id = id; }
+  inline uint32_t labelId() const noexcept { return _labelId; }
 
-  //! Returns the label as `Label` operand.
-  inline Label label() const noexcept { return Label(_id); }
   //! Sets the label id from `label` operand.
-  inline void setLabel(const Label& label) noexcept { setId(label.id()); }
+  inline void setLabel(const Label& label) noexcept { setLabelId(label.id()); }
+  //! Sets the label id (use with caution, improper use can break a lot of things).
+  inline void setLabelId(uint32_t labelId) noexcept { _labelId = labelId; }
 
   //! \}
+
+#ifndef ASMJIT_NO_DEPRECATED
+  ASMJIT_DEPRECATED("Use labelId() instead")
+  inline uint32_t id() const noexcept { return labelId(); }
+#endif // !ASMJIT_NO_DEPRECATED
 };
 
 // ============================================================================
@@ -1097,18 +1186,18 @@ class EmbedLabelDeltaNode : public BaseNode {
 public:
   ASMJIT_NONCOPYABLE(EmbedLabelDeltaNode)
 
-  uint32_t _id;
-  uint32_t _baseId;
+  uint32_t _labelId;
+  uint32_t _baseLabelId;
   uint32_t _dataSize;
 
   //! \name Construction & Destruction
   //! \{
 
   //! Creates a new `EmbedLabelDeltaNode` instance.
-  inline EmbedLabelDeltaNode(BaseBuilder* cb, uint32_t id = 0, uint32_t baseId = 0, uint32_t dataSize = 0) noexcept
+  inline EmbedLabelDeltaNode(BaseBuilder* cb, uint32_t labelId = 0, uint32_t baseLabelId = 0, uint32_t dataSize = 0) noexcept
     : BaseNode(cb, kNodeEmbedLabelDelta, kFlagIsData),
-      _id(id),
-      _baseId(baseId),
+      _labelId(labelId),
+      _baseLabelId(baseLabelId),
       _dataSize(dataSize) {}
 
   //! \}
@@ -1116,28 +1205,46 @@ public:
   //! \name Accessors
   //! \{
 
-  //! Returns the id of the label.
-  inline uint32_t id() const noexcept { return _id; }
-  //! Sets the label id.
-  inline void setId(uint32_t id) noexcept { _id = id; }
   //! Returns the label as `Label` operand.
-  inline Label label() const noexcept { return Label(_id); }
+  inline Label label() const noexcept { return Label(_labelId); }
+  //! Returns the id of the label.
+  inline uint32_t labelId() const noexcept { return _labelId; }
+
   //! Sets the label id from `label` operand.
-  inline void setLabel(const Label& label) noexcept { setId(label.id()); }
+  inline void setLabel(const Label& label) noexcept { setLabelId(label.id()); }
+  //! Sets the label id.
+  inline void setLabelId(uint32_t labelId) noexcept { _labelId = labelId; }
 
-  //! Returns the id of the base label.
-  inline uint32_t baseId() const noexcept { return _baseId; }
-  //! Sets the base label id.
-  inline void setBaseId(uint32_t baseId) noexcept { _baseId = baseId; }
   //! Returns the base label as `Label` operand.
-  inline Label baseLabel() const noexcept { return Label(_baseId); }
-  //! Sets the base label id from `label` operand.
-  inline void setBaseLabel(const Label& baseLabel) noexcept { setBaseId(baseLabel.id()); }
+  inline Label baseLabel() const noexcept { return Label(_baseLabelId); }
+  //! Returns the id of the base label.
+  inline uint32_t baseLabelId() const noexcept { return _baseLabelId; }
 
+  //! Sets the base label id from `label` operand.
+  inline void setBaseLabel(const Label& baseLabel) noexcept { setBaseLabelId(baseLabel.id()); }
+  //! Sets the base label id.
+  inline void setBaseLabelId(uint32_t baseLabelId) noexcept { _baseLabelId = baseLabelId; }
+
+  //! Returns the size of the embedded label address.
   inline uint32_t dataSize() const noexcept { return _dataSize; }
+  //! Sets the size of the embedded label address.
   inline void setDataSize(uint32_t dataSize) noexcept { _dataSize = dataSize; }
 
   //! \}
+
+#ifndef ASMJIT_NO_DEPRECATED
+  ASMJIT_DEPRECATED("Use labelId() instead")
+  inline uint32_t id() const noexcept { return labelId(); }
+
+  ASMJIT_DEPRECATED("Use setLabelId() instead")
+  inline void setId(uint32_t id) noexcept { setLabelId(id); }
+
+  ASMJIT_DEPRECATED("Use baseLabelId() instead")
+  inline uint32_t baseId() const noexcept { return baseLabelId(); }
+
+  ASMJIT_DEPRECATED("Use setBaseLabelId() instead")
+  inline void setBaseId(uint32_t id) noexcept { setBaseLabelId(id); }
+#endif // !ASMJIT_NO_DEPRECATED
 };
 
 // ============================================================================
@@ -1229,7 +1336,9 @@ public:
 
   //! Type of the sentinel (purery informative purpose).
   enum SentinelType : uint32_t {
+    //! Type of the sentinel is not known.
     kSentinelUnknown = 0u,
+    //! This is a sentinel used at the end of \ref FuncNode.
     kSentinelFuncEnd = 1u
   };
 
@@ -1248,8 +1357,15 @@ public:
   //! \name Accessors
   //! \{
 
-  inline uint32_t sentinelType() const noexcept { return _sentinel._sentinelType; }
-  inline void setSentinelType(uint32_t type) noexcept { _sentinel._sentinelType = uint8_t(type); }
+  //! Returns the type of the sentinel.
+  inline uint32_t sentinelType() const noexcept {
+    return _sentinel._sentinelType;
+  }
+
+  //! Sets the type of the sentinel.
+  inline void setSentinelType(uint32_t type) noexcept {
+    _sentinel._sentinelType = uint8_t(type);
+  }
 
   //! \}
 };
@@ -1280,7 +1396,9 @@ public:
   //! \name Accessors
   //! \{
 
+  //! Returns \ref BaseBuilder associated with the pass.
   inline const BaseBuilder* cb() const noexcept { return _cb; }
+  //! Returns the name of the pass.
   inline const char* name() const noexcept { return _name; }
 
   //! \}
@@ -1292,7 +1410,7 @@ public:
   //!
   //! This is the only function that is called by the `BaseBuilder` to process
   //! the code. It passes `zone`, which will be reset after the `run()` finishes.
-  virtual Error run(Zone* zone, Logger* logger) noexcept = 0;
+  virtual Error run(Zone* zone, Logger* logger) = 0;
 
   //! \}
 };

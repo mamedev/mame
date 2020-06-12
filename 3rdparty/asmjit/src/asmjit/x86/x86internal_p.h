@@ -43,10 +43,10 @@ ASMJIT_BEGIN_SUB_NAMESPACE(x86)
 //! X86 utilities used at multiple places, not part of public API, not exported.
 struct X86Internal {
   //! Initialize `FuncDetail` (X86 specific).
-  static Error initFuncDetail(FuncDetail& func, const FuncSignature& sign, uint32_t gpSize) noexcept;
+  static Error initFuncDetail(FuncDetail& func, const FuncSignature& signature, uint32_t registerSize) noexcept;
 
   //! Initialize `FuncFrame` (X86 specific).
-  static Error initFuncFrame(FuncFrame& frame, const FuncDetail& func) noexcept;
+  static Error initFuncFrame(FuncFrame& frame, const FuncDetail& signature) noexcept;
 
   //! Finalize `FuncFrame` (X86 specific).
   static Error finalizeFuncFrame(FuncFrame& frame) noexcept;

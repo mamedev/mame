@@ -36,6 +36,7 @@ ASMJIT_BEGIN_NAMESPACE
 // [asmjit::ZoneStringBase]
 // ============================================================================
 
+//! A helper class used by \ref ZoneString implementation.
 struct ZoneStringBase {
   union {
     struct {
@@ -77,11 +78,12 @@ struct ZoneStringBase {
 // [asmjit::ZoneString<N>]
 // ============================================================================
 
-//! Small string is a template that helps to create strings that can be either
-//! statically allocated if they are small, or externally allocated in case
-//! their size exceeds the limit. The `N` represents the size of the whole
-//! `ZoneString` structure, based on that size the maximum size of the internal
-//! buffer is determined.
+//! A string template that can be zone allocated.
+//!
+//! Helps with creating strings that can be either statically allocated if they
+//! are small, or externally allocated in case their size exceeds the limit.
+//! The `N` represents the size of the whole `ZoneString` structure, based on
+//! that size the maximum size of the internal buffer is determined.
 template<size_t N>
 class ZoneString {
 public:
@@ -105,12 +107,22 @@ public:
   //! \name Accessors
   //! \{
 
-  inline const char* data() const noexcept { return _base._size <= kMaxEmbeddedSize ? _base._embedded : _base._external; }
+  //! Tests whether the string is empty.
   inline bool empty() const noexcept { return _base._size == 0; }
+
+  //! Returns the string data.
+  inline const char* data() const noexcept { return _base._size <= kMaxEmbeddedSize ? _base._embedded : _base._external; }
+  //! Returns the string size.
   inline uint32_t size() const noexcept { return _base._size; }
 
+  //! Tests whether the string is embedded (e.g. no dynamically allocated).
   inline bool isEmbedded() const noexcept { return _base._size <= kMaxEmbeddedSize; }
 
+  //! Copies a new `data` of the given `size` to the string.
+  //!
+  //! If the `size` exceeds the internal buffer the given `zone` will be
+  //! used to duplicate the data, otherwise the internal buffer will be
+  //! used as a storage.
   inline Error setData(Zone* zone, const char* data, size_t size) noexcept {
     return _base.setData(zone, kMaxEmbeddedSize, data, size);
   }

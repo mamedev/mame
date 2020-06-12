@@ -27,6 +27,7 @@
 #include "../core/api-config.h"
 #ifndef ASMJIT_NO_COMPILER
 
+#include "../core/formatter.h"
 #include "../core/rapass_p.h"
 
 ASMJIT_BEGIN_NAMESPACE
@@ -66,7 +67,7 @@ public:
   static constexpr uint32_t kCodeIndentation = 4;
 
   // NOTE: This is a bit hacky. There are some nodes which are processed twice
-  // (see `onBeforeCall()` and `onBeforeRet()`) as they can insert some nodes
+  // (see `onBeforeInvoke()` and `onBeforeRet()`) as they can insert some nodes
   // around them. Since we don't have any flags to mark these we just use their
   // position that is [at that time] unassigned.
   static constexpr uint32_t kNodePositionDidOnBefore = 0xFFFFFFFFu;
@@ -122,7 +123,7 @@ public:
         // Instruction | Jump | Invoke | Return
         // ------------------------------------
 
-        // Handle `InstNode`, `FuncCallNode`, and `FuncRetNode`. All of them
+        // Handle `InstNode`, `InvokeNode`, and `FuncRetNode`. All of them
         // share the same interface that provides operands that have read/write
         // semantics.
         if (ASMJIT_UNLIKELY(!_curBlock)) {
@@ -135,18 +136,18 @@ public:
 
         _hasCode = true;
 
-        if (node->isFuncCall() || node->isFuncRet()) {
+        if (node->isInvoke() || node->isFuncRet()) {
           if (node->position() != kNodePositionDidOnBefore) {
             // Call and Reg are complicated as they may insert some surrounding
             // code around them. The simplest approach is to get the previous
             // node, call the `onBefore()` handlers and then check whether
             // anything changed and restart if so. By restart we mean that the
             // current `node` would go back to the first possible inserted node
-            // by `onBeforeCall()` or `onBeforeRet()`.
+            // by `onBeforeInvoke()` or `onBeforeRet()`.
             BaseNode* prev = node->prev();
 
-            if (node->type() == BaseNode::kNodeFuncCall)
-              ASMJIT_PROPAGATE(static_cast<This*>(this)->onBeforeCall(node->as<FuncCallNode>()));
+            if (node->type() == BaseNode::kNodeInvoke)
+              ASMJIT_PROPAGATE(static_cast<This*>(this)->onBeforeInvoke(node->as<InvokeNode>()));
             else
               ASMJIT_PROPAGATE(static_cast<This*>(this)->onBeforeRet(node->as<FuncRetNode>()));
 
@@ -159,7 +160,7 @@ public:
               node->setPosition(kNodePositionDidOnBefore);
               node = prev->next();
 
-              // `onBeforeCall()` and `onBeforeRet()` can only insert instructions.
+              // `onBeforeInvoke()` and `onBeforeRet()` can only insert instructions.
               ASMJIT_ASSERT(node->isInst());
             }
 
@@ -179,8 +180,8 @@ public:
         ib.reset();
         ASMJIT_PROPAGATE(static_cast<This*>(this)->onInst(inst, controlType, ib));
 
-        if (node->isFuncCall()) {
-          ASMJIT_PROPAGATE(static_cast<This*>(this)->onCall(inst->as<FuncCallNode>(), ib));
+        if (node->isInvoke()) {
+          ASMJIT_PROPAGATE(static_cast<This*>(this)->onInvoke(inst->as<InvokeNode>(), ib));
         }
 
         if (node->isFuncRet()) {
@@ -409,7 +410,7 @@ public:
         logNode(node, kRootIndentation);
 
         // Unlikely: Assume that the exit label is reached only once per function.
-        if (ASMJIT_UNLIKELY(node->as<LabelNode>()->id() == _exitLabelId)) {
+        if (ASMJIT_UNLIKELY(node->as<LabelNode>()->labelId() == _exitLabelId)) {
           _curBlock->setLast(node);
           _curBlock->makeConstructed(_blockRegStats);
           ASMJIT_PROPAGATE(_pass->addExitBlock(_curBlock));
@@ -492,7 +493,7 @@ public:
 
     // Reset everything we may need.
     _blockRegStats.reset();
-    _exitLabelId = func->exitNode()->id();
+    _exitLabelId = func->exitNode()->labelId();
 
     // Initially we assume there is no code in the function body.
     _hasCode = false;
@@ -599,11 +600,11 @@ public:
     _sb.clear();
     _sb.appendChars(' ', indentation);
     if (action) {
-      _sb.appendString(action);
-      _sb.appendChar(' ');
+      _sb.append(action);
+      _sb.append(' ');
     }
-    Logging::formatNode(_sb, _logFlags, cc(), node);
-    _sb.appendChar('\n');
+    Formatter::formatNode(_sb, _logFlags, cc(), node);
+    _sb.append('\n');
     _logger->log(_sb);
   }
 #else

@@ -53,7 +53,9 @@ static void fail(const char* message, Error err) {
 }
 
 int main() {
-  CodeInfo codeInfo(ArchInfo::kIdHost);
+  printf("AsmJit X86 Sections Test\n\n");
+
+  Environment env = hostEnvironment();
   JitAllocator allocator;
 
 #ifndef ASMJIT_NO_LOGGING
@@ -62,7 +64,7 @@ int main() {
 #endif
 
   CodeHolder code;
-  code.init(codeInfo);
+  code.init(env);
 
 #ifndef ASMJIT_NO_LOGGING
   code.setLogger(&logger);
@@ -83,7 +85,7 @@ int main() {
     Label data = a.newLabel();
 
     FuncDetail func;
-    func.init(FuncSignatureT<size_t, size_t>(CallConv::kIdHost));
+    func.init(FuncSignatureT<size_t, size_t>(CallConv::kIdHost), code.environment());
 
     FuncFrame frame;
     frame.init(func);
@@ -159,18 +161,15 @@ int main() {
   typedef size_t (*Func)(size_t idx);
   Func fn = (Func)roPtr;
 
-  printf("\nTesting the generated function:\n");
+  printf("\n");
   if (fn(0) != dataArray[0] ||
       fn(3) != dataArray[3] ||
       fn(6) != dataArray[6] ||
       fn(9) != dataArray[9] ) {
-    printf("  [FAILED] The generated function returned incorrect result(s)\n");
+    printf("Failure:\n  The generated function returned incorrect result(s)\n");
     return 1;
   }
-  else {
-    printf("  [PASSED] The generated function returned expected results\n");
-  }
 
-  allocator.release((void*)fn);
+  printf("Success:\n  The generated function returned expected results\n");
   return 0;
 }

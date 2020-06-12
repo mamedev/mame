@@ -42,41 +42,41 @@ ASMJIT_BEGIN_NAMESPACE
 // [asmjit::FuncDetail - Init / Reset]
 // ============================================================================
 
-ASMJIT_FAVOR_SIZE Error FuncDetail::init(const FuncSignature& sign) {
-  uint32_t ccId = sign.callConv();
-  CallConv& cc = _callConv;
+ASMJIT_FAVOR_SIZE Error FuncDetail::init(const FuncSignature& signature, const Environment& environment) noexcept {
+  uint32_t ccId = signature.callConv();
+  uint32_t argCount = signature.argCount();
 
-  uint32_t argCount = sign.argCount();
   if (ASMJIT_UNLIKELY(argCount > Globals::kMaxFuncArgs))
     return DebugUtils::errored(kErrorInvalidArgument);
 
-  ASMJIT_PROPAGATE(cc.init(ccId));
+  CallConv& cc = _callConv;
+  ASMJIT_PROPAGATE(cc.init(ccId, environment));
 
-  uint32_t gpSize = (cc.archId() == ArchInfo::kIdX86) ? 4 : 8;
-  uint32_t deabstractDelta = Type::deabstractDeltaOfSize(gpSize);
+  uint32_t registerSize = Environment::registerSizeFromArch(cc.arch());
+  uint32_t deabstractDelta = Type::deabstractDeltaOfSize(registerSize);
 
-  const uint8_t* args = sign.args();
+  const uint8_t* args = signature.args();
   for (uint32_t i = 0; i < argCount; i++) {
     FuncValue& arg = _args[i];
     arg.initTypeId(Type::deabstract(args[i], deabstractDelta));
   }
   _argCount = uint8_t(argCount);
-  _vaIndex = uint8_t(sign.vaIndex());
+  _vaIndex = uint8_t(signature.vaIndex());
 
-  uint32_t ret = sign.ret();
+  uint32_t ret = signature.ret();
   if (ret != Type::kIdVoid) {
     _rets[0].initTypeId(Type::deabstract(ret, deabstractDelta));
     _retCount = 1;
   }
 
 #ifdef ASMJIT_BUILD_X86
-  if (CallConv::isX86Family(ccId))
-    return x86::X86Internal::initFuncDetail(*this, sign, gpSize);
+  if (environment.isFamilyX86())
+    return x86::X86Internal::initFuncDetail(*this, signature, registerSize);
 #endif
 
 #ifdef ASMJIT_BUILD_ARM
-  if (CallConv::isArmFamily(ccId))
-    return arm::ArmInternal::initFuncDetail(*this, sign, gpSize);
+  if (environment.isFamilyARM())
+    return arm::ArmInternal::initFuncDetail(*this, signature, registerSize);
 #endif
 
   // We should never bubble here as if `cc.init()` succeeded then there has to
@@ -89,15 +89,13 @@ ASMJIT_FAVOR_SIZE Error FuncDetail::init(const FuncSignature& sign) {
 // ============================================================================
 
 ASMJIT_FAVOR_SIZE Error FuncFrame::init(const FuncDetail& func) noexcept {
-  uint32_t ccId = func.callConv().id();
-
 #ifdef ASMJIT_BUILD_X86
-  if (CallConv::isX86Family(ccId))
+  if (Environment::isFamilyX86(func.callConv().arch()))
     return x86::X86Internal::initFuncFrame(*this, func);
 #endif
 
 #ifdef ASMJIT_BUILD_ARM
-  if (CallConv::isArmFamily(ccId))
+  if (Environment::isFamilyARM(func.callConv().arch()))
     return arm::ArmInternal::initFuncFrame(*this, func);
 #endif
 
@@ -106,12 +104,12 @@ ASMJIT_FAVOR_SIZE Error FuncFrame::init(const FuncDetail& func) noexcept {
 
 ASMJIT_FAVOR_SIZE Error FuncFrame::finalize() noexcept {
 #ifdef ASMJIT_BUILD_X86
-  if (ArchInfo::isX86Family(archId()))
+  if (Environment::isFamilyX86(arch()))
     return x86::X86Internal::finalizeFuncFrame(*this);
 #endif
 
 #ifdef ASMJIT_BUILD_ARM
-  if (ArchInfo::isArmFamily(archId()))
+  if (Environment::isFamilyARM(arch()))
     return arm::ArmInternal::finalizeFuncFrame(*this);
 #endif
 
@@ -123,18 +121,19 @@ ASMJIT_FAVOR_SIZE Error FuncFrame::finalize() noexcept {
 // ============================================================================
 
 ASMJIT_FAVOR_SIZE Error FuncArgsAssignment::updateFuncFrame(FuncFrame& frame) const noexcept {
+  uint32_t arch = frame.arch();
   const FuncDetail* func = funcDetail();
-  if (!func) return DebugUtils::errored(kErrorInvalidState);
 
-  uint32_t ccId = func->callConv().id();
+  if (!func)
+    return DebugUtils::errored(kErrorInvalidState);
 
 #ifdef ASMJIT_BUILD_X86
-  if (CallConv::isX86Family(ccId))
+  if (Environment::isFamilyX86(arch))
     return x86::X86Internal::argsToFuncFrame(*this, frame);
 #endif
 
 #ifdef ASMJIT_BUILD_ARM
-  if (CallConv::isArmFamily(ccId))
+  if (Environment::isFamilyARM(arch))
     return arm::ArmInternal::argsToFuncFrame(*this, frame);
 #endif
 

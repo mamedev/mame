@@ -45,7 +45,7 @@
   // Apple recently introduced MAP_JIT flag, which we want to use.
   #if defined(__APPLE__)
     #include <TargetConditionals.h>
-    #if defined(TARGET_OS_OSX)
+    #if TARGET_OS_OSX
       #include <sys/utsname.h>
     #endif
     // Older SDK doesn't define `MAP_JIT`.
@@ -316,10 +316,10 @@ static ASMJIT_INLINE bool VirtMem_isHardened() noexcept {
 // MAP_JIT flag required to run unsigned JIT code is only supported by kernel
 // version 10.14+ (Mojave) and IOS.
 static ASMJIT_INLINE bool VirtMem_hasMapJitSupport() noexcept {
-#if defined(TARGET_OS_OSX)
-  static volatile uint32_t globalVersion;
+#if TARGET_OS_OSX
+  static volatile int globalVersion;
 
-  uint32_t ver = globalVersion;
+  int ver = globalVersion;
   if (!ver) {
     struct utsname osname;
     uname(&osname);
@@ -333,19 +333,19 @@ static ASMJIT_INLINE bool VirtMem_hasMapJitSupport() noexcept {
 #endif
 }
 
-static ASMJIT_INLINE uint32_t VirtMem_appleSpecificMMapFlags(uint32_t flags) {
+static ASMJIT_INLINE int VirtMem_appleSpecificMMapFlags(uint32_t flags) {
   // Always use MAP_JIT flag if user asked for it (could be used for testing
   // on non-hardened processes) and detect whether it must be used when the
   // process is actually hardened (in that case it doesn't make sense to rely
   // on user `flags`).
   bool useMapJit = ((flags & VirtMem::kMMapEnableMapJit) != 0) || VirtMem_isHardened();
   if (useMapJit)
-    return VirtMem_hasMapJitSupport() ? MAP_JIT : 0u;
+    return VirtMem_hasMapJitSupport() ? int(MAP_JIT) : 0;
   else
     return 0;
 }
 #else
-static ASMJIT_INLINE uint32_t VirtMem_appleSpecificMMapFlags(uint32_t flags) {
+static ASMJIT_INLINE int VirtMem_appleSpecificMMapFlags(uint32_t flags) {
   DebugUtils::unused(flags);
   return 0;
 }
@@ -406,7 +406,7 @@ static Error VirtMem_openAnonymousMemory(int* fd, bool preferTmpOverDevShm) noex
     bits = ((bits >> 14) ^ (bits << 6)) + uint64_t(++internalCounter) * 10619863;
 
     if (!ASMJIT_VM_SHM_DETECT || preferTmpOverDevShm) {
-      uniqueName.assignString(VirtMem_getTmpDir());
+      uniqueName.assign(VirtMem_getTmpDir());
       uniqueName.appendFormat(kShmFormat, (unsigned long long)bits);
       *fd = open(uniqueName.data(), O_RDWR | O_CREAT | O_EXCL, 0);
       if (ASMJIT_LIKELY(*fd >= 0)) {
