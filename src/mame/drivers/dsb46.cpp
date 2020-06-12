@@ -40,26 +40,31 @@ public:
 	dsb46_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 	{ }
 
 	void dsb46(machine_config &config);
-	void init_dsb46();
 
 private:
-	virtual void machine_reset() override;
+	void machine_reset() override;
+	void machine_start() override;
 	void port1a_w(u8 data);
-	void dsb46_io(address_map &map);
-	void dsb46_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	bool m_rom_in_map;
 	required_device<z80_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 };
 
-void dsb46_state::dsb46_mem(address_map &map)
+void dsb46_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x07ff).bankr("read").bankw("write");
+	map(0x0000, 0x07ff).ram().share("mainram").lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
 	map(0x0800, 0xffff).ram();
 }
 
-void dsb46_state::dsb46_io(address_map &map)
+void dsb46_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
@@ -76,24 +81,19 @@ void dsb46_state::dsb46_io(address_map &map)
 static INPUT_PORTS_START( dsb46 )
 INPUT_PORTS_END
 
-void dsb46_state::init_dsb46()
+void dsb46_state::machine_start()
 {
-	u8 *RAM = memregion("maincpu")->base();
-	membank("read")->configure_entry(0, &RAM[0x10000]);
-	membank("read")->configure_entry(1, &RAM[0x00000]);
-	membank("write")->configure_entry(0, &RAM[0x00000]);
+	save_item(NAME(m_rom_in_map));
 }
 
 void dsb46_state::machine_reset()
 {
-	membank("read")->set_entry(0);
-	membank("write")->set_entry(0);
-	m_maincpu->reset();
+	m_rom_in_map = true;
 }
 
 void dsb46_state::port1a_w(u8 data)
 {
-	membank("read")->set_entry(data & 1);
+	m_rom_in_map = BIT(~data, 0);
 }
 
 static const z80_daisy_config daisy_chain[] =
@@ -108,8 +108,8 @@ void dsb46_state::dsb46(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dsb46_state::dsb46_mem);
-	m_maincpu->set_addrmap(AS_IO, &dsb46_state::dsb46_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dsb46_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &dsb46_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* Devices */
@@ -134,11 +134,11 @@ void dsb46_state::dsb46(machine_config &config)
 }
 
 ROM_START( dsb46 )
-	ROM_REGION( 0x10800, "maincpu", 0 )
-	ROM_LOAD( "1538a.bin", 0x10000, 0x800, CRC(65b3e26e) SHA1(afe1f03f266b7d13fdb1f1bc6762df5e0aa5c764) )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "1538a.bin", 0x0000, 0x0800, CRC(65b3e26e) SHA1(afe1f03f266b7d13fdb1f1bc6762df5e0aa5c764) )
 
 	ROM_REGION( 0x4000, "ades", 0 )
 	ROM_LOAD( "ades.bin", 0x0000, 0x4000, CRC(d374abf0) SHA1(331f51a2bb81375aeffbe63c1ebc1d7cd779b9c3) )
 ROM_END
 
-COMP( 198?, dsb46, 0, 0, dsb46, dsb46, dsb46_state, init_dsb46, "Davidge", "DSB-4/6",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 198?, dsb46, 0, 0, dsb46, dsb46, dsb46_state, empty_init, "Davidge", "DSB-4/6",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
