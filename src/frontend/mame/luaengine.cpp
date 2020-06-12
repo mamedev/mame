@@ -2071,6 +2071,8 @@ void lua_engine::initialize()
  * field.crosshair_scale
  * field.crosshair_offset
  * field.user_value
+ *
+ * field.settings[] - ioport_setting table (k=value, v=name)
  */
 
 	auto ioport_field_type = sol().registry().create_simple_usertype<ioport_field>("new", sol::no_constructor);
@@ -2151,6 +2153,13 @@ void lua_engine::initialize()
 			f.get_user_settings(settings);
 			settings.value = val;
 			f.set_user_settings(settings);
+		}));
+	ioport_field_type.set("settings", sol::property([this](ioport_field &f) {
+			sol::table result = sol().create_table();
+			for (ioport_setting &setting : f.settings())
+				if (setting.enabled())
+					result[setting.value()] = setting.name();
+			return result;
 		}));
 	sol().registry().set_usertype("ioport_field", ioport_field_type);
 
