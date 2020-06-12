@@ -18,9 +18,6 @@
 #include "includes/bosco.h"
 
 
-#define VIDEO_RAM_SIZE 0x400
-
-
 void bosco_state::bosco_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
