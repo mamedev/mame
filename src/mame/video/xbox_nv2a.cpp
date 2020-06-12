@@ -502,7 +502,7 @@ void vertex_program_simulator::decode_instruction(int address)
 int vertex_program_simulator::step()
 {
 	int p1, p2;
-	float tmp[3 * 4];
+	float tmp[3 * 4] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	float tmpv[4] = { 0, 0, 0, 0};
 	float tmps[4] = { 0, 0, 0, 0};
 	instruction::decoded *d;
