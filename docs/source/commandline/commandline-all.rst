@@ -551,8 +551,8 @@ overwritten.
 
 **-listsoftware** / **-lsoft** [<*pattern*>]
 
-    Displays the contents of all softlists that can be used by the system or
-    systems represented by *pattern*.
+    Displays the contents of all software lists that can be used by the system
+    or systems represented by *pattern*.
 
     Example:
         .. code-block:: bash
@@ -879,7 +879,7 @@ Example:
 
     Chooses how MAME will get joystick input. The default is ``auto``.
 
-.. list-table:: Supported light gun input providers per-platform
+.. list-table:: Supported joystick input providers per-platform
     :header-rows: 0
     :stub-columns: 0
 
@@ -1732,7 +1732,7 @@ Core Performance Options
     Example:
         .. code-block:: bash
 
-            mame64 gradius4 -noframeskip
+            mame64 gradius4 -autoframeskip
 
 .. _mame-commandline-frameskip:
 
