@@ -673,13 +673,6 @@ Notes:
 TODO:
 ----
 
-- bosco: is the scrolling tilemap placement correct? It is currently aligned so that
-  the test grid shown on startup is correct, but this way an unerased grey strip
-  remains on the left of the screen during the title sequence. Alignment of the
-  bullets/radar blips is also mysterious. Currently the radar blips are perfectly
-  aligned with the radar, but the alignment of the player bullets with the player
-  ship differs by one horizontal pixel when the screen is flipped.
-
 - gallag/gatsbee: explosions are not emulated since the bootleg board doesn't have
   the 54XX custom. Should probably use samples like Battles?
 
@@ -3493,11 +3486,11 @@ void battles_state::driver_init()
 /* Original Namco hardware, with Namco Customs */
 
 //    YEAR, NAME,      PARENT,  MACHINE, INPUT,    STATE,         INIT,         MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1981, bosco,     0,       bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian (new version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1981, boscoo,    bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian (old version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1981, boscoo2,   bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian (older version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1981, boscomd,   bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian (Midway, new version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1981, boscomdo,  bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian (Midway, old version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1981, bosco,     0,       bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian (new version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscoo,    bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian (old version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscoo2,   bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian (older version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscomd,   bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian (Midway, new version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscomdo,  bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian (Midway, old version)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, galaga,    0,       galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco rev. B)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, galagao,   galaga,  galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco)", MACHINE_SUPPORTS_SAVE )
