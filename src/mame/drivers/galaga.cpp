@@ -672,6 +672,8 @@ Notes:
 
 TODO:
 ----
+- bosco: is the screen horizontal resolution maybe 285? PCB videos do show a slightly
+  larger right border though
 
 - gallag/gatsbee: explosions are not emulated since the bootleg board doesn't have
   the 54XX custom. Should probably use samples like Battles?
