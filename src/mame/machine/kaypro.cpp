@@ -21,9 +21,9 @@ WRITE_LINE_MEMBER( kaypro_state::write_centronics_busy )
 	m_centronics_busy = state;
 }
 
-uint8_t kaypro_state::pio_system_r()
+u8 kaypro_state::pio_system_r()
 {
-	uint8_t data = 0;
+	u8 data = 0;
 
 	/* centronics busy */
 	data |= m_centronics_busy << 3;
@@ -34,7 +34,7 @@ uint8_t kaypro_state::pio_system_r()
 	return data;
 }
 
-void kaypro_state::kayproii_pio_system_w(uint8_t data)
+void kaypro_state::kayproii_pio_system_w(u8 data)
 {
 /*  d7 bank select
     d6 disk drive motors - (0=on)
@@ -44,8 +44,9 @@ void kaypro_state::kayproii_pio_system_w(uint8_t data)
     d1 drive B
     d0 drive A */
 
-	membank("bankr0")->set_entry(BIT(data, 7));
-	membank("bank3")->set_entry(BIT(data, 7));
+	m_bankr->set_entry(BIT(data, 7));
+	m_bankw->set_entry(BIT(data, 7));
+	m_bank3->set_entry(BIT(data, 7));
 	m_is_motor_off = BIT(data, 6);
 
 	m_floppy = nullptr;
@@ -72,7 +73,7 @@ void kaypro_state::kayproii_pio_system_w(uint8_t data)
 	m_system_port = data;
 }
 
-void kaypro_state::kayproiv_pio_system_w(uint8_t data)
+void kaypro_state::kayproiv_pio_system_w(u8 data)
 {
 	kayproii_pio_system_w(data);
 
@@ -88,13 +89,13 @@ void kaypro_state::kayproiv_pio_system_w(uint8_t data)
 
 ************************************************************/
 
-uint8_t kaypro_state::kaypro484_system_port_r()
+u8 kaypro_state::kaypro484_system_port_r()
 {
-	uint8_t data = m_centronics_busy << 6;
+	u8 data = m_centronics_busy << 6;
 	return (m_system_port & 0xbf) | data;
 }
 
-void kaypro_state::kaypro484_system_port_w(uint8_t data)
+void kaypro_state::kaypro484_system_port_w(u8 data)
 {
 /*  d7 bank select
     d6 alternate character set (write only)
@@ -105,8 +106,9 @@ void kaypro_state::kaypro484_system_port_w(uint8_t data)
     d1 drive B
     d0 drive A */
 
-	membank("bankr0")->set_entry(BIT(data, 7));
-	membank("bank3")->set_entry(BIT(data, 7));
+	m_bankr->set_entry(BIT(data, 7));
+	m_bankw->set_entry(BIT(data, 7));
+	m_bank3->set_entry(BIT(data, 7));
 	m_is_motor_off = !BIT(data, 4);
 
 	m_floppy = nullptr;
@@ -221,16 +223,29 @@ WRITE_LINE_MEMBER( kaypro_state::fdc_drq_w )
     Machine
 
 ************************************************************/
-MACHINE_START_MEMBER( kaypro_state,kayproii )
+void kaypro_state::machine_start()
 {
-	m_pio_s->strobe_a(0);
+	if (m_pio_s)
+		m_pio_s->strobe_a(0);
+
+	save_pointer(NAME(m_vram), 0x1000);
+	save_pointer(NAME(m_ram),  0x4000);
+
+	save_item(NAME(m_mc6845_reg));
+	save_item(NAME(m_mc6845_ind));
+	save_item(NAME(m_framecnt));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_is_motor_off));
+	save_item(NAME(m_fdc_rq));
+	save_item(NAME(m_system_port));
+	save_item(NAME(m_mc6845_video_address));
 }
 
-MACHINE_RESET_MEMBER( kaypro_state,kaypro )
+void kaypro_state::machine_reset()
 {
-	membank("bankr0")->set_entry(1); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
-	membank("bank3")->set_entry(1); // point at video ram
+	m_bankr->set_entry(1); // point at rom
+	m_bankw->set_entry(1); // always write to ram
+	m_bank3->set_entry(1); // point at video ram
 	m_system_port = 0x80;
 	m_fdc_rq = 0;
 	m_maincpu->reset();
@@ -251,31 +266,32 @@ MACHINE_RESET_MEMBER( kaypro_state,kaypro )
 
 QUICKLOAD_LOAD_MEMBER(kaypro_state::quickload_cb)
 {
-	uint8_t *RAM = memregion("rambank")->base();
+	m_bankr->set_entry(0);
+	m_bankw->set_entry(0);
+	m_bank3->set_entry(0);
+
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
 	/* Avoid loading a program if CP/M-80 is not in memory */
-	if ((RAM[0] != 0xc3) || (RAM[5] != 0xc3))
+	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 		return image_init_result::FAIL;
 
 	if (quickload_size >= 0xfd00)
 		return image_init_result::FAIL;
 
 	/* Load image to the TPA (Transient Program Area) */
-	for (uint16_t i = 0; i < quickload_size; i++)
+	for (u16 i = 0; i < quickload_size; i++)
 	{
-		uint8_t data;
+		u8 data;
 		if (image.fread( &data, 1) != 1)
 			return image_init_result::FAIL;
-		RAM[i+0x100] = data;
+		prog_space.write_byte(i+0x100, data);
 	}
 
-
-	membank("bankr0")->set_entry(0);
-	membank("bank3")->set_entry(0);
-	RAM[0x80]=0; RAM[0x81]=0;    // clear out command tail
+	prog_space.write_byte(0x80, 0);   prog_space.write_byte(0x81, 0);    // clear out command tail
 
 	m_maincpu->set_pc(0x100);    // start program
-	m_maincpu->set_state_int(Z80_SP, 256 * RAM[7] - 300);   // put the stack a bit before BDOS
+	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);   // put the stack a bit before BDOS
 
 	return image_init_result::PASS;
 }
