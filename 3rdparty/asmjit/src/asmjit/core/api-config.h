@@ -139,6 +139,8 @@ namespace asmjit {
 // [asmjit::Options]
 // ============================================================================
 
+#define ASMJIT_STATIC
+
 // ASMJIT_NO_BUILDER implies ASMJIT_NO_COMPILER.
 #if defined(ASMJIT_NO_BUILDER) && !defined(ASMJIT_NO_COMPILER)
   #define ASMJIT_NO_COMPILER

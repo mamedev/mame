@@ -553,7 +553,7 @@ Error BaseCompiler::emitAnnotatedJump(uint32_t instId, const Operand_& o0, JumpA
   resetInlineComment();
   resetExtraReg();
 
-  JumpNode* node;
+  JumpNode* node = nullptr;
   ASMJIT_PROPAGATE(newJumpNode(&node, instId, options, o0, annotation));
 
   node->setExtraReg(extra);
