@@ -2,9 +2,14 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  video.c
-
   Functions to emulate the video hardware of the machine.
+
+  Bullet vs tilemap offsets are correct when compared with PCB videos
+  (both playfield area, and radar area). Bullet vs sprite offsets are also
+  correct.
+
+  The radar area is offset by 3 pixels, also confirmed with PCB video when
+  it does the VRAM check.
 
 ***************************************************************************/
 
