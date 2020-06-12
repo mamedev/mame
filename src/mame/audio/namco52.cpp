@@ -105,18 +105,13 @@ void namco_52xx_device::O_w(uint8_t data)
 		m_address = (m_address & 0xf0ff) | ((data & 0xf) << 8);
 }
 
-TIMER_CALLBACK_MEMBER( namco_52xx_device::irq_clear )
-{
-	m_cpu->set_input_line(0, CLEAR_LINE);
-}
 
 void namco_52xx_device::write(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_52xx_device::latch_callback),this), data);
 
 	// TODO: should use chip_select line for this
-	m_cpu->set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(m_irq_duration, timer_expired_delegate(FUNC(namco_52xx_device::irq_clear),this), 0);
+	m_cpu->pulse_input_line(0, m_irq_duration);
 }
 
 WRITE_LINE_MEMBER( namco_52xx_device::chip_select )

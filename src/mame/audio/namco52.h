@@ -29,7 +29,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	TIMER_CALLBACK_MEMBER( latch_callback );
-	TIMER_CALLBACK_MEMBER( irq_clear );
 	TIMER_CALLBACK_MEMBER( external_clock_pulse );
 
 private:

@@ -3488,11 +3488,11 @@ void battles_state::driver_init()
 /* Original Namco hardware, with Namco Customs */
 
 //    YEAR, NAME,      PARENT,  MACHINE, INPUT,    STATE,         INIT,         MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1981, bosco,     0,       bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian (new version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, boscoo,    bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian (old version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, boscoo2,   bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian (older version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, boscomd,   bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian (Midway, new version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, boscomdo,  bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian (Midway, old version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, bosco,     0,       bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (new version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscoo,    bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (old version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscoo2,   bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (older version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscomd,   bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian - Star Destroyer (Midway, new version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscomdo,  bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian - Star Destroyer (Midway, old version)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, galaga,    0,       galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco rev. B)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, galagao,   galaga,  galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco)", MACHINE_SUPPORTS_SAVE )
