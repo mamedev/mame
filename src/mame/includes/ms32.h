@@ -60,10 +60,10 @@ protected:
 	void configure_banks();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ms32_interrupt);
-	DECLARE_WRITE8_MEMBER(ms32_snd_bank_w);
+	void ms32_snd_bank_w(u8 data);
 
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(to_main_w);
+	u8 latch_r();
+	void to_main_w(u8 data);
 	u32 ms32_sound_r();
 	void ms32_sound_w(u32 data);
 	void reset_sub_w(u32 data);
@@ -114,10 +114,10 @@ private:
 	int m_brt_g;
 	int m_brt_b;
 	u32 ms32_read_inputs3();
-	DECLARE_READ8_MEMBER(ms32_nvram_r8);
-	DECLARE_WRITE8_MEMBER(ms32_nvram_w8);
-	DECLARE_READ8_MEMBER(ms32_priram_r8);
-	DECLARE_WRITE8_MEMBER(ms32_priram_w8);
+	u8 ms32_nvram_r8(offs_t offset);
+	void ms32_nvram_w8(offs_t offset, u8 data);
+	u8 ms32_priram_r8(offs_t offset);
+	void ms32_priram_w8(offs_t offset, u8 data);
 	u16 ms32_palram_r16(offs_t offset);
 	void ms32_palram_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 ms32_rozram_r16(offs_t offset);

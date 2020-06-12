@@ -221,7 +221,7 @@ void pci_device::set_multifunction_device(bool enable)
 	is_multifunction_device = enable;
 }
 
-READ8_MEMBER(pci_device::header_type_r)
+uint8_t pci_device::header_type_r()
 {
 	return is_multifunction_device ? 0x80 : 0x00;
 }
@@ -455,7 +455,7 @@ pci_bridge_device::pci_bridge_device(const machine_config &mconfig, device_type 
 {
 }
 
-READ8_MEMBER(pci_bridge_device::header_type_r)
+uint8_t pci_bridge_device::header_type_r()
 {
 	return 0x01;
 }

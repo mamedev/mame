@@ -545,22 +545,22 @@ void ms32_state::reset_sub_w(u32 data)
 /********** MEMORY MAP **********/
 
 
-READ8_MEMBER(ms32_state::ms32_nvram_r8)
+u8 ms32_state::ms32_nvram_r8(offs_t offset)
 {
 	return m_nvram_8[offset];
 }
 
-WRITE8_MEMBER(ms32_state::ms32_nvram_w8)
+void ms32_state::ms32_nvram_w8(offs_t offset, u8 data)
 {
 	m_nvram_8[offset] = data;
 }
 
-READ8_MEMBER(ms32_state::ms32_priram_r8)
+u8 ms32_state::ms32_priram_r8(offs_t offset)
 {
 	return m_priram[offset];
 }
 
-WRITE8_MEMBER(ms32_state::ms32_priram_w8)
+void ms32_state::ms32_priram_w8(offs_t offset, u8 data)
 {
 	m_priram[offset] = data;
 }
@@ -1662,18 +1662,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
  code at $38 reads the 2nd command latch ??
 */
 
-READ8_MEMBER(ms32_state::latch_r)
+u8 ms32_state::latch_r()
 {
 	return m_soundlatch->read()^0xff;
 }
 
-WRITE8_MEMBER(ms32_state::ms32_snd_bank_w)
+void ms32_state::ms32_snd_bank_w(u8 data)
 {
 	m_z80bank[0]->set_entry((data >> 0) & 0x0F);
 	m_z80bank[1]->set_entry((data >> 4) & 0x0F);
 }
 
-WRITE8_MEMBER(ms32_state::to_main_w)
+void ms32_state::to_main_w(u8 data)
 {
 	m_to_main=data;
 	irq_raise(1);

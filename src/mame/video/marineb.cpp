@@ -84,27 +84,27 @@ void marineb_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(marineb_state::marineb_videoram_w)
+void marineb_state::marineb_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_colorram_w)
+void marineb_state::marineb_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_column_scroll_w)
+void marineb_state::marineb_column_scroll_w(uint8_t data)
 {
 	m_column_scroll = data;
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_palette_bank_0_w)
+void marineb_state::marineb_palette_bank_0_w(uint8_t data)
 {
 	uint8_t old = m_palette_bank;
 
@@ -117,7 +117,7 @@ WRITE8_MEMBER(marineb_state::marineb_palette_bank_0_w)
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_palette_bank_1_w)
+void marineb_state::marineb_palette_bank_1_w(uint8_t data)
 {
 	uint8_t old = m_palette_bank;
 

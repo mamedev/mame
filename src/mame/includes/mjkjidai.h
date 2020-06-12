@@ -50,9 +50,9 @@ private:
 
 	void keyboard_select_lo_w(uint8_t data);
 	void keyboard_select_hi_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(mjkjidai_videoram_w);
+	void mjkjidai_videoram_w(offs_t offset, uint8_t data);
 	void mjkjidai_ctrl_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
+	void adpcm_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;

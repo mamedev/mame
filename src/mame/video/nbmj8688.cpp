@@ -97,7 +97,7 @@ void nbmj8688_state::mbmj8688_lcd(palette_device &palette) const
 	palette.set_pen_color(1, rgb_t(0, 0, 0));
 }
 
-WRITE8_MEMBER(nbmj8688_state::clut_w)
+void nbmj8688_state::clut_w(offs_t offset, uint8_t data)
 {
 	m_clut[offset] = (data ^ 0xff);
 }
@@ -107,7 +107,7 @@ WRITE8_MEMBER(nbmj8688_state::clut_w)
 
 ******************************************************************************/
 
-WRITE8_MEMBER(nbmj8688_state::blitter_w)
+void nbmj8688_state::blitter_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -130,7 +130,7 @@ WRITE8_MEMBER(nbmj8688_state::blitter_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj8688_state::mjsikaku_gfxflag2_w)
+void nbmj8688_state::mjsikaku_gfxflag2_w(uint8_t data)
 {
 	m_gfxflag2 = data;
 
@@ -145,17 +145,17 @@ WRITE8_MEMBER(nbmj8688_state::mjsikaku_gfxflag2_w)
 		m_gfxflag2 |= 0x20;
 }
 
-WRITE8_MEMBER(nbmj8688_state::mjsikaku_gfxflag3_w)
+void nbmj8688_state::mjsikaku_gfxflag3_w(uint8_t data)
 {
 	m_gfxflag3 = (data & 0xe0);
 }
 
-WRITE8_MEMBER(nbmj8688_state::scrolly_w)
+void nbmj8688_state::scrolly_w(uint8_t data)
 {
 	m_scrolly = data;
 }
 
-WRITE8_MEMBER(nbmj8688_state::mjsikaku_romsel_w)
+void nbmj8688_state::mjsikaku_romsel_w(uint8_t data)
 {
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = (data & 0x0f);
@@ -169,11 +169,11 @@ WRITE8_MEMBER(nbmj8688_state::mjsikaku_romsel_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj8688_state::secolove_romsel_w)
+void nbmj8688_state::secolove_romsel_w(uint8_t data)
 {
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = ((data & 0xc0) >> 4) + (data & 0x03);
-	mjsikaku_gfxflag2_w(space, 0, data);
+	mjsikaku_gfxflag2_w(data);
 
 	if ((m_gfxrom << 17) > (gfxlen - 1))
 	{
@@ -184,11 +184,11 @@ WRITE8_MEMBER(nbmj8688_state::secolove_romsel_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj8688_state::crystalg_romsel_w)
+void nbmj8688_state::crystalg_romsel_w(uint8_t data)
 {
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = (data & 0x03);
-	mjsikaku_gfxflag2_w(space, 0, data);
+	mjsikaku_gfxflag2_w(data);
 
 	if ((m_gfxrom << 17) > (gfxlen - 1))
 	{
@@ -199,11 +199,11 @@ WRITE8_MEMBER(nbmj8688_state::crystalg_romsel_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj8688_state::seiha_romsel_w)
+void nbmj8688_state::seiha_romsel_w(uint8_t data)
 {
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = (data & 0x1f);
-	mjsikaku_gfxflag3_w(space, 0, data);
+	mjsikaku_gfxflag3_w(data);
 
 	if ((m_gfxrom << 17) > (gfxlen - 1))
 	{
@@ -611,13 +611,13 @@ VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_pure_16bit_LCD)
 	common_video_start();
 }
 
-WRITE8_MEMBER(nbmj8688_state::HD61830B_both_instr_w)
+void nbmj8688_state::HD61830B_both_instr_w(uint8_t data)
 {
 	m_lcdc0->control_w(data);
 	m_lcdc1->control_w(data);
 }
 
-WRITE8_MEMBER(nbmj8688_state::HD61830B_both_data_w)
+void nbmj8688_state::HD61830B_both_data_w(uint8_t data)
 {
 	m_lcdc0->data_w(data);
 	m_lcdc1->data_w(data);

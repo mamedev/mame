@@ -59,15 +59,15 @@ private:
 	int m_flipscreen_old;
 	emu_timer *m_blitter_timer;
 
-	DECLARE_READ8_MEMBER(palette_type1_r);
-	DECLARE_WRITE8_MEMBER(palette_type1_w);
-	DECLARE_WRITE8_MEMBER(clutsel_w);
-	DECLARE_READ8_MEMBER(clut_r);
-	DECLARE_WRITE8_MEMBER(clut_w);
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(vramsel_w);
-	DECLARE_WRITE8_MEMBER(romsel_w);
+	uint8_t palette_type1_r(offs_t offset);
+	void palette_type1_w(offs_t offset, uint8_t data);
+	void clutsel_w(uint8_t data);
+	uint8_t clut_r(offs_t offset);
+	void clut_w(offs_t offset, uint8_t data);
+	void blitter_w(offs_t offset, uint8_t data);
+	void scrolly_w(uint8_t data);
+	void vramsel_w(uint8_t data);
+	void romsel_w(uint8_t data);
 
 	virtual void video_start() override;
 

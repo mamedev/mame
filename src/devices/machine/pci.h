@@ -57,7 +57,7 @@ public:
 	DECLARE_READ32_MEMBER(class_rev_r);
 	virtual DECLARE_READ8_MEMBER(cache_line_size_r);
 	virtual DECLARE_READ8_MEMBER(latency_timer_r);
-	virtual DECLARE_READ8_MEMBER(header_type_r);
+	virtual uint8_t header_type_r();
 	virtual DECLARE_READ8_MEMBER(bist_r);
 	DECLARE_READ32_MEMBER(address_base_r);
 	DECLARE_WRITE32_MEMBER(address_base_w);
@@ -152,7 +152,7 @@ public:
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 	virtual void reset_all_mappings() override;
 
-	virtual DECLARE_READ8_MEMBER(header_type_r) override;
+	virtual uint8_t header_type_r() override;
 
 	virtual void config_map(address_map &map) override;
 

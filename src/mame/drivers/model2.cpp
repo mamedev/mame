@@ -1095,7 +1095,7 @@ void model2_state::lumaram_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 /* Top Skater reads here and discards the result */
-READ8_MEMBER(model2_state::tgpid_r)
+u8 model2_state::tgpid_r(offs_t offset)
 {
 	unsigned char ID[]={0,'T','A','H',0,'A','K','O',0,'Z','A','K',0,'M','T','K'};
 
@@ -1365,7 +1365,7 @@ void model2o_maxx_state::model2o_maxx_mem(address_map &map)
 	map(0x00240000, 0x0024ffff).r(FUNC(model2o_maxx_state::maxx_r));
 }
 
-READ8_MEMBER(model2o_gtx_state::gtx_r)
+u8 model2o_gtx_state::gtx_r(offs_t offset)
 {
 	u8 *ROM = memregion("prot_data")->base();
 

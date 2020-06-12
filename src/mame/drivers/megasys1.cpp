@@ -496,7 +496,7 @@ WRITE_LINE_MEMBER(megasys1_state::sound_irq)
 }
 
 template<int Chip>
-READ8_MEMBER(megasys1_state::oki_status_r)
+u8 megasys1_state::oki_status_r()
 {
 	if (m_ignore_oki_status == 1)
 		return 0;

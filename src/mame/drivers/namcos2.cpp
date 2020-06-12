@@ -621,12 +621,12 @@ void namcos2_state::GollyGhostUpdateDiorama_c0( int data )
 	}
 }
 
-READ16_MEMBER(namcos2_state::dpram_word_r)
+uint16_t namcos2_state::dpram_word_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-WRITE16_MEMBER(namcos2_state::dpram_word_w)
+void namcos2_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{

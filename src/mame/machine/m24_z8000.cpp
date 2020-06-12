@@ -176,12 +176,12 @@ void m24_z8000_device::i86_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_maincpu->space(AS_IO).write_word(offset << 1, data, (mem_mask << 8) | (mem_mask >> 8));
 }
 
-WRITE8_MEMBER(m24_z8000_device::irqctl_w)
+void m24_z8000_device::irqctl_w(uint8_t data)
 {
 	m_irq = data;
 }
 
-WRITE8_MEMBER(m24_z8000_device::serctl_w)
+void m24_z8000_device::serctl_w(uint8_t data)
 {
 	m_z8000_mem = (data & 0x20) ? true : false;
 }
@@ -197,12 +197,12 @@ uint16_t m24_z8000_device::viack_r()
 	return m_pic->acknowledge() << 1;
 }
 
-READ8_MEMBER(m24_z8000_device::handshake_r)
+uint8_t m24_z8000_device::handshake_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(m24_z8000_device::handshake_w)
+void m24_z8000_device::handshake_w(uint8_t data)
 {
 	m_handshake = data;
 	if(data & 1)

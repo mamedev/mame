@@ -3577,7 +3577,7 @@ void mw8080bw_state::tornbase_audio(machine_config &config)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::tornbase_audio_w)
+void mw8080bw_state::tornbase_audio_w(uint8_t data)
 {
 	m_discrete->write(TORNBASE_TONE_240_EN, (data >> 0) & 0x01);
 
@@ -4102,7 +4102,7 @@ void mw8080bw_state::checkmat_audio(machine_config &config)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::checkmat_audio_w)
+void mw8080bw_state::checkmat_audio_w(uint8_t data)
 {
 	m_discrete->write(CHECKMAT_TONE_EN, data & 0x01);
 
@@ -4320,7 +4320,7 @@ void mw8080bw_state::shuffle_audio(machine_config &config)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::shuffle_audio_1_w)
+void mw8080bw_state::shuffle_audio_1_w(uint8_t data)
 {
 	m_discrete->write(SHUFFLE_CLICK_EN, (data >> 0) & 0x01);
 
@@ -4338,7 +4338,7 @@ WRITE8_MEMBER(mw8080bw_state::shuffle_audio_1_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::shuffle_audio_2_w)
+void mw8080bw_state::shuffle_audio_2_w(uint8_t data)
 {
 	m_discrete->write(SHUFFLE_FOUL_EN, (data >> 0) & 0x01);
 
@@ -4437,7 +4437,7 @@ void mw8080bw_state::bowler_audio(machine_config &config)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_audio_1_w)
+void mw8080bw_state::bowler_audio_1_w(uint8_t data)
 {
 	/* D0 - selects controller on the cocktail PCB */
 
@@ -4457,7 +4457,7 @@ WRITE8_MEMBER(mw8080bw_state::bowler_audio_1_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_audio_2_w)
+void mw8080bw_state::bowler_audio_2_w(uint8_t data)
 {
 	/* set BALL ROLLING SOUND FREQ(data & 0x0f)
 	   0, if no rolling, 0x08 used during ball return */
@@ -4471,28 +4471,28 @@ WRITE8_MEMBER(mw8080bw_state::bowler_audio_2_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_audio_3_w)
+void mw8080bw_state::bowler_audio_3_w(uint8_t data)
 {
 	/* regardless of the data, enable BALL HITS PIN 1 sound
 	   (top circuit on the schematics) */
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_audio_4_w)
+void mw8080bw_state::bowler_audio_4_w(uint8_t data)
 {
 	/* regardless of the data, enable BALL HITS PIN 2 sound
 	   (bottom circuit on the schematics) */
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_audio_5_w)
+void mw8080bw_state::bowler_audio_5_w(uint8_t data)
 {
-	/* not sure, appears to me trigerred alongside the two
+	/* not sure, appears to me triggered alongside the two
 	   BALL HITS PIN sounds */
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_audio_6_w)
+void mw8080bw_state::bowler_audio_6_w(uint8_t data)
 {
 	/* D0 is not connected */
 
@@ -4877,7 +4877,7 @@ void mw8080bw_state::blueshrk_audio(machine_config &config)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::blueshrk_audio_w)
+void mw8080bw_state::blueshrk_audio_w(uint8_t data)
 {
 	m_discrete->write(BLUESHRK_GAME_ON_EN, (data >> 0) & 0x01);
 

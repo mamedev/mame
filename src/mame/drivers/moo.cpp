@@ -226,7 +226,7 @@ void moo_state::sound_irq_w(uint16_t data)
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(moo_state::sound_bankswitch_w)
+void moo_state::sound_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_base(memregion("soundcpu")->base() + 0x10000 + (data&0xf)*0x4000);
 }

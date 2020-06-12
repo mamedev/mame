@@ -70,15 +70,15 @@ protected:
 		, m_audionmi(*this, "audionmi")
 	{ }
 
-	DECLARE_READ16_MEMBER(memcard_r);
-	DECLARE_WRITE16_MEMBER(memcard_w);
-	DECLARE_READ8_MEMBER(audio_cpu_bank_select_r);
-	DECLARE_WRITE8_MEMBER(audio_cpu_enable_nmi_w);
-	DECLARE_READ16_MEMBER(unmapped_r);
-	DECLARE_READ16_MEMBER(paletteram_r);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_READ16_MEMBER(video_register_r);
-	DECLARE_WRITE16_MEMBER(video_register_w);
+	uint16_t memcard_r(offs_t offset);
+	void memcard_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t audio_cpu_bank_select_r(offs_t offset);
+	void audio_cpu_enable_nmi_w(offs_t offset, uint8_t data);
+	uint16_t unmapped_r(address_space &space);
+	uint16_t paletteram_r(offs_t offset);
+	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t video_register_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void video_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TIMER_CALLBACK_MEMBER(display_position_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
@@ -87,17 +87,17 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void io_control_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
+	void audio_command_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(set_use_cart_vectors);
 	DECLARE_WRITE_LINE_MEMBER(set_use_cart_audio);
-	DECLARE_READ16_MEMBER(banked_vectors_r);
-	DECLARE_WRITE16_MEMBER(write_banksel);
-	DECLARE_WRITE16_MEMBER(write_bankprot);
-	DECLARE_WRITE16_MEMBER(write_bankprot_pvc);
-	DECLARE_WRITE16_MEMBER(write_bankprot_ms5p);
-	DECLARE_WRITE16_MEMBER(write_bankprot_kf2k3bl);
-	DECLARE_WRITE16_MEMBER(write_bankprot_kof10th);
-	DECLARE_READ16_MEMBER(read_lorom_kof10th);
+	uint16_t banked_vectors_r(offs_t offset);
+	void write_banksel(uint16_t data);
+	void write_bankprot(uint16_t data);
+	void write_bankprot_pvc(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void write_bankprot_ms5p(offs_t offset, uint16_t data);
+	void write_bankprot_kf2k3bl(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void write_bankprot_kof10th(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t read_lorom_kof10th(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER(set_screen_shadow);
 	DECLARE_WRITE_LINE_MEMBER(set_palette_bank);
@@ -229,11 +229,11 @@ protected:
 
 	virtual void io_control_w(offs_t offset, uint8_t data) override;
 	DECLARE_WRITE_LINE_MEMBER(set_save_ram_unlock);
-	DECLARE_WRITE16_MEMBER(save_ram_w);
-	DECLARE_READ16_MEMBER(in0_edge_r);
-	DECLARE_READ16_MEMBER(in0_edge_joy_r);
-	DECLARE_READ16_MEMBER(in1_edge_r);
-	DECLARE_READ16_MEMBER(in1_edge_joy_r);
+	void save_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t in0_edge_r();
+	uint16_t in0_edge_joy_r();
+	uint16_t in1_edge_r();
+	uint16_t in1_edge_joy_r();
 
 	void neogeo_arcade(machine_config &config);
 	void neogeo_mono(machine_config &config);
@@ -261,7 +261,7 @@ protected:
 	{
 	}
 
-	DECLARE_READ16_MEMBER(aes_in2_r);
+	uint16_t aes_in2_r();
 
 	virtual void machine_start() override;
 

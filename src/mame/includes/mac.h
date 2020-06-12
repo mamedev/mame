@@ -419,10 +419,10 @@ private:
 	uint32_t rbv_ramdac_r();
 	void rbv_ramdac_w(offs_t offset, uint32_t data);
 	void ariel_ramdac_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_READ8_MEMBER( mac_sonora_vctl_r );
-	DECLARE_WRITE8_MEMBER( mac_sonora_vctl_w );
-	DECLARE_READ8_MEMBER ( mac_rbv_r );
-	DECLARE_WRITE8_MEMBER ( mac_rbv_w );
+	uint8_t mac_sonora_vctl_r(offs_t offset);
+	void mac_sonora_vctl_w(offs_t offset, uint8_t data);
+	uint8_t mac_rbv_r(offs_t offset);
+	void mac_rbv_w(offs_t offset, uint8_t data);
 
 	uint32_t mac_read_id();
 
@@ -430,25 +430,25 @@ private:
 
 	uint32_t biu_r(offs_t offset, uint32_t mem_mask = ~0);
 	void biu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_READ8_MEMBER(oss_r);
-	DECLARE_WRITE8_MEMBER(oss_w);
+	uint8_t oss_r(offs_t offset);
+	void oss_w(offs_t offset, uint8_t data);
 	uint32_t buserror_r();
-	DECLARE_READ8_MEMBER(swimiop_r);
-	DECLARE_WRITE8_MEMBER(swimiop_w);
-	DECLARE_READ8_MEMBER(scciop_r);
-	DECLARE_WRITE8_MEMBER(scciop_w);
+	uint8_t swimiop_r(offs_t offset);
+	void swimiop_w(offs_t offset, uint8_t data);
+	uint8_t scciop_r(offs_t offset);
+	void scciop_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(hmc_r);
-	DECLARE_WRITE8_MEMBER(hmc_w);
-	DECLARE_READ8_MEMBER(amic_dma_r);
-	DECLARE_WRITE8_MEMBER(amic_dma_w);
-	DECLARE_READ8_MEMBER(pmac_diag_r);
+	uint8_t hmc_r();
+	void hmc_w(offs_t offset, uint8_t data);
+	uint8_t amic_dma_r();
+	void amic_dma_w(offs_t offset, uint8_t data);
+	uint8_t pmac_diag_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER(mac_gsc_r);
-	DECLARE_WRITE8_MEMBER(mac_gsc_w);
+	uint8_t mac_gsc_r(offs_t offset);
+	void mac_gsc_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(mac_5396_r);
-	DECLARE_WRITE8_MEMBER(mac_5396_w);
+	uint8_t mac_5396_r(offs_t offset);
+	void mac_5396_w(offs_t offset, uint8_t data);
 
 	uint32_t dafb_r(offs_t offset, uint32_t mem_mask = ~0);
 	void dafb_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

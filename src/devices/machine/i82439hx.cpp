@@ -163,7 +163,7 @@ void i82439hx_host_device::map_extra(uint64_t memory_window_start, uint64_t memo
 }
 
 
-READ8_MEMBER (i82439hx_host_device::header_type_r)
+uint8_t i82439hx_host_device::header_type_r()
 {
 	return 0x00; // from datasheet
 }

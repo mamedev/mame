@@ -549,7 +549,7 @@ void mystwarr_state::gaiapols_map(address_map &map)
 
 /**********************************************************************************/
 
-WRITE8_MEMBER(mystwarr_state::sound_ctrl_w)
+void mystwarr_state::sound_ctrl_w(uint8_t data)
 {
 	if (!(data & 0x10))
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);

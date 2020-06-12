@@ -296,8 +296,8 @@ private:
 	uint64_t model3_rtc_r(offs_t offset, uint64_t mem_mask = ~0);
 	void model3_rtc_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t real3d_status_r(offs_t offset);
-	DECLARE_READ8_MEMBER(model3_sound_r);
-	DECLARE_WRITE8_MEMBER(model3_sound_w);
+	uint8_t model3_sound_r(offs_t offset);
+	void model3_sound_w(offs_t offset, uint8_t data);
 
 	void daytona2_rombank_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void model3snd_ctrl(uint16_t data);

@@ -259,18 +259,18 @@ protected:
 		return 0;
 	}
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(bankswitch_r);
-	DECLARE_WRITE8_MEMBER(bankset_w);
-	DECLARE_WRITE8_MEMBER(characteriser_w);
-	DECLARE_READ8_MEMBER(characteriser_r);
-	DECLARE_WRITE8_MEMBER(bwb_characteriser_w);
-	DECLARE_READ8_MEMBER(bwb_characteriser_r);
-	DECLARE_WRITE8_MEMBER(mpu4_ym2413_w);
-	DECLARE_READ8_MEMBER(mpu4_ym2413_r);
-	DECLARE_READ8_MEMBER(crystal_sound_r);
-	DECLARE_WRITE8_MEMBER(crystal_sound_w);
-	DECLARE_WRITE8_MEMBER(ic3ss_w);
+	void bankswitch_w(uint8_t data);
+	uint8_t bankswitch_r();
+	void bankset_w(uint8_t data);
+	void characteriser_w(offs_t offset, uint8_t data);
+	uint8_t characteriser_r(address_space &space, offs_t offset);
+	void bwb_characteriser_w(offs_t offset, uint8_t data);
+	uint8_t bwb_characteriser_r(offs_t offset);
+	void mpu4_ym2413_w(offs_t offset, uint8_t data);
+	uint8_t mpu4_ym2413_r(offs_t offset);
+	uint8_t crystal_sound_r();
+	void crystal_sound_w(uint8_t data);
+	void ic3ss_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o2_callback);

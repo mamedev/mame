@@ -358,7 +358,7 @@ void namcos1_state::mcu_irq_ack_w(u8 data)
 }
 
 
-READ8_MEMBER(namcos1_state::dsw_r)
+u8 namcos1_state::dsw_r(offs_t offset)
 {
 	// 7654----  not used
 	// ----3---  ls257 dsw selector 1y

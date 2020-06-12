@@ -61,9 +61,9 @@ private:
 	required_shared_ptr<uint8_t> m_paletteram;
 	required_shared_ptr<uint8_t> m_scroll;
 	required_shared_ptr<uint8_t> m_video_control;
-	DECLARE_WRITE8_MEMBER(irq_clear_w);
-	DECLARE_WRITE8_MEMBER(mystston_ay8910_select_w);
-	DECLARE_WRITE8_MEMBER(mystston_video_control_w);
+	void irq_clear_w(uint8_t data);
+	void mystston_ay8910_select_w(uint8_t data);
+	void mystston_video_control_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update_mystston(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

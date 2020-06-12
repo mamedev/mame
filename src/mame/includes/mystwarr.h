@@ -65,7 +65,7 @@ private:
 	void mceeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t mccontrol_r();
 	void mccontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE8_MEMBER(sound_ctrl_w);
+	void sound_ctrl_w(uint8_t data);
 
 	void ddd_053936_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void ddd_053936_clip_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

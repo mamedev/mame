@@ -37,10 +37,10 @@ public:
 	void ondra(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(ondra_keyboard_r);
-	DECLARE_WRITE8_MEMBER(ondra_port_03_w);
-	DECLARE_WRITE8_MEMBER(ondra_port_09_w);
-	DECLARE_WRITE8_MEMBER(ondra_port_0a_w);
+	uint8_t ondra_keyboard_r(offs_t offset);
+	void ondra_port_03_w(uint8_t data);
+	void ondra_port_09_w(uint8_t data);
+	void ondra_port_0a_w(uint8_t data);
 	uint32_t screen_update_ondra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(nmi_check_callback);

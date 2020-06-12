@@ -47,12 +47,12 @@ private:
 	/* misc */
 	int            m_prot_val;
 
-	DECLARE_WRITE8_MEMBER(protection_w);
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_WRITE8_MEMBER(gfire2_protection_w);
-	DECLARE_READ8_MEMBER(gfire2_protection_r);
-	DECLARE_WRITE8_MEMBER(fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(bgvideoram_w);
+	void protection_w(uint8_t data);
+	uint8_t protection_r();
+	void gfire2_protection_w(uint8_t data);
+	uint8_t gfire2_protection_r();
+	void fgvideoram_w(offs_t offset, uint8_t data);
+	void bgvideoram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

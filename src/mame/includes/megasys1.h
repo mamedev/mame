@@ -169,7 +169,7 @@ private:
 	void monkelf_scroll0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void monkelf_scroll1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void megasys1_set_vreg_flag(int which, int data);
-	template<int Chip> DECLARE_READ8_MEMBER(oki_status_r);
+	template<int Chip> u8 oki_status_r();
 	void ram_w(offs_t offset, u16 data);
 	void p47b_adpcm_w(offs_t offset, u8 data);
 

@@ -79,8 +79,8 @@ protected:
 	optional_ioport m_DIPS;
 	m5_cart_slot_device *m_cart_ram, *m_cart;
 
-	DECLARE_READ8_MEMBER( sts_r );
-	DECLARE_WRITE8_MEMBER( com_w );
+	uint8_t sts_r();
+	void com_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -91,22 +91,22 @@ private:
 	uint8_t ppi_pc_r();
 	void ppi_pc_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( fd5_data_r );
-	DECLARE_WRITE8_MEMBER( fd5_data_w );
-	DECLARE_READ8_MEMBER( fd5_com_r );
-	DECLARE_WRITE8_MEMBER( fd5_com_w );
-	DECLARE_WRITE8_MEMBER( fd5_ctrl_w );
-	DECLARE_WRITE8_MEMBER( fd5_tc_w );
+	uint8_t fd5_data_r();
+	void fd5_data_w(uint8_t data);
+	uint8_t fd5_com_r();
+	void fd5_com_w(uint8_t data);
+	void fd5_ctrl_w(uint8_t data);
+	void fd5_tc_w(uint8_t data);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
 	// memory
-	DECLARE_READ8_MEMBER( mem64KBI_r );
-	DECLARE_WRITE8_MEMBER( mem64KBI_w );
-	DECLARE_WRITE8_MEMBER( mem64KBF_w );
-	DECLARE_WRITE8_MEMBER( mem64KRX_w );
+	uint8_t mem64KBI_r();
+	void mem64KBI_w(offs_t offset, uint8_t data);
+	void mem64KBF_w(uint8_t data);
+	void mem64KRX_w(offs_t offset, uint8_t data);
 
 	void fd5_io(address_map &map);
 	void fd5_mem(address_map &map);
@@ -147,15 +147,15 @@ public:
 	void init_brno();
 
 private:
-	DECLARE_READ8_MEMBER(mmu_r);
-	DECLARE_WRITE8_MEMBER(mmu_w);
-	DECLARE_READ8_MEMBER(ramsel_r);
-	DECLARE_WRITE8_MEMBER(ramsel_w);
-	DECLARE_READ8_MEMBER(romsel_r);
-	DECLARE_WRITE8_MEMBER(romsel_w);
+	uint8_t mmu_r();
+	void mmu_w(uint8_t data);
+	uint8_t ramsel_r();
+	void ramsel_w(uint8_t data);
+	uint8_t romsel_r();
+	void romsel_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(fd_r);
-	DECLARE_WRITE8_MEMBER(fd_w);
+	uint8_t fd_r();
+	void fd_w(uint8_t data);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 

@@ -45,15 +45,15 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t      m_irq_mask;
-	DECLARE_READ8_MEMBER(mikie_sh_timer_r);
+	uint8_t m_irq_mask;
+	uint8_t mikie_sh_timer_r();
 	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(mikie_videoram_w);
-	DECLARE_WRITE8_MEMBER(mikie_colorram_w);
-	DECLARE_WRITE8_MEMBER(mikie_palettebank_w);
+	void mikie_videoram_w(offs_t offset, uint8_t data);
+	void mikie_colorram_w(offs_t offset, uint8_t data);
+	void mikie_palettebank_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;

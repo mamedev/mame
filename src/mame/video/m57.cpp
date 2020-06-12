@@ -123,7 +123,7 @@ TILE_GET_INFO_MEMBER(m57_state::get_tile_info)
  *
  *************************************/
 
-WRITE8_MEMBER(m57_state::m57_videoram_w)
+void m57_state::m57_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -151,7 +151,7 @@ void m57_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(m57_state::m57_flipscreen_w)
+void m57_state::m57_flipscreen_w(uint8_t data)
 {
 	/* screen flip is handled both by software and hardware */
 	m_flipscreen = (data & 0x01) ^ (~ioport("DSW2")->read() & 0x01);

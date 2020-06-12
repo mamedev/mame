@@ -205,7 +205,7 @@ protected:
 	void fbvram_bankB_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void model2_3d_zclip_w(u32 data);
 	void model2snd_ctrl(u16 data);
-	DECLARE_READ8_MEMBER(tgpid_r);
+	u8 tgpid_r(offs_t offset);
 	u32 polygon_count_r();
 
 	u8 driveio_portg_r();
@@ -434,7 +434,7 @@ public:
 		: model2o_state(mconfig, type, tag)
 	{}
 
-	DECLARE_READ8_MEMBER(gtx_r);
+	u8 gtx_r(offs_t offset);
 	void daytona_gtx(machine_config &config);
 	void model2o_gtx_mem(address_map &map);
 

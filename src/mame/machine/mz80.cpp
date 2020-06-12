@@ -75,12 +75,12 @@ WRITE_LINE_MEMBER( mz80_state::pit_out2_changed )
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER( mz80_state::mz80k_strobe_r )
+uint8_t mz80_state::mz80k_strobe_r()
 {
 	return 0x7e | (uint8_t)m_mz80k_tempo_strobe;
 }
 
-WRITE8_MEMBER( mz80_state::mz80k_strobe_w )
+void mz80_state::mz80k_strobe_w(uint8_t data)
 {
 	m_pit->write_gate0(BIT(data, 0));
 }

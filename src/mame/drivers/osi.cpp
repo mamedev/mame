@@ -270,7 +270,7 @@ DISCRETE_SOUND_END
 
 /* Keyboard */
 
-READ8_MEMBER( sb2m600_state::keyboard_r )
+uint8_t sb2m600_state::keyboard_r()
 {
 	if (m_io_reset->read())
 		m_maincpu->reset();
@@ -284,7 +284,7 @@ READ8_MEMBER( sb2m600_state::keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( sb2m600_state::keyboard_w )
+void sb2m600_state::keyboard_w(uint8_t data)
 {
 	m_keylatch = data;
 
@@ -292,12 +292,12 @@ WRITE8_MEMBER( sb2m600_state::keyboard_w )
 		m_discrete->write(NODE_01, (data >> 2) & 0x0f);
 }
 
-WRITE8_MEMBER( uk101_state::keyboard_w )
+void uk101_state::keyboard_w(uint8_t data)
 {
 	m_keylatch = data;
 }
 
-WRITE8_MEMBER( sb2m600_state::ctrl_w )
+void sb2m600_state::ctrl_w(uint8_t data)
 {
 	/*
 
@@ -320,7 +320,7 @@ WRITE8_MEMBER( sb2m600_state::ctrl_w )
 	m_discrete->write(NODE_10, BIT(data, 4));
 }
 
-WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
+void c1p_state::osi630_ctrl_w(uint8_t data)
 {
 	/*
 
@@ -340,7 +340,7 @@ WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
 	m_beeper->set_state(BIT(data, 1));
 }
 
-WRITE8_MEMBER( c1p_state::osi630_sound_w )
+void c1p_state::osi630_sound_w(uint8_t data)
 {
 	if (data != 0)
 		m_beeper->set_clock(49152 / data);

@@ -164,8 +164,8 @@ void i82371sb_device::map_busmaster_dma()
 {
 	if (m_base != 0)
 	{
-		spaceio->install_readwrite_handler(m_base, m_base + 0x7, read32_delegate(*m_ide, FUNC(bus_master_ide_controller_device::bmdma_r)), write32_delegate(*m_ide, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
-		spaceio->install_readwrite_handler(m_base + 0x8, m_base + 0xf, read32_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_r)), write32_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
+		spaceio->install_readwrite_handler(m_base, m_base + 0x7, read32s_delegate(*m_ide, FUNC(bus_master_ide_controller_device::bmdma_r)), write32s_delegate(*m_ide, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
+		spaceio->install_readwrite_handler(m_base + 0x8, m_base + 0xf, read32s_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_r)), write32s_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
 	}
 }
 

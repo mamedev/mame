@@ -97,9 +97,6 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-
 	void bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
@@ -209,7 +206,7 @@ private:
 	// Machine
 	void irq_raise(int level);
 	void irq_init();
-	DECLARE_WRITE8_MEMBER(irq_control_w);
+	void irq_control_w(u8 data);
 
 	uint8_t m_irq_status;
 	int m_last_irq;
@@ -342,7 +339,7 @@ private:
 	// I/O related
 	output_finder<2> m_digits;
 	output_finder<8> m_outs;
-	DECLARE_READ8_MEMBER(dpram_r);
+	u8 dpram_r(offs_t offset);
 	void gen_outputs_w(uint8_t data);
 	void vf_outputs_w(uint8_t data);
 	void vr_outputs_w(uint8_t data);

@@ -39,8 +39,8 @@ public:
 	void init_mz80k();
 
 private:
-	DECLARE_READ8_MEMBER(mz80k_strobe_r);
-	DECLARE_WRITE8_MEMBER(mz80k_strobe_w);
+	uint8_t mz80k_strobe_r();
+	void mz80k_strobe_w(uint8_t data);
 	uint8_t mz80k_8255_portb_r();
 	uint8_t mz80k_8255_portc_r();
 	void mz80k_8255_porta_w(uint8_t data);

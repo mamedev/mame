@@ -62,7 +62,7 @@ private:
 	bitmap_ind16 m_bitmap;
 
 	void cpu_irq_ack_w(uint16_t data);
-	DECLARE_READ8_MEMBER(sound_r);
+	uint8_t sound_r();
 	void vreg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void ay8910_portB_0_w(uint8_t data);
 	void ay8910_portA_0_w(uint8_t data);

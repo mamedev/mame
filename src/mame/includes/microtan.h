@@ -53,8 +53,8 @@ public:
 	void init_microtan();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
-	DECLARE_READ8_MEMBER(bffx_r);
-	DECLARE_WRITE8_MEMBER(bffx_w);
+	uint8_t bffx_r(offs_t offset);
+	void bffx_w(offs_t offset, uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 
 protected:
@@ -94,9 +94,9 @@ private:
 	std::unique_ptr<uint8_t[]> m_chunky_buffer;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	uint8_t sound_r();
+	void sound_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void pgm_chargen_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -128,7 +128,7 @@ protected:
 	virtual void store_key(int key) override;
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_r);
+	uint8_t keyboard_r();
 
 	void mt6809_map(address_map &map);
 };

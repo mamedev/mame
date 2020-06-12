@@ -74,13 +74,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 
 /*****************************************************************************/
 
-WRITE8_MEMBER(m107_state::coincounter_w)
+void m107_state::coincounter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 }
 
-WRITE8_MEMBER(m107_state::bankswitch_w)
+void m107_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry((data & 0x06) >> 1);
 	if (data & 0xf9)

@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(m10_state::get_tile_info)
 }
 
 
-WRITE8_MEMBER(m10_state::m10_colorram_w)
+void m10_state::m10_colorram_w(offs_t offset, uint8_t data)
 {
 	if (m_colorram[offset] != data)
 	{
@@ -66,7 +66,7 @@ WRITE8_MEMBER(m10_state::m10_colorram_w)
 }
 
 
-WRITE8_MEMBER(m10_state::m10_chargen_w)
+void m10_state::m10_chargen_w(offs_t offset, uint8_t data)
 {
 	if (m_chargen[offset] != data)
 	{
@@ -76,7 +76,7 @@ WRITE8_MEMBER(m10_state::m10_chargen_w)
 }
 
 
-WRITE8_MEMBER(m10_state::m15_chargen_w)
+void m10_state::m15_chargen_w(offs_t offset, uint8_t data)
 {
 	if (m_chargen[offset] != data)
 	{

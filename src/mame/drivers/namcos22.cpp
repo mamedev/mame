@@ -1086,7 +1086,7 @@ Notes:
 // Main CPU
 
 /* SCI, prelim! */
-READ32_MEMBER(namcos22_state::namcos22_sci_r)
+u32 namcos22_state::namcos22_sci_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1098,7 +1098,7 @@ READ32_MEMBER(namcos22_state::namcos22_sci_r)
 	}
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22_sci_w)
+void namcos22_state::namcos22_sci_w(u32 data)
 {
 	/*
 	20020000  2 R/W RX Status
@@ -1575,7 +1575,7 @@ void namcos22_state::namcos22_keycus_w(offs_t offset, u16 data, u16 mem_mask)
  * Writes to 0x50000008 and 0x5000000a reset the state of the input buffer.
  * It appears to be meant for debugging, not all games use it.
  */
-READ16_MEMBER(namcos22_state::namcos22_portbit_r)
+u16 namcos22_state::namcos22_portbit_r(offs_t offset)
 {
 	u16 ret = m_portbits[offset] & 1;
 
@@ -1585,7 +1585,7 @@ READ16_MEMBER(namcos22_state::namcos22_portbit_r)
 	return ret;
 }
 
-WRITE16_MEMBER(namcos22_state::namcos22_portbit_w)
+void namcos22_state::namcos22_portbit_w(offs_t offset, u16 data)
 {
 	m_portbits[offset] = m_custom[offset].read_safe(0xffff);
 }
@@ -1600,7 +1600,7 @@ void namcos22_state::namcos22_cpuleds_w(offs_t offset, u32 data, u32 mem_mask)
 		m_cpuled_out[i] = (~data << i & 0x800000) ? 0 : 1;
 }
 
-WRITE32_MEMBER(namcos22s_state::namcos22s_chipselect_w)
+void namcos22s_state::namcos22s_chipselect_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// assume that this register is for chip enable/disable
 	// it's written many times during boot-up, and most games don't touch it afterwards (last value usually 0038 or 0838)
@@ -1853,7 +1853,7 @@ void namcos22s_state::namcos22s_am(address_map &map)
 
 
 // Time Crisis gun
-READ16_MEMBER(namcos22s_state::timecris_gun_r)
+u16 namcos22s_state::timecris_gun_r(offs_t offset)
 {
 	u16 xpos = m_opt[0]->read();
 	u16 ypos = m_opt[1]->read();
@@ -1890,12 +1890,12 @@ void namcos22s_state::timecris_am(address_map &map)
 
 
 // Alpine Surfer protection
-READ32_MEMBER(namcos22s_state::alpinesa_prot_r)
+u32 namcos22s_state::alpinesa_prot_r()
 {
 	return m_alpinesa_protection;
 }
 
-WRITE32_MEMBER(namcos22s_state::alpinesa_prot_w)
+void namcos22s_state::alpinesa_prot_w(u32 data)
 {
 	switch (data)
 	{
@@ -2235,7 +2235,7 @@ void namcos22_state::dsp_xf_output_w(u16 data)
 	/* STUB */
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_unk2_w)
+void namcos22_state::dsp_unk2_w(u16 data)
 {
 	/**
 	* Used by Ridge Racer (Japan) to specify baseaddr
@@ -2247,14 +2247,14 @@ WRITE16_MEMBER(namcos22_state::dsp_unk2_w)
 	m_pdp_base = data;
 }
 
-READ16_MEMBER(namcos22_state::dsp_unk_port3_r)
+u16 namcos22_state::dsp_unk_port3_r()
 {
 	m_dsp_master_bioz = 0;
 	m_dsp_upload_state = NAMCOS22_DSP_UPLOAD_READY;
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
+void namcos22_state::upload_code_to_slave_dsp_w(u16 data)
 {
 	switch (m_dsp_upload_state)
 	{
@@ -2308,19 +2308,19 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 	}
 }
 
-READ16_MEMBER(namcos22_state::dsp_unk8_r)
+u16 namcos22_state::dsp_unk8_r()
 {
 	/* bit 0x0001 is busy signal */
 	return 0x0000;
 }
 
-READ16_MEMBER(namcos22_state::custom_ic_status_r)
+u16 namcos22_state::custom_ic_status_r()
 {
 	/* bit 0x0001 signals completion */
 	return 0x0063;
 }
 
-READ16_MEMBER(namcos22_state::dsp_upload_status_r)
+u16 namcos22_state::dsp_upload_status_r()
 {
 	/* bit 0x0001 is polled to confirm that code/data has been successfully uploaded to the slave dsp via port 0x7. */
 	return 0x0000;
@@ -2357,11 +2357,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_serial_pulse)
 	}
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_unk_porta_w)
+void namcos22_state::dsp_unk_porta_w(u16 data)
 {
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_led_w)
+void namcos22_state::dsp_led_w(u16 data)
 {
 	/* I believe this port controls diagnostic LEDs on the DSP PCB. */
 }
@@ -2402,13 +2402,13 @@ WRITE16_MEMBER(namcos22_state::dsp_led_w)
  * 0x0075 0xf205 // sx,sy
  * 0x602b 0x93e8 // i,zpos
  */
-WRITE16_MEMBER(namcos22_state::dsp_unk8_w)
+void namcos22_state::dsp_unk8_w(u16 data)
 {
 	m_RenderBufSize = 0;
 	m_render_refresh = true; // this one is more likely controlled by slavedsp somewhere
 }
 
-WRITE16_MEMBER(namcos22_state::master_render_device_w)
+void namcos22_state::master_render_device_w(u16 data)
 {
 	if (m_RenderBufSize < NAMCOS22_MAX_RENDER_CMD_SEQ)
 	{
@@ -2458,18 +2458,18 @@ u16 namcos22_state::dsp_slave_bioz_r()
 	return 1;
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port3_r)
+u16 namcos22_state::dsp_slave_port3_r()
 {
 	return 0x0010; /* ? */
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port4_r)
+u16 namcos22_state::dsp_slave_port4_r()
 {
 	return 0;
 	//return ReadDataFromSlaveBuf();
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port5_r)
+u16 namcos22_state::dsp_slave_port5_r()
 {
 #if 0
 	int numWords = SlaveBufSize();
@@ -2479,32 +2479,32 @@ READ16_MEMBER(namcos22_state::dsp_slave_port5_r)
 	return 0;
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port6_r)
+u16 namcos22_state::dsp_slave_port6_r()
 {
 	/* bit 0x9 indicates whether device at port2 is ready to receive data */
 	/* bit 0xd indicates whether data is available from port4 */
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_slave_portc_w)
+void namcos22_state::dsp_slave_portc_w(u16 data)
 {
 	/* Unknown; used before transmitting a command sequence. */
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port8_r)
+u16 namcos22_state::dsp_slave_port8_r()
 {
 	/* This reports  status of the device mapped at port 0xb. */
 	/* The slave dsp waits for bit 0x0001 to be zero before writing a new command sequence. */
 	return 0; /* status */
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_portb_r)
+u16 namcos22_state::dsp_slave_portb_r()
 {
 	/* The slave DSP reads before transmitting a command sequence. */
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_slave_portb_w)
+void namcos22_state::dsp_slave_portb_w(u16 data)
 {
 	/* The slave dsp uses this to transmit a command sequence to an external device. */
 }
@@ -5497,7 +5497,7 @@ ROM_END
 // MCU speed cheats (every bit helps with these games)
 
 // for MCU BIOS v1.41
-READ16_MEMBER(namcos22s_state::mcu141_speedup_r)
+u16 namcos22s_state::mcu141_speedup_r()
 {
 	if ((m_mcu->pc() == 0xc12d) && (!(m_su_82 & 0xff00)))
 	{
@@ -5507,13 +5507,13 @@ READ16_MEMBER(namcos22s_state::mcu141_speedup_r)
 	return m_su_82;
 }
 
-WRITE16_MEMBER(namcos22_state::mcu_speedup_w)
+void namcos22_state::mcu_speedup_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_su_82);
 }
 
 // for MCU BIOS v1.20/v1.30
-READ16_MEMBER(namcos22s_state::mcu130_speedup_r)
+u16 namcos22s_state::mcu130_speedup_r()
 {
 	if ((m_mcu->pc() == 0xc12a) && (!(m_su_82 & 0xff00)))
 	{
@@ -5524,7 +5524,7 @@ READ16_MEMBER(namcos22s_state::mcu130_speedup_r)
 }
 
 // for NSTX7702 v1.00 (C74)
-READ16_MEMBER(namcos22_state::mcuc74_speedup_r)
+u16 namcos22_state::mcuc74_speedup_r()
 {
 	if (((m_mcu->pc() == 0xc0df) || (m_mcu->pc() == 0xc101)) && (!(m_su_82 & 0xff00)))
 	{
@@ -5537,21 +5537,30 @@ READ16_MEMBER(namcos22_state::mcuc74_speedup_r)
 void namcos22_state::install_c74_speedup()
 {
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x80, 0x81, read16_delegate(*this, FUNC(namcos22_state::mcuc74_speedup_r)), write16_delegate(*this, FUNC(namcos22_state::mcu_speedup_w)));
+	{
+		m_mcu->space(AS_PROGRAM).install_read_handler(0x80, 0x81, read16smo_delegate(*this, FUNC(namcos22_state::mcuc74_speedup_r)));
+		m_mcu->space(AS_PROGRAM).install_write_handler(0x80, 0x81, write16s_delegate(*this, FUNC(namcos22_state::mcu_speedup_w)));
+	}
 }
 
 void namcos22s_state::install_130_speedup()
 {
 	// install speedup cheat for 1.20/1.30 MCU BIOS
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(*this, FUNC(namcos22s_state::mcu130_speedup_r)), write16_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
+	{
+		m_mcu->space(AS_PROGRAM).install_read_handler(0x82, 0x83, read16smo_delegate(*this, FUNC(namcos22s_state::mcu130_speedup_r)));
+		m_mcu->space(AS_PROGRAM).install_write_handler(0x82, 0x83, write16s_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
+	}
 }
 
 void namcos22s_state::install_141_speedup()
 {
 	// install speedup cheat for 1.41 MCU BIOS
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(*this, FUNC(namcos22s_state::mcu141_speedup_r)), write16_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
+	{
+		m_mcu->space(AS_PROGRAM).install_read_handler(0x82, 0x83, read16smo_delegate(*this, FUNC(namcos22s_state::mcu141_speedup_r)));
+		m_mcu->space(AS_PROGRAM).install_write_handler(0x82, 0x83, write16s_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
+	}
 }
 
 

@@ -182,7 +182,7 @@ void macpci_state::mac_scc_2_w(offs_t offset, uint16_t data)
 	m_scc->reg_w(offset, data >> 8);
 }
 
-READ8_MEMBER(macpci_state::mac_5396_r)
+uint8_t macpci_state::mac_5396_r(offs_t offset)
 {
 	if (offset < 0x100)
 	{
@@ -197,7 +197,7 @@ READ8_MEMBER(macpci_state::mac_5396_r)
 	//return 0;
 }
 
-WRITE8_MEMBER(macpci_state::mac_5396_w)
+void macpci_state::mac_5396_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x100)
 	{

@@ -57,13 +57,13 @@ int nitedrvr_state::nitedrvr_steering(  )
 nitedrvr_steering_reset
 ***************************************************************************/
 
-READ8_MEMBER(nitedrvr_state::nitedrvr_steering_reset_r)
+uint8_t nitedrvr_state::nitedrvr_steering_reset_r()
 {
 	m_steering_val = 0;
 	return 0;
 }
 
-WRITE8_MEMBER(nitedrvr_state::nitedrvr_steering_reset_w)
+void nitedrvr_state::nitedrvr_steering_reset_w(uint8_t data)
 {
 	m_steering_val = 0;
 }
@@ -97,7 +97,7 @@ Night Driver looks for the following:
 Fill in the steering and gear bits in a special way.
 ***************************************************************************/
 
-READ8_MEMBER(nitedrvr_state::nitedrvr_in0_r)
+uint8_t nitedrvr_state::nitedrvr_in0_r(offs_t offset)
 {
 	int gear = ioport("GEARS")->read();
 
@@ -160,7 +160,7 @@ Night Driver looks for the following:
 Fill in the track difficulty switch and special signal in a special way.
 ***************************************************************************/
 
-READ8_MEMBER(nitedrvr_state::nitedrvr_in1_r)
+uint8_t nitedrvr_state::nitedrvr_in1_r(offs_t offset)
 {
 	int port = ioport("IN0")->read();
 
@@ -207,7 +207,7 @@ D4 = SKID1
 D5 = SKID2
 ***************************************************************************/
 
-WRITE8_MEMBER(nitedrvr_state::nitedrvr_out0_w)
+void nitedrvr_state::nitedrvr_out0_w(uint8_t data)
 {
 	m_discrete->write(NITEDRVR_MOTOR_DATA, data & 0x0f);  // Motor freq data
 	m_discrete->write(NITEDRVR_SKID1_EN, data & 0x10);    // Skid1 enable
@@ -225,7 +225,7 @@ D4 = LED START
 D5 = Spare (Not used)
 ***************************************************************************/
 
-WRITE8_MEMBER(nitedrvr_state::nitedrvr_out1_w)
+void nitedrvr_state::nitedrvr_out1_w(uint8_t data)
 {
 	m_led = BIT(data, 4);
 

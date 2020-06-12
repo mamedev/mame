@@ -73,7 +73,7 @@ class naomi_state : public dc_state
 	DECLARE_CUSTOM_INPUT_MEMBER(naomi_kb_r);
 	DECLARE_INPUT_CHANGED_MEMBER(naomi_mp_w);
 
-	DECLARE_READ64_MEMBER( naomi2_biose_idle_skip_r );
+	uint64_t naomi2_biose_idle_skip_r();
 
 protected:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -83,22 +83,22 @@ protected:
 	DECLARE_MACHINE_RESET(naomi);
 	DECLARE_WRITE_LINE_MEMBER(external_reset);
 
-	DECLARE_READ16_MEMBER( naomi_g2bus_r );
-	DECLARE_READ64_MEMBER( eeprom_93c46a_r );
-	DECLARE_WRITE64_MEMBER( eeprom_93c46a_w );
+	uint16_t naomi_g2bus_r(offs_t offset);
+	uint64_t eeprom_93c46a_r();
+	void eeprom_93c46a_w(uint64_t data);
 
 	uint8_t m_mp_mux;
 
 	uint8_t asciihex_to_dec(uint8_t in);
 	void create_pic_from_retdat();
 
-	DECLARE_READ64_MEMBER( naomi_biose_idle_skip_r );
-	DECLARE_READ64_MEMBER( naomi_biosh_idle_skip_r );
-	DECLARE_READ64_MEMBER( naomigd_ggxxsla_idle_skip_r );
-	DECLARE_READ64_MEMBER( naomigd_ggxx_idle_skip_r );
-	DECLARE_READ64_MEMBER( naomigd_ggxxrl_idle_skip_r );
-	DECLARE_READ64_MEMBER( naomigd_sfz3ugd_idle_skip_r );
-	DECLARE_READ64_MEMBER( hotd2_idle_skip_r );
+	uint64_t naomi_biose_idle_skip_r();
+	uint64_t naomi_biosh_idle_skip_r();
+	uint64_t naomigd_ggxxsla_idle_skip_r();
+	uint64_t naomigd_ggxx_idle_skip_r();
+	uint64_t naomigd_ggxxrl_idle_skip_r();
+	uint64_t naomigd_sfz3ugd_idle_skip_r();
+	uint64_t hotd2_idle_skip_r();
 
 	void naomi_map(address_map &map);
 	void naomi_port(address_map &map);
@@ -129,7 +129,7 @@ private:
 	required_shared_ptr<uint64_t> m_elan_ram;
 	required_device<powervr2_device> m_powervr2_slave;
 
-	DECLARE_WRITE32_MEMBER(both_pvr2_ta_w);
+	void both_pvr2_ta_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void naomi2_map(address_map &map);
 };
 
@@ -151,12 +151,12 @@ public:
 private:
 	required_device<macronix_29l001mc_device> m_awflash;
 
-	DECLARE_READ64_MEMBER( aw_flash_r );
-	DECLARE_WRITE64_MEMBER( aw_flash_w );
-	DECLARE_READ64_MEMBER( aw_modem_r );
-	DECLARE_WRITE64_MEMBER( aw_modem_w );
+	uint64_t aw_flash_r(offs_t offset);
+	void aw_flash_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t aw_modem_r(offs_t offset, uint64_t mem_mask = ~0);
+	void aw_modem_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
-	DECLARE_READ64_MEMBER( xtrmhnt2_hack_r );
+	uint64_t xtrmhnt2_hack_r();
 
 	void aw_map(address_map &map);
 	void aw_port(address_map &map);

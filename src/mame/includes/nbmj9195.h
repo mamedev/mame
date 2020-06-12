@@ -115,7 +115,7 @@ private:
 	emu_timer *m_blitter_timer;
 
 	void soundbank_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(inputportsel_w);
+	void inputportsel_w(uint8_t data);
 	uint8_t mscoutm_dipsw_0_r();
 	uint8_t mscoutm_dipsw_1_r();
 	uint8_t mscoutm_cpu_portb_r();
@@ -124,14 +124,14 @@ private:
 	uint8_t others_cpu_portb_r();
 	uint8_t others_cpu_portc_r();
 	void soundcpu_porte_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(nb22090_palette_w);
-	DECLARE_WRITE8_MEMBER(blitter_0_w);
-	DECLARE_WRITE8_MEMBER(blitter_1_w);
-	DECLARE_READ8_MEMBER(blitter_0_r);
-	DECLARE_READ8_MEMBER(blitter_1_r);
-	DECLARE_WRITE8_MEMBER(clut_0_w);
-	DECLARE_WRITE8_MEMBER(clut_1_w);
+	void palette_w(offs_t offset, uint8_t data);
+	void nb22090_palette_w(offs_t offset, uint8_t data);
+	void blitter_0_w(offs_t offset, uint8_t data);
+	void blitter_1_w(offs_t offset, uint8_t data);
+	uint8_t blitter_0_r(offs_t offset);
+	uint8_t blitter_1_r(offs_t offset);
+	void clut_0_w(offs_t offset, uint8_t data);
+	void clut_1_w(offs_t offset, uint8_t data);
 	void clutsel_w(uint8_t data);
 	void gfxflag2_w(uint8_t data);
 	void outcoin_flag_w(uint8_t data);

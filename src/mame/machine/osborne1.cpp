@@ -13,19 +13,19 @@ There are three IRQ sources:
 #include "includes/osborne1.h"
 
 
-WRITE8_MEMBER( osborne1_state::bank_0xxx_w )
+void osborne1_state::bank_0xxx_w(offs_t offset, u8 data)
 {
 	if (!rom_mode())
 		m_ram->pointer()[offset] = data;
 }
 
-WRITE8_MEMBER( osborne1_state::bank_1xxx_w )
+void osborne1_state::bank_1xxx_w(offs_t offset, u8 data)
 {
 	if (!rom_mode())
 		m_ram->pointer()[0x1000 + offset] = data;
 }
 
-READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
+u8 osborne1_state::bank_2xxx_3xxx_r(offs_t offset)
 {
 	if (!rom_mode())
 		return m_ram->pointer()[0x2000 + offset];
@@ -33,7 +33,7 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 	// Since each peripheral only checks two bits, many addresses will
 	// result in multiple peripherals attempting to drive the bus.  This is
 	// simulated by ANDing all the values together.
-	uint8_t data = 0xFF;
+	u8 data = 0xFF;
 	if ((offset & 0x900) == 0x100) // Floppy
 		data &= m_fdc->read(offset & 0x03);
 	if ((offset & 0x900) == 0x900) // IEEE488 PIA
@@ -55,7 +55,7 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 	return data;
 }
 
-WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
+void osborne1_state::bank_2xxx_3xxx_w(offs_t offset, u8 data)
 {
 	if (!rom_mode())
 	{
@@ -77,9 +77,9 @@ WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
 	}
 }
 
-READ8_MEMBER( osborne1sp_state::bank_2xxx_3xxx_r )
+u8 osborne1sp_state::bank_2xxx_3xxx_r(offs_t offset)
 {
-	uint8_t data = osborne1_state::bank_2xxx_3xxx_r(space, offset, mem_mask);
+	u8 data = osborne1_state::bank_2xxx_3xxx_r(offset);
 	if (!rom_mode())
 		return data;
 
@@ -90,9 +90,9 @@ READ8_MEMBER( osborne1sp_state::bank_2xxx_3xxx_r )
 	return data;
 }
 
-WRITE8_MEMBER( osborne1sp_state::bank_2xxx_3xxx_w )
+void osborne1sp_state::bank_2xxx_3xxx_w(offs_t offset, u8 data)
 {
-	osborne1_state::bank_2xxx_3xxx_w(space, offset, data, mem_mask);
+	osborne1_state::bank_2xxx_3xxx_w(offset, data);
 
 	if (rom_mode())
 	{
@@ -104,22 +104,22 @@ WRITE8_MEMBER( osborne1sp_state::bank_2xxx_3xxx_w )
 	}
 }
 
-WRITE8_MEMBER( osborne1_state::videoram_w )
+void osborne1_state::videoram_w(offs_t offset, u8 data)
 {
 	// Attribute RAM is only one bit wide - low seven bits are discarded and read back high
 	if (m_bit_9)
 		data |= 0x7F;
 	else
 		m_tilemap->mark_tile_dirty(offset);
-	reinterpret_cast<uint8_t *>(m_bank_fxxx->base())[offset] = data;
+	reinterpret_cast<u8 *>(m_bank_fxxx->base())[offset] = data;
 }
 
-READ8_MEMBER( osborne1_state::opcode_r )
+u8 osborne1_state::opcode_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
 		// Update the flipflops that control bank selection and NMI
-		uint8_t const new_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;
+		u8 const new_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;
 		if (!rom_mode())
 		{
 			set_rom_mode(m_ub4a_q ? 0 : 1);
@@ -133,7 +133,7 @@ READ8_MEMBER( osborne1_state::opcode_r )
 	return m_mem_cache.read_byte(offset);
 }
 
-WRITE8_MEMBER( osborne1_state::bankswitch_w )
+void osborne1_state::bankswitch_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER( osborne1_state::irqack_w )
 }
 
 
-uint8_t osborne1_state::ieee_pia_pb_r()
+u8 osborne1_state::ieee_pia_pb_r()
 {
 	/*
 	    bit     description
@@ -181,7 +181,7 @@ uint8_t osborne1_state::ieee_pia_pb_r()
 	    6       NDAC
 	    7       NRFD
 	*/
-	uint8_t data = 0;
+	u8 data = 0;
 
 	data |= m_ieee->eoi_r() << 3;
 	data |= m_ieee->dav_r() << 5;
@@ -191,7 +191,7 @@ uint8_t osborne1_state::ieee_pia_pb_r()
 	return data;
 }
 
-void osborne1_state::ieee_pia_pb_w(uint8_t data)
+void osborne1_state::ieee_pia_pb_w(u8 data)
 {
 	/*
 	    bit     description
@@ -218,14 +218,14 @@ WRITE_LINE_MEMBER( osborne1_state::ieee_pia_irq_a_func )
 }
 
 
-void osborne1_state::video_pia_port_a_w(uint8_t data)
+void osborne1_state::video_pia_port_a_w(u8 data)
 {
 	m_scroll_x = data >> 1;
 
 	m_fdc->dden_w(BIT(data, 0));
 }
 
-void osborne1_state::video_pia_port_b_w(uint8_t data)
+void osborne1_state::video_pia_port_b_w(u8 data)
 {
 	m_speaker->level_w((BIT(data, 5) && m_beep_state) ? 1 : 0);
 
@@ -381,17 +381,17 @@ inline void osborne1_state::draw_rows(uint16_t col, bitmap_ind16 &bitmap, const 
 			m_scroll_y = m_pia1->b_output() & 0x1F;
 
 		// Draw a line of the display
-		uint8_t const ra(y % 10);
+		u8 const ra(y % 10);
 		uint16_t *p(&bitmap.pix16(y));
 		uint16_t const row(((m_scroll_y + (y / 10)) << 7) & 0x0F80);
 
 		for (uint16_t x = 0; Width > x; ++x)
 		{
 			uint16_t const offs(row | ((col + x) & 0x7F));
-			uint8_t const chr(m_ram->pointer()[0xF000 + offs]);
-			uint8_t const clr((m_ram->pointer()[0x10000 + offs] & 0x80) ? 2 : 1);
+			u8 const chr(m_ram->pointer()[0xF000 + offs]);
+			u8 const clr((m_ram->pointer()[0x10000 + offs] & 0x80) ? 2 : 1);
 
-			uint8_t const gfx(((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_chargen[(ra << 7) | (chr & 0x7F)]);
+			u8 const gfx(((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_chargen[(ra << 7) | (chr & 0x7F)]);
 
 			// Display a scanline of a character
 			for (unsigned b = 0; 8 > b; ++b)
@@ -460,7 +460,7 @@ uint32_t osborne1sp_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 {
 	int const y(m_screen->vpos());
-	uint8_t const ra(y % 10);
+	u8 const ra(y % 10);
 
 	// The beeper is gated so it's active four out of every ten scanlines
 	m_beep_state = (ra & 0x04) ? 1 : 0;
@@ -484,7 +484,7 @@ TILE_GET_INFO_MEMBER(osborne1_state::get_tile_info)
 }
 
 
-bool osborne1_state::set_rom_mode(uint8_t value)
+bool osborne1_state::set_rom_mode(u8 value)
 {
 	if (value != m_rom_mode)
 	{
@@ -499,7 +499,7 @@ bool osborne1_state::set_rom_mode(uint8_t value)
 	}
 }
 
-bool osborne1_state::set_bit_9(uint8_t value)
+bool osborne1_state::set_bit_9(u8 value)
 {
 	if (value != m_bit_9)
 	{
@@ -540,13 +540,13 @@ MC6845_UPDATE_ROW(osborne1nv_state::crtc_update_row)
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint16_t const base = (ma >> 1) & 0xF80;
 	uint32_t *p = &bitmap.pix32(y);
-	for (uint8_t x = 0; x < x_count; ++x)
+	for (u8 x = 0; x < x_count; ++x)
 	{
 		uint16_t const offset = base | ((ma + x) & 0x7F);
-		uint8_t const chr = m_ram->pointer()[0xF000 | offset];
-		uint8_t const clr = BIT(m_ram->pointer()[0x10000 | offset], 7) ? 2 : 1;
+		u8 const chr = m_ram->pointer()[0xF000 | offset];
+		u8 const clr = BIT(m_ram->pointer()[0x10000 | offset], 7) ? 2 : 1;
 
-		uint8_t const gfx = ((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_nuevo[(ra << 7) | (chr & 0x7F)];
+		u8 const gfx = ((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_nuevo[(ra << 7) | (chr & 0x7F)];
 
 		for (unsigned bit = 0; 8 > bit; ++bit)
 			*p++ = palette[BIT(gfx, 7 - bit) ? clr : 0];

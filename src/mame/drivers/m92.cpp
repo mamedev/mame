@@ -267,7 +267,7 @@ void m92_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_eeprom[offset] = data;
 }
 
-WRITE8_MEMBER(m92_state::coincounter_w)
+void m92_state::coincounter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -276,7 +276,7 @@ WRITE8_MEMBER(m92_state::coincounter_w)
 	/* Bit 0x40 set in Blade Master test mode input check */
 }
 
-WRITE8_MEMBER(m92_state::bankswitch_w)
+void m92_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry((data & 0x06) >> 1);
 	if (data & 0xf9)

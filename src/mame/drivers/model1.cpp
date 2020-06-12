@@ -606,7 +606,7 @@ Notes:
 // and writes the data to the dual port RAM. This isn't
 // emulated yet, data just gets written to RAM.
 
-READ8_MEMBER( model1_state::dpram_r )
+u8 model1_state::dpram_r(offs_t offset)
 {
 	// insert waitstate
 	m_maincpu->adjust_icount(-1);
@@ -808,7 +808,7 @@ IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
 	return m_last_irq;
 }
 
-WRITE8_MEMBER(model1_state::irq_control_w)
+void model1_state::irq_control_w(u8 data)
 {
 	switch (data)
 	{

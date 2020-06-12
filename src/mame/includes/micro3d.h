@@ -152,8 +152,8 @@ private:
 	int                 m_drawing_buffer;
 	int                 m_display_buffer;
 
-	DECLARE_WRITE8_MEMBER(vgb_uart_w);
-	DECLARE_READ8_MEMBER(vgb_uart_r);
+	void vgb_uart_w(offs_t offset, uint8_t data);
+	uint8_t vgb_uart_r(offs_t offset);
 	void micro3d_mac1_w(uint32_t data);
 	uint32_t micro3d_mac2_r();
 	void micro3d_mac2_w(uint32_t data);
@@ -173,15 +173,15 @@ private:
 	void micro3d_fifo_w(uint32_t data);
 	void micro3d_alt_fifo_w(uint32_t data);
 	uint32_t micro3d_pipe_r();
-	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_a);
-	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_b);
+	void micro3d_snd_dac_a(uint8_t data);
+	void micro3d_snd_dac_b(uint8_t data);
 	void micro3d_sound_p1_w(uint8_t data);
 	void micro3d_sound_p3_w(uint8_t data);
 	uint8_t micro3d_sound_p1_r();
 	uint8_t micro3d_sound_p3_r();
 	INTERRUPT_GEN_MEMBER(micro3d_vblank);
 	TIMER_CALLBACK_MEMBER(mac_done_callback);
-	DECLARE_WRITE8_MEMBER(micro3d_upd7759_w);
+	void micro3d_upd7759_w(uint8_t data);
 	void data_from_i8031(uint8_t data);
 	uint8_t data_to_i8031();
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);

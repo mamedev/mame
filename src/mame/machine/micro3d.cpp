@@ -84,7 +84,7 @@ void micro3d_state::duart_output_w(uint8_t data)
  *
  *************************************/
 
-READ8_MEMBER( micro3d_state::vgb_uart_r )
+uint8_t micro3d_state::vgb_uart_r(offs_t offset)
 {
 	// the mode and sync registers switched places?
 	if (offset == 1 || offset == 2)
@@ -93,7 +93,7 @@ READ8_MEMBER( micro3d_state::vgb_uart_r )
 	return m_vgb_uart->read(offset);
 }
 
-WRITE8_MEMBER( micro3d_state::vgb_uart_w )
+void micro3d_state::vgb_uart_w(offs_t offset, uint8_t data)
 {
 	// the mode and sync registers switched places?
 	if (offset == 1 || offset == 2)
@@ -454,13 +454,13 @@ void micro3d_state::drmath_intr2_ack(uint32_t data)
 ***************************************************************************/
 
 
-WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_a)
+void micro3d_state::micro3d_snd_dac_a(uint8_t data)
 {
 	m_noise_1->dac_w(data);
 	m_noise_2->dac_w(data);
 }
 
-WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_b)
+void micro3d_state::micro3d_snd_dac_b(uint8_t data)
 {
 	/* TODO: This controls upd7759 volume */
 }
@@ -491,7 +491,7 @@ uint8_t micro3d_state::micro3d_sound_p3_r()
 	return (m_sound_port_latch[3] & 0xf7) | (m_upd7759->busy_r() ? 0x08 : 0);
 }
 
-WRITE8_MEMBER(micro3d_state::micro3d_upd7759_w)
+void micro3d_state::micro3d_upd7759_w(uint8_t data)
 {
 	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);

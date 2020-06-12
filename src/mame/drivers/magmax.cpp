@@ -38,7 +38,7 @@ void magmax_state::cpu_irq_ack_w(uint16_t data)
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
-READ8_MEMBER(magmax_state::sound_r)
+uint8_t magmax_state::sound_r()
 {
 	return (m_soundlatch->read() << 1) | m_LS74_q;
 }

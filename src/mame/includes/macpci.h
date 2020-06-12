@@ -130,8 +130,8 @@ private:
 
 	uint32_t mac_read_id();
 
-	DECLARE_READ8_MEMBER(mac_5396_r);
-	DECLARE_WRITE8_MEMBER(mac_5396_w);
+	uint8_t mac_5396_r(offs_t offset);
+	void mac_5396_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);

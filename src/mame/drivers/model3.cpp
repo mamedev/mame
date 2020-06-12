@@ -1617,7 +1617,7 @@ uint64_t model3_state::real3d_status_r(offs_t offset)
 }
 
 /* SCSP interface */
-READ8_MEMBER(model3_state::model3_sound_r)
+uint8_t model3_state::model3_sound_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1643,7 +1643,7 @@ READ8_MEMBER(model3_state::model3_sound_r)
 	return 0;
 }
 
-WRITE8_MEMBER(model3_state::model3_sound_w)
+void model3_state::model3_sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

@@ -19,7 +19,7 @@
     mtx_strobe_r - centronics strobe
 -------------------------------------------------*/
 
-READ8_MEMBER(mtx_state::mtx_strobe_r)
+uint8_t mtx_state::mtx_strobe_r()
 {
 	/* set STROBE low */
 	m_centronics->write_strobe(false);
@@ -40,7 +40,7 @@ READ8_MEMBER(mtx_state::mtx_strobe_r)
     in subpages 0 to 15.
 */
 
-WRITE8_MEMBER(mtx_state::mtx_subpage_w)
+void mtx_state::mtx_subpage_w(uint8_t data)
 {
 	if (m_extrom->exists())
 	{
@@ -122,7 +122,7 @@ void mtx_state::bankswitch(uint8_t data)
 	{
 		/* rom based memory map */
 		program.install_rom(0x0000, 0x1fff, memregion("user1")->base());
-		program.install_write_handler(0x0000, 0x1fff, write8_delegate(*this, FUNC(mtx_state::mtx_subpage_w)));
+		program.install_write_handler(0x0000, 0x1fff, write8smo_delegate(*this, FUNC(mtx_state::mtx_subpage_w)));
 		program.install_read_bank(0x2000, 0x3fff, "rommap_bank1");
 		program.unmap_write(0x2000, 0x3fff);
 		program.install_readwrite_bank(0x4000, 0x7fff, "rommap_bank2");
@@ -143,7 +143,7 @@ void mtx_state::bankswitch(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(mtx_state::mtx_bankswitch_w)
+void mtx_state::mtx_bankswitch_w(uint8_t data)
 {
 	bankswitch(data);
 }
@@ -152,7 +152,7 @@ WRITE8_MEMBER(mtx_state::mtx_bankswitch_w)
     mtx_sound_strobe_r - sound strobe
 -------------------------------------------------*/
 
-READ8_MEMBER(mtx_state::mtx_sound_strobe_r)
+uint8_t mtx_state::mtx_sound_strobe_r()
 {
 	m_sn->write(m_sound_latch);
 	return 0xff;
@@ -162,7 +162,7 @@ READ8_MEMBER(mtx_state::mtx_sound_strobe_r)
     mtx_sound_latch_w - sound latch write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(mtx_state::mtx_sound_latch_w)
+void mtx_state::mtx_sound_latch_w(uint8_t data)
 {
 	m_sound_latch = data;
 }
@@ -171,7 +171,7 @@ WRITE8_MEMBER(mtx_state::mtx_sound_latch_w)
     mtx_cst_w - cassette write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(mtx_state::mtx_cst_w)
+void mtx_state::mtx_cst_w(uint8_t data)
 {
 	m_cassette->output( BIT(data, 0) ? -1 : 1);
 }
@@ -180,7 +180,7 @@ WRITE8_MEMBER(mtx_state::mtx_cst_w)
     mtx_cst_motor_w - cassette motor
 -------------------------------------------------*/
 
-WRITE8_MEMBER(mtx_state::mtx_cst_motor_w)
+void mtx_state::mtx_cst_motor_w(uint8_t data)
 {
 	/* supported in the MTX ROM */
 	switch (data)
@@ -218,7 +218,7 @@ WRITE_LINE_MEMBER(mtx_state::write_centronics_select)
 	m_centronics_select = state;
 }
 
-READ8_MEMBER(mtx_state::mtx_prt_r)
+uint8_t mtx_state::mtx_prt_r()
 {
 	/*
 
@@ -252,7 +252,7 @@ READ8_MEMBER(mtx_state::mtx_prt_r)
     mtx_sense_w - keyboard sense write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(mtx_state::mtx_sense_w)
+void mtx_state::mtx_sense_w(uint8_t data)
 {
 	m_key_sense = data;
 }
@@ -261,7 +261,7 @@ WRITE8_MEMBER(mtx_state::mtx_sense_w)
     mtx_key_lo_r - keyboard low read
 -------------------------------------------------*/
 
-READ8_MEMBER(mtx_state::mtx_key_lo_r)
+uint8_t mtx_state::mtx_key_lo_r()
 {
 	uint8_t data = 0xff;
 
@@ -281,7 +281,7 @@ READ8_MEMBER(mtx_state::mtx_key_lo_r)
     mtx_key_lo_r - keyboard high read
 -------------------------------------------------*/
 
-READ8_MEMBER(mtx_state::mtx_key_hi_r)
+uint8_t mtx_state::mtx_key_hi_r()
 {
 	uint8_t data = ioport("country_code")->read();
 
@@ -301,7 +301,7 @@ READ8_MEMBER(mtx_state::mtx_key_hi_r)
     hrx_address_w - HRX video RAM address
 -------------------------------------------------*/
 
-WRITE8_MEMBER(mtx_state::hrx_address_w)
+void mtx_state::hrx_address_w(offs_t offset, uint8_t data)
 {
 	if (offset)
 	{
@@ -343,7 +343,7 @@ WRITE8_MEMBER(mtx_state::hrx_address_w)
     hrx_data_r - HRX data read
 -------------------------------------------------*/
 
-READ8_MEMBER(mtx_state::hrx_data_r)
+uint8_t mtx_state::hrx_data_r()
 {
 	return 0;
 }
@@ -352,7 +352,7 @@ READ8_MEMBER(mtx_state::hrx_data_r)
     hrx_data_w - HRX data write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(mtx_state::hrx_data_w)
+void mtx_state::hrx_data_w(uint8_t data)
 {
 }
 
@@ -360,7 +360,7 @@ WRITE8_MEMBER(mtx_state::hrx_data_w)
     hrx_attr_r - HRX attribute read
 -------------------------------------------------*/
 
-READ8_MEMBER(mtx_state::hrx_attr_r)
+uint8_t mtx_state::hrx_attr_r()
 {
 	return 0;
 }
@@ -369,7 +369,7 @@ READ8_MEMBER(mtx_state::hrx_attr_r)
     hrx_attr_r - HRX attribute write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(mtx_state::hrx_attr_w)
+void mtx_state::hrx_attr_w(uint8_t data)
 {
 	/*
 

@@ -126,13 +126,13 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER(mermaid_state::mermaid_ay8910_write_port_w)
+void mermaid_state::mermaid_ay8910_write_port_w(uint8_t data)
 {
 	if (m_ay8910_enable[0]) m_ay8910[0]->data_w(data);
 	if (m_ay8910_enable[1]) m_ay8910[1]->data_w(data);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_ay8910_control_port_w)
+void mermaid_state::mermaid_ay8910_control_port_w(uint8_t data)
 {
 	if (m_ay8910_enable[0]) m_ay8910[0]->address_w(data);
 	if (m_ay8910_enable[1]) m_ay8910[1]->address_w(data);

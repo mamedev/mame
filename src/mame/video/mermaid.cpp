@@ -54,19 +54,19 @@ void mermaid_state::rougien_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(mermaid_state::mermaid_videoram2_w)
+void mermaid_state::mermaid_videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_videoram_w)
+void mermaid_state::mermaid_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_colorram_w)
+void mermaid_state::mermaid_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -82,13 +82,13 @@ WRITE_LINE_MEMBER(mermaid_state::flip_screen_y_w)
 	flip_screen_y_set(state);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_bg_scroll_w)
+void mermaid_state::mermaid_bg_scroll_w(offs_t offset, uint8_t data)
 {
 	m_bg_scrollram[offset] = data;
 	m_bg_tilemap->set_scrolly(offset, data);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_fg_scroll_w)
+void mermaid_state::mermaid_fg_scroll_w(offs_t offset, uint8_t data)
 {
 	m_fg_scrollram[offset] = data;
 	m_fg_tilemap->set_scrolly(offset, data);
@@ -104,7 +104,7 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_gfxbankswitch2_w)
 	m_rougien_gfxbank2 = state;
 }
 
-READ8_MEMBER(mermaid_state::mermaid_collision_r)
+uint8_t mermaid_state::mermaid_collision_r()
 {
 	/*
 	    collision register active LOW:

@@ -339,7 +339,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_irq2_cb)
 
 /****************************************************************************/
 
-WRITE8_MEMBER(namconb1_state::namconb1_cpureg_w)
+void namconb1_state::namconb1_cpureg_w(offs_t offset, u8 data)
 {
 	/**
 	 * 400000 0x00
@@ -426,7 +426,7 @@ WRITE8_MEMBER(namconb1_state::namconb1_cpureg_w)
 }
 
 
-WRITE8_MEMBER(namconb1_state::namconb2_cpureg_w)
+void namconb1_state::namconb2_cpureg_w(offs_t offset, u8 data)
 {
 	/**
 	 * f00000 VBL IRQ enable/level
@@ -514,7 +514,7 @@ WRITE8_MEMBER(namconb1_state::namconb2_cpureg_w)
 }
 
 
-READ8_MEMBER(namconb1_state::namconb1_cpureg_r)
+u8 namconb1_state::namconb1_cpureg_r(offs_t offset)
 {
 	// 16: Watchdog
 	if (ENABLE_LOGGING)
@@ -527,7 +527,7 @@ READ8_MEMBER(namconb1_state::namconb1_cpureg_r)
 }
 
 
-READ8_MEMBER(namconb1_state::namconb2_cpureg_r)
+u8 namconb1_state::namconb2_cpureg_r(offs_t offset)
 {
 	// 14: Watchdog
 	if (ENABLE_LOGGING)
@@ -542,7 +542,7 @@ READ8_MEMBER(namconb1_state::namconb2_cpureg_r)
 
 /****************************************************************************/
 
-READ32_MEMBER(namconb1_state::custom_key_r)
+u32 namconb1_state::custom_key_r(offs_t offset)
 {
 	u16 old_count = m_count;
 
@@ -643,7 +643,7 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 /***************************************************************/
 
 
-READ32_MEMBER(namconb1_state::gunbulet_gun_r)
+u32 namconb1_state::gunbulet_gun_r(offs_t offset)
 {
 	int result = 0;
 
@@ -657,12 +657,12 @@ READ32_MEMBER(namconb1_state::gunbulet_gun_r)
 	return result<<24;
 } /* gunbulet_gun_r */
 
-READ32_MEMBER(namconb1_state::randgen_r)
+u32 namconb1_state::randgen_r()
 {
 	return machine().rand();
 } /* randgen_r */
 
-WRITE32_MEMBER(namconb1_state::srand_w)
+void namconb1_state::srand_w(u32 data)
 {
 	/**
 	 * Used to seed the hardware random number generator.
@@ -670,12 +670,12 @@ WRITE32_MEMBER(namconb1_state::srand_w)
 	 */
 } /* srand_w */
 
-READ32_MEMBER(namconb1_state::share_r)
+u32 namconb1_state::share_r(offs_t offset)
 {
 	return (m_namconb_shareram[offset * 2] << 16) | m_namconb_shareram[offset * 2 + 1];
 }
 
-WRITE32_MEMBER(namconb1_state::share_w)
+void namconb1_state::share_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(m_namconb_shareram + offset * 2 + 1);
 	data >>= 16;
@@ -726,7 +726,7 @@ void namconb1_state::namconb2_am(address_map &map)
 	map(0xf00000, 0xf0001f).rw(FUNC(namconb1_state::namconb2_cpureg_r), FUNC(namconb1_state::namconb2_cpureg_w));
 }
 
-WRITE16_MEMBER(namconb1_state::mcu_shared_w)
+void namconb1_state::mcu_shared_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.

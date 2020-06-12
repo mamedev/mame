@@ -60,7 +60,7 @@ ROMs 6A, 7A, 8A, 9A: 2764
  *
  *************************************/
 
-READ8_MEMBER(mrjong_state::io_0x03_r)
+uint8_t mrjong_state::io_0x03_r()
 {
 	return 0x00;
 }

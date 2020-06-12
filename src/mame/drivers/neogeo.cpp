@@ -878,7 +878,7 @@ void neogeo_base_state::start_interrupt_timers()
  *
  *************************************/
 
-WRITE8_MEMBER(neogeo_base_state::audio_cpu_enable_nmi_w)
+void neogeo_base_state::audio_cpu_enable_nmi_w(offs_t offset, uint8_t data)
 {
 	// out ($08) enables the nmi, out ($18) disables it
 	m_audionmi->in_w<1>(BIT(~offset, 4));
@@ -892,22 +892,22 @@ WRITE8_MEMBER(neogeo_base_state::audio_cpu_enable_nmi_w)
  *
  *************************************/
 
-READ16_MEMBER(ngarcade_base_state::in0_edge_r)
+uint16_t ngarcade_base_state::in0_edge_r()
 {
 	return (m_edge->in0_r() << 8) | m_dsw->read();
 }
 
-READ16_MEMBER(ngarcade_base_state::in0_edge_joy_r)
+uint16_t ngarcade_base_state::in0_edge_joy_r()
 {
 	return ((m_edge->in0_r() & m_ctrl1->read_ctrl()) << 8) | m_dsw->read();
 }
 
-READ16_MEMBER(ngarcade_base_state::in1_edge_r)
+uint16_t ngarcade_base_state::in1_edge_r()
 {
 	return (m_edge->in1_r() << 8) | 0xff;
 }
 
-READ16_MEMBER(ngarcade_base_state::in1_edge_joy_r)
+uint16_t ngarcade_base_state::in1_edge_joy_r()
 {
 	return ((m_edge->in1_r() & m_ctrl2->read_ctrl()) << 8) | 0xff;
 }
@@ -989,7 +989,7 @@ void mvs_state::io_control_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE8_MEMBER(neogeo_base_state::audio_command_w)
+void neogeo_base_state::audio_command_w(uint8_t data)
 {
 	// glitches in s1945p without the boost_interleave here
 	m_soundlatch->write(data);
@@ -1003,7 +1003,7 @@ WRITE8_MEMBER(neogeo_base_state::audio_command_w)
  *
  *************************************/
 
-READ16_MEMBER(neogeo_base_state::unmapped_r)
+uint16_t neogeo_base_state::unmapped_r(address_space &space)
 {
 	uint16_t ret;
 
@@ -1036,7 +1036,7 @@ WRITE_LINE_MEMBER(ngarcade_base_state::set_save_ram_unlock)
 }
 
 
-WRITE16_MEMBER(ngarcade_base_state::save_ram_w)
+void ngarcade_base_state::save_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_save_ram_unlocked)
 		COMBINE_DATA(&m_save_ram[offset]);
@@ -1058,7 +1058,7 @@ CUSTOM_INPUT_MEMBER(neogeo_base_state::get_memcard_status)
 }
 
 
-READ16_MEMBER(neogeo_base_state::memcard_r)
+uint16_t neogeo_base_state::memcard_r(offs_t offset)
 {
 	m_maincpu->eat_cycles(2); // insert waitstate
 
@@ -1073,7 +1073,7 @@ READ16_MEMBER(neogeo_base_state::memcard_r)
 }
 
 
-WRITE16_MEMBER(neogeo_base_state::memcard_w)
+void neogeo_base_state::memcard_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->eat_cycles(2); // insert waitstate
 
@@ -1105,7 +1105,7 @@ CUSTOM_INPUT_MEMBER(neogeo_base_state::get_audio_result)
  *
  *************************************/
 
-READ8_MEMBER(neogeo_base_state::audio_cpu_bank_select_r)
+uint8_t neogeo_base_state::audio_cpu_bank_select_r(offs_t offset)
 {
 	m_bank_audio_cart[offset & 3]->set_entry(offset >> 8);
 
@@ -1134,7 +1134,7 @@ WRITE_LINE_MEMBER(neogeo_base_state::set_use_cart_audio)
 }
 
 
-WRITE16_MEMBER(neogeo_base_state::write_banksel)
+void neogeo_base_state::write_banksel(uint16_t data)
 {
 	uint32_t len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
 
@@ -1218,16 +1218,16 @@ void mvs_led_el_state::output_strobe(uint8_t bits, uint8_t data)
 // FIXME: These are a temporary workaround for slot-driven bankswitch with protected carts.
 // A cleaner implementation is in progress.
 
-WRITE16_MEMBER(neogeo_base_state::write_bankprot)
+void neogeo_base_state::write_bankprot(uint16_t data)
 {
 	m_bank_base = m_slots[m_curr_slot]->get_bank_base(data);
 	m_bank_cartridge->set_base((uint8_t *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 }
 
-WRITE16_MEMBER(neogeo_base_state::write_bankprot_pvc)
+void neogeo_base_state::write_bankprot_pvc(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// write to cart ram
-	m_slots[m_curr_slot]->protection_w(space, offset, data, mem_mask);
+	m_slots[m_curr_slot]->protection_w(offset, data, mem_mask);
 
 	// actual bankswitch
 	if (offset >= 0xff8)
@@ -1237,10 +1237,10 @@ WRITE16_MEMBER(neogeo_base_state::write_bankprot_pvc)
 	}
 }
 
-WRITE16_MEMBER(neogeo_base_state::write_bankprot_kf2k3bl)
+void neogeo_base_state::write_bankprot_kf2k3bl(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// write to cart ram
-	m_slots[m_curr_slot]->protection_w(space, offset, data, mem_mask);
+	m_slots[m_curr_slot]->protection_w(offset, data, mem_mask);
 
 	// actual bankswitch
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2)
@@ -1250,7 +1250,7 @@ WRITE16_MEMBER(neogeo_base_state::write_bankprot_kf2k3bl)
 	}
 }
 
-WRITE16_MEMBER(neogeo_base_state::write_bankprot_ms5p)
+void neogeo_base_state::write_bankprot_ms5p(offs_t offset, uint16_t data)
 {
 	logerror("ms5plus bankswitch - offset: %06x PC %06x: set banking %04x\n", offset, m_maincpu->pc(), data);
 
@@ -1266,9 +1266,9 @@ WRITE16_MEMBER(neogeo_base_state::write_bankprot_ms5p)
 	}
 }
 
-WRITE16_MEMBER(neogeo_base_state::write_bankprot_kof10th)
+void neogeo_base_state::write_bankprot_kof10th(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_slots[m_curr_slot]->protection_w(space, offset, data, mem_mask);
+	m_slots[m_curr_slot]->protection_w(offset, data, mem_mask);
 
 	if (offset == 0xffff0/2)
 	{
@@ -1278,7 +1278,7 @@ WRITE16_MEMBER(neogeo_base_state::write_bankprot_kof10th)
 	}
 }
 
-READ16_MEMBER(neogeo_base_state::read_lorom_kof10th)
+uint16_t neogeo_base_state::read_lorom_kof10th(offs_t offset)
 {
 	uint16_t* rom = (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0) ? m_slots[m_curr_slot]->get_rom_base() : (uint16_t*)m_region_maincpu->base();
 	if (offset + 0x80/2 >= 0x10000/2)
@@ -1406,7 +1406,7 @@ void neogeo_base_state::set_slot_idx(int slot)
 
 
 		space.install_read_bank(0x200000, 0x2fffff, "cartridge");
-		space.install_write_handler(0x2ffff0, 0x2fffff, write16_delegate(*this, FUNC(neogeo_base_state::write_banksel)));
+		space.install_write_handler(0x2ffff0, 0x2fffff, write16smo_delegate(*this, FUNC(neogeo_base_state::write_banksel)));
 		m_bank_cartridge = membank("cartridge");
 
 		init_cpu();
@@ -1425,49 +1425,51 @@ void neogeo_base_state::set_slot_idx(int slot)
 		switch (type)
 		{
 		case NEOGEO_FATFURY2:
-			space.install_readwrite_handler(0x200000, 0x2fffff, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)), write16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_w)));
+			space.install_read_handler(0x200000, 0x2fffff, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_write_handler(0x200000, 0x2fffff, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_w)));
 			break;
 		case NEOGEO_KOF98:
-			space.install_read_handler(0x00100, 0x00103, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
-			space.install_write_handler(0x20aaaa, 0x20aaab, write16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_w)));
+			space.install_read_handler(0x00100, 0x00103, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_write_handler(0x20aaaa, 0x20aaab, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_w)));
 			break;
 		case NEOGEO_MSLUGX:
-			space.install_readwrite_handler(0x2fffe0, 0x2fffef, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)), write16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_w)));
+			space.install_read_handler(0x2fffe0, 0x2fffef, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_write_handler(0x2fffe0, 0x2fffef, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_w)));
 			break;
 		case NEOGEO_KOF99:
 			// addon_r here gives SMA random number
-			space.install_write_handler(0x2ffff0, 0x2ffff1, write16_delegate(*this, FUNC(neogeo_base_state::write_bankprot)));
-			space.install_read_handler(0x2fe446, 0x2fe447, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
-			space.install_read_handler(0x2ffff8, 0x2ffff9, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
-			space.install_read_handler(0x2ffffa, 0x2ffffb, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
+			space.install_write_handler(0x2ffff0, 0x2ffff1, write16smo_delegate(*this, FUNC(neogeo_base_state::write_bankprot)));
+			space.install_read_handler(0x2fe446, 0x2fe447, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_read_handler(0x2ffff8, 0x2ffff9, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
+			space.install_read_handler(0x2ffffa, 0x2ffffb, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
 			break;
 		case NEOGEO_GAROU:
 			// addon_r here gives SMA random number
-			space.install_write_handler(0x2fffc0, 0x2fffc1, write16_delegate(*this, FUNC(neogeo_base_state::write_bankprot)));
-			space.install_read_handler(0x2fe446, 0x2fe447, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
-			space.install_read_handler(0x2fffcc, 0x2fffcd, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
-			space.install_read_handler(0x2ffff0, 0x2ffff1, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
+			space.install_write_handler(0x2fffc0, 0x2fffc1, write16smo_delegate(*this, FUNC(neogeo_base_state::write_bankprot)));
+			space.install_read_handler(0x2fe446, 0x2fe447, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_read_handler(0x2fffcc, 0x2fffcd, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
+			space.install_read_handler(0x2ffff0, 0x2ffff1, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
 			break;
 		case NEOGEO_GAROUH:
 			// addon_r here gives SMA random number
-			space.install_write_handler(0x2fffc0, 0x2fffc1, write16_delegate(*this, FUNC(neogeo_base_state::write_bankprot)));
-			space.install_read_handler(0x2fe446, 0x2fe447, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
-			space.install_read_handler(0x2fffcc, 0x2fffcd, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
-			space.install_read_handler(0x2ffff0, 0x2ffff1, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
+			space.install_write_handler(0x2fffc0, 0x2fffc1, write16smo_delegate(*this, FUNC(neogeo_base_state::write_bankprot)));
+			space.install_read_handler(0x2fe446, 0x2fe447, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_read_handler(0x2fffcc, 0x2fffcd, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
+			space.install_read_handler(0x2ffff0, 0x2ffff1, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
 			break;
 		case NEOGEO_MSLUG3:
 		case NEOGEO_MSLUG3A:
-			space.install_write_handler(0x2fffe4, 0x2fffe5, write16_delegate(*this, FUNC(neogeo_base_state::write_bankprot)));
-			space.install_read_handler(0x2fe446, 0x2fe447, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
-			//space.install_read_handler(0x2ffff8, 0x2ffff9, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
-			//space.install_read_handler(0x2ffffa, 0x2ffffb, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
+			space.install_write_handler(0x2fffe4, 0x2fffe5, write16smo_delegate(*this, FUNC(neogeo_base_state::write_bankprot)));
+			space.install_read_handler(0x2fe446, 0x2fe447, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			//space.install_read_handler(0x2ffff8, 0x2ffff9, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
+			//space.install_read_handler(0x2ffffa, 0x2ffffb, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
 			break;
 		case NEOGEO_KOF2K:
 			// addon_r here gives SMA random number
-			space.install_write_handler(0x2fffec, 0x2fffed, write16_delegate(*this, FUNC(neogeo_base_state::write_bankprot)));
-			space.install_read_handler(0x2fe446, 0x2fe447, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
-			space.install_read_handler(0x2fffd8, 0x2fffd9, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
-			space.install_read_handler(0x2fffda, 0x2fffdb, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
+			space.install_write_handler(0x2fffec, 0x2fffed, write16smo_delegate(*this, FUNC(neogeo_base_state::write_bankprot)));
+			space.install_read_handler(0x2fe446, 0x2fe447, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_read_handler(0x2fffd8, 0x2fffd9, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
+			space.install_read_handler(0x2fffda, 0x2fffdb, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
 			break;
 		case NEOGEO_MSLUG5:
 		case NEOGEO_SVC:
@@ -1475,26 +1477,30 @@ void neogeo_base_state::set_slot_idx(int slot)
 		case NEOGEO_KOF2K3H:
 		case NEOGEO_SVCBOOT:
 		case NEOGEO_SVCSPLUS:
-			space.install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)), write16_delegate(*this, FUNC(neogeo_base_state::write_bankprot_pvc)));
+			space.install_read_handler(0x2fe000, 0x2fffff, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_write_handler(0x2fe000, 0x2fffff, write16s_delegate(*this, FUNC(neogeo_base_state::write_bankprot_pvc)));
 			break;
 		case NEOGEO_CTHD2K3:
 		case NEOGEO_CT2K3SP:
-			space.install_write_handler(0x2ffff0, 0x2ffff1, write16_delegate(*this, FUNC(neogeo_base_state::write_bankprot)));
+			space.install_write_handler(0x2ffff0, 0x2ffff1, write16smo_delegate(*this, FUNC(neogeo_base_state::write_bankprot)));
 			break;
 		case NEOGEO_MSLUG5P:
-			space.install_readwrite_handler(0x2ffff0, 0x2fffff, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)), write16_delegate(*this, FUNC(neogeo_base_state::write_bankprot_ms5p)));
+			space.install_read_handler(0x2ffff0, 0x2fffff, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_write_handler(0x2ffff0, 0x2fffff, write16sm_delegate(*this, FUNC(neogeo_base_state::write_bankprot_ms5p)));
 			break;
 		case NEOGEO_KOG:
-			space.install_read_handler(0x0ffffe, 0x0fffff, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_read_handler(0x0ffffe, 0x0fffff, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
 			break;
 		case NEOGEO_KOF2K3B:
 		case NEOGEO_KOF2K3UP:
 			// addon_r here gives m_overlay member from bootleg protection (possibly hack?)
-			space.install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)), write16_delegate(*this, FUNC(neogeo_base_state::write_bankprot_kf2k3bl)));
-			space.install_read_handler(0x58196, 0x58197, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
+			space.install_read_handler(0x2fe000, 0x2fffff, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_write_handler(0x2fe000, 0x2fffff, write16s_delegate(*this, FUNC(neogeo_base_state::write_bankprot_kf2k3bl)));
+			space.install_read_handler(0x58196, 0x58197, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
 			break;
 		case NEOGEO_KOF2K3P:
-			space.install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)), write16_delegate(*this, FUNC(neogeo_base_state::write_bankprot_kf2k3bl)));
+			space.install_read_handler(0x2fe000, 0x2fffff, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_write_handler(0x2fe000, 0x2fffff, write16s_delegate(*this, FUNC(neogeo_base_state::write_bankprot_kf2k3bl)));
 			break;
 		case NEOGEO_SBP:
 			// there seems to be a protection device living around here..
@@ -1502,21 +1508,24 @@ void neogeo_base_state::set_slot_idx(int slot)
 			// there are also writes to 0x1080..
 			//
 			// other stuff going on as well tho, the main overlay is still missing, and p1 inputs don't work
-			space.install_readwrite_handler(0x00200, 0x001fff, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)), write16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_w)));
+			space.install_read_handler(0x00200, 0x001fff, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_write_handler(0x00200, 0x001fff, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_w)));
 			break;
 		case NEOGEO_KOF10TH:
 			// addon_r here reads from ram2 bank
-			space.install_read_handler(0x000080, 0x0dffff, read16_delegate(*this, FUNC(neogeo_base_state::read_lorom_kof10th)));
-			space.install_read_handler(0x0e0000, 0x0fffff, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
-			space.install_read_handler(0x2fe000, 0x2fffff, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
+			space.install_read_handler(0x000080, 0x0dffff, read16sm_delegate(*this, FUNC(neogeo_base_state::read_lorom_kof10th)));
+			space.install_read_handler(0x0e0000, 0x0fffff, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::addon_r)));
+			space.install_read_handler(0x2fe000, 0x2fffff, read16m_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_r)));
 			// REVIEW ME: we might possibly need to split this, by adding further write handlers
-			space.install_write_handler(0x200000, 0x2fffff, write16_delegate(*this, FUNC(neogeo_base_state::write_bankprot_kof10th)));
+			space.install_write_handler(0x200000, 0x2fffff, write16s_delegate(*this, FUNC(neogeo_base_state::write_bankprot_kof10th)));
 			break;
 		case NEOGEO_JOCKEYGP:
-			space.install_readwrite_handler(0x200000, 0x201fff, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::ram_r)), write16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::ram_w)));
+			space.install_read_handler(0x200000, 0x201fff, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::ram_r)));
+			space.install_write_handler(0x200000, 0x201fff, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::ram_w)));
 			break;
 		case NEOGEO_VLINER:
-			space.install_readwrite_handler(0x200000, 0x201fff, read16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::ram_r)), write16_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::ram_w)));
+			space.install_read_handler(0x200000, 0x201fff, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::ram_r)));
+			space.install_write_handler(0x200000, 0x201fff, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::ram_w)));
 			// custom input handling... install it here for the moment.
 			space.install_read_port(0x300000, 0x300001, 0x01ff7e, "DSW");
 			space.install_read_port(0x280000, 0x280001, "IN5");
@@ -1564,19 +1573,20 @@ void ngarcade_base_state::machine_start()
 	address_space &main_program_space(m_maincpu->space(AS_PROGRAM));
 
 	if (m_ctrl1)
-		main_program_space.install_read_handler(0x300000, 0x300001, 0, 0x01ff7e, 0, read16_delegate(*this, FUNC(ngarcade_base_state::in0_edge_joy_r)));
+		main_program_space.install_read_handler(0x300000, 0x300001, 0, 0x01ff7e, 0, read16smo_delegate(*this, FUNC(ngarcade_base_state::in0_edge_joy_r)));
 	else if (m_edge)
-		main_program_space.install_read_handler(0x300000, 0x300001, 0, 0x01ff7e, 0, read16_delegate(*this, FUNC(ngarcade_base_state::in0_edge_r)));
+		main_program_space.install_read_handler(0x300000, 0x300001, 0, 0x01ff7e, 0, read16smo_delegate(*this, FUNC(ngarcade_base_state::in0_edge_r)));
 
 	if (m_ctrl2)
-		main_program_space.install_read_handler(0x340000, 0x340001, 0, 0x01fffe, 0, read16_delegate(*this, FUNC(ngarcade_base_state::in1_edge_joy_r)));
+		main_program_space.install_read_handler(0x340000, 0x340001, 0, 0x01fffe, 0, read16smo_delegate(*this, FUNC(ngarcade_base_state::in1_edge_joy_r)));
 	else if (m_edge)
-		main_program_space.install_read_handler(0x340000, 0x340001, 0, 0x01fffe, 0, read16_delegate(*this, FUNC(ngarcade_base_state::in1_edge_r)));
+		main_program_space.install_read_handler(0x340000, 0x340001, 0, 0x01fffe, 0, read16smo_delegate(*this, FUNC(ngarcade_base_state::in1_edge_r)));
 
 	if (m_memcard)
 	{
 		main_program_space.unmap_readwrite(0x800000, 0x800fff);
-		main_program_space.install_readwrite_handler(0x800000, 0x800fff, read16_delegate(*this, FUNC(ngarcade_base_state::memcard_r)), write16_delegate(*this, FUNC(ngarcade_base_state::memcard_w)));
+		main_program_space.install_read_handler(0x800000, 0x800fff, read16sm_delegate(*this, FUNC(ngarcade_base_state::memcard_r)));
+		main_program_space.install_write_handler(0x800000, 0x800fff, write16s_delegate(*this, FUNC(ngarcade_base_state::memcard_w)));
 	}
 
 	// enable rtc and serial mode
@@ -1675,7 +1685,7 @@ void ngarcade_base_state::machine_reset()
  *************************************/
 
 
-READ16_MEMBER(neogeo_base_state::banked_vectors_r)
+uint16_t neogeo_base_state::banked_vectors_r(offs_t offset)
 {
 	if (!m_use_cart_vectors)
 	{
@@ -1727,7 +1737,7 @@ void ngarcade_base_state::neogeo_main_map(address_map &map)
 
 
 
-READ16_MEMBER(aes_base_state::aes_in2_r)
+uint16_t aes_base_state::aes_in2_r()
 {
 	uint32_t ret = m_io_in2->read() & 0xf0ff;
 	ret |= ((m_ctrl1->read_start_sel() & 0x03) << 8) | ((m_ctrl2->read_start_sel() & 0x03) << 10);
