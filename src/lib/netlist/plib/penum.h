@@ -34,7 +34,6 @@ namespace plib
 		enum E { __VA_ARGS__ }; \
 		constexpr ename (const E &v) : m_v(v) { } \
 		template <typename T> explicit constexpr ename(const T &val) { m_v = static_cast<E>(val); } \
-		template <typename T> explicit constexpr ename(T && val) { m_v = static_cast<E>(val); } \
 		bool set_from_string (const pstring &s) { \
 			int f = from_string_int(strings(), s); \
 			if (f>=0) { m_v = static_cast<E>(f); return true; } \

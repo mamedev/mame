@@ -289,7 +289,7 @@ public:
 		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
 
 	template <typename T>
-	explicit ofstream(const pstring_t<T> name, ios_base::openmode mode = ios_base::in)
+	explicit ofstream(const pstring_t<T> name, ios_base::openmode mode = ios_base::out | ios_base::trunc)
 	: std::ofstream(filename_type(name).c_str(), mode)
 	{
 	}

@@ -187,7 +187,7 @@ namespace netlist
 			}
 		};
 
-		/// \brief: used define a constant in device description struct
+		/// \brief: used to define a constant in device description struct
 		///
 		/// See the 74125 implementation
 		///

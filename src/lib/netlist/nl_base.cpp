@@ -831,10 +831,8 @@ namespace netlist
 		device.state().setup().register_param_t(*this);
 	}
 
-	param_t::~param_t() noexcept
-	{
-		// placed here to avoid weak vtable warnings
-	}
+	// placed here to avoid weak vtable warnings
+	param_t::~param_t() noexcept = default;
 
 	param_t::param_type_t param_t::param_type() const noexcept(false)
 	{
