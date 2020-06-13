@@ -11227,6 +11227,9 @@ ROM_START( witchcdj )
 	ROM_LOAD( "3.7a",   0x1000, 0x0800, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
 	ROM_IGNORE(                 0x0800) /* identical halves */
 
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise the game is not working
+	ROM_LOAD( "witchcdj_nvram.bin", 0x0000, 0x0800, CRC(39766c6a) SHA1(9de4c5886d1ee12898f7d3b0224ab99d49e5e43d) )
+
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10.9c",    0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
@@ -12109,7 +12112,7 @@ GAMEL( 1985, witchcdf,  witchcrd, witchcrd, witchcdf, goldnpkr_state, empty_init
 GAMEL( 199?, witchcdg,  witchcrd, wcfalcon, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",        0,                   layout_goldnpkr )
 GAMEL( 1994, witchcdh,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",        0,                   layout_goldnpkr )
 GAMEL( 1994, witchcdi,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",       0,                   layout_goldnpkr )
-GAME(  199?, witchcdj,  witchcrd, witchcdj, witchcrd, goldnpkr_state, init_icp1db,   ROT0,   "<unknown>",                "Witch Card (ICP-1)",                         0 )
+GAME(  199?, witchcdj,  witchcrd, witchcdj, witchcrd, goldnpkr_state, init_icp1db,   ROT0,   "<unknown>",                "Witch Card (ICP-1, encrypted)",              0 )
 
 GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",            0,                   layout_goldnpkr )
 GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",            MACHINE_NOT_WORKING, layout_goldnpkr )
