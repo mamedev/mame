@@ -150,6 +150,7 @@ void coco3_state::update_cart_base(uint8_t *cart_base)
 uint32_t coco3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bool result;
+	m_screen = screen;
 	if (!strcmp(screen.tag(), ":" COMPOSITE_SCREEN_TAG))
 	{
 		/* composite screen */

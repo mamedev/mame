@@ -195,8 +195,8 @@ protected:
 		ioport_port *m_input[2][2];
 		ioport_port *m_buttons;
 
-		uint8_t input(int joystick, int axis) const { return m_input[joystick][axis] ? m_input[joystick][axis]->read() : 0x00; }
-		uint8_t buttons(void) const { return m_buttons ? m_buttons->read() : 0x00; }
+		u32 input(int joystick, int axis) const { return m_input[joystick][axis] ? m_input[joystick][axis]->read() : 0x00; }
+		u32 buttons(void) const { return m_buttons ? m_buttons->read() : 0x00; }
 	};
 
 	void analog_port_start(analog_input_t *analog, const char *rx_tag, const char *ry_tag, const char *lx_tag, const char *ly_tag, const char *buttons_tag);
@@ -269,7 +269,7 @@ protected:
 	uint8_t m_dclg_output_h;
 	uint8_t m_dclg_output_v;
 	uint8_t m_dclg_state;
-	uint16_t m_dclg_timer;
+	u32 m_dclg_timer;
 
 	// VHD selection
 	uint8_t m_vhd_select;
