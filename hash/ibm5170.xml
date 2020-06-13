@@ -5306,6 +5306,38 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ultrasnd205" cloneof="ultrasnd">
+		<!-- Included with Gravis Ultrasound Rev. 2.4 card -->
+		<description>Gravis UltraSound (GUS) Installation - V2.05</description>
+		<year>1993</year>
+		<publisher>Advanced Gravis</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="gus205_disk1.img" size="1474560" crc="63eb9aee" sha1="c0b4c759aa92beed0a689ba22e9843649f193dee"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="gus205_disk2.img" size="1474560" crc="211b3496" sha1="0322d81c3599fffbe18dfef0f102e0e6fd15de6c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="gus205_disk3.img" size="1474560" crc="0a563568" sha1="eb59f75cb15bb904a681c60a1f97799a0cc3fbbd"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="gus205_disk4.img" size="1474560" crc="de0852eb" sha1="8d230bc0f4066212869b631b04d5c082db016f39"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="gus205_disk5.img" size="1474560" crc="4bbc6c6f" sha1="2447a9d6832660d52e07fb7e2e4a70701c28fe51"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gusbonus" supported="no">
 		<!-- includes WinSoft Sound Station, UltraSound Studio -->
 		<description>Gravis UltraSound BONUS Software Installation v. 1.52</description>
@@ -9327,6 +9359,33 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="cyacgus">
+		<!-- Included with Gravis Ultrasound Rev. 2.4 card -->
+		<description>Chuck Yeager's Air Combat (Gravis Ultrasound version)</description>
+		<year>1992</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="cyac_gus_disk1.img" size="737280" crc="da79f1fb" sha1="35b2b4a13daece9afbe701e6d8c630825d329f63"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="cyac_gus_disk2.img" size="737280" crc="0af680eb" sha1="61e850e70473338c89e6c943792651727f5c9c45"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="cyac_gus_disk3.img" size="737280" crc="488d635c" sha1="dc68d1e5523b6ba0bd48b2a0eda0803bafef4747"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="cyac_gus_disk4.img" size="737280" crc="23645ee6" sha1="dc26f1eff2c190d04815724f510b64d792716d20"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cischeat">
 		<!-- Dumped via Kryoflux -->
 		<description>Cisco Heat - All American Police Car Race</description>
@@ -10121,7 +10180,28 @@ license:CC0
 	</software>
 
 	<software name="dune">
-		<description>Dune</description>
+		<description>Dune (3.5")</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="dune_disk1.img" size="737280" crc="1538a981" sha1="aaa06cf87b769fa57018775fc76db264eae4ed24"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="dune_disk2.img" size="737280" crc="6eb9eb71" sha1="52100bcf700ddc318df5feb80fa02cb8969bf089"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="dune_disk3.img" size="737280" crc="a3ebe546" sha1="eeeda9400523c1b70f4369bff20ebefa5e3a1185"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dune525" cloneof="dune">
+		<description>Dune (5.25")</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -10638,6 +10718,24 @@ license:CC0
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Freddy Pharkas Frontier Pharmacist [Sierra On-Line] [1993] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="fac2e0cd" sha1="397aeea0ec5cfde3b8a1064cecc6e11c646ceea2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frontier">
+		<description>Frontier - Elite II</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk"/>
+			<dataarea name="flop" size = "737280">
+				<rom name="frontier_program.img" size="737280" crc="5ec6142c" sha1="7b8897067a76c46f1814b4ad31f86257d7479d51"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk"/>
+			<dataarea name="flop" size = "737280">
+				<rom name="frontier_data.img" size="737280" crc="1a7b1209" sha1="9dfde31f3591d19856a8bbeb82eb5b2ed1fd3726"/>
 			</dataarea>
 		</part>
 	</software>
