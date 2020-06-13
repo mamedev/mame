@@ -57,6 +57,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_framecnt(0)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_beeper(*this, "beeper")
 		, m_cass(*this, "cassette")
 		, m_p_colorram(*this, "colorram")
@@ -74,14 +76,17 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	uint32_t screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void z9001_io(address_map &map);
-	void z9001_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	uint8_t m_framecnt;
 	bool m_cassbit;
 	virtual void machine_reset() override;
-	//virtual void machine_start();
+	virtual void machine_start() override;
+	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_device<beep_device> m_beeper;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<uint8_t> m_p_colorram;
@@ -89,17 +94,17 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-void z9001_state::z9001_mem(address_map &map)
+void z9001_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xe7ff).ram();
+	map(0x0000, 0xe7ff).ram().share("mainram");
+	map(0xc000, 0xe7ff).rom().region("maincpu",0x1000);
 	map(0xe800, 0xebff).ram().share("colorram");
-	map(0xc000, 0xe7ff).rom();
 	map(0xec00, 0xefff).ram().share("videoram");
-	map(0xf000, 0xffff).rom();
+	map(0xf000, 0xffff).rom().region("maincpu",0);
 }
 
-void z9001_state::z9001_io(address_map &map)
+void z9001_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -144,7 +149,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(z9001_state::timer_callback)
 
 void z9001_state::machine_reset()
 {
-	m_maincpu->set_state_int(Z80_PC, 0xf000);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x0fff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xf000, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
+}
+
+void z9001_state::machine_start()
+{
+	save_item(NAME(m_framecnt));
+	save_item(NAME(m_cassbit));
 }
 
 uint32_t z9001_state::screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -191,7 +217,7 @@ uint32_t z9001_state::screen_update_z9001(screen_device &screen, bitmap_ind16 &b
 }
 
 /* F4 Character Displayer */
-static const gfx_layout z9001_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
 	1024,                   /* 4 x 256 characters */
@@ -210,7 +236,7 @@ void z9001_state::kbd_put(u8 data)
 }
 
 static GFXDECODE_START( gfx_z9001 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, z9001_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -218,8 +244,8 @@ void z9001_state::z9001(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(9'830'400) / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &z9001_state::z9001_mem);
-	m_maincpu->set_addrmap(AS_IO, &z9001_state::z9001_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z9001_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &z9001_state::io_map);
 	m_maincpu->set_daisy_config(z9001_daisy_chain);
 
 	/* video hardware */
@@ -261,13 +287,13 @@ void z9001_state::z9001(machine_config &config)
 
 /* ROM definition */
 ROM_START( z9001 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x3800, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "orig", "Original" )
-	ROMX_LOAD( "os____f0.851", 0xf000, 0x1000, CRC(9fe60a92) SHA1(553609631f5eaa7d6758a73f56c613e280a5b310), ROM_BIOS(0))
+	ROMX_LOAD( "os____f0.851", 0x0000, 0x1000, CRC(9fe60a92) SHA1(553609631f5eaa7d6758a73f56c613e280a5b310), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "rb20", "ROM-Bank System without menu" )
-	ROMX_LOAD( "os_rb20.rom",  0xf000, 0x1000, CRC(c783124d) SHA1(c2893ce5bb23b280ba4e982e860586d21de2469b), ROM_BIOS(1))
+	ROMX_LOAD( "os_rb20.rom",  0x0000, 0x1000, CRC(c783124d) SHA1(c2893ce5bb23b280ba4e982e860586d21de2469b), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "rb21", "ROM-Bank System with menu" )
-	ROMX_LOAD( "os_rb21.rom",  0xf000, 0x1000, CRC(11eec2dd) SHA1(5dbb661bdf4daf92d6c4ffbbdec674e57917e9eb), ROM_BIOS(2))
+	ROMX_LOAD( "os_rb21.rom",  0x0000, 0x1000, CRC(11eec2dd) SHA1(5dbb661bdf4daf92d6c4ffbbdec674e57917e9eb), ROM_BIOS(2))
 
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "chargen.851", 0x0000, 0x0800, CRC(dd9c0f4e) SHA1(2e4928ba7161f5cce7173b7d2ded3d6596ae2aa2))
@@ -279,15 +305,15 @@ ROM_END
 #define rom_kc85_111 rom_z9001
 
 ROM_START( kc87_10 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x3800, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "orig", "Original" )
-	ROMX_LOAD( "os____f0.851", 0xf000, 0x1000, CRC(9fe60a92) SHA1(553609631f5eaa7d6758a73f56c613e280a5b310), ROM_BIOS(0))
+	ROMX_LOAD( "os____f0.851", 0x0000, 0x1000, CRC(9fe60a92) SHA1(553609631f5eaa7d6758a73f56c613e280a5b310), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "rb20", "ROM-Bank System without menu" )
-	ROMX_LOAD( "os_rb20.rom",  0xf000, 0x1000, CRC(c783124d) SHA1(c2893ce5bb23b280ba4e982e860586d21de2469b), ROM_BIOS(1))
+	ROMX_LOAD( "os_rb20.rom",  0x0000, 0x1000, CRC(c783124d) SHA1(c2893ce5bb23b280ba4e982e860586d21de2469b), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "rb21", "ROM-Bank System with menu" )
-	ROMX_LOAD( "os_rb21.rom",  0xf000, 0x1000, CRC(11eec2dd) SHA1(5dbb661bdf4daf92d6c4ffbbdec674e57917e9eb), ROM_BIOS(2))
+	ROMX_LOAD( "os_rb21.rom",  0x0000, 0x1000, CRC(11eec2dd) SHA1(5dbb661bdf4daf92d6c4ffbbdec674e57917e9eb), ROM_BIOS(2))
 
-	ROM_LOAD( "basic_c0.87a", 0xc000, 0x2800, CRC(c508d45e) SHA1(ea85b53e21429c4cb85cdb81b92f278a8f4eb574))
+	ROM_LOAD( "basic_c0.87a", 0x1000, 0x2800, CRC(c508d45e) SHA1(ea85b53e21429c4cb85cdb81b92f278a8f4eb574))
 
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "chargen.851", 0x0000, 0x0800, CRC(dd9c0f4e) SHA1(2e4928ba7161f5cce7173b7d2ded3d6596ae2aa2))
@@ -299,15 +325,15 @@ ROM_END
 #define rom_kc87_11 rom_kc87_10
 
 ROM_START( kc87_20 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x3800, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "orig", "Original" )
-	ROMX_LOAD( "os____f0.87b", 0xf000, 0x1000, CRC(a357d093) SHA1(b1df6b499517c8366a0795030ee800e8a258e938), ROM_BIOS(0))
+	ROMX_LOAD( "os____f0.87b", 0x0000, 0x1000, CRC(a357d093) SHA1(b1df6b499517c8366a0795030ee800e8a258e938), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "rb20", "ROM-Bank System without menu" )
-	ROMX_LOAD( "os_rb20.rom",  0xf000, 0x1000, CRC(c783124d) SHA1(c2893ce5bb23b280ba4e982e860586d21de2469b), ROM_BIOS(1))
+	ROMX_LOAD( "os_rb20.rom",  0x0000, 0x1000, CRC(c783124d) SHA1(c2893ce5bb23b280ba4e982e860586d21de2469b), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "rb21", "ROM-Bank System with menu" )
-	ROMX_LOAD( "os_rb21.rom",  0xf000, 0x1000, CRC(11eec2dd) SHA1(5dbb661bdf4daf92d6c4ffbbdec674e57917e9eb), ROM_BIOS(2))
+	ROMX_LOAD( "os_rb21.rom",  0x0000, 0x1000, CRC(11eec2dd) SHA1(5dbb661bdf4daf92d6c4ffbbdec674e57917e9eb), ROM_BIOS(2))
 
-	ROM_LOAD( "basic_c0.87b", 0xc000, 0x2800, CRC(9e8f6380) SHA1(8ffecc64ba35c953c93738f8568c83dc6af1ae72))
+	ROM_LOAD( "basic_c0.87b", 0x1000, 0x2800, CRC(9e8f6380) SHA1(8ffecc64ba35c953c93738f8568c83dc6af1ae72))
 
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "chargen.851", 0x0000, 0x0800, CRC(dd9c0f4e) SHA1(2e4928ba7161f5cce7173b7d2ded3d6596ae2aa2))
@@ -321,9 +347,9 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME              FLAGS
-COMP( 1984, z9001,    0,      0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "Z9001 (KC 85/1.10)", MACHINE_NOT_WORKING )
-COMP( 1986, kc85_111, z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 85/1.11",         MACHINE_NOT_WORKING )
-COMP( 1987, kc87_10,  z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 87.10",           MACHINE_NOT_WORKING )
-COMP( 1987, kc87_11,  z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 87.11",           MACHINE_NOT_WORKING )
-COMP( 1987, kc87_20,  z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 87.20",           MACHINE_NOT_WORKING )
-COMP( 1987, kc87_21,  z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 87.21",           MACHINE_NOT_WORKING )
+COMP( 1984, z9001,    0,      0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "Z9001 (KC 85/1.10)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, kc85_111, z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 85/1.11",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, kc87_10,  z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 87.10",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, kc87_11,  z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 87.11",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, kc87_20,  z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 87.20",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, kc87_21,  z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 87.21",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

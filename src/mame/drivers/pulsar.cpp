@@ -57,11 +57,11 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_rtc(*this, "rtc")
-		, m_ram(*this, "mainram")
 	{ }
 
 	void pulsar(machine_config &config);
@@ -74,27 +74,26 @@ private:
 	void ppi_pb_w(u8 data);
 	void ppi_pc_w(u8 data);
 	u8 ppi_pc_r();
-	u8 read_rom(offs_t offset);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	bool m_rom_in_map;
 	floppy_image_device *m_floppy;
+	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<msm5832_device> m_rtc;
-	memory_passthrough_handler *m_rom_shadow_tap;
-	required_shared_ptr<u8> m_ram;
 };
 
 void pulsar_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("mainram");
-	map(0xf800, 0xffff).r(FUNC(pulsar_state::read_rom));
+	map(0xf800, 0xffff).lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset+0xf800]; }));
 }
 
 void pulsar_state::io_map(address_map &map)
@@ -107,13 +106,6 @@ void pulsar_state::io_map(address_map &map)
 	map(0xf0, 0xf0).mirror(0x0f).w("brg", FUNC(com8116_device::stt_str_w));
 }
 
-u8 pulsar_state::read_rom(offs_t offset)
-{
-	if (m_rom_in_map)
-		return m_rom[offset];
-	else
-		return m_ram[offset+0xf800];
-}
 
 /*
 d0..d3 Drive select 0-3 (we only emulate 1 drive)

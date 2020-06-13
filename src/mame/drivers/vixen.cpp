@@ -373,14 +373,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(vixen_state::vsync_tick)
 	}
 }
 
-void vixen_state::video_start()
-{
-	// register for state saving
-	save_item(NAME(m_alt));
-	save_item(NAME(m_256));
-	save_item(NAME(m_vsync));
-}
-
 uint32_t vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
@@ -658,6 +650,20 @@ void vixen_state::machine_start()
 	save_item(NAME(m_cmd_d0));
 	save_item(NAME(m_cmd_d1));
 	save_item(NAME(m_fdint));
+	save_item(NAME(m_alt));
+	save_item(NAME(m_256));
+	save_item(NAME(m_vsync));
+	save_item(NAME(m_srq));
+	save_item(NAME(m_atn));
+	save_item(NAME(m_enb_srq_int));
+	save_item(NAME(m_enb_atn_int));
+	save_item(NAME(m_rxrdy));
+	save_item(NAME(m_txrdy));
+	save_item(NAME(m_int_clk));
+	save_item(NAME(m_enb_xmt_int));
+	save_item(NAME(m_enb_rcv_int));
+	save_item(NAME(m_enb_ring_int));
+
 }
 
 void vixen_state::machine_reset()
@@ -777,4 +783,4 @@ void vixen_state::init_vixen()
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY    FULLNAME  FLAGS
-COMP( 1984, vixen, 0,       0,     vixen,   vixen,  vixen_state, init_vixen, "Osborne", "Vixen",  0 )
+COMP( 1984, vixen, 0,       0,     vixen,   vixen,  vixen_state, init_vixen, "Osborne", "Vixen",  MACHINE_SUPPORTS_SAVE )

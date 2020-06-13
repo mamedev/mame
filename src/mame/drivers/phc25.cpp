@@ -119,15 +119,15 @@ WRITE_LINE_MEMBER( phc25_state::write_centronics_busy )
 
 /* Memory Maps */
 
-void phc25_state::phc25_mem(address_map &map)
+void phc25_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x5fff).rom().region(Z80_TAG, 0);
-	map(0x6000, 0x77ff).ram().share("video_ram");
+	map(0x6000, 0x77ff).ram().share("videoram");
 	map(0xc000, 0xffff).ram();
 }
 
-void phc25_state::phc25_io(address_map &map)
+void phc25_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -270,16 +270,16 @@ uint8_t phc25_state::video_ram_r(offs_t offset)
 {
 	if (BIT(m_port40, 7)) // graphics
 	{
-		return m_video_ram[offset];
+		return m_vram[offset];
 	}
 	else    // text
 	{
 		offset &= 0x7ff;
-		m_vdg->inv_w(BIT(m_video_ram[offset | 0x800], 0)); // cursor attribute
-		m_vdg->as_w(BIT(m_video_ram[offset | 0x800], 1)); // screen2 lores attribute
-		m_vdg->css_w(BIT(m_video_ram[offset | 0x800], 2)); // css attribute
+		m_vdg->inv_w(BIT(m_vram[offset | 0x800], 0)); // cursor attribute
+		m_vdg->as_w(BIT(m_vram[offset | 0x800], 1)); // screen2 lores attribute
+		m_vdg->css_w(BIT(m_vram[offset | 0x800], 2)); // css attribute
 		// bit 7 is set for all text (not spaces), meaning is unknown
-		return m_video_ram[offset];
+		return m_vram[offset];
 	}
 }
 
@@ -299,11 +299,17 @@ MC6847_GET_CHARROM_MEMBER(phc25_state::ntsc_char_rom_r)
 	return m_char_rom[(ch * 16 + line) & 0xfff];
 }
 
-void phc25_state::video_start()
+void phc25_state::machine_reset()
+{
+	m_port40 = 0;
+}
+
+void phc25_state::machine_start()
 {
 	/* find memory regions */
 	m_char_rom = memregion(Z80_TAG)->base() + 0x5000;
-	m_port40 = 0;
+	save_item(NAME(m_port40));
+	save_item(NAME(m_centronics_busy));
 }
 
 /* Machine Driver */
@@ -312,8 +318,8 @@ void phc25_state::phc25(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &phc25_state::phc25_mem);
-	m_maincpu->set_addrmap(AS_IO, &phc25_state::phc25_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &phc25_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &phc25_state::io_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -379,6 +385,7 @@ ROM_START( phc25 )
 	ROM_LOAD( "phc25rom.0", 0x0000, 0x2000, CRC(fa28336b) SHA1(582376bee455e124de24ba4ac02326c8a592fa5a)) // 031_00aa.ic13 ?
 	ROM_LOAD( "phc25rom.1", 0x2000, 0x2000, CRC(38fd578b) SHA1(dc3db78c0cdc89f1605200d39535be65a4091705)) // 031_01a.ic14 ?
 	ROM_LOAD( "phc25rom.2", 0x4000, 0x2000, CRC(54392b27) SHA1(1587827fe9438780b50164727ce3fdea1b98078a)) // 031_02a.ic15 ?
+
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "031_04a.ic6", 0x0000, 0x1000, CRC(e56fb8c5) SHA1(6fc388c17fb43debfbc1464f767d0ce1375ce27b))
 ROM_END
@@ -391,6 +398,7 @@ ROM_START( phc25j )
 	//ROM_LOAD( "022 00aa.ic", 0x0000, 0x2000, NO_DUMP )
 	//ROM_LOAD( "022 01aa.ic", 0x2000, 0x2000, NO_DUMP )
 	//ROM_LOAD( "022 02aa.ic", 0x4000, 0x2000, NO_DUMP )
+
 	//ROM_REGION( 0x1000, "chargen", 0 )
 	//ROM_LOAD( "022 04a.ic", 0x0000, 0x1000, NO_DUMP )
 ROM_END
@@ -398,5 +406,5 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY  FULLNAME           FLAGS
-COMP( 1983, phc25,  0,      0,      pal,     phc25,  phc25_state, empty_init, "Sanyo", "PHC-25 (Europe)", MACHINE_NO_SOUND )
-COMP( 1983, phc25j, phc25,  0,      ntsc,    phc25j, phc25_state, empty_init, "Sanyo", "PHC-25 (Japan)",  MACHINE_NO_SOUND )
+COMP( 1983, phc25,  0,      0,      pal,     phc25,  phc25_state, empty_init, "Sanyo", "PHC-25 (Europe)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, phc25j, phc25,  0,      ntsc,    phc25j, phc25_state, empty_init, "Sanyo", "PHC-25 (Japan)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
