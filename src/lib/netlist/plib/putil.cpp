@@ -3,9 +3,9 @@
 
 #include "putil.h"
 #include "penum.h"
+#include "pstream.h"
 #include "pstrutil.h"
 #include "ptypes.h"
-#include "pstream.h"
 
 #include <algorithm>
 #include <cstdlib> // needed for getenv ...
@@ -22,7 +22,7 @@ namespace plib
 		{
 			auto p=find_last_of(filename, pstring(PATH_SEPS));
 			pstring ret = (p == pstring::npos) ? filename : filename.substr(p+1);
-			if (suffix != "" && endsWith(ret, suffix))
+			if (!suffix.empty() && endsWith(ret, suffix))
 				return ret.substr(0, ret.length() - suffix.length());
 			return ret;
 		}
@@ -49,7 +49,7 @@ namespace plib
 			pstring ret = "";
 			for( const auto &elem : list )
 			{
-				if (ret == "")
+				if (ret.empty())
 					ret = elem;
 				else
 					ret += (PATH_SEP + elem);
@@ -126,7 +126,7 @@ namespace plib
 		auto i = str.begin();
 		while (i != str.end())
 		{
-			auto p = static_cast<std::size_t>(-1);
+			auto p = pstring::npos;
 			for (std::size_t j=0; j < onstrl.size(); j++)
 			{
 				if (std::equal(onstrl[j].begin(), onstrl[j].end(), i))
@@ -135,14 +135,14 @@ namespace plib
 					break;
 				}
 			}
-			if (p != static_cast<std::size_t>(-1))
+			if (p != pstring::npos)
 			{
-				if (col != "")
+				if (!col.empty())
 					ret.push_back(col);
 
 				col = "";
 				ret.push_back(onstrl[p]);
-				i = std::next(i, static_cast<pstring::difference_type>(onstrl[p].length()));
+				i = std::next(i, narrow_cast<pstring::difference_type>(onstrl[p].length()));
 			}
 			else
 			{
@@ -151,7 +151,7 @@ namespace plib
 				i++;
 			}
 		}
-		if (col != "")
+		if (!col.empty())
 			ret.push_back(col);
 
 		return ret;
@@ -170,8 +170,8 @@ namespace plib
 		return -1;
 	}
 
-	pstring penum_base::nthstr(int n, const pstring &str)
+	pstring penum_base::nthstr(std::size_t n, const pstring &str)
 	{
-		return psplit(str, ",", false)[static_cast<std::size_t>(n)];
+		return psplit(str, ",", false)[n];
 	}
 } // namespace plib

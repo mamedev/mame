@@ -127,7 +127,7 @@ protected:
 	netlist::host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
 	{
 		//return plib::make_unique<plib::dynlib_static>(nullptr);
-		return netlist::host_arena::make_unique<plib::dynlib_static>(nl_static_solver_syms);
+		return plib::make_unique<plib::dynlib_static, netlist::host_arena>(nl_static_solver_syms);
 	}
 
 private:
@@ -169,7 +169,7 @@ protected:
 
 	netlist::host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
 	{
-		return netlist::host_arena::make_unique<plib::dynlib_static>(nullptr);
+		return plib::make_unique<plib::dynlib_static, netlist::host_arena>(nullptr);
 	}
 
 private:
@@ -181,7 +181,7 @@ class netlist_mame_device::netlist_mame_t : public netlist::netlist_state_t
 public:
 
 	netlist_mame_t(netlist_mame_device &parent, const pstring &name)
-		: netlist::netlist_state_t(name, netlist::host_arena::make_unique<netlist_mame_device::netlist_mame_callbacks_t>(parent))
+		: netlist::netlist_state_t(name, plib::make_unique<netlist_mame_device::netlist_mame_callbacks_t, netlist::host_arena>(parent))
 		, m_parent(parent)
 	{
 	}
@@ -978,7 +978,8 @@ netlist::host_arena::unique_ptr<netlist::netlist_state_t> netlist_mame_device::b
 {
 	try
 	{
-		auto lnetlist = netlist::host_arena::make_unique<netlist::netlist_state_t>("netlist", netlist::host_arena::make_unique<netlist_validate_callbacks_t>());
+		auto lnetlist = plib::make_unique<netlist::netlist_state_t, netlist::host_arena>("netlist",
+			plib::make_unique<netlist_validate_callbacks_t, netlist::host_arena>());
 		// enable validation mode
 		lnetlist->set_extended_validation(true);
 		common_dev_start(lnetlist.get());

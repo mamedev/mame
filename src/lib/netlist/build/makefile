@@ -25,11 +25,13 @@ VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
 
 TIDY_FLAGSX = -checks=*,-google*,-hicpp*,readability*,-fuchsia*,cert-*,-android-*,
-TIDY_FLAGSX += -llvm-header-guard,-cppcoreguidelines-pro-type-reinterpret-cast,
+TIDY_FLAGSX += -llvm-header-guard,
+# TIDY_FLAGSX += -cppcoreguidelines-pro-type-reinterpret-cast,
 TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,
 #TIDY_FLAGSX += -cppcoreguidelines-owning-memory,
 TIDY_FLAGSX += -modernize-use-default-member-init,-cppcoreguidelines-pro-bounds-constant-array-index,
-TIDY_FLAGSX += -modernize-pass-by-value,-cppcoreguidelines-pro-type-static-cast-downcast,
+TIDY_FLAGSX += -modernize-pass-by-value,
+#TIDY_FLAGSX += -cppcoreguidelines-pro-type-static-cast-downcast,
 TIDY_FLAGSX += -cppcoreguidelines-avoid-magic-numbers,
 TIDY_FLAGSX += -cppcoreguidelines-macro-usage,
 TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes,
@@ -37,7 +39,7 @@ TIDY_FLAGSX += -bugprone-macro-parentheses,
 #TIDY_FLAGSX += -misc-macro-parentheses,
 TIDY_FLAGSX += -bugprone-too-small-loop-variable,
 TIDY_FLAGSX += -modernize-use-trailing-return-type,
-TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+#TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
 TIDY_FLAGSX += -readability-magic-numbers,-readability-braces-around-statements,
 TIDY_FLAGSX += -readability-implicit-bool-conversion,
 TIDY_FLAGSX += -readability-named-parameter,-readability-function-size,
@@ -85,7 +87,7 @@ CC = g++
 LD = @g++
 MD = @mkdir
 RM = @rm
-CLANG_TIDY = clang-tidy-10
+CLANG_TIDY = clang-tidy-11
 DEPENDCC=$(CC)
 
 
@@ -132,6 +134,8 @@ POBJS := \
 PMAIN := $(POBJ)/pmain.o
 
 NLOBJS := \
+	$(NLOBJ)/solver/nld_solver.o \
+	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/nl_base.o \
 	$(NLOBJ)/nl_parser.o \
 	$(NLOBJ)/nl_setup.o \
@@ -142,8 +146,6 @@ NLOBJS := \
 	$(NLOBJ)/analog/nld_switches.o \
 	$(NLOBJ)/analog/nlid_twoterm.o \
 	$(NLOBJ)/analog/nld_opamps.o \
-	$(NLOBJ)/solver/nld_solver.o \
-	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/tools/nl_convert.o \
 	$(NLOBJ)/generated/static_solvers.o \
 	$(NLOBJ)/devices/nld_2102A.o \
@@ -287,27 +289,32 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
 gcc9:
-	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -fext-numeric-literals -Wall -pedantic -Wpedantic -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
+	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -Wall -pedantic -Wpedantic -fext-numeric-literals -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
 
 clang:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
 	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native \
 		-mllvm -inline-threshold=2000 \
+		-Wunknown-warning-option \
 		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
 		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wno-unused-template \
-		-Wno-missing-variable-declarations -Wno-float-equal -Wconversion \
+		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
-		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override"
+		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
+		-Wno-return-std-move-in-c++11 -Wno-unreachable-code"
 
 clang-libc:
+	#clang-11 currently broken
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
-	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
+	$(MAKE) CC=clang++-10 LD=clang++-10 OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
 		-stdlib=libc++ -mllvm -inline-threshold=2000 \
+		-Wunknown-warning-option \
 		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
 		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wno-unused-template \
-		-Wno-missing-variable-declarations -Wno-float-equal -Wconversion \
+		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
-		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override" \
+		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
+		-Wno-return-std-move-in-c++11 -Wno-unreachable-code"
 		LDEXTRAFLAGS=-stdlib=libc++
 
 clang-5:

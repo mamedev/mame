@@ -95,14 +95,14 @@ namespace plib {
 				if (this->gptr() == this->egptr())
 				{
 					// clang reports sign error - weird
-					std::size_t bytes = m_strm->m_outbuf.size() - static_cast<std::size_t>(m_strm->m_pos);
+					std::size_t bytes = m_strm->m_outbuf.size() - narrow_cast<std::size_t>(m_strm->m_pos);
 
 					if (bytes > m_buf.size())
 						bytes = m_buf.size();
 					std::copy(m_strm->m_outbuf.c_str() + m_strm->m_pos, m_strm->m_outbuf.c_str() + m_strm->m_pos + bytes, m_buf.data());
 					this->setg(m_buf.data(), m_buf.data(), m_buf.data() + bytes);
 
-					m_strm->m_pos += static_cast<long>(bytes);
+					m_strm->m_pos += narrow_cast<long>(bytes);
 				}
 
 				return this->gptr() == this->egptr()

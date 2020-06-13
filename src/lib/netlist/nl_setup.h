@@ -307,10 +307,10 @@ namespace netlist
 		void register_param(const pstring &param, nl_fptype value);
 
 		template <typename T>
-		std::enable_if_t<plib::is_floating_point<T>::value || plib::is_integral<T>::value>
+		std::enable_if_t<plib::is_arithmetic<T>::value>
 		register_param_val(const pstring &param, T value)
 		{
-			register_param(param, static_cast<nl_fptype>(value));
+			register_param(param, plib::narrow_cast<nl_fptype>(value));
 		}
 
 		void register_lib_entry(const pstring &name, factory::properties &&props);

@@ -24,7 +24,7 @@ namespace plib
 		// Implementation in putil.cpp.
 		// Putting the code here leads to a performance decrease.
 		static int from_string_int(const pstring &str, const pstring &x);
-		static pstring nthstr(int n, const pstring &str);
+		static pstring nthstr(std::size_t n, const pstring &str);
 	};
 
 } // namespace plib
@@ -43,7 +43,7 @@ namespace plib
 		constexpr bool operator==(const ename &rhs) const noexcept {return m_v == rhs.m_v;} \
 		constexpr bool operator==(const E &rhs) const noexcept {return m_v == rhs;} \
 		pstring name() const { \
-			return nthstr(static_cast<int>(m_v), strings()); \
+			return nthstr(m_v, strings()); \
 		} \
 		private: E m_v; \
 		static pstring strings() {\

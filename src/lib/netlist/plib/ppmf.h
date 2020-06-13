@@ -159,32 +159,43 @@ namespace plib {
 			if (PMFINTERNAL == 1)
 			{
 				// apply the "this" delta to the object first
-				// NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
+				// NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult,cppcoreguidelines-pro-type-reinterpret-cast)
 				generic_class *o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 
 				// if the low bit of the vtable index is clear, then it is just a raw function pointer
 				if ((m_function & 1) == 0)
+				{
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					func = reinterpret_cast<generic_function>(m_function);
+				}
 				else
 				{
 					// otherwise, it is the byte index into the vtable where the actual function lives
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(o_p_delta);
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					func = *reinterpret_cast<generic_function *>(vtable_base + m_function - 1);
 				}
 				object = o_p_delta;
 			}
 			else if (PMFINTERNAL == 2)
 			{
-				if ((m_this_delta & 1) == 0) {
+				if ((m_this_delta & 1) == 0)
+				{
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					object = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					func = reinterpret_cast<generic_function>(m_function);
 				}
 				else
 				{
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					object = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object));
 
 					// otherwise, it is the byte index into the vtable where the actual function lives
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(object);
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					func = *reinterpret_cast<generic_function *>(vtable_base + m_function + m_this_delta - 1);
 				}
 			}
@@ -192,8 +203,10 @@ namespace plib {
 			{
 				const int SINGLE_MEMFUNCPTR_SIZE = sizeof(void (generic_class::*)());
 
+				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 				func = reinterpret_cast<generic_function>(m_function);
 				if (m_size == SINGLE_MEMFUNCPTR_SIZE + sizeof(int))
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					object = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 			}
 		}
@@ -231,8 +244,10 @@ namespace plib {
 		{
 			raw_type mfpo(mftp);
 			generic_function_storage rfunc(nullptr);
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			auto *robject = reinterpret_cast<generic_class *>(object);
 			mfpo.convert_to_generic(rfunc, robject);
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			return std::make_pair(reinterpret_cast<FunctionType>(rfunc), reinterpret_cast<ObjectType *>(robject));
 		}
 		template<typename O>
@@ -259,6 +274,7 @@ namespace plib {
 		template<typename FunctionType, typename MemberFunctionType, typename ObjectType>
 		static std::pair<FunctionType, ObjectType *> get(MemberFunctionType mftp, ObjectType *object)
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			return std::make_pair(reinterpret_cast<FunctionType>(mftp), reinterpret_cast<ObjectType *>(object));
 		}
 
@@ -286,6 +302,7 @@ namespace plib {
 		template<typename FunctionType, typename MemberFunctionType, typename ObjectType>
 		static std::pair<FunctionType, ObjectType *> get(MemberFunctionType mftp, ObjectType *object)
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			return std::make_pair(reinterpret_cast<FunctionType>(object->*mftp), reinterpret_cast<ObjectType *>(object));
 		}
 		template<typename O>
@@ -315,6 +332,7 @@ namespace plib {
 		pmfp_base()
 		: m_obj(nullptr)
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			auto *s = reinterpret_cast<std::uint8_t *>(&m_resolved);
 			std::fill(s, s + sizeof(m_resolved), 0);
 		}
@@ -323,6 +341,7 @@ namespace plib {
 		pmfp_base(specific_member_function<O> mftp, O *object)
 		: m_obj(nullptr)
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			auto *s = reinterpret_cast<std::uint8_t *>(&m_resolved);
 			std::fill(s, s + sizeof(m_resolved), 0);
 			bind(object, &mftp);
@@ -351,6 +370,7 @@ namespace plib {
 			//auto pFunc = *reinterpret_cast<specific_member_function<O> *>(fraw); // mftp;
 			specific_member_function<O> pFunc;
 			static_assert(sizeof(pFunc) >= sizeof(MF), "size error");
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			*reinterpret_cast<MF *>(&pFunc) = *fraw;
 
 			auto r = helper::template get<member_abi_function<O>>(pFunc, object);
@@ -360,18 +380,21 @@ namespace plib {
 
 			//*reinterpret_cast<member_abi_function<O> *>(&m_resolved) = r.first;
 			reinterpret_copy(r.first, m_resolved);
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			m_obj = reinterpret_cast<generic_class *>(r.second);
 		}
 
 		template<typename O>
 		R call(O *obj, Targs&&... args) const noexcept(true)
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			return helper::call(reinterpret_cast<member_abi_function<O> *>(&m_resolved),
 				obj, std::forward<Targs>(args)...);
 		}
 
 		R call(Targs&&... args) const noexcept(true)
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			return helper::call(reinterpret_cast<const member_abi_function<generic_class> *>(&m_resolved),
 				m_obj, std::forward<Targs>(args)...);
 		}
@@ -414,12 +437,13 @@ namespace plib {
 
 		using static_creator = return_type (*)(const generic_member_function *, generic_class *);
 
-		late_pmfp() {}
+		late_pmfp() = default;
 
 		template<typename O>
 		late_pmfp(specific_member_function<O> mftp)
 		{
 			static_assert(sizeof(m_raw) >= sizeof(specific_member_function<O>), "size issue");
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			*reinterpret_cast<specific_member_function<O> *>(&m_raw) = mftp;
 			m_creator = creator<O>;
 		}
@@ -427,6 +451,7 @@ namespace plib {
 		template<typename O>
 		return_type operator()(O *object) const
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			return m_creator(&m_raw, reinterpret_cast<generic_class *>(object));
 		}
 
@@ -435,7 +460,9 @@ namespace plib {
 		template <typename O>
 		static return_type creator(const generic_member_function *raw, generic_class *obj)
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			auto p = reinterpret_cast<const specific_member_function<O> *>(raw);
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			auto o = reinterpret_cast<O *>(obj);
 			return return_type(*p, o);
 		}

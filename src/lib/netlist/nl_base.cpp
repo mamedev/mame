@@ -27,7 +27,7 @@ namespace netlist
 
 	host_arena::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
 	{
-		return host_arena::make_unique<plib::dynlib_static>(nullptr);
+		return plib::make_unique<plib::dynlib_static, host_arena>(nullptr);
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -129,9 +129,9 @@ namespace netlist
 
 		m_lib = m_callbacks->static_solver_lib();
 
-		m_setup = host_arena::make_unique<setup_t>(*this);
+		m_setup = plib::make_unique<setup_t, host_arena>(*this);
 		// create the run interface
-		m_netlist = m_pool.make_unique<netlist_t>(*this, name);
+		m_netlist = plib::make_unique<netlist_t>(m_pool, *this, name);
 
 		// Make sure save states are invalidated when a new version is deployed
 
@@ -313,7 +313,7 @@ namespace netlist
 			case 0:
 			{
 				std::vector<core_device_t *> d;
-				std::vector<nldelegate *> t;
+				std::vector<const nldelegate *> t;
 				log().verbose("Using default startup strategy");
 				for (auto &n : m_nets)
 					for (auto & term : n->core_terms())
@@ -402,7 +402,7 @@ namespace netlist
 		}
 
 		log().verbose("Total calls : {1:12} {2:12} {3:12}", total_count,
-			total_time, total_time / static_cast<decltype(total_time)>((total_count > 0) ? total_count : 1));
+			total_time, total_time / gsl::narrow<decltype(total_time)>((total_count > 0) ? total_count : 1));
 
 		log().verbose("Total loop     {1:15}", si.m_stat_mainloop());
 		log().verbose("Total time     {1:15}", total_time);
@@ -424,8 +424,8 @@ namespace netlist
 			}
 
 			plib::pperftime_t<true>::type total_overhead = overhead()
-					* static_cast<plib::pperftime_t<true>::type>(total_count)
-					/ static_cast<plib::pperftime_t<true>::type>(200000);
+					* gsl::narrow<plib::pperftime_t<true>::type>(total_count)
+					/ gsl::narrow<plib::pperftime_t<true>::type>(200000);
 
 			log().verbose("Queue Pushes   {1:15}", si.m_queue.m_prof_call());
 			log().verbose("Queue Moves    {1:15}", si.m_queue.m_prof_sortmove());
@@ -436,7 +436,7 @@ namespace netlist
 			log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
 			log().verbose("Total overhead {1:15}", total_overhead);
 			plib::pperftime_t<true>::type overhead_per_pop = (si.m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
-					/ static_cast<plib::pperftime_t<true>::type>(si.m_queue.m_prof_call());
+					/ gsl::narrow<plib::pperftime_t<true>::type>(si.m_queue.m_prof_call());
 			log().verbose("Overhead per pop  {1:11}", overhead_per_pop );
 			log().verbose("");
 		}
@@ -450,7 +450,7 @@ namespace netlist
 			if (stats->m_stat_inc_active() > 3 * stats->m_stat_total_time.count()
 				&& stats->m_stat_inc_active() > trigger)
 				log().verbose("HINT({}, NO_DEACTIVATE) // {} {} {}", ep->name(),
-					static_cast<nl_fptype>(stats->m_stat_inc_active()) / static_cast<nl_fptype>(stats->m_stat_total_time.count()),
+					gsl::narrow<nl_fptype>(stats->m_stat_inc_active()) / gsl::narrow<nl_fptype>(stats->m_stat_total_time.count()),
 					stats->m_stat_inc_active(), stats->m_stat_total_time.count());
 		}
 		log().verbose("");
@@ -856,14 +856,14 @@ namespace netlist
 	pstring param_t::get_initial(const core_device_t *dev, bool *found) const
 	{
 		pstring res = dev->state().setup().get_initial_param_val(this->name(), "");
-		*found = (res != "");
+		*found = (!res.empty());
 		return res;
 	}
 
 	param_str_t::param_str_t(core_device_t &device, const pstring &name, const pstring &val)
 	: param_t(device, name)
 	{
-		m_param = host_arena::make_unique<pstring>(val);
+		m_param = plib::make_unique<pstring, host_arena>(val);
 		*m_param = device.state().setup().get_initial_param_val(this->name(),val);
 	}
 
@@ -871,7 +871,7 @@ namespace netlist
 	: param_t(name)
 	{
 		// deviceless parameter, no registration, owner is responsible
-		m_param = host_arena::make_unique<pstring>(val);
+		m_param = plib::make_unique<pstring, host_arena>(val);
 		*m_param = state.setup().get_initial_param_val(this->name(),val);
 	}
 

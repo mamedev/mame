@@ -62,11 +62,13 @@ namespace plib {
 
 		reference operator[](size_type index) noexcept
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			return reinterpret_cast<reference>(m_buf[index]);
 		}
 
 		constexpr const_reference operator[](size_type index) const noexcept
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			return reinterpret_cast<const_reference>(m_buf[index]);
 		}
 
@@ -78,13 +80,19 @@ namespace plib {
 			new (&m_buf[index]) C(std::forward<Args>(args)...);
 		}
 
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		iterator begin() const noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		iterator end() const noexcept { return reinterpret_cast<iterator>(&m_buf[N]); }
 
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		iterator begin() noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		iterator end() noexcept { return reinterpret_cast<iterator>(&m_buf[N]); }
 
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		const_iterator cbegin() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0]); }
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		const_iterator cend() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[N]); }
 
 	protected:

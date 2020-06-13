@@ -12,7 +12,8 @@
 
 #include "plib/mat_cr.h"
 
-#include "nld_ms_direct.h"
+//#include "nld_ms_direct.h"
+#include "nld_matrix_solver_ext.h"
 #include "nld_solver.h"
 #include "plib/pdynlib.h"
 #include "plib/pstream.h"
@@ -31,6 +32,8 @@ namespace solver
 	public:
 
 		using mat_type = plib::pGEmatrix_cr_t<plib::pmatrix_cr_t<FT, SIZE>>;
+		using base_type = matrix_solver_ext_t<FT, SIZE>;
+		using fptype = typename base_type::fptype;
 
 		matrix_solver_GCR_t(netlist_state_t &anetlist, const pstring &name,
 			const analog_net_t::list_t &nets,
@@ -85,9 +88,9 @@ namespace solver
 
 			anetlist.log().verbose("maximum fill: {1}", gr.first);
 			anetlist.log().verbose("Post elimination occupancy ratio: {2} Ops: {1}", gr.second,
-					static_cast<nl_fptype>(mat.nz_num) / static_cast<nl_fptype>(iN * iN));
+					static_cast<fptype>(mat.nz_num) / static_cast<fptype>(iN * iN));
 			anetlist.log().verbose(" Pre elimination occupancy ratio: {2}",
-					static_cast<nl_fptype>(raw_elements) / static_cast<nl_fptype>(iN * iN));
+					static_cast<fptype>(raw_elements) / static_cast<fptype>(iN * iN));
 
 			// FIXME: Move me
 			//
@@ -123,7 +126,7 @@ namespace solver
 		pstring static_compile_name();
 
 		mat_type mat;
-		plib::dynproc<void, FT *, nl_fptype *, nl_fptype *, nl_fptype *, nl_fptype ** > m_proc;
+		plib::dynproc<void, FT *, fptype *, fptype *, fptype *, fptype ** > m_proc;
 
 	};
 
@@ -273,7 +276,7 @@ namespace solver
 	pstring matrix_solver_GCR_t<FT, SIZE>::static_compile_name()
 	{
 		pstring str_floattype(fp_constants<FT>::name());
-		pstring str_fptype(fp_constants<nl_fptype>::name());
+		pstring str_fptype(fp_constants<fptype>::name());
 		std::stringstream t;
 		t.imbue(std::locale::classic());
 		plib::putf8_fmt_writer w(&t);
@@ -290,7 +293,7 @@ namespace solver
 		plib::putf8_fmt_writer strm(&t);
 		pstring name = static_compile_name();
 		pstring str_floattype(fp_constants<FT>::name());
-		pstring str_fptype(fp_constants<nl_fptype>::name());
+		pstring str_fptype(fp_constants<fptype>::name());
 
 		pstring extqual;
 		if (target == CXX_EXTERNAL_C)

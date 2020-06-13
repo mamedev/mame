@@ -8,6 +8,7 @@
 /// \file nld_ms_direct2.h
 ///
 
+#include "nld_matrix_solver_ext.h"
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
 

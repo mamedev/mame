@@ -708,9 +708,8 @@ namespace netlist
 	#endif
 
 			void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
-			nldelegate &delegate() noexcept { return m_delegate; }
 			const nldelegate &delegate() const noexcept { return m_delegate; }
-			inline void run_delegate() noexcept { m_delegate(); }
+			inline void run_delegate() noexcept { return m_delegate(); }
 		private:
 			nldelegate m_delegate;
 			net_t * m_net;
@@ -997,7 +996,7 @@ namespace netlist
 	{
 	public:
 
-		using list_t =  std::vector<analog_net_t *>;
+		using list_t =  plib::aligned_vector<analog_net_t *>;
 
 		analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *railterminal = nullptr);
 
@@ -1209,7 +1208,7 @@ namespace netlist
 
 		pstring valstr() const override
 		{
-			return plib::pfmt("{}").e(static_cast<nl_fptype>(m_param));
+			return plib::pfmt("{}").e(gsl::narrow<nl_fptype>(m_param));
 		}
 
 	private:
@@ -1309,7 +1308,7 @@ namespace netlist
 		public:
 			template <typename P, typename Y=T, typename DUMMY = std::enable_if_t<plib::is_arithmetic<Y>::value>>
 			value_base_t(P &param, const pstring &name)
-			: m_value(static_cast<T>(param.value(name)))
+			: m_value(gsl::narrow<T>(param.value(name)))
 			{
 			}
 			template <typename P, typename Y=T, std::enable_if_t<!plib::is_arithmetic<Y>::value, int> = 0>
@@ -1513,7 +1512,8 @@ namespace netlist
 
 		~device_t() noexcept override = default;
 
-		nldelegate default_delegate() { return nldelegate(&device_t::update, this); }
+		//nldelegate default_delegate() { return nldelegate(&device_t::update, this); }
+		nldelegate default_delegate() { return { &device_t::update, this }; }
 	protected:
 
 		NETLIB_UPDATEI() { }
@@ -1757,7 +1757,7 @@ namespace netlist
 		template<typename T, typename... Args>
 		device_arena::unique_ptr<T> make_pool_object(Args&&... args)
 		{
-			return m_pool.make_unique<T>(std::forward<Args>(args)...);
+			return plib::make_unique<T>(m_pool, std::forward<Args>(args)...);
 		}
 		// memory pool - still needed in some places
 		device_arena &pool() noexcept { return m_pool; }
@@ -2302,6 +2302,7 @@ namespace netlist
 
 	inline void detail::net_t::remove_from_active_list(core_terminal_t &term) noexcept
 	{
+		gsl_Expects(!m_list_active.empty());
 		m_list_active.remove(&term);
 		if (m_list_active.empty())
 			railterminal().device().do_dec_active();
@@ -2309,24 +2310,24 @@ namespace netlist
 
 	inline const analog_net_t & analog_t::net() const noexcept
 	{
-		return static_cast<const analog_net_t &>(core_terminal_t::net());
+		return plib::downcast<const analog_net_t &>(core_terminal_t::net());
 	}
 
 	inline analog_net_t & analog_t::net() noexcept
 	{
-		return static_cast<analog_net_t &>(core_terminal_t::net());
+		return plib::downcast<analog_net_t &>(core_terminal_t::net());
 	}
 
 	inline nl_fptype terminal_t::operator ()() const noexcept { return net().Q_Analog(); }
 
 	inline logic_net_t & logic_t::net() noexcept
 	{
-		return static_cast<logic_net_t &>(core_terminal_t::net());
+		return plib::downcast<logic_net_t &>(core_terminal_t::net());
 	}
 
 	inline const logic_net_t & logic_t::net() const noexcept
 	{
-		return static_cast<const logic_net_t &>(core_terminal_t::net());
+		return plib::downcast<const logic_net_t &>(core_terminal_t::net());
 	}
 
 	inline netlist_sig_t logic_input_t::operator()() const noexcept
@@ -2516,7 +2517,7 @@ namespace netlist
 			if (plib::is_integral<T>::value)
 				if (plib::abs(valx - plib::trunc(valx)) > nlconst::magic(1e-6))
 					throw nl_exception(MF_INVALID_NUMBER_CONVERSION_1_2(device.name() + "." + name, p));
-			m_param = static_cast<T>(valx);
+			m_param = plib::narrow_cast<T>(valx);
 		}
 
 		device.state().save(*this, m_param, this->name(), "m_param");
@@ -2599,7 +2600,7 @@ namespace netlist
 	state_container<C>::state_container(O &owner, const pstring &name,
 		const state_container<C>::value_type & value)
 	{
-		owner.state().save(owner, *static_cast<C *>(this), owner.name(), name);
+		owner.state().save(owner, static_cast<C &>(*this), owner.name(), name);
 		for (std::size_t i=0; i < this->size(); i++)
 			(*this)[i] = value;
 	}
@@ -2610,7 +2611,7 @@ namespace netlist
 		std::size_t n, const state_container<C>::value_type & value)
 	: C(n, value)
 	{
-		owner.state().save(owner, *static_cast<C *>(this), owner.name(), name);
+		owner.state().save(owner, static_cast<C &>(*this), owner.name(), name);
 	}
 
 	extern template struct state_var<std::uint8_t>;
