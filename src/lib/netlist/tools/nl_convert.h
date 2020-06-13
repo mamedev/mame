@@ -132,7 +132,7 @@ private:
 		double value() const { return m_val;}
 		const str_list &extra() const { return m_extra;}
 
-		bool has_model() const { return m_model != ""; }
+		bool has_model() const { return !m_model.empty(); }
 		bool has_value() const { return m_has_val; }
 
 		void add_extra(const pstring &s) { m_extra.push_back(s); }

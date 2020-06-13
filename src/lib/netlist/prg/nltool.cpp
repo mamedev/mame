@@ -27,7 +27,7 @@
 #define NL_DISABLE_DYNAMIC_LOAD 0
 #endif
 
-extern plib::dynlib_static_sym nl_static_solver_syms[];
+extern const plib::dynlib_static_sym nl_static_solver_syms[];
 
 class tool_app_t : public plib::app
 {
@@ -668,8 +668,8 @@ void tool_app_t::static_compile()
 			sout << "// " << e.second.m_module << "\n";
 			sout << e.second.m_code;
 		}
-		sout << "extern plib::dynlib_static_sym nl_static_solver_syms[];\n";
-		sout << "plib::dynlib_static_sym nl_static_solver_syms[] = {\n";
+		sout << "extern const plib::dynlib_static_sym nl_static_solver_syms[];\n";
+		sout << "const plib::dynlib_static_sym nl_static_solver_syms[] = {\n";
 		for (auto &e : map)
 		{
 			sout << "// " << e.second.m_module << "\n";
@@ -1066,7 +1066,7 @@ void tool_app_t::listdevices()
 	{
 		pstring out = plib::pfmt("{1:-20} {2}(<id>")(fl->name())(fl->name());
 
-		netlist::factory::element_t *f;
+		netlist::factory::element_t *f = nullptr;
 		nt.parser().register_dev(fl->name(), fl->name() + "_lc",
 			std::vector<pstring>(), &f);
 

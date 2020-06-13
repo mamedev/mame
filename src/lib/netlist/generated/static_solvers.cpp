@@ -17951,8 +17951,8 @@ static void nl_gcr_f6a620d52ca4719f_7_double_double(double * __restrict V, const
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
-extern plib::dynlib_static_sym nl_static_solver_syms[];
-plib::dynlib_static_sym nl_static_solver_syms[] = {
+extern const plib::dynlib_static_sym nl_static_solver_syms[];
+const plib::dynlib_static_sym nl_static_solver_syms[] = {
 // konami1x
 	{"nl_gcr_105d3ecb773843b6_49_double_double", reinterpret_cast<void *>(&nl_gcr_105d3ecb773843b6_49_double_double)},
 // breakout

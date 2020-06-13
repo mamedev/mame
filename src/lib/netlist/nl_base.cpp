@@ -324,6 +324,7 @@ namespace netlist
 								t.push_back(&term->delegate());
 								term->run_delegate();
 							}
+							// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 							auto *dev = reinterpret_cast<core_device_t *>(term->delegate().object());
 							if (!plib::container::contains(d, dev))
 								d.push_back(dev);
