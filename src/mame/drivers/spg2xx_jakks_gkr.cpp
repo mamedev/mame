@@ -542,7 +542,7 @@ void jakks_gkr_state::jakks_gkr_wp(machine_config &config)
 	jakks_gkr(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
 	m_maincpu->adc_in<0>().set_ioport("JOYX");
-	m_maincpu->adc_in<1>().set_ioport("JOYY");
+	m_maincpu->adc_in<2>().set_ioport("JOYY");
 	//SOFTWARE_LIST(config, "jakks_gamekey_wp").set_original("jakks_gamekey_wp"); // NO KEYS RELEASED
 
 	m_maincpu->set_force_no_drc(true); // the Light Tag game seems to hang maybe once every 7 times with the DRC, appears more stable without (could just be chance tho)
@@ -553,7 +553,7 @@ void jakks_gkr_state::jakks_gkr_cb(machine_config &config)
 	jakks_gkr(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
 	m_maincpu->adc_in<0>().set_ioport("JOYX");
-	m_maincpu->adc_in<1>().set_ioport("JOYY");
+	m_maincpu->adc_in<2>().set_ioport("JOYY");
 	//SOFTWARE_LIST(config, "jakks_gamekey_cb").set_original("jakks_gamekey_cb"); // NO KEYS RELEASED
 }
 
