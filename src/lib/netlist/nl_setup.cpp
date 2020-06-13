@@ -15,13 +15,6 @@
 
 #include "solver/nld_solver.h"
 
-// Workaround for return value optimization failure in some older versions of clang
-#if defined(__APPLE__) && defined(__clang__) && __clang_major__ < 8
-#define MOVE_UNIQUE_PTR(x) (std::move(x))
-#else
-#define MOVE_UNIQUE_PTR(x) (x)
-#endif
-
 namespace netlist
 {
 	// ----------------------------------------------------------------------------------------
@@ -1602,17 +1595,17 @@ bool source_netlist_t::parse(nlparse_t &setup, const pstring &name)
 source_string_t::stream_ptr source_string_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	auto ret(std::make_unique<std::istringstream>(m_str));
+	source_string_t::stream_ptr ret(std::make_unique<std::istringstream>(m_str));
 	ret->imbue(std::locale::classic());
-	return MOVE_UNIQUE_PTR(ret);
+	return ret;
 }
 
 source_mem_t::stream_ptr source_mem_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	auto ret(std::make_unique<std::istringstream>(m_str, std::ios_base::binary));
+	source_mem_t::stream_ptr ret(std::make_unique<std::istringstream>(m_str, std::ios_base::binary));
 	ret->imbue(std::locale::classic());
-	return MOVE_UNIQUE_PTR(ret);
+	return ret;
 }
 
 source_file_t::stream_ptr source_file_t::stream(const pstring &name)

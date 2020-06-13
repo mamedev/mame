@@ -43,14 +43,6 @@
 
 #define LOGMASKED(mask, ...) do { if (LOG_MASK & (mask)) (LOG_OUTPUT_FUNC)(__VA_ARGS__); } while (false)
 
-
-// Workaround for return value optimization failure in some older versions of clang
-#if defined(__APPLE__) && defined(__clang__) && __clang_major__ < 8
-#define MOVE_UNIQUE_PTR(x) (std::move(x))
-#else
-#define MOVE_UNIQUE_PTR(x) (x)
-#endif
-
 DEFINE_DEVICE_TYPE(NETLIST_CORE,  netlist_mame_device,       "netlist_core",  "Netlist Core Device")
 DEFINE_DEVICE_TYPE(NETLIST_CPU,   netlist_mame_cpu_device,   "netlist_cpu",   "Netlist CPU Device")
 DEFINE_DEVICE_TYPE(NETLIST_SOUND, netlist_mame_sound_device, "netlist_sound", "Netlist Sound Device")
@@ -266,9 +258,9 @@ netlist_source_memregion_t::stream_ptr netlist_source_memregion_t::stream(const 
 	if (m_dev.has_running_machine())
 	{
 		memory_region *mem = m_dev.memregion(m_name.c_str());
-		auto ret(std::make_unique<std::istringstream>(pstring(reinterpret_cast<char *>(mem->base()), mem->bytes())));
+		stream_ptr ret(std::make_unique<std::istringstream>(pstring(reinterpret_cast<char *>(mem->base()), mem->bytes())));
 		ret->imbue(std::locale::classic());
-		return MOVE_UNIQUE_PTR(ret);
+		return ret;
 	}
 	else
 		throw memregion_not_set("memregion unavailable for {1} in source {2}", name, m_name);
@@ -307,9 +299,9 @@ netlist_data_memregions_t::stream_ptr netlist_data_memregions_t::stream(const ps
 		memory_region *mem = m_dev.memregion(name.c_str());
 		if (mem != nullptr)
 		{
-			auto ret(std::make_unique<std::istringstream>(std::string(reinterpret_cast<char *>(mem->base()), mem->bytes()), std::ios_base::binary));
+			stream_ptr ret(std::make_unique<std::istringstream>(std::string(reinterpret_cast<char *>(mem->base()), mem->bytes()), std::ios_base::binary));
 			ret->imbue(std::locale::classic());
-			return MOVE_UNIQUE_PTR(ret);
+			return ret;
 		}
 		else
 			return stream_ptr(nullptr);
@@ -320,9 +312,9 @@ netlist_data_memregions_t::stream_ptr netlist_data_memregions_t::stream(const ps
 		if (rom_exists(m_dev.mconfig().root_device(), pstring(m_dev.tag()) + ":" + name))
 		{
 			// Create an empty stream.
-			auto ret(std::make_unique<std::istringstream>(std::ios_base::binary));
+			stream_ptr ret(std::make_unique<std::istringstream>(std::ios_base::binary));
 			ret->imbue(std::locale::classic());
-			return MOVE_UNIQUE_PTR(ret);
+			return ret;
 		}
 		else
 			return stream_ptr(nullptr);
