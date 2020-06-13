@@ -646,12 +646,34 @@ static INPUT_PORTS_START( fordrace )
 
 	PORT_MODIFY("P3")
 
-	PORT_START("AD0") // 12-bit port (controls the display of 2 pedals in service mode, always same position, is there another multiplexer for brake, or should more bits be using to select analog port in core?)
-	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+	PORT_START("AD0") // 12-bit port, Accelerator
+	PORT_BIT(0x0fff, 0x0000, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
 
-	PORT_START("AD1") // 12-bit port (not sure which bits are used and how, shows a position in service mode if you return random values)
-	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+	PORT_START("AD1") // 12-bit port, Brake
+	PORT_BIT(0x0fff, 0x0000, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+
+	PORT_START("AD2") // 12-bit port, Wheel is split across 2 ports, value added together?
+	PORT_BIT( 0x0fff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(spg2xx_game_fordrace_state, wheel2_r)
+
+	PORT_START("AD3") // 12-bit port, Wheel (see above)
+	PORT_BIT( 0x0fff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(spg2xx_game_fordrace_state, wheel_r)
+
+	PORT_START("WHEEL_REAL")
+	PORT_BIT(0x1fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x1fff) PORT_NAME("Wheel")  
 INPUT_PORTS_END
+
+CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel_r)
+{
+	return ioport("WHEEL_REAL")->read() >> 1;
+}
+
+CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel2_r)
+{
+//	return 0x0800;
+	uint16_t dat = ioport("WHEEL_REAL")->read();
+
+	return ((dat >> 1) ^ 0xfff) + (dat & 1);
+}
 
 static INPUT_PORTS_START( senspeed )
 	PORT_START("P1")
@@ -1016,8 +1038,11 @@ void spg2xx_game_fordrace_state::fordrace(machine_config &config)
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_fordrace_state::base_portc_r));
 
 	// these do something in test mode, but in game the ADC interrupt is never generated?
-	m_maincpu->adc_in<0>().set_ioport("AD0"); // pedals
-	m_maincpu->adc_in<1>().set_ioport("AD1"); // steering
+	m_maincpu->adc_in<0>().set_ioport("AD0"); // pedals1
+	m_maincpu->adc_in<1>().set_ioport("AD1"); // pedal2
+	m_maincpu->adc_in<2>().set_ioport("AD2"); // steering
+	m_maincpu->adc_in<3>().set_ioport("AD3"); // steering
+
 }
 
 uint16_t spg2xx_game_senspeed_state::portb_r()

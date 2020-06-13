@@ -1655,31 +1655,49 @@ void spg2xx_io_device::check_irqs(const uint16_t changed)
 	if (changed & 0x0c00) // Timer A, Timer B IRQ
 	{
 		LOGMASKED(LOG_TIMERS, "%ssserting IRQ2 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00), changed);
-		m_timer_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
+		
+		if (m_timer_irq_cb)
+			m_timer_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
+		else
+			logerror("spg2xx_io_device::check_irqs, attempted to use m_timer_irq_cb without setting it\n");
 	}
 
 	if (changed & 0x6100) // UART, SPI, SIO, I2C, ADC IRQ
 	{
 		LOGMASKED(LOG_UART | LOG_SIO | LOG_SPI | LOG_I2C | LOG_ADC, "%ssserting IRQ3 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x6100) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100), changed);
-		m_uart_adc_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x6100) ? ASSERT_LINE : CLEAR_LINE);
+		if (m_uart_adc_irq_cb)
+			m_uart_adc_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x6100) ? ASSERT_LINE : CLEAR_LINE);
+		else
+			logerror("spg2xx_io_device::check_irqs, attempted to use m_uart_adc_irq_cb without setting it\n");
 	}
 
 	if (changed & 0x1200) // External IRQ
 	{
 		LOGMASKED(LOG_UART, "%ssserting IRQ5 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200), changed);
-		m_external_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
+		if (m_external_irq_cb)
+			m_external_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
+		else
+			logerror("spg2xx_io_device::check_irqs, attempted to use m_external_irq_cb without setting it\n");
+
 	}
 
 	if (changed & 0x0070) // 1024Hz, 2048Hz, 4096Hz IRQ
 	{
 		LOGMASKED(LOG_TIMERS, "%ssserting IRQ6 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070), changed);     //m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
-		m_ffreq_tmr1_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
+		if (m_ffreq_tmr1_irq_cb)
+			m_ffreq_tmr1_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
+		else
+			logerror("spg2xx_io_device::check_irqs, attempted to use m_ffreq_tmr1_irq_cb without setting it\n");
 	}
 
 	if (changed & 0x008b) // TMB1, TMB2, 4Hz, key change IRQ
 	{
 		LOGMASKED(LOG_IRQS, "%ssserting IRQ7 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b), changed);
-		m_ffreq_tmr2_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
+		if (m_ffreq_tmr2_irq_cb)	
+			m_ffreq_tmr2_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
+		else
+			logerror("spg2xx_io_device::check_irqs, attempted to use m_ffreq_tmr2_irq_cb without setting it\n");
+
 	}
 }
 
