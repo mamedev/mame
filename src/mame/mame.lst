@@ -11773,6 +11773,7 @@ lw3_208                         //
 rab_103                         //
 rab_130                         //
 rab_320                         //
+stwr_101                        //
 stwr_102                        //
 stwr_103                        //
 stwr_104                        //
@@ -34729,6 +34730,9 @@ redclashs                       // (c) Suntronics
 zerohour                        // 8011 (c) Universal
 zerohoura                       // 8011 (c) Universal
 zerohouri                       //
+
+@source:regama.cpp
+trebol                          // 1985 Regama
 
 @source:regence.cpp
 regence
