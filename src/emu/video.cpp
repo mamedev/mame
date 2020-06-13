@@ -229,7 +229,7 @@ void video_manager::frame_update(bool from_debugger)
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();
-	if (!from_debugger && !skipped_it && !m_low_latency && effective_throttle())
+	if (!from_debugger && !skipped_it && phase > machine_phase::INIT && !m_low_latency && effective_throttle())
 		update_throttle(current_time);
 
 	// ask the OSD to update
@@ -238,7 +238,7 @@ void video_manager::frame_update(bool from_debugger)
 	g_profiler.stop();
 
 	// we synchronize after rendering instead of before, if low latency mode is enabled
-	if (!from_debugger && !skipped_it && m_low_latency && effective_throttle())
+	if (!from_debugger && !skipped_it && phase > machine_phase::INIT && m_low_latency && effective_throttle())
 		update_throttle(current_time);
 
 	// get most recent input now
@@ -251,11 +251,11 @@ void video_manager::frame_update(bool from_debugger)
 		machine().call_notifiers(MACHINE_NOTIFY_FRAME);
 
 	// update frameskipping
-	if (!from_debugger)
+	if (!from_debugger && phase > machine_phase::INIT)
 		update_frameskip();
 
 	// update speed computations
-	if (!from_debugger && !skipped_it)
+	if (!from_debugger && !skipped_it && phase > machine_phase::INIT)
 		recompute_speed(current_time);
 
 	// call the end-of-frame callback
