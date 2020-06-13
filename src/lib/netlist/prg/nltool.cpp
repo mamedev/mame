@@ -206,7 +206,7 @@ public:
 			return stream_ptr(nullptr);
 
 		strm->imbue(std::locale::classic());
-		return std::move(strm); // FIXME: for c++11 clang builds;
+		return strm;
 	}
 
 private:
@@ -225,14 +225,14 @@ public:
 	netlist::host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const override
 	{
 		if (m_boostlib == "builtin")
-			return netlist::host_arena::make_unique<plib::dynlib_static>(nl_static_solver_syms);
+			return plib::make_unique<plib::dynlib_static, netlist::host_arena>(nl_static_solver_syms);
 		if (m_boostlib == "generic")
-			return netlist::host_arena::make_unique<plib::dynlib_static>(nullptr);
+			return plib::make_unique<plib::dynlib_static, netlist::host_arena>(nullptr);
 		if (NL_DISABLE_DYNAMIC_LOAD)
 			throw netlist::nl_exception("Dynamic library loading not supported due to project security concerns.");
 
 		//pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
-		return netlist::host_arena::make_unique<plib::dynlib>(m_boostlib);
+		return plib::make_unique<plib::dynlib, netlist::host_arena>(m_boostlib);
 	}
 
 private:
@@ -245,7 +245,7 @@ class netlist_tool_t : public netlist::netlist_state_t
 public:
 
 	netlist_tool_t(tool_app_t &app, const pstring &name, const pstring &boostlib)
-	: netlist::netlist_state_t(name, netlist::host_arena::make_unique<netlist_tool_callbacks_t>(app, boostlib))
+	: netlist::netlist_state_t(name, plib::make_unique<netlist_tool_callbacks_t, netlist::host_arena>(app, boostlib))
 	{
 	}
 
@@ -364,13 +364,13 @@ struct input_t
 			case netlist::param_t::POINTER:
 				throw netlist::nl_exception(plib::pfmt("param {1} is not numeric\n")(m_param.param().name()));
 			case netlist::param_t::DOUBLE:
-				static_cast<netlist::param_fp_t*>(&m_param.param())->set(m_value);
+				plib::downcast<netlist::param_fp_t &>(m_param.param()).set(m_value);
 				break;
 			case netlist::param_t::INTEGER:
-				static_cast<netlist::param_int_t*>(&m_param.param())->set(static_cast<int>(m_value));
+				plib::downcast<netlist::param_int_t &>(m_param.param()).set(static_cast<int>(m_value));
 				break;
 			case netlist::param_t::LOGIC:
-				static_cast<netlist::param_logic_t*>(&m_param.param())->set(static_cast<bool>(m_value));
+				plib::downcast<netlist::param_logic_t &>(m_param.param()).set(static_cast<bool>(m_value));
 				break;
 		}
 	}
@@ -383,7 +383,7 @@ struct input_t
 static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstring &fname)
 {
 	std::vector<input_t> ret;
-	if (fname != "")
+	if (!fname.empty())
 	{
 		plib::putf8_reader r = plib::putf8_reader(std::make_unique<plib::ifstream>(plib::filesystem::u8path(fname)));
 		if (r.stream().fail())
@@ -392,7 +392,7 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstr
 		pstring l;
 		while (r.readline(l))
 		{
-			if (l != "")
+			if (!l.empty())
 			{
 				input_t inp(setup, l);
 				ret.push_back(inp);
@@ -659,6 +659,8 @@ void tool_app_t::static_compile()
 			}
 		}
 		plib::ofstream sout(opt_out());
+		if (sout.fail())
+			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_out()));
 
 		sout << "#include \"plib/pdynlib.h\"\n\n";
 		for (auto &e : map)
@@ -666,6 +668,7 @@ void tool_app_t::static_compile()
 			sout << "// " << e.second.m_module << "\n";
 			sout << e.second.m_code;
 		}
+		sout << "extern plib::dynlib_static_sym nl_static_solver_syms[];\n";
 		sout << "plib::dynlib_static_sym nl_static_solver_syms[] = {\n";
 		for (auto &e : map)
 		{
@@ -721,7 +724,7 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 		if (plib::startsWith(l, "//-"))
 		{
 			l = plib::trim(l.substr(3));
-			if (l != "")
+			if (!l.empty())
 			{
 				auto a(plib::psplit(l, ":", true));
 				if (a.empty() || (a.size() > 2))
@@ -761,7 +764,7 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 					else if (n == "FunctionTable")
 						ret.functiontable = v;
 					else if (n == "Param")
-						ret.params.push_back(std::pair<pstring, pstring>(v2, plib::trim(v.substr(v2.length()))));
+						ret.params.emplace_back(v2, plib::trim(v.substr(v2.length())));
 					else if (n == "Example")
 					{
 						ret.example = plib::psplit(plib::trim(v),",",true);
@@ -818,7 +821,7 @@ void tool_app_t::header_entry(const netlist::factory::element_t *e)
 			avs += ", " + s.substr(1);
 
 	mac_out("// usage       : " + e->name() + "(name" + vs + ")", false);
-	if (avs != "")
+	if (!avs.empty())
 		mac_out("// auto connect: " + avs.substr(2), false);
 
 	mac_out("#define " + e->name() + "(...)");
@@ -942,7 +945,7 @@ void tool_app_t::create_docheader()
 	{
 		auto d(read_docsrc(e->source().file_name(), e->name()));
 
-		if (d.id != "")
+		if (!d.id.empty())
 		{
 			pout("//! [{1} csynopsis]\n", e->name());
 			header_entry(e.get());
@@ -964,7 +967,7 @@ void tool_app_t::create_docheader()
 	{
 		//auto d(read_docsrc(e->source().file_name(), e->name()));
 
-		if (d.id != "")
+		if (!d.id.empty())
 		{
 
 			poutprefix("///", "");
@@ -1017,7 +1020,7 @@ void tool_app_t::create_docheader()
 			poutprefix("///", "");
 			poutprefix("///", "  @section {}_4 Function Table", d.id);
 			poutprefix("///", "");
-			if (d.functiontable == "")
+			if (!d.functiontable.empty())
 				poutprefix("///", "  Please refer to the datasheet.");
 			else
 				poutprefix("///", "  {}", d.functiontable);

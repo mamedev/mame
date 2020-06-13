@@ -93,7 +93,7 @@ namespace devices
 		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
-			if (m_func() != "")
+			if (!m_func().empty())
 				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 			connect(m_feedback, m_Q);
 		}

@@ -14,8 +14,8 @@
 
 #include <algorithm>
 #include <initializer_list>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
@@ -262,7 +262,9 @@ namespace plib
 	void reinterpret_copy(S &s, D &d)
 	{
 		static_assert(sizeof(D) >= sizeof(S), "size mismatch");
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		auto *dp = reinterpret_cast<std::uint8_t *>(&d);
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		const auto *sp = reinterpret_cast<std::uint8_t *>(&s);
 		std::copy(sp, sp + sizeof(S), dp);
 	}
@@ -290,14 +292,14 @@ namespace plib
 		{
 			auto it = std::find(con.begin(), con.end(), elem);
 			if (it != con.end())
-				return static_cast<std::size_t>(it - con.begin());
+				return narrow_cast<std::size_t>(it - con.begin());
 			return npos;
 		}
 
 		template <class C>
 		void insert_at(C &con, const std::size_t index, const typename C::value_type &elem)
 		{
-			con.insert(con.begin() + static_cast<std::ptrdiff_t>(index), elem);
+			con.insert(con.begin() + narrow_cast<std::ptrdiff_t>(index), elem);
 		}
 
 		template <class C>
@@ -336,7 +338,7 @@ namespace plib
 	{
 		std::size_t result = 5381; // NOLINT
 		for (const T* p = buf; p != buf + size; p++)
-			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<std::size_t>(*p); // NOLINT
+			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ narrow_cast<std::size_t>(*p); // NOLINT
 		return result;
 	}
 

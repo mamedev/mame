@@ -73,7 +73,7 @@ namespace plib
 
 		~pmatrix_cr_t() = default;
 
-		constexpr std::size_t size() const noexcept { return (N>0) ? static_cast<std::size_t>(N) : m_size; }
+		constexpr std::size_t size() const noexcept { return (N>0) ? narrow_cast<std::size_t>(N) : m_size; }
 
 		void clear() noexcept
 		{
@@ -132,9 +132,9 @@ namespace plib
 				row_idx[k] = nz;
 
 				for (std::size_t j=0; j < size(); j++)
-					if (f[k][j] <= max_fill && plib::abs(static_cast<int>(k)-static_cast<int>(j)) <= static_cast<int>(band_width))
+					if (f[k][j] <= max_fill && plib::abs(narrow_cast<int>(k)-narrow_cast<int>(j)) <= narrow_cast<int>(band_width))
 					{
-						col_idx[nz] = static_cast<C>(j);
+						col_idx[nz] = narrow_cast<C>(j);
 						if (j == k)
 							diag[k] = nz;
 						nz++;
@@ -150,7 +150,7 @@ namespace plib
 			{
 				for (std::size_t j=k + 1; j < size(); j++)
 					if (f[j][k] < FILL_INFINITY)
-						nzbd[k].push_back(static_cast<C>(j));
+						nzbd[k].push_back(narrow_cast<C>(j));
 				nzbd[k].push_back(0); // end of sequence
 			}
 
@@ -343,7 +343,7 @@ namespace plib
 		{
 			for (std::size_t i = 0; i <  m_ge_par.size(); i++)
 				if (plib::container::contains( m_ge_par[i], k))
-					return static_cast<int>(i);
+					return narrow_cast<int>(i);
 			return -1;
 		}
 
@@ -525,7 +525,7 @@ namespace plib
 					}
 				}
 				if (found)
-					ilu_rows[p++] = static_cast<index_type>(i);
+					ilu_rows[p++] = narrow_cast<index_type>(i);
 			}
 			ilu_rows[p] = 0; // end of array
 			this->build_from_fill_mat(fill, ilup); //, m_band_width); // ILU(2)

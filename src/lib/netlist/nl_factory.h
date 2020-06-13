@@ -129,7 +129,7 @@ namespace factory {
 	    	    			netlist_state_t &anetlist,
 	    	    			const pstring &name, std::tuple<Args...>& args, std::index_sequence<Is...>)
 	    {
-	    	return pool.make_unique<C>(anetlist, name, std::forward<Args>(std::get<Is>(args))...);
+	    	return plib::make_unique<C>(pool, anetlist, name, std::forward<Args>(std::get<Is>(args))...);
 	    }
 
 	    dev_uptr make_device(device_arena &pool,
@@ -149,7 +149,7 @@ namespace factory {
 
 		static uptr create(const pstring &name, properties &&props, Args&&... args)
 		{
-			return host_arena::make_unique<device_element_t<C, Args...>>(name,
+			return plib::make_unique<device_element_t<C, Args...>, host_arena>(name,
 				std::move(props), std::forward<Args>(args)...);
 		}
 	private:
@@ -194,7 +194,7 @@ namespace factory {
 	template <typename T>
 	element_t::uptr constructor_t(const pstring &name, properties &&props)
 	{
-		return host_arena::make_unique<device_element_t<T>>(name, std::move(props));
+		return plib::make_unique<device_element_t<T>, host_arena>(name, std::move(props));
 	}
 
 	// -----------------------------------------------------------------------------

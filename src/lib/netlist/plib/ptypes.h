@@ -15,7 +15,11 @@
 #include <type_traits>
 
 #if (PUSE_FLOAT128)
+#if defined(__has_include)
+#if __has_include(<quadmath.h>)
 #include <quadmath.h>
+#endif
+#endif
 #endif
 
 // noexcept on move operator -> issue with macosx clang
@@ -273,7 +277,7 @@ namespace plib
 	template <typename T> class name                                            \
 	{                                                                           \
 		template <typename U> static long test(decltype(&U:: member));          \
-		template <typename U> static char  test(...);                           \
+		template <typename U> static char test(...);                            \
 	public:                                                                     \
 		static constexpr const bool value = sizeof(test<T>(nullptr)) == sizeof(long);   \
 	}

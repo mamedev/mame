@@ -9,6 +9,7 @@
 ///
 
 #include "pconfig.h"
+#include "pgsl.h"
 #include "pmath.h"
 #include "ptypes.h"
 
@@ -50,7 +51,7 @@ namespace plib
 			seed(5489);
 		}
 
-		static constexpr T min() noexcept { return static_cast<T>(0); }
+		static constexpr T min() noexcept { return T(0); }
 		static constexpr T max() noexcept { return ~T(0) >> (sizeof(T)*8 - w); }
 
 		template <typename ST>
@@ -103,7 +104,7 @@ namespace plib
 		void twist()
 		{
 			const T lowest_w(~T(0) >> (sizeof(T)*8 - w));
-			const T lower_mask((static_cast<T>(1) << r) - 1); // That is, the binary number of r 1's
+			const T lower_mask((T(1) << r) - 1); // That is, the binary number of r 1's
 			const T upper_mask((~lower_mask) & lowest_w);
 
 			for (std::size_t i=0; i<N; i++)
@@ -122,10 +123,10 @@ namespace plib
 	template <typename FT, typename T>
 	FT normalize_uniform(T &p, FT m = constants<FT>::one(), FT b = constants<FT>::zero())
 	{
-		const auto mmin(static_cast<FT>(p.min()));
-		const auto mmax(static_cast<FT>(p.max()));
+		const auto mmin(narrow_cast<FT>(p.min()));
+		const auto mmax(narrow_cast<FT>(p.max()));
 		// -> 0 to a
-		return (static_cast<FT>(p())- mmin) / (mmax - mmin) * m - b;
+		return (narrow_cast<FT>(p())- mmin) / (mmax - mmin) * m - b;
 	}
 
 	template<typename FT>

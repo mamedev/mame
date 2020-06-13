@@ -121,7 +121,7 @@ namespace solver
 							{
 								pstring nname(this->name() + "." + pstring(plib::pfmt("m{1}")(m_inps.size())));
 								nl_assert(p->net().is_analog());
-								auto net_proxy_output_u = state().make_pool_object<proxied_analog_output_t>(*this, nname, static_cast<analog_net_t *>(&p->net()));
+								auto net_proxy_output_u = state().make_pool_object<proxied_analog_output_t>(*this, nname, &dynamic_cast<analog_net_t &>(p->net()));
 								net_proxy_output = net_proxy_output_u.get();
 								m_inps.emplace_back(std::move(net_proxy_output_u));
 							}
@@ -375,6 +375,17 @@ namespace solver
 		m_Idrn.resize(iN, max_count);
 		m_connected_net_Vn.resize(iN, max_count);
 
+		// Initialize arrays to 0 (in case the vrl one is used
+		for (std::size_t k = 0; k < iN; k++)
+			for (std::size_t j = 0; j < m_terms[k].count(); j++)
+			{
+				m_gtn.set(k,j, nlconst::zero());
+				m_gonn.set(k,j, nlconst::zero());
+				m_Idrn.set(k,j, nlconst::zero());
+				m_connected_net_Vn.set(k, j, nullptr);
+			}
+
+
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			auto count = m_terms[k].count();
@@ -421,7 +432,7 @@ namespace solver
 
 	void matrix_solver_t::step(netlist_time delta) noexcept
 	{
-		const auto dd(delta.as_fp<nl_fptype>());
+		const auto dd(delta.as_fp<fptype>());
 		for (auto &d : m_step_funcs)
 			d(dd);
 	}
@@ -478,7 +489,7 @@ namespace solver
 
 
 		if (m_params.m_dynamic_ts)
-			return compute_next_timestep(delta.as_fp<nl_fptype>(), m_params.m_max_timestep);
+			return compute_next_timestep(delta.as_fp<fptype>(), m_params.m_max_timestep);
 
 		return netlist_time::from_fp(m_params.m_max_timestep);
 	}
@@ -523,7 +534,7 @@ namespace solver
 		return {colmax, colmin};
 	}
 
-	nl_fptype matrix_solver_t::get_weight_around_diag(std::size_t row, std::size_t diag)
+	matrix_solver_t::fptype matrix_solver_t::get_weight_around_diag(std::size_t row, std::size_t diag)
 	{
 		{
 			//
@@ -532,7 +543,7 @@ namespace solver
 
 			std::vector<bool> touched(1024, false); // FIXME!
 
-			nl_fptype weight = nlconst::zero();
+			fptype weight = nlconst::zero();
 			auto &term = m_terms[row];
 			for (std::size_t i = 0; i < term.count(); i++)
 			{
@@ -545,7 +556,7 @@ namespace solver
 						if (colu==row) colu = static_cast<unsigned>(diag);
 						else if (colu==diag) colu = static_cast<unsigned>(row);
 
-						weight = weight + plib::abs(static_cast<nl_fptype>(colu) - static_cast<nl_fptype>(diag));
+						weight = weight + plib::abs(static_cast<fptype>(colu) - static_cast<fptype>(diag));
 						touched[colu] = true;
 					}
 				}
@@ -585,14 +596,14 @@ namespace solver
 			log().verbose("       has {1} dynamic elements", this->dynamic_device_count());
 			log().verbose("       has {1} timestep elements", this->timestep_device_count());
 			log().verbose("       {1:6.3} average newton raphson loops",
-						static_cast<nl_fptype>(this->m_stat_newton_raphson) / static_cast<nl_fptype>(this->m_stat_vsolver_calls));
+						static_cast<fptype>(this->m_stat_newton_raphson) / static_cast<fptype>(this->m_stat_vsolver_calls));
 			log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
 					this->m_stat_calculations,
-					static_cast<nl_fptype>(this->m_stat_calculations) / this->exec().time().as_fp<nl_fptype>(),
+					static_cast<fptype>(this->m_stat_calculations) / this->exec().time().as_fp<fptype>(),
 					this->m_iterative_fail,
-					nlconst::hundred() * static_cast<nl_fptype>(this->m_iterative_fail)
-						/ static_cast<nl_fptype>(this->m_stat_calculations),
-					static_cast<nl_fptype>(this->m_iterative_total) / static_cast<nl_fptype>(this->m_stat_calculations));
+					nlconst::hundred() * static_cast<fptype>(this->m_iterative_fail)
+						/ static_cast<fptype>(this->m_stat_calculations),
+					static_cast<fptype>(this->m_iterative_total) / static_cast<fptype>(this->m_stat_calculations));
 		}
 	}
 

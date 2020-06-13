@@ -655,10 +655,10 @@ void nlwav_app::convert_wav(std::ostream &ostrm, wav_t::format fmt)
 	double dt = plib::reciprocal(static_cast<double>(opt_rate()));
 	auto nchan = m_instrms.size();
 
-	auto wo = arena::make_unique<wavwriter>(ostrm, opt_out() != "-", fmt, nchan, opt_rate(), opt_amp());
-	auto ago = arena::make_unique<aggregator>(nchan, dt, aggregator::callback_type(&wavwriter::process, wo.get()));
-	auto fgo_hp = arena::make_unique<filter_hp>(opt_highpass(), opt_hpboost(), nchan, filter_hp::callback_type(&aggregator::process, ago.get()));
-	auto fgo_lp = arena::make_unique<filter_lp>(opt_lowpass(), nchan, filter_lp::callback_type(&filter_hp::process, fgo_hp.get()));
+	auto wo = plib::make_unique<wavwriter, arena>(ostrm, opt_out() != "-", fmt, nchan, opt_rate(), opt_amp());
+	auto ago = plib::make_unique<aggregator, arena>(nchan, dt, aggregator::callback_type(&wavwriter::process, wo.get()));
+	auto fgo_hp = plib::make_unique<filter_hp, arena>(opt_highpass(), opt_hpboost(), nchan, filter_hp::callback_type(&aggregator::process, ago.get()));
+	auto fgo_lp = plib::make_unique<filter_lp, arena>(opt_lowpass(), nchan, filter_lp::callback_type(&filter_hp::process, fgo_hp.get()));
 
 	auto topcb = log_processor::callback_type(&filter_lp::process, fgo_lp.get());
 
@@ -680,7 +680,7 @@ void nlwav_app::convert_wav(std::ostream &ostrm, wav_t::format fmt)
 void nlwav_app::convert_vcd(std::ostream &ostrm, vcdwriter::format_e format)
 {
 
-	arena::unique_ptr<vcdwriter> wo = arena::make_unique<vcdwriter>(ostrm, opt_args(),
+	arena::unique_ptr<vcdwriter> wo = plib::make_unique<vcdwriter, arena>(ostrm, opt_args(),
 		format, opt_high(), opt_low());
 	log_processor::callback_type agcb = log_processor::callback_type(&vcdwriter::process, wo.get());
 
@@ -702,7 +702,7 @@ void nlwav_app::convert_vcd(std::ostream &ostrm, vcdwriter::format_e format)
 void nlwav_app::convert_tab(std::ostream &ostrm)
 {
 
-	auto wo = arena::make_unique<tabwriter>(ostrm, opt_args(),
+	auto wo = plib::make_unique<tabwriter, arena>(ostrm, opt_args(),
 		opt_start(), opt_inc(), opt_samples());
 	log_processor::callback_type agcb = log_processor::callback_type(&tabwriter::process, wo.get());
 

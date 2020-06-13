@@ -561,11 +561,11 @@ namespace analog
 		{
 			register_subalias("P", P());
 			register_subalias("N", N());
-			if (m_func() != "")
+			if (!m_func().empty())
 				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
 
-		NETLIB_IS_TIMESTEP(m_func() != "")
+		NETLIB_IS_TIMESTEP(!m_func().empty())
 
 		NETLIB_TIMESTEPI()
 		{
@@ -609,11 +609,11 @@ namespace analog
 		{
 			register_subalias("P", P());
 			register_subalias("N", N());
-			if (m_func() != "")
+			if (!m_func().empty())
 				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
 
-		NETLIB_IS_TIMESTEP(m_func() != "")
+		NETLIB_IS_TIMESTEP(!m_func().empty())
 		NETLIB_TIMESTEPI()
 		{
 			m_t += step;

@@ -83,7 +83,7 @@ bool parser_t::parse(const pstring &nlname)
 			require_token(m_tok_paren_left);
 			token_t name = get_token();
 			require_token(m_tok_paren_right);
-			if (name.str() == nlname || nlname == "")
+			if (name.str() == nlname || nlname.empty())
 			{
 				parse_netlist(name.str());
 				return true;
@@ -164,8 +164,8 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 
 	netlist::tt_desc desc;
 	desc.name = name;
-	desc.ni = static_cast<unsigned long>(ni);
-	desc.no = static_cast<unsigned long>(no);
+	desc.ni = gsl::narrow<unsigned long>(ni);
+	desc.no = gsl::narrow<unsigned long>(no);
 	desc.family = "";
 
 	while (true)

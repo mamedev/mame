@@ -13,6 +13,8 @@
 #include "plib/parray.h"
 #include "plib/vector_ops.h"
 
+#include "nld_matrix_solver_ext.h"
+
 #include <algorithm>
 
 namespace netlist
@@ -49,7 +51,7 @@ namespace solver
 		template <typename T>
 		void LE_back_subst(T & x);
 
-		PALIGNAS_VECTOROPT()
+		// PALIGNAS_VECTOROPT() parrays define alignment already
 		plib::parray2D<FT, SIZE, m_pitch_ABS> m_A;
 	};
 

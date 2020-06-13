@@ -415,8 +415,8 @@ namespace analog
 				else
 				{
 					// linear
-					const auto Sqr1(static_cast<nl_fptype>(plib::pow(Vdsat - Vds, 2)));
-					const auto Sqr2(static_cast<nl_fptype>(plib::pow(nlconst::two() * Vdsat - Vds, 2)));
+					const auto Sqr1(plib::narrow_cast<nl_fptype>(plib::pow(Vdsat - Vds, 2)));
+					const auto Sqr2(plib::narrow_cast<nl_fptype>(plib::pow(nlconst::two() * Vdsat - Vds, 2)));
 					Cgb = 0;
 					Cgs = m_CoxWL * (nlconst::one() - Sqr1 / Sqr2) * nlconst::two_thirds();
 					Cgd = m_CoxWL * (nlconst::one() - Vdsat * Vdsat / Sqr2) * nlconst::two_thirds();

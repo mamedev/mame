@@ -78,9 +78,9 @@ namespace netlist
 	/// \note This is not the right location yet.
 	///
 
-	using device_arena = std::conditional<NL_USE_MEMPOOL,
+	using device_arena = std::conditional_t<config::use_mempool::value,
 		plib::mempool_arena<plib::aligned_arena>,
-		plib::aligned_arena>::type;
+		plib::aligned_arena>;
 	using host_arena   = plib::aligned_arena;
 
 	/// \brief Interface definition for netlist callbacks into calling code
@@ -187,7 +187,7 @@ namespace netlist
 			}
 		};
 
-		/// \brief: used define a constant in device description struct
+		/// \brief: used to define a constant in device description struct
 		///
 		/// See the 74125 implementation
 		///

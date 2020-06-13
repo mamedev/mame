@@ -440,7 +440,7 @@ namespace devices
 
 			if (!m_ttbl)
 			{
-				m_ttbl = pool.make_unique<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t>();
+				m_ttbl = plib::make_unique<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t>(pool);
 				truthtable_parser desc_s(m_NO, m_NI,
 						packed_int(m_ttbl->m_out_state.data(), sizeof(m_ttbl->m_out_state[0]) * 8),
 						m_ttbl->m_timing_index.data(), m_ttbl->m_timing_nt.data());
@@ -448,7 +448,7 @@ namespace devices
 				desc_s.parse(m_desc);
 			}
 
-			return pool.make_unique<tt_type>(anetlist, name, m_family_name, *m_ttbl, m_desc);
+			return plib::make_unique<tt_type>(pool, anetlist, name, m_family_name, *m_ttbl, m_desc);
 		}
 	private:
 		device_arena::unique_ptr<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t> m_ttbl;
@@ -578,7 +578,7 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 	for (int j=0; j < 16; j++)
 		m_timing_nt[j] = netlist_time::zero();
 
-	while (!(ttline == ""))
+	while (!ttline.empty())
 	{
 		std::vector<pstring> io(plib::psplit(ttline,"|"));
 		// checks
@@ -670,7 +670,7 @@ namespace factory
 	#define ENTRYY(n, m, s)    case (n * 100 + m): \
 		{ using xtype = devices::netlist_factory_truthtable_t<n, m>; \
 			auto cs=s; \
-			ret = host_arena::make_unique<xtype>(desc.name, std::move(cs)); } \
+			ret = plib::make_unique<xtype, host_arena>(desc.name, std::move(cs)); } \
 			break
 
 	#define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \
@@ -700,7 +700,7 @@ namespace factory
 				nl_assert_always(false, msg.c_str());
 		}
 		ret->m_desc = desc.desc;
-		ret->m_family_name = (desc.family != "" ? desc.family : pstring(config::DEFAULT_LOGIC_FAMILY()));
+		ret->m_family_name = (!desc.family.empty() ? desc.family : pstring(config::DEFAULT_LOGIC_FAMILY()));
 
 		return ret;
 	}

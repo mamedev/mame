@@ -15,9 +15,7 @@
 #include <cmath>
 #include <type_traits>
 
-#if (PUSE_FLOAT128)
-#include <quadmath.h>
-#endif
+// quadmath.h included by ptypes.h
 
 namespace plib
 {

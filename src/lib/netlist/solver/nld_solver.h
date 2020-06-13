@@ -39,7 +39,7 @@ namespace devices
 		void post_start();
 		void stop();
 
-		nl_fptype gmin() const { return m_params.m_gmin(); }
+		auto gmin() const -> decltype(solver::solver_parameters_t::m_gmin()) { return m_params.m_gmin(); }
 
 		solver::static_compile_container create_solver_code(solver::static_compile_target target);
 

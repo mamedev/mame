@@ -115,7 +115,7 @@ namespace netlist
 		, m_VL(*this, "VL")
 		, m_VREF(*this, "VREF")
 		{
-			m_type = static_cast<int>(m_modacc.m_TYPE);
+			m_type = plib::narrow_cast<int>(m_modacc.m_TYPE);
 			if (m_type < 1 || m_type > 3)
 			{
 				log().fatal(MF_OPAMP_UNKNOWN_TYPE(m_type));

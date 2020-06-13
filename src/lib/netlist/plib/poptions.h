@@ -136,7 +136,7 @@ namespace plib {
 
 			if (raw != plib::container::npos)
 			{
-				m_val = static_cast<T>(raw);
+				m_val = narrow_cast<T>(raw);
 				return 0;
 			}
 

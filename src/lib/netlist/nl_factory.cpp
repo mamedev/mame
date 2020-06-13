@@ -76,7 +76,7 @@ namespace factory {
 
 	device_arena::unique_ptr<core_device_t> library_element_t::make_device(device_arena &pool, netlist_state_t &anetlist, const pstring &name)
 	{
-		return pool.make_unique<NETLIB_NAME(wrapper)>(anetlist, name);
+		return plib::make_unique<NETLIB_NAME(wrapper)>(pool, anetlist, name);
 	}
 
 

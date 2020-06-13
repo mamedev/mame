@@ -55,7 +55,7 @@ namespace plib {
 		static char32_t fmt_spec() { return 'f'; }
 		static inline void streamify(std::ostream &s, const FLOAT128 &v)
 		{
-			s << static_cast<long double>(v);
+			s << narrow_cast<long double>(v);
 		}
 	};
 	#endif
@@ -322,7 +322,7 @@ namespace plib {
 			if (build_enabled && enabled && m_enabled)
 			{
 				pfmt pf(fmt);
-				static_cast<T *>(this)->vdowrite(xlog(pf, std::forward<Args>(args)...));
+				dynamic_cast<T &>(*this).vdowrite(xlog(pf, std::forward<Args>(args)...));
 			}
 		}
 
@@ -332,7 +332,7 @@ namespace plib {
 			if (build_enabled && m_enabled)
 			{
 				pfmt pf(fmt);
-				static_cast<const T *>(this)->vdowrite(xlog(pf, std::forward<Args>(args)...));
+				static_cast<const T &>(*this).vdowrite(xlog(pf, std::forward<Args>(args)...));
 			}
 		}
 

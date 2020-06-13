@@ -200,6 +200,12 @@ namespace netlist
 		///
 		using MAX_QUEUE_SIZE = std::integral_constant<std::size_t, 512>; // NOLINT
 
+		using use_float_matrix = std::integral_constant<bool, NL_USE_FLOAT_MATRIX>;
+		using use_long_double_matrix = std::integral_constant<bool, NL_USE_LONG_DOUBLE_MATRIX>;
+		using use_float128_matrix = std::integral_constant<bool, NL_USE_FLOAT128>;
+
+		using use_mempool = std::integral_constant<bool, NL_USE_MEMPOOL>;
+
 		/// \brief  Floating point types used
 		///
 		/// nl_fptype is the floating point type used throughout the

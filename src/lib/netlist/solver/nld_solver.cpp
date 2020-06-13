@@ -87,7 +87,7 @@ namespace devices
 		analog_net_t::list_t &nets,
 		solver::solver_parameters_t &params, std::size_t size)
 	{
-		return host_arena::make_unique<C>(nl, name, nets, &params, size);
+		return plib::make_unique<C, host_arena>(nl, name, nets, &params, size);
 	}
 
 	template <typename FT, int SIZE>
@@ -136,29 +136,21 @@ namespace devices
 		switch (net_count)
 		{
 			case 1:
-				return host_arena::make_unique<solver::matrix_solver_direct1_t<FT>>(state(), sname, nets, &m_params);
-				break;
+				return plib::make_unique<solver::matrix_solver_direct1_t<FT>, host_arena>(state(), sname, nets, &m_params);
 			case 2:
-				return host_arena::make_unique<solver::matrix_solver_direct2_t<FT>>(state(), sname, nets, &m_params);
-				break;
+				return plib::make_unique<solver::matrix_solver_direct2_t<FT>, host_arena>(state(), sname, nets, &m_params);
 			case 3:
 				return create_solver<FT, 3>(3, sname, nets);
-				break;
 			case 4:
 				return create_solver<FT, 4>(4, sname, nets);
-				break;
 			case 5:
 				return create_solver<FT, 5>(5, sname, nets);
-				break;
 			case 6:
 				return create_solver<FT, 6>(6, sname, nets);
-				break;
 			case 7:
 				return create_solver<FT, 7>(7, sname, nets);
-				break;
 			case 8:
 				return create_solver<FT, 8>(8, sname, nets);
-				break;
 			default:
 				log().info(MI_NO_SPECIFIC_SOLVER(net_count));
 				if (net_count <= 16)
@@ -186,7 +178,6 @@ namespace devices
 					return create_solver<FT, -512>(net_count, sname, nets);
 				}
 				return create_solver<FT, 0>(net_count, sname, nets);
-				break;
 		}
 	}
 
@@ -201,7 +192,7 @@ namespace devices
 				{
 					netlist.log().verbose("   ==> not a rail net");
 					// Must be an analog net
-					auto &n = *static_cast<analog_net_t *>(net.get());
+					auto &n = dynamic_cast<analog_net_t &>(*net);
 					if (!already_processed(n))
 					{
 						groupspre.emplace_back(analog_net_t::list_t());
@@ -273,9 +264,9 @@ namespace devices
 					// only process analog terminals
 					if (term->is_type(detail::terminal_type::TERMINAL))
 					{
-						auto *pt = static_cast<terminal_t *>(term);
+						auto &pt = dynamic_cast<terminal_t &>(*term);
 						// check the connected terminal
-						analog_net_t &connected_net = netlist.setup().get_connected_terminal(*pt)->net();
+						analog_net_t &connected_net = netlist.setup().get_connected_terminal(pt)->net();
 						netlist.log().verbose("  Connected net {}", connected_net.name());
 						if (!check_if_processed_and_join(connected_net))
 							process_net(netlist, connected_net);
@@ -306,17 +297,17 @@ namespace devices
 			switch (m_params.m_fp_type())
 			{
 				case solver::matrix_fp_type_e::FLOAT:
-					if (!NL_USE_FLOAT_MATRIX)
+					if (!config::use_float_matrix())
 						log().info("FPTYPE {1} not supported. Using DOUBLE", m_params.m_fp_type().name());
-					ms = create_solvers<std::conditional_t<NL_USE_FLOAT_MATRIX,float, double>>(sname, grp);
+					ms = create_solvers<std::conditional_t<config::use_float_matrix::value, float, double>>(sname, grp);
 					break;
 				case solver::matrix_fp_type_e::DOUBLE:
 					ms = create_solvers<double>(sname, grp);
 					break;
 				case solver::matrix_fp_type_e::LONGDOUBLE:
-					if (!NL_USE_LONG_DOUBLE_MATRIX)
+					if (!config::use_long_double_matrix())
 						log().info("FPTYPE {1} not supported. Using DOUBLE", m_params.m_fp_type().name());
-					ms = create_solvers<std::conditional_t<NL_USE_LONG_DOUBLE_MATRIX, long double, double>>(sname, grp);
+					ms = create_solvers<std::conditional_t<config::use_long_double_matrix::value, long double, double>>(sname, grp);
 					break;
 				case solver::matrix_fp_type_e::FLOATQ128:
 #if (NL_USE_FLOAT128)
@@ -355,7 +346,7 @@ namespace devices
 		for (auto & s : m_mat_solvers)
 		{
 			auto r = s->create_solver_code(target);
-			if (r.first != "") // ignore solvers not supporting static compile
+			if (!r.first.empty()) // ignore solvers not supporting static compile
 				mp.push_back(r);
 		}
 		return mp;

@@ -18,10 +18,10 @@
 
 #include <array>
 #include <fstream>
+#include <fstream>
 #include <ios>
 #include <iostream>
 #include <sstream>
-#include <fstream>
 #include <type_traits>
 #include <vector>
 
@@ -204,7 +204,7 @@ public:
 	{
 		const auto sz(static_cast<std::streamsize>(val.size()));
 		write(sz);
-		m_strm.write(reinterpret_cast<const std::ostream::char_type *>(val.data()), sz * static_cast<std::streamsize>(sizeof(T)));
+		m_strm.write(reinterpret_cast<const std::ostream::char_type *>(val.data()), sz * gsl::narrow<std::streamsize>(sizeof(T)));
 	}
 
 private:
@@ -225,7 +225,7 @@ public:
 	template <typename T>
 	void read(T &val)
 	{
-		m_strm.read(reinterpret_cast<std::istream::char_type *>(&val), sizeof(T));
+		m_strm.read(reinterpret_cast<std::istream::char_type *>(&val), gsl::narrow<std::streamsize>(sizeof(T)));
 	}
 
 	void read( pstring &s)
@@ -244,7 +244,7 @@ public:
 		std::size_t sz = 0;
 		read(sz);
 		val.resize(sz);
-		m_strm.read(reinterpret_cast<std::istream::char_type *>(val.data()), static_cast<std::streamsize>(sizeof(T) * sz));
+		m_strm.read(reinterpret_cast<std::istream::char_type *>(val.data()), gsl::narrow<std::streamsize>(sizeof(T) * sz));
 	}
 
 private:
@@ -289,7 +289,7 @@ public:
 		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
 
 	template <typename T>
-	explicit ofstream(const pstring_t<T> name, ios_base::openmode mode = ios_base::in)
+	explicit ofstream(const pstring_t<T> name, ios_base::openmode mode = ios_base::out | ios_base::trunc)
 	: std::ofstream(filename_type(name).c_str(), mode)
 	{
 	}

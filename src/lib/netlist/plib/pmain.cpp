@@ -29,8 +29,8 @@ namespace plib {
 	int app::main_utfX(int argc, char *argv[])
 	{
 		std::vector<putf8string> arg;
-		for (std::size_t i = 0; i < static_cast<std::size_t>(argc); i++)
-			arg.push_back(putf8string(argv[i]));
+		for (std::size_t i = 0; i < narrow_cast<std::size_t>(argc); i++)
+			arg.emplace_back(putf8string(argv[i]));
 
 		return main_utfX(arg);
 	}
@@ -38,8 +38,8 @@ namespace plib {
 	int app::main_utfX(int argc, wchar_t *argv[])
 	{
 		std::vector<putf8string> arg;
-		for (std::size_t i = 0; i < static_cast<std::size_t>(argc); i++)
-			arg.push_back(putf8string(pwstring(argv[i])));
+		for (std::size_t i = 0; i < narrow_cast<std::size_t>(argc); i++)
+			arg.emplace_back(putf8string(pwstring(argv[i])));
 
 		return main_utfX(arg);
 	}
