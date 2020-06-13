@@ -313,13 +313,11 @@ void microb_state::microb(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_raw(1'620'000 * 8, 800, 0, 640, 324, 0, 300);
+	//screen.set_raw(1'620'000 * 8, 800, 0, 640, 270, 0, 250);
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
-	screen.set_size(640, 250);
-	screen.set_visarea(0, 639, 0, 249);
 
-	i8275_device &crtc(I8275(config, "crtc", 1'944'000)); // calculated for 60 Hz operation
+	i8275_device &crtc(I8275(config, "crtc", 1'620'000));
 	crtc.set_screen("screen");
 	crtc.set_character_width(8);
 	crtc.set_display_callback(FUNC(microb_state::draw_character));
@@ -336,14 +334,14 @@ void microb_state::microb(machine_config &config)
 
 	pit8253_device &pit1(PIT8253(config, "pit1"));
 	pit1.set_clk<2>(1'536'000);
-	pit1.out_handler<2>().set(m_usart[0], FUNC(i8251_device::write_rxc));
+	pit1.out_handler<2>().set(m_usart[1], FUNC(i8251_device::write_rxc));
 
 	pit8253_device &pit2(PIT8253(config, "pit2"));
 	pit2.set_clk<0>(1'536'000);
 	pit2.set_clk<1>(1'536'000);
 	pit2.set_clk<2>(1'536'000);
 	pit2.out_handler<0>().set(m_usart[0], FUNC(i8251_device::write_txc));
-	pit2.out_handler<1>().set(m_usart[1], FUNC(i8251_device::write_rxc));
+	pit2.out_handler<1>().set(m_usart[0], FUNC(i8251_device::write_rxc));
 	pit2.out_handler<2>().set(m_usart[1], FUNC(i8251_device::write_txc));
 
 	SPEAKER(config, "mono").front_center();
