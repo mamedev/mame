@@ -249,6 +249,9 @@ public:
 
 	void fordrace(machine_config &config);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(wheel_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(wheel2_r);
+
 private:
 };
 
