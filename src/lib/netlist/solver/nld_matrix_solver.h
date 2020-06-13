@@ -274,10 +274,17 @@ namespace solver
 		virtual bool check_err() = 0;
 		virtual void store() = 0;
 
+#if 0
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gonn;
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gtn;
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_Idrn;
 		plib::pmatrix2d<nl_fptype *, aligned_alloc<nl_fptype *>>    m_connected_net_Vn;
+#else
+		plib::pmatrix2d_vrl<nl_fptype, aligned_alloc<nl_fptype>>        m_gonn;
+		plib::pmatrix2d_vrl<nl_fptype, aligned_alloc<nl_fptype>>        m_gtn;
+		plib::pmatrix2d_vrl<nl_fptype, aligned_alloc<nl_fptype>>        m_Idrn;
+		plib::pmatrix2d_vrl<nl_fptype *, aligned_alloc<nl_fptype *>>    m_connected_net_Vn;
+#endif
 
 		plib::aligned_vector<terms_for_net_t> m_terms;
 

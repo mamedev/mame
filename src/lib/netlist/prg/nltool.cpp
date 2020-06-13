@@ -659,6 +659,8 @@ void tool_app_t::static_compile()
 			}
 		}
 		plib::ofstream sout(opt_out());
+		if (sout.fail())
+			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_out()));
 
 		sout << "#include \"plib/pdynlib.h\"\n\n";
 		for (auto &e : map)
@@ -666,6 +668,7 @@ void tool_app_t::static_compile()
 			sout << "// " << e.second.m_module << "\n";
 			sout << e.second.m_code;
 		}
+		sout << "extern plib::dynlib_static_sym nl_static_solver_syms[];\n";
 		sout << "plib::dynlib_static_sym nl_static_solver_syms[] = {\n";
 		for (auto &e : map)
 		{
@@ -761,7 +764,7 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 					else if (n == "FunctionTable")
 						ret.functiontable = v;
 					else if (n == "Param")
-						ret.params.push_back(std::pair<pstring, pstring>(v2, plib::trim(v.substr(v2.length()))));
+						ret.params.emplace_back(v2, plib::trim(v.substr(v2.length())));
 					else if (n == "Example")
 					{
 						ret.example = plib::psplit(plib::trim(v),",",true);

@@ -375,6 +375,17 @@ namespace solver
 		m_Idrn.resize(iN, max_count);
 		m_connected_net_Vn.resize(iN, max_count);
 
+		// Initialize arrays to 0 (in case the vrl one is used
+		for (std::size_t k = 0; k < iN; k++)
+			for (std::size_t j = 0; j < m_terms[k].count(); j++)
+			{
+				m_gtn.set(k,j, nlconst::zero());
+				m_gonn.set(k,j, nlconst::zero());
+				m_Idrn.set(k,j, nlconst::zero());
+				m_connected_net_Vn.set(k, j, nullptr);
+			}
+
+
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			auto count = m_terms[k].count();
