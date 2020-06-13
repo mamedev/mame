@@ -39,8 +39,8 @@ protected:
 	void out_c_w(uint8_t data);
 	uint8_t in_a_r();
 	uint8_t in_b_r();
-	DECLARE_READ8_MEMBER(lcd_read);
-	DECLARE_WRITE8_MEMBER(lcd_write);
+	uint8_t lcd_read(offs_t offset);
+	void lcd_write(offs_t offset, uint8_t data);
 
 private:
 	required_ioport_array<13> m_keys;

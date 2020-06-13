@@ -38,7 +38,7 @@ TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_real_data_r)
 	m_zaccept = 1;
 }
 
-READ8_MEMBER(pitnrun_state::mcu_data_r)
+uint8_t pitnrun_state::mcu_data_r()
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::mcu_real_data_r),this));
 	return m_toz80;
@@ -51,13 +51,13 @@ TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_real_data_w)
 	m_fromz80 = param;
 }
 
-WRITE8_MEMBER(pitnrun_state::mcu_data_w)
+void pitnrun_state::mcu_data_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::mcu_real_data_w),this), data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
 }
 
-READ8_MEMBER(pitnrun_state::mcu_status_r)
+uint8_t pitnrun_state::mcu_status_r()
 {
 	/* mcu synchronization */
 	/* bit 0 = the 68705 has read data from the Z80 */

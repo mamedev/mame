@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  video.c
+  pbaction.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -11,31 +11,31 @@
 #include "emu.h"
 #include "includes/pbaction.h"
 
-WRITE8_MEMBER(pbaction_state::pbaction_videoram_w)
+void pbaction_state::pbaction_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pbaction_state::pbaction_colorram_w)
+void pbaction_state::pbaction_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pbaction_state::pbaction_videoram2_w)
+void pbaction_state::pbaction_videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pbaction_state::pbaction_colorram2_w)
+void pbaction_state::pbaction_colorram2_w(offs_t offset, uint8_t data)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pbaction_state::pbaction_scroll_w)
+void pbaction_state::pbaction_scroll_w(uint8_t data)
 {
 	m_scroll = data - 3;
 	if (flip_screen())
@@ -45,7 +45,7 @@ WRITE8_MEMBER(pbaction_state::pbaction_scroll_w)
 	m_fg_tilemap->set_scrollx(0, m_scroll);
 }
 
-WRITE8_MEMBER(pbaction_state::pbaction_flipscreen_w)
+void pbaction_state::pbaction_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 0x01);
 }

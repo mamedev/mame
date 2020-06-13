@@ -32,15 +32,15 @@ public:
 	void p2000t(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(p2000t_port_000f_r);
-	DECLARE_READ8_MEMBER(p2000t_port_202f_r);
-	DECLARE_WRITE8_MEMBER(p2000t_port_101f_w);
-	DECLARE_WRITE8_MEMBER(p2000t_port_303f_w);
-	DECLARE_WRITE8_MEMBER(p2000t_port_505f_w);
-	DECLARE_WRITE8_MEMBER(p2000t_port_707f_w);
-	DECLARE_WRITE8_MEMBER(p2000t_port_888b_w);
-	DECLARE_WRITE8_MEMBER(p2000t_port_8c90_w);
-	DECLARE_WRITE8_MEMBER(p2000t_port_9494_w);
+	uint8_t p2000t_port_000f_r(offs_t offset);
+	uint8_t p2000t_port_202f_r();
+	void p2000t_port_101f_w(uint8_t data);
+	void p2000t_port_303f_w(uint8_t data);
+	void p2000t_port_505f_w(uint8_t data);
+	void p2000t_port_707f_w(uint8_t data);
+	void p2000t_port_888b_w(uint8_t data);
+	void p2000t_port_8c90_w(uint8_t data);
+	void p2000t_port_9494_w(uint8_t data);
 	uint8_t videoram_r(offs_t offset);
 
 	INTERRUPT_GEN_MEMBER(p2000_interrupt);

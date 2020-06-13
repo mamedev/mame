@@ -35,8 +35,8 @@ public:
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_READ8_MEMBER( port40_r );
-	DECLARE_WRITE8_MEMBER( port40_w );
+	uint8_t port40_r();
+	void port40_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	uint8_t video_ram_r(offs_t offset);
 	MC6847_GET_CHARROM_MEMBER(ntsc_char_rom_r);

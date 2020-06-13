@@ -120,7 +120,7 @@ WRITE_LINE_MEMBER(policetr_state::vblank)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::control_w)
+void policetr_state::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// bit $80000000 = BSMT access/ROM read
 	// bit $40000000 = N.C. (per schematic)
@@ -176,7 +176,7 @@ WRITE32_MEMBER(policetr_state::control_w)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::bsmt2000_reg_w)
+void policetr_state::bsmt2000_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (BIT(m_control_data, 31))
 		m_bsmt->write_data(data);
@@ -185,7 +185,7 @@ WRITE32_MEMBER(policetr_state::bsmt2000_reg_w)
 }
 
 
-WRITE32_MEMBER(policetr_state::bsmt2000_data_w)
+void policetr_state::bsmt2000_data_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_bsmt->write_reg(data);
 	COMBINE_DATA(&m_bsmt_data_bank);
@@ -198,7 +198,7 @@ READ_LINE_MEMBER(policetr_state::bsmt_status_r)
 }
 
 
-READ8_MEMBER(policetr_state::bsmt2000_data_r)
+uint8_t policetr_state::bsmt2000_data_r(offs_t offset)
 {
 	return m_bsmt_region[(m_bsmt_data_bank << 16) + m_bsmt_data_offset];
 }
@@ -211,7 +211,7 @@ READ8_MEMBER(policetr_state::bsmt2000_data_r)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::speedup_w)
+void policetr_state::speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_speedup_data);
 
@@ -742,7 +742,7 @@ ROM_END
 
 void policetr_state::driver_init()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(m_speedup_addr, m_speedup_addr+3, write32_delegate(*this, FUNC(policetr_state::speedup_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(m_speedup_addr, m_speedup_addr+3, write32s_delegate(*this, FUNC(policetr_state::speedup_w)));
 	m_speedup_data = m_rambase + m_speedup_addr/4;
 }
 

@@ -1180,8 +1180,8 @@ WRITE8_MEMBER(vicdual_state::brdrline_io_w)
 
 WRITE8_MEMBER(vicdual_state::pulsar_io_w)
 {
-	if (offset & 0x01)  pulsar_audio_1_w(space, 0, data);
-	if (offset & 0x02)  pulsar_audio_2_w(space, 0, data);
+	if (offset & 0x01)  pulsar_audio_1_w(data);
+	if (offset & 0x02)  pulsar_audio_2_w(data);
 	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  palette_bank_w(space, 0, data);
 }

@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER(tpp2_state::screen_vblank)
 /* the protection device simply returns the last two values written shifted left */
 /* by a variable amount. */
 
-READ8_MEMBER(tnx1_state::protection_r)
+uint8_t tnx1_state::protection_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -156,7 +156,7 @@ READ8_MEMBER(tnx1_state::protection_r)
 	}
 }
 
-WRITE8_MEMBER(tnx1_state::protection_w)
+void tnx1_state::protection_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{

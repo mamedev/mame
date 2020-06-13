@@ -45,7 +45,7 @@ RUN
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( phc25_state::port40_r )
+uint8_t phc25_state::port40_r()
 {
 	/*
 
@@ -79,7 +79,7 @@ READ8_MEMBER( phc25_state::port40_r )
 	return data;
 }
 
-WRITE8_MEMBER( phc25_state::port40_w )
+void phc25_state::port40_w(uint8_t data)
 {
 	/*
 

@@ -48,7 +48,7 @@ private:
 
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER( cldig_w );
+	void cldig_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	void pio1_pa_w(uint8_t data);

@@ -16,18 +16,18 @@ inline offs_t poly_state::physical(offs_t offset)
 	return (((~m_dat[(m_dat_bank << 3) | (offset >> 13)]) & 0x0f) << 13) | (offset & 0x1fff);
 }
 
-READ8_MEMBER(poly_state::logical_mem_r)
+uint8_t poly_state::logical_mem_r(offs_t offset)
 {
 	return m_user->base()[physical(offset)];
 }
 
-WRITE8_MEMBER(poly_state::logical_mem_w)
+void poly_state::logical_mem_w(offs_t offset, uint8_t data)
 {
 	m_user->base()[physical(offset)] = data;
 }
 
 
-READ8_MEMBER(poly_state::vector_r)
+uint8_t poly_state::vector_r(offs_t offset)
 {
 	/* system mode is selected by a vector fetch (interrupt and reset) */
 	m_bankdev->set_bank(0);
@@ -41,24 +41,24 @@ TIMER_CALLBACK_MEMBER(poly_state::set_protect)
 	m_bankdev->set_bank(1);
 }
 
-WRITE8_MEMBER(poly_state::set_protect_w)
+void poly_state::set_protect_w(uint8_t data)
 {
 	/* set protect after 1 E cycle */
 	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(2), timer_expired_delegate(FUNC(poly_state::set_protect), this));
 }
 
 
-READ8_MEMBER(poly_state::select_map_r)
+uint8_t poly_state::select_map_r()
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(poly_state::select_map1_w)
+void poly_state::select_map1_w(uint8_t data)
 {
 	m_dat_bank = 0;
 }
 
-WRITE8_MEMBER(poly_state::select_map2_w)
+void poly_state::select_map2_w(uint8_t data)
 {
 	m_dat_bank = 1;
 }
@@ -148,19 +148,19 @@ WRITE_LINE_MEMBER(poly_state::ptm_o3_callback)
 	m_speaker->level_w(state);
 }
 
-WRITE8_MEMBER(poly_state::baud_rate_w )
+void poly_state::baud_rate_w (uint8_t data)
 {
 	/* baud rate controller (0=9600,2=4800,4=2400,6=1200,8=600,A=300) */
 	int selector = (data & 0x0e) >> 1;
 	m_acia_clock->set_clock_scale((selector <= 5) ? 1.0 / (1 << selector) : 0.0);
 }
 
-READ8_MEMBER(poly_state::network_r)
+uint8_t poly_state::network_r(offs_t offset)
 {
 	return m_adlc->read(offset >> 1);
 }
 
-WRITE8_MEMBER(poly_state::network_w)
+void poly_state::network_w(offs_t offset, uint8_t data)
 {
 	m_adlc->write(offset >> 1, data);
 }
@@ -172,7 +172,7 @@ WRITE_LINE_MEMBER(poly_state::network_clk_w)
 }
 
 
-WRITE8_MEMBER(polydev_state::drive_register_w)
+void polydev_state::drive_register_w(uint8_t data)
 {
 	/* drive select */
 	switch (data & 0x03)
@@ -198,7 +198,7 @@ WRITE8_MEMBER(polydev_state::drive_register_w)
 	}
 }
 
-READ8_MEMBER(polydev_state::drive_register_r)
+uint8_t polydev_state::drive_register_r()
 {
 	/* disk change */
 	return (m_current_floppy ? m_current_floppy->dskchg_r() : 1) << 1;
@@ -209,12 +209,12 @@ WRITE_LINE_MEMBER(polydev_state::motor_w)
 	if (m_current_floppy) m_current_floppy->mon_w(!state);
 }
 
-READ8_MEMBER(polydev_state::fdc_inv_r)
+uint8_t polydev_state::fdc_inv_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER(polydev_state::fdc_inv_w)
+void polydev_state::fdc_inv_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }

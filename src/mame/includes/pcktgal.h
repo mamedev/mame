@@ -38,11 +38,11 @@ public:
 	int m_msm5205next;
 	int m_toggle;
 
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(sound_bank_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_READ8_MEMBER(sound_unk_r);
+	void bank_w(uint8_t data);
+	void sound_bank_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void adpcm_data_w(uint8_t data);
+	uint8_t sound_unk_r();
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	void init_pcktgal();

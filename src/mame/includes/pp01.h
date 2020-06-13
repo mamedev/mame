@@ -59,15 +59,15 @@ private:
 	bool m_txe, m_txd, m_rts, m_casspol;
 	u8 m_cass_data[4];
 
-	DECLARE_WRITE8_MEMBER(video_write_mode_w);
-	DECLARE_WRITE8_MEMBER(video_r_1_w);
-	DECLARE_WRITE8_MEMBER(video_g_1_w);
-	DECLARE_WRITE8_MEMBER(video_b_1_w);
-	DECLARE_WRITE8_MEMBER(video_r_2_w);
-	DECLARE_WRITE8_MEMBER(video_g_2_w);
-	DECLARE_WRITE8_MEMBER(video_b_2_w);
-	DECLARE_WRITE8_MEMBER(mem_block_w);
-	DECLARE_READ8_MEMBER(mem_block_r);
+	void video_write_mode_w(uint8_t data);
+	void video_r_1_w(offs_t offset, uint8_t data);
+	void video_g_1_w(offs_t offset, uint8_t data);
+	void video_b_1_w(offs_t offset, uint8_t data);
+	void video_r_2_w(offs_t offset, uint8_t data);
+	void video_g_2_w(offs_t offset, uint8_t data);
+	void video_b_2_w(offs_t offset, uint8_t data);
+	void mem_block_w(offs_t offset, uint8_t data);
+	uint8_t mem_block_r(offs_t offset);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	void pp01_palette(palette_device &palette) const;
 	uint32_t screen_update_pp01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

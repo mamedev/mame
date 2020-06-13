@@ -66,10 +66,10 @@ public:
 	uint8_t m_joy_6b_packet[5];
 	void mess_pce_joystick_w(uint8_t data);
 	uint8_t mess_pce_joystick_r();
-	DECLARE_WRITE8_MEMBER(pce_cd_intf_w);
-	DECLARE_READ8_MEMBER(pce_cd_intf_r);
-	DECLARE_READ8_MEMBER(pce_cd_acard_wram_r);
-	DECLARE_WRITE8_MEMBER(pce_cd_acard_wram_w);
+	void pce_cd_intf_w(offs_t offset, uint8_t data);
+	uint8_t pce_cd_intf_r(offs_t offset);
+	uint8_t pce_cd_acard_wram_r(offs_t offset);
+	void pce_cd_acard_wram_w(offs_t offset, uint8_t data);
 	void init_sgx();
 	void init_tg16();
 	void init_mess_pce();

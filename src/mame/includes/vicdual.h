@@ -160,8 +160,8 @@ protected:
 	void invinco_audio_w(uint8_t data);
 
 	/*----------- defined in audio/pulsar.cpp -----------*/
-	DECLARE_WRITE8_MEMBER( pulsar_audio_1_w );
-	DECLARE_WRITE8_MEMBER( pulsar_audio_2_w );
+	void pulsar_audio_1_w(uint8_t data);
+	void pulsar_audio_2_w(uint8_t data);
 
 	/*----------- defined in audio/tranqgun.cpp -----------*/
 	DECLARE_WRITE8_MEMBER( tranqgun_audio_w );

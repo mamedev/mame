@@ -459,7 +459,7 @@ void pmd85_state::pmd85_ppi_3_portc_w(uint8_t data)
 
 *******************************************************************************/
 
-READ8_MEMBER(pmd85_state::pmd85_io_r)
+uint8_t pmd85_state::pmd85_io_r(offs_t offset)
 {
 	if (m_startup_mem_map)
 	{
@@ -513,7 +513,7 @@ READ8_MEMBER(pmd85_state::pmd85_io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pmd85_state::pmd85_io_w)
+void pmd85_state::pmd85_io_w(offs_t offset, uint8_t data)
 {
 	if (m_startup_mem_map)
 	{
@@ -589,7 +589,7 @@ WRITE8_MEMBER(pmd85_state::pmd85_io_w)
 
 *******************************************************************************/
 
-READ8_MEMBER(pmd85_state::mato_io_r)
+uint8_t pmd85_state::mato_io_r(offs_t offset)
 {
 	if (m_startup_mem_map)
 	{
@@ -611,7 +611,7 @@ READ8_MEMBER(pmd85_state::mato_io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pmd85_state::mato_io_w)
+void pmd85_state::mato_io_w(offs_t offset, uint8_t data)
 {
 	if (m_startup_mem_map)
 	{
