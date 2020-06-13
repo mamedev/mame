@@ -47,7 +47,7 @@ K007420_CALLBACK_MEMBER(rockrage_state::rockrage_sprite_callback)
 }
 
 
-WRITE8_MEMBER(rockrage_state::rockrage_vreg_w)
+void rockrage_state::rockrage_vreg_w(uint8_t data)
 {
 	/* bits 4-7: unused */
 	/* bit 3: bit 4 of bank # (layer 0) */

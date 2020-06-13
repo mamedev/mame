@@ -343,7 +343,7 @@ uint32_t redalert_state::screen_update_redalert(screen_device &screen, bitmap_rg
 	[3]
 	---- --xx <3 on normal/first form boss, 1 on second form>
 */
-WRITE8_MEMBER(redalert_state::demoneye_bitmap_layer_w)
+void redalert_state::demoneye_bitmap_layer_w(offs_t offset, uint8_t data)
 {
 	m_demoneye_bitmap_reg[offset] = data;
 }
