@@ -96,7 +96,8 @@ void emma2_state::mem_map(address_map &map)
 	map(0x0900, 0x090f).mirror(0x02f0).m(m_via, FUNC(via6522_device::map));
 	map(0x0a00, 0x0a03).mirror(0x00fc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0c00, 0x0fff).ram();
-	map(0xd800, 0xdfff).mirror(0x2000).rom();
+	map(0x9000, 0x97ff).rom().region("maincpu", 0);
+	map(0xd800, 0xdfff).mirror(0x2000).rom().region("maincpu", 0x0800);
 }
 
 
@@ -219,9 +220,9 @@ void emma2_state::emma2(machine_config &config)
 
 /* ROM definition */
 ROM_START( emma2 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "se118a_90-97", 0x9000, 0x0800, CRC(32d36938) SHA1(910fd1c18c7deae83933c7c4f397103a35bf574a) )
-	ROM_LOAD( "se116a_d8-dd_fe-ff", 0xd800, 0x0800, CRC(ef0f1513) SHA1(46089ba0402828b4204812a04134b313d9be0f93) )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "se118a_90-97", 0x0000, 0x0800, CRC(32d36938) SHA1(910fd1c18c7deae83933c7c4f397103a35bf574a) ) // 0x9000
+	ROM_LOAD( "se116a_d8-dd_fe-ff", 0x0800, 0x0800, CRC(ef0f1513) SHA1(46089ba0402828b4204812a04134b313d9be0f93) ) // 0xd800
 ROM_END
 
 

@@ -27,7 +27,8 @@ public:
 	zorba_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_config_port(*this, "CNF")
-		, m_read_bank(*this, "bankr0")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_p_chargen(*this, "chargen")
 		, m_maincpu(*this, "maincpu")
 		, m_dma(*this, "dma")
@@ -91,7 +92,8 @@ private:
 
 	required_ioport                     m_config_port;
 
-	required_memory_bank                m_read_bank;
+	required_region_ptr<u8>             m_rom;
+	required_shared_ptr<u8>             m_ram;
 	required_region_ptr<uint8_t>        m_p_chargen;
 
 	required_device<cpu_device>         m_maincpu;
@@ -122,6 +124,7 @@ private:
 	int     m_printer_select;
 
 	uint8_t m_term_data;
+	bool m_rom_in_map;
 };
 
 #endif // MAME_INCLUDES_ZORBA_H
