@@ -57,22 +57,22 @@ public:
 	void ipc(machine_config &config);
 
 private:
-	void ipc_io(address_map &map);
-	void ipc_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
 
-void ipc_state::ipc_mem(address_map &map)
+void ipc_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xdfff).ram();
 	map(0xe800, 0xffff).rom().region("roms", 0);
 }
 
-void ipc_state::ipc_io(address_map &map)
+void ipc_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -96,8 +96,8 @@ void ipc_state::ipc(machine_config &config)
 {
 	/* basic machine hardware */
 	I8085A(config, m_maincpu, XTAL(19'660'800) / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ipc_state::ipc_mem);
-	m_maincpu->set_addrmap(AS_IO, &ipc_state::ipc_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ipc_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &ipc_state::io_map);
 
 	pit8253_device &pit(PIT8253(config, "pit", 0));
 	pit.set_clk<0>(XTAL(19'660'800) / 16);
@@ -147,5 +147,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
-COMP( 19??, ipb,  0,      0,      ipc,     ipc,   ipc_state, empty_init, "Intel", "iPB",    MACHINE_NO_SOUND_HW )
-COMP( 19??, ipc,  ipb,    0,      ipc,     ipc,   ipc_state, empty_init, "Intel", "iPC",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 19??, ipb,  0,      0,      ipc,     ipc,   ipc_state, empty_init, "Intel", "iPB",    MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 19??, ipc,  ipb,    0,      ipc,     ipc,   ipc_state, empty_init, "Intel", "iPC",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

@@ -74,7 +74,8 @@ private:
 	void mfabfz85_io(address_map &map);
 	void mfabfz_io(address_map &map);
 	void mfabfz_mem(address_map &map);
-	virtual void machine_reset() override;
+	void machine_reset() override;
+	void machine_start() override;
 	DECLARE_WRITE_LINE_MEMBER(kansas_r);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
 	u8 m_cass_data[5];
@@ -192,6 +193,13 @@ void mfabfz_state::machine_reset()
 	m_uart->write_cts(0);
 }
 
+void mfabfz_state::machine_start()
+{
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cassoutbit));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_cassold));
+}
 
 void mfabfz_state::mfabfz(machine_config &config)
 {
@@ -304,5 +312,5 @@ ROM_START( mfabfz85 )
 ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS,        INIT        COMPANY                         FULLNAME                               FLAGS */
-COMP( 1979, mfabfz,   0,      0,      mfabfz,   mfabfz, mfabfz_state, empty_init, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1979, mfabfz85, mfabfz, 0,      mfabfz85, mfabfz, mfabfz_state, empty_init, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung MAT85", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1979, mfabfz,   0,      0,      mfabfz,   mfabfz, mfabfz_state, empty_init, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1979, mfabfz85, mfabfz, 0,      mfabfz85, mfabfz, mfabfz_state, empty_init, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung MAT85", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
