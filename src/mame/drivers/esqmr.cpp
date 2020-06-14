@@ -202,6 +202,7 @@
 #include "emu.h"
 #include "machine/esqvfd.h"
 
+#include "cpu/m6805/m68hc05.h"
 #include "machine/68340.h"
 #include "machine/68340ser.h"
 #include "sound/es5506.h"
@@ -280,6 +281,8 @@ void esqmr_state::mr(machine_config &config)
 	duart.a_tx_cb().set(FUNC(esqmr_state::duart_tx_a));
 	duart.b_tx_cb().set(FUNC(esqmr_state::duart_tx_b));
 
+	M68HC705C4A(config, "mcu", 4'000'000);
+
 	//IDT7130(config, "dpram"); // present in PCB, but unknown purpose (mcu communication?)
 
 	ESQPANEL2X40_VFX(config, m_panel);
@@ -316,6 +319,8 @@ ROM_START( mr61 )
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD16_WORD_SWAP( "mrw-osf-11af-2.10.bin",  0x000000, 0x080000, CRC(5854314e) SHA1(8fb2e2ee2f5fb12eae8ea33cb18f757efaec6780) )
 	ROM_LOAD16_WORD_SWAP( "mrw-romc-32ef-1.20.bin", 0x080000, 0x080000, CRC(68321347) SHA1(56cb96943ba42c35ba2787a49b5f4adf7c8dffb8) )
+
+	ROM_REGION(0x2000, "mcu", ROMREGION_ERASE00)
 
 	ROM_REGION(0x400000, "waverom", ROMREGION_ERASE00)
 
