@@ -947,10 +947,10 @@ void rex6000_state::rex6000(machine_config &config)
 	by the flash emulation and I have split every bank into a separate
 	device in order to have similar behavior.
 	*/
-	FUJITSU_29DL16X(config, m_flash0a); //bank 0 of first flash
-	FUJITSU_29DL16X(config, m_flash0b); //bank 1 of first flash
-	FUJITSU_29DL16X(config, m_flash1a); //bank 0 of second flash
-	FUJITSU_29DL16X(config, m_flash1b); //bank 1 of second flash
+	FUJITSU_29DL164BD(config, m_flash0a); //bank 0 of first flash
+	FUJITSU_29DL164BD(config, m_flash0b); //bank 1 of first flash
+	FUJITSU_29DL164BD(config, m_flash1a); //bank 0 of second flash
+	FUJITSU_29DL164BD(config, m_flash1b); //bank 1 of second flash
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("32K");
