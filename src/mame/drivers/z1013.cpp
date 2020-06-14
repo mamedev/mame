@@ -90,7 +90,7 @@ private:
 	bool m_keyboard_part;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	memory_passthrough_handler *m_rom_shadow_tap;
+
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -277,22 +277,7 @@ void z1013_state::machine_reset()
 	m_keyboard_part = 0;
 	m_keyboard_line = 0;
 
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xf000, 0xf7ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
-
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+	m_maincpu->set_state_int(Z80_PC, 0xf000);
 }
 
 void z1013_state::machine_start()
@@ -443,7 +428,7 @@ void z1013_state::z1013k76(machine_config &config)
 
 /* ROM definition */
 ROM_START( z1013 )
-	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "202", "Original" )
 	ROMX_LOAD( "mon_202.bin", 0x0000, 0x0800, CRC(5884edab) SHA1(c3a45ea5cc4da2b7c270068ba1e2d75916960709), ROM_BIOS(0))
 
@@ -456,7 +441,7 @@ ROM_START( z1013 )
 ROM_END
 
 ROM_START( z1013a2 )
-	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mon_a2.bin", 0x0000, 0x0800, CRC(98b19b10) SHA1(97e158f589198cb96aae1567ee0aa6e47824027e))
 
 	ROM_REGION(0x1000, "chargen",0)
@@ -465,7 +450,7 @@ ROM_START( z1013a2 )
 ROM_END
 
 ROM_START( z1013k76 )
-	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mon_rb_k7659.bin", 0x0000, 0x1000, CRC(b3d88c45) SHA1(0bcd20338cf0706b384f40901b7f8498c6f6c320))
 
 	ROM_REGION(0x1000, "chargen",0)
@@ -477,12 +462,12 @@ ROM_START( z1013k76 )
 ROM_END
 
 ROM_START( z1013s60 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
-	ROMX_LOAD( "mon_rb_s6009.bin", 0xf000, 0x1000, CRC(b37faeed) SHA1(ce2e69af5378d39284e8b3be23da50416a0b0fbe), ROM_BIOS(0))
+	ROMX_LOAD( "mon_rb_s6009.bin", 0x0000, 0x1000, CRC(b37faeed) SHA1(ce2e69af5378d39284e8b3be23da50416a0b0fbe), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
-	ROMX_LOAD( "4k-moni-k7652.bin", 0xf000, 0x1000, CRC(a1625fce) SHA1(f0847399502b38a73ad26b38ee2d85ba04ab85ec), ROM_BIOS(1))
+	ROMX_LOAD( "4k-moni-k7652.bin", 0x0000, 0x1000, CRC(a1625fce) SHA1(f0847399502b38a73ad26b38ee2d85ba04ab85ec), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
@@ -490,8 +475,8 @@ ROM_START( z1013s60 )
 ROM_END
 
 ROM_START( z1013k69 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "4k-moni-k7669.bin", 0xf000, 0x1000, CRC(09cd2a7a) SHA1(0b8500320d464469868a6b48db31105f34710c41))
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "4k-moni-k7669.bin", 0x0000, 0x1000, CRC(09cd2a7a) SHA1(0b8500320d464469868a6b48db31105f34710c41))
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))

@@ -142,8 +142,8 @@ void phc25_state::io_map(address_map &map)
 	map(0x86, 0x86).portr("KEY6");
 	map(0x87, 0x87).portr("KEY7");
 	map(0x88, 0x88).portr("KEY8");
-	map(0xc0, 0xc0).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0xc1, 0xc1).w(AY8910_TAG, FUNC(ay8910_device::address_w));
+	map(0xc0, 0xc0).w(AY8910_TAG, FUNC(ay8910_device::data_w));
+	map(0xc1, 0xc1).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 }
 
 /* Input Ports */

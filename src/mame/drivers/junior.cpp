@@ -68,7 +68,7 @@ private:
 
 	virtual void machine_start() override;
 
-	void junior_mem(address_map &map);
+	void mem_map(address_map &map);
 
 	required_device<mos6532_new_device> m_riot;
 	required_device<cpu_device> m_maincpu;
@@ -79,7 +79,7 @@ private:
 
 
 
-void junior_state::junior_mem(address_map &map)
+void junior_state::mem_map(address_map &map)
 {
 	map.global_mask(0x1FFF);
 	map.unmap_value_high();
@@ -193,7 +193,7 @@ void junior_state::junior(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &junior_state::junior_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &junior_state::mem_map);
 
 	/* video hardware */
 	config.set_default_layout(layout_junior);
@@ -227,4 +227,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                FULLNAME           FLAGS */
-COMP( 1980, junior, 0,      0,      junior,  junior, junior_state, empty_init, "Elektor Electronics", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+COMP( 1980, junior, 0,      0,      junior,  junior, junior_state, empty_init, "Elektor Electronics", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

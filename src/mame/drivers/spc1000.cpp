@@ -173,8 +173,8 @@ private:
 		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
 	}
 
-	void spc1000_io(address_map &map);
-	void spc1000_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	uint8_t m_IPLK;
 	uint8_t m_GMODE;
@@ -194,7 +194,7 @@ private:
 	required_device<centronics_device> m_centronics;
 };
 
-void spc1000_state::spc1000_mem(address_map &map)
+void spc1000_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).bankr("bank1").bankw("bank2");
@@ -263,7 +263,7 @@ uint8_t spc1000_state::keyboard_r(offs_t offset)
 }
 
 
-void spc1000_state::spc1000_io(address_map &map)
+void spc1000_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("videoram");
@@ -391,6 +391,8 @@ INPUT_PORTS_END
 
 void spc1000_state::machine_start()
 {
+	m_work_ram = make_unique_clear<uint8_t[]>(0x10000);
+
 	uint8_t *mem = memregion("maincpu")->base();
 	uint8_t *ram = m_ram->pointer();
 
@@ -399,20 +401,26 @@ void spc1000_state::machine_start()
 	membank("bank1")->configure_entry(1, mem);
 	membank("bank3")->configure_entry(0, ram + 0x8000);
 	membank("bank3")->configure_entry(1, mem);
-	membank("bank1")->set_entry(1);
-	membank("bank3")->set_entry(1);
 
 	// intialize banks 2 & 4 (write banks)
 	membank("bank2")->set_base(ram);
 	membank("bank4")->set_base(ram + 0x8000);
 
 	m_time = machine().scheduler().time();
+
+	save_item(NAME(m_IPLK));
+	save_item(NAME(m_GMODE));
+	save_item(NAME(m_page));
+	save_pointer(NAME(m_work_ram), 0x10000);
+	save_item(NAME(m_time));
+	save_item(NAME(m_centronics_busy));
 }
 
 void spc1000_state::machine_reset()
 {
-	m_work_ram = make_unique_clear<uint8_t[]>(0x10000);
 	m_IPLK = 1;
+	membank("bank1")->set_entry(1);
+	membank("bank3")->set_entry(1);
 }
 
 uint8_t spc1000_state::mc6847_videoram_r(offs_t offset)
@@ -466,8 +474,8 @@ void spc1000_state::spc1000(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &spc1000_state::spc1000_mem);
-	m_maincpu->set_addrmap(AS_IO, &spc1000_state::spc1000_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spc1000_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &spc1000_state::io_map);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -511,20 +519,13 @@ void spc1000_state::spc1000(machine_config &config)
 
 /* ROM definition */
 ROM_START( spc1000 )
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x8000, "maincpu", ROMREGION_ERASEFF)
+	//ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(2fbb6eca) SHA1(cc9a076b0f00d54b2aec31f1f558b10f43ef61c8))  // bad?
 	ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(240426be) SHA1(8eb32e147c17a6d0f947b8bb3c6844750a7b64a8))
 ROM_END
-
-#if 0
-ROM_START( spc1000 )
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(2fbb6eca) SHA1(cc9a076b0f00d54b2aec31f1f558b10f43ef61c8))
-	/// more roms to come...
-ROM_END
-#endif
 
 
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME    FLAGS
-COMP( 1982, spc1000, 0,      0,      spc1000, spc1000, spc1000_state, empty_init, "Samsung", "SPC-1000", 0 )
+COMP( 1982, spc1000, 0,      0,      spc1000, spc1000, spc1000_state, empty_init, "Samsung", "SPC-1000", MACHINE_SUPPORTS_SAVE )
