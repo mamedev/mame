@@ -894,7 +894,7 @@ void video_manager::update_frameskip()
 		// calibrate the "adjusted speed" based on the target
 		double adjusted_speed_percent = m_speed_percent / (double) m_throttle_rate;
 
-		// if we're too fast, attempt to increase the frameskip
+		// if we're too fast, attempt to decrease the frameskip
 		double speed = m_speed * 0.001;
 		if (adjusted_speed_percent >= 0.995 * speed)
 		{
