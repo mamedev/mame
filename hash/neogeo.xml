@@ -51,11 +51,10 @@ license:CC0
 				<rom offset="0x000000" size="0x040000" name="001-m1.m1" crc="ba874463" sha1="a83514f4b20301f84a98699900e2593f1c1b8846" />   <!-- MB832000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x80000">
-				<!-- AES has different label, data is the same: 001-v1.v1 -->
+				<!-- AES has different label, data is the same: 001-v11.v1 -->
 				<rom name="001-v11.v11" offset="0x000000" size="0x080000" crc="a7c3d5e5" sha1="e3efc86940f91c53b7724c4566cfc21ea1a7a465" /> <!-- MB834200 -->
 			</dataarea>
 			<dataarea name="ymsnd.deltat" size="0x180000">
-				<!-- AES has different label, data is the same: 001-v2.v21 -->
 				<rom name="001-v21.v21" offset="0x000000" size="0x080000" crc="55e670b3" sha1="a047049646a90b6db2d1882264df9256aa5a85e5" /> <!-- MB834200 -->
 				<rom name="001-v22.v22" offset="0x080000" size="0x080000" crc="ab0d8368" sha1="404114db9f3295929080b87a5d0106b40da6223a" /> <!-- MB834000 -->
 				<rom name="001-v23.v23" offset="0x100000" size="0x080000" crc="df468e28" sha1="4e5d4a709a4737a87bba4083aeb788f657862f1a" /> <!-- MB834000 -->
@@ -92,6 +91,7 @@ license:CC0
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="002-pg.p1" offset="0x000000" size="0x080000" crc="c100b5f5" sha1="4cea9f29ad67288c3eccfa4cf961ee9782e49165" />   <!-- MB834200 -->
+				<!-- also found set with P1 on maskrom with chip label 002-P1 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="002-s1.s1" crc="1a7fd0c6" sha1="3fc701b7afddab369ddf9dedfbc5e1aaf80b8af3" />   <!-- MB831000 -->
@@ -100,6 +100,7 @@ license:CC0
 				<rom offset="0x000000" size="0x040000" name="002-m1.m1" crc="4ecaa4ee" sha1="50abfb8eed6cb4887393089f9ccc76f306ef69b5" />   <!-- MB832000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x200000">
+				<!-- also found set with different chip labels on V11 and V21 locations; chip labels are : 002-V1 and 002-V2 -->
 				<rom name="002-v11.v11" offset="0x000000" size="0x080000" crc="b7b925bd" sha1="644c92fa90e74998e73714f74b1e0680ee372a07" /> <!-- MB834000 -->
 				<rom name="002-v12.v12" offset="0x080000" size="0x080000" crc="329f26fc" sha1="2c8009edc88c6b26f7be5beb2b8d260aac394ee1" /> <!-- MB834000 -->
 				<rom name="002-v13.v13" offset="0x100000" size="0x080000" crc="0c39f3c8" sha1="db8f8670639601215707d918d4fb93221460446a" /> <!-- MB834000 -->
@@ -545,6 +546,7 @@ license:CC0
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="009-p1.p1" offset="0x000000" size="0x080000" crc="b45fcfbf" sha1="3872147dda2d1ba905d35f4571065d87b1958b4a" />   <!-- TC534200 -->
+				<!-- also found set with P1 on TC534200 with chip label 009-PG1 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="009-s1.s1" crc="d49afee8" sha1="77615f12edf08ae8f1353f7a056a8f3a50d3ebdc" />   <!-- TC531000 -->
@@ -813,6 +815,7 @@ license:CC0
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="016-hp1.p1" offset="0x000000" size="0x080000" crc="b774621e" sha1="7684b2e07163aec68cd083ef1d8900f855f6cb42" />  <!-- TC534200 -->
 				<rom loadflag="load16_word_swap" name="016-p2.p2" offset="0x080000" size="0x020000" crc="12afdc2b" sha1="3a95f5910cbb9f17e63ddece995c6e120fa2f622" />   <!-- TC531024 -->
+				<!-- also found sets with P1 on TC534200 and P2 on TC531024 with chip labels 016-P1 and 016-P2 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="016-s1.s1" crc="1a2eeeb3" sha1="8d2b96d395020197bc59294b6b0c8d62b1d8d4dd" />   <!-- TC531000 -->
@@ -1354,6 +1357,7 @@ license:CC0
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="022-hp1.p1" offset="0x000000" size="0x100000" crc="62cbe7b2" sha1="f9a8fd98702c623ae793804ba50d09751e3fee4c" />   <!-- TC538200 -->
+				<!-- also found sets with P1 on TC5358200; chip label is 022-P1 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="022-s1.s1" crc="843c3624" sha1="dbdf86c193b7c1d795f8c21f2c103c1d3e18abbe" />   <!-- TC531000 -->
@@ -1444,7 +1448,7 @@ license:CC0
 	. NGM-024
 	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
 	. NGH-024
-
+	NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 	. prototype
 	NEO-MVS PROG-EP / NEO-MVS CHA-EPG
 	-->
@@ -1779,6 +1783,7 @@ license:CC0
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="031-pg1.p1" offset="0x000000" size="0x080000" crc="17f034a7" sha1="2e66c7bd93a08efe63c4894494db50bbf58f60e4" />  <!-- TC534200 -->
+				<!-- also found set with P1 on TC534200 with chip label 031-P1 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="031-s1.s1" crc="4c117174" sha1="26e52c4f628338a9aa1c159517cdf873f738fb98" />   <!-- TC531000 -->
@@ -1836,6 +1841,7 @@ license:CC0
 	ID-0032
 	. NGM-032
 	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+	NEO-MVS PROG42G-COM / NEO-MVS CHA42G-1
 	. NGH-032
 	NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 	-->
@@ -1852,12 +1858,13 @@ license:CC0
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="032-p1.p1" offset="0x000000" size="0x080000" crc="cd11cbd4" sha1="23163e3da2f07e830a7f4a02aea1cb01a54ccbf3" />   <!-- TC534200 -->
+				<!-- also found sets with P1 on eprom; correct chip label unknown -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="032-s1.s1" crc="ac0daa1b" sha1="93bae4697dc403fce19422752a514326ccf66a91" />   <!-- TC531000 -->
 			</dataarea>
 			<dataarea name="audiocpu" size="0x020000">
-				<rom offset="0x000000" size="0x020000" name="032-m1.m1" crc="35ec952d" sha1="8aed30e26d7e2c70dbce5de752df416091066f7b" />   <!-- TC531001 -->
+				<rom offset="0x000000" size="0x020000" name="032-m1.m1" crc="35ec952d" sha1="8aed30e26d7e2c70dbce5de752df416091066f7b" />   <!-- TC541000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x200000">
 				<rom name="032-v1.v1" offset="0x000000" size="0x100000" crc="63791533" sha1="4479e9308cdc906b9e03b985303f4ebedd00512f" />   <!-- TC538200 -->
@@ -1889,7 +1896,7 @@ license:CC0
 				<rom offset="0x000000" size="0x020000" name="032-s1.s1" crc="ac0daa1b" sha1="93bae4697dc403fce19422752a514326ccf66a91" />   <!-- TC531000 -->
 			</dataarea>
 			<dataarea name="audiocpu" size="0x020000">
-				<rom offset="0x000000" size="0x020000" name="032-m1.m1" crc="35ec952d" sha1="8aed30e26d7e2c70dbce5de752df416091066f7b" />   <!-- TC531001 -->
+				<rom offset="0x000000" size="0x020000" name="032-m1.m1" crc="35ec952d" sha1="8aed30e26d7e2c70dbce5de752df416091066f7b" />   <!-- TC541000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x200000">
 				<rom name="032-v1.v1" offset="0x000000" size="0x100000" crc="63791533" sha1="4479e9308cdc906b9e03b985303f4ebedd00512f" />   <!-- TC538200 -->
@@ -1925,11 +1932,13 @@ license:CC0
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="033-p1.p1" offset="0x000000" size="0x080000" crc="47ebdc2f" sha1="d46786502920fb510f1999db00c5e09fb641c0bd" />   <!-- TC534200 -->
 				<rom loadflag="load16_word_swap" name="033-p2.p2" offset="0x080000" size="0x020000" crc="c473af1c" sha1="4919eeca20abe807493872ca7c79a5d1f496fe68" />   <!-- TC531024 -->
+				<!-- also found MVS sets with P1 and P2 on eprom; correct chip label unknown -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="033-s1.s1" crc="3c3bdf8c" sha1="2f3e5feed6c27850b2a0f6fae0b97041690e944c" />   <!-- TC531000 -->
 			</dataarea>
 			<dataarea name="audiocpu" size="0x020000">
+				<!-- also found MVS sets with M1 on eprom -->
 				<rom offset="0x000000" size="0x020000" name="033-m1.m1" crc="5be10ffd" sha1="90a5e6cbbc58a7883cd2a3a597180d631a466882" />   <!-- TC531001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x200000">
@@ -2393,7 +2402,9 @@ license:CC0
 			</dataarea>
 			<dataarea name="ymsnd" size="0x400000">
 				<rom name="043-v1.v1" offset="0x000000" size="0x200000" crc="63688ce8" sha1="5c6ac29a0cc0655a87cfe3ada8706838b86b86e4" />   <!-- TC5316200 -->
+				<!-- AES has different label: 043-v1.v2; same data -->
 				<rom name="043-v2.v2" offset="0x200000" size="0x200000" crc="c69a827b" sha1="f5197ea87bb6573fa6aef3a1713c3679c58c1e74" />   <!-- TC5316200 -->
+				<!-- AES has different label: 040-v2.v4; same data -->
 			</dataarea>
 			<dataarea name="sprites" size="0x800000">
 				<rom loadflag="load16_byte" name="043-c1.c1" offset="0x000000" size="0x100000" crc="bad2d67f" sha1="04928e50ca75b7fbc52b64e816ec5701901f5893" />    <!-- TC5316200 -->
@@ -2429,6 +2440,7 @@ license:CC0
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="044-p1.p1" offset="0x000000" size="0x080000" crc="ca9f7a6d" sha1="4d28ef86696f7e832510a66d3e8eb6c93b5b91a1" />   <!-- TC534200 -->
+				<!-- also found sets with EP1 or P1 on eprom -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="044-s1.s1" crc="89903f39" sha1="a04a0c244a5d5c7a595fcf649107969635a6a8b6" />   <!-- TC531000 -->
@@ -2475,6 +2487,7 @@ license:CC0
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="045-p1.p1" offset="0x000000" size="0x100000" crc="dfe51bf0" sha1="2243af3770a516ae698b69bcd9daf53632d9128d" />   <!-- TC538200 -->
 				<rom loadflag="load16_word_swap" name="045-pg2.sp2" offset="0x100000" size="0x100000" crc="46745b94" sha1="d9e959fd1f88c9402915c1d0dcdb4a9e3d49cdcb" /> <!-- TC538200 -->
+				<!-- also found set with EP1 / EP2 on eprom and P2 on maskrom; same rom data as samshoh is used -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="045-s1.s1" crc="9142a4d3" sha1="54088e99fcfd75fd0f94852890a56350066a05a3" />   <!-- TC531000 -->
@@ -2527,6 +2540,7 @@ license:CC0
 				<rom loadflag="load16_byte" name="045-c3.c3" offset="0x400000" size="0x200000" crc="f3dabd1e" sha1="c80e52df42be9f8b2e89b467b11ab140a480cee8" />    <!-- TC5316200 -->
 				<rom loadflag="load16_byte" name="045-c4.c4" offset="0x400001" size="0x200000" crc="935c62f0" sha1="0053d40085fac14096b683f4341f65e543b71dc1" />    <!-- TC5316200 -->
 				<rom loadflag="load16_byte" name="045-c5.c5" offset="0x800000" size="0x080000" crc="a2bb8284" sha1="aa118e3b8c062daa219b36758b9a3814c08c69dc" />    <!-- TC534200 -->
+				<!--also found AES set with C6 on TC538200; label is 045-C61.C6; same rom data as samsho -->
 				<rom loadflag="load16_byte" name="045-c6.c6" offset="0x800001" size="0x080000" crc="4fa71252" sha1="afe374a9d1f2d955a59efe7b6196b89e021b164c" />    <!-- TC534200 -->
 			</dataarea>
 		</part>
@@ -2641,12 +2655,13 @@ license:CC0
 			<feature name="slot" value="rom_fatfur2" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="047-p1.p1" offset="0x000000" size="0x100000" crc="ecfdbb69" sha1="59e2f137c6eaf043df4ddae865a9159a10265c60" />   <!-- TC538200 -->
-				<!-- The original p1 is 8mbit; also found sets with p1 / p2 4mbit on eprom. -->
+				<!-- The original P1 is 8mbit; also found sets with P1 / P2 4mbit on eprom. -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="047-s1.s1" crc="d7dbbf39" sha1="29253e596f475ebd41a6e3bb53952e3a0ccd2eed" />   <!-- TC531000 -->
 			</dataarea>
 			<dataarea name="audiocpu" size="0x020000">
+				<!-- also found sets with M1 on eprom -->
 				<rom offset="0x000000" size="0x020000" name="047-m1.m1" crc="820b0ba7" sha1="5708248d89446e49184eaadb52f7c61b2b6c13c5" />   <!-- TC531001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x400000">
@@ -3087,6 +3102,7 @@ license:CC0
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="056-p1.p1" offset="0x000000" size="0x100000" crc="a3b1d021" sha1="ee42f3ca4516226b0088d0303ed28e3ecdabcd71" />   <!-- TC538200 -->
+				<!-- also found set with EP1 / EP2 on eprom; correct chip label unknown -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="056-s1.s1" crc="8b02638e" sha1="aa4d28804ca602da776948b5f223ea89e427906b" />   <!-- TC531000 -->
@@ -3381,6 +3397,7 @@ license:CC0
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="060-p1.p1" offset="0x000000" size="0x100000" crc="2a104b50" sha1="3eb663d3df7074e1cdf4c0e450a35c9cf55d8979" />   <!-- VIC940800 -->
+				<!-- also found set with EP1 / EP2 on eprom with sticker; stickers have Viccom logo with '1' for EP1 and '2' for EP2 in the center -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="060-s1.s1" crc="d62a72e9" sha1="a23e4c4fd4ec11a7467ce41227c418b4dd1ef649" />   <!-- VIC930100 -->
@@ -3545,6 +3562,7 @@ license:CC0
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="063-p1.p1" offset="0x100000" size="0x100000" crc="22368892" sha1="0997f8284aa0f57a333be8a0fdea777d0d01afd6" />   <!-- TC5316200 -->
 				<rom size="0x100000" offset="0x000000" loadflag="continue" />
+				<!-- also found MVS sets with EP1 / EP2 on M27C4002 eprom and P1 / SP2 on D27C4000 maskrom; correct chip label unknown -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="063-s1.s1" crc="64a5cd66" sha1="12cdfb27bf9ccd5a8df6ddd4628ef7cf2c6d4964" />   <!-- TC531000 -->
@@ -4344,6 +4362,7 @@ license:CC0
 	NEO-MVS PROGTOP / NEO-MVS CHA 42G-3
 	NEO-MVS PROGBK1 / NEO-MVS CHA256
 	. NGH-082
+	NEO-AEG PROGTOP2 / NEO-AEG CHA256 B
 	-->
 
 	<software name="doubledr">
@@ -4629,6 +4648,7 @@ license:CC0
 				<rom loadflag="load16_word_swap" name="087-epr.ep4" offset="0x180000" size="0x080000" crc="53e60c58" sha1="f975e81cab6322d3260348402721c673023259fa" /> <!-- M27C4002 -->
 				<!-- P's on eprom, correct chip label unknown -->
 				<rom loadflag="load16_word_swap" name="087-p5.p5" offset="0x200000" size="0x100000" crc="e86ca4af" sha1="5246acbab77ac2f232b88b8522187764ff0872f0" />   <!-- TC538200 -->
+				<!-- also found sets with P1 / SP2 on maskrom on PROG board NEO-MVS PROGBK1; chip label are 087-PG1 and 087-P2 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="087-s1.s1" crc="74ec7d9f" sha1="d79c479838a7ca51735a44f91f1968ec5b3c6b91" />   <!-- TC531000 -->
@@ -4990,6 +5010,7 @@ license:CC0
 	. NGM-094
 	NEO-MVS PROGBK1 / NEO-MVS CHA42G-3B
 	. NGH-094
+	NEO-AEG PROGTOP2Y / NEO-AEG CHA256BY
 	-->
 
 	<software name="gowcaizr">
@@ -5206,6 +5227,7 @@ license:CC0
 	. NGM-096
 	NEO-MVS PROGBK1 / NEO-MVS CHA256
 	. NGH-096
+	NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 	-->
 
 	<software name="aof3">
@@ -5357,6 +5379,7 @@ license:CC0
 	. NGM-200
 	NEO-MVS PROGBK1 / NEO-MVS CHA256B
 	. NGH-200
+	NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 	-->
 
 	<software name="turfmast">
@@ -5522,6 +5545,7 @@ license:CC0
 	. ??M-206
 	NEO-MVS PROGBK1 / NEO-MVS CHA256
 	. ??H-206
+	NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 	-->
 
 	<software name="marukodq">
@@ -5683,6 +5707,7 @@ license:CC0
 	. ADM-011
 	NEO-MVS PROGBK1 / NEO-MVS CHA256
 	. ADH-011
+	NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 	-->
 
 	<software name="overtop">
@@ -5778,6 +5803,7 @@ license:CC0
 			<dataarea name="maincpu" width="16" endianness="big" size="0x300000">
 				<rom loadflag="load16_word_swap" name="214-p1.p1" offset="0x000000" size="0x100000" crc="52755d74" sha1="4232d627f1d2e6ea9fc8cf01571d77d4d5b8a1bb" />   <!-- TC538200 -->
 				<rom loadflag="load16_word_swap" name="214-p2.sp2" offset="0x100000" size="0x200000" crc="002ccb73" sha1="3ae8df682c75027ca82db25491021eeba00a267e" />  <!-- TC5316200 -->
+				<!-- also found sets with EP1 / EP2 / EP3 / EP4 on eprom and P5 on TC5316200 with chip label 214-P5; correct chip labels for eproms is unknown -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="214-s1.s1" crc="1254cbdb" sha1="fce5cf42588298711a3633e9c9c1d4dcb723ac76" />   <!-- TC531000 -->
@@ -6462,6 +6488,12 @@ license:CC0
 	<!--
 	ID-0228
 	Ghostlop (prototype) 1996 Data East Corp.
+	
+	Ghostlop (location test) 2001 Data East Corp.
+	NEO-MVS PROGGSC / NEO-MVS CHA256
+	
+	The location test version uses socketed EPROMs on the PROG board, flash chips on adapter boards for the C ROMs and EPROMs for M1 and S1 on the CHA. 
+	It has a piece of cardboard between the 2 boards to avoid shorts because the socketed flash adapter boards are a bit too high and could get shorted with traces on the PROG board.
 	-->
 
 	<software name="ghostlop">
@@ -6600,6 +6632,7 @@ license:CC0
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="232-p1.p1" offset="0x000000" size="0x100000" crc="7db81ad9" sha1="8bc42be872fd497eb198ca13bf004852b88eb1dc" />   <!-- TC538200 -->
 				<rom loadflag="load16_word_swap" name="232-p2.sp2" offset="0x100000" size="0x400000" crc="158b23f6" sha1="9744620a70513490aaf9c5eda33e5ec31222be19" />  <!-- TC5332205 -->
+				<!-- also found sets with P1 on TC538200 and SP2 on TC5332205 with chip labels 232-PG1 and 232-P2 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="232-s1.s1" crc="8514ecf5" sha1="18d8e7feb51ea88816f1c786932a53655b0de6a0" />   <!-- TC531000 -->
@@ -6754,6 +6787,7 @@ license:CC0
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="234-p1.p1" offset="0x000000" size="0x100000" crc="e123a5a3" sha1="a3ddabc00feeb54272b145246612ad4632b0e413" />   <!-- TC538200 -->
 				<rom loadflag="load16_word_swap" name="234-p2.sp2" offset="0x100000" size="0x400000" crc="0fdc289e" sha1="1ff31c0b0f4f9ddbedaf4bcf927faaae81892ec7" />  <!-- TC5332205 -->
+			<!-- also found sets with P1 / SP2 / EP1 / EP2 / M1 on eprom with sticker; chip labels for eproms are 0234-P1, 0234-SP2, 0234-EP1, 0234-EP2 and 0234-M1; same data -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="234-s1.s1" crc="95561412" sha1="995de272f572fd08d909d3d0af4251b9957b3640" />   <!-- TC531000 -->
@@ -8161,6 +8195,7 @@ license:CC0
 				<!-- stored in the custom chip -->
 				<rom loadflag="load16_word_swap" name="253-p1.p1" offset="0x100000" size="0x400000" crc="18ae5d7e" sha1="bdb58ec9137d8653979b47132f2d10e1cc6aaa24" />   <!-- mask rom TC5332205 -->
 				<rom loadflag="load16_word_swap" name="253-p2.p2" offset="0x500000" size="0x400000" crc="afffa779" sha1="ac017986f02277fbcd656b8c02492a3f4216a90e" />   <!-- mask rom TC5332205 -->
+				<!-- also found AES JP set with EP1 / EP2 / EP3 and EP4 on eproms and KE NEO-SMA with a white marking; chip labels for eproms are 253-EP1, 253-EP2, 253-EP3 and 253-EP4 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x80000">
 				<!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
@@ -8520,7 +8555,7 @@ license:CC0
 	Non SMA protected version found on:
 	NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
 	. NGH-2570
-	NEO-AEG PROGLBA (NEO-SMA) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+	NEO-AEG PROGLBA (1999.7.6) (NEO-SMA) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
 	-->
 
 	<software name="kof2000">
@@ -9176,6 +9211,7 @@ license:CC0
 			<feature name="slot" value="pcm2_pnyaa" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="pn202.p1" offset="0x000000" size="0x100000" crc="bf34e71c" sha1="cfa7a2c7c41601a758414faf34e59583d7537363" />
+				<!-- P1 on eprom with sticker; chip label is P N 2. 02 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x20000">
 				<!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
@@ -9183,7 +9219,8 @@ license:CC0
 			</dataarea>
 				<!-- Encrypted -->
 			<dataarea name="audiocrypt" size="0x80000">
-				<rom offset="0x00000" size="0x80000" name="267-m1.m1" crc="c7853ccd" sha1="1b7a4c5093cf0fe3861ce44fd1d3b30c71ad0abe" /> <!-- mask rom TC534000 -->
+				<rom offset="0x00000" size="0x80000" name="m1.m1" crc="c7853ccd" sha1="1b7a4c5093cf0fe3861ce44fd1d3b30c71ad0abe" /> <!-- mask rom TC534000 -->
+				<!-- M1 on eprom with sticker; chip label is M1 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x400000">
 				<!-- Encrypted -->
@@ -9295,6 +9332,7 @@ license:CC0
 			<dataarea name="maincpu" width="16" endianness="big" size="0x800000">
 				<rom loadflag="load32_word_swap" name="268-p1c.p1" offset="0x000000" size="0x400000" crc="3636690a" sha1="e0da714b4bdc6efffe1250ded02ebddb3ab6d7b3" />
 				<rom loadflag="load32_word_swap" name="268-p2c.p2" offset="0x000002" size="0x400000" crc="8dfc47a2" sha1="27d618cfbd0107a4d2a836797e967b39d2eb4851" />
+				<!-- also found AES set with P1 / P2 on maskrom and m1 on M27C4001 eprom with sticker; chip labels are 268-P1CR2, 268-P2CR2 and 268-M1 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x20000">
 				<!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
@@ -9677,7 +9715,7 @@ license:CC0
 				<!-- Less censored -->
 				<rom loadflag="load16_word_swap" name="272-p1ca.p1" offset="0x000000" size="0x400000" crc="c30a08dd" sha1="66864954017c841d7ca8490112c3aa7a71a4da70" />
 				<rom loadflag="load16_word_swap" name="272-p2ca.sp2" offset="0x400000" size="0x400000" crc="bd64a518" sha1="aa259a168930f106377d680db444535411b3bce0" />
-				<!-- Correct chip labels unknown -->
+				<!-- Correct chip labels unknown. Also found AES set on NEO-AEG PROGBK2S with P1 / P2 on eprom with sticker; chip label is 272-P1 and 272-P2 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x20000">
 				<!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
