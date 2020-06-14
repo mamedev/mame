@@ -92,7 +92,8 @@ video_manager::video_manager(running_machine &machine)
 	, m_speed(original_speed_setting())
 	, m_low_latency(machine.options().low_latency())
 	, m_empty_skip_count(0)
-	, m_frameskip_level(machine.options().frameskip())
+	, m_frameskip_max(m_auto_frameskip ? machine.options().frameskip() : 0)
+	, m_frameskip_level(m_auto_frameskip ? 0 : machine.options().frameskip())
 	, m_frameskip_counter(0)
 	, m_frameskip_adjust(0)
 	, m_skipping_this_frame(false)
@@ -921,7 +922,11 @@ void video_manager::update_frameskip()
 			while (m_frameskip_adjust <= -2)
 			{
 				m_frameskip_adjust += 2;
-				if (m_frameskip_level < MAX_FRAMESKIP)
+				u8 max = m_frameskip_max;
+				if (max == 0 || max > MAX_FRAMESKIP)
+					max = MAX_FRAMESKIP;
+
+				if (m_frameskip_level < max)
 					m_frameskip_level++;
 			}
 		}
