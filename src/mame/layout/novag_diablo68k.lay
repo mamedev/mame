@@ -426,10 +426,10 @@ license:CC0
 
 	<!-- lcd panel -->
 
-		<element ref="lcdw"><bounds x="86" y="8.5" width="25.25" height="4.5" /></element>
-		<screen tag="screen"><bounds x="86.5" y="9.5" width="24.25" height="2.5" /></screen>
-		<element ref="lcdm" blend="multiply"><bounds x="86" y="8.5" width="25.25" height="4.5" /></element>
-		<element ref="lcda" blend="add"><bounds x="86" y="8.5" width="25.25" height="4.5" /></element>
+		<element ref="lcdw"><bounds x="86" y="8" width="25.25" height="5" /></element>
+		<screen tag="screen"><bounds x="86.5" y="9" width="24.25" height="3" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds x="86" y="8" width="25.25" height="5" /></element>
+		<element ref="lcda" blend="add"><bounds x="86" y="8" width="25.25" height="5" /></element>
 
 	<!-- right side buttons -->
 

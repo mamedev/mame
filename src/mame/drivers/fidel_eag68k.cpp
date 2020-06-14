@@ -623,7 +623,6 @@ void eag_state::eag_base(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
-	m_board->set_nvram_enable(true);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
