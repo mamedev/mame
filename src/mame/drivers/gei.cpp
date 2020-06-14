@@ -1932,19 +1932,19 @@ ROM_START( geimulti )
 	ROM_LOAD( "cont", 0x00000, 0x8000, CRC(920020df) SHA1(01cb0a58bf863d63bcafe1e198ce5ea10bb8f59e) )
 
 	ROM_REGION( 0x8000*(13 + 1), "bank", ROMREGION_ERASEFF )
-	ROM_LOAD( "pokr",      0x00000, 0x8000, CRC(1e9651a0) SHA1(23f98633701a9ac01784b29d1283ec9236810baf) ) /* C5 game ROMs 4-21-92 */
-	ROM_LOAD( "bljk",      0x08000, 0x8000, CRC(afde21e6) SHA1(4db37ee4ffc72e3513cbfe31d018caa062683adf) ) /* C5 game ROMs 4-21-92 */
-	ROM_LOAD( "bone",      0x10000, 0x8000, CRC(6a84fc5d) SHA1(09d5d052a90744e5c6e0b06cabfdbbaa2458bbb5) ) /* C5 game ROMs 4-21-92 */
-	ROM_LOAD( "slot",      0x18000, 0x8000, CRC(11b85a71) SHA1(5672f6f796b2743c252d159778bd8746cf1f5f86) ) /* C5 game ROMs 4-21-92 */
-	ROM_LOAD( "sprd",      0x20000, 0x8000, CRC(2f067b3d) SHA1(cd7cae3d2def74369b8d015b9f36d5a174bea92c) ) /* C5 game ROMs 4-21-92 */
-	ROM_LOAD( "hrse",      0x28000, 0x8000, CRC(ab1d014a) SHA1(aa7a372266decd7b65234de4d866fe7baf71c9bb) ) /* C5 game ROMs IAM 07-02-92 */
-	ROM_LOAD( "dogs",      0x30000, 0x8000, CRC(83cd070a) SHA1(ed7ce3ffe030802e99dd27f2310524615fcfc8bf) ) /* C5 game ROMs IAM 07-02-92 */
-	ROM_LOAD( "memotest",  0x38000, 0x8000, CRC(8942b98c) SHA1(3f182eb6d00618d9859cd8acdf13c829d4469075) ) /* C5 game ROMs 9-30-92 */
-	ROM_LOAD( "reelfun",   0x40000, 0x8000, CRC(b3ede904) SHA1(e77c15e893583572650bb60432d68a1f7bf67d09) ) /* C5 game ROMs 9-11-92 */
-	ROM_LOAD( "fact@1",    0x48000, 0x8000, CRC(949b5519) SHA1(d4ac35ccbbb50f4e0d1e21e8427e6ad535e6da53) ) /* T5 question ROMs */
-	ROM_LOAD( "adltsex@1", 0x50000, 0x8000, CRC(9e4d320b) SHA1(76a6280bce884acb3faa9ef3882de016612c34f6) ) /* T5 question ROMs */
-	ROM_LOAD( "nfl@1",     0x58000, 0x8000, CRC(74fbbf17) SHA1(9d559034d3ec0b293d4b720150197daea3d450ff) ) /* T5 question ROMs */
-	ROM_LOAD( "entr@1",    0x60000, 0x8000, CRC(caceaa7b) SHA1(c51f10f5acd3d3fedce43103b9f11d006139043c) ) /* T5 question ROMs */
+	ROM_LOAD( "pokr",      0x00000, 0x8000, CRC(1e9651a0) SHA1(23f98633701a9ac01784b29d1283ec9236810baf) ) /* C5 game ROM 4-21-92 */
+	ROM_LOAD( "bljk",      0x08000, 0x8000, CRC(afde21e6) SHA1(4db37ee4ffc72e3513cbfe31d018caa062683adf) ) /* C5 game ROM 4-21-92 */
+	ROM_LOAD( "bone",      0x10000, 0x8000, CRC(6a84fc5d) SHA1(09d5d052a90744e5c6e0b06cabfdbbaa2458bbb5) ) /* C5 game ROM 4-21-92 */
+	ROM_LOAD( "slot",      0x18000, 0x8000, CRC(11b85a71) SHA1(5672f6f796b2743c252d159778bd8746cf1f5f86) ) /* C5 game ROM 4-21-92 */
+	ROM_LOAD( "sprd",      0x20000, 0x8000, CRC(2f067b3d) SHA1(cd7cae3d2def74369b8d015b9f36d5a174bea92c) ) /* C5 game ROM 4-21-92 */
+	ROM_LOAD( "hrse",      0x28000, 0x8000, CRC(ab1d014a) SHA1(aa7a372266decd7b65234de4d866fe7baf71c9bb) ) /* C5 game ROM IAM 07-02-92 */
+	ROM_LOAD( "dogs",      0x30000, 0x8000, CRC(83cd070a) SHA1(ed7ce3ffe030802e99dd27f2310524615fcfc8bf) ) /* C5 game ROM IAM 07-02-92 */
+	ROM_LOAD( "memotest",  0x38000, 0x8000, CRC(8942b98c) SHA1(3f182eb6d00618d9859cd8acdf13c829d4469075) ) /* C5 game ROM 9-30-92 */
+	ROM_LOAD( "reelfun",   0x40000, 0x8000, CRC(b3ede904) SHA1(e77c15e893583572650bb60432d68a1f7bf67d09) ) /* C5 game ROM 9-11-92 */
+	ROM_LOAD( "fact@1",    0x48000, 0x8000, CRC(949b5519) SHA1(d4ac35ccbbb50f4e0d1e21e8427e6ad535e6da53) ) /* T5 question ROM */
+	ROM_LOAD( "adltsex@1", 0x50000, 0x8000, CRC(9e4d320b) SHA1(76a6280bce884acb3faa9ef3882de016612c34f6) ) /* T5 question ROM */
+	ROM_LOAD( "nfl@1",     0x58000, 0x8000, CRC(74fbbf17) SHA1(9d559034d3ec0b293d4b720150197daea3d450ff) ) /* T5 question ROM */
+	ROM_LOAD( "entr@1",    0x60000, 0x8000, CRC(caceaa7b) SHA1(c51f10f5acd3d3fedce43103b9f11d006139043c) ) /* T5 question ROM */
 	ROM_LOAD( "grph",      0x68000, 0x8000, CRC(25e265db) SHA1(6e184309ee67dbe7930570b135ace09eeb1eb333) ) /* game graphics */
 
 	ROM_REGION( 0x0800, "nvram", 0 )
