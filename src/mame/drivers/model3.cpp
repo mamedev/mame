@@ -4328,7 +4328,7 @@ ROM_START( swtrilgyp )  // Step 2.1, Sega game ID# is 833-13586-T, ROM board ID#
 	ROM_LOAD( "mpr-21378.24", 0xc00000, 0x400000, CRC(1fcf715e) SHA1(9706f36e7a61d885d34a6974311a2410fe3d6760) )
 ROM_END
 
-ROM_START( dirtdvls )   /* Step 2.1 - Export version, Sega game ID# is 833-13427, ROM board ID# 834-13528 DRT */
+ROM_START( dirtdvls )   /* Step 2.1 - Export version, Sega game ID# is 833-13427, ROM board ID# 834-13528 DRT, Security board ID# 837-13499-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21062a.17", 0x000006, 0x200000, CRC(64b55254) SHA1(0e5de3786edad77dde08652ac837dc9125e7851c) )
@@ -4385,6 +4385,18 @@ ROM_START( dirtdvls )   /* Step 2.1 - Export version, Sega game ID# is 833-13427
 	//             ????     317-0238-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29290f17" )
 ROM_END
+
+ /*
+ Dirt Devils (USA)
+ 
+ Program ROMs:  EPR-21054A, EPR-21055A, EPR-21056A & EPR-21057A
+ 
+ 837-13022-01 MODEL3 STEP2 ROM
+ 834-13527-01 GAME BD DRT USA
+ 833-13528-01 DRT USA
+ 837-13499-COM
+ 837-11861-91 MODEL3 COMMUNICATION BOARD
+ */
 
 ROM_START( dirtdvlsa )  /* Step 2.1 - Australia version */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
