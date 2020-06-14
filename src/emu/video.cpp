@@ -292,7 +292,7 @@ std::string video_manager::speed_text()
 
 	// if we're auto frameskipping, display that plus the level
 	else if (effective_autoframeskip())
-		util::stream_format(str, "auto%2d/%d", effective_frameskip(), MAX_FRAMESKIP);
+		util::stream_format(str, "auto%2d/%d", effective_frameskip(), m_frameskip_max ? m_frameskip_max : MAX_FRAMESKIP);
 
 	// otherwise, just display the frameskip plus the level
 	else
@@ -922,11 +922,7 @@ void video_manager::update_frameskip()
 			while (m_frameskip_adjust <= -2)
 			{
 				m_frameskip_adjust += 2;
-				u8 max = m_frameskip_max;
-				if (max == 0 || max > MAX_FRAMESKIP)
-					max = MAX_FRAMESKIP;
-
-				if (m_frameskip_level < max)
+				if (m_frameskip_level < (m_frameskip_max ? m_frameskip_max : MAX_FRAMESKIP))
 					m_frameskip_level++;
 			}
 		}
