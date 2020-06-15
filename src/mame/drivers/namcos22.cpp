@@ -1085,47 +1085,47 @@ Notes:
 
 // Main CPU
 
-/* SCI, prelim! */
-u32 namcos22_state::namcos22_sci_r(offs_t offset)
+/* SCI, preliminary!
+
+20020000  2 R/W RX Status
+            0x01 : Frame Error
+            0x02 : Frame Received
+            0x04 : ?
+
+20020002  2 R/W Status/Control Flags
+            0x01 :
+            0x02 : RX flag? (cleared every vsync)
+            0x04 : RX flag? (cleared every vsync)
+            0x08 :
+
+20020004  2 W   FIFO Control Register
+            0x01 : sync bit enable?
+            0x02 : TX FIFO sync bit (bit-8)
+
+20020006  2 W   TX Control Register
+            0x01 : TX start/stop
+            0x02 : ?
+            0x10 : ?
+
+20020008  2 W   -
+2002000a  2 W   TX Frame Size
+2002000c  2 R/W RX FIFO Pointer (0x0000 - 0x0fff)
+2002000e  2 W   TX FIFO Pointer (0x0000 - 0x1fff)
+*/
+u16 namcos22_state::namcos22_sci_r(offs_t offset)
 {
 	switch (offset)
 	{
-		case 0x0/4:
-			return 0x0004 << 16;
+		case 0x0:
+			return 0x0004;
 
 		default:
 			return 0;
 	}
 }
 
-void namcos22_state::namcos22_sci_w(u32 data)
+void namcos22_state::namcos22_sci_w(offs_t offset, u16 data)
 {
-	/*
-	20020000  2 R/W RX Status
-	            0x01 : Frame Error
-	            0x02 : Frame Received
-	            0x04 : ?
-
-	20020002  2 R/W Status/Control Flags
-	            0x01 :
-	            0x02 : RX flag? (cleared every vsync)
-	            0x04 : RX flag? (cleared every vsync)
-	            0x08 :
-
-	20020004  2 W   FIFO Control Register
-	            0x01 : sync bit enable?
-	            0x02 : TX FIFO sync bit (bit-8)
-
-	20020006  2 W   TX Control Register
-	            0x01 : TX start/stop
-	            0x02 : ?
-	            0x10 : ?
-
-	20020008  2 W   -
-	2002000a  2 W   TX Frame Size
-	2002000c  2 R/W RX FIFO Pointer (0x0000 - 0x0fff)
-	2002000e  2 W   TX FIFO Pointer (0x0000 - 0x1fff)
-	*/
 }
 
 
@@ -2961,8 +2961,8 @@ static INPUT_PORTS_START( ridgera )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("ADC.0") // 1152
-	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x380, 0xc80) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Steering Wheel")
+	PORT_START("ADC.0") // 1408 (deluxe cabs have higher range)
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x280, 0xd80) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Steering Wheel")
 
 	PORT_START("ADC.1") // 1552
 	PORT_BIT( 0xfff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x610) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Gas Pedal")
@@ -3000,9 +3000,6 @@ static INPUT_PORTS_START( ridgeracf )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("AT Switch")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("MT Switch")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE2 )
-
-	PORT_MODIFY("ADC.0") // 1408
-	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x280, 0xd80) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Steering Wheel")
 
 	// DIP3-1 to DIP3-3 are for setting up the viewing angle (game used one board per screen?)
 	// Some of the other dipswitches are for debugging, like with Ridge Racer 2.
@@ -3603,8 +3600,6 @@ void namcos22_state::machine_reset()
 	m_dsp_irq_enabled = false;
 
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	if (!m_is_ss22)
-		m_iomcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 void namcos22_state::device_post_load()
@@ -3755,12 +3750,12 @@ void namcos22_state::namcos22(machine_config &config)
 	NAMCO_C74(config, m_iomcu, 6.144_MHz_XTAL);
 	m_iomcu->set_addrmap(AS_PROGRAM, &namcos22_state::iomcu_s22_program);
 	m_iomcu->p4_in_cb().set(FUNC(namcos22_state::iomcu_port4_s22_r));
+	m_iomcu->set_disable(); // not emulated yet
 
 	EEPROM_2864(config, "eeprom").write_time(attotime::zero);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	//m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(namcos22_state::screen_update_namcos22));
 	m_screen->screen_vblank().set(FUNC(namcos22_state::screen_vblank));
