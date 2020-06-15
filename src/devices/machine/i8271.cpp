@@ -3,7 +3,6 @@
 
 #include "emu.h"
 #include "i8271.h"
-#include "imagedev/floppy.h"
 
 DEFINE_DEVICE_TYPE(I8271, i8271_device, "i8271", "Intel 8271 FDC")
 
@@ -121,15 +120,23 @@ bool i8271_device::get_ready(int fid)
 	return !external_ready;
 }
 
-void i8271_device::set_floppy(floppy_image_device *flop)
+void i8271_device::set_floppies(floppy_connector *f0, floppy_connector *f1)
 {
-	for(auto & elem : flopi) {
-		if(elem.dev)
-			elem.dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
-		elem.dev = flop;
+	if (f0) {
+		flopi[0].dev = f0->get_device();
+		if (flopi[0].dev != nullptr)
+			flopi[0].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&i8271_device::index_callback, this));
 	}
-	if(flop)
-		flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&i8271_device::index_callback, this));
+	else
+		flopi[0].dev = nullptr;
+
+	if (f1) {
+		flopi[1].dev = f0->get_device();
+		if (flopi[1].dev != nullptr)
+			flopi[1].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&i8271_device::index_callback, this));
+	}
+	else
+		flopi[1].dev = nullptr;
 }
 
 uint8_t i8271_device::sr_r()
