@@ -93,42 +93,42 @@ protected:
 		uint8_t                   bank = 0;
 	};
 
-	DECLARE_WRITE16_MEMBER(sonic_level_load_protection);
-	DECLARE_READ16_MEMBER(brival_protection_r);
-	DECLARE_WRITE16_MEMBER(brival_protection_w);
-	DECLARE_WRITE16_MEMBER(darkedge_protection_w);
-	DECLARE_READ16_MEMBER(darkedge_protection_r);
-	DECLARE_WRITE16_MEMBER(dbzvrvs_protection_w);
-	DECLARE_READ16_MEMBER(dbzvrvs_protection_r);
-	DECLARE_WRITE16_MEMBER(jleague_protection_w);
-	DECLARE_READ16_MEMBER(arescue_dsp_r);
-	DECLARE_WRITE16_MEMBER(arescue_dsp_w);
-	template<int Which> DECLARE_READ16_MEMBER(paletteram_r);
-	template<int Which> DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_READ16_MEMBER(videoram_r);
-	DECLARE_WRITE16_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(sprite_control_r);
-	DECLARE_WRITE8_MEMBER(sprite_control_w);
-	DECLARE_READ16_MEMBER(spriteram_r);
-	DECLARE_WRITE16_MEMBER(spriteram_w);
-	template<int Which> DECLARE_READ16_MEMBER(mixer_r);
-	template<int Which> DECLARE_WRITE16_MEMBER(mixer_w);
-	DECLARE_READ8_MEMBER(int_control_r);
-	DECLARE_WRITE8_MEMBER(int_control_w);
+	void sonic_level_load_protection(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t brival_protection_r(offs_t offset, uint16_t mem_mask = ~0);
+	void brival_protection_w(offs_t offset, uint16_t data);
+	void darkedge_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t darkedge_protection_r(offs_t offset, uint16_t mem_mask = ~0);
+	void dbzvrvs_protection_w(address_space &space, uint16_t data);
+	uint16_t dbzvrvs_protection_r();
+	void jleague_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t arescue_dsp_r(offs_t offset);
+	void arescue_dsp_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Which> uint16_t paletteram_r(offs_t offset);
+	template<int Which> void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t videoram_r(offs_t offset);
+	void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t sprite_control_r(offs_t offset);
+	void sprite_control_w(offs_t offset, uint8_t data);
+	uint16_t spriteram_r(offs_t offset);
+	void spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Which> uint16_t mixer_r(offs_t offset);
+	template<int Which> void mixer_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t int_control_r(offs_t offset);
+	void int_control_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE16_MEMBER(random_number_w);
-	DECLARE_READ16_MEMBER(random_number_r);
-	DECLARE_READ8_MEMBER(shared_ram_r);
-	DECLARE_WRITE8_MEMBER(shared_ram_w);
-	DECLARE_WRITE8_MEMBER(sound_int_control_lo_w);
-	DECLARE_WRITE8_MEMBER(sound_int_control_hi_w);
-	DECLARE_WRITE8_MEMBER(sound_bank_lo_w);
-	DECLARE_WRITE8_MEMBER(sound_bank_hi_w);
-	DECLARE_READ8_MEMBER(sound_dummy_r);
-	DECLARE_WRITE8_MEMBER(sound_dummy_w);
+	void random_number_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t random_number_r();
+	uint8_t shared_ram_r(offs_t offset);
+	void shared_ram_w(offs_t offset, uint8_t data);
+	void sound_int_control_lo_w(offs_t offset, uint8_t data);
+	void sound_int_control_hi_w(offs_t offset, uint8_t data);
+	void sound_bank_lo_w(uint8_t data);
+	void sound_bank_hi_w(uint8_t data);
+	uint8_t sound_dummy_r();
+	void sound_dummy_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(multipcm_bank_w);
-	DECLARE_WRITE8_MEMBER(scross_bank_w);
+	void multipcm_bank_w(uint8_t data);
+	void scross_bank_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -361,7 +361,7 @@ public:
 
 	ioport_value in2_analog_read();
 	ioport_value in3_analog_read();
-	DECLARE_WRITE8_MEMBER(analog_bank_w);
+	void analog_bank_w(uint8_t data);
 
 	void multi32_analog_map(address_map &map);
 protected:

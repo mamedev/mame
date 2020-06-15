@@ -138,13 +138,13 @@ void sauro_state::machine_start()
 	save_item(NAME(m_irq_enable));
 }
 
-WRITE8_MEMBER(sauro_state::sauro_sound_command_w)
+void sauro_state::sauro_sound_command_w(uint8_t data)
 {
 	data |= 0x80;
 	m_soundlatch->write(data);
 }
 
-READ8_MEMBER(sauro_state::sauro_sound_command_r)
+uint8_t sauro_state::sauro_sound_command_r()
 {
 	int ret = m_soundlatch->read();
 	m_soundlatch->clear_w();
@@ -179,7 +179,7 @@ WRITE_LINE_MEMBER(sauro_state::flip_screen_w)
 	flip_screen_set(state);
 }
 
-WRITE8_MEMBER(sauro_state::adpcm_w)
+void sauro_state::adpcm_w(uint8_t data)
 {
 	m_sp0256->ald_w(data);
 }

@@ -160,7 +160,7 @@ void s11a_state::dig0_w(uint8_t data)
 	set_segment2(0);
 }
 
-WRITE8_MEMBER( s11a_state::bgbank_w )
+void s11a_state::bgbank_w(uint8_t data)
 {
 	membank("bgbank")->set_entry(data & 0x03);
 }

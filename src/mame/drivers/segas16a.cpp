@@ -242,7 +242,7 @@ void segas16a_state::tilemap_sound_w(uint8_t data)
 //  standard_io_r - default I/O handler for reads
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::standard_io_r )
+uint16_t segas16a_state::standard_io_r(offs_t offset)
 {
 	offset &= 0x3fff/2;
 	switch (offset & (0x3000/2))
@@ -268,7 +268,7 @@ READ16_MEMBER( segas16a_state::standard_io_r )
 //  standard_io_r - default I/O handler for writes
 //-------------------------------------------------
 
-WRITE16_MEMBER( segas16a_state::standard_io_w )
+void segas16a_state::standard_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x3fff/2;
 	switch (offset & (0x3000/2))
@@ -288,10 +288,10 @@ WRITE16_MEMBER( segas16a_state::standard_io_w )
 //  misc_io_r - miscellaneous I/O reads
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::misc_io_r )
+uint16_t segas16a_state::misc_io_r(offs_t offset)
 {
 	// just call custom handler
-	return m_custom_io_r(space, offset, mem_mask);
+	return m_custom_io_r(offset);
 }
 
 
@@ -299,10 +299,10 @@ READ16_MEMBER( segas16a_state::misc_io_r )
 //  misc_io_w - miscellaneous I/O writes
 //-------------------------------------------------
 
-WRITE16_MEMBER( segas16a_state::misc_io_w )
+void segas16a_state::misc_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// just call custom handler
-	m_custom_io_w(space, offset, data, mem_mask);
+	m_custom_io_w(offset, data, mem_mask);
 }
 
 
@@ -707,7 +707,7 @@ void segas16a_state::dumpmtmt_i8751_sim()
 //  for Ace Attacker
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::aceattaca_custom_io_r )
+uint16_t segas16a_state::aceattaca_custom_io_r(offs_t offset)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -750,10 +750,10 @@ READ16_MEMBER( segas16a_state::aceattaca_custom_io_r )
 				return m_cxdio->read(offset & 0x0f);
 			break;
 	}
-	return standard_io_r(space, offset, mem_mask);
+	return standard_io_r(offset);
 }
 
-WRITE16_MEMBER( segas16a_state::aceattaca_custom_io_w )
+void segas16a_state::aceattaca_custom_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -765,7 +765,7 @@ WRITE16_MEMBER( segas16a_state::aceattaca_custom_io_w )
 			}
 			break;
 	}
-	standard_io_w(space, offset, data, mem_mask);
+	standard_io_w(offset, data, mem_mask);
 }
 
 
@@ -774,7 +774,7 @@ WRITE16_MEMBER( segas16a_state::aceattaca_custom_io_w )
 //  for Major League
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
+uint16_t segas16a_state::mjleague_custom_io_r(offs_t offset)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -845,7 +845,7 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(space, offset, mem_mask);
+	return standard_io_r(offset);
 }
 
 
@@ -854,7 +854,7 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 //  for Passing Shot
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::passsht16a_custom_io_r )
+uint16_t segas16a_state::passsht16a_custom_io_r(offs_t offset)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -878,7 +878,7 @@ READ16_MEMBER( segas16a_state::passsht16a_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(space, offset, mem_mask);
+	return standard_io_r(offset);
 }
 
 
@@ -887,7 +887,7 @@ READ16_MEMBER( segas16a_state::passsht16a_custom_io_r )
 //  for SDI
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::sdi_custom_io_r )
+uint16_t segas16a_state::sdi_custom_io_r(offs_t offset)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -899,7 +899,7 @@ READ16_MEMBER( segas16a_state::sdi_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(space, offset, mem_mask);
+	return standard_io_r(offset);
 }
 
 
@@ -908,7 +908,7 @@ READ16_MEMBER( segas16a_state::sdi_custom_io_r )
 //  for Sukeban Jansi Ryuko
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::sjryuko_custom_io_r )
+uint16_t segas16a_state::sjryuko_custom_io_r(offs_t offset)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -925,7 +925,7 @@ READ16_MEMBER( segas16a_state::sjryuko_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(space, offset, mem_mask);
+	return standard_io_r(offset);
 }
 
 
@@ -3889,8 +3889,8 @@ void segas16a_state::init_generic()
 	m_nvram->set_base(m_workram, m_workram.bytes());
 
 	// create default read/write handlers
-	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::standard_io_r));
-	m_custom_io_w = write16_delegate(*this, FUNC(segas16a_state::standard_io_w));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::standard_io_r));
+	m_custom_io_w = write16s_delegate(*this, FUNC(segas16a_state::standard_io_w));
 
 	// save state
 	save_item(NAME(m_video_control));
@@ -3911,8 +3911,8 @@ void segas16a_state::init_generic()
 void segas16a_state::init_aceattaca()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::aceattaca_custom_io_r));
-	m_custom_io_w = write16_delegate(*this, FUNC(segas16a_state::aceattaca_custom_io_w));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::aceattaca_custom_io_r));
+	m_custom_io_w = write16s_delegate(*this, FUNC(segas16a_state::aceattaca_custom_io_w));
 }
 
 void segas16a_state::init_dumpmtmt()
@@ -3924,25 +3924,25 @@ void segas16a_state::init_dumpmtmt()
 void segas16a_state::init_mjleague()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::mjleague_custom_io_r));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::mjleague_custom_io_r));
 }
 
 void segas16a_state::init_passsht16a()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::passsht16a_custom_io_r));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::passsht16a_custom_io_r));
 }
 
 void segas16a_state::init_sdi()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::sdi_custom_io_r));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::sdi_custom_io_r));
 }
 
 void segas16a_state::init_sjryukoa()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::sjryuko_custom_io_r));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::sjryuko_custom_io_r));
 	m_lamp_changed_w = lamp_changed_delegate(&segas16a_state::sjryuko_lamp_changed_w, this);
 }
 

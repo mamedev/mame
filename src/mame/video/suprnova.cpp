@@ -89,7 +89,7 @@ void skns_state::draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const 
 }
 
 
-WRITE32_MEMBER(skns_state::pal_regs_w)
+void skns_state::pal_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_pal_regs[offset]);
 	m_palette_updated =1;
@@ -176,7 +176,7 @@ WRITE32_MEMBER(skns_state::pal_regs_w)
 }
 
 
-WRITE32_MEMBER(skns_state::palette_ram_w)
+void skns_state::palette_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r,g,b;
 	int brightness_r, brightness_g, brightness_b/*, alpha*/;
@@ -291,7 +291,7 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_A_tile_info)
 	//if (pri) popmessage("pri A!! %02x\n", pri);
 }
 
-WRITE32_MEMBER(skns_state::tilemapA_w)
+void skns_state::tilemapA_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemapA_ram[offset]);
 	m_tilemap_A->mark_tile_dirty(offset);
@@ -317,13 +317,13 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_B_tile_info)
 	//if (pri) popmessage("pri B!! %02x\n", pri); // 02 on cyvern
 }
 
-WRITE32_MEMBER(skns_state::tilemapB_w)
+void skns_state::tilemapB_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemapB_ram[offset]);
 	m_tilemap_B->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(skns_state::v3_regs_w)
+void skns_state::v3_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_v3_regs[offset]);
 

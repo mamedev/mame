@@ -311,7 +311,7 @@ void sgi_mc_device::dma_immediate()
 	}
 }
 
-READ32_MEMBER(sgi_mc_device::read)
+uint32_t sgi_mc_device::read(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset & ~1)
 	{
@@ -487,7 +487,7 @@ READ32_MEMBER(sgi_mc_device::read)
 	return 0;
 }
 
-WRITE32_MEMBER( sgi_mc_device::write )
+void sgi_mc_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset & ~1)
 	{

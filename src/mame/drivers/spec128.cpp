@@ -165,7 +165,7 @@ resulting mess can be seen in the F4 viewer display.
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
-READ8_MEMBER(spectrum_state::spectrum_128_pre_opcode_fetch_r)
+uint8_t spectrum_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 {
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
@@ -177,13 +177,13 @@ READ8_MEMBER(spectrum_state::spectrum_128_pre_opcode_fetch_r)
 	return retval;
 }
 
-WRITE8_MEMBER( spectrum_state::spectrum_128_bank1_w )
+void spectrum_state::spectrum_128_bank1_w(offs_t offset, uint8_t data)
 {
 	if (m_exp->romcs())
 		m_exp->mreq_w(offset, data);
 }
 
-READ8_MEMBER( spectrum_state::spectrum_128_bank1_r )
+uint8_t spectrum_state::spectrum_128_bank1_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -202,7 +202,7 @@ READ8_MEMBER( spectrum_state::spectrum_128_bank1_r )
 	return data;
 }
 
-WRITE8_MEMBER(spectrum_state::spectrum_128_port_7ffd_w)
+void spectrum_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 {
 	/* D0-D2: RAM page located at 0x0c000-0x0ffff */
 	/* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
@@ -240,7 +240,7 @@ void spectrum_state::spectrum_128_update_memory()
 		m_screen_location = messram + (5<<14);
 }
 
-READ8_MEMBER( spectrum_state::spectrum_128_ula_r )
+uint8_t spectrum_state::spectrum_128_ula_r()
 {
 	int vpos = m_screen->vpos();
 

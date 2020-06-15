@@ -152,7 +152,7 @@ void simpsons_state::bank2000_map(address_map &map)
 	map(0x3000, 0x3fff).ram();
 }
 
-WRITE8_MEMBER(simpsons_state::z80_bankswitch_w)
+void simpsons_state::z80_bankswitch_w(uint8_t data)
 {
 	membank("bank2")->set_entry(data & 7);
 }
@@ -175,7 +175,7 @@ void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-WRITE8_MEMBER(simpsons_state::z80_arm_nmi_w)
+void simpsons_state::z80_arm_nmi_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_nmi_enabled = machine().time().as_ticks(m_audiocpu->clock());

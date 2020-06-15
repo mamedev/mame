@@ -95,7 +95,7 @@ EB26IC73.BIN    27C240      /  Main Program
 
 /*** SOUND *******************************************************************/
 
-WRITE8_MEMBER(suprslam_state::suprslam_sh_bankswitch_w)
+void suprslam_state::suprslam_sh_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }

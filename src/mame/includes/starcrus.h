@@ -23,19 +23,19 @@ public:
 	void starcrus(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(s1_x_w);
-	DECLARE_WRITE8_MEMBER(s1_y_w);
-	DECLARE_WRITE8_MEMBER(s2_x_w);
-	DECLARE_WRITE8_MEMBER(s2_y_w);
-	DECLARE_WRITE8_MEMBER(p1_x_w);
-	DECLARE_WRITE8_MEMBER(p1_y_w);
-	DECLARE_WRITE8_MEMBER(p2_x_w);
-	DECLARE_WRITE8_MEMBER(p2_y_w);
-	DECLARE_WRITE8_MEMBER(ship_parm_1_w);
-	DECLARE_WRITE8_MEMBER(ship_parm_2_w);
-	DECLARE_WRITE8_MEMBER(proj_parm_1_w);
-	DECLARE_WRITE8_MEMBER(proj_parm_2_w);
-	DECLARE_READ8_MEMBER(coll_det_r);
+	void s1_x_w(uint8_t data);
+	void s1_y_w(uint8_t data);
+	void s2_x_w(uint8_t data);
+	void s2_y_w(uint8_t data);
+	void p1_x_w(uint8_t data);
+	void p1_y_w(uint8_t data);
+	void p2_x_w(uint8_t data);
+	void p2_y_w(uint8_t data);
+	void ship_parm_1_w(uint8_t data);
+	void ship_parm_2_w(uint8_t data);
+	void proj_parm_1_w(uint8_t data);
+	void proj_parm_2_w(uint8_t data);
+	uint8_t coll_det_r();
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

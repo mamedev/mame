@@ -485,10 +485,10 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 //  misc_io_r - miscellaneous I/O reads
 //-------------------------------------------------
 
-READ16_MEMBER( segaorun_state::misc_io_r )
+uint16_t segaorun_state::misc_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!m_custom_io_r.isnull())
-		return m_custom_io_r(space, offset, mem_mask);
+		return m_custom_io_r(space, offset);
 
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return m_mapper->open_bus_r();
@@ -499,11 +499,11 @@ READ16_MEMBER( segaorun_state::misc_io_r )
 //  misc_io_w - miscellaneous I/O writes
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaorun_state::misc_io_w )
+void segaorun_state::misc_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_custom_io_w.isnull())
 	{
-		m_custom_io_w(space, offset, data, mem_mask);
+		m_custom_io_w(offset, data, mem_mask);
 		return;
 	}
 
@@ -515,7 +515,7 @@ WRITE16_MEMBER( segaorun_state::misc_io_w )
 //  nop_w - no-op write when mapping ROMs as RAM
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaorun_state::nop_w )
+void segaorun_state::nop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
@@ -640,7 +640,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segaorun_state::bankmotor_update)
 //  for Out Run
 //-------------------------------------------------
 
-READ16_MEMBER( segaorun_state::outrun_custom_io_r )
+uint16_t segaorun_state::outrun_custom_io_r(address_space &space, offs_t offset)
 {
 	offset &= 0x7f/2;
 	switch (offset & 0x70/2)
@@ -673,7 +673,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 //  for Out Run
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
+void segaorun_state::outrun_custom_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x7f/2;
 	switch (offset & 0x70/2)
@@ -708,7 +708,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 			return;
 
 		case 0x70/2:
-			m_sprites->draw_write(space, offset, data, mem_mask);
+			m_sprites->draw_write(data);
 			return;
 
 		default:
@@ -724,7 +724,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 //  for Super Hang-On
 //-------------------------------------------------
 
-READ16_MEMBER( segaorun_state::shangon_custom_io_r )
+uint16_t segaorun_state::shangon_custom_io_r(address_space &space, offs_t offset)
 {
 	offset &= 0x303f/2;
 	switch (offset)
@@ -754,7 +754,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 //  for Super Hang-On
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
+void segaorun_state::shangon_custom_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x303f/2;
 	switch (offset)
@@ -2923,8 +2923,8 @@ void segaorun_state::init_generic()
 void segaorun_state::init_outrun()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(*this, FUNC(segaorun_state::outrun_custom_io_r));
-	m_custom_io_w = write16_delegate(*this, FUNC(segaorun_state::outrun_custom_io_w));
+	m_custom_io_r = read16m_delegate(*this, FUNC(segaorun_state::outrun_custom_io_r));
+	m_custom_io_w = write16s_delegate(*this, FUNC(segaorun_state::outrun_custom_io_w));
 }
 
 void segaorun_state::init_outrunb()
@@ -2969,8 +2969,8 @@ void segaorun_state::init_shangon()
 {
 	init_generic();
 	m_shangon_video = true;
-	m_custom_io_r = read16_delegate(*this, FUNC(segaorun_state::shangon_custom_io_r));
-	m_custom_io_w = write16_delegate(*this, FUNC(segaorun_state::shangon_custom_io_w));
+	m_custom_io_r = read16m_delegate(*this, FUNC(segaorun_state::shangon_custom_io_r));
+	m_custom_io_w = write16s_delegate(*this, FUNC(segaorun_state::shangon_custom_io_w));
 }
 
 

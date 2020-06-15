@@ -127,7 +127,7 @@ static INPUT_PORTS_START( s11c )
 INPUT_PORTS_END
 
 /*
-WRITE8_MEMBER( s11c_state::bgbank_w )
+void s11c_state::bgbank_w(uint8_t data)
 {
     uint8_t bank = ((data & 0x04) >> 2) | ((data & 0x03) << 1);
     membank("bgbank")->set_entry(bank);

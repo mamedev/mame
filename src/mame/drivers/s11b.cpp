@@ -157,7 +157,7 @@ MACHINE_RESET_MEMBER( s11b_state, s11b )
 		m_bgcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-WRITE8_MEMBER( s11b_state::bg_speech_clock_w )
+void s11b_state::bg_speech_clock_w(uint8_t data)
 {
 	if(m_bg_hc55516)
 	{
@@ -167,7 +167,7 @@ WRITE8_MEMBER( s11b_state::bg_speech_clock_w )
 	}
 }
 
-WRITE8_MEMBER( s11b_state::bg_speech_digit_w )
+void s11b_state::bg_speech_digit_w(uint8_t data)
 {
 	if(m_bg_hc55516)
 		m_bg_hc55516->digit_w(data);

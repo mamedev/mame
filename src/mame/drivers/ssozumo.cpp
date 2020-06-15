@@ -48,7 +48,7 @@ void ssozumo_state::ssozumo_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(ssozumo_state::sound_nmi_mask_w)
+void ssozumo_state::sound_nmi_mask_w(uint8_t data)
 {
 	m_sound_nmi_mask = data & 1;
 }

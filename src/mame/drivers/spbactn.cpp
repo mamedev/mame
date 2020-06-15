@@ -141,7 +141,7 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 #include "speaker.h"
 
 
-WRITE16_MEMBER(spbactn_state::main_irq_ack_w)
+void spbactn_state::main_irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 }

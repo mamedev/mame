@@ -37,7 +37,7 @@ void starfire_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(starfire_state::starfire_colorram_w)
+void starfire_state::starfire_colorram_w(offs_t offset, uint8_t data)
 {
 	/* handle writes to the pseudo-color RAM */
 	if ((offset & 0xe0) == 0)
@@ -70,7 +70,7 @@ WRITE8_MEMBER(starfire_state::starfire_colorram_w)
 	}
 }
 
-READ8_MEMBER(starfire_state::starfire_colorram_r)
+uint8_t starfire_state::starfire_colorram_r(offs_t offset)
 {
 	/* handle writes to the pseudo-color RAM, which also happen on reads */
 	if ((offset & 0xe0) == 0)
@@ -97,7 +97,7 @@ READ8_MEMBER(starfire_state::starfire_colorram_r)
  *
  *************************************/
 
-WRITE8_MEMBER(starfire_state::starfire_videoram_w)
+void starfire_state::starfire_videoram_w(offs_t offset, uint8_t data)
 {
 	int sh, lr, dm, ds, mask, d0, dalu;
 	int offset1 = offset & 0x1fff;
@@ -177,7 +177,7 @@ WRITE8_MEMBER(starfire_state::starfire_videoram_w)
 	}
 }
 
-READ8_MEMBER(starfire_state::starfire_videoram_r)
+uint8_t starfire_state::starfire_videoram_r(offs_t offset)
 {
 	int sh, mask, d0;
 	int offset1 = offset & 0x1fff;

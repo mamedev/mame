@@ -87,13 +87,13 @@ a joystick.  This is not an emulation bug.
 #include "speaker.h"
 
 
-WRITE8_MEMBER(snowbros_state::snowbros_flipscreen_w)
+void snowbros_state::snowbros_flipscreen_w(uint8_t data)
 {
 	m_pandora->flip_screen_set(!BIT(data, 7));
 }
 
 
-WRITE8_MEMBER(snowbros_state::bootleg_flipscreen_w)
+void snowbros_state::bootleg_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(~data & 0x80);
 }
@@ -119,17 +119,17 @@ WRITE_LINE_MEMBER(snowbros_state::screen_vblank_snowbros)
 
 
 
-WRITE16_MEMBER(snowbros_state::snowbros_irq4_ack_w)
+void snowbros_state::snowbros_irq4_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(snowbros_state::snowbros_irq3_ack_w)
+void snowbros_state::snowbros_irq3_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(3, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(snowbros_state::snowbros_irq2_ack_w)
+void snowbros_state::snowbros_irq2_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
@@ -181,7 +181,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros3_irq)
 
 }
 
-READ16_MEMBER(snowbros_state::toto_read)
+uint16_t snowbros_state::toto_read(offs_t offset, uint16_t mem_mask)
 {
 	int pc = m_maincpu->pc();
 	if ((pc!= 0x3f010) && (pc!= 0x38008)) printf("toto prot %08x %04x\n", pc, mem_mask);
@@ -322,7 +322,7 @@ void snowbros_state::twinadv_map(address_map &map)
 	map(0xa00000, 0xa00001).w(FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
 }
 
-WRITE8_MEMBER(snowbros_state::twinadv_oki_bank_w)
+void snowbros_state::twinadv_oki_bank_w(uint8_t data)
 {
 	int bank = (data &0x02)>>1;
 
@@ -376,7 +376,7 @@ void snowbros_state::hyperpac_sound_map(address_map &map)
 
 /* Same volume used for all samples at the Moment, could be right, we have no
    way of knowing .. */
-READ16_MEMBER(snowbros_state::sb3_sound_r)
+uint16_t snowbros_state::sb3_sound_r()
 {
 	return 0x0003;
 }
@@ -445,7 +445,7 @@ void snowbros_state::sb3_play_sound (int data)
 
 }
 
-WRITE16_MEMBER(snowbros_state::sb3_sound_w)
+void snowbros_state::sb3_sound_w(uint16_t data)
 {
 	if (data == 0x00fe)
 	{
@@ -524,7 +524,7 @@ void snowbros_state::finalttr_map(address_map &map)
 // The sequence MEN is sent to the protection device, followed by the code request (4 bytes in all).
 // After each byte, a number of NOPs are executed to give the device time to catch up.
 // After the 4th byte, the code reads the device to get its response.
-READ16_MEMBER(snowbros_state::yutnori_prot_r)
+uint16_t snowbros_state::yutnori_prot_r()
 {
 	switch(m_yutnori_prot_val) // the 4th byte
 	{
@@ -539,7 +539,7 @@ READ16_MEMBER(snowbros_state::yutnori_prot_r)
 	return 0;
 }
 
-WRITE16_MEMBER(snowbros_state::yutnori_prot_w)
+void snowbros_state::yutnori_prot_w(uint16_t data)
 {
 	m_yutnori_prot_val = data;
 }
@@ -2787,7 +2787,7 @@ void snowbros_state::init_cookbib2()
 }
 
 
-READ16_MEMBER(snowbros_state::_4in1_02_read)
+uint16_t snowbros_state::_4in1_02_read()
 {
 	return 0x0202;
 }
@@ -2817,7 +2817,7 @@ void snowbros_state::init_4in1boot()
 			buffer[i] = src[i^0x4000];
 		memcpy(src,&buffer[0],len);
 	}
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(*this, FUNC(snowbros_state::_4in1_02_read)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16smo_delegate(*this, FUNC(snowbros_state::_4in1_02_read)));
 }
 
 void snowbros_state::init_snowbro3()
@@ -2837,25 +2837,25 @@ void snowbros_state::init_snowbro3()
 	save_item(NAME(m_sb3_music));
 }
 
-READ16_MEMBER(snowbros_state::_3in1_read)
+uint16_t snowbros_state::_3in1_read()
 {
 	return 0x000a;
 }
 
 void snowbros_state::init_3in1semi()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(*this, FUNC(snowbros_state::_3in1_read)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16smo_delegate(*this, FUNC(snowbros_state::_3in1_read)));
 }
 
 
-READ16_MEMBER(snowbros_state::cookbib3_read)
+uint16_t snowbros_state::cookbib3_read()
 {
 	return 0x2a2a;
 }
 
 void snowbros_state::init_cookbib3()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(*this, FUNC(snowbros_state::cookbib3_read)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16smo_delegate(*this, FUNC(snowbros_state::cookbib3_read)));
 }
 
 void snowbros_state::init_pzlbreak()
@@ -2893,7 +2893,7 @@ void snowbros_state::init_toto()
 	}
 
 	// protection? (just return 0x07)
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x500006, 0x500007, read16_delegate(*this, FUNC(snowbros_state::toto_read)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x500006, 0x500007, read16s_delegate(*this, FUNC(snowbros_state::toto_read)));
 }
 
 void snowbros_state::init_hyperpac()
