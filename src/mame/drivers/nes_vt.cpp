@@ -172,6 +172,7 @@ public:
 		nes_vt_waixing_state(mconfig, type, tag)
 	{ }
 
+	void nes_vt_waixing_alt_4mb(machine_config& config);
 	void nes_vt_waixing_alt_pal_8mb(machine_config& config);
 };
 
@@ -860,6 +861,15 @@ void nes_vt_waixing_state::nes_vt_waixing_2mb(machine_config &config)
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_2mbyte);
 	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
+}
+
+void nes_vt_waixing_alt_state::nes_vt_waixing_alt_4mb(machine_config &config)
+{
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_4mbyte);
+	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
+	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
 }
 
 void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_8mb(machine_config &config)
@@ -1789,25 +1799,24 @@ ROM_START( sudopptv )
 	ROM_LOAD( "sudokupnptvgame_29lv400tc_000422b9.bin", 0x00000, 0x80000, CRC(722cc36d) SHA1(1f6d1f57478cf175a36722b39c52eded4b669f81) )
 ROM_END
 
+ROM_START( zudugo )
+	ROM_REGION( 0x400000, "mainrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "zudugo.bin", 0x00000, 0x400000, CRC(0fa9d9ad) SHA1(7533eaf51785d8fcced900ea0498281b0cf49dbf) )
+ROM_END
+
 ROM_START( ablping )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "abl_pingpong.bin", 0x00000, 0x200000, CRC(b31de1fb) SHA1(94e8afb2315ba1fa0892191c8e1832391e401c70) )
 ROM_END
 
-ROM_START( dgun2573 ) // bad ROM inside unit
+ROM_START( dgun2573 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "dgun2573.bin", 0x00000, 0x2000000, BAD_DUMP CRC(cde71a53) SHA1(d0d4c1965876291861781ecde46b1142b062f1f3) )
+	ROM_LOAD( "myarcadegamerportabledreamgear_s29gl256p10tfi01_0001227e.bin", 0x00000, 0x2000000, CRC(928c41ad) SHA1(c0119a13a47a5b784d0b834d1451973ff0b4a84f) )
 ROM_END
 
-/* From a different unit, but also a bad ROM inside, some of the same areas appear to be corrupt.  The first 128KByte still has some incorrect / corrupt images for menu)
-   For example, "13. Backstroke" image is corrupt.  That's stored in the 0xc000 - 0xffff region of the ROM.  Using the data from rminitv instead fixes it
-   however things get more confusing with "25. Freestyle Stroke" which is stored in the 0x10000 - 0x1ffff area.  This area is already a match for 'rminitv' so would
-   appear to not be a bad dump, however the image in this section of ROM and 'rminitv' references it elsewhere.  This suggests the chip might have been reprogrammed
-   from something else, and the process failed to erase / replace one of the old blocks? */
-
-ROM_START( dgun2573a ) 
+ROM_START( dgun2573a ) // this one lacked a DreamGear logo but was otherwise physically identical, is it a clone product or did DreamGear drop the logo in favor of just using the 'My Arcade' brand?
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "gamer.bin", 0x00000, 0x2000000, BAD_DUMP CRC(abe72c09) SHA1(b81ab3adf6905367c2e52f0d8bf71fb73c2b697f))
+	ROM_LOAD( "myarcadegamerportable_s29gl256p10tfi01_0001227e.bin", 0x00000, 0x2000000, CRC(8f8c8da7) SHA1(76a18458922e39abe1982f05f184babb5e65acf2) )
 ROM_END
 
 ROM_START( bittboy )
@@ -1972,6 +1981,9 @@ CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_
 
 // 060303 date code on PCB
 CONS( 2006, ablmini,   0, 0,  nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
+
+// silver 'N64' type controller design
+CONS( 200?, zudugo,    0, 0,  nes_vt_waixing_alt_4mb,     nes_vt, nes_vt_waixing_alt_state, empty_init, "<unknown>", "Zudu-go / 2udu-go", MACHINE_IMPERFECT_GRAPHICS ) // the styling on the box looks like a '2' in places, a 'Z' in others.
 
  // needs PCM samples, Y button is not mapped (not used by any of the games?)
 CONS( 200?, timetp36,  0, 0,  nes_vt_pal_4mb, timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -2147,9 +2159,8 @@ CONS( 2016, mog_m320,   0,        0,  nes_vt_hh_8mb, nes_vt, nes_vt_hh_state, em
 
 
 // similar menus to above, but with opcode scrambling
-// some menu gfx broken, both units contained bad ROM, seems to be common issue?
 CONS( 2015, dgun2573,  0,         0,  nes_vt_fp_32mb,     nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573) (set 1)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2015, dgun2573a, 0,         0,  nes_vt_fp_32mb,     nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573) (set 2)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2015, dgun2573a, dgun2573,  0,  nes_vt_fp_32mb,     nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573) (set 2)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2015, rminitv,   0,  0,  nes_vt_fp_pal_32mb, nes_vt, nes_vt_hh_state, empty_init, "Orb Gaming", "Retro 'Mini TV' Console 300-in-1", MACHINE_IMPERFECT_GRAPHICS ) // single 32Mbyte bank!
 // New platform with scrambled opcodes, same as DGUN-2561. Runs fine with minor GFX and sound issues in menu
