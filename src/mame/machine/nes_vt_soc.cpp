@@ -1131,7 +1131,7 @@ void nes_vt_soc_device::external_space_write(offs_t offset, uint8_t data)
 
 void nes_vt_soc_device::nes_vt_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram();
+	map(0x0000, 0x07ff).ram().mirror(0x1800); // zudugo relies on mirror when selecting 'game' menu
 
 	// ddrdismx relies on the mirroring
 	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      // standard PPU registers
