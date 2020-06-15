@@ -158,6 +158,7 @@ void n64_periphs::device_reset()
 	vi_vburst = 0;
 	vi_xscale = 0;
 	vi_yscale = 0;
+	field = 0;
 
 	ai_timer->adjust(attotime::never);
 	memset(ai_fifo, 0, sizeof(ai_fifo));
