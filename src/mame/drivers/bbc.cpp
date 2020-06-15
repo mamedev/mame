@@ -1241,6 +1241,7 @@ void bbc_state::bbcb(machine_config &config)
 	subdevice<software_list_device>("cass_ls")->set_filter("A,B");
 	SOFTWARE_LIST(config, "flop_ls_b").set_original("bbcb_flop");
 	SOFTWARE_LIST(config, "flop_ls_b_orig").set_original("bbcb_flop_orig");
+	SOFTWARE_LIST(config, "hdd_ls").set_original("bbc_hdd").set_filter("B");
 }
 
 
@@ -1721,6 +1722,7 @@ void bbcm_state::bbcm(machine_config &config)
 	SOFTWARE_LIST(config, "flop_ls_b").set_compatible("bbcb_flop");
 	SOFTWARE_LIST(config, "flop_ls_b_orig").set_compatible("bbcb_flop_orig");
 	SOFTWARE_LIST(config, "rom_ls").set_original("bbc_rom").set_filter("M");
+	SOFTWARE_LIST(config, "hdd_ls").set_original("bbc_hdd").set_filter("M");
 }
 
 
