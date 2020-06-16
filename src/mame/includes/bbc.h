@@ -91,8 +91,7 @@ public:
 		, m_rtc(*this, "rtc")
 		, m_i2cmem(*this, "i2cmem")
 		, m_fdc(*this, "fdc")
-		, m_wd1770(*this, "wd1770")
-		, m_wd1772(*this, "wd1772")
+		, m_wd_fdc(*this, "wd_fdc")
 		, m_rom(*this, "romslot%u", 0U)
 		, m_cart(*this, "cartslot%u", 1U)
 		, m_region_mos(*this, "mos")
@@ -143,7 +142,6 @@ public:
 	void bbcmc_paged_w(offs_t offset, uint8_t data);
 	void bbcbp_drive_control_w(uint8_t data);
 	void bbcm_drive_control_w(uint8_t data);
-	void bbcmc_drive_control_w(uint8_t data);
 	void serial_ula_w(uint8_t data);
 	void video_ula_w(offs_t offset, uint8_t data);
 	uint8_t bbc_fe_r() { return 0xfe; };
@@ -248,8 +246,7 @@ protected:
 	optional_device<mc146818_device> m_rtc;
 	optional_device<i2cmem_device> m_i2cmem;
 	optional_device<bbc_fdc_slot_device> m_fdc;
-	optional_device<wd1770_device> m_wd1770;
-	optional_device<wd1772_device> m_wd1772;
+	optional_device<wd_fdc_digital_device_base> m_wd_fdc;
 	optional_device_array<bbc_romslot_device, 16> m_rom;
 	optional_device_array<bbc_cartslot_device, 2> m_cart;
 

@@ -180,7 +180,7 @@ void bbcbp_state::bbcbp_mem(address_map &map)
 	map(0x8000, 0xbfff).rw(FUNC(bbc_state::bbcbp_paged_r), FUNC(bbc_state::bbcbp_paged_w));                           //    8000-bfff                 Paged ROM/RAM
 	map(0xfe30, 0xfe3f).w(FUNC(bbc_state::bbcbp_romsel_w));                                                           // W: fe30-fe3f  84LS161        Paged ROM selector
 	map(0xfe80, 0xfe83).w(FUNC(bbc_state::bbcbp_drive_control_w));                                                    //    fe80-fe83  1770 FDC       Drive control register
-	map(0xfe84, 0xfe9f).rw(m_wd1770, FUNC(wd1770_device::read), FUNC(wd1770_device::write));                          //    fe84-fe9f  1770 FDC       Floppy disc controller
+	map(0xfe84, 0xfe9f).rw(m_wd_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));                          //    fe84-fe9f  1770 FDC       Floppy disc controller
 }
 
 
@@ -232,7 +232,7 @@ void bbcm_state::bbcm_bankdev(address_map &map)
 	map(0x0218, 0x021f).mirror(0x400).rw(m_upd7002, FUNC(upd7002_device::read), FUNC(upd7002_device::write));                         //    fe18-fe1f  uPD7002        Analogue to digital converter
 	map(0x0220, 0x0223).mirror(0x400).w(FUNC(bbc_state::video_ula_w));                                                                //    fe20-fe23  Video ULA      Video system chip
 	map(0x0224, 0x0227).mirror(0x400).w(FUNC(bbc_state::bbcm_drive_control_w));                                                       //    fe24-fe27  FDC Latch      1770 Control latch
-	map(0x0228, 0x022f).mirror(0x400).rw(m_wd1770, FUNC(wd1770_device::read), FUNC(wd1770_device::write));                            //    fe28-fe2f  1770 FDC       Floppy disc controller
+	map(0x0228, 0x022f).mirror(0x400).rw(m_wd_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));                            //    fe28-fe2f  1770 FDC       Floppy disc controller
 	map(0x0230, 0x0233).mirror(0x400).w(FUNC(bbc_state::bbcm_romsel_w));                                                              //    fe30-fe33  ROMSEL         ROM Select
 	map(0x0234, 0x0237).mirror(0x400).rw(FUNC(bbc_state::bbcm_acccon_r), FUNC(bbc_state::bbcm_acccon_w));                             //    fe34-fe37  ACCCON         ACCCON select register
 	map(0x0238, 0x023b).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe38-fe3b  INTOFF
@@ -301,8 +301,8 @@ void bbcm_state::bbcmc_bankdev(address_map &map)
 	map(0x0208, 0x020f).mirror(0x400).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));                          //    fe08-fe0f  6850 ACIA      Serial controller
 	map(0x0210, 0x0217).mirror(0x400).w(FUNC(bbc_state::serial_ula_w));                                                               //    fe10-fe17  Serial ULA     Serial system chip
 	map(0x0220, 0x0223).mirror(0x400).w(FUNC(bbc_state::video_ula_w));                                                                //    fe20-fe23  Video ULA      Video system chip
-	map(0x0224, 0x0227).mirror(0x400).w(FUNC(bbc_state::bbcmc_drive_control_w));                                                      //    fe24-fe27  FDC Latch      1772 Control latch
-	map(0x0228, 0x022f).mirror(0x400).rw(m_wd1772, FUNC(wd1772_device::read), FUNC(wd1772_device::write));                            //    fe28-fe2f  1772 FDC       Floppy disc controller
+	map(0x0224, 0x0227).mirror(0x400).w(FUNC(bbc_state::bbcm_drive_control_w));                                                       //    fe24-fe27  FDC Latch      1772 Control latch
+	map(0x0228, 0x022f).mirror(0x400).rw(m_wd_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write));                            //    fe28-fe2f  1772 FDC       Floppy disc controller
 	map(0x0230, 0x0233).mirror(0x400).w(FUNC(bbc_state::bbcm_romsel_w));                                                              //    fe30-fe33  ROMSEL         ROM Select
 	map(0x0234, 0x0237).mirror(0x400).rw(FUNC(bbc_state::bbcm_acccon_r), FUNC(bbc_state::bbcm_acccon_w));                             //    fe34-fe37  ACCCON         ACCCON select register
 	map(0x0238, 0x023b).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe38-fe3b  INTOFF
@@ -335,8 +335,7 @@ INPUT_CHANGED_MEMBER(bbc_state::trigger_reset)
 		if (m_adlc) m_adlc->reset();
 		if (m_rtc) m_rtc->reset();
 		if (m_fdc) m_fdc->reset();
-		if (m_wd1770) m_wd1770->reset();
-		if (m_wd1772) m_wd1772->reset();
+		if (m_wd_fdc) m_wd_fdc->reset();
 		if (m_1mhzbus) m_1mhzbus->reset();
 		if (m_tube) m_tube->reset();
 		if (m_intube) m_intube->reset();
@@ -1349,14 +1348,14 @@ void bbcbp_state::bbcbp(machine_config &config)
 	m_ram->set_default_size("64K");
 
 	/* fdc */
-	WD1770(config, m_wd1770, 16_MHz_XTAL / 2);
-	m_wd1770->set_force_ready(true);
-	m_wd1770->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
-	m_wd1770->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
+	WD1770(config, m_wd_fdc, 16_MHz_XTAL / 2);
+	m_wd_fdc->set_force_ready(true);
+	m_wd_fdc->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_wd_fdc->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
 	config.device_remove("fdc");
 
-	FLOPPY_CONNECTOR(config, "wd1770:0", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "wd1770:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "wd_fdc:0", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "wd_fdc:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
 
 	/* remove sockets not present in B+ */
 	config.device_remove("romslot0");
@@ -1405,7 +1404,7 @@ void bbcbp_state::abc110(machine_config &config)
 {
 	bbcbp(config);
 	/* fdc */
-	m_wd1770->subdevice<floppy_connector>("1")->set_default_option(nullptr);
+	m_wd_fdc->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* Acorn Z80 co-processor */
 	m_tube->set_default_option("z80");
@@ -1426,7 +1425,7 @@ void bbcbp_state::acw443(machine_config &config)
 {
 	bbcbp(config);
 	/* fdc */
-	m_wd1770->subdevice<floppy_connector>("1")->set_default_option(nullptr);
+	m_wd_fdc->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* 32016 co-processor */
 	//m_tube->set_default_option("32016");
@@ -1448,7 +1447,7 @@ void bbcbp_state::abc310(machine_config &config)
 {
 	bbcbp(config);
 	/* fdc */
-	m_wd1770->subdevice<floppy_connector>("1")->set_default_option(nullptr);
+	m_wd_fdc->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* Acorn 80286 co-processor */
 	m_tube->set_default_option("80286");
@@ -1493,7 +1492,7 @@ void bbcbp_state::reutapm(machine_config &config)
 	config.device_remove("cassette");
 
 	/* fdc */
-	config.device_remove("wd1770");
+	config.device_remove("wd_fdc");
 
 	/* software lists */
 	config.device_remove("cass_ls");
@@ -1524,7 +1523,7 @@ void bbcbp_state::econx25(machine_config &config)
 	m_latch->q_out_cb<2>().set_nop();
 
 	/* fdc */
-	//config.device_remove("wd1770")
+	//config.device_remove("wd_fdc")
 
 	/* Add Econet X25 Gateway co-processor */
 	//m_tube->set_default_option("x25");
@@ -1654,13 +1653,13 @@ void bbcm_state::bbcm(machine_config &config)
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
 	/* fdc */
-	WD1770(config, m_wd1770, 16_MHz_XTAL / 2);
-	m_wd1770->set_force_ready(true);
-	m_wd1770->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
-	m_wd1770->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
+	WD1770(config, m_wd_fdc, 16_MHz_XTAL / 2);
+	m_wd_fdc->set_force_ready(true);
+	m_wd_fdc->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_wd_fdc->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, "wd1770:0", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "wd1770:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "wd_fdc:0", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "wd_fdc:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
 
 	/* econet */
 	MC6854(config, m_adlc);
@@ -1784,7 +1783,7 @@ void bbcm_state::bbcmet(machine_config &config)
 	config.device_remove("via6522_1");
 
 	/* fdc */
-	config.device_remove("wd1770");
+	config.device_remove("wd_fdc");
 
 	/* expansion ports (not fitted) */
 	config.device_remove("analogue");
@@ -1867,8 +1866,8 @@ void bbcm_state::cfa3000(machine_config &config)
 	bbcm(config);
 
 	/* fdc */
-	m_wd1770->subdevice<floppy_connector>("0")->set_default_option(nullptr);
-	m_wd1770->subdevice<floppy_connector>("1")->set_default_option(nullptr);
+	m_wd_fdc->subdevice<floppy_connector>("0")->set_default_option(nullptr);
+	m_wd_fdc->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* lk18 and lk19 are set to enable rom, disabling ram */
 	m_rom[0x04]->set_default_option(nullptr);
@@ -1914,13 +1913,12 @@ void bbcm_state::bbcmc(machine_config &config)
 	config.device_remove("cassette");
 
 	/* fdc */
-	WD1772(config, m_wd1772, 16_MHz_XTAL / 2);
-	m_wd1772->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
-	m_wd1772->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
-	config.device_remove("wd1770");
+	WD1772(config.replace(), m_wd_fdc, 16_MHz_XTAL / 2);
+	m_wd_fdc->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_wd_fdc->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, "wd1772:0", bbc_floppies, "35dd", bbc_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "wd1772:1", bbc_floppies, "35dd", bbc_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "wd_fdc:0", bbc_floppies, "35dd", bbc_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "wd_fdc:1", bbc_floppies, "35dd", bbc_state::floppy_formats).enable_sound(true);
 
 	I2C_PCD8572(config, "i2cmem", 0);
 	config.device_remove("rtc");
