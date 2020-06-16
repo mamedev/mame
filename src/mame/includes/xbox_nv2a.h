@@ -439,6 +439,7 @@ public:
 		A8R8G8B8_RECT = 0x12,
 		L8_RECT = 0x13,
 		DSDT8_RECT = 0x17,
+		A8 = 0x19,
 		A8L8 = 0x1a,
 		I8_RECT = 0x1b,
 		A4R4G4B4_RECT = 0x1d,
@@ -711,13 +712,14 @@ public:
 	void compute_limits_rendertarget(uint32_t chanel, uint32_t subchannel);
 	void compute_size_rendertarget(uint32_t chanel, uint32_t subchannel);
 	void extract_packed_float(uint32_t data, float &first, float &second, float &third);
-	void read_vertex(address_space & space, offs_t address, vertex_nv &vertex, int attrib);
-	int read_vertices_0x180x(address_space & space, vertex_nv *destination, uint32_t address, int limit);
-	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
-	int read_vertices_0x1818(address_space & space, vertex_nv *destination, uint32_t address, int limit);
-	void convert_vertices(vertex_nv *source, nv2avertex_t *destination, int count);
-	void assemble_primitive(vertex_nv *source, int count);
-	int clip_triangle_w(nv2avertex_t *vi[3], nv2avertex_t *vo);
+	void read_vertex(address_space &space, offs_t address, vertex_nv &vertex, int attrib);
+	int read_vertices_0x180x(address_space &space, int destination, uint32_t address, int limit);
+	int read_vertices_0x1810(address_space &space, int destination, int offset, int limit);
+	int read_vertices_0x1818(address_space &space, int destination, uint32_t address, int limit);
+	void convert_vertices(vertex_nv *source, nv2avertex_t *destination);
+	void assemble_primitive(int source, int count);
+	void process_persistent_vertex();
+	int clip_triangle_w(nv2avertex_t vi[3], nv2avertex_t *vo);
 	uint32_t render_triangle_clipping(const rectangle &cliprect, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
 	uint32_t render_triangle_culling(const rectangle &cliprect, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
 	void clear_render_target(int what, uint32_t value);
