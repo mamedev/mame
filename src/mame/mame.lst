@@ -3266,6 +3266,9 @@ cfa3000                         // 1989 Henson CFA 3000
 daisy                           // 1987 Comus Daisy
 discmon                         // 1988 Arbiter Discmonitor
 discmate                        // 1988 Arbiter Discmate
+mpc800                          // 1987 MasterPieCe 800
+mpc900                          // 1988 MasterPieCe 900
+mpc900gx                        // 1990 MasterPieCe 900GX
 econx25                         // 1986 Econet X25 Gateway
 ltmpbp                          // 1985 LTM Portable (B+)
 ltmpm                           // 1986 LTM Portable (Master)

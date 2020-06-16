@@ -1861,6 +1861,51 @@ void bbcm_state::discmate(machine_config &config)
 }
 
 
+void bbcm_state::mpc_prisma_default(device_t* device)
+{
+	device->subdevice<bbc_1mhzbus_slot_device>("1mhzbus")->set_default_option("awhd");
+	device->subdevice<bbc_1mhzbus_slot_device>("1mhzbus")->set_fixed(true);
+}
+
+
+void bbcm_state::mpc800(machine_config& config)
+{
+	bbcm(config);
+	/* Acorn 65C102 co-processor */
+	m_intube->set_default_option("65c102");
+	m_intube->set_fixed(true);
+
+	/* Prisma 2 */
+	//m_1mhzbus->set_default_option("prisma2");
+	//m_1mhzbus->set_fixed(true);
+	//m_1mhzbus->set_option_machine_config("prisma2", mpc_prisma_default);
+
+	/* Mouse (AMX compatible) */
+	m_userport->set_default_option("amxmouse");
+	m_userport->set_fixed(true);
+}
+
+
+void bbcm_state::mpc900(machine_config& config)
+{
+	mpc800(config);
+	/* Prisma 3 */
+	//m_1mhzbus->set_default_option("prisma3");
+	//m_1mhzbus->set_fixed(true);
+	//m_1mhzbus->set_option_machine_config("prisma3", mpc_prisma_default);
+}
+
+
+void bbcm_state::mpc900gx(machine_config& config)
+{
+	mpc800(config);
+	/* Prisma 3+ */
+	//m_1mhzbus->set_default_option("prisma3p");
+	//m_1mhzbus->set_fixed(true);
+	//m_1mhzbus->set_option_machine_config("prisma3p", mpc_prisma_default);
+}
+
+
 void bbcm_state::cfa3000(machine_config &config)
 {
 	bbcm(config);
@@ -2699,6 +2744,108 @@ ROM_START(discmate)
 ROM_END
 
 
+ROM_START(mpc800)
+	ROM_REGION(0x44000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
+	ROM_DEFAULT_BIOS("mos320")
+	ROM_SYSTEM_BIOS(0, "mos320", "Original MOS 3.20")
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
+	ROM_COPY("swr", 0x20000, 0x40000, 0x4000) // Move loaded roms into place
+	ROM_FILL(0x20000, 0x4000, 0xff)
+	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
+	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
+	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
+	/* 0c000 rom 3   SK4 Front Cartridge top 16K */
+	/* 10000 rom 4   IC41 SWRAM or bottom 16K */
+	/* 14000 rom 5   IC41 SWRAM or top 16K */
+	/* 18000 rom 6   IC37 SWRAM or bottom 16K */
+	/* 1c000 rom 7   IC37 SWRAM or top 16K */
+	/* 20000 rom 8   IC27 800 Manager */
+	/* 24000 rom 9   IC24 DFS + SRAM */
+	/* 28000 rom 10  IC24 Viewsheet */
+	/* 2c000 rom 11  IC24 Edit */
+	/* 30000 rom 12  IC24 BASIC */
+	/* 34000 rom 13  IC24 ADFS */
+	/* 38000 rom 14  IC24 View + MOS code */
+	/* 3c000 rom 15  IC24 Terminal + Tube host + CFS */
+	ROM_LOAD("mpc800manager-2.40.rom", 0x20000, 0x4000, CRC(d5a27b00) SHA1(533e846f47803d61508fe270fd7021c010a21a84))
+
+	ROM_REGION(0x4000, "mos", 0)
+	ROM_COPY("swr", 0x40000, 0, 0x4000)
+
+	ROM_REGION(0x40, "rtc", 0) /* mc146818 */
+	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
+	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
+ROM_END
+
+
+ROM_START(mpc900)
+	ROM_REGION(0x44000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
+	ROM_DEFAULT_BIOS("mos320")
+	ROM_SYSTEM_BIOS(0, "mos320", "Original MOS 3.20")
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
+	ROM_COPY("swr", 0x20000, 0x40000, 0x4000) // Move loaded roms into place
+	ROM_FILL(0x20000, 0x4000, 0xff)
+	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
+	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
+	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
+	/* 0c000 rom 3   SK4 Front Cartridge top 16K */
+	/* 10000 rom 4   IC41 SWRAM or bottom 16K */
+	/* 14000 rom 5   IC41 SWRAM or top 16K */
+	/* 18000 rom 6   IC37 SWRAM or bottom 16K */
+	/* 1c000 rom 7   IC37 SWRAM or top 16K */
+	/* 20000 rom 8   IC27 900 Manager */
+	/* 24000 rom 9   IC24 DFS + SRAM */
+	/* 28000 rom 10  IC24 Viewsheet */
+	/* 2c000 rom 11  IC24 Edit */
+	/* 30000 rom 12  IC24 BASIC */
+	/* 34000 rom 13  IC24 ADFS */
+	/* 38000 rom 14  IC24 View + MOS code */
+	/* 3c000 rom 15  IC24 Terminal + Tube host + CFS */
+	ROM_LOAD("mpc900_manager-1.20.rom", 0x20000, 0x4000, BAD_DUMP CRC(3470af89) SHA1(5d54ace2fbfdb9a7ec88aeaebcfe978688ef1893))
+
+	ROM_REGION(0x4000, "mos", 0)
+	ROM_COPY("swr", 0x40000, 0, 0x4000)
+
+	ROM_REGION(0x40, "rtc", 0) /* mc146818 */
+	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
+	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
+ROM_END
+
+
+ROM_START(mpc900gx)
+	ROM_REGION(0x44000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
+	ROM_DEFAULT_BIOS("mos320")
+	ROM_SYSTEM_BIOS(0, "mos320", "Original MOS 3.20")
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
+	ROM_COPY("swr", 0x20000, 0x40000, 0x4000) // Move loaded roms into place
+	ROM_FILL(0x20000, 0x4000, 0xff)
+	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
+	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
+	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
+	/* 0c000 rom 3   SK4 Front Cartridge top 16K */
+	/* 10000 rom 4   IC41 SWRAM or bottom 16K */
+	/* 14000 rom 5   IC41 SWRAM or top 16K */
+	/* 18000 rom 6   IC37 SWRAM or bottom 16K */
+	/* 1c000 rom 7   IC37 SWRAM or top 16K */
+	/* 20000 rom 8   IC27 900GX Manager */
+	/* 24000 rom 9   IC24 DFS + SRAM */
+	/* 28000 rom 10  IC24 Viewsheet */
+	/* 2c000 rom 11  IC24 Edit */
+	/* 30000 rom 12  IC24 BASIC */
+	/* 34000 rom 13  IC24 ADFS */
+	/* 38000 rom 14  IC24 View + MOS code */
+	/* 3c000 rom 15  IC24 Terminal + Tube host + CFS */
+	ROM_LOAD("mpc900gx_manager-1.20.rom", 0x20000, 0x4000, CRC(3470af89) SHA1(5d54ace2fbfdb9a7ec88aeaebcfe978688ef1893))
+
+	ROM_REGION(0x4000, "mos", 0)
+	ROM_COPY("swr", 0x40000, 0, 0x4000)
+
+	ROM_REGION(0x40, "rtc", 0) /* mc146818 */
+	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
+	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
+ROM_END
+
+
 ROM_START(cfa3000)
 	ROM_REGION(0x44000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
 	ROM_LOAD("cfa3000_3_4_iss10.3.ic41",           0x10000, 0x08000, CRC(ecb385ab) SHA1(eafa9b34cb1cf63790f74332bb7d85ee356b6973))
@@ -2769,4 +2916,7 @@ COMP ( 1988, autoc15,  bbcmc,  0,     autoc15,  autoc,  bbcm_state,  init_bbc,  
 COMP ( 1988, discmon,  bbcm,   0,     discmon,  bbcm,   bbcm_state,  init_bbc,  "Arbiter Leisure", "Arbiter Discmonitor A-01",           MACHINE_NOT_WORKING)
 COMP ( 1988, discmate, bbcm,   0,     discmate, bbcm,   bbcm_state,  init_bbc,  "Arbiter Leisure", "Arbiter Discmate A-02",              MACHINE_NOT_WORKING)
 //COMP ( 1988, discmast, bbcm,   0,     discmast, bbcm,   bbcm_state,  init_bbc, "Arbiter Leisure", "Arbiter Discmaster A-03",            MACHINE_NOT_WORKING)
+COMP ( 1987, mpc800,   bbcm,   0,     mpc800,   bbcm,   bbcm_state,  init_bbc,  "G2 Systems",      "MasterPieCe 800 Series",             MACHINE_NOT_WORKING)
+COMP ( 1988, mpc900,   bbcm,   0,     mpc900,   bbcm,   bbcm_state,  init_bbc,  "G2 Systems",      "MasterPieCe 900 Series",             MACHINE_NOT_WORKING)
+COMP ( 1990, mpc900gx, bbcm,   0,     mpc900gx, bbcm,   bbcm_state,  init_bbc,  "G2 Systems",      "MasterPieCe 900GX Series",           MACHINE_NOT_WORKING)
 COMP ( 1989, cfa3000,  bbcm,   0,     cfa3000,  bbcm,   bbcm_state,  init_cfa,  "Tinsley Medical Instruments",  "Henson CFA 3000",       MACHINE_NOT_WORKING)
