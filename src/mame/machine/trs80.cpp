@@ -341,6 +341,17 @@ READ8_MEMBER( trs80_state::keyboard_r )
 
 void trs80_state::machine_start()
 {
+	save_item(NAME(m_mode));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_mask));
+	save_item(NAME(m_tape_unit));
+	save_item(NAME(m_reg_load));
+	save_item(NAME(m_lnw_mode));
+	save_item(NAME(m_cassette_data));
+	save_item(NAME(m_old_cassette_val));
+	save_item(NAME(m_size_store));
+	save_item(NAME(m_timeout));
+
 	m_size_store = 0xff;
 	m_tape_unit=1;
 	m_reg_load=1;

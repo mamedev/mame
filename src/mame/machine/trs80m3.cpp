@@ -531,6 +531,25 @@ READ8_MEMBER( trs80m3_state::keyboard_r )
 
 void trs80m3_state::machine_start()
 {
+	save_item(NAME(m_model4));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_mask));
+	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_port_ec));
+	save_item(NAME(m_reg_load));
+	save_item(NAME(m_nmi_data));
+	save_item(NAME(m_cassette_data));
+	save_item(NAME(m_old_cassette_val));
+	save_item(NAME(m_start_address));
+	save_item(NAME(m_crtc_reg));
+	save_item(NAME(m_size_store));
+	save_item(NAME(m_a11_flipflop));
+	save_item(NAME(m_timeout));
+	save_item(NAME(m_wait));
+	save_item(NAME(m_drq_off));
+	save_item(NAME(m_intrq_off));
+
 	m_mode = 0;
 	m_reg_load = 1;
 	m_nmi_data = 0;
