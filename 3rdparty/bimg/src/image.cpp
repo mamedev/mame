@@ -1264,7 +1264,7 @@ namespace bimg
 						, mip.m_height
 						, mip.m_depth
 						);
-					BX_CHECK(ok, "Conversion from %s to %s failed!"
+					BX_ASSERT(ok, "Conversion from %s to %s failed!"
 							, getName(_input.m_format)
 							, getName(output->m_format)
 							);
@@ -4965,14 +4965,14 @@ namespace bimg
 				const uint32_t mipSize = width/blockWidth * height/blockHeight * depth * blockSize;
 				const uint32_t size    = mipSize*numSides;
 				uint32_t imageSize = bx::toHostEndian(*(const uint32_t*)&data[offset], _imageContainer.m_ktxLE);
-				BX_CHECK(size == imageSize, "KTX: Image size mismatch %d (expected %d).", size, imageSize);
+				BX_ASSERT(size == imageSize, "KTX: Image size mismatch %d (expected %d).", size, imageSize);
 				BX_UNUSED(size, imageSize);
 
 				offset += sizeof(uint32_t);
 
 				for (uint16_t side = 0; side < numSides; ++side)
 				{
-					BX_CHECK(offset <= _size, "Reading past size of data buffer! (offset %d, size %d)", offset, _size);
+					BX_ASSERT(offset <= _size, "Reading past size of data buffer! (offset %d, size %d)", offset, _size);
 
 					if (side == _side
 					&&  lod  == _lod)
@@ -5009,7 +5009,7 @@ namespace bimg
 
 				for (uint8_t lod = 0, num = _imageContainer.m_numMips; lod < num; ++lod)
 				{
-					BX_CHECK(offset <= _size, "Reading past size of data buffer! (offset %d, size %d)", offset, _size);
+					BX_ASSERT(offset <= _size, "Reading past size of data buffer! (offset %d, size %d)", offset, _size);
 
 					width  = bx::max<uint32_t>(blockWidth  * minBlockX, ( (width  + blockWidth  - 1) / blockWidth )*blockWidth);
 					height = bx::max<uint32_t>(blockHeight * minBlockY, ( (height + blockHeight - 1) / blockHeight)*blockHeight);
