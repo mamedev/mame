@@ -703,12 +703,12 @@ public:
 	DECLARE_WRITE32_MEMBER( sh4_internal_w );
 	DECLARE_READ32_MEMBER( sh4_internal_r );
 
-	DECLARE_READ64_MEMBER( sh4_utlb_address_array_r );
-	DECLARE_WRITE64_MEMBER( sh4_utlb_address_array_w );
-	DECLARE_READ64_MEMBER( sh4_utlb_data_array1_r );
-	DECLARE_WRITE64_MEMBER( sh4_utlb_data_array1_w );
-	DECLARE_READ64_MEMBER( sh4_utlb_data_array2_r );
-	DECLARE_WRITE64_MEMBER( sh4_utlb_data_array2_w );
+	uint64_t sh4_utlb_address_array_r(offs_t offset);
+	void sh4_utlb_address_array_w(offs_t offset, uint64_t data);
+	uint64_t sh4_utlb_data_array1_r(offs_t offset);
+	void sh4_utlb_data_array1_w(offs_t offset, uint64_t data);
+	uint64_t sh4_utlb_data_array2_r(offs_t offset);
+	void sh4_utlb_data_array2_w(offs_t offset, uint64_t data);
 
 	virtual void LDTLB(const uint16_t opcode) override;
 

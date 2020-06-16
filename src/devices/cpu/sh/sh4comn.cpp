@@ -1324,7 +1324,7 @@ uint32_t sh4_base_device::sh4_getsqremap(uint32_t address)
 }
 
 
-WRITE64_MEMBER( sh4_base_device::sh4_utlb_address_array_w )
+void sh4_base_device::sh4_utlb_address_array_w(offs_t offset, uint64_t data)
 {
 /*  uses bits 13:8 of address to select which UTLB entry we're addressing
     bit 7 of the address enables 'associative' mode, causing a search
@@ -1360,7 +1360,7 @@ WRITE64_MEMBER( sh4_base_device::sh4_utlb_address_array_w )
 	}
 }
 
-READ64_MEMBER( sh4_base_device::sh4_utlb_address_array_r )
+uint64_t sh4_base_device::sh4_utlb_address_array_r(offs_t offset)
 {
 	// associative bit is ignored for reads
 	int offs = offset*8;
@@ -1378,7 +1378,7 @@ READ64_MEMBER( sh4_base_device::sh4_utlb_address_array_r )
 }
 
 
-WRITE64_MEMBER( sh4_base_device::sh4_utlb_data_array1_w )
+void sh4_base_device::sh4_utlb_data_array1_w(offs_t offset, uint64_t data)
 {
 /*  uses bits 13:8 of address to select which UTLB entry we're addressing
 
@@ -1411,7 +1411,7 @@ WRITE64_MEMBER( sh4_base_device::sh4_utlb_data_array1_w )
 }
 
 
-READ64_MEMBER(sh4_base_device::sh4_utlb_data_array1_r)
+uint64_t sh4_base_device::sh4_utlb_data_array1_r(offs_t offset)
 {
 	uint32_t ret = 0;
 	int offs = offset*8;
@@ -1433,7 +1433,7 @@ READ64_MEMBER(sh4_base_device::sh4_utlb_data_array1_r)
 
 
 
-WRITE64_MEMBER( sh4_base_device::sh4_utlb_data_array2_w )
+void sh4_base_device::sh4_utlb_data_array2_w(offs_t offset, uint64_t data)
 {
 /*  uses bits 13:8 of address to select which UTLB entry we're addressing
 
@@ -1455,7 +1455,7 @@ WRITE64_MEMBER( sh4_base_device::sh4_utlb_data_array2_w )
 }
 
 
-READ64_MEMBER(sh4_base_device::sh4_utlb_data_array2_r)
+uint64_t sh4_base_device::sh4_utlb_data_array2_r(offs_t offset)
 {
 	uint32_t ret = 0;
 	int offs = offset*8;

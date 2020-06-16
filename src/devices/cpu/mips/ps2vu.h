@@ -188,8 +188,8 @@ public:
 
 	ps2_vif1_device* interface();
 
-	DECLARE_READ64_MEMBER(vif_r);
-	DECLARE_WRITE64_MEMBER(vif_w);
+	uint64_t vif_r(offs_t offset);
+	void vif_w(offs_t offset, uint64_t data);
 
 protected:
 	virtual void device_start() override;

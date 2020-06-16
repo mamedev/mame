@@ -8,7 +8,7 @@
 #include "logmacro.h"
 
 // general DMA to/from entire main map (not dedicated sprite DMA)
-WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
+void xavix_state::rom_dmatrg_w(uint8_t data)
 {
 	// 0x80 is set in the IRQ routine, presumably to ack it
 	if (data & 0x80)
@@ -60,27 +60,27 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 }
 
 
-WRITE8_MEMBER(xavix_state::rom_dmasrc_w)
+void xavix_state::rom_dmasrc_w(offs_t offset, uint8_t data)
 {
 	// has_wamg expects to be able to read back the source to modify it (need to check if it expects it to change after an operation)
 	LOG("%s: rom_dmasrc_w (%02x) %02x\n", machine().describe_context(), offset, data);
 	m_rom_dma_src[offset] = data;
 }
 
-WRITE8_MEMBER(xavix_state::rom_dmadst_w)
+void xavix_state::rom_dmadst_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: rom_dmadst_w (%02x) %02x\n", machine().describe_context(), offset, data);
 	m_rom_dma_dst[offset] = data;
 }
 
-WRITE8_MEMBER(xavix_state::rom_dmalen_w)
+void xavix_state::rom_dmalen_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: rom_dmalen_w (%02x) %02x\n", machine().describe_context(), offset, data);
 	m_rom_dma_len[offset] = data;
 }
 
 
-READ8_MEMBER(xavix_state::rom_dmastat_r)
+uint8_t xavix_state::rom_dmastat_r()
 {
 	LOG("%s: rom_dmastat_r (operation status?)\n", machine().describe_context());
 	return 0x00;
@@ -88,53 +88,53 @@ READ8_MEMBER(xavix_state::rom_dmastat_r)
 
 
 
-WRITE8_MEMBER(xavix_state::vector_enable_w)
+void xavix_state::vector_enable_w(uint8_t data)
 {
 	LOG("%s: vector_enable_w %02x\n", machine().describe_context(), data);
 	m_vectorenable = data;
 }
 
-READ8_MEMBER(xavix_state::nmi_vector_lo_r)
+uint8_t xavix_state::nmi_vector_lo_r()
 {
 	return m_nmi_vector_lo_data;
 }
 
-WRITE8_MEMBER(xavix_state::nmi_vector_lo_w)
+void xavix_state::nmi_vector_lo_w(uint8_t data)
 {
 	LOG("%s: nmi_vector_lo_w %02x\n", machine().describe_context(), data);
 	m_nmi_vector_lo_data = data;
 }
 
-READ8_MEMBER(xavix_state::nmi_vector_hi_r)
+uint8_t xavix_state::nmi_vector_hi_r()
 {
 	return m_nmi_vector_hi_data;
 }
 
-WRITE8_MEMBER(xavix_state::nmi_vector_hi_w)
+void xavix_state::nmi_vector_hi_w(uint8_t data)
 {
 	LOG("%s: nmi_vector_hi_w %02x\n", machine().describe_context(), data);
 	m_nmi_vector_hi_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::irq_vector_lo_w)
+void xavix_state::irq_vector_lo_w(uint8_t data)
 {
 	LOG("%s: irq_vector_lo_w %02x\n", machine().describe_context(), data);
 	m_irq_vector_lo_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::irq_vector_hi_w)
+void xavix_state::irq_vector_hi_w(uint8_t data)
 {
 	LOG("%s: irq_vector_hi_w %02x\n", machine().describe_context(), data);
 	m_irq_vector_hi_data = data;
 }
 
-READ8_MEMBER(xavix_state::irq_vector_lo_r)
+uint8_t xavix_state::irq_vector_lo_r()
 {
 	LOG("%s: irq_vector_lo_r\n", machine().describe_context());
 	return m_irq_vector_lo_data;
 }
 
-READ8_MEMBER(xavix_state::irq_vector_hi_r)
+uint8_t xavix_state::irq_vector_hi_r()
 {
 	LOG("%s: irq_vector_hi_r\n", machine().describe_context());
 	return m_irq_vector_hi_data;
@@ -143,13 +143,13 @@ READ8_MEMBER(xavix_state::irq_vector_hi_r)
 
 // this is external bus control (access to ROM etc.)
 
-READ8_MEMBER(xavix_state::extintrf_790x_r)
+uint8_t xavix_state::extintrf_790x_r(offs_t offset)
 {
 	LOG("%s: extintrf_790x_r %02x\n", machine().describe_context(), offset);
 	return m_extbusctrl[offset];
 }
 
-WRITE8_MEMBER(xavix_state::extintrf_790x_w)
+void xavix_state::extintrf_790x_w(offs_t offset, uint8_t data)
 {
 	// Popira, Taiko De Popira etc. games with SEEPROM cartridges uses this to swap between ROM and other peripherals in the cart for data bus access?
 	LOG("%s: extintrf_790x_w %02x %02x\n", machine().describe_context(), offset, data);
@@ -160,13 +160,13 @@ WRITE8_MEMBER(xavix_state::extintrf_790x_w)
 
 
 
-READ8_MEMBER(xavix_state::ioevent_enable_r)
+uint8_t xavix_state::ioevent_enable_r()
 {
 	LOG("%s: ioevent_enable_r\n", machine().describe_context());
 	return m_ioevent_enable;
 }
 
-WRITE8_MEMBER(xavix_state::ioevent_enable_w)
+void xavix_state::ioevent_enable_w(uint8_t data)
 {
 	LOG("%s: ioevent_enable_w %02x\n", machine().describe_context(), data);
 	m_ioevent_enable = data;
@@ -207,13 +207,13 @@ WRITE_LINE_MEMBER(xavix_state::ioevent_trg08)
 	process_ioevent(0x08);
 }
 
-READ8_MEMBER(xavix_state::ioevent_irqstate_r)
+uint8_t xavix_state::ioevent_irqstate_r()
 {
 	LOG("%s: ioevent_irqstate_r\n", machine().describe_context());
 	return m_ioevent_active;
 }
 
-WRITE8_MEMBER(xavix_state::ioevent_irqack_w)
+void xavix_state::ioevent_irqack_w(uint8_t data)
 {
 	LOG("%s: ioevent_irqack_w %02x\n", machine().describe_context(), data);
 
@@ -247,7 +247,7 @@ WRITE8_MEMBER(xavix_state::ioevent_irqack_w)
 
 
 
-WRITE8_MEMBER(xavix_state::slotreg_7810_w)
+void xavix_state::slotreg_7810_w(uint8_t data)
 {
 	LOG("%s: slotreg_7810_w %02x\n", machine().describe_context(), data);
 }
@@ -268,24 +268,24 @@ INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 }
 
 
-WRITE8_MEMBER(xavix_state::colmix_sh_w)
+void xavix_state::colmix_sh_w(offs_t offset, uint8_t data)
 {
 	m_colmix_sh[offset] = data;
 }
 
-WRITE8_MEMBER(xavix_state::colmix_l_w)
+void xavix_state::colmix_l_w(offs_t offset, uint8_t data)
 {
 	m_colmix_l[offset] = data;
 }
 
-WRITE8_MEMBER(xavix_state::colmix_6ff2_w)
+void xavix_state::colmix_6ff2_w(uint8_t data)
 {
 	LOG("%s: colmix_6ff2_w %02x\n", machine().describe_context(), data);
 	m_colmix_ctrl[0] = data;
 }
 
 
-READ8_MEMBER(xavix_state::dispctrl_6ff8_r)
+uint8_t xavix_state::dispctrl_6ff8_r()
 {
 	// 0x80 = main IRQ asserted flag
 	// 0x40 = raster IRQ asserted flag
@@ -296,7 +296,7 @@ READ8_MEMBER(xavix_state::dispctrl_6ff8_r)
 	return m_video_ctrl;
 }
 
-WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
+void xavix_state::dispctrl_6ff8_w(uint8_t data)
 {
 	// 0x80 = main IRQ ack?
 	// 0x40 = raster IRQ ack?
@@ -362,13 +362,13 @@ TIMER_CALLBACK_MEMBER(xavix_state::interrupt_gen)
 }
 
 
-WRITE8_MEMBER(xavix_state::dispctrl_posirq_x_w)
+void xavix_state::dispctrl_posirq_x_w(uint8_t data)
 {
 	LOG("%s: dispctrl_posirq_x_w %02x\n", machine().describe_context(), data);
 	m_posirq_x[0] = data;
 }
 
-WRITE8_MEMBER(xavix_state::dispctrl_posirq_y_w)
+void xavix_state::dispctrl_posirq_y_w(uint8_t data)
 {
 	LOG("%s: dispctrl_posirq_y_w %02x\n", machine().describe_context(), data);
 	m_posirq_y[0] = data;
@@ -576,39 +576,39 @@ void xavix_popira2_cart_state::write_io1(uint8_t data, uint8_t direction)
 
 /* General IO port handling */
 
-READ8_MEMBER(xavix_state::io0_data_r)
+uint8_t xavix_state::io0_data_r()
 {
 	uint8_t ret = read_io0(m_io0_direction) & ~m_io0_direction;
 	ret |= m_io0_data & m_io0_direction;
 	return ret;
 }
 
-READ8_MEMBER(xavix_state::io1_data_r)
+uint8_t xavix_state::io1_data_r()
 {
 	uint8_t ret = read_io1(m_io1_direction) & ~m_io1_direction;
 	ret |= m_io1_data & m_io1_direction;
 	return ret;
 }
 
-READ8_MEMBER(xavix_state::io0_direction_r)
+uint8_t xavix_state::io0_direction_r()
 {
 	return m_io0_direction;
 }
 
-READ8_MEMBER(xavix_state::io1_direction_r)
+uint8_t xavix_state::io1_direction_r()
 {
 	return m_io1_direction;
 }
 
 
-WRITE8_MEMBER(xavix_state::io0_data_w)
+void xavix_state::io0_data_w(uint8_t data)
 {
 	m_io0_data = data;
 	write_io0((data & m_io0_direction) | (read_io0(m_io0_direction) & ~m_io0_direction), m_io0_direction);
 	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_state::io1_data_w)
+void xavix_state::io1_data_w(uint8_t data)
 {
 	m_io1_data = data;
 	write_io1((data & m_io1_direction) | (read_io1(m_io1_direction) & ~m_io1_direction), m_io1_direction);
@@ -616,54 +616,54 @@ WRITE8_MEMBER(xavix_state::io1_data_w)
 }
 
 
-WRITE8_MEMBER(xavix_state::io0_direction_w)
+void xavix_state::io0_direction_w(uint8_t data)
 {
 	m_io0_direction = data;
 	LOG("%s: io0_direction_w %02x\n", machine().describe_context(), data);
-	io0_data_w(space, 0, m_io0_data);
+	io0_data_w(m_io0_data);
 }
 
-WRITE8_MEMBER(xavix_state::io1_direction_w)
+void xavix_state::io1_direction_w(uint8_t data)
 {
 	m_io1_direction = data;
 	LOG("%s: io1_direction_w %02x\n", machine().describe_context(), data);
-	io1_data_w(space, 0, m_io1_data); // requires this for i2cmem to work, is it correct tho?
+	io1_data_w(m_io1_data); // requires this for i2cmem to work, is it correct tho?
 }
 
 /* Arena (Visible Area + hblank?) handling */
 
-READ8_MEMBER(xavix_state::arena_start_r)
+uint8_t xavix_state::arena_start_r()
 {
 	//LOG("%s: arena_start_r\n", machine().describe_context());
 	return m_arena_start;
 }
 
-WRITE8_MEMBER(xavix_state::arena_start_w)
+void xavix_state::arena_start_w(uint8_t data)
 {
 	LOG("%s: arena_start_w %02x\n", machine().describe_context(), data);
 	m_arena_start = data; // expected to return data written
 
 }
-READ8_MEMBER(xavix_state::arena_end_r)
+uint8_t xavix_state::arena_end_r()
 {
 	LOG("%s: arena_end_r\n", machine().describe_context());
 	return m_arena_end;
 }
 
-WRITE8_MEMBER(xavix_state::arena_end_w)
+void xavix_state::arena_end_w(uint8_t data)
 {
 	LOG("%s: arena_end_w %02x\n", machine().describe_context(), data);
 	m_arena_end = data; // expected to return data written
 }
 
-READ8_MEMBER(xavix_state::arena_control_r)
+uint8_t xavix_state::arena_control_r()
 {
 	// xavtenni expects 0x40 to go high (interlace related?)
 	m_arena_control ^= 0x40;
 	return m_arena_control;
 }
 
-WRITE8_MEMBER(xavix_state::arena_control_w)
+void xavix_state::arena_control_w(uint8_t data)
 {
 	LOG("%s: arena_control_w %02x\n", machine().describe_context(), data);
 	m_arena_control = data;
@@ -674,20 +674,20 @@ WRITE8_MEMBER(xavix_state::arena_control_w)
 }
 
 
-READ8_MEMBER(xavix_state::timer_baseval_r)
+uint8_t xavix_state::timer_baseval_r()
 {
 	LOG("%s: timer_baseval_r\n", machine().describe_context());
 	return m_timer_baseval;
 }
 
-READ8_MEMBER(xavix_state::timer_status_r)
+uint8_t xavix_state::timer_status_r()
 {
 	uint8_t ret = m_timer_control;
 	LOG("%s: timer_status_r\n", machine().describe_context());
 	return ret;
 }
 
-WRITE8_MEMBER(xavix_state::timer_control_w)
+void xavix_state::timer_control_w(uint8_t data)
 {
 	/* timer is actively used by
 	   ttv_lotr, ttv_sw, drgqst, has_wamg, rad_rh, eka_*, epo_efdx, rad_bass, rad_bb2
@@ -729,20 +729,20 @@ WRITE8_MEMBER(xavix_state::timer_control_w)
 	}
 }
 
-WRITE8_MEMBER(xavix_state::timer_baseval_w)
+void xavix_state::timer_baseval_w(uint8_t data)
 {
 	// expected to return data written
 	m_timer_baseval = data;
 	LOG("%s: timer_baseval_w %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(xavix_state::timer_freq_r)
+uint8_t xavix_state::timer_freq_r()
 {
 	LOG("%s: timer_freq_r\n", machine().describe_context());
 	return m_timer_freq;
 }
 
-READ8_MEMBER(xavix_state::timer_curval_r)
+uint8_t xavix_state::timer_curval_r()
 {
 	// TODO implement properly with timers etc. as rad_fb / rad_madfb rely on these values to calculate throw strength!
 	LOG("%s: timer_curval_r\n", machine().describe_context());
@@ -750,7 +750,7 @@ READ8_MEMBER(xavix_state::timer_curval_r)
 }
 
 
-WRITE8_MEMBER(xavix_state::timer_freq_w)
+void xavix_state::timer_freq_w(uint8_t data)
 {
 	// 4-bit prescale
 	LOG("%s: timer_freq_w %02x\n", machine().describe_context(), data);
@@ -796,7 +796,7 @@ TIMER_CALLBACK_MEMBER(xavix_state::freq_timer_done)
 }
 
 
-READ8_MEMBER(xavix_state::irq_source_r)
+uint8_t xavix_state::irq_source_r()
 {
 	/* the 2nd IRQ routine (regular IRQ) reads here before deciding what to do
 
@@ -816,7 +816,7 @@ READ8_MEMBER(xavix_state::irq_source_r)
 	return m_irqsource;
 }
 
-WRITE8_MEMBER(xavix_state::irq_source_w)
+void xavix_state::irq_source_w(uint8_t data)
 {
 	LOG("%s: irq_source_w %02x\n", machine().describe_context(), data);
 	// cleared on startup in monster truck, no purpose?
@@ -993,19 +993,19 @@ int16_t xavix_state::get_vectors(int which, int half)
 
 // additional SuperXaviX / XaviX2002 stuff
 
-WRITE8_MEMBER(xavix_state::extended_extbus_reg0_w)
+void xavix_state::extended_extbus_reg0_w(uint8_t data)
 {
 	LOG("%s: extended_extbus_reg0_w %02x\n", machine().describe_context(), data);
 	m_sx_extended_extbus[0] = data;
 }
 
-WRITE8_MEMBER(xavix_state::extended_extbus_reg1_w)
+void xavix_state::extended_extbus_reg1_w(uint8_t data)
 {
 	LOG("%s: extended_extbus_reg1_w %02x\n", machine().describe_context(), data);
 	m_sx_extended_extbus[1] = data;
 }
 
-WRITE8_MEMBER(xavix_state::extended_extbus_reg2_w)
+void xavix_state::extended_extbus_reg2_w(uint8_t data)
 {
 	LOG("%s: extended_extbus_reg2_w %02x\n", machine().describe_context(), data);
 	m_sx_extended_extbus[2] = data;

@@ -119,10 +119,10 @@ public:
 
 	void enable_recompiler();
 
-	DECLARE_READ64_MEMBER( pm0_r);
-	DECLARE_WRITE64_MEMBER(pm0_w);
-	DECLARE_READ64_MEMBER( pm1_r);
-	DECLARE_WRITE64_MEMBER(pm1_w);
+	uint64_t pm0_r(offs_t offset);
+	void pm0_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t pm1_r(offs_t offset);
+	void pm1_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	DECLARE_READ32_MEMBER( dmw0_r);
 	DECLARE_WRITE32_MEMBER(dmw0_w);
 	DECLARE_READ32_MEMBER( dmw1_r);
