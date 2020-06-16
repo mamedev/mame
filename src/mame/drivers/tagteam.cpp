@@ -42,7 +42,7 @@ void tagteam_state::machine_start()
 	save_item(NAME(m_sound_nmi_mask));
 }
 
-WRITE8_MEMBER(tagteam_state::irq_clear_w)
+void tagteam_state::irq_clear_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
@@ -61,7 +61,7 @@ void tagteam_state::main_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-WRITE8_MEMBER(tagteam_state::sound_nmi_mask_w)
+void tagteam_state::sound_nmi_mask_w(uint8_t data)
 {
 	m_sound_nmi_mask = data & 1;
 }

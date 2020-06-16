@@ -168,4 +168,17 @@ Acorn BBC Micro - Z80 2nd Processor discs
 		</part>
 	</software>
 
+	<software name="z80winutil">
+		<description>Z80 Winchester Utilities</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="CP/M" />
+		<info name="usage" value="Requires Z80 2nd Processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="z80_winchester_utilities.ssd" size="204800" crc="4a0479da" sha1="8c29fe18228330a8c0bbbdd5c6510d9da61602c6"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

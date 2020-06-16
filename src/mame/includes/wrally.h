@@ -32,11 +32,11 @@ public:
 	void wrally(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(shareram_r);
-	DECLARE_WRITE8_MEMBER(shareram_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	uint8_t shareram_r(offs_t offset);
+	void shareram_w(offs_t offset, uint8_t data);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(okim6295_bankswitch_w);
+	void okim6295_bankswitch_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);

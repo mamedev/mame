@@ -279,7 +279,7 @@ void vip_state::update_interrupts()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER(vip_state::read)
+uint8_t vip_state::read(offs_t offset)
 {
 	int cs = BIT(offset, 15) || m_8000;
 	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
@@ -304,7 +304,7 @@ READ8_MEMBER(vip_state::read)
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER(vip_state::write)
+void vip_state::write(offs_t offset, uint8_t data)
 {
 	int cs = BIT(offset, 15) || m_8000;
 	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
@@ -323,7 +323,7 @@ WRITE8_MEMBER(vip_state::write)
 //  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER(vip_state::io_r)
+uint8_t vip_state::io_r(offs_t offset)
 {
 	uint8_t data = m_exp->io_r(offset);
 
@@ -352,7 +352,7 @@ READ8_MEMBER(vip_state::io_r)
 //  io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER(vip_state::io_w)
+void vip_state::io_w(offs_t offset, uint8_t data)
 {
 	m_exp->io_w(offset, data);
 

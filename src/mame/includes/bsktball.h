@@ -12,7 +12,9 @@
 
 #include "machine/timer.h"
 #include "sound/discrete.h"
+
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 /* Discrete Sound Input Nodes */
@@ -27,12 +29,13 @@ class bsktball_state : public driver_device
 public:
 	bsktball_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_motion(*this, "motion"),
-		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_discrete(*this, "discrete"),
+		m_videoram(*this, "videoram"),
+		m_motion(*this, "motion")
 	{ }
 
 	void bsktball(machine_config &config);
@@ -58,17 +61,21 @@ protected:
 	void main_map(address_map &map);
 
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<discrete_device> m_discrete;
+
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_motion;
-	required_device<discrete_device> m_discrete;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 
 	/* misc */
 	uint32_t   m_nmi_on;
-//  int      m_i256v;
 
 	/* input-related */
 	int m_ld1;
@@ -81,10 +88,6 @@ private:
 	int m_last_p1_vert;
 	int m_last_p2_horiz;
 	int m_last_p2_vert;
-
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 /*----------- defined in audio/bsktball.c -----------*/

@@ -51,7 +51,7 @@ void tankbatt_state::tankbatt_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(tankbatt_state::videoram_w)
+void tankbatt_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

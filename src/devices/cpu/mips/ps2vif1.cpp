@@ -240,7 +240,7 @@ WRITE32_MEMBER(ps2_vif1_device::regs_w)
 	logerror("%s: Write: Unknown %08x = %08x\n", machine().describe_context(), 0x10003c00 + (offset << 2), data);
 }
 
-READ64_MEMBER(ps2_vif1_device::mmio_r)
+uint64_t ps2_vif1_device::mmio_r(offs_t offset)
 {
 	uint64_t ret = 0ULL;
 	if (offset)
@@ -254,7 +254,7 @@ READ64_MEMBER(ps2_vif1_device::mmio_r)
 	return ret;
 }
 
-WRITE64_MEMBER(ps2_vif1_device::mmio_w)
+void ps2_vif1_device::mmio_w(offs_t offset, uint64_t data)
 {
 	if (offset)
 	{

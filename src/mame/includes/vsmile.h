@@ -52,7 +52,7 @@ protected:
 
 	void chip_sel_w(uint8_t data);
 
-	DECLARE_READ16_MEMBER(bank3_r);
+	uint16_t bank3_r(offs_t offset);
 
 	required_device<spg2xx_device> m_maincpu;
 	required_device<screen_device> m_screen;

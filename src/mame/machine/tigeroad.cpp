@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/tigeroad.h"
 
-READ16_MEMBER(pushman_state::mcu_comm_r)
+uint16_t pushman_state::mcu_comm_r(offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & 0x03)
 	{
@@ -20,7 +20,7 @@ READ16_MEMBER(pushman_state::mcu_comm_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(pushman_state::pushman_mcu_comm_w)
+void pushman_state::pushman_mcu_comm_w(offs_t offset, uint16_t data)
 {
 	switch (offset & 0x01)
 	{
@@ -35,7 +35,7 @@ WRITE16_MEMBER(pushman_state::pushman_mcu_comm_w)
 	}
 }
 
-WRITE16_MEMBER(pushman_state::bballs_mcu_comm_w)
+void pushman_state::bballs_mcu_comm_w(uint16_t data)
 {
 	m_host_latch = data;
 	m_host_semaphore = true;

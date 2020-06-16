@@ -687,7 +687,7 @@ void williams_state::blitter_init(int blitter_config, const uint8_t *remap_prom)
 }
 
 
-WRITE8_MEMBER(williams_state::blitter_w)
+void williams_state::blitter_w(address_space &space, offs_t offset, u8 data)
 {
 	/* store the data */
 	m_blitterram[offset] = data;

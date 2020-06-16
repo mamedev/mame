@@ -295,7 +295,7 @@ void taitoair_state::gradram_w(offs_t offset, u16 data, u16 mem_mask)
                 INPUTS
 ***********************************************************/
 
-READ16_MEMBER(taitoair_state::stick_input_r)
+u16 taitoair_state::stick_input_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -315,7 +315,7 @@ READ16_MEMBER(taitoair_state::stick_input_r)
 	return 0;
 }
 
-READ16_MEMBER(taitoair_state::stick2_input_r)
+u16 taitoair_state::stick2_input_r(offs_t offset)
 {
 	switch (offset)
 	{

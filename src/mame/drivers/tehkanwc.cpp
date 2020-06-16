@@ -112,7 +112,7 @@ void tehkanwc_state::machine_start()
 	m_digits.resolve();
 }
 
-WRITE8_MEMBER(tehkanwc_state::sub_cpu_halt_w)
+void tehkanwc_state::sub_cpu_halt_w(uint8_t data)
 {
 	if (data)
 		m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -121,7 +121,7 @@ WRITE8_MEMBER(tehkanwc_state::sub_cpu_halt_w)
 }
 
 
-READ8_MEMBER(tehkanwc_state::track_0_r)
+uint8_t tehkanwc_state::track_0_r(offs_t offset)
 {
 	int joy;
 
@@ -131,7 +131,7 @@ READ8_MEMBER(tehkanwc_state::track_0_r)
 	return ioport(offset ? "P1Y" : "P1X")->read() - m_track0[offset];
 }
 
-READ8_MEMBER(tehkanwc_state::track_1_r)
+uint8_t tehkanwc_state::track_1_r(offs_t offset)
 {
 	int joy;
 
@@ -141,13 +141,13 @@ READ8_MEMBER(tehkanwc_state::track_1_r)
 	return ioport(offset ? "P2Y" : "P2X")->read() - m_track1[offset];
 }
 
-WRITE8_MEMBER(tehkanwc_state::track_0_reset_w)
+void tehkanwc_state::track_0_reset_w(offs_t offset, uint8_t data)
 {
 	/* reset the trackball counters */
 	m_track0[offset] = ioport(offset ? "P1Y" : "P1X")->read() + data;
 }
 
-WRITE8_MEMBER(tehkanwc_state::track_1_reset_w)
+void tehkanwc_state::track_1_reset_w(offs_t offset, uint8_t data)
 {
 	/* reset the trackball counters */
 	m_track1[offset] = ioport(offset ? "P2Y" : "P2X")->read() + data;
@@ -155,7 +155,7 @@ WRITE8_MEMBER(tehkanwc_state::track_1_reset_w)
 
 
 
-WRITE8_MEMBER(tehkanwc_state::sound_command_w)
+void tehkanwc_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -173,7 +173,7 @@ void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
+void tehkanwc_state::sound_answer_w(uint8_t data)
 {
 	m_soundlatch2->write(data);
 

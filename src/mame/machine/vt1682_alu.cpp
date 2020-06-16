@@ -70,14 +70,14 @@ void vrt_vt1682_alu_device::device_reset()
     0x01 - ALU Output 1
 */
 
-READ8_MEMBER(vrt_vt1682_alu_device::alu_out_1_r)
+uint8_t vrt_vt1682_alu_device::alu_out_1_r()
 {
 	uint8_t ret = m_alu_out[0];
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_out_1_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_1_w)
+void vrt_vt1682_alu_device::alu_oprand_1_w(uint8_t data)
 {
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_oprand_1_w writing: %02x\n", machine().describe_context(), data);
 	m_alu_oprand[0] = data;
@@ -107,14 +107,14 @@ WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_1_w)
     0x01 - ALU Output 2
 */
 
-READ8_MEMBER(vrt_vt1682_alu_device::alu_out_2_r)
+uint8_t vrt_vt1682_alu_device::alu_out_2_r()
 {
 	uint8_t ret = m_alu_out[1];
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_out_2_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_2_w)
+void vrt_vt1682_alu_device::alu_oprand_2_w(uint8_t data)
 {
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_oprand_2_w writing: %02x\n", machine().describe_context(), data);
 	m_alu_oprand[1] = data;
@@ -144,14 +144,14 @@ WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_2_w)
     0x01 - ALU Output 3
 */
 
-READ8_MEMBER(vrt_vt1682_alu_device::alu_out_3_r)
+uint8_t vrt_vt1682_alu_device::alu_out_3_r()
 {
 	uint8_t ret = m_alu_out[2];
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_out_3_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_3_w)
+void vrt_vt1682_alu_device::alu_oprand_3_w(uint8_t data)
 {
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_oprand_3_w writing: %02x\n", machine().describe_context(), data);
 	m_alu_oprand[2] = data;
@@ -182,7 +182,7 @@ WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_3_w)
     0x01 - ALU Output 4
 */
 
-READ8_MEMBER(vrt_vt1682_alu_device::alu_out_4_r)
+uint8_t vrt_vt1682_alu_device::alu_out_4_r()
 {
 	uint8_t ret = m_alu_out[3];
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_out_4_r returning: %02x\n", machine().describe_context(), ret);
@@ -190,7 +190,7 @@ READ8_MEMBER(vrt_vt1682_alu_device::alu_out_4_r)
 }
 
 
-WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_4_w)
+void vrt_vt1682_alu_device::alu_oprand_4_w(uint8_t data)
 {
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_oprand_4_w writing: %02x\n", machine().describe_context(), data);
 	m_alu_oprand[3] = data;
@@ -220,7 +220,7 @@ WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_4_w)
     0x01 - ALU Output 5
 */
 
-READ8_MEMBER(vrt_vt1682_alu_device::alu_out_5_r)
+uint8_t vrt_vt1682_alu_device::alu_out_5_r()
 {
 	uint8_t ret = m_alu_out[4];
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_out_5_r returning: %02x\n", machine().describe_context(), ret);
@@ -228,7 +228,7 @@ READ8_MEMBER(vrt_vt1682_alu_device::alu_out_5_r)
 }
 
 
-WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_5_mult_w)
+void vrt_vt1682_alu_device::alu_oprand_5_mult_w(uint8_t data)
 {
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_oprand_5_mult_w writing: %02x\n", machine().describe_context(), data);
 	m_alu_oprand_mult[0] = data;
@@ -259,14 +259,14 @@ WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_5_mult_w)
     0x01 - ALU Output 6
 */
 
-READ8_MEMBER(vrt_vt1682_alu_device::alu_out_6_r)
+uint8_t vrt_vt1682_alu_device::alu_out_6_r()
 {
 	uint8_t ret = m_alu_out[5];
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_out_6_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_6_mult_w)
+void vrt_vt1682_alu_device::alu_oprand_6_mult_w(uint8_t data)
 {
 	// used one of the 32in1 menus
 
@@ -302,7 +302,7 @@ WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_6_mult_w)
 
 */
 
-WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_5_div_w)
+void vrt_vt1682_alu_device::alu_oprand_5_div_w(uint8_t data)
 {
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_oprand_5_div_w writing: %02x\n", machine().describe_context(), data);
 	m_alu_oprand_div[0] = data;
@@ -321,7 +321,7 @@ WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_5_div_w)
     0x01 - ALU Div Oprand 6
 */
 
-WRITE8_MEMBER(vrt_vt1682_alu_device::alu_oprand_6_div_w)
+void vrt_vt1682_alu_device::alu_oprand_6_div_w(uint8_t data)
 {
 	//LOGMASKED(LOG_ALU, "%s: alu_oprand_6_div_w writing: %02x\n", machine().describe_context(), data);
 	m_alu_oprand_div[1] = data;

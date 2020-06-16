@@ -3266,6 +3266,9 @@ cfa3000                         // 1989 Henson CFA 3000
 daisy                           // 1987 Comus Daisy
 discmon                         // 1988 Arbiter Discmonitor
 discmate                        // 1988 Arbiter Discmate
+mpc800                          // 1987 MasterPieCe 800
+mpc900                          // 1988 MasterPieCe 900
+mpc900gx                        // 1990 MasterPieCe 900GX
 econx25                         // 1986 Econet X25 Gateway
 ltmpbp                          // 1985 LTM Portable (B+)
 ltmpm                           // 1986 LTM Portable (Master)
@@ -9895,6 +9898,7 @@ dfeveron                        // (c) 1998 Cave + Nihon System license
 donpachi                        // (c) 1995 Atlus/Cave
 donpachihk                      // (c) 1995 Atlus/Cave
 donpachij                       // (c) 1995 Atlus/Cave
+donpachijs                      // (c) 1995 Atlus/Cave
 donpachikr                      // (c) 1995 Atlus/Cave
 esprade                         // (c) 1998 Atlus/Cave
 espradej                        // (c) 1998 Atlus/Cave (Japan)
@@ -34588,6 +34592,7 @@ raiden2e                        // (c) 1993 Seibu Kaihatsu
 raiden2eup
 raiden2ea                       // (c) 1993 Seibu Kaihatsu
 raiden2eg                       // (c) 1993 Seibu Kaihatsu + Tuning license
+raiden2es                       // (c) 1993 Seibu Kaihatsu
 raiden2eu                       // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2eua                      // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2f                        // (c) 1993 Seibu Kaihatsu

@@ -40,43 +40,43 @@
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( tmc2000e_state::vismac_r )
+uint8_t tmc2000e_state::vismac_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( tmc2000e_state::vismac_w )
+void tmc2000e_state::vismac_w(uint8_t data)
 {
 }
 
-READ8_MEMBER( tmc2000e_state::floppy_r )
-{
-	return 0;
-}
-
-WRITE8_MEMBER( tmc2000e_state::floppy_w )
-{
-}
-
-READ8_MEMBER( tmc2000e_state::ascii_keyboard_r )
+uint8_t tmc2000e_state::floppy_r()
 {
 	return 0;
 }
 
-READ8_MEMBER( tmc2000e_state::io_r )
+void tmc2000e_state::floppy_w(uint8_t data)
+{
+}
+
+uint8_t tmc2000e_state::ascii_keyboard_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( tmc2000e_state::io_w )
+uint8_t tmc2000e_state::io_r()
+{
+	return 0;
+}
+
+void tmc2000e_state::io_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( tmc2000e_state::io_select_w )
+void tmc2000e_state::io_select_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( tmc2000e_state::keyboard_latch_w )
+void tmc2000e_state::keyboard_latch_w(uint8_t data)
 {
 	m_keylatch = data;
 }

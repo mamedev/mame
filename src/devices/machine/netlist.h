@@ -332,10 +332,10 @@ public:
 			write(newval);
 	}
 	inline DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
-	inline DECLARE_WRITE8_MEMBER(write8)               { write(data);   }
-	inline DECLARE_WRITE16_MEMBER(write16)             { write(data);   }
-	inline DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
-	inline DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
+	inline void write8(uint8_t data)               { write(data);   }
+	inline void write16(uint16_t data)             { write(data);   }
+	inline void write32(uint32_t data)             { write(data);   }
+	inline void write64(uint64_t data)             { write(data);   }
 
 	virtual void validity_helper(validity_checker &valid,
 		netlist::netlist_state_t &nlstate) const override;
@@ -432,10 +432,10 @@ public:
 
 	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
 	DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
-	DECLARE_WRITE8_MEMBER(write8)               { write(data);   }
-	DECLARE_WRITE16_MEMBER(write16)             { write(data);   }
-	DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
-	DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
+	void write8(uint8_t data)               { write(data);   }
+	void write16(uint16_t data)             { write(data);   }
+	void write32(uint32_t data)             { write(data);   }
+	void write64(uint64_t data)             { write(data);   }
 
 	virtual void validity_helper(validity_checker &valid, netlist::netlist_state_t &nlstate) const override;
 
@@ -473,10 +473,10 @@ public:
 
 	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
 	DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
-	DECLARE_WRITE8_MEMBER(write8)               { write(data);   }
-	DECLARE_WRITE16_MEMBER(write16)             { write(data);   }
-	DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
-	DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
+	void write8(uint8_t data)               { write(data);   }
+	void write16(uint16_t data)             { write(data);   }
+	void write32(uint32_t data)             { write(data);   }
+	void write64(uint64_t data)             { write(data);   }
 
 	virtual void validity_helper(validity_checker &valid, netlist::netlist_state_t &nlstate) const override;
 

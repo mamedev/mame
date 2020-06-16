@@ -198,8 +198,8 @@ private:
 	void machine_start() override;
 	void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER( x07_io_r );
-	DECLARE_WRITE8_MEMBER( x07_io_w );
+	uint8_t x07_io_r(offs_t offset);
+	void x07_io_w(offs_t offset, uint8_t data);
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 

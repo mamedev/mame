@@ -68,17 +68,17 @@ void tandy2k_state::speaker_update()
 	m_speaker->level_w(level);
 }
 
-READ8_MEMBER( tandy2k_state::char_ram_r )
+uint8_t tandy2k_state::char_ram_r(offs_t offset)
 {
 	return m_char_ram[offset];
 }
 
-WRITE8_MEMBER( tandy2k_state::char_ram_w )
+void tandy2k_state::char_ram_w(offs_t offset, uint8_t data)
 {
 	m_char_ram[offset] = data;
 }
 
-READ8_MEMBER( tandy2k_state::videoram_r )
+uint8_t tandy2k_state::videoram_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -94,7 +94,7 @@ READ8_MEMBER( tandy2k_state::videoram_r )
 	return data & 0xff;
 }
 
-READ8_MEMBER( tandy2k_state::enable_r )
+uint8_t tandy2k_state::enable_r()
 {
 	/*
 
@@ -119,7 +119,7 @@ READ8_MEMBER( tandy2k_state::enable_r )
 	return data;
 }
 
-WRITE8_MEMBER( tandy2k_state::enable_w )
+void tandy2k_state::enable_w(uint8_t data)
 {
 	/*
 
@@ -169,7 +169,7 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 	m_maincpu->tmrin1_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER( tandy2k_state::dma_mux_w )
+void tandy2k_state::dma_mux_w(uint8_t data)
 {
 	/*
 
@@ -206,7 +206,7 @@ WRITE8_MEMBER( tandy2k_state::dma_mux_w )
 	update_drq();
 }
 
-READ8_MEMBER( tandy2k_state::kbint_clr_r )
+uint8_t tandy2k_state::kbint_clr_r()
 {
 	if (m_pb_sel == KBDINEN)
 	{
@@ -219,7 +219,7 @@ READ8_MEMBER( tandy2k_state::kbint_clr_r )
 	return 0xff;
 }
 
-READ8_MEMBER( tandy2k_state::clkmouse_r )
+uint8_t tandy2k_state::clkmouse_r(offs_t offset)
 {
 	uint8_t ret = 0;
 	switch (offset)
@@ -241,7 +241,7 @@ READ8_MEMBER( tandy2k_state::clkmouse_r )
 	return ret;
 }
 
-WRITE8_MEMBER( tandy2k_state::clkmouse_w )
+void tandy2k_state::clkmouse_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -290,22 +290,22 @@ WRITE8_MEMBER( tandy2k_state::clkmouse_w )
 	}
 }
 
-READ8_MEMBER( tandy2k_state::fldtc_r )
+uint8_t tandy2k_state::fldtc_r()
 {
 	if (LOG) logerror("FLDTC\n");
 
-	fldtc_w(space, 0, 0);
+	fldtc_w(0);
 
 	return 0;
 }
 
-WRITE8_MEMBER( tandy2k_state::fldtc_w )
+void tandy2k_state::fldtc_w(uint8_t data)
 {
 	m_fdc->tc_w(1);
 	m_fdc->tc_w(false);
 }
 
-WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
+void tandy2k_state::addr_ctrl_w(uint8_t data)
 {
 	/*
 
@@ -567,7 +567,7 @@ WRITE_LINE_MEMBER( tandy2k_state::vpac_sld_w )
 	m_vac->sld_w(state);
 }
 
-WRITE8_MEMBER( tandy2k_state::hires_plane_w )
+void tandy2k_state::hires_plane_w(uint8_t data)
 {
 	int bank = 3;
 	if (((data & 1) + ((data >> 1) & 1) + ((data >> 2) & 1)) == 1)
@@ -579,7 +579,7 @@ WRITE8_MEMBER( tandy2k_state::hires_plane_w )
 // bit 0 - 0 = hires board installed
 // bit 1 - 0 = 1 plane, 1 = 3 planes
 // bit 2-4 - board rev
-READ8_MEMBER( tandy2k_state::hires_status_r )
+uint8_t tandy2k_state::hires_status_r()
 {
 	return 2;
 }

@@ -194,7 +194,7 @@ void adsp21062_device::sharc_iop_delayed_w(uint32_t reg, uint32_t data, int cycl
 // 3 ab9 5h 5l 4l
 // 4 cde 6h 6l 7h
 
-READ64_MEMBER( adsp21062_device::pm0_r)
+uint64_t adsp21062_device::pm0_r(offs_t offset)
 {
 	offs_t slot = offset >> 12;
 	offs_t base = (offset & 0xfff) + (slot >> 1) * (3<<12);
@@ -204,7 +204,7 @@ READ64_MEMBER( adsp21062_device::pm0_r)
 		return (uint64_t(m_block0[base         ]) << 16) | (m_block0[base + 0x1000] >> 16);
 }
 
-WRITE64_MEMBER(adsp21062_device::pm0_w)
+void adsp21062_device::pm0_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	offs_t slot = offset >> 12;
 	offs_t base = (offset & 0xfff) + (slot >> 1) * (3<<12);
@@ -219,7 +219,7 @@ WRITE64_MEMBER(adsp21062_device::pm0_w)
 	}
 }
 
-READ64_MEMBER( adsp21062_device::pm1_r)
+uint64_t adsp21062_device::pm1_r(offs_t offset)
 {
 	offs_t slot = offset >> 12;
 	offs_t base = (offset & 0xfff) + (slot >> 1) * (3<<12);
@@ -229,7 +229,7 @@ READ64_MEMBER( adsp21062_device::pm1_r)
 		return (uint64_t(m_block1[base         ]) << 16) | (m_block1[base + 0x1000] >> 16);
 }
 
-WRITE64_MEMBER(adsp21062_device::pm1_w)
+void adsp21062_device::pm1_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	offs_t slot = offset >> 12;
 	offs_t base = (offset & 0xfff) + (slot >> 1) * (3<<12);

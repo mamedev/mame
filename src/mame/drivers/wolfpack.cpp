@@ -60,7 +60,7 @@ READ_LINE_MEMBER(wolfpack_state::dial_r)
 }
 
 
-READ8_MEMBER(wolfpack_state::misc_r)
+uint8_t wolfpack_state::misc_r()
 {
 	uint8_t val = 0;
 
@@ -86,43 +86,43 @@ READ8_MEMBER(wolfpack_state::misc_r)
 }
 
 
-WRITE8_MEMBER(wolfpack_state::high_explo_w){ }
-WRITE8_MEMBER(wolfpack_state::sonar_ping_w){}
-WRITE8_MEMBER(wolfpack_state::sirlat_w){}
-WRITE8_MEMBER(wolfpack_state::pt_sound_w){}
-WRITE8_MEMBER(wolfpack_state::launch_torpedo_w){}
-WRITE8_MEMBER(wolfpack_state::low_explo_w){}
-WRITE8_MEMBER(wolfpack_state::screw_cont_w){}
-WRITE8_MEMBER(wolfpack_state::lamp_flash_w){}
-WRITE8_MEMBER(wolfpack_state::warning_light_w){}
-WRITE8_MEMBER(wolfpack_state::audamp_w){}
+void wolfpack_state::high_explo_w(uint8_t data){ }
+void wolfpack_state::sonar_ping_w(uint8_t data){}
+void wolfpack_state::sirlat_w(uint8_t data){}
+void wolfpack_state::pt_sound_w(uint8_t data){}
+void wolfpack_state::launch_torpedo_w(uint8_t data){}
+void wolfpack_state::low_explo_w(uint8_t data){}
+void wolfpack_state::screw_cont_w(uint8_t data){}
+void wolfpack_state::lamp_flash_w(uint8_t data){}
+void wolfpack_state::warning_light_w(uint8_t data){}
+void wolfpack_state::audamp_w(uint8_t data){}
 
-WRITE8_MEMBER(wolfpack_state::word_w)
+void wolfpack_state::word_w(uint8_t data)
 {
 	/* latch word from bus into temp register, and place on s14001a input bus */
 	/* there is no real need for a temp register at all, since the bus 'register' acts as one */
 	m_s14001a->data_w(data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
 }
 
-WRITE8_MEMBER(wolfpack_state::start_speech_w)
+void wolfpack_state::start_speech_w(uint8_t data)
 {
 	m_s14001a->start_w(data&1);
 }
 
 
-WRITE8_MEMBER(wolfpack_state::attract_w)
+void wolfpack_state::attract_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_global_w(!(data & 1));
 }
 
 
-WRITE8_MEMBER(wolfpack_state::credit_w)
+void wolfpack_state::credit_w(uint8_t data)
 {
 	m_led = BIT(~data, 0);
 }
 
 
-WRITE8_MEMBER(wolfpack_state::coldetres_w)
+void wolfpack_state::coldetres_w(uint8_t data)
 {
 	m_collision = 0;
 }

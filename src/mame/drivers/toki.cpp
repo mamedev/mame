@@ -103,13 +103,13 @@ Notes:
 #include "speaker.h"
 
 
-WRITE16_MEMBER(toki_state::tokib_soundcommand_w)
+void toki_state::tokib_soundcommand_w(uint16_t data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-READ16_MEMBER(toki_state::pip_r)
+uint16_t toki_state::pip_r()
 {
 	return ~0;
 }
@@ -126,7 +126,7 @@ WRITE_LINE_MEMBER(toki_state::tokib_adpcm_int)
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(toki_state::tokib_adpcm_control_w)
+void toki_state::tokib_adpcm_control_w(uint8_t data)
 {
 	/* the code writes either 2 or 3 in the bottom two bits */
 	membank("bank1")->set_entry(data & 1);
@@ -134,7 +134,7 @@ WRITE8_MEMBER(toki_state::tokib_adpcm_control_w)
 	m_msm->reset_w(data & 0x08);
 }
 
-WRITE8_MEMBER(toki_state::tokib_adpcm_data_w)
+void toki_state::tokib_adpcm_data_w(uint8_t data)
 {
 	m_msm5205next = data;
 }
@@ -234,7 +234,7 @@ void toki_state::jujuba_audio_opcodes_map(address_map &map)
 	map(0x8000, 0xffff).bankr("seibu_bank1");
 }
 
-READ8_MEMBER(toki_state::jujuba_z80_data_decrypt)
+uint8_t toki_state::jujuba_z80_data_decrypt(offs_t offset)
 {
 	return m_audiocpu_rom[offset] ^ 0x55;
 }
