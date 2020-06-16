@@ -34,12 +34,12 @@ namespace bx
 
 	ProcessReader::~ProcessReader()
 	{
-		BX_CHECK(NULL == m_file, "Process not closed!");
+		BX_ASSERT(NULL == m_file, "Process not closed!");
 	}
 
 	bool ProcessReader::open(const FilePath& _filePath, const StringView& _args, Error* _err)
 	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+		BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 		if (NULL != m_file)
 		{
@@ -64,7 +64,7 @@ namespace bx
 
 	void ProcessReader::close()
 	{
-		BX_CHECK(NULL != m_file, "Process not open!");
+		BX_ASSERT(NULL != m_file, "Process not open!");
 		FILE* file = (FILE*)m_file;
 		m_exitCode = pclose(file);
 		m_file = NULL;
@@ -72,7 +72,7 @@ namespace bx
 
 	int32_t ProcessReader::read(void* _data, int32_t _size, Error* _err)
 	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors."); BX_UNUSED(_err);
+		BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors."); BX_UNUSED(_err);
 
 		FILE* file = (FILE*)m_file;
 		int32_t size = (int32_t)fread(_data, 1, _size, file);
@@ -105,12 +105,12 @@ namespace bx
 
 	ProcessWriter::~ProcessWriter()
 	{
-		BX_CHECK(NULL == m_file, "Process not closed!");
+		BX_ASSERT(NULL == m_file, "Process not closed!");
 	}
 
 	bool ProcessWriter::open(const FilePath& _filePath, const StringView& _args, Error* _err)
 	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+		BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 		if (NULL != m_file)
 		{
@@ -135,7 +135,7 @@ namespace bx
 
 	void ProcessWriter::close()
 	{
-		BX_CHECK(NULL != m_file, "Process not open!");
+		BX_ASSERT(NULL != m_file, "Process not open!");
 		FILE* file = (FILE*)m_file;
 		m_exitCode = pclose(file);
 		m_file = NULL;
@@ -143,7 +143,7 @@ namespace bx
 
 	int32_t ProcessWriter::write(const void* _data, int32_t _size, Error* _err)
 	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors."); BX_UNUSED(_err);
+		BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors."); BX_UNUSED(_err);
 
 		FILE* file = (FILE*)m_file;
 		int32_t size = (int32_t)fwrite(_data, 1, _size, file);

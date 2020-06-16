@@ -230,9 +230,9 @@
 #	define BX_CLASS(_class, ...) BX_MACRO_DISPATCHER(BX_CLASS_, __VA_ARGS__)(_class, __VA_ARGS__)
 #endif // BX_COMPILER_MSVC
 
-#ifndef BX_CHECK
-#	define BX_CHECK(_condition, ...) BX_NOOP()
-#endif // BX_CHECK
+#ifndef BX_ASSERT
+#	define BX_ASSERT(_condition, ...) BX_NOOP()
+#endif // BX_ASSERT
 
 #ifndef BX_TRACE
 #	define BX_TRACE(...) BX_NOOP()
@@ -240,7 +240,7 @@
 
 #ifndef BX_WARN
 #	define BX_WARN(_condition, ...) BX_NOOP()
-#endif // BX_CHECK
+#endif // BX_ASSERT
 
 // static_assert sometimes causes unused-local-typedef...
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wunused-local-typedef")

@@ -100,7 +100,7 @@ namespace bx
 
 		virtual bool open(const FilePath& _filePath, Error* _err) override
 		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 			if (NULL != m_file)
 			{
@@ -131,15 +131,15 @@ namespace bx
 
 		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) override
 		{
-			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
+			BX_ASSERT(NULL != m_file, "Reader/Writer file is not open.");
 			fseeko64(m_file, _offset, _whence);
 			return ftello64(m_file);
 		}
 
 		virtual int32_t read(void* _data, int32_t _size, Error* _err) override
 		{
-			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_ASSERT(NULL != m_file, "Reader/Writer file is not open.");
+			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 			int32_t size = (int32_t)fread(_data, 1, _size, m_file);
 			if (size != _size)
@@ -180,7 +180,7 @@ namespace bx
 
 		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) override
 		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 			if (NULL != m_file)
 			{
@@ -212,15 +212,15 @@ namespace bx
 
 		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) override
 		{
-			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
+			BX_ASSERT(NULL != m_file, "Reader/Writer file is not open.");
 			fseeko64(m_file, _offset, _whence);
 			return ftello64(m_file);
 		}
 
 		virtual int32_t write(const void* _data, int32_t _size, Error* _err) override
 		{
-			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_ASSERT(NULL != m_file, "Reader/Writer file is not open.");
+			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 			int32_t size = (int32_t)fwrite(_data, 1, _size, m_file);
 			if (size != _size)
@@ -272,7 +272,7 @@ namespace bx
 
 		virtual bool open(const FilePath& _filePath, Error* _err) override
 		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 			if (0 != m_fd)
 			{
@@ -304,14 +304,14 @@ namespace bx
 
 		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) override
 		{
-			BX_CHECK(0 != m_fd, "Reader/Writer file is not open.");
+			BX_ASSERT(0 != m_fd, "Reader/Writer file is not open.");
 			return crt0::seek(m_fd, _offset, crt0::Whence::Enum(_whence) );
 		}
 
 		virtual int32_t read(void* _data, int32_t _size, Error* _err) override
 		{
-			BX_CHECK(0 != m_fd, "Reader/Writer file is not open.");
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_ASSERT(0 != m_fd, "Reader/Writer file is not open.");
+			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 			int32_t size = crt0::read(m_fd, _data, _size);
 			if (size != _size)
@@ -353,7 +353,7 @@ namespace bx
 
 		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) override
 		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 			if (0 != m_fd)
 			{
@@ -385,14 +385,14 @@ namespace bx
 
 		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) override
 		{
-			BX_CHECK(0 != m_fd, "Reader/Writer file is not open.");
+			BX_ASSERT(0 != m_fd, "Reader/Writer file is not open.");
 			return crt0::seek(m_fd, _offset, crt0::Whence::Enum(_whence) );
 		}
 
 		virtual int32_t write(const void* _data, int32_t _size, Error* _err) override
 		{
-			BX_CHECK(0 != m_fd, "Reader/Writer file is not open.");
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_ASSERT(0 != m_fd, "Reader/Writer file is not open.");
+			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 			int32_t size = crt0::write(m_fd, _data, _size);
 			if (size != _size)
@@ -582,7 +582,7 @@ namespace bx
 
 		virtual bool open(const FilePath& _filePath, Error* _err) override
 		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 			m_dir = opendir(_filePath.getCPtr() );
 
@@ -608,7 +608,7 @@ namespace bx
 
 		virtual int32_t read(void* _data, int32_t _size, Error* _err) override
 		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 			int32_t total = 0;
 
@@ -701,7 +701,7 @@ namespace bx
 		virtual int32_t read(void* _data, int32_t _size, Error* _err) override
 		{
 			BX_UNUSED(_data, _size);
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "DirectoryReader: EOF.");
 			return 0;
 		}
