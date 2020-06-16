@@ -49,6 +49,7 @@ TODO:
 #include "machine/taitoio.h"
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
+#include "speaker.h"
 #include "includes/galastrm.h"
 
 
@@ -220,7 +221,12 @@ void galastrm_state::galastrm(machine_config &config)
 	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
-	TAITO_EN(config, "taito_en", 0);
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en.add_route(0, "lspeaker", 1.0);
+	taito_en.add_route(1, "rspeaker", 1.0);
 }
 
 /***************************************************************************/
@@ -251,7 +257,7 @@ ROM_START( galastrm )
 	ROM_REGION16_LE( 0x80000, "sprmaprom", 0 )
 	ROM_LOAD16_WORD( "c99-11.ic90",  0x00000,  0x80000, CRC(26a6926c) SHA1(918860e2829131e9ecfe983b2ae3e49e1c9ecd72) )  /* STY, spritemap */
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "c99-08.ic3",  0x000000, 0x100000, CRC(fedb4187) SHA1(83563e4af795a0dfeb261a62c31b6fed72f45a4d) )  /* Ensoniq samples */
 	ROM_LOAD16_BYTE( "c99-09.ic4",  0x200000, 0x100000, CRC(ba70b86b) SHA1(ffbb9547d6b6e47a3ef23206b5f40c57f3ea7619) )
 	ROM_LOAD16_BYTE( "c99-10.ic5",  0x400000, 0x100000, CRC(da016f1e) SHA1(581ef158c6f6576618dd75429b1d3aa92cd3581d) )

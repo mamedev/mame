@@ -50,6 +50,7 @@
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "screen.h"
+#include "speaker.h"
 
 #include "superchs.lh"
 
@@ -248,7 +249,12 @@ void superchs_state::superchs(machine_config &config)
 	m_tc0480scp->set_offsets_tx(-1, 0);
 
 	/* sound hardware */
-	TAITO_EN(config, "taito_en", 0);
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en.add_route(0, "lspeaker", 1.0);
+	taito_en.add_route(1, "rspeaker", 1.0);
 }
 
 void superchs_state::chase3(machine_config &config)
@@ -289,7 +295,7 @@ ROM_START( superchs )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d46-07.ic34", 0x00000, 0x80000, CRC(c3b8b093) SHA1(f34364248ca7fdaaa1a0f8f6f795f9b4bc935fb9) )    /* STY, used to create big sprites on the fly */
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq" , ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d46-10.ic2", 0xc00000, 0x200000, CRC(306256be) SHA1(e6e5d4a4c0b98470f2aff2e94624dd19af73ec5d) )
 	ROM_LOAD16_BYTE( "d46-12.ic4", 0x000000, 0x200000, CRC(a24a53a8) SHA1(5d5fb87a94ceabda89360064d7d9b6d23c4c606b) )
 	ROM_RELOAD     (               0x400000, 0x200000 )
@@ -339,7 +345,7 @@ ROM_START( superchsu )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d46-07.ic34", 0x00000, 0x80000, CRC(c3b8b093) SHA1(f34364248ca7fdaaa1a0f8f6f795f9b4bc935fb9) )    /* STY, used to create big sprites on the fly */
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq" , ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d46-10.ic2", 0xc00000, 0x200000, CRC(306256be) SHA1(e6e5d4a4c0b98470f2aff2e94624dd19af73ec5d) )
 	ROM_LOAD16_BYTE( "d46-12.ic4", 0x000000, 0x200000, CRC(a24a53a8) SHA1(5d5fb87a94ceabda89360064d7d9b6d23c4c606b) )
 	ROM_RELOAD     (               0x400000, 0x200000 )
@@ -389,7 +395,7 @@ ROM_START( superchsj )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d46-07.ic34", 0x00000, 0x80000, CRC(c3b8b093) SHA1(f34364248ca7fdaaa1a0f8f6f795f9b4bc935fb9) )    /* STY, used to create big sprites on the fly */
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq" , ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d46-10.ic2", 0xc00000, 0x200000, CRC(306256be) SHA1(e6e5d4a4c0b98470f2aff2e94624dd19af73ec5d) )
 	ROM_LOAD16_BYTE( "d46-09.ic4", 0x000000, 0x200000, CRC(0acb8bc7) SHA1(62d66925f0eee4cee282c4e0972e08d12acf331c) )
 	ROM_RELOAD     (               0x400000, 0x200000 )
@@ -454,7 +460,7 @@ ROM_START( superchsp )
 	ROM_LOAD16_BYTE( "0style.ic28", 0x00000, 0x40000, CRC(161263e5) SHA1(3b501dd9c543a9505c3fd7627aa42434eeb1a531) )
 	ROM_LOAD16_BYTE( "8style.ic27", 0x00001, 0x40000, CRC(b32f246c) SHA1(be950f0da5d839978961cb77745427ac0bd83a5c) )
 
-	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_REGION16_BE(0x800000, "taito_en:ensoniq" , ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("0wave.ic1", 0x000000, 0x080000, CRC(3ffdc22e) SHA1(16cc02895a0219fdecec5da3ce37bb246e511a1f) )
 	ROM_LOAD16_BYTE("1wave.ic2", 0x100000, 0x080000, CRC(2ffc7b82) SHA1(e7837753bf4b85fc2973ef4d70afac47a614830c) )
 	ROM_LOAD16_BYTE("2wave.ic3", 0x200000, 0x080000, CRC(ab976601) SHA1(2edfceb3bfbc65b61a0f8358b24242c2cf0eebcf) )
@@ -512,7 +518,7 @@ ROM_START( superchsp2 )
 	ROM_LOAD16_BYTE( "28.ic27", 0x00001, 0x40000, CRC(94bf0bc3) SHA1(9b0d4517e9c3f3a5833fe773b8e2774b9a42f48f) )
 
 	// real ROM labels is unknown
-	ROM_REGION16_BE(0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_REGION16_BE(0x1000000, "taito_en:ensoniq" , ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("0wave.ic1",   0x000000, 0x080000, CRC(3426d5fc) SHA1(e4c846b5e6adc0e0dfc1fc6b1f8867401e859051) )
 	ROM_LOAD16_BYTE("1wave.ic2",   0x100000, 0x080000, CRC(86bfd6cb) SHA1(c9d95a079393b911b476e82f6f9319d510d27e31) )
 	ROM_LOAD16_BYTE("2wave.ic3",   0x200000, 0x080000, CRC(39ceebab) SHA1(f4bb61b83be8d40762f0d1da69a54778eea11c50) )

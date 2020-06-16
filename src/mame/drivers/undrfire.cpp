@@ -201,6 +201,7 @@ Board contains only 29 ROMs and not much else.
 #include "machine/watchdog.h"
 #include "sound/es5506.h"
 #include "screen.h"
+#include "speaker.h"
 
 #include "cbombers.lh"
 
@@ -554,7 +555,12 @@ void undrfire_state::undrfire(machine_config &config)
 	m_tc0480scp->set_offsets_tx(-1, 0);
 
 	/* sound hardware */
-	TAITO_EN(config, "taito_en", 0);
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en.add_route(0, "lspeaker", 1.0);
+	taito_en.add_route(1, "rspeaker", 1.0);
 }
 
 
@@ -612,7 +618,12 @@ void undrfire_state::cbombers(machine_config &config)
 	m_tc0480scp->set_col_base(4096);
 
 	/* sound hardware */
-	TAITO_EN(config, "taito_en", 0);
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en.add_route(0, "lspeaker", 1.0);
+	taito_en.add_route(1, "rspeaker", 1.0);
 }
 
 
@@ -652,7 +663,7 @@ ROM_START( undrfire )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d67-13", 0x00000,  0x80000,  CRC(42e7690d) SHA1(5f00f3f814653733bf9a5cb010675799de02fa76) )   /* STY, spritemap */
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d67-01", 0x000000, 0x200000, CRC(a2f18122) SHA1(640014c6e6d66c59fe0accf370ad3bab9f40429a) )   /* Ensoniq samples */
 	ROM_LOAD16_BYTE( "d67-02", 0xc00000, 0x200000, CRC(fceb715e) SHA1(9326513acb0696669d4f2345649ab37c8c6ed171) )
 
@@ -693,7 +704,7 @@ ROM_START( undrfireu )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d67-13", 0x00000,  0x80000,  CRC(42e7690d) SHA1(5f00f3f814653733bf9a5cb010675799de02fa76) )   /* STY, spritemap */
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d67-01", 0x000000, 0x200000, CRC(a2f18122) SHA1(640014c6e6d66c59fe0accf370ad3bab9f40429a) )   /* Ensoniq samples */
 	ROM_LOAD16_BYTE( "d67-02", 0xc00000, 0x200000, CRC(fceb715e) SHA1(9326513acb0696669d4f2345649ab37c8c6ed171) )
 
@@ -733,7 +744,7 @@ ROM_START( undrfirej )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d67-13", 0x00000,  0x80000,  CRC(42e7690d) SHA1(5f00f3f814653733bf9a5cb010675799de02fa76) )   /* STY, spritemap */
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d67-01", 0x000000, 0x200000, CRC(a2f18122) SHA1(640014c6e6d66c59fe0accf370ad3bab9f40429a) )   /* Ensoniq samples */
 	ROM_LOAD16_BYTE( "d67-02", 0xc00000, 0x200000, CRC(fceb715e) SHA1(9326513acb0696669d4f2345649ab37c8c6ed171) )
 
@@ -786,7 +797,7 @@ ROM_START( cbombers )
 	ROM_REGION( 0x40000, "spritemaphi", 0 )
 	ROM_LOAD( "d83_30.ic9", 0x00000,  0x40000,  CRC(eb86dc67) SHA1(31c7b6f30ff912fafed4b87ce8bf603ee17d1664) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq" , ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d83_01.ic40", 0xc00000, 0x200000, CRC(912799f4) SHA1(22f69e61519d2cddcfc4e4c9601e78a9d5265d5b) )
 	ROM_LOAD16_BYTE( "d83_02.ic39", 0x000000, 0x200000, CRC(2abca020) SHA1(3491a95651ca89b7fe6d040b8576fa7646bfe84b) )
 	ROM_RELOAD     (                0x400000, 0x200000 )
@@ -841,7 +852,7 @@ ROM_START( cbombersj )
 	ROM_REGION( 0x40000, "spritemaphi", 0 )
 	ROM_LOAD( "d83_30.ic9", 0x00000,  0x40000,  CRC(eb86dc67) SHA1(31c7b6f30ff912fafed4b87ce8bf603ee17d1664) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq" , ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d83_01.ic40", 0xc00000, 0x200000, CRC(912799f4) SHA1(22f69e61519d2cddcfc4e4c9601e78a9d5265d5b) )
 	ROM_LOAD16_BYTE( "d83_02.ic39", 0x000000, 0x200000, CRC(2abca020) SHA1(3491a95651ca89b7fe6d040b8576fa7646bfe84b) )
 	ROM_RELOAD     (                0x400000, 0x200000 )
@@ -930,7 +941,7 @@ ROM_START( cbombersp )
 	ROM_REGION( 0x40000, "spritemaphi", 0 )
 	ROM_LOAD( "st16_ic3.bin", 0x00000,  0x40000, CRC(c4ff6b2f) SHA1(65795bcb3749cce9c291204cd64fafa529317e14) )
 
-	ROM_REGION16_BE( 0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq" , ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("ic84_0816_wave0.bin", 0x000000, 0x080000, CRC(c30c71fd) SHA1(4240a23120b85f9daf6a462770185614fa758e4d) )
 	ROM_LOAD16_BYTE("ic85_8058_wave1.bin", 0x100000, 0x080000, CRC(fe37d544) SHA1(75c23b4e4e2efbbda1724a557f68c3bf1e5016c6) )
 	ROM_LOAD16_BYTE("ic86_9e88_wave2.bin", 0x200000, 0x080000, CRC(d6dcb45d) SHA1(ec69fb0a9fc6f7e72850775656e9fcd185889825) )

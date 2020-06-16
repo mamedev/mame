@@ -18,7 +18,7 @@
 #include "machine/mb87078.h"
 #include "machine/mb8421.h"
 
-class taito_en_device : public device_t
+class taito_en_device : public device_t, public device_mixer_interface
 
 {
 public:
@@ -36,6 +36,7 @@ protected:
 
 private:
 	void en_sound_map(address_map &map);
+	void en_otis_map(address_map &map);
 	void fc7_map(address_map &map);
 
 	// inherited devices/pointers
@@ -50,14 +51,18 @@ private:
 
 	required_memory_region m_osrom;
 	required_memory_bank_array<3> m_cpubank;
+	required_memory_region m_otisrom;
+	required_memory_bank m_otisbank;
 
-	uint32_t m_bankmask;
+	uint32_t m_bankmask = 1;
+	uint32_t m_oldbank = 0;
 
 	IRQ_CALLBACK_MEMBER(duart_iack);
 	void duart_output(uint8_t data);
 
 	void mb87078_gain_changed(offs_t offset, uint8_t data);
 	void es5505_clock_changed(u32 data);
+	void es5505_exbank_cb(offs_t offset, u32 data);
 
 	void en_es5505_bank_w(offs_t offset, uint16_t data);
 	void en_volume_w(offs_t offset, uint8_t data);

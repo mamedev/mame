@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "taito_en.h"
-#include "speaker.h"
 #include <algorithm>
 
 
@@ -24,6 +23,7 @@ DEFINE_DEVICE_TYPE(TAITO_EN, taito_en_device, "taito_en", "Taito Ensoniq Sound S
 
 taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TAITO_EN, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this, 2)
 	, m_audiocpu(*this, "audiocpu")
 	, m_ensoniq(*this, "ensoniq")
 	, m_esp(*this, "esp")
@@ -33,6 +33,8 @@ taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag,
 	, m_osram(*this, "osram")
 	, m_osrom(*this, "audiocpu")
 	, m_cpubank(*this, "cpubank%u", 1)
+	, m_otisrom(*this, "ensoniq")
+	, m_otisbank(*this, "otisbank")
 {
 }
 
@@ -48,7 +50,10 @@ void taito_en_device::device_start()
 	for (int i = 0; i < 3; i++)
 		m_cpubank[i]->configure_entries(0, max, &ROM[0x100000], 0x20000);
 
-	m_bankmask = (memregion(":ensoniq.0")->bytes()/0x200000)-1;
+	max = (m_otisrom->bytes()) / 0x200000;
+	m_bankmask = max - 1;
+	m_otisbank->configure_entries(0, max, m_otisrom->base(), 0x200000);
+	save_item(NAME(m_oldbank));
 }
 
 
@@ -76,9 +81,7 @@ void taito_en_device::device_reset()
 
 void taito_en_device::en_es5505_bank_w(offs_t offset, uint16_t data)
 {
-	/* mask out unused bits */
-	data &= m_bankmask;
-	m_ensoniq->voice_bank_w(offset,data<<20);
+	m_ensoniq->voice_bank_w(offset,data);
 }
 
 void taito_en_device::en_volume_w(offs_t offset, uint8_t data)
@@ -116,6 +119,17 @@ void taito_en_device::fc7_map(address_map &map)
 
 /*************************************
  *
+ *  ES5505 memory map
+ *
+ *************************************/
+
+void taito_en_device::en_otis_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).bankr(m_otisbank);
+}
+
+/*************************************
+ *
  *  MB87078 callback
  *
  *************************************/
@@ -143,6 +157,17 @@ void taito_en_device::mb87078_gain_changed(offs_t offset, uint8_t data)
 void taito_en_device::es5505_clock_changed(u32 data)
 {
 	m_pump->set_unscaled_clock(data);
+}
+
+void taito_en_device::es5505_exbank_cb(offs_t offset, u32 data)
+{
+	/* mask out unused bits */
+	const u32 newbank = data & m_bankmask;
+	if (m_oldbank != newbank)
+	{
+		m_otisbank->set_entry(newbank);
+		m_oldbank = newbank;
+	}
 }
 
 
@@ -209,18 +234,16 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 	MB8421(config, "dpram", 0); // host accesses this from the other side
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
 	ESQ_5505_5510_PUMP(config, m_pump, XTAL(30'476'180) / (2 * 16 * 32));
 	m_pump->set_esp(m_esp);
-	m_pump->add_route(0, "lspeaker", 1.0);
-	m_pump->add_route(1, "rspeaker", 1.0);
+	m_pump->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_pump->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	ES5505(config, m_ensoniq, XTAL(30'476'180) / 2);
 	m_ensoniq->sample_rate_changed().set(FUNC(taito_en_device::es5505_clock_changed));
-	m_ensoniq->set_region0("ensoniq.0");
-	m_ensoniq->set_region1("ensoniq.0");
+	m_ensoniq->exbank_cb().set(FUNC(taito_en_device::es5505_exbank_cb));
+	m_ensoniq->set_addrmap(0, &taito_en_device::en_otis_map);
+	m_ensoniq->set_addrmap(1, &taito_en_device::en_otis_map);
 	m_ensoniq->set_channels(4);
 	m_ensoniq->add_route(0, "pump", 1.0, 0);
 	m_ensoniq->add_route(1, "pump", 1.0, 1);

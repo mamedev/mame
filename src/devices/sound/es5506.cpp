@@ -84,6 +84,7 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 
 #include "emu.h"
 #include "es5506.h"
+#include <algorithm>
 
 #if ES5506_MAKE_WAVS
 #include "sound/wavwrite.h"
@@ -149,6 +150,7 @@ enum : u16 {
 es550x_device::es550x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_sample_rate(0)
 	, m_master_clock(0)
@@ -162,25 +164,26 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 #if ES5506_MAKE_WAVS
 	, m_wavraw(nullptr)
 #endif
-	, m_region0(nullptr)
-	, m_region1(nullptr)
-	, m_region2(nullptr)
-	, m_region3(nullptr)
+	, m_region0(*this, finder_base::DUMMY_TAG)
+	, m_region1(*this, finder_base::DUMMY_TAG)
+	, m_region2(*this, finder_base::DUMMY_TAG)
+	, m_region3(*this, finder_base::DUMMY_TAG)
 	, m_channels(0)
 	, m_irq_cb(*this)
 	, m_read_port_cb(*this)
 	, m_sample_rate_changed_cb(*this)
+	, m_exbank_cb(*this)
 {
-	for (auto & elem : m_region_base)
-	{
-		elem = nullptr;
-	}
 }
 
 DEFINE_DEVICE_TYPE(ES5506, es5506_device, "es5506", "Ensoniq ES5506")
 
 es5506_device::es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: es550x_device(mconfig, ES5506, tag, owner, clock)
+	, m_bank0_config("bank0", ENDIANNESS_BIG, 16, 21, -1) // 21 bit address bus, word addressing only
+	, m_bank1_config("bank1", ENDIANNESS_BIG, 16, 21, -1)
+	, m_bank2_config("bank2", ENDIANNESS_BIG, 16, 21, -1)
+	, m_bank3_config("bank3", ENDIANNESS_BIG, 16, 21, -1)
 	, m_write_latch(0)
 	, m_read_latch(0)
 	, m_wst(0)
@@ -199,6 +202,7 @@ void es550x_device::device_start()
 	m_irq_cb.resolve();
 	m_read_port_cb.resolve();
 	m_sample_rate_changed_cb.resolve();
+	m_exbank_cb.resolve();
 	m_irqv = 0x80;
 
 	/* allocate memory */
@@ -214,26 +218,22 @@ void es550x_device::device_start()
 
 	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
 
-	for (int j = 0; j < 32; j++)
-	{
-		save_item(NAME(m_voice[j].control), j);
-		save_item(NAME(m_voice[j].freqcount), j);
-		save_item(NAME(m_voice[j].start), j);
-		save_item(NAME(m_voice[j].end), j);
-		save_item(NAME(m_voice[j].accum), j);
-		save_item(NAME(m_voice[j].lvol), j);
-		save_item(NAME(m_voice[j].rvol), j);
-		save_item(NAME(m_voice[j].k2), j);
-		save_item(NAME(m_voice[j].k1), j);
-		save_item(NAME(m_voice[j].o4n1), j);
-		save_item(NAME(m_voice[j].o3n1), j);
-		save_item(NAME(m_voice[j].o3n2), j);
-		save_item(NAME(m_voice[j].o2n1), j);
-		save_item(NAME(m_voice[j].o2n2), j);
-		save_item(NAME(m_voice[j].o1n1), j);
-		save_item(NAME(m_voice[j].exbank), j);
-	}
-
+	save_item(STRUCT_MEMBER(m_voice, control));
+	save_item(STRUCT_MEMBER(m_voice, freqcount));
+	save_item(STRUCT_MEMBER(m_voice, start));
+	save_item(STRUCT_MEMBER(m_voice, end));
+	save_item(STRUCT_MEMBER(m_voice, accum));
+	save_item(STRUCT_MEMBER(m_voice, lvol));
+	save_item(STRUCT_MEMBER(m_voice, rvol));
+	save_item(STRUCT_MEMBER(m_voice, k2));
+	save_item(STRUCT_MEMBER(m_voice, k1));
+	save_item(STRUCT_MEMBER(m_voice, o4n1));
+	save_item(STRUCT_MEMBER(m_voice, o3n1));
+	save_item(STRUCT_MEMBER(m_voice, o3n2));
+	save_item(STRUCT_MEMBER(m_voice, o2n1));
+	save_item(STRUCT_MEMBER(m_voice, o2n2));
+	save_item(STRUCT_MEMBER(m_voice, o1n1));
+	save_item(STRUCT_MEMBER(m_voice, exbank));
 }
 
 void es5506_device::device_start()
@@ -249,39 +249,20 @@ void es5506_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32));
 
 	/* initialize the regions */
-	m_region_base[0] = m_region_base[1] = m_region_base[2] = m_region_base[3] = nullptr;
-	if (m_region0)
-	{
-		memory_region *region0 = machine().root_device().memregion(m_region0);
-		if (region0 != nullptr)
-		{
-			m_region_base[0] = (u16 *)region0->base();
-		}
-	}
-	if (m_region1)
-	{
-		memory_region *region1 = machine().root_device().memregion(m_region1);
-		if (region1 != nullptr)
-		{
-			m_region_base[1] = (u16 *)region1->base();
-		}
-	}
-	if (m_region2)
-	{
-		memory_region *region2 = machine().root_device().memregion(m_region2);
-		if (region2 != nullptr)
-		{
-			m_region_base[2] = (u16 *)region2->base();
-		}
-	}
-	if (m_region3)
-	{
-		memory_region *region3 = machine().root_device().memregion(m_region3);
-		if (region3 != nullptr)
-		{
-			m_region_base[3] = (u16 *)region3->base();
-		}
-	}
+	if (m_region0 && !has_configured_map(0))
+		space(0).install_rom(0, std::min<offs_t>((1 << ADDRESS_INTEGER_BIT_ES5506) - 1, (m_region0->bytes() / 2) - 1), m_region0->base());
+
+	if (m_region1 && !has_configured_map(1))
+		space(1).install_rom(0, std::min<offs_t>((1 << ADDRESS_INTEGER_BIT_ES5506) - 1, (m_region1->bytes() / 2) - 1), m_region1->base());
+
+	if (m_region2 && !has_configured_map(2))
+		space(2).install_rom(0, std::min<offs_t>((1 << ADDRESS_INTEGER_BIT_ES5506) - 1, (m_region2->bytes() / 2) - 1), m_region2->base());
+
+	if (m_region3 && !has_configured_map(3))
+		space(3).install_rom(0, std::min<offs_t>((1 << ADDRESS_INTEGER_BIT_ES5506) - 1, (m_region3->bytes() / 2) - 1), m_region3->base());
+
+	for (int s = 0; s < 4; s++)
+		space(s).cache(m_cache[s]);
 
 	/* compute the tables */
 	compute_tables(VOLUME_BIT_ES5506, 4, 8); // 4 bit exponent, 8 bit mantissa
@@ -305,15 +286,12 @@ void es5506_device::device_start()
 	save_item(NAME(m_wend));
 	save_item(NAME(m_lrend));
 
-	for (int j = 0; j < 32; j++)
-	{
-		save_item(NAME(m_voice[j].ecount), j);
-		save_item(NAME(m_voice[j].lvramp), j);
-		save_item(NAME(m_voice[j].rvramp), j);
-		save_item(NAME(m_voice[j].k2ramp), j);
-		save_item(NAME(m_voice[j].k1ramp), j);
-		save_item(NAME(m_voice[j].filtcount), j);
-	}
+	save_item(STRUCT_MEMBER(m_voice, ecount));
+	save_item(STRUCT_MEMBER(m_voice, lvramp));
+	save_item(STRUCT_MEMBER(m_voice, rvramp));
+	save_item(STRUCT_MEMBER(m_voice, k2ramp));
+	save_item(STRUCT_MEMBER(m_voice, k1ramp));
+	save_item(STRUCT_MEMBER(m_voice, filtcount));
 
 	/* success */
 }
@@ -359,10 +337,27 @@ void es550x_device::device_stop()
 #endif
 }
 
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector es5506_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(0, &m_bank0_config),
+		std::make_pair(1, &m_bank1_config),
+		std::make_pair(2, &m_bank2_config),
+		std::make_pair(3, &m_bank3_config)
+	};
+}
+
 DEFINE_DEVICE_TYPE(ES5505, es5505_device, "es5505", "Ensoniq ES5505")
 
 es5505_device::es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: es550x_device(mconfig, ES5505, tag, owner, clock)
+	, m_bank0_config("bank0", ENDIANNESS_BIG, 16, 20, -1) // 20 bit address bus, word addressing only
+	, m_bank1_config("bank1", ENDIANNESS_BIG, 16, 20, -1)
 {
 }
 
@@ -383,16 +378,14 @@ void es5505_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32));
 
 	/* initialize the regions */
-	if (m_region0)
-	{
-		memory_region* region = machine().root_device().memregion(m_region0);
-		m_region_base[0] = region ? reinterpret_cast<u16 *>(region->base()) : nullptr;
-	}
-	if (m_region1)
-	{
-		memory_region* region = machine().root_device().memregion(m_region1);
-		m_region_base[1] = region ? reinterpret_cast<u16 *>(region->base()) : nullptr;
-	}
+	if (m_region0 && !has_configured_map(0))
+		space(0).install_rom(0, std::min<offs_t>((1 << ADDRESS_INTEGER_BIT_ES5505) - 1, (m_region0->bytes() / 2) - 1), m_region0->base());
+
+	if (m_region1 && !has_configured_map(1))
+		space(1).install_rom(0, std::min<offs_t>((1 << ADDRESS_INTEGER_BIT_ES5505) - 1, (m_region1->bytes() / 2) - 1), m_region1->base());
+
+	for (int s = 0; s < 2; s++)
+		space(s).cache(m_cache[s]);
 
 	/* compute the tables */
 	compute_tables(VOLUME_BIT_ES5505, 4, 4); // 4 bit exponent, 4 bit mantissa
@@ -406,6 +399,18 @@ void es5505_device::device_start()
 	/* success */
 }
 
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector es5505_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(0, &m_bank0_config),
+		std::make_pair(1, &m_bank1_config)
+	};
+}
 
 /**********************************************************************************************
 
@@ -818,73 +823,16 @@ inline void es5505_device::check_for_end_reverse(es550x_voice *voice, u64 &accum
 }
 
 
-
-/**********************************************************************************************
-
-     generate_dummy -- generate nothing, just apply envelopes
-
-***********************************************************************************************/
-
-void es550x_device::generate_dummy(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples)
-{
-	const u32 freqcount = voice->freqcount;
-	u64 accum = voice->accum & m_address_acc_mask;
-
-	/* outer loop, in case we switch directions */
-	if (!(voice->control & CONTROL_STOPMASK))
-	{
-		/* two cases: first case is forward direction */
-		if (!(voice->control & CONTROL_DIR))
-		{
-			/* fetch two samples */
-			accum = (accum + freqcount) & m_address_acc_mask;
-
-			/* update filters/volumes */
-			if (voice->ecount != 0)
-				update_envelopes(voice);
-
-			/* check for loop end */
-			check_for_end_forward(voice, accum);
-		}
-
-		/* two cases: second case is backward direction */
-		else
-		{
-			/* fetch two samples */
-			accum = (accum - freqcount) & m_address_acc_mask;
-
-			/* update filters/volumes */
-			if (voice->ecount != 0)
-				update_envelopes(voice);
-
-			/* check for loop end */
-			check_for_end_reverse(voice, accum);
-		}
-	}
-	else
-	{
-		/* if we stopped, process any additional envelope */
-		if (voice->ecount != 0)
-			update_envelopes(voice);
-	}
-
-	voice->accum = accum;
-}
-
-
 /**********************************************************************************************
 
      generate_ulaw -- general u-law decoding routine
 
 ***********************************************************************************************/
 
-void es550x_device::generate_ulaw(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples)
+void es550x_device::generate_ulaw(es550x_voice *voice, s32 *lbuffer, s32 *rbuffer, int samples)
 {
 	const u32 freqcount = voice->freqcount;
 	u64 accum = voice->accum & m_address_acc_mask;
-
-	/* pre-add the bank offset */
-	base += voice->exbank;
 
 	/* outer loop, in case we switch directions */
 	if (!(voice->control & CONTROL_STOPMASK))
@@ -893,8 +841,8 @@ void es550x_device::generate_ulaw(es550x_voice *voice, u16 *base, s32 *lbuffer, 
 		if (!(voice->control & CONTROL_DIR))
 		{
 			/* fetch two samples */
-			s32 val1 = base[get_integer_addr(accum)];
-			s32 val2 = base[get_integer_addr(accum, 1)];
+			s32 val1 = read_sample(voice, get_integer_addr(accum));
+			s32 val2 = read_sample(voice, get_integer_addr(accum, 1));
 
 			/* decompress u-law */
 			val1 = m_ulaw_lookup[val1 >> (16 - ULAW_MAXBITS)];
@@ -923,8 +871,8 @@ void es550x_device::generate_ulaw(es550x_voice *voice, u16 *base, s32 *lbuffer, 
 		else
 		{
 			/* fetch two samples */
-			s32 val1 = base[get_integer_addr(accum)];
-			s32 val2 = base[get_integer_addr(accum, 1)];
+			s32 val1 = read_sample(voice, get_integer_addr(accum));
+			s32 val2 = read_sample(voice, get_integer_addr(accum, 1));
 
 			/* decompress u-law */
 			val1 = m_ulaw_lookup[val1 >> (16 - ULAW_MAXBITS)];
@@ -967,13 +915,10 @@ void es550x_device::generate_ulaw(es550x_voice *voice, u16 *base, s32 *lbuffer, 
 
 ***********************************************************************************************/
 
-void es550x_device::generate_pcm(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples)
+void es550x_device::generate_pcm(es550x_voice *voice, s32 *lbuffer, s32 *rbuffer, int samples)
 {
 	const u32 freqcount = voice->freqcount;
 	u64 accum = voice->accum & m_address_acc_mask;
-
-	/* pre-add the bank offset */
-	base += voice->exbank;
 
 	/* outer loop, in case we switch directions */
 	if (!(voice->control & CONTROL_STOPMASK))
@@ -982,8 +927,8 @@ void es550x_device::generate_pcm(es550x_voice *voice, u16 *base, s32 *lbuffer, s
 		if (!(voice->control & CONTROL_DIR))
 		{
 			/* fetch two samples */
-			s32 val1 = (s16)base[get_integer_addr(accum)];
-			s32 val2 = (s16)base[get_integer_addr(accum, 1)];
+			s32 val1 = (s16)read_sample(voice, get_integer_addr(accum));
+			s32 val2 = (s16)read_sample(voice, get_integer_addr(accum, 1));
 
 			/* interpolate */
 			val1 = interpolate(val1, val2, accum);
@@ -1008,8 +953,8 @@ void es550x_device::generate_pcm(es550x_voice *voice, u16 *base, s32 *lbuffer, s
 		else
 		{
 			/* fetch two samples */
-			s32 val1 = (s16)base[get_integer_addr(accum)];
-			s32 val2 = (s16)base[get_integer_addr(accum, 1)];
+			s32 val1 = (s16)read_sample(voice, get_integer_addr(accum));
+			s32 val2 = (s16)read_sample(voice, get_integer_addr(accum, 1));
 
 			/* interpolate */
 			val1 = interpolate(val1, val2, accum);
@@ -1094,7 +1039,6 @@ void es5506_device::generate_samples(s32 **outputs, int offset, int samples)
 		for (int v = 0; v <= m_active_voices; v++)
 		{
 			es550x_voice *voice = &m_voice[v];
-			u16 *base = m_region_base[get_bank(voice->control)];
 
 			/* special case: if end == start, stop the voice */
 			if (voice->start == voice->end)
@@ -1108,15 +1052,10 @@ void es5506_device::generate_samples(s32 **outputs, int offset, int samples)
 			s32 *right = outputs[r] + offset;
 
 			/* generate from the appropriate source */
-			if (!base)
-			{
-				LOG("es5506: nullptr region base %d\n",get_bank(voice->control));
-				generate_dummy(voice, base, left, right, samples);
-			}
-			else if (voice->control & CONTROL_CMPD)
-				generate_ulaw(voice, base, left, right, samples);
+			if (voice->control & CONTROL_CMPD)
+				generate_ulaw(voice, left, right, samples);
 			else
-				generate_pcm(voice, base, left, right, samples);
+				generate_pcm(voice, left, right, samples);
 
 			/* does this voice have it's IRQ bit raised? */
 			generate_irq(voice, v);
@@ -1145,7 +1084,6 @@ void es5505_device::generate_samples(s32 **outputs, int offset, int samples)
 		for (int v = 0; v <= m_active_voices; v++)
 		{
 			es550x_voice *voice = &m_voice[v];
-			u16 *base = m_region_base[get_bank(voice->control)];
 
 // This special case does not appear to match the behaviour observed in the es5505 in
 // actual Ensoniq synthesizers: those, it turns out, do set loop start and end to the
@@ -1165,14 +1103,8 @@ void es5505_device::generate_samples(s32 **outputs, int offset, int samples)
 			s32 *right = outputs[r] + offset;
 
 			/* generate from the appropriate source */
-			if (!base)
-			{
-				LOG("es5506: nullptr region base %d\n",get_bank(voice->control));
-				generate_dummy(voice, base, left, right, samples);
-			}
 			// no compressed sample support
-			else
-				generate_pcm(voice, base, left, right, samples);
+			generate_pcm(voice, left, right, samples);
 
 			/* does this voice have it's IRQ bit raised? */
 			generate_irq(voice, v);
@@ -1661,9 +1593,9 @@ uint8_t es5506_device::read(offs_t offset)
 
 
 
-void es5506_device::voice_bank_w(int voice, int bank)
+void es5506_device::voice_bank_w(int voice, u32 bank)
 {
-	m_voice[voice].exbank=bank;
+	m_voice[voice].exbank = bank;
 }
 
 
@@ -2092,9 +2024,9 @@ inline u16 es5505_device::reg_read_high(es550x_voice *voice, offs_t offset)
 			/* want to waste time filtering stopped channels, we just look for a read from */
 			/* this register on a stopped voice, and return the raw sample data at the */
 			/* accumulator */
-			if ((voice->control & CONTROL_STOPMASK) && m_region_base[get_bank(voice->control)])
+			if ((voice->control & CONTROL_STOPMASK))
 			{
-				voice->o1n1 = m_region_base[get_bank(voice->control)][voice->exbank + get_integer_addr(voice->accum)];
+				voice->o1n1 = read_sample(voice, get_integer_addr(voice->accum));
 				// logerror("%02x %08x ==> %08x\n",voice->o1n1,get_bank(voice->control),voice->exbank + get_integer_addr(voice->accum));
 			}
 			result = voice->o1n1 & 0xffff;
@@ -2196,12 +2128,12 @@ READ16_MEMBER(es5505_device::read)
 
 
 
-void es5505_device::voice_bank_w(int voice, int bank)
+void es5505_device::voice_bank_w(int voice, u32 bank)
 {
 #if RAINE_CHECK
 	m_voice[voice].control = CONTROL_STOPMASK;
 #endif
-	m_voice[voice].exbank=bank;
+	m_voice[voice].exbank = bank;
 }
 
 

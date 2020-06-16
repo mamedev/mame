@@ -679,9 +679,8 @@ WRITE16_MEMBER(ssv_state::srmp7_sound_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int bank = 0x400000/2 * (data & 1); // uint16_t address
-		for (int voice = 0; voice < 32; voice++)
-			m_ensoniq->voice_bank_w(voice, bank);
+		m_srmp7_esbank[0]->set_entry(data & 1);
+		m_srmp7_esbank[1]->set_entry(data & 1);
 	}
 //  popmessage("%04X",data);
 }
@@ -710,6 +709,16 @@ void ssv_state::srmp7_map(address_map &map)
 	map(0x580000, 0x580001).w(FUNC(ssv_state::srmp7_sound_bank_w));               // Sound Bank
 	map(0x600000, 0x600001).r(FUNC(ssv_state::srmp7_input_r));                     // Inputs
 	map(0x680000, 0x680001).writeonly().share("input_sel"); // Inputs
+}
+
+void ssv_state::srmp7_es5506_bank2_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).bankr(m_srmp7_esbank[0]);
+}
+
+void ssv_state::srmp7_es5506_bank3_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).bankr(m_srmp7_esbank[1]);
 }
 
 
@@ -2565,6 +2574,15 @@ void ssv_state::init_ssv_irq1()
 	m_interrupt_ultrax = 1;
 }
 
+void ssv_state::init_srmp7()
+{
+	init_ssv();
+	m_srmp7_esbank[0]->configure_entries(0, 2, memregion("ensoniq.2")->base(), 0x400000);
+	m_srmp7_esbank[1]->configure_entries(0, 2, memregion("ensoniq.3")->base(), 0x400000);
+	m_srmp7_esbank[0]->set_entry(0);
+	m_srmp7_esbank[1]->set_entry(0);
+}
+
 
 #define SSV_MASTER_CLOCK XTAL(48'000'000)/3
 
@@ -2777,6 +2795,9 @@ void ssv_state::srmp7(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_visarea(0, (0xd4-0x2c)*2-1, 0, (0xfd - 0x0e)-1);
+
+	m_ensoniq->set_addrmap(2, &ssv_state::srmp7_es5506_bank2_map);
+	m_ensoniq->set_addrmap(3, &ssv_state::srmp7_es5506_bank3_map);
 }
 
 void ssv_state::stmblade(machine_config &config)
@@ -3129,10 +3150,10 @@ ROM_START( drifto94 )
 	ROM_LOAD( "vg003-12.d2", 0x1c00000, 0x200000, CRC(ac0fd855) SHA1(992ae0d02bcefaa2fad7462b211a49fbd1338b62) )
 	ROM_LOAD( "vg003-16.d3", 0x1e00000, 0x200000, CRC(1a5fd312) SHA1(1e67ffa51408de107be75c9c63df6fd1bb6ce6b1) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "vg003-17.u22", 0x000000, 0x200000, CRC(6f9294ce) SHA1(b097defd95eb1d8f00e107d7669f9d33148e75c1) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "vg003-18.u15", 0x000000, 0x200000, CRC(511b3e93) SHA1(09eda175c8f1b21c18645519cc6e89c6ca1fc5de) )
 
 	ROM_REGION( 0x11000, "st010", 0)
@@ -3393,10 +3414,10 @@ ROM_START( janjans1 )
 	ROM_LOAD( "jj1-d1.bin", 0x2200000, 0x400000, CRC(f24c0d36) SHA1(212969b456bfd7cc00081f65c03c1e167186891a) )
 	ROM_LOAD( "jj1-d2.bin", 0x2600000, 0x200000, CRC(481b3be8) SHA1(cd1bcaca8c236cebba72d315e759b2e9d243aca8) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "jj1-snd0.bin", 0x000000, 0x200000, CRC(4f7d620a) SHA1(edded130ce7bb0f37e1f59b2771ae6a10a061f9e) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "jj1-snd1.bin", 0x000000, 0x200000, CRC(9b3a7ae5) SHA1(193743fcce779c4a8a73a44c54b5391d08116331) )
 ROM_END
 
@@ -3436,10 +3457,10 @@ ROM_START( janjans2 )
 	ROM_LOAD( "jan2-d0.u34", 0x1800000, 0x400000, CRC(479fdb54) SHA1(667d89518877a3b501a87c9c765b85b9a0b23517) )
 	ROM_LOAD( "jan2-d1.u35", 0x1c00000, 0x400000, CRC(c0148895) SHA1(f89482a6ef475ca44d570332d05201b34887afbb) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )    /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )    /* Samples */
 	ROM_LOAD16_BYTE( "jan2-snd0.u29", 0x000000, 0x200000, CRC(22cc054e) SHA1(4926dd9f8f85880d6c1d14f93d68f330898b473a) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )    /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )    /* Samples */
 	ROM_LOAD16_BYTE( "jan2-snd1.u33", 0x000000, 0x200000, CRC(cbcac4a6) SHA1(f0c57fa6784e910bdb94f046d09e58e26921773b) )
 ROM_END
 
@@ -3630,10 +3651,10 @@ ROM_START( koikois2 )
 	ROM_LOAD( "kk2-d0.bin", 0x1800000, 0x400000, CRC(0e3005a4) SHA1(fa8da58308d58bb6b2e8beb8ee8f7ea08b18f4d9) )
 	ROM_LOAD( "kk2-d1.bin", 0x1c00000, 0x200000, CRC(17a02252) SHA1(c7aa61e27f197b3c497a65a9369e3a6a20c9f82a) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "kk2_snd0.bin", 0x000000, 0x200000, CRC(b27eaa94) SHA1(05baaef683a1fcd9eb8a7cfd5b280c05108e832f) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "kk2_snd1.bin", 0x000000, 0x200000, CRC(e5a963e1) SHA1(464ffd53ac2e6db62225b18d12bfea93160771ec) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
@@ -3760,7 +3781,7 @@ ROM_START( ryorioh )
 	ROM_LOAD( "ryorioh.d0", 0x1800000, 0x400000, CRC(ffa14ef1) SHA1(22a6992f6217d8ef2140e72063290fa34cb45683) )
 	ROM_LOAD( "ryorioh.d1", 0x1c00000, 0x400000, CRC(ae6055e8) SHA1(ee20a7b3c4f899404ca259991509728d3a0f96b9) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "ryorioh.snd", 0x000000, 0x200000, CRC(7bd38b76) SHA1(d8490b4af839ef0802b8b2a47277fcd4091e4d37) )
 
 	ROM_REGION( 0x400, "plds", 0 )
@@ -3892,19 +3913,17 @@ ROM_START( srmp7 )
 	ROM_LOAD( "sx015-12.d2", 0x3800000, 0x400000, CRC(80336523) SHA1(ec66e21fe1401fdb438e03657542a7b6b0cbc5ce) )
 	ROM_LOAD( "sx015-11.d3", 0x3c00000, 0x400000, CRC(134c8e28) SHA1(669118b58f27d5e2e08052debe904f95d9ab32a3) )
 
-	ROM_REGION16_BE( 0x800000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "sx015-06.s0", 0x000000, 0x200000, CRC(0d5a206c) SHA1(2fdaf2a56b6608f20a788eb79a8426102ff33e14) )
-	ROM_RELOAD(                     0x400000, 0x200000)
 
-	ROM_REGION16_BE( 0x800000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "sx015-05.s1", 0x000000, 0x200000, CRC(bb8cebe2) SHA1(3691e5fb4e963f69c1fe01cb5d968433029c4833) )
-	ROM_RELOAD(                     0x400000, 0x200000)
 
-	ROM_REGION16_BE( 0x800000, "ensoniq.2", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x800000, "ensoniq.2", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "sx015-04.s2", 0x000000, 0x200000, CRC(f6e933df) SHA1(7cb69515a0ffc62fbac2be3a5fb322538560bd38) )
 	ROM_LOAD16_BYTE( "sx015-02.s4", 0x400000, 0x200000, CRC(6567bc3e) SHA1(e902f22f1499edc6a0e2c8b6cc26460d66a3bdbe) )
 
-	ROM_REGION16_BE( 0x800000, "ensoniq.3", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x800000, "ensoniq.3", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "sx015-03.s3", 0x000000, 0x200000, CRC(5b51ab21) SHA1(cf3e86e41f7984208984d6486b04cec117dadc18) )
 	ROM_LOAD16_BYTE( "sx015-01.s5", 0x400000, 0x200000, CRC(481b00ed) SHA1(2c3d158dd5be9af0ee57fd5dd94d2ec75e28b182) )
 ROM_END
@@ -4391,7 +4410,7 @@ ROM_START( stmblade )
 	ROM_LOAD( "sb-c2.u4",  0x1000000, 0x080000, CRC(fd1d2a92) SHA1(957a8a52b79e252c7f1a4b6383107ae609dce5ef) )
 	ROM_FILL(              0x1200000, 0x600000, 0x000000)
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
 
 	ROM_REGION( 0x11000, "st010", 0)
@@ -4422,7 +4441,7 @@ ROM_START( stmbladej )
 	ROM_LOAD( "sb-c2.u4",  0x1000000, 0x080000, CRC(fd1d2a92) SHA1(957a8a52b79e252c7f1a4b6383107ae609dce5ef) )
 	ROM_FILL(              0x1200000, 0x600000, 0x000000)
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
 
 	ROM_REGION( 0x11000, "st010", 0)
@@ -4490,10 +4509,10 @@ ROM_START( twineag2 )
 
 	ROM_FILL(             0x1200000, 0x600000, 0x000000          )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD16_BYTE( "sx002-10.u14", 0x000000, 0x200000, CRC(b0669dfa) SHA1(ff805f59864ac4ccee3e249c06804d844d3df59c) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD16_BYTE( "sx002-11.u7",  0x000000, 0x200000, CRC(b8dd621a) SHA1(f9b43e018f2bb121e4f4e9554419cd32b870556b) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
@@ -4536,10 +4555,10 @@ ROM_START( ultrax )
 	ROM_LOAD( "71047-06.u88", 0x0800000, 0x100000, CRC(b8ac2942) SHA1(3e85e8f5669d469dd3114455248546d32a642315) )
 	ROM_FILL(                 0x0900000, 0x300000, 0x000000 )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD16_BYTE( "71047-07.u59", 0x000000, 0x200000, CRC(d9828b62) SHA1(f66a388d7a00b3a45d386671c061f5b840453451) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD16_BYTE( "71047-08.u60", 0x000000, 0x200000, CRC(30ebff6d) SHA1(53824c1fc37e22b545fd68b59722f7968f0ca1e2) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
@@ -4566,10 +4585,10 @@ ROM_START( ultraxg )
 	ROM_LOAD( "71047-06.u88", 0x0800000, 0x100000, CRC(b8ac2942) SHA1(3e85e8f5669d469dd3114455248546d32a642315) )
 	ROM_FILL(                 0x0900000, 0x300000, 0x000000 )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD16_BYTE( "71047-07.u59", 0x000000, 0x200000, CRC(d9828b62) SHA1(f66a388d7a00b3a45d386671c061f5b840453451) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD16_BYTE( "71047-08.u60", 0x000000, 0x200000, CRC(30ebff6d) SHA1(53824c1fc37e22b545fd68b59722f7968f0ca1e2) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
@@ -4679,10 +4698,10 @@ ROM_START( vasara )
 	ROM_LOAD( "c0.u3", 0x1000000, 0x800000, CRC(d110dacf) SHA1(6f33bf6ce8c06f0b823b5478a56dc95095385181) )
 	ROM_LOAD( "d0.u4", 0x1800000, 0x800000, CRC(82d0ca55) SHA1(5ac07df713504329fbc8e8b5374c04e53745230e) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "s0.u36", 0x000000, 0x200000, CRC(754fca02) SHA1(5b2810a36183e0d4f42f0fb4a09be033ad0db40d) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "s1.u37", 0x000000, 0x200000, CRC(5f303698) SHA1(bd6495f912aa9d761d245ef0a1566d9d7bdbb2ad) )
 ROM_END
 
@@ -4700,10 +4719,10 @@ ROM_START( vasara2 )
 	ROM_LOAD( "c0.u3", 0x1000000, 0x800000, CRC(54ede017) SHA1(4a7ff7ff8ec5843837016f35a588983b5ace06ff) )
 	ROM_LOAD( "d0.u4", 0x1800000, 0x800000, CRC(4be8479d) SHA1(cbb5943dfae86f4d571459263199a63399dedc20) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "s0.u36", 0x000000, 0x200000, CRC(2b381b33) SHA1(b9dd13651e4b8d0b9e3bc4c592022f31ea634d19) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "s1.u37", 0x000000, 0x200000, CRC(11cd7098) SHA1(f75288b5c89df039dfb41d66bd275cda8605e75a) )
 ROM_END
 
@@ -4721,10 +4740,10 @@ ROM_START( vasara2a )
 	ROM_LOAD( "c0.u3", 0x1000000, 0x800000, CRC(54ede017) SHA1(4a7ff7ff8ec5843837016f35a588983b5ace06ff) )
 	ROM_LOAD( "d0.u4", 0x1800000, 0x800000, CRC(4be8479d) SHA1(cbb5943dfae86f4d571459263199a63399dedc20) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "s0.u36", 0x000000, 0x200000, CRC(2b381b33) SHA1(b9dd13651e4b8d0b9e3bc4c592022f31ea634d19) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "s1.u37", 0x000000, 0x200000, CRC(11cd7098) SHA1(f75288b5c89df039dfb41d66bd275cda8605e75a) )
 ROM_END
 
@@ -4877,7 +4896,7 @@ GAME( 1997,  koikois2,  0,        janjans1, koikois2, ssv_state, init_ssv,      
 
 GAME( 1997,  mslider,   0,        mslider,  mslider,  ssv_state, init_ssv,           ROT0,   "Visco / Datt Japan", "Monster Slider (Japan)",                                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997,  srmp7,     0,        srmp7,    srmp7,    ssv_state, init_ssv,           ROT0,   "Seta",               "Super Real Mahjong P7 (Japan)",                                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  srmp7,     0,        srmp7,    srmp7,    ssv_state, init_srmp7,         ROT0,   "Seta",               "Super Real Mahjong P7 (Japan)",                                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1998,  ryorioh,   0,        ryorioh,  ryorioh,  ssv_state, init_ssv,           ROT0,   "Visco",              "Gourmet Battle Quiz Ryohrioh CooKing (Japan)",                           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 

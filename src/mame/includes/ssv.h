@@ -30,6 +30,7 @@ public:
 		m_scroll(*this, "scroll"),
 		m_irq_vectors(*this, "irq_vectors"),
 		m_input_sel(*this, "input_sel"),
+		m_srmp7_esbank(*this, "esbank_%u", 2U),
 		m_raster_interrupt_enabled(false),
 		m_io_key(*this, "KEY%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -61,6 +62,7 @@ public:
 	void init_ssv();
 	void init_ssv_tilescram();
 	void init_ssv_irq1();
+	void init_srmp7();
 	void init_jsk();
 	void init_pastelis();
 
@@ -74,6 +76,7 @@ protected:
 	required_shared_ptr<uint16_t> m_scroll;
 	required_shared_ptr<uint16_t> m_irq_vectors;
 	optional_shared_ptr<uint16_t> m_input_sel;
+	optional_memory_bank_array<2> m_srmp7_esbank;
 
 	int m_tile_code[16];
 	int m_enable_video;
@@ -144,6 +147,8 @@ protected:
 	void ryorioh_map(address_map &map);
 	void srmp4_map(address_map &map);
 	void srmp7_map(address_map &map);
+	void srmp7_es5506_bank2_map(address_map &map);
+	void srmp7_es5506_bank3_map(address_map &map);
 	void survarts_map(address_map &map);
 	void twineag2_map(address_map &map);
 	void ultrax_map(address_map &map);

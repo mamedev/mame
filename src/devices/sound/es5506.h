@@ -14,18 +14,19 @@
 
 #define ES5506_MAKE_WAVS 0
 
-class es550x_device : public device_t, public device_sound_interface
+class es550x_device : public device_t, public device_sound_interface, public device_memory_interface
 {
 public:
-	void set_region0(const char *region0) { m_region0 = region0; }
-	void set_region1(const char *region1) { m_region1 = region1; }
-	void set_region2(const char *region2) { m_region2 = region2; }
-	void set_region3(const char *region3) { m_region3 = region3; }
+	template <typename T> void set_region0(T &&tag) { m_region0.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_region1(T &&tag) { m_region1.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_region2(T &&tag) { m_region2.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_region3(T &&tag) { m_region3.set_tag(std::forward<T>(tag)); }
 	void set_channels(int channels) { m_channels = channels; }
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 	auto read_port_cb() { return m_read_port_cb.bind(); }
 	auto sample_rate_changed() { return m_sample_rate_changed_cb.bind(); }
+	auto exbank_cb() { return m_exbank_cb.bind(); }
 
 protected:
 	enum {
@@ -109,16 +110,26 @@ protected:
 	virtual void update_envelopes(es550x_voice *voice) = 0;
 	virtual void check_for_end_forward(es550x_voice *voice, u64 &accum) = 0;
 	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) = 0;
-	void generate_dummy(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples);
-	void generate_ulaw(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples);
-	void generate_pcm(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples);
+	void generate_ulaw(es550x_voice *voice, s32 *lbuffer, s32 *rbuffer, int samples);
+	void generate_pcm(es550x_voice *voice, s32 *lbuffer, s32 *rbuffer, int samples);
 	inline void generate_irq(es550x_voice *voice, int v);
 	virtual void generate_samples(s32 **outputs, int offset, int samples) {};
+
+	inline u32 update_exbank(es550x_voice *voice)
+	{
+		const u32 bank = get_bank(voice->control);
+		/* pre-add the bank offset */
+		if (!m_exbank_cb.isnull())
+			m_exbank_cb(bank, voice->exbank);
+
+		return bank;
+	}
+
+	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) { return 0; }
 
 	// internal state
 	sound_stream *m_stream;               /* which stream are we using */
 	int           m_sample_rate;          /* current sample rate */
-	u16 *         m_region_base[4];       /* pointer to the base of the region */
 	u32           m_master_clock;         /* master clock frequency */
 	s8            m_address_acc_shift;
 	u64           m_address_acc_mask;
@@ -142,14 +153,15 @@ protected:
 	void *      m_wavraw;                 /* raw waveform */
 #endif
 
-	const char * m_region0;                       /* memory region where the sample ROM lives */
-	const char * m_region1;                       /* memory region where the sample ROM lives */
-	const char * m_region2;                       /* memory region where the sample ROM lives */
-	const char * m_region3;                       /* memory region where the sample ROM lives */
+	optional_memory_region m_region0;                       /* memory region where the sample ROM lives */
+	optional_memory_region m_region1;                       /* memory region where the sample ROM lives */
+	optional_memory_region m_region2;                       /* memory region where the sample ROM lives */
+	optional_memory_region m_region3;                       /* memory region where the sample ROM lives */
 	int m_channels;                               /* number of output channels: 1 .. 6 */
 	devcb_write_line m_irq_cb;  /* irq callback */
 	devcb_read16 m_read_port_cb;          /* input port read */
 	devcb_write32 m_sample_rate_changed_cb;          /* callback for when sample rate is changed */
+	devcb_write32 m_exbank_cb;          /* callback for external bankswitching */
 };
 
 
@@ -161,12 +173,20 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	void voice_bank_w(int voice, int bank);
+	void voice_bank_w(int voice, u32 bank);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device_memory_interface configuration
+	virtual space_config_vector memory_space_config() const override;
+
+	address_space_config m_bank0_config;
+	address_space_config m_bank1_config;
+	address_space_config m_bank2_config;
+	address_space_config m_bank3_config;
 
 	const s8 VOLUME_BIT_ES5506 = 16;
 	const s8 ADDRESS_INTEGER_BIT_ES5506 = 21;
@@ -181,6 +201,8 @@ protected:
 	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) override;
 	virtual void generate_samples(s32 **outputs, int offset, int samples) override;
 
+	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { return m_cache[update_exbank(voice)].read_word(addr); }
+
 private:
 	inline void reg_write_low(es550x_voice *voice, offs_t offset, u32 data);
 	inline void reg_write_high(es550x_voice *voice, offs_t offset, u32 data);
@@ -188,6 +210,8 @@ private:
 	inline u32 reg_read_low(es550x_voice *voice, offs_t offset);
 	inline u32 reg_read_high(es550x_voice *voice, offs_t offset);
 	inline u32 reg_read_test(es550x_voice *voice, offs_t offset);
+
+	memory_access<21, 1, -1, ENDIANNESS_BIG>::cache m_cache[4];
 
 	// ES5506 specific registers
 	u32      m_write_latch;            /* currently accumulated data for write */
@@ -207,11 +231,17 @@ public:
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
-	void voice_bank_w(int voice, int bank);
+	void voice_bank_w(int voice, u32 bank);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// device_memory_interface configuration
+	virtual space_config_vector memory_space_config() const override;
+
+	address_space_config m_bank0_config;
+	address_space_config m_bank1_config;
 
 	const s8 VOLUME_BIT_ES5505 = 8;
 	const s8 ADDRESS_INTEGER_BIT_ES5505 = 20;
@@ -226,6 +256,8 @@ protected:
 	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) override;
 	virtual void generate_samples(s32 **outputs, int offset, int samples) override;
 
+	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { return m_cache[update_exbank(voice)].read_word(addr); }
+
 private:
 	// internal state
 	inline void reg_write_low(es550x_voice *voice, offs_t offset, u16 data, u16 mem_mask);
@@ -234,6 +266,8 @@ private:
 	inline u16 reg_read_low(es550x_voice *voice, offs_t offset);
 	inline u16 reg_read_high(es550x_voice *voice, offs_t offset);
 	inline u16 reg_read_test(es550x_voice *voice, offs_t offset);
+
+	memory_access<20, 1, -1, ENDIANNESS_BIG>::cache m_cache[2];
 };
 
 DECLARE_DEVICE_TYPE(ES5505, es5505_device)
