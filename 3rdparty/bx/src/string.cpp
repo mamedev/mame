@@ -310,9 +310,9 @@ namespace bx
 
 	inline int32_t strCopy(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
-		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
-		BX_CHECK(NULL != _src, "_src can't be NULL!");
-		BX_CHECK(0 < _dstSize, "_dstSize can't be 0!");
+		BX_ASSERT(NULL != _dst, "_dst can't be NULL!");
+		BX_ASSERT(NULL != _src, "_src can't be NULL!");
+		BX_ASSERT(0 < _dstSize, "_dstSize can't be 0!");
 
 		const int32_t len = strLen(_src, _num);
 		const int32_t max = _dstSize-1;
@@ -330,9 +330,9 @@ namespace bx
 
 	inline int32_t strCat(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
-		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
-		BX_CHECK(NULL != _src, "_src can't be NULL!");
-		BX_CHECK(0 < _dstSize, "_dstSize can't be 0!");
+		BX_ASSERT(NULL != _dst, "_dst can't be NULL!");
+		BX_ASSERT(NULL != _src, "_src can't be NULL!");
+		BX_ASSERT(0 < _dstSize, "_dstSize can't be 0!");
 
 		const int32_t max = _dstSize;
 		const int32_t len = strLen(_dst, max);

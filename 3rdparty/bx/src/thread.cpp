@@ -130,7 +130,7 @@ namespace bx
 
 	bool Thread::init(ThreadFn _fn, void* _userData, uint32_t _stackSize, const char* _name)
 	{
-		BX_CHECK(!m_running, "Already running!");
+		BX_ASSERT(!m_running, "Already running!");
 
 		m_fn = _fn;
 		m_userData = _userData;
@@ -220,7 +220,7 @@ namespace bx
 
 	void Thread::shutdown()
 	{
-		BX_CHECK(m_running, "Not running!");
+		BX_ASSERT(m_running, "Not running!");
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 #if BX_CRT_NONE
 		crt0::threadJoin(ti->m_handle, NULL);
@@ -388,14 +388,14 @@ namespace bx
 
 		TlsDataInternal* ti = (TlsDataInternal*)m_internal;
 		ti->m_id = TlsAlloc();
-		BX_CHECK(TLS_OUT_OF_INDEXES != ti->m_id, "Failed to allocated TLS index (err: 0x%08x).", GetLastError() );
+		BX_ASSERT(TLS_OUT_OF_INDEXES != ti->m_id, "Failed to allocated TLS index (err: 0x%08x).", GetLastError() );
 	}
 
 	TlsData::~TlsData()
 	{
 		TlsDataInternal* ti = (TlsDataInternal*)m_internal;
 		BOOL result = TlsFree(ti->m_id);
-		BX_CHECK(0 != result, "Failed to free TLS index (err: 0x%08x).", GetLastError() ); BX_UNUSED(result);
+		BX_ASSERT(0 != result, "Failed to free TLS index (err: 0x%08x).", GetLastError() ); BX_UNUSED(result);
 	}
 
 	void* TlsData::get() const
@@ -418,14 +418,14 @@ namespace bx
 
 		TlsDataInternal* ti = (TlsDataInternal*)m_internal;
 		int result = pthread_key_create(&ti->m_id, NULL);
-		BX_CHECK(0 == result, "pthread_key_create failed %d.", result); BX_UNUSED(result);
+		BX_ASSERT(0 == result, "pthread_key_create failed %d.", result); BX_UNUSED(result);
 	}
 
 	TlsData::~TlsData()
 	{
 		TlsDataInternal* ti = (TlsDataInternal*)m_internal;
 		int result = pthread_key_delete(ti->m_id);
-		BX_CHECK(0 == result, "pthread_key_delete failed %d.", result); BX_UNUSED(result);
+		BX_ASSERT(0 == result, "pthread_key_delete failed %d.", result); BX_UNUSED(result);
 	}
 
 	void* TlsData::get() const
@@ -438,7 +438,7 @@ namespace bx
 	{
 		TlsDataInternal* ti = (TlsDataInternal*)m_internal;
 		int result = pthread_setspecific(ti->m_id, _ptr);
-		BX_CHECK(0 == result, "pthread_setspecific failed %d.", result); BX_UNUSED(result);
+		BX_ASSERT(0 == result, "pthread_setspecific failed %d.", result); BX_UNUSED(result);
 	}
 #endif // BX_PLATFORM_*
 

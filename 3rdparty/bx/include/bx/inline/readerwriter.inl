@@ -118,7 +118,7 @@ namespace bx
 
 	inline int32_t SizerWriter::write(const void* /*_data*/, int32_t _size, Error* _err)
 	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+		BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 		int32_t morecore = int32_t(m_pos - m_top) + _size;
 
@@ -170,7 +170,7 @@ namespace bx
 
 	inline int32_t MemoryReader::read(void* _data, int32_t _size, Error* _err)
 	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+		BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 		int64_t remainder = m_top-m_pos;
 		int32_t size = uint32_min(_size, uint32_t(min<int64_t>(remainder, INT32_MAX) ) );
@@ -233,7 +233,7 @@ namespace bx
 
 	inline int32_t MemoryWriter::write(const void* _data, int32_t _size, Error* _err)
 	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+		BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 		int32_t morecore = int32_t(m_pos - m_size) + _size;
 

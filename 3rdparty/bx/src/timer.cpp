@@ -41,7 +41,7 @@ namespace bx
 		gettimeofday(&now, 0);
 		int64_t i64 = now.tv_sec*INT64_C(1000000) + now.tv_usec;
 #else
-		BX_CHECK(false, "Not implemented!");
+		BX_ASSERT(false, "Not implemented!");
 		int64_t i64 = UINT64_MAX;
 #endif // BX_PLATFORM_
 		return i64;
