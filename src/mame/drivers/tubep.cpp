@@ -110,7 +110,7 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 #include "sound/msm5205.h"
 #include "speaker.h"
 
-#define LOG_IRQ (1U << 0)
+#define LOG_IRQ (1U << 1)
 //#define VERBOSE (LOG_IRQ)
 
 #include "logmacro.h"
