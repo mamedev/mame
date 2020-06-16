@@ -105,7 +105,7 @@ void seicross_state::portB_w(uint8_t data)
 	m_portb = data;
 }
 
-WRITE8_MEMBER(seicross_state::dac_w)
+void seicross_state::dac_w(uint8_t data)
 {
 	m_dac->write(data >> 4);
 }

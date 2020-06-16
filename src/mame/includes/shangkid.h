@@ -59,12 +59,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_1_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_2_w);
-	DECLARE_WRITE8_MEMBER(nmiq_1_w);
-	DECLARE_WRITE8_MEMBER(nmiq_2_w);
+	void nmiq_1_w(uint8_t data);
+	void nmiq_2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	uint8_t soundlatch_r();
+	void videoram_w(offs_t offset, uint8_t data);
 	void ay8910_portb_w(uint8_t data);
 
 	// game specific

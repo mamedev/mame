@@ -37,13 +37,13 @@ void sspeedr_state::sspeedr_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_int_ack_w)
+void sspeedr_state::sspeedr_int_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_lamp_w)
+void sspeedr_state::sspeedr_lamp_w(uint8_t data)
 {
 	output().set_value("lampGO", BIT(data, 0));
 	output().set_value("lampEP", BIT(data, 1));
@@ -55,7 +55,7 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_lamp_w)
 constexpr uint8_t ls48_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_time_w)
+void sspeedr_state::sspeedr_time_w(offs_t offset, uint8_t data)
 {
 	data = data & 15;
 	m_digits[24 + offset] = ls48_map[data];
@@ -63,7 +63,7 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_time_w)
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_score_w)
+void sspeedr_state::sspeedr_score_w(offs_t offset, uint8_t data)
 {
 	data = ~data & 15;
 	m_digits[offset] = ls48_map[data];
@@ -71,7 +71,7 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_score_w)
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_sound_w)
+void sspeedr_state::sspeedr_sound_w(uint8_t data)
 {
 	/* not implemented */
 }

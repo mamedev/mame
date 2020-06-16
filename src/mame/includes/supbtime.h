@@ -41,7 +41,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
-	DECLARE_READ16_MEMBER(vblank_ack_r);
+	uint16_t vblank_ack_r();
 	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool use_offsets);
 	uint32_t screen_update_chinatwn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -110,13 +110,13 @@ WRITE_LINE_MEMBER(shangkid_state::irq_2_w)
 		m_bbx->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(shangkid_state::nmiq_1_w)
+void shangkid_state::nmiq_1_w(uint8_t data)
 {
 	if (m_nmi_enable[0])
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(shangkid_state::nmiq_2_w)
+void shangkid_state::nmiq_2_w(uint8_t data)
 {
 	if (m_nmi_enable[1])
 		m_bbx->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -155,7 +155,7 @@ void shangkid_state::ay8910_portb_w(uint8_t data)
 
 /***************************************************************************************/
 
-READ8_MEMBER(shangkid_state::soundlatch_r)
+uint8_t shangkid_state::soundlatch_r()
 {
 	return m_sound_latch;
 }

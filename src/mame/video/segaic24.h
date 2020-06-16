@@ -29,12 +29,12 @@ public:
 	// configuration
 	void set_tile_mask(uint16_t _tile_mask) { tile_mask = _tile_mask; }
 
-	DECLARE_READ16_MEMBER(tile_r);
-	DECLARE_WRITE16_MEMBER(tile_w);
-	DECLARE_READ16_MEMBER(char_r);
-	DECLARE_WRITE16_MEMBER(char_w);
-	DECLARE_WRITE16_MEMBER(xhout_w);
-	DECLARE_WRITE16_MEMBER(xvout_w);
+	uint16_t tile_r(offs_t offset);
+	void tile_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t char_r(offs_t offset);
+	void char_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void xhout_w(uint16_t data);
+	void xvout_w(uint16_t data);
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
@@ -83,8 +83,8 @@ class segas24_sprite_device : public device_t
 public:
 	segas24_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, const int *spri);
 
@@ -103,8 +103,8 @@ class segas24_mixer_device : public device_t
 public:
 	segas24_mixer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint16_t get_reg(int reg);
 

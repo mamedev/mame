@@ -351,9 +351,15 @@ license:CC0
 
 <!-- lcd/button panel -->
 
+	<element name="lcdw"><rect><color red="1" green="1" blue="1" /></rect></element>
+	<element name="lcdm"><rect><color red="0.36" green="0.42" blue="0.42" /></rect></element>
+	<element name="lcda"><rect><color red="0.20" green="0.16" blue="0.17" /></rect></element>
+
 	<group name="panel1">
-		<element ref="lcd_bg"><bounds x="0" y="0" width="24.8" height="5.3" /></element>
-		<screen index="0" blend="alpha"><bounds x="0.4" y="0.4" width="24" height="4.5" /></screen>
+		<element ref="lcdw"><bounds x="0" y="0" width="1" height="1" /></element>
+		<screen index="0"><bounds x="0.02" y="0.1" width="0.96" height="0.8" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds x="0" y="0" width="1" height="1" /></element>
+		<element ref="lcda" blend="add"><bounds x="0" y="0" width="1" height="1" /></element>
 	</group>
 
 	<group name="panel2">
@@ -398,6 +404,7 @@ license:CC0
 
 
 <!-- build screen -->
+
 	<view name="Internal Layout">
 		<bounds left="1" right="129" top="0.5" bottom="90" />
 
@@ -442,7 +449,7 @@ license:CC0
 		<bezel name="led15" element="ledr"><bounds x="16.5" y="7.5"  width="2" height="1" /></bezel>
 
 	<!-- LCD panel -->
-		<group ref="panel1"><bounds x="103.5" y="59" width="23" height="4.915" /></group>
+		<group ref="panel1"><bounds x="103.5" y="56.9" width="23" height="6.1" /></group>
 		<group ref="panel2"><bounds x="103" y="69" width="24" height="17" /></group>
 
 		<group ref="sb_board"><bounds x="20" y="3" width="80" height="80" /></group>

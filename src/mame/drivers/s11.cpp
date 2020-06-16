@@ -204,7 +204,7 @@ WRITE_LINE_MEMBER( s11_state::pia_irq )
 	}
 }
 
-WRITE8_MEMBER( s11_state::sol3_w )
+void s11_state::sol3_w(uint8_t data)
 {
 }
 
@@ -323,7 +323,7 @@ WRITE_LINE_MEMBER( s11_state::pia34_cb2_w )
 		m_bg->ctrl_w(state);
 }
 
-WRITE8_MEMBER( s11_state::bank_w )
+void s11_state::bank_w(uint8_t data)
 {
 	membank("bank0")->set_entry(BIT(data, 1));
 	membank("bank1")->set_entry(BIT(data, 0));

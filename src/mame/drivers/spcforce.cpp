@@ -102,12 +102,12 @@ READ_LINE_MEMBER(spcforce_state::t0_r)
 }
 
 
-WRITE8_MEMBER(spcforce_state::soundtrigger_w)
+void spcforce_state::soundtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(spcforce_state::misc_outputs_w)
+void spcforce_state::misc_outputs_w(uint8_t data)
 {
 	m_lamps[0] = BIT(data, 0); // 1P start lamp
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));

@@ -538,7 +538,7 @@ ROM_END
 
 
 
-READ32_MEMBER(superchs_state::main_cycle_r)
+u32 superchs_state::main_cycle_r()
 {
 	if (m_maincpu->pc() == 0x702)
 		m_maincpu->spin_until_interrupt();
@@ -546,7 +546,7 @@ READ32_MEMBER(superchs_state::main_cycle_r)
 	return m_ram[0];
 }
 
-READ16_MEMBER(superchs_state::sub_cycle_r)
+u16 superchs_state::sub_cycle_r()
 {
 	if (m_subcpu->pc() == 0x454)
 		m_subcpu->spin_until_interrupt();
@@ -557,8 +557,8 @@ READ16_MEMBER(superchs_state::sub_cycle_r)
 void superchs_state::init_superchs()
 {
 	/* Speedup handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x100003, read32_delegate(*this, FUNC(superchs_state::main_cycle_r)));
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x80000a, 0x80000b, read16_delegate(*this, FUNC(superchs_state::sub_cycle_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x100003, read32smo_delegate(*this, FUNC(superchs_state::main_cycle_r)));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x80000a, 0x80000b, read16smo_delegate(*this, FUNC(superchs_state::sub_cycle_r)));
 }
 
 GAMEL( 1992, superchs,   0,        superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito Corporation Japan",   "Super Chase - Criminal Termination (World)", 0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2O

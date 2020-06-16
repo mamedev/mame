@@ -244,7 +244,7 @@ void segag80r_state::astrob_sound_board(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::astrob_sound_w)
+void segag80r_state::astrob_sound_w(offs_t offset, uint8_t data)
 {
 	static const float attack_resistor[10] =
 	{
@@ -593,7 +593,7 @@ void segag80r_state::spaceod_sound_board(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::spaceod_sound_w)
+void segag80r_state::spaceod_sound_w(offs_t offset, uint8_t data)
 {
 	uint8_t diff = data ^ m_sound_state[offset];
 	m_sound_state[offset] = data;

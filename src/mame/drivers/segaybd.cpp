@@ -671,17 +671,17 @@ WRITE_LINE_MEMBER(segaybd_state::mb8421_intr)
 }
 
 
-READ16_MEMBER(segaybd_state::link_r)
+uint16_t segaybd_state::link_r()
 {
 	return machine().rand();
 }
 
-READ16_MEMBER(segaybd_state::link2_r)
+uint16_t segaybd_state::link2_r()
 {
 	return 0x0000;
 }
 
-WRITE16_MEMBER(segaybd_state::link2_w)
+void segaybd_state::link2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 	logerror("link2_w %04x\n", data);

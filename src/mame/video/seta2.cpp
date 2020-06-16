@@ -149,7 +149,7 @@
 
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::vregs_w)
+void seta2_state::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* 02/04 = horizontal display start/end
 	           mj4simai = 0065/01E5 (0180 visible area)
@@ -272,12 +272,12 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 	}
 }
 
-READ16_MEMBER(seta2_state::spriteram_r)
+uint16_t seta2_state::spriteram_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(seta2_state::spriteram_w)
+void seta2_state::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 }

@@ -60,7 +60,7 @@ starfira has one less rom in total than starfire but everything passes as
  *
  *************************************/
 
-WRITE8_MEMBER(starfire_state::starfire_scratch_w)
+void starfire_state::starfire_scratch_w(offs_t offset, uint8_t data)
 {
 	/* A12 and A3 select video control registers */
 	if ((offset & 0x1008) == 0x1000)
@@ -69,7 +69,7 @@ WRITE8_MEMBER(starfire_state::starfire_scratch_w)
 		{
 			case 0: m_starfire_vidctrl = data; break;
 			case 1: m_starfire_vidctrl1 = data; break;
-			case 2: m_io2_write(space, offset, data, 0xff); break;
+			case 2: m_io2_write(data); break;
 			default: break;
 		}
 	}
@@ -80,11 +80,11 @@ WRITE8_MEMBER(starfire_state::starfire_scratch_w)
 }
 
 
-READ8_MEMBER(starfire_state::starfire_scratch_r)
+uint8_t starfire_state::starfire_scratch_r(offs_t offset)
 {
 	/* A11 selects input ports */
 	if (offset & 0x800)
-		return m_input_read(space, offset, 0xff);
+		return m_input_read(offset);
 
 	/* convert to a videoram offset */
 	offset = (offset & 0x31f) | ((offset & 0xe0) << 5);
@@ -99,7 +99,7 @@ READ8_MEMBER(starfire_state::starfire_scratch_r)
  *
  *************************************/
 
-WRITE8_MEMBER(starfire_state::starfire_sound_w)
+void starfire_state::starfire_sound_w(uint8_t data)
 {
 	// starfire sound samples (preliminary)
 	uint8_t rise = data & ~m_prev_sound;
@@ -127,14 +127,14 @@ WRITE8_MEMBER(starfire_state::starfire_sound_w)
 	else if (rise & 0x10) m_samples->start(4, 4);
 }
 
-WRITE8_MEMBER(starfire_state::fireone_sound_w)
+void starfire_state::fireone_sound_w(uint8_t data)
 {
 	// TODO: sound
 	m_fireone_select = (data & 0x8) ? 0 : 1;
 }
 
 
-READ8_MEMBER(starfire_state::starfire_input_r)
+uint8_t starfire_state::starfire_input_r(offs_t offset)
 {
 	switch (offset & 15)
 	{
@@ -155,7 +155,7 @@ READ8_MEMBER(starfire_state::starfire_input_r)
 	}
 }
 
-READ8_MEMBER(starfire_state::fireone_input_r)
+uint8_t starfire_state::fireone_input_r(offs_t offset)
 {
 	static const uint8_t fireone_paddle_map[64] =
 	{
@@ -450,8 +450,8 @@ ROM_END
 
 void starfire_state::init_starfire()
 {
-	m_input_read = read8_delegate(*this, FUNC(starfire_state::starfire_input_r));
-	m_io2_write = write8_delegate(*this, FUNC(starfire_state::starfire_sound_w));
+	m_input_read = read8sm_delegate(*this, FUNC(starfire_state::starfire_input_r));
+	m_io2_write = write8smo_delegate(*this, FUNC(starfire_state::starfire_sound_w));
 
 	/* register for state saving */
 	save_item(NAME(m_prev_sound));
@@ -459,8 +459,8 @@ void starfire_state::init_starfire()
 
 void starfire_state::init_fireone()
 {
-	m_input_read = read8_delegate(*this, FUNC(starfire_state::fireone_input_r));
-	m_io2_write = write8_delegate(*this, FUNC(starfire_state::fireone_sound_w));
+	m_input_read = read8sm_delegate(*this, FUNC(starfire_state::fireone_input_r));
+	m_io2_write = write8smo_delegate(*this, FUNC(starfire_state::fireone_sound_w));
 
 	/* register for state saving */
 	save_item(NAME(m_fireone_select));

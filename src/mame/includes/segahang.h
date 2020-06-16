@@ -88,7 +88,7 @@ private:
 	uint8_t analog_r();
 
 	// Z80 sound CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
+	uint8_t sound_data_r();
 
 	// I8751-related VBLANK interrupt handlers
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );

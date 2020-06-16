@@ -50,18 +50,18 @@ CUSTOM_INPUT_MEMBER(scramble_state::darkplnt_dial_r)
 /* state of the security PAL (6J) */
 
 
-READ8_MEMBER(scramble_state::mariner_protection_1_r )
+uint8_t scramble_state::mariner_protection_1_r()
 {
 	return 7;
 }
 
-READ8_MEMBER(scramble_state::mariner_protection_2_r )
+uint8_t scramble_state::mariner_protection_2_r()
 {
 	return 3;
 }
 
 
-READ8_MEMBER(scramble_state::triplep_pip_r )
+uint8_t scramble_state::triplep_pip_r()
 {
 	logerror("PC %04x: triplep read port 2\n",m_maincpu->pc());
 	if (m_maincpu->pc() == 0x015a) return 0xff;
@@ -69,7 +69,7 @@ READ8_MEMBER(scramble_state::triplep_pip_r )
 	else return 0;
 }
 
-READ8_MEMBER(scramble_state::triplep_pap_r )
+uint8_t scramble_state::triplep_pap_r()
 {
 	logerror("PC %04x: triplep read port 3\n",m_maincpu->pc());
 	if (m_maincpu->pc() == 0x015d) return 0x04;
@@ -88,7 +88,7 @@ void scramble_state::cavelon_banksw()
 	membank("bank1")->set_entry(m_cavelon_bank);
 }
 
-READ8_MEMBER(scramble_state::cavelon_banksw_r )
+uint8_t scramble_state::cavelon_banksw_r(offs_t offset)
 {
 	cavelon_banksw();
 
@@ -100,7 +100,7 @@ READ8_MEMBER(scramble_state::cavelon_banksw_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER(scramble_state::cavelon_banksw_w )
+void scramble_state::cavelon_banksw_w(offs_t offset, uint8_t data)
 {
 	cavelon_banksw();
 
@@ -111,12 +111,12 @@ WRITE8_MEMBER(scramble_state::cavelon_banksw_w )
 }
 
 
-READ8_MEMBER(scramble_state::hunchbks_mirror_r )
+uint8_t scramble_state::hunchbks_mirror_r(address_space &space, offs_t offset)
 {
 	return space.read_byte(0x1000+offset);
 }
 
-WRITE8_MEMBER(scramble_state::hunchbks_mirror_w )
+void scramble_state::hunchbks_mirror_w(address_space &space, offs_t offset, uint8_t data)
 {
 	space.write_byte(0x1000+offset,data);
 }
@@ -182,8 +182,8 @@ void scramble_state::init_mariner()
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x5800, 0x67ff);
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x5800);
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9008, 0x9008, read8_delegate(*this, FUNC(scramble_state::mariner_protection_2_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb401, 0xb401, read8_delegate(*this, FUNC(scramble_state::mariner_protection_1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9008, 0x9008, read8smo_delegate(*this, FUNC(scramble_state::mariner_protection_2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb401, 0xb401, read8smo_delegate(*this, FUNC(scramble_state::mariner_protection_1_r)));
 
 	/* ??? (it's NOT a background enable) */
 	/*m_maincpu->space(AS_PROGRAM).nop_write(0x6803, 0x6803);*/
@@ -259,7 +259,7 @@ void scramble_state::init_cavelon()
 	cavelon_banksw();
 
 	/* A15 switches memory banks */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xffff, read8_delegate(*this, FUNC(scramble_state::cavelon_banksw_r)), write8_delegate(*this, FUNC(scramble_state::cavelon_banksw_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xffff, read8sm_delegate(*this, FUNC(scramble_state::cavelon_banksw_r)), write8sm_delegate(*this, FUNC(scramble_state::cavelon_banksw_w)));
 
 	m_maincpu->space(AS_PROGRAM).nop_write(0x2000, 0x2000);  /* ??? */
 	m_maincpu->space(AS_PROGRAM).nop_write(0x3800, 0x3801);  /* looks suspicously like
@@ -540,12 +540,12 @@ void scramble_state::init_ad2083()
  Harem run-time decryption
 *************************************************************/
 
-WRITE8_MEMBER(scramble_state::harem_decrypt_bit_w)
+void scramble_state::harem_decrypt_bit_w(uint8_t data)
 {
 	m_harem_decrypt_bit = data;
 }
 
-WRITE8_MEMBER(scramble_state::harem_decrypt_clk_w)
+void scramble_state::harem_decrypt_clk_w(uint8_t data)
 {
 	if ((data & 1) && !(m_harem_decrypt_clk & 1))
 	{
@@ -580,7 +580,7 @@ WRITE8_MEMBER(scramble_state::harem_decrypt_clk_w)
 	}
 }
 
-WRITE8_MEMBER(scramble_state::harem_decrypt_rst_w)
+void scramble_state::harem_decrypt_rst_w(uint8_t data)
 {
 	m_harem_decrypt_mode = 0;
 	m_harem_decrypt_count = 0;
@@ -638,6 +638,6 @@ void scramble_state::init_newsin7a()
 //  ROM[0x0067] ^= 0x22;          /* rst $00         - should be push hl - the NMI routine is corrupt in this set, but the IRQ routine bypasses it? intentional? */
 
 	// attempts to access port at c20x instead of 820x in one location, mirror or bitrot?
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc200, 0xc20f, read8_delegate(*this, FUNC(scramble_state::mars_ppi8255_1_r)), write8_delegate(*this, FUNC(scramble_state::mars_ppi8255_1_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc200, 0xc20f, read8sm_delegate(*this, FUNC(scramble_state::mars_ppi8255_1_r)), write8sm_delegate(*this, FUNC(scramble_state::mars_ppi8255_1_w)));
 
 }

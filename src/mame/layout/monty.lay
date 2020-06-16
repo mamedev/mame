@@ -7,8 +7,8 @@ license:CC0
 <!-- define elements -->
 
 	<element name="lcdw"><rect><color red="1" green="1" blue="1" /></rect></element>
-	<element name="lcdm"><rect><color red="0.37" green="0.42" blue="0.43" /></rect></element>
-	<element name="lcda"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
+	<element name="lcdm"><rect><color red="0.36" green="0.42" blue="0.42" /></rect></element>
+	<element name="lcda"><rect><color red="0.20" green="0.16" blue="0.17" /></rect></element>
 
 
 <!-- build screen -->

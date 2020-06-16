@@ -308,8 +308,8 @@ protected:
 	u16 dsp_slave_port8_r();
 	u16 dsp_slave_portb_r();
 	void dsp_slave_portb_w(u16 data);
-	u32 namcos22_sci_r(offs_t offset);
-	void namcos22_sci_w(u32 data);
+	u16 namcos22_sci_r(offs_t offset);
+	void namcos22_sci_w(offs_t offset, u16 data);
 	u16 namcos22_shared_r(offs_t offset);
 	void namcos22_shared_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 namcos22_keycus_r(offs_t offset);

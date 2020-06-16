@@ -77,20 +77,20 @@ private:
 	int m_vblank;
 	int m_prev_value;
 
-	DECLARE_WRITE16_MEMBER(flip_screen);
-	DECLARE_READ16_MEMBER(input_ports_r);
-	DECLARE_WRITE8_MEMBER(screen_brt_w);
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_WRITE16_MEMBER(irq_w);
-	DECLARE_WRITE16_MEMBER(scanline_w);
-	DECLARE_WRITE16_MEMBER(fgvideoram_w);
-	DECLARE_WRITE16_MEMBER(bg0videoram_w);
-	DECLARE_WRITE16_MEMBER(bg1videoram_w);
-	DECLARE_WRITE16_MEMBER(bg0scrollx_w);
-	DECLARE_WRITE16_MEMBER(bg0scrolly_w);
-	DECLARE_WRITE16_MEMBER(bg1scrollx_w);
-	DECLARE_WRITE16_MEMBER(bg1scrolly_w);
-	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
+	void flip_screen(uint16_t data);
+	uint16_t input_ports_r(offs_t offset);
+	void screen_brt_w(uint8_t data);
+	void irq_ack_w(offs_t offset, uint16_t data);
+	void irq_w(uint16_t data);
+	void scanline_w(uint16_t data);
+	void fgvideoram_w(offs_t offset, uint16_t data);
+	void bg0videoram_w(offs_t offset, uint16_t data);
+	void bg1videoram_w(offs_t offset, uint16_t data);
+	void bg0scrollx_w(uint16_t data);
+	void bg0scrolly_w(uint16_t data);
+	void bg1scrollx_w(uint16_t data);
+	void bg1scrolly_w(uint16_t data);
+	void oki_bankswitch_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_fgtile_info);
 	TILE_GET_INFO_MEMBER(get_bg0tile_info);

@@ -8,7 +8,6 @@ but that part is emulated in the driver.
 
 TODO:
 - add mmdisplay1.cpp, the one with shift registers and 4-digit lcd
-- correct lcd screen aspect ratio in layouts
 
 *********************************************************************/
 
@@ -63,9 +62,9 @@ void mephisto_display_module2_device::device_add_mconfig(machine_config &config)
 
 void mephisto_display_module2_device::lcd_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t(51, 42, 43)); // lcd pixel on
-	palette.set_pen_color(2, rgb_t(130, 136, 137)); // lcd pixel off
+	palette.set_pen_color(0, rgb_t(0xff, 0xff, 0xff)); // background
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(0xe8, 0xe8, 0xe8)); // lcd pixel off
 }
 
 HD44780_PIXEL_UPDATE(mephisto_display_module2_device::lcd_pixel_update)

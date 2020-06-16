@@ -166,8 +166,8 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(cpu_io_videoreg_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void cpu_io_videoreg_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -186,7 +186,7 @@ private:
 *               Video Hardware               *
 *********************************************/
 
-WRITE8_MEMBER(smotor_state::videoram_w)
+void smotor_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset/2);
@@ -331,7 +331,7 @@ void smotor_state::smotor_cpu_io(address_map &map)
 
 }
 
-WRITE8_MEMBER(smotor_state::cpu_io_videoreg_w)
+void smotor_state::cpu_io_videoreg_w(offs_t offset, uint8_t data)
 {
 	switch (offset) {
 

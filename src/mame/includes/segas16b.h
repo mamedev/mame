@@ -137,22 +137,22 @@ protected:
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
 
 	// main CPU read/write handlers
-	DECLARE_WRITE16_MEMBER( rom_5704_bank_w );
-	DECLARE_READ16_MEMBER( rom_5797_bank_math_r );
-	DECLARE_WRITE16_MEMBER( rom_5797_bank_math_w );
-	DECLARE_READ16_MEMBER( unknown_rgn2_r );
-	DECLARE_WRITE16_MEMBER( unknown_rgn2_w );
-	DECLARE_READ16_MEMBER( standard_io_r );
-	DECLARE_WRITE16_MEMBER( standard_io_w );
-	DECLARE_WRITE16_MEMBER( atomicp_sound_w );
+	void rom_5704_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t rom_5797_bank_math_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void rom_5797_bank_math_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t unknown_rgn2_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void unknown_rgn2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t standard_io_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void standard_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void atomicp_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( bootleg_custom_io_r );
-	DECLARE_WRITE16_MEMBER( bootleg_custom_io_w );
+	uint16_t bootleg_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void bootleg_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// sound CPU read/write handlers
 	void upd7759_control_w(uint8_t data);
 	uint8_t upd7759_status_r();
-	DECLARE_WRITE16_MEMBER( sound_w16 );
+	void sound_w16(uint16_t data);
 
 	// other callbacks
 	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
@@ -162,8 +162,8 @@ protected:
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER( tileram_w ) { m_segaic16vid->tileram_w(space,offset,data,mem_mask); };
-	DECLARE_WRITE16_MEMBER( textram_w ) { m_segaic16vid->textram_w(space,offset,data,mem_mask); };
+	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->tileram_w(offset,data,mem_mask); };
+	void textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->textram_w(offset,data,mem_mask); };
 
 	// bootleg stuff
 	void tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram);
@@ -225,15 +225,15 @@ protected:
 	void wb3_i8751_sim();
 
 	// custom I/O handlers
-	DECLARE_READ16_MEMBER( aceattac_custom_io_r );
-	DECLARE_WRITE16_MEMBER( aceattac_custom_io_w );
-	DECLARE_READ16_MEMBER( dunkshot_custom_io_r );
-	DECLARE_READ16_MEMBER( hwchamp_custom_io_r );
-	DECLARE_WRITE16_MEMBER( hwchamp_custom_io_w );
-	DECLARE_READ16_MEMBER( passshtj_custom_io_r );
-	DECLARE_READ16_MEMBER( sdi_custom_io_r );
-	DECLARE_READ16_MEMBER( sjryuko_custom_io_r );
-	DECLARE_WRITE16_MEMBER( sjryuko_custom_io_w );
+	uint16_t aceattac_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void aceattac_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dunkshot_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t hwchamp_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void hwchamp_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t passshtj_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t sdi_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t sjryuko_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void sjryuko_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// devices
 	optional_device<sega_315_5195_mapper_device> m_mapper;
@@ -260,7 +260,7 @@ protected:
 	// configuration
 	segas16b_rom_board  m_romboard;
 	int                 m_tilemap_type;
-	read16_delegate     m_custom_io_r;
+	read16_delegate   m_custom_io_r;
 	write16_delegate    m_custom_io_w;
 	bool                m_disable_screen_blanking;
 	const uint8_t *       m_i8751_initial_config;
@@ -369,19 +369,19 @@ public:
 
 private:
 	// read/write handlers
-	DECLARE_WRITE16_MEMBER( cart_addr_high_w );
-	DECLARE_WRITE16_MEMBER( cart_addr_low_w );
-	DECLARE_READ16_MEMBER( cart_data_r );
-	DECLARE_WRITE16_MEMBER( data_w );
-	DECLARE_WRITE16_MEMBER( datatype_w );
-	DECLARE_WRITE16_MEMBER( addr_high_w );
-	DECLARE_WRITE16_MEMBER( addr_low_w );
-	DECLARE_WRITE16_MEMBER( cart_security_high_w );
-	DECLARE_WRITE16_MEMBER( cart_security_low_w );
-	DECLARE_READ16_MEMBER( cart_security_low_r );
-	DECLARE_READ16_MEMBER( cart_security_high_r );
-	DECLARE_WRITE16_MEMBER( sound_reset_w );
-	DECLARE_WRITE16_MEMBER( main_bank_change_w );
+	void cart_addr_high_w(uint16_t data);
+	void cart_addr_low_w(uint16_t data);
+	uint16_t cart_data_r();
+	void data_w(uint16_t data);
+	void datatype_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void addr_high_w(uint16_t data);
+	void addr_low_w(uint16_t data);
+	void cart_security_high_w(uint16_t data);
+	void cart_security_low_w(uint16_t data);
+	uint16_t cart_security_low_r();
+	uint16_t cart_security_high_r();
+	void sound_reset_w(uint16_t data);
+	void main_bank_change_w(uint16_t data);
 
 	// security callbacks
 	uint32_t shinfz_security(uint32_t input);
