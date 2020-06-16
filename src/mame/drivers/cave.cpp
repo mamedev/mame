@@ -3301,6 +3301,46 @@ ROM_START( donpachihk )
 	ROM_LOAD( "peel18cv8p-15.u18", 0x0000, 0x0155, CRC(3f4787e9) SHA1(fc7da25c9f36c9cbc6ba5a7314c4828d405d1261) ) /* PEEL18CV8P-15 */
 ROM_END
 
+/*
+	When you press the 2p start button, it pauses the game (music still plays).
+	Pressing the 1p start button unpauses the game.
+	If you press both 1p start and 2p start at the same time, the game lets you play in slow motion (music still plays normally).
+
+	This was on the label of the ROM chip: 国内撮影用
+*/
+
+ROM_START( donpachijs )
+	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "prg.u29",     0x00000, 0x80000, CRC(810dbd42) SHA1(703a5aec90b595a1c5a679ab165643119ba6b2f3) )
+
+	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_LOAD16_WORD_SWAP( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
+	ROM_LOAD16_WORD_SWAP( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
+
+	ROM_REGION( 0x100000, "layer0", 0 ) /* Layer 0 */
+	ROM_LOAD( "atdp.u54", 0x000000, 0x100000, CRC(6bda6b66) SHA1(6472e6706505bac17484fb8bf4e8922ced4adf63) )
+
+	ROM_REGION( 0x100000, "layer1", 0 ) /* Layer 1 */
+	ROM_LOAD( "atdp.u57", 0x000000, 0x100000, CRC(0a0e72b9) SHA1(997e8253777e7acca5a1c0c4026e78eecc122d5d) )
+
+	ROM_REGION( 0x040000, "layer2", 0 ) /* Text / Character Layer */
+	ROM_LOAD( "text.u58", 0x000000, 0x040000, CRC(5dba06e7) SHA1(f9dab7f6c732a683fddb4cae090a875b3962332b) )
+
+	ROM_REGION( 0x240000, "oki1", 0 )   /* OKIM6295 #1 Samples */
+	/* Leave the 0x40000 bytes addressable by the chip empty */
+	ROM_LOAD( "atdp.u33", 0x040000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+
+	ROM_REGION( 0x340000, "oki2", 0 )   /* OKIM6295 #2 Samples */
+	/* Leave the 0x40000 bytes addressable by the chip empty */
+	ROM_LOAD( "atdp.u32", 0x040000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
+	ROM_LOAD( "atdp.u33", 0x140000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-donpachi.u10", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) ) /* ATMEL 93C46 */
+
+	ROM_REGION( 0x0155, "pal", 0 )
+	ROM_LOAD( "peel18cv8p-15.u18", 0x0000, 0x0155, CRC(3f4787e9) SHA1(fc7da25c9f36c9cbc6ba5a7314c4828d405d1261) ) /* PEEL18CV8P-15 */
+ROM_END
 
 /***************************************************************************
 
@@ -5147,6 +5187,7 @@ GAME( 1994, mazingerj,  mazinger, mazinger, cave,     cave_state, init_mazinger,
 
 GAME( 1995, donpachi,   0,        donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (US)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, donpachij,  donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, donpachijs, donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Japan, Satsuei version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, donpachikr, donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Korea)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1995, donpachihk, donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Hong Kong)", MACHINE_SUPPORTS_SAVE )
 
