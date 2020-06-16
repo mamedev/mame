@@ -117,38 +117,38 @@ protected:
 	int16_t      m_sampledata[0x40000];
 
 	uint8_t      m_irq5_mask;
-	DECLARE_READ16_MEMBER(k052109_word_noA12_r);
-	DECLARE_WRITE16_MEMBER(k052109_word_noA12_w);
-	DECLARE_WRITE16_MEMBER(punkshot_k052109_word_w);
-	DECLARE_WRITE16_MEMBER(punkshot_k052109_word_noA12_w);
-	DECLARE_READ16_MEMBER(k053245_scattered_word_r);
-	DECLARE_WRITE16_MEMBER(k053245_scattered_word_w);
-	DECLARE_READ16_MEMBER(k053244_word_noA1_r);
-	DECLARE_WRITE16_MEMBER(k053244_word_noA1_w);
-	DECLARE_READ8_MEMBER(tmnt_sres_r);
-	DECLARE_WRITE8_MEMBER(tmnt_sres_w);
-	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
-	DECLARE_READ16_MEMBER(punkshot_kludge_r);
-	DECLARE_READ16_MEMBER(ssriders_protection_r);
-	DECLARE_WRITE16_MEMBER(ssriders_protection_w);
-	DECLARE_READ16_MEMBER(blswhstl_coin_r);
-	DECLARE_READ16_MEMBER(ssriders_eeprom_r);
-	DECLARE_READ16_MEMBER(sunsetbl_eeprom_r);
-	DECLARE_WRITE16_MEMBER(blswhstl_eeprom_w);
-	DECLARE_READ16_MEMBER(thndrx2_eeprom_r);
-	DECLARE_WRITE16_MEMBER(thndrx2_eeprom_w);
-	DECLARE_WRITE8_MEMBER(cuebrick_nvbank_w);
-	DECLARE_WRITE16_MEMBER(ssriders_soundkludge_w);
-	DECLARE_WRITE16_MEMBER(tmnt2_1c0800_w);
-	DECLARE_WRITE16_MEMBER(tmnt_0a0000_w);
-	DECLARE_WRITE16_MEMBER(punkshot_0a0020_w);
-	DECLARE_WRITE16_MEMBER(lgtnfght_0a0018_w);
-	DECLARE_WRITE16_MEMBER(blswhstl_700300_w);
-	DECLARE_WRITE16_MEMBER(ssriders_eeprom_w);
-	DECLARE_WRITE16_MEMBER(ssriders_1c0300_w);
-	DECLARE_WRITE16_MEMBER(tmnt_priority_w);
-	DECLARE_WRITE8_MEMBER(tmnt_upd_start_w);
-	DECLARE_READ8_MEMBER(tmnt_upd_busy_r);
+	uint16_t k052109_word_noA12_r(offs_t offset);
+	void k052109_word_noA12_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void punkshot_k052109_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void punkshot_k052109_word_noA12_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t k053245_scattered_word_r(offs_t offset);
+	void k053245_scattered_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t k053244_word_noA1_r(offs_t offset);
+	void k053244_word_noA1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t tmnt_sres_r();
+	void tmnt_sres_w(uint8_t data);
+	void sound_arm_nmi_w(uint8_t data);
+	uint16_t punkshot_kludge_r();
+	uint16_t ssriders_protection_r(address_space &space);
+	void ssriders_protection_w(address_space &space, offs_t offset, uint16_t data);
+	uint16_t blswhstl_coin_r();
+	uint16_t ssriders_eeprom_r();
+	uint16_t sunsetbl_eeprom_r();
+	void blswhstl_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t thndrx2_eeprom_r();
+	void thndrx2_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cuebrick_nvbank_w(uint8_t data);
+	void ssriders_soundkludge_w(uint16_t data);
+	void tmnt2_1c0800_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tmnt_0a0000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void punkshot_0a0020_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void lgtnfght_0a0018_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void blswhstl_700300_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ssriders_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ssriders_1c0300_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tmnt_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tmnt_upd_start_w(uint8_t data);
+	uint8_t tmnt_upd_busy_r();
 
 	DECLARE_MACHINE_RESET(common);
 	DECLARE_VIDEO_START(cuebrick);
@@ -169,7 +169,7 @@ protected:
 	INTERRUPT_GEN_MEMBER(punkshot_interrupt);
 	INTERRUPT_GEN_MEMBER(lgtnfght_interrupt);
 	inline uint32_t tmnt2_get_word( uint32_t addr );
-	void tmnt2_put_word( address_space &space, uint32_t addr, uint16_t data );
+	void tmnt2_put_word( uint32_t addr, uint16_t data );
 	void volume_callback(uint8_t data);
 	K051960_CB_MEMBER(mia_sprite_callback);
 	K051960_CB_MEMBER(tmnt_sprite_callback);
@@ -215,12 +215,12 @@ public:
 	void glfgreat(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(k053251_glfgreat_w);
+	void k053251_glfgreat_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t controller_r();
-	DECLARE_READ16_MEMBER(glfgreat_rom_r);
-	DECLARE_WRITE16_MEMBER(glfgreat_122000_w);
-	DECLARE_READ16_MEMBER(glfgreat_ball_r);
-	DECLARE_WRITE8_MEMBER(glfgreat_sound_w);
+	uint16_t glfgreat_rom_r(offs_t offset);
+	void glfgreat_122000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t glfgreat_ball_r();
+	void glfgreat_sound_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(glfgreat_get_roz_tile_info);
 	DECLARE_VIDEO_START(glfgreat);
@@ -249,11 +249,11 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(prmrsocr_sound_irq_w);
-	DECLARE_WRITE8_MEMBER(prmrsocr_audio_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(prmrsocr_eeprom_w);
-	DECLARE_WRITE16_MEMBER(prmrsocr_122000_w);
-	DECLARE_READ16_MEMBER(prmrsocr_rom_r);
+	void prmrsocr_sound_irq_w(uint16_t data);
+	void prmrsocr_audio_bankswitch_w(uint8_t data);
+	void prmrsocr_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void prmrsocr_122000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t prmrsocr_rom_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(prmrsocr_get_roz_tile_info);
 	DECLARE_VIDEO_START(prmrsocr);

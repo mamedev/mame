@@ -473,20 +473,20 @@ TIMER_CALLBACK_MEMBER(turbo_state::delayed_i8255_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::buckrog_i8255_0_w)
+void turbo_state::buckrog_i8255_0_w(offs_t offset, uint8_t data)
 {
 	/* the port C handshaking signals control the sub CPU IRQ, */
 	/* so we have to sync whenever we access this PPI */
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(turbo_state::delayed_i8255_w),this), ((offset & 3) << 8) | (data & 0xff));
 }
 
-READ8_MEMBER(turbo_state::spriteram_r)
+uint8_t turbo_state::spriteram_r(offs_t offset)
 {
 	offset = (offset & 0x07) | ((offset & 0xf0) >> 1);
 	return m_alt_spriteram[offset];
 }
 
-WRITE8_MEMBER(turbo_state::spriteram_w)
+void turbo_state::spriteram_w(offs_t offset, uint8_t data)
 {
 	offset = (offset & 0x07) | ((offset & 0xf0) >> 1);
 	m_alt_spriteram[offset] = data;

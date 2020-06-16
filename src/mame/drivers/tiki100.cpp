@@ -92,14 +92,14 @@ void tiki100_state::mrq_w(offs_t offset, uint8_t data)
 	m_exp->mrq_w(offset, data);
 }
 
-READ8_MEMBER( tiki100_state::iorq_r )
+uint8_t tiki100_state::iorq_r(offs_t offset)
 {
 	uint8_t data = m_exp->iorq_r(offset, 0xff);
 
 	switch ((offset & 0xff) >> 2)
 	{
 	case 0x00: // KEYS
-		data = keyboard_r(space, 0);
+		data = keyboard_r();
 		break;
 
 	case 0x01: // SERS
@@ -131,14 +131,14 @@ READ8_MEMBER( tiki100_state::iorq_r )
 	return data;
 }
 
-WRITE8_MEMBER( tiki100_state::iorq_w )
+void tiki100_state::iorq_w(offs_t offset, uint8_t data)
 {
 	m_exp->iorq_w(offset, data);
 
 	switch ((offset & 0xff) >> 2)
 	{
 	case 0x00: // KEYS
-		keyboard_w(space, 0, data);
+		keyboard_w(data);
 		break;
 
 	case 0x01: // SERS
@@ -150,7 +150,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x03: // VIPB
-		video_mode_w(space, 0, data);
+		video_mode_w(data);
 		break;
 
 	case 0x04: // FLOP
@@ -161,7 +161,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		switch (offset & 0x03)
 		{
 		case 0: case 1:
-			palette_w(space, 0, data);
+			palette_w(data);
 			break;
 
 		case 2:
@@ -179,14 +179,14 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x07: // SYL
-		system_w(space, 0, data);
+		system_w(data);
 		break;
 	}
 }
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( tiki100_state::keyboard_r )
+uint8_t tiki100_state::keyboard_r()
 {
 	uint8_t data = 0xff;
 
@@ -201,12 +201,12 @@ READ8_MEMBER( tiki100_state::keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( tiki100_state::keyboard_w )
+void tiki100_state::keyboard_w(uint8_t data)
 {
 	m_keylatch = 0;
 }
 
-WRITE8_MEMBER( tiki100_state::video_mode_w )
+void tiki100_state::video_mode_w(uint8_t data)
 {
 	/*
 
@@ -226,7 +226,7 @@ WRITE8_MEMBER( tiki100_state::video_mode_w )
 	m_mode = data;
 }
 
-WRITE8_MEMBER( tiki100_state::palette_w )
+void tiki100_state::palette_w(uint8_t data)
 {
 	/*
 
@@ -246,7 +246,7 @@ WRITE8_MEMBER( tiki100_state::palette_w )
 	m_palette_val = data;
 }
 
-WRITE8_MEMBER( tiki100_state::system_w )
+void tiki100_state::system_w(uint8_t data)
 {
 	/*
 
@@ -699,9 +699,7 @@ void tiki100_state::machine_start()
 
 void tiki100_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	system_w(space, 0, 0);
+	system_w(0);
 
 	m_st = m_st_io->read();
 }

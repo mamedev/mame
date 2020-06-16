@@ -146,7 +146,7 @@ void tubep_state::tubep_main_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(tubep_state::main_cpu_irq_line_clear_w)
+void tubep_state::main_cpu_irq_line_clear_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	LOGIRQ("CPU#0 VBLANK int clear at scanline=%3i\n", m_curr_scanline);
@@ -178,7 +178,7 @@ void tubep_state::tubep_main_portmap(address_map &map)
  *
  *************************************/
 
-WRITE8_MEMBER(tubep_state::second_cpu_irq_line_clear_w)
+void tubep_state::second_cpu_irq_line_clear_w(uint8_t data)
 {
 	m_slave->set_input_line(0, CLEAR_LINE);
 	LOGIRQ("CPU#1 VBLANK int clear at scanline=%3i\n", m_curr_scanline);
@@ -206,12 +206,12 @@ void tubep_state::tubep_second_portmap(address_map &map)
 }
 
 
-READ8_MEMBER(tubep_state::tubep_soundlatch_r)
+uint8_t tubep_state::tubep_soundlatch_r()
 {
 	return (m_soundlatch->pending_r() << 7) | (m_soundlatch->read() & 0x7f);
 }
 
-READ8_MEMBER(tubep_state::tubep_sound_irq_ack)
+uint8_t tubep_state::tubep_sound_irq_ack()
 {
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
 	return 0;
@@ -499,7 +499,7 @@ MACHINE_RESET_MEMBER(tubep_state,rjammer)
  *
  *************************************/
 
-WRITE8_MEMBER(tubep_state::rjammer_voice_startstop_w)
+void tubep_state::rjammer_voice_startstop_w(uint8_t data)
 {
 	/* bit 0 of data selects voice start/stop (reset pin on MSM5205)*/
 	// 0 -stop; 1-start
@@ -509,7 +509,7 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_startstop_w)
 }
 
 
-WRITE8_MEMBER(tubep_state::rjammer_voice_frequency_select_w)
+void tubep_state::rjammer_voice_frequency_select_w(uint8_t data)
 {
 	/* bit 0 of data selects voice frequency on MSM5205 */
 	// 0 -4 KHz; 1- 8KHz
@@ -537,7 +537,7 @@ WRITE_LINE_MEMBER(tubep_state::rjammer_adpcm_vck)
 }
 
 
-WRITE8_MEMBER(tubep_state::rjammer_voice_input_w)
+void tubep_state::rjammer_voice_input_w(uint8_t data)
 {
 	/* 8 bits of adpcm data for MSM5205 */
 	/* need to buffer the data, and switch two nibbles on two following interrupts*/
@@ -554,7 +554,7 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_input_w)
 }
 
 
-WRITE8_MEMBER(tubep_state::rjammer_voice_intensity_control_w)
+void tubep_state::rjammer_voice_intensity_control_w(uint8_t data)
 {
 	/* 4 LSB bits select the intensity (analog circuit that alters the output from MSM5205) */
 	/* need to buffer the data */

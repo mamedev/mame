@@ -77,14 +77,14 @@ private:
 
 	uint8_t mrq_r(offs_t offset);
 	void mrq_w(offs_t offset, uint8_t data);
-	DECLARE_READ8_MEMBER( iorq_r );
-	DECLARE_WRITE8_MEMBER( iorq_w );
+	uint8_t iorq_r(offs_t offset);
+	void iorq_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( keyboard_w );
-	DECLARE_WRITE8_MEMBER( video_mode_w );
-	DECLARE_WRITE8_MEMBER( palette_w );
-	DECLARE_WRITE8_MEMBER( system_w );
+	uint8_t keyboard_r();
+	void keyboard_w(uint8_t data);
+	void video_mode_w(uint8_t data);
+	void palette_w(uint8_t data);
+	void system_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( bar0_w );
 	DECLARE_WRITE_LINE_MEMBER( bar2_w );
 	void video_scroll_w(uint8_t data);

@@ -3478,8 +3478,8 @@ void xevious_state::init_xevios()
 void battles_state::driver_init()
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7000, 0x700f, read8_delegate(*this, FUNC(battles_state::customio_data0_r)), write8_delegate(*this, FUNC(battles_state::customio_data0_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7100, 0x7100, read8_delegate(*this, FUNC(battles_state::customio0_r)), write8_delegate(*this, FUNC(battles_state::customio0_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7000, 0x700f, read8sm_delegate(*this, FUNC(battles_state::customio_data0_r)), write8sm_delegate(*this, FUNC(battles_state::customio_data0_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7100, 0x7100, read8smo_delegate(*this, FUNC(battles_state::customio0_r)), write8smo_delegate(*this, FUNC(battles_state::customio0_w)));
 
 	init_xevious();
 }

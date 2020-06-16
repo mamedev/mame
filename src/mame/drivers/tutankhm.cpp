@@ -127,7 +127,7 @@ WRITE_LINE_MEMBER(tutankhm_state::irq_enable_w)
  *
  *************************************/
 
-WRITE8_MEMBER(tutankhm_state::tutankhm_bankselect_w)
+void tutankhm_state::tutankhm_bankselect_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER(tutankhm_state::coin_counter_2_w)
 }
 
 
-WRITE8_MEMBER(tutankhm_state::sound_on_w)
+void tutankhm_state::sound_on_w(uint8_t data)
 {
 	m_timeplt_audio->sh_irqtrigger_w(0);
 	m_timeplt_audio->sh_irqtrigger_w(1);

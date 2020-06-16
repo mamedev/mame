@@ -650,8 +650,8 @@ public:
 			persistvertexattr.attribute[n].fv[3] = 1;
 	}
 	running_machine &machine() { return mach; }
-	DECLARE_READ32_MEMBER(geforce_r);
-	DECLARE_WRITE32_MEMBER(geforce_w);
+	uint32_t geforce_r(offs_t offset, uint32_t mem_mask = ~0);
+	void geforce_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(vblank_callback);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bool update_interrupts();

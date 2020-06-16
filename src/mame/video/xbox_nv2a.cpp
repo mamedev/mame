@@ -4907,7 +4907,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 	}
 }
 
-READ32_MEMBER(nv2a_renderer::geforce_r)
+uint32_t nv2a_renderer::geforce_r(offs_t offset, uint32_t mem_mask)
 {
 	static int x, ret;
 
@@ -4964,7 +4964,7 @@ READ32_MEMBER(nv2a_renderer::geforce_r)
 	return ret;
 }
 
-WRITE32_MEMBER(nv2a_renderer::geforce_w)
+void nv2a_renderer::geforce_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old;
 	bool update_int;

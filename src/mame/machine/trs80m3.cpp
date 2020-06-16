@@ -52,7 +52,7 @@ TIMER_CALLBACK_MEMBER(trs80m3_state::cassette_data_callback)
  *************************************/
 
 
-READ8_MEMBER( trs80m3_state::port_e0_r )
+uint8_t trs80m3_state::port_e0_r()
 {
 /* Indicates which devices are interrupting - d6..d3 not emulated.
     Whenever an interrupt occurs, this port is immediately read
@@ -72,7 +72,7 @@ READ8_MEMBER( trs80m3_state::port_e0_r )
 	return ~(m_mask & m_irq);
 }
 
-READ8_MEMBER( trs80m3_state::port_e4_r )
+uint8_t trs80m3_state::port_e4_r()
 {
 /* Indicates which devices are interrupting - d6..d5 not emulated.
     Whenever an NMI occurs, this port is immediately read
@@ -91,7 +91,7 @@ READ8_MEMBER( trs80m3_state::port_e4_r )
 	return ~(m_nmi_mask & data);
 }
 
-READ8_MEMBER( trs80m3_state::port_e8_r )
+uint8_t trs80m3_state::port_e8_r()
 {
 /* not emulated
     d7 Clear-to-Send (CTS), Pin 5
@@ -104,7 +104,7 @@ READ8_MEMBER( trs80m3_state::port_e8_r )
 	return 0;
 }
 
-READ8_MEMBER( trs80m3_state::port_ea_r )
+uint8_t trs80m3_state::port_ea_r()
 {
 /* UART Status Register
     d7 Data Received ('1'=condition true)
@@ -126,14 +126,14 @@ READ8_MEMBER( trs80m3_state::port_ea_r )
 	return data;
 }
 
-READ8_MEMBER( trs80m3_state::port_ec_r )
+uint8_t trs80m3_state::port_ec_r()
 {
 /* Reset the RTC interrupt */
 	m_irq &= ~IRQ_M4_RTC;
 	return 0;
 }
 
-READ8_MEMBER( trs80m3_state::port_ff_r )
+uint8_t trs80m3_state::port_ff_r()
 {
 /* Return of cassette data stream from tape
     d7 Low-speed data
@@ -145,7 +145,7 @@ READ8_MEMBER( trs80m3_state::port_ff_r )
 	return m_port_ec | m_cassette_data;
 }
 
-READ8_MEMBER( trs80m3_state::cp500_port_f4_r )
+uint8_t trs80m3_state::cp500_port_f4_r()
 {
 	/* The A11 flipflop is used for enabling access to
 	       the system monitor code at the EPROM address range 3800-3fff */
@@ -161,7 +161,7 @@ READ8_MEMBER( trs80m3_state::cp500_port_f4_r )
 }
 
 
-WRITE8_MEMBER( trs80m3_state::port_84_w ) // Model 4 & 4P only
+void trs80m3_state::port_84_w(uint8_t data) // Model 4 & 4P only
 {
 /* Memory banking control, video mode control
     d7 Video Page Control
@@ -229,12 +229,12 @@ WRITE8_MEMBER( trs80m3_state::port_84_w ) // Model 4 & 4P only
 	}
 }
 
-WRITE8_MEMBER( trs80m3_state::port_90_w )
+void trs80m3_state::port_90_w(uint8_t data)
 {
 	m_speaker->level_w(!(BIT(data, 0)));
 }
 
-WRITE8_MEMBER( trs80m3_state::port_9c_w )     /* model 4P only - swaps the ROM with read-only RAM */
+void trs80m3_state::port_9c_w(uint8_t data)     /* model 4P only - swaps the ROM with read-only RAM */
 {
 	/* Meaning of model4 variable:
 	    d5..d4 memory mode (as described in section above)
@@ -272,7 +272,7 @@ WRITE8_MEMBER( trs80m3_state::port_9c_w )     /* model 4P only - swaps the ROM w
 	}
 }
 
-WRITE8_MEMBER( trs80m3_state::port_e0_w )
+void trs80m3_state::port_e0_w(uint8_t data)
 {
 /* Interrupt settings - which devices are allowed to interrupt - bits align with read of E0
     d6 Enable Rec Err
@@ -286,7 +286,7 @@ WRITE8_MEMBER( trs80m3_state::port_e0_w )
 	m_mask = data;
 }
 
-WRITE8_MEMBER( trs80m3_state::port_e4_w )
+void trs80m3_state::port_e4_w(uint8_t data)
 {
 /* Disk to NMI interface
     d7 1=enable disk INTRQ to generate NMI
@@ -295,14 +295,14 @@ WRITE8_MEMBER( trs80m3_state::port_e4_w )
 	m_nmi_mask = data;
 }
 
-WRITE8_MEMBER( trs80m3_state::port_e8_w )
+void trs80m3_state::port_e8_w(uint8_t data)
 {
 /* d1 when '1' enables control register load (see below) */
 
 	m_reg_load = BIT(data, 1);
 }
 
-WRITE8_MEMBER( trs80m3_state::port_ea_w )
+void trs80m3_state::port_ea_w(uint8_t data)
 {
 	if (m_reg_load)
 
@@ -341,7 +341,7 @@ WRITE8_MEMBER( trs80m3_state::port_ea_w )
 	}
 }
 
-WRITE8_MEMBER( trs80m3_state::port_ec_w )
+void trs80m3_state::port_ec_w(uint8_t data)
 {
 /* Hardware settings - d5..d4 not emulated
     d6 CPU fast (1=4MHz, 0=2MHz)
@@ -371,7 +371,7 @@ WRITE8_MEMBER( trs80m3_state::port_ec_w )
     d2 1=select drive 2
     d1 1=select drive 1
     d0 1=select drive 0 */
-WRITE8_MEMBER( trs80m3_state::port_f4_w )
+void trs80m3_state::port_f4_w(uint8_t data)
 {
 	if (BIT(data, 6))
 	{
@@ -404,7 +404,7 @@ WRITE8_MEMBER( trs80m3_state::port_f4_w )
 	m_fdc->dden_w(!BIT(data, 7));
 }
 
-WRITE8_MEMBER( trs80m3_state::port_ff_w )
+void trs80m3_state::port_ff_w(uint8_t data)
 {
 /* Cassette port
     d1, d0 Cassette output */
@@ -489,7 +489,7 @@ WRITE_LINE_MEMBER(trs80m3_state::drq_w)
  *                                   *
  *************************************/
 
-READ8_MEMBER( trs80m3_state::wd179x_r )
+uint8_t trs80m3_state::wd179x_r()
 {
 	uint8_t data = 0xff;
 	if (BIT(m_io_config->read(), 7))
@@ -498,12 +498,12 @@ READ8_MEMBER( trs80m3_state::wd179x_r )
 	return data;
 }
 
-READ8_MEMBER( trs80m3_state::printer_r )
+uint8_t trs80m3_state::printer_r()
 {
 	return m_cent_status_in->read();
 }
 
-WRITE8_MEMBER( trs80m3_state::printer_w )
+void trs80m3_state::printer_w(uint8_t data)
 {
 	m_cent_data_out->write(data);
 	m_centronics->write_strobe(0);
@@ -513,7 +513,7 @@ WRITE8_MEMBER( trs80m3_state::printer_w )
 /*************************************
  *      Keyboard                     *
  *************************************/
-READ8_MEMBER( trs80m3_state::keyboard_r )
+uint8_t trs80m3_state::keyboard_r(offs_t offset)
 {
 	u8 i, result = 0;
 
@@ -607,12 +607,11 @@ void trs80m3_state::machine_reset()
 	m_size_store = 0xff;
 	m_drq_off = true;
 	m_intrq_off = true;
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	if (m_model4 & 4)
-		port_9c_w(mem, 0, 1);    // 4P - enable rom
+		port_9c_w(1);    // 4P - enable rom
 	if (m_model4 & 6)
-		port_84_w(mem, 0, 0);    // 4 & 4P - switch in devices
+		port_84_w(0);    // 4 & 4P - switch in devices
 }
 
 

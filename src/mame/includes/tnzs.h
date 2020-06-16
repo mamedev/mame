@@ -37,9 +37,9 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	virtual DECLARE_WRITE8_MEMBER(bankswitch1_w);
+	virtual void bankswitch1_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(ramrom_bankswitch_w);
+	void ramrom_bankswitch_w(uint8_t data);
 
 	void prompalette(palette_device &palette) const;
 	uint32_t screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -80,12 +80,12 @@ public:
 	void tnzs(machine_config &config);
 
 protected:
-	virtual DECLARE_WRITE8_MEMBER(bankswitch1_w) override;
+	virtual void bankswitch1_w(uint8_t data) override;
 
 	uint8_t mcu_port1_r();
 	void mcu_port2_w(uint8_t data);
-	DECLARE_READ8_MEMBER(mcu_r);
-	DECLARE_WRITE8_MEMBER(mcu_w);
+	uint8_t mcu_r(offs_t offset);
+	void mcu_w(offs_t offset, uint8_t data);
 
 	uint8_t analog_r(offs_t offset);
 
@@ -141,10 +141,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual DECLARE_WRITE8_MEMBER(bankswitch1_w) override;
+	virtual void bankswitch1_w(uint8_t data) override;
 
-	DECLARE_READ8_MEMBER(mcu_r);
-	DECLARE_WRITE8_MEMBER(mcu_w);
+	uint8_t mcu_r(offs_t offset);
+	void mcu_w(offs_t offset, uint8_t data);
 	INTERRUPT_GEN_MEMBER(mcu_interrupt);
 
 	void arknoid2_sub_map(address_map &map);
@@ -193,7 +193,7 @@ protected:
 private:
 	static constexpr unsigned MAX_SAMPLES = 0x2f;
 
-	virtual DECLARE_WRITE8_MEMBER(bankswitch1_w) override;
+	virtual void bankswitch1_w(uint8_t data) override;
 
 	uint8_t csport_r();
 	void csport_w(uint8_t data);
@@ -230,7 +230,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(subbankswitch_w);
+	void subbankswitch_w(uint8_t data);
 
 	void jpopnics_main_map(address_map &map);
 	void jpopnics_sub_map(address_map &map);
@@ -247,7 +247,7 @@ public:
 	void insectx(machine_config &config);
 
 private:
-	virtual DECLARE_WRITE8_MEMBER(bankswitch1_w) override;
+	virtual void bankswitch1_w(uint8_t data) override;
 	void insectx_sub_map(address_map &map);
 };
 
@@ -265,9 +265,9 @@ public:
 protected:
 	DECLARE_WRITE_LINE_MEMBER(ym2203_irqhandler);
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
+	void sound_command_w(uint8_t data);
 
-	virtual DECLARE_WRITE8_MEMBER(bankswitch1_w) override;
+	virtual void bankswitch1_w(uint8_t data) override;
 
 	void tnzsb_base_sub_map(address_map &map);
 	void tnzsb_cpu2_map(address_map &map);

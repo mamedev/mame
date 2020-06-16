@@ -25,7 +25,7 @@ inline void tecmosys_state::set_color_555(pen_t color, int rshift, int gshift, i
 	m_palette->set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
-WRITE16_MEMBER(tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w)
+void tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_tilemap_paletteram16[offset]);
 	set_color_555(offset+0x4000, 5, 10, 0, m_tilemap_paletteram16[offset]);

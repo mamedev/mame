@@ -45,16 +45,16 @@ private:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_sound_nmi_mask;
 
-	DECLARE_WRITE8_MEMBER(irq_clear_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_READ8_MEMBER(mirrorvideoram_r);
-	DECLARE_READ8_MEMBER(mirrorcolorram_r);
-	DECLARE_WRITE8_MEMBER(mirrorvideoram_w);
-	DECLARE_WRITE8_MEMBER(mirrorcolorram_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void irq_clear_w(uint8_t data);
+	void sound_nmi_mask_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	uint8_t mirrorvideoram_r(offs_t offset);
+	uint8_t mirrorcolorram_r(offs_t offset);
+	void mirrorvideoram_w(offs_t offset, uint8_t data);
+	void mirrorcolorram_w(offs_t offset, uint8_t data);
+	void control_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 

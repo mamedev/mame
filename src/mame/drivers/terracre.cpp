@@ -93,12 +93,12 @@ AT-2
 #include "speaker.h"
 
 
-WRITE16_MEMBER(terracre_state::amazon_sound_w)
+void terracre_state::amazon_sound_w(uint16_t data)
 {
 	m_soundlatch->write(((data & 0x7f) << 1) | 1);
 }
 
-READ8_MEMBER(terracre_state::soundlatch_clear_r)
+uint8_t terracre_state::soundlatch_clear_r()
 {
 	m_soundlatch->clear_w();
 	return 0;

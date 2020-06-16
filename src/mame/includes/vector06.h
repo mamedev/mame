@@ -65,14 +65,14 @@ private:
 	uint8_t vector06_8255_portc_r();
 	void vector06_8255_porta_w(uint8_t data);
 	void vector06_8255_portb_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(vector06_color_set);
+	void vector06_color_set(uint8_t data);
 	uint8_t vector06_romdisk_portb_r();
 	void vector06_romdisk_portb_w(uint8_t data);
 	void vector06_romdisk_porta_w(uint8_t data);
 	void vector06_romdisk_portc_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(vector06_disc_w);
+	void vector06_disc_w(uint8_t data);
 	void vector06_status_callback(uint8_t data);
-	DECLARE_WRITE8_MEMBER(vector06_ramdisk_w);
+	void vector06_ramdisk_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	void vector06_set_video_mode(int width);
 	virtual void machine_start() override;
