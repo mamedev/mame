@@ -295,4 +295,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, bsktball, 0, bsktball, bsktball, bsktball_state, empty_init, ROT0, "Atari", "Basketball (Atari)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, bsktball, 0, bsktball, bsktball, bsktball_state, empty_init, ROT0, "Atari", "Atari Basketball", MACHINE_SUPPORTS_SAVE )
