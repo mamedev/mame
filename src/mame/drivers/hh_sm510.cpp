@@ -1995,6 +1995,9 @@ ROM_END
   * Sharp SM510 label GH-54 52ZD (no decap)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
+  After the 20,000,000th G&W, Nintendo made a special edition of Green House
+  (still model GH-54), with the box art showing all the released games so far.
+
 ***************************************************************************/
 
 class gnw_ghouse_state : public hh_sm510_state
@@ -9199,7 +9202,7 @@ CONS( 1986, gnw_bfight,  0,          0, gnw_bfight,  gnw_bfight,  gnw_bfight_sta
 CONS( 1988, gnw_bfightn, gnw_bfight, 0, gnw_bfightn, gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1991, gnw_mariotj, 0,          0, gnw_mariotj, gnw_mariotj, gnw_mariotj_state, empty_init, "Nintendo", "Game & Watch: Mario The Juggler", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-// Nintendo G&W: Table Top / Panorama Screen
+// Nintendo G&W: Table Top / Panorama Screen (the first Table Top releases in Japan were called "Color Screen")
 CONS( 1983, gnw_mariocmt,0,          0, gnw_mariocmt,gnw_mariocmt,gnw_mariocmt_state,empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (Table Top)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1983, gnw_snoopyp, 0,          0, gnw_snoopyp, gnw_snoopyp, gnw_snoopyp_state, empty_init, "Nintendo", "Game & Watch: Snoopy (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1983, gnw_popeyep, 0,          0, gnw_popeyep, gnw_popeyep, gnw_popeyep_state, empty_init, "Nintendo", "Game & Watch: Popeye (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

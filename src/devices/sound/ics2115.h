@@ -12,7 +12,7 @@
 
 // ======================> ics2115_device
 
-class ics2115_device : public device_t, public device_sound_interface
+class ics2115_device : public device_t, public device_sound_interface, public device_memory_interface
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; } // Incorrect/Unverified interrupt, interpolation;
@@ -33,6 +33,20 @@ public:
 	TIMER_CALLBACK_MEMBER(timer_cb_1);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
+
+	// device_sound_interface overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	// device_memory_interface configuration
+	virtual space_config_vector memory_space_config() const override;
+
+	address_space_config m_data_config;
+
+private:
 	static constexpr u16 revision = 0x1;
 
 	struct ics2115_voice {
@@ -99,14 +113,6 @@ protected:
 		void update_ramp();
 	};
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_clock_changed() override;
-
-	// internal callbacks
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-
 	//internal register helper functions
 	u16 reg_read();
 	void reg_write(u16 data, u16 mem_mask);
@@ -117,10 +123,12 @@ protected:
 	//stream helper functions
 	int fill_output(ics2115_voice& voice, stream_sample_t *outputs[2], int samples);
 	stream_sample_t get_sample(ics2115_voice& voice);
+	u8 read_sample(ics2115_voice& voice, u32 addr) { return m_cache.read_byte((voice.osc.saddr << 20) | (addr & 0xfffff)); }
 
 	sound_stream *m_stream;
 
 	// internal state
+	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
 	required_region_ptr<u8> m_rom;
 	devcb_write_line m_irq_cb;
 
@@ -141,8 +149,10 @@ protected:
 	u8 m_irq_enabled, m_irq_pending;
 	bool m_irq_on;
 
-	//Unknown variable, seems to be effected by 0x12. Further investigation
-	//Required.
+	/*
+		Unknown variable, seems to be effected by 0x12. Further investigation
+		Required.
+	*/
 	u8 m_vmode;
 };
 
