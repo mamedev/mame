@@ -233,6 +233,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("saved",     CMDFLAG_NONE, AS_DATA, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("savei",     CMDFLAG_NONE, AS_IO, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("saveo",     CMDFLAG_NONE, AS_OPCODES, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
+	m_console.register_command("saver",     CMDFLAG_NONE, 0, 3, 3, std::bind(&debugger_commands::execute_saveregion, this, _1, _2));
 
 	m_console.register_command("load",      CMDFLAG_NONE, AS_PROGRAM, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
 	m_console.register_command("loadd",     CMDFLAG_NONE, AS_DATA, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
@@ -525,6 +526,25 @@ bool debugger_commands::validate_cpu_space_parameter(const char *param, int spac
 		return false;
 	}
 	result = &cpu->memory().space(spacenum);
+	return true;
+}
+
+
+/*-------------------------------------------------
+    validate_memory_region_parameter - validates
+    a parameter as a memory region name and
+	retrieves the given memory region
+-------------------------------------------------*/
+
+bool debugger_commands::validate_memory_region_parameter(const std::string &param, memory_region *&result)
+{
+	auto &regions = m_machine.memory().regions();
+	auto iter = regions.find(param);
+	if(iter == regions.end()) {
+		m_console.printf("No matching memory region found for '%s'\n", param);
+		return false;
+	}
+	result = iter->second.get();
 	return true;
 }
 
@@ -1947,6 +1967,45 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	m_console.printf("Data saved successfully\n");
 }
 
+
+/*-------------------------------------------------
+    execute_saveregion - execute the save command on region memory
+-------------------------------------------------*/
+
+void debugger_commands::execute_saveregion(int ref, const std::vector<std::string> &params)
+{
+	u64 offset, length;
+	memory_region *region;
+	FILE *f;
+
+	/* validate parameters */
+	if (!validate_number_parameter(params[1], offset))
+		return;
+	if (!validate_number_parameter(params[2], length))
+		return;
+	if (!validate_memory_region_parameter(params[3], region))
+		return;
+
+	/* open the file */
+	f = fopen(params[0].c_str(), "wb");
+	if (!f) {
+		m_console.printf("Error opening file '%s'\n", params[0].c_str());
+		return;
+	}
+
+	if(offset >= region->bytes()) {
+		m_console.printf("Invalide offset\n");
+		return;
+	}
+	// get full length
+	if(length <= 0 || length + offset >= region->bytes()) {
+		length = region->bytes() - offset;
+	}
+	fwrite(region->base() + offset, 1, length, f);
+
+	fclose(f);
+	m_console.printf("Data saved successfully\n");
+}
 
 /*-------------------------------------------------
     execute_load - execute the load command
