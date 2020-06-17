@@ -53,49 +53,6 @@ WRITE_LINE_MEMBER( mbee_state::crtc_vs )
 		m_pio->port_b_write(pio_port_b_r());
 }
 
-/***********************************************************
-
-    The 6845 can produce a variety of cursor shapes - all
-    are emulated here.
-
-    Need to find out if the 6545 works the same way.
-
-************************************************************/
-
-void mbee_state::sy6545_cursor_configure()
-{
-	uint8_t i,curs_type=0,r9,r10,r11;
-
-	/* curs_type holds the general cursor shape to be created
-	    0 = no cursor
-	    1 = partial cursor (only shows on a block of scan lines)
-	    2 = full cursor
-	    3 = two-part cursor (has a part at the top and bottom with the middle blank) */
-
-	for ( i = 0; i < ARRAY_LENGTH(m_sy6545_cursor); i++) m_sy6545_cursor[i] = 0;        // prepare cursor by erasing old one
-
-	r9  = m_sy6545_reg[9];                  // number of scan lines - 1
-	r10 = m_sy6545_reg[10] & 0x1f;              // cursor start line = last 5 bits
-	r11 = m_sy6545_reg[11]+1;               // cursor end line incremented to suit for-loops below
-
-	/* decide the curs_type by examining the registers */
-	if (r10 < r11) curs_type=1;             // start less than end, show start to end
-	else
-	if (r10 == r11) curs_type=2;                // if equal, show full cursor
-	else curs_type=3;                   // if start greater than end, it's a two-part cursor
-
-	if ((r11 - 1) > r9) curs_type=2;            // if end greater than scan-lines, show full cursor
-	if (r10 > r9) curs_type=0;              // if start greater than scan-lines, then no cursor
-	if (r11 > 16) r11=16;                   // truncate 5-bit register to fit our 4-bit hardware
-
-	/* create the new cursor */
-	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(m_sy6545_cursor);i++) m_sy6545_cursor[i]=0xff; // turn on full cursor
-
-	if (curs_type == 1) for (i = r10;i < r11;i++) m_sy6545_cursor[i]=0xff; // for each line that should show, turn on that scan line
-
-	if (curs_type == 3) for (i = r11; i < r10;i++) m_sy6545_cursor[i]=0; // now take a bite out of the middle
-}
-
 
 /***********************************************************
 
@@ -107,12 +64,12 @@ void mbee_state::sy6545_cursor_configure()
 uint8_t mbee_state::video_low_r(offs_t offset)
 {
 	if (m_is_premium && ((m_1c & 0x9f) == 0x90))
-		return m_p_attribram[offset];
+		return m_aram[offset];
 	else
 	if (m_0b)
-		return m_p_gfxram[offset];
+		return m_pram[offset];
 	else
-		return m_p_videoram[offset];
+		return m_vram[offset];
 }
 
 void mbee_state::video_low_w(offs_t offset, uint8_t data)
@@ -121,26 +78,26 @@ void mbee_state::video_low_w(offs_t offset, uint8_t data)
 	{
 		// non-premium attribute writes are discarded
 		if (m_is_premium && BIT(m_1c, 7))
-			m_p_attribram[offset] = data;
+			m_aram[offset] = data;
 	}
 	else
-		m_p_videoram[offset] = data;
+		m_vram[offset] = data;
 }
 
 uint8_t mbee_state::video_high_r(offs_t offset)
 {
 	if (BIT(m_08, 6))
-		return m_p_colorram[offset];
+		return m_cram[offset];
 	else
-		return m_p_gfxram[(((m_1c & 15) + 1) << 11) | offset];
+		return m_pram[(((m_1c & 15) + 1) << 11) | offset];
 }
 
 void mbee_state::video_high_w(offs_t offset, uint8_t data)
 {
 	if (BIT(m_08, 6) && (~m_0b & 1))
-		m_p_colorram[offset] = data;
+		m_cram[offset] = data;
 	else
-		m_p_gfxram[(((m_1c & 15) + 1) << 11) | offset] = data;
+		m_pram[(((m_1c & 15) + 1) << 11) | offset] = data;
 }
 
 void mbee_state::port0b_w(uint8_t data)
@@ -168,7 +125,7 @@ void mbee_state::port1c_w(uint8_t data)
 /*  d7 extended graphics (1=allow attributes and pcg banks)
     d5 bankswitch basic rom
     d4 select attribute ram
-    d3..d0 select m_videoram bank */
+    d3..d0 select videoram bank */
 
 	if (m_is_premium && BIT(data, 7))
 		m_1c = data;
@@ -268,12 +225,11 @@ void mbee_state::m6545_data_w(uint8_t data)
 	case 12:
 		data &= 0x3f; // select alternate character set
 		if( m_sy6545_reg[12] != data )
-			memcpy(m_p_gfxram, memregion("gfx")->base() + (((data & 0x30) == 0x20) << 11), 0x800);
+			memcpy(m_pram.get(), memregion("chargen")->base() + (((data & 0x30) == 0x20) << 11), 0x800);
 		break;
 	}
 	m_sy6545_reg[m_sy6545_ind] = data & sy6545_mask[m_sy6545_ind];  /* save data in register */
 	m_crtc->register_w(data);
-	if ((m_sy6545_ind > 8) && (m_sy6545_ind < 12)) sy6545_cursor_configure();       /* adjust cursor shape - remove when mame fixed */
 }
 
 
@@ -287,28 +243,28 @@ void mbee_state::m6545_data_w(uint8_t data)
 
 VIDEO_START_MEMBER( mbee_state, mono )
 {
-	m_p_videoram = memregion("videoram")->base();
-	m_p_gfxram = memregion("gfx")->base()+0x1000;
-	m_p_colorram = nullptr;
-	m_p_attribram = nullptr;
+	m_vram = make_unique_clear<u8[]>(0x0800);
+	m_pram = make_unique_clear<u8[]>(0x1000);
+	memcpy(m_pram.get(), memregion("chargen")->base(), 0x800);
 	m_is_premium = 0;
 }
 
 VIDEO_START_MEMBER( mbee_state, standard )
 {
-	m_p_videoram = memregion("videoram")->base();
-	m_p_gfxram = memregion("gfx")->base()+0x1000;
-	m_p_colorram = memregion("colorram")->base();
-	m_p_attribram = nullptr;
+	m_vram = make_unique_clear<u8[]>(0x0800);
+	m_pram = make_unique_clear<u8[]>(0x1000);
+	m_cram = make_unique_clear<u8[]>(0x0800);
+	memcpy(m_pram.get(), memregion("chargen")->base(), 0x800);
 	m_is_premium = 0;
 }
 
 VIDEO_START_MEMBER( mbee_state, premium )
 {
-	m_p_videoram = memregion("videoram")->base();
-	m_p_colorram = memregion("colorram")->base();
-	m_p_gfxram = memregion("gfx")->base()+0x1000;
-	m_p_attribram = memregion("attrib")->base();
+	m_vram = make_unique_clear<u8[]>(0x0800);
+	m_pram = make_unique_clear<u8[]>(0x8800);
+	m_cram = make_unique_clear<u8[]>(0x0800);
+	m_aram = make_unique_clear<u8[]>(0x0800);
+	memcpy(m_pram.get(), memregion("chargen")->base(), 0x800);
 	m_is_premium = 1;
 }
 
@@ -337,7 +293,7 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 	uint8_t colourm = (m_08 & 0x0e) >> 1;
 	uint8_t monopal = (m_io_config->read() & 0x30) >> 4;
 	// if colour chosen on mono bee, default to amber
-	if (!monopal && !m_p_colorram)
+	if (!monopal && !m_cram)
 		monopal = 2;
 
 	uint32_t *p = &bitmap.pix32(y);
@@ -346,13 +302,13 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 
 	for (x = 0; x < x_count; x++)           // for each character
 	{
-		inv = 0;
+		inv = (x == cursor_x) ? 0xff : 0;
 		mem = (ma + x) & 0x7ff;
-		chr = m_p_videoram[mem];
+		chr = m_vram[mem];
 
 		if (BIT(m_1c, 7)) // premium graphics enabled?
 		{
-			attr = m_p_attribram[mem];
+			attr = m_aram[mem];
 
 			if (BIT(chr, 7))
 				chr += ((attr & 15) << 7);          // bump chr to its particular pcg definition
@@ -366,17 +322,13 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 
 		oldkb_scan(x+ma);
 
-		/* process cursor */
-		if (x == cursor_x)
-			inv ^= m_sy6545_cursor[ra];          // cursor scan row
-
 		/* get pattern of pixels for that character scanline */
-		gfx = m_p_gfxram[(chr<<4) | ra] ^ inv;
+		gfx = m_pram[(chr<<4) | ra] ^ inv;
 
 		// get colours
 		if (!monopal)
 		{
-			col = m_p_colorram[mem];                     // read a byte of colour
+			col = m_cram[mem];                     // read a byte of colour
 
 			if (m_is_premium)
 			{

@@ -58,7 +58,9 @@ public:
 		, m_io_newkb(*this, "Y.%u", 0)
 		, m_io_config(*this, "CONFIG")
 		, m_screen(*this, "screen")
-	{ }
+		, m_bankr(*this, "bankr%d", 0)
+		, m_bankw(*this, "bankw%d", 0)
+		{ }
 
 	void mbee56(machine_config &config);
 	void mbeeppc(machine_config &config);
@@ -151,10 +153,6 @@ private:
 	void mbeett_io(address_map &map);
 	void mbeett_mem(address_map &map);
 
-	uint8_t *m_p_videoram;
-	uint8_t *m_p_gfxram;
-	uint8_t *m_p_colorram;
-	uint8_t *m_p_attribram;
 	bool m_is_premium;
 	bool m_has_oldkb;
 	size_t m_size;
@@ -166,7 +164,6 @@ private:
 	uint8_t m_0a;
 	uint8_t m_0b;
 	uint8_t m_1c;
-	uint8_t m_sy6545_cursor[16];
 	uint8_t m_mbee256_was_pressed[15];
 	uint8_t m_mbee256_q[20];
 	uint8_t m_mbee256_q_pos;
@@ -174,8 +171,13 @@ private:
 	uint8_t m_sy6545_ind;
 	uint8_t m_fdc_rq;
 	uint8_t m_bank_array[33];
+	std::unique_ptr<u8[]> m_dummy; // black hole for writes to rom
+	std::unique_ptr<u8[]> m_ram;   // main banked-switch ram, 128/256/pp
+	std::unique_ptr<u8[]> m_vram;  // video ram, all models
+	std::unique_ptr<u8[]> m_pram;  // pcg ram, all models
+	std::unique_ptr<u8[]> m_cram;  // colour ram, all except mbee
+	std::unique_ptr<u8[]> m_aram;  // attribute ram, ppc/128/256/pp/tt
 	void setup_banks(uint8_t data, bool first_time, uint8_t b_mask);
-	void sy6545_cursor_configure();
 	void oldkb_scan(uint16_t param);
 	void oldkb_matrix_r(uint16_t offs);
 	void machine_reset_common();
@@ -199,6 +201,8 @@ private:
 	optional_ioport_array<15> m_io_newkb;
 	required_ioport m_io_config;
 	required_device<screen_device> m_screen;
+	optional_memory_bank_array<16> m_bankr;
+	optional_memory_bank_array<16> m_bankw;
 };
 
 #endif // MAME_INCLUDES_MBEE_H
