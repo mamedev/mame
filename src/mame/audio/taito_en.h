@@ -48,21 +48,19 @@ private:
 	required_device<mb87078_device> m_mb87078;
 
 	required_shared_ptr<uint16_t> m_osram;
+	required_region_ptr<uint16_t> m_otisrom;
 
 	required_memory_region m_osrom;
 	required_memory_bank_array<3> m_cpubank;
-	required_memory_region m_otisrom;
-	required_memory_bank m_otisbank;
 
-	uint32_t m_bankmask = 1;
-	uint32_t m_oldbank = 0;
+	uint32_t m_bankmask = 0;
+	uint32_t m_old_clock = ~0;
 
 	IRQ_CALLBACK_MEMBER(duart_iack);
 	void duart_output(uint8_t data);
 
 	void mb87078_gain_changed(offs_t offset, uint8_t data);
 	void es5505_clock_changed(u32 data);
-	void es5505_exbank_cb(offs_t offset, u32 data);
 
 	void en_es5505_bank_w(offs_t offset, uint16_t data);
 	void en_volume_w(offs_t offset, uint8_t data);

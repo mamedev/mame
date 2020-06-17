@@ -31,10 +31,9 @@ taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag,
 	, m_duart68681(*this, "duart68681")
 	, m_mb87078(*this, "mb87078")
 	, m_osram(*this, "osram")
+	, m_otisrom(*this, "ensoniq")
 	, m_osrom(*this, "audiocpu")
 	, m_cpubank(*this, "cpubank%u", 1)
-	, m_otisrom(*this, "ensoniq")
-	, m_otisbank(*this, "otisbank")
 {
 }
 
@@ -50,10 +49,8 @@ void taito_en_device::device_start()
 	for (int i = 0; i < 3; i++)
 		m_cpubank[i]->configure_entries(0, max, &ROM[0x100000], 0x20000);
 
-	max = (m_otisrom->bytes()) / 0x200000;
-	m_bankmask = max - 1;
-	m_otisbank->configure_entries(0, max, m_otisrom->base(), 0x200000);
-	save_item(NAME(m_oldbank));
+	m_bankmask = ((m_otisrom.bytes()) / 0x200000) - 1;
+	save_item(NAME(m_old_clock));
 }
 
 
@@ -81,7 +78,9 @@ void taito_en_device::device_reset()
 
 void taito_en_device::en_es5505_bank_w(offs_t offset, uint16_t data)
 {
-	m_ensoniq->voice_bank_w(offset,data);
+	/* mask out unused bits */
+	data &= m_bankmask;
+	m_ensoniq->voice_bank_w(offset,data << 20);
 }
 
 void taito_en_device::en_volume_w(offs_t offset, uint8_t data)
@@ -125,8 +124,9 @@ void taito_en_device::fc7_map(address_map &map)
 
 void taito_en_device::en_otis_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).bankr(m_otisbank);
+	map(0x000000, 0x0fffff).lr16([this](offs_t offset) -> u16 { return m_otisrom[(m_ensoniq->exbank() + offset) & m_otisrom.mask()]; }, "banked_otisrom");
 }
+
 
 /*************************************
  *
@@ -156,17 +156,10 @@ void taito_en_device::mb87078_gain_changed(offs_t offset, uint8_t data)
 
 void taito_en_device::es5505_clock_changed(u32 data)
 {
-	m_pump->set_unscaled_clock(data);
-}
-
-void taito_en_device::es5505_exbank_cb(offs_t offset, u32 data)
-{
-	/* mask out unused bits */
-	const u32 newbank = data & m_bankmask;
-	if (m_oldbank != newbank)
+	if (m_old_clock != data)
 	{
-		m_otisbank->set_entry(newbank);
-		m_oldbank = newbank;
+		m_pump->set_unscaled_clock(data);
+		m_old_clock = data;
 	}
 }
 
@@ -241,7 +234,6 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 
 	ES5505(config, m_ensoniq, XTAL(30'476'180) / 2);
 	m_ensoniq->sample_rate_changed().set(FUNC(taito_en_device::es5505_clock_changed));
-	m_ensoniq->exbank_cb().set(FUNC(taito_en_device::es5505_exbank_cb));
 	m_ensoniq->set_addrmap(0, &taito_en_device::en_otis_map);
 	m_ensoniq->set_addrmap(1, &taito_en_device::en_otis_map);
 	m_ensoniq->set_channels(4);

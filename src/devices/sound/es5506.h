@@ -23,10 +23,10 @@ public:
 	template <typename T> void set_region3(T &&tag) { m_region3.set_tag(std::forward<T>(tag)); }
 	void set_channels(int channels) { m_channels = channels; }
 
+	u32 exbank() { return m_exbank; }
 	auto irq_cb() { return m_irq_cb.bind(); }
 	auto read_port_cb() { return m_read_port_cb.bind(); }
 	auto sample_rate_changed() { return m_sample_rate_changed_cb.bind(); }
-	auto exbank_cb() { return m_exbank_cb.bind(); }
 
 protected:
 	enum {
@@ -115,34 +115,31 @@ protected:
 	inline void generate_irq(es550x_voice *voice, int v);
 	virtual void generate_samples(s32 **outputs, int offset, int samples) {};
 
-	inline u32 update_exbank(es550x_voice *voice)
+	inline void update_exbank(es550x_voice *voice)
 	{
-		const u32 bank = get_bank(voice->control);
-		/* pre-add the bank offset */
-		if (!m_exbank_cb.isnull())
-			m_exbank_cb(bank, voice->exbank);
-
-		return bank;
+		// pre-add the bank offset
+		m_exbank = voice->exbank;
 	}
 
 	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) { return 0; }
 
 	// internal state
-	sound_stream *m_stream;               /* which stream are we using */
-	int           m_sample_rate;          /* current sample rate */
-	u32           m_master_clock;         /* master clock frequency */
-	s8            m_address_acc_shift;
-	u64           m_address_acc_mask;
+	sound_stream *m_stream;               // which stream are we using
+	int           m_sample_rate;          // current sample rate
+	u32           m_master_clock;         // master clock frequency
+	s8            m_address_acc_shift;    // right shift accumulator for generate integer address
+	u64           m_address_acc_mask;     // accumulator mask
 
-	s8            m_volume_shift;
-	s64           m_volume_acc_shift;
+	s8            m_volume_shift;         // right shift volume for generate integer volume
+	s64           m_volume_acc_shift;     // right shift output for output balance
 
-	u8            m_current_page;         /* current register page */
-	u8            m_active_voices;        /* number of active voices */
-	u16           m_mode;                 /* MODE register */
-	u8            m_irqv;                 /* IRQV register */
+	u8            m_current_page;         // current register page
+	u8            m_active_voices;        // number of active voices
+	u16           m_mode;                 // MODE register
+	u8            m_irqv;                 // IRQV register
+	u32           m_exbank;               // current external bankswitch value
 
-	es550x_voice  m_voice[32];             /* the 32 voices */
+	es550x_voice  m_voice[32];            // the 32 voices
 
 	std::unique_ptr<s32[]>    m_scratch;
 
@@ -150,18 +147,17 @@ protected:
 	std::unique_ptr<u32[]>    m_volume_lookup;
 
 #if ES5506_MAKE_WAVS
-	void *      m_wavraw;                 /* raw waveform */
+	void *      m_wavraw;                 // raw waveform
 #endif
 
-	optional_memory_region m_region0;                       /* memory region where the sample ROM lives */
-	optional_memory_region m_region1;                       /* memory region where the sample ROM lives */
-	optional_memory_region m_region2;                       /* memory region where the sample ROM lives */
-	optional_memory_region m_region3;                       /* memory region where the sample ROM lives */
-	int m_channels;                               /* number of output channels: 1 .. 6 */
-	devcb_write_line m_irq_cb;  /* irq callback */
-	devcb_read16 m_read_port_cb;          /* input port read */
-	devcb_write32 m_sample_rate_changed_cb;          /* callback for when sample rate is changed */
-	devcb_write32 m_exbank_cb;          /* callback for external bankswitching */
+	optional_memory_region m_region0;             // memory region where the sample ROM lives
+	optional_memory_region m_region1;             // memory region where the sample ROM lives
+	optional_memory_region m_region2;             // memory region where the sample ROM lives
+	optional_memory_region m_region3;             // memory region where the sample ROM lives
+	int m_channels;                               // number of output channels: 1 .. 6
+	devcb_write_line m_irq_cb;                    // irq callback
+	devcb_read16 m_read_port_cb;                  // input port read
+	devcb_write32 m_sample_rate_changed_cb;       // callback for when sample rate is changed
 };
 
 
@@ -201,7 +197,7 @@ protected:
 	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) override;
 	virtual void generate_samples(s32 **outputs, int offset, int samples) override;
 
-	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { return m_cache[update_exbank(voice)].read_word(addr); }
+	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { update_exbank(voice); return m_cache[get_bank(voice->control)].read_word(addr); }
 
 private:
 	inline void reg_write_low(es550x_voice *voice, offs_t offset, u32 data);
@@ -256,7 +252,7 @@ protected:
 	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) override;
 	virtual void generate_samples(s32 **outputs, int offset, int samples) override;
 
-	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { return m_cache[update_exbank(voice)].read_word(addr); }
+	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { update_exbank(voice); return m_cache[get_bank(voice->control)].read_word(addr); }
 
 private:
 	// internal state
