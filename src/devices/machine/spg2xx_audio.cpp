@@ -200,7 +200,7 @@ void spg2xx_audio_device::check_irqs(const uint16_t changed)
 	}
 }
 
-READ16_MEMBER(spg2xx_audio_device::audio_ctrl_r)
+uint16_t spg2xx_audio_device::audio_ctrl_r(offs_t offset)
 {
 	uint16_t data = m_audio_ctrl_regs[offset];
 
@@ -332,7 +332,7 @@ READ16_MEMBER(spg2xx_audio_device::audio_ctrl_r)
 	return data;
 }
 
-READ16_MEMBER(spg2xx_audio_device::audio_r)
+uint16_t spg2xx_audio_device::audio_r(offs_t offset)
 {
 	const uint16_t channel = (offset & 0x01f0) >> 4;
 	uint16_t data = m_audio_regs[offset];
@@ -410,7 +410,7 @@ READ16_MEMBER(spg2xx_audio_device::audio_r)
 }
 
 
-READ16_MEMBER(spg2xx_audio_device::audio_phase_r)
+uint16_t spg2xx_audio_device::audio_phase_r(offs_t offset)
 {
 	const uint16_t channel = (offset & 0x01f0) >> 4;
 	uint16_t data = m_audio_phase_regs[offset];
@@ -458,7 +458,7 @@ READ16_MEMBER(spg2xx_audio_device::audio_phase_r)
 	return data;
 }
 
-WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
+void spg2xx_audio_device::audio_ctrl_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -741,7 +741,7 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 	}
 }
 
-WRITE16_MEMBER(spg2xx_audio_device::audio_phase_w)
+void spg2xx_audio_device::audio_phase_w(offs_t offset, uint16_t data)
 {
 	const uint16_t channel = (offset & 0x01f0) >> 4;
 
@@ -800,7 +800,7 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_phase_w)
 }
 
 
-WRITE16_MEMBER(spg2xx_audio_device::audio_w)
+void spg2xx_audio_device::audio_w(offs_t offset, uint16_t data)
 {
 	const uint16_t channel = (offset & 0x01f0) >> 4;
 
@@ -1442,7 +1442,7 @@ bool spg2xx_audio_device::audio_envelope_tick(const uint32_t channel)
 
 
 
-WRITE16_MEMBER(spg110_audio_device::audio_w)
+void spg110_audio_device::audio_w(offs_t offset, uint16_t data)
 {
 	const uint16_t channel = (offset & 0x00f0) >> 4;
 
@@ -1456,7 +1456,7 @@ WRITE16_MEMBER(spg110_audio_device::audio_w)
 		return;
 	}
 
-	spg2xx_audio_device::audio_w(space,offset,data,mem_mask);
+	spg2xx_audio_device::audio_w(offset,data);
 }
 
 uint16_t sunplus_gcm394_audio_device::control_group16_r(uint8_t group, uint8_t offset)
@@ -1473,13 +1473,13 @@ void sunplus_gcm394_audio_device::control_group16_w(uint8_t group, uint8_t offse
 	// offset 0x0b = triggers?
 }
 
-READ16_MEMBER(sunplus_gcm394_audio_device::control_r)
+uint16_t sunplus_gcm394_audio_device::control_r(offs_t offset)
 {
 	return control_group16_r(offset & 0x20 ? 1 : 0, offset & 0x1f);
 }
 
 
-WRITE16_MEMBER(sunplus_gcm394_audio_device::control_w)
+void sunplus_gcm394_audio_device::control_w(offs_t offset, uint16_t data)
 {
 	control_group16_w(offset & 0x20 ? 1 : 0, offset & 0x1f, data);
 }

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, superctr
 /*
-    c352.c - Namco C352 custom PCM chip emulation
+    c352.cpp - Namco C352 custom PCM chip emulation
     v2.0
     By R. Belmont
     Rewritten and improved by superctr
@@ -180,7 +180,7 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	}
 }
 
-u16 c352_device::read_reg16(offs_t offset)
+u16 c352_device::read(offs_t offset)
 {
 	m_stream->update();
 
@@ -206,7 +206,7 @@ u16 c352_device::read_reg16(offs_t offset)
 	return 0;
 }
 
-void c352_device::write_reg16(offs_t offset, u16 data, u16 mem_mask)
+void c352_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_stream->update();
 
@@ -224,7 +224,7 @@ void c352_device::write_reg16(offs_t offset, u16 data, u16 mem_mask)
 
 	if (offset < 0x100)
 	{
-		u16 newval = read_reg16(offset);
+		u16 newval = read(offset);
 		COMBINE_DATA(&newval);
 		*((u16*)&m_c352_v[offset / 8] + reg_map[offset % 8]) = newval;
 	}
@@ -413,14 +413,4 @@ void c352_device::device_reset()
 	// init noise generator
 	m_random = 0x1234;
 	m_control = 0;
-}
-
-READ16_MEMBER( c352_device::read )
-{
-	return read_reg16(offset);
-}
-
-WRITE16_MEMBER( c352_device::write )
-{
-	write_reg16(offset, data, mem_mask);
 }

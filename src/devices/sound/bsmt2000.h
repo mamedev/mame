@@ -60,13 +60,13 @@ protected:
 
 public:
 	// internal TMS I/O callbacks
-	DECLARE_READ16_MEMBER( tms_register_r );
-	DECLARE_READ16_MEMBER( tms_data_r );
-	DECLARE_READ16_MEMBER( tms_rom_r );
-	DECLARE_WRITE16_MEMBER( tms_rom_addr_w );
-	DECLARE_WRITE16_MEMBER( tms_rom_bank_w );
-	DECLARE_WRITE16_MEMBER( tms_left_w );
-	DECLARE_WRITE16_MEMBER( tms_right_w );
+	uint16_t tms_register_r();
+	uint16_t tms_data_r();
+	uint16_t tms_rom_r();
+	void tms_rom_addr_w(uint16_t data);
+	void tms_rom_bank_w(uint16_t data);
+	void tms_left_w(uint16_t data);
+	void tms_right_w(uint16_t data);
 
 private:
 	// timers

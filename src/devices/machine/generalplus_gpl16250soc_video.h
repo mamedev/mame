@@ -41,98 +41,98 @@ public:
 	//void set_pal_sprites(int pal_sprites) { m_pal_sprites = pal_sprites; }
 	//void set_pal_back(int pal_back) { m_pal_back = pal_back; }
 
-	DECLARE_READ16_MEMBER(tmap0_regs_r);
-	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
-	DECLARE_READ16_MEMBER(tmap0_tilebase_lsb_r);
-	DECLARE_READ16_MEMBER(tmap0_tilebase_msb_r);
-	DECLARE_WRITE16_MEMBER(tmap0_tilebase_lsb_w);
-	DECLARE_WRITE16_MEMBER(tmap0_tilebase_msb_w);
+	uint16_t tmap0_regs_r(offs_t offset);
+	void tmap0_regs_w(offs_t offset, uint16_t data);
+	uint16_t tmap0_tilebase_lsb_r();
+	uint16_t tmap0_tilebase_msb_r();
+	void tmap0_tilebase_lsb_w(uint16_t data);
+	void tmap0_tilebase_msb_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(tmap1_regs_r);
-	DECLARE_WRITE16_MEMBER(tmap1_regs_w);
-	DECLARE_READ16_MEMBER(tmap1_tilebase_lsb_r);
-	DECLARE_READ16_MEMBER(tmap1_tilebase_msb_r);
-	DECLARE_WRITE16_MEMBER(tmap1_tilebase_lsb_w);
-	DECLARE_WRITE16_MEMBER(tmap1_tilebase_msb_w);
+	uint16_t tmap1_regs_r(offs_t offset);
+	void tmap1_regs_w(offs_t offset, uint16_t data);
+	uint16_t tmap1_tilebase_lsb_r();
+	uint16_t tmap1_tilebase_msb_r();
+	void tmap1_tilebase_lsb_w(uint16_t data);
+	void tmap1_tilebase_msb_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(tmap2_regs_r);
-	DECLARE_WRITE16_MEMBER(tmap2_regs_w);
-	DECLARE_READ16_MEMBER(tmap2_tilebase_lsb_r);
-	DECLARE_READ16_MEMBER(tmap2_tilebase_msb_r);
-	DECLARE_WRITE16_MEMBER(tmap2_tilebase_lsb_w);
-	DECLARE_WRITE16_MEMBER(tmap2_tilebase_msb_w);
+	uint16_t tmap2_regs_r(offs_t offset);
+	void tmap2_regs_w(offs_t offset, uint16_t data);
+	uint16_t tmap2_tilebase_lsb_r();
+	uint16_t tmap2_tilebase_msb_r();
+	void tmap2_tilebase_lsb_w(uint16_t data);
+	void tmap2_tilebase_msb_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(tmap3_regs_r);
-	DECLARE_WRITE16_MEMBER(tmap3_regs_w);
-	DECLARE_READ16_MEMBER(tmap3_tilebase_lsb_r);
-	DECLARE_READ16_MEMBER(tmap3_tilebase_msb_r);
-	DECLARE_WRITE16_MEMBER(tmap3_tilebase_lsb_w);
-	DECLARE_WRITE16_MEMBER(tmap3_tilebase_msb_w);
+	uint16_t tmap3_regs_r(offs_t offset);
+	void tmap3_regs_w(offs_t offset, uint16_t data);
+	uint16_t tmap3_tilebase_lsb_r();
+	uint16_t tmap3_tilebase_msb_r();
+	void tmap3_tilebase_lsb_w(uint16_t data);
+	void tmap3_tilebase_msb_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(video_701c_w);
-	DECLARE_WRITE16_MEMBER(video_701d_w);
-	DECLARE_WRITE16_MEMBER(video_701e_w);
+	void video_701c_w(uint16_t data);
+	void video_701d_w(uint16_t data);
+	void video_701e_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(sprite_7022_gfxbase_lsb_r);
-	DECLARE_READ16_MEMBER(sprite_702d_gfxbase_msb_r);
+	uint16_t sprite_7022_gfxbase_lsb_r();
+	uint16_t sprite_702d_gfxbase_msb_r();
 
-	DECLARE_WRITE16_MEMBER(sprite_7022_gfxbase_lsb_w);
-	DECLARE_WRITE16_MEMBER(sprite_702d_gfxbase_msb_w);
-	DECLARE_READ16_MEMBER(sprite_7042_extra_r);
-	DECLARE_WRITE16_MEMBER(sprite_7042_extra_w);
+	void sprite_7022_gfxbase_lsb_w(uint16_t data);
+	void sprite_702d_gfxbase_msb_w(uint16_t data);
+	uint16_t sprite_7042_extra_r();
+	void sprite_7042_extra_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(video_dma_source_w);
-	DECLARE_WRITE16_MEMBER(video_dma_dest_w);
-	DECLARE_READ16_MEMBER(video_dma_size_busy_r);
-	DECLARE_WRITE16_MEMBER(video_dma_size_trigger_w);
-	DECLARE_WRITE16_MEMBER(video_707e_spritebank_w);
+	void video_dma_source_w(uint16_t data);
+	void video_dma_dest_w(uint16_t data);
+	uint16_t video_dma_size_busy_r();
+	void video_dma_size_trigger_w(address_space &space, uint16_t data);
+	void video_707e_spritebank_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(video_703a_palettebank_r);
-	DECLARE_WRITE16_MEMBER(video_703a_palettebank_w);
+	uint16_t video_703a_palettebank_r();
+	void video_703a_palettebank_w(uint16_t data);
 
 	void update_raster_split_position();
-	DECLARE_WRITE16_MEMBER(split_irq_xpos_w);
-	DECLARE_WRITE16_MEMBER(split_irq_ypos_w);
+	void split_irq_xpos_w(uint16_t data);
+	void split_irq_ypos_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(videoirq_source_enable_r);
-	DECLARE_WRITE16_MEMBER(videoirq_source_enable_w);
+	uint16_t videoirq_source_enable_r();
+	void videoirq_source_enable_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(video_7063_videoirq_source_r);
-	DECLARE_WRITE16_MEMBER(video_7063_videoirq_source_ack_w);
+	uint16_t video_7063_videoirq_source_r();
+	void video_7063_videoirq_source_ack_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(video_702a_w);
-	DECLARE_READ16_MEMBER(video_7030_brightness_r);
-	DECLARE_WRITE16_MEMBER(video_7030_brightness_w);
-	DECLARE_READ16_MEMBER(video_curline_r);
+	void video_702a_w(uint16_t data);
+	uint16_t video_7030_brightness_r();
+	void video_7030_brightness_w(uint16_t data);
+	uint16_t video_curline_r();
 
-	DECLARE_READ16_MEMBER(video_703c_tvcontrol1_r);
-	DECLARE_WRITE16_MEMBER(video_703c_tvcontrol1_w);
+	uint16_t video_703c_tvcontrol1_r();
+	void video_703c_tvcontrol1_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(video_707c_r);
+	uint16_t video_707c_r();
 
-	DECLARE_READ16_MEMBER(video_707f_r);
-	DECLARE_WRITE16_MEMBER(video_707f_w);
+	uint16_t video_707f_r();
+	void video_707f_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(video_7080_w);
-	DECLARE_WRITE16_MEMBER(video_7081_w);
-	DECLARE_WRITE16_MEMBER(video_7082_w);
-	DECLARE_WRITE16_MEMBER(video_7083_w);
-	DECLARE_WRITE16_MEMBER(video_7084_w);
-	DECLARE_WRITE16_MEMBER(video_7085_w);
-	DECLARE_WRITE16_MEMBER(video_7086_w);
-	DECLARE_WRITE16_MEMBER(video_7087_w);
-	DECLARE_WRITE16_MEMBER(video_7088_w);
+	void video_7080_w(uint16_t data);
+	void video_7081_w(uint16_t data);
+	void video_7082_w(uint16_t data);
+	void video_7083_w(uint16_t data);
+	void video_7084_w(uint16_t data);
+	void video_7085_w(uint16_t data);
+	void video_7086_w(uint16_t data);
+	void video_7087_w(uint16_t data);
+	void video_7088_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(video_7083_r);
+	uint16_t video_7083_r();
 
-	DECLARE_READ16_MEMBER(palette_r);
-	DECLARE_WRITE16_MEMBER(palette_w);
+	uint16_t palette_r(offs_t offset);
+	void palette_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(spriteram_w);
-	DECLARE_READ16_MEMBER(spriteram_r);
+	void spriteram_w(offs_t offset, uint16_t data);
+	uint16_t spriteram_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER(video_7051_r);
-	DECLARE_READ16_MEMBER(video_70e0_r);
+	uint16_t video_7051_r();
+	uint16_t video_70e0_r();
 
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 

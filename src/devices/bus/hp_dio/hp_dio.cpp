@@ -251,9 +251,7 @@ WRITE_LINE_MEMBER(dio16_device::reset_in)
 	}
 }
 
-void dio16_device::install_memory(offs_t start, offs_t end,
-				  read16_delegate rhandler,
-				  write16_delegate whandler) {
+template<typename R, typename W> void dio16_device::install_memory(offs_t start, offs_t end, R rhandler, W whandler) {
 	switch (m_prgwidth) {
 	case 16:
 		m_prgspace->install_readwrite_handler(start, end, rhandler,
@@ -267,6 +265,9 @@ void dio16_device::install_memory(offs_t start, offs_t end,
 		fatalerror("DIO: Bus width %d not supported\n", m_prgwidth);
 	}
 }
+
+template void dio16_device::install_memory<read16_delegate,    write16_delegate   >(offs_t start, offs_t end, read16_delegate rhandler,    write16_delegate whandler);
+template void dio16_device::install_memory<read16s_delegate,   write16s_delegate  >(offs_t start, offs_t end, read16s_delegate rhandler,   write16s_delegate whandler);
 
 void dio16_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
 {

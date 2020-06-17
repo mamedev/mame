@@ -116,8 +116,8 @@ void dio16_98543_device::device_start()
 
 	dio().install_memory(
 			0x566000, 0x567fff,
-			read16_delegate(*m_nereid, FUNC(nereid_device::ctrl_r)),
-			write16_delegate(*m_nereid, FUNC(nereid_device::ctrl_w)));
+			read16s_delegate(*m_nereid, FUNC(nereid_device::ctrl_r)),
+			write16s_delegate(*m_nereid, FUNC(nereid_device::ctrl_w)));
 }
 
 void dio16_98543_device::device_reset()
@@ -157,14 +157,14 @@ READ16_MEMBER(dio16_98543_device::vram_r)
 {
 	uint16_t ret = 0;
 	for (auto &tc: m_topcat)
-		ret |= tc->vram_r(space, offset, mem_mask);
+		ret |= tc->vram_r(offset, mem_mask);
 	return ret;
 }
 
 WRITE16_MEMBER(dio16_98543_device::vram_w)
 {
 	for (auto &tc: m_topcat)
-		tc->vram_w(space, offset, data, mem_mask);
+		tc->vram_w(offset, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(dio16_98543_device::vblank_w)

@@ -396,7 +396,7 @@ uint16_t spg2xx_io_device::clock_rng(int which)
 
 
 
-READ16_MEMBER(spg2xx_io_device::io_r)
+uint16_t spg2xx_io_device::io_r(offs_t offset)
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[] = { 'A', 'B', 'C' };
@@ -497,7 +497,7 @@ READ16_MEMBER(spg2xx_io_device::io_r)
 	return val;
 }
 
-READ16_MEMBER(spg2xx_io_device::io_extended_r)
+uint16_t spg2xx_io_device::io_extended_r(offs_t offset)
 {
 	// this set of registers might only be on the 24x not the 11x
 
@@ -755,7 +755,7 @@ void spg2xx_io_device::update_timer_c_src()
 }
 
 
-WRITE16_MEMBER(spg28x_io_device::io_extended_w)
+void spg28x_io_device::io_extended_w(offs_t offset, uint16_t data)
 {
 	offset += REG_UART_CTRL;
 
@@ -767,11 +767,11 @@ WRITE16_MEMBER(spg28x_io_device::io_extended_w)
 	}
 	else
 	{
-		spg2xx_io_device::io_extended_w(space, offset - REG_UART_CTRL, data, mem_mask);
+		spg2xx_io_device::io_extended_w(offset - REG_UART_CTRL, data);
 	}
 }
 
-WRITE16_MEMBER(spg2xx_io_device::io_w)
+void spg2xx_io_device::io_w(offs_t offset, uint16_t data)
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[3] = { 'A', 'B', 'C' };
@@ -1214,7 +1214,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 
 
 
-WRITE16_MEMBER(spg2xx_io_device::io_extended_w)
+void spg2xx_io_device::io_extended_w(offs_t offset, uint16_t data)
 {
 	// this set of registers might only be on the 24x not the 11x
 

@@ -291,7 +291,7 @@ inline void acorn_vidc10_device::screen_dynamic_res_change()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE32_MEMBER( acorn_vidc10_device::write )
+void acorn_vidc10_device::write(offs_t offset, u32 data, u32 mem_mask)
 {
 	// TODO: check against mem_mask not 32-bit wide
 	u8 reg = data >> 24;
@@ -314,7 +314,7 @@ inline void acorn_vidc10_device::update_4bpp_palette(u16 index, u32 paldata)
 	screen().update_partial(screen().vpos());
 }
 
-WRITE32_MEMBER( acorn_vidc10_device::pal_data_display_w )
+void acorn_vidc10_device::pal_data_display_w(offs_t offset, u32 data)
 {
 	update_4bpp_palette(offset+0x100, data);
 	//printf("%02x: %01x %01x %01x [%d]\n",offset,r,g,b,screen().vpos());
@@ -330,12 +330,12 @@ WRITE32_MEMBER( acorn_vidc10_device::pal_data_display_w )
 	}
 }
 
-WRITE32_MEMBER( acorn_vidc10_device::pal_data_cursor_w )
+void acorn_vidc10_device::pal_data_cursor_w(offs_t offset, u32 data)
 {
 	update_4bpp_palette(offset+0x110, data);
 }
 
-WRITE32_MEMBER( acorn_vidc10_device::control_w )
+void acorn_vidc10_device::control_w(u32 data)
 {
 	// TODO: not sure what the commented out bits do
 	m_pixel_clock = (data & 0x03);
@@ -358,7 +358,7 @@ inline u32 acorn_vidc10_device::convert_crtc_hdisplay(u8 index)
 	return (m_crtc_raw_horz[index]*2)+x_step[m_bpp_mode];
 }
 
-WRITE32_MEMBER( acorn_vidc10_device::crtc_w )
+void acorn_vidc10_device::crtc_w(offs_t offset, u32 data)
 {
 	switch(offset)
 	{
@@ -420,14 +420,14 @@ inline void acorn_vidc10_device::refresh_stereo_image(u8 channel)
 }
 
 
-WRITE32_MEMBER( acorn_vidc10_device::stereo_image_w )
+void acorn_vidc10_device::stereo_image_w(offs_t offset, u32 data)
 {
 	u8 channel = (offset + 7) & 0x7;
 	m_stereo_image[channel] = data & 0x7;
 	refresh_stereo_image(channel);
 }
 
-WRITE32_MEMBER( acorn_vidc10_device::sound_frequency_w )
+void acorn_vidc10_device::sound_frequency_w(u32 data)
 {
 	m_sound_frequency_test_bit = BIT(data, 8);
 	m_sound_frequency_latch = data & 0xff;
@@ -643,7 +643,7 @@ inline void arm_vidc20_device::update_8bpp_palette(u16 index, u32 paldata)
 	screen().update_partial(screen().vpos());
 }
 
-WRITE32_MEMBER(arm_vidc20_device::vidc20_pal_data_display_w)
+void arm_vidc20_device::vidc20_pal_data_display_w(offs_t offset, u32 data)
 {
 	u8 ext_data = offset & 0xf;
 	update_8bpp_palette(m_pal_data_index, (ext_data<<24) | data);
@@ -651,12 +651,12 @@ WRITE32_MEMBER(arm_vidc20_device::vidc20_pal_data_display_w)
 	m_pal_data_index &= 0xff;
 }
 
-WRITE32_MEMBER( arm_vidc20_device::vidc20_pal_data_index_w )
+void arm_vidc20_device::vidc20_pal_data_index_w(u32 data)
 {
 	m_pal_data_index = data & 0xff;
 }
 
-WRITE32_MEMBER( arm_vidc20_device::vidc20_pal_data_cursor_w )
+void arm_vidc20_device::vidc20_pal_data_cursor_w(offs_t offset, u32 data)
 {
 	u8 ext_data = offset & 0xf;
 	u8 cursor_pal_index = (offset >> 4) & 3;
@@ -681,7 +681,7 @@ u32 arm_vidc20_device::get_pixel_clock()
 	throw emu_fatalerror("%s unhandled pixel source %02x selected",this->tag(), m_pixel_source);
 }
 
-WRITE32_MEMBER(arm_vidc20_device::vidc20_crtc_w)
+void arm_vidc20_device::vidc20_crtc_w(offs_t offset, u32 data)
 {
 	if (offset & 0x8)
 		throw emu_fatalerror("%s accessing CRTC test register %02x, please call the ambulance",this->tag(),offset+0x80);
@@ -717,7 +717,7 @@ WRITE32_MEMBER(arm_vidc20_device::vidc20_crtc_w)
 	screen_dynamic_res_change();
 }
 
-WRITE32_MEMBER( arm_vidc20_device::fsynreg_w )
+void arm_vidc20_device::fsynreg_w(u32 data)
 {
 	m_vco_r_modulo = data & 0x3f;
 	m_vco_v_modulo = (data >> 8) & 0x3f;
@@ -726,7 +726,7 @@ WRITE32_MEMBER( arm_vidc20_device::fsynreg_w )
 	screen_dynamic_res_change();
 }
 
-WRITE32_MEMBER( arm_vidc20_device::vidc20_control_w )
+void arm_vidc20_device::vidc20_control_w(u32 data)
 {
 	// ---- --00: VCLK
 	// ---- --01: HCLK
@@ -745,13 +745,13 @@ WRITE32_MEMBER( arm_vidc20_device::vidc20_control_w )
 	screen_dynamic_res_change();
 }
 
-WRITE32_MEMBER( arm_vidc20_device::vidc20_sound_control_w )
+void arm_vidc20_device::vidc20_sound_control_w(u32 data)
 {
 	// TODO: VIDC10 mode, ext clock bit 0
 	m_dac_serial_mode = BIT(data, 1);
 }
 
-WRITE32_MEMBER( arm_vidc20_device::vidc20_sound_frequency_w )
+void arm_vidc20_device::vidc20_sound_frequency_w(u32 data)
 {
 	m_sound_frequency_latch = data & 0xff;
 	if (m_sound_mode == true)

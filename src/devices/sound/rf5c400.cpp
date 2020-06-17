@@ -318,7 +318,7 @@ void rf5c400_device::rom_bank_updated()
 
 /*****************************************************************************/
 
-READ16_MEMBER( rf5c400_device::rf5c400_r )
+uint16_t rf5c400_device::rf5c400_r(offs_t offset, uint16_t mem_mask)
 {
 	if (offset < 0x400)
 	{
@@ -364,7 +364,7 @@ READ16_MEMBER( rf5c400_device::rf5c400_r )
 	}
 }
 
-WRITE16_MEMBER( rf5c400_device::rf5c400_w )
+void rf5c400_device::rf5c400_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 0x400)
 	{

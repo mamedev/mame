@@ -489,7 +489,7 @@ void gcm394_base_video_device::write_tmap_extrascroll(int tmap, uint16_t* regs, 
 
 // **************************************** TILEMAP 0 *************************************************
 
-READ16_MEMBER(gcm394_base_video_device::tmap0_regs_r)
+uint16_t gcm394_base_video_device::tmap0_regs_r(offs_t offset)
 {
 	if (offset < 2)
 	{
@@ -501,7 +501,7 @@ READ16_MEMBER(gcm394_base_video_device::tmap0_regs_r)
 	}
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap0_regs_w)
+void gcm394_base_video_device::tmap0_regs_w(offs_t offset, uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_TMAP_EXTRA, "%s:gcm394_base_video_device::tmap0_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 	if (offset < 2)
@@ -514,24 +514,24 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap0_regs_w)
 	}
 }
 
-READ16_MEMBER(gcm394_base_video_device::tmap0_tilebase_lsb_r)
+uint16_t gcm394_base_video_device::tmap0_tilebase_lsb_r()
 {
 	return m_page0_addr_lsb;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap0_tilebase_lsb_w)
+void gcm394_base_video_device::tmap0_tilebase_lsb_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_tilebase_lsb_w %04x\n", machine().describe_context(), data);
 	m_page0_addr_lsb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "\t(tmap0 tilegfxbase is now %04x%04x)\n", m_page0_addr_msb, m_page0_addr_lsb);
 }
 
-READ16_MEMBER(gcm394_base_video_device::tmap0_tilebase_msb_r)
+uint16_t gcm394_base_video_device::tmap0_tilebase_msb_r()
 {
 	return m_page0_addr_msb;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap0_tilebase_msb_w)
+void gcm394_base_video_device::tmap0_tilebase_msb_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_tilebase_msb_w %04x\n", machine().describe_context(), data);
 	m_page0_addr_msb = data;
@@ -541,7 +541,7 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap0_tilebase_msb_w)
 // **************************************** TILEMAP 1 *************************************************
 
 
-READ16_MEMBER(gcm394_base_video_device::tmap1_regs_r)
+uint16_t gcm394_base_video_device::tmap1_regs_r(offs_t offset)
 {
 	if (offset < 2)
 	{
@@ -553,7 +553,7 @@ READ16_MEMBER(gcm394_base_video_device::tmap1_regs_r)
 	}
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap1_regs_w)
+void gcm394_base_video_device::tmap1_regs_w(offs_t offset, uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_TMAP_EXTRA, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 	if (offset < 2)
@@ -566,24 +566,24 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap1_regs_w)
 	}
 }
 
-READ16_MEMBER(gcm394_base_video_device::tmap1_tilebase_lsb_r)
+uint16_t gcm394_base_video_device::tmap1_tilebase_lsb_r()
 {
 	return m_page1_addr_lsb;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_lsb_w)
+void gcm394_base_video_device::tmap1_tilebase_lsb_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_tilebase_lsb_w %04x\n", machine().describe_context(), data);
 	m_page1_addr_lsb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "\t(tmap1 tilegfxbase is now %04x%04x)\n", m_page1_addr_msb, m_page1_addr_lsb);
 }
 
-READ16_MEMBER(gcm394_base_video_device::tmap1_tilebase_msb_r)
+uint16_t gcm394_base_video_device::tmap1_tilebase_msb_r()
 {
 	return m_page1_addr_msb;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_msb_w)
+void gcm394_base_video_device::tmap1_tilebase_msb_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_tilebase_msb_w %04x\n", machine().describe_context(), data);
 	m_page1_addr_msb = data;
@@ -592,7 +592,7 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_msb_w)
 
 // **************************************** unknown video device 1 (another tilemap? roz? line? zooming sprite layer?) *************************************************
 
-READ16_MEMBER(gcm394_base_video_device::tmap2_regs_r)
+uint16_t gcm394_base_video_device::tmap2_regs_r(offs_t offset)
 {
 	if (offset < 4)
 	{
@@ -604,7 +604,7 @@ READ16_MEMBER(gcm394_base_video_device::tmap2_regs_r)
 	}
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap2_regs_w)
+void gcm394_base_video_device::tmap2_regs_w(offs_t offset, uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_TMAP_EXTRA, "%s:gcm394_base_video_device::tmap2_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 	if (offset < 4)
@@ -617,25 +617,25 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap2_regs_w)
 	}
 }
 
-READ16_MEMBER(gcm394_base_video_device::tmap2_tilebase_lsb_r)
+uint16_t gcm394_base_video_device::tmap2_tilebase_lsb_r()
 {
 	return m_page2_addr_lsb;
 }
 
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap2_tilebase_lsb_w)
+void gcm394_base_video_device::tmap2_tilebase_lsb_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::tmap2_tilebase_lsb_w %04x\n", machine().describe_context(), data);
 	m_page2_addr_lsb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid1 tilegfxbase is now %04x%04x)\n", m_page2_addr_msb, m_page2_addr_lsb);
 }
 
-READ16_MEMBER(gcm394_base_video_device::tmap2_tilebase_msb_r)
+uint16_t gcm394_base_video_device::tmap2_tilebase_msb_r()
 {
 	return m_page2_addr_msb;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap2_tilebase_msb_w)
+void gcm394_base_video_device::tmap2_tilebase_msb_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::tmap2_tilebase_msb_w %04x\n", machine().describe_context(), data);
 	m_page2_addr_msb = data;
@@ -644,7 +644,7 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap2_tilebase_msb_w)
 
 // **************************************** unknown video device 2 (another tilemap? roz? lines? zooming sprite layer?) *************************************************
 
-READ16_MEMBER(gcm394_base_video_device::tmap3_regs_r)
+uint16_t gcm394_base_video_device::tmap3_regs_r(offs_t offset)
 {
 	if (offset < 4)
 	{
@@ -656,7 +656,7 @@ READ16_MEMBER(gcm394_base_video_device::tmap3_regs_r)
 	}
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap3_regs_w)
+void gcm394_base_video_device::tmap3_regs_w(offs_t offset, uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_TMAP_EXTRA, "%s:gcm394_base_video_device::tmap3_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 	if (offset < 4)
@@ -669,26 +669,26 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap3_regs_w)
 	}
 }
 
-READ16_MEMBER(gcm394_base_video_device::tmap3_tilebase_lsb_r)
+uint16_t gcm394_base_video_device::tmap3_tilebase_lsb_r()
 {
 	return m_page3_addr_lsb;
 }
 
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap3_tilebase_lsb_w)
+void gcm394_base_video_device::tmap3_tilebase_lsb_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::tmap3_tilebase_lsb_w %04x\n", machine().describe_context(), data);
 	m_page3_addr_lsb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid2 tilegfxbase is now %04x%04x)\n", m_page3_addr_msb, m_page3_addr_lsb);
 }
 
-READ16_MEMBER(gcm394_base_video_device::tmap3_tilebase_msb_r)
+uint16_t gcm394_base_video_device::tmap3_tilebase_msb_r()
 {
 	return m_page3_addr_msb;
 }
 
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap3_tilebase_msb_w)
+void gcm394_base_video_device::tmap3_tilebase_msb_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::tmap3_tilebase_msb_w %04x\n", machine().describe_context(), data);
 	m_page3_addr_msb = data;
@@ -699,38 +699,38 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap3_tilebase_msb_w)
 
 // set to 001264c0 in wrlshunt, which point at the menu selectors (game names, arrows etc.)
 
-READ16_MEMBER(gcm394_base_video_device::sprite_7022_gfxbase_lsb_r)
+uint16_t gcm394_base_video_device::sprite_7022_gfxbase_lsb_r()
 {
 	return m_sprite_7022_gfxbase_lsb;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::sprite_7022_gfxbase_lsb_w)
+void gcm394_base_video_device::sprite_7022_gfxbase_lsb_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_7022_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
 	m_sprite_7022_gfxbase_lsb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "\t(sprite tilebase is now %04x%04x)\n", m_sprite_702d_gfxbase_msb, m_sprite_7022_gfxbase_lsb);
 }
 
-READ16_MEMBER(gcm394_base_video_device::sprite_702d_gfxbase_msb_r)
+uint16_t gcm394_base_video_device::sprite_702d_gfxbase_msb_r()
 {
 	return m_sprite_702d_gfxbase_msb;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::sprite_702d_gfxbase_msb_w)
+void gcm394_base_video_device::sprite_702d_gfxbase_msb_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_702d_gfxbase_msb_w %04x\n", machine().describe_context(), data);
 	m_sprite_702d_gfxbase_msb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "\t(sprite tilebase tilegfxbase is now %04x%04x)\n", m_sprite_702d_gfxbase_msb, m_sprite_7022_gfxbase_lsb);
 }
 
-READ16_MEMBER(gcm394_base_video_device::sprite_7042_extra_r)
+uint16_t gcm394_base_video_device::sprite_7042_extra_r()
 {
 	uint16_t retdata = m_7042_sprite;
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_7042_extra_r (returning: %04x)\n", machine().describe_context(), retdata);
 	return retdata;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::sprite_7042_extra_w)
+void gcm394_base_video_device::sprite_7042_extra_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_7042_extra_w %04x\n", machine().describe_context(), data);
 	m_7042_sprite = data;
@@ -742,25 +742,25 @@ WRITE16_MEMBER(gcm394_base_video_device::sprite_7042_extra_w)
 
 // **************************************** video DMA device *************************************************
 
-WRITE16_MEMBER(gcm394_base_video_device::video_dma_source_w)
+void gcm394_base_video_device::video_dma_source_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_source_w %04x\n", machine().describe_context(), data);
 	m_videodma_source = data;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_dma_dest_w)
+void gcm394_base_video_device::video_dma_dest_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_dest_w %04x\n", machine().describe_context(), data);
 	m_videodma_dest = data;
 }
 
-READ16_MEMBER(gcm394_base_video_device::video_dma_size_busy_r)
+uint16_t gcm394_base_video_device::video_dma_size_busy_r()
 {
 	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_size_busy_r\n", machine().describe_context());
 	return 0x0000;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_trigger_w)
+void gcm394_base_video_device::video_dma_size_trigger_w(address_space &space, uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_size_trigger_w %04x\n", machine().describe_context(), data);
 	m_videodma_size = data;
@@ -785,13 +785,13 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_trigger_w)
 	}
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_707e_spritebank_w)
+void gcm394_base_video_device::video_707e_spritebank_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707e_spritebank_w %04x\n", machine().describe_context(), data);
 	m_707e_spritebank = data;
 }
 
-READ16_MEMBER(gcm394_base_video_device::video_707c_r)
+uint16_t gcm394_base_video_device::video_707c_r()
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707c_r\n", machine().describe_context());
 	return 0x8000;
@@ -813,13 +813,13 @@ READ16_MEMBER(gcm394_base_video_device::video_707c_r)
 */
 
 
-READ16_MEMBER(gcm394_base_video_device::video_707f_r)
+uint16_t gcm394_base_video_device::video_707f_r()
 {
 	uint16_t retdata = m_renderer->get_video_reg_7f();
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_r (returning %04x)\n", machine().describe_context(), retdata);
 	return retdata;
 }
-WRITE16_MEMBER(gcm394_base_video_device::video_707f_w)
+void gcm394_base_video_device::video_707f_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_w %04x\n", machine().describe_context(), data);
 
@@ -845,13 +845,13 @@ WRITE16_MEMBER(gcm394_base_video_device::video_707f_w)
 	//popmessage("707f is %04x\n", data);
 }
 
-READ16_MEMBER(gcm394_base_video_device::video_703a_palettebank_r)
+uint16_t gcm394_base_video_device::video_703a_palettebank_r()
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_palettebank_r\n", machine().describe_context());
 	return m_703a_palettebank;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_703a_palettebank_w)
+void gcm394_base_video_device::video_703a_palettebank_w(uint16_t data)
 {
 	// I don't think bit 0 (0x01) is a bank select, it might be a 'mode select' for how the palette operates.
 	// neither lazertag or tkmag220 set it
@@ -866,13 +866,13 @@ WRITE16_MEMBER(gcm394_base_video_device::video_703a_palettebank_w)
 	m_703a_palettebank = data;
 }
 
-READ16_MEMBER(gcm394_base_video_device::videoirq_source_enable_r)
+uint16_t gcm394_base_video_device::videoirq_source_enable_r()
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::videoirq_source_enable_r\n", machine().describe_context());
 	return m_video_irq_enable;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::videoirq_source_enable_w)
+void gcm394_base_video_device::videoirq_source_enable_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "videoirq_source_enable_w: Video IRQ Enable = %04x (DMA:%d, Timing:%d, Blanking:%d)\n", data, BIT(data, 2), BIT(data, 1), BIT(data, 0));
 	const uint16_t old = m_video_irq_enable & m_video_irq_status;
@@ -882,14 +882,14 @@ WRITE16_MEMBER(gcm394_base_video_device::videoirq_source_enable_w)
 		check_video_irq();
 }
 
-READ16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_r)
+uint16_t gcm394_base_video_device::video_7063_videoirq_source_r()
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_videoirq_source_r\n", machine().describe_context());
 	return m_video_irq_status;
 }
 
 
-WRITE16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_ack_w)
+void gcm394_base_video_device::video_7063_videoirq_source_ack_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "video_7063_videoirq_source_ack_w: Video IRQ Acknowledge = %04x\n", data);
 	const uint16_t old = m_video_irq_enable & m_video_irq_status;
@@ -899,21 +899,21 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_ack_w)
 		check_video_irq();
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_702a_w)
+void gcm394_base_video_device::video_702a_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_702a_w %04x\n", machine().describe_context(), data);
 	m_702a = data;
 	m_renderer->set_video_reg_2a(data);
 }
 
-READ16_MEMBER(gcm394_base_video_device::video_curline_r)
+uint16_t gcm394_base_video_device::video_curline_r()
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s: video_r: Current Line: %04x\n", machine().describe_context(), m_screen->vpos());
 	return m_screen->vpos();
 }
 
 // read in IRQ
-READ16_MEMBER(gcm394_base_video_device::video_7030_brightness_r)
+uint16_t gcm394_base_video_device::video_7030_brightness_r()
 {
 	/* wrlshunt ends up doing an explicit jump to 0000 shortly after boot if you just return the value written here, however I think that is correct code flow and something else is wrong
 	   as this simply looks like some kind of brightness register - there is code to decrease it from 0xff to 0x00 by 0x5 increments (waiting for it to hit 0x05) and code to do the reverse
@@ -924,7 +924,7 @@ READ16_MEMBER(gcm394_base_video_device::video_7030_brightness_r)
 	return retdat;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_7030_brightness_w)
+void gcm394_base_video_device::video_7030_brightness_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_brightness_w %04x\n", machine().describe_context(), data);
 	m_7030_brightness = data;
@@ -945,7 +945,7 @@ void gcm394_base_video_device::update_raster_split_position()
 		m_screenpos_timer->adjust(attotime::never);
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::split_irq_ypos_w)
+void gcm394_base_video_device::split_irq_ypos_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:split_irq_ypos_w %04x\n", machine().describe_context(), data);
 
@@ -953,7 +953,7 @@ WRITE16_MEMBER(gcm394_base_video_device::split_irq_ypos_w)
 	update_raster_split_position();
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::split_irq_xpos_w)
+void gcm394_base_video_device::split_irq_xpos_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:split_irq_xpos_w %04x\n", machine().describe_context(), data);
 
@@ -961,20 +961,20 @@ WRITE16_MEMBER(gcm394_base_video_device::split_irq_xpos_w)
 	update_raster_split_position();
 }
 
-READ16_MEMBER(gcm394_base_video_device::video_703c_tvcontrol1_r)
+uint16_t gcm394_base_video_device::video_703c_tvcontrol1_r()
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_tvcontrol1_r\n", machine().describe_context());
 	return m_703c_tvcontrol1;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_703c_tvcontrol1_w)
+void gcm394_base_video_device::video_703c_tvcontrol1_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_tvcontrol1_w %04x\n", machine().describe_context(), data);
 	m_703c_tvcontrol1 = data;
 	m_renderer->set_video_reg_3c(data);
 }
 
-READ16_MEMBER(gcm394_base_video_device::video_7051_r)
+uint16_t gcm394_base_video_device::video_7051_r()
 {
 	/* related to what ends up crashing wrlshunt? */
 	uint16_t retdat = 0x03ff;
@@ -982,7 +982,7 @@ READ16_MEMBER(gcm394_base_video_device::video_7051_r)
 	return retdat;
 }
 
-READ16_MEMBER(gcm394_base_video_device::video_70e0_r)
+uint16_t gcm394_base_video_device::video_70e0_r()
 {
 	uint16_t retdat = machine().rand();
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_70e0_r (returning %04x)\n", machine().describe_context(), retdat);
@@ -991,19 +991,19 @@ READ16_MEMBER(gcm394_base_video_device::video_70e0_r)
 
 
 // this block get set once, in a single function, could be important
-WRITE16_MEMBER(gcm394_base_video_device::video_7080_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7080_w %04x\n", machine().describe_context(), data); m_7080 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7081_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7081_w %04x\n", machine().describe_context(), data); m_7081 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7082_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7082_w %04x\n", machine().describe_context(), data); m_7082 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7083_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7083_w %04x\n", machine().describe_context(), data); m_7083 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7084_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7084_w %04x\n", machine().describe_context(), data); m_7084 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7085_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7085_w %04x\n", machine().describe_context(), data); m_7085 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7086_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7086_w %04x\n", machine().describe_context(), data); m_7086 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7087_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7087_w %04x\n", machine().describe_context(), data); m_7087 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7088_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7088_w %04x\n", machine().describe_context(), data); m_7088 = data; }
+void gcm394_base_video_device::video_7080_w(uint16_t data) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7080_w %04x\n", machine().describe_context(), data); m_7080 = data; }
+void gcm394_base_video_device::video_7081_w(uint16_t data) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7081_w %04x\n", machine().describe_context(), data); m_7081 = data; }
+void gcm394_base_video_device::video_7082_w(uint16_t data) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7082_w %04x\n", machine().describe_context(), data); m_7082 = data; }
+void gcm394_base_video_device::video_7083_w(uint16_t data) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7083_w %04x\n", machine().describe_context(), data); m_7083 = data; }
+void gcm394_base_video_device::video_7084_w(uint16_t data) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7084_w %04x\n", machine().describe_context(), data); m_7084 = data; }
+void gcm394_base_video_device::video_7085_w(uint16_t data) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7085_w %04x\n", machine().describe_context(), data); m_7085 = data; }
+void gcm394_base_video_device::video_7086_w(uint16_t data) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7086_w %04x\n", machine().describe_context(), data); m_7086 = data; }
+void gcm394_base_video_device::video_7087_w(uint16_t data) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7087_w %04x\n", machine().describe_context(), data); m_7087 = data; }
+void gcm394_base_video_device::video_7088_w(uint16_t data) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7088_w %04x\n", machine().describe_context(), data); m_7088 = data; }
 
-READ16_MEMBER(gcm394_base_video_device::video_7083_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7083_r\n", machine().describe_context()); return m_7083; }
+uint16_t gcm394_base_video_device::video_7083_r() { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7083_r\n", machine().describe_context()); return m_7083; }
 
-WRITE16_MEMBER(gcm394_base_video_device::spriteram_w)
+void gcm394_base_video_device::spriteram_w(offs_t offset, uint16_t data)
 {
 	// transfers an additional word for each sprite with this bit set (smartfp) or an entire extra bank (wrlshunt)
 	// wrlshunt instead seems to base if it writes the extra data based on 707f so maybe this is more complex than banking
@@ -1025,7 +1025,7 @@ WRITE16_MEMBER(gcm394_base_video_device::spriteram_w)
 	}
 }
 
-READ16_MEMBER(gcm394_base_video_device::spriteram_r)
+uint16_t gcm394_base_video_device::spriteram_r(offs_t offset)
 {
 	if (m_707e_spritebank == 0x0000)
 	{
@@ -1042,7 +1042,7 @@ READ16_MEMBER(gcm394_base_video_device::spriteram_r)
 	}
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::palette_w)
+void gcm394_base_video_device::palette_w(offs_t offset, uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO_PALETTE, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context(), offset, data, m_703a_palettebank);
 
@@ -1063,7 +1063,7 @@ WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 	}
 }
 
-READ16_MEMBER(gcm394_base_video_device::palette_r)
+uint16_t gcm394_base_video_device::palette_r(offs_t offset)
 {
 	if (m_703a_palettebank & 0xfff0)
 	{
@@ -1076,19 +1076,19 @@ READ16_MEMBER(gcm394_base_video_device::palette_r)
 	}
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_701c_w)
+void gcm394_base_video_device::video_701c_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_701c_w (unknown video reg?) %04x\n", machine().describe_context(), data);
 	m_renderer->set_video_reg_1c(data);
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_701d_w)
+void gcm394_base_video_device::video_701d_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_701d_w (unknown video reg?) %04x\n", machine().describe_context(), data);
 	m_renderer->set_video_reg_1d(data);
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_701e_w)
+void gcm394_base_video_device::video_701e_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_701e_w (unknown video reg?) %04x\n", machine().describe_context(), data);
 	m_renderer->set_video_reg_1e(data);

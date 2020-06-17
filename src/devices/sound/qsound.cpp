@@ -141,7 +141,7 @@ qsound_device::qsound_device(machine_config const &mconfig, char const *tag, dev
 }
 
 
-WRITE8_MEMBER(qsound_device::qsound_w)
+void qsound_device::qsound_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -169,7 +169,7 @@ WRITE8_MEMBER(qsound_device::qsound_w)
 }
 
 
-READ8_MEMBER(qsound_device::qsound_r)
+u8 qsound_device::qsound_r()
 {
 	return m_dsp_ready ? 0x80 : 0x00;
 }
@@ -279,7 +279,7 @@ void qsound_device::dsp_io_map(address_map &map)
 }
 
 
-READ16_MEMBER(qsound_device::dsp_sample_r)
+u16 qsound_device::dsp_sample_r(offs_t offset)
 {
 	// on CPS2, bit 0-7 of external ROM data is tied to ground
 	u8 const byte(read_byte((u32(m_rom_bank) << 16) | m_rom_offset));

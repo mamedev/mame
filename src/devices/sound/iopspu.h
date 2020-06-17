@@ -31,8 +31,8 @@ public:
 	iop_spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~iop_spu_device() override;
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	uint16_t read(offs_t offset, uint16_t mem_mask = ~0);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint16_t reg_read(int bank, uint32_t offset, uint16_t mem_mask);
 	void reg_write(int bank, uint32_t offset, uint16_t data, uint16_t mem_mask);
