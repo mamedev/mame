@@ -249,7 +249,7 @@ uint8_t mbee_state::port07_r()   // read
 // See it work: Run mbeett, choose RTC in the config switches, run the F3 test, press Esc.
 WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
 {
-	m_b7_rtc = (state) ? 0 : 1; // inverted by IC15 (pins 8,9,10)
+	m_b7_rtc = state; // inverted by IC15 (pins 8,9,10) then again by mame
 
 	if ((m_io_config->read() & 0xc0) == 0x40) // RTC selected in config menu
 		m_pio->port_b_write(pio_port_b_r());
