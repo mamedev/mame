@@ -131,7 +131,7 @@ protected:
 	u64           m_address_acc_mask;     // accumulator mask
 
 	s8            m_volume_shift;         // right shift volume for generate integer volume
-	s64           m_volume_acc_shift;     // right shift output for output balance
+	s64           m_volume_acc_shift;     // right shift output for output normalizing
 
 	u8            m_current_page;         // current register page
 	u8            m_active_voices;        // number of active voices
@@ -210,11 +210,11 @@ private:
 	memory_access<21, 1, -1, ENDIANNESS_BIG>::cache m_cache[4];
 
 	// ES5506 specific registers
-	u32      m_write_latch;            /* currently accumulated data for write */
-	u32      m_read_latch;             /* currently accumulated data for read */
-	u8       m_wst;                    /* W_ST register */
-	u8       m_wend;                   /* W_END register */
-	u8       m_lrend;                  /* LR_END register */
+	u32      m_write_latch;            // currently accumulated data for write
+	u32      m_read_latch;             // currently accumulated data for read
+	u8       m_wst;                    // W_ST register
+	u8       m_wend;                   // W_END register
+	u8       m_lrend;                  // LR_END register
 };
 
 DECLARE_DEVICE_TYPE(ES5506, es5506_device)
