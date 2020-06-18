@@ -533,6 +533,7 @@ Error BaseCompiler::newJumpNode(JumpNode** out, uint32_t instId, uint32_t instOp
   JumpNode* node = _allocator.allocT<JumpNode>();
   uint32_t opCount = 1;
 
+  *out = node;
   if (ASMJIT_UNLIKELY(!node))
     return reportError(DebugUtils::errored(kErrorOutOfMemory));
 
@@ -540,7 +541,6 @@ Error BaseCompiler::newJumpNode(JumpNode** out, uint32_t instId, uint32_t instOp
   node->setOp(0, o0);
   node->resetOpRange(opCount, JumpNode::kBaseOpCapacity);
 
-  *out = node;
   return kErrorOk;
 }
 
