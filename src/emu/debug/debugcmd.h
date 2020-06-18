@@ -144,6 +144,7 @@ private:
 	void execute_save(int ref, const std::vector<std::string> &params);
 	void execute_saveregion(int ref, const std::vector<std::string> &params);
 	void execute_load(int ref, const std::vector<std::string> &params);
+	void execute_loadregion(int ref, const std::vector<std::string> &params);
 	void execute_dump(int ref, const std::vector<std::string> &params);
 	void execute_cheatinit(int ref, const std::vector<std::string> &params);
 	void execute_cheatnext(int ref, const std::vector<std::string> &params);
