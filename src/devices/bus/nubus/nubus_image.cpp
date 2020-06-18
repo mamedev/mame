@@ -180,13 +180,13 @@ void nubus_image_device::device_start()
 
 //  printf("[image %p] slotspace = %x, super = %x\n", this, slotspace, superslotspace);
 
-	nubus().install_device(slotspace, slotspace+3, read32_delegate(*this, FUNC(nubus_image_device::image_r)), write32_delegate(*this, FUNC(nubus_image_device::image_w)));
-	nubus().install_device(slotspace+4, slotspace+7, read32_delegate(*this, FUNC(nubus_image_device::image_status_r)), write32_delegate(*this, FUNC(nubus_image_device::image_status_w)));
-	nubus().install_device(slotspace+8, slotspace+11, read32_delegate(*this, FUNC(nubus_image_device::file_cmd_r)), write32_delegate(*this, FUNC(nubus_image_device::file_cmd_w)));
-	nubus().install_device(slotspace+12, slotspace+15, read32_delegate(*this, FUNC(nubus_image_device::file_data_r)), write32_delegate(*this, FUNC(nubus_image_device::file_data_w)));
-	nubus().install_device(slotspace+16, slotspace+19, read32_delegate(*this, FUNC(nubus_image_device::file_len_r)), write32_delegate(*this, FUNC(nubus_image_device::file_len_w)));
-	nubus().install_device(slotspace+20, slotspace+147, read32_delegate(*this, FUNC(nubus_image_device::file_name_r)), write32_delegate(*this, FUNC(nubus_image_device::file_name_w)));
-	nubus().install_device(superslotspace, superslotspace+((256*1024*1024)-1), read32_delegate(*this, FUNC(nubus_image_device::image_super_r)), write32_delegate(*this, FUNC(nubus_image_device::image_super_w)));
+	nubus().install_device(slotspace, slotspace+3, read32smo_delegate(*this, FUNC(nubus_image_device::image_r)), write32smo_delegate(*this, FUNC(nubus_image_device::image_w)));
+	nubus().install_device(slotspace+4, slotspace+7, read32smo_delegate(*this, FUNC(nubus_image_device::image_status_r)), write32smo_delegate(*this, FUNC(nubus_image_device::image_status_w)));
+	nubus().install_device(slotspace+8, slotspace+11, read32smo_delegate(*this, FUNC(nubus_image_device::file_cmd_r)), write32smo_delegate(*this, FUNC(nubus_image_device::file_cmd_w)));
+	nubus().install_device(slotspace+12, slotspace+15, read32smo_delegate(*this, FUNC(nubus_image_device::file_data_r)), write32smo_delegate(*this, FUNC(nubus_image_device::file_data_w)));
+	nubus().install_device(slotspace+16, slotspace+19, read32smo_delegate(*this, FUNC(nubus_image_device::file_len_r)), write32smo_delegate(*this, FUNC(nubus_image_device::file_len_w)));
+	nubus().install_device(slotspace+20, slotspace+147, read32sm_delegate(*this, FUNC(nubus_image_device::file_name_r)), write32sm_delegate(*this, FUNC(nubus_image_device::file_name_w)));
+	nubus().install_device(superslotspace, superslotspace+((256*1024*1024)-1), read32s_delegate(*this, FUNC(nubus_image_device::image_super_r)), write32s_delegate(*this, FUNC(nubus_image_device::image_super_w)));
 
 	m_image = subdevice<messimg_disk_image_device>(IMAGE_DISK0_TAG);
 
@@ -204,12 +204,12 @@ void nubus_image_device::device_reset()
 {
 }
 
-WRITE32_MEMBER( nubus_image_device::image_status_w )
+void nubus_image_device::image_status_w(uint32_t data)
 {
 	m_image->m_ejected = true;
 }
 
-READ32_MEMBER( nubus_image_device::image_status_r )
+uint32_t nubus_image_device::image_status_r()
 {
 	if(m_image->m_ejected) {
 		return 0;
@@ -221,16 +221,16 @@ READ32_MEMBER( nubus_image_device::image_status_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_image_device::image_w )
+void nubus_image_device::image_w(uint32_t data)
 {
 }
 
-READ32_MEMBER( nubus_image_device::image_r )
+uint32_t nubus_image_device::image_r()
 {
 	return m_image->m_size;
 }
 
-WRITE32_MEMBER( nubus_image_device::image_super_w )
+void nubus_image_device::image_super_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *image = (uint32_t*)m_image->m_data.get();
 	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
@@ -239,14 +239,14 @@ WRITE32_MEMBER( nubus_image_device::image_super_w )
 	COMBINE_DATA(&image[offset]);
 }
 
-READ32_MEMBER( nubus_image_device::image_super_r )
+uint32_t nubus_image_device::image_super_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *image = (uint32_t*)m_image->m_data.get();
 	uint32_t data = image[offset];
 	return ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 }
 
-WRITE32_MEMBER( nubus_image_device::file_cmd_w )
+void nubus_image_device::file_cmd_w(uint32_t data)
 {
 //  data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 	filectx.curcmd = data;
@@ -305,12 +305,12 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 	}
 }
 
-READ32_MEMBER( nubus_image_device::file_cmd_r )
+uint32_t nubus_image_device::file_cmd_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_image_device::file_data_w )
+void nubus_image_device::file_data_w(uint32_t data)
 {
 	std::uint32_t count = 4;
 	std::uint32_t actualcount = 0;
@@ -328,7 +328,7 @@ WRITE32_MEMBER( nubus_image_device::file_data_w )
 	}
 }
 
-READ32_MEMBER( nubus_image_device::file_data_r )
+uint32_t nubus_image_device::file_data_r()
 {
 	if(filectx.fd) {
 		std::uint32_t ret;
@@ -343,23 +343,23 @@ READ32_MEMBER( nubus_image_device::file_data_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_image_device::file_len_w )
+void nubus_image_device::file_len_w(uint32_t data)
 {
 	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 	filectx.filelen = big_endianize_int32(data);
 }
 
-READ32_MEMBER( nubus_image_device::file_len_r )
+uint32_t nubus_image_device::file_len_r()
 {
 	return filectx.filelen;
 }
 
-WRITE32_MEMBER( nubus_image_device::file_name_w )
+void nubus_image_device::file_name_w(offs_t offset, uint32_t data)
 {
 	((uint32_t*)(filectx.filename))[offset] = big_endianize_int32(data);
 }
 
-READ32_MEMBER( nubus_image_device::file_name_r )
+uint32_t nubus_image_device::file_name_r(offs_t offset)
 {
 	uint32_t ret;
 	ret = big_endianize_int32(((uint32_t*)(filectx.filename))[offset]);

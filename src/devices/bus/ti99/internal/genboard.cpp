@@ -477,14 +477,14 @@ geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig
 {
 }
 
-WRITE8_MEMBER( geneve_gate_array_device::cru_sstep_write )
+void geneve_gate_array_device::cru_sstep_write(offs_t offset, uint8_t data)
 {
 	// Single step
 	// 13c0 - 13fe: 0001 0011 11xx xxx0  (offset << 1)
 	LOGMASKED(LOG_WARN, "Single step not implemented; bit %d set to %d\n", offset & 0x001f, data);
 }
 
-WRITE8_MEMBER( geneve_gate_array_device::cru_ctrl_write )
+void geneve_gate_array_device::cru_ctrl_write(offs_t offset, uint8_t data)
 {
 	// This is just mirroring the internal flags of the 9995
 	int bit = (offset & 0x000f);

@@ -168,7 +168,7 @@ void cmd_hd_device::cbm_iec_reset(int state)
 //  led_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cmd_hd_device::led_w )
+void cmd_hd_device::led_w(uint8_t data)
 {
 	/*
 

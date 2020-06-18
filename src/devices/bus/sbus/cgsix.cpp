@@ -204,28 +204,28 @@ uint32_t sbus_cgsix_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-READ32_MEMBER(sbus_cgsix_device::rom_r)
+uint32_t sbus_cgsix_device::rom_r(offs_t offset)
 {
 	return ((uint32_t*)m_rom->base())[offset];
 }
 
-READ32_MEMBER(sbus_cgsix_device::unknown_r)
+uint32_t sbus_cgsix_device::unknown_r(offs_t offset, uint32_t mem_mask)
 {
 	logerror("%s: unknown_r: %08x & %08x\n", machine().describe_context(), offset << 2, mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(sbus_cgsix_device::unknown_w)
+void sbus_cgsix_device::unknown_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%s: unknown_w: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 }
 
-READ32_MEMBER(sbus_cgsix_device::vram_r)
+uint32_t sbus_cgsix_device::vram_r(offs_t offset)
 {
 	return m_vram[offset];
 }
 
-WRITE32_MEMBER(sbus_cgsix_device::vram_w)
+void sbus_cgsix_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 }
@@ -456,7 +456,7 @@ void sbus_cgsix_device::handle_blit_command()
 	}
 }
 
-READ32_MEMBER(sbus_cgsix_device::fbc_r)
+uint32_t sbus_cgsix_device::fbc_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -769,7 +769,7 @@ READ32_MEMBER(sbus_cgsix_device::fbc_r)
 	return ret;
 }
 
-WRITE32_MEMBER(sbus_cgsix_device::fbc_w)
+void sbus_cgsix_device::fbc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	static char const *const misc_bdisp_name[4] = { "IGNORE", "0", "1", "ILLEGAL" };
 	static char const *const misc_bread_name[4] = { "IGNORE", "0", "1", "ILLEGAL" };
@@ -1233,34 +1233,34 @@ WRITE32_MEMBER(sbus_cgsix_device::fbc_w)
 	}
 }
 
-READ32_MEMBER(sbus_cgsix_device::cursor_address_r)
+uint32_t sbus_cgsix_device::cursor_address_r()
 {
 	return (m_cursor_x << 16) | (uint16_t)m_cursor_y;
 }
 
-WRITE32_MEMBER(sbus_cgsix_device::cursor_address_w)
+void sbus_cgsix_device::cursor_address_w(uint32_t data)
 {
 	m_cursor_x = (int16_t)(data >> 16);
 	m_cursor_y = (int16_t)data;
 }
 
-READ32_MEMBER(sbus_cgsix_device::cursor_ram_r)
+uint32_t sbus_cgsix_device::cursor_ram_r(offs_t offset)
 {
 	return m_cursor_ram[offset];
 }
 
-WRITE32_MEMBER(sbus_cgsix_device::cursor_ram_w)
+void sbus_cgsix_device::cursor_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_cursor_ram[offset]);
 }
 
-READ32_MEMBER(sbus_cgsix_device::thc_misc_r)
+uint32_t sbus_cgsix_device::thc_misc_r(offs_t offset, uint32_t mem_mask)
 {
 	logerror("thc_misc_r: %08x & %08x\n", m_thc_misc | THC_MISC_REV, mem_mask);
 	return m_thc_misc | THC_MISC_REV;
 }
 
-WRITE32_MEMBER(sbus_cgsix_device::thc_misc_w)
+void sbus_cgsix_device::thc_misc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("thc_misc_w: %08x & %08x\n", data, mem_mask);
 	if (BIT(data, THC_MISC_IRQ_BIT) && BIT(m_thc_misc, THC_MISC_IRQ_BIT))

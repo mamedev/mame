@@ -975,12 +975,12 @@ void sonyvu0_device::device_reset()
 	m_cmsar1 = 0;
 }
 
-READ32_MEMBER(sonyvu0_device::vu1_reg_r)
+uint32_t sonyvu0_device::vu1_reg_r(offs_t offset)
 {
 	return m_vu1_regs[offset];
 }
 
-WRITE32_MEMBER(sonyvu0_device::vu1_reg_w)
+void sonyvu0_device::vu1_reg_w(offs_t offset, uint32_t data)
 {
 	m_vu1_regs[offset] = data;
 }

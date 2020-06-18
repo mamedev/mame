@@ -35,8 +35,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
+	uint16_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint16_t data);
 
 	void dmack_w_in(int channel, uint8_t data) override;
 	uint8_t dmack_r_in(int channel) override;

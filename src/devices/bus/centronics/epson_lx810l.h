@@ -77,8 +77,8 @@ private:
 	void portc_w(offs_t offset, uint8_t data);
 
 	/* fake memory I/O to get past memory reset check */
-	DECLARE_READ8_MEMBER(fakemem_r);
-	DECLARE_WRITE8_MEMBER(fakemem_w);
+	uint8_t fakemem_r();
+	void fakemem_w(uint8_t data);
 
 	/* Extended Timer Output */
 	DECLARE_WRITE_LINE_MEMBER(co0_w);

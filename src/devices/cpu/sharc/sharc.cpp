@@ -244,7 +244,7 @@ void adsp21062_device::pm1_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	}
 }
 
-READ32_MEMBER( adsp21062_device::dmw0_r)
+uint32_t adsp21062_device::dmw0_r(offs_t offset)
 {
 	if(offset & 1)
 		return m_block0[offset >> 1] >> 16;
@@ -252,7 +252,7 @@ READ32_MEMBER( adsp21062_device::dmw0_r)
 		return m_block0[offset >> 1] & 0xffff;
 }
 
-WRITE32_MEMBER(adsp21062_device::dmw0_w)
+void adsp21062_device::dmw0_w(offs_t offset, uint32_t data)
 {
 	if(offset & 1)
 		m_block0[offset >> 1] = (m_block0[offset >> 1] & 0xffff) | (data << 16);
@@ -260,7 +260,7 @@ WRITE32_MEMBER(adsp21062_device::dmw0_w)
 		m_block0[offset >> 1] = (m_block0[offset >> 1] & 0xffff0000) | (data & 0xffff);
 }
 
-READ32_MEMBER( adsp21062_device::dmw1_r)
+uint32_t adsp21062_device::dmw1_r(offs_t offset)
 {
 	if(offset & 1)
 		return m_block1[offset >> 1] >> 16;
@@ -268,7 +268,7 @@ READ32_MEMBER( adsp21062_device::dmw1_r)
 		return m_block1[offset >> 1] & 0xffff;
 }
 
-WRITE32_MEMBER(adsp21062_device::dmw1_w)
+void adsp21062_device::dmw1_w(offs_t offset, uint32_t data)
 {
 	if(offset & 1)
 		m_block1[offset >> 1] = (m_block1[offset >> 1] & 0xffff) | (data << 16);
@@ -277,7 +277,7 @@ WRITE32_MEMBER(adsp21062_device::dmw1_w)
 }
 
 /* IOP registers */
-READ32_MEMBER( adsp21062_device::iop_r)
+uint32_t adsp21062_device::iop_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -295,7 +295,7 @@ READ32_MEMBER( adsp21062_device::iop_r)
 	}
 }
 
-WRITE32_MEMBER(adsp21062_device::iop_w)
+void adsp21062_device::iop_w(offs_t offset, uint32_t data)
 {
 	switch (offset)
 	{

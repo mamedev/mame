@@ -130,7 +130,7 @@ WRITE_LINE_MEMBER(dsp16_device_base::exm_w)
     high-level passive parallel I/O handlers
 ***********************************************************************/
 
-READ16_MEMBER(dsp16_device_base::pio_r)
+u16 dsp16_device_base::pio_r()
 {
 	if (!pio_pods_active())
 	{
@@ -148,7 +148,7 @@ READ16_MEMBER(dsp16_device_base::pio_r)
 	}
 }
 
-WRITE16_MEMBER(dsp16_device_base::pio_w)
+void dsp16_device_base::pio_w(u16 data)
 {
 	if (!pio_pids_active())
 	{
@@ -639,7 +639,7 @@ dsp16_disassembler::cpu::predicate dsp16_device_base::check_branch(offs_t pc) co
 		return predicate::INDETERMINATE;
 }
 
-template <offs_t Base> READ16_MEMBER(dsp16_device_base::external_memory_r)
+template <offs_t Base> u16 dsp16_device_base::external_memory_r(offs_t offset, u16 mem_mask)
 {
 	return m_spaces[AS_IO]->read_word(Base + offset, mem_mask);
 }
@@ -2092,7 +2092,7 @@ void dsp16_device::external_memory_enable(address_space &space, bool enable)
 	// this assumes internal ROM is mirrored above 2KiB, but actual hardware behaviour is unknown
 	space.unmap_read(0x0000, 0xffff);
 	if (enable)
-		space.install_read_handler(0x0000, 0xffff, read16_delegate(*this, FUNC(dsp16_device::external_memory_r<0x0000>)));
+		space.install_read_handler(0x0000, 0xffff, read16s_delegate(*this, FUNC(dsp16_device::external_memory_r<0x0000>)));
 	else
 		space.install_rom(0x0000, 0x07ff, 0xf800, &m_rom[0]);
 }
@@ -2123,12 +2123,12 @@ void dsp16a_device::external_memory_enable(address_space &space, bool enable)
 	space.unmap_read(0x0000, 0xffff);
 	if (enable)
 	{
-		space.install_read_handler(0x0000, 0xffff, read16_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x0000>)));
+		space.install_read_handler(0x0000, 0xffff, read16s_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x0000>)));
 	}
 	else
 	{
 		space.install_rom(0x0000, 0x0fff, &m_rom[0]);
-		space.install_read_handler(0x1000, 0xffff, read16_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x1000>)));
+		space.install_read_handler(0x1000, 0xffff, read16s_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x1000>)));
 	}
 }
 

@@ -316,24 +316,24 @@ void h8s2245_device::device_reset()
 	mstpcr = 0x3fff;
 }
 
-READ8_MEMBER(h8s2245_device::syscr_r)
+uint8_t h8s2245_device::syscr_r()
 {
 	return syscr;
 }
 
-WRITE8_MEMBER(h8s2245_device::syscr_w)
+void h8s2245_device::syscr_w(uint8_t data)
 {
 	syscr = data;
 	update_irq_filter();
 	logerror("syscr = %02x\n", data);
 }
 
-READ16_MEMBER(h8s2245_device::mstpcr_r)
+uint16_t h8s2245_device::mstpcr_r()
 {
 	return mstpcr;
 }
 
-WRITE16_MEMBER(h8s2245_device::mstpcr_w)
+void h8s2245_device::mstpcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t omstpcr = mstpcr;
 	COMBINE_DATA(&mstpcr);

@@ -123,7 +123,7 @@ WRITE_LINE_MEMBER(dio16_98643_device::lance_int_w)
 	update_int();
 }
 
-WRITE16_MEMBER(dio16_98643_device::sc_w)
+void dio16_98643_device::sc_w(uint16_t data)
 {
 	LOG("%s: %02x\n", __func__, data);
 	data &= (REG_SC_LOCK|REG_SC_IE);
@@ -136,27 +136,27 @@ WRITE16_MEMBER(dio16_98643_device::sc_w)
 	update_int();
 }
 
-READ16_MEMBER(dio16_98643_device::sc_r)
+uint16_t dio16_98643_device::sc_r()
 {
 	LOG("%s: %02x\n", __func__, m_sc);
 	return m_sc;
 }
 
-READ16_MEMBER(dio16_98643_device::id_r)
+uint16_t dio16_98643_device::id_r()
 {
 	return (REG_ID | (m_switches->read() & REG_SWITCHES_REMOTE));
 }
 
-WRITE16_MEMBER(dio16_98643_device::id_w)
+void dio16_98643_device::id_w(uint16_t data)
 {
 	reset();
 }
-READ16_MEMBER(dio16_98643_device::novram_r)
+uint16_t dio16_98643_device::novram_r(offs_t offset)
 {
 	return m_novram[offset];
 }
 
-WRITE16_MEMBER(dio16_98643_device::novram_w)
+void dio16_98643_device::novram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_novram[offset & 0x3f]);
 }

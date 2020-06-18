@@ -197,12 +197,12 @@ void vme_mzr8300_card_device::device_reset()
 }
 
 #if 0
-READ8_MEMBER (vme_mzr8300_card_device::read8){
+uint8_t vme_mzr8300_card_device::read8(offs_t offset){
 	LOG("%s()\n", FUNCNAME);
 	return (uint8_t) 0;
 }
 
-WRITE8_MEMBER (vme_mzr8300_card_device::write8){
+void vme_mzr8300_card_device::write8(offs_t offset, uint8_t data){
 	LOG("%s()\n", FUNCNAME);
 }
 #endif

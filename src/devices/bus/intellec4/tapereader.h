@@ -41,10 +41,10 @@ protected:
 	virtual void device_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(rom4_in) { return m_ready ? 0x07U : 0x0fU; }
-	DECLARE_READ8_MEMBER(rom6_in) { return ~m_data & 0x0fU; }
-	DECLARE_READ8_MEMBER(rom7_in) { return (~m_data >> 4) & 0x0fU; }
-	DECLARE_WRITE8_MEMBER(rom4_out) { advance(BIT(data, 3)); }
+	u8 rom4_in() { return m_ready ? 0x07U : 0x0fU; }
+	u8 rom6_in() { return ~m_data & 0x0fU; }
+	u8 rom7_in() { return (~m_data >> 4) & 0x0fU; }
+	void rom4_out(u8 data) { advance(BIT(data, 3)); }
 	DECLARE_WRITE_LINE_MEMBER(advance);
 	TIMER_CALLBACK_MEMBER(step);
 

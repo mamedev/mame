@@ -77,8 +77,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
 	DECLARE_WRITE_LINE_MEMBER( extready_in );
 	DECLARE_WRITE_LINE_MEMBER( sndready_in );
-	DECLARE_WRITE8_MEMBER( cru_sstep_write );
-	DECLARE_WRITE8_MEMBER( cru_ctrl_write );
+	void cru_sstep_write(offs_t offset, uint8_t data);
+	void cru_ctrl_write(offs_t offset, uint8_t data);
 
 	// Outputs
 	DECLARE_READ_LINE_MEMBER( csr_out );

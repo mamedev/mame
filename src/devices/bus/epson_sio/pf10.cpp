@@ -164,18 +164,18 @@ void epson_pf10_device::port2_w(uint8_t data)
 	logerror("%s: port2_w(%02x)\n", tag(), data);
 }
 
-READ8_MEMBER( epson_pf10_device::fdc_r )
+uint8_t epson_pf10_device::fdc_r(offs_t offset)
 {
 	logerror("%s: fdc_r @ %04x\n", tag(), offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER( epson_pf10_device::fdc_w )
+void epson_pf10_device::fdc_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: fdc_w @ %04x (%02x)\n", tag(), offset, data);
 }
 
-WRITE8_MEMBER( epson_pf10_device::fdc_tc_w )
+void epson_pf10_device::fdc_tc_w(uint8_t data)
 {
 	logerror("%s: fdc_tc_w(%02x)\n", tag(), data);
 }
