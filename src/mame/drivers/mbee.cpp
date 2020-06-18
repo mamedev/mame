@@ -22,8 +22,7 @@ from Brett Selwood and Andrew Davies.
 
     The Premium Plus was a limited-edition kit from Microbee Systems, but we don't
     have any technical info or schematic as yet. It starts up, keyboard works, disks
-    work much the same as a 128k or 256tc. It has 1024k of RAM but we do not know how
-    the extra RAM is selected. At this time it has 256k allocated and it seems happy enough.
+    work much the same as a 128k or 256tc. It has 1024k of RAM.
     The kit itself has an extra custom FPGA CPU board with memory-card slot, but there's
     no info on it yet. We just emulate the Z80 portion.
 
@@ -93,14 +92,16 @@ from Brett Selwood and Andrew Davies.
 
     TODO/not working:
 
+    Keyboard:
     - 256tc: Paste ignores shift key
     - All others: Paste drops most characters.
+    - Teleterm: keyboard has problems. The schematic shows it using the old-style keyboard,
+                however it actually uses the new keyboard with interrupts.
+                The keyboard has issues in the Offsider Macro Key Editor.
 
-    - various fdc issues:
-        - B drive doesn't work with most disks.
-        - some disks cause MESS to freeze.
-        - ENMF pin missing from wd_fdc.
-        - incorrect timing for track register causes 256tc failure to boot a disk.
+    FDC:   (TODO: see if these bugs still exist)
+    - B drive doesn't work with most disks.
+    - some disks cause MESS to freeze.
 
     - Simply Write has keyboard problems (in 128k, no keys work).
 
@@ -111,9 +112,6 @@ from Brett Selwood and Andrew Davies.
 
     - 256tc, Teleterm: Keyboard CPU inbuilt ROM needs to be dumped.
     - 128k, 64k: PALs need to be dumped for the bankswitching.
-
-    - Teleterm: keyboard has problems. The schematic shows it using the old-style keyboard,
-                however it actually uses the new keyboard with interrupts.
 
     - Mouse: a few programs support the use of a serial mouse which interfaced
              directly to the Z80PIO. However there's little info to be found.
@@ -315,7 +313,7 @@ void mbee_state::mbee128_io(address_map &map)
 	map(0x1c, 0x1f).rw(FUNC(mbee_state::port1c_r), FUNC(mbee_state::port1c_w));
 	map(0x44, 0x47).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0x48, 0x4f).rw(FUNC(mbee_state::fdc_status_r), FUNC(mbee_state::fdc_motor_w));
-	map(0x50, 0x57).w(FUNC(mbee_state::mbee128_50_w));
+	map(0x50, 0x57).w(FUNC(mbee_state::port50_w));
 }
 
 void mbee_state::mbee256_io(address_map &map)
@@ -337,7 +335,7 @@ void mbee_state::mbee256_io(address_map &map)
 	map(0x001c, 0x001f).mirror(0xff00).rw(FUNC(mbee_state::port1c_r), FUNC(mbee_state::port1c_w));
 	map(0x0044, 0x0047).mirror(0xff00).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0x0048, 0x004f).mirror(0xff00).rw(FUNC(mbee_state::fdc_status_r), FUNC(mbee_state::fdc_motor_w));
-	map(0x0050, 0x0057).mirror(0xff00).w(FUNC(mbee_state::mbee256_50_w));
+	map(0x0050, 0x0057).mirror(0xff00).w(FUNC(mbee_state::port50_w));
 	// map(0x0058, 0x005f).mirror(0xff00); External options: floppy drive, hard drive and keyboard
 	// map(0x0060, 0x0067).mirror(0xff00); Reserved for file server selection (unused)
 	// map(0x0068, 0x006f).mirror(0xff00); Reserved for 8530 SCC (unused)

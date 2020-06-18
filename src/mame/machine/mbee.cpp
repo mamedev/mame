@@ -266,7 +266,7 @@ WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
     and (output = 22,21,20,19,18,17,16,15). The prom is also used to control
     the refresh required by the dynamic rams, however we ignore this function.
 
-    b_mask = total dynamic ram (1=64k; 3=128k; 7=256k)
+    b_mask = total dynamic ram (1=64k; 3=128k; 7=256k or more)
 
     Certain software (such as the PJB system) constantly switch banks around,
     causing slowness. Therefore this function only changes the banks that need
@@ -276,6 +276,9 @@ WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
 
 void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 {
+	b_mask &= 7;
+	u32 dbank = m_ramsize / 0x1000;
+	u8 extra_bits = data & 0xc0;
 	data &= 0x3f; // (bits 0-5 are referred to as S0-S5)
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint8_t *prom = memregion("pals")->base();
@@ -314,9 +317,9 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 					mem.install_read_bank( b_vid, b_vid+0xfff, m_bankr[b_bank] );
 
 					if (!BIT(b_byte, 3))
-						m_bankr[b_bank]->set_entry(64 + (b_bank & 3)); // read from rom
+						m_bankr[b_bank]->set_entry(dbank + (b_bank & 3)); // read from rom
 					else
-						m_bankr[b_bank]->set_entry((b_bank & 7) | ((b_byte & b_mask) << 3)); // ram
+						m_bankr[b_bank]->set_entry(extra_bits + (b_bank & 7) + ((b_byte & b_mask) << 3)); // ram
 				}
 			}
 			p_bank++;
@@ -342,10 +345,10 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 				{
 					mem.install_write_bank( b_vid, b_vid+0xfff, m_bankw[b_bank] );
 
-					if (!BIT(b_byte, 3))
-						m_bankw[b_bank]->set_entry(64); // write to rom dummy area
-					else
-						m_bankw[b_bank]->set_entry((b_bank & 7) | ((b_byte & b_mask) << 3)); // ram
+					//if (!BIT(b_byte, 3))
+						//m_bankw[b_bank]->set_entry(dbank); // write to rom dummy area
+					//else
+						m_bankw[b_bank]->set_entry(extra_bits + (b_bank & 7) + ((b_byte & b_mask) << 3)); // ram
 				}
 			}
 			p_bank++;
@@ -353,9 +356,10 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 	}
 }
 
-void mbee_state::mbee256_50_w(uint8_t data)
+void mbee_state::port50_w(u8 data)
 {
-	setup_banks(data, 0, 7);
+	u8 mask = ((m_ramsize / 0x8000) - 1) & 7;
+	setup_banks(data, 0, mask);
 }
 
 /***********************************************************
@@ -371,10 +375,6 @@ void mbee_state::mbee256_50_w(uint8_t data)
 
 ************************************************************/
 
-void mbee_state::mbee128_50_w(uint8_t data)
-{
-	setup_banks(data, 0, 3);
-}
 
 /***********************************************************
 
@@ -432,6 +432,7 @@ uint8_t mbee_state::telcom_high_r()
 
 void mbee_state::machine_start()
 {
+	save_item(NAME(m_ramsize));
 	save_item(NAME(m_features));
 	save_item(NAME(m_size));
 	save_item(NAME(m_b7_rtc));
@@ -510,27 +511,29 @@ void mbee_state::machine_start()
 	u8 b = BIT(m_features, 4, 2);
 	if (b)
 	{
-		u32 ramsize = 0x40000;  // 128k
+		m_ramsize = 0x20000;  // 128k
 		if (b == 2)
-			ramsize = 0x40000;  // 256k
+			m_ramsize = 0x40000;  // 256k
 		else
 		if (b == 3)
-			ramsize = 0x100000;  // 1MB for PP
+			m_ramsize = 0x100000;  // 1MB for PP
 
-		m_ram = make_unique_clear<u8[]>(ramsize);
-		save_pointer(NAME(m_ram), ramsize);
+		m_ram = make_unique_clear<u8[]>(m_ramsize);
+		save_pointer(NAME(m_ram), m_ramsize);
 		m_dummy = std::make_unique<u8[]>(0x1000);  // don't save this
 
 		u8 *r = m_ram.get();
 		u8 *d = m_dummy.get();
 		u8 *m = memregion("maincpu")->base();
 
+		u32 banks = m_ramsize / 0x1000;
+
 		for (u8 b_bank = 0; b_bank < 16; b_bank++)
 		{
-			m_bankr[b_bank]->configure_entries(0, 64, r, 0x1000); // RAM banks
-			m_bankr[b_bank]->configure_entries(64, 4, m, 0x1000); // rom
-			m_bankw[b_bank]->configure_entries(0, 64, r, 0x1000); // RAM banks
-			m_bankw[b_bank]->configure_entry(64, d); // dummy rom
+			m_bankr[b_bank]->configure_entries(0, banks, r, 0x1000); // RAM banks
+			m_bankr[b_bank]->configure_entries(banks, 4, m, 0x1000); // rom
+			m_bankw[b_bank]->configure_entries(0, banks, r, 0x1000); // RAM banks
+			m_bankw[b_bank]->configure_entry(banks, d); // dummy rom
 		}
 	}
 }

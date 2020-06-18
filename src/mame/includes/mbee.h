@@ -75,7 +75,7 @@ public:
 	void init_mbee()     { m_features = 0x00; };
 	void init_mbeett()   { m_features = 0x0d; };
 	void init_mbeeppc()  { m_features = 0x09; };
-	void init_mbeepp()   { m_features = 0x29; }; // TODO: give 1MB ram when we find out how it is switched (feature byte = 0x39)
+	void init_mbeepp()   { m_features = 0x39; };
 	void init_mbeeic()   { m_features = 0x01; };
 	void init_mbee56()   { m_features = 0x03; };
 	void init_mbee128()  { m_features = 0x11; };
@@ -98,8 +98,7 @@ private:
 	uint8_t port18_r();
 	uint8_t port1c_r();
 	void port1c_w(uint8_t data);
-	void mbee128_50_w(uint8_t data);
-	void mbee256_50_w(uint8_t data);
+	void port50_w(uint8_t data);
 	uint8_t telcom_low_r();
 	uint8_t telcom_high_r();
 	uint8_t speed_low_r();
@@ -149,6 +148,7 @@ private:
 
 	u8 m_features;
 	u16 m_size;
+	u32 m_ramsize;
 	bool m_b7_rtc;
 	bool m_b7_vs;
 	bool m_b2;
