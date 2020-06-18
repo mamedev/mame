@@ -319,7 +319,7 @@ WRITE_LINE_MEMBER(igs_m027_state::vblank_irq)
 
 void igs_m027_state::igs_majhong(machine_config &config)
 {
-	ARM7(config, m_maincpu, 20000000);
+	ARM7(config, m_maincpu, 22_MHz_XTAL); // 22 MHz XTAL, Mostly
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_majhong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
