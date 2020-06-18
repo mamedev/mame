@@ -26,10 +26,10 @@ public:
 	void set_input(int inputnum, int state);
 	void set_filter(int icr_filter, int ipr_filter);
 
-	DECLARE_READ8_MEMBER(ier_r);
-	DECLARE_WRITE8_MEMBER(ier_w);
-	DECLARE_READ8_MEMBER(iscr_r);
-	DECLARE_WRITE8_MEMBER(iscr_w);
+	uint8_t ier_r();
+	void ier_w(uint8_t data);
+	uint8_t iscr_r();
+	void iscr_w(uint8_t data);
 
 protected:
 	enum { IRQ_LEVEL, IRQ_EDGE, IRQ_DUAL_EDGE };
@@ -64,16 +64,16 @@ class h8h_intc_device : public h8_intc_device {
 public:
 	h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_READ8_MEMBER(isr_r);
-	DECLARE_WRITE8_MEMBER(isr_w);
-	DECLARE_READ8_MEMBER(icr_r);
-	DECLARE_WRITE8_MEMBER(icr_w);
-	DECLARE_READ8_MEMBER(icrc_r);
-	DECLARE_WRITE8_MEMBER(icrc_w);
-	DECLARE_READ8_MEMBER(iscrh_r);
-	DECLARE_WRITE8_MEMBER(iscrh_w);
-	DECLARE_READ8_MEMBER(iscrl_r);
-	DECLARE_WRITE8_MEMBER(iscrl_w);
+	uint8_t isr_r();
+	void isr_w(uint8_t data);
+	uint8_t icr_r(offs_t offset);
+	void icr_w(offs_t offset, uint8_t data);
+	uint8_t icrc_r();
+	void icrc_w(uint8_t data);
+	uint8_t iscrh_r();
+	void iscrh_w(uint8_t data);
+	uint8_t iscrl_r();
+	void iscrl_w(uint8_t data);
 
 protected:
 	static const int vector_to_slot[];
@@ -93,10 +93,10 @@ class h8s_intc_device : public h8h_intc_device {
 public:
 	h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_READ8_MEMBER(ipr_r);
-	DECLARE_WRITE8_MEMBER(ipr_w);
-	DECLARE_READ8_MEMBER(iprk_r);
-	DECLARE_WRITE8_MEMBER(iprk_w);
+	uint8_t ipr_r(offs_t offset);
+	void ipr_w(offs_t offset, uint8_t data);
+	uint8_t iprk_r();
+	void iprk_w(uint8_t data);
 private:
 	static const int vector_to_slot[];
 	uint8_t ipr[11];

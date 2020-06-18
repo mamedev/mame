@@ -1245,13 +1245,13 @@ bool arm7_cpu_device::get_t_flag() const
 
 /* ARM system coprocessor support */
 
-WRITE32_MEMBER( arm7_cpu_device::arm7_do_callback )
+void arm7_cpu_device::arm7_do_callback(uint32_t data)
 {
 	m_pendingUnd = true;
 	update_irq_state();
 }
 
-READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
+uint32_t arm7_cpu_device::arm7_rt_r_callback(offs_t offset)
 {
 	uint32_t opcode = offset;
 	uint8_t cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
@@ -1367,7 +1367,7 @@ READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 	return data;
 }
 
-WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
+void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 {
 	uint32_t opcode = offset;
 	uint8_t cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
@@ -1477,7 +1477,7 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 	}
 }
 
-READ32_MEMBER( arm946es_cpu_device::arm7_rt_r_callback )
+uint32_t arm946es_cpu_device::arm7_rt_r_callback(offs_t offset)
 {
 	uint32_t opcode = offset;
 	uint8_t cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
@@ -1531,7 +1531,7 @@ READ32_MEMBER( arm946es_cpu_device::arm7_rt_r_callback )
 	return data;
 }
 
-WRITE32_MEMBER( arm946es_cpu_device::arm7_rt_w_callback )
+void arm946es_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 {
 	uint32_t opcode = offset;
 	uint8_t cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
@@ -1782,7 +1782,7 @@ void arm7_cpu_device::arm7_dt_w_callback(uint32_t insn, uint32_t *prn)
 	}
 }
 
-READ32_MEMBER( arm1176jzf_s_cpu_device::arm7_rt_r_callback )
+uint32_t arm1176jzf_s_cpu_device::arm7_rt_r_callback(offs_t offset)
 {
 	uint32_t opcode = offset;
 	uint8_t crn = (opcode & INSN_COPRO_CREG) >> INSN_COPRO_CREG_SHIFT;
@@ -1803,7 +1803,7 @@ READ32_MEMBER( arm1176jzf_s_cpu_device::arm7_rt_r_callback )
 	return data;
 }
 
-WRITE32_MEMBER( arm1176jzf_s_cpu_device::arm7_rt_w_callback )
+void arm1176jzf_s_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 {
 	uint32_t opcode = offset;
 	uint8_t crn = (opcode & INSN_COPRO_CREG) >> INSN_COPRO_CREG_SHIFT;

@@ -14,22 +14,22 @@
 
 DEFINE_DEVICE_TYPE(N2A03, n2a03_device, "n2a03", "Ricoh N2A03")
 
-READ8_MEMBER(n2a03_device::psg1_4014_r)
+uint8_t n2a03_device::psg1_4014_r()
 {
 	return m_apu->read(0x14);
 }
 
-READ8_MEMBER(n2a03_device::psg1_4015_r)
+uint8_t n2a03_device::psg1_4015_r()
 {
 	return m_apu->read(0x15);
 }
 
-WRITE8_MEMBER(n2a03_device::psg1_4015_w)
+void n2a03_device::psg1_4015_w(uint8_t data)
 {
 	m_apu->write(0x15, data);
 }
 
-WRITE8_MEMBER(n2a03_device::psg1_4017_w)
+void n2a03_device::psg1_4017_w(uint8_t data)
 {
 	m_apu->write(0x17, data);
 }

@@ -27,8 +27,8 @@ public:
 	// construction/destruction
 	pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(opn_r);
-	DECLARE_WRITE8_MEMBER(opn_w);
+	uint8_t opn_r(offs_t offset);
+	void opn_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

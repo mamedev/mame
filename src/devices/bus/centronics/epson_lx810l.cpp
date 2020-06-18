@@ -347,12 +347,12 @@ void epson_lx810l_device::device_timer(emu_timer &timer, device_timer_id id, int
     FAKEMEM READ/WRITE
 ***************************************************************************/
 
-READ8_MEMBER(epson_lx810l_device::fakemem_r)
+uint8_t epson_lx810l_device::fakemem_r()
 {
 	return m_fakemem;
 }
 
-WRITE8_MEMBER(epson_lx810l_device::fakemem_w)
+void epson_lx810l_device::fakemem_w(uint8_t data)
 {
 	m_fakemem = data;
 }

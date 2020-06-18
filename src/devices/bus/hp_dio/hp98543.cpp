@@ -103,12 +103,12 @@ void dio16_98543_device::device_start()
 
 	dio().install_memory(
 			0x200000, 0x27ffff,
-			read16_delegate(*this, FUNC(dio16_98543_device::vram_r)),
-			write16_delegate(*this, FUNC(dio16_98543_device::vram_w)));
+			read16s_delegate(*this, FUNC(dio16_98543_device::vram_r)),
+			write16s_delegate(*this, FUNC(dio16_98543_device::vram_w)));
 	dio().install_memory(
 			0x560000, 0x563fff,
-			read16_delegate(*this, FUNC(dio16_98543_device::rom_r)),
-			write16_delegate(*this, FUNC(dio16_98543_device::rom_w)));
+			read16sm_delegate(*this, FUNC(dio16_98543_device::rom_r)),
+			write16sm_delegate(*this, FUNC(dio16_98543_device::rom_w)));
 	dio().install_memory(
 			0x564000, 0x565fff,
 			read16_delegate(*this, FUNC(dio16_98543_device::ctrl_r)),
@@ -124,20 +124,20 @@ void dio16_98543_device::device_reset()
 {
 }
 
-READ16_MEMBER(dio16_98543_device::rom_r)
+uint16_t dio16_98543_device::rom_r(offs_t offset)
 {
 	if (offset == 1)
 		return m_intreg;
 	return 0xff00 | m_rom[offset];
 }
 
-WRITE16_MEMBER(dio16_98543_device::rom_w)
+void dio16_98543_device::rom_w(offs_t offset, uint16_t data)
 {
 	if (offset == 1)
 		m_intreg = data;
 }
 
-READ16_MEMBER(dio16_98543_device::ctrl_r)
+uint16_t dio16_98543_device::ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0;
 
@@ -147,13 +147,13 @@ READ16_MEMBER(dio16_98543_device::ctrl_r)
 	return ret;
 }
 
-WRITE16_MEMBER(dio16_98543_device::ctrl_w)
+void dio16_98543_device::ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	for (auto &tc: m_topcat)
 		tc->ctrl_w(space, offset, data, mem_mask);
 }
 
-READ16_MEMBER(dio16_98543_device::vram_r)
+uint16_t dio16_98543_device::vram_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0;
 	for (auto &tc: m_topcat)
@@ -161,7 +161,7 @@ READ16_MEMBER(dio16_98543_device::vram_r)
 	return ret;
 }
 
-WRITE16_MEMBER(dio16_98543_device::vram_w)
+void dio16_98543_device::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	for (auto &tc: m_topcat)
 		tc->vram_w(offset, data, mem_mask);

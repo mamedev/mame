@@ -30,10 +30,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_READ8_MEMBER(asntm3b_ram_r);
-	DECLARE_WRITE8_MEMBER(asntm3b_ram_w);
-	DECLARE_READ32_MEMBER(en_r);
-	DECLARE_WRITE32_MEMBER(en_w);
+	uint8_t asntm3b_ram_r(offs_t offset);
+	void asntm3b_ram_w(offs_t offset, uint8_t data);
+	uint32_t en_r(offs_t offset, uint32_t mem_mask = ~0);
+	void en_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	required_device<dp8390_device> m_dp83902;
 

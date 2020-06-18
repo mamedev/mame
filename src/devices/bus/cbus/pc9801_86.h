@@ -29,12 +29,12 @@ public:
 	pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(opna_r);
-	DECLARE_WRITE8_MEMBER(opna_w);
-	DECLARE_READ8_MEMBER(id_r);
-	DECLARE_WRITE8_MEMBER(mask_w);
-	DECLARE_READ8_MEMBER(pcm_r);
-	DECLARE_WRITE8_MEMBER(pcm_w);
+	uint8_t opna_r(offs_t offset);
+	void opna_w(offs_t offset, uint8_t data);
+	uint8_t id_r();
+	void mask_w(uint8_t data);
+	uint8_t pcm_r(offs_t offset);
+	void pcm_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 
@@ -73,8 +73,8 @@ public:
 	// construction/destruction
 	pc9801_speakboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(opna_slave_r);
-	DECLARE_WRITE8_MEMBER(opna_slave_w);
+	uint8_t opna_slave_r(offs_t offset);
+	void opna_slave_w(offs_t offset, uint8_t data);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

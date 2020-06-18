@@ -49,8 +49,8 @@ public:
 	uint8_t via0_pb_r();
 	void via0_pb_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( via1_r );
-	DECLARE_WRITE8_MEMBER( via1_w );
+	uint8_t via1_r(offs_t offset);
+	void via1_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
 	uint8_t via1_pb_r();
 	void via1_pb_w(uint8_t data);

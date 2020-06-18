@@ -246,9 +246,9 @@ protected:
 	virtual uint8_t arm7_cpu_read8(uint32_t addr);
 
 	// Coprocessor support
-	DECLARE_WRITE32_MEMBER( arm7_do_callback );
-	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback );
-	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback );
+	void arm7_do_callback(uint32_t data);
+	virtual uint32_t arm7_rt_r_callback(offs_t offset);
+	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data);
 	void arm7_dt_r_callback(uint32_t insn, uint32_t *prn);
 	void arm7_dt_w_callback(uint32_t insn, uint32_t *prn);
 
@@ -637,8 +637,8 @@ public:
 	arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// 946E-S has Protection Unit instead of ARM MMU so CP15 is quite different
-	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback ) override;
-	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback ) override;
+	virtual uint32_t arm7_rt_r_callback(offs_t offset) override;
+	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data) override;
 
 	virtual void arm7_cpu_write32(uint32_t addr, uint32_t data) override;
 	virtual void arm7_cpu_write16(uint32_t addr, uint16_t data) override;
@@ -677,8 +677,8 @@ public:
 	// construction/destruction
 	arm1176jzf_s_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback ) override;
-	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback ) override;
+	virtual uint32_t arm7_rt_r_callback(offs_t offset) override;
+	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data) override;
 
 protected:
 	virtual void device_reset() override;

@@ -97,13 +97,13 @@ WRITE_LINE_MEMBER(hp9845_io_slot_device::dmar_w)
 	m_dmar_cb_func(state);
 }
 
-int hp9845_io_slot_device::get_rw_handlers(read16_delegate& rhandler , write16_delegate& whandler)
+int hp9845_io_slot_device::get_rw_handlers(read16m_delegate& rhandler , write16m_delegate& whandler)
 {
 	device_hp9845_io_interface *card = get_card_device();
 
 	if (card) {
-		rhandler = read16_delegate(*card, FUNC(device_hp9845_io_interface::reg_r));
-		whandler = write16_delegate(*card, FUNC(device_hp9845_io_interface::reg_w));
+		rhandler = read16m_delegate(*card, FUNC(device_hp9845_io_interface::reg_r));
+		whandler = write16m_delegate(*card, FUNC(device_hp9845_io_interface::reg_w));
 		return card->get_sc();
 	} else {
 		return -1;

@@ -131,7 +131,7 @@ void ps2_vif1_device::device_reset()
 	m_unpack_format = FMT_S32;
 }
 
-READ32_MEMBER(ps2_vif1_device::regs_r)
+uint32_t ps2_vif1_device::regs_r(offs_t offset)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -235,7 +235,7 @@ READ32_MEMBER(ps2_vif1_device::regs_r)
 	return ret;
 }
 
-WRITE32_MEMBER(ps2_vif1_device::regs_w)
+void ps2_vif1_device::regs_w(offs_t offset, uint32_t data)
 {
 	logerror("%s: Write: Unknown %08x = %08x\n", machine().describe_context(), 0x10003c00 + (offset << 2), data);
 }

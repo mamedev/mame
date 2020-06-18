@@ -12,7 +12,7 @@
     arranged logically.
 
     A memory array is stored in "natural" order, i.e., read/writes to it
-    are done via AM_RAM, or standard COMBINE_DATA, even if the width of
+    are done via ram(), or standard COMBINE_DATA, even if the width of
     the CPU is different from the array width.
 
     The read_entry/write_entry functions serve to read/write entries of

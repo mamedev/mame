@@ -32,8 +32,8 @@ public:
 	virtual void install_mem_rw(address_space& space) override;
 
 	// Access to I/O space by CPU
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t io_r(address_space &space, offs_t offset);
+	void io_w(address_space &space, offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(co_w);
 

@@ -16,8 +16,8 @@ class fd800_legacy_device : public device_t
 public:
 	fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( cru_r );
-	DECLARE_WRITE8_MEMBER( cru_w );
+	uint8_t cru_r(offs_t offset);
+	void cru_w(offs_t offset, uint8_t data);
 	auto int_cb() { return m_int_line.bind(); }
 
 private:

@@ -105,8 +105,8 @@ public:
 	void set_vme_slot(const char *tag, const char *slottag);
 	void update_vme_chains(uint32_t slot_nbr);
 
-	virtual DECLARE_READ8_MEMBER(read8);
-	virtual DECLARE_WRITE8_MEMBER(write8);
+	virtual uint8_t read8(offs_t offset);
+	virtual void write8(offs_t offset, uint8_t data);
 
 protected:
 	vme_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -224,8 +224,8 @@ public:
 	virtual ~device_vme_card_interface();
 	void set_vme_device();
 
-	virtual DECLARE_READ8_MEMBER(read8);
-	virtual DECLARE_WRITE8_MEMBER(write8);
+	virtual uint8_t read8(offs_t offset);
+	virtual void write8(offs_t offset, uint8_t data);
 
 	device_vme_card_interface(const machine_config &mconfig, device_t &device);
 

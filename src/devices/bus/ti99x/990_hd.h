@@ -15,8 +15,8 @@ class ti990_hdc_device : public device_t
 public:
 	ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( load_hd );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( unload_hd );

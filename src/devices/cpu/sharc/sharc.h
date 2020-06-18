@@ -123,12 +123,12 @@ public:
 	void pm0_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t pm1_r(offs_t offset);
 	void pm1_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	DECLARE_READ32_MEMBER( dmw0_r);
-	DECLARE_WRITE32_MEMBER(dmw0_w);
-	DECLARE_READ32_MEMBER( dmw1_r);
-	DECLARE_WRITE32_MEMBER(dmw1_w);
-	DECLARE_READ32_MEMBER( iop_r);
-	DECLARE_WRITE32_MEMBER(iop_w);
+	uint32_t dmw0_r(offs_t offset);
+	void dmw0_w(offs_t offset, uint32_t data);
+	uint32_t dmw1_r(offs_t offset);
+	void dmw1_w(offs_t offset, uint32_t data);
+	uint32_t iop_r(offs_t offset);
+	void iop_w(offs_t offset, uint32_t data);
 
 	enum ASTAT_FLAGS
 	{
