@@ -274,7 +274,7 @@ peribox_device::peribox_device(const machine_config &mconfig, const char *tag, d
 	m_address_prefix = 0x70000;
 }
 
-READ8Z_MEMBER(peribox_device::readz)
+void peribox_device::readz(offs_t offset, uint8_t *value)
 {
 	for (int i=2; i <= 8; i++)
 	{
@@ -290,7 +290,7 @@ void peribox_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-SETADDRESS_DBIN_MEMBER(peribox_device::setaddress_dbin)
+void peribox_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Ignore the address when the TI-99/8 transmits the high-order 8 bits
 	if (!m_memen) return;
@@ -301,7 +301,7 @@ SETADDRESS_DBIN_MEMBER(peribox_device::setaddress_dbin)
 	}
 }
 
-READ8Z_MEMBER(peribox_device::crureadz)
+void peribox_device::crureadz(offs_t offset, uint8_t *value)
 {
 	for (int i=2; i <= 8; i++)
 	{
@@ -676,7 +676,7 @@ peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const ch
 {
 }
 
-READ8Z_MEMBER(peribox_slot_device::readz)
+void peribox_slot_device::readz(offs_t offset, uint8_t *value)
 {
 	m_card->readz(offset, value);
 }
@@ -686,12 +686,12 @@ void peribox_slot_device::write(offs_t offset, uint8_t data)
 	m_card->write(offset, data);
 }
 
-SETADDRESS_DBIN_MEMBER(peribox_slot_device::setaddress_dbin)
+void peribox_slot_device::setaddress_dbin(offs_t offset, int state)
 {
 	m_card->setaddress_dbin(offset, state);
 }
 
-READ8Z_MEMBER(peribox_slot_device::crureadz)
+void peribox_slot_device::crureadz(offs_t offset, uint8_t *value)
 {
 	m_card->crureadz(offset, value);
 }

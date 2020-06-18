@@ -338,7 +338,7 @@ void ti99_cartridge_device::set_slot(int i)
 	m_slot = i;
 }
 
-READ8Z_MEMBER(ti99_cartridge_device::readz)
+void ti99_cartridge_device::readz(offs_t offset, uint8_t *value)
 {
 	if (m_pcb != nullptr)
 		m_pcb->readz(offset, value);
@@ -350,7 +350,7 @@ void ti99_cartridge_device::write(offs_t offset, uint8_t data)
 		m_pcb->write(offset, data);
 }
 
-READ8Z_MEMBER(ti99_cartridge_device::crureadz)
+void ti99_cartridge_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if (m_pcb != nullptr) m_pcb->crureadz(offset, value);
 }
@@ -493,7 +493,7 @@ void ti99_cartridge_pcb::gromwrite(uint8_t data)
     cartridges with up to 16 KiB we need a new PCB type. Unfortunately, such
     cartridges were never developed.
 */
-READ8Z_MEMBER(ti99_cartridge_pcb::readz)
+void ti99_cartridge_pcb::readz(offs_t offset, uint8_t *value)
 {
 	if (m_romspace_selected)
 	{
@@ -536,7 +536,7 @@ void ti99_cartridge_pcb::write(offs_t offset, uint8_t data)
 	}
 }
 
-READ8Z_MEMBER(ti99_cartridge_pcb::crureadz)
+void ti99_cartridge_pcb::crureadz(offs_t offset, uint8_t *value)
 {
 }
 
@@ -609,7 +609,7 @@ WRITE_LINE_MEMBER(ti99_cartridge_pcb::gclock_in)
 
 ******************************************************************************/
 
-READ8Z_MEMBER(ti99_paged12k_cartridge::readz)
+void ti99_paged12k_cartridge::readz(offs_t offset, uint8_t *value)
 {
 	if (m_romspace_selected)
 	{
@@ -664,7 +664,7 @@ void ti99_paged12k_cartridge::write(offs_t offset, uint8_t data)
     6002 = bank 1).
 ******************************************************************************/
 
-READ8Z_MEMBER(ti99_paged16k_cartridge::readz)
+void ti99_paged16k_cartridge::readz(offs_t offset, uint8_t *value)
 {
 	if (m_romspace_selected)
 	{
@@ -711,7 +711,7 @@ void ti99_paged16k_cartridge::write(offs_t offset, uint8_t data)
 ******************************************************************************/
 
 /* Read function for the minimem cartridge. */
-READ8Z_MEMBER(ti99_minimem_cartridge::readz)
+void ti99_minimem_cartridge::readz(offs_t offset, uint8_t *value)
 {
 	if (m_romspace_selected)
 	{
@@ -786,7 +786,7 @@ void ti99_minimem_cartridge::write(offs_t offset, uint8_t data)
 ******************************************************************************/
 
 /* Read function for the super cartridge. */
-READ8Z_MEMBER(ti99_super_cartridge::readz)
+void ti99_super_cartridge::readz(offs_t offset, uint8_t *value)
 {
 	if (m_romspace_selected)
 	{
@@ -814,7 +814,7 @@ void ti99_super_cartridge::write(offs_t offset, uint8_t data)
 	}
 }
 
-READ8Z_MEMBER(ti99_super_cartridge::crureadz)
+void ti99_super_cartridge::crureadz(offs_t offset, uint8_t *value)
 {
 	// offset is the bit number. The CRU base address is already divided  by 2.
 
@@ -903,7 +903,7 @@ void ti99_super_cartridge::cruwrite(offs_t offset, uint8_t data)
 ******************************************************************************/
 
 /* Read function for the mbx cartridge. */
-READ8Z_MEMBER(ti99_mbx_cartridge::readz)
+void ti99_mbx_cartridge::readz(offs_t offset, uint8_t *value)
 {
 	if (m_romspace_selected)
 	{
@@ -988,7 +988,7 @@ void ti99_mbx_cartridge::write(offs_t offset, uint8_t data)
 ******************************************************************************/
 
 /* Read function for the paged7 cartridge. */
-READ8Z_MEMBER(ti99_paged7_cartridge::readz)
+void ti99_paged7_cartridge::readz(offs_t offset, uint8_t *value)
 {
 	if (m_romspace_selected)
 	{
@@ -1074,7 +1074,7 @@ void ti99_paged7_cartridge::write(offs_t offset, uint8_t data)
 ******************************************************************************/
 
 /* Read function for the paged379i cartridge. */
-READ8Z_MEMBER(ti99_paged379i_cartridge::readz)
+void ti99_paged379i_cartridge::readz(offs_t offset, uint8_t *value)
 {
 	if (m_romspace_selected)
 		*value = m_rom_ptr[(m_rom_page<<13) | (offset & 0x1fff)];
@@ -1125,7 +1125,7 @@ void ti99_paged379i_cartridge::write(offs_t offset, uint8_t data)
 ******************************************************************************/
 
 /* Read function for the paged378 cartridge. */
-READ8Z_MEMBER(ti99_paged378_cartridge::readz)
+void ti99_paged378_cartridge::readz(offs_t offset, uint8_t *value)
 {
 	if (m_romspace_selected)
 		*value = m_rom_ptr[(m_rom_page<<13) | (offset & 0x1fff)];
@@ -1165,7 +1165,7 @@ void ti99_paged378_cartridge::write(offs_t offset, uint8_t data)
 ******************************************************************************/
 
 /* Read function for the paged377 cartridge. */
-READ8Z_MEMBER(ti99_paged377_cartridge::readz)
+void ti99_paged377_cartridge::readz(offs_t offset, uint8_t *value)
 {
 	if (m_romspace_selected)
 		*value = m_rom_ptr[(m_rom_page<<13) | (offset & 0x1fff)];
@@ -1219,7 +1219,7 @@ void ti99_paged377_cartridge::write(offs_t offset, uint8_t data)
 ******************************************************************************/
 
 /* Read function for the pagedcru cartridge. */
-READ8Z_MEMBER(ti99_pagedcru_cartridge::readz)
+void ti99_pagedcru_cartridge::readz(offs_t offset, uint8_t *value)
 {
 	if (m_romspace_selected)
 		*value = m_rom_ptr[(m_rom_page<<13) | (offset & 0x1fff)];
@@ -1231,7 +1231,7 @@ void ti99_pagedcru_cartridge::write(offs_t offset, uint8_t data)
 	return;
 }
 
-READ8Z_MEMBER(ti99_pagedcru_cartridge::crureadz)
+void ti99_pagedcru_cartridge::crureadz(offs_t offset, uint8_t *value)
 {
 	int page = m_rom_page;
 	if ((offset & 0xf800)==0x0800)
@@ -1313,7 +1313,7 @@ void ti99_gromemu_cartridge::set_gromlines(line_state mline, line_state moline, 
 	}
 }
 
-READ8Z_MEMBER(ti99_gromemu_cartridge::readz)
+void ti99_gromemu_cartridge::readz(offs_t offset, uint8_t *value)
 {
 	if (m_grom_selected)
 	{
@@ -1363,7 +1363,7 @@ void ti99_gromemu_cartridge::write(offs_t offset, uint8_t data)
 	}
 }
 
-READ8Z_MEMBER(ti99_gromemu_cartridge::gromemureadz)
+void ti99_gromemu_cartridge::gromemureadz(offs_t offset, uint8_t *value)
 {
 	// Similar to the GKracker implemented above, we do not have a readable
 	// GROM address counter but use the one from the console GROMs.

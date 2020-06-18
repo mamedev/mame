@@ -182,7 +182,7 @@ nouspikel_ide_card_device::nouspikel_ide_card_device(const machine_config &mconf
 {
 }
 
-READ8Z_MEMBER(nouspikel_ide_card_device::readz)
+void nouspikel_ide_card_device::readz(offs_t offset, uint8_t *value)
 {
 	bool mmap = false;
 	bool sramsel = false;
@@ -510,7 +510,7 @@ void nouspikel_ide_card_device::decode(offs_t offset, bool& mmap, bool& sramsel,
 /*
     CRU read access to the LS251 multiplexer.
 */
-READ8Z_MEMBER( nouspikel_ide_card_device::crureadz )
+void nouspikel_ide_card_device::crureadz(offs_t offset, uint8_t *value)
 {
 	uint8_t bit = 0;
 
