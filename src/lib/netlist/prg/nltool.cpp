@@ -201,7 +201,7 @@ public:
 	stream_ptr stream(const pstring &file) override
 	{
 		pstring name = m_folder + "/" + file;
-		auto strm(std::make_unique<plib::ifstream>(plib::filesystem::u8path(name)));
+		stream_ptr strm(std::make_unique<plib::ifstream>(plib::filesystem::u8path(name)));
 		if (strm->fail())
 			return stream_ptr(nullptr);
 
