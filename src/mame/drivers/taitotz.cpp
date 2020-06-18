@@ -175,7 +175,7 @@ Notes:
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
 #include "cpu/powerpc/ppc.h"
-#include "cpu/tlcs900/tlcs900.h"
+#include "cpu/tlcs900/tmp95c063.h"
 #include "machine/nvram.h"
 #include "video/poly.h"
 
