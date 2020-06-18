@@ -433,7 +433,7 @@ u16 catseye_device::vram_r(offs_t offset, u16 mem_mask)
 		return vram_r_word<Idx>(offset, mem_mask);
 }
 
-READ16_MEMBER(catseye_device::vram_r)
+uint16_t catseye_device::vram_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0;
 
@@ -491,7 +491,7 @@ void catseye_device::vram_w(offs_t offset, u16 data, u16 mem_mask)
 		vram_w_word<Idx>(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(catseye_device::vram_w)
+void catseye_device::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOGMASKED(LOG_VRAM, "%s: %04x: %04x(%04x)\n", __func__, offset << 1, data, mem_mask);
 
@@ -502,7 +502,7 @@ WRITE16_MEMBER(catseye_device::vram_w)
 		vram_w<VRAM_OVERLAY_PLANE>(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(catseye_device::ctrl_w)
+void catseye_device::ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	bool trigger = false;
 
@@ -863,7 +863,7 @@ WRITE16_MEMBER(catseye_device::ctrl_w)
 
 }
 
-READ16_MEMBER(catseye_device::ctrl_r)
+uint16_t catseye_device::ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret;
 

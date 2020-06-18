@@ -13,8 +13,8 @@ class linear_flash_pccard_device : public device_t,
 	public device_memory_interface
 {
 public:
-	virtual DECLARE_READ16_MEMBER(read_memory) override;
-	virtual DECLARE_WRITE16_MEMBER(write_memory) override;
+	virtual uint16_t read_memory(offs_t offset, uint16_t mem_mask = ~0) override;
+	virtual void write_memory(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 protected:
 	linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

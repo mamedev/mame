@@ -12,10 +12,10 @@ public:
 
 	catseye_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_READ16_MEMBER(ctrl_r);
-	DECLARE_WRITE16_MEMBER(ctrl_w);
+	uint16_t vram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	uint16_t ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	void set_fb_width(int width) { m_fb_width = width; }

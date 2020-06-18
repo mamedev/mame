@@ -102,8 +102,8 @@ void dio32_98550_device::device_start()
 
 	dio().install_memory(
 			0x566000, 0x5660ff,
-			read16_delegate(*m_nereid, FUNC(nereid_device::ctrl_r)),
-			write16_delegate(*m_nereid, FUNC(nereid_device::ctrl_w)));
+			read16s_delegate(*m_nereid, FUNC(nereid_device::ctrl_r)),
+			write16s_delegate(*m_nereid, FUNC(nereid_device::ctrl_w)));
 }
 
 void dio32_98550_device::device_reset()
@@ -153,7 +153,7 @@ WRITE16_MEMBER(dio32_98550_device::catseye_w)
 {
 	LOG("%s: %04X = %04X\n", __func__, offset << 1, data);
 	for (auto &ce: m_catseye)
-		ce->ctrl_w(space, offset, data, mem_mask);
+		ce->ctrl_w(offset, data, mem_mask);
 }
 
 READ16_MEMBER(dio32_98550_device::vram_r)
@@ -161,7 +161,7 @@ READ16_MEMBER(dio32_98550_device::vram_r)
 	uint16_t ret = 0;
 
 	for (auto &ce: m_catseye)
-		ret |= ce->vram_r(space, offset, mem_mask);
+		ret |= ce->vram_r(offset, mem_mask);
 
 	return ret;
 }
@@ -169,7 +169,7 @@ READ16_MEMBER(dio32_98550_device::vram_r)
 WRITE16_MEMBER(dio32_98550_device::vram_w)
 {
 	for (auto &ce: m_catseye)
-		ce->vram_w(space, offset, data, mem_mask);
+		ce->vram_w(offset, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(dio32_98550_device::vblank_w)

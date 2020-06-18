@@ -518,7 +518,7 @@ void isa16_device::device_start()
 	m_out_drq7_cb.resolve_safe();
 }
 
-void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler)
+template<typename R, typename W> void isa16_device::install16_device(offs_t start, offs_t end, R rhandler, W whandler)
 {
 	int buswidth = m_iowidth;
 	switch(buswidth)
@@ -535,7 +535,7 @@ void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rh
 					m_iospace->install_readwrite_handler(start, end,   rhandler, whandler, 0xffffffff);
 				}
 			} else {
-				// we handle just misalligned by 2
+				// we handle just misaligned by 2
 				m_iospace->install_readwrite_handler(start-2, end, rhandler, whandler, 0xffff0000);
 			}
 
@@ -545,32 +545,10 @@ void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rh
 	}
 }
 
-void isa16_device::install16_device(offs_t start, offs_t end, read16s_delegate rhandler, write16s_delegate whandler)
-{
-	int buswidth = m_iowidth;
-	switch(buswidth)
-	{
-		case 16:
-			m_iospace->install_readwrite_handler(start, end, rhandler, whandler, 0);
-			break;
-		case 32:
-			m_iospace->install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
-			if ((start % 4) == 0) {
-				if ((end-start)==1) {
-					m_iospace->install_readwrite_handler(start, end+2, rhandler, whandler, 0x0000ffff);
-				} else {
-					m_iospace->install_readwrite_handler(start, end,   rhandler, whandler, 0xffffffff);
-				}
-			} else {
-				// we handle just misalligned by 2
-				m_iospace->install_readwrite_handler(start-2, end, rhandler, whandler, 0xffff0000);
-			}
-
-			break;
-		default:
-			fatalerror("ISA16: Bus width %d not supported\n", buswidth);
-	}
-}
+template void isa16_device::install16_device<read16_delegate,    write16_delegate   >(offs_t start, offs_t end, read16_delegate rhandler,    write16_delegate whandler);
+template void isa16_device::install16_device<read16s_delegate,   write16s_delegate  >(offs_t start, offs_t end, read16s_delegate rhandler,   write16s_delegate whandler);
+template void isa16_device::install16_device<read16sm_delegate,  write16sm_delegate >(offs_t start, offs_t end, read16sm_delegate rhandler,  write16sm_delegate whandler);
+template void isa16_device::install16_device<read16smo_delegate, write16smo_delegate>(offs_t start, offs_t end, read16smo_delegate rhandler, write16smo_delegate whandler);
 
 uint16_t isa16_device::mem16_r(offs_t offset, uint16_t mem_mask)
 {

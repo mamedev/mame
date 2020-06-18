@@ -196,13 +196,13 @@ void dio16_98643_device::addrmap(address_map &map)
 	map(0x0000, 0x0001).rw(FUNC(dio16_98643_device::id_r), FUNC(dio16_98643_device::id_w));
 	map(0x0002, 0x0003).rw(FUNC(dio16_98643_device::sc_r), FUNC(dio16_98643_device::sc_w));
 	map(0x4000, 0x4003).lrw16(
-			[this] (address_space &space, offs_t offset, u16 mem_mask) -> u16 {
+			[this] (address_space &space, offs_t offset) -> u16 {
 				m_sc |= REG_STATUS_ACK;
-				return m_lance->regs_r(space, offset, mem_mask);
+				return m_lance->regs_r(space, offset);
 			}, "lance_r",
-			[this] (address_space &space, offs_t offset, u16 data, u16 mem_mask) {
+			[this] (offs_t offset, u16 data) {
 				m_sc |= REG_STATUS_ACK;
-				return m_lance->regs_w(space, offset, data, mem_mask);
+				return m_lance->regs_w(offset, data);
 			}, "lance_w");
 
 	map(0x8000, 0xbfff).lrw16(

@@ -686,7 +686,7 @@ u32 epic12_device::gfx_ready_r_unsafe()
 		return 0x00000010;
 }
 
-WRITE32_MEMBER(epic12_device::gfx_exec_w)
+void epic12_device::gfx_exec_w(address_space &space, offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -818,7 +818,7 @@ void epic12_device::draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 }
 
 
-READ32_MEMBER(epic12_device::blitter_r)
+u32 epic12_device::blitter_r(offs_t offset, u32 mem_mask)
 {
 	switch (offset * 4)
 	{
@@ -842,7 +842,7 @@ READ32_MEMBER(epic12_device::blitter_r)
 	return 0;
 }
 
-READ32_MEMBER(epic12_device::blitter_r_unsafe)
+u32 epic12_device::blitter_r_unsafe(offs_t offset, u32 mem_mask)
 {
 	switch (offset * 4)
 	{
@@ -867,7 +867,7 @@ READ32_MEMBER(epic12_device::blitter_r_unsafe)
 }
 
 
-WRITE32_MEMBER(epic12_device::blitter_w)
+void epic12_device::blitter_w(address_space &space, offs_t offset, u32 data, u32 mem_mask)
 {
 	switch (offset * 4)
 	{
@@ -898,7 +898,7 @@ WRITE32_MEMBER(epic12_device::blitter_w)
 	}
 }
 
-WRITE32_MEMBER(epic12_device::blitter_w_unsafe)
+void epic12_device::blitter_w_unsafe(address_space &space, offs_t offset, u32 data, u32 mem_mask)
 {
 	switch (offset * 4)
 	{
@@ -933,22 +933,23 @@ void epic12_device::install_handlers(int addr1, int addr2)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	read32_delegate read(*this);
+	read32s_delegate read(*this);
 	write32_delegate write(*this);
 
 	if (m_is_unsafe)
 	{
 		printf("using unsafe blit code!\n");
-		read = read32_delegate(*this, FUNC(epic12_device::blitter_r_unsafe));
+		read = read32s_delegate(*this, FUNC(epic12_device::blitter_r_unsafe));
 		write = write32_delegate(*this, FUNC(epic12_device::blitter_w_unsafe));
 	}
 	else
 	{
-		read = read32_delegate(*this, FUNC(epic12_device::blitter_r));
+		read = read32s_delegate(*this, FUNC(epic12_device::blitter_r));
 		write = write32_delegate(*this, FUNC(epic12_device::blitter_w));
 	}
 
-	space.install_readwrite_handler(addr1, addr2, std::move(read), std::move(write), 0xffffffffffffffffU);
+	space.install_read_handler(addr1, addr2, std::move(read), 0xffffffffffffffffU);
+	space.install_write_handler(addr1, addr2, std::move(write), 0xffffffffffffffffU);
 }
 
 u64 epic12_device::fpga_r()

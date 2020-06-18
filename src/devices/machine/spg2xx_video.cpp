@@ -151,7 +151,7 @@ void spg2xx_video_device::do_sprite_dma(uint32_t len)
 	}
 }
 
-READ16_MEMBER(spg2xx_video_device::video_r)
+uint16_t spg2xx_video_device::video_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -223,7 +223,7 @@ READ16_MEMBER(spg2xx_video_device::video_r)
 	return m_video_regs[offset];
 }
 
-WRITE16_MEMBER(spg2xx_video_device::video_w)
+void spg2xx_video_device::video_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{

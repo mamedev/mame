@@ -37,18 +37,18 @@ public:
 	auto gpio0_write() { return m_gpio0_w.bind(); }
 	auto gpio0_read() { return m_gpio0_r.bind(); }
 
-	DECLARE_READ32_MEMBER(i2s_r);
-	DECLARE_WRITE32_MEMBER(i2s_w);
-	DECLARE_READ32_MEMBER(dma_r);
-	DECLARE_WRITE32_MEMBER(dma_w);
-	DECLARE_READ32_MEMBER(ostimer_r);
-	DECLARE_WRITE32_MEMBER(ostimer_w);
-	DECLARE_READ32_MEMBER(intc_r);
-	DECLARE_WRITE32_MEMBER(intc_w);
-	DECLARE_READ32_MEMBER(gpio_r);
-	DECLARE_WRITE32_MEMBER(gpio_w);
-	DECLARE_READ32_MEMBER(lcd_r);
-	DECLARE_WRITE32_MEMBER(lcd_w);
+	uint32_t i2s_r(offs_t offset, uint32_t mem_mask = ~0);
+	void i2s_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dma_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ostimer_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ostimer_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t intc_r(offs_t offset, uint32_t mem_mask = ~0);
+	void intc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gpio_r(offs_t offset, uint32_t mem_mask = ~0);
+	void gpio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t lcd_r(offs_t offset, uint32_t mem_mask = ~0);
+	void lcd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void set_irq_line(uint32_t line, int state);
 

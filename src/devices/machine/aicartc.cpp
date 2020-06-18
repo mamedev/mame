@@ -128,7 +128,7 @@ void aicartc_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ16_MEMBER( aicartc_device::read )
+uint16_t aicartc_device::read(offs_t offset)
 {
 	uint16_t res;
 
@@ -144,7 +144,7 @@ READ16_MEMBER( aicartc_device::read )
 	return res;
 }
 
-WRITE16_MEMBER( aicartc_device::write )
+void aicartc_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{

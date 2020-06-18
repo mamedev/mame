@@ -138,7 +138,7 @@ void mbee_state::mbee_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram();
-	map(0x8000, 0xefff).rom();
+	map(0x8000, 0xefff).rom().region("maincpu",0);
 	map(0xf000, 0xf7ff).rw(FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
 	map(0xf800, 0xffff).rw(FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
 }
@@ -146,9 +146,9 @@ void mbee_state::mbee_mem(address_map &map)
 void mbee_state::mbeeic_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).ram();
-	map(0x8000, 0xbfff).rom();
+	map(0x8000, 0xbfff).rom().region("maincpu",0);
 	map(0xc000, 0xdfff).bankr("pak");
-	map(0xe000, 0xefff).rom();
+	map(0xe000, 0xefff).rom().region("maincpu",0x4000);
 	map(0xf000, 0xf7ff).rw(FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
 	map(0xf800, 0xffff).rw(FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
 }
@@ -156,7 +156,7 @@ void mbee_state::mbeeic_mem(address_map &map)
 void mbee_state::mbeepc_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).ram();
-	map(0x8000, 0xbfff).rom();
+	map(0x8000, 0xbfff).rom().region("maincpu",0);
 	map(0xc000, 0xdfff).bankr("pak");
 	map(0xe000, 0xefff).bankr("telcom");
 	map(0xf000, 0xf7ff).rw(FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
@@ -167,7 +167,7 @@ void mbee_state::mbeeppc_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).ram();
 	map(0x8000, 0x9fff).bankr("basic");
-	map(0xa000, 0xbfff).rom();
+	map(0xa000, 0xbfff).rom().region("maincpu",0);
 	map(0xc000, 0xdfff).bankr("pak");
 	map(0xe000, 0xefff).bankr("telcom");
 	map(0xf000, 0xf7ff).rw(FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
@@ -177,7 +177,7 @@ void mbee_state::mbeeppc_mem(address_map &map)
 void mbee_state::mbee56_mem(address_map &map)
 {
 	map(0x0000, 0xdfff).ram();
-	map(0xe000, 0xefff).rom();
+	map(0xe000, 0xefff).rom().region("maincpu",0);
 	map(0xf000, 0xf7ff).rw(FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
 	map(0xf800, 0xffff).rw(FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
 }
@@ -205,7 +205,7 @@ void mbee_state::mbee256_mem(address_map &map)
 void mbee_state::mbeett_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).ram();
-	map(0x8000, 0x9fff).rom();
+	map(0x8000, 0x9fff).rom().region("maincpu",0);
 	map(0xa000, 0xbfff).ram();
 	map(0xc000, 0xdfff).bankr("pak");
 	map(0xe000, 0xefff).bankr("telcom");
@@ -611,7 +611,7 @@ static const z80_daisy_config mbee_daisy_chain[] =
 };
 
 /**************************** F4 CHARACTER DISPLAYER */
-static const gfx_layout mbee_charlayout =
+static const gfx_layout charlayout =
 {
 	8,16,                   /* 8 x 16 characters */
 	RGN_FRAC(1,1),
@@ -625,15 +625,15 @@ static const gfx_layout mbee_charlayout =
 };
 
 static GFXDECODE_START( gfx_mono )
-	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 96, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 96, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_standard )
-	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 48 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 48 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_premium )
-	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 8 )
 GFXDECODE_END
 
 static void mbee_floppies(device_slot_interface &device)
@@ -859,93 +859,77 @@ void mbee_state::mbeett(machine_config &config)
 */
 
 
-/* gfxram:
-    0000 = normal characters in charrom
-    0800 = small characters in charrom
-    1000 = characters selected
-    1800 = pcg */
-
 ROM_START( mbee )
-	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("bas510a.ic25",          0x8000,  0x1000, CRC(2ca47c36) SHA1(f36fd0afb3f1df26edc67919e78000b762b6cbcb) )
-	ROM_LOAD("bas510b.ic27",          0x9000,  0x1000, CRC(a07a0c51) SHA1(dcbdd9df78b4b6b2972de2e4050dabb8ae9c3f5a) )
-	ROM_LOAD("bas510c.ic28",          0xa000,  0x1000, CRC(906ac00f) SHA1(9b46458e5755e2c16cdb191a6a70df6de9fe0271) )
-	ROM_LOAD("bas510d.ic30",          0xb000,  0x1000, CRC(61727323) SHA1(c0fea9fd0e25beb9faa7424db8efd07cf8d26c1b) )
-	ROM_LOAD_OPTIONAL("edasma.ic31",  0xc000,  0x1000, CRC(120c3dea) SHA1(32c9bb6e54dd50d5218bb43cc921885a0307161d) )
-	ROM_LOAD_OPTIONAL("edasmb.ic33",  0xd000,  0x1000, CRC(a23bf3c8) SHA1(73a57c2800a1c744b527d0440b170b8b03351753) )
-	ROM_LOAD_OPTIONAL("telcom10.rom", 0xe000,  0x1000, CRC(cc9ac94d) SHA1(6804b5ff54d16f8e06180751d8681c44f351e0bb) )
+	ROM_REGION( 0x7000, "maincpu", 0 )
+	ROM_LOAD("bas510a.ic25",          0x0000,  0x1000, CRC(2ca47c36) SHA1(f36fd0afb3f1df26edc67919e78000b762b6cbcb) )
+	ROM_LOAD("bas510b.ic27",          0x1000,  0x1000, CRC(a07a0c51) SHA1(dcbdd9df78b4b6b2972de2e4050dabb8ae9c3f5a) )
+	ROM_LOAD("bas510c.ic28",          0x2000,  0x1000, CRC(906ac00f) SHA1(9b46458e5755e2c16cdb191a6a70df6de9fe0271) )
+	ROM_LOAD("bas510d.ic30",          0x3000,  0x1000, CRC(61727323) SHA1(c0fea9fd0e25beb9faa7424db8efd07cf8d26c1b) )
+	ROM_LOAD_OPTIONAL("edasma.ic31",  0x4000,  0x1000, CRC(120c3dea) SHA1(32c9bb6e54dd50d5218bb43cc921885a0307161d) )
+	ROM_LOAD_OPTIONAL("edasmb.ic33",  0x5000,  0x1000, CRC(a23bf3c8) SHA1(73a57c2800a1c744b527d0440b170b8b03351753) )
+	ROM_LOAD_OPTIONAL("telcom10.rom", 0x6000,  0x1000, CRC(cc9ac94d) SHA1(6804b5ff54d16f8e06180751d8681c44f351e0bb) )
 
-	ROM_REGION(0x2000, "gfx", 0)
-	ROM_LOAD("charrom.ic13",          0x1000,  0x0800, CRC(b149737b) SHA1(a3cd4f5d0d3c71137cd1f0f650db83333a2e3597) )
-	ROM_RELOAD( 0x0000, 0x0800 )
+	// first 0x800 for normal chars, 2nd 0x800 for small chars. Some roms don't have small chars so normal ones loaded twice.
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD("charrom.ic13",          0x0000,  0x0800, CRC(b149737b) SHA1(a3cd4f5d0d3c71137cd1f0f650db83333a2e3597) )
 	ROM_RELOAD( 0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0000,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( mbeeic )
-	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("bas522a.rom",           0x8000,  0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
-	ROM_LOAD("bas522b.rom",           0xa000,  0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
-	ROM_LOAD_OPTIONAL("telcom12.rom", 0xe000,  0x1000, CRC(0231bda3) SHA1(be7b32499034f985cc8f7865f2bc2b78c485585c) )
+	ROM_REGION( 0x5000, "maincpu", 0 )
+	ROM_LOAD("bas522a.rom",           0x0000,  0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
+	ROM_LOAD("bas522b.rom",           0x2000,  0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
+	ROM_LOAD_OPTIONAL("telcom12.rom", 0x4000,  0x1000, CRC(0231bda3) SHA1(be7b32499034f985cc8f7865f2bc2b78c485585c) )
 
 	/* PAK option roms */
-	ROM_REGION(0x20000, "pakrom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
 	ROM_LOAD_OPTIONAL("edasm.rom",    0x0000,  0x2000, CRC(1af1b3a9) SHA1(d035a997c2dbbb3918b3395a3a5a1076aa203ee5) ) // 0
 	ROM_LOAD_OPTIONAL("wbee12.rom",   0x2000,  0x2000, CRC(0fc21cb5) SHA1(33b3995988fc51ddef1568e160dfe699867adbd5) ) // 1
 	ROM_LOAD_OPTIONAL("forth11.rom",  0x4000,  0x2000, CRC(f0fc2358) SHA1(b7303b94abe647d5a6ffb2fba5d205412f970c16) ) // 2
 
-	ROM_REGION(0x2000, "gfx", 0)
-	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
-	ROM_RELOAD( 0x0000, 0x1000 )
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD("charrom.bin",           0x0000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeepc )
-	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("bas522a.rom",           0x8000,  0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
-	ROM_LOAD("bas522b.rom",           0xa000,  0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD("bas522a.rom",           0x0000,  0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
+	ROM_LOAD("bas522b.rom",           0x2000,  0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
 
-	ROM_REGION(0x2000, "telcomrom", 0)
+	ROM_REGION( 0x2000, "telcomrom", 0 )
 	ROM_LOAD_OPTIONAL("telcom31.rom", 0x0000,  0x2000, CRC(5a904a29) SHA1(3120fb65ccefeb180ab80d8d35440c70dc8452c8) )
 
 	/* PAK option roms */
-	ROM_REGION(0x20000, "pakrom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
 	ROM_LOAD_OPTIONAL("edasm.rom",    0x0000,  0x2000, CRC(1af1b3a9) SHA1(d035a997c2dbbb3918b3395a3a5a1076aa203ee5) ) // 0
 	ROM_LOAD_OPTIONAL("wbee12.rom",   0x2000,  0x2000, CRC(0fc21cb5) SHA1(33b3995988fc51ddef1568e160dfe699867adbd5) ) // 1
 	ROM_LOAD_OPTIONAL("mwbhelp.rom",  0x4000,  0x2000, CRC(d34fae54) SHA1(5ed30636f48e9d208ce2da367ba4425782a5bce3) ) // 2
 
-	ROM_REGION(0x2000, "gfx", 0)
-	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
-	ROM_RELOAD( 0x0000, 0x1000 )
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD("charrom.bin",           0x0000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeepc85 )
-	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD("bas525a.rom",           0x8000,  0x2000, CRC(a6e02afe) SHA1(0495308c7e1d84b5989a3af6d3b881f4580b2641) )
-	ROM_LOAD("bas525b.rom",           0xa000,  0x2000, CRC(245dd36b) SHA1(dd288f3e6737627f50d3d2a49df3e57c423d3118) )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD("bas525a.rom",           0x0000,  0x2000, CRC(a6e02afe) SHA1(0495308c7e1d84b5989a3af6d3b881f4580b2641) )
+	ROM_LOAD("bas525b.rom",           0x2000,  0x2000, CRC(245dd36b) SHA1(dd288f3e6737627f50d3d2a49df3e57c423d3118) )
 
-	ROM_REGION(0x2000, "telcomrom", 0)
+	ROM_REGION( 0x2000, "telcomrom", 0 )
 	ROM_LOAD_OPTIONAL("telco321.rom", 0x0000,  0x2000, CRC(36852a11) SHA1(c45b8d03629e86231c6b256a7435abd87d8872a4) )
 
 	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. */
-	ROM_REGION(0x20000, "pakrom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
 	ROM_LOAD("wbee13.rom",            0x0000,  0x2000, CRC(d7c58b7b) SHA1(5af1b8d21a0f21534ed1833ae919dbbc6ca973e2) ) // 0
 	ROM_LOAD_OPTIONAL("cmdhelp.rom",  0x2000,  0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f) ) // 1
 	ROM_LOAD_OPTIONAL("edasm.rom",    0x4000,  0x2000, CRC(1af1b3a9) SHA1(d035a997c2dbbb3918b3395a3a5a1076aa203ee5) ) // 2
@@ -954,28 +938,24 @@ ROM_START( mbeepc85 )
 	ROM_LOAD_OPTIONAL("ozlogo.rom",   0xc000,  0x2000, CRC(47c3ef69) SHA1(8274d27c323ca4a6cc9e7d24946ae9c0531c3112) ) // 6
 	ROM_LOAD_OPTIONAL("chess.rom",    0xe000,  0x2000, CRC(fe9ee9d0) SHA1(a316559414e68c0101af5f00755db551e7c5788e) ) // 7
 
-	ROM_REGION(0x2000, "gfx", 0)
-	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
-	ROM_RELOAD( 0x0000, 0x1000 )
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD("charrom.bin",           0x0000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeepc85b )
-	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD("bas525a.rom",           0x8000,  0x2000, CRC(a6e02afe) SHA1(0495308c7e1d84b5989a3af6d3b881f4580b2641) )
-	ROM_LOAD("bas525b.rom",           0xa000,  0x2000, CRC(245dd36b) SHA1(dd288f3e6737627f50d3d2a49df3e57c423d3118) )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD("bas525a.rom",           0x0000,  0x2000, CRC(a6e02afe) SHA1(0495308c7e1d84b5989a3af6d3b881f4580b2641) )
+	ROM_LOAD("bas525b.rom",           0x2000,  0x2000, CRC(245dd36b) SHA1(dd288f3e6737627f50d3d2a49df3e57c423d3118) )
 
-	ROM_REGION(0x2000, "telcomrom", 0)
+	ROM_REGION( 0x2000, "telcomrom", 0 )
 	ROM_LOAD_OPTIONAL("telco321.rom", 0x0000,  0x2000, CRC(36852a11) SHA1(c45b8d03629e86231c6b256a7435abd87d8872a4) )
 
 	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. */
-	ROM_REGION(0x20000, "pakrom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
 	ROM_LOAD("wbee13.rom",            0x0000,  0x2000, CRC(d7c58b7b) SHA1(5af1b8d21a0f21534ed1833ae919dbbc6ca973e2) ) // 0
 	ROM_LOAD_OPTIONAL("cmdhelp.rom",  0x2000,  0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f) ) // 1
 	ROM_LOAD_OPTIONAL("busy.rom",     0x4000,  0x2000, CRC(56255f60) SHA1(fd2e37209fd49290be6875bc460cfc05392938ba) ) // 2
@@ -985,28 +965,24 @@ ROM_START( mbeepc85b )
 	ROM_LOAD_OPTIONAL("viatel.rom",   0x8000,  0x2000, CRC(2da2411f) SHA1(d3cfa978165feef0a96e28197f6a762aa6604799) ) // 4
 	ROM_LOAD("shell-b.rom",           0xa000,  0x2000, CRC(17bf2d58) SHA1(ae22a5fc5783f37066ba5555497e40945272ca3d) ) // 5
 
-	ROM_REGION(0x2000, "gfx", 0)
-	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
-	ROM_RELOAD( 0x0000, 0x1000 )
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD("charrom.bin",           0x0000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeepc85s )
-	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD("bas524a.rom",           0x8000,  0x2000, CRC(ec9c7a60) SHA1(a4021bcedc8da8c0eb0bda036a1d457619a175b0) )
-	ROM_LOAD("bas524b.rom",           0xa000,  0x2000, CRC(17d3eac7) SHA1(d40d376cc5e751d257d951909a34445e70506c7b) )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD("bas524a.rom",           0x0000,  0x2000, CRC(ec9c7a60) SHA1(a4021bcedc8da8c0eb0bda036a1d457619a175b0) )
+	ROM_LOAD("bas524b.rom",           0x2000,  0x2000, CRC(17d3eac7) SHA1(d40d376cc5e751d257d951909a34445e70506c7b) )
 
-	ROM_REGION(0x2000, "telcomrom", 0)
+	ROM_REGION( 0x2000, "telcomrom", 0 )
 	ROM_LOAD_OPTIONAL("telco321s.rom", 0x0000, 0x2000, CRC(00f8fde1) SHA1(eb881bbab90c85fd6e29540decd25e884c67f738) )
 
 	/* PAK roms - These are not optional and will only work in the correct slots. */
-	ROM_REGION(0x20000, "pakrom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
 	ROM_LOAD("wbee20-s.rom",          0x0000,  0x2000, CRC(6a0fe57f) SHA1(a101b588b1872e19382b9e9ea50fabb0fd060aa6) ) // 0
 	ROM_LOAD("db-s.rom",              0x2000,  0x2000, CRC(e2094771) SHA1(62d7fb66c91d2bd24523bc84e4f005cf2c4480bb) ) // 1
 	ROM_LOAD("kalk-s.rom",            0x4000,  0x2000, CRC(08dd71ee) SHA1(c9d506d8bb56f602c3481b253d4cac226f545d98) ) // 2
@@ -1014,26 +990,22 @@ ROM_START( mbeepc85s )
 	ROM_LOAD("videotex-s.rom",        0x8000,  0x2000, CRC(67592b3f) SHA1(7f1d23ded34781ccda5f36b4a4fa118a8c0e44ec) ) // 4
 	ROM_LOAD("shell-s.rom",           0xa000,  0x2000, CRC(bdf1768f) SHA1(4385351d07288cf94947ac63131eeed98572caa1) ) // 5
 
-	ROM_REGION(0x2000, "gfx", 0)
-	ROM_LOAD("charrom-s.bin",         0x1000,  0x1000, CRC(1bcbf083) SHA1(6438649b8b5fc20dd772ec7195e69a5bbe016b09) )
-	ROM_RELOAD( 0x0000, 0x1000 )
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD("charrom-s.bin",         0x0000,  0x1000, CRC(1bcbf083) SHA1(6438649b8b5fc20dd772ec7195e69a5bbe016b09) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeett )
-	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("kernel_106.rom",        0x8000,  0x2000, CRC(5ab9cb1d) SHA1(a1fb971622f85c4d866b91cb4bec6d75757e8c5f) )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD("kernel_106.rom",        0x0000,  0x2000, CRC(5ab9cb1d) SHA1(a1fb971622f85c4d866b91cb4bec6d75757e8c5f) )
 
-	ROM_REGION(0x2000, "telcomrom", 0)
+	ROM_REGION( 0x2000, "telcomrom", 0 )
 	ROM_LOAD("wm_106.rom",            0x0000,  0x2000, CRC(77e0b355) SHA1(1db6769cd6b12e1c335c83f17f8c139986c87758) )
 
-	ROM_REGION(0x20000, "pakrom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
 	ROM_LOAD("tv_470311.rom",         0x2000,  0x2000, CRC(2c4c2dcb) SHA1(77cd75166a389cb2d1d8abf00b1ddd077ce98354) ) // 1
 	ROM_CONTINUE( 0x12000, 0x2000 )
 	ROM_LOAD("tw_103.rom",            0x4000,  0x2000, CRC(881edb4b) SHA1(f6e30a12b1537bd55b69d1319799b150e80a471b) ) // 2
@@ -1042,27 +1014,22 @@ ROM_START( mbeett )
 	ROM_CONTINUE( 0x16000, 0x1000 )
 	ROM_LOAD("test_105.rom",          0x8000,  0x2000, CRC(b69aa618) SHA1(49de8cbad59f549c7ad9f8efc9beee0cfcd901fe) ) // 4
 
-	ROM_REGION(0x9800, "gfx", 0)
-	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
-	ROM_RELOAD( 0x0000, 0x1000 )
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD("charrom.bin",           0x0000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 ROM_END
 
 ROM_START( mbeeppc )
-	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD("bas529b.rom",           0xa000,  0x2000, CRC(a1bd986b) SHA1(5d79f210c9042db5aefc85a0bdf45210cb9e9899) )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD("bas529b.rom",           0x0000,  0x2000, CRC(a1bd986b) SHA1(5d79f210c9042db5aefc85a0bdf45210cb9e9899) )
 
-	ROM_REGION(0x4000, "basicrom", 0)
+	ROM_REGION( 0x4000, "basicrom", 0 )
 	ROM_LOAD("bas529a.rom",           0x0000,  0x4000, CRC(fe8242e1) SHA1(ff790edf4fcc7a134d451dbad7779157b07f6abf) )
 
-	ROM_REGION(0x2000, "telcomrom", 0)
+	ROM_REGION( 0x2000, "telcomrom", 0 )
 	ROM_LOAD_OPTIONAL("telco321.rom", 0x0000,  0x2000, CRC(36852a11) SHA1(c45b8d03629e86231c6b256a7435abd87d8872a4) )
 
 	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. */
-	ROM_REGION(0x20000, "pakrom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
 	ROM_LOAD("wbee13.rom",            0x0000,  0x2000, CRC(d7c58b7b) SHA1(5af1b8d21a0f21534ed1833ae919dbbc6ca973e2) ) // 0
 	ROM_LOAD_OPTIONAL("cmdhelp.rom",  0x2000,  0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f) ) // 1
 	ROM_LOAD_OPTIONAL("busy-p.rom",   0x4000,  0x2000, CRC(f2897427) SHA1(b4c351bdac72d89589980be6d654f9b931bcba6b) ) // 2
@@ -1072,56 +1039,39 @@ ROM_START( mbeeppc )
 	ROM_LOAD_OPTIONAL("vtex235.rom",  0x8000,  0x2000, CRC(8c30ecb2) SHA1(cf068462d7def885bdb5d3a265851b88c727c0d7) ) // 4
 	ROM_LOAD("ppcshell.rom",          0xa000,  0x2000, CRC(1e793555) SHA1(ddeaa081ec4408e80e3fb192865d87daa035c701) ) // 5
 
-	ROM_REGION(0x9800, "gfx", 0)
-	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
-	ROM_RELOAD( 0x0000, 0x1000 )
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
-	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD("charrom.bin",           0x0000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 ROM_END
 
 ROM_START( mbee56 )
-	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("56kb.rom",              0xe000,  0x1000, CRC(28211224) SHA1(b6056339402a6b2677b0e6c57bd9b78a62d20e4f) )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD("56kb.rom",              0x0000,  0x1000, CRC(28211224) SHA1(b6056339402a6b2677b0e6c57bd9b78a62d20e4f) )
 
-	ROM_REGION(0x2000, "gfx", 0)
-	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
-	ROM_RELOAD( 0x0000, 0x1000 )
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD("charrom.bin",           0x0000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbee128 ) // Standard 128k (CIAB is the same thing with half the ram)
-	ROM_REGION(0x20000, "rams", ROMREGION_ERASEFF)
-
-	ROM_REGION(0x8000, "roms", 0)
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD("bn54.bin",              0x0000,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
 
-	ROM_REGION(0x2000, "gfx", 0)
-	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
-	ROM_RELOAD( 0x0000, 0x1000 )
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD("charrom.bin",           0x0000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 
-	ROM_REGION(0x4000, "pals", 0) // undumped; using prom from 256tc for now
+	ROM_REGION( 0x4000, "pals", 0 ) // undumped; using prom from 256tc for now
 	ROM_LOAD( "silver.u39", 0x0000, 0x4000, BAD_DUMP CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbee128p ) // Premium 128K
-	ROM_REGION(0x20000, "rams", ROMREGION_ERASEFF)
-
-	ROM_REGION(0x8000, "roms", 0) // rom plus optional undumped roms plus dummy area
+	ROM_REGION( 0x8000, "maincpu", 0 ) // rom plus optional undumped roms plus dummy area
 	ROM_SYSTEM_BIOS( 0, "bn56", "bn56" )
 	ROMX_LOAD("bn56.rom",     0x0000, 0x2000, CRC(3f76769d) SHA1(cfae2069d739c26fe39f734d9f705a3c965d1e6f), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "bn59", "Version 2.02" )
@@ -1135,58 +1085,37 @@ ROM_START( mbee128p ) // Premium 128K
 	ROM_SYSTEM_BIOS( 5, "hd18", "Hard Disk System" )
 	ROMX_LOAD("hd18.rom",     0x0000, 0x2000, CRC(ed53ace7) SHA1(534e2e00cc527197c76b3c106b3c9ff7f1328487), ROM_BIOS(5) )
 
-	ROM_REGION(0x4000, "pals", 0) // undumped; using prom from 256tc for now
+	ROM_REGION( 0x4000, "pals", 0 ) // undumped; using prom from 256tc for now
 	ROM_LOAD( "silver.u39", 0x0000, 0x4000, BAD_DUMP CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )
 
-	ROM_REGION(0x9800, "gfx", 0)
-	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
-	ROM_RELOAD( 0x0000, 0x1000 )
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
-	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD("charrom.bin",           0x0000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 ROM_END
 
 ROM_START( mbee256 ) // 256tc
-	ROM_REGION(0x40000, "rams", ROMREGION_ERASEFF)
-
-	ROM_REGION(0x5000, "roms", 0) // rom plus dummy area
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "1.20", "Version 1.20" )
 	ROMX_LOAD("256tc_boot_1.20.u38", 0x0000, 0x4000, CRC(fe8d6a84) SHA1(a037a1b90b18a2180e9f5f216b829fcd480449a4), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "1.15", "Version 1.15" )
 	ROMX_LOAD("256tc_boot_1.15.u38", 0x0000, 0x4000, CRC(1902062d) SHA1(e4a1c0b3f4996e313da0bac0edb6d34e3270723e), ROM_BIOS(1) )
 
-	ROM_REGION(0x4000, "pals", 0)
+	ROM_REGION( 0x4000, "pals", 0 )
 	ROM_LOAD( "silver.u39", 0x0000, 0x4000, CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )
 
-	ROM_REGION(0x9800, "gfx", 0)
-	ROM_LOAD("char256.u53", 0x1000, 0x1000, CRC(9372af3c) SHA1(a63591822c0504de2fed52e88d64e1dbd6124b74) )
-	ROM_IGNORE( 0x1000 )    // throw away swedish characters for now
-	ROM_COPY( "gfx", 0x1000, 0x0000, 0x1000 )
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
-	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "chargen", 0 )
+	ROM_LOAD("char256.u53", 0x0000, 0x2000, CRC(9372af3c) SHA1(a63591822c0504de2fed52e88d64e1dbd6124b74) )
 ROM_END
 
 // Note: The bios rom is the only one confirmed to be in the machine. IC position numbers are unknown.
 ROM_START( mbeepp ) // Premium Plus
-	ROM_REGION(0x40000, "rams", ROMREGION_ERASEFF)
-
-	ROM_REGION(0x5000, "roms", 0) // rom plus dummy area
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "pp.bin", 0x0000, 0x4000, CRC(33292300) SHA1(8ba32123ef1b3beffa797855a1de0ea2078d652a) ) // ver 1.0
 
-	ROM_REGION(0x4000, "pals", 0)
+	ROM_REGION( 0x4000, "pals", 0 )
 	ROM_LOAD( "silver.u39", 0x0000, 0x4000, CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )
 
-	ROM_REGION(0x9800, "gfx", 0)
-	ROM_LOAD("char256.u53", 0x1000, 0x1000, CRC(9372af3c) SHA1(a63591822c0504de2fed52e88d64e1dbd6124b74) )
-	ROM_IGNORE( 0x1000 )    // throw away swedish characters for now
-	ROM_COPY( "gfx", 0x1000, 0x0000, 0x1000 )
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
-	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "chargen", 0 )
+	ROM_LOAD("char256.u53", 0x0000, 0x2000, CRC(9372af3c) SHA1(a63591822c0504de2fed52e88d64e1dbd6124b74) )
 ROM_END
 
 /***************************************************************************

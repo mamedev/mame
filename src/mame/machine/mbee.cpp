@@ -249,7 +249,7 @@ uint8_t mbee_state::port07_r()   // read
 // See it work: Run mbeett, choose RTC in the config switches, run the F3 test, press Esc.
 WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
 {
-	m_b7_rtc = (state) ? 0 : 1; // inverted by IC15 (pins 8,9,10)
+	m_b7_rtc = state; // inverted by IC15 (pins 8,9,10) then again by mame
 
 	if ((m_io_config->read() & 0xc0) == 0x40) // RTC selected in config menu
 		m_pio->port_b_write(pio_port_b_r());
@@ -282,7 +282,6 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 	uint8_t b_data = bitswap<8>(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
 	uint8_t b_bank, b_byte, b_byte_t, b_addr, p_bank = 1;
 	uint16_t b_vid;
-	char banktag[10];
 
 	if (first_time || (b_data != m_bank_array[0])) // if same data as last time, leave now
 	{
@@ -314,13 +313,12 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 				}
 				else
 				{
-					sprintf(banktag, "bankr%d", b_bank);
-					mem.install_read_bank( b_vid, b_vid+0xfff, banktag );
+					mem.install_read_bank( b_vid, b_vid+0xfff, m_bankr[b_bank] );
 
 					if (!BIT(b_byte, 3))
-						membank(banktag)->set_entry(64 + (b_bank & 3)); // read from rom
+						m_bankr[b_bank]->set_entry(64 + (b_bank & 3)); // read from rom
 					else
-						membank(banktag)->set_entry((b_bank & 7) | ((b_byte & b_mask) << 3)); // ram
+						m_bankr[b_bank]->set_entry((b_bank & 7) | ((b_byte & b_mask) << 3)); // ram
 				}
 			}
 			p_bank++;
@@ -346,13 +344,12 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 				}
 				else
 				{
-					sprintf(banktag, "bankw%d", b_bank);
-					mem.install_write_bank( b_vid, b_vid+0xfff, banktag );
+					mem.install_write_bank( b_vid, b_vid+0xfff, m_bankw[b_bank] );
 
 					if (!BIT(b_byte, 3))
-						membank(banktag)->set_entry(64); // write to rom dummy area
+						m_bankw[b_bank]->set_entry(64); // write to rom dummy area
 					else
-						membank(banktag)->set_entry((b_bank & 7) | ((b_byte & b_mask) << 3)); // ram
+						m_bankw[b_bank]->set_entry((b_bank & 7) | ((b_byte & b_mask) << 3)); // ram
 				}
 			}
 			p_bank++;
@@ -555,19 +552,19 @@ void mbee_state::init_mbee56()
 // PP has 1024k which is 256 banks, but having 64 banks stops it crashing during the self-test. Need a schematic before we can fix it.
 void mbee_state::init_mbee128()
 {
-	uint8_t *RAM = memregion("rams")->base();
-	uint8_t *ROM = memregion("roms")->base();
-	char banktag[10];
+	m_ram = make_unique_clear<u8[]>(0x40000);
+	m_dummy = std::make_unique<u8[]>(0x1000);
+	u8 *r = m_ram.get();
+	u8 *d = m_dummy.get();
+	u8 *m = memregion("maincpu")->base();
 
-	for (uint8_t b_bank = 0; b_bank < 16; b_bank++)
+	for (u8 b_bank = 0; b_bank < 16; b_bank++)
 	{
-		sprintf(banktag, "bankr%d", b_bank);
-		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
-		membank(banktag)->configure_entries(64, 4, &ROM[0x0000], 0x1000); // rom
+		m_bankr[b_bank]->configure_entries(0, 64, r, 0x1000); // RAM banks
+		m_bankr[b_bank]->configure_entries(64, 4, m, 0x1000); // rom
 
-		sprintf(banktag, "bankw%d", b_bank);
-		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
-		membank(banktag)->configure_entries(64, 1, &ROM[0x4000], 0x1000); // dummy rom
+		m_bankw[b_bank]->configure_entries(0, 64, r, 0x1000); // RAM banks
+		m_bankw[b_bank]->configure_entry(64, d); // dummy rom
 	}
 
 	m_size = 0x8000;
@@ -576,19 +573,19 @@ void mbee_state::init_mbee128()
 
 void mbee_state::init_mbee256()
 {
-	uint8_t *RAM = memregion("rams")->base();
-	uint8_t *ROM = memregion("roms")->base();
-	char banktag[10];
+	m_ram = make_unique_clear<u8[]>(0x40000);
+	m_dummy = std::make_unique<u8[]>(0x1000);
+	u8 *r = m_ram.get();
+	u8 *d = m_dummy.get();
+	u8 *m = memregion("maincpu")->base();
 
-	for (uint8_t b_bank = 0; b_bank < 16; b_bank++)
+	for (u8 b_bank = 0; b_bank < 16; b_bank++)
 	{
-		sprintf(banktag, "bankr%d", b_bank);
-		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
-		membank(banktag)->configure_entries(64, 4, &ROM[0x0000], 0x1000); // rom
+		m_bankr[b_bank]->configure_entries(0, 64, r, 0x1000); // RAM banks
+		m_bankr[b_bank]->configure_entries(64, 4, m, 0x1000); // rom
 
-		sprintf(banktag, "bankw%d", b_bank);
-		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
-		membank(banktag)->configure_entries(64, 1, &ROM[0x4000], 0x1000); // dummy rom
+		m_bankw[b_bank]->configure_entries(0, 64, r, 0x1000); // RAM banks
+		m_bankw[b_bank]->configure_entry(64, d); // dummy rom
 	}
 
 	timer_set(attotime::from_hz(1), TIMER_MBEE_NEWKB);   /* kick-start timer for kbd */

@@ -90,9 +90,10 @@ void a2065_device::autoconfig_base_address(offs_t address)
 			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 
 	// install access to lance registers
-	m_slot->space().install_readwrite_handler(address + 0x4000, address + 0x4003,
-			read16_delegate(*m_lance, FUNC(am7990_device::regs_r)),
-			write16_delegate(*m_lance, FUNC(am7990_device::regs_w)), 0xffff);
+	m_slot->space().install_read_handler(address + 0x4000, address + 0x4003,
+			read16m_delegate(*m_lance, FUNC(am7990_device::regs_r)), 0xffff);
+	m_slot->space().install_write_handler(address + 0x4000, address + 0x4003,
+			write16sm_delegate(*m_lance, FUNC(am7990_device::regs_w)), 0xffff);
 
 	// install access to onboard ram (32k)
 	m_slot->space().install_readwrite_handler(address + 0x8000, address + 0x8000 + 0x7fff,

@@ -101,8 +101,8 @@ void dio16_98544_device::device_start()
 	save_item(NAME(m_intreg));
 	dio().install_memory(
 			0x200000, 0x2fffff,
-			read16_delegate(*m_topcat, FUNC(topcat_device::vram_r)),
-			write16_delegate(*m_topcat, FUNC(topcat_device::vram_w)));
+			read16s_delegate(*m_topcat, FUNC(topcat_device::vram_r)),
+			write16s_delegate(*m_topcat, FUNC(topcat_device::vram_w)));
 	dio().install_memory(
 			0x560000, 0x563fff,
 			read16_delegate(*this, FUNC(dio16_98544_device::rom_r)),

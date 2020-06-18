@@ -2088,7 +2088,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		return;
 
 	int shift = space->addr_shift();
-	u64 granularity = shift > 0 ? 2 : 1 << -shift;
+	u64 granularity = shift >= 0 ? 1 : 1 << -shift;
 
 	/* further validation */
 	if (width == 0)

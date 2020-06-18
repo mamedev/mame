@@ -71,12 +71,12 @@ public:
 	DECLARE_READ_LINE_MEMBER( hf_r ) { return !m_hf; } // _HF
 
 	// normal configuration
-	DECLARE_WRITE16_MEMBER( data_word_w ) { fifo_write(data); }
-	DECLARE_READ16_MEMBER( data_word_r ) { return (uint16_t)fifo_read(); }
+	void data_word_w(uint16_t data) { fifo_write(data); }
+	uint16_t data_word_r() { return (uint16_t)fifo_read(); }
 
 	// use these for simple configurations that don't have d8/q8 connected
-	DECLARE_WRITE8_MEMBER( data_byte_w ) { fifo_write(data); }
-	DECLARE_READ8_MEMBER( data_byte_r ) { return (uint8_t)fifo_read(); }
+	void data_byte_w(uint8_t data) { fifo_write(data); }
+	uint8_t data_byte_r() { return (uint8_t)fifo_read(); }
 
 protected:
 	fifo7200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, int size);

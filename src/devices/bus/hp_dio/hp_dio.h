@@ -77,7 +77,7 @@ public:
 	auto irq6_out_cb() { return m_irq6_out_cb.bind(); }
 	auto irq7_out_cb() { return m_irq7_out_cb.bind(); }
 
-	void install_memory(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
+	template<typename R, typename W> void install_memory(offs_t start, offs_t end, R rhandler, W whandler);
 
 	// DANGER: these will currently produce different results for a DIO-I card on DIO-I and DIO-II systems
 	//         due to the varying bus widths.  Using all install_memory() shields you from this problem.

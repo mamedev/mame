@@ -31,7 +31,7 @@ void i80130_device::io_map(address_map &map)
 	//map(0x08, 0x0f).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 }
 
-READ16_MEMBER( i80130_device::io_r )
+uint16_t i80130_device::io_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -55,7 +55,7 @@ READ16_MEMBER( i80130_device::io_r )
 	return data;
 }
 
-WRITE16_MEMBER( i80130_device::io_w )
+void i80130_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
