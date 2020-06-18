@@ -2033,7 +2033,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hyper girl - akiko - premium version (japan)" sha1="5869c0c1d2eee0f551722a7d08d7feef6be53868" />
+				<disk name="hyper girl - akiko - premium version (japan)" sha1="fa1b72c5b4a0ca23a32dd9f6004ea163d4578968" />
 			</diskarea>
 		</part>
 	</software>
