@@ -148,7 +148,7 @@ private:
 	void mbeett_mem(address_map &map);
 
 	u8 m_features;
-	size_t m_size;
+	u16 m_size;
 	bool m_b7_rtc;
 	bool m_b7_vs;
 	bool m_b2;
