@@ -63,7 +63,7 @@ WRITE_LINE_MEMBER( mbee_state::crtc_vs )
 
 uint8_t mbee_state::video_low_r(offs_t offset)
 {
-	if (m_is_premium && ((m_1c & 0x9f) == 0x90))
+	if (BIT(m_features, 3) && ((m_1c & 0x9f) == 0x90))
 		return m_aram[offset];
 	else
 	if (m_0b)
@@ -77,7 +77,7 @@ void mbee_state::video_low_w(offs_t offset, uint8_t data)
 	if (BIT(m_1c, 4))
 	{
 		// non-premium attribute writes are discarded
-		if (m_is_premium && BIT(m_1c, 7))
+		if (BIT(m_features, 3) && BIT(m_1c, 7))
 			m_aram[offset] = data;
 	}
 	else
@@ -127,7 +127,7 @@ void mbee_state::port1c_w(uint8_t data)
     d4 select attribute ram
     d3..d0 select videoram bank */
 
-	if (m_is_premium && BIT(data, 7))
+	if (BIT(m_features, 3) && BIT(data, 7))
 		m_1c = data;
 	else
 		m_1c = data & 0x30;
@@ -146,7 +146,7 @@ void mbee_state::port1c_w(uint8_t data)
 
 void mbee_state::oldkb_matrix_r(uint16_t offs)
 {
-	if (m_has_oldkb)
+	if (!BIT(m_features, 2))
 	{
 		uint8_t port = (offs >> 7) & 7;
 		uint8_t bit = (offs >> 4) & 7;
@@ -157,7 +157,7 @@ void mbee_state::oldkb_matrix_r(uint16_t offs)
 		// This adds premium-style cursor keys to the old keyboard.
 		// They are used by the pc85 menu. Premium keyboards already
 		// have these keys fitted.
-		if (!keydown && !m_is_premium)
+		if (!keydown && !BIT(m_features, 3))
 		{
 			if ((port == 0) || (port == 2) || (port == 3))
 				extra = m_io_x7->read();
@@ -241,33 +241,6 @@ void mbee_state::m6545_data_w(uint8_t data)
 
 ************************************************************/
 
-VIDEO_START_MEMBER( mbee_state, mono )
-{
-	m_vram = make_unique_clear<u8[]>(0x0800);
-	m_pram = make_unique_clear<u8[]>(0x1000);
-	memcpy(m_pram.get(), memregion("chargen")->base(), 0x800);
-	m_is_premium = 0;
-}
-
-VIDEO_START_MEMBER( mbee_state, standard )
-{
-	m_vram = make_unique_clear<u8[]>(0x0800);
-	m_pram = make_unique_clear<u8[]>(0x1000);
-	m_cram = make_unique_clear<u8[]>(0x0800);
-	memcpy(m_pram.get(), memregion("chargen")->base(), 0x800);
-	m_is_premium = 0;
-}
-
-VIDEO_START_MEMBER( mbee_state, premium )
-{
-	m_vram = make_unique_clear<u8[]>(0x0800);
-	m_pram = make_unique_clear<u8[]>(0x8800);
-	m_cram = make_unique_clear<u8[]>(0x0800);
-	m_aram = make_unique_clear<u8[]>(0x0800);
-	memcpy(m_pram.get(), memregion("chargen")->base(), 0x800);
-	m_is_premium = 1;
-}
-
 uint32_t mbee_state::screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_framecnt++;
@@ -290,10 +263,10 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	// colours
-	uint8_t colourm = (m_08 & 0x0e) >> 1;
-	uint8_t monopal = (m_io_config->read() & 0x30) >> 4;
+	uint8_t colourm = BIT(m_08, 2, 3);
+	uint8_t monopal = BIT(m_io_config->read(), 4, 2);
 	// if colour chosen on mono bee, default to amber
-	if (!monopal && !m_cram)
+	if ((monopal==0) && !BIT(m_features, 0))
 		monopal = 2;
 
 	uint32_t *p = &bitmap.pix32(y);
@@ -326,11 +299,11 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 		gfx = m_pram[(chr<<4) | ra] ^ inv;
 
 		// get colours
-		if (!monopal)
+		if (monopal==0)
 		{
 			col = m_cram[mem];                     // read a byte of colour
 
-			if (m_is_premium)
+			if (BIT(m_features, 3)) // premium
 			{
 				fg = col & 15;
 				bg = col >> 4;

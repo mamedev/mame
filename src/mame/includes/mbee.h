@@ -72,15 +72,15 @@ public:
 	void mbeepc(machine_config &config);
 	void mbee128p(machine_config &config);
 
-	void init_mbeepc85();
-	void init_mbee256();
-	void init_mbee56();
-	void init_mbeett();
-	void init_mbeeppc();
-	void init_mbee();
-	void init_mbeepc();
-	void init_mbeeic();
-	void init_mbee128();
+	void init_mbee()     { m_features = 0x00; };
+	void init_mbeett()   { m_features = 0x0d; };
+	void init_mbeeppc()  { m_features = 0x09; };
+	void init_mbeepp()   { m_features = 0x29; }; // TODO: give 1MB ram when we find out how it is switched (feature byte = 0x39)
+	void init_mbeeic()   { m_features = 0x01; };
+	void init_mbee56()   { m_features = 0x03; };
+	void init_mbee128()  { m_features = 0x11; };
+	void init_mbee128p() { m_features = 0x19; };
+	void init_mbee256()  { m_features = 0x2d; };
 
 private:
 	enum
@@ -116,16 +116,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
 	uint8_t fdc_status_r();
 	void fdc_motor_w(uint8_t data);
-	DECLARE_MACHINE_RESET(mbee);
-	DECLARE_VIDEO_START(mono);
-	DECLARE_VIDEO_START(standard);
-	DECLARE_VIDEO_START(premium);
 	void standard_palette(palette_device &palette) const;
 	void premium_palette(palette_device &palette) const;
-	DECLARE_MACHINE_RESET(mbee56);
-	DECLARE_MACHINE_RESET(mbee128);
-	DECLARE_MACHINE_RESET(mbee256);
-	DECLARE_MACHINE_RESET(mbeett);
 	uint32_t screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_newkb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_bee);
@@ -135,6 +127,8 @@ private:
 	WRITE_LINE_MEMBER(fdc_drq_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
+	void machine_start() override;
+	void machine_reset() override;
 
 	required_device<palette_device> m_palette;
 	void mbee128_io(address_map &map);
@@ -153,8 +147,7 @@ private:
 	void mbeett_io(address_map &map);
 	void mbeett_mem(address_map &map);
 
-	bool m_is_premium;
-	bool m_has_oldkb;
+	u8 m_features;
 	size_t m_size;
 	bool m_b7_rtc;
 	bool m_b7_vs;
@@ -164,9 +157,9 @@ private:
 	uint8_t m_0a;
 	uint8_t m_0b;
 	uint8_t m_1c;
-	uint8_t m_mbee256_was_pressed[15];
-	uint8_t m_mbee256_q[20];
-	uint8_t m_mbee256_q_pos;
+	uint8_t m_newkb_was_pressed[15];
+	uint8_t m_newkb_q[20];
+	uint8_t m_newkb_q_pos;
 	uint8_t m_sy6545_reg[32];
 	uint8_t m_sy6545_ind;
 	uint8_t m_fdc_rq;
@@ -180,7 +173,6 @@ private:
 	void setup_banks(uint8_t data, bool first_time, uint8_t b_mask);
 	void oldkb_scan(uint16_t param);
 	void oldkb_matrix_r(uint16_t offs);
-	void machine_reset_common();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
