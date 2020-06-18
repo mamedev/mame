@@ -303,8 +303,6 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 				if (!BIT(data, 5))
 					b_byte &= 0xfb;  // U42/1 - S17 only valid if S5 is on
 
-				mem.unmap_read (b_vid, b_vid + 0xfff);
-
 				if (!BIT(b_byte, 4))
 				{
 					// select video
@@ -333,8 +331,6 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 
 				if (!BIT(data, 5))
 					b_byte &= 0xfb;  // U42/1 - S17 only valid if S5 is on
-
-				mem.unmap_write (b_vid, b_vid + 0xfff);
 
 				if (!BIT(b_byte, 4))
 				{
@@ -436,13 +432,6 @@ uint8_t mbee_state::telcom_high_r()
 
 void mbee_state::machine_start()
 {
-	// must init these vars here, or weird random crashes can occur when scroll lock pressed
-	m_fdc_rq = 0;
-	m_08 = 0;
-	m_0a = 0;
-	m_0b = 0;
-	m_1c = 0;
-
 	save_item(NAME(m_features));
 	save_item(NAME(m_size));
 	save_item(NAME(m_b7_rtc));
@@ -513,8 +502,8 @@ void mbee_state::machine_start()
 	}
 	else
 	{
-		m_pram = make_unique_clear<u8[]>(0x0800);
-		save_pointer(NAME(m_pram), 0x0800);
+		m_pram = make_unique_clear<u8[]>(0x1000);
+		save_pointer(NAME(m_pram), 0x1000);
 	}
 
 	// Banked systems

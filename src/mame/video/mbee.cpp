@@ -63,7 +63,7 @@ WRITE_LINE_MEMBER( mbee_state::crtc_vs )
 
 uint8_t mbee_state::video_low_r(offs_t offset)
 {
-	if (BIT(m_features, 3) && ((m_1c & 0x9f) == 0x90))
+	if ((m_1c & 0x9f) == 0x90)
 		return m_aram[offset];
 	else
 	if (m_0b)
@@ -77,7 +77,7 @@ void mbee_state::video_low_w(offs_t offset, uint8_t data)
 	if (BIT(m_1c, 4))
 	{
 		// non-premium attribute writes are discarded
-		if (BIT(m_features, 3) && BIT(m_1c, 7))
+		if (BIT(m_1c, 7))
 			m_aram[offset] = data;
 	}
 	else
@@ -86,7 +86,7 @@ void mbee_state::video_low_w(offs_t offset, uint8_t data)
 
 uint8_t mbee_state::video_high_r(offs_t offset)
 {
-	if (BIT(m_08, 6))
+	if (BIT(m_08, 6) && BIT(m_features, 0))
 		return m_cram[offset];
 	else
 		return m_pram[(((m_1c & 15) + 1) << 11) | offset];
@@ -94,7 +94,7 @@ uint8_t mbee_state::video_high_r(offs_t offset)
 
 void mbee_state::video_high_w(offs_t offset, uint8_t data)
 {
-	if (BIT(m_08, 6) && (~m_0b & 1))
+	if (BIT(m_08, 6) && (m_0b==0) && BIT(m_features, 0))
 		m_cram[offset] = data;
 	else
 		m_pram[(((m_1c & 15) + 1) << 11) | offset] = data;
@@ -102,7 +102,8 @@ void mbee_state::video_high_w(offs_t offset, uint8_t data)
 
 void mbee_state::port0b_w(uint8_t data)
 {
-	m_0b = data & 1;
+	if (BIT(m_features, 0))
+		m_0b = data & 1;
 }
 
 uint8_t mbee_state::port08_r()
