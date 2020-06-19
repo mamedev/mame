@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    machine.c
+    machine.cpp
 
     Controls execution of the core MAME system.
 

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    debugcon.c
+    debugcon.cpp
 
     Debugger console engine.
 

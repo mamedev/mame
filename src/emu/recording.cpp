@@ -4,7 +4,7 @@
 
     recording.cpp
 
-    Core MAME video routines.
+    MAME AVI/MNG video recording routines.
 
 ***************************************************************************/
 

@@ -7,6 +7,7 @@
     Device callback interface helpers.
 
 ***************************************************************************/
+
 #ifndef MAME_EMU_DEVCB_H
 #define MAME_EMU_DEVCB_H
 

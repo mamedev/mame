@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    render.c
+    render.cpp
 
     Core rendering system.
 

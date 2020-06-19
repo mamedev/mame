@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    testcpu.c
+    testcpu.cpp
 
     Example driver for performing CPU stress tests.
 

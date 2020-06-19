@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-    diimage.c
+    diimage.cpp
 
     Device image interfaces.
 

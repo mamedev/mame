@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    textbuf.c
+    textbuf.cpp
 
     Debugger text buffering engine.
 

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    debughlp.c
+    debughlp.cpp
 
     Debugger help engine.
 

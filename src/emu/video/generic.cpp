@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /*********************************************************************
 
-    generic.c
+    generic.cpp
 
     Generic simple video functions.
 

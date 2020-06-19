@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    ioport.c
+    ioport.cpp
 
     Input/output port handling.
 

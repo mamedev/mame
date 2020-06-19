@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    dimemory.c
+    dimemory.cpp
 
     Device memory interfaces.
 
