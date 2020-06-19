@@ -307,6 +307,7 @@ SOUNDS["SWP20"] = true
 SOUNDS["SWP30"] = true
 SOUNDS["S_DSP"] = true
 SOUNDS["ROLANDPCM"] = true
+--SOUNDS["TT5665"] = true
 
 --------------------------------------------------
 -- specify available video cores
