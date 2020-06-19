@@ -32739,7 +32739,6 @@ pengo4                          // 834-0386 (c) 1982 Sega
 pengo5                          // 834-0386 (c) 1982 Sega
 pengob                          // bootleg
 penta                           // bootleg
-schick                          // Microhard
 
 @source:pentagon.cpp
 pent1024                        //
@@ -35632,6 +35631,9 @@ sbuggera                        // (c) 1981 Game-A-Tron
 @source:sc2.cpp
 sc2                             //
 sc2a                            //
+
+@source:schick.cpp
+schick                          // Microhard
 
 @source:scm_500.cpp
 scm_500                         //
