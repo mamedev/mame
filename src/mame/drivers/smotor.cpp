@@ -11,7 +11,7 @@
 *********************************************************************
 
   Seems to be a prototype, since there are some issues.
-  You can choose motorcycle <-> car game throug a DIP switch.
+  You can choose motorcycle <-> car game through a DIP switch.
 
   Also there are four difficult modes:
 
@@ -30,9 +30,9 @@
 
 
   Duintronic, the manufacturer, is a Spanish company from Barcelona,
-  created by someone from Ampetronic, and finally adquired by one of
+  created by someone from Ampetronic, and finally acquired by one of
   the Tecfri CEOs. The only arcade game known released by them was
-  Buccaneers, running in IREM M75 Vigilante hardware.
+  Buccaneers, running on IREM M75 Vigilante hardware.
 
 
 *********************************************************************
@@ -154,6 +154,10 @@ public:
 
 	void smotor(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ym2413_device> m_ym2413;
@@ -171,9 +175,6 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-
-	virtual void machine_start() override;
-	virtual void video_start() override;
 
 	void smotor_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -533,4 +534,4 @@ ROM_END
 *********************************************/
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS         INIT        ROT    COMPANY       FULLNAME                  FLAGS
-GAME( 19??, smotor,  0,      smotor,  smotor,  smotor_state, empty_init, ROT0, "Duintronic", "Super Motor (prototype)", 0 )
+GAME( 19??, smotor,  0,      smotor,  smotor,  smotor_state, empty_init, ROT0, "Duintronic", "Super Motor (prototype)", MACHINE_SUPPORTS_SAVE )
