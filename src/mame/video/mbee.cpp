@@ -61,7 +61,7 @@ WRITE_LINE_MEMBER( mbee_state::crtc_vs )
 ************************************************************/
 
 
-uint8_t mbee_state::video_low_r(offs_t offset)
+u8 mbee_state::video_low_r(offs_t offset)
 {
 	if ((m_1c & 0x9f) == 0x90)
 		return m_aram[offset];
@@ -72,7 +72,7 @@ uint8_t mbee_state::video_low_r(offs_t offset)
 		return m_vram[offset];
 }
 
-void mbee_state::video_low_w(offs_t offset, uint8_t data)
+void mbee_state::video_low_w(offs_t offset, u8 data)
 {
 	if (BIT(m_1c, 4))
 	{
@@ -84,7 +84,7 @@ void mbee_state::video_low_w(offs_t offset, uint8_t data)
 		m_vram[offset] = data;
 }
 
-uint8_t mbee_state::video_high_r(offs_t offset)
+u8 mbee_state::video_high_r(offs_t offset)
 {
 	if (BIT(m_08, 6) && BIT(m_features, 0))
 		return m_cram[offset];
@@ -92,7 +92,7 @@ uint8_t mbee_state::video_high_r(offs_t offset)
 		return m_pram[(((m_1c & 15) + 1) << 11) | offset];
 }
 
-void mbee_state::video_high_w(offs_t offset, uint8_t data)
+void mbee_state::video_high_w(offs_t offset, u8 data)
 {
 	if (BIT(m_08, 6) && (m_0b==0) && BIT(m_features, 0))
 		m_cram[offset] = data;
@@ -100,28 +100,28 @@ void mbee_state::video_high_w(offs_t offset, uint8_t data)
 		m_pram[(((m_1c & 15) + 1) << 11) | offset] = data;
 }
 
-void mbee_state::port0b_w(uint8_t data)
+void mbee_state::port0b_w(u8 data)
 {
 	if (BIT(m_features, 0))
 		m_0b = data & 1;
 }
 
-uint8_t mbee_state::port08_r()
+u8 mbee_state::port08_r()
 {
 	return m_08;
 }
 
-void mbee_state::port08_w(uint8_t data)
+void mbee_state::port08_w(u8 data)
 {
 	m_08 = data & 0x4e;
 }
 
-uint8_t mbee_state::port1c_r()
+u8 mbee_state::port1c_r()
 {
 	return m_1c;
 }
 
-void mbee_state::port1c_w(uint8_t data)
+void mbee_state::port1c_w(u8 data)
 {
 /*  d7 extended graphics (1=allow attributes and pcg banks)
     d5 bankswitch basic rom
@@ -145,14 +145,14 @@ void mbee_state::port1c_w(uint8_t data)
 ************************************************************/
 
 
-void mbee_state::oldkb_matrix_r(uint16_t offs)
+void mbee_state::oldkb_matrix_r(u16 offs)
 {
 	if (!BIT(m_features, 2))
 	{
-		uint8_t port = (offs >> 7) & 7;
-		uint8_t bit = (offs >> 4) & 7;
-		uint8_t extra = 0;
-		uint8_t data = m_io_oldkb[port]->read();
+		u8 port = (offs >> 7) & 7;
+		u8 bit = (offs >> 4) & 7;
+		u8 extra = 0;
+		u8 data = m_io_oldkb[port]->read();
 		bool keydown  = BIT(data, bit);
 
 		// This adds premium-style cursor keys to the old keyboard.
@@ -196,7 +196,7 @@ void mbee_state::oldkb_matrix_r(uint16_t offs)
 }
 
 
-void mbee_state::oldkb_scan( uint16_t param )
+void mbee_state::oldkb_scan( u16 param )
 {
 	if (m_0b) return; // IC5 (pins 11,12,13)
 	if (param & 15) return; // only scan once per row instead of 16 times
@@ -210,16 +210,16 @@ void mbee_state::oldkb_scan( uint16_t param )
 
 ************************************************************/
 
-void mbee_state::m6545_index_w(uint8_t data)
+void mbee_state::m6545_index_w(u8 data)
 {
 	data &= 0x1f;
 	m_sy6545_ind = data;
 	m_crtc->address_w(data);
 }
 
-void mbee_state::m6545_data_w(uint8_t data)
+void mbee_state::m6545_data_w(u8 data)
 {
-	static const uint8_t sy6545_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0,0x3f,0xff};
+	static const u8 sy6545_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0,0x3f,0xff};
 
 	switch( m_sy6545_ind )
 	{
@@ -242,7 +242,7 @@ void mbee_state::m6545_data_w(uint8_t data)
 
 ************************************************************/
 
-uint32_t mbee_state::screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 mbee_state::screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_framecnt++;
 	m_crtc->screen_update(screen, bitmap, cliprect);
@@ -264,15 +264,15 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	// colours
-	uint8_t colourm = BIT(m_08, 2, 3);
-	uint8_t monopal = BIT(m_io_config->read(), 4, 2);
+	u8 colourm = BIT(m_08, 1, 3);
+	u8 monopal = BIT(m_io_config->read(), 4, 2);
 	// if colour chosen on mono bee, default to amber
 	if ((monopal==0) && !BIT(m_features, 0))
 		monopal = 2;
 
-	uint32_t *p = &bitmap.pix32(y);
-	uint8_t inv, attr=0, gfx, fg=96+monopal, bg=96, col=0;
-	uint16_t mem, x, chr;
+	u32 *p = &bitmap.pix32(y);
+	u8 inv, attr=0, gfx, fg=96+monopal, bg=96, col=0;
+	u16 mem, x, chr;
 
 	for (x = 0; x < x_count; x++)           // for each character
 	{
@@ -345,19 +345,19 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 
 void mbee_state::standard_palette(palette_device &palette) const
 {
-	constexpr uint8_t bglevel[] = { 0, 0x54, 0xa0, 0xff };
-	constexpr uint8_t fglevel[] = { 0, 0xa0, 0xff, 0xff };
-	uint8_t i;
+	constexpr u8 bglevel[] = { 0, 0x54, 0xa0, 0xff };
+	constexpr u8 fglevel[] = { 0, 0xa0, 0xff, 0xff };
+	u8 i;
 
 	// set up background colours (00-63)
 	i = 0;
-	for (uint8_t b : bglevel)
+	for (u8 b : bglevel)
 	{
-		for (uint8_t g : bglevel)
+		for (u8 g : bglevel)
 		{
-			for (uint8_t r : bglevel)
+			for (u8 r : bglevel)
 			{
-				uint8_t const k = bitswap<8>(i, 7, 6, 5, 3, 1, 4, 2, 0);
+				u8 const k = bitswap<8>(i, 7, 6, 5, 3, 1, 4, 2, 0);
 				palette.set_pen_color(k, rgb_t(r, g, b));
 				i++;
 			}
@@ -365,13 +365,13 @@ void mbee_state::standard_palette(palette_device &palette) const
 	}
 
 	// set up foreground palette (64-95) by reading the prom
-	uint8_t const *const color_prom = memregion("proms")->base();
+	u8 const *const color_prom = memregion("proms")->base();
 	for (i = 0; i < 32; i++)
 	{
-		uint8_t const k = color_prom[i];
-		uint8_t const r = fglevel[(BIT(k, 2))|(BIT(k, 5)<<1)];
-		uint8_t const g = fglevel[(BIT(k, 1))|(BIT(k, 4)<<1)];
-		uint8_t const b = fglevel[(BIT(k, 0))|(BIT(k, 3)<<1)];
+		u8 const k = color_prom[i];
+		u8 const r = fglevel[(BIT(k, 2))|(BIT(k, 5)<<1)];
+		u8 const g = fglevel[(BIT(k, 1))|(BIT(k, 4)<<1)];
+		u8 const b = fglevel[(BIT(k, 0))|(BIT(k, 3)<<1)];
 		palette.set_pen_color(i|64, rgb_t(r, g, b));
 	}
 
@@ -386,11 +386,11 @@ void mbee_state::standard_palette(palette_device &palette) const
 void mbee_state::premium_palette(palette_device &palette) const
 {
 	// set up 8 low intensity colours
-	for (uint8_t i = 0; i < 7; i++)
+	for (u8 i = 0; i < 7; i++)
 	{
-		uint8_t const r = BIT(i, 0) ? 0xc0 : 0;
-		uint8_t const g = BIT(i, 1) ? 0xc0 : 0;
-		uint8_t const b = BIT(i, 2) ? 0xc0 : 0;
+		u8 const r = BIT(i, 0) ? 0xc0 : 0;
+		u8 const g = BIT(i, 1) ? 0xc0 : 0;
+		u8 const b = BIT(i, 2) ? 0xc0 : 0;
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
@@ -398,11 +398,11 @@ void mbee_state::premium_palette(palette_device &palette) const
 	palette.set_pen_color(8, rgb_t(96, 96, 96));
 
 	// set up 8 high intensity colours
-	for (uint8_t i = 9; i < 16; i++)
+	for (u8 i = 9; i < 16; i++)
 	{
-		uint8_t const r = BIT(i, 0) ? 0xff : 0;
-		uint8_t const g = BIT(i, 1) ? 0xff : 0;
-		uint8_t const b = BIT(i, 2) ? 0xff : 0;
+		u8 const r = BIT(i, 0) ? 0xff : 0;
+		u8 const g = BIT(i, 1) ? 0xff : 0;
+		u8 const b = BIT(i, 2) ? 0xff : 0;
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
