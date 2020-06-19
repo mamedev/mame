@@ -415,8 +415,9 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 
 	if (ctrl & 0x0040) // 'vertical compression feature' (later models only?)
 	{
-		if (m_video_regs_1e != 0x0000)
-			popmessage("vertical compression mode with non-0 step amount %04x offset %04x step %04x\n", m_video_regs_1c, m_video_regs_1d, m_video_regs_1e);
+		// used by senspeed
+		//if (m_video_regs_1e != 0x0000)
+		//	popmessage("vertical compression mode with non-0 step amount %04x offset %04x step %04x\n", m_video_regs_1c, m_video_regs_1d, m_video_regs_1e);
 
 		logical_scanline = m_ycmp_table[scanline];
 		if (logical_scanline == 0xffffffff)
