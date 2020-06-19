@@ -1261,6 +1261,7 @@ void tmp95c061_device::sc0buf_w(uint8_t data)
 {
 	// Fake finish sending data
 	m_int_reg[TMP95C061_INTES0] |= 0x80;
+	m_check_irqs = 1;
 }
 
 uint8_t tmp95c061_device::sc0cr_r()
@@ -1305,6 +1306,7 @@ void tmp95c061_device::sc1buf_w(uint8_t data)
 {
 	// Fake finish sending data
 	m_int_reg[TMP95C061_INTES1] |= 0x80;
+	m_check_irqs = 1;
 }
 
 uint8_t tmp95c061_device::sc1cr_r()

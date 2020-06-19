@@ -118,6 +118,8 @@ void tlcs900h_device::device_start()
 	save_item( NAME(m_prefetch_clear) );
 	save_item( NAME(m_prefetch_index) );
 	save_item( NAME(m_prefetch) );
+	save_item( NAME(m_halted) );
+	save_item( NAME(m_regbank) );
 
 	state_add( TLCS900_PC,    "PC",    m_pc.d ).formatstr("%08X");
 	state_add( TLCS900_XWA0,  "XWA0",  m_xwa[0].d ).formatstr("%08X");
