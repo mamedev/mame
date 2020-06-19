@@ -86,7 +86,7 @@ void bowltry_state::bowltry_map(address_map &map)
 	map(0x080000, 0x083fff).ram();
 	//map(0x200000, 0x200003).noprw();
 	//map(0x240000, 0x240001).noprw();
-	//map(0x400000, 0x400006).noprw();
+	//map(0x400000, 0x400005).noprw();
 	map(0x600000, 0x60ffff).ram();
 #if HACK_ENABLED
 	map(0x60e090, 0x60e093).rw(FUNC(bowltry_state::hack_r), FUNC(bowltry_state::hack_w));
