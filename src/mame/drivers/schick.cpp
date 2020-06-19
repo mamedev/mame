@@ -246,19 +246,19 @@ uint32_t schick_state::screen_update_schick(screen_device& screen, bitmap_ind16&
 
 			color = (spriteram[offs + 1] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6);
 
-			m_gfxdecode->gfx(1)->transmask(bitmap, spriteclip,
+			m_gfxdecode->gfx(1)->transpen(bitmap, spriteclip,
 				(spriteram[offs] >> 2) | (m_spritebank << 6),
 				color,
 				fx, fy,
 				sx, sy,
-				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x0f, 0));
+				0);
 
-			m_gfxdecode->gfx(1)->transmask(bitmap, spriteclip,
+			m_gfxdecode->gfx(1)->transpen(bitmap, spriteclip,
 				(spriteram[offs] >> 2) | (m_spritebank << 6),
 				color,
 				fx, fy,
 				sx - 256, sy,
-				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x0f, 0));
+				0);
 		}
 	}
 
