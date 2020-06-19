@@ -38,9 +38,11 @@ ASMJIT_BEGIN_SUB_NAMESPACE(x86)
 
 //! X86-specific function API (calling conventions and other utilities).
 namespace CallConvInternal {
-  //! Initialize `CallConv` structure (X86 specific).
-  Error init(CallConv& cc, uint32_t ccId) noexcept;
-}
+
+//! Initialize `CallConv` structure (X86 specific).
+Error init(CallConv& cc, uint32_t ccId, const Environment& environment) noexcept;
+
+} // {CallConvInternal}
 
 //! \}
 //! \endcond

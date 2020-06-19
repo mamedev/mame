@@ -236,7 +236,7 @@ void bsmt2000_device::write_data(uint16_t data)
 //  the register select port
 //-------------------------------------------------
 
-READ16_MEMBER( bsmt2000_device::tms_register_r )
+uint16_t bsmt2000_device::tms_register_r()
 {
 	return m_register_select;
 }
@@ -247,7 +247,7 @@ READ16_MEMBER( bsmt2000_device::tms_register_r )
 //  data port
 //-------------------------------------------------
 
-READ16_MEMBER( bsmt2000_device::tms_data_r )
+uint16_t bsmt2000_device::tms_data_r()
 {
 	// also implicitly clear the write pending flag
 	m_write_pending = false;
@@ -262,7 +262,7 @@ READ16_MEMBER( bsmt2000_device::tms_data_r )
 //  selected ROM bank and address
 //-------------------------------------------------
 
-READ16_MEMBER( bsmt2000_device::tms_rom_r )
+uint16_t bsmt2000_device::tms_rom_r()
 {
 	// DSP code expects a 16-bit value with the data in the high byte
 	return (int16_t)(read_byte((m_rom_bank << 16) + m_rom_address) << 8);
@@ -274,7 +274,7 @@ READ16_MEMBER( bsmt2000_device::tms_rom_r )
 //  current ROM bank to access
 //-------------------------------------------------
 
-WRITE16_MEMBER( bsmt2000_device::tms_rom_addr_w )
+void bsmt2000_device::tms_rom_addr_w(uint16_t data)
 {
 	m_rom_address = data;
 }
@@ -285,7 +285,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_rom_addr_w )
 //  access
 //-------------------------------------------------
 
-WRITE16_MEMBER( bsmt2000_device::tms_rom_bank_w )
+void bsmt2000_device::tms_rom_bank_w(uint16_t data)
 {
 	m_rom_bank = data;
 }
@@ -296,7 +296,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_rom_bank_w )
 //  DAC
 //-------------------------------------------------
 
-WRITE16_MEMBER( bsmt2000_device::tms_left_w )
+void bsmt2000_device::tms_left_w(uint16_t data)
 {
 	m_stream->update();
 	m_left_data = data;
@@ -308,7 +308,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_left_w )
 //  channel DAC
 //-------------------------------------------------
 
-WRITE16_MEMBER( bsmt2000_device::tms_right_w )
+void bsmt2000_device::tms_right_w(uint16_t data)
 {
 	m_stream->update();
 	m_right_data = data;

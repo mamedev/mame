@@ -45,7 +45,7 @@ public:
 	void kothello(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(shanghai_coin_w);
+	void shanghai_coin_w(uint8_t data);
 	void shanghai_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(half_vblank_irq);
 
@@ -97,7 +97,7 @@ INTERRUPT_GEN_MEMBER(shanghai_state::half_vblank_irq)
 		device.execute().set_input_line_and_vector(0,HOLD_LINE,0x80); // V30
 }
 
-WRITE8_MEMBER(shanghai_state::shanghai_coin_w)
+void shanghai_state::shanghai_coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 1);
 	machine().bookkeeping().coin_counter_w(1,data & 2);

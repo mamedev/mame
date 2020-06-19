@@ -122,7 +122,7 @@ VIDEO_START_MEMBER(fromance_state,hatris)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_gfxreg_w)
+void fromance_state::fromance_gfxreg_w(uint8_t data)
 {
 	m_gfxreg = data;
 	m_flipscreen = (data & 0x01);
@@ -144,7 +144,7 @@ WRITE8_MEMBER(fromance_state::fromance_gfxreg_w)
  *
  *************************************/
 
-READ8_MEMBER(fromance_state::fromance_paletteram_r)
+uint8_t fromance_state::fromance_paletteram_r(offs_t offset)
 {
 	/* adjust for banking and read */
 	offset |= m_selected_paletteram << 11;
@@ -152,7 +152,7 @@ READ8_MEMBER(fromance_state::fromance_paletteram_r)
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_paletteram_w)
+void fromance_state::fromance_paletteram_w(offs_t offset, uint8_t data)
 {
 	int palword;
 
@@ -173,13 +173,13 @@ WRITE8_MEMBER(fromance_state::fromance_paletteram_w)
  *
  *************************************/
 
-READ8_MEMBER(fromance_state::fromance_videoram_r)
+uint8_t fromance_state::fromance_videoram_r(offs_t offset)
 {
 	return m_local_videoram[m_selected_videoram][offset];
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_videoram_w)
+void fromance_state::fromance_videoram_w(offs_t offset, uint8_t data)
 {
 	m_local_videoram[m_selected_videoram][offset] = data;
 	(m_selected_videoram ? m_fg_tilemap : m_bg_tilemap)->mark_tile_dirty(offset & 0x0fff);
@@ -193,7 +193,7 @@ WRITE8_MEMBER(fromance_state::fromance_videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_scroll_w)
+void fromance_state::fromance_scroll_w(offs_t offset, uint8_t data)
 {
 	if (m_flipscreen)
 	{

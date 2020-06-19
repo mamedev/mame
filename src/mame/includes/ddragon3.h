@@ -82,10 +82,10 @@ protected:
 	required_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 
-	DECLARE_WRITE16_MEMBER(ddragon3_scroll_w);
-	DECLARE_READ16_MEMBER(ddragon3_scroll_r);
-	DECLARE_WRITE16_MEMBER(ddragon3_bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(ddragon3_fg_videoram_w);
+	void ddragon3_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ddragon3_scroll_r(offs_t offset);
+	void ddragon3_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ddragon3_fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -94,10 +94,10 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(ddragon3_vreg_w);
-	DECLARE_WRITE16_MEMBER(irq6_ack_w);
-	DECLARE_WRITE16_MEMBER(irq5_ack_w);
-	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
+	void ddragon3_vreg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void irq6_ack_w(uint16_t data);
+	void irq5_ack_w(uint16_t data);
+	void oki_bankswitch_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
@@ -137,15 +137,15 @@ private:
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_ioport_array<2> m_dsw;
 	tilemap_t *m_fg0_tilemap;
-	DECLARE_WRITE16_MEMBER(wwfwfest_fg0_videoram_w);
+	void wwfwfest_fg0_videoram_w(offs_t offset, uint16_t data);
 
 	//required_device<buffered_spriteram16_device> m_spriteram;
-	DECLARE_WRITE8_MEMBER(wwfwfest_priority_w);
-	DECLARE_WRITE16_MEMBER(wwfwfest_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(wwfwfest_flipscreen_w);
-	DECLARE_READ16_MEMBER(wwfwfest_paletteram_r);
-	DECLARE_WRITE16_MEMBER(wwfwfest_paletteram_w);
-	DECLARE_WRITE16_MEMBER(wwfwfest_soundwrite);
+	void wwfwfest_priority_w(uint8_t data);
+	void wwfwfest_irq_ack_w(offs_t offset, uint16_t data);
+	void wwfwfest_flipscreen_w(uint16_t data);
+	uint16_t wwfwfest_paletteram_r(offs_t offset);
+	void wwfwfest_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void wwfwfest_soundwrite(uint16_t data);
 
 	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
 

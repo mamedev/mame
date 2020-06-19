@@ -88,14 +88,14 @@ G  171-8278G  315-6416  2x 512Mbit  RMI
 #include "includes/segasp.h"
 #include "machine/naomim4.h"
 
-READ64_MEMBER(segasp_state::sp_bank_r)
+uint64_t segasp_state::sp_bank_r(offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		return -1;
 	return m_sp_bank;
 }
 
-WRITE64_MEMBER(segasp_state::sp_bank_w)
+void segasp_state::sp_bank_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		return;
@@ -105,7 +105,7 @@ WRITE64_MEMBER(segasp_state::sp_bank_w)
 	m_sp_bank = bank;
 }
 
-READ64_MEMBER(segasp_state::sn_93c46a_r)
+uint64_t segasp_state::sn_93c46a_r()
 {
 	int res;
 
@@ -115,7 +115,7 @@ READ64_MEMBER(segasp_state::sn_93c46a_r)
 	return res;
 }
 
-WRITE64_MEMBER(segasp_state::sn_93c46a_w)
+void segasp_state::sn_93c46a_w(uint64_t data)
 {
 	/* bit 4 is data */
 	/* bit 2 is clock */
@@ -125,14 +125,14 @@ WRITE64_MEMBER(segasp_state::sn_93c46a_w)
 	m_eeprom->clk_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ64_MEMBER(segasp_state::sp_eeprom_r)
+uint64_t segasp_state::sp_eeprom_r(offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		return -1;
 	return m_sp_eeprom->do_read() << 4;
 }
 
-WRITE64_MEMBER(segasp_state::sp_eeprom_w)
+void segasp_state::sp_eeprom_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		return;
@@ -141,14 +141,14 @@ WRITE64_MEMBER(segasp_state::sp_eeprom_w)
 	m_sp_eeprom->clk_write((data & 4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ64_MEMBER(segasp_state::sp_rombdflg_r)
+uint64_t segasp_state::sp_rombdflg_r()
 {
 	// bit 0 - romboard type, 1 = M4
 	// bit 1 - debug mode (enable easter eggs in BIOS, can boot game without proper eeproms/settings)
 	return ioport("CFG")->read();
 }
 
-READ64_MEMBER(segasp_state::sp_io_r)
+uint64_t segasp_state::sp_io_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t retval;
 

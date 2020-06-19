@@ -31,6 +31,58 @@
 
 ASMJIT_BEGIN_SUB_NAMESPACE(x86)
 
+#define ASMJIT_MEM_PTR(FUNC, SIZE)                                                    \
+  static constexpr Mem FUNC(const Gp& base, int32_t offset = 0) noexcept {            \
+    return Mem(base, offset, SIZE);                                                   \
+  }                                                                                   \
+  static constexpr Mem FUNC(const Gp& base, const Gp& index, uint32_t shift = 0, int32_t offset = 0) noexcept { \
+    return Mem(base, index, shift, offset, SIZE);                                     \
+  }                                                                                   \
+  static constexpr Mem FUNC(const Gp& base, const Vec& index, uint32_t shift = 0, int32_t offset = 0) noexcept { \
+    return Mem(base, index, shift, offset, SIZE);                                     \
+  }                                                                                   \
+  static constexpr Mem FUNC(const Label& base, int32_t offset = 0) noexcept {         \
+    return Mem(base, offset, SIZE);                                                   \
+  }                                                                                   \
+  static constexpr Mem FUNC(const Label& base, const Gp& index, uint32_t shift = 0, int32_t offset = 0) noexcept { \
+    return Mem(base, index, shift, offset, SIZE);                                     \
+  }                                                                                   \
+  static constexpr Mem FUNC(const Rip& rip_, int32_t offset = 0) noexcept {           \
+    return Mem(rip_, offset, SIZE);                                                   \
+  }                                                                                   \
+  static constexpr Mem FUNC(uint64_t base) noexcept {                                 \
+    return Mem(base, SIZE);                                                           \
+  }                                                                                   \
+  static constexpr Mem FUNC(uint64_t base, const Gp& index, uint32_t shift = 0) noexcept { \
+    return Mem(base, index, shift, SIZE);                                             \
+  }                                                                                   \
+  static constexpr Mem FUNC(uint64_t base, const Vec& index, uint32_t shift = 0) noexcept { \
+    return Mem(base, index, shift, SIZE);                                             \
+  }                                                                                   \
+                                                                                      \
+  static constexpr Mem FUNC##_abs(uint64_t base) noexcept {                           \
+    return Mem(base, SIZE, BaseMem::kSignatureMemAbs);                                \
+  }                                                                                   \
+  static constexpr Mem FUNC##_abs(uint64_t base, const Gp& index, uint32_t shift = 0) noexcept { \
+    return Mem(base, index, shift, SIZE, BaseMem::kSignatureMemAbs);                  \
+  }                                                                                   \
+  static constexpr Mem FUNC##_abs(uint64_t base, const Vec& index, uint32_t shift = 0) noexcept { \
+    return Mem(base, index, shift, SIZE, BaseMem::kSignatureMemAbs);                  \
+  }                                                                                   \
+                                                                                      \
+  static constexpr Mem FUNC##_rel(uint64_t base) noexcept {                           \
+    return Mem(base, SIZE, BaseMem::kSignatureMemRel);                                \
+  }                                                                                   \
+  static constexpr Mem FUNC##_rel(uint64_t base, const Gp& index, uint32_t shift = 0) noexcept { \
+    return Mem(base, index, shift, SIZE, BaseMem::kSignatureMemRel);                  \
+  }                                                                                   \
+  static constexpr Mem FUNC##_rel(uint64_t base, const Vec& index, uint32_t shift = 0) noexcept { \
+    return Mem(base, index, shift, SIZE, BaseMem::kSignatureMemRel);                  \
+  }
+
+//! \addtogroup asmjit_x86
+//! \{
+
 // ============================================================================
 // [Forward Declarations]
 // ============================================================================
@@ -58,11 +110,8 @@ class St;
 class Bnd;
 class Rip;
 
-//! \addtogroup asmjit_x86
-//! \{
-
 // ============================================================================
-// [asmjit::x86::RegTraits]
+// [asmjit::x86::Reg]
 // ============================================================================
 
 //! Register traits (X86).
@@ -95,10 +144,6 @@ ASMJIT_DEFINE_REG_TRAITS(St   , BaseReg::kTypeCustom + 3, BaseReg::kGroupVirt + 
 ASMJIT_DEFINE_REG_TRAITS(Bnd  , BaseReg::kTypeCustom + 4, BaseReg::kGroupVirt + 4, 16, 4 , Type::kIdVoid  );
 ASMJIT_DEFINE_REG_TRAITS(Rip  , BaseReg::kTypeIP        , BaseReg::kGroupVirt + 5, 0 , 1 , Type::kIdVoid  );
 //! \endcond
-
-// ============================================================================
-// [asmjit::x86::Reg]
-// ============================================================================
 
 //! Register (X86).
 class Reg : public BaseReg {
@@ -403,6 +448,303 @@ inline Ymm Vec::ymm() const noexcept { return Ymm(id()); }
 inline Zmm Vec::zmm() const noexcept { return Zmm(id()); }
 //! \endcond
 
+//! \namespace asmjit::x86::regs
+//!
+//! Registers provided by X86 and X64 ISAs are in both `asmjit::x86` and
+//! `asmjit::x86::regs` namespaces so they can be included with using directive.
+//! For example `using namespace asmjit::x86::regs` would include all registers,
+//! but not other X86-specific API, whereas `using namespace asmjit::x86` would
+//! include everything X86-specific.
+#ifndef _DOXYGEN
+namespace regs {
+#endif
+
+//! Creates an 8-bit low GPB register operand.
+static constexpr GpbLo gpb(uint32_t rId) noexcept { return GpbLo(rId); }
+//! Creates an 8-bit low GPB register operand.
+static constexpr GpbLo gpb_lo(uint32_t rId) noexcept { return GpbLo(rId); }
+//! Creates an 8-bit high GPB register operand.
+static constexpr GpbHi gpb_hi(uint32_t rId) noexcept { return GpbHi(rId); }
+//! Creates a 16-bit GPW register operand.
+static constexpr Gpw gpw(uint32_t rId) noexcept { return Gpw(rId); }
+//! Creates a 32-bit GPD register operand.
+static constexpr Gpd gpd(uint32_t rId) noexcept { return Gpd(rId); }
+//! Creates a 64-bit GPQ register operand (64-bit).
+static constexpr Gpq gpq(uint32_t rId) noexcept { return Gpq(rId); }
+//! Creates a 128-bit XMM register operand.
+static constexpr Xmm xmm(uint32_t rId) noexcept { return Xmm(rId); }
+//! Creates a 256-bit YMM register operand.
+static constexpr Ymm ymm(uint32_t rId) noexcept { return Ymm(rId); }
+//! Creates a 512-bit ZMM register operand.
+static constexpr Zmm zmm(uint32_t rId) noexcept { return Zmm(rId); }
+//! Creates a 64-bit Mm register operand.
+static constexpr Mm mm(uint32_t rId) noexcept { return Mm(rId); }
+//! Creates a 64-bit K register operand.
+static constexpr KReg k(uint32_t rId) noexcept { return KReg(rId); }
+//! Creates a 32-bit or 64-bit control register operand.
+static constexpr CReg cr(uint32_t rId) noexcept { return CReg(rId); }
+//! Creates a 32-bit or 64-bit debug register operand.
+static constexpr DReg dr(uint32_t rId) noexcept { return DReg(rId); }
+//! Creates an 80-bit st register operand.
+static constexpr St st(uint32_t rId) noexcept { return St(rId); }
+//! Creates a 128-bit bound register operand.
+static constexpr Bnd bnd(uint32_t rId) noexcept { return Bnd(rId); }
+
+static constexpr Gp al = Gp(GpbLo::kSignature, Gp::kIdAx);
+static constexpr Gp bl = Gp(GpbLo::kSignature, Gp::kIdBx);
+static constexpr Gp cl = Gp(GpbLo::kSignature, Gp::kIdCx);
+static constexpr Gp dl = Gp(GpbLo::kSignature, Gp::kIdDx);
+static constexpr Gp spl = Gp(GpbLo::kSignature, Gp::kIdSp);
+static constexpr Gp bpl = Gp(GpbLo::kSignature, Gp::kIdBp);
+static constexpr Gp sil = Gp(GpbLo::kSignature, Gp::kIdSi);
+static constexpr Gp dil = Gp(GpbLo::kSignature, Gp::kIdDi);
+static constexpr Gp r8b = Gp(GpbLo::kSignature, Gp::kIdR8);
+static constexpr Gp r9b = Gp(GpbLo::kSignature, Gp::kIdR9);
+static constexpr Gp r10b = Gp(GpbLo::kSignature, Gp::kIdR10);
+static constexpr Gp r11b = Gp(GpbLo::kSignature, Gp::kIdR11);
+static constexpr Gp r12b = Gp(GpbLo::kSignature, Gp::kIdR12);
+static constexpr Gp r13b = Gp(GpbLo::kSignature, Gp::kIdR13);
+static constexpr Gp r14b = Gp(GpbLo::kSignature, Gp::kIdR14);
+static constexpr Gp r15b = Gp(GpbLo::kSignature, Gp::kIdR15);
+
+static constexpr Gp ah = Gp(GpbHi::kSignature, Gp::kIdAx);
+static constexpr Gp bh = Gp(GpbHi::kSignature, Gp::kIdBx);
+static constexpr Gp ch = Gp(GpbHi::kSignature, Gp::kIdCx);
+static constexpr Gp dh = Gp(GpbHi::kSignature, Gp::kIdDx);
+
+static constexpr Gp ax = Gp(Gpw::kSignature, Gp::kIdAx);
+static constexpr Gp bx = Gp(Gpw::kSignature, Gp::kIdBx);
+static constexpr Gp cx = Gp(Gpw::kSignature, Gp::kIdCx);
+static constexpr Gp dx = Gp(Gpw::kSignature, Gp::kIdDx);
+static constexpr Gp sp = Gp(Gpw::kSignature, Gp::kIdSp);
+static constexpr Gp bp = Gp(Gpw::kSignature, Gp::kIdBp);
+static constexpr Gp si = Gp(Gpw::kSignature, Gp::kIdSi);
+static constexpr Gp di = Gp(Gpw::kSignature, Gp::kIdDi);
+static constexpr Gp r8w = Gp(Gpw::kSignature, Gp::kIdR8);
+static constexpr Gp r9w = Gp(Gpw::kSignature, Gp::kIdR9);
+static constexpr Gp r10w = Gp(Gpw::kSignature, Gp::kIdR10);
+static constexpr Gp r11w = Gp(Gpw::kSignature, Gp::kIdR11);
+static constexpr Gp r12w = Gp(Gpw::kSignature, Gp::kIdR12);
+static constexpr Gp r13w = Gp(Gpw::kSignature, Gp::kIdR13);
+static constexpr Gp r14w = Gp(Gpw::kSignature, Gp::kIdR14);
+static constexpr Gp r15w = Gp(Gpw::kSignature, Gp::kIdR15);
+
+static constexpr Gp eax = Gp(Gpd::kSignature, Gp::kIdAx);
+static constexpr Gp ebx = Gp(Gpd::kSignature, Gp::kIdBx);
+static constexpr Gp ecx = Gp(Gpd::kSignature, Gp::kIdCx);
+static constexpr Gp edx = Gp(Gpd::kSignature, Gp::kIdDx);
+static constexpr Gp esp = Gp(Gpd::kSignature, Gp::kIdSp);
+static constexpr Gp ebp = Gp(Gpd::kSignature, Gp::kIdBp);
+static constexpr Gp esi = Gp(Gpd::kSignature, Gp::kIdSi);
+static constexpr Gp edi = Gp(Gpd::kSignature, Gp::kIdDi);
+static constexpr Gp r8d = Gp(Gpd::kSignature, Gp::kIdR8);
+static constexpr Gp r9d = Gp(Gpd::kSignature, Gp::kIdR9);
+static constexpr Gp r10d = Gp(Gpd::kSignature, Gp::kIdR10);
+static constexpr Gp r11d = Gp(Gpd::kSignature, Gp::kIdR11);
+static constexpr Gp r12d = Gp(Gpd::kSignature, Gp::kIdR12);
+static constexpr Gp r13d = Gp(Gpd::kSignature, Gp::kIdR13);
+static constexpr Gp r14d = Gp(Gpd::kSignature, Gp::kIdR14);
+static constexpr Gp r15d = Gp(Gpd::kSignature, Gp::kIdR15);
+
+static constexpr Gp rax = Gp(Gpq::kSignature, Gp::kIdAx);
+static constexpr Gp rbx = Gp(Gpq::kSignature, Gp::kIdBx);
+static constexpr Gp rcx = Gp(Gpq::kSignature, Gp::kIdCx);
+static constexpr Gp rdx = Gp(Gpq::kSignature, Gp::kIdDx);
+static constexpr Gp rsp = Gp(Gpq::kSignature, Gp::kIdSp);
+static constexpr Gp rbp = Gp(Gpq::kSignature, Gp::kIdBp);
+static constexpr Gp rsi = Gp(Gpq::kSignature, Gp::kIdSi);
+static constexpr Gp rdi = Gp(Gpq::kSignature, Gp::kIdDi);
+static constexpr Gp r8 = Gp(Gpq::kSignature, Gp::kIdR8);
+static constexpr Gp r9 = Gp(Gpq::kSignature, Gp::kIdR9);
+static constexpr Gp r10 = Gp(Gpq::kSignature, Gp::kIdR10);
+static constexpr Gp r11 = Gp(Gpq::kSignature, Gp::kIdR11);
+static constexpr Gp r12 = Gp(Gpq::kSignature, Gp::kIdR12);
+static constexpr Gp r13 = Gp(Gpq::kSignature, Gp::kIdR13);
+static constexpr Gp r14 = Gp(Gpq::kSignature, Gp::kIdR14);
+static constexpr Gp r15 = Gp(Gpq::kSignature, Gp::kIdR15);
+
+static constexpr Xmm xmm0 = Xmm(0);
+static constexpr Xmm xmm1 = Xmm(1);
+static constexpr Xmm xmm2 = Xmm(2);
+static constexpr Xmm xmm3 = Xmm(3);
+static constexpr Xmm xmm4 = Xmm(4);
+static constexpr Xmm xmm5 = Xmm(5);
+static constexpr Xmm xmm6 = Xmm(6);
+static constexpr Xmm xmm7 = Xmm(7);
+static constexpr Xmm xmm8 = Xmm(8);
+static constexpr Xmm xmm9 = Xmm(9);
+static constexpr Xmm xmm10 = Xmm(10);
+static constexpr Xmm xmm11 = Xmm(11);
+static constexpr Xmm xmm12 = Xmm(12);
+static constexpr Xmm xmm13 = Xmm(13);
+static constexpr Xmm xmm14 = Xmm(14);
+static constexpr Xmm xmm15 = Xmm(15);
+static constexpr Xmm xmm16 = Xmm(16);
+static constexpr Xmm xmm17 = Xmm(17);
+static constexpr Xmm xmm18 = Xmm(18);
+static constexpr Xmm xmm19 = Xmm(19);
+static constexpr Xmm xmm20 = Xmm(20);
+static constexpr Xmm xmm21 = Xmm(21);
+static constexpr Xmm xmm22 = Xmm(22);
+static constexpr Xmm xmm23 = Xmm(23);
+static constexpr Xmm xmm24 = Xmm(24);
+static constexpr Xmm xmm25 = Xmm(25);
+static constexpr Xmm xmm26 = Xmm(26);
+static constexpr Xmm xmm27 = Xmm(27);
+static constexpr Xmm xmm28 = Xmm(28);
+static constexpr Xmm xmm29 = Xmm(29);
+static constexpr Xmm xmm30 = Xmm(30);
+static constexpr Xmm xmm31 = Xmm(31);
+
+static constexpr Ymm ymm0 = Ymm(0);
+static constexpr Ymm ymm1 = Ymm(1);
+static constexpr Ymm ymm2 = Ymm(2);
+static constexpr Ymm ymm3 = Ymm(3);
+static constexpr Ymm ymm4 = Ymm(4);
+static constexpr Ymm ymm5 = Ymm(5);
+static constexpr Ymm ymm6 = Ymm(6);
+static constexpr Ymm ymm7 = Ymm(7);
+static constexpr Ymm ymm8 = Ymm(8);
+static constexpr Ymm ymm9 = Ymm(9);
+static constexpr Ymm ymm10 = Ymm(10);
+static constexpr Ymm ymm11 = Ymm(11);
+static constexpr Ymm ymm12 = Ymm(12);
+static constexpr Ymm ymm13 = Ymm(13);
+static constexpr Ymm ymm14 = Ymm(14);
+static constexpr Ymm ymm15 = Ymm(15);
+static constexpr Ymm ymm16 = Ymm(16);
+static constexpr Ymm ymm17 = Ymm(17);
+static constexpr Ymm ymm18 = Ymm(18);
+static constexpr Ymm ymm19 = Ymm(19);
+static constexpr Ymm ymm20 = Ymm(20);
+static constexpr Ymm ymm21 = Ymm(21);
+static constexpr Ymm ymm22 = Ymm(22);
+static constexpr Ymm ymm23 = Ymm(23);
+static constexpr Ymm ymm24 = Ymm(24);
+static constexpr Ymm ymm25 = Ymm(25);
+static constexpr Ymm ymm26 = Ymm(26);
+static constexpr Ymm ymm27 = Ymm(27);
+static constexpr Ymm ymm28 = Ymm(28);
+static constexpr Ymm ymm29 = Ymm(29);
+static constexpr Ymm ymm30 = Ymm(30);
+static constexpr Ymm ymm31 = Ymm(31);
+
+static constexpr Zmm zmm0 = Zmm(0);
+static constexpr Zmm zmm1 = Zmm(1);
+static constexpr Zmm zmm2 = Zmm(2);
+static constexpr Zmm zmm3 = Zmm(3);
+static constexpr Zmm zmm4 = Zmm(4);
+static constexpr Zmm zmm5 = Zmm(5);
+static constexpr Zmm zmm6 = Zmm(6);
+static constexpr Zmm zmm7 = Zmm(7);
+static constexpr Zmm zmm8 = Zmm(8);
+static constexpr Zmm zmm9 = Zmm(9);
+static constexpr Zmm zmm10 = Zmm(10);
+static constexpr Zmm zmm11 = Zmm(11);
+static constexpr Zmm zmm12 = Zmm(12);
+static constexpr Zmm zmm13 = Zmm(13);
+static constexpr Zmm zmm14 = Zmm(14);
+static constexpr Zmm zmm15 = Zmm(15);
+static constexpr Zmm zmm16 = Zmm(16);
+static constexpr Zmm zmm17 = Zmm(17);
+static constexpr Zmm zmm18 = Zmm(18);
+static constexpr Zmm zmm19 = Zmm(19);
+static constexpr Zmm zmm20 = Zmm(20);
+static constexpr Zmm zmm21 = Zmm(21);
+static constexpr Zmm zmm22 = Zmm(22);
+static constexpr Zmm zmm23 = Zmm(23);
+static constexpr Zmm zmm24 = Zmm(24);
+static constexpr Zmm zmm25 = Zmm(25);
+static constexpr Zmm zmm26 = Zmm(26);
+static constexpr Zmm zmm27 = Zmm(27);
+static constexpr Zmm zmm28 = Zmm(28);
+static constexpr Zmm zmm29 = Zmm(29);
+static constexpr Zmm zmm30 = Zmm(30);
+static constexpr Zmm zmm31 = Zmm(31);
+
+static constexpr Mm mm0 = Mm(0);
+static constexpr Mm mm1 = Mm(1);
+static constexpr Mm mm2 = Mm(2);
+static constexpr Mm mm3 = Mm(3);
+static constexpr Mm mm4 = Mm(4);
+static constexpr Mm mm5 = Mm(5);
+static constexpr Mm mm6 = Mm(6);
+static constexpr Mm mm7 = Mm(7);
+
+static constexpr KReg k0 = KReg(0);
+static constexpr KReg k1 = KReg(1);
+static constexpr KReg k2 = KReg(2);
+static constexpr KReg k3 = KReg(3);
+static constexpr KReg k4 = KReg(4);
+static constexpr KReg k5 = KReg(5);
+static constexpr KReg k6 = KReg(6);
+static constexpr KReg k7 = KReg(7);
+
+static constexpr SReg no_seg = SReg(SReg::kIdNone);
+static constexpr SReg es = SReg(SReg::kIdEs);
+static constexpr SReg cs = SReg(SReg::kIdCs);
+static constexpr SReg ss = SReg(SReg::kIdSs);
+static constexpr SReg ds = SReg(SReg::kIdDs);
+static constexpr SReg fs = SReg(SReg::kIdFs);
+static constexpr SReg gs = SReg(SReg::kIdGs);
+
+static constexpr CReg cr0 = CReg(0);
+static constexpr CReg cr1 = CReg(1);
+static constexpr CReg cr2 = CReg(2);
+static constexpr CReg cr3 = CReg(3);
+static constexpr CReg cr4 = CReg(4);
+static constexpr CReg cr5 = CReg(5);
+static constexpr CReg cr6 = CReg(6);
+static constexpr CReg cr7 = CReg(7);
+static constexpr CReg cr8 = CReg(8);
+static constexpr CReg cr9 = CReg(9);
+static constexpr CReg cr10 = CReg(10);
+static constexpr CReg cr11 = CReg(11);
+static constexpr CReg cr12 = CReg(12);
+static constexpr CReg cr13 = CReg(13);
+static constexpr CReg cr14 = CReg(14);
+static constexpr CReg cr15 = CReg(15);
+
+static constexpr DReg dr0 = DReg(0);
+static constexpr DReg dr1 = DReg(1);
+static constexpr DReg dr2 = DReg(2);
+static constexpr DReg dr3 = DReg(3);
+static constexpr DReg dr4 = DReg(4);
+static constexpr DReg dr5 = DReg(5);
+static constexpr DReg dr6 = DReg(6);
+static constexpr DReg dr7 = DReg(7);
+static constexpr DReg dr8 = DReg(8);
+static constexpr DReg dr9 = DReg(9);
+static constexpr DReg dr10 = DReg(10);
+static constexpr DReg dr11 = DReg(11);
+static constexpr DReg dr12 = DReg(12);
+static constexpr DReg dr13 = DReg(13);
+static constexpr DReg dr14 = DReg(14);
+static constexpr DReg dr15 = DReg(15);
+
+static constexpr St st0 = St(0);
+static constexpr St st1 = St(1);
+static constexpr St st2 = St(2);
+static constexpr St st3 = St(3);
+static constexpr St st4 = St(4);
+static constexpr St st5 = St(5);
+static constexpr St st6 = St(6);
+static constexpr St st7 = St(7);
+
+static constexpr Bnd bnd0 = Bnd(0);
+static constexpr Bnd bnd1 = Bnd(1);
+static constexpr Bnd bnd2 = Bnd(2);
+static constexpr Bnd bnd3 = Bnd(3);
+
+static constexpr Rip rip = Rip(0);
+
+#ifndef _DOXYGEN
+} // {regs}
+
+// Make `x86::regs` accessible through `x86` namespace as well.
+using namespace regs;
+#endif
+
 // ============================================================================
 // [asmjit::x86::Mem]
 // ============================================================================
@@ -552,328 +894,6 @@ public:
   inline Mem& operator=(const Mem& other) noexcept = default;
 };
 
-// ============================================================================
-// [asmjit::x86::OpData]
-// ============================================================================
-
-struct OpData {
-  //! Information about all architecture registers.
-  ArchRegs archRegs;
-};
-ASMJIT_VARAPI const OpData opData;
-
-//! \cond
-// ... Reg methods that require `opData`.
-inline uint32_t Reg::groupOf(uint32_t rType) noexcept {
-  ASMJIT_ASSERT(rType <= BaseReg::kTypeMax);
-  return opData.archRegs.regInfo[rType].group();
-}
-
-inline uint32_t Reg::typeIdOf(uint32_t rType) noexcept {
-  ASMJIT_ASSERT(rType <= BaseReg::kTypeMax);
-  return opData.archRegs.regTypeToTypeId[rType];
-}
-
-inline uint32_t Reg::signatureOf(uint32_t rType) noexcept {
-  ASMJIT_ASSERT(rType <= BaseReg::kTypeMax);
-  return opData.archRegs.regInfo[rType].signature();
-}
-//! \endcond
-
-// ============================================================================
-// [asmjit::x86::regs]
-// ============================================================================
-
-namespace regs {
-
-//! Creates an 8-bit low GPB register operand.
-static constexpr GpbLo gpb(uint32_t rId) noexcept { return GpbLo(rId); }
-//! Creates an 8-bit low GPB register operand.
-static constexpr GpbLo gpb_lo(uint32_t rId) noexcept { return GpbLo(rId); }
-//! Creates an 8-bit high GPB register operand.
-static constexpr GpbHi gpb_hi(uint32_t rId) noexcept { return GpbHi(rId); }
-//! Creates a 16-bit GPW register operand.
-static constexpr Gpw gpw(uint32_t rId) noexcept { return Gpw(rId); }
-//! Creates a 32-bit GPD register operand.
-static constexpr Gpd gpd(uint32_t rId) noexcept { return Gpd(rId); }
-//! Creates a 64-bit GPQ register operand (64-bit).
-static constexpr Gpq gpq(uint32_t rId) noexcept { return Gpq(rId); }
-//! Creates a 128-bit XMM register operand.
-static constexpr Xmm xmm(uint32_t rId) noexcept { return Xmm(rId); }
-//! Creates a 256-bit YMM register operand.
-static constexpr Ymm ymm(uint32_t rId) noexcept { return Ymm(rId); }
-//! Creates a 512-bit ZMM register operand.
-static constexpr Zmm zmm(uint32_t rId) noexcept { return Zmm(rId); }
-//! Creates a 64-bit Mm register operand.
-static constexpr Mm mm(uint32_t rId) noexcept { return Mm(rId); }
-//! Creates a 64-bit K register operand.
-static constexpr KReg k(uint32_t rId) noexcept { return KReg(rId); }
-//! Creates a 32-bit or 64-bit control register operand.
-static constexpr CReg cr(uint32_t rId) noexcept { return CReg(rId); }
-//! Creates a 32-bit or 64-bit debug register operand.
-static constexpr DReg dr(uint32_t rId) noexcept { return DReg(rId); }
-//! Creates an 80-bit st register operand.
-static constexpr St st(uint32_t rId) noexcept { return St(rId); }
-//! Creates a 128-bit bound register operand.
-static constexpr Bnd bnd(uint32_t rId) noexcept { return Bnd(rId); }
-
-static constexpr Gp al(GpbLo::kSignature, Gp::kIdAx);
-static constexpr Gp bl(GpbLo::kSignature, Gp::kIdBx);
-static constexpr Gp cl(GpbLo::kSignature, Gp::kIdCx);
-static constexpr Gp dl(GpbLo::kSignature, Gp::kIdDx);
-static constexpr Gp spl(GpbLo::kSignature, Gp::kIdSp);
-static constexpr Gp bpl(GpbLo::kSignature, Gp::kIdBp);
-static constexpr Gp sil(GpbLo::kSignature, Gp::kIdSi);
-static constexpr Gp dil(GpbLo::kSignature, Gp::kIdDi);
-static constexpr Gp r8b(GpbLo::kSignature, Gp::kIdR8);
-static constexpr Gp r9b(GpbLo::kSignature, Gp::kIdR9);
-static constexpr Gp r10b(GpbLo::kSignature, Gp::kIdR10);
-static constexpr Gp r11b(GpbLo::kSignature, Gp::kIdR11);
-static constexpr Gp r12b(GpbLo::kSignature, Gp::kIdR12);
-static constexpr Gp r13b(GpbLo::kSignature, Gp::kIdR13);
-static constexpr Gp r14b(GpbLo::kSignature, Gp::kIdR14);
-static constexpr Gp r15b(GpbLo::kSignature, Gp::kIdR15);
-
-static constexpr Gp ah(GpbHi::kSignature, Gp::kIdAx);
-static constexpr Gp bh(GpbHi::kSignature, Gp::kIdBx);
-static constexpr Gp ch(GpbHi::kSignature, Gp::kIdCx);
-static constexpr Gp dh(GpbHi::kSignature, Gp::kIdDx);
-
-static constexpr Gp ax(Gpw::kSignature, Gp::kIdAx);
-static constexpr Gp bx(Gpw::kSignature, Gp::kIdBx);
-static constexpr Gp cx(Gpw::kSignature, Gp::kIdCx);
-static constexpr Gp dx(Gpw::kSignature, Gp::kIdDx);
-static constexpr Gp sp(Gpw::kSignature, Gp::kIdSp);
-static constexpr Gp bp(Gpw::kSignature, Gp::kIdBp);
-static constexpr Gp si(Gpw::kSignature, Gp::kIdSi);
-static constexpr Gp di(Gpw::kSignature, Gp::kIdDi);
-static constexpr Gp r8w(Gpw::kSignature, Gp::kIdR8);
-static constexpr Gp r9w(Gpw::kSignature, Gp::kIdR9);
-static constexpr Gp r10w(Gpw::kSignature, Gp::kIdR10);
-static constexpr Gp r11w(Gpw::kSignature, Gp::kIdR11);
-static constexpr Gp r12w(Gpw::kSignature, Gp::kIdR12);
-static constexpr Gp r13w(Gpw::kSignature, Gp::kIdR13);
-static constexpr Gp r14w(Gpw::kSignature, Gp::kIdR14);
-static constexpr Gp r15w(Gpw::kSignature, Gp::kIdR15);
-
-static constexpr Gp eax(Gpd::kSignature, Gp::kIdAx);
-static constexpr Gp ebx(Gpd::kSignature, Gp::kIdBx);
-static constexpr Gp ecx(Gpd::kSignature, Gp::kIdCx);
-static constexpr Gp edx(Gpd::kSignature, Gp::kIdDx);
-static constexpr Gp esp(Gpd::kSignature, Gp::kIdSp);
-static constexpr Gp ebp(Gpd::kSignature, Gp::kIdBp);
-static constexpr Gp esi(Gpd::kSignature, Gp::kIdSi);
-static constexpr Gp edi(Gpd::kSignature, Gp::kIdDi);
-static constexpr Gp r8d(Gpd::kSignature, Gp::kIdR8);
-static constexpr Gp r9d(Gpd::kSignature, Gp::kIdR9);
-static constexpr Gp r10d(Gpd::kSignature, Gp::kIdR10);
-static constexpr Gp r11d(Gpd::kSignature, Gp::kIdR11);
-static constexpr Gp r12d(Gpd::kSignature, Gp::kIdR12);
-static constexpr Gp r13d(Gpd::kSignature, Gp::kIdR13);
-static constexpr Gp r14d(Gpd::kSignature, Gp::kIdR14);
-static constexpr Gp r15d(Gpd::kSignature, Gp::kIdR15);
-
-static constexpr Gp rax(Gpq::kSignature, Gp::kIdAx);
-static constexpr Gp rbx(Gpq::kSignature, Gp::kIdBx);
-static constexpr Gp rcx(Gpq::kSignature, Gp::kIdCx);
-static constexpr Gp rdx(Gpq::kSignature, Gp::kIdDx);
-static constexpr Gp rsp(Gpq::kSignature, Gp::kIdSp);
-static constexpr Gp rbp(Gpq::kSignature, Gp::kIdBp);
-static constexpr Gp rsi(Gpq::kSignature, Gp::kIdSi);
-static constexpr Gp rdi(Gpq::kSignature, Gp::kIdDi);
-static constexpr Gp r8(Gpq::kSignature, Gp::kIdR8);
-static constexpr Gp r9(Gpq::kSignature, Gp::kIdR9);
-static constexpr Gp r10(Gpq::kSignature, Gp::kIdR10);
-static constexpr Gp r11(Gpq::kSignature, Gp::kIdR11);
-static constexpr Gp r12(Gpq::kSignature, Gp::kIdR12);
-static constexpr Gp r13(Gpq::kSignature, Gp::kIdR13);
-static constexpr Gp r14(Gpq::kSignature, Gp::kIdR14);
-static constexpr Gp r15(Gpq::kSignature, Gp::kIdR15);
-
-static constexpr Xmm xmm0(0);
-static constexpr Xmm xmm1(1);
-static constexpr Xmm xmm2(2);
-static constexpr Xmm xmm3(3);
-static constexpr Xmm xmm4(4);
-static constexpr Xmm xmm5(5);
-static constexpr Xmm xmm6(6);
-static constexpr Xmm xmm7(7);
-static constexpr Xmm xmm8(8);
-static constexpr Xmm xmm9(9);
-static constexpr Xmm xmm10(10);
-static constexpr Xmm xmm11(11);
-static constexpr Xmm xmm12(12);
-static constexpr Xmm xmm13(13);
-static constexpr Xmm xmm14(14);
-static constexpr Xmm xmm15(15);
-static constexpr Xmm xmm16(16);
-static constexpr Xmm xmm17(17);
-static constexpr Xmm xmm18(18);
-static constexpr Xmm xmm19(19);
-static constexpr Xmm xmm20(20);
-static constexpr Xmm xmm21(21);
-static constexpr Xmm xmm22(22);
-static constexpr Xmm xmm23(23);
-static constexpr Xmm xmm24(24);
-static constexpr Xmm xmm25(25);
-static constexpr Xmm xmm26(26);
-static constexpr Xmm xmm27(27);
-static constexpr Xmm xmm28(28);
-static constexpr Xmm xmm29(29);
-static constexpr Xmm xmm30(30);
-static constexpr Xmm xmm31(31);
-
-static constexpr Ymm ymm0(0);
-static constexpr Ymm ymm1(1);
-static constexpr Ymm ymm2(2);
-static constexpr Ymm ymm3(3);
-static constexpr Ymm ymm4(4);
-static constexpr Ymm ymm5(5);
-static constexpr Ymm ymm6(6);
-static constexpr Ymm ymm7(7);
-static constexpr Ymm ymm8(8);
-static constexpr Ymm ymm9(9);
-static constexpr Ymm ymm10(10);
-static constexpr Ymm ymm11(11);
-static constexpr Ymm ymm12(12);
-static constexpr Ymm ymm13(13);
-static constexpr Ymm ymm14(14);
-static constexpr Ymm ymm15(15);
-static constexpr Ymm ymm16(16);
-static constexpr Ymm ymm17(17);
-static constexpr Ymm ymm18(18);
-static constexpr Ymm ymm19(19);
-static constexpr Ymm ymm20(20);
-static constexpr Ymm ymm21(21);
-static constexpr Ymm ymm22(22);
-static constexpr Ymm ymm23(23);
-static constexpr Ymm ymm24(24);
-static constexpr Ymm ymm25(25);
-static constexpr Ymm ymm26(26);
-static constexpr Ymm ymm27(27);
-static constexpr Ymm ymm28(28);
-static constexpr Ymm ymm29(29);
-static constexpr Ymm ymm30(30);
-static constexpr Ymm ymm31(31);
-
-static constexpr Zmm zmm0(0);
-static constexpr Zmm zmm1(1);
-static constexpr Zmm zmm2(2);
-static constexpr Zmm zmm3(3);
-static constexpr Zmm zmm4(4);
-static constexpr Zmm zmm5(5);
-static constexpr Zmm zmm6(6);
-static constexpr Zmm zmm7(7);
-static constexpr Zmm zmm8(8);
-static constexpr Zmm zmm9(9);
-static constexpr Zmm zmm10(10);
-static constexpr Zmm zmm11(11);
-static constexpr Zmm zmm12(12);
-static constexpr Zmm zmm13(13);
-static constexpr Zmm zmm14(14);
-static constexpr Zmm zmm15(15);
-static constexpr Zmm zmm16(16);
-static constexpr Zmm zmm17(17);
-static constexpr Zmm zmm18(18);
-static constexpr Zmm zmm19(19);
-static constexpr Zmm zmm20(20);
-static constexpr Zmm zmm21(21);
-static constexpr Zmm zmm22(22);
-static constexpr Zmm zmm23(23);
-static constexpr Zmm zmm24(24);
-static constexpr Zmm zmm25(25);
-static constexpr Zmm zmm26(26);
-static constexpr Zmm zmm27(27);
-static constexpr Zmm zmm28(28);
-static constexpr Zmm zmm29(29);
-static constexpr Zmm zmm30(30);
-static constexpr Zmm zmm31(31);
-
-static constexpr Mm mm0(0);
-static constexpr Mm mm1(1);
-static constexpr Mm mm2(2);
-static constexpr Mm mm3(3);
-static constexpr Mm mm4(4);
-static constexpr Mm mm5(5);
-static constexpr Mm mm6(6);
-static constexpr Mm mm7(7);
-
-static constexpr KReg k0(0);
-static constexpr KReg k1(1);
-static constexpr KReg k2(2);
-static constexpr KReg k3(3);
-static constexpr KReg k4(4);
-static constexpr KReg k5(5);
-static constexpr KReg k6(6);
-static constexpr KReg k7(7);
-
-static constexpr SReg no_seg(SReg::kIdNone);
-static constexpr SReg es(SReg::kIdEs);
-static constexpr SReg cs(SReg::kIdCs);
-static constexpr SReg ss(SReg::kIdSs);
-static constexpr SReg ds(SReg::kIdDs);
-static constexpr SReg fs(SReg::kIdFs);
-static constexpr SReg gs(SReg::kIdGs);
-
-static constexpr CReg cr0(0);
-static constexpr CReg cr1(1);
-static constexpr CReg cr2(2);
-static constexpr CReg cr3(3);
-static constexpr CReg cr4(4);
-static constexpr CReg cr5(5);
-static constexpr CReg cr6(6);
-static constexpr CReg cr7(7);
-static constexpr CReg cr8(8);
-static constexpr CReg cr9(9);
-static constexpr CReg cr10(10);
-static constexpr CReg cr11(11);
-static constexpr CReg cr12(12);
-static constexpr CReg cr13(13);
-static constexpr CReg cr14(14);
-static constexpr CReg cr15(15);
-
-static constexpr DReg dr0(0);
-static constexpr DReg dr1(1);
-static constexpr DReg dr2(2);
-static constexpr DReg dr3(3);
-static constexpr DReg dr4(4);
-static constexpr DReg dr5(5);
-static constexpr DReg dr6(6);
-static constexpr DReg dr7(7);
-static constexpr DReg dr8(8);
-static constexpr DReg dr9(9);
-static constexpr DReg dr10(10);
-static constexpr DReg dr11(11);
-static constexpr DReg dr12(12);
-static constexpr DReg dr13(13);
-static constexpr DReg dr14(14);
-static constexpr DReg dr15(15);
-
-static constexpr St st0(0);
-static constexpr St st1(1);
-static constexpr St st2(2);
-static constexpr St st3(3);
-static constexpr St st4(4);
-static constexpr St st5(5);
-static constexpr St st6(6);
-static constexpr St st7(7);
-
-static constexpr Bnd bnd0(0);
-static constexpr Bnd bnd1(1);
-static constexpr Bnd bnd2(2);
-static constexpr Bnd bnd3(3);
-
-static constexpr Rip rip(0);
-
-} // {regs}
-
-// Make `x86::regs` accessible through `x86` namespace as well.
-using namespace regs;
-
-// ============================================================================
-// [asmjit::x86::ptr]
-// ============================================================================
-
 //! Creates `[base.reg + offset]` memory operand.
 static constexpr Mem ptr(const Gp& base, int32_t offset = 0, uint32_t size = 0) noexcept {
   return Mem(base, offset, size);
@@ -944,70 +964,6 @@ static constexpr Mem ptr_rel(uint64_t base, const Vec& index, uint32_t shift = 0
   return Mem(base, index, shift, size, BaseMem::kSignatureMemRel);
 }
 
-#define ASMJIT_MEM_PTR(FUNC, SIZE)                                                    \
-  /*! Creates `[base + offset]` memory operand. */                                    \
-  static constexpr Mem FUNC(const Gp& base, int32_t offset = 0) noexcept {            \
-    return Mem(base, offset, SIZE);                                                   \
-  }                                                                                   \
-  /*! Creates `[base + (index << shift) + offset]` memory operand. */                 \
-  static constexpr Mem FUNC(const Gp& base, const Gp& index, uint32_t shift = 0, int32_t offset = 0) noexcept { \
-    return Mem(base, index, shift, offset, SIZE);                                     \
-  }                                                                                   \
-  /*! Creates `[base + (vec_index << shift) + offset]` memory operand. */             \
-  static constexpr Mem FUNC(const Gp& base, const Vec& index, uint32_t shift = 0, int32_t offset = 0) noexcept { \
-    return Mem(base, index, shift, offset, SIZE);                                     \
-  }                                                                                   \
-  /*! Creates `[base + offset]` memory operand. */                                    \
-  static constexpr Mem FUNC(const Label& base, int32_t offset = 0) noexcept {         \
-    return Mem(base, offset, SIZE);                                                   \
-  }                                                                                   \
-  /*! Creates `[base + (index << shift) + offset]` memory operand. */                 \
-  static constexpr Mem FUNC(const Label& base, const Gp& index, uint32_t shift = 0, int32_t offset = 0) noexcept { \
-    return Mem(base, index, shift, offset, SIZE);                                     \
-  }                                                                                   \
-  /*! Creates `[rip + offset]` memory operand. */                                     \
-  static constexpr Mem FUNC(const Rip& rip_, int32_t offset = 0) noexcept {           \
-    return Mem(rip_, offset, SIZE);                                                   \
-  }                                                                                   \
-  /*! Creates `[ptr]` memory operand. */                                              \
-  static constexpr Mem FUNC(uint64_t base) noexcept {                                 \
-    return Mem(base, SIZE);                                                           \
-  }                                                                                   \
-  /*! Creates `[base + (index << shift) + offset]` memory operand. */                 \
-  static constexpr Mem FUNC(uint64_t base, const Gp& index, uint32_t shift = 0) noexcept { \
-    return Mem(base, index, shift, SIZE);                                             \
-  }                                                                                   \
-  /*! Creates `[base + (vec_index << shift) + offset]` memory operand. */             \
-  static constexpr Mem FUNC(uint64_t base, const Vec& index, uint32_t shift = 0) noexcept { \
-    return Mem(base, index, shift, SIZE);                                             \
-  }                                                                                   \
-                                                                                      \
-  /*! Creates `[base + offset]` memory operand (absolute). */                         \
-  static constexpr Mem FUNC##_abs(uint64_t base) noexcept {                           \
-    return Mem(base, SIZE, BaseMem::kSignatureMemAbs);                                \
-  }                                                                                   \
-  /*! Creates `[base + (index << shift) + offset]` memory operand (absolute). */      \
-  static constexpr Mem FUNC##_abs(uint64_t base, const Gp& index, uint32_t shift = 0) noexcept { \
-    return Mem(base, index, shift, SIZE, BaseMem::kSignatureMemAbs);                  \
-  }                                                                                   \
-  /*! Creates `[base + (vec_index << shift) + offset]` memory operand (absolute). */  \
-  static constexpr Mem FUNC##_abs(uint64_t base, const Vec& index, uint32_t shift = 0) noexcept { \
-    return Mem(base, index, shift, SIZE, BaseMem::kSignatureMemAbs);                  \
-  }                                                                                   \
-                                                                                      \
-  /*! Creates `[base + offset]` memory operand (relative). */                         \
-  static constexpr Mem FUNC##_rel(uint64_t base) noexcept {                           \
-    return Mem(base, SIZE, BaseMem::kSignatureMemRel);                                \
-  }                                                                                   \
-  /*! Creates `[base + (index << shift) + offset]` memory operand (relative). */      \
-  static constexpr Mem FUNC##_rel(uint64_t base, const Gp& index, uint32_t shift = 0) noexcept { \
-    return Mem(base, index, shift, SIZE, BaseMem::kSignatureMemRel);                  \
-  }                                                                                   \
-  /*! Creates `[base + (vec_index << shift) + offset]` memory operand (relative). */  \
-  static constexpr Mem FUNC##_rel(uint64_t base, const Vec& index, uint32_t shift = 0) noexcept { \
-    return Mem(base, index, shift, SIZE, BaseMem::kSignatureMemRel);                  \
-  }
-
 // Definition of memory operand constructors that use platform independent naming.
 ASMJIT_MEM_PTR(ptr_8, 1)
 ASMJIT_MEM_PTR(ptr_16, 2)
@@ -1032,7 +988,33 @@ ASMJIT_MEM_PTR(xmmword_ptr, 16)
 ASMJIT_MEM_PTR(ymmword_ptr, 32)
 ASMJIT_MEM_PTR(zmmword_ptr, 64)
 
-#undef ASMJIT_MEM_PTR
+// ============================================================================
+// [asmjit::x86::OpData]
+// ============================================================================
+
+struct OpData {
+  //! Information about all architecture registers.
+  ArchRegs archRegs;
+};
+ASMJIT_VARAPI const OpData opData;
+
+//! \cond
+// ... Reg methods that require `opData`.
+inline uint32_t Reg::groupOf(uint32_t rType) noexcept {
+  ASMJIT_ASSERT(rType <= BaseReg::kTypeMax);
+  return opData.archRegs.regInfo[rType].group();
+}
+
+inline uint32_t Reg::typeIdOf(uint32_t rType) noexcept {
+  ASMJIT_ASSERT(rType <= BaseReg::kTypeMax);
+  return opData.archRegs.regTypeToTypeId[rType];
+}
+
+inline uint32_t Reg::signatureOf(uint32_t rType) noexcept {
+  ASMJIT_ASSERT(rType <= BaseReg::kTypeMax);
+  return opData.archRegs.regInfo[rType].signature();
+}
+//! \endcond
 
 //! \}
 
@@ -1043,7 +1025,6 @@ ASMJIT_END_SUB_NAMESPACE
 // ============================================================================
 
 //! \cond INTERNAL
-
 ASMJIT_BEGIN_NAMESPACE
 ASMJIT_DEFINE_TYPE_ID(x86::Gpb, kIdI8);
 ASMJIT_DEFINE_TYPE_ID(x86::Gpw, kIdI16);
@@ -1054,7 +1035,8 @@ ASMJIT_DEFINE_TYPE_ID(x86::Xmm, kIdI32x4);
 ASMJIT_DEFINE_TYPE_ID(x86::Ymm, kIdI32x8);
 ASMJIT_DEFINE_TYPE_ID(x86::Zmm, kIdI32x16);
 ASMJIT_END_NAMESPACE
-
 //! \endcond
+
+#undef ASMJIT_MEM_PTR
 
 #endif // ASMJIT_X86_X86OPERAND_H_INCLUDED

@@ -49,15 +49,15 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(jackalr_rotary_r);
-	DECLARE_WRITE8_MEMBER(jackal_flipscreen_w);
-	DECLARE_READ8_MEMBER(jackal_zram_r);
-	DECLARE_READ8_MEMBER(jackal_voram_r);
-	DECLARE_READ8_MEMBER(jackal_spriteram_r);
-	DECLARE_WRITE8_MEMBER(jackal_rambank_w);
-	DECLARE_WRITE8_MEMBER(jackal_zram_w);
-	DECLARE_WRITE8_MEMBER(jackal_voram_w);
-	DECLARE_WRITE8_MEMBER(jackal_spriteram_w);
+	uint8_t jackalr_rotary_r(offs_t offset);
+	void jackal_flipscreen_w(uint8_t data);
+	uint8_t jackal_zram_r(offs_t offset);
+	uint8_t jackal_voram_r(offs_t offset);
+	uint8_t jackal_spriteram_r(offs_t offset);
+	void jackal_rambank_w(uint8_t data);
+	void jackal_zram_w(offs_t offset, uint8_t data);
+	void jackal_voram_w(offs_t offset, uint8_t data);
+	void jackal_spriteram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

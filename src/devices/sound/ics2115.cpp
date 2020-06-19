@@ -1,14 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Alex Marshall,nimitz,austere
-//ICS2115 by Raiden II team (c) 2010
-//members: austere, nimitz, Alex Marshal
-//
-//Original driver by O. Galibert, ElSemi
-//
-//Use tab size = 4 for your viewing pleasure.
+/*
+	ICS2115 by Raiden II team (c) 2010
+	members: austere, nimitz, Alex Marshal
+
+	Original driver by O. Galibert, ElSemi
+
+	Use tab size = 4 for your viewing pleasure.
+
+	TODO:
+	- Implement Panning, Chip has support stereo
+	- Verify BYTE/ROMEN pin behaviors
+	- DRAM, DMA, MIDI interface is unimplemented
+	- Verify interrupt, envelope, timer period
+	- Verify unemulated registers
+*/
 
 #include "emu.h"
 #include "ics2115.h"
+#include <algorithm>
 #include <cmath>
 
 //#define ICS2115_DEBUG
@@ -18,15 +28,34 @@
 DEFINE_DEVICE_TYPE(ICS2115, ics2115_device, "ics2115", "ICS2115 WaveFront Synthesizer")
 
 ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, ICS2115, tag, owner, clock),
-		device_sound_interface(mconfig, *this), m_stream(nullptr),
-		m_rom(*this, DEVICE_SELF),
-		m_irq_cb(*this), m_active_osc(0), m_osc_select(0), m_reg_select(0), m_irq_enabled(0), m_irq_pending(0), m_irq_on(false), m_vmode(0)
+	: device_t(mconfig, ICS2115, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 24) // 24 bit address bus, 8 bit data bus(ROM), 11 bit address bus, 8 bit data bus, 4 banks(DRAM)
+	, m_stream(nullptr)
+	, m_rom(*this, DEVICE_SELF)
+	, m_irq_cb(*this)
+	, m_active_osc(0)
+	, m_osc_select(0)
+	, m_reg_select(0)
+	, m_irq_enabled(0)
+	, m_irq_pending(0)
+	, m_irq_on(false)
+	, m_vmode(0)
 {
 }
 
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
 void ics2115_device::device_start()
 {
+	if (m_rom && !has_configured_map(0))
+		space(0).install_rom(0, std::min<offs_t>((1 << 24) - 1, m_rom.bytes()), m_rom.target());
+
+	space(0).cache(m_cache);
+
 	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_0),this), this);
 	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_1),this), this);
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / (32 * 32));
@@ -97,6 +126,9 @@ void ics2115_device::device_start()
 	}
 }
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
 
 void ics2115_device::device_reset()
 {
@@ -137,10 +169,28 @@ void ics2115_device::device_reset()
 	}
 }
 
+
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
 void ics2115_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / ((m_active_osc + 1) * 32));
 }
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector ics2115_device::memory_space_config() const
+{
+	return space_config_vector{ std::make_pair(0, &m_data_config) };
+}
+
 
 //TODO: improve using next-state logic from column 126 of patent 5809466
 int ics2115_device::ics2115_voice::update_volume_envelope()
@@ -263,38 +313,38 @@ int ics2115_device::ics2115_voice::update_oscillator()
 	return ret;
 }
 
-//TODO: proper interpolation for uLaw (fill_output doesn't use this) and 8-bit samples (looping)
+//TODO: proper interpolation for 8-bit samples (looping)
 stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 {
-	u32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
+	u32 curaddr = voice.osc.acc >> 12;
 	u32 nextaddr;
 
 	if (voice.state.bitflags.on && voice.osc_conf.bitflags.loop && !voice.osc_conf.bitflags.loop_bidir &&
 			(voice.osc.left < (voice.osc.fc <<2)))
 	{
 		//logerror("C?[%x:%x]", voice.osc.left, voice.osc.acc);
-		nextaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.start >> 12);
+		nextaddr = voice.osc.start >> 12;
 	}
 	else
 		nextaddr = curaddr + 2;
 
-
 	s16 sample1, sample2;
-	if (voice.osc_conf.bitflags.eightbit)
+	if (voice.osc_conf.bitflags.ulaw)
 	{
-		sample1 = ((s8)m_rom[curaddr]) << 8;
-		sample2 = ((s8)m_rom[curaddr + 1]) << 8;
+		sample1 = m_ulaw[read_sample(voice, curaddr)];
+		sample2 = m_ulaw[read_sample(voice, curaddr + 1)];
+	}
+	else if (voice.osc_conf.bitflags.eightbit)
+	{
+		sample1 = ((s8)read_sample(voice, curaddr)) << 8;
+		sample2 = ((s8)read_sample(voice, curaddr + 1)) << 8;
 	}
 	else
 	{
-		sample1 = m_rom[curaddr + 0] | (((s8)m_rom[curaddr + 1]) << 8);
-		sample2 = m_rom[nextaddr+ 0] | (((s8)m_rom[nextaddr+ 1]) << 8);
-		//sample2 = m_rom[curaddr + 2] | (((s8)m_rom[curaddr + 3]) << 8);
+		sample1 = read_sample(voice, curaddr + 0) | (((s8)read_sample(voice, curaddr + 1)) << 8);
+		sample2 = read_sample(voice, nextaddr+ 0) | (((s8)read_sample(voice, nextaddr+ 1)) << 8);
+		//sample2 = read_sample(voice, curaddr + 2) | (((s8)read_sample(voice, curaddr + 3)) << 8);
 	}
-
-	//no need for interpolation since it's around 1 note a cycle?
-	//if (voice.osc.fc >> 10)
-	//    return sample1;
 
 	//linear interpolation as in US patent 6,246,774 B1, column 2 row 59
 	//LEN=1, BLEN=0, DIR=0, start+end interpolation
@@ -302,6 +352,10 @@ stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 	u16 fract;
 	diff = sample2 - sample1;
 	fract = (voice.osc.acc >> 3) & 0x1ff;
+
+	//no need for interpolation since it's around 1 note a cycle?
+	//if (!fract)
+	//    return sample1;
 
 	sample = (((s32)sample1 << 9) + diff * fract) >> 9;
 	//sample = sample1;
@@ -349,14 +403,7 @@ int ics2115_device::fill_output(ics2115_voice& voice, stream_sample_t *outputs[2
 		//final output, even if they are not running.  This means that whatever data value
 		//that the voice is pointing at is contributing to the summation.
 		//(austere note: this will of course fix some of the glitches due to multiple transition)
-		stream_sample_t sample;
-		if (voice.osc_conf.bitflags.ulaw)
-		{
-			u32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
-			sample = m_ulaw[m_rom[curaddr]];
-		}
-		else
-			sample = get_sample(voice);
+		stream_sample_t sample = get_sample(voice);
 
 		//15-bit volume + (5-bit worth of 32 channel sum) + 16-bit samples = 4-bit extra
 		if (!m_vmode || voice.playing())
@@ -396,11 +443,7 @@ void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 /*
 #ifdef ICS2115_DEBUG
         u32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
-        stream_sample_t sample;
-        if (voice.osc_conf.bitflags.ulaw)
-            sample = m_ulaw[m_rom[curaddr]];
-        else
-            sample = get_sample(voice);
+        stream_sample_t sample = get_sample(voice);
         logerror("[%06x=%04x]", curaddr, (s16)sample);
 #endif
 */
@@ -587,6 +630,9 @@ u16 ics2115_device::reg_read()
 			ret = m_irq_pending & 3;
 			break;
 
+		// case 0x48: // Accumulator Monitor Status
+		// case 0x49: // Accumulator Monitor Data
+
 		case 0x4a: // IRQ Pending
 			ret = m_irq_pending;
 			break;
@@ -598,6 +644,17 @@ u16 ics2115_device::reg_read()
 		case 0x4c: // Chip Revision
 			ret = revision;
 			break;
+
+		// case 0x4d: // System Control
+
+		// case 0x50: // MIDI Data Register
+		// case 0x51: // MIDI Status Register
+		// case 0x52: // Host Data Register
+		// case 0x53: // Host Status Register
+		// case 0x54: // MIDI Emulation Interrupt Control
+		// case 0x55: // Host Emulation Interrupt Control
+		// case 0x56: // Host/MIDI Emulation Interrupt Status
+		// case 0x57: // Emulation Mode
 
 		default:
 #ifdef ICS2115_DEBUG
@@ -794,6 +851,11 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 			}
 			break;
 
+		// case 0x44: // DMA Start Address Low (11:4)
+		// case 0x45: // DMA Start Address Low (19:12)
+		// case 0x46: // DMA Start Address Low (21:20)
+		// case 0x47: // DMA Control
+
 		case 0x4a: // IRQ Enable
 			if (ACCESSING_BITS_0_7)
 			{
@@ -802,10 +864,22 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 			}
 			break;
 
+		// case 0x4c: // Memory Config
+		// case 0x4d: // System Control
+
 		case 0x4f: // Oscillator Address being Programmed
 			if (ACCESSING_BITS_0_7)
 				m_osc_select = (data & 0xff) % (1+m_active_osc);
 			break;
+
+		// case 0x50: // MIDI Data Register
+		// case 0x51: // MIDI Control Register
+		// case 0x52: // Host Data Register
+		// case 0x53: // Host Control Register
+		// case 0x54: // MIDI Emulation Interrupt Control
+		// case 0x55: // Host Emulation Interrupt Control
+		// case 0x57: // Emulation Mode
+
 		default:
 #ifdef ICS2115_DEBUG
 			logerror("ICS2115: Unhandled write %x onto %x [voice = %d]\n", data, m_reg_select, m_osc_select);

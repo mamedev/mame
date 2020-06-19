@@ -144,26 +144,26 @@ public:
 		TIMER_CB
 	};
 
-	DECLARE_WRITE8_MEMBER( nmi_clock_w );
-	DECLARE_READ8_MEMBER( sndrom_r );
-	DECLARE_WRITE8_MEMBER( sndrombank1_w );
-	DECLARE_WRITE8_MEMBER( sndrombank1_alt_w );
-	DECLARE_WRITE8_MEMBER( sndrombank2_w );
-	DECLARE_READ8_MEMBER( gfxrom_r );
-	DECLARE_WRITE8_MEMBER( gfxrombank_w );
-	DECLARE_WRITE8_MEMBER( gfxradr_l_w );
-	DECLARE_WRITE8_MEMBER( gfxradr_h_w );
-	DECLARE_WRITE8_MEMBER( inputportsel_w );
-	DECLARE_READ8_MEMBER( inputport0_r );
-	DECLARE_READ8_MEMBER( inputport1_r );
-	DECLARE_READ8_MEMBER( inputport2_r );
-	DECLARE_READ8_MEMBER( inputport3_r );
+	void nmi_clock_w(uint8_t data);
+	uint8_t sndrom_r(address_space &space, offs_t offset);
+	void sndrombank1_w(uint8_t data);
+	void sndrombank1_alt_w(uint8_t data);
+	void sndrombank2_w(uint8_t data);
+	uint8_t gfxrom_r(offs_t offset);
+	void gfxrombank_w(uint8_t data);
+	void gfxradr_l_w(uint8_t data);
+	void gfxradr_h_w(uint8_t data);
+	void inputportsel_w(uint8_t data);
+	uint8_t inputport0_r();
+	uint8_t inputport1_r();
+	uint8_t inputport2_r();
+	uint8_t inputport3_r();
 	uint8_t dipsw1_r();
 	uint8_t dipsw2_r();
-	DECLARE_READ8_MEMBER( dipsw3_l_r );
-	DECLARE_READ8_MEMBER( dipsw3_h_r );
-	DECLARE_WRITE8_MEMBER( outcoin_w );
-	DECLARE_WRITE8_MEMBER( vcrctrl_w );
+	uint8_t dipsw3_l_r();
+	uint8_t dipsw3_h_r();
+	void outcoin_w(uint8_t data);
+	void vcrctrl_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( busyflag_r );
 	DECLARE_WRITE_LINE_MEMBER( busyflag_w );
 

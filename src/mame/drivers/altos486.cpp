@@ -134,7 +134,7 @@ void altos486_state::altos486_z80_io(address_map &map)
 
 void altos486_state::altos486(machine_config &config)
 {
-	I80186(config, m_maincpu, 32_MHz_XTAL / 4);
+	I80186(config, m_maincpu, 32_MHz_XTAL / 2); // divided by 2 externally and by 2 again internally to operate at 8 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &altos486_state::altos486_mem);
 	m_maincpu->set_addrmap(AS_IO, &altos486_state::altos486_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb)); // yes, really

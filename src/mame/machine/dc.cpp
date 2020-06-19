@@ -367,7 +367,7 @@ void dc_state::dc_update_interrupt_status()
 	}
 }
 
-READ64_MEMBER(dc_state::dc_sysctrl_r )
+uint64_t dc_state::dc_sysctrl_r(offs_t offset, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -384,7 +384,7 @@ READ64_MEMBER(dc_state::dc_sysctrl_r )
 	return (uint64_t)dc_sysctrl_regs[reg] << shift;
 }
 
-WRITE64_MEMBER(dc_state::dc_sysctrl_w )
+void dc_state::dc_sysctrl_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -480,7 +480,7 @@ WRITE64_MEMBER(dc_state::dc_sysctrl_w )
 	#endif
 }
 
-READ64_MEMBER(dc_state::dc_gdrom_r )
+uint64_t dc_state::dc_gdrom_r(offs_t offset, uint64_t mem_mask)
 {
 	uint32_t off;
 
@@ -501,7 +501,7 @@ READ64_MEMBER(dc_state::dc_gdrom_r )
 	return 0;
 }
 
-WRITE64_MEMBER(dc_state::dc_gdrom_w )
+void dc_state::dc_gdrom_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	uint32_t dat,off;
 
@@ -519,7 +519,7 @@ WRITE64_MEMBER(dc_state::dc_gdrom_w )
 	osd_printf_verbose("GDROM: [%08x=%x]write %x to %x, mask %x\n", 0x5f7000+off*4, dat, data, offset, mem_mask);
 }
 
-READ64_MEMBER(dc_state::dc_g2_ctrl_r )
+uint64_t dc_state::dc_g2_ctrl_r(offs_t offset, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -529,7 +529,7 @@ READ64_MEMBER(dc_state::dc_g2_ctrl_r )
 	return (uint64_t)g2bus_regs[reg] << shift;
 }
 
-WRITE64_MEMBER(dc_state::dc_g2_ctrl_w )
+void dc_state::dc_g2_ctrl_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -609,7 +609,7 @@ int dc_state::decode_reg_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift)
 	return reg;
 }
 
-READ64_MEMBER(dc_state::dc_modem_r )
+uint64_t dc_state::dc_modem_r(offs_t offset, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -627,7 +627,7 @@ READ64_MEMBER(dc_state::dc_modem_r )
 	return 0;
 }
 
-WRITE64_MEMBER(dc_state::dc_modem_w )
+void dc_state::dc_modem_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -677,7 +677,7 @@ void dc_state::machine_reset()
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;
 }
 
-READ32_MEMBER(dc_state::dc_aica_reg_r)
+uint32_t dc_state::dc_aica_reg_r(offs_t offset, uint32_t mem_mask)
 {
 //  osd_printf_verbose("AICA REG: [%08x] read %x, mask %x\n", 0x700000+reg*4, (uint64_t)offset, mem_mask);
 
@@ -687,7 +687,7 @@ READ32_MEMBER(dc_state::dc_aica_reg_r)
 	return m_aica->read(offset*2);
 }
 
-WRITE32_MEMBER(dc_state::dc_aica_reg_w)
+void dc_state::dc_aica_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == (0x2c00/4))
 	{
@@ -713,22 +713,22 @@ WRITE32_MEMBER(dc_state::dc_aica_reg_w)
 //  osd_printf_verbose("AICA REG: [%08x=%x] write %x to %x, mask %x\n", 0x700000+reg*4, data, offset, mem_mask);
 }
 
-READ32_MEMBER(dc_state::dc_arm_aica_r)
+uint32_t dc_state::dc_arm_aica_r(offs_t offset)
 {
 	return m_aica->read(offset*2) & 0xffff;
 }
 
-WRITE32_MEMBER(dc_state::dc_arm_aica_w)
+void dc_state::dc_arm_aica_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_aica->write(offset*2, data, mem_mask&0xffff);
 }
 
-READ16_MEMBER(dc_state::soundram_r )
+uint16_t dc_state::soundram_r(offs_t offset)
 {
 	return dc_sound_ram[offset];
 }
 
-WRITE16_MEMBER(dc_state::soundram_w )
+void dc_state::soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&dc_sound_ram[offset]);
 }

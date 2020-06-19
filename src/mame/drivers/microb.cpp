@@ -1,19 +1,18 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Robbbert, AJR
 /***************************************************************************
 
-    BEEHIVE DM3270
+    BEEHIVE Micro B Series
 
     25/05/2009 Skeleton driver [Robbbert]
 
-    This is a conventional computer terminal using a serial link.
-    Could be a clone of the IBM3276-2.
+    This is a series of conventional computer terminals using a serial link.
+    DM3270 is a clone of the IBM3276-2.
 
     The character gen rom is not dumped. Using the one from 'c10'
     for the moment.
 
-    Screen goes crazy during the memory test, just ignore it.
-    System freezes if ^G pressed.
+    System beeps if ^G or ^Z pressed. Pressing ^Q is the same as Enter.
 
     25/04/2011 Added partial keyboard.
     26/06/2011 Added modifier keys.
@@ -22,71 +21,110 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "emupal.h"
+#include "machine/input_merger.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/i8257.h"
+#include "machine/pit8253.h"
+#include "video/i8275.h"
+#include "bus/rs232/rs232.h"
+#include "sound/beep.h"
 #include "screen.h"
+#include "speaker.h"
 
 
-class beehive_state : public driver_device
+class microb_state : public driver_device
 {
 public:
-	beehive_state(const machine_config &mconfig, device_type type, const char *tag)
+	microb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_p_videoram(*this, "videoram")
+		, m_dmac(*this, "dmac")
 		, m_p_chargen(*this, "chargen")
+		, m_beep(*this, "beep")
+		, m_usart(*this, "usart%u", 1U)
+		, m_rs232(*this, "rs232%c", 'a')
+		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
-	void beehive(machine_config &config);
+	void microb(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
-	void beehive_io(address_map &map);
-	void beehive_mem(address_map &map);
-	u8 beehive_60_r();
-	void beehive_62_w(u8 data);
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(dmac_hrq_w);
+	u8 dmac_mem_r(offs_t offset);
+	void dmac_mem_w(offs_t offset, u8 data);
+	I8275_DRAW_CHARACTER_MEMBER(draw_character);
+
+	u8 ppi2_pa_r();
+	void ppi2_pc_w(u8 data);
+
+	void microb_io(address_map &map);
+	void microb_mem(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<u8> m_p_videoram;
+	required_device<i8257_device> m_dmac;
 	required_region_ptr<u8> m_p_chargen;
+	required_device<beep_device> m_beep;
+	required_device_array<i8251_device, 2> m_usart;
+	required_device_array<rs232_port_device, 2> m_rs232;
+	required_ioport_array<16> m_io_keyboard;
+
 	u8 m_keyline;
-	virtual void machine_reset() override;
 };
 
-u8 beehive_state::beehive_60_r()
+WRITE_LINE_MEMBER(microb_state::dmac_hrq_w)
 {
-	if (BIT(m_keyline, 4))
-	{
-		char kbdrow[6];
-		sprintf(kbdrow,"X%d", m_keyline&15);
-		return ioport(kbdrow)->read();
-	}
-	else
-		return 0xff;
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_dmac->hlda_w(state);
 }
 
-void beehive_state::beehive_62_w(u8 data)
+u8 microb_state::dmac_mem_r(offs_t offset)
+{
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+void microb_state::dmac_mem_w(offs_t offset, u8 data)
+{
+	return m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
+}
+
+u8 microb_state::ppi2_pa_r()
+{
+	return m_io_keyboard[m_keyline & 15]->read();
+}
+
+void microb_state::ppi2_pc_w(u8 data)
 {
 	m_keyline = data;
+	m_beep->set_state(!BIT(data, 4));
 }
 
-void beehive_state::beehive_mem(address_map &map)
+void microb_state::microb_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x17ff).rom();
-	map(0x8000, 0x8fff).ram().share("videoram");
+	map(0x8000, 0x8fff).ram();
 }
 
-void beehive_state::beehive_io(address_map &map)
+void microb_state::microb_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x11, 0x11).portr("DIPS");
-	map(0x60, 0x60).r(FUNC(beehive_state::beehive_60_r));
-	map(0x61, 0x61).portr("MODIFIERS");
-	map(0x62, 0x62).w(FUNC(beehive_state::beehive_62_w));
+	map(0x00, 0x09).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x10, 0x13).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x21).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x30, 0x31).rw(m_usart[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x50, 0x51).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0x60, 0x63).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe0, 0xe3).rw("pit1", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xf0, 0xf3).rw("pit2", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 }
 
 /* Input ports */
-static INPUT_PORTS_START( beehive )
+static INPUT_PORTS_START( microb )
 	PORT_START("X0")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")  PORT_CODE(KEYCODE_Q)    PORT_CHAR('q') PORT_CHAR('Q')
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")  PORT_CODE(KEYCODE_W)    PORT_CHAR('w') PORT_CHAR('W')
@@ -128,7 +166,7 @@ static INPUT_PORTS_START( beehive )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("{")  PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{') PORT_CHAR('}')
 
 	PORT_START("X4")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("<")  PORT_CODE(KEYCODE_PGDN) PORT_CHAR('<') PORT_CHAR('>')
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("<")  PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<') PORT_CHAR('>')
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",")  PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".")  PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/")  PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
@@ -171,8 +209,8 @@ static INPUT_PORTS_START( beehive )
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1pad")   PORT_CODE(KEYCODE_1_PAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2pad")   PORT_CODE(KEYCODE_2_PAD)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3pad")   PORT_CODE(KEYCODE_3_PAD)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")    PORT_CODE(KEYCODE_ESC)
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Show/Hide Status")
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Down")   PORT_CODE(KEYCODE_DOWN)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0pad")   PORT_CODE(KEYCODE_0_PAD)
@@ -183,8 +221,8 @@ static INPUT_PORTS_START( beehive )
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Blink On/Off")
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED) // carriage return
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left")   PORT_CODE(KEYCODE_LEFT)
 
 	PORT_START("X10")
@@ -235,84 +273,108 @@ static INPUT_PORTS_START( beehive )
 INPUT_PORTS_END
 
 
-void beehive_state::machine_reset()
+void microb_state::machine_start()
 {
+	save_item(NAME(m_keyline));
 }
 
-/* This system appears to have inline attribute bytes of unknown meaning.
-    Currently they are ignored. */
-u32 beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+I8275_DRAW_CHARACTER_MEMBER(microb_state::draw_character)
 {
-	uint16_t cursor_pos = (m_p_videoram[0xcaf] | (m_p_videoram[0xcb0] << 8)) & 0xfff;
-	uint16_t p_linelist;
-	u8 line_length;
-	u8 y,ra,chr,gfx,inv;
-	uint16_t sy=0,ma,x;
+	u8 dots = lten ? 0xff : (vsp || linecount == 9) ? 0 : m_p_chargen[(charcode << 4) | linecount];
+	if (rvv)
+		dots ^= 0xff;
 
-	for (y = 0; y < 25; y++)
+	// HLGT is active on status line
+	rgb_t fg = hlgt ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
+
+	u32 *pix = &bitmap.pix32(y, x);
+	for (int i = 0; i < 8; i++)
 	{
-		p_linelist = 0x1af + y*3;
-		line_length = m_p_videoram[p_linelist]+1;
-		ma = (m_p_videoram[p_linelist+1] | (m_p_videoram[p_linelist+2] << 8)) & 0xfff;
-
-		for (ra = 0; ra < 10; ra++)
-		{
-			uint16_t *p = &bitmap.pix16(sy++);
-			u8 chars = 0;
-
-			for (x = ma; x < ma + line_length; x++)
-			{
-				inv = gfx = chr = 0;
-				if (y == 24) inv=0xff; // status line reverse video
-				if (ra < 9)
-				{
-					if (x == cursor_pos) inv=0xff; // show cursor
-					chr = m_p_videoram[x]; // get char in videoram
-					gfx = m_p_chargen[(chr<<4) | ra ] ^ inv; // get dot pattern in chargen
-				}
-
-				if ((chars < 80) && (!BIT(chr, 7)))  // ignore attribute bytes
-				{
-					chars++;
-
-					/* Display a scanline of a character */
-					*p++ = BIT(gfx, 7);
-					*p++ = BIT(gfx, 6);
-					*p++ = BIT(gfx, 5);
-					*p++ = BIT(gfx, 4);
-					*p++ = BIT(gfx, 3);
-					*p++ = BIT(gfx, 2);
-					*p++ = BIT(gfx, 1);
-					*p++ = BIT(gfx, 0);
-				}
-			}
-		}
+		*pix++ = BIT(dots, 7) ? fg : rgb_t::black();
+		dots <<= 1;
 	}
-	return 0;
 }
 
-void beehive_state::beehive(machine_config &config)
+void microb_state::microb(machine_config &config)
 {
 	/* basic machine hardware */
 	I8085A(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &beehive_state::beehive_mem);
-	m_maincpu->set_addrmap(AS_IO, &beehive_state::beehive_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &microb_state::microb_mem);
+	m_maincpu->set_addrmap(AS_IO, &microb_state::microb_io);
+
+	INPUT_MERGER_ANY_HIGH(config, "usartint").output_handler().set_inputline(m_maincpu, I8085_RST55_LINE);
+
+	I8257(config, m_dmac, 2'000'000);
+	m_dmac->out_hrq_cb().set(FUNC(microb_state::dmac_hrq_w));
+	m_dmac->in_memr_cb().set(FUNC(microb_state::dmac_mem_r));
+	m_dmac->out_memw_cb().set(FUNC(microb_state::dmac_mem_w));
+	m_dmac->out_iow_cb<2>().set("crtc", FUNC(i8275_device::dack_w));
+	m_dmac->out_tc_cb().set_inputline(m_maincpu, I8085_RST75_LINE);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(beehive_state::screen_update));
-	screen.set_size(640, 250);
-	screen.set_visarea(0, 639, 0, 249);
-	screen.set_palette("palette");
+	screen.set_raw(1'620'000 * 8, 800, 0, 640, 324, 0, 300);
+	//screen.set_raw(1'620'000 * 8, 800, 0, 640, 270, 0, 250);
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	i8275_device &crtc(I8275(config, "crtc", 1'620'000));
+	crtc.set_screen("screen");
+	crtc.set_character_width(8);
+	crtc.set_display_callback(FUNC(microb_state::draw_character));
+	crtc.irq_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
+	crtc.drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
+
+	i8255_device &ppi1(I8255(config, "ppi1"));
+	ppi1.in_pb_callback().set_ioport("DIPS");
+
+	i8255_device &ppi2(I8255(config, "ppi2"));
+	ppi2.in_pa_callback().set(FUNC(microb_state::ppi2_pa_r));
+	ppi2.in_pb_callback().set_ioport("MODIFIERS");
+	ppi2.out_pc_callback().set(FUNC(microb_state::ppi2_pc_w));
+
+	pit8253_device &pit1(PIT8253(config, "pit1"));
+	pit1.set_clk<2>(1'536'000);
+	pit1.out_handler<2>().set(m_usart[1], FUNC(i8251_device::write_rxc));
+
+	pit8253_device &pit2(PIT8253(config, "pit2"));
+	pit2.set_clk<0>(1'536'000);
+	pit2.set_clk<1>(1'536'000);
+	pit2.set_clk<2>(1'536'000);
+	pit2.out_handler<0>().set(m_usart[0], FUNC(i8251_device::write_txc));
+	pit2.out_handler<1>().set(m_usart[0], FUNC(i8251_device::write_rxc));
+	pit2.out_handler<2>().set(m_usart[1], FUNC(i8251_device::write_txc));
+
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	I8251(config, m_usart[0], 0);
+	m_usart[0]->txd_handler().set(m_rs232[0], FUNC(rs232_port_device::write_txd));
+	m_usart[0]->dtr_handler().set(m_rs232[0], FUNC(rs232_port_device::write_dtr));
+	m_usart[0]->rts_handler().set(m_rs232[0], FUNC(rs232_port_device::write_rts));
+	m_usart[0]->rxrdy_handler().set("usartint", FUNC(input_merger_device::in_w<0>));
+	m_usart[0]->txrdy_handler().set("usartint", FUNC(input_merger_device::in_w<1>));
+
+	RS232_PORT(config, m_rs232[0], default_rs232_devices, nullptr);
+	m_rs232[0]->rxd_handler().set(m_usart[0], FUNC(i8251_device::write_rxd));
+	m_rs232[0]->dsr_handler().set(m_usart[0], FUNC(i8251_device::write_dsr));
+	m_rs232[0]->cts_handler().set(m_usart[0], FUNC(i8251_device::write_cts));
+
+	I8251(config, m_usart[1], 0);
+	m_usart[1]->txd_handler().set(m_rs232[1], FUNC(rs232_port_device::write_txd));
+	m_usart[1]->dtr_handler().set(m_rs232[1], FUNC(rs232_port_device::write_dtr));
+	m_usart[1]->rts_handler().set(m_rs232[1], FUNC(rs232_port_device::write_rts));
+	m_usart[1]->rxrdy_handler().set("usartint", FUNC(input_merger_device::in_w<2>));
+	m_usart[1]->txrdy_handler().set("usartint", FUNC(input_merger_device::in_w<3>));
+
+	RS232_PORT(config, m_rs232[1], default_rs232_devices, nullptr);
+	m_rs232[1]->rxd_handler().set(m_usart[1], FUNC(i8251_device::write_rxd));
+	m_rs232[1]->dsr_handler().set(m_usart[1], FUNC(i8251_device::write_dsr));
+	m_rs232[1]->cts_handler().set(m_usart[1], FUNC(i8251_device::write_cts));
 }
 
 /* ROM definition */
-ROM_START( beehive )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+ROM_START( dm3270 )
+	ROM_REGION( 0x1800, "maincpu", 0 )
 	ROM_LOAD( "dm3270-1.rom", 0x0000, 0x0800, CRC(781bde32) SHA1(a3fe25baadd2bfc2b1791f509bb0f4960281ee32) )
 	ROM_LOAD( "dm3270-2.rom", 0x0800, 0x0800, CRC(4d3476b7) SHA1(627ad42029ca6c8574cda8134d047d20515baf53) )
 	ROM_LOAD( "dm3270-3.rom", 0x1000, 0x0800, CRC(dbf15833) SHA1(ae93117260a259236c50885c5cecead2aad9b3c4) )
@@ -324,5 +386,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME  FLAGS
-COMP( 1982, beehive, 0,      0,      beehive, beehive, beehive_state, empty_init, "BeeHive", "DM3270", MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPU    CLASS         INIT        COMPANY                  FULLNAME                               FLAGS
+COMP( 1982, dm3270, 0,      0,      microb, microb, microb_state, empty_init, "Beehive International", "DM3270 Control Unit Display Station", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

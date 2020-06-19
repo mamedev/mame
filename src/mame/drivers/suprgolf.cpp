@@ -72,13 +72,13 @@ private:
 	uint8_t m_bg_vreg_test;
 	uint8_t m_toggle;
 
-	DECLARE_READ8_MEMBER(videoram_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(bg_vram_r);
-	DECLARE_WRITE8_MEMBER(bg_vram_w);
-	DECLARE_WRITE8_MEMBER(pen_w);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(rom2_bank_select_w);
+	uint8_t videoram_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint8_t bg_vram_r(offs_t offset);
+	void bg_vram_w(offs_t offset, uint8_t data);
+	void pen_w(uint8_t data);
+	void adpcm_data_w(uint8_t data);
+	void rom2_bank_select_w(uint8_t data);
 	uint8_t vregs_r();
 	void vregs_w(uint8_t data);
 	uint8_t rom_bank_select_r();
@@ -177,7 +177,7 @@ uint32_t suprgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ8_MEMBER(suprgolf_state::videoram_r)
+uint8_t suprgolf_state::videoram_r(offs_t offset)
 {
 	if (m_palette_switch)
 		return m_paletteram[offset];
@@ -185,7 +185,7 @@ READ8_MEMBER(suprgolf_state::videoram_r)
 		return m_videoram[offset];
 }
 
-WRITE8_MEMBER(suprgolf_state::videoram_w)
+void suprgolf_state::videoram_w(offs_t offset, uint8_t data)
 {
 	if(m_palette_switch)
 	{
@@ -227,12 +227,12 @@ void suprgolf_state::vregs_w(uint8_t data)
 	//  printf("Video regs with data %02x activated\n",data);
 }
 
-READ8_MEMBER(suprgolf_state::bg_vram_r)
+uint8_t suprgolf_state::bg_vram_r(offs_t offset)
 {
 	return m_bg_vram[offset+m_bg_bank*0x2000];
 }
 
-WRITE8_MEMBER(suprgolf_state::bg_vram_w)
+void suprgolf_state::bg_vram_w(offs_t offset, uint8_t data)
 {
 	uint8_t hi_nibble,lo_nibble;
 	uint8_t hi_dirty_dot,lo_dirty_dot; // helpers
@@ -288,12 +288,12 @@ void suprgolf_state::machine_start()
 	save_item(NAME(m_toggle));
 }
 
-WRITE8_MEMBER(suprgolf_state::pen_w)
+void suprgolf_state::pen_w(uint8_t data)
 {
 	m_vreg_pen = data;
 }
 
-WRITE8_MEMBER(suprgolf_state::adpcm_data_w)
+void suprgolf_state::adpcm_data_w(uint8_t data)
 {
 	m_msm5205next = data;
 }
@@ -315,7 +315,7 @@ void suprgolf_state::rom_bank_select_w(uint8_t data)
 	flip_screen_set(data & 0x80);
 }
 
-WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
+void suprgolf_state::rom2_bank_select_w(uint8_t data)
 {
 	//osd_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,m_maincpu->pcbase());
 	membank("bank1")->set_entry(data & 0x0f);

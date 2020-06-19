@@ -139,8 +139,8 @@ public:
 	}
 
 	// Interface
-	DECLARE_READ32_MEMBER( cpu_id_r );
-	DECLARE_WRITE32_MEMBER( cpu_id_w );
+	uint32_t cpu_id_r(address_space &space);
+	void cpu_id_w(address_space &space, uint32_t data);
 
 	uint8_t read_bus8(offs_t offset);
 	uint16_t read_bus16(offs_t offset);
@@ -253,8 +253,8 @@ public:
 		update_interrupts();
 	}
 
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( read );
+	void write(offs_t offset, uint32_t data);
+	uint32_t read(offs_t offset);
 
 protected:
 	virtual void device_start() override;
@@ -297,8 +297,8 @@ public:
 	template <std::size_t Line> auto gpio_in_handler() { return m_gpio_in[Line].bind(); }
 	template <std::size_t Line> auto gpio_out_handler() { return m_gpio_out[Line].bind(); }
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	virtual void device_start() override;
@@ -392,8 +392,8 @@ public:
 	auto vint1_int_handler() { return m_vint1_int_handler.bind(); }
 	template <typename T> void set_screen(T &&screen_tag) { m_screen.set_tag(std::forward<T>(screen_tag)); }
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -455,8 +455,8 @@ class m2_ctrlport_device : public device_t
 public:
 	m2_ctrlport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset);
+	void write(offs_t offset, uint32_t data);
 
 protected:
 	virtual void device_start() override;
@@ -477,8 +477,8 @@ class m2_mpeg_device : public device_t
 public:
 	m2_mpeg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset);
+	void write(offs_t offset, uint32_t data);
 
 protected:
 	virtual void device_start() override;
@@ -511,10 +511,10 @@ public:
 	void set_syscfg(uint32_t syscfg) { m_syscfg = syscfg; }
 	auto sdbg_out() { return m_sdbg_out_handler.bind(); }
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = ~0);
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER(sdbg_in);
+	void sdbg_in(uint32_t data);
 
 	void set_external_interrupt(uint32_t which, uint32_t state)
 	{

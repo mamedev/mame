@@ -43,11 +43,9 @@ RAStackSlot* RAStackAllocator::newSlot(uint32_t baseRegId, uint32_t size, uint32
 
   slot->_baseRegId = uint8_t(baseRegId);
   slot->_alignment = uint8_t(Support::max<uint32_t>(alignment, 1));
-  slot->_reserved[0] = 0;
-  slot->_reserved[1] = 0;
+  slot->_flags = uint16_t(flags);
   slot->_useCount = 0;
   slot->_size = size;
-  slot->_flags = flags;
 
   slot->_weight = 0;
   slot->_offset = 0;
@@ -92,7 +90,7 @@ Error RAStackAllocator::calculateStackFrame() noexcept {
     uint32_t alignment = slot->alignment();
     ASMJIT_ASSERT(alignment > 0);
 
-    uint32_t power = Support::ctz(alignment);
+    uint32_t power = Support::min<uint32_t>(Support::ctz(alignment), 6);
     uint64_t weight;
 
     if (slot->isRegHome())
@@ -128,7 +126,8 @@ Error RAStackAllocator::calculateStackFrame() noexcept {
   ZoneVector<RAStackGap> gaps[kSizeCount - 1];
 
   for (RAStackSlot* slot : _slots) {
-    if (slot->isStackArg()) continue;
+    if (slot->isStackArg())
+      continue;
 
     uint32_t slotAlignment = slot->alignment();
     uint32_t alignedOffset = Support::alignUp(offset, slotAlignment);

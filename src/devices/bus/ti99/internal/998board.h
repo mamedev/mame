@@ -101,7 +101,7 @@ public:
 	line_state ready();
 	void treset();
 
-	DECLARE_SETADDRESS_DBIN_MEMBER( set_address );
+	void set_address(offs_t offset, int state);
 
 	DECLARE_READ_LINE_MEMBER( sprd_out );
 	DECLARE_READ_LINE_MEMBER( spwt_out );
@@ -248,7 +248,7 @@ public:
 	void device_reset() override;
 
 	void cruwrite(offs_t offset, uint8_t data);
-	DECLARE_SETADDRESS_DBIN_MEMBER( set_address );
+	void set_address(offs_t offset, int state);
 
 	// Debugger support
 	bool hexbus_access_debug();
@@ -548,7 +548,7 @@ public:
 	void debugger_write(offs_t offset, uint8_t data);
 
 	// I/O space
-	DECLARE_READ8Z_MEMBER( crureadz );
+	void crureadz(offs_t offset, uint8_t *value);
 	void cruwrite(offs_t offset, uint8_t data);
 
 	// Control lines

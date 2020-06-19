@@ -138,6 +138,8 @@ void berlin_state::berlin(machine_config &config)
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&berlin_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
 	MEPHISTO_BUTTONS_BOARD(config, m_board);
+	subdevice<sensorboard_device>("board:board")->set_nvram_enable(true);
+
 	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_berlin);
 }

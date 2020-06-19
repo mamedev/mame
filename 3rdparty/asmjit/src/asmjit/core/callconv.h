@@ -30,7 +30,7 @@
 
 ASMJIT_BEGIN_NAMESPACE
 
-//! \addtogroup asmjit_func
+//! \addtogroup asmjit_function
 //! \{
 
 // ============================================================================
@@ -46,8 +46,8 @@ ASMJIT_BEGIN_NAMESPACE
 struct CallConv {
   //! Calling convention id, see `Id`.
   uint8_t _id;
-  //! Architecture id (see `ArchInfo::Id`).
-  uint8_t _archId;
+  //! Architecture identifier, see \ref Environment::Arch.
+  uint8_t _arch;
   //! Register assignment strategy.
   uint8_t _strategy;
   //! Flags.
@@ -78,179 +78,117 @@ struct CallConv {
     uint32_t packed[(kMaxRegArgsPerGroup + 3) / 4];
   };
 
-  //! Passed registers' order, per group.
+  //! Passed registers' order, per register group.
   RegOrder _passedOrder[BaseReg::kGroupVirt];
 
   //! Calling convention id.
+  //!
+  //! Calling conventions can be divided into the following groups:
+  //!
+  //!   - Universal - calling conventions are applicable to any target. They
+  //!     will be converted to a target dependent calling convention at runtime
+  //!     by \ref init(). The purpose of these conventions is to make using
+  //!     functions less target dependent and closer to how they are declared
+  //!     in C and C++.
+  //!
+  //!   - Target specific - calling conventions that are used by a particular
+  //!     architecture and ABI. For example Windows 64-bit calling convention
+  //!     and AMD64 SystemV calling convention.
   enum Id : uint32_t {
     //! None or invalid (can't be used).
     kIdNone = 0,
 
     // ------------------------------------------------------------------------
-    // [Universal]
+    // [Universal Calling Conventions]
     // ------------------------------------------------------------------------
 
-    // TODO: To make this possible we need to know target ARCH and ABI.
-
-    /*
-
-    // Universal calling conventions are applicable to any target and are
-    // converted to target dependent conventions at runtime. The purpose of
-    // these conventions is to make using functions less target dependent.
-
+    //! Standard function call or explicit `__cdecl` where it can be specified.
+    //!
+    //! This is a universal convention, which is used to initialize specific
+    //! calling connventions based on architecture, platform, and its ABI.
     kIdCDecl = 1,
+
+    //! `__stdcall` on targets that support this calling convention.
+    //!
+    //! \note This calling convention is only supported on 32-bit X86. If used
+    //! on environment that doesn't support this calling convention \ref kIdCDecl
+    //! will be used instead.
     kIdStdCall = 2,
+
+    //! `__fastcall` on targets that support this calling convention.
+    //!
+    //! \note This calling convention is only supported on 32-bit X86. If used
+    //! on environment that doesn't support this calling convention \ref kIdCDecl
+    //! will be used instead.
     kIdFastCall = 3,
+
+    //! `__vectorcall` on targets that support this calling convention.
+    //!
+    //! \note This calling convention is only supported on 32-bit and 64-bit
+    //! X86 architecture on Windows platform. If used on environment that doesn't
+    //! support this calling convention \ref kIdCDecl will be used instead.
+    kIdVectorCall = 4,
+
+    //! `__thiscall` on targets that support this calling convention.
+    //!
+    //! \note This calling convention is only supported on 32-bit X86 Windows
+    //! platform. If used on environment that doesn't support this calling
+    //! convention \ref kIdCDecl will be used instead.
+    kIdThisCall = 5,
+
+    //! `__attribute__((regparm(1)))` convention (GCC and Clang).
+    kIdRegParm1 = 6,
+    //! `__attribute__((regparm(2)))` convention (GCC and Clang).
+    kIdRegParm2 = 7,
+    //! `__attribute__((regparm(3)))` convention (GCC and Clang).
+    kIdRegParm3 = 8,
+
+    //! Soft-float calling convention (ARM).
+    //!
+    //! Floating point arguments are passed via general purpose registers.
+    kIdSoftFloat = 9,
+
+    //! Hard-float calling convention (ARM).
+    //!
+    //! Floating point arguments are passed via SIMD registers.
+    kIdHardFloat = 10,
 
     //! AsmJit specific calling convention designed for calling functions
     //! inside a multimedia code that don't use many registers internally,
     //! but are long enough to be called and not inlined. These functions are
     //! usually used to calculate trigonometric functions, logarithms, etc...
-    kIdLightCall2 = 10,
-    kIdLightCall3 = 11,
-    kIdLightCall4 = 12,
-    */
+    kIdLightCall2 = 16,
+    kIdLightCall3 = 17,
+    kIdLightCall4 = 18,
 
     // ------------------------------------------------------------------------
-    // [X86]
+    // [ABI-Specific Calling Conventions]
     // ------------------------------------------------------------------------
 
-    //! X86 `__cdecl` calling convention (used by C runtime and libraries).
-    kIdX86CDecl = 16,
-    //! X86 `__stdcall` calling convention (used mostly by WinAPI).
-    kIdX86StdCall = 17,
-    //! X86 `__thiscall` calling convention (MSVC/Intel).
-    kIdX86MsThisCall = 18,
-    //! X86 `__fastcall` convention (MSVC/Intel).
-    kIdX86MsFastCall = 19,
-    //! X86 `__fastcall` convention (GCC and Clang).
-    kIdX86GccFastCall = 20,
-    //! X86 `regparm(1)` convention (GCC and Clang).
-    kIdX86GccRegParm1 = 21,
-    //! X86 `regparm(2)` convention (GCC and Clang).
-    kIdX86GccRegParm2 = 22,
-    //! X86 `regparm(3)` convention (GCC and Clang).
-    kIdX86GccRegParm3 = 23,
-
-    kIdX86LightCall2 = 29,
-    kIdX86LightCall3 = 30,
-    kIdX86LightCall4 = 31,
-
-    //! X64 calling convention - WIN64-ABI.
-    kIdX86Win64 = 32,
-    //! X64 calling convention - SystemV / AMD64-ABI.
-    kIdX86SysV64 = 33,
-
-    kIdX64LightCall2 = 45,
-    kIdX64LightCall3 = 46,
-    kIdX64LightCall4 = 47,
-
-    // ------------------------------------------------------------------------
-    // [ARM]
-    // ------------------------------------------------------------------------
-
-    //! Legacy calling convention, floating point arguments are passed via GP registers.
-    kIdArm32SoftFP = 48,
-    //! Modern calling convention, uses VFP registers to pass floating point arguments.
-    kIdArm32HardFP = 49,
-
-    // ------------------------------------------------------------------------
-    // [Internal]
-    // ------------------------------------------------------------------------
-
-    //! \cond INTERNAL
-
-    _kIdX86Start = 16,
-    _kIdX86End = 31,
-
-    _kIdX64Start = 32,
-    _kIdX64End = 47,
-
-    _kIdArmStart = 48,
-    _kIdArmEnd = 49,
-
-    //! \endcond
+    kIdX64SystemV = 32,
+    kIdX64Windows = 33,
 
     // ------------------------------------------------------------------------
     // [Host]
     // ------------------------------------------------------------------------
 
-#if defined(ASMJIT_DOCGEN)
-
-    //! Default calling convention based on the current C++ compiler's settings.
-    //!
-    //! \note This should be always the same as `kIdHostCDecl`, but some
-    //! compilers allow to override the default calling convention. Overriding
-    //! is not detected at the moment.
-    kIdHost           = DETECTED_AT_COMPILE_TIME,
-
-    //! Default CDECL calling convention based on the current C++ compiler's settings.
-    kIdHostCDecl      = DETECTED_AT_COMPILE_TIME,
-
-    //! Default STDCALL calling convention based on the current C++ compiler's settings.
-    //!
-    //! \note If not defined by the host then it's the same as `kIdHostCDecl`.
-    kIdHostStdCall    = DETECTED_AT_COMPILE_TIME,
-
-    //! Compatibility for `__fastcall` calling convention.
-    //!
-    //! \note If not defined by the host then it's the same as `kIdHostCDecl`.
-    kIdHostFastCall   = DETECTED_AT_COMPILE_TIME
-
-#elif ASMJIT_ARCH_X86 == 32
-
-    kIdHost           = kIdX86CDecl,
-    kIdHostCDecl      = kIdX86CDecl,
-    kIdHostStdCall    = kIdX86StdCall,
-
-# if defined(_MSC_VER)
-    kIdHostFastCall   = kIdX86MsFastCall,
-# elif defined(__GNUC__)
-    kIdHostFastCall   = kIdX86GccFastCall,
-# else
-    kIdHostFastCall   = kIdHost,
-# endif
-
-    kIdHostLightCall2 = kIdX86LightCall2,
-    kIdHostLightCall3 = kIdX86LightCall3,
-    kIdHostLightCall4 = kIdX86LightCall4
-
-#elif ASMJIT_ARCH_X86 == 64
-
-# if defined(_WIN32)
-    kIdHost           = kIdX86Win64,
-# else
-    kIdHost           = kIdX86SysV64,
-# endif
-
-    kIdHostCDecl      = kIdHost, // Doesn't exist, redirected to host.
-    kIdHostStdCall    = kIdHost, // Doesn't exist, redirected to host.
-    kIdHostFastCall   = kIdHost, // Doesn't exist, redirected to host.
-
-    kIdHostLightCall2 = kIdX64LightCall2,
-    kIdHostLightCall3 = kIdX64LightCall3,
-    kIdHostLightCall4 = kIdX64LightCall4
-
-#elif ASMJIT_ARCH_ARM == 32
-
-# if defined(__SOFTFP__)
-    kIdHost           = kIdArm32SoftFP,
-# else
-    kIdHost           = kIdArm32HardFP,
-# endif
-    // These don't exist on ARM.
-    kIdHostCDecl      = kIdHost, // Doesn't exist, redirected to host.
-    kIdHostStdCall    = kIdHost, // Doesn't exist, redirected to host.
-    kIdHostFastCall   = kIdHost  // Doesn't exist, redirected to host.
-
+    kIdHost =
+#if ASMJIT_ARCH_ARM == 32 && defined(__SOFTFP__)
+      kIdSoftFloat
+#elif ASMJIT_ARCH_ARM == 32 && !defined(__SOFTFP__)
+      kIdHardFloat
 #else
-
-    kIdHost           = kIdNone,
-    kIdHostCDecl      = kIdHost,
-    kIdHostStdCall    = kIdHost,
-    kIdHostFastCall   = kIdHost
-
+      kIdCDecl
 #endif
+
+#ifndef ASMJIT_NO_DEPRECATE
+    , kIdHostCDecl = kIdCDecl
+    , kIdHostStdCall = kIdStdCall
+    , kIdHostFastCall = kIdFastCall
+    , kIdHostLightCall2 = kIdLightCall2
+    , kIdHostLightCall3 = kIdLightCall3
+    , kIdHostLightCall4 = kIdLightCall4
+#endif // !ASMJIT_NO_DEPRECATE
   };
 
   //! Strategy used to assign registers to function arguments.
@@ -262,23 +200,50 @@ struct CallConv {
   //! as defined by WIN64 calling convention - it applies to 64-bit calling
   //! conventions only.
   enum Strategy : uint32_t {
-    kStrategyDefault     = 0,            //!< Default register assignment strategy.
-    kStrategyWin64       = 1             //!< WIN64 specific register assignment strategy.
+    //! Default register assignment strategy.
+    kStrategyDefault = 0,
+    //! Windows 64-bit ABI register assignment strategy.
+    kStrategyX64Windows = 1,
+    //! Windows 64-bit __vectorcall register assignment strategy.
+    kStrategyX64VectorCall = 2,
+
+    //! Number of assignment strategies.
+    kStrategyCount = 3
   };
 
   //! Calling convention flags.
   enum Flags : uint32_t {
-    kFlagCalleePopsStack = 0x01,         //!< Callee is responsible for cleaning up the stack.
-    kFlagPassFloatsByVec = 0x02,         //!< Pass F32 and F64 arguments by VEC128 register.
-    kFlagVectorCall      = 0x04,         //!< This is a '__vectorcall' calling convention.
-    kFlagIndirectVecArgs = 0x08          //!< Pass vector arguments indirectly (as a pointer).
+    //! Callee is responsible for cleaning up the stack.
+    kFlagCalleePopsStack = 0x01u,
+    //! Pass vector arguments indirectly (as a pointer).
+    kFlagIndirectVecArgs = 0x02u,
+    //! Pass F32 and F64 arguments by VEC128 register.
+    kFlagPassFloatsByVec = 0x04u,
+    //! Pass MMX and vector arguments by stack if the function has variable arguments.
+    kFlagPassVecByStackIfVA = 0x08u,
+    //! MMX registers are passed and returned via GP registers.
+    kFlagPassMmxByGp = 0x10u,
+    //! MMX registers are passed and returned via XMM registers.
+    kFlagPassMmxByXmm = 0x20u,
+    //! Calling convention can be used with variable arguments.
+    kFlagVarArgCompatible = 0x80u
   };
 
   //! \name Construction & Destruction
   //! \{
 
-  ASMJIT_API Error init(uint32_t ccId) noexcept;
+  //! Initializes this calling convention to the given `ccId` based on the
+  //! `environment`.
+  //!
+  //! See \ref Id and \ref Environment for more details.
+  ASMJIT_API Error init(uint32_t ccId, const Environment& environment) noexcept;
 
+  //! Resets this CallConv struct into a defined state.
+  //!
+  //! It's recommended to reset the \ref CallConv struct in case you would
+  //! like create a custom calling convention as it prevents from using an
+  //! uninitialized data (CallConv doesn't have a constructor that would
+  //! initialize it, it's just a struct).
   inline void reset() noexcept {
     memset(this, 0, sizeof(*this));
     memset(_passedOrder, 0xFF, sizeof(_passedOrder));
@@ -295,9 +260,9 @@ struct CallConv {
   inline void setId(uint32_t id) noexcept { _id = uint8_t(id); }
 
   //! Returns the calling function architecture id.
-  inline uint32_t archId() const noexcept { return _archId; }
+  inline uint32_t arch() const noexcept { return _arch; }
   //! Sets the calling function architecture id.
-  inline void setArchType(uint32_t archId) noexcept { _archId = uint8_t(archId); }
+  inline void setArch(uint32_t arch) noexcept { _arch = uint8_t(arch); }
 
   //! Returns the strategy used to assign registers to arguments, see `Strategy`.
   inline uint32_t strategy() const noexcept { return _strategy; }
@@ -337,11 +302,13 @@ struct CallConv {
   //! implement custom calling conventions that guarantee higher stack alignment.
   inline void setNaturalStackAlignment(uint32_t value) noexcept { _naturalStackAlignment = uint8_t(value); }
 
+  //! Returns the order of passed registers of the given `group`, see \ref BaseReg::RegGroup.
   inline const uint8_t* passedOrder(uint32_t group) const noexcept {
     ASMJIT_ASSERT(group < BaseReg::kGroupVirt);
     return _passedOrder[group].id;
   }
 
+  //! Returns the mask of passed registers of the given `group`, see \ref BaseReg::RegGroup.
   inline uint32_t passedRegs(uint32_t group) const noexcept {
     ASMJIT_ASSERT(group < BaseReg::kGroupVirt);
     return _passedRegs[group];
@@ -356,6 +323,7 @@ struct CallConv {
     _passedOrder[group].packed[3] = p3;
   }
 
+  //! Resets the order and mask of passed registers.
   inline void setPassedToNone(uint32_t group) noexcept {
     ASMJIT_ASSERT(group < BaseReg::kGroupVirt);
 
@@ -363,6 +331,7 @@ struct CallConv {
     _passedRegs[group] = 0u;
   }
 
+  //! Sets the order and mask of passed registers.
   inline void setPassedOrder(uint32_t group, uint32_t a0, uint32_t a1 = 0xFF, uint32_t a2 = 0xFF, uint32_t a3 = 0xFF, uint32_t a4 = 0xFF, uint32_t a5 = 0xFF, uint32_t a6 = 0xFF, uint32_t a7 = 0xFF) noexcept {
     ASMJIT_ASSERT(group < BaseReg::kGroupVirt);
 
@@ -383,23 +352,17 @@ struct CallConv {
                          (a7 != 0xFF ? 1u << a7 : 0u) ;
   }
 
+  //! Returns preserved register mask of the given `group`, see \ref BaseReg::RegGroup.
   inline uint32_t preservedRegs(uint32_t group) const noexcept {
     ASMJIT_ASSERT(group < BaseReg::kGroupVirt);
     return _preservedRegs[group];
   }
 
+  //! Sets preserved register mask of the given `group`, see \ref BaseReg::RegGroup.
   inline void setPreservedRegs(uint32_t group, uint32_t regs) noexcept {
     ASMJIT_ASSERT(group < BaseReg::kGroupVirt);
     _preservedRegs[group] = regs;
   }
-
-  //! \}
-
-  //! \name Static Functions
-  //! \{
-
-  static inline bool isX86Family(uint32_t ccId) noexcept { return ccId >= _kIdX86Start && ccId <= _kIdX64End; }
-  static inline bool isArmFamily(uint32_t ccId) noexcept { return ccId >= _kIdArmStart && ccId <= _kIdArmEnd; }
 
   //! \}
 };

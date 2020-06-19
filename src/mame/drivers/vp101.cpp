@@ -124,23 +124,23 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
-	DECLARE_READ32_MEMBER(tty_ready_r);
-	DECLARE_WRITE32_MEMBER(tty_w);
-	DECLARE_READ32_MEMBER(test_r) { return 0xffffffff; }
+	uint32_t tty_ready_r();
+	void tty_w(uint32_t data);
+	uint32_t test_r() { return 0xffffffff; }
 
-	DECLARE_READ32_MEMBER(pic_r);
-	DECLARE_WRITE32_MEMBER(pic_w);
+	uint32_t pic_r();
+	void pic_w(uint32_t data);
 
-	DECLARE_WRITE32_MEMBER(dmaaddr_w);
+	void dmaaddr_w(uint32_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(dmarq_w);
 
-	DECLARE_READ32_MEMBER(tty_4925_rdy_r) { return 0x2; }
+	uint32_t tty_4925_rdy_r() { return 0x2; }
 
-	DECLARE_READ32_MEMBER(spi_status_r) { return 0x8007; }
+	uint32_t spi_status_r() { return 0x8007; }
 
-	DECLARE_READ32_MEMBER(spi_r);
-	DECLARE_WRITE32_MEMBER(spi_w);
+	uint32_t spi_r();
+	void spi_w(uint32_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t vp50_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -175,7 +175,7 @@ void vp10x_state::machine_start()
 //  m_maincpu->add_fastram(0x00000000, 0x03ffffff, false, m_mainram);
 }
 
-WRITE32_MEMBER(vp10x_state::dmaaddr_w)
+void vp10x_state::dmaaddr_w(uint32_t data)
 {
 	m_dma_ptr = (data & 0x07ffffff);
 }
@@ -204,7 +204,7 @@ WRITE_LINE_MEMBER(vp10x_state::dmarq_w)
 	}
 }
 
-READ32_MEMBER(vp10x_state::pic_r)
+uint32_t vp10x_state::pic_r()
 {
 	static const uint8_t vers[5] = { 0x00, 0x01, 0x00, 0x00, 0x00 };
 	static const uint8_t serial[10] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
@@ -226,7 +226,7 @@ READ32_MEMBER(vp10x_state::pic_r)
 	return 0;
 }
 
-WRITE32_MEMBER(vp10x_state::pic_w)
+void vp10x_state::pic_w(uint32_t data)
 {
 	//printf("%02x to pic_cmd\n", data&0xff);
 	if ((data & 0xff) == 0)
@@ -237,12 +237,12 @@ WRITE32_MEMBER(vp10x_state::pic_w)
 	pic_state = 0;
 }
 
-READ32_MEMBER(vp10x_state::spi_r)
+uint32_t vp10x_state::spi_r()
 {
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(vp10x_state::spi_w)
+void vp10x_state::spi_w(uint32_t data)
 {
 //  printf("%d to SPI select\n", data);
 	m_spi_select = data;
@@ -292,12 +292,12 @@ uint32_t vp10x_state::vp50_screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-READ32_MEMBER(vp10x_state::tty_ready_r)
+uint32_t vp10x_state::tty_ready_r()
 {
 	return 0x60;    // must return &0x20 for output at tty_w to continue
 }
 
-WRITE32_MEMBER(vp10x_state::tty_w)  // set breakpoint at bfc01430 to catch when it's printing things
+void vp10x_state::tty_w(uint32_t data)  // set breakpoint at bfc01430 to catch when it's printing things
 {
 // uncomment to see startup messages - it says "RAM OK" and "EPI RSS Ver 4.5.1" followed by "<RSS active>" and then lots of dots
 // Special Forces also says "<inited tv_cap> = 00000032"

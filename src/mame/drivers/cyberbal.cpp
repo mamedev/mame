@@ -90,7 +90,7 @@ void cyberbal2p_state::machine_reset()
  *
  *************************************/
 
-READ16_MEMBER(cyberbal2p_state::sound_state_r)
+uint16_t cyberbal2p_state::sound_state_r()
 {
 	int temp = 0xffff;
 	if (m_jsa->main_to_sound_ready()) temp ^= 0xffff;
@@ -105,7 +105,7 @@ READ16_MEMBER(cyberbal2p_state::sound_state_r)
  *
  *************************************/
 
-WRITE16_MEMBER(cyberbal_state::p2_reset_w)
+void cyberbal_state::p2_reset_w(uint16_t data)
 {
 	m_extracpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }

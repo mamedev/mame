@@ -1254,7 +1254,7 @@ void dkong_state::dkong_p1_w(uint8_t data)
  *
  ****************************************************************/
 
-WRITE8_MEMBER(dkong_state::dkong_audio_irq_w)
+void dkong_state::dkong_audio_irq_w(uint8_t data)
 {
 	if (data)
 		m_soundcpu->set_input_line(0, ASSERT_LINE);

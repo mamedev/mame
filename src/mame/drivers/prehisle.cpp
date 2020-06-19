@@ -22,7 +22,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(prehisle_state::soundcmd_w)
+void prehisle_state::soundcmd_w(u16 data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -56,7 +56,7 @@ void prehisle_state::prehisle_map(address_map &map)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(prehisle_state::upd_port_w)
+void prehisle_state::upd_port_w(u8 data)
 {
 	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);

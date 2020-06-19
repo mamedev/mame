@@ -186,8 +186,8 @@ private:
 	required_device<hd44780_device> m_lcdc;
 	required_device<dac_bit_interface> m_dac;
 
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
+	uint8_t port_r(offs_t offset);
+	void port_w(offs_t offset, uint8_t data);
 	virtual void machine_reset() override;
 	void replicator_palette(palette_device &palette) const;
 	void replicator_data_map(address_map &map);
@@ -199,7 +199,7 @@ void replicator_state::machine_start()
 {
 }
 
-READ8_MEMBER(replicator_state::port_r)
+uint8_t replicator_state::port_r(offs_t offset)
 {
 	switch( offset )
 	{
@@ -284,7 +284,7 @@ READ8_MEMBER(replicator_state::port_r)
 	return 0;
 }
 
-WRITE8_MEMBER(replicator_state::port_w)
+void replicator_state::port_w(offs_t offset, uint8_t data)
 {
 	switch( offset )
 	{

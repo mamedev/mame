@@ -324,16 +324,16 @@ public:
 	void bpoker(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(videopkr_io_r);
-	DECLARE_WRITE8_MEMBER(videopkr_io_w);
+	uint8_t videopkr_io_r(offs_t offset);
+	void videopkr_io_w(offs_t offset, uint8_t data);
 	uint8_t videopkr_p1_data_r();
 	uint8_t videopkr_p2_data_r();
 	void videopkr_p1_data_w(uint8_t data);
 	void videopkr_p2_data_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(videopkr_t0_latch);
 	DECLARE_WRITE_LINE_MEMBER(prog_w);
-	DECLARE_READ8_MEMBER(sound_io_r);
-	DECLARE_WRITE8_MEMBER(sound_io_w);
+	uint8_t sound_io_r();
+	void sound_io_w(uint8_t data);
 	uint8_t sound_p2_r();
 	void sound_p2_w(uint8_t data);
 	uint8_t baby_sound_p0_r();
@@ -549,7 +549,7 @@ uint32_t videopkr_state::screen_update_videopkr(screen_device &screen, bitmap_in
 *      R/W Handlers      *
 *************************/
 
-READ8_MEMBER(videopkr_state::videopkr_io_r)
+uint8_t videopkr_state::videopkr_io_r(offs_t offset)
 {
 	uint8_t valor = 0, hf, co;
 
@@ -629,7 +629,7 @@ READ8_MEMBER(videopkr_state::videopkr_io_r)
 	return valor;
 }
 
-WRITE8_MEMBER(videopkr_state::videopkr_io_w)
+void videopkr_state::videopkr_io_w(offs_t offset, uint8_t data)
 {
 	switch (m_p2)
 	{
@@ -802,7 +802,7 @@ WRITE_LINE_MEMBER(videopkr_state::prog_w)
 
 */
 
-READ8_MEMBER(videopkr_state::sound_io_r)
+uint8_t videopkr_state::sound_io_r()
 {
 	switch (m_vp_sound_p2)
 	{
@@ -824,7 +824,7 @@ READ8_MEMBER(videopkr_state::sound_io_r)
 	return m_sound_latch;
 }
 
-WRITE8_MEMBER(videopkr_state::sound_io_w)
+void videopkr_state::sound_io_w(uint8_t data)
 {
 	if (m_vp_sound_p2 == 0x5f || m_vp_sound_p2 == 0xdf)
 	{

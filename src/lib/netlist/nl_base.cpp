@@ -18,10 +18,6 @@
 
 #include <limits>
 
-// ----------------------------------------------------------------------------------------
-// Statically compiled solvers for mame netlist
-// ----------------------------------------------------------------------------------------
-
 namespace netlist
 {
 
@@ -29,9 +25,9 @@ namespace netlist
 	// callbacks_t
 	// ----------------------------------------------------------------------------------------
 
-	plib::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
+	host_arena::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
 	{
-		return plib::make_unique<plib::dynlib_static>(nullptr);
+		return plib::make_unique<plib::dynlib_static, host_arena>(nullptr);
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -124,7 +120,7 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	netlist_state_t::netlist_state_t(const pstring &name,
-		plib::unique_ptr<callbacks_t> &&callbacks)
+		host_arena::unique_ptr<callbacks_t> &&callbacks)
 	: m_callbacks(std::move(callbacks)) // Order is important here
 	, m_log(*m_callbacks)
 	, m_extended_validation(false)
@@ -133,9 +129,9 @@ namespace netlist
 
 		m_lib = m_callbacks->static_solver_lib();
 
-		m_setup = plib::make_unique<setup_t>(*this);
+		m_setup = plib::make_unique<setup_t, host_arena>(*this);
 		// create the run interface
-		m_netlist = m_pool.make_unique<netlist_t>(*this, name);
+		m_netlist = plib::make_unique<netlist_t>(m_pool, *this, name);
 
 		// Make sure save states are invalidated when a new version is deployed
 
@@ -145,7 +141,7 @@ namespace netlist
 		devices::initialize_factory(m_setup->parser().factory());
 
 		// Add default include file
-		using a = plib::psource_str_t<plib::psource_t>;
+		using a = plib::psource_str_t;
 		const pstring content =
 		"#define RES_R(res) (res)            \n"
 		"#define RES_K(res) ((res) * 1e3)    \n"
@@ -247,6 +243,11 @@ namespace netlist
 		ENTRY_EX(sizeof(pstring))
 		ENTRY_EX(sizeof(core_device_t::stats_t))
 		ENTRY_EX(sizeof(plib::plog_level))
+
+		ENTRY_EX(sizeof(nldelegate))
+		ENTRY(PPMF_TYPE)
+		ENTRY(PHAS_PMF_INTERNAL)
+
 	#undef ENTRY
 	#undef ENTRY_EX
 	}
@@ -312,7 +313,7 @@ namespace netlist
 			case 0:
 			{
 				std::vector<core_device_t *> d;
-				std::vector<nldelegate *> t;
+				std::vector<const nldelegate *> t;
 				log().verbose("Using default startup strategy");
 				for (auto &n : m_nets)
 					for (auto & term : n->core_terms())
@@ -323,6 +324,7 @@ namespace netlist
 								t.push_back(&term->delegate());
 								term->run_delegate();
 							}
+							// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 							auto *dev = reinterpret_cast<core_device_t *>(term->delegate().object());
 							if (!plib::container::contains(d, dev))
 								d.push_back(dev);
@@ -401,7 +403,7 @@ namespace netlist
 		}
 
 		log().verbose("Total calls : {1:12} {2:12} {3:12}", total_count,
-			total_time, total_time / static_cast<decltype(total_time)>((total_count > 0) ? total_count : 1));
+			total_time, total_time / gsl::narrow<decltype(total_time)>((total_count > 0) ? total_count : 1));
 
 		log().verbose("Total loop     {1:15}", si.m_stat_mainloop());
 		log().verbose("Total time     {1:15}", total_time);
@@ -423,8 +425,8 @@ namespace netlist
 			}
 
 			plib::pperftime_t<true>::type total_overhead = overhead()
-					* static_cast<plib::pperftime_t<true>::type>(total_count)
-					/ static_cast<plib::pperftime_t<true>::type>(200000);
+					* gsl::narrow<plib::pperftime_t<true>::type>(total_count)
+					/ gsl::narrow<plib::pperftime_t<true>::type>(200000);
 
 			log().verbose("Queue Pushes   {1:15}", si.m_queue.m_prof_call());
 			log().verbose("Queue Moves    {1:15}", si.m_queue.m_prof_sortmove());
@@ -435,7 +437,7 @@ namespace netlist
 			log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
 			log().verbose("Total overhead {1:15}", total_overhead);
 			plib::pperftime_t<true>::type overhead_per_pop = (si.m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
-					/ static_cast<plib::pperftime_t<true>::type>(si.m_queue.m_prof_call());
+					/ gsl::narrow<plib::pperftime_t<true>::type>(si.m_queue.m_prof_call());
 			log().verbose("Overhead per pop  {1:11}", overhead_per_pop );
 			log().verbose("");
 		}
@@ -449,7 +451,7 @@ namespace netlist
 			if (stats->m_stat_inc_active() > 3 * stats->m_stat_total_time.count()
 				&& stats->m_stat_inc_active() > trigger)
 				log().verbose("HINT({}, NO_DEACTIVATE) // {} {} {}", ep->name(),
-					static_cast<nl_fptype>(stats->m_stat_inc_active()) / static_cast<nl_fptype>(stats->m_stat_total_time.count()),
+					gsl::narrow<nl_fptype>(stats->m_stat_inc_active()) / gsl::narrow<nl_fptype>(stats->m_stat_total_time.count()),
 					stats->m_stat_inc_active(), stats->m_stat_total_time.count());
 		}
 		log().verbose("");
@@ -493,7 +495,7 @@ namespace netlist
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
 		//printf("owned device: %s\n", this->name().c_str());
-		owner.state().register_device(this->name(), owned_pool_ptr<core_device_t>(this, false));
+		owner.state().register_device(this->name(), device_arena::owned_ptr<core_device_t>(this, false));
 		if (exec().stats_enabled())
 			m_stats = owner.state().make_pool_object<stats_t>();
 	}
@@ -757,7 +759,7 @@ namespace netlist
 
 	logic_input_t::logic_input_t(device_t &dev, const pstring &aname,
 			nldelegate delegate)
-			: logic_t(dev, aname, STATE_INP_ACTIVE, delegate)
+			: logic_t(dev, aname, STATE_INP_ACTIVE, delegate.is_set() ? delegate : dev.default_delegate())
 	{
 		state().setup().register_term(*this);
 	}
@@ -773,7 +775,7 @@ namespace netlist
 	{
 		plib::unused_var(dummy);
 		this->set_net(&m_my_net);
-		state().register_net(owned_pool_ptr<logic_net_t>(&m_my_net, false));
+		state().register_net(device_arena::owned_ptr<logic_net_t>(&m_my_net, false));
 		state().setup().register_term(*this);
 	}
 
@@ -802,7 +804,7 @@ namespace netlist
 		: analog_t(dev, aname, STATE_OUT)
 		, m_my_net(dev.state(), name() + ".net", this)
 	{
-		state().register_net(owned_pool_ptr<analog_net_t>(&m_my_net, false));
+		state().register_net(device_arena::owned_ptr<analog_net_t>(&m_my_net, false));
 		this->set_net(&m_my_net);
 
 		//net().m_cur_Analog = NL_FCONST(0.0);
@@ -830,10 +832,8 @@ namespace netlist
 		device.state().setup().register_param_t(*this);
 	}
 
-	param_t::~param_t() noexcept
-	{
-		// placed here to avoid weak vtable warnings
-	}
+	// placed here to avoid weak vtable warnings
+	param_t::~param_t() noexcept = default;
 
 	param_t::param_type_t param_t::param_type() const noexcept(false)
 	{
@@ -857,14 +857,14 @@ namespace netlist
 	pstring param_t::get_initial(const core_device_t *dev, bool *found) const
 	{
 		pstring res = dev->state().setup().get_initial_param_val(this->name(), "");
-		*found = (res != "");
+		*found = (!res.empty());
 		return res;
 	}
 
 	param_str_t::param_str_t(core_device_t &device, const pstring &name, const pstring &val)
 	: param_t(device, name)
 	{
-		m_param = plib::make_unique<pstring>(val);
+		m_param = plib::make_unique<pstring, host_arena>(val);
 		*m_param = device.state().setup().get_initial_param_val(this->name(),val);
 	}
 
@@ -872,7 +872,7 @@ namespace netlist
 	: param_t(name)
 	{
 		// deviceless parameter, no registration, owner is responsible
-		m_param = plib::make_unique<pstring>(val);
+		m_param = plib::make_unique<pstring, host_arena>(val);
 		*m_param = state.setup().get_initial_param_val(this->name(),val);
 	}
 
@@ -907,7 +907,7 @@ namespace netlist
 	}
 
 
-	plib::unique_ptr<std::istream> param_data_t::stream()
+	std::unique_ptr<std::istream> param_data_t::stream()
 	{
 		return device().state().parser().get_data_stream(str());
 	}

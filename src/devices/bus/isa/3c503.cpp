@@ -110,8 +110,7 @@ void el2_3c503_device::dack_w(int line, uint8_t data) {
 uint8_t el2_3c503_device::el2_3c503_loport_r(offs_t offset) {
 	switch((m_regs.ctrl >> 2) & 3) {
 	case 0:
-		m_dp8390->dp8390_cs(CLEAR_LINE);
-		return m_dp8390->dp8390_r(offset);
+		return m_dp8390->cs_read(offset);
 	case 1:
 		return m_prom[offset];
 	case 2:
@@ -125,8 +124,7 @@ uint8_t el2_3c503_device::el2_3c503_loport_r(offs_t offset) {
 void el2_3c503_device::el2_3c503_loport_w(offs_t offset, uint8_t data) {
 	switch((m_regs.ctrl >> 2) & 3) {
 	case 0:
-		m_dp8390->dp8390_cs(CLEAR_LINE);
-		return m_dp8390->dp8390_w(offset, data);
+		return m_dp8390->cs_write(offset, data);
 	case 1:
 	case 2:
 		logerror("3c503: invalid attempt to write to prom\n");

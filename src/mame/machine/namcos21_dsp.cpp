@@ -48,20 +48,20 @@ void namcos21_dsp_device::device_reset()
 }
 
 
-READ16_MEMBER(namcos21_dsp_device::winrun_dspcomram_r)
+uint16_t namcos21_dsp_device::winrun_dspcomram_r(offs_t offset)
 {
 	int bank = 1-(m_winrun_dspcomram_control[0x4/2]&1);
 	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
 	return mem[offset];
 }
-WRITE16_MEMBER(namcos21_dsp_device::winrun_dspcomram_w)
+void namcos21_dsp_device::winrun_dspcomram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int bank = 1-(m_winrun_dspcomram_control[0x4/2]&1);
 	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
 	COMBINE_DATA( &mem[offset] );
 }
 
-READ16_MEMBER(namcos21_dsp_device::winrun_cuskey_r)
+uint16_t namcos21_dsp_device::winrun_cuskey_r()
 {
 	int pc = m_dsp->pc();
 	switch( pc )
@@ -82,7 +82,7 @@ READ16_MEMBER(namcos21_dsp_device::winrun_cuskey_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos21_dsp_device::winrun_cuskey_w)
+void namcos21_dsp_device::winrun_cuskey_w(uint16_t data)
 {
 }
 
@@ -136,7 +136,7 @@ uint16_t namcos21_dsp_device::winrun_poly_reset_r()
 	return 0;
 }
 
-WRITE16_MEMBER(namcos21_dsp_device::winrun_dsp_render_w)
+void namcos21_dsp_device::winrun_dsp_render_w(uint16_t data)
 {
 	if( m_winrun_poly_index<WINRUN_MAX_POLY_PARAM )
 	{
@@ -148,7 +148,7 @@ WRITE16_MEMBER(namcos21_dsp_device::winrun_dsp_render_w)
 	}
 }
 
-WRITE16_MEMBER(namcos21_dsp_device::winrun_dsp_pointrom_addr_w)
+void namcos21_dsp_device::winrun_dsp_pointrom_addr_w(offs_t offset, uint16_t data)
 {
 	if( offset==0 )
 	{ /* port 8 */
@@ -160,12 +160,12 @@ WRITE16_MEMBER(namcos21_dsp_device::winrun_dsp_pointrom_addr_w)
 	}
 }
 
-READ16_MEMBER(namcos21_dsp_device::winrun_dsp_pointrom_data_r)
+uint16_t namcos21_dsp_device::winrun_dsp_pointrom_data_r()
 {
 	return m_ptrom16[m_winrun_pointrom_addr++];
 }
 
-WRITE16_MEMBER(namcos21_dsp_device::winrun_dsp_complete_w)
+void namcos21_dsp_device::winrun_dsp_complete_w(uint16_t data)
 {
 	if( data )
 	{
@@ -175,12 +175,12 @@ WRITE16_MEMBER(namcos21_dsp_device::winrun_dsp_complete_w)
 	}
 }
 
-READ16_MEMBER(namcos21_dsp_device::winrun_table_r)
+uint16_t namcos21_dsp_device::winrun_table_r(offs_t offset)
 {
 	return m_winrun_polydata[offset];
 }
 
-WRITE16_MEMBER(namcos21_dsp_device::winrun_dspbios_w)
+void namcos21_dsp_device::winrun_dspbios_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_winrun_dspbios[offset] );
 	if( offset==0xfff ) // is this the real trigger?
@@ -195,26 +195,26 @@ WRITE16_MEMBER(namcos21_dsp_device::winrun_dspbios_w)
 //380004 : dspcomram bank, as seen by 68k
 //380008 : read : state?
 
-READ16_MEMBER(namcos21_dsp_device::winrun_68k_dspcomram_r)
+uint16_t namcos21_dsp_device::winrun_68k_dspcomram_r(offs_t offset)
 {
 	int bank = m_winrun_dspcomram_control[0x4/2]&1;
 	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
 	return mem[offset];
 }
 
-WRITE16_MEMBER(namcos21_dsp_device::winrun_68k_dspcomram_w)
+void namcos21_dsp_device::winrun_68k_dspcomram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int bank = m_winrun_dspcomram_control[0x4/2]&1;
 	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
 	COMBINE_DATA( &mem[offset] );
 }
 
-READ16_MEMBER(namcos21_dsp_device::winrun_dspcomram_control_r)
+uint16_t namcos21_dsp_device::winrun_dspcomram_control_r(offs_t offset)
 {
 	return m_winrun_dspcomram_control[offset];
 }
 
-WRITE16_MEMBER(namcos21_dsp_device::winrun_dspcomram_control_w)
+void namcos21_dsp_device::winrun_dspcomram_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_winrun_dspcomram_control[offset] );
 }
@@ -254,18 +254,18 @@ void namcos21_dsp_device::device_add_mconfig(machine_config &config)
 	dsp.xf_out_cb().set_nop();
 }
 
-WRITE16_MEMBER(namcos21_dsp_device::pointram_control_w)
+void namcos21_dsp_device::pointram_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_pointram_control );
 	m_pointram_idx = 0; /* HACK */
 }
 
-READ16_MEMBER(namcos21_dsp_device::pointram_data_r)
+uint16_t namcos21_dsp_device::pointram_data_r()
 {
 	return m_pointram[m_pointram_idx];
 }
 
-WRITE16_MEMBER(namcos21_dsp_device::pointram_data_w)
+void namcos21_dsp_device::pointram_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{

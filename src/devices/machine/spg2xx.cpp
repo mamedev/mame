@@ -182,6 +182,8 @@ void spg2xx_device::configure_spg_io(spg2xx_io_device* io)
 	io->portc_out().set(FUNC(spg2xx_device::portc_w));
 	io->adc_in<0>().set(FUNC(spg2xx_device::adc_r<0>));
 	io->adc_in<1>().set(FUNC(spg2xx_device::adc_r<1>));
+	io->adc_in<2>().set(FUNC(spg2xx_device::adc_r<2>));
+	io->adc_in<3>().set(FUNC(spg2xx_device::adc_r<3>));
 	io->i2c_w().set(FUNC(spg2xx_device::eepromx_w));
 	io->i2c_r().set(FUNC(spg2xx_device::eepromx_r));
 	io->uart_tx().set(FUNC(spg2xx_device::uart_tx_w));

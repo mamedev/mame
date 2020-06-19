@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu, Robbbert
+// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu
 /***************************************************************************
 
         Intel MCS-86 System Design Kit (SDK-86)
@@ -69,7 +69,7 @@ private:
 void sdk86_state::sdk86_mem(address_map &map)
 {
 	map(0x00000, 0x00fff).ram(); //2K standard, or 4k (board fully populated)
-	map(0xfe000, 0xfffff).rom();
+	map(0xfe000, 0xfffff).rom().region("maincpu", 0);
 }
 
 void sdk86_state::sdk86_io(address_map &map)
@@ -182,7 +182,7 @@ void sdk86_state::sdk86(machine_config &config)
 
 /* ROM definition */
 ROM_START( sdk86 )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF ) // all are Intel D2616 ?eproms with the windows painted over? (factory programmed eproms? this would match the 'i8642' marking on the factory programmed eprom version of the AT keyboard mcu...)
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF ) // all are Intel D2616 ?eproms with the windows painted over? (factory programmed eproms? this would match the 'i8642' marking on the factory programmed eprom version of the AT keyboard mcu...)
 	/* Note that the rom pairs at FE000-FEFFF and FF000-FFFFF are
 	   interchangeable; the ones at FF000-FFFFF are the ones which start on
 	   bootup, and the other ones live at FE000-FEFFF and can be switched in by
@@ -192,16 +192,16 @@ ROM_START( sdk86 )
 	   the opposite arrangement (Serial primary). */
 	// Keypad Monitor Version 1.1 (says "- 86   1.1" on LED display at startup)
 	ROM_SYSTEM_BIOS( 0, "keypad", "Keypad Monitor" )
-	ROMX_LOAD( "0456_104531-001.a36", 0xfe000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
-	ROMX_LOAD( "0457_104532-001.a37", 0xfe001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
-	ROMX_LOAD( "0169_102042-001.a27", 0xff000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
-	ROMX_LOAD( "0170_102043-001.a30", 0xff001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
+	ROMX_LOAD( "0456_104531-001.a36", 0x0000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
+	ROMX_LOAD( "0457_104532-001.a37", 0x0001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
+	ROMX_LOAD( "0169_102042-001.a27", 0x1000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
+	ROMX_LOAD( "0170_102043-001.a30", 0x1001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
 	// Serial Monitor Version 1.2 (says "  86   1.2" on LED display at startup, and sends a data prompt over serial)
 	ROM_SYSTEM_BIOS( 1, "serial", "Serial Monitor" )
-	ROMX_LOAD( "0169_102042-001.a36", 0xfe000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
-	ROMX_LOAD( "0170_102043-001.a37", 0xfe001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
-	ROMX_LOAD( "0456_104531-001.a27", 0xff000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
-	ROMX_LOAD( "0457_104532-001.a30", 0xff001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
+	ROMX_LOAD( "0169_102042-001.a36", 0x0000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
+	ROMX_LOAD( "0170_102043-001.a37", 0x0001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
+	ROMX_LOAD( "0456_104531-001.a27", 0x1000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
+	ROMX_LOAD( "0457_104532-001.a30", 0x1001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
 
 	/* proms:
 	 * dumped 11/21/09 through 11/29/09 by LN

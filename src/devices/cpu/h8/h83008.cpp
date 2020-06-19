@@ -218,12 +218,12 @@ void h83008_device::device_reset()
 }
 
 
-READ8_MEMBER(h83008_device::syscr_r)
+uint8_t h83008_device::syscr_r()
 {
 	return syscr;
 }
 
-WRITE8_MEMBER(h83008_device::syscr_w)
+void h83008_device::syscr_w(uint8_t data)
 {
 	syscr = data;
 	update_irq_filter();

@@ -28,7 +28,7 @@
 #ifndef ASMJIT_NO_COMPILER
 
 #include "../core/compiler.h"
-#include "../core/logging.h"
+#include "../core/logger.h"
 #include "../core/support.h"
 #include "../core/zone.h"
 #include "../core/zonevector.h"
@@ -984,10 +984,7 @@ public:
     //! Stack allocation is preferred.
     kFlagStackPreferred = 0x00000004u,
     //! Marked for stack argument reassignment.
-    kFlagStackArgToStack = 0x00000008u,
-
-    // TODO: Used?
-    kFlagDirtyStats       = 0x80000000u
+    kFlagStackArgToStack = 0x00000008u
   };
 
   enum ArgIndex : uint32_t {
@@ -1004,7 +1001,7 @@ public:
       _tiedReg(nullptr),
       _stackSlot(nullptr),
       _info(vReg->info()),
-      _flags(kFlagDirtyStats),
+      _flags(0),
       _allocatedMask(0),
       _clobberSurvivalMask(0),
       _regByteMask(0),

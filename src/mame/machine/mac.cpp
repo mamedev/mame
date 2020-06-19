@@ -284,7 +284,7 @@ WRITE_LINE_MEMBER(mac_state::mac_asc_irq)
 	}
 }
 
-WRITE16_MEMBER ( mac_state::mac_autovector_w )
+void mac_state::mac_autovector_w(offs_t offset, uint16_t data)
 {
 	if (LOG_GENERAL)
 		logerror("mac_autovector_w: offset=0x%08x data=0x%04x\n", offset, data);
@@ -294,7 +294,7 @@ WRITE16_MEMBER ( mac_state::mac_autovector_w )
 	/* Not yet implemented */
 }
 
-READ16_MEMBER ( mac_state::mac_autovector_r )
+uint16_t mac_state::mac_autovector_r(offs_t offset)
 {
 	if (LOG_GENERAL)
 		logerror("mac_autovector_r: offset=0x%08x\n", offset);
@@ -344,7 +344,7 @@ void mac_state::v8_resize()
 		mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 
 		// install catcher in place of ROM that will detect the first access to ROM in its real location
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xafffff, read32_delegate(*this, FUNC(mac_state::rom_switch_r)), 0xffffffff);
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xafffff, read32sm_delegate(*this, FUNC(mac_state::rom_switch_r)), 0xffffffff);
 	}
 	else
 	{
@@ -464,7 +464,7 @@ void mac_state::set_memory_overlay(int overlay)
 
 			if (is_rom)
 			{
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000000, 0x4fffffff, read32_delegate(*this, FUNC(mac_state::rom_switch_r)), 0xffffffff);
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000000, 0x4fffffff, read32sm_delegate(*this, FUNC(mac_state::rom_switch_r)), 0xffffffff);
 			}
 			else
 			{
@@ -489,7 +489,7 @@ void mac_state::set_memory_overlay(int overlay)
 	}
 }
 
-READ32_MEMBER(mac_state::rom_switch_r)
+uint32_t mac_state::rom_switch_r(offs_t offset)
 {
 	offs_t ROM_size = memregion("bootrom")->bytes();
 	uint32_t *ROM_data = (uint32_t *)memregion("bootrom")->base();
@@ -945,7 +945,7 @@ Note:  Asserting the DACK signal applies only to write operations to
   scsiRd+sRESET       $580070    Reset Parity/Interrupt
              */
 
-READ16_MEMBER ( mac_state::macplus_scsi_r )
+uint16_t mac_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -959,7 +959,7 @@ READ16_MEMBER ( mac_state::macplus_scsi_r )
 	return m_ncr5380->ncr5380_read_reg(reg)<<8;
 }
 
-READ32_MEMBER (mac_state::macii_scsi_drq_r)
+uint32_t mac_state::macii_scsi_drq_r(offs_t offset, uint32_t mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -979,7 +979,7 @@ READ32_MEMBER (mac_state::macii_scsi_drq_r)
 	return 0;
 }
 
-WRITE32_MEMBER (mac_state::macii_scsi_drq_w)
+void mac_state::macii_scsi_drq_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -1005,7 +1005,7 @@ WRITE32_MEMBER (mac_state::macii_scsi_drq_w)
 	}
 }
 
-WRITE16_MEMBER ( mac_state::macplus_scsi_w )
+void mac_state::macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -1019,7 +1019,7 @@ WRITE16_MEMBER ( mac_state::macplus_scsi_w )
 	m_ncr5380->ncr5380_write_reg(reg, data);
 }
 
-WRITE16_MEMBER ( mac_state::macii_scsi_w )
+void mac_state::macii_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -1165,7 +1165,7 @@ void mac_state::scc_mouse_irq(int x, int y)
 
 
 
-READ16_MEMBER ( mac_state::mac_scc_r )
+uint16_t mac_state::mac_scc_r(offs_t offset)
 {
 	uint16_t result;
 
@@ -1175,12 +1175,12 @@ READ16_MEMBER ( mac_state::mac_scc_r )
 
 
 
-WRITE16_MEMBER ( mac_state::mac_scc_w )
+void mac_state::mac_scc_w(offs_t offset, uint16_t data)
 {
 	m_scc->reg_w(offset, data);
 }
 
-WRITE16_MEMBER ( mac_state::mac_scc_2_w )
+void mac_state::mac_scc_2_w(offs_t offset, uint16_t data)
 {
 	m_scc->reg_w(offset, data >> 8);
 }
@@ -1189,7 +1189,7 @@ WRITE16_MEMBER ( mac_state::mac_scc_2_w )
  * IWM Code specific to the Mac Plus  *
  * ********************************** */
 
-READ16_MEMBER ( mac_state::mac_iwm_r )
+uint16_t mac_state::mac_iwm_r(offs_t offset, uint16_t mem_mask)
 {
 	/* The first time this is called is in a floppy test, which goes from
 	 * $400104 to $400126.  After that, all access to the floppy goes through
@@ -1207,7 +1207,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	return (result << 8) | result;
 }
 
-WRITE16_MEMBER ( mac_state::mac_iwm_w )
+void mac_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG_MAC_IWM)
 		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
@@ -1652,7 +1652,7 @@ WRITE_LINE_MEMBER(mac_state::mac_via_irq)
 	set_via_interrupt(state);
 }
 
-READ16_MEMBER ( mac_state::mac_via_r )
+uint16_t mac_state::mac_via_r(offs_t offset)
 {
 	uint16_t data;
 
@@ -1668,7 +1668,7 @@ READ16_MEMBER ( mac_state::mac_via_r )
 	return (data & 0xff) | (data << 8);
 }
 
-WRITE16_MEMBER ( mac_state::mac_via_w )
+void mac_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1693,7 +1693,7 @@ WRITE_LINE_MEMBER(mac_state::mac_via2_irq)
 	set_via2_interrupt(state);
 }
 
-READ16_MEMBER ( mac_state::mac_via2_r )
+uint16_t mac_state::mac_via2_r(offs_t offset)
 {
 	int data;
 
@@ -1708,7 +1708,7 @@ READ16_MEMBER ( mac_state::mac_via2_r )
 	return (data & 0xff) | (data << 8);
 }
 
-WRITE16_MEMBER ( mac_state::mac_via2_w )
+void mac_state::mac_via2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 8;
 	offset &= 0x0f;
@@ -2088,7 +2088,7 @@ TIMER_CALLBACK_MEMBER(mac_state::overlay_timeout_func)
 	m_overlay_timeout->adjust(attotime::never);
 }
 
-READ32_MEMBER(mac_state::mac_read_id)
+uint32_t mac_state::mac_read_id()
 {
 //    printf("Mac read ID reg @ PC=%x\n", m_maincpu->pc());
 

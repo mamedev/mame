@@ -86,17 +86,17 @@ private:
 	required_device<input_merger_device> m_soundnmi;
 	optional_ioport m_extraio1;
 
-	DECLARE_READ8_MEMBER(snd_flag_r);
-	DECLARE_WRITE8_MEMBER(snd_reset_w);
-	DECLARE_READ8_MEMBER(flstory_mcu_status_r);
-	DECLARE_READ8_MEMBER(victnine_mcu_status_r);
-	DECLARE_WRITE8_MEMBER(flstory_videoram_w);
-	DECLARE_WRITE8_MEMBER(flstory_palette_w);
-	DECLARE_READ8_MEMBER(flstory_palette_r);
-	DECLARE_WRITE8_MEMBER(flstory_gfxctrl_w);
-	DECLARE_READ8_MEMBER(victnine_gfxctrl_r);
-	DECLARE_WRITE8_MEMBER(victnine_gfxctrl_w);
-	DECLARE_WRITE8_MEMBER(flstory_scrlram_w);
+	uint8_t snd_flag_r();
+	void snd_reset_w(uint8_t data);
+	uint8_t flstory_mcu_status_r();
+	uint8_t victnine_mcu_status_r();
+	void flstory_videoram_w(offs_t offset, uint8_t data);
+	void flstory_palette_w(offs_t offset, uint8_t data);
+	uint8_t flstory_palette_r(offs_t offset);
+	void flstory_gfxctrl_w(uint8_t data);
+	uint8_t victnine_gfxctrl_r();
+	void victnine_gfxctrl_w(uint8_t data);
+	void flstory_scrlram_w(offs_t offset, uint8_t data);
 	void sound_control_0_w(uint8_t data);
 	void sound_control_1_w(uint8_t data);
 	void sound_control_2_w(uint8_t data);

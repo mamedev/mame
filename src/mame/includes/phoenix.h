@@ -23,11 +23,11 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(phoenix_videoram_w);
-	DECLARE_WRITE8_MEMBER(phoenix_videoreg_w);
-	DECLARE_WRITE8_MEMBER(pleiads_videoreg_w);
-	DECLARE_WRITE8_MEMBER(phoenix_scroll_w);
-	DECLARE_READ8_MEMBER(survival_input_port_0_r);
+	void phoenix_videoram_w(offs_t offset, uint8_t data);
+	void phoenix_videoreg_w(uint8_t data);
+	void pleiads_videoreg_w(uint8_t data);
+	void phoenix_scroll_w(uint8_t data);
+	uint8_t survival_input_port_0_r();
 	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
 	DECLARE_READ_LINE_MEMBER(pleiads_protection_r);
 	void init_oneprom();

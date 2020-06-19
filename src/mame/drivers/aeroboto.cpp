@@ -36,7 +36,7 @@ Revisions:
 #include "speaker.h"
 
 
-READ8_MEMBER(aeroboto_state::aeroboto_201_r)
+uint8_t aeroboto_state::aeroboto_201_r()
 {
 	/* if you keep a button pressed during boot, the game will expect this */
 	/* serie of values to be returned from 3004, and display "PASS 201" if it is */
@@ -60,19 +60,19 @@ WRITE_LINE_MEMBER(aeroboto_state::vblank_irq)
 	}
 }
 
-READ8_MEMBER(aeroboto_state::aeroboto_irq_ack_r)
+uint8_t aeroboto_state::aeroboto_irq_ack_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
 }
 
-READ8_MEMBER(aeroboto_state::aeroboto_2973_r)
+uint8_t aeroboto_state::aeroboto_2973_r()
 {
 	m_mainram[0x02be] = 0;
 	return 0xff;
 }
 
-WRITE8_MEMBER(aeroboto_state::aeroboto_1a2_w)
+void aeroboto_state::aeroboto_1a2_w(uint8_t data)
 {
 	m_mainram[0x01a2] = data;
 	if (data)

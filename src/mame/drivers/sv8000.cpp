@@ -72,8 +72,8 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void sv8000_io(address_map &map);
-	void sv8000_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s68047_device> m_s68047p;
@@ -98,7 +98,7 @@ private:
 };
 
 
-void sv8000_state::sv8000_mem(address_map &map)
+void sv8000_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	//map(0x0000, 0x0fff)      // mapped by the cartslot
@@ -107,7 +107,7 @@ void sv8000_state::sv8000_mem(address_map &map)
 }
 
 
-void sv8000_state::sv8000_io(address_map &map)
+void sv8000_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -172,15 +172,6 @@ INPUT_PORTS_END
 
 void sv8000_state::machine_start()
 {
-	m_ag = 0;
-	m_gm2 = 0;
-	m_gm1 = 0;
-	m_gm0 = 0;
-	m_as = 0;
-	m_css = 0;
-	m_intext = 0;
-	m_inv = 0;
-
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
@@ -199,6 +190,14 @@ void sv8000_state::machine_start()
 void sv8000_state::machine_reset()
 {
 	m_column = 0xff;
+	m_ag = 0;
+	m_gm2 = 0;
+	m_gm1 = 0;
+	m_gm0 = 0;
+	m_as = 0;
+	m_css = 0;
+	m_intext = 0;
+	m_inv = 0;
 }
 
 
@@ -238,15 +237,15 @@ uint8_t sv8000_state::i8255_portb_r()
 
 	//logerror("i8255_portb_r\n");
 
-	if (!(m_column & 0x01))
+	if (!BIT(m_column, 0))
 	{
 		data &= m_io_row0->read();
 	}
-	if (!(m_column & 0x02))
+	if (!BIT(m_column, 1))
 	{
 		data &= m_io_row1->read();
 	}
-	if (!(m_column & 0x04))
+	if (!BIT(m_column, 2))
 	{
 		data &= m_io_row2->read();
 	}
@@ -378,8 +377,8 @@ void sv8000_state::sv8000(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(10'738'635)/3);  /* Not verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &sv8000_state::sv8000_mem);
-	m_maincpu->set_addrmap(AS_IO, &sv8000_state::sv8000_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sv8000_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sv8000_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sv8000_state::irq0_line_hold));
 
 	i8255_device &ppi(I8255(config, "i8255"));
@@ -424,4 +423,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   STATE         INIT        COMPANY   FULLNAME                            FLAGS */
-CONS( 1979, sv8000, 0,      0,       sv8000,  sv8000, sv8000_state, empty_init, "Bandai", "Super Vision 8000 (TV Jack 8000)", 0 )
+CONS( 1979, sv8000, 0,      0,       sv8000,  sv8000, sv8000_state, empty_init, "Bandai", "Super Vision 8000 (TV Jack 8000)", MACHINE_SUPPORTS_SAVE )

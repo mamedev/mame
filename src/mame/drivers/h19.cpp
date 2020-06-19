@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert, Mark Garlanger
+// copyright-holders:Mark Garlanger
 /***************************************************************************
 
     Heathkit H19
@@ -116,7 +116,7 @@ private:
 	void mem_map(address_map &map);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 	required_device<palette_device> m_palette;
 	required_device<cpu_device>     m_maincpu;
@@ -369,8 +369,12 @@ INPUT_PORTS_END
 #define KB_STATUS_KEYBOARD_STROBE_MASK 0x80
 
 
-void h19_state::machine_reset()
+void h19_state::machine_start()
 {
+	save_item(NAME(m_transchar));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_keyclickactive));
+	save_item(NAME(m_bellactive));
 }
 
 
@@ -570,7 +574,7 @@ void h19_state::h19(machine_config &config)
 
 /* ROM definition */
 ROM_START( h19 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	// Original
 	ROM_LOAD( "2732_444-46_h19code.bin", 0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b))
 
@@ -585,7 +589,7 @@ ROM_END
 
 ROM_START( super19 )
 	// Super H19 ROM
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "2732_super19_h447.bin", 0x0000, 0x1000, CRC(6c51aaa6) SHA1(5e368b39fe2f1af44a905dc474663198ab630117))
 
 	ROM_REGION( 0x0800, "chargen", 0 )
@@ -599,7 +603,7 @@ ROM_END
 
 ROM_START( watz19 )
 	// Watzman ROM
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9))
 
 	ROM_REGION( 0x0800, "chargen", 0 )
@@ -612,7 +616,7 @@ ROM_END
 
 ROM_START( ultra19 )
 	// ULTRA ROM
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "2532_h19_ultra_firmware.bin", 0x0000, 0x1000, CRC(8ad4cdb4) SHA1(d6e1fc37a1f52abfce5e9adb1819e0030bed1df3))
 
 	ROM_REGION( 0x0800, "chargen", 0 )
@@ -625,11 +629,11 @@ ROM_END
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY      FULLNAME                         FLAGS
-COMP( 1979, h19,     0,      0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19",                 0 )
+COMP( 1979, h19,     0,      0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19",                 MACHINE_SUPPORTS_SAVE )
 //Super-19 ROM - ATG Systems, Inc - Adv in Sextant Issue 4, Winter 1983. With the magazine lead-time, likely released late 1982.
-COMP( 1982, super19, h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", 0 )
+COMP( 1982, super19, h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", MACHINE_SUPPORTS_SAVE )
 // Watzman ROM - HUG p/n 885-1121, announced in REMark Issue 33, Oct. 1982
-COMP( 1982, watz19,  h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ Watzman ROM",  0 )
+COMP( 1982, watz19,  h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ Watzman ROM",  MACHINE_SUPPORTS_SAVE )
 // ULTRA ROM - Software Wizardry, Inc., (c) 1983 William G. Parrott, III
-COMP( 1983, ultra19, h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ ULTRA ROM",    0 )
+COMP( 1983, ultra19, h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ ULTRA ROM",    MACHINE_SUPPORTS_SAVE )
 

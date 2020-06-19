@@ -2,29 +2,49 @@
 // copyright-holders:Ville Linde
 /*  Taito Wolf System
 
-    Driver by Ville Linde
+Driver by Ville Linde
 
-AMD M4-128N/64 stamped 'E58-01'
-AMD MACH231 stamped 'E58-02'
-AMD MACH211 stamped 'E58-03'
-Zoom ZFX2
-Zoom ZSG-2
-Taito TC0510NIO
-Panasonic MN1020019
-1x RAM NEC 42S4260
-1x RAM GM71C4400
-12x RAM Alliance AS4C256K16E0-35 (256k x 16)
-Mitsubishi M66220
-Fujitsu MB87078
-Atmel 93C66 EEPROM (4kb probably for high scores, test mode settings etc)
-ICS GENDAC ICS5342-3
-3DFX 500-0003-03 F805281.1 FBI
-3DFX 500-0004-02 F804701.1 TMU
-some logic
-clocks 50MHz (near 3DFX) and 14.31818MHz (near RAMDAC)
+Three board system consisting of a P5TX-LA PC motherboard, a Taito main board and a rom board.
+
+Hardware configuration:
+
+P5TX-LA Motherboard:
+-CPU: Intel SL27J Pentium MMX @ 200 MHz
+-Onboard sound: Crystal CS4237B ISA Audio
+-Onboard VGA: ATI Rage II 3D Graph (removed from motherboard)
+
+Chipsets (430TX PCIset):
+-82439TX Northbridge
+-82371EB PIIX4 PCI-ISA Southbridge
+
+Taito W Main Board:
+-AMD M4-128N/64 CPLD stamped 'E58-01'
+-AMD MACH231 CPLD stamped 'E58-02'
+-AMD MACH211 CPLD stamped 'E58-03'
+-Panasonic MN1020019 (MN10200 based) Sound CPU
+-Zoom ZFX-2 DSP (TMS57002 DSP)
+-Zoom ZSG-2 Sound PCM chip
+-Taito TC0510NIO I/O chip
+-1x RAM NEC 42S4260
+-1x RAM GM71C4400
+-12x RAM Alliance AS4C256K16E0-35 (256k x 16)
+-Mitsubishi M66220 256 x 8-bit CMOS memory
+-Fujitsu MB87078 6-bit, 4-channel Electronic Volume Controller
+-Atmel 93C66 EEPROM (4kb probably for high scores, test mode settings etc)
+-ICS5342-3 GENDAC 16-Bit Integrated Clock-LUT-DAC
+-3DFX 500-0003-03 F805281.1 FBI
+-3DFX 500-0004-02 F804701.1 TMU
+-Rom: E58-04 (bootscreen)
+-XTALs 50MHz (near 3DFX) and 14.31818MHz (near RAMDAC)
+
+Taito W Rom Board:
+-AMD M4-128N/64 CPLD stamped 'E58-05'
+-Program, Sound roms
 
 TODO:
-- program ROM is read via parallel port (for offset write, encrypted) and game port!?
+- program ROM is read via parallel port (for offset write, encrypted) and game port!? 
+- Emulation of the entire Taito Wolf main board which plugs into the PC motherboard's only PCI slot.
+- PCI comms between both boards have yet to be understood.
 
 */
 
@@ -64,9 +84,9 @@ private:
 	required_region_ptr<uint8_t> m_bootscreen_rom;
 	required_memory_bank m_bank1;
 	optional_device<palette_device> m_palette;
-	DECLARE_WRITE32_MEMBER(pnp_config_w);
-	DECLARE_WRITE32_MEMBER(pnp_data_w);
-	DECLARE_WRITE32_MEMBER(bios_ram_w);
+	void pnp_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void pnp_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 #if !TAITOWLF_ENABLE_VGA
 	void taitowlf_palette(palette_device &palette) const;
@@ -242,7 +262,7 @@ void taitowlf_state::intel82371ab_pci_w(int function, int reg, uint32_t data, ui
 }
 
 // ISA Plug-n-Play
-WRITE32_MEMBER(taitowlf_state::pnp_config_w)
+void taitowlf_state::pnp_config_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -250,7 +270,7 @@ WRITE32_MEMBER(taitowlf_state::pnp_config_w)
 	}
 }
 
-WRITE32_MEMBER(taitowlf_state::pnp_data_w)
+void taitowlf_state::pnp_data_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -260,7 +280,7 @@ WRITE32_MEMBER(taitowlf_state::pnp_data_w)
 
 
 
-WRITE32_MEMBER(taitowlf_state::bios_ram_w)
+void taitowlf_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -388,7 +408,6 @@ void taitowlf_state::taitowlf(machine_config &config)
 #if TAITOWLF_ENABLE_VGA
 	pcvideo_vga(config);
 #else
-	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -420,11 +439,11 @@ ROM_START(pf2012)
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 #endif
 
-	ROM_REGION(0x400000, "user3", 0)       // Program ROM disk
+	ROM_REGION(0x400000, "user3", 0) // Program ROM
 	ROM_LOAD("u1.bin", 0x000000, 0x200000, CRC(8f4c09cb) SHA1(0969a92fec819868881683c580f9e01cbedf4ad2))
 	ROM_LOAD("u2.bin", 0x200000, 0x200000, CRC(59881781) SHA1(85ff074ab2a922eac37cf96f0bf153a2dac55aa4))
 
-	ROM_REGION(0x4000000, "user4", 0)      // Data ROM disk
+	ROM_REGION(0x4000000, "user4", 0) // Data ROM
 	ROM_LOAD("e59-01.u20", 0x0000000, 0x800000, CRC(701d3a9a) SHA1(34c9f34f4da34bb8eed85a4efd1d9eea47a21d77) )
 	ROM_LOAD("e59-02.u23", 0x0800000, 0x800000, CRC(626df682) SHA1(35bb4f91201734ce7ccdc640a75030aaca3d1151) )
 	ROM_LOAD("e59-03.u26", 0x1000000, 0x800000, CRC(74e4efde) SHA1(630235c2e4a11f615b5f3b8c93e1e645da09eefe) )
@@ -434,18 +453,18 @@ ROM_START(pf2012)
 	ROM_LOAD("e59-07.u22", 0x3000000, 0x800000, CRC(1f0ddcdc) SHA1(72ffe08f5effab093bdfe9863f8a11f80e914272) )
 	ROM_LOAD("e59-08.u25", 0x3800000, 0x800000, CRC(8db38ffd) SHA1(4b71ea86fb774ba6a8ac45abf4191af64af007e7) )
 
-	ROM_REGION(0x1400000, "samples", 0)         // ZOOM sample data
+	ROM_REGION(0x1400000, "samples", 0) // ZOOM sample data
 	ROM_LOAD("e59-09.u29", 0x0000000, 0x800000, CRC(d0da5c50) SHA1(56fb3c38f35244720d32a44fed28e6b58c7851f7) )
 	ROM_LOAD("e59-10.u32", 0x0800000, 0x800000, CRC(4c0e0a5c) SHA1(6454befa3a1dd532eb2a760129dcd7e611508730) )
 	ROM_LOAD("e59-11.u33", 0x1000000, 0x400000, CRC(c90a896d) SHA1(2b62992f20e4ca9634e7953fe2c553906de44f04) )
 
-	ROM_REGION(0x180000, "cpu1", 0)         // MN10200 program
+	ROM_REGION(0x180000, "cpu1", 0) // MN10200 program
 	ROM_LOAD("e59-12.u13", 0x000000, 0x80000, CRC(9a473a7e) SHA1(b0ec7b0ae2b33a32da98899aa79d44e8e318ceb7) )
 	ROM_LOAD("e59-13.u15", 0x080000, 0x80000, CRC(77719880) SHA1(8382dd2dfb0dae60a3831ed6d3ff08539e2d94eb) )
 	ROM_LOAD("e59-14.u14", 0x100000, 0x40000, CRC(d440887c) SHA1(d965871860d757bc9111e9adb2303a633c662d6b) )
 	ROM_LOAD("e59-15.u16", 0x140000, 0x40000, CRC(eae8e523) SHA1(8a054d3ded7248a7906c4f0bec755ddce53e2023) )
 
-	ROM_REGION(0x20000, "bootscreen", 0)         // bootscreen
+	ROM_REGION(0x20000, "bootscreen", 0) // bootscreen
 	ROM_LOAD("e58-04.u71", 0x000000, 0x20000, CRC(500e6113) SHA1(93226706517c02e336f96bdf9443785158e7becf) )
 ROM_END
 

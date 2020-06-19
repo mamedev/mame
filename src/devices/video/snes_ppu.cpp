@@ -1886,7 +1886,7 @@ void snes_ppu_device::update_video_mode()
 	}
 }
 
-uint8_t snes_ppu_device::read(address_space &space, uint32_t offset, uint8_t wrio_bit7)
+uint8_t snes_ppu_device::read(uint32_t offset, uint8_t wrio_bit7)
 {
 	uint8_t value;
 
@@ -2033,7 +2033,7 @@ uint8_t snes_ppu_device::read(address_space &space, uint32_t offset, uint8_t wri
 }
 
 
-void snes_ppu_device::write(address_space &space, uint32_t offset, uint8_t data)
+void snes_ppu_device::write(uint32_t offset, uint8_t data)
 {
 	switch (offset)
 	{

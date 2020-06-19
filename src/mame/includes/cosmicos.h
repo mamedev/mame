@@ -59,17 +59,17 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( video_off_r );
-	DECLARE_READ8_MEMBER( video_on_r );
-	DECLARE_WRITE8_MEMBER( audio_latch_w );
-	DECLARE_READ8_MEMBER( hex_keyboard_r );
-	DECLARE_WRITE8_MEMBER( hex_keylatch_w );
-	DECLARE_READ8_MEMBER( reset_counter_r );
-	DECLARE_WRITE8_MEMBER( segment_w );
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( display_w );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t video_off_r();
+	uint8_t video_on_r();
+	void audio_latch_w(uint8_t data);
+	uint8_t hex_keyboard_r();
+	void hex_keylatch_w(uint8_t data);
+	uint8_t reset_counter_r();
+	void segment_w(uint8_t data);
+	uint8_t data_r();
+	void display_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( dmaout_w );
 	DECLARE_WRITE_LINE_MEMBER( efx_w );
 	DECLARE_READ_LINE_MEMBER( wait_r );

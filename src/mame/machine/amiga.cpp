@@ -217,12 +217,12 @@ WRITE_LINE_MEMBER( amiga_state::kbreset_w )
 }
 
 // simple mirror of region 0xf80000 to 0xfbffff
-READ16_MEMBER( amiga_state::rom_mirror_r )
+uint16_t amiga_state::rom_mirror_r(offs_t offset, uint16_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_word(offset + 0xf80000, mem_mask);
 }
 
-READ32_MEMBER( amiga_state::rom_mirror32_r )
+uint32_t amiga_state::rom_mirror32_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_dword(offset + 0xf80000, mem_mask);
 }
@@ -1027,7 +1027,7 @@ WRITE_LINE_MEMBER( amiga_state::centronics_select_w )
 // CIA-A access: 101x xxxx xxx0 oooo xxxx xxx1
 // CIA-B access: 101x xxxx xx0x oooo xxxx xxx0
 
-READ16_MEMBER( amiga_state::cia_r )
+uint16_t amiga_state::cia_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -1043,7 +1043,7 @@ READ16_MEMBER( amiga_state::cia_r )
 	return data;
 }
 
-WRITE16_MEMBER( amiga_state::cia_w )
+void amiga_state::cia_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG_CIA)
 		logerror("%s: cia_w(%06x) = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
@@ -1055,7 +1055,7 @@ WRITE16_MEMBER( amiga_state::cia_w )
 		m_cia_1->write(offset >> 7, data >> 8);
 }
 
-WRITE16_MEMBER( amiga_state::gayle_cia_w )
+void amiga_state::gayle_cia_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// the first write to cia 0 after a reset switches in chip ram
 	if (m_gayle_reset && (offset & 0x1000/2) == 0 && ACCESSING_BITS_0_7)
@@ -1065,7 +1065,7 @@ WRITE16_MEMBER( amiga_state::gayle_cia_w )
 	}
 
 	// hand down to the standard cia handler
-	cia_w(space, offset, data, mem_mask);
+	cia_w(offset, data, mem_mask);
 }
 
 CUSTOM_INPUT_MEMBER( amiga_state::floppy_drive_status )
@@ -1143,7 +1143,7 @@ void amiga_state::custom_chip_reset()
 	CUSTOM_REG(REG_BEAMCON0) = (m_agnus_id & 0x10) ? 0x0000 : 0x0020;
 }
 
-READ16_MEMBER( amiga_state::custom_chip_r )
+uint16_t amiga_state::custom_chip_r(offs_t offset)
 {
 	uint16_t temp;
 

@@ -144,7 +144,7 @@ TODO:
 - schematics show 4 lines going from the 58XX I/O chip to the 26XX (starfield generator).
   Function and operation unknown.
 
-- Complete 62XX custom emulation (machine/namco62.c) (though it's quite different from 56XX and 58XX).
+- Complete 62XX custom emulation (machine/namco62.cpp) (though it's quite different from 56XX and 58XX).
 
 - Is the sprite generator the same as Phozon? This isn't clear yet. They are
   very similar, especially in the way the size flags are layed out.
@@ -161,7 +161,7 @@ TODO:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(gaplus_base_state::irq_1_ctrl_w)
+void gaplus_base_state::irq_1_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 11);
 	m_main_irq_mask = bit & 1;
@@ -169,7 +169,7 @@ WRITE8_MEMBER(gaplus_base_state::irq_1_ctrl_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_base_state::irq_2_ctrl_w)
+void gaplus_base_state::irq_2_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = offset & 1;
 	m_sub_irq_mask = bit & 1;
@@ -177,7 +177,7 @@ WRITE8_MEMBER(gaplus_base_state::irq_2_ctrl_w)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_base_state::irq_3_ctrl_w)
+void gaplus_base_state::irq_3_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 13);
 	m_sub2_irq_mask = bit & 1;
@@ -185,7 +185,7 @@ WRITE8_MEMBER(gaplus_base_state::irq_3_ctrl_w)
 		m_subcpu2->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_base_state::sreset_w)
+void gaplus_base_state::sreset_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 11);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
@@ -193,7 +193,7 @@ WRITE8_MEMBER(gaplus_base_state::sreset_w)
 	m_namco_15xx->sound_enable_w(bit);
 }
 
-WRITE8_MEMBER(gaplus_base_state::freset_w)
+void gaplus_base_state::freset_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 11);
 

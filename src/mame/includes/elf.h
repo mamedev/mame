@@ -44,10 +44,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( input_w );
 
 private:
-	DECLARE_READ8_MEMBER( dispon_r );
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_WRITE8_MEMBER( memory_w );
+	uint8_t dispon_r();
+	uint8_t data_r();
+	void data_w(uint8_t data);
+	void memory_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER( wait_r );
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );

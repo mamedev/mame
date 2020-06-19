@@ -92,7 +92,7 @@ void atarisy2_state::video_start()
  *
  *************************************/
 
-WRITE16_MEMBER( atarisy2_state::xscroll_w )
+void atarisy2_state::xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_xscroll;
 	uint16_t newscroll = oldscroll;
@@ -123,7 +123,7 @@ TIMER_CALLBACK_MEMBER(atarisy2_state::reset_yscroll_callback)
 }
 
 
-WRITE16_MEMBER( atarisy2_state::yscroll_w )
+void atarisy2_state::yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_yscroll;
 	uint16_t newscroll = oldscroll;
@@ -187,7 +187,7 @@ rgb_t atarisy2_state::RRRRGGGGBBBBIIII(uint32_t raw)
  *
  *************************************/
 
-READ16_MEMBER( atarisy2_state::slapstic_r )
+uint16_t atarisy2_state::slapstic_r(address_space &space, offs_t offset)
 {
 	int result = m_slapstic_base[offset];
 	m_slapstic->slapstic_tweak(space, offset);
@@ -198,7 +198,7 @@ READ16_MEMBER( atarisy2_state::slapstic_r )
 }
 
 
-WRITE16_MEMBER( atarisy2_state::slapstic_w )
+void atarisy2_state::slapstic_w(address_space &space, offs_t offset, uint16_t data)
 {
 	m_slapstic->slapstic_tweak(space, offset);
 
@@ -213,7 +213,7 @@ WRITE16_MEMBER( atarisy2_state::slapstic_w )
  *
  *************************************/
 
-WRITE16_MEMBER( atarisy2_state::spriteram_w )
+void atarisy2_state::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* force an update if the link of object 0 is about to change */
 	if (offset == 0x0003)

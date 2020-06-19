@@ -956,12 +956,12 @@ void rmnimbus_state::nimbus_bank_memory()
 	}
 }
 
-READ8_MEMBER(rmnimbus_state::nimbus_mcu_r)
+uint8_t rmnimbus_state::nimbus_mcu_r()
 {
 	return m_mcu_reg080;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_mcu_w)
+void rmnimbus_state::nimbus_mcu_w(uint8_t data)
 {
 	m_mcu_reg080=data;
 
@@ -1046,7 +1046,7 @@ uint8_t rmnimbus_state::fdc_driveno(uint8_t drivesel)
     7   !REQ from HDD
 */
 
-READ8_MEMBER(rmnimbus_state::scsi_r)
+uint8_t rmnimbus_state::scsi_r(offs_t offset)
 {
 	int result = 0;
 
@@ -1097,7 +1097,7 @@ READ8_MEMBER(rmnimbus_state::scsi_r)
     6   hdc drq enabled
     7   fdc drq enabled
 */
-WRITE8_MEMBER(rmnimbus_state::fdc_ctl_w)
+void rmnimbus_state::fdc_ctl_w(uint8_t data)
 {
 	uint8_t reg400_old = m_nimbus_drives.reg400;
 	char drive[5];
@@ -1128,7 +1128,7 @@ WRITE8_MEMBER(rmnimbus_state::fdc_ctl_w)
     2   SCSI IRQ Enable
 */
 
-WRITE8_MEMBER(rmnimbus_state::scsi_w)
+void rmnimbus_state::scsi_w(offs_t offset, uint8_t data)
 {
 	int pc=m_maincpu->pc();
 
@@ -1297,7 +1297,7 @@ void rmnimbus_state::nimbus_pc8031_w(offs_t offset, uint8_t data)
 
 /* 8031/8051 Peripheral controller 8031/8051 side */
 
-READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
+uint8_t rmnimbus_state::nimbus_pc8031_iou_r(offs_t offset)
 {
 	int pc=m_iocpu->pc();
 	uint8_t   result = 0;
@@ -1322,7 +1322,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
 	return result;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
+void rmnimbus_state::nimbus_pc8031_iou_w(offs_t offset, uint8_t data)
 {
 	int pc=m_iocpu->pc();
 
@@ -1416,7 +1416,7 @@ void rmnimbus_state::nimbus_pc8031_port3_w(uint8_t data)
 
 
 /* IO Unit */
-READ8_MEMBER(rmnimbus_state::nimbus_iou_r)
+uint8_t rmnimbus_state::nimbus_iou_r(offs_t offset)
 {
 	int pc=m_maincpu->pc();
 	uint8_t   result=0;
@@ -1432,7 +1432,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_iou_r)
 	return result;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_iou_w)
+void rmnimbus_state::nimbus_iou_w(offs_t offset, uint8_t data)
 {
 	int pc=m_maincpu->pc();
 
@@ -1650,7 +1650,7 @@ void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	m_nimbus_mouse.m_intstate_y=intstate_y;
 }
 
-READ8_MEMBER(rmnimbus_state::nimbus_mouse_js_r)
+uint8_t rmnimbus_state::nimbus_mouse_js_r()
 {
 	/*
 
@@ -1682,20 +1682,20 @@ READ8_MEMBER(rmnimbus_state::nimbus_mouse_js_r)
 	return result;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_mouse_js_w)
+void rmnimbus_state::nimbus_mouse_js_w(uint8_t data)
 {
 }
 
 /**********************************************************************
-Paralell printer / User port.
-The Nimbus paralell printer port card is almost identical to the circuit
+Parallel printer / User port.
+The Nimbus parallel printer port card is almost identical to the circuit
 in the BBC micro, so I have borrowed the driver code from the BBC :)
 
 Port A output is buffered before being connected to the printer connector.
 This means that they can only be operated as output lines.
 CA1 is pulled high by a 4K7 resistor. CA1 normally acts as an acknowledge
 line when a printer is used. CA2 is buffered so that it has become an open
-collector output only. It usially acts as the printer strobe line.
+collector output only. It usually acts as the printer strobe line.
 ***********************************************************************/
 
 /* USER VIA 6522 port B is connected to the BBC user port */

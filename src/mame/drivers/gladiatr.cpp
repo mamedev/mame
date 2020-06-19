@@ -227,7 +227,7 @@ WRITE_LINE_MEMBER(gladiatr_state_base::ym_irq)
 }
 
 /*Sound Functions*/
-WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
+void gladiatr_state::gladiator_adpcm_w(u8 data)
 {
 	// bit 6 = bank offset
 	membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
@@ -237,7 +237,7 @@ WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
 	m_msm->vclk_w (BIT(data, 4));   // bit 4
 }
 
-WRITE8_MEMBER(ppking_state::ppking_adpcm_w)
+void ppking_state::ppking_adpcm_w(u8 data)
 {
 	// bit 6 = bank offset
 	//membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
@@ -247,18 +247,18 @@ WRITE8_MEMBER(ppking_state::ppking_adpcm_w)
 	m_msm->vclk_w (BIT(data, 4));   // bit 4
 }
 
-WRITE8_MEMBER(ppking_state::cpu2_irq_ack_w)
+void ppking_state::cpu2_irq_ack_w(u8 data)
 {
 	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gladiatr_state_base::adpcm_command_w)
+void gladiatr_state_base::adpcm_command_w(u8 data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-READ8_MEMBER(gladiatr_state_base::adpcm_command_r)
+u8 gladiatr_state_base::adpcm_command_r()
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read();
@@ -271,7 +271,7 @@ WRITE_LINE_MEMBER(gladiatr_state_base::flipscreen_w)
 
 #if 1
 /* !!!!! patch to IRQ timing for 2nd CPU !!!!! */
-WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
+void gladiatr_state::gladiatr_irq_patch_w(u8 data)
 {
 	m_subcpu->set_input_line(0, HOLD_LINE);
 }
@@ -436,7 +436,7 @@ inline void ppking_state::mcu_input_check()
 	}
 }
 
-READ8_MEMBER(ppking_state::ppking_qx0_r)
+u8 ppking_state::ppking_qx0_r(offs_t offset)
 {
 	// status
 	if(offset == 1)
@@ -506,7 +506,7 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 	return m_mcu[0].rxd;
 }
 
-WRITE8_MEMBER(ppking_state::ppking_qx0_w)
+void ppking_state::ppking_qx0_w(offs_t offset, u8 data)
 {
 	if(offset == 1)
 	{
@@ -557,7 +557,7 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 	}
 }
 
-WRITE8_MEMBER(ppking_state::ppking_qx1_w)
+void ppking_state::ppking_qx1_w(offs_t offset, u8 data)
 {
 	if(offset == 1)
 	{
@@ -566,12 +566,12 @@ WRITE8_MEMBER(ppking_state::ppking_qx1_w)
 	}
 }
 
-WRITE8_MEMBER(ppking_state::ppking_qx3_w)
+void ppking_state::ppking_qx3_w(u8 data)
 {
 }
 
 
-READ8_MEMBER(ppking_state::ppking_qx1_r)
+u8 ppking_state::ppking_qx1_r(offs_t offset)
 {
 	// status
 	if(offset == 1)
@@ -583,7 +583,7 @@ READ8_MEMBER(ppking_state::ppking_qx1_r)
 	return m_soundlatch2->read();
 }
 
-READ8_MEMBER(ppking_state::ppking_qx3_r)
+u8 ppking_state::ppking_qx3_r(offs_t offset)
 {
 	if(offset == 1)
 		return 1;
@@ -594,7 +594,7 @@ READ8_MEMBER(ppking_state::ppking_qx3_r)
 // serial communication with another board (COMU in service mode)
 // NMI is used to acquire data from the other board,
 // either sent via 1->0 poll of the 0xc003 port or by reading 0xc0c0 (former more likely)
-READ8_MEMBER(ppking_state::ppking_qxcomu_r)
+u8 ppking_state::ppking_qxcomu_r(offs_t offset)
 {
 	if(offset == 1)
 		return 1;
@@ -602,7 +602,7 @@ READ8_MEMBER(ppking_state::ppking_qxcomu_r)
 	return 0;
 }
 
-WRITE8_MEMBER(ppking_state::ppking_qxcomu_w)
+void ppking_state::ppking_qxcomu_w(u8 data)
 {
 	// ...
 }

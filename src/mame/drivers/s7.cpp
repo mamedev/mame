@@ -108,8 +108,8 @@ private:
 	uint8_t dips_r();
 	uint8_t switch_r();
 	void switch_w(uint8_t data);
-	DECLARE_READ8_MEMBER(nvram_r);
-	DECLARE_WRITE8_MEMBER(nvram_w);
+	uint8_t nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w) { };
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
@@ -360,12 +360,12 @@ void s7_state::switch_w(uint8_t data)
 	m_kbdrow = data;
 }
 
-READ8_MEMBER( s7_state::nvram_r )
+uint8_t s7_state::nvram_r(offs_t offset)
 {
 	return m_nvram[offset] | 0xf0;
 }
 
-WRITE8_MEMBER( s7_state::nvram_w )
+void s7_state::nvram_w(offs_t offset, uint8_t data)
 {
 	if ((m_memprotect) && (offset > 0x7f))
 	{}

@@ -35,7 +35,7 @@ ASMJIT_BEGIN_NAMESPACE
 
 class CodeHolder;
 
-//! \addtogroup asmjit_jit
+//! \addtogroup asmjit_virtual_memory
 //! \{
 
 // ============================================================================

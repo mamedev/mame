@@ -489,7 +489,7 @@ void system1_state::dakkochn_custom_w(u8 data, u8 prevdata)
  *
  *************************************/
 
-READ8_MEMBER(system1_state::shtngmst_gunx_r)
+u8 system1_state::shtngmst_gunx_r()
 {
 	// x is slightly offset, and has a range of 00-fe
 	u8 x = ioport("GUNX")->read() - 0x12;
@@ -585,7 +585,7 @@ void system1_state::mcu_control_w(u8 data)
 }
 
 
-WRITE8_MEMBER(system1_state::mcu_io_w)
+void system1_state::mcu_io_w(offs_t offset, u8 data)
 {
 	switch ((m_mcu_control >> 3) & 3)
 	{
@@ -605,7 +605,7 @@ WRITE8_MEMBER(system1_state::mcu_io_w)
 }
 
 
-READ8_MEMBER(system1_state::mcu_io_r)
+u8 system1_state::mcu_io_r(offs_t offset)
 {
 	switch ((m_mcu_control >> 3) & 3)
 	{
@@ -684,13 +684,13 @@ void system1_state::nob_mcu_control_p2_w(u8 data)
 }
 
 
-READ8_MEMBER(system1_state::nob_maincpu_latch_r)
+u8 system1_state::nob_maincpu_latch_r()
 {
 	return m_nob_maincpu_latch;
 }
 
 
-WRITE8_MEMBER(system1_state::nob_maincpu_latch_w)
+void system1_state::nob_maincpu_latch_w(u8 data)
 {
 	m_nob_maincpu_latch = data;
 	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
@@ -698,7 +698,7 @@ WRITE8_MEMBER(system1_state::nob_maincpu_latch_w)
 }
 
 
-READ8_MEMBER(system1_state::nob_mcu_status_r)
+u8 system1_state::nob_mcu_status_r()
 {
 	return m_nob_mcu_status;
 }
@@ -710,25 +710,25 @@ READ8_MEMBER(system1_state::nob_mcu_status_r)
  *
  *************************************/
 
-READ8_MEMBER(system1_state::nobb_inport1c_r)
+u8 system1_state::nobb_inport1c_r()
 {
 //  logerror("IN  $1c : pc = %04x - data = 0x80\n",m_maincpu->pc());
 	return(0x80);   // infinite loop (at 0x0fb3) until bit 7 is set
 }
 
-READ8_MEMBER(system1_state::nobb_inport22_r)
+u8 system1_state::nobb_inport22_r()
 {
 //  logerror("IN  $22 : pc = %04x - data = %02x\n",m_maincpu->pc(),nobb_inport17_step);
 	return(0);//nobb_inport17_step);
 }
 
-READ8_MEMBER(system1_state::nobb_inport23_r)
+u8 system1_state::nobb_inport23_r()
 {
 //  logerror("IN  $23 : pc = %04x - step = %02x\n",m_maincpu->pc(),m_nobb_inport23_step);
 	return(m_nobb_inport23_step);
 }
 
-WRITE8_MEMBER(system1_state::nobb_outport24_w)
+void system1_state::nobb_outport24_w(u8 data)
 {
 //  logerror("OUT $24 : pc = %04x - data = %02x\n",m_maincpu->pc(),data);
 	m_nobb_inport23_step = data;
@@ -5429,7 +5429,7 @@ void system1_state::init_dakkochn()
 
 
 
-READ8_MEMBER(system1_state::nob_start_r)
+u8 system1_state::nob_start_r()
 {
 	/* in reality, it's likely some M1-dependent behavior */
 	return (m_maincpu->pc() <= 0x0003) ? 0x80 : m_maincpu_region->base()[1];
@@ -5445,11 +5445,11 @@ void system1_state::init_nob()
 	/* hack to fix incorrect JMP at start, which should obviously be to $0080 */
 	/* patching the ROM causes errors in the self-test */
 	/* in real-life, it could be some behavior dependent upon M1 */
-	space.install_read_handler(0x0001, 0x0001, read8_delegate(*this, FUNC(system1_state::nob_start_r)));
+	space.install_read_handler(0x0001, 0x0001, read8smo_delegate(*this, FUNC(system1_state::nob_start_r)));
 
 	/* install MCU communications */
-	iospace.install_readwrite_handler(0x18, 0x18, read8_delegate(*this, FUNC(system1_state::nob_maincpu_latch_r)), write8_delegate(*this, FUNC(system1_state::nob_maincpu_latch_w)));
-	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(*this, FUNC(system1_state::nob_mcu_status_r)));
+	iospace.install_readwrite_handler(0x18, 0x18, read8smo_delegate(*this, FUNC(system1_state::nob_maincpu_latch_r)), write8smo_delegate(*this, FUNC(system1_state::nob_maincpu_latch_w)));
+	iospace.install_read_handler(0x1c, 0x1c, read8smo_delegate(*this, FUNC(system1_state::nob_mcu_status_r)));
 }
 
 void system1_state::init_nobb()
@@ -5476,10 +5476,10 @@ void system1_state::init_nobb()
 
 	init_bank44();
 
-	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(*this, FUNC(system1_state::nobb_inport1c_r)));
-	iospace.install_read_handler(0x02, 0x02, read8_delegate(*this, FUNC(system1_state::nobb_inport22_r)));
-	iospace.install_read_handler(0x03, 0x03, read8_delegate(*this, FUNC(system1_state::nobb_inport23_r)));
-	iospace.install_write_handler(0x04, 0x04, write8_delegate(*this, FUNC(system1_state::nobb_outport24_w)));
+	iospace.install_read_handler(0x1c, 0x1c, read8smo_delegate(*this, FUNC(system1_state::nobb_inport1c_r)));
+	iospace.install_read_handler(0x02, 0x02, read8smo_delegate(*this, FUNC(system1_state::nobb_inport22_r)));
+	iospace.install_read_handler(0x03, 0x03, read8smo_delegate(*this, FUNC(system1_state::nobb_inport23_r)));
+	iospace.install_write_handler(0x04, 0x04, write8smo_delegate(*this, FUNC(system1_state::nobb_outport24_w)));
 }
 
 
@@ -5509,7 +5509,7 @@ void system1_state::init_shtngmst()
 	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_read_port(0x12, 0x12, "TRIGGER");
 	iospace.install_read_port(0x18, 0x18, 0x03, "18");
-	iospace.install_read_handler(0x1c, 0x1c, 0, 0x02, 0, read8_delegate(*this, FUNC(system1_state::shtngmst_gunx_r)));
+	iospace.install_read_handler(0x1c, 0x1c, 0, 0x02, 0, read8smo_delegate(*this, FUNC(system1_state::shtngmst_gunx_r)));
 	iospace.install_read_port(0x1d, 0x1d, 0x02, "GUNY");
 	init_bank0c();
 }

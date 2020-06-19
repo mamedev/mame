@@ -151,7 +151,7 @@ static GFXDECODE_START( gfx_ps4 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x40 ) // 8bpp tiles
 GFXDECODE_END
 
-WRITE8_MEMBER(psikyo4_state::eeprom_w)
+void psikyo4_state::eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_eeprom->di_write((data & 0x20) ? 1 : 0);
 	m_eeprom->cs_write((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -179,7 +179,7 @@ CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
 	return ret;
 }
 
-WRITE32_MEMBER(psikyo4_state::paletteram_w)
+void psikyo4_state::paletteram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 
@@ -192,7 +192,7 @@ WRITE32_MEMBER(psikyo4_state::paletteram_w)
 }
 
 template<int Screen>
-WRITE32_MEMBER(psikyo4_state::bgpen_w)
+void psikyo4_state::bgpen_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_bgpen[Screen][0]);
 
@@ -204,7 +204,7 @@ WRITE32_MEMBER(psikyo4_state::bgpen_w)
 }
 
 template<int Screen>
-WRITE8_MEMBER(psikyo4_state::screen_brt_w)
+void psikyo4_state::screen_brt_w(uint8_t data)
 {
 	/* Need separate brightness for both screens if displaying together */
 	double brt = data & 0xff;
@@ -225,7 +225,7 @@ WRITE8_MEMBER(psikyo4_state::screen_brt_w)
 	/* I believe this to be separate rgb brightness due to strings in hotdebut, unused in 4 dumped games */
 }
 
-WRITE32_MEMBER(psikyo4_state::vidregs_w)
+void psikyo4_state::vidregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t const old = m_vidregs[offset];
 	data = COMBINE_DATA(&m_vidregs[offset]);
@@ -240,7 +240,7 @@ WRITE32_MEMBER(psikyo4_state::vidregs_w)
 	}
 }
 
-WRITE16_MEMBER(psikyo4_state::ymf_bank_w)
+void psikyo4_state::ymf_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// YMF banking
 	uint16_t bankdata = data;
@@ -258,7 +258,7 @@ WRITE16_MEMBER(psikyo4_state::ymf_bank_w)
 	}
 }
 
-WRITE8_MEMBER(psikyo4_state::io_select_w)
+void psikyo4_state::io_select_w(uint8_t data)
 {
 	// mahjong input multiplexing
 	m_io_select = data;

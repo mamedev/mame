@@ -24,12 +24,12 @@ public:
 	auto write_irq_callback() { return m_irq_cb.bind(); }
 	auto channel_irq_callback() { return m_ch_irq_cb.bind(); }
 
-	DECLARE_READ16_MEMBER(audio_r);
-	virtual DECLARE_WRITE16_MEMBER(audio_w);
-	DECLARE_READ16_MEMBER(audio_ctrl_r);
-	DECLARE_WRITE16_MEMBER(audio_ctrl_w);
-	DECLARE_READ16_MEMBER(audio_phase_r);
-	DECLARE_WRITE16_MEMBER(audio_phase_w);
+	uint16_t audio_r(offs_t offset);
+	virtual void audio_w(offs_t offset, uint16_t data);
+	uint16_t audio_ctrl_r(offs_t offset);
+	void audio_ctrl_w(offs_t offset, uint16_t data);
+	uint16_t audio_phase_r(offs_t offset);
+	void audio_phase_w(offs_t offset, uint16_t data);
 
 protected:
 	// sound stream update overrides
@@ -386,7 +386,7 @@ class spg110_audio_device : public spg2xx_audio_device
 public:
 	spg110_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE16_MEMBER(audio_w) override;
+	virtual void audio_w(offs_t offset, uint16_t data) override;
 
 	// these either come from somewhere else on spg110 or are hardcoded
 	virtual uint16_t get_16bit_bit(const offs_t channel) const override { return 1; }
@@ -400,8 +400,8 @@ class sunplus_gcm394_audio_device : public spg2xx_audio_device
 public:
 	sunplus_gcm394_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(control_r);
-	DECLARE_WRITE16_MEMBER(control_w);
+	uint16_t control_r(offs_t offset);
+	void control_w(offs_t offset, uint16_t data);
 
 	virtual void device_start() override;
 

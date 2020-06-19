@@ -128,6 +128,8 @@ void wd_fdc_device_base::device_start()
 	enmf = false;
 	floppy = nullptr;
 	status = 0x00;
+	data = 0x00;
+	track = 0x00;
 	mr = true;
 
 	save_item(NAME(status));
@@ -168,14 +170,12 @@ void wd_fdc_device_base::soft_reset()
 WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 {
 	if(mr && !state) {
-		command = 0x00;
+		command = 0x03;
 		main_state = IDLE;
 		sub_state = IDLE;
 		cur_live.state = IDLE;
-		track = 0x00;
 		sector = 0x01;
 		status = 0x00;
-		data = 0x00;
 		cmd_buffer = track_buffer = sector_buffer = -1;
 		counter = 0;
 		status_type_1 = true;
@@ -204,6 +204,8 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 		live_abort();
 	} else if(state && !mr) {
 		// trigger a restore after everything else is reset too, in particular the floppy device itself
+		// CHECKME: WD1770/72 supposedly may not perform RESTORE after reset
+		status |= S_BUSY;
 		sub_state = INITIAL_RESTORE;
 		t_gen->adjust(attotime::zero);
 		mr = true;
@@ -326,8 +328,14 @@ void wd_fdc_device_base::seek_continue()
 			}
 
 			if(main_state == SEEK && track == data) {
-				sub_state = SEEK_WAIT_STABILIZATION_TIME;
-				delay_cycles(t_gen, 30000);
+				if (command & 0x04) {
+					set_hld();
+					sub_state = SEEK_WAIT_STABILIZATION_TIME;
+					delay_cycles(t_gen, 30000);
+					return;
+				}
+				else
+					sub_state = SEEK_DONE;
 			}
 
 			if(sub_state == SPINUP_DONE) {
@@ -396,8 +404,7 @@ void wd_fdc_device_base::seek_continue()
 
 		case SEEK_WAIT_STABILIZATION_TIME_DONE:
 			LOGSTATE("SEEK_WAIT_STABILIZATION_TIME_DONE\n");
-			if (command & 0x04)
-				set_hld();
+			// TODO: here should be HLT wait
 			sub_state = SEEK_DONE;
 			break;
 
@@ -779,6 +786,12 @@ void wd_fdc_device_base::write_track_continue()
 
 		case SETTLE_DONE:
 			LOGSTATE("SETTLE_DONE\n");
+			if (floppy && floppy->wpt_r()) {
+				LOGSTATE("WRITE_PROT\n");
+				status |= S_WP;
+				command_end();
+				return;
+			}
 			set_drq();
 			sub_state = DATA_LOAD_WAIT;
 			delay_cycles(t_gen, 192);
@@ -885,6 +898,12 @@ void wd_fdc_device_base::write_sector_continue()
 
 		case SETTLE_DONE:
 			LOGSTATE("SETTLE_DONE\n");
+			if (floppy && floppy->wpt_r()) {
+				LOGSTATE("WRITE_PROT\n");
+				status |= S_WP;
+				command_end();
+				return;
+			}
 			sub_state = SCAN_ID;
 			counter = 0;
 			live_start(SEARCH_ADDRESS_MARK_HEADER);
@@ -956,6 +975,20 @@ void wd_fdc_device_base::interrupt_start()
 		intrq = true;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
+	}
+
+	if (spinup_on_interrupt)  // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
+	{
+		if (head_control)
+			set_hld();
+
+		if (motor_control) {
+			status |= S_MON | S_SPIN;
+
+			mon_cb(0);
+			if (floppy && !disable_motor_control)
+				floppy->mon_w(0);
+		}
 	}
 
 	if(command & 0x03) {
@@ -1037,11 +1070,15 @@ void wd_fdc_device_base::do_generic()
 
 void wd_fdc_device_base::do_cmd_w()
 {
+	// it is actually possible to send another command even while in busy state.
+	// currently we simply accept any commands, but chip logic probably more complex (presumable it is possible change command of the same type only).
+#if 0
 	// Only available command when busy is interrupt
 	if(main_state != IDLE && (cmd_buffer & 0xf0) != 0xd0) {
 		cmd_buffer = -1;
 		return;
 	}
+#endif
 	command = cmd_buffer;
 	cmd_buffer = -1;
 
@@ -1121,13 +1158,6 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 	{
 		// checkme timings
 		delay_cycles(t_cmd, dden ? delay_register_commit * 2 : delay_register_commit);
-		if (spinup_on_interrupt)  // see note in WD1772 constructor, might be true for other FDC types as well.
-		{
-			if (head_control)
-				set_hld();
-			if (motor_control)
-				spinup();
-		}
 	}
 	else
 	{
@@ -1409,6 +1439,9 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	case TRACK_DONE:
 		live_abort();
 		break;
+
+	case DUMMY:
+		return;
 
 	default:
 		logerror("%s: Index pulse on unknown sub-state %d\n", machine().time().to_string(), sub_state);
@@ -2214,8 +2247,11 @@ void wd_fdc_device_base::set_hld()
 {
 	if(head_control && !hld) {
 		hld = true;
+		int temp = sub_state;
+		sub_state = DUMMY;
 		if(!hld_cb.isnull())
 			hld_cb(hld);
+		sub_state = temp;
 	}
 }
 
@@ -2223,8 +2259,11 @@ void wd_fdc_device_base::drop_hld()
 {
 	if(head_control && hld) {
 		hld = false;
+		int temp = sub_state;
+		sub_state = DUMMY;
 		if(!hld_cb.isnull())
 			hld_cb(hld);
+		sub_state = temp;
 	}
 }
 

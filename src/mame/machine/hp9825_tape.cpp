@@ -173,7 +173,7 @@ void hp9825_tape_device::clear_state()
 	m_led_handler(false);
 }
 
-READ16_MEMBER(hp9825_tape_device::tape_r)
+uint16_t hp9825_tape_device::tape_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -208,7 +208,7 @@ READ16_MEMBER(hp9825_tape_device::tape_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9825_tape_device::tape_w)
+void hp9825_tape_device::tape_w(offs_t offset, uint16_t data)
 {
 	LOG_REG("W R%u=%02x\n" , offset + 4 , data);
 

@@ -58,9 +58,9 @@ public:
 	void risc2500(machine_config &config);
 
 protected:
-	DECLARE_READ32_MEMBER(p1000_r);
-	DECLARE_WRITE32_MEMBER(p1000_w);
-	DECLARE_READ32_MEMBER(disable_boot_rom_r);
+	uint32_t p1000_r();
+	void p1000_w(uint32_t data);
+	uint32_t disable_boot_rom_r();
 	TIMER_CALLBACK_MEMBER(disable_boot_rom);
 
 	virtual void machine_start() override;
@@ -184,7 +184,7 @@ static INPUT_PORTS_START( risc2500 )
 INPUT_PORTS_END
 
 
-READ32_MEMBER(risc2500_state::p1000_r)
+uint32_t risc2500_state::p1000_r()
 {
 	uint32_t data = 0;
 
@@ -200,7 +200,7 @@ READ32_MEMBER(risc2500_state::p1000_r)
 	return data;
 }
 
-WRITE32_MEMBER(risc2500_state::p1000_w)
+void risc2500_state::p1000_w(uint32_t data)
 {
 	if ((data & 0xff000000) == 0x01000000)          // VRAM address
 	{
@@ -234,7 +234,7 @@ WRITE32_MEMBER(risc2500_state::p1000_w)
 	m_p1000 = data;
 }
 
-READ32_MEMBER(risc2500_state::disable_boot_rom_r)
+uint32_t risc2500_state::disable_boot_rom_r()
 {
 	m_boot_rom_disable_timer->adjust(m_maincpu->cycles_to_attotime(10));
 	return 0;
@@ -301,6 +301,7 @@ void risc2500_state::risc2500(machine_config &config)
 	m_board->set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(100));
+	m_board->set_nvram_enable(true);
 
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("128K, 256K, 512K, 1M, 2M");
 

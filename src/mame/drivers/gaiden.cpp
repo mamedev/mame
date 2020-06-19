@@ -152,12 +152,12 @@ Notes:
 #include <algorithm>
 
 
-WRITE16_MEMBER(gaiden_state::irq_ack_w)
+void gaiden_state::irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(5, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaiden_state::drgnbowl_irq_ack_w)
+void gaiden_state::drgnbowl_irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(5, CLEAR_LINE);
 }
@@ -175,7 +175,7 @@ static const int wildfang_jumppoints[] =
 	0x1b52
 };
 
-WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
+void gaiden_state::wildfang_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -217,7 +217,7 @@ WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 	}
 }
 
-READ16_MEMBER(gaiden_state::wildfang_protection_r)
+uint16_t gaiden_state::wildfang_protection_r()
 {
 //  logerror("PC %06x: read prot %02x\n", m_maincpu->pc(), m_prot);
 	return m_prot;
@@ -336,7 +336,7 @@ void gaiden_state::machine_start()
 	save_item(NAME(m_spr_offset_y));
 }
 
-WRITE16_MEMBER(gaiden_state::raiga_protection_w)
+void gaiden_state::raiga_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -386,7 +386,7 @@ WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 	}
 }
 
-READ16_MEMBER(gaiden_state::raiga_protection_r)
+uint16_t gaiden_state::raiga_protection_r()
 {
 //  logerror("PC %06x: read prot %02x\n", m_maincpu->pc(), m_prot);
 	return m_prot;
@@ -919,7 +919,7 @@ WRITE_LINE_MEMBER(gaiden_state::vck_flipflop_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_adpcm_toggle);
 }
 
-WRITE8_MEMBER(gaiden_state::adpcm_bankswitch_w)
+void gaiden_state::adpcm_bankswitch_w(uint8_t data)
 {
 	m_msm[0]->reset_w(BIT(data, 3));
 	m_msm[1]->reset_w(BIT(data, 4));

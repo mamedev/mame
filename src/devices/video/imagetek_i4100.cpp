@@ -383,12 +383,12 @@ void imagetek_i4100_device::device_timer(emu_timer &timer, device_timer_id id, i
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ16_MEMBER(imagetek_i4100_device::vram_0_r){ return vram_r(offset, 0); }
-READ16_MEMBER(imagetek_i4100_device::vram_1_r){ return vram_r(offset, 1); }
-READ16_MEMBER(imagetek_i4100_device::vram_2_r){ return vram_r(offset, 2); }
-WRITE16_MEMBER(imagetek_i4100_device::vram_0_w){ vram_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER(imagetek_i4100_device::vram_1_w){ vram_w(offset, data, mem_mask, 1); }
-WRITE16_MEMBER(imagetek_i4100_device::vram_2_w){ vram_w(offset, data, mem_mask, 2); }
+uint16_t imagetek_i4100_device::vram_0_r(offs_t offset){ return vram_r(offset, 0); }
+uint16_t imagetek_i4100_device::vram_1_r(offs_t offset){ return vram_r(offset, 1); }
+uint16_t imagetek_i4100_device::vram_2_r(offs_t offset){ return vram_r(offset, 2); }
+void imagetek_i4100_device::vram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask){ vram_w(offset, data, mem_mask, 0); }
+void imagetek_i4100_device::vram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask){ vram_w(offset, data, mem_mask, 1); }
+void imagetek_i4100_device::vram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask){ vram_w(offset, data, mem_mask, 2); }
 
 /* Some game uses almost only the blitter to write to the tilemaps.
    The CPU can only access a "window" of 512x256 pixels in the upper
@@ -400,19 +400,19 @@ static inline offs_t RMW_OFFS(offs_t offset)
 	return (offset & 0x3f) + ((offset & ~0x3f) * (0x100 / 0x40));
 }
 
-READ16_MEMBER(imagetek_i4100_device::rmw_vram_0_r){ return vram_r(RMW_OFFS(offset), 0); }
-READ16_MEMBER(imagetek_i4100_device::rmw_vram_1_r){ return vram_r(RMW_OFFS(offset), 1); }
-READ16_MEMBER(imagetek_i4100_device::rmw_vram_2_r){ return vram_r(RMW_OFFS(offset), 2); }
-WRITE16_MEMBER(imagetek_i4100_device::rmw_vram_0_w){ vram_w(RMW_OFFS(offset), data, mem_mask, 0); }
-WRITE16_MEMBER(imagetek_i4100_device::rmw_vram_1_w){ vram_w(RMW_OFFS(offset), data, mem_mask, 1); }
-WRITE16_MEMBER(imagetek_i4100_device::rmw_vram_2_w){ vram_w(RMW_OFFS(offset), data, mem_mask, 2); }
+uint16_t imagetek_i4100_device::rmw_vram_0_r(offs_t offset){ return vram_r(RMW_OFFS(offset), 0); }
+uint16_t imagetek_i4100_device::rmw_vram_1_r(offs_t offset){ return vram_r(RMW_OFFS(offset), 1); }
+uint16_t imagetek_i4100_device::rmw_vram_2_r(offs_t offset){ return vram_r(RMW_OFFS(offset), 2); }
+void imagetek_i4100_device::rmw_vram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask){ vram_w(RMW_OFFS(offset), data, mem_mask, 0); }
+void imagetek_i4100_device::rmw_vram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask){ vram_w(RMW_OFFS(offset), data, mem_mask, 1); }
+void imagetek_i4100_device::rmw_vram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask){ vram_w(RMW_OFFS(offset), data, mem_mask, 2); }
 
-READ16_MEMBER(imagetek_i4100_device::scratchram_r) { return m_scratchram[offset]; }
-WRITE16_MEMBER(imagetek_i4100_device::scratchram_w) { COMBINE_DATA(&m_scratchram[offset]); }
-READ16_MEMBER(imagetek_i4100_device::spriteram_r) { return m_spriteram->live()[offset]; }
-WRITE16_MEMBER(imagetek_i4100_device::spriteram_w) { COMBINE_DATA(&m_spriteram->live()[offset]); }
-READ16_MEMBER(imagetek_i4100_device::tiletable_r) { return m_tiletable[offset]; }
-WRITE16_MEMBER(imagetek_i4100_device::tiletable_w) { COMBINE_DATA(&m_tiletable[offset]); }
+uint16_t imagetek_i4100_device::scratchram_r(offs_t offset) { return m_scratchram[offset]; }
+void imagetek_i4100_device::scratchram_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_scratchram[offset]); }
+uint16_t imagetek_i4100_device::spriteram_r(offs_t offset) { return m_spriteram->live()[offset]; }
+void imagetek_i4100_device::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_spriteram->live()[offset]); }
+uint16_t imagetek_i4100_device::tiletable_r(offs_t offset) { return m_tiletable[offset]; }
+void imagetek_i4100_device::tiletable_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_tiletable[offset]); }
 
 // video registers
 /*************************************************************
@@ -420,8 +420,8 @@ WRITE16_MEMBER(imagetek_i4100_device::tiletable_w) { COMBINE_DATA(&m_tiletable[o
  * 0.w  ---- ---- ---- ----     Number Of Sprites To Draw
  *
  ************************************************************/
-READ16_MEMBER(imagetek_i4100_device::sprite_count_r) { return m_sprite_count; }
-WRITE16_MEMBER(imagetek_i4100_device::sprite_count_w) { COMBINE_DATA(&m_sprite_count); }
+uint16_t imagetek_i4100_device::sprite_count_r() { return m_sprite_count; }
+void imagetek_i4100_device::sprite_count_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_sprite_count); }
 
 /*************************************************************
  *
@@ -433,8 +433,8 @@ WRITE16_MEMBER(imagetek_i4100_device::sprite_count_w) { COMBINE_DATA(&m_sprite_c
  *      ---- ---- ---4 3210     Sprites Masked Number
  *
  *************************************************************/
-READ16_MEMBER(imagetek_i4100_device::sprite_priority_r) { return m_sprite_priority; }
-WRITE16_MEMBER(imagetek_i4100_device::sprite_priority_w) { COMBINE_DATA(&m_sprite_priority); }
+uint16_t imagetek_i4100_device::sprite_priority_r() { return m_sprite_priority; }
+void imagetek_i4100_device::sprite_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_sprite_priority); }
 
 /*************************************************************
  *
@@ -442,18 +442,18 @@ WRITE16_MEMBER(imagetek_i4100_device::sprite_priority_w) { COMBINE_DATA(&m_sprit
  * 6.w  ---- ---- ---- ----     Sprites X Offset
  *
  ************************************************************/
-READ16_MEMBER(imagetek_i4100_device::sprite_xoffset_r) { return m_sprite_xoffset; }
-WRITE16_MEMBER(imagetek_i4100_device::sprite_xoffset_w) { COMBINE_DATA(&m_sprite_xoffset); }
-READ16_MEMBER(imagetek_i4100_device::sprite_yoffset_r) { return m_sprite_yoffset; }
-WRITE16_MEMBER(imagetek_i4100_device::sprite_yoffset_w) { COMBINE_DATA(&m_sprite_yoffset); }
+uint16_t imagetek_i4100_device::sprite_xoffset_r() { return m_sprite_xoffset; }
+void imagetek_i4100_device::sprite_xoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_sprite_xoffset); }
+uint16_t imagetek_i4100_device::sprite_yoffset_r() { return m_sprite_yoffset; }
+void imagetek_i4100_device::sprite_yoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_sprite_yoffset); }
 
 /*************************************************************
  *
  * 8.w  ---- ---- ---- ----     Sprites Color Codes Start
  *
  ************************************************************/
-READ16_MEMBER(imagetek_i4100_device::sprite_color_code_r) { return m_sprite_color_code; }
-WRITE16_MEMBER(imagetek_i4100_device::sprite_color_code_w) { COMBINE_DATA(&m_sprite_color_code); }
+uint16_t imagetek_i4100_device::sprite_color_code_r() { return m_sprite_color_code; }
+void imagetek_i4100_device::sprite_color_code_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_sprite_color_code); }
 
 /*************************************************************
  *
@@ -463,12 +463,12 @@ WRITE16_MEMBER(imagetek_i4100_device::sprite_color_code_w) { COMBINE_DATA(&m_spr
  *
  ************************************************************/
 
-READ16_MEMBER(imagetek_i4100_device::layer_priority_r)
+uint16_t imagetek_i4100_device::layer_priority_r()
 {
 	return (m_layer_priority[2]<<4) | (m_layer_priority[1]<<2) | m_layer_priority[0];
 }
 
-WRITE16_MEMBER(imagetek_i4100_device::layer_priority_w)
+void imagetek_i4100_device::layer_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_layer_priority[2] = (data >> 4) & 3;
 	m_layer_priority[1] = (data >> 2) & 3;
@@ -483,12 +483,12 @@ WRITE16_MEMBER(imagetek_i4100_device::layer_priority_w)
  *
  ************************************************************/
 
-READ16_MEMBER(imagetek_i4100_device::background_color_r)
+uint16_t imagetek_i4100_device::background_color_r()
 {
 	return m_background_color;
 }
 
-WRITE16_MEMBER(imagetek_i4100_device::background_color_w)
+void imagetek_i4100_device::background_color_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_background_color);
 
@@ -506,15 +506,15 @@ WRITE16_MEMBER(imagetek_i4100_device::background_color_w)
  * certain conditions
  *
  ***************************************************************************/
-READ16_MEMBER(imagetek_i4100_device::screen_xoffset_r) { return m_screen_xoffset; }
-WRITE16_MEMBER(imagetek_i4100_device::screen_xoffset_w) { COMBINE_DATA(&m_screen_xoffset); }
-READ16_MEMBER(imagetek_i4100_device::screen_yoffset_r) { return m_screen_yoffset; }
-WRITE16_MEMBER(imagetek_i4100_device::screen_yoffset_w) { COMBINE_DATA(&m_screen_yoffset); }
+uint16_t imagetek_i4100_device::screen_xoffset_r() { return m_screen_xoffset; }
+void imagetek_i4100_device::screen_xoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_screen_xoffset); }
+uint16_t imagetek_i4100_device::screen_yoffset_r() { return m_screen_yoffset; }
+void imagetek_i4100_device::screen_yoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_screen_yoffset); }
 
-READ16_MEMBER(imagetek_i4100_device::window_r) { return m_window[offset]; }
-WRITE16_MEMBER(imagetek_i4100_device::window_w) { COMBINE_DATA(&m_window[offset]); }
-READ16_MEMBER(imagetek_i4100_device::scroll_r) { return m_scroll[offset]; }
-WRITE16_MEMBER(imagetek_i4100_device::scroll_w) { COMBINE_DATA(&m_scroll[offset]); }
+uint16_t imagetek_i4100_device::window_r(offs_t offset) { return m_window[offset]; }
+void imagetek_i4100_device::window_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_window[offset]); }
+uint16_t imagetek_i4100_device::scroll_r(offs_t offset) { return m_scroll[offset]; }
+void imagetek_i4100_device::scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_scroll[offset]); }
 
 /****************************************************
  *
@@ -529,7 +529,7 @@ WRITE16_MEMBER(imagetek_i4100_device::scroll_w) { COMBINE_DATA(&m_scroll[offset]
  * ---- ---- ---- ---0     Flip  Screen
  *
  ****************************************************/
-WRITE16_MEMBER(imagetek_i4100_device::screen_ctrl_w)
+void imagetek_i4100_device::screen_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_layer_tile_select[2] = BIT(data,7);
 	m_layer_tile_select[1] = BIT(data,6);
@@ -553,7 +553,7 @@ WRITE16_MEMBER(imagetek_i4100_device::screen_ctrl_w)
     that the blitter can readily use (which is a form of compression)
 */
 
-READ16_MEMBER(imagetek_i4100_device::gfxrom_r)
+uint16_t imagetek_i4100_device::gfxrom_r(offs_t offset)
 {
 	offset = offset * 2 + 0x10000 * (m_rombank);
 
@@ -563,12 +563,12 @@ READ16_MEMBER(imagetek_i4100_device::gfxrom_r)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(imagetek_i4100_device::rombank_w)
+void imagetek_i4100_device::rombank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rombank);
 }
 
-WRITE16_MEMBER(imagetek_i4100_device::crtc_horz_w)
+void imagetek_i4100_device::crtc_horz_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_crtc_unlock == true)
 	{
@@ -576,7 +576,7 @@ WRITE16_MEMBER(imagetek_i4100_device::crtc_horz_w)
 	}
 }
 
-WRITE16_MEMBER(imagetek_i4100_device::crtc_vert_w)
+void imagetek_i4100_device::crtc_vert_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_crtc_unlock == true)
 	{
@@ -584,7 +584,7 @@ WRITE16_MEMBER(imagetek_i4100_device::crtc_vert_w)
 	}
 }
 
-WRITE16_MEMBER(imagetek_i4100_device::crtc_unlock_w)
+void imagetek_i4100_device::crtc_unlock_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_crtc_unlock = BIT(data,0);
 	if (data & ~1)
@@ -694,7 +694,7 @@ void imagetek_i4100_device::blt_write(int const tmap, const offs_t offs, u16 con
 
 
 // TODO: clean this up
-WRITE16_MEMBER(imagetek_i4100_device::blitter_w)
+void imagetek_i4100_device::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_blitter_regs[offset]);
 

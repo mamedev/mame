@@ -49,8 +49,8 @@ public:
 private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void mx2178_io(address_map &map);
-	void mx2178_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	virtual void machine_reset() override;
 	required_device<palette_device> m_palette;
@@ -59,7 +59,7 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-void mx2178_state::mx2178_mem(address_map &map)
+void mx2178_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom().region("roms", 0);
@@ -68,7 +68,7 @@ void mx2178_state::mx2178_mem(address_map &map)
 	map(0xe000, 0xe7ff).ram();
 }
 
-void mx2178_state::mx2178_io(address_map &map)
+void mx2178_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
@@ -110,7 +110,7 @@ MC6845_UPDATE_ROW( mx2178_state::crtc_update_row )
 }
 
 /* F4 Character Displayer */
-static const gfx_layout mx2178_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 16,                  /* 8 x 16 characters */
 	256,                    /* 256 characters */
@@ -124,7 +124,7 @@ static const gfx_layout mx2178_charlayout =
 };
 
 static GFXDECODE_START( gfx_mx2178 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, mx2178_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 void mx2178_state::machine_reset()
@@ -135,8 +135,8 @@ void mx2178_state::mx2178(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(18'869'600) / 5); // guess
-	m_maincpu->set_addrmap(AS_PROGRAM, &mx2178_state::mx2178_mem);
-	m_maincpu->set_addrmap(AS_IO, &mx2178_state::mx2178_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mx2178_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &mx2178_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
@@ -199,4 +199,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME        FLAGS
-COMP( 1984, mx2178, 0,      0,      mx2178,  mx2178, mx2178_state, empty_init, "Memorex", "Memorex 2178", MACHINE_IS_SKELETON )
+COMP( 1984, mx2178, 0,      0,      mx2178,  mx2178, mx2178_state, empty_init, "Memorex", "Memorex 2178", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

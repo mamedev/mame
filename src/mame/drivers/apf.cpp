@@ -263,6 +263,13 @@ void apf_state::machine_start()
 
 		m_cart->save_ram();
 	}
+
+	save_item(NAME(m_latch));
+	save_item(NAME(m_keyboard_data));
+	save_item(NAME(m_pad_data));
+	save_item(NAME(m_portb));
+	save_item(NAME(m_ca2));
+	save_item(NAME(m_has_cart_ram));
 }
 
 
@@ -612,5 +619,5 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY                 FULLNAME
-COMP( 1979, apfimag,  apfm1000, 0,      apfimag,  apfimag,  apf_state, empty_init, "APF Electronics Inc.", "APF Imagination Machine", 0 )
-CONS( 1978, apfm1000, 0,        0,      apfm1000, apfm1000, apf_state, empty_init, "APF Electronics Inc.", "APF M-1000", 0 )
+COMP( 1979, apfimag,  apfm1000, 0,      apfimag,  apfimag,  apf_state, empty_init, "APF Electronics Inc.", "APF Imagination Machine", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, apfm1000, 0,        0,      apfm1000, apfm1000, apf_state, empty_init, "APF Electronics Inc.", "APF M-1000", MACHINE_SUPPORTS_SAVE )

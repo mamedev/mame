@@ -47,7 +47,7 @@
             Bg Y    Bg X    Fg Y    Fg X    <-Scroll High Bits (complemented!)
 */
 
-WRITE8_MEMBER(airbustr_state::scrollregs_w)
+void airbustr_state::scrollregs_w(offs_t offset, uint8_t data)
 {
 	switch (offset)     // offset 0 <-> port 4
 	{

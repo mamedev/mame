@@ -291,7 +291,7 @@ SamRam
 /****************************************************************************************************/
 /* Spectrum 48k functions */
 
-READ8_MEMBER(spectrum_state::pre_opcode_fetch_r)
+uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 {
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
@@ -303,7 +303,7 @@ READ8_MEMBER(spectrum_state::pre_opcode_fetch_r)
 	return retval;
 }
 
-READ8_MEMBER(spectrum_state::spectrum_data_r)
+uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 {
 	m_exp->pre_data_fetch(offset);
 	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
@@ -311,18 +311,18 @@ READ8_MEMBER(spectrum_state::spectrum_data_r)
 	return retval;
 }
 
-WRITE8_MEMBER(spectrum_state::spectrum_data_w)
+void spectrum_state::spectrum_data_w(offs_t offset, uint8_t data)
 {
 	m_specmem->space(AS_PROGRAM).write_byte(offset,data);
 }
 
-WRITE8_MEMBER(spectrum_state::spectrum_rom_w)
+void spectrum_state::spectrum_rom_w(offs_t offset, uint8_t data)
 {
 	if (m_exp->romcs())
 		m_exp->mreq_w(offset, data);
 }
 
-READ8_MEMBER(spectrum_state::spectrum_rom_r)
+uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -374,7 +374,7 @@ void spectrum_state::spectrum_port_fe_w(offs_t offset, uint8_t data)
 
 /* KT: more accurate keyboard reading */
 /* DJR: Spectrum+ keys added */
-READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
+uint8_t spectrum_state::spectrum_port_fe_r(offs_t offset)
 {
 	int lines = offset >> 8;
 	int data = 0xff;
@@ -449,7 +449,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 	return data;
 }
 
-READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
+uint8_t spectrum_state::spectrum_port_ula_r(offs_t offset)
 {
 	// known ports used for reading floating bus are:
 	//   0x28ff   Arkanoid, Cobra, Renegade, Short Circuit, Terra Cresta
@@ -477,7 +477,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 	return floating_bus_r();
 }
 
-READ8_MEMBER(spectrum_state::spectrum_clone_port_ula_r)
+uint8_t spectrum_state::spectrum_clone_port_ula_r()
 {
 	int vpos = m_screen->vpos();
 

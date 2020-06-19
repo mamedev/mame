@@ -24,8 +24,8 @@ public:
 
 	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ32_MEMBER(entry_r);
-	DECLARE_WRITE32_MEMBER(entry_w);
+	uint32_t entry_r(offs_t offset, uint32_t mem_mask = ~0);
+	void entry_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	static constexpr uint32_t x_res = 1024;
 	static constexpr uint32_t y_res = 768;

@@ -45,7 +45,7 @@ void vsmile_base_state::chip_sel_w(uint8_t data)
 	m_maincpu->invalidate_cache();
 }
 
-READ16_MEMBER(vsmile_base_state::bank3_r)
+uint16_t vsmile_base_state::bank3_r(offs_t offset)
 {
 	return ((uint16_t*)m_system_region->base())[offset];
 }

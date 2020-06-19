@@ -8,6 +8,7 @@
 /// \file pstrutil.h
 ///
 
+#include "pgsl.h"
 #include "pstring.h"
 #include "ptypes.h"
 
@@ -157,22 +158,22 @@ namespace plib
 	template<typename T, typename TA>
 	bool startsWith(const T &str, const TA &arg)
 	{
-		return startsWith(str, static_cast<pstring>(arg));
+		return startsWith(str, static_cast<T>(arg));
 	}
 
 	template<typename T, typename TA>
 	bool endsWith(const T &str, const TA &arg)
 	{
-		return endsWith(str, static_cast<pstring>(arg));
+		return endsWith(str, static_cast<T>(arg));
 	}
 
 	template<typename T>
 	std::size_t strlen(const T *str)
 	{
 		const T *p = str;
-		while (*p)
+		while (*p != 0)
 			p++;
-		return static_cast<std::size_t>(p - str);
+		return narrow_cast<std::size_t>(p - str);
 	}
 
 	template<typename T>

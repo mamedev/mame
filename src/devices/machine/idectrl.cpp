@@ -282,7 +282,7 @@ void bus_master_ide_controller_device::set_dmarq(int state)
  *
  *************************************/
 
-READ32_MEMBER( bus_master_ide_controller_device::bmdma_r )
+uint32_t bus_master_ide_controller_device::bmdma_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	switch( offset )
@@ -313,7 +313,7 @@ READ32_MEMBER( bus_master_ide_controller_device::bmdma_r )
  *
  *************************************/
 
-WRITE32_MEMBER( bus_master_ide_controller_device::bmdma_w )
+void bus_master_ide_controller_device::bmdma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOG("%s:ide_bus_master32_w(%d, %08x, %08X)\n", machine().describe_context(), offset, mem_mask, data);
 

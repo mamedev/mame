@@ -337,12 +337,12 @@ Notes:
 
 /******************************************************************************/
 
-WRITE16_MEMBER(dec0_state::dec0_control_w)
+void dec0_state::dec0_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{
 		case 0: /* Playfield & Sprite priority */
-			priority_w(space, 0, data, mem_mask);
+			priority_w(0, data, mem_mask);
 			break;
 
 		case 2: /* DMA flag */
@@ -380,7 +380,7 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 	}
 }
 
-WRITE16_MEMBER(dec0_automat_state::automat_control_w)
+void dec0_automat_state::automat_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{
@@ -410,7 +410,7 @@ WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 	}
 }
 
-WRITE16_MEMBER(dec0_state::midres_sound_w)
+void dec0_state::midres_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch->write(data & 0xff);
@@ -499,7 +499,7 @@ void dec0_state::hippodrm_sub_map(address_map &map)
 }
 
 
-READ16_MEMBER(dec0_state::slyspy_controls_r)
+uint16_t dec0_state::slyspy_controls_r(offs_t offset)
 {
 	switch (offset<<1)
 	{
@@ -518,7 +518,7 @@ READ16_MEMBER(dec0_state::slyspy_controls_r)
 }
 
 // TODO: this can be a timer access, maybe video counter returns (and used as RNG in both games)
-READ16_MEMBER(dec0_state::slyspy_protection_r)
+uint16_t dec0_state::slyspy_protection_r(offs_t offset)
 {
 	switch (offset<<1)
 	{
@@ -571,13 +571,13 @@ READ16_MEMBER(dec0_state::slyspy_protection_r)
 
 */
 
-WRITE16_MEMBER(dec0_state::slyspy_state_w)
+void dec0_state::slyspy_state_w(uint16_t data)
 {
 	m_slyspy_state = 0;
 	m_pfprotect->set_bank(m_slyspy_state);
 }
 
-READ16_MEMBER(dec0_state::slyspy_state_r)
+uint16_t dec0_state::slyspy_state_r()
 {
 	m_slyspy_state = (m_slyspy_state + 1) % 4;
 	m_pfprotect->set_bank(m_slyspy_state);
@@ -703,7 +703,7 @@ void dec0_state::slyspy_s_map(address_map &map)
 // Sly Spy sound state protection machine emulation
 // similar to the video state machine
 // current bank is at 0x1f0045, incremented by 1 then here is read
-READ8_MEMBER(dec0_state::slyspy_sound_state_r)
+uint8_t dec0_state::slyspy_sound_state_r()
 {
 	m_slyspy_sound_state ++;
 	m_slyspy_sound_state &= 3;
@@ -713,7 +713,7 @@ READ8_MEMBER(dec0_state::slyspy_sound_state_r)
 	return 0xff;
 }
 
-READ8_MEMBER(dec0_state::slyspy_sound_state_reset_r)
+uint8_t dec0_state::slyspy_sound_state_reset_r()
 {
 	m_slyspy_sound_state = 0;
 	m_sndprotect->set_bank(m_slyspy_sound_state);
@@ -774,13 +774,13 @@ void dec0_automat_state::machine_start()
 
 
 /* swizzle the palette writes around so we can use the same gfx plane ordering as the originals */
-READ16_MEMBER( dec0_automat_state::automat_palette_r )
+uint16_t dec0_automat_state::automat_palette_r(offs_t offset)
 {
 	offset ^=0xf;
 	return m_paletteram[offset];
 }
 
-WRITE16_MEMBER( dec0_automat_state::automat_palette_w )
+void dec0_automat_state::automat_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset ^=0xf;
 	m_palette->write16(offset, data, mem_mask);
@@ -1821,7 +1821,7 @@ void dec0_state::dec1(machine_config &config)
 }
 
 
-WRITE8_MEMBER(dec0_automat_state::sound_bankswitch_w)
+void dec0_automat_state::sound_bankswitch_w(uint8_t data)
 {
 	m_msm[0]->reset_w(BIT(data, 3));
 	m_msm[1]->reset_w(BIT(data, 4));
@@ -4068,7 +4068,7 @@ void dec0_state::init_midresb()
 //  m_maincpu->space(AS_PROGRAM).install_write_handler(0x00180014, 0x00180015, write16_delegate(*this, FUNC(dec0_state::midres_sound_w)));
 }
 
-READ16_MEMBER(dec0_state::ffantasybl_242024_r)
+uint16_t dec0_state::ffantasybl_242024_r()
 {
 /*
     000152: 41F9 0024 2020             lea     $242020.l, A0
@@ -4085,7 +4085,7 @@ void dec0_state::init_ffantasybl()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x24c880, 0x24cbff); // what is this? layer 3-related??
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00242024, 0x00242025, read16_delegate(*this, FUNC(dec0_state::ffantasybl_242024_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00242024, 0x00242025, read16smo_delegate(*this, FUNC(dec0_state::ffantasybl_242024_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x00ff87ee, 0x00ff87ef, "VBLANK");
 }
 

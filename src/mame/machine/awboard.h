@@ -15,14 +15,14 @@ public:
 
 	virtual void submap(address_map &map) override;
 
-	DECLARE_WRITE16_MEMBER(epr_offsetl_w);          // 5f7000
-	DECLARE_WRITE16_MEMBER(epr_offseth_w);          // 5f7004
-	DECLARE_WRITE16_MEMBER(mpr_record_index_w);     // 5f700c
-	DECLARE_WRITE16_MEMBER(mpr_first_file_index_w); // 5f7010
-	DECLARE_WRITE16_MEMBER(mpr_file_offsetl_w);     // 5f7014
-	DECLARE_WRITE16_MEMBER(mpr_file_offseth_w);     // 5f7018
-	DECLARE_READ16_MEMBER(pio_r);                   // 5f7080
-	DECLARE_WRITE16_MEMBER(pio_w);                  // 5f7080
+	void epr_offsetl_w(uint16_t data);          // 5f7000
+	void epr_offseth_w(uint16_t data);          // 5f7004
+	void mpr_record_index_w(uint16_t data);     // 5f700c
+	void mpr_first_file_index_w(uint16_t data); // 5f7010
+	void mpr_file_offsetl_w(uint16_t data);     // 5f7014
+	void mpr_file_offseth_w(uint16_t data);     // 5f7018
+	uint16_t pio_r();                           // 5f7080
+	void pio_w(uint16_t data);                  // 5f7080
 
 protected:
 	virtual void device_start() override;

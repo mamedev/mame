@@ -19,7 +19,7 @@ namespace netlist
 		, m_D(*this, "DATA")
 		, m_RESET(*this, "RESET")
 		, m_SET(*this, "SET")
-		, m_CLK(*this, "CLOCK", NETLIB_DELEGATE(CD4013, clk))
+		, m_CLK(*this, "CLOCK", NETLIB_DELEGATE(clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_nextD(*this, "m_nextD", 0)

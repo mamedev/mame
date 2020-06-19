@@ -52,9 +52,9 @@ private:
 
 	uint8_t *m_shadow_ram;
 
-	DECLARE_READ8_MEMBER(bios_r);
-	DECLARE_WRITE8_MEMBER(bios_w);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
+	uint8_t bios_r(offs_t offset);
+	void bios_w(offs_t offset, uint8_t data);
+	void eeprom_w(uint8_t data);
 
 	uint16_t m_pci_shadow_reg;
 
@@ -133,7 +133,7 @@ void photoply_state::sis_pcm_w(int function, int reg, uint32_t data, uint32_t me
 	}
 }
 
-READ8_MEMBER(photoply_state::bios_r)
+uint8_t photoply_state::bios_r(offs_t offset)
 {
 	uint8_t bit_mask = (offset & 0x38000) >> 15;
 
@@ -168,7 +168,7 @@ READ8_MEMBER(photoply_state::bios_r)
 	return m_main_bios[offset & 0x1ffff];
 }
 
-WRITE8_MEMBER(photoply_state::bios_w)
+void photoply_state::bios_w(offs_t offset, uint8_t data)
 {
 //  return m_bios[offset];
 
@@ -181,7 +181,7 @@ WRITE8_MEMBER(photoply_state::bios_w)
 	}
 }
 
-WRITE8_MEMBER(photoply_state::eeprom_w)
+void photoply_state::eeprom_w(uint8_t data)
 {
 	//logerror("Writing %X to EEPROM output port\n", data);
 	m_eeprom->di_write(BIT(data, 0));

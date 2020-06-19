@@ -100,19 +100,19 @@ WRITE_LINE_MEMBER(imm4_22_device::reset_4002_in)
 }
 
 
-WRITE8_MEMBER(imm4_22_device::ram_out)
+void imm4_22_device::ram_out(offs_t offset, u8 data)
 {
 	// GPIO write - hooking this up would be a pain with MAME as it is
 	logerror("4002 A%u out %X\n", 13U + (offset & 0x03U), data & 0x0fU);
 }
 
-WRITE8_MEMBER(imm4_22_device::rom_out)
+void imm4_22_device::rom_out(offs_t offset, u8 data)
 {
 	// GPIO write - hooking this up would be a pain with MAME as it is
 	logerror("ROM %u out %X\n", (m_rom_page << 2) | ((offset >> 4) & 0x03U), data & 0x0fU);
 }
 
-READ8_MEMBER(imm4_22_device::rom_in)
+u8 imm4_22_device::rom_in(offs_t offset)
 {
 	// GPIO read - hooking this up would be a pain with MAME as it is
 	if (!machine().side_effects_disabled())
@@ -155,7 +155,7 @@ void imm4_22_device::map_ram_io()
 		{
 			memory_space().install_ram(start << 8, (start << 8) | 0x00ffU, m_memory);
 			status_space().install_ram(start << 6, (start << 6) | 0x003fU, m_status);
-			ram_ports_space().install_write_handler(start << 2, (start << 2) | 0x03U, write8_delegate(*this, FUNC(imm4_22_device::ram_out)));
+			ram_ports_space().install_write_handler(start << 2, (start << 2) | 0x03U, write8sm_delegate(*this, FUNC(imm4_22_device::ram_out)));
 		}
 
 		offs_t const rom_ports_start(offs_t(m_rom_page) << 6);
@@ -163,7 +163,7 @@ void imm4_22_device::map_ram_io()
 		offs_t const rom_ports_mirror(m_rom_mirror ? 0x1f00U : 0x0700U);
 		rom_ports_space().install_readwrite_handler(
 				rom_ports_start, rom_ports_end, 0U, rom_ports_mirror, 0U,
-				read8_delegate(*this, FUNC(imm4_22_device::rom_in)), write8_delegate(*this, FUNC(imm4_22_device::rom_out)));
+				read8sm_delegate(*this, FUNC(imm4_22_device::rom_in)), write8sm_delegate(*this, FUNC(imm4_22_device::rom_out)));
 
 		if (is_loaded())
 			map_prom();

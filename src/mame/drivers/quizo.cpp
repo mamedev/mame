@@ -57,8 +57,8 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_vram;
 
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_WRITE8_MEMBER(vrambank_w);
+	void rombank_w(uint8_t data);
+	void vrambank_w(uint8_t data);
 
 	void quizo_palette(palette_device &palette) const;
 
@@ -114,12 +114,12 @@ uint32_t quizo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-WRITE8_MEMBER(quizo_state::rombank_w)
+void quizo_state::rombank_w(uint8_t data)
 {
 	m_rombank->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(quizo_state::vrambank_w)
+void quizo_state::vrambank_w(uint8_t data)
 {
 	m_vrambank->set_entry(BIT(data, 3));
 }

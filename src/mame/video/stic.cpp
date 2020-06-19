@@ -1148,7 +1148,7 @@ void stic_device::screenrefresh()
 
 
 
-READ16_MEMBER( stic_device::read )
+uint16_t stic_device::read(offs_t offset)
 {
 	//logerror("%x = stic_r(%x)\n",0,offset);
 	switch (offset)
@@ -1212,7 +1212,7 @@ READ16_MEMBER( stic_device::read )
 	}
 }
 
-WRITE16_MEMBER( stic_device::write )
+void stic_device::write(offs_t offset, uint16_t data)
 {
 	intv_sprite_type *s;
 
@@ -1321,12 +1321,12 @@ WRITE16_MEMBER( stic_device::write )
 }
 
 
-READ16_MEMBER( stic_device::gram_read )
+uint16_t stic_device::gram_read(offs_t offset)
 {
 	return m_gram[offset];
 }
 
-WRITE16_MEMBER( stic_device::gram_write )
+void stic_device::gram_write(offs_t offset, uint16_t data)
 {
 	data &= 0xff;
 	m_gram[offset] = data;

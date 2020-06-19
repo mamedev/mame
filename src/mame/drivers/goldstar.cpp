@@ -261,13 +261,13 @@ constexpr XTAL AY_CLOCK     = MASTER_CLOCK / 8;
 
 
 
-WRITE8_MEMBER(goldstar_state::protection_w)
+void goldstar_state::protection_w(uint8_t data)
 {
 	if (data == 0x2a)
 		m_dataoffset = 0;
 }
 
-READ8_MEMBER(goldstar_state::protection_r)
+uint8_t goldstar_state::protection_r()
 {
 	static const int data[4] = { 0x47, 0x4f, 0x4c, 0x44 };
 
@@ -275,7 +275,7 @@ READ8_MEMBER(goldstar_state::protection_r)
 	return data[m_dataoffset++];
 }
 
-WRITE8_MEMBER(goldstar_state::p1_lamps_w)
+void goldstar_state::p1_lamps_w(uint8_t data)
 {
 /*  bits
   7654 3210     goldstar                            crazybon                ncb3/cb3a               lucky8/bingowng
@@ -316,7 +316,7 @@ WRITE8_MEMBER(goldstar_state::p1_lamps_w)
 //  popmessage("p1 lamps: %02X", data);
 }
 
-WRITE8_MEMBER(goldstar_state::p2_lamps_w)
+void goldstar_state::p2_lamps_w(uint8_t data)
 {
 	m_lamps[8 + 0] = BIT(data, 0);
 	m_lamps[8 + 1] = BIT(data, 1);
@@ -403,7 +403,7 @@ void sanghopm_state::star100_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(sanghopm_state::coincount_w)
+void sanghopm_state::coincount_w(uint8_t data)
 {
 /*
   7654 3210
@@ -422,7 +422,7 @@ WRITE8_MEMBER(sanghopm_state::coincount_w)
 	machine().bookkeeping().coin_counter_w(4, data & 0x01);  /* counter5 payout */
 }
 
-WRITE8_MEMBER(sanghopm_state::enable_w)
+void sanghopm_state::enable_w(uint8_t data)
 {
 	m_enable_reg = data;
 }
@@ -600,7 +600,7 @@ void goldstar_state::ramdac_map(address_map &map)
 
 
 
-WRITE8_MEMBER(goldstar_state::ncb3_port81_w)
+void goldstar_state::ncb3_port81_w(uint8_t data)
 {
 //  if (data!=0x00)
 //      popmessage("ncb3_port81_w %02x\n",data);
@@ -811,7 +811,7 @@ void goldstar_state::nfm_map(address_map &map)
 
 
 
-WRITE8_MEMBER(goldstar_state::cm_coincount_w)
+void goldstar_state::cm_coincount_w(uint8_t data)
 {
 /*  bits
   7654 3210
@@ -1085,7 +1085,7 @@ void goldstar_state::mbstar_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(wingco_state::magodds_outb850_w)
+void wingco_state::magodds_outb850_w(uint8_t data)
 {
 	// guess, could be wrong, this might just be lights
 
@@ -1101,7 +1101,7 @@ WRITE8_MEMBER(wingco_state::magodds_outb850_w)
 
 }
 
-WRITE8_MEMBER(wingco_state::magodds_outb860_w)
+void wingco_state::magodds_outb860_w(uint8_t data)
 {
 //  popmessage("magodds_outb860_w %02x\n", data);
 }
@@ -1160,7 +1160,7 @@ void goldstar_state::kkotnoli_map(address_map &map)
 }
 
 
-//WRITE8_MEMBER(goldstar_state::ladylinr_outport_w)
+//void goldstar_state::ladylinr_outport_w(uint8_t data)
 //{
 /* LAMPS (b840)...
 
@@ -1252,7 +1252,7 @@ void unkch_state::unkch_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(unkch_state::coincount_w)
+void unkch_state::coincount_w(uint8_t data)
 {
 /*
   7654 3210
@@ -1274,7 +1274,7 @@ WRITE8_MEMBER(unkch_state::coincount_w)
 	//popmessage("coin counters: %02x", data);
 }
 
-WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
+void unkch_state::unkcm_0x02_w(uint8_t data)
 {
 /*  bits
   7654 3210
@@ -1304,7 +1304,7 @@ WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
 	m_lamps[5] = BIT(data, 5);  /* Take / Stop 1 */
 }
 
-WRITE8_MEMBER(unkch_state::unkcm_0x03_w)
+void unkch_state::unkcm_0x03_w(uint8_t data)
 {
 	//popmessage("unkcm_0x03_w %02x", data);
 
@@ -15395,7 +15395,7 @@ void cmaster_state::init_fb2010()
 	ROM[0x10dc] = 0x00;
 	ROM[0x10dd] = 0x00;
 
-	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x7d>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x7d>)));
 }
 
 
@@ -18423,8 +18423,8 @@ void cmaster_state::init_schery97()
 
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x1d, 0x1d, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xa8>)));
-	m_maincpu->space(AS_IO).install_read_handler(0x2a, 0x2a, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb4>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x1d, 0x1d, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xa8>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x2a, 0x2a, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb4>)));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -18446,7 +18446,7 @@ void cmaster_state::init_schery97a()
 	}
 
 
-	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x38>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x38>)));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -18466,7 +18466,7 @@ void cmaster_state::init_skill98()
 
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xea>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xea>)));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -18520,7 +18520,7 @@ void cmaster_state::init_nfb96_c1()
 		}
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x31, 0x31, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x68>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x31, 0x31, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x68>)));
 
 }
 
@@ -18540,7 +18540,7 @@ void cmaster_state::init_nfb96_c1_2() // C1 PCB, different CPLD
 		}
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x18, 0x18, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x3a>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x18, 0x18, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x3a>)));
 
 }
 
@@ -18561,7 +18561,7 @@ void cmaster_state::init_nfb96_c2()
 
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x21, 0x21, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x58>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x21, 0x21, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x58>)));
 }
 
 void cmaster_state::init_nfb96_d()
@@ -18581,11 +18581,11 @@ void cmaster_state::init_nfb96_d()
 		rom[i] = x;
 	}
 	// nfb96b needs both of these
-	m_maincpu->space(AS_IO).install_read_handler(0x23, 0x23, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x80>)));
-	m_maincpu->space(AS_IO).install_read_handler(0x5a, 0x5a, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xaa>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x23, 0x23, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x80>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x5a, 0x5a, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xaa>)));
 
 	// csel96b
-	m_maincpu->space(AS_IO).install_read_handler(0x6e, 0x6e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x96>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x6e, 0x6e, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x96>)));
 
 }
 
@@ -18606,7 +18606,7 @@ void cmaster_state::init_nfb96_dk()
 		}
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x2e, 0x2e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xbe>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x2e, 0x2e, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xbe>)));
 
 }
 
@@ -18645,8 +18645,8 @@ void cmaster_state::init_rp35()
 		rom[i] = x;
 	}
 
-	m_maincpu->space(AS_IO).install_read_handler(0x5e, 0x5e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x84>)));
-	m_maincpu->space(AS_IO).install_read_handler(0x36, 0x36, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x90>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x5e, 0x5e, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x84>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x36, 0x36, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x90>)));
 }
 
 void cmaster_state::init_rp36()
@@ -18667,7 +18667,7 @@ void cmaster_state::init_rp36()
 		rom[i] = x;
 	}
 
-	m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb2>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb2>)));
 }
 
 void cmaster_state::init_rp36c3()
@@ -18688,7 +18688,7 @@ void cmaster_state::init_rp36c3()
 		rom[i] = x;
 	}
 
-	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x48>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x48>)));
 }
 
 void cmaster_state::init_rp96sub()  // 95 33 95 33 70 6C 70 6C... XORs and bitswaps seem ok. Stuck at Program Check screen. Unlike the other sets, there aren't unmapped reads where to put the handler.
@@ -18709,7 +18709,7 @@ void cmaster_state::init_rp96sub()  // 95 33 95 33 70 6C 70 6C... XORs and bitsw
 		rom[i] = x;
 	}
 
-//  m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb2>)));
+//  m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb2>)));
 }
 
 
@@ -18730,8 +18730,8 @@ void cmaster_state::init_po33()
 
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x32, 0x32, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x74>)));
-	m_maincpu->space(AS_IO).install_read_handler(0x12, 0x12, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x09>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x32, 0x32, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x74>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x12, 0x12, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x09>)));
 	/* oki6295 at 0x20 */
 }
 
@@ -18754,8 +18754,8 @@ void cmaster_state::init_match133()
 		rom[i] = x;
 	}
 
-	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xc7>)));
-	m_maincpu->space(AS_IO).install_read_handler(0x1a, 0x1a, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xe4>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xc7>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x1a, 0x1a, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xe4>)));
 }
 
 

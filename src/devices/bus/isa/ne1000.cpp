@@ -41,13 +41,11 @@ void ne1000_device::device_reset() {
 
 uint8_t ne1000_device::ne1000_port_r(offs_t offset) {
 	if(offset < 16) {
-		m_dp8390->dp8390_cs(CLEAR_LINE);
-		return m_dp8390->dp8390_r(offset);
+		return m_dp8390->cs_read(offset);
 	}
 	switch(offset) {
 	case 16:
-		m_dp8390->dp8390_cs(ASSERT_LINE);
-		return m_dp8390->dp8390_r(offset);
+		return m_dp8390->remote_read();
 	case 31:
 		m_dp8390->dp8390_reset(CLEAR_LINE);
 		return 0;
@@ -59,14 +57,12 @@ uint8_t ne1000_device::ne1000_port_r(offs_t offset) {
 
 void ne1000_device::ne1000_port_w(offs_t offset, uint8_t data) {
 	if(offset < 16) {
-		m_dp8390->dp8390_cs(CLEAR_LINE);
-		m_dp8390->dp8390_w(offset, data);
+		m_dp8390->cs_write(offset, data);
 		return;
 	}
 	switch(offset) {
 	case 16:
-		m_dp8390->dp8390_cs(ASSERT_LINE);
-		m_dp8390->dp8390_w(offset, data);
+		m_dp8390->remote_write(data);
 		return;
 	case 31:
 		m_dp8390->dp8390_reset(ASSERT_LINE);

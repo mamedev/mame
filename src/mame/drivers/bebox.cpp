@@ -28,8 +28,8 @@
 #include "formats/pc_dsk.h"
 #include "machine/8042kbdc.h"
 
-READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return m_dma8237[1]->read(offset / 2); }
-WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { m_dma8237[1]->write(offset / 2, data); }
+uint8_t bebox_state::at_dma8237_1_r(offs_t offset) { return m_dma8237[1]->read(offset / 2); }
+void bebox_state::at_dma8237_1_w(offs_t offset, uint8_t data) { m_dma8237[1]->write(offset / 2, data); }
 
 void bebox_state::main_mem(address_map &map)
 {
@@ -71,7 +71,7 @@ void bebox_state::main_mem(address_map &map)
 // The following is a gross hack to let the BeBox boot ROM identify the processors correctly.
 // This needs to be done in a better way if someone comes up with one.
 
-READ64_MEMBER(bebox_state::bb_slave_64be_r)
+uint64_t bebox_state::bb_slave_64be_r(offs_t offset, uint64_t mem_mask)
 {
 	// 2e94 is the real address, 2e84 is where the PC appears to be under full DRC
 	if ((m_ppc[1]->pc() == 0xfff02e94) || (m_ppc[1]->pc() == 0xfff02e84))
@@ -79,7 +79,7 @@ READ64_MEMBER(bebox_state::bb_slave_64be_r)
 		return 0x108000ff;  // indicate slave CPU
 	}
 
-	return m_pcibus->read_64be(space, offset, mem_mask);
+	return m_pcibus->read_64be(offset, mem_mask);
 }
 
 void bebox_state::slave_mem(address_map &map)

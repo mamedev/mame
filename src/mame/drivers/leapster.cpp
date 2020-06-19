@@ -239,7 +239,7 @@ private:
 		return machine().rand() | (machine().rand()<<16); // there is a loop checking that this is above a certain value
 	}
 
-	DECLARE_WRITE32_MEMBER(leapster_aux004b_w)
+	void leapster_aux004b_w(uint32_t data)
 	{
 		printf("leapster_aux004b_w %04x\n", data);
 	}

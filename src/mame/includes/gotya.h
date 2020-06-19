@@ -44,10 +44,10 @@ private:
 
 	/* devices */
 	required_device<samples_device> m_samples;
-	DECLARE_WRITE8_MEMBER(gotya_videoram_w);
-	DECLARE_WRITE8_MEMBER(gotya_colorram_w);
-	DECLARE_WRITE8_MEMBER(gotya_video_control_w);
-	DECLARE_WRITE8_MEMBER(gotya_soundlatch_w);
+	void gotya_videoram_w(offs_t offset, uint8_t data);
+	void gotya_colorram_w(offs_t offset, uint8_t data);
+	void gotya_video_control_w(uint8_t data);
+	void gotya_soundlatch_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows_thehand);
 	virtual void machine_start() override;

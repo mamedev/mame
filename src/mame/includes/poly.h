@@ -92,9 +92,9 @@ public:
 	virtual void poly_bank(address_map &map);
 
 private:
-	DECLARE_READ8_MEMBER( logical_mem_r );
-	DECLARE_WRITE8_MEMBER( logical_mem_w );
-	DECLARE_READ8_MEMBER( vector_r );
+	uint8_t logical_mem_r(offs_t offset);
+	void logical_mem_w(offs_t offset, uint8_t data);
+	uint8_t vector_r(offs_t offset);
 	void kbd_put(u8 data); // remove when KR2376 is implemented
 	DECLARE_READ_LINE_MEMBER( kbd_shift_r );
 	DECLARE_READ_LINE_MEMBER( kbd_control_r );
@@ -105,14 +105,14 @@ private:
 	uint8_t videoram_2_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( ptm_o2_callback );
 	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
-	DECLARE_WRITE8_MEMBER( baud_rate_w );
+	void baud_rate_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER( set_protect );
-	DECLARE_WRITE8_MEMBER( set_protect_w );
-	DECLARE_READ8_MEMBER( select_map_r );
-	DECLARE_WRITE8_MEMBER( select_map1_w );
-	DECLARE_WRITE8_MEMBER( select_map2_w );
-	DECLARE_READ8_MEMBER( network_r );
-	DECLARE_WRITE8_MEMBER( network_w );
+	void set_protect_w(uint8_t data);
+	uint8_t select_map_r();
+	void select_map1_w(uint8_t data);
+	void select_map2_w(uint8_t data);
+	uint8_t network_r(offs_t offset);
+	void network_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( network_clk_w );
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -165,11 +165,11 @@ public:
 	void polydev(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(drive_register_w);
-	DECLARE_READ8_MEMBER(drive_register_r);
+	void drive_register_w(uint8_t data);
+	uint8_t drive_register_r();
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_READ8_MEMBER(fdc_inv_r);
-	DECLARE_WRITE8_MEMBER(fdc_inv_w);
+	uint8_t fdc_inv_r(offs_t offset);
+	void fdc_inv_w(offs_t offset, uint8_t data);
 
 
 	virtual void poly_bank(address_map &map) override;

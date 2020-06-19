@@ -93,22 +93,22 @@ private:
 	void portb_w(u8 data);
 	u8 port08_r();
 	void port08_w(u8 data);
+	u8 mem_r(offs_t offset);
+	void mem_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	void kbd_put(u8 data);
 
-	void dg680_io(address_map &map);
-	void dg680_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	void machine_reset() override;
+	void machine_start() override;
 
 	u8 m_pio_b;
 	u8 m_term_data;
 	u8 m_protection[0x100];
-	virtual void machine_reset() override;
-
 	u8 m_cass_data[4];
 	bool m_cassold, m_cassinbit, m_cassoutbit;
-	u8 mem_r(offs_t offset);
-	void mem_w(offs_t offset, u8 data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -175,16 +175,16 @@ void dg680_state::mem_w(offs_t offset, u8 data)
 }
 
 
-void dg680_state::dg680_mem(address_map &map)
+void dg680_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xcfff).ram();
-	map(0xd000, 0xd7ff).rom();
+	map(0xd000, 0xd7ff).rom().region("maincpu", 0);
 	map(0xd800, 0xefff).ram();
 	map(0xf000, 0xffff).rw(FUNC(dg680_state::mem_r),FUNC(dg680_state::mem_w));
 }
 
-void dg680_state::dg680_io(address_map &map)
+void dg680_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -194,6 +194,17 @@ void dg680_state::dg680_io(address_map &map)
 	//map(0x09,0x09) parallel input port
 	// Optional AM9519 Programmable Interrupt Controller (port c = data, port d = control)
 	//map(0x0c,0x0d).rw("am9519", FUNC(am9519_device::read), FUNC(am9519_device::write));
+}
+
+void dg680_state::machine_start()
+{
+	save_item(NAME(m_pio_b));
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_protection));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_cassinbit));
+	save_item(NAME(m_cassoutbit));
 }
 
 void dg680_state::machine_reset()
@@ -285,8 +296,8 @@ void dg680_state::dg680(machine_config &config)
 
 	/* basic machine hardware */
 	z80_device& maincpu(Z80(config, m_maincpu, XTAL(8'000'000) / 4));
-	maincpu.set_addrmap(AS_PROGRAM, &dg680_state::dg680_mem);
-	maincpu.set_addrmap(AS_IO, &dg680_state::dg680_io);
+	maincpu.set_addrmap(AS_PROGRAM, &dg680_state::mem_map);
+	maincpu.set_addrmap(AS_IO, &dg680_state::io_map);
 	maincpu.set_daisy_config(dg680_daisy_chain);
 
 	/* Keyboard */
@@ -313,8 +324,8 @@ void dg680_state::dg680(machine_config &config)
 
 /* ROM definition */
 ROM_START( dg680 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dg680.rom", 0xd000, 0x0800, BAD_DUMP CRC(c1aaef6a) SHA1(1508ca8315452edfb984718e795ccbe79a0c0b58) )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "dg680.rom", 0x0000, 0x0800, BAD_DUMP CRC(c1aaef6a) SHA1(1508ca8315452edfb984718e795ccbe79a0c0b58) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.bin", 0x0000, 0x0020, NO_DUMP )
@@ -323,4 +334,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY            FULLNAME                   FLAGS
-COMP( 1980, dg680, 0,      0,      dg680,   dg680, dg680_state, empty_init, "David Griffiths", "DG680 with DGOS-Z80 1.4", MACHINE_NO_SOUND_HW )
+COMP( 1980, dg680, 0,      0,      dg680,   dg680, dg680_state, empty_init, "David Griffiths", "DG680 with DGOS-Z80 1.4", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

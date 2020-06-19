@@ -42,37 +42,37 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{}
 
-	DECLARE_WRITE16_MEMBER(scudhamm_motor_command_w);
-	DECLARE_WRITE16_MEMBER(scudhamm_leds_w);
-	DECLARE_WRITE16_MEMBER(scudhamm_enable_w);
-	DECLARE_WRITE16_MEMBER(scudhamm_oki_bank_w);
-	DECLARE_WRITE16_MEMBER(bigrun_soundbank_w);
-	DECLARE_READ16_MEMBER(scudhamm_motor_status_r);
-	DECLARE_READ16_MEMBER(scudhamm_motor_pos_r);
+	void scudhamm_motor_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void scudhamm_leds_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void scudhamm_enable_w(uint16_t data);
+	void scudhamm_oki_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bigrun_soundbank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t scudhamm_motor_status_r();
+	uint16_t scudhamm_motor_pos_r();
 	uint8_t scudhamm_analog_r();
-	DECLARE_READ16_MEMBER(bigrun_ip_select_r);
-	DECLARE_WRITE16_MEMBER(leds_out_w);
-	DECLARE_WRITE16_MEMBER(unknown_out_w);
-	DECLARE_WRITE16_MEMBER(motor_out_w);
-	DECLARE_WRITE16_MEMBER(wheel_out_w);
-	DECLARE_WRITE16_MEMBER(ip_select_w);
-	DECLARE_WRITE16_MEMBER(ip_select_plus1_w);
-	DECLARE_WRITE16_MEMBER(bigrun_comms_w);
-	DECLARE_WRITE16_MEMBER(active_layers_w);
-	DECLARE_READ16_MEMBER(cischeat_ip_select_r);
-	DECLARE_WRITE16_MEMBER(cischeat_soundlatch_w);
-	DECLARE_WRITE16_MEMBER(cischeat_comms_w);
-	DECLARE_READ16_MEMBER(f1gpstar_wheel_r);
-	DECLARE_READ16_MEMBER(f1gpstr2_ioready_r);
-	DECLARE_READ16_MEMBER(wildplt_xy_r);
-	DECLARE_READ16_MEMBER(wildplt_mux_r);
-	DECLARE_WRITE16_MEMBER(wildplt_mux_w);
-	DECLARE_WRITE16_MEMBER(f1gpstar_motor_w);
-	DECLARE_WRITE16_MEMBER(f1gpstar_soundint_w);
-	DECLARE_WRITE16_MEMBER(f1gpstar_comms_w);
-	DECLARE_WRITE16_MEMBER(f1gpstr2_io_w);
-	DECLARE_WRITE16_MEMBER(cischeat_soundbank_1_w);
-	DECLARE_WRITE16_MEMBER(cischeat_soundbank_2_w);
+	uint16_t bigrun_ip_select_r();
+	void leds_out_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void unknown_out_w(uint16_t data);
+	void motor_out_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void wheel_out_w(uint16_t data);
+	void ip_select_w(uint16_t data);
+	void ip_select_plus1_w(uint16_t data);
+	void bigrun_comms_w(uint16_t data);
+	void active_layers_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cischeat_ip_select_r();
+	void cischeat_soundlatch_w(uint16_t data);
+	void cischeat_comms_w(uint16_t data);
+	uint16_t f1gpstar_wheel_r();
+	uint16_t f1gpstr2_ioready_r();
+	uint16_t wildplt_xy_r();
+	uint16_t wildplt_mux_r();
+	void wildplt_mux_w(uint16_t data);
+	void f1gpstar_motor_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void f1gpstar_soundint_w(uint16_t data);
+	void f1gpstar_comms_w(uint16_t data);
+	void f1gpstr2_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cischeat_soundbank_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cischeat_soundbank_2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	void init_cischeat();
 	void init_bigrun();
@@ -165,10 +165,10 @@ public:
 		m_armold = 0;
 	}
 
-	DECLARE_READ16_MEMBER(motor_status_r);
-	DECLARE_WRITE16_MEMBER(motor_command_w);
+	uint16_t motor_status_r();
+	void motor_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t analog_r();
-	DECLARE_WRITE16_MEMBER(output_w);
+	void output_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	
 	void armchmp2(machine_config &config);
 	void armchmp2_map(address_map &map);
@@ -193,7 +193,7 @@ public:
 	std::unique_ptr<uint16_t[]> m_allocated_spriteram;
 	void wildplt_map(address_map &map);
 	void wildplt(machine_config &config);
-	DECLARE_WRITE16_MEMBER(sprite_dma_w);
+	void sprite_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	virtual void video_start() override;
@@ -224,12 +224,12 @@ public:
 	void init_captflag();
 
 private:
-	DECLARE_WRITE16_MEMBER(motor_command_right_w);
-	DECLARE_WRITE16_MEMBER(motor_command_left_w);
+	void motor_command_right_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void motor_command_left_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void motor_move(int side, uint16_t data);
-	DECLARE_WRITE16_MEMBER(oki_bank_w);
+	void oki_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(leds_w);
+	void leds_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(captflag_scanline);
 

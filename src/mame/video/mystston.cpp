@@ -125,7 +125,7 @@ void mystston_state::set_palette()
  *
  *************************************/
 
-WRITE8_MEMBER(mystston_state::mystston_video_control_w)
+void mystston_state::mystston_video_control_w(uint8_t data)
 {
 	*m_video_control = data;
 

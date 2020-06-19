@@ -92,7 +92,7 @@ pfmt::rtype pfmt::setfmt(std::stringstream &strm, char32_t cfmt_spec)
 		// a.b format here ...
 		char32_t pend(0);
 		int width(0);
-		if (fmt != "" && pstring("duxofge").find(static_cast<pstring::value_type>(cfmt_spec)) != pstring::npos)
+		if (!fmt.empty() && pstring("duxofge").find(static_cast<pstring::value_type>(cfmt_spec)) != pstring::npos)
 		{
 			pend = static_cast<char32_t>(fmt.at(fmt.size() - 1));
 			if (pstring("duxofge").find(static_cast<pstring::value_type>(pend)) == pstring::npos)
@@ -113,7 +113,7 @@ pfmt::rtype pfmt::setfmt(std::stringstream &strm, char32_t cfmt_spec)
 			strm << std::setprecision(pstonum_ne_def<int>(fmt.substr(pdot + 1), 6));
 			width = pstonum_ne_def<int>(left(fmt,pdot), 0);
 		}
-		else if (fmt != "")
+		else if (!fmt.empty())
 			width = pstonum_ne_def<int>(fmt, 0);
 
 		auto aw(plib::abs(width));

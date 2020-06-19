@@ -104,8 +104,8 @@
 #include "netlist/macro/nlm_cd4xxx.h"
 #include "netlist/macro/nlm_opamp.h"
 #include "netlist/macro/nlm_other.h"
-#include "netlist/macro/nlm_ttl74xx.h"
 #include "netlist/macro/nlm_roms.h"
+#include "netlist/macro/nlm_ttl74xx.h"
 
 #include "netlist/analog/nld_bjt.h"
 #include "netlist/analog/nld_fourterm.h"

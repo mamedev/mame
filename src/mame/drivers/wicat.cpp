@@ -65,30 +65,30 @@ public:
 	void wicat(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER(invalid_r);
-	DECLARE_WRITE16_MEMBER(invalid_w);
-	DECLARE_READ16_MEMBER(memmap_r);
-	DECLARE_WRITE16_MEMBER(memmap_w);
+	uint16_t invalid_r(offs_t offset);
+	void invalid_w(offs_t offset, uint16_t data);
+	uint16_t memmap_r();
+	void memmap_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(adir_w);
 	DECLARE_WRITE_LINE_MEMBER(bdir_w);
 	void via_a_w(uint8_t data);
 	void via_b_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(videosram_store_w);
-	DECLARE_WRITE8_MEMBER(videosram_recall_w);
-	DECLARE_READ8_MEMBER(video_timer_r);
-	DECLARE_WRITE8_MEMBER(video_timer_w);
+	void videosram_store_w(uint8_t data);
+	void videosram_recall_w(uint8_t data);
+	uint8_t video_timer_r(offs_t offset);
+	void video_timer_w(offs_t offset, uint8_t data);
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
-	DECLARE_READ8_MEMBER(video_status_r);
+	uint8_t video_status_r();
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_irq_clear_w);
-	DECLARE_READ8_MEMBER(hdc_r);
-	DECLARE_WRITE8_MEMBER(hdc_w);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ16_MEMBER(via_r);
-	DECLARE_WRITE16_MEMBER(via_w);
+	uint8_t hdc_r(offs_t offset);
+	void hdc_w(offs_t offset, uint8_t data);
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
+	uint16_t via_r(offs_t offset, uint16_t mem_mask = ~0);
+	void via_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	I8275_DRAW_CHARACTER_MEMBER(wicat_display_pixels);
 
 	required_device<m68000_device> m_maincpu;
@@ -378,7 +378,7 @@ void wicat_state::via_b_w(uint8_t data)
 	logerror("VIA: write %02x to port B\n",data);
 }
 
-READ16_MEMBER( wicat_state::invalid_r )
+uint16_t wicat_state::invalid_r(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -389,7 +389,7 @@ READ16_MEMBER( wicat_state::invalid_r )
 	return 0xff;
 }
 
-WRITE16_MEMBER( wicat_state::invalid_w )
+void wicat_state::invalid_w(offs_t offset, uint16_t data)
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -400,20 +400,20 @@ WRITE16_MEMBER( wicat_state::invalid_w )
 }
 
 // TODO
-READ16_MEMBER(wicat_state::memmap_r)
+uint16_t wicat_state::memmap_r()
 {
 	popmessage("Memory mapping register EFFC01 read!");
 	return 0xff;
 }
 
-WRITE16_MEMBER(wicat_state::memmap_w)
+void wicat_state::memmap_w(uint16_t data)
 {
 	popmessage("Memory mapping register EFFC01 written!");
 }
 
 // WD1000 Winchester Disk controller (10MB 5 1/4" HD)
 // for now, we'll just try to tell the system there is no HD
-READ8_MEMBER(wicat_state::hdc_r)
+uint8_t wicat_state::hdc_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -425,7 +425,7 @@ READ8_MEMBER(wicat_state::hdc_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(wicat_state::hdc_w)
+void wicat_state::hdc_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -471,7 +471,7 @@ WRITE8_MEMBER(wicat_state::hdc_w)
 	}
 }
 
-READ8_MEMBER(wicat_state::fdc_r)
+uint8_t wicat_state::fdc_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
@@ -497,7 +497,7 @@ READ8_MEMBER(wicat_state::fdc_r)
 	return ret;
 }
 
-WRITE8_MEMBER(wicat_state::fdc_w)
+void wicat_state::fdc_w(offs_t offset, uint8_t data)
 {
 	popmessage("FDC: write offset %02x data %02x",offset,data);
 	switch(offset)
@@ -520,14 +520,14 @@ WRITE8_MEMBER(wicat_state::fdc_w)
 	}
 }
 
-READ16_MEMBER(wicat_state::via_r)
+uint16_t wicat_state::via_r(offs_t offset, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		return m_via->read(offset);
 	return 0x00;
 }
 
-WRITE16_MEMBER(wicat_state::via_w)
+void wicat_state::via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		m_via->write(offset,data);
@@ -545,7 +545,7 @@ void wicat_state::vram_w(offs_t offset, uint8_t data)
 	m_videocpu->space(AS_IO).write_byte(offset*2,data);
 }
 
-WRITE8_MEMBER(wicat_state::videosram_store_w)
+void wicat_state::videosram_store_w(uint8_t data)
 {
 	if(data & 0x01)  // unsure of the actual bit checked, the terminal code just writes 0xff
 	{
@@ -555,7 +555,7 @@ WRITE8_MEMBER(wicat_state::videosram_store_w)
 	}
 }
 
-WRITE8_MEMBER(wicat_state::videosram_recall_w)
+void wicat_state::videosram_recall_w(uint8_t data)
 {
 	if(data & 0x01)  // unsure of the actual bit checked, the terminal code just writes 0xff
 	{
@@ -565,7 +565,7 @@ WRITE8_MEMBER(wicat_state::videosram_recall_w)
 	}
 }
 
-READ8_MEMBER(wicat_state::video_timer_r)
+uint8_t wicat_state::video_timer_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
@@ -583,14 +583,14 @@ READ8_MEMBER(wicat_state::video_timer_r)
 	return ret;
 }
 
-WRITE8_MEMBER(wicat_state::video_timer_w)
+void wicat_state::video_timer_w(offs_t offset, uint8_t data)
 {
 	logerror("I/O port 0x%04x write %02x\n",offset,data);
 	if(offset == 0x01)
 		m_videouart->write(data);
 }
 
-READ8_MEMBER(wicat_state::video_status_r)
+uint8_t wicat_state::video_status_r()
 {
 	// this port is read in the NVI IRQ routine, which if bit 2 is set, will unmask DMA channel 0.  But no idea what triggers it...
 	return m_crtc_irq ? 0x04 : 0x00;

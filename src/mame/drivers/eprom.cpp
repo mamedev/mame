@@ -113,7 +113,7 @@ void eprom_state::eprom_latch_w(uint8_t data)
  *
  *************************************/
 
-template<bool maincpu> WRITE16_MEMBER(eprom_state::sync_w)
+template<bool maincpu> void eprom_state::sync_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	u16 oldword = m_share1[0xcc00/2];
 	COMBINE_DATA(&m_share1[0xcc00/2]);

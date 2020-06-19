@@ -70,15 +70,16 @@ private:
 	u8 mem_r(offs_t offset);
 	void mem_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
-	DECLARE_READ_LINE_MEMBER(binbug_serial_r);
-	DECLARE_WRITE_LINE_MEMBER(binbug_serial_w);
+	DECLARE_READ_LINE_MEMBER(serial_r);
+	DECLARE_WRITE_LINE_MEMBER(serial_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
 	u8 m_cass_data[4];
 	bool m_cassold, m_cassinbit, m_cassoutbit;
 
-	void binbug_mem(address_map &map);
+	void mem_map(address_map &map);
+	void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -132,12 +133,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( binbug_state::kansas_r )
 	}
 }
 
-READ_LINE_MEMBER( binbug_state::binbug_serial_r )
+READ_LINE_MEMBER( binbug_state::serial_r )
 {
 	return m_rs232->rxd_r() & m_cassinbit;
 }
 
-WRITE_LINE_MEMBER( binbug_state::binbug_serial_w )
+WRITE_LINE_MEMBER( binbug_state::serial_w )
 {
 	m_cassoutbit = state;
 }
@@ -152,7 +153,15 @@ void binbug_state::mem_w(offs_t offset, u8 data)
 	m_s100->mwrt_w(offset + 0x7800, data);
 }
 
-void binbug_state::binbug_mem(address_map &map)
+void binbug_state::machine_start()
+{
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_cassinbit));
+	save_item(NAME(m_cassoutbit));
+}
+
+void binbug_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).rom();
@@ -258,9 +267,9 @@ void binbug_state::binbug(machine_config &config)
 
 	/* basic machine hardware */
 	s2650_device &maincpu(S2650(config, m_maincpu, XTAL(1'000'000)));
-	maincpu.set_addrmap(AS_PROGRAM, &binbug_state::binbug_mem);
-	maincpu.sense_handler().set(FUNC(binbug_state::binbug_serial_r));
-	maincpu.flag_handler().set(FUNC(binbug_state::binbug_serial_w));
+	maincpu.set_addrmap(AS_PROGRAM, &binbug_state::mem_map);
+	maincpu.sense_handler().set(FUNC(binbug_state::serial_r));
+	maincpu.flag_handler().set(FUNC(binbug_state::serial_w));
 
 	/* Keyboard */
 	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard").set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
@@ -275,12 +284,12 @@ void binbug_state::binbug(machine_config &config)
 
 /* ROM definition */
 ROM_START( binbug )
-	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0400, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "binbug.rom", 0x0000, 0x0400, CRC(2cb1ac6e) SHA1(a969883fc767484d6b0fa103cfa4b4129b90441b) )
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT        COMPANY      FULLNAME      FLAGS
-COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, binbug_state, empty_init, "MicroByte", "BINBUG 3.6", 0 )
+COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, binbug_state, empty_init, "MicroByte", "BINBUG 3.6", MACHINE_SUPPORTS_SAVE )
 

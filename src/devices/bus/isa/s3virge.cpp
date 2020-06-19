@@ -1475,7 +1475,7 @@ void s3virge_vga_device::device_timer(emu_timer &timer, device_timer_id id, int 
 // bit 31 - 2D / 3D Select
 
 
-READ32_MEMBER(s3virge_vga_device::s3d_sub_status_r)
+uint32_t s3virge_vga_device::s3d_sub_status_r()
 {
 	uint32_t res = 0x00000000;
 
@@ -1489,14 +1489,14 @@ READ32_MEMBER(s3virge_vga_device::s3d_sub_status_r)
 	return res;
 }
 
-WRITE32_MEMBER(s3virge_vga_device::s3d_sub_control_w)
+void s3virge_vga_device::s3d_sub_control_w(uint32_t data)
 {
 	s3virge.interrupt_enable = data & 0x00003f80;
 	// TODO: bits 14-15==10 - reset engine
 	LOGMMIO("Sub control = %08x\n", data);
 }
 
-READ32_MEMBER(s3virge_vga_device::s3d_func_ctrl_r)
+uint32_t s3virge_vga_device::s3d_func_ctrl_r()
 {
 	uint32_t ret = 0;
 
@@ -1504,7 +1504,7 @@ READ32_MEMBER(s3virge_vga_device::s3d_func_ctrl_r)
 	return ret;
 }
 
-READ32_MEMBER(s3virge_vga_device::s3d_register_r)
+uint32_t s3virge_vga_device::s3d_register_r(offs_t offset)
 {
 	uint32_t res = 0;
 	int op_type = (((offset*4) & 0x1c00) >> 10) - 1;
@@ -1525,7 +1525,7 @@ READ32_MEMBER(s3virge_vga_device::s3d_register_r)
 	return res;
 }
 
-WRITE32_MEMBER(s3virge_vga_device::s3d_register_w)
+void s3virge_vga_device::s3d_register_w(offs_t offset, uint32_t data)
 {
 	int op_type = (((offset*4) & 0x1c00) >> 10) - 1;
 

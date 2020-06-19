@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(liberate_state::prosport_get_back_tile_info)
 
 /***************************************************************************/
 
-WRITE8_MEMBER(liberate_state::deco16_io_w)
+void liberate_state::deco16_io_w(offs_t offset, uint8_t data)
 {
 	m_io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
@@ -132,7 +132,7 @@ WRITE8_MEMBER(liberate_state::deco16_io_w)
 	}
 }
 
-WRITE8_MEMBER(liberate_state::prosoccr_io_w)
+void liberate_state::prosoccr_io_w(offs_t offset, uint8_t data)
 {
 	m_io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
@@ -161,7 +161,7 @@ WRITE8_MEMBER(liberate_state::prosoccr_io_w)
 }
 
 /* completely different i/o...*/
-WRITE8_MEMBER(liberate_state::prosport_io_w)
+void liberate_state::prosport_io_w(offs_t offset, uint8_t data)
 {
 	m_io_ram[offset] = data;
 
@@ -182,19 +182,19 @@ WRITE8_MEMBER(liberate_state::prosport_io_w)
 	}
 }
 
-WRITE8_MEMBER(liberate_state::liberate_videoram_w)
+void liberate_state::liberate_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(liberate_state::liberate_colorram_w)
+void liberate_state::liberate_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(liberate_state::prosport_bg_vram_w)
+void liberate_state::prosport_bg_vram_w(offs_t offset, uint8_t data)
 {
 	m_bg_vram[offset] = data;
 	m_back_tilemap->mark_tile_dirty(offset);

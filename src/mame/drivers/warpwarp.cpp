@@ -160,7 +160,7 @@ WRITE_LINE_MEMBER(warpwarp_state::vblank_irq)
 }
 
 /* B&W Games I/O */
-READ8_MEMBER(warpwarp_state::geebee_in_r)
+uint8_t warpwarp_state::geebee_in_r(offs_t offset)
 {
 	int res;
 
@@ -180,7 +180,7 @@ READ8_MEMBER(warpwarp_state::geebee_in_r)
 	return res;
 }
 
-WRITE8_MEMBER(warpwarp_state::geebee_out6_w)
+void warpwarp_state::geebee_out6_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
@@ -231,19 +231,19 @@ WRITE_LINE_MEMBER(warpwarp_state::inv_w)
 /* Color Games I/O */
 
 /* Read Switch Inputs */
-READ8_MEMBER(warpwarp_state::warpwarp_sw_r)
+uint8_t warpwarp_state::warpwarp_sw_r(offs_t offset)
 {
 	return (m_in0->read() >> (offset & 7)) & 1;
 }
 
 /* Read Dipswitches */
-READ8_MEMBER(warpwarp_state::warpwarp_dsw1_r)
+uint8_t warpwarp_state::warpwarp_dsw1_r(offs_t offset)
 {
 	return (m_dsw1->read() >> (offset & 7)) & 1;
 }
 
 /* Read mux Controller Inputs */
-READ8_MEMBER(warpwarp_state::warpwarp_vol_r)
+uint8_t warpwarp_state::warpwarp_vol_r()
 {
 	int res;
 
@@ -259,7 +259,7 @@ READ8_MEMBER(warpwarp_state::warpwarp_vol_r)
 	return res;
 }
 
-WRITE8_MEMBER(warpwarp_state::warpwarp_out0_w)
+void warpwarp_state::warpwarp_out0_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{

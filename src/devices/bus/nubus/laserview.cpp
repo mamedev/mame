@@ -91,7 +91,7 @@ void nubus_laserview_device::device_start()
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, "bank_laserview", &m_vram[0]);
 	install_bank(slotspace+0x900000, slotspace+0x900000+VRAM_SIZE-1, "bank_laserview2", &m_vram[0]);
 
-	nubus().install_device(slotspace+0xB0000, slotspace+0xBFFFF, read32_delegate(*this, FUNC(nubus_laserview_device::regs_r)), write32_delegate(*this, FUNC(nubus_laserview_device::regs_w)));
+	nubus().install_device(slotspace+0xB0000, slotspace+0xBFFFF, read32s_delegate(*this, FUNC(nubus_laserview_device::regs_r)), write32s_delegate(*this, FUNC(nubus_laserview_device::regs_w)));
 }
 
 //-------------------------------------------------
@@ -147,7 +147,7 @@ uint32_t nubus_laserview_device::screen_update(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_laserview_device::regs_w )
+void nubus_laserview_device::regs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("%08x to regs @ %x mask %08x\n", data, offset, mem_mask);
 
@@ -172,7 +172,7 @@ WRITE32_MEMBER( nubus_laserview_device::regs_w )
 
 }
 
-READ32_MEMBER( nubus_laserview_device::regs_r )
+uint32_t nubus_laserview_device::regs_r(offs_t offset, uint32_t mem_mask)
 {
 	//f (offset != 0x3fc1) printf("Read regs_r @ %x mask %08x\n", offset, mem_mask);
 

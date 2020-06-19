@@ -61,12 +61,12 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// comad
-	READ16_MEMBER(comad_timer_r);
+	uint16_t comad_timer_r();
 	void newquiz_map(address_map &map);
 
 };
 
-READ16_MEMBER(galspanic_ms_state::comad_timer_r)
+uint16_t galspanic_ms_state::comad_timer_r()
 {
 	return (m_screen->vpos() & 0x07) << 8;
 }

@@ -32,8 +32,8 @@ private:
 	/* video-related */
 	tilemap_t*             m_bg_tilemap;
 	int                  m_flipscreen;
-	DECLARE_WRITE8_MEMBER(m57_videoram_w);
-	DECLARE_WRITE8_MEMBER(m57_flipscreen_w);
+	void m57_videoram_w(offs_t offset, uint8_t data);
+	void m57_flipscreen_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	void m57_palette(palette_device &palette) const;

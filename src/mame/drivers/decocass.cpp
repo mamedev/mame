@@ -64,16 +64,16 @@
  *
  ***************************************************************************/
 
-WRITE8_MEMBER(decocass_state::mirrorvideoram_w) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_fgvideoram_w(space, offset, data, mem_mask); }
-WRITE8_MEMBER(decocass_state::mirrorcolorram_w) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_colorram_w(space, offset, data, mem_mask); }
+void decocass_state::mirrorvideoram_w(offs_t offset, uint8_t data) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_fgvideoram_w(offset, data); }
+void decocass_state::mirrorcolorram_w(offs_t offset, uint8_t data) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_colorram_w(offset, data); }
 
-READ8_MEMBER(decocass_state::mirrorvideoram_r)
+uint8_t decocass_state::mirrorvideoram_r(offs_t offset)
 {
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return m_fgvideoram[offset];
 }
 
-READ8_MEMBER(decocass_state::mirrorcolorram_r)
+uint8_t decocass_state::mirrorcolorram_r(offs_t offset)
 {
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return m_colorram[offset];
@@ -2061,9 +2061,9 @@ ROM_END
 
 void decocass_state::init_decocass()
 {
-	/* Call the state save setup code in machine/decocass.c */
+	/* Call the state save setup code in machine/decocass.cpp */
 	decocass_machine_state_save_init();
-	/* and in video/decocass.c, too */
+	/* and in video/decocass.cpp, too */
 	decocass_video_state_save_init();
 }
 
@@ -2074,17 +2074,17 @@ void decocass_state::init_decocrom()
 
 	/* convert charram to a banked ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x6000, 0xafff, "bank1");
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0xafff, write8_delegate(*this, FUNC(decocass_state::decocass_de0091_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0xafff, write8sm_delegate(*this, FUNC(decocass_state::decocass_de0091_w)));
 	membank("bank1")->configure_entry(0, m_charram);
 	membank("bank1")->configure_entry(1, memregion("user3")->base());
 	membank("bank1")->configure_entry(2, memregion("user3")->base()+0x5000);
 	membank("bank1")->set_entry(0);
 
 	/* install the bank selector */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe900, 0xe900, write8_delegate(*this, FUNC(decocass_state::decocass_e900_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe900, 0xe900, write8smo_delegate(*this, FUNC(decocass_state::decocass_e900_w)));
 }
 
-READ8_MEMBER(decocass_state::cdsteljn_input_r )
+uint8_t decocass_state::cdsteljn_input_r(offs_t offset)
 {
 	uint8_t res;
 	static const char *const portnames[2][4] = {
@@ -2092,14 +2092,14 @@ READ8_MEMBER(decocass_state::cdsteljn_input_r )
 		{"P2_MP0", "P2_MP1", "P2_MP2", "P2_MP3"}         };
 
 	if(offset & 6)
-		return decocass_input_r(space,offset);
+		return decocass_input_r(offset);
 
 	res = ioport(portnames[offset & 1][m_mux_data])->read();
 
 	return res;
 }
 
-WRITE8_MEMBER(decocass_state::cdsteljn_mux_w )
+void decocass_state::cdsteljn_mux_w(uint8_t data)
 {
 	m_mux_data = (data & 0xc) >> 2;
 	/* bit 0 and 1 are p1/p2 lamps */
@@ -2114,8 +2114,8 @@ void decocass_state::init_cdsteljn()
 	init_decocass();
 
 	/* install custom mahjong panel */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe413, 0xe413, write8_delegate(*this, FUNC(decocass_state::cdsteljn_mux_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe600, 0xe6ff, read8_delegate(*this, FUNC(decocass_state::cdsteljn_input_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe413, 0xe413, write8smo_delegate(*this, FUNC(decocass_state::cdsteljn_mux_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe600, 0xe6ff, read8sm_delegate(*this, FUNC(decocass_state::cdsteljn_input_r)));
 }
 
 /* -- */ GAME( 1981, decocass,  0,        decocass, decocass, decocass_state,        init_decocass, ROT270, "Data East Corporation", "DECO Cassette System", MACHINE_IS_BIOS_ROOT )

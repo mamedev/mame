@@ -99,7 +99,7 @@ WRITE_LINE_MEMBER( ti_fdc_device::fdc_hld_w )
 	LOGMASKED(LOG_SIGNALS, "HLD callback = %d\n", m_HLD);
 }
 
-SETADDRESS_DBIN_MEMBER( ti_fdc_device::setaddress_dbin )
+void ti_fdc_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Selection login in the PAL and some circuits on the board
 
@@ -131,7 +131,7 @@ void ti_fdc_device::debug_read(offs_t offset, uint8_t* value)
 	}
 }
 
-READ8Z_MEMBER(ti_fdc_device::readz)
+void ti_fdc_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -201,7 +201,7 @@ void ti_fdc_device::write(offs_t offset, uint8_t data)
 
     See schematics for the meaning of the bits.
 */
-READ8Z_MEMBER(ti_fdc_device::crureadz)
+void ti_fdc_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{

@@ -106,6 +106,7 @@ using util::BIT;
 #include "cpu/minx/minxd.h"
 #include "cpu/mips/mips3dsm.h"
 #include "cpu/mips/mips1dsm.h"
+#include "cpu/mn1880/mn1880d.h"
 #include "cpu/mn10200/mn102dis.h"
 #include "cpu/nanoprocessor/nanoprocessor_dasm.h"
 #include "cpu/nec/necdasm.h"
@@ -117,6 +118,7 @@ using util::BIT;
 #include "cpu/pdp1/tx0dasm.h"
 #include "cpu/pdp8/pdp8dasm.h"
 #include "cpu/pic16/pic16d.h"
+#include "cpu/pic1670/pic1670d.h"
 #include "cpu/pic16c5x/16c5xdsm.h"
 #include "cpu/pic16c62x/16c62xdsm.h"
 #include "cpu/pic17/pic17d.h"
@@ -377,6 +379,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cquestsnd",       be, -3, []() -> util::disasm_interface * { return new cquestsnd_disassembler; } },
 	{ "dp8344",          le, -1, []() -> util::disasm_interface * { return new dp8344_disassembler; } },
 	{ "ds5002fp",        le,  0, []() -> util::disasm_interface * { return new ds5002fp_disassembler; } },
+	{ "ds80c320",        le,  0, []() -> util::disasm_interface * { return new ds80c320_disassembler; } },
 	{ "dsp16",           le, -1, []() -> util::disasm_interface * { return new dsp16_disassembler; } },
 	{ "dsp32c",          le,  0, []() -> util::disasm_interface * { return new dsp32c_disassembler; } },
 	{ "dsp56000",        be, -2, []() -> util::disasm_interface * { return new dsp56000_disassembler; } },
@@ -469,6 +472,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "mips3be",         be,  0, []() -> util::disasm_interface * { return new mips3_disassembler; } },
 	{ "mips3le",         le,  0, []() -> util::disasm_interface * { return new mips3_disassembler; } },
 	{ "mn10200",         le,  0, []() -> util::disasm_interface * { return new mn10200_disassembler; } },
+	{ "mn1870",          be,  0, []() -> util::disasm_interface * { return new mn1870_disassembler; } },
+	{ "mn1880",          be,  0, []() -> util::disasm_interface * { return new mn1880_disassembler; } },
 	{ "nanoprocessor",   le,  0, []() -> util::disasm_interface * { return new hp_nanoprocessor_disassembler; } },
 	{ "nec",             le,  0, []() -> util::disasm_interface * { return new nec_disassembler(&nec_unidasm); } },
 	{ "ns32000",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler; } },
@@ -480,6 +485,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "pdp8",            be,  0, []() -> util::disasm_interface * { return new pdp8_disassembler; } },
 	{ "pic16",           le, -1, []() -> util::disasm_interface * { return new pic16_disassembler; } },
 	{ "pic16c5x",        le, -1, []() -> util::disasm_interface * { return new pic16c5x_disassembler; } },
+	{ "pic1670",         le, -1, []() -> util::disasm_interface * { return new pic1670_disassembler; } },
 	{ "pic16c62x",       le, -1, []() -> util::disasm_interface * { return new pic16c62x_disassembler; } },
 	{ "pic17",           le, -1, []() -> util::disasm_interface * { return new pic17_disassembler; } },
 	{ "powerpc",         be,  0, []() -> util::disasm_interface * { return new powerpc_disassembler; } },
@@ -489,8 +495,11 @@ static const dasm_table_entry dasm_table[] =
 	{ "r65c19",          le,  0, []() -> util::disasm_interface * { return new r65c19_disassembler; } },
 	{ "romp",            be,  0, []() -> util::disasm_interface * { return new romp_disassembler; } },
 	{ "rsp",             le,  0, []() -> util::disasm_interface * { return new rsp_disassembler; } },
+	{ "rupi44",          le,  0, []() -> util::disasm_interface * { return new rupi44_disassembler; } },
 	{ "rx01",            le,  0, []() -> util::disasm_interface * { return new rx01_disassembler; } },
 	{ "s2650",           be,  0, []() -> util::disasm_interface * { return new s2650_disassembler(&s2650_unidasm); } },
+	{ "sab80515",        le,  0, []() -> util::disasm_interface * { return new sab80515_disassembler; } },
+	{ "sab80c515",       le,  0, []() -> util::disasm_interface * { return new sab80c515_disassembler; } },
 	{ "saturn",          le,  0, []() -> util::disasm_interface * { return new saturn_disassembler(&saturn_unidasm); } },
 	{ "sc61860",         le,  0, []() -> util::disasm_interface * { return new sc61860_disassembler; } },
 	{ "scmp",            le,  0, []() -> util::disasm_interface * { return new scmp_disassembler; } },

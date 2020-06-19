@@ -23,7 +23,7 @@ Hardware notes:
 - 4KB ROM(AMI 2332)
 - 1KB RAM(2*2114), or 256 bytes RAM(GTE 3539)
 - buzzer, 64+12 leds, button chessboard
-- expansion slot at top-tight (dummy empty cartridge by default)
+- expansion slot at top-right (dummy empty cartridge by default)
 
 Expansion modules: (* denotes not dumped)
 - Strong Play Module
@@ -79,10 +79,10 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(leds1_w);
-	DECLARE_WRITE8_MEMBER(leds2_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void leds1_w(u8 data);
+	void leds2_w(offs_t offset, u8 data);
+	void control_w(u8 data);
+	u8 input_r();
 
 	u8 m_inp_mux = 0;
 	u8 m_led_data = 0;
@@ -106,21 +106,21 @@ void schess_state::update_display()
 	m_display->matrix_partial(0, 8, 1 << m_inp_mux, led_data);
 }
 
-WRITE8_MEMBER(schess_state::leds1_w)
+void schess_state::leds1_w(u8 data)
 {
 	// chessboard leds (muxed)
 	m_led_data = ~data;
 	update_display();
 }
 
-WRITE8_MEMBER(schess_state::leds2_w)
+void schess_state::leds2_w(offs_t offset, u8 data)
 {
 	// button panel leds (direct)
 	m_display->write_row(8 + (offset ? 1 : 0), ~data);
 	m_display->update();
 }
 
-WRITE8_MEMBER(schess_state::control_w)
+void schess_state::control_w(u8 data)
 {
 	// d0-d3: input mux, led select
 	m_inp_mux = data & 0xf;
@@ -132,7 +132,7 @@ WRITE8_MEMBER(schess_state::control_w)
 	// other: ?
 }
 
-READ8_MEMBER(schess_state::input_r)
+u8 schess_state::input_r()
 {
 	u8 data = 0;
 

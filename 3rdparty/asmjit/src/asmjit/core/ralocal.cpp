@@ -596,7 +596,7 @@ Error RALocalAllocator::allocInst(InstNode* node) noexcept {
 
           // DECIDE whether to MOVE or SPILL.
           if (allocableRegs) {
-            uint32_t reassignedId = decideOnUnassignment(group, workId, assignedId, allocableRegs);
+            uint32_t reassignedId = decideOnReassignment(group, workId, assignedId, allocableRegs);
             if (reassignedId != RAAssignment::kPhysNone) {
               ASMJIT_PROPAGATE(onMoveReg(group, workId, reassignedId, assignedId));
               allocableRegs ^= Support::bitMask(reassignedId);
@@ -897,7 +897,7 @@ Error RALocalAllocator::allocBranch(InstNode* node, RABlock* target, RABlock* co
       // Additional instructions emitted to switch from the current state to
       // the `target` state. This means that we have to move these instructions
       // into an independent code block and patch the jump location.
-      Operand& targetOp(node->opType(node->opCount() - 1));
+      Operand& targetOp = node->op(node->opCount() - 1);
       if (ASMJIT_UNLIKELY(!targetOp.isLabel()))
         return DebugUtils::errored(kErrorInvalidState);
 
@@ -970,38 +970,39 @@ Error RALocalAllocator::allocJumpTable(InstNode* node, const RABlocks& targets, 
 // ============================================================================
 
 uint32_t RALocalAllocator::decideOnAssignment(uint32_t group, uint32_t workId, uint32_t physId, uint32_t allocableRegs) const noexcept {
-  DebugUtils::unused(group, physId);
   ASMJIT_ASSERT(allocableRegs != 0);
+  DebugUtils::unused(group, physId);
 
   RAWorkReg* workReg = workRegById(workId);
 
-  // HIGHEST PRIORITY: Home register id.
+  // Prefer home register id, if possible.
   if (workReg->hasHomeRegId()) {
     uint32_t homeId = workReg->homeRegId();
     if (Support::bitTest(allocableRegs, homeId))
       return homeId;
   }
 
-  // HIGH PRIORITY: Register IDs used upon block entries.
+  // Prefer registers used upon block entries.
   uint32_t previouslyAssignedRegs = workReg->allocatedMask();
   if (allocableRegs & previouslyAssignedRegs)
     allocableRegs &= previouslyAssignedRegs;
 
-  if (Support::isPowerOf2(allocableRegs))
-    return Support::ctz(allocableRegs);
-
-  // TODO: This is not finished.
   return Support::ctz(allocableRegs);
 }
 
-uint32_t RALocalAllocator::decideOnUnassignment(uint32_t group, uint32_t workId, uint32_t physId, uint32_t allocableRegs) const noexcept {
+uint32_t RALocalAllocator::decideOnReassignment(uint32_t group, uint32_t workId, uint32_t physId, uint32_t allocableRegs) const noexcept {
   ASMJIT_ASSERT(allocableRegs != 0);
+  DebugUtils::unused(group, physId);
 
-  // TODO:
-  DebugUtils::unused(allocableRegs, group, workId, physId);
+  RAWorkReg* workReg = workRegById(workId);
 
-  // if (!_curAssignment.isPhysDirty(group, physId)) {
-  // }
+  // Prefer allocating back to HomeId, if possible.
+  if (workReg->hasHomeRegId()) {
+    if (Support::bitTest(allocableRegs, workReg->homeRegId()))
+      return workReg->homeRegId();
+  }
+
+  // TODO: [Register Allocator] This could be improved.
 
   // Decided to SPILL.
   return RAAssignment::kPhysNone;

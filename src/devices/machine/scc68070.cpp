@@ -1241,7 +1241,7 @@ void scc68070_device::mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 #if ENABLE_UART_PRINTING
-READ16_MEMBER( scc68070_device::uart_loopback_enable )
+uint16_t scc68070_device::uart_loopback_enable()
 {
 	return 0x1234;
 }

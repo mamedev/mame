@@ -100,23 +100,23 @@ private:
 
 	void update_memory_mapping();
 
-	DECLARE_WRITE8_MEMBER( qx10_18_w );
-	DECLARE_WRITE8_MEMBER( prom_sel_w );
-	DECLARE_WRITE8_MEMBER( cmos_sel_w );
+	void qx10_18_w(uint8_t data);
+	void prom_sel_w(uint8_t data);
+	void cmos_sel_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( qx10_upd765_interrupt );
-	DECLARE_WRITE8_MEMBER( fdd_motor_w );
-	DECLARE_READ8_MEMBER( qx10_30_r );
+	void fdd_motor_w(uint8_t data);
+	uint8_t qx10_30_r();
 	uint8_t gdc_dack_r();
 	void gdc_dack_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
-	DECLARE_READ8_MEMBER( mc146818_r );
-	DECLARE_WRITE8_MEMBER( mc146818_w );
+	uint8_t mc146818_r(offs_t offset);
+	void mc146818_w(offs_t offset, uint8_t data);
 	IRQ_CALLBACK_MEMBER( inta_call );
 	uint8_t get_slave_ack(offs_t offset);
-	DECLARE_READ8_MEMBER( vram_bank_r );
-	DECLARE_WRITE8_MEMBER( vram_bank_w );
-	DECLARE_READ16_MEMBER( vram_r );
-	DECLARE_WRITE16_MEMBER( vram_w );
+	uint8_t vram_bank_r();
+	void vram_bank_w(uint8_t data);
+	uint16_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
@@ -296,19 +296,19 @@ void qx10_state::update_memory_mapping()
 	}
 }
 
-WRITE8_MEMBER( qx10_state::qx10_18_w )
+void qx10_state::qx10_18_w(uint8_t data)
 {
 	m_membank = (data >> 4) & 0x0f;
 	update_memory_mapping();
 }
 
-WRITE8_MEMBER( qx10_state::prom_sel_w )
+void qx10_state::prom_sel_w(uint8_t data)
 {
 	m_memprom = data & 1;
 	update_memory_mapping();
 }
 
-WRITE8_MEMBER( qx10_state::cmos_sel_w )
+void qx10_state::cmos_sel_w(uint8_t data)
 {
 	m_memcmos = data & 1;
 	update_memory_mapping();
@@ -380,7 +380,7 @@ WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
 	m_pic_m->ir6_w(state);
 }
 
-WRITE8_MEMBER( qx10_state::fdd_motor_w )
+void qx10_state::fdd_motor_w(uint8_t data)
 {
 	m_fdcmotor = 1;
 
@@ -388,7 +388,7 @@ WRITE8_MEMBER( qx10_state::fdd_motor_w )
 	// motor off controlled by clock
 }
 
-READ8_MEMBER( qx10_state::qx10_30_r )
+uint8_t qx10_state::qx10_30_r()
 {
 	floppy_image_device *floppy1,*floppy2;
 
@@ -457,12 +457,12 @@ void qx10_state::memory_write_byte(offs_t offset, uint8_t data)
     MC146818
 */
 
-WRITE8_MEMBER(qx10_state::mc146818_w)
+void qx10_state::mc146818_w(offs_t offset, uint8_t data)
 {
 	m_rtc->write(!offset, data);
 }
 
-READ8_MEMBER(qx10_state::mc146818_r)
+uint8_t qx10_state::mc146818_r(offs_t offset)
 {
 	return m_rtc->read(!offset);
 }
@@ -522,12 +522,12 @@ uint8_t qx10_state::get_slave_ack(offs_t offset)
 
 */
 
-READ8_MEMBER( qx10_state::vram_bank_r )
+uint8_t qx10_state::vram_bank_r()
 {
 	return m_vram_bank;
 }
 
-WRITE8_MEMBER( qx10_state::vram_bank_w )
+void qx10_state::vram_bank_w(uint8_t data)
 {
 	if(m_color_mode)
 	{
@@ -685,7 +685,7 @@ void qx10_state::qx10_palette(palette_device &palette) const
 	// ...
 }
 
-READ16_MEMBER( qx10_state::vram_r )
+uint16_t qx10_state::vram_r(offs_t offset)
 {
 	int bank = 0;
 
@@ -696,7 +696,7 @@ READ16_MEMBER( qx10_state::vram_r )
 	return m_video_ram[offset + (0x20000 * bank)];
 }
 
-WRITE16_MEMBER( qx10_state::vram_w )
+void qx10_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int bank = 0;
 

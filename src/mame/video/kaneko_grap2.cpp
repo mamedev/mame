@@ -78,7 +78,7 @@ void kaneko_grap2_device::rom_bank_updated()
 {
 }
 
-READ16_MEMBER(kaneko_grap2_device::regs1_r)
+uint16_t kaneko_grap2_device::regs1_r(offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -154,7 +154,7 @@ void kaneko_grap2_device::do_rle(uint32_t address)
 }
 
 
-WRITE16_MEMBER(kaneko_grap2_device::regs1_go_w)
+void kaneko_grap2_device::regs1_go_w(uint16_t data)
 {
 	uint32_t address = m_regs1_address_regs[1]| (m_regs1_address_regs[0]<<16);
 
@@ -168,14 +168,14 @@ void kaneko_grap2_device::set_color_555(pen_t color, int rshift, int gshift, int
 	set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
-WRITE16_MEMBER(kaneko_grap2_device::framebuffer1_palette_w)
+void kaneko_grap2_device::framebuffer1_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_framebuffer_palette[offset]);
 	set_color_555(offset, 5, 10, 0, m_framebuffer_palette[offset]);
 }
 
 /* definitely looks like a cycling bg colour used for the girls */
-WRITE16_MEMBER(kaneko_grap2_device::framebuffer1_bgcol_w)
+void kaneko_grap2_device::framebuffer1_bgcol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_framebuffer_palette[0x100]);
 	set_color_555(0x100, 5, 10, 0, m_framebuffer_palette[0x100]);

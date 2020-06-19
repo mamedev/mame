@@ -31,7 +31,7 @@
 
 ASMJIT_BEGIN_NAMESPACE
 
-//! \addtogroup asmjit_jit
+//! \addtogroup asmjit_virtual_memory
 //! \{
 
 // ============================================================================

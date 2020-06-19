@@ -260,7 +260,7 @@ void itech32_state::itech020_plane_w(u8 data)
  *
  *************************************/
 
-WRITE16_MEMBER(itech32_state::bloodstm_paletteram_w)
+void itech32_state::bloodstm_paletteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/* in test mode, the LSB is used; in game mode, the MSB is used */
 	if (!ACCESSING_BITS_0_7 && (offset & 1))

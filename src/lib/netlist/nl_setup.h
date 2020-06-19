@@ -307,10 +307,10 @@ namespace netlist
 		void register_param(const pstring &param, nl_fptype value);
 
 		template <typename T>
-		typename std::enable_if<plib::is_floating_point<T>::value || plib::is_integral<T>::value>::type
+		std::enable_if_t<plib::is_arithmetic<T>::value>
 		register_param_val(const pstring &param, T value)
 		{
-			register_param(param, static_cast<nl_fptype>(value));
+			register_param(param, plib::narrow_cast<nl_fptype>(value));
 		}
 
 		void register_lib_entry(const pstring &name, factory::properties &&props);
@@ -323,7 +323,7 @@ namespace netlist
 		{
 			static_assert(std::is_base_of<plib::psource_t, S>::value, "S must inherit from plib::psource_t");
 
-			auto src(plib::make_unique<S>(std::forward<Args>(args)...));
+			auto src(std::make_unique<S>(std::forward<Args>(args)...));
 			m_sources.add_source(std::move(src));
 		}
 
@@ -351,7 +351,7 @@ namespace netlist
 		{
 			static_assert(std::is_base_of<plib::psource_t, S>::value, "S must inherit from plib::psource_t");
 
-			auto src(plib::make_unique<S>(std::forward<Args>(args)...));
+			auto src(std::make_unique<S>(std::forward<Args>(args)...));
 			m_includes.add_source(std::move(src));
 		}
 
@@ -486,15 +486,15 @@ namespace netlist
 		models_t                                    m_models;
 
 		// FIXME: currently only used during setup
-		devices::nld_netlistparams                  *m_netlist_params;
+		devices::nld_netlistparams *                           m_netlist_params;
 
 		// FIXME: can be cleared before run
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
-		std::unordered_map<const terminal_t *, terminal_t *> m_connected_terminals;
-		std::unordered_map<pstring, param_ref_t>    m_params;
+		std::unordered_map<const terminal_t *, terminal_t *>   m_connected_terminals;
+		std::unordered_map<pstring, param_ref_t>               m_params;
 		std::unordered_map<const detail::core_terminal_t *,
-			devices::nld_base_proxy *>              m_proxies;
-		std::vector<plib::unique_ptr<param_t>>      m_defparam_lifetime;
+			devices::nld_base_proxy *>                         m_proxies;
+		std::vector<host_arena::unique_ptr<param_t>>           m_defparam_lifetime;
 
 		unsigned m_proxy_cnt;
 	};

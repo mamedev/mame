@@ -44,14 +44,14 @@ private:
 	int        m_keyb;
 	bool m_nmi_enable;
 
-	DECLARE_READ8_MEMBER(keyboard_0_r);
-	DECLARE_READ8_MEMBER(keyboard_1_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_param_w);
-	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_start_w);
-	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_clear_w);
-	DECLARE_WRITE8_MEMBER(hnayayoi_palbank_w);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
+	uint8_t keyboard_0_r();
+	uint8_t keyboard_1_r();
+	void keyboard_w(uint8_t data);
+	void dynax_blitter_rev1_param_w(offs_t offset, uint8_t data);
+	void dynax_blitter_rev1_start_w(uint8_t data);
+	void dynax_blitter_rev1_clear_w(uint8_t data);
+	void hnayayoi_palbank_w(offs_t offset, uint8_t data);
+	void adpcm_data_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_clock_w);

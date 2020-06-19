@@ -78,13 +78,13 @@ private:
 	void eacc_segment_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
-	void eacc_mem(address_map &map);
+	void mem_map(address_map &map);
 	uint8_t m_digit;
 	bool m_cb1;
 	bool m_cb2;
 	bool m_nmi;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_shared_ptr<uint8_t> m_p_nvram;
@@ -98,7 +98,7 @@ private:
  Address Maps
 ******************************************************************************/
 
-void eacc_state::eacc_mem(address_map &map)
+void eacc_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xc7ff); // A11,A12,A13 not connected
@@ -142,6 +142,15 @@ INPUT_PORTS_END
 void eacc_state::machine_reset()
 {
 	m_cb2 = 0;
+}
+
+void eacc_state::machine_start()
+{
+	m_digits.resolve();
+
+	save_item(NAME(m_cb1));
+	save_item(NAME(m_cb2));
+	save_item(NAME(m_nmi));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::eacc_cb1)
@@ -250,7 +259,7 @@ void eacc_state::eacc(machine_config &config)
 	/* basic machine hardware */
 	M6802(config, m_maincpu, XTAL(3'579'545));  /* Divided by 4 inside the m6802*/
 	m_maincpu->set_ram_enable(false); // FIXME: needs standby support
-	m_maincpu->set_addrmap(AS_PROGRAM, &eacc_state::eacc_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eacc_state::mem_map);
 
 	config.set_default_layout(layout_eacc);
 
@@ -287,4 +296,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                  FULLNAME           FLAGS
-COMP( 1982, eacc, 0,      0,      eacc,    eacc,  eacc_state, empty_init, "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW)
+COMP( 1982, eacc, 0,      0,      eacc,    eacc,  eacc_state, empty_init, "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

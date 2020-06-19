@@ -209,7 +209,7 @@ Cisco Heat.
                                 Big Run
 **************************************************************************/
 
-WRITE16_MEMBER(cischeat_state::leds_out_w)
+void cischeat_state::leds_out_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// leds
 	if (ACCESSING_BITS_0_7)
@@ -382,7 +382,7 @@ void cischeat_state::f1gpstar_map(address_map &map)
 **************************************************************************/
 
 // ad stick read select
-READ16_MEMBER(cischeat_state::wildplt_xy_r)
+uint16_t cischeat_state::wildplt_xy_r()
 {
 	switch(m_ip_select)
 	{
@@ -394,7 +394,7 @@ READ16_MEMBER(cischeat_state::wildplt_xy_r)
 }
 
 // buttons & sensors are muxed. bit 0 routes to coin chute (single according to test mode)
-READ16_MEMBER(cischeat_state::wildplt_mux_r)
+uint16_t cischeat_state::wildplt_mux_r()
 {
 	uint16_t split_in = 0xffff;
 	switch(m_wildplt_output & 0xc)
@@ -407,7 +407,7 @@ READ16_MEMBER(cischeat_state::wildplt_mux_r)
 	return split_in & ioport("IN1_COMMON")->read();
 }
 
-WRITE16_MEMBER(cischeat_state::wildplt_mux_w)
+void cischeat_state::wildplt_mux_w(uint16_t data)
 {
 	m_wildplt_output = data & 0xc;
 }
@@ -513,13 +513,13 @@ void cischeat_state::f1gpstr2_map(address_map &map)
     ---- ---- ---- --1-     Up Limit
     ---- ---- ---- ---0     Down Limit  */
 
-READ16_MEMBER(cischeat_state::scudhamm_motor_status_r)
+uint16_t cischeat_state::scudhamm_motor_status_r()
 {
 	return m_scudhamm_motor_command;    // Motor Status
 }
 
 
-READ16_MEMBER(cischeat_state::scudhamm_motor_pos_r)
+uint16_t cischeat_state::scudhamm_motor_pos_r()
 {
 	return 0x00 << 8;
 }
@@ -533,7 +533,7 @@ READ16_MEMBER(cischeat_state::scudhamm_motor_pos_r)
 
     Within $20 vblanks the motor must reach the target. */
 
-WRITE16_MEMBER(cischeat_state::scudhamm_motor_command_w)
+void cischeat_state::scudhamm_motor_command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_scudhamm_motor_command );
 }
@@ -565,7 +565,7 @@ uint8_t cischeat_state::scudhamm_analog_r()
     port (coins, tilt, buttons, select etc.) triggers the corresponding bit
     in this word. I mapped the 3 buttons to the first 3 led.
 */
-WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
+void cischeat_state::scudhamm_leds_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -587,12 +587,12 @@ WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
     $FFFC during self test, $FFFF onwards.
     It could be audio(L/R) or layers(0/2) enable.
 */
-WRITE16_MEMBER(cischeat_state::scudhamm_enable_w)
+void cischeat_state::scudhamm_enable_w(uint16_t data)
 {
 }
 
 
-WRITE16_MEMBER(cischeat_state::scudhamm_oki_bank_w)
+void cischeat_state::scudhamm_oki_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -628,12 +628,12 @@ void cischeat_state::scudhamm_map(address_map &map)
                             Arm Champs II
 **************************************************************************/
 
-READ16_MEMBER(armchamp2_state::motor_status_r)
+uint16_t armchamp2_state::motor_status_r()
 {
 	return 0x11;
 }
 
-WRITE16_MEMBER(armchamp2_state::motor_command_w)
+void armchamp2_state::motor_command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// 0x00xx -> disable motor (test mode)
 	// 0x10ff -> automated test (test limits?)
@@ -659,7 +659,7 @@ uint8_t armchamp2_state::analog_r()
     ---- ---- 76-- ----     Coin counters
     ---- ---- --54 3210
 */
-WRITE16_MEMBER(armchamp2_state::output_w)
+void armchamp2_state::output_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -705,7 +705,7 @@ void armchamp2_state::armchmp2_map(address_map &map)
 #define RIGHT 0
 #define LEFT  1
 
-WRITE16_MEMBER(captflag_state::leds_w)
+void captflag_state::leds_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_captflag_leds );
 	if (ACCESSING_BITS_8_15)
@@ -722,7 +722,7 @@ WRITE16_MEMBER(captflag_state::leds_w)
 	}
 }
 
-WRITE16_MEMBER(captflag_state::oki_bank_w)
+void captflag_state::oki_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -733,7 +733,7 @@ WRITE16_MEMBER(captflag_state::oki_bank_w)
 
 // Motors
 
-WRITE16_MEMBER(captflag_state::motor_command_right_w)
+void captflag_state::motor_command_right_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Output check:
 	// e09a up
@@ -743,7 +743,7 @@ WRITE16_MEMBER(captflag_state::motor_command_right_w)
 	data = COMBINE_DATA( &m_motor_command[RIGHT] );
 	motor_move(RIGHT, data);
 }
-WRITE16_MEMBER(captflag_state::motor_command_left_w)
+void captflag_state::motor_command_left_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Output check:
 	// e0ba up
@@ -953,7 +953,7 @@ void cischeat_state::f1gpstar_map3(address_map &map)
                                 Big Run
 **************************************************************************/
 
-WRITE16_MEMBER(cischeat_state::bigrun_soundbank_w)
+void cischeat_state::bigrun_soundbank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -978,12 +978,12 @@ void cischeat_state::bigrun_sound_map(address_map &map)
                                 Cisco Heat
 **************************************************************************/
 
-WRITE16_MEMBER(cischeat_state::cischeat_soundbank_1_w)
+void cischeat_state::cischeat_soundbank_1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) m_oki1->set_rom_bank(data & 1);
 }
 
-WRITE16_MEMBER(cischeat_state::cischeat_soundbank_2_w)
+void cischeat_state::cischeat_soundbank_2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) m_oki2->set_rom_bank(data & 1);
 }

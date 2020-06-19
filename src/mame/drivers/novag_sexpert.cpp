@@ -6,7 +6,7 @@
 Novag Super Expert (model 878/886/887/902) / Novag Super Forte
 
 Hardware notes (Super Expert)
-- 65C02 @ 5MHz or 6MHz (10MHz or 12MHz XTAL)
+- R65C02P4 or W65C802P-6 @ 5MHz/6MHz (10MHz/12MHz XTAL)
 - 8KB RAM battery-backed, 3*32KB ROM
 - HD44780 LCD controller (16x1)
 - beeper(32KHz/32), IRQ(32KHz/128) via MC14060
@@ -23,8 +23,13 @@ To distinguish between versions, press the Set Level button.
 - version B: default selectivity 3
 - version C: default selectivity 5
 
-Note that the H8 option doesn't appear to work with sexperta1, but when doing a
+Note that the H8 option doesn't appear to work with sexperta2, but when doing a
 hex compare with sexperta, the program differences are minor.
+
+TODO:
+- use W65C802 device for version B/C? it works ok but this cpu core emulation is
+  not as accurate, and the program doesn't enable extended mode (in other words,
+  it always runs in W65C02 emulation mode)
 
 ******************************************************************************/
 
@@ -411,7 +416,7 @@ INPUT_PORTS_END
 void sexpert_state::sexpert(machine_config &config)
 {
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, 10_MHz_XTAL/2); // or 12_MHz_XTAL/2
+	M65C02(config, m_maincpu, 10_MHz_XTAL/2); // or 12_MHz_XTAL/2, also seen with R65C02
 	m_maincpu->set_addrmap(AS_PROGRAM, &sexpert_state::sexpert_map);
 
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
@@ -424,6 +429,7 @@ void sexpert_state::sexpert(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(200));
+	m_board->set_nvram_enable(true);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
@@ -467,6 +473,7 @@ void sforte_state::sforte(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sforte_state::sforte_map);
 	m_irq_on->set_start_delay(m_irq_on->period() - attotime::from_usec(10)); // tlow measured between 8us and 12us (unstable)
+
 	m_board->set_type(sensorboard_device::BUTTONS);
 
 	config.set_default_layout(layout_novag_sforte);
@@ -486,6 +493,13 @@ ROM_START( sexperta ) // from model 886
 ROM_END
 
 ROM_START( sexperta1 ) // from model 878
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD("se_202_l.u3", 0x0000, 0x8000, CRC(d51fed16) SHA1(01aaddab36a721a4b9efde94979256d397cd1953) ) // NEC D27C256AD-12
+	ROM_LOAD("se_202_h1.u1", 0x8000, 0x8000, CRC(933eafa8) SHA1(293f63a5bc7d760ad675522c98f9f0a49e61aef5) ) // "
+	ROM_LOAD("se_c22_h0.u2", 0x10000, 0x8000, CRC(3e42cf7c) SHA1(b2faa36a127e08e5755167a25ed4a07f12d62957) ) // "
+ROM_END
+
+ROM_START( sexperta2 ) // from model 878
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD("se_lo_b15.u3", 0x0000, 0x8000, CRC(6cc9527c) SHA1(29bab809399f2863a88a9c41535ecec0a4fd65ea) )
 	ROM_LOAD("se_hi1_b15.u1", 0x8000, 0x8000, CRC(6e57f0c0) SHA1(ea44769a6f54721fd4543366bda932e86e497d43) )
@@ -558,11 +572,12 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT   CMP MACHINE  INPUT    STATE          INIT          COMPANY, FULLNAME, FLAGS
-CONS( 1988, sexperta,  0,        0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, sexperta1, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version A, older)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, sexpertb,  sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, sexperta,  0,        0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 886
+CONS( 1987, sexperta1, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 878
+CONS( 1987, sexperta2, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 878
+CONS( 1988, sexpertb,  sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 887
 CONS( 1990, sexpertc,  sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, sexpertc1, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V3.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, sexpertc1, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V3.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 902
 
 CONS( 1987, sfortea,   0,        0, sforte,  sexpert, sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, sfortea1,  sfortea,  0, sforte,  sexpert, sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

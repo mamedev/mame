@@ -59,14 +59,14 @@ WRITE_LINE_MEMBER(gaelco_state::coin2_counter_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(gaelco_state::oki_bankswitch_w)
+void gaelco_state::oki_bankswitch_w(uint8_t data)
 {
 	m_okibank->set_entry(data & 0x0f);
 }
 
 /*********** Squash Encryption Related Code ******************/
 
-WRITE16_MEMBER(gaelco_state::vram_encrypted_w)
+void gaelco_state::vram_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
@@ -74,7 +74,7 @@ WRITE16_MEMBER(gaelco_state::vram_encrypted_w)
 }
 
 
-WRITE16_MEMBER(gaelco_state::encrypted_w)
+void gaelco_state::encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
@@ -83,14 +83,14 @@ WRITE16_MEMBER(gaelco_state::encrypted_w)
 
 /*********** Thunder Hoop Encryption Related Code ******************/
 
-WRITE16_MEMBER(gaelco_state::thoop_vram_encrypted_w)
+void gaelco_state::thoop_vram_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
 	vram_w(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(gaelco_state::thoop_encrypted_w)
+void gaelco_state::thoop_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);

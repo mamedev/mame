@@ -44,16 +44,17 @@ public:
 		, m_beep(*this, "beeper")
 	{ }
 
-	uint8_t port08_r();
-	void port08_w(uint8_t data);
-	void port09_w(uint8_t data);
-
 	void brandt8641(machine_config &config);
-	void brandt8641_io(address_map &map);
-	void brandt8641_mem(address_map &map);
+
 private:
-	uint8_t m_port08;
-	uint8_t m_port09;
+	virtual void machine_start() override;
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	u8 port08_r();
+	void port08_w(u8 data);
+	void port09_w(u8 data);
+	u8 m_port08;
+	u8 m_port09;
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio1;
 	required_device<z80pio_device> m_pio2;
@@ -63,14 +64,14 @@ private:
 	required_device<beep_device> m_beep;
 };
 
-void brandt8641_state::brandt8641_mem(address_map &map)
+void brandt8641_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom(); // 27256 at U12
 	map(0x8000, 0x9fff).ram(); // 8KB static ram 6264 at U12
 }
 
-void brandt8641_state::brandt8641_io(address_map &map)
+void brandt8641_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -125,9 +126,9 @@ static INPUT_PORTS_START( brandt8641 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)
 INPUT_PORTS_END
 
-uint8_t brandt8641_state::port08_r()
+u8 brandt8641_state::port08_r()
 {
-	uint8_t i, data = 7;
+	u8 i, data = 7;
 
 	for (i = 0; i < 8; i++)
 		if (BIT(m_port09, i))
@@ -136,15 +137,21 @@ uint8_t brandt8641_state::port08_r()
 	return data | m_port08;
 }
 
-void brandt8641_state::port08_w(uint8_t data)
+void brandt8641_state::port08_w(u8 data)
 {
 	m_port08 = data & 0xf8;
 	m_beep->set_state(BIT(data, 4));
 }
 
-void brandt8641_state::port09_w(uint8_t data)
+void brandt8641_state::port09_w(u8 data)
 {
 	m_port09 = data ^ 0xff;
+}
+
+void brandt8641_state::machine_start()
+{
+	save_item(NAME(m_port08));
+	save_item(NAME(m_port09));
 }
 
 static const z80_daisy_config daisy_chain_intf[] =
@@ -162,8 +169,8 @@ void brandt8641_state::brandt8641(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000)); // U4 ,4MHz crystal on board
-	m_maincpu->set_addrmap(AS_PROGRAM, &brandt8641_state::brandt8641_mem);
-	m_maincpu->set_addrmap(AS_IO, &brandt8641_state::brandt8641_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &brandt8641_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &brandt8641_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* sound hardware */
@@ -190,9 +197,9 @@ void brandt8641_state::brandt8641(machine_config &config)
 
 /* ROM definition */
 ROM_START( br8641 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "v0911he.u11", 0x0000, 0x8000, CRC(59a16951) SHA1(893dba60ec8bfa391fb2d2a30db5d42d601f5eb9))
 ROM_END
 
 /* Driver */
-COMP( 1986, br8641, 0, 0, brandt8641, brandt8641, brandt8641_state, empty_init, "Brandt", "Brandt 8641", MACHINE_NOT_WORKING )
+COMP( 1986, br8641, 0, 0, brandt8641, brandt8641, brandt8641_state, empty_init, "Brandt", "Brandt 8641", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

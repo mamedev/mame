@@ -128,7 +128,7 @@ void turrett_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  read - host CPU read access
 //-------------------------------------------------
 
-READ32_MEMBER( turrett_device::read )
+uint32_t turrett_device::read(offs_t offset)
 {
 	m_stream->update();
 
@@ -142,7 +142,7 @@ READ32_MEMBER( turrett_device::read )
 //  write - host CPU write access
 //-------------------------------------------------
 
-WRITE32_MEMBER( turrett_device::write )
+void turrett_device::write(offs_t offset, uint32_t data)
 {
 	m_stream->update();
 

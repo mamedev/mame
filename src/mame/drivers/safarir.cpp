@@ -86,10 +86,10 @@ private:
 	uint8_t m_port_last;
 	uint8_t m_port_last2;
 
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_bank_w);
-	DECLARE_WRITE8_MEMBER(safarir_audio_w);
+	void ram_w(offs_t offset, uint8_t data);
+	uint8_t ram_r(offs_t offset);
+	void ram_bank_w(uint8_t data);
+	void safarir_audio_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
@@ -107,7 +107,7 @@ private:
  *
  *************************************/
 
-WRITE8_MEMBER(safarir_state::ram_w)
+void safarir_state::ram_w(offs_t offset, uint8_t data)
 {
 	if (m_ram_bank)
 		m_ram_2[offset] = data;
@@ -118,13 +118,13 @@ WRITE8_MEMBER(safarir_state::ram_w)
 }
 
 
-READ8_MEMBER(safarir_state::ram_r)
+uint8_t safarir_state::ram_r(offs_t offset)
 {
 	return m_ram_bank ? m_ram_2[offset] : m_ram_1[offset];
 }
 
 
-WRITE8_MEMBER(safarir_state::ram_bank_w)
+void safarir_state::ram_bank_w(uint8_t data)
 {
 	m_ram_bank = data & 0x01;
 
@@ -169,8 +169,7 @@ void safarir_state::safarir_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
 {
 	int color;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint8_t code = ram_r(space,tile_index | 0x400);
+	uint8_t code = ram_r(tile_index | 0x400);
 
 	if (code & 0x80)
 		color = 6;  /* yellow */
@@ -191,8 +190,7 @@ TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(safarir_state::get_fg_tile_info)
 {
 	int color, flags;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint8_t code = ram_r(space,tile_index);
+	uint8_t code = ram_r(tile_index);
 
 	if (code & 0x80)
 		color = 7;  /* white */
@@ -250,7 +248,7 @@ uint32_t safarir_state::screen_update_safarir(screen_device &screen, bitmap_ind1
 #define CHANNEL_SOUND6      5
 
 
-WRITE8_MEMBER(safarir_state::safarir_audio_w)
+void safarir_state::safarir_audio_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_last;
 

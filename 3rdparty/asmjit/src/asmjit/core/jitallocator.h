@@ -32,7 +32,7 @@
 
 ASMJIT_BEGIN_NAMESPACE
 
-//! \addtogroup asmjit_jit
+//! \addtogroup asmjit_virtual_memory
 //! \{
 
 // ============================================================================
@@ -132,9 +132,6 @@ public:
   //! JitAllocator allocator(&params);
   //! ```
   struct CreateParams {
-    // Reset the content of `CreateParams`.
-    inline void reset() noexcept { memset(this, 0, sizeof(*this)); }
-
     //! Allocator options, see \ref JitAllocator::Options.
     //!
     //! No options are used by default.
@@ -161,6 +158,9 @@ public:
     //!
     //! Only used if \ref kOptionCustomFillPattern is set.
     uint32_t fillPattern;
+
+    // Reset the content of `CreateParams`.
+    inline void reset() noexcept { memset(this, 0, sizeof(*this)); }
   };
 
   //! Creates a `JitAllocator` instance.
@@ -221,6 +221,15 @@ public:
 
   //! Statistics about `JitAllocator`.
   struct Statistics {
+    //! Number of blocks `JitAllocator` maintains.
+    size_t _blockCount;
+    //! How many bytes are currently used / allocated.
+    size_t _usedSize;
+    //! How many bytes are currently reserved by the allocator.
+    size_t _reservedSize;
+    //! Allocation overhead (in bytes) required to maintain all blocks.
+    size_t _overheadSize;
+
     inline void reset() noexcept {
       _blockCount = 0;
       _usedSize = 0;
@@ -251,15 +260,6 @@ public:
     inline double overheadSizeAsPercent() const noexcept {
       return (double(overheadSize()) / (double(reservedSize()) + 1e-16)) * 100.0;
     }
-
-    //! Number of blocks `JitAllocator` maintains.
-    size_t _blockCount;
-    //! How many bytes are currently used / allocated.
-    size_t _usedSize;
-    //! How many bytes are currently reserved by the allocator.
-    size_t _reservedSize;
-    //! Allocation overhead (in bytes) required to maintain all blocks.
-    size_t _overheadSize;
   };
 
   //! Returns JIT allocator statistics.

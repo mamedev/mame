@@ -115,6 +115,15 @@
 #define NL_USE_FLOAT128 PUSE_FLOAT128
 #endif
 
+/// \brief Prefer 128bit int type for ptime if supported
+///
+/// Set this to one if you want to use 128 bit int for ptime.
+/// This is about 10% slower on a skylake processor for pongf.
+///
+#ifndef NL_PREFER_INT128
+#define NL_PREFER_INT128 (0)
+#endif
+
 /// \brief Support float type for matrix calculations.
 ///
 /// Defaults to NL_USE_ACADEMIC_SOLVERS to provide faster build times
@@ -190,6 +199,12 @@ namespace netlist
 		/// \brief Maximum queue size
 		///
 		using MAX_QUEUE_SIZE = std::integral_constant<std::size_t, 512>; // NOLINT
+
+		using use_float_matrix = std::integral_constant<bool, NL_USE_FLOAT_MATRIX>;
+		using use_long_double_matrix = std::integral_constant<bool, NL_USE_LONG_DOUBLE_MATRIX>;
+		using use_float128_matrix = std::integral_constant<bool, NL_USE_FLOAT128>;
+
+		using use_mempool = std::integral_constant<bool, NL_USE_MEMPOOL>;
 
 		/// \brief  Floating point types used
 		///

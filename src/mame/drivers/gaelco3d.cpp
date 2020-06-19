@@ -240,7 +240,7 @@ INTERRUPT_GEN_MEMBER(gaelco3d_state::vblank_gen)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::irq_ack_w)
+void gaelco3d_state::irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
@@ -253,7 +253,7 @@ WRITE16_MEMBER(gaelco3d_state::irq_ack_w)
  *
  *************************************/
 
-READ16_MEMBER(gaelco3d_state::eeprom_data_r)
+uint16_t gaelco3d_state::eeprom_data_r(offs_t offset, uint16_t mem_mask)
 {
 	uint32_t result = 0xffff;
 
@@ -280,7 +280,7 @@ READ16_MEMBER(gaelco3d_state::eeprom_data_r)
  *
  *************************************/
 
-READ16_MEMBER(gaelco3d_state::sound_status_r)
+uint16_t gaelco3d_state::sound_status_r(offs_t offset, uint16_t mem_mask)
 {
 	if (LOG)
 		logerror("%s:sound_status_r(%02X) = %02X\n", machine().describe_context(), offset, m_sound_status);
@@ -290,7 +290,7 @@ READ16_MEMBER(gaelco3d_state::sound_status_r)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::sound_status_w)
+void gaelco3d_state::sound_status_w(uint16_t data)
 {
 	if (LOG)
 		logerror("sound_status_w(%02X)\n", m_sound_status);
@@ -375,14 +375,14 @@ WRITE_LINE_MEMBER(gaelco3d_state::fp_analog_clock_w)
  *
  *************************************/
 
-READ32_MEMBER(gaelco3d_state::tms_m68k_ram_r)
+uint32_t gaelco3d_state::tms_m68k_ram_r(offs_t offset)
 {
 //  logerror("%s:tms_m68k_ram_r(%04X) = %08X\n", machine().describe_context(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
 	return (int32_t)(int16_t)m_m68k_ram_base[offset ^ m_tms_offset_xor];
 }
 
 
-WRITE32_MEMBER(gaelco3d_state::tms_m68k_ram_w)
+void gaelco3d_state::tms_m68k_ram_w(offs_t offset, uint32_t data)
 {
 	m_m68k_ram_base[offset ^ m_tms_offset_xor] = data;
 }
@@ -466,7 +466,7 @@ ADSP control 3FF2 W = 4A0F  (S1_CONTROL_REG)
 ADSP control 3FFF W = 0C08  (SYSCONTROL_REG)
 */
 
-WRITE16_MEMBER(gaelco3d_state::adsp_control_w)
+void gaelco3d_state::adsp_control_w(offs_t offset, uint16_t data)
 {
 	if (LOG)
 		logerror("ADSP control %04X W = %04X\n", 0x3fe0 + offset, data);
@@ -506,7 +506,7 @@ WRITE16_MEMBER(gaelco3d_state::adsp_control_w)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::adsp_rombank_w)
+void gaelco3d_state::adsp_rombank_w(offs_t offset, uint16_t data)
 {
 	if (LOG)
 		logerror("adsp_rombank_w(%d) = %04X\n", offset, data);

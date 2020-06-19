@@ -85,7 +85,7 @@ bool isbc_215g_device::write_sector(uint16_t data)
 	return false;
 }
 
-READ16_MEMBER(isbc_215g_device::io_r)
+uint16_t isbc_215g_device::io_r(offs_t offset)
 {
 	uint16_t data = 0;
 	switch(offset)
@@ -166,7 +166,7 @@ READ16_MEMBER(isbc_215g_device::io_r)
 	return data;
 }
 
-WRITE16_MEMBER(isbc_215g_device::io_w)
+void isbc_215g_device::io_w(offs_t offset, uint16_t data)
 {
 	switch(offset)
 	{
@@ -293,7 +293,7 @@ WRITE16_MEMBER(isbc_215g_device::io_w)
 	}
 }
 
-READ16_MEMBER(isbc_215g_device::mem_r)
+uint16_t isbc_215g_device::mem_r(offs_t offset, uint16_t mem_mask)
 {
 	// XXX: hack to permit debugger to disassemble rom
 	if(machine().side_effects_disabled() && (offset < 0x1fff))
@@ -312,7 +312,7 @@ READ16_MEMBER(isbc_215g_device::mem_r)
 	}
 }
 
-WRITE16_MEMBER(isbc_215g_device::mem_w)
+void isbc_215g_device::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu_mem->write_word_unaligned(offset*2, data, mem_mask);
 }
@@ -419,7 +419,7 @@ void isbc_215g_device::device_start()
 
 }
 
-WRITE8_MEMBER(isbc_215g_device::write)
+void isbc_215g_device::write(offs_t offset, uint8_t data)
 {
 	if(!offset)
 	{

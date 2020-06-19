@@ -139,6 +139,8 @@ interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device
 	, m_out_irq_vector_func(*this)
 	, m_fdc_tc_func(*this)
 	, m_eth_ca_func(*this)
+	, m_force_state(0)
+	, m_softint(0)
 	, m_dma_channel{
 		{ 0,0,0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_PLOT, DMA_PLOTTER, "plotter" },
 		{ 0,0,0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_SCSI, DMA_SCSI, "scsi" },
@@ -163,6 +165,7 @@ turquoise_ioga_device::turquoise_ioga_device(const machine_config &mconfig, cons
 sapphire_ioga_device::sapphire_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: interpro_ioga_device(mconfig, SAPPHIRE_IOGA, tag, owner, clock)
 {
+	std::fill(std::begin(m_swicr), std::end(m_swicr), 0);
 }
 
 void interpro_ioga_device::device_start()
@@ -556,7 +559,7 @@ IRQ_CALLBACK_MEMBER(sapphire_ioga_device::acknowledge_interrupt)
 	return 0;
 }
 
-WRITE16_MEMBER(interpro_ioga_device::hardint_w)
+void interpro_ioga_device::hardint_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const int number = get_int_number(offset);
 	bool force = false;
@@ -600,7 +603,7 @@ WRITE16_MEMBER(interpro_ioga_device::hardint_w)
 		set_int_line(number, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(interpro_ioga_device::softint_w)
+void interpro_ioga_device::softint_w(u8 data)
 {
 	// store the written value
 	m_softint |= data;
@@ -609,7 +612,7 @@ WRITE8_MEMBER(interpro_ioga_device::softint_w)
 	m_interrupt_timer->adjust(attotime::zero);
 }
 
-WRITE8_MEMBER(interpro_ioga_device::nmictrl_w)
+void interpro_ioga_device::nmictrl_w(u8 data)
 {
 	// check for a forced nmi (NMI_NEGPOL written from 1 to 0 with NMI_IE set)
 	const bool forced = (m_nmictrl & NMI_NEGPOL) && ((data & (NMI_NEGPOL | NMI_IE)) == NMI_IE);
@@ -625,7 +628,7 @@ WRITE8_MEMBER(interpro_ioga_device::nmictrl_w)
 	}
 }
 
-WRITE16_MEMBER(sapphire_ioga_device::softint_vector_w)
+void sapphire_ioga_device::softint_vector_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const int number = offset + 8;
 
@@ -827,7 +830,7 @@ void interpro_ioga_device::drq(int state, int channel)
 		m_dma_timer->adjust(attotime::zero);
 }
 
-u32 interpro_ioga_device::dma_r(address_space &space, offs_t offset, u32 mem_mask, dma_channel channel) const
+u32 interpro_ioga_device::dma_r(offs_t offset, dma_channel channel) const
 {
 	const dma_channel_t &dma_channel = m_dma_channel[channel];
 
@@ -851,7 +854,7 @@ u32 interpro_ioga_device::dma_r(address_space &space, offs_t offset, u32 mem_mas
 	}
 }
 
-void interpro_ioga_device::dma_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, dma_channel channel)
+void interpro_ioga_device::dma_w(offs_t offset, u32 data, u32 mem_mask, dma_channel channel)
 {
 	dma_channel_t &dma_channel = m_dma_channel[channel];
 
@@ -977,7 +980,7 @@ void interpro_ioga_device::serial_drq(int state, int channel)
 		m_serial_dma_timer->adjust(attotime::zero);
 }
 
-void interpro_ioga_device::serial_dma_addr_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel)
+void interpro_ioga_device::serial_dma_addr_w(offs_t offset, u32 data, u32 mem_mask, int channel)
 {
 	LOGMASKED(LOG_SERIALDMA, "dma: serial channel %d address 0x%08x mask 0x%08x (%s)\n",
 		channel, data, mem_mask, machine().describe_context());
@@ -985,7 +988,7 @@ void interpro_ioga_device::serial_dma_addr_w(address_space &space, offs_t offset
 	COMBINE_DATA(&m_serial_dma_channel[channel].address);
 }
 
-void interpro_ioga_device::serial_dma_ctrl_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel)
+void interpro_ioga_device::serial_dma_ctrl_w(offs_t offset, u32 data, u32 mem_mask, int channel)
 {
 	serial_dma_channel_t &dma_channel = m_serial_dma_channel[channel];
 
@@ -1001,7 +1004,7 @@ void interpro_ioga_device::serial_dma_ctrl_w(address_space &space, offs_t offset
 /*
  * Bus arbitration and control
  */
-WRITE16_MEMBER(interpro_ioga_device::arbctl_w)
+void interpro_ioga_device::arbctl_w(u16 data)
 {
 	LOGMASKED(LOG_DMA | LOG_SERIALDMA, "dma: arbctl = 0x%04x (%s)\n",
 		data, machine().describe_context());
@@ -1013,7 +1016,7 @@ WRITE16_MEMBER(interpro_ioga_device::arbctl_w)
 		m_serial_dma_timer->adjust(attotime::zero);
 }
 
-READ32_MEMBER(interpro_ioga_device::error_businfo_r)
+u32 interpro_ioga_device::error_businfo_r()
 {
 	const u32 result = m_error_businfo;
 
@@ -1027,7 +1030,7 @@ READ32_MEMBER(interpro_ioga_device::error_businfo_r)
 /*
  * Timers
  */
-READ32_MEMBER(interpro_ioga_device::timer0_r)
+u32 interpro_ioga_device::timer0_r(offs_t offset, u32 mem_mask)
 {
 	LOGMASKED(LOG_TIMERRD, "timer0_r data 0x%08x mask 0x%08x (%s)\n",
 		m_timer0_count, mem_mask, machine().describe_context());
@@ -1035,7 +1038,7 @@ READ32_MEMBER(interpro_ioga_device::timer0_r)
 	return m_timer0_count;
 }
 
-WRITE32_MEMBER(interpro_ioga_device::timer0_w)
+void interpro_ioga_device::timer0_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_TIMER0, "timer0_w data 0x%08x mask 0x%08x prescaler 0x%08x (%s)\n",
 		data, mem_mask, m_prescaler, machine().describe_context());
@@ -1077,7 +1080,7 @@ TIMER_CALLBACK_MEMBER(sapphire_ioga_device::timer_60hz)
 	set_int_line(IRQ_TIMER0, CLEAR_LINE);
 }
 
-READ32_MEMBER(interpro_ioga_device::timer1_r)
+u32 interpro_ioga_device::timer1_r(offs_t offset, u32 mem_mask)
 {
 	u32 result = m_timer1_count & TIMER1_COUNT;
 
@@ -1093,7 +1096,7 @@ READ32_MEMBER(interpro_ioga_device::timer1_r)
 	return result;
 }
 
-WRITE32_MEMBER(interpro_ioga_device::timer1_w)
+void interpro_ioga_device::timer1_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// disable the timer
 	m_timer1->enable(false);
@@ -1133,7 +1136,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer1)
 	}
 }
 
-READ32_MEMBER(sapphire_ioga_device::timer2_count_r)
+u32 sapphire_ioga_device::timer2_count_r(offs_t offset, u32 mem_mask)
 {
 	LOGMASKED(LOG_TIMERRD, "timer2_count_r data 0x%08x mask 0x%08x (%s)\n",
 		m_timer2_count, mem_mask, machine().describe_context());
@@ -1141,7 +1144,7 @@ READ32_MEMBER(sapphire_ioga_device::timer2_count_r)
 	return m_timer2_count;
 }
 
-WRITE32_MEMBER(sapphire_ioga_device::timer2_count_w)
+void sapphire_ioga_device::timer2_count_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_timer2_count = data;
 
@@ -1149,7 +1152,7 @@ WRITE32_MEMBER(sapphire_ioga_device::timer2_count_w)
 		data, mem_mask, machine().describe_context());
 }
 
-READ32_MEMBER(sapphire_ioga_device::timer2_value_r)
+u32 sapphire_ioga_device::timer2_value_r(offs_t offset, u32 mem_mask)
 {
 	LOGMASKED(LOG_TIMERRD, "timer2_value_r data 0x%08x mask 0x%08x (%s)\n",
 		m_timer2_value, mem_mask, machine().describe_context());
@@ -1157,7 +1160,7 @@ READ32_MEMBER(sapphire_ioga_device::timer2_value_r)
 	return m_timer2_value;
 }
 
-WRITE32_MEMBER(sapphire_ioga_device::timer2_value_w)
+void sapphire_ioga_device::timer2_value_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_timer2_value = data;
 	m_timer2_count = data; // ?
@@ -1166,7 +1169,7 @@ WRITE32_MEMBER(sapphire_ioga_device::timer2_value_w)
 		data, mem_mask, machine().describe_context());
 }
 
-READ32_MEMBER(sapphire_ioga_device::timer3_r)
+u32 sapphire_ioga_device::timer3_r(offs_t offset, u32 mem_mask)
 {
 	u32 result = m_timer3_count & TIMER3_COUNT;
 
@@ -1181,7 +1184,7 @@ READ32_MEMBER(sapphire_ioga_device::timer3_r)
 	return result;
 }
 
-WRITE32_MEMBER(sapphire_ioga_device::timer3_w)
+void sapphire_ioga_device::timer3_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// stop the timer so it won't trigger while we're fiddling with it
 	m_timer3->enable(false);
@@ -1219,12 +1222,12 @@ TIMER_CALLBACK_MEMBER(sapphire_ioga_device::timer3)
 	}
 }
 
-READ32_MEMBER(interpro_ioga_device::prescaler_r)
+u32 interpro_ioga_device::prescaler_r()
 {
 	return (m_prescaler ^ 0xffff0000) - 0x10000;
 }
 
-WRITE32_MEMBER(interpro_ioga_device::prescaler_w)
+void interpro_ioga_device::prescaler_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_TIMER0 | LOG_TIMER1, "prescaler_w data 0x%08x mask 0x%08x (%s)\n",
 		data, mem_mask, machine().describe_context());
@@ -1235,7 +1238,7 @@ WRITE32_MEMBER(interpro_ioga_device::prescaler_w)
 /*
  * Mouse
  */
-READ32_MEMBER(interpro_ioga_device::mouse_status_r)
+u32 interpro_ioga_device::mouse_status_r(offs_t offset, u32 mem_mask)
 {
 	const u32 result = m_mouse_status ^ MOUSE_BUTTONS;
 
@@ -1269,7 +1272,7 @@ void interpro_ioga_device::mouse_status_w(offs_t offset, u32 data, u32 mem_mask)
 /*
  * Ethernet
  */
-WRITE32_MEMBER(emerald_ioga_device::eth_base_w)
+void emerald_ioga_device::eth_base_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_NETWORK, "eth: base_w 0x%08x mem_mask 0x%08x (%s)\n",
 		data, mem_mask, machine().describe_context());
@@ -1277,7 +1280,7 @@ WRITE32_MEMBER(emerald_ioga_device::eth_base_w)
 	m_eth_base = ((m_eth_base & ~mem_mask) | (data & mem_mask)) & ETH_BASE_MASK;
 }
 
-WRITE16_MEMBER(emerald_ioga_device::eth_control_w)
+void emerald_ioga_device::eth_control_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOGMASKED(LOG_NETWORK, "eth: control_w 0x%04x mem_mask 0x%04x (%s)\n",
 		data, mem_mask, machine().describe_context());
@@ -1302,7 +1305,7 @@ WRITE16_MEMBER(emerald_ioga_device::eth_control_w)
 	}
 }
 
-WRITE16_MEMBER(emerald_ioga_device::eth_w)
+void emerald_ioga_device::eth_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
 
@@ -1311,7 +1314,7 @@ WRITE16_MEMBER(emerald_ioga_device::eth_w)
 	m_memory.write_word(address, data, mem_mask);
 }
 
-READ16_MEMBER(emerald_ioga_device::eth_r)
+u16 emerald_ioga_device::eth_r(offs_t offset, u16 mem_mask)
 {
 	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
 
@@ -1330,7 +1333,7 @@ TIMER_CALLBACK_MEMBER(emerald_ioga_device::eth_reset)
 	m_eth_control &= ~ETH_RESET;
 }
 
-WRITE32_MEMBER(turquoise_ioga_device::eth_base_w)
+void turquoise_ioga_device::eth_base_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_NETWORK, "eth: base_w 0x%08x mem_mask 0x%08x (%s)\n",
 		data, mem_mask, machine().describe_context());
@@ -1338,7 +1341,7 @@ WRITE32_MEMBER(turquoise_ioga_device::eth_base_w)
 	m_eth_base = ((m_eth_base & ~mem_mask) | (data & mem_mask)) & ETH_BASE_MASK;
 }
 
-WRITE16_MEMBER(turquoise_ioga_device::eth_control_w)
+void turquoise_ioga_device::eth_control_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOGMASKED(LOG_NETWORK, "eth: control_w 0x%04x mem_mask 0x%04x (%s)\n",
 		data, mem_mask, machine().describe_context());
@@ -1363,7 +1366,7 @@ WRITE16_MEMBER(turquoise_ioga_device::eth_control_w)
 	}
 }
 
-WRITE16_MEMBER(turquoise_ioga_device::eth_w)
+void turquoise_ioga_device::eth_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
 
@@ -1372,7 +1375,7 @@ WRITE16_MEMBER(turquoise_ioga_device::eth_w)
 	m_memory.write_word(address, data, mem_mask);
 }
 
-READ16_MEMBER(turquoise_ioga_device::eth_r)
+u16 turquoise_ioga_device::eth_r(offs_t offset, u16 mem_mask)
 {
 	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
 
@@ -1391,7 +1394,7 @@ TIMER_CALLBACK_MEMBER(turquoise_ioga_device::eth_reset)
 	m_eth_control &= ~ETH_RESET;
 }
 
-WRITE32_MEMBER(sapphire_ioga_device::eth_remap_w)
+void sapphire_ioga_device::eth_remap_w(u32 data)
 {
 	LOGMASKED(LOG_NETWORK, "eth: remap = 0x%08x (%s)\n",
 		data, machine().describe_context());
@@ -1399,7 +1402,7 @@ WRITE32_MEMBER(sapphire_ioga_device::eth_remap_w)
 	m_eth_remap = data & ~0xf;
 }
 
-WRITE32_MEMBER(sapphire_ioga_device::eth_mappg_w)
+void sapphire_ioga_device::eth_mappg_w(u32 data)
 {
 	LOGMASKED(LOG_NETWORK, "eth: map page = 0x%08x (%s)\n",
 		data, machine().describe_context());
@@ -1407,7 +1410,7 @@ WRITE32_MEMBER(sapphire_ioga_device::eth_mappg_w)
 	m_eth_mappg = data & ~0xf;
 }
 
-READ32_MEMBER(sapphire_ioga_device::eth_control_r)
+u32 sapphire_ioga_device::eth_control_r()
 {
 	LOGMASKED(LOG_NETWORK, "eth: control_r 0x%08x (%s)\n",
 		m_eth_control, machine().describe_context());
@@ -1415,7 +1418,7 @@ READ32_MEMBER(sapphire_ioga_device::eth_control_r)
 	return m_eth_control;
 }
 
-WRITE32_MEMBER(sapphire_ioga_device::eth_control_w)
+void sapphire_ioga_device::eth_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_NETWORK, "eth: control_w 0x%08x mem_mask 0x%08x (%s)\n",
 		data, mem_mask, machine().describe_context());
@@ -1440,7 +1443,7 @@ WRITE32_MEMBER(sapphire_ioga_device::eth_control_w)
 	}
 }
 
-WRITE16_MEMBER(sapphire_ioga_device::eth_w)
+void sapphire_ioga_device::eth_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// top two bits give channel (0=A, 4=B, 8=C, f=?)
 	const int channel = offset >> 29;
@@ -1460,7 +1463,7 @@ WRITE16_MEMBER(sapphire_ioga_device::eth_w)
 	m_memory.write_word(address, data, mem_mask);
 }
 
-READ16_MEMBER(sapphire_ioga_device::eth_r)
+u16 sapphire_ioga_device::eth_r(offs_t offset, u16 mem_mask)
 {
 	// top two bits give channel (0=A, 4=B, 8=C, f=?)
 	const int channel = offset >> 29;

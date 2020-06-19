@@ -106,22 +106,25 @@ static inline void simplifyCpuVendor(CpuInfo& cpu, uint32_t d0, uint32_t d1, uin
 }
 
 static inline void simplifyCpuBrand(char* s) noexcept {
-  // Used to always clear the current character to ensure that the result
-  // doesn't contain garbage after the new zero terminator.
   char* d = s;
 
+  char c = s[0];
   char prev = 0;
-  char curr = s[0];
+
+  // Used to always clear the current character to ensure that the result
+  // doesn't contain garbage after a new null terminator is placed at the end.
   s[0] = '\0';
 
   for (;;) {
-    if (curr == 0)
+    if (!c)
       break;
 
-    if (!(curr == ' ' && (prev == '@' || s[1] == ' ' || s[1] == '@')))
-      *d++ = prev = curr;
+    if (!(c == ' ' && (prev == '@' || s[1] == ' ' || s[1] == '@'))) {
+      *d++ = c;
+      prev = c;
+    }
 
-    curr = *++s;
+    c = *++s;
     s[0] = '\0';
   }
 
@@ -136,7 +139,9 @@ ASMJIT_FAVOR_SIZE void detectCpu(CpuInfo& cpu) noexcept {
   Features& features = cpu._features.as<Features>();
 
   cpu.reset();
-  cpu._archInfo.init(ArchInfo::kIdHost);
+  cpu._arch = Environment::kArchHost;
+  cpu._subArch = Environment::kSubArchUnknown;
+  cpu._reserved = 0;
   cpu._maxLogicalProcessors = 1;
   features.add(Features::kI486);
 

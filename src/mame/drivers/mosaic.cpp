@@ -52,7 +52,7 @@ NOTE: PIC16C5x protection chip at 5A (UC02 as silkscreened on PCB)
 #include "speaker.h"
 
 
-WRITE8_MEMBER(mosaic_state::protection_w) // TODO: hook up PIC dump and remove this simulation (PIC dump contains the exact values in this jumptable)
+void mosaic_state::protection_w(uint8_t data) // TODO: hook up PIC dump and remove this simulation (PIC dump contains the exact values in this jumptable)
 {
 	if (!BIT(data, 7))
 	{
@@ -76,7 +76,7 @@ WRITE8_MEMBER(mosaic_state::protection_w) // TODO: hook up PIC dump and remove t
 	}
 }
 
-READ8_MEMBER(mosaic_state::protection_r)
+uint8_t mosaic_state::protection_r()
 {
 	int res = (m_prot_val >> 8) & 0xff;
 
@@ -87,7 +87,7 @@ READ8_MEMBER(mosaic_state::protection_r)
 	return res;
 }
 
-WRITE8_MEMBER(mosaic_state::gfire2_protection_w)
+void mosaic_state::gfire2_protection_w(uint8_t data)
 {
 	logerror("%06x: protection_w %02x\n", m_maincpu->pc(), data);
 
@@ -114,7 +114,7 @@ WRITE8_MEMBER(mosaic_state::gfire2_protection_w)
 	}
 }
 
-READ8_MEMBER(mosaic_state::gfire2_protection_r)
+uint8_t mosaic_state::gfire2_protection_r()
 {
 	int res = m_prot_val & 0xff;
 

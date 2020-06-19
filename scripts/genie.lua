@@ -1086,6 +1086,16 @@ end
 					"-Wno-pragma-pack" -- clang 6.0 complains when the packing change lifetime is not contained within a header file.
 				}
 			end
+			if ((version < 60000) or (_OPTIONS["targetos"]=="macosx" and (version <= 90000))) then
+				buildoptions {
+					"-Wno-missing-braces" -- std::array brace initialization not fixed until 6.0.0 (https://reviews.llvm.org/rC314838)
+				}
+			end
+			if (_OPTIONS["targetos"]=="macosx" and (version < 80000)) then
+				defines {
+					"TARGET_OS_OSX=1",
+				}
+			end
 		else
 			if (version < 70000) then
 				print("GCC version 7.0 or later needed")

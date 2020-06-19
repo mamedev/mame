@@ -91,16 +91,16 @@ private:
 	void ppi60b_w(uint8_t data);
 	void ppi64c_w(uint8_t data);
 	uint8_t sw_r();
-	DECLARE_WRITE8_MEMBER(dmdram_w);
-	DECLARE_READ8_MEMBER(dmdram_r);
-	DECLARE_READ8_MEMBER(sndcmd_r);
-	DECLARE_WRITE8_MEMBER(sndbank_a_w);
-	DECLARE_WRITE8_MEMBER(sndbank_m_w);
-	DECLARE_WRITE8_MEMBER(sndcmd_w);
-	DECLARE_WRITE8_MEMBER(lamp_w) { };
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_WRITE8_MEMBER(volume_w) { };
-	DECLARE_WRITE8_MEMBER(disp_w);
+	void dmdram_w(offs_t offset, uint8_t data);
+	uint8_t dmdram_r(offs_t offset);
+	uint8_t sndcmd_r();
+	void sndbank_a_w(uint8_t data);
+	void sndbank_m_w(uint8_t data);
+	void sndcmd_w(uint8_t data);
+	void lamp_w(uint8_t data) { };
+	void lamp1_w(uint8_t data) { };
+	void volume_w(uint8_t data) { };
+	void disp_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
 	void spinb_palette(palette_device &palette) const;
@@ -368,22 +368,22 @@ uint8_t spinb_state::sw_r()
 	return m_switches[m_row]->read();
 }
 
-WRITE8_MEMBER( spinb_state::sndcmd_w )
+void spinb_state::sndcmd_w(uint8_t data)
 {
 	m_sndcmd = data;
 }
 
-READ8_MEMBER( spinb_state::sndcmd_r )
+uint8_t spinb_state::sndcmd_r()
 {
 	return m_sndcmd;
 }
 
-WRITE8_MEMBER( spinb_state::dmdram_w )
+void spinb_state::dmdram_w(offs_t offset, uint8_t data)
 {
 	m_dmdram[offset & 0x1fff] = data;
 }
 
-READ8_MEMBER( spinb_state::dmdram_r )
+uint8_t spinb_state::dmdram_r(offs_t offset)
 {
 	switch (m_dmdbank)
 	{
@@ -400,7 +400,7 @@ READ8_MEMBER( spinb_state::dmdram_r )
 	return m_dmdcmd;
 }
 
-WRITE8_MEMBER( spinb_state::disp_w )
+void spinb_state::disp_w(uint8_t data)
 {
 	m_dmdcmd = data;
 	m_p32 = 0;
@@ -428,7 +428,7 @@ void spinb_state::ppi64c_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( spinb_state::sndbank_a_w )
+void spinb_state::sndbank_a_w (uint8_t data)
 {
 	m_sndbank_a = data;
 	m_sound_addr_a = (m_sound_addr_a & 0xffff) | ((data & 7) << 16);
@@ -443,7 +443,7 @@ WRITE8_MEMBER( spinb_state::sndbank_a_w )
 	update_sound_a();
 }
 
-WRITE8_MEMBER( spinb_state::sndbank_m_w )
+void spinb_state::sndbank_m_w(uint8_t data)
 {
 	m_sndbank_m = data;
 	m_sound_addr_m = (m_sound_addr_m & 0xffff) | ((data & 7) << 16);

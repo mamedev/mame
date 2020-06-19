@@ -605,10 +605,10 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_score_input_r)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::tornbase_io_w)
+void mw8080bw_state::tornbase_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)
-		tornbase_audio_w(space, 0, data);
+		tornbase_audio_w(data);
 
 	if (offset & 0x02)
 		m_mb14241->shift_count_w(data);
@@ -881,7 +881,7 @@ MACHINE_START_MEMBER(mw8080bw_state,maze)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::maze_coin_counter_w)
+void mw8080bw_state::maze_coin_counter_w(uint8_t data)
 {
 	/* the data is not used, just pulse the counter */
 	machine().bookkeeping().coin_counter_w(0, 0);
@@ -889,9 +889,9 @@ WRITE8_MEMBER(mw8080bw_state::maze_coin_counter_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::maze_io_w)
+void mw8080bw_state::maze_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x01)  maze_coin_counter_w(space, 0, data);
+	if (offset & 0x01)  maze_coin_counter_w(data);
 
 	if (offset & 0x02)  m_watchdog->watchdog_reset();
 }
@@ -1063,9 +1063,9 @@ void boothill_state::boothill(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(mw8080bw_state::checkmat_io_w)
+void mw8080bw_state::checkmat_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x01)  checkmat_audio_w(space, 0, data);
+	if (offset & 0x01)  checkmat_audio_w(data);
 
 	if (offset & 0x02)  m_watchdog->watchdog_reset();
 }
@@ -2277,7 +2277,7 @@ void mw8080bw_state::phantom2(machine_config &config)
  *
  *************************************/
 
-READ8_MEMBER(mw8080bw_state::bowler_shift_result_r)
+uint8_t mw8080bw_state::bowler_shift_result_r()
 {
 	/* ZV - not too sure why this is needed, I don't see
 	   anything unusual on the schematics that would cause
@@ -2286,7 +2286,7 @@ READ8_MEMBER(mw8080bw_state::bowler_shift_result_r)
 	return ~m_mb14241->shift_result_r();
 }
 
-WRITE8_MEMBER(mw8080bw_state::bowler_lights_1_w)
+void mw8080bw_state::bowler_lights_1_w(uint8_t data)
 {
 	output().set_value("200_LEFT_LIGHT",  (data >> 0) & 0x01);
 
@@ -2307,7 +2307,7 @@ WRITE8_MEMBER(mw8080bw_state::bowler_lights_1_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_lights_2_w)
+void mw8080bw_state::bowler_lights_2_w(uint8_t data)
 {
 	output().set_value("REGULATION_GAME_LIGHT", ( data >> 0) & 0x01);
 	output().set_value("FLASH_GAME_LIGHT",      (~data >> 0) & 0x01);

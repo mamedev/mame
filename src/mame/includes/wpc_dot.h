@@ -50,8 +50,8 @@ protected:
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
 	DECLARE_WRITE_LINE_MEMBER(wpc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(wpc_firq_w);

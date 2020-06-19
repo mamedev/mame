@@ -29,7 +29,7 @@ namespace plib {
 	void ptokenizer::skipeol()
 	{
 		pstring::value_type c = getc();
-		while (c)
+		while (c != 0)
 		{
 			if (c == 10)
 			{

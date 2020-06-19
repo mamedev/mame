@@ -115,8 +115,8 @@ private:
 	required_device<t11_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<qbus_device> m_qbus;
-	DECLARE_READ16_MEMBER( teletype_ctrl_r );
-	DECLARE_WRITE16_MEMBER( teletype_ctrl_w );
+	uint16_t teletype_ctrl_r(offs_t offset);
+	void teletype_ctrl_w(offs_t offset, uint16_t data);
 	void kbd_put(u8 data);
 	uint8_t m_teletype_data;
 	uint16_t m_teletype_status;
@@ -129,7 +129,7 @@ private:
 	void sms1000_mem_188(address_map &map);
 };
 
-READ16_MEMBER(pdp11_state::teletype_ctrl_r)
+uint16_t pdp11_state::teletype_ctrl_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -157,7 +157,7 @@ READ16_MEMBER(pdp11_state::teletype_ctrl_r)
 	return res;
 }
 
-WRITE16_MEMBER(pdp11_state::teletype_ctrl_w)
+void pdp11_state::teletype_ctrl_w(offs_t offset, uint16_t data)
 {
 	switch(offset)
 	{

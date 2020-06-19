@@ -1133,7 +1133,7 @@ uint16_t primrag2_state::vt83c461_16_r(offs_t offset, uint16_t mem_mask)
 
 	if( offset >= 0x30 / 2 && offset < 0x40 / 2 )
 	{
-		return m_vt83c461->read_config( ( offset / 2 ) & 3 ) >> shift;
+		return m_vt83c461->config_r( ( offset / 2 ) & 3 ) >> shift;
 	}
 	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
 	{
@@ -1156,7 +1156,7 @@ void primrag2_state::vt83c461_16_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 	if( offset >= 0x30 / 2 && offset < 0x40 / 2 )
 	{
-		m_vt83c461->write_config( ( offset / 2 ) & 3, data << shift );
+		m_vt83c461->config_w( ( offset / 2 ) & 3, data << shift );
 	}
 	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
 	{

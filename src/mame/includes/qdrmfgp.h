@@ -58,17 +58,16 @@ private:
 	int32_t m_pal;
 	emu_timer *m_gp2_timer;
 
-	DECLARE_WRITE16_MEMBER(gp_control_w);
-	DECLARE_WRITE16_MEMBER(gp2_control_w);
-	DECLARE_READ16_MEMBER(v_rom_r);
-	DECLARE_READ16_MEMBER(gp2_vram_r);
-	DECLARE_READ16_MEMBER(gp2_vram_mirror_r);
-	DECLARE_WRITE16_MEMBER(gp2_vram_w);
-	DECLARE_WRITE16_MEMBER(gp2_vram_mirror_w);
-	DECLARE_READ16_MEMBER(sndram_r);
-	DECLARE_WRITE16_MEMBER(sndram_w);
-	DECLARE_READ16_MEMBER(gp2_ide_std_r);
-	DECLARE_READ16_MEMBER(inputs_r);
+	void gp_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gp2_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t v_rom_r(offs_t offset);
+	uint16_t gp2_vram_r(offs_t offset);
+	uint16_t gp2_vram_mirror_r(offs_t offset);
+	void gp2_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gp2_vram_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sndram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void sndram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t inputs_r();
 
 	DECLARE_MACHINE_START(qdrmfgp);
 	DECLARE_VIDEO_START(qdrmfgp);

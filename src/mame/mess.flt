@@ -103,12 +103,12 @@ babbage.cpp
 banctec.cpp
 bandai_design_master.cpp
 basic52.cpp
+basssta.cpp
 bbc.cpp
 bbcbc.cpp
 bbl380.cpp
 bcs3.cpp
 bebox.cpp
-beehive.cpp
 bert.cpp
 besta.cpp
 beta.cpp
@@ -164,6 +164,7 @@ cit101.cpp
 cit1500.cpp
 cit220.cpp
 cking_master.cpp
+ckz80.cpp
 clcd.cpp
 clickstart.cpp
 clxvme186.cpp
@@ -184,6 +185,7 @@ comx35.cpp
 concept.cpp
 conchess.cpp
 conic_cchess2.cpp
+consola_emt.cpp
 controlid.cpp
 cortex.cpp
 cosmicos.cpp
@@ -200,7 +202,6 @@ cxg_sphinx40.cpp
 cxhumax.cpp
 cybiko.cpp
 cz101.cpp
-czk80.cpp
 d400.cpp
 d6800.cpp
 d6809.cpp
@@ -231,6 +232,7 @@ dolphunk.cpp
 dpb7000.cpp
 dps1.cpp
 dragon.cpp
+drumsta.cpp
 dsb46.cpp
 dual68.cpp
 duet16.cpp
@@ -341,6 +343,7 @@ gizmondo.cpp
 gkidabc.cpp
 glcx.cpp
 gmaster.cpp
+gnat10.cpp
 goupil.cpp
 gp2x.cpp
 gp32.cpp
@@ -545,6 +548,7 @@ mfabfz.cpp
 mice.cpp
 micral.cpp
 micro20.cpp
+microb.cpp
 microdec.cpp
 microkit.cpp
 micromon.cpp
@@ -994,7 +998,6 @@ ts802.cpp
 ts803.cpp
 ts816.cpp
 tsispch.cpp
-tti.cpp
 tulip1.cpp
 tutor.cpp
 tv910.cpp
@@ -1010,6 +1013,7 @@ tvgame.cpp
 tx0.cpp
 uchroma68.cpp
 uknc.cpp
+ultim809.cpp
 unichamp.cpp
 unior.cpp
 unistar.cpp

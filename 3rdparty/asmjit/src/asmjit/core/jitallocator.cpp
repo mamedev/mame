@@ -26,7 +26,7 @@
 
 #include "../core/arch.h"
 #include "../core/jitallocator.h"
-#include "../core/osutils.h"
+#include "../core/osutils_p.h"
 #include "../core/support.h"
 #include "../core/virtmem.h"
 #include "../core/zone.h"
@@ -938,7 +938,7 @@ public:
 // Helper class to verify that JitAllocator doesn't return addresses that overlap.
 class JitAllocatorWrapper {
 public:
-  explicit inline JitAllocatorWrapper(const JitAllocator::CreateParams* params) noexcept
+  inline explicit JitAllocatorWrapper(const JitAllocator::CreateParams* params) noexcept
     : _zone(1024 * 1024),
       _heap(&_zone),
       _allocator(params) {}

@@ -231,13 +231,13 @@ uint8_t xavix_state::sound_regram_read_cb(offs_t offset)
 
 
 /* 75f0, 75f1 - 2x8 bits (16 voices?) */
-READ8_MEMBER(xavix_state::sound_startstop_r)
+uint8_t xavix_state::sound_startstop_r(offs_t offset)
 {
 	LOG("%s: sound_startstop_r %02x\n", machine().describe_context(), offset);
 	return m_soundreg16_0[offset];
 }
 
-WRITE8_MEMBER(xavix_state::sound_startstop_w)
+void xavix_state::sound_startstop_w(offs_t offset, uint8_t data)
 {
 	/* looks like the sound triggers
 
@@ -290,13 +290,13 @@ WRITE8_MEMBER(xavix_state::sound_startstop_w)
 }
 
 /* 75f0, 75f1 - 2x8 bits (16 voices?) */
-READ8_MEMBER(xavix_state::sound_updateenv_r)
+uint8_t xavix_state::sound_updateenv_r(offs_t offset)
 {
 	LOG("%s: sound_updateenv_r %02x\n", machine().describe_context(), offset);
 	return m_soundreg16_1[offset];
 }
 
-WRITE8_MEMBER(xavix_state::sound_updateenv_w)
+void xavix_state::sound_updateenv_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 		LOG("%s: sound_updateenv_w %02x, %02x (%d %d %d %d %d %d %d %d - - - - - - - -)\n", machine().describe_context(), offset, data, (data & 0x01) ? 1 : 0, (data & 0x02) ? 1 : 0, (data & 0x04) ? 1 : 0, (data & 0x08) ? 1 : 0, (data & 0x10) ? 1 : 0, (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0, (data & 0x80) ? 1 : 0);
@@ -328,7 +328,7 @@ WRITE8_MEMBER(xavix_state::sound_updateenv_w)
 
 
 /* 75f4, 75f5 - 2x8 bits (16 voices?) status? */
-READ8_MEMBER(xavix_state::sound_sta16_r)
+uint8_t xavix_state::sound_sta16_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
@@ -343,13 +343,13 @@ READ8_MEMBER(xavix_state::sound_sta16_r)
 }
 
 /* 75f6 - master volume control? */
-READ8_MEMBER(xavix_state::sound_volume_r)
+uint8_t xavix_state::sound_volume_r()
 {
 	LOG("%s: sound_volume_r\n", machine().describe_context());
 	return m_mastervol;
 }
 
-WRITE8_MEMBER(xavix_state::sound_volume_w)
+void xavix_state::sound_volume_w(uint8_t data)
 {
 	m_mastervol = data;
 	LOG("%s: sound_volume_w %02x\n", machine().describe_context(), data);
@@ -357,7 +357,7 @@ WRITE8_MEMBER(xavix_state::sound_volume_w)
 
 /* 75f7 - main register base*/
 
-WRITE8_MEMBER(xavix_state::sound_regbase_w)
+void xavix_state::sound_regbase_w(uint8_t data)
 {
 	// this is the upper 6 bits of the RAM address where the actual sound register sets are
 	// (16x16 regs, so complete 0x100 bytes of RAM eg 0x3b means the complete 0x3b00 - 0x3bff range with 0x3b00 - 0x3b0f being voice 1 etc)
@@ -367,25 +367,25 @@ WRITE8_MEMBER(xavix_state::sound_regbase_w)
 
 /* 75f8, 75f9 - misc unknown sound regs*/
 
-READ8_MEMBER(xavix_state::sound_75f8_r)
+uint8_t xavix_state::sound_75f8_r()
 {
 	LOG("%s: sound_75f8_r\n", machine().describe_context());
 	return m_unk_snd75f8;
 }
 
-WRITE8_MEMBER(xavix_state::sound_75f8_w)
+void xavix_state::sound_75f8_w(uint8_t data)
 {
 	m_unk_snd75f8 = data;
 	LOG("%s: sound_75f8_w %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(xavix_state::sound_75f9_r)
+uint8_t xavix_state::sound_75f9_r()
 {
 	LOG("%s: sound_75f9_r\n", machine().describe_context());
 	return m_unk_snd75f9;
 }
 
-WRITE8_MEMBER(xavix_state::sound_75f9_w)
+void xavix_state::sound_75f9_w(uint8_t data)
 {
 	m_unk_snd75f9 = data;
 	LOG("%s: sound_75f9_w %02x\n", machine().describe_context().c_str(), data);
@@ -393,49 +393,49 @@ WRITE8_MEMBER(xavix_state::sound_75f9_w)
 
 /* 75fa, 75fb, 75fc, 75fd - timers?? generate interrupts?? */
 
-READ8_MEMBER(xavix_state::sound_timer0_r)
+uint8_t xavix_state::sound_timer0_r()
 {
 	LOG("%s: sound_timer0_r\n", machine().describe_context());
 	return m_sndtimer[0];
 }
 
-WRITE8_MEMBER(xavix_state::sound_timer0_w)
+void xavix_state::sound_timer0_w(uint8_t data)
 {
 	m_sndtimer[0] = data;
 	LOG("%s: sound_timer0_w %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(xavix_state::sound_timer1_r)
+uint8_t xavix_state::sound_timer1_r()
 {
 	LOG("%s: sound_timer1_r\n", machine().describe_context());
 	return m_sndtimer[1];
 }
 
-WRITE8_MEMBER(xavix_state::sound_timer1_w)
+void xavix_state::sound_timer1_w(uint8_t data)
 {
 	m_sndtimer[1] = data;
 	LOG("%s: sound_timer1_w %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(xavix_state::sound_timer2_r)
+uint8_t xavix_state::sound_timer2_r()
 {
 	LOG("%s: sound_timer2_r\n", machine().describe_context());
 	return m_sndtimer[2];
 }
 
-WRITE8_MEMBER(xavix_state::sound_timer2_w)
+void xavix_state::sound_timer2_w(uint8_t data)
 {
 	m_sndtimer[2] = data;
 	LOG("%s: sound_timer2_w %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(xavix_state::sound_timer3_r)
+uint8_t xavix_state::sound_timer3_r()
 {
 	LOG("%s: sound_timer3_r\n", machine().describe_context());
 	return m_sndtimer[3];
 }
 
-WRITE8_MEMBER(xavix_state::sound_timer3_w) // this one is used by ekara (uk carts)  , enabled with 08 in 75fe
+void xavix_state::sound_timer3_w(uint8_t data) // this one is used by ekara (uk carts)  , enabled with 08 in 75fe
 {
 	m_sndtimer[3] = data;
 	LOG("%s: sound_timer3_w %02x\n", machine().describe_context(), data);
@@ -443,7 +443,7 @@ WRITE8_MEMBER(xavix_state::sound_timer3_w) // this one is used by ekara (uk cart
 
 /* 75fe - some kind of IRQ status / Timer Status? */
 
-READ8_MEMBER(xavix_state::sound_irqstatus_r)
+uint8_t xavix_state::sound_irqstatus_r()
 {
 	// rad_rh checks this after doing something that looks like an irq ack
 	// the UK ekara sets check the upper bit to see if the interrupt is from the sound timer (rather than checking interrupt source register)
@@ -451,7 +451,7 @@ READ8_MEMBER(xavix_state::sound_irqstatus_r)
 	return m_sound_irqstatus;
 }
 
-WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
+void xavix_state::sound_irqstatus_w(uint8_t data)
 {
 	// these look like irq ack bits, 4 sources?
 	// related to sound_timer0_w ,  sound_timer1_w,  sound_timer2_w,  sound_timer3_w  ?
@@ -514,7 +514,7 @@ WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
 
 
 
-WRITE8_MEMBER(xavix_state::sound_75ff_w)
+void xavix_state::sound_75ff_w(uint8_t data)
 {
 	m_unk_snd75ff = data;
 	LOG("%s: sound_75ff_w %02x\n", machine().describe_context(), data);

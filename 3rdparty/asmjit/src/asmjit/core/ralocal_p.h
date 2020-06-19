@@ -198,12 +198,13 @@ public:
   //! Decides on register assignment.
   uint32_t decideOnAssignment(uint32_t group, uint32_t workId, uint32_t assignedId, uint32_t allocableRegs) const noexcept;
 
-  //! Decides on whether to MOVE or SPILL the given WorkReg.
+  //! Decides on whether to MOVE or SPILL the given WorkReg, because it's allocated
+  //! in a physical register that have to be used by another WorkReg.
   //!
   //! The function must return either `RAAssignment::kPhysNone`, which means that
-  //! the WorkReg should be spilled, or a valid physical register ID, which means
-  //! that the register should be moved to that physical register instead.
-  uint32_t decideOnUnassignment(uint32_t group, uint32_t workId, uint32_t assignedId, uint32_t allocableRegs) const noexcept;
+  //! the WorkReg of `workId` should be spilled, or a valid physical register ID,
+  //! which means that the register should be moved to that physical register instead.
+  uint32_t decideOnReassignment(uint32_t group, uint32_t workId, uint32_t assignedId, uint32_t allocableRegs) const noexcept;
 
   //! Decides on best spill given a register mask `spillableRegs`
   uint32_t decideOnSpillFor(uint32_t group, uint32_t workId, uint32_t spillableRegs, uint32_t* spillWorkId) const noexcept;

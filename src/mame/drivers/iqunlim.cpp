@@ -105,14 +105,14 @@ DEVICE_IMAGE_LOAD_MEMBER(iqunlim_state::cart_load)
 
 void iqunlim_state::iqunlim(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2); // DragonBall EZ (MC68EZ328) (68k core) (is the xtal correct? this was from the other hardware)
+	// Basic machine hardware
+	M68000(config, m_maincpu, XTAL(32'000'000)/2); // DragonBall EZ (MC68EZ328, 68k core) (Is the xtal correct? This was from the other hardware)
 	m_maincpu->set_addrmap(AS_PROGRAM, &iqunlim_state::iqunlim_mem);
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not accurate
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
 	screen.set_screen_update(FUNC(iqunlim_state::screen_update));
@@ -130,8 +130,8 @@ ROM_START( iqunlim )
 ROM_END
 
 ROM_START( iqunlimgr )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD16_WORD_SWAP( "27-06126-007.bin", 0x000000, 0x200000, BAD_DUMP CRC(af38c743) SHA1(5b91748536905812e6de7145638699acb375865a) ) // Seems underdumped
+	ROM_REGION(0x400000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "27-06126-007.bin", 0x000000, 0x400000, CRC(2e99cfef) SHA1(790869ffcf7fd666def8ff57fce0691062b3cec5) )
 ROM_END
 
 COMP( 1995, iqunlim,         0, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited",           MACHINE_IS_SKELETON) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.

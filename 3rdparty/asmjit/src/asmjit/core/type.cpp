@@ -31,14 +31,62 @@ ASMJIT_BEGIN_NAMESPACE
 // [asmjit::Type]
 // ============================================================================
 
-const Type::TypeData Type::_typeData = {
-  #define VALUE(X) Type::BaseOfTypeId<X>::kTypeId
+namespace Type {
+
+template<uint32_t TYPE_ID>
+struct BaseOfTypeId {
+  static constexpr uint32_t kTypeId =
+    isBase  (TYPE_ID) ? TYPE_ID :
+    isMask8 (TYPE_ID) ? kIdU8   :
+    isMask16(TYPE_ID) ? kIdU16  :
+    isMask32(TYPE_ID) ? kIdU32  :
+    isMask64(TYPE_ID) ? kIdU64  :
+    isMmx32 (TYPE_ID) ? kIdI32  :
+    isMmx64 (TYPE_ID) ? kIdI64  :
+    isVec32 (TYPE_ID) ? TYPE_ID + kIdI8 - _kIdVec32Start  :
+    isVec64 (TYPE_ID) ? TYPE_ID + kIdI8 - _kIdVec64Start  :
+    isVec128(TYPE_ID) ? TYPE_ID + kIdI8 - _kIdVec128Start :
+    isVec256(TYPE_ID) ? TYPE_ID + kIdI8 - _kIdVec256Start :
+    isVec512(TYPE_ID) ? TYPE_ID + kIdI8 - _kIdVec512Start : 0;
+};
+
+template<uint32_t TYPE_ID>
+struct SizeOfTypeId {
+  static constexpr uint32_t kTypeSize =
+    isInt8   (TYPE_ID) ?  1 :
+    isUInt8  (TYPE_ID) ?  1 :
+    isInt16  (TYPE_ID) ?  2 :
+    isUInt16 (TYPE_ID) ?  2 :
+    isInt32  (TYPE_ID) ?  4 :
+    isUInt32 (TYPE_ID) ?  4 :
+    isInt64  (TYPE_ID) ?  8 :
+    isUInt64 (TYPE_ID) ?  8 :
+    isFloat32(TYPE_ID) ?  4 :
+    isFloat64(TYPE_ID) ?  8 :
+    isFloat80(TYPE_ID) ? 10 :
+    isMask8  (TYPE_ID) ?  1 :
+    isMask16 (TYPE_ID) ?  2 :
+    isMask32 (TYPE_ID) ?  4 :
+    isMask64 (TYPE_ID) ?  8 :
+    isMmx32  (TYPE_ID) ?  4 :
+    isMmx64  (TYPE_ID) ?  8 :
+    isVec32  (TYPE_ID) ?  4 :
+    isVec64  (TYPE_ID) ?  8 :
+    isVec128 (TYPE_ID) ? 16 :
+    isVec256 (TYPE_ID) ? 32 :
+    isVec512 (TYPE_ID) ? 64 : 0;
+};
+
+const TypeData _typeData = {
+  #define VALUE(X) BaseOfTypeId<X>::kTypeId
   { ASMJIT_LOOKUP_TABLE_256(VALUE, 0) },
   #undef VALUE
 
-  #define VALUE(X) Type::SizeOfTypeId<X>::kTypeSize
+  #define VALUE(X) SizeOfTypeId<X>::kTypeSize
   { ASMJIT_LOOKUP_TABLE_256(VALUE, 0) }
   #undef VALUE
 };
+
+} // {Type}
 
 ASMJIT_END_NAMESPACE

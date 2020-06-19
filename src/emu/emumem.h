@@ -1150,8 +1150,6 @@ public:
 private:
 	address_space *             m_space;
 
-	int                         m_notifier_id;             // id to remove the notifier on destruction
-
 	offs_t                      m_addrmask;                // address mask
 	offs_t                      m_addrstart_r;             // minimum valid address for reading
 	offs_t                      m_addrend_r;               // maximum valid address for reading
@@ -1887,25 +1885,6 @@ private:
 //  MACROS
 //**************************************************************************
 
-// space read/write handler function macros
-#define READ8_MEMBER(name)              u8     name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 mem_mask)
-#define WRITE8_MEMBER(name)             void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 data, ATTR_UNUSED u8 mem_mask)
-#define READ16_MEMBER(name)             u16    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u16 mem_mask)
-#define WRITE16_MEMBER(name)            void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u16 data, ATTR_UNUSED u16 mem_mask)
-#define READ32_MEMBER(name)             u32    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u32 mem_mask)
-#define WRITE32_MEMBER(name)            void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u32 data, ATTR_UNUSED u32 mem_mask)
-#define READ64_MEMBER(name)             u64    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u64 mem_mask)
-#define WRITE64_MEMBER(name)            void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u64 data, ATTR_UNUSED u64 mem_mask)
-
-#define DECLARE_READ8_MEMBER(name)      u8     name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 mem_mask = 0xff)
-#define DECLARE_WRITE8_MEMBER(name)     void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 data, ATTR_UNUSED u8 mem_mask = 0xff)
-#define DECLARE_READ16_MEMBER(name)     u16    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u16 mem_mask = 0xffff)
-#define DECLARE_WRITE16_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u16 data, ATTR_UNUSED u16 mem_mask = 0xffff)
-#define DECLARE_READ32_MEMBER(name)     u32    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u32 mem_mask = 0xffffffff)
-#define DECLARE_WRITE32_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u32 data, ATTR_UNUSED u32 mem_mask = 0xffffffff)
-#define DECLARE_READ64_MEMBER(name)     u64    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u64 mem_mask = 0xffffffffffffffffU)
-#define DECLARE_WRITE64_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u64 data, ATTR_UNUSED u64 mem_mask = 0xffffffffffffffffU)
-
 
 // helper macro for merging data with the memory mask
 #define COMBINE_DATA(varptr)            (*(varptr) = (*(varptr) & ~mem_mask) | (data & mem_mask))
@@ -2004,18 +1983,18 @@ set(address_space *space, std::pair<void *, void *> rw)
 	m_space = space;
 	m_addrmask = space->addrmask();
 
-	m_notifier_id = space->add_change_notifier([this](read_or_write mode) {
-												  if(u32(mode) & u32(read_or_write::READ)) {
-													  m_addrend_r = 0;
-													  m_addrstart_r = 1;
-													  m_cache_r = nullptr;
-												  }
-												  if(u32(mode) & u32(read_or_write::WRITE)) {
-													  m_addrend_w = 0;
-													  m_addrstart_w = 1;
-													  m_cache_w = nullptr;
-												  }
-											  });
+	space->add_change_notifier([this](read_or_write mode) {
+								   if(u32(mode) & u32(read_or_write::READ)) {
+									   m_addrend_r = 0;
+									   m_addrstart_r = 1;
+									   m_cache_r = nullptr;
+								   }
+								   if(u32(mode) & u32(read_or_write::WRITE)) {
+									   m_addrend_w = 0;
+									   m_addrstart_w = 1;
+									   m_cache_w = nullptr;
+								   }
+							   });
 	m_root_read  = (handler_entry_read <Width, AddrShift, Endian> *)(rw.first);
 	m_root_write = (handler_entry_write<Width, AddrShift, Endian> *)(rw.second);
 
@@ -2032,8 +2011,6 @@ template<int Width, int AddrShift, endianness_t Endian>
 emu::detail::memory_access_cache<Width, AddrShift, Endian>::
 ~memory_access_cache()
 {
-	if(m_space)
-		m_space->remove_change_notifier(m_notifier_id);
 }
 
 #endif  /* MAME_EMU_EMUMEM_H */

@@ -242,7 +242,7 @@ void st_state::fdc_dma_transfer()
 //  fdc_data_r -
 //-------------------------------------------------
 
-READ16_MEMBER( st_state::fdc_data_r )
+uint16_t st_state::fdc_data_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -274,7 +274,7 @@ READ16_MEMBER( st_state::fdc_data_r )
 //  fdc_data_w -
 //-------------------------------------------------
 
-WRITE16_MEMBER( st_state::fdc_data_w )
+void st_state::fdc_data_w(offs_t offset, uint16_t data)
 {
 	if (m_fdc_mode & DMA_MODE_SECTOR_COUNT)
 	{
@@ -316,7 +316,7 @@ WRITE16_MEMBER( st_state::fdc_data_w )
 //  dma_status_r -
 //-------------------------------------------------
 
-READ16_MEMBER( st_state::dma_status_r )
+uint16_t st_state::dma_status_r()
 {
 	uint16_t data = 0;
 
@@ -337,7 +337,7 @@ READ16_MEMBER( st_state::dma_status_r )
 //  dma_mode_w -
 //-------------------------------------------------
 
-WRITE16_MEMBER( st_state::dma_mode_w )
+void st_state::dma_mode_w(uint16_t data)
 {
 	if (LOG) logerror("DMA Mode %04x\n", data);
 
@@ -360,7 +360,7 @@ WRITE16_MEMBER( st_state::dma_mode_w )
 //  dma_counter_r -
 //-------------------------------------------------
 
-READ8_MEMBER( st_state::dma_counter_r )
+uint8_t st_state::dma_counter_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -385,7 +385,7 @@ READ8_MEMBER( st_state::dma_counter_r )
 //  dma_base_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( st_state::dma_base_w )
+void st_state::dma_base_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -416,7 +416,7 @@ WRITE8_MEMBER( st_state::dma_base_w )
 //  mmu_r -
 //-------------------------------------------------
 
-READ8_MEMBER( st_state::mmu_r )
+uint8_t st_state::mmu_r()
 {
 	return m_mmu;
 }
@@ -426,7 +426,7 @@ READ8_MEMBER( st_state::mmu_r )
 //  mmu_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( st_state::mmu_w )
+void st_state::mmu_w(uint8_t data)
 {
 	if (LOG) logerror("Memory Configuration Register: %02x\n", data);
 
@@ -434,13 +434,13 @@ WRITE8_MEMBER( st_state::mmu_w )
 }
 
 
-WRITE16_MEMBER( st_state::berr_w )
+void st_state::berr_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
-READ16_MEMBER( st_state::berr_r )
+uint16_t st_state::berr_r()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -712,14 +712,14 @@ void st_state::ikbd_port4_w(uint8_t data)
 //  fpu_r -
 //-------------------------------------------------
 
-READ16_MEMBER( megast_state::fpu_r )
+uint16_t megast_state::fpu_r()
 {
 	// HACK diagnostic cartridge wants to see this value
 	return 0x0802;
 }
 
 
-WRITE16_MEMBER( megast_state::fpu_w )
+void megast_state::fpu_w(uint16_t data)
 {
 }
 
@@ -845,7 +845,7 @@ void ste_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 //  sound_dma_control_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ste_state::sound_dma_control_r )
+uint8_t ste_state::sound_dma_control_r()
 {
 	return m_dmasnd_ctrl;
 }
@@ -855,7 +855,7 @@ READ8_MEMBER( ste_state::sound_dma_control_r )
 //  sound_dma_base_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ste_state::sound_dma_base_r )
+uint8_t ste_state::sound_dma_base_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -882,7 +882,7 @@ READ8_MEMBER( ste_state::sound_dma_base_r )
 //  sound_dma_counter_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ste_state::sound_dma_counter_r )
+uint8_t ste_state::sound_dma_counter_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -909,7 +909,7 @@ READ8_MEMBER( ste_state::sound_dma_counter_r )
 //  sound_dma_end_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ste_state::sound_dma_end_r )
+uint8_t ste_state::sound_dma_end_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -936,7 +936,7 @@ READ8_MEMBER( ste_state::sound_dma_end_r )
 //  sound_mode_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ste_state::sound_mode_r )
+uint8_t ste_state::sound_mode_r()
 {
 	return m_dmasnd_mode;
 }
@@ -946,7 +946,7 @@ READ8_MEMBER( ste_state::sound_mode_r )
 //  sound_dma_control_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ste_state::sound_dma_control_w )
+void ste_state::sound_dma_control_w(uint8_t data)
 {
 	m_dmasnd_ctrl = data & 0x03;
 
@@ -970,7 +970,7 @@ WRITE8_MEMBER( ste_state::sound_dma_control_w )
 //  sound_dma_base_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ste_state::sound_dma_base_w )
+void ste_state::sound_dma_base_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -996,7 +996,7 @@ WRITE8_MEMBER( ste_state::sound_dma_base_w )
 //  sound_dma_end_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ste_state::sound_dma_end_w )
+void ste_state::sound_dma_end_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1022,7 +1022,7 @@ WRITE8_MEMBER( ste_state::sound_dma_end_w )
 //  sound_mode_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ste_state::sound_mode_w )
+void ste_state::sound_mode_w(uint8_t data)
 {
 	m_dmasnd_mode = data & 0x83;
 }
@@ -1084,7 +1084,7 @@ void ste_state::microwire_tick()
 //  microwire_data_r -
 //-------------------------------------------------
 
-READ16_MEMBER( ste_state::microwire_data_r )
+uint16_t ste_state::microwire_data_r()
 {
 	return m_mw_data;
 }
@@ -1094,7 +1094,7 @@ READ16_MEMBER( ste_state::microwire_data_r )
 //  microwire_data_w -
 //-------------------------------------------------
 
-WRITE16_MEMBER( ste_state::microwire_data_w )
+void ste_state::microwire_data_w(uint16_t data)
 {
 	if (!m_microwire_timer->enabled())
 	{
@@ -1108,7 +1108,7 @@ WRITE16_MEMBER( ste_state::microwire_data_w )
 //  microwire_mask_r -
 //-------------------------------------------------
 
-READ16_MEMBER( ste_state::microwire_mask_r )
+uint16_t ste_state::microwire_mask_r()
 {
 	return m_mw_mask;
 }
@@ -1118,7 +1118,7 @@ READ16_MEMBER( ste_state::microwire_mask_r )
 //  microwire_mask_w -
 //-------------------------------------------------
 
-WRITE16_MEMBER( ste_state::microwire_mask_w )
+void ste_state::microwire_mask_w(uint16_t data)
 {
 	if (!m_microwire_timer->enabled())
 	{
@@ -1136,7 +1136,7 @@ WRITE16_MEMBER( ste_state::microwire_mask_w )
 //  cache_r -
 //-------------------------------------------------
 
-READ16_MEMBER( megaste_state::cache_r )
+uint16_t megaste_state::cache_r()
 {
 	return m_cache;
 }
@@ -1146,7 +1146,7 @@ READ16_MEMBER( megaste_state::cache_r )
 //  cache_w -
 //-------------------------------------------------
 
-WRITE16_MEMBER( megaste_state::cache_w )
+void megaste_state::cache_w(uint16_t data)
 {
 	m_cache = data;
 
@@ -1163,7 +1163,7 @@ WRITE16_MEMBER( megaste_state::cache_w )
 //  config_r -
 //-------------------------------------------------
 
-READ16_MEMBER( stbook_state::config_r )
+uint16_t stbook_state::config_r()
 {
 	/*
 
@@ -1196,7 +1196,7 @@ READ16_MEMBER( stbook_state::config_r )
 //  lcd_control_w -
 //-------------------------------------------------
 
-WRITE16_MEMBER( stbook_state::lcd_control_w )
+void stbook_state::lcd_control_w(uint16_t data)
 {
 	/*
 

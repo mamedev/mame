@@ -45,7 +45,7 @@ void msx_cart_super_swangi_device::initialize_cartridge()
 {
 	if (get_rom_size() < 0x10000)
 	{
-		fatalerror("rtype: Invalid ROM size\n");
+		fatalerror("super_swangi: Invalid ROM size\n");
 	}
 
 	restore_banks();

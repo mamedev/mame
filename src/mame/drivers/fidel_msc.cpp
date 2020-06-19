@@ -16,7 +16,7 @@ Hardware notes:
 
 released modules, * denotes not dumped yet:
 - CAC: Challenger Advanced Chess
-- *CBO: Challenger Book Openings
+- CBO: Challenger Book Openings
 - *CGG: Challenger Greatest Games
 
 As noted in the hash file: The modules have 2 programs in them, one for Z8

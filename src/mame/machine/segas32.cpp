@@ -51,7 +51,7 @@ void segas32_v25_state::decrypt_protrom()
 
 
 #if 0 // simulation
-READ16_MEMBER(segas32_state::ga2_sprite_protection_r)
+uint16_t segas32_state::ga2_sprite_protection_r(offs_t offset)
 {
 	static const uint16_t prot[16] =
 	{
@@ -68,7 +68,7 @@ READ16_MEMBER(segas32_state::ga2_sprite_protection_r)
 	return prot[offset];
 }
 
-READ16_MEMBER(segas32_state::ga2_wakeup_protection_r)
+uint16_t segas32_state::ga2_wakeup_protection_r(offs_t offset)
 {
 	static const char prot[] =
 		"wake up! GOLDEN AXE The Revenge of Death-Adder! ";
@@ -90,7 +90,7 @@ READ16_MEMBER(segas32_state::ga2_wakeup_protection_r)
 #define CURRENT_LEVEL_STATUS        0xF0BC
 #define LEVEL_ORDER_ARRAY       0x263A
 
-WRITE16_MEMBER(segas32_state::sonic_level_load_protection)
+void segas32_state::sonic_level_load_protection(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t level;
 //Perform write
@@ -124,7 +124,7 @@ WRITE16_MEMBER(segas32_state::sonic_level_load_protection)
 
 // the protection board on many system32 games has full dma/bus access
 // and can write things into work RAM.  we simulate that here for burning rival.
-READ16_MEMBER(segas32_state::brival_protection_r)
+uint16_t segas32_state::brival_protection_r(offs_t offset, uint16_t mem_mask)
 {
 	if (mem_mask == 0xffff) // only trap on word-wide reads
 	{
@@ -140,7 +140,7 @@ READ16_MEMBER(segas32_state::brival_protection_r)
 	return m_system32_workram[0xba00/2 + offset];
 }
 
-WRITE16_MEMBER(segas32_state::brival_protection_w)
+void segas32_state::brival_protection_w(offs_t offset, uint16_t data)
 {
 	static const int protAddress[6][2] =
 	{
@@ -211,14 +211,14 @@ void segas32_state::darkedge_fd1149_vblank()
 	}
 }
 
-WRITE16_MEMBER(segas32_state::darkedge_protection_w)
+void segas32_state::darkedge_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s:darkedge_prot_w(%06X) = %04X & %04X\n",
 		machine().describe_context(), 0xa00000 + 2*offset, data, mem_mask);
 }
 
 
-READ16_MEMBER(segas32_state::darkedge_protection_r)
+uint16_t segas32_state::darkedge_protection_r(offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s:darkedge_prot_r(%06X) & %04X\n",
 		machine().describe_context(), 0xa00000 + 2*offset, mem_mask);
@@ -251,13 +251,13 @@ void segas32_state::f1lap_fd1149_vblank()
  ******************************************************************************
  ******************************************************************************/
 
-WRITE16_MEMBER(segas32_state::dbzvrvs_protection_w)
+void segas32_state::dbzvrvs_protection_w(address_space &space, uint16_t data)
 {
 	space.write_word( 0x2080c8, space.read_word( 0x200044 ) );
 }
 
 
-READ16_MEMBER(segas32_state::dbzvrvs_protection_r)
+uint16_t segas32_state::dbzvrvs_protection_r()
 {
 	return 0xffff;
 }
@@ -294,7 +294,7 @@ const uint8_t segas32_v25_state::arf_opcode_table[256] = {
 #undef xxxx
 
 #if 0 // old simulation
-READ16_MEMBER(segas32_state::arabfgt_protection_r)
+uint16_t segas32_state::arabfgt_protection_r()
 {
 	int PC = m_maincpu->pc();
 	int cmpVal;
@@ -314,11 +314,11 @@ READ16_MEMBER(segas32_state::arabfgt_protection_r)
 	return 0;
 }
 
-WRITE16_MEMBER(segas32_state::arabfgt_protection_w)
+void segas32_state::arabfgt_protection_w(uint16_t data)
 {
 }
 
-READ16_MEMBER(segas32_state::arf_wakeup_protection_r)
+uint16_t segas32_state::arf_wakeup_protection_r(offs_t offset)
 {
 	static const char prot[] =
 		"wake up! ARF!                                   ";
@@ -331,7 +331,7 @@ READ16_MEMBER(segas32_state::arf_wakeup_protection_r)
   The J.League 1994 (Japan)
  ******************************************************************************
  ******************************************************************************/
-WRITE16_MEMBER(segas32_state::jleague_protection_w)
+void segas32_state::jleague_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_system32_workram[0xf700/2 + offset ] );
 
@@ -374,7 +374,7 @@ WRITE16_MEMBER(segas32_state::jleague_protection_w)
     maybe the standalone board was for dev only? nop the 3 bytes at 0x06023A for standalone. (centred intro text)
 */
 
-READ16_MEMBER(segas32_state::arescue_dsp_r)
+uint16_t segas32_state::arescue_dsp_r(offs_t offset)
 {
 	if( offset == 4/2 )
 	{
@@ -403,7 +403,7 @@ READ16_MEMBER(segas32_state::arescue_dsp_r)
 	return m_arescue_dsp_io[offset];
 }
 
-WRITE16_MEMBER(segas32_state::arescue_dsp_w)
+void segas32_state::arescue_dsp_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_arescue_dsp_io[offset]);
 }

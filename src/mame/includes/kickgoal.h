@@ -48,17 +48,17 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(fgram_w);
-	DECLARE_WRITE16_MEMBER(bgram_w);
-	DECLARE_WRITE16_MEMBER(bg2ram_w);
-	DECLARE_WRITE16_MEMBER(actionhw_snd_w);
+	void fgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bg2ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void actionhw_snd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void soundio_port_a_w(uint8_t data);
-	uint8_t soundio_port_b_r();
-	void soundio_port_b_w(uint8_t data);
-	uint8_t soundio_port_c_r();
-	void soundio_port_c_w(uint8_t data);
-	DECLARE_WRITE16_MEMBER(to_pic_w);
+	void soundio_port_a_w(u8 data);
+	u8 soundio_port_b_r();
+	void soundio_port_b_w(u8 data);
+	u8 soundio_port_c_r();
+	void soundio_port_c_w(u8 data);
+	void to_pic_w(u16 data);
 
 	TILE_GET_INFO_MEMBER(get_kickgoal_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

@@ -41,8 +41,8 @@ private:
 	void portb_w(u8 data);
 	u8 porta_r();
 	u8 portb_r();
-	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_READ8_MEMBER(unk_r);
+	void unk_w(u8 data);
+	u8 unk_r();
 	void maincpu_map(address_map &map);
 
 	u8 m_t_c;
@@ -105,13 +105,13 @@ u8 spirit76_state::portb_r()
 }
 
 // writes here once at start
-WRITE8_MEMBER( spirit76_state::unk_w )
+void spirit76_state::unk_w(u8 data)
 {
 	printf("UNK PORT=%X\n",data);
 }
 
 // continual read in irq routine
-READ8_MEMBER( spirit76_state::unk_r )
+u8 spirit76_state::unk_r()
 {
 	return 0;
 }

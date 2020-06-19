@@ -111,10 +111,10 @@ void nubus_mac8390_device::device_start()
 
 	// TODO: move 24-bit mirroring down into nubus.c
 	uint32_t ofs_24bit = slotno()<<20;
-	nubus().install_device(slotspace+0xd0000, slotspace+0xdffff, read8_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_r)), write8_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_w)));
-	nubus().install_device(slotspace+0xe0000, slotspace+0xe003f, read32_delegate(*this, FUNC(nubus_mac8390_device::en_r)), write32_delegate(*this, FUNC(nubus_mac8390_device::en_w)));
-	nubus().install_device(slotspace+0xd0000+ofs_24bit, slotspace+0xdffff+ofs_24bit, read8_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_r)), write8_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_w)));
-	nubus().install_device(slotspace+0xe0000+ofs_24bit, slotspace+0xe003f+ofs_24bit, read32_delegate(*this, FUNC(nubus_mac8390_device::en_r)), write32_delegate(*this, FUNC(nubus_mac8390_device::en_w)));
+	nubus().install_device(slotspace+0xd0000, slotspace+0xdffff, read8sm_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_r)), write8sm_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_w)));
+	nubus().install_device(slotspace+0xe0000, slotspace+0xe003f, read32s_delegate(*this, FUNC(nubus_mac8390_device::en_r)), write32s_delegate(*this, FUNC(nubus_mac8390_device::en_w)));
+	nubus().install_device(slotspace+0xd0000+ofs_24bit, slotspace+0xdffff+ofs_24bit, read8sm_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_r)), write8sm_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_w)));
+	nubus().install_device(slotspace+0xe0000+ofs_24bit, slotspace+0xe003f+ofs_24bit, read32s_delegate(*this, FUNC(nubus_mac8390_device::en_r)), write32s_delegate(*this, FUNC(nubus_mac8390_device::en_w)));
 }
 
 //-------------------------------------------------
@@ -124,34 +124,31 @@ void nubus_mac8390_device::device_start()
 void nubus_mac8390_device::device_reset()
 {
 	m_dp83902->dp8390_reset(0);
-	m_dp83902->dp8390_cs(0);
 	memcpy(m_prom, m_dp83902->get_mac(), 6);
 }
 
-WRITE8_MEMBER( nubus_mac8390_device::asntm3b_ram_w )
+void nubus_mac8390_device::asntm3b_ram_w(offs_t offset, uint8_t data)
 {
 //    printf("MC3NB: CPU wrote %02x to RAM @ %x\n", data, offset);
 	m_ram[offset] = data;
 }
 
-READ8_MEMBER( nubus_mac8390_device::asntm3b_ram_r )
+uint8_t nubus_mac8390_device::asntm3b_ram_r(offs_t offset)
 {
 //    printf("MC3NB: CPU read %02x @ RAM %x\n", m_ram[offset], offset);
 	return m_ram[offset];
 }
 
-WRITE32_MEMBER( nubus_mac8390_device::en_w )
+void nubus_mac8390_device::en_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (mem_mask == 0xff000000)
 	{
 //        printf("%02x to 8390 @ %x\n", data>>24, 0xf-offset);
-		m_dp83902->dp8390_w(0xf-offset, data>>24);
+		m_dp83902->cs_write(0xf-offset, data>>24);
 	}
 	else if (mem_mask == 0xffff0000)
 	{
-		m_dp83902->dp8390_cs(1);
-		m_dp83902->dp8390_w(0xf-offset, data>>16);
-		m_dp83902->dp8390_cs(0);
+		m_dp83902->remote_write(data>>16);
 	}
 	else
 	{
@@ -159,17 +156,15 @@ WRITE32_MEMBER( nubus_mac8390_device::en_w )
 	}
 }
 
-READ32_MEMBER( nubus_mac8390_device::en_r )
+uint32_t nubus_mac8390_device::en_r(offs_t offset, uint32_t mem_mask)
 {
 	if (mem_mask == 0xff000000)
 	{
-		return (m_dp83902->dp8390_r(0xf-offset)<<24);
+		return (m_dp83902->cs_read(0xf-offset)<<24);
 	}
 	else if (mem_mask == 0xffff0000)
 	{
-		m_dp83902->dp8390_cs(1);
-		return (m_dp83902->dp8390_r(0xf-offset)<<16);
-		m_dp83902->dp8390_cs(0);
+		return (m_dp83902->remote_read()<<16);
 	}
 	else
 	{

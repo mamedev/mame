@@ -18,9 +18,8 @@
 
 TILE_GET_INFO_MEMBER(atetris_state::get_tile_info)
 {
-	uint8_t *videoram = m_videoram;
-	int code = videoram[tile_index * 2] | ((videoram[tile_index * 2 + 1] & 7) << 8);
-	int color = (videoram[tile_index * 2 + 1] & 0xf0) >> 4;
+	int code = m_videoram[tile_index * 2] | ((m_videoram[tile_index * 2 + 1] & 7) << 8);
+	int color = (m_videoram[tile_index * 2 + 1] & 0xf0) >> 4;
 
 	tileinfo.set(0, code, color, 0);
 }
@@ -33,11 +32,9 @@ TILE_GET_INFO_MEMBER(atetris_state::get_tile_info)
  *
  *************************************/
 
-WRITE8_MEMBER(atetris_state::videoram_w)
+void atetris_state::videoram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
-
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 

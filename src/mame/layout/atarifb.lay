@@ -3,6 +3,9 @@
 license:CC0
 -->
 <mamelayout version="2">
+
+<!-- simplified layout for the leds, play-select leds would be on 1.0 and 1.1 -->
+
 	<element name="sweep" defstate="0">
 		<rect state="1">
 			<color red="0.0" green="0.0" blue="0.0" />
@@ -43,32 +46,32 @@ license:CC0
 		</text>
 	</element>
 
-	<view name="Lamps">
+	<view name="Internal Layout">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<bezel name="ledleft0" element="sweep">
+		<bezel name="0.0" element="sweep">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
 		</bezel>
-		<bezel name="ledleft1" element="keeper">
+		<bezel name="0.1" element="keeper">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
 		</bezel>
-		<bezel name="ledleft2" element="bomb">
+		<bezel name="0.2" element="bomb">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
 		</bezel>
-		<bezel name="ledleft3" element="down">
+		<bezel name="0.3" element="down">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
 		</bezel>
-		<bezel name="ledright0" element="sweep">
+		<bezel name="2.0" element="sweep">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
 		</bezel>
-		<bezel name="ledright1" element="keeper">
+		<bezel name="2.1" element="keeper">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
 		</bezel>
-		<bezel name="ledright2" element="bomb">
+		<bezel name="2.2" element="bomb">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
 		</bezel>
-		<bezel name="ledright3" element="down">
+		<bezel name="2.3" element="down">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
 		</bezel>
 	</view>

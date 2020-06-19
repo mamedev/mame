@@ -27,6 +27,8 @@
 // http://de.wikipedia.org/wiki/RIFF_WAVE
 //
 
+using arena = plib::aligned_arena;
+
 class wav_t
 {
 public:
@@ -75,7 +77,7 @@ public:
 	void write(const T &val)
 	{
 		static_assert(sizeof(std::ostream::char_type) == 1, "char_type size must be 1");
-		auto ptr(reinterpret_cast<const std::ostream::char_type *>(&val));
+		const auto *ptr(reinterpret_cast<const std::ostream::char_type *>(&val));
 		m_f.write(ptr, sizeof(T));
 	}
 
@@ -216,7 +218,7 @@ public:
 		return success;
 	}
 
-	void process(std::vector<plib::unique_ptr<std::istream>> &is)
+	void process(std::vector<std::unique_ptr<std::istream>> &is)
 	{
 		std::vector<plib::putf8_reader> readers;
 		for (auto &i : is)
@@ -644,7 +646,7 @@ private:
 	plib::option_example   opt_ex1;
 	plib::option_example   opt_ex2;
 	plib::option_example   opt_ex3;
-	std::vector<plib::unique_ptr<std::istream>> m_instrms;
+	std::vector<std::unique_ptr<std::istream>> m_instrms;
 };
 
 void nlwav_app::convert_wav(std::ostream &ostrm, wav_t::format fmt)
@@ -653,10 +655,10 @@ void nlwav_app::convert_wav(std::ostream &ostrm, wav_t::format fmt)
 	double dt = plib::reciprocal(static_cast<double>(opt_rate()));
 	auto nchan = m_instrms.size();
 
-	auto wo = plib::make_unique<wavwriter>(ostrm, opt_out() != "-", fmt, nchan, opt_rate(), opt_amp());
-	auto ago = plib::make_unique<aggregator>(nchan, dt, aggregator::callback_type(&wavwriter::process, wo.get()));
-	auto fgo_hp = plib::make_unique<filter_hp>(opt_highpass(), opt_hpboost(), nchan, filter_hp::callback_type(&aggregator::process, ago.get()));
-	auto fgo_lp = plib::make_unique<filter_lp>(opt_lowpass(), nchan, filter_lp::callback_type(&filter_hp::process, fgo_hp.get()));
+	auto wo = plib::make_unique<wavwriter, arena>(ostrm, opt_out() != "-", fmt, nchan, opt_rate(), opt_amp());
+	auto ago = plib::make_unique<aggregator, arena>(nchan, dt, aggregator::callback_type(&wavwriter::process, wo.get()));
+	auto fgo_hp = plib::make_unique<filter_hp, arena>(opt_highpass(), opt_hpboost(), nchan, filter_hp::callback_type(&aggregator::process, ago.get()));
+	auto fgo_lp = plib::make_unique<filter_lp, arena>(opt_lowpass(), nchan, filter_lp::callback_type(&filter_hp::process, fgo_hp.get()));
 
 	auto topcb = log_processor::callback_type(&filter_lp::process, fgo_lp.get());
 
@@ -678,7 +680,7 @@ void nlwav_app::convert_wav(std::ostream &ostrm, wav_t::format fmt)
 void nlwav_app::convert_vcd(std::ostream &ostrm, vcdwriter::format_e format)
 {
 
-	plib::unique_ptr<vcdwriter> wo = plib::make_unique<vcdwriter>(ostrm, opt_args(),
+	arena::unique_ptr<vcdwriter> wo = plib::make_unique<vcdwriter, arena>(ostrm, opt_args(),
 		format, opt_high(), opt_low());
 	log_processor::callback_type agcb = log_processor::callback_type(&vcdwriter::process, wo.get());
 
@@ -700,7 +702,7 @@ void nlwav_app::convert_vcd(std::ostream &ostrm, vcdwriter::format_e format)
 void nlwav_app::convert_tab(std::ostream &ostrm)
 {
 
-	auto wo = plib::make_unique<tabwriter>(ostrm, opt_args(),
+	auto wo = plib::make_unique<tabwriter, arena>(ostrm, opt_args(),
 		opt_start(), opt_inc(), opt_samples());
 	log_processor::callback_type agcb = log_processor::callback_type(&tabwriter::process, wo.get());
 
@@ -718,12 +720,12 @@ pstring nlwav_app::usage()
 }
 
 template <typename F>
-static void open_ostream_and_exec(pstring fname, bool binary, F func)
+static void open_ostream_and_exec(const pstring &fname, bool binary, F func)
 {
 	if (fname != "-")
 	{
 		// FIXME: binary depends on format!
-		std::ofstream outstrm(plib::filesystem::u8path(fname),
+		plib::ofstream outstrm(plib::filesystem::u8path(fname),
 			binary ? (std::ios::out | std::ios::binary) : std::ios::out);
 		if (outstrm.fail())
 			throw plib::file_open_e(fname);
@@ -793,16 +795,16 @@ int nlwav_app::execute()
 	{
 		for (const auto &oi: opt_args())
 		{
-			plib::unique_ptr<std::istream> fin;
+			std::unique_ptr<std::istream> fin;
 			if (oi == "-")
 			{
-				auto temp(plib::make_unique<std::stringstream>());
+				auto temp(std::make_unique<std::stringstream>());
 				plib::copystream(*temp, std::cin);
 				fin = std::move(temp);
 			}
 			else
 			{
-				fin = plib::make_unique<std::ifstream>(plib::filesystem::u8path(oi), std::ios::in);
+				fin = std::make_unique<plib::ifstream>(plib::filesystem::u8path(oi), std::ios::in);
 				if (fin->fail())
 					throw plib::file_open_e(oi);
 			}

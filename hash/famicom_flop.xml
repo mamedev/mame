@@ -527,7 +527,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="dkong">
 		<description>Donkey Kong (Disk Writer)</description>
-		<year>1987</year>
+		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-DKD"/>
 		<info name="release" value="19880408"/>
@@ -1005,7 +1005,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 <!-- Save Disk Error -->
 	<software name="haokun" supported="no">
 		<description>Hao-kun no Fushigi na Tabi</description>
-		<year>1986</year>
+		<year>1987</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SQF-HFT"/>
 		<info name="release" value="19870501"/>
@@ -1128,7 +1128,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="kickchal">
 		<description>Kick Challenger Air Foot - Yasai no Kuni no Ashi Senshi</description>
-		<year>1988</year>
+		<year>1987</year>
 		<publisher>VAP</publisher>
 		<info name="serial" value="VAP-AFT"/>
 		<info name="release" value="19871120"/>

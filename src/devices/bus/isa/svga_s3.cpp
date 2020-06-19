@@ -87,22 +87,22 @@ void isa16_svga_s3_device::device_start()
 	m_isa->install_device(0x03b0, 0x03bf, read8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03b0_w)));
 	m_isa->install_device(0x03c0, 0x03cf, read8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03c0_w)));
 	m_isa->install_device(0x03d0, 0x03df, read8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(s3_vga_device::port_03d0_w)));
-	m_isa->install16_device(0x82e8, 0x82eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currenty_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currenty_w)));
-	m_isa->install16_device(0x86e8, 0x86eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currentx_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currentx_w)));
-	m_isa->install16_device(0x8ae8, 0x8aeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_desty_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_desty_w)));
-	m_isa->install16_device(0x8ee8, 0x8eeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_destx_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_destx_w)));
-	m_isa->install16_device(0x92e8, 0x92eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_line_error_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_line_error_w)));
-	m_isa->install16_device(0x96e8, 0x96eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_width_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_width_w)));
-	m_isa->install16_device(0x9ae8, 0x9aeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_gpstatus_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_cmd_w)));
-	m_isa->install16_device(0x9ee8, 0x9eeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_ssv_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_ssv_w)));
-	m_isa->install16_device(0xa2e8, 0xa2eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_bgcolour_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_bgcolour_w)));
-	m_isa->install16_device(0xa6e8, 0xa6eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_fgcolour_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_fgcolour_w)));
-	m_isa->install16_device(0xaae8, 0xaaeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_write_mask_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_write_mask_w)));
-	m_isa->install16_device(0xaee8, 0xaeeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_read_mask_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_read_mask_w)));
-	m_isa->install16_device(0xb6e8, 0xb6eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_backmix_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_backmix_w)));
-	m_isa->install16_device(0xbae8, 0xbaeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_foremix_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_foremix_w)));
-	m_isa->install16_device(0xbee8, 0xbeeb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_multifunc_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_multifunc_w)));
-	m_isa->install16_device(0xe2e8, 0xe2eb, read16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_pixel_xfer_r)), write16_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_pixel_xfer_w)));
+	m_isa->install16_device(0x82e8, 0x82eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currenty_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currenty_w)));
+	m_isa->install16_device(0x86e8, 0x86eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currentx_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_currentx_w)));
+	m_isa->install16_device(0x8ae8, 0x8aeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_desty_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_desty_w)));
+	m_isa->install16_device(0x8ee8, 0x8eeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_destx_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_destx_w)));
+	m_isa->install16_device(0x92e8, 0x92eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_line_error_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_line_error_w)));
+	m_isa->install16_device(0x96e8, 0x96eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_width_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_width_w)));
+	m_isa->install16_device(0x9ae8, 0x9aeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_gpstatus_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_cmd_w)));
+	m_isa->install16_device(0x9ee8, 0x9eeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_ssv_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_ssv_w)));
+	m_isa->install16_device(0xa2e8, 0xa2eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_bgcolour_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_bgcolour_w)));
+	m_isa->install16_device(0xa6e8, 0xa6eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_fgcolour_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_fgcolour_w)));
+	m_isa->install16_device(0xaae8, 0xaaeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_write_mask_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_write_mask_w)));
+	m_isa->install16_device(0xaee8, 0xaeeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_read_mask_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_read_mask_w)));
+	m_isa->install16_device(0xb6e8, 0xb6eb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_backmix_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_backmix_w)));
+	m_isa->install16_device(0xbae8, 0xbaeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_foremix_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_foremix_w)));
+	m_isa->install16_device(0xbee8, 0xbeeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_multifunc_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_multifunc_w)));
+	m_isa->install16_device(0xe2e8, 0xe2eb, read16sm_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_pixel_xfer_r)), write16sm_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_pixel_xfer_w)));
 
 	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(s3_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(s3_vga_device::mem_w)));
 }

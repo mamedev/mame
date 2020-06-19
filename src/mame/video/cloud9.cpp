@@ -52,7 +52,7 @@ void cloud9_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(cloud9_state::cloud9_paletteram_w)
+void cloud9_state::cloud9_paletteram_w(offs_t offset, uint8_t data)
 {
 	int bit0, bit1, bit2;
 	int r, g, b;
@@ -160,7 +160,7 @@ inline void cloud9_state::bitmode_autoinc(  )
  *
  *************************************/
 
-WRITE8_MEMBER(cloud9_state::cloud9_videoram_w)
+void cloud9_state::cloud9_videoram_w(offs_t offset, uint8_t data)
 {
 	/* direct writes to VRAM go through the write protect PROM as well */
 	cloud9_write_vram(offset, data, 0, 0);
@@ -174,7 +174,7 @@ WRITE8_MEMBER(cloud9_state::cloud9_videoram_w)
  *
  *************************************/
 
-READ8_MEMBER(cloud9_state::cloud9_bitmode_r)
+uint8_t cloud9_state::cloud9_bitmode_r()
 {
 	/* in bitmode, the address comes from the autoincrement latches */
 	uint16_t addr = (m_bitmode_addr[1] << 6) | (m_bitmode_addr[0] >> 2);
@@ -190,7 +190,7 @@ READ8_MEMBER(cloud9_state::cloud9_bitmode_r)
 }
 
 
-WRITE8_MEMBER(cloud9_state::cloud9_bitmode_w)
+void cloud9_state::cloud9_bitmode_w(uint8_t data)
 {
 	/* in bitmode, the address comes from the autoincrement latches */
 	uint16_t addr = (m_bitmode_addr[1] << 6) | (m_bitmode_addr[0] >> 2);
@@ -206,7 +206,7 @@ WRITE8_MEMBER(cloud9_state::cloud9_bitmode_w)
 }
 
 
-WRITE8_MEMBER(cloud9_state::cloud9_bitmode_addr_w)
+void cloud9_state::cloud9_bitmode_addr_w(offs_t offset, uint8_t data)
 {
 	/* write through to video RAM and also to the addressing latches */
 	cloud9_write_vram(offset, data, 0, 0);

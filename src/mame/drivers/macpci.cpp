@@ -39,6 +39,7 @@
 #include "emu.h"
 #include "includes/macpci.h"
 #include "cpu/powerpc/ppc.h"
+#include "cpu/mn1880/mn1880.h"
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
 #include "emupal.h"
@@ -46,14 +47,14 @@
 #include "softlist.h"
 #include "speaker.h"
 
-READ64_MEMBER( macpci_state::unk1_r )
+uint64_t macpci_state::unk1_r()
 {
 	m_unk1_test ^= 0x0400; //PC=ff808760
 
 	return m_unk1_test << 16;
 }
 
-READ64_MEMBER( macpci_state::unk2_r )
+uint64_t macpci_state::unk2_r(offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_47)
 		return (uint64_t)0xe1 << 32; //PC=fff04810
@@ -79,6 +80,11 @@ void macpci_state::pippin_mem(address_map &map)
 	map(0xf3016000, 0xf3017fff).rw(FUNC(macpci_state::mac_via_r), FUNC(macpci_state::mac_via_w));
 
 	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
+}
+
+void macpci_state::cdmcu_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("cdrom", 0);
 }
 
 /* Input ports */
@@ -140,6 +146,9 @@ void macpci_state::pippin(machine_config &config)
 	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
 	config.set_perfect_quantum(m_maincpu);
+
+	mn1880_device &cdmcu(MN1880(config, "cdmcu", 8388608)); // type and clock unknown
+	cdmcu.set_addrmap(AS_PROGRAM, &macpci_state::cdmcu_mem);
 }
 
 /* ROM definition */

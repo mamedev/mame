@@ -70,7 +70,7 @@ myarc_fdc_device::myarc_fdc_device(const machine_config &mconfig, const char *ta
 	  m_address(0)
 	  { }
 
-SETADDRESS_DBIN_MEMBER( myarc_fdc_device::setaddress_dbin )
+void myarc_fdc_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Do not allow setaddress for debugger
 	if (machine().side_effects_disabled()) return;
@@ -127,7 +127,7 @@ void myarc_fdc_device::debug_write(offs_t offset, uint8_t data)
 /*
     Read access to the RAM, EPROM, and controller chip.
 */
-READ8Z_MEMBER(myarc_fdc_device::readz)
+void myarc_fdc_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -193,7 +193,7 @@ void myarc_fdc_device::write(offs_t offset, uint8_t data)
 /*
     CRU read access to the LS251 multiplexer.
 */
-READ8Z_MEMBER( myarc_fdc_device::crureadz )
+void myarc_fdc_device::crureadz(offs_t offset, uint8_t *value)
 {
 	const uint8_t dipswitch[] = { 0x00, 0x01, 0x02, 0x04, 0x08 };
 	uint16_t addrcopy = m_address;

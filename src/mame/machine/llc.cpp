@@ -133,7 +133,7 @@ MACHINE_RESET_MEMBER(llc_state,llc2)
 
 }
 
-WRITE8_MEMBER(llc_state::llc2_rom_disable_w)
+void llc_state::llc2_rom_disable_w(uint8_t data)
 {
 	address_space &mem_space = m_maincpu->space(AS_PROGRAM);
 	uint8_t *ram = m_ram->pointer();
@@ -152,7 +152,7 @@ WRITE8_MEMBER(llc_state::llc2_rom_disable_w)
 
 }
 
-WRITE8_MEMBER(llc_state::llc2_basic_enable_w)
+void llc_state::llc2_basic_enable_w(uint8_t data)
 {
 	address_space &mem_space = m_maincpu->space(AS_PROGRAM);
 	if (data & 0x02)

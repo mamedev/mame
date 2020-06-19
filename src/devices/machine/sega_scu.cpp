@@ -571,14 +571,14 @@ inline void sega_scu_device::dma_start_factor_ack(uint8_t event)
 	}
 }
 
-READ32_MEMBER(sega_scu_device::dma_lv0_r)  { return dma_common_r(offset,0); }
-WRITE32_MEMBER(sega_scu_device::dma_lv0_w) { dma_common_w(offset,0,data); }
-READ32_MEMBER(sega_scu_device::dma_lv1_r)  { return dma_common_r(offset,1); }
-WRITE32_MEMBER(sega_scu_device::dma_lv1_w) { dma_common_w(offset,1,data); }
-READ32_MEMBER(sega_scu_device::dma_lv2_r)  { return dma_common_r(offset,2); }
-WRITE32_MEMBER(sega_scu_device::dma_lv2_w) { dma_common_w(offset,2,data); }
+uint32_t sega_scu_device::dma_lv0_r(offs_t offset)  { return dma_common_r(offset,0); }
+void sega_scu_device::dma_lv0_w(offs_t offset, uint32_t data) { dma_common_w(offset,0,data); }
+uint32_t sega_scu_device::dma_lv1_r(offs_t offset)  { return dma_common_r(offset,1); }
+void sega_scu_device::dma_lv1_w(offs_t offset, uint32_t data) { dma_common_w(offset,1,data); }
+uint32_t sega_scu_device::dma_lv2_r(offs_t offset)  { return dma_common_r(offset,2); }
+void sega_scu_device::dma_lv2_w(offs_t offset, uint32_t data) { dma_common_w(offset,2,data); }
 
-READ32_MEMBER(sega_scu_device::dma_status_r)
+uint32_t sega_scu_device::dma_status_r()
 {
 	return m_status;
 }
@@ -587,12 +587,12 @@ READ32_MEMBER(sega_scu_device::dma_status_r)
 //  Timers
 //**************************************************************************
 
-WRITE32_MEMBER(sega_scu_device::t0_compare_w )
+void sega_scu_device::t0_compare_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_t0c);
 }
 
-WRITE32_MEMBER(sega_scu_device::t1_setdata_w )
+void sega_scu_device::t1_setdata_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_t1s);
 }
@@ -601,7 +601,7 @@ WRITE32_MEMBER(sega_scu_device::t1_setdata_w )
  ---- ---x ---- ---- T1MD Timer 1 mode (0=each line, 1=only at timer 0 lines)
  ---- ---- ---- ---x TENB Timers enable
  */
-WRITE16_MEMBER(sega_scu_device::t1_mode_w )
+void sega_scu_device::t1_mode_w(uint16_t data)
 {
 	m_t1md = BIT(data,8);
 	m_tenb = BIT(data,0);
@@ -649,23 +649,23 @@ void sega_scu_device::check_scanline_timers(int scanline,int y_step)
 //  Interrupt
 //**************************************************************************
 
-READ32_MEMBER(sega_scu_device::irq_mask_r)
+uint32_t sega_scu_device::irq_mask_r()
 {
 	return m_ism;
 }
 
-READ32_MEMBER(sega_scu_device::irq_status_r)
+uint32_t sega_scu_device::irq_status_r()
 {
 	return m_ist;
 }
 
-WRITE32_MEMBER(sega_scu_device::irq_mask_w)
+void sega_scu_device::irq_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_ism);
 	test_pending_irqs();
 }
 
-WRITE32_MEMBER(sega_scu_device::irq_status_w)
+void sega_scu_device::irq_status_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(mem_mask != 0xffffffff)
 		logerror("%s IST write %08x with %08x\n",this->tag(),data,mem_mask);
@@ -797,7 +797,7 @@ WRITE_LINE_MEMBER(sega_scu_device::scudsp_end_w)
 //  Miscellanea
 //**************************************************************************
 
-READ32_MEMBER(sega_scu_device::version_r)
+uint32_t sega_scu_device::version_r()
 {
 	return 4; // correct for stock Saturn at least
 }

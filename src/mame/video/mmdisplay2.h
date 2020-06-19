@@ -27,7 +27,7 @@ public:
 	// construction/destruction
 	mephisto_display_module2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	hd44780_device *get() { return m_lcdc; }
+	hd44780_device *get() { return m_lcd; }
 
 	void latch_w(uint8_t data);
 	void io_w(uint8_t data);
@@ -38,11 +38,13 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void lcd_palette(palette_device &palette) const;
-
 private:
-	optional_device<hd44780_device> m_lcdc;
+	optional_device<hd44780_device> m_lcd;
 	required_device<dac_byte_interface> m_dac;
+
+	void lcd_palette(palette_device &palette) const;
+	HD44780_PIXEL_UPDATE(lcd_pixel_update);
+
 	uint8_t m_latch;
 	uint8_t m_ctrl;
 };

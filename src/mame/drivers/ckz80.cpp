@@ -2,13 +2,13 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-CZK-80
+CKZ-80
 
 2010-08-30 Skeleton driver
 2010-11-27 Connected to a terminal
 2014-01-08 Added devices
 
-Only known info: http://forum.z80.de/showtopic.php?threadid=280
+Only known info: http://forumcpm.gaby.de/oldboard/showtopic0adb.html?threadid=280
 
 On main board there are Z80A CPU, Z80A PIO, Z80A DART and Z80A CTC
    there is 8K ROM and XTAL 16MHz
@@ -49,22 +49,23 @@ I/O ports: These ranges are what is guessed
 #include "machine/terminal.h"
 
 
-class czk80_state : public driver_device
+class ckz80_state : public driver_device
 {
 public:
-	czk80_state(const machine_config &mconfig, device_type type, const char *tag)
+	ckz80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_terminal(*this, "terminal")
 		, m_fdc(*this, "fdc")
 	{ }
 
-	void czk80(machine_config &config);
-	void init_czk80();
+	void ckz80(machine_config &config);
 
 private:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(czk80_reset);
 	u8 port80_r();
 	u8 port81_r();
 	void port40_w(u8 data);
@@ -72,54 +73,57 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	void czk80_io(address_map &map);
-	void czk80_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 	u8 m_term_data;
+	bool m_rom_in_map;
 	required_device<z80_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	memory_passthrough_handler *m_rom_shadow_tap;
+	required_shared_ptr<u8> m_ram;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<upd765a_device> m_fdc;
 };
 
 
-void czk80_state::port40_w(u8 data)
+void ckz80_state::port40_w(u8 data)
 {
-	membank("bankr1")->set_entry(BIT(data, 1));
+	m_rom_in_map = !BIT(data, 1);
 }
 
-u8 czk80_state::port80_r()
+u8 ckz80_state::port80_r()
 {
 	u8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-u8 czk80_state::port81_r()
+u8 ckz80_state::port81_r()
 {
 	return (m_term_data) ? 3 : 1;
 }
 
-void czk80_state::czk80_mem(address_map &map)
+void ckz80_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x1fff).bankr("bankr0").bankw("bankw0");
-	map(0x2000, 0xdfff).ram();
-	map(0xe000, 0xffff).bankr("bankr1").bankw("bankw1");
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0xe000, 0xffff).lr8(NAME([this] (offs_t offset) { if (m_rom_in_map) return m_rom[offset]; else return m_ram[offset+0xe000]; } ));
 }
 
-void czk80_state::czk80_io(address_map &map)
+void ckz80_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).w(FUNC(czk80_state::port40_w));
+	map(0x40, 0x40).w(FUNC(ckz80_state::port40_w));
 	map(0x4c, 0x4f).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x50, 0x53).rw("dart", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0x54, 0x57).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	// 80, 81 - no setup bytes
-	map(0x80, 0x80).r(FUNC(czk80_state::port80_r)).w(m_terminal, FUNC(generic_terminal_device::write));
-	map(0x81, 0x81).r(FUNC(czk80_state::port81_r));
+	map(0x80, 0x80).r(FUNC(ckz80_state::port80_r)).w(m_terminal, FUNC(generic_terminal_device::write));
+	map(0x81, 0x81).r(FUNC(ckz80_state::port81_r));
 	map(0xc0, 0xc1).m(m_fdc, FUNC(upd765a_device::map));
 }
 
 /* Input ports */
-static INPUT_PORTS_START( czk80 )
+static INPUT_PORTS_START( ckz80 )
 INPUT_PORTS_END
 
 /* Z80 Daisy Chain */
@@ -134,75 +138,75 @@ static const z80_daisy_config daisy_chain[] =
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( czk80_state::ctc_z0_w )
+WRITE_LINE_MEMBER( ckz80_state::ctc_z0_w )
 {
 // guess this generates clock for z80dart
 }
 
-WRITE_LINE_MEMBER( czk80_state::ctc_z1_w )
+WRITE_LINE_MEMBER( ckz80_state::ctc_z1_w )
 {
 }
 
-WRITE_LINE_MEMBER( czk80_state::ctc_z2_w )
+WRITE_LINE_MEMBER( ckz80_state::ctc_z2_w )
 {
 }
 
-/* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER( czk80_state::czk80_reset)
+void ckz80_state::machine_start()
 {
-	membank("bankr0")->set_entry(1);
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_rom_in_map));
 }
 
-void czk80_state::machine_reset()
+void ckz80_state::machine_reset()
 {
-	machine().scheduler().timer_set(attotime::from_usec(3), timer_expired_delegate(FUNC(czk80_state::czk80_reset),this));
-	membank("bankr0")->set_entry(0); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
-	membank("bankr1")->set_entry(0); // point at rom
-	membank("bankw1")->set_entry(0); // always write to ram
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x1fff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xe000, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
+
+	m_rom_in_map = true;
 }
 
-void czk80_state::init_czk80()
-{
-	u8 *main = memregion("maincpu")->base();
-
-	membank("bankr0")->configure_entry(1, &main[0x0000]);
-	membank("bankr0")->configure_entry(0, &main[0x10000]);
-	membank("bankw0")->configure_entry(0, &main[0x0000]);
-
-	membank("bankr1")->configure_entry(1, &main[0xe000]);
-	membank("bankr1")->configure_entry(0, &main[0x10000]);
-	membank("bankw1")->configure_entry(0, &main[0xe000]);
-}
-
-static void czk80_floppies(device_slot_interface &device)
+static void ckz80_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-void czk80_state::kbd_put(u8 data)
+void ckz80_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-void czk80_state::czk80(machine_config &config)
+void ckz80_state::ckz80(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &czk80_state::czk80_mem);
-	m_maincpu->set_addrmap(AS_IO, &czk80_state::czk80_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ckz80_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &ckz80_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	GENERIC_TERMINAL(config, m_terminal, 0);
-	m_terminal->set_keyboard_callback(FUNC(czk80_state::kbd_put));
+	m_terminal->set_keyboard_callback(FUNC(ckz80_state::kbd_put));
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
-	FLOPPY_CONNECTOR(config, "fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", ckz80_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", 16_MHz_XTAL / 4));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ctc.zc_callback<0>().set(FUNC(czk80_state::ctc_z0_w));
-	ctc.zc_callback<1>().set(FUNC(czk80_state::ctc_z1_w));
-	ctc.zc_callback<2>().set(FUNC(czk80_state::ctc_z2_w));
+	ctc.zc_callback<0>().set(FUNC(ckz80_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(FUNC(ckz80_state::ctc_z1_w));
+	ctc.zc_callback<2>().set(FUNC(ckz80_state::ctc_z2_w));
 
 	z80dart_device& dart(Z80DART(config, "dart", 16_MHz_XTAL / 4));
 	//dart.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -216,12 +220,12 @@ void czk80_state::czk80(machine_config &config)
 
 
 /* ROM definition */
-ROM_START( czk80 )
-	ROM_REGION( 0x12000, "maincpu", 0 )
-	ROM_LOAD( "czk80.rom", 0x10000, 0x2000, CRC(7081b7c6) SHA1(13f75b14ea73b252bdfa2384e6eead6e720e49e3))
+ROM_START( ckz80 )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "ckz80.rom", 0x0000, 0x2000, CRC(7081b7c6) SHA1(13f75b14ea73b252bdfa2384e6eead6e720e49e3))
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
-COMP( 198?, czk80, 0,      0,      czk80,   czk80, czk80_state, init_czk80, "<unknown>", "CZK-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 198?, ckz80, 0,      0,      ckz80,   ckz80, ckz80_state, empty_init, "<unknown>", "CKZ-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

@@ -270,18 +270,18 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<am79c90_device> m_lance;
 
-	DECLARE_READ32_MEMBER( tl_mmu_r );
-	DECLARE_WRITE32_MEMBER( tl_mmu_w );
-	DECLARE_READ32_MEMBER( ram_r );
-	DECLARE_WRITE32_MEMBER( ram_w );
-	DECLARE_READ32_MEMBER( parity_r );
-	DECLARE_WRITE32_MEMBER( parity_w );
-	DECLARE_READ32_MEMBER( ecc_r );
-	DECLARE_WRITE32_MEMBER( ecc_w );
-	DECLARE_READ32_MEMBER( irqctrl_r );
-	DECLARE_WRITE32_MEMBER( irqctrl_w );
-	DECLARE_READ8_MEMBER( rtc7170_r );
-	DECLARE_WRITE8_MEMBER( rtc7170_w );
+	uint32_t tl_mmu_r(offs_t offset, uint32_t mem_mask = ~0);
+	void tl_mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t parity_r(offs_t offset);
+	void parity_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ecc_r(offs_t offset);
+	void ecc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t irqctrl_r();
+	void irqctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t rtc7170_r(offs_t offset);
+	void rtc7170_w(offs_t offset, uint8_t data);
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -330,7 +330,7 @@ static void scsi_devices(device_slot_interface &device)
 	device.set_option_machine_config("cdrom", sun_cdrom);
 }
 
-READ32_MEMBER( sun3_state::ram_r )
+uint32_t sun3_state::ram_r(offs_t offset)
 {
 	if (m_ecc[0] == 0x10c00000)
 	{
@@ -366,7 +366,7 @@ READ32_MEMBER( sun3_state::ram_r )
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER( sun3_state::ram_w )
+void sun3_state::ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// if writing bad parity is enabled
 	if (((m_parregs[0] & 0x20000000) == 0x20000000) &&
@@ -437,7 +437,7 @@ WRITE32_MEMBER( sun3_state::ram_w )
 	}
 }
 
-READ32_MEMBER( sun3_state::tl_mmu_r )
+uint32_t sun3_state::tl_mmu_r(offs_t offset, uint32_t mem_mask)
 {
 	uint8_t fc = m_maincpu->get_fc();
 
@@ -574,7 +574,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER( sun3_state::tl_mmu_w )
+void sun3_state::tl_mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t fc = m_maincpu->get_fc();
 
@@ -722,7 +722,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 	logerror("sun3: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<2);
 }
 
-READ32_MEMBER(sun3_state::parity_r)
+uint32_t sun3_state::parity_r(offs_t offset)
 {
 	uint32_t rv = m_parregs[offset];
 
@@ -735,7 +735,7 @@ READ32_MEMBER(sun3_state::parity_r)
 	return rv;
 }
 
-WRITE32_MEMBER(sun3_state::parity_w)
+void sun3_state::parity_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("sun3: %08x to parity registers @ %x (mask %08x)\n", data, offset, mem_mask);
 
@@ -800,12 +800,12 @@ void sun3_state::vmetype3space_map(address_map &map)
 {
 }
 
-READ32_MEMBER(sun3_state::irqctrl_r)
+uint32_t sun3_state::irqctrl_r()
 {
 	return m_irqctrl;
 }
 
-WRITE32_MEMBER(sun3_state::irqctrl_w)
+void sun3_state::irqctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("sun3: %08x to interrupt control (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_irqctrl);
@@ -837,14 +837,14 @@ WRITE32_MEMBER(sun3_state::irqctrl_w)
 	}
 }
 
-READ8_MEMBER(sun3_state::rtc7170_r)
+uint8_t sun3_state::rtc7170_r(offs_t offset)
 {
 	//printf("read 7170 @ %x, PC=%x\n", offset, m_maincpu->pc());
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(sun3_state::rtc7170_w)
+void sun3_state::rtc7170_w(offs_t offset, uint8_t data)
 {
 	//printf("%02x to 7170 @ %x\n", data, offset);
 
@@ -857,7 +857,7 @@ WRITE8_MEMBER(sun3_state::rtc7170_w)
 	}
 }
 
-READ32_MEMBER(sun3_state::ecc_r)
+uint32_t sun3_state::ecc_r(offs_t offset)
 {
 	//printf("read ECC @ %x, PC=%x\n", offset, m_maincpu->pc());
 	// fefc34a
@@ -880,7 +880,7 @@ READ32_MEMBER(sun3_state::ecc_r)
 	return rv;
 }
 
-WRITE32_MEMBER(sun3_state::ecc_w)
+void sun3_state::ecc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("%08x to ecc @ %x, mask %08x\n", data, offset, mem_mask);
 

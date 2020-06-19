@@ -35,8 +35,8 @@ public:
 	void init_galaxyp();
 
 private:
-	DECLARE_READ8_MEMBER(galaxy_keyboard_r);
-	DECLARE_WRITE8_MEMBER(galaxy_latch_w);
+	uint8_t galaxy_keyboard_r(offs_t offset);
+	void galaxy_latch_w(uint8_t data);
 	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(galaxy);
 	DECLARE_MACHINE_RESET(galaxyp);

@@ -125,7 +125,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_state::exctsccr_sound_irq)
  *************************************/
 
 /* champbja another protection */
-READ8_MEMBER(champbas_state::champbja_protection_r)
+uint8_t champbas_state::champbja_protection_r(offs_t offset)
 {
 	uint8_t data = 0;
 	/*

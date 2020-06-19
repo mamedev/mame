@@ -18,7 +18,7 @@
 #include "includes/b2m.h"
 #include "machine/ram.h"
 
-READ8_MEMBER(b2m_state::b2m_keyboard_r)
+uint8_t b2m_state::b2m_keyboard_r(offs_t offset)
 {
 	uint8_t key = 0x00;
 	if (offset < 0x100) {
@@ -80,7 +80,7 @@ void b2m_state::b2m_set_bank(int bank)
 						space.unmap_write(0xe000, 0xffff);
 
 						membank("bank1")->set_base(ram);
-						space.install_read_handler(0x2800, 0x2fff, read8_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
+						space.install_read_handler(0x2800, 0x2fff, read8sm_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
 						membank("bank3")->set_base(ram + 0x10000);
 						membank("bank4")->set_base(ram + 0x7000);
 						membank("bank5")->set_base(rom + 0x10000);
@@ -90,7 +90,7 @@ void b2m_state::b2m_set_bank(int bank)
 						space.unmap_write(0xe000, 0xffff);
 
 						membank("bank1")->set_base(ram);
-						space.install_read_handler(0x2800, 0x2fff, read8_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
+						space.install_read_handler(0x2800, 0x2fff, read8sm_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
 						membank("bank3")->set_base(ram + 0x14000);
 						membank("bank4")->set_base(ram + 0x7000);
 						membank("bank5")->set_base(rom + 0x10000);
@@ -100,7 +100,7 @@ void b2m_state::b2m_set_bank(int bank)
 						space.unmap_write(0xe000, 0xffff);
 
 						membank("bank1")->set_base(ram);
-						space.install_read_handler(0x2800, 0x2fff, read8_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
+						space.install_read_handler(0x2800, 0x2fff, read8sm_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
 						membank("bank3")->set_base(ram + 0x18000);
 						membank("bank4")->set_base(ram + 0x7000);
 						membank("bank5")->set_base(rom + 0x10000);
@@ -111,7 +111,7 @@ void b2m_state::b2m_set_bank(int bank)
 						space.unmap_write(0xe000, 0xffff);
 
 						membank("bank1")->set_base(ram);
-						space.install_read_handler(0x2800, 0x2fff, read8_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
+						space.install_read_handler(0x2800, 0x2fff, read8sm_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
 						membank("bank3")->set_base(ram + 0x1c000);
 						membank("bank4")->set_base(ram + 0x7000);
 						membank("bank5")->set_base(rom + 0x10000);
@@ -229,7 +229,7 @@ void b2m_state::init_b2m()
 	m_vblank_state = 0;
 }
 
-WRITE8_MEMBER(b2m_state::b2m_palette_w)
+void b2m_state::b2m_palette_w(offs_t offset, uint8_t data)
 {
 	uint8_t b = (3 - ((data >> 6) & 3)) * 0x55;
 	uint8_t g = (3 - ((data >> 4) & 3)) * 0x55;
@@ -246,17 +246,17 @@ WRITE8_MEMBER(b2m_state::b2m_palette_w)
 	}
 }
 
-READ8_MEMBER(b2m_state::b2m_palette_r)
+uint8_t b2m_state::b2m_palette_r(offs_t offset)
 {
 	return m_b2m_color[offset];
 }
 
-WRITE8_MEMBER(b2m_state::b2m_localmachine_w)
+void b2m_state::b2m_localmachine_w(uint8_t data)
 {
 	m_b2m_localmachine = data;
 }
 
-READ8_MEMBER(b2m_state::b2m_localmachine_r)
+uint8_t b2m_state::b2m_localmachine_r()
 {
 	return m_b2m_localmachine;
 }

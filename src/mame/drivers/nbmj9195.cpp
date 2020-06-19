@@ -58,7 +58,7 @@ void nbmj9195_state::outcoin_flag_w(uint8_t data)
 	else m_outcoin_flag = 1;
 }
 
-WRITE8_MEMBER(nbmj9195_state::inputportsel_w)
+void nbmj9195_state::inputportsel_w(uint8_t data)
 {
 	m_inputport = (data ^ 0xff);
 }

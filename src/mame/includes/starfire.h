@@ -61,8 +61,8 @@ private:
 	uint8_t m_starfire_color;
 	uint16_t m_starfire_colors[STARFIRE_NUM_PENS];
 
-	read8_delegate m_input_read;
-	write8_delegate m_io2_write;
+	read8sm_delegate m_input_read;
+	write8smo_delegate m_io2_write;
 
 	emu_timer* m_scanline_timer;
 	bitmap_rgb32 m_starfire_screen;
@@ -70,16 +70,16 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	DECLARE_WRITE8_MEMBER(starfire_scratch_w);
-	DECLARE_READ8_MEMBER(starfire_scratch_r);
-	DECLARE_READ8_MEMBER(starfire_input_r);
-	DECLARE_READ8_MEMBER(fireone_input_r);
-	DECLARE_WRITE8_MEMBER(starfire_sound_w);
-	DECLARE_WRITE8_MEMBER(fireone_sound_w);
-	DECLARE_WRITE8_MEMBER(starfire_colorram_w);
-	DECLARE_READ8_MEMBER(starfire_colorram_r);
-	DECLARE_WRITE8_MEMBER(starfire_videoram_w);
-	DECLARE_READ8_MEMBER(starfire_videoram_r);
+	void starfire_scratch_w(offs_t offset, uint8_t data);
+	uint8_t starfire_scratch_r(offs_t offset);
+	uint8_t starfire_input_r(offs_t offset);
+	uint8_t fireone_input_r(offs_t offset);
+	void starfire_sound_w(uint8_t data);
+	void fireone_sound_w(uint8_t data);
+	void starfire_colorram_w(offs_t offset, uint8_t data);
+	uint8_t starfire_colorram_r(offs_t offset);
+	void starfire_videoram_w(offs_t offset, uint8_t data);
+	uint8_t starfire_videoram_r(offs_t offset);
 	virtual void video_start() override;
 	uint32_t screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(starfire_scanline_callback);

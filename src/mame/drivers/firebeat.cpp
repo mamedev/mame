@@ -261,7 +261,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(spu_timer_callback);
 	void set_ibutton(uint8_t *data);
 	int ibutton_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(security_w);
+	void security_w(uint8_t data);
 	void init_lights(write32s_delegate out1, write32s_delegate out2, write32s_delegate out3);
 	void init_firebeat();
 	void init_keyboard();
@@ -1363,7 +1363,7 @@ int firebeat_state::ibutton_w(uint8_t data)
 	return r;
 }
 
-WRITE8_MEMBER(firebeat_state::security_w)
+void firebeat_state::security_w(uint8_t data)
 {
 	int r = ibutton_w(data);
 	if (r >= 0)
@@ -1395,7 +1395,7 @@ void firebeat_state::init_firebeat()
 
 	m_cur_cab_data = cab_data;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(firebeat_state::security_w)));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(firebeat_state::security_w)));
 
 	set_ibutton(rom);
 

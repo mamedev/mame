@@ -30,7 +30,7 @@
 
 ASMJIT_BEGIN_NAMESPACE
 
-//! \addtogroup asmjit_core
+//! \addtogroup asmjit_utilities
 //! \{
 
 // ============================================================================
@@ -65,15 +65,23 @@ public:
 
   //! Zone-allocated const-pool gap created by two differently aligned constants.
   struct Gap {
-    Gap* _next;                          //!< Pointer to the next gap
-    size_t _offset;                      //!< Offset of the gap.
-    size_t _size;                        //!< Remaining bytes of the gap (basically a gap size).
+    //! Pointer to the next gap
+    Gap* _next;
+    //! Offset of the gap.
+    size_t _offset;
+    //! Remaining bytes of the gap (basically a gap size).
+    size_t _size;
   };
 
   //! Zone-allocated const-pool node.
   class Node : public ZoneTreeNodeT<Node> {
   public:
     ASMJIT_NONCOPYABLE(Node)
+
+    //! If this constant is shared with another.
+    uint32_t _shared : 1;
+    //! Data offset from the beginning of the pool.
+    uint32_t _offset;
 
     inline Node(size_t offset, bool shared) noexcept
       : ZoneTreeNodeT<Node>(),
@@ -83,14 +91,13 @@ public:
     inline void* data() const noexcept {
       return static_cast<void*>(const_cast<ConstPool::Node*>(this) + 1);
     }
-
-    uint32_t _shared : 1;                //!< If this constant is shared with another.
-    uint32_t _offset;                    //!< Data offset from the beginning of the pool.
   };
 
   //! Data comparer used internally.
   class Compare {
   public:
+    size_t _dataSize;
+
     inline Compare(size_t dataSize) noexcept
       : _dataSize(dataSize) {}
 
@@ -101,12 +108,17 @@ public:
     inline int operator()(const Node& a, const void* data) const noexcept {
       return ::memcmp(a.data(), data, _dataSize);
     }
-
-    size_t _dataSize;
   };
 
   //! Zone-allocated const-pool tree.
   struct Tree {
+    //! RB tree.
+    ZoneTree<Node> _tree;
+    //! Size of the tree (number of nodes).
+    size_t _size;
+    //! Size of the data.
+    size_t _dataSize;
+
     inline explicit Tree(size_t dataSize = 0) noexcept
       : _tree(),
         _size(0),
@@ -177,13 +189,6 @@ public:
       memcpy(node->data(), data, size);
       return node;
     }
-
-    //! RB tree.
-    ZoneTree<Node> _tree;
-    //! Size of the tree (number of nodes).
-    size_t _size;
-    //! Size of the data.
-    size_t _dataSize;
   };
 
   //! \endcond

@@ -310,7 +310,7 @@ u32 vrender0soc_device::intst_r()
 	return m_intst;
 }
 
-void vrender0soc_device::intst_w(offs_t offset, u32 data, u32 mem_mask)
+void vrender0soc_device::intst_w(u32 data)
 {
 	// TODO: contradicts with documentation, games writes to this?
 	// ...

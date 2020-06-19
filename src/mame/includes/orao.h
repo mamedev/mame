@@ -33,8 +33,8 @@ public:
 	void init_orao103();
 
 private:
-	DECLARE_READ8_MEMBER(orao_io_r);
-	DECLARE_WRITE8_MEMBER(orao_io_w);
+	uint8_t orao_io_r(offs_t offset);
+	void orao_io_w(offs_t offset, uint8_t data);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_orao(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

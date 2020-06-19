@@ -68,33 +68,33 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(tx_w);
 	DECLARE_WRITE_LINE_MEMBER(t11_reset_w);
 	DECLARE_READ_LINE_MEMBER(i8085_sid_r);
-	DECLARE_READ8_MEMBER(i8085_comm_r);
-	DECLARE_WRITE8_MEMBER(i8085_comm_w);
-	DECLARE_READ8_MEMBER(t11_comm_r);
-	DECLARE_WRITE8_MEMBER(t11_comm_w);
-	DECLARE_READ8_MEMBER(duart_r);
-	DECLARE_WRITE8_MEMBER(duart_w);
+	uint8_t i8085_comm_r(offs_t offset);
+	void i8085_comm_w(offs_t offset, uint8_t data);
+	uint8_t t11_comm_r();
+	void t11_comm_w(uint8_t data);
+	uint8_t duart_r(offs_t offset);
+	void duart_w(offs_t offset, uint8_t data);
 	void duartout_w(uint8_t data);
-	DECLARE_READ8_MEMBER(mem_map_cs_r);
-	DECLARE_WRITE8_MEMBER(mem_map_cs_w);
-	DECLARE_READ8_MEMBER(ctrl_r);
-	DECLARE_WRITE8_MEMBER(mem_map_sel_w);
-	DECLARE_READ8_MEMBER(char_buf_r);
-	DECLARE_WRITE8_MEMBER(char_buf_w);
-	DECLARE_WRITE8_MEMBER(patmult_w);
-	DECLARE_WRITE8_MEMBER(vpat_w);
-	DECLARE_READ16_MEMBER(vram_r);
+	uint8_t mem_map_cs_r(offs_t offset);
+	void mem_map_cs_w(offs_t offset, uint8_t data);
+	uint8_t ctrl_r();
+	void mem_map_sel_w(uint8_t data);
+	uint8_t char_buf_r();
+	void char_buf_w(uint8_t data);
+	void patmult_w(uint8_t data);
+	void vpat_w(uint8_t data);
+	uint16_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint16_t data);
-	DECLARE_READ8_MEMBER(vom_r);
-	DECLARE_WRITE8_MEMBER(vom_w);
-	DECLARE_READ8_MEMBER(nvr_store_r);
-	DECLARE_WRITE8_MEMBER(nvr_store_w);
-	DECLARE_WRITE8_MEMBER(mask_w);
-	DECLARE_WRITE8_MEMBER(reg0_w);
-	DECLARE_WRITE8_MEMBER(reg1_w);
-	DECLARE_WRITE8_MEMBER(lu_w);
-	DECLARE_WRITE8_MEMBER(hbscrl_w);
-	DECLARE_WRITE8_MEMBER(lbscrl_w);
+	uint8_t vom_r(offs_t offset);
+	void vom_w(offs_t offset, uint8_t data);
+	uint8_t nvr_store_r();
+	void nvr_store_w(uint8_t data);
+	void mask_w(uint8_t data);
+	void reg0_w(uint8_t data);
+	void reg1_w(uint8_t data);
+	void lu_w(uint8_t data);
+	void hbscrl_w(uint8_t data);
+	void lbscrl_w(uint8_t data);
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
 	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
@@ -223,19 +223,19 @@ UPD7220_DISPLAY_PIXELS_MEMBER( vt240_state::hgdc_draw )
 	}
 }
 
-READ8_MEMBER(vt240_state::t11_comm_r)
+uint8_t vt240_state::t11_comm_r()
 {
 	m_t11 = 1;
 	m_i8085->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
 	return m_t11_out;
 }
 
-WRITE8_MEMBER(vt240_state::t11_comm_w)
+void vt240_state::t11_comm_w(uint8_t data)
 {
 	m_i8085_out = data;
 }
 
-READ8_MEMBER(vt240_state::i8085_comm_r)
+uint8_t vt240_state::i8085_comm_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -250,7 +250,7 @@ READ8_MEMBER(vt240_state::i8085_comm_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(vt240_state::i8085_comm_w)
+void vt240_state::i8085_comm_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -267,14 +267,14 @@ WRITE8_MEMBER(vt240_state::i8085_comm_w)
 	}
 }
 
-READ8_MEMBER(vt240_state::duart_r)
+uint8_t vt240_state::duart_r(offs_t offset)
 {
 	if(!(offset & 1))
 		return m_duart->read(offset >> 1);
 	return 0;
 }
 
-WRITE8_MEMBER(vt240_state::duart_w)
+void vt240_state::duart_w(offs_t offset, uint8_t data)
 {
 	if(offset & 1)
 		m_duart->write(offset >> 1, data);
@@ -290,22 +290,22 @@ void vt240_state::duartout_w(uint8_t data)
 	irq_encoder(10, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ8_MEMBER(vt240_state::mem_map_cs_r)
+uint8_t vt240_state::mem_map_cs_r(offs_t offset)
 {
 	return ~m_mem_map[offset];
 }
 
-WRITE8_MEMBER(vt240_state::mem_map_cs_w)
+void vt240_state::mem_map_cs_w(offs_t offset, uint8_t data)
 {
 	m_mem_map[offset] = ~data;
 }
 
-READ8_MEMBER(vt240_state::ctrl_r)
+uint8_t vt240_state::ctrl_r()
 {
 	return m_mem_map_sel | ((m_lb ? 0 : 1) << 3) | (m_i8085_rdy << 6) | (m_t11 << 7) | (1<<5); // no modem
 }
 
-WRITE8_MEMBER(vt240_state::mem_map_sel_w)
+void vt240_state::mem_map_sel_w(uint8_t data)
 {
 	m_mem_map_sel = data & 1;
 }
@@ -330,31 +330,31 @@ void vt240_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-READ8_MEMBER(vt240_state::char_buf_r)
+uint8_t vt240_state::char_buf_r()
 {
 	m_char_idx = 0;
 	return 0xff;
 }
 
-WRITE8_MEMBER(vt240_state::char_buf_w)
+void vt240_state::char_buf_w(uint8_t data)
 {
 	m_char_buf[m_char_idx++] = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 	m_char_idx &= 0xf;
 }
 
-WRITE8_MEMBER(vt240_state::patmult_w)
+void vt240_state::patmult_w(uint8_t data)
 {
 	m_patmult = data & 0xf;
 }
 
-WRITE8_MEMBER(vt240_state::vpat_w)
+void vt240_state::vpat_w(uint8_t data)
 {
 	m_vpat = data;
 	m_patcnt = m_patmult;
 	m_patidx = 7;
 }
 
-READ8_MEMBER(vt240_state::vom_r)
+uint8_t vt240_state::vom_r(offs_t offset)
 {
 	if(!BIT(m_reg0, 2))
 		return m_vom[offset];
@@ -365,7 +365,7 @@ READ8_MEMBER(vt240_state::vom_r)
 	return m_vom[((m_reg0 & 3) << 2) + 3];
 }
 
-WRITE8_MEMBER(vt240_state::vom_w)
+void vt240_state::vom_w(offs_t offset, uint8_t data)
 {
 	if(!BIT(m_reg0, 2))
 	{
@@ -376,7 +376,7 @@ WRITE8_MEMBER(vt240_state::vom_w)
 	}
 }
 
-READ16_MEMBER(vt240_state::vram_r)
+uint16_t vt240_state::vram_r(offs_t offset)
 {
 	if(!BIT(m_reg0, 3) || machine().side_effects_disabled())
 	{
@@ -492,45 +492,45 @@ void vt240_state::vram_w(offs_t offset, uint16_t data)
 		video_ram[offset] = data;
 }
 
-WRITE8_MEMBER(vt240_state::mask_w)
+void vt240_state::mask_w(uint8_t data)
 {
 	m_mask = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
-READ8_MEMBER(vt240_state::nvr_store_r)
+uint8_t vt240_state::nvr_store_r()
 {
 	m_nvram->store(ASSERT_LINE);
 	m_nvram->store(CLEAR_LINE);
 	return 0;
 }
 
-WRITE8_MEMBER(vt240_state::nvr_store_w)
+void vt240_state::nvr_store_w(uint8_t data)
 {
 	m_nvram->store(ASSERT_LINE);
 	m_nvram->store(CLEAR_LINE);
 }
 
-WRITE8_MEMBER(vt240_state::reg0_w)
+void vt240_state::reg0_w(uint8_t data)
 {
 	m_reg0 = data;
 }
 
-WRITE8_MEMBER(vt240_state::reg1_w)
+void vt240_state::reg1_w(uint8_t data)
 {
 	m_reg1 = data;
 }
 
-WRITE8_MEMBER(vt240_state::lu_w)
+void vt240_state::lu_w(uint8_t data)
 {
 	m_lu = data;
 }
 
-WRITE8_MEMBER(vt240_state::lbscrl_w)
+void vt240_state::lbscrl_w(uint8_t data)
 {
 	m_scrl = (m_scrl & 0xff00) | data;
 }
 
-WRITE8_MEMBER(vt240_state::hbscrl_w)
+void vt240_state::hbscrl_w(uint8_t data)
 {
 	m_scrl = (m_scrl & 0xff) | ((data & 0x3f) << 8);
 }

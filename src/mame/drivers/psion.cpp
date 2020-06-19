@@ -170,7 +170,7 @@ void psion_state::io_rw(uint16_t offset)
 	}
 }
 
-WRITE8_MEMBER( psion_state::io_w )
+void psion_state::io_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x0ffc0)
 	{
@@ -182,7 +182,7 @@ WRITE8_MEMBER( psion_state::io_w )
 	}
 }
 
-READ8_MEMBER( psion_state::io_r )
+uint8_t psion_state::io_r(offs_t offset)
 {
 	switch (offset & 0xffc0)
 	{
@@ -203,19 +203,19 @@ INPUT_CHANGED_MEMBER(psion_state::psion_on)
 		m_maincpu->reset();
 }
 
-READ8_MEMBER( psion1_state::reset_kb_counter_r )
+uint8_t psion1_state::reset_kb_counter_r()
 {
 	m_kb_counter = 0;
 	return 0;
 }
 
-READ8_MEMBER( psion1_state::inc_kb_counter_r )
+uint8_t psion1_state::inc_kb_counter_r()
 {
 	m_kb_counter++;
 	return 0;
 }
 
-READ8_MEMBER( psion1_state::switchoff_r )
+uint8_t psion1_state::switchoff_r()
 {
 	if (!m_stby_pwr)
 	{

@@ -142,8 +142,8 @@ private:
 	int m_meter;
 	virtual void machine_reset() override;
 	void meter_w(uint8_t data);
-	DECLARE_WRITE16_MEMBER(serial_transmit);
-	DECLARE_READ16_MEMBER(serial_receive);
+	void serial_transmit(offs_t offset, uint16_t data);
+	uint16_t serial_receive(offs_t offset);
 };
 
 void proconn_state::proconn_map(address_map &map)
@@ -216,7 +216,7 @@ void proconn_state::proconn_portmap(address_map &map)
 static INPUT_PORTS_START( proconn )
 INPUT_PORTS_END
 
-WRITE16_MEMBER(proconn_state::serial_transmit)
+void proconn_state::serial_transmit(offs_t offset, uint16_t data)
 {
 //Don't like the look of this, should be a clock somewhere
 
@@ -233,7 +233,7 @@ WRITE16_MEMBER(proconn_state::serial_transmit)
 	}
 }
 
-READ16_MEMBER(proconn_state::serial_receive)
+uint16_t proconn_state::serial_receive(offs_t offset)
 {
 	logerror("proconn serial receive read %x",offset);
 	return -1;

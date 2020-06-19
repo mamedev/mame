@@ -19,7 +19,52 @@
 
 struct text_buffer;
 
+struct text_buffer_line
+{
+    const char *text;
+    size_t length;
+};
 
+/* helper class that makes it possible to iterate over the lines of a text_buffer */
+class text_buffer_lines
+{
+private:
+    text_buffer& m_buffer;
+
+public:
+    text_buffer_lines(text_buffer& buffer) : m_buffer(buffer) { }
+
+    class text_buffer_line_iterator
+    {
+        text_buffer& m_buffer;
+        s32 m_lineptr;
+    public:
+        text_buffer_line_iterator(text_buffer& buffer, s32 lineptr) :
+            m_buffer(buffer),
+            m_lineptr(lineptr)
+        {
+        }
+
+        /* technically this isn't a valid forward iterator, because
+         * operator * doesn't return a reference
+         */
+        text_buffer_line operator *() const;
+        text_buffer_line_iterator& operator ++(); 
+
+        bool operator != (const text_buffer_line_iterator& rhs)
+        {
+            return m_lineptr != rhs.m_lineptr;
+        }
+        /* according to C++ spec, only != is needed; == is present for completeness. */
+        bool operator == (const text_buffer_line_iterator& rhs) { return !(operator !=(rhs)); }
+    };
+
+    typedef text_buffer_line_iterator iterator;
+    typedef text_buffer_line_iterator const iterator_const;
+
+    iterator begin() const;
+    iterator end() const;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -52,5 +97,7 @@ u32 text_buffer_line_index_to_seqnum(text_buffer *text, u32 index);
 /* get a sequenced line from the text buffer */
 const char *text_buffer_get_seqnum_line(text_buffer *text, u32 seqnum);
 
+/* get an iterable container of the lines in the buffer */
+text_buffer_lines text_buffer_get_lines(text_buffer* text);
 
 #endif  /* MAME_EMU_DEBUG_TEXTBUF_H */

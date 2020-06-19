@@ -155,7 +155,7 @@ VIDEO_START_MEMBER(galaga_state,galaga)
 ***************************************************************************/
 
 
-WRITE8_MEMBER(galaga_state::galaga_videoram_w)
+void galaga_state::galaga_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);

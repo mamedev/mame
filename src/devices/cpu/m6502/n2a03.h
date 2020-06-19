@@ -24,10 +24,10 @@ public:
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
-	READ8_MEMBER(psg1_4014_r);
-	READ8_MEMBER(psg1_4015_r);
-	WRITE8_MEMBER(psg1_4015_w);
-	WRITE8_MEMBER(psg1_4017_w);
+	uint8_t psg1_4014_r();
+	uint8_t psg1_4015_r();
+	void psg1_4015_w(uint8_t data);
+	void psg1_4017_w(uint8_t data);
 
 	void n2a03_map(address_map &map);
 protected:

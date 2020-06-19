@@ -48,20 +48,20 @@ Notes:
 #include "speaker.h"
 
 
-WRITE16_MEMBER(drgnmst_base_state::coin_w)
+void drgnmst_base_state::coin_w(uint16_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x100);
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x400);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x800);
 }
 
-WRITE8_MEMBER(drgnmst_pic_state::snd_command_w)
+void drgnmst_pic_state::snd_command_w(uint8_t data)
 {
 	m_snd_command = data;
 	m_maincpu->yield();
 }
 
-WRITE8_MEMBER(drgnmst_pic_state::snd_flag_w)
+void drgnmst_pic_state::snd_flag_w(uint8_t data)
 {
 	/* Enables the following 68K write operation to latch through to the PIC */
 	m_snd_flag = 1;

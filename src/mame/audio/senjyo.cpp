@@ -28,7 +28,7 @@ WRITE_LINE_MEMBER(senjyo_state::sound_line_clock)
 	}
 }
 
-WRITE8_MEMBER(senjyo_state::volume_w)
+void senjyo_state::volume_w(uint8_t data)
 {
 	m_single_volume = data & 0x0f;
 }

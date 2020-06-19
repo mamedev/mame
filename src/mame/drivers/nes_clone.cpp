@@ -34,11 +34,11 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(sprite_dma_w);
+	void sprite_dma_w(address_space &space, uint8_t data);
 
-	virtual DECLARE_READ8_MEMBER(in0_r);
-	virtual DECLARE_READ8_MEMBER(in1_r);
-	virtual DECLARE_WRITE8_MEMBER(in0_w);
+	virtual uint8_t in0_r();
+	virtual uint8_t in1_r();
+	virtual void in0_w(uint8_t data);
 
 	void nes_clone_basemap(address_map &map);
 
@@ -70,20 +70,20 @@ private:
 	void nes_clone_dnce2000_map(address_map& map);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_WRITE8_MEMBER(bank_w);
+	uint8_t rom_r(offs_t offset);
+	void bank_w(uint8_t data);
 	int m_rombase;
 };
 
 
-WRITE8_MEMBER(nes_clone_state::sprite_dma_w)
+void nes_clone_state::sprite_dma_w(address_space &space, uint8_t data)
 {
 	int source = (data & 7);
 	m_ppu->spriteram_dma(space, source);
 }
 
 // Standard NES style inputs (not using bus device as there are no real NES controller ports etc. these are all-in-one units and can be custom
-READ8_MEMBER(nes_clone_state::in0_r)
+uint8_t nes_clone_state::in0_r()
 {
 	//logerror("%s: in0_r\n", machine().describe_context());
 	uint8_t ret = 0x40;
@@ -92,7 +92,7 @@ READ8_MEMBER(nes_clone_state::in0_r)
 	return ret;
 }
 
-READ8_MEMBER(nes_clone_state::in1_r)
+uint8_t nes_clone_state::in1_r()
 {
 	//logerror("%s: in1_r\n", machine().describe_context());
 	uint8_t ret = 0x40;
@@ -101,7 +101,7 @@ READ8_MEMBER(nes_clone_state::in1_r)
 	return ret;
 }
 
-WRITE8_MEMBER(nes_clone_state::in0_w)
+void nes_clone_state::in0_w(uint8_t data)
 {
 	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
 	if (data & 0x01)
@@ -270,12 +270,12 @@ void nes_clone_dnce2000_state::machine_start()
 	save_item(NAME(m_rombase));
 }
 
-READ8_MEMBER(nes_clone_dnce2000_state::rom_r)
+uint8_t nes_clone_dnce2000_state::rom_r(offs_t offset)
 {
 	return m_mainrom[(offset + (m_rombase * 0x8000)) & (m_mainromsize - 1)];
 }
 
-WRITE8_MEMBER(nes_clone_dnce2000_state::bank_w)
+void nes_clone_dnce2000_state::bank_w(uint8_t data)
 {
 	m_rombase = data;
 }

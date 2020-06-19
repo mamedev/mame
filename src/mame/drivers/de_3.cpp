@@ -1093,6 +1093,20 @@ ROM_START(stwr_102)
 	ROM_LOAD("s-wars.u21", 0x080000, 0x40000, CRC(7b08fdf1) SHA1(489d21a10e97e886f948d81dedd7f8de3acecd2b))
 ROM_END
 
+ROM_START(stwr_101)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("starcpu.101", 0x0000, 0x10000, CRC(6efc7b14) SHA1(f669669fbd8733d06b386ea352fdb2041bf98362))
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("stardisp_u14.102", 0x00000, 0x40000, CRC(f8087364) SHA1(4cd66b72cf430018cfb7ac8306b96a8499d41896))
+	ROM_LOAD("stardisp_u12.102", 0x40000, 0x40000, CRC(fde126c6) SHA1(0a3eacfd4589ee0f26c4212ba9948dff061f3338))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("s-wars.u7", 0x8000, 0x8000, CRC(cefa19d5) SHA1(7ddf9cc85ab601514305bc46083a07a3d087b286))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("s-wars.u17", 0x000000, 0x80000, CRC(7950a147) SHA1(f5bcd5cf6b35f9e4f14d62b084495c3a743d92a1))
+	ROM_LOAD("s-wars.u21", 0x080000, 0x40000, CRC(7b08fdf1) SHA1(489d21a10e97e886f948d81dedd7f8de3acecd2b))
+ROM_END
+
 ROM_START(stwr_e12)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("starcpue.102", 0x0000, 0x10000, CRC(b441abd3) SHA1(42cab6e16be8e25a68b2db30f53ba516bbb8741d))
@@ -1362,6 +1376,7 @@ GAME(1992,  stwr_103,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, 
 GAME(1992,  stwr_g11,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.01 Germany)",        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_a14,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (Display Rev.1.04)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_102,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.02)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  stwr_101,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.01)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_e12,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.02 England)",        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  tftc_303,  0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Tales From the Crypt (3.03)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  tftc_302,  tftc_303, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Tales From the Crypt (3.02 Dutch)",                MACHINE_IS_SKELETON_MECHANICAL)

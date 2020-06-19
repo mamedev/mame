@@ -98,7 +98,7 @@ void bbc_fdc_slot_device::write(offs_t offset, uint8_t data)
 #include "cv1797.h"
 #include "microware.h"
 #include "opus.h"
-//#include "solidisk.h"
+#include "solidisk.h"
 #include "watford.h"
 
 
@@ -115,9 +115,9 @@ void bbc_fdc_devices(device_slot_interface &device)
 	device.option_add("opus2791",  BBC_OPUS2791);
 	device.option_add("opus2793",  BBC_OPUS2793);
 	device.option_add("opus1770",  BBC_OPUS1770);
-	//device.option_add("stl8271",   BBC_STL8271);
-	//device.option_add("stl1770_1", BBC_STL1770_1);
-	//device.option_add("stl1770_2", BBC_STL1770_2);
+	device.option_add("stl1770_1", BBC_STL1770_1);
+	device.option_add("stl1770_2", BBC_STL1770_2);
+	device.option_add("stldfdc_1", BBC_STLDFDC_1);
 	device.option_add("weddb2",    BBC_WEDDB2);
 	device.option_add("weddb3",    BBC_WEDDB3);
 }

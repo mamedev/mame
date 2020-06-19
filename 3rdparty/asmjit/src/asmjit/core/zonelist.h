@@ -35,6 +35,7 @@ ASMJIT_BEGIN_NAMESPACE
 // [asmjit::ZoneListNode]
 // ============================================================================
 
+//! Node used by \ref ZoneList template.
 template<typename NodeT>
 class ZoneListNode {
 public:
@@ -69,6 +70,7 @@ public:
 // [asmjit::ZoneList<T>]
 // ============================================================================
 
+//! Zone allocated list container that uses nodes of `NodeT` type.
 template <typename NodeT>
 class ZoneList {
 public:

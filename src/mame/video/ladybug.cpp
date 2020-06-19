@@ -403,7 +403,7 @@ TILE_GET_INFO_MEMBER(sraider_state::get_grid_tile_info)
 	}
 }
 
-WRITE8_MEMBER(sraider_state::sraider_io_w)
+void sraider_state::sraider_io_w(uint8_t data)
 {
 	// bit7 = flip
 	// bit6 = grid red

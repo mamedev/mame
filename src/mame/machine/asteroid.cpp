@@ -43,7 +43,7 @@ WRITE_LINE_MEMBER(asteroid_state::cocktail_inv_w)
 	m_dvg->set_flip_y(flip);
 }
 
-READ8_MEMBER(asteroid_state::asteroid_IN0_r)
+uint8_t asteroid_state::asteroid_IN0_r(offs_t offset)
 {
 	int res = ioport("IN0")->read();
 	int bitmask = (1 << offset);
@@ -57,7 +57,7 @@ READ8_MEMBER(asteroid_state::asteroid_IN0_r)
 }
 
 
-READ8_MEMBER(asteroid_state::asterock_IN0_r)
+uint8_t asteroid_state::asterock_IN0_r(offs_t offset)
 {
 	int res = ioport("IN0")->read();
 	int bitmask = (1 << offset);
@@ -75,7 +75,7 @@ READ8_MEMBER(asteroid_state::asterock_IN0_r)
  * Typically, only the high bit is used. This is handled by one input port.
  */
 
-READ8_MEMBER(asteroid_state::asteroid_IN1_r)
+uint8_t asteroid_state::asteroid_IN1_r(offs_t offset)
 {
 	int res = ioport("IN1")->read();
 	int bitmask = (1 << (offset & 0x7));
@@ -89,7 +89,7 @@ READ8_MEMBER(asteroid_state::asteroid_IN1_r)
 }
 
 
-READ8_MEMBER(asteroid_state::asteroid_DSW1_r)
+uint8_t asteroid_state::asteroid_DSW1_r(offs_t offset)
 {
 	// 765432--  not used
 	// ------1-  ls253 dsw selector 2y

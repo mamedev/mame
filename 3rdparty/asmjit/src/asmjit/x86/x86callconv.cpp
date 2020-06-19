@@ -33,13 +33,19 @@ ASMJIT_BEGIN_SUB_NAMESPACE(x86)
 // [asmjit::x86::CallConvInternal - Init]
 // ============================================================================
 
-static inline void CallConv_initX86Common(CallConv& cc) noexcept {
-  cc.setNaturalStackAlignment(4);
-  cc.setArchType(ArchInfo::kIdX86);
-  cc.setPreservedRegs(Reg::kGroupGp, Support::bitMask(Gp::kIdBx, Gp::kIdSp, Gp::kIdBp, Gp::kIdSi, Gp::kIdDi));
+namespace CallConvInternal {
+
+static inline bool shouldThreatAsCDeclIn64BitMode(uint32_t ccId) noexcept {
+  return ccId == CallConv::kIdCDecl ||
+         ccId == CallConv::kIdStdCall ||
+         ccId == CallConv::kIdThisCall ||
+         ccId == CallConv::kIdFastCall ||
+         ccId == CallConv::kIdRegParm1 ||
+         ccId == CallConv::kIdRegParm2 ||
+         ccId == CallConv::kIdRegParm3;
 }
 
-ASMJIT_FAVOR_SIZE Error CallConvInternal::init(CallConv& cc, uint32_t ccId) noexcept {
+ASMJIT_FAVOR_SIZE Error init(CallConv& cc, uint32_t ccId, const Environment& environment) noexcept {
   constexpr uint32_t kGroupGp   = Reg::kGroupGp;
   constexpr uint32_t kGroupVec  = Reg::kGroupVec;
   constexpr uint32_t kGroupMm   = Reg::kGroupMm;
@@ -54,109 +60,178 @@ ASMJIT_FAVOR_SIZE Error CallConvInternal::init(CallConv& cc, uint32_t ccId) noex
   constexpr uint32_t kZsi = Gp::kIdSi;
   constexpr uint32_t kZdi = Gp::kIdDi;
 
-  switch (ccId) {
-    case CallConv::kIdX86StdCall:
-      cc.setFlags(CallConv::kFlagCalleePopsStack);
-      CallConv_initX86Common(cc);
-      break;
+  bool winABI = environment.isPlatformWindows() || environment.isAbiMSVC();
 
-    case CallConv::kIdX86MsThisCall:
-      cc.setFlags(CallConv::kFlagCalleePopsStack);
-      cc.setPassedOrder(kGroupGp, kZcx);
-      CallConv_initX86Common(cc);
-      break;
+  cc.setArch(environment.arch());
 
-    case CallConv::kIdX86MsFastCall:
-    case CallConv::kIdX86GccFastCall:
-      cc.setFlags(CallConv::kFlagCalleePopsStack);
-      cc.setPassedOrder(kGroupGp, kZcx, kZdx);
-      CallConv_initX86Common(cc);
-      break;
+  if (environment.is32Bit()) {
+    bool isStandardCallConv = true;
 
-    case CallConv::kIdX86GccRegParm1:
-      cc.setPassedOrder(kGroupGp, kZax);
-      CallConv_initX86Common(cc);
-      break;
+    cc.setPreservedRegs(Reg::kGroupGp, Support::bitMask(Gp::kIdBx, Gp::kIdSp, Gp::kIdBp, Gp::kIdSi, Gp::kIdDi));
+    cc.setNaturalStackAlignment(4);
 
-    case CallConv::kIdX86GccRegParm2:
-      cc.setPassedOrder(kGroupGp, kZax, kZdx);
-      CallConv_initX86Common(cc);
-      break;
+    switch (ccId) {
+      case CallConv::kIdCDecl:
+        break;
 
-    case CallConv::kIdX86GccRegParm3:
-      cc.setPassedOrder(kGroupGp, kZax, kZdx, kZcx);
-      CallConv_initX86Common(cc);
-      break;
+      case CallConv::kIdStdCall:
+        cc.setFlags(CallConv::kFlagCalleePopsStack);
+        break;
 
-    case CallConv::kIdX86CDecl:
-      CallConv_initX86Common(cc);
-      break;
+      case CallConv::kIdFastCall:
+        cc.setFlags(CallConv::kFlagCalleePopsStack);
+        cc.setPassedOrder(kGroupGp, kZcx, kZdx);
+        break;
 
-    case CallConv::kIdX86Win64:
-      cc.setArchType(ArchInfo::kIdX64);
-      cc.setStrategy(CallConv::kStrategyWin64);
-      cc.setFlags(CallConv::kFlagPassFloatsByVec | CallConv::kFlagIndirectVecArgs);
-      cc.setNaturalStackAlignment(16);
-      cc.setSpillZoneSize(32);
-      cc.setPassedOrder(kGroupGp, kZcx, kZdx, 8, 9);
-      cc.setPassedOrder(kGroupVec, 0, 1, 2, 3);
-      cc.setPreservedRegs(kGroupGp, Support::bitMask(kZbx, kZsp, kZbp, kZsi, kZdi, 12, 13, 14, 15));
-      cc.setPreservedRegs(kGroupVec, Support::bitMask(6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
-      break;
+      case CallConv::kIdVectorCall:
+        cc.setFlags(CallConv::kFlagCalleePopsStack);
+        cc.setPassedOrder(kGroupGp, kZcx, kZdx);
+        cc.setPassedOrder(kGroupVec, 0, 1, 2, 3, 4, 5);
+        break;
 
-    case CallConv::kIdX86SysV64:
-      cc.setArchType(ArchInfo::kIdX64);
-      cc.setFlags(CallConv::kFlagPassFloatsByVec);
-      cc.setNaturalStackAlignment(16);
-      cc.setRedZoneSize(128);
-      cc.setPassedOrder(kGroupGp, kZdi, kZsi, kZdx, kZcx, 8, 9);
-      cc.setPassedOrder(kGroupVec, 0, 1, 2, 3, 4, 5, 6, 7);
-      cc.setPreservedRegs(kGroupGp, Support::bitMask(kZbx, kZsp, kZbp, 12, 13, 14, 15));
-      break;
+      case CallConv::kIdThisCall:
+        // NOTE: Even MINGW (starting with GCC 4.7.0) now uses __thiscall on MS Windows,
+        // so we won't bail to any other calling convention if __thiscall was specified.
+        if (winABI) {
+          cc.setFlags(CallConv::kFlagCalleePopsStack);
+          cc.setPassedOrder(kGroupGp, kZcx);
+        }
+        else {
+          ccId = CallConv::kIdCDecl;
+        }
+        break;
 
-    case CallConv::kIdX86LightCall2:
-    case CallConv::kIdX86LightCall3:
-    case CallConv::kIdX86LightCall4: {
-      uint32_t n = (ccId - CallConv::kIdX86LightCall2) + 2;
+      case CallConv::kIdRegParm1:
+        cc.setPassedOrder(kGroupGp, kZax);
+        break;
 
-      cc.setArchType(ArchInfo::kIdX86);
-      cc.setFlags(CallConv::kFlagPassFloatsByVec);
-      cc.setNaturalStackAlignment(16);
-      cc.setPassedOrder(kGroupGp, kZax, kZdx, kZcx, kZsi, kZdi);
-      cc.setPassedOrder(kGroupMm, 0, 1, 2, 3, 4, 5, 6, 7);
-      cc.setPassedOrder(kGroupVec, 0, 1, 2, 3, 4, 5, 6, 7);
-      cc.setPassedOrder(kGroupKReg, 0, 1, 2, 3, 4, 5, 6, 7);
+      case CallConv::kIdRegParm2:
+        cc.setPassedOrder(kGroupGp, kZax, kZdx);
+        break;
 
-      cc.setPreservedRegs(kGroupGp  , Support::lsbMask<uint32_t>(8));
-      cc.setPreservedRegs(kGroupVec , Support::lsbMask<uint32_t>(8) & ~Support::lsbMask<uint32_t>(n));
-      break;
+      case CallConv::kIdRegParm3:
+        cc.setPassedOrder(kGroupGp, kZax, kZdx, kZcx);
+        break;
+
+      case CallConv::kIdLightCall2:
+      case CallConv::kIdLightCall3:
+      case CallConv::kIdLightCall4: {
+        uint32_t n = (ccId - CallConv::kIdLightCall2) + 2;
+
+        cc.setFlags(CallConv::kFlagPassFloatsByVec);
+        cc.setPassedOrder(kGroupGp, kZax, kZdx, kZcx, kZsi, kZdi);
+        cc.setPassedOrder(kGroupMm, 0, 1, 2, 3, 4, 5, 6, 7);
+        cc.setPassedOrder(kGroupVec, 0, 1, 2, 3, 4, 5, 6, 7);
+        cc.setPassedOrder(kGroupKReg, 0, 1, 2, 3, 4, 5, 6, 7);
+        cc.setPreservedRegs(kGroupGp, Support::lsbMask<uint32_t>(8));
+        cc.setPreservedRegs(kGroupVec, Support::lsbMask<uint32_t>(8) & ~Support::lsbMask<uint32_t>(n));
+
+        cc.setNaturalStackAlignment(16);
+        isStandardCallConv = false;
+        break;
+      }
+
+      default:
+        return DebugUtils::errored(kErrorInvalidArgument);
     }
 
-    case CallConv::kIdX64LightCall2:
-    case CallConv::kIdX64LightCall3:
-    case CallConv::kIdX64LightCall4: {
-      uint32_t n = (ccId - CallConv::kIdX64LightCall2) + 2;
+    if (isStandardCallConv) {
+      // MMX arguments is something where compiler vendors disagree. For example
+      // GCC and MSVC would pass first three via registers and the rest via stack,
+      // however Clang passes all via stack. Returning MMX registers is even more
+      // fun, where GCC uses MM0, but Clang uses EAX:EDX pair. I'm not sure it's
+      // something we should be worried about as MMX is deprecated anyway.
+      cc.setPassedOrder(kGroupMm, 0, 1, 2);
 
-      cc.setArchType(ArchInfo::kIdX64);
-      cc.setFlags(CallConv::kFlagPassFloatsByVec);
-      cc.setNaturalStackAlignment(16);
-      cc.setPassedOrder(kGroupGp, kZax, kZdx, kZcx, kZsi, kZdi);
-      cc.setPassedOrder(kGroupMm, 0, 1, 2, 3, 4, 5, 6, 7);
-      cc.setPassedOrder(kGroupVec, 0, 1, 2, 3, 4, 5, 6, 7);
-      cc.setPassedOrder(kGroupKReg, 0, 1, 2, 3, 4, 5, 6, 7);
+      // Vector arguments (XMM|YMM|ZMM) are passed via registers. However, if the
+      // function is variadic then they have to be passed via stack.
+      cc.setPassedOrder(kGroupVec, 0, 1, 2);
 
-      cc.setPreservedRegs(kGroupGp  , Support::lsbMask<uint32_t>(16));
-      cc.setPreservedRegs(kGroupVec ,~Support::lsbMask<uint32_t>(n));
-      break;
+      // Functions with variable arguments always use stack for MM and vector
+      // arguments.
+      cc.addFlags(CallConv::kFlagPassVecByStackIfVA);
     }
 
-    default:
-      return DebugUtils::errored(kErrorInvalidArgument);
+    if (ccId == CallConv::kIdCDecl) {
+      cc.addFlags(CallConv::kFlagVarArgCompatible);
+    }
+  }
+  else {
+    // Preprocess the calling convention into a common id as many conventions
+    // are normally ignored even by C/C++ compilers and treated as `__cdecl`.
+    if (shouldThreatAsCDeclIn64BitMode(ccId))
+      ccId = winABI ? CallConv::kIdX64Windows : CallConv::kIdX64SystemV;
+
+    switch (ccId) {
+      case CallConv::kIdX64SystemV: {
+        cc.setFlags(CallConv::kFlagPassFloatsByVec |
+                    CallConv::kFlagPassMmxByXmm    |
+                    CallConv::kFlagVarArgCompatible);
+        cc.setNaturalStackAlignment(16);
+        cc.setRedZoneSize(128);
+        cc.setPassedOrder(kGroupGp, kZdi, kZsi, kZdx, kZcx, 8, 9);
+        cc.setPassedOrder(kGroupVec, 0, 1, 2, 3, 4, 5, 6, 7);
+        cc.setPreservedRegs(kGroupGp, Support::bitMask(kZbx, kZsp, kZbp, 12, 13, 14, 15));
+        break;
+      }
+
+      case CallConv::kIdX64Windows: {
+        cc.setStrategy(CallConv::kStrategyX64Windows);
+        cc.setFlags(CallConv::kFlagPassFloatsByVec |
+                    CallConv::kFlagIndirectVecArgs |
+                    CallConv::kFlagPassMmxByGp     |
+                    CallConv::kFlagVarArgCompatible);
+        cc.setNaturalStackAlignment(16);
+        // Maximum 4 arguments in registers, each adds 8 bytes to the spill zone.
+        cc.setSpillZoneSize(4 * 8);
+        cc.setPassedOrder(kGroupGp, kZcx, kZdx, 8, 9);
+        cc.setPassedOrder(kGroupVec, 0, 1, 2, 3);
+        cc.setPreservedRegs(kGroupGp, Support::bitMask(kZbx, kZsp, kZbp, kZsi, kZdi, 12, 13, 14, 15));
+        cc.setPreservedRegs(kGroupVec, Support::bitMask(6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+        break;
+      }
+
+      case CallConv::kIdVectorCall: {
+        cc.setStrategy(CallConv::kStrategyX64VectorCall);
+        cc.setFlags(CallConv::kFlagPassFloatsByVec |
+                    CallConv::kFlagPassMmxByGp     );
+        cc.setNaturalStackAlignment(16);
+        // Maximum 6 arguments in registers, each adds 8 bytes to the spill zone.
+        cc.setSpillZoneSize(6 * 8);
+        cc.setPassedOrder(kGroupGp, kZcx, kZdx, 8, 9);
+        cc.setPassedOrder(kGroupVec, 0, 1, 2, 3, 4, 5);
+        cc.setPreservedRegs(kGroupGp, Support::bitMask(kZbx, kZsp, kZbp, kZsi, kZdi, 12, 13, 14, 15));
+        cc.setPreservedRegs(kGroupVec, Support::bitMask(6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+        break;
+      }
+
+      case CallConv::kIdLightCall2:
+      case CallConv::kIdLightCall3:
+      case CallConv::kIdLightCall4: {
+        uint32_t n = (ccId - CallConv::kIdLightCall2) + 2;
+
+        cc.setFlags(CallConv::kFlagPassFloatsByVec);
+        cc.setNaturalStackAlignment(16);
+        cc.setPassedOrder(kGroupGp, kZax, kZdx, kZcx, kZsi, kZdi);
+        cc.setPassedOrder(kGroupMm, 0, 1, 2, 3, 4, 5, 6, 7);
+        cc.setPassedOrder(kGroupVec, 0, 1, 2, 3, 4, 5, 6, 7);
+        cc.setPassedOrder(kGroupKReg, 0, 1, 2, 3, 4, 5, 6, 7);
+
+        cc.setPreservedRegs(kGroupGp, Support::lsbMask<uint32_t>(16));
+        cc.setPreservedRegs(kGroupVec, ~Support::lsbMask<uint32_t>(n));
+        break;
+      }
+
+      default:
+        return DebugUtils::errored(kErrorInvalidArgument);
+    }
   }
 
   cc.setId(ccId);
   return kErrorOk;
 }
+
+} // {CallConvInternal}
 
 ASMJIT_END_SUB_NAMESPACE
 

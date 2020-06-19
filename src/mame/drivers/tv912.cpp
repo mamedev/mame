@@ -104,11 +104,11 @@ private:
 	void p1_w(u8 data);
 	u8 p2_r();
 	void p2_w(u8 data);
-	DECLARE_READ8_MEMBER(crtc_r);
-	DECLARE_WRITE8_MEMBER(crtc_w);
-	DECLARE_READ8_MEMBER(uart_status_r);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(output_40c);
+	u8 crtc_r(offs_t offset);
+	void crtc_w(offs_t offset, u8 data);
+	u8 uart_status_r(offs_t offset);
+	u8 keyboard_r(offs_t offset);
+	void output_40c(u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -188,17 +188,17 @@ void tv912_state::p2_w(u8 data)
 	m_4hz_flasher = BIT(data, 4);
 }
 
-READ8_MEMBER(tv912_state::crtc_r)
+u8 tv912_state::crtc_r(offs_t offset)
 {
 	return m_crtc->read(bitswap<4>(offset, 5, 4, 1, 0));
 }
 
-WRITE8_MEMBER(tv912_state::crtc_w)
+void tv912_state::crtc_w(offs_t offset, u8 data)
 {
 	m_crtc->write(bitswap<4>(offset, 5, 4, 1, 0), data);
 }
 
-READ8_MEMBER(tv912_state::keyboard_r)
+u8 tv912_state::keyboard_r(offs_t offset)
 {
 	u8 result = m_modifiers->read();
 
@@ -209,7 +209,7 @@ READ8_MEMBER(tv912_state::keyboard_r)
 	return result;
 }
 
-READ8_MEMBER(tv912_state::uart_status_r)
+u8 tv912_state::uart_status_r(offs_t offset)
 {
 	m_uart->write_swe(0);
 	u8 status = m_uart->dav_r() << 0;
@@ -222,7 +222,7 @@ READ8_MEMBER(tv912_state::uart_status_r)
 	return status;
 }
 
-WRITE8_MEMBER(tv912_state::output_40c)
+void tv912_state::output_40c(u8 data)
 {
 	// DB6: -PRTOL
 

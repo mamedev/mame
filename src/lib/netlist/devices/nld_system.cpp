@@ -26,10 +26,7 @@ namespace devices
 	{
 		m_cnt = 0;
 		m_off = netlist_time::from_fp<decltype(m_offset())>(m_offset());
-		m_feedback.set_delegate(NETLIB_DELEGATE(extclock, update));
-
-		//m_feedback.m_delegate .set(&NETLIB_NAME(extclock)::update, this);
-		//m_Q.initial(0);
+		m_feedback.set_delegate(NETLIB_DELEGATE(update));
 	}
 
 	NETLIB_HANDLER(extclock, clk2)

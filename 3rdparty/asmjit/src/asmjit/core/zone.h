@@ -383,15 +383,22 @@ public:
 // [b2d::ZoneTmp]
 // ============================================================================
 
+//! \ref Zone with `N` bytes of a static storage, used for the initial block.
+//!
+//! Temporary zones are used in cases where it's known that some memory will be
+//! required, but in many cases it won't exceed N bytes, so the whole operation
+//! can be performed without a dynamic memory allocation.
 template<size_t N>
 class ZoneTmp : public Zone {
 public:
   ASMJIT_NONCOPYABLE(ZoneTmp<N>)
 
+  //! Temporary storage, embedded after \ref Zone.
   struct Storage {
     char data[N];
   } _storage;
 
+  //! Creates a temporary zone. Dynamic block size is specified by `blockSize`.
   ASMJIT_INLINE explicit ZoneTmp(size_t blockSize, size_t blockAlignment = 1) noexcept
     : Zone(blockSize, blockAlignment, Support::Temporary(_storage.data, N)) {}
 };

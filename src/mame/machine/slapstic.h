@@ -159,10 +159,11 @@ protected:
 private:
 	// legacy helpers
 	void legacy_update_bank(int bank);
-	void slapstic_w(address_space &space, offs_t offset, u16 data, u16 mem_mask);
-	uint16_t slapstic_r(address_space &space, offs_t offset, u16 mem_mask);
+	void slapstic_w(offs_t offset, u16 data, u16 mem_mask);
+	uint16_t slapstic_r(offs_t offset, u16 mem_mask);
 
 	bool             m_legacy_configured;
+	address_space *  m_legacy_space;
 	u16 *            m_legacy_memptr;
 	u8               m_legacy_bank;
 	std::vector<u8>  m_legacy_bank0;

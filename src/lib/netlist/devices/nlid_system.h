@@ -10,8 +10,8 @@
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_factory.h"
-#include "netlist/plib/putil.h"
 #include "netlist/plib/prandom.h"
+#include "netlist/plib/putil.h"
 
 #include <random>
 
@@ -93,7 +93,7 @@ namespace devices
 		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
-			if (m_func() != "")
+			if (!m_func().empty())
 				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 			connect(m_feedback, m_Q);
 		}
@@ -380,7 +380,7 @@ namespace devices
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
-		std::vector<unique_pool_ptr<analog_input_t>> m_I;
+		std::vector<device_arena::unique_ptr<analog_input_t>> m_I;
 
 		pf_type::values_container m_vals;
 		state_var<pf_type> m_compiled;
@@ -395,10 +395,10 @@ namespace devices
 	{
 	public:
 		NETLIB_CONSTRUCTOR(sys_dsw1)
-		, m_R(*this, "_R")
-		, m_I(*this, "I")
 		, m_RON(*this, "RON", nlconst::one())
 		, m_ROFF(*this, "ROFF", nlconst::magic(1.0E20))
+		, m_R(*this, "_R")
+		, m_I(*this, "I")
 		, m_last_state(*this, "m_last_state", 0)
 		{
 			register_subalias("1", m_R.P());
@@ -417,7 +417,7 @@ namespace devices
 			if (state != m_last_state)
 			{
 				m_last_state = state;
-				const nl_fptype R = state ? m_RON() : m_ROFF();
+				const nl_fptype R = (state != 0) ? m_RON() : m_ROFF();
 
 				m_R.change_state([this, &R]()
 				{
@@ -428,13 +428,19 @@ namespace devices
 
 		//NETLIB_UPDATE_PARAMI();
 
-		// used by 74123
-		analog::NETLIB_SUB(R_base) m_R;
-		logic_input_t m_I;
+		//FIXME: used by 74123
+
+		const terminal_t &P() const noexcept { return m_R.P(); }
+		const terminal_t &N() const noexcept { return m_R.N(); }
+		const logic_input_t &I() const noexcept { return m_I; }
+
 		param_fp_t m_RON;
 		param_fp_t m_ROFF;
 
 	private:
+		analog::NETLIB_SUB(R_base) m_R;
+		logic_input_t m_I;
+
 		state_var<netlist_sig_t> m_last_state;
 	};
 
@@ -451,7 +457,6 @@ namespace devices
 		, m_I(*this, "I")
 		, m_GON(*this, "GON", nlconst::magic(1e9)) // FIXME: all switches should have some on value
 		, m_GOFF(*this, "GOFF", nlconst::cgmin())
-		, m_last_state(*this, "m_last_state", 0)
 		, m_power_pins(*this)
 		{
 			// connect and register pins
@@ -463,7 +468,6 @@ namespace devices
 
 		NETLIB_RESETI()
 		{
-			m_last_state = 1;
 			m_R1.set_G(m_GOFF());
 			m_R2.set_G(m_GON());
 		}
@@ -471,45 +475,40 @@ namespace devices
 		NETLIB_UPDATEI()
 		{
 			const netlist_sig_t state = m_I();
-			// FIXME: update should only be called if m_I changes
-			if (true || (state != m_last_state))
+
+			//printf("Here %d\n", state);
+			const nl_fptype G1 = (state != 0) ? m_GON() : m_GOFF();
+			const nl_fptype G2 = (state != 0) ? m_GOFF() : m_GON();
+			if (m_R1.solver() == m_R2.solver())
 			{
-				m_last_state = state;
-				//printf("Here %d\n", state);
-				const nl_fptype G1 = state ? m_GON() : m_GOFF();
-				const nl_fptype G2 = state ? m_GOFF() : m_GON();
-				if (m_R1.solver() == m_R2.solver())
+				m_R1.change_state([this, &G1, &G2]()
 				{
-					m_R1.change_state([this, &G1, &G2]()
-					{
-						m_R1.set_G(G1);
-						m_R2.set_G(G2);
-					});
-				}
-				else
+					m_R1.set_G(G1);
+					m_R2.set_G(G2);
+				});
+			}
+			else
+			{
+				m_R1.change_state([this, &G1]()
 				{
-					m_R1.change_state([this, &G1]()
-					{
-						m_R1.set_G(G1);
-					});
-					m_R2.change_state([this, &G2]()
-					{
-						m_R2.set_G(G2);
-					});
-				}
+					m_R1.set_G(G1);
+				});
+				m_R2.change_state([this, &G2]()
+				{
+					m_R2.set_G(G2);
+				});
 			}
 		}
 
 		//NETLIB_UPDATE_PARAMI();
 
+	private:
 		analog::NETLIB_SUB(R_base) m_R1;
 		analog::NETLIB_SUB(R_base) m_R2;
 		logic_input_t m_I;
 		param_fp_t m_GON;
 		param_fp_t m_GOFF;
 
-	private:
-		state_var<netlist_sig_t> m_last_state;
 		nld_power_pins m_power_pins;
 	};
 
@@ -550,13 +549,13 @@ namespace devices
 
 		//NETLIB_UPDATE_PARAMI();
 
+	private:
 		analog_input_t m_IP;
 		analog_input_t m_IN;
 		logic_output_t m_Q;
 		logic_output_t m_QQ;
 		nld_power_pins m_power_pins;
 
-	private:
 		state_var<netlist_sig_t> m_last_state;
 	};
 

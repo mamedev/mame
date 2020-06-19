@@ -13,7 +13,7 @@
 #include "includes/pp01.h"
 
 
-WRITE8_MEMBER(pp01_state::video_write_mode_w)
+void pp01_state::video_write_mode_w(uint8_t data)
 {
 	m_video_write_mode = data & 0x0f;
 }
@@ -53,28 +53,28 @@ void pp01_state::video_w(uint8_t block,uint16_t offset,uint8_t data,uint8_t part
 	}
 }
 
-WRITE8_MEMBER(pp01_state::video_r_1_w)
+void pp01_state::video_r_1_w(offs_t offset, uint8_t data)
 {
 	video_w(0,offset,data,0);
 }
-WRITE8_MEMBER(pp01_state::video_g_1_w)
+void pp01_state::video_g_1_w(offs_t offset, uint8_t data)
 {
 	video_w(1,offset,data,0);
 }
-WRITE8_MEMBER(pp01_state::video_b_1_w)
+void pp01_state::video_b_1_w(offs_t offset, uint8_t data)
 {
 	video_w(2,offset,data,0);
 }
 
-WRITE8_MEMBER(pp01_state::video_r_2_w)
+void pp01_state::video_r_2_w(offs_t offset, uint8_t data)
 {
 	video_w(0,offset,data,1);
 }
-WRITE8_MEMBER(pp01_state::video_g_2_w)
+void pp01_state::video_g_2_w(offs_t offset, uint8_t data)
 {
 	video_w(1,offset,data,1);
 }
-WRITE8_MEMBER(pp01_state::video_b_2_w)
+void pp01_state::video_b_2_w(offs_t offset, uint8_t data)
 {
 	video_w(2,offset,data,1);
 }
@@ -94,22 +94,22 @@ void pp01_state::set_memory(uint8_t block, uint8_t data)
 		space.install_read_bank (startaddr, endaddr, bank);
 		switch(data) {
 		case 0xe6 :
-			space.install_write_handler(startaddr, endaddr, write8_delegate(*this, FUNC(pp01_state::video_r_1_w)));
+			space.install_write_handler(startaddr, endaddr, write8sm_delegate(*this, FUNC(pp01_state::video_r_1_w)));
 			break;
 		case 0xe7:
-			space.install_write_handler(startaddr, endaddr, write8_delegate(*this, FUNC(pp01_state::video_r_2_w)));
+			space.install_write_handler(startaddr, endaddr, write8sm_delegate(*this, FUNC(pp01_state::video_r_2_w)));
 			break;
 		case 0xea:
-			space.install_write_handler(startaddr, endaddr, write8_delegate(*this, FUNC(pp01_state::video_g_1_w)));
+			space.install_write_handler(startaddr, endaddr, write8sm_delegate(*this, FUNC(pp01_state::video_g_1_w)));
 			break;
 		case 0xeb:
-			space.install_write_handler(startaddr, endaddr, write8_delegate(*this, FUNC(pp01_state::video_g_2_w)));
+			space.install_write_handler(startaddr, endaddr, write8sm_delegate(*this, FUNC(pp01_state::video_g_2_w)));
 			break;
 		case 0xee:
-			space.install_write_handler(startaddr, endaddr, write8_delegate(*this, FUNC(pp01_state::video_b_1_w)));
+			space.install_write_handler(startaddr, endaddr, write8sm_delegate(*this, FUNC(pp01_state::video_b_1_w)));
 			break;
 		case 0xef:
-			space.install_write_handler(startaddr, endaddr, write8_delegate(*this, FUNC(pp01_state::video_b_2_w)));
+			space.install_write_handler(startaddr, endaddr, write8sm_delegate(*this, FUNC(pp01_state::video_b_2_w)));
 			break;
 		default:
 			space.install_write_bank(startaddr, endaddr, bank);
@@ -138,13 +138,13 @@ void pp01_state::machine_reset()
 	m_uart->write_cts(0);
 }
 
-WRITE8_MEMBER(pp01_state::mem_block_w)
+void pp01_state::mem_block_w(offs_t offset, uint8_t data)
 {
 	m_memory_block[offset] = data;
 	set_memory(offset, data);
 }
 
-READ8_MEMBER(pp01_state::mem_block_r)
+uint8_t pp01_state::mem_block_r(offs_t offset)
 {
 	return m_memory_block[offset];
 }

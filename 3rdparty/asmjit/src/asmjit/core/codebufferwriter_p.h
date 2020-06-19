@@ -25,12 +25,13 @@
 #define ASMJIT_CORE_CODEBUFFERWRITER_P_H_INCLUDED
 
 #include "../core/assembler.h"
+#include "../core/codebuffer.h"
 #include "../core/support.h"
 
 ASMJIT_BEGIN_NAMESPACE
 
 //! \cond INTERNAL
-//! \addtogroup asmjit_core
+//! \addtogroup asmjit_assembler
 //! \{
 
 // ============================================================================

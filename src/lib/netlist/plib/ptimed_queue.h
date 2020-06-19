@@ -10,8 +10,8 @@
 
 #include "palloc.h"
 #include "pchrono.h"
-#include "pstring.h"
 #include "pmulti_threading.h"
+#include "pstring.h"
 
 #include <algorithm>
 #include <mutex>
@@ -210,7 +210,7 @@ namespace plib {
 		// save state support & mame disasm
 
 		const T *listptr() const noexcept { return &m_list[1]; }
-		std::size_t size() const noexcept { return static_cast<std::size_t>(m_end - &m_list[1]); }
+		std::size_t size() const noexcept { return narrow_cast<std::size_t>(m_end - &m_list[1]); }
 		const T & operator[](std::size_t index) const noexcept { return m_list[ 1 + index]; }
 	private:
 		using mutex_type       = pspin_mutex<TS>;

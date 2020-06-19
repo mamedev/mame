@@ -88,10 +88,10 @@ private:
 	uint8_t m_model;
 	emu_timer * m_cassette_timer;
 	void (pmd85_state::*update_memory)();
-	DECLARE_READ8_MEMBER(pmd85_io_r);
-	DECLARE_WRITE8_MEMBER(pmd85_io_w);
-	DECLARE_READ8_MEMBER(mato_io_r);
-	DECLARE_WRITE8_MEMBER(mato_io_w);
+	uint8_t pmd85_io_r(offs_t offset);
+	void pmd85_io_w(offs_t offset, uint8_t data);
+	uint8_t mato_io_r(offs_t offset);
+	void mato_io_w(offs_t offset, uint8_t data);
 
 	virtual void machine_reset() override;
 	uint32_t screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

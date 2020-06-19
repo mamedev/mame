@@ -14,13 +14,13 @@
 #include "screen.h"
 
 
-WRITE16_MEMBER(prehisle_state::fg_vram_w)
+void prehisle_state::fg_vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fg_vram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(prehisle_state::tx_vram_w)
+void prehisle_state::tx_vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_tx_vram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);

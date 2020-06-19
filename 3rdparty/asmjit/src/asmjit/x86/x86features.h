@@ -40,6 +40,8 @@ class Features : public BaseFeatures {
 public:
   //! CPU feature ID.
   enum Id : uint32_t {
+    // @EnumValuesBegin{"enum": "x86::Features::Id"}@
+
     kNone = 0,                 //!< No feature (never set, used internally).
 
     kMT,                       //!< CPU has multi-threading capabilities.
@@ -144,6 +146,8 @@ public:
     kXSAVEC,                   //!< CPU has XSAVEC.
     kXSAVEOPT,                 //!< CPU has XSAVEOPT.
     kXSAVES,                   //!< CPU has XSAVES.
+
+    // @EnumValuesEnd@
 
     kCount                     //!< Count of X86 CPU features.
   };

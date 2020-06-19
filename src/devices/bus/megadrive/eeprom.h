@@ -31,8 +31,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	required_device<i2cmem_device> m_i2cmem;
 	uint8_t m_i2c_mem, m_i2c_clk;
@@ -51,8 +51,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 // ======================> md_eeprom_nbajamte_device
@@ -68,8 +68,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 // ======================> md_eeprom_cslam_device (same read/write as nbajamte, but different I2C type)
@@ -85,8 +85,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 // ======================> md_eeprom_nflqb_device (same read/write as nbajamte, but different I2C type)
@@ -102,8 +102,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 // ======================> md_eeprom_nhlpa_device
@@ -119,8 +119,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 // ======================> md_eeprom_blara_device (same read/write as codemast, but different I2C type)
@@ -136,8 +136,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 
@@ -174,8 +174,8 @@ public:
 	md_eeprom_nbajam_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 protected:
 	// device-level overrides

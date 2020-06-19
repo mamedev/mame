@@ -41,10 +41,14 @@ ASMJIT_BEGIN_NAMESPACE
 
 //! Stack slot.
 struct RAStackSlot {
+  //! Stack slot flags.
+  //!
+  //! TODO: kFlagStackArg is not used by the current implementation, do we need to keep it?
   enum Flags : uint32_t {
-    // TODO: kFlagRegHome is apparently not used, but isRegHome() is.
-    kFlagRegHome          = 0x00000001u, //!< Stack slot is register home slot.
-    kFlagStackArg         = 0x00000002u  //!< Stack slot position matches argument passed via stack.
+    //! Stack slot is register home slot.
+    kFlagRegHome = 0x0001u,
+    //! Stack slot position matches argument passed via stack.
+    kFlagStackArg = 0x0002u  
   };
 
   enum ArgIndex : uint32_t {
@@ -56,17 +60,15 @@ struct RAStackSlot {
   //! Minimum alignment required by the slot.
   uint8_t _alignment;
   //! Reserved for future use.
-  uint8_t _reserved[2];
+  uint16_t _flags;
   //! Size of memory required by the slot.
   uint32_t _size;
-  //! Slot flags.
-  uint32_t _flags;
 
   //! Usage counter (one unit equals one memory access).
   uint32_t _useCount;
-  //! Weight of the slot (calculated by `calculateStackFrame()`).
+  //! Weight of the slot, calculated by \ref RAStackAllocator::calculateStackFrame().
   uint32_t _weight;
-  //! Stack offset (calculated by `calculateStackFrame()`).
+  //! Stack offset, calculated by \ref RAStackAllocator::calculateStackFrame().
   int32_t _offset;
 
   //! \name Accessors
@@ -79,9 +81,11 @@ struct RAStackSlot {
   inline uint32_t alignment() const noexcept { return _alignment; }
 
   inline uint32_t flags() const noexcept { return _flags; }
-  inline void addFlags(uint32_t flags) noexcept { _flags |= flags; }
-  inline bool isRegHome() const noexcept { return (_flags & kFlagRegHome) != 0; }
-  inline bool isStackArg() const noexcept { return (_flags & kFlagStackArg) != 0; }
+  inline bool hasFlag(uint32_t flag) const noexcept { return (_flags & flag) != 0; }
+  inline void addFlags(uint32_t flags) noexcept { _flags = uint16_t(_flags | flags); }
+
+  inline bool isRegHome() const noexcept { return hasFlag(kFlagRegHome); }
+  inline bool isStackArg() const noexcept { return hasFlag(kFlagStackArg); }
 
   inline uint32_t useCount() const noexcept { return _useCount; }
   inline void addUseCount(uint32_t n = 1) noexcept { _useCount += n; }

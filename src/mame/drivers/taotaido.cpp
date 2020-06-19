@@ -84,7 +84,7 @@ void taotaido_state::machine_start()
 }
 
 
-READ16_MEMBER(taotaido_state::pending_command_r)
+uint16_t taotaido_state::pending_command_r()
 {
 	/* Only bit 0 is tested */
 	return m_soundlatch->pending_r();
@@ -119,7 +119,7 @@ void taotaido_state::main_map(address_map &map)
 /* sound cpu - same as aerofgt */
 
 
-WRITE8_MEMBER(taotaido_state::sh_bankswitch_w)
+void taotaido_state::sh_bankswitch_w(uint8_t data)
 {
 	m_soundbank->set_entry(data & 0x03);
 }

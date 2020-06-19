@@ -69,18 +69,18 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	DECLARE_READ8_MEMBER(mcu_reset_r);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_WRITE8_MEMBER(nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(scroll_lsb_w);
-	DECLARE_WRITE8_MEMBER(scroll_msb_w);
-	DECLARE_WRITE8_MEMBER(adpcm_start_w);
-	DECLARE_WRITE8_MEMBER(adpcm_addr_w);
-	DECLARE_WRITE8_MEMBER(adpcm_stop_w);
+	uint8_t mcu_reset_r();
+	void bankswitch_w(uint8_t data);
+	void irq_ack_w(uint8_t data);
+	void nmi_ack_w(uint8_t data);
+	void fg_videoram_w(offs_t offset, uint8_t data);
+	void bg_videoram_w(offs_t offset, uint8_t data);
+	void flipscreen_w(uint8_t data);
+	void scroll_lsb_w(uint8_t data);
+	void scroll_msb_w(uint8_t data);
+	void adpcm_start_w(uint8_t data);
+	void adpcm_addr_w(uint8_t data);
+	void adpcm_stop_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	TILE_GET_INFO_MEMBER(get_bg_tilemap_info);

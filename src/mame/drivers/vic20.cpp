@@ -88,10 +88,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( vic_videoram_r );
+	uint8_t vic_videoram_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( write_light_pen );
 	DECLARE_WRITE_LINE_MEMBER( write_user_joy0 );
@@ -175,7 +175,7 @@ QUICKLOAD_LOAD_MEMBER(vic20_state::quickload_vc20)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( vic20_state::read )
+uint8_t vic20_state::read(offs_t offset)
 {
 	uint8_t data = m_vic->bus_r();
 
@@ -256,7 +256,7 @@ READ8_MEMBER( vic20_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( vic20_state::write )
+void vic20_state::write(offs_t offset, uint8_t data)
 {
 	int ram1 = 1, ram2 = 1, ram3 = 1;
 	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
@@ -323,7 +323,7 @@ WRITE8_MEMBER( vic20_state::write )
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( vic20_state::vic_videoram_r )
+uint8_t vic20_state::vic_videoram_r(offs_t offset)
 {
 	int ram1 = 1, ram2 = 1, ram3 = 1;
 	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;

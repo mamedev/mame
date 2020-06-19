@@ -150,19 +150,19 @@ Notes:
 
 /* KANEKO BEAST state */
 
-READ8_MEMBER(djboy_state::beast_status_r)
+uint8_t djboy_state::beast_status_r()
 {
 	return (m_slavelatch->pending_r() ? 0x0 : 0x4) | (m_beastlatch->pending_r() ? 0x8 : 0x0);
 }
 
 /******************************************************************************/
 
-WRITE8_MEMBER(djboy_state::trigger_nmi_on_mastercpu)
+void djboy_state::trigger_nmi_on_mastercpu(uint8_t data)
 {
 	m_mastercpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(djboy_state::mastercpu_bankswitch_w)
+void djboy_state::mastercpu_bankswitch_w(uint8_t data)
 {
 	data ^= m_bankxor;
 	m_masterbank->set_entry(data);
@@ -177,7 +177,7 @@ WRITE8_MEMBER(djboy_state::mastercpu_bankswitch_w)
  * ---x---- screen flip
  * ----xxxx bank
  */
-WRITE8_MEMBER(djboy_state::slavecpu_bankswitch_w)
+void djboy_state::slavecpu_bankswitch_w(uint8_t data)
 {
 	m_videoreg = data;
 
@@ -185,7 +185,7 @@ WRITE8_MEMBER(djboy_state::slavecpu_bankswitch_w)
 		m_slavebank->set_entry((data & 0xf));
 }
 
-WRITE8_MEMBER(djboy_state::coin_count_w)
+void djboy_state::coin_count_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
@@ -193,7 +193,7 @@ WRITE8_MEMBER(djboy_state::coin_count_w)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(djboy_state::soundcpu_bankswitch_w)
+void djboy_state::soundcpu_bankswitch_w(uint8_t data)
 {
 	m_soundbank->set_entry(data);  // shall we check data<0x07?
 }

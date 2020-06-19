@@ -740,7 +740,7 @@ public:
 	void main_comram_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t main_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
 	void main_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	DECLARE_WRITE32_MEMBER(main_cpu_dc_store);
+	void main_cpu_dc_store(offs_t offset, uint32_t data);
 
 	uint32_t sub_comram_r(offs_t offset);
 	void sub_comram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -759,7 +759,7 @@ public:
 	uint32_t sub_psac2_r();
 	void sub_psac2_w(uint32_t data);
 	void sub_psac_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_WRITE32_MEMBER(sub_sound_dma_w);
+	void sub_sound_dma_w(offs_t offset, uint32_t data);
 
 	void gfx_fifo0_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void gfx_fifo1_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
@@ -769,9 +769,9 @@ public:
 	void gfx_unk1_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t gfx_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
 	void gfx_buf_w(uint64_t data);
-	DECLARE_WRITE32_MEMBER(gfx_cpu_dc_store);
+	void gfx_cpu_dc_store(offs_t offset, uint32_t data);
 
-	DECLARE_WRITE8_MEMBER(sub_jvs_w);
+	void sub_jvs_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 
@@ -1678,7 +1678,7 @@ void cobra_state::main_comram_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	m_comram[page][(offset << 1) + 1] = (w2 & ~m2) | (d2 & m2);
 }
 
-WRITE32_MEMBER(cobra_state::main_cpu_dc_store)
+void cobra_state::main_cpu_dc_store(offs_t offset, uint32_t data)
 {
 	if ((offset & 0xf0000000) == 0xc0000000)
 	{
@@ -1966,7 +1966,7 @@ void cobra_state::sub_psac2_w(uint32_t data)
 {
 }
 
-WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
+void cobra_state::sub_sound_dma_w(offs_t offset, uint32_t data)
 {
 	//printf("DMA write to unknown: size %d, data %08X\n", address, data);
 
@@ -1997,7 +1997,7 @@ WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
 	}
 }
 
-WRITE8_MEMBER(cobra_state::sub_jvs_w)
+void cobra_state::sub_jvs_w(uint8_t data)
 {
 #if LOG_JVS
 	printf("sub_jvs_w: %02X\n", data);
@@ -3074,7 +3074,7 @@ void cobra_state::gfx_buf_w(uint64_t data)
 	}
 }
 
-WRITE32_MEMBER(cobra_state::gfx_cpu_dc_store)
+void cobra_state::gfx_cpu_dc_store(offs_t offset, uint32_t data)
 {
 	uint32_t addr = offset >> 24;
 	if (addr == 0x10 || addr == 0x18 || addr == 0x1e)
@@ -3364,12 +3364,12 @@ void cobra_state::init_cobra()
 								cobra_fifo::event_delegate(&cobra_state::s2mfifo_event_callback, this))
 								);
 
-	m_maincpu->ppc_set_dcstore_callback(write32_delegate(*this, FUNC(cobra_state::main_cpu_dc_store)));
+	m_maincpu->ppc_set_dcstore_callback(write32sm_delegate(*this, FUNC(cobra_state::main_cpu_dc_store)));
 
-	m_gfxcpu->ppc_set_dcstore_callback(write32_delegate(*this, FUNC(cobra_state::gfx_cpu_dc_store)));
+	m_gfxcpu->ppc_set_dcstore_callback(write32sm_delegate(*this, FUNC(cobra_state::gfx_cpu_dc_store)));
 
-	m_subcpu->ppc4xx_set_dma_write_handler(0, write32_delegate(*this, FUNC(cobra_state::sub_sound_dma_w)), 44100);
-	m_subcpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(cobra_state::sub_jvs_w)));
+	m_subcpu->ppc4xx_set_dma_write_handler(0, write32sm_delegate(*this, FUNC(cobra_state::sub_sound_dma_w)), 44100);
+	m_subcpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(cobra_state::sub_jvs_w)));
 
 
 	m_comram[0] = std::make_unique<uint32_t[]>(0x40000/4);

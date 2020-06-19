@@ -58,13 +58,13 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_READ32_MEMBER( control_r );
-	DECLARE_WRITE32_MEMBER( control_w );
-	DECLARE_READ32_MEMBER( baud_rate_div_r );
-	DECLARE_WRITE32_MEMBER( baud_rate_div_w );
-	DECLARE_READ32_MEMBER( status_r );
-	DECLARE_WRITE32_MEMBER( transmit_buffer_w );
-	DECLARE_READ32_MEMBER( receive_buffer_r );
+	u32 control_r();
+	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 baud_rate_div_r();
+	void baud_rate_div_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 status_r();
+	void transmit_buffer_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 receive_buffer_r(offs_t offset, u32 mem_mask = ~0);
 	TIMER_CALLBACK_MEMBER( break_timer_cb );
 
 	u32 m_ucon = 0; // control
@@ -147,14 +147,14 @@ private:
 	u8 m_IntHigh = 0;
 	u32 m_intst = 0;
 	u32 intst_r();
-	void intst_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void intst_w(u32 data);
 
 	DECLARE_WRITE_LINE_MEMBER(soundirq_cb);
 
 	// Timer
-	template<int Which> void tmcon_w(offs_t offset, u32 data, u32 mem_mask);
+	template<int Which> void tmcon_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	template<int Which> u32 tmcon_r();
-	template<int Which> void tmcnt_w(offs_t offset, u16 data, u16 mem_mask);
+	template<int Which> void tmcnt_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<int Which> u16 tmcnt_r();
 	TIMER_CALLBACK_MEMBER(Timercb);
 

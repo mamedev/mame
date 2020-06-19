@@ -68,7 +68,7 @@ namespace plib {
 			auto *o = dynamic_cast<option *>(opt);
 			if (o != nullptr)
 			{
-				if (o->short_opt() == "" && o->long_opt() == "")
+				if (o->short_opt().empty() && o->long_opt().empty())
 				{
 					auto *ov = dynamic_cast<option_args *>(o);
 					if (ov != nullptr)
@@ -87,23 +87,23 @@ namespace plib {
 		}
 	}
 
-	int options::parse(int argc, char **argv)
+	std::size_t options::parse(const std::vector<putf8string> &argv)
 	{
 		check_consistency();
-		m_app = pstring(argv[0]);
+		m_app = argv[0];
 		bool seen_other_args = false;
 
-		for (int i=1; i<argc; )
+		for (std::size_t i=1; i < argv.size(); )
 		{
-			pstring arg(argv[i]);
+			putf8string arg(argv[i]);
 			option *opt = nullptr;
-			pstring opt_arg;
+			putf8string opt_arg;
 			bool has_equal_arg = false;
 
 			if (!seen_other_args && plib::startsWith(arg, "--"))
 			{
 				auto v = psplit(arg.substr(2),"=");
-				if (!v.empty() && v[0] != "")
+				if (!v.empty() && !v[0].empty())
 				{
 					opt = getopt_long(v[0]);
 					has_equal_arg = (v.size() > 1);
@@ -151,7 +151,7 @@ namespace plib {
 				else
 				{
 					i++;
-					if (i >= argc)
+					if (i >= argv.size())
 						return i - 1;
 					if (opt->do_parse(pstring(argv[i])) != 0)
 						return i - 1;
@@ -165,7 +165,7 @@ namespace plib {
 			}
 			i++;
 		}
-		return argc;
+		return argv.size();
 	}
 
 	pstring options::split_paragraphs(const pstring &text, unsigned width, unsigned indent,
@@ -210,11 +210,11 @@ namespace plib {
 			if (auto * const opt = dynamic_cast<option *>(optbase))
 			{
 				pstring line = "";
-				if (opt->short_opt() != "")
+				if (!opt->short_opt().empty())
 					line += "  -" + opt->short_opt();
-				if (opt->long_opt() != "")
+				if (!opt->long_opt().empty())
 				{
-					if (line != "")
+					if (!line.empty())
 						line += ", ";
 					else
 						line = "      ";
@@ -223,7 +223,7 @@ namespace plib {
 					{
 						line += "=";
 						auto *ol = dynamic_cast<option_str_limit_base *>(opt);
-						if (ol)
+						if (ol != nullptr)
 						{
 							for (const auto &v : ol->limit())
 							{
@@ -248,7 +248,8 @@ namespace plib {
 			else if (auto *grp = dynamic_cast<option_group *>(optbase))
 			{
 				ret += "\n" + grp->group() + ":\n";
-				if (grp->help() != "") ret += split_paragraphs(grp->help(), width, 4, 4) + "\n\n";
+				if (!grp->help().empty())
+					ret += split_paragraphs(grp->help(), width, 4, 4) + "\n\n";
 			}
 		}
 		// FIXME: other help ...
@@ -274,7 +275,7 @@ namespace plib {
 		for (const auto & optbase : m_opts)
 		{
 			auto *opt = dynamic_cast<option *>(optbase);
-			if (opt && arg != "" && opt->short_opt() == arg)
+			if (opt != nullptr && !arg.empty() && opt->short_opt() == arg)
 				return opt;
 		}
 		return nullptr;
@@ -284,7 +285,7 @@ namespace plib {
 		for (const auto & optbase : m_opts)
 		{
 			auto *opt = dynamic_cast<option *>(optbase);
-			if (opt && arg !="" && opt->long_opt() == arg)
+			if (opt != nullptr && !arg.empty() && opt->long_opt() == arg)
 				return opt;
 		}
 		return nullptr;

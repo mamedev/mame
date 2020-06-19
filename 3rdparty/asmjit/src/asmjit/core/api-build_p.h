@@ -53,7 +53,7 @@
 
 #include "./api-config.h"
 
-#if !defined(ASMJIT_BUILD_DEBUG) && ASMJIT_CXX_GNU >= ASMJIT_CXX_MAKE_VER(4, 4, 0)
+#if !defined(ASMJIT_BUILD_DEBUG) && defined(__GNUC__) && !defined(__clang__)
   #define ASMJIT_FAVOR_SIZE  __attribute__((__optimize__("Os")))
   #define ASMJIT_FAVOR_SPEED __attribute__((__optimize__("O3")))
 #elif ASMJIT_CXX_HAS_ATTRIBUTE(__minsize__, 0)

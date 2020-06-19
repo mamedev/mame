@@ -383,7 +383,7 @@ void tubep_state::video_reset()
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_textram_w)
+void tubep_state::tubep_textram_w(offs_t offset, uint8_t data)
 {
 	m_textram[offset] = data;
 }
@@ -409,13 +409,13 @@ WRITE_LINE_MEMBER(tubep_state::colorproms_A4_line_w)
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_background_a000_w)
+void tubep_state::tubep_background_a000_w(uint8_t data)
 {
 	m_ls175_b7 = ((data & 0x0f) ^ 0x0f) | 0xf0;
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_background_c000_w)
+void tubep_state::tubep_background_c000_w(uint8_t data)
 {
 	m_ls175_e8 = ((data & 0x0f) ^ 0x0f);
 }
@@ -433,14 +433,14 @@ void tubep_state::draw_sprite()
 
 	for (YDOT=0; (YDOT^m_YSize) != 0x00; YDOT++)
 	{
-	/* upper part of the schematic */
+		/* upper part of the schematic */
 		uint32_t ls273_e12 = romD10[ m_romD_addr | YDOT ] & 0x7f;
 		uint32_t romEF_addr_now = m_romEF_addr | ls273_e12;
 		uint32_t E16_add_a = romEF13[ romEF_addr_now ] |
 							((romEF13[0x1000 + romEF_addr_now ]&0x0f)<<8);
 		uint32_t F16_add_b = E16_add_a + m_E16_add_b;
 
-	/* lower part of the schematic */
+		/* lower part of the schematic */
 		uint32_t romHI_addr = (YDOT) | (m_romHI_addr_mid) | (((m_romHI_addr_msb + 0x800) )&0x1800);
 		uint32_t ls273_g4 = romHI2[ romHI_addr ];
 		uint32_t ls273_j4 = romHI2[0x2000+ romHI_addr ];
@@ -457,7 +457,7 @@ void tubep_state::draw_sprite()
 
 		for (XDOT=0; (XDOT^m_XSize) != 0x00; XDOT++)
 		{
-	/* upper part of the schematic */
+			/* upper part of the schematic */
 			uint32_t romD10_out = romD10[ m_romD_addr | XDOT ];
 			uint32_t F16_add_a = (romD10_out & 0x7e) >>1;
 			uint32_t romCxx_addr = (F16_add_a + F16_add_b ) & 0xffff;
@@ -467,7 +467,7 @@ void tubep_state::draw_sprite()
 
 			uint8_t sp_data = m_sprite_colorsharedram[ m_colorram_addr_hi | colorram_addr_lo ] & 0x0f; /* 2114 4-bit RAM */
 
-	/* lower part of the schematic */
+			/* lower part of the schematic */
 			romHI_addr = (XDOT) | (m_romHI_addr_mid) | (m_romHI_addr_msb);
 			ls273_g4 = romHI2[ romHI_addr ];
 			ls273_j4 = romHI2[0x2000+ romHI_addr ];
@@ -490,11 +490,10 @@ void tubep_state::draw_sprite()
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_sprite_control_w)
+void tubep_state::tubep_sprite_control_w(offs_t offset, uint8_t data)
 {
 	if (offset < 10)
 	{
-		/*graph_ctrl[offset] = data;*/
 		switch(offset)
 		{
 		case 0: /*a*/
@@ -583,8 +582,16 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 	{
 		uint32_t h;
 		uint32_t sp_data0=0,sp_data1=0,sp_data2=0;
+
+		// It appears there is a 1 pixel delay when renderer switches from background to sprite/text,
+		// this causes text and sprite layers to draw a drop shadow with 1 dot width to the left.
+		// See the gameplay video on the PCB. https://www.youtube.com/watch?v=xxONzbUOOsw
+		bool prev_text_or_sprite_pixel = true;
+
 		for (h = 0*8; h < 32*8; h++)
 		{
+			bool draw_text_or_sprite_pixel = false;
+
 			offs_t text_offs;
 			uint8_t text_code;
 			uint8_t text_gfx_data;
@@ -598,7 +605,10 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 			text_gfx_data = text_gfx_base[(text_code << 3) | (v & 0x07)];
 
 			if (text_gfx_data & (0x80 >> (h & 0x07)))
+			{
 				bitmap.pix16(v, h) = (m_textram[text_offs + 1] & 0x0f) | m_color_A4;
+				draw_text_or_sprite_pixel = true;
+			}
 			else
 			{
 				uint32_t bg_data;
@@ -636,11 +646,19 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 				else
 					sp_data = sp_data1;
 
-				if (sp_data != 0x0f)
+				if (sp_data != 0x0f && h >= 4)
+				{
 					bg_data = m_prom2[sp_data | m_color_A4];
+					draw_text_or_sprite_pixel = true;
+				}
 
 				bitmap.pix16(v, h) = pen_base + bg_data*64 + romB_data_h;
 			}
+
+			// text and sprite drop shadow
+			if (draw_text_or_sprite_pixel && !prev_text_or_sprite_pixel && h > 0)
+				bitmap.pix16(v, h - 1) = 0x0;
+			prev_text_or_sprite_pixel = draw_text_or_sprite_pixel;
 		}
 	}
 
@@ -710,13 +728,13 @@ void tubep_state::rjammer_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(tubep_state::rjammer_background_LS377_w)
+void tubep_state::rjammer_background_LS377_w(uint8_t data)
 {
 	m_ls377_data = data & 0xff;
 }
 
 
-WRITE8_MEMBER(tubep_state::rjammer_background_page_w)
+void tubep_state::rjammer_background_page_w(uint8_t data)
 {
 	m_page = (data & 1) * 0x200;
 }

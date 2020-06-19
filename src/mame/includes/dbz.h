@@ -75,11 +75,11 @@ private:
 
 	required_ioport m_dsw2;
 
-	DECLARE_WRITE16_MEMBER(dbzcontrol_w);
-	DECLARE_WRITE16_MEMBER(dbz_sound_command_w);
-	DECLARE_WRITE16_MEMBER(dbz_sound_cause_nmi);
-	DECLARE_WRITE16_MEMBER(dbz_bg2_videoram_w);
-	DECLARE_WRITE16_MEMBER(dbz_bg1_videoram_w);
+	void dbzcontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dbz_sound_command_w(uint16_t data);
+	void dbz_sound_cause_nmi(uint16_t data);
+	void dbz_bg2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dbz_bg1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(dbz_irq2_ack_w);
 	TILE_GET_INFO_MEMBER(get_dbz_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_dbz_bg1_tile_info);

@@ -117,7 +117,7 @@ void ampoker2_state::ampoker2_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(ampoker2_state::videoram_w)
+void ampoker2_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);

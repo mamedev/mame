@@ -25,30 +25,30 @@ private:
 	required_device<ppc4xx_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 
-	DECLARE_WRITE8_MEMBER ( dm7000_iic0_w );
-	DECLARE_READ8_MEMBER ( dm7000_iic0_r );
-	DECLARE_WRITE8_MEMBER ( dm7000_iic1_w );
-	DECLARE_READ8_MEMBER ( dm7000_iic1_r );
+	void dm7000_iic0_w(offs_t offset, uint8_t data);
+	uint8_t dm7000_iic0_r(offs_t offset);
+	void dm7000_iic1_w(offs_t offset, uint8_t data);
+	uint8_t dm7000_iic1_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER ( dm7000_scc0_w );
-	DECLARE_READ8_MEMBER ( dm7000_scc0_r );
+	void dm7000_scc0_w(offs_t offset, uint8_t data);
+	uint8_t dm7000_scc0_r(offs_t offset);
 	void kbd_put(u8 data);
 	uint8_t m_scc0_lcr;
 	uint8_t m_scc0_lsr;
 	uint8_t m_term_data;
 
 
-	DECLARE_WRITE8_MEMBER ( dm7000_gpio0_w );
-	DECLARE_READ8_MEMBER ( dm7000_gpio0_r );
+	void dm7000_gpio0_w(offs_t offset, uint8_t data);
+	uint8_t dm7000_gpio0_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER ( dm7000_scp0_w );
-	DECLARE_READ8_MEMBER ( dm7000_scp0_r );
+	void dm7000_scp0_w(offs_t offset, uint8_t data);
+	uint8_t dm7000_scp0_r(offs_t offset);
 
-	DECLARE_WRITE16_MEMBER ( dm7000_enet_w );
-	DECLARE_READ16_MEMBER ( dm7000_enet_r );
+	void dm7000_enet_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dm7000_enet_r(offs_t offset);
 
-	DECLARE_READ32_MEMBER( dcr_r );
-	DECLARE_WRITE32_MEMBER( dcr_w );
+	uint32_t dcr_r(offs_t offset);
+	void dcr_w(offs_t offset, uint32_t data);
 
 
 	uint16_t          m_enet_regs[32];

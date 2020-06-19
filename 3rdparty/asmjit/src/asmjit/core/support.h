@@ -32,7 +32,7 @@
 
 ASMJIT_BEGIN_NAMESPACE
 
-//! \addtogroup asmjit_support
+//! \addtogroup asmjit_utilities
 //! \{
 
 //! Contains support classes and functions that may be used by AsmJit source
@@ -69,26 +69,33 @@ namespace Internal {
   template<> struct AlignedInt<uint64_t, 4> { typedef uint64_t ASMJIT_ALIGN_TYPE(T, 4); };
   template<> struct AlignedInt<uint64_t, 8> { typedef uint64_t T; };
 
-  // IntBySize - Make an int-type by size (signed or unsigned) that is the
+  // StdInt    - Make an int-type by size (signed or unsigned) that is the
   //             same as types defined by <stdint.h>.
   // Int32Or64 - Make an int-type that has at least 32 bits: [u]int[32|64]_t.
 
-  template<size_t SIZE, int IS_SIGNED>
-  struct IntBySize {}; // Fail if not specialized.
+  template<size_t Size, unsigned Unsigned>
+  struct StdInt {}; // Fail if not specialized.
 
-  template<> struct IntBySize<1, 0> { typedef uint8_t  Type; };
-  template<> struct IntBySize<1, 1> { typedef int8_t   Type; };
-  template<> struct IntBySize<2, 0> { typedef uint16_t Type; };
-  template<> struct IntBySize<2, 1> { typedef int16_t  Type; };
-  template<> struct IntBySize<4, 0> { typedef uint32_t Type; };
-  template<> struct IntBySize<4, 1> { typedef int32_t  Type; };
-  template<> struct IntBySize<8, 0> { typedef uint64_t Type; };
-  template<> struct IntBySize<8, 1> { typedef int64_t  Type; };
+  template<> struct StdInt<1, 0> { typedef int8_t   Type; };
+  template<> struct StdInt<1, 1> { typedef uint8_t  Type; };
+  template<> struct StdInt<2, 0> { typedef int16_t  Type; };
+  template<> struct StdInt<2, 1> { typedef uint16_t Type; };
+  template<> struct StdInt<4, 0> { typedef int32_t  Type; };
+  template<> struct StdInt<4, 1> { typedef uint32_t Type; };
+  template<> struct StdInt<8, 0> { typedef int64_t  Type; };
+  template<> struct StdInt<8, 1> { typedef uint64_t Type; };
 
-  template<typename T, int IS_SIGNED = std::is_signed<T>::value>
-  struct Int32Or64 : public IntBySize<sizeof(T) <= 4 ? size_t(4) : sizeof(T), IS_SIGNED> {};
+  template<typename T, int Unsigned = std::is_unsigned<T>::value>
+  struct Int32Or64 : public StdInt<sizeof(T) <= 4 ? size_t(4) : sizeof(T), Unsigned> {};
 }
 //! \endcond
+
+// ============================================================================
+// [asmjit::Support - Basic Traits]
+// ============================================================================
+
+template<typename T>
+static constexpr bool isUnsigned() noexcept { return std::is_unsigned<T>::value; }
 
 // ============================================================================
 // [asmjit::Support - FastUInt8]
@@ -101,20 +108,32 @@ typedef unsigned int FastUInt8;
 #endif
 
 // ============================================================================
-// [asmjit::Support - IntBySize / Int32Or64]
+// [asmjit::Support - asInt / asUInt / asNormalized]
 // ============================================================================
 
 //! Casts an integer `x` to either `int32_t` or `int64_t` depending on `T`.
 template<typename T>
-static constexpr typename Internal::Int32Or64<T, 1>::Type asInt(T x) noexcept { return (typename Internal::Int32Or64<T, 1>::Type)x; }
+static constexpr typename Internal::Int32Or64<T, 0>::Type asInt(const T& x) noexcept {
+  return (typename Internal::Int32Or64<T, 0>::Type)x;
+}
 
 //! Casts an integer `x` to either `uint32_t` or `uint64_t` depending on `T`.
 template<typename T>
-static constexpr typename Internal::Int32Or64<T, 0>::Type asUInt(T x) noexcept { return (typename Internal::Int32Or64<T, 0>::Type)x; }
+static constexpr typename Internal::Int32Or64<T, 1>::Type asUInt(const T& x) noexcept {
+  return (typename Internal::Int32Or64<T, 1>::Type)x;
+}
 
 //! Casts an integer `x` to either `int32_t`, uint32_t`, `int64_t`, or `uint64_t` depending on `T`.
 template<typename T>
-static constexpr typename Internal::Int32Or64<T>::Type asNormalized(T x) noexcept { return (typename Internal::Int32Or64<T>::Type)x; }
+static constexpr typename Internal::Int32Or64<T>::Type asNormalized(const T& x) noexcept {
+  return (typename Internal::Int32Or64<T>::Type)x;
+}
+
+//! Casts an integer `x` to the same type as defined by `<stdint.h>`.
+template<typename T>
+static constexpr typename Internal::StdInt<sizeof(T), isUnsigned<T>()>::Type asStdInt(const T& x) noexcept {
+  return (typename Internal::StdInt<sizeof(T), isUnsigned<T>()>::Type)x;
+}
 
 // ============================================================================
 // [asmjit::Support - BitCast]
@@ -142,7 +161,7 @@ static inline Dst bitCast(const Src& x) noexcept { return Internal::BitCastUnion
 // ============================================================================
 
 //! Storage used to store a pack of bits (should by compatible with a machine word).
-typedef Internal::IntBySize<sizeof(uintptr_t), 0>::Type BitWord;
+typedef Internal::StdInt<sizeof(uintptr_t), 1>::Type BitWord;
 
 template<typename T>
 static constexpr uint32_t bitSizeOf() noexcept { return uint32_t(sizeof(T) * 8u); }
@@ -194,14 +213,14 @@ static constexpr T blsi(T x) noexcept {
 
 //! Generate a trailing bit-mask that has `n` least significant (trailing) bits set.
 template<typename T, typename CountT>
-static constexpr T lsbMask(CountT n) noexcept {
+static constexpr T lsbMask(const CountT& n) noexcept {
   typedef typename std::make_unsigned<T>::type U;
   return (sizeof(U) < sizeof(uintptr_t))
+    // Prevent undefined behavior by using a larger type than T.
     ? T(U((uintptr_t(1) << n) - uintptr_t(1)))
-    // Shifting more bits than the type provides is UNDEFINED BEHAVIOR.
-    // In such case we trash the result by ORing it with a mask that has
-    // all bits set and discards the UNDEFINED RESULT of the shift.
-    : T(((U(1) << n) - U(1u)) | neg(U(n >= CountT(bitSizeOf<T>()))));
+    // Prevent undefined behavior by performing `n & (nBits - 1)` so it's always within the range.
+    : shr(sar(neg(T(n)), bitSizeOf<T>() - 1u),
+          neg(T(n)) & CountT(bitSizeOf<T>() - 1u));
 }
 
 //! Tests whether the given value `x` has `n`th bit set.
@@ -398,30 +417,113 @@ static constexpr T max(const T& a, const T& b, Args&&... args) noexcept { return
 //! \cond
 namespace Internal {
   template<typename T>
-  static ASMJIT_INLINE T addOverflowImpl(T x, T y, FastUInt8* of) noexcept {
+  ASMJIT_INLINE T addOverflowFallback(T x, T y, FastUInt8* of) noexcept {
     typedef typename std::make_unsigned<T>::type U;
 
     U result = U(x) + U(y);
-    *of = FastUInt8(*of | FastUInt8(std::is_unsigned<T>::value ? result < U(x) : T((U(x) ^ ~U(y)) & (U(x) ^ result)) < 0));
+    *of = FastUInt8(*of | FastUInt8(isUnsigned<T>() ? result < U(x) : T((U(x) ^ ~U(y)) & (U(x) ^ result)) < 0));
     return T(result);
   }
 
   template<typename T>
-  static ASMJIT_INLINE T subOverflowImpl(T x, T y, FastUInt8* of) noexcept {
+  ASMJIT_INLINE T subOverflowFallback(T x, T y, FastUInt8* of) noexcept {
     typedef typename std::make_unsigned<T>::type U;
 
     U result = U(x) - U(y);
-    *of = FastUInt8(*of | FastUInt8(std::is_unsigned<T>::value ? result > U(x) : T((U(x) ^ U(y)) & (U(x) ^ result)) < 0));
+    *of = FastUInt8(*of | FastUInt8(isUnsigned<T>() ? result > U(x) : T((U(x) ^ U(y)) & (U(x) ^ result)) < 0));
     return T(result);
   }
-}
+
+  template<typename T>
+  ASMJIT_INLINE T mulOverflowFallback(T x, T y, FastUInt8* of) noexcept {
+    typedef typename Internal::StdInt<sizeof(T) * 2, isUnsigned<T>()>::Type I;
+    typedef typename std::make_unsigned<I>::type U;
+
+    U mask = allOnes<U>();
+    if (std::is_signed<T>::value) {
+      U prod = U(I(x)) * U(I(y));
+      *of = FastUInt8(*of | FastUInt8(I(prod) < I(std::numeric_limits<T>::lowest()) || I(prod) > I(std::numeric_limits<T>::max())));
+      return T(I(prod & mask));
+    }
+    else {
+      U prod = U(x) * U(y);
+      *of = FastUInt8(*of | FastUInt8((prod & ~mask) != 0));
+      return T(prod & mask);
+    }
+  }
+
+  template<>
+  ASMJIT_INLINE int64_t mulOverflowFallback(int64_t x, int64_t y, FastUInt8* of) noexcept {
+    int64_t result = int64_t(uint64_t(x) * uint64_t(y));
+    *of = FastUInt8(*of | FastUInt8(x && (result / x != y)));
+    return result;
+  }
+
+  template<>
+  ASMJIT_INLINE uint64_t mulOverflowFallback(uint64_t x, uint64_t y, FastUInt8* of) noexcept {
+    uint64_t result = x * y;
+    *of = FastUInt8(*of | FastUInt8(y != 0 && allOnes<uint64_t>() / y < x));
+    return result;
+  }
+
+  // These can be specialized.
+  template<typename T> ASMJIT_INLINE T addOverflowImpl(const T& x, const T& y, FastUInt8* of) noexcept { return addOverflowFallback(x, y, of); }
+  template<typename T> ASMJIT_INLINE T subOverflowImpl(const T& x, const T& y, FastUInt8* of) noexcept { return subOverflowFallback(x, y, of); }
+  template<typename T> ASMJIT_INLINE T mulOverflowImpl(const T& x, const T& y, FastUInt8* of) noexcept { return mulOverflowFallback(x, y, of); }
+
+  #if defined(__GNUC__) && !defined(ASMJIT_NO_INTRINSICS)
+  #if defined(__clang__) || __GNUC__ >= 5
+  #define ASMJIT_ARITH_OVERFLOW_SPECIALIZE(FUNC, T, RESULT_T, BUILTIN)        \
+    template<>                                                                \
+    ASMJIT_INLINE T FUNC(const T& x, const T& y, FastUInt8* of) noexcept {    \
+      RESULT_T result;                                                        \
+      *of = FastUInt8(*of | (BUILTIN((RESULT_T)x, (RESULT_T)y, &result)));    \
+      return T(result);                                                       \
+    }
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(addOverflowImpl, int32_t , int               , __builtin_sadd_overflow  )
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(addOverflowImpl, uint32_t, unsigned int      , __builtin_uadd_overflow  )
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(addOverflowImpl, int64_t , long long         , __builtin_saddll_overflow)
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(addOverflowImpl, uint64_t, unsigned long long, __builtin_uaddll_overflow)
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(subOverflowImpl, int32_t , int               , __builtin_ssub_overflow  )
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(subOverflowImpl, uint32_t, unsigned int      , __builtin_usub_overflow  )
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(subOverflowImpl, int64_t , long long         , __builtin_ssubll_overflow)
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(subOverflowImpl, uint64_t, unsigned long long, __builtin_usubll_overflow)
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(mulOverflowImpl, int32_t , int               , __builtin_smul_overflow  )
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(mulOverflowImpl, uint32_t, unsigned int      , __builtin_umul_overflow  )
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(mulOverflowImpl, int64_t , long long         , __builtin_smulll_overflow)
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(mulOverflowImpl, uint64_t, unsigned long long, __builtin_umulll_overflow)
+  #undef ASMJIT_ARITH_OVERFLOW_SPECIALIZE
+  #endif
+  #endif
+
+  // There is a bug in MSVC that makes these specializations unusable, maybe in the future...
+  #if defined(_MSC_VER) && 0
+  #define ASMJIT_ARITH_OVERFLOW_SPECIALIZE(FUNC, T, ALT_T, BUILTIN)           \
+    template<>                                                                \
+    ASMJIT_INLINE T FUNC(T x, T y, FastUInt8* of) noexcept {                  \
+      ALT_T result;                                                           \
+      *of = FastUInt8(*of | BUILTIN(0, (ALT_T)x, (ALT_T)y, &result));         \
+      return T(result);                                                       \
+    }
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(addOverflowImpl, uint32_t, unsigned int      , _addcarry_u32 )
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(subOverflowImpl, uint32_t, unsigned int      , _subborrow_u32)
+  #if ARCH_BITS >= 64
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(addOverflowImpl, uint64_t, unsigned __int64  , _addcarry_u64 )
+  ASMJIT_ARITH_OVERFLOW_SPECIALIZE(subOverflowImpl, uint64_t, unsigned __int64  , _subborrow_u64)
+  #endif
+  #undef ASMJIT_ARITH_OVERFLOW_SPECIALIZE
+  #endif
+} // {Internal}
 //! \endcond
 
 template<typename T>
-static ASMJIT_INLINE T addOverflow(const T& x, const T& y, FastUInt8* of) noexcept { return T(Internal::addOverflowImpl(x, y, of)); }
+static ASMJIT_INLINE T addOverflow(const T& x, const T& y, FastUInt8* of) noexcept { return T(Internal::addOverflowImpl(asStdInt(x), asStdInt(y), of)); }
 
 template<typename T>
-static ASMJIT_INLINE T subOverflow(const T& x, const T& y, FastUInt8* of) noexcept { return T(Internal::subOverflowImpl(x, y, of)); }
+static ASMJIT_INLINE T subOverflow(const T& x, const T& y, FastUInt8* of) noexcept { return T(Internal::subOverflowImpl(asStdInt(x), asStdInt(y), of)); }
+
+template<typename T>
+static ASMJIT_INLINE T mulOverflow(const T& x, const T& y, FastUInt8* of) noexcept { return T(Internal::mulOverflowImpl(asStdInt(x), asStdInt(y), of)); }
 
 // ============================================================================
 // [asmjit::Support - Alignment]
@@ -429,7 +531,7 @@ static ASMJIT_INLINE T subOverflow(const T& x, const T& y, FastUInt8* of) noexce
 
 template<typename X, typename Y>
 static constexpr bool isAligned(X base, Y alignment) noexcept {
-  typedef typename Internal::IntBySize<sizeof(X), 0>::Type U;
+  typedef typename Internal::StdInt<sizeof(X), 1>::Type U;
   return ((U)base % (U)alignment) == 0;
 }
 
@@ -442,27 +544,27 @@ static constexpr bool isPowerOf2(T x) noexcept {
 
 template<typename X, typename Y>
 static constexpr X alignUp(X x, Y alignment) noexcept {
-  typedef typename Internal::IntBySize<sizeof(X), 0>::Type U;
+  typedef typename Internal::StdInt<sizeof(X), 1>::Type U;
   return (X)( ((U)x + ((U)(alignment) - 1u)) & ~((U)(alignment) - 1u) );
 }
 
 template<typename T>
 static constexpr T alignUpPowerOf2(T x) noexcept {
-  typedef typename Internal::IntBySize<sizeof(T), 0>::Type U;
+  typedef typename Internal::StdInt<sizeof(T), 1>::Type U;
   return (T)(fillTrailingBits(U(x) - 1u) + 1u);
 }
 
 //! Returns either zero or a positive difference between `base` and `base` when
 //! aligned to `alignment`.
 template<typename X, typename Y>
-static constexpr typename Internal::IntBySize<sizeof(X), 0>::Type alignUpDiff(X base, Y alignment) noexcept {
-  typedef typename Internal::IntBySize<sizeof(X), 0>::Type U;
+static constexpr typename Internal::StdInt<sizeof(X), 1>::Type alignUpDiff(X base, Y alignment) noexcept {
+  typedef typename Internal::StdInt<sizeof(X), 1>::Type U;
   return alignUp(U(base), alignment) - U(base);
 }
 
 template<typename X, typename Y>
 static constexpr X alignDown(X x, Y alignment) noexcept {
-  typedef typename Internal::IntBySize<sizeof(X), 0>::Type U;
+  typedef typename Internal::StdInt<sizeof(X), 1>::Type U;
   return (X)( (U)x & ~((U)(alignment) - 1u) );
 }
 
@@ -475,7 +577,7 @@ static constexpr X alignDown(X x, Y alignment) noexcept {
 //! the number of BitWords to represent N bits, for example.
 template<typename X, typename Y>
 static constexpr X numGranularized(X base, Y granularity) noexcept {
-  typedef typename Internal::IntBySize<sizeof(X), 0>::Type U;
+  typedef typename Internal::StdInt<sizeof(X), 1>::Type U;
   return X((U(base) + U(granularity) - 1) / U(granularity));
 }
 
@@ -620,10 +722,10 @@ static inline uint32_t byteShiftOfDWordStruct(uint32_t index) noexcept {
 // ============================================================================
 
 template<typename T>
-static constexpr T asciiToLower(T c) noexcept { return c ^ (T(c >= T('A') && c <= T('Z')) << 5); }
+static constexpr T asciiToLower(T c) noexcept { return T(c ^ T(T(c >= T('A') && c <= T('Z')) << 5)); }
 
 template<typename T>
-static constexpr T asciiToUpper(T c) noexcept { return c ^ (T(c >= T('a') && c <= T('z')) << 5); }
+static constexpr T asciiToUpper(T c) noexcept { return T(c ^ T(T(c >= T('a') && c <= T('z')) << 5)); }
 
 static ASMJIT_INLINE size_t strLen(const char* s, size_t maxSize) noexcept {
   size_t i = 0;
@@ -920,6 +1022,7 @@ static inline void writeU64uBE(void* p, uint64_t x) noexcept { writeU64xBE<1>(p,
 // [asmjit::Support - Operators]
 // ============================================================================
 
+//! \cond INTERNAL
 struct Set    { template<typename T> static inline T op(T x, T y) noexcept { DebugUtils::unused(x); return  y; } };
 struct SetNot { template<typename T> static inline T op(T x, T y) noexcept { DebugUtils::unused(x); return ~y; } };
 struct And    { template<typename T> static inline T op(T x, T y) noexcept { return  x &  y; } };
@@ -931,6 +1034,7 @@ struct Add    { template<typename T> static inline T op(T x, T y) noexcept { ret
 struct Sub    { template<typename T> static inline T op(T x, T y) noexcept { return  x -  y; } };
 struct Min    { template<typename T> static inline T op(T x, T y) noexcept { return min<T>(x, y); } };
 struct Max    { template<typename T> static inline T op(T x, T y) noexcept { return max<T>(x, y); } };
+//! \endcond
 
 // ============================================================================
 // [asmjit::Support - BitWordIterator]
@@ -1081,6 +1185,13 @@ static inline size_t bitVectorIndexOf(T* buf, size_t start, bool value) noexcept
 template<typename T>
 class BitVectorIterator {
 public:
+  const T* _ptr;
+  size_t _idx;
+  size_t _end;
+  T _current;
+
+  ASMJIT_INLINE BitVectorIterator(const BitVectorIterator& other) noexcept = default;
+
   ASMJIT_INLINE BitVectorIterator(const T* data, size_t numBitWords, size_t start = 0) noexcept {
     init(data, numBitWords, start);
   }
@@ -1126,11 +1237,6 @@ public:
     ASMJIT_ASSERT(_current != T(0));
     return _idx + ctz(_current);
   }
-
-  const T* _ptr;
-  size_t _idx;
-  size_t _end;
-  T _current;
 };
 
 // ============================================================================
@@ -1141,6 +1247,12 @@ template<typename T, class OperatorT>
 class BitVectorOpIterator {
 public:
   static constexpr uint32_t kTSizeInBits = bitSizeOf<T>();
+
+  const T* _aPtr;
+  const T* _bPtr;
+  size_t _idx;
+  size_t _end;
+  T _current;
 
   ASMJIT_INLINE BitVectorOpIterator(const T* aData, const T* bData, size_t numBitWords, size_t start = 0) noexcept {
     init(aData, bData, numBitWords, start);
@@ -1184,12 +1296,6 @@ public:
     _current = bitWord;
     return n;
   }
-
-  const T* _aPtr;
-  const T* _bPtr;
-  size_t _idx;
-  size_t _end;
-  T _current;
 };
 
 // ============================================================================
@@ -1289,7 +1395,6 @@ namespace Internal {
   };
 }
 //! \endcond
-
 
 //! Quick sort implementation.
 //!

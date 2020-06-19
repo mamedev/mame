@@ -189,7 +189,7 @@ CUSTOM_INPUT_MEMBER(exidy_state::teetert_input_r)
  *
  *************************************/
 
-WRITE8_MEMBER(exidy_state::fax_bank_select_w)
+void exidy_state::fax_bank_select_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x1f);
 
@@ -198,7 +198,7 @@ WRITE8_MEMBER(exidy_state::fax_bank_select_w)
 
 }
 
-WRITE8_MEMBER(exidy_state::mtrap_ocl_w) // Mouse Trap (possibly others) set P1 and P2 leds value at 5101, too.
+void exidy_state::mtrap_ocl_w(uint8_t data) // Mouse Trap (possibly others) set P1 and P2 leds value at 5101, too.
 {
 	*m_sprite_enable = data;
 

@@ -56,7 +56,7 @@ ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config 
     Memory read
 */
 
-READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
+void ti_speech_synthesizer_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled()) return;
 
@@ -88,7 +88,7 @@ void ti_speech_synthesizer_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
+void ti_speech_synthesizer_device::setaddress_dbin(offs_t offset, int state)
 {
 	// 1001 00xx xxxx xxx0   DBIN=1
 	// 1001 01xx xxxx xxx0   DBIN=0

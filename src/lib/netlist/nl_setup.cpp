@@ -2,8 +2,6 @@
 // copyright-holders:Couriersud
 
 #include "plib/palloc.h"
-#include "plib/putil.h"
-#include "plib/penum.h"
 #include "analog/nld_twoterm.h"
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_system.h"
@@ -12,6 +10,8 @@
 #include "nl_factory.h"
 #include "nl_parser.h"
 #include "nl_setup.h"
+#include "plib/penum.h"
+#include "plib/putil.h"
 
 #include "solver/nld_solver.h"
 
@@ -55,7 +55,7 @@ namespace netlist
 		std::initializer_list<const char *> more_parameters)
 	{
 		std::vector<pstring> params;
-		auto i(more_parameters.begin());
+		const auto *i(more_parameters.begin());
 		pstring name(*i);
 		++i;
 		for (; i != more_parameters.end(); ++i)
@@ -81,7 +81,6 @@ namespace netlist
 			include(f->name());
 			namespace_pop();
 		}
-		//f->macro_actions(*this, name);
 
 		pstring key = build_fqn(name);
 		if (device_exists(key))
@@ -201,7 +200,7 @@ namespace netlist
 			|| plib::abs(value) > nlconst::magic(1e9))
 			register_param(param, plib::pfmt("{1:.9}").e(value));
 		else
-			register_param(param, plib::pfmt("{1}")(static_cast<long>(value)));
+			register_param(param, plib::pfmt("{1}")(gsl::narrow<long>(value)));
 	}
 
 	void nlparse_t::register_param(const pstring &param, const pstring &value)
@@ -249,7 +248,7 @@ namespace netlist
 
 	void nlparse_t::register_lib_entry(const pstring &name, factory::properties &&props)
 	{
-		m_factory.add(plib::make_unique<factory::library_element_t>(name, std::move(props)));
+		m_factory.add(plib::make_unique<factory::library_element_t, host_arena>(name, std::move(props)));
 	}
 
 	void nlparse_t::register_frontier(const pstring &attach, const pstring &r_IN,
@@ -328,7 +327,7 @@ namespace netlist
 
 	bool nlparse_t::parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name)
 	{
-		auto y = plib::make_unique<plib::ppreprocessor>(m_includes, &m_defines);
+		auto y = std::make_unique<plib::ppreprocessor>(m_includes, &m_defines);
 		y->process(std::move(istrm));
 		return parser_t(std::move(y), *this).parse(name);
 		//return parser_t(std::move(plib::ppreprocessor(&m_defines).process(std::move(istrm))), *this).parse(name);
@@ -509,7 +508,7 @@ pstring setup_t::resolve_alias(const pstring &name) const
 		ret = temp;
 		auto p = m_abstract.m_alias.find(ret);
 		temp = (p != m_abstract.m_alias.end() ? p->second : "");
-	} while (temp != "" && temp != ret);
+	} while (!temp.empty() && temp != ret);
 
 	log().debug("{1}==>{2}\n", name, ret);
 	return ret;
@@ -533,7 +532,7 @@ pstring setup_t::de_alias(const pstring &alias) const
 				break;
 			}
 		}
-	} while (temp != "" && temp != ret);
+	} while (!temp.empty() && temp != ret);
 
 	log().debug("{1}==>{2}\n", alias, ret);
 	return ret;
@@ -651,7 +650,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &o
 {
 	nl_assert(out.is_logic());
 
-	const auto &out_cast = static_cast<const logic_output_t &>(out);
+	const auto &out_cast = dynamic_cast<const logic_output_t &>(out);
 	auto iter_proxy(m_proxies.find(&out));
 
 	if (iter_proxy != m_proxies.end())
@@ -879,7 +878,7 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1,detail::core_termina
 	{
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
-		auto anet = nlstate().pool().make_owned<analog_net_t>(m_nlstate,"net." + t1.name());
+		auto anet = plib::make_owned<analog_net_t>(nlstate().pool(), m_nlstate,"net." + t1.name());
 		auto *anetp = anet.get();
 		m_nlstate.register_net(std::move(anet));
 		t1.set_net(anetp);
@@ -1044,7 +1043,7 @@ void setup_t::resolve_inputs()
 			detail::core_terminal_t *t1 = find_terminal(t1s);
 			detail::core_terminal_t *t2 = find_terminal(t2s);
 			if (connect(*t1, *t2))
-				m_abstract.m_links.erase(m_abstract.m_links.begin() + static_cast<std::ptrdiff_t>(i));
+				m_abstract.m_links.erase(m_abstract.m_links.begin() + plib::narrow_cast<std::ptrdiff_t>(i));
 			else
 				i++;
 		}
@@ -1105,16 +1104,16 @@ void setup_t::resolve_inputs()
 		detail::core_terminal_t *term = i.second;
 		if (term->is_tristate_output())
 		{
-			const auto *tri(static_cast<tristate_output_t *>(term));
+			const auto &tri(dynamic_cast<tristate_output_t &>(*term));
 			// check if we are connected to a proxy
-			const auto iter_proxy(m_proxies.find(tri));
+			const auto iter_proxy(m_proxies.find(&tri));
 
-			if (iter_proxy == m_proxies.end() && !tri->is_force_logic())
+			if (iter_proxy == m_proxies.end() && !tri.is_force_logic())
 			{
 				log().error(ME_TRISTATE_NO_PROXY_FOUND_2(term->name(), term->device().name()));
 				err = true;
 			}
-			else if (iter_proxy != m_proxies.end() && tri->is_force_logic())
+			else if (iter_proxy != m_proxies.end() && tri.is_force_logic())
 			{
 				log().error(ME_TRISTATE_PROXY_FOUND_2(term->name(), term->device().name()));
 				err = true;
@@ -1257,7 +1256,7 @@ nl_fptype models_t::model_t::value(const pstring &entity) const
 	pstring tmp = value_str(entity);
 
 	nl_fptype factor = nlconst::one();
-	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.size() - 1));
+	auto p = std::next(tmp.begin(), plib::narrow_cast<pstring::difference_type>(tmp.size() - 1));
 	switch (*p)
 	{
 		case 'M': factor = nlconst::magic(1e6); break; // NOLINT
@@ -1303,7 +1302,7 @@ public:
 	}
 
 	// FIXME: create proxies based on family type (far future)
-	unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist,
+	device_arena::unique_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist,
 			const pstring &name, const logic_output_t *proxied) const override
 	{
 		switch(m_family_type)
@@ -1319,7 +1318,7 @@ public:
 		return anetlist.make_pool_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 
-	unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const override
+	device_arena::unique_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const override
 	{
 		switch(m_family_type)
 		{
@@ -1391,7 +1390,7 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 	if (it != m_nlstate.family_cache().end())
 		return it->second.get();
 
-	auto ret = plib::make_unique<logic_family_std_proxy_t>(ft);
+	auto ret = plib::make_unique<logic_family_std_proxy_t, host_arena>(ft);
 
 	ret->m_low_thresh_PCNT = modv.m_IVL();
 	ret->m_high_thresh_PCNT = modv.m_IVH();
@@ -1415,7 +1414,7 @@ void setup_t::delete_empty_nets()
 {
 	m_nlstate.nets().erase(
 		std::remove_if(m_nlstate.nets().begin(), m_nlstate.nets().end(),
-			[](owned_pool_ptr<detail::net_t> &net)
+			[](device_arena::owned_ptr<detail::net_t> &net)
 			{
 				if (!net->has_connections())
 				{
@@ -1435,7 +1434,7 @@ void setup_t::prepare_to_run()
 {
 	pstring envlog = plib::util::environment("NL_LOGS", "");
 
-	if (envlog != "")
+	if (!envlog.empty())
 	{
 		std::vector<pstring> loglist(plib::psplit(envlog, ":"));
 		m_parser.register_dynamic_log_devices(loglist);
@@ -1445,7 +1444,7 @@ void setup_t::prepare_to_run()
 
 	for (auto & e : m_abstract.m_defparams)
 	{
-		auto param(plib::make_unique<param_str_t>(nlstate(), e.first, e.second));
+		auto param(plib::make_unique<param_str_t, host_arena>(nlstate(), e.first, e.second));
 		register_param_t(*param);
 		m_defparam_lifetime.push_back(std::move(param));
 	}
@@ -1596,23 +1595,23 @@ bool source_netlist_t::parse(nlparse_t &setup, const pstring &name)
 source_string_t::stream_ptr source_string_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	auto ret(plib::make_unique<std::istringstream>(m_str));
+	source_string_t::stream_ptr ret(std::make_unique<std::istringstream>(m_str));
 	ret->imbue(std::locale::classic());
-	return std::move(ret); // FIXME: for c++11 clang builds
+	return ret;
 }
 
 source_mem_t::stream_ptr source_mem_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	auto ret(plib::make_unique<std::istringstream>(m_str, std::ios_base::binary));
+	source_mem_t::stream_ptr ret(std::make_unique<std::istringstream>(m_str, std::ios_base::binary));
 	ret->imbue(std::locale::classic());
-	return std::move(ret); // FIXME: for c++11 clang builds
+	return ret;
 }
 
 source_file_t::stream_ptr source_file_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	auto ret(plib::make_unique<std::ifstream>(plib::filesystem::u8path(m_filename)));
+	auto ret(std::make_unique<plib::ifstream>(plib::filesystem::u8path(m_filename)));
 	return (ret->is_open()) ? std::move(ret) : stream_ptr(nullptr);
 }
 

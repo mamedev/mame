@@ -74,7 +74,7 @@ void tankbatt_state::machine_start()
 	save_item(NAME(m_sound_enable));
 }
 
-READ8_MEMBER(tankbatt_state::in0_r)
+uint8_t tankbatt_state::in0_r(offs_t offset)
 {
 	int val;
 
@@ -82,7 +82,7 @@ READ8_MEMBER(tankbatt_state::in0_r)
 	return ((val << (7 - offset)) & 0x80);
 }
 
-READ8_MEMBER(tankbatt_state::in1_r)
+uint8_t tankbatt_state::in1_r(offs_t offset)
 {
 	int val;
 
@@ -90,7 +90,7 @@ READ8_MEMBER(tankbatt_state::in1_r)
 	return ((val << (7 - offset)) & 0x80);
 }
 
-READ8_MEMBER(tankbatt_state::dsw_r)
+uint8_t tankbatt_state::dsw_r(offs_t offset)
 {
 	int val;
 
@@ -140,7 +140,7 @@ WRITE_LINE_MEMBER(tankbatt_state::sh_fire_w)
 	}
 }
 
-WRITE8_MEMBER(tankbatt_state::irq_ack_w)
+void tankbatt_state::irq_ack_w(uint8_t data)
 {
 	/* 0x6e written at the end of the irq routine, could be either irq ack or a coin sample */
 	m_maincpu->set_input_line(0, CLEAR_LINE);

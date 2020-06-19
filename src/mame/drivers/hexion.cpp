@@ -90,7 +90,7 @@ Notes:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(hexion_state::coincntr_w)
+void hexion_state::coincntr_w(uint8_t data)
 {
 //logerror("%04x: coincntr_w %02x\n",m_maincpu->pc(),data);
 

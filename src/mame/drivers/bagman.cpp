@@ -89,9 +89,9 @@ void squaitsa_state::machine_start()
 }
 
 
-WRITE8_MEMBER(bagman_state::ls259_w)
+void bagman_state::ls259_w(offs_t offset, uint8_t data)
 {
-	pal16r6_w(space, offset,data); /*this is just a simulation*/
+	pal16r6_w(offset, data); /*this is just a simulation*/
 
 	if (m_tmslatch.found())
 		m_tmslatch->write_bit(offset, data & 1);

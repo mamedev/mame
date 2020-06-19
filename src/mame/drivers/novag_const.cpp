@@ -377,6 +377,7 @@ void const_state::ssensor4(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::ssensor4_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	m_board->set_nvram_enable(true);
 
 	config.set_default_layout(layout_novag_ssensor4);
 }
@@ -447,6 +448,7 @@ void const_state::sconst(machine_config &config)
 	m_irq_on->set_start_delay(m_irq_on->period() - attotime::from_nsec(10200)); // irq active for 10.2us
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	m_board->set_nvram_enable(true);
 
 	config.set_default_layout(layout_novag_supercon);
 }

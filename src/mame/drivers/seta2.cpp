@@ -135,7 +135,7 @@ void seta2_state::machine_start()
 	m_lamps.resolve();
 }
 
-WRITE8_MEMBER(seta2_state::sound_bank_w)
+void seta2_state::sound_bank_w(offs_t offset, uint8_t data)
 {
 	m_x1_bank[offset & 7]->set_entry(data);
 }
@@ -157,7 +157,7 @@ void seta2_state::x1_map(address_map &map)
                                 Guardians
 ***************************************************************************/
 
-WRITE8_MEMBER(seta2_state::grdians_lockout_w)
+void seta2_state::grdians_lockout_w(uint8_t data)
 {
 	// initially 0, then either $25 (coin 1) or $2a (coin 2)
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);   // or 0x04
@@ -234,7 +234,7 @@ void mj4simai_state::machine_start()
 	save_item(NAME(m_keyboard_row));
 }
 
-READ16_MEMBER(seta2_state::mj4simai_p1_r)
+uint16_t seta2_state::mj4simai_p1_r()
 {
 	switch (m_keyboard_row)
 	{
@@ -247,7 +247,7 @@ READ16_MEMBER(seta2_state::mj4simai_p1_r)
 	}
 }
 
-READ16_MEMBER(seta2_state::mj4simai_p2_r)
+uint16_t seta2_state::mj4simai_p2_r()
 {
 	switch (m_keyboard_row)
 	{
@@ -332,18 +332,18 @@ void seta2_state::myangel2_map(address_map &map)
 
 /*  The game checks for a specific value read from the ROM region.
     The offset to use is stored in RAM at address 0x20BA16 */
-READ16_MEMBER(seta2_state::pzlbowl_protection_r)
+uint16_t seta2_state::pzlbowl_protection_r(address_space &space)
 {
 	uint32_t address = (space.read_word(0x20ba16) << 16) | space.read_word(0x20ba18);
 	return memregion("maincpu")->base()[address - 2];
 }
 
-READ8_MEMBER(seta2_state::pzlbowl_coins_r)
+uint8_t seta2_state::pzlbowl_coins_r()
 {
 	return ioport("SYSTEM")->read() | (machine().rand() & 0x80 );
 }
 
-WRITE8_MEMBER(seta2_state::pzlbowl_coin_counter_w)
+void seta2_state::pzlbowl_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 0x10);
 	machine().bookkeeping().coin_counter_w(1,data & 0x20);
@@ -434,7 +434,7 @@ void seta2_state::reelquak_leds_w(offs_t offset, uint16_t data, uint16_t mem_mas
 //  popmessage("LED %04X", data);
 }
 
-WRITE8_MEMBER(seta2_state::reelquak_coin_w)
+void seta2_state::reelquak_coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // coin in
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);  // coin in
@@ -483,7 +483,7 @@ void seta2_state::namcostr_map(address_map &map)
                             Sammy Outdoor Shooting
 ***************************************************************************/
 
-WRITE8_MEMBER(seta2_state::samshoot_coin_w)
+void seta2_state::samshoot_coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
@@ -532,7 +532,7 @@ void staraudi_state::staraudi_debug_outputs()
 //  popmessage("L1: %04X L2: %04X CAM: %04X", m_lamps1, m_lamps2, m_cam);
 }
 
-WRITE8_MEMBER(staraudi_state::lamps1_w)
+void staraudi_state::lamps1_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_lamps1);
 	m_leds[0] = BIT(data, 0);  // Lamp 1 |
@@ -542,7 +542,7 @@ WRITE8_MEMBER(staraudi_state::lamps1_w)
 	staraudi_debug_outputs();
 }
 
-WRITE8_MEMBER(staraudi_state::lamps2_w)
+void staraudi_state::lamps2_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_lamps2);
 	//                        data & 0x20 );  // ? Always On
@@ -551,7 +551,7 @@ WRITE8_MEMBER(staraudi_state::lamps2_w)
 	staraudi_debug_outputs();
 }
 
-WRITE8_MEMBER(staraudi_state::camera_w)
+void staraudi_state::camera_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_cam);
 	//                        data & 0x01 );  // ? Always On
@@ -566,12 +566,12 @@ WRITE8_MEMBER(staraudi_state::camera_w)
 #define TILE0 (0x7c000)
 #define TILERAM(offset) ((uint16_t*)(memregion("sprites")->base() + TILE0 * 8*8 + (offset * 2 / 0x20000) * 2 + ((offset * 2) % 0x20000) / 2 * 8))
 
-READ16_MEMBER(staraudi_state::tileram_r)
+uint16_t staraudi_state::tileram_r(offs_t offset)
 {
 	return *TILERAM(offset);
 }
 
-WRITE16_MEMBER(staraudi_state::tileram_w)
+void staraudi_state::tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(TILERAM(offset));
 	int tile = TILE0 + ((offset * 2) % 0x20000) / (8*2);
@@ -618,7 +618,7 @@ void staraudi_state::staraudi_map(address_map &map)
                             TelePachi Fever Lion
 ***************************************************************************/
 
-WRITE8_MEMBER(seta2_state::telpacfl_lamp1_w)
+void seta2_state::telpacfl_lamp1_w(uint8_t data)
 {
 	for (int i = 0; i <= 7; i++)
 		m_lamps[i] = BIT(data, i);
@@ -626,7 +626,7 @@ WRITE8_MEMBER(seta2_state::telpacfl_lamp1_w)
 //  popmessage("LAMP1 %04X", data);
 }
 
-WRITE8_MEMBER(seta2_state::telpacfl_lamp2_w)
+void seta2_state::telpacfl_lamp2_w(uint8_t data)
 {
 	m_lamps[8] = BIT(data, 0); // on/off lamp (throughout)
 	m_lamps[9] = BIT(data, 1); // bet lamp
@@ -638,7 +638,7 @@ WRITE8_MEMBER(seta2_state::telpacfl_lamp2_w)
 //  popmessage("LAMP2 %04X", data);
 }
 
-WRITE8_MEMBER(seta2_state::telpacfl_lockout_w)
+void seta2_state::telpacfl_lockout_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(1,  data & 0x02); // 100yen in
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x04); // coin blocker
@@ -786,13 +786,13 @@ void funcube_touchscreen_device::tra_callback()
 // Bus conversion functions:
 
 // RAM shared with the sub CPU
-READ32_MEMBER(funcube_state::nvram_r)
+uint32_t funcube_state::nvram_r(offs_t offset)
 {
 	uint16_t val = m_nvram[offset];
 	return ((val & 0xff00) << 8) | (val & 0x00ff);
 }
 
-WRITE32_MEMBER(funcube_state::nvram_w)
+void funcube_state::nvram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -807,7 +807,7 @@ WRITE32_MEMBER(funcube_state::nvram_w)
 // Main CPU
 
 
-READ32_MEMBER(funcube_state::debug_r)
+uint32_t funcube_state::debug_r()
 {
 	uint32_t ret = ioport("DEBUG")->read();
 
@@ -875,7 +875,7 @@ void funcube_state::funcube_sub_map(address_map &map)
 
 #define FUNCUBE_SUB_CPU_CLOCK (XTAL(14'745'600))
 
-READ16_MEMBER(funcube_state::coins_r)
+uint16_t funcube_state::coins_r()
 {
 	uint8_t ret = ioport("SWITCH")->read();
 	uint8_t coin_bit0 = 1;    // active low
@@ -912,7 +912,7 @@ void funcube_state::funcube_debug_outputs()
 #endif
 }
 
-WRITE16_MEMBER(funcube_state::leds_w)
+void funcube_state::leds_w(uint16_t data)
 {
 	*m_funcube_leds = data;
 
@@ -928,13 +928,13 @@ WRITE16_MEMBER(funcube_state::leds_w)
 	funcube_debug_outputs();
 }
 
-READ16_MEMBER(funcube_state::outputs_r)
+uint16_t funcube_state::outputs_r()
 {
 	// Bits 1,2,3 read
 	return *m_outputs;
 }
 
-WRITE16_MEMBER(funcube_state::outputs_w)
+void funcube_state::outputs_w(uint16_t data)
 {
 	*m_outputs = data;
 
@@ -951,7 +951,7 @@ WRITE16_MEMBER(funcube_state::outputs_w)
 	funcube_debug_outputs();
 }
 
-READ16_MEMBER(funcube_state::battery_r)
+uint16_t funcube_state::battery_r()
 {
 	return ioport("BATTERY")->read() ? 0x40 : 0x00;
 }

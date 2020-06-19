@@ -57,14 +57,14 @@ private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_ram;
 
-	DECLARE_READ8_MEMBER(bankedram_r);
-	DECLARE_WRITE8_MEMBER(bankedram_w);
-	DECLARE_WRITE8_MEMBER(k88games_5f84_w);
-	DECLARE_WRITE8_MEMBER(k88games_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(speech_control_w);
-	DECLARE_WRITE8_MEMBER(speech_msg_w);
-	DECLARE_READ8_MEMBER(k052109_051960_r);
-	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	uint8_t bankedram_r(offs_t offset);
+	void bankedram_w(offs_t offset, uint8_t data);
+	void k88games_5f84_w(uint8_t data);
+	void k88games_sh_irqtrigger_w(uint8_t data);
+	void speech_control_w(uint8_t data);
+	void speech_msg_w(uint8_t data);
+	uint8_t k052109_051960_r(offs_t offset);
+	void k052109_051960_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_88games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

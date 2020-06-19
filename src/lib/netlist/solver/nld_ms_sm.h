@@ -33,6 +33,7 @@
 ///
 
 #include "nld_matrix_solver.h"
+#include "nld_matrix_solver_ext.h"
 #include "nld_solver.h"
 #include "plib/vector_ops.h"
 

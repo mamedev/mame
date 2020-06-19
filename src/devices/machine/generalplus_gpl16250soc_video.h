@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "spg_renderer.h"
 #include "cpu/unsp/unsp.h"
 #include "screen.h"
 #include "emupal.h"
@@ -35,101 +36,103 @@ public:
 	void set_alt_extrasprite(int alt_extrasprite_hack) { m_alt_extrasprite_hack = alt_extrasprite_hack; }
 
 
+	void set_video_spaces(address_space& cpuspace, address_space& cs_space, int csbase) { m_cpuspace = &cpuspace; m_cs_space = &cs_space; m_csbase = csbase; }
+
 	//void set_pal_sprites(int pal_sprites) { m_pal_sprites = pal_sprites; }
 	//void set_pal_back(int pal_back) { m_pal_back = pal_back; }
 
-	DECLARE_READ16_MEMBER(tmap0_regs_r);
-	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
-	DECLARE_READ16_MEMBER(tmap0_tilebase_lsb_r);
-	DECLARE_READ16_MEMBER(tmap0_tilebase_msb_r);
-	DECLARE_WRITE16_MEMBER(tmap0_tilebase_lsb_w);
-	DECLARE_WRITE16_MEMBER(tmap0_tilebase_msb_w);
+	uint16_t tmap0_regs_r(offs_t offset);
+	void tmap0_regs_w(offs_t offset, uint16_t data);
+	uint16_t tmap0_tilebase_lsb_r();
+	uint16_t tmap0_tilebase_msb_r();
+	void tmap0_tilebase_lsb_w(uint16_t data);
+	void tmap0_tilebase_msb_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(tmap1_regs_r);
-	DECLARE_WRITE16_MEMBER(tmap1_regs_w);
-	DECLARE_READ16_MEMBER(tmap1_tilebase_lsb_r);
-	DECLARE_READ16_MEMBER(tmap1_tilebase_msb_r);
-	DECLARE_WRITE16_MEMBER(tmap1_tilebase_lsb_w);
-	DECLARE_WRITE16_MEMBER(tmap1_tilebase_msb_w);
+	uint16_t tmap1_regs_r(offs_t offset);
+	void tmap1_regs_w(offs_t offset, uint16_t data);
+	uint16_t tmap1_tilebase_lsb_r();
+	uint16_t tmap1_tilebase_msb_r();
+	void tmap1_tilebase_lsb_w(uint16_t data);
+	void tmap1_tilebase_msb_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(tmap2_regs_r);
-	DECLARE_WRITE16_MEMBER(tmap2_regs_w);
-	DECLARE_READ16_MEMBER(tmap2_tilebase_lsb_r);
-	DECLARE_READ16_MEMBER(tmap2_tilebase_msb_r);
-	DECLARE_WRITE16_MEMBER(tmap2_tilebase_lsb_w);
-	DECLARE_WRITE16_MEMBER(tmap2_tilebase_msb_w);
+	uint16_t tmap2_regs_r(offs_t offset);
+	void tmap2_regs_w(offs_t offset, uint16_t data);
+	uint16_t tmap2_tilebase_lsb_r();
+	uint16_t tmap2_tilebase_msb_r();
+	void tmap2_tilebase_lsb_w(uint16_t data);
+	void tmap2_tilebase_msb_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(tmap3_regs_r);
-	DECLARE_WRITE16_MEMBER(tmap3_regs_w);
-	DECLARE_READ16_MEMBER(tmap3_tilebase_lsb_r);
-	DECLARE_READ16_MEMBER(tmap3_tilebase_msb_r);
-	DECLARE_WRITE16_MEMBER(tmap3_tilebase_lsb_w);
-	DECLARE_WRITE16_MEMBER(tmap3_tilebase_msb_w);
+	uint16_t tmap3_regs_r(offs_t offset);
+	void tmap3_regs_w(offs_t offset, uint16_t data);
+	uint16_t tmap3_tilebase_lsb_r();
+	uint16_t tmap3_tilebase_msb_r();
+	void tmap3_tilebase_lsb_w(uint16_t data);
+	void tmap3_tilebase_msb_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(video_701c_w);
-	DECLARE_WRITE16_MEMBER(video_701d_w);
-	DECLARE_WRITE16_MEMBER(video_701e_w);
+	void video_701c_w(uint16_t data);
+	void video_701d_w(uint16_t data);
+	void video_701e_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(sprite_7022_gfxbase_lsb_r);
-	DECLARE_READ16_MEMBER(sprite_702d_gfxbase_msb_r);
+	uint16_t sprite_7022_gfxbase_lsb_r();
+	uint16_t sprite_702d_gfxbase_msb_r();
 
-	DECLARE_WRITE16_MEMBER(sprite_7022_gfxbase_lsb_w);
-	DECLARE_WRITE16_MEMBER(sprite_702d_gfxbase_msb_w);
-	DECLARE_READ16_MEMBER(sprite_7042_extra_r);
-	DECLARE_WRITE16_MEMBER(sprite_7042_extra_w);
+	void sprite_7022_gfxbase_lsb_w(uint16_t data);
+	void sprite_702d_gfxbase_msb_w(uint16_t data);
+	uint16_t sprite_7042_extra_r();
+	void sprite_7042_extra_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(video_dma_source_w);
-	DECLARE_WRITE16_MEMBER(video_dma_dest_w);
-	DECLARE_READ16_MEMBER(video_dma_size_busy_r);
-	DECLARE_WRITE16_MEMBER(video_dma_size_trigger_w);
-	DECLARE_WRITE16_MEMBER(video_707e_spritebank_w);
+	void video_dma_source_w(uint16_t data);
+	void video_dma_dest_w(uint16_t data);
+	uint16_t video_dma_size_busy_r();
+	void video_dma_size_trigger_w(address_space &space, uint16_t data);
+	void video_707e_spritebank_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(video_703a_palettebank_r);
-	DECLARE_WRITE16_MEMBER(video_703a_palettebank_w);
+	uint16_t video_703a_palettebank_r();
+	void video_703a_palettebank_w(uint16_t data);
 
 	void update_raster_split_position();
-	DECLARE_WRITE16_MEMBER(split_irq_xpos_w);
-	DECLARE_WRITE16_MEMBER(split_irq_ypos_w);
+	void split_irq_xpos_w(uint16_t data);
+	void split_irq_ypos_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(videoirq_source_enable_r);
-	DECLARE_WRITE16_MEMBER(videoirq_source_enable_w);
+	uint16_t videoirq_source_enable_r();
+	void videoirq_source_enable_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(video_7063_videoirq_source_r);
-	DECLARE_WRITE16_MEMBER(video_7063_videoirq_source_ack_w);
+	uint16_t video_7063_videoirq_source_r();
+	void video_7063_videoirq_source_ack_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(video_702a_w);
-	DECLARE_READ16_MEMBER(video_7030_brightness_r);
-	DECLARE_WRITE16_MEMBER(video_7030_brightness_w);
-	DECLARE_READ16_MEMBER(video_curline_r);
+	void video_702a_w(uint16_t data);
+	uint16_t video_7030_brightness_r();
+	void video_7030_brightness_w(uint16_t data);
+	uint16_t video_curline_r();
 
-	DECLARE_READ16_MEMBER(video_703c_tvcontrol1_r);
-	DECLARE_WRITE16_MEMBER(video_703c_tvcontrol1_w);
+	uint16_t video_703c_tvcontrol1_r();
+	void video_703c_tvcontrol1_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(video_707c_r);
+	uint16_t video_707c_r();
 
-	DECLARE_READ16_MEMBER(video_707f_r);
-	DECLARE_WRITE16_MEMBER(video_707f_w);
+	uint16_t video_707f_r();
+	void video_707f_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(video_7080_w);
-	DECLARE_WRITE16_MEMBER(video_7081_w);
-	DECLARE_WRITE16_MEMBER(video_7082_w);
-	DECLARE_WRITE16_MEMBER(video_7083_w);
-	DECLARE_WRITE16_MEMBER(video_7084_w);
-	DECLARE_WRITE16_MEMBER(video_7085_w);
-	DECLARE_WRITE16_MEMBER(video_7086_w);
-	DECLARE_WRITE16_MEMBER(video_7087_w);
-	DECLARE_WRITE16_MEMBER(video_7088_w);
+	void video_7080_w(uint16_t data);
+	void video_7081_w(uint16_t data);
+	void video_7082_w(uint16_t data);
+	void video_7083_w(uint16_t data);
+	void video_7084_w(uint16_t data);
+	void video_7085_w(uint16_t data);
+	void video_7086_w(uint16_t data);
+	void video_7087_w(uint16_t data);
+	void video_7088_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(video_7083_r);
+	uint16_t video_7083_r();
 
-	DECLARE_READ16_MEMBER(palette_r);
-	DECLARE_WRITE16_MEMBER(palette_w);
+	uint16_t palette_r(offs_t offset);
+	void palette_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(spriteram_w);
-	DECLARE_READ16_MEMBER(spriteram_r);
+	void spriteram_w(offs_t offset, uint16_t data);
+	uint16_t spriteram_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER(video_7051_r);
-	DECLARE_READ16_MEMBER(video_70e0_r);
+	uint16_t video_7051_r();
+	uint16_t video_70e0_r();
 
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
@@ -146,37 +149,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	enum blend_enable_t : bool
-	{
-		BlendOff = false,
-		BlendOn = true
-	};
-
-	enum rowscroll_enable_t : bool
-	{
-		RowScrollOff = false,
-		RowScrollOn = true
-	};
-
-	enum flipx_t : bool
-	{
-		FlipXOff = false,
-		FlipXOn = true
-	};
-
-	template<blend_enable_t Blend, rowscroll_enable_t RowScroll, flipx_t FlipX>
-	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint32_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset, int addressing_mode);
-	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs, uint16_t *scroll, int which);
-	void draw_sprites(const rectangle& cliprect, uint32_t scanline, int priority);
-	void draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t base_addr);
-
-	uint32_t m_screenbuf[640 * 480];
-	uint8_t m_rgb5_to_rgb8[32];
-	uint32_t m_rgb555_to_rgb888[0x8000];
-
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
-//  required_shared_ptr<uint16_t> m_scrollram;
 
 	uint16_t m_page0_addr_lsb;
 	uint16_t m_page0_addr_msb;
@@ -241,8 +215,7 @@ protected:
 
 	emu_timer *m_screenpos_timer;
 
-	uint16_t m_spriteram[0x400];
-	uint16_t m_spriteextra[0x400];
+	uint16_t m_spriteram[0x400*2];
 	uint16_t m_paletteram[0x100*0x10];
 
 	required_device<palette_device> m_palette;
@@ -261,6 +234,11 @@ protected:
 	int m_alt_extrasprite_hack;
 	int m_alt_tile_addressing;
 
+	required_device<spg_renderer_device> m_renderer;
+
+	address_space* m_cpuspace;
+	address_space* m_cs_space;
+	int m_csbase;
 };
 
 class gcm394_video_device : public gcm394_base_video_device

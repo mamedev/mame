@@ -36,9 +36,15 @@ ASMJIT_BEGIN_NAMESPACE
 // [asmjit::BaseFeatures]
 // ============================================================================
 
+//! Base class that provides information about CPU features.
+//!
+//! Internally each feature is repreesnted by a single bit in an embedded
+//! bit-array, however, feature bits are defined by an architecture specific
+//! implementations, like \ref x86::Features.
 class BaseFeatures {
 public:
   typedef Support::BitWord BitWord;
+  typedef Support::BitVectorIterator<BitWord> Iterator;
 
   enum : uint32_t {
     kMaxFeatures = 128,
@@ -74,9 +80,11 @@ public:
   //! \name Cast
   //! \{
 
+  //! Casts this base class into a derived type `T`.
   template<typename T>
   inline T& as() noexcept { return static_cast<T&>(*this); }
 
+  //! Casts this base class into a derived type `T` (const).
   template<typename T>
   inline const T& as() const noexcept { return static_cast<const T&>(*this); }
 
@@ -85,10 +93,26 @@ public:
   //! \name Accessors
   //! \{
 
-  //! Returns all features as `BitWord` array.
+  inline bool empty() const noexcept {
+    for (uint32_t i = 0; i < kNumBitWords; i++)
+      if (_bits[i])
+        return false;
+    return true;
+  }
+
+  //! Returns all features as array of bitwords (see \ref Support::BitWord).
   inline BitWord* bits() noexcept { return _bits; }
-  //! Returns all features as `BitWord` array (const).
+  //! Returns all features as array of bitwords (const).
   inline const BitWord* bits() const noexcept { return _bits; }
+
+  //! Returns the number of BitWords returned by \ref bits().
+  inline size_t bitWordCount() const noexcept { return kNumBitWords; }
+
+  //! Returns \ref Support::BitVectorIterator, that can be used to iterate
+  //! all features efficiently
+  inline Iterator iterator() const noexcept {
+    return Iterator(_bits, kNumBitWords);
+  }
 
   //! Tests whether the feature `featureId` is present.
   inline bool has(uint32_t featureId) const noexcept {

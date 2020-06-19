@@ -208,10 +208,12 @@ public:
 		m_analog1(*this, "ANALOG1"),
 		m_analog2(*this, "ANALOG2"),
 		m_analog3(*this, "ANALOG3"),
+		m_pcb_digit(*this, "pcbdigit%u", 0U),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
-		m_konppc(*this, "konppc") { }
+		m_konppc(*this, "konppc")
+	{ }
 
 	void zr107(machine_config &config);
 
@@ -227,14 +229,13 @@ protected:
 	required_device<k001005_device> m_k001005;
 	required_device<k001006_device> m_k001006_1;
 	required_ioport m_in0, m_in1, m_in2, m_in3, m_in4, m_out4, m_eepromout, m_analog1, m_analog2, m_analog3;
+	output_finder<2> m_pcb_digit;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	required_device<konppc_device> m_konppc;
 
 	std::unique_ptr<uint32_t[]> m_sharc_dataram;
-	uint8_t m_led_reg0;
-	uint8_t m_led_reg1;
 	int m_ccu_vcth;
 	int m_ccu_vctl;
 	uint8_t m_sound_ctrl;
@@ -312,8 +313,6 @@ uint32_t jetwave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	m_k001005->draw(bitmap, cliprect);
 	m_k001604->draw_front_layer(screen, bitmap, cliprect);
 
-	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 	return 0;
 }
 
@@ -353,8 +352,6 @@ uint32_t midnrun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	m_k001005->draw(bitmap, cliprect);
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
-	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 	return 0;
 }
 
@@ -383,6 +380,8 @@ uint8_t zr107_state::sysreg_r(offs_t offset)
 			break;
 		case 5: /* Parallel data port */
 			break;
+		default:
+			break;
 	}
 	return r;
 }
@@ -391,12 +390,9 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 0: /* LED Register 0 */
-			m_led_reg0 = data;
-			break;
-
-		case 1: /* LED Register 1 */
-			m_led_reg1 = data;
+		case 0: /* 7seg LEDs on PCB */
+		case 1:
+			m_pcb_digit[offset] = bitswap<8>(~data,7,0,1,2,3,4,5,6) & 0x7f;
 			break;
 
 		case 2: /* Parallel data register */
@@ -447,6 +443,8 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 				m_watchdog->watchdog_reset();
 			break;
 
+		default:
+			break;
 	}
 }
 
@@ -483,6 +481,8 @@ void zr107_state::ccu_w(uint32_t data)
 
 void zr107_state::machine_start()
 {
+	m_pcb_digit.resolve();
+
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
@@ -851,7 +851,6 @@ void jetwave_state::jetwave(machine_config &config)
 void zr107_state::driver_init()
 {
 	m_sharc_dataram = std::make_unique<uint32_t[]>(0x100000/4);
-	m_led_reg0 = m_led_reg1 = 0x7f;
 	m_ccu_vcth = m_ccu_vctl = 0;
 
 	m_dsp->enable_recompiler();

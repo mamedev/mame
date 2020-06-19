@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(hitme_state::get_hitme_tile_info)
 }
 
 
-WRITE8_MEMBER(hitme_state::hitme_vidram_w)
+void hitme_state::hitme_vidram_w(offs_t offset, uint8_t data)
 {
 	/* mark this tile dirty */
 	m_videoram[offset] = data;
@@ -151,25 +151,25 @@ uint8_t hitme_state::read_port_and_t0_and_hblank( int port )
 }
 
 
-READ8_MEMBER(hitme_state::hitme_port_0_r)
+uint8_t hitme_state::hitme_port_0_r()
 {
 	return read_port_and_t0_and_hblank(0);
 }
 
 
-READ8_MEMBER(hitme_state::hitme_port_1_r)
+uint8_t hitme_state::hitme_port_1_r()
 {
 	return read_port_and_t0(1);
 }
 
 
-READ8_MEMBER(hitme_state::hitme_port_2_r)
+uint8_t hitme_state::hitme_port_2_r()
 {
 	return read_port_and_t0_and_hblank(2);
 }
 
 
-READ8_MEMBER(hitme_state::hitme_port_3_r)
+uint8_t hitme_state::hitme_port_3_r()
 {
 	return read_port_and_t0(3);
 }
@@ -182,7 +182,7 @@ READ8_MEMBER(hitme_state::hitme_port_3_r)
  *
  *************************************/
 
-WRITE8_MEMBER(hitme_state::output_port_0_w)
+void hitme_state::output_port_0_w(uint8_t data)
 {
 	/*
 	    Note: We compute the timeout time on a write here. Unfortunately, the situation is
@@ -200,7 +200,7 @@ WRITE8_MEMBER(hitme_state::output_port_0_w)
 }
 
 
-WRITE8_MEMBER(hitme_state::output_port_1_w)
+void hitme_state::output_port_1_w(uint8_t data)
 {
 	m_discrete->write(HITME_ENABLE_VAL, data);
 	m_discrete->write(HITME_OUT1, 1);

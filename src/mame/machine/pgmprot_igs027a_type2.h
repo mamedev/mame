@@ -42,8 +42,8 @@ private:
 	void martmast_arm_region_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void kov2_arm_region_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void kov2p_arm_region_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	DECLARE_READ32_MEMBER( ddp2_speedup_r );
-	DECLARE_READ16_MEMBER( ddp2_main_speedup_r );
+	u32 ddp2_speedup_r(address_space &space);
+	u16 ddp2_main_speedup_r();
 	void _55857F_arm7_map(address_map &map);
 	void kov2_mem(address_map &map);
 };

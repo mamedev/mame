@@ -12,7 +12,7 @@
  *********************************/
 
 // TODO: move into device
-WRITE8_MEMBER(tatsumi_state::hd6445_crt_w)
+void tatsumi_state::hd6445_crt_w(offs_t offset, uint8_t data)
 {
 	if (offset==0)
 		m_hd6445_address = data & 0x3f;
@@ -41,12 +41,12 @@ WRITE8_MEMBER(tatsumi_state::hd6445_crt_w)
 	}
 }
 
-READ16_MEMBER(tatsumi_state::tatsumi_sprite_control_r)
+uint16_t tatsumi_state::tatsumi_sprite_control_r(offs_t offset)
 {
 	return m_sprite_control_ram[offset];
 }
 
-WRITE16_MEMBER(tatsumi_state::tatsumi_sprite_control_w)
+void tatsumi_state::tatsumi_sprite_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sprite_control_ram[offset]);
 
@@ -76,10 +76,9 @@ void tatsumi_state::apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &c
 	}
 }
 
-WRITE16_MEMBER(tatsumi_state::text_w)
+void tatsumi_state::text_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t *videoram = m_videoram;
-	COMBINE_DATA(&videoram[offset]);
+	COMBINE_DATA(&m_videoram[offset]);
 	m_tx_layer->mark_tile_dirty(offset);
 }
 
@@ -586,12 +585,12 @@ void tatsumi_state::update_cluts(int fake_palette_offset, int object_base, int l
  *
  *********************************/
 
-WRITE16_MEMBER(apache3_state::apache3_road_z_w)
+void apache3_state::apache3_road_z_w(uint16_t data)
 {
 	m_apache3_road_z = data & 0xff;
 }
 
-WRITE8_MEMBER(apache3_state::apache3_road_x_w)
+void apache3_state::apache3_road_x_w(offs_t offset, uint8_t data)
 {
 	// Note: Double buffered. Yes, this is correct :)
 	m_apache3_road_x_ram[data] = offset;
@@ -718,7 +717,7 @@ uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb3
  *
  *********************************/
 
-READ8_MEMBER(roundup5_state::gfxdata_r)
+uint8_t roundup5_state::gfxdata_r(offs_t offset)
 {
 	if((m_control_word & 0x200) == 0x200)
 	{
@@ -731,7 +730,7 @@ READ8_MEMBER(roundup5_state::gfxdata_r)
 	return m_tx_gfxram[offset];
 }
 
-WRITE8_MEMBER(roundup5_state::gfxdata_w)
+void roundup5_state::gfxdata_w(offs_t offset, uint8_t data)
 {
 	if((m_control_word & 0x200) == 0x200)
 	{
@@ -1077,7 +1076,7 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
  * ---x ---- ---- x--- one these might be color bank
  *
  */
-WRITE16_MEMBER(cyclwarr_state::video_config_w)
+void cyclwarr_state::video_config_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_config[offset]);
 }
@@ -1086,7 +1085,7 @@ WRITE16_MEMBER(cyclwarr_state::video_config_w)
 // --x- ---- enabled in Big Fight, disabled in Cycle Warriors (unknown purpose)
 // ---- -x-- enable shadow mixing
 // ---- ---x if 1 invert shadows, i.e. shadows are drawn with original pen while non shadows are halved (Chen stage in Big Fight)
-WRITE16_MEMBER(cyclwarr_state::mixing_control_w)
+void cyclwarr_state::mixing_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mixing_control);
 }

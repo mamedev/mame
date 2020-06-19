@@ -26,13 +26,14 @@
 
 #include "../core/arch.h"
 #include "../core/callconv.h"
+#include "../core/environment.h"
 #include "../core/operand.h"
 #include "../core/type.h"
 #include "../core/support.h"
 
 ASMJIT_BEGIN_NAMESPACE
 
-//! \addtogroup asmjit_func
+//! \addtogroup asmjit_function
 //! \{
 
 // ============================================================================
@@ -365,7 +366,7 @@ public:
   inline FuncDetail(const FuncDetail& other) noexcept = default;
 
   //! Initializes this `FuncDetail` to the given signature.
-  ASMJIT_API Error init(const FuncSignature& sign);
+  ASMJIT_API Error init(const FuncSignature& signature, const Environment& environment) noexcept;
   inline void reset() noexcept { memset(this, 0, sizeof(*this)); }
 
   //! \}
@@ -472,12 +473,13 @@ public:
 //! frame. The function frame in most cases won't use all of the properties
 //! illustrated (for example Spill Zone and Red Zone are never used together).
 //!
+//! ```
 //!   +-----------------------------+
 //!   | Arguments Passed by Stack   |
 //!   +-----------------------------+
 //!   | Spill Zone                  |
 //!   +-----------------------------+ <- Stack offset (args) starts from here.
-//!   | Return Address if Pushed    |
+//!   | Return Address, if Pushed   |
 //!   +-----------------------------+ <- Stack pointer (SP) upon entry.
 //!   | Save/Restore Stack.         |
 //!   +-----------------------------+-----------------------------+
@@ -487,32 +489,42 @@ public:
 //!   +-----------------------------+-----------------------------+ <- SP after prolog.
 //!   | Red Zone                    |
 //!   +-----------------------------+
+//! ```
 class FuncFrame {
 public:
   enum Tag : uint32_t {
-    kTagInvalidOffset     = 0xFFFFFFFFu  //!< Tag used to inform that some offset is invalid.
+    //! Tag used to inform that some offset is invalid.
+    kTagInvalidOffset = 0xFFFFFFFFu
   };
 
   //! Attributes are designed in a way that all are initially false, and user
   //! or FuncFrame finalizer adds them when necessary.
   enum Attributes : uint32_t {
-    kAttrHasVarArgs       = 0x00000001u, //!< Function has variable number of arguments.
-    kAttrHasPreservedFP   = 0x00000010u, //!< Preserve frame pointer (don't omit FP).
-    kAttrHasFuncCalls     = 0x00000020u, //!< Function calls other functions (is not leaf).
+    //! Function has variable number of arguments.
+    kAttrHasVarArgs = 0x00000001u,
+    //! Preserve frame pointer (don't omit FP).
+    kAttrHasPreservedFP = 0x00000010u,
+    //! Function calls other functions (is not leaf).
+    kAttrHasFuncCalls = 0x00000020u,
 
-    kAttrX86AvxEnabled    = 0x00010000u, //!< Use AVX instead of SSE for all operations (X86).
-    kAttrX86AvxCleanup    = 0x00020000u, //!< Emit VZEROUPPER instruction in epilog (X86).
-    kAttrX86MmxCleanup    = 0x00040000u, //!< Emit EMMS instruction in epilog (X86).
+    //! Use AVX instead of SSE for all operations (X86).
+    kAttrX86AvxEnabled = 0x00010000u,
+    //! Emit VZEROUPPER instruction in epilog (X86).
+    kAttrX86AvxCleanup = 0x00020000u,
+    //! Emit EMMS instruction in epilog (X86).
+    kAttrX86MmxCleanup = 0x00040000u,
 
-    kAttrAlignedVecSR     = 0x40000000u, //!< Function has aligned save/restore of vector registers.
-    kAttrIsFinalized      = 0x80000000u  //!< FuncFrame is finalized and can be used by PEI.
+    //! Function has aligned save/restore of vector registers.
+    kAttrAlignedVecSR = 0x40000000u,
+    //! FuncFrame is finalized and can be used by PEI.
+    kAttrIsFinalized = 0x80000000u
   };
 
   //! Function attributes.
   uint32_t _attributes;
 
-  //! Architecture ID.
-  uint8_t _archId;
+  //! Architecture, see \ref Environment::Arch.
+  uint8_t _arch;
   //! SP register ID (to access call stack and local stack).
   uint8_t _spRegId;
   //! SA register ID (to access stack arguments).
@@ -591,7 +603,7 @@ public:
   //! \{
 
   //! Returns the target architecture of the function frame.
-  inline uint32_t archId() const noexcept { return _archId; }
+  inline uint32_t arch() const noexcept { return _arch; }
 
   //! Returns function frame attributes, see `Attributes`.
   inline uint32_t attributes() const noexcept { return _attributes; }
@@ -784,10 +796,8 @@ public:
   }
 
   inline void setAllDirty() noexcept {
-    _dirtyRegs[0] = 0xFFFFFFFFu;
-    _dirtyRegs[1] = 0xFFFFFFFFu;
-    _dirtyRegs[2] = 0xFFFFFFFFu;
-    _dirtyRegs[3] = 0xFFFFFFFFu;
+    for (size_t i = 0; i < ASMJIT_ARRAY_SIZE(_dirtyRegs); i++)
+      _dirtyRegs[i] = 0xFFFFFFFFu;
   }
 
   inline void setAllDirty(uint32_t group) noexcept {

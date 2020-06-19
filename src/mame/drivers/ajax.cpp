@@ -136,7 +136,7 @@ INPUT_PORTS_END
     0   / 2MBANK
 */
 
-WRITE8_MEMBER(ajax_state::sound_bank_w)
+void ajax_state::sound_bank_w(uint8_t data)
 {
 	int bank_A, bank_B;
 
@@ -157,7 +157,7 @@ void ajax_state::volume_callback0(uint8_t data)
 	m_k007232_1->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-WRITE8_MEMBER(ajax_state::k007232_extvol_w)
+void ajax_state::k007232_extvol_w(uint8_t data)
 {
 	/* channel A volume (mono) */
 	m_k007232_2->set_volume(0, (data & 0x0f) * 0x11/2, (data & 0x0f) * 0x11/2);

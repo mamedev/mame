@@ -19,24 +19,24 @@ public:
 
 	seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data);
 
-	DECLARE_READ16_MEMBER( reg_lo_addr_r );
-	DECLARE_READ16_MEMBER( reg_hi_addr_r );
-	DECLARE_READ16_MEMBER( status_r );
-	DECLARE_READ16_MEMBER( dist_r );
-	DECLARE_READ16_MEMBER( angle_r );
-	DECLARE_WRITE16_MEMBER( reg_lo_addr_w );
-	DECLARE_WRITE16_MEMBER( reg_hi_addr_w );
-	DECLARE_WRITE16_MEMBER( cmd_trigger_w );
-	DECLARE_READ16_MEMBER( d104_move_r );
-	DECLARE_WRITE16_MEMBER( d104_move_w );
-	DECLARE_READ16_MEMBER( prng_max_r );
-	DECLARE_WRITE16_MEMBER( prng_max_w );
-	DECLARE_READ16_MEMBER( prng_r );
-	DECLARE_READ16_MEMBER( scale_r );
-	DECLARE_WRITE16_MEMBER( scale_w );
+	uint16_t reg_lo_addr_r(offs_t offset);
+	uint16_t reg_hi_addr_r(offs_t offset);
+	uint16_t status_r();
+	uint16_t dist_r();
+	uint16_t angle_r();
+	void reg_lo_addr_w(offs_t offset, uint16_t data);
+	void reg_hi_addr_w(offs_t offset, uint16_t data);
+	void cmd_trigger_w(offs_t offset, uint16_t data);
+	uint16_t d104_move_r(offs_t offset);
+	void d104_move_w(offs_t offset, uint16_t data);
+	uint16_t prng_max_r();
+	void prng_max_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t prng_r();
+	uint16_t scale_r();
+	void scale_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void seibucopbl_map(address_map &map);
 protected:

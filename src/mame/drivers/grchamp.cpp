@@ -145,7 +145,7 @@ INTERRUPT_GEN_MEMBER(grchamp_state::cpu1_interrupt)
  *
  *************************************/
 
-WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
+void grchamp_state::cpu0_outputs_w(offs_t offset, uint8_t data)
 {
 	uint8_t diff = data ^ m_cpu0_out[offset];
 	m_cpu0_out[offset] = data;
@@ -225,7 +225,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 }
 
 
-WRITE8_MEMBER(grchamp_state::led_board_w)
+void grchamp_state::led_board_w(offs_t offset, uint8_t data)
 {
 	static const uint8_t ls247_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
@@ -269,7 +269,7 @@ WRITE8_MEMBER(grchamp_state::led_board_w)
  *
  *************************************/
 
-WRITE8_MEMBER(grchamp_state::cpu1_outputs_w)
+void grchamp_state::cpu1_outputs_w(offs_t offset, uint8_t data)
 {
 	uint8_t diff = data ^ m_cpu1_out[offset];
 	m_cpu1_out[offset] = data;
@@ -377,25 +377,25 @@ uint8_t grchamp_state::get_pc3259_bits(int offs)
 }
 
 
-READ8_MEMBER(grchamp_state::pc3259_0_r)
+uint8_t grchamp_state::pc3259_0_r()
 {
 	return get_pc3259_bits(0);
 }
 
 
-READ8_MEMBER(grchamp_state::pc3259_1_r)
+uint8_t grchamp_state::pc3259_1_r()
 {
 	return get_pc3259_bits(1);
 }
 
 
-READ8_MEMBER(grchamp_state::pc3259_2_r)
+uint8_t grchamp_state::pc3259_2_r()
 {
 	return get_pc3259_bits(2);
 }
 
 
-READ8_MEMBER(grchamp_state::pc3259_3_r)
+uint8_t grchamp_state::pc3259_3_r()
 {
 	return get_pc3259_bits(3);
 }
@@ -408,7 +408,7 @@ READ8_MEMBER(grchamp_state::pc3259_3_r)
  *
  *************************************/
 
-READ8_MEMBER(grchamp_state::sub_to_main_comm_r)
+uint8_t grchamp_state::sub_to_main_comm_r()
 {
 	return m_comm_latch;
 }
@@ -421,13 +421,13 @@ TIMER_CALLBACK_MEMBER(grchamp_state::main_to_sub_comm_sync_w)
 }
 
 
-WRITE8_MEMBER(grchamp_state::main_to_sub_comm_w)
+void grchamp_state::main_to_sub_comm_w(offs_t offset, uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(grchamp_state::main_to_sub_comm_sync_w),this), data | (offset << 8));
 }
 
 
-READ8_MEMBER(grchamp_state::main_to_sub_comm_r)
+uint8_t grchamp_state::main_to_sub_comm_r(offs_t offset)
 {
 	return m_comm_latch2[offset];
 }
@@ -456,7 +456,7 @@ TIMER_CALLBACK_MEMBER(grchamp_state::soundlatch_clear7_w_cb)
 }
 
 // RD5000
-READ8_MEMBER(grchamp_state::soundlatch_r)
+uint8_t grchamp_state::soundlatch_r()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -467,13 +467,13 @@ READ8_MEMBER(grchamp_state::soundlatch_r)
 }
 
 // WR5000
-WRITE8_MEMBER(grchamp_state::soundlatch_clear7_w)
+void grchamp_state::soundlatch_clear7_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(grchamp_state::soundlatch_clear7_w_cb), this), data);
 }
 
 // RD5001
-READ8_MEMBER(grchamp_state::soundlatch_flags_r)
+uint8_t grchamp_state::soundlatch_flags_r()
 {
 	return (m_soundlatch_flag?8:0) /*| (m_sound_semaphore2?4:0)*/ | 3;
 }

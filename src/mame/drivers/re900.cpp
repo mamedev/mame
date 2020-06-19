@@ -105,9 +105,9 @@ public:
 
 private:
 	// common
-	DECLARE_READ8_MEMBER(rom_r);
+	uint8_t rom_r(offs_t offset);
 	void cpu_port_0_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(watchdog_reset_w);
+	void watchdog_reset_w(uint8_t data);
 
 	// re900 specific
 	uint8_t re_psg_portA_r();
@@ -204,7 +204,7 @@ uint8_t re900_state::re_psg_portB_r()
 	return retval;
 }
 
-READ8_MEMBER(re900_state::rom_r)
+uint8_t re900_state::rom_r(offs_t offset)
 {
 	return m_rom[offset];
 }
@@ -244,7 +244,7 @@ void re900_state::cpu_port_0_w(uint8_t data)
 //  m_lamps[8] = 1 ^ ( (data >> 5) & 1); /* Cont. Ent */
 }
 
-WRITE8_MEMBER(re900_state::watchdog_reset_w)
+void re900_state::watchdog_reset_w(uint8_t data)
 {
 	//watchdog_reset_w(space,0,0); /* To do! */
 }

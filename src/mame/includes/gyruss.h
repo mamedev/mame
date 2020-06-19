@@ -64,8 +64,8 @@ private:
 	void slave_irq_mask_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(gyruss_spriteram_w);
-	DECLARE_READ8_MEMBER(gyruss_scanline_r);
+	void gyruss_spriteram_w(offs_t offset, uint8_t data);
+	uint8_t gyruss_scanline_r();
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	uint8_t gyruss_portA_r();
 	void gyruss_dac_w(uint8_t data);

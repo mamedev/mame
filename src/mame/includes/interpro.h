@@ -104,8 +104,8 @@ public:
 
 	void init_common();
 
-	virtual DECLARE_READ32_MEMBER(unmapped_r);
-	virtual DECLARE_WRITE32_MEMBER(unmapped_w);
+	virtual u32 unmapped_r(address_space &space, offs_t offset);
+	virtual void unmapped_w(offs_t offset, u32 data);
 
 	enum error_mask : u16
 	{
@@ -119,9 +119,9 @@ public:
 		ERROR_BG       = 0x0070,
 		ERROR_BUSHOG   = 0x0080
 	};
-	DECLARE_READ16_MEMBER(error_r);
+	u16 error_r();
 
-	DECLARE_WRITE16_MEMBER(led_w);
+	void led_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	enum status_mask : u16
 	{
@@ -131,14 +131,14 @@ public:
 		STATUS_RED_ZONE    = 0x0008,
 		STATUS_BP          = 0x00f0
 	};
-	DECLARE_READ16_MEMBER(status_r) { return m_status; }
+	u16 status_r() { return m_status; }
 
-	virtual DECLARE_READ16_MEMBER(ctrl1_r) = 0;
-	virtual DECLARE_WRITE16_MEMBER(ctrl1_w) = 0;
-	virtual DECLARE_READ16_MEMBER(ctrl2_r) = 0;
-	virtual DECLARE_WRITE16_MEMBER(ctrl2_w) = 0;
+	virtual u16 ctrl1_r() = 0;
+	virtual void ctrl1_w(offs_t offset, u16 data, u16 mem_mask = ~0) = 0;
+	virtual u16 ctrl2_r() = 0;
+	virtual void ctrl2_w(offs_t offset, u16 data, u16 mem_mask = ~0) = 0;
 
-	DECLARE_READ8_MEMBER(nodeid_r);
+	u8 nodeid_r(address_space &space, offs_t offset);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -174,7 +174,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(error_w) { m_error = data; }
+	void error_w(u8 data) { m_error = data; }
 
 	enum ctrl1_mask : u16
 	{
@@ -188,8 +188,8 @@ public:
 		CTRL1_CLIPRESET  = 0x0040, // hard reset (write)?
 		CTRL1_FIFOACTIVE = 0x0080  // plotter fifo active?
 	};
-	DECLARE_READ16_MEMBER(ctrl1_r) override { return m_ctrl1; }
-	DECLARE_WRITE16_MEMBER(ctrl1_w) override;
+	u16 ctrl1_r() override { return m_ctrl1; }
+	void ctrl1_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
 
 	enum ctrl2_mask : u16
 	{
@@ -204,8 +204,8 @@ public:
 
 		CTRL2_WMASK     = 0x000f
 	};
-	DECLARE_READ16_MEMBER(ctrl2_r) override { return m_ctrl2; }
-	DECLARE_WRITE16_MEMBER(ctrl2_w) override;
+	u16 ctrl2_r() override { return m_ctrl2; }
+	void ctrl2_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
 
 	required_device<cammu_c3_device> m_d_cammu;
 	required_device<cammu_c3_device> m_i_cammu;
@@ -242,7 +242,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(error_w) { m_error = data; }
+	void error_w(u8 data) { m_error = data; }
 
 	enum ctrl1_mask : u16
 	{
@@ -256,8 +256,8 @@ public:
 		CTRL1_CLIPRESET  = 0x0040, // hard reset (write)?
 		CTRL1_FIFOACTIVE = 0x0080  // plotter fifo active?
 	};
-	DECLARE_READ16_MEMBER(ctrl1_r) override { return m_ctrl1; }
-	DECLARE_WRITE16_MEMBER(ctrl1_w) override;
+	u16 ctrl1_r() override { return m_ctrl1; }
+	void ctrl1_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
 
 	enum ctrl2_mask : u16
 	{
@@ -272,8 +272,8 @@ public:
 
 		CTRL2_WMASK     = 0x000f
 	};
-	DECLARE_READ16_MEMBER(ctrl2_r) override { return m_ctrl2; }
-	DECLARE_WRITE16_MEMBER(ctrl2_w) override;
+	u16 ctrl2_r() override { return m_ctrl2; }
+	void ctrl2_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
 
 	required_device<cammu_c3_device> m_d_cammu;
 	required_device<cammu_c3_device> m_i_cammu;
@@ -311,8 +311,8 @@ public:
 	{
 	}
 
-	virtual DECLARE_READ32_MEMBER(unmapped_r) override;
-	virtual DECLARE_WRITE32_MEMBER(unmapped_w) override;
+	virtual u32 unmapped_r(address_space &space, offs_t offset) override;
+	virtual void unmapped_w(offs_t offset, u32 data) override;
 
 	enum ctrl1_mask : u16
 	{
@@ -325,8 +325,8 @@ public:
 		CTRL1_ETHRMOD    = 0x0040, // 0 = sytem configured for remote modems
 		CTRL1_FIFOACTIVE = 0x0080  // 0 = plotter fifos reset
 	};
-	DECLARE_READ16_MEMBER(ctrl1_r) override { return m_ctrl1; }
-	DECLARE_WRITE16_MEMBER(ctrl1_w) override;
+	u16 ctrl1_r() override { return m_ctrl1; }
+	void ctrl1_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
 
 	enum ctrl2_mask : u16
 	{
@@ -338,8 +338,8 @@ public:
 		CTRL2_BUSENA    = 0x0040, // clear bus grant error
 		CTRL2_FLASHEN   = 0x0080, // flash eprom write enable
 	};
-	DECLARE_READ16_MEMBER(ctrl2_r) override { return m_ctrl2; }
-	DECLARE_WRITE16_MEMBER(ctrl2_w) override;
+	u16 ctrl2_r() override { return m_ctrl2; }
+	void ctrl2_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
 
 	required_device<cammu_c4_device> m_mmu;
 	required_device<ncr53c94_device> m_scsi;

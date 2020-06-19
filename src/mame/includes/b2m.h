@@ -35,11 +35,11 @@ public:
 		, m_pic(*this, "pic8259")
 	{ }
 
-	DECLARE_READ8_MEMBER(b2m_keyboard_r);
-	DECLARE_WRITE8_MEMBER(b2m_palette_w);
-	DECLARE_READ8_MEMBER(b2m_palette_r);
-	DECLARE_WRITE8_MEMBER(b2m_localmachine_w);
-	DECLARE_READ8_MEMBER(b2m_localmachine_r);
+	uint8_t b2m_keyboard_r(offs_t offset);
+	void b2m_palette_w(offs_t offset, uint8_t data);
+	uint8_t b2m_palette_r(offs_t offset);
+	void b2m_localmachine_w(uint8_t data);
+	uint8_t b2m_localmachine_r();
 	void init_b2m();
 
 	void b2m_palette(palette_device &palette) const;

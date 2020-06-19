@@ -154,7 +154,7 @@ void namconb1_state::video_start()
 
 /****************************************************************************************************/
 
-WRITE32_MEMBER(namconb1_state::rozbank32_w)
+void namconb1_state::rozbank32_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 old_data = m_rozbank32[offset];
 	COMBINE_DATA(&m_rozbank32[offset]);

@@ -41,8 +41,8 @@ public:
 
 	uint8_t* get_lcd_state() { return m_lcd_state; }
 
-	DECLARE_READ16_MEMBER( slave_r );
-	DECLARE_WRITE16_MEMBER( slave_w );
+	uint16_t slave_r(offs_t offset);
+	void slave_w(offs_t offset, uint16_t data);
 
 protected:
 	// device-level overrides

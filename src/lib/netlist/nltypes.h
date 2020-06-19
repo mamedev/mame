@@ -73,6 +73,16 @@ namespace netlist
 	///
 	using netlist_sig_t = std::uint32_t;
 
+	/// \brief The memory pool for netlist objects
+	///
+	/// \note This is not the right location yet.
+	///
+
+	using device_arena = std::conditional_t<config::use_mempool::value,
+		plib::mempool_arena<plib::aligned_arena>,
+		plib::aligned_arena>;
+	using host_arena   = plib::aligned_arena;
+
 	/// \brief Interface definition for netlist callbacks into calling code
 	///
 	/// A class inheriting from netlist_callbacks_t has to be passed to the netlist_t
@@ -99,7 +109,7 @@ namespace netlist
 		/// of a callbacks_t implementation to optionally provide such a collection
 		/// of symbols.
 		///
-		virtual plib::unique_ptr<plib::dynlib_base> static_solver_lib() const;
+		virtual host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const;
 	};
 
 	using log_type =  plib::plog_base<callbacks_t, NL_DEBUG>;
@@ -107,28 +117,6 @@ namespace netlist
 	//============================================================
 	//  Types needed by various includes
 	//============================================================
-
-	/// \brief The memory pool for netlist objects
-	///
-	/// \note This is not the right location yet.
-	///
-
-#if (NL_USE_MEMPOOL)
-	using nlmempool = plib::mempool_arena;
-#else
-	using nlmempool = plib::aligned_arena;
-#endif
-
-	/// \brief Owned pointer type for pooled allocations.
-	///
-	template <typename T>
-	using owned_pool_ptr = nlmempool::owned_pool_ptr<T>;
-
-	/// \brief Unique pointer type for pooled allocations.
-	///
-
-	template <typename T>
-	using unique_pool_ptr = nlmempool::unique_pool_ptr<T>;
 
 	namespace detail {
 
@@ -142,13 +130,9 @@ namespace netlist
 
 	} // namespace detail
 
-#if (PHAS_INT128)
 	using netlist_time = plib::ptime<std::int64_t, config::INTERNAL_RES::value>;
-	using netlist_time_ext = plib::ptime<INT128, config::INTERNAL_RES::value>;
-#else
-	using netlist_time = plib::ptime<std::int64_t, config::INTERNAL_RES::value>;
-	using netlist_time_ext = netlist_time;
-#endif
+	using netlist_time_ext = plib::ptime<std::conditional<NL_PREFER_INT128 && plib::compile_info::has_int128::value, INT128, std::int64_t>::type, config::INTERNAL_RES::value>;
+
 	static_assert(noexcept(netlist_time::from_nsec(1)), "Not evaluated as constexpr");
 
 	//============================================================
@@ -203,7 +187,7 @@ namespace netlist
 			}
 		};
 
-		/// \brief: used define a constant in device description struct
+		/// \brief: used to define a constant in device description struct
 		///
 		/// See the 74125 implementation
 		///

@@ -209,7 +209,7 @@ public:
 	void driver_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(intflag_write);
+	void intflag_write(offs_t offset, uint8_t data);
 
 	uint8_t mem_read(offs_t offset);
 	void mem_write(offs_t offset, uint8_t data);
@@ -288,7 +288,7 @@ void ti99_2_state::crumap(address_map &map)
     These CRU addresses are actually inside the 9995 CPU, but they are
     propagated to the outside world, so we can watch the changes.
 */
-WRITE8_MEMBER(ti99_2_state::intflag_write)
+void ti99_2_state::intflag_write(offs_t offset, uint8_t data)
 {
 	int addr = 0x1ee0 | (offset<<1);
 	switch (addr)

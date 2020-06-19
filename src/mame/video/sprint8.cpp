@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info2)
 }
 
 
-WRITE8_MEMBER(sprint8_state::video_ram_w)
+void sprint8_state::video_ram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 	m_tilemap1->mark_tile_dirty(offset);

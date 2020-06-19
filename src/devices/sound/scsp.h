@@ -29,12 +29,12 @@ public:
 	auto main_irq_cb() { return m_main_irq_cb.bind(); }
 
 	// SCSP register access
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	u16 read(offs_t offset);
+	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// MIDI I/O access (used for comms on Model 2/3)
 	void midi_in(u8 data);
-	DECLARE_READ16_MEMBER(midi_out_r);
+	u16 midi_out_r();
 
 protected:
 	// device-level overrides

@@ -163,12 +163,12 @@
 *         Custom Handlers          *
 ***********************************/
 
-WRITE8_MEMBER(_4enraya_state::sound_data_w)
+void _4enraya_state::sound_data_w(uint8_t data)
 {
 	m_soundlatch = data;
 }
 
-WRITE8_MEMBER(_4enraya_state::sound_control_w)
+void _4enraya_state::sound_control_w(uint8_t data)
 {
 	// BDIR must be high
 	if (~data & 4)
@@ -192,7 +192,7 @@ WRITE8_MEMBER(_4enraya_state::sound_control_w)
 	}
 }
 
-READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
+uint8_t _4enraya_state::fenraya_custom_map_r(offs_t offset)
 {
 	uint8_t prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
 	uint8_t res = 0;
@@ -220,7 +220,7 @@ READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
 	return res;
 }
 
-WRITE8_MEMBER(_4enraya_state::fenraya_custom_map_w)
+void _4enraya_state::fenraya_custom_map_w(offs_t offset, uint8_t data)
 {
 	uint8_t prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
 
@@ -241,7 +241,7 @@ WRITE8_MEMBER(_4enraya_state::fenraya_custom_map_w)
 
 	if (prom_routing & 8) // gfx control / RAM wait
 	{
-		fenraya_videoram_w(space, offset & 0xfff, data);
+		fenraya_videoram_w(offset & 0xfff, data);
 	}
 }
 

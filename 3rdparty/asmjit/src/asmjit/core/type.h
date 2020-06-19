@@ -35,7 +35,7 @@ ASMJIT_BEGIN_NAMESPACE
 // [asmjit::Type]
 // ============================================================================
 
-//! Provides minimum type-system that is used by \ref asmjit_func and \ref asmjit_compiler.
+//! Provides a minimalist type-system that is used by Asmjit library.
 namespace Type {
 
 //! TypeId.
@@ -46,7 +46,7 @@ namespace Type {
 //! width used) and it's also used by APIs that allow to describe and work with
 //! function signatures.
 enum Id : uint32_t {
-  kIdVoid         = 0,
+  kIdVoid         = 0,  //!< Void type.
 
   _kIdBaseStart   = 32,
   _kIdBaseEnd     = 44,
@@ -54,38 +54,38 @@ enum Id : uint32_t {
   _kIdIntStart    = 32,
   _kIdIntEnd      = 41,
 
-  kIdIntPtr       = 32,
-  kIdUIntPtr      = 33,
+  kIdIntPtr       = 32, //!< Abstract signed integer type that has a native size.
+  kIdUIntPtr      = 33, //!< Abstract unsigned integer type that has a native size.
 
-  kIdI8           = 34,
-  kIdU8           = 35,
-  kIdI16          = 36,
-  kIdU16          = 37,
-  kIdI32          = 38,
-  kIdU32          = 39,
-  kIdI64          = 40,
-  kIdU64          = 41,
+  kIdI8           = 34, //!< 8-bit signed integer type.
+  kIdU8           = 35, //!< 8-bit unsigned integer type.
+  kIdI16          = 36, //!< 16-bit signed integer type.
+  kIdU16          = 37, //!< 16-bit unsigned integer type.
+  kIdI32          = 38, //!< 32-bit signed integer type.
+  kIdU32          = 39, //!< 32-bit unsigned integer type.
+  kIdI64          = 40, //!< 64-bit signed integer type.
+  kIdU64          = 41, //!< 64-bit unsigned integer type.
 
   _kIdFloatStart  = 42,
   _kIdFloatEnd    = 44,
 
-  kIdF32          = 42,
-  kIdF64          = 43,
-  kIdF80          = 44,
+  kIdF32          = 42, //!< 32-bit floating point type.
+  kIdF64          = 43, //!< 64-bit floating point type.
+  kIdF80          = 44, //!< 80-bit floating point type.
 
   _kIdMaskStart   = 45,
   _kIdMaskEnd     = 48,
 
-  kIdMask8        = 45,
-  kIdMask16       = 46,
-  kIdMask32       = 47,
-  kIdMask64       = 48,
+  kIdMask8        = 45, //!< 8-bit opmask register (K).
+  kIdMask16       = 46, //!< 16-bit opmask register (K).
+  kIdMask32       = 47, //!< 32-bit opmask register (K).
+  kIdMask64       = 48, //!< 64-bit opmask register (K).
 
   _kIdMmxStart    = 49,
   _kIdMmxEnd      = 50,
 
-  kIdMmx32        = 49,
-  kIdMmx64        = 50,
+  kIdMmx32        = 49, //!< 64-bit MMX register only used for 32 bits.
+  kIdMmx64        = 50, //!< 64-bit MMX register.
 
   _kIdVec32Start  = 51,
   _kIdVec32End    = 60,
@@ -206,70 +206,72 @@ static constexpr bool isVec128(uint32_t typeId) noexcept { return typeId >= _kId
 static constexpr bool isVec256(uint32_t typeId) noexcept { return typeId >= _kIdVec256Start && typeId <= _kIdVec256End; }
 static constexpr bool isVec512(uint32_t typeId) noexcept { return typeId >= _kIdVec512Start && typeId <= _kIdVec512End; }
 
-//! IdOfT<> template allows to get a TypeId of a C++ `T` type.
-template<typename T> struct IdOfT { /* Fail if not specialized. */ };
-
 //! \cond
-template<typename T> struct IdOfT<T*> {
-  enum : uint32_t { kTypeId = kIdUIntPtr };
+enum TypeCategory : uint32_t {
+  kTypeCategoryUnknown = 0,
+  kTypeCategoryEnum = 1,
+  kTypeCategoryIntegral = 2,
+  kTypeCategoryFloatingPoint = 3,
+  kTypeCategoryFunction = 4
 };
 
-template<typename T> struct IdOfT<T&> {
-  enum : uint32_t { kTypeId = kIdUIntPtr };
+template<typename T, uint32_t Category>
+struct IdOfT_ByCategory {}; // Fails if not specialized.
+
+template<typename T>
+struct IdOfT_ByCategory<T, kTypeCategoryIntegral> {
+  enum : uint32_t {
+    kTypeId = (sizeof(T) == 1 &&  std::is_signed<T>::value) ? kIdI8 :
+              (sizeof(T) == 1 && !std::is_signed<T>::value) ? kIdU8 :
+              (sizeof(T) == 2 &&  std::is_signed<T>::value) ? kIdI16 :
+              (sizeof(T) == 2 && !std::is_signed<T>::value) ? kIdU16 :
+              (sizeof(T) == 4 &&  std::is_signed<T>::value) ? kIdI32 :
+              (sizeof(T) == 4 && !std::is_signed<T>::value) ? kIdU32 :
+              (sizeof(T) == 8 &&  std::is_signed<T>::value) ? kIdI64 :
+              (sizeof(T) == 8 && !std::is_signed<T>::value) ? kIdU64 : kIdVoid
+  };
 };
 
 template<typename T>
-struct IdOfIntT {
-  static constexpr uint32_t kTypeId =
-    sizeof(T) == 1 ? (std::is_signed<T>::value ? kIdI8  : kIdU8 ) :
-    sizeof(T) == 2 ? (std::is_signed<T>::value ? kIdI16 : kIdU16) :
-    sizeof(T) == 4 ? (std::is_signed<T>::value ? kIdI32 : kIdU32) :
-    sizeof(T) == 8 ? (std::is_signed<T>::value ? kIdI64 : kIdU64) : kIdVoid;
+struct IdOfT_ByCategory<T, kTypeCategoryFloatingPoint> {
+  enum : uint32_t {
+    kTypeId = (sizeof(T) == 4 ) ? kIdF32 :
+              (sizeof(T) == 8 ) ? kIdF64 :
+              (sizeof(T) >= 10) ? kIdF80 : kIdVoid
+  };
 };
 
-template<uint32_t TYPE_ID>
-struct BaseOfTypeId {
-  static constexpr uint32_t kTypeId =
-    isBase  (TYPE_ID) ? TYPE_ID :
-    isMask8 (TYPE_ID) ? kIdU8   :
-    isMask16(TYPE_ID) ? kIdU16  :
-    isMask32(TYPE_ID) ? kIdU32  :
-    isMask64(TYPE_ID) ? kIdU64  :
-    isMmx32 (TYPE_ID) ? kIdI32  :
-    isMmx64 (TYPE_ID) ? kIdI64  :
-    isVec32 (TYPE_ID) ? TYPE_ID + kIdI8 - _kIdVec32Start  :
-    isVec64 (TYPE_ID) ? TYPE_ID + kIdI8 - _kIdVec64Start  :
-    isVec128(TYPE_ID) ? TYPE_ID + kIdI8 - _kIdVec128Start :
-    isVec256(TYPE_ID) ? TYPE_ID + kIdI8 - _kIdVec256Start :
-    isVec512(TYPE_ID) ? TYPE_ID + kIdI8 - _kIdVec512Start : 0;
-};
+template<typename T>
+struct IdOfT_ByCategory<T, kTypeCategoryEnum>
+  : public IdOfT_ByCategory<typename std::underlying_type<T>::type, kTypeCategoryIntegral> {};
 
-template<uint32_t TYPE_ID>
-struct SizeOfTypeId {
-  static constexpr uint32_t kTypeSize =
-    isInt8   (TYPE_ID) ?  1 :
-    isUInt8  (TYPE_ID) ?  1 :
-    isInt16  (TYPE_ID) ?  2 :
-    isUInt16 (TYPE_ID) ?  2 :
-    isInt32  (TYPE_ID) ?  4 :
-    isUInt32 (TYPE_ID) ?  4 :
-    isInt64  (TYPE_ID) ?  8 :
-    isUInt64 (TYPE_ID) ?  8 :
-    isFloat32(TYPE_ID) ?  4 :
-    isFloat64(TYPE_ID) ?  8 :
-    isFloat80(TYPE_ID) ? 10 :
-    isMask8  (TYPE_ID) ?  1 :
-    isMask16 (TYPE_ID) ?  2 :
-    isMask32 (TYPE_ID) ?  4 :
-    isMask64 (TYPE_ID) ?  8 :
-    isMmx32  (TYPE_ID) ?  4 :
-    isMmx64  (TYPE_ID) ?  8 :
-    isVec32  (TYPE_ID) ?  4 :
-    isVec64  (TYPE_ID) ?  8 :
-    isVec128 (TYPE_ID) ? 16 :
-    isVec256 (TYPE_ID) ? 32 :
-    isVec512 (TYPE_ID) ? 64 : 0;
+template<typename T>
+struct IdOfT_ByCategory<T, kTypeCategoryFunction> {
+  enum: uint32_t { kTypeId = kIdUIntPtr };
 };
+//! \endcond
+
+//! IdOfT<> template allows to get a TypeId from a C++ type `T`.
+template<typename T>
+struct IdOfT
+#ifdef _DOXYGEN
+  //! TypeId of C++ type `T`.
+  static constexpr uint32_t kTypeId = _TypeIdDeducedAtCompileTime_;
+#else
+  : public IdOfT_ByCategory<T,
+    std::is_enum<T>::value           ? kTypeCategoryEnum          :
+    std::is_integral<T>::value       ? kTypeCategoryIntegral      :
+    std::is_floating_point<T>::value ? kTypeCategoryFloatingPoint :
+    std::is_function<T>::value       ? kTypeCategoryFunction      : kTypeCategoryUnknown>
+#endif
+{};
+
+//! \cond
+template<typename T>
+struct IdOfT<T*> { enum : uint32_t { kTypeId = kIdUIntPtr }; };
+
+template<typename T>
+struct IdOfT<T&> { enum : uint32_t { kTypeId = kIdUIntPtr }; };
 //! \endcond
 
 static inline uint32_t baseOf(uint32_t typeId) noexcept {
@@ -283,14 +285,14 @@ static inline uint32_t sizeOf(uint32_t typeId) noexcept {
 }
 
 //! Returns offset needed to convert a `kIntPtr` and `kUIntPtr` TypeId
-//! into a type that matches `gpSize` (general-purpose register size).
+//! into a type that matches `registerSize` (general-purpose register size).
 //! If you find such TypeId it's then only about adding the offset to it.
 //!
 //! For example:
 //!
 //! ```
-//! uint32_t gpSize = '4' or '8';
-//! uint32_t deabstractDelta = Type::deabstractDeltaOfSize(gpSize);
+//! uint32_t registerSize = '4' or '8';
+//! uint32_t deabstractDelta = Type::deabstractDeltaOfSize(registerSize);
 //!
 //! uint32_t typeId = 'some type-id';
 //!
@@ -300,8 +302,8 @@ static inline uint32_t sizeOf(uint32_t typeId) noexcept {
 //! // The same, but by using Type::deabstract() function.
 //! typeId = Type::deabstract(typeId, deabstractDelta);
 //! ```
-static constexpr uint32_t deabstractDeltaOfSize(uint32_t gpSize) noexcept {
-  return gpSize >= 8 ? kIdI64 - kIdIntPtr : kIdI32 - kIdIntPtr;
+static constexpr uint32_t deabstractDeltaOfSize(uint32_t registerSize) noexcept {
+  return registerSize >= 8 ? kIdI64 - kIdIntPtr : kIdI32 - kIdIntPtr;
 }
 
 static constexpr uint32_t deabstract(uint32_t typeId, uint32_t deabstractDelta) noexcept {
@@ -350,45 +352,20 @@ namespace Type {                           \
   };                                       \
 }
 
-ASMJIT_DEFINE_TYPE_ID(bool              , IdOfIntT<bool              >::kTypeId);
-ASMJIT_DEFINE_TYPE_ID(char              , IdOfIntT<char              >::kTypeId);
-ASMJIT_DEFINE_TYPE_ID(signed char       , IdOfIntT<signed char       >::kTypeId);
-ASMJIT_DEFINE_TYPE_ID(unsigned char     , IdOfIntT<unsigned char     >::kTypeId);
-ASMJIT_DEFINE_TYPE_ID(short             , IdOfIntT<short             >::kTypeId);
-ASMJIT_DEFINE_TYPE_ID(unsigned short    , IdOfIntT<unsigned short    >::kTypeId);
-ASMJIT_DEFINE_TYPE_ID(int               , IdOfIntT<int               >::kTypeId);
-ASMJIT_DEFINE_TYPE_ID(unsigned int      , IdOfIntT<unsigned int      >::kTypeId);
-ASMJIT_DEFINE_TYPE_ID(long              , IdOfIntT<long              >::kTypeId);
-ASMJIT_DEFINE_TYPE_ID(unsigned long     , IdOfIntT<unsigned long     >::kTypeId);
-ASMJIT_DEFINE_TYPE_ID(long long         , IdOfIntT<long long         >::kTypeId);
-ASMJIT_DEFINE_TYPE_ID(unsigned long long, IdOfIntT<unsigned long long>::kTypeId);
-
-#if ASMJIT_CXX_HAS_NATIVE_WCHAR_T
-ASMJIT_DEFINE_TYPE_ID(wchar_t           , IdOfIntT<wchar_t           >::kTypeId);
-#endif
-
-#if ASMJIT_CXX_HAS_UNICODE_LITERALS
-ASMJIT_DEFINE_TYPE_ID(char16_t          , IdOfIntT<char16_t          >::kTypeId);
-ASMJIT_DEFINE_TYPE_ID(char32_t          , IdOfIntT<char32_t          >::kTypeId);
-#endif
-
-ASMJIT_DEFINE_TYPE_ID(void              , kIdVoid);
-ASMJIT_DEFINE_TYPE_ID(float             , kIdF32);
-ASMJIT_DEFINE_TYPE_ID(double            , kIdF64);
-
-ASMJIT_DEFINE_TYPE_ID(Bool              , kIdU8);
-ASMJIT_DEFINE_TYPE_ID(I8                , kIdI8);
-ASMJIT_DEFINE_TYPE_ID(U8                , kIdU8);
-ASMJIT_DEFINE_TYPE_ID(I16               , kIdI16);
-ASMJIT_DEFINE_TYPE_ID(U16               , kIdU16);
-ASMJIT_DEFINE_TYPE_ID(I32               , kIdI32);
-ASMJIT_DEFINE_TYPE_ID(U32               , kIdU32);
-ASMJIT_DEFINE_TYPE_ID(I64               , kIdI64);
-ASMJIT_DEFINE_TYPE_ID(U64               , kIdU64);
-ASMJIT_DEFINE_TYPE_ID(IPtr              , kIdIntPtr);
-ASMJIT_DEFINE_TYPE_ID(UPtr              , kIdUIntPtr);
-ASMJIT_DEFINE_TYPE_ID(F32               , kIdF32);
-ASMJIT_DEFINE_TYPE_ID(F64               , kIdF64);
+ASMJIT_DEFINE_TYPE_ID(void, kIdVoid);
+ASMJIT_DEFINE_TYPE_ID(Bool, kIdU8);
+ASMJIT_DEFINE_TYPE_ID(I8  , kIdI8);
+ASMJIT_DEFINE_TYPE_ID(U8  , kIdU8);
+ASMJIT_DEFINE_TYPE_ID(I16 , kIdI16);
+ASMJIT_DEFINE_TYPE_ID(U16 , kIdU16);
+ASMJIT_DEFINE_TYPE_ID(I32 , kIdI32);
+ASMJIT_DEFINE_TYPE_ID(U32 , kIdU32);
+ASMJIT_DEFINE_TYPE_ID(I64 , kIdI64);
+ASMJIT_DEFINE_TYPE_ID(U64 , kIdU64);
+ASMJIT_DEFINE_TYPE_ID(IPtr, kIdIntPtr);
+ASMJIT_DEFINE_TYPE_ID(UPtr, kIdUIntPtr);
+ASMJIT_DEFINE_TYPE_ID(F32 , kIdF32);
+ASMJIT_DEFINE_TYPE_ID(F64 , kIdF64);
 //! \endcond
 
 //! \}

@@ -50,8 +50,8 @@ private:
 	std::unique_ptr<uint8_t[]> m_colorram;
 	uint8_t m_output;
 
-	DECLARE_READ8_MEMBER(colorram_r) { return m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] | 0x0f; }
-	DECLARE_WRITE8_MEMBER(colorram_w) { m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] = data & 0xf0; }
+	uint8_t colorram_r(offs_t offset) { return m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] | 0x0f; }
+	void colorram_w(offs_t offset, uint8_t data) { m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] = data & 0xf0; }
 	uint8_t input_r();
 	void output_w(uint8_t data);
 

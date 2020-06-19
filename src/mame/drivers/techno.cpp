@@ -39,20 +39,20 @@ private:
 		IRQ_ADVANCE_TIMER
 	};
 
-	DECLARE_READ16_MEMBER(key_r);
-	DECLARE_READ16_MEMBER(rtrg_r);
-	DECLARE_READ16_MEMBER(sound_r);
-	DECLARE_WRITE16_MEMBER(disp1_w);
-	DECLARE_WRITE16_MEMBER(disp2_w);
-	DECLARE_WRITE16_MEMBER(lamp1_w);
-	DECLARE_WRITE16_MEMBER(lamp2_w);
-	DECLARE_WRITE16_MEMBER(setout_w);
-	DECLARE_WRITE16_MEMBER(sol1_w);
-	DECLARE_WRITE16_MEMBER(sol2_w);
-	DECLARE_WRITE16_MEMBER(sound_w);
+	uint16_t key_r();
+	uint16_t rtrg_r();
+	uint16_t sound_r();
+	void disp1_w(uint16_t data);
+	void disp2_w(uint16_t data);
+	void lamp1_w(uint16_t data);
+	void lamp2_w(uint16_t data);
+	void setout_w(uint16_t data);
+	void sol1_w(uint16_t data);
+	void sol2_w(uint16_t data);
+	void sound_w(uint16_t data);
 
-	DECLARE_READ8_MEMBER(rd_r) { return 0; }
-	DECLARE_WRITE8_MEMBER(wr_w) {}
+	uint8_t rd_r() { return 0; }
+	void wr_w(uint8_t data) {}
 
 	void techno_map(address_map &map);
 	void techno_sub_map(address_map &map);
@@ -100,17 +100,17 @@ void techno_state::techno_sub_map(address_map &map)
 	map(0xc000, 0xffff).rom(); // another 16k ROM
 }
 
-WRITE16_MEMBER( techno_state::disp1_w )
+void techno_state::disp1_w(uint16_t data)
 {
 	m_digits[m_digit] = bitswap<16>(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
-WRITE16_MEMBER( techno_state::disp2_w )
+void techno_state::disp2_w(uint16_t data)
 {
 	m_digits[m_digit+30] = bitswap<16>(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
-WRITE16_MEMBER( techno_state::sound_w )
+void techno_state::sound_w(uint16_t data)
 {
 /*
 d0..d7 : to sound board
@@ -132,7 +132,7 @@ d11-d15: AUX outputs
 }
 
 // lamps & keymatrix
-WRITE16_MEMBER( techno_state::lamp1_w )
+void techno_state::lamp1_w(uint16_t data)
 {
 // Work out key row
 	for (int i = 8; i < 16; i++)
@@ -141,39 +141,39 @@ WRITE16_MEMBER( techno_state::lamp1_w )
 }
 
 // more lamps
-WRITE16_MEMBER( techno_state::lamp2_w )
+void techno_state::lamp2_w(uint16_t data)
 {
 }
 
 // solenoids
-WRITE16_MEMBER( techno_state::sol1_w )
+void techno_state::sol1_w(uint16_t data)
 {
 }
 
 // more solenoids
-WRITE16_MEMBER( techno_state::sol2_w )
+void techno_state::sol2_w(uint16_t data)
 {
 }
 
 // unknown
-WRITE16_MEMBER( techno_state::setout_w )
+void techno_state::setout_w(uint16_t data)
 {
 }
 
 // inputs
-READ16_MEMBER( techno_state::key_r )
+uint16_t techno_state::key_r()
 {
 	return m_switch[m_keyrow]->read();
 }
 
 // unknown
-READ16_MEMBER( techno_state::rtrg_r )
+uint16_t techno_state::rtrg_r()
 {
 	return 0xffff;
 }
 
 // feedback from sound board, and some AUX inputs
-READ16_MEMBER( techno_state::sound_r )
+uint16_t techno_state::sound_r()
 {
 	return 0;
 }

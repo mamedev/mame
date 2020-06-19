@@ -30,8 +30,8 @@ public:
 		m_banks[3] = offs4;
 	}
 
-	DECLARE_WRITE16_MEMBER( gaelcosnd_w );
-	DECLARE_READ16_MEMBER( gaelcosnd_r );
+	void gaelcosnd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gaelcosnd_r(offs_t offset);
 
 protected:
 	gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

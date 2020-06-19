@@ -929,7 +929,7 @@ static void ngen_floppies(device_slot_interface &device)
 void ngen_state::ngen(machine_config &config)
 {
 	// basic machine hardware
-	I80186(config, m_maincpu, 16_MHz_XTAL / 2);
+	I80186(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ngen_state::ngen_mem);
 	m_maincpu->set_addrmap(AS_IO, &ngen_state::ngen_io);
 	m_maincpu->chip_select_callback().set(FUNC(ngen_state::cpu_peripheral_cb));

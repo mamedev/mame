@@ -102,7 +102,7 @@ void gauntlet_state::video_start()
  *
  *************************************/
 
-WRITE16_MEMBER( gauntlet_state::gauntlet_xscroll_w )
+void gauntlet_state::gauntlet_xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldxscroll = *m_xscroll;
 	COMBINE_DATA(m_xscroll);
@@ -126,7 +126,7 @@ WRITE16_MEMBER( gauntlet_state::gauntlet_xscroll_w )
  *
  *************************************/
 
-WRITE16_MEMBER( gauntlet_state::gauntlet_yscroll_w )
+void gauntlet_state::gauntlet_yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldyscroll = *m_yscroll;
 	COMBINE_DATA(m_yscroll);

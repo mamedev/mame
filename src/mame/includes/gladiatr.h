@@ -13,13 +13,13 @@
 class gladiatr_state_base : public driver_device
 {
 public:
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(textram_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
+	void videoram_w(offs_t offset, u8 data);
+	void colorram_w(offs_t offset, u8 data);
+	void textram_w(offs_t offset, u8 data);
+	void paletteram_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(spritebuffer_w);
-	DECLARE_WRITE8_MEMBER(adpcm_command_w);
-	DECLARE_READ8_MEMBER(adpcm_command_r);
+	void adpcm_command_w(u8 data);
+	u8 adpcm_command_r();
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
@@ -111,11 +111,11 @@ public:
 	}
 
 	DECLARE_WRITE_LINE_MEMBER(spritebank_w);
-	DECLARE_WRITE8_MEMBER(gladiatr_video_registers_w);
+	void gladiatr_video_registers_w(offs_t offset, u8 data);
 
-	DECLARE_WRITE8_MEMBER(gladiatr_irq_patch_w);
+	void gladiatr_irq_patch_w(u8 data);
 	void gladiator_int_control_w(u8 data);
-	DECLARE_WRITE8_MEMBER(gladiator_adpcm_w);
+	void gladiator_adpcm_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(tclk_w);
 	u8 cctl_p1_r();
@@ -174,17 +174,17 @@ public:
 	}
 
 	u8 ppking_f1_r();
-	DECLARE_WRITE8_MEMBER(ppking_qx0_w);
-	DECLARE_WRITE8_MEMBER(ppking_qx1_w);
-	DECLARE_WRITE8_MEMBER(ppking_qx3_w);
-	DECLARE_READ8_MEMBER(ppking_qx3_r);
-	DECLARE_READ8_MEMBER(ppking_qx0_r);
-	DECLARE_READ8_MEMBER(ppking_qx1_r);
-	DECLARE_READ8_MEMBER(ppking_qxcomu_r);
-	DECLARE_WRITE8_MEMBER(ppking_qxcomu_w);
-	DECLARE_WRITE8_MEMBER(ppking_video_registers_w);
-	DECLARE_WRITE8_MEMBER(ppking_adpcm_w);
-	DECLARE_WRITE8_MEMBER(cpu2_irq_ack_w);
+	void ppking_qx0_w(offs_t offset, u8 data);
+	void ppking_qx1_w(offs_t offset, u8 data);
+	void ppking_qx3_w(u8 data);
+	u8 ppking_qx3_r(offs_t offset);
+	u8 ppking_qx0_r(offs_t offset);
+	u8 ppking_qx1_r(offs_t offset);
+	u8 ppking_qxcomu_r(offs_t offset);
+	void ppking_qxcomu_w(u8 data);
+	void ppking_video_registers_w(offs_t offset, u8 data);
+	void ppking_adpcm_w(u8 data);
+	void cpu2_irq_ack_w(u8 data);
 
 	void init_ppking();
 

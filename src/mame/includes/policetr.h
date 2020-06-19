@@ -54,15 +54,15 @@ protected:
 
 	void ramdac_map(address_map& map);
 
-	DECLARE_WRITE32_MEMBER(control_w);
-	DECLARE_WRITE32_MEMBER(speedup_w);
+	void control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER(bsmt2000_reg_w);
-	DECLARE_WRITE32_MEMBER(bsmt2000_data_w);
-	DECLARE_READ8_MEMBER(bsmt2000_data_r);
+	void bsmt2000_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bsmt2000_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t bsmt2000_data_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER(video_w);
-	DECLARE_READ32_MEMBER(video_r);
+	void video_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t video_r();
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 	void render_display_list(offs_t offset);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

@@ -51,17 +51,13 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(cop01_sound_command_w);
-	DECLARE_READ8_MEMBER(cop01_sound_command_r);
-	DECLARE_WRITE8_MEMBER(cop01_irq_ack_w);
-	DECLARE_READ8_MEMBER(cop01_sound_irq_ack_w);
-	DECLARE_READ8_MEMBER(kludge);
-	DECLARE_WRITE8_MEMBER(cop01_background_w);
-	DECLARE_WRITE8_MEMBER(cop01_foreground_w);
-	DECLARE_WRITE8_MEMBER(cop01_vreg_w);
-	DECLARE_WRITE8_MEMBER(prot_address_w);
-	DECLARE_WRITE8_MEMBER(prot_data_w);
-	DECLARE_READ8_MEMBER(prot_data_r);
+	void cop01_sound_command_w(uint8_t data);
+	uint8_t cop01_sound_command_r();
+	void cop01_irq_ack_w(uint8_t data);
+	uint8_t cop01_sound_irq_ack_w();
+	void cop01_background_w(offs_t offset, uint8_t data);
+	void cop01_foreground_w(offs_t offset, uint8_t data);
+	void cop01_vreg_w(offs_t offset, uint8_t data);
 	template <int Mask> DECLARE_READ_LINE_MEMBER(mightguy_area_r);
 	void init_mightguy();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

@@ -17,7 +17,7 @@ TILE_GET_INFO_MEMBER(pass_state::get_pass_bg_tile_info)
 
 }
 
-WRITE16_MEMBER(pass_state::pass_bg_videoram_w)
+void pass_state::pass_bg_videoram_w(offs_t offset, uint16_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(pass_state::get_pass_fg_tile_info)
 
 }
 
-WRITE16_MEMBER(pass_state::pass_fg_videoram_w)
+void pass_state::pass_fg_videoram_w(offs_t offset, uint16_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);

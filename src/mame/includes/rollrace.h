@@ -49,22 +49,22 @@ private:
 	uint8_t m_nmi_mask;
 	uint8_t m_sound_nmi_mask;
 
-	DECLARE_READ8_MEMBER(fake_d800_r);
-	DECLARE_WRITE8_MEMBER(fake_d800_w);
+	uint8_t fake_d800_r();
+	void fake_d800_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
+	void sound_nmi_mask_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(charbank_0_w);
 	DECLARE_WRITE_LINE_MEMBER(charbank_1_w);
-	DECLARE_WRITE8_MEMBER(bkgpen_w);
+	void bkgpen_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(spritebank_w);
-	DECLARE_WRITE8_MEMBER(backgroundpage_w);
-	DECLARE_WRITE8_MEMBER(backgroundcolor_w);
-	DECLARE_WRITE8_MEMBER(flipy_w);
+	void backgroundpage_w(uint8_t data);
+	void backgroundcolor_w(uint8_t data);
+	void flipy_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipx_w);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(cram_w);
+	void vram_w(offs_t offset, uint8_t data);
+	void cram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void tilemap_refresh_flip();
 

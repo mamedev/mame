@@ -66,20 +66,21 @@ public:
 	void pipbug(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(pipbug_ctrl_w);
+	virtual void machine_start() override;
+	void pipbug_ctrl_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(serial_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	required_device<rs232_port_device> m_rs232;
 	required_device<s2650_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	void pipbug_data(address_map &map);
-	void pipbug_mem(address_map &map);
+	void data_map(address_map &map);
+	void mem_map(address_map &map);
 	u8 m_cass_data[4];
 	bool m_cassold, m_cassinbit;
 };
 
-WRITE8_MEMBER( pipbug_state::pipbug_ctrl_w )
+void pipbug_state::pipbug_ctrl_w(u8 data)
 {
 // 0x80 is written here - not connected in the baby 2650
 }
@@ -113,14 +114,21 @@ READ_LINE_MEMBER( pipbug_state::serial_r )
 	return m_rs232->rxd_r() & m_cassinbit;
 }
 
-void pipbug_state::pipbug_mem(address_map &map)
+void pipbug_state::machine_start()
+{
+	save_pointer(NAME(m_cass_data), 4);
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_cassinbit));
+}
+
+void pipbug_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).rom();
 	map(0x0400, 0x7fff).ram();
 }
 
-void pipbug_state::pipbug_data(address_map &map)
+void pipbug_state::data_map(address_map &map)
 {
 //  map.unmap_value_high();
 	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(FUNC(pipbug_state::pipbug_ctrl_w));
@@ -146,7 +154,7 @@ QUICKLOAD_LOAD_MEMBER(pipbug_state::quickload_cb)
 	int quick_addr = 0x440;
 	int exec_addr;
 	int quick_length;
-	std::vector<uint8_t> quick_data;
+	std::vector<u8> quick_data;
 	int read_;
 	image_init_result result = image_init_result::FAIL;
 
@@ -207,8 +215,8 @@ void pipbug_state::pipbug(machine_config &config)
 {
 	/* basic machine hardware */
 	S2650(config, m_maincpu, XTAL(1'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &pipbug_state::pipbug_mem);
-	m_maincpu->set_addrmap(AS_DATA, &pipbug_state::pipbug_data);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pipbug_state::mem_map);
+	m_maincpu->set_addrmap(AS_DATA, &pipbug_state::data_map);
 	m_maincpu->flag_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_maincpu->sense_handler().set(FUNC(pipbug_state::serial_r));
 
@@ -231,11 +239,11 @@ void pipbug_state::pipbug(machine_config &config)
 
 /* ROM definition */
 ROM_START( pipbug )
-	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "pipbug.rom", 0x0000, 0x0400, CRC(f242b93e) SHA1(f82857cc882e6b5fc9f00b20b375988024f413ff))
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME  FLAGS
-COMP( 1979, pipbug, 0,      0,      pipbug,  pipbug, pipbug_state, empty_init, "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )
+COMP( 1979, pipbug, 0,      0,      pipbug,  pipbug, pipbug_state, empty_init, "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

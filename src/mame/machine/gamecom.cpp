@@ -202,7 +202,7 @@ void gamecom_state::handle_input_press(uint16_t mux_data)
 	}
 }
 
-WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
+void gamecom_state::gamecom_pio_w(offs_t offset, uint8_t data)
 {
 	offset += 0x14;
 	m_p_ram[offset] = data;
@@ -225,12 +225,12 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 	}
 }
 
-READ8_MEMBER( gamecom_state::gamecom_pio_r )
+uint8_t gamecom_state::gamecom_pio_r(offs_t offset)
 {
 	return m_p_ram[offset + 0x14];
 }
 
-READ8_MEMBER( gamecom_state::gamecom_internal_r )
+uint8_t gamecom_state::gamecom_internal_r(offs_t offset)
 {
 	return m_p_ram[offset + 0x20];
 }
@@ -265,7 +265,7 @@ void gamecom_state::recompute_lcd_params()
 	m_screen->configure(hblank_period, vblank_period, visarea, refresh);
 }
 
-WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
+void gamecom_state::gamecom_internal_w(offs_t offset, uint8_t data)
 {
 	offset += 0x20;
 	switch( offset )

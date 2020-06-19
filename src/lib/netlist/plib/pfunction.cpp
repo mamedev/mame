@@ -10,9 +10,9 @@
 #include "putil.h"
 
 #include <array>
+#include <map>
 #include <stack>
 #include <type_traits>
-#include <map>
 #include <utility>
 
 namespace plib {
@@ -25,26 +25,26 @@ namespace plib {
 	{
 		static std::map<pstring, F> units_si_stat =
 		{
-			//{ "Y", static_cast<F>(1e24) }, // NOLINT: Yotta
-			//{ "Z", static_cast<F>(1e21) }, // NOLINT: Zetta
-			//{ "E", static_cast<F>(1e18) }, // NOLINT: Exa
-			{ "P", static_cast<F>(1e15) }, // NOLINT: Peta
-			{ "T", static_cast<F>(1e12) }, // NOLINT: Tera
-			{ "G", static_cast<F>( 1e9) }, // NOLINT: Giga
-			{ "M", static_cast<F>( 1e6) }, // NOLINT: Mega
-			{ "k", static_cast<F>( 1e3) }, // NOLINT: Kilo
-			{ "h", static_cast<F>( 1e2) }, // NOLINT: Hekto
-			//{ "da", static_cast<F>(1e1) }, // NOLINT: Deka
-			{ "d", static_cast<F>(1e-1) }, // NOLINT: Dezi
-			{ "c", static_cast<F>(1e-2) }, // NOLINT: Zenti
-			{ "m", static_cast<F>(1e-3) }, // NOLINT: Milli
-			{ "μ", static_cast<F>(1e-6) }, // NOLINT: Mikro
-			{ "n", static_cast<F>(1e-9) }, // NOLINT: Nano
-			{ "p", static_cast<F>(1e-12) }, // NOLINT: Piko
-			{ "f", static_cast<F>(1e-15) }, // NOLINT: Femto
-			{ "a", static_cast<F>(1e-18) }, // NOLINT: Atto
-			{ "z", static_cast<F>(1e-21) }, // NOLINT: Zepto
-			{ "y", static_cast<F>(1e-24) }, // NOLINT: Yokto
+			//{ "Y", narrow_cast<F>(1e24) }, // NOLINT: Yotta
+			//{ "Z", narrow_cast<F>(1e21) }, // NOLINT: Zetta
+			//{ "E", narrow_cast<F>(1e18) }, // NOLINT: Exa
+			{ "P", narrow_cast<F>(1e15) }, // NOLINT: Peta
+			{ "T", narrow_cast<F>(1e12) }, // NOLINT: Tera
+			{ "G", narrow_cast<F>( 1e9) }, // NOLINT: Giga
+			{ "M", narrow_cast<F>( 1e6) }, // NOLINT: Mega
+			{ "k", narrow_cast<F>( 1e3) }, // NOLINT: Kilo
+			{ "h", narrow_cast<F>( 1e2) }, // NOLINT: Hekto
+			//{ "da", narrow_cast<F>(1e1) }, // NOLINT: Deka
+			{ "d", narrow_cast<F>(1e-1) }, // NOLINT: Dezi
+			{ "c", narrow_cast<F>(1e-2) }, // NOLINT: Zenti
+			{ "m", narrow_cast<F>(1e-3) }, // NOLINT: Milli
+			{ "μ", narrow_cast<F>(1e-6) }, // NOLINT: Mikro
+			{ "n", narrow_cast<F>(1e-9) }, // NOLINT: Nano
+			{ "p", narrow_cast<F>(1e-12) }, // NOLINT: Piko
+			{ "f", narrow_cast<F>(1e-15) }, // NOLINT: Femto
+			{ "a", narrow_cast<F>(1e-18) }, // NOLINT: Atto
+			{ "z", narrow_cast<F>(1e-21) }, // NOLINT: Zepto
+			{ "y", narrow_cast<F>(1e-24) }, // NOLINT: Yokto
 		};
 		return units_si_stat;
 	}
@@ -105,7 +105,7 @@ namespace plib {
 					if (inputs[i] == cmd)
 					{
 						rc.m_cmd = PUSH_INPUT;
-						rc.m_param = static_cast<NT>(i);
+						rc.m_param = narrow_cast<NT>(i);
 						stk += 1;
 						break;
 					}
@@ -128,7 +128,7 @@ namespace plib {
 			}
 			if (stk < 1)
 				throw pexception(plib::pfmt("pfunction: stack underflow on token <{1}> in <{2}>")(cmd)(expr));
-			if (stk >= static_cast<int>(MAX_STACK))
+			if (stk >= narrow_cast<int>(MAX_STACK))
 				throw pexception(plib::pfmt("pfunction: stack overflow on token <{1}> in <{2}>")(cmd)(expr));
 			m_precompiled.push_back(rc);
 		}
@@ -279,25 +279,25 @@ namespace plib {
 	}
 
 	template <typename NT>
-	static inline typename std::enable_if<plib::is_floating_point<NT>::value, NT>::type
+	static inline std::enable_if_t<plib::is_floating_point<NT>::value, NT>
 	lfsr_random(std::uint16_t &lfsr) noexcept
 	{
 		std::uint16_t lsb = lfsr & 1;
 		lfsr >>= 1;
 		if (lsb)
 			lfsr ^= 0xB400U; // NOLINT: taps 15, 13, 12, 10
-		return static_cast<NT>(lfsr) / static_cast<NT>(0xffffU); // NOLINT
+		return narrow_cast<NT>(lfsr) / narrow_cast<NT>(0xffffU); // NOLINT
 	}
 
 	template <typename NT>
-	static inline typename std::enable_if<plib::is_integral<NT>::value, NT>::type
+	static inline std::enable_if_t<plib::is_integral<NT>::value, NT>
 	lfsr_random(std::uint16_t &lfsr) noexcept
 	{
 		std::uint16_t lsb = lfsr & 1;
 		lfsr >>= 1;
 		if (lsb)
 			lfsr ^= 0xB400U; // NOLINT: taps 15, 13, 12, 10
-		return static_cast<NT>(lfsr);
+		return narrow_cast<NT>(lfsr);
 	}
 
 	#define ST1 stack[ptr]
@@ -333,7 +333,7 @@ namespace plib {
 					stack[ptr++] = lfsr_random<value_type>(m_lfsr);
 					break;
 				case PUSH_INPUT:
-					stack[ptr++] = values[static_cast<unsigned>(rc.m_param)];
+					stack[ptr++] = values[narrow_cast<unsigned>(rc.m_param)];
 					break;
 				case PUSH_CONST:
 					stack[ptr++] = rc.m_param;

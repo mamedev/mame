@@ -16,24 +16,24 @@ driver by Nicola Salmoria
 #include "speaker.h"
 
 
-WRITE8_MEMBER(dogfgt_state::subirqtrigger_w)
+void dogfgt_state::subirqtrigger_w(uint8_t data)
 {
 	/* bit 0 used but unknown */
 	if (data & 0x04)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(dogfgt_state::sub_irqack_w)
+void dogfgt_state::sub_irqack_w(uint8_t data)
 {
 	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(dogfgt_state::soundlatch_w)
+void dogfgt_state::soundlatch_w(uint8_t data)
 {
 	m_soundlatch = data;
 }
 
-WRITE8_MEMBER(dogfgt_state::soundcontrol_w)
+void dogfgt_state::soundcontrol_w(uint8_t data)
 {
 	/* bit 5 goes to YM2149 #0 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)

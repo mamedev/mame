@@ -56,59 +56,64 @@ public:
 	unior_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_pit(*this, "pit")
 		, m_dma(*this, "dma")
 		, m_uart(*this, "uart")
 		, m_cass(*this, "cassette")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
-		, m_p_vram(*this, "vram")
 		, m_io_keyboard(*this, "X%d", 0)
 	{ }
 
 	void unior(machine_config &config);
 
 private:
-	void vram_w(offs_t offset, uint8_t data);
-	void scroll_w(uint8_t data);
-	uint8_t ppi0_b_r();
-	void ppi0_b_w(uint8_t data);
-	uint8_t ppi1_a_r();
-	uint8_t ppi1_b_r();
-	uint8_t ppi1_c_r();
-	void ppi1_a_w(uint8_t data);
-	void ppi1_c_w(uint8_t data);
+	void vram_w(offs_t offset, u8 data);
+	void scroll_w(u8 data);
+	u8 ppi0_b_r();
+	void ppi0_b_w(u8 data);
+	u8 ppi1_a_r();
+	u8 ppi1_b_r();
+	u8 ppi1_c_r();
+	void ppi1_a_w(u8 data);
+	void ppi1_c_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	void unior_palette(palette_device &palette) const;
-	uint8_t dma_r(offs_t offset);
+	u8 dma_r(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_4c;
-	uint8_t m_4e;
+	u8 m_4c;
+	u8 m_4e;
 	bool m_txe, m_txd, m_rts, m_casspol;
 	u8 m_cass_data[4];
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	std::unique_ptr<u8[]> m_vram;
+	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_device<pit8253_device> m_pit;
 	required_device<i8257_device> m_dma;
 	required_device<i8251_device> m_uart;
 	required_device<cassette_image_device> m_cass;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_p_chargen;
-	required_region_ptr<u8> m_p_vram;
 	required_ioport_array<11> m_io_keyboard;
 };
 
 void unior_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xf7ff).ram();
-	map(0xf800, 0xffff).rom().w(FUNC(unior_state::vram_w)); // main video
+	map(0x0000, 0xf7ff).ram().share("mainram");
+	map(0xf800, 0xffff).rom().region("maincpu", 0).w(FUNC(unior_state::vram_w)); // main video
 }
 
 void unior_state::io_map(address_map &map)
@@ -245,7 +250,7 @@ INPUT_PORTS_END
 *************************************************/
 
 /* F4 Character Displayer */
-static const gfx_layout unior_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
 	256,                    /* 256 characters */
@@ -259,25 +264,25 @@ static const gfx_layout unior_charlayout =
 };
 
 static GFXDECODE_START( gfx_unior )
-	GFXDECODE_ENTRY( "chargen", 0x0000, unior_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
-void unior_state::vram_w(offs_t offset, uint8_t data)
+void unior_state::vram_w(offs_t offset, u8 data)
 {
-	m_p_vram[offset] = data;
+	m_vram[offset] = data;
 }
 
 // pulses a 1 to scroll
-void unior_state::scroll_w(uint8_t data)
+void unior_state::scroll_w(u8 data)
 {
 	if (data)
-		memmove(m_p_vram, m_p_vram+80, 24*80);
+		memmove(m_vram.get(), m_vram.get()+80, 24*80);
 }
 
 I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
+	u8 gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
 
 	if (vsp)
 		gfx = 0;
@@ -288,7 +293,7 @@ I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 	if (rvv)
 		gfx ^= 0xff;
 
-	for(uint8_t i=0;i<6;i++)
+	for(u8 i=0;i<6;i++)
 		bitmap.pix32(y, x + i) = palette[BIT(gfx, 5-i) ? (hlgt ? 2 : 1) : 0];
 }
 
@@ -322,7 +327,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( unior_state::kansas_r )
 	m_cass_data[1]++;
 	m_cass_data[2]++;
 
-	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -353,22 +358,22 @@ WRITE_LINE_MEMBER(unior_state::ctc_z1_w)
 }
 
 
-uint8_t unior_state::ppi0_b_r()
+u8 unior_state::ppi0_b_r()
 {
 	return 0;
 }
 
 // Bit 4 - cassette relay?
-void unior_state::ppi0_b_w(uint8_t data)
+void unior_state::ppi0_b_w(u8 data)
 {
 }
 
-uint8_t unior_state::ppi1_a_r()
+u8 unior_state::ppi1_a_r()
 {
 	return m_4c;
 }
 
-uint8_t unior_state::ppi1_b_r()
+u8 unior_state::ppi1_b_r()
 {
 	u8 t = m_4c & 15;
 	if (t < 11)
@@ -377,12 +382,12 @@ uint8_t unior_state::ppi1_b_r()
 		return 0xff;
 }
 
-uint8_t unior_state::ppi1_c_r()
+u8 unior_state::ppi1_c_r()
 {
 	return m_4e;
 }
 
-void unior_state::ppi1_a_w(uint8_t data)
+void unior_state::ppi1_a_w(u8 data)
 {
 	m_4c = data;
 }
@@ -394,7 +399,7 @@ d5 = unknown
 d6 = connect to A7 of the palette prom
 d7 = not used
 */
-void unior_state::ppi1_c_w(uint8_t data)
+void unior_state::ppi1_c_w(u8 data)
 {
 	m_4e = data;
 	m_pit->write_gate2(BIT(data, 4));
@@ -406,12 +411,12 @@ void unior_state::ppi1_c_w(uint8_t data)
 
 *************************************************/
 
-uint8_t unior_state::dma_r(offs_t offset)
+u8 unior_state::dma_r(offs_t offset)
 {
 	if (offset < 0xf800)
 		return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 	else
-		return m_p_vram[offset & 0x7ff];
+		return m_vram[offset & 0x7ff];
 }
 
 WRITE_LINE_MEMBER( unior_state::hrq_w )
@@ -429,11 +434,40 @@ WRITE_LINE_MEMBER( unior_state::hrq_w )
 
 void unior_state::machine_reset()
 {
-	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, 0xF800);
 	m_uart->write_cts(0);
 	m_uart->write_dsr(0);
 	m_casspol = 0;
 	m_cass_data[0] = m_cass_data[1] = 0;
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
+}
+
+void unior_state::machine_start()
+{
+	m_vram = make_unique_clear<u8[]>(0x0800);
+	save_pointer(NAME(m_vram), 0x0800);
+	save_item(NAME(m_4c));
+	save_item(NAME(m_4e));
+	save_item(NAME(m_txe));
+	save_item(NAME(m_txd));
+	save_item(NAME(m_rts));
+	save_item(NAME(m_casspol));
+	save_item(NAME(m_cass_data));
 }
 
 void unior_state::unior(machine_config &config)
@@ -502,18 +536,16 @@ void unior_state::unior(machine_config &config)
 
 /* ROM definition */
 ROM_START( unior )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "unior.rom.d30", 0xf800, 0x0800, CRC(23a347e8) SHA1(2ef3134e2f4a696c3b52a145fa5a2d4c3487194b))
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "unior.rom.d30", 0x0000, 0x0800, CRC(23a347e8) SHA1(2ef3134e2f4a696c3b52a145fa5a2d4c3487194b))
 
-	ROM_REGION( 0x0840, "chargen", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0840, "chargen", 0 )
 	ROM_LOAD( "unior.fnt.d5",   0x0000, 0x0800, CRC(4f654828) SHA1(8c0ac11ea9679a439587952e4908940b67c4105e))
 	// according to schematic this should be 256 bytes
 	ROM_LOAD( "palette.rom.d9", 0x0800, 0x0040, BAD_DUMP CRC(b4574ceb) SHA1(f7a82c61ab137de8f6a99b0c5acf3ac79291f26a))
-
-	ROM_REGION( 0x0800, "vram", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME   PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS */
-COMP( 19??, unior, 0,       0,      unior,   unior, unior_state, empty_init, "<unknown>", "Unior",  MACHINE_WRONG_COLORS )
+COMP( 19??, unior, 0,       0,      unior,   unior, unior_state, empty_init, "<unknown>", "Unior",  MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

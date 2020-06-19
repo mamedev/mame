@@ -54,11 +54,11 @@ private:
 
 	void layer_en_w(uint16_t data);
 	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE16_MEMBER(gfxbank_w);
-	DECLARE_WRITE16_MEMBER(background_w);
-	DECLARE_WRITE16_MEMBER(foreground_w);
-	DECLARE_WRITE16_MEMBER(midground_w);
-	DECLARE_WRITE16_MEMBER(text_w);
+	void gfxbank_w(uint16_t data);
+	void background_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void midground_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);

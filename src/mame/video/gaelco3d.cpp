@@ -370,7 +370,7 @@ void gaelco3d_state::gaelco3d_render(screen_device &screen)
  *
  *************************************/
 
-WRITE32_MEMBER(gaelco3d_state::gaelco3d_render_w)
+void gaelco3d_state::gaelco3d_render_w(uint32_t data)
 {
 	/* append the data to our buffer */
 	m_polydata_buffer[m_polydata_count++] = data;
@@ -401,7 +401,7 @@ WRITE32_MEMBER(gaelco3d_state::gaelco3d_render_w)
  *
  *************************************/
 
-WRITE16_MEMBER(gaelco3d_state::gaelco3d_paletteram_w)
+void gaelco3d_state::gaelco3d_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_poly->wait("Palette change");
 	COMBINE_DATA(&m_paletteram16[offset]);
@@ -409,7 +409,7 @@ WRITE16_MEMBER(gaelco3d_state::gaelco3d_paletteram_w)
 }
 
 
-WRITE32_MEMBER(gaelco3d_state::gaelco3d_paletteram_020_w)
+void gaelco3d_state::gaelco3d_paletteram_020_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_poly->wait("Palette change");
 	COMBINE_DATA(&m_paletteram32[offset]);

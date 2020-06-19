@@ -103,7 +103,7 @@ enum
 //  mreq_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bullet_state::mreq_r )
+uint8_t bullet_state::mreq_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -131,7 +131,7 @@ READ8_MEMBER( bullet_state::mreq_r )
 //  mreq_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::mreq_w )
+void bullet_state::mreq_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0xc000)
 	{
@@ -148,7 +148,7 @@ WRITE8_MEMBER( bullet_state::mreq_w )
 //  win_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bullet_state::win_r )
+uint8_t bullet_state::win_r()
 {
 	return 0;
 }
@@ -158,7 +158,7 @@ READ8_MEMBER( bullet_state::win_r )
 //  wstrobe_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::wstrobe_w )
+void bullet_state::wstrobe_w(uint8_t data)
 {
 }
 
@@ -167,7 +167,7 @@ WRITE8_MEMBER( bullet_state::wstrobe_w )
 //  brom_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bullet_state::brom_r )
+uint8_t bullet_state::brom_r()
 {
 	m_brom = 1;
 
@@ -179,7 +179,7 @@ READ8_MEMBER( bullet_state::brom_r )
 //  brom_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::brom_w )
+void bullet_state::brom_w(uint8_t data)
 {
 	m_brom = 1;
 }
@@ -189,7 +189,7 @@ WRITE8_MEMBER( bullet_state::brom_w )
 //  exdsk_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::exdsk_w )
+void bullet_state::exdsk_w(uint8_t data)
 {
 	/*
 
@@ -248,7 +248,7 @@ WRITE8_MEMBER( bullet_state::exdsk_w )
 //  exdma_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::exdma_w )
+void bullet_state::exdma_w(uint8_t data)
 {
 	/*
 
@@ -277,7 +277,7 @@ WRITE8_MEMBER( bullet_state::exdma_w )
 //  hdcon_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::hdcon_w )
+void bullet_state::hdcon_w(uint8_t data)
 {
 	/*
 
@@ -314,7 +314,7 @@ WRITE8_MEMBER( bullet_state::hdcon_w )
 //  info_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bullet_state::info_r )
+uint8_t bullet_state::info_r()
 {
 	/*
 
@@ -350,7 +350,7 @@ READ8_MEMBER( bullet_state::info_r )
 //  segst_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::segst_w )
+void bullet_state::segst_w(uint8_t data)
 {
 	m_segst = BIT(data, 0);
 }
@@ -360,7 +360,7 @@ WRITE8_MEMBER( bullet_state::segst_w )
 //  mreq_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bulletf_state::mreq_r )
+uint8_t bulletf_state::mreq_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -395,7 +395,7 @@ READ8_MEMBER( bulletf_state::mreq_r )
 //  mreq_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bulletf_state::mreq_w )
+void bulletf_state::mreq_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0xc000)
 	{
@@ -419,7 +419,7 @@ WRITE8_MEMBER( bulletf_state::mreq_w )
 //  xdma0_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bulletf_state::xdma0_w )
+void bulletf_state::xdma0_w(uint8_t data)
 {
 	/*
 
@@ -446,7 +446,7 @@ WRITE8_MEMBER( bulletf_state::xdma0_w )
 //  xfdc_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bulletf_state::xfdc_w )
+void bulletf_state::xfdc_w(uint8_t data)
 {
 	/*
 
@@ -506,7 +506,7 @@ WRITE8_MEMBER( bulletf_state::xfdc_w )
 //  mbank_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bulletf_state::mbank_w )
+void bulletf_state::mbank_w(uint8_t data)
 {
 	/*
 
@@ -531,7 +531,7 @@ WRITE8_MEMBER( bulletf_state::mbank_w )
 //  scsi_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bulletf_state::scsi_r )
+uint8_t bulletf_state::scsi_r()
 {
 	uint8_t data = m_scsi_data_in->read();
 
@@ -548,7 +548,7 @@ READ8_MEMBER( bulletf_state::scsi_r )
 //  scsi_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bulletf_state::scsi_w )
+void bulletf_state::scsi_w(uint8_t data)
 {
 	m_scsi_data_out->write(data);
 
@@ -562,7 +562,7 @@ WRITE8_MEMBER( bulletf_state::scsi_w )
 //  hwsts_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bulletf_state::hwsts_r )
+uint8_t bulletf_state::hwsts_r()
 {
 	/*
 

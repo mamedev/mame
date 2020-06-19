@@ -27,14 +27,14 @@
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::midyunit_cmos_w)
+void midyunit_state::midyunit_cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%08x:CMOS Write @ %05X\n", m_maincpu->pc(), offset);
 	COMBINE_DATA(&m_cmos_ram[offset + m_cmos_page]);
 }
 
 
-READ16_MEMBER(midyunit_state::midyunit_cmos_r)
+uint16_t midyunit_state::midyunit_cmos_r(offs_t offset)
 {
 	return m_cmos_ram[offset + m_cmos_page];
 }
@@ -47,7 +47,7 @@ READ16_MEMBER(midyunit_state::midyunit_cmos_r)
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::midyunit_cmos_enable_w)
+void midyunit_state::midyunit_cmos_enable_w(address_space &space, uint16_t data)
 {
 	m_cmos_w_enable = (~data >> 9) & 1;
 
@@ -97,7 +97,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_cmos_enable_w)
 }
 
 
-READ16_MEMBER(midyunit_state::midyunit_protection_r)
+uint16_t midyunit_state::midyunit_protection_r()
 {
 	/* return the most recently clocked value */
 	logerror("%08X:Protection read = %04X\n", m_maincpu->pc(), m_prot_result);
@@ -112,7 +112,7 @@ READ16_MEMBER(midyunit_state::midyunit_protection_r)
  *
  *************************************/
 
-READ16_MEMBER(midyunit_state::midyunit_input_r)
+uint16_t midyunit_state::midyunit_input_r(offs_t offset)
 {
 	return m_ports[offset]->read();
 }
@@ -125,7 +125,7 @@ READ16_MEMBER(midyunit_state::midyunit_input_r)
  *
  *************************************/
 
-READ16_MEMBER(midyunit_state::term2_input_r)
+uint16_t midyunit_state::term2_input_r(offs_t offset)
 {
 	if (offset != 2)
 		return m_ports[offset]->read();
@@ -133,7 +133,7 @@ READ16_MEMBER(midyunit_state::term2_input_r)
 	return m_term2_adc->read() | 0xff00;
 }
 
-WRITE16_MEMBER(midyunit_state::term2_sound_w)
+void midyunit_state::term2_sound_w(offs_t offset, uint16_t data)
 {
 	/* Flash Lamp Output Data */
 	if  ( ((data & 0x800) != 0x800) && ((data & 0x400) == 0x400 ) )
@@ -174,7 +174,7 @@ WRITE16_MEMBER(midyunit_state::term2_sound_w)
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::term2_hack_w)
+void midyunit_state::term2_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 1 && m_maincpu->pc() == 0xffce6520)
 	{
@@ -184,7 +184,7 @@ WRITE16_MEMBER(midyunit_state::term2_hack_w)
 	COMBINE_DATA(&m_t2_hack_mem[offset]);
 }
 
-WRITE16_MEMBER(midyunit_state::term2la3_hack_w)
+void midyunit_state::term2la3_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && m_maincpu->pc() == 0xffce5230)
 	{
@@ -194,7 +194,7 @@ WRITE16_MEMBER(midyunit_state::term2la3_hack_w)
 	COMBINE_DATA(&m_t2_hack_mem[offset]);
 }
 
-WRITE16_MEMBER(midyunit_state::term2la2_hack_w)
+void midyunit_state::term2la2_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && m_maincpu->pc() == 0xffce4b80)
 	{
@@ -204,7 +204,7 @@ WRITE16_MEMBER(midyunit_state::term2la2_hack_w)
 	COMBINE_DATA(&m_t2_hack_mem[offset]);
 }
 
-WRITE16_MEMBER(midyunit_state::term2la1_hack_w)
+void midyunit_state::term2la1_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && m_maincpu->pc() == 0xffce33f0)
 	{
@@ -222,7 +222,7 @@ WRITE16_MEMBER(midyunit_state::term2la1_hack_w)
  *
  *************************************/
 
-WRITE8_MEMBER(midyunit_state::cvsd_protection_w)
+void midyunit_state::cvsd_protection_w(offs_t offset, uint8_t data)
 {
 	/* because the entire CVSD ROM is banked, we have to make sure that writes */
 	/* go to the proper location (i.e., bank 0); currently bank 0 always lives */
@@ -286,7 +286,7 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 	switch (sound)
 	{
 		case SOUND_CVSD_SMALL:
-			m_cvsd_sound->get_cpu()->space(AS_PROGRAM).install_write_handler(prot_start, prot_end, write8_delegate(*this, FUNC(midyunit_state::cvsd_protection_w)));
+			m_cvsd_sound->get_cpu()->space(AS_PROGRAM).install_write_handler(prot_start, prot_end, write8sm_delegate(*this, FUNC(midyunit_state::cvsd_protection_w)));
 			m_cvsd_protection_base = memregion("cvsd:cpu")->base() + 0x10000 + (prot_start - 0x8000);
 			break;
 
@@ -457,7 +457,7 @@ void midyunit_state::init_mkyawdim()
  *
  *************************************/
 
-READ16_MEMBER(midyunit_state::mkturbo_prot_r)
+uint16_t midyunit_state::mkturbo_prot_r()
 {
 	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM space.
 	 * A startup protection check expects to read back two different values in succession */
@@ -467,14 +467,14 @@ READ16_MEMBER(midyunit_state::mkturbo_prot_r)
 void midyunit_state::init_mkyturbo()
 {
 	/* protection */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(*this, FUNC(midyunit_state::mkturbo_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16smo_delegate(*this, FUNC(midyunit_state::mkturbo_prot_r)));
 
 	init_mkyunit();
 }
 
 /********************** Terminator 2 **********************/
 
-void midyunit_state::term2_init_common(write16_delegate hack_w)
+void midyunit_state::term2_init_common(write16s_delegate hack_w)
 {
 	// protection
 	static constexpr struct protection_data term2_protection_data =
@@ -488,8 +488,8 @@ void midyunit_state::term2_init_common(write16_delegate hack_w)
 	init_generic(6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
 
 	// special inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01c00000, 0x01c0005f, read16_delegate(*this, FUNC(midyunit_state::term2_input_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01e00000, 0x01e0001f, write16_delegate(*this, FUNC(midyunit_state::term2_sound_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01c00000, 0x01c0005f, read16sm_delegate(*this, FUNC(midyunit_state::term2_input_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01e00000, 0x01e0001f, write16sm_delegate(*this, FUNC(midyunit_state::term2_sound_w)));
 
 	// HACK: this prevents the freeze on the movies
 	// until we figure what's causing it, this is better than nothing
@@ -497,10 +497,10 @@ void midyunit_state::term2_init_common(write16_delegate hack_w)
 	m_t2_hack_mem = m_mainram + (0xaa0e0>>4);
 }
 
-void midyunit_state::init_term2()    { term2_init_common(write16_delegate(*this, FUNC(midyunit_state::term2_hack_w))); }
-void midyunit_state::init_term2la3() { term2_init_common(write16_delegate(*this, FUNC(midyunit_state::term2la3_hack_w))); }
-void midyunit_state::init_term2la2() { term2_init_common(write16_delegate(*this, FUNC(midyunit_state::term2la2_hack_w))); }
-void midyunit_state::init_term2la1() { term2_init_common(write16_delegate(*this, FUNC(midyunit_state::term2la1_hack_w))); }
+void midyunit_state::init_term2()    { term2_init_common(write16s_delegate(*this, FUNC(midyunit_state::term2_hack_w))); }
+void midyunit_state::init_term2la3() { term2_init_common(write16s_delegate(*this, FUNC(midyunit_state::term2la3_hack_w))); }
+void midyunit_state::init_term2la2() { term2_init_common(write16s_delegate(*this, FUNC(midyunit_state::term2la2_hack_w))); }
+void midyunit_state::init_term2la1() { term2_init_common(write16s_delegate(*this, FUNC(midyunit_state::term2la1_hack_w))); }
 
 
 
@@ -563,7 +563,7 @@ MACHINE_RESET_MEMBER(midyunit_state,midyunit)
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::midyunit_sound_w)
+void midyunit_state::midyunit_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* check for out-of-bounds accesses */
 	if (offset)

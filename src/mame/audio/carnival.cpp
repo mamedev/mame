@@ -61,7 +61,7 @@ enum
 };
 
 
-WRITE8_MEMBER( carnival_state::carnival_audio_1_w )
+void carnival_state::carnival_audio_1_w(uint8_t data)
 {
 	int bitsChanged;
 	int bitsGoneHigh;
@@ -126,7 +126,7 @@ WRITE8_MEMBER( carnival_state::carnival_audio_1_w )
 	}
 }
 
-WRITE8_MEMBER( carnival_state::carnival_audio_2_w )
+void carnival_state::carnival_audio_2_w(uint8_t data)
 {
 	int bitsChanged;
 	//int bitsGoneHigh;

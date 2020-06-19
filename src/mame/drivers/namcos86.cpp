@@ -183,7 +183,7 @@ TODO:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(namcos86_state::bankswitch1_w)
+void namcos86_state::bankswitch1_w(uint8_t data)
 {
 	/* if the ROM expansion module is available, don't do anything. This avoids conflict */
 	/* with bankswitch1_ext_w() in wndrmomo */
@@ -193,7 +193,7 @@ WRITE8_MEMBER(namcos86_state::bankswitch1_w)
 	membank("bank1")->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(namcos86_state::bankswitch1_ext_w)
+void namcos86_state::bankswitch1_ext_w(uint8_t data)
 {
 	if (!m_user1_ptr)
 		return;
@@ -201,13 +201,13 @@ WRITE8_MEMBER(namcos86_state::bankswitch1_ext_w)
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER(namcos86_state::bankswitch2_w)
+void namcos86_state::bankswitch2_w(uint8_t data)
 {
 	membank("bank2")->set_entry(data & 0x03);
 }
 
 /* Stubs to pass the correct Dip Switch setup to the MCU */
-READ8_MEMBER(namcos86_state::dsw0_r)
+uint8_t namcos86_state::dsw0_r()
 {
 	int rhi, rlo;
 
@@ -223,7 +223,7 @@ READ8_MEMBER(namcos86_state::dsw0_r)
 	return rhi | rlo;
 }
 
-READ8_MEMBER(namcos86_state::dsw1_r)
+uint8_t namcos86_state::dsw1_r()
 {
 	int rhi, rlo;
 
@@ -241,18 +241,18 @@ READ8_MEMBER(namcos86_state::dsw1_r)
 }
 
 
-WRITE8_MEMBER(namcos86_state::int_ack1_w)
+void namcos86_state::int_ack1_w(uint8_t data)
 {
 	m_cpu1->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(namcos86_state::int_ack2_w)
+void namcos86_state::int_ack2_w(uint8_t data)
 {
 	m_cpu2->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(namcos86_state::watchdog1_w)
+void namcos86_state::watchdog1_w(uint8_t data)
 {
 	m_wdog |= 1;
 	if (m_wdog == 3)
@@ -262,7 +262,7 @@ WRITE8_MEMBER(namcos86_state::watchdog1_w)
 	}
 }
 
-WRITE8_MEMBER(namcos86_state::watchdog2_w)
+void namcos86_state::watchdog2_w(uint8_t data)
 {
 	m_wdog |= 2;
 	if (m_wdog == 3)
@@ -287,7 +287,7 @@ void namcos86_state::led_w(uint8_t data)
 }
 
 
-WRITE8_MEMBER(namcos86_state::cus115_w)
+void namcos86_state::cus115_w(offs_t offset, uint8_t data)
 {
 	/* make sure the expansion board is present */
 	if (!m_user1_ptr)
@@ -306,7 +306,7 @@ WRITE8_MEMBER(namcos86_state::cus115_w)
 			break;
 
 		case 4:
-			bankswitch1_ext_w(space,0,data);
+			bankswitch1_ext_w(data);
 			break;
 
 		case 5: // not used?

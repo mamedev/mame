@@ -14,6 +14,7 @@
 #include "halnote.h"
 #include "hfox.h"
 #include "holy_quran.h"
+#include "ink.h"
 #include "konami.h"
 #include "korean.h"
 #include "majutsushi.h"
@@ -58,6 +59,7 @@ void msx_cart(device_slot_interface &device)
 	device.option_add_internal("msxaud_nms1205", MSX_CART_MSX_AUDIO_NMS1205);
 	device.option_add_internal("super_swangi", MSX_CART_SUPER_SWANGI);
 	device.option_add_internal("hfox", MSX_CART_HFOX);
+	device.option_add_internal("ink", MSX_CART_INK);
 	device.option_add_internal("keyboard_master", MSX_CART_KEYBOARD_MASTER);
 	device.option_add_internal("holy_quran", MSX_CART_HOLY_QURAN);
 	device.option_add_internal("dooly", MSX_CART_DOOLY);

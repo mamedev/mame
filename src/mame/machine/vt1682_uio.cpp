@@ -25,7 +25,7 @@ vrt_vt1682_uio_device::vrt_vt1682_uio_device(const machine_config &mconfig, cons
 {
 }
 
-READ8_MEMBER(vrt_vt1682_uio_device::inteact_2129_uio_a_data_r)
+uint8_t vrt_vt1682_uio_device::inteact_2129_uio_a_data_r()
 {
 	// TODO, use direction register etc.
 	uint8_t dat = m_porta_in();
@@ -34,7 +34,7 @@ READ8_MEMBER(vrt_vt1682_uio_device::inteact_2129_uio_a_data_r)
 }
 
 
-WRITE8_MEMBER(vrt_vt1682_uio_device::inteact_2129_uio_a_data_w)
+void vrt_vt1682_uio_device::inteact_2129_uio_a_data_w(uint8_t data)
 {
 	// TODO, use direction register etc.
 
@@ -43,30 +43,30 @@ WRITE8_MEMBER(vrt_vt1682_uio_device::inteact_2129_uio_a_data_w)
 	m_porta_out(m_2129_uio_a_data);
 }
 
-READ8_MEMBER(vrt_vt1682_uio_device::inteact_212a_uio_a_direction_r)
+uint8_t vrt_vt1682_uio_device::inteact_212a_uio_a_direction_r()
 {
 	return m_212a_uio_a_direction;
 }
 
-WRITE8_MEMBER(vrt_vt1682_uio_device::inteact_212a_uio_a_direction_w)
+void vrt_vt1682_uio_device::inteact_212a_uio_a_direction_w(uint8_t data)
 {
 	LOGMASKED(LOG_UIO, "%s: inteact_212a_uio_a_direction_w %02x\n", machine().describe_context(), data);
 	m_212a_uio_a_direction = data;
 }
 
-READ8_MEMBER(vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_r)
+uint8_t vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_r()
 {
 	return m_212b_uio_a_attribute;
 }
 
-WRITE8_MEMBER(vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_w)
+void vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_w(uint8_t data)
 {
 	LOGMASKED(LOG_UIO, "%s: inteact_212b_uio_a_attribute_w %02x\n", machine().describe_context(), data);
 	m_212b_uio_a_attribute = data;
 }
 
 
-READ8_MEMBER(vrt_vt1682_uio_device::inteact_2149_uio_b_data_r)
+uint8_t vrt_vt1682_uio_device::inteact_2149_uio_b_data_r()
 {
 	// TODO, use direction register etc.
 	uint8_t dat = m_portb_in();
@@ -75,7 +75,7 @@ READ8_MEMBER(vrt_vt1682_uio_device::inteact_2149_uio_b_data_r)
 }
 
 
-WRITE8_MEMBER(vrt_vt1682_uio_device::inteact_2149_uio_b_data_w)
+void vrt_vt1682_uio_device::inteact_2149_uio_b_data_w(uint8_t data)
 {
 	// TODO, use direction register etc.
 	LOGMASKED(LOG_UIO, "%s: inteact_2149_uio_b_data_w %02x\n", machine().describe_context(), data);
@@ -83,23 +83,23 @@ WRITE8_MEMBER(vrt_vt1682_uio_device::inteact_2149_uio_b_data_w)
 	m_portb_out(m_2149_uio_b_data);
 }
 
-READ8_MEMBER(vrt_vt1682_uio_device::inteact_214a_uio_b_direction_r)
+uint8_t vrt_vt1682_uio_device::inteact_214a_uio_b_direction_r()
 {
 	return m_214a_uio_b_direction;
 }
 
-WRITE8_MEMBER(vrt_vt1682_uio_device::inteact_214a_uio_b_direction_w)
+void vrt_vt1682_uio_device::inteact_214a_uio_b_direction_w(uint8_t data)
 {
 	LOGMASKED(LOG_UIO, "%s: inteact_214a_uio_b_direction_w %02x\n", machine().describe_context(), data);
 	m_214a_uio_b_direction = data;
 }
 
-READ8_MEMBER(vrt_vt1682_uio_device::inteact_214b_uio_b_attribute_r)
+uint8_t vrt_vt1682_uio_device::inteact_214b_uio_b_attribute_r()
 {
 	return m_214b_uio_b_attribute;
 }
 
-WRITE8_MEMBER(vrt_vt1682_uio_device::inteact_214b_uio_b_attribute_w)
+void vrt_vt1682_uio_device::inteact_214b_uio_b_attribute_w(uint8_t data)
 {
 	LOGMASKED(LOG_UIO, "%s: inteact_214b_uio_b_attribute_w %02x\n", machine().describe_context(), data);
 	m_214b_uio_b_attribute = data;

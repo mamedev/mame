@@ -152,7 +152,7 @@ void vino_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		fetch_pixel((int)id);
 }
 
-READ32_MEMBER(vino_device::read)
+uint32_t vino_device::read(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset & ~1)
 	{
@@ -297,7 +297,7 @@ READ32_MEMBER(vino_device::read)
 	return 0;
 }
 
-WRITE32_MEMBER(vino_device::write)
+void vino_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset & ~1)
 	{

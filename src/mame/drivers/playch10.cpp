@@ -314,7 +314,7 @@ WRITE_LINE_MEMBER(playch10_state::up8w_w)
 	m_up_8w = state;
 }
 
-READ8_MEMBER(playch10_state::ram_8w_r)
+uint8_t playch10_state::ram_8w_r(offs_t offset)
 {
 	if ( offset >= 0x400 && m_up_8w )
 		return m_ram_8w[offset];
@@ -322,7 +322,7 @@ READ8_MEMBER(playch10_state::ram_8w_r)
 	return m_ram_8w[offset & 0x3ff];
 }
 
-WRITE8_MEMBER(playch10_state::ram_8w_w)
+void playch10_state::ram_8w_w(offs_t offset, uint8_t data)
 {
 	if ( offset >= 0x400 && m_up_8w )
 		m_ram_8w[offset] = data;
@@ -330,7 +330,7 @@ WRITE8_MEMBER(playch10_state::ram_8w_w)
 		m_ram_8w[offset & 0x3ff] = data;
 }
 
-WRITE8_MEMBER(playch10_state::sprite_dma_w)
+void playch10_state::sprite_dma_w(address_space &space, uint8_t data)
 {
 	int source = ( data & 7 );
 	m_ppu->spriteram_dma(space, source);
@@ -338,7 +338,7 @@ WRITE8_MEMBER(playch10_state::sprite_dma_w)
 
 /* Only used in single monitor bios */
 
-WRITE8_MEMBER(playch10_state::time_w)
+void playch10_state::time_w(offs_t offset, uint8_t data)
 {
 	constexpr static uint8_t DIGIT_MAP[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 

@@ -13,6 +13,8 @@
 #include "plib/ptypes.h"
 #include "plib/putil.h"
 
+#include <tuple>
+#include <utility>
 #include <vector>
 
 #define NETLIB_DEVICE_IMPL_ALIAS(p_alias, chip, p_name, p_def_param) \
@@ -25,8 +27,7 @@
 	NETLIB_DEVICE_IMPL_BASE(ns, chip, chip, p_name, p_def_param) \
 
 #define NETLIB_DEVICE_IMPL_BASE(ns, p_alias, chip, p_name, p_def_param) \
-	static plib::unique_ptr<factory::element_t> NETLIB_NAME(p_alias ## _c) \
-			() \
+	static factory::element_t::uptr NETLIB_NAME(p_alias ## _c) () \
 	{ \
 		using devtype = factory::device_element_t<ns :: NETLIB_NAME(chip)>; \
 		factory::properties sl(p_def_param, PSOURCELOC()); \
@@ -90,8 +91,8 @@ namespace factory {
 	{
 	public:
 
-		using dev_uptr = unique_pool_ptr<core_device_t>;
-		using uptr = plib::unique_ptr<element_t>;
+		using dev_uptr = device_arena::unique_ptr<core_device_t>;
+		using uptr = host_arena::unique_ptr<element_t>;
 		using pointer = element_t *;
 
 		element_t(const pstring &name, properties &&props);
@@ -99,7 +100,7 @@ namespace factory {
 
 		PCOPYASSIGNMOVE(element_t, default)
 
-		virtual dev_uptr make_device(nlmempool &pool,
+		virtual dev_uptr make_device(device_arena &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) = 0;
 
@@ -112,25 +113,47 @@ namespace factory {
 		properties m_properties;                    ///< source file and other information and settings
 	};
 
-	template <class C>
+	template <class C, typename... Args>
 	class device_element_t : public element_t
 	{
 	public:
 
-		device_element_t(const pstring &name, properties &&props)
-		: element_t(name, std::move(props)) { }
+		device_element_t(const pstring &name, properties &&props, Args&&... args)
+		: element_t(name, std::move(props))
+		, m_args(std::forward<Args>(args)...)
+		{ }
 
-		dev_uptr make_device(nlmempool &pool,
+
+	    template <std::size_t... Is>
+	    dev_uptr make_device(device_arena &pool,
+	    	    			netlist_state_t &anetlist,
+	    	    			const pstring &name, std::tuple<Args...>& args, std::index_sequence<Is...>)
+	    {
+	    	return plib::make_unique<C>(pool, anetlist, name, std::forward<Args>(std::get<Is>(args))...);
+	    }
+
+	    dev_uptr make_device(device_arena &pool,
+	    			netlist_state_t &anetlist,
+	    			const pstring &name, std::tuple<Args...>& args)
+	    {
+	        return make_device(pool, anetlist, name, args, std::index_sequence_for<Args...>{});
+	    }
+
+		dev_uptr make_device(device_arena &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) override
 		{
-			return pool.make_unique<C>(anetlist, name);
+			return make_device(pool, anetlist, name, m_args);
+			//return pool.make_unique<C>(anetlist, name);
 		}
 
-		static uptr create(const pstring &name, properties &&props)
+		static uptr create(const pstring &name, properties &&props, Args&&... args)
 		{
-			return plib::make_unique<device_element_t<C>>(name, std::move(props));
+			return plib::make_unique<device_element_t<C, Args...>, host_arena>(name,
+				std::move(props), std::forward<Args>(args)...);
 		}
+	private:
+		std::tuple<Args...> m_args;
 	};
 
 	class list_t : public std::vector<element_t::uptr>
@@ -141,10 +164,11 @@ namespace factory {
 
 		PCOPYASSIGNMOVE(list_t, delete)
 
-		template<class device_class>
-		void add(const pstring &name, properties &&props)
+		template<class device_class, typename... Args>
+		void add(const pstring &name, properties &&props, Args&&... args)
 		{
-			add(device_element_t<device_class>::create(name, std::move(props)));
+			add(device_element_t<device_class, Args...>::create(name, std::move(props),
+				std::forward<Args>(args)...));
 		}
 
 		void add(element_t::uptr &&factory) noexcept(false);
@@ -170,7 +194,7 @@ namespace factory {
 	template <typename T>
 	element_t::uptr constructor_t(const pstring &name, properties &&props)
 	{
-		return plib::make_unique<device_element_t<T>>(name, std::move(props));
+		return plib::make_unique<device_element_t<T>, host_arena>(name, std::move(props));
 	}
 
 	// -----------------------------------------------------------------------------
@@ -183,7 +207,7 @@ namespace factory {
 
 		library_element_t(const pstring &name, properties &&props);
 
-		dev_uptr make_device(nlmempool &pool,
+		dev_uptr make_device(device_arena &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) override;
 	};

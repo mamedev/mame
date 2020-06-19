@@ -152,7 +152,7 @@ WRITE_LINE_MEMBER(tsispch_state::i8251_txrdy_int)
 /*****************************************************************************
  LED/dipswitch stuff
 *****************************************************************************/
-READ8_MEMBER( tsispch_state::dsw_r )
+uint8_t tsispch_state::dsw_r()
 {
 	/* the only dipswitch I'm really sure about is s4-7 which enables the test mode
 	 * The switches are, for normal operation on my unit (and the older unit as well):
@@ -164,7 +164,7 @@ READ8_MEMBER( tsispch_state::dsw_r )
 	return ioport("s4")->read();
 }
 
-WRITE8_MEMBER( tsispch_state::peripheral_w )
+void tsispch_state::peripheral_w(uint8_t data)
 {
 	/* This controls the four LEDS, the RESET line for the upd77p20,
 	and (probably) the p0-to-ir0 masking of the upd77p20; there are two
@@ -183,7 +183,7 @@ WRITE8_MEMBER( tsispch_state::peripheral_w )
 /*****************************************************************************
  UPD77P20 stuff
 *****************************************************************************/
-READ16_MEMBER( tsispch_state::dsp_data_r )
+uint16_t tsispch_state::dsp_data_r()
 {
 #ifdef DEBUG_DSP
 	uint8_t temp = m_dsp->snesdsp_read(true);
@@ -194,7 +194,7 @@ READ16_MEMBER( tsispch_state::dsp_data_r )
 #endif
 }
 
-WRITE16_MEMBER( tsispch_state::dsp_data_w )
+void tsispch_state::dsp_data_w(uint16_t data)
 {
 #ifdef DEBUG_DSP_W
 	fprintf(stderr, "dsp data write: %02x\n", data);
@@ -202,7 +202,7 @@ WRITE16_MEMBER( tsispch_state::dsp_data_w )
 	m_dsp->snesdsp_write(true, data);
 }
 
-READ16_MEMBER( tsispch_state::dsp_status_r )
+uint16_t tsispch_state::dsp_status_r()
 {
 #ifdef DEBUG_DSP
 	uint8_t temp = m_dsp->snesdsp_read(false);
@@ -213,7 +213,7 @@ READ16_MEMBER( tsispch_state::dsp_status_r )
 #endif
 }
 
-WRITE16_MEMBER( tsispch_state::dsp_status_w )
+void tsispch_state::dsp_status_w(uint16_t data)
 {
 	fprintf(stderr, "warning: upd772x status register should never be written to!\n");
 	m_dsp->snesdsp_write(false, data);

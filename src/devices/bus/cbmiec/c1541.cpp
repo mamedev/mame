@@ -634,7 +634,7 @@ const tiny_rom_entry *msd_sd2_device::device_rom_region() const
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( c1541_prologic_dos_classic_device::read )
+uint8_t c1541_prologic_dos_classic_device::read()
 {
 	return 0;
 }
@@ -644,7 +644,7 @@ READ8_MEMBER( c1541_prologic_dos_classic_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c1541_prologic_dos_classic_device::write )
+void c1541_prologic_dos_classic_device::write(uint8_t data)
 {
 }
 
@@ -913,12 +913,12 @@ FLOPPY_FORMATS_MEMBER( c1541_device_base::floppy_formats )
 FLOPPY_FORMATS_END
 
 
-READ8_MEMBER( c1541_prologic_dos_classic_device::pia_r )
+uint8_t c1541_prologic_dos_classic_device::pia_r(offs_t offset)
 {
 	return m_pia->read((offset >> 2) & 0x03);
 }
 
-WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_w )
+void c1541_prologic_dos_classic_device::pia_w(offs_t offset, uint8_t data)
 {
 	m_pia->write((offset >> 2) & 0x03, data);
 }

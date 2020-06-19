@@ -1269,7 +1269,7 @@ void thomson_state::mo5_palette(palette_device &palette)
 
 
 /* write to video memory through addresses 0x4000-0x5fff */
-WRITE8_MEMBER( thomson_state::to7_vram_w )
+void thomson_state::to7_vram_w(offs_t offset, uint8_t data)
 {
 	assert( offset < 0x2000 );
 	/* force two topmost color bits to 1 */
@@ -1308,7 +1308,7 @@ unsigned thomson_state::to7_lightpen_gpl ( int decx, int decy )
 
 /* write to video memory through addresses 0x4000-0x5fff (TO)
    or 0x0000-0x1fff (MO) */
-WRITE8_MEMBER( thomson_state::to770_vram_w )
+void thomson_state::to770_vram_w(offs_t offset, uint8_t data)
 {
 	assert( offset < 0x2000 );
 	if ( m_thom_vram[ offset + m_thom_mode_point ] == data )
@@ -1327,7 +1327,7 @@ WRITE8_MEMBER( thomson_state::to770_vram_w )
 
 /* write to video memory through system space (always page 1) */
 
-WRITE8_MEMBER( thomson_state::to8_sys_lo_w )
+void thomson_state::to8_sys_lo_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + offset + 0x6000;
 	assert( offset < 0x2000 );
@@ -1340,7 +1340,7 @@ WRITE8_MEMBER( thomson_state::to8_sys_lo_w )
 
 
 
-WRITE8_MEMBER( thomson_state::to8_sys_hi_w )
+void thomson_state::to8_sys_hi_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + offset + 0x4000;
 	assert( offset < 0x2000 );
@@ -1354,7 +1354,7 @@ WRITE8_MEMBER( thomson_state::to8_sys_hi_w )
 
 /* write to video memory through data space */
 
-WRITE8_MEMBER( thomson_state::to8_data_lo_w )
+void thomson_state::to8_data_lo_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage + 0x2000 ) & m_ram->mask() );
 	assert( offset < 0x2000 );
@@ -1369,7 +1369,7 @@ WRITE8_MEMBER( thomson_state::to8_data_lo_w )
 
 
 
-WRITE8_MEMBER( thomson_state::to8_data_hi_w )
+void thomson_state::to8_data_hi_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage ) & m_ram->mask() );
 	assert( offset < 0x2000 );
@@ -1385,7 +1385,7 @@ WRITE8_MEMBER( thomson_state::to8_data_hi_w )
 
 
 /* write to video memory page through cartridge addresses space */
-WRITE8_MEMBER( thomson_state::to8_vcart_w )
+void thomson_state::to8_vcart_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x4000 );
@@ -1398,7 +1398,7 @@ WRITE8_MEMBER( thomson_state::to8_vcart_w )
 	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = 1;
 }
 
-WRITE8_MEMBER( thomson_state::mo6_vcart_lo_w )
+void thomson_state::mo6_vcart_lo_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x3000 + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x1000 );
@@ -1411,7 +1411,7 @@ WRITE8_MEMBER( thomson_state::mo6_vcart_lo_w )
 	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = 1;
 }
 
-WRITE8_MEMBER( thomson_state::mo6_vcart_hi_w )
+void thomson_state::mo6_vcart_hi_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x3000 );

@@ -99,7 +99,7 @@ public:
   //! \endcond
 };
 
-//! RB-Tree typed to `NodeT`.
+//! RB-Tree node casted to `NodeT`.
 template<typename NodeT>
 class ZoneTreeNodeT : public ZoneTreeNode {
 public:

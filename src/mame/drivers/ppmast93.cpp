@@ -166,9 +166,9 @@ private:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_WRITE8_MEMBER(bgram_w);
-	DECLARE_WRITE8_MEMBER(port4_w);
+	void fgram_w(offs_t offset, uint8_t data);
+	void bgram_w(offs_t offset, uint8_t data);
+	void port4_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -189,19 +189,19 @@ void ppmast93_state::machine_start()
 	membank("cpubank")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 }
 
-WRITE8_MEMBER(ppmast93_state::fgram_w)
+void ppmast93_state::fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(ppmast93_state::bgram_w)
+void ppmast93_state::bgram_w(offs_t offset, uint8_t data)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(ppmast93_state::port4_w)
+void ppmast93_state::port4_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x08);
 	machine().bookkeeping().coin_counter_w(1, data & 0x10);

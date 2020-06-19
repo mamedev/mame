@@ -7,19 +7,19 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(dynduke_state::background_w)
+void dynduke_state::background_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_data[offset]);
 	m_bg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(dynduke_state::foreground_w)
+void dynduke_state::foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fore_data[offset]);
 	m_fg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(dynduke_state::text_w)
+void dynduke_state::text_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_tx_layer->mark_tile_dirty(offset);
@@ -83,7 +83,7 @@ void dynduke_state::video_start()
 	save_item(NAME(m_old_fore));
 }
 
-WRITE16_MEMBER(dynduke_state::gfxbank_w)
+void dynduke_state::gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -101,7 +101,7 @@ WRITE16_MEMBER(dynduke_state::gfxbank_w)
 }
 
 
-WRITE16_MEMBER(dynduke_state::control_w)
+void dynduke_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

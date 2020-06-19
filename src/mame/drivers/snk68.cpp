@@ -54,7 +54,7 @@ Notes:
 
 /******************************************************************************/
 
-WRITE8_MEMBER(snk68_state::sound_w)
+void snk68_state::sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // caused by 74123
@@ -88,17 +88,17 @@ void searchar_state::machine_start()
 	save_item(NAME(m_invert_controls));
 }
 
-READ16_MEMBER(searchar_state::rotary_1_r)
+uint16_t searchar_state::rotary_1_r()
 {
 	return (( ~(1 << m_rotary_io[0]->read()) )<<8)&0xff00;
 }
 
-READ16_MEMBER(searchar_state::rotary_2_r)
+uint16_t searchar_state::rotary_2_r()
 {
 	return (( ~(1 << m_rotary_io[1]->read()) )<<8)&0xff00;
 }
 
-READ16_MEMBER(searchar_state::rotary_lsb_r)
+uint16_t searchar_state::rotary_lsb_r()
 {
 	return ((( ~(1 << m_rotary_io[1]->read())  ) <<4)&0xf000)
 			+ ((( ~(1 << m_rotary_io[0]->read())  )    )&0x0f00);
@@ -141,7 +141,7 @@ void snk68_state::sound_map(address_map &map)
 	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 
-WRITE8_MEMBER(snk68_state::D7759_write_port_0_w)
+void snk68_state::D7759_write_port_0_w(uint8_t data)
 {
 	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);

@@ -110,8 +110,9 @@ private:
 	void port00_w(offs_t offset, u8 data);
 	void port06_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
-	void dauphin_io(address_map &map);
-	void dauphin_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	void machine_start() override;
 
 	u8 m_cass_data;
 	u8 m_last_key;
@@ -182,7 +183,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(dauphin_state::kansas_w)
 		m_cass->output(BIT(m_cass_data, 0) ? -1.0 : +1.0); // 2000Hz
 }
 
-void dauphin_state::dauphin_mem(address_map &map)
+void dauphin_state::machine_start()
+{
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_last_key));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_speaker_state));
+}
+
+void dauphin_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x01ff).rom();
@@ -190,7 +200,7 @@ void dauphin_state::dauphin_mem(address_map &map)
 	map(0x0c00, 0x0fff).rom();
 }
 
-void dauphin_state::dauphin_io(address_map &map)
+void dauphin_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00, 0x03).w(FUNC(dauphin_state::port00_w)); // 4-led display
@@ -230,8 +240,8 @@ void dauphin_state::dauphin(machine_config &config)
 {
 	/* basic machine hardware */
 	S2650(config, m_maincpu, XTAL(1'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &dauphin_state::dauphin_mem);
-	m_maincpu->set_addrmap(AS_IO, &dauphin_state::dauphin_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dauphin_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &dauphin_state::io_map);
 	m_maincpu->sense_handler().set(FUNC(dauphin_state::cass_r));
 	m_maincpu->flag_handler().set([this] (bool state) { m_cassbit = state; });
 
@@ -269,4 +279,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY              FULLNAME   FLAGS
-COMP( 1979, dauphin, 0,      0,      dauphin, dauphin, dauphin_state, empty_init, "LCD EPFL Stoppani", "Dauphin", 0 )
+COMP( 1979, dauphin, 0,      0,      dauphin, dauphin, dauphin_state, empty_init, "LCD EPFL Stoppani", "Dauphin", MACHINE_SUPPORTS_SAVE )

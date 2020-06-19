@@ -44,27 +44,27 @@ void pecom_state::machine_reset()
 	m_reset_timer->adjust(attotime::from_msec(5));
 }
 
-READ8_MEMBER(pecom_state::pecom_cdp1869_charram_r)
+uint8_t pecom_state::pecom_cdp1869_charram_r(offs_t offset)
 {
 	return m_cdp1869->char_ram_r(offset);
 }
 
-WRITE8_MEMBER(pecom_state::pecom_cdp1869_charram_w)
+void pecom_state::pecom_cdp1869_charram_w(offs_t offset, uint8_t data)
 {
 	return m_cdp1869->char_ram_w(offset, data);
 }
 
-READ8_MEMBER(pecom_state::pecom_cdp1869_pageram_r)
+uint8_t pecom_state::pecom_cdp1869_pageram_r(offs_t offset)
 {
 	return m_cdp1869->page_ram_r(offset);
 }
 
-WRITE8_MEMBER(pecom_state::pecom_cdp1869_pageram_w)
+void pecom_state::pecom_cdp1869_pageram_w(offs_t offset, uint8_t data)
 {
 	return m_cdp1869->page_ram_w(offset, data);
 }
 
-WRITE8_MEMBER(pecom_state::pecom_bank_w)
+void pecom_state::pecom_bank_w(uint8_t data)
 {
 	address_space &space2 = m_cdp1802->space(AS_PROGRAM);
 	uint8_t *rom = memregion(CDP1802_TAG)->base();
@@ -73,10 +73,10 @@ WRITE8_MEMBER(pecom_state::pecom_bank_w)
 
 	if (data==2)
 	{
-		space2.install_read_handler (0xf000, 0xf7ff, read8_delegate(*this, FUNC(pecom_state::pecom_cdp1869_charram_r)));
-		space2.install_write_handler(0xf000, 0xf7ff, write8_delegate(*this, FUNC(pecom_state::pecom_cdp1869_charram_w)));
-		space2.install_read_handler (0xf800, 0xffff, read8_delegate(*this, FUNC(pecom_state::pecom_cdp1869_pageram_r)));
-		space2.install_write_handler(0xf800, 0xffff, write8_delegate(*this, FUNC(pecom_state::pecom_cdp1869_pageram_w)));
+		space2.install_read_handler (0xf000, 0xf7ff, read8sm_delegate(*this, FUNC(pecom_state::pecom_cdp1869_charram_r)));
+		space2.install_write_handler(0xf000, 0xf7ff, write8sm_delegate(*this, FUNC(pecom_state::pecom_cdp1869_charram_w)));
+		space2.install_read_handler (0xf800, 0xffff, read8sm_delegate(*this, FUNC(pecom_state::pecom_cdp1869_pageram_r)));
+		space2.install_write_handler(0xf800, 0xffff, write8sm_delegate(*this, FUNC(pecom_state::pecom_cdp1869_pageram_w)));
 	}
 	else
 	{
@@ -89,7 +89,7 @@ WRITE8_MEMBER(pecom_state::pecom_bank_w)
 	}
 }
 
-READ8_MEMBER(pecom_state::pecom_keyboard_r)
+uint8_t pecom_state::pecom_keyboard_r()
 {
 	/*
 	   INP command BUS -> M(R(X)) BUS -> D

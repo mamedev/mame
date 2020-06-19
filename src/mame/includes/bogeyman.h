@@ -62,12 +62,12 @@ private:
 	int        m_last_write;
 	int        m_colbank;
 
-	DECLARE_WRITE8_MEMBER(ay8910_latch_w);
-	DECLARE_WRITE8_MEMBER(ay8910_control_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(colorram2_w);
+	void ay8910_latch_w(uint8_t data);
+	void ay8910_control_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void videoram2_w(offs_t offset, uint8_t data);
+	void colorram2_w(offs_t offset, uint8_t data);
 	void colbank_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

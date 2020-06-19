@@ -1710,7 +1710,7 @@ void namcos22_state::draw_sprites()
 	}
 }
 
-READ32_MEMBER(namcos22s_state::namcos22s_vics_control_r)
+u32 namcos22s_state::namcos22s_vics_control_r(offs_t offset)
 {
 	u32 ret = m_vics_control[offset];
 
@@ -1734,7 +1734,7 @@ READ32_MEMBER(namcos22s_state::namcos22s_vics_control_r)
 	return ret;
 }
 
-WRITE32_MEMBER(namcos22s_state::namcos22s_vics_control_w)
+void namcos22s_state::namcos22s_vics_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_vics_control[offset]);
 }
@@ -1879,7 +1879,7 @@ low byte is indirect pen, high byte is shift amount when spot is in alpha blend 
 
 */
 
-READ16_MEMBER(namcos22s_state::spotram_r)
+u16 namcos22s_state::spotram_r(offs_t offset)
 {
 	if (offset == 2)
 	{
@@ -1895,7 +1895,7 @@ READ16_MEMBER(namcos22s_state::spotram_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22s_state::spotram_w)
+void namcos22s_state::spotram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	switch (offset)
 	{
@@ -2120,7 +2120,7 @@ void namcos22_state::update_palette()
 }
 
 
-WRITE16_MEMBER(namcos22s_state::namcos22s_czattr_w)
+void namcos22s_state::namcos22s_czattr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/*
 	       0    1    2    3    4    5    6    7
@@ -2149,7 +2149,7 @@ WRITE16_MEMBER(namcos22s_state::namcos22s_czattr_w)
 	}
 }
 
-READ16_MEMBER(namcos22s_state::namcos22s_czattr_r)
+u16 namcos22s_state::namcos22s_czattr_r(offs_t offset)
 {
 	return m_czattr[offset];
 }

@@ -212,7 +212,7 @@ public:
 	void set_bus_frequency(uint32_t bus_frequency) { c_bus_frequency = bus_frequency; }
 	void set_bus_frequency(const XTAL &xtal) { set_bus_frequency(xtal.value()); }
 
-	void ppc_set_dcstore_callback(write32_delegate callback);
+	void ppc_set_dcstore_callback(write32sm_delegate callback);
 
 	void ppcdrc_set_options(uint32_t options);
 	void ppcdrc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
@@ -479,7 +479,7 @@ protected:
 		emu_timer *     timer;
 		uint8_t           rxbuffer[256];
 		uint32_t          rxin, rxout;
-		write8_delegate tx_cb;
+		write8smo_delegate tx_cb;
 	};
 
 	ppc4xx_spu_state m_spu;
@@ -501,13 +501,13 @@ protected:
 	uint64_t          m_dec_zero_cycles;
 	emu_timer *     m_decrementer_int_timer;
 
-	read32_delegate  m_dcr_read_func;
-	write32_delegate m_dcr_write_func;
+	read32sm_delegate  m_dcr_read_func;
+	write32sm_delegate m_dcr_write_func;
 
-	write32_delegate m_dcstore_cb;
+	write32sm_delegate m_dcstore_cb;
 
 	read32_delegate::array<4> m_ext_dma_read_cb;
-	write32_delegate::array<4> m_ext_dma_write_cb;
+	write32sm_delegate::array<4> m_ext_dma_write_cb;
 
 	/* PowerPC function pointers for memory accesses/exceptions */
 #ifdef PPC_H_INCLUDED_FROM_PPC_C
@@ -751,13 +751,13 @@ public:
 class ppc4xx_device : public ppc_device
 {
 public:
-	void ppc4xx_spu_set_tx_handler(write8_delegate callback);
+	void ppc4xx_spu_set_tx_handler(write8smo_delegate callback);
 	void ppc4xx_spu_receive_byte(uint8_t byteval);
 
 	void ppc4xx_set_dma_read_handler(int channel, read32_delegate callback, int rate);
-	void ppc4xx_set_dma_write_handler(int channel, write32_delegate callback, int rate);
-	void ppc4xx_set_dcr_read_handler(read32_delegate dcr_read_func);
-	void ppc4xx_set_dcr_write_handler(write32_delegate dcr_write_func);
+	void ppc4xx_set_dma_write_handler(int channel, write32sm_delegate callback, int rate);
+	void ppc4xx_set_dcr_read_handler(read32sm_delegate dcr_read_func);
+	void ppc4xx_set_dcr_write_handler(write32sm_delegate dcr_write_func);
 
 	uint8_t ppc4xx_spu_r(offs_t offset);
 	void ppc4xx_spu_w(offs_t offset, uint8_t data);

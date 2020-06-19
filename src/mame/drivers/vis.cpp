@@ -728,8 +728,8 @@ private:
 	void unk_w(offs_t offset, uint8_t data);
 	uint8_t unk2_r();
 	uint8_t unk3_r();
-	DECLARE_READ16_MEMBER(pad_r);
-	DECLARE_WRITE16_MEMBER(pad_w);
+	uint16_t pad_r(offs_t offset);
+	void pad_w(offs_t offset, uint16_t data);
 	uint8_t unk1_r(offs_t offset);
 	void unk1_w(offs_t offset, uint8_t data);
 	void io_map(address_map &map);
@@ -783,7 +783,7 @@ uint8_t vis_state::unk3_r()
 	return 0x00;
 }
 
-READ16_MEMBER(vis_state::pad_r)
+uint16_t vis_state::pad_r(offs_t offset)
 {
 	uint16_t ret = 0;
 	switch(offset)
@@ -803,7 +803,7 @@ READ16_MEMBER(vis_state::pad_r)
 	return ret;
 }
 
-WRITE16_MEMBER(vis_state::pad_w)
+void vis_state::pad_w(offs_t offset, uint16_t data)
 {
 	switch(offset)
 	{

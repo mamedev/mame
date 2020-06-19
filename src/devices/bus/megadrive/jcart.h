@@ -24,8 +24,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 protected:
 	md_jcart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -58,8 +58,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	required_device<i2cmem_device> m_i2cmem;
 

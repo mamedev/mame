@@ -58,8 +58,8 @@ private:
 	uint8_t dio_r();
 	void dio_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ieee488_ctrl_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(latch_w);
+	uint8_t switch_r();
+	void latch_w(uint8_t data);
 
 	void cpu_io_map(address_map &map);
 

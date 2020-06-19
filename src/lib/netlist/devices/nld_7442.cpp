@@ -12,7 +12,7 @@ namespace netlist
 {
 namespace devices
 {
-	static C14CONSTEXPR const netlist_time delay = NLTIME_FROM_NS(30); // Worst-case through 3 levels of logic
+	static constexpr const netlist_time delay = NLTIME_FROM_NS(30); // Worst-case through 3 levels of logic
 
 	NETLIB_OBJECT(7442)
 	{

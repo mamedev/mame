@@ -61,14 +61,14 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(k007121_registers_w);
-	DECLARE_WRITE8_MEMBER(fastlane_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(fastlane_vram1_w);
-	DECLARE_WRITE8_MEMBER(fastlane_vram2_w);
-	DECLARE_READ8_MEMBER(fastlane_k1_k007232_r);
-	DECLARE_WRITE8_MEMBER(fastlane_k1_k007232_w);
-	DECLARE_READ8_MEMBER(fastlane_k2_k007232_r);
-	DECLARE_WRITE8_MEMBER(fastlane_k2_k007232_w);
+	void k007121_registers_w(offs_t offset, uint8_t data);
+	void fastlane_bankswitch_w(uint8_t data);
+	void fastlane_vram1_w(offs_t offset, uint8_t data);
+	void fastlane_vram2_w(offs_t offset, uint8_t data);
+	uint8_t fastlane_k1_k007232_r(offs_t offset);
+	void fastlane_k1_k007232_w(offs_t offset, uint8_t data);
+	uint8_t fastlane_k2_k007232_r(offs_t offset);
+	void fastlane_k2_k007232_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	virtual void machine_start() override;

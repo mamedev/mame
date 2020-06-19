@@ -12,7 +12,7 @@
 
 Checks done by main code:
 - as part of EEPROM data
-jchan  : "95/05/24 Jackie ChanVer 1.20"
+jchan  : "95/05/24 Jackie ChanVer 1.20"  (both sets report the same info)
 jchan2 : "95/11/28 Jackie ChanVer 2.31"
 - as (one of) MCU protection cmd
 jchan  : "1995/05/24 The kung-Fu Master Jackie Chan   "
@@ -630,14 +630,14 @@ void jchan_state::jchan(machine_config &config)
 
 ROM_START( jchan )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "jm01x3.u67", 0x000001, 0x080000, CRC(c0adb141) SHA1(de265e1da06e723492e0c2465cd04e25ce1c237f) )
-	ROM_LOAD16_BYTE( "jm00x3.u68", 0x000000, 0x080000, CRC(b1aadc5a) SHA1(0a93693088c0a4b8a79159fb0ebac47d5556d800) )
+	ROM_LOAD16_BYTE( "jm01x4.u67", 0x000001, 0x080000, CRC(ace80563) SHA1(1d2774935aa046f258682c953f788cf95348bb0c) ) // rev 4?
+	ROM_LOAD16_BYTE( "jm00x4.u68", 0x000000, 0x080000, CRC(08172186) SHA1(7d6ade633bec18c4b2bbd54648c2e141fe925fbe) ) // rev 4?
 	ROM_LOAD16_BYTE( "jm11x3.u69", 0x100001, 0x080000, CRC(d2e3f913) SHA1(db2d790fba5351660a9525f545ab1b23dfe319b0) )
 	ROM_LOAD16_BYTE( "jm10x3.u70", 0x100000, 0x080000, CRC(ee08fee1) SHA1(5514bd8c625bc7cf8dd5da2f76b760716609b925) )
 
 	ROM_REGION( 0x100000, "sub", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "jsp1x3.u86", 0x000001, 0x080000, CRC(d15d2b8e) SHA1(e253f2d64fee6627f68833b441f41ea6bbb3ab07) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD16_BYTE( "jsp0x3.u87", 0x000000, 0x080000, CRC(ebec50b1) SHA1(57d7bd728349c2b9d662bcf20a3be92902cb3ffb) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "jsp1x4.u86", 0x000001, 0x080000, CRC(787939d0) SHA1(9d896834bc5f14cd759dd8fcfff3f15e97139238) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF - rev 4?
+	ROM_LOAD16_BYTE( "jsp0x4.u87", 0x000000, 0x080000, CRC(1b27383e) SHA1(eaea9722195d0356e5996d7648f31cffc07d3d9a) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF - rev 4?
 
 	ROM_REGION( 0x2000000, "spritegen1", 0 ) /* SPA GFX */
 	ROM_LOAD( "jc-100-00.179", 0x0000000, 0x0400000, CRC(578d928c) SHA1(1cfe04f9b02c04f95a85d6fe7c4306a535ff969f) ) // SPA0 kaneko logo
@@ -664,7 +664,47 @@ ROM_START( jchan )
 	ROM_LOAD( "jcw0x0.u56",   0x400000, 0x040000, CRC(bcf25c2a) SHA1(b57a563ab5c05b05d133eed3d099c4de997f37e4) )
 
 	ROM_REGION( 0x020000, "mcudata", 0 ) /* MCU Data */
-	ROM_LOAD16_WORD_SWAP( "jcd0x1.u13", 0x000000, 0x020000, CRC(2a41da9c) SHA1(7b1ba0efc0544e276196b9605df1881fde871708) )
+	ROM_LOAD16_WORD_SWAP( "jcd0x2.u13", 0x000000, 0x020000, CRC(011dae3e) SHA1(348c5d4465d92be437f097e89e924d36cc681fc2) ) // rev 2?
+ROM_END
+
+
+ROM_START( jchana )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "jm01x3.u67", 0x000001, 0x080000, CRC(c0adb141) SHA1(de265e1da06e723492e0c2465cd04e25ce1c237f) ) // rev 3?
+	ROM_LOAD16_BYTE( "jm00x3.u68", 0x000000, 0x080000, CRC(b1aadc5a) SHA1(0a93693088c0a4b8a79159fb0ebac47d5556d800) ) // rev 3?
+	ROM_LOAD16_BYTE( "jm11x3.u69", 0x100001, 0x080000, CRC(d2e3f913) SHA1(db2d790fba5351660a9525f545ab1b23dfe319b0) )
+	ROM_LOAD16_BYTE( "jm10x3.u70", 0x100000, 0x080000, CRC(ee08fee1) SHA1(5514bd8c625bc7cf8dd5da2f76b760716609b925) )
+
+	ROM_REGION( 0x100000, "sub", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "jsp1x3.u86", 0x000001, 0x080000, CRC(d15d2b8e) SHA1(e253f2d64fee6627f68833b441f41ea6bbb3ab07) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF - rev 3?
+	ROM_LOAD16_BYTE( "jsp0x3.u87", 0x000000, 0x080000, CRC(ebec50b1) SHA1(57d7bd728349c2b9d662bcf20a3be92902cb3ffb) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF - rev 3?
+
+	ROM_REGION( 0x2000000, "spritegen1", 0 ) /* SPA GFX */
+	ROM_LOAD( "jc-100-00.179", 0x0000000, 0x0400000, CRC(578d928c) SHA1(1cfe04f9b02c04f95a85d6fe7c4306a535ff969f) ) // SPA0 kaneko logo
+	ROM_LOAD( "jc-101-00.180", 0x0400000, 0x0400000, CRC(7f5e1aca) SHA1(66ed3deedfd55d88e7dcd017b9c2ce523ccb421a) ) // SPA1
+	ROM_LOAD( "jc-102-00.181", 0x0800000, 0x0400000, CRC(72caaa68) SHA1(f6b98aa949768a306ac9bc5f9c05a1c1a3fb6c3f) ) // SPA2
+	ROM_LOAD( "jc-103-00.182", 0x0c00000, 0x0400000, CRC(4e9e9fc9) SHA1(bf799cdee930b7f71aea4d55c3dd6a760f7478bb) ) // SPA3 title logo? + char select
+	ROM_LOAD( "jc-104-00.183", 0x1000000, 0x0200000, CRC(6b2a2e93) SHA1(e34010e39043b67493bcb23a04828ab7cda8ba4d) ) // SPA4
+	ROM_LOAD( "jc-105-00.184", 0x1200000, 0x0200000, CRC(73cad1f0) SHA1(5dbe4e318948e4f74bfc2d0d59455d43ba030c0d) ) // SPA5 11xxxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "jc-108-00.185", 0x1400000, 0x0200000, CRC(67dd1131) SHA1(96f334378ae0267bdb3dc528635d8d03564bd859) ) // SPA6 text
+	ROM_LOAD16_BYTE( "jcs0x3.164", 0x1600000, 0x040000, CRC(9a012cbc) SHA1(b3e7390220c90d55dccfb96397f0af73925e36f9) ) // SPA-7A female portraits
+	ROM_LOAD16_BYTE( "jcs1x3.165", 0x1600001, 0x040000, CRC(57ae7c8d) SHA1(4086f638c2aabcee84e838243f0fd15cec5c040d) ) // SPA-7B female portraits
+
+	ROM_REGION( 0x1000000, "spritegen2", 0 ) /* SPB GFX (background sprites) */
+	ROM_LOAD( "jc-106-00.171", 0x000000, 0x200000, CRC(bc65661b) SHA1(da28b8fcd7c7a0de427a54be2cf41a1d6a295164) ) // SPB0
+	ROM_LOAD( "jc-107-00.172", 0x200000, 0x200000, CRC(92a86e8b) SHA1(c37eddbc9d84239deb543504e27b5bdaf2528f79) ) // SPB1
+
+	ROM_REGION( 0x100000, "view2", 0 ) /* BG GFX */
+	ROM_LOAD( "jc-200.00", 0x000000, 0x100000, CRC(1f30c24e) SHA1(0c413fc67c3ec020e6786e7157d82aa242c8d2ad) )
+
+	ROM_REGION( 0x1000000, "ymz", 0 ) /* Audio */
+	ROM_LOAD( "jc-301-00.85", 0x000000, 0x100000, CRC(9c5b3077) SHA1(db9a31e1c65d9f12d0f2fb316ced48a02aae089d) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_LOAD( "jc-300-00.84", 0x200000, 0x200000, CRC(13d5b1eb) SHA1(b047594d0f1a71d89b8f072879ccba480f54a483) )
+	ROM_LOAD( "jcw0x0.u56",   0x400000, 0x040000, CRC(bcf25c2a) SHA1(b57a563ab5c05b05d133eed3d099c4de997f37e4) )
+
+	ROM_REGION( 0x020000, "mcudata", 0 ) /* MCU Data */
+	ROM_LOAD16_WORD_SWAP( "jcd0x1.u13", 0x000000, 0x020000, CRC(2a41da9c) SHA1(7b1ba0efc0544e276196b9605df1881fde871708) ) // rev 1?
 ROM_END
 
 
@@ -715,5 +755,6 @@ void jchan_state::init_jchan()
 
 
 /* game drivers */
-GAME( 1995, jchan,  0, jchan, jchan,  jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, jchan2, 0, jchan, jchan2, jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan in Fists of Fire",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan,      0, jchan, jchan,  jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master (rev 4?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchana, jchan, jchan, jchan,  jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master (rev 3?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan2,     0, jchan, jchan2, jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan in Fists of Fire",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

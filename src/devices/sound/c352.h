@@ -29,8 +29,8 @@ public:
 
 	void set_divider(int divider) { m_divider = divider; }
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	u16 read(offs_t offset);
+	void write(offs_t offset, u16 data, u16 mem_mask = 0);
 
 protected:
 	// device-level overrides
@@ -90,9 +90,6 @@ private:
 
 	void fetch_sample(c352_voice_t &v);
 	void ramp_volume(c352_voice_t &v, int ch, u8 val);
-
-	u16 read_reg16(offs_t offset);
-	void write_reg16(offs_t offset, u16 data, u16 mem_mask = 0);
 
 	sound_stream *m_stream;
 

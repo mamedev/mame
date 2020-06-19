@@ -71,6 +71,7 @@ void kbdc8042_device::device_start()
 	m_sending = 0;
 	m_last_write_to_control = 0;
 	m_status_read_mode = 0;
+	m_speaker = 0;
 
 	m_update_timer = timer_alloc(TIMER_UPDATE);
 	m_update_timer->adjust(attotime::never);

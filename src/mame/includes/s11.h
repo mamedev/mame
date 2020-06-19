@@ -57,13 +57,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 	uint8_t sound_r();
-	DECLARE_WRITE8_MEMBER(bank_w);
+	void bank_w(uint8_t data);
 	void dig0_w(uint8_t data);
 	void dig1_w(uint8_t data);
 	void lamp0_w(uint8_t data);
 	void lamp1_w(uint8_t data) { };
 	void sol2_w(uint8_t data) { }; // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w); // solenoids 0-7
+	void sol3_w(uint8_t data); // solenoids 0-7
 	void sound_w(uint8_t data);
 
 	void pia2c_pa_w(uint8_t data);

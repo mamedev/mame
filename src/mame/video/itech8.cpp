@@ -163,7 +163,7 @@ void itech8_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::palette_w)
+void itech8_state::palette_w(offs_t offset, uint8_t data)
 {
 	m_tlc34076->write(offset/2, data);
 }
@@ -411,7 +411,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::blitter_done)
  *
  *************************************/
 
-READ8_MEMBER(itech8_state::blitter_r)
+uint8_t itech8_state::blitter_r(offs_t offset)
 {
 	int result = m_blitter_data[offset / 2];
 
@@ -439,7 +439,7 @@ READ8_MEMBER(itech8_state::blitter_r)
 }
 
 
-WRITE8_MEMBER(itech8_state::blitter_w)
+void itech8_state::blitter_w(offs_t offset, uint8_t data)
 {
 	/* low bit seems to be ignored */
 	offset /= 2;
@@ -487,7 +487,7 @@ WRITE8_MEMBER(itech8_state::blitter_w)
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::tms34061_w)
+void itech8_state::tms34061_w(offs_t offset, uint8_t data)
 {
 	int func = (offset >> 9) & 7;
 	int col = offset & 0xff;
@@ -502,7 +502,7 @@ WRITE8_MEMBER(itech8_state::tms34061_w)
 }
 
 
-READ8_MEMBER(itech8_state::tms34061_r)
+uint8_t itech8_state::tms34061_r(offs_t offset)
 {
 	int func = (offset >> 9) & 7;
 	int col = offset & 0xff;
@@ -524,14 +524,14 @@ READ8_MEMBER(itech8_state::tms34061_r)
  *
  *************************************/
 
-WRITE8_MEMBER(grmatch_state::palette_w)
+void grmatch_state::palette_w(uint8_t data)
 {
 	/* set the palette control; examined in the scanline callback */
 	m_palcontrol = data;
 }
 
 
-WRITE8_MEMBER(grmatch_state::xscroll_w)
+void grmatch_state::xscroll_w(uint8_t data)
 {
 	/* update the X scroll value */
 	//m_screen->update_now();

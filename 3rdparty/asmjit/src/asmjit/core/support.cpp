@@ -100,12 +100,20 @@ static void testBitUtils() noexcept {
     EXPECT(Support::bitTest((1 << i), i) == true, "Support::bitTest(%X, %u) should return true", (1 << i), i);
   }
 
-  INFO("Support::lsbMask()");
+  INFO("Support::lsbMask<uint32_t>()");
   for (i = 0; i < 32; i++) {
     uint32_t expectedBits = 0;
     for (uint32_t b = 0; b < i; b++)
       expectedBits |= uint32_t(1) << b;
     EXPECT(Support::lsbMask<uint32_t>(i) == expectedBits);
+  }
+
+  INFO("Support::lsbMask<uint64_t>()");
+  for (i = 0; i < 64; i++) {
+    uint64_t expectedBits = 0;
+    for (uint32_t b = 0; b < i; b++)
+      expectedBits |= uint64_t(1) << b;
+    EXPECT(Support::lsbMask<uint64_t>(i) == expectedBits);
   }
 
   INFO("Support::popcnt()");

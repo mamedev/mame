@@ -35,7 +35,7 @@ ASMJIT_BEGIN_NAMESPACE
 // [asmjit::ZoneStackBase]
 // ============================================================================
 
-//! Base class used by `ZoneStack<T>`.
+//! Base class used by \ref ZoneStack.
 class ZoneStackBase {
 public:
   ASMJIT_NONCOPYABLE(ZoneStackBase)

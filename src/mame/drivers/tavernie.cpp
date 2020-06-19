@@ -80,7 +80,6 @@ public:
 		, m_pia0(*this, "pia0")
 		, m_acia(*this, "acia")
 		, m_ptm(*this, "ptm")
-		, m_rs232(*this, "rs232")
 	{ }
 
 	void cpu09(machine_config &config);
@@ -99,7 +98,6 @@ protected:
 	required_device<pia6821_device> m_pia0;
 	required_device<acia6850_device> m_acia;
 	required_device<ptm6840_device> m_ptm;
-	required_device<rs232_port_device> m_rs232;
 
 private:
 	virtual void machine_reset() override;
@@ -432,10 +430,10 @@ void cpu09_state::cpu09(machine_config &config)
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
-	m_rs232->rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
-	m_rs232->cts_handler().set("acia", FUNC(acia6850_device::write_cts));
-	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 }
 
 void ivg09_state::ivg09(machine_config &config)
@@ -458,10 +456,7 @@ void ivg09_state::ivg09(machine_config &config)
 	BEEP(config, m_beep, 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
 
 	/* Devices */
-	config.device_remove("rs232");
-	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
-	m_rs232->cts_handler().set("acia", FUNC(acia6850_device::write_cts));
+	subdevice<rs232_port_device>("rs232")->set_default_option(nullptr);
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(ivg09_state::kbd_put));

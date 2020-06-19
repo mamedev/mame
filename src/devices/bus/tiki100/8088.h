@@ -45,8 +45,8 @@ private:
 
 	uint8_t m_data;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read();
+	void write(uint8_t data);
 
 	void i8088_io(address_map &map);
 	void i8088_mem(address_map &map);

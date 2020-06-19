@@ -19,11 +19,11 @@ uint16_t pastelg_state::blitter_src_addr_r()
 	return m_blitter_src_addr;
 }
 
-void pastelg_state::romsel_w(address_space &space, uint8_t data)
+void pastelg_state::romsel_w(uint8_t data)
 {
 	m_gfxbank = ((data & 0xc0) >> 6);
 	m_palbank = ((data & 0x10) >> 4);
-	m_nb1413m3->sndrombank1_w(space, 0, data);
+	m_nb1413m3->sndrombank1_w(data);
 
 	if ((m_gfxbank << 16) > m_blitter_rom.mask())
 	{

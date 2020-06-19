@@ -28,10 +28,10 @@ namespace netlist
 		, m_Q(*this, {"QA", "QB", "QC", "QD"})
 		, m_BORROWQ(*this, "BORROWQ")
 		, m_CARRYQ(*this, "CARRYQ")
-		, m_A(*this, "A", NETLIB_DELEGATE(74192, sub))
-		, m_B(*this, "B", NETLIB_DELEGATE(74192, sub))
-		, m_C(*this, "C", NETLIB_DELEGATE(74192, sub))
-		, m_D(*this, "D", NETLIB_DELEGATE(74192, sub))
+		, m_A(*this, "A", NETLIB_DELEGATE(sub))
+		, m_B(*this, "B", NETLIB_DELEGATE(sub))
+		, m_C(*this, "C", NETLIB_DELEGATE(sub))
+		, m_D(*this, "D", NETLIB_DELEGATE(sub))
 		, m_power_pins(*this)
 		{
 		}

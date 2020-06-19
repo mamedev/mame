@@ -672,13 +672,8 @@ Notes:
 
 TODO:
 ----
-
-- bosco: is the scrolling tilemap placement correct? It is currently aligned so that
-  the test grid shown on startup is correct, but this way an unerased grey strip
-  remains on the left of the screen during the title sequence. Alignment of the
-  bullets/radar blips is also mysterious. Currently the radar blips are perfectly
-  aligned with the radar, but the alignment of the player bullets with the player
-  ship differs by one horizontal pixel when the screen is flipped.
+- bosco: is the screen horizontal resolution maybe 285? PCB videos do show a slightly
+  larger right border though
 
 - gallag/gatsbee: explosions are not emulated since the bootleg board doesn't have
   the 54XX custom. Should probably use samples like Battles?
@@ -725,7 +720,7 @@ TODO:
 #define STARFIELD_X_LIMIT_BOSCO     224
 
 
-READ8_MEMBER(galaga_state::bosco_dsw_r)
+uint8_t galaga_state::bosco_dsw_r(offs_t offset)
 {
 	int bit0,bit1;
 
@@ -809,12 +804,12 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 }
 
 
-READ8_MEMBER(digdug_state::earom_read)
+uint8_t digdug_state::earom_read()
 {
 	return m_earom->data();
 }
 
-WRITE8_MEMBER(digdug_state::earom_write)
+void digdug_state::earom_write(offs_t offset, uint8_t data)
 {
 	m_earom->set_address(offset & 0x3f);
 	m_earom->set_data(data);
@@ -1612,6 +1607,7 @@ void bosco_state::bosco(machine_config &config)
 	namco_54xx_device &n54xx(NAMCO_54XX(config, "54xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
 	n54xx.set_discrete("discrete");
 	n54xx.set_basenote(NODE_01);
+	n54xx.set_irq_duration(attotime::from_usec(200));
 
 	namco_06xx_device &n06xx_0(NAMCO_06XX(config, "06xx_0", MASTER_CLOCK/6/64));
 	n06xx_0.set_maincpu(m_maincpu);
@@ -1624,6 +1620,7 @@ void bosco_state::bosco(machine_config &config)
 	n06xx_0.rw_callback<2>().set("50xx_1", FUNC(namco_50xx_device::rw));
 	n06xx_0.write_callback<2>().set("50xx_1", FUNC(namco_50xx_device::write));
 	n06xx_0.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
+	n06xx_0.chip_select_callback<3>().set("54xx", FUNC(namco_54xx_device::chip_select));
 
 	namco_06xx_device &n06xx_1(NAMCO_06XX(config, "06xx_1", MASTER_CLOCK/6/64));
 	n06xx_1.set_maincpu(m_subcpu);
@@ -1632,6 +1629,7 @@ void bosco_state::bosco(machine_config &config)
 	n06xx_1.rw_callback<2>().set("50xx_2", FUNC(namco_50xx_device::rw));
 	n06xx_1.write_callback<0>().set("50xx_2", FUNC(namco_50xx_device::write));
 	n06xx_1.write_callback<1>().set("52xx", FUNC(namco_52xx_device::write));
+	n06xx_1.chip_select_callback<1>().set("52xx", FUNC(namco_52xx_device::chip_select));
 
 	LS259(config, m_videolatch); // 1B on video board
 	m_videolatch->q_out_cb<0>().set(FUNC(galaga_state::flip_screen_w)).invert();
@@ -1645,6 +1643,7 @@ void bosco_state::bosco(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 16, 224+16);
 	m_screen->set_screen_update(FUNC(bosco_state::screen_update_bosco));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // starfield lfsr
 	m_screen->screen_vblank().set(FUNC(bosco_state::screen_vblank_bosco));
 	m_screen->screen_vblank().append(FUNC(galaga_state::vblank_irq));
 	m_screen->screen_vblank().append("51xx", FUNC(namco_51xx_device::vblank));
@@ -1709,6 +1708,7 @@ void galaga_state::galaga(machine_config &config)
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 	n06xx.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
+	n06xx.chip_select_callback<3>().set("54xx", FUNC(namco_54xx_device::chip_select));
 
 	LS259(config, m_videolatch); // 5K on video board
 	// Q0-Q5 to 05XX for starfield control
@@ -1720,6 +1720,7 @@ void galaga_state::galaga(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
 	m_screen->set_screen_update(FUNC(galaga_state::screen_update_galaga));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // starfield lfsr
 	m_screen->screen_vblank().set(FUNC(galaga_state::screen_vblank_galaga));
 	m_screen->screen_vblank().append(FUNC(galaga_state::vblank_irq));
 	m_screen->screen_vblank().append("51xx", FUNC(namco_51xx_device::vblank));
@@ -1753,8 +1754,7 @@ void galaga_state::galagab(machine_config &config)
 	config.device_remove("06xx");
 	config.device_remove("54xx");
 	ls259_device* misclatch = reinterpret_cast<ls259_device*>(config.device("misclatch"));
-	// galaga has the custom chips on this line, so just set the resets this
-	// board has
+	// galaga has the custom chips on this line, so just set the resets this board has
 	misclatch->q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
 	misclatch->q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
 	misclatch->q_out_cb<3>().append_inputline("sub3", INPUT_LINE_RESET).invert();
@@ -1830,6 +1830,7 @@ void xevious_state::xevious(machine_config &config)
 	n06xx.read_callback<2>().set("50xx", FUNC(namco_50xx_device::read));
 	n06xx.write_callback<2>().set("50xx", FUNC(namco_50xx_device::write));
 	n06xx.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
+	n06xx.chip_select_callback<3>().set("54xx", FUNC(namco_54xx_device::chip_select));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
@@ -1866,8 +1867,7 @@ void battles_state::battles(machine_config &config)
 	config.device_remove("54xx");
 	config.device_remove("06xx");
 	ls259_device* misclatch = reinterpret_cast<ls259_device*>(config.device("misclatch"));
-	// xevious has the custom chips on this line, so just set the resets
-	// this board has
+	// xevious has the custom chips on this line, so just set the resets this board has
 	misclatch->q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
 	misclatch->q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
 
@@ -3478,8 +3478,8 @@ void xevious_state::init_xevios()
 void battles_state::driver_init()
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7000, 0x700f, read8_delegate(*this, FUNC(battles_state::customio_data0_r)), write8_delegate(*this, FUNC(battles_state::customio_data0_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7100, 0x7100, read8_delegate(*this, FUNC(battles_state::customio0_r)), write8_delegate(*this, FUNC(battles_state::customio0_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7000, 0x700f, read8sm_delegate(*this, FUNC(battles_state::customio_data0_r)), write8sm_delegate(*this, FUNC(battles_state::customio_data0_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7100, 0x7100, read8smo_delegate(*this, FUNC(battles_state::customio0_r)), write8smo_delegate(*this, FUNC(battles_state::customio0_w)));
 
 	init_xevious();
 }
@@ -3488,11 +3488,11 @@ void battles_state::driver_init()
 /* Original Namco hardware, with Namco Customs */
 
 //    YEAR, NAME,      PARENT,  MACHINE, INPUT,    STATE,         INIT,         MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1981, bosco,     0,       bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian (new version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1981, boscoo,    bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian (old version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1981, boscoo2,   bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian (older version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1981, boscomd,   bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian (Midway, new version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1981, boscomdo,  bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian (Midway, old version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1981, bosco,     0,       bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (new version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscoo,    bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (old version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscoo2,   bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (older version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscomd,   bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian - Star Destroyer (Midway, new version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscomdo,  bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian - Star Destroyer (Midway, old version)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, galaga,    0,       galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco rev. B)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, galagao,   galaga,  galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco)", MACHINE_SUPPORTS_SAVE )

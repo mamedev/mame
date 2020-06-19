@@ -31,14 +31,14 @@ uint8_t malzak_state::videoram_r(offs_t offset)
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER(malzak_state::port60_w)
+void malzak_state::port60_w(uint8_t data)
 {
 	m_scrollx = data;
 //  logerror("I/O: port 0x60 write 0x%02x\n", data);
 	m_playfield_tilemap->set_scrollx(0, m_scrollx + 48);
 }
 
-WRITE8_MEMBER(malzak_state::portc0_w)
+void malzak_state::portc0_w(uint8_t data)
 {
 	m_scrolly = data;
 //  logerror("I/O: port 0xc0 write 0x%02x\n", data);
@@ -46,7 +46,7 @@ WRITE8_MEMBER(malzak_state::portc0_w)
 }
 
 //TODO: how readback works with this arrangement? Never occurs in-game
-WRITE8_MEMBER(malzak_state::playfield_w)
+void malzak_state::playfield_w(offs_t offset, uint8_t data)
 {
 	int tile = ((m_scrollx / 16) * 16) + (offset / 16);
 

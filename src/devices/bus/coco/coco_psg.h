@@ -22,7 +22,7 @@ class coco_psg_device :
 {
 public:
 	// construction/destruction
-	coco_psg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	coco_psg_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -34,21 +34,21 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(cts_read) override;
-	virtual DECLARE_WRITE8_MEMBER(cts_write) override;
-	virtual DECLARE_READ8_MEMBER(scs_read) override;
-	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+	virtual u8 cts_read(offs_t offset) override;
+	virtual void cts_write(offs_t offset, u8 data) override;
+	virtual u8 scs_read(offs_t offset) override;
+	virtual void scs_write(offs_t offset, u8 data) override;
 
 private:
 	required_device<ay8910_device> m_psg;
 	required_device<sst_39sf040_device> m_flash;
 
-	void flash2aaa_w(offs_t offset, uint8_t data);
-	void flash5555_w(offs_t offset, uint8_t data);
+	void flash2aaa_w(offs_t offset, u8 data);
+	void flash5555_w(offs_t offset, u8 data);
 
-	std::unique_ptr<uint8_t[]> m_sram;
-	uint8_t m_bank[2];
-	uint8_t m_control;
+	std::unique_ptr<u8[]> m_sram;
+	u8 m_bank[2];
+	u8 m_control;
 };
 
 

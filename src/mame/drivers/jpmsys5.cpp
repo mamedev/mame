@@ -74,7 +74,7 @@ WRITE_LINE_MEMBER(jpmsys5v_state::generate_tms34061_interrupt)
 	m_maincpu->set_input_line(INT_TMS34061, state);
 }
 
-WRITE16_MEMBER(jpmsys5v_state::sys5_tms34061_w)
+void jpmsys5v_state::sys5_tms34061_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int func = (offset >> 19) & 3;
 	int row = (offset >> 7) & 0x1ff;
@@ -97,7 +97,7 @@ WRITE16_MEMBER(jpmsys5v_state::sys5_tms34061_w)
 		m_tms34061->write(col | 1, row, func, data & 0xff);
 }
 
-READ16_MEMBER(jpmsys5v_state::sys5_tms34061_r)
+uint16_t jpmsys5v_state::sys5_tms34061_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 	int func = (offset >> 19) & 3;
@@ -123,7 +123,7 @@ READ16_MEMBER(jpmsys5v_state::sys5_tms34061_r)
 	return data;
 }
 
-WRITE16_MEMBER(jpmsys5v_state::ramdac_w)
+void jpmsys5v_state::ramdac_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 	{
@@ -194,12 +194,12 @@ void jpmsys5_state::sys5_draw_lamps()
  *
  ****************************************/
 
-WRITE16_MEMBER(jpmsys5v_state::rombank_w)
+void jpmsys5v_state::rombank_w(uint16_t data)
 {
 	m_rombank->set_entry(data & 0x1f);
 }
 
-READ16_MEMBER(jpmsys5_state::coins_r)
+uint16_t jpmsys5_state::coins_r(offs_t offset)
 {
 	if (offset == 2)
 		return ioport("COINS")->read() << 8;
@@ -207,22 +207,22 @@ READ16_MEMBER(jpmsys5_state::coins_r)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(jpmsys5_state::coins_w)
+void jpmsys5_state::coins_w(uint16_t data)
 {
 	/* TODO */
 }
 
-READ16_MEMBER(jpmsys5_state::unk_r)
+uint16_t jpmsys5_state::unk_r()
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(jpmsys5_state::mux_w)
+void jpmsys5_state::mux_w(offs_t offset, uint16_t data)
 {
 	m_muxram[offset]=data;
 }
 
-READ16_MEMBER(jpmsys5_state::mux_r)
+uint16_t jpmsys5_state::mux_r(offs_t offset)
 {
 	if (offset == 0x81/2)
 		return ioport("DSW")->read();
@@ -230,7 +230,7 @@ READ16_MEMBER(jpmsys5_state::mux_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
+void jpmsys5_state::jpm_upd7759_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -263,7 +263,7 @@ WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
 	}
 }
 
-READ16_MEMBER(jpmsys5_state::jpm_upd7759_r)
+uint16_t jpmsys5_state::jpm_upd7759_r()
 {
 	return 0x14 | m_upd7759->busy_r();
 }
@@ -647,7 +647,7 @@ void jpmsys5v_state::jpmsys5v(machine_config &config)
 	ptm.irq_callback().set(FUNC(jpmsys5v_state::ptm_irq));
 }
 
-READ16_MEMBER(jpmsys5_state::mux_awp_r)
+uint16_t jpmsys5_state::mux_awp_r(offs_t offset)
 {
 	static const char *const portnames[] = { "DSW", "DSW2", "ROTARY", "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4" };
 
@@ -661,7 +661,7 @@ READ16_MEMBER(jpmsys5_state::mux_awp_r)
 	}
 }
 
-READ16_MEMBER(jpmsys5_state::coins_awp_r)
+uint16_t jpmsys5_state::coins_awp_r(offs_t offset)
 {
 	switch (offset)
 	{

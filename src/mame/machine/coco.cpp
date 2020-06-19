@@ -421,7 +421,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_irq_b )
 //  ff20_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::ff20_write )
+void coco_state::ff20_write(offs_t offset, uint8_t data)
 {
 	/* write to the PIA */
 	pia_1().write(offset, data);
@@ -1106,7 +1106,7 @@ coco_vhd_image_device *coco_state::current_vhd()
 //  ff60_read
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::ff60_read )
+uint8_t coco_state::ff60_read(offs_t offset)
 {
 	uint8_t result;
 
@@ -1128,7 +1128,7 @@ READ8_MEMBER( coco_state::ff60_read )
 //  ff60_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::ff60_write )
+void coco_state::ff60_write(offs_t offset, uint8_t data)
 {
 	if ((current_vhd() != nullptr) && (offset >= 32) && (offset <= 37))
 	{
@@ -1155,14 +1155,14 @@ WRITE8_MEMBER( coco_state::ff60_write )
 //  ff40_read
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::ff40_read )
+uint8_t coco_state::ff40_read(offs_t offset)
 {
 	if (offset >= 1 && offset <= 2 && m_beckerportconfig.read_safe(0) == 1)
 	{
-		return m_beckerport->read(space, offset-1, mem_mask);
+		return m_beckerport->read(offset-1);
 	}
 
-	return m_cococart->scs_read(space, offset, mem_mask);
+	return m_cococart->scs_read(offset);
 }
 
 
@@ -1170,14 +1170,14 @@ READ8_MEMBER( coco_state::ff40_read )
 //  ff40_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::ff40_write )
+void coco_state::ff40_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 1 && offset <= 2 && m_beckerportconfig.read_safe(0) == 1)
 	{
-		return m_beckerport->write(space, offset-1, data, mem_mask);
+		return m_beckerport->write(offset-1, data);
 	}
 
-	m_cococart->scs_write(space, offset, data, mem_mask);
+	m_cococart->scs_write(offset, data);
 }
 
 

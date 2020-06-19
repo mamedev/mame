@@ -67,7 +67,7 @@ X-6026 : Roll of paper for the printer
     mark cycle. Control must be returned at that time to the cassette routine
     in order to maintain data integrity.
 */
-READ8_MEMBER(aquarius_state::cassette_r)
+uint8_t aquarius_state::cassette_r()
 {
 	return ((m_cassette)->input() < +0.0) ? 0 : 1;
 }
@@ -78,7 +78,7 @@ READ8_MEMBER(aquarius_state::cassette_r)
     will appear on audio output. Sound port is a simple one bit I/O and therefore
     it must be toggled at a specific rate under software control.
 */
-WRITE8_MEMBER(aquarius_state::cassette_w)
+void aquarius_state::cassette_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 0));
 	m_cassette->output(BIT(data, 0) ? +1.0 : -1.0);
@@ -97,7 +97,7 @@ WRITE8_MEMBER(aquarius_state::cassette_w)
         +                             +       +
     +++++                             +++++++++
 */
-READ8_MEMBER(aquarius_state::vsync_r)
+uint8_t aquarius_state::vsync_r()
 {
 	return m_screen->vblank() ? 0 : 1;
 }
@@ -108,7 +108,7 @@ READ8_MEMBER(aquarius_state::vsync_r)
     map with the upper 16K. A 1 in this bit indicates swapping. This bit is reset
     after power up initialization.
 */
-WRITE8_MEMBER(aquarius_state::mapper_w)
+void aquarius_state::mapper_w(uint8_t data)
 {
 }
 
@@ -118,7 +118,7 @@ WRITE8_MEMBER(aquarius_state::mapper_w)
     to send status from PRNHASK pin at bit D0. A 1 indicates printer is ready,
     0 means not ready.
 */
-READ8_MEMBER(aquarius_state::printer_r)
+uint8_t aquarius_state::printer_r()
 {
 	return 1; /* ready */
 }
@@ -130,7 +130,7 @@ READ8_MEMBER(aquarius_state::printer_r)
     baudrate is variable. In BASIC this is a 1200 baud printer port for
     the 40 column thermal printer.
 */
-WRITE8_MEMBER(aquarius_state::printer_w)
+void aquarius_state::printer_w(uint8_t data)
 {
 }
 
@@ -146,7 +146,7 @@ WRITE8_MEMBER(aquarius_state::printer_w)
     Therefore the keyboard can be scanned by placing a specific scanning
     pattern in (A) or (B) and reading the result returned on rows.
 */
-READ8_MEMBER(aquarius_state::keyboard_r)
+uint8_t aquarius_state::keyboard_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -181,12 +181,12 @@ READ8_MEMBER(aquarius_state::keyboard_r)
     routine. For game cartridge the lock pattern is generated from data in the
     game cartridge itself.
 */
-WRITE8_MEMBER(aquarius_state::scrambler_w)
+void aquarius_state::scrambler_w(uint8_t data)
 {
 	m_scrambler = data;
 }
 
-READ8_MEMBER(aquarius_state::cartridge_r)
+uint8_t aquarius_state::cartridge_r(offs_t offset)
 {
 	uint8_t data = 0;
 	if (m_cart->exists())

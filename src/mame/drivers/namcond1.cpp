@@ -225,7 +225,7 @@ void namcond1_state::abcheck_map(address_map &map)
 	map(0xc3ff00, 0xc3ffff).rw(FUNC(namcond1_state::cuskey_r), FUNC(namcond1_state::cuskey_w));
 }
 
-READ16_MEMBER(namcond1_state::printer_r)
+uint16_t namcond1_state::printer_r()
 {
 	// bits tested:
 	// bit 2 = 0 for paper cut switch on, 1 for off
@@ -304,17 +304,17 @@ static INPUT_PORTS_START( abcheck )
 INPUT_PORTS_END
 
 
-READ16_MEMBER(namcond1_state::mcu_p7_read)
+uint16_t namcond1_state::mcu_p7_read()
 {
 	return 0xff;
 }
 
-READ16_MEMBER(namcond1_state::mcu_pa_read)
+uint16_t namcond1_state::mcu_pa_read()
 {
 	return 0xff;
 }
 
-WRITE16_MEMBER(namcond1_state::mcu_pa_write)
+void namcond1_state::mcu_pa_write(uint16 data)
 {
 	m_p8 = data;
 }

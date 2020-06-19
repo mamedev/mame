@@ -3563,12 +3563,12 @@ bit  0-12  (911/924) LINE PARAMETER/ERROR TERM. For Line Drawing this is the
             the major or independent axis).
      0-13  (80x +) LINE PARAMETER/ERROR TERM. See above.
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_line_error_r)
+uint16_t ibm8514a_device::ibm8514_line_error_r()
 {
 	return ibm8514.line_errorterm;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_line_error_w)
+void ibm8514a_device::ibm8514_line_error_w(uint16_t data)
 {
 	ibm8514.line_errorterm = data;
 	if(LOG_8514) logerror("8514/A: Line Parameter/Error Term write %04x\n",data);
@@ -3595,7 +3595,7 @@ bit   0-7  Queue State.
             available, Fh for 9 words, 7 for 10 words, 3 for 11 words, 1 for
             12 words and 0 for 13 words available.
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_gpstatus_r)
+uint16_t ibm8514a_device::ibm8514_gpstatus_r()
 {
 	uint16_t ret = 0x0000;
 
@@ -3735,7 +3735,7 @@ bit     0  (911-928) ~RD/WT. Read/Write Data. If set VRAM write operations are
                 rectangle, which is copied repeatably to the destination
                 rectangle.
  */
-WRITE16_MEMBER(ibm8514a_device::ibm8514_cmd_w)
+void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 {
 	int x,y;
 	int pattern_x,pattern_y;
@@ -4031,12 +4031,12 @@ bit  0-11  DESTINATION Y-POSITION. During BITBLT operations this is the Y
      0-13  (80 x+) LINE PARAMETER AXIAL STEP CONSTANT. Se above
 
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_desty_r)
+uint16_t ibm8514a_device::ibm8514_desty_r()
 {
 	return ibm8514.line_axial_step;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_desty_w)
+void ibm8514a_device::ibm8514_desty_w(uint16_t data)
 {
 	ibm8514.line_axial_step = data;
 	ibm8514.dest_y = data;
@@ -4056,12 +4056,12 @@ bit  0-11  DESTINATION X-POSITION. During BITBLT operations this is the X
      0-13  (80x +) LINE PARAMETER DIAGONAL STEP CONSTANT. Se above
 
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_destx_r)
+uint16_t ibm8514a_device::ibm8514_destx_r()
 {
 	return ibm8514.line_diagonal_step;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_destx_w)
+void ibm8514a_device::ibm8514_destx_w(uint16_t data)
 {
 	ibm8514.line_diagonal_step = data;
 	ibm8514.dest_x = data;
@@ -4187,12 +4187,12 @@ void ibm8514a_device::ibm8514_draw_ssv(uint8_t data)
 	ibm8514_draw_vector(len,dir,draw);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_ssv_r)
+uint16_t ibm8514a_device::ibm8514_ssv_r()
 {
 	return ibm8514.ssv;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_ssv_w)
+void ibm8514a_device::ibm8514_ssv_w(uint16_t data)
 {
 	ibm8514.ssv = data;
 
@@ -4299,58 +4299,58 @@ bit  0-10  (911/924)  RECTANGLE WIDTH/LINE PARAMETER MAX. For BITBLT and
             independent axis). Must be positive.
      0-11  (80x +) RECTANGLE WIDTH/LINE PARAMETER MAX. See above
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_width_r)
+uint16_t ibm8514a_device::ibm8514_width_r()
 {
 	return ibm8514.rect_width;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_width_w)
+void ibm8514a_device::ibm8514_width_w(uint16_t data)
 {
 	ibm8514.rect_width = data & 0x1fff;
 	if(LOG_8514) logerror("8514/A: Major Axis Pixel Count / Rectangle Width write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_currentx_r)
+uint16_t ibm8514a_device::ibm8514_currentx_r()
 {
 	return ibm8514.curr_x;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_currentx_w)
+void ibm8514a_device::ibm8514_currentx_w(uint16_t data)
 {
 	ibm8514.curr_x = data;
 	ibm8514.prev_x = data;
 	if(LOG_8514) logerror("8514/A: Current X set to %04x (%i)\n",data,ibm8514.curr_x);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_currenty_r)
+uint16_t ibm8514a_device::ibm8514_currenty_r()
 {
 	return ibm8514.curr_y;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_currenty_w)
+void ibm8514a_device::ibm8514_currenty_w(uint16_t data)
 {
 	ibm8514.curr_y = data;
 	ibm8514.prev_y = data;
 	if(LOG_8514) logerror("8514/A: Current Y set to %04x (%i)\n",data,ibm8514.curr_y);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_fgcolour_r)
+uint16_t ibm8514a_device::ibm8514_fgcolour_r()
 {
 	return ibm8514.fgcolour;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_fgcolour_w)
+void ibm8514a_device::ibm8514_fgcolour_w(uint16_t data)
 {
 	ibm8514.fgcolour = data;
 	if(LOG_8514) logerror("8514/A: Foreground Colour write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_bgcolour_r)
+uint16_t ibm8514a_device::ibm8514_bgcolour_r()
 {
 	return ibm8514.bgcolour;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_bgcolour_w)
+void ibm8514a_device::ibm8514_bgcolour_w(uint16_t data)
 {
 	ibm8514.bgcolour = data;
 	if(LOG_8514) logerror("8514/A: Background Colour write %04x\n",data);
@@ -4367,12 +4367,12 @@ bit   0-7  (911/924) Read Mask affects the following commands: CMD_RECT,
             which 16 bits are accessible and each access toggles to the other
             16 bits.
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_read_mask_r)
+uint16_t ibm8514a_device::ibm8514_read_mask_r()
 {
 	return ibm8514.read_mask & 0xffff;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_read_mask_w)
+void ibm8514a_device::ibm8514_read_mask_w(uint16_t data)
 {
 	ibm8514.read_mask = (ibm8514.read_mask & 0xffff0000) | data;
 	if(LOG_8514) logerror("8514/A: Read Mask (Low) write = %08x\n",ibm8514.read_mask);
@@ -4388,18 +4388,18 @@ bit   0-7  (911/924) Writemask. A plane can only be modified if the
             which 16 bits are accessible and each access toggles to the other
             16 bits.
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_write_mask_r)
+uint16_t ibm8514a_device::ibm8514_write_mask_r()
 {
 	return ibm8514.write_mask & 0xffff;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_write_mask_w)
+void ibm8514a_device::ibm8514_write_mask_w(uint16_t data)
 {
 	ibm8514.write_mask = (ibm8514.write_mask & 0xffff0000) | data;
 	if(LOG_8514) logerror("8514/A: Write Mask (Low) write = %08x\n",ibm8514.write_mask);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_multifunc_r )
+uint16_t ibm8514a_device::ibm8514_multifunc_r()
 {
 	switch(ibm8514.multifunc_sel)
 	{
@@ -4420,7 +4420,7 @@ READ16_MEMBER(ibm8514a_device::ibm8514_multifunc_r )
 	}
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_multifunc_w )
+void ibm8514a_device::ibm8514_multifunc_w(uint16_t data)
 {
 	switch(data & 0xf000)
 	{
@@ -4699,29 +4699,29 @@ bit   0-3  Background MIX (BACKMIX).
              2  BSS is Pixel Data from the PIX_TRANS register (E2E8h)
              3  BSS is Bitmap Data (Source data from display buffer).
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_backmix_r)
+uint16_t ibm8514a_device::ibm8514_backmix_r()
 {
 	return ibm8514.bgmix;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_backmix_w)
+void ibm8514a_device::ibm8514_backmix_w(uint16_t data)
 {
 	ibm8514.bgmix = data;
 	if(LOG_8514) logerror("8514/A: BG Mix write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_foremix_r)
+uint16_t ibm8514a_device::ibm8514_foremix_r()
 {
 	return ibm8514.fgmix;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_foremix_w)
+void ibm8514a_device::ibm8514_foremix_w(uint16_t data)
 {
 	ibm8514.fgmix = data;
 	if(LOG_8514) logerror("8514/A: FG Mix write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_pixel_xfer_r)
+uint16_t ibm8514a_device::ibm8514_pixel_xfer_r(offs_t offset)
 {
 	if(offset == 1)
 		return (ibm8514.pixel_xfer & 0xffff0000) >> 16;
@@ -4729,7 +4729,7 @@ READ16_MEMBER(ibm8514a_device::ibm8514_pixel_xfer_r)
 		return ibm8514.pixel_xfer & 0x0000ffff;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_pixel_xfer_w)
+void ibm8514a_device::ibm8514_pixel_xfer_w(offs_t offset, uint16_t data)
 {
 	if(offset == 1)
 		ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0x0000ffff) | (data << 16);
@@ -4882,7 +4882,7 @@ void s3_vga_device::mem_w(offs_t offset, uint8_t data)
 		case 0x8119:
 		case 0x9ae9:
 			s3.mmio_9ae8 = (s3.mmio_9ae8 & 0x00ff) | (data << 8);
-			dev->ibm8514_cmd_w(machine().dummy_space(),0,s3.mmio_9ae8,0xffff);
+			dev->ibm8514_cmd_w(s3.mmio_9ae8);
 			break;
 		case 0x8120:
 		case 0xa2e8:
@@ -5002,14 +5002,14 @@ void s3_vga_device::mem_w(offs_t offset, uint8_t data)
 			break;
 		case 0xbee9:
 			s3.mmio_bee8 = (s3.mmio_bee8 & 0x00ff) | (data << 8);
-			dev->ibm8514_multifunc_w(machine().dummy_space(),0,s3.mmio_bee8,0xffff);
+			dev->ibm8514_multifunc_w(s3.mmio_bee8);
 			break;
 		case 0x96e8:
 			s3.mmio_96e8 = (s3.mmio_96e8 & 0xff00) | data;
 			break;
 		case 0x96e9:
 			s3.mmio_96e8 = (s3.mmio_96e8 & 0x00ff) | (data << 8);
-			dev->ibm8514_width_w(machine().dummy_space(),0,s3.mmio_96e8,0xffff);
+			dev->ibm8514_width_w(s3.mmio_96e8);
 			break;
 		case 0xe2e8:
 			dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0xffffff00) | data;
@@ -5500,7 +5500,7 @@ bit   0-3  Interrupt requests. These bits show the state of internal interrupt
      8-11  CHIP_REV. Chip revision number.
     12-15  (CT82c480) CHIP_ID. 0=CT 82c480.
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_substatus_r)
+uint16_t ibm8514a_device::ibm8514_substatus_r()
 {
 	// TODO:
 	if(m_vga->vga_vblank() != 0)  // not correct, but will do for now
@@ -5525,14 +5525,14 @@ bit   0-3  Interrupt Reset. Write 1 to a bit to reset the interrupt.
     12-13  CHPTEST. Used for chip testing.
     14-15  Graphics Processor Control (GPCTRL).
  */
-WRITE16_MEMBER(ibm8514a_device::ibm8514_subcontrol_w)
+void ibm8514a_device::ibm8514_subcontrol_w(uint16_t data)
 {
 	ibm8514.subctrl = data;
 	ibm8514.substatus &= ~(data & 0x0f);  // reset interrupts
 //  if(LOG_8514) logerror("8514/A: Subsystem control write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_subcontrol_r)
+uint16_t ibm8514a_device::ibm8514_subcontrol_r()
 {
 	return ibm8514.subctrl;
 }
@@ -5544,7 +5544,7 @@ READ16_MEMBER(ibm8514a_device::ibm8514_subcontrol_r)
  *  bit    4: Interlace
  *  bits 5-6: Emable Display - 0=no change, 1=enable 8514/A, 2 or 3=8514/A reset
  */
-WRITE16_MEMBER(ibm8514a_device::ibm8514_display_ctrl_w)
+void ibm8514a_device::ibm8514_display_ctrl_w(uint16_t data)
 {
 	ibm8514.display_ctrl = data & 0x7e;
 	switch(data & 0x60)
@@ -5561,47 +5561,47 @@ WRITE16_MEMBER(ibm8514a_device::ibm8514_display_ctrl_w)
 	}
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_advfunc_w)
+void ibm8514a_device::ibm8514_advfunc_w(uint16_t data)
 {
 	ibm8514.advfunction_ctrl = data;
 	ibm8514.passthrough = data & 0x0001;
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_htotal_r)
+uint16_t ibm8514a_device::ibm8514_htotal_r()
 {
 	return ibm8514.htotal;
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_vtotal_r)
+uint16_t ibm8514a_device::ibm8514_vtotal_r()
 {
 	return ibm8514.vtotal;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_vtotal_w)
+void ibm8514a_device::ibm8514_vtotal_w(uint16_t data)
 {
 	ibm8514.vtotal = data;
 //  vga.crtc.vert_total = data;
 	if(LOG_8514) logerror("8514/A: Vertical total write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_vdisp_r)
+uint16_t ibm8514a_device::ibm8514_vdisp_r()
 {
 	return ibm8514.vdisp;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_vdisp_w)
+void ibm8514a_device::ibm8514_vdisp_w(uint16_t data)
 {
 	ibm8514.vdisp = data;
 //  vga.crtc.vert_disp_end = data >> 3;
 	if(LOG_8514) logerror("8514/A: Vertical Displayed write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_vsync_r)
+uint16_t ibm8514a_device::ibm8514_vsync_r()
 {
 	return ibm8514.vsync;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_vsync_w)
+void ibm8514a_device::ibm8514_vsync_w(uint16_t data)
 {
 	ibm8514.vsync = data;
 	if(LOG_8514) logerror("8514/A: Vertical Sync write %04x\n",data);
@@ -5613,78 +5613,78 @@ void ibm8514a_device::enabled()
 	ibm8514.gpbusy = false;
 }
 
-READ16_MEMBER(mach8_device::mach8_ec0_r)
+uint16_t mach8_device::mach8_ec0_r()
 {
 	return ibm8514.ec0;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ec0_w)
+void mach8_device::mach8_ec0_w(uint16_t data)
 {
 	ibm8514.ec0 = data;
 	if(LOG_8514) logerror("8514/A: Extended configuration 0 write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_ec1_r)
+uint16_t mach8_device::mach8_ec1_r()
 {
 	return ibm8514.ec1;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ec1_w)
+void mach8_device::mach8_ec1_w(uint16_t data)
 {
 	ibm8514.ec1 = data;
 	if(LOG_8514) logerror("8514/A: Extended configuration 1 write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_ec2_r)
+uint16_t mach8_device::mach8_ec2_r()
 {
 	return ibm8514.ec2;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ec2_w)
+void mach8_device::mach8_ec2_w(uint16_t data)
 {
 	ibm8514.ec2 = data;
 	if(LOG_8514) logerror("8514/A: Extended configuration 2 write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_ec3_r)
+uint16_t mach8_device::mach8_ec3_r()
 {
 	return ibm8514.ec3;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ec3_w)
+void mach8_device::mach8_ec3_w(uint16_t data)
 {
 	ibm8514.ec3 = data;
 	if(LOG_8514) logerror("8514/A: Extended configuration 3 write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_ext_fifo_r)
+uint16_t mach8_device::mach8_ext_fifo_r()
 {
 	return 0x00;  // for now, report all FIFO slots as free
 }
 
-WRITE16_MEMBER(mach8_device::mach8_linedraw_index_w)
+void mach8_device::mach8_linedraw_index_w(uint16_t data)
 {
 	mach8.linedraw = data & 0x07;
 	if(LOG_8514) logerror("Mach8: Line Draw Index write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_bresenham_count_r)
+uint16_t mach8_device::mach8_bresenham_count_r()
 {
 	return ibm8514.rect_width & 0x1fff;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_bresenham_count_w)
+void mach8_device::mach8_bresenham_count_w(uint16_t data)
 {
 	ibm8514.rect_width = data & 0x1fff;
 	if(LOG_8514) logerror("Mach8: Bresenham count write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_linedraw_r)
+uint16_t mach8_device::mach8_linedraw_r()
 {
 	return 0xff;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_linedraw_w)
+void mach8_device::mach8_linedraw_w(uint16_t data)
 {
 	// TODO: actually draw the lines
 	switch(mach8.linedraw)
@@ -5717,74 +5717,74 @@ WRITE16_MEMBER(mach8_device::mach8_linedraw_w)
 	logerror("ATI: Linedraw register write %04x, mode %i\n",data,mach8.linedraw);
 }
 
-READ16_MEMBER(mach8_device::mach8_sourcex_r)
+uint16_t mach8_device::mach8_sourcex_r()
 {
 	return ibm8514.dest_x & 0x07ff;
 }
 
-READ16_MEMBER(mach8_device::mach8_sourcey_r)
+uint16_t mach8_device::mach8_sourcey_r()
 {
 	return ibm8514.dest_y & 0x07ff;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ext_leftscissor_w)
+void mach8_device::mach8_ext_leftscissor_w(uint16_t data)
 {
 	// TODO
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ext_topscissor_w)
+void mach8_device::mach8_ext_topscissor_w(uint16_t data)
 {
 	// TODO
 }
 
-READ16_MEMBER(mach8_device::mach8_scratch0_r)
+uint16_t mach8_device::mach8_scratch0_r()
 {
 	return mach8.scratch0;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_scratch0_w)
+void mach8_device::mach8_scratch0_w(uint16_t data)
 {
 	mach8.scratch0 = data;
 	if(LOG_8514) logerror("Mach8: Scratch Pad 0 write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_scratch1_r)
+uint16_t mach8_device::mach8_scratch1_r()
 {
 	return mach8.scratch1;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_scratch1_w)
+void mach8_device::mach8_scratch1_w(uint16_t data)
 {
 	mach8.scratch1 = data;
 	if(LOG_8514) logerror("Mach8: Scratch Pad 1 write %04x\n",data);
 }
 
-WRITE16_MEMBER(mach8_device::mach8_crt_pitch_w)
+void mach8_device::mach8_crt_pitch_w(uint16_t data)
 {
 	mach8.crt_pitch = data & 0x00ff;
 	m_vga->set_offset(mach8.crt_pitch);
 	if(LOG_8514) logerror("Mach8: CRT pitch write %04x\n",mach8.crt_pitch);
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ge_offset_l_w)
+void mach8_device::mach8_ge_offset_l_w(uint16_t data)
 {
 	mach8.ge_offset = (mach8.ge_offset & 0x0f0000) | data;
 	if(LOG_8514) logerror("Mach8: Graphics Engine Offset (Low) write %05x\n",mach8.ge_offset);
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ge_offset_h_w)
+void mach8_device::mach8_ge_offset_h_w(uint16_t data)
 {
 	mach8.ge_offset = (mach8.ge_offset & 0x00ffff) | ((data & 0x000f) << 16);
 	if(LOG_8514) logerror("Mach8: Graphics Engine Offset (High) write %05x\n",mach8.ge_offset);
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ge_pitch_w)
+void mach8_device::mach8_ge_pitch_w(uint16_t data)
 {
 	mach8.ge_pitch = data & 0x00ff;
 	if(LOG_8514) logerror("Mach8: Graphics Engine pitch write %04x\n",mach8.ge_pitch);
 }
 
-WRITE16_MEMBER(mach8_device::mach8_scan_x_w)
+void mach8_device::mach8_scan_x_w(uint16_t data)
 {
 	mach8.scan_x = data & 0x07ff;
 
@@ -5798,9 +5798,9 @@ WRITE16_MEMBER(mach8_device::mach8_scan_x_w)
 	if(LOG_8514) logerror("Mach8: Scan To X write %04x\n",mach8.scan_x);
 }
 
-WRITE16_MEMBER(mach8_device::mach8_pixel_xfer_w)
+void mach8_device::mach8_pixel_xfer_w(offs_t offset, uint16_t data)
 {
-	ibm8514_pixel_xfer_w(space,offset,data,mem_mask);
+	ibm8514_pixel_xfer_w(offset, data);
 
 	if(ibm8514.state == MACH8_DRAWING_SCAN)
 		mach8_wait_scan();
@@ -5858,7 +5858,7 @@ void mach8_device::mach8_wait_scan()
  *     12: LSB First (ignored in mach8 mode when data width is not set)
  *  13-15: Foreground Colour Source (as Background Source, plus 5=Colour pattern shift register)
  */
-WRITE16_MEMBER(mach8_device::mach8_dp_config_w)
+void mach8_device::mach8_dp_config_w(uint16_t data)
 {
 	mach8.dp_config = data;
 	if(LOG_8514) logerror("Mach8: Data Path Configuration write %04x\n",mach8.dp_config);
@@ -5877,7 +5877,7 @@ bit    0  CLK_MODE. Set to use clock chip, clear to use crystals.
     9-15  ROM_LOCATION. If bit 2 and 3 are 0 the ROM will be at this location:
            0: C000h, 1: C080h, 2: C100h, .. 127: FF80h (unlikely)
  */
-READ16_MEMBER(mach8_device::mach8_config1_r)
+uint16_t mach8_device::mach8_config1_r()
 {
 	return 0x0082;
 }
@@ -5890,7 +5890,7 @@ bit    0  SHARE_CLOCK. If set the Mach8 shares clock with the VGA
        3  WRITE_PER_BIT. Write masked VRAM operations supported if set
        4  FLASH_ENA. Flash page writes supported if set
  */
-READ16_MEMBER(mach8_device::mach8_config2_r)
+uint16_t mach8_device::mach8_config2_r()
 {
 	return 0x0002;
 }
@@ -5903,7 +5903,7 @@ READ16_MEMBER(mach8_device::mach8_config2_r)
  * bit      14  EEPROM Chip Select
  * bit      15  EEPROM Select (Enables read/write of external EEPROM)
  */
-WRITE16_MEMBER(mach8_device::mach8_ge_ext_config_w)
+void mach8_device::mach8_ge_ext_config_w(uint16_t data)
 {
 	mach8.ge_ext_config = data;
 	if(data & 0x8000)

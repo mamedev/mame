@@ -101,40 +101,40 @@ Noted added by ClawGrip 28-Mar-2008:
 #define MSM5205_CLOCK XTAL(384'000)
 
 
-WRITE8_MEMBER(wc90b_state::bankswitch_w)
+void wc90b_state::bankswitch_w(uint8_t data)
 {
 	membank("mainbank")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(wc90b_state::bankswitch1_w)
+void wc90b_state::bankswitch1_w(uint8_t data)
 {
 	membank("subbank")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(wc90b_state::sound_command_w)
+void wc90b_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(wc90b_state::adpcm_control_w)
+void wc90b_state::adpcm_control_w(uint8_t data)
 {
 	membank("audiobank")->set_entry(data & 0x01);
 	m_msm->reset_w(data & 0x08);
 }
 
-WRITE8_MEMBER(wc90b_state::adpcm_data_w)
+void wc90b_state::adpcm_data_w(uint8_t data)
 {
 	m_msm5205next = data;
 }
 
-READ8_MEMBER(wc90b_state::master_irq_ack_r)
+uint8_t wc90b_state::master_irq_ack_r()
 {
 	m_maincpu->set_input_line(0,CLEAR_LINE);
 	return 0xff;
 }
 
-WRITE8_MEMBER(wc90b_state::slave_irq_ack_w)
+void wc90b_state::slave_irq_ack_w(uint8_t data)
 {
 	m_subcpu->set_input_line(0,CLEAR_LINE);
 }
@@ -190,7 +190,7 @@ void wc90b_state::sound_cpu(address_map &map)
 }
 
 
-WRITE8_MEMBER(eurogael_state::master_irq_ack_w)
+void eurogael_state::master_irq_ack_w(uint8_t data)
 {
 	// this seems to be write based instead of read based
 	m_maincpu->set_input_line(0,CLEAR_LINE);

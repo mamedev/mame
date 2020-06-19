@@ -103,7 +103,7 @@ uint8_t diskonchip_g3_device::g3_read_data()
 	return data;
 }
 
-READ16_MEMBER( diskonchip_g3_device::sec_1_r )
+uint16_t diskonchip_g3_device::sec_1_r(offs_t offset)
 {
 	uint16_t data;
 	if (m_sec_2[0x1B] & 0x40)
@@ -142,7 +142,7 @@ void diskonchip_g3_device::g3_write_data(uint8_t data)
 	m_transfer_offset++;
 }
 
-WRITE16_MEMBER( diskonchip_g3_device::sec_1_w )
+void diskonchip_g3_device::sec_1_w(offs_t offset, uint16_t data)
 {
 	verboselog(*this, 9, "(DOC) %08X <- %04X\n", 0x0800 + (offset << 1), data);
 	if (m_sec_2[0x1B] & 0x40)
@@ -691,7 +691,7 @@ void diskonchip_g3_device::sec_2_write8(uint32_t offset, uint8_t data)
 	}
 }
 
-READ16_MEMBER( diskonchip_g3_device::sec_2_r )
+uint16_t diskonchip_g3_device::sec_2_r(offs_t offset, uint16_t mem_mask)
 {
 	if (mem_mask == 0xffff)
 	{
@@ -712,7 +712,7 @@ READ16_MEMBER( diskonchip_g3_device::sec_2_r )
 	}
 }
 
-WRITE16_MEMBER( diskonchip_g3_device::sec_2_w )
+void diskonchip_g3_device::sec_2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask == 0xffff)
 	{
@@ -732,14 +732,14 @@ WRITE16_MEMBER( diskonchip_g3_device::sec_2_w )
 	}
 }
 
-READ16_MEMBER( diskonchip_g3_device::sec_3_r )
+uint16_t diskonchip_g3_device::sec_3_r(offs_t offset)
 {
 	uint16_t data = 0;
 	verboselog(*this, 9, "(DOC) %08X -> %04X\n", 0x1800 + (offset << 1), data);
 	return data;
 }
 
-WRITE16_MEMBER( diskonchip_g3_device::sec_3_w )
+void diskonchip_g3_device::sec_3_w(offs_t offset, uint16_t data)
 {
 	verboselog(*this, 9, "(DOC) %08X <- %02X\n", 0x1800 + (offset << 1), data);
 }

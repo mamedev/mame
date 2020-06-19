@@ -104,7 +104,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_READ8_MEMBER(semaphore_r);
+	uint8_t semaphore_r();
 
 	void shougi_palette(palette_device &palette) const;
 
@@ -265,7 +265,7 @@ void shougi_state::main_map(address_map &map)
 
 // subcpu side
 
-READ8_MEMBER(shougi_state::semaphore_r)
+uint8_t shougi_state::semaphore_r()
 {
 	// d0: waits for it to be set before handling NMI routine
 	// hmm it must be a signal from maincpu, but what?

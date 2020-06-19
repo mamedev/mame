@@ -188,16 +188,16 @@ private:
 	void io_portd_w(uint8_t data);
 	void io_porth_w(uint8_t data);
 
-	DECLARE_WRITE16_MEMBER( segac2_upd7759_w );
-	DECLARE_READ16_MEMBER( palette_r );
-	DECLARE_WRITE16_MEMBER( palette_w );
-	DECLARE_WRITE8_MEMBER( control_w );
-	DECLARE_READ8_MEMBER( prot_r );
-	DECLARE_WRITE8_MEMBER( prot_w );
-	DECLARE_WRITE8_MEMBER( counter_timer_w );
-	DECLARE_READ16_MEMBER( printer_r );
-	DECLARE_WRITE16_MEMBER( print_club_camera_w );
-	DECLARE_READ16_MEMBER(ichirjbl_prot_r);
+	void segac2_upd7759_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t palette_r(offs_t offset);
+	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void control_w(uint8_t data);
+	uint8_t prot_r();
+	void prot_w(uint8_t data);
+	void counter_timer_w(uint8_t data);
+	uint16_t printer_r();
+	void print_club_camera_w(uint16_t data);
+	uint16_t ichirjbl_prot_r();
 	DECLARE_WRITE_LINE_MEMBER(segac2_irq2_interrupt);
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<screen_device> m_screen;
@@ -307,7 +307,7 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 ******************************************************************************/
 
 /* handle writes to the UPD7759 */
-WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
+void segac2_state::segac2_upd7759_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* make sure we have a UPD chip */
 	if (m_upd7759 == nullptr)
@@ -341,7 +341,7 @@ WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
 ******************************************************************************/
 
 /* handle reads from the paletteram */
-READ16_MEMBER(segac2_state::palette_r)
+uint16_t segac2_state::palette_r(offs_t offset)
 {
 	offset &= 0x1ff;
 	if (m_segac2_alt_palette_mode)
@@ -351,7 +351,7 @@ READ16_MEMBER(segac2_state::palette_r)
 }
 
 /* handle writes to the paletteram */
-WRITE16_MEMBER(segac2_state::palette_w)
+void segac2_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r, g, b, newword;
 	int tmpr, tmpg, tmpb;
@@ -507,7 +507,7 @@ void segac2_state::io_porth_w(uint8_t data)
 
 ******************************************************************************/
 
-WRITE8_MEMBER(segac2_state::control_w)
+void segac2_state::control_w(uint8_t data)
 {
 	data &= 0x0f;
 
@@ -539,7 +539,7 @@ WRITE8_MEMBER(segac2_state::control_w)
 ******************************************************************************/
 
 /* protection chip reads */
-READ8_MEMBER(segac2_state::prot_r)
+uint8_t segac2_state::prot_r()
 {
 	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", m_maincpu->pcbase(), m_prot_read_buf);
 	return m_prot_read_buf | 0xf0;
@@ -547,7 +547,7 @@ READ8_MEMBER(segac2_state::prot_r)
 
 
 /* protection chip writes */
-WRITE8_MEMBER(segac2_state::prot_w)
+void segac2_state::prot_w(uint8_t data)
 {
 	int new_sp_palbase = (data >> 2) & 3;
 	int new_bg_palbase = data & 3;
@@ -586,7 +586,7 @@ WRITE8_MEMBER(segac2_state::prot_w)
 
 ******************************************************************************/
 
-WRITE8_MEMBER(segac2_state::counter_timer_w)
+void segac2_state::counter_timer_w(uint8_t data)
 {
 	/*int value = data & 1;*/
 	switch (data & 0x1e)
@@ -630,12 +630,12 @@ WRITE8_MEMBER(segac2_state::counter_timer_w)
 
 ******************************************************************************/
 
-READ16_MEMBER(segac2_state::printer_r)
+uint16_t segac2_state::printer_r()
 {
 	return m_cam_data;
 }
 
-WRITE16_MEMBER(segac2_state::print_club_camera_w)
+void segac2_state::print_club_camera_w(uint16_t data)
 {
 	m_cam_data = data;
 }
@@ -2248,7 +2248,7 @@ void segac2_state::segac2_common_init(segac2_prot_delegate prot_func)
 	m_prot_func = prot_func;
 
 	if (m_upd7759 != nullptr)
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x880000, 0x880001, 0, 0x13fefe, 0, write16_delegate(*this, FUNC(segac2_state::segac2_upd7759_w)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x880000, 0x880001, 0, 0x13fefe, 0, write16s_delegate(*this, FUNC(segac2_state::segac2_upd7759_w)));
 }
 
 int segac2_state::prot_func_dummy(int in)
@@ -2571,7 +2571,7 @@ void segac2_state::init_ichirj()
 	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_ichirj)));
 }
 
-READ16_MEMBER(segac2_state::ichirjbl_prot_r )
+uint16_t segac2_state::ichirjbl_prot_r()
 {
 	return 0x00f5;
 }
@@ -2580,7 +2580,7 @@ void segac2_state::init_ichirjbl()
 {
 	segac2_common_init(segac2_prot_delegate(*this, FUNC(segac2_state::prot_func_dummy)));
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x840108, 0x840109, read16_delegate(*this, FUNC(segac2_state::ichirjbl_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x840108, 0x840109, read16smo_delegate(*this, FUNC(segac2_state::ichirjbl_prot_r)));
 }
 
 void segac2_state::init_puyopuy2()
@@ -2595,9 +2595,9 @@ void segac2_state::init_zunkyou()
 
 void segac2_state::init_pclub()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(*this, FUNC(segac2_state::printer_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(*this, FUNC(segac2_state::printer_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(*this, FUNC(segac2_state::print_club_camera_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16smo_delegate(*this, FUNC(segac2_state::printer_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16smo_delegate(*this, FUNC(segac2_state::printer_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16smo_delegate(*this, FUNC(segac2_state::print_club_camera_w)));
 }
 
 void segac2_state::init_pclubj()

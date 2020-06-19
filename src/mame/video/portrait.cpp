@@ -11,13 +11,13 @@
 #include "includes/portrait.h"
 
 
-WRITE8_MEMBER(portrait_state::bgvideo_write)
+void portrait_state::bgvideo_write(offs_t offset, uint8_t data)
 {
 	m_background->mark_tile_dirty(offset/2);
 	m_bgvideoram[offset] = data;
 }
 
-WRITE8_MEMBER(portrait_state::fgvideo_write)
+void portrait_state::fgvideo_write(offs_t offset, uint8_t data)
 {
 	m_foreground->mark_tile_dirty(offset/2);
 	m_fgvideoram[offset] = data;

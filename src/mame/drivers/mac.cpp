@@ -117,12 +117,12 @@ WRITE_LINE_MEMBER(mac_state::mac_rbv_vbl)
 	}
 }
 
-READ32_MEMBER( mac_state::rbv_ramdac_r )
+uint32_t mac_state::rbv_ramdac_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER( mac_state::rbv_ramdac_w )
+void mac_state::rbv_ramdac_w(offs_t offset, uint32_t data)
 {
 	if (!offset)
 	{
@@ -158,7 +158,7 @@ WRITE32_MEMBER( mac_state::rbv_ramdac_w )
 	}
 }
 
-WRITE32_MEMBER( mac_state::ariel_ramdac_w ) // this is for the "Ariel" style RAMDAC
+void mac_state::ariel_ramdac_w(offs_t offset, uint32_t data, uint32_t mem_mask) // this is for the "Ariel" style RAMDAC
 {
 	if (mem_mask == 0xff000000)
 	{
@@ -202,7 +202,7 @@ WRITE32_MEMBER( mac_state::ariel_ramdac_w ) // this is for the "Ariel" style RAM
 	}
 }
 
-READ8_MEMBER( mac_state::mac_sonora_vctl_r )
+uint8_t mac_state::mac_sonora_vctl_r(offs_t offset)
 {
 	if (offset == 2)
 	{
@@ -213,7 +213,7 @@ READ8_MEMBER( mac_state::mac_sonora_vctl_r )
 	return m_sonora_vctl[offset];
 }
 
-WRITE8_MEMBER( mac_state::mac_sonora_vctl_w )
+void mac_state::mac_sonora_vctl_w(offs_t offset, uint8_t data)
 {
 //  printf("Sonora: %02x to vctl %x\n", data, offset);
 	m_sonora_vctl[offset] = data;
@@ -252,7 +252,7 @@ void mac_state::rbv_recalc_irqs()
 	}
 }
 
-READ8_MEMBER ( mac_state::mac_rbv_r )
+uint8_t mac_state::mac_rbv_r(offs_t offset)
 {
 	int data = 0;
 
@@ -300,7 +300,7 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 	return data;
 }
 
-WRITE8_MEMBER ( mac_state::mac_rbv_w )
+void mac_state::mac_rbv_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x100)
 	{
@@ -422,24 +422,24 @@ VIDEO_START_MEMBER(mac_state,macprtb)
 {
 }
 
-READ16_MEMBER(mac_state::mac_config_r)
+uint16_t mac_state::mac_config_r()
 {
 	return 0xffff;  // returns nonzero if no PDS RAM expansion, 0 if present
 }
 
 // IIfx
-READ32_MEMBER(mac_state::biu_r)
+uint32_t mac_state::biu_r(offs_t offset, uint32_t mem_mask)
 {
 //  printf("biu_r @ %x, mask %08x\n", offset, mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(mac_state::biu_w)
+void mac_state::biu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("biu_w %x @ %x, mask %08x\n", data, offset, mem_mask);
 }
 
-READ8_MEMBER(mac_state::oss_r)
+uint8_t mac_state::oss_r(offs_t offset)
 {
 //  printf("oss_r @ %x\n", offset);
 //  if (offset <= 0xe)  // for interrupt mask registers, we're intended to return something different than is written in the low 3 bits (?)
@@ -450,42 +450,42 @@ READ8_MEMBER(mac_state::oss_r)
 	return m_oss_regs[offset];
 }
 
-WRITE8_MEMBER(mac_state::oss_w)
+void mac_state::oss_w(offs_t offset, uint8_t data)
 {
 //  printf("oss_w %x @ %x\n", data, offset);
 	m_oss_regs[offset] = data;
 }
 
-READ32_MEMBER(mac_state::buserror_r)
+uint32_t mac_state::buserror_r()
 {
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	return 0;
 }
 
-READ8_MEMBER(mac_state::scciop_r)
+uint8_t mac_state::scciop_r(offs_t offset)
 {
 //  printf("scciop_r @ %x (PC=%x)\n", offset, m_maincpu->pc());
 	return 0;
 }
 
-WRITE8_MEMBER(mac_state::scciop_w)
+void mac_state::scciop_w(offs_t offset, uint8_t data)
 {
 //  printf("scciop_w %x @ %x (PC=%x)\n", data, offset, m_maincpu->pc());
 }
 
-READ8_MEMBER(mac_state::swimiop_r)
+uint8_t mac_state::swimiop_r(offs_t offset)
 {
 //  printf("swimiop_r @ %x (PC=%x)\n", offset, m_maincpu->pc());
 	return 0;
 }
 
-WRITE8_MEMBER(mac_state::swimiop_w)
+void mac_state::swimiop_w(offs_t offset, uint8_t data)
 {
 //  printf("swimiop_w %x @ %x (PC=%x)\n", data, offset, m_maincpu->pc());
 }
 
-READ8_MEMBER(mac_state::pmac_diag_r)
+uint8_t mac_state::pmac_diag_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -496,25 +496,25 @@ READ8_MEMBER(mac_state::pmac_diag_r)
 	return 0;
 }
 
-READ8_MEMBER(mac_state::amic_dma_r)
+uint8_t mac_state::amic_dma_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(mac_state::amic_dma_w)
+void mac_state::amic_dma_w(offs_t offset, uint8_t data)
 {
 //  printf("amic_dma_w: %02x at %x (PC=%x)\n", data, offset+0x1000, m_maincpu->pc());
 }
 
 // HMC has one register: a 35-bit shift register which is accessed one bit at a time (see pmac6100 code at 4030383c which makes this obvious)
-READ8_MEMBER(mac_state::hmc_r)
+uint8_t mac_state::hmc_r()
 {
 	uint8_t rv = (uint8_t)(m_hmc_shiftout&1);
 	m_hmc_shiftout>>= 1;
 	return rv;
 }
 
-WRITE8_MEMBER(mac_state::hmc_w)
+void mac_state::hmc_w(offs_t offset, uint8_t data)
 {
 	// writes to xxx8 reset the bit shift position
 	if ((offset&0x8) == 8)
@@ -529,7 +529,7 @@ WRITE8_MEMBER(mac_state::hmc_w)
 	}
 }
 
-READ8_MEMBER(mac_state::mac_gsc_r)
+uint8_t mac_state::mac_gsc_r(offs_t offset)
 {
 	if (offset == 1)
 	{
@@ -539,11 +539,11 @@ READ8_MEMBER(mac_state::mac_gsc_r)
 	return 0;
 }
 
-WRITE8_MEMBER(mac_state::mac_gsc_w)
+void mac_state::mac_gsc_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(mac_state::mac_5396_r)
+uint8_t mac_state::mac_5396_r(offs_t offset)
 {
 	if (offset < 0x100)
 	{
@@ -558,7 +558,7 @@ READ8_MEMBER(mac_state::mac_5396_r)
 	//return 0;
 }
 
-WRITE8_MEMBER(mac_state::mac_5396_w)
+void mac_state::mac_5396_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x100)
 	{

@@ -36,21 +36,21 @@ public:
 private:
 	DECLARE_READ_LINE_MEMBER(clear_r);
 
-	void micromon_io(address_map &map);
-	void micromon_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	virtual void machine_reset() override;
 	uint8_t m_resetcnt;
 	required_device<cosmac_device> m_maincpu;
 };
 
-void micromon_state::micromon_mem(address_map &map)
+void micromon_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rom().region("maincpu", 0);
+	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram();
 }
 
-void micromon_state::micromon_io(address_map &map)
+void micromon_state::io_map(address_map &map)
 {
 }
 
@@ -77,8 +77,8 @@ void micromon_state::micromon(machine_config &config)
 {
 	// basic machine hardware
 	CDP1802(config, m_maincpu, 2457600);
-	m_maincpu->set_addrmap(AS_PROGRAM, &micromon_state::micromon_mem);
-	m_maincpu->set_addrmap(AS_IO, &micromon_state::micromon_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &micromon_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &micromon_state::io_map);
 	m_maincpu->wait_cb().set_constant(1);
 	m_maincpu->clear_cb().set(FUNC(micromon_state::clear_r));
 
@@ -93,4 +93,4 @@ ROM_START( micromon7141 )
 	ROM_LOAD( "702423_rev4.0_25_7_95.ic41", 0x1000, 0x1000, CRC(5efe6b4b) SHA1(b3670c53e2527e824cc22e4a54db9abf5a07239f) )
 ROM_END
 
-SYST( 1995?, micromon7141, 0, 0, micromon, micromon, micromon_state, empty_init, "Kontron Instruments",  "Micromon 7141 ECG unit",  MACHINE_IS_SKELETON )
+SYST( 1995?, micromon7141, 0, 0, micromon, micromon, micromon_state, empty_init, "Kontron Instruments",  "Micromon 7141 ECG unit",  MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

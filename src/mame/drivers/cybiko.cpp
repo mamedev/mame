@@ -118,12 +118,12 @@ void cybiko_state::cybikoxt_mem(address_map &map)
 	map(0xe00000, 0xefffff).r(FUNC(cybiko_state::cybikoxt_key_r));
 }
 
-WRITE16_MEMBER(cybiko_state::serflash_w)
+void cybiko_state::serflash_w(uint16_t data)
 {
 	m_flash1->cs_w ((data & 0x10) ? 0 : 1);
 }
 
-READ16_MEMBER(cybiko_state::clock_r)
+uint16_t cybiko_state::clock_r()
 {
 	if (m_rtc->sda_r())
 	{
@@ -133,13 +133,13 @@ READ16_MEMBER(cybiko_state::clock_r)
 	return 0x04;
 }
 
-WRITE16_MEMBER(cybiko_state::clock_w)
+void cybiko_state::clock_w(uint16_t data)
 {
 	m_rtc->scl_w((data & 0x02) ? 1 : 0);
 	m_rtc->sda_w((data & 0x01) ? 0 : 1);
 }
 
-READ16_MEMBER(cybiko_state::xtclock_r)
+uint16_t cybiko_state::xtclock_r()
 {
 	if (m_rtc->sda_r())
 	{
@@ -149,30 +149,30 @@ READ16_MEMBER(cybiko_state::xtclock_r)
 	return 0;
 }
 
-WRITE16_MEMBER(cybiko_state::xtclock_w)
+void cybiko_state::xtclock_w(uint16_t data)
 {
 	m_rtc->scl_w((data & 0x02) ? 1 : 0);
 	m_rtc->sda_w((data & 0x40) ? 0 : 1);
 }
 
-READ16_MEMBER(cybiko_state::xtpower_r)
+uint16_t cybiko_state::xtpower_r()
 {
 	// bit 7 = on/off button
 	// bit 6 = battery charged if "1"
 	return 0xc0;
 }
 
-READ16_MEMBER(cybiko_state::adc1_r)
+uint16_t cybiko_state::adc1_r()
 {
 	return 0x01;
 }
 
-READ16_MEMBER(cybiko_state::adc2_r)
+uint16_t cybiko_state::adc2_r()
 {
 	return 0x00;
 }
 
-READ16_MEMBER(cybiko_state::port0_r)
+uint16_t cybiko_state::port0_r()
 {
 	// bit 3 = on/off button
 	return 0x08;

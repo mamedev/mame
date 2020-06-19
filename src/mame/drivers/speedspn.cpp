@@ -59,14 +59,14 @@ TCH-SS9.u34     "     /               AB2Bh
 
 ******************************************************************************/
 
-READ8_MEMBER(speedspn_state::irq_ack_r)
+uint8_t speedspn_state::irq_ack_r()
 {
 	// I think this simply acknowledges the IRQ #0, it's read within the handler and the
 	//  value is discarded
 	return 0;
 }
 
-WRITE8_MEMBER(speedspn_state::rombank_w)
+void speedspn_state::rombank_w(uint8_t data)
 {
 	if (data > 8)
 	{
@@ -78,13 +78,13 @@ WRITE8_MEMBER(speedspn_state::rombank_w)
 
 /*** SOUND RELATED ***********************************************************/
 
-WRITE8_MEMBER(speedspn_state::sound_w)
+void speedspn_state::sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(speedspn_state::okibank_w)
+void speedspn_state::okibank_w(uint8_t data)
 {
 	m_okibank->set_entry(data & 3);
 }

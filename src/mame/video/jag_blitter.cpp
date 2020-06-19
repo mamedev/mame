@@ -173,31 +173,31 @@ void jag_blitter_device::regs_map(address_map &map)
 	map(0x3c, 0x3f).w(FUNC(jag_blitter_device::count_inner_w)).umask32(0x0000ffff);
 }
 
-WRITE32_MEMBER(jag_blitter_device::a1_base_w)
+void jag_blitter_device::a1_base_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_a1.base);
 	// align to phrase
 	m_a1.base &= ~7;
 }
 
-WRITE16_MEMBER(jag_blitter_device::a1_xstep_w)
+void jag_blitter_device::a1_xstep_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_a1.xstep);
 }
 
-WRITE16_MEMBER(jag_blitter_device::a1_ystep_w)
+void jag_blitter_device::a1_ystep_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_a1.ystep);
 }
 
-READ32_MEMBER(jag_blitter_device::status_r)
+u32 jag_blitter_device::status_r()
 {
 	// TODO: stopped bit
 	// TODO: diag bits 2-31
 	return m_status_idle;
 }
 
-WRITE32_MEMBER(jag_blitter_device::command_w)
+void jag_blitter_device::command_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_command_latch);
 	// TODO: is it possible from 68k to write on this in byte units?
@@ -207,7 +207,7 @@ WRITE32_MEMBER(jag_blitter_device::command_w)
 		command_start();
 }
 
-WRITE16_MEMBER(jag_blitter_device::count_outer_w)
+void jag_blitter_device::count_outer_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_count_lines);
 	if (m_count_lines == 0)
@@ -218,7 +218,7 @@ WRITE16_MEMBER(jag_blitter_device::count_outer_w)
 	}
 }
 
-WRITE16_MEMBER(jag_blitter_device::count_inner_w)
+void jag_blitter_device::count_inner_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_count_pixels);
 	if (m_count_pixels == 0)

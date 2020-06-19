@@ -8,15 +8,17 @@
 
 #include "emu.h"
 
+#include "qbus.h"
+
 // Peripheral boards
 #include "pc11.h"
-
-#include "qbus.h"
+#include "qtx.h"
 
 
 void qbus_cards(device_slot_interface &device)
 {
 	device.option_add("pc11", DEC_PC11); /* Paper tape reader and punch */
+	device.option_add("qts1", TTI_QTS1);
 }
 
 
@@ -131,7 +133,7 @@ void qbus_device::add_card(device_qbus_card_interface *card)
 	m_device_list.append(*card);
 }
 
-void qbus_device::install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask)
+void qbus_device::install_device(offs_t start, offs_t end, read16sm_delegate rhandler, write16sm_delegate whandler, uint32_t mask)
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
 }

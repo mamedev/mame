@@ -25,7 +25,7 @@
 #include "speaker.h"
 
 
-READ8_MEMBER(bottom9_state::k052109_051960_r)
+uint8_t bottom9_state::k052109_051960_r(offs_t offset)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
@@ -40,7 +40,7 @@ READ8_MEMBER(bottom9_state::k052109_051960_r)
 		return m_k052109->read(offset);
 }
 
-WRITE8_MEMBER(bottom9_state::k052109_051960_w)
+void bottom9_state::k052109_051960_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
 		m_k051960->k051937_w(offset - 0x3800, data);
@@ -50,10 +50,10 @@ WRITE8_MEMBER(bottom9_state::k052109_051960_w)
 		m_k051960->k051960_w(offset - 0x3c00, data);
 }
 
-READ8_MEMBER(bottom9_state::bottom9_bankedram1_r)
+uint8_t bottom9_state::bottom9_bankedram1_r(offs_t offset)
 {
 	if (m_k052109_selected)
-		return k052109_051960_r(space, offset);
+		return k052109_051960_r(offset);
 	else
 	{
 		if (m_zoomreadroms)
@@ -63,31 +63,31 @@ READ8_MEMBER(bottom9_state::bottom9_bankedram1_r)
 	}
 }
 
-WRITE8_MEMBER(bottom9_state::bottom9_bankedram1_w)
+void bottom9_state::bottom9_bankedram1_w(offs_t offset, uint8_t data)
 {
 	if (m_k052109_selected)
-		k052109_051960_w(space, offset, data);
+		k052109_051960_w(offset, data);
 	else
 		m_k051316->write(offset, data);
 }
 
-READ8_MEMBER(bottom9_state::bottom9_bankedram2_r)
+uint8_t bottom9_state::bottom9_bankedram2_r(offs_t offset)
 {
 	if (m_k052109_selected)
-		return k052109_051960_r(space, offset + 0x2000);
+		return k052109_051960_r(offset + 0x2000);
 	else
 		return m_palette->basemem().read8(offset);
 }
 
-WRITE8_MEMBER(bottom9_state::bottom9_bankedram2_w)
+void bottom9_state::bottom9_bankedram2_w(offs_t offset, uint8_t data)
 {
 	if (m_k052109_selected)
-		k052109_051960_w(space, offset + 0x2000, data);
+		k052109_051960_w(offset + 0x2000, data);
 	else
 		m_palette->write8(offset, data);
 }
 
-WRITE8_MEMBER(bottom9_state::bankswitch_w)
+void bottom9_state::bankswitch_w(uint8_t data)
 {
 	int bank;
 
@@ -104,7 +104,7 @@ WRITE8_MEMBER(bottom9_state::bankswitch_w)
 	membank("bank1")->set_entry(bank);
 }
 
-WRITE8_MEMBER(bottom9_state::bottom9_1f90_w)
+void bottom9_state::bottom9_1f90_w(uint8_t data)
 {
 	/* bits 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -123,7 +123,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_1f90_w)
 	m_k052109_selected = data & 0x20;
 }
 
-WRITE8_MEMBER(bottom9_state::bottom9_sh_irqtrigger_w)
+void bottom9_state::bottom9_sh_irqtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
@@ -134,12 +134,12 @@ INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_sound_interrupt)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(bottom9_state::nmi_enable_w)
+void bottom9_state::nmi_enable_w(uint8_t data)
 {
 	m_nmienable = data;
 }
 
-WRITE8_MEMBER(bottom9_state::sound_bank_w)
+void bottom9_state::sound_bank_w(uint8_t data)
 {
 	int bank_A, bank_B;
 

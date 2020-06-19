@@ -50,9 +50,9 @@
 //  ff20_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco3_state::ff20_write )
+void coco3_state::ff20_write(offs_t offset, uint8_t data)
 {
-	coco_state::ff20_write(space, offset, data, mem_mask);
+	coco_state::ff20_write(offset, data);
 
 	if (offset == 0x02)
 		m_gime->ff22_write(data);
@@ -64,11 +64,11 @@ WRITE8_MEMBER( coco3_state::ff20_write )
 //  ff40_read
 //-------------------------------------------------
 
-READ8_MEMBER( coco3_state::ff40_read )
+uint8_t coco3_state::ff40_read(offs_t offset)
 {
 	uint8_t result = 0x00;
 	if (m_gime->spare_chip_select_enabled())
-		result = coco_state::ff40_read(space, offset, mem_mask);
+		result = coco_state::ff40_read(offset);
 	return result;
 }
 
@@ -78,10 +78,10 @@ READ8_MEMBER( coco3_state::ff40_read )
 //  ff40_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco3_state::ff40_write )
+void coco3_state::ff40_write(offs_t offset, uint8_t data)
 {
 	if (m_gime->spare_chip_select_enabled())
-		coco_state::ff40_write(space, offset, data, mem_mask);
+		coco_state::ff40_write(offset, data);
 }
 
 

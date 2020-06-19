@@ -52,11 +52,11 @@ public:
 protected:
 	// handlers
 	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
-	DECLARE_READ8_MEMBER(champbja_protection_r);
+	uint8_t champbja_protection_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
-	DECLARE_WRITE8_MEMBER(tilemap_w);
+	void tilemap_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);

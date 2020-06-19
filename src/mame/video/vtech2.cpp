@@ -296,7 +296,7 @@ uint32_t vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-WRITE8_MEMBER(vtech2_state::laser_bg_mode_w)
+void vtech2_state::laser_bg_mode_w(uint8_t data)
 {
 	if (m_laser_bg_mode != data)
 	{
@@ -305,7 +305,7 @@ WRITE8_MEMBER(vtech2_state::laser_bg_mode_w)
 	}
 }
 
-WRITE8_MEMBER(vtech2_state::laser_two_color_w)
+void vtech2_state::laser_two_color_w(uint8_t data)
 {
 	if (m_laser_two_color != data)
 	{

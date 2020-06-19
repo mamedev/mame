@@ -42,7 +42,7 @@ TIMER_CALLBACK_MEMBER(starwars_state::math_run_clear)
  *
  *************************************/
 
-WRITE8_MEMBER(starwars_state::starwars_nstore_w)
+void starwars_state::starwars_nstore_w(uint8_t data)
 {
 	m_novram->store(0);
 	m_novram->store(1);
@@ -302,7 +302,7 @@ void starwars_state::run_mproc()
  *
  *************************************/
 
-READ8_MEMBER(starwars_state::starwars_prng_r)
+uint8_t starwars_state::starwars_prng_r()
 {
 	/*
 	 * The PRNG is a modified 23 bit LFSR. Taps are at 4 and 22 so the
@@ -332,19 +332,19 @@ WRITE_LINE_MEMBER(starwars_state::prng_reset_w)
  *
  *************************************/
 
-READ8_MEMBER(starwars_state::starwars_div_reh_r)
+uint8_t starwars_state::starwars_div_reh_r()
 {
 	return (m_quotient_shift & 0xff00) >> 8;
 }
 
 
-READ8_MEMBER(starwars_state::starwars_div_rel_r)
+uint8_t starwars_state::starwars_div_rel_r()
 {
 	return m_quotient_shift & 0x00ff;
 }
 
 
-WRITE8_MEMBER(starwars_state::starwars_math_w)
+void starwars_state::starwars_math_w(offs_t offset, uint8_t data)
 {
 	int i;
 

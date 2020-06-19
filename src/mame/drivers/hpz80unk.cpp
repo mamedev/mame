@@ -61,56 +61,57 @@ public:
 	void hpz80unk(machine_config &config);
 
 private:
-	uint8_t port00_r();
-	uint8_t port02_r();
-	uint8_t port03_r();
-	uint8_t port0d_r();
-	uint8_t portfc_r();
+	u8 port00_r();
+	u8 port02_r();
+	u8 port03_r();
+	u8 port0d_r();
+	u8 portfc_r();
 
-	void hpz80unk_io(address_map &map);
-	void hpz80unk_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
-	uint8_t m_port02_data;
-	virtual void machine_reset() override;
+	u8 m_port02_data;
+	void machine_reset() override;
+	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_rom;
+	required_shared_ptr<u8> m_p_rom;
 	required_device_array<ay51013_device, 3> m_uart;
 };
 
-uint8_t hpz80unk_state::port00_r()
+u8 hpz80unk_state::port00_r()
 {
 	return (m_uart[0]->dav_r() << 1) | (m_uart[0]->tbmt_r()) | 0xfc;
 }
 
-uint8_t hpz80unk_state::port02_r()
+u8 hpz80unk_state::port02_r()
 {
 	m_port02_data ^= 1;
 	return m_port02_data;
 }
 
-uint8_t hpz80unk_state::port03_r()
+u8 hpz80unk_state::port03_r()
 {
 	return (m_uart[1]->dav_r() << 1) | (m_uart[1]->tbmt_r()) | 0xfc;
 }
 
-uint8_t hpz80unk_state::port0d_r()
+u8 hpz80unk_state::port0d_r()
 {
 	return (m_uart[2]->dav_r() << 1) | (m_uart[2]->tbmt_r()) | 0xfc;
 }
 
-uint8_t hpz80unk_state::portfc_r()
+u8 hpz80unk_state::portfc_r()
 {
 	return 0xfe; // or it halts
 }
 
-void hpz80unk_state::hpz80unk_mem(address_map &map)
+void hpz80unk_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xbfff).ram();
 	map(0xc000, 0xffff).rom().share("rom");
 }
 
-void hpz80unk_state::hpz80unk_io(address_map &map)
+void hpz80unk_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -138,10 +139,15 @@ static INPUT_PORTS_START( hpz80unk )
 INPUT_PORTS_END
 
 
+void hpz80unk_state::machine_start()
+{
+	save_item(NAME(m_port02_data));
+}
+
 void hpz80unk_state::machine_reset()
 {
-	uint8_t* user1 = memregion("user1")->base();
-	memcpy((uint8_t*)m_p_rom, user1, 0x4000);
+	u8* user1 = memregion("user1")->base();
+	memcpy((u8*)m_p_rom, user1, 0x4000);
 	m_maincpu->set_pc(0xc000);
 
 	// no idea if these are hard-coded, or programmable
@@ -167,8 +173,8 @@ void hpz80unk_state::hpz80unk(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &hpz80unk_state::hpz80unk_mem);
-	m_maincpu->set_addrmap(AS_IO, &hpz80unk_state::hpz80unk_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hpz80unk_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &hpz80unk_state::io_map);
 
 	AY51013(config, m_uart[0]); // COM2502
 	m_uart[0]->read_si_callback().set("rs232a", FUNC(rs232_port_device::rxd_r));
@@ -223,4 +229,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY            FULLNAME                       FLAGS
-COMP( 1977, hpz80unk, 0,      0,      hpz80unk, hpz80unk, hpz80unk_state, empty_init, "Hewlett-Packard", "unknown Z80-based mainframe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1977, hpz80unk, 0,      0,      hpz80unk, hpz80unk, hpz80unk_state, empty_init, "Hewlett-Packard", "unknown Z80-based mainframe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

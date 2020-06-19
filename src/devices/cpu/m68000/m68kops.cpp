@@ -11402,7 +11402,7 @@ void m68000_base_device::x0c80_cmpi_l_071234fc()
 	u32 res = dst - src;
 
 	if (!m_cmpild_instr_callback.isnull())
-		(m_cmpild_instr_callback)(*m_program, m_ir & 7, src, 0xffffffff);
+		(m_cmpild_instr_callback)(m_ir & 7, src);
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);

@@ -100,7 +100,7 @@ TODO:
 #include "speaker.h"
 
 
-WRITE16_MEMBER(playmark_state::coinctrl_w)
+void playmark_state::coinctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -118,7 +118,7 @@ WRITE16_MEMBER(playmark_state::coinctrl_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(playmark_state::wbeachvl_coin_eeprom_w)
+void playmark_state::wbeachvl_coin_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -135,7 +135,7 @@ WRITE16_MEMBER(playmark_state::wbeachvl_coin_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
+void playmark_state::hotmind_coin_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -163,7 +163,7 @@ WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::luckboomh_dispenser_w)
+void playmark_state::luckboomh_dispenser_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -187,13 +187,13 @@ WRITE16_MEMBER(playmark_state::luckboomh_dispenser_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_coin_w)
+void playmark_state::hrdtimes_coin_w(uint16_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
 
-WRITE16_MEMBER(playmark_state::playmark_snd_command_w)
+void playmark_state::playmark_snd_command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

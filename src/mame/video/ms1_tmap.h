@@ -43,9 +43,9 @@ public:
 	void set_colorbase(uint16_t colorbase) { m_colorbase = colorbase; }
 
 	// memory handlers
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_READ16_MEMBER(scroll_r);
-	DECLARE_WRITE16_MEMBER(scroll_w);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t scroll_r(offs_t offset);
+	void scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// drawing and layer control
 	void draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority = 0, uint8_t priority_mask = 0xff);

@@ -24,7 +24,7 @@ class pv1000_sound_device : public device_t,
 public:
 	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(voice_w);
+	void voice_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -77,7 +77,7 @@ void pv1000_sound_device::device_start()
 	save_item(NAME(m_voice[3].val));
 }
 
-WRITE8_MEMBER(pv1000_sound_device::voice_w)
+void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
 {
 	offset &= 0x03;
 	m_voice[offset].period = data;
@@ -148,8 +148,8 @@ public:
 	void pv1000(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(io_r);
+	void io_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
 	void gfxram_w(offs_t offset, uint8_t data);
 	uint8_t   m_io_regs[8];
 	uint8_t   m_fd_data;
@@ -206,7 +206,7 @@ void pv1000_state::gfxram_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE8_MEMBER( pv1000_state::io_w )
+void pv1000_state::io_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -214,7 +214,7 @@ WRITE8_MEMBER( pv1000_state::io_w )
 	case 0x01:
 	case 0x02:
 		//logerror("io_w offset=%02x, data=%02x (%03d)\n", offset, data , data);
-		m_sound->voice_w(space, offset, data);
+		m_sound->voice_w(offset, data);
 	break;
 
 	case 0x03:
@@ -237,7 +237,7 @@ WRITE8_MEMBER( pv1000_state::io_w )
 }
 
 
-READ8_MEMBER( pv1000_state::io_r )
+uint8_t pv1000_state::io_r(offs_t offset)
 {
 	uint8_t data = m_io_regs[offset];
 

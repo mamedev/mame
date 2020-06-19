@@ -386,11 +386,15 @@ license:CC0
 <!-- LCD panel -->
 
 	<element name="text_lcd"><text string="GRAPHIC DISPLAY MODUL"><color red="0.64" green="0.59" blue="0.30" /></text></element>
-	<element name="static_lcd"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
+	<element name="lcdw"><rect><color red="1" green="1" blue="1" /></rect></element>
+	<element name="lcdm"><rect><color red="0.36" green="0.42" blue="0.42" /></rect></element>
+	<element name="lcda"><rect><color red="0.20" green="0.16" blue="0.17" /></rect></element>
 
 	<group name="panel">
-		<element ref="static_lcd"><bounds x="0" y="0" width="24.5" height="6.5" /></element>
-		<screen index="0" blend="alpha"><bounds x="0.25" y="1" width="24" height="4.5" /></screen>
+		<element ref="lcdw"><bounds x="0" y="0" width="1" height="1" /></element>
+		<screen index="0"><bounds x="0.02" y="0.1" width="0.96" height="0.8" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds x="0" y="0" width="1" height="1" /></element>
+		<element ref="lcda" blend="add"><bounds x="0" y="0" width="1" height="1" /></element>
 	</group>
 
 

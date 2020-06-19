@@ -60,7 +60,7 @@ public:
 	};
 
 	// write trigger memory handler
-	DECLARE_WRITE16_MEMBER( draw_write );
+	void draw_write(uint16_t data);
 
 protected:
 	// device-level overrides

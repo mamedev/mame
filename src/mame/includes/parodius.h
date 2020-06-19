@@ -52,10 +52,10 @@ public:
 	required_device<k052109_device> m_k052109;
 	required_device<k05324x_device> m_k053245;
 	required_device<k053251_device> m_k053251;
-	DECLARE_WRITE8_MEMBER(parodius_videobank_w);
-	DECLARE_WRITE8_MEMBER(parodius_3fc0_w);
-	DECLARE_WRITE8_MEMBER(parodius_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
+	void parodius_videobank_w(uint8_t data);
+	void parodius_3fc0_w(uint8_t data);
+	void parodius_sh_irqtrigger_w(uint8_t data);
+	void sound_arm_nmi_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_parodius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
