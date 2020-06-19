@@ -23,7 +23,6 @@ public:
 	template <typename T> void set_region3(T &&tag) { m_region3.set_tag(std::forward<T>(tag)); }
 	void set_channels(int channels) { m_channels = channels; }
 
-	u32 exbank() { return m_exbank; }
 	auto irq_cb() { return m_irq_cb.bind(); }
 	auto read_port_cb() { return m_read_port_cb.bind(); }
 	auto sample_rate_changed() { return m_sample_rate_changed_cb.bind(); }
@@ -115,12 +114,6 @@ protected:
 	inline void generate_irq(es550x_voice *voice, int v);
 	virtual void generate_samples(s32 **outputs, int offset, int samples) {};
 
-	inline void update_exbank(es550x_voice *voice)
-	{
-		// pre-add the bank offset
-		m_exbank = voice->exbank;
-	}
-
 	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) { return 0; }
 
 	// internal state
@@ -169,7 +162,6 @@ public:
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
-	void voice_bank_w(int voice, u32 bank);
 
 protected:
 	// device-level overrides
@@ -197,7 +189,7 @@ protected:
 	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) override;
 	virtual void generate_samples(s32 **outputs, int offset, int samples) override;
 
-	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { update_exbank(voice); return m_cache[get_bank(voice->control)].read_word(addr); }
+	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { return m_cache[get_bank(voice->control)].read_word(addr); }
 
 private:
 	inline void reg_write_low(es550x_voice *voice, offs_t offset, u32 data);
@@ -229,6 +221,8 @@ public:
 	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void voice_bank_w(int voice, u32 bank);
 
+	u32 exbank() { return m_exbank; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -252,7 +246,7 @@ protected:
 	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) override;
 	virtual void generate_samples(s32 **outputs, int offset, int samples) override;
 
-	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { update_exbank(voice); return m_cache[get_bank(voice->control)].read_word(addr); }
+	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { m_exbank = voice->exbank; return m_cache[get_bank(voice->control)].read_word(addr); }
 
 private:
 	// internal state
@@ -264,6 +258,8 @@ private:
 	inline u16 reg_read_test(es550x_voice *voice, offs_t offset);
 
 	memory_access<20, 1, -1, ENDIANNESS_BIG>::cache m_cache[2];
+
+	u32           m_exbank;               // current external bankswitch value, ES5505 specific?
 };
 
 DECLARE_DEVICE_TYPE(ES5505, es5505_device)

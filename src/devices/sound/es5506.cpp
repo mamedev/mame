@@ -154,10 +154,14 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 	, m_stream(nullptr)
 	, m_sample_rate(0)
 	, m_master_clock(0)
+	, m_address_acc_shift(0)
+	, m_address_acc_mask(0)
+	, m_volume_shift(0)
+	, m_volume_acc_shift(0)
 	, m_current_page(0)
 	, m_active_voices(0)
 	, m_mode(0)
-	, m_irqv(0)
+	, m_irqv(0x80)
 	, m_scratch(nullptr)
 	, m_ulaw_lookup(nullptr)
 	, m_volume_lookup(nullptr)
@@ -213,7 +217,6 @@ void es550x_device::device_start()
 	save_item(NAME(m_active_voices));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_irqv));
-	save_item(NAME(m_exbank));
 
 	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
 
@@ -357,6 +360,7 @@ es5505_device::es5505_device(const machine_config &mconfig, const char *tag, dev
 	: es550x_device(mconfig, ES5505, tag, owner, clock)
 	, m_bank0_config("bank0", ENDIANNESS_BIG, 16, 20, -1) // 20 bit address bus, word addressing only
 	, m_bank1_config("bank1", ENDIANNESS_BIG, 16, 20, -1)
+	, m_exbank(0)
 {
 }
 
@@ -395,6 +399,7 @@ void es5505_device::device_start()
 	// 20 bit integer and 9 bit fraction
 	get_accum_mask(ADDRESS_INTEGER_BIT_ES5505, ADDRESS_FRAC_BIT_ES5505);
 
+	save_item(NAME(m_exbank));
 	// success
 }
 
@@ -1588,13 +1593,6 @@ u8 es5506_device::read(offs_t offset)
 
 	// return the high byte
 	return m_read_latch >> 24;
-}
-
-
-
-void es5506_device::voice_bank_w(int voice, u32 bank)
-{
-	m_voice[voice].exbank = bank;
 }
 
 
