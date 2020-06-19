@@ -1066,6 +1066,7 @@ sbasketb.cpp
 sbowling.cpp
 sbrkout.cpp
 sbugger.cpp
+schick.cpp
 scm_500.cpp
 scobra.cpp
 scotrsht.cpp
