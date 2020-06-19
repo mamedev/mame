@@ -31,7 +31,7 @@ namespace
 		virtual bool append_single_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) override;
 
 	private:
-		avi_file::ptr       m_avi_file;                 // handle to the open movie file
+		avi_file::ptr m_avi_file; // handle to the open movie file
 	};
 
 
@@ -48,8 +48,8 @@ namespace
 		virtual bool append_single_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) override;
 
 	private:
-		std::unique_ptr<emu_file>           m_mng_file;           // handle to the open movie file
-		std::map<std::string, std::string>  m_info_fields;
+		std::unique_ptr<emu_file> m_mng_file; // handle to the open movie file
+		std::map<std::string, std::string> m_info_fields;
 	};
 };
 
@@ -64,9 +64,10 @@ namespace
 
 movie_recording::movie_recording(screen_device *screen)
 	: m_screen(screen)
+	, m_frame_period(attotime::zero)
+	, m_next_frame_time(attotime::zero)
 	, m_frame(0)
 {
-	m_frame_period = m_screen ? m_screen->frame_period() : attotime::from_hz(screen_device::DEFAULT_FRAME_RATE);
 }
 
 
@@ -174,7 +175,7 @@ bool avi_movie_recording::initialize(running_machine &machine, std::unique_ptr<e
 	// build up information about this new movie
 	avi_file::movie_info info;
 	info.video_format = 0;
-	info.video_timescale = 1000 * frame_period().as_hz();
+	info.video_timescale = 1000 * (screen() ? screen()->frame_period().as_hz() : screen_device::DEFAULT_FRAME_RATE);
 	info.video_sampletime = 1000;
 	info.video_numsamples = 0;
 	info.video_width = width;
@@ -188,6 +189,9 @@ bool avi_movie_recording::initialize(running_machine &machine, std::unique_ptr<e
 	info.audio_channels = 2;
 	info.audio_samplebits = 16;
 	info.audio_samplerate = machine.sample_rate();
+
+	// compute the frame time
+	set_frame_period(attotime::from_seconds(1000) / info.video_timescale);
 
 	// create the file
 	avi_file::error avierr = avi_file::create(fullpath, info, m_avi_file);
@@ -212,7 +216,7 @@ bool avi_movie_recording::append_single_video_frame(bitmap_rgb32 &bitmap, const 
 //  avi_movie_recording::append_video_frame
 //-------------------------------------------------
 
- bool avi_movie_recording::add_sound_to_recording(const s16 *sound, int numsamples)
+bool avi_movie_recording::add_sound_to_recording(const s16 *sound, int numsamples)
 {
 	g_profiler.start(PROFILER_MOVIE_REC);
 
@@ -254,8 +258,13 @@ mng_movie_recording::~mng_movie_recording()
 
 bool mng_movie_recording::initialize(std::unique_ptr<emu_file> &&file, bitmap_t &snap_bitmap)
 {
+	// compute the frame time (MNG rate is an unsigned integer)
+	attotime period = screen() ? screen()->frame_period() : attotime::from_hz(screen_device::DEFAULT_FRAME_RATE);
+	u32 rate = u32(period.as_hz());
+	set_frame_period(attotime::from_hz(rate));
+
 	m_mng_file = std::move(file);
-	png_error pngerr = mng_capture_start(*m_mng_file, snap_bitmap, frame_period().as_hz());
+	png_error pngerr = mng_capture_start(*m_mng_file, snap_bitmap, rate);
 	if (pngerr != PNGERR_NONE)
 		osd_printf_error("Error capturing MNG, png_error=%d\n", pngerr);
 	return pngerr == PNGERR_NONE;

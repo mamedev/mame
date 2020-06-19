@@ -276,7 +276,7 @@ void running_machine::start()
 		m_video->begin_recording(filename, movie_recording::format::MNG);
 
 	filename = options().avi_write();
-	if (filename[0] != 0)
+	if (filename[0] != 0 && !m_video->is_recording())
 		m_video->begin_recording(filename, movie_recording::format::AVI);
 
 	// if we're coming in with a savegame request, process it now
