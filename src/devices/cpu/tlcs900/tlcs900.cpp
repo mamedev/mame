@@ -108,7 +108,6 @@ void tlcs900h_device::device_start()
 	save_item( NAME(m_dmad) );
 	save_item( NAME(m_dmac) );
 	save_item( NAME(m_dmam) );
-	save_item( NAME(m_reg) );
 	save_item( NAME(m_timer_pre) );
 	save_item( NAME(m_timer) );
 	save_item( NAME(m_timer_change) );
@@ -164,6 +163,21 @@ void tlcs900h_device::device_start()
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_sr.w.l ).formatstr("%12s").noshow();
 
 	set_icountptr(m_icount);
+}
+
+void tlcs900h_device::device_reset()
+{
+	m_pc.b.l = RDMEM( 0xFFFF00 );
+	m_pc.b.h = RDMEM( 0xFFFF01 );
+	m_pc.b.h2 = RDMEM( 0xFFFF02 );
+	m_pc.b.h3 = 0;
+	/* system mode, iff set to 111, max mode, register bank 0 */
+	m_sr.d = 0xF800;
+	m_regbank = 0;
+	m_xssp.d = 0x0100;
+	m_halted = 0;
+	m_check_irqs = 0;
+	m_prefetch_clear = true;
 }
 
 

@@ -29,13 +29,107 @@ tmp95c061_device::tmp95c061_device(const machine_config &mconfig, const char *ta
 	m_porta_read(*this),
 	m_porta_write(*this),
 	m_portb_read(*this),
-	m_portb_write(*this)
+	m_portb_write(*this),
+	m_port_latch{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	m_port_control{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	m_port_function{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	m_trun(0),
+	m_t8_reg{ 0, 0, 0, 0 },
+	m_t8_mode{ 0, 0 },
+	m_t8_invert(0),
+	m_trdc(0),
+	m_to1(0),
+	m_to3(0),
+	m_t16_reg{ 0, 0, 0, 0 },
+	m_t16_cap{ 0, 0, 0, 0 },
+	m_t16_mode{ 0, 0 },
+	m_t16_invert{ 0, 0 },
+	m_t45cr(0),
+	m_pgreg{ 0, 0 },
+	m_pg01cr(0),
+	m_watchdog_mode(0),
+	m_serial_control{ 0, 0 },
+	m_serial_mode{ 0, 0 },
+	m_baud_rate{ 0, 0 },
+	m_od_enable(0),
+	m_ad_result{ 0, 0, 0, 0 },
+	m_ad_mode(0),
+	m_int_reg{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	m_iimc(0),
+	m_dma_vector{ 0, 0, 0, 0 },
+	m_block_cs{ 0, 0, 0, 0 },
+	m_external_cs(0),
+	m_mem_start_reg{ 0, 0, 0, 0 },
+	m_mem_start_mask{ 0, 0, 0, 0 },
+	m_dram_refresh(0),
+	m_dram_access(0)
 {
 }
 
 void tmp95c061_device::internal_mem(address_map &map)
 {
-	map(0x000000, 0x00007f).rw(FUNC(tmp95c061_device::internal_r), FUNC(tmp95c061_device::internal_w));
+	map(0x000001, 0x000001).rw(FUNC(tmp95c061_device::p1_r), FUNC(tmp95c061_device::p1_w));
+	map(0x000004, 0x000004).w(FUNC(tmp95c061_device::p1cr_w));
+	map(0x000006, 0x000006).rw(FUNC(tmp95c061_device::p2_r), FUNC(tmp95c061_device::p2_w));
+	map(0x000009, 0x000009).w(FUNC(tmp95c061_device::p2fc_w));
+	map(0x00000d, 0x00000d).rw(FUNC(tmp95c061_device::p5_r), FUNC(tmp95c061_device::p5_w));
+	map(0x000010, 0x000010).w(FUNC(tmp95c061_device::p5cr_w));
+	map(0x000011, 0x000011).w(FUNC(tmp95c061_device::p5fc_w));
+	map(0x000012, 0x000012).rw(FUNC(tmp95c061_device::p6_r), FUNC(tmp95c061_device::p6_w));
+	map(0x000013, 0x000013).rw(FUNC(tmp95c061_device::p7_r), FUNC(tmp95c061_device::p7_w));
+	map(0x000015, 0x000015).w(FUNC(tmp95c061_device::p6fc_w));
+	map(0x000016, 0x000016).w(FUNC(tmp95c061_device::p7cr_w));
+	map(0x000017, 0x000017).w(FUNC(tmp95c061_device::p7fc_w));
+	map(0x000018, 0x000018).rw(FUNC(tmp95c061_device::p8_r), FUNC(tmp95c061_device::p8_w));
+	map(0x000019, 0x000019).r(FUNC(tmp95c061_device::p9_r));
+	map(0x00001a, 0x00001a).w(FUNC(tmp95c061_device::p8cr_w));
+	map(0x00001b, 0x00001b).w(FUNC(tmp95c061_device::p8fc_w));
+	map(0x00001e, 0x00001e).rw(FUNC(tmp95c061_device::pa_r), FUNC(tmp95c061_device::pa_w));
+	map(0x00001f, 0x00001f).rw(FUNC(tmp95c061_device::pb_r), FUNC(tmp95c061_device::pb_w));
+	map(0x000020, 0x000020).rw(FUNC(tmp95c061_device::trun_r), FUNC(tmp95c061_device::trun_w));
+	map(0x000022, 0x000023).w(FUNC(tmp95c061_device::treg01_w));
+	map(0x000024, 0x000024).w(FUNC(tmp95c061_device::t01mod_w));
+	map(0x000025, 0x000025).rw(FUNC(tmp95c061_device::tffcr_r), FUNC(tmp95c061_device::tffcr_w));
+	map(0x000026, 0x000027).w(FUNC(tmp95c061_device::treg23_w));
+	map(0x000028, 0x000028).w(FUNC(tmp95c061_device::t23mod_w));
+	map(0x000029, 0x000029).rw(FUNC(tmp95c061_device::trdc_r), FUNC(tmp95c061_device::trdc_w));
+	map(0x00002c, 0x00002c).w(FUNC(tmp95c061_device::pacr_w));
+	map(0x00002d, 0x00002d).w(FUNC(tmp95c061_device::pafc_w));
+	map(0x00002e, 0x00002e).w(FUNC(tmp95c061_device::pbcr_w));
+	map(0x00002f, 0x00002f).w(FUNC(tmp95c061_device::pbfc_w));
+	map(0x000030, 0x000033).w(FUNC(tmp95c061_device::treg45_w));
+	map(0x000034, 0x000037).r(FUNC(tmp95c061_device::cap12_r));
+	map(0x000038, 0x000038).rw(FUNC(tmp95c061_device::t4mod_r), FUNC(tmp95c061_device::t4mod_w));
+	map(0x000039, 0x000039).rw(FUNC(tmp95c061_device::t4ffcr_r), FUNC(tmp95c061_device::t4ffcr_w));
+	map(0x00003a, 0x00003a).rw(FUNC(tmp95c061_device::t45cr_r), FUNC(tmp95c061_device::t45cr_w));
+	map(0x00003c, 0x00003f).rw(FUNC(tmp95c061_device::msar01_r), FUNC(tmp95c061_device::msar01_w));
+	map(0x000040, 0x000043).w(FUNC(tmp95c061_device::treg67_w));
+	map(0x000044, 0x000047).r(FUNC(tmp95c061_device::cap34_r));
+	map(0x000048, 0x000048).rw(FUNC(tmp95c061_device::t5mod_r), FUNC(tmp95c061_device::t5mod_w));
+	map(0x000049, 0x000049).rw(FUNC(tmp95c061_device::t5ffcr_r), FUNC(tmp95c061_device::t5ffcr_w));
+	map(0x00004c, 0x00004d).rw(FUNC(tmp95c061_device::pgreg_r), FUNC(tmp95c061_device::pgreg_w));
+	map(0x00004e, 0x00004e).rw(FUNC(tmp95c061_device::pg01cr_r), FUNC(tmp95c061_device::pg01cr_w));
+	map(0x000050, 0x000050).rw(FUNC(tmp95c061_device::sc0buf_r), FUNC(tmp95c061_device::sc0buf_w));
+	map(0x000051, 0x000051).rw(FUNC(tmp95c061_device::sc0cr_r), FUNC(tmp95c061_device::sc0cr_w));
+	map(0x000052, 0x000052).rw(FUNC(tmp95c061_device::sc0mod_r), FUNC(tmp95c061_device::sc0mod_w));
+	map(0x000053, 0x000053).rw(FUNC(tmp95c061_device::br0cr_r), FUNC(tmp95c061_device::br0cr_w));
+	map(0x000054, 0x000054).rw(FUNC(tmp95c061_device::sc1buf_r), FUNC(tmp95c061_device::sc1buf_w));
+	map(0x000055, 0x000055).rw(FUNC(tmp95c061_device::sc1cr_r), FUNC(tmp95c061_device::sc1cr_w));
+	map(0x000056, 0x000056).rw(FUNC(tmp95c061_device::sc1mod_r), FUNC(tmp95c061_device::sc1mod_w));
+	map(0x000057, 0x000057).rw(FUNC(tmp95c061_device::br1cr_r), FUNC(tmp95c061_device::br1cr_w));
+	map(0x000058, 0x000058).rw(FUNC(tmp95c061_device::ode_r), FUNC(tmp95c061_device::ode_w));
+	map(0x00005a, 0x00005a).rw(FUNC(tmp95c061_device::drefcr_r), FUNC(tmp95c061_device::drefcr_w));
+	map(0x00005b, 0x00005b).rw(FUNC(tmp95c061_device::dmemcr_r), FUNC(tmp95c061_device::dmemcr_w));
+	map(0x00005c, 0x00005f).rw(FUNC(tmp95c061_device::msar23_r), FUNC(tmp95c061_device::msar23_w));
+	map(0x000060, 0x000067).r(FUNC(tmp95c061_device::adreg_r));
+	map(0x000068, 0x00006b).w(FUNC(tmp95c061_device::bcs_w));
+	map(0x00006c, 0x00006c).w(FUNC(tmp95c061_device::bexcs_w));
+	map(0x00006d, 0x00006d).rw(FUNC(tmp95c061_device::admod_r), FUNC(tmp95c061_device::admod_w));
+	map(0x00006e, 0x00006e).rw(FUNC(tmp95c061_device::wdmod_r), FUNC(tmp95c061_device::wdmod_w));
+	map(0x00006f, 0x00006f).w(FUNC(tmp95c061_device::wdcr_w));
+	map(0x000070, 0x00007a).rw(FUNC(tmp95c061_device::inte_r), FUNC(tmp95c061_device::inte_w));
+	map(0x00007b, 0x00007b).w(FUNC(tmp95c061_device::iimc_w));
+	map(0x00007c, 0x00007f).w(FUNC(tmp95c061_device::dmav_w));
 }
 
 //-------------------------------------------------
@@ -58,121 +152,43 @@ void tmp95c061_device::device_config_complete()
 
 
 
-/* Internal register defines */
-#define TMP95C061_P1          0x01
-#define TMP95C061_P1CR        0x02
-#define TMP95C061_P2          0x06
-#define TMP95C061_P2FC        0x09
-#define TMP95C061_P5          0x0d
-#define TMP95C061_P5CR        0x10
-#define TMP95C061_P5FC        0x11
-#define TMP95C061_P6          0x12
-#define TMP95C061_P7          0x13
-#define TMP95C061_P6FC        0x15
-#define TMP95C061_P7CR        0x16
-#define TMP95C061_P7FC        0x17
-#define TMP95C061_P8          0x18
-#define TMP95C061_P9          0x19
-#define TMP95C061_P8CR        0x1a
-#define TMP95C061_P8FC        0x1b
-#define TMP95C061_PA          0x1e
-#define TMP95C061_PB          0x1f
-#define TMP95C061_TRUN        0x20
-#define TMP95C061_TREG0       0x22
-#define TMP95C061_TREG1       0x23
-#define TMP95C061_T01MOD      0x24
-#define TMP95C061_TFFCR       0x25
-#define TMP95C061_TREG2       0x26
-#define TMP95C061_TREG3       0x27
-#define TMP95C061_T23MOD      0x28
-#define TMP95C061_TRDC        0x29
-#define TMP95C061_PACR        0x2c
-#define TMP95C061_PAFC        0x2d
-#define TMP95C061_PBCR        0x2e
-#define TMP95C061_PBFC        0x2f
-#define TMP95C061_TREG4L      0x30
-#define TMP95C061_TREG4H      0x31
-#define TMP95C061_TREG5L      0x32
-#define TMP95C061_TREG5H      0x33
-#define TMP95C061_CAP1L       0x34
-#define TMP95C061_CAP1H       0x35
-#define TMP95C061_CAP2L       0x36
-#define TMP95C061_CAP2H       0x37
-#define TMP95C061_T4MOD       0x38
-#define TMP95C061_T4FFCR      0x39
-#define TMP95C061_T45CR       0x3a
-#define TMP95C061_MSAR0       0x3c
-#define TMP95C061_MAMR0       0x3d
-#define TMP95C061_MSAR1       0x3e
-#define TMP95C061_MAMR1       0x3f
-#define TMP95C061_TREG6L      0x40
-#define TMP95C061_TREG6H      0x41
-#define TMP95C061_TREG7L      0x42
-#define TMP95C061_TREG7H      0x43
-#define TMP95C061_CAP3L       0x44
-#define TMP95C061_CAP3H       0x45
-#define TMP95C061_CAP4L       0x46
-#define TMP95C061_CAP4H       0x47
-#define TMP95C061_T5MOD       0x48
-#define TMP95C061_T5FFCR      0x49
-#define TMP95C061_PG0REG      0x4c
-#define TMP95C061_PG1REG      0x4d
-#define TMP95C061_PG01CR      0x4e
-#define TMP95C061_SC0BUF      0x50
-#define TMP95C061_SC0CR       0x51
-#define TMP95C061_SC0MOD      0x52
-#define TMP95C061_BR0CR       0x53
-#define TMP95C061_SC1BUF      0x54
-#define TMP95C061_SC1CR       0x55
-#define TMP95C061_SC1MOD      0x56
-#define TMP95C061_BR1CR       0x57
-#define TMP95C061_ODE         0x58
-#define TMP95C061_DREFCR      0x5a
-#define TMP95C061_DMEMCR      0x5b
-#define TMP95C061_MSAR2       0x5c
-#define TMP95C061_MAMR2       0x5d
-#define TMP95C061_MSAR3       0x5e
-#define TMP95C061_MAMR3       0x5f
-#define TMP95C061_ADREG0L     0x60
-#define TMP95C061_ADREG0H     0x61
-#define TMP95C061_ADREG1L     0x62
-#define TMP95C061_ADREG1H     0x63
-#define TMP95C061_ADREG2L     0x64
-#define TMP95C061_ADREG2H     0x65
-#define TMP95C061_ADREG3L     0x66
-#define TMP95C061_ADREG3H     0x67
-#define TMP95C061_B0CS        0x68
-#define TMP95C061_B1CS        0x69
-#define TMP95C061_B2CS        0x6a
-#define TMP95C061_B3CS        0x6b
-#define TMP95C061_BEXCS       0x6c
-#define TMP95C061_ADMOD       0x6d
-#define TMP95C061_WDMOD       0x6e
-#define TMP95C061_WDCR        0x6f
-#define TMP95C061_INTE0AD     0x70
-#define TMP95C061_INTE45      0x71
-#define TMP95C061_INTE67      0x72
-#define TMP95C061_INTET10     0x73
-#define TMP95C061_INTET32     0x74
-#define TMP95C061_INTET54     0x75
-#define TMP95C061_INTET76     0x76
-#define TMP95C061_INTES0      0x77
-#define TMP95C061_INTES1      0x78
-#define TMP95C061_INTETC10    0x79
-#define TMP95C061_INTETC32    0x7a
-#define TMP95C061_IIMC        0x7b
-#define TMP95C061_DMA0V       0x7c
-#define TMP95C061_DMA1V       0x7d
-#define TMP95C061_DMA2V       0x7e
-#define TMP95C061_DMA3V       0x7f
-
-
 void tmp95c061_device::device_start()
 {
 	tlcs900h_device::device_start();
 
-	save_item( NAME(m_to1) );
-	save_item( NAME(m_to3) );
+	save_item(NAME(m_port_latch));
+	save_item(NAME(m_port_control));
+	save_item(NAME(m_port_function));
+	save_item(NAME(m_trun));
+	save_item(NAME(m_t8_reg));
+	save_item(NAME(m_t8_mode));
+	save_item(NAME(m_t8_invert));
+	save_item(NAME(m_trdc));
+	save_item(NAME(m_to1));
+	save_item(NAME(m_to3));
+	save_item(NAME(m_t16_reg));
+	save_item(NAME(m_t16_cap));
+	save_item(NAME(m_t16_mode));
+	save_item(NAME(m_t16_invert));
+	save_item(NAME(m_t45cr));
+	save_item(NAME(m_pgreg));
+	save_item(NAME(m_pg01cr));
+	save_item(NAME(m_watchdog_mode));
+	save_item(NAME(m_serial_control));
+	save_item(NAME(m_serial_mode));
+	save_item(NAME(m_baud_rate));
+	save_item(NAME(m_od_enable));
+	save_item(NAME(m_ad_result));
+	save_item(NAME(m_ad_mode));
+	save_item(NAME(m_int_reg));
+	save_item(NAME(m_iimc));
+	save_item(NAME(m_dma_vector));
+	save_item(NAME(m_block_cs));
+	save_item(NAME(m_external_cs));
+	save_item(NAME(m_mem_start_reg));
+	save_item(NAME(m_mem_start_mask));
+	save_item(NAME(m_dram_refresh));
+	save_item(NAME(m_dram_access));
 
 	m_port1_read.resolve_safe(0);
 	m_port1_write.resolve_safe();
@@ -194,21 +210,11 @@ void tmp95c061_device::device_start()
 
 void tmp95c061_device::device_reset()
 {
-	int i;
+	tlcs900h_device::device_reset();
 
 	m_to1 = 0;
 	m_to3 = 0;
 
-	m_pc.b.l = RDMEM( 0xFFFF00 );
-	m_pc.b.h = RDMEM( 0xFFFF01 );
-	m_pc.b.h2 = RDMEM( 0xFFFF02 );
-	m_pc.b.h3 = 0;
-	/* system mode, iff set to 111, max mode, register bank 0 */
-	m_sr.d = 0xF800;
-	m_regbank = 0;
-	m_xssp.d = 0x0100;
-	m_halted = 0;
-	m_check_irqs = 0;
 	m_ad_cycles_left = 0;
 	m_nmi_state = CLEAR_LINE;
 	m_timer_pre = 0;
@@ -217,75 +223,68 @@ void tmp95c061_device::device_reset()
 	m_timer_change[2] = 0;
 	m_timer_change[3] = 0;
 
-	memset(m_reg, 0x00, sizeof(m_reg));
+	m_port_latch[1] = 0x00;
+	m_port_latch[2] = 0xff;
+	m_port_latch[5] = 0x3d;
+	m_port_latch[6] = 0x3b;
+	m_port_latch[7] = 0xff;
+	m_port_latch[8] = 0x3f;
+	m_port_latch[0xa] = 0x0f;
+	m_port_latch[0xb] = 0xff;
+	std::fill_n(&m_port_control[0], 0xc, 0x00);
+	std::fill_n(&m_port_function[0], 0xc, 0x00);
+	m_port_control[0xa] = 0x0c; // HACK ngpc needs this but should be zero
+	m_port_function[0xa] = 0x0c; // HACK ngpc needs this but should be zero
+	m_trun = 0x00;
+	std::fill_n(&m_t8_mode[0], 2, 0x00);
+	m_t8_invert = 0xcc;
+	m_trdc = 0x00;
+	std::fill_n(&m_t16_mode[0], 2, 0x20);
+	std::fill_n(&m_t16_invert[0], 2, 0x00);
+	m_t45cr = 0x00;
+	m_pgreg[0] &= 0x0f;
+	m_pgreg[1] &= 0x0f;
+	m_pg01cr = 0x00;
+	m_watchdog_mode = 0x80;
+	for (int i = 0; i < 2; i++)
+	{
+		m_serial_control[i] &= 0x80;
+		m_serial_mode[i] &= 0x80;
+		m_baud_rate[i] = 0x00;
+	}
+	m_od_enable = 0x00;
+	m_ad_mode = 0x00;
+	std::fill_n(&m_int_reg[0], 0xb, 0x00);
+	m_iimc = 0x00;
+	std::fill_n(&m_dma_vector[0], 4, 0x00);
+	m_block_cs[0] = 0x00;
+	m_block_cs[1] = 0x00;
+	m_block_cs[2] = 0x10;
+	m_block_cs[3] = 0x00;
+	m_external_cs = 0x00;
+	std::fill_n(&m_mem_start_reg[0], 4, 0xff);
+	std::fill_n(&m_mem_start_mask[0], 4, 0xff);
+	m_dram_refresh = 0x00;
+	m_dram_access = 0x80;
 
-	m_reg[TMP95C061_P1] = 0x00;
-	m_reg[TMP95C061_P1CR] = 0x00;
-	m_reg[TMP95C061_P2] = 0xff;
-	m_reg[TMP95C061_P2FC] = 0x00;
-	m_reg[TMP95C061_P5] = 0x3d;
-	m_reg[TMP95C061_P5CR] = 0x00;
-	m_reg[TMP95C061_P5FC] = 0x00;
-	m_reg[TMP95C061_P6] = 0x3b;
-	m_reg[TMP95C061_P6FC] = 0x00;
-	m_reg[TMP95C061_P7] = 0xff;
-	m_reg[TMP95C061_P7CR] = 0x00;
-	m_reg[TMP95C061_P7FC] = 0x00;
-	m_reg[TMP95C061_P8] = 0x3f;
-	m_reg[TMP95C061_P8CR] = 0x00;
-	m_reg[TMP95C061_P8FC] = 0x00;
-	m_reg[TMP95C061_PA] = 0x0f;
-	m_reg[TMP95C061_PACR] = 0x0c; // HACK ngpc needs this but should be zero
-	m_reg[TMP95C061_PAFC] = 0x0c; // HACK ngpc needs this but should be zero
-	m_reg[TMP95C061_PB] = 0xff;
-	m_reg[TMP95C061_PBCR] = 0x00;
-	m_reg[TMP95C061_PBFC] = 0x00;
-	m_reg[TMP95C061_MSAR0] = 0xff;
-	m_reg[TMP95C061_MSAR1] = 0xff;
-	m_reg[TMP95C061_MSAR2] = 0xff;
-	m_reg[TMP95C061_MSAR3] = 0xff;
-	m_reg[TMP95C061_MAMR0] = 0xff;
-	m_reg[TMP95C061_MAMR1] = 0xff;
-	m_reg[TMP95C061_MAMR2] = 0xff;
-	m_reg[TMP95C061_MAMR3] = 0xff;
-	m_reg[TMP95C061_DREFCR] = 0x00;
-	m_reg[TMP95C061_DMEMCR] = 0x80;
-	m_reg[TMP95C061_T01MOD] = 0x00;
-	m_reg[TMP95C061_T23MOD] = 0x00;
-	m_reg[TMP95C061_TFFCR] = 0x00;
-	m_reg[TMP95C061_TRUN] = 0x00;
-	m_reg[TMP95C061_TRDC] = 0x00;
-	m_reg[TMP95C061_T4MOD] = 0x20;
-	m_reg[TMP95C061_T4FFCR] = 0x00;
-	m_reg[TMP95C061_T5MOD] = 0x20;
-	m_reg[TMP95C061_T5FFCR] = 0x00;
-	m_reg[TMP95C061_T45CR] = 0x00;
-	m_reg[TMP95C061_PG01CR] = 0x00;
-	m_reg[TMP95C061_PG0REG] = 0x00;
-	m_reg[TMP95C061_PG1REG] = 0x00;
-	m_reg[TMP95C061_SC0MOD] = 0x00;
-	m_reg[TMP95C061_SC0CR] = 0x00;
-	m_reg[TMP95C061_BR0CR] = 0x00;
-	m_reg[TMP95C061_SC1MOD] = 0x00;
-	m_reg[TMP95C061_SC1CR] = 0x00;
-	m_reg[TMP95C061_BR1CR] = 0x00;
-	m_reg[TMP95C061_P8FC] = 0x00;
-	m_reg[TMP95C061_ODE] = 0x00;
-	m_reg[TMP95C061_ADMOD] = 0x00;
-	m_reg[TMP95C061_ADREG0L] = 0x3f;
-	m_reg[TMP95C061_ADREG1L] = 0x3f;
-	m_reg[TMP95C061_ADREG2L] = 0x3f;
-	m_reg[TMP95C061_ADREG3L] = 0x3f;
-	m_reg[TMP95C061_WDMOD] = 0x80;
-
-	for ( i = 0; i < TLCS900_NUM_INPUTS; i++ )
+	for (int i = 0; i < TLCS900_NUM_INPUTS; i++)
 	{
 		m_level[i] = CLEAR_LINE;
 	}
-	m_prefetch_clear = true;
 }
 
 
+#define TMP95C061_INTE0AD     0x0
+#define TMP95C061_INTE45      0x1
+#define TMP95C061_INTE67      0x2
+#define TMP95C061_INTET10     0x3
+#define TMP95C061_INTET32     0x4
+#define TMP95C061_INTET54     0x5
+#define TMP95C061_INTET76     0x6
+#define TMP95C061_INTES0      0x7
+#define TMP95C061_INTES1      0x8
+#define TMP95C061_INTETC10    0x9
+#define TMP95C061_INTETC32    0xa
 
 #define TMP95C061_NUM_MASKABLE_IRQS   22
 static const struct {
@@ -322,7 +321,7 @@ static const struct {
 
 int tmp95c061_device::tlcs900_process_hdma( int channel )
 {
-	uint8_t vector = ( m_reg[0x7c + channel] & 0x1f ) << 2;
+	uint8_t vector = ( m_dma_vector[channel] & 0x1f ) << 2;
 
 	/* Check if any HDMA actions should be performed */
 	if ( vector >= 0x28 && vector != 0x3C && vector < 0x74 )
@@ -333,7 +332,7 @@ int tmp95c061_device::tlcs900_process_hdma( int channel )
 			irq++;
 
 		/* Check if our interrupt flip-flop is set */
-		if ( irq < TMP95C061_NUM_MASKABLE_IRQS && m_reg[tmp95c061_irq_vector_map[irq].reg] & tmp95c061_irq_vector_map[irq].iff )
+		if ( irq < TMP95C061_NUM_MASKABLE_IRQS && m_int_reg[tmp95c061_irq_vector_map[irq].reg] & tmp95c061_irq_vector_map[irq].iff )
 		{
 			switch( m_dmam[channel].b.l & 0x1f )
 			{
@@ -419,26 +418,26 @@ int tmp95c061_device::tlcs900_process_hdma( int channel )
 
 			if ( m_dmac[channel].w.l == 0 )
 			{
-				m_reg[0x7c + channel] = 0;
+				m_dma_vector[channel] = 0;
 				switch( channel )
 				{
 				case 0:
-					m_reg[TMP95C061_INTETC10] |= 0x08;
+					m_int_reg[TMP95C061_INTETC10] |= 0x08;
 					break;
 				case 1:
-					m_reg[TMP95C061_INTETC10] |= 0x80;
+					m_int_reg[TMP95C061_INTETC10] |= 0x80;
 					break;
 				case 2:
-					m_reg[TMP95C061_INTETC32] |= 0x08;
+					m_int_reg[TMP95C061_INTETC32] |= 0x08;
 					break;
 				case 3:
-					m_reg[TMP95C061_INTETC32] |= 0x80;
+					m_int_reg[TMP95C061_INTETC32] |= 0x80;
 					break;
 				}
 			}
 
 			/* Clear the interrupt flip-flop */
-			m_reg[tmp95c061_irq_vector_map[irq].reg] &= ~tmp95c061_irq_vector_map[irq].iff;
+			m_int_reg[tmp95c061_irq_vector_map[irq].reg] &= ~tmp95c061_irq_vector_map[irq].iff;
 
 			return 1;
 		}
@@ -494,15 +493,15 @@ void tmp95c061_device::tlcs900_check_irqs()
 	/* Check regular irqs */
 	for( i = 0; i < TMP95C061_NUM_MASKABLE_IRQS; i++ )
 	{
-		if ( m_reg[tmp95c061_irq_vector_map[i].reg] & tmp95c061_irq_vector_map[i].iff )
+		if ( m_int_reg[tmp95c061_irq_vector_map[i].reg] & tmp95c061_irq_vector_map[i].iff )
 		{
 			switch( tmp95c061_irq_vector_map[i].iff )
 			{
 			case 0x80:
-				irq_vectors[ ( m_reg[ tmp95c061_irq_vector_map[i].reg ] >> 4 ) & 0x07 ] = i;
+				irq_vectors[ ( m_int_reg[ tmp95c061_irq_vector_map[i].reg ] >> 4 ) & 0x07 ] = i;
 				break;
 			case 0x08:
-				irq_vectors[ m_reg[ tmp95c061_irq_vector_map[i].reg ] & 0x07 ] = i;
+				irq_vectors[ m_int_reg[ tmp95c061_irq_vector_map[i].reg ] & 0x07 ] = i;
 				break;
 			}
 		}
@@ -538,7 +537,7 @@ void tmp95c061_device::tlcs900_check_irqs()
 		m_halted = 0;
 
 		/* Clear taken IRQ */
-		m_reg[ tmp95c061_irq_vector_map[irq].reg ] &= ~ tmp95c061_irq_vector_map[irq].iff;
+		m_int_reg[ tmp95c061_irq_vector_map[irq].reg ] &= ~ tmp95c061_irq_vector_map[irq].iff;
 	}
 }
 
@@ -551,11 +550,10 @@ void tmp95c061_device::tlcs900_handle_ad()
 		if ( m_ad_cycles_left <= 0 )
 		{
 			/* Store A/D converted value */
-			switch( m_reg[TMP95C061_ADMOD] & 0x03 )
+			switch( m_ad_mode & 0x03 )
 			{
 			case 0x00:  /* AN0 */
-				m_reg[TMP95C061_ADREG0L] |= 0xc0;
-				m_reg[TMP95C061_ADREG0H] = 0xff;
+				m_ad_result[0] = 0x3ff;
 				break;
 			case 0x01:  /* AN1 */
 			case 0x02:  /* AN2 */
@@ -564,10 +562,10 @@ void tmp95c061_device::tlcs900_handle_ad()
 			}
 
 			/* Clear BUSY flag, set END flag */
-			m_reg[TMP95C061_ADMOD] &= ~ 0x40;
-			m_reg[TMP95C061_ADMOD] |= 0x80;
+			m_ad_mode &= ~ 0x40;
+			m_ad_mode |= 0x80;
 
-			m_reg[TMP95C061_INTE0AD] |= 0x80;
+			m_int_reg[TMP95C061_INTE0AD] |= 0x80;
 			m_check_irqs = 1;
 		}
 	}
@@ -626,13 +624,13 @@ void tmp95c061_device::tlcs900_handle_timers()
 	uint32_t  old_pre = m_timer_pre;
 
 	/* Is the pre-scaler active */
-	if ( m_reg[TMP95C061_TRUN] & 0x80 )
+	if ( m_trun & 0x80 )
 		m_timer_pre += m_cycles;
 
 	/* Timer 0 */
-	if ( m_reg[TMP95C061_TRUN] & 0x01 )
+	if ( m_trun & 0x01 )
 	{
-		switch( m_reg[TMP95C061_T01MOD] & 0x03 )
+		switch( m_t8_mode[0] & 0x03 )
 		{
 		case 0x00:  /* TIO */
 			break;
@@ -649,29 +647,28 @@ void tmp95c061_device::tlcs900_handle_timers()
 
 		for( ; m_timer_change[0] > 0; m_timer_change[0]-- )
 		{
-//printf("timer0 = %02x, TREG0 = %02x\n", m_timer[0], m_reg[TREG0] );
 			m_timer[0] += 1;
-			if ( m_timer[0] == m_reg[TMP95C061_TREG0] )
+			if ( m_timer[0] == m_t8_reg[0] )
 			{
-				if ( ( m_reg[TMP95C061_T01MOD] & 0x0c ) == 0x00 )
+				if ( ( m_t8_mode[0] & 0x0c ) == 0x00 )
 				{
 					m_timer_change[1] += 1;
 				}
 
 				/* In 16bit timer mode the timer should not be reset */
-				if ( ( m_reg[TMP95C061_T01MOD] & 0xc0 ) != 0x40 )
+				if ( ( m_t8_mode[0] & 0xc0 ) != 0x40 )
 				{
 					m_timer[0] = 0;
-					m_reg[TMP95C061_INTET10] |= 0x08;
+					m_int_reg[TMP95C061_INTET10] |= 0x08;
 				}
 			}
 		}
 	}
 
 	/* Timer 1 */
-	if ( m_reg[TMP95C061_TRUN] & 0x02 )
+	if ( m_trun & 0x02 )
 	{
-		switch( ( m_reg[TMP95C061_T01MOD] >> 2 ) & 0x03 )
+		switch( ( m_t8_mode[0] >> 2 ) & 0x03 )
 		{
 		case 0x00:  /* TO0TRG */
 			break;
@@ -689,18 +686,18 @@ void tmp95c061_device::tlcs900_handle_timers()
 		for( ; m_timer_change[1] > 0; m_timer_change[1]-- )
 		{
 			m_timer[1] += 1;
-			if ( m_timer[1] == m_reg[TMP95C061_TREG1] )
+			if ( m_timer[1] == m_t8_reg[1] )
 			{
 				m_timer[1] = 0;
-				m_reg[TMP95C061_INTET10] |= 0x80;
+				m_int_reg[TMP95C061_INTET10] |= 0x80;
 
-				if ( m_reg[TMP95C061_TFFCR] & 0x02 )
+				if ( m_t8_invert & 0x02 )
 				{
 					tlcs900_change_tff( 1, FF_INVERT );
 				}
 
 				/* In 16bit timer mode also reset timer 0 */
-				if ( ( m_reg[TMP95C061_T01MOD] & 0xc0 ) == 0x40 )
+				if ( ( m_t8_mode[0] & 0xc0 ) == 0x40 )
 				{
 					m_timer[0] = 0;
 				}
@@ -709,9 +706,9 @@ void tmp95c061_device::tlcs900_handle_timers()
 	}
 
 	/* Timer 2 */
-	if ( m_reg[TMP95C061_TRUN] & 0x04 )
+	if ( m_trun & 0x04 )
 	{
-		switch( m_reg[TMP95C061_T23MOD] & 0x03 )
+		switch( m_t8_mode[1] & 0x03 )
 		{
 		case 0x00:  /* invalid */
 		case 0x01:  /* T1 */
@@ -728,27 +725,27 @@ void tmp95c061_device::tlcs900_handle_timers()
 		for( ; m_timer_change[2] > 0; m_timer_change[2]-- )
 		{
 			m_timer[2] += 1;
-			if ( m_timer[2] == m_reg[TMP95C061_TREG2] )
+			if ( m_timer[2] == m_t8_reg[2] )
 			{
-				if ( ( m_reg[TMP95C061_T23MOD] & 0x0c ) == 0x00 )
+				if ( ( m_t8_mode[1] & 0x0c ) == 0x00 )
 				{
 					m_timer_change[3] += 1;
 				}
 
 				/* In 16bit timer mode the timer should not be reset */
-				if ( ( m_reg[TMP95C061_T23MOD] & 0xc0 ) != 0x40 )
+				if ( ( m_t8_mode[1] & 0xc0 ) != 0x40 )
 				{
 					m_timer[2] = 0;
-					m_reg[TMP95C061_INTET32] |= 0x08;
+					m_int_reg[TMP95C061_INTET32] |= 0x08;
 				}
 			}
 		}
 	}
 
 	/* Timer 3 */
-	if ( m_reg[TMP95C061_TRUN] & 0x08 )
+	if ( m_trun & 0x08 )
 	{
-		switch( ( m_reg[TMP95C061_T23MOD] >> 2 ) & 0x03 )
+		switch( ( m_t8_mode[1] >> 2 ) & 0x03 )
 		{
 		case 0x00:  /* TO2TRG */
 			break;
@@ -766,18 +763,18 @@ void tmp95c061_device::tlcs900_handle_timers()
 		for( ; m_timer_change[3] > 0; m_timer_change[3]-- )
 		{
 			m_timer[3] += 1;
-			if ( m_timer[3] == m_reg[TMP95C061_TREG3] )
+			if ( m_timer[3] == m_t8_reg[3] )
 			{
 				m_timer[3] = 0;
-				m_reg[TMP95C061_INTET32] |= 0x80;
+				m_int_reg[TMP95C061_INTET32] |= 0x80;
 
-				if ( m_reg[TMP95C061_TFFCR] & 0x20 )
+				if ( m_t8_invert & 0x20 )
 				{
 					tlcs900_change_tff( 3, FF_INVERT );
 				}
 
 				/* In 16bit timer mode also reset timer 2 */
-				if ( ( m_reg[TMP95C061_T23MOD] & 0xc0 ) == 0x40 )
+				if ( ( m_t8_mode[1] & 0xc0 ) == 0x40 )
 				{
 					m_timer[2] = 0;
 				}
@@ -807,54 +804,54 @@ void tmp95c061_device::execute_set_input(int input, int level)
 
 	case TLCS900_INT0:
 		/* Is INT0 functionality enabled? */
-		if ( m_reg[TMP95C061_IIMC] & 0x04 )
+		if ( m_iimc & 0x04 )
 		{
-			if ( m_reg[TMP95C061_IIMC] & 0x02 )
+			if ( m_iimc & 0x02 )
 			{
 				/* Rising edge detect */
 				if ( m_level[TLCS900_INT0] == CLEAR_LINE && level == ASSERT_LINE )
 				{
 					/* Leave HALT state */
 					m_halted = 0;
-					m_reg[TMP95C061_INTE0AD] |= 0x08;
+					m_int_reg[TMP95C061_INTE0AD] |= 0x08;
 				}
 			}
 			else
 			{
 				/* Level detect */
 				if ( level == ASSERT_LINE )
-					m_reg[TMP95C061_INTE0AD] |= 0x08;
+					m_int_reg[TMP95C061_INTE0AD] |= 0x08;
 				else
-					m_reg[TMP95C061_INTE0AD] &= ~ 0x08;
+					m_int_reg[TMP95C061_INTE0AD] &= ~ 0x08;
 			}
 		}
 		m_level[TLCS900_INT0] = level;
 		break;
 
 	case TLCS900_INT4:
-		if ( ! ( m_reg[TMP95C061_PBCR] & 0x01 ) )
+		if ( ! ( m_port_control[0xb] & 0x01 ) )
 		{
 			if ( m_level[TLCS900_INT4] == CLEAR_LINE && level == ASSERT_LINE )
 			{
-				m_reg[TMP95C061_INTE45] |= 0x08;
+				m_int_reg[TMP95C061_INTE45] |= 0x08;
 			}
 		}
 		m_level[TLCS900_INT4] = level;
 		break;
 
 	case TLCS900_INT5:
-		if ( ! ( m_reg[TMP95C061_PBCR] & 0x02 ) )
+		if ( ! ( m_port_control[0xb] & 0x02 ) )
 		{
 			if ( m_level[TLCS900_INT5] == CLEAR_LINE && level == ASSERT_LINE )
 			{
-				m_reg[TMP95C061_INTE45] |= 0x80;
+				m_int_reg[TMP95C061_INTE45] |= 0x80;
 			}
 		}
 		m_level[TLCS900_INT5] = level;
 		break;
 
 	case TLCS900_TIO:   /* External timer input for timer 0 */
-		if ( ( m_reg[TMP95C061_TRUN] & 0x01 ) && ( m_reg[TMP95C061_T01MOD] & 0x03 ) == 0x00 )
+		if ( ( m_trun & 0x01 ) && ( m_t8_mode[0] & 0x03 ) == 0x00 )
 		{
 			if ( m_level[TLCS900_TIO] == CLEAR_LINE && level == ASSERT_LINE )
 			{
@@ -868,155 +865,609 @@ void tmp95c061_device::execute_set_input(int input, int level)
 }
 
 
-uint8_t tmp95c061_device::internal_r(offs_t offset)
+uint8_t tmp95c061_device::p1_r()
 {
-	switch (offset)
-	{
-		case TMP95C061_P1: m_reg[offset] = m_port1_read(0); break;
-		case TMP95C061_P5: m_reg[offset] = m_port5_read(0); break;
-		case TMP95C061_P6: m_reg[offset] = m_port6_read(0); break;
-		case TMP95C061_P7: m_reg[offset] = m_port7_read(0); break;
-		case TMP95C061_P8: m_reg[offset] = m_port8_read(0); break;
-		case TMP95C061_P9: m_reg[offset] = m_port9_read(0); break;
-		case TMP95C061_PA: m_reg[offset] = m_porta_read(0); break;
-		case TMP95C061_PB: m_reg[offset] = m_portb_read(0); break;
-	}
-	return m_reg[ offset ];
+	return m_port1_read(0);
 }
 
+void tmp95c061_device::p1_w(uint8_t data)
+{
+	m_port_latch[1] = data;
+	m_port1_write(0, data, 0xff);
+}
+
+void tmp95c061_device::p1cr_w(uint8_t data)
+{
+	m_port_control[1] = data;
+}
+
+uint8_t tmp95c061_device::p2_r()
+{
+	return m_port_latch[2];
+}
+
+void tmp95c061_device::p2_w(uint8_t data)
+{
+	m_port_latch[2] = data;
+	m_port2_write(0, data, 0xff);
+}
+
+void tmp95c061_device::p2fc_w(uint8_t data)
+{
+	m_port_control[2] = data;
+}
+
+uint8_t tmp95c061_device::p5_r()
+{
+	return m_port5_read(0);
+}
+
+void tmp95c061_device::p5_w(uint8_t data)
+{
+	m_port_latch[5] = data;
+	m_port5_write(0, data, 0xff);
+}
+
+void tmp95c061_device::p5cr_w(uint8_t data)
+{
+	m_port_control[5] = data;
+}
+
+void tmp95c061_device::p5fc_w(uint8_t data)
+{
+	m_port_function[5] = data;
+}
+
+uint8_t tmp95c061_device::p6_r()
+{
+	return m_port6_read(0);
+}
+
+void tmp95c061_device::p6_w(uint8_t data)
+{
+	m_port_latch[6] = data;
+	m_port6_write(0, data, 0xff);
+}
+
+void tmp95c061_device::p6fc_w(uint8_t data)
+{
+	m_port_function[6] = data;
+}
+
+uint8_t tmp95c061_device::p7_r()
+{
+	return m_port7_read(0);
+}
+
+void tmp95c061_device::p7_w(uint8_t data)
+{
+	m_port_latch[7] = data;
+	m_port7_write(0, data, 0xff);
+}
+
+void tmp95c061_device::p7cr_w(uint8_t data)
+{
+	m_port_control[7] = data;
+}
+
+void tmp95c061_device::p7fc_w(uint8_t data)
+{
+	m_port_function[7] = data;
+}
+
+uint8_t tmp95c061_device::p8_r()
+{
+	return m_port8_read(0);
+}
+
+void tmp95c061_device::p8_w(uint8_t data)
+{
+	m_port_latch[8] = data;
+	m_port8_write(0, data, 0xff);
+}
+
+void tmp95c061_device::p8cr_w(uint8_t data)
+{
+	m_port_control[8] = data;
+}
+
+void tmp95c061_device::p8fc_w(uint8_t data)
+{
+	m_port_function[8] = data;
+}
+
+uint8_t tmp95c061_device::p9_r()
+{
+	return m_port9_read(0);
+}
+
+uint8_t tmp95c061_device::pa_r()
+{
+	return m_porta_read(0);
+}
+
+void tmp95c061_device::pa_w(uint8_t data)
+{
+	m_port_latch[0xa] = data;
+	update_porta();
+}
+
+void tmp95c061_device::pacr_w(uint8_t data)
+{
+	m_port_control[0xa] = data;
+	update_porta();
+}
+
+void tmp95c061_device::pafc_w(uint8_t data)
+{
+	m_port_function[0xa] = data;
+	update_porta();
+}
 
 void tmp95c061_device::update_porta()
 {
 	int fc = (m_to1 << 2) | (m_to3 << 3);
 
-	m_porta_write(0, ((fc & m_reg[TMP95C061_PAFC]) | (m_reg[TMP95C061_PA] & ~m_reg[TMP95C061_PAFC])) & m_reg[TMP95C061_PACR], 0xff);
+	m_porta_write(0, ((fc & m_port_function[0xa]) | (m_port_latch[0xa] & ~m_port_function[0xa])) & m_port_control[0xa], 0xff);
 }
 
-void tmp95c061_device::internal_w(offs_t offset, uint8_t data)
+uint8_t tmp95c061_device::pb_r()
 {
-	switch ( offset )
+	return m_portb_read(0);
+}
+
+void tmp95c061_device::pb_w(uint8_t data)
+{
+	m_port_latch[0xb] = data;
+	m_portb_write(0, data, 0xff);
+}
+
+void tmp95c061_device::pbcr_w(uint8_t data)
+{
+	m_port_control[0xb] = data;
+}
+
+void tmp95c061_device::pbfc_w(uint8_t data)
+{
+	m_port_function[0xb] = data;
+}
+
+
+uint8_t tmp95c061_device::trun_r()
+{
+	return m_trun;
+}
+
+void tmp95c061_device::trun_w(uint8_t data)
+{
+	if ( ! ( data & 0x01 ) )
 	{
-	case TMP95C061_TRUN:
-		if ( ! ( data & 0x01 ) )
-		{
-			m_timer[0] = 0;
-			m_timer_change[0] = 0;
-		}
-		if ( ! ( data & 0x02 ) )
-		{
-			m_timer[1] = 0;
-			m_timer_change[1] = 0;
-		}
-		if ( ! ( data & 0x04 ) )
-		{
-			m_timer[2] = 0;
-			m_timer_change[2] = 0;
-		}
-		if ( ! ( data & 0x08 ) )
-		{
-			m_timer[3] = 0;
-			m_timer_change[3] = 0;
-		}
-		if ( ! ( data & 0x10 ) )
-			m_timer[4] = 0;
-		if ( ! ( data & 0x20 ) )
-			m_timer[5] = 0;
-		break;
+		m_timer[0] = 0;
+		m_timer_change[0] = 0;
+	}
+	if ( ! ( data & 0x02 ) )
+	{
+		m_timer[1] = 0;
+		m_timer_change[1] = 0;
+	}
+	if ( ! ( data & 0x04 ) )
+	{
+		m_timer[2] = 0;
+		m_timer_change[2] = 0;
+	}
+	if ( ! ( data & 0x08 ) )
+	{
+		m_timer[3] = 0;
+		m_timer_change[3] = 0;
+	}
+	if ( ! ( data & 0x10 ) )
+		m_timer[4] = 0;
+	if ( ! ( data & 0x20 ) )
+		m_timer[5] = 0;
 
-	case TMP95C061_TFFCR:
-		switch( data & 0x0c )
-		{
-		case 0x00:
-			tlcs900_change_tff( 1, FF_INVERT );
-			break;
-		case 0x04:
-			tlcs900_change_tff( 1, FF_SET );
-			break;
-		case 0x08:
-			tlcs900_change_tff( 1, FF_CLEAR );
-			break;
-		}
-		switch( data & 0xc0 )
-		{
-		case 0x00:
-			tlcs900_change_tff( 3, FF_INVERT );
-			break;
-		case 0x40:
-			tlcs900_change_tff( 3, FF_SET );
-			break;
-		case 0x80:
-			tlcs900_change_tff( 3, FF_CLEAR );
-			break;
-		}
-		break;
-	case TMP95C061_MSAR0:
-	case TMP95C061_MAMR0:
-	case TMP95C061_MSAR1:
-	case TMP95C061_MAMR1:
-		break;
+	m_trun = data;
+}
 
-	case TMP95C061_SC0BUF:
-		// Fake finish sending data
-		m_reg[TMP95C061_INTES0] |= 0x80;
+void tmp95c061_device::treg01_w(offs_t offset, uint8_t data)
+{
+	m_t8_reg[offset] = data;
+}
+
+void tmp95c061_device::t01mod_w(uint8_t data)
+{
+	m_t8_mode[0] = data;
+}
+
+uint8_t tmp95c061_device::tffcr_r()
+{
+	return m_t8_invert;
+}
+
+void tmp95c061_device::tffcr_w(uint8_t data)
+{
+	switch( data & 0x0c )
+	{
+	case 0x00:
+		tlcs900_change_tff( 1, FF_INVERT );
 		break;
-
-	case TMP95C061_ADMOD:
-		/* Preserve read-only bits */
-		data = ( m_reg[TMP95C061_ADMOD] & 0xc0 ) | ( data & 0x3f );
-
-		/* Check for A/D request start */
-		if ( data & 0x04 )
-		{
-			data &= ~0x04;
-			data |= 0x40;
-			m_ad_cycles_left = ( data & 0x08 ) ? 640 : 320;
-		}
+	case 0x04:
+		tlcs900_change_tff( 1, FF_SET );
 		break;
-
-	case TMP95C061_WDMOD:
-	case TMP95C061_WDCR:
+	case 0x08:
+		tlcs900_change_tff( 1, FF_CLEAR );
 		break;
-
-	case TMP95C061_INTE0AD:
-	case TMP95C061_INTE45:
-	case TMP95C061_INTE67:
-	case TMP95C061_INTET10:
-	case TMP95C061_INTET32:
-	case TMP95C061_INTET54:
-	case TMP95C061_INTET76:
-	case TMP95C061_INTES0:
-	case TMP95C061_INTES1:
-	case TMP95C061_INTETC10:
-	case TMP95C061_INTETC32:
-		if ( data & 0x80 )
-			data = ( data & 0x7f ) | ( m_reg[offset] & 0x80 );
-		if ( data & 0x08 )
-			data = ( data & 0xf7 ) | ( m_reg[offset] & 0x08 );
+	}
+	switch( data & 0xc0 )
+	{
+	case 0x00:
+		tlcs900_change_tff( 3, FF_INVERT );
 		break;
-
-	case TMP95C061_IIMC:
+	case 0x40:
+		tlcs900_change_tff( 3, FF_SET );
 		break;
-
-	default:
+	case 0x80:
+		tlcs900_change_tff( 3, FF_CLEAR );
 		break;
 	}
 
+	m_t8_invert = data | 0xcc;
+}
+
+void tmp95c061_device::treg23_w(offs_t offset, uint8_t data)
+{
+	m_t8_reg[offset + 2] = data;
+}
+
+void tmp95c061_device::t23mod_w(uint8_t data)
+{
+	m_t8_mode[1] = data;
+}
+
+uint8_t tmp95c061_device::trdc_r()
+{
+	return m_trdc;
+}
+
+void tmp95c061_device::trdc_w(uint8_t data)
+{
+	m_trdc = data;
+}
+
+void tmp95c061_device::treg45_w(offs_t offset, uint8_t data)
+{
+	if (BIT(offset, 0))
+		m_t16_reg[offset >> 1] = (m_t16_reg[offset >> 1] & 0x00ff) | uint16_t(data) << 8;
+	else
+		m_t16_reg[offset >> 1] = (m_t16_reg[offset >> 1] & 0xff00) | data;
+}
+
+uint8_t tmp95c061_device::cap12_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return m_t16_cap[offset >> 1] >> 8;
+	else
+		return m_t16_cap[offset >> 1] & 0x00ff;
+}
+
+uint8_t tmp95c061_device::t4mod_r()
+{
+	return m_t16_mode[0];
+}
+
+void tmp95c061_device::t4mod_w(uint8_t data)
+{
+	m_t16_mode[0] = data | 0x20;
+}
+
+uint8_t tmp95c061_device::t4ffcr_r()
+{
+	return m_t16_invert[0];
+}
+
+void tmp95c061_device::t4ffcr_w(uint8_t data)
+{
+	m_t16_invert[0] = data | 0xc3;
+}
+
+uint8_t tmp95c061_device::t45cr_r()
+{
+	return m_t45cr;
+}
+
+void tmp95c061_device::t45cr_w(uint8_t data)
+{
+	m_t45cr = data;
+}
+
+void tmp95c061_device::treg67_w(offs_t offset, uint8_t data)
+{
+	if (BIT(offset, 0))
+		m_t16_reg[(offset >> 1) + 2] = (m_t16_reg[(offset >> 1) + 2] & 0x00ff) | uint16_t(data) << 8;
+	else
+		m_t16_reg[(offset >> 1) + 2] = (m_t16_reg[(offset >> 1) + 2] & 0xff00) | data;
+}
+
+uint8_t tmp95c061_device::cap34_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return m_t16_cap[(offset >> 1) + 2] >> 8;
+	else
+		return m_t16_cap[(offset >> 1) + 2] & 0x00ff;
+}
+
+uint8_t tmp95c061_device::t5mod_r()
+{
+	return m_t16_mode[1];
+}
+
+void tmp95c061_device::t5mod_w(uint8_t data)
+{
+	m_t16_mode[1] = data | 0x20;
+}
+
+uint8_t tmp95c061_device::t5ffcr_r()
+{
+	return m_t16_invert[1];
+}
+
+void tmp95c061_device::t5ffcr_w(uint8_t data)
+{
+	m_t16_invert[1] = data | 0xc3;
+}
+
+
+uint8_t tmp95c061_device::pgreg_r(offs_t offset)
+{
+	return m_pgreg[offset];
+}
+
+void tmp95c061_device::pgreg_w(offs_t offset, uint8_t data)
+{
+	m_pgreg[offset] = data;
+}
+
+uint8_t tmp95c061_device::pg01cr_r()
+{
+	return m_pg01cr;
+}
+
+void tmp95c061_device::pg01cr_w(uint8_t data)
+{
+	m_pg01cr = data;
+}
+
+
+uint8_t tmp95c061_device::wdmod_r()
+{
+	return m_watchdog_mode;
+}
+
+void tmp95c061_device::wdmod_w(uint8_t data)
+{
+	m_watchdog_mode = data;
+}
+
+void tmp95c061_device::wdcr_w(uint8_t data)
+{
+}
+
+
+uint8_t tmp95c061_device::sc0buf_r()
+{
+	return 0;
+}
+
+void tmp95c061_device::sc0buf_w(uint8_t data)
+{
+	// Fake finish sending data
+	m_int_reg[TMP95C061_INTES0] |= 0x80;
+}
+
+uint8_t tmp95c061_device::sc0cr_r()
+{
+	uint8_t reg = m_serial_control[0];
+	if (!machine().side_effects_disabled())
+		m_serial_control[0] &= 0xe3;
+	return reg;
+}
+
+void tmp95c061_device::sc0cr_w(uint8_t data)
+{
+	m_serial_control[0] = data;
+}
+
+uint8_t tmp95c061_device::sc0mod_r()
+{
+	return m_serial_mode[0];
+}
+
+void tmp95c061_device::sc0mod_w(uint8_t data)
+{
+	m_serial_mode[0] = data;
+}
+
+uint8_t tmp95c061_device::br0cr_r()
+{
+	return m_baud_rate[0];
+}
+
+void tmp95c061_device::br0cr_w(uint8_t data)
+{
+	m_baud_rate[0] = data;
+}
+
+uint8_t tmp95c061_device::sc1buf_r()
+{
+	return 0;
+}
+
+void tmp95c061_device::sc1buf_w(uint8_t data)
+{
+	// Fake finish sending data
+	m_int_reg[TMP95C061_INTES1] |= 0x80;
+}
+
+uint8_t tmp95c061_device::sc1cr_r()
+{
+	uint8_t reg = m_serial_control[1];
+	if (!machine().side_effects_disabled())
+		m_serial_control[1] &= 0xe3;
+	return reg;
+}
+
+void tmp95c061_device::sc1cr_w(uint8_t data)
+{
+	m_serial_control[1] = data;
+}
+
+uint8_t tmp95c061_device::sc1mod_r()
+{
+	return m_serial_mode[1];
+}
+
+void tmp95c061_device::sc1mod_w(uint8_t data)
+{
+	m_serial_mode[1] = data;
+}
+
+uint8_t tmp95c061_device::br1cr_r()
+{
+	return m_baud_rate[1];
+}
+
+void tmp95c061_device::br1cr_w(uint8_t data)
+{
+	m_baud_rate[1] = data;
+}
+
+uint8_t tmp95c061_device::ode_r()
+{
+	return m_od_enable;
+}
+
+void tmp95c061_device::ode_w(uint8_t data)
+{
+	m_od_enable = data;
+}
+
+
+uint8_t tmp95c061_device::adreg_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return m_ad_result[offset >> 1] >> 2;
+	else
+		return m_ad_result[offset >> 1] << 6 | 0x3f;
+}
+
+uint8_t tmp95c061_device::admod_r()
+{
+	return m_ad_mode;
+}
+
+void tmp95c061_device::admod_w(uint8_t data)
+{
+	// Preserve read-only bits
+	data = ( m_ad_mode & 0xc0 ) | ( data & 0x3f );
+
+	// Check for A/D request start */
+	if ( data & 0x04 )
+	{
+		data &= ~0x04;
+		data |= 0x40;
+		m_ad_cycles_left = ( data & 0x08 ) ? 640 : 320;
+	}
+
+	m_ad_mode = data;
+}
+
+
+uint8_t tmp95c061_device::inte_r(offs_t offset)
+{
+	return m_int_reg[offset];
+}
+
+void tmp95c061_device::inte_w(offs_t offset, uint8_t data)
+{
+	if ( data & 0x80 )
+		data = ( data & 0x7f ) | ( m_int_reg[offset] & 0x80 );
+	if ( data & 0x08 )
+		data = ( data & 0xf7 ) | ( m_int_reg[offset] & 0x08 );
+
+	m_int_reg[offset] = data;
 	m_check_irqs = 1;
-	m_reg[ offset ] = data;
+}
 
-	switch(offset)
-	{
-	case TMP95C061_P1: m_port1_write(0, data, 0xff); break;
-	case TMP95C061_P2: m_port2_write(0, data, 0xff); break;
-	case TMP95C061_P5: m_port5_write(0, data, 0xff); break;
-	case TMP95C061_P6: m_port6_write(0, data, 0xff); break;
-	case TMP95C061_P7: m_port7_write(0, data, 0xff); break;
-	case TMP95C061_P8: m_port8_write(0, data, 0xff); break;
+void tmp95c061_device::iimc_w(uint8_t data)
+{
+	m_iimc = data;
+	m_check_irqs = 1;
+}
 
-	case TMP95C061_PA:
-	case TMP95C061_PACR:
-	case TMP95C061_PAFC:
-		update_porta();
-		break;
-	}
+void tmp95c061_device::dmav_w(offs_t offset, uint8_t data)
+{
+	m_dma_vector[offset] = data;
+}
+
+
+void tmp95c061_device::bcs_w(offs_t offset, uint8_t data)
+{
+	m_block_cs[offset] = data;
+}
+
+void tmp95c061_device::bexcs_w(uint8_t data)
+{
+	m_external_cs = data;
+}
+
+uint8_t tmp95c061_device::msar01_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return m_mem_start_mask[offset >> 1];
+	else
+		return m_mem_start_reg[offset >> 1];
+}
+
+void tmp95c061_device::msar01_w(offs_t offset, uint8_t data)
+{
+	if (BIT(offset, 0))
+		m_mem_start_mask[offset >> 1] = data;
+	else
+		m_mem_start_reg[offset >> 1] = data;
+}
+
+uint8_t tmp95c061_device::msar23_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return m_mem_start_mask[(offset >> 1) + 2];
+	else
+		return m_mem_start_reg[(offset >> 1) + 2];
+}
+
+void tmp95c061_device::msar23_w(offs_t offset, uint8_t data)
+{
+	if (BIT(offset, 0))
+		m_mem_start_mask[(offset >> 1) + 2] = data;
+	else
+		m_mem_start_reg[(offset >> 1) + 2] = data;
+}
+
+
+uint8_t tmp95c061_device::drefcr_r()
+{
+	return m_dram_refresh;
+}
+
+void tmp95c061_device::drefcr_w(uint8_t data)
+{
+	m_dram_refresh = data;
+}
+
+uint8_t tmp95c061_device::dmemcr_r()
+{
+	return m_dram_access;
+}
+
+void tmp95c061_device::dmemcr_w(uint8_t data)
+{
+	m_dram_access = data;
 }

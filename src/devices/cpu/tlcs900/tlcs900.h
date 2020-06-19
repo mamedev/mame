@@ -52,6 +52,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; } /* FIXME */
@@ -100,7 +101,6 @@ protected:
 	PAIR    m_dmam[4];
 
 	/* Internal timers, irqs, etc */
-	uint8_t   m_reg[0xa0];
 	uint32_t  m_timer_pre;
 	uint8_t   m_timer[6];
 	int     m_timer_change[4];
