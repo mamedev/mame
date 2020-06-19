@@ -84,7 +84,7 @@ public:
 	auto birq7() { return m_out_birq7_cb.bind(); }
 
 	void add_card(device_qbus_card_interface *card);
-	void install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask=0xffffffff);
+	void install_device(offs_t start, offs_t end, read16sm_delegate rhandler, write16sm_delegate whandler, uint32_t mask=0xffffffff);
 
 	DECLARE_WRITE_LINE_MEMBER(birq4_w) { m_out_birq4_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER(birq5_w) { m_out_birq5_cb(state); }

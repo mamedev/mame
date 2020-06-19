@@ -115,7 +115,7 @@ ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const 
 {
 }
 
-SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
+void ti_pcode_card_device::setaddress_dbin(offs_t offset, int state)
 {
 	m_address = offset;
 	m_inDsrArea = in_dsr_space(offset, true);
@@ -155,7 +155,7 @@ void ti_pcode_card_device::debugger_read(uint16_t offset, uint8_t& value)
 	}
 }
 
-READ8Z_MEMBER( ti_pcode_card_device::readz )
+void ti_pcode_card_device::readz(offs_t offset, uint8_t *value)
 {
 	// Care for debugger
 	if (machine().side_effects_disabled())
@@ -240,7 +240,7 @@ WRITE_LINE_MEMBER( ti_pcode_card_device::clock_in)
     we just ignore any request. (Note that CRU lines are not like memory; you
     may be able to write to them, but not necessarily read them again.)
 */
-READ8Z_MEMBER(ti_pcode_card_device::crureadz)
+void ti_pcode_card_device::crureadz(offs_t offset, uint8_t *value)
 {
 }
 

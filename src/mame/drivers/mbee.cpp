@@ -22,8 +22,7 @@ from Brett Selwood and Andrew Davies.
 
     The Premium Plus was a limited-edition kit from Microbee Systems, but we don't
     have any technical info or schematic as yet. It starts up, keyboard works, disks
-    work much the same as a 128k or 256tc. It has 1024k of RAM but we do not know how
-    the extra RAM is selected. At this time it has 256k allocated and it seems happy enough.
+    work much the same as a 128k or 256tc. It has 1024k of RAM.
     The kit itself has an extra custom FPGA CPU board with memory-card slot, but there's
     no info on it yet. We just emulate the Z80 portion.
 
@@ -93,14 +92,16 @@ from Brett Selwood and Andrew Davies.
 
     TODO/not working:
 
+    Keyboard:
     - 256tc: Paste ignores shift key
     - All others: Paste drops most characters.
+    - Teleterm: keyboard has problems. The schematic shows it using the old-style keyboard,
+                however it actually uses the new keyboard with interrupts.
+                The keyboard has issues in the Offsider Macro Key Editor.
 
-    - various fdc issues:
-        - B drive doesn't work with most disks.
-        - some disks cause MESS to freeze.
-        - ENMF pin missing from wd_fdc.
-        - incorrect timing for track register causes 256tc failure to boot a disk.
+    FDC:   (TODO: see if these bugs still exist)
+    - B drive doesn't work with most disks.
+    - some disks cause MESS to freeze.
 
     - Simply Write has keyboard problems (in 128k, no keys work).
 
@@ -111,9 +112,6 @@ from Brett Selwood and Andrew Davies.
 
     - 256tc, Teleterm: Keyboard CPU inbuilt ROM needs to be dumped.
     - 128k, 64k: PALs need to be dumped for the bankswitching.
-
-    - Teleterm: keyboard has problems. The schematic shows it using the old-style keyboard,
-                however it actually uses the new keyboard with interrupts.
 
     - Mouse: a few programs support the use of a serial mouse which interfaced
              directly to the Z80PIO. However there's little info to be found.
@@ -138,7 +136,9 @@ void mbee_state::mbee_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram();
-	map(0x8000, 0xefff).rom().region("maincpu",0);
+	map(0x8000, 0xbfff).rom().region("maincpu",0);
+	map(0xc000, 0xdfff).rom().region("pakrom",0);
+	map(0xe000, 0xefff).rom().region("telcomrom",0);
 	map(0xf000, 0xf7ff).rw(FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
 	map(0xf800, 0xffff).rw(FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
 }
@@ -148,7 +148,7 @@ void mbee_state::mbeeic_mem(address_map &map)
 	map(0x0000, 0x7fff).ram();
 	map(0x8000, 0xbfff).rom().region("maincpu",0);
 	map(0xc000, 0xdfff).bankr("pak");
-	map(0xe000, 0xefff).rom().region("maincpu",0x4000);
+	map(0xe000, 0xefff).rom().region("telcomrom",0);
 	map(0xf000, 0xf7ff).rw(FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
 	map(0xf800, 0xffff).rw(FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
 }
@@ -313,7 +313,7 @@ void mbee_state::mbee128_io(address_map &map)
 	map(0x1c, 0x1f).rw(FUNC(mbee_state::port1c_r), FUNC(mbee_state::port1c_w));
 	map(0x44, 0x47).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0x48, 0x4f).rw(FUNC(mbee_state::fdc_status_r), FUNC(mbee_state::fdc_motor_w));
-	map(0x50, 0x57).w(FUNC(mbee_state::mbee128_50_w));
+	map(0x50, 0x57).w(FUNC(mbee_state::port50_w));
 }
 
 void mbee_state::mbee256_io(address_map &map)
@@ -335,7 +335,7 @@ void mbee_state::mbee256_io(address_map &map)
 	map(0x001c, 0x001f).mirror(0xff00).rw(FUNC(mbee_state::port1c_r), FUNC(mbee_state::port1c_w));
 	map(0x0044, 0x0047).mirror(0xff00).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0x0048, 0x004f).mirror(0xff00).rw(FUNC(mbee_state::fdc_status_r), FUNC(mbee_state::fdc_motor_w));
-	map(0x0050, 0x0057).mirror(0xff00).w(FUNC(mbee_state::mbee256_50_w));
+	map(0x0050, 0x0057).mirror(0xff00).w(FUNC(mbee_state::port50_w));
 	// map(0x0058, 0x005f).mirror(0xff00); External options: floppy drive, hard drive and keyboard
 	// map(0x0060, 0x0067).mirror(0xff00); Reserved for file server selection (unused)
 	// map(0x0068, 0x006f).mirror(0xff00); Reserved for 8530 SCC (unused)
@@ -651,8 +651,6 @@ void mbee_state::mbee(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee_io);
 	m_maincpu->set_daisy_config(mbee_daisy_chain);
 
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
-
 	Z80PIO(config, m_pio, 12_MHz_XTAL / 6);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
@@ -670,8 +668,6 @@ void mbee_state::mbee(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mono);
 
 	PALETTE(config, m_palette, FUNC(mbee_state::standard_palette), 100);
-
-	MCFG_VIDEO_START_OVERRIDE(mbee_state, mono)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -710,8 +706,6 @@ void mbee_state::mbeeic(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeeic_io);
 	m_maincpu->set_daisy_config(mbee_daisy_chain);
 
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
-
 	Z80PIO(config, m_pio, 13.5_MHz_XTAL / 4);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
@@ -729,8 +723,6 @@ void mbee_state::mbeeic(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_standard);
 
 	PALETTE(config, m_palette, FUNC(mbee_state::standard_palette), 100);
-
-	MCFG_VIDEO_START_OVERRIDE(mbee_state, standard)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -773,7 +765,6 @@ void mbee_state::mbeeppc(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeeppc_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeeppc_io);
-	MCFG_VIDEO_START_OVERRIDE(mbee_state, premium)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_premium);
 	m_palette->set_init(FUNC(mbee_state::premium_palette));
 
@@ -786,7 +777,6 @@ void mbee_state::mbee56(machine_config &config)
 	mbeeic(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee56_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee56_io);
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56)
 
 	WD2793(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(mbee_state::fdc_intrq_w));
@@ -801,7 +791,6 @@ void mbee_state::mbee128(machine_config &config)
 	mbee56(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee256_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee128_io);
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(FUNC(mbee_state::rtc_irq_w));
@@ -812,7 +801,6 @@ void mbee_state::mbee128p(machine_config &config)
 	mbeeppc(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee256_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee128_io);
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
 
 	WD2793(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(mbee_state::fdc_intrq_w));
@@ -827,7 +815,6 @@ void mbee_state::mbee256(machine_config &config)
 	mbee128p(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee256_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee256_io);
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee256)
 
 	config.device_remove("fdc:0");
 	config.device_remove("fdc:1");
@@ -840,7 +827,6 @@ void mbee_state::mbeett(machine_config &config)
 	mbeeppc(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeett_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeett_io);
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbeett)
 	config.device_remove("quickload");
 	config.device_remove("quickload2");
 	SCC8530(config, "scc", 4000000); // clock unknown
@@ -860,14 +846,19 @@ void mbee_state::mbeett(machine_config &config)
 
 
 ROM_START( mbee )
-	ROM_REGION( 0x7000, "maincpu", 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD("bas510a.ic25",          0x0000,  0x1000, CRC(2ca47c36) SHA1(f36fd0afb3f1df26edc67919e78000b762b6cbcb) )
 	ROM_LOAD("bas510b.ic27",          0x1000,  0x1000, CRC(a07a0c51) SHA1(dcbdd9df78b4b6b2972de2e4050dabb8ae9c3f5a) )
 	ROM_LOAD("bas510c.ic28",          0x2000,  0x1000, CRC(906ac00f) SHA1(9b46458e5755e2c16cdb191a6a70df6de9fe0271) )
 	ROM_LOAD("bas510d.ic30",          0x3000,  0x1000, CRC(61727323) SHA1(c0fea9fd0e25beb9faa7424db8efd07cf8d26c1b) )
-	ROM_LOAD_OPTIONAL("edasma.ic31",  0x4000,  0x1000, CRC(120c3dea) SHA1(32c9bb6e54dd50d5218bb43cc921885a0307161d) )
-	ROM_LOAD_OPTIONAL("edasmb.ic33",  0x5000,  0x1000, CRC(a23bf3c8) SHA1(73a57c2800a1c744b527d0440b170b8b03351753) )
-	ROM_LOAD_OPTIONAL("telcom10.rom", 0x6000,  0x1000, CRC(cc9ac94d) SHA1(6804b5ff54d16f8e06180751d8681c44f351e0bb) )
+
+	ROM_REGION( 0x1000, "telcomrom", 0 )
+	ROM_LOAD_OPTIONAL("telcom10.rom", 0x0000,  0x1000, CRC(cc9ac94d) SHA1(6804b5ff54d16f8e06180751d8681c44f351e0bb) )
+
+	// there's no actual PAK board or command in this machine
+	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
+	ROM_LOAD_OPTIONAL("edasma.ic31",  0x0000,  0x1000, CRC(120c3dea) SHA1(32c9bb6e54dd50d5218bb43cc921885a0307161d) )
+	ROM_LOAD_OPTIONAL("edasmb.ic33",  0x1000,  0x1000, CRC(a23bf3c8) SHA1(73a57c2800a1c744b527d0440b170b8b03351753) )
 
 	// first 0x800 for normal chars, 2nd 0x800 for small chars. Some roms don't have small chars so normal ones loaded twice.
 	ROM_REGION( 0x1000, "chargen", 0 )
@@ -879,10 +870,12 @@ ROM_START( mbee )
 ROM_END
 
 ROM_START( mbeeic )
-	ROM_REGION( 0x5000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD("bas522a.rom",           0x0000,  0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
 	ROM_LOAD("bas522b.rom",           0x2000,  0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
-	ROM_LOAD_OPTIONAL("telcom12.rom", 0x4000,  0x1000, CRC(0231bda3) SHA1(be7b32499034f985cc8f7865f2bc2b78c485585c) )
+
+	ROM_REGION( 0x1000, "telcomrom", 0 )
+	ROM_LOAD_OPTIONAL("telcom12.rom", 0x0000,  0x1000, CRC(0231bda3) SHA1(be7b32499034f985cc8f7865f2bc2b78c485585c) )
 
 	/* PAK option roms */
 	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
@@ -1125,16 +1118,16 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT           COMPANY               FULLNAME
-COMP( 1982, mbee,      0,      0,      mbee,     mbee,    mbee_state, init_mbee,     "Applied Technology", "Microbee 16 Standard", 0 )
-COMP( 1982, mbeeic,    mbee,   0,      mbeeic,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee 32 IC", 0 )
-COMP( 1982, mbeepc,    mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeepc,   "Applied Technology", "Microbee Personal Communicator", 0 )
-COMP( 1985, mbeepc85,  mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeepc85, "Applied Technology", "Microbee PC85", 0 )
-COMP( 1985, mbeepc85b, mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeepc85, "Applied Technology", "Microbee PC85 (New version)", 0 )
-COMP( 1985, mbeepc85s, mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeepc85, "Applied Technology", "Microbee PC85 (Swedish)", 0 )
-COMP( 1986, mbeeppc,   mbee,   0,      mbeeppc,  mbee,    mbee_state, init_mbeeppc,  "Applied Technology", "Microbee Premium PC85", 0 )
-COMP( 1986, mbeett,    mbee,   0,      mbeett,   mbee256, mbee_state, init_mbeett,   "Applied Technology", "Microbee Teleterm",      MACHINE_NOT_WORKING )
-COMP( 1986, mbee56,    mbee,   0,      mbee56,   mbee,    mbee_state, init_mbee56,   "Applied Technology", "Microbee 56k",           MACHINE_NOT_WORKING )
-COMP( 1986, mbee128,   mbee,   0,      mbee128,  mbee128, mbee_state, init_mbee128,  "Applied Technology", "Microbee 128k Standard", MACHINE_NOT_WORKING )
-COMP( 1986, mbee128p,  mbee,   0,      mbee128p, mbee128, mbee_state, init_mbee128,  "Applied Technology", "Microbee 128k Premium",  MACHINE_NOT_WORKING )
-COMP( 1987, mbee256,   mbee,   0,      mbee256,  mbee256, mbee_state, init_mbee256,  "Applied Technology", "Microbee 256TC",         MACHINE_NOT_WORKING )
-COMP( 2012, mbeepp,    mbee,   0,      mbee256,  mbee128, mbee_state, init_mbee128,  "Microbee Systems",   "Microbee Premium Plus",  MACHINE_NOT_WORKING )
+COMP( 1982, mbee,      0,      0,      mbee,     mbee,    mbee_state, init_mbee,     "Applied Technology", "Microbee 16 Standard", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, mbeeic,    mbee,   0,      mbeeic,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee 32 IC", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, mbeepc,    mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee Personal Communicator", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, mbeepc85,  mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, mbeepc85b, mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85 (New version)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, mbeepc85s, mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85 (Swedish)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, mbeeppc,   mbee,   0,      mbeeppc,  mbee,    mbee_state, init_mbeeppc,  "Applied Technology", "Microbee Premium PC85", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, mbeett,    mbee,   0,      mbeett,   mbee256, mbee_state, init_mbeett,   "Applied Technology", "Microbee Teleterm",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, mbee56,    mbee,   0,      mbee56,   mbee,    mbee_state, init_mbee56,   "Applied Technology", "Microbee 56k",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, mbee128,   mbee,   0,      mbee128,  mbee128, mbee_state, init_mbee128,  "Applied Technology", "Microbee 128k Standard", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, mbee128p,  mbee,   0,      mbee128p, mbee128, mbee_state, init_mbee128p, "Applied Technology", "Microbee 128k Premium",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, mbee256,   mbee,   0,      mbee256,  mbee256, mbee_state, init_mbee256,  "Applied Technology", "Microbee 256TC",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 2012, mbeepp,    mbee,   0,      mbee256,  mbee128, mbee_state, init_mbeepp,   "Microbee Systems",   "Microbee Premium Plus",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

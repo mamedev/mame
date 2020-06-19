@@ -1385,14 +1385,6 @@ end
 		end
 	end
 
-	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
-		if string.find(_OPTIONS["gcc"], "clang") and (version < 80000) then
-			defines {
-				"TARGET_OS_OSX=1",
-			}
-		end
-	end
-
 	defines {
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",

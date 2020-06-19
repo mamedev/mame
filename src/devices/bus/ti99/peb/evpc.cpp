@@ -79,7 +79,7 @@ snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mco
 {
 }
 
-SETADDRESS_DBIN_MEMBER( snug_enhanced_video_device::setaddress_dbin )
+void snug_enhanced_video_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Do not allow setaddress for the debugger. It will mess up the
 	// setaddress/memory access pairs when the CPU enters wait states.
@@ -149,7 +149,7 @@ void snug_enhanced_video_device::nvram_write(emu_file &file)
     0x5f00 - 0x5fef   NOVRAM
     0x5ff0 - 0x5fff   Palette (5ff0, 5ff2, 5ff4, 5ff6)
 */
-READ8Z_MEMBER(snug_enhanced_video_device::readz)
+void snug_enhanced_video_device::readz(offs_t offset, uint8_t *value)
 {
 	if (m_selected && m_inDsrArea)
 	{
@@ -320,7 +320,7 @@ void snug_enhanced_video_device::write(offs_t offset, uint8_t data)
     7: DIP or NOVRAM
     Logic is inverted
 */
-READ8Z_MEMBER(snug_enhanced_video_device::crureadz)
+void snug_enhanced_video_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if ((offset & 0xff00)==EVPC_CRU_BASE)
 	{

@@ -377,7 +377,7 @@ ASMJIT_FAVOR_SIZE Error InstInternal::validate(uint32_t arch, const BaseInst& in
           memSize <<= m.getBroadcast();
         }
 
-        if (baseType) {
+        if (baseType != 0 && baseType > Label::kLabelTag) {
           uint32_t baseId = m.baseId();
 
           if (m.isRegHome()) {
@@ -411,6 +411,9 @@ ASMJIT_FAVOR_SIZE Error InstInternal::validate(uint32_t arch, const BaseInst& in
 
           if (!indexType && !m.offsetLo32())
             memFlags |= InstDB::kMemOpBaseOnly;
+        }
+        else if (baseType == Label::kLabelTag) {
+          // [Label] - there is no need to validate the base as it's label.
         }
         else {
           // Base is a 64-bit address.

@@ -36,8 +36,8 @@ public:
 	uint64_t mmio_r(offs_t offset);
 	void mmio_w(offs_t offset, uint64_t data);
 
-	DECLARE_READ32_MEMBER(regs_r);
-	DECLARE_WRITE32_MEMBER(regs_w);
+	uint32_t regs_r(offs_t offset);
+	void regs_w(offs_t offset, uint32_t data);
 
 	void dma_write(const uint64_t hi, const uint64_t lo);
 	void tag_write(uint32_t *data);

@@ -35,10 +35,10 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_READ32_MEMBER(m2hires_r);
-	DECLARE_WRITE32_MEMBER(m2hires_w);
-	DECLARE_READ32_MEMBER(vram_r);
-	DECLARE_WRITE32_MEMBER(vram_w);
+	uint32_t m2hires_r(offs_t offset, uint32_t mem_mask = ~0);
+	void m2hires_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t vram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

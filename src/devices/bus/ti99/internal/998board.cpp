@@ -351,7 +351,7 @@ void mainboard8_device::debugger_write(offs_t offset, uint8_t data)
 
 // =============== CRU bus access ==================
 
-READ8Z_MEMBER(mainboard8_device::crureadz)
+void mainboard8_device::crureadz(offs_t offset, uint8_t *value)
 {
 	m_ioport->crureadz(offset, value);
 }
@@ -1153,7 +1153,7 @@ vaquerro_device::vaquerro_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-SETADDRESS_DBIN_MEMBER( vaquerro_device::set_address )
+void vaquerro_device::set_address(offs_t offset, int state)
 {
 	// Do the decoding
 	// state = dbin, offset = address
@@ -1602,7 +1602,7 @@ mofetta_device::mofetta_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-SETADDRESS_DBIN_MEMBER( mofetta_device::set_address )
+void mofetta_device::set_address(offs_t offset, int state)
 {
 	if (!m_gotfirstword)
 	{

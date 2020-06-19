@@ -496,13 +496,13 @@ void vme_fccpu20_device::device_timer (emu_timer &timer, device_timer_id id, int
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
-READ32_MEMBER (vme_fccpu20_device::bootvect_r)
+uint32_t vme_fccpu20_device::bootvect_r(offs_t offset)
 {
 	LOG("%s\n", FUNCNAME);
 	return m_sysrom[offset];
 }
 
-WRITE32_MEMBER (vme_fccpu20_device::bootvect_w)
+void vme_fccpu20_device::bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOG("%s\n", FUNCNAME);
 	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;

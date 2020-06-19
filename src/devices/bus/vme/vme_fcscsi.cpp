@@ -354,7 +354,7 @@ void vme_fcscsi1_card_device::device_reset()
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
-READ16_MEMBER (vme_fcscsi1_card_device::bootvect_r){
+uint16_t vme_fcscsi1_card_device::bootvect_r(offs_t offset){
 	return m_sysrom [offset];
 }
 
@@ -370,12 +370,12 @@ Bit #: 7 6 5 4 3 2 1 0
               \ ISCSI-l 1.D. Bit #2
 */
 
-READ8_MEMBER (vme_fcscsi1_card_device::tcr_r){
+uint8_t vme_fcscsi1_card_device::tcr_r(){
 	LOG("%s\n", FUNCNAME);
 	return (uint8_t) m_tcr;
 }
 
-WRITE8_MEMBER (vme_fcscsi1_card_device::tcr_w){
+void vme_fcscsi1_card_device::tcr_w(uint8_t data){
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
 	floppy_image_device *floppy2 = m_fdc->subdevice<floppy_connector>("2")->get_device();
@@ -460,7 +460,7 @@ void vme_fcscsi1_card_device::fdc_write_byte(uint8_t data)
 	m_fdc->data_w(data & 0xff);
 }
 
-READ8_MEMBER(vme_fcscsi1_card_device::scsi_r)
+uint8_t vme_fcscsi1_card_device::scsi_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -473,12 +473,12 @@ READ8_MEMBER(vme_fcscsi1_card_device::scsi_r)
 	return data;
 }
 
-WRITE8_MEMBER(vme_fcscsi1_card_device::scsi_w)
+void vme_fcscsi1_card_device::scsi_w(offs_t offset, uint8_t data)
 {
 	LOG("scsi W %02x <- %02x\n", offset, data);
 }
 
-READ8_MEMBER (vme_fcscsi1_card_device::not_implemented_r){
+uint8_t vme_fcscsi1_card_device::not_implemented_r(){
 	static int been_here = 0;
 	if (!been_here++){
 		logerror(TODO);
@@ -487,7 +487,7 @@ READ8_MEMBER (vme_fcscsi1_card_device::not_implemented_r){
 	return (uint8_t) 0;
 }
 
-WRITE8_MEMBER (vme_fcscsi1_card_device::not_implemented_w){
+void vme_fcscsi1_card_device::not_implemented_w(uint8_t data){
 	static int been_here = 0;
 	if (!been_here++){
 		logerror(TODO);

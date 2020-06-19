@@ -1316,12 +1316,12 @@ void jaguardsp_cpu_device::io_map(address_map &map)
 	map(0x20, 0x23).r(FUNC(jaguardsp_cpu_device::high_accum_r));
 }
 
-READ32_MEMBER(jaguar_cpu_device::flags_r)
+u32 jaguar_cpu_device::flags_r()
 {
 	return (m_flags & 0x1c1f7) | (m_imask << 3);
 }
 
-WRITE32_MEMBER(jaguar_cpu_device::flags_w)
+void jaguar_cpu_device::flags_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_flags);
 	// clear imask only on bit 3 clear (1 has no effect)
@@ -1345,21 +1345,21 @@ WRITE32_MEMBER(jaguar_cpu_device::flags_w)
 	check_irqs();
 }
 
-WRITE32_MEMBER(jaguar_cpu_device::matrix_control_w)
+void jaguar_cpu_device::matrix_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_mtxc);
 	m_mwidth = m_io_mtxc & 0xf;
 	m_maddw = BIT(m_io_mtxc, 4);
 }
 
-WRITE32_MEMBER(jaguar_cpu_device::matrix_address_w)
+void jaguar_cpu_device::matrix_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_mtxa);
 	// matrix can be long word address only, and only read from internal RAM
 	m_mtxaddr = m_internal_ram_start | (m_io_mtxa & 0xffc);
 }
 
-WRITE32_MEMBER(jaguar_cpu_device::pc_w)
+void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_pc);
 	if (m_go == false)
@@ -1377,7 +1377,7 @@ WRITE32_MEMBER(jaguar_cpu_device::pc_w)
  * ----	---x I/O endianness
  */
 // TODO: just log if anything farts for now, change to bit struct once we have something to test out
-WRITE32_MEMBER(jaguar_cpu_device::end_w)
+void jaguar_cpu_device::end_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_end);
 	// sburnout sets bit 1 == 0
@@ -1385,7 +1385,7 @@ WRITE32_MEMBER(jaguar_cpu_device::end_w)
 		throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
 }
 
-WRITE32_MEMBER(jaguardsp_cpu_device::dsp_end_w)
+void jaguardsp_cpu_device::dsp_end_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_end);
 	// wolfn3d writes a '0' to bit 1 (which is a NOP for DSP)
@@ -1405,7 +1405,7 @@ WRITE32_MEMBER(jaguardsp_cpu_device::dsp_end_w)
  * - ---- ---- ---- ---x GPUGO or DSPGO flag
  *
  */
-READ32_MEMBER(jaguar_cpu_device::status_r)
+u32 jaguar_cpu_device::status_r()
 {
 	u32 result = ((m_version & 0xf)<<12) | (m_bus_hog<<11) | m_go;
 	result|= (m_int_latch & 0x1f) << 6;
@@ -1422,7 +1422,7 @@ WRITE_LINE_MEMBER(jaguar_cpu_device::go_w)
 	yield();
 }
 
-WRITE32_MEMBER(jaguar_cpu_device::control_w)
+void jaguar_cpu_device::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_status);
 	bool new_go = BIT(m_io_status, 0);
@@ -1447,33 +1447,33 @@ WRITE32_MEMBER(jaguar_cpu_device::control_w)
 		logerror("%s: bus hog enabled\n", this->tag());
 }
 
-READ32_MEMBER(jaguargpu_cpu_device::hidata_r)
+u32 jaguargpu_cpu_device::hidata_r()
 {
 	return m_hidata;
 }
 
-WRITE32_MEMBER(jaguargpu_cpu_device::hidata_w)
+void jaguargpu_cpu_device::hidata_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_hidata);
 }
 
-READ32_MEMBER(jaguar_cpu_device::div_remainder_r)
+u32 jaguar_cpu_device::div_remainder_r()
 {
 	// TODO: truly 32-bit?
 	return m_div_remainder;
 }
 
-WRITE32_MEMBER(jaguar_cpu_device::div_control_w)
+void jaguar_cpu_device::div_control_w(u32 data)
 {
 	m_div_offset = BIT(data, 0);
 }
 
-WRITE32_MEMBER(jaguardsp_cpu_device::modulo_w)
+void jaguardsp_cpu_device::modulo_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_modulo);
 }
 
-READ32_MEMBER(jaguardsp_cpu_device::high_accum_r)
+u32 jaguardsp_cpu_device::high_accum_r()
 {
 	printf("%s: high 16-bit accumulator read\n", this->tag());
 	return (m_accum >> 32) & 0xff;

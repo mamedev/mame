@@ -65,9 +65,9 @@ class ti99_cartridge_device : public device_t, public device_image_interface
 public:
 	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8Z_MEMBER(readz);
+	void readz(offs_t offset, uint8_t *value);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_READ8Z_MEMBER(crureadz);
+	void crureadz(offs_t offset, uint8_t *value);
 	void cruwrite(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
@@ -212,9 +212,9 @@ public:
 	virtual ~ti99_cartridge_pcb() { }
 
 protected:
-	virtual DECLARE_READ8Z_MEMBER(readz);
+	virtual void readz(offs_t offset, uint8_t *value);
 	virtual void write(offs_t offset, uint8_t data);
-	virtual DECLARE_READ8Z_MEMBER(crureadz);
+	virtual void crureadz(offs_t offset, uint8_t *value);
 	virtual void cruwrite(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(romgq_line);
@@ -262,7 +262,7 @@ public:
 class ti99_paged12k_cartridge : public ti99_cartridge_pcb
 {
 public:
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
 };
 
@@ -271,7 +271,7 @@ public:
 class ti99_paged16k_cartridge : public ti99_cartridge_pcb
 {
 public:
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
 };
 
@@ -280,7 +280,7 @@ public:
 class ti99_paged7_cartridge : public ti99_cartridge_pcb
 {
 public:
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
 };
 
@@ -289,7 +289,7 @@ public:
 class ti99_minimem_cartridge : public ti99_cartridge_pcb
 {
 public:
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
 };
 
@@ -298,9 +298,9 @@ public:
 class ti99_super_cartridge : public ti99_cartridge_pcb
 {
 public:
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
-	DECLARE_READ8Z_MEMBER(crureadz) override;
+	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
 };
 
@@ -309,7 +309,7 @@ public:
 class ti99_mbx_cartridge : public ti99_cartridge_pcb
 {
 public:
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
 };
 
@@ -318,7 +318,7 @@ public:
 class ti99_paged379i_cartridge : public ti99_cartridge_pcb
 {
 public:
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
 private:
 	int     get_paged379i_bank(int rompage);
@@ -329,7 +329,7 @@ private:
 class ti99_paged378_cartridge : public ti99_cartridge_pcb
 {
 public:
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
 };
 
@@ -338,7 +338,7 @@ public:
 class ti99_paged377_cartridge : public ti99_cartridge_pcb
 {
 public:
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
 };
 
@@ -347,9 +347,9 @@ public:
 class ti99_pagedcru_cartridge : public ti99_cartridge_pcb
 {
 public:
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
-	DECLARE_READ8Z_MEMBER(crureadz) override;
+	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
 };
 
@@ -360,9 +360,9 @@ class ti99_gromemu_cartridge : public ti99_cartridge_pcb
 public:
 	ti99_gromemu_cartridge(): m_waddr_LSB(false), m_grom_selected(false), m_grom_read_mode(false), m_grom_address_mode(false)
 	{  m_grom_address = 0; }
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
-	DECLARE_READ8Z_MEMBER(gromemureadz);
+	void gromemureadz(offs_t offset, uint8_t *value);
 	void gromemuwrite(offs_t offset, uint8_t data);
 	void set_gromlines(line_state mline, line_state moline, line_state gsq) override;
 

@@ -44,12 +44,12 @@ public:
 	template<std::size_t Bit> auto write_p() { return m_write_p[Bit-3].bind(); }
 	template<std::size_t Bit> auto read_ad() { return m_read_ad[Bit].bind(); }
 
-	DECLARE_READ8_MEMBER(ports_r);
-	DECLARE_WRITE8_MEMBER(ports_w);
-	DECLARE_READ8_MEMBER(adc_r);
-	DECLARE_WRITE8_MEMBER(adc_w);
-	DECLARE_READ8_MEMBER(intregs_r);
-	DECLARE_WRITE8_MEMBER(intregs_w);
+	uint8_t ports_r(offs_t offset);
+	void ports_w(offs_t offset, uint8_t data);
+	uint8_t adc_r(offs_t offset);
+	void adc_w(offs_t offset, uint8_t data);
+	uint8_t intregs_r(offs_t offset);
+	void intregs_w(offs_t offset, uint8_t data);
 
 	bool are_port_bits_output(uint8_t port, uint8_t mask) { return ((m_ddrs[port] & mask) == mask) ? true : false; }
 

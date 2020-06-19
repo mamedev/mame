@@ -467,7 +467,7 @@ void c8280_device::ieee488_ifc(int state)
 	m_ifc = state;
 }
 
-READ8_MEMBER( c8280_device::fk5_r )
+uint8_t c8280_device::fk5_r()
 {
 	/*
 
@@ -492,7 +492,7 @@ READ8_MEMBER( c8280_device::fk5_r )
 	return data;
 }
 
-WRITE8_MEMBER( c8280_device::fk5_w )
+void c8280_device::fk5_w(uint8_t data)
 {
 	/*
 

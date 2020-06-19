@@ -2,7 +2,7 @@
 // copyright-holders:Mirko Buffoni,Aaron Giles
 /***************************************************************************
 
-    okim6295.h
+    okim6295.cpp
 
     OKIM 6295 ADCPM sound chip.
 

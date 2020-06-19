@@ -54,8 +54,8 @@ public:
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data);
 
 protected:
 	// device-level overrides

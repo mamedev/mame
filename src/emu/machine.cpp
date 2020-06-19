@@ -1339,12 +1339,12 @@ void system_time::full_time::set(struct tm &t)
 //  DUMMY ADDRESS SPACE
 //**************************************************************************
 
-READ8_MEMBER(dummy_space_device::read)
+u8 dummy_space_device::read(offs_t offset)
 {
 	throw emu_fatalerror("Attempted to read from generic address space (offs %X)\n", offset);
 }
 
-WRITE8_MEMBER(dummy_space_device::write)
+void dummy_space_device::write(offs_t offset, u8 data)
 {
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }

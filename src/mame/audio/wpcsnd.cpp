@@ -37,11 +37,11 @@ void wpcsnd_device::wpcsnd_map(address_map &map)
 	map(0x2000, 0x2000).mirror(0x03ff).w(FUNC(wpcsnd_device::rombank_w));
 	map(0x2400, 0x2401).mirror(0x03fe).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x2800, 0x2800).mirror(0x03ff).w("dac", FUNC(dac_byte_interface::data_w));
-	map(0x2c00, 0x2fff).w(FUNC(wpcsnd_device::bg_speech_digit_w));
-	map(0x3000, 0x33ff).r(FUNC(wpcsnd_device::latch_r));
-	map(0x3400, 0x37ff).w(FUNC(wpcsnd_device::bg_speech_clock_w));
-	map(0x3800, 0x3bff).w(FUNC(wpcsnd_device::volume_w));
-	map(0x3c00, 0x3fff).w(FUNC(wpcsnd_device::latch_w));
+	map(0x2c00, 0x2c00).mirror(0x03ff).w(FUNC(wpcsnd_device::bg_cvsd_clock_set_w));
+	map(0x3000, 0x3000).mirror(0x03ff).r(FUNC(wpcsnd_device::latch_r));
+	map(0x3400, 0x3400).mirror(0x03ff).w(FUNC(wpcsnd_device::bg_cvsd_digit_clock_clear_w));
+	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(wpcsnd_device::volume_w));
+	map(0x3c00, 0x3c00).mirror(0x03ff).w(FUNC(wpcsnd_device::latch_w));
 	map(0x4000, 0xbfff).bankr("rombank");
 	map(0xc000, 0xffff).bankr("fixed");
 }
@@ -113,16 +113,24 @@ WRITE_LINE_MEMBER( wpcsnd_device::ym2151_irq_w)
 	m_cpu->set_input_line(M6809_FIRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void wpcsnd_device::bg_speech_clock_w(uint8_t data)
+//------------------------------------------------------
+//  bg_cvsd_clock_set_w - set the clk pin on the HC555xx
+//------------------------------------------------------
+
+void wpcsnd_device::bg_cvsd_clock_set_w(uint8_t data)
 {
-	// pulses clock input?
 	m_hc55516->clock_w(1);
-	m_hc55516->clock_w(0);
 }
 
-void wpcsnd_device::bg_speech_digit_w(uint8_t data)
+//----------------------------------------------------
+//  bg_cvsd_digit_clock_clear_w - clear the clk pin on
+//  the HC555xx and clock the data latch
+//----------------------------------------------------
+
+void wpcsnd_device::bg_cvsd_digit_clock_clear_w(uint8_t data)
 {
-	m_hc55516->digit_w(data);
+	m_hc55516->clock_w(0);
+	m_hc55516->digit_w(data&1);
 }
 
 void wpcsnd_device::rombank_w(uint8_t data)
@@ -146,12 +154,14 @@ void wpcsnd_device::rombank_w(uint8_t data)
 	LOG("WPCSND: Bank set to %02x\n",bank);
 }
 
+/// TODO: 74ls374@U39? plus 74LS74@U24B, replace this with a generic_latch_8 device
 uint8_t wpcsnd_device::latch_r()
 {
 	m_cpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 	return m_latch;
 }
 
+/// TODO: 74ls374@U23? plus 74LS74@U24A, replace this with a generic_latch_8 device
 void wpcsnd_device::latch_w(uint8_t data)
 {
 	m_reply_available = true;
@@ -159,6 +169,7 @@ void wpcsnd_device::latch_w(uint8_t data)
 	m_reply_cb(1);
 }
 
+/// TODO: actually implement this
 void wpcsnd_device::volume_w(uint8_t data)
 {
 }

@@ -163,25 +163,25 @@ TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
 	for (i = 0; i < 15; i++)
 	{
 		pressed = m_io_newkb[i]->read();
-		if (pressed != m_mbee256_was_pressed[i])
+		if (pressed != m_newkb_was_pressed[i])
 		{
 			// get scankey value
 			for (j = 0; j < 8; j++)
 			{
-				if (BIT(pressed^m_mbee256_was_pressed[i], j))
+				if (BIT(pressed^m_newkb_was_pressed[i], j))
 				{
 					// put it in the queue
 					uint8_t code = (i << 3) | j | (BIT(pressed, j) ? 0x80 : 0);
-					m_mbee256_q[m_mbee256_q_pos] = code;
-					if (m_mbee256_q_pos < 19) m_mbee256_q_pos++;
+					m_newkb_q[m_newkb_q_pos] = code;
+					if (m_newkb_q_pos < 19) m_newkb_q_pos++;
 				}
 			}
-			m_mbee256_was_pressed[i] = pressed;
+			m_newkb_was_pressed[i] = pressed;
 		}
 	}
 
 	// if anything queued, cause an interrupt
-	if (m_mbee256_q_pos)
+	if (m_newkb_q_pos)
 		m_b2 = 1; // set irq
 
 	if (m_b2)
@@ -192,12 +192,12 @@ TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
 
 uint8_t mbee_state::port18_r()
 {
-	uint8_t i, data = m_mbee256_q[0]; // get oldest key
+	uint8_t i, data = m_newkb_q[0]; // get oldest key
 
-	if (m_mbee256_q_pos)
+	if (m_newkb_q_pos)
 	{
-		m_mbee256_q_pos--;
-		for (i = 0; i < m_mbee256_q_pos; i++) m_mbee256_q[i] = m_mbee256_q[i+1]; // ripple queue
+		m_newkb_q_pos--;
+		for (i = 0; i < m_newkb_q_pos; i++) m_newkb_q[i] = m_newkb_q[i+1]; // ripple queue
 	}
 
 	m_b2 = 0; // clear irq
@@ -266,7 +266,7 @@ WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
     and (output = 22,21,20,19,18,17,16,15). The prom is also used to control
     the refresh required by the dynamic rams, however we ignore this function.
 
-    b_mask = total dynamic ram (1=64k; 3=128k; 7=256k)
+    b_mask = total dynamic ram (1=64k; 3=128k; 7=256k or more)
 
     Certain software (such as the PJB system) constantly switch banks around,
     causing slowness. Therefore this function only changes the banks that need
@@ -276,6 +276,9 @@ WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
 
 void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 {
+	b_mask &= 7;
+	u32 dbank = m_ramsize / 0x1000;
+	u8 extra_bits = data & 0xc0;
 	data &= 0x3f; // (bits 0-5 are referred to as S0-S5)
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint8_t *prom = memregion("pals")->base();
@@ -303,8 +306,6 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 				if (!BIT(data, 5))
 					b_byte &= 0xfb;  // U42/1 - S17 only valid if S5 is on
 
-				mem.unmap_read (b_vid, b_vid + 0xfff);
-
 				if (!BIT(b_byte, 4))
 				{
 					// select video
@@ -316,9 +317,9 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 					mem.install_read_bank( b_vid, b_vid+0xfff, m_bankr[b_bank] );
 
 					if (!BIT(b_byte, 3))
-						m_bankr[b_bank]->set_entry(64 + (b_bank & 3)); // read from rom
+						m_bankr[b_bank]->set_entry(dbank + (b_bank & 3)); // read from rom
 					else
-						m_bankr[b_bank]->set_entry((b_bank & 7) | ((b_byte & b_mask) << 3)); // ram
+						m_bankr[b_bank]->set_entry(extra_bits + (b_bank & 7) + ((b_byte & b_mask) << 3)); // ram
 				}
 			}
 			p_bank++;
@@ -334,8 +335,6 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 				if (!BIT(data, 5))
 					b_byte &= 0xfb;  // U42/1 - S17 only valid if S5 is on
 
-				mem.unmap_write (b_vid, b_vid + 0xfff);
-
 				if (!BIT(b_byte, 4))
 				{
 					// select video
@@ -346,10 +345,10 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 				{
 					mem.install_write_bank( b_vid, b_vid+0xfff, m_bankw[b_bank] );
 
-					if (!BIT(b_byte, 3))
-						m_bankw[b_bank]->set_entry(64); // write to rom dummy area
-					else
-						m_bankw[b_bank]->set_entry((b_bank & 7) | ((b_byte & b_mask) << 3)); // ram
+					//if (!BIT(b_byte, 3))
+						//m_bankw[b_bank]->set_entry(dbank); // write to rom dummy area
+					//else
+						m_bankw[b_bank]->set_entry(extra_bits + (b_bank & 7) + ((b_byte & b_mask) << 3)); // ram
 				}
 			}
 			p_bank++;
@@ -357,9 +356,10 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 	}
 }
 
-void mbee_state::mbee256_50_w(uint8_t data)
+void mbee_state::port50_w(u8 data)
 {
-	setup_banks(data, 0, 7);
+	u8 mask = ((m_ramsize / 0x8000) - 1) & 7;
+	setup_banks(data, 0, mask);
 }
 
 /***********************************************************
@@ -375,10 +375,6 @@ void mbee_state::mbee256_50_w(uint8_t data)
 
 ************************************************************/
 
-void mbee_state::mbee128_50_w(uint8_t data)
-{
-	setup_banks(data, 0, 3);
-}
 
 /***********************************************************
 
@@ -434,8 +430,115 @@ uint8_t mbee_state::telcom_high_r()
   It gets set back to normal on the first attempt to write to memory. (/WR line goes active).
 */
 
+void mbee_state::machine_start()
+{
+	save_item(NAME(m_ramsize));
+	save_item(NAME(m_features));
+	save_item(NAME(m_size));
+	save_item(NAME(m_b7_rtc));
+	save_item(NAME(m_b7_vs));
+	save_item(NAME(m_b2));
+	save_item(NAME(m_framecnt)); // not important
+	save_item(NAME(m_08));
+	save_item(NAME(m_0a));
+	save_item(NAME(m_0b));
+	save_item(NAME(m_1c));
+	save_item(NAME(m_newkb_was_pressed));
+	save_item(NAME(m_newkb_q));
+	save_item(NAME(m_newkb_q_pos));
+	save_item(NAME(m_sy6545_reg));
+	save_item(NAME(m_sy6545_ind));
+	save_item(NAME(m_fdc_rq));
+	save_item(NAME(m_bank_array));
 
-void mbee_state::machine_reset_common()
+	// banking of the BASIC roms
+	if (m_basic)
+	{
+		u8 *b = memregion("basicrom")->base();
+		m_basic->configure_entries(0, 2, b, 0x2000);
+	}
+
+	// banking of the TELCOM rom
+	if (m_telcom)
+	{
+		u8 *t = memregion("telcomrom")->base();
+		m_telcom->configure_entries(0, 2, t, 0x1000);
+	}
+
+	// PAKs fitted
+	if (m_pak)
+	{
+		u8 *p = memregion("pakrom")->base();
+		m_pak->configure_entries(0, 16, p, 0x2000);
+	}
+
+	// videoram
+	m_vram = make_unique_clear<u8[]>(0x0800);
+	save_pointer(NAME(m_vram), 0x0800);
+
+	// colour
+	if (BIT(m_features, 0))
+	{
+		m_cram = make_unique_clear<u8[]>(0x0800);
+		save_pointer(NAME(m_cram), 0x0800);
+	}
+
+	// minimal main ram
+	if (BIT(m_features, 1))
+		m_size = 0xE000;
+	else
+		m_size = 0x8000;
+
+	// new keyboard
+	if (BIT(m_features, 2))
+		timer_set(attotime::from_hz(1), TIMER_MBEE_NEWKB);   /* kick-start timer for kbd */
+
+	// premium
+	if (BIT(m_features, 3))
+	{
+		m_aram = make_unique_clear<u8[]>(0x0800);
+		save_pointer(NAME(m_aram), 0x0800);
+		m_pram = make_unique_clear<u8[]>(0x8800);
+		save_pointer(NAME(m_pram), 0x8800);
+	}
+	else
+	{
+		m_pram = make_unique_clear<u8[]>(0x1000);
+		save_pointer(NAME(m_pram), 0x1000);
+	}
+
+	// Banked systems
+	u8 b = BIT(m_features, 4, 2);
+	if (b)
+	{
+		m_ramsize = 0x20000;  // 128k
+		if (b == 2)
+			m_ramsize = 0x40000;  // 256k
+		else
+		if (b == 3)
+			m_ramsize = 0x100000;  // 1MB for PP
+
+		m_ram = make_unique_clear<u8[]>(m_ramsize);
+		save_pointer(NAME(m_ram), m_ramsize);
+		m_dummy = std::make_unique<u8[]>(0x1000);  // don't save this
+
+		u8 *r = m_ram.get();
+		u8 *d = m_dummy.get();
+		u8 *m = memregion("maincpu")->base();
+
+		u32 banks = m_ramsize / 0x1000;
+
+		for (u8 b_bank = 0; b_bank < 16; b_bank++)
+		{
+			m_bankr[b_bank]->configure_entries(0, banks, r, 0x1000); // RAM banks
+			m_bankr[b_bank]->configure_entries(banks, 4, m, 0x1000); // rom
+			m_bankw[b_bank]->configure_entries(0, banks, r, 0x1000); // RAM banks
+			m_bankw[b_bank]->configure_entry(banks, d); // dummy rom
+		}
+	}
+}
+
+void mbee_state::machine_reset()
 {
 	m_fdc_rq = 0;
 	m_08 = 0;
@@ -443,172 +546,43 @@ void mbee_state::machine_reset_common()
 	m_0b = 0;
 	m_1c = 0;
 
+	// set default chars
+	memcpy(m_pram.get(), memregion("chargen")->base(), 0x800);
+
 	if (m_basic)
 		m_basic->set_entry(0);
 
 	if (m_telcom)
 		m_telcom->set_entry(0);
+
+	if (m_pak)
+		m_pak->set_entry(5);
+
+	m_maincpu->set_pc(m_size);
+
+	// init new kbd
+	if (BIT(m_features, 2))
+		m_newkb_q_pos = 0;
+
+	// set banks to default
+	if (BIT(m_features, 4, 2) == 1)
+		setup_banks(0, 1, 3);
+	else
+	if (BIT(m_features, 4, 2) == 2)
+		setup_banks(0, 1, 7);
+	else
+	if (BIT(m_features, 4, 2) == 3)
+		setup_banks(0, 1, 31);
 }
 
-MACHINE_RESET_MEMBER( mbee_state, mbee )
-{
-	machine_reset_common();
-	m_maincpu->set_pc(0x8000);
-}
 
-MACHINE_RESET_MEMBER( mbee_state, mbee56 )
-{
-	machine_reset_common();
-	m_maincpu->set_pc(0xE000);
-}
-
-MACHINE_RESET_MEMBER( mbee_state, mbee128 )
-{
-	machine_reset_common();
-	setup_banks(0, 1, 3); // set banks to default
-	m_maincpu->set_pc(0x8000);
-}
-
-MACHINE_RESET_MEMBER( mbee_state, mbee256 )
-{
-	m_mbee256_q_pos = 0;
-	machine_reset_common();
-	setup_banks(0, 1, 7); // set banks to default
-	m_maincpu->set_pc(0x8000);
-}
-
-MACHINE_RESET_MEMBER( mbee_state, mbeett )
-{
-	m_mbee256_q_pos = 0;
-	machine_reset_common();
-	m_maincpu->set_pc(0x8000);
-}
-
-void mbee_state::init_mbee()
-{
-	m_size = 0x8000;
-	m_has_oldkb = 1;
-}
-
-void mbee_state::init_mbeeic()
-{
-	uint8_t *RAM = memregion("pakrom")->base();
-	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-	m_pak->set_entry(0);
-
-	m_size = 0x8000;
-	m_has_oldkb = 1;
-}
-
-void mbee_state::init_mbeepc()
-{
-	uint8_t *RAM = memregion("telcomrom")->base();
-	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
-
-	RAM = memregion("pakrom")->base();
-	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-	m_pak->set_entry(0);
-
-	m_size = 0x8000;
-	m_has_oldkb = 1;
-}
-
-void mbee_state::init_mbeepc85()
-{
-	uint8_t *RAM = memregion("telcomrom")->base();
-	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
-
-	RAM = memregion("pakrom")->base();
-	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-	m_pak->set_entry(5);
-
-	m_size = 0x8000;
-	m_has_oldkb = 1;
-}
-
-void mbee_state::init_mbeeppc()
-{
-	uint8_t *RAM = memregion("basicrom")->base();
-	m_basic->configure_entries(0, 2, &RAM[0x0000], 0x2000);
-
-	RAM = memregion("telcomrom")->base();
-	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
-
-	RAM = memregion("pakrom")->base();
-	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-	m_pak->set_entry(5);
-
-	m_size = 0x8000;
-	m_has_oldkb = 1;
-}
-
-void mbee_state::init_mbee56()
-{
-	m_size = 0xe000;
-	m_has_oldkb = 1;
-}
-
-// 128k uses 32 RAM banks.
-// PP has 1024k which is 256 banks, but having 64 banks stops it crashing during the self-test. Need a schematic before we can fix it.
-void mbee_state::init_mbee128()
-{
-	m_ram = make_unique_clear<u8[]>(0x40000);
-	m_dummy = std::make_unique<u8[]>(0x1000);
-	u8 *r = m_ram.get();
-	u8 *d = m_dummy.get();
-	u8 *m = memregion("maincpu")->base();
-
-	for (u8 b_bank = 0; b_bank < 16; b_bank++)
-	{
-		m_bankr[b_bank]->configure_entries(0, 64, r, 0x1000); // RAM banks
-		m_bankr[b_bank]->configure_entries(64, 4, m, 0x1000); // rom
-
-		m_bankw[b_bank]->configure_entries(0, 64, r, 0x1000); // RAM banks
-		m_bankw[b_bank]->configure_entry(64, d); // dummy rom
-	}
-
-	m_size = 0x8000;
-	m_has_oldkb = 1;
-}
-
-void mbee_state::init_mbee256()
-{
-	m_ram = make_unique_clear<u8[]>(0x40000);
-	m_dummy = std::make_unique<u8[]>(0x1000);
-	u8 *r = m_ram.get();
-	u8 *d = m_dummy.get();
-	u8 *m = memregion("maincpu")->base();
-
-	for (u8 b_bank = 0; b_bank < 16; b_bank++)
-	{
-		m_bankr[b_bank]->configure_entries(0, 64, r, 0x1000); // RAM banks
-		m_bankr[b_bank]->configure_entries(64, 4, m, 0x1000); // rom
-
-		m_bankw[b_bank]->configure_entries(0, 64, r, 0x1000); // RAM banks
-		m_bankw[b_bank]->configure_entry(64, d); // dummy rom
-	}
-
-	timer_set(attotime::from_hz(1), TIMER_MBEE_NEWKB);   /* kick-start timer for kbd */
-
-	m_size = 0x8000;
-	m_has_oldkb = 0;
-}
-
-void mbee_state::init_mbeett()
-{
-	uint8_t *RAM = memregion("telcomrom")->base();
-	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
-
-	RAM = memregion("pakrom")->base();
-	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-	m_pak->set_entry(5);
-
-	timer_set(attotime::from_hz(1), TIMER_MBEE_NEWKB);   /* kick-start timer for kbd */
-
-	m_size = 0x8000;
-	m_has_oldkb = 0;
-}
-
+/* m_features:
+bit 0 : (colour fitted) 1 = yes
+bit 1 : (initial pc value / size of main ram) 1=0xE000, 0=0x8000
+bit 2 : (keyboard type) 1 = new keyboard
+bit 3 : (core type) 1 = premium
+bit 4,5 : (banking main ram) 0x10 = 128k; 0x20 = 256k
+*/
 
 /***********************************************************
 

@@ -983,7 +983,7 @@ void tms3203x_device::execute_run()
 }
 
 // internal peripherals
-WRITE32_MEMBER(tms3203x_device::primary_bus_control_w)
+void tms3203x_device::primary_bus_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// change in internal hold state
 	if ((m_primary_bus_control ^ data) & HIZ)
