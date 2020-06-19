@@ -200,14 +200,21 @@ void pengo_state::jrpacmbl_map(address_map &map)
 	map(0x90c0, 0x90ff).portr("P1");
 }
 
-void pengo_state::schick_map(address_map &map) // everything needs to be verified
+void pengo_state::schick_map(address_map &map) // everything needs to be verified, where's the sound latch?
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x83ff).ram().w(FUNC(pengo_state::pacman_videoram_w)).share("videoram");
 	map(0x8400, 0x87ff).ram().w(FUNC(pengo_state::pacman_colorram_w)).share("colorram");
 	map(0x8800, 0x8fef).ram().share("mainram");
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
+	map(0x9000, 0x901f).nopw(); // leftover from pengo?
 	map(0x9020, 0x902f).writeonly().share("spriteram2");
+	map(0x9000, 0x903f).portr("SW2");
+	map(0x9040, 0x907f).portr("SW1");
+	map(0x9040, 0x9047).w(m_latch, FUNC(ls259_device::write_d0));
+	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x9080, 0x90bf).portr("IN1");
+	map(0x90c0, 0x90ff).portr("IN0");
 	map(0xe000, 0xffff).rom();
 }
 
@@ -328,26 +335,26 @@ static INPUT_PORTS_START( pengo )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( schick )
+static INPUT_PORTS_START( schick ) // TODO: check everything
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("SW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
@@ -552,11 +559,19 @@ void pengo_state::schick(machine_config &config) // all dividers unknown
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
-	LS259(config, m_latch); // 3I
+	LS259(config, m_latch); // 3I, TODO: identify bits' function. 0 is correct, 2, 6 and 7 seem to be set when switching from title screen to game screen, 1, 3, 4 and 5 seem to never be set during gameplay
+	m_latch->q_out_cb<0>().set(FUNC(pengo_state::irq_mask_w));
+	m_latch->q_out_cb<1>().set_log("m_latch bit 1 set");
+	m_latch->q_out_cb<2>().set(FUNC(pengo_state::pengo_palettebank_w));
+	m_latch->q_out_cb<3>().set_log("m_latch bit 3 set");
+	m_latch->q_out_cb<4>().set_log("m_latch bit 4 set");
+	m_latch->q_out_cb<5>().set_log("m_latch bit 5 set");
+	m_latch->q_out_cb<6>().set(FUNC(pengo_state::pengo_colortablebank_w));
+	m_latch->q_out_cb<7>().set(FUNC(pengo_state::pengo_gfxbank_w));
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pengo);
-	PALETTE(config, m_palette).set_entries(128); // wrong
+	PALETTE(config, m_palette, FUNC(pengo_state::pacman_palette), 128 * 4, 32);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // to be verified
 	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
@@ -826,8 +841,10 @@ ROM_START( schick )
 	ROM_LOAD( "27c256.4e",    0x0000, 0x8000, CRC(edb4a243) SHA1(64f35b5142ffb3bfbd6a2899af9d1d719b83e2a1) )
 	ROM_LOAD( "4.27c256.4f",  0x8000, 0x8000, CRC(f666a52a) SHA1(877e1112c9c9a39b55934f6a382ad35fc9bf6859) ) // only labeled ROM
 
-	ROM_REGION( 0x0400, "proms", ROMREGION_ERASEFF )
-	// currently not dumped
+	ROM_REGION( 0x0420, "proms", ROMREGION_ERASEFF )
+	// currently not dumped, using the ones from Pengo for now
+	ROM_LOAD( "pr1633.ic78",    0x0000, 0x0020, BAD_DUMP CRC(3a5844ec) SHA1(680eab0e1204c9b74adc11588461651b474021bb) ) // color palette
+	ROM_LOAD( "pr1634.ic88",    0x0020, 0x0400, BAD_DUMP CRC(766b139b) SHA1(3fcd66610fcaee814953a115bf5e04788923181f) ) // color lookup
 ROM_END
 
 
@@ -963,7 +980,7 @@ void pengo_state::decode_schick_extra(int size, uint8_t* rom)
 		rom[A] = srcdec;
 	}
 
-	for (int A = 0x8000; A < 0x10000; A++)
+	for (int A = 0x8000; A < 0x10000; A++) // TODO: verify everything
 	{
 		uint8_t srcdec = rom[A];
 
@@ -971,56 +988,28 @@ void pengo_state::decode_schick_extra(int size, uint8_t* rom)
 
 		if (rom == m_decrypted_opcodes)
 		{
-			// these are wrong
-			if (A & 0x1000) // might be more conditions too, but there's certainly a boundary at efff-f000 (jump table)
+			if (A & 0x1000) // TODO: more conditions?
 			{
-				// note, bit substitution tables, each value 0x00, 0x01, 0x10, 0x11, 0x40, 0x41, 0x50, 0x51 can only be used once.
-
-				switch (srcdec & 0x51)
-				{
-				case 0x00: srcdec = (srcdec & ~0x51) | 0x10; break; // looks good for ld ops
-				case 0x01: srcdec = (srcdec & ~0x51) | 0x50; break; // ok?
-				case 0x10: srcdec = (srcdec & ~0x51) | 0x11; break; // ok?
-				case 0x11: srcdec = (srcdec & ~0x51) | 0x51; break; // push/pull opcodes, see f1a1, f1a2, f1fd etc  (d3 case too)
-				case 0x40: srcdec = (srcdec & ~0x51) | 0x00; break; // ok for some NOPs? and jr ops
-				case 0x41: srcdec = (srcdec & ~0x51) | 0x40; break; // maybe, ret z at f3be
-				case 0x50: srcdec = (srcdec & ~0x51) | 0x01; break; // not 11, not 50, maybe 01? see fcc1
-				case 0x51: srcdec = (srcdec & ~0x51) | 0x41; break; // jmp
-				}
+				srcdec = bitswap<8>(srcdec ^ 0x40, 7, 0, 5, 6, 3, 2, 1, 4);
 				rom[A] = srcdec;
 			}
 			else
 			{
-				// does this REALLY affect bit 0x80?  more logical would be bits 0x55, but that doesn't seem to be the case  (answer, NO, doesn't help)
-
-				// this sequence appears in several places
-				//E5C7 : CD 2B BE    call $FF6B // valid call
-				//E5CA : oo dd dd               // must be a 3 byte opcode, but NOT a jump dd are clearly data, bit 0x80 is set on oo tho and only 3 byte opcodes with is set are jumps to invalid addresses?
-				//E5CD : C3 82 A2    jp   $F2D2 // valid jump
-				// this can't be right either, no combination of dropping 0x80 gives a 3 byte opcode
-
-				// unless these really are jumps and there is code there? or the data decryption is wrong? (it seems correct for the jump offsets tho, so would need to be another condition)
-				// I wouldn't put it past Microhard to have an MCU supplying code too... (but why, there's already plenty of extra code for this pengo hack)
-
-
-				switch (srcdec & 0x51)
+				if  (A & 0x100)
 				{
-				case 0x00: srcdec = (srcdec & ~0x51) | 0x40; break;
-				case 0x01: srcdec = (srcdec & ~0x51) | 0x01; break;
-				case 0x10: srcdec = (srcdec & ~0x51) | 0x41; break; // JMP table EFA0
-				case 0x11: srcdec = (srcdec & ~0x51) | 0x11; break;
-				case 0x40: srcdec = (srcdec & ~0x51) | 0x00; break; // NOPs at e538
-				case 0x41: srcdec = (srcdec & ~0x51) | 0x51; break;
-				case 0x50: srcdec = (srcdec & ~0x51) | 0x50; break;
-				case 0x51: srcdec = (srcdec & ~0x51) | 0x10; break;
+					srcdec = bitswap<8>(srcdec ^ 0x40, 7, 4, 5, 0, 3, 2, 1, 6);
+					rom[A] = srcdec;
 				}
-
-				rom[A] = srcdec;
+				else
+				{
+					srcdec = bitswap<8>(srcdec ^ 0x41, 7, 0, 5, 6, 3, 2, 1, 4);
+					rom[A] = srcdec;
+				}
 			}
 		}
 		else
 		{
-			// these are correct(?) give good text, good jump locations etc.  note, based on above might be substitution table like the base encryption, not bitswap, so could still be some bad cases
+			// // TODO: more conditions?
 			if (A & 0x10)
 				srcdec = bitswap<8>(srcdec ^ 0x11, 7, 0, 5, 6, 3, 2, 1, 4);
 			else
@@ -1057,4 +1046,4 @@ GAME( 1982, pengo5,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  RO
 GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, init_penta,  ROT90, "bootleg",                  "Pengo (bootleg)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, init_penta,  ROT90, "bootleg (Grinbee Shouji)", "Penta",                               MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
 GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, empty_init,  ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, schick,   0,        schick,   schick,   pengo_state, init_schick, ROT90, "Microhard",                "Super Chick",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // only partially decrypted
+GAME( 1988, schick,   0,        schick,   schick,   pengo_state, init_schick, ROT90, "Microhard",                "Super Chick",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong colors due to missing PROMs, sound not hooked up, only basic controls verified, decryption could be incomplete (bad ROMs in test mode?)
