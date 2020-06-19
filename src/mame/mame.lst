@@ -19390,8 +19390,10 @@ lkageb3                         // bootleg
 lkageo                          // A54 (c) 1984 Taito Corporation
 lkageoo                         // A54 (c) 1984 Taito Corporation
 
-@source:llc.cpp
+@source:llc1.cpp
 llc1                            //
+
+@source:llc2.cpp
 llc2                            //
 
 @source:lms46.cpp
