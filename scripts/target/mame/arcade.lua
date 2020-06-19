@@ -3250,6 +3250,7 @@ files {
 	MAME_DIR .. "src/mame/machine/pacplus.cpp",
 	MAME_DIR .. "src/mame/machine/pacplus.h",
 	MAME_DIR .. "src/mame/drivers/pengo.cpp",
+	MAME_DIR .. "src/mame/drivers/schick.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "pce")
