@@ -36,10 +36,7 @@ class umipoker_state : public driver_device
 public:
 	umipoker_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_vram_0(*this, "vra0")
-		, m_vram_1(*this, "vra1")
-		, m_vram_2(*this, "vra2")
-		, m_vram_3(*this, "vra3")
+		, m_vram(*this, "vram.%u", 0U)
 		, m_z80_wram(*this, "z80_wram")
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -50,44 +47,30 @@ public:
 	void umipoker(machine_config &config);
 
 protected:
+	virtual void video_start() override;
+
 	uint8_t z80_rom_readback_r(offs_t offset);
 	uint8_t z80_shared_ram_r(offs_t offset);
 	void z80_shared_ram_w(offs_t offset, uint8_t data);
-	void umipoker_irq_ack_w(uint16_t data);
-	void umipoker_scrolly_0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void umipoker_scrolly_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void umipoker_scrolly_2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void umipoker_scrolly_3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void umipoker_vram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void umipoker_vram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void umipoker_vram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void umipoker_vram_3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void irq_ack_w(uint16_t data);
+	template<uint8_t Which> void scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<uint8_t Which> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void umi_counters_w(uint16_t data);
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	TILE_GET_INFO_MEMBER(get_tile_info_2);
-	TILE_GET_INFO_MEMBER(get_tile_info_3);
-	virtual void video_start() override;
-	uint32_t screen_update_umipoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	template<uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void umipoker_audio_io_map(address_map &map);
-	void umipoker_audio_map(address_map &map);
+	void audio_io_map(address_map &map);
+	void audio_map(address_map &map);
 	void umipoker_map(address_map &map);
 
-	required_shared_ptr<uint16_t> m_vram_0;
-	required_shared_ptr<uint16_t> m_vram_1;
-	required_shared_ptr<uint16_t> m_vram_2;
-	required_shared_ptr<uint16_t> m_vram_3;
-	tilemap_t *m_tilemap_0;
-	tilemap_t *m_tilemap_1;
-	tilemap_t *m_tilemap_2;
-	tilemap_t *m_tilemap_3;
+	required_shared_ptr_array<uint16_t, 4> m_vram;
 	required_shared_ptr<uint8_t> m_z80_wram;
-	int m_umipoker_scrolly[4];
-
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	tilemap_t *m_tilemap[4];
+	int m_scrolly[4];
 };
 
 class saiyukip_state : public umipoker_state
@@ -113,43 +96,11 @@ private:
 	output_finder<6> m_lamps;
 };
 
-TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_0)
+template<uint8_t Which>
+TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info)
 {
-	int tile = m_vram_0[tile_index*2+0];
-	int color = m_vram_0[tile_index*2+1] & 0x3f;
-
-	tileinfo.set(0,
-			tile,
-			color,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_1)
-{
-	int tile = m_vram_1[tile_index*2+0];
-	int color = m_vram_1[tile_index*2+1] & 0x3f;
-
-	tileinfo.set(0,
-			tile,
-			color,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_2)
-{
-	int tile = m_vram_2[tile_index*2+0];
-	int color = m_vram_2[tile_index*2+1] & 0x3f;
-
-	tileinfo.set(0,
-			tile,
-			color,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_3)
-{
-	int tile = m_vram_3[tile_index*2+0];
-	int color = m_vram_3[tile_index*2+1] & 0x3f;
+	int tile = m_vram[Which][tile_index*2+0];
+	int color = m_vram[Which][tile_index*2+1] & 0x3f;
 
 	tileinfo.set(0,
 			tile,
@@ -159,31 +110,32 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_3)
 
 void umipoker_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info_0)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
-	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info_1)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
-	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info_2)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
-	m_tilemap_3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info_3)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 
-	m_tilemap_0->set_transparent_pen(0);
-	m_tilemap_1->set_transparent_pen(0);
-	m_tilemap_2->set_transparent_pen(0);
-	m_tilemap_3->set_transparent_pen(0);
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(0);
+	m_tilemap[2]->set_transparent_pen(0);
+	m_tilemap[3]->set_transparent_pen(0);
 
+	save_item(NAME(m_scrolly));
 }
 
-uint32_t umipoker_state::screen_update_umipoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t umipoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap_0->set_scrolly(0, m_umipoker_scrolly[0]);
-	m_tilemap_1->set_scrolly(0, m_umipoker_scrolly[1]);
-	m_tilemap_2->set_scrolly(0, m_umipoker_scrolly[2]);
-	m_tilemap_3->set_scrolly(0, m_umipoker_scrolly[3]);
+	m_tilemap[0]->set_scrolly(0, m_scrolly[0]);
+	m_tilemap[1]->set_scrolly(0, m_scrolly[1]);
+	m_tilemap[2]->set_scrolly(0, m_scrolly[2]);
+	m_tilemap[3]->set_scrolly(0, m_scrolly[3]);
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
-	m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
-	m_tilemap_2->draw(screen, bitmap, cliprect, 0,0);
-	m_tilemap_3->draw(screen, bitmap, cliprect, 0,0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0,0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0,0);
+	m_tilemap[2]->draw(screen, bitmap, cliprect, 0,0);
+	m_tilemap[3]->draw(screen, bitmap, cliprect, 0,0);
 
 	return 0;
 }
@@ -209,7 +161,7 @@ void umipoker_state::z80_shared_ram_w(offs_t offset, uint8_t data)
 	m_z80_wram[offset] = data;
 }
 
-void umipoker_state::umipoker_irq_ack_w(uint16_t data)
+void umipoker_state::irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 
@@ -218,34 +170,14 @@ void umipoker_state::umipoker_irq_ack_w(uint16_t data)
 		popmessage("%04x IRQ ACK, contact MAMEdev",data);
 }
 
-void umipoker_state::umipoker_scrolly_0_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_umipoker_scrolly[0]); }
-void umipoker_state::umipoker_scrolly_1_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_umipoker_scrolly[1]); }
-void umipoker_state::umipoker_scrolly_2_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_umipoker_scrolly[2]); }
-void umipoker_state::umipoker_scrolly_3_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_umipoker_scrolly[3]); }
+template<uint8_t Which>
+void umipoker_state::scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_scrolly[Which]); }
 
-void umipoker_state::umipoker_vram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+template<uint8_t Which>
+void umipoker_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_vram_0[offset]);
-	m_tilemap_0->mark_tile_dirty(offset >> 1);
-}
-
-void umipoker_state::umipoker_vram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_vram_1[offset]);
-	m_tilemap_1->mark_tile_dirty(offset >> 1);
-}
-
-
-void umipoker_state::umipoker_vram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_vram_2[offset]);
-	m_tilemap_2->mark_tile_dirty(offset >> 1);
-}
-
-void umipoker_state::umipoker_vram_3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_vram_3[offset]);
-	m_tilemap_3->mark_tile_dirty(offset >> 1);
+	COMBINE_DATA(&m_vram[Which][offset]);
+	m_tilemap[Which]->mark_tile_dirty(offset >> 1);
 }
 
 void saiyukip_state::lamps_w(uint16_t data)
@@ -347,10 +279,10 @@ void umipoker_state::umipoker_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x400000, 0x403fff).ram().share("nvram");
 	map(0x600000, 0x6007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x800000, 0x801fff).ram().w(FUNC(umipoker_state::umipoker_vram_0_w)).share("vra0");
-	map(0x802000, 0x803fff).ram().w(FUNC(umipoker_state::umipoker_vram_1_w)).share("vra1");
-	map(0x804000, 0x805fff).ram().w(FUNC(umipoker_state::umipoker_vram_2_w)).share("vra2");
-	map(0x806000, 0x807fff).ram().w(FUNC(umipoker_state::umipoker_vram_3_w)).share("vra3");
+	map(0x800000, 0x801fff).ram().w(FUNC(umipoker_state::vram_w<0>)).share(m_vram[0]);
+	map(0x802000, 0x803fff).ram().w(FUNC(umipoker_state::vram_w<1>)).share(m_vram[1]);
+	map(0x804000, 0x805fff).ram().w(FUNC(umipoker_state::vram_w<2>)).share(m_vram[2]);
+	map(0x806000, 0x807fff).ram().w(FUNC(umipoker_state::vram_w<3>)).share(m_vram[3]);
 	map(0xc00000, 0xc0ffff).r(FUNC(umipoker_state::z80_rom_readback_r)).umask16(0x00ff);
 	map(0xc1f000, 0xc1ffff).rw(FUNC(umipoker_state::z80_shared_ram_r), FUNC(umipoker_state::z80_shared_ram_w)).umask16(0x00ff);
 	map(0xe00000, 0xe00001).portr("IN0");
@@ -361,12 +293,12 @@ void umipoker_state::umipoker_map(address_map &map)
 //  map(0xe00010, 0xe00011).w(FUNC(umipoker_state::counters_w)); --> coin counters for both games.
 	map(0xe00014, 0xe00015).portr("DSW1-2");
 	map(0xe00018, 0xe00019).portr("DSW3-4");
-	map(0xe00020, 0xe00021).w(FUNC(umipoker_state::umipoker_scrolly_0_w));
-	map(0xe00022, 0xe00023).w(FUNC(umipoker_state::umipoker_irq_ack_w));
-	map(0xe00026, 0xe00027).w(FUNC(umipoker_state::umipoker_scrolly_2_w));
-	map(0xe0002a, 0xe0002b).w(FUNC(umipoker_state::umipoker_scrolly_1_w));
+	map(0xe00020, 0xe00021).w(FUNC(umipoker_state::scrolly_w<0>));
+	map(0xe00022, 0xe00023).w(FUNC(umipoker_state::irq_ack_w));
+	map(0xe00026, 0xe00027).w(FUNC(umipoker_state::scrolly_w<2>));
+	map(0xe0002a, 0xe0002b).w(FUNC(umipoker_state::scrolly_w<1>));
 	map(0xe0002c, 0xe0002d).nopw(); // unknown meaning, bit 0 goes from 0 -> 1 on IRQ service routine
-	map(0xe0002e, 0xe0002f).w(FUNC(umipoker_state::umipoker_scrolly_3_w));
+	map(0xe0002e, 0xe0002f).w(FUNC(umipoker_state::scrolly_w<3>));
 }
 
 void saiyukip_state::saiyukip_map(address_map &map)
@@ -376,13 +308,13 @@ void saiyukip_state::saiyukip_map(address_map &map)
 	map(0xe00010, 0xe00011).w(FUNC(saiyukip_state::saiyu_counters_w));
 }
 
-void umipoker_state::umipoker_audio_map(address_map &map)
+void umipoker_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xf800, 0xffff).rw(FUNC(umipoker_state::z80_shared_ram_r), FUNC(umipoker_state::z80_shared_ram_w)).share("z80_wram");
+	map(0xf800, 0xffff).rw(FUNC(umipoker_state::z80_shared_ram_r), FUNC(umipoker_state::z80_shared_ram_w)).share(m_z80_wram);
 }
 
-void umipoker_state::umipoker_audio_io_map(address_map &map)
+void umipoker_state::audio_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -704,8 +636,8 @@ void umipoker_state::umipoker(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &umipoker_state::umipoker_map);
 
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181) / 4)); // 3.579545MHz
-	audiocpu.set_addrmap(AS_PROGRAM, &umipoker_state::umipoker_audio_map);
-	audiocpu.set_addrmap(AS_IO, &umipoker_state::umipoker_audio_io_map);
+	audiocpu.set_addrmap(AS_PROGRAM, &umipoker_state::audio_map);
+	audiocpu.set_addrmap(AS_IO, &umipoker_state::audio_io_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -715,9 +647,9 @@ void umipoker_state::umipoker(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, 48*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(umipoker_state::screen_update_umipoker));
+	screen.set_screen_update(FUNC(umipoker_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set_inputline("maincpu", 6, ASSERT_LINE);
+	screen.screen_vblank().set_inputline(m_maincpu, 6, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_umipoker);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x400);
@@ -786,14 +718,9 @@ ROM_END
 
 
 /******************************************
-*              Driver Init                *
-******************************************/
-
-
-/******************************************
 *              Game Drivers               *
 ******************************************/
 
-//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT         ROT   COMPANY                  FULLNAME                                  FLAGS   LAYOUT
-GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", 0 )                      // title screen is toggleable thru a dsw
-GAMEL( 1998, saiyukip,  0,        saiyukip,  saiyukip, saiyukip_state, empty_init, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",             0,      layout_saiyukip )
+//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT        ROT   COMPANY                  FULLNAME                                  FLAGS                   LAYOUT
+GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", MACHINE_SUPPORTS_SAVE )                      // title screen is toggleable thru a dsw
+GAMEL( 1998, saiyukip,  0,        saiyukip,  saiyukip, saiyukip_state, empty_init, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",             MACHINE_SUPPORTS_SAVE,  layout_saiyukip )
