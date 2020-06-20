@@ -122,7 +122,7 @@ void gigatron_cpu_device::init()
 	save_item(NAME(m_pc));
 
 	m_outx_cb.resolve_safe();
-	m_ir_cb.resolve_safe();
+	m_ir_cb.resolve();
 }
 
 void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
