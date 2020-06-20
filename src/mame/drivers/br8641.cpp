@@ -27,6 +27,7 @@ ToDo:
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 #include "sound/beep.h"
 #include "speaker.h"
 
@@ -40,6 +41,7 @@ public:
 		, m_pio2(*this, "pio2")
 		, m_pio3(*this, "pio3")
 		, m_ctc(*this, "ctc")
+		, m_sio(*this, "sio")
 		, m_io_keyboard(*this, "KEY.%u", 0)
 		, m_beep(*this, "beeper")
 	{ }
@@ -60,6 +62,7 @@ private:
 	required_device<z80pio_device> m_pio2;
 	required_device<z80pio_device> m_pio3;
 	required_device<z80ctc_device> m_ctc;
+	required_device<z80sio_device> m_sio;
 	required_ioport_array<8> m_io_keyboard;
 	required_device<beep_device> m_beep;
 };
@@ -79,7 +82,7 @@ void brandt8641_state::io_map(address_map &map)
 	map(0x08, 0x0b).rw(m_pio2, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x0c, 0x0f).rw(m_pio3, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x10, 0x13).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x1E, 0x1F).nopw();  // unknown device
+	map(0x1c, 0x1f).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 }
 
 /* Input ports */
@@ -160,6 +163,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ "pio2" },
 	{ "pio3" },
 	{ "ctc" },
+	{ "sio" },
 	{ nullptr }
 };
 
@@ -192,7 +196,11 @@ void brandt8641_state::brandt8641(machine_config &config)
 	Z80PIO(config, m_pio3, XTAL(4'000'000));
 	m_pio3->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80CTC(config, "ctc", XTAL(4'000'000)); // Z80CTC U8
+	Z80CTC(config, m_ctc, XTAL(4'000'000)); // Z80CTC U8
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	Z80SIO(config, m_sio, XTAL(4'000'000)); // unknown type
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 }
 
 /* ROM definition */
