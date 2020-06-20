@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood, Nicola Salmoria
 
 /* a strange hack of Pengo, seems to be built on top of the 'Penta' bootleg
-   its recycles encryption from there + adds an additional layer of encryption
+   it recycles encryption from there + adds an additional layer of encryption
    has 4bpp tils instead of 2bpp, bombjack sound system
    and possibly extra protection (conditional jumps to areas where there is no ROM data)
    colours from undumped? proms (doesn't seem to be a palette RAM even with the extended 4bpp tiles)
@@ -106,7 +106,7 @@ private:
 
 #define PIXEL_CLOCK         (MASTER_CLOCK/3)
 
-/* H counts from 128->511, HBLANK starts at 128+16=144 and ends at 128+64+32+16=240 */
+// H counts from 128->511, HBLANK starts at 128+16=144 and ends at 128+64+32+16=240
 #define HTOTAL              (384)
 #define HBEND               (0)     /*(96+16)*/
 #define HBSTART             (288)   /*(16)*/
@@ -222,8 +222,7 @@ uint32_t schick_state::screen_update_schick(screen_device& screen, bitmap_ind16&
 		rectangle spriteclip(2 * 8, 34 * 8 - 1, 0 * 8, 28 * 8 - 1);
 		spriteclip &= cliprect;
 
-		/* Draw the sprites. Note that it is important to draw them exactly in this */
-		/* order, to have the correct priorities. */
+		// Draw the sprites. Note that it is important to draw them exactly in this order, to have the correct priorities.
 		for (offs = m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
 		{
 			int color;
@@ -273,7 +272,7 @@ void schick_state::schick_portmap(address_map &map)
 	map.global_mask(0xff);
 }
 
-void schick_state::schick_map(address_map &map) // everything needs to be verified, where's the sound latch?
+void schick_state::schick_map(address_map &map) // where's the sound latch?
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x83ff).ram().w(FUNC(schick_state::schick_videoram_w)).share("videoram");
@@ -433,7 +432,7 @@ void schick_state::schick(machine_config &config) // all dividers unknown
 
 	MCFG_VIDEO_START_OVERRIDE(schick_state, schick)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "ay1", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.13);
@@ -474,19 +473,19 @@ void schick_state::decode_penta(int end, int nodecend)
 */
 	static const uint8_t data_xortable[2][8] =
 	{
-		{ 0xa0,0x82,0x28,0x0a,0x82,0xa0,0x0a,0x28 },    /* ...............0 */
-		{ 0x88,0x0a,0x82,0x00,0x88,0x0a,0x82,0x00 }     /* ...............1 */
+		{ 0xa0,0x82,0x28,0x0a,0x82,0xa0,0x0a,0x28 },    // ...............0
+		{ 0x88,0x0a,0x82,0x00,0x88,0x0a,0x82,0x00 }     // ...............1
 	};
 	static const uint8_t opcode_xortable[8][8] =
 	{
-		{ 0x02,0x08,0x2a,0x20,0x20,0x2a,0x08,0x02 },    /* ...0...0...0.... */
-		{ 0x88,0x88,0x00,0x00,0x88,0x88,0x00,0x00 },    /* ...0...0...1.... */
-		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 },    /* ...0...1...0.... */
-		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 },    /* ...0...1...1.... */
-		{ 0x2a,0x08,0x2a,0x08,0x8a,0xa8,0x8a,0xa8 },    /* ...1...0...0.... */
-		{ 0x2a,0x08,0x2a,0x08,0x8a,0xa8,0x8a,0xa8 },    /* ...1...0...1.... */
-		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 },    /* ...1...1...0.... */
-		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 }     /* ...1...1...1.... */
+		{ 0x02,0x08,0x2a,0x20,0x20,0x2a,0x08,0x02 },    // ...0...0...0....
+		{ 0x88,0x88,0x00,0x00,0x88,0x88,0x00,0x00 },    // ...0...0...1....
+		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 },    // ...0...1...0....
+		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 },    // ...0...1...1....
+		{ 0x2a,0x08,0x2a,0x08,0x8a,0xa8,0x8a,0xa8 },    // ...1...0...0....
+		{ 0x2a,0x08,0x2a,0x08,0x8a,0xa8,0x8a,0xa8 },    // ...1...0...1....
+		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 },    // ...1...1...0....
+		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 }     // ...1...1...1....
 	};
 
 	uint8_t *rom = memregion("maincpu")->base();
@@ -495,19 +494,19 @@ void schick_state::decode_penta(int end, int nodecend)
 	{
 		uint8_t src = rom[A];
 
-		/* pick the translation table from bit 0 of the address */
+		// pick the translation table from bit 0 of the address
 		int i = A & 1;
 
-		/* pick the offset in the table from bits 1, 3 and 5 of the source data */
+		// pick the offset in the table from bits 1, 3 and 5 of the source data
 		int j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
-		/* the bottom half of the translation table is the mirror image of the top */
+		// the bottom half of the translation table is the mirror image of the top
 		if (src & 0x80) j = 7 - j;
 
-		/* decode the ROM data */
+		// decode the ROM data
 		rom[A] = src ^ data_xortable[i][j];
 
-		/* now decode the opcodes */
-		/* pick the translation table from bits 4, 8 and 12 of the address */
+		// now decode the opcodes
+		// pick the translation table from bits 4, 8 and 12 of the address
 		i = ((A >> 4) & 1) + (((A >> 8) & 1) << 1) + (((A >> 12) & 1) << 2);
 		m_decrypted_opcodes[A] = src ^ opcode_xortable[i][j];
 	}
@@ -538,15 +537,15 @@ void schick_state::decode_schick_extra(int size, uint8_t* rom)
 		rom[A] = srcdec;
 	}
 
-	for (int A = 0x8000; A < 0x10000; A++) // TODO: verify everything
+	for (int A = 0x8000; A < 0x10000; A++) // TODO: decryption is presumed correct, but ROM test fails (because it's a hack or because of some decryption errors lingering?)
 	{
 		uint8_t srcdec = rom[A];
 
-		// this layer of encryption only affects bits 0,4,6 ?
+		// this layer of encryption only affects bits 0,4,6
 
 		if (rom == m_decrypted_opcodes)
 		{
-			if (A & 0x1000) // TODO: more conditions?
+			if (A & 0x1000)
 			{
 				srcdec = bitswap<8>(srcdec ^ 0x40, 7, 0, 5, 6, 3, 2, 1, 4);
 				rom[A] = srcdec;
@@ -567,7 +566,6 @@ void schick_state::decode_schick_extra(int size, uint8_t* rom)
 		}
 		else
 		{
-			// // TODO: more conditions?
 			if (A & 0x10)
 				srcdec = bitswap<8>(srcdec ^ 0x11, 7, 0, 5, 6, 3, 2, 1, 4);
 			else
@@ -591,7 +589,6 @@ void schick_state::init_schick()
 
 // MH032288 PCB. LC ('lato componenti', components side in Italian) so maybe produced in Italy?
 // A plastic block in a corner covers probably the main CPU and the decryption logic.
-// Might fit better in a different driver once decrypted
 ROM_START( schick )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512.8d", 0x0000, 0x10000, CRC(38986329) SHA1(bfd62d6a49d25acc582e5f076833c3b22c1a7fd7) )
@@ -603,9 +600,10 @@ ROM_START( schick )
 	ROM_LOAD( "4.27c256.4f",  0x0000, 0x8000, CRC(f666a52a) SHA1(877e1112c9c9a39b55934f6a382ad35fc9bf6859) ) // only labeled ROM
 	ROM_LOAD( "27c256.4e",    0x8000, 0x8000, CRC(edb4a243) SHA1(64f35b5142ffb3bfbd6a2899af9d1d719b83e2a1) )
 
-	ROM_REGION( 0x0100, "proms", ROMREGION_ERASEFF )
-	ROM_LOAD( "proms",    0x0000, 0x0100, NO_DUMP ) // color palette, unknown PROM size + arrangement
+	ROM_REGION( 0x420, "proms", ROMREGION_ERASEFF ) // color palette
+	ROM_LOAD( "63s081n",   0x000, 0x020, NO_DUMP)
+	ROM_LOAD( "am27s33pc", 0x020, 0x400, NO_DUMP)
 ROM_END
 
 
-GAME( 1988, schick,   0,        schick,   schick,   schick_state, init_schick, ROT90, "Microhard",                "Super Chick",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong colors due to missing PROMs, sound not hooked up, only basic controls verified, decryption could be incomplete (bad ROMs in test mode?)
+GAME( 1988, schick, 0, schick, schick, schick_state, init_schick, ROT90, "Microhard", "Super Chick", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
