@@ -48,7 +48,7 @@ private:
 	}
 
 	void blinkenlights(uint8_t data);
-	void inputs();
+	uint8_t inputs();
 
 	required_device<gigatron_cpu_device> m_maincpu;
 	required_ioport m_io_inputs;
@@ -83,7 +83,7 @@ void gigatron_state::blinkenlights(uint8_t data)
 	lights_changed ^= light;
 }
 
-void gigatron_state::inputs()
+uint8_t gigatron_state::inputs()
 {
 	return m_io_inputs->read() ^ 0xFF;
 }
