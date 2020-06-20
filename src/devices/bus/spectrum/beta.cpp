@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nigel Barnes, David Haywood
+// copyright-holders:Nigel Barnes, David Haywood, MetalliC
 /*********************************************************************
 
     Technology Research Beta Disk interface & clones
