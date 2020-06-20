@@ -108,8 +108,8 @@ renderer_bgfx::renderer_bgfx(std::shared_ptr<osd_window> w)
 renderer_bgfx::~renderer_bgfx()
 {
 	bgfx::reset(0, 0, BGFX_RESET_NONE);
-	bgfx::touch(0);
-	bgfx::frame();
+	//bgfx::touch(0);
+	//bgfx::frame();
 	if (m_avi_writer != nullptr && m_avi_writer->recording())
 	{
 		m_avi_writer->stop();
