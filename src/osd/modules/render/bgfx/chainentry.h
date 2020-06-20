@@ -58,7 +58,7 @@ private:
 	void setup_quaddims_uniform(chain_manager::screen_prim &prim) const;
 	void setup_screenindex_uniform(int32_t screen) const;
 
-	bool setup_view(int view, uint16_t screen_width, uint16_t screen_height, int32_t screen) const;
+	bool setup_view(texture_manager& textures, int view, uint16_t screen_width, uint16_t screen_height, int32_t screen) const;
 	void put_screen_buffer(uint16_t screen_width, uint16_t screen_height, uint32_t screen_tint, bgfx::TransientVertexBuffer* buffer) const;
 
 	std::string                         m_name;
