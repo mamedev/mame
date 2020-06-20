@@ -52,7 +52,7 @@ void gigatron_cpu_device::execute_run()
 
 		opcode = gigatron_readop(m_pc);
 		m_pc = m_npc;
-		m_npc = (m_pc + 1) & 0x7FFF;
+		m_npc = (m_pc + 1) & m_romMask;
 
 		uint8_t op = (opcode >> 13) & 0x0007;
 		uint8_t mode = (opcode >> 10) & 0x0007;
@@ -98,7 +98,7 @@ void gigatron_cpu_device::init()
 	m_x = 0;
 	m_y = 0;
 	m_pc = 0;
-	m_npc = (m_pc + 1) & 0x7FFF;
+	m_npc = (m_pc + 1) & m_romMask;
 	m_ppc = 0;
 	m_inReg = 0xFF;
 
@@ -318,7 +318,8 @@ void gigatron_cpu_device::execute_set_input(int irqline, int state)
 
 gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, GTRON, tag, owner, clock)
-	, m_ramMask(0x7fff)
+	, m_ramMask(0x7FFF)
+	, m_romMask(0xFFFF)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 14, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 15, 0)
 	, m_outx_cb(*this)

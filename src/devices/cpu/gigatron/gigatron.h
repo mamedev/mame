@@ -62,6 +62,7 @@ protected:
 	uint16_t m_ppc;
 	uint8_t m_inReg;
 	uint16_t m_ramMask;
+	uint16_t m_romMask;
 	uint16_t m_out;
 	uint16_t m_outx;
 
