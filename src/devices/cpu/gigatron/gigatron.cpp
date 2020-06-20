@@ -13,7 +13,7 @@
 #include "gigatrondasm.h"
 
 
-DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU")
+DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron")
 
 
 /* FLAGS */
@@ -23,7 +23,6 @@ DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU")
 #define OV 0x20
 #define C  0x10
 #endif
-
 
 #define gigatron_readop(A) m_program->read_word(A)
 #define gigatron_readmem16(A) m_data->read_dword(A)
@@ -52,7 +51,8 @@ void gigatron_cpu_device::execute_run()
 		debugger_instruction_hook(m_pc);
 
 		opcode = gigatron_readop(m_pc);
-		m_pc = m_npc++;
+		m_pc = m_npc;
+		m_npc = (m_pc + 1) & 0x7FFF;
 
 		uint8_t op = (opcode >> 13) & 0x0007;
 		uint8_t mode = (opcode >> 10) & 0x0007;
@@ -98,7 +98,7 @@ void gigatron_cpu_device::init()
 	m_x = 0;
 	m_y = 0;
 	m_pc = 0;
-	m_npc = (m_pc + 1);
+	m_npc = (m_pc + 1) & 0x7FFF;
 	m_ppc = 0;
 	m_inReg = 0xFF;
 
@@ -109,6 +109,7 @@ void gigatron_cpu_device::init()
 	state_add(GTRON_AC,        "AC",        m_ac);
 	state_add(GTRON_X,         "X",         m_x);
 	state_add(GTRON_Y,         "Y",         m_y);
+	state_add(GTRON_IREG,      "IREG",      m_inReg);
 
 	set_icountptr(m_icount);
 
@@ -121,6 +122,7 @@ void gigatron_cpu_device::init()
 	save_item(NAME(m_pc));
 
 	m_outx_cb.resolve_safe();
+	m_ir_cb.resolve_safe();
 }
 
 void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
@@ -131,29 +133,29 @@ void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_
 	uint16_t base = m_pc & 0xff00;
 	switch (mode)
 	{
-	case 0:
+	case 0: //jmp
 		c = true;
 		base = m_y << 8;
 		break;
-	case 1:
+	case 1: //bgt
 		c = (ac2 > ZERO);
 		break;
-	case 2:
+	case 2: //blt
 		c = (ac2 < ZERO);
 		break;
-	case 3:
+	case 3: //bne
 		c = (ac2 != ZERO);
 		break;
-	case 4:
+	case 4: //beq
 		c = (ac2 == ZERO);
 		break;
-	case 5:
+	case 5: //bge
 		c = (ac2 >= ZERO);
 		break;
-	case 6:
+	case 6: //ble
 		c = (ac2 <= ZERO);
 		break;
-	case 7:
+	case 7: //bra
 		c = true;
 		break;
 	}
@@ -320,6 +322,7 @@ gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const ch
 	, m_program_config("program", ENDIANNESS_BIG, 16, 14, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 15, 0)
 	, m_outx_cb(*this)
+	, m_ir_cb(*this)
 {
 }
 

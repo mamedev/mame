@@ -82,6 +82,11 @@ void gigatron_state::blinkenlights(uint8_t data)
 	lights_changed ^= light;
 }
 
+void gigatron_state::inputs()
+{
+	return m_io_inputs->read() ^ 0xFF;
+}
+
 static INPUT_PORTS_START(gigatron)
 	PORT_START("GAMEPAD")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -100,6 +105,7 @@ void gigatron_state::gigatron(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gigatron_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA, &gigatron_state::data_map);
 	m_maincpu->outx_cb().set(FUNC(gigatron_state::blinkenlights));
+	m_maincpu->ir_cb().set(FUNC(gigatron_state::inputs));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
