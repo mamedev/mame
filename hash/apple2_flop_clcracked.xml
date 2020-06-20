@@ -36733,6 +36733,7 @@ license:CC0
 		<year>1981</year>
 		<publisher>Milliken Publishing</publisher>
 		<info name="release" value="2020-05-10"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="homonyms i rev. 2 (4am crack).dsk" size="143360" crc="9681d4b6" sha1="1deb93a2be7d78d848c4def9bb319b0ab2bffbda"/>
@@ -36745,6 +36746,7 @@ license:CC0
 		<year>1981</year>
 		<publisher>Milliken Publishing</publisher>
 		<info name="release" value="2020-05-10"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="homonyms ii rev. 2 (4am crack).dsk" size="143360" crc="cd7c8e9e" sha1="3bfa0f7a7156845eb1b7392c7fa09756ae50ad4f"/>
@@ -36757,6 +36759,7 @@ license:CC0
 		<year>1982</year>
 		<publisher>Milliken Publishing</publisher>
 		<info name="release" value="2020-05-10"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="pronouns i rev. 2 (4am crack).dsk" size="143360" crc="85d199a0" sha1="b4dd139c4f17825a13f5dd762b7bf1a242e59481"/>
@@ -36769,6 +36772,7 @@ license:CC0
 		<year>1982</year>
 		<publisher>Milliken Publishing</publisher>
 		<info name="release" value="2020-05-10"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="pronouns ii rev. 2 (4am crack).dsk" size="143360" crc="e73e4fcb" sha1="b675fac3a52944031b1fa51e884b9e52496ed35c"/>
@@ -36781,6 +36785,7 @@ license:CC0
 		<year>1982</year>
 		<publisher>Milliken Publishing</publisher>
 		<info name="release" value="2020-05-10"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="verbs i rev. 2 (4am crack).dsk" size="143360" crc="b0c2705f" sha1="a6b36da980cb96e8421bb1492d0d115bf528e38a"/>
@@ -36793,6 +36798,7 @@ license:CC0
 		<year>1982</year>
 		<publisher>Milliken Publishing</publisher>
 		<info name="release" value="2020-05-10"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="verbs ii rev. 2 (4am crack).dsk" size="143360" crc="6a23f644" sha1="ea1bfa8af5aefea3f67265a068aa090fdb146cb8"/>
@@ -36805,6 +36811,7 @@ license:CC0
 		<year>1985</year>
 		<publisher>EMC Corporation</publisher>
 		<info name="release" value="2020-05-20"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="143360">
@@ -36863,6 +36870,168 @@ license:CC0
 			<feature name="part_id" value="Disk 10"/>
 			<dataarea name="flop" size="143360">
 				<rom name="deutsch aktuell 1 (4am crack) disk 10.dsk" size="143360" crc="c6e470cd" sha1="3ddc13f93becc5b48ca015b08cae3536f76b2323"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deugddd">
+		<description>Deutsche Grammatik: der-die-das (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Gessler Educational Software</publisher>
+		<info name="release" value="2020-05-26"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="deutsche grammatik (4am crack).dsk" size="143360" crc="2d396899" sha1="7199dcb8e67c905ec49af7a4aa3940a37ff2fed0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcemny10">
+		<description>MECC-A816 Electronic Money (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2020-05-26"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a816 electronic money v1.0 (4am crack).dsk" size="143360" crc="f1dc965d" sha1="67d09045ced758930f96a522cb0661e457bf3f51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcemny11">
+		<description>MECC-A816 Electronic Money (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2020-05-26"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a816 electronic money v1.1 (4am crack).dsk" size="143360" crc="cfe8e02a" sha1="544b7f18d3ac44156fa543aeba47aa80c425b0cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccls1v1">
+		<description>MECC-A824 Classification (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2020-05-26"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a824 classification volume 1 v1.0 (4am crack).dsk" size="143360" crc="f809449c" sha1="4fbfbb69c1deab64257028e2494a2be1033fbb12"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmm1v13">
+		<description>MECC-A757 Computer Generated Mathematics Materials Volume 1: Problem Solving (Version 1.3) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2020-05-27"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a757 computer generated mathematics materials volume 1- problem solving v1.3 (4am crack).dsk" size="143360" crc="004ffc88" sha1="f30b0487b985979bdcd9e5812679c9bff74a1bd6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dcktrex">
+		<description>Dinosaur Construction Kit: Tyrannosaurus Rex (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2020-05-27"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dinosaur construction kit- tyrannosaurus rex (4am crack) disk 1 - program disk.dsk" size="143360" crc="97dc5e8d" sha1="e947f4bab7ce46493ee615e19bf84736fecb3028"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Student disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dinosaur construction kit- tyrannosaurus rex (4am crack) disk 2 - student disk.dsk" size="143360" crc="a08310fc" sha1="08afd032f761fdabc21c37a88e67072847587c42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpsntcmb">
+		<description>Sentence Combining (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2020-05-27"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="sentence combining i (4am crack).dsk" size="143360" crc="cc058220" sha1="fde07885d295948016480de75409593bf64e417d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rhyrdlr2">
+		<description>Rhymes and Riddles (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Spinnaker</publisher>
+		<info name="release" value="2020-05-27"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rhymes and riddles rev. 2 (4am crack).dsk" size="143360" crc="bd22bb36" sha1="fd4ad4bd87ab03a212e1ae036d9aa665fce6ddf2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jbrtlky">
+		<description>Jabbertalky (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2020-05-27"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="jabbertalky (4am crack).dsk" size="143360" crc="d4ef2bf5" sha1="d39e52135171037b2f1451294cba795df955a457"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grmwrdr1">
+		<description>German Word Order (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Gessler Educational Software</publisher>
+		<info name="release" value="2020-05-26"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="german word order (4am crack).dsk" size="143360" crc="acdab126" sha1="e2e9d4d71115899aa38c49292cd21c4c0f9dec6b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grmwrdr2">
+		<description>German Word Order (Revision 2) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Gessler Educational Software</publisher>
+		<info name="release" value="2020-05-26"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="german word order rev. 2 (4am crack).dsk" size="143360" crc="87b4e49e" sha1="8a0bf71300112118088a93360aa84243eb4b9ca0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizmath">
+		<description>The Wizard of Id's WizMath (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2020-06-18"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the wizard of id's wizmath (4am crack).dsk" size="143360" crc="b90a08c7" sha1="f8d13d1ef59301856c847469b107dd9251fd90db"/>
 			</dataarea>
 		</part>
 	</software>
