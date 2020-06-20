@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "bus/ti99/ti99defs.h"
+#define TI99_GROMPORT_TAG    "gromport"
 
 namespace bus { namespace ti99 { namespace gromport {
 

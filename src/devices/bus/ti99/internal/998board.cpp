@@ -160,8 +160,8 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_amigo(*this, TI998_AMIGO_TAG),
 	m_oso(*this, TI998_OSO_TAG),
 	m_maincpu(*owner, "maincpu"),
-	m_video(*owner, TI_VDP_TAG),               // subdevice of main class
-	m_sound(*owner, TI_SOUNDCHIP_TAG),
+	m_video(*owner, TI998_VDP_TAG),
+	m_sound(*owner, TI998_SOUNDCHIP_TAG),
 	m_speech(*owner, TI998_SPEECHSYN_TAG),
 	m_gromport(*owner, TI99_GROMPORT_TAG),
 	m_ioport(*owner, TI99_IOPORT_TAG),
@@ -2266,7 +2266,7 @@ void amigo_device::device_reset()
 oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	bus::hexbus::hexbus_chained_device(mconfig, TI99_OSO, tag, owner, clock),
 	m_int(*this),
-	m_hexbusout(*this, ":" TI_HEXBUS_TAG),
+	m_hexbusout(*this, ":" TI998_HEXBUS_TAG),
 	m_data(0),
 	m_status(0xff),
 	m_control(0),

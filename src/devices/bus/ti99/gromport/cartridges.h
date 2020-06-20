@@ -9,7 +9,6 @@
 #pragma once
 
 #include "emuopts.h"
-#include "bus/ti99/ti99defs.h"
 #include "machine/tmc0430.h"
 #include "softlist_dev.h"
 #include "gromport.h"

@@ -3,7 +3,7 @@
 /****************************************************************************
 
     Peripheral expansion box
-    See peribox.c for documentation
+    See peribox.cpp for documentation
 
     Michael Zapf
 
@@ -16,8 +16,10 @@
 
 #pragma once
 
-#include "bus/ti99/ti99defs.h"
 #include "bus/ti99/internal/ioport.h"
+
+#define TI_PERIBOX_TAG     "peb"
+#define TI99_DSRROM        "dsrrom"
 
 namespace bus { namespace ti99 { namespace peb {
 

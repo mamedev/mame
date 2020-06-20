@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include "bus/ti99/ti99defs.h"
 #include "cartridges.h"
 
 namespace bus { namespace ti99 { namespace gromport {

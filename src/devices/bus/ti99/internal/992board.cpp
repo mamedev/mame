@@ -344,15 +344,13 @@ void video992_device::device_reset()
     E80E: Cassette
 
     [3] I/O Controller CF40051, Preliminary specification, Texas Instruments
-
-    TODO: Loading still unstable; often failing
 */
 
 io992_device::io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: bus::hexbus::hexbus_chained_device(mconfig, type, tag, owner, clock),
-		m_hexbus(*this, "^" TI_HEXBUS_TAG),
-		m_cassette(*this, "^" TI_CASSETTE),
-		m_videoctrl(*this, "^" TI992_VDC_TAG),
+		m_hexbus(*owner, TI992_HEXBUS_TAG),
+		m_cassette(*owner, TI992_CASSETTE),
+		m_videoctrl(*owner, TI992_VDC_TAG),
 		m_keyboard(*this, "LINE%u", 0U),
 		m_set_rom_bank(*this),
 		m_key_row(0),

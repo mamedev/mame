@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "bus/ti99/ti99defs.h"
 #include "bus/ti99/gromport/gromport.h"
 #include "bus/hexbus/hexbus.h"
 
@@ -31,11 +30,15 @@
 
 // -------------- Defines ------------------------------------
 
-#define TI998_SRAM_TAG        "sram8"
-#define TI998_DRAM_TAG        "dram8"
-#define TI998_MAPPER_TAG      "mapper"
+#define TI998_SRAM_TAG       "sram8"
+#define TI998_DRAM_TAG       "dram8"
+#define TI998_MAPPER_TAG     "mapper"
 #define TI998_MAINBOARD_TAG  "mainboard8"
-#define TI998_SPEECHSYN_TAG     "speech"
+#define TI998_SPEECHSYN_TAG  "speech"
+#define TI998_SOUNDCHIP_TAG  "soundchip"
+#define TI998_TMS9901_TAG    "tms9901"
+#define TI998_VDP_TAG        "vdp"
+#define TI998_HEXBUS_TAG     "hexbus"
 
 #define TI998_ROM0_REG        "rom0_region"
 #define TI998_ROM1_REG        "rom1_region"

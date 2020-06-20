@@ -15,7 +15,6 @@
 
 #pragma once
 
-#include "bus/ti99/ti99defs.h"
 #include "bus/ti99/peb/peribox.h"
 #include "video/v9938.h"
 #include "cpu/tms9900/tms9995.h"

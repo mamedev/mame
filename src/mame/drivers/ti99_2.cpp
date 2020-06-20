@@ -163,17 +163,16 @@
 */
 
 #include "emu.h"
-#include "bus/ti99/ti99defs.h"
 #include "cpu/tms9900/tms9995.h"
 #include "bus/ti99/internal/992board.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/hexbus/hexbus.h"
 
-#define TI992_SCREEN_TAG      "screen"
-#define TI992_ROM          "rom_region"
-#define TI992_RAM_TAG      "ram_region"
 #define TI992_IO_TAG       "io"
+#define TI992_RAM_TAG      "ram_region"
+#define TI992_ROM          "rom_region"
+#define TI992_SCREEN_TAG   "screen"
 
 #define LOG_WARN           (1U<<1)   // Warnings
 #define LOG_CRU            (1U<<2)   // CRU activities
@@ -192,7 +191,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_videoctrl(*this, TI992_VDC_TAG),
 		m_io992(*this, TI992_IO_TAG),
-		m_cassette(*this, TI_CASSETTE),
+		m_cassette(*this, TI992_CASSETTE),
 		m_ram(*this, TI992_RAM_TAG),
 		m_otherbank(false),
 		m_rom(nullptr),
@@ -470,7 +469,7 @@ void ti99_2_state::ti99_2(machine_config& config)
 	CASSETTE(config, "cassette", 0);
 
 	// Hexbus
-	HEXBUS(config, TI_HEXBUS_TAG, 0, hexbus_options, nullptr);
+	HEXBUS(config, TI992_HEXBUS_TAG, 0, hexbus_options, nullptr);
 }
 
 /*
