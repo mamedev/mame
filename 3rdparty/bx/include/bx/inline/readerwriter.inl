@@ -132,7 +132,7 @@ namespace bx
 		m_pos += size;
 		if (size != _size)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "SizerWriter: write truncated.");
+			BX_ERROR_SET(_err, kErrorReaderWriterWrite, "SizerWriter: write truncated.");
 		}
 		return size;
 	}
@@ -178,7 +178,7 @@ namespace bx
 		m_pos += size;
 		if (size != _size)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "MemoryReader: read truncated.");
+			BX_ERROR_SET(_err, kErrorReaderWriterRead, "MemoryReader: read truncated.");
 		}
 		return size;
 	}
@@ -251,7 +251,7 @@ namespace bx
 		m_top = max(m_top, m_pos);
 		if (size != _size)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "MemoryWriter: write truncated.");
+			BX_ERROR_SET(_err, kErrorReaderWriterWrite, "MemoryWriter: write truncated.");
 		}
 		return size;
 	}
@@ -422,7 +422,7 @@ namespace bx
 			const int64_t offset  = bx::seek(_reader, size);
 			if (offset != aligned)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "Align: read truncated.");
+				BX_ERROR_SET(_err, kErrorReaderWriterWrite, "Align: read truncated.");
 			}
 			return int32_t(offset - current);
 		}

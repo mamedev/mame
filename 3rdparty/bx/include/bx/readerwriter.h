@@ -14,14 +14,14 @@
 #include "string.h"
 #include "uint32_t.h"
 
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_OPEN,         BX_MAKEFOURCC('R', 'W', 0, 1) );
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_READ,         BX_MAKEFOURCC('R', 'W', 0, 2) );
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_WRITE,        BX_MAKEFOURCC('R', 'W', 0, 3) );
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_EOF,          BX_MAKEFOURCC('R', 'W', 0, 4) );
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_ALREADY_OPEN, BX_MAKEFOURCC('R', 'W', 0, 5) );
-
 namespace bx
 {
+	BX_ERROR_RESULT(kErrorReaderWriterOpen,        BX_MAKEFOURCC('b', 'x', 2, 1) );
+	BX_ERROR_RESULT(kErrorReaderWriterRead,        BX_MAKEFOURCC('b', 'x', 2, 2) );
+	BX_ERROR_RESULT(kErrorReaderWriterWrite,       BX_MAKEFOURCC('b', 'x', 2, 3) );
+	BX_ERROR_RESULT(kErrorReaderWriterEof,         BX_MAKEFOURCC('b', 'x', 2, 4) );
+	BX_ERROR_RESULT(kErrorReaderWriterAlreadyOpen, BX_MAKEFOURCC('b', 'x', 2, 5) );
+
 	/// The position from where offset is added.
 	struct Whence
 	{
