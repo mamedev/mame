@@ -48,6 +48,7 @@ private:
 	}
 
 	void blinkenlights(uint8_t data);
+	void inputs();
 
 	required_device<gigatron_cpu_device> m_maincpu;
 	required_ioport m_io_inputs;
