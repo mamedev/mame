@@ -846,12 +846,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,-z,relro",
 			"-Wl,-z,now",
 		}
-	local sonamelink
-	if _OPTIONS["with-shared-lib"] then 
-		sonamelink = ""  
-	else 
-		sonamelink = "--fix-cortex-a8" 
-	end;
+
 	configuration { "android-arm" }
 		targetdir (path.join(_buildDir, "android-arm/bin"))
 		objdir (path.join(_buildDir, "android-arm/obj"))
@@ -879,7 +874,6 @@ function toolchain(_buildDir, _libDir)
 			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm/usr/lib/crtend_so.o"),
 			"-target armv7-none-linux-androideabi",
 			"-march=armv7-a",
-			"-Wl,",sonamelink
 		}
 
 	configuration { "android-arm64" }
@@ -906,7 +900,6 @@ function toolchain(_buildDir, _libDir)
 			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm64/usr/lib/crtend_so.o"),
 			"-target aarch64-none-linux-androideabi",
 			"-march=armv8-a",
-			"-Wl,",sonamelink
 		}
 
 	configuration { "android-x86" }
