@@ -9428,6 +9428,9 @@ bp1200                          // (c) 1991 BP Microsystems
 @source:br8641.cpp
 br8641                          //
 
+@source:braiplus.cpp
+braiplus                        //
+
 @source:brkthru.cpp
 brkthru                         // (c) 1986 Data East USA (US)
 brkthruj                        // (c) 1986 Data East Corporation (Japan)
@@ -16240,7 +16243,6 @@ vitaminc                        // (c) 1989 Home Data
 
 @source:homelab.cpp
 brailab4                        //
-braiplus                        //
 homelab2                        //
 homelab3                        //
 homelab4                        //

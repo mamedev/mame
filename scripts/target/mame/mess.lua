@@ -2503,6 +2503,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "homelab")
 files {
+	MAME_DIR .. "src/mame/drivers/braiplus.cpp",
 	MAME_DIR .. "src/mame/drivers/homelab.cpp",
 }
 

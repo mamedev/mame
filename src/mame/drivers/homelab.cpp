@@ -24,9 +24,6 @@
                  The bios never talks to it. Official port numbers
                  are 3C-3F.
     - Brailab4 - Same as homelab3.
-    - Braiplus - No work has been done. Needs to be developed from scratch.
-                 Since it is a CP/M machine, it probably should have its own
-                 source, once information can be found.
 
 
 TM188 is (it seems) equivalent to 27S19, TBP18S030N, 6331-1, 74S288, 82S123,
@@ -890,14 +887,6 @@ ROM_START( brailab4 )
 	ROM_LOAD_OPTIONAL( "brlcpm.rom",      0x5000, 0x0020, CRC(b936d568) SHA1(150330eccbc4b664eba4103f051d6e932038e9e8) )
 ROM_END
 
-ROM_START( braiplus )
-	ROM_REGION( 0x5000, "maincpu", 0 )
-	ROM_LOAD( "brailabplus.bin", 0x0000, 0x4000, CRC(521d6952) SHA1(f7405520d86fc7abd2dec51d1d016658472f6fe8) )
-
-	ROM_REGION( 0x0800, "chargen", 0 ) // no idea what chargen it uses, using the one from homelab4 for now
-	ROM_LOAD( "hl4.chr",   0x0000, 0x0800, BAD_DUMP CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
-ROM_END
-
 /* Driver */
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS            INIT           COMPANY                    FULLNAME                  FLAGS */
@@ -905,4 +894,3 @@ COMP( 1982, homelab2, 0,        0,      homelab2, homelab2, homelab2_state,  emp
 COMP( 1983, homelab3, homelab2, 0,      homelab3, homelab3, homelab3_state,  empty_init, "Jozsef and Endre Lukacs", "Homelab 3",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1984, homelab4, homelab2, 0,      homelab3, homelab3, homelab3_state,  empty_init, "Jozsef and Endre Lukacs", "Homelab 4",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1984, brailab4, homelab2, 0,      brailab4, brailab4, brailab4_state,  empty_init, "Jozsef and Endre Lukacs", "Brailab 4",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1988, braiplus, homelab2, 0,      brailab4, brailab4, brailab4_state,  empty_init, "Jozsef and Endre Lukacs", "Brailab Plus",           MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
