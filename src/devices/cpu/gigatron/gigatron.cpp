@@ -221,7 +221,7 @@ void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d
 		if (rising & 0x40)
 		{
 			m_outx = m_ac;
-			m_outx_cb(0, m_outx, 0xFF;
+			m_outx_cb(0, m_outx, 0xFF);
 		}
 		break;
 	}
