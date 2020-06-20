@@ -440,8 +440,11 @@ void spectrum_plusd_device::iorq_w(offs_t offset, uint8_t data)
 		break;
 	case 0xef: // bit 0-1: drive select, 6: printer strobe, 7: side select
 		{
-			uint8_t drive = data & 3;
-			floppy_image_device* floppy = m_floppy[drive > 0 ? drive-1 : drive]->get_device();
+			floppy_image_device* floppy = nullptr;
+			if (data & 1)
+				floppy = m_floppy[0]->get_device();
+			else if (data & 2)
+				floppy = m_floppy[1]->get_device();
 			m_fdc->set_floppy(floppy);
 			m_centronics->write_strobe(BIT(data, 6));
 			if (floppy) floppy->ss_w(BIT(data, 7));

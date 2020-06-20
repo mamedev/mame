@@ -12,6 +12,8 @@
 #include "softlist.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
+#include "machine/i8255.h"
+#include "machine/6850acia.h"
 #include "formats/trd_dsk.h"
 
 //**************************************************************************
@@ -95,8 +97,22 @@ protected:
 
 };
 
-class spectrum_betacbi_device :
+class spectrum_betaclone_device :
 	public spectrum_betaplus_device
+{
+public:
+	// construction/destruction
+	spectrum_betaclone_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_betaclone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual uint8_t mreq_r(offs_t offset) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+};
+
+class spectrum_betacbi_device :
+	public spectrum_betaclone_device
 {
 public:
 	// construction/destruction
@@ -105,16 +121,37 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual void fetch(offs_t offset) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+};
+
+class spectrum_gamma_device :
+	public spectrum_betaplus_device
+{
+public:
+	// construction/destruction
+	spectrum_gamma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_gamma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	required_device<i8255_device> m_ppi;
+	required_device<acia6850_device> m_acia;
+
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual uint8_t mreq_r(offs_t offset) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual uint8_t iorq_r(offs_t offset) override;
+	virtual void iorq_w(offs_t offset, uint8_t data) override;
+	virtual DECLARE_READ_LINE_MEMBER(romcs) override { return 1; };
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(SPECTRUM_BETAV2, spectrum_betav2_device)
 DECLARE_DEVICE_TYPE(SPECTRUM_BETAV3, spectrum_betav3_device)
 DECLARE_DEVICE_TYPE(SPECTRUM_BETAPLUS, spectrum_betaplus_device)
+DECLARE_DEVICE_TYPE(SPECTRUM_BETACLONE, spectrum_betaclone_device)
 DECLARE_DEVICE_TYPE(SPECTRUM_BETACBI, spectrum_betacbi_device)
+DECLARE_DEVICE_TYPE(SPECTRUM_GAMMA, spectrum_gamma_device)
 
 #endif // MAME_BUS_SPECTRUM_BETA_H
