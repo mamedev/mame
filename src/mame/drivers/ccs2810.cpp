@@ -138,6 +138,11 @@ protected:
 	optional_device<ins8250_device> m_ins8250;
 	optional_device<mb8877_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
+	optional_ioport_array<2> m_jump_addr_sel;
+	optional_ioport m_ser_addr_sel;
+	optional_ioport m_jump_en;
+	optional_ioport m_rom_en;
+	optional_ioport m_ser_en;
 
 private:
 	u8 memory_read(offs_t offset);
@@ -153,12 +158,6 @@ private:
 	void ccs2422_io(address_map &map);
 	void ccs2810_io(address_map &map);
 	void ccs2810_mem(address_map &map);
-
-	optional_ioport_array<2> m_jump_addr_sel;
-	optional_ioport m_ser_addr_sel;
-	optional_ioport m_jump_en;
-	optional_ioport m_rom_en;
-	optional_ioport m_ser_en;
 
 	u8 m_power_on_status;
 };
