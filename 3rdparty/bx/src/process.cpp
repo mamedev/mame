@@ -43,7 +43,7 @@ namespace bx
 
 		if (NULL != m_file)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "ProcessReader: File is already open.");
+			BX_ERROR_SET(_err, kErrorReaderWriterAlreadyOpen, "ProcessReader: File is already open.");
 			return false;
 		}
 
@@ -55,7 +55,7 @@ namespace bx
 		m_file = popen(tmp, "r");
 		if (NULL == m_file)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "ProcessReader: Failed to open process.");
+			BX_ERROR_SET(_err, kErrorReaderWriterOpen, "ProcessReader: Failed to open process.");
 			return false;
 		}
 
@@ -80,11 +80,11 @@ namespace bx
 		{
 			if (0 != feof(file) )
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "ProcessReader: EOF.");
+				BX_ERROR_SET(_err, kErrorReaderWriterEof, "ProcessReader: EOF.");
 			}
 			else if (0 != ferror(file) )
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "ProcessReader: read error.");
+				BX_ERROR_SET(_err, kErrorReaderWriterRead, "ProcessReader: read error.");
 			}
 
 			return size >= 0 ? size : 0;
@@ -114,7 +114,7 @@ namespace bx
 
 		if (NULL != m_file)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "ProcessWriter: File is already open.");
+			BX_ERROR_SET(_err, kErrorReaderWriterAlreadyOpen, "ProcessWriter: File is already open.");
 			return false;
 		}
 
@@ -126,7 +126,7 @@ namespace bx
 		m_file = popen(tmp, "w");
 		if (NULL == m_file)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "ProcessWriter: Failed to open process.");
+			BX_ERROR_SET(_err, kErrorReaderWriterOpen, "ProcessWriter: Failed to open process.");
 			return false;
 		}
 
@@ -151,7 +151,7 @@ namespace bx
 		{
 			if (0 != ferror(file) )
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "ProcessWriter: write error.");
+				BX_ERROR_SET(_err, kErrorReaderWriterWrite, "ProcessWriter: write error.");
 			}
 
 			return size >= 0 ? size : 0;

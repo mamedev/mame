@@ -104,14 +104,14 @@ namespace bx
 
 			if (NULL != m_file)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "FileReader: File is already open.");
+				BX_ERROR_SET(_err, kErrorReaderWriterAlreadyOpen, "FileReader: File is already open.");
 				return false;
 			}
 
 			m_file = fopen(_filePath.getCPtr(), "rb");
 			if (NULL == m_file)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "FileReader: Failed to open file.");
+				BX_ERROR_SET(_err, kErrorReaderWriterOpen, "FileReader: Failed to open file.");
 				return false;
 			}
 
@@ -146,11 +146,11 @@ namespace bx
 			{
 				if (0 != feof(m_file) )
 				{
-					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "FileReader: EOF.");
+					BX_ERROR_SET(_err, kErrorReaderWriterEof, "FileReader: EOF.");
 				}
 				else if (0 != ferror(m_file) )
 				{
-					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "FileReader: read error.");
+					BX_ERROR_SET(_err, kErrorReaderWriterRead, "FileReader: read error.");
 				}
 
 				return size >= 0 ? size : 0;
@@ -184,7 +184,7 @@ namespace bx
 
 			if (NULL != m_file)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "FileReader: File is already open.");
+				BX_ERROR_SET(_err, kErrorReaderWriterAlreadyOpen, "FileReader: File is already open.");
 				return false;
 			}
 
@@ -192,7 +192,7 @@ namespace bx
 
 			if (NULL == m_file)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "FileWriter: Failed to open file.");
+				BX_ERROR_SET(_err, kErrorReaderWriterOpen, "FileWriter: Failed to open file.");
 				return false;
 			}
 
@@ -225,7 +225,7 @@ namespace bx
 			int32_t size = (int32_t)fwrite(_data, 1, _size, m_file);
 			if (size != _size)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "FileWriter: write failed.");
+				BX_ERROR_SET(_err, kErrorReaderWriterWrite, "FileWriter: write failed.");
 				return size >= 0 ? size : 0;
 			}
 
@@ -276,7 +276,7 @@ namespace bx
 
 			if (0 != m_fd)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "FileReader: File is already open.");
+				BX_ERROR_SET(_err, kErrorReaderWriterAlreadyOpen, "FileReader: File is already open.");
 				return false;
 			}
 
@@ -284,7 +284,7 @@ namespace bx
 
 			if (0 >= m_fd)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "FileReader: Failed to open file.");
+				BX_ERROR_SET(_err, kErrorReaderWriterOpen, "FileReader: Failed to open file.");
 				return false;
 			}
 
@@ -319,11 +319,11 @@ namespace bx
 				BX_UNUSED(_err);
 //				if (0 != feof(m_file) )
 //				{
-//					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "FileReader: EOF.");
+//					BX_ERROR_SET(_err, kErrorReaderWriterEof, "FileReader: EOF.");
 //				}
 //				else if (0 != ferror(m_file) )
 //				{
-//					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "FileReader: read error.");
+//					BX_ERROR_SET(_err, kErrorReaderWriterRead, "FileReader: read error.");
 //				}
 
 				return size >= 0 ? size : 0;
@@ -357,7 +357,7 @@ namespace bx
 
 			if (0 != m_fd)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "FileReader: File is already open.");
+				BX_ERROR_SET(_err, kErrorReaderWriterAlreadyOpen, "FileReader: File is already open.");
 				return false;
 			}
 
@@ -365,7 +365,7 @@ namespace bx
 
 			if (0 >= m_fd)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "FileWriter: Failed to open file.");
+				BX_ERROR_SET(_err, kErrorReaderWriterOpen, "FileWriter: Failed to open file.");
 				return false;
 			}
 
@@ -397,7 +397,7 @@ namespace bx
 			int32_t size = crt0::write(m_fd, _data, _size);
 			if (size != _size)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "FileWriter: write failed.");
+				BX_ERROR_SET(_err, kErrorReaderWriterWrite, "FileWriter: write failed.");
 				return size >= 0 ? size : 0;
 			}
 
@@ -588,7 +588,7 @@ namespace bx
 
 			if (NULL == m_dir)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "DirectoryReader: Failed to open directory.");
+				BX_ERROR_SET(_err, kErrorReaderWriterOpen, "DirectoryReader: Failed to open directory.");
 				return false;
 			}
 
@@ -620,7 +620,7 @@ namespace bx
 				{
 					if (!fetch(m_cache, m_dir) )
 					{
-						BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "DirectoryReader: EOF.");
+						BX_ERROR_SET(_err, kErrorReaderWriterEof, "DirectoryReader: EOF.");
 						return total;
 					}
 				}
@@ -690,7 +690,7 @@ namespace bx
 		virtual bool open(const FilePath& _filePath, Error* _err) override
 		{
 			BX_UNUSED(_filePath);
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "DirectoryReader: Failed to open directory.");
+			BX_ERROR_SET(_err, kErrorReaderWriterOpen, "DirectoryReader: Failed to open directory.");
 			return false;
 		}
 
@@ -702,7 +702,7 @@ namespace bx
 		{
 			BX_UNUSED(_data, _size);
 			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "DirectoryReader: EOF.");
+			BX_ERROR_SET(_err, kErrorReaderWriterEof, "DirectoryReader: EOF.");
 			return 0;
 		}
 	};
@@ -811,7 +811,7 @@ namespace bx
 
 		if (0 != result)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
+			BX_ERROR_SET(_err, kErrorAccess, "The parent directory does not allow write permission to the process.");
 			return false;
 		}
 
@@ -836,7 +836,7 @@ namespace bx
 				return true;
 			}
 
-			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
+			BX_ERROR_SET(_err, kErrorNotDirectory, "File already exist, and is not directory.");
 			return false;
 		}
 
@@ -888,7 +888,7 @@ namespace bx
 
 		if (0 != result)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
+			BX_ERROR_SET(_err, kErrorAccess, "The parent directory does not allow write permission to the process.");
 			return false;
 		}
 
@@ -910,13 +910,13 @@ namespace bx
 
 		if (!stat(fi, _filePath) )
 		{
-			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
+			BX_ERROR_SET(_err, kErrorAccess, "The parent directory does not allow write permission to the process.");
 			return false;
 		}
 
 		if (FileType::Dir != fi.type)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
+			BX_ERROR_SET(_err, kErrorNotDirectory, "File already exist, and is not directory.");
 			return false;
 		}
 
@@ -925,7 +925,7 @@ namespace bx
 
 		if (!bx::open(&dr, _filePath) )
 		{
-			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
+			BX_ERROR_SET(_err, kErrorNotDirectory, "File already exist, and is not directory.");
 			return false;
 		}
 
