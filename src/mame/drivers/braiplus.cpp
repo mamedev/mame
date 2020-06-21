@@ -4,6 +4,22 @@
 
     Skeleton driver for BraiLab Plus talking computer.
 
+    (from a document translated from Hungarian)
+In addition to the Z80 microprocessor on the two-sided printed circuit board,
+there are 256 Kbytes of dynamic RAM, 16 Kbytes of EPROM, 2 Z80PIOs, 4 Kbytes
+of static RAM, a character generator EPROM, a WD2793 floppy disk controller,
+a I8251 PUSART and a MEA-8000 speech synthesizer.
+
+180 Kbytes of 256 Kbytes of RAM is handled as a fixed RAM disk under the
+CP/M operating system. Memory management supports the use of a dynamic RAM
+fixed disk, provides the appropriate address space for the operating system,
+and flips between them and between EPROMs. The two Z80PIOs perform centronics
+interface, system clock interrupt handling, and serial programming of the
+baud rate with serial interface I8251 and HD-4702.
+
+The increased size of 4 Kbytes memory enabled 25x80 character screen.
+Floppy disk holds 792kb (formatted).
+
 ***************************************************************************/
 
 #include "emu.h"
