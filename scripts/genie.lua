@@ -1275,8 +1275,8 @@ configuration { "mingw*" }
 				"-static",
 			}
 		end
-		flags {
-			"LinkSupportCircularDependencies",
+		linkoptions {
+			"-Wl,--start-group",
 		}
 		links {
 			"user32",
