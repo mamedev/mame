@@ -4245,7 +4245,7 @@ static INPUT_PORTS_START( gnw_dkong3 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
