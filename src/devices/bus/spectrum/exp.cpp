@@ -197,6 +197,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("plusd", SPECTRUM_PLUSD);
 	device.option_add("d40", SPECTRUM_D40);
 	device.option_add("d80", SPECTRUM_D80);
+	device.option_add("d80v2", SPECTRUM_D80V2);
 	device.option_add("protek", SPECTRUM_PROTEK);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);
 	device.option_add("uslot", SPECTRUM_USLOT);
@@ -216,8 +217,6 @@ void spec128_expansion_devices(device_slot_interface &device)
 	device.option_add("mikroplus", SPECTRUM_MIKROPLUS);
 	device.option_add("mprint", SPECTRUM_MPRINT);
 	device.option_add("opus", SPECTRUM_OPUS);
-	//device.option_add("d40", SPECTRUM_D40);
-	//device.option_add("d80", SPECTRUM_D80);
 	//device.option_add("plusd", SPECTRUM_PLUSD);
 	device.option_add("plus2test", SPECTRUM_PLUS2TEST);
 	device.option_add("protek", SPECTRUM_PROTEK);
