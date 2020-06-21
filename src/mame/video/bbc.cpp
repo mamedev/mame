@@ -320,7 +320,7 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 
 			for (int pixelno = 0; pixelno < m_pixels_per_byte; pixelno++)
 			{
-				int col = !(ra & 0x08) ? m_vula_palette_lookup[m_pixel_bits[data]] : 7;
+				int col = !(ra & 0x08) ? m_vula_palette_lookup[m_pixel_bits[data]] : 0;
 
 				col ^= ((cursor_x != -1 && x_pos >= cursor_x && x_pos < (cursor_x + m_cursor_size)) ? 7 : 0);
 
