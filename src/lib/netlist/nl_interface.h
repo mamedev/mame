@@ -32,21 +32,21 @@ namespace netlist
 		/// The following code is an example on how to add the device to
 		/// the netlist factory.
 		///
-		/// 	const pstring pin(m_in);
-		/// 	pstring dname = pstring("OUT_") + pin;
+		///     const pstring pin(m_in);
+		///     pstring dname = pstring("OUT_") + pin;
 		///
-		/// 	const auto lambda = [this](auto &in, netlist::nl_fptype val)
-		/// 	{
-		/// 		this->cpu()->update_icount(in.exec().time());
-		/// 		this->m_delegate(val, this->cpu()->local_time());
-		/// 		this->cpu()->check_mame_abort_slice();
-		/// 	};
+		///     const auto lambda = [this](auto &in, netlist::nl_fptype val)
+		///     {
+		///         this->cpu()->update_icount(in.exec().time());
+		///         this->m_delegate(val, this->cpu()->local_time());
+		///         this->cpu()->check_mame_abort_slice();
+		///     };
 		///
-		/// 	using lb_t = decltype(lambda);
-		/// 	using cb_t = netlist::interface::NETLIB_NAME(analog_callback)<lb_t>;
+		///     using lb_t = decltype(lambda);
+		///     using cb_t = netlist::interface::NETLIB_NAME(analog_callback)<lb_t>;
 		///
-		/// 	parser.factory().add<cb_t, netlist::nl_fptype, lb_t>(dname,
-		/// 		netlist::factory::properties("-", PSOURCELOC()), 1e-6, std::forward<lb_t>(lambda));
+		///     parser.factory().add<cb_t, netlist::nl_fptype, lb_t>(dname,
+		///         netlist::factory::properties("-", PSOURCELOC()), 1e-6, std::forward<lb_t>(lambda));
 		///
 
 		template <typename FUNC>
@@ -232,7 +232,7 @@ namespace netlist
 			object_array_t<param_fp_t, MAX_INPUT_CHANNELS>  m_param_mults;
 			object_array_t<param_fp_t, MAX_INPUT_CHANNELS>  m_param_offsets;
 			std::array<param_fp_t *, MAX_INPUT_CHANNELS>             m_params;
-			std::array<T *, MAX_INPUT_CHANNELS> 	                          m_buffers;
+			std::array<T *, MAX_INPUT_CHANNELS>                               m_buffers;
 		};
 
 	} // namespace interface

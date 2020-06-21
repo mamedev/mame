@@ -373,7 +373,7 @@ WRITE_LINE_MEMBER(gaplus_base_state::screen_vblank)/* update starfields */
 					/* scroll down (speed 2) */
 					stars[i].x += SPEED_2;
 				break;
-				
+
 				case 0x80:
 					/* scroll up (speed 1) */
 					stars[i].x -= SPEED_1;

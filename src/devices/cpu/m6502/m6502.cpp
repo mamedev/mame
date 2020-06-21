@@ -43,7 +43,7 @@ void m6502_device::device_start()
 }
 
 void m6502_device::init()
-{	
+{
 	space(AS_PROGRAM).cache(mintf->cprogram);
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(mintf->csprogram);
 	if(space(AS_PROGRAM).addr_width() > 14)

@@ -659,7 +659,7 @@ static INPUT_PORTS_START( fordrace )
 	PORT_BIT( 0x0fff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(spg2xx_game_fordrace_state, wheel_r)
 
 	PORT_START("WHEEL_REAL")
-	PORT_BIT(0x1fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x1fff) PORT_NAME("Wheel")  
+	PORT_BIT(0x1fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x1fff) PORT_NAME("Wheel")
 INPUT_PORTS_END
 
 CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel_r)
@@ -669,7 +669,7 @@ CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel_r)
 
 CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel2_r)
 {
-//	return 0x0800;
+//  return 0x0800;
 	uint16_t dat = ioport("WHEEL_REAL")->read();
 
 	return ((dat >> 1) ^ 0xfff) + (dat & 1);
@@ -1076,9 +1076,9 @@ void spg2xx_game_senspeed_state::senspeed(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_senspeed_state::portb_w));
 
 	/*
-		ATMLH806
-		02B 1
-		A7J4565E
+	    ATMLH806
+	    02B 1
+	    A7J4565E
 	*/
 	I2C_24C01(config, "i2cmem", 0); // saves 0x80 bytes, but loading fails?
 }

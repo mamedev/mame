@@ -1028,7 +1028,7 @@ int xx1,yy1,xx2,yy2;
         }
         for (int y=yy1;y <= yy2;y++) {
             *(bmp+y*width+xx1) = color;
-		}
+        }
     } else if (yy1 == yy2) {
         if (xx1 > xx2) {
             int t=xx1;
@@ -1957,8 +1957,8 @@ void nv2a_renderer::write_pixel(int x, int y, uint32_t color, int z)
 		w = (ft & ~color_mask) | (ct & color_mask);
 
 /* for debugging
-		if (w == 0x94737d7b)
-			x++;
+        if (w == 0x94737d7b)
+            x++;
 */
 		switch (colorformat_rendertarget) {
 		case NV2A_COLOR_FORMAT::R5G6B5:
@@ -3501,8 +3501,8 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 		compute_limits_rendertarget(chanel, subchannel);
 		compute_size_rendertarget(chanel, subchannel);
 /* for debugging
-		if (limits_rendertarget.max_x == 1023)
-			type_rendertarget = NV2A_RT_TYPE::LINEAR;
+        if (limits_rendertarget.max_x == 1023)
+            type_rendertarget = NV2A_RT_TYPE::LINEAR;
 */
 		switch (colorformat_rendertarget) {
 		case NV2A_COLOR_FORMAT::R5G6B5:

@@ -3302,11 +3302,11 @@ ROM_START( donpachihk )
 ROM_END
 
 /*
-	When you press the 2p start button, it pauses the game (music still plays).
-	Pressing the 1p start button unpauses the game.
-	If you press both 1p start and 2p start at the same time, the game lets you play in slow motion (music still plays normally).
+    When you press the 2p start button, it pauses the game (music still plays).
+    Pressing the 1p start button unpauses the game.
+    If you press both 1p start and 2p start at the same time, the game lets you play in slow motion (music still plays normally).
 
-	This was on the label of the ROM chip: 国内撮影用
+    This was on the label of the ROM chip: 国内撮影用
 */
 
 ROM_START( donpachijs )

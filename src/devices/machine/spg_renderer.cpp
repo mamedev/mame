@@ -60,7 +60,7 @@ void spg_renderer_device::device_reset()
 	m_video_regs_1e = 0x0000;
 
 	m_video_regs_2a = 0x0000;
-	
+
 	m_video_regs_30 = 0x0000;
 	m_video_regs_3c = 0x0020;
 
@@ -140,8 +140,8 @@ void spg_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screen
 				{
 
 					m_linebuf[realdrawpos] = (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 10) & 0x1f,  (rgb >> 10) & 0x1f, blendlevel) << 10) |
-						                     (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 5)  & 0x1f,  (rgb >> 5)  & 0x1f, blendlevel) << 5) |
-						                     (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 0)  & 0x1f,  (rgb >> 0)  & 0x1f, blendlevel) << 0);
+											 (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 5)  & 0x1f,  (rgb >> 5)  & 0x1f, blendlevel) << 5) |
+											 (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 0)  & 0x1f,  (rgb >> 0)  & 0x1f, blendlevel) << 0);
 				}
 				else
 				{
@@ -158,7 +158,7 @@ void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectang
 	if (has_extended_tilemaps)
 	{
 		uint32_t ctrl = tilemapregs[1];
-		
+
 		if (0)
 		{
 			if (ctrl & 0x0010)
@@ -350,7 +350,7 @@ void spg_renderer_device::update_vcmp_table()
 			{
 				m_ycmp_table[i] = currentline;
 			}
-			
+
 			counter += current_inc_value;
 
 			while (counter >= (0x20<<4))
@@ -417,7 +417,7 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 	{
 		// used by senspeed
 		//if (m_video_regs_1e != 0x0000)
-		//	popmessage("vertical compression mode with non-0 step amount %04x offset %04x step %04x\n", m_video_regs_1c, m_video_regs_1d, m_video_regs_1e);
+		//  popmessage("vertical compression mode with non-0 step amount %04x offset %04x step %04x\n", m_video_regs_1c, m_video_regs_1d, m_video_regs_1e);
 
 		logical_scanline = m_ycmp_table[scanline];
 		if (logical_scanline == 0xffffffff)
@@ -428,7 +428,7 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 	uint32_t y_mask;
 	uint32_t screenwidth;
 
-	 
+
 	if (read_from_csspace && (attr & 0x8000)) // is this only available in high res mode, or always?
 	{
 		// just a guess based on this being set on the higher resolution tilemaps we've seen, could be 100% incorrect register
@@ -617,7 +617,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 
 
 	uint32_t screenwidth = 320;
-//	uint32_t screenheight = 240;
+//  uint32_t screenheight = 240;
 	uint32_t screenheight = 256;
 	uint32_t xmask = 0x1ff;
 	uint32_t ymask = 0x1ff;
@@ -625,7 +625,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 	if (highres)
 	{
 		screenwidth = 640;
-//		screenheight = 480;
+//      screenheight = 480;
 		screenheight = 512;
 		xmask = 0x3ff;
 		ymask = 0x3ff;
@@ -637,7 +637,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 	if (!(m_video_regs_42 & 0x0002))
 	{
 		x = ((screenwidth/2) + x) - tile_w / 2;
-//		y = ((screenheight/2) - y) - (tile_h / 2) + 8;
+//      y = ((screenheight/2) - y) - (tile_h / 2) + 8;
 		y = ((screenheight/2) - y) - (tile_h / 2);
 	}
 
@@ -656,7 +656,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 	uint8_t blendlevel = (m_video_regs_2a & 3) << 3;
 
 	uint32_t words_per_tile;
-	
+
 	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
 	if (has_extended_sprites && ((m_video_regs_42 & 0x0010) == 0x10))
 	{
@@ -682,7 +682,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 
 
 	bool flip_y = (attr & 0x0008);
-	
+
 	// various games don't want the flip bits in the usual place, wrlshunt for example, there's probably a bit to control this
 	// and likewise these bits probably now have a different meaning, so this shouldn't be trusted
 	if (has_extended_sprites)
@@ -693,9 +693,9 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 			flip_y = 0;
 		}
 	}
-	
+
 	uint32_t palette_offset = (attr & 0x0f00) >> 4;
-	
+
 	if (has_extended_sprites)
 	{
 		// guess, tkmag220 / myac220 don't set this bit and expect all sprite palettes to be from the same bank as background palettes

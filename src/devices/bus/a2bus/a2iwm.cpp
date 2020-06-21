@@ -6,8 +6,8 @@
 
     Implementation of the Apple II IWM controller card
 
-	WANTED: there are no ROM dumps from this card in any form
-	(the IWM card, the UniDisk )
+    WANTED: there are no ROM dumps from this card in any form
+    (the IWM card, the UniDisk )
 
 *********************************************************************/
 

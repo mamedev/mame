@@ -20,7 +20,7 @@ class gsz80_state : public driver_device
 public:
 	gsz80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")	// Tag name for Z80 is "maincpu"
+		, m_maincpu(*this, "maincpu")   // Tag name for Z80 is "maincpu"
 		, m_acia(*this, "acia")         // Tag name for UART is "acia"
 	{ }
 
@@ -64,23 +64,23 @@ DEVICE_INPUT_DEFAULTS_END
 void gsz80_state::gsz80(machine_config &config)
 {
 	/* basic machine hardware */
-	
+
 	// Configure member Z80 (via m_maincpu)
 	Z80(config, m_maincpu, XTAL(7'372'800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &gsz80_state::gsz80_mem);
 	m_maincpu->set_addrmap(AS_IO, &gsz80_state::gsz80_io);
-	
+
 	// Configure UART (via m_acia)
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_acia->irq_handler().set_inputline("maincpu", INPUT_LINE_IRQ0); // Connect interrupt pin to our Z80 INT line
-	
+
 	// Create a clock device to connect to the transmit and receive clock on the 6850
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 7'372'800));
 	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
-	
+
 	// Configure a "default terminal" to connect to the 6850, so we have a console
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));

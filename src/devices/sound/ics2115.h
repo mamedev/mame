@@ -150,8 +150,8 @@ private:
 	bool m_irq_on;
 
 	/*
-		Unknown variable, seems to be effected by 0x12. Further investigation
-		Required.
+	    Unknown variable, seems to be effected by 0x12. Further investigation
+	    Required.
 	*/
 	u8 m_vmode;
 };

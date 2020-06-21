@@ -1337,7 +1337,7 @@ license:CC0
 		<year>1996</year> <!-- 03/96 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="	812-0478-001"/>
+			<feature name="part_number" value="812-0478-001"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="iris_development_option_6_2" sha1="eabaa5238a3515f1c71d693efc2781b4d1675cf9" />
@@ -2099,7 +2099,7 @@ license:CC0
 		<year>1993</year> <!-- 09/93 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="	812-0232-002"/>
+			<feature name="part_number" value="812-0232-002"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="indy_irix_5_1_1" sha1="e041bee239367f926ce0cef0d16830bdbe49ea01" />
@@ -2231,7 +2231,7 @@ license:CC0
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0469-001"/>
-				<feature name="part_id" value="IRIX 6.2 part 1 of 2"/>
+			<feature name="part_id" value="IRIX 6.2 part 1 of 2"/>
 			<!-- Origin: private dump. Verified SHA1 against a Plextor dump without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_2_part_1_of_2" sha1="714ad598cde6a48132005e4728e7e7d18fdbbb1b" />
@@ -2246,7 +2246,7 @@ license:CC0
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="irix_6_2_a" cloneof="irix_6_2">
 		<description>IRIX 6.2 with Indigo IMPACT 10000</description>
 		<year>1996</year>
@@ -2325,7 +2325,7 @@ license:CC0
 		</part>
 		<part name="cdrom4" interface="cdrom">
 			<feature name="part_number" value="812-0747-001"/>
-			<feature name="part_id" value="	IRIX 6.5 Beta Applications"/>
+			<feature name="part_id" value="IRIX 6.5 Beta Applications"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_beta_applications" sha1="6640a6b668de811d681bb8b17c16a44d67529c33" />
@@ -2357,7 +2357,7 @@ license:CC0
 		</part>
 		<part name="cdrom8" interface="cdrom">
 			<feature name="part_number" value="812-0753-001"/>
-			<feature name="part_id" value="	IRIX 6.5 Beta O2 Demos"/>
+			<feature name="part_id" value="IRIX 6.5 Beta O2 Demos"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_beta_o2_demos" sha1="c954caa735d92dcf4a6aba620c8d7ad44cf3b0bb" />
@@ -3337,7 +3337,7 @@ license:CC0
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="cdrom">
-			<feature name="part_number" value="812-0877-022	"/>
+			<feature name="part_number" value="812-0877-022 "/>
 			<feature name="part_id" value="IRIX 6.5 Applications November 2003"/>
 			<!-- Origin: archive.org -->
 			<diskarea name="cdrom">

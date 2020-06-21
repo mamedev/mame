@@ -239,7 +239,7 @@ namespace
 		}
 
 	private:
-		std::array<std::pair<const char *, T>, SIZE>	m_map;
+		std::array<std::pair<const char *, T>, SIZE>    m_map;
 	};
 };
 

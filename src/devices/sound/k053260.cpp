@@ -65,21 +65,21 @@ static constexpr int CLOCKS_PER_SAMPLE = 64;
 
 // device type definition
 DEFINE_DEVICE_TYPE(K053260, k053260_device, "k053260", "K053260 KDSC")
-    ;
+	;
 
 
 // Pan multipliers.  Set according to integer angles in degrees, amusingly.
 // Exact precision hard to know, the floating point-ish output format makes
 // comparisons iffy.  So we used a 1.16 format.
 const int k053260_device::pan_mul[8][2] = {
-    {     0,     0 }, // No sound for pan 0
-    { 65536,     0 }, //  0 degrees
-    { 59870, 26656 }, // 24 degrees
-    { 53684, 37950 }, // 35 degrees
-    { 46341, 46341 }, // 45 degrees
-    { 37950, 53684 }, // 55 degrees
-    { 26656, 59870 }, // 66 degrees
-    {     0, 65536 }  // 90 degrees
+	{     0,     0 }, // No sound for pan 0
+	{ 65536,     0 }, //  0 degrees
+	{ 59870, 26656 }, // 24 degrees
+	{ 53684, 37950 }, // 35 degrees
+	{ 46341, 46341 }, // 45 degrees
+	{ 37950, 53684 }, // 55 degrees
+	{ 26656, 59870 }, // 66 degrees
+	{     0, 65536 }  // 90 degrees
 };
 
 

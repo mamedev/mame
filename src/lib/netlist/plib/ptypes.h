@@ -148,7 +148,7 @@ namespace plib
 		using arch = std::integral_constant<ci_arch, ci_arch::ARM>;
 	#elif defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64)
 		using arch = std::integral_constant<ci_arch, ci_arch::MIPS>;
- 	#else
+	#else
 		using arch = std::integral_constant<ci_arch, ci_arch::UNKNOWN>;
 	#endif
 	#if defined(__MINGW32__)

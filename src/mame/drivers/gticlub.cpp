@@ -599,8 +599,8 @@ void gticlub_state::gn680_memmap(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x200000, 0x203fff).ram();
 	map(0x300000, 0x300001).w(FUNC(gticlub_state::gn680_sysctrl_w));
-//	map(0x310000, 0x311fff).nopw(); //056230 regs?
-//	map(0x312000, 0x313fff).nopw(); //056230 ram?
+//  map(0x310000, 0x311fff).nopw(); //056230 regs?
+//  map(0x312000, 0x313fff).nopw(); //056230 ram?
 }
 
 /*****************************************************************************/

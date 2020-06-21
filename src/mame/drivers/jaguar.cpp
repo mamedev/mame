@@ -1766,10 +1766,10 @@ void jaguar_state::video_config(machine_config &config, const XTAL clock)
 
 	JAGUARDSP(config, m_dsp, clock);
 	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
-	
-	// TODO: Tom 
+
+	// TODO: Tom
 	// TODO: Object Processor
-	
+
 	JAG_BLITTER(config, m_blitter, clock);
 }
 
@@ -1808,7 +1808,7 @@ void jaguar_state::cojagr3k(machine_config &config)
 	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-	
+
 	// TODO: subwoofer speaker
 }
 

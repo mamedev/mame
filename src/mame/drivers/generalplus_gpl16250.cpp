@@ -62,8 +62,8 @@
                 the High School Musical part has its own test mode which tests a different part of the ROM, use the same code but after selecting the game from menu
 
 
-	--- the individual CS spaces could (and probably should?) be done with a bunch of extra memory spaces rather than the cs0_r / cs0_w etc. but that would mean yet
-	    another trip through the memory system for almost everything and at ~100Mhz that is slow.
+    --- the individual CS spaces could (and probably should?) be done with a bunch of extra memory spaces rather than the cs0_r / cs0_w etc. but that would mean yet
+        another trip through the memory system for almost everything and at ~100Mhz that is slow.
 
 */
 

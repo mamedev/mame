@@ -34,7 +34,7 @@
 #define LOG_DEBUG       (1U << 2)
 
 //#define LOG_MASK (LOG_GENERAL | LOG_DEV_CALLS | LOG_DEBUG)
-#define LOG_MASK		(0)
+#define LOG_MASK        (0)
 
 #define LOGDEVCALLS(...) LOGMASKED(LOG_DEV_CALLS, __VA_ARGS__)
 #define LOGDEBUG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
@@ -870,7 +870,7 @@ void netlist_mame_stream_output_device::process(netlist::netlist_time_ext tim, n
 
 	int pos = (tim - m_last_buffer_time) / m_sample_time;
 	//if (pos > m_bufsize)
-	//	throw emu_fatalerror("sound %s: pos %d exceeded bufsize %d\n", name().c_str(), pos, m_bufsize);
+	//  throw emu_fatalerror("sound %s: pos %d exceeded bufsize %d\n", name().c_str(), pos, m_bufsize);
 	while (m_buffer.size() < pos )
 	{
 		m_buffer.push_back(static_cast<stream_sample_t>(m_cur));
@@ -1375,7 +1375,7 @@ void netlist_mame_sound_device::device_start()
 void netlist_mame_sound_device::nl_register_devices(netlist::nlparse_t &parser) const
 {
 	//parser.factory().add<nld_sound_out>("NETDEV_SOUND_OUT",
-	//	netlist::factory::properties("+CHAN", PSOURCELOC()));
+	//  netlist::factory::properties("+CHAN", PSOURCELOC()));
 	parser.factory().add<nld_sound_in>("NETDEV_SOUND_IN",
 		netlist::factory::properties("-", PSOURCELOC()));
 }

@@ -50,7 +50,7 @@
 // numeric instability. Also adjusts values of resistors associated with these
 // oscillators to maintain their frequency and voltage levels.
 
-#define CONVERGENCE_FRONTIERS	1
+#define CONVERGENCE_FRONTIERS   1
 
 
 static NETLIST_START(mc3340)
@@ -61,7 +61,7 @@ static NETLIST_START(mc3340)
 	// control signal, with a maximum gain of about 12-13 dB (about a
 	// factor of 4 in voltage), and higher control voltages giving greater
 	// attenuation, which scales logarithmically.
-	
+
 	// The netlist here is based on the circuit schematic given in
 	// Motorola's own data books, especially the most recent ones
 	// published in the 1990s (e.g. _Motorola Analog/Interface ICs Device
@@ -286,7 +286,7 @@ static NETLIST_START(280zzzap_schematics)
 	// 280-ZZZAP schematic and the schematic for the earlier Laguna Racer
 	// board, but this is a non-standard value. The nearest standard value
 	// is 470 Kohm, and this may have been used in production. Need to
-	// check against actual PCBs.	
+	// check against actual PCBs.
 	RES(R51, RES_K(480))  // 470 Kohm in later Laguna and Super Speed Race
 	RES(R46, RES_M(2))    // 2.2 Mohm in later Laguna and Super Speed Race
 	RES(R47, RES_M(1))
@@ -840,13 +840,13 @@ NETLIST_START(280zzzap)
 
 	// All together, loosening both tolerances and reducing accuracy
 	// increases speed by ~10%, but it also causes audible "crackling".
-//	PARAM(Solver.RELTOL, 1e-2) // default 1e-3 (several % faster, but < quality)
-//	PARAM(Solver.VNTOL, 5e-3)  // default 1e-7 (several % faster, but < quality)
-//	PARAM(Solver.ACCURACY, 1e-3)  // default 1e-7  (few % faster)
+//  PARAM(Solver.RELTOL, 1e-2) // default 1e-3 (several % faster, but < quality)
+//  PARAM(Solver.VNTOL, 5e-3)  // default 1e-7 (several % faster, but < quality)
+//  PARAM(Solver.ACCURACY, 1e-3)  // default 1e-7  (few % faster)
 
-//	PARAM(Solver.DYNAMIC_TS, 1)
-//	PARAM(Solver.DYNAMIC_LTE, 1e-4)  // default 1e-5
-//	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-8)  // default 1e-6
+//  PARAM(Solver.DYNAMIC_TS, 1)
+//  PARAM(Solver.DYNAMIC_LTE, 1e-4)  // default 1e-5
+//  PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-8)  // default 1e-6
 
 	ANALOG_INPUT(I_V12, 12)
 	ANALOG_INPUT(I_V5, 5)
@@ -899,27 +899,27 @@ NETLIST_START(280zzzap)
 
 	// Power pins for logic inputs:
 	NET_C(I_V5.Q,
-	      I_F4_2.VCC, I_F4_5.VCC, I_F4_7.VCC, I_F4_10.VCC,
-	      I_F5_2.VCC, I_F5_5.VCC, I_F5_7.VCC, I_F5_10.VCC,
-	      I_F5_12.VCC, I_F5_15.VCC)
+		  I_F4_2.VCC, I_F4_5.VCC, I_F4_7.VCC, I_F4_10.VCC,
+		  I_F5_2.VCC, I_F5_5.VCC, I_F5_7.VCC, I_F5_10.VCC,
+		  I_F5_12.VCC, I_F5_15.VCC)
 	NET_C(GND,
-	      I_F4_2.GND, I_F4_5.GND, I_F4_7.GND, I_F4_10.GND,
-	      I_F5_2.GND, I_F5_5.GND, I_F5_7.GND, I_F5_10.GND,
-	      I_F5_12.GND, I_F5_15.GND)
+		  I_F4_2.GND, I_F4_5.GND, I_F4_7.GND, I_F4_10.GND,
+		  I_F5_2.GND, I_F5_5.GND, I_F5_7.GND, I_F5_10.GND,
+		  I_F5_12.GND, I_F5_15.GND)
 
 	// Power inputs for the LM3900 op-amps. These aren't shown on the
 	// schematics, but it looks like 5-volt power is needed to get proper
 	// results.
 	NET_C(I_V5.Q,
-	      H4_1.VCC, H4_2.VCC, H4_3.VCC, H4_4.VCC,
-	      H5_1.VCC, H5_2.VCC, H5_3.VCC, H5_4.VCC,
-	      J3_1.VCC, J3_2.VCC, J3_3.VCC, J3_4.VCC,
-	      J5_1.VCC, J5_2.VCC, J5_3.VCC)
+		  H4_1.VCC, H4_2.VCC, H4_3.VCC, H4_4.VCC,
+		  H5_1.VCC, H5_2.VCC, H5_3.VCC, H5_4.VCC,
+		  J3_1.VCC, J3_2.VCC, J3_3.VCC, J3_4.VCC,
+		  J5_1.VCC, J5_2.VCC, J5_3.VCC)
 	NET_C(GND,
-	      H4_1.GND, H4_2.GND, H4_3.GND, H4_4.GND,
-	      H5_1.GND, H5_2.GND, H5_3.GND, H5_4.GND,
-	      J3_1.GND, J3_2.GND, J3_3.GND, J3_4.GND,
-	      J5_1.GND, J5_2.GND, J5_3.GND)
+		  H4_1.GND, H4_2.GND, H4_3.GND, H4_4.GND,
+		  H5_1.GND, H5_2.GND, H5_3.GND, H5_4.GND,
+		  J3_1.GND, J3_2.GND, J3_3.GND, J3_4.GND,
+		  J5_1.GND, J5_2.GND, J5_3.GND)
 
 	// Power inputs for the CD4016 switches. Again, these aren't shown on
 	// the schematics, but 5-volt power must be used for the switches to

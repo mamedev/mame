@@ -44,19 +44,19 @@ protected:
 	virtual void key_repeat(uint8_t row, uint8_t column) override;
 
 private:
-    devcb_write_line m_int_handler;
+	devcb_write_line m_int_handler;
 
-    enum
-    {
-        STATUS_READY_FOR_DATA = 0x01,
-        STATUS_DATA_AVAILABLE = 0x02
-    };
+	enum
+	{
+		STATUS_READY_FOR_DATA = 0x01,
+		STATUS_DATA_AVAILABLE = 0x02
+	};
 
 	uint8_t translate(uint8_t row, uint8_t column);
 	void send_key(uint8_t code);
 
-    uint8_t m_status;
-    uint8_t m_data;
+	uint8_t m_status;
+	uint8_t m_data;
 };
 
 // device type definition

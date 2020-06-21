@@ -751,10 +751,10 @@ void dec8_state::csilver_mcu_to_main_w(uint8_t data)
 {
 	if (~data & 0x10)
 		m_i8751_port0 = m_i8751_value >> 8;
-	
+
 	if (~data & 0x20)
 		m_i8751_port1 = m_i8751_value & 0xff;
-	
+
 	if (~data & 0x40)
 	{
 		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
@@ -763,7 +763,7 @@ void dec8_state::csilver_mcu_to_main_w(uint8_t data)
 
 	if (~data & 0x80)
 		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
-	
+
 	m_i8751_p2 = data;
 }
 

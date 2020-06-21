@@ -81,8 +81,8 @@ void i80130_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 //-------------------------------------------------
 
 //ROM_START( i80130 )
-//	ROM_REGION16_LE( 0x4000, "rom", 0 )
-//	ROM_LOAD( "80130", 0x0000, 0x4000, NO_DUMP )
+//  ROM_REGION16_LE( 0x4000, "rom", 0 )
+//  ROM_LOAD( "80130", 0x0000, 0x4000, NO_DUMP )
 //ROM_END
 
 
@@ -92,7 +92,7 @@ void i80130_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 //const tiny_rom_entry *i80130_device::device_rom_region() const
 //{
-//	return ROM_NAME( i80130 );
+//  return ROM_NAME( i80130 );
 //}
 
 

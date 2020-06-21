@@ -63,11 +63,11 @@ TODO:
 // TODO: NTSC system clock is 30.2098 MHz; additional 4.9152 MHz XTAL provided for UART
 #define CLOCK_A 30_MHz_XTAL
 
-#define LOG_DVC				(1 << 1)
-#define LOG_QUIZARD_READS	(1 << 2)
-#define LOG_QUIZARD_WRITES	(1 << 3)
-#define LOG_QUIZARD_OTHER	(1 << 4)
-#define LOG_UART			(1 << 5)
+#define LOG_DVC             (1 << 1)
+#define LOG_QUIZARD_READS   (1 << 2)
+#define LOG_QUIZARD_WRITES  (1 << 3)
+#define LOG_QUIZARD_OTHER   (1 << 4)
+#define LOG_UART            (1 << 5)
 
 #define VERBOSE         (0)
 #include "logmacro.h"

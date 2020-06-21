@@ -1,19 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Alex Marshall,nimitz,austere
 /*
-	ICS2115 by Raiden II team (c) 2010
-	members: austere, nimitz, Alex Marshal
+    ICS2115 by Raiden II team (c) 2010
+    members: austere, nimitz, Alex Marshal
 
-	Original driver by O. Galibert, ElSemi
+    Original driver by O. Galibert, ElSemi
 
-	Use tab size = 4 for your viewing pleasure.
+    Use tab size = 4 for your viewing pleasure.
 
-	TODO:
-	- Implement Panning, Chip has support stereo
-	- Verify BYTE/ROMEN pin behaviors
-	- DRAM, DMA, MIDI interface is unimplemented
-	- Verify interrupt, envelope, timer period
-	- Verify unemulated registers
+    TODO:
+    - Implement Panning, Chip has support stereo
+    - Verify BYTE/ROMEN pin behaviors
+    - DRAM, DMA, MIDI interface is unimplemented
+    - Verify interrupt, envelope, timer period
+    - Verify unemulated registers
 */
 
 #include "emu.h"

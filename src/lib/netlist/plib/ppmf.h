@@ -117,7 +117,7 @@ namespace plib {
 					|| ci::os() == ci_os::EMSCRIPTEN))                           ? 2 :
 			(ci::type() == ci_compiler::CLANG || ci::type() == ci_compiler::GCC) ? 1 :
 			(ci::type() == ci_compiler::MSC && ci::m64()) ?                        3 :
-				                                                                   0
+																				   0
 		};
 	};
 
@@ -416,10 +416,10 @@ namespace plib {
 	///     plib::late_pmfp<plib::pmfp<void, pstring>> a(&nld_7493::printer);
 	///     // Store the a object somewhere
 	///
-	/// 	// After full construction ...
+	///     // After full construction ...
 	///
-	///		auto dele = a(this);
-	///		dele(pstring("Hello World!"));
+	///     auto dele = a(this);
+	///     dele(pstring("Hello World!"));
 	///
 	template<typename T>
 	class late_pmfp

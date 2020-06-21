@@ -36,8 +36,8 @@ TODO:
 #define LOG_READS       (1 << 6)
 #define LOG_WRITES      (1 << 7)
 #define LOG_UNKNOWNS    (1 << 8)
-#define LOG_RAM			(1 << 9)
-#define LOG_ALL			(LOG_DECODES | LOG_SAMPLES | LOG_COMMANDS | LOG_SECTORS | LOG_IRQS | LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_RAM)
+#define LOG_RAM         (1 << 9)
+#define LOG_ALL         (LOG_DECODES | LOG_SAMPLES | LOG_COMMANDS | LOG_SECTORS | LOG_IRQS | LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_RAM)
 
 #define VERBOSE         (LOG_ALL)
 #include "logmacro.h"
@@ -751,9 +751,9 @@ void cdicdic_device::process_delayed_command()
 					m_intreq_callback(ASSERT_LINE);
 					//else
 					//{
-					//	LOGMASKED(LOG_IRQS, "%s: Setting CDIC interrupt line for ignored audio sector (m_channel %04x, m_audio_channel %04x, sector channel %04x\n",
-					//		machine().describe_context(), m_channel, m_audio_channel, (1 << buffer[CDIC_SECTOR_CHAN2]));
-					//	m_intreq_callback(ASSERT_LINE);
+					//  LOGMASKED(LOG_IRQS, "%s: Setting CDIC interrupt line for ignored audio sector (m_channel %04x, m_audio_channel %04x, sector channel %04x\n",
+					//      machine().describe_context(), m_channel, m_audio_channel, (1 << buffer[CDIC_SECTOR_CHAN2]));
+					//  m_intreq_callback(ASSERT_LINE);
 					//}
 				}
 				else if ((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)

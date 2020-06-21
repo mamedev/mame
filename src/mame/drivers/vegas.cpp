@@ -1274,7 +1274,7 @@ static INPUT_PORTS_START( vegas_4p )
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START4 )
-	
+
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(3) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(3) PORT_8WAY
@@ -1292,12 +1292,12 @@ static INPUT_PORTS_START( vegas_4p )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vegas_analog )
 	PORT_INCLUDE(vegas_common)
-	
+
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Button")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1341,7 +1341,7 @@ static INPUT_PORTS_START( gauntleg )
 	PORT_DIPSETTING(      0xc000, "Standard Res 512x256" )
 	PORT_DIPSETTING(      0x4000, "Medium Res 512x384" )
 	PORT_DIPSETTING(      0x0000, "VGA Res 640x480" ) //VGA res not supported for gauntleg
-	
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Fight")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Magic")
@@ -1350,7 +1350,7 @@ static INPUT_PORTS_START( gauntleg )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Magic")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Fight")
 
-	PORT_MODIFY("IN2")	
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Fight")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Magic")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Turbo")
@@ -1371,10 +1371,10 @@ static INPUT_PORTS_START( tenthdeg )
 	PORT_DIPSETTING(      0xc000, "Standard Res 512x256" )
 	PORT_DIPSETTING(      0x4000, "Medium Res 512x384" )
 	PORT_DIPSETTING(      0x0000, "VGA Res 640x480" ) //VGA res not supported for this game
-	
+
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Counter")
-	
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Jab")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Strong")
@@ -1716,7 +1716,7 @@ void vegas_state::vegas_cs2_map(address_map &map)
 void vegas_state::vegas_cs3_map(address_map &map)
 {
 	map(0x00000000, 0x00000003).rw(FUNC(vegas_state::analog_port_r), FUNC(vegas_state::analog_port_w));
-//	map(0x00001000, 0x00001003).rw(FUNC(vegas_state::lcd_r), FUNC(vegas_state::lcd_w));
+//  map(0x00001000, 0x00001003).rw(FUNC(vegas_state::lcd_r), FUNC(vegas_state::lcd_w));
 }
 
 void vegas_state::vegas_cs4_map(address_map &map)
@@ -1741,7 +1741,7 @@ void vegas_state::vegas_cs6_map(address_map &map)
 
 void vegas_state::vegas_cs7_map(address_map &map)
 {
-//	map(0x00000000, 0x00000003).rw(FUNC(vegas_state::nss_r), FUNC(vegas_state::nss_w));
+//  map(0x00000000, 0x00000003).rw(FUNC(vegas_state::nss_r), FUNC(vegas_state::nss_w));
 	map(0x00001000, 0x0000100f).rw(FUNC(vegas_state::ethernet_r), FUNC(vegas_state::ethernet_w));
 	map(0x00005000, 0x00005003).w(m_dcs, FUNC(dcs_audio_device::dsio_idma_addr_w)); // if (m_dcs_idma_cs == 7)
 	map(0x00007000, 0x00007003).rw(m_dcs, FUNC(dcs_audio_device::dsio_idma_data_r), FUNC(dcs_audio_device::dsio_idma_data_w)); // if (m_dcs_idma_cs == 7)

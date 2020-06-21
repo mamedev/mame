@@ -51,17 +51,17 @@ void gs6502_state::gs6502(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, XTAL(1'843'200));
 	m_maincpu->set_addrmap(AS_PROGRAM, &gs6502_state::gs6502_mem);
-	
+
 	// Configure UART (via m_acia)
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	// should this be reverse polarity?
-	m_acia->irq_handler().set("rs232", FUNC(rs232_port_device::write_rts)); 
-	
+	m_acia->irq_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 1'843'200));
 	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
-	
+
 	// Configure a "default terminal" to connect to the 6850, so we have a console
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));

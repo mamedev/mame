@@ -367,7 +367,7 @@ void iwm_device::sync()
 					break;
 				}
 				m_rsh = (m_rsh << 1) | (m_rw_state == SR_WINDOW_EDGE_1 ? 1 : 0);
-				m_next_state_change = m_last_sync = endw;				
+				m_next_state_change = m_last_sync = endw;
 				m_rw_state = SR_WINDOW_EDGE_0;
 				if(is_sync()) {
 					if(m_rsh >= 0x80) {

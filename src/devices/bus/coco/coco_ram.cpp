@@ -6,7 +6,7 @@
 
     Code for emulating the Disto RAM cartridge
 
-	This cartridge came in several forms: 256K, 512K, 768K, and 1024K.
+    This cartridge came in several forms: 256K, 512K, 768K, and 1024K.
 
 ***************************************************************************/
 
@@ -53,7 +53,7 @@ namespace
 
 	private:
 		required_device<ram_device>             m_staticram;
-		int										m_offset;
+		int                                     m_offset;
 	};
 };
 
@@ -124,7 +124,7 @@ void coco_pak_ram_device::device_reset()
 
 void coco_pak_ram_device::scs_write(offs_t offset, u8 data)
 {
-// 	int idata = data;
+//  int idata = data;
 
 	switch(offset)
 	{

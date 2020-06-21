@@ -289,7 +289,7 @@ void spg2xx_vsplus_game_state::vsplus(machine_config &config)
 	m_maincpu->porta_in().set_ioport("P1");
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
-	
+
 	// output was PAL when connected to TV at least
 	m_maincpu->set_pal(true);
 	m_screen->set_refresh_hz(50);

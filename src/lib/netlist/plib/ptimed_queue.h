@@ -89,7 +89,7 @@ namespace plib {
 		std::size_t capacity() const noexcept { return m_list.capacity() - 1; }
 		bool empty() const noexcept { return (m_end == &m_list[1]); }
 
-	    template<bool KEEPSTAT, typename... Args>
+		template<bool KEEPSTAT, typename... Args>
 		void emplace(Args&&... args) noexcept
 		{
 			// Lock

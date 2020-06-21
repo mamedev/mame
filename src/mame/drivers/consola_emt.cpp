@@ -84,8 +84,8 @@ void consoemt_state::io_map(address_map &map)
 	map(0x220, 0x220).portr("NUMBUS-H");
 	map(0x230, 0x230).portr("NUMFAB-L");
 	map(0x240, 0x240).portr("NUMFAB-H");
-//	map(0x250, 0x250).r // read on int2
-//	map(0x260, 0x260).r // read on int1
+//  map(0x250, 0x250).r // read on int2
+//  map(0x260, 0x260).r // read on int1
 	map(0x280, 0x281).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 }
 

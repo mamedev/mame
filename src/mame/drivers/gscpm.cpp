@@ -3,7 +3,7 @@
 // http://searle.x10host.com/cpm/index.html
 // Written by Frank Palazzolo - frank@avoidspikes.com
 
-// This driver uses a compact flash card as a hard disk device.  
+// This driver uses a compact flash card as a hard disk device.
 // To create a virtual disk file, use the following (for a 128MB card):
 //     chdman createhd -s 134217728 -o filename.chd
 // (or use -s 67108864 for 64MB card)
@@ -56,7 +56,7 @@ protected:
 void gscpm_state::gscpm_mem(address_map &map)
 {
 	//map(0x0000, 0x3fff).rom("maincpu");  // This is ROM after reset, and RAM is switched in when CP/M is booted
-	                                       // (will install handlers dynamically)
+										   // (will install handlers dynamically)
 	map(0x4000, 0xffff).ram();
 }
 
@@ -166,13 +166,13 @@ void gscpm_state::gscpm(machine_config &config)
 	m_sio->out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_sio->out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_sio->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0); // Connect interrupt pin to our Z80 INT line
-	
+
 	clock_device &sio_clock(CLOCK(config, "sio_clock", 7'372'800));
 	sio_clock.signal_handler().set("sio", FUNC(z80sio_device::txca_w));
 	sio_clock.signal_handler().append("sio", FUNC(z80sio_device::rxca_w));
 	sio_clock.signal_handler().append("sio", FUNC(z80sio_device::txcb_w));
 	sio_clock.signal_handler().append("sio", FUNC(z80sio_device::rxcb_w));
-	
+
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be below the DEVICE_INPUT_DEFAULTS_START block

@@ -401,13 +401,13 @@ void namcos2_state::sound_bankselect_w(uint8_t data)
 uint16_t namcos2_state::c140_rom_r(offs_t offset)
 {
 	/*
-		Verified from schematics:
-		MD0-MD3 : Connected in 3N "voice0" D0-D3 or D4-D7, Nibble changeable with 74LS157
-		MD4-MD11 : Connected in 3M "voice1" or 3L "voice2" D0-D7
-		MA0-MA18 : Connected in Address bus of ROMs
-		MA19 : Connected in 74LS157 Select Pin
-		MA20 : Connected in 74LS157 Strobe(Enable) Pin
-		MA21 : ROM select in MD4-MD11 area
+	    Verified from schematics:
+	    MD0-MD3 : Connected in 3N "voice0" D0-D3 or D4-D7, Nibble changeable with 74LS157
+	    MD4-MD11 : Connected in 3M "voice1" or 3L "voice2" D0-D7
+	    MA0-MA18 : Connected in Address bus of ROMs
+	    MA19 : Connected in 74LS157 Select Pin
+	    MA20 : Connected in 74LS157 Strobe(Enable) Pin
+	    MA21 : ROM select in MD4-MD11 area
 	*/
 	if (m_c140_region != nullptr)
 	{

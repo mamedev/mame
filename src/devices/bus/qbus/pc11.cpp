@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	DEC PC11 paper tape reader and punch controller (punch not implemented)
+    DEC PC11 paper tape reader and punch controller (punch not implemented)
 
 ***************************************************************************/
 

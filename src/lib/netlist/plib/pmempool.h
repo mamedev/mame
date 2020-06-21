@@ -189,7 +189,7 @@ namespace plib {
 		using base_allocator_typex = typename BASEARENA::template allocator_type<std::pair<void * const, info>>;
 		std::unordered_map<void *, info, std::hash<void *>, std::equal_to<void *>,
 			base_allocator_typex> m_info;
-//		std::unordered_map<void *, info> m_info;
+//      std::unordered_map<void *, info> m_info;
 		std::vector<block *, typename BASEARENA::template allocator_type<block *>> m_blocks;
 
 	};

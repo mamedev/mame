@@ -68,11 +68,11 @@
         * Everything needs to be verified on real PCB or schematics
 
     Known issues/to-do's Panther:
-		* Analog sounds (same as Red Alert?)
-		* AY sounds needs an actual ref, they are dubious at best
+        * Analog sounds (same as Red Alert?)
+        * AY sounds needs an actual ref, they are dubious at best
         * No title screen?
-		* Fails ROM check in service mode with "ROM ERR 0", bootleg/prototype set?
-		* Likewise sports corrupted words in input test
+        * Fails ROM check in service mode with "ROM ERR 0", bootleg/prototype set?
+        * Likewise sports corrupted words in input test
 
     ********************************************************************
     IREM 'WW III' 1981
@@ -96,19 +96,19 @@
 
     ********************************************************************
     Panther notes:
-	- Hold start 1 on boot, press coin chutes or service button to cycle:
-	-> RAM/ROM check 
-	-> Continous Video drawing check (only if above is success)
-	-> (NMI again goes to PROM check and beyond)
-	- Hold start 2 on boot: 
-	-> PROM check?
-	-> Input check
-	-> Freeze
-	- Notes on "ROM ERR 0":
-	  PC=b482 ROM check main routine
-	  PC=b5cc SUM16 individual ROM chunk (ROM 0 -> 8000-87ff, ROM 1 -> 8800-8fff ...)
-	  PC=b5b4 Taking the branch -> failed check
-	  
+    - Hold start 1 on boot, press coin chutes or service button to cycle:
+    -> RAM/ROM check
+    -> Continous Video drawing check (only if above is success)
+    -> (NMI again goes to PROM check and beyond)
+    - Hold start 2 on boot:
+    -> PROM check?
+    -> Input check
+    -> Freeze
+    - Notes on "ROM ERR 0":
+      PC=b482 ROM check main routine
+      PC=b5cc SUM16 individual ROM chunk (ROM 0 -> 8000-87ff, ROM 1 -> 8800-8fff ...)
+      PC=b5b4 Taking the branch -> failed check
+
 
 ****************************************************************************/
 
@@ -265,7 +265,7 @@ static INPUT_PORTS_START( m27_base )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, redalert_state, coin_inserted, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, redalert_state, coin_inserted, 0)
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -321,7 +321,7 @@ static INPUT_PORTS_START( panther )
 	// no p2
 	PORT_MODIFY("KEY1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_MODIFY("KEY2")
 	PORT_BIT( 0x7c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -332,7 +332,7 @@ static INPUT_PORTS_START( panther )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
 	// actually just flips input test text if enabled, everything else is unaffected
-	PORT_DIPNAME( 0x04, 0x00, "Cabinet in Service Mode" ) PORT_DIPLOCATION("SW:3") 
+	PORT_DIPNAME( 0x04, 0x00, "Cabinet in Service Mode" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:4")
@@ -357,7 +357,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( demoneye )
 	PORT_INCLUDE( m27_base )
-	
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )

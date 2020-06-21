@@ -141,7 +141,7 @@ void debugger_console::execute_help_custom(int ref, const std::vector<std::strin
 }
 
 /*------------------------------------------------------------
-	execute_condump - execute the condump command
+    execute_condump - execute the condump command
 ------------------------------------------------------------*/
 
 void debugger_console::execute_condump(int ref, const std::vector<std::string>& params)
@@ -584,8 +584,8 @@ std::string debugger_console::cmderr_to_string(CMDERR error)
 
 
 /*-------------------------------------------------
-	print_core - write preformatted text
-	to the debug console
+    print_core - write preformatted text
+    to the debug console
 -------------------------------------------------*/
 
 void debugger_console::print_core(const char *text)
@@ -597,8 +597,8 @@ void debugger_console::print_core(const char *text)
 }
 
 /*-------------------------------------------------
-	print_core_wrap - write preformatted text
-	to the debug console, with wrapping
+    print_core_wrap - write preformatted text
+    to the debug console, with wrapping
 -------------------------------------------------*/
 
 void debugger_console::print_core_wrap(const char *text, int wrapcol)

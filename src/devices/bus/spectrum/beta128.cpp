@@ -11,7 +11,7 @@
     is moved from 3cxx to 3dxx for example)
 
     TODO:
-	original ROMs should have bits 0 and 7 swapped
+    original ROMs should have bits 0 and 7 swapped
 
     there were many unofficial ROMs available for this, make them
     available for use.

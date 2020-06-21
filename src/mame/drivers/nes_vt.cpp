@@ -2038,7 +2038,7 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_stat
 
     (units for use with TV)
     Lexibook Retro TV Game Console (300 Games) - Cars
-	Lexibook Retro TV Game Console (300 Games) - PJ Masks
+    Lexibook Retro TV Game Console (300 Games) - PJ Masks
 
     (more?)
 */

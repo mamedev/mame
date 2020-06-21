@@ -440,8 +440,8 @@ void seattle_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	// configure fast RAM regions
-//	m_maincpu->add_fastram(0x00000000, 0x007fffff, FALSE, m_rambase);
-//	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+//  m_maincpu->add_fastram(0x00000000, 0x007fffff, FALSE, m_rambase);
+//  m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 
 	save_item(NAME(m_widget.ethernet_addr));
 	save_item(NAME(m_widget.irq_num));
@@ -1271,7 +1271,7 @@ static INPUT_PORTS_START( seattle_common )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("IN2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1301,12 +1301,12 @@ static INPUT_PORTS_START( seattle_4p )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( seattle_analog )
 	PORT_INCLUDE(seattle_common)
-	
+
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Button")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1334,7 +1334,7 @@ static INPUT_PORTS_START( wg3dh )
 	PORT_DIPNAME( 0x0002, 0x0002, "Boot ROM Test" )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot/Block")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Pass/Steal")
@@ -1344,7 +1344,7 @@ static INPUT_PORTS_START( wg3dh )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Pass/Steal")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Burst/Turbo")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Shoot/Block")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Pass/Steal")
@@ -1604,7 +1604,7 @@ static INPUT_PORTS_START( blitz )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Turbo")
-	
+
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B")
@@ -1948,7 +1948,7 @@ void seattle_state::seattle200_widget(machine_config &config)
 	seattle200(config);
 
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::widget_cs3_map, "widget_cs3_map", this), this);
-	
+
 	SMC91C94(config, m_ethernet, 0);
 	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
 }
@@ -2122,7 +2122,7 @@ void seattle_state::carnevil(machine_config &config)
 {
 	seattle150(config);
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::carnevil_cs3_map, "carnevil_cs3_map", this), this);
-	
+
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0af7);
@@ -2479,7 +2479,7 @@ ROM_START( carnevil1 )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Rom Version 1.9 
+	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Rom Version 1.9
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive v1.0.1  Diagnostics v3.3 / Oct 20 1998 11:44:41
@@ -2506,7 +2506,7 @@ ROM_START( hyprdriv )
 
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )
 	ROM_LOAD( "hyperdrive1.1.u32", 0x000000, 0x80000, CRC(3120991e) SHA1(8e47888a5a23c9d3c0d0c64497e1cfb4e46c2cd6) )  // Boot Rom Version 2. Doesn't work, maybe for older drive?
-	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )  // Boot Rom Version 9. 
+	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )  // Boot Rom Version 9.
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Version 1.40  Oct 23 1998  15:16:00
 	DISK_IMAGE( "hyprdriv", 0, SHA1(8cfa343797575b32f46cc24150024be48963a03e) )
@@ -2668,7 +2668,7 @@ void seattle_state::init_hyprdriv()
 	// speedups
 	m_maincpu->mips3drc_add_hotspot(0x801643BC, 0x3C03801B, 250); // confirmed
 	m_maincpu->mips3drc_add_hotspot(0x80011FB8, 0x8E020018, 250); // confirmed
-//	m_maincpu->mips3drc_add_hotspot(0x80136A80, 0x3C02801D, 250); // potential
+//  m_maincpu->mips3drc_add_hotspot(0x80136A80, 0x3C02801D, 250); // potential
 }
 
 

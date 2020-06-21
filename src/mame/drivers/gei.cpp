@@ -58,7 +58,7 @@ Biblical
 NOTE: Series 8 through 14 are "T3" sets as noted by the first 2 bytes of the questions ROMs.
       The question ROMs are 27256 (twice the size of previous question ROMs) and contain 3
       times the number of questions.  ROM labels are yellow.
-      
+
 
 Series 8: (256K)           Series 9: (256K)           Series 10: (256K)
 ----------------           ----------------           -----------------
@@ -88,13 +88,13 @@ NOTE: Series 15 and later are "T4" sets as noted by the first 2 bytes of the que
       pink.
 
 
-Series 15: (256K)          Series 16: (256K)          Series 17: (256K) 
+Series 15: (256K)          Series 16: (256K)          Series 17: (256K)
 -----------------          -----------------          -----------------
 Entertainment 2            Late TV Shows              Night Time TV
 The Seventies              The Eighties               New Eighties
 Facts 2                    People and Places          History and Geography
 New Science 3              Potluck                    New Potpourri
-N F L Football             N B A Basketball           N H L Hockey 
+N F L Football             N B A Basketball           N H L Hockey
  or alt: Adult Sex 6        or alt: Adult Sex 7        or alt: Adult Sex 8
 
 

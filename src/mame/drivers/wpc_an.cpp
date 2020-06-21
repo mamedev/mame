@@ -3,18 +3,18 @@
 /*
     Williams WPC (Alpha Numeric)
 
-	Note: It is possible to get funhouse (fh_l3 at least) in-game by coining it up, then holding the following keys,
-		and pressing the start button, or else you get "PINBALL MISSING":
-	W (right ball shooter, c6 r2)
-	E (right trough, c6 r3)
-	[ (dummy jaw opto, c5 r1)
-	] (right outlane, c5 r2)
-	\ (right slingshot kicker, c5 r3)
-	It's possible not all of these are strictly necessary to make it work.
+    Note: It is possible to get funhouse (fh_l3 at least) in-game by coining it up, then holding the following keys,
+        and pressing the start button, or else you get "PINBALL MISSING":
+    W (right ball shooter, c6 r2)
+    E (right trough, c6 r3)
+    [ (dummy jaw opto, c5 r1)
+    ] (right outlane, c5 r2)
+    \ (right slingshot kicker, c5 r3)
+    It's possible not all of these are strictly necessary to make it work.
 
-	TODO: replace the 8x8 pinball input matrix keymap by some sort of common interface for the williams system 6, 9, 10, 11 and wpc_an;
-	while the actual purpose of the switches differ per machine (and some machines like wpc_an have one switch permanently closed as a test switch),
-	the entire matrix should be mapped to keyboard keys, there are more than enough keys on a 104 key keyboard to do it, even avoiding MAME's reserved keys.
+    TODO: replace the 8x8 pinball input matrix keymap by some sort of common interface for the williams system 6, 9, 10, 11 and wpc_an;
+    while the actual purpose of the switches differ per machine (and some machines like wpc_an have one switch permanently closed as a test switch),
+    the entire matrix should be mapped to keyboard keys, there are more than enough keys on a 104 key keyboard to do it, even avoiding MAME's reserved keys.
 */
 
 

@@ -3,59 +3,59 @@
 /*
 Konami 037122
 
-	This chip has CLUT, CRTC, Variable size single tilemap
+    This chip has CLUT, CRTC, Variable size single tilemap
 
-	Color lookup table is 16 bit BRG format, total 8192 entries (256 color per each tile * 32 banks))
+    Color lookup table is 16 bit BRG format, total 8192 entries (256 color per each tile * 32 banks))
 
-	Color format (4 byte (1x32bit word) per each color)
-	Bits                              Description
-	fedcba9876543210 fedcba9876543210
-	---------------- xxxxx----------- Blue
-	---------------- -----xxxxx------ Red
-	---------------- ----------xxxxxx Green
+    Color format (4 byte (1x32bit word) per each color)
+    Bits                              Description
+    fedcba9876543210 fedcba9876543210
+    ---------------- xxxxx----------- Blue
+    ---------------- -----xxxxx------ Red
+    ---------------- ----------xxxxxx Green
 
-	Tilemap is can be rotated, zoomed, similar as K053936 "simple mode"
-	Tilemap size is 256x64 (2048x512 pixels) or 128x64 (1024x512 pixels), Each tile is 8bpp 8x8.
+    Tilemap is can be rotated, zoomed, similar as K053936 "simple mode"
+    Tilemap size is 256x64 (2048x512 pixels) or 128x64 (1024x512 pixels), Each tile is 8bpp 8x8.
 
-	Tile format (4 byte (1x32bit word) per each tile)
-	Bits                              Description
-	fedcba9876543210 fedcba9876543210
-	--------x------- ---------------- Flip Y
-	---------x------ ---------------- Flip X
-	----------xxxxx- ---------------- CLUT Bank index (256 color granularity)
-	---------------- --xxxxxxxxxxxxxx Tile code (from character RAM, 8x8 pixel granularity (128 byte))
+    Tile format (4 byte (1x32bit word) per each tile)
+    Bits                              Description
+    fedcba9876543210 fedcba9876543210
+    --------x------- ---------------- Flip Y
+    ---------x------ ---------------- Flip X
+    ----------xxxxx- ---------------- CLUT Bank index (256 color granularity)
+    ---------------- --xxxxxxxxxxxxxx Tile code (from character RAM, 8x8 pixel granularity (128 byte))
 
-	Other bits unknown
+    Other bits unknown
 
-	Register map
-	00-0f Display timing
-	20-2f Scroll/ROZ register
-	30-3f Control, etc
+    Register map
+    00-0f Display timing
+    20-2f Scroll/ROZ register
+    30-3f Control, etc
 
-	Offset Bits                              Description
-	       fedcba9876543210 fedcba9876543210
-	00     xxxxxxxxxxxxxxxx ---------------- Horizontal total pixels - 1
-	       ---------------- xxxxxxxxxxxxxxxx Horizontal sync width - 1
-	04     xxxxxxxxxxxxxxxx ---------------- Horizontal front porch - 5
-	       ---------------- xxxxxxxxxxxxxxxx Horizontal back porch + 5
-	08     xxxxxxxxxxxxxxxx ---------------- Vertical total pixels - 1
-	       ---------------- xxxxxxxxxxxxxxxx Vertical sync width - 1
-	0c     xxxxxxxxxxxxxxxx ---------------- Vertical front porch + 1
-	       ---------------- xxxxxxxxxxxxxxxx Vertical back porch - 2
-	20     sxxxxxxxxxxxxxxx ---------------- X counter starting value (12.4 fixed point)
-	       ---------------- sxxxxxxxxxxxxxxx Y counter starting value (12.4 fixed point)
-	24     ---------------- sxxxxxxxxxxxxxxx amount to add to the Y counter after each line (4.12 fixed point)
-	28     sxxxxxxxxxxxxxxx ---------------- amount to add to the X counter after each horizontal pixel (4.12 fixed point)
-	30     ---------------x ---------------- VRAM mapping mode
-	       ---------------0 ---------------- CLUT at 0x00000-0x08000, Display tilemap area at 0x08000-0x18000 (256x64)
-	       ---------------1 ---------------- CLUT at 0x18000-0x20000, Display tilemap area at 0x00000-0x08000 (128x64)
-	       ---------------- -------------xxx Character RAM bank
+    Offset Bits                              Description
+           fedcba9876543210 fedcba9876543210
+    00     xxxxxxxxxxxxxxxx ---------------- Horizontal total pixels - 1
+           ---------------- xxxxxxxxxxxxxxxx Horizontal sync width - 1
+    04     xxxxxxxxxxxxxxxx ---------------- Horizontal front porch - 5
+           ---------------- xxxxxxxxxxxxxxxx Horizontal back porch + 5
+    08     xxxxxxxxxxxxxxxx ---------------- Vertical total pixels - 1
+           ---------------- xxxxxxxxxxxxxxxx Vertical sync width - 1
+    0c     xxxxxxxxxxxxxxxx ---------------- Vertical front porch + 1
+           ---------------- xxxxxxxxxxxxxxxx Vertical back porch - 2
+    20     sxxxxxxxxxxxxxxx ---------------- X counter starting value (12.4 fixed point)
+           ---------------- sxxxxxxxxxxxxxxx Y counter starting value (12.4 fixed point)
+    24     ---------------- sxxxxxxxxxxxxxxx amount to add to the Y counter after each line (4.12 fixed point)
+    28     sxxxxxxxxxxxxxxx ---------------- amount to add to the X counter after each horizontal pixel (4.12 fixed point)
+    30     ---------------x ---------------- VRAM mapping mode
+           ---------------0 ---------------- CLUT at 0x00000-0x08000, Display tilemap area at 0x08000-0x18000 (256x64)
+           ---------------1 ---------------- CLUT at 0x18000-0x20000, Display tilemap area at 0x00000-0x08000 (128x64)
+           ---------------- -------------xxx Character RAM bank
 
-	Other bits/registers unknown, some registers are used
+    Other bits/registers unknown, some registers are used
 
 TODO:
-	- verify and implement scroll, ROZ, display timing registers
-	- verify other unknown but used registers
+    - verify and implement scroll, ROZ, display timing registers
+    - verify other unknown but used registers
 */
 
 #include "emu.h"

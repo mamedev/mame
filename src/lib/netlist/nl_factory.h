@@ -124,20 +124,20 @@ namespace factory {
 		{ }
 
 
-	    template <std::size_t... Is>
-	    dev_uptr make_device(device_arena &pool,
-	    	    			netlist_state_t &anetlist,
-	    	    			const pstring &name, std::tuple<Args...>& args, std::index_sequence<Is...>)
-	    {
-	    	return plib::make_unique<C>(pool, anetlist, name, std::forward<Args>(std::get<Is>(args))...);
-	    }
+		template <std::size_t... Is>
+		dev_uptr make_device(device_arena &pool,
+							netlist_state_t &anetlist,
+							const pstring &name, std::tuple<Args...>& args, std::index_sequence<Is...>)
+		{
+			return plib::make_unique<C>(pool, anetlist, name, std::forward<Args>(std::get<Is>(args))...);
+		}
 
-	    dev_uptr make_device(device_arena &pool,
-	    			netlist_state_t &anetlist,
-	    			const pstring &name, std::tuple<Args...>& args)
-	    {
-	        return make_device(pool, anetlist, name, args, std::index_sequence_for<Args...>{});
-	    }
+		dev_uptr make_device(device_arena &pool,
+					netlist_state_t &anetlist,
+					const pstring &name, std::tuple<Args...>& args)
+		{
+			return make_device(pool, anetlist, name, args, std::index_sequence_for<Args...>{});
+		}
 
 		dev_uptr make_device(device_arena &pool,
 			netlist_state_t &anetlist,

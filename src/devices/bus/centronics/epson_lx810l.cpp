@@ -595,7 +595,7 @@ uint8_t epson_lx810l_device::an3_r()
 	return res - 1; /* DIPSW2.4 */
 }
 
-uint8_t epson_lx810l_device::an4_r() 
+uint8_t epson_lx810l_device::an4_r()
 {
 	return 0xff;
 }

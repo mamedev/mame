@@ -99,7 +99,7 @@
 		NET_CONNECT(name, B,    cB)                                            \
 		NET_CONNECT(name, C,    cC)                                            \
 		NET_CONNECT(name, D,    cD)
-	
+
 #define TTL_74161(...)                                                         \
 		NET_REGISTER_DEVEXT(TTL_74161, __VA_ARGS__)
 

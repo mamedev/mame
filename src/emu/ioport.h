@@ -459,7 +459,7 @@ enum
 //  INPUT_STRING_8C_4C,     //  0.500000
 //  INPUT_STRING_6C_3C,     //  0.500000
 	INPUT_STRING_4C_2C,     //  0.500000
-    INPUT_STRING_5C_2C,     //  0.500000
+	INPUT_STRING_5C_2C,     //  0.500000
 	INPUT_STRING_2C_1C,     //  0.500000
 //  INPUT_STRING_9C_5C,     //  0.555556
 //  INPUT_STRING_7C_4C,     //  0.571429
@@ -1266,10 +1266,10 @@ public:
 	void read(ioport_value &value);
 	float crosshair_read();
 	void frame_update(running_machine &machine);
-	
+
 	// setters
 	void set_value(s32 value);
-	
+
 private:
 	// helpers
 	s32 apply_min_max(s32 value) const;

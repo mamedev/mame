@@ -3520,14 +3520,14 @@ void analog_field::frame_update(running_machine &machine)
 	// get the new raw analog value and its type
 	input_item_class itemclass;
 	s32 rawvalue = machine.input().seq_axis_value(m_field.seq(SEQ_TYPE_STANDARD), itemclass);
-	
+
 	// use programmatically set value if avaiable
 	if (m_was_written)
 	{
 		m_was_written = false;
 		rawvalue = m_prog_analog_value;
 	}
-	
+
 	// if we got an absolute input, it overrides everything else
 	if (itemclass == ITEM_CLASS_ABSOLUTE)
 	{

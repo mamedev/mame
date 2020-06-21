@@ -149,7 +149,7 @@ private:
 	// registers
 	u8 m_cache_controler;
 	u8 m_cache_pointer;
-	required_device<ram_device>     	        m_cache_buffer;
+	required_device<ram_device>                 m_cache_buffer;
 };
 
 

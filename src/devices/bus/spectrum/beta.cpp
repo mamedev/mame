@@ -84,7 +84,7 @@
       V2: D7 BDI ROM_latch (0=enable, 1=disble), D4 - FDC HLT, D3 - SIDE, D0-2 - floppy drive select (bitmask, active low).
       V3-V4: D7 BDI ROM_latch (0=enable, 1=disble), D6 - FDC DDEN, D4 - SIDE, D3 - FDC HLT, D2 - FDC /MR (reset), D0-1 - floppy drive select (binary value).
       CBI clones: D5 - printer port /STROBE
-	IO read port 0b1xxxx111 <- D7 - FDC INTRQ, D6 - FDC DRQ
+    IO read port 0b1xxxx111 <- D7 - FDC INTRQ, D6 - FDC DRQ
     IO read/write ports 0b0YYxx111 - access FDC ports YY
 
     So mostly the same as beta128, except for new BDI ROM_latch bit

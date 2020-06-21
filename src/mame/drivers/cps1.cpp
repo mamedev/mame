@@ -8071,7 +8071,7 @@ ROM_START( sf2rk )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "w6.u222", 0x000000, 0x80000, CRC(49422b6f) SHA1(69fe9147c7ee3f6fa29077df16f4ef1224495be3) )
 	ROM_LOAD16_BYTE( "w5.u196", 0x000001, 0x80000, CRC(7e9c8c2f) SHA1(3d34a3920a771e1d62a41c104c8b16e3c6ac9405) )
-	
+
 	/* The dark screen issue is present on the real pcb, although much less noticable than in mame.
 	   The bootleggers have patched out the code which modifies the brightness/fade component of the palette word.
 	   This is somewhat strange as unlike some bootlegs, this board DOES have the brightness circuitry (2x 7407's, 12x resistor dac) populated!

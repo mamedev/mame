@@ -811,7 +811,7 @@ ROM_START( m505neo )
 ROM_END
 
 ROM_START( m521neo )
-	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 ) // was this dumped with some address lines swapped?             
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 ) // was this dumped with some address lines swapped?
 	ROM_LOAD16_WORD_SWAP( "6gu-1cd-a.u2", 0x0000000, 0x800000, CRC(7cb31b4c) SHA1(8de44756747a292c5d39bd491048d6fac4219953) )
 	ROM_CONTINUE(0x01000000, 0x800000)
 	ROM_CONTINUE(0x00800000, 0x800000)
@@ -884,16 +884,16 @@ void oplayer_100in1_state::init_m505neo()
 		ROM[i] = bitswap<16>(ROM[i],
 									 11,  3,   10,  2,
 									 9,  1,  8,  0,
-			
+
 									 4, 12, 5, 13,
-									 6, 14,  7,  15		
+									 6, 14,  7,  15
 			);
 
 	}
 
 	// TODO: remove these hacks
 	// port a checks when starting the system
-	ROM[0x43c30 + (0x2000000 / 2)] = 0xf165; // boot main bank		
+	ROM[0x43c30 + (0x2000000 / 2)] = 0xf165; // boot main bank
 }
 
 

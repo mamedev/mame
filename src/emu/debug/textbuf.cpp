@@ -318,8 +318,8 @@ text_buffer_lines text_buffer_get_lines(text_buffer* text)
 }
 
 /*---------------------------------------------------------------------
-	text_buffer_lines::text_buffer_line_iterator::operator*
-	Gets the line that the iterator currently points to.
+    text_buffer_lines::text_buffer_line_iterator::operator*
+    Gets the line that the iterator currently points to.
 -----------------------------------------------------------------------*/
 
 text_buffer_line text_buffer_lines::text_buffer_line_iterator::operator*() const
@@ -331,7 +331,7 @@ text_buffer_line text_buffer_lines::text_buffer_line_iterator::operator*() const
 		next_lineptr = 0;
 
 	const char* nextline = &m_buffer.buffer[m_buffer.lineoffs[next_lineptr]];
-	
+
 	/* -1 for the '\0' at the end of line */
 
 	ptrdiff_t difference = (nextline - line) - 1;
@@ -343,8 +343,8 @@ text_buffer_line text_buffer_lines::text_buffer_line_iterator::operator*() const
 }
 
 /*---------------------------------------------------------------------
-	text_buffer_lines::text_buffer_line_iterator::operator++
-	Moves to the next line.
+    text_buffer_lines::text_buffer_line_iterator::operator++
+    Moves to the next line.
 -----------------------------------------------------------------------*/
 
 text_buffer_lines::text_buffer_line_iterator& text_buffer_lines::text_buffer_line_iterator::operator++()
@@ -356,8 +356,8 @@ text_buffer_lines::text_buffer_line_iterator& text_buffer_lines::text_buffer_lin
 }
 
 /*------------------------------------------------------
-	text_buffer_lines::begin()
-	Returns an iterator that points to the first line.
+    text_buffer_lines::begin()
+    Returns an iterator that points to the first line.
 --------------------------------------------------------*/
 
 text_buffer_lines::iterator text_buffer_lines::begin() const
@@ -366,8 +366,8 @@ text_buffer_lines::iterator text_buffer_lines::begin() const
 }
 
 /*-----------------------------------------------------------
-	text_buffer_lines::begin()
-	Returns an iterator that points just past the last line.
+    text_buffer_lines::begin()
+    Returns an iterator that points just past the last line.
 -------------------------------------------------------------*/
 
 text_buffer_lines::iterator text_buffer_lines::end() const

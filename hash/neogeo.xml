@@ -6488,11 +6488,11 @@ license:CC0
 	<!--
 	ID-0228
 	Ghostlop (prototype) 1996 Data East Corp.
-	
+
 	Ghostlop (location test) 2001 Data East Corp.
 	NEO-MVS PROGGSC / NEO-MVS CHA256
-	
-	The location test version uses socketed EPROMs on the PROG board, flash chips on adapter boards for the C ROMs and EPROMs for M1 and S1 on the CHA. 
+
+	The location test version uses socketed EPROMs on the PROG board, flash chips on adapter boards for the C ROMs and EPROMs for M1 and S1 on the CHA.
 	It has a piece of cardboard between the 2 boards to avoid shorts because the socketed flash adapter boards are a bit too high and could get shorted with traces on the PROG board.
 	-->
 

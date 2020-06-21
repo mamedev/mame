@@ -143,12 +143,12 @@ void bbc_state::video_ula_w(offs_t offset, uint8_t data)
 	{
 	case 0:
 		/* Video ULA control register
-			 b7     Master cursor size
-			 b6-b5  Width of cursor in bytes
-			 b4     6845 clock rate select
-			 b3-b2  Number of characters per line
-			 b1     Teletext/Normal select
-			 b0     Flash colour select
+		     b7     Master cursor size
+		     b6-b5  Width of cursor in bytes
+		     b4     6845 clock rate select
+		     b3-b2  Number of characters per line
+		     b1     Teletext/Normal select
+		     b0     Flash colour select
 		*/
 
 		/* flash colour select has changed */

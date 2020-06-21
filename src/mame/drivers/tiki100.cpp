@@ -196,7 +196,7 @@ uint8_t tiki100_state::keyboard_r()
 	}
 
 	m_keylatch++;
-	if (m_keylatch == 16) m_keylatch = 0;	// Column selected by a 4-bit counter
+	if (m_keylatch == 16) m_keylatch = 0;   // Column selected by a 4-bit counter
 
 	return data;
 }

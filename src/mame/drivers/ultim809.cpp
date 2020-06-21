@@ -80,7 +80,7 @@ void ultim809_state::mem_map(address_map &map)
 	map(0x0000, 0x7fff).lrw8(NAME([this] (offs_t offset) { return m_ram[offset]; }), NAME([this] (offs_t offset, u8 data) { m_ram[offset] = data; } ));
 	// main ram any bank
 	map(0x8000, 0xbfff).lrw8(NAME([this] (offs_t offset) { return m_ram[offset | (m_membank << 14)]; }),
-	                         NAME([this] (offs_t offset, u8 data) { m_ram[offset | (m_membank << 14)] = data; } )); // u8
+							 NAME([this] (offs_t offset, u8 data) { m_ram[offset | (m_membank << 14)] = data; } )); // u8
 	// devices
 	map(0xc000, 0xc00f).m(m_via, FUNC(via6522_device::map)); // u11
 	map(0xc400, 0xc407).rw(m_uart, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));  // u16

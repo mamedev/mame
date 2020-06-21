@@ -27,10 +27,10 @@
 #define CSR_ERR         (1u << CSR_V_ERR)
 
 
-#define	clear_virq(_callback, _csr, _ie, _intrq) \
+#define clear_virq(_callback, _csr, _ie, _intrq) \
 	if ((_csr) & (_ie)) { (_intrq) = CLEAR_LINE; }
 
-#define	raise_virq(_callback, _csr, _ie, _intrq) \
+#define raise_virq(_callback, _csr, _ie, _intrq) \
 	if ((_csr) & (_ie)) { (_intrq) = ASSERT_LINE; _callback (ASSERT_LINE); }
 
 

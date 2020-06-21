@@ -232,7 +232,7 @@ void homelab3_state::homelab3_mem(address_map &map)
 	map(0x4000, 0xcfff).ram();
 	map(0xe800, 0xefff).r(FUNC(homelab3_state::exxx_r));
 	map(0xf800, 0xffff).lr8(NAME([this] (offs_t offset) { if(m_ramhere) return m_ram[offset]; else return m_vram[offset]; }))
-	                   .lw8(NAME([this] (offs_t offset, u8 data) { if(m_ramhere) m_ram[offset]=data; else m_vram[offset]=data; }));
+					   .lw8(NAME([this] (offs_t offset, u8 data) { if(m_ramhere) m_ram[offset]=data; else m_vram[offset]=data; }));
 }
 
 void homelab3_state::homelab3_io(address_map &map)

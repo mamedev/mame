@@ -37003,7 +37003,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Gessler Educational Software</publisher>
 		<info name="release" value="2020-05-26"/>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="german word order (4am crack).dsk" size="143360" crc="acdab126" sha1="e2e9d4d71115899aa38c49292cd21c4c0f9dec6b"/>

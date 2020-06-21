@@ -157,7 +157,7 @@ namespace devices
 
 			if (doOUT)
 				//for (std::size_t i = 0; i < m_NO; ++i)
-				//	m_Q[i].push((out >> i) & 1, tim[t[i]]);
+				//  m_Q[i].push((out >> i) & 1, tim[t[i]]);
 				this->push(out, t);
 			else
 			{

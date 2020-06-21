@@ -2,8 +2,8 @@
 // copyright-holders:MetalliC
 /**********************************************************************
 
-	Didaktik D40/D80 disk interface
-	(C) 1991 Didaktik Scalica
+    Didaktik D40/D80 disk interface
+    (C) 1991 Didaktik Scalica
 
 **********************************************************************/
 
