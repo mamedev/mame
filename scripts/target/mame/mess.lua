@@ -983,6 +983,7 @@ FORMATS["CONCEPT_DSK"] = true
 FORMATS["COUPEDSK"] = true
 FORMATS["CPIS_DSK"] = true
 FORMATS["CSW_CAS"] = true
+FORMATS["D40_DSK"] = true
 FORMATS["D64_DSK"] = true
 FORMATS["D71_DSK"] = true
 FORMATS["D80_DSK"] = true
