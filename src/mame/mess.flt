@@ -552,6 +552,7 @@ micro20.cpp
 microb.cpp
 microdec.cpp
 microkit.cpp
+microkorg.cpp
 micromon.cpp
 micronic.cpp
 microtan.cpp

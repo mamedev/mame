@@ -2695,6 +2695,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/korgdw8k.cpp",
 	MAME_DIR .. "src/mame/drivers/korgm1.cpp",
 	MAME_DIR .. "src/mame/drivers/korgz3.cpp",
+	MAME_DIR .. "src/mame/drivers/microkorg.cpp",
 	MAME_DIR .. "src/mame/drivers/poly800.cpp",
 	MAME_DIR .. "src/mame/drivers/polysix.cpp",
 }

@@ -22592,6 +22592,9 @@ md3                             //
 @source:microkit.cpp
 microkit                        //
 
+@source:microkorg.cpp
+microkorg                       //
+
 @source:micromon.cpp
 micromon7141                    //
 
