@@ -10805,7 +10805,7 @@ license:CC0
 	</software>
 
 	<software name="goblins">
-		<description>Gobliiins (US - VGA release)</description>
+		<description>Gobliiins (USA, VGA version)</description>
 		<year>1992</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.000 09/11/92" />
@@ -11125,17 +11125,17 @@ license:CC0
 		<description>The Humans (5.25" HD)</description>
 		<year>1993</year>
 		<publisher>GameTek</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="The Humans [GameTek] [1992] [5.25HD] [Disk 1 of 3].img" size="1228800" crc="2dc56954" sha1="25877a02d07686f71e9bfc74a6e507a02a859c56"/>
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="The Humans [GameTek] [1992] [5.25HD] [Disk 2 of 3].img" size="1228800" crc="f376ef79" sha1="7a7f3b829edba812e88a81a958549eb4099bd9cd"/>
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="The Humans [GameTek] [1992] [5.25HD] [Disk 3 of 3].img" size="1228800" crc="1e0e73ed" sha1="e0fcd8422b91c8d3ea00e5706be871e9a4cf408c"/>
 			</dataarea>
@@ -11200,7 +11200,7 @@ license:CC0
 	</software>
 
 	<software name="inca2">
-		<description>Inca 2: Wiracocha (Europe)</description>
+		<description>Inca 2: Wiracocha (Euro)</description>
 		<year>1993</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Coktel Vision" />
