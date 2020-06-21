@@ -88,17 +88,18 @@ private:
 	bool m_nmi;
 };
 
-class homelab3_state : public homelab2_state
+class homelab3_state : public homelab_state
 {
 public:
 	homelab3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: homelab2_state(mconfig, type, tag)
+		: homelab_state(mconfig, type, tag)
 		{ }
 
 	void homelab3(machine_config &config);
+	void brailab4(machine_config &config);
 	DECLARE_READ_LINE_MEMBER(cass3_r);
 
-protected:
+private:
 	u8 exxx_r(offs_t offset);
 	std::unique_ptr<u8[]> m_ram;
 	bool m_ramhere;
@@ -108,18 +109,6 @@ protected:
 	void machine_reset() override;
 	void homelab3_io(address_map &map);
 	void homelab3_mem(address_map &map);
-};
-
-class brailab4_state : public homelab3_state
-{
-public:
-	brailab4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: homelab3_state(mconfig, type, tag)
-		{ }
-
-	void brailab4(machine_config &config);
-
-private:
 	void brailab4_io(address_map &map);
 	void brailab4_mem(address_map &map);
 };
@@ -254,13 +243,13 @@ void homelab3_state::homelab3_io(address_map &map)
 	map(0xff, 0xff).w(FUNC(homelab3_state::portff_w));
 }
 
-void brailab4_state::brailab4_mem(address_map &map)
+void homelab3_state::brailab4_mem(address_map &map)
 {
 	homelab3_mem(map);
 	map(0xd000, 0xdfff).rom().region("maincpu", 0x4000);
 }
 
-void brailab4_state::brailab4_io(address_map &map)
+void homelab3_state::brailab4_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
@@ -501,7 +490,7 @@ static INPUT_PORTS_START( brailab4 ) // F4 to F8 are foreign characters
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(brailab4_state, cass3_r)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(homelab3_state, cass3_r)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -817,11 +806,11 @@ void homelab3_state::homelab3(machine_config &config)
 	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab3_state::quickload_cb));
 }
 
-void brailab4_state::brailab4(machine_config &config)
+void homelab3_state::brailab4(machine_config &config)
 {
 	homelab3(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &brailab4_state::brailab4_mem);
-	m_maincpu->set_addrmap(AS_IO, &brailab4_state::brailab4_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &homelab3_state::brailab4_mem);
+	m_maincpu->set_addrmap(AS_IO, &homelab3_state::brailab4_io);
 	MEA8000(config, "mea8000", 3840000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
@@ -893,4 +882,4 @@ ROM_END
 COMP( 1982, homelab2, 0,        0,      homelab2, homelab2, homelab2_state,  empty_init, "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 COMP( 1983, homelab3, homelab2, 0,      homelab3, homelab3, homelab3_state,  empty_init, "Jozsef and Endre Lukacs", "Homelab 3",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1984, homelab4, homelab2, 0,      homelab3, homelab3, homelab3_state,  empty_init, "Jozsef and Endre Lukacs", "Homelab 4",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1984, brailab4, homelab2, 0,      brailab4, brailab4, brailab4_state,  empty_init, "Jozsef and Endre Lukacs", "Brailab 4",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, brailab4, homelab2, 0,      brailab4, brailab4, homelab3_state,  empty_init, "Jozsef and Endre Lukacs", "Brailab 4",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
