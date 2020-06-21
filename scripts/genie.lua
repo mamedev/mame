@@ -1269,15 +1269,18 @@ configuration { "osx* or xcode4" }
 		}
 
 configuration { "mingw*" }
-		if _OPTIONS["osd"]~="sdl"
-		then
+		if _OPTIONS["osd"]=="sdl" then
+			linkoptions {
+				"-Wl,--start-group",
+			}
+		else
 			linkoptions {
 				"-static",
 			}
+			flags {
+				"LinkSupportCircularDependencies",
+			}
 		end
-		flags {
-			"LinkSupportCircularDependencies",
-		}
 		links {
 			"user32",
 			"winmm",
