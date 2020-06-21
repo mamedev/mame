@@ -1985,7 +1985,7 @@ CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_
 CONS( 2006, ablmini,   0, 0,  nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
 
 // silver 'N64' type controller design
-CONS( 200?, zudugo,    0, 0,  nes_vt_waixing_alt_4mb,     nes_vt, nes_vt_waixing_alt_state, empty_init, "<unknown>", "Zudu-go / 2udu-go", MACHINE_IMPERFECT_GRAPHICS ) // the styling on the box looks like a '2' in places, a 'Z' in others.
+CONS( 200?, zudugo,    0, 0,  nes_vt_waixing_alt_4mb,     nes_vt, nes_vt_waixing_alt_state, empty_init, "Macro Winners / Waixing", "Zudu-go / 2udu-go", MACHINE_IMPERFECT_GRAPHICS ) // the styling on the box looks like a '2' in places, a 'Z' in others.
 
  // needs PCM samples, Y button is not mapped (not used by any of the games?)
 CONS( 200?, timetp36,  0, 0,  nes_vt_pal_4mb, timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
