@@ -317,9 +317,7 @@ private:
 	s32                     m_inttrigger;               // interrupt trigger index
 
 	// clock and timing information
-protected: // FIXME: MIPS3 accesses m_totalcycles directly from execute_burn - devise a better solution
 	u64                     m_totalcycles;              // total device cycles executed
-private:
 	attotime                m_localtime;                // local time, relative to the timer system's global time
 	s32                     m_divisor;                  // 32-bit attoseconds_per_cycle divisor
 	u8                      m_divshift;                 // right shift amount to fit the divisor into 32 bits
