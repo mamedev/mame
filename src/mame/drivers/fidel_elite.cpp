@@ -10,7 +10,7 @@ TODO:
 - add feas (original program)
 
 BTANB:
-- feasglaa locks up at boot if it was powered off in the middle of the game.
+- feasglab locks up at boot if it was powered off in the middle of the game.
   To resolve this, hold the Game Control button while booting to clear nvram.
   The ROM dump was verified from 2 chesscomputers.
 
@@ -570,6 +570,42 @@ ROM_END
 
 ROM_START( feasglaa )
 	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_LOAD("orange", 0x8000, 0x0800, CRC(32784e2d) SHA1(dae060a5c49cc1993a78db293cd80464adfd892d) )
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("black", 0xc000, 0x0800, CRC(3f0b01b6) SHA1(fe8d214f1678e000ba945e2f6dc3438af97c6f33) ) // only 2 bytes different
+	ROM_CONTINUE( 0xd000, 0x0800 )
+	ROM_CONTINUE( 0xc800, 0x0800 )
+	ROM_CONTINUE( 0xd800, 0x0800 )
+	ROM_LOAD("green", 0xe000, 0x0800, CRC(62a5305a) SHA1(a361bd9a54b903d7b0fbacabe55ea5ccbbc1dc51) )
+	ROM_CONTINUE( 0xf000, 0x0800 )
+	ROM_CONTINUE( 0xe800, 0x0800 )
+	ROM_CONTINUE( 0xf800, 0x0800 )
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( feasglab )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("6a", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -761,6 +797,7 @@ ROM_END
 CONS( 1983, feasbu,    0,      0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 CONS( 1984, feasgla,   feasbu, 0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 CONS( 1984, feasglaa,  feasbu, 0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, feasglab,  feasbu, 0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 
 CONS( 1982, fpres,     0,      0, pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 CONS( 1983, fpresbu,   fpres,  0, pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
