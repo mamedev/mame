@@ -57,11 +57,7 @@ static void didaktik_floppies(device_slot_interface &device)
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(spectrum_d40_device::floppy_formats)
-	FLOPPY_D40D80_FORMAT
-FLOPPY_FORMATS_END
-
-FLOPPY_FORMATS_MEMBER(spectrum_d80v2_device::floppy_formats)
+FLOPPY_FORMATS_MEMBER(spectrum_d40base_device::floppy_formats)
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 

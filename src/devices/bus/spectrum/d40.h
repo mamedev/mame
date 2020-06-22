@@ -17,7 +17,6 @@
 #include "machine/wd_fdc.h"
 #include "machine/upd765.h"
 #include "machine/i8255.h"
-#include "formats/d40_dsk.h"
 #include "formats/pc_dsk.h"
 
 //**************************************************************************
@@ -28,6 +27,7 @@ class spectrum_d40base_device: public device_t, public device_spectrum_expansion
 {
 public:
 	DECLARE_INPUT_CHANGED_MEMBER(snapshot_button);
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 protected:
 	spectrum_d40base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -69,7 +69,6 @@ class spectrum_d40_device :
 public:
 	spectrum_d40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 protected:
 	spectrum_d40_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -109,7 +108,6 @@ class spectrum_d80v2_device :
 public:
 	spectrum_d80v2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
