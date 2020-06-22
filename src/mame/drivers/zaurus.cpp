@@ -1468,7 +1468,7 @@ void zaurus_state::zaurus_map(address_map &map)
 
 INPUT_CHANGED_MEMBER( zaurus_state::system_start )
 {
-	m_pxa_periphs->gpio_bit_w(m_maincpu->space(AS_PROGRAM), 10, m_power->read());
+	m_pxa_periphs->gpio_bit_w(10, m_power->read());
 }
 
 static INPUT_PORTS_START( zaurus )

@@ -755,7 +755,7 @@ void pxa255_periphs_device::intc_w(offs_t offset, uint32_t data, uint32_t mem_ma
 
 */
 
-uint32_t pxa255_periphs_device::gpio_r(offs_t offset, uint32_t mem_mask)
+void pxa255_periphs_device::gpio_bit_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	const uint32_t val = (data != 0 ? 1 : 0);
 	LOGMASKED(LOG_GPIO, "pxa255: GPIO%d written: %d\n", offset, val);
@@ -1353,7 +1353,7 @@ void pxa255_periphs_device::lcd_w(address_space &space, offs_t offset, uint32_t 
 	}
 }
 
-uin32_t pxa255_periphs_device::power_r(offs_t offset, uint32_t mem_mask)
+uint32_t pxa255_periphs_device::power_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(PXA255_POWER_BASE_ADDR | (offset << 2))
 	{
