@@ -5,10 +5,7 @@
     Sharp Zaurus PDA skeleton driver (SL, ARM/Linux based, 4th generation)
 
     TODO:
-    - PXA-255 ID opcode fails on this
     - ARM TLB look-up errors?
-    - RTC IRQ doesn't fire?
-    - For whatever reason, after RTC check ARM executes invalid code at 0-0x200
     - Dumps are questionable
 
 =========================================================================================================================================
@@ -1407,6 +1404,7 @@ Note:
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/pxa255.h"
+#include "machine/sa1110.h"
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
@@ -1423,14 +1421,46 @@ class zaurus_state : public driver_device
 public:
 	zaurus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_pxa_periphs(*this, "pxa_periphs")
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, "ram")
+	{ }
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint32_t> m_ram;
+};
+
+class zaurus_sa_state : public zaurus_state
+{
+public:
+	zaurus_sa_state(const machine_config &mconfig, device_type type, const char *tag)
+		: zaurus_state(mconfig, type, tag)
+		, m_sa_periphs(*this, "sa_periphs")
+	{ }
+
+	void zaurus_sa1110(machine_config &config);
+
+private:
+	void main_map(address_map &map);
+
+	required_device<sa1110_periphs_device> m_sa_periphs;
+};
+
+class zaurus_pxa_state : public zaurus_state
+{
+public:
+	zaurus_pxa_state(const machine_config &mconfig, device_type type, const char *tag)
+		: zaurus_state(mconfig, type, tag)
+		, m_pxa_periphs(*this, "pxa_periphs")
 		, m_power(*this, "PWR")
 	{ }
 
-	void zaurus_base(machine_config &config);
-	void zaurus_sa1110(machine_config &config);
+	void zaurus_pxa_base(machine_config &config);
 	void zaurus_pxa250(machine_config &config);
 	void zaurus_pxa255(machine_config &config);
 	void zaurus_pxa270(machine_config &config);
@@ -1438,20 +1468,21 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( system_start );
 
 private:
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void main_map(address_map &map);
 
-	void zaurus_map(address_map &map);
-
-	// devices
 	required_device<pxa255_periphs_device> m_pxa_periphs;
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint32_t> m_ram;
 	required_ioport m_power;
 };
 
-void zaurus_state::zaurus_map(address_map &map)
+void zaurus_sa_state::main_map(address_map &map)
+{
+	map(0x00000000, 0x00ffffff).ram().region("firmware", 0);
+	map(0x90020000, 0x9002001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::power_r), FUNC(sa1110_periphs_device::power_w));
+	map(0x90050000, 0x90050023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::intc_r), FUNC(sa1110_periphs_device::intc_w));
+	map(0xc0000000, 0xc07fffff).ram().share("ram");
+}
+
+void zaurus_pxa_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().region("firmware", 0);
 	map(0x40000000, 0x400002ff).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::dma_r), FUNC(pxa255_periphs_device::dma_w));
@@ -1466,16 +1497,18 @@ void zaurus_state::zaurus_map(address_map &map)
 	map(0xa0000000, 0xa07fffff).ram().share("ram");
 }
 
-INPUT_CHANGED_MEMBER( zaurus_state::system_start )
+INPUT_CHANGED_MEMBER( zaurus_pxa_state::system_start )
 {
 	m_pxa_periphs->gpio_bit_w(10, m_power->read());
 }
 
-static INPUT_PORTS_START( zaurus )
-	PORT_START("PWR")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start System") PORT_CHANGED_MEMBER(DEVICE_SELF, zaurus_state, system_start, 0)
+static INPUT_PORTS_START( zaurus_sa )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( zaurus_pxa )
+	PORT_START("PWR")
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start System") PORT_CHANGED_MEMBER(DEVICE_SELF, zaurus_pxa_state, system_start, 0)
+INPUT_PORTS_END
 
 void zaurus_state::machine_start()
 {
@@ -1485,37 +1518,36 @@ void zaurus_state::machine_reset()
 {
 }
 
-void zaurus_state::zaurus_base(machine_config &config)
-{
-	m_maincpu->set_addrmap(AS_PROGRAM, &zaurus_state::zaurus_map);
-}
-
-void zaurus_state::zaurus_sa1110(machine_config &config)
+void zaurus_sa_state::zaurus_sa1110(machine_config &config)
 {
 	SA1110(config, m_maincpu, SA1110_CLOCK);
-	PXA255_PERIPHERALS(config, m_pxa_periphs, SA1110_CLOCK, m_maincpu); // TODO: Correct peripherals
-	zaurus_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaurus_sa_state::main_map);
+
+	SA1110_PERIPHERALS(config, m_sa_periphs, SA1110_CLOCK, m_maincpu);
 }
 
-void zaurus_state::zaurus_pxa250(machine_config &config)
+void zaurus_pxa_state::zaurus_pxa250(machine_config &config)
 {
 	PXA250(config, m_maincpu, PXA250_CLOCK);
-	PXA255_PERIPHERALS(config, m_pxa_periphs, PXA250_CLOCK, m_maincpu); // TODO: Correct peripherals
-	zaurus_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaurus_pxa_state::main_map);
+
+	PXA255_PERIPHERALS(config, m_pxa_periphs, PXA250_CLOCK, m_maincpu);
 }
 
-void zaurus_state::zaurus_pxa255(machine_config &config)
+void zaurus_pxa_state::zaurus_pxa255(machine_config &config)
 {
 	PXA255(config, m_maincpu, PXA255_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaurus_pxa_state::main_map);
+
 	PXA255_PERIPHERALS(config, m_pxa_periphs, PXA255_CLOCK, m_maincpu);
-	zaurus_base(config);
 }
 
-void zaurus_state::zaurus_pxa270(machine_config &config)
+void zaurus_pxa_state::zaurus_pxa270(machine_config &config)
 {
 	PXA270(config, m_maincpu, PXA270_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaurus_pxa_state::main_map);
+
 	PXA255_PERIPHERALS(config, m_pxa_periphs, PXA270_CLOCK, m_maincpu); // TODO: Correct peripherals
-	zaurus_base(config);
 }
 
 /***************************************************************************
@@ -1563,10 +1595,10 @@ ROM_START( zslc1000 )
 	ROM_LOAD( "openzaurus 3.5.3 - zimage-sharp sl-c1000-20050427214434.bin", 0x000000, 0x128980, BAD_DUMP  CRC(1e1a9279) SHA1(909ac3f00385eced55822d6a155b79d9d25f43b3) )
 ROM_END
 
-COMP( 2002, zsl5500,  0, 0, zaurus_sa1110, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-5500 \"Collie\"",           MACHINE_IS_SKELETON )
-COMP( 2002, zslc500,  0, 0, zaurus_pxa250, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C500",                      MACHINE_IS_SKELETON )
-COMP( 2002, zsl5600,  0, 0, zaurus_pxa250, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_IS_SKELETON )
-COMP( 2003, zslc750,  0, 0, zaurus_pxa255, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_IS_SKELETON )
-COMP( 2004, zslc760,  0, 0, zaurus_pxa255, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C760 \"Husky\" (Japan)",    MACHINE_IS_SKELETON )
-COMP( 200?, zslc3000, 0, 0, zaurus_pxa270, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Spitz\" (Japan)",   MACHINE_IS_SKELETON )
-COMP( 200?, zslc1000, 0, 0, zaurus_pxa270, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Akita\" (Japan)",   MACHINE_IS_SKELETON )
+COMP( 2002, zsl5500,  0, 0, zaurus_sa1110, zaurus_sa,  zaurus_sa_state,  empty_init, "Sharp", "Zaurus SL-5500 \"Collie\"",           MACHINE_IS_SKELETON )
+COMP( 2002, zslc500,  0, 0, zaurus_pxa250, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C500",                      MACHINE_IS_SKELETON )
+COMP( 2002, zsl5600,  0, 0, zaurus_pxa250, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_IS_SKELETON )
+COMP( 2003, zslc750,  0, 0, zaurus_pxa255, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_IS_SKELETON )
+COMP( 2004, zslc760,  0, 0, zaurus_pxa255, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C760 \"Husky\" (Japan)",    MACHINE_IS_SKELETON )
+COMP( 200?, zslc3000, 0, 0, zaurus_pxa270, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Spitz\" (Japan)",   MACHINE_IS_SKELETON )
+COMP( 200?, zslc1000, 0, 0, zaurus_pxa270, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Akita\" (Japan)",   MACHINE_IS_SKELETON )
