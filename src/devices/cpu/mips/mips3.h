@@ -310,7 +310,6 @@ public:
 	void clear_fastram(uint32_t select_start);
 	void mips3drc_set_options(uint32_t options);
 	void mips3drc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
-	void burn_cycles(int32_t cycles);
 
 protected:
 	// device-level overrides
@@ -324,7 +323,6 @@ protected:
 	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual void execute_burn(int32_t cycles) override { m_totalcycles += cycles; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
