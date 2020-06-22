@@ -228,7 +228,8 @@ uint8_t pia6821_device::get_in_a_value()
 			// assume pins are disconnected and simulate the internal pullups.
 			port_a_data = 0xff;
 
-			if (!m_logged_port_a_not_connected && (m_ddr_a != 0xff))
+			if (!m_logged_port_a_not_connected && (m_ddr_a != 0xff) &&
+			    !machine().side_effects_disabled())
 			{
 				logerror("Warning! No port A read handler. Assuming pins 0x%02X not connected\n", m_ddr_a ^ 0xff);
 				m_logged_port_a_not_connected = true;
@@ -277,7 +278,8 @@ uint8_t pia6821_device::get_in_b_value()
 			}
 			else
 			{
-				if (!m_logged_port_b_not_connected && (m_ddr_b != 0xff))
+				if (!m_logged_port_b_not_connected && (m_ddr_b != 0xff)
+				    && !machine().side_effects_disabled())
 				{
 					logerror("Error! No port B read handler. Three-state pins 0x%02X are undefined\n", m_ddr_b ^ 0xff);
 					m_logged_port_b_not_connected = true;
@@ -393,23 +395,26 @@ uint8_t pia6821_device::port_a_r()
 {
 	uint8_t ret = get_in_a_value();
 
-	// IRQ flags implicitly cleared by a read
-	m_irq_a1 = false;
-	m_irq_a2 = false;
-	update_interrupts();
-
-	// CA2 is configured as output and in read strobe mode
-	if (c2_output(m_ctl_a) && c2_strobe_mode(m_ctl_a))
+	if (!machine().side_effects_disabled())
 	{
-		// this will cause a transition low
-		set_out_ca2(false);
+		// IRQ flags implicitly cleared by a read
+		m_irq_a1 = false;
+		m_irq_a2 = false;
+		update_interrupts();
 
-		// if the CA2 strobe is cleared by the E, reset it right away
-		if (strobe_e_reset(m_ctl_a))
-			set_out_ca2(true);
+		// CA2 is configured as output and in read strobe mode
+		if (c2_output(m_ctl_a) && c2_strobe_mode(m_ctl_a))
+		{
+			// this will cause a transition low
+			set_out_ca2(false);
+
+			// if the CA2 strobe is cleared by the E, reset it right away
+			if (strobe_e_reset(m_ctl_a))
+				set_out_ca2(true);
+		}
+
+		LOG("PIA port A read = %02X\n", ret);
 	}
-
-	LOG("PIA port A read = %02X\n", ret);
 
 	return ret;
 }
@@ -437,19 +442,23 @@ uint8_t pia6821_device::port_b_r()
 {
 	const uint8_t ret = get_in_b_value();
 
-	// This read will implicitly clear the IRQ B1 flag.  If CB2 is in write-strobe
-	// mode with CB1 restore, and a CB1 active transition set the flag,
-	// clearing it will cause CB2 to go high again.  Note that this is different
-	// from what happens with port A.
-	if (m_irq_b1 && c2_strobe_mode(m_ctl_b) && strobe_c1_reset(m_ctl_b))
-		set_out_cb2(true);
+	if (!machine().side_effects_disabled())
+	{
+		// This read will implicitly clear the IRQ B1 flag.  If CB2 is
+		// in write-strobe mode with CB1 restore, and a CB1 active
+		// transition set the flag, clearing it will cause CB2 to go
+		// high again.  Note that this is different from what happens
+		// with port A.
+		if (m_irq_b1 && c2_strobe_mode(m_ctl_b) && strobe_c1_reset(m_ctl_b))
+			set_out_cb2(true);
 
-	// IRQ flags implicitly cleared by a read
-	m_irq_b1 = false;
-	m_irq_b2 = false;
-	update_interrupts();
+		// IRQ flags implicitly cleared by a read
+		m_irq_b1 = false;
+		m_irq_b2 = false;
+		update_interrupts();
 
-	LOG("PIA port B read = %02X\n", ret);
+		LOG("PIA port B read = %02X\n", ret);
+	}
 
 	return ret;
 }
@@ -477,25 +486,28 @@ uint8_t pia6821_device::control_a_r()
 {
 	uint8_t ret;
 
-	// update CA1 & CA2 if callback exists, these in turn may update IRQ's
-	if (!m_in_ca1_handler.isnull())
+	if (!machine().side_effects_disabled())
 	{
-		ca1_w(m_in_ca1_handler());
-	}
-	else if(!m_logged_ca1_not_connected && (!m_in_ca1_pushed))
-	{
-		logerror("Warning! No CA1 read handler. Assuming pin not connected\n");
-		m_logged_ca1_not_connected = true;
-	}
+		// update CA1 & CA2 if callback exists, these in turn may update IRQ's
+		if (!m_in_ca1_handler.isnull())
+		{
+			ca1_w(m_in_ca1_handler());
+		}
+		else if(!m_logged_ca1_not_connected && (!m_in_ca1_pushed))
+		{
+			logerror("Warning! No CA1 read handler. Assuming pin not connected\n");
+			m_logged_ca1_not_connected = true;
+		}
 
-	if (!m_in_ca2_handler.isnull())
-	{
-		ca2_w(m_in_ca2_handler());
-	}
-	else if ( !m_logged_ca2_not_connected && c2_input(m_ctl_a) && !m_in_ca2_pushed)
-	{
-		logerror("Warning! No CA2 read handler. Assuming pin not connected\n");
-		m_logged_ca2_not_connected = true;
+		if (!m_in_ca2_handler.isnull())
+		{
+			ca2_w(m_in_ca2_handler());
+		}
+		else if ( !m_logged_ca2_not_connected && c2_input(m_ctl_a) && !m_in_ca2_pushed)
+		{
+			logerror("Warning! No CA2 read handler. Assuming pin not connected\n");
+			m_logged_ca2_not_connected = true;
+		}
 	}
 
 	// read control register
@@ -522,21 +534,24 @@ uint8_t pia6821_device::control_b_r()
 {
 	uint8_t ret;
 
-	// update CB1 & CB2 if callback exists, these in turn may update IRQ's
-	if(!m_in_cb1_handler.isnull())
+	if (!machine().side_effects_disabled())
 	{
-		cb1_w(m_in_cb1_handler());
-	}
-	else if(!m_logged_cb1_not_connected && !m_in_cb1_pushed)
-	{
-		logerror("Error! no CB1 read handler. Three-state pin is undefined\n");
-		m_logged_cb1_not_connected = true;
-	}
+		// update CB1 & CB2 if callback exists, these in turn may update IRQ's
+		if(!m_in_cb1_handler.isnull())
+		{
+			cb1_w(m_in_cb1_handler());
+		}
+		else if(!m_logged_cb1_not_connected && !m_in_cb1_pushed)
+		{
+			logerror("Error! no CB1 read handler. Three-state pin is undefined\n");
+			m_logged_cb1_not_connected = true;
+		}
 
-	if(!m_logged_cb2_not_connected && c2_input(m_ctl_b) && !m_in_cb2_pushed)
-	{
-		logerror("Error! Three-state pin is undefined\n");
-		m_logged_cb2_not_connected = true;
+		if(!m_logged_cb2_not_connected && c2_input(m_ctl_b) && !m_in_cb2_pushed)
+		{
+			logerror("Error! Three-state pin is undefined\n");
+			m_logged_cb2_not_connected = true;
+		}
 	}
 
 	// read control register
