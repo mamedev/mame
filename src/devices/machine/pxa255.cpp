@@ -23,9 +23,12 @@
 #define LOG_GPIO        (1 << 6)
 #define LOG_LCD_DMA     (1 << 7)
 #define LOG_LCD         (1 << 8)
-#define LOG_ALL         (LOG_UNKNOWN | LOG_I2S | LOG_DMA | LOG_OSTIMER | LOG_INTC | LOG_GPIO | LOG_LCD_DMA | LOG_LCD)
+#define LOG_POWER		(1 << 9)
+#define LOG_RTC			(1 << 10)
+#define LOG_CLOCKS		(1 << 11)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_I2S | LOG_DMA | LOG_OSTIMER | LOG_INTC | LOG_GPIO | LOG_LCD_DMA | LOG_LCD | LOG_POWER | LOG_RTC | LOG_CLOCKS)
 
-#define VERBOSE         (0)
+#define VERBOSE         (LOG_ALL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(PXA255_PERIPHERALS, pxa255_periphs_device, "pxa255_periphs", "Intel XScale PXA255 Peripherals")
@@ -198,14 +201,14 @@ void pxa255_periphs_device::dma_load_descriptor_and_start(int channel)
 	m_dma_regs.dcsr[channel] &= ~PXA255_DCSR_STOPSTATE;
 }
 
-TIMER_CALLBACK_MEMBER(pxa255_periphs_device::dma_dma_end)
+void pxa255_periphs_device::dma_end_tick(int channel)
 {
-	uint32_t sadr = m_dma_regs.dsadr[param];
-	uint32_t tadr = m_dma_regs.dtadr[param];
-	uint32_t count = m_dma_regs.dcmd[param] & 0x00001fff;
+	uint32_t sadr = m_dma_regs.dsadr[channel];
+	uint32_t tadr = m_dma_regs.dtadr[channel];
+	uint32_t count = m_dma_regs.dcmd[channel] & 0x00001fff;
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	switch (param)
+	switch (channel)
 	{
 		case 3:
 			for (uint32_t index = 0; index < count; index += 4)
@@ -224,7 +227,7 @@ TIMER_CALLBACK_MEMBER(pxa255_periphs_device::dma_dma_end)
 		default:
 			for (uint32_t index = 0; index < count;)
 			{
-				switch (m_dma_regs.dcmd[param] & PXA255_DCMD_SIZE)
+				switch (m_dma_regs.dcmd[channel] & PXA255_DCMD_SIZE)
 				{
 					case PXA255_DCMD_SIZE_8:
 						space.write_byte(tadr, space.read_byte(sadr));
@@ -243,9 +246,9 @@ TIMER_CALLBACK_MEMBER(pxa255_periphs_device::dma_dma_end)
 						break;
 				}
 
-				if (m_dma_regs.dcmd[param] & PXA255_DCMD_INCSRCADDR)
+				if (m_dma_regs.dcmd[channel] & PXA255_DCMD_INCSRCADDR)
 				{
-					switch(m_dma_regs.dcmd[param] & PXA255_DCMD_SIZE)
+					switch(m_dma_regs.dcmd[channel] & PXA255_DCMD_SIZE)
 					{
 						case PXA255_DCMD_SIZE_8:
 							sadr++;
@@ -260,9 +263,9 @@ TIMER_CALLBACK_MEMBER(pxa255_periphs_device::dma_dma_end)
 							break;
 					}
 				}
-				if(m_dma_regs.dcmd[param] & PXA255_DCMD_INCTRGADDR)
+				if(m_dma_regs.dcmd[channel] & PXA255_DCMD_INCTRGADDR)
 				{
-					switch(m_dma_regs.dcmd[param] & PXA255_DCMD_SIZE)
+					switch(m_dma_regs.dcmd[channel] & PXA255_DCMD_SIZE)
 					{
 						case PXA255_DCMD_SIZE_8:
 							tadr++;
@@ -281,27 +284,27 @@ TIMER_CALLBACK_MEMBER(pxa255_periphs_device::dma_dma_end)
 			break;
 	}
 
-	if (m_dma_regs.dcmd[param] & PXA255_DCMD_ENDIRQEN)
+	if (m_dma_regs.dcmd[channel] & PXA255_DCMD_ENDIRQEN)
 	{
-		m_dma_regs.dcsr[param] |= PXA255_DCSR_ENDINTR;
+		m_dma_regs.dcsr[channel] |= PXA255_DCSR_ENDINTR;
 	}
 
-	if (!(m_dma_regs.ddadr[param] & PXA255_DDADR_STOP) && (m_dma_regs.dcsr[param] & PXA255_DCSR_RUN))
+	if (!(m_dma_regs.ddadr[channel] & PXA255_DDADR_STOP) && (m_dma_regs.dcsr[channel] & PXA255_DCSR_RUN))
 	{
-		if (m_dma_regs.dcsr[param] & PXA255_DCSR_RUN)
+		if (m_dma_regs.dcsr[channel] & PXA255_DCSR_RUN)
 		{
-			dma_load_descriptor_and_start(param);
+			dma_load_descriptor_and_start(channel);
 		}
 		else
 		{
-			m_dma_regs.dcsr[param] &= ~PXA255_DCSR_RUN;
-			m_dma_regs.dcsr[param] |= PXA255_DCSR_STOPSTATE;
+			m_dma_regs.dcsr[channel] &= ~PXA255_DCSR_RUN;
+			m_dma_regs.dcsr[channel] |= PXA255_DCSR_STOPSTATE;
 		}
 	}
 	else
 	{
-		m_dma_regs.dcsr[param] &= ~PXA255_DCSR_RUN;
-		m_dma_regs.dcsr[param] |= PXA255_DCSR_STOPSTATE;
+		m_dma_regs.dcsr[channel] &= ~PXA255_DCSR_RUN;
+		m_dma_regs.dcsr[channel] |= PXA255_DCSR_STOPSTATE;
 	}
 
 	dma_irq_check();
@@ -446,6 +449,95 @@ void pxa255_periphs_device::dma_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 /*
 
+  PXA255 Real-Time Clock
+
+  pg. 132 to 138, PXA255 Processor Developers Manual [278693-002].pdf
+
+*/
+
+void pxa255_periphs_device::rtc_tick()
+{
+	m_rtc_regs.rcnr++;
+	if (BIT(m_rtc_regs.rtsr, 3))
+	{
+		m_rtc_regs.rtsr |= (1 << 1);
+		set_irq_line(PXA255_INT_RTC_HZ, 1);
+	}
+
+	if (m_rtc_regs.rcnr == m_rtc_regs.rtar)
+	{
+		if (BIT(m_rtc_regs.rtsr, 2))
+		{
+			m_rtc_regs.rtsr |= (1 << 0);
+			set_irq_line(PXA255_INT_RTC_ALARM, 1);
+		}
+	}
+}
+
+uint32_t pxa255_periphs_device::rtc_r(offs_t offset, uint32_t mem_mask)
+{
+	switch(PXA255_RTC_BASE_ADDR | (offset << 2))
+	{
+		case PXA255_RCNR:
+			LOGMASKED(LOG_RTC, "%s: pxa255 rtc_r: RTC Counter Register: %08x\n", machine().describe_context(), m_rtc_regs.rcnr);
+			return m_rtc_regs.rcnr;
+		case PXA255_RTAR:
+			LOGMASKED(LOG_RTC, "%s: pxa255 rtc_r: RTC Alarm Register: %08x\n", machine().describe_context(), m_rtc_regs.rtar);
+			return m_rtc_regs.rtar;
+		case PXA255_RTSR:
+			LOGMASKED(LOG_RTC, "%s: pxa255 rtc_r: RTC Status Register: %08x\n", machine().describe_context(), m_rtc_regs.rtsr);
+			return m_rtc_regs.rtsr;
+		case PXA255_RTTR:
+			LOGMASKED(LOG_RTC, "%s: pxa255 rtc_r: RTC Trim Register: %08x\n", machine().describe_context(), m_rtc_regs.rttr);
+			return m_rtc_regs.rttr;
+		default:
+			LOGMASKED(LOG_RTC | LOG_UNKNOWN, "pxa255 rtc_r: Unknown address: %08x\n", PXA255_RTC_BASE_ADDR | (offset << 2));
+			break;
+	}
+	return 0;
+}
+
+void pxa255_periphs_device::rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch(PXA255_RTC_BASE_ADDR | (offset << 2))
+	{
+		case PXA255_RCNR:
+			LOGMASKED(LOG_RTC, "pxa255 rtc_w: RTC Counter Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_rtc_regs.rcnr);
+			break;
+		case PXA255_RTAR:
+			LOGMASKED(LOG_RTC, "pxa255 rtc_w: RTC Alarm Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_rtc_regs.rtar);
+			break;
+		case PXA255_RTSR:
+		{
+			LOGMASKED(LOG_RTC, "pxa255 rtc_w: RTC Status Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			const uint32_t old = m_rtc_regs.rtsr;
+			m_rtc_regs.rtsr &= ~(data & 0x00000003);
+			m_rtc_regs.rtsr &= ~0x0000000c;
+			m_rtc_regs.rtsr |= data & 0x0000000c;
+			const uint32_t diff = old ^ m_rtc_regs.rtsr;
+			if (BIT(diff, 1))
+				set_irq_line(PXA255_INT_RTC_HZ, 0);
+			if (BIT(diff, 0))
+				set_irq_line(PXA255_INT_RTC_ALARM, 0);
+			break;
+		}
+		case PXA255_RTTR:
+			LOGMASKED(LOG_RTC, "pxa255 rtc_w: RTC Trim Register (not yet implemented): %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			if (!BIT(m_rtc_regs.rttr, 31))
+			{
+				COMBINE_DATA(&m_rtc_regs.rttr);
+			}
+			break;
+		default:
+			LOGMASKED(LOG_RTC | LOG_UNKNOWN, "pxa255 rtc_w: Unknown address: %08x = %08x & %08x\n", PXA255_RTC_BASE_ADDR | (offset << 2), data, mem_mask);
+			break;
+	}
+}
+
+/*
+
   PXA255 OS Timer register
 
   pg. 138 to 142, PXA255 Processor Developers Manual [278693-002].pdf
@@ -460,10 +552,10 @@ void pxa255_periphs_device::ostimer_irq_check()
 	//set_irq_line(PXA255_INT_OSTIMER3, (m_ostimer_regs.oier & PXA255_OIER_E3) ? ((m_ostimer_regs.ossr & PXA255_OSSR_M3) ? 1 : 0) : 0);
 }
 
-TIMER_CALLBACK_MEMBER(pxa255_periphs_device::ostimer_match)
+void pxa255_periphs_device::ostimer_match_tick(int channel)
 {
-	m_ostimer_regs.ossr |= (1 << param);
-	m_ostimer_regs.oscr = m_ostimer_regs.osmr[param];
+	m_ostimer_regs.ossr |= (1 << channel);
+	m_ostimer_regs.oscr = m_ostimer_regs.osmr[channel];
 	ostimer_irq_check();
 }
 
@@ -665,6 +757,77 @@ void pxa255_periphs_device::intc_w(offs_t offset, uint32_t data, uint32_t mem_ma
 
 uint32_t pxa255_periphs_device::gpio_r(offs_t offset, uint32_t mem_mask)
 {
+	const uint32_t val = (data != 0 ? 1 : 0);
+	LOGMASKED(LOG_GPIO, "pxa255: GPIO%d written: %d\n", offset, val);
+	if (offset < 32)
+	{
+		const uint32_t old = m_gpio_regs.gplr0;
+		m_gpio_regs.gplr0 &= ~(1   << offset);
+		m_gpio_regs.gplr0 |= (val << offset);
+
+		LOGMASKED(LOG_GPIO, "pxa255: Old GPLR0 %08x, New GPLR0 %08x\n", old, m_gpio_regs.gplr0);
+
+		const uint32_t rising = ~old & m_gpio_regs.gplr0;
+		const uint32_t falling = old & ~m_gpio_regs.gplr0;
+
+		LOGMASKED(LOG_GPIO, "pxa255: Rising %08x, Falling %08x\n", rising, falling);
+
+		const uint32_t old_gedr = m_gpio_regs.gedr0;
+		m_gpio_regs.gedr0 |= (rising & m_gpio_regs.grer0);
+		m_gpio_regs.gedr0 |= (falling & m_gpio_regs.gfer0);
+
+		LOGMASKED(LOG_GPIO, "pxa255: Old GEDR0 %08x, New GEDR0 %08x\n", old_gedr, m_gpio_regs.gedr0);
+		if (old_gedr != m_gpio_regs.gedr0)
+		{
+			LOGMASKED(LOG_GPIO, "pxa255: Edge detected on GPIO%d\n", offset);
+			if (offset > 1)
+				set_irq_line(PXA255_INT_GPIO84_2, 1);
+			else if (offset == 1)
+				set_irq_line(PXA255_INT_GPIO1, 1);
+			else
+				set_irq_line(PXA255_INT_GPIO0, 1);
+		}
+	}
+	else if (offset < 64)
+	{
+		const uint32_t old = m_gpio_regs.gplr1;
+		m_gpio_regs.gplr1 &= ~(1   << (offset - 32));
+		m_gpio_regs.gplr1 |= ~(val << (offset - 32));
+
+		const uint32_t rising = ~old & m_gpio_regs.gplr1;
+		const uint32_t falling = old & ~m_gpio_regs.gplr1;
+
+		const uint32_t old_gedr = m_gpio_regs.gedr1;
+		m_gpio_regs.gedr1 |= (rising & m_gpio_regs.grer1);
+		m_gpio_regs.gedr1 |= (falling & m_gpio_regs.gfer1);
+		if (old_gedr != m_gpio_regs.gedr1)
+		{
+			LOGMASKED(LOG_GPIO, "pxa255: Edge detected on GPIO%d\n", offset);
+			set_irq_line(PXA255_INT_GPIO84_2, 1);
+		}
+	}
+	else if (offset < 85)
+	{
+		const uint32_t old = m_gpio_regs.gplr2;
+		m_gpio_regs.gplr2 &= ~(1   << (offset - 64));
+		m_gpio_regs.gplr2 |= ~(val << (offset - 64));
+
+		const uint32_t rising = ~old & m_gpio_regs.gplr2;
+		const uint32_t falling = old & ~m_gpio_regs.gplr2;
+
+		const uint32_t old_gedr = m_gpio_regs.gedr2;
+		m_gpio_regs.gedr2 |= (rising & m_gpio_regs.grer2);
+		m_gpio_regs.gedr2 |= (falling & m_gpio_regs.gfer2);
+		if (old_gedr != m_gpio_regs.gedr2)
+		{
+			LOGMASKED(LOG_GPIO, "pxa255: Edge detected on GPIO%d\n", offset);
+			set_irq_line(PXA255_INT_GPIO84_2, 1);
+		}
+	}
+}
+
+uint32_t pxa255_periphs_device::gpio_r(offs_t offset, uint32_t mem_mask)
+{
 	switch(PXA255_GPIO_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_GPLR0:
@@ -844,17 +1007,39 @@ void pxa255_periphs_device::gpio_w(offs_t offset, uint32_t data, uint32_t mem_ma
 			m_gpio_regs.gfer2 = data;
 			break;
 		case PXA255_GEDR0:
+		{
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Edge Detect Status Register 0: %08x & %08x\n", m_gpio_regs.gedr0, mem_mask);
+			const uint32_t old = m_gpio_regs.gedr0;
 			m_gpio_regs.gedr0 &= ~data;
+			const uint32_t lowered = old & ~m_gpio_regs.gedr0;
+			if (BIT(lowered, 0))
+				set_irq_line(PXA255_INT_GPIO0, 0);
+			else if (BIT(lowered, 1))
+				set_irq_line(PXA255_INT_GPIO1, 0);
+			else if ((lowered & 0xfffffffc) && !m_gpio_regs.gedr0 && !m_gpio_regs.gedr1 && !m_gpio_regs.gedr2)
+				set_irq_line(PXA255_INT_GPIO84_2, 0);
 			break;
+		}
 		case PXA255_GEDR1:
+		{
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Edge Detect Status Register 1: %08x & %08x\n", m_gpio_regs.gedr1, mem_mask);
+			const uint32_t old = m_gpio_regs.gedr1;
 			m_gpio_regs.gedr1 &= ~data;
+			const uint32_t lowered = old & !m_gpio_regs.gedr1;
+			if (lowered && !m_gpio_regs.gedr0 && !m_gpio_regs.gedr1 && !m_gpio_regs.gedr2)
+				set_irq_line(PXA255_INT_GPIO84_2, 0);
 			break;
+		}
 		case PXA255_GEDR2:
+		{
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Edge Detect Status Register 2: %08x & %08x\n", m_gpio_regs.gedr2, mem_mask);
+			const uint32_t old = m_gpio_regs.gedr2;
 			m_gpio_regs.gedr2 &= ~data;
+			const uint32_t lowered = old & !m_gpio_regs.gedr2;
+			if (lowered && !m_gpio_regs.gedr0 && !m_gpio_regs.gedr1 && !m_gpio_regs.gedr2)
+				set_irq_line(PXA255_INT_GPIO84_2, 0);
 			break;
+		}
 		case PXA255_GAFR0_L:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Alternate Function Register 0 Lower: %08x & %08x\n", m_gpio_regs.gafr0l, mem_mask);
 			m_gpio_regs.gafr0l = data;
@@ -987,15 +1172,15 @@ void pxa255_periphs_device::lcd_check_load_next_branch(int channel)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pxa255_periphs_device::lcd_dma_eof)
+void pxa255_periphs_device::lcd_dma_eof_tick(int channel)
 {
 	LOGMASKED(LOG_LCD_DMA, "End of frame callback\n" );
-	if(m_lcd_regs.dma[param].ldcmd & PXA255_LDCMD_EOFINT)
+	if(m_lcd_regs.dma[channel].ldcmd & PXA255_LDCMD_EOFINT)
 	{
-		m_lcd_regs.liidr = m_lcd_regs.dma[param].fidr;
+		m_lcd_regs.liidr = m_lcd_regs.dma[channel].fidr;
 		m_lcd_regs.lcsr |= PXA255_LCSR_EOF;
 	}
-	lcd_check_load_next_branch(param);
+	lcd_check_load_next_branch(channel);
 	lcd_irq_check();
 }
 
@@ -1168,20 +1353,182 @@ void pxa255_periphs_device::lcd_w(address_space &space, offs_t offset, uint32_t 
 	}
 }
 
+uin32_t pxa255_periphs_device::power_r(offs_t offset, uint32_t mem_mask)
+{
+	switch(PXA255_POWER_BASE_ADDR | (offset << 2))
+	{
+		case PXA255_PMCR:
+			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Control Register: %08x\n", machine().describe_context(), m_power_regs.pmcr);
+			return m_power_regs.pmcr;
+		case PXA255_PSSR:
+			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Sleep Status Register: %08x\n", machine().describe_context(), m_power_regs.pssr);
+			return m_power_regs.pssr;
+		case PXA255_PSPR:
+			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Scratch Pad Register: %08x\n", machine().describe_context(), m_power_regs.pspr);
+			return m_power_regs.pspr;
+		case PXA255_PWER:
+			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Wake-up Enable Register: %08x\n", machine().describe_context(), m_power_regs.pwer);
+			return m_power_regs.pwer;
+		case PXA255_PRER:
+			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager GPIO Rising-Edge Detect Enable Register: %08x\n", machine().describe_context(), m_power_regs.prer);
+			return m_power_regs.prer;
+		case PXA255_PFER:
+			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager GPIO Falling-Edge Detect Enable Register: %08x\n", machine().describe_context(), m_power_regs.pfer);
+			return m_power_regs.pfer;
+		case PXA255_PEDR:
+			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager GPIO Edge Detect Status Register: %08x\n", machine().describe_context(), m_power_regs.pedr);
+			return m_power_regs.pedr;
+		case PXA255_PCFR:
+			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager General Configuration Register: %08x\n", machine().describe_context(), m_power_regs.pcfr);
+			return m_power_regs.pcfr;
+		case PXA255_PGSR0:
+			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager GPIO Sleep State Register for GP[31-0]: %08x\n", machine().describe_context(), m_power_regs.pgsr0);
+			return m_power_regs.pgsr0;
+		case PXA255_PGSR1:
+			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager GPIO Sleep State Register for GP[63-32]: %08x\n", machine().describe_context(), m_power_regs.pgsr1);
+			return m_power_regs.pgsr1;
+		case PXA255_PGSR2:
+			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager GPIO Sleep State Register for GP[84-64]: %08x\n", machine().describe_context(), m_power_regs.pgsr2);
+			return m_power_regs.pgsr2;
+		case PXA255_RCSR:
+			LOGMASKED(LOG_POWER, "%s: power_r: Reset Controller Status Register: %08x\n", machine().describe_context(), m_power_regs.rcsr);
+			return m_power_regs.rcsr;
+		case PXA255_PMFW:
+			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Fast Sleep Walk-Up Configuration Register: %08x\n", machine().describe_context(), m_power_regs.pmfw);
+			return m_power_regs.pmfw;
+		default:
+			LOGMASKED(LOG_POWER | LOG_UNKNOWN, "%s: power_r: Unknown address: %08x\n", machine().describe_context(), PXA255_POWER_BASE_ADDR | (offset << 2));
+			break;
+	}
+	return 0;
+}
+
+void pxa255_periphs_device::power_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch(PXA255_POWER_BASE_ADDR | (offset << 2))
+	{
+		case PXA255_PMCR:
+			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Control Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_power_regs.pmcr);
+			break;
+		case PXA255_PSSR:
+			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Sleep Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			m_power_regs.pssr &= ~(data & 0x00000037);
+			break;
+		case PXA255_PSPR:
+			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Scratch Pad Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_power_regs.pspr);
+			break;
+		case PXA255_PWER:
+			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Wake-Up Enable Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_power_regs.pwer);
+			break;
+		case PXA255_PRER:
+			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Rising-Edge Detect Enable Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_power_regs.prer);
+			break;
+		case PXA255_PFER:
+			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Falling-Edge Detect Enable Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_power_regs.pfer);
+			break;
+		case PXA255_PEDR:
+			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager GPIO Edge Detect Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			m_power_regs.pedr &= ~(data & 0x0000ffff);
+			break;
+		case PXA255_PCFR:
+			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager General Configuration Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_power_regs.pcfr);
+			break;
+		case PXA255_PGSR0:
+			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager GPIO Sleep State Register 0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_power_regs.pgsr0);
+			break;
+		case PXA255_PGSR1:
+			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager GPIO Sleep State Register 1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_power_regs.pgsr1);
+			break;
+		case PXA255_PGSR2:
+			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager GPIO Sleep State Register 2 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_power_regs.pgsr2);
+			break;
+		case PXA255_PMFW:
+			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Fast Sleep Walk-Up Configuration Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_power_regs.pmfw);
+			break;
+		default:
+			LOGMASKED(LOG_POWER | LOG_UNKNOWN, "%s: power_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), PXA255_POWER_BASE_ADDR | (offset << 2),
+				data, mem_mask);
+			break;
+	}
+}
+
+/*
+  PXA255 Clock controller
+
+  pg. 96 to 100, PXA255 Processor Developers Manual [278693-002].pdf
+
+*/
+
+uint32_t pxa255_periphs_device::clocks_r(offs_t offset, uint32_t mem_mask)
+{
+	switch(PXA255_CLOCKS_BASE_ADDR | (offset << 2))
+	{
+		case PXA255_CCCR:
+			LOGMASKED(LOG_CLOCKS, "%s: clocks_r: Core Clock Configuration Register: %08x\n", machine().describe_context(), m_clocks_regs.cccr);
+			return m_clocks_regs.cccr;
+		case PXA255_CKEN:
+			LOGMASKED(LOG_CLOCKS, "%s: clocks_r: Clock Enable Register: %08x\n", machine().describe_context(), m_clocks_regs.cken);
+			return m_clocks_regs.cken;
+		case PXA255_OSCC:
+			LOGMASKED(LOG_CLOCKS, "%s: clocks_r: Oscillator Configuration Register: %08x\n", machine().describe_context(), m_clocks_regs.oscc);
+			return BIT(m_clocks_regs.oscc, 0);
+		default:
+			LOGMASKED(LOG_CLOCKS | LOG_UNKNOWN, "%s: clocks_r: Unknown address: %08x\n", machine().describe_context(), PXA255_CLOCKS_BASE_ADDR | (offset << 2));
+			break;
+	}
+	return 0;
+}
+
+void pxa255_periphs_device::clocks_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch(PXA255_CLOCKS_BASE_ADDR | (offset << 2))
+	{
+		case PXA255_CCCR:
+			LOGMASKED(LOG_CLOCKS, "%s: clocks_w: Core Clock Configuration Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_clocks_regs.cccr);
+			break;
+		case PXA255_CKEN:
+			LOGMASKED(LOG_CLOCKS, "%s: clocks_w: Clock Enable Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_clocks_regs.cken);
+			break;
+		case PXA255_OSCC:
+			LOGMASKED(LOG_CLOCKS, "%s: clocks_w: Oscillator Configuration Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			if (BIT(data, 1))
+			{
+				m_clocks_regs.oscc |= 0x00000003;
+			}
+			break;
+		default:
+			LOGMASKED(LOG_CLOCKS | LOG_UNKNOWN, "%s: clocks_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), PXA255_CLOCKS_BASE_ADDR | (offset << 2),
+				data, mem_mask);
+			break;
+	}
+}
+
 void pxa255_periphs_device::device_start()
 {
 	for (int index = 0; index < 16; index++)
 	{
-		m_dma_regs.timer[index] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pxa255_periphs_device::dma_dma_end),this));
+		m_dma_regs.timer[index] = timer_alloc(TIMER_DMA0 + index);
 	}
 
 	for (int index = 0; index < 4; index++)
 	{
-		m_ostimer_regs.timer[index] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pxa255_periphs_device::ostimer_match),this));
+		m_ostimer_regs.timer[index] = timer_alloc(TIMER_OSTIMER0 + index);
 	}
 
-	m_lcd_regs.dma[0].eof = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pxa255_periphs_device::lcd_dma_eof),this));
-	m_lcd_regs.dma[1].eof = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pxa255_periphs_device::lcd_dma_eof),this));
+	m_lcd_regs.dma[0].eof = timer_alloc(TIMER_LCD_EOF0);
+	m_lcd_regs.dma[1].eof = timer_alloc(TIMER_LCD_EOF0 + 1);
 
 	m_lcd_palette = make_unique_clear<uint32_t[]>(0x100);
 	m_lcd_framebuffer = make_unique_clear<uint8_t[]>(0x100000);
@@ -1194,6 +1541,8 @@ void pxa255_periphs_device::device_start()
 	m_gpio0_r.resolve_safe(0xffffffff);
 	m_gpio1_r.resolve_safe(0xffffffff);
 	m_gpio2_r.resolve_safe(0xffffffff);
+
+	m_rtc_regs.timer = timer_alloc(TIMER_RTC);
 }
 
 void pxa255_periphs_device::device_reset()
@@ -1203,10 +1552,31 @@ void pxa255_periphs_device::device_reset()
 		m_dma_regs.dcsr[index] = 0x00000008;
 	}
 
+	m_rtc_regs.rcnr = 0x00000000;
+	m_rtc_regs.rtar = 0x00000000;
+	m_rtc_regs.rtsr = 0x00000000;
+	m_rtc_regs.rttr = 0x00007fff;
+	m_rtc_regs.timer->adjust(attotime::from_hz(1));
+
 	memset(&m_intc_regs, 0, sizeof(m_intc_regs));
 
 	m_lcd_regs.trgbr = 0x00aa5500;
 	m_lcd_regs.tcr = 0x0000754f;
+
+	memset(&m_power_regs, 0, sizeof(m_power_regs));
+	memset(&m_clocks_regs, 0, sizeof(m_clocks_regs));
+}
+
+void pxa255_periphs_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id < TIMER_OSTIMER0)
+		dma_end_tick(id);
+	else if (id < TIMER_LCD_EOF0)
+		ostimer_match_tick(id - TIMER_OSTIMER0);
+	else if (id < TIMER_RTC)
+		lcd_dma_eof_tick(id - TIMER_LCD_EOF0);
+	else if (id == TIMER_RTC)
+		rtc_tick();
 }
 
 uint32_t pxa255_periphs_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

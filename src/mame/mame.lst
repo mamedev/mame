@@ -42066,6 +42066,7 @@ zapcomp                         // (1981) ZAP computer - Z80 Applications Proces
 
 @source:zaurus.cpp
 zsl5500                         // Sharp Zaurus SL-5500 "Collie"
+zslc500                         // Sharp Zaurus SL-C500
 zsl5600                         // Sharp Zaurus SL-5600 / SL-B500 "Poodle"
 zslc1000                        // Sharp Zaurus SL-C1000 "Akita"
 zslc3000                        // Sharp Zaurus SL-C3000 "Spitz"
