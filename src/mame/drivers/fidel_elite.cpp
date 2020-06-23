@@ -35,6 +35,7 @@ hardware overview:
 
 *In West Germany, some distributors released it with overclocked CPUs,
 advertised as 3.2, 3.6, or 4MHz. Unmodified EAS PCB photos show only a 3MHz XTAL.
+Though model EAS-C(Glasgow) had a 4MHz XTAL
 
 A condensator/battery keeps RAM contents alive for a while when powered off.
 Note that EAS doesn't have a "new game" button, it is done through game options:
@@ -108,9 +109,14 @@ public:
 	// machine configs
 	void pc(machine_config &config);
 	void eas(machine_config &config);
+	void easc(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	void set_cpu_freq();
 
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
@@ -166,6 +172,20 @@ void elite_state::machine_start()
 	save_item(NAME(m_speech_bank));
 }
 
+void elite_state::machine_reset()
+{
+	set_cpu_freq();
+	fidel_clockdiv_state::machine_reset();
+}
+
+void elite_state::set_cpu_freq()
+{
+	// known official CPU speeds: 3MHz(EAS/EAS-B?), 3.57MHz(PC/Privat), 4MHz(PC/EAS-C)
+	u8 inp = ioport("FAKE")->read();
+	m_maincpu->set_unscaled_clock((inp & 2) ? 4_MHz_XTAL : ((inp & 1) ? 3.579545_MHz_XTAL : 3_MHz_XTAL));
+	div_refresh();
+}
+
 // EAG
 
 class eag_state : public elite_state
@@ -183,6 +203,9 @@ public:
 
 	void init_eag2100();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	// address maps
 	void eag_map(address_map &map);
@@ -192,6 +215,12 @@ private:
 void eag_state::init_eag2100()
 {
 	m_rombank->configure_entries(0, 4, memregion("rombank")->base(), 0x2000);
+}
+
+void eag_state::machine_reset()
+{
+	fidel_clockdiv_state::machine_reset();
+	m_rombank->set_entry(0);
 }
 
 
@@ -381,10 +410,26 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, switch_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x00, "3MHz" )
+	PORT_CONFSETTING(    0x01, "3.57MHz" )
+	PORT_CONFSETTING(    0x02, "4MHz" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( easc )
+	PORT_INCLUDE( eas )
+
+	PORT_MODIFY("FAKE") // default to 4MHz
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, switch_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x00, "3MHz" )
+	PORT_CONFSETTING(    0x01, "3.57MHz" )
+	PORT_CONFSETTING(    0x02, "4MHz" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc )
-	PORT_INCLUDE( eas )
+	PORT_INCLUDE( easc )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") // led display still says - G C -
@@ -450,12 +495,11 @@ void elite_state::pc(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
 
-void elite_state::eas(machine_config &config)
+void elite_state::easc(machine_config &config)
 {
 	pc(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(3_MHz_XTAL);
 	m_mainmap->set_addrmap(AS_PROGRAM, &elite_state::eas_map);
 
 	I8255(config, m_ppi8255); // port B: input, port A & C: output
@@ -469,6 +513,12 @@ void elite_state::eas(machine_config &config)
 	m_board->set_nvram_enable(true);
 
 	config.set_default_layout(layout_fidel_eas);
+}
+
+void elite_state::eas(machine_config &config)
+{
+	easc(config);
+	m_maincpu->set_clock(3_MHz_XTAL);
 }
 
 void eag_state::eag(machine_config &config)
@@ -568,7 +618,7 @@ ROM_START( feasgla )
 	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
-ROM_START( feasglaa )
+ROM_START( feasglaa ) // model EAS-C
 	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("orange", 0x8000, 0x0800, CRC(32784e2d) SHA1(dae060a5c49cc1993a78db293cd80464adfd892d) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
@@ -795,9 +845,9 @@ ROM_END
 
 //    YEAR  NAME       PARENT CMP MACHINE   INPUT  STATE        INIT          COMPANY, FULLNAME, FLAGS
 CONS( 1983, feasbu,    0,      0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, feasgla,   feasbu, 0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, feasglaa,  feasbu, 0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, feasglab,  feasbu, 0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, feasgla,   feasbu, 0, easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, feasglaa,  feasbu, 0, easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, feasglab,  feasbu, 0, easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 
 CONS( 1982, fpres,     0,      0, pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 CONS( 1983, fpresbu,   fpres,  0, pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
