@@ -7762,9 +7762,10 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ボンバーマン ぱにっくボンバー" />
 		<info name="release" value="19950405" />
+		<!-- was mislabeled as hldrun clone -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="panicbom.d88" size="1281968" crc="f972bd7b" sha1="5eb1125a2b1906b66b05f9da91bf9e4e7767032f" offset="0" />
+				<rom name="loderun.d88" size="1281968" crc="7c3e3f7e" sha1="3df6f8d37240b2af4ac01da2d6d7efd6c61c9bdf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -22919,24 +22920,27 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<software name="hldrun">
+		<!-- remake, converted to DOS 3.30, has original ldrun levels + extra mode -->
 		<description>Hozonban Lode Runner</description>
 		<year>1989</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="保存版ロードランナー" />
 		<info name="release" value="198907xx" />
+		<!-- was mislabeled as panicbom -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="loderun.d88" size="1281968" crc="7c3e3f7e" sha1="3df6f8d37240b2af4ac01da2d6d7efd6c61c9bdf" offset="0" />
+				<rom name="panicbom.d88" size="1281968" crc="f972bd7b" sha1="5eb1125a2b1906b66b05f9da91bf9e4e7767032f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="hldruna" cloneof="hldrun">
-		<description>Hozonban Lode Runner (Alt)</description>
-		<year>1989</year>
+	<software name="ldrun" cloneof="hldrun">
+		<!-- original version, compiled in N88-Basic 2.0 -->
+		<description>Lode Runner</description>
+		<year>1983</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
-		<info name="alt_title" value="保存版ロードランナー" />
-		<info name="release" value="198907xx" />
+		<info name="alt_title" value="ロードランナー" />
+		<info name="release" value="1983xxxx" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1086448">
 				<rom name="lode runner.d88" size="1086448" crc="e5f804b6" sha1="d2b6241fbc6f15f1fba791ae6d6260653a6140af" offset="0" />
