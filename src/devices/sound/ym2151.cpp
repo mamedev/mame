@@ -1583,7 +1583,7 @@ void ym2151_device::advance()
 	while (noise_p >= noise_f)
 	{
 		uint32_t j;
-		j = (BIT(noise_rng, 0) ^ BIT(noise_rng, 3)) ^ 1;
+		j = ( (noise_rng ^ (noise_rng>>3) ) & 1) ^ 1;
 		noise_rng = (j<<16) | (noise_rng>>1);
 		noise_p -= noise_f;
 	}
