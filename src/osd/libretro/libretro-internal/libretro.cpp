@@ -42,6 +42,7 @@ char RPATH[512];
 static char option_mouse[50];
 static char option_lightgun[50];
 static char option_cheats[50];
+static char option_overclock[50];
 static char option_renderer[50];
 static char option_osd[50];
 static char option_cli[50];
@@ -68,6 +69,7 @@ const char *retro_content_directory;
 retro_log_printf_t log_cb;
 
 static bool draw_this_frame;
+static int cpu_overclock = 100;
 
 //FIXME: re-add way to handle 16/32 bit
 #ifdef M16B
@@ -142,6 +144,7 @@ void retro_set_environment(retro_environment_t cb)
    sprintf(option_mouse, "%s_%s", core, "mouse_enable");
    sprintf(option_lightgun, "%s_%s", core, "lightgun_mode");
    sprintf(option_cheats, "%s_%s", core, "cheats_enable");
+   sprintf(option_overclock, "%s_%s", core, "cpu_overclock");
    sprintf(option_renderer,"%s_%s",core,"alternate_renderer");
    sprintf(option_osd,"%s_%s",core,"boot_to_osd");
    sprintf(option_bios,"%s_%s",core,"boot_to_bios");
@@ -170,6 +173,7 @@ void retro_set_environment(retro_environment_t cb)
     { option_buttons_profiles, "Profile Buttons according to games (Restart); enabled|disabled" },
     { option_throttle, "Enable throttle; disabled|enabled" },
     { option_cheats, "Enable cheats; disabled|enabled" },
+    { option_overclock, "Main CPU Overclock; default|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|60|65|70|75|80|85|90|95|100|105|110|115|120|125|130|135|140|145|150" },
     { option_renderer, "Alternate render method; disabled|enabled" },
 
     { option_softlist, "Enable softlists; enabled|disabled" },
@@ -189,6 +193,24 @@ void retro_set_environment(retro_environment_t cb)
    environ_cb = cb;
 
    cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void*)vars);
+}
+
+static void update_runtime_variables(void)
+{
+   // update CPU Overclock
+   if (mame_machine_manager::instance() != NULL && mame_machine_manager::instance()->machine() != NULL)
+   {
+      device_iterator iter(mame_machine_manager::instance()->machine()->root_device());
+      for (device_t &device : iter)
+      {
+         if (dynamic_cast<cpu_device *>(&device) != nullptr)
+         {
+            cpu_device* firstcpu = downcast<cpu_device *>(&device);
+            firstcpu->set_clock_scale((float)cpu_overclock * 0.01f);
+            break;
+         }
+      }
+   }
 }
 
 static void check_variables(void)
@@ -307,6 +329,16 @@ video_changed=true;
          cheats_enable = false;
       if (!strcmp(var.value, "enabled"))
          cheats_enable = true;
+   }
+
+   var.key   = option_overclock;
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      cpu_overclock = 100;
+      if (strcmp(var.value, "default"))
+        cpu_overclock = atoi(var.value);
    }
 
    var.key   = option_renderer;
@@ -629,7 +661,10 @@ void retro_run (void)
    bool updated = false;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
+   {
       check_variables();
+      update_runtime_variables();
+   }
 
    static int mfirst=1;
    if(mfirst==1)
@@ -640,6 +675,7 @@ void retro_run (void)
       if(res==0 || res==-2)exit(0);
       if (log_cb)log_cb(RETRO_LOG_INFO,"MAIN FIRST\n");
       retro_load_ok=true;
+      update_runtime_variables();
       return;
    }
 
