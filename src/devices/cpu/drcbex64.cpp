@@ -2695,7 +2695,7 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 
 		// default cases
 		default:
-			a.pushfq();                                                                 // pushf
+			a.pushf();                                                                  // pushf
 			a.pop(eax);                                                                 // pop    eax
 			a.and_(eax, flagmask);                                                      // and    eax,flagmask
 			a.movzx(dstreg, byte_ptr(rbp, rax, 0, offset_from_rbp(&m_near.flagsmap[0]))); // movzx  dstreg,[flags_map]
@@ -2730,7 +2730,7 @@ void drcbe_x64::op_save(Assembler &a, const instruction &inst)
 	emit_mov_r64_imm(a, rcx, (uintptr_t)dstp.memory());                                 // mov    rcx,dstp
 
 	// copy flags
-	a.pushfq();                                                                         // pushf
+	a.pushf();                                                                          // pushf
 	a.pop(rax);                                                                         // pop    rax
 	a.and_(eax, 0x8c5);                                                                 // and    eax,0x8c5
 	a.mov(al, ptr(rbp, rax, 0, offset_from_rbp(&m_near.flagsmap[0])));                  // mov    al,[flags_map]
@@ -2826,7 +2826,7 @@ void drcbe_x64::op_restore(Assembler &a, const instruction &inst)
 	// copy flags
 	a.movzx(eax, byte_ptr(rcx, offsetof(drcuml_machine_state, flags)));                 // movzx  eax,state->flags
 	a.push(ptr(rbp, rax, 3, offset_from_rbp(&m_near.flagsunmap[0])));                   // push   flags_unmap[eax*8]
-	a.popfq();                                                                          // popf
+	a.popf();                                                                           // popf
 }
 
 
@@ -4038,7 +4038,7 @@ void drcbe_x64::op_mulu(Assembler &a, const instruction &inst)
 			if (zsflags != 0)
 			{
 				if (vflag)
-					a.pushfq();                                                         // pushf
+					a.pushf();                                                          // pushf
 				if (compute_hi)
 				{
 					if (zsflags == FLAG_Z)
@@ -4059,11 +4059,11 @@ void drcbe_x64::op_mulu(Assembler &a, const instruction &inst)
 				// we rely on the fact that OF is cleared by all logical operations above
 				if (vflag)
 				{
-					a.pushfq();                                                         // pushf
+					a.pushf();                                                          // pushf
 					a.pop(rax);                                                         // pop   rax
 					a.and_(qword_ptr(rsp), ~0x84);                                      // and   [rsp],~0x84
 					a.or_(ptr(rsp), rax);                                               // or    [rsp],rax
-					a.popfq();                                                          // popf
+					a.popf();                                                           // popf
 				}
 			}
 		}
@@ -4093,7 +4093,7 @@ void drcbe_x64::op_mulu(Assembler &a, const instruction &inst)
 			if (zsflags != 0)
 			{
 				if (vflag)
-					a.pushfq();                                                         // pushf
+					a.pushf();                                                          // pushf
 				if (compute_hi)
 				{
 					if (zsflags == FLAG_Z)
@@ -4114,11 +4114,11 @@ void drcbe_x64::op_mulu(Assembler &a, const instruction &inst)
 				// we rely on the fact that OF is cleared by all logical operations above
 				if (vflag)
 				{
-					a.pushfq();                                                         // pushf
+					a.pushf();                                                          // pushf
 					a.pop(rax);                                                         // pop   rax
 					a.and_(qword_ptr(rsp), ~0x84);                                      // and   [rsp],~0x84
 					a.or_(ptr(rsp), rax);                                               // or    [rsp],rax
-					a.popfq();                                                          // popf
+					a.popf();                                                           // popf
 				}
 			}
 		}
@@ -4197,7 +4197,7 @@ void drcbe_x64::op_muls(Assembler &a, const instruction &inst)
 			if (zsflags != 0)
 			{
 				if (vflag)
-					a.pushfq();                                                         // pushf
+					a.pushf();                                                          // pushf
 				if (compute_hi)
 				{
 					if (zsflags == FLAG_Z)
@@ -4218,11 +4218,11 @@ void drcbe_x64::op_muls(Assembler &a, const instruction &inst)
 				// we rely on the fact that OF is cleared by all logical operations above
 				if (vflag)
 				{
-					a.pushfq();                                                         // pushf
+					a.pushf();                                                          // pushf
 					a.pop(rax);                                                         // pop   rax
 					a.and_(qword_ptr(rsp), ~0x84);                                      // and   [rsp],~0x84
 					a.or_(ptr(rsp), rax);                                               // or    [rsp],rax
-					a.popfq();                                                          // popf
+					a.popf();                                                           // popf
 				}
 			}
 		}
@@ -4277,7 +4277,7 @@ void drcbe_x64::op_muls(Assembler &a, const instruction &inst)
 			if (zsflags != 0)
 			{
 				if (vflag)
-					a.pushfq();                                                         // pushf
+					a.pushf();                                                          // pushf
 				if (compute_hi)
 				{
 					if (zsflags == FLAG_Z)
@@ -4298,11 +4298,11 @@ void drcbe_x64::op_muls(Assembler &a, const instruction &inst)
 				// we rely on the fact that OF is cleared by all logical operations above
 				if (vflag)
 				{
-					a.pushfq();                                                         // pushf
+					a.pushf();                                                          // pushf
 					a.pop(rax);                                                         // pop   rax
 					a.and_(qword_ptr(rsp), ~0x84);                                      // and   [rsp],~0x84
 					a.or_(ptr(rsp), rax);                                               // or    [rsp],rax
-					a.popfq();                                                          // popf
+					a.popf();                                                           // popf
 				}
 			}
 		}
