@@ -58,7 +58,7 @@ public:
 
 	void outputString(bx::WriterI* _writer)
 	{
-		const char* data = (const char*)m_mb.more(0);
+		const uint8_t* data = (const uint8_t*)m_mb.more(0);
 		uint32_t size = uint32_t(bx::seek(&m_mw) );
 
 		bx::Error err;
@@ -77,7 +77,7 @@ public:
 
 			for (uint32_t ii = 0; ii < size; ++ii)
 			{
-				char ch = data[ii];
+				const char ch = char(data[ii]);
 
 				if (!escaped)
 				{
@@ -113,7 +113,7 @@ public:
 #define HEX_DUMP_WIDTH 16
 #define HEX_DUMP_SPACE_WIDTH 96
 #define HEX_DUMP_FORMAT "%-" BX_STRINGIZE(HEX_DUMP_SPACE_WIDTH) "." BX_STRINGIZE(HEX_DUMP_SPACE_WIDTH) "s"
-		const char* data = (const char*)m_mb.more(0);
+		const uint8_t* data = (const uint8_t*)m_mb.more(0);
 		uint32_t size = uint32_t(bx::seek(&m_mw) );
 
 		bx::Error err;
