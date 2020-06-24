@@ -122,7 +122,7 @@ void dinaris_state::dice_io(address_map &map)
 	map(0x08, 0x0b).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 }
 
-// borrowed from Specialist MX, probably wrong and expected to be the cause of visual glitches
+// borrowed from Specialist MX, probably wrong
 static constexpr rgb_t specimx_pens[16] = {
 	{ 0x00, 0x00, 0x00 }, // 0
 	{ 0x00, 0x00, 0xaa }, // 1
@@ -154,9 +154,12 @@ u32 dinaris_state::screen_update_dice(screen_device &screen, bitmap_ind16 &bitma
 		for (int y = 0; y < 256; y++)
 		{
 			u8 const code = m_vram[0x0000 + y + x * 256];
-			u8 const color = m_vram[0x4000 + y + x * 256];
-			for (int b = 7; b >= 0; b--)
-				bitmap.pix16(y, x * 8 + (7 - b)) = BIT(code, b) ? (color & 0xf) : (color >> 4);
+			u8 const color1 = m_vram[0x4000 + (y & 0xfe) + x * 256];
+			u8 const color2 = m_vram[0x4000 + (y | 0x01) + x * 256];
+			for (int b = 7; b >= 4; b--)
+				bitmap.pix16(y, x * 8 + (7 - b)) = BIT(code, b) ? (color1 & 0xf) : (color1 >> 4);
+			for (int b = 3; b >= 0; b--)
+				bitmap.pix16(y, x * 8 + (7 - b)) = BIT(code, b) ? (color2 & 0xf) : (color2 >> 4);
 		}
 	}
 	return 0;
@@ -214,4 +217,4 @@ ROM_START(dindice)
 	ROM_LOAD( "27256.bin", 0x0000, 0x8000, CRC(511f8ba8) SHA1(e75a2cab80ac6b08a19d1adb8ba9bb321aa5e7a8))
 ROM_END
 
-GAME( 199?, dindice, 0,    dice,     dice,     dinaris_state, empty_init, ROT0,  "Dinaris",   "Dice game", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_GRAPHICS)
+GAME( 199?, dindice, 0,    dice,     dice,     dinaris_state, empty_init, ROT0,  "Dinaris",   "Dice game", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_COLORS)
