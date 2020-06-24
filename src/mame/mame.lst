@@ -22219,6 +22219,11 @@ mekd5                           // 1980 Motorola Evaluation Kit
 crzyddz2                        // 2006 Sealy
 menghong                        // 2004? Sealy
 
+@source:mephisto_academy.cpp
+academy
+academyg
+academyga
+
 @source:mephisto_berlin.cpp
 berl16                          // 1992 Mephisto Berlin 68000
 berl16a                         // 1992 Mephisto Berlin 68000
@@ -22326,9 +22331,6 @@ polgar10                        // 1990 Mephisto Polgar 10MHz
 polgar101                       // 1990 Mephisto Polgar 10MHz
 mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
-academy                         // 1989 Mephisto Academy
-academyg                        // 1989 Mephisto Academy
-academyga                       // 1989 Mephisto Academy
 milano                          // 1991 Mephisto Milano
 milanoa                         // 1991 Mephisto Milano
 nshort                          // 1993 Mephisto Nigel Short

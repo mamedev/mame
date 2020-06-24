@@ -592,16 +592,16 @@ Notes:
 
 - bosco: there appears to be a bug in the code at 0BB1, which handles communication
   with the 06XX custom chip. First it saves in A' the command to write, then if a
-  transfer is still in progress it jups to 0BC1, does other things, then restores
+  transfer is still in progress it jumps to 0BC1, does other things, then restores
   the command from A' and stores it in RAM. At that point (0BE1) it checks again if
-  a transfer is in progress. If the trasnfer has terminated, it jumps to 0BEB, which
+  a transfer is in progress. If the transfer has terminated, it jumps to 0BEB, which
   restores the command from RAM, and jumps back to 0BBA to send the command. However,
   the instruction at 0BBA is ex af,af', so the command is overwritten with garbage.
   There's also an exx at 0BBB which seems unnecessary but that's harmless.
   Anyway, what this bug means is that we must make sure that the 06XX generates NMIs
   quickly enough to ensure that 0BB1 is usually not called with a transfer still is
-    progress. It doesn't seem possible to prevent it altogether though, so we can only
-    hope that the transfer doesn't terminate in the middle of the function.
+  progress. It doesn't seem possible to prevent it altogether though, so we can only
+  hope that the transfer doesn't terminate in the middle of the function.
 
 - bosco: we have two dumps of the sound shape ROM, "prom.1d" and "bosco.spr". Music
   changes a lot from one version to the other.
