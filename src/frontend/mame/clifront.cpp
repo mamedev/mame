@@ -1739,6 +1739,6 @@ void cli_frontend::display_help(const char *exename)
 			"        %s -showconfig   to show your current %s.ini\n"
 			"        %s -listmedia    for a full list of supported media\n"
 			"        %s -createconfig to create a %s.ini\n\n"
-			"For usage instructions, please consult the files config.txt and windows.txt.\n",exename,
+			"For usage instructions, please visit https://docs.mamedev.org \n",exename,
 			exename,emulator_info::get_configname(),exename,exename,emulator_info::get_configname());
 }
