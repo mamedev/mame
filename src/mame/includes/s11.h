@@ -47,6 +47,7 @@ public:
 		, m_ym(*this, "ym2151")
 		, m_bg(*this, "bgm")
 		, m_digits(*this, "digit%u", 0U)
+		, m_swarray(*this, "SW.%u", 0U)
 		{ }
 
 	void s11(machine_config &config);
@@ -111,6 +112,7 @@ protected:
 	optional_device<ym2151_device> m_ym;
 	optional_device<s11c_bg_device> m_bg;
 	output_finder<63> m_digits;
+	required_ioport_array<8> m_swarray;
 
 	// getters/setters
 	uint8_t get_strobe() { return m_strobe; }
@@ -131,7 +133,7 @@ private:
 
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
-	uint8_t m_kbdrow;
+	uint8_t m_switch_col;
 	uint8_t m_diag;
 	uint32_t m_segment1;
 	uint32_t m_segment2;
