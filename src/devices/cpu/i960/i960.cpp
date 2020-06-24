@@ -92,10 +92,11 @@ void i960_cpu_device::send_iac(uint32_t adr)
 
 	switch(iac[0]>>24) {
 	case 0x40:  // generate irq
+		logerror("I960: %x: IAC %08x %08x %08x %08x (generate IRQ)\n", m_PIP, iac[0], iac[1], iac[2], iac[3]);
 		break;
 	case 0x41:  // test for pending interrupts
-		// check_irqs() seems to take care of this
-		// though it may not be entirely accurate
+		logerror("I960: %x: IAC %08x %08x %08x %08x (test for pending interrupts)\n", m_PIP, iac[0], iac[1], iac[2], iac[3]);
+		// check_irqs() seems to take care of this though it may not be entirely accurate
 		check_irqs();
 		break;
 	case 0x80:  // store SAT & PRCB in memory
@@ -103,14 +104,18 @@ void i960_cpu_device::send_iac(uint32_t adr)
 		m_program.write_dword(iac[1]+4, m_PRCB);
 		break;
 	case 0x89:  // invalidate internal instruction cache
+		logerror("I960: %x: IAC %08x %08x %08x %08x (invalidate internal instruction cache)\n", m_PIP, iac[0], iac[1], iac[2], iac[3]);
 		// we do not emulate the instruction cache, so this is safe to ignore
 		break;
 	case 0x8F:  // enable/disable breakpoints
+		logerror("I960: %x: IAC %08x %08x %08x %08x (enable/disable breakpoints)\n", m_PIP, iac[0], iac[1], iac[2], iac[3]);
 		// processor breakpoints are not emulated, safe to ignore
 		break;
 	case 0x91:  // stop processor
+		logerror("I960: %x: IAC %08x %08x %08x %08x (stop processor)\n", m_PIP, iac[0], iac[1], iac[2], iac[3]);
 		break;
 	case 0x92:  // continue initialization
+		logerror("I960: %x: IAC %08x %08x %08x %08x (continue initialization)\n", m_PIP, iac[0], iac[1], iac[2], iac[3]);
 		break;
 	case 0x93: // reinit
 		m_SAT  = iac[1];
