@@ -620,7 +620,7 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY           FULLNAME           FLAGS
-COMP( 1982, grid1101, 0,        0,      grid1101, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1101",    MACHINE_TYPE_COMPUTER | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_CONTROLS | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_LAN )
+COMP( 1982, grid1101, 0,        0,      grid1101, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1101",    MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_CONTROLS | MACHINE_NODEVICE_WAN )
 COMP( 1982, grid1109, grid1101, 0,      grid1109, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1109",    MACHINE_IS_SKELETON )
 COMP( 1984, grid1121, 0,        0,      grid1121, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1121", MACHINE_IS_SKELETON )
 COMP( 1984, grid1129, grid1121, 0,      grid1129, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1129", MACHINE_IS_SKELETON )
