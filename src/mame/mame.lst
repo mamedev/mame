@@ -37436,6 +37436,9 @@ specialm                        //
 specialp                        //
 specimx                         //
 
+@source:special_gambl.cpp
+dindice                         //
+
 @source:specpls3.cpp
 sp3e8bit                        // 2002 ZX Spectrum +3e 8bit IDE
 sp3eata                         // 2002 ZX Spectrum +3e ZXATASP
