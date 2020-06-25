@@ -16,6 +16,8 @@
     - homelab2 - cassette to fix.
                  Note that rom code 0x40-48 is meaningless garbage,
                  had to patch to stop it crashing. Need a new dump.
+               - The speaker code is wrong, but it's the only way to
+                 get any sound. Needs to be looked at again.
     - homelab3/4 - Need a dump of the TM188 prom.
                  cassette to fix.
                  up to 64k ram can be fitted. schematic only shows 16k.
@@ -35,9 +37,9 @@ MB7051 - fuse programmed prom.
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "sound/dac.h"
 #include "sound/mea8000.h"
-#include "sound/volt_reg.h"
+#include "sound/spkrdev.h"
+#include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -51,7 +53,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
-		, m_dac(*this, "dac")
+		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
 		, m_io_keyboard(*this, "X%d", 0)
 	{ }
@@ -64,7 +66,7 @@ protected:
 	u8 m_cols;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
-	required_device<dac_bit_interface> m_dac;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	required_ioport_array<16> m_io_keyboard;
 };
@@ -82,10 +84,13 @@ private:
 	void machine_start() override;
 	INTERRUPT_GEN_MEMBER(homelab_frame);
 	void homelab2_mem(address_map &map);
-	u8 key_r(offs_t offset);
-	void cass_w(offs_t offset, u8 data);
 	u8 cass2_r();
 	bool m_nmi;
+	bool m_spr_bit;
+	u8 mem3800_r();
+	u8 mem3a00_r(offs_t);
+	void mem3c00_w(offs_t, u8);
+	void mem3e00_w(offs_t, u8);
 };
 
 class homelab3_state : public homelab_state
@@ -120,42 +125,43 @@ INTERRUPT_GEN_MEMBER(homelab2_state::homelab_frame)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-u8 homelab2_state::key_r(offs_t offset) // offset 27F-2FE
+u8 homelab2_state::mem3800_r()
 {
-	if (offset == 0x38) // 0x3838
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		return 0;
-	}
+	return m_io_keyboard[15]->read();  // reset key
+}
 
+u8 homelab2_state::mem3a00_r(offs_t offset)
+{
 	u8 i,data = 0xff;
 
 	for (i=0; i<8; i++)
-	{
 		if (!BIT(offset, i))
-		{
 			data &= m_io_keyboard[i]->read();
-		}
-	}
 
 	return data;
 }
 
-u8 homelab2_state::cass2_r()
+void homelab2_state::mem3c00_w(offs_t offset, u8 data)
 {
-	return (m_cass->input() > 0.03) ? 0xff : 0;
+	m_spr_bit ^= 1;
+	m_speaker->level_w(m_spr_bit? -1.0 : +1.0);
+	m_cass->output(m_spr_bit ? -1.0 : +1.0);
 }
 
-void homelab2_state::cass_w(offs_t offset, u8 data)
+void homelab2_state::mem3e00_w(offs_t offset, u8 data)
 {
-	if (offset == 0x73f) // 0x3f3f
+	if (BIT(offset, 8))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		m_nmi = true;
+	}
 	else
-	if (offset == 0x63e) // 0x3e3e
 		m_nmi = false;
-	else
-	if (offset == 0x400) // 0x3c00
-		m_cass->output(BIT(data, 0) ? -1.0 : +1.0); // FIXME
+}
+
+u8 homelab2_state::cass2_r()
+{
+	return (m_cass->input() > 0.03) ? 0x37 : 0;
 }
 
 void homelab3_state::machine_reset()
@@ -191,21 +197,20 @@ u8 homelab3_state::exxx_r(offs_t offset)
 	else
 	if (offset == 0x80)
 	{
-		m_dac->write(0);
+		m_speaker->level_w(0);
 		m_cass->output(-1.0);
 	}
 	else
 	if (offset == 0x02)
 	{
-		m_dac->write(1);
+		m_speaker->level_w(1);
 		m_cass->output(+1.0);
 	}
 
 	u8 data = 0xff;
 	if (offset < 0x10)
-	{
 		data = m_io_keyboard[offset]->read();
-	}
+
 	return data;
 }
 
@@ -220,10 +225,13 @@ void homelab2_state::homelab2_mem(address_map &map)
 	map(0x2000, 0x27ff).rom();  // ROM 5
 	map(0x2800, 0x2fff).rom();  // ROM 6
 	map(0x3000, 0x37ff).rom();  // Empty
-	map(0x3800, 0x3fff).rw(FUNC(homelab2_state::key_r), FUNC(homelab2_state::cass_w));
+	map(0x3800, 0x39ff).r(FUNC(homelab2_state::mem3800_r));
+	map(0x3a00, 0x3bff).r(FUNC(homelab2_state::mem3a00_r));
+	map(0x3c00, 0x3dff).w(FUNC(homelab2_state::mem3c00_w));
+	map(0x3e00, 0x3fff).w(FUNC(homelab2_state::mem3e00_w));
 	map(0x4000, 0x7fff).ram();
-	map(0xc000, 0xc3ff).lr8(NAME([this] (offs_t offset) { return m_vram[offset]; })).lw8(NAME([this] (offs_t offset, u8 data) { m_vram[offset]=data; }));
-	map(0xe000, 0xe0ff).r(FUNC(homelab2_state::cass2_r));
+	map(0xc000, 0xc3ff).mirror(0xc00).lr8(NAME([this] (offs_t offset) { return m_vram[offset]; })).lw8(NAME([this] (offs_t offset, u8 data) { m_vram[offset]=data; }));
+	map(0xe000, 0xffff).r(FUNC(homelab2_state::cass2_r));
 }
 
 void homelab3_state::homelab3_mem(address_map &map)
@@ -262,7 +270,7 @@ void homelab3_state::brailab4_io(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( homelab2 )
 	PORT_START("X0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT) //PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -351,7 +359,8 @@ static INPUT_PORTS_START( homelab2 )
 	PORT_START("X14")
 	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_START("X15")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0xFE, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( homelab3 ) // F4 to F8 are foreign characters
@@ -371,7 +380,7 @@ static INPUT_PORTS_START( homelab3 ) // F4 to F8 are foreign characters
 
 	PORT_START("X2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM)   PORT_VBLANK("screen")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ALT") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -484,7 +493,7 @@ static INPUT_PORTS_START( brailab4 ) // F4 to F8 are foreign characters
 
 	PORT_START("X2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM)   PORT_VBLANK("screen")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ALT") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -583,6 +592,7 @@ INPUT_PORTS_END
 void homelab2_state::machine_start()
 {
 	save_item(NAME(m_nmi));
+	save_item(NAME(m_spr_bit));
 	save_item(NAME(m_rows));
 	save_item(NAME(m_cols));
 	m_vram = make_unique_clear<u8[]>(0x800);
@@ -765,13 +775,11 @@ void homelab2_state::homelab2(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	CASSETTE(config, m_cass);
-	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab2_state::quickload_cb));
 }
@@ -796,13 +804,12 @@ void homelab3_state::homelab3(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	CASSETTE(config, m_cass);
-	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+
 	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab3_state::quickload_cb));
 }
 
@@ -811,7 +818,7 @@ void homelab3_state::brailab4(machine_config &config)
 	homelab3(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &homelab3_state::brailab4_mem);
 	m_maincpu->set_addrmap(AS_IO, &homelab3_state::brailab4_io);
-	MEA8000(config, "mea8000", 3840000).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MEA8000(config, "mea8000", 3840000).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -819,52 +826,61 @@ void homelab3_state::brailab4(machine_config &config)
 
 ROM_START( homelab2 )
 	ROM_REGION( 0x3800, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "hl2_1.rom", 0x0000, 0x0800, BAD_DUMP CRC(205365f7) SHA1(da93b65befd83513dc762663b234227ba804124d))
-	ROM_LOAD( "hl2_2.rom", 0x0800, 0x0800, CRC(696af3c1) SHA1(b53bc6ae2b75975618fc90e7181fa5d21409fce1))
-	ROM_LOAD( "hl2_3.rom", 0x1000, 0x0800, CRC(69e57e8c) SHA1(e98510abb715dbf513e1b29fb6b09ab54e9483b7))
-	ROM_LOAD( "hl2_4.rom", 0x1800, 0x0800, CRC(97cbbe74) SHA1(34f0bad41302b059322018abc3d1c2336ecfbea8))
-	ROM_LOAD( "hl2_m.rom", 0x2000, 0x0800, CRC(10040235) SHA1(e121dfb97cc8ea99193a9396a9f7af08585e0ff0) )
+	ROM_LOAD( "hl2_1.ic2", 0x0000, 0x0800, BAD_DUMP CRC(205365f7) SHA1(da93b65befd83513dc762663b234227ba804124d))
+	ROM_LOAD( "hl2_2.ic3", 0x0800, 0x0800, CRC(696af3c1) SHA1(b53bc6ae2b75975618fc90e7181fa5d21409fce1))
+	ROM_LOAD( "hl2_3.ic4", 0x1000, 0x0800, CRC(69e57e8c) SHA1(e98510abb715dbf513e1b29fb6b09ab54e9483b7))
+	ROM_LOAD( "hl2_4.ic5", 0x1800, 0x0800, CRC(97cbbe74) SHA1(34f0bad41302b059322018abc3d1c2336ecfbea8))
+	ROM_LOAD( "hl2_m.ic6", 0x2000, 0x0800, CRC(10040235) SHA1(e121dfb97cc8ea99193a9396a9f7af08585e0ff0) )
 	ROM_FILL(0x46, 1, 0x18) // fix bad code
 	ROM_FILL(0x47, 1, 0x0E)
 
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "hl2.chr",   0x0000, 0x0800, CRC(2e669d40) SHA1(639dd82ed29985dc69830aca3b904b6acc8fe54a))
+	ROM_LOAD( "hl2.ic33",  0x0000, 0x0800, CRC(2e669d40) SHA1(639dd82ed29985dc69830aca3b904b6acc8fe54a))
 	// found on net, looks like bad dump
 	//ROM_LOAD_OPTIONAL( "hl2_ch.rom", 0x0800, 0x1000, CRC(6a5c915a) SHA1(7e4e966358556c6aabae992f4c2b292b6aab59bd) )
 ROM_END
 
 ROM_START( homelab3 )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "hl3_1.rom", 0x0000, 0x1000, CRC(6b90a8ea) SHA1(8ac40ca889b8c26cdf74ca309fbafd70dcfdfbec))
-	ROM_LOAD( "hl3_2.rom", 0x1000, 0x1000, CRC(bcac3c24) SHA1(aff371d17f61cb60c464998e092f04d5d85c4d52))
-	ROM_LOAD( "hl3_3.rom", 0x2000, 0x1000, CRC(ab1b4ab0) SHA1(ad74c7793f5dc22061a88ef31d3407267ad08719))
-	ROM_LOAD( "hl3_4.rom", 0x3000, 0x1000, CRC(bf67eff9) SHA1(2ef5d46f359616e7d0e5a124df528de44f0e850b))
+	ROM_LOAD( "hl3_1.ic1", 0x0000, 0x1000, CRC(6b90a8ea) SHA1(8ac40ca889b8c26cdf74ca309fbafd70dcfdfbec) )
+	ROM_LOAD( "hl3_2.ic2", 0x1000, 0x1000, CRC(bcac3c24) SHA1(aff371d17f61cb60c464998e092f04d5d85c4d52) )
+	ROM_LOAD( "hl3_3.ic3", 0x2000, 0x1000, CRC(ab1b4ab0) SHA1(ad74c7793f5dc22061a88ef31d3407267ad08719) )
+	ROM_LOAD( "hl3_4.ic4", 0x3000, 0x1000, CRC(bf67eff9) SHA1(2ef5d46f359616e7d0e5a124df528de44f0e850b) )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "hl3.chr",   0x0000, 0x0800, CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
+	ROM_LOAD( "hl3.ic21",  0x0000, 0x0800, CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "tm188.ic7", 0x0000, 0x0040, NO_DUMP )
 ROM_END
 
 ROM_START( homelab4 )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "hl4_1.rom", 0x0000, 0x1000, CRC(a549b2d4) SHA1(90fc5595da8431616aee56eb5143b9f04281e798))
-	ROM_LOAD( "hl4_2.rom", 0x1000, 0x1000, CRC(151d33e8) SHA1(d32004bc1553f802b9d3266709552f7d5315fe44))
-	ROM_LOAD( "hl4_3.rom", 0x2000, 0x1000, CRC(39571ab1) SHA1(8470cff2e3442101e6a0bc655358b3a6fc1ef944))
-	ROM_LOAD( "hl4_4.rom", 0x3000, 0x1000, CRC(f4b77ca2) SHA1(ffbdb3c1819c7357e2a0fc6317c111a8a7ecfcd5))
+	ROM_LOAD( "hl4_1.ic1", 0x0000, 0x1000, CRC(a549b2d4) SHA1(90fc5595da8431616aee56eb5143b9f04281e798) )
+	ROM_LOAD( "hl4_2.ic2", 0x1000, 0x1000, CRC(151d33e8) SHA1(d32004bc1553f802b9d3266709552f7d5315fe44) )
+	ROM_LOAD( "hl4_3.ic3", 0x2000, 0x1000, CRC(39571ab1) SHA1(8470cff2e3442101e6a0bc655358b3a6fc1ef944) )
+	ROM_LOAD( "hl4_4.ic4", 0x3000, 0x1000, CRC(f4b77ca2) SHA1(ffbdb3c1819c7357e2a0fc6317c111a8a7ecfcd5) )
 
 	ROM_REGION( 0x0800, "chargen",0 )
-	ROM_LOAD( "hl4.chr",   0x0000, 0x0800, CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
+	ROM_LOAD( "hl4.ic21",  0x0000, 0x0800, CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "tm188.ic7", 0x0000, 0x0040, NO_DUMP )
 ROM_END
 
 ROM_START( brailab4 )
 	ROM_REGION( 0x5000, "maincpu", 0 )
-	ROM_LOAD( "brl1.rom",  0x0000, 0x1000, CRC(02323403) SHA1(3a2e853e0a39e05a04a8db58e1a76de1eda579c9))
-	ROM_LOAD( "brl2.rom",  0x1000, 0x1000, CRC(36173fbc) SHA1(1c01398e16a1cbe4103e1be769347ceae873e090))
-	ROM_LOAD( "brl3.rom",  0x2000, 0x1000, CRC(d3cdd108) SHA1(1a24e6c5f9c370ff6cb25045cb9d95e664467eb5))
-	ROM_LOAD( "brl4.rom",  0x3000, 0x1000, CRC(d4047885) SHA1(00fe40c4c2c64a49bb429fb2b27cc7e0d0025a85))
-	ROM_LOAD( "brl5.rom",  0x4000, 0x1000, CRC(8a76be04) SHA1(4b683b9be23b47117901fe874072eb7aa481e4ff))
+	ROM_LOAD( "brl1.ic1",  0x0000, 0x1000, CRC(02323403) SHA1(3a2e853e0a39e05a04a8db58e1a76de1eda579c9) )
+	ROM_LOAD( "brl2.ic2",  0x1000, 0x1000, CRC(36173fbc) SHA1(1c01398e16a1cbe4103e1be769347ceae873e090) )
+	ROM_LOAD( "brl3.ic3",  0x2000, 0x1000, CRC(d3cdd108) SHA1(1a24e6c5f9c370ff6cb25045cb9d95e664467eb5) )
+	ROM_LOAD( "brl4.ic4",  0x3000, 0x1000, CRC(d4047885) SHA1(00fe40c4c2c64a49bb429fb2b27cc7e0d0025a85) )
+	ROM_LOAD( "brl5.rom",  0x4000, 0x1000, CRC(8a76be04) SHA1(4b683b9be23b47117901fe874072eb7aa481e4ff) )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "hl4.chr",   0x0000, 0x0800, CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
+	ROM_LOAD( "hl4.ic21",  0x0000, 0x0800, CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "tm188.ic7", 0x0000, 0x0040, NO_DUMP )
 
 	// these roms were found on the net, to be investigated
 	ROM_REGION( 0x5020, "user1", 0 )
