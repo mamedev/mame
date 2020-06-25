@@ -601,7 +601,7 @@ ROM_START(pkrno_l1)
 	ROM_LOAD("white2.716",   0x1800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
 
 	ROM_REGION(0x0800, "audioroms", 0)
-	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_LOAD("488_s0_pokerino.716",   0x0000, 0x0800, CRC(5de02e62) SHA1(f838439a731511a264e508a576ae7193d9fed1af))
 ROM_END
 
 GAME( 1977, httip_l1, 0, s3,  s3, s3_state, empty_init, ROT0, "Williams", "Hot Tip (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

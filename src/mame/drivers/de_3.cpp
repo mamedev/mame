@@ -898,6 +898,23 @@ ROM_START(lw3_200)
 ROM_END
 
 /*-------------------------------------------------------------
+/ Michael Jordan - CPU Rev 3 / DMD Type 2 512K Rom - 64K CPU Rom
+/------------------------------------------------------------*/
+
+ROM_START(mj_130)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("mjcpuc5.bin", 0x0000, 0x10000, CRC(311ab1d1) SHA1(062b02aab851f9f2ca64c24b8faa7dd293cacd22))
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("mjdsp0.bin", 0x00000, 0x80000, CRC(1e2f27e8) SHA1(bfc567d6d3a7cecf7623ceb383350c78c14baef3))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("mjsndu7.bin", 0x0000, 0x10000, CRC(a32237f5) SHA1(0fc106429af320c4a30a99c67b45f44cb9a45644))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("mjsndu17.bin", 0x000000, 0x80000, CRC(8b11d7b9) SHA1(bb84b1650b253a433e947137256e4bc34a6ceac4))
+	ROM_LOAD("mjsndu21.bin", 0x080000, 0x80000, CRC(addfe20e) SHA1(3a6862640f81493da1beddca11011090d8b7cab0))
+ROM_END
+
+/*-------------------------------------------------------------
 / Star Trek - CPU Rev 3 /DMD Type 1 128K Rom - 64K CPU Rom
 /------------------------------------------------------------*/
 ROM_START(trek_201)
@@ -1362,6 +1379,7 @@ GAME(1992,  lw3_207c,  lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, 
 GAME(1992,  lw3_205,   lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Lethal Weapon 3 (2.05)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  lw3_203,   lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Lethal Weapon 3 (2.03)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  lw3_200,   lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Lethal Weapon 3 (2.00)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  mj_130,    0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Michael Jordan (1.30)",            MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  trek_201,  0,        de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Trek 25th Anniversary (2.01)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  trek_200,  trek_201, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Trek 25th Anniversary (2.00)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  trek_120,  trek_201, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Trek 25th Anniversary (1.20)",                MACHINE_IS_SKELETON_MECHANICAL)
