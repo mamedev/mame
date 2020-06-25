@@ -1,7 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Frank Palazzolo
 
 // MAME driver for Grant Searle's Simple CP/M Computer
-// http://searle.x10host.com/cpm/index.html
-// Written by Frank Palazzolo - frank@avoidspikes.com
+// http://www.searle.wales/
 
 // This driver uses a compact flash card as a hard disk device.
 // To create a virtual disk file, use the following (for a 128MB card):
