@@ -103,11 +103,6 @@ void gigatron_cpu_device::reset_cpu()
 	m_inReg = 0xFF;
 	m_outx = 0;
 	m_out = 0;
-	
-	for(uint16_t i = 0; i < m_ramMask; i++)
-	{
-		gigatron_writemem8(i, floor(machine().rand() & 0xff));
-	}
 }
 
 void gigatron_cpu_device::init()
