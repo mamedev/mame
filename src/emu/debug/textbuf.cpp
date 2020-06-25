@@ -312,7 +312,7 @@ const char *text_buffer_get_seqnum_line(text_buffer *text, u32 seqnum)
 	return &text->buffer[text->lineoffs[(text->linestart + index) % text->linesize]];
 }
 
-text_buffer_lines text_buffer_get_lines(text_buffer* text)
+text_buffer_lines text_buffer_get_lines(text_buffer *text)
 {
 	return text_buffer_lines(*text);
 }
@@ -324,13 +324,13 @@ text_buffer_lines text_buffer_get_lines(text_buffer* text)
 
 text_buffer_line text_buffer_lines::text_buffer_line_iterator::operator*() const
 {
-	const char* line = &m_buffer.buffer[m_buffer.lineoffs[m_lineptr]];
+	const char *line = &m_buffer.buffer[m_buffer.lineoffs[m_lineptr]];
 
 	auto next_lineptr = m_lineptr + 1;
 	if (next_lineptr == m_buffer.linesize)
 		next_lineptr = 0;
 
-	const char* nextline = &m_buffer.buffer[m_buffer.lineoffs[next_lineptr]];
+	const char *nextline = &m_buffer.buffer[m_buffer.lineoffs[next_lineptr]];
 
 	/* -1 for the '\0' at the end of line */
 
@@ -347,7 +347,7 @@ text_buffer_line text_buffer_lines::text_buffer_line_iterator::operator*() const
     Moves to the next line.
 -----------------------------------------------------------------------*/
 
-text_buffer_lines::text_buffer_line_iterator& text_buffer_lines::text_buffer_line_iterator::operator++()
+text_buffer_lines::text_buffer_line_iterator &text_buffer_lines::text_buffer_line_iterator::operator++()
 {
 	if (++m_lineptr == m_buffer.linesize)
 		m_lineptr = 0;
