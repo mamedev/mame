@@ -15,11 +15,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+protected:
 	uint8_t _84_porta_r();
 	void _84_porta_w(uint8_t data);
 	void _84_portc_w(uint8_t data);
 
-protected:
 	uint8_t video_color_r();
 	void video_color_w(uint8_t data);
 	uint8_t text_start_r();
