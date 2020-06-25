@@ -881,7 +881,7 @@ const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(char32_t 
 {
 	keycode_map::const_iterator const found(m_keycode_map.find(ch));
 	if (m_keycode_map.end() == found) return nullptr;
-	for(const keycode_map_entry &entry : found->second)
+	for (keycode_map_entry const &entry : found->second)
 	{
 		if (entry.condition.eval())
 			return &entry;

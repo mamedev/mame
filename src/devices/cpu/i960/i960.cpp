@@ -107,7 +107,7 @@ void i960_cpu_device::send_iac(uint32_t adr)
 		logerror("I960: %x: IAC %08x %08x %08x %08x (invalidate internal instruction cache)\n", m_PIP, iac[0], iac[1], iac[2], iac[3]);
 		// we do not emulate the instruction cache, so this is safe to ignore
 		break;
-	case 0x8F:  // enable/disable breakpoints
+	case 0x8f:  // enable/disable breakpoints
 		logerror("I960: %x: IAC %08x %08x %08x %08x (enable/disable breakpoints)\n", m_PIP, iac[0], iac[1], iac[2], iac[3]);
 		// processor breakpoints are not emulated, safe to ignore
 		break;
