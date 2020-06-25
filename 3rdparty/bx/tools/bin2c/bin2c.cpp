@@ -171,7 +171,7 @@ public:
 	bool             m_outputAsCStr;
 };
 
-void error(const bx::StringView& _format, ...)
+void error(const char* _format, ...)
 {
 	bx::WriterI* stdOut = bx::getStdOut();
 	bx::Error err;
