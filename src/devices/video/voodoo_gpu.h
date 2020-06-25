@@ -12,6 +12,8 @@
 #include <vector>
 #include <map>
 #include <queue>
+#include <sstream>
+#include <string>
 
 #include <d3d11.h>
 #include <directxcolors.h>
@@ -212,7 +214,9 @@ public:
 	void CopyBuffer(uint16_t *dst);
 	void CopyBufferComp(uint16_t *dst);
 	void CopyBufferRGB(uint8_t *dst);
-	
+	std::string SVInfo(const ShaderVertex sv);
+	std::string GpuInfo(void);
+
 	void SetFbzMode(uint32_t fbzMode);
 	void SetLfbMode(uint32_t lfbMode);
 	void SetAlphaMode(uint32_t &alphaMode);

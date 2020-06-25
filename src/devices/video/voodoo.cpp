@@ -5707,7 +5707,7 @@ void voodoo_device::device_start()
 		if (!m_gpu.InitDevice()) {
 			fatalerror("Error initialize gpu device\n");
 		}
-		if (!m_gpu.InitBuffers(640, 480)) {
+		if (!m_gpu.InitBuffers(512, 384)) {
 			fatalerror("Error setting up gpu\n");
 		}
 	}

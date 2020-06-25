@@ -460,6 +460,15 @@ bool voodoo_gpu::InitRenderBuffers(int sizeX, int sizeY, int fbiWidth)
 	if (FAILED(m_gpu->CreateDepthStencilView(m_depthBuffer, &descDSV, &m_depthView)))
 		return false;
 
+	m_updateFrameBufferCtrl = true;
+	m_updateTexCtrl = true;
+	m_updateColorCtrl = true;
+	m_updateBlendState = true;
+	m_updateAlphaTest = true;
+	m_updateDepth = true;
+	m_updateFogTable = true;
+	m_updateFogCtrl = true;
+
 	return true;
 }
 
@@ -498,19 +507,19 @@ bool voodoo_gpu::InitBuffers(int sizeX, int sizeY)
 
 	// Vertex buffer
 	ZeroMemory(&bd, sizeof(bd));
-	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.Usage = D3D11_USAGE_DYNAMIC;
 	bd.ByteWidth = sizeof(ShaderVertex) * 3 * DEPTH_TRIANGLE_BUFFER;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = 0;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	if (FAILED(m_gpu->CreateBuffer(&bd, NULL, &m_pVertexBuffer)))
 		return false;
 	
 	// Pixel buffer
 	ZeroMemory(&bd, sizeof(bd));
-	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.Usage = D3D11_USAGE_DYNAMIC;
 	bd.ByteWidth = sizeof(ShaderPoint) * DEPTH_PIXEL_BUFFER;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = 0;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	if (FAILED(m_gpu->CreateBuffer(&bd, NULL, &m_pixelBuffer)))
 		return false;
 
@@ -1182,15 +1191,25 @@ void voodoo_gpu::DrawFastFill(ShaderPoint *triangleVertices)
 	UpdateConstants();
 
 	// Copy vertex buffer over
-	D3D11_BOX pointBox;
-	pointBox.left = 0;
-	// Fast fill is always 2 vertices
-	pointBox.right = 2 * sizeof(ShaderPoint);
-	pointBox.top = 0;
-	pointBox.bottom = 1;
-	pointBox.front = 0;
-	pointBox.back = 1;
-	m_context->UpdateSubresource(m_pixelBuffer, 0, &pointBox, triangleVertices, 0, 0);
+	//D3D11_BOX pointBox;
+	//pointBox.left = 0;
+	//// Fast fill is always 2 vertices
+	//pointBox.right = 2 * sizeof(ShaderPoint);
+	//pointBox.top = 0;
+	//pointBox.bottom = 1;
+	//pointBox.front = 0;
+	//pointBox.back = 1;
+	//m_context->UpdateSubresource(m_pixelBuffer, 0, &pointBox, triangleVertices, 0, 0);
+	
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	//	Disable GPU access to the vertex buffer data.
+	m_context->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	//m_context->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mappedResource);
+	//	Update the vertex buffer here.
+	memcpy(mappedResource.pData, triangleVertices, 2 * sizeof(ShaderPoint));
+	//	Reenable GPU access to the vertex buffer data.
+	m_context->Unmap(m_pixelBuffer, 0);
 
 	//////// Pass 0 /////////
 	// Setup to draw to render buffer
@@ -1243,17 +1262,6 @@ void voodoo_gpu::DrawTriangle()
 	if (m_lfb_write_ready)
 		DrawLfbWrites();
 
-	/*
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-	//	Disable GPU access to the vertex buffer data.
-	m_context->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	//	Update the vertex buffer here.
-	memcpy(mappedResource.pData, vertices, sizeof(vertices));
-	//	Reenable GPU access to the vertex buffer data.
-	m_context->Unmap(m_pVertexBuffer, 0);
-	*/
-
 	// Check to see if we are in the right mode
 	if (m_renderMode != TRIANGLE)
 	{
@@ -1275,14 +1283,25 @@ void voodoo_gpu::DrawTriangle()
 	UpdateConstants();
 
 	// Copy vertex buffer over
-	D3D11_BOX pointBox;
-	pointBox.left = 0;
-	pointBox.right = m_trianglePoints.size() * sizeof(ShaderVertex);
-	pointBox.top = 0;
-	pointBox.bottom = 1;
-	pointBox.front = 0;
-	pointBox.back = 1;
-	m_context->UpdateSubresource(m_pVertexBuffer, 0, &pointBox, m_trianglePoints.data(), 0, 0);
+	//D3D11_BOX pointBox;
+	//pointBox.left = 0;
+	//pointBox.right = m_trianglePoints.size() * sizeof(ShaderVertex);
+	//pointBox.top = 0;
+	//pointBox.bottom = 1;
+	//pointBox.front = 0;
+	//pointBox.back = 1;
+	//m_context->UpdateSubresource(m_pVertexBuffer, 0, &pointBox, m_trianglePoints.data(), 0, 0);
+	
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	//	Disable GPU access to the vertex buffer data.
+	m_context->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	//m_context->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mappedResource);
+	//	Update the vertex buffer here.
+	memcpy(mappedResource.pData, m_trianglePoints.data(), m_trianglePoints.size() * sizeof(ShaderVertex));
+	//	Reenable GPU access to the vertex buffer data.
+	m_context->Unmap(m_pVertexBuffer, 0);
+	
 
 	//////// Pass 0 /////////
 	// Setup to draw to render buffer
@@ -1358,14 +1377,24 @@ void voodoo_gpu::DrawPixels()
 	UpdateConstants();
 
 	// Copy pixel point buffer over
-	D3D11_BOX pointBox;
-	pointBox.left = 0;
-	pointBox.right = m_pixelPoints.size() * sizeof(ShaderPoint);
-	pointBox.top = 0;
-	pointBox.bottom = 1;
-	pointBox.front = 0;
-	pointBox.back = 1;
-	m_context->UpdateSubresource(m_pixelBuffer, 0, &pointBox, m_pixelPoints.data(), 0, 0);
+	//D3D11_BOX pointBox;
+	//pointBox.left = 0;
+	//pointBox.right = m_pixelPoints.size() * sizeof(ShaderPoint);
+	//pointBox.top = 0;
+	//pointBox.bottom = 1;
+	//pointBox.front = 0;
+	//pointBox.back = 1;
+	//m_context->UpdateSubresource(m_pixelBuffer, 0, &pointBox, m_pixelPoints.data(), 0, 0);
+
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	//	Disable GPU access to the vertex buffer data.
+	m_context->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	//m_context->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mappedResource);
+	//	Update the vertex buffer here.
+	memcpy(mappedResource.pData, m_pixelPoints.data(), m_pixelPoints.size() * sizeof(ShaderPoint));
+	//	Reenable GPU access to the vertex buffer data.
+	m_context->Unmap(m_pixelBuffer, 0);
 
 	//////// Pass 0 /////////
 	// Setup to draw to render buffer
@@ -1436,14 +1465,24 @@ void voodoo_gpu::DrawLfbWrites()
 	UpdateConstants();
 
 	// Copy pixel point buffer over
-	D3D11_BOX pointBox;
-	pointBox.left = 0;
-	pointBox.right = m_lfbWritePoints.size() * sizeof(ShaderPoint);
-	pointBox.top = 0;
-	pointBox.bottom = 1;
-	pointBox.front = 0;
-	pointBox.back = 1;
-	m_context->UpdateSubresource(m_pixelBuffer, 0, &pointBox, m_lfbWritePoints.data(), 0, 0);
+	//D3D11_BOX pointBox;
+	//pointBox.left = 0;
+	//pointBox.right = m_lfbWritePoints.size() * sizeof(ShaderPoint);
+	//pointBox.top = 0;
+	//pointBox.bottom = 1;
+	//pointBox.front = 0;
+	//pointBox.back = 1;
+	//m_context->UpdateSubresource(m_pixelBuffer, 0, &pointBox, m_lfbWritePoints.data(), 0, 0);
+
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	//	Disable GPU access to the vertex buffer data.
+	m_context->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	//m_context->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mappedResource);
+	//	Update the vertex buffer here.
+	memcpy(mappedResource.pData, m_lfbWritePoints.data(), m_lfbWritePoints.size() * sizeof(ShaderPoint));
+	//	Reenable GPU access to the vertex buffer data.
+	m_context->Unmap(m_pixelBuffer, 0);
 
 	//////// Pass 0 /////////
 	// Setup to draw to render buffer
@@ -1622,7 +1661,6 @@ void voodoo_gpu::CopyBuffer(uint16_t *dst)
 
 	D3D11_TEXTURE2D_DESC desc;
 	m_stageTexture->GetDesc(&desc);
-
 	m_context->CopyResource(m_stageTexture, m_compTexture);
 
 	D3D11_MAPPED_SUBRESOURCE resource;
@@ -1656,7 +1694,8 @@ void voodoo_gpu::CopyBuffer(uint16_t *dst)
 			//dst[h * m_hVis + elem] = rgb16;
 			dst[elem] = rgb16;
 			//if ((elem < 2) && (h < 2))
-			//	printf("x: %d y: %d pix: %4x\n", elem, int(h), rgb16);
+			//	printf("(%d, %d)=%4x ", elem, int(h), rgb16);
+			//if (elem == 2 && h == 2) printf("\n");
 		}
 		dst += desc.Width;
 		//dst += rowPixels;
@@ -1664,6 +1703,44 @@ void voodoo_gpu::CopyBuffer(uint16_t *dst)
 
 	m_context->Unmap(m_stageTexture, 0);
 	delete[] dptr;
+}
+
+std::string voodoo_gpu::SVInfo(const ShaderVertex sv)
+{
+	std::stringstream str;
+	//str << "col: ";
+	//str << " " << sv.Col.w;
+	//str << " " << sv.Col.x;
+	//str << " " << sv.Col.y;
+	//str << " " << sv.Col.z;
+	str << "pos: ";
+	str << " " << sv.Pos.w;
+	str << " " << sv.Pos.x;
+	str << " " << sv.Pos.y;
+	str << " " << sv.Pos.z;
+	return str.str();
+}
+
+std::string voodoo_gpu::GpuInfo(void)
+{
+	std::stringstream str;
+	if (m_trianglePoints.size() >= 3)
+	{
+		str << "TriaP: " << m_trianglePoints.size();
+		str << " " << SVInfo(m_trianglePoints[0]);
+		str << " " << SVInfo(m_trianglePoints[1]);
+		str << " " << SVInfo(m_trianglePoints[2]);
+		str << " updateColorCtrl: " << m_updateColorCtrl;
+		str << " FbzMode: " << std::hex << m_regFbzMode;
+		str << " LfbMode: " << std::hex << m_regLfbMode;
+		str << " FbzColorPath: " << std::hex << m_regFbzColorPath;
+		str << " color0: " << std::hex << m_regColor0;
+		str << " color1: " << std::hex << m_regColor1;
+		str << " AlphaMode: " << std::hex << m_regAlphaMode;
+		str << " TexMode0: " << std::hex << m_regTexMode[0];
+		str << " TexMode1: " << std::hex << m_regTexMode[1];
+	}
+	return str.str();
 }
 
 void voodoo_gpu::CopyBufferRGB(uint8_t *dst)
