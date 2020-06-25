@@ -13038,6 +13038,7 @@ emma2                           // 1979 L.J.Technical Systems
 emu2                            //
 
 @source:emu3.cpp
+emax2                           //
 emu3                            //
 
 @source:enigma2.cpp
