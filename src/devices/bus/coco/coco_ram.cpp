@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "coco_ram.h"
-#include "cococart.h"
+
 #include "machine/ram.h"
 
 #define STATICRAM_TAG   "static_ram"
@@ -53,7 +53,7 @@ namespace
 
 	private:
 		required_device<ram_device>             m_staticram;
-		int                                     m_offset;
+		u32                                     m_offset;
 	};
 };
 
@@ -126,19 +126,19 @@ void coco_pak_ram_device::scs_write(offs_t offset, u8 data)
 {
 //  int idata = data;
 
-	switch(offset)
+	switch (offset)
 	{
 		case 0:
-			m_offset = ((m_offset & 0xffff00) + data);
+			m_offset = (m_offset & 0xffff00) | u32(data);
 			break;
 		case 1:
-			m_offset = ((m_offset & 0xff00ff) + (data << 8));
+			m_offset = (m_offset & 0xff00ff) | (u32(data) << 8);
 			break;
 		case 2:
-			m_offset = ((m_offset & 0x00ffff) + (data << 16));
+			m_offset = (m_offset & 0x00ffff) | (u32(data) << 16);
 			break;
 		case 3:
-			if( m_offset < BUFFER_SIZE )
+			if (m_offset < BUFFER_SIZE)
 			{
 				m_staticram->write(m_offset, data);
 			}
@@ -161,20 +161,19 @@ u8 coco_pak_ram_device::scs_read(offs_t offset)
 	switch (offset)
 	{
 		case 0:
-			data = (m_offset) & 0xff;
+			data = u8(m_offset & 0x00ff);
 			break;
 		case 1:
-			data = (m_offset & 0xff00ff) >> 8;
+			data = u8((m_offset >> 8) & 0x00ff);
 			break;
 		case 2:
-			data = (m_offset & 0xff0000) >> 16;
+			data = u8((m_offset >> 16) & 0x00ff);
 			break;
 		case 3:
-			if( m_offset < BUFFER_SIZE )
+			if (m_offset < BUFFER_SIZE)
 			{
 				data = m_staticram->read(m_offset);
 			}
-
 			break;
 	}
 
