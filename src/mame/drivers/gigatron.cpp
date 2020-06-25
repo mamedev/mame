@@ -42,11 +42,6 @@ private:
 
 	uint16_t lights_changed;
 
-	uint8_t gigatron_random()
-	{
-		return machine().rand() & 0xff;
-	}
-
 	void blinkenlights(uint8_t data);
 	uint8_t inputs();
 
