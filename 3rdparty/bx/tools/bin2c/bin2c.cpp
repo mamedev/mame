@@ -27,19 +27,20 @@ public:
 
 	virtual int32_t write(const void* _data, int32_t _size, bx::Error* _err) override
 	{
-		m_outputAsCStr = true;
+		bool asCStr = true;
 
 		const char* data = (const char*)_data;
-		for (int32_t ii = 0; ii < _size; ++ii)
+		for (int32_t ii = 0; ii < _size && asCStr; ++ii)
 		{
 			char ch = data[ii];
-			if (!bx::isPrint(ch)
-			&&  !bx::isSpace(ch) )
-			{
-				m_outputAsCStr = false;
-				break;
-			}
+
+			asCStr &= false
+				| bx::isPrint(ch)
+				| bx::isSpace(ch)
+				;
 		}
+
+		m_outputAsCStr = asCStr;
 
 		return bx::write(&m_mw, _data, _size, _err);
 	}
@@ -170,6 +171,19 @@ public:
 	bool             m_outputAsCStr;
 };
 
+void error(const bx::StringView& _format, ...)
+{
+	bx::WriterI* stdOut = bx::getStdOut();
+	bx::Error err;
+
+	va_list argList;
+	va_start(argList, _format);
+	bx::write(stdOut, &err, "Error:\n");
+	bx::write(stdOut, _format, argList, &err);
+	bx::write(stdOut, &err, "\n\n");
+	va_end(argList);
+}
+
 void help(const char* _error = NULL)
 {
 	bx::WriterI* stdOut = bx::getStdOut();
@@ -177,7 +191,7 @@ void help(const char* _error = NULL)
 
 	if (NULL != _error)
 	{
-		bx::write(stdOut, &err, "Error:\n%s\n\n", _error);
+		error(_error);
 	}
 
 	bx::write(stdOut, &err
@@ -250,8 +264,18 @@ int main(int _argc, const char* _argv[])
 			writer.output(&fw);
 			bx::close(&fw);
 		}
+		else
+		{
+			bx::StringView path = outFilePath;
+			error("Failed to open output file '%.*s'.\n", path.getLength(), path.getPtr() );
+		}
 
 		BX_FREE(&allocator, data);
+	}
+	else
+	{
+		bx::StringView path = filePath;
+		error("Failed to open input file '%.*s'.\n", path.getLength(), path.getPtr() );
 	}
 
 	return 0;
