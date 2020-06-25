@@ -2268,7 +2268,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 				case 0x18:  /* NEG */
 					m_dst = 0;
 					m_src = tmp;
-					SUBB();
+					set_CFB(SUBB());
 					PutbackRMByte(m_dst);
 					CLKM(NEGNOT_R8,NEGNOT_M8);
 					break;
@@ -2358,7 +2358,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 				case 0x18:  /* NEG */
 					m_dst = 0;
 					m_src = tmp;
-					SUBX();
+					set_CFW(SUBX());
 					PutbackRMWord(m_dst);
 					CLKM(NEGNOT_R16,NEGNOT_M16);
 					break;
