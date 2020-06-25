@@ -2667,6 +2667,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/kawai_k5.cpp",
 	MAME_DIR .. "src/mame/drivers/kawai_ksp10.cpp",
 	MAME_DIR .. "src/mame/drivers/kawai_r100.cpp",
+	MAME_DIR .. "src/mame/drivers/kawai_sx240.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "kaypro")

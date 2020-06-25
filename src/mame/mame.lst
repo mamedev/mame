@@ -18670,6 +18670,9 @@ ksp10                           //
 @source:kawai_r100.cpp
 r100                            //
 
+@source:kawai_sx240.cpp
+sx240                           //
+
 @source:kaypro.cpp
 kaypro1                         // Kaypro 1
 kaypro10                        // Kaypro 10/83
